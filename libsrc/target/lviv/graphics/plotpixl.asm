@@ -1,8 +1,8 @@
 
-	SECTION	code_himem
+    SECTION code_himem
 
-	PUBLIC	plotpixel
+    PUBLIC  plotpixel
 
-.plotpixel
-        defc    NEEDplot = 1
-        INCLUDE "target/lviv/graphics/pixel.inc"
+plotpixel:
+    defc    NEEDplot=1
+    INCLUDE "target/lviv/graphics/pixel.inc"

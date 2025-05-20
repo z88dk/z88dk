@@ -12,8 +12,8 @@
 ;        c = failure
 generic_console_vpeek:
     call    generic_console_xypos
-    ld      c,l
-    ld      b,h
-    in      a,(c)
+    ld      c, l
+    ld      b, h
+    in      a, (c)
     and     a
     ret

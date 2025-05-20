@@ -148,6 +148,10 @@ extern void __LIB__ hrg_on();
 extern void __LIB__ hrg_tune_left();
 extern void __LIB__ hrg_tune_right();
 
+// Invert the current TV frames phase when
+// interlaced 384 rows mode is in use
+extern void __LIB__ hrg_phase();
+
 // Hides the HRG screen making the zx81 run faster!
 extern void __LIB__ zx_blank();
 // Shows the HRG screen back

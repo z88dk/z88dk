@@ -1,7 +1,9 @@
 
 
-        SECTION bss_graphics
-        PUBLIC  __gfx_fatpix
+    SECTION bss_graphics
+    PUBLIC  __gfx_fatpix
+
+    EXTERN  CLIB_GFX_FATPIX
 
 __gfx_fatpix:
-        defb    0
+    defb    CLIB_GFX_FATPIX

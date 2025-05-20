@@ -1,0 +1,227 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func0
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func1
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	call	l_inclong
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	call	l_inclong
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func2a
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	call	l_inclong
+	call	lp_gint
+	push	hl
+	call	_callit
+	pop	bc
+	ret
+
+
+
+._func2b
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	call	l_inclong
+	call	lp_glong
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func3
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,7
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	push	de
+	push	hl
+	ld	hl,10	;const
+	exx
+	pop	hl
+	pop	de
+	exx
+	call	lp_pchar
+	ret
+
+
+
+._func4
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,10
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func5
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,15
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	call	lp_gint
+	push	hl
+	call	_callit
+	pop	bc
+	ret
+
+
+
+._func5a
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,15
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	call	lp_gint
+	call	l_glong
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func6
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,17
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	call	lp_gptr
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func6a
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,17
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	call	lp_gptr
+	call	lp_glong
+	push	de
+	push	hl
+	call	_callit
+	pop	bc
+	pop	bc
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_callit
+	GLOBAL	_func
+	GLOBAL	_func0
+	GLOBAL	_func1
+	GLOBAL	_func2
+	GLOBAL	_func2a
+	GLOBAL	_func2b
+	GLOBAL	_func3
+	GLOBAL	_func4
+	GLOBAL	_func5
+	GLOBAL	_func5a
+	GLOBAL	_func6
+	GLOBAL	_func6a
+
+
+
+

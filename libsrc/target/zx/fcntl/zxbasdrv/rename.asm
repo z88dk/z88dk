@@ -10,34 +10,34 @@
 ;
 ; $Id: rename.asm,v 1.5 2016-06-23 20:40:25 dom Exp $
 
-	SECTION code_clib
-	PUBLIC	rename
-	PUBLIC	_rename
-	PUBLIC	___rename
+    SECTION code_clib
+    PUBLIC  rename
+    PUBLIC  _rename
+    PUBLIC  ___rename
 
-	EXTERN	zx_setstr
-	EXTERN	zx_goto
-	EXTERN	zxgetfname
+    EXTERN  zx_setstr
+    EXTERN  zx_goto
+    EXTERN  zxgetfname
 
-.rename
-._rename
-.___rename
-	pop	bc
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	push	bc
+rename:
+_rename:
+___rename:
+    pop     bc
+    pop     de
+    pop     hl
+    push    hl
+    push    de
+    push    bc
 
-	push	de
+    push    de
 
-	call	zxgetfname	; HL points to old name and drive specification
-	
-	ld	h,0
-	ld	l,'O'		; O$
-	call	zx_setstr
-	pop	de
+    call    zxgetfname                  ; HL points to old name and drive specification
 
-	ld	hl,7950		; BASIC routine for "rename"
-	jp	zx_goto
+    ld      h, 0
+    ld      l, 'O'                      ; O$
+    call    zx_setstr
+    pop     de
+
+    ld      hl, 7950                    ; BASIC routine for "rename"
+    jp      zx_goto
 

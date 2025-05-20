@@ -30,12 +30,13 @@
 	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
 
-	PUBLIC	cleanup		; used by exit()
+	PUBLIC	crt0_exit		; used by exit()
 	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
 	PUBLIC	cpygraph	; TI calc specific stuff
 	PUBLIC	tidi		;
 	PUBLIC	tiei		;
+	PUBLIC	__Exit
 
 ;-------------------------
 ; Begin of (shell) headers
@@ -269,15 +270,11 @@ IF ZASMLOAD
 	call	_runIndicOff	; stop anoing run-indicator
 ENDIF
 	ld	(__restore_sp_onexit+1),sp
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-	ld	(exitsp),sp
+        INCLUDE "crt/classic/crt_init_sp.inc"
+	call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-
+	INCLUDE "crt/classic/crt_init_heap.inc"
 
 	EXTERN	fputc_cons
 	ld	hl,12
@@ -301,7 +298,7 @@ ENDIF
 
 	im	2
 	call	_main
-cleanup:			; exit() jumps to this point
+__Exit:			; exit() jumps to this point
 __restore_sp_onexit:
     ld	sp,0		; writeback
 	ld	iy,_IY_TABLE	; Restore flag-pointer
@@ -381,8 +378,8 @@ ENDIF
 			 defc ansicolumns = 32
 		ENDIF
 		
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-        INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+        INCLUDE "crt/classic/crt_section.inc"
 
         SECTION code_crt_init
         ld      hl,plotSScreen

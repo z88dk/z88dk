@@ -13,6 +13,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "codearea.h"
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "init.h"
@@ -78,7 +79,7 @@ static long _calc_divide(long a, long b)
 {
 	if (b == 0)
 	{
-		error_division_by_zero();	/* BUG_0040 */
+        error(ErrDivisionByZero, NULL);	/* BUG_0040 */
 		return 0;
 	}
 
@@ -89,7 +90,7 @@ static long _calc_mod(long a, long b)
 {
 	if (b == 0)
 	{
-		error_division_by_zero();	/* BUG_0040 */
+        error(ErrDivisionByZero, NULL);	/* BUG_0040 */
 		return 0;
 	}
 
@@ -290,7 +291,7 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 			{
 				expr->result.undefined_symbol = true;
 				if (not_defined_error)
-					error_undefined_symbol(self->d.symbol->name);
+                    error(ErrUndefinedSymbol, self->d.symbol->name);
 			}
 
 			Calc_push(0);
@@ -410,6 +411,7 @@ static bool Expr_parse_ternary_cond(Expr1* expr);
 static bool Expr_parse_factor(Expr1* self)
 {
 	Symbol1* symptr;
+    const char* short_name, * long_name;
 
 	switch (sym.tok)
 	{
@@ -423,14 +425,15 @@ static bool Expr_parse_factor(Expr1* self)
 		break;
 
 	case TK_NAME:
-		symptr = get_used_symbol(sym_text(&sym));
+        short_name = spool_add(sym_text(&sym));
+        long_name = local_labels_use_label(short_name);
+        symptr = get_used_symbol(long_name);
+        ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops), symptr);
 
-		ExprOp_init_symbol(ExprOpArray_push(self->rpn_ops),
-			symptr);
+        /* copy type */
+        self->type = MAX(self->type, symptr->type);
 
-		/* copy type */
-		self->type = MAX(self->type, symptr->type);
-		Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
+		Str_append(self->text, long_name);      /* add identifier to infix expr */
 
 		GetSym();
 		break;
@@ -605,7 +608,7 @@ Expr1* expr_parse(void) {
 	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
-		error_syntax_error_in_expression();
+        error(ErrSyntaxExpr, NULL);
 
 		OBJ_DELETE(self);
 		self = NULL;
@@ -627,6 +630,7 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 	self->result.undefined_symbol = false;
 	self->result.extern_symbol = false;
 	self->result.cross_section_addr = false;
+    self->result.has_local_symbol = false;
 
 	self->is_computed = true;
 
@@ -658,7 +662,7 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 	}
 
 	/* need to downgrade to CONSTANT if it is the difference of two addresses */
-	if (Expr_is_addr_diff(self))
+	if (self->type >= TYPE_ADDRESS && Expr_is_addr_diff(self))
 		self->type = TYPE_CONSTANT;
 
 	/* need to upgrade to TYPE_COMPUTED if it contains more than one address */
@@ -740,7 +744,7 @@ bool Expr_without_addresses(Expr1* self)
 			num_addresses++;
 			break;
 
-		case NUMBER_OP:
+        case NUMBER_OP:
 		case UNARY_OP:
 		case BINARY_OP:
 		case TERNARY_OP:
@@ -774,7 +778,7 @@ bool Expr_is_recusive(Expr1* self, const char* name)
 				return true;
 			break;
 
-		case ASMPC_OP:
+        case ASMPC_OP:
 		case NUMBER_OP:
 		case UNARY_OP:
 		case BINARY_OP:

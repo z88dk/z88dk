@@ -2462,7 +2462,6 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 		} else if (!strcmp(argv[i], "-Z")) {
 			no_special_macros = 1;
 		} else if (!strcmp(argv[i], "-d")) {
-			ls->flags &= ~KEEP_OUTPUT;
 			print_defs = 1;
 		} else if (!strcmp(argv[i], "-e")) {
 			ls->flags &= ~KEEP_OUTPUT;

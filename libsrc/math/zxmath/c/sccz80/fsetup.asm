@@ -12,47 +12,47 @@
 ; Peeks the parameter from stack
 
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-		PUBLIC    fsetup
-		EXTERN	fsetup1
- 
-.fsetup 
-	
-	ld	hl,9		; 4 (ret locations) + 5 (mantissa)
-	add	hl,sp		;ret to this function and ret to code
-	
-	ld	a,(hl)
-	dec	hl
-	ld	e,(hl)
-	dec	hl
-	ld	d,(hl)
-	dec	hl
-	ld	c,(hl)
-	dec	hl
-	ld	b,(hl)
+    SECTION code_fp
+    PUBLIC  fsetup
+    EXTERN  fsetup1
 
-	; load in the FP calculator stack	
-	call	ZXFP_STK_STORE
+fsetup:
 
-	pop	hl		; save the locatrions for ret
-	pop	de
-	pop	bc		; get rid of fp number
-	pop	bc
-	pop	bc
-	push	de		; restore the locatrions for ret
-	push	hl
-	jp	fsetup1
+    ld      hl, 9                       ; 4 (ret locations) + 5 (mantissa)
+    add     hl, sp                      ;ret to this function and ret to code
+
+    ld      a, (hl)
+    dec     hl
+    ld      e, (hl)
+    dec     hl
+    ld      d, (hl)
+    dec     hl
+    ld      c, (hl)
+    dec     hl
+    ld      b, (hl)
+
+	; load in the FP calculator stack
+    call    ZXFP_STK_STORE
+
+    pop     hl                          ; save the locatrions for ret
+    pop     de
+    pop     bc                          ; get rid of fp number
+    pop     bc
+    pop     bc
+    push    de                          ; restore the locatrions for ret
+    push    hl
+    jp      fsetup1
 

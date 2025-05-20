@@ -13,22 +13,23 @@ use Modern::Perl;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+		skip "strict $cpu" if $cpu =~ /_strict/;
 
 		for my $dd (qw( B  C  D  E  H  L  BC  DE  HL  IX IY 
 						B_ C_ D_ E_ H_ L_ BC_ DE_ HL_       )) {
 			next if $dd =~ /ix|iy/i && $cpu =~ /^80|gbz80/;
-			next if $dd =~ /_/ && $cpu !~ /^r4k|^r5k/;
+			next if $dd =~ /_/ && $cpu !~ /^r4k|^r5k|^r6k/;
 			
 			my $reg = $dd =~ s/_/'/r;
 			my $r = ticks(<<END, "-m$cpu");
-				IF __CPU_R4K__ || __CPU_R5K__
+				IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 					;; Enable R4K instruction mode on the R4K
 					ld      a,0xC0
 					ioi ld  (0x0420),a      ;EDMR register (p299 in R4000UM.pdf)
 				ENDIF			
 					ld $reg, -1
 					clr $reg
-					rst 0
+					jp 0
 END
 				is $r->{$dd}, 0, "$dd result";
 				

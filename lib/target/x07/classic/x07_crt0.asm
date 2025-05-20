@@ -13,7 +13,7 @@
 
     EXTERN  _main		;main() is always external to crt0
 
-    PUBLIC  cleanup		;jp'd to by exit()
+    PUBLIC  __Exit		;jp'd to by exit()
     PUBLIC  l_dcal		;jp(hl)
 
 
@@ -35,15 +35,12 @@ start:
     ;di
 
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ;ld a,65	; (Debugging:  print 'A' char)
     ;call $009F
@@ -51,9 +48,9 @@ ENDIF
     ;ld a,65	; (Debugging:  print 'A' char)
     ;call $009F
 
-cleanup:
+__Exit:
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Pick up entry sp
     ret             ; End of program
@@ -65,8 +62,8 @@ l_dcal:
 end:
     defb    0   ; null file name
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 

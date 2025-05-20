@@ -220,6 +220,14 @@
 =
 	ld	hl,(hl+0)
 
+%notcpu r2ka
+%notcpu r3k
+	ld	hl,0	;const
+=
+	clr	hl
+
+%notcpu r6k
+%notcpu r4k
 	ld	hl,0	;const
 =
 	bool	hl
@@ -307,3 +315,75 @@
 =
 	ld	hl,(hl+%1)
 	ld	h,0
+
+%check 0 <= %1 <= 254
+	push	hl
+	ld	hl,(sp+%1)
+	pop	de
+=
+	ex	de,hl
+	ld	hl,(sp+%eval(%1 2 -))
+
+%check 0 <= %1 <= 254
+	call	l_gint%1sp	;%2
+=
+	ld	hl,(sp+%1)
+
+%notcpu r2ka
+%notcpu r3k
+	call	l_neg
+=
+	neg	hl
+
+%notcpu r2ka
+%notcpu r3k
+	call	l_xor
+=
+	xor	hl,de
+
+%cpu r6k
+	call	l_mult
+=
+	mul	hl,de
+
+%cpu r6k
+	call	l_mult_u
+=
+	mulu	hl,de
+
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	and	hl,de
+=
+	and	hl,(sp+%1)
+
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	or	hl,de
+=
+	or	hl,(sp+%1)
+
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	xor	hl,de
+=
+	xor	hl,(sp+%1)
+
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	add	hl,de
+=
+	add	hl,(sp+%1)
+
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	ex	de,hl
+	and	a
+	sbc	hl,de
+=
+	sub	hl,(sp+%1)

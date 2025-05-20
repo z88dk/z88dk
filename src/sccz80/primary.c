@@ -106,11 +106,13 @@ int primary(LVALUE* lval)
                     return (1);
                 }
                 /* Handle arrays... */
-                address(ptr);
+                gen_address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect_kind = lval->ptr_type = ptr->type;
-                if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY )
+                if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY ) {
+                    if ( ptr->ctype->flags & FARACC ) { lval->flags |= FARACC; }
                     lval->ptr_type = lval->ltype->ptr->kind;
+                }
                 return (0);
             } else {
                 lval->symbol = ptr;
@@ -132,7 +134,7 @@ int primary(LVALUE* lval)
                 lval->val_type = KIND_INT;
                 lval->ptr_type = KIND_NONE;
                 lval->indirect_kind = KIND_NONE;
-	        return(1);
+	            return(1);
             } else {
                 /* assume it's a function we haven't seen yet */
                 /* NB value set to 0 */
@@ -322,7 +324,7 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
     }
 
     if ( t2 == KIND_LONGLONG ) {
-        if ( t1 != KIND_LONGLONG) {
+        if ( t1 != KIND_LONGLONG && !kind_is_decimal(t1)) {
             // Just convert down to a 32 bit number regardless of destination type
             // inefficient, but we have just been dealing with 64 bit numbers!
             zconvert_to_long(isunsigned1, t2, isunsigned2);
@@ -436,17 +438,19 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
 
 
 
-    if (lval2->val_type == KIND_LONG) {
+    if (lval2->val_type == KIND_LONG || lval2->val_type == KIND_CPTR) {
         /* Second operator is long */
-        if (lval->val_type != KIND_LONG) {
+        if (lval->val_type != KIND_LONG && lval->val_type != KIND_CPTR) {
             zwiden_stack_to_long(lval);
-            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
+            if ( lval2->val_type == KIND_CPTR) {
+            } else if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
                 lval->ltype = type_ulong;
             } else {
                 lval->ltype = type_long;
             }
             lval->val_type = KIND_LONG;
-        } else {
+
+        } else if ( lval2->val_type == KIND_LONG) {
             if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
                 lval->ltype = type_ulong;
             } else {
@@ -456,14 +460,16 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         return;
     }
 
-    if (lval->val_type == KIND_LONG) {
+    if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
             zconvert_to_long(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
         }
-        if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
-            lval->ltype = type_ulong;
-        } else {
-            lval->ltype = type_long;
+        if ( lval->val_type == KIND_LONG ) {
+            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
+                lval->ltype = type_ulong;
+            } else {
+                lval->ltype = type_long;
+            }
         }
         return;
     }

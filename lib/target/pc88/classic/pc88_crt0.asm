@@ -14,7 +14,7 @@
     EXTERN  _main
 
     PUBLIC  l_dcal
-    PUBLIC  cleanup
+    PUBLIC  __Exit
 
     PUBLIC	__CLIB_PC8800_HAS_BASIC
     PUBLIC	pc88bios

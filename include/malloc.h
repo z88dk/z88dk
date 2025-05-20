@@ -2,15 +2,8 @@
 #define __MALLOC_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 
-/*
- * Now some trickery to link in the correct routines for far
- *
- * $Id: malloc.h,v 1.17 2016-06-11 19:53:08 dom Exp $
- */
-
-
-#ifndef FARDATA
 
 // The Near Malloc Library is still a simple first
 // fit linear search of a list of free blocks.  The
@@ -47,23 +40,20 @@
 
 // Automatic Preset for malloc:  3/4 of the free memory
 #ifdef AMALLOC
-#pragma output USING_amalloc
+#pragma define CRT_HEAP_AMALLOC = 0x01
 #endif
 #ifdef AMALLOC3
-#pragma output USING_amalloc
+#pragma define CRT_HEAP_AMALLOC = 0x01
 #endif
 
 // Automatic Preset for malloc:  2/4 of the free memory
 #ifdef AMALLOC2
-#pragma output USING_amalloc
-#pragma output USING_amalloc_2
+#pragma define CRT_HEAP_AMALLOC = 0x03
 #endif
 
 // Automatic Preset for malloc:  1/4 of the free memory
 #ifdef AMALLOC1
-#pragma output USING_amalloc
-#pragma output USING_amalloc_2
-#pragma output USING_amalloc_1
+#pragma define CRT_HEAP_AMALLOC = 0x07
 #endif
 
 extern void __LIB__              mallinit(void);
@@ -158,43 +148,34 @@ extern void __LIB__    HeapInfo_callee(unsigned int *total, unsigned int *larges
 #define HeapRealloc(a,b,c)  HeapRealloc_callee(a,b,c)
 #define HeapInfo(a,b,c)     HeapInfo_callee(a,b,c)
 
-#else
+
+#ifdef __SCCZ80
 
 /*
  * Now some definitions for far functions
  */
 
-#define calloc(a,b) calloc_far(a,b)
-#define malloc(a)   malloc_far(a)
-#define free(a)     free_far(a)
+extern void __LIB__ * __far malloc_far(size_t sz);
+extern void __LIB__         free_far(void * __far ptr);
+extern void __LIB__         sbrk_far(void *__far ptr, size_t sz);
 
-// realloc, sbrk, mallinit, mallinfo not implemented in far lib
+// Not on z88
+extern void __LIB__ * __far calloc_far(size_t n, size_t sz);
+extern void __LIB__ * __far realloc_far(void * __far ptr, size_t sz);
 
-#define realloc(a,b)
-#define sbrk(a,b)      heapinit_far(b)
-#define mallinit()
-#define mallinfo(a,b)
+extern void __LIB__         mallinfo_far(unsigned long *total, unsigned long *largest);
 
-// these are for compatibility with the older version of the near malloc lib
 
-#define HEAPSIZE(bp)
-#define getfree()  
-#define getlarge()
-#define heapinit(a)    heapinit_far(a)
+// z88 only
+extern void __LIB__         freeall_far(void);
 
-extern far void __LIB__ *calloc_far(int, int);
-extern far void __LIB__ *malloc_far(long);
-extern void __LIB__ free_far(far void *);
-extern void __LIB__ freeall_far();
 
 /* Create the correct memory spec */
 #ifdef MAKE_PACKAGE
 #pragma output far_mmset
 #endif
 
-
-
-#endif /* FARDATA */
+#endif /* __SCCZ80 */
 
 
 

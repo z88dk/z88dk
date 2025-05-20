@@ -1,8 +1,8 @@
-       	SECTION	code_graphics 
-	PUBLIC    getmaxy
-        PUBLIC    _getmaxy
+    SECTION code_graphics
+    PUBLIC  getmaxy
+    PUBLIC  _getmaxy
 
-.getmaxy
-._getmaxy
-	ld	hl,768 - 1
-	ret
+getmaxy:
+_getmaxy:
+    ld      hl, 768-1
+    ret

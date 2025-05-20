@@ -1,27 +1,27 @@
 
-SECTION code_clib
-PUBLIC  remove
-PUBLIC  _remove
+    SECTION code_clib
+    PUBLIC  remove
+    PUBLIC  _remove
 
-EXTERN   __agon_hl24
+    EXTERN  __agon_hl24
 
-INCLUDE "target/agon/def/mos_api.inc"
+    INCLUDE "target/agon/def/mos_api.inc"
 
 ;int remove(char *name)
 
-.remove
-._remove
+remove:
+_remove:
     pop     de
-    pop     hl      ;filename
+    pop     hl                          ;filename
     push    hl
     push    de
-	push	ix
+    push    ix
     call    __agon_hl24
-    MOSCALL(mos_del)
-    ld      hl,0
+    MOSCALL (mos_del)
+    ld      hl, 0
     pop     ix
     and     a
     ret     z
-    dec     hl      ;=1
+    dec     hl                          ;=1
     ret
 

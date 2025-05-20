@@ -65,7 +65,7 @@ loop:
 		ld		a, b
 		or		c
 		jr 		nz, loop
-		ret
+		jp 		0
 END
 
 path("$test-new.asm")->spew(<<'END');
@@ -85,7 +85,7 @@ loop:
 		dec 	c       
 		jr 		nz,loop 
 		djnz    loop 
-		ret
+		jp 		0
 END
 
 my %data;
@@ -94,18 +94,8 @@ for my $cpu (qw( 8080 8085 gbz80 r2ka z180 z80 z80n )) {
 		# assemble
 		run("z88dk-z80asm -b -l -m$cpu $base.asm");
 		
-		# get end address
-		for (path("$base.lis")->lines) {
-			if (/^\s*\d+\s+([0-9a-f]{4})\s+c9\s+ret/) { 
-				$data{$cpu}{$base}{end} = $1; 
-				last; 
-			}
-		}
-		defined($data{$cpu}{$base}{end}) or die "end address not found in $base.lis\n";
-		
 		# run ticks
-		run("z88dk-ticks -m$cpu -start 0000 -end $data{$cpu}{$base}{end} ".
-		    "$base.bin >$base.out");
+		run("z88dk-ticks -m$cpu $base.bin >$base.out");
 		my $t = path("$base.out")->slurp;
 		$t =~ /^(\d+)\s*$/ or die "expected ticks count, got $t\n";
 		$data{$cpu}{$base}{ticks} = 0+$t;

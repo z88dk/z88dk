@@ -1,6 +1,6 @@
 #include "stdlib_tests.h"
 
-#ifndef __8080__
+#ifndef __8080
 
 void t_sqrt_0()
 {

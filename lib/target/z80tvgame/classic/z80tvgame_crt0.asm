@@ -11,7 +11,7 @@
 
     EXTERN    _main           ; main() is always external to crt0 code
 
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
 
 
@@ -45,17 +45,17 @@ if (ASMPC<>$0000)
 endif
 
     jp      start 
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 
 start:
     di
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    INCLUDE "crt/classic/crt_start_eidi.inc"
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main           ; Call user program
-cleanup:
+__Exit:
     call    crt0_exit
     INCLUDE "crt/classic/crt_terminate.inc"
 
@@ -63,7 +63,7 @@ l_dcal:
     jp      (hl)            ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     defc    __crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
@@ -71,7 +71,7 @@ l_dcal:
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
 
 

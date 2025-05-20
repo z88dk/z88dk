@@ -34,9 +34,9 @@ enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY
 // Color translation table
 static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
-#define	textattr(a)		cprintf("\x1b[%dm",a)
+//#define	textattr(a)		cprintf("\x1b[%dm",a)
 #define	clrscr()		cprintf("\x1b[2J")
-#define	gotoxy(x,y)		cprintf("\x1b[%d;%df",y,x)
+#define	gotoxy(x,y)		cprintf("\x1b[%d;%df",y+1,x+1)
 #define textcolor(a)	        cprintf("\x1b[%um",PCDOS_COLORS[a]+30)
 #define textbackground(a)	cprintf("\x1b[%um",PCDOS_COLORS[a]+40)
 #define textattr(a)	        cprintf("\x1b[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
@@ -87,6 +87,10 @@ extern void __LIB__        textbackground(int c) __z88dk_fastcall;
 #endif
 
 
+#ifndef CONIO_NATIVE_VT100
+#ifndef CONIO_NATIVE_VT52
+
+// These peek into the internals of the z88dk implementation
 
 extern int     __LIB__     wherex (void);
 extern int     __LIB__     wherey (void);
@@ -100,6 +104,17 @@ __ZPROTO2(void,,screensize,unsigned int *,x,unsigned int *,y)
 #ifndef __STDC_ABI_ONLY
 extern void    __LIB__     screensize_callee(unsigned int *x, unsigned int *y) __smallc __z88dk_callee;
 #define screensize(a,b) screensize_callee(a,b)
+#endif
+
+
+// Get the character that is on screen at the specified location
+__ZPROTO2(int,,cvpeek,int,x,int,y)
+
+// Get the character that is on screen at the specified location (no charset
+// translations will be made)
+__ZPROTO2(int,,cvpeekr,int,x,int,y)
+
+#endif
 #endif
 
 
@@ -132,12 +147,6 @@ extern void __LIB__ cgets(char *dest);
 extern int __LIB__ kbhit(void);
 extern int __LIB__ getch(void);
 
-// Get the character that is on screen at the specified location
-__ZPROTO2(int,,cvpeek,int,x,int,y)
-
-// Get the character that is on screen at the specified location (no charset
-// translations will be made)
-__ZPROTO2(int,,cvpeekr,int,x,int,y)
 
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;

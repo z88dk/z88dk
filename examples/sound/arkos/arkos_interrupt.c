@@ -6,9 +6,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <interrupt.h>
 #include <intrinsic.h>
 #include <stdint.h>
-#include <interrupt.h>
 
 #ifdef __SPECTRUM__
 #include <spectrum.h>
@@ -26,36 +26,47 @@ extern uint8_t song[];
 
 void wrapper() __naked
 {
-__asm
-   INCLUDE "hocuspocus.asm"
-__endasm;
+    __asm
+    INCLUDE "hocuspocus.asm"
+    SECTION code_compiler
+    __endasm;
 }
 
-void service_interrupt( void )
+void service_interrupt(void)
 {
     M_PRESERVE_ALL;
+#ifdef __AQUARIUS__
+    static int NTSCCount = 6;
+    if (--NTSCCount)
+        ply_akg_play();
+    else
+        NTSCCount = 6;
+#else
     ply_akg_play();
+#endif
     M_RESTORE_ALL;
 }
 
-void init_interrupts( void ) {
+void init_interrupts(void)
+{
     intrinsic_di();
 #if __SPECTRUM__
     zx_im2_init(0xd300, 0xd4);
-   add_raster_int(0x38);
+    add_raster_int(0x38);
 #endif
 #ifndef NO_INTERRUPT_INIT
-   im1_init();
+    im1_init();
 #endif
-    add_raster_int( service_interrupt );
+    add_raster_int(service_interrupt);
     intrinsic_ei();
 }
 
-
-void main( void ) {
-    ply_akg_init( song, 0 );
+void main(void)
+{
+    ply_akg_init(song, 0);
     init_interrupts();
-    while ( 1 ) {
+    while (1)
+    {
         // do whatever in your main loop
         // music playback should happen in interrupt context
     }

@@ -4,6 +4,7 @@
 ; modified by Stefano Bodrato - Jan 2001
 ;
 ; Sept 2003 - Stefano: Fixed bug for sprites wider than 8.
+; March 2025 - Stefano: 8080 and gbz80 CPU compatibility
 ;
 ; Much More Generic version
 ; Uses plotpixel, respixel and xorpixel
@@ -11,278 +12,426 @@
 ;
 
 
-  IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        SECTION code_graphics
-        PUBLIC  __generic_putsprite
+    SECTION code_graphics
+    PUBLIC  __generic_putsprite
 
-        EXTERN  swapgfxbk
-        EXTERN  __graphics_end
+    EXTERN  swapgfxbk
+    EXTERN  __graphics_end
 
-        EXTERN  plotpixel
-        EXTERN  respixel
-        EXTERN  xorpixel
-        INCLUDE "graphics/grafix.inc"
+    EXTERN  plotpixel
+    EXTERN  respixel
+    EXTERN  xorpixel
+    INCLUDE "graphics/grafix.inc"
 
 ; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
 
 __generic_putsprite:
-    IF  NEED_swapgfxbk=1
-        call    swapgfxbk
-    ENDIF
-        ld      hl, 2
-        add     hl, sp
-        ld      e, (hl)
-        inc     hl
-        ld      d, (hl)                 ;sprite address
-        push    ix
-        push    de
-        pop     ix
+  IF    NEED_swapgfxbk=1
+    call    swapgfxbk
+  ENDIF
+    ld      hl, 2
+    add     hl, sp
+    ld      e, (hl)
+    inc     hl
+    ld      d, (hl)                     ;sprite address
 
-        inc     hl
-        ld      e, (hl)
-        inc     hl
-        inc     hl
-        ld      d, (hl)                 ; x and y __gfx_coords
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    push    ix
+    push    de
+    pop     ix
+ELSE
+    push    de
+ENDIF
 
-        inc     hl
+    inc     hl
+    ld      e, (hl)
+    inc     hl
+    inc     hl
+    ld      d, (hl)                     ; x and y __gfx_coords
 
-        inc     hl
-        ld      a, (hl)                 ; and/or/xor mode
+    inc     hl
 
-        ld      h, d
-        ld      l, e
+    inc     hl
 
-        cp      166                     ; and(hl) opcode
-        jr      z, doand
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      a, (ix+0)                   ; Width
+    push    af
+    ld      b, (ix+1)                   ; Height
+ELSE
+    ex      (sp),hl
+    inc     hl
+    ld      a,(hl)                      ; Height
+    ld      b,a
+    inc     hl
+    ld      (__spr_bitmap),hl
+    dec     hl
+    dec     hl
+    ld      a,(hl)                      ; Width
+    ex      (sp),hl
+    push    af                          ; Width
+ENDIF
 
-        cp      182                     ; or(hl) opcode
-        jp      z, door
+    ld      a, (hl)                     ; and/or/xor mode
+
+    ld      h, d
+    ld      l, e
+
+    cp      166                         ; and(hl) opcode
+    jr      z, doand
+
+    cp      182                         ; or(hl) opcode
+    jp      z, door
 
     ; 182 - or
     ; 174 - xor
 
 doxor:
-        ld      a, (ix+0)               ; Width
-        ld      b, (ix+1)               ; Height
-oloopx: push    bc                      ;Save # of rows
-        push    af
+    pop     af                   ; Width
 
+oloopx:
+    push    bc                          ;Save # of rows
+    push    af
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     ;ld    b,a    ;Load width
-        ld      b, 0                    ; Better, start from zero !!
+    ld      b, 0                        ; Better, start from zero !!
 
-        ld      c, (ix+2)               ;Load one line of image
+iloopx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
+    jr      nc, noplotx                 ;See if a plot is needed
 
-iloopx: sla     c                       ;Test leftmost pixel
-        jr      nc, noplotx             ;See if a plot is needed
+    pop     af
+    push    af
 
-        pop     af
-        push    af
-
-        push    hl
+    push    hl
     ;push    bc    ; this should be done by the called routine
-        push    de
-        ld      a, h
-        add     a, b
-        ld      h, a
-        call    xorpixel
-        pop     de
+    push    de
+    ld      a, h
+    add     a, b
+    ld      h, a
+    call    xorpixel
+    pop     de
     ;pop    bc
-        pop     hl
+    pop     hl
 
 noplotx:
 
-        inc     b                       ; witdh counter
+    inc     b                           ; witdh counter
 
-        pop     af
-        push    af
+    pop     af
+    push    af
 
-        cp      b                       ; end of row ?
+    cp      b                           ; end of row ?
 
-        jr      nz, noblkx
+    jr      nz, noblkx
 
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    inc     ix
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
 
-        jr      noblockx
+    jr      noblockx
 
 noblkx:
 
-        ld      a, b                    ; next byte in row ?
+    ld      a, b                        ; next byte in row ?
     ;dec    a
-        and     a
-        jr      z, iloopx
-        and     7
+    and     a
+    jr      z, iloopx
+    and     7
 
-        jr      nz, iloopx
+    jr      nz, iloopx
 
 blockx:
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
-        jr      iloopx
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    inc     ix
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
+    jr      iloopx
 
 noblockx:
 
-        inc     l
+    inc     l
 
-        pop     af
-        pop     bc                      ;Restore data
-        djnz    oloopx
-    ;pop    ix
-    IF  NEED_swapgfxbk
-        jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        pop     ix
-      ENDIF
-        ret
+    pop     af
+    pop     bc                          ;Restore data
+    djnz    oloopx
+
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
     ENDIF
+    ret
+  ENDIF
 
 
 doand:
-        ld      a, (ix+0)               ; Width
-        ld      b, (ix+1)               ; Height
-oloopa: push    bc                      ;Save # of rows
-        push    af
+    pop     af                   ; Width
 
+oloopa:
+    push    bc                          ;Save # of rows
+    push    af
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     ;ld    b,a    ;Load width
-        ld      b, 0                    ; Better, start from zero !!
+    ld      b, 0                        ; Better, start from zero !!
 
-        ld      c, (ix+2)               ;Load one line of image
+iloopa:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
+    jr      nc, noplota                 ;See if a plot is needed
 
-iloopa: sla     c                       ;Test leftmost pixel
-        jr      nc, noplota             ;See if a plot is needed
+    pop     af
+    push    af
 
-        pop     af
-        push    af
-
-        push    hl
+    push    hl
     ;push    bc    ; this should be done by the called routine
-        push    de
-        ld      a, h
-        add     a, b
-        ld      h, a
-        call    respixel
-        pop     de
+    push    de
+    ld      a, h
+    add     a, b
+    ld      h, a
+    call    respixel
+    pop     de
     ;pop    bc
-        pop     hl
+    pop     hl
 
 noplota:
 
-        inc     b                       ; witdh counter
+    inc     b                           ; witdh counter
 
-        pop     af
-        push    af
+    pop     af
+    push    af
 
-        cp      b                       ; end of row ?
+    cp      b                           ; end of row ?
 
-        jr      nz, noblka
+    jr      nz, noblka
 
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    inc     ix
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
 
-        jr      noblocka
+    jr      noblocka
 
 noblka:
 
-        ld      a, b                    ; next byte in row ?
+    ld      a, b                        ; next byte in row ?
     ;dec    a
-        and     a
-        jr      z, iloopa
-        and     7
+    and     a
+    jr      z, iloopa
+    and     7
 
-        jr      nz, iloopa
+    jr      nz, iloopa
 
 blocka:
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
-        jr      iloopa
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    inc     ix
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
+    jr      iloopa
 
 noblocka:
 
-        inc     l
-        pop     af
-        pop     bc                      ;Restore data
-        djnz    oloopa
-    ;pop    ix
-        jp      __graphics_end
+    inc     l
+    pop     af
+    pop     bc                          ;Restore data
+    djnz    oloopa
+
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ENDIF
+    ret
+  ENDIF
 
 
 
 
 door:
-        ld      a, (ix+0)               ; Width
-        ld      b, (ix+1)               ; Height
-oloopo: push    bc                      ;Save # of rows
-        push    af
+    pop     af                   ; Width
 
+oloopo:
+    push    bc                          ;Save # of rows
+    push    af
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
     ;ld    b,a    ;Load width
-        ld      b, 0                    ; Better, start from zero !!
+    ld      b, 0                        ; Better, start from zero !!
 
-        ld      c, (ix+2)               ;Load one line of image
+iloopo:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+    ld      c,a
+ENDIF
+    jr      nc, noploto                 ;See if a plot is needed
 
-iloopo: sla     c                       ;Test leftmost pixel
-        jr      nc, noploto             ;See if a plot is needed
+    pop     af
+    push    af
 
-        pop     af
-        push    af
-
-        push    hl
+    push    hl
     ;push    bc    ; this should be done by the called routine
-        push    de
-        ld      a, h
-        add     a, b
-        ld      h, a
-        call    plotpixel
-        pop     de
+    push    de
+    ld      a, h
+    add     a, b
+    ld      h, a
+    call    plotpixel
+    pop     de
     ;pop    bc
-        pop     hl
+    pop     hl
 
 noploto:
 
-        inc     b                       ; witdh counter
+    inc     b                           ; witdh counter
 
-        pop     af
-        push    af
+    pop     af
+    push    af
 
-        cp      b                       ; end of row ?
+    cp      b                           ; end of row ?
 
-        jr      nz, noblko
+    jr      nz, noblko
 
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    inc     ix
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
 
-        jr      noblocko
+    jr      noblocko
 
 noblko:
 
-        ld      a, b                    ; next byte in row ?
+    ld      a, b                        ; next byte in row ?
     ;dec    a
-        and     a
-        jr      z, iloopo
-        and     7
+    and     a
+    jr      z, iloopo
+    and     7
 
-        jr      nz, iloopo
+    jr      nz, iloopo
 
 blocko:
-        inc     ix
-        ld      c, (ix+2)               ;Load next byte of image
-        jr      iloopo
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    inc     ix
+    ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    push    hl
+    ld      hl,(__spr_bitmap)
+    inc     hl
+    ld      (__spr_bitmap),hl
+    ld      a,(hl)
+    pop     hl
+    ld      c,a
+ENDIF
+    jr      iloopo
 
 noblocko:
 
     ;djnz    iloopo
-        inc     l
-        pop     af
-        pop     bc                      ;Restore data
-        djnz    oloopo
-    ;pop    ix
-    IF  NEED_swapgfxbk
-        jp      __graphics_end
-    ELSE
-      IF    !__CPU_INTEL__&!__CPU_GBZ80__
-        pop     ix
-      ENDIF
-        ret
+    inc     l
+    pop     af
+    pop     bc                          ;Restore data
+    djnz    oloopo
+
+  IF    NEED_swapgfxbk
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
     ENDIF
+    ret
   ENDIF
+
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
+; Z80 has got index registers
+
+ELSE
+
+    SECTION bss_graphics
+
+__spr_bitmap:
+    defw    0
+
+ENDIF

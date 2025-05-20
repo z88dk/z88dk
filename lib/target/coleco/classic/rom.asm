@@ -17,7 +17,9 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7400
-    defc        CRT_KEY_DEL = 127
+    defc    TAR__crt_enable_eidi = $02  ; ei on startup
+    defc    TAR__crt_on_exit = $0000
+    defc    CRT_KEY_DEL = 127
 
     ;; RAM trimming
 IF !DEFINED_CLIB_FOPEN_MAX
@@ -25,7 +27,7 @@ IF !DEFINED_CLIB_FOPEN_MAX
     defc    CLIB_FOPEN_MAX = 3
 ENDIF
     defc    DEFINED_basegraphics = 1
-IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
     defc    CLIB_DEFAULT_SCREEN_MODE = 2
 ENDIF
 
@@ -112,25 +114,21 @@ restart_ret:
     ret
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
-IF CLIB_DEFAULT_SCREEN_MODE != -1
-    ld      hl,CLIB_DEFAULT_SCREEN_MODE
-    call    vdp_set_mode
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
     im      1
-    ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     call     _main
-cleanup:
-    rst     0                ;Restart when main finishes
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 
@@ -168,7 +166,7 @@ IFNDEF DEFINED_CRT_FONT
 ENDIF
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
     
     defc        __crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
@@ -176,7 +174,7 @@ ENDIF
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE        "crt/classic/crt_section.asm"
+    INCLUDE        "crt/classic/crt_section.inc"
 
 
     SECTION bss_crt

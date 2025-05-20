@@ -18,7 +18,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     defc    CONSOLE_COLUMNS = 32
@@ -44,6 +44,10 @@ ENDIF
 
     defc    CRT_ORG_CODE = $140d
 
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -52,36 +56,30 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     di
     ld      a,$ff
     ld      i,a
     im      2
-    call    crt0_init_bss
+    call    crt0_init
     ; Code is shared with CP/M. This is a noop, but pulls in code
     ; into crt0_init and crt0_exit
     call    cpm_platform_init 
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-     ; Initialise mode 2 by default
-    ld      hl,2
-    call    vdp_set_mode
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
-
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
 
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     ret
@@ -90,11 +88,11 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
     ; And include handling disabling screenmodes
-    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
     INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
 

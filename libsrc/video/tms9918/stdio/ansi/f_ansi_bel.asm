@@ -10,10 +10,10 @@
 ;	$Id: f_ansi_bel.asm $
 ;
 
-	SECTION  code_video_vdp
-	
-	PUBLIC	ansi_BEL
+    SECTION code_video_vdp
 
-.ansi_BEL
-	ret
+    PUBLIC  ansi_BEL
+
+ansi_BEL:
+    ret
 

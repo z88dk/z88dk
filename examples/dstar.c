@@ -110,10 +110,11 @@
  *      zcc +cpm -subtype=bw2 -create-app -Dspritesize=21 dstar.c
  *
  *      ZX81, various HRG flavours (see also the specific target version):
- *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
+ *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=10 dstar.c
  *      zcc +zx81 -O3 -clib=g007  -create-app -Dspritesize=16 dstar.c 
  *      zcc +zx81 -O3 -clib=arx -subtype=arx  -create-app -Dspritesize=16 dstar.c
  *      zcc +zx81 -O3 -clib=wrx -subtype=wrx  -create-app -Dspritesize=16 dstar.c
+ *      zcc +zx81 -O3 -subtype=wrxi -clib=wrxi  -create-app -Dspritesize=32 -pragma-define:hrgpage=32768 dstar.c
  *
  *      To get an 80 pixel graphics version of the game (Mattel Aquarius, TRS80, etc):
  *      zcc +aquarius -Dspritesize=5 -create-app dstar.c
@@ -161,6 +162,9 @@
 
 
 /* Single sprite memory usage, including bytes for its size */
+#if (spritesize == 4)
+  #define spritemem 5
+#endif
 #if (spritesize == 10)
   #define spritemem 22
 #endif
@@ -168,7 +172,12 @@
   #define spritemem 30
 #endif
 #if (spritesize == 15)|(spritesize == 16)
+  // Normal 16x16 sprite
   #define spritemem 34
+#endif
+#if (spritesize == 32)
+  #define xsize 16
+  #define spritemem 66  // wrxi, 256x384
 #endif
 #if (spritesize == 20)
   #define spritemem 62
@@ -277,6 +286,11 @@ void Gamekeys(void)
 			bit_fx6 (1);
 		  #endif
 		  SetupLevel();
+#if (spritesize == 32)  // ZX81 192x384 WRXi
+		case '1':
+		  hrg_phase();
+		  while (getk()=='1') {};
+#endif
 	}
 }
 

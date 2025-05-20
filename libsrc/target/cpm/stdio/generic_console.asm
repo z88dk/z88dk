@@ -5,25 +5,25 @@
 ; 
 
 
-		MODULE		generic_console_ADM3
-		SECTION		code_clib
+	MODULE		generic_console_ADM3
+	SECTION		code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
+	PUBLIC		generic_console_cls
+	PUBLIC		generic_console_vpeek
+	PUBLIC		generic_console_scrollup
+	PUBLIC		generic_console_printc
+	PUBLIC		generic_console_ioctl
+    PUBLIC      generic_console_set_ink
+    PUBLIC      generic_console_set_paper
+    PUBLIC      generic_console_set_attribute
 
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
-		EXTERN		__bdos
+	EXTERN		CONSOLE_COLUMNS
+	EXTERN		CONSOLE_ROWS
+	EXTERN		__bdos
 
-		INCLUDE		"ioctl.def"
-		PUBLIC          CLIB_GENCON_CAPS
-		defc            CLIB_GENCON_CAPS = 0
+	INCLUDE		"ioctl.def"
+	PUBLIC      CLIB_GENCON_CAPS
+	defc        CLIB_GENCON_CAPS = 0
 
 generic_console_ioctl:
 	scf
@@ -118,15 +118,15 @@ generic_console_vpeek:
 	ret
 
 xypos:
-        ld      hl,screen_copy - CONSOLE_COLUMNS
-        ld      de,CONSOLE_COLUMNS
-        inc     b
+    ld      hl,screen_copy - CONSOLE_COLUMNS
+    ld      de,CONSOLE_COLUMNS
+    inc     b
 generic_console_printc_1:
-        add     hl,de
-        djnz    generic_console_printc_1
+    add     hl,de
+    djnz    generic_console_printc_1
 generic_console_printc_3:
-        add     hl,bc                   ;hl now points to address in display
-        ret
+    add     hl,bc                   ;hl now points to address in display
+    ret
 
 	SECTION	data_clib
 

@@ -46,4 +46,4 @@ the [Z88DK Sinclair ZX forum](https://www.z88dk.org/forum/viewforum.php?f=2).
 
 And of course, the [Programming Forum](https://spectrumcomputing.co.uk/forums/viewforum.php?f=6) at [Spectrum Computing](https://spectrumcomputing.co.uk/), where many of the best Spectrum developers are always ready to discuss everything to do with programming the ZX Spectrum.
 
-[Derek Fountain](http://www.derekfountain.org/), January, 2023
+[Derek Fountain](http://www.derekfountain.org/), October, 2024

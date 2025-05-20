@@ -1,0 +1,36 @@
+; NEC-8201 firmware macros and defs
+;
+; M100 system ROM aka firmware can be called in atleast a couple of ways
+; If we're calling it from OPTROM made with Stephen Adolph's template, we do
+; RST 6; DEFW ROM_ADDR
+; And if we're calling from normal RAM, then we simply do CALL ROM_ADDR
+
+; With ROMCALL macro, all ROM calls (except RSTs) can be abstracted into
+; ROMCALL; DEFW ROM_ADDR
+; ...and be conditionally compiled depending on the subtype we use.
+
+	EXTERN	ROMCALL_OP ; it's defined in m100_crt0.asm
+#define ROMCALL defb ROMCALL_OP
+	
+; ROM calls:
+
+#define OPTROM_SIG "AB"
+defc    CONSOLE_ROWS = 8
+
+
+; call 62393 to start an optrom
+defc    POPAFRET = $2BA3	;On NEC is tail of different machine
+defc    OPTROMSIG = 0 		;XXX can't find this routine
+
+defc	KYREAD	= $174D ; wait for key from the keyboard
+defc	KYPEND	= $183D	; check keyboard queue for pending characters
+
+defc	CLS	= $4260	; clear screen
+defc	CHROUT	= $4CFA	; print character in reg. A to LCD/printer
+defc	CURPOS	= $42B5	; position cursor; H=column (1-40), L=row(1-8)
+defc	CURSON	= $4278	; turn cursor on
+defc	CURSOFF	= $427D	; ...and off
+defc	BEEP	= $4258	; sound the beeper
+
+defc	LCDSET	= $74D0 ; LCD set pixel (D, E)
+defc	LCDRES	= $74D1 ; LCD reset pixel (D, E)

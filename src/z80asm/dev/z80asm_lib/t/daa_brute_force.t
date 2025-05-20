@@ -17,6 +17,7 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	SKIP: {
 		skip "$cpu not supported by ticks" if $cpu =~ /^ez80$/;
+		skip "$cpu not supported by ticks" if $cpu =~ /_strict/;
 
 		my @asm = "ld hl, 0";			# overwrite code with output data
 		my @in;
@@ -60,7 +61,7 @@ for my $cpu (@CPUS) {
 			}
 		}
 
-		push @asm, "rst 0";
+		push @asm, "jp 0";
 		my $r = ticks(join("\n", @asm), "-m$cpu");
 		my $data = 0;
 		for (@in) {

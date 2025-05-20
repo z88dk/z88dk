@@ -25,55 +25,55 @@
 asm_printf:
 IF __CPU_INTEL__ | __CPU_GBZ80__
 
-    IF __CPU_INTEL__
-	ld      hl,0
-	add     hl,sp
-	ld      (__printf_context),hl
-	ex      de,hl
-	ld      hl,-80
-	add     hl,sp
-	ld      sp,hl
-	ex      de,hl	;hl = ix + 0
-    ELIF __CPU_GBZ80__
-	ld      hl,sp+0
-	ld      d,h
-	ld      e,l
-	ld      hl,__printf_context
-	ld      a,e
-	ld      (hl+),a
-	ld      a,d
-	ld      (hl+),a
-	add     sp,-80
-        ld      l,e
-        ld      h,d
-    ENDIF
+  IF __CPU_INTEL__
+    ld      hl,0
+    add     hl,sp
+    ld      (__printf_context),hl
+    ex      de,hl
+    ld      hl,-80
+    add     hl,sp
+    ld      sp,hl
+    ex      de,hl	;hl = ix + 0
+  ELIF __CPU_GBZ80__
+    ld      hl,sp+0
+    ld      d,h
+    ld      e,l
+    ld      hl,__printf_context
+    ld      a,e
+    ld      (hl+),a
+    ld      a,d
+    ld      (hl+),a
+    add     sp,-80
+    ld      l,e
+    ld      h,d
+  ENDIF
 	push    hl	;save for a bit later
 	xor	a
 	dec     hl	;-1
-IF __CPU_GBZ80__
+  IF __CPU_GBZ80__
 	ld      (hl-),a
 	ld      (hl-),a
-ELSE
+  ELSE
 	ld      (hl),a
 	dec     hl	;-2
 	ld      (hl),a
 	dec     hl	;-3
-ENDIF
+  ENDIF
 	dec     a
 	dec     hl	;-4
 	dec     hl	;-5
-IF __CPU_GBZ80__
+  IF __CPU_GBZ80__
 	ld      (hl-),a
 	ld      (hl-),a
 	ld      (hl-),a
-ELSE
+  ELSE
 	ld      (hl),a
 	dec     hl	;-6
 	ld      (hl),a
 	dec     hl	;-7
 	ld      (hl),a
 	dec     hl	;-8
-ENDIF
+  ENDIF
 	ld      (hl),a
 	pop     hl	;+0
 	inc     hl	;+1
@@ -82,12 +82,12 @@ ENDIF
 	inc     hl	;+3
 	ld      d,(hl)
 	inc     hl	;+4
-IF __CPU_GBZ80__
+  IF __CPU_GBZ80__
 	ld      a,(hl+)
-ELSE
+  ELSE
 	ld      a,(hl)
 	inc     hl	;+5
-ENDIF
+  ENDIF
 	ld      h,(hl)
 	ld      l,a
 ELSE
@@ -99,6 +99,7 @@ ELSE
 	; -4 = 0x01 = pad right, 0x02=force sign, 0x04=pad with 0, 0x08=space if no sign, 0x10=precede with base
 	;	0x20=use ftoe
 	;	0x40=long (bit 6)
+    ;   0x80=printing far string
 	; -5,-6 = width
 	; -7,-8 = precision
 	; -9 = base for number conversion
@@ -106,25 +107,25 @@ ELSE
 	;
 	; -80->-11 = buffer (69 bytes)
   IF __CPU_RABBIT__
-	add     sp,-80
-	ld      hl,(ix+2)
-	ex      de,hl
-	ld      hl,(ix+4)
+    add     sp,-80
+    ld      hl,(ix+2)
+    ex      de,hl
+    ld      hl,(ix+4)
   ELSE
-	ld      hl,-80
-	add     hl,sp
-	ld      sp,hl
-        ld      de,(ix+2)	;arg pointer
-        ld      hl,(ix+4)	;format pointer
+    ld      hl,-80
+    add     hl,sp
+    ld      sp,hl
+    ld      de,(ix+2)	;arg pointer
+    ld      hl,(ix+4)	;format pointer
   ENDIF
-	xor	a
-	ld      (ix-1),a
-	ld      (ix-2),a
-	dec     a
-	ld      (ix-5),a
-	ld      (ix-6),a
-        ld      (ix-7),a	;precision = undefined
-        ld      (ix-8),a
+    xor     a
+    ld      (ix-1),a
+    ld      (ix-2),a
+    dec     a
+    ld      (ix-5),a
+    ld      (ix-6),a
+    ld      (ix-7),a	;precision = undefined
+    ld      (ix-8),a
 ENDIF
 .__printf_loop
 IF __CPU_INTEL__ | __CPU_GBZ80__
@@ -166,70 +167,70 @@ ELSE
 	ld      (ix-10),a		;length of temp buffer
 ENDIF
 IF __CPU_GBZ80__
-	ld      a,(hl+)
+    ld      a,(hl+)
 ELSE 
-	ld      a,(hl)
-	inc     hl
+    ld      a,(hl)
+    inc     hl
 ENDIF
-	and     a
-	jr      nz,cont
+    and     a
+    jr      nz,cont
 IF __CPU_RABBIT__ | __CPU_GBZ80__
-	add     sp,78
+    add     sp,78
 ELSE
-	ld      hl,78		;adjust the stack
-	add     hl,sp
-	ld      sp,hl
+    ld      hl,78		;adjust the stack
+    add     hl,sp
+    ld      sp,hl
 ENDIF
-	pop     hl		;grab the number of bytes written
+    pop     hl		;grab the number of bytes written
 IF __CPU_GBZ80__
-	ld      d,h
-	ld      e,l
+    ld      d,h
+    ld      e,l
 ENDIF
 __printf_get_flags_noop:	
-	ret
+    ret
 	
 .cont
-	cp	'%'
-	jr      z,handle_percent
+    cp	'%'
+    jr      z,handle_percent
 print_format_character:
-	call	__printf_doprint
-	jr      __printf_loop	
+    call	__printf_doprint
+    jr      __printf_loop	
 
 handle_percent:
 IF __CPU_GBZ80__
-	ld      a,(hl+)
+    ld      a,(hl+)
 ELSE
-	ld      a,(hl)
-	inc     hl
+    ld      a,(hl)
+    inc     hl
 ENDIF
-	cp	'%'
-	jr      z,print_format_character
-	call	__printf_get_flags		;level2
+    cp      '%'
+    jr      z,print_format_character
+    call    __printf_get_flags		;level2
 IF __CPU_INTEL__ | __CPU_GBZ80__
-	call	__printf_res_long_flag
+	call    __printf_res_long_flag
 ELSE
-	res	6,(ix-4)
+    res     6,(ix-4)
 ENDIF
-	cp      'z'               ;size_t argument (i.e. integer)
-	jr      z,get_next_char
-	cp	'h'               ;int sized argument
-	jr      nz,check_long_qualifier
+    cp      'z'               ;size_t argument (i.e. integer)
+    jr      z,get_next_char
+    cp      'h'               ;int sized argument
+    jr      nz,check_long_qualifier
 IF __CPU_GBZ80__
-	ld      a,(hl+)
+    ld      a,(hl+)
 ELSE
-	ld      a,(hl)
-	inc     hl
+    ld      a,(hl)
+    inc     hl
 ENDIF
-	cp      'h'
-	jr      nz,no_long_qualifier  ; Not promoted from a char
-        jr      get_next_char         ; It was %hh, pick up next character
+    cp      'h'
+    jr      nz,no_long_qualifier  ; Not promoted from a char
+    jr      get_next_char         ; It was %hh, pick up next character
 check_long_qualifier:
-	cp	'l'
-	jr      nz,no_long_qualifier
+    cp      'l'
+    jr      nz,no_long_qualifier
 IF __CPU_INTEL__ | __CPU_GBZ80__
-	call	__printf_set_long_flag
+    call    __printf_set_long_flag
 ELSE
-	set	6,(ix-4)
+    set     6,(ix-4)
 ENDIF
 get_next_char:
 IF __CPU_GBZ80__

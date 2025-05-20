@@ -245,8 +245,8 @@ void test_rshift32_const_unsigned(void)
 }
 
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
 void test_rshift64_var(void)
 {
      long long val = 0x8000000000000000LL;
@@ -531,8 +531,8 @@ int suite_rshift()
 {
     suite_setup("Right shift Tests");
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     suite_add_test(test_rshift64_const);
     suite_add_test(test_rshift64_const_unsigned);
     suite_add_test(test_rshift64_var);

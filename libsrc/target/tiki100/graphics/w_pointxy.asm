@@ -5,12 +5,12 @@
 
 
 
-	SECTION		code_graphics
-	PUBLIC		w_pointxy
+    SECTION code_graphics
+    PUBLIC  w_pointxy
 
-	defc	NEEDpoint= 1
+    defc    NEEDpoint=1
 
 
-.w_pointxy			
-	INCLUDE		"w_pixel.asm"
+w_pointxy:
+    INCLUDE "w_pixel.asm"
 

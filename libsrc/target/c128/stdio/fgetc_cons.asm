@@ -8,21 +8,21 @@
 ;
 
 
-        SECTION code_clib
-		PUBLIC	fgetc_cons
-		PUBLIC	_fgetc_cons
-		EXTERN	getk
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
+    EXTERN  getk
 
-.fgetc_cons
-._fgetc_cons
-	call	getk
-	and	a
-	jr	nz,fgetc_cons
-.kwait
-	call	getk
-	and	a
-	jr	z,kwait
-	
-	ld	l,a
-	ld	h,0
-	ret
+fgetc_cons:
+_fgetc_cons:
+    call    getk
+    and     a
+    jr      nz, fgetc_cons
+kwait:
+    call    getk
+    and     a
+    jr      z, kwait
+
+    ld      l, a
+    ld      h, 0
+    ret

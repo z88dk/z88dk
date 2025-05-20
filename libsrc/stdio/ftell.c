@@ -12,17 +12,14 @@
  */
 
 #define ANSI_STDIO
-
-#ifdef Z80
 #define STDIO_ASM
-#endif
 
 #include <stdio.h>
 #include <fcntl.h>
 
 fpos_t ftell(FILE *fp)
 {
-#ifdef Z80
+#ifdef __SCCZ80
 #asm
     pop     bc
     pop     hl

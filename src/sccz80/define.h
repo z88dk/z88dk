@@ -190,6 +190,7 @@ enum symbol_flags {
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
+        NONBANKED = 0x100000,       /* Symbol is in HOME section */
 };
 
 
@@ -380,9 +381,10 @@ struct gototab_s {
 #define CPU_GBZ80    128
 #define CPU_EZ80_Z80 256
 #define CPU_R4K      512
-#define CPU_KC160    1024
+#define CPU_R6K      1024
+#define CPU_KC160    2048
 
-#define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K)
+#define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K)
 
 #define IS_8080() (c_cpu == CPU_8080 )
 #define IS_8085() (c_cpu == CPU_8085 )

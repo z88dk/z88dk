@@ -2,12 +2,12 @@
 ;	MSX extension for "GFX - a small graphics library" by Jannone
 ;
 
-	SECTION code_video_vdp
-	PUBLIC	surface_pixeladdress
+    SECTION code_video_vdp
+    PUBLIC  surface_pixeladdress
 
-	EXTERN	base_graphics
+    EXTERN  base_graphics
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
 
 ;
@@ -29,36 +29,36 @@
 ;  afbcde../.... different
 ;
 
-.surface_pixeladdress
-	
-	ld	c,h		; X
-	ld	b,l		; Y
-	
-	ld	a,h		; X
-	and	@11111000
-	ld	l,a
+surface_pixeladdress:
 
-	ld	a,b		; Y
-	rra
-	rra
-	rra
-	and	@00011111
+    ld      c, h                        ; X
+    ld      b, l                        ; Y
 
-	ld	h,a		; + ((Y & @11111000) << 5)
+    ld      a, h                        ; X
+    and     @11111000
+    ld      l, a
 
-	ld	a,b		; Y
-	and	7
-	ld	e,a
-	ld	d,0
-	add	hl,de		; + Y&7
-	
-	ld	de,(base_graphics)
-	add	hl,de
-	ex	de,hl
+    ld      a, b                        ; Y
+    rra
+    rra
+    rra
+    and     @00011111
 
-        ld	a,c
-        and     @00000111
-        xor	@00000111
-	
-	ret
+    ld      h, a                        ; + ((Y & @11111000) << 5)
+
+    ld      a, b                        ; Y
+    and     7
+    ld      e, a
+    ld      d, 0
+    add     hl, de                      ; + Y&7
+
+    ld      de, (base_graphics)
+    add     hl, de
+    ex      de, hl
+
+    ld      a, c
+    and     @00000111
+    xor     @00000111
+
+    ret
 

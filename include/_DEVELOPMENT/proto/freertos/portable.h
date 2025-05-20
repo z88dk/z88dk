@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V11.0.1
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -85,6 +85,10 @@ include(__link__.m4)
 
 #ifndef portARCH_NAME
     #define portARCH_NAME    NULL
+#endif
+
+#ifndef configSTACK_DEPTH_TYPE
+    #define configSTACK_DEPTH_TYPE    StackType_t
 #endif
 
 #ifndef configSTACK_ALLOCATION_FROM_SEPARATE_HEAP
@@ -186,7 +190,7 @@ __OPROTO(,,void,,vPortGetHeapStats,HeapStats_t * pxHeapStats)
  * Map to the memory management routines required for the port.
  */
 /*
-void * pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
+void * pvPortMalloc( size_t xWantedSize ) PRIVILEGED_FUNCTION;
 void * pvPortCalloc( size_t xNum,
                      size_t xSize ) PRIVILEGED_FUNCTION;
 void vPortFree( void * pv ) PRIVILEGED_FUNCTION;
@@ -194,7 +198,7 @@ void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,*,pvPortMalloc,size_t xSize)
+__OPROTO(,,void,*,pvPortMalloc,size_t xWantedSize)
 __OPROTO(,,void,*,pvPortCalloc,size_t xNum,size_t xSize)
 __OPROTO(,,void,,vPortFree,void * pv)
 __OPROTO(,,void,,vPortInitialiseBlocks,void)
@@ -212,6 +216,15 @@ __OPROTO(,,size_t,,xPortGetMinimumEverFreeHeapSize,void)
     #define pvPortMallocStack    pvPortMalloc
     #define vPortFreeStack       vPortFree
 #endif
+
+/*
+ * This function resets the internal state of the heap module. It must be called
+ * by the application before restarting the scheduler.
+ */
+/*
+void vPortHeapResetState( void ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,void,,vPortHeapResetState,void)
 
 #if ( configUSE_MALLOC_FAILED_HOOK == 1 )
 

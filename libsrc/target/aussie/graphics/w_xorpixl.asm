@@ -1,13 +1,13 @@
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
-        PUBLIC    w_xorpixel
+    SECTION code_clib
+    PUBLIC  w_xorpixel
 
-        EXTERN     l_cmp
-        EXTERN     w_pixeladdress
-		EXTERN     pchar
+    EXTERN  l_cmp
+    EXTERN  w_pixeladdress
+    EXTERN  pchar
 
-        EXTERN    __gfx_coords
+    EXTERN  __gfx_coords
 
 ;
 ;       $Id: w_xorpixl.asm,v 1.1 2016-11-17 09:39:03 stefano Exp $
@@ -29,29 +29,31 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 ;
-.w_xorpixel
-                        push    hl
-                        ld      hl,maxy
-                        call    l_cmp
-                        pop     hl
-                        ret     nc               ; Return if Y overflows
+w_xorpixel:
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-                        push    de
-                        ld      de,maxx
-                        call    l_cmp
-                        pop     de
-                        ret     c               ; Return if X overflows
-                        
-                        ld      (__gfx_coords),hl     ; store X
-                        ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
-                        
-                        call    w_pixeladdress
-						ld		c,a	;;;
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
+
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
+
+    call    w_pixeladdress
+    ld      c, a                        ;;;
                         ;ld      b,a
-                        ld      a,1
-                        jr      z, or_pixel     ; pixel is at bit 0...
-.plot_position          rlca
-                        djnz    plot_position
-.or_pixel               xor		c
-						jp		pchar
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:
+    xor     c
+    jp      pchar
 

@@ -42,7 +42,7 @@
 #define freeRTOSBoardDefs_h
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 #ifdef __YAZ180

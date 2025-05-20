@@ -724,7 +724,11 @@ int cpc_exec(char* target)
     if (outfile == NULL)
     {
         strcpy(filename, binname);
-        suffix_change(filename, ".cpc");
+        if ( disk || noext ) {
+            suffix_change(filename, "");
+        } else {
+            suffix_change(filename, ".cpc");
+        }
     }
     else
     {

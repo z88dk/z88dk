@@ -21,7 +21,7 @@
     EXTERN  asm_im1_handler
     EXTERN	__primo_screen_base
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -44,28 +44,25 @@ ENDIF
 
 program:
     ld      (__sp),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+
     ; Entry stack is is ~ $e800 for 64k
     ;		      $a800 for 48k?
     ;		      $6800 for 32k
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     ld      hl,($0013)
     ld      (__primo_screen_base),hl
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
     call    _main
-cleanup:
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     ld      sp,(__sp)
     ret
 
@@ -76,6 +73,6 @@ __sp:	defw    0
 
     INCLUDE "target/primo/def/maths_mbf.def"
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"

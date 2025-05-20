@@ -12,75 +12,75 @@
 ;Number in FA..
 
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-                PUBLIC    fprand
-                PUBLIC    fpseed
+    SECTION code_fp
+    PUBLIC  fprand
+    PUBLIC  fpseed
 
-                EXTERN	stkequ
+    EXTERN  stkequ
 
-.fpseed
-	pop bc
-	pop de
-	pop hl
-	push hl
-	add hl,de ; shuffle 4/5 of the FP value into an integer value
-	push de
-	push bc
-	ld (fprand+1),hl
-	ret
-	
-	
+fpseed:
+    pop     bc
+    pop     de
+    pop     hl
+    push    hl
+    add     hl, de                      ; shuffle 4/5 of the FP value into an integer value
+    push    de
+    push    bc
+    ld      (fprand+1), hl
+    ret
 
-.fprand
 
-	LD      BC,1111      ; SEED 
-	LD		A,R          ; Add a little bit of randomness by shuffling FPSEED with R.
-	XOR		B            ; It avoids vertical patterns with PLOT RND*255, RND*176
-	LD		B,A          ; fpseed can't be used anymore to get a predictable sequence,
+
+fprand:
+
+    LD      BC, 1111                    ; SEED
+    LD      A, R                        ; Add a little bit of randomness by shuffling FPSEED with R.
+    XOR     B                           ; It avoids vertical patterns with PLOT RND*255, RND*176
+    LD      B, A                        ; fpseed can't be used anymore to get a predictable sequence,
 	                     ; but setting fpseed to RANDOMIZE is still recommended.
-	CALL    ZXFP_STACK_BC
+    CALL    ZXFP_STACK_BC
 
-	rst	ZXFP_BEGIN_CALC
+    rst     ZXFP_BEGIN_CALC
 
-	defb	ZXFP_STK_ONE
-	defb	ZXFP_ADDITION
-	defb	ZXFP_STK_DATA
-        DEFB    $37             ;;Exponent: $87, Bytes: 1 
-        DEFB    $16             ;;(+00,+00,+00) 
-	defb	ZXFP_MULTIPLY
-	defb	ZXFP_STK_DATA
-        DEFB    $80             ;;Bytes: 3 
-        DEFB    $41             ;;Exponent $91 
-        DEFB    $00,$00,$80     ;;(+00) 
-	defb	ZXFP_N_MOD_M
-	defb	ZXFP_DELETE
-	defb	ZXFP_STK_ONE
-	defb	ZXFP_SUBTRACT
-IF FORlambda
-	defb	ZXFP_DUPLICATE + 128
+    defb    ZXFP_STK_ONE
+    defb    ZXFP_ADDITION
+    defb    ZXFP_STK_DATA
+    DEFB    $37                         ;;Exponent: $87, Bytes: 1
+    DEFB    $16                         ;;(+00,+00,+00)
+    defb    ZXFP_MULTIPLY
+    defb    ZXFP_STK_DATA
+    DEFB    $80                         ;;Bytes: 3
+    DEFB    $41                         ;;Exponent $91
+    DEFB    $00, $00, $80               ;;(+00)
+    defb    ZXFP_N_MOD_M
+    defb    ZXFP_DELETE
+    defb    ZXFP_STK_ONE
+    defb    ZXFP_SUBTRACT
+IF  FORlambda
+    defb    ZXFP_DUPLICATE+128
 ELSE
-	defb	ZXFP_DUPLICATE
-	defb	ZXFP_END_CALC
+    defb    ZXFP_DUPLICATE
+    defb    ZXFP_END_CALC
 ENDIF
 
-	CALL    ZXFP_FP_TO_BC
-	LD      (fprand+1),BC      ; SEED ..Self Modifying Code, why not?
-	
-	ld a,(hl)                   ; pick up the exponent
-	sub 16                      ; reduce it by 16 (=divide number by 65536)
-	ld   (hl),a
+    CALL    ZXFP_FP_TO_BC
+    LD      (fprand+1), BC              ; SEED ..Self Modifying Code, why not?
 
-	jp      stkequ
+    ld      a, (hl)                     ; pick up the exponent
+    sub     16                          ; reduce it by 16 (=divide number by 65536)
+    ld      (hl), a
+
+    jp      stkequ

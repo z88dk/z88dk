@@ -32,7 +32,6 @@ EXTERN asm_am9511_min
     pop bc                      ; my return
     pop hl                      ; sdcc_float
     pop de
-    dec sp                      ; pop only 6 significant hex digits
     push bc
 
     ld a,$7f
@@ -46,7 +45,7 @@ EXTERN asm_am9511_min
     rl e
 
     dec a
-    jr Z,asm_am9511_min         ; safety net, in case something is borked
+    jp Z,asm_am9511_min         ; safety net, in case something is borked
 
     jr normmant
 

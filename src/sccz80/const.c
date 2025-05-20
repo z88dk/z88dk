@@ -260,7 +260,7 @@ typecheck:
     if ( lval->const_val > UINT32_MAX || lval->const_val < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
         if ( sizeof(long double) == sizeof(double)) {
-            warningfmt("limited-range", "On this host, 64 bit constants may not be correct\n");
+            warningfmt("limited-range", "On this host, 64 bit constants may not be correct");
         }
     }
     lval->is_const = 1;
@@ -329,17 +329,6 @@ int hex(char c)
     return ((c1 >= '0' && c1 <= '9') || (c1 >= 'A' && c1 <= 'F'));
 }
 
-/* djm, seems to load up literal address? */
-
-void address(SYMBOL* ptr)
-{
-    immed();
-    outname(ptr->name, dopref(ptr));
-    nl();
-    if ( ptr->ctype->kind == KIND_CPTR ) {
-        const2(0);
-    }
-}
 
 int pstr(LVALUE *lval)
 {
@@ -564,7 +553,7 @@ void offset_of(LVALUE *lval)
                     } else if ( ptr->ctype->kind == KIND_STRUCT ) {
                         tag = ptr->ctype->tag;
                     } else {
-                        printf("%d\n",ptr->type);
+//                        printf("%d\n",ptr->type);
                     }
                 }
             }
@@ -670,7 +659,7 @@ void size_of(LVALUE* lval)
                     do {
                         if ( (mptr = get_member(type->kind == KIND_STRUCT ? type->tag : type->ptr->tag) ) != NULL ) {
                             type = mptr;
-                            if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
+                            if ( ( mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
                                 // Do nothing
                             } else {
                                 // tag_sym->size = numner of elements

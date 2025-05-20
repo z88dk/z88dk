@@ -450,6 +450,8 @@ void flush_output(struct lexer_state *ls)
 }
 #endif
 
+static char nl_flag = 0;
+
 /*
  * Output one character; flush the buffer if needed.
  * This function should not be called, except by put_char().
@@ -467,6 +469,23 @@ static inline void write_char(struct lexer_state *ls, unsigned char c)
 #endif
 	if (c == '\n') {
 		ls->oline ++;
+	} else {
+		nl_flag = 0;
+	}
+}
+
+/*
+ * Output one character; flush the buffer if needed.
+ * This function should not be called, except by put_char().
+ */
+static inline void write_char_nl(struct lexer_state *ls)
+{
+	if (nl_flag) {
+		ls->oline ++;
+		return;
+	} else {
+		write_char(ls, '\n');
+		nl_flag = 1;
 	}
 }
 
@@ -516,6 +535,12 @@ static inline int read_char(struct lexer_state *ls)
 		if (x == EOF) return -1;
 		c = x;
 #endif
+		if (c == '\r') {
+			/*
+			 * We found a '\r'; let's skip it
+             */
+            continue;
+		}
 		if (ls->flags & COPY_LINE) {
 			if (c == '\n') {
 				ls->copy_line[ls->cli] = 0;
@@ -523,17 +548,6 @@ static inline int read_char(struct lexer_state *ls)
 			} else if (ls->cli < (COPY_LINE_LENGTH - 1)) {
 				ls->copy_line[ls->cli ++] = c;
 			}
-		}
-		if (c == '\r') {
-			/*
-			 * We found a '\r'; we handle it as a newline.
-			 * For '\r\n' cases (Windows) prefer to ignore this one and use '\n' later.
-			 */
-            if (ls->pbuf != ls->ebuf && ls->input_buf[ls->pbuf] == '\n')
-            {
-                continue;
-            }
-			c = '\n';
 		}
 		break;
 	}
@@ -814,7 +828,7 @@ static inline int read_token(struct lexer_state *ls)
 		shift_state = 0;
 	}
 	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
-		for (; ls->line > ls->oline;) put_char(ls, '\n');
+		for (; ls->line > ls->oline;) write_char_nl(ls);
 	do {
 		c = next_char(ls);
 		if (c < 0) {

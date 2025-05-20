@@ -49,14 +49,13 @@ ELSE
     ENDIF
 ENDIF
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    call    crt0_init
 
 
-IF DEFINED_USING_amalloc
-;    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+;    INCLUDE "crt/classic/crt_init_heap.inc"
+
     exx
     ex      de,hl
     ld      hl,-128		;Copy argument to stack, max length is 128 characters
@@ -85,14 +84,14 @@ found_end:
     ld      b,0
     ; hl = argument ends
     ;  c = length, b = 0
-    INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
 
     push    hl	;argv
     push    bc	;argc
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl

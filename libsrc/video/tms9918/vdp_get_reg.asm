@@ -23,8 +23,8 @@ _vdp_get_reg:
 
     ; (FASTCALL) -> HL = address
 
-    ld      de,RG0SAV
-    add     hl,de
-    ld      l,(hl)
-    ld      h,0
+    ld      de, RG0SAV
+    add     hl, de
+    ld      l, (hl)
+    ld      h, 0
     ret

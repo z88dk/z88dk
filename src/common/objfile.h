@@ -5,10 +5,6 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "die.h"
 #include "strutil.h"
 #include "types.h"
@@ -17,6 +13,10 @@ extern "C" {
 #include "z80asm_defs.h"
 #include "strtable.h"
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MIN_VERSION				1
 #define MAX_VERSION				18

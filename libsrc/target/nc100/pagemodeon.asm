@@ -1,8 +1,8 @@
 
-                SECTION code_clib
-		PUBLIC pagemodeon
-		PUBLIC _pagemodeon
+    SECTION code_clib
+    PUBLIC  pagemodeon
+    PUBLIC  _pagemodeon
 
-.pagemodeon
-._pagemodeon
-		jp 0xba49
+pagemodeon:
+_pagemodeon:
+    jp      0xba49

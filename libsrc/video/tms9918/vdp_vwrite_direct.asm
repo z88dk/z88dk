@@ -19,33 +19,33 @@
 
 vdp_vwrite_direct:
 _vdp_vwrite_direct:
-    push	ix		;save callers
-    ld      ix,4
-    add     ix,sp
+    push    ix                          ;save callers
+    ld      ix, 4
+    add     ix, sp
 
-    ld      l, (ix+2)	; dest
+    ld      l, (ix+2)                   ; dest
     ld      h, (ix+3)
 
     call    SETWRT
 
-    ld      l, (ix+0)	; count
+    ld      l, (ix+0)                   ; count
     ld      h, (ix+1)
 
-    ld      e, (ix+4)	; source
+    ld      e, (ix+4)                   ; source
     ld      d, (ix+5)
 
-IF VDP_DATA >= 256
-    ld      bc,VDP_DATA
+IF  VDP_DATA>=256
+    ld      bc, VDP_DATA
 ENDIF
 
 wrtloop:
-    ld      a,(de)
-    VDPOUT(VDP_DATA)
+    ld      a, (de)
+    VDPOUT  (VDP_DATA)
     inc     de
     dec     hl
-    ld      a,h
+    ld      a, h
     or      l
-    jr      nz,wrtloop
-    pop     ix		;restore callers
+    jr      nz, wrtloop
+    pop     ix                          ;restore callers
     ret
 

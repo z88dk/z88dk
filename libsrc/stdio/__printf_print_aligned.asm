@@ -7,8 +7,13 @@
     EXTERN  __printf_get_width
     EXTERN  __printf_is_padding_zero
     EXTERN  __printf_check_pad_right
+    EXTERN  __printf_pickup_far
 
-; Entry: bc = buffer to print
+    EXTERN  __far_page
+    EXTERN  l_far_incptrs
+
+; Entry:    bc = buffer to print OR
+;       e'b'c' = far buffer to print
 ;        de = length of the buffer
 __printf_print_aligned:
 IF __CPU_INTEL__ | __CPU_GBZ80__
@@ -52,9 +57,14 @@ print_buffer:
     or      e
     jr      z,buffer_done
     ld      a,(bc)
+IF __CPU_Z80__
+    bit     7,(ix-4)
+    call    nz,__printf_pickup_far
+ENDIF
+    call    __printf_doprint
+
 ;       and     a
 ;       jr      z,print_buffer_end
-    call    __printf_doprint
     inc     bc
     dec     de
     jr      print_buffer
@@ -84,3 +94,4 @@ ENDIF
     jr      z,print_padding_loop
     ld      c,'0'
     jr      print_padding_loop
+

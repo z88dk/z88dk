@@ -1,0 +1,194 @@
+;
+;	Extremely compact font to be used witht he ANSI VT routines
+;	when your target's display is short on pixels
+;
+;	Stefano Bodrato - 2025
+;
+;	set it up with:
+;	.__console_w	= max columns
+;	.__console_h	= max rows
+;
+;	Display a char in location (__console_y),(__console_x)
+;	A=char to display
+;
+;
+;	$Id: __ansichar_4x4.asm $
+;
+
+
+    SECTION code_graphics
+
+    PUBLIC  __ansichar_4x4
+
+;    EXTERN  __console_w
+;    EXTERN  __console_h
+
+    EXTERN  __console_y
+    EXTERN  __console_x
+
+;    EXTERN  CONSOLE_COLUMNS
+;    EXTERN  CONSOLE_ROWS
+
+
+    EXTERN  plot
+    EXTERN  unplot
+    EXTERN  __graphics_end
+
+
+__ansichar_4x4:
+
+    sub     32
+    ld      (chr), a
+
+    ld      a, (__console_x)
+    add     a
+    add     a
+    ld      (x_4x4),a
+    ld      a, (__console_y)
+    add     a
+    add     a
+    ld      (y_4x4),a
+
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    push    ix
+ENDIF
+IF  NEED_swapgfxbk=1
+    call    swapgfxbk
+ENDIF
+
+    ld      a, (chr)
+    rra
+
+    add     a                            ; x2
+;    add     a
+
+    ld      d, 0
+    ld      e, a
+    ld      hl, font4x4
+    add     hl, de
+    add     hl, de                       ; x4
+
+
+    ld      b, 4
+rowloop:
+    push    bc
+    push    hl
+    ld      a, (chr)
+    rra                                 ; even odd ?
+    ld      a, (hl)
+    jr      nc, iseven
+    rla
+    rla
+    rla
+    rla
+iseven:
+    ld      b, 4
+    ld      c, a
+
+    ld      a, (x_4x4)
+    ld      d, 0
+    ld      e, a
+colloop:
+IF  __CPU_INTEL__
+    ld      a, c
+    rla
+    ld      c, a
+ELSE
+    rl      c                           ; cy = pixel status
+ENDIF
+    push    bc
+    push    de
+    ld      a, (y_4x4)
+    ld      e, a
+    push    de
+
+    jr      nc, noplot
+    call    plot
+    jr      nores
+noplot:
+    call    unplot
+nores:
+    pop     de
+    pop     de
+    inc     e
+
+    pop     bc
+    djnz    colloop
+
+    ld      hl, y_4x4
+    inc     (hl)
+
+    pop     hl
+    inc     hl
+    pop     bc
+    djnz    rowloop
+
+IF  NEED_swapgfxbk
+    jp      __graphics_end
+ELSE
+  IF    !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+  ENDIF
+    ret
+ENDIF
+
+
+    SECTION bss_graphics
+
+x_4x4:  defb 0
+y_4x4:  defb 0
+chr:    defb 0
+
+
+    SECTION rodata_clib
+font4x4:
+defb 0x04 , 0x04 , 0x00 , 0x04
+defb 0xA8 , 0x0E , 0x0E , 0x02
+defb 0x4A , 0x86 , 0x2C , 0x4A
+defb 0x64 , 0xE4 , 0xC0 , 0x60
+defb 0x24 , 0x42 , 0x42 , 0x24
+defb 0x04 , 0x4E , 0x04 , 0x00
+defb 0x00 , 0x0E , 0x40 , 0x40
+defb 0x02 , 0x04 , 0x48 , 0x00
+defb 0xEC , 0xA4 , 0xEE , 0x00
+defb 0xCC , 0x46 , 0x6C , 0x00
+defb 0xA6 , 0xE4 , 0x2C , 0x00
+defb 0x8E , 0xE2 , 0xE2 , 0x00
+defb 0xEE , 0xEE , 0xE2 , 0x00
+defb 0x44 , 0x00 , 0x44 , 0x08
+defb 0x2E , 0x40 , 0x2E , 0x00
+defb 0x46 , 0x22 , 0x40 , 0x04
+defb 0x64 , 0x9E , 0xBA , 0x30
+defb 0xCE , 0xE8 , 0xCE , 0x00
+defb 0xCE , 0xAC , 0xCE , 0x00
+defb 0xEC , 0xCA , 0x8E , 0x00
+defb 0xAE , 0xE4 , 0xAE , 0x00
+defb 0x2A , 0x2C , 0xCA , 0x00
+defb 0x8E , 0x8E , 0xEA , 0x00
+defb 0xCE , 0xAA , 0xAE , 0x00
+defb 0xEE , 0xEA , 0x8C , 0x00
+defb 0xC6 , 0xE4 , 0xAC , 0x00
+defb 0xEA , 0x4A , 0x4E , 0x00
+defb 0xAA , 0xAE , 0x6E , 0x00
+defb 0xAA , 0x44 , 0xA4 , 0x00
+defb 0xCC , 0x48 , 0x6C , 0x00
+defb 0x86 , 0x42 , 0x26 , 0x00
+defb 0x40 , 0xA0 , 0x0F , 0x00   ; '^_'
+defb 0x40 , 0x22 , 0x06 , 0x00   ; ' a'
+defb 0x40 , 0x64 , 0x66 , 0x00
+defb 0x20 , 0x6E , 0x66 , 0x00   ; 'de'
+defb 0x24 , 0x4A , 0x66 , 0x4C
+defb 0x80 , 0xC4 , 0xA4 , 0x00
+defb 0x28 , 0xAA , 0x4C , 0x0A
+defb 0x40 , 0x4E , 0x4F , 0x00   ; 'lm'
+defb 0x00 , 0xC6 , 0xA6 , 0x00
+defb 0x00 , 0x66 , 0x66 , 0x42
+defb 0x00 , 0x66 , 0x4C , 0x00
+defb 0x40 , 0x6A , 0x46 , 0x00   ; 'tu'
+defb 0x00 , 0xA9 , 0x46 , 0x00
+defb 0x00 , 0xAA , 0x44 , 0xA8
+defb 0x06 , 0xCC , 0x66 , 0x00
+defb 0x4C , 0x46 , 0x4C , 0x00
+defb 0x50 , 0xA0 , 0x00 , 0x00
+

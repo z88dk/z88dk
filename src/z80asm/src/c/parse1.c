@@ -14,6 +14,7 @@ Define ragel-based parser.
 #include "cpu_rules_action.h"
 #include "die.h"
 #include "directives.h"
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "module1.h"
@@ -75,14 +76,14 @@ struct Expr1 *parse_expr(const char *expr_text)
 		sfile_hold_input();
 		{
 			SetTemporaryLine(expr_text);
-			num_errors = get_num_errors();
+			num_errors = get_error_count();
 			found_EOL = false;
 			scan_expect_operands();
 			GetSym();
 			expr = expr_parse();		/* may output error */
 			if (sym.tok != TK_END && sym.tok != TK_NEWLINE &&
-				num_errors == get_num_errors()) {
-				error_syntax_error();
+				num_errors == get_error_count()) {
+                error(ErrSyntax, NULL);
 				OBJ_DELETE(expr);
 				expr = NULL;
 			}
@@ -305,7 +306,9 @@ static void read_token(ParseCtx *ctx)
 	ctx->expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(ctx->tokens)) + expr_start_index : NULL;
 
 	// if symbol is a prefix, set scanner to get an opcode
-	if (sym.tok == TK_ALTD || sym.tok == TK_IOE || sym.tok == TK_IOI)
+	if (sym.tok == TK_ALTD || sym.tok == TK_ALTS || sym.tok == TK_ALTSD ||
+	    sym.tok == TK_IOE || sym.tok == TK_IOI
+	    )
 		scan_expect_opcode();
 
 	GetSym();
@@ -328,30 +331,30 @@ static void free_tokens(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   IF, IFDEF, IFNDEF, ELSE, ELIF, ELIFDEF, ELIFNDEF, ENDIF
 *----------------------------------------------------------------------------*/
-void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
+void parse_const_expr_eval(const char* expr_text, int* result, bool* got_error) {
 	*result = 0;
-	*error = false;
+	*got_error = false;
 	struct Expr1* expr = parse_expr(expr_text);
 	if (!expr)
-		*error = true;
+		*got_error = true;
 	else {
 		// eval and discard expression
 		*result = Expr_eval(expr, true);
 		if (expr->result.not_evaluable) {
-			error_constant_expression_expected();
-			*error = true;
+			error(ErrConstExprExpected, NULL);
+			*got_error = true;
 		}
 		OBJ_DELETE(expr);
 	}
 }
 
-void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* error) {
-	*condition = *error = false;
+void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* got_error) {
+	*condition = *got_error = false;
 	struct Expr1 *expr = parse_expr(expr_text);
 	if (expr)
 		*condition = check_if_condition(expr);
 	else
-		*error = true;
+		*got_error = true;
 }
 
 bool check_if_condition(Expr1 *expr) {
@@ -399,17 +402,17 @@ static void parseline(ParseCtx *ctx)
 	next_PC();				/* update assembler program counter */
 	found_EOL = false;			/* reset END OF LINE flag */
 
-	start_num_errors = get_num_errors();
+	start_num_errors = get_error_count();
 
 	scan_expect_opcode();
 	GetSym();
 
-	if (get_num_errors() != start_num_errors)		/* detect errors in GetSym() */
+	if (get_error_count() != start_num_errors)		/* detect errors in GetSym() */
 		Skipline();
 	else if (!parse_statement(ctx))
 	{
-		if (get_num_errors() == start_num_errors) {	/* no error output yet */
-			error_syntax_error();
+		if (get_error_count() == start_num_errors) {	/* no error output yet */
+            error(ErrSyntax, NULL);
 			ctx->current_sm = SM_MAIN;				/* reset state machine */
 		}
 
@@ -421,7 +424,7 @@ void parse_file(const char* filename)
 {
 	ParseCtx* ctx = ParseCtx_new();
 	{
-		if (sfile_open(filename, true)) {
+		if (sfile_open(filename)) {
 			sym.tok = TK_NIL;
 			while (sym.tok != TK_END)
 				parseline(ctx);				/* before parsing it */

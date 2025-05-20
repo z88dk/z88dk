@@ -1,9 +1,9 @@
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
-	PUBLIC    w_plotpixel
+    SECTION code_clib
+    PUBLIC  w_plotpixel
 
-	EXTERN   __v1050_pixel
+    EXTERN  __v1050_pixel
 
 ;
 ;       $Id: w_plotpixl.asm $
@@ -26,8 +26,8 @@
 ;  afbcdehl/.... different
 ;
 
-.w_plotpixel
+w_plotpixel:
 
-		ld c,'0'
-		jp __v1050_pixel
+    ld      c, '0'
+    jp      __v1050_pixel
 

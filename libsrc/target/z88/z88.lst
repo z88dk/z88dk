@@ -41,7 +41,6 @@ target/z88/stdlib/sleep
 
 target/z88/time/clock
 target/z88/time/time
-games/joystick
 target/z88/games/bit_open
 target/z88/games/bit_open_di
 target/z88/games/bit_close
@@ -87,3 +86,8 @@ target/z88/graphics/window
 target/z88/input/in_Pause
 target/z88/input/in_WaitForKey
 target/z88/input/in_WaitForNoKey
+target/z88/far/__far_misc.asm
+target/z88/far/__far_page.asm
+target/z88/far/free_far.asm
+target/z88/far/freeall_far.asm
+target/z88/far/malloc_far.asm

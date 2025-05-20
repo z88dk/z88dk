@@ -8,17 +8,17 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_open
-    PUBLIC     _bit_open
-    EXTERN     __snd_tick
+    PUBLIC  bit_open
+    PUBLIC  _bit_open
+    EXTERN  __snd_tick
 
-.bit_open
-._bit_open
-          ld   a,($038A9)
-          cp   $3A
-		  ld   a,1
-		  jr   nz,do_init
-          ld   a,($431C)
-.do_init
-          ld   (__snd_tick),a
-          ret
+bit_open:
+_bit_open:
+    ld      a, ($038A9)
+    cp      $3A
+    ld      a, 1
+    jr      nz, do_init
+    ld      a, ($431C)
+do_init:
+    ld      (__snd_tick), a
+    ret

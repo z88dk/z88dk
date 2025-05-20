@@ -8,18 +8,11 @@
 #define _BYTESWAP_H
 
 #include <sys/compiler.h>
+#include <intrinsic.h>
 
 
-unsigned int bswap_16 (unsigned int __x)
-{
-  return (__x >> 8) | (__x << 8);
-}
-
-unsigned long bswap_32 (unsigned long __x)
-{
-  return (bswap_16 (__x & 0xffff) << 16) | (bswap_16 (__x >> 16));
-}
-
+#define bswap_32(a) intrinsic_swap_endian_32(a)
+#define bswap_16(a) intrinsic_swap_endian_16(a)
 
 
 #endif /*_BYTESWAP_H*/

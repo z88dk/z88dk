@@ -8,18 +8,18 @@
 ;	$Id: mt_invhrg.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	invhrg
-	PUBLIC	_invhrg
-	EXTERN	hrgmode
+    SECTION code_clib
+    PUBLIC  invhrg
+    PUBLIC  _invhrg
+    EXTERN  hrgmode
 
 	; 2=true video, 3=inverse video
 
-.invhrg
-._invhrg
-	ld	a,(hrgmode)
-	xor	1
-	ld	(hrgmode),a
-	in	a,($5f)
+invhrg:
+_invhrg:
+    ld      a, (hrgmode)
+    xor     1
+    ld      (hrgmode), a
+    in      a, ($5f)
 
-	ret
+    ret

@@ -214,6 +214,10 @@ extern void __LIB__ bit_tapin_bit(void);
   #define BEEP_TSTATES 447443.1 /* 3.579545 Mhz */
 #endif
 
+#ifdef __NC100__
+  #define BEEP_TSTATES 575750.0  /* 4.606 MHz */
+#endif
+
 #ifdef __P2000__
   #define BEEP_TSTATES 312500.0 /* 2.5 Mhz */
 #endif
@@ -250,6 +254,10 @@ extern void __LIB__ bit_tapin_bit(void);
 
 #ifdef __TI86__
   #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __TIKI100__
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
 #ifdef __OZ__

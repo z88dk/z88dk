@@ -4,14 +4,14 @@
 ;	by Stefano Bodrato  - 2016
 
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-        SECTION code_clib
-	PUBLIC	w_pointxy
-	EXTERN		l_cmp
+    SECTION code_clib
+    PUBLIC  w_pointxy
+    EXTERN  l_cmp
 
 
-	EXTERN	w_pixeladdress
+    EXTERN  w_pixeladdress
 
 ;
 ;	$Id: w_pointxy.asm,v 1.1 2016-11-17 09:39:03 stefano Exp $
@@ -34,25 +34,27 @@
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
-.w_pointxy
-                        push    hl
-                        ld      hl,maxy
-                        call    l_cmp
-                        pop     hl
-                        ret     nc               ; Return if Y overflows
+w_pointxy:
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-                        push    de
-                        ld      de,maxx
-                        call    l_cmp
-                        pop     de
-                        ret     c               ; Return if X overflows
-                        
-                        call    w_pixeladdress
-						ld		c,a	;;;
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
+
+    call    w_pixeladdress
+    ld      c, a                        ;;;
                         ;ld      b,a
-                        ld      a,1
-                        jr      z, test_pixel     ; pixel is at bit 0...
-.pix_position           rlca
-                        djnz    pix_position
-.test_pixel             and		c
-                        ret
+    ld      a, 1
+    jr      z, test_pixel               ; pixel is at bit 0...
+pix_position:
+    rlca
+    djnz    pix_position
+test_pixel:
+    and     c
+    ret

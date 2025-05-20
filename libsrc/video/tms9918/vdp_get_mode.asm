@@ -18,6 +18,6 @@
 
 vdp_get_mode:
 _vdp_get_mode:
-    ld      hl,(__tms9918_screen_mode)
-    ld      h,0
+    ld      hl, (__tms9918_screen_mode)
+    ld      h, 0
     ret

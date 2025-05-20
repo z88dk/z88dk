@@ -5,9 +5,29 @@ z88dk v2.4 - xx.xx.2024
 
 Future release changes:
 
-- [zsdcc] Upgraded to SDCC 4.4.0 r14648
+- [appmake] +c128 Correct filename handling for use with c1541
+- [classic] Support more ways of configuring the heap size
+- [classic] Additional pragma support for interrupts added to targets
+- [classic] +aquarius: Support for far heap (-clib=aqplus)
+- [classic] +cpm: Stack now setup correctly when running on CP/M Plus
+- [classic] +cpm: Support for many new disc formats
+- [classic] +cpm: Support for far heap (PCW)
+- [classic] +hector: New target
+- [classic] +msx: Support for far heap (MSXDOS)
+- [classic] +sam: Support for far heap 
+- [classic] +zx: Support for far heap 
+- [classic] +zx81 ARX hires graphics updates
+- [classic] -llib3d is now integratted into target library
+- [classic] More near-heap size choice pragmas
+- [classic] More modularised crt setup
+- [newlib] Resolve and correct library build issues with .asm.m4 files
+- [sccz80] 8080 codegen fixes
+- [zsdcc] Upgraded to SDCC 4.5.0 r15248
+- [z80asm] GBZ80 opcode conversion fixes
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
-
+- [z80asm] add string argument to ASSERT
+- [z80asm] fix expansion of nested macros with same parameter names
+- [z80asm] add local labels
 
 z88dk v2.3 - 20.12.2023
 

@@ -35,11 +35,11 @@
  */
 #define SXMLC_VERSION "4.5.0"
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdio.h>
 
 /**
  * \brief Define this to compile unicode support.

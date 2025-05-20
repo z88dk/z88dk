@@ -18,7 +18,7 @@
     EXTERN  _main
     EXTERN  msxbios
 
-    PUBLIC  cleanup
+    PUBLIC  __Exit
     PUBLIC  l_dcal
 
 
@@ -50,17 +50,11 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 IF startup != 2
     call    $53     ; Hide function key menu
@@ -68,11 +62,13 @@ ELSE
     im      1
     ei
 ENDIF
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
+
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
-
-
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
 IF startup = 2
@@ -93,12 +89,12 @@ ENDIF
 
     ; All startup modes follow on here
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; And include handling disabling screenmodes
-    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 IF startup = 2
     INCLUDE "target/svi/classic/bootstrap.asm"

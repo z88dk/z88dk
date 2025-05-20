@@ -10,19 +10,19 @@
 ;
 
 
-			INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-			SECTION code_clib
-			PUBLIC	respixel
+    SECTION code_clib
+    PUBLIC  respixel
 
-			EXTERN	__gfx_coords
-			EXTERN	base_graphics
-	INCLUDE "target/m100/def/romcalls.def"
-.respixel
-			ld	d,h
-			ld	e,l
-			ld	(__gfx_coords),hl
-			ROMCALL
-			defw	LCDRES
-			ret
+    EXTERN  __gfx_coords
+    EXTERN  base_graphics
+    INCLUDE "target/m100/def/romcalls.def"
+respixel:
+    ld      d, h
+    ld      e, l
+    ld      (__gfx_coords), hl
+    ROMCALL
+    defw    LCDRES
+    ret
 

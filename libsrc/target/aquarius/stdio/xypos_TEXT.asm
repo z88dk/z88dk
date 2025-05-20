@@ -5,8 +5,7 @@ PUBLIC xypos_TEXT
 PUBLIC xypos_BITMAP_ATTR
 
 EXTERN CONSOLE_COLUMNS
-
-INCLUDE "target/aquarius/def/aquarius.def"
+EXTERN DISPLAY
 
 EXTERN __aquarius_video_base
 

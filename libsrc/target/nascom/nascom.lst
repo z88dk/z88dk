@@ -12,5 +12,5 @@ target/nascom/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 target/nascom/graphics/textpixl6
 @gfx/gencon/gfx_gencon6.lst
-games/joystick
+@games/games.lst
 

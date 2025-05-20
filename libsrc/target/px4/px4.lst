@@ -4,6 +4,9 @@ target/px4/graphics/putsprite
 target/px4/graphics/bksave
 target/px4/graphics/bkrestore
 target/px4/graphics/swapgfxbk
+gfx/narrow/obj/${TARGET}/clrarea2
+gfx/narrow/obj/${TARGET}/fillarea2
+gfx/narrow/obj/${TARGET}/xorclrarea2
 @gfx/narrow/gfx_narrow.lst
 @stdio/ansicore.lst
 target/px4/stdio/ansi/f_ansi_attr
@@ -12,3 +15,4 @@ target/px4/stdio/ansi/f_ansi_char
 target/px4/stdio/ansi/f_ansi_cls
 target/px4/stdio/ansi/f_ansi_dline
 target/px4/stdio/ansi/f_ansi_scrollup
+@games/games.lst

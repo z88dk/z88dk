@@ -22,6 +22,7 @@ ${NEWLIB_ROOT}/l/sccz80/4-ez80/l_glongsp
 ${NEWLIB_ROOT}/l/sccz80/4-ez80/l_pint_pop
 ${NEWLIB_ROOT}/l/sccz80/4-ez80/l_plong
 ${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_gchar
+${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_guchar
 ${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_gint
 ${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_glong
 ${NEWLIB_ROOT}/l/sccz80/4-ez80/lp_gptr

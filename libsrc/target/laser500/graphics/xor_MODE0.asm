@@ -1,8 +1,8 @@
 
-        SECTION code_clib
+    SECTION code_clib
 
-        PUBLIC  xor_MODE0
+    PUBLIC  xor_MODE0
 
-.xor_MODE0
-        defc    NEEDxor = 1
-        INCLUDE "gfx/gencon/pixel.inc"
+xor_MODE0:
+    defc    NEEDxor=1
+    INCLUDE "gfx/gencon/pixel.inc"

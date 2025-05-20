@@ -7,10 +7,10 @@
 ;       $Id: lpton.asm,v 1.4 2016-06-19 20:58:00 dom Exp $
 ;
 
-        SECTION   code_clib
-PUBLIC lpton
-PUBLIC _lpton
+    SECTION code_clib
+    PUBLIC  lpton
+    PUBLIC  _lpton
 
 lpton:
 _lpton:
-   jp	$1fd9
+    jp      $1fd9

@@ -21,7 +21,7 @@
 ;
 ;	$Id: app_crt0.asm,v 1.30 2016-07-15 19:32:43 dom Exp $
 
-    PUBLIC    cleanup               ;jp'd to by exit()
+    PUBLIC    __Exit               ;jp'd to by exit()
     PUBLIC    l_dcal                ;jp(hl)
 
 
@@ -138,22 +138,23 @@ init_continue:			;We had enough memory
     ld      hl,clrscr2
     call_oz(gn_sop)
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
 crt0_reqpag_check1:
     ld      hl,0        ; reqpag  address
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    defc CRT_MAX_HEAP_ADDRESS_hl = 1
 ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+
 IF DEFINED_farheapsz
     call    init_far	;Initialise far memory if required
 ENDIF
     call    _main   ;Call the users code
     ld      l,0     ;Default return value is 0
-cleanup:            ;Jump back to here from exit()
+__Exit:            ;Jump back to here from exit()
     push	hl      ;Save exit value
     call    crt0_exit
  IF DEFINED_farheapsz
@@ -200,7 +201,7 @@ IF DEFINED_applicationquit
     call    applicationquit
 ENDIF
     ld      l,0
-    jr      cleanup
+    jr      __Exit
 not_quit:
     xor     a
     ret
@@ -212,7 +213,7 @@ not_quit:
 ; Prototype is extern void __FASTCALL__ *cpfar2near(far void *)
 ;--------
 IF DEFINED_farheapsz
-    EXTERN	strcpy_far
+    EXTERN	strcpyf
 _cpfar2near:
     pop     bc	;ret address
     pop     hl
@@ -228,7 +229,7 @@ _cpfar2near:
     push    bc	;dest
     push    de	;source
     push    hl
-    call    strcpy_far
+    call    strcpyf
     pop     bc	;dump args
     pop     bc
     pop     bc
@@ -246,7 +247,7 @@ _cpfar2near:
     ret
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 ;-------
 ; Text to define the BASIC style window
@@ -302,7 +303,7 @@ ENDIF
 IF CRT_Z88_SAFEDATA = 0
     defc __crt_org_bss_fardata_start = 8192
 ENDIF
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

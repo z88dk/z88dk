@@ -3,12 +3,12 @@
 ;       transcendental floating point routines
 ;
 
-        SECTION code_fp
-        PUBLIC    cos
-        EXTERN     sin
-	EXTERN	hladd
+    SECTION code_fp
+    PUBLIC  cos
+    EXTERN  sin
+    EXTERN  hladd
 
-	EXTERN	__halfpi
+    EXTERN  __halfpi
 
 
 
@@ -23,11 +23,14 @@
 ;
 ;       transcendental functions: sin, cos, tan
 ;
-.cos    LD      HL,halfpi	;local copy..
-        CALL    hladd   
-        jp      sin
+cos:
+    LD      HL, halfpi                  ;local copy..
+    CALL    hladd
+    jp      sin
 
-.halfpi	DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2
+halfpi:
+    DEFB    $22, $A2, $DA, $0F, $49, $81
+                                        ; pi/2
 
 
 

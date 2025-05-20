@@ -45,6 +45,7 @@ extern double_t __LIB__ atanh(double_t); /* arc hyberbolic tangent */
 /* Power functions */
 extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
 extern double_t __LIB__ sqrt(double_t);  /* square root */
+#define sqr(x) ((x)*(x))
 #define cbrt(x) ((x)==0.?0.:(x)>0.?pow(x,.33333333):-pow(-x,.33333333))
 #define hypot(x,y) sqrt(x*x+y*y)
 

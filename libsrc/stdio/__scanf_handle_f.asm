@@ -27,8 +27,9 @@ __scanf_handle_f:
     call    __scanf_common_start	
     jp      c,scanf_exit
     call    __scanf_ungetchar
+    push    hl          ;Save fmt
     push    de          ;save destination
-    ld      hl,2
+    ld      hl,4
     add     hl,sp
     ex      de,hl       ;de = our buffer for the number
     ld      c,0	       ;[000000E.]
@@ -89,12 +90,12 @@ handle_f_fmt_store:
 handle_f_fmt_finished_reading:
     xor     a
     ld      (de),a
-    ld      hl,2
+    ld      hl,4
     add     hl,sp
     call    l_cmp
     jr      z,handle_f_fmt_error
     ; TODO: Check there's something there
-    ld      hl,2    ;we have the destination on the stack
+    ld      hl,4    ;we have the destination on the stack
     add     hl,sp
 IF !__CPU_INTEL__
     push    ix      ;save our framepointer - fp library will disturb it
@@ -128,10 +129,12 @@ IF __CPU_INTEL__
 ELSE
     inc     (ix-1)  ;increase number of conversions
 ENDIF
+    pop     hl      ;restore fmt
     jp      scanf_loop
 handle_f_fmt_error:
     call    __scanf_ungetchar
-    pop         de  ;discard destinatino
+    pop     de  ;discard destinatino
+    pop     hl      ;restore fmt
     jp      scanf_exit
 
 ENDIF

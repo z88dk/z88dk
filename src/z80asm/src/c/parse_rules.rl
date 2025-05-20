@@ -83,7 +83,7 @@ Define rules for a ragel-based parser.
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr
 		  %{ if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			else {
 				asm_DEFGROUP_start(ctx->expr_value);
 				asm_DEFGROUP_define_const(Str_data(name));
@@ -117,7 +117,7 @@ Define rules for a ragel-based parser.
 
 	defgroup_open :=
 		  _TK_NEWLINE
-		| _TK_END 								@{ error_missing_bracket_block(); }
+		| _TK_END 								@{ error(ErrMissingBlock, NULL); }
 		| _TK_LCURLY _TK_NEWLINE 				@{ ctx->current_sm = SM_DEFGROUP_LINE; }
 		| _TK_LCURLY 			 				@{ ctx->current_sm = SM_DEFGROUP_LINE; }
 		  defgroup_vars _TK_NEWLINE
@@ -128,7 +128,7 @@ Define rules for a ragel-based parser.
 
 	defgroup_line :=
 		  _TK_NEWLINE
-		| _TK_END 								@{ error_bracket_block_not_closed(); }
+		| _TK_END 								@{ error(ErrMissingCloseBlock, NULL); }
 		| _TK_RCURLY _TK_NEWLINE				@{ ctx->current_sm = SM_MAIN; }
 		| defgroup_vars _TK_NEWLINE
 		| defgroup_vars
@@ -145,7 +145,7 @@ Define rules for a ragel-based parser.
 #foreach <S> in B, W, P, Q
 		|	name _TK_DS_<S> const_expr _TK_NEWLINE
 											@{ 	if (ctx->expr_error)
-													error_constant_expression_expected();
+													error(ErrConstExprExpected, NULL);
 												else
 													asm_DEFVARS_define_const( Str_data(name),
 																			  DEFVARS_SIZE_<S>,
@@ -155,7 +155,7 @@ Define rules for a ragel-based parser.
 #foreach <S> in B, W, P, Q
 		|	name _TK_DS_<S> const_expr _TK_RCURLY _TK_NEWLINE
 											@{ 	if (ctx->expr_error)
-													error_constant_expression_expected();
+													error(ErrConstExprExpected, NULL);
 												else
 													asm_DEFVARS_define_const( Str_data(name),
 																			  DEFVARS_SIZE_<S>,
@@ -168,21 +168,21 @@ Define rules for a ragel-based parser.
 	asm_DEFVARS =
 		  _TK_DEFVARS const_expr _TK_NEWLINE
 											@{ 	if (ctx->expr_error)
-													error_constant_expression_expected();
+													error(ErrConstExprExpected, NULL);
 												else
 													asm_DEFVARS_start(ctx->expr_value);
 												ctx->current_sm = SM_DEFVARS_OPEN;
 											}
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
 											@{ 	if (ctx->expr_error)
-													error_constant_expression_expected();
+													error(ErrConstExprExpected, NULL);
 												else
 													asm_DEFVARS_start(ctx->expr_value);
 												ctx->current_sm = SM_DEFVARS_LINE;
 											}
 		| _TK_DEFVARS const_expr _TK_LCURLY
 											@{ 	if (ctx->expr_error)
-													error_constant_expression_expected();
+													error(ErrConstExprExpected, NULL);
 												else
 													asm_DEFVARS_start(ctx->expr_value);
 												ctx->current_sm = SM_DEFVARS_LINE;
@@ -192,7 +192,7 @@ Define rules for a ragel-based parser.
 
 	defvars_open :=
 		  _TK_NEWLINE
-		| _TK_END 							@{ error_missing_bracket_block(); }
+		| _TK_END 							@{ error(ErrMissingBlock, NULL); }
 		| _TK_LCURLY _TK_NEWLINE 			@{ ctx->current_sm = SM_DEFVARS_LINE; }
 		| _TK_LCURLY 			 			@{ ctx->current_sm = SM_DEFVARS_LINE; }
 		  defvars_define
@@ -200,7 +200,7 @@ Define rules for a ragel-based parser.
 
 	defvars_line :=
 		  _TK_NEWLINE
-		| _TK_END 							@{ error_bracket_block_not_closed(); }
+		| _TK_END 							@{ error(ErrMissingCloseBlock, NULL); }
 		| _TK_RCURLY _TK_NEWLINE			@{ ctx->current_sm = SM_MAIN; }
 		| defvars_define
 		;
@@ -212,26 +212,26 @@ Define rules for a ragel-based parser.
 		  label? (_TK_DEFS | _TK_DS) const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL();
 		     if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			 else
 				asm_DEFS(ctx->expr_value, option_filler()); }
 		| label? (_TK_DEFS | _TK_DS)
 				const_expr _TK_COMMA
 				@{ if (ctx->expr_error)
-					  error_constant_expression_expected();
+					  error(ErrConstExprExpected, NULL);
 			       value1 = ctx->expr_error ? 0 : ctx->expr_value;
 				   ctx->expr_error = false;
 				}
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL();
 		     if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			 else
 				asm_DEFS(value1, ctx->expr_value); }
 		| label? (_TK_DEFS | _TK_DS)
 				const_expr _TK_COMMA
 				@{ if (ctx->expr_error)
-					  error_constant_expression_expected();
+					  error(ErrConstExprExpected, NULL);
 			       value1 = ctx->expr_error ? 0 : ctx->expr_value;
 				   ctx->expr_error = false;
 				}
@@ -355,7 +355,7 @@ Define rules for a ragel-based parser.
 	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
 			@{	DO_STMT_LABEL();
 			    if (ctx->expr_error)
-				    error_constant_expression_expected();
+				    error(ErrConstExprExpected, NULL);
 			    else
 					add_Z88_<OP>(ctx->expr_value);
 			};
@@ -413,43 +413,52 @@ Define rules for a ragel-based parser.
 		| label? _TK_ASSERT const_expr _TK_NEWLINE @{
 			DO_STMT_LABEL();
 			if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			else if (ctx->expr_value == 0)
-				error_assertion_failed();
+				error(ErrAssertFailed, NULL);
+			else 
+				; 
+		}
+		| label? _TK_ASSERT const_expr _TK_COMMA string _TK_NEWLINE @{
+			DO_STMT_LABEL();
+			if (ctx->expr_error)
+				error(ErrConstExprExpected, NULL);
+			else if (ctx->expr_value == 0)
+				error(ErrAssertFailed, Str_data(name));
 			else 
 				; 
 		}
 		| label? _TK_ALIGN const_expr _TK_NEWLINE @{
 		    DO_STMT_LABEL();
 			if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			else
 				asm_ALIGN(ctx->expr_value, option_filler());
 		}
 		| label? _TK_ALIGN const_expr _TK_COMMA
 				@{ if (ctx->expr_error)
-					   error_constant_expression_expected();
+					   error(ErrConstExprExpected, NULL);
 				   value1 = ctx->expr_error ? 0 : ctx->expr_value;
 				   ctx->expr_error = false;
 				}
 				const_expr _TK_NEWLINE @{
 			DO_STMT_LABEL();
 		    if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			else
 				asm_ALIGN(value1, ctx->expr_value);
 		}
 
 		| _TK_ORG const_expr _TK_NEWLINE @{
 			if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			else
 				asm_ORG(ctx->expr_value);
 		}
 
 		| _TK_PHASE const_expr _TK_NEWLINE @{
 			if (ctx->expr_error)
-				error_constant_expression_expected();
+				error(ErrConstExprExpected, NULL);
 			else
 				asm_PHASE(ctx->expr_value);
 		}
@@ -497,15 +506,41 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 
 		| _TK_ASSUME _TK_ADL _TK_EQUAL const_expr _TK_NEWLINE @{
-			if (option_cpu() != CPU_EZ80 && option_cpu() != CPU_EZ80_Z80)
-				error_illegal_identifier();
-			else if (ctx->expr_error)
-				error_constant_expression_expected();
+			if (ctx->expr_error)
+				error(ErrConstExprExpected, NULL);
             else {
-                switch (ctx->expr_value) {
-                case 0: set_cpu_option(CPU_EZ80_Z80); break;
-                case 1: set_cpu_option(CPU_EZ80); break;
-                default: error_integer_range(ctx->expr_value);
+                switch (option_cpu()) {
+                case CPU_EZ80:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80); break;
+                    case 1: option_set_cpu(CPU_EZ80); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                case CPU_EZ80_Z80:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80); break;
+                    case 1: option_set_cpu(CPU_EZ80); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                case CPU_EZ80_STRICT:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80_STRICT); break;
+                    case 1: option_set_cpu(CPU_EZ80_STRICT); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                case CPU_EZ80_Z80_STRICT:
+                    switch (ctx->expr_value) {
+                    case 0: option_set_cpu(CPU_EZ80_Z80_STRICT); break;
+                    case 1: option_set_cpu(CPU_EZ80_STRICT); break;
+                    default: error_hex2(ErrIntRange, ctx->expr_value);
+                    }
+                    break;
+                default:
+                    error(ErrIllegalIdent, NULL);
+                    break;
                 }
             }
 		}
@@ -553,7 +588,7 @@ static int get_start_state(ParseCtx *ctx)
 static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
 	int  value1 = 0;
-	int  start_num_errors = get_num_errors();
+	int  start_num_errors = get_error_count();
 	ctx->expr_value = 0;			/* last computed expression value */
 	ctx->expr_error = false;		/* last computed expression error */
 	ctx->expr_in_parens = false;	/* true if expression has enclosing parens */
@@ -578,7 +613,7 @@ static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 			return true;
 
 		/* assembly error? must test after check for end of parse */
-		if (get_num_errors() != start_num_errors)
+		if (get_error_count() != start_num_errors)
 			break;
 	}
 

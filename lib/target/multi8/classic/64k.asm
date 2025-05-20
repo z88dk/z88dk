@@ -6,6 +6,8 @@
     defc    CRT_ORG_CODE  = 0x0000
     defc    TAR__register_sp = 0xffff
     defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001       ;loop forever
     defc    VRAM_IN = 0x37;
     defc    VRAM_OUT = 0x2f
 
@@ -24,36 +26,29 @@
 
     org     CRT_ORG_CODE
 
-    INCLUDE    "crt/classic/crt_z80_rsts.asm"
+    INCLUDE    "crt/classic/crt_z80_rsts.inc"
 
 program:
     ; Make room for the atexit() stack
-    INCLUDE    "crt/classic/crt_init_sp.asm"
-    INCLUDE    "crt/classic/crt_init_atexit.asm"
+    INCLUDE    "crt/classic/crt_init_sp.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE    "crt/classic/crt_init_atexit.inc"
 
     ld      a,(SYSVAR_PORT29_COPY)
     ld      (__port29_copy),a
-
-
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-
-
+    INCLUDE "crt/classic/crt_init_heap.inc"
     im      1
-    ei
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
-endloop:
-    jr      endloop
 

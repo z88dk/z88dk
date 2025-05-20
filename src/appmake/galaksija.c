@@ -131,7 +131,8 @@ int gal_exec(char* target)
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
     int c, i;
-    int len, screenmode, after_header;
+    int len, screenmode;
+    int after_header = 0;
 
     unsigned long checksum;
     FILE *fpin, *fpout;
@@ -150,8 +151,8 @@ int gal_exec(char* target)
     }
 
     if (loud) {
-        gal_h_lvl = 0xFF;
-        gal_l_lvl = 0;
+        gal_h_lvl = 0xFE;
+        gal_l_lvl = 2;
     } else {
         gal_h_lvl = 0xe0;
         gal_l_lvl = 0x20;
@@ -243,8 +244,8 @@ int gal_exec(char* target)
         }
 
         /* basic */
-        for (i = 0; i < (screenmode ? basicgraphlen : basicdeflen); i++) { /* block name string */
-            writebyte_cksum(screenmode ? basicgraphdef[i] : basicdef[i], fpout, &checksum);
+        for (i = 0; i < (screenmode == 1 ? basicgraphlen : basicdeflen); i++) { /* block name string */
+            writebyte_cksum(screenmode == 1 ? basicgraphdef[i] : basicdef[i], fpout, &checksum);
         }
 
         writebyte(255 - (checksum % 256), fpout); /* data checksum */

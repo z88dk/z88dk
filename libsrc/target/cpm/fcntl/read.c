@@ -13,17 +13,18 @@
 #include <stdio.h>
 #include <cpm.h>
 
+extern void *_CPM_READ_CACHE_ALWAYS;
+#define CPM_READ_CACHE_ALWAYS (int)&_CPM_READ_CACHE_ALWAYS
 
 ssize_t read(int fd, void *buf, size_t len)
 {
     unsigned char buffer[SECSIZE+2];
     unsigned char uid;
-    struct fcb *fc;
     size_t cnt,size,offset;
+    struct fcb *fc;
 
-    if ( fd >= MAXFILE )
-       return -1;
-    fc = &_fcb[fd];
+
+    fc = (struct fcb *) fd; 
     switch ( fc->use ) {
 #ifdef DEVICES
     case U_RDR:         /* Reader device */
@@ -53,32 +54,60 @@ ssize_t read(int fd, void *buf, size_t len)
     case U_READ:
     case U_RDWR:
         cnt = len;
-        uid = swapuid(fc->uid);
-        while ( len ) {
-            unsigned long record_nr = fc->rwptr/SECSIZE;
+
+        if ( len == 1 ) {
+            unsigned long record_nr = fc->record_nr;
+            if ( fc->rnr_dirty ) { fc->record_nr = record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
             offset = fc->rwptr%SECSIZE;
-            if ( ( size = SECSIZE - offset ) > len ) {
-                size = len;
-            }
-            _putoffset(fc->ranrec,record_nr);
-            if ( size == SECSIZE ) {
-                bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_RRAN,fc) ) {
-                    swapuid(uid);
-                    return cnt-len;
-                }
-            } else {
+
+            if ( record_nr != fc->cached_record ) {
                 if ( cpm_cache_get(fc, record_nr, 1) ) {
-                    swapuid(uid);
-                    return cnt-len;
+                    return 0;
                 }
-                memcpy(buf,fc->buffer+offset,size);
             }
-            buf += size;
-            fc->rwptr += size;
-            len -= size;
+            *(uint8_t *)buf = fc->buffer[offset];
+            ++fc->rwptr;
+            if ( offset+1 == SECSIZE) {
+                ++fc->record_nr;
+            }
+            return 1;
+        } else {
+            while ( len ) {
+                unsigned long record_nr = fc->record_nr;
+                
+                if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
+                offset = fc->rwptr%SECSIZE;
+
+                if ( ( size = SECSIZE - offset ) > len ) {
+                    size = len;
+                }
+                if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
+                    _putoffset(fc->ranrec,record_nr);
+                    uid = swapuid(fc->uid);
+                    bdos(CPM_SDMA,buf);
+                    if ( bdos(CPM_RRAN,fc) ) {
+                        swapuid(uid);
+                        return cnt-len;
+                    }
+                    swapuid(uid);
+                } else {
+                    if ( record_nr != fc->cached_record ) {
+                        if ( cpm_cache_get(fc, record_nr, 1) ) {
+                            return cnt-len;
+                        }
+                    }
+                    if ( size == 1 ) {
+                        *(uint8_t *)buf = fc->buffer[offset];
+                    } else memcpy(buf,fc->buffer+offset,size);
+                }
+                buf += size;
+                fc->rwptr += size;
+                if ( size + offset == SECSIZE) {
+                    ++fc->record_nr;
+                }
+                len -= size;
+            }
         }
-        swapuid(uid);
         return cnt-len;
         break;
     default:

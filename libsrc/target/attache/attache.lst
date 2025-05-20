@@ -6,6 +6,9 @@ target/attache/graphics/w_respixl
 target/attache/graphics/w_xorpixl
 target/attache/graphics/w_pointxy
 @gfx/wide/gfx_wide.lst
+target/attache/bios/kbd_click
+target/attache/time/clock
+target/attache/time/time
 target/attache/psg/set_psg
 target/attache/psg/set_psg_callee
 target/attache/psg/psg_init

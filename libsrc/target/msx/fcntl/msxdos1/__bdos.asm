@@ -1,7 +1,7 @@
 
-	SECTION	code_driver
+    SECTION code_driver
 
-	PUBLIC	__bdos
+    PUBLIC  __bdos
 
 ; The Bondwell2 uses ix during bdos calls.
 ;
@@ -14,7 +14,7 @@
 ; all z80 CP/M platforms
 
 ;IF __CPU_INTEL__
-	defc	__bdos = 5
+    defc    __bdos=5
 ;ELSE
 ;__bdos:
 ;	push	ix

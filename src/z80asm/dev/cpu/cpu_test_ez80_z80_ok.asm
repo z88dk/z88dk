@@ -1,4 +1,3 @@
- aci -128                       ; CE 80
  aci 0                          ; CE 00
  aci 127                        ; CE 7F
  aci 255                        ; CE FF
@@ -13,7 +12,6 @@
  adc (iy+0)                     ; FD 8E 00
  adc (iy+126)                   ; FD 8E 7E
  adc (iy-128)                   ; FD 8E 80
- adc -128                       ; CE 80
  adc 0                          ; CE 00
  adc 127                        ; CE 7F
  adc 255                        ; CE FF
@@ -29,7 +27,6 @@
  adc a, (iy+0)                  ; FD 8E 00
  adc a, (iy+126)                ; FD 8E 7E
  adc a, (iy-128)                ; FD 8E 80
- adc a, -128                    ; CE 80
  adc a, 0                       ; CE 00
  adc a, 127                     ; CE 7F
  adc a, 255                     ; CE FF
@@ -60,8 +57,8 @@
  adc l                          ; 8D
  adc m                          ; 8E
  adc.l (hl)                     ; 49 8E
- adc.l (hl+)                    ; 49 8E 23
- adc.l (hl-)                    ; 49 8E 2B
+ adc.l (hl+)                    ; 49 8E 49 23
+ adc.l (hl-)                    ; 49 8E 49 2B
  adc.l (ix)                     ; 49 DD 8E 00
  adc.l (ix+0)                   ; 49 DD 8E 00
  adc.l (ix+126)                 ; 49 DD 8E 7E
@@ -71,8 +68,8 @@
  adc.l (iy+126)                 ; 49 FD 8E 7E
  adc.l (iy-128)                 ; 49 FD 8E 80
  adc.l a, (hl)                  ; 49 8E
- adc.l a, (hl+)                 ; 49 8E 23
- adc.l a, (hl-)                 ; 49 8E 2B
+ adc.l a, (hl+)                 ; 49 8E 49 23
+ adc.l a, (hl-)                 ; 49 8E 49 2B
  adc.l a, (ix)                  ; 49 DD 8E 00
  adc.l a, (ix+0)                ; 49 DD 8E 00
  adc.l a, (ix+126)              ; 49 DD 8E 7E
@@ -86,8 +83,8 @@
  adc.l hl, hl                   ; 49 ED 6A
  adc.l hl, sp                   ; 49 ED 7A
  adc.lis (hl)                   ; 49 8E
- adc.lis (hl+)                  ; 49 8E 23
- adc.lis (hl-)                  ; 49 8E 2B
+ adc.lis (hl+)                  ; 49 8E 49 23
+ adc.lis (hl-)                  ; 49 8E 49 2B
  adc.lis (ix)                   ; 49 DD 8E 00
  adc.lis (ix+0)                 ; 49 DD 8E 00
  adc.lis (ix+126)               ; 49 DD 8E 7E
@@ -97,8 +94,8 @@
  adc.lis (iy+126)               ; 49 FD 8E 7E
  adc.lis (iy-128)               ; 49 FD 8E 80
  adc.lis a, (hl)                ; 49 8E
- adc.lis a, (hl+)               ; 49 8E 23
- adc.lis a, (hl-)               ; 49 8E 2B
+ adc.lis a, (hl+)               ; 49 8E 49 23
+ adc.lis a, (hl-)               ; 49 8E 49 2B
  adc.lis a, (ix)                ; 49 DD 8E 00
  adc.lis a, (ix+0)              ; 49 DD 8E 00
  adc.lis a, (ix+126)            ; 49 DD 8E 7E
@@ -122,7 +119,6 @@
  add (iy+0)                     ; FD 86 00
  add (iy+126)                   ; FD 86 7E
  add (iy-128)                   ; FD 86 80
- add -128                       ; C6 80
  add 0                          ; C6 00
  add 127                        ; C6 7F
  add 255                        ; C6 FF
@@ -138,7 +134,6 @@
  add a, (iy+0)                  ; FD 86 00
  add a, (iy+126)                ; FD 86 7E
  add a, (iy-128)                ; FD 86 80
- add a, -128                    ; C6 80
  add a, 0                       ; C6 00
  add a, 127                     ; C6 7F
  add a, 255                     ; C6 FF
@@ -182,12 +177,12 @@
  add iyl                        ; FD 85
  add l                          ; 85
  add m                          ; 86
- add sp, -128                   ; CD @__z80asm__add_sp_s 80
- add sp, 0                      ; CD @__z80asm__add_sp_s 00
- add sp, 126                    ; CD @__z80asm__add_sp_s 7E
+ add sp, -128                   ; CD @__z80asm__add_sp_d 80
+ add sp, 0                      ; CD @__z80asm__add_sp_d 00
+ add sp, 126                    ; CD @__z80asm__add_sp_d 7E
  add.l (hl)                     ; 49 86
- add.l (hl+)                    ; 49 86 23
- add.l (hl-)                    ; 49 86 2B
+ add.l (hl+)                    ; 49 86 49 23
+ add.l (hl-)                    ; 49 86 49 2B
  add.l (ix)                     ; 49 DD 86 00
  add.l (ix+0)                   ; 49 DD 86 00
  add.l (ix+126)                 ; 49 DD 86 7E
@@ -197,8 +192,8 @@
  add.l (iy+126)                 ; 49 FD 86 7E
  add.l (iy-128)                 ; 49 FD 86 80
  add.l a, (hl)                  ; 49 86
- add.l a, (hl+)                 ; 49 86 23
- add.l a, (hl-)                 ; 49 86 2B
+ add.l a, (hl+)                 ; 49 86 49 23
+ add.l a, (hl-)                 ; 49 86 49 2B
  add.l a, (ix)                  ; 49 DD 86 00
  add.l a, (ix+0)                ; 49 DD 86 00
  add.l a, (ix+126)              ; 49 DD 86 7E
@@ -220,8 +215,8 @@
  add.l iy, iy                   ; 49 FD 29
  add.l iy, sp                   ; 49 FD 39
  add.lis (hl)                   ; 49 86
- add.lis (hl+)                  ; 49 86 23
- add.lis (hl-)                  ; 49 86 2B
+ add.lis (hl+)                  ; 49 86 49 23
+ add.lis (hl-)                  ; 49 86 49 2B
  add.lis (ix)                   ; 49 DD 86 00
  add.lis (ix+0)                 ; 49 DD 86 00
  add.lis (ix+126)               ; 49 DD 86 7E
@@ -231,8 +226,8 @@
  add.lis (iy+126)               ; 49 FD 86 7E
  add.lis (iy-128)               ; 49 FD 86 80
  add.lis a, (hl)                ; 49 86
- add.lis a, (hl+)               ; 49 86 23
- add.lis a, (hl-)               ; 49 86 2B
+ add.lis a, (hl+)               ; 49 86 49 23
+ add.lis a, (hl-)               ; 49 86 49 2B
  add.lis a, (ix)                ; 49 DD 86 00
  add.lis a, (ix+0)              ; 49 DD 86 00
  add.lis a, (ix+126)            ; 49 DD 86 7E
@@ -253,10 +248,15 @@
  add.lis iy, de                 ; 49 FD 19
  add.lis iy, iy                 ; 49 FD 29
  add.lis iy, sp                 ; 49 FD 39
- adi -128                       ; C6 80
  adi 0                          ; C6 00
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF
+ adi hl, 0                      ; E5 11 00 00 19 EB E1
+ adi hl, 127                    ; E5 11 7F 00 19 EB E1
+ adi hl, 255                    ; E5 11 FF 00 19 EB E1
+ adi sp, 0                      ; EB 21 00 00 39 EB
+ adi sp, 127                    ; EB 21 7F 00 39 EB
+ adi sp, 255                    ; EB 21 FF 00 39 EB
  ana a                          ; A7
  ana b                          ; A0
  ana c                          ; A1
@@ -276,7 +276,6 @@
  and (iy+0)                     ; FD A6 00
  and (iy+126)                   ; FD A6 7E
  and (iy-128)                   ; FD A6 80
- and -128                       ; E6 80
  and 0                          ; E6 00
  and 127                        ; E6 7F
  and 255                        ; E6 FF
@@ -292,7 +291,6 @@
  and a, (iy+0)                  ; FD A6 00
  and a, (iy+126)                ; FD A6 7E
  and a, (iy-128)                ; FD A6 80
- and a, -128                    ; E6 80
  and a, 0                       ; E6 00
  and a, 127                     ; E6 7F
  and a, 255                     ; E6 FF
@@ -324,8 +322,8 @@
  and iyl                        ; FD A5
  and l                          ; A5
  and.l (hl)                     ; 49 A6
- and.l (hl+)                    ; 49 A6 23
- and.l (hl-)                    ; 49 A6 2B
+ and.l (hl+)                    ; 49 A6 49 23
+ and.l (hl-)                    ; 49 A6 49 2B
  and.l (ix)                     ; 49 DD A6 00
  and.l (ix+0)                   ; 49 DD A6 00
  and.l (ix+126)                 ; 49 DD A6 7E
@@ -335,8 +333,8 @@
  and.l (iy+126)                 ; 49 FD A6 7E
  and.l (iy-128)                 ; 49 FD A6 80
  and.l a, (hl)                  ; 49 A6
- and.l a, (hl+)                 ; 49 A6 23
- and.l a, (hl-)                 ; 49 A6 2B
+ and.l a, (hl+)                 ; 49 A6 49 23
+ and.l a, (hl-)                 ; 49 A6 49 2B
  and.l a, (ix)                  ; 49 DD A6 00
  and.l a, (ix+0)                ; 49 DD A6 00
  and.l a, (ix+126)              ; 49 DD A6 7E
@@ -346,8 +344,8 @@
  and.l a, (iy+126)              ; 49 FD A6 7E
  and.l a, (iy-128)              ; 49 FD A6 80
  and.lis (hl)                   ; 49 A6
- and.lis (hl+)                  ; 49 A6 23
- and.lis (hl-)                  ; 49 A6 2B
+ and.lis (hl+)                  ; 49 A6 49 23
+ and.lis (hl-)                  ; 49 A6 49 2B
  and.lis (ix)                   ; 49 DD A6 00
  and.lis (ix+0)                 ; 49 DD A6 00
  and.lis (ix+126)               ; 49 DD A6 7E
@@ -357,8 +355,8 @@
  and.lis (iy+126)               ; 49 FD A6 7E
  and.lis (iy-128)               ; 49 FD A6 80
  and.lis a, (hl)                ; 49 A6
- and.lis a, (hl+)               ; 49 A6 23
- and.lis a, (hl-)               ; 49 A6 2B
+ and.lis a, (hl+)               ; 49 A6 49 23
+ and.lis a, (hl-)               ; 49 A6 49 2B
  and.lis a, (ix)                ; 49 DD A6 00
  and.lis a, (ix+0)              ; 49 DD A6 00
  and.lis a, (ix+126)            ; 49 DD A6 7E
@@ -367,7 +365,6 @@
  and.lis a, (iy+0)              ; 49 FD A6 00
  and.lis a, (iy+126)            ; 49 FD A6 7E
  and.lis a, (iy-128)            ; 49 FD A6 80
- ani -128                       ; E6 80
  ani 0                          ; E6 00
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
@@ -650,7 +647,7 @@
  c_c 0x1234                     ; DC 34 12
  c_eq 0x1234                    ; CC 34 12
  c_geu 0x1234                   ; D4 34 12
- c_gtu 0x1234                   ; 28 05 38 03 CD 34 12
+ c_gtu 0x1234                   ; 28 03 D4 34 12
  c_leu 0x1234                   ; 28 02 30 03 CD 34 12
  c_ltu 0x1234                   ; DC 34 12
  c_m 0x1234                     ; FC 34 12
@@ -670,7 +667,7 @@
  call c, 0x1234                 ; DC 34 12
  call eq, 0x1234                ; CC 34 12
  call geu, 0x1234               ; D4 34 12
- call gtu, 0x1234               ; 28 05 38 03 CD 34 12
+ call gtu, 0x1234               ; 28 03 D4 34 12
  call leu, 0x1234               ; 28 02 30 03 CD 34 12
  call ltu, 0x1234               ; DC 34 12
  call m, 0x1234                 ; FC 34 12
@@ -687,7 +684,7 @@
  call.il c, 0x123456            ; 52 DC 56 34 12
  call.il eq, 0x123456           ; 52 CC 56 34 12
  call.il geu, 0x123456          ; 52 D4 56 34 12
- call.il gtu, 0x123456          ; 28 07 38 05 52 CD 56 34 12
+ call.il gtu, 0x123456          ; 28 05 52 D4 56 34 12
  call.il leu, 0x123456          ; 28 02 30 05 52 CD 56 34 12
  call.il ltu, 0x123456          ; 52 DC 56 34 12
  call.il m, 0x123456            ; 52 FC 56 34 12
@@ -704,8 +701,8 @@
  call.is c, 0x1234              ; 40 DC 34 12
  call.is eq, 0x1234             ; 40 CC 34 12
  call.is geu, 0x1234            ; 40 D4 34 12
- call.is gtu, 0x1234            ; 28 06 38 04 40 CD 34 12
- call.is leu, 0x123456          ; 28 02 30 05 40 CD 56 34 12
+ call.is gtu, 0x1234            ; 28 04 40 D4 34 12
+ call.is leu, 0x1234            ; 28 02 30 04 40 CD 34 12
  call.is ltu, 0x1234            ; 40 DC 34 12
  call.is m, 0x1234              ; 40 FC 34 12
  call.is nc, 0x1234             ; 40 D4 34 12
@@ -721,7 +718,7 @@
  call.sil c, 0x123456           ; 52 DC 56 34 12
  call.sil eq, 0x123456          ; 52 CC 56 34 12
  call.sil geu, 0x123456         ; 52 D4 56 34 12
- call.sil gtu, 0x123456         ; 28 07 38 05 52 CD 56 34 12
+ call.sil gtu, 0x123456         ; 28 05 52 D4 56 34 12
  call.sil leu, 0x123456         ; 28 02 30 05 52 CD 56 34 12
  call.sil ltu, 0x123456         ; 52 DC 56 34 12
  call.sil m, 0x123456           ; 52 FC 56 34 12
@@ -738,8 +735,8 @@
  call.sis c, 0x1234             ; 40 DC 34 12
  call.sis eq, 0x1234            ; 40 CC 34 12
  call.sis geu, 0x1234           ; 40 D4 34 12
- call.sis gtu, 0x1234           ; 28 06 38 04 40 CD 34 12
- call.sis leu, 0x123456         ; 28 02 30 05 40 CD 56 34 12
+ call.sis gtu, 0x1234           ; 28 04 40 D4 34 12
+ call.sis leu, 0x1234           ; 28 02 30 04 40 CD 34 12
  call.sis ltu, 0x1234           ; 40 DC 34 12
  call.sis m, 0x1234             ; 40 FC 34 12
  call.sis nc, 0x1234            ; 40 D4 34 12
@@ -755,7 +752,7 @@
  ccf                            ; 3F
  ceq 0x1234                     ; CC 34 12
  cgeu 0x1234                    ; D4 34 12
- cgtu 0x1234                    ; 28 05 38 03 CD 34 12
+ cgtu 0x1234                    ; 28 03 D4 34 12
  cleu 0x1234                    ; 28 02 30 03 CD 34 12
  clr (hl)                       ; 36 00
  clr (ix)                       ; DD 36 00 00
@@ -797,7 +794,6 @@
  cmp (iy+0)                     ; FD BE 00
  cmp (iy+126)                   ; FD BE 7E
  cmp (iy-128)                   ; FD BE 80
- cmp -128                       ; FE 80
  cmp 0                          ; FE 00
  cmp 127                        ; FE 7F
  cmp 255                        ; FE FF
@@ -813,7 +809,6 @@
  cmp a, (iy+0)                  ; FD BE 00
  cmp a, (iy+126)                ; FD BE 7E
  cmp a, (iy-128)                ; FD BE 80
- cmp a, -128                    ; FE 80
  cmp a, 0                       ; FE 00
  cmp a, 127                     ; FE 7F
  cmp a, 255                     ; FE FF
@@ -840,8 +835,8 @@
  cmp l                          ; BD
  cmp m                          ; BE
  cmp.l (hl)                     ; 49 BE
- cmp.l (hl+)                    ; 49 BE 23
- cmp.l (hl-)                    ; 49 BE 2B
+ cmp.l (hl+)                    ; 49 BE 49 23
+ cmp.l (hl-)                    ; 49 BE 49 2B
  cmp.l (ix)                     ; 49 DD BE 00
  cmp.l (ix+0)                   ; 49 DD BE 00
  cmp.l (ix+126)                 ; 49 DD BE 7E
@@ -851,8 +846,8 @@
  cmp.l (iy+126)                 ; 49 FD BE 7E
  cmp.l (iy-128)                 ; 49 FD BE 80
  cmp.l a, (hl)                  ; 49 BE
- cmp.l a, (hl+)                 ; 49 BE 23
- cmp.l a, (hl-)                 ; 49 BE 2B
+ cmp.l a, (hl+)                 ; 49 BE 49 23
+ cmp.l a, (hl-)                 ; 49 BE 49 2B
  cmp.l a, (ix)                  ; 49 DD BE 00
  cmp.l a, (ix+0)                ; 49 DD BE 00
  cmp.l a, (ix+126)              ; 49 DD BE 7E
@@ -862,8 +857,8 @@
  cmp.l a, (iy+126)              ; 49 FD BE 7E
  cmp.l a, (iy-128)              ; 49 FD BE 80
  cmp.lis (hl)                   ; 49 BE
- cmp.lis (hl+)                  ; 49 BE 23
- cmp.lis (hl-)                  ; 49 BE 2B
+ cmp.lis (hl+)                  ; 49 BE 49 23
+ cmp.lis (hl-)                  ; 49 BE 49 2B
  cmp.lis (ix)                   ; 49 DD BE 00
  cmp.lis (ix+0)                 ; 49 DD BE 00
  cmp.lis (ix+126)               ; 49 DD BE 7E
@@ -873,8 +868,8 @@
  cmp.lis (iy+126)               ; 49 FD BE 7E
  cmp.lis (iy-128)               ; 49 FD BE 80
  cmp.lis a, (hl)                ; 49 BE
- cmp.lis a, (hl+)               ; 49 BE 23
- cmp.lis a, (hl-)               ; 49 BE 2B
+ cmp.lis a, (hl+)               ; 49 BE 49 23
+ cmp.lis a, (hl-)               ; 49 BE 49 2B
  cmp.lis a, (ix)                ; 49 DD BE 00
  cmp.lis a, (ix+0)              ; 49 DD BE 00
  cmp.lis a, (ix+126)            ; 49 DD BE 7E
@@ -898,7 +893,6 @@
  cp (iy+0)                      ; FD BE 00
  cp (iy+126)                    ; FD BE 7E
  cp (iy-128)                    ; FD BE 80
- cp -128                        ; FE 80
  cp 0                           ; FE 00
  cp 127                         ; FE 7F
  cp 255                         ; FE FF
@@ -914,7 +908,6 @@
  cp a, (iy+0)                   ; FD BE 00
  cp a, (iy+126)                 ; FD BE 7E
  cp a, (iy-128)                 ; FD BE 80
- cp a, -128                     ; FE 80
  cp a, 0                        ; FE 00
  cp a, 127                      ; FE 7F
  cp a, 255                      ; FE FF
@@ -940,8 +933,8 @@
  cp iyl                         ; FD BD
  cp l                           ; BD
  cp.l (hl)                      ; 49 BE
- cp.l (hl+)                     ; 49 BE 23
- cp.l (hl-)                     ; 49 BE 2B
+ cp.l (hl+)                     ; 49 BE 49 23
+ cp.l (hl-)                     ; 49 BE 49 2B
  cp.l (ix)                      ; 49 DD BE 00
  cp.l (ix+0)                    ; 49 DD BE 00
  cp.l (ix+126)                  ; 49 DD BE 7E
@@ -951,8 +944,8 @@
  cp.l (iy+126)                  ; 49 FD BE 7E
  cp.l (iy-128)                  ; 49 FD BE 80
  cp.l a, (hl)                   ; 49 BE
- cp.l a, (hl+)                  ; 49 BE 23
- cp.l a, (hl-)                  ; 49 BE 2B
+ cp.l a, (hl+)                  ; 49 BE 49 23
+ cp.l a, (hl-)                  ; 49 BE 49 2B
  cp.l a, (ix)                   ; 49 DD BE 00
  cp.l a, (ix+0)                 ; 49 DD BE 00
  cp.l a, (ix+126)               ; 49 DD BE 7E
@@ -962,8 +955,8 @@
  cp.l a, (iy+126)               ; 49 FD BE 7E
  cp.l a, (iy-128)               ; 49 FD BE 80
  cp.lis (hl)                    ; 49 BE
- cp.lis (hl+)                   ; 49 BE 23
- cp.lis (hl-)                   ; 49 BE 2B
+ cp.lis (hl+)                   ; 49 BE 49 23
+ cp.lis (hl-)                   ; 49 BE 49 2B
  cp.lis (ix)                    ; 49 DD BE 00
  cp.lis (ix+0)                  ; 49 DD BE 00
  cp.lis (ix+126)                ; 49 DD BE 7E
@@ -973,8 +966,8 @@
  cp.lis (iy+126)                ; 49 FD BE 7E
  cp.lis (iy-128)                ; 49 FD BE 80
  cp.lis a, (hl)                 ; 49 BE
- cp.lis a, (hl+)                ; 49 BE 23
- cp.lis a, (hl-)                ; 49 BE 2B
+ cp.lis a, (hl+)                ; 49 BE 49 23
+ cp.lis a, (hl-)                ; 49 BE 49 2B
  cp.lis a, (ix)                 ; 49 DD BE 00
  cp.lis a, (ix+0)               ; 49 DD BE 00
  cp.lis a, (ix+126)             ; 49 DD BE 7E
@@ -991,7 +984,6 @@
  cpdr.lis                       ; 49 ED B9
  cpe 0x1234                     ; EC 34 12
  cpi                            ; ED A1
- cpi -128                       ; FE 80
  cpi 0                          ; FE 00
  cpi 127                        ; FE 7F
  cpi 255                        ; FE FF
@@ -1057,8 +1049,8 @@
  dec l                          ; 2D
  dec sp                         ; 3B
  dec.l (hl)                     ; 49 35
- dec.l (hl+)                    ; 49 35 23
- dec.l (hl-)                    ; 49 35 2B
+ dec.l (hl+)                    ; 49 35 49 23
+ dec.l (hl-)                    ; 49 35 49 2B
  dec.l (ix)                     ; 49 DD 35 00
  dec.l (ix+0)                   ; 49 DD 35 00
  dec.l (ix+126)                 ; 49 DD 35 7E
@@ -1074,8 +1066,8 @@
  dec.l iy                       ; 49 FD 2B
  dec.l sp                       ; 49 3B
  dec.lis (hl)                   ; 49 35
- dec.lis (hl+)                  ; 49 35 23
- dec.lis (hl-)                  ; 49 35 2B
+ dec.lis (hl+)                  ; 49 35 49 23
+ dec.lis (hl-)                  ; 49 35 49 2B
  dec.lis (ix)                   ; 49 DD 35 00
  dec.lis (ix+0)                 ; 49 DD 35 00
  dec.lis (ix+126)               ; 49 DD 35 7E
@@ -1119,11 +1111,9 @@
  im 2                           ; ED 5E
  in (bc)                        ; ED 70
  in (c)                         ; ED 70
- in -128                        ; DB 80
  in 0                           ; DB 00
  in 127                         ; DB 7F
  in 255                         ; DB FF
- in a, (-128)                   ; DB 80
  in a, (0)                      ; DB 00
  in a, (127)                    ; DB 7F
  in a, (255)                    ; DB FF
@@ -1137,35 +1127,30 @@
  in d, (c)                      ; ED 50
  in e, (bc)                     ; ED 58
  in e, (c)                      ; ED 58
+ in f, (bc)                     ; ED 70
+ in f, (c)                      ; ED 70
  in h, (bc)                     ; ED 60
  in h, (c)                      ; ED 60
  in l, (bc)                     ; ED 68
  in l, (c)                      ; ED 68
- in0 a, (-128)                  ; ED 38 80
  in0 a, (0)                     ; ED 38 00
  in0 a, (127)                   ; ED 38 7F
  in0 a, (255)                   ; ED 38 FF
- in0 b, (-128)                  ; ED 00 80
  in0 b, (0)                     ; ED 00 00
  in0 b, (127)                   ; ED 00 7F
  in0 b, (255)                   ; ED 00 FF
- in0 c, (-128)                  ; ED 08 80
  in0 c, (0)                     ; ED 08 00
  in0 c, (127)                   ; ED 08 7F
  in0 c, (255)                   ; ED 08 FF
- in0 d, (-128)                  ; ED 10 80
  in0 d, (0)                     ; ED 10 00
  in0 d, (127)                   ; ED 10 7F
  in0 d, (255)                   ; ED 10 FF
- in0 e, (-128)                  ; ED 18 80
  in0 e, (0)                     ; ED 18 00
  in0 e, (127)                   ; ED 18 7F
  in0 e, (255)                   ; ED 18 FF
- in0 h, (-128)                  ; ED 20 80
  in0 h, (0)                     ; ED 20 00
  in0 h, (127)                   ; ED 20 7F
  in0 h, (255)                   ; ED 20 FF
- in0 l, (-128)                  ; ED 28 80
  in0 l, (0)                     ; ED 28 00
  in0 l, (127)                   ; ED 28 7F
  in0 l, (255)                   ; ED 28 FF
@@ -1198,8 +1183,8 @@
  inc l                          ; 2C
  inc sp                         ; 33
  inc.l (hl)                     ; 49 34
- inc.l (hl+)                    ; 49 34 23
- inc.l (hl-)                    ; 49 34 2B
+ inc.l (hl+)                    ; 49 34 49 23
+ inc.l (hl-)                    ; 49 34 49 2B
  inc.l (ix)                     ; 49 DD 34 00
  inc.l (ix+0)                   ; 49 DD 34 00
  inc.l (ix+126)                 ; 49 DD 34 7E
@@ -1215,8 +1200,8 @@
  inc.l iy                       ; 49 FD 23
  inc.l sp                       ; 49 33
  inc.lis (hl)                   ; 49 34
- inc.lis (hl+)                  ; 49 34 23
- inc.lis (hl-)                  ; 49 34 2B
+ inc.lis (hl+)                  ; 49 34 49 23
+ inc.lis (hl-)                  ; 49 34 49 2B
  inc.lis (ix)                   ; 49 DD 34 00
  inc.lis (ix+0)                 ; 49 DD 34 00
  inc.lis (ix+126)               ; 49 DD 34 7E
@@ -1291,7 +1276,7 @@
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
  j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA 9B 0F D2 34 12
+ j_gtu 0x1234                   ; CA B1 0F D2 34 12
  j_leu 0x1234                   ; CA 34 12 DA 34 12
  j_ltu 0x1234                   ; DA 34 12
  j_m 0x1234                     ; FA 34 12
@@ -1307,7 +1292,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA D1 0F D2 34 12
+ jgtu 0x1234                    ; CA E7 0F D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jm 0x1234                      ; FA 34 12
@@ -1320,7 +1305,7 @@
  jmp c, 0x1234                  ; DA 34 12
  jmp eq, 0x1234                 ; CA 34 12
  jmp geu, 0x1234                ; D2 34 12
- jmp gtu, 0x1234                ; CA F8 0F D2 34 12
+ jmp gtu, 0x1234                ; 28 03 D2 34 12
  jmp leu, 0x1234                ; CA 34 12 DA 34 12
  jmp ltu, 0x1234                ; DA 34 12
  jmp m, 0x1234                  ; FA 34 12
@@ -1340,7 +1325,7 @@
  jmp.lil c, 0x123456            ; 5B DA 56 34 12
  jmp.lil eq, 0x123456           ; 5B CA 56 34 12
  jmp.lil geu, 0x123456          ; 5B D2 56 34 12
- jmp.lil gtu, 0x123456          ; 5B CA 45 10 00 5B D2 56 34 12
+ jmp.lil gtu, 0x123456          ; 28 05 5B D2 56 34 12
  jmp.lil leu, 0x123456          ; 5B CA 56 34 12 5B DA 56 34 12
  jmp.lil ltu, 0x123456          ; 5B DA 56 34 12
  jmp.lil m, 0x123456            ; 5B FA 56 34 12
@@ -1360,7 +1345,7 @@
  jmp.sis c, 0x1234              ; 40 DA 34 12
  jmp.sis eq, 0x1234             ; 40 CA 34 12
  jmp.sis geu, 0x1234            ; 40 D2 34 12
- jmp.sis gtu, 0x1234            ; 40 CA A6 10 40 D2 34 12
+ jmp.sis gtu, 0x1234            ; 28 04 40 D2 34 12
  jmp.sis leu, 0x1234            ; 40 CA 34 12 40 DA 34 12
  jmp.sis ltu, 0x1234            ; 40 DA 34 12
  jmp.sis m, 0x1234              ; 40 FA 34 12
@@ -1386,7 +1371,7 @@
  jp c, 0x1234                   ; DA 34 12
  jp eq, 0x1234                  ; CA 34 12
  jp geu, 0x1234                 ; D2 34 12
- jp gtu, 0x1234                 ; CA 01 11 D2 34 12
+ jp gtu, 0x1234                 ; 28 03 D2 34 12
  jp leu, 0x1234                 ; CA 34 12 DA 34 12
  jp ltu, 0x1234                 ; DA 34 12
  jp m, 0x1234                   ; FA 34 12
@@ -1406,7 +1391,7 @@
  jp.lil c, 0x123456             ; 5B DA 56 34 12
  jp.lil eq, 0x123456            ; 5B CA 56 34 12
  jp.lil geu, 0x123456           ; 5B D2 56 34 12
- jp.lil gtu, 0x123456           ; 5B CA 4E 11 00 5B D2 56 34 12
+ jp.lil gtu, 0x123456           ; 28 05 5B D2 56 34 12
  jp.lil leu, 0x123456           ; 5B CA 56 34 12 5B DA 56 34 12
  jp.lil ltu, 0x123456           ; 5B DA 56 34 12
  jp.lil m, 0x123456             ; 5B FA 56 34 12
@@ -1426,7 +1411,7 @@
  jp.sis c, 0x1234               ; 40 DA 34 12
  jp.sis eq, 0x1234              ; 40 CA 34 12
  jp.sis geu, 0x1234             ; 40 D2 34 12
- jp.sis gtu, 0x1234             ; 40 CA AF 11 40 D2 34 12
+ jp.sis gtu, 0x1234             ; 28 04 40 D2 34 12
  jp.sis leu, 0x1234             ; 40 CA 34 12 40 DA 34 12
  jp.sis ltu, 0x1234             ; 40 DA 34 12
  jp.sis m, 0x1234               ; 40 FA 34 12
@@ -1464,7 +1449,6 @@
  ld (bc), a                     ; 02
  ld (bc+), a                    ; 02 03
  ld (bc-), a                    ; 02 0B
- ld (de), -128                  ; EB 36 80 EB
  ld (de), 0                     ; EB 36 00 EB
  ld (de), 127                   ; EB 36 7F EB
  ld (de), 255                   ; EB 36 FF EB
@@ -1474,8 +1458,8 @@
  ld (de), d                     ; EB 74 EB
  ld (de), e                     ; EB 75 EB
  ld (de), h                     ; EB 72 EB
+ ld (de), hl                    ; EB 73 23 72 2B EB
  ld (de), l                     ; EB 73 EB
- ld (de+), -128                 ; EB 36 80 EB 13
  ld (de+), 0                    ; EB 36 00 EB 13
  ld (de+), 127                  ; EB 36 7F EB 13
  ld (de+), 255                  ; EB 36 FF EB 13
@@ -1486,7 +1470,6 @@
  ld (de+), e                    ; EB 75 EB 13
  ld (de+), h                    ; EB 72 EB 13
  ld (de+), l                    ; EB 73 EB 13
- ld (de-), -128                 ; EB 36 80 EB 1B
  ld (de-), 0                    ; EB 36 00 EB 1B
  ld (de-), 127                  ; EB 36 7F EB 1B
  ld (de-), 255                  ; EB 36 FF EB 1B
@@ -1497,7 +1480,6 @@
  ld (de-), e                    ; EB 75 EB 1B
  ld (de-), h                    ; EB 72 EB 1B
  ld (de-), l                    ; EB 73 EB 1B
- ld (hl), -128                  ; 36 80
  ld (hl), 0                     ; 36 00
  ld (hl), 127                   ; 36 7F
  ld (hl), 255                   ; 36 FF
@@ -1513,7 +1495,6 @@
  ld (hl), ix                    ; ED 3F
  ld (hl), iy                    ; ED 3E
  ld (hl), l                     ; 75
- ld (hl+), -128                 ; 36 80 23
  ld (hl+), 0                    ; 36 00 23
  ld (hl+), 127                  ; 36 7F 23
  ld (hl+), 255                  ; 36 FF 23
@@ -1529,7 +1510,6 @@
  ld (hl+), ix                   ; ED 3F 23 23
  ld (hl+), iy                   ; ED 3E 23 23
  ld (hl+), l                    ; 75 23
- ld (hl-), -128                 ; 36 80 2B
  ld (hl-), 0                    ; 36 00 2B
  ld (hl-), 127                  ; 36 7F 2B
  ld (hl-), 255                  ; 36 FF 2B
@@ -1554,7 +1534,6 @@
  ld (hli), e                    ; 73 23
  ld (hli), h                    ; 74 23
  ld (hli), l                    ; 75 23
- ld (ix), -128                  ; DD 36 00 80
  ld (ix), 0                     ; DD 36 00 00
  ld (ix), 127                   ; DD 36 00 7F
  ld (ix), 255                   ; DD 36 00 FF
@@ -1570,7 +1549,6 @@
  ld (ix), ix                    ; DD 3F 00
  ld (ix), iy                    ; DD 3E 00
  ld (ix), l                     ; DD 75 00
- ld (ix+0), -128                ; DD 36 00 80
  ld (ix+0), 0                   ; DD 36 00 00
  ld (ix+0), 127                 ; DD 36 00 7F
  ld (ix+0), 255                 ; DD 36 00 FF
@@ -1586,7 +1564,6 @@
  ld (ix+0), ix                  ; DD 3F 00
  ld (ix+0), iy                  ; DD 3E 00
  ld (ix+0), l                   ; DD 75 00
- ld (ix+126), -128              ; DD 36 7E 80
  ld (ix+126), 0                 ; DD 36 7E 00
  ld (ix+126), 127               ; DD 36 7E 7F
  ld (ix+126), 255               ; DD 36 7E FF
@@ -1602,7 +1579,6 @@
  ld (ix+126), ix                ; DD 3F 7E
  ld (ix+126), iy                ; DD 3E 7E
  ld (ix+126), l                 ; DD 75 7E
- ld (ix-128), -128              ; DD 36 80 80
  ld (ix-128), 0                 ; DD 36 80 00
  ld (ix-128), 127               ; DD 36 80 7F
  ld (ix-128), 255               ; DD 36 80 FF
@@ -1618,7 +1594,6 @@
  ld (ix-128), ix                ; DD 3F 80
  ld (ix-128), iy                ; DD 3E 80
  ld (ix-128), l                 ; DD 75 80
- ld (iy), -128                  ; FD 36 00 80
  ld (iy), 0                     ; FD 36 00 00
  ld (iy), 127                   ; FD 36 00 7F
  ld (iy), 255                   ; FD 36 00 FF
@@ -1634,7 +1609,6 @@
  ld (iy), ix                    ; FD 3E 00
  ld (iy), iy                    ; FD 3F 00
  ld (iy), l                     ; FD 75 00
- ld (iy+0), -128                ; FD 36 00 80
  ld (iy+0), 0                   ; FD 36 00 00
  ld (iy+0), 127                 ; FD 36 00 7F
  ld (iy+0), 255                 ; FD 36 00 FF
@@ -1650,7 +1624,6 @@
  ld (iy+0), ix                  ; FD 3E 00
  ld (iy+0), iy                  ; FD 3F 00
  ld (iy+0), l                   ; FD 75 00
- ld (iy+126), -128              ; FD 36 7E 80
  ld (iy+126), 0                 ; FD 36 7E 00
  ld (iy+126), 127               ; FD 36 7E 7F
  ld (iy+126), 255               ; FD 36 7E FF
@@ -1666,7 +1639,6 @@
  ld (iy+126), ix                ; FD 3E 7E
  ld (iy+126), iy                ; FD 3F 7E
  ld (iy+126), l                 ; FD 75 7E
- ld (iy-128), -128              ; FD 36 80 80
  ld (iy-128), 0                 ; FD 36 80 00
  ld (iy-128), 127               ; FD 36 80 7F
  ld (iy-128), 255               ; FD 36 80 FF
@@ -1702,7 +1674,6 @@
  ld a, (iy+0)                   ; FD 7E 00
  ld a, (iy+126)                 ; FD 7E 7E
  ld a, (iy-128)                 ; FD 7E 80
- ld a, -128                     ; 3E 80
  ld a, 0                        ; 3E 00
  ld a, 127                      ; 3E 7F
  ld a, 255                      ; 3E FF
@@ -1736,7 +1707,6 @@
  ld b, (iy+0)                   ; FD 46 00
  ld b, (iy+126)                 ; FD 46 7E
  ld b, (iy-128)                 ; FD 46 80
- ld b, -128                     ; 06 80
  ld b, 0                        ; 06 00
  ld b, 127                      ; 06 7F
  ld b, 255                      ; 06 FF
@@ -1750,6 +1720,8 @@
  ld b, iyh                      ; FD 44
  ld b, iyl                      ; FD 45
  ld b, l                        ; 45
+ ld bc', de'                    ; D9 42 4B D9
+ ld bc', hl'                    ; D9 44 4D D9
  ld bc, (0x1234)                ; ED 4B 34 12
  ld bc, (hl)                    ; ED 07
  ld bc, (hl+)                   ; ED 07 23 23
@@ -1762,8 +1734,11 @@
  ld bc, (iy+126)                ; FD 07 7E
  ld bc, (iy-128)                ; FD 07 80
  ld bc, 0x1234                  ; 01 34 12
+ ld bc, bc'                     ; D9 C5 D9 C1
  ld bc, de                      ; 42 4B
+ ld bc, de'                     ; D9 D5 D9 C1
  ld bc, hl                      ; 44 4D
+ ld bc, hl'                     ; D9 E5 D9 C1
  ld bc, ix                      ; DD 44 DD 4D
  ld bc, iy                      ; FD 44 FD 4D
  ld c, (de)                     ; EB 4E EB
@@ -1782,7 +1757,6 @@
  ld c, (iy+0)                   ; FD 4E 00
  ld c, (iy+126)                 ; FD 4E 7E
  ld c, (iy-128)                 ; FD 4E 80
- ld c, -128                     ; 0E 80
  ld c, 0                        ; 0E 00
  ld c, 127                      ; 0E 7F
  ld c, 255                      ; 0E FF
@@ -1812,7 +1786,6 @@
  ld d, (iy+0)                   ; FD 56 00
  ld d, (iy+126)                 ; FD 56 7E
  ld d, (iy-128)                 ; FD 56 80
- ld d, -128                     ; 16 80
  ld d, 0                        ; 16 00
  ld d, 127                      ; 16 7F
  ld d, 255                      ; 16 FF
@@ -1826,6 +1799,8 @@
  ld d, iyh                      ; FD 54
  ld d, iyl                      ; FD 55
  ld d, l                        ; 55
+ ld de', bc'                    ; D9 50 59 D9
+ ld de', hl'                    ; D9 54 5D D9
  ld de, (0x1234)                ; ED 5B 34 12
  ld de, (hl)                    ; ED 17
  ld de, (hl+)                   ; ED 17 23 23
@@ -1839,15 +1814,18 @@
  ld de, (iy-128)                ; FD 17 80
  ld de, 0x1234                  ; 11 34 12
  ld de, bc                      ; 50 59
+ ld de, bc'                     ; D9 C5 D9 D1
+ ld de, de'                     ; D9 D5 D9 D1
  ld de, hl                      ; 54 5D
+ ld de, hl'                     ; D9 E5 D9 D1
  ld de, hl+0                    ; E5 11 00 00 19 EB E1
- ld de, hl+128                  ; E5 11 80 00 19 EB E1
+ ld de, hl+127                  ; E5 11 7F 00 19 EB E1
  ld de, hl+255                  ; E5 11 FF 00 19 EB E1
  ld de, ix                      ; DD 54 DD 5D
  ld de, iy                      ; FD 54 FD 5D
  ld de, sp                      ; EB 21 00 00 39 EB
  ld de, sp+0                    ; EB 21 00 00 39 EB
- ld de, sp+128                  ; EB 21 80 00 39 EB
+ ld de, sp+127                  ; EB 21 7F 00 39 EB
  ld de, sp+255                  ; EB 21 FF 00 39 EB
  ld e, (de)                     ; EB 6E EB
  ld e, (de+)                    ; EB 6E EB 13
@@ -1865,7 +1843,6 @@
  ld e, (iy+0)                   ; FD 5E 00
  ld e, (iy+126)                 ; FD 5E 7E
  ld e, (iy-128)                 ; FD 5E 80
- ld e, -128                     ; 1E 80
  ld e, 0                        ; 1E 00
  ld e, 127                      ; 1E 7F
  ld e, 255                      ; 1E FF
@@ -1895,7 +1872,6 @@
  ld h, (iy+0)                   ; FD 66 00
  ld h, (iy+126)                 ; FD 66 7E
  ld h, (iy-128)                 ; FD 66 80
- ld h, -128                     ; 26 80
  ld h, 0                        ; 26 00
  ld h, 127                      ; 26 7F
  ld h, 255                      ; 26 FF
@@ -1906,9 +1882,11 @@
  ld h, e                        ; 63
  ld h, h                        ; 64
  ld h, l                        ; 65
+ ld hl', bc'                    ; D9 60 69 D9
+ ld hl', de'                    ; D9 62 6B D9
  ld hl, (0x1234)                ; 2A 34 12
+ ld hl, (de)                    ; EB 5E 23 56 2B EB
  ld hl, (hl)                    ; ED 27
- ld hl, (hl+)                   ; ED 27 23 23
  ld hl, (ix)                    ; DD 27 00
  ld hl, (ix+0)                  ; DD 27 00
  ld hl, (ix+126)                ; DD 27 7E
@@ -1919,7 +1897,10 @@
  ld hl, (iy-128)                ; FD 27 80
  ld hl, 0x1234                  ; 21 34 12
  ld hl, bc                      ; 60 69
+ ld hl, bc'                     ; D9 C5 D9 E1
  ld hl, de                      ; 62 6B
+ ld hl, de'                     ; D9 D5 D9 E1
+ ld hl, hl'                     ; D9 E5 D9 E1
  ld hl, i                       ; ED D7
  ld hl, ix                      ; DD E5 E1
  ld hl, iy                      ; FD E5 E1
@@ -1942,10 +1923,12 @@
  ld ix, (iy-128)                ; FD 31 80
  ld ix, 0x1234                  ; DD 21 34 12
  ld ix, bc                      ; DD 60 DD 69
+ ld ix, bc'                     ; D9 C5 D9 DD E1
  ld ix, de                      ; DD 62 DD 6B
+ ld ix, de'                     ; D9 D5 D9 DD E1
  ld ix, hl                      ; E5 DD E1
+ ld ix, hl'                     ; D9 E5 D9 DD E1
  ld ix, iy                      ; FD E5 DD E1
- ld ixh, -128                   ; DD 26 80
  ld ixh, 0                      ; DD 26 00
  ld ixh, 127                    ; DD 26 7F
  ld ixh, 255                    ; DD 26 FF
@@ -1956,7 +1939,6 @@
  ld ixh, e                      ; DD 63
  ld ixh, ixh                    ; DD 64
  ld ixh, ixl                    ; DD 65
- ld ixl, -128                   ; DD 2E 80
  ld ixl, 0                      ; DD 2E 00
  ld ixl, 127                    ; DD 2E 7F
  ld ixl, 255                    ; DD 2E FF
@@ -1980,10 +1962,12 @@
  ld iy, (iy-128)                ; FD 37 80
  ld iy, 0x1234                  ; FD 21 34 12
  ld iy, bc                      ; FD 60 FD 69
+ ld iy, bc'                     ; D9 C5 D9 FD E1
  ld iy, de                      ; FD 62 FD 6B
+ ld iy, de'                     ; D9 D5 D9 FD E1
  ld iy, hl                      ; E5 FD E1
+ ld iy, hl'                     ; D9 E5 D9 FD E1
  ld iy, ix                      ; DD E5 FD E1
- ld iyh, -128                   ; FD 26 80
  ld iyh, 0                      ; FD 26 00
  ld iyh, 127                    ; FD 26 7F
  ld iyh, 255                    ; FD 26 FF
@@ -1994,7 +1978,6 @@
  ld iyh, e                      ; FD 63
  ld iyh, iyh                    ; FD 64
  ld iyh, iyl                    ; FD 65
- ld iyl, -128                   ; FD 2E 80
  ld iyl, 0                      ; FD 2E 00
  ld iyl, 127                    ; FD 2E 7F
  ld iyl, 255                    ; FD 2E FF
@@ -2021,7 +2004,6 @@
  ld l, (iy+0)                   ; FD 6E 00
  ld l, (iy+126)                 ; FD 6E 7E
  ld l, (iy-128)                 ; FD 6E 80
- ld l, -128                     ; 2E 80
  ld l, 0                        ; 2E 00
  ld l, 127                      ; 2E 7F
  ld l, 255                      ; 2E FF
@@ -2039,15 +2021,40 @@
  ld sp, hl                      ; F9
  ld sp, ix                      ; DD F9
  ld sp, iy                      ; FD F9
- ld.il (0x123456), a            ; 52 32 56 34 12
- ld.il a, (0x123456)            ; 52 3A 56 34 12
+ ld.il (0x123456), a            ; 5B 32 56 34 12
  ld.l (bc), a                   ; 49 02
- ld.l (bc+), a                  ; 49 02 03
- ld.l (bc-), a                  ; 49 02 0B
+ ld.l (bc+), a                  ; 49 02 49 03
+ ld.l (bc-), a                  ; 49 02 49 0B
+ ld.l (de), 0                   ; EB 49 36 00 EB
+ ld.l (de), 127                 ; EB 49 36 7F EB
+ ld.l (de), 255                 ; EB 49 36 FF EB
  ld.l (de), a                   ; 49 12
- ld.l (de+), a                  ; 49 12 13
- ld.l (de-), a                  ; 49 12 1B
- ld.l (hl), -128                ; 49 36 80
+ ld.l (de), b                   ; EB 49 70 EB
+ ld.l (de), c                   ; EB 49 71 EB
+ ld.l (de), d                   ; EB 49 74 EB
+ ld.l (de), e                   ; EB 49 75 EB
+ ld.l (de), h                   ; EB 49 72 EB
+ ld.l (de), l                   ; EB 49 73 EB
+ ld.l (de+), 0                  ; EB 49 36 00 EB 49 13
+ ld.l (de+), 127                ; EB 49 36 7F EB 49 13
+ ld.l (de+), 255                ; EB 49 36 FF EB 49 13
+ ld.l (de+), a                  ; 49 12 49 13
+ ld.l (de+), b                  ; EB 49 70 EB 49 13
+ ld.l (de+), c                  ; EB 49 71 EB 49 13
+ ld.l (de+), d                  ; EB 49 74 EB 49 13
+ ld.l (de+), e                  ; EB 49 75 EB 49 13
+ ld.l (de+), h                  ; EB 49 72 EB 49 13
+ ld.l (de+), l                  ; EB 49 73 EB 49 13
+ ld.l (de-), 0                  ; EB 49 36 00 EB 49 1B
+ ld.l (de-), 127                ; EB 49 36 7F EB 49 1B
+ ld.l (de-), 255                ; EB 49 36 FF EB 49 1B
+ ld.l (de-), a                  ; 49 12 49 1B
+ ld.l (de-), b                  ; EB 49 70 EB 49 1B
+ ld.l (de-), c                  ; EB 49 71 EB 49 1B
+ ld.l (de-), d                  ; EB 49 74 EB 49 1B
+ ld.l (de-), e                  ; EB 49 75 EB 49 1B
+ ld.l (de-), h                  ; EB 49 72 EB 49 1B
+ ld.l (de-), l                  ; EB 49 73 EB 49 1B
  ld.l (hl), 0                   ; 49 36 00
  ld.l (hl), 127                 ; 49 36 7F
  ld.l (hl), 255                 ; 49 36 FF
@@ -2063,48 +2070,45 @@
  ld.l (hl), ix                  ; 49 ED 3F
  ld.l (hl), iy                  ; 49 ED 3E
  ld.l (hl), l                   ; 49 75
- ld.l (hl+), -128               ; 49 36 80 23
- ld.l (hl+), 0                  ; 49 36 00 23
- ld.l (hl+), 127                ; 49 36 7F 23
- ld.l (hl+), 255                ; 49 36 FF 23
- ld.l (hl+), a                  ; 49 77 23
- ld.l (hl+), b                  ; 49 70 23
- ld.l (hl+), bc                 ; 49 ED 0F 23 23
- ld.l (hl+), c                  ; 49 71 23
- ld.l (hl+), d                  ; 49 72 23
- ld.l (hl+), de                 ; 49 ED 1F 23 23
- ld.l (hl+), e                  ; 49 73 23
- ld.l (hl+), h                  ; 49 74 23
- ld.l (hl+), hl                 ; 49 ED 2F 23 23
- ld.l (hl+), ix                 ; 49 ED 3F 23 23
- ld.l (hl+), iy                 ; 49 ED 3E 23 23
- ld.l (hl+), l                  ; 49 75 23
- ld.l (hl-), -128               ; 49 36 80 2B
- ld.l (hl-), 0                  ; 49 36 00 2B
- ld.l (hl-), 127                ; 49 36 7F 2B
- ld.l (hl-), 255                ; 49 36 FF 2B
- ld.l (hl-), a                  ; 49 77 2B
- ld.l (hl-), b                  ; 49 70 2B
- ld.l (hl-), c                  ; 49 71 2B
- ld.l (hl-), d                  ; 49 72 2B
- ld.l (hl-), e                  ; 49 73 2B
- ld.l (hl-), h                  ; 49 74 2B
- ld.l (hl-), l                  ; 49 75 2B
- ld.l (hld), a                  ; 49 77 2B
- ld.l (hld), b                  ; 49 70 2B
- ld.l (hld), c                  ; 49 71 2B
- ld.l (hld), d                  ; 49 72 2B
- ld.l (hld), e                  ; 49 73 2B
- ld.l (hld), h                  ; 49 74 2B
- ld.l (hld), l                  ; 49 75 2B
- ld.l (hli), a                  ; 49 77 23
- ld.l (hli), b                  ; 49 70 23
- ld.l (hli), c                  ; 49 71 23
- ld.l (hli), d                  ; 49 72 23
- ld.l (hli), e                  ; 49 73 23
- ld.l (hli), h                  ; 49 74 23
- ld.l (hli), l                  ; 49 75 23
- ld.l (ix), -128                ; 49 DD 36 00 80
+ ld.l (hl+), 0                  ; 49 36 00 49 23
+ ld.l (hl+), 127                ; 49 36 7F 49 23
+ ld.l (hl+), 255                ; 49 36 FF 49 23
+ ld.l (hl+), a                  ; 49 77 49 23
+ ld.l (hl+), b                  ; 49 70 49 23
+ ld.l (hl+), bc                 ; 49 ED 0F 49 23 49 23
+ ld.l (hl+), c                  ; 49 71 49 23
+ ld.l (hl+), d                  ; 49 72 49 23
+ ld.l (hl+), de                 ; 49 ED 1F 49 23 49 23
+ ld.l (hl+), e                  ; 49 73 49 23
+ ld.l (hl+), h                  ; 49 74 49 23
+ ld.l (hl+), hl                 ; 49 ED 2F 49 23 49 23
+ ld.l (hl+), ix                 ; 49 ED 3F 49 23 49 23
+ ld.l (hl+), iy                 ; 49 ED 3E 49 23 49 23
+ ld.l (hl+), l                  ; 49 75 49 23
+ ld.l (hl-), 0                  ; 49 36 00 49 2B
+ ld.l (hl-), 127                ; 49 36 7F 49 2B
+ ld.l (hl-), 255                ; 49 36 FF 49 2B
+ ld.l (hl-), a                  ; 49 77 49 2B
+ ld.l (hl-), b                  ; 49 70 49 2B
+ ld.l (hl-), c                  ; 49 71 49 2B
+ ld.l (hl-), d                  ; 49 72 49 2B
+ ld.l (hl-), e                  ; 49 73 49 2B
+ ld.l (hl-), h                  ; 49 74 49 2B
+ ld.l (hl-), l                  ; 49 75 49 2B
+ ld.l (hld), a                  ; 49 77 49 2B
+ ld.l (hld), b                  ; 49 70 49 2B
+ ld.l (hld), c                  ; 49 71 49 2B
+ ld.l (hld), d                  ; 49 72 49 2B
+ ld.l (hld), e                  ; 49 73 49 2B
+ ld.l (hld), h                  ; 49 74 49 2B
+ ld.l (hld), l                  ; 49 75 49 2B
+ ld.l (hli), a                  ; 49 77 49 23
+ ld.l (hli), b                  ; 49 70 49 23
+ ld.l (hli), c                  ; 49 71 49 23
+ ld.l (hli), d                  ; 49 72 49 23
+ ld.l (hli), e                  ; 49 73 49 23
+ ld.l (hli), h                  ; 49 74 49 23
+ ld.l (hli), l                  ; 49 75 49 23
  ld.l (ix), 0                   ; 49 DD 36 00 00
  ld.l (ix), 127                 ; 49 DD 36 00 7F
  ld.l (ix), 255                 ; 49 DD 36 00 FF
@@ -2120,7 +2124,6 @@
  ld.l (ix), ix                  ; 49 DD 3F 00
  ld.l (ix), iy                  ; 49 DD 3E 00
  ld.l (ix), l                   ; 49 DD 75 00
- ld.l (ix+0), -128              ; 49 DD 36 00 80
  ld.l (ix+0), 0                 ; 49 DD 36 00 00
  ld.l (ix+0), 127               ; 49 DD 36 00 7F
  ld.l (ix+0), 255               ; 49 DD 36 00 FF
@@ -2136,7 +2139,6 @@
  ld.l (ix+0), ix                ; 49 DD 3F 00
  ld.l (ix+0), iy                ; 49 DD 3E 00
  ld.l (ix+0), l                 ; 49 DD 75 00
- ld.l (ix+126), -128            ; 49 DD 36 7E 80
  ld.l (ix+126), 0               ; 49 DD 36 7E 00
  ld.l (ix+126), 127             ; 49 DD 36 7E 7F
  ld.l (ix+126), 255             ; 49 DD 36 7E FF
@@ -2152,7 +2154,6 @@
  ld.l (ix+126), ix              ; 49 DD 3F 7E
  ld.l (ix+126), iy              ; 49 DD 3E 7E
  ld.l (ix+126), l               ; 49 DD 75 7E
- ld.l (ix-128), -128            ; 49 DD 36 80 80
  ld.l (ix-128), 0               ; 49 DD 36 80 00
  ld.l (ix-128), 127             ; 49 DD 36 80 7F
  ld.l (ix-128), 255             ; 49 DD 36 80 FF
@@ -2168,7 +2169,6 @@
  ld.l (ix-128), ix              ; 49 DD 3F 80
  ld.l (ix-128), iy              ; 49 DD 3E 80
  ld.l (ix-128), l               ; 49 DD 75 80
- ld.l (iy), -128                ; 49 FD 36 00 80
  ld.l (iy), 0                   ; 49 FD 36 00 00
  ld.l (iy), 127                 ; 49 FD 36 00 7F
  ld.l (iy), 255                 ; 49 FD 36 00 FF
@@ -2184,7 +2184,6 @@
  ld.l (iy), ix                  ; 49 FD 3E 00
  ld.l (iy), iy                  ; 49 FD 3F 00
  ld.l (iy), l                   ; 49 FD 75 00
- ld.l (iy+0), -128              ; 49 FD 36 00 80
  ld.l (iy+0), 0                 ; 49 FD 36 00 00
  ld.l (iy+0), 127               ; 49 FD 36 00 7F
  ld.l (iy+0), 255               ; 49 FD 36 00 FF
@@ -2200,7 +2199,6 @@
  ld.l (iy+0), ix                ; 49 FD 3E 00
  ld.l (iy+0), iy                ; 49 FD 3F 00
  ld.l (iy+0), l                 ; 49 FD 75 00
- ld.l (iy+126), -128            ; 49 FD 36 7E 80
  ld.l (iy+126), 0               ; 49 FD 36 7E 00
  ld.l (iy+126), 127             ; 49 FD 36 7E 7F
  ld.l (iy+126), 255             ; 49 FD 36 7E FF
@@ -2216,7 +2214,6 @@
  ld.l (iy+126), ix              ; 49 FD 3E 7E
  ld.l (iy+126), iy              ; 49 FD 3F 7E
  ld.l (iy+126), l               ; 49 FD 75 7E
- ld.l (iy-128), -128            ; 49 FD 36 80 80
  ld.l (iy-128), 0               ; 49 FD 36 80 00
  ld.l (iy-128), 127             ; 49 FD 36 80 7F
  ld.l (iy-128), 255             ; 49 FD 36 80 FF
@@ -2233,16 +2230,16 @@
  ld.l (iy-128), iy              ; 49 FD 3F 80
  ld.l (iy-128), l               ; 49 FD 75 80
  ld.l a, (bc)                   ; 49 0A
- ld.l a, (bc+)                  ; 49 0A 03
- ld.l a, (bc-)                  ; 49 0A 0B
+ ld.l a, (bc+)                  ; 49 0A 49 03
+ ld.l a, (bc-)                  ; 49 0A 49 0B
  ld.l a, (de)                   ; 49 1A
- ld.l a, (de+)                  ; 49 1A 13
- ld.l a, (de-)                  ; 49 1A 1B
+ ld.l a, (de+)                  ; 49 1A 49 13
+ ld.l a, (de-)                  ; 49 1A 49 1B
  ld.l a, (hl)                   ; 49 7E
- ld.l a, (hl+)                  ; 49 7E 23
- ld.l a, (hl-)                  ; 49 7E 2B
- ld.l a, (hld)                  ; 49 7E 2B
- ld.l a, (hli)                  ; 49 7E 23
+ ld.l a, (hl+)                  ; 49 7E 49 23
+ ld.l a, (hl-)                  ; 49 7E 49 2B
+ ld.l a, (hld)                  ; 49 7E 49 2B
+ ld.l a, (hli)                  ; 49 7E 49 23
  ld.l a, (ix)                   ; 49 DD 7E 00
  ld.l a, (ix+0)                 ; 49 DD 7E 00
  ld.l a, (ix+126)               ; 49 DD 7E 7E
@@ -2251,11 +2248,14 @@
  ld.l a, (iy+0)                 ; 49 FD 7E 00
  ld.l a, (iy+126)               ; 49 FD 7E 7E
  ld.l a, (iy-128)               ; 49 FD 7E 80
+ ld.l b, (de)                   ; EB 49 46 EB
+ ld.l b, (de+)                  ; EB 49 46 EB 49 13
+ ld.l b, (de-)                  ; EB 49 46 EB 49 1B
  ld.l b, (hl)                   ; 49 46
- ld.l b, (hl+)                  ; 49 46 23
- ld.l b, (hl-)                  ; 49 46 2B
- ld.l b, (hld)                  ; 49 46 2B
- ld.l b, (hli)                  ; 49 46 23
+ ld.l b, (hl+)                  ; 49 46 49 23
+ ld.l b, (hl-)                  ; 49 46 49 2B
+ ld.l b, (hld)                  ; 49 46 49 2B
+ ld.l b, (hli)                  ; 49 46 49 23
  ld.l b, (ix)                   ; 49 DD 46 00
  ld.l b, (ix+0)                 ; 49 DD 46 00
  ld.l b, (ix+126)               ; 49 DD 46 7E
@@ -2265,7 +2265,7 @@
  ld.l b, (iy+126)               ; 49 FD 46 7E
  ld.l b, (iy-128)               ; 49 FD 46 80
  ld.l bc, (hl)                  ; 49 ED 07
- ld.l bc, (hl+)                 ; 49 ED 07 23 23
+ ld.l bc, (hl+)                 ; 49 ED 07 49 23 49 23
  ld.l bc, (ix)                  ; 49 DD 07 00
  ld.l bc, (ix+0)                ; 49 DD 07 00
  ld.l bc, (ix+126)              ; 49 DD 07 7E
@@ -2274,11 +2274,14 @@
  ld.l bc, (iy+0)                ; 49 FD 07 00
  ld.l bc, (iy+126)              ; 49 FD 07 7E
  ld.l bc, (iy-128)              ; 49 FD 07 80
+ ld.l c, (de)                   ; EB 49 4E EB
+ ld.l c, (de+)                  ; EB 49 4E EB 49 13
+ ld.l c, (de-)                  ; EB 49 4E EB 49 1B
  ld.l c, (hl)                   ; 49 4E
- ld.l c, (hl+)                  ; 49 4E 23
- ld.l c, (hl-)                  ; 49 4E 2B
- ld.l c, (hld)                  ; 49 4E 2B
- ld.l c, (hli)                  ; 49 4E 23
+ ld.l c, (hl+)                  ; 49 4E 49 23
+ ld.l c, (hl-)                  ; 49 4E 49 2B
+ ld.l c, (hld)                  ; 49 4E 49 2B
+ ld.l c, (hli)                  ; 49 4E 49 23
  ld.l c, (ix)                   ; 49 DD 4E 00
  ld.l c, (ix+0)                 ; 49 DD 4E 00
  ld.l c, (ix+126)               ; 49 DD 4E 7E
@@ -2287,11 +2290,14 @@
  ld.l c, (iy+0)                 ; 49 FD 4E 00
  ld.l c, (iy+126)               ; 49 FD 4E 7E
  ld.l c, (iy-128)               ; 49 FD 4E 80
+ ld.l d, (de)                   ; EB 49 66 EB
+ ld.l d, (de+)                  ; EB 49 66 EB 49 13
+ ld.l d, (de-)                  ; EB 49 66 EB 49 1B
  ld.l d, (hl)                   ; 49 56
- ld.l d, (hl+)                  ; 49 56 23
- ld.l d, (hl-)                  ; 49 56 2B
- ld.l d, (hld)                  ; 49 56 2B
- ld.l d, (hli)                  ; 49 56 23
+ ld.l d, (hl+)                  ; 49 56 49 23
+ ld.l d, (hl-)                  ; 49 56 49 2B
+ ld.l d, (hld)                  ; 49 56 49 2B
+ ld.l d, (hli)                  ; 49 56 49 23
  ld.l d, (ix)                   ; 49 DD 56 00
  ld.l d, (ix+0)                 ; 49 DD 56 00
  ld.l d, (ix+126)               ; 49 DD 56 7E
@@ -2301,7 +2307,7 @@
  ld.l d, (iy+126)               ; 49 FD 56 7E
  ld.l d, (iy-128)               ; 49 FD 56 80
  ld.l de, (hl)                  ; 49 ED 17
- ld.l de, (hl+)                 ; 49 ED 17 23 23
+ ld.l de, (hl+)                 ; 49 ED 17 49 23 49 23
  ld.l de, (ix)                  ; 49 DD 17 00
  ld.l de, (ix+0)                ; 49 DD 17 00
  ld.l de, (ix+126)              ; 49 DD 17 7E
@@ -2310,11 +2316,14 @@
  ld.l de, (iy+0)                ; 49 FD 17 00
  ld.l de, (iy+126)              ; 49 FD 17 7E
  ld.l de, (iy-128)              ; 49 FD 17 80
+ ld.l e, (de)                   ; EB 49 6E EB
+ ld.l e, (de+)                  ; EB 49 6E EB 49 13
+ ld.l e, (de-)                  ; EB 49 6E EB 49 1B
  ld.l e, (hl)                   ; 49 5E
- ld.l e, (hl+)                  ; 49 5E 23
- ld.l e, (hl-)                  ; 49 5E 2B
- ld.l e, (hld)                  ; 49 5E 2B
- ld.l e, (hli)                  ; 49 5E 23
+ ld.l e, (hl+)                  ; 49 5E 49 23
+ ld.l e, (hl-)                  ; 49 5E 49 2B
+ ld.l e, (hld)                  ; 49 5E 49 2B
+ ld.l e, (hli)                  ; 49 5E 49 23
  ld.l e, (ix)                   ; 49 DD 5E 00
  ld.l e, (ix+0)                 ; 49 DD 5E 00
  ld.l e, (ix+126)               ; 49 DD 5E 7E
@@ -2323,11 +2332,14 @@
  ld.l e, (iy+0)                 ; 49 FD 5E 00
  ld.l e, (iy+126)               ; 49 FD 5E 7E
  ld.l e, (iy-128)               ; 49 FD 5E 80
+ ld.l h, (de)                   ; EB 49 56 EB
+ ld.l h, (de+)                  ; EB 49 56 EB 49 13
+ ld.l h, (de-)                  ; EB 49 56 EB 49 1B
  ld.l h, (hl)                   ; 49 66
- ld.l h, (hl+)                  ; 49 66 23
- ld.l h, (hl-)                  ; 49 66 2B
- ld.l h, (hld)                  ; 49 66 2B
- ld.l h, (hli)                  ; 49 66 23
+ ld.l h, (hl+)                  ; 49 66 49 23
+ ld.l h, (hl-)                  ; 49 66 49 2B
+ ld.l h, (hld)                  ; 49 66 49 2B
+ ld.l h, (hli)                  ; 49 66 49 23
  ld.l h, (ix)                   ; 49 DD 66 00
  ld.l h, (ix+0)                 ; 49 DD 66 00
  ld.l h, (ix+126)               ; 49 DD 66 7E
@@ -2337,7 +2349,6 @@
  ld.l h, (iy+126)               ; 49 FD 66 7E
  ld.l h, (iy-128)               ; 49 FD 66 80
  ld.l hl, (hl)                  ; 49 ED 27
- ld.l hl, (hl+)                 ; 49 ED 27 23 23
  ld.l hl, (ix)                  ; 49 DD 27 00
  ld.l hl, (ix+0)                ; 49 DD 27 00
  ld.l hl, (ix+126)              ; 49 DD 27 7E
@@ -2347,7 +2358,7 @@
  ld.l hl, (iy+126)              ; 49 FD 27 7E
  ld.l hl, (iy-128)              ; 49 FD 27 80
  ld.l ix, (hl)                  ; 49 ED 37
- ld.l ix, (hl+)                 ; 49 ED 37 23 23
+ ld.l ix, (hl+)                 ; 49 ED 37 49 23 49 23
  ld.l ix, (ix)                  ; 49 DD 37 00
  ld.l ix, (ix+0)                ; 49 DD 37 00
  ld.l ix, (ix+126)              ; 49 DD 37 7E
@@ -2357,7 +2368,7 @@
  ld.l ix, (iy+126)              ; 49 FD 31 7E
  ld.l ix, (iy-128)              ; 49 FD 31 80
  ld.l iy, (hl)                  ; 49 ED 31
- ld.l iy, (hl+)                 ; 49 ED 31 23 23
+ ld.l iy, (hl+)                 ; 49 ED 31 49 23 49 23
  ld.l iy, (ix)                  ; 49 DD 31 00
  ld.l iy, (ix+0)                ; 49 DD 31 00
  ld.l iy, (ix+126)              ; 49 DD 31 7E
@@ -2366,11 +2377,14 @@
  ld.l iy, (iy+0)                ; 49 FD 37 00
  ld.l iy, (iy+126)              ; 49 FD 37 7E
  ld.l iy, (iy-128)              ; 49 FD 37 80
+ ld.l l, (de)                   ; EB 49 5E EB
+ ld.l l, (de+)                  ; EB 49 5E EB 49 13
+ ld.l l, (de-)                  ; EB 49 5E EB 49 1B
  ld.l l, (hl)                   ; 49 6E
- ld.l l, (hl+)                  ; 49 6E 23
- ld.l l, (hl-)                  ; 49 6E 2B
- ld.l l, (hld)                  ; 49 6E 2B
- ld.l l, (hli)                  ; 49 6E 23
+ ld.l l, (hl+)                  ; 49 6E 49 23
+ ld.l l, (hl-)                  ; 49 6E 49 2B
+ ld.l l, (hld)                  ; 49 6E 49 2B
+ ld.l l, (hli)                  ; 49 6E 49 23
  ld.l l, (ix)                   ; 49 DD 6E 00
  ld.l l, (ix+0)                 ; 49 DD 6E 00
  ld.l l, (ix+126)               ; 49 DD 6E 7E
@@ -2382,12 +2396,14 @@
  ld.l sp, hl                    ; 49 F9
  ld.l sp, ix                    ; 49 DD F9
  ld.l sp, iy                    ; 49 FD F9
+ ld.lil (0x123456), a           ; 5B 32 56 34 12
  ld.lil (0x123456), bc          ; 5B ED 43 56 34 12
  ld.lil (0x123456), de          ; 5B ED 53 56 34 12
  ld.lil (0x123456), hl          ; 5B 22 56 34 12
  ld.lil (0x123456), ix          ; 5B DD 22 56 34 12
  ld.lil (0x123456), iy          ; 5B FD 22 56 34 12
  ld.lil (0x123456), sp          ; 5B ED 73 56 34 12
+ ld.lil a, (0x123456)           ; 5B 3A 56 34 12
  ld.lil bc, (0x123456)          ; 5B ED 4B 56 34 12
  ld.lil bc, 0x123456            ; 5B 01 56 34 12
  ld.lil de, (0x123456)          ; 5B ED 5B 56 34 12
@@ -2401,12 +2417,38 @@
  ld.lil sp, (0x123456)          ; 5B ED 7B 56 34 12
  ld.lil sp, 0x123456            ; 5B 31 56 34 12
  ld.lis (bc), a                 ; 49 02
- ld.lis (bc+), a                ; 49 02 03
- ld.lis (bc-), a                ; 49 02 0B
+ ld.lis (bc+), a                ; 49 02 49 03
+ ld.lis (bc-), a                ; 49 02 49 0B
+ ld.lis (de), 0                 ; EB 49 36 00 EB
+ ld.lis (de), 127               ; EB 49 36 7F EB
+ ld.lis (de), 255               ; EB 49 36 FF EB
  ld.lis (de), a                 ; 49 12
- ld.lis (de+), a                ; 49 12 13
- ld.lis (de-), a                ; 49 12 1B
- ld.lis (hl), -128              ; 49 36 80
+ ld.lis (de), b                 ; EB 49 70 EB
+ ld.lis (de), c                 ; EB 49 71 EB
+ ld.lis (de), d                 ; EB 49 74 EB
+ ld.lis (de), e                 ; EB 49 75 EB
+ ld.lis (de), h                 ; EB 49 72 EB
+ ld.lis (de), l                 ; EB 49 73 EB
+ ld.lis (de+), 0                ; EB 49 36 00 EB 49 13
+ ld.lis (de+), 127              ; EB 49 36 7F EB 49 13
+ ld.lis (de+), 255              ; EB 49 36 FF EB 49 13
+ ld.lis (de+), a                ; 49 12 49 13
+ ld.lis (de+), b                ; EB 49 70 EB 49 13
+ ld.lis (de+), c                ; EB 49 71 EB 49 13
+ ld.lis (de+), d                ; EB 49 74 EB 49 13
+ ld.lis (de+), e                ; EB 49 75 EB 49 13
+ ld.lis (de+), h                ; EB 49 72 EB 49 13
+ ld.lis (de+), l                ; EB 49 73 EB 49 13
+ ld.lis (de-), 0                ; EB 49 36 00 EB 49 1B
+ ld.lis (de-), 127              ; EB 49 36 7F EB 49 1B
+ ld.lis (de-), 255              ; EB 49 36 FF EB 49 1B
+ ld.lis (de-), a                ; 49 12 49 1B
+ ld.lis (de-), b                ; EB 49 70 EB 49 1B
+ ld.lis (de-), c                ; EB 49 71 EB 49 1B
+ ld.lis (de-), d                ; EB 49 74 EB 49 1B
+ ld.lis (de-), e                ; EB 49 75 EB 49 1B
+ ld.lis (de-), h                ; EB 49 72 EB 49 1B
+ ld.lis (de-), l                ; EB 49 73 EB 49 1B
  ld.lis (hl), 0                 ; 49 36 00
  ld.lis (hl), 127               ; 49 36 7F
  ld.lis (hl), 255               ; 49 36 FF
@@ -2422,48 +2464,45 @@
  ld.lis (hl), ix                ; 49 ED 3F
  ld.lis (hl), iy                ; 49 ED 3E
  ld.lis (hl), l                 ; 49 75
- ld.lis (hl+), -128             ; 49 36 80 23
- ld.lis (hl+), 0                ; 49 36 00 23
- ld.lis (hl+), 127              ; 49 36 7F 23
- ld.lis (hl+), 255              ; 49 36 FF 23
- ld.lis (hl+), a                ; 49 77 23
- ld.lis (hl+), b                ; 49 70 23
- ld.lis (hl+), bc               ; 49 ED 0F 23 23
- ld.lis (hl+), c                ; 49 71 23
- ld.lis (hl+), d                ; 49 72 23
- ld.lis (hl+), de               ; 49 ED 1F 23 23
- ld.lis (hl+), e                ; 49 73 23
- ld.lis (hl+), h                ; 49 74 23
- ld.lis (hl+), hl               ; 49 ED 2F 23 23
- ld.lis (hl+), ix               ; 49 ED 3F 23 23
- ld.lis (hl+), iy               ; 49 ED 3E 23 23
- ld.lis (hl+), l                ; 49 75 23
- ld.lis (hl-), -128             ; 49 36 80 2B
- ld.lis (hl-), 0                ; 49 36 00 2B
- ld.lis (hl-), 127              ; 49 36 7F 2B
- ld.lis (hl-), 255              ; 49 36 FF 2B
- ld.lis (hl-), a                ; 49 77 2B
- ld.lis (hl-), b                ; 49 70 2B
- ld.lis (hl-), c                ; 49 71 2B
- ld.lis (hl-), d                ; 49 72 2B
- ld.lis (hl-), e                ; 49 73 2B
- ld.lis (hl-), h                ; 49 74 2B
- ld.lis (hl-), l                ; 49 75 2B
- ld.lis (hld), a                ; 49 77 2B
- ld.lis (hld), b                ; 49 70 2B
- ld.lis (hld), c                ; 49 71 2B
- ld.lis (hld), d                ; 49 72 2B
- ld.lis (hld), e                ; 49 73 2B
- ld.lis (hld), h                ; 49 74 2B
- ld.lis (hld), l                ; 49 75 2B
- ld.lis (hli), a                ; 49 77 23
- ld.lis (hli), b                ; 49 70 23
- ld.lis (hli), c                ; 49 71 23
- ld.lis (hli), d                ; 49 72 23
- ld.lis (hli), e                ; 49 73 23
- ld.lis (hli), h                ; 49 74 23
- ld.lis (hli), l                ; 49 75 23
- ld.lis (ix), -128              ; 49 DD 36 00 80
+ ld.lis (hl+), 0                ; 49 36 00 49 23
+ ld.lis (hl+), 127              ; 49 36 7F 49 23
+ ld.lis (hl+), 255              ; 49 36 FF 49 23
+ ld.lis (hl+), a                ; 49 77 49 23
+ ld.lis (hl+), b                ; 49 70 49 23
+ ld.lis (hl+), bc               ; 49 ED 0F 49 23 49 23
+ ld.lis (hl+), c                ; 49 71 49 23
+ ld.lis (hl+), d                ; 49 72 49 23
+ ld.lis (hl+), de               ; 49 ED 1F 49 23 49 23
+ ld.lis (hl+), e                ; 49 73 49 23
+ ld.lis (hl+), h                ; 49 74 49 23
+ ld.lis (hl+), hl               ; 49 ED 2F 49 23 49 23
+ ld.lis (hl+), ix               ; 49 ED 3F 49 23 49 23
+ ld.lis (hl+), iy               ; 49 ED 3E 49 23 49 23
+ ld.lis (hl+), l                ; 49 75 49 23
+ ld.lis (hl-), 0                ; 49 36 00 49 2B
+ ld.lis (hl-), 127              ; 49 36 7F 49 2B
+ ld.lis (hl-), 255              ; 49 36 FF 49 2B
+ ld.lis (hl-), a                ; 49 77 49 2B
+ ld.lis (hl-), b                ; 49 70 49 2B
+ ld.lis (hl-), c                ; 49 71 49 2B
+ ld.lis (hl-), d                ; 49 72 49 2B
+ ld.lis (hl-), e                ; 49 73 49 2B
+ ld.lis (hl-), h                ; 49 74 49 2B
+ ld.lis (hl-), l                ; 49 75 49 2B
+ ld.lis (hld), a                ; 49 77 49 2B
+ ld.lis (hld), b                ; 49 70 49 2B
+ ld.lis (hld), c                ; 49 71 49 2B
+ ld.lis (hld), d                ; 49 72 49 2B
+ ld.lis (hld), e                ; 49 73 49 2B
+ ld.lis (hld), h                ; 49 74 49 2B
+ ld.lis (hld), l                ; 49 75 49 2B
+ ld.lis (hli), a                ; 49 77 49 23
+ ld.lis (hli), b                ; 49 70 49 23
+ ld.lis (hli), c                ; 49 71 49 23
+ ld.lis (hli), d                ; 49 72 49 23
+ ld.lis (hli), e                ; 49 73 49 23
+ ld.lis (hli), h                ; 49 74 49 23
+ ld.lis (hli), l                ; 49 75 49 23
  ld.lis (ix), 0                 ; 49 DD 36 00 00
  ld.lis (ix), 127               ; 49 DD 36 00 7F
  ld.lis (ix), 255               ; 49 DD 36 00 FF
@@ -2479,7 +2518,6 @@
  ld.lis (ix), ix                ; 49 DD 3F 00
  ld.lis (ix), iy                ; 49 DD 3E 00
  ld.lis (ix), l                 ; 49 DD 75 00
- ld.lis (ix+0), -128            ; 49 DD 36 00 80
  ld.lis (ix+0), 0               ; 49 DD 36 00 00
  ld.lis (ix+0), 127             ; 49 DD 36 00 7F
  ld.lis (ix+0), 255             ; 49 DD 36 00 FF
@@ -2495,7 +2533,6 @@
  ld.lis (ix+0), ix              ; 49 DD 3F 00
  ld.lis (ix+0), iy              ; 49 DD 3E 00
  ld.lis (ix+0), l               ; 49 DD 75 00
- ld.lis (ix+126), -128          ; 49 DD 36 7E 80
  ld.lis (ix+126), 0             ; 49 DD 36 7E 00
  ld.lis (ix+126), 127           ; 49 DD 36 7E 7F
  ld.lis (ix+126), 255           ; 49 DD 36 7E FF
@@ -2511,7 +2548,6 @@
  ld.lis (ix+126), ix            ; 49 DD 3F 7E
  ld.lis (ix+126), iy            ; 49 DD 3E 7E
  ld.lis (ix+126), l             ; 49 DD 75 7E
- ld.lis (ix-128), -128          ; 49 DD 36 80 80
  ld.lis (ix-128), 0             ; 49 DD 36 80 00
  ld.lis (ix-128), 127           ; 49 DD 36 80 7F
  ld.lis (ix-128), 255           ; 49 DD 36 80 FF
@@ -2527,7 +2563,6 @@
  ld.lis (ix-128), ix            ; 49 DD 3F 80
  ld.lis (ix-128), iy            ; 49 DD 3E 80
  ld.lis (ix-128), l             ; 49 DD 75 80
- ld.lis (iy), -128              ; 49 FD 36 00 80
  ld.lis (iy), 0                 ; 49 FD 36 00 00
  ld.lis (iy), 127               ; 49 FD 36 00 7F
  ld.lis (iy), 255               ; 49 FD 36 00 FF
@@ -2543,7 +2578,6 @@
  ld.lis (iy), ix                ; 49 FD 3E 00
  ld.lis (iy), iy                ; 49 FD 3F 00
  ld.lis (iy), l                 ; 49 FD 75 00
- ld.lis (iy+0), -128            ; 49 FD 36 00 80
  ld.lis (iy+0), 0               ; 49 FD 36 00 00
  ld.lis (iy+0), 127             ; 49 FD 36 00 7F
  ld.lis (iy+0), 255             ; 49 FD 36 00 FF
@@ -2559,7 +2593,6 @@
  ld.lis (iy+0), ix              ; 49 FD 3E 00
  ld.lis (iy+0), iy              ; 49 FD 3F 00
  ld.lis (iy+0), l               ; 49 FD 75 00
- ld.lis (iy+126), -128          ; 49 FD 36 7E 80
  ld.lis (iy+126), 0             ; 49 FD 36 7E 00
  ld.lis (iy+126), 127           ; 49 FD 36 7E 7F
  ld.lis (iy+126), 255           ; 49 FD 36 7E FF
@@ -2575,7 +2608,6 @@
  ld.lis (iy+126), ix            ; 49 FD 3E 7E
  ld.lis (iy+126), iy            ; 49 FD 3F 7E
  ld.lis (iy+126), l             ; 49 FD 75 7E
- ld.lis (iy-128), -128          ; 49 FD 36 80 80
  ld.lis (iy-128), 0             ; 49 FD 36 80 00
  ld.lis (iy-128), 127           ; 49 FD 36 80 7F
  ld.lis (iy-128), 255           ; 49 FD 36 80 FF
@@ -2592,16 +2624,16 @@
  ld.lis (iy-128), iy            ; 49 FD 3F 80
  ld.lis (iy-128), l             ; 49 FD 75 80
  ld.lis a, (bc)                 ; 49 0A
- ld.lis a, (bc+)                ; 49 0A 03
- ld.lis a, (bc-)                ; 49 0A 0B
+ ld.lis a, (bc+)                ; 49 0A 49 03
+ ld.lis a, (bc-)                ; 49 0A 49 0B
  ld.lis a, (de)                 ; 49 1A
- ld.lis a, (de+)                ; 49 1A 13
- ld.lis a, (de-)                ; 49 1A 1B
+ ld.lis a, (de+)                ; 49 1A 49 13
+ ld.lis a, (de-)                ; 49 1A 49 1B
  ld.lis a, (hl)                 ; 49 7E
- ld.lis a, (hl+)                ; 49 7E 23
- ld.lis a, (hl-)                ; 49 7E 2B
- ld.lis a, (hld)                ; 49 7E 2B
- ld.lis a, (hli)                ; 49 7E 23
+ ld.lis a, (hl+)                ; 49 7E 49 23
+ ld.lis a, (hl-)                ; 49 7E 49 2B
+ ld.lis a, (hld)                ; 49 7E 49 2B
+ ld.lis a, (hli)                ; 49 7E 49 23
  ld.lis a, (ix)                 ; 49 DD 7E 00
  ld.lis a, (ix+0)               ; 49 DD 7E 00
  ld.lis a, (ix+126)             ; 49 DD 7E 7E
@@ -2610,11 +2642,14 @@
  ld.lis a, (iy+0)               ; 49 FD 7E 00
  ld.lis a, (iy+126)             ; 49 FD 7E 7E
  ld.lis a, (iy-128)             ; 49 FD 7E 80
+ ld.lis b, (de)                 ; EB 49 46 EB
+ ld.lis b, (de+)                ; EB 49 46 EB 49 13
+ ld.lis b, (de-)                ; EB 49 46 EB 49 1B
  ld.lis b, (hl)                 ; 49 46
- ld.lis b, (hl+)                ; 49 46 23
- ld.lis b, (hl-)                ; 49 46 2B
- ld.lis b, (hld)                ; 49 46 2B
- ld.lis b, (hli)                ; 49 46 23
+ ld.lis b, (hl+)                ; 49 46 49 23
+ ld.lis b, (hl-)                ; 49 46 49 2B
+ ld.lis b, (hld)                ; 49 46 49 2B
+ ld.lis b, (hli)                ; 49 46 49 23
  ld.lis b, (ix)                 ; 49 DD 46 00
  ld.lis b, (ix+0)               ; 49 DD 46 00
  ld.lis b, (ix+126)             ; 49 DD 46 7E
@@ -2624,7 +2659,7 @@
  ld.lis b, (iy+126)             ; 49 FD 46 7E
  ld.lis b, (iy-128)             ; 49 FD 46 80
  ld.lis bc, (hl)                ; 49 ED 07
- ld.lis bc, (hl+)               ; 49 ED 07 23 23
+ ld.lis bc, (hl+)               ; 49 ED 07 49 23 49 23
  ld.lis bc, (ix)                ; 49 DD 07 00
  ld.lis bc, (ix+0)              ; 49 DD 07 00
  ld.lis bc, (ix+126)            ; 49 DD 07 7E
@@ -2634,11 +2669,14 @@
  ld.lis bc, (iy+126)            ; 49 FD 07 7E
  ld.lis bc, (iy-128)            ; 49 FD 07 80
  ld.lis bc, 0x1234              ; 49 01 34 12
+ ld.lis c, (de)                 ; EB 49 4E EB
+ ld.lis c, (de+)                ; EB 49 4E EB 49 13
+ ld.lis c, (de-)                ; EB 49 4E EB 49 1B
  ld.lis c, (hl)                 ; 49 4E
- ld.lis c, (hl+)                ; 49 4E 23
- ld.lis c, (hl-)                ; 49 4E 2B
- ld.lis c, (hld)                ; 49 4E 2B
- ld.lis c, (hli)                ; 49 4E 23
+ ld.lis c, (hl+)                ; 49 4E 49 23
+ ld.lis c, (hl-)                ; 49 4E 49 2B
+ ld.lis c, (hld)                ; 49 4E 49 2B
+ ld.lis c, (hli)                ; 49 4E 49 23
  ld.lis c, (ix)                 ; 49 DD 4E 00
  ld.lis c, (ix+0)               ; 49 DD 4E 00
  ld.lis c, (ix+126)             ; 49 DD 4E 7E
@@ -2647,11 +2685,14 @@
  ld.lis c, (iy+0)               ; 49 FD 4E 00
  ld.lis c, (iy+126)             ; 49 FD 4E 7E
  ld.lis c, (iy-128)             ; 49 FD 4E 80
+ ld.lis d, (de)                 ; EB 49 66 EB
+ ld.lis d, (de+)                ; EB 49 66 EB 49 13
+ ld.lis d, (de-)                ; EB 49 66 EB 49 1B
  ld.lis d, (hl)                 ; 49 56
- ld.lis d, (hl+)                ; 49 56 23
- ld.lis d, (hl-)                ; 49 56 2B
- ld.lis d, (hld)                ; 49 56 2B
- ld.lis d, (hli)                ; 49 56 23
+ ld.lis d, (hl+)                ; 49 56 49 23
+ ld.lis d, (hl-)                ; 49 56 49 2B
+ ld.lis d, (hld)                ; 49 56 49 2B
+ ld.lis d, (hli)                ; 49 56 49 23
  ld.lis d, (ix)                 ; 49 DD 56 00
  ld.lis d, (ix+0)               ; 49 DD 56 00
  ld.lis d, (ix+126)             ; 49 DD 56 7E
@@ -2661,7 +2702,7 @@
  ld.lis d, (iy+126)             ; 49 FD 56 7E
  ld.lis d, (iy-128)             ; 49 FD 56 80
  ld.lis de, (hl)                ; 49 ED 17
- ld.lis de, (hl+)               ; 49 ED 17 23 23
+ ld.lis de, (hl+)               ; 49 ED 17 49 23 49 23
  ld.lis de, (ix)                ; 49 DD 17 00
  ld.lis de, (ix+0)              ; 49 DD 17 00
  ld.lis de, (ix+126)            ; 49 DD 17 7E
@@ -2671,11 +2712,14 @@
  ld.lis de, (iy+126)            ; 49 FD 17 7E
  ld.lis de, (iy-128)            ; 49 FD 17 80
  ld.lis de, 0x1234              ; 49 11 34 12
+ ld.lis e, (de)                 ; EB 49 6E EB
+ ld.lis e, (de+)                ; EB 49 6E EB 49 13
+ ld.lis e, (de-)                ; EB 49 6E EB 49 1B
  ld.lis e, (hl)                 ; 49 5E
- ld.lis e, (hl+)                ; 49 5E 23
- ld.lis e, (hl-)                ; 49 5E 2B
- ld.lis e, (hld)                ; 49 5E 2B
- ld.lis e, (hli)                ; 49 5E 23
+ ld.lis e, (hl+)                ; 49 5E 49 23
+ ld.lis e, (hl-)                ; 49 5E 49 2B
+ ld.lis e, (hld)                ; 49 5E 49 2B
+ ld.lis e, (hli)                ; 49 5E 49 23
  ld.lis e, (ix)                 ; 49 DD 5E 00
  ld.lis e, (ix+0)               ; 49 DD 5E 00
  ld.lis e, (ix+126)             ; 49 DD 5E 7E
@@ -2684,11 +2728,14 @@
  ld.lis e, (iy+0)               ; 49 FD 5E 00
  ld.lis e, (iy+126)             ; 49 FD 5E 7E
  ld.lis e, (iy-128)             ; 49 FD 5E 80
+ ld.lis h, (de)                 ; EB 49 56 EB
+ ld.lis h, (de+)                ; EB 49 56 EB 49 13
+ ld.lis h, (de-)                ; EB 49 56 EB 49 1B
  ld.lis h, (hl)                 ; 49 66
- ld.lis h, (hl+)                ; 49 66 23
- ld.lis h, (hl-)                ; 49 66 2B
- ld.lis h, (hld)                ; 49 66 2B
- ld.lis h, (hli)                ; 49 66 23
+ ld.lis h, (hl+)                ; 49 66 49 23
+ ld.lis h, (hl-)                ; 49 66 49 2B
+ ld.lis h, (hld)                ; 49 66 49 2B
+ ld.lis h, (hli)                ; 49 66 49 23
  ld.lis h, (ix)                 ; 49 DD 66 00
  ld.lis h, (ix+0)               ; 49 DD 66 00
  ld.lis h, (ix+126)             ; 49 DD 66 7E
@@ -2698,7 +2745,6 @@
  ld.lis h, (iy+126)             ; 49 FD 66 7E
  ld.lis h, (iy-128)             ; 49 FD 66 80
  ld.lis hl, (hl)                ; 49 ED 27
- ld.lis hl, (hl+)               ; 49 ED 27 23 23
  ld.lis hl, (ix)                ; 49 DD 27 00
  ld.lis hl, (ix+0)              ; 49 DD 27 00
  ld.lis hl, (ix+126)            ; 49 DD 27 7E
@@ -2709,7 +2755,7 @@
  ld.lis hl, (iy-128)            ; 49 FD 27 80
  ld.lis hl, 0x1234              ; 49 21 34 12
  ld.lis ix, (hl)                ; 49 ED 37
- ld.lis ix, (hl+)               ; 49 ED 37 23 23
+ ld.lis ix, (hl+)               ; 49 ED 37 49 23 49 23
  ld.lis ix, (ix)                ; 49 DD 37 00
  ld.lis ix, (ix+0)              ; 49 DD 37 00
  ld.lis ix, (ix+126)            ; 49 DD 37 7E
@@ -2718,8 +2764,9 @@
  ld.lis ix, (iy+0)              ; 49 FD 31 00
  ld.lis ix, (iy+126)            ; 49 FD 31 7E
  ld.lis ix, (iy-128)            ; 49 FD 31 80
+ ld.lis ix, 0x1234              ; 49 DD 21 34 12
  ld.lis iy, (hl)                ; 49 ED 31
- ld.lis iy, (hl+)               ; 49 ED 31 23 23
+ ld.lis iy, (hl+)               ; 49 ED 31 49 23 49 23
  ld.lis iy, (ix)                ; 49 DD 31 00
  ld.lis iy, (ix+0)              ; 49 DD 31 00
  ld.lis iy, (ix+126)            ; 49 DD 31 7E
@@ -2728,11 +2775,15 @@
  ld.lis iy, (iy+0)              ; 49 FD 37 00
  ld.lis iy, (iy+126)            ; 49 FD 37 7E
  ld.lis iy, (iy-128)            ; 49 FD 37 80
+ ld.lis iy, 0x1234              ; 49 FD 21 34 12
+ ld.lis l, (de)                 ; EB 49 5E EB
+ ld.lis l, (de+)                ; EB 49 5E EB 49 13
+ ld.lis l, (de-)                ; EB 49 5E EB 49 1B
  ld.lis l, (hl)                 ; 49 6E
- ld.lis l, (hl+)                ; 49 6E 23
- ld.lis l, (hl-)                ; 49 6E 2B
- ld.lis l, (hld)                ; 49 6E 2B
- ld.lis l, (hli)                ; 49 6E 23
+ ld.lis l, (hl+)                ; 49 6E 49 23
+ ld.lis l, (hl-)                ; 49 6E 49 2B
+ ld.lis l, (hld)                ; 49 6E 49 2B
+ ld.lis l, (hli)                ; 49 6E 49 23
  ld.lis l, (ix)                 ; 49 DD 6E 00
  ld.lis l, (ix+0)               ; 49 DD 6E 00
  ld.lis l, (ix+126)             ; 49 DD 6E 7E
@@ -2745,15 +2796,13 @@
  ld.lis sp, hl                  ; 49 F9
  ld.lis sp, ix                  ; 49 DD F9
  ld.lis sp, iy                  ; 49 FD F9
- ld.sil (0x123456), a           ; 52 32 56 34 12
- ld.sil a, (0x123456)           ; 52 3A 56 34 12
+ lda 0x1234                     ; 3A 34 12
  ldax b                         ; 0A
  ldax bc                        ; 0A
  ldax d                         ; 1A
  ldax de                        ; 1A
  ldd                            ; ED A8
  ldd (bc), a                    ; 02 0B
- ldd (de), -128                 ; EB 36 80 EB 1B
  ldd (de), 0                    ; EB 36 00 EB 1B
  ldd (de), 127                  ; EB 36 7F EB 1B
  ldd (de), 255                  ; EB 36 FF EB 1B
@@ -2764,7 +2813,6 @@
  ldd (de), e                    ; EB 75 EB 1B
  ldd (de), h                    ; EB 72 EB 1B
  ldd (de), l                    ; EB 73 EB 1B
- ldd (hl), -128                 ; 36 80 2B
  ldd (hl), 0                    ; 36 00 2B
  ldd (hl), 127                  ; 36 7F 2B
  ldd (hl), 255                  ; 36 FF 2B
@@ -2791,57 +2839,87 @@
  ldd l, (de)                    ; EB 5E EB 1B
  ldd l, (hl)                    ; 6E 2B
  ldd.l                          ; 49 ED A8
- ldd.l (bc), a                  ; 49 02 0B
- ldd.l (de), a                  ; 49 12 1B
- ldd.l (hl), -128               ; 49 36 80 2B
- ldd.l (hl), 0                  ; 49 36 00 2B
- ldd.l (hl), 127                ; 49 36 7F 2B
- ldd.l (hl), 255                ; 49 36 FF 2B
- ldd.l (hl), a                  ; 49 77 2B
- ldd.l (hl), b                  ; 49 70 2B
- ldd.l (hl), c                  ; 49 71 2B
- ldd.l (hl), d                  ; 49 72 2B
- ldd.l (hl), e                  ; 49 73 2B
- ldd.l (hl), h                  ; 49 74 2B
- ldd.l (hl), l                  ; 49 75 2B
- ldd.l a, (bc)                  ; 49 0A 0B
- ldd.l a, (de)                  ; 49 1A 1B
- ldd.l a, (hl)                  ; 49 7E 2B
- ldd.l b, (hl)                  ; 49 46 2B
- ldd.l c, (hl)                  ; 49 4E 2B
- ldd.l d, (hl)                  ; 49 56 2B
- ldd.l e, (hl)                  ; 49 5E 2B
- ldd.l h, (hl)                  ; 49 66 2B
- ldd.l l, (hl)                  ; 49 6E 2B
+ ldd.l (bc), a                  ; 49 02 49 0B
+ ldd.l (de), 0                  ; EB 49 36 00 EB 49 1B
+ ldd.l (de), 127                ; EB 49 36 7F EB 49 1B
+ ldd.l (de), 255                ; EB 49 36 FF EB 49 1B
+ ldd.l (de), a                  ; 49 12 49 1B
+ ldd.l (de), b                  ; EB 49 70 EB 49 1B
+ ldd.l (de), c                  ; EB 49 71 EB 49 1B
+ ldd.l (de), d                  ; EB 49 74 EB 49 1B
+ ldd.l (de), e                  ; EB 49 75 EB 49 1B
+ ldd.l (de), h                  ; EB 49 72 EB 49 1B
+ ldd.l (de), l                  ; EB 49 73 EB 49 1B
+ ldd.l (hl), 0                  ; 49 36 00 49 2B
+ ldd.l (hl), 127                ; 49 36 7F 49 2B
+ ldd.l (hl), 255                ; 49 36 FF 49 2B
+ ldd.l (hl), a                  ; 49 77 49 2B
+ ldd.l (hl), b                  ; 49 70 49 2B
+ ldd.l (hl), c                  ; 49 71 49 2B
+ ldd.l (hl), d                  ; 49 72 49 2B
+ ldd.l (hl), e                  ; 49 73 49 2B
+ ldd.l (hl), h                  ; 49 74 49 2B
+ ldd.l (hl), l                  ; 49 75 49 2B
+ ldd.l a, (bc)                  ; 49 0A 49 0B
+ ldd.l a, (de)                  ; 49 1A 49 1B
+ ldd.l a, (hl)                  ; 49 7E 49 2B
+ ldd.l b, (de)                  ; EB 49 46 EB 49 1B
+ ldd.l b, (hl)                  ; 49 46 49 2B
+ ldd.l c, (de)                  ; EB 49 4E EB 49 1B
+ ldd.l c, (hl)                  ; 49 4E 49 2B
+ ldd.l d, (de)                  ; EB 49 66 EB 49 1B
+ ldd.l d, (hl)                  ; 49 56 49 2B
+ ldd.l e, (de)                  ; EB 49 6E EB 49 1B
+ ldd.l e, (hl)                  ; 49 5E 49 2B
+ ldd.l h, (de)                  ; EB 49 56 EB 49 1B
+ ldd.l h, (hl)                  ; 49 66 49 2B
+ ldd.l l, (de)                  ; EB 49 5E EB 49 1B
+ ldd.l l, (hl)                  ; 49 6E 49 2B
  ldd.lis                        ; 49 ED A8
- ldd.lis (bc), a                ; 49 02 0B
- ldd.lis (de), a                ; 49 12 1B
- ldd.lis (hl), -128             ; 49 36 80 2B
- ldd.lis (hl), 0                ; 49 36 00 2B
- ldd.lis (hl), 127              ; 49 36 7F 2B
- ldd.lis (hl), 255              ; 49 36 FF 2B
- ldd.lis (hl), a                ; 49 77 2B
- ldd.lis (hl), b                ; 49 70 2B
- ldd.lis (hl), c                ; 49 71 2B
- ldd.lis (hl), d                ; 49 72 2B
- ldd.lis (hl), e                ; 49 73 2B
- ldd.lis (hl), h                ; 49 74 2B
- ldd.lis (hl), l                ; 49 75 2B
- ldd.lis a, (bc)                ; 49 0A 0B
- ldd.lis a, (de)                ; 49 1A 1B
- ldd.lis a, (hl)                ; 49 7E 2B
- ldd.lis b, (hl)                ; 49 46 2B
- ldd.lis c, (hl)                ; 49 4E 2B
- ldd.lis d, (hl)                ; 49 56 2B
- ldd.lis e, (hl)                ; 49 5E 2B
- ldd.lis h, (hl)                ; 49 66 2B
- ldd.lis l, (hl)                ; 49 6E 2B
+ ldd.lis (bc), a                ; 49 02 49 0B
+ ldd.lis (de), 0                ; EB 49 36 00 EB 49 1B
+ ldd.lis (de), 127              ; EB 49 36 7F EB 49 1B
+ ldd.lis (de), 255              ; EB 49 36 FF EB 49 1B
+ ldd.lis (de), a                ; 49 12 49 1B
+ ldd.lis (de), b                ; EB 49 70 EB 49 1B
+ ldd.lis (de), c                ; EB 49 71 EB 49 1B
+ ldd.lis (de), d                ; EB 49 74 EB 49 1B
+ ldd.lis (de), e                ; EB 49 75 EB 49 1B
+ ldd.lis (de), h                ; EB 49 72 EB 49 1B
+ ldd.lis (de), l                ; EB 49 73 EB 49 1B
+ ldd.lis (hl), 0                ; 49 36 00 49 2B
+ ldd.lis (hl), 127              ; 49 36 7F 49 2B
+ ldd.lis (hl), 255              ; 49 36 FF 49 2B
+ ldd.lis (hl), a                ; 49 77 49 2B
+ ldd.lis (hl), b                ; 49 70 49 2B
+ ldd.lis (hl), c                ; 49 71 49 2B
+ ldd.lis (hl), d                ; 49 72 49 2B
+ ldd.lis (hl), e                ; 49 73 49 2B
+ ldd.lis (hl), h                ; 49 74 49 2B
+ ldd.lis (hl), l                ; 49 75 49 2B
+ ldd.lis a, (bc)                ; 49 0A 49 0B
+ ldd.lis a, (de)                ; 49 1A 49 1B
+ ldd.lis a, (hl)                ; 49 7E 49 2B
+ ldd.lis b, (de)                ; EB 49 46 EB 49 1B
+ ldd.lis b, (hl)                ; 49 46 49 2B
+ ldd.lis c, (de)                ; EB 49 4E EB 49 1B
+ ldd.lis c, (hl)                ; 49 4E 49 2B
+ ldd.lis d, (de)                ; EB 49 66 EB 49 1B
+ ldd.lis d, (hl)                ; 49 56 49 2B
+ ldd.lis e, (de)                ; EB 49 6E EB 49 1B
+ ldd.lis e, (hl)                ; 49 5E 49 2B
+ ldd.lis h, (de)                ; EB 49 56 EB 49 1B
+ ldd.lis h, (hl)                ; 49 66 49 2B
+ ldd.lis l, (de)                ; EB 49 5E EB 49 1B
+ ldd.lis l, (hl)                ; 49 6E 49 2B
  lddr                           ; ED B8
  lddr.l                         ; 49 ED B8
  lddr.lis                       ; 49 ED B8
+ ldhi 0                         ; E5 11 00 00 19 EB E1
+ ldhi 127                       ; E5 11 7F 00 19 EB E1
+ ldhi 255                       ; E5 11 FF 00 19 EB E1
  ldi                            ; ED A0
  ldi (bc), a                    ; 02 03
- ldi (de), -128                 ; EB 36 80 EB 13
  ldi (de), 0                    ; EB 36 00 EB 13
  ldi (de), 127                  ; EB 36 7F EB 13
  ldi (de), 255                  ; EB 36 FF EB 13
@@ -2852,7 +2930,6 @@
  ldi (de), e                    ; EB 75 EB 13
  ldi (de), h                    ; EB 72 EB 13
  ldi (de), l                    ; EB 73 EB 13
- ldi (hl), -128                 ; 36 80 23
  ldi (hl), 0                    ; 36 00 23
  ldi (hl), 127                  ; 36 7F 23
  ldi (hl), 255                  ; 36 FF 23
@@ -2883,80 +2960,108 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (de)                    ; EB 56 EB 13
  ldi h, (hl)                    ; 66 23
- ldi hl, (hl)                   ; ED 27 23 23
  ldi ix, (hl)                   ; ED 37 23 23
  ldi iy, (hl)                   ; ED 31 23 23
  ldi l, (de)                    ; EB 5E EB 13
  ldi l, (hl)                    ; 6E 23
  ldi.l                          ; 49 ED A0
- ldi.l (bc), a                  ; 49 02 03
- ldi.l (de), a                  ; 49 12 13
- ldi.l (hl), -128               ; 49 36 80 23
- ldi.l (hl), 0                  ; 49 36 00 23
- ldi.l (hl), 127                ; 49 36 7F 23
- ldi.l (hl), 255                ; 49 36 FF 23
- ldi.l (hl), a                  ; 49 77 23
- ldi.l (hl), b                  ; 49 70 23
- ldi.l (hl), bc                 ; 49 ED 0F 23 23
- ldi.l (hl), c                  ; 49 71 23
- ldi.l (hl), d                  ; 49 72 23
- ldi.l (hl), de                 ; 49 ED 1F 23 23
- ldi.l (hl), e                  ; 49 73 23
- ldi.l (hl), h                  ; 49 74 23
- ldi.l (hl), hl                 ; 49 ED 2F 23 23
- ldi.l (hl), ix                 ; 49 ED 3F 23 23
- ldi.l (hl), iy                 ; 49 ED 3E 23 23
- ldi.l (hl), l                  ; 49 75 23
- ldi.l a, (bc)                  ; 49 0A 03
- ldi.l a, (de)                  ; 49 1A 13
- ldi.l a, (hl)                  ; 49 7E 23
- ldi.l b, (hl)                  ; 49 46 23
- ldi.l bc, (hl)                 ; 49 ED 07 23 23
- ldi.l c, (hl)                  ; 49 4E 23
- ldi.l d, (hl)                  ; 49 56 23
- ldi.l de, (hl)                 ; 49 ED 17 23 23
- ldi.l e, (hl)                  ; 49 5E 23
- ldi.l h, (hl)                  ; 49 66 23
- ldi.l hl, (hl)                 ; 49 ED 27 23 23
- ldi.l ix, (hl)                 ; 49 ED 37 23 23
- ldi.l iy, (hl)                 ; 49 ED 31 23 23
- ldi.l l, (hl)                  ; 49 6E 23
+ ldi.l (bc), a                  ; 49 02 49 03
+ ldi.l (de), 0                  ; EB 49 36 00 EB 49 13
+ ldi.l (de), 127                ; EB 49 36 7F EB 49 13
+ ldi.l (de), 255                ; EB 49 36 FF EB 49 13
+ ldi.l (de), a                  ; 49 12 49 13
+ ldi.l (de), b                  ; EB 49 70 EB 49 13
+ ldi.l (de), c                  ; EB 49 71 EB 49 13
+ ldi.l (de), d                  ; EB 49 74 EB 49 13
+ ldi.l (de), e                  ; EB 49 75 EB 49 13
+ ldi.l (de), h                  ; EB 49 72 EB 49 13
+ ldi.l (de), l                  ; EB 49 73 EB 49 13
+ ldi.l (hl), 0                  ; 49 36 00 49 23
+ ldi.l (hl), 127                ; 49 36 7F 49 23
+ ldi.l (hl), 255                ; 49 36 FF 49 23
+ ldi.l (hl), a                  ; 49 77 49 23
+ ldi.l (hl), b                  ; 49 70 49 23
+ ldi.l (hl), bc                 ; 49 ED 0F 49 23 49 23
+ ldi.l (hl), c                  ; 49 71 49 23
+ ldi.l (hl), d                  ; 49 72 49 23
+ ldi.l (hl), de                 ; 49 ED 1F 49 23 49 23
+ ldi.l (hl), e                  ; 49 73 49 23
+ ldi.l (hl), h                  ; 49 74 49 23
+ ldi.l (hl), hl                 ; 49 ED 2F 49 23 49 23
+ ldi.l (hl), ix                 ; 49 ED 3F 49 23 49 23
+ ldi.l (hl), iy                 ; 49 ED 3E 49 23 49 23
+ ldi.l (hl), l                  ; 49 75 49 23
+ ldi.l a, (bc)                  ; 49 0A 49 03
+ ldi.l a, (de)                  ; 49 1A 49 13
+ ldi.l a, (hl)                  ; 49 7E 49 23
+ ldi.l b, (de)                  ; EB 49 46 EB 49 13
+ ldi.l b, (hl)                  ; 49 46 49 23
+ ldi.l bc, (hl)                 ; 49 ED 07 49 23 49 23
+ ldi.l c, (de)                  ; EB 49 4E EB 49 13
+ ldi.l c, (hl)                  ; 49 4E 49 23
+ ldi.l d, (de)                  ; EB 49 66 EB 49 13
+ ldi.l d, (hl)                  ; 49 56 49 23
+ ldi.l de, (hl)                 ; 49 ED 17 49 23 49 23
+ ldi.l e, (de)                  ; EB 49 6E EB 49 13
+ ldi.l e, (hl)                  ; 49 5E 49 23
+ ldi.l h, (de)                  ; EB 49 56 EB 49 13
+ ldi.l h, (hl)                  ; 49 66 49 23
+ ldi.l ix, (hl)                 ; 49 ED 37 49 23 49 23
+ ldi.l iy, (hl)                 ; 49 ED 31 49 23 49 23
+ ldi.l l, (de)                  ; EB 49 5E EB 49 13
+ ldi.l l, (hl)                  ; 49 6E 49 23
  ldi.lis                        ; 49 ED A0
- ldi.lis (bc), a                ; 49 02 03
- ldi.lis (de), a                ; 49 12 13
- ldi.lis (hl), -128             ; 49 36 80 23
- ldi.lis (hl), 0                ; 49 36 00 23
- ldi.lis (hl), 127              ; 49 36 7F 23
- ldi.lis (hl), 255              ; 49 36 FF 23
- ldi.lis (hl), a                ; 49 77 23
- ldi.lis (hl), b                ; 49 70 23
- ldi.lis (hl), bc               ; 49 ED 0F 23 23
- ldi.lis (hl), c                ; 49 71 23
- ldi.lis (hl), d                ; 49 72 23
- ldi.lis (hl), de               ; 49 ED 1F 23 23
- ldi.lis (hl), e                ; 49 73 23
- ldi.lis (hl), h                ; 49 74 23
- ldi.lis (hl), hl               ; 49 ED 2F 23 23
- ldi.lis (hl), ix               ; 49 ED 3F 23 23
- ldi.lis (hl), iy               ; 49 ED 3E 23 23
- ldi.lis (hl), l                ; 49 75 23
- ldi.lis a, (bc)                ; 49 0A 03
- ldi.lis a, (de)                ; 49 1A 13
- ldi.lis a, (hl)                ; 49 7E 23
- ldi.lis b, (hl)                ; 49 46 23
- ldi.lis bc, (hl)               ; 49 ED 07 23 23
- ldi.lis c, (hl)                ; 49 4E 23
- ldi.lis d, (hl)                ; 49 56 23
- ldi.lis de, (hl)               ; 49 ED 17 23 23
- ldi.lis e, (hl)                ; 49 5E 23
- ldi.lis h, (hl)                ; 49 66 23
- ldi.lis hl, (hl)               ; 49 ED 27 23 23
- ldi.lis ix, (hl)               ; 49 ED 37 23 23
- ldi.lis iy, (hl)               ; 49 ED 31 23 23
- ldi.lis l, (hl)                ; 49 6E 23
+ ldi.lis (bc), a                ; 49 02 49 03
+ ldi.lis (de), 0                ; EB 49 36 00 EB 49 13
+ ldi.lis (de), 127              ; EB 49 36 7F EB 49 13
+ ldi.lis (de), 255              ; EB 49 36 FF EB 49 13
+ ldi.lis (de), a                ; 49 12 49 13
+ ldi.lis (de), b                ; EB 49 70 EB 49 13
+ ldi.lis (de), c                ; EB 49 71 EB 49 13
+ ldi.lis (de), d                ; EB 49 74 EB 49 13
+ ldi.lis (de), e                ; EB 49 75 EB 49 13
+ ldi.lis (de), h                ; EB 49 72 EB 49 13
+ ldi.lis (de), l                ; EB 49 73 EB 49 13
+ ldi.lis (hl), 0                ; 49 36 00 49 23
+ ldi.lis (hl), 127              ; 49 36 7F 49 23
+ ldi.lis (hl), 255              ; 49 36 FF 49 23
+ ldi.lis (hl), a                ; 49 77 49 23
+ ldi.lis (hl), b                ; 49 70 49 23
+ ldi.lis (hl), bc               ; 49 ED 0F 49 23 49 23
+ ldi.lis (hl), c                ; 49 71 49 23
+ ldi.lis (hl), d                ; 49 72 49 23
+ ldi.lis (hl), de               ; 49 ED 1F 49 23 49 23
+ ldi.lis (hl), e                ; 49 73 49 23
+ ldi.lis (hl), h                ; 49 74 49 23
+ ldi.lis (hl), hl               ; 49 ED 2F 49 23 49 23
+ ldi.lis (hl), ix               ; 49 ED 3F 49 23 49 23
+ ldi.lis (hl), iy               ; 49 ED 3E 49 23 49 23
+ ldi.lis (hl), l                ; 49 75 49 23
+ ldi.lis a, (bc)                ; 49 0A 49 03
+ ldi.lis a, (de)                ; 49 1A 49 13
+ ldi.lis a, (hl)                ; 49 7E 49 23
+ ldi.lis b, (de)                ; EB 49 46 EB 49 13
+ ldi.lis b, (hl)                ; 49 46 49 23
+ ldi.lis bc, (hl)               ; 49 ED 07 49 23 49 23
+ ldi.lis c, (de)                ; EB 49 4E EB 49 13
+ ldi.lis c, (hl)                ; 49 4E 49 23
+ ldi.lis d, (de)                ; EB 49 66 EB 49 13
+ ldi.lis d, (hl)                ; 49 56 49 23
+ ldi.lis de, (hl)               ; 49 ED 17 49 23 49 23
+ ldi.lis e, (de)                ; EB 49 6E EB 49 13
+ ldi.lis e, (hl)                ; 49 5E 49 23
+ ldi.lis h, (de)                ; EB 49 56 EB 49 13
+ ldi.lis h, (hl)                ; 49 66 49 23
+ ldi.lis ix, (hl)               ; 49 ED 37 49 23 49 23
+ ldi.lis iy, (hl)               ; 49 ED 31 49 23 49 23
+ ldi.lis l, (de)                ; EB 49 5E EB 49 13
+ ldi.lis l, (hl)                ; 49 6E 49 23
  ldir                           ; ED B0
  ldir.l                         ; 49 ED B0
  ldir.lis                       ; 49 ED B0
+ ldsi 0                         ; EB 21 00 00 39 EB
+ ldsi 127                       ; EB 21 7F 00 39 EB
+ ldsi 255                       ; EB 21 FF 00 39 EB
  lea bc, ix                     ; ED 02 00
  lea bc, ix+0                   ; ED 02 00
  lea bc, ix+126                 ; ED 02 7E
@@ -3078,6 +3183,8 @@
  lea.lis iy, iy+126             ; 49 ED 33 7E
  lea.lis iy, iy-128             ; 49 ED 33 80
  lhld 0x1234                    ; 2A 34 12
+ lhlde                          ; EB 5E 23 56 2B EB
+ lhlx                           ; EB 5E 23 56 2B EB
  lxi b, 0x1234                  ; 01 34 12
  lxi bc, 0x1234                 ; 01 34 12
  lxi d, 0x1234                  ; 11 34 12
@@ -3089,8 +3196,6 @@
  mlt de                         ; ED 5C
  mlt hl                         ; ED 6C
  mlt sp                         ; ED 7C
- mlt.l sp                       ; 49 ED 7C
- mlt.lis sp                     ; 49 ED 7C
  mov a, a                       ; 7F
  mov a, b                       ; 78
  mov a, c                       ; 79
@@ -3150,40 +3255,43 @@
  mov m, e                       ; 73
  mov m, h                       ; 74
  mov m, l                       ; 75
- mvi a, -128                    ; 3E 80
  mvi a, 0                       ; 3E 00
  mvi a, 127                     ; 3E 7F
  mvi a, 255                     ; 3E FF
- mvi b, -128                    ; 06 80
  mvi b, 0                       ; 06 00
  mvi b, 127                     ; 06 7F
  mvi b, 255                     ; 06 FF
- mvi c, -128                    ; 0E 80
  mvi c, 0                       ; 0E 00
  mvi c, 127                     ; 0E 7F
  mvi c, 255                     ; 0E FF
- mvi d, -128                    ; 16 80
  mvi d, 0                       ; 16 00
  mvi d, 127                     ; 16 7F
  mvi d, 255                     ; 16 FF
- mvi e, -128                    ; 1E 80
  mvi e, 0                       ; 1E 00
  mvi e, 127                     ; 1E 7F
  mvi e, 255                     ; 1E FF
- mvi h, -128                    ; 26 80
  mvi h, 0                       ; 26 00
  mvi h, 127                     ; 26 7F
  mvi h, 255                     ; 26 FF
- mvi l, -128                    ; 2E 80
  mvi l, 0                       ; 2E 00
  mvi l, 127                     ; 2E 7F
  mvi l, 255                     ; 2E FF
- mvi m, -128                    ; 36 80
  mvi m, 0                       ; 36 00
  mvi m, 127                     ; 36 7F
  mvi m, 255                     ; 36 FF
  neg                            ; ED 44
  neg a                          ; ED 44
+ neg b                          ; F5 78 2F 47 04 F1
+ neg bc                         ; F5 78 2F 47 79 2F 4F 03 F1
+ neg c                          ; F5 79 2F 4F 0C F1
+ neg d                          ; F5 7A 2F 57 14 F1
+ neg de                         ; F5 7A 2F 57 7B 2F 5F 13 F1
+ neg e                          ; F5 7B 2F 5F 1C F1
+ neg h                          ; F5 7C 2F 67 24 F1
+ neg hl                         ; F5 7C 2F 67 7D 2F 6F 23 F1
+ neg ix                         ; F5 DD 7C 2F DD 67 DD 7D 2F DD 6F DD 23 F1
+ neg iy                         ; F5 FD 7C 2F FD 67 FD 7D 2F FD 6F FD 23 F1
+ neg l                          ; F5 7D 2F 6F 2C F1
  nop                            ; 00
  or (hl)                        ; B6
  or (hl+)                       ; B6 23
@@ -3196,7 +3304,6 @@
  or (iy+0)                      ; FD B6 00
  or (iy+126)                    ; FD B6 7E
  or (iy-128)                    ; FD B6 80
- or -128                        ; F6 80
  or 0                           ; F6 00
  or 127                         ; F6 7F
  or 255                         ; F6 FF
@@ -3212,7 +3319,6 @@
  or a, (iy+0)                   ; FD B6 00
  or a, (iy+126)                 ; FD B6 7E
  or a, (iy-128)                 ; FD B6 80
- or a, -128                     ; F6 80
  or a, 0                        ; F6 00
  or a, 127                      ; F6 7F
  or a, 255                      ; F6 FF
@@ -3244,8 +3350,8 @@
  or iyl                         ; FD B5
  or l                           ; B5
  or.l (hl)                      ; 49 B6
- or.l (hl+)                     ; 49 B6 23
- or.l (hl-)                     ; 49 B6 2B
+ or.l (hl+)                     ; 49 B6 49 23
+ or.l (hl-)                     ; 49 B6 49 2B
  or.l (ix)                      ; 49 DD B6 00
  or.l (ix+0)                    ; 49 DD B6 00
  or.l (ix+126)                  ; 49 DD B6 7E
@@ -3255,8 +3361,8 @@
  or.l (iy+126)                  ; 49 FD B6 7E
  or.l (iy-128)                  ; 49 FD B6 80
  or.l a, (hl)                   ; 49 B6
- or.l a, (hl+)                  ; 49 B6 23
- or.l a, (hl-)                  ; 49 B6 2B
+ or.l a, (hl+)                  ; 49 B6 49 23
+ or.l a, (hl-)                  ; 49 B6 49 2B
  or.l a, (ix)                   ; 49 DD B6 00
  or.l a, (ix+0)                 ; 49 DD B6 00
  or.l a, (ix+126)               ; 49 DD B6 7E
@@ -3266,8 +3372,8 @@
  or.l a, (iy+126)               ; 49 FD B6 7E
  or.l a, (iy-128)               ; 49 FD B6 80
  or.lis (hl)                    ; 49 B6
- or.lis (hl+)                   ; 49 B6 23
- or.lis (hl-)                   ; 49 B6 2B
+ or.lis (hl+)                   ; 49 B6 49 23
+ or.lis (hl-)                   ; 49 B6 49 2B
  or.lis (ix)                    ; 49 DD B6 00
  or.lis (ix+0)                  ; 49 DD B6 00
  or.lis (ix+126)                ; 49 DD B6 7E
@@ -3277,8 +3383,8 @@
  or.lis (iy+126)                ; 49 FD B6 7E
  or.lis (iy-128)                ; 49 FD B6 80
  or.lis a, (hl)                 ; 49 B6
- or.lis a, (hl+)                ; 49 B6 23
- or.lis a, (hl-)                ; 49 B6 2B
+ or.lis a, (hl+)                ; 49 B6 49 23
+ or.lis a, (hl-)                ; 49 B6 49 2B
  or.lis a, (ix)                 ; 49 DD B6 00
  or.lis a, (ix+0)               ; 49 DD B6 00
  or.lis a, (ix+126)             ; 49 DD B6 7E
@@ -3295,7 +3401,6 @@
  ora h                          ; B4
  ora l                          ; B5
  ora m                          ; B6
- ori -128                       ; F6 80
  ori 0                          ; F6 00
  ori 127                        ; F6 7F
  ori 255                        ; F6 FF
@@ -3329,7 +3434,6 @@
  otirx                          ; ED C3
  otirx.l                        ; 49 ED C3
  otirx.lis                      ; 49 ED C3
- out (-128), a                  ; D3 80
  out (0), a                     ; D3 00
  out (127), a                   ; D3 7F
  out (255), a                   ; D3 FF
@@ -3339,6 +3443,7 @@
  out (bc), c                    ; ED 49
  out (bc), d                    ; ED 51
  out (bc), e                    ; ED 59
+ out (bc), f                    ; ED 71
  out (bc), h                    ; ED 61
  out (bc), l                    ; ED 69
  out (c), 0                     ; ED 71
@@ -3347,19 +3452,12 @@
  out (c), c                     ; ED 49
  out (c), d                     ; ED 51
  out (c), e                     ; ED 59
+ out (c), f                     ; ED 71
  out (c), h                     ; ED 61
  out (c), l                     ; ED 69
- out -128                       ; D3 80
  out 0                          ; D3 00
  out 127                        ; D3 7F
  out 255                        ; D3 FF
- out0 (-128), a                 ; ED 39 80
- out0 (-128), b                 ; ED 01 80
- out0 (-128), c                 ; ED 09 80
- out0 (-128), d                 ; ED 11 80
- out0 (-128), e                 ; ED 19 80
- out0 (-128), h                 ; ED 21 80
- out0 (-128), l                 ; ED 29 80
  out0 (0), a                    ; ED 39 00
  out0 (0), b                    ; ED 01 00
  out0 (0), c                    ; ED 09 00
@@ -3443,10 +3541,13 @@
  push af                        ; F5
  push b                         ; C5
  push bc                        ; C5
+ push bc'                       ; D9 C5 D9
  push d                         ; D5
  push de                        ; D5
+ push de'                       ; D9 D5 D9
  push h                         ; E5
  push hl                        ; E5
+ push hl'                       ; D9 E5 D9
  push ix                        ; DD E5
  push iy                        ; FD E5
  push psw                       ; F5
@@ -3465,7 +3566,7 @@
  r_c                            ; D8
  r_eq                           ; C8
  r_geu                          ; D0
- r_gtu                          ; 28 03 38 01 C9
+ r_gtu                          ; 28 01 D0
  r_leu                          ; C8 D8
  r_ltu                          ; D8
  r_m                            ; F8
@@ -3759,7 +3860,7 @@
  ret c                          ; D8
  ret eq                         ; C8
  ret geu                        ; D0
- ret gtu                        ; 28 03 38 01 C9
+ ret gtu                        ; 28 01 D0
  ret leu                        ; C8 D8
  ret ltu                        ; D8
  ret m                          ; F8
@@ -3776,7 +3877,7 @@
  ret.l c                        ; 49 D8
  ret.l eq                       ; 49 C8
  ret.l geu                      ; 49 D0
- ret.l gtu                      ; 28 04 38 02 49 C9
+ ret.l gtu                      ; 28 02 49 D0
  ret.l leu                      ; 49 C8 49 D8
  ret.l ltu                      ; 49 D8
  ret.l m                        ; 49 F8
@@ -3793,7 +3894,7 @@
  ret.lis c                      ; 49 D8
  ret.lis eq                     ; 49 C8
  ret.lis geu                    ; 49 D0
- ret.lis gtu                    ; 28 04 38 02 49 C9
+ ret.lis gtu                    ; 28 02 49 D0
  ret.lis leu                    ; 49 C8 49 D8
  ret.lis ltu                    ; 49 D8
  ret.lis m                      ; 49 F8
@@ -3813,7 +3914,7 @@
  retn.l                         ; 49 ED 45
  retn.lis                       ; 49 ED 45
  rgeu                           ; D0
- rgtu                           ; 28 03 38 01 C9
+ rgtu                           ; 28 01 D0
  rl (hl)                        ; CB 16
  rl (ix)                        ; DD CB 00 16
  rl (ix+0)                      ; DD CB 00 16
@@ -3978,49 +4079,28 @@
  rrhl                           ; CB 2C CB 1D
  rsmix                          ; ED 7E
  rst 0                          ; C7
- rst 1                          ; CF
  rst 16                         ; D7
- rst 2                          ; D7
  rst 24                         ; DF
- rst 3                          ; DF
  rst 32                         ; E7
- rst 4                          ; E7
  rst 40                         ; EF
  rst 48                         ; F7
- rst 5                          ; EF
  rst 56                         ; FF
- rst 6                          ; F7
- rst 7                          ; FF
  rst 8                          ; CF
  rst.l 0                        ; 49 C7
- rst.l 1                        ; 49 CF
  rst.l 16                       ; 49 D7
- rst.l 2                        ; 49 D7
  rst.l 24                       ; 49 DF
- rst.l 3                        ; 49 DF
  rst.l 32                       ; 49 E7
- rst.l 4                        ; 49 E7
  rst.l 40                       ; 49 EF
  rst.l 48                       ; 49 F7
- rst.l 5                        ; 49 EF
  rst.l 56                       ; 49 FF
- rst.l 6                        ; 49 F7
- rst.l 7                        ; 49 FF
  rst.l 8                        ; 49 CF
  rst.lis 0                      ; 49 C7
- rst.lis 1                      ; 49 CF
  rst.lis 16                     ; 49 D7
- rst.lis 2                      ; 49 D7
  rst.lis 24                     ; 49 DF
- rst.lis 3                      ; 49 DF
  rst.lis 32                     ; 49 E7
- rst.lis 4                      ; 49 E7
  rst.lis 40                     ; 49 EF
  rst.lis 48                     ; 49 F7
- rst.lis 5                      ; 49 EF
  rst.lis 56                     ; 49 FF
- rst.lis 6                      ; 49 F7
- rst.lis 7                      ; 49 FF
  rst.lis 8                      ; 49 CF
  rv                             ; E8
  rz                             ; C8
@@ -4043,7 +4123,6 @@
  sbc (iy+0)                     ; FD 9E 00
  sbc (iy+126)                   ; FD 9E 7E
  sbc (iy-128)                   ; FD 9E 80
- sbc -128                       ; DE 80
  sbc 0                          ; DE 00
  sbc 127                        ; DE 7F
  sbc 255                        ; DE FF
@@ -4059,7 +4138,6 @@
  sbc a, (iy+0)                  ; FD 9E 00
  sbc a, (iy+126)                ; FD 9E 7E
  sbc a, (iy-128)                ; FD 9E 80
- sbc a, -128                    ; DE 80
  sbc a, 0                       ; DE 00
  sbc a, 127                     ; DE 7F
  sbc a, 255                     ; DE FF
@@ -4089,8 +4167,8 @@
  sbc iyl                        ; FD 9D
  sbc l                          ; 9D
  sbc.l (hl)                     ; 49 9E
- sbc.l (hl+)                    ; 49 9E 23
- sbc.l (hl-)                    ; 49 9E 2B
+ sbc.l (hl+)                    ; 49 9E 49 23
+ sbc.l (hl-)                    ; 49 9E 49 2B
  sbc.l (ix)                     ; 49 DD 9E 00
  sbc.l (ix+0)                   ; 49 DD 9E 00
  sbc.l (ix+126)                 ; 49 DD 9E 7E
@@ -4100,8 +4178,8 @@
  sbc.l (iy+126)                 ; 49 FD 9E 7E
  sbc.l (iy-128)                 ; 49 FD 9E 80
  sbc.l a, (hl)                  ; 49 9E
- sbc.l a, (hl+)                 ; 49 9E 23
- sbc.l a, (hl-)                 ; 49 9E 2B
+ sbc.l a, (hl+)                 ; 49 9E 49 23
+ sbc.l a, (hl-)                 ; 49 9E 49 2B
  sbc.l a, (ix)                  ; 49 DD 9E 00
  sbc.l a, (ix+0)                ; 49 DD 9E 00
  sbc.l a, (ix+126)              ; 49 DD 9E 7E
@@ -4115,8 +4193,8 @@
  sbc.l hl, hl                   ; 49 ED 62
  sbc.l hl, sp                   ; 49 ED 72
  sbc.lis (hl)                   ; 49 9E
- sbc.lis (hl+)                  ; 49 9E 23
- sbc.lis (hl-)                  ; 49 9E 2B
+ sbc.lis (hl+)                  ; 49 9E 49 23
+ sbc.lis (hl-)                  ; 49 9E 49 2B
  sbc.lis (ix)                   ; 49 DD 9E 00
  sbc.lis (ix+0)                 ; 49 DD 9E 00
  sbc.lis (ix+126)               ; 49 DD 9E 7E
@@ -4126,8 +4204,8 @@
  sbc.lis (iy+126)               ; 49 FD 9E 7E
  sbc.lis (iy-128)               ; 49 FD 9E 80
  sbc.lis a, (hl)                ; 49 9E
- sbc.lis a, (hl+)               ; 49 9E 23
- sbc.lis a, (hl-)               ; 49 9E 2B
+ sbc.lis a, (hl+)               ; 49 9E 49 23
+ sbc.lis a, (hl-)               ; 49 9E 49 2B
  sbc.lis a, (ix)                ; 49 DD 9E 00
  sbc.lis a, (ix+0)              ; 49 DD 9E 00
  sbc.lis a, (ix+126)            ; 49 DD 9E 7E
@@ -4140,7 +4218,6 @@
  sbc.lis hl, de                 ; 49 ED 52
  sbc.lis hl, hl                 ; 49 ED 62
  sbc.lis hl, sp                 ; 49 ED 72
- sbi -128                       ; DE 80
  sbi 0                          ; DE 00
  sbi 127                        ; DE 7F
  sbi 255                        ; DE FF
@@ -4418,6 +4495,8 @@
  set.lis 7, (iy+126)            ; 49 FD CB 7E FE
  set.lis 7, (iy-128)            ; 49 FD CB 80 FE
  shld 0x1234                    ; 22 34 12
+ shlde                          ; EB 73 23 72 2B EB
+ shlx                           ; EB 73 23 72 2B EB
  sla (hl)                       ; CB 26
  sla (ix)                       ; DD CB 00 26
  sla (ix+0)                     ; DD CB 00 26
@@ -4525,6 +4604,7 @@
  srl.lis (iy+0)                 ; 49 FD CB 00 3E
  srl.lis (iy+126)               ; 49 FD CB 7E 3E
  srl.lis (iy-128)               ; 49 FD CB 80 3E
+ sta 0x1234                     ; 32 34 12
  stax b                         ; 02
  stax bc                        ; 02
  stax d                         ; 12
@@ -4542,7 +4622,6 @@
  sub (iy+0)                     ; FD 96 00
  sub (iy+126)                   ; FD 96 7E
  sub (iy-128)                   ; FD 96 80
- sub -128                       ; D6 80
  sub 0                          ; D6 00
  sub 127                        ; D6 7F
  sub 255                        ; D6 FF
@@ -4558,7 +4637,6 @@
  sub a, (iy+0)                  ; FD 96 00
  sub a, (iy+126)                ; FD 96 7E
  sub a, (iy-128)                ; FD 96 80
- sub a, -128                    ; D6 80
  sub a, 0                       ; D6 00
  sub a, 127                     ; D6 7F
  sub a, 255                     ; D6 FF
@@ -4589,8 +4667,8 @@
  sub l                          ; 95
  sub m                          ; 96
  sub.l (hl)                     ; 49 96
- sub.l (hl+)                    ; 49 96 23
- sub.l (hl-)                    ; 49 96 2B
+ sub.l (hl+)                    ; 49 96 49 23
+ sub.l (hl-)                    ; 49 96 49 2B
  sub.l (ix)                     ; 49 DD 96 00
  sub.l (ix+0)                   ; 49 DD 96 00
  sub.l (ix+126)                 ; 49 DD 96 7E
@@ -4600,8 +4678,8 @@
  sub.l (iy+126)                 ; 49 FD 96 7E
  sub.l (iy-128)                 ; 49 FD 96 80
  sub.l a, (hl)                  ; 49 96
- sub.l a, (hl+)                 ; 49 96 23
- sub.l a, (hl-)                 ; 49 96 2B
+ sub.l a, (hl+)                 ; 49 96 49 23
+ sub.l a, (hl-)                 ; 49 96 49 2B
  sub.l a, (ix)                  ; 49 DD 96 00
  sub.l a, (ix+0)                ; 49 DD 96 00
  sub.l a, (ix+126)              ; 49 DD 96 7E
@@ -4611,8 +4689,8 @@
  sub.l a, (iy+126)              ; 49 FD 96 7E
  sub.l a, (iy-128)              ; 49 FD 96 80
  sub.lis (hl)                   ; 49 96
- sub.lis (hl+)                  ; 49 96 23
- sub.lis (hl-)                  ; 49 96 2B
+ sub.lis (hl+)                  ; 49 96 49 23
+ sub.lis (hl-)                  ; 49 96 49 2B
  sub.lis (ix)                   ; 49 DD 96 00
  sub.lis (ix+0)                 ; 49 DD 96 00
  sub.lis (ix+126)               ; 49 DD 96 7E
@@ -4622,8 +4700,8 @@
  sub.lis (iy+126)               ; 49 FD 96 7E
  sub.lis (iy-128)               ; 49 FD 96 80
  sub.lis a, (hl)                ; 49 96
- sub.lis a, (hl+)               ; 49 96 23
- sub.lis a, (hl-)               ; 49 96 2B
+ sub.lis a, (hl+)               ; 49 96 49 23
+ sub.lis a, (hl-)               ; 49 96 49 2B
  sub.lis a, (ix)                ; 49 DD 96 00
  sub.lis a, (ix+0)              ; 49 DD 96 00
  sub.lis a, (ix+126)            ; 49 DD 96 7E
@@ -4632,18 +4710,15 @@
  sub.lis a, (iy+0)              ; 49 FD 96 00
  sub.lis a, (iy+126)            ; 49 FD 96 7E
  sub.lis a, (iy-128)            ; 49 FD 96 80
- sui -128                       ; D6 80
  sui 0                          ; D6 00
  sui 127                        ; D6 7F
  sui 255                        ; D6 FF
  test (hl)                      ; ED 34
- test -128                      ; ED 64 80
  test 0                         ; ED 64 00
  test 127                       ; ED 64 7F
  test 255                       ; ED 64 FF
  test a                         ; ED 3C
  test a, (hl)                   ; ED 34
- test a, -128                   ; ED 64 80
  test a, 0                      ; ED 64 00
  test a, 127                    ; ED 64 7F
  test a, 255                    ; ED 64 FF
@@ -4665,13 +4740,11 @@
  test.lis (hl)                  ; 49 ED 34
  test.lis a, (hl)               ; 49 ED 34
  tst (hl)                       ; ED 34
- tst -128                       ; ED 64 80
  tst 0                          ; ED 64 00
  tst 127                        ; ED 64 7F
  tst 255                        ; ED 64 FF
  tst a                          ; ED 3C
  tst a, (hl)                    ; ED 34
- tst a, -128                    ; ED 64 80
  tst a, 0                       ; ED 64 00
  tst a, 127                     ; ED 64 7F
  tst a, 255                     ; ED 64 FF
@@ -4692,7 +4765,6 @@
  tst.l a, (hl)                  ; 49 ED 34
  tst.lis (hl)                   ; 49 ED 34
  tst.lis a, (hl)                ; 49 ED 34
- tstio -128                     ; ED 74 80
  tstio 0                        ; ED 74 00
  tstio 127                      ; ED 74 7F
  tstio 255                      ; ED 74 FF
@@ -4708,7 +4780,6 @@
  xor (iy+0)                     ; FD AE 00
  xor (iy+126)                   ; FD AE 7E
  xor (iy-128)                   ; FD AE 80
- xor -128                       ; EE 80
  xor 0                          ; EE 00
  xor 127                        ; EE 7F
  xor 255                        ; EE FF
@@ -4724,7 +4795,6 @@
  xor a, (iy+0)                  ; FD AE 00
  xor a, (iy+126)                ; FD AE 7E
  xor a, (iy-128)                ; FD AE 80
- xor a, -128                    ; EE 80
  xor a, 0                       ; EE 00
  xor a, 127                     ; EE 7F
  xor a, 255                     ; EE FF
@@ -4756,8 +4826,8 @@
  xor iyl                        ; FD AD
  xor l                          ; AD
  xor.l (hl)                     ; 49 AE
- xor.l (hl+)                    ; 49 AE 23
- xor.l (hl-)                    ; 49 AE 2B
+ xor.l (hl+)                    ; 49 AE 49 23
+ xor.l (hl-)                    ; 49 AE 49 2B
  xor.l (ix)                     ; 49 DD AE 00
  xor.l (ix+0)                   ; 49 DD AE 00
  xor.l (ix+126)                 ; 49 DD AE 7E
@@ -4767,8 +4837,8 @@
  xor.l (iy+126)                 ; 49 FD AE 7E
  xor.l (iy-128)                 ; 49 FD AE 80
  xor.l a, (hl)                  ; 49 AE
- xor.l a, (hl+)                 ; 49 AE 23
- xor.l a, (hl-)                 ; 49 AE 2B
+ xor.l a, (hl+)                 ; 49 AE 49 23
+ xor.l a, (hl-)                 ; 49 AE 49 2B
  xor.l a, (ix)                  ; 49 DD AE 00
  xor.l a, (ix+0)                ; 49 DD AE 00
  xor.l a, (ix+126)              ; 49 DD AE 7E
@@ -4778,8 +4848,8 @@
  xor.l a, (iy+126)              ; 49 FD AE 7E
  xor.l a, (iy-128)              ; 49 FD AE 80
  xor.lis (hl)                   ; 49 AE
- xor.lis (hl+)                  ; 49 AE 23
- xor.lis (hl-)                  ; 49 AE 2B
+ xor.lis (hl+)                  ; 49 AE 49 23
+ xor.lis (hl-)                  ; 49 AE 49 2B
  xor.lis (ix)                   ; 49 DD AE 00
  xor.lis (ix+0)                 ; 49 DD AE 00
  xor.lis (ix+126)               ; 49 DD AE 7E
@@ -4789,8 +4859,8 @@
  xor.lis (iy+126)               ; 49 FD AE 7E
  xor.lis (iy-128)               ; 49 FD AE 80
  xor.lis a, (hl)                ; 49 AE
- xor.lis a, (hl+)               ; 49 AE 23
- xor.lis a, (hl-)               ; 49 AE 2B
+ xor.lis a, (hl+)               ; 49 AE 49 23
+ xor.lis a, (hl-)               ; 49 AE 49 2B
  xor.lis a, (ix)                ; 49 DD AE 00
  xor.lis a, (ix+0)              ; 49 DD AE 00
  xor.lis a, (ix+126)            ; 49 DD AE 7E
@@ -4807,7 +4877,6 @@
  xra h                          ; AC
  xra l                          ; AD
  xra m                          ; AE
- xri -128                       ; EE 80
  xri 0                          ; EE 00
  xri 127                        ; EE 7F
  xri 255                        ; EE FF

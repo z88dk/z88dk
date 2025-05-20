@@ -5,10 +5,6 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "utarray.h"
 #include "utstring.h"
 #include <stdlib.h>
@@ -23,6 +19,10 @@ extern "C" {
 #endif
 #else
 #include <strings.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 //-----------------------------------------------------------------------------

@@ -41,6 +41,7 @@ static char             *app_name = NULL;
 
 // Command args
 static char             *binname         = NULL;
+static char             *crtfile         = NULL;
 static char             *outfile         = NULL;
 static char             *other_pages     = NULL;
 static char              help            =0;
@@ -56,6 +57,7 @@ option_t ti8xk_options[] = {
     { 'p', "other-pages", "A comma separated list of the pages without any spaces (ex main.o,page_1.o)", OPT_STR, &other_pages},
     { 'b', "binfile",  "Linked binary file",                OPT_STR,   &binname },
     { 'o', "output",   "Name of output file",               OPT_STR,   &outfile },
+    { 'c', "crt0file", "crt0 file used in linking",         OPT_STR,   &crtfile },
     {  0,  NULL,       NULL,                                OPT_NONE,  NULL }
 };
 
@@ -298,7 +300,7 @@ static int findfield_flex( unsigned char prefix_byte, const unsigned char* buffe
     return 1;
 }
 
-static int search_for_branch_start()
+static int search_for_branch_start(void)
 {
     char filename[256];
     char line[2048];
@@ -518,7 +520,8 @@ static void handle_page_branches(unsigned char* buffer, int size, struct FoundLa
 
 int ti8xk_exec(char *target)
 {
-    FILE *fp, *fp2;
+    FILE *fp = NULL;
+    FILE *fp2 = NULL;
     int size, tempnum, pnt, field_sz, pages, i, siglength, total_size, f;
     struct FoundLabels* labels[1024] = {NULL};
     unsigned char *buffer;
@@ -558,12 +561,12 @@ int ti8xk_exec(char *target)
 
 
     if (single_page) {
-        fp = fopen_bin(binname, NULL);
+        fp = fopen_bin(binname, crtfile);
         if (!fp)
             exit_log(1,"Failed to open input file: %s\n", binname);
         size = i = get_file_size(fp);
         buffer = (unsigned char *) calloc(1, size+256);
-        fread(buffer, size, 1, fp); // To memory
+        (void) !fread(buffer, size, 1, fp); // To memory - (void) ! to suppress warn unused result
 
         if (size >= 0x4000) {
             free(buffer);
@@ -605,7 +608,7 @@ int ti8xk_exec(char *target)
             FILE* page_fp = fopen_bin(fileName, NULL);
             int psize = get_file_size(page_fp);
             size = i = pageStart + psize;
-            fread(buffer+pageStart, psize, 1, page_fp);
+            (void) !fread(buffer+pageStart, psize, 1, page_fp); // (void) ! to suppress warn unused result
             fclose(page_fp);
 
             if (firstPage) // If first page

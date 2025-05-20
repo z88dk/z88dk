@@ -1,10 +1,10 @@
 
-        SECTION code_clib
-	PUBLIC	respixel
+    SECTION code_clib
+    PUBLIC  respixel
 
-	EXTERN	__gfx_coords
+    EXTERN  __gfx_coords
 
-	EXTERN	textpixl
+    EXTERN  textpixl
 
 ;
 ;	$Id: respixl.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
@@ -14,93 +14,96 @@
 ;
 ; Clear pixel at (x,y) coordinate.
 ;
-; ZX 80 version.  
+; ZX 80 version.
 ; 64x48 dots.
 ;
 ;
-.respixel
-				ld	a,h
-				cp	64
-				ret	nc
-				ld	a,l
+respixel:
+    ld      a, h
+    cp      64
+    ret     nc
+    ld      a, l
 				;cp	maxy
-				cp	48
-				ret	nc		; y0	out of range
-				
-				ld	(__gfx_coords),hl
+    cp      48
+    ret     nc                          ; y0	out of range
 
-				push	bc
+    ld      (__gfx_coords), hl
 
-				ld	c,l
-				ld	b,h
+    push    bc
 
-				push	bc
-				
-				srl	b
-				srl	c
-				ld	hl,(16396)
-				inc	hl
-				ld	a,c
-				ld	c,b	; !!
-				ld	de,33	; 32+1. Every text line ends with an HALT
-				and	a
-				jr	z,r_zero
-				ld	b,a
-.r_loop
-				add	hl,de
-				djnz	r_loop
-.r_zero						; hl = char address
-				ld	e,c
-				add	hl,de
-				
-				ld	a,(hl)		; get current symbol
-				
-			ld	e,a
+    ld      c, l
+    ld      b, h
 
-			push	hl
-			ld	hl,textpixl
-			ld	e,0
-			ld	b,16
-.ckmap			cp	(hl)
-			jr	z,chfound
-			inc	hl
-			inc	e
-			djnz	ckmap
-			ld	e,0
-.chfound		ld	a,e
-			pop	hl
+    push    bc
 
-.islow				ex	(sp),hl		; save char address <=> restore x,y
+    srl     b
+    srl     c
+    ld      hl, (16396)
+    inc     hl
+    ld      a, c
+    ld      c, b                        ; !!
+    ld      de, 33                      ; 32+1. Every text line ends with an HALT
+    and     a
+    jr      z, r_zero
+    ld      b, a
+r_loop:
+    add     hl, de
+    djnz    r_loop
+r_zero:                                 ; hl = char address
+    ld      e, c
+    add     hl, de
+
+    ld      a, (hl)                     ; get current symbol
+
+    ld      e, a
+
+    push    hl
+    ld      hl, textpixl
+    ld      e, 0
+    ld      b, 16
+ckmap:
+    cp      (hl)
+    jr      z, chfound
+    inc     hl
+    inc     e
+    djnz    ckmap
+    ld      e, 0
+chfound:
+    ld      a, e
+    pop     hl
+
+islow:
+    ex      (sp), hl                    ; save char address <=> restore x,y
 
 ;				cp	16		; Just to be sure:
 ;				jr	c,issym		; if it isn't a symbol...
 ;				xor	a		; .. force to blank sym
 ;.issym
-				ld	b,a
+    ld      b, a
 
-				ld	a,1		; the bit we want to draw
-				
-				bit	0,h
-				jr	z,iseven
-				add	a,a		; move right the bit
+    ld      a, 1                        ; the bit we want to draw
 
-.iseven
-				bit	0,l
-				jr	z,evenrow
-				add	a,a
-				add	a,a		; move down the bit
-.evenrow
-				cpl
-				and	b
+    bit     0, h
+    jr      z, iseven
+    add     a, a                        ; move right the bit
 
-			ld	hl,textpixl
-			ld	d,0
-			ld	e,a
-			add	hl,de
-			ld	a,(hl)
+iseven:
+    bit     0, l
+    jr      z, evenrow
+    add     a, a
+    add     a, a                        ; move down the bit
+evenrow:
+    cpl
+    and     b
 
-			pop	hl
-			ld	(hl),a
-				
-				pop	bc
-				ret
+    ld      hl, textpixl
+    ld      d, 0
+    ld      e, a
+    add     hl, de
+    ld      a, (hl)
+
+    pop     hl
+    ld      (hl), a
+
+    pop     bc
+    ret

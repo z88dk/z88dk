@@ -28,7 +28,7 @@
 ;-------
 
     EXTERN    _main           ;main() is always external to crt0 code
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
         
@@ -154,16 +154,15 @@ filler3:
 
 start:
 ;    Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
 ; Clear static memory
     ld      hl,RAM_Start
     ld      de,RAM_Start+1
     ld      bc,RAM_Length-1
     ld      (hl),0
     ldir
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     
     call    DefaultInitialiseVDP
@@ -172,7 +171,7 @@ start:
     ei
     call    _main
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 endloop:
@@ -291,10 +290,10 @@ banked_call:
     ret
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; And include handling disabling screenmodes
-    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
     IF DEFINED_CRT_ORG_BSS
         defc __crt_org_bss = CRT_ORG_BSS
@@ -309,7 +308,7 @@ ENDIF
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE    "crt/classic/crt_section.asm"
+    INCLUDE    "crt/classic/crt_section.inc"
 
 
 IF CRT_ENABLE_BANKED_CALLS = 1

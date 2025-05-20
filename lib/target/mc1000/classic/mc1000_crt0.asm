@@ -14,54 +14,48 @@
 
 
 
-                MODULE  mc1000_crt0
-
-;--------
-; Include zcc_opt.def to find out some info
-;--------
-
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
-
-;--------
-; Some scope definitions
-;--------
-
-        EXTERN    _main           ;main() is always external to crt0 code
-
-        PUBLIC    cleanup         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
+    MODULE  mc1000_crt0
 
 
-	; Force the interrupt handler to be registered
-	EXTERN	asm_im1_handler
-	defc	IMPORT_asm_im1_handler = asm_im1_handler
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 
-        defc    CONSOLE_COLUMNS = 32
+    EXTERN  _main           ;main() is always external to crt0 code
+
+    PUBLIC  __Exit         ;jp'd to by exit()
+    PUBLIC  l_dcal          ;jp(hl)
+
+
+    ; Force the interrupt handler to be registered
+    EXTERN  asm_im1_handler
+    defc	IMPORT_asm_im1_handler = asm_im1_handler
+
+
+    defc    CONSOLE_COLUMNS = 32
 IF NEED_ansiterminal
 	defc	CONSOLE_ROWS = 24
 ELSE
-        defc    CONSOLE_ROWS = 16
+    defc    CONSOLE_ROWS = 16
 ENDIF
 
-        IF      !DEFINED_CRT_ORG_CODE
-	   IF (startup=2)
-		defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
- 	   ELSE
-		defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
-	   ENDIF
-        ENDIF
+IF      !DEFINED_CRT_ORG_CODE
+  IF (startup=2)
+    defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
+  ELSE
+    defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
+  ENDIF
+ENDIF
 
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 0	; 0 = autodetect
-	defc	__CPU_CLOCK = 3579545
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = 0	; 0 = autodetect
+    defc	__CPU_CLOCK = 3579545
+    INCLUDE "crt/classic/crt_rules.inc"
 
-	INCLUDE	"target/mc1000/def/maths_mbf.def"
+    INCLUDE	"target/mc1000/def/maths_mbf.def"
 
-	org     CRT_ORG_CODE
+    org     CRT_ORG_CODE
 
 
 IF (startup=2)
@@ -280,46 +274,44 @@ has48k:
     defc    __register_sp = -1
 ENDIF
         
-        ;ei
-        ;xor     a
-        ;out     ($80),a
-        ;call    $c021      ; setup text page (ptr in HL)
-       
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm" 
-	call	crt0_init_bss
-	ld	(exitsp),sp
-		
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-		
-        call    _main
-cleanup:
-        push    hl
-        call    crt0_exit
+    ;ei
+    ;xor     a
+    ;out     ($80),a
+    ;call    $c021      ; setup text page (ptr in HL)
+    
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc" 
+        
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-        pop     bc
+
+    call    _main
+__Exit:
+    push    hl
+    call    crt0_exit
+    pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
-        ld      sp,0
+    ld      sp,0
 
 IF (startup=2)
-        ;jp      $C000  ; BASIC entry (COLD RESET)
-        jp      $C003  ; BASIC entry (WARM RESET)
+    ;jp      $C000  ; BASIC entry (COLD RESET)
+    jp      $C003  ; BASIC entry (WARM RESET)
 ELSE
-	ret
+    ret
 ENDIF
 
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 		
 ; If we were given an address for the BSS then use it
 IF DEFINED_CRT_ORG_BSS
-	defc	__crt_org_bss = CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-
-	INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE	"crt/classic/crt_section.inc"
 

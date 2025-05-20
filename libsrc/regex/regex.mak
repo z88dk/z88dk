@@ -9,6 +9,7 @@ REGEX_OBJS := $(addprefix regex/obj/z80/, $(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/ixiy/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/z80n/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/8080/,$(REGEX_OBJECTS)) \
+	$(addprefix regex/obj/8085/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/gbz80/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/ez80_z80/,$(REGEX_OBJECTS)) \
 	$(addprefix regex/obj/z180/,$(REGEX_OBJECTS)) \
@@ -25,6 +26,7 @@ regex: $(REGEX_OBJS)
 $(eval $(call buildbit,regex,z80,test))
 $(eval $(call buildbit,regex,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,regex,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,regex,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,regex,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,regex,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,regex,r4k,test,-clib=rabbit4k,-mr4k))

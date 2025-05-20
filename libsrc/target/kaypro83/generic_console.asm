@@ -1,48 +1,48 @@
 ;
 
 
-		SECTION		code_graphics
+    SECTION code_graphics
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
-		EXTERN		generic_console_xypos
-		EXTERN		swapgfxbk
-		EXTERN		swapgfxbk1
-		EXTERN		cleargraphics
+    PUBLIC  generic_console_cls
+    PUBLIC  generic_console_vpeek
+    PUBLIC  generic_console_printc
+    PUBLIC  generic_console_set_ink
+    PUBLIC  generic_console_set_paper
+    PUBLIC  generic_console_set_attribute
+    EXTERN  generic_console_xypos
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
+    EXTERN  cleargraphics
 
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
+    EXTERN  CONSOLE_COLUMNS
+    EXTERN  CONSOLE_ROWS
 
-		defc		pagein = swapgfxbk
-		defc		pageout = swapgfxbk1
-		defc		DISPLAY = 0x3000
+    defc    pagein=swapgfxbk
+    defc    pageout=swapgfxbk1
+    defc    DISPLAY=0x3000
 
 
 generic_console_set_attribute:
 generic_console_set_ink:
 generic_console_set_paper:
-	ret
+    ret
 
 generic_console_cls:
-	call	pagein
-	call	cleargraphics
-	call	pageout
-	ret
+    call    pagein
+    call    cleargraphics
+    call    pageout
+    ret
 
 ; c = x
 ; b = y
 ; a = character to print
 ; e = raw
 generic_console_printc:
-	call	pagein
-	call	generic_console_xypos
-	ld	(hl),a
-	call	pageout
-	ret
+    call    pagein
+    call    generic_console_xypos
+    ld      (hl), a
+    call    pageout
+    ret
 
 
 ;Entry: c = x,
@@ -51,11 +51,11 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-	call	pagein
-        call    generic_console_xypos
-        ld      a,(hl)
-        and     a
-	call	pageout
-        ret
+    call    pagein
+    call    generic_console_xypos
+    ld      a, (hl)
+    and     a
+    call    pageout
+    ret
 
 

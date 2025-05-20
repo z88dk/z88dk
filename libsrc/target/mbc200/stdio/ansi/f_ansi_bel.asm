@@ -10,13 +10,13 @@
 ;	$Id: f_ansi_bel.asm $
 ;
 
-        SECTION  code_clib
+    SECTION code_clib
 
-        PUBLIC	 ansi_BEL
-        EXTERN    mbc_sendchar
+    PUBLIC  ansi_BEL
+    EXTERN  mbc_sendchar
 
 
-.ansi_BEL
-		ld l,7
-		jp mbc_sendchar
+ansi_BEL:
+    ld      l, 7
+    jp      mbc_sendchar
 

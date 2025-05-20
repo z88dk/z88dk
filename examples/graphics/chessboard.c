@@ -33,7 +33,7 @@
    #ifdef FANCY
       #include "fancychess.h"
    #else
-      #if defined __G800__ || defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
+      #if defined __G800__ || defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__ || defined __PX4__ || defined __PX8__
          #include "ti_chessboard.h"
       #else
          #if defined __RX78__

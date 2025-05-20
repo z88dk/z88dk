@@ -42,7 +42,7 @@ As always, we start simple. Here's a source file containing a *main()* function:
 
 extern unsigned char message[];
 
-int main()
+int main(void)
 {
   printf("Message is: \"%s\"\n", message);
 

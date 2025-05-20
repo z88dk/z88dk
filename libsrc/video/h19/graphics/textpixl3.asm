@@ -12,12 +12,12 @@
 ;
 
 
-	PUBLIC	textpixl
+    PUBLIC  textpixl
 
 
-.textpixl
-		defb	' '
-		defb	'z', 'a', 'p'  ; '{'+128
-		defb	'{', 'a'+128, 'p'+128  ; 'z'+128
-		defb	' '+128
+textpixl:
+    defb    ' '
+    defb    'z', 'a', 'p'               ; '{'+128
+    defb    '{', 'a'+128, 'p'+128       ; 'z'+128
+    defb    ' '+128
 

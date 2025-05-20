@@ -1,0 +1,203 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,10
+	and	a
+	sbc	hl,de
+	jp	nz,i_2	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	call	_func1
+	pop	bc
+	ret
+
+
+.i_2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ret
+
+
+
+._func1a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,10
+	and	a
+	sbc	hl,de
+	jp	nz,i_3	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	call	_func1
+	pop	bc
+	ret
+
+
+.i_3
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ret
+
+
+
+._func1b
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,1
+	and	a
+	sbc	hl,de
+	ld	hl,1	;const
+	jr	z,ASMPC+3
+	dec	hl
+	ret
+
+
+
+._func1c
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,1
+	and	a
+	sbc	hl,de
+	ld	hl,1	;const
+	jr	z,ASMPC+3
+	dec	hl
+	ret
+
+
+
+._func2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,10
+	and	a
+	sbc	hl,de
+	jp	z,i_4	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	call	_func1
+	pop	bc
+	ret
+
+
+.i_4
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ret
+
+
+
+._func2a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,10
+	and	a
+	sbc	hl,de
+	jp	z,i_5	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	call	_func1
+	pop	bc
+	ret
+
+
+.i_5
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ret
+
+
+
+._func2c
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,1
+	and	a
+	sbc	hl,de
+	ld	hl,1	;const
+	jr	nz,ASMPC+3
+	dec	hl
+	ret
+
+
+
+._func2d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,1
+	and	a
+	sbc	hl,de
+	ld	hl,1	;const
+	jr	nz,ASMPC+3
+	dec	hl
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func1
+	GLOBAL	_func1a
+	GLOBAL	_func1b
+	GLOBAL	_func1c
+	GLOBAL	_func2
+	GLOBAL	_func2a
+	GLOBAL	_func2c
+	GLOBAL	_func2d
+
+
+
+

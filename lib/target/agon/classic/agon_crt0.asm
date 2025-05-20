@@ -10,7 +10,7 @@
 
 
     EXTERN    _main           ;main() is always external to crt0 code
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
     EXTERN	  asm_im1_handler
     EXTERN	  asm_nmi_handler
@@ -29,11 +29,8 @@ IFNDEF CLIB_DEFAULT_SCREEN_MODE
 ENDIF
 
 
-    ; Default, don't change the stack pointer
     defc    TAR__register_sp = 0xffff
     defc    TAR__clib_exit_stack_size = 32
-    ; Default, halt loop
-    defc    TAR__crt_on_exit = 0x10001
 
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
@@ -104,18 +101,15 @@ copy_done:
     sub     b
     ld      (__cmdline_length+1),a
 ENDIF
-    INCLUDE "crt/classic/crt_start_eidi.inc"
-    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
     ; Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
     ld      (__agon_mbase),a
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     ld      a,CLIB_DEFAULT_SCREEN_MODE
     call    asm_agon_setmode
@@ -129,7 +123,7 @@ __cmdline_length:
     ld      b,0
     ld      hl,cmdline
     add     hl,bc       ; now points to end of the command line
-    INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
     push    hl  ;argv
     push    bc  ;argc
 ELSE
@@ -143,9 +137,13 @@ ENDIF
     pop     bc
     pop     bc
     ; Exit code is in hl
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
+IFDEF CLIB_EXIT_SCREEN_MODE
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    asm_agon_setmode
+ENDIF
     pop     hl
 __restore_sp:
     ld      sp,0
@@ -196,14 +194,14 @@ __agon_de24:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 
     ; If we were given a model then use it
 IF DEFINED_CRT_MODEL
     defc __crt_model = CRT_MODEL
 ENDIF
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION bss_crt
 PUBLIC __agon_mbase

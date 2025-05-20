@@ -38,7 +38,7 @@ PUBLIC asm_am9511_popf
     ;
     ; exit  : dehl = IEEE_float
     ; 
-    ; uses  : af, bc, de, hl
+    ; uses  : af, de, hl
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY

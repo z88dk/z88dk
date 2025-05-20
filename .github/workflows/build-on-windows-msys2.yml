@@ -17,11 +17,11 @@ jobs:
         shell: msys2 {0}
     steps:
     - name: Checkout from git
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with: 
         submodules: 'true'
     - name: Cache multiple paths
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/perl5
@@ -36,6 +36,7 @@ jobs:
           perl-doc
           perl-YAML-Tiny
           mingw64/mingw-w64-x86_64-gcc
+          mingw64/mingw-w64-x86_64-pkg-config
           mingw64/mingw-w64-x86_64-libxml2
           mingw64/mingw-w64-x86_64-ragel
           mingw64/mingw-w64-x86_64-boost
@@ -50,7 +51,7 @@ jobs:
         eval $(perl -Mlocal::lib)
         # install modules that fail tests in msys2 with -f
         cpan -f Test::Harness
-        cpan App::Prove Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table
+        cpan App::Prove Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Test::HexDifferences Text::Diff Text::Table
     - name: Build binaries
       run: |
         set -e -x

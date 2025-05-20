@@ -1,9 +1,9 @@
 
-	SECTION	rodata_clib
+    SECTION rodata_clib
 
-	PUBLIC	textpixl
+    PUBLIC  textpixl
 
-	EXTERN	base_graphics
+    EXTERN  base_graphics
 
 ;       32 16
 ;        8  4
@@ -18,94 +18,94 @@ textpixl:
 ;       .. .. .. ..
 
 
-	defb 	192, 193, 194, 195
+    defb    192, 193, 194, 195
 
 ;       .. X. .X XX
 ;       X. X. X. X.
 ;       .. .. .. ..
 
-	defb	196, 197, 198, 199
+    defb    196, 197, 198, 199
 
 ;       .. X. .X XX
 ;       .X .X .X .X
 ;       .. .. .. ..
 
-	defb	200, 201, 202, 203
+    defb    200, 201, 202, 203
 
 ;       .. X. .X XX
 ;       XX XX XX XX
 ;       .. .. .. ..
 
-	defb	204, 205, 206, 207
+    defb    204, 205, 206, 207
 
 ;	.. X. .X XX
 ;	.. .. .. ..
 ;	X. X. X. X.
 
-	defb	208, 209, 210, 211
+    defb    208, 209, 210, 211
 
 ;	.. X. .X XX
 ;	X. X. X. X.
 ;	X. X. X. X.
 
-	defb	212, 213, 214, 215
+    defb    212, 213, 214, 215
 
 ;	.. X. .X XX
 ;       .X .X .X .X
 ;       X. X. X  X.
 
-	defb	216, 217, 218, 219
+    defb    216, 217, 218, 219
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	X. X. X. X.
 
-	defb	220, 221, 222, 223
+    defb    220, 221, 222, 223
 
 ;	.. X. .X XX
 ;	.. .. .. ..
 ;	.X .X .X .X
 
-	defb	224, 225, 226, 227
+    defb    224, 225, 226, 227
 
 ;	.. X. .X XX
 ;       X. X. X. X.
 ;       .X .X .X .X
 
-	defb	228, 229, 230, 231
+    defb    228, 229, 230, 231
 
 ;	.. X. .X XX
 ;	.X .X .X .X
 ;	.X .X .X .X
 
-	defb	232, 233, 234, 235
+    defb    232, 233, 234, 235
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	.X .X .X .X
 
-	defb	236, 237, 238, 239
+    defb    236, 237, 238, 239
 
 ;	.. X. .X XX
 ;       .. .. .. ..
 ;       XX XX XX XX
 
-	defb	240, 241, 242, 243
+    defb    240, 241, 242, 243
 
 ;	.. X. .X XX
 ;       X. X. X. X.
 ; 	XX XX XX XX
 
-	defb	244, 245, 246, 247
+    defb    244, 245, 246, 247
 
 ;	.. X. .X XX
 ;	.X .X .X .X
 ;	XX XX XX XX
 
-	defb	248, 249, 250, 251
+    defb    248, 249, 250, 251
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	XX XX XX XX
 
-	defb	252, 253, 254, 255
+    defb    252, 253, 254, 255

@@ -1,12 +1,14 @@
 
-		MODULE		conio_vars
+    MODULE  conio_vars
 
-		SECTION		bss_clib
+    SECTION bss_clib
 
-		PUBLIC		__pc6001_mode
+    PUBLIC  __pc6001_mode
 
-__pc6001_mode:	defb		0
+__pc6001_mode:
+    defb    0
 
-		SECTION		data_clib
-		PUBLIC		__MODE2_attr
-__MODE2_attr:     defb    @11000000,@00000000
+    SECTION data_clib
+    PUBLIC  __MODE2_attr
+__MODE2_attr:
+    defb    @11000000, @00000000

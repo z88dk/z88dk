@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with: 
         submodules: 'true'
     - name: Install homebrew dependencies
@@ -23,9 +23,12 @@ jobs:
       run: |
         export PATH=/usr/local/bin:$PATH
         cpan -T Capture::Tiny
-        cpan App::Prove Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+        cpan App::Prove Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::HexDifferences Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
       run: |
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
+        export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
         export PATH=/usr/local/bin:$PATH
         MAKE_CONCURRENCY=-j3 ./build.sh -v -l
     - name: Build libraries
@@ -38,6 +41,9 @@ jobs:
         ./build.sh -v -b -l -e
     - name: Build sdcc needed for tests
       run: |
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
+        export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
         export PATH=/usr/local/bin:$PATH
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
     - name: Run tests

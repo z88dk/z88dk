@@ -18,30 +18,30 @@
 ; $Id: nb_putblock.asm,v 1.5 2016-06-19 20:33:40 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC nb_putblock
-	PUBLIC _nb_putblock
-	
-	EXTERN ZCALL
+    SECTION code_clib
+    PUBLIC  nb_putblock
+    PUBLIC  _nb_putblock
 
-.nb_putblock
-._nb_putblock
-	push	ix		;save callers
-	ld	ix,4
-	add	ix,sp
+    EXTERN  ZCALL
 
-	ld	e,(ix+4)	; stream
+nb_putblock:
+_nb_putblock:
+    push    ix                          ;save callers
+    ld      ix, 4
+    add     ix, sp
 
-	ld	c,(ix+0)	; block length
-	ld	b,(ix+1)
+    ld      e, (ix+4)                   ; stream
 
-	ld	l,(ix+2)	; block location
-	ld	h,(ix+3)
+    ld      c, (ix+0)                   ; block length
+    ld      b, (ix+1)
 
-	call	ZCALL
-	defb	$3d	; zblkout
-	
-	ld	h,b
-	ld	l,c
-	pop	ix
-	ret
+    ld      l, (ix+2)                   ; block location
+    ld      h, (ix+3)
+
+    call    ZCALL
+    defb    $3d                         ; zblkout
+
+    ld      h, b
+    ld      l, c
+    pop     ix
+    ret

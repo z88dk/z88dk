@@ -725,8 +725,8 @@ int mz_exec(char *target)
 	}
 
 	if (loud) {
-		mz_h_lvl = 0xFF;
-		mz_l_lvl = 0x00;
+		mz_h_lvl = 0xFd;
+		mz_l_lvl = 0x02;
 	} else {
 		mz_h_lvl = 0xe0;
 		mz_l_lvl = 0x20;

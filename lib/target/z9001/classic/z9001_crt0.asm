@@ -17,7 +17,7 @@
 
 
     EXTERN    _main           ;main() is always external to crt0 code
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -75,6 +75,7 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__register_sp = CRT_ORG_CODE - 2
     defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__crt_on_exit = $f000
     defc    __CPU_CLOCK = 2457600
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -83,15 +84,13 @@ ENDIF
 start:
     ld      (__restore_sp_onexit+1),sp
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+
     ; Copy variables from "text graphics mem" to "video graphics mem page 0"
     ld      hl,$efc0
     ld      b,64
@@ -104,23 +103,25 @@ copy_loop:
     ld      (hl),c
     inc     hl
     djnz    copy_loop
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main   ;Call user program
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
-    jp      $F000
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: 
     jp      (hl)    ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION code_crt_init
     ld      hl,$EC00

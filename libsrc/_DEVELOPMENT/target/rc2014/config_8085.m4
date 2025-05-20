@@ -42,12 +42,12 @@ include(`_DEVELOPMENT/target/rc2014/config/config_cpu_8085.m4')
 
 include(`_DEVELOPMENT/target/rc2014/config/config_acia.m4')
 include(`_DEVELOPMENT/target/rc2014/config/config_sio.m4')
+include(`_DEVELOPMENT/target/rc2014/config/config_uart.m4')
 include(`_DEVELOPMENT/target/rc2014/config/config_82c55.m4')
 include(`_DEVELOPMENT/target/rc2014/config/config_cide.m4')
 include(`_DEVELOPMENT/target/rc2014/config/config_ppide.m4')
 include(`_DEVELOPMENT/target/rc2014/config/config_ram.m4')
 
-include(`_DEVELOPMENT/target/hbios/config/config_hbios.m4')
 include(`_DEVELOPMENT/target/cpm/config/config_cpm.m4')
 
 dnl############################################################

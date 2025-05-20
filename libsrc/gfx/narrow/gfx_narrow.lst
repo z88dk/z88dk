@@ -1,9 +1,11 @@
 @gfx/common/gfx_common.lst
+gfx/narrow/obj/${TARGET}/__ansichar_4x4
 gfx/narrow/obj/${TARGET}/__gfx_coords
 gfx/narrow/obj/${TARGET}/bkrestore3
 gfx/narrow/obj/${TARGET}/bksave2
 gfx/narrow/obj/${TARGET}/circle
 gfx/narrow/obj/${TARGET}/circle_callee
+gfx/narrow/obj/${TARGET}/__generic_clrarea
 gfx/narrow/obj/${TARGET}/clga
 gfx/narrow/obj/${TARGET}/clga_callee
 gfx/narrow/obj/${TARGET}/clrarea
@@ -30,6 +32,10 @@ gfx/narrow/obj/${TARGET}/gety
 gfx/narrow/obj/${TARGET}/hline_dither
 gfx/narrow/obj/${TARGET}/line
 gfx/narrow/obj/${TARGET}/liner
+gfx/narrow/obj/${TARGET}/lscroll_1px
+gfx/narrow/obj/${TARGET}/lscroll_2px
+gfx/narrow/obj/${TARGET}/lscroll_4px
+gfx/narrow/obj/${TARGET}/lscroll_8px
 gfx/narrow/obj/${TARGET}/move
 gfx/narrow/obj/${TARGET}/multipoint
 gfx/narrow/obj/${TARGET}/multipoint_callee
@@ -43,6 +49,12 @@ gfx/narrow/obj/${TARGET}/putc4x6
 gfx/narrow/obj/${TARGET}/__generic_putsprite
 gfx/narrow/obj/${TARGET}/putsprite2
 gfx/narrow/obj/${TARGET}/respixl
+gfx/narrow/obj/${TARGET}/rscroll_1px
+gfx/narrow/obj/${TARGET}/rscroll_2px
+gfx/narrow/obj/${TARGET}/rscroll_4px
+gfx/narrow/obj/${TARGET}/rscroll_8px
+gfx/narrow/obj/${TARGET}/scrollup_1px
+gfx/narrow/obj/${TARGET}/scrollup_4px
 gfx/narrow/obj/${TARGET}/setpos
 gfx/narrow/obj/${TARGET}/setpos_callee
 gfx/narrow/obj/${TARGET}/setxy

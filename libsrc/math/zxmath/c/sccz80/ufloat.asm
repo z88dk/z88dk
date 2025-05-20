@@ -2,10 +2,10 @@
 ;       Converts integer in hl to fp number
 
 
-                SECTION  code_fp
-                PUBLIC    ufloat
+    SECTION code_fp
+    PUBLIC  ufloat
 
-                EXTERN    stkequ
+    EXTERN  stkequ
 
 
 ;
@@ -13,55 +13,55 @@
 ;       a floating point number in FA
 ;
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
 
-		
-.ufloat
-IF TINYMODE
 
-	ld	b,h
-	ld	c,l
-	
-	call	ZXFP_STACK_BC 
+ufloat:
+IF  TINYMODE
+
+    ld      b, h
+    ld      c, l
+
+    call    ZXFP_STACK_BC
 
 ELSE
 
-	ld	b,h
-	ld	c,l
+    ld      b, h
+    ld      c, l
 
-	push	de
-	call	ZXFP_STACK_BC	; LSW
-	pop		bc
-	call	ZXFP_STACK_BC	; MSW
-	ld		bc,256
-	push	bc
-	call	ZXFP_STACK_BC
-	pop		bc
-	call	ZXFP_STACK_BC
+    push    de
+    call    ZXFP_STACK_BC               ; LSW
+    pop     bc
+    call    ZXFP_STACK_BC               ; MSW
+    ld      bc, 256
+    push    bc
+    call    ZXFP_STACK_BC
+    pop     bc
+    call    ZXFP_STACK_BC
 
-	rst	ZXFP_BEGIN_CALC
-	defb	ZXFP_MULTIPLY
-	defb	ZXFP_MULTIPLY
-IF FORlambda
-	defb	ZXFP_ADDITION + 128
-ELSE
-	defb	ZXFP_ADDITION
-	defb	ZXFP_END_CALC
+    rst     ZXFP_BEGIN_CALC
+    defb    ZXFP_MULTIPLY
+    defb    ZXFP_MULTIPLY
+  IF    FORlambda
+    defb    ZXFP_ADDITION+128
+  ELSE
+    defb    ZXFP_ADDITION
+    defb    ZXFP_END_CALC
+  ENDIF
+
+
 ENDIF
 
-
-ENDIF
-
-	jp	stkequ
+    jp      stkequ

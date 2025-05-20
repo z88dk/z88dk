@@ -6,11 +6,9 @@
     defc    CRT_ORG_CODE  = 0xe000
     defc    TAR__register_sp = 0x3fff
     defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__crt_on_exit = 0x10001  ;Loop forever
     defc	RAM_Start = 0x3900
     INCLUDE	"crt/classic/crt_rules.inc"
-
-    ; Page video into 0x8000 - 0xc000
-    defc    CLIB_VIDEO_PAGE_PORT = PORT_BANK2
 
 
     org     CRT_ORG_CODE
@@ -19,28 +17,21 @@
     defb    $53,$43,$30,$38,$4B,$9C,$B5,$B0,$A8,$6C,$AC,$64,$CC,$A8,$06,$70
 
 program:
+    INCLUDE "crt/classic/crt_init_sp.inc"
 
-; Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
-
-
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
     call    _main
 
-cleanup:
-    push    hl
+__Exit:
     call    crt0_exit
-
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
     defc	__crt_org_bss = RAM_Start
     ; If we were given a model then use it

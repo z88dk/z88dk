@@ -47,6 +47,22 @@ extern void __LIB__ putsprite_callee(int ortype, int x, int y, void *sprite) __s
 #define SPR_XOR  spr_xor
 #define SPR_MASK spr_and
 
+/* Flip the picture in the sprite data vertically */
+extern void  __LIB__ *flipsprite_v(void *sprite) __z88dk_fastcall;
+
+/* Flip the picture in the sprite data horizontally */
+extern void  __LIB__ *flipsprite_h(void *sprite) __z88dk_fastcall;
+
+/* Invert the graphics bitmap in a sprite */
+extern void  __LIB__ *invsprite(void *sprite) __z88dk_fastcall;
+
+/* Push the sprite picture 1px right */
+extern void  __LIB__ *shiftsprite_r(void *sprite) __z88dk_fastcall;
+
+/* Push the sprite picture 1px left */
+extern void  __LIB__ *shiftsprite_l(void *sprite) __z88dk_fastcall;
+
+
 
 /* Joystick (or whatever game device) control function */
 extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
@@ -300,7 +316,7 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __AQUARIUS__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
 	#define GAME_DEVICES 4
 #endif
@@ -447,6 +463,13 @@ extern const unsigned char *joystick_type[];
 	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2","AQOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
 	#define GAME_DEVICES 6
+#endif
+
+#ifdef __HECTOR
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2","AQOP-BN", "8246-05", "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 5
 #endif
 
 

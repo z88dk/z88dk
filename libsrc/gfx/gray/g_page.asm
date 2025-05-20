@@ -10,15 +10,15 @@
 ; Usage: g_page(int page)
 ;
 
-        PUBLIC  g_page
-        PUBLIC  _g_page
+    PUBLIC  g_page
+    PUBLIC  _g_page
 
-        EXTERN  graypage
+    EXTERN  graypage
 
 g_page:
 _g_page:
-        ld      ix, 0
-        add     ix, sp
-        ld      a, (ix+2)
+    ld      ix, 0
+    add     ix, sp
+    ld      a, (ix+2)
 
-        jp      graypage
+    jp      graypage

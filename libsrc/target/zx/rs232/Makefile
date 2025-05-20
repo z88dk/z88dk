@@ -1,7 +1,7 @@
 include ../../../Make.config
 
 
-SUBDIRS = if1 plus3
+SUBDIRS = if1 plus3 morex
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: subdirs-all

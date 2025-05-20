@@ -13,17 +13,26 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
    see t\developer\benchmark_symtab.t
 */
 
+#include "ctype.h"
 #include "die.h"
+#include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
+#include "limits.h"
+#include "options.h"
 #include "reloc_code.h"
 #include "scan1.h"
+#include "stdint.h"
 #include "str.h"
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
+#include "uthash.h"
+#include "utlist.h"
+#include "utstring.h"
 #include "xassert.h"
+#include "xmalloc.h"
 #include "z80asm1.h"
 #include "zobjfile.h"
 
@@ -126,7 +135,7 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 		if (sym->module && sym->module != module && sym->module->modname)
 			error_duplicate_definition_module(sym->module->modname, name);
 		else
-			error_duplicate_definition(name);
+            error(ErrDuplicateDefinition, name);
     }
 
     return sym;
@@ -137,22 +146,19 @@ Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t 
 *   search for symbol in either local tree or global table,
 *   create undefined symbol if not found, return symbol
 *----------------------------------------------------------------------------*/
-Symbol1 *get_used_symbol(const char *name )
-{
-    Symbol1     *sym;
+Symbol1* get_used_symbol(const char* name) {
+    Symbol1* sym;
 
-    sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
+    sym = find_symbol(name, CURRENTMODULE->local_symtab);	/* search in local tab */
 
-    if ( sym == NULL )
-    {
+    if (sym == NULL) {
         /* not local */
-        sym = find_symbol( name, global_symtab );			/* search in global tab */
+        sym = find_symbol(name, global_symtab);			/* search in global tab */
 
-        if ( sym == NULL )
-        {
-            sym = Symbol_create( name, 0, TYPE_UNDEFINED, SCOPE_LOCAL, 
-								 CURRENTMODULE, CURRENTSECTION );
-            Symbol1Hash_set( & CURRENTMODULE->local_symtab, name, sym );
+        if (sym == NULL) {
+            sym = Symbol_create(name, 0, TYPE_UNDEFINED, SCOPE_LOCAL,
+                CURRENTMODULE, CURRENTSECTION);
+            Symbol1Hash_set(&CURRENTMODULE->local_symtab, name, sym);
         }
     }
 
@@ -336,7 +342,7 @@ static Symbol1* define_local_symbol(const char* name, long value, sym_type_t typ
 		Symbol1Hash_set(&CURRENTMODULE->local_symtab, name, sym);
 	}
 	else if (sym->is_defined)			/* local symbol already defined */
-		error_duplicate_definition(name);
+        error(ErrDuplicateDefinition, name);
 	else								/* symbol declared local, but not yet defined */
 	{
 		sym->value = value;
@@ -372,7 +378,7 @@ Symbol1* define_symbol(const char* name, long value, sym_type_t type)
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
 		if (strncmp(name, "__CDBINFO__", 11) != 0)
-			error_duplicate_definition(name);
+            error(ErrDuplicateDefinition, name);
 	}
 	else
 	{
@@ -402,7 +408,7 @@ void update_symbol(const char *name, long value, sym_type_t type )
 		sym = find_symbol( name, global_symtab );
 
     if ( sym == NULL )
-		error_undefined_symbol(name);
+        error(ErrUndefinedSymbol, name);
 	else
 	{
 		sym->value = value;
@@ -437,7 +443,7 @@ void declare_global_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_GLOBAL)
 		{
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -501,7 +507,7 @@ void declare_public_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_PUBLIC)
 		{
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -560,7 +566,7 @@ void declare_extern_symbol(const char *name)
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_EXTERN)
 		{
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
 		else
 		{
@@ -589,13 +595,13 @@ void declare_extern_symbol(const char *name)
             else
             {
                 /* already declared local */
-                error_symbol_redeclaration( name );
+                error(ErrSymbolRedeclaration, name);
             }
         }
         else 
         {
 			/* re-declaration not allowed */
-			error_symbol_redeclaration(name);
+            error(ErrSymbolRedeclaration, name);
 		}
     }
 }
@@ -713,8 +719,55 @@ void check_undefined_symbols(Symbol1Hash *symtab)
 
 		if (sym->scope == SCOPE_PUBLIC && !sym->is_defined) {
 			set_error_location(sym->filename, sym->line_num);
-			error_undefined_symbol(sym->name);
+            error(ErrUndefinedSymbol, sym->name);
 		}
 	}
 	clear_error_location();
+}
+
+/*-----------------------------------------------------------------------------
+*   Local labels
+*----------------------------------------------------------------------------*/
+
+static const char* last_global_label = "";  // last non-local label, used as prefix for each new local label
+
+void init_local_labels(void) {
+    last_global_label = spool_add("");
+}
+
+static const char* local_labels_add_use(bool is_add, const char* short_name) {
+    const char* p = strchr(short_name, '@');
+    if (p == NULL) {                // standard label, no @
+        if (is_add) {
+            last_global_label = spool_add(short_name);
+            return last_global_label;
+        }
+        else
+            return short_name;
+    }
+    else if (p == short_name) {     // @label
+        if (*last_global_label == '\0') {
+            error(ErrLocalLabelBeforeNormalLabel, short_name);
+            return short_name;
+        }
+        else {
+            UT_string* long_name;
+            utstring_new(long_name);
+            utstring_printf(long_name, "%s%s", last_global_label, short_name);  // label@label
+            const char* long_name_str = spool_add(utstring_body(long_name));
+            utstring_free(long_name);
+            return long_name_str;
+        }
+    }
+    else {                          // label@label
+        return spool_add(short_name);
+    }
+}
+
+const char* local_labels_add_label(const char* short_name) {
+    return local_labels_add_use(true, short_name);
+}
+
+const char* local_labels_use_label(const char* short_name) {
+    return local_labels_add_use(false, short_name);
 }

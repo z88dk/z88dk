@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.4.0 #14648 (Linux)
+; Version 4.5.0 #15248 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -414,7 +414,7 @@ ENDIF
 ;--------------------------------------------------------
 ; Home
 ;--------------------------------------------------------
-	SECTION IGNORE
+	SECTION code_home
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -584,16 +584,14 @@ l_m32_powf_00116:
 	ld	e,(ix+6)
 	ld	d,(ix+7)
 	call	_m32_logf
-	ld	c, l
-	ld	l,(ix+10)
-	ld	b,h
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	push	de
+	ld	c,(ix+10)
+	ld	b,(ix+11)
 	push	bc
+	ld	c,(ix+8)
+	ld	b,(ix+9)
+	push	bc
+	push	de
+	push	hl
 	call	___fsmul_callee
 	call	_m32_expf
 l_m32_powf_00117:

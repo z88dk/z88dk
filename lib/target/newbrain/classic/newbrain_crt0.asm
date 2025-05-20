@@ -5,76 +5,68 @@
 ;       $Id: newbrain_crt0.asm,v 1.20 2016-07-15 21:03:25 dom Exp $
 ;
 
-	MODULE  newbrain_crt0
-;--------
-; Include zcc_opt.def to find out some info
-;--------
+    MODULE  newbrain_crt0
 
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
 
-;--------
-; Some scope definitions
-;--------
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
-        EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
+    EXTERN    _main           ;main() is always external to crt0 code
+
+    PUBLIC    __Exit         ;jp'd to by exit()
+    PUBLIC    l_dcal          ;jp(hl)
 
 
 
-	PUBLIC	nbclockptr	;ptr to clock counter location
+    PUBLIC  nbclockptr	;ptr to clock counter location
 IF (startup=2)
-	PUBLIC	oldintaddr	;made available to chain an interrupt handler
+    PUBLIC  oldintaddr	;made available to chain an interrupt handler
 ENDIF
 
 
 IF      !DEFINED_CRT_ORG_CODE
-	defc    CRT_ORG_CODE  = 10000
+    defc    CRT_ORG_CODE  = 10000
 ENDIF
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 4000000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc	__CPU_CLOCK = 4000000
+    INCLUDE "crt/classic/crt_rules.inc"
 
-        org     CRT_ORG_CODE
+    org     CRT_ORG_CODE
 
 
 start:
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-        
 IF (startup=2)
-	ld	hl,(57)
-	ld	(oldintaddr),hl
-	ld	hl,nbckcount
-	ld	(57),hl
+    ld      hl,(57)
+    ld      (oldintaddr),hl
+    ld      hl,nbckcount
+    ld      (57),hl
 ENDIF
 
-        call    _main		;Call user program
+    call    _main		;Call user program
 
-cleanup:
+__Exit:
     call    crt0_exit
 
 IF (startup=2)
 	ld	hl,(oldintaddr)
 	ld	(57),hl
 ENDIF
-
-cleanup_exit:
-
-__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
-        ret
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+__restore_sp_onexit:
+    ld      sp,0            ;Restore stack to entry value
+    ret
 
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
@@ -122,6 +114,5 @@ nbclockptr:	defb	$52	; paged system clock counter
 ENDIF
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-
-        INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"

@@ -4,12 +4,14 @@
 
 
     GLOBAL  _main
+    PUBLIC  __Exit
 
     ;	defc	CRT_ORG_BSS = 0x7000
     defc    CRT_ORG_CODE = 0x0000
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x4000
+    defc    TAR__crt_on_exit = 0x10001 ; Loop forever
 
     defc    CONSOLE_COLUMNS = 16
     defc    CONSOLE_ROWS = 4
@@ -83,26 +85,22 @@ program:
     di
     xor     a
     out     (0x27), a       ; MINT_ENABLE_REG
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     call    _main
-cleanup:
-    di
-    halt
-    jp      cleanup
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"

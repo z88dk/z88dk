@@ -22,17 +22,17 @@ jobs:
     - name: Install perl prerequisites
       run: |
         perl -S cpan App::cpanminus
-        perl -S cpanm App::Prove Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+        perl -S cpanm App::Prove Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
     - name: Checkout from git
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with: 
         submodules: 'true'
-    - name: Get lastest nightly
+    - name: Get latest nightly
       run: |
         curl -L -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
         unzip -d win32-latest z88dk-win32-latest.zip
     - name: Find MSBuild
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v2
       with:
         msbuild-architecture: x86
     - name: Create config.h

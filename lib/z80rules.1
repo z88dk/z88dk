@@ -189,6 +189,7 @@
 	push	hl
 	push	de
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_gint	;%9
@@ -2131,10 +2132,43 @@
 	ld	a,(hl)
 	sub	%eval(%1 256 %%)
 
+%title simplify comparison with zero for z80
+	ld	a,h
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	jp	nc,%1	;%5
+=
+	ld	a,h
+	or	l
+	jp	nz,%1	;%5
+
+%title simplify comparison with zero for 8080
+	ld	a,h
+	or	l
+	jp	nz,ASMPC+4
+	scf
+	jp	nc,%1	;%5
+=
+	ld	a,h
+	or	l
+	jp	nz,%1	;%5
+
 	xor	a
 	sub	(hl)
 	and	a
 	jr	nz,ASMPC+3
+	scf
+	jp	nc,%1	;%5
+=
+	ld	a,(hl)
+	and	a
+	jp	nz,%1	;%5
+
+	xor	a
+	sub	(hl)
+	and	a
+	jp	nz,ASMPC+4
 	scf
 	jp	nc,%1	;%5
 =
@@ -3114,6 +3148,7 @@ $notcpu 8085
 =
 	call	z,%1
 
+%title Cleanup ==
 	scf
 	jr	z,ASMPC+3
 	ccf
@@ -3127,15 +3162,26 @@ $notcpu 8085
 =
 	jp	z,%1	;%5
 
+%title Cleanup !=
 	scf
-	jr	z,ASMPC+3
+	jr	nz,ASMPC+3
+	ccf
+	jp	nc,%1	;%5
+=
+	jp	z,%1	;%5
+
+%title Cleanup != and ==
+	scf
+	jr	%1z,ASMPC+3
 	ccf
 	ld	hl,0	;const
 	rl	l
 =
 	ld	hl,1	;const
-	jr	z,ASMPC+3
+	jr	%1z,ASMPC+3
 	dec	hl
+
+
 
 	jr	z,ASMPC+3
 	scf
@@ -4178,6 +4224,23 @@ $notcpu 8085
 	ld	l,(hl)
 	ld	h,0
 	ex	de,hl
+	ld	h,0
+
+%title Cleanup glong & 0xff
+	ld	e,(hl)
+	inc	hl
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	l,a
 	ld	h,0
 
 %check 9 <= %1 <= 15
@@ -6207,6 +6270,9 @@ $notcpu 8085
 =
 	ld	a,(_%1)
 	ld	(de),a
+	xor	a
+	inc	de
+	ld	(de),a
 	jp	%2	;EOS
 
 %title Use 8 bit load for comparison
@@ -7077,3 +7143,119 @@ $notcpu 8085
 	ld	b,0
 	push	bc
 	inc	hl
+
+%title Far struct+array access
+	ld	bc,%1
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	ld	bc,%2
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+=
+	ld	bc,%eval( %1 %2 +)
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+
+%title push/pop around
+%check 2 <= %1 <= 10
+	push	hl
+	call	l_gint%1sp	;
+	pop	de
+=
+	ex	de,hl
+	call	l_gint%eval(%1 2 -)sp
+
+%title 8 bit and of long value
+	call	l_glong
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	pop	de
+	call	l_pint
+	ld	hl,%2	;const
+=
+	ld	a,(hl)
+	and	%1
+	pop	de
+	ld	(de),a
+	xor	a
+	inc	de
+	ld	(de),a
+	ld	hl,%2	;const
+
+%title avoid subroutine call
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%2	;const
+	add	hl,sp
+	call	l_gint	;%3
+	ex	de,hl
+=
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
+%title Avoid reloading hl
+	push	hl
+	dec	sp
+	ld	hl,1	;const
+	call	l_gintspsp	;%1
+=
+	push	hl
+	dec	sp
+	push	hl
+
+%title Avoid going via stack
+	push	hl
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;%2
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+=
+	ex	de,hl
+	ld	hl,%eval(%1 2 -)	;const
+	add	hl,sp
+	call	l_gint	;%2
+	ld	a,(hl)
+	ld	(de),a
+
+%title Increment long in place
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+	ld	hl,%1
+=
+	call	l_long_inc_mhl
+	ld	hl,%1
+
+%title Increment long in place
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+.%2
+	ld	hl,%3
+=
+	call	l_long_inc_mhl
+.%2
+	ld	hl,%3

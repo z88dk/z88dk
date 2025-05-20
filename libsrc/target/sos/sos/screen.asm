@@ -5,19 +5,19 @@
 ;
 
 
-SECTION   code_clib
-PUBLIC screen
-PUBLIC _screen
+    SECTION code_clib
+    PUBLIC  screen
+    PUBLIC  _screen
 
-EXTERN asm_screen
+    EXTERN  asm_screen
 
 screen:
 _screen:
-   pop bc
-   pop de
-   pop hl
-   push hl
-   push de
-   push bc
-   
-   jp asm_screen
+    pop     bc
+    pop     de
+    pop     hl
+    push    hl
+    push    de
+    push    bc
+
+    jp      asm_screen

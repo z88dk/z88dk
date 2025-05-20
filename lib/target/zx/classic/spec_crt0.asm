@@ -19,7 +19,7 @@
 
 
     EXTERN    _main           ; main() is always external to crt0 code
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
     PUBLIC    call_rom3       ; Interposer
 
@@ -34,6 +34,10 @@
             defc	DEFINED_CRT_ORG_CODE = 1
         ENDIF
         defc REG__register_sp = 0xff57	; below UDG, keep eye when using banks
+    ENDIF
+
+    IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+        defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
     ENDIF
 
 
@@ -126,7 +130,7 @@ endif
 
 init:
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 
     ld      a,@111000       ; White PAPER, black INK
     call    zx_internal_cls
@@ -134,8 +138,8 @@ init:
     ld      bc,42239
     ldir
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
+    call    crt0_init
 
     im      1
     ei
@@ -156,16 +160,28 @@ ELSE
   IF !DEFINED_ZXVGS
         ld      (__restore_sp_onexit+1),sp   ; Save entry stack
   ENDIF
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
-; Optional definition for auto MALLOC init; it takes
-; all the space between the end of the program and UDG
-IF DEFINED_USING_amalloc
-    defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+
+  IF CLIB_FARHEAP_BANKS > 0
+    IF CLIB_FARHEAP_BANKS > 4
+        defs    CANT_ALLOCATE_MORE_THAN_64K_TO_FARHEAP
+    ENDIF
+    EXTERN  sbrk_far
+    ld      de,$0001
+    ld      hl,0
+    push    de
+    push    hl
+    ld      bc,+(CLIB_FARHEAP_BANKS * 16384) - 1
+    push    bc
+    call    sbrk_far
+    pop     af
+    pop     af
+    pop     af
+  ENDIF
 
   IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading
@@ -180,22 +196,22 @@ ENDIF
 
 
 IF DEFINED_NEEDresidos
-        call    residos_detect
-        jp      c,cleanup_exit
+    call    residos_detect
+    jp      c,crt0_exit_exit
 ENDIF
-        call    _main           ; Call user program
-cleanup:
-        push    hl
-      call    crt0_exit
-
+    call    _main           ; Call user program
+__Exit:
+    push    hl
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 
 IF (startup=2)      ; ROM ?
 
-cleanup_exit:
+crt0_exit_exit:
     rst     0
 
-    defs    56-cleanup_exit-1
+    defs    56-crt0_exit_exit-1
 
 if (ASMPC<>$0038)
     defs    CODE_ALIGNMENT_ERROR
@@ -232,7 +248,7 @@ ELSE
         RST     8
         DEFB    $FD             ;Program finished
   ELSE
-cleanup_exit:
+crt0_exit_exit:
         ld      hl,10072        ;Restore hl' to what basic wants
         exx
         pop     bc
@@ -261,7 +277,7 @@ IF NEED_fzxterminal
     defc    _fgets_cons_erase_character = fgets_cons_erase_character_fzx
 ENDIF
 
-    INCLUDE	"crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_runtime_selection.inc"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
@@ -383,7 +399,7 @@ IF CRT_ORG_CODE < 32768
     SECTION CONTENDED
 ENDIF
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION	code_crt_init
     ld      a,@111000       ; White PAPER, black INK

@@ -16,7 +16,7 @@ It might be a reasonable assumption that most people picking up Spectrum
 programming for the first time are looking to write games, and so are interested
 in sprites, joysticks, music, and so on. First things first, however. Simple
 text based programs allow programmers to experiment with library routines, to
-feed them inputs and see the outputs. Runtime debugging will go a long way away in
+feed them inputs and see the outputs. Runtime debugging is a long way away in
 this "getting started" series, so for the time being text IO is going to be
 useful.
 
@@ -30,7 +30,7 @@ powerful. It looks a bit strange in 32 columns.
 
 The stdio library talks to a "driver." A driver is some Z88DK code that is
 attached to the end of a byte stream.  These drivers can handle screen output
-and keyboard input like PRINT and INPUT do in basic.
+and keyboard input like PRINT and INPUT do in BASIC.
 
 ### Hello World
 
@@ -44,7 +44,7 @@ file called hello_world.c:
   #include <arch/zx.h>
   #include <stdio.h>
 
-  int main()
+  int main(void)
   {
     zx_cls(PAPER_WHITE);
 
@@ -112,7 +112,7 @@ few bytes of the Spectrum's ROM:
   #include <arch/zx.h>
   #include <stdio.h>
 
-  int main()
+  int main(void)
   {
     unsigned char* rom_addr = 0;
     unsigned char i, j;
@@ -169,7 +169,7 @@ called question.c:
   #include <arch/zx.h>
   #include <stdio.h>
 
-  int main()
+  int main(void)
   {
     unsigned char name[15];
 

@@ -40,6 +40,7 @@ static int gotocnt = 0;
 
 Node *dolabel(void)
 {
+#if 0
     int savelptr;
     char sname[NAMESIZE];
     SYMBOL* ptr;
@@ -66,6 +67,8 @@ Node *dolabel(void)
     }
     lptr = savelptr;
     return (0);
+#endif
+     return NULL;
 }
 
 /*

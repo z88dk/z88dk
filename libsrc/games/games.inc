@@ -183,7 +183,19 @@ IF FORenterprise
         ;----
 ENDIF
 
-IF FORg800
+IF FORg815
+        defc SOUND_ONEBIT_port   = $18
+        defc SOUND_ONEBIT_bit    = 7
+        defc SOUND_ONEBIT_mask   = 192
+ENDIF
+
+IF FORe200
+        defc SOUND_ONEBIT_port   = $18
+        defc SOUND_ONEBIT_bit    = 7
+        defc SOUND_ONEBIT_mask   = 192
+ENDIF
+
+IF FORg850
         defc SOUND_ONEBIT_port   = $18
         defc SOUND_ONEBIT_bit    = 7
         defc SOUND_ONEBIT_mask   = 192

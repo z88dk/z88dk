@@ -27,7 +27,7 @@
 #define COLOR1 6	// foreground cube color
 #define COLOR2 2	// background cube color
 
-Vector_t cube[8]
+vector_t cube[8]
 = { { -20 ,  20,   20 },
 	{  20 ,  20,   20 },
 	{  20 , -20,   20 },
@@ -37,9 +37,9 @@ Vector_t cube[8]
 	{  20 , -20,  -20 },
 	{ -20 , -20,  -20 } };
 
-	static Vector_t rot;
-	static Vector_t t;
-	static Point_t p[8];
+	static vector_t rot;
+	static vector_t t;
+	static point_t p[8];
 	static unsigned c = 0;
 	static int i;
 	static int zf = 600;

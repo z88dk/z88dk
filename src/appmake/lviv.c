@@ -12,8 +12,12 @@ static char             *crtfile      = NULL;
 static char              khz_22       = 0;
 static int               origin       = -1;
 static int               exec         = -1;
+static char              loud         = 0;
 static char              snapshot     = 0;
 static char              help         = 0;
+
+static uint8_t           h_lvl;
+static uint8_t           l_lvl;
 
 
 /* Options that are available for this module */
@@ -25,6 +29,7 @@ option_t lviv_options[] = {
     {  0 , "org",        "Origin of the embedded binary",    OPT_INT,   &origin },
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
     {  0,  "22",         "22050hz bitrate option",           OPT_BOOL,  &khz_22 },
+    {  0,  "loud",       "Louder audio volume",              OPT_BOOL,  &loud },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
@@ -35,9 +40,6 @@ static void writebyte_lviv(uint8_t byte, FILE *fp, FILE *fpwav);
 
 
 
-
-static uint8_t    h_lvl = 0xff;
-static uint8_t    l_lvl = 0x00;
 
 
 static void lviv_bit(FILE* fpout, int bit)
@@ -117,6 +119,15 @@ int lviv_exec(char *target)
     if ( binname == NULL ) {
         return -1;
     }
+
+    if (loud) {
+        h_lvl = 0xFd;
+        l_lvl = 2;
+    } else {
+        h_lvl = 0xe0;
+        l_lvl = 0x20;
+    }
+
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);

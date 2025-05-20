@@ -3,144 +3,144 @@
 ; OP: 0=load, 1=or, 2=xor, 3=and, 4=add, 5 = adc, 6=sub, 7 = sbc, 8 = rls, 9 = rrs else address of OP function
 ; 05.2007 aralbrec
 
-PUBLIC memopd_callee
-PUBLIC _memopd_callee
-PUBLIC asm_memopd
+    PUBLIC  memopd_callee
+    PUBLIC  _memopd_callee
+    PUBLIC  asm_memopd
 
-EXTERN l_jpix, memops
+    EXTERN  l_jpix, memops
 
-.memopd_callee
-._memopd_callee
+memopd_callee:
+_memopd_callee:
 
-   pop hl
-   pop ix
-   pop bc
-   pop de
-   ex (sp),hl
+    pop     hl
+    pop     ix
+    pop     bc
+    pop     de
+    ex      (sp), hl
 
-.asm_memopd
+asm_memopd:
 
    ; enter : ix = OP
    ;         bc = uint n
    ;         de = src
    ;         hl = dst
 
-   ld a,b
-   or c
-   ret z
+    ld      a, b
+    or      c
+    ret     z
 
-   push hl
+    push    hl
 
-IF __CPU_RABBIT__| __CPU_Z180__ | __CPU_KC160__
+IF  __CPU_RABBIT__|__CPU_Z180__|__CPU_KC160__
 
-   push ix
-   pop hl
-   
-   ld a,h
-   or a
-   jr nz, func_enter
-   
-   ld a,h
-   cp 10
-   jr nc, func_enter
-   
-   add a,a
-   add a,memops%256
-   ld h,a
-   ld a,0
-   adc a,memops/256
-   ld l,a
+    push    ix
+    pop     hl
 
-   push hl
-   pop ix
-   
-   pop hl
-   push hl
-   
+    ld      a, h
+    or      a
+    jr      nz, func_enter
+
+    ld      a, h
+    cp      10
+    jr      nc, func_enter
+
+    add     a, a
+    add     a, memops%256
+    ld      h, a
+    ld      a, 0
+    adc     a, memops/256
+    ld      l, a
+
+    push    hl
+    pop     ix
+
+    pop     hl
+    push    hl
+
 ELSE
 
-   ld a,ixh
-   or a
-   jr nz, func
-   
-   ld a,ixl
-   cp 10
-   jr nc, func
+    ld      a, ixh
+    or      a
+    jr      nz, func
 
-   add a,a
-   add a,memops%256
-   ld ixl,a
-   ld a,0
-   adc a,memops/256
-   ld ixh,a
+    ld      a, ixl
+    cp      10
+    jr      nc, func
+
+    add     a, a
+    add     a, memops%256
+    ld      ixl, a
+    ld      a, 0
+    adc     a, memops/256
+    ld      ixh, a
 
 ENDIF
 
    ; ix = addr of op function
-   
-.loop
 
-   ld a,(de)
-   call l_jpix
+loop:
 
-.return
+    ld      a, (de)
+    call    l_jpix
 
-   ld (hl),a
-   dec hl
-   dec de
-   
-   dec bc                      ; must not mess with carry flag in loop
-   inc c
-   dec c
-   jp nz, loop
-   
-   inc b
-   djnz loop
-   
-   pop hl
-   ret
+return:
 
-IF __CPU_RABBIT__ | __CPU_Z180__ | __CPU_KC160__
+    ld      (hl), a
+    dec     hl
+    dec     de
 
-.func_enter
+    dec     bc                          ; must not mess with carry flag in loop
+    inc     c
+    dec     c
+    jp      nz, loop
 
-   pop hl
-   push hl
+    inc     b
+    djnz    loop
+
+    pop     hl
+    ret
+
+IF  __CPU_RABBIT__|__CPU_Z180__|__CPU_KC160__
+
+func_enter:
+
+    pop     hl
+    push    hl
 
 ENDIF
 
 
-.func
+func:
 
-   push bc
-   push de
-   push hl
-   ld a,(de)
-   ld e,a
-   ld d,0
-   ld l,(hl)
-   ld h,d
-   push hl
-   push de
-   call l_jpix                 ; (func)(uchar dst_byte, uchar src_byte)
-   ld a,l
-   pop de
-   pop hl
-   pop hl
-   pop de
-   pop bc
+    push    bc
+    push    de
+    push    hl
+    ld      a, (de)
+    ld      e, a
+    ld      d, 0
+    ld      l, (hl)
+    ld      h, d
+    push    hl
+    push    de
+    call    l_jpix                      ; (func)(uchar dst_byte, uchar src_byte)
+    ld      a, l
+    pop     de
+    pop     hl
+    pop     hl
+    pop     de
+    pop     bc
 
-   ld (hl),a
-   dec hl
-   dec de
-   
-   dec bc                      ; must not mess with carry flag in loop
-   inc c
-   dec c
-   jp nz, func
-   
-   inc b
-   djnz func
-      
-   pop hl
-   ret
+    ld      (hl), a
+    dec     hl
+    dec     de
+
+    dec     bc                          ; must not mess with carry flag in loop
+    inc     c
+    dec     c
+    jp      nz, func
+
+    inc     b
+    djnz    func
+
+    pop     hl
+    ret

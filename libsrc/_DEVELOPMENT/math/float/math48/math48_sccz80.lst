@@ -108,4 +108,9 @@ math/float/math48/c/sccz80/cm48_sccz80_tan
 math/float/math48/c/sccz80/cm48_sccz80_tanh
 math/float/math48/c/sccz80/cm48_sccz80_tgamma
 math/float/math48/c/sccz80/cm48_sccz80_trunc
+math/float/math48/c/sccz80/cm48_sccz80p_f2sllong.asm
+math/float/math48/c/sccz80/cm48_sccz80p_f2ullong.asm
+math/float/math48/c/sccz80/cm48_sccz80p_sllong2f.asm
+math/float/math48/c/sccz80/cm48_sccz80p_ullong2f.asm
 @math/float/math48/math48_asm.lst
+

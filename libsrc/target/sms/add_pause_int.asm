@@ -1,9 +1,9 @@
 
-        SECTION code_clib
-        PUBLIC  add_pause_int
-        PUBLIC  _add_pause_int
+    SECTION code_clib
+    PUBLIC  add_pause_int
+    PUBLIC  _add_pause_int
 
-        EXTERN  pause_procs
+    EXTERN  pause_procs
 
 ;==============================================================
 ; add_pause_int(void *ptr)
@@ -12,25 +12,25 @@
 ;==============================================================
 add_pause_int:
 _add_pause_int:
-        ld      hl, 2
-        add     hl, sp
-        ld      c, (hl)                 ; Proc address
-        inc     hl
-        ld      b, (hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      c, (hl)                     ; Proc address
+    inc     hl
+    ld      b, (hl)
 
-        ld      hl, pause_procs
+    ld      hl, pause_procs
 
 loop:
-        ld      a, (hl)
-        inc     hl
-        or      (hl)
-        jr      z, found
-        inc     hl
-        jr      loop
+    ld      a, (hl)
+    inc     hl
+    or      (hl)
+    jr      z, found
+    inc     hl
+    jr      loop
 
 found:
-        ld      (hl), b
-        dec     hl
-        ld      (hl), c
-        ret
+    ld      (hl), b
+    dec     hl
+    ld      (hl), c
+    ret
 

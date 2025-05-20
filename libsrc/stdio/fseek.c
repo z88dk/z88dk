@@ -12,10 +12,7 @@
  */
 
 #define ANSI_STDIO
-
-#ifdef Z80
 #define STDIO_ASM
-#endif
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -25,7 +22,7 @@ static long fseek1(FILE *fp, fpos_t posn, int whence) __z88dk_callee;
 int fseek(FILE *fp, fpos_t posn, int whence) __z88dk_saveframe
 {
     if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
-#if CPU_8080 || CPU_GBZ80
+#if CPU_8080 || CPU_8085 || CPU_GBZ80
         if (lseek(fp->desc.fd,posn,whence) != -1L ) {
 #else
         if (fseek1(fp,posn,whence) != -1L ) {
@@ -78,12 +75,4 @@ call_trampoline:
     ret
 ENDIF
 #endasm
-
-
-
-
-
-
-    
-
 

@@ -18,10 +18,10 @@ copy_font_8x8:
 copy_1:
     push    bc
     call    filltop
-    ld      b,__CLIB_FONT_HEIGHT
+    ld      b, __CLIB_FONT_HEIGHT
 copy_2:
-    ld      a,(de)
-    ld      (hl),a
+    ld      a, (de)
+    ld      (hl), a
     inc     c
     inc     de
     inc     hl
@@ -29,25 +29,25 @@ copy_2:
     call    fillbottom
     pop     bc
     dec     c
-    jr      nz,copy_1
+    jr      nz, copy_1
     ret
 
 filltop:
-    ld      c,0
-    ld      a,__CLIB_FONT_HEIGHT
+    ld      c, 0
+    ld      a, __CLIB_FONT_HEIGHT
     cp      8
     ret     nz
-    ld      a,1
+    ld      a, 1
     jr      fill_loop
 
 fillbottom:
-    ld      a,16
+    ld      a, 16
     sub     c
     ret     c
 fill_loop:
     and     a
     ret     z
-    ld      (hl),0
+    ld      (hl), 0
     inc     hl
     inc     c
     dec     a

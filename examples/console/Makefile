@@ -7,7 +7,7 @@ include ../../support/multitarget_build/Makefile
 # Hello world 
 WORLD_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius aqplus bee c128 c7420 coleco bit90 cpc cpm dai \
 	eg2000 enterprise fp1100 g800 gal gamegear gl  gl4000 gl6000  \
-	hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 micro8085 mikro80 \
+	hector hectorhr hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 micro8085 mikro80 \
 	msx msx2_rom mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \
 	pv2000 rcmx000 rx78 sam sc3000 smc777 sms sol20 sos spc1000 special srr super80 super80_vduem svi svi_rom svi_rom318 test ti82 ti83 ti85 ti86 ti83p \
@@ -26,7 +26,7 @@ $(eval $(call build_app, $(WORLD_TARGETS), world.bin, world.c) )
 
 # Hello world using conio features
 
-CONIO_TARGETS = abc80 ace adam alphatro aquarius aqplus bee cpc coleco cpm fp1100 gb hemc hgmc homelab homelab2 \
+CONIO_TARGETS = abc80 ace adam alphatro aquarius aqplus bee cpc coleco cpm fp1100 gb hector hectorhr  hemc hgmc homelab homelab2 \
 	kramermc laser500 mc1000 mikro80 nabu \
 	nascom ondra pmd85 pv1000 pps rx78 sam spc1000 srr super80 super80_vduem trs80 vg5k vz z1013 zx80 zx81 \
 	msx msx2_rom pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx \
@@ -74,5 +74,3 @@ $(eval $(call build_app, $(ADVA_TARGETS), adva.bin, adv_a.c) )
 
 binaries: $(OUTPUT_BINS)
 
-clean:
-	$(RM) -fr bin

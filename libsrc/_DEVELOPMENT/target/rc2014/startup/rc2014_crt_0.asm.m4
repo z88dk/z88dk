@@ -1,7 +1,7 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##    RC2014_CRT_0.ASM.M4 - ACIA INDEPENDENT OF BASIC     ##
+dnl##     RC2014_CRT_0.ASM.M4 - ACIA INDEPENDENT OF BASIC    ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                RC2014 standalone target                   ;;
@@ -231,6 +231,11 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_jump_vectors_z80.inc"
+
+PUBLIC _z80_rst_38h
+EXTERN _acia_interrupt
+
+defc _z80_rst_38h = _acia_interrupt
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

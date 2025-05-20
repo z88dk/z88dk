@@ -10,10 +10,10 @@
 ;
 
 
-  IF    !__CPU_INTEL__
+IF  !__CPU_INTEL__
 
-        SECTION code_graphics
-        PUBLIC  w_area
+    SECTION code_graphics
+    PUBLIC  w_area
 
 
 w_area:
@@ -21,48 +21,48 @@ w_area:
 ; IN:  HL,DE = (x,y).  HL' = width, DE' = height
 
     ;exx
-        push    de                      ; y delta
-        exx
-        pop     bc                      ; y delta
-        exx
+    push    de                          ; y delta
+    exx
+    pop     bc                          ; y delta
+    exx
     ;inc hl
 
 
 xloop:
-        exx
+    exx
 
-        push    de
-        push    bc
+    push    de
+    push    bc
 
 yloop:
-        push    bc
-        push    hl
-        push    de
-        ld      bc, p_RET1
-        push    bc
-        jp      (ix)                    ;    execute PLOT at (hl,de)
+    push    bc
+    push    hl
+    push    de
+    ld      bc, p_RET1
+    push    bc
+    jp      (ix)                        ;    execute PLOT at (hl,de)
 p_RET1:
-        pop     de
-        pop     hl
-        pop     bc
+    pop     de
+    pop     hl
+    pop     bc
 
-        inc     de
-        dec     bc                      ; y delta
-        ld      a, b
-        or      c
-        jr      nz, yloop
+    inc     de
+    dec     bc                          ; y delta
+    ld      a, b
+    or      c
+    jr      nz, yloop
 
-        pop     bc
-        pop     de
+    pop     bc
+    pop     de
 
-        inc     hl
+    inc     hl
 
-        exx
-        dec     hl                      ; x delta
-        ld      a, h
-        or      l
-        jr      nz, xloop
+    exx
+    dec     hl                          ; x delta
+    ld      a, h
+    or      l
+    jr      nz, xloop
 
-        ret
+    ret
 
-  ENDIF
+ENDIF

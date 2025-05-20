@@ -36,7 +36,7 @@ series, [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/s
 The explanation is that the header files in the include/ directory relate to
 functions in the _classic_ library. We're using the newer compiler with the _new_
 library, and you'll notice that there's no graphics.h file in the
-include/_DEVELOPMENT/sdcc directory. As of this writing, June 2017, the graphics
+include/_DEVELOPMENT/sdcc directory. As of this writing, October 2024, the graphics
 routines haven't yet been ported to the new library.
 
 Thus, for now at least, we meet a dead end. If your application requires the
@@ -185,7 +185,7 @@ that draws lines using the Bresenham algorithm. The results here will be quick b
 not going to be the fastest possible way to draw lines.
 
 It really isn't important to understand the Bresenham algorithm. The important
-point here is that Z88DK provides the low level tools which enable such a
+point here is that Z88DK provides the low level tools which enable such an
 algorithm to be implemented.
 
 Retaining our plot function and borrowing the internet line code, save the following in

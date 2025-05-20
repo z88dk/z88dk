@@ -52,15 +52,15 @@
 
 #endif
 
-#ifdef __8080__
+#ifdef __8080
 #define __DISABLE_BUILTIN
 #endif
 
-#ifdef __8085__
+#ifdef __8085
 #define __DISABLE_BUILTIN
 #endif
 
-#if __SDCC && __GBZ80__
+#if __SDCC && __GBZ80
 #define __DISABLE_BUILTIN
 #define __z88dk_fastcall
 #endif

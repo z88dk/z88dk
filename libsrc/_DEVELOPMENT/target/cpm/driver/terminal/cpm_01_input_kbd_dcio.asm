@@ -90,7 +90,7 @@
 ;
 ; * IOCTL_ITERM_CURS
 ;   enable / disable cursor in line mode
-; 
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,11 +119,11 @@ cpm_01_input_kbd_dcio:
 
    cp ITERM_MSG_GETC
    jp z, cpm_01_input_kbd_dcio_iterm_msg_getc
-   
+
    cp ITERM_MSG_INTERRUPT
    jp z, cpm_01_input_kbd_dcio_iterm_msg_interrupt
-   
+
    cp STDIO_MSG_FLSH
    jp z, cpm_01_input_kbd_dcio_stdio_msg_flsh
-   
+
    jp console_01_input_terminal    ; forward to library

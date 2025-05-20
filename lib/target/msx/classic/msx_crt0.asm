@@ -7,7 +7,7 @@
 
     EXTERN  _main
 
-    PUBLIC  cleanup
+    PUBLIC  __Exit
     PUBLIC  l_dcal
     PUBLIC  msxbios
 
@@ -16,6 +16,12 @@ IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
 ENDIF
     defc    __CPU_CLOCK = 3580000
+
+    ; Don't change the screenmode by default
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc CLIB_DEFAULT_SCREEN_MODE = -1
+ENDIF
+
 
 IF (!DEFINED_startup || (startup=1))
     INCLUDE	"target/msx/classic/ram.asm"
@@ -29,8 +35,14 @@ IF startup = 3
     INCLUDE	"target/msx/classic/rom.asm"
 ENDIF
 
+
+IFDEF __bdos
+    PUBLIC  __bdos
+ENDIF
+
+
     ; And include handling disabling screenmodes
-    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
     SECTION code_clib
 

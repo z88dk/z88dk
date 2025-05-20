@@ -39,39 +39,37 @@
 ; Some general scope declarations
 ;-------
 
-	EXTERN    _main		;main() is always external to crt0 code
-IF (startup=2)
-	EXTERN	_irq_handler	;Interrupt handlers
-ENDIF
-	PUBLIC    cleanup
-	PUBLIC    l_dcal          ;jp(hl)
+    EXTERN  _main		;main() is always external to crt0 code
+    EXTERN  _irq_handler	;Interrupt handlers
+    PUBLIC  __Exit
+    PUBLIC  l_dcal          ;jp(hl)
 
 
 
 IF !DEFINED_CRT_ORG_BSS
-	defc CRT_ORG_BSS =  RAM_Start   ; Static variables are kept in RAM
-	defc DEFINED_CRT_ORG_BSS = 1
+    defc    CRT_ORG_BSS =  RAM_Start   ; Static variables are kept in RAM
+    defc    DEFINED_CRT_ORG_BSS = 1
 ENDIF
 IF !DEFINED_CRT_ORG_CODE
-	defc CRT_ORG_CODE =  ROM_Start   ; Static variables are kept in RAM
-	defc DEFINED_CRT_ORG_CODE = 1
+    defc    CRT_ORG_CODE =  ROM_Start   ; Static variables are kept in RAM
+    defc    DEFINED_CRT_ORG_CODE = 1
 ENDIF
-        defc    TAR__register_sp = -1
-        defc    TAR__clib_exit_stack_size = 4
+    defc    TAR__register_sp = -1
+    defc    TAR__clib_exit_stack_size = 4
+    defc    TAR__crt_on_exit = 0x10001      ;loop forever
 
-	defc	__crt_org_bss = CRT_ORG_BSS
-	PUBLIC	__CPU_CLOCK
-	defc	__CPU_CLOCK = 2000000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    __crt_org_bss = CRT_ORG_BSS
+    PUBLIC  __CPU_CLOCK
+    defc    __CPU_CLOCK = 2000000
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
-	org    CRT_ORG_CODE
-	
+    org    CRT_ORG_CODE
 
 ; reset
 	di
 	ld sp,Stack_Top		; setup stack
-	call	crt0_init_bss
+	call	crt0_init
 	jp start		; jump to start
 
 
@@ -134,7 +132,10 @@ start:
 	ei
 ; Entry to the user code
 	call    _main
-cleanup:
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 endloop:
 	jr	endloop
 	
@@ -142,15 +143,15 @@ l_dcal:
 	jp      (hl)
 
 
-	; If we were given a model then use it
-	IF DEFINED_CRT_MODEL
-	  defc __crt_model = CRT_MODEL
-	ELSE
-	  defc __crt_model = 1
-	ENDIF
+    ; If we were given a model then use it
+    IF DEFINED_CRT_MODEL
+        defc __crt_model = CRT_MODEL
+    ELSE
+        defc __crt_model = 1
+    ENDIF
 
-	INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
 
 SECTION bss_crt

@@ -16,17 +16,17 @@ am48_double8:
    ;         AC'= (double)(n)
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
-   
+
    ld a,l
    or a
    jp p, am48_double8u
-   
+
    neg
-   
+
    call am48_double8u_0
-   
+
    exx
    set 7,b
    exx
-   
+
    ret

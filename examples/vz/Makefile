@@ -24,7 +24,7 @@ adv_a.vz: ../console/adv_a.c
 	zcc +vz -vn -DCOMPUTE_SCORE $^ -O3 -o $@
 
 globe.vz: ../graphics/globe.c
-	zcc +vz -vn -DNOLOGO -lm -llib3d $^ -O3 -Dhires -o $@
+	zcc +vz -vn -DNOLOGO -lm  $^ -O3 -Dhires -o $@
 
 microman.vz: ../microman.c
 	zcc +vz -vn $^ -I.. -DJOYSTICK_DIALOG -DDEFINE_JOYSTICK_TYPE -DCOMPACT=2 -DSIZE=6 -DSOUND -o microman.vz
@@ -45,7 +45,7 @@ snakes.vz: ../graphics/csnakes.c
 	zcc +vz -vn $^ -O3 -o $@
 
 %.vz: ../graphics/%.c
-	zcc +vz -I../graphics -vn $^ -O3 -o $@ -lm -llib3d
+	zcc +vz -I../graphics -vn $^ -O3 -o $@ -lm 
 
 %.vz: ../sound/%.c
 	zcc +vz -vn $^ -O3 -o $@ -lm

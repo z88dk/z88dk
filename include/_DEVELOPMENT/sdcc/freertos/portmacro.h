@@ -47,13 +47,15 @@
 
 /* Type definitions. */
 
+#define portPOINTER_SIZE_TYPE    uint16_t
+
 typedef uint16_t            StackType_t;
 typedef int8_t              BaseType_t;
 typedef uint8_t             UBaseType_t;
 
 #if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
     typedef uint16_t        TickType_t;
-    #define portMAX_DELAY    ( TickType_t ) ( 0xffff )
+    #define portMAX_DELAY    ( TickType_t ) ( 0xffffU )
 #elif ( configTICK_TYPE_WIDTH_IN_BITS  == TICK_TYPE_WIDTH_32_BITS )
     typedef uint32_t        TickType_t;
     #define portMAX_DELAY   ( TickType_t ) ( 0xffffffffUL )
@@ -259,8 +261,8 @@ extern void vPortYieldFromISR(void);
 /*-----------------------------------------------------------*/
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
-#define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
+#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void * pvParameters )
+#define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void * pvParameters )
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

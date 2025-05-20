@@ -5,15 +5,17 @@
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
+#include "options.h"
 #include "utlist.h"
-#include "zobjfile.h"
-#include "z80asm1.h"
-#include "z80asm_defs.h"
 #include "xmalloc.h"
+#include "z80asm_defs.h"
+#include "z80asm1.h"
+#include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
@@ -137,10 +139,14 @@ void make_library(const char *lib_filename) {
 
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
-            set_cpu_option(*cpu);
+            // only include non-strict cpus in library
+            if (cpu_is_strict(*cpu))
+                continue;
+
+            option_set_cpu(*cpu);
 
             for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
-                set_swap_ixiy_option(ixiy);
+                option_set_swap_ixiy(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++) {
                     const char* filename = option_file(i);
@@ -148,7 +154,7 @@ void make_library(const char *lib_filename) {
                     if (got_asm)
                         assemble_file(option_file(i));
 
-                    if (get_num_errors()) {
+                    if (get_error_count()) {
                         xfclose(fp);			/* error */
                         remove(utstring_body(temp_filename));
                         goto cleanup_and_return;
@@ -194,7 +200,8 @@ void make_library(const char *lib_filename) {
     remove(lib_filename);
     int rv = rename(utstring_body(temp_filename), lib_filename);
     if (rv != 0) {
-        error_file_rename(utstring_body(temp_filename));
+        error(ErrFileRename, utstring_body(temp_filename));
+        perror(utstring_body(temp_filename));
     }
 
 cleanup_and_return:

@@ -11,12 +11,7 @@
 
 long fdtell(int fd)
 {
-	struct	fcb *fc;
-
-	if(fd >= MAXFILE)
-		return -1;
-	
-	fc = &_fcb[fd];
+	struct	fcb *fc = (struct fcb *)fd;
 	
 	return (fc->rwptr);
 }

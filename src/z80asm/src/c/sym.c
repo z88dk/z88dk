@@ -9,6 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 One symbol from the assembly code - label or constant.
 */
 
+#include "errors.h"
 #include "expr1.h"
 #include "if.h"
 #include "scan1.h"

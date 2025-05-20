@@ -30,8 +30,6 @@ PUBLIC asm_am9511_float8u
 PUBLIC asm_am9511_float16u
 PUBLIC asm_am9511_float32u
 
-EXTERN asm_am9511_normalize
-
 ; convert unsigned char in l to float in dehl
 .asm_am9511_float8u
     ld h,0

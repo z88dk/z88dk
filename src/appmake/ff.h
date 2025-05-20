@@ -22,10 +22,6 @@
 #ifndef FF_DEFINED
 #define FF_DEFINED	86604	/* Revision ID */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "ffconf.h"		/* FatFs configuration options */
 
 #if FF_DEFINED != FFCONF_DEF
@@ -57,6 +53,9 @@ typedef unsigned short	WCHAR;	/* 16-bit unsigned integer */
 typedef unsigned long	DWORD;	/* 32-bit unsigned integer */
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Definitions of volume management */
 

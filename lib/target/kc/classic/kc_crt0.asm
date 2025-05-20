@@ -26,7 +26,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -80,21 +80,18 @@ ENDIF
 ENDIF
 
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"	
-    INCLUDE "crt/classic/crt_init_atexit.asm"	
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"	
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"	
 
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main	;Call user program
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 
@@ -120,7 +117,7 @@ IF !DEFINED_nointerrupsaving
     ld      ($01EA),hl
   ENDIF
 ENDIF
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 	pop	bc
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
@@ -187,8 +184,8 @@ INT01EA:
 ENDIF
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION code_crt_init
     ld      hl,$8000

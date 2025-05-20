@@ -33,7 +33,8 @@
 extern unsigned char a,b,c,d,e,h,l,j,k;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_,j_,k_;
 extern unsigned char xh, xl, yh, yl;
-extern unsigned char ioi, ioe, altd;
+extern unsigned char i, r7;
+extern unsigned char ioi, ioe, altd, alts, iff, im;
 
 extern unsigned short ff, fr, fa, fb, fk, pc, sp, mp;
 extern unsigned short ff_, fr_, fa_, fb_;
@@ -41,10 +42,12 @@ extern long long st;
 
 
 extern int trace;
-extern int rom_size;		/* amount of memory in low addresses that is read-only */
-extern int ioport;
-extern int rc2014_mode;
+extern int c_rom_size;		/* amount of memory in low addresses that is read-only */
+extern int c_ioport;
 extern int break_required;
+
+extern int c_rc2014_mode;
+extern int c_z80asm_tests;
 
 extern uint8_t verbose;
 extern char* script_file;
@@ -82,6 +85,9 @@ extern int f_(void);
 #define Z88DK_ENFILE   5
 #define Z88DK_ENOMEM   6
 
+extern void setf(int a);
+extern void cpu_run(long long counter, long long stint, int intr, int start, int end);
+
 typedef void (*hook_command)(void);
 
 extern void      PatchZ80(void);
@@ -90,11 +96,13 @@ extern void      hook_io_init(hook_command *cmds);
 extern void      hook_io_set_ide_device(int unit, const char *file);
 extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_cpm(void);
+extern void      hook_cpm_init(hook_command *cmds);
 extern void      hook_rc2014(void);
 extern void      hook_console_init(hook_command *cmds);
 
 extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
+extern int memory_in(int port);
 extern void memory_reset_paging();
 extern int       rabbit_get_ioi_reg(int reg);
 
@@ -271,6 +279,23 @@ extern void r4k_xor_hl_de(uint8_t opcode);
 extern void r4k_flag_cc_hl(uint8_t opcode, uint8_t set);
 extern void r4k_setsysp_mn(uint8_t opcode);
 extern void r4k_exp(uint8_t opcode);
+extern void r4k_test_rp2(uint8_t opcode, uint8_t rp2);
+extern void r4k_ld_hl_bc(uint8_t opcode);
+extern void r4k_ld_hl_de(uint8_t opcode);
+extern void r4k_ld_de_hl(uint8_t opcode);
+
+// r6k
+extern void r6k_swap_rp2(uint8_t opcode);
+extern void r6k_mul_hl_de(void);
+extern void r6k_mulu_hl_de(void);
+extern void r6k_handle_49_page(void);
+extern void r6k_ex_jkhl_bcde1(void);
+extern void r6k_swap_r32(uint8_t opcode, uint8_t isjkhl);
+extern void r6k_add_xy_d(uint8_t opc, uint8_t iy);
+extern void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy);
+extern void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy);
+extern void r6k_tstnull_ps(uint8_t opcode);
+extern void r6k_swap_r(uint8_t opcode);
 
 // rxk
 extern void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy);

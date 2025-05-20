@@ -1,6 +1,8 @@
 
 ; char *utoa(unsigned int num, char *buf, int radix)
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+
 SECTION code_clib
 SECTION code_stdlib
 
@@ -14,8 +16,10 @@ utoa_callee:
    pop bc
    pop de
    ex (sp),hl
-   
-   jp asm_utoa
+   push ix   
+   call asm_utoa
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC
@@ -23,3 +27,4 @@ PUBLIC _utoa_callee
 defc _utoa_callee = utoa_callee
 ENDIF
 
+ENDIF

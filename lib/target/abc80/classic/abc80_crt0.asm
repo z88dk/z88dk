@@ -13,7 +13,7 @@
     EXTERN    _main
 
 
-    PUBLIC    cleanup
+    PUBLIC    __Exit
     PUBLIC    l_dcal
 
     defc	CONSOLE_ROWS = 24
@@ -33,22 +33,19 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
         
-cleanup:
+__Exit:
     push	hl
     call    crt0_exit
-
     pop     bc
 __restore_sp_onexit:
     ld      sp,0
@@ -58,6 +55,6 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE	"crt/classic/crt_section.inc"
 

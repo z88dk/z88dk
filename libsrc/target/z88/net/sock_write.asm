@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_write
 
-        SECTION code_clib
-	PUBLIC	sock_write
-	PUBLIC	_sock_write
+    SECTION code_clib
+    PUBLIC  sock_write
+    PUBLIC  _sock_write
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_write
-._sock_write
-	ld	a,r_sock_write
-	call_pkg(tcp_all)
-	ret	nc
+sock_write:
+_sock_write:
+    ld      a, r_sock_write
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_write
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_write
+    jp      no_zsock

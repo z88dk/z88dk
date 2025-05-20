@@ -7,19 +7,19 @@
 
 ;set vdc reg, d = reg, e = val
 
-        SECTION code_clib
-	PUBLIC	vdcset
-	PUBLIC	_vdcset
+    SECTION code_clib
+    PUBLIC  vdcset
+    PUBLIC  _vdcset
 
 vdcset:
 _vdcset:
-        ld      bc,0d600h
-        out     (c),d
+    ld      bc, 0d600h
+    out     (c), d
 loop1:
-        in      d,(c)
-        bit     7,d
-        jr      z,loop1
-        inc     bc
-        out     (c),e
-        ret
+    in      d, (c)
+    bit     7, d
+    jr      z, loop1
+    inc     bc
+    out     (c), e
+    ret
 

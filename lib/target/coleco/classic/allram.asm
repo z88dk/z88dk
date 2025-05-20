@@ -11,10 +11,16 @@
 
     ; No interrupts registered
     defc    TAR__crt_enable_rst = $0000
-    IFNDEF CRT_ENABLE_NMI
-        defc        TAR__crt_enable_nmi = 1
-        defc        _z80_nmi = nmi_handler
-    ENDIF
+    defc    TAR__crt_on_exit = 0x10001  ;Loop forever
+IFNDEF CRT_ENABLE_NMI
+    defc        TAR__crt_enable_nmi = 1
+    defc        _z80_nmi = nmi_handler
+ENDIF
+
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
 
     defc    CRT_ORG_CODE = 0
 
@@ -28,30 +34,30 @@
 
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 program:
     ; Make room for the atexit() stack
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-    ld      hl,2
-    call    vdp_set_mode
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
 
-        ; Entry to the user code
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
+    ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     call    crt0_exit
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 l_dcal:
     jp      (hl)
@@ -96,8 +102,8 @@ _fgetc_cons:
 msxbios:
     ret
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     ; Include the IPL bootstrap code
     INCLUDE "target/coleco/classic/adam_bootstrap.asm"

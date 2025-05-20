@@ -14,7 +14,7 @@
 
     EXTERN    _main           ; main() is always external to crt0 code
 
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
 
 
@@ -32,6 +32,8 @@
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xebff
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $0000
     defc    __CPU_CLOCK = 4090909
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -43,32 +45,21 @@
 
 start:
     di
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     ld      hl,interrupt
     ld      (0xe788),hl		;RAM interrupt vector
-    call    crt0_init_bss
-    ei
+    call    crt0_init
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main           ; Call user program
-cleanup:
-    push    hl              ; return code
-
+__Exit:
     call    crt0_exit
-
-
-
-cleanup_exit:
-
-    pop     bc              ; return code (still not sure it is teh right one !)
-
-end:
-    rst     0
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
     
 interrupt:
     ei
@@ -78,7 +69,7 @@ l_dcal:
     jp      (hl)            ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     defc    __crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
@@ -86,7 +77,7 @@ l_dcal:
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
 
 

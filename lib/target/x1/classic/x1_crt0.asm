@@ -15,7 +15,7 @@
     EXTERN    _main
     EXTERN    _x1_printf
 
-    PUBLIC    cleanup 
+    PUBLIC    __Exit 
     PUBLIC    l_dcal
 
     PUBLIC	_wait_sub_cpu
@@ -54,9 +54,9 @@ _wait_sub_cpu:
          defc ansicolumns = 40
     ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 
 

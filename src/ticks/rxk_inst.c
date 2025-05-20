@@ -5,8 +5,8 @@
 
 
 // TODO: Setting P flag
-#define BOOL(hi, lo, hia, loa, isalt) do {                \
-          if ( isalt ) {                  \
+#define BOOL(hi, lo, hia, loa) do {                \
+          if ( altd ) {                  \
             loa = fr_ = hi|lo ? 1 : 0; hia = 0; ff_ &= ~256; \
           } else {                       \
             lo = fr = hi|lo ? 1 : 0; hi = 0; ff &= ~256; \
@@ -85,11 +85,12 @@ void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
     SUSPECT_IMPL("Need to set P flag");
     if ( ih ) {
-        BOOL(h,l, h_, l_, altd);
+        if ( alts )  BOOL( h_, l_, h_, l_);
+        else BOOL( h, l, h_, l_);
     } else if ( iy ) {
-        BOOL(yh, yl, yh, yl, 0);
+        BOOL(yh, yl, yh, yl);
     } else {
-        BOOL(xh,xl,xh,xl, 0);
+        BOOL(xh,xl,xh,xl);
     }
     st += 2;
 }
@@ -178,20 +179,19 @@ void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix)
     if ( prefix == 0xfd ) {
         if ( altd ) { h_ = yh; l_ = yl; }
         else { h = yh; l = yl; }
-        st += 4;
     } else {
         if ( altd ) { h_ = xh; l_ = xl; }
         else { h = xh; l = xl; }
-        st += 4;
     }
+    st += 4;
 }
 
 void rxk_ld_xy_hl(uint8_t opcode, uint8_t prefix)
 {
     if ( prefix == 0xfd ) {
-        yl = l; yh = h;
+        yl = alts ? l_ : l; yh = alts ? h_ : h;
     } else {
-        xl = l; xh = h;
+        xl = alts ? l_ : l; xh = alts ? h_ : h;
     }
     st += 4;
 }

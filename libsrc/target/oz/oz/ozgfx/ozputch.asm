@@ -13,27 +13,27 @@
 ; $Id: ozputch.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozputch
-	PUBLIC	_ozputch
+    SECTION code_clib
+    PUBLIC  ozputch
+    PUBLIC  _ozputch
 
-	EXTERN	ozputs
+    EXTERN  ozputs
 
 
 ozputch:
 _ozputch:
         ;ld   hl,6
-        ld	hl,2
-        add  hl,sp
-        ld   a,(hl)
-        ld   (ozputchbuf),a
-        ld   bc,ozputchbuf
-        ld   (hl),c
-        inc  hl
-        ld   (hl),b
-        jp   ozputs
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
+    ld      (ozputchbuf), a
+    ld      bc, ozputchbuf
+    ld      (hl), c
+    inc     hl
+    ld      (hl), b
+    jp      ozputs
 
-	SECTION bss_clib
+    SECTION bss_clib
 ozputchbuf:
-        defb 0	; Char to be printed
-        defb 0	; string terminator
+    defb    0                           ; Char to be printed
+    defb    0                           ; string terminator

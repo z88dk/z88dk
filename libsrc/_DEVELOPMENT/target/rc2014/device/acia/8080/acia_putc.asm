@@ -11,7 +11,6 @@ SECTION code_driver_character_output
 PUBLIC _acia_putc
 
 EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
-EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
 ._acia_putc
     ; enter    : l = char to output

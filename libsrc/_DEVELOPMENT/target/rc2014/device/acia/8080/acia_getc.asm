@@ -11,7 +11,6 @@ SECTION code_driver_character_input
 PUBLIC _acia_getc
 
 EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
-EXTERN asm_z80_push_di, asm_z80_pop_ei
 
 ._acia_getc
     ; exit     : l = char received
@@ -20,7 +19,6 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei
     ; modifies : af, hl
 
     ld a,(aciaRxCount)          ; get the number of bytes in the Rx buffer
-    ld l,a                      ; and put it in hl
     or a                        ; see if there are zero bytes available
     ret Z                       ; if the count is zero, then return
 

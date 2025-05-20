@@ -8,7 +8,7 @@ all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
 	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap marilyn.tap eagle.tap \
 	fern.tap thuemorse.tap wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
 	coswave_small.tap spritest.tap smile.tap xample.tap psgtest.tap \
-	ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
+	carpet.tap ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
 
 
 fontexample.tap: fontexample.c
@@ -18,7 +18,7 @@ clisp.tap: ../clisp/clisp.c
 	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=1200 -oclisp.bin
 
 clisp_speclisp.tap: ../clisp/clisp.c
-	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP -oclisp_speclisp.bin
+	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP -oclisp_speclisp.bin
 
 adv_a.tap: ../console/adv_a.c
 	zcc +zx -vn -lndos ../console/adv_a.c -I../console -create-app -DTAPE -DPICS -DCOMPUTE_SCORE -O3 -zorg=27000 -oadv_a.bin
@@ -81,7 +81,7 @@ ccoswave.tap: ccoswave.c
 	zcc +zx -vn ccoswave.c -lndos -lm -create-app -occoswave.bin
 
 c3d.tap: c3d.c
-	zcc +zx -vn c3d.c -lndos -llib3d -create-app -oc3d.bin
+	zcc +zx -vn c3d.c -lndos  -create-app -oc3d.bin
 
 cmandel.tap: cmandel.c
 	zcc +zx -vn cmandel.c -lndos -lm -create-app -ocmandel.bin
@@ -120,7 +120,7 @@ smallgfx.tap: ../graphics/smallgfx.c
 	zcc +zx -vn ../graphics/smallgfx.c -lndos -lm -create-app -osmallgfx.bin
 
 turtle.tap: ../graphics/turtle.c
-	zcc +zx -vn ../graphics/turtle.c -lndos -lm -llib3d -create-app -oturtle.bin
+	zcc +zx -vn ../graphics/turtle.c -lndos -lm  -create-app -oturtle.bin
 
 spirograph.tap: ../graphics/spirograph.c
 	zcc +zx -vn ../graphics/spirograph.c -lndos --math32 -create-app -ospirograph.bin
@@ -129,16 +129,19 @@ rndsphere.tap: ../graphics/rndsphere.c
 	zcc +zx -vn ../graphics/rndsphere.c -lndos -lm -create-app -orndsphere.bin
 
 stencil.tap: ../graphics/stencil.c
-	zcc +zx -vn ../graphics/stencil.c -lndos -lm -llib3d -create-app -ostencil.bin
+	zcc +zx -vn ../graphics/stencil.c -lndos -lm  -create-app -ostencil.bin
 
 clock.tap: ../graphics/clock.c
-	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm -llib3d -DDETAILED -create-app -oclock.bin
+	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm  -DDETAILED -create-app -oclock.bin
 
 showlib3d.tap: ../graphics/showlib3d.c
-	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm -llib3d -create-app -oshowlib3d.bin
+	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm  -create-app -oshowlib3d.bin
 
 marilyn.tap: ../graphics/marilyn.c
 	zcc +zx -vn ../graphics/marilyn.c -lndos -create-app -omarilyn.bin
+
+carpet.tap: ../graphics/carpet.c
+	zcc +zx -vn ../graphics/carpet.c -lndos -create-app -ocarpet.bin
 
 eagle.tap: ../graphics/eagle.c
 	zcc +zx -vn ../graphics/eagle.c -lndos -create-app -oeagle.bin
@@ -150,7 +153,7 @@ fern.tap: ../graphics/fern.c
 	zcc +zx -vn ../graphics/fern.c -lndos -lm -create-app -ofern.bin
 
 thuemorse.tap: ../graphics/thuemorse.c
-	zcc +zx -vn ../graphics/thuemorse.c -lndos -create-app -llib3d -othuemorse.bin
+	zcc +zx -vn ../graphics/thuemorse.c -lndos -create-app  -othuemorse.bin
 
 wintest.tap: ../graphics/wintest.c
 	zcc +zx -vn ../graphics/wintest.c -lndos -lm -create-app -owintest.bin

@@ -121,21 +121,21 @@ void genname(const char *fname, char *name)
         c++;
         *c = toupper(*c);
         
-        // Warnings of bad ideas in variable names
+        // Warnings of bad ideas in program (aka variable) names
         if (*c == ' ' && !has_warned_of_spaces){
             has_warned_of_spaces=1;
-            fprintf(stderr, "Warning: Use of spaces in the variable name is not certain to work on all calculators!\n");
+            fprintf(stderr, "Warning: Use of spaces in the program name is not certain to work on all calculators!\n");
         }
         if (*c >= '0' && *c <= '9' && !has_warned_of_number){
             has_warned_of_number=1;
-            fprintf(stderr, "Warning: Use of numbers in the variable name is not certain to work on all calculators!\n");
+            fprintf(stderr, "Warning: Use of numbers in the program name is not certain to work on all calculators!\n");
         }
 
         if (!isalnum(*c))
             *c = 0;
     } while (*c != 0);
     if (!strlen(str))
-        exit_log(1,"A valid variable name could not be generated!\n");
+        exit_log(1,"A valid program name could not be generated!\n");
     strcpy(name, str);
 }
 

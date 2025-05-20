@@ -10,17 +10,17 @@
 
     INCLUDE "graphics/grafix.inc"
 
-.draw_callee
-._draw_callee
+draw_callee:
+_draw_callee:
     pop     af
-    pop     de    ;y2
-    pop     hl    ;x2
-    exx        ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-    pop     de    ;y1
-    pop     hl    ;x1
-    push    af    ; ret addr
-    
+    pop     de                          ;y2
+    pop     hl                          ;x2
+    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    pop     de                          ;y1
+    pop     hl                          ;x1
+    push    af                          ; ret addr
+
 ; de = x1, hl = y1, hl'=x2, de'=y2
-.asm_draw
-	ld      c,'0'
-    jp    __v1050_line
+asm_draw:
+    ld      c, '0'
+    jp      __v1050_line

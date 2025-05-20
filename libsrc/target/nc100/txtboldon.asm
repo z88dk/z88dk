@@ -1,8 +1,8 @@
 
-                SECTION code_clib
-		PUBLIC	txtboldon
-		PUBLIC	_txtboldon
+    SECTION code_clib
+    PUBLIC  txtboldon
+    PUBLIC  _txtboldon
 
-.txtboldon
-._txtboldon
-		jp 0xB842
+txtboldon:
+_txtboldon:
+    jp      0xB842

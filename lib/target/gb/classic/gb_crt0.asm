@@ -19,7 +19,7 @@
     EXTERN  _main           ;main() is always external to crt0 code
     EXTERN  asm_im1_handler
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     PUBLIC  add_VBL
@@ -193,7 +193,7 @@ program:
     di
     ld      d,a	    ;Save CPU type
     xor     a
-    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     ; Clear from 0xc00 to 0xdfff
     ld      hl,0xdfff
     ld      c,0x20
@@ -231,7 +231,7 @@ clear3:
     ld      a,7
     ldh     (WX),a
 
-    call    crt0_init_bss
+    call    crt0_init
 
 	; Copy refresh_OAM routine to high ram
     ld      bc,refresh_OAM
@@ -287,32 +287,21 @@ copy1:
     ld      A,0x80
     ldh     (SC),a         ; Use external clock
 
-IF 0
-    ld      hl,sp+0
-    ld      d,h
-    ld      e,l
-    ld      hl,exitsp
-    ld      a,l
-    ld      (hl+),a
-    ld      a,h
-    ld      (hl+),a
-ENDIF
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+
     ei
     push    hl	;argv
     push    bc	;argc
     call    banked_call
     defw    _main
     defw    1		;Bank
-cleanup:
-    halt
-    nop
-    jr	cleanup
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 
 
@@ -655,9 +644,9 @@ __printTStates:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION	bss_crt
 

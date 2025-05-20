@@ -13,32 +13,32 @@
 ; $Id: ozblankscreen.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozblankscreen
-	PUBLIC	_ozblankscreen
-	
-	EXTERN	ozunblankscreen
-	EXTERN	ozsetlcdstate
-	
-	EXTERN	s_blanked
-	
-	EXTERN	s_ozlcdstatus
-	EXTERN	s_init_unblank
+    SECTION code_clib
+    PUBLIC  ozblankscreen
+    PUBLIC  _ozblankscreen
+
+    EXTERN  ozunblankscreen
+    EXTERN  ozsetlcdstate
+
+    EXTERN  s_blanked
+
+    EXTERN  s_ozlcdstatus
+    EXTERN  s_init_unblank
 
 
 ozblankscreen:
 _ozblankscreen:
-        ld      hl,ozunblankscreen	; was ozslow
-        ld      (s_init_unblank+1),hl
+    ld      hl, ozunblankscreen         ; was ozslow
+    ld      (s_init_unblank+1), hl
 
-        ld      a,1
-        ld      (s_blanked),a
-        ld      hl,(s_ozlcdstatus)
-        ld      a,l
-        or      40h
-        and     7fh
-        ld      l,a
-        push    hl
-        call    ozsetlcdstate
-        pop     hl
-        ret
+    ld      a, 1
+    ld      (s_blanked), a
+    ld      hl, (s_ozlcdstatus)
+    ld      a, l
+    or      40h
+    and     7fh
+    ld      l, a
+    push    hl
+    call    ozsetlcdstate
+    pop     hl
+    ret

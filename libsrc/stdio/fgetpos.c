@@ -12,16 +12,13 @@
  */
 
 #define ANSI_STDIO
-
-#ifdef Z80
 #define STDIO_ASM
-#endif
 
 #include <stdio.h>
 
 int fgetpos(FILE *fp, fpos_t *posn)
 {
-#ifdef Z80
+#ifdef __SCCZ80
 #asm
 IF __CPU_GBZ80__ | __CPU_INTEL__
     ld      hl,sp+2

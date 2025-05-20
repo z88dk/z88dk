@@ -1,9 +1,9 @@
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
-	PUBLIC    w_respixel
+    SECTION code_clib
+    PUBLIC  w_respixel
 
-	EXTERN   __v1050_pixel
+    EXTERN  __v1050_pixel
 
 ;
 ;       $Id: w_respixl.asm $
@@ -26,7 +26,7 @@
 ;  afbcdehl/.... different
 ;
 
-.w_respixel
+w_respixel:
 
-		ld c,'1'
-		jp __v1050_pixel
+    ld      c, '1'
+    jp      __v1050_pixel

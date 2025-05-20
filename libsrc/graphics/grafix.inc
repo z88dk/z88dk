@@ -78,10 +78,22 @@ IF FORvz
     defc    WANT_swapgfxbk = 0
 ENDIF
 
-IF FORg800
+IF FORg850
     DEFINE gotgfx
-    defc maxx    = 143    ; display size of the PC-G850
-    defc maxy    = 47    ; (a different "getmaxy" is provided for G800 and smaller ones)
+    defc maxx    = 144    ; display size of the PC-G850
+    defc maxy    = 48
+ENDIF
+
+IF FORg815
+    DEFINE gotgfx
+    defc maxx    = 144    ; display size of the PC-G815
+    defc maxy    = 32
+ENDIF
+
+IF FORe200
+    DEFINE gotgfx
+    defc maxx    = 120    ; display size of the PC-E200
+    defc maxy    = 28
 ENDIF
 
 IF FORh19
@@ -175,10 +187,22 @@ IF FORzx81hr64
     defc maxy    = 64
 ENDIF
 
+IF FORzx81hr128
+    DEFINE gotgfx
+    defc maxx    = 256
+    defc maxy    = 128
+ENDIF
+
 IF FORzx81hr192
     DEFINE gotgfx
     defc maxx    = 256
     defc maxy    = 192
+ENDIF
+
+IF FORzx81hr384
+    DEFINE gotgfx
+    defc maxx    = 256
+    defc maxy    = 384
 ENDIF
 
 IF FORzx81mt64
@@ -480,6 +504,13 @@ IF FORnascom
     DEFINE gotgfx
     defc maxx    = 96
     defc maxy    = 48
+    defc blankch    = 32
+ENDIF
+
+IF FORrc700
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 75
     defc blankch    = 32
 ENDIF
 
@@ -849,6 +880,28 @@ IF FORtim011
    DEFINE gotgfx
    defc maxx = 512
    defc maxy = 256
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORinteract
+   DEFINE gotgfx
+   defc maxx = 112
+   defc maxy = 77
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORhector1
+   DEFINE gotgfx
+   DEFINE GFX_noclip
+   defc maxx = 112
+   defc maxy = 77
+   defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORhectorhr
+   DEFINE gotgfx
+   defc maxx = 240
+   defc maxy = 226
    defc    WANT_swapgfxbk = 0
 ENDIF
 

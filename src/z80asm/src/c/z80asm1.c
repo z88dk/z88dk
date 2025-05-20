@@ -9,12 +9,14 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "die.h"
 #include "directives.h"
+#include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
 #include "module1.h"
+#include "options.h"
 #include "parse1.h"
 #include "scan1.h"
 #include "strpool.h"
@@ -61,7 +63,7 @@ void assemble_file( const char *filename ) {
 	// when building libraries need to reset codearea to allow total library size > 64K
 	// when building binary cannot reset codearea so that each module is linked
 	// after the previous one, allocating addresses
-	if (!(option_make_bin() || option_bin_file() || option_consol_obj_file()))
+	if (!(option_make_bin() || option_bin_file() || option_is_consol_obj_file()))
 		reset_codearea();
 
 	// Create module data structures for new file
@@ -73,7 +75,7 @@ void assemble_file( const char *filename ) {
 	}
 	else {
         // check -o file as output of a single assembly file
-        if (option_consol_obj_file() && option_files_size() == 1) {
+        if (option_is_consol_obj_file() && option_files_size() == 1) {
             obj_filename = option_consol_obj_file_name();
         }
 
@@ -101,7 +103,7 @@ void assemble_file( const char *filename ) {
 *----------------------------------------------------------------------------*/
 static void do_assemble(const char *src_filename, const char* obj_filename)
 {
-    int start_errors = get_num_errors();     /* count errors in this source file */
+    int start_errors = get_error_count();     /* count errors in this source file */
 
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();
@@ -113,6 +115,7 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
 		printf("Assembling '%s'\n", path_canon(src_filename));
 
 	list_open(get_lis_filename(src_filename));
+    init_local_labels();
 	parse_file(src_filename);
 	asm_MODULE_default();			/* Module1 name must be defined */
 	clear_error_location();
@@ -121,7 +124,7 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
 	list_close();
 
 	/* remove incomplete object file */
-	if (start_errors != get_num_errors())
+	if (start_errors != get_error_count())
 		remove(obj_filename);
 
 	remove_all_local_syms();
@@ -136,7 +139,7 @@ static void do_assemble(const char *src_filename, const char* obj_filename)
  * Main entry of Z80asm
  ***************************************************************************************************/
 int z80asm_main() {
-	if (!get_num_errors()) {		/* if no errors in command line parsing */
+	if (!get_error_count()) {		/* if no errors in command line parsing */
         if (!option_lib_for_all_cpus()) {
             for (size_t i = 0; i < option_files_size(); i++)
                 assemble_file(option_file(i));
@@ -144,20 +147,20 @@ int z80asm_main() {
 	}
 
 	/* Create output file */
-	if (!get_num_errors()) {
+	if (!get_error_count()) {
 		if (option_lib_file()) {
 			make_library(option_lib_file());
 		}
 		else if (option_make_bin()) {
 			link_modules();
 
-			if (!get_num_errors())
+			if (!get_error_count())
 				CreateBinFile();
 
-			if (!get_num_errors())
+			if (!get_error_count())
 				checkrun_appmake();		/* call appmake if requested in the options */
 		}
-        else if (option_consol_obj_file() && option_files_size() > 1) {	// -o consolidated obj
+        else if (option_is_consol_obj_file() && option_files_size() > 1) {	// -o consolidated obj
             link_modules();
 
             set_cur_module(get_first_module(NULL));
@@ -165,10 +168,10 @@ int z80asm_main() {
             CURRENTMODULE->filename = get_asm_filename(option_consol_obj_file_name());
             CURRENTMODULE->modname = remove_extension(path_file(CURRENTMODULE->filename));
 
-            if (!get_num_errors())
+            if (!get_error_count())
                 write_obj_file(option_consol_obj_file_name());
 
-            if (!get_num_errors() && option_symtable())
+            if (!get_error_count() && option_symtable())
                 write_sym_file(CURRENTMODULE);
         }
 	}
@@ -181,7 +184,7 @@ int z80asm_main() {
 			m_free(reloctable);
 	}
 
-	if (get_num_errors())
+	if (get_error_count())
 		return EXIT_FAILURE;
 	else
 		return EXIT_SUCCESS;

@@ -14,7 +14,7 @@
 
     EXTERN    _main		;main() is always external to crt0
 
-    PUBLIC    cleanup		;jp'd to by exit()
+    PUBLIC    __Exit		;jp'd to by exit()
     PUBLIC    l_dcal		;jp(hl)
 
 
@@ -35,14 +35,11 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     dec     sp
-    call    crt0_init_bss
-    ld      (exitsp),sp
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 
 ; Push pointers to argv[n] onto the stack now
@@ -76,7 +73,9 @@ find_end:
     ; now HL points to the end of command line
     ; and C holds the length of args buffer
     ld      b,0
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
+
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     push    hl      ;argv
     push    bc      ;argc
@@ -84,10 +83,11 @@ find_end:
     pop     bc	;kill argv
     pop     bc	;kill argc
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     bc      ;Get exit() value into bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0		;Pick up entry sp
     jp      $1FFA	; HOT boot
@@ -95,8 +95,8 @@ __restore_sp_onexit:
 l_dcal:
     jp  (hl)		;Used for call by function ptr
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
 

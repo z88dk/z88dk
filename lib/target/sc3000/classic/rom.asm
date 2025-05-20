@@ -20,6 +20,7 @@ ENDIF
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__fgetc_cons_inkey = 1
     defc	__CPU_CLOCK = 3580000
+    defc    TAR__crt_enable_eidi = $02
 
     ; VDP signals delivered to im1
     defc    TAR__crt_enable_rst = $8080
@@ -31,7 +32,13 @@ ENDIF
         EXTERN asm_nmi_handler
         defc _z80_nmi = asm_nmi_handler
     ENDIF
+
+    IFNDEF CLIB_DEFAULT_SCREEN_MODE
+        defc    CLIB_DEFAULT_SCREEN_MODE = 1
+    ENDIF
+
     INCLUDE	"crt/classic/crt_rules.inc"
+
 
     EXTERN  vdp_set_mode
     EXTERN  im1_vectors
@@ -43,10 +50,10 @@ if (ASMPC = $0000)
     di
     jp      program
 
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 
     ; Interrupt routine, defines tms9918_interrupt
-    INCLUDE	"crt/classic/tms9918/interrupt.asm"
+    INCLUDE	"crt/classic/tms99x8/tms99x8_interrupt.inc"
     ei
     reti
 
@@ -62,30 +69,27 @@ ENDIF
 
 
 program:
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
-    ; Initialise mode 2 by default
-    ld      hl,1
-    call    vdp_set_mode
     im      1
-    ;	ei
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
-
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    pop     hl
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
 
 

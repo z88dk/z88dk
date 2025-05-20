@@ -14,18 +14,16 @@ EXTERN l_compare_result
 
 l_uge:
 
-   ; DE >= HL [unsigned
+   ; DE >= HL [unsigned]
 
    ; set carry if true
 
    ld a,d
    cp h
-   
    ccf
    jp nz, l_compare_result
-   
+
    ld a,e
    cp l
-   
    ccf
    jp l_compare_result

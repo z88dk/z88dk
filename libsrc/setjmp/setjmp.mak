@@ -10,6 +10,7 @@ SETJMP_OBJS := $(addprefix setjmp/obj/z80/, $(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/ixiy/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/z80n/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/8080/,$(SETJMP_OBJECTS)) \
+	$(addprefix setjmp/obj/8085/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/gbz80/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/z180/,$(SETJMP_OBJECTS)) \
 	$(addprefix setjmp/obj/ez80_z80/,$(SETJMP_OBJECTS)) \
@@ -25,6 +26,7 @@ setjmp: $(SETJMP_OBJS)
 $(eval $(call buildbit,setjmp,z80,test))
 $(eval $(call buildbit,setjmp,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,setjmp,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,setjmp,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,setjmp,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,setjmp,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,setjmp,r4k,test,-clib=rabbit4k,-mr4k))

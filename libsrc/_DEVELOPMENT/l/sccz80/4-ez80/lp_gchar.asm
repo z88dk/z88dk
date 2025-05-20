@@ -16,4 +16,8 @@ lp_gchar:
     ld.l      (hl),e   ; store the E register at the HLU location on stack
     pop.l     hl       ; pop a correct (far pointer) long address into 24 bit HL
     ld.l      a,(hl)   ; get a byte from that location into A.
+    ld        l,a
+    rlca
+    sbc       a
+    ld        h,a
     ret                ; return from a short call

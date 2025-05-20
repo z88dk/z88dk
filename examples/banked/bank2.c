@@ -16,6 +16,8 @@
 #endif
 
 
+const int banked_val = 4;
+
 int func_bank2() {
     // printf is in common code
     printf("Printing from bank%d\n",BANK);

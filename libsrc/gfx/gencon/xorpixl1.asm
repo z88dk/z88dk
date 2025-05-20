@@ -4,9 +4,9 @@
 
 
 
-        SECTION code_clib
-        PUBLIC  xorpixel
+    SECTION code_clib
+    PUBLIC  xorpixel
 
 xorpixel:
-        defc    NEEDxor=1
-        INCLUDE "pixel1.inc"
+    defc    NEEDxor=1
+    INCLUDE "pixel1.inc"

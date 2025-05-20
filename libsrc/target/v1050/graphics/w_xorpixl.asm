@@ -1,9 +1,9 @@
-	INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
-	PUBLIC    w_xorpixel
+    SECTION code_clib
+    PUBLIC  w_xorpixel
 
-	EXTERN   __v1050_pixel
+    EXTERN  __v1050_pixel
 
 ;
 ;       $Id: w_xorpixl.asm $
@@ -26,7 +26,7 @@
 ;  afbcdehl/.... different
 ;
 
-.w_xorpixel
+w_xorpixel:
 
-		ld c,'8'
-		jp __v1050_pixel
+    ld      c, '8'
+    jp      __v1050_pixel

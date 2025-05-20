@@ -1,8 +1,8 @@
 
 
-SECTION code_driver
-PUBLIC lcd_set_cursor
-PUBLIC _lcd_set_cursor
+    SECTION code_driver
+    PUBLIC  lcd_set_cursor
+    PUBLIC  _lcd_set_cursor
 
 
 lcd_set_cursor:

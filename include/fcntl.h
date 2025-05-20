@@ -81,7 +81,7 @@ extern int  __LIB__ rmdir(const char *);
 
 #ifndef RND_BLOCKSIZE
 extern void *_RND_BLOCKSIZE;
-#define RND_BLOCKSIZE &_RND_BLOCKSIZE
+#define RND_BLOCKSIZE (int)&_RND_BLOCKSIZE
 #endif
 
 

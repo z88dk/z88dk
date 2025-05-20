@@ -12,9 +12,9 @@
 ; $Id: ozkeylower.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozkeylower
-	PUBLIC	_ozkeylower
+    SECTION code_clib
+    PUBLIC  ozkeylower
+    PUBLIC  _ozkeylower
 
 
 ozkeylower:
@@ -25,19 +25,19 @@ _ozkeylower:
         ;push    hl     ; pushed byte
         ;pop     bc
 
-	pop	hl
-	pop	bc	; pick the mask
-	push	bc
-	push	hl
+    pop     hl
+    pop     bc                          ; pick the mask
+    push    bc
+    push    hl
 
-        xor     a
-        out     (18),a
-        ld      a,c
-        out     (17),a
-        in      a,(16)
-        ld      c,a
-        ld      b,0
-        push    bc
-        pop     hl
-        ret
+    xor     a
+    out     (18), a
+    ld      a, c
+    out     (17), a
+    in      a, (16)
+    ld      c, a
+    ld      b, 0
+    push    bc
+    pop     hl
+    ret
 

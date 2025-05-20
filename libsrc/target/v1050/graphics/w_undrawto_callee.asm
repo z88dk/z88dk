@@ -10,18 +10,18 @@
 
     INCLUDE "graphics/grafix.inc"
 
-.undrawto_callee
-._undrawto_callee
+undrawto_callee:
+_undrawto_callee:
     pop     af
     pop     de
     pop     hl
     push    af
 
 ; de = x1, hl = y1, hl'=x2, de'=y2
-.asm_undrawto
+asm_undrawto:
     exx
-    ld      de,(__gfx_coords+2)
-    ld      hl,(__gfx_coords)
+    ld      de, (__gfx_coords+2)
+    ld      hl, (__gfx_coords)
 
-	ld      c,'1'
-    jp    __v1050_line
+    ld      c, '1'
+    jp      __v1050_line

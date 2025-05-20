@@ -98,17 +98,19 @@ ragel, to expand token definition from token_def.h.
 	TOKEN_8085_1(opcode, #opcode)
 
 #define TOKEN_EZ80_1(opcode, string)	 \
-	string <CAT> i										<NL> \
-	{													<NL> \
-		<TAB>		if (option_cpu() == CPU_EZ80 ||		<NL> \
-					    option_cpu() == CPU_EZ80_Z80) {	<NL> \
-		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
-		<TAB>		}									<NL> \
-		<TAB>		else {								<NL> \
-		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
-		<TAB>		}									<NL> \
-		<TAB>		fbreak; 							<NL> \
-	};													<NL>
+	string <CAT> i												<NL> \
+	{															<NL> \
+		<TAB>		if (option_cpu() == CPU_EZ80 ||				<NL> \
+					    option_cpu() == CPU_EZ80_Z80 ||			<NL> \
+					    option_cpu() == CPU_EZ80_STRICT ||		<NL> \
+					    option_cpu() == CPU_EZ80_Z80_STRICT) {	<NL> \
+		<TAB><TAB>		sym.tok        = TK_##opcode;			<NL> \
+		<TAB>		}											<NL> \
+		<TAB>		else {										<NL> \
+		<TAB><TAB>		sym.tok        = TK_NAME;				<NL> \
+		<TAB>		}											<NL> \
+		<TAB>		fbreak; 									<NL> \
+	};															<NL>
 
 #define TOKEN_EZ80(opcode)	 \
 	TOKEN_EZ80_1(opcode, #opcode)
@@ -132,7 +134,8 @@ alnum_u = alnum | '_';
 alpha_u = alpha | '_';
 
 /* Name */
-name = alpha_u alnum_u*;
+name1 = alpha_u alnum_u*;
+name = '@' name1 | name1 '@' name1 | name1;
 
 /* Label */
 label = "." hspace0 name | name hspace0 ":";
@@ -248,13 +251,13 @@ main := |*
 			if (Str_len(string) == 1)
 				sym.number = Str_data(string)[0];
 			else
-				error_invalid_char_const(); 
+                error(ErrInvalidCharConst, NULL);
 				
 			STR_DELETE(string);
 		}
 		else
 		{
-			error_invalid_char_const(); 
+            error(ErrInvalidCharConst, NULL);
 		}
 		ts = te = p;
 		fbreak;
@@ -265,7 +268,7 @@ main := |*
 	{ 
 		sym.tok = TK_STRING;
 		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
-			error_missing_quote(); 
+            error(ErrMissingQuote, NULL);
 		fbreak;
 	};
 	

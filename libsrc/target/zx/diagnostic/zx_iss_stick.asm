@@ -11,15 +11,15 @@
 ;	$Id: zx_iss_stick.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_iss_stick
-	PUBLIC	_zx_iss_stick
-	
+    SECTION code_clib
+    PUBLIC  zx_iss_stick
+    PUBLIC  _zx_iss_stick
+
 zx_iss_stick:
 _zx_iss_stick:
-	ld	hl,0
-	in	a,(32)
-	cp	32
-	ret	nc
-	inc	hl
-	ret
+    ld      hl, 0
+    in      a, (32)
+    cp      32
+    ret     nc
+    inc     hl
+    ret

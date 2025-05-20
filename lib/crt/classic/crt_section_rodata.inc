@@ -17,6 +17,9 @@
 IF !__crt_org_graphics
     SECTION rodata_graphics
 ENDIF
+IF !__crt_org_far
+    SECTION rodata_far
+ENDIF
     SECTION rodata_user
     SECTION rodata_font
     SECTION rodata_font_fzx

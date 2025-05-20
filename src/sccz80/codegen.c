@@ -103,7 +103,7 @@ struct _mapping {
         { "f2uint",  "ifix",  "l_f16_f2uint",  "l_f32_f2uint",  "l_f64_f2uint", "l_fix16_f2uint", "l_fix32_f2uint" },
         { "f2slong", "ifix",  "l_f16_f2slong", "l_f32_f2slong", "l_f64_f2slong", "l_fix16_f2slong", "l_fix32_f2slong" },
         { "f2ulong", "ifix",  "l_f16_f2ulong", "l_f32_f2ulong", "l_f64_f2ulong", "l_fix16_f2ulong", "l_fix32_f2ulong" },
-        { "f2slllong", "l_f48_f2sllong", "l_f16_f2sllong", "l_f32_f2sllong", "l_f64_f2sllong", "l_fix16_f2sllong", "l_fix32_f2sllong" },
+        { "f2sllong", "l_f48_f2sllong", "l_f16_f2sllong", "l_f32_f2sllong", "l_f64_f2sllong", "l_fix16_f2sllong", "l_fix32_f2sllong" },
         { "f2ullong",  "l_f48_f2ullong", "l_f16_f2ullong", "l_f32_f2ullong", "l_f64_f2ullong", "l_fix16_f2ullong", "l_fix32_f2ullong" },
         { "fpush",   "dpush",  NULL,            NULL, "l_f64_dpush", NULL, NULL },
         { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3", NULL, NULL }, // Inlined
@@ -234,7 +234,6 @@ void DoLibHeader(void)
     outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
     if (c_notaltreg) {
         ol("EXTERN\tsaved_hl");
-        ol("EXTERN\tsaved_de");
     }
     donelibheader = 1;
 }
@@ -287,6 +286,18 @@ static void switch_namespace(char *name)
  */
 void gen_load_static(SYMBOL* sym)
 {
+    if ( sym->ctype->flags & FARACC ) {
+        LVALUE lval={0};
+
+        // Load the address and convert it
+        gen_address(sym);
+        
+        lval.ltype = sym->ctype;
+        lval.flags = FARACC;
+        lval.indirect_kind = sym->ctype->kind;
+        gen_load_indirect(&lval);
+        return;
+    }
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_CHAR) {
         if ( (sym->ctype->isunsigned) == 0 )  {
@@ -323,10 +334,10 @@ void gen_load_static(SYMBOL* sym)
 
 #endif
     } else if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
-        address(sym);
+        gen_address(sym);
         dcallrts("dload", KIND_DOUBLE);
     } else if (sym->ctype->kind == KIND_LONGLONG ) {
-        address(sym);
+        gen_address(sym);
         callrts("l_i64_load");
     } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
         if ( IS_GBZ80() ) {
@@ -378,13 +389,31 @@ int getloc(SYMBOL* sym, int off)
     return (offs);
 }
 
+
+void gen_address(SYMBOL* ptr)
+{
+    if ( ptr->ctype->flags & FARACC ) {
+        outfmt("\tld\thl,+(%s%s %% 65536)\n", dopref(ptr) ? Z80ASM_PREFIX : "", ptr->name);
+        outfmt("\tld\tde,+(%s%s / 65536)\n",  dopref(ptr) ? Z80ASM_PREFIX : "", ptr->name);
+        callrts("l_far_mapaddr");
+    } else {
+        immed();
+        outname(ptr->name, dopref(ptr));
+        nl();
+        if ( ptr->ctype->kind == KIND_CPTR ) {
+            const2(0);
+        }
+    }
+}
+
+
 /* Store the primary register into the specified */
 /*      static memory cell */
 void gen_store_static(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
-        address(sym);
+        gen_address(sym);
         dcallrts("dstore", KIND_DOUBLE);
     } else if (sym->ctype->kind == KIND_CHAR) {
         ol("ld\ta,l");
@@ -818,10 +847,11 @@ void gen_load_indirect(LVALUE* lval)
     if (flags & FARACC) { /* Access via far method */
         switch (typeobj) {
         case KIND_CHAR:
-            callrts("lp_gchar");
-            if (!sign)
-                callrts("l_sxt");
-            /*                        else ol("ld\th,0"); */
+            if (!sign) {
+                callrts("lp_gchar");
+            } else {
+                callrts("lp_guchar");
+            }
             break;
         case KIND_CPTR:
             callrts("lp_gptr");
@@ -949,6 +979,13 @@ void gen_push_primary(LVALUE *lval)
     case KIND_CPTR:
         lpush();
         break;
+    case KIND_ARRAY:
+        if ( lval->flags & FARACC ) {
+            lpush();
+        } else {
+            zpush();
+        }
+        break;
     default:
         zpush();
     }
@@ -1003,6 +1040,9 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
         outfmt("\tld\tbc,%d\n",type->size);
         ol("ldir");
         return type->size;
+    } else if ( expr == KIND_ARRAY && (type->flags & FARACC) ) {
+        lpush();
+        return 4;
     }
     // Default push the word
     push("hl");
@@ -1414,6 +1454,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     int savesp;
     Kind save = vartype;
     int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
+    int saved_hl = 0;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
@@ -1458,25 +1499,22 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             Zsp += 2;
         }
 
-        if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE && vartype != KIND_LONGLONG) && abs(Zsp) >= 11 ) {
+        if ( c_notaltreg && vartype == KIND_LONG && abs(Zsp) >= 13 ) { // Return address is considered part of Zsp here, so +2 on modstk code
             // 8080, save hl, pop return int hl
             ol("ld\t(saved_hl),hl");
-            pop("hl");
-        } else {
-            // Pop return address into bc
-            pop("bc");
-            bcused = 1;
+            saved_hl = 1;
         }
-
+        // Pop return address into bc
+        pop("bc");
+   
         if ( Zsp > 0 ) {
             errorfmt("Internal error: Cannot cleanup function by lowering sp: Zsp=%d",1,Zsp);
         }
-        modstk(0, vartype, NO, !bcused);
+        modstk(0, vartype, NO, NO);
 
-        if ( bcused ) {
-            ol("push\tbc");
-        } else {
-            push("hl");
+        ol("push\tbc");
+
+        if (saved_hl) {
             ol("ld\thl,(saved_hl)");
          }
          Zsp = savesp;
@@ -1623,8 +1661,11 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         }
         // We're on 8080 and returning a value
         if ( save == KIND_LONG ) {
-            ol("ld\tb,h");
-            ol("ld\tc,l");
+            // usebc=NO for return from callee function
+            if ( usebc ) {
+                ol("ld\tb,h");
+                ol("ld\tc,l");
+            }
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
             swap();
         }
@@ -1632,8 +1673,10 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         ol("add\thl,sp");
         ol("ld\tsp,hl");
         if ( save == KIND_LONG ) {
-            ol("ld\th,b");
-            ol("ld\tl,c");
+            if ( usebc ) {
+                ol("ld\th,b");
+                ol("ld\tl,c");
+            }
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
             swap();
         }

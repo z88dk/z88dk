@@ -4,7 +4,7 @@
 #define STDIO_ASM
 #include <stdio.h>
 
-#ifdef __8080__
+#if __8080 || __8085
 int fread(void *ptr, size_t size, size_t nmemb, FILE *fp) {
     if ( (fp->flags & (_IOUSE|_IOREAD|_IOSYSTEM)) == (_IOUSE|_IOREAD)) {
         unsigned int len = size * nmemb;

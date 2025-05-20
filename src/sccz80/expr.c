@@ -494,20 +494,19 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     Type *old_type = lval->ltype;
 
-
     lval->symbol = NULL;
     if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_FUNC ) {
         return lval->symbol;
     }
 
     lval->ltype = lval->ltype->ptr;
-    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR )
+    if ( !ispointer(lval->ltype) ) 
         lval->ptr_type = KIND_NONE;
     else
         lval->ptr_type = lval->ltype->ptr->kind;
     lval->val_type = lval->indirect_kind = lval->ltype->kind;
 
-    if ( old_type->kind == KIND_CPTR ) {
+    if ( old_type->kind == KIND_CPTR || (old_type->kind != KIND_PTR && (lval->flags & FARACC) )  ) {
         lval->flags |= FARACC;
     } else {
         lval->flags &= ~FARACC;
@@ -605,20 +604,19 @@ int heira(LVALUE *lval)
         if (heira(lval) == 0) {
             lval->ltype = make_pointer(lval->ltype);
             lval->ptr_type = lval->ltype->ptr->kind;
-            lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
+            lval->val_type = lval->ltype->kind = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
             return 0;
         }
         lval->ltype = make_pointer(lval->ltype);
         lval->ptr_type = lval->ltype->ptr->kind;
-        lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
-
+        lval->val_type = lval->ltype->kind = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
         if (lval->symbol) {
             lval->symbol->isassigned = YES;
         }
         if (lval->indirect_kind)
             return 0;
         /* global & non-array */
-        address(lval->symbol);
+        gen_address(lval->symbol);
         lval->indirect_kind = lval->symbol->ctype->kind;
         lval->node = ast_uop(OP_ADDR, lval->node);
         return 0;
@@ -655,8 +653,8 @@ int heirb(LVALUE* lval)
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
             if (cmatch('[')) {
+                int savesp;
                 Type *type;
-
                 if (k && ispointer(lval->ltype)) {
                     rvalue(lval);
                 } else if ( !ispointer(lval->ltype) && lval->ltype->kind != KIND_ARRAY) {
@@ -666,6 +664,7 @@ int heirb(LVALUE* lval)
                     return 0;
                 }
                 setstage(&before, &start);
+                savesp = Zsp;
                 if (lval->ltype->kind == KIND_CPTR)
                     lpush();
                 else
@@ -676,9 +675,7 @@ int heirb(LVALUE* lval)
                 val = dval;
                 needchar(']');
                 if (con) {
-                    Zsp += 2; /* undo push */
-                    if (lval->ltype->kind == KIND_CPTR)
-                        Zsp += 2;
+                    Zsp = savesp;
                     if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
                         warningfmt("unknown","Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
@@ -687,7 +684,7 @@ int heirb(LVALUE* lval)
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
-                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY && ptr->ctype->kind != KIND_PTR) {
+                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY &&  (ptr->ctype->kind != KIND_PTR && ptr->ctype->kind != KIND_CPTR)) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
@@ -704,7 +701,9 @@ int heirb(LVALUE* lval)
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
                         lval->node = ast_binop(OP_ADD, lval->node, ast_literal(type_int, val-lval->offset));
+                        //lval->val_type = ((lval->flags & FARACC) || lval->val_type == KIND_CPTR) ? KIND_CPTR : KIND_PTR; TODO?
                         zadd_const(lval, val  - lval->offset);
+                     //   lval->val_type = stype;
                         lval->offset = 0;
                     }
                 } else {
@@ -729,7 +728,7 @@ int heirb(LVALUE* lval)
                     }
                     /* If near, then pop other side back, otherwise
                        load high reg with de and do an add  */
-                    if (lval->ltype->kind == KIND_CPTR) {
+                    if (lval->ltype->kind == KIND_CPTR || (lval->flags & FARACC) ) {
                         const2(0);
                     } else {
                         zpop();
@@ -782,8 +781,9 @@ int heirb(LVALUE* lval)
                 lval->val_type = lval->ltype->kind;
                 lval->symbol = NULL;
                 // Function returing pointer
-                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR ) {
+                if ( ispointer(lval->ltype) ) {
                     lval->val_type = lval->ltype->kind;
+                    lval->ptr_type = lval->ltype->kind;
                     lval->indirect_kind = lval->ltype->kind;
                 }
             }
@@ -801,7 +801,6 @@ int heirb(LVALUE* lval)
                     str = lval->cast_type;
                 }
                 name_result = symname(sname);
-
                 if ( str->kind == KIND_PTR || str->kind == KIND_CPTR) {
                     if ( direct ) {
                         UT_string *us;
@@ -839,19 +838,25 @@ int heirb(LVALUE* lval)
                     junk();
                     return 0;
                 }
+
                 /*
                  * Here, we're trying to chase our member up, we have to be careful
                  * not to access via far methods near data..
                  */
-                if (k && direct == 0)
+                if (k && direct == 0) {
                     rvalue(lval);
+                }
 
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = member_type->flags;
-                if (direct == 0) {
-                    if ( lval->ltype->kind == KIND_CPTR ) {
-                        flags |= FARACC;
-                    }
+
+                // We need to acccess via FARACC if:
+                // 1. We're accessing via a cptr
+                // 2. Our parent was FARACC
+                if ( lval->ltype->kind == KIND_CPTR ) {
+                    flags |= FARACC;
+                } else if ( (lval->flags & FARACC) && (member_type->kind == KIND_CPTR || lval->ltype    ->kind == KIND_STRUCT) ) {
+                    flags |= FARACC;
                 }
                 lval->flags = flags;
                 lval->node = ast_binop(OP_ADD, lval->node, ast_literal(type_int,member_type->offset));
@@ -874,11 +879,13 @@ int heirb(LVALUE* lval)
                 return k;
         }
     if (ptr && ptr->ctype->kind == KIND_FUNC) {
-        address(ptr);
+        gen_address(ptr);
         lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
         lval->ltype = ptr->ctype;
         lval->flags = ptr->flags;
         return 0;
+    } else if ( ptr && ptr->ctype->flags & FARACC ) {
+        lval->flags = FARACC;
     }
     return k;
 }

@@ -5,13 +5,14 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "args.h"
 #include "if.h"
+#include "options.h"
 #include "scan2.h"
 #include "utils.h"
-#include <unordered_map>
+#include "utils2.h"
 #include <cassert>
 #include <cmath>
+#include <unordered_map>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -28,7 +29,8 @@ using namespace std;
     end 	= "\x00";
     ws		=  [ \t\v\f];
     nl		= "\r\n"|"\r"|"\n";
-    ident 	= [_a-zA-Z][_a-zA-Z0-9]*;
+    ident1 	= [_a-zA-Z][_a-zA-Z0-9]*;
+    ident   = '@' ident1 | ident1 '@' ident1 | ident1;
     bin		= [0-1];
     oct		= [0-7];
     dec		= [0-9];
@@ -51,6 +53,7 @@ static double a2f(const char* start, const char* end) {
 }
 
 static string str_swap_x_y(string str) {
+    // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
     for (auto& c : str) {
         switch (c) {
         case 'x': c = 'y'; break;
@@ -126,7 +129,10 @@ string Token::to_string() const {
     case TType::String:
         return string_bytes(m_svalue);
     default:
-        return tokens[static_cast<int>(m_type)];
+        if (g_options.get_swap_ixiy() != IXIY_NO_SWAP)
+            return str_swap_x_y(tokens[static_cast<int>(m_type)]);
+        else
+            return tokens[static_cast<int>(m_type)];
     }
 }
 
@@ -174,14 +180,14 @@ string Token::concat(const string& s1, const string& s2) {
         return s1 + s2;
     else if (str_ends_with(s1, "##"))   // cpp-style concatenation
         return s1.substr(0, s1.length() - 2) + s2;
-    else if (is_space(s1.back()) || is_space(s2.front()))
+    else if (isspace(s1.back()) || isspace(s2.front()))
         return s1 + s2;
     else if (is_ident(s1.back()) && is_ident(s2.front()))
         return s1 + " " + s2;
-    else if (s1.back() == '$' && is_xdigit(s2.front()))
+    else if (s1.back() == '$' && isxdigit(s2.front()))
         return s1 + " " + s2;
     else if ((s1.back() == '%' || s1.back() == '@') &&
-        (is_digit(s2.front()) || s2.front() == '"'))
+        (isdigit(s2.front()) || s2.front() == '"'))
         return s1 + " " + s2;
     else if ((s1.back() == '&' && s2.front() == '&') ||
         (s1.back() == '|' && s2.front() == '|') ||
@@ -260,13 +266,13 @@ bool FileScanner::open(const string& filename) {
     line_start = line_end = p = p0 = marker = limit = m_buffer.c_str();
 
     if (!fs::is_regular_file(fs::path(filename))) {
-        g_errors.error(ErrCode::FileNotFound, filename);
+        g_errors.error(ErrFileNotFound, filename);
         return false;
     }
     else {
         m_ifs.open(filename, ios::binary);
         if (!m_ifs.is_open()) {
-            g_errors.error(ErrCode::FileOpen, filename);
+            g_errors.error(ErrFileOpen, filename);
             perror(filename.c_str());
             return false;
         }
@@ -283,7 +289,7 @@ bool FileScanner::open(const string& filename) {
 void FileScanner::scan_text(Location location, const string& text) {
     if (m_ifs.is_open())
         m_ifs.close();
-    m_filename = location.filename();
+    m_filename = location.filename;
     m_location = location;
     m_buffer = text;
     line_start = line_end = p = p0 = marker = m_buffer.c_str();
@@ -308,7 +314,7 @@ bool FileScanner::peek_text_line(ScannedLine& line) {
     while (true) {
         /*!re2c
             end             { p--; goto end; }
-            nl              { m_location.inc_line(); goto end; }
+            nl              { m_location.inc_line_num(); goto end; }
             $               { goto end; }
             *               { continue; }
         */
@@ -332,7 +338,7 @@ bool FileScanner::get_token_line(ScannedLine& line) {
     line.clear();
     string str, error;
     int quote = 0;
-    bool raw_strings = g_args.raw_strings();
+    bool raw_strings = g_options.raw_strings;
     m_got_error = false;
     m_blank_before = false;
 
@@ -350,7 +356,7 @@ main_loop:
         /*!re2c
             end             { p--; goto end; }
             $               { goto end; }
-            *               { scan_error(ErrCode::InvalidChar); continue; }
+            *               { scan_error(ErrInvalidChar); continue; }
             ws+             { m_blank_before = true; continue; }
             nl              { goto end; }
             ';'	[^\r\n\000]* { continue; }
@@ -416,7 +422,7 @@ main_loop:
             ident "'"?      { str = string(p0, p);
 
                               // to upper
-                              if (g_args.ucase()) str = str_toupper(str);
+                              if (g_options.ucase) str = str_toupper(str);
 
                               // handle af' et all
                               Keyword keyword = keyword_lookup(str);
@@ -427,10 +433,12 @@ main_loop:
                               }
 
                               // check for -IXIY
-                              if (g_args.swap_ixiy() != IXIY_NO_SWAP) {
+                              if (g_options.get_swap_ixiy() != IXIY_NO_SWAP) {
                                 switch (keyword) {
                                 case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
                                 case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
+                                case Keyword::AIX: case Keyword::PIX: case Keyword::XIX: case Keyword::YIX: case Keyword::ZIX: 
+                                case Keyword::AIY: case Keyword::PIY: case Keyword::XIY: case Keyword::YIY: case Keyword::ZIY: 
                                   str = str_swap_x_y(str);
                                   keyword = keyword_lookup(str);
                                   break;
@@ -468,18 +476,18 @@ string_loop:
     while (true) {
         p0 = p;
         /*!re2c
-            end             { p--; scan_error(ErrCode::MissingQuote, error); goto end; }
-            $               { scan_error(ErrCode::MissingQuote, error); goto end; }
+            end             { p--; scan_error(ErrMissingQuote, error); goto end; }
+            $               { scan_error(ErrMissingQuote, error); goto end; }
             *               { str.push_back(*p0); continue; }
             nl              { if (raw_strings) {
                                 str.append(string(p0, p));
-                                error = "started at " + m_location.filename() +
-                                        ":" + std::to_string(m_location.line_num());
+                                error = "started at " + m_location.filename +
+                                        ":" + std::to_string(m_location.line_num);
                                 line_start = p; peek_text_line(line);
                                 continue;
                               }
                               else {
-                                scan_error(ErrCode::MissingQuote, error); goto end;
+                                scan_error(ErrMissingQuote, error); goto end;
                               }
                             }
             '"'             { if (quote == 2) {
@@ -493,7 +501,7 @@ string_loop:
                             }
             "'"             { if (quote == 1) {
                                 if (str.length() != 1) {
-                                  scan_error(ErrCode::InvalidCharConst);
+                                  scan_error(ErrInvalidCharConst);
                                   goto main_loop;
                                 }
                                 else {
@@ -599,9 +607,9 @@ bool FileScanner::fill() {
 void FileScanner::notify_new_line(const string& text_) {
     string text = str_chomp(text_) + "\n";
     m_location.set_source_line(text);
-    g_errors.set_location(m_location);
-    list_got_source_line(m_location.filename().c_str(), m_location.line_num(),
-        m_location.source_line().c_str());
+    g_errors.location = m_location;
+    list_got_source_line(m_location.filename.c_str(), m_location.line_num,
+        m_location.source_line.c_str());
 }
 
 void FileScanner::scan_error(ErrCode code, const string& arg) {

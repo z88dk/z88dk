@@ -3,13 +3,13 @@
 
 
 
-        SECTION code_clib
-        PUBLIC  pointxy
+    SECTION code_clib
+    PUBLIC  pointxy
 
 
-	EXTERN	pointxy_MODE0
+    EXTERN  pointxy_MODE0
 
-	defc pointxy = pointxy_MODE0
+    defc    pointxy=pointxy_MODE0
 
 
 

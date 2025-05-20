@@ -42,7 +42,7 @@
 ; Some variables which are needed for both app and basic startup
 ;
 
-        PUBLIC    cleanup
+        PUBLIC    __Exit
         PUBLIC    l_dcal
 
 
@@ -94,18 +94,19 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $5000
 ENDIF
 
-        defc    CONSOLE_COLUMNS = 40
-        defc    CONSOLE_ROWS = 25
+    defc    CONSOLE_COLUMNS = 40
+    defc    CONSOLE_ROWS = 25
 
-	defc	TAR__no_ansifont = 1
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 65536 - 6
-	defc	__CPU_CLOCK = 4000000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc	TAR__no_ansifont = 1
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = 65536 - 6
+    defc    TAR__crt_enable_eidi = $02
+    defc	__CPU_CLOCK = 4000000
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
 IF ((CRT_ORG_CODE = $5000) | (!DEFINED_osca_bank))
-       org	CRT_ORG_CODE
+    org     CRT_ORG_CODE
 ELSE
 	; optional Program Location File Header
 	org	CRT_ORG_CODE
@@ -124,54 +125,39 @@ ELSE
 ENDIF
 	
 start:
-        di
-		
-	ld	(cmdline+1),hl
-;	ld	b,h
-;	ld	c,l
+    di
+    ld      (cmdline+1),hl
 
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    ;	push	bc		
-    call	crt0_init_bss
-    ;	pop	bc
-    ld      (exitsp),sp
-;       push	bc  ; keep ptr to arg list
-
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 IF (!DEFINED_osca_notimer)
+    ld      hl,(FLOS_irq_vector)            		; The label "irq_vector" = $A01 (contained in equates file)
+    ld      (original_irq_vector),hl   		; Store the original FLOS vecotr for restoration later.
+    ld      hl,my_custom_irq_handler
+    ld      (FLOS_irq_vector),hl
 
-        ld  hl,(FLOS_irq_vector)            		; The label "irq_vector" = $A01 (contained in equates file)
-        ld  (original_irq_vector),hl   		; Store the original FLOS vecotr for restoration later.
-        ld  hl,my_custom_irq_handler
-        ld  (FLOS_irq_vector),hl
+    ld      a,@10000111                		; Enable keyboard, mouse and timer interrupts
+    out     (sys_irq_enable),a
 
-        ld  a,@10000111                		; Enable keyboard, mouse and timer interrupts
-        out  (sys_irq_enable),a
+    ld      a,250
+    neg
+    out     (sys_timer),a
 
-        ld a,250
-        neg
-        out (sys_timer),a
-
-        ld  a,@00000100
-        out  (sys_clear_irq_flags),a           ; Clear the timer IRQ flag
+    ld      a,@00000100
+    out     (sys_clear_irq_flags),a           ; Clear the timer IRQ flag
 ELSE
-	ld	b,255
+    ld      b,255
 .v_srand_loop
-	ld	hl,FLOSvarsaddr
-	add	(hl)
-	ld	(FRAMES),a
-	inc hl
-	djnz v_srand_loop
+    ld      hl,FLOSvarsaddr
+    add     (hl)
+    ld      (FRAMES),a
+    inc     hl
+    djnz    v_srand_loop
 ENDIF
-        ei
         
 	; Push pointers to argv[n] onto the stack now
 	; We must start from the end 
@@ -192,35 +178,38 @@ find_end:
 	jr	nz,find_end
 	dec	hl
 
-	INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
 
-        push    hl      ;argv
-        push    bc      ;argc
+    push    hl      ;argv
+    push    bc      ;argc
 
-	call    _main		;Call user code
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-	pop	bc	;kill argv
-	pop	bc	;kill argc
+    call    _main		;Call user code
 
-cleanup:
-        push	hl		;save exit value
-        call    crt0_exit
+    pop     bc	;kill argv
+    pop     bc	;kill argc
+
+__Exit:
+    push	hl		;save exit value
+    call    crt0_exit
 
 	; kjt_flos_display restores the text mode but makes the screen flicker
 	; if it is in text mode already
 	;
 IF (DEFINED_osca_restoretxt)
-        call	$10c4 ; kjt_flos_display (added in v547)
+    call	$10c4 ; kjt_flos_display (added in v547)
 ENDIF
 IF (!DEFINED_osca_notimer)
-        di
-        ld		hl,(original_irq_vector)
-        ld		(FLOS_irq_vector),hl
-        ld		a,@10000011                     ; Enable keyboard and mouse interrupts only
-        out		(sys_irq_enable),a
-        ei
+    di
+    ld		hl,(original_irq_vector)
+    ld		(FLOS_irq_vector),hl
+    ld		a,@10000011                     ; Enable keyboard and mouse interrupts only
+    out		(sys_irq_enable),a
+    ei
 ENDIF
         pop	hl	; restore exit value
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
         ld	sp,0
         xor	a
@@ -349,8 +338,8 @@ current_asciicode	ds.b 1
 
 ;--------------------------------------------------------------------------------------------
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+	INCLUDE "crt/classic/crt_section.inc"
 
 	SECTION  code_crt_init
 	ld	hl,$2000

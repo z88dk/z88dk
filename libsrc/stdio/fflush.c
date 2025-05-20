@@ -7,9 +7,7 @@
  * $Id: fflush.c,v 1.4 2016-03-06 21:36:52 dom Exp $
  */
 
-#ifdef Z80
 #define STDIO_ASM
-#endif
 
 #include <stdio.h>
 #include <fcntl.h>

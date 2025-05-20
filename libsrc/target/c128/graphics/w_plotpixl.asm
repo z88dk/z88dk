@@ -1,15 +1,17 @@
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION	  code_clib
-        PUBLIC    w_plotpixel
+    SECTION code_graphics
+    PUBLIC  w_plotpixel
 
-        EXTERN     l_cmp
-        EXTERN     w_pixeladdress
+    EXTERN  l_cmp
 
-        EXTERN    __gfx_coords
+    EXTERN  __c128_vaddr
+    EXTERN  w_pixeladdress
+
+    EXTERN  __gfx_coords
 
 ;
-;       $Id: w_plotpixl.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
+;       $Id: w_plotpixl.asm $
 ;
 
 ; ******************************************************************
@@ -28,97 +30,39 @@
 ;  ......../ixiy same
 ;  afbcdehl/.... different
 ;
-.w_plotpixel
+w_plotpixel:
 
-        push    hl
-        ld      hl,maxy
-        call    l_cmp
-        pop     hl
-        ret     nc               ; Return if Y overflows
+    push    hl
+    ld      hl, maxy
+    call    l_cmp
+    pop     hl
+    ret     nc                          ; Return if Y overflows
 
-        push    de
-        ld      de,maxx
-        call    l_cmp
-        pop     de
-        ret     c                ; Return if X overflows
-        
-        ld      (__gfx_coords),hl      ; store X
-        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
+    push    de
+    ld      de, maxx
+    call    l_cmp
+    pop     de
+    ret     c                           ; Return if X overflows
 
-	call	w_pixeladdress
+    ld      (__gfx_coords), hl          ; store X
+    ld      (__gfx_coords+2), de        ; store Y: COORDS must be 2 bytes wider
 
-	ld	b,a
-	ld	a,1
-	jr	z, or_pixel		; pixel is at bit 0...
-.plot_position
-	rlca
-	djnz	plot_position
-.or_pixel
+    call    w_pixeladdress
 
-	ex	af,af
-	ld	d,18
-        ld      bc,0d600h
-        out     (c),d
-loop1:
-        in      a,(c)
-        rla
-        jp      nc,loop1
-        inc	c
-        out     (c),h
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:
 
-        dec	c
-        inc	d
-        out     (c),d
-loop2:
-        in      a,(c)
-        rla
-        jp      nc,loop2
-        inc	c
-        out     (c),l
+    call    __c128_vaddr
+    in      e, (c)
 
-        dec	c
-        ld	a,31
-        out     (c),a
-loop3:
-        in      a,(c)
-        rla
-        jp      nc,loop3
-        inc	c
+    or      e                           ; set pixel in current byte
 
-	ex	af,af
-        in	e,(c)
-        or	e	; set pixel in current byte
-        ex	af,af
-        
-        dec	c
-        dec	d
-        out     (c),d
-loop4:
-        in      a,(c)
-        rla
-        jp      nc,loop4
-        inc	c
-        out     (c),h
+    call    __c128_vaddr
+    out     (c), a
 
-        dec	c
-        inc	d
-        out     (c),d
-loop5:
-        in      a,(c)
-        rla
-        jp      nc,loop5
-        inc	c
-        out     (c),l
-
-        dec	c
-        ld	a,31
-        out     (c),a
-loop6:
-        in      a,(c)
-        rla
-        jp      nc,loop6
-        inc	c
-        ex	af,af
-        out	(c),a
-        
-	ret
+    ret

@@ -11,19 +11,19 @@
 ;       void ei(int)
 
 
-        SECTION code_clib
+    SECTION code_clib
 
-               PUBLIC    ei
-               PUBLIC    _ei
+    PUBLIC  ei
+    PUBLIC  _ei
 
-                INCLUDE "interrpt.def"
+    INCLUDE "interrpt.def"
 
-.ei
-._ei
-        pop     bc
-        pop     af
-        push    af
-        push    bc
-        call    oz_ei
-        ret
-        
+ei:
+_ei:
+    pop     bc
+    pop     af
+    push    af
+    push    bc
+    call    oz_ei
+    ret
+

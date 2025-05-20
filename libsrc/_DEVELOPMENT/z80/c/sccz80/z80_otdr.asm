@@ -21,8 +21,9 @@ z80_otdr:
    push af
 
    ld b,e
-   jp asm_z80_otdr
-
+   otdr
+   ret
+   
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _z80_otdr

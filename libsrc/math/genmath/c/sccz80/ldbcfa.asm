@@ -3,12 +3,13 @@
 ;
 ;	 bc ix de = FA
 
-        SECTION code_fp
-	PUBLIC	ldbcfa
+    SECTION code_fp
+    PUBLIC  ldbcfa
 
-	EXTERN	fa
+    EXTERN  fa
 
-.ldbcfa LD      DE,(fa)
-        LD      IX,(fa+2)
-        LD      BC,(fa+4)
-        RET
+ldbcfa:
+    LD      DE, (fa)
+    LD      IX, (fa+2)
+    LD      BC, (fa+4)
+    RET

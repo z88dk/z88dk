@@ -21,16 +21,16 @@ FILE *fopen_zsock(char *name)
 	char	host[50];
 	int	proto;
 	char	*next,*next2;
-	int 	len;
-        FILE   *fp;
+	int	len;
+	FILE	*fp;
 
-        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
-                if (fp->flags == 0 ) break;
-        }
+	for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
+		if (fp->flags == 0 ) break;
+	}
 
-        if (fp >= _sgoioblk_end) {
-                return NULL; /* No free slots */
-        }
+	if (fp >= _sgoioblk_end) {
+		return NULL; /* No free slots */
+	}
 
 	if (strncmp(name,":UDP",4) == 0 ) proto=17;
 	else if (strncmp(name,":TCP",4) == 0 ) proto=6;
@@ -44,11 +44,11 @@ FILE *fopen_zsock(char *name)
 	host[len]=0;
 	len=open_net1(host,atoi(++next2),proto);
 	if ( len ) {
-			fp->desc.ptr=(char *)len;
-			fp->flags=_IOEXTRA|_IOUSE;
-			fp->ungetc=0;
-                        fp->extra = zsock_trampoline;
-			return fp;
+		fp->desc.ptr=(uint8_t *)len;
+		fp->flags=_IOEXTRA|_IOUSE;
+		fp->ungetc=0;
+		fp->extra = zsock_trampoline;
+		return fp;
 	}
 	return NULL;	/* Failed */
 }

@@ -13,16 +13,14 @@
 
 #define ANSI_STDIO
 
-#ifdef Z80
 #define STDIO_ASM
-#endif
 
 #include <stdio.h>
 
 
 int fchkstd(FILE *fp)
 {
-#ifdef Z80
+#ifdef __SCCZ80
 #asm
 IF __CPU_RABBIT__
     ld      hl,(sp + 2)

@@ -20,34 +20,29 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     exx
     push    hl
-
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
         
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
-
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
 
     pop     bc
     exx
     pop     hl
     exx
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     ret

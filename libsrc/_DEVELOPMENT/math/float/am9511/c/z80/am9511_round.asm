@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.4.0 #14648 (Linux)
+; Version 4.5.0 #15248 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -384,7 +384,7 @@ ENDIF
 ;--------------------------------------------------------
 ; Home
 ;--------------------------------------------------------
-	SECTION IGNORE
+	SECTION code_home
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -465,7 +465,7 @@ l_am9511_round_00151:
 	inc	a
 	jp	NZ,l_am9511_round_00113
 	ld	bc,0x0000
-	ld	e,0x80
+	set	7, e
 	ld	a, d
 	or	a,0x3f
 	ld	d, a
@@ -499,20 +499,16 @@ l_am9511_round_00156:
 	ld	a,(ix-13)
 	and	a,(ix-7)
 	ld	(ix-3),a
-	ld	a,(ix-12)
-	and	a,(ix-6)
+	xor	a, a
 	ld	(ix-2),a
-	ld	a,(ix-11)
-	and	a,(ix-5)
 	ld	(ix-1),a
-	ld	a,0x00
-	or	a,(ix-2)
+	or	a,a
 	or	a,(ix-3)
 	or	a,(ix-4)
 	jr	NZ,l_am9511_round_00104
 	ld	l, c
 	ld	h, b
-	jp	l_am9511_round_00114
+	jr	l_am9511_round_00114
 l_am9511_round_00104:
 	ld	a,(ix-10)
 	push	af
@@ -548,18 +544,12 @@ l_am9511_round_00158:
 	cpl
 	ld	b, a
 	ld	a, c
-	ld	de,0x0000
 	and	a,(ix-4)
 	ld	c, a
 	ld	a, b
 	and	a,(ix-3)
 	ld	b, a
-	ld	a, e
-	and	a,(ix-2)
-	ld	e, a
-	ld	a, d
-	and	a,(ix-1)
-	ld	d, a
+	ld	de,0x0000
 	jr	l_am9511_round_00113
 l_am9511_round_00112:
 	ld	a,(ix-10)

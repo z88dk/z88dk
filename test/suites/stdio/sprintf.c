@@ -5,7 +5,7 @@
 #include "test.h"
 
 
-#if __RCMX000__ | __GBZ80__ | __8080__
+#if __RCMX000__ | __GBZ80 | __8080
 #pragma output CLIB_OPT_PRINTF=0x40ffffff
 #else
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
@@ -127,7 +127,7 @@ void test_sprintf_long_positive()
        ++test;
     }
 }
-#if __RCMX000__ | __GBZ80__ | __8080__
+#if __RCMX000__ | __GBZ80 | __8080
 #else
 struct sprintf_test double_tests[] = {
     { "%f", "1.234500" },
@@ -153,6 +153,36 @@ void test_sprintf_double()
     }
 }
 #endif
+
+struct sprintf_test2 {
+    char *pattern;
+    long  value;
+    char *result;
+} ltests_negative[] = {
+    { "%lu", -1L, "4294967295" },
+    { "%lu", -2L, "4294967294" },
+    { "%lu", -3L, "4294967293" },
+    { "%lu", -4L, "4294967292" },
+    { "%ld", -1L, "-1" },
+    { "%ld", -2L, "-2" },
+    { "%ld", -3L, "-3" },
+    { "%ld", -4L, "-4" },
+    { NULL, 0L, NULL }
+};
+void test_sprintf_long_negative()
+{
+    char    buf[100];
+    struct sprintf_test2 *test = &ltests_negative[0];
+
+    while ( test->pattern != NULL ) {
+       sprintf(buf,test->pattern, test->value);
+       printf("Testing <%s> expect <%s> got <%s>\n",test->pattern, test->result,buf);
+       Assert(strcmp(buf, test->result) == 0, "Result didn't match");
+       ++test;
+    }
+}
+
+
 
 void test_sprintf_precision_parameter()
 {
@@ -182,7 +212,8 @@ int test_scanf()
     suite_add_test(test_sprintf_int);
     suite_add_test(test_sprintf_int_negative);
     suite_add_test(test_sprintf_long_positive);
-#if __RCMX000__ | __GBZ80__ | __8080__
+    suite_add_test(test_sprintf_long_negative);
+#if __RCMX000__ | __GBZ80 | __8080
 #else
     suite_add_test(test_sprintf_double);
 #endif

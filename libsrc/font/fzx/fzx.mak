@@ -17,6 +17,7 @@ $(eval $(call buildnew,font/fzx,r4k,-mr4k -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOB
 $(eval $(call buildnew,font/fzx,z80n,-mz80n -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,font/fzx,ixiy,-mz80 -IXIY -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,font/fzx,8080,-m8080 -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,font/fzx,8085,-m8085 -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,font/fzx,gbz80,-mgbz80 -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,font/fzx,z180,-mz180 -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,font/fzx,ez80_z80,-mez80_z80 -I$(NEWLIB_DIRECTORY),$(FZX_NEWLIBGLOBS),$(FZX_NEWLIBGLOBS_ex)))

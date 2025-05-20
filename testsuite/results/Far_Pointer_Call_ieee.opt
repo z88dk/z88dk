@@ -68,7 +68,6 @@
 	pop	bc
 	pop	bc
 	call	lp_gchar
-	call	l_sxt
 	ret
 
 

@@ -33,7 +33,7 @@
 
     EXTERN    _main           ;main() is always external to crt0 code
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -50,6 +50,7 @@ ENDIF
     defc    TAR__clib_exit_stack_size = 32
     ;defc    TAR__register_sp = $5fff
     defc    TAR__register_sp = -1
+    defc    TAR__crt_on_exit = $1904        ;BASIC USR() function, pass hl as parameter
     defc	__CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -59,38 +60,33 @@ ENDIF
 start:
 
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
 
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 
     pop     hl
 __restore_sp_onexit:
     ld      sp,0
-    jp      $1904		; pass HL as a result to the USR(n) BASIC function
-    ;ret
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
+    
 l_dcal:
     jp      (hl)
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION	code_crt_init
 

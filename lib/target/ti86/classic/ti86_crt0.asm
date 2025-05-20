@@ -25,12 +25,13 @@
 	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
 
-	PUBLIC	cleanup		; used by exit()
+	PUBLIC	crt0_exit		; used by exit()
 	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
 	PUBLIC	cpygraph	; TI calc specific stuff
 	PUBLIC	tidi		;
 	PUBLIC	tiei		;
+	PUBLIC	__Exit
 
 ;-------------------------
 ; Begin of (shell) headers
@@ -206,20 +207,14 @@ IF STDASM | LASM		; asm( executable
 	call	_runindicoff	; stop anoing run-indicator
 ENDIF
 
-	ld	hl,0
-	add	hl,sp
-	ld	(__restore_sp_onexit+1),hl
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss
-        ld      (exitsp),sp
+    ld      hl,0
+    add     hl,sp
+    ld      (__restore_sp_onexit+1),hl
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 
 ;  IF NONANSI
@@ -242,7 +237,7 @@ ENDIF
 	call	tidi
 	call	_flushallmenus
 	call	_main
-cleanup:			; exit() jumps to this point
+__Exit:			; exit() jumps to this point
 __restore_sp_onexit:
 	ld	sp,0
 IF DEFINED_GRAYlib
@@ -294,8 +289,8 @@ l_dcal:
 			 defc ansicolumns = 32
 		ENDIF
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+	INCLUDE "crt/classic/crt_section.inc"
 
 	SECTION bss_crt
 hl1save: defw	0

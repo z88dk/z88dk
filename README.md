@@ -1,6 +1,6 @@
 # Z88DK - The Development Kit for Z80 Computers
 
-![WinXP+](doc/images/windows.png) ![MacOSX](doc/images/mac.png) ![Linux and Other](doc/images/linux.png) ![Build Status](https://github.com/z88dk/z88dk/workflows/z88dk/badge.svg)
+![WinXP+](doc/images/windows.png) ![MacOSX](doc/images/mac.png) ![Linux and Other](doc/images/linux.png) 
 
 Z88DK is a collection of software development tools that targets the 8080 and z80 family of machines.  It allows development of programs in C, assembly language or any mixture of the two.  What makes z88dk unique is its ease of use, built-in support for many z80 machines and its extensive set of assembly language library subroutines implementing the C standard and extensions.
 
@@ -9,41 +9,42 @@ Z88DK is a collection of software development tools that targets the 8080 and z8
 There are several ways to install z88dk.
 
 1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases).  Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
-2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and generate source packages for everyone else.  The same [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
+2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for **Windows** and **MacOS** and generate source packages for everyone else.  The simple [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) should be followed.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
 3. Use the [Snap package](https://github.com/z88dk/z88dk/wiki/Snap-usage) on Linux
-4. Use GitHub and build it yourself. The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`. To build, the following [instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix) should be followed.
+4. Use the [Docker image](https://hub.docker.com/r/z88dk/z88dk)
+5. Use GitHub and build it yourself. The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`. To build, the following [instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix) should be followed.
 
-## CMAKE
 
-CMake can be used to build Z88DK projects (a toolchain is provided).
-Please refer to [CMake](https://github.com/z88dk/z88dk/wiki/CMake) wiki.
+## The Tools
 
-## THE TOOLS
+The front end of z88dk is called `zcc`, it is this that you should call if you want to do any compilations. It can process C files (.c) , preprocessed C files(.i), compiled C files (.asm), optimised compiled file (.opt) or assembled files (.o), any combination of them can be mixed together and the relevant processes will be done on them. Also processing of a file list is supported, with processing of each file done in turn (i.e. preprocess, compile, optimise, assemble), and at the end all processed files may be linked into a correctly formatted single executable if desired.
+
+It is not typically necessary for a new user (or for an established platform) to need to use the other tools individually. 
 
 Many tools have a `z88dk-` prefix to distinguish them from tools from other packages that may be installed with the same name. The documentation
 generally omits the prefix when referring to them.
 
-* **ZCC** is the toolchain's front end.  zcc can generate an output binary out of any set of input source files.
-* **Z88DK-SCCZ80** is z88dk's native c compiler.  sccz80 is derived from small c but has seen much development to the point that it is nearly c90 compliant.
-* **Z88DK-ZSDCC** is z88dk's customization of the [sdcc compiler](https://sdcc.sourceforge.net/).  [Our patch](https://github.com/z88dk/z88dk/tree/master/src/zsdcc) makes sdcc compatible with the z88dk toolchain, gives it access to z88dk's extensive assembly language libraries and ready-made crts, addresses code generation bugs where present and improves on sdcc's generated code.
-* **Z88DK-Z80ASM** (not to be confused with several external projects called z80asm) is a fully featured assembler / linker / librarian implementing sections.
-* **Z88DK-Z80NM** is z80asm's companion archiver.  It can provide a listing of functions or data encoded in an object or library file.
-* **Z88DK-APPMAKE** processes the raw binaries generated by the toolkit into a form suitable for specific target machines.  For example, it can generate intel hex files, tapes, ROMs, etc.
-* **Z88DK-TICKS** is a command line emulator that can be used to time execution speed of code fragments. Ticks includes a debugger and disassembler.
-* **Z88DK-GDB** provides the debugger interface from ticks and connects to a gdbserver to permit line-by-line debugging of software in emulators or on real hardware.
-* **Z88DK-DIS** is a command line disassembler for 8085, 8085, GBZ80, Z80, Z180, Z80N, EZ80, R800 and Rabbit 2000/3000. It can additionally read map files generated by z80asm to provide a more symbolic output.
-* **Z88DK-LIB** is an installer for third party libraries.  It manages installation, removal and listing of available libraries.
-* **Z88DK-ZX0** and **Z88DK-ZX7** are PC side data compression tools with companion decompression functions in the z80 library.
-* **Z88DK-DZX0** and **Z88DK-DZX7** are  PC-side decompressor counterparties to the z88dk-zx0 and z88dk-zx7.
+* `zcc` is the toolchain's front end.  zcc can generate an output binary out of any set of input source files.
+* `z88dk-sccz80` is z88dk's native c compiler.  sccz80 is derived from small c but has seen much development to the point that it is nearly c90 compliant.
+* `z88dk-zsdcc` is z88dk's customization of the [sdcc compiler](https://sdcc.sourceforge.net/).  [Our patch](https://github.com/z88dk/z88dk/tree/master/src/zsdcc) makes sdcc compatible with the z88dk toolchain, gives it access to z88dk's extensive assembly language libraries and ready-made crts, addresses code generation bugs where present and improves on sdcc's generated code.
+* `z88dk-z80asm` (not to be confused with several external projects called z80asm) is a fully featured assembler / linker / librarian implementing sections.
+* `z88dk-z80nm` is z80asm's companion archiver.  It can provide a listing of functions or data encoded in an object or library file.
+* `z88dk-appmake` processes the raw binaries generated by the toolkit into a form suitable for specific target machines.  For example, it can generate intel hex files, tapes, ROMs, etc.
+* `z88dk-ticks` is a command line emulator that can be used to time execution speed of code fragments. Ticks includes a debugger and disassembler.
+* `z88dk-gdb` provides the debugger interface from ticks and connects to a gdbserver to permit line-by-line debugging of software in emulators or on real hardware.
+* `z88dk-dis` is a command line disassembler for 8080, 8085, GBZ80, Z80, Z180, Z80N, EZ80, R800 and Rabbit 2000/3000. It can additionally read map files generated by z80asm to provide a more symbolic output.
+* `z88dk-lib` is an installer for third party libraries.  It manages installation, removal and listing of available libraries.
+* `z88dk-zx0` and `z88dk-zx7` are PC side data compression tools with companion decompression functions in the z80 library.
+* `z88dk-dzx0` and `z88dk-dzx7` are  PC-side decompressor counterparties to the z88dk-zx0 and z88dk-zx7.
 
 These tools are not normally directly invoked by the user:
 
-* **M4** acts as z88dk's macro preprocessor and can optionally process files ahead of the c preprocessor or assembler.
-* **Z88DK-UCPP** is the c preprocessor invoked for sccz80 and for zsdcc.
-* **Z88DK-ZPRAGMA** is used by the toolchain to process pragmas embedded in c source.
-* **Z88DK-COPT** is a regular expression engine that is used as peephole optimizer for sccz80 and as a post-processing tool for both sccz80 and zsdcc.
+* `m4` acts as z88dk's macro preprocessor and can optionally process files ahead of the c preprocessor or assembler.
+* `z88dk-ucpp` is the c preprocessor invoked for sccz80 and for zsdcc.
+* `z88dk-zpragma` is used by the toolchain to process pragmas embedded in c source.
+* `z88dk-copt` is a regular expression engine that is used as peephole optimizer for sccz80 and as a post-processing tool for both sccz80 and zsdcc.
 
-## BENCHMARKS
+## Benchmarks
 
 The assembly language libraries supplied by z88dk give it performance advantages over other z80 compilers. For details please look at the [Benchmarks](https://github.com/z88dk/z88dk/wiki/Benchmarks) section in the Wiki.
 
@@ -53,15 +54,16 @@ The assembly language libraries supplied by z88dk give it performance advantages
 * **Whetstone 1.2**  Whetstone is a common synthetic floating point benchmark.
 * **Program Size**  Program size has great importance for small machines.  A collection of test programs were compiled for the common cp/m target and resulting binary sizes were compared.
 
-## USING Z88DK
+## Using cmake to build z88dk projects
 
-Unfortunately, like a lot of open source projects, we could use a lot of help with the documentation.
+CMake can be used to build Z88DK projects (a toolchain is provided).  Please refer to [CMake](https://github.com/z88dk/z88dk/wiki/CMake) wiki.
+
+## Using z88dk
 
 Some things to know:
 
 * There are two c libraries in z88dk. These are referred to as the classic c library and the new c library.
 * There are two c compilers in z88dk. Projects built using the classic library can mix object files generated by the both compilers. Projects built with newlib must use only one of the compilers.
-* Thankfully there is only one assembler so we only need to deal with 2*2 combinations :)
 
 When you form a compile line you must decide which compiler you will use and which c library you will link against.  You will make that decision based on which targets you want to compile for and what features you need.
 
@@ -69,7 +71,7 @@ The classic c library is z88dk's main c library and has crts that allow generati
 
 The new c library was z88dk's rewrite aiming for a large subset of C11 conformance. The bulk of the standard library has now been incorporated into classic, however it still supports some targets not supported by classic: [hbios](https://github.com/wwarthen/RomWBW/blob/master/Doc/RomWBW%20Architecture.pdf), [rc2014](https://rc2014.co.uk/), [scz180](https://smallcomputercentral.wordpress.com/sc130-z180-motherboard/), [yaz180](https://github.com/feilipu/yaz180) as well as some incorporating 3rd party libraries for some duplicated targets:  [sega master system](https://en.wikipedia.org/wiki/Master_System), [zx spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum), and [zx spectrum next](https://www.specnext.com/). Additionally, a bare bones target for the z180, [z80](https://github.com/z88dk/z88dk/wiki/NewLib--Platform--Embedded) can be used to compile programs for any z80 machine. [Documentation begins here](https://github.com/z88dk/z88dk/wiki/Introduction) and example programs can be found in [z88dk/libsrc/_DEVELOPMENT/EXAMPLES](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES) with compile lines most often appearing at the top of .c files.
 
-## QUICK LINKS
+## Quick links
 
 [Z88DK Home Page](https://www.z88dk.org/forum/)
 Includes a link to the nightly builds where you can get an up-to-date package.
@@ -77,7 +79,6 @@ Includes a link to the nightly builds where you can get an up-to-date package.
 [Install Instructions](https://github.com/z88dk/z88dk/wiki/installation)
 
 [Bug Reporting](https://github.com/z88dk/z88dk/issues)
-(old bugs in the forum)
 
 [Introduction to Compiling Using the Classic C Library](https://github.com/z88dk/z88dk/wiki)
 Examples in [z88dk/examples](https://github.com/z88dk/z88dk/tree/master/examples)

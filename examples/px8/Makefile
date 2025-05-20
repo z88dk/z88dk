@@ -15,7 +15,7 @@ rndsphere.rom: ../graphics/rndsphere.c
 	zcc +cpm -subtype=px8 -vn ../graphics/rndsphere.c -lndos -lm -create-app -orndsphere
 
 clisp.rom: ../clisp/clisp.c
-	zcc +cpm -subtype=px8ansi -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=1200 -DGRAPHICS -llib3d -oclisp
+	zcc +cpm -subtype=px8ansi -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=1200 -DGRAPHICS  -oclisp
 
 today.rom: ../console/today.c
 	zcc +cpm -subtype=px8 -vn -lndos ../console/today.c -create-app -otoday
@@ -69,13 +69,13 @@ smallgfx.rom: ../graphics/smallgfx.c
 	zcc +cpm -subtype=px8 -vn ../graphics/smallgfx.c -lndos -lm -create-app -osmallgfx
 
 stencil.rom: ../graphics/stencil.c
-	zcc +cpm -subtype=px8 -vn ../graphics/stencil.c -lndos -lm -llib3d -create-app -ostencil
+	zcc +cpm -subtype=px8 -vn ../graphics/stencil.c -lndos -lm  -create-app -ostencil
 
 clock.rom: ../graphics/clock.c
-	zcc +cpm -subtype=px8 -vn ../graphics/clock.c -I../graphics -lndos -lm -llib3d -create-app -oclock
+	zcc +cpm -subtype=px8 -vn ../graphics/clock.c -I../graphics -lndos -lm  -create-app -oclock
 
 showlib3d.rom: ../graphics/showlib3d.c
-	zcc +cpm -subtype=px8 -vn ../graphics/showlib3d.c -lndos -lm -llib3d -create-app -oshowlib3d
+	zcc +cpm -subtype=px8 -vn ../graphics/showlib3d.c -lndos -lm  -create-app -oshowlib3d
 
 smallgfx2.rom: ../graphics/smallgfx2.c
 	zcc +cpm -subtype=px8 -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2

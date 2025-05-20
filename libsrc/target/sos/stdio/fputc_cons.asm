@@ -10,28 +10,28 @@
 ;----------------------------------------------------------------
 ;
 
-	SECTION code_clib
-	PUBLIC	fputc_cons_native
+    SECTION code_clib
+    PUBLIC  fputc_cons_native
 
-.fputc_cons_native
+fputc_cons_native:
 
-	ld	hl,2
-	add	hl,sp
-	ld	a,(hl)
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
 
-	cp	7		; bel
-	jp	z,1FC4h
+    cp      7                           ; bel
+    jp      z, 1FC4h
 
-	cp	8
-	jr	nz,nobs
-	ld	a,$1d
-.nobs
+    cp      8
+    jr      nz, nobs
+    ld      a, $1d
+nobs:
 
-IF STANDARDESCAPECHARS
-	cp	10
-	jr	nz,nocr
-	ld	a,13
-.nocr
-ENDIF
+  IF    STANDARDESCAPECHARS
+    cp      10
+    jr      nz, nocr
+    ld      a, 13
+nocr:
+  ENDIF
 
-	jp	1FF4h 
+    jp      1FF4h

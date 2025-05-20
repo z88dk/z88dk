@@ -17,7 +17,7 @@
 
     EXTERN    _main           ; main() is always external to crt0 code
 
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
 
 
@@ -49,31 +49,25 @@
     jp      start
 start:
     ld      (__restore_sp_onexit+1),sp   ; Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     ld      a,SUB_BEEPOFF
     call    TRNC1
 
 
     call    _main           ; Call user program
-cleanup:
+__Exit:
     push    hl              ; return code
     call    crt0_exit
-
-
-cleanup_exit:
     pop     bc
-    
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret
@@ -83,8 +77,8 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     INCLUDE	"target/fp1100/classic/bootstrap.asm"

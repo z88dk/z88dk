@@ -158,6 +158,7 @@ extern void gen_builtin_strcpy(void);
 extern void gen_builtin_strchr(int32_t c); 
 extern void gen_builtin_memset(int32_t c, int32_t s);
 extern void gen_builtin_memcpy(int32_t src, int32_t n);
+extern void gen_address(SYMBOL *ptr);
 
 extern void zconvert_to_long(unsigned char tounsigned, Kind from, unsigned char fromunsigned);
 extern void zconvert_to_llong(unsigned char tounsigned, Kind from, unsigned char fromunsigned);
@@ -166,7 +167,6 @@ extern void zconvert_to_llong(unsigned char tounsigned, Kind from, unsigned char
 /* const.c */
 extern int        constant(LVALUE *lval);
 
-extern void       address(SYMBOL *ptr);
 
 extern int        storeq(int length, unsigned char *queue,int32_t *val);
 extern int        qstr(double *val);

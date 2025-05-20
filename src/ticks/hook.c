@@ -22,7 +22,7 @@ void PatchZ80(void)
        return;
     }
 
-    if ( rc2014_mode && (pc == 0x08 + 2 || pc == 0x10 + 2|| pc == 0x18 + 2) ) {
+    if ( c_rc2014_mode && (pc == 0x08 + 2 || pc == 0x10 + 2|| pc == 0x18 + 2) ) {
         hook_rc2014();
         return;
     }
@@ -47,6 +47,7 @@ void hook_init(void)
 {
     hooks[CMD_EXIT] = cmd_exit;
     hook_io_init(hooks);
+    hook_cpm_init(hooks);
     hook_misc_init(hooks);
     hook_console_init(hooks);
 }

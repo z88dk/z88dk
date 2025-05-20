@@ -61,10 +61,10 @@ void mult_m(matrix_t * multiplicand, matrix_t * multiplier)
 
     memset(&result, 0, sizeof(ELEMENT)*MATRIX_ORDER*MATRIX_ORDER);
 
-    for(uint8_t y = 0; y < MATRIX_ORDER; ++y) {
+    for(uint8_t y = 0; y != MATRIX_ORDER; ++y) {
         uint8_t col = y * MATRIX_ORDER;
-        for(uint8_t x = 0; x < MATRIX_ORDER; ++x) {
-            for(uint8_t i = 0; i < MATRIX_ORDER; ++i) {
+        for(uint8_t x = 0; x != MATRIX_ORDER; ++x) {
+            for(uint8_t i = 0; i != MATRIX_ORDER; ++i) {
                 result.e[col + x] += multiplicand->e[col + i] * multiplier->e[i * MATRIX_ORDER + x];
             }
         }

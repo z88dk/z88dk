@@ -19,7 +19,7 @@
     EXTERN    _main           ;main() is always external to crt0 code
     EXTERN    asm_im1_handler
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 IFNDEF CLIB_FGETC_CONS_DELAY
@@ -28,7 +28,8 @@ ENDIF
 
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
-    defc    TAR__register_sp = -1 
+    defc    TAR__register_sp = -1
+    defc    TAR__crt_on_exit = $c800        ;Jump to here
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 2000000
     defc    CONSOLE_COLUMNS = 48
@@ -45,39 +46,34 @@ endif
 
     jp      program
 
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 
 
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     push    bc	;argv
     push    bc	;argc
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl
-    jp      $c800
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
+

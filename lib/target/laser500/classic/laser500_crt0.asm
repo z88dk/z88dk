@@ -17,7 +17,7 @@
 
     EXTERN    _main           ;main() is always external to crt0 code
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
     ; 2 columns on left and 2 column on right are lost
@@ -35,5 +35,5 @@ ELSE
     INCLUDE "target/laser500/classic/ram.asm"
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"

@@ -22,7 +22,6 @@ m32_dhexpop:
     pop bc                      ; my return
     pop hl                      ; sdcc_float
     pop de
-    dec sp                      ; pop only 6 significant hex digits
     push bc
 
     ld a,$7f
@@ -35,7 +34,7 @@ m32_dhexpop:
     rl e
 
     dec a
-    jr Z,m32_fsmin              ; safety net, in case something is borked
+    jp Z,m32_fsmin              ; safety net, in case something is borked
 
     jr normmant
 

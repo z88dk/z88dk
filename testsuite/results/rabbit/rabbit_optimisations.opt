@@ -18,9 +18,8 @@
 ._mult
 	add	sp,-4
 	ld	hl,(sp+2)
-	push	hl
-	ld	hl,(sp+2)
-	pop	de
+	ex	de,hl
+	ld	hl,(sp+0)
 	call	l_mult
 	add	sp,4
 	ret

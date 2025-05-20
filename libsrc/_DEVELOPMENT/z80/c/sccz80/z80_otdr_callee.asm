@@ -16,7 +16,8 @@ z80_otdr_callee:
    ex (sp),hl
 
    ld b,e
-   jp asm_z80_otdr
+   otdr
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

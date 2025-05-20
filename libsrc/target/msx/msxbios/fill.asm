@@ -9,81 +9,81 @@
 
 ;Usage: fill(struct *pixel)
 
-	SECTION	  code_clib
-        PUBLIC    fill
-        PUBLIC    _fill
+    SECTION code_clib
+    PUBLIC  fill
+    PUBLIC  _fill
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	EXTERN	msxextrom
+    EXTERN  msxextrom
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbasic.def"
-		EXTERN	msxbasic
-ELSE
-        INCLUDE "target/svi/def/svibasic.def"
-		EXTERN	msxbios
-ENDIF
+  IF    FORmsx
+    INCLUDE "target/msx/def/msxbasic.def"
+    EXTERN  msxbasic
+  ELSE
+    INCLUDE "target/svi/def/svibasic.def"
+    EXTERN  msxbios
+  ENDIF
 
-	EXTERN	msx_breakoff
-	EXTERN	msx_breakon
+    EXTERN  msx_breakoff
+    EXTERN  msx_breakon
 
 
-.fill
-._fill
-	push	ix		;save callers
-	ld	ix,2
-	add	ix,sp
-	ld	a,(ix+2)
-	cp	maxy       ;check range for y
-	jr	nc, fill_exit
+fill:
+_fill:
+    push    ix                          ;save callers
+    ld      ix, 2
+    add     ix, sp
+    ld      a, (ix+2)
+    cp      maxy                        ;check range for y
+    jr      nc, fill_exit
 
-	ld	l,(ix+4)   ;x
-	ld	h,0
-	ld	d,h
-	ld	e,a        ;y
+    ld      l, (ix+4)                   ;x
+    ld      h, 0
+    ld      d, h
+    ld      e, a                        ;y
 
-	ld	(GRPACX),hl
-	ld	(GRPACY),de
-	push	hl
-	push	de
-	
-	ld	a,fcolor
-	ld	(ATRBYT),a		; set fill color
-	ld	(BRDATR),a		; set border color
+    ld      (GRPACX), hl
+    ld      (GRPACY), de
+    push    hl
+    push    de
+
+    ld      a, fcolor
+    ld      (ATRBYT), a                 ; set fill color
+    ld      (BRDATR), a                 ; set border color
 
 	;ld	hl,-2048
 	;add	hl,sp
-	
+
 	;ld	(STREND),hl
-	
-	pop	de			; set y
-	pop	bc			; set x
 
-IF FORmsx
-	call	msx_breakoff
-	ld	a,(SCRMOD)
-	cp	4+1
-	jr	c,pnt_old
-	ld	ix,N_PAINT
-	call	msxextrom
-	jr	pnt_done
+    pop     de                          ; set y
+    pop     bc                          ; set x
+
+  IF    FORmsx
+    call    msx_breakoff
+    ld      a, (SCRMOD)
+    cp      4+1
+    jr      c, pnt_old
+    ld      ix, N_PAINT
+    call    msxextrom
+    jr      pnt_done
 pnt_old:
-ELSE
-	xor a
-	ld (INTFLG),a
-ENDIF
+  ELSE
+    xor     a
+    ld      (INTFLG), a
+  ENDIF
 
-	ld	ix,O_PAINT
+    ld      ix, O_PAINT
 
-IF FORmsx
-	call	msxbasic
+  IF    FORmsx
+    call    msxbasic
 pnt_done:
-	call	msx_breakon
-ELSE
-	call	msxbios
-ENDIF
-.fill_exit
-	pop	ix
-	ret
+    call    msx_breakon
+  ELSE
+    call    msxbios
+  ENDIF
+fill_exit:
+    pop     ix
+    ret
 

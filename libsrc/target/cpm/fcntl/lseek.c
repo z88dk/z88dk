@@ -14,16 +14,11 @@
 
 long lseek(int fd,long posn, int whence)
 {
-    struct  fcb *fc;
+    struct fcb *fc = (struct fcb *)fd;
     long    pos;
     int     cnt;
     char    buffer[SECSIZE];
 
-    if(fd >= MAXFILE)
-        return -1L;
-    
-    fc = &_fcb[fd];
-    
     switch(whence) {
     default:
         pos = posn;
@@ -35,6 +30,7 @@ long lseek(int fd,long posn, int whence)
         if ( (fc->use == U_WRITE || fc->use == U_RDWR) && fsync(fd) != 0 ) return -1L;
         bdos(CPM_CFS,fc); 
         pos = (unsigned long) (fc->ranrec[0] + 256 * fc->ranrec[1]) * 128L; 
+
         if (fc->ranrec[2]&1) 
             pos += 8388608L; 
         if ((fc->mode & _IOTEXT) && (pos >= 128)) { 
@@ -56,6 +52,7 @@ long lseek(int fd,long posn, int whence)
         return -1L;
     
     fc->rwptr = pos;
+    fc->rnr_dirty = 1;
     return pos;
     
 }

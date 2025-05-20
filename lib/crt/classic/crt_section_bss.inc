@@ -17,6 +17,9 @@ ENDIF
 IF __crt_org_bss_fardata_start
     org	__crt_org_bss_fardata_start
 ENDIF
+IF !__crt_org_far
+    SECTION bss_far
+ENDIF
     SECTION bss_compiler
 IF __crt_org_bss_compiler_start
     org	__crt_org_bss_compiler_start

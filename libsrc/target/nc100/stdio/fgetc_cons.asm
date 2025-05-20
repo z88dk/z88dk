@@ -13,41 +13,41 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-	EXTERN	cleanup		;in crt0
+    EXTERN  __Exit                   ;in crt0
 
-.fgetc_cons
-._fgetc_cons
-	call	$B9B3	;kmreadchar
-	jr	nc,fgetc_cons	;no key available...try again
-IF STANDARDESCAPECHARS
-	ld	a,c
-	cp	13
-	jr	nz,nocr
-	ld	c,10
-.nocr
-ENDIF
-	ld	l,c
-	ld	h,b
-	ld	a,b
-	cp  3
-	jr	z,fgetc_cons	; timeout or unwanted chars ?
-	and	a
-	ret	z		;no token
-	sub	2
-	ret	nz		;not b=2
-	ld	a,c
-	cp	$FC
-	ret	nz
+fgetc_cons:
+_fgetc_cons:
+    call    $B9B3                       ;kmreadchar
+    jr      nc, fgetc_cons              ;no key available...try again
+  IF    STANDARDESCAPECHARS
+    ld      a, c
+    cp      13
+    jr      nz, nocr
+    ld      c, 10
+nocr:
+  ENDIF
+    ld      l, c
+    ld      h, b
+    ld      a, b
+    cp      3
+    jr      z, fgetc_cons               ; timeout or unwanted chars ?
+    and     a
+    ret     z                           ;no token
+    sub     2
+    ret     nz                          ;not b=2
+    ld      a, c
+    cp      $FC
+    ret     nz
 ; We've got here so we have just received escape so check yellow
-	push	hl		;keep this in case 
-	call	$B8d2	;kmgetyellow
-	pop	hl		;get it back
-	ret	nc		;no yellow
-	jp	cleanup		;was yellow so outta here
+    push    hl                          ;keep this in case
+    call    $B8d2                       ;kmgetyellow
+    pop     hl                          ;get it back
+    ret     nc                          ;no yellow
+    jp      __Exit                      ;was yellow so outta here
 
 
 

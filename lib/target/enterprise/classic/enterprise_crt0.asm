@@ -33,7 +33,7 @@
 
         EXTERN    _main
 
-        PUBLIC    cleanup
+        PUBLIC    __Exit
         PUBLIC    l_dcal
 
 
@@ -120,7 +120,7 @@ ENDIF
         ld      (__restore_sp_onexit+1),sp
         ld    a, 004h
         out   (0bfh), a
-	INCLUDE "crt/classic/crt_init_sp.asm"
+	INCLUDE "crt/classic/crt_init_sp.inc"
         ld    a, 0ffh
         out   (0b2h), a
 
@@ -149,59 +149,54 @@ ENDIF
 ;        rst   30h
 ;        defb  11
 
-        ld    a, 66h
-        ld    bc, $0101                ; @@DISP, from first line
-        ld    de, $1901                ; to line 25, at screen line 1
-        rst   30h
-        defb  11						; set 40x25 characters window
+    ld      a, 66h
+    ld      bc, $0101               ; @@DISP, from first line
+    ld      de, $1901               ; to line 25, at screen line 1
+    rst     30h
+    defb    11                      ; set 40x25 characters window
 
 
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-        call    _main
+    call    _main
 	
-cleanup:
+__Exit:
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 IF (!DEFINED_startup | (startup=1))
 warmreset:
-		PUBLIC    warmreset
-        ld      sp, 0100h
-        ld      a, 0ffh
-        out     (0b2h), a
-        ld      c, 60h
-        rst		30h
-        defb	0
-        ld      de, _basiccmd
-        rst		30h
-        defb	26
-        ld      a, 01h
-        out     (0b3h), a
-        ld      a, 6
-        jp      0c00dh
+    PUBLIC    warmreset
+    ld      sp, 0100h
+    ld      a, 0ffh
+    out     (0b2h), a
+    ld      c, 60h
+    rst		30h
+    defb	0
+    ld      de, _basiccmd
+    rst		30h
+    defb	26
+    ld      a, 01h
+    out     (0b3h), a
+    ld      a, 6
+    jp      0c00dh
 
 _basiccmd:
-        defb    5
-        defm    "BASIC"
+    defb    5
+    defm    "BASIC"
 ENDIF
 
 __restore_sp_onexit:
-        ld      sp,0
-        ret
+    ld      sp,0
+    ret
 
 
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 
 
@@ -316,8 +311,8 @@ __VideoVariables:
 end:	 defb	0
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-	INCLUDE	"crt/classic/crt_section.asm"
+	INCLUDE	"crt/classic/crt_section.inc"
 
 

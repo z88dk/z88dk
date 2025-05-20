@@ -14,7 +14,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -53,41 +53,22 @@ IF CRT_ORG_CODE = 0x0000
 
     jp  program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 ENDIF
 
 program:
-IF __CPU_R4K__ || __CPU_R5K__
+IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
     ;; Enable R4K instruction mode on the R4K
     ld      a,$c0
     ioi ld  ($0420),a       ;EDMR register (p299 in R4000UM.pdf)
 ENDIF
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-IF __CPU_GBZ80__
-    ld      hl,sp+0
-    ld      d,h
-    ld      e,l
-    ld      hl,exitsp
-    ld      a,l
-    ld      (hl+),a
-    ld      a,h
-    ld      (hl+),a
-ELSE
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 IF !__CPU_RABBIT__
     ei
 ENDIF
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
     ld      a,(argv_length)
     and     a
     jp      z,argv_done
@@ -95,16 +76,19 @@ ENDIF
     ld      b,0
     ld      hl,argv_start
     add     hl,bc	; now points to end of the command line
-    INCLUDE "crt/classic/crt_command_line.asm"
+    INCLUDE "crt/classic/crt_command_line.inc"
+
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     push    hl	;argv
     push    bc	;argc
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     ld      a,CMD_EXIT	;exit
     ; Fall into SYSCALL
 
@@ -122,6 +106,6 @@ l_dcal:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
+    INCLUDE	"crt/classic/crt_section.inc"
 

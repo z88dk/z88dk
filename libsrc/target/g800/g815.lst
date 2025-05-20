@@ -1,0 +1,12 @@
+target/g800/stdio/fgetc_cons
+target/g800/stdio/getk
+@stdio/ansicore.lst
+target/g800/stdio/ansi/f_ansi_attr
+target/g800/stdio/ansi/f_ansi_bel
+target/g800/stdio/ansi/f_ansi_char_815
+target/g800/stdio/ansi/_font_3x5_850
+target/g800/stdio/ansi/f_ansi_cls_815
+stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+target/g800/stdio/ansi/f_ansi_scrollup_815
+@stdio/stdio.lst
+@target/g800/g800_common.lst

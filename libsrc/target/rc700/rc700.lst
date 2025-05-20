@@ -1,2 +1,7 @@
 target/rc700/generic_console
-@gfx/gencon/gfx_gencon1.lst
+target/rc700/time/clock
+target/rc700/graphics/textpixl6
+target/rc700/graphics/clsgraph
+target/rc700/graphics/swapgfxbk
+@gfx/text6/gfx_text6.lst
+@games/games.lst

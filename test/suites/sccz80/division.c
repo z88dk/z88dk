@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
 void test_ullong_division()
 {
      uint64_t val = 0x80000000LL;
@@ -91,8 +91,8 @@ int suite_division()
 {
     suite_setup("Division Tests");
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     suite_add_test(test_ullong_division);
   #endif
 #endif

@@ -17,7 +17,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 ;--------
@@ -55,13 +55,10 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ld      (start_prefix),ix
 
@@ -71,6 +68,7 @@ ENDIF
     ld      a,' '
     ld      c,$56		;CLEAR
     rst     $10
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 ; Work out argc/argv - same as the CPM version 
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,0    ; NULL pointer at the end
@@ -83,7 +81,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      c,a
     add     hl,bc   ;now points to end of arguments
 
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
     push    hl	;argv
     push    bc	;argc
 ELSE
@@ -94,10 +92,11 @@ ENDIF
     call    _main   ;Call user code
     pop     bc      ;kill argv
     pop     bc      ;kill argc
-cleanup:
+__Exit:
     push    hl      ;save return code
     call    crt0_exit
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     ld      bc,$41  ;exit with - error code
@@ -109,8 +108,8 @@ l_dcal:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION  bss_crt
 

@@ -45,7 +45,7 @@ CLASS( Section1 )
 	bool		 section_split : 1;	// ORG -1 was given, signal that this section
 									// should be output to a new binary file
 	bool		 max_codesize_issued : 1;
-									// error_segment_overflow issued, ignore next calls
+									// ErrSegmentOverflow issued, ignore next calls
 	bool		 align_found : 1;	// ALIGN already found in this section
 	int			 asmpc;				// address of current opcode relative to start
 									// of the current module, reset to 0 at start
@@ -93,6 +93,7 @@ extern Section1 *new_section(const char *name );
 /* get/set current section */
 extern Section1 *get_cur_section( void );
 extern Section1 *set_cur_section( Section1 *section );
+extern const char* get_cur_section_name(void);
 
 #define CURRENTSECTION	(get_cur_section())
 

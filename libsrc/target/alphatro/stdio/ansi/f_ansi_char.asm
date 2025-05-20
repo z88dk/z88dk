@@ -12,13 +12,13 @@
 ;	$Id: f_ansi_char.asm $
 ;
 
-        SECTION  code_clib
-	PUBLIC	ansi_CHAR
-	EXTERN	generic_console_printc
-	EXTERN	__console_x
+    SECTION code_clib
+    PUBLIC  ansi_CHAR
+    EXTERN  generic_console_printc
+    EXTERN  __console_x
 
-.ansi_CHAR
-	ld	bc,(__console_x)
-	ld	e,1
-	call	generic_console_printc
-	ret
+ansi_CHAR:
+    ld      bc, (__console_x)
+    ld      e, 1
+    call    generic_console_printc
+    ret

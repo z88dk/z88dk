@@ -198,8 +198,8 @@ int sorcerer_exec(char* target)
     }
 
     if (loud) {
-        sorcerer_h_lvl = 0xFF;
-        sorcerer_l_lvl = 0;
+        sorcerer_h_lvl = 0xFD;
+        sorcerer_l_lvl = 2;
     } else {
         sorcerer_h_lvl = 0xe0;
         sorcerer_l_lvl = 0x20;

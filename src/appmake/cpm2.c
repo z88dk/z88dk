@@ -105,7 +105,7 @@ static disc_spec actrix_spec = {
 
 static disc_spec ampro_spec = {
     .name = "Ampro",
-    .disk_mode = MFM300,	
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -208,7 +208,7 @@ static disc_spec archive_spec = {
 
 static disc_spec attache_spec = {
     .name = "Attache",
-    .disk_mode = MFM300,	
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -301,6 +301,22 @@ static disc_spec osborne_sd_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 }
 };
 
+
+static disc_spec dmv_ss_spec = {
+    .name = "NCR DMV",
+    .disk_mode = MFM300,
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
 
 static disc_spec dmv_spec = {
     .name = "NCR DMV",
@@ -638,6 +654,22 @@ static disc_spec bondwell2_spec = {
 };
 
 
+static disc_spec itt3030_spec = {
+    .name = "ITT 3030",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 70,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .first_sector_offset = 1
+};
+
+
 static disc_spec kayproii_spec = {
     .name = "KayproII",
     .disk_mode = MFM300,
@@ -670,7 +702,30 @@ static disc_spec kaypro4_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 0,
-	.side2_sector_numbering = 1
+    .side2_sector_numbering = 1
+};
+
+
+// Philips used TEAC FD55-A with 40 tracks and 160 KB capacity each one (=Philips P2010)
+// later Philips took TEAC FD55-F 80 track drives with 640 KB capacity (=Philips P2012).
+// SSDD 96 tpi 5.25" - 256 x 16,  should work also on P2000C
+static disc_spec philips_spec = {
+    .name = "PHILIPS",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 160,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0,2,4,6,8,10,12,14,1,3,5,7,9,11,13,15 }
 };
 
 
@@ -691,9 +746,8 @@ static disc_spec mz800_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .has_skew = 1,
-    .skew_track_start = 0,
-    .skew_tab = { 0, 4, 1, 5, 2, 6, 3, 7 }
+    .has_skew = 0,
+    .side2_sector_numbering = 1
 };
 
 
@@ -713,12 +767,30 @@ static disc_spec mz80_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-	.xor_data = 0xff,
+    .xor_data = 0xff,
     .has_skew = 1,
     .skew_track_start = 0,
     .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
-	.inverted_sides = 1,
-	.side2_sector_numbering = 1
+    .inverted_sides = 1,
+    .side2_sector_numbering = 1
+};
+
+
+// Sharp MZ-2000
+static disc_spec mz2000_spec = {
+    .name = "MZ2000",
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
 };
 
 
@@ -737,6 +809,30 @@ static disc_spec mz2500cpm_spec = {
     .byte_size_extents = 0,
     .first_sector_offset = 1,
     .alternate_sides = 1
+};
+
+
+// Sharp MZ-3500 - 320K
+// Creates good images only in RAW mode, to convert to IMD:
+// BIN2IMD.COM /2 N=40 SS=256 DM=5 SM=1-16 dpb.img a.imd
+
+static disc_spec mz3500_spec = {
+    .name = "MZ3500",
+    .disk_mode = MFM250,
+    .sectors_per_track = 32,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 4, 8, 12, 16, 20, 24, 28,  1, 5, 9, 13, 17, 21, 25, 29,   2, 6, 10, 14, 18, 22, 26, 30,   3, 7, 11, 15, 19, 23, 27, 31 }
 };
 
 
@@ -889,6 +985,8 @@ static disc_spec pc88_spec = {
 };
 
 
+// Epson QX/QC, 10x512 s/t
+// (tracks 0/0 to 1/1 need to be reformatted to 16x256 to boot CP/M)
 static disc_spec qc10_spec = {
     .name = "QC10",
     .sectors_per_track = 10,
@@ -902,8 +1000,28 @@ static disc_spec qc10_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-    .alternate_sides = 1,
+    .alternate_sides = 1
 };
+
+
+// Epson QX/QC, 16x256 s/t
+static disc_spec qc10m1_spec = {
+    .name = "QC10",
+    .disk_mode = MFM250,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+	.gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 8,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
+};
+
 
 
 static disc_spec tiki100_ss_spec = {
@@ -1137,6 +1255,148 @@ static disc_spec lnw80_spec = {
     .skew_tab = { 0,5,10,15,2,7,12,17,4,9,14,1,6,11,16,3,8,13 }
 };
 
+//  (TRS80 clone) Genie IIs / Genie III / Genie IIIs
+//  Klaus Kaempf CP/M System disk
+static disc_spec g2s_kkcpm_spec = {
+    .name = "GII_KKCPM",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 6,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,2,4,1,3 }	
+};
+
+// Genie IIs (TRS80 clone) Klaus Kaempf CP/M Data disk (B:)
+static disc_spec g2s_kkcpmb_spec = {
+    .name = "GII_KKCPMB",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,2,4,1,3 }	
+};
+
+// Genie IIs (TRS80 clone) GS CP/M
+static disc_spec g2s_gscpm_spec = {
+    .name = "GII_GSCPM",
+    .disk_mode = MFM250,
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 256,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,2,4,1,3 }	
+};
+
+// Genie III (TRS80 clone) Holte CP/M 3.0
+// also good for Genie IIIs on B: with KK CP/M 2.2
+static disc_spec g3_holte30_spec = {
+    .name = "GIII_HOLTE",
+    .disk_mode = MFM300,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 0
+};
+
+// Genie III (TRS80 clone) Holte CP/M 2.2
+static disc_spec g3_holte22_spec = {
+    .name = "GIII_HOLTE",
+    .disk_mode = MFM300,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 192,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 0
+};
+
+
+// Genie III (TRS80 clone) LOWE CP/M 2.2a in drive A:
+// For drive B:, see the next definition
+static disc_spec g3_lowe22a_spec = {
+    .name = "GIII_LOWEAA",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 0,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .side2_sector_numbering = 1,
+    .first_sector_offset = 0
+};
+
+// Genie III (TRS80 clone) LOWE CP/M 2.2 in drive A:
+// a.k.a. "lowe patch" or "lowe fritz"
+static disc_spec g3_lowe22b_spec = {
+    .name = "GIII_LOWEB",
+    .disk_mode = MFM250,
+    .sectors_per_track = 18,
+    .tracks = 80,
+    .sides = 2,
+    .alternate_sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 6,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15, 17 },
+    .side2_sector_numbering = 1
+};
+
+
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
     .sectors_per_track = 17,
@@ -1309,6 +1569,26 @@ static disc_spec hc2000_spec = {
     .first_sector_offset = 1,
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+
+// LEC CP/M on BetaDisk interface
+// 3" floppy disk drive (80 trk, 9 sec)
+static disc_spec zxlec_spec = {
+    .name = "ZXLEC_80T",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
 };
 
 
@@ -1529,7 +1809,7 @@ static disc_spec lynx_spec = {
 // Some of the disk images are marked as MFM300
 static disc_spec rainbow_spec = {
     .name = "Rainbow100",
-    .disk_mode = MFM250,	
+    .disk_mode = MFM250,
     .sectors_per_track = 10,
     .tracks = 80,
     .sides = 1,
@@ -1583,6 +1863,23 @@ static disc_spec alphatro_spec = {
 };
 
 
+static disc_spec alphatP2_spec = {
+    .disk_mode = MFM250,           // 300 kbps MFM, visible only when using the IMD format
+    .name = "AlphatP2",
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1
+};
+
+
 // "FOX OS" for the SAGA FOX
 // (Torino - Italy)
 static disc_spec sagafox_spec = {
@@ -1602,7 +1899,7 @@ static disc_spec sagafox_spec = {
     .first_sector_offset = 1,
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 },
-	.xor_data = 0xff
+    .xor_data = 0xff
 };
 
 
@@ -1958,6 +2255,24 @@ static disc_spec x820_spec = {
 };
 
 
+static disc_spec nokiamikromikko320_spec = {
+      .name = "Nokia MikroMikko 320k",
+      .sectors_per_track = 8,
+      .tracks = 80,
+      .sides = 1,
+      .sector_size = 512,
+      .gap3_length = 0x2a, //?
+      .filler_byte = 0xe5,
+      .boottracks = 2,
+      .directory_entries = 128,
+      .alternate_sides = 0,
+      .extent_size = 2048,
+      .byte_size_extents = 1, 
+      .first_sector_offset = 1,
+      .has_skew = 1,  // Skew=3
+      .skew_tab = { 0, 3, 6, 1, 4, 7, 2, 5 },
+    };
+
 static struct formats {
      const char    *name;
      const char    *description;
@@ -1969,6 +2284,7 @@ static struct formats {
 } formats[] = {
     { "actrixss",  "Accesss Matrix SS",     &actrixss_spec, 0, NULL, 1 },
     { "actrix",    "Accesss Matrix DS",     &actrix_spec, 0, NULL, 1 },
+    { "alphatp2",  "TA Alphatronic P2",     &alphatP2_spec, 0, NULL, 1 },
     { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "altos5",    "Altos 5",               &altos5_spec, 0, NULL, 1 },
     { "altos580",  "Altos 580",             &altos580_spec, 0, NULL, 1 },
@@ -1993,6 +2309,7 @@ static struct formats {
     { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "datamax",   "Datamax-8000, 8in",     &bigboard_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
+    { "dmvss",     "NCR Decision Mate SS",  &dmv_ss_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "eagle2",    "Eagle II",              &eagle2_spec, 0, NULL, 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
@@ -2001,14 +2318,23 @@ static struct formats {
     { "gnat10",    "Gnat System 10",        &gnat_spec, 0, NULL, 1 },
     { "hp125",     "HP 125/120",            &hp125_spec, 0, NULL, 1 },
     { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
+    { "itt3030",   "ITT 3030",              &itt3030_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "kaypro4",   "Kaypro 4/10",           &kaypro4_spec,  0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "lnw80",     "LNW80 TRS80 Clone",     &lnw80_spec, 0, NULL, 1 },
-	{ "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
+    { "g2sgs",     "Genie II GS CP/M",      &g2s_gscpm_spec, 0, NULL, 1 },
+    { "g2skk",     "Genie II/III/IIIs KK",  &g2s_kkcpm_spec, 0, NULL, 1 },
+    { "g2skkb",    "Genie II KK CP/M B:",   &g2s_kkcpmb_spec, 0, NULL, 1 },
+    { "g3holte22", "Genie III Holte 2.2",   &g3_holte22_spec, 0, NULL, 1 },
+    { "g3holte30", "Genie III Holte 3.0",   &g3_holte30_spec, 0, NULL, 1 },
+    { "g3lowe22a", "Genie III Lowe 2.2a",   &g3_lowe22a_spec, 0, NULL, 1 },
+    { "g3lowe22b", "Genie III Lowe 2.2b",   &g3_lowe22b_spec, 0, NULL, 1 },
+    { "max80cpm3", "Lobo MAX-80 CPM3 SS",   &lobo_spec, 0, NULL, 1 },
     { "microbee-ds40",  "Microbee DS40",    &microbee40_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
     { "micromate", "PMC-101 MicroMate",     &pmc101_spec, 0, NULL, 1 },
+    { "mikko-320", "Nokia Mikro Mikko 320kb", &nokiamikromikko320_spec, 0, NULL, 1},
     { "morrow2",   "Morrow MD 2 (SS)",      &md2_spec, 0, NULL, 1 },
     { "morrow3",   "Morrow MD 3 (DS)",      &md3_spec, 0, NULL, 1 },
     { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
@@ -2020,10 +2346,13 @@ static struct formats {
     { "nshd8",     "Northstar Virtual 8",   &nshd8_spec, 0, NULL, 1 },
     { "mz80",      "Sharp MZ80A/80B",       &mz80_spec, 0, NULL, 1 },
     { "mz800",     "Sharp MZ800",           &mz800_spec, 0, NULL, 1 },
+    { "mz2000",    "Sharp MZ2000",          &mz2000_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
+    { "mz3500",    "Sharp MZ3500 (RAW)",    &mz3500_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1 DD",          &osborne_spec, 0, NULL, 1 },
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
+    { "philips",   "Philips P2012/P2000C",  &philips_spec, 0, NULL, 1 },
     { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
@@ -2037,8 +2366,10 @@ static struct formats {
     { "fdd3000",   "ZX Timex FDD-3000",     &fdd3000_spec, 0, NULL, 1 },
     { "hc91",      "ZX ICE Felix HC-91",    &hc91_spec, 0, NULL, 1 },
     { "hc2000",    "ZX HC-2000 / CoBra",    &hc2000_spec, 0, NULL, 1 },
+    { "lec80t",    "ZX LEC Betadisk 80T",   &zxlec_spec, 0, NULL, 1 },
     { "quorum",    "ZX Quorum,Profi,Hobb.", &quorum_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
+    { "qc10m1",    "Epson QC-10, QX-10",    &qc10m1_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow/DECmate",   &rainbow_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "sagafox",   "SAGA FOX OS",           &sagafox_spec, 0, NULL, 1 },
@@ -2055,7 +2386,7 @@ static struct formats {
     { "omikron",   "TRS80 I Omikron",       &omikron_spec, 0, NULL, 1 },
     { "lifeboat",  "TRS80 II Lifeboat",     &lifeboat_spec, 0, NULL, 1 },
     { "fmgcpm",    "TRS80 II FMG CP/M",     &fmgcpm_spec, 0, NULL, 1 },
-    { "ptcpm",     "TRS80 II PickelsTrout", &ptcpm_spec, 0, NULL, 1 },
+    { "ptcpm",     "TRS80 II P&T or Plus",  &ptcpm_spec, 0, NULL, 1 },
     { "holmes",    "TRS80 Holmes VID-80",   &holmes_spec, 0, NULL, 1 },
     { "merchant",  "TRS80 III MemMerchant", &merchant_spec, 0, NULL, 1 },
     { "compactor", "TRS80 III Hurricane C", &hurricane_spec, 0, NULL, 1 },

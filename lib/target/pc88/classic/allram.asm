@@ -7,6 +7,8 @@
     defc    TAR__register_sp = 0xc000
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001
 
     ; No interrupts registered
     defc    TAR__crt_enable_rst = $0000
@@ -25,39 +27,32 @@ ENDIF
 
     jp      program
 
-    INCLUDE	"crt/classic/crt_z80_rsts.asm"
+    INCLUDE	"crt/classic/crt_z80_rsts.inc"
 
 program:
     di
     ; Make room for the atexit() stack
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ld  hl,asm_im1_handler
     ld  ($f302),hl		;vsync interrupt
     ld  a,2			;Enable vsync interrupt only
     out ($e4),a
     out ($e6),a
-    ei
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 ; Entry to the user code
     call    _main
 
-cleanup:
+__Exit:
     call    crt0_exit
-endloop:
-    jr      endloop
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)
@@ -69,8 +64,8 @@ _im1_init:
 pc88bios:	
     ret
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     ; Include the IPL bootstrap code
     INCLUDE "target/pc88/classic/bootstrap.asm"

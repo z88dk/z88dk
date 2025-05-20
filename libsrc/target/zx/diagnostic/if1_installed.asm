@@ -10,18 +10,18 @@
 ;	$Id: if1_installed.asm,v 1.3 2016-06-10 20:02:04 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	if1_installed
-	PUBLIC	_if1_installed
-	
+    SECTION code_clib
+    PUBLIC  if1_installed
+    PUBLIC  _if1_installed
+
 if1_installed:
 _if1_installed:
-	ld	hl,(23635)
-	ld	de,23813
-	sbc	hl,de
-	ld	a,h
-	or	l
-	ld	hl,0
-	ret	nz
-	inc	hl
-	ret
+    ld      hl, (23635)
+    ld      de, 23813
+    sbc     hl, de
+    ld      a, h
+    or      l
+    ld      hl, 0
+    ret     nz
+    inc     hl
+    ret

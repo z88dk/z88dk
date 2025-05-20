@@ -8,13 +8,13 @@
 
 
 # Targets that you want to compile for (eg zx, multi8 etc)
-TARGETS = 
+TARGETS ?= 
 
 # Name of the output binary
-APPNAME = 
+APPNAME ?= 
 
 # Source files shared between all z88dk targets (eg $(wildcard *.c) $(wildcard *.asm))
-COMMON_SRCS =  
+COMMON_SRCS ?=  
 
 
 
@@ -44,8 +44,8 @@ ZCFLAGS_aquarius_rom = -subtype=rom
 ZLDFLAGS_aquarius_rom = 
 
 Z88DKTARGET_aqplus = aquarius
-ZCFLAGS_aqplus = -clib=aqplus
-ZLDFLAGS_aqplus = 
+ZCFLAGS_aqplus = -clib=aqplus -subtype=aqx
+ZLDFLAGS_aqplus =
 
 Z88DKTARGET_bit90 = coleco
 ZCFLAGS_bit90 = -subtype=bit90
@@ -89,6 +89,26 @@ ZLDFLAGS_gl6000 =
 Z88DKTARGET_gamegear = sms
 ZCFLAGS_gamegear = -subtype=gamegear
 ZLDFLAGS_gamegear = 
+
+Z88DKTARGET_m10 = m100
+ZCFLAGS_m10 = -clib=m10
+ZLDFLAGS_m100 = 
+
+Z88DKTARGET_m10_optrom = m100
+ZCFLAGS_m10_optrom = -clib=m10 -subtype=optrom
+ZLDFLAGS_m100_optrom = 
+
+Z88DKTARGET_kc85 = m100
+ZCFLAGS_kc85 = -clib=kc85
+ZLDFLAGS_kc85 = 
+
+Z88DKTARGET_kc85_optrom = m100
+ZCFLAGS_kc85_optrom = -clib=kc85 -subtype=optrom
+ZLDFLAGS_kc85_optrom = 
+
+Z88DKTARGET_pc8201 = m100
+ZCFLAGS_pc8201 = -clib=pc8201
+ZLDFLAGS_pc8201 = 
 
 Z88DKTARGET_m100_optrom = m100
 ZCFLAGS_m100_optrom = -subtype=optrom
@@ -141,13 +161,21 @@ Z88DKTARGET_zx_rom = zx
 ZCFLAGS_zx_rom = -subtype=rom
 ZLDFLAGS_zx_rom = -lndos
 
+Z88DKTARGET_hectorhr = hector
+ZCFLAGS_hectorhr = -clib=hectorhr
+ZLDFLAGS_hectorhr = 
+
 
 # Setup the CP/M mappings to +cpm
-CPMSUBTYPES = aussie px pxansi px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
+CPMSUBTYPES = aussie px px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
 	kaypro84 mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777 pasopia \
 	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bondwell2  \
 	cpc pcw40 pcw80 corvette nabu mbc200 mbc1100 mbc1160 mbc2000 x820 partner v1050 \
-	tim011 hz89 hz100 ptcpm
+	tim011 hz89 hz100 ptcpm lec80t zxlec scorpion atmturbo quorum diskface \
+	actrix actrixss altos5 altos580 ampro amust amustold apple2 bbc beehive \
+	bigboard fmgcpm gemini gnat10 holmes hp125 lifeboat max80 magnolia \
+	merchant micromate montezuma m4cpm3 mz80 mz800 teletek televideo \
+	cortex vt180 lnw80
 
 define setup_cpm_subtypes
 Z88DKTARGET_cpm_$(1) = cpm

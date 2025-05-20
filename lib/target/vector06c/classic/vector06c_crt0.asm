@@ -21,7 +21,7 @@
     EXTERN    asm_im1_handler
     EXTERN    asm_load_palette
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 IFNDEF CLIB_FGETC_CONS_DELAY
@@ -64,16 +64,13 @@ ENDIF
 
 program:
     di
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     ld      a,195
     ld      ($38),a
     ld      hl,asm_im1_handler
     ld      ($39),hl
-    call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     xor     a
     out     ($10),a
 
@@ -82,14 +79,15 @@ program:
     ld      hl,palette
     call    asm_load_palette
 
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-    INCLUDE "crt/classic/crt_start_eidi.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     ld      hl,0
     push    hl
     push    hl
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     INCLUDE "crt/classic/crt_terminate.inc"
 
 
@@ -119,6 +117,7 @@ palette:
     defb    @01111111	;Yellow
     defb    @11111111	;White
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
+

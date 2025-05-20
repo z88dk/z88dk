@@ -7,12 +7,12 @@
 #include <X11/Xlib.h>
 
 typedef struct {
-    	long flags;	/* marks which fields in this structure are defined */
+	long flags;		/* marks which fields in this structure are defined */
 	int x, y;		/* obsolete for new window mgrs, but clients */
 	int width, height;	/* should set so old wm's don't mess up */
 	int min_width, min_height;
 	int max_width, max_height;
-    	int width_inc, height_inc;
+	int width_inc, height_inc;
 	struct {
 		int x;	/* numerator */
 		int y;	/* denominator */

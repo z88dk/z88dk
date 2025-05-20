@@ -12,41 +12,41 @@
 ;Number in FA..
 
 
-IF FORts2068
-		INCLUDE  "target/ts2068/def/ts2068fp.def"
+IF  FORts2068
+    INCLUDE "target/ts2068/def/ts2068fp.def"
 ENDIF
-IF FORzx
-		INCLUDE  "target/zx/def/zxfp.def"
+IF  FORzx
+    INCLUDE "target/zx/def/zxfp.def"
 ENDIF
-IF FORzx81
-		INCLUDE  "target/zx81/def/81fp.def"
+IF  FORzx81
+    INCLUDE "target/zx81/def/81fp.def"
 ENDIF
-IF FORlambda
-		INCLUDE  "target/lambda/def/lambdafp.def"
+IF  FORlambda
+    INCLUDE "target/lambda/def/lambdafp.def"
 ENDIF
 
-                SECTION  code_fp
-                PUBLIC    sqrt
+    SECTION code_fp
+    PUBLIC  sqrt
 
-                EXTERN	fsetup1
-                EXTERN	stkequ
+    EXTERN  fsetup1
+    EXTERN  stkequ
 
-.sqrt
-        call    fsetup1
+sqrt:
+    call    fsetup1
 
 ; In C the square root of a negative number forces ZERO.
 ; SQR( (ABS(N)+N) / 2 ) does the trick
-	defb	ZXFP_DUPLICATE
-	defb	ZXFP_ABS
-	defb	ZXFP_ADDITION
-	defb	ZXFP_STK_HALF
-	defb	ZXFP_MULTIPLY
+    defb    ZXFP_DUPLICATE
+    defb    ZXFP_ABS
+    defb    ZXFP_ADDITION
+    defb    ZXFP_STK_HALF
+    defb    ZXFP_MULTIPLY
 
-IF FORlambda
-	defb	ZXFP_SQR + 128
+IF  FORlambda
+    defb    ZXFP_SQR+128
 ELSE
-	defb	ZXFP_SQR
-	defb	ZXFP_END_CALC
+    defb    ZXFP_SQR
+    defb    ZXFP_END_CALC
 ENDIF
-        jp      stkequ
+    jp      stkequ
 

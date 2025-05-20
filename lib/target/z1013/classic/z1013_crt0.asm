@@ -16,7 +16,7 @@
     INCLUDE "zcc_opt.def"
 
     EXTERN  _main           ;main() is always external to crt0 code
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -74,6 +74,7 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__register_sp = 0xdfff
     defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__crt_on_exit = $F000
     defc    __CPU_CLOCK = 1000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -82,29 +83,28 @@ ENDIF
 start:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
 
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main   ;Call user program
 
-cleanup:
+__Exit:
 	push    hl
     call    crt0_exit
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
-    jp      $F000
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)    ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
     SECTION code_crt_init
     ld      hl,$EC00
     ld      (base_graphics),hl

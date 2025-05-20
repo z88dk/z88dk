@@ -1,12 +1,12 @@
 
 
-SECTION code_clib
+    SECTION code_clib
 
-INCLUDE "target/msx/def/msxdos.def"
+    INCLUDE "target/msx/def/msxdos.def"
 
-PUBLIC target_read_structtm
+    PUBLIC  target_read_structtm
 
-EXTERN MSXDOS
+    EXTERN  MSXDOS
 
 ; struct tm {
 ;        int tm_sec;
@@ -25,28 +25,28 @@ EXTERN MSXDOS
 ; int target_read_structtm(struct tm *) __z88dk_fastcall
 target_read_structtm:
     push    hl
-    ld      c,_GTIME
+    ld      c, _GTIME
     call    MSXDOS
     pop     ix
-    ld      (ix+0),d
-    ld      (ix+1),0
-    ld      (ix+2),l
-    ld      (ix+3),0
-    ld      (ix+4),h
-    ld      (ix+5),0
+    ld      (ix+0), d
+    ld      (ix+1), 0
+    ld      (ix+2), l
+    ld      (ix+3), 0
+    ld      (ix+4), h
+    ld      (ix+5), 0
     push    ix
-    ld      c,_GDATE
+    ld      c, _GDATE
     call    MSXDOS
     pop     ix
-    ld      (ix+6),e
-    ld      (ix+7),0
+    ld      (ix+6), e
+    ld      (ix+7), 0
     dec     d
-    ld      (ix+8),d
-    ld      (ix+9),0
-    ld      de,1900
+    ld      (ix+8), d
+    ld      (ix+9), 0
+    ld      de, 1900
     and     a
-    sbc     hl,de
-    ld      (ix+10),l
-    ld      (ix+11),h
-    ld      hl,1
+    sbc     hl, de
+    ld      (ix+10), l
+    ld      (ix+11), h
+    ld      hl, 1
     ret

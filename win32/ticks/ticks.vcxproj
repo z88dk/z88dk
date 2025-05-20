@@ -189,6 +189,7 @@
     <ClCompile Include="..\..\src\ticks\hook_misc.c" />
     <ClCompile Include="..\..\src\ticks\hook_rc2014.c" />
     <ClCompile Include="..\..\src\ticks\i8085_inst.c" />
+    <ClCompile Include="..\..\src\ticks\i8255.c" />
     <ClCompile Include="..\..\src\ticks\kc160_inst.c" />
     <ClCompile Include="..\..\src\ticks\lex.yy.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
@@ -200,6 +201,7 @@
     <ClCompile Include="..\..\src\ticks\srcfile.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
     <ClCompile Include="..\..\src\ticks\ticks.c" />
+    <ClCompile Include="..\..\src\ticks\ticks_main.c" />
     <ClCompile Include="..\..\src\ticks\utf8.c" />
     <ClCompile Include="..\..\src\ticks\z180_inst.c" />
     <ClCompile Include="..\..\src\ticks\z80n_inst.c" />

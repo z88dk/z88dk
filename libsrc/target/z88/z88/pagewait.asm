@@ -14,23 +14,23 @@
 ;       Returns with key pressed
 
 
-        SECTION code_clib
+    SECTION code_clib
 
-               PUBLIC    pagewait
-               PUBLIC    _pagewait
+    PUBLIC  pagewait
+    PUBLIC  _pagewait
 
-                INCLUDE "saverst.def"
+    INCLUDE "saverst.def"
 
-.pagewait
-._pagewait
-        ld      a,SR_PWT
-        call_oz(os_sr)
-        ld      l,a
-        ld      h,0
-        ret     nc
-        dec     a               ; rc.esc
-        ld      hl,-1
-        ret     z
-        inc     hl
-        ret
-        
+pagewait:
+_pagewait:
+    ld      a, SR_PWT
+    call_oz (os_sr)
+    ld      l, a
+    ld      h, 0
+    ret     nc
+    dec     a                           ; rc.esc
+    ld      hl, -1
+    ret     z
+    inc     hl
+    ret
+

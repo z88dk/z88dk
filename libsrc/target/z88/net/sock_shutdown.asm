@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_shutdown
 
-        SECTION code_clib
-	PUBLIC	sock_shutdown
-	PUBLIC	_sock_shutdown
+    SECTION code_clib
+    PUBLIC  sock_shutdown
+    PUBLIC  _sock_shutdown
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_shutdown
-._sock_shutdown
-	ld	a,r_sock_shutdown
-	call_pkg(tcp_all)
-	ret	nc
+sock_shutdown:
+_sock_shutdown:
+    ld      a, r_sock_shutdown
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_shutdown
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_shutdown
+    jp      no_zsock

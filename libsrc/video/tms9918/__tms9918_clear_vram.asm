@@ -1,16 +1,16 @@
 
 
-SECTION code_video_vdp
-PUBLIC  __tms9918_clear_vram
+    SECTION code_video_vdp
+    PUBLIC  __tms9918_clear_vram
 
-EXTERN  FILVRM
+    EXTERN  FILVRM
 
 __tms9918_clear_vram:
-IFDEF V9938
-    ld      bc,65536
+IFDEF   V9938
+    ld      bc, 65536
 ELSE
-    ld      bc,16384
+    ld      bc, 16384
 ENDIF
-    ld      hl,0
+    ld      hl, 0
     xor     a
     jp      FILVRM

@@ -11,23 +11,23 @@
 ;	$Id: zx_kempstonmouse.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	zx_kempstonmouse
-	PUBLIC	_zx_kempstonmouse
-	
+    SECTION code_clib
+    PUBLIC  zx_kempstonmouse
+    PUBLIC  _zx_kempstonmouse
+
 zx_kempstonmouse:
 _zx_kempstonmouse:
-	ld	hl,0
-	ld	de,65535
+    ld      hl, 0
+    ld      de, 65535
 loop:
-	ld	bc,64223
-	in	a,(c)
-	cp	255
-	ret	nz
-	dec	de
-	ld	a,d
-	or	e
-	jr	nz,loop
-	
-	inc	hl
-	ret
+    ld      bc, 64223
+    in      a, (c)
+    cp      255
+    ret     nz
+    dec     de
+    ld      a, d
+    or      e
+    jr      nz, loop
+
+    inc     hl
+    ret

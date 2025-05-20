@@ -14,9 +14,11 @@
 	PUBLIC	getk
 	PUBLIC	_getk
 	
+KEYASC	equ	$1f00
 	
 .getk
 ._getk
+	push	ix
 
         ld      bc,$00ff		; Scan all columns at once.
         in      a,(c)			; Read the results.
@@ -79,7 +81,7 @@ KCOLCNT:
 ;
 KFOUND:
 		ld		e,a
-		call	$1f01			; KDECODE + 1 (skip the scan count increment)
+		call	KEYASC+1	; KDECODE + 1 (skip the scan count increment)
 		
 
 IF STANDARDESCAPECHARS
@@ -94,5 +96,6 @@ ENDIF
 .getk_exit
 	ld	l,a
 	ld	h,0
+	pop	ix
 	ret
 

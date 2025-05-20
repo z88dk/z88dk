@@ -364,9 +364,8 @@ char* subst_imp(char* pat, char** vars)
     static char lin[MAXLINE];
     char num[30];
     char *s, *start = pat;
-    int i;
+    int i = 0;
 
-    i = 0;
     for (;;) {
         if (pat[0] == '%' && pat[1] == '%') {
             if (i < MAXLINE) {
@@ -396,7 +395,7 @@ char* subst_imp(char* pat, char** vars)
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
         } else if (pat[0] == '%' && strncmp(pat,"%defb(", 6) == 0 ) {
-            int  var,quotes = 0,needcomma = 0;
+            int var = 0,quotes = 0,needcomma = 0;
             pat += 6;
             while (*pat != ')') {
                 if (*pat++ == '%' ) {

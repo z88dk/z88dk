@@ -3,10 +3,10 @@ SECTION code_clib
 
 PUBLIC scrollup_TEXT
 
-INCLUDE "target/aquarius/def/aquarius.def"
-
+EXTERN COLOUR_MAP
 EXTERN CONSOLE_COLUMNS
 EXTERN CONSOLE_ROWS
+EXTERN DISPLAY
 EXTERN __aquarius_attr
 
 scrollup_TEXT:

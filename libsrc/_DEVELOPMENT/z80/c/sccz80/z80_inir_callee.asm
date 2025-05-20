@@ -16,7 +16,8 @@ z80_inir_callee:
    ex (sp),hl
 
    ld b,e
-   jp asm_z80_inir
+   inir
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

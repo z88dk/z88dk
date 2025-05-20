@@ -17,56 +17,58 @@
 ; Mode 3 = 640x480  4bpp 80x60
 
 asm_agon_setmode:
-    ld      c,a
-    ld      a,22
+    ld      c, a
+    ld      a, 22
     call    __agon_putc
-    ld      a,c
+    ld      a, c
     call    __agon_putc
 
     ;Pause
-    ld      bc,0
+    ld      bc, 0
 busy:
     push    ix
     pop     ix
     dec     bc
-    ld      a,c
+    ld      a, c
     or      b
-    jr      nz,busy
+    jr      nz, busy
 
 get_params:
     ; Now query the parameters
     push    ix
 query_again:
-    MOSCALL(mos_sysvars)
-    defb    $5b     ;LIL
-    res     4,(ix+sysvar_vpd_pflags)
-    ld      a,23
+    MOSCALL (mos_sysvars)
+    defb    $5b                         ;LIL
+    res     4, (ix+sysvar_vpd_pflags)
+    ld      a, 23
     call    __agon_putc
     xor     a
     call    __agon_putc
-    ld      a,vdp_mode
+    ld      a, vdp_mode
     call    __agon_putc
 ck:
-    defb    $5b     ;LIL
-   bit     4,(ix+sysvar_vpd_pflags)
-   jr      z,ck
+    defb    $5b                         ;LIL
+    bit     4, (ix+sysvar_vpd_pflags)
+    jr      z, ck
 
    ; This doesn't work on the emulator
-    defb    $5b     ;LIL
-    ld      a,(ix+sysvar_scrMode)
+    defb    $5b                         ;LIL
+    ld      a, (ix+sysvar_scrMode)
     cp      c
 ;    jr      nz,query_again
 
-    defb    $5b     ;LIL
-    ld      a,(ix+ sysvar_scrRows)
-    ld      (__console_h),a
-    defb    $5b     ;LIL
-    ld      a,(ix+ sysvar_scrCols)
-    ld      (__console_w),a
-    defb    $5b, $dd, $27, sysvar_scrWidth      ;ld.lil hl,(ix+sysvar_scrWidth)
-    ld      (__agon_gfxw),hl
-    defb    $5b, $dd, $27, sysvar_scrHeight     ;ld.lil hl,(ix+sysvar_scrHeight)
-    ld      (__agon_gfxh),hl 
+    defb    $5b                         ;LIL
+    ld      a, (ix+sysvar_scrRows)
+    ld      (__console_h), a
+    defb    $5b                         ;LIL
+    ld      a, (ix+sysvar_scrCols)
+    ld      (__console_w), a
+    defb    $5b, $dd, $27, sysvar_scrWidth
+                                        ;ld.lil hl,(ix+sysvar_scrWidth)
+    ld      (__agon_gfxw), hl
+    defb    $5b, $dd, $27, sysvar_scrHeight
+                                        ;ld.lil hl,(ix+sysvar_scrHeight)
+    ld      (__agon_gfxh), hl
     and     a
     pop     ix
     ret
@@ -74,15 +76,15 @@ ck:
     SECTION rodata_clib
 
 initscr:
-    defb    23, 0, $c0, 0       ;Unset logical coordinates
-    defb    23, 1, 0            ;Hide cursor
+    defb    23, 0, $c0, 0               ;Unset logical coordinates
+    defb    23, 1, 0                    ;Hide cursor
 
     SECTION code_crt_init
 
-    ld      hl,initscr
-    ld      b,7
+    ld      hl, initscr
+    ld      b, 7
 loop:
-    ld      a,(hl)
+    ld      a, (hl)
     call    __agon_putc
     inc     hl
     djnz    loop

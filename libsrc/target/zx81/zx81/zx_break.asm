@@ -10,20 +10,20 @@
 ;
 ;----------------------------------------------------------------
 
-        SECTION code_clib
-        PUBLIC    zx_break
-        PUBLIC    _zx_break
+    SECTION code_clib
+    PUBLIC  zx_break
+    PUBLIC  _zx_break
 
 zx_break:
 _zx_break:
 
 		;call $f46	; BREAK-1
 
-		LD A,$7F
-		IN A,($FE)
-		RRCA
+    LD      A, $7F
+    IN      A, ($FE)
+    RRCA
 
-		ld	hl,0	; assume break is not pressed
-		ret c
-		inc l
-		ret
+    ld      hl, 0                       ; assume break is not pressed
+    ret     c
+    inc     l
+    ret

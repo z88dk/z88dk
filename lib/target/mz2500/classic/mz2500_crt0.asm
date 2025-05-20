@@ -21,7 +21,7 @@
     EXTERN    _main
     EXTERN    _mz2500_printf
 
-    PUBLIC    cleanup 
+    PUBLIC    __Exit 
     PUBLIC    l_dcal
 
 
@@ -37,6 +37,7 @@
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__fputc_cons_generic = 1
+    defc    TAR__crt_on_exit = $10001       ;loop forever
     defc	__CPU_CLOCK = 6000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -118,45 +119,37 @@ start:
     defb    70h     ; clear text
 
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 	
 ;	im 2
 ;	ei
 
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
 ; INIT math identify platform
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    ld      hl,0
-    add     hl,sp
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _main
 
-cleanup:
+__Exit:
 
     call    crt0_exit
 
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
-    ;push    hl				; return code
 
-    di
-    halt
-
-cleanup_exit:
+crt0_exit_exit:
     ret
 
 
 ;IF (!DEFINED_startup | (startup=1))
 ;
-;        defs    56-cleanup_exit-1
+;        defs    56-crt0_exit_exit-1
 ;
 ;if (ASMPC<>$0038)
 ;        defs    CODE_ALIGNMENT_ERROR
@@ -175,13 +168,8 @@ IF !DEFINED_ansicolumns
     defc ansicolumns = 40
 ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
-
-
-    SECTION code_crt_init
-    ld      hl,TAR__register_sp
-    ld      (exitsp),hl
+    INCLUDE	"crt/classic/crt_section.inc"
 
 

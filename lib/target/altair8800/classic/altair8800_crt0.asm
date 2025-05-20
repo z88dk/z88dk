@@ -16,7 +16,7 @@
     EXTERN    _main           ;main() is always external to crt0 code
     EXTERN    asm_im1_handler
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -33,6 +33,7 @@
         defc CONSOLE_COLUMNS = 80
     ENDIF
 
+    defc TAR__crt_enable_eidi = $02     ;enable on start
     defc TAR__crt_enable_rst = $8080
     EXTERN asm_im1_handler
     defc _z80_rst_38h = asm_im1_handler
@@ -53,30 +54,24 @@ IF CRT_ORG_CODE = 0x0000
 
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 ENDIF
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
-    ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
     call    _main
     pop     bc
     pop     bc
-cleanup:
+__Exit:
     rst     0
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
@@ -94,6 +89,7 @@ ENDIF
         defc __crt_model = 1
     ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
+

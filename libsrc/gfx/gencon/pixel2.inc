@@ -49,7 +49,7 @@
         ld      b, l
         ld      a, (__gfx_fatpix)
         and     a
-        jr      z, not_fatpix0
+        jr      nz, fatpix0
   IF    __CPU_INTEL__
         ld      a, l
         rra
@@ -58,7 +58,7 @@
   ELSE
         srl     b
   ENDIF
-not_fatpix0:
+fatpix0:
         push    bc                      ;save reduced cooardinates
         push    hl                      ;save original coordinates
   IF    USEplotc
@@ -85,13 +85,13 @@ chfound:
         ld      a, (__gfx_fatpix)
         and     a
         ld      a, 3
-        jr      z, not_fatpix
+        jr      nz, fatpix
         ld      a, l
         rlca
         and     2
-        jr      nz, not_fatpix
+        jr      nz, fatpix
         inc     a
-not_fatpix:
+fatpix:
 
   IF    NEEDplot
         or      b

@@ -18,6 +18,7 @@
  *   - disk save in data block mode (-DDISKBLOCK)
  *   - opt graphics scenes   (-DPICS)
  *   - low resolution graphics scenes   (-DPICS -DRASTER)
+ *   - splash title screen   (-DPICS -DSPLASH)
  *   - score made optional   (-DCOMPUTE_SCORE)
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
@@ -30,7 +31,7 @@
 
  
  /*
-  *	Using -DDISKBLOCKS on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
+  *	Using -DDISKBLOCK on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
   * ZX Microdrive syntax example is given:
   *
   * 5000 STOP
@@ -71,7 +72,11 @@
 #include <games.h>
 #include "adv_a.h"
 int mazepic;
+  #ifdef SPLASH
+  #include <games.h>
+  #endif
 #endif
+
 
 #ifdef ACE
 #include <arch/ace.h>
@@ -3081,7 +3086,13 @@ int main()
 #ifdef COMPUTE_SCORE
 		nScore = 0;
 #endif
-		
+
+#ifdef PICS
+#ifdef SPLASH
+		putsprite (spr_or, (getmaxx()-151)/2, (getmaxy()-110)/2, splash_screen);
+		i_GetCh();
+#endif
+#endif
 
 		PrintInstr();
 

@@ -80,6 +80,7 @@ enum {
     CPU_TYPE_R2KA,
     CPU_TYPE_R3K,
     CPU_TYPE_R4K,
+    CPU_TYPE_R6K,
     CPU_TYPE_8080,
     CPU_TYPE_8085,
     CPU_TYPE_GBZ80,
@@ -282,6 +283,7 @@ static char           *m4arg = NULL;
 static char           *coptarg = NULL;
 static char           *pragincname = NULL;  /* File containing pragmas to append to zcc_opt.def */
 static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
+static char           *c_target = NULL;     // Placeholder, unused
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -2;
@@ -382,6 +384,7 @@ static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
 static int    c_stylecpp = outspecified;
+static char  *c_swallow_mf = NULL;
 
 static char  *c_extension = NULL;
 static char  *c_assembler = NULL;
@@ -477,16 +480,18 @@ static option options[] = {
     { 0, "mr2ka", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2KA },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_TYPE_R3K },
     { 0, "mr4k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 4000", &c_cpu, NULL, CPU_TYPE_R4K },
+    { 0, "mr6k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 6000", &c_cpu, NULL, CPU_TYPE_R6K },
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the gbz80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
     { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 (z80 mode)", &c_cpu, NULL, CPU_TYPE_EZ80 },
     { 0, "mkc160", OPT_ASSIGN|OPT_INT, "Generate output for the KC160 (z80 mode)", &c_cpu, NULL, CPU_TYPE_KC160 },
 
     { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
+    { 0, "target", OPT_STRING, "Set the target (alternative to + syntax)", &c_target, NULL, 0 },
     { 0, "subtype", OPT_STRING,  "Set the target subtype" , &c_subtype, NULL, 0},
     { 0, "clib", OPT_STRING,  "Set the target clib type" , &c_clib, NULL, 0},
     { 0, "crt0", OPT_STRING,  "Override the crt0 assembler file to use" , &c_crt0, NULL, 0},
     { 0, "startuplib", OPT_STRING,  "Override STARTUPLIB - compiler base support routines" , &c_startuplib, NULL, 0},
-    { 0, "no-crt", OPT_BOOL|OPT_DOUBLE_DASH,  "Link without crt0 file" , &c_nocrt, NULL, 0},
+    { 0, "no-crt", OPT_BOOL|OPT_DOUBLE_DASH,  "Link without crt0 file (if possible, may not be successful)" , &c_nocrt, NULL, 0},
     { 0, "startupoffset", OPT_INT|OPT_PRIVATE,  "Startup offset value (internal)" , &c_startupoffset, NULL, 0},
     { 0, "startup", OPT_INT,  "Set the startup type" , &c_startup, NULL, 0},
     { 0, "zorg", OPT_INT,  "Set the origin (only certain targets)" , &c_zorg, NULL, 0},
@@ -568,6 +573,9 @@ static option options[] = {
     { 0, "lstcwd", OPT_BOOL|OPT_DOUBLE_DASH,  "Paths in .lst files are relative to the current working dir" , &lstcwd, NULL, 0},
     { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
     { 'M', NULL, OPT_BOOL|OPT_PRIVATE,  "Swallow -M option in configs" , &swallow_M, NULL, 0},
+    { 0, "MD", OPT_BOOL|OPT_PRIVATE,  "Ignore -MD" , &swallow_M, NULL, 0},
+    { 0, "MT", OPT_BOOL|OPT_PRIVATE,  "Ignore -MT" , &c_swallow_mf, NULL, 0},
+    { 0, "MF", OPT_STRING|OPT_PRIVATE,  "Ignore -MF" , &c_swallow_mf, NULL, 0},
     { 0, "vn", OPT_BOOL_FALSE|OPT_PRIVATE,  "Turn off command tracing" , &verbose, NULL, 0},
     { 0, "no-cleanup", OPT_BOOL_FALSE, "Don't cleanup temporary files", &cleanup, NULL, 0 },
     { 0, "", 0, NULL },
@@ -582,6 +590,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-mr2ka"  , "-mr2ka"  , "-mr2ka"  , "-mr2ka", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL  }},          /* CPU_TYPE_R2KA     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mr4k"   , "-mr4k"   , "-mr4ka"  , "-mr4k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R4K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr6k"   , "-mr6k"   , "-mr4ka"  , "-mr6k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R6K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8080"  , "-m8080"  , NULL   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1", "_8080", NULL  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8085"  , "-m8085"  , NULL   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1", "_8085", NULL  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80", NULL }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
@@ -768,8 +777,8 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
     }
 
     if (verbose) {
-        printf("%s\n", buffer);
-        fflush(stdout);
+        fprintf(stderr, "%s\n", buffer);
+        fflush(stderr);
     }
 
     status = system(buffer);
@@ -975,6 +984,10 @@ int main(int argc, char **argv)
         if (aa[0] == '+') {
             strcpy(configuration, aa);
             break;
+        } else if ( strncmp(aa, "-target=", 8) == 0 ) {
+            strcpy(configuration, "+");
+            strcat(configuration, aa + 8);
+            break;
         } else if (aa[0] == '@') {
             struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
 
@@ -990,7 +1003,7 @@ int main(int argc, char **argv)
     }
 
     if (strlen(configuration) == 0) {
-        fprintf(stderr, "A config file must be specified with +file\n\n");
+        fprintf(stderr, "A config file must be specified with +file or with -target=[target]\n\n");
         print_help_text(argv[0]);
         exit(1);
     }
@@ -1411,7 +1424,6 @@ int main(int argc, char **argv)
                 }
 
                 if (process(".i", ".opt", c_compiler, compiler_arg, compiler_style, i, YES, NO)) {
-                    perror(c_compiler);
                     exit(1);
                 }
                 free(compiler_arg);
@@ -1642,11 +1654,16 @@ int main(int argc, char **argv)
         case OBJFILE:
             break;
         default:
-            if (strcmp(filelist[i], original_filenames[i]) == 0)
-                fprintf(stderr, "Filetype of %s unrecognized\n", filelist[i]);
-            else
-                fprintf(stderr, "Filetype of %s (%s) unrecognized\n", filelist[i], original_filenames[i]);
-            exit(1);
+            {
+                struct stat sb;
+                if (stat(original_filenames[i], &sb) != 0) 
+                    fprintf(stderr, "File %s not found\n", filelist[i]);
+                else if (strcmp(filelist[i], original_filenames[i]) == 0)
+                    fprintf(stderr, "Filetype of %s unrecognized\n", filelist[i]);
+                 else
+                    fprintf(stderr, "Filetype of %s (%s) unrecognized\n", filelist[i], original_filenames[i]);
+                exit(1);
+            }
         }
     }
 
@@ -1749,12 +1766,15 @@ int main(int argc, char **argv)
         }
 
 		// z80asm now generates def file with same basename as output binary, i.e. a.def
-		/*
+
+        /*
 		if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
+        */
+        if (globaldefon && copy_defc_file(filenamebuf, ".def", filenamebuf, ".dfc")) {
             fprintf(stderr, "Cannot create global defc file\n");
             status = 1;
         }
-		*/
+		
 
         if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
@@ -2275,15 +2295,14 @@ void SetStringConfig(arg_t *argument, char *arg)
 
 void SetNumber(arg_t *argument, char *arg)
 {
-    char *ptr = arg + 1;
+    char *ptr = arg;
     char *end;
     int   val;
-
     if (strncmp(ptr, argument->name, strlen(argument->name)) == 0) {
         ptr += strlen(argument->name);
     }
-
     while (ispunct(*ptr)) ++ptr;
+
     val = (int)strtol(ptr, &end, 0);
 
     if (end != ptr) {
@@ -3301,9 +3320,35 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
         if (c_zcc_cfg != NULL) {
             /* Config file in config directory */
             snprintf(buf, buflen, "%s/%s.cfg", c_zcc_cfg, arg + 1);
+            if ( (fp = fopen(buf, "r") ) != NULL ) {
+                fclose(fp);
+                return;
+            }
+            // We can't find the file here, check for ti8x
+            if ( strcmp(arg+1,"ti8x") == 0 ) {
+                fprintf(stderr, "Target ti8x has been requested, the target is now named ti83p\n");
+                snprintf(buf, buflen, "%s/ti83p.cfg", c_zcc_cfg);
+            } else {
+                fprintf(stderr, "Can't find configuration file for target %s in %s\n", arg+1, c_zcc_cfg);
+                exit(1);
+            }
+
             return;
         } else {
             snprintf(buf, buflen, "%s/lib/config/%s.cfg", c_install_dir, arg + 1);
+
+            if ( (fp = fopen(buf, "r") ) != NULL ) {
+                fclose(fp);
+                return;
+            }
+            // We can't find the file here, check for ti8x
+            if ( strcmp(arg+1,"ti8x") == 0 ) {
+                fprintf(stderr, "Target ti8x has been requested, the target is now named ti83p\n");
+                snprintf(buf, buflen, "%s/lib/config/ti83p.cfg", c_install_dir);
+            } else {
+                fprintf(stderr, "Can't find configuration file for target %s in %s/lib/config\n", arg+1, c_install_dir);
+                exit(1);
+            }
         }
         /*
          * User supplied invalid config file, let it fall over back
@@ -3312,7 +3357,7 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
         return;
     }
     /* Without a config file, we should just print usage and then exit */
-    fprintf(stderr, "A config file must be specified with +file\n\n");
+    fprintf(stderr, "A config file must be specified with +file or with -target=[target]\n\n");
     print_help_text(program);
     exit(1);
 }

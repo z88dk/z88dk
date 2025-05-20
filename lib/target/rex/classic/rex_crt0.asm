@@ -21,7 +21,7 @@ IF (startup=2)                 ; Library ?
 ENDIF
 
     PUBLIC	l_dcal		;jp(hl) instruction
-    PUBLIC	cleanup
+    PUBLIC	crt0_exit
 
 
 ;	defm	"ApplicationName:Addin",10,13
@@ -56,13 +56,14 @@ lib:
     push    hl
     jp      _LibMain
 start:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp	;Store atexit() stack
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     ; Entry to the user code
     call    _main		;Call the users code
-cleanup:
+__Exit:
     ld      de,$42	;DS_ADDIN_TERMINATE
     ld      ($c000),de
     rst     $10		;Exit the addin
@@ -78,13 +79,12 @@ farret:             ;Used for farcall logic
 ELSE
 
 start:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    ld      (exitsp),sp	;Store atexit() stack
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     ; Entry to the user code
     call    _main		;Call the users code
-cleanup:
+__Exit:
     ld      de,$42	;DS_ADDIN_TERMINATE
     ld      ($c000),de
     rst     $10		;Exit the addin
@@ -95,8 +95,8 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 ENDIF
 
 
-;	INCLUDE	"crt/classic/crt_runtime_selection.asm"
+;	INCLUDE	"crt/classic/crt_runtime_selection.inc"
     defc	__crt_org_bss = $f033
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 

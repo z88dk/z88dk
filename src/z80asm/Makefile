@@ -19,6 +19,8 @@ PROJ		:= z88dk-$(BARE_PROJ)
 TARGET_EXE	:= $(PROJ)$(EXESUFFIX)
 TARGET_LIB	:= $(PROJ).lib
 
+TASKS ?= 9
+
 CC 			?= gcc
 CXX			?= g++
 INSTALL 	?= install
@@ -40,6 +42,7 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 ifeq ($(findstring m68k, $(CC)), m68k)
+	LOCAL_CFLAGS := $(subst -ggdb, , $(LOCAL_CFLAGS))
     PARSE1_CFLAGS = -mlong-jump-table-offsets
 endif
 
@@ -58,7 +61,7 @@ endif
 # Object files
 #------------------------------------------------------------------------------
 C_SRCS		:= $(filter-out src/c/test.c, $(wildcard src/c/*.c ../common/*.c ../../ext/regex/reg*.c))
-CXX_SRCS	:= $(wildcard src/cpp/*.cpp)
+CXX_SRCS	:= $(wildcard src/*.cpp src/cpp/*.cpp)
 OBJS_ALL	:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o) $(UNIXem_OBJS)
 OBJS		:= $(filter-out main.o, $(OBJS_ALL))
 
@@ -130,7 +133,7 @@ ifeq ($(CROSS),0)
   ifeq ($(DEVELOPER),1)
 	perl asmstyle.pl dev/z80asm_lib/*.asm
   endif
-	$(MAKE) -C dev/z80asm_lib
+	$(MAKE) TASKS=$(TASKS) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(TARGET_LIB) .
   ifdef ZCCCFG
 	cp dev/z80asm_lib/$(TARGET_LIB) $(ZCCCFG)/../
@@ -180,7 +183,8 @@ $(TARGET_EXE): src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action
 
 ifeq ($(DEVELOPER),1)
 src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h: \
-			$(wildcard dev/cpu/*.pl dev/cpu/*.y) dev/cpu/Makefile Makefile
+			$(wildcard dev/cpu/*.pl dev/cpu/*.pm dev/cpu/*.dat) \
+			dev/cpu/Makefile Makefile
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
 	cp dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c
@@ -205,7 +209,7 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 
 test: $(TARGET_EXE) $(TARGET_LIB)
 	$(MAKE) -C dev/z80asm_lib test
-	perl -S prove --state=slow,save -j9 t/*.t
+	perl -S prove --state=slow,save -j$(TASKS) t/*.t
 
 testzcc : $(TARGET_EXE)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c

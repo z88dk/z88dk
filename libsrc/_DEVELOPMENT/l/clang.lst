@@ -1,3 +1,4 @@
+${NEWLIB_ROOT}l/clang/__bremu.asm
 ${NEWLIB_ROOT}l/clang/__setflag.asm
 ${NEWLIB_ROOT}l/clang/__lneg.asm
 ${NEWLIB_ROOT}l/clang/__lor.asm

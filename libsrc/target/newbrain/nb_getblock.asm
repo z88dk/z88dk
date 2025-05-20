@@ -18,33 +18,33 @@
 ; $Id: nb_getblock.asm,v 1.4 2016-06-19 20:33:40 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC nb_getblock
-	PUBLIC _nb_getblock
-	
-	EXTERN ZCALL
+    SECTION code_clib
+    PUBLIC  nb_getblock
+    PUBLIC  _nb_getblock
 
-.nb_getblock
-._nb_getblock
-	push	ix
-	ld	ix,4
-	add	ix,sp
+    EXTERN  ZCALL
 
-	ld	e,(ix+4)	; stream
+nb_getblock:
+_nb_getblock:
+    push    ix
+    ld      ix, 4
+    add     ix, sp
 
-	ld	c,(ix+0)	; block length
-	ld	b,(ix+1)
+    ld      e, (ix+4)                   ; stream
 
-	ld	l,(ix+2)	; block location
-	ld	h,(ix+3)
+    ld      c, (ix+0)                   ; block length
+    ld      b, (ix+1)
 
-	push	bc
-	
-	call	ZCALL
-	defb	$3c	; zblkin
-	
-	and	a
-	pop	hl
-	sbc	hl,bc
-	pop	ix	;restore caller
-	ret
+    ld      l, (ix+2)                   ; block location
+    ld      h, (ix+3)
+
+    push    bc
+
+    call    ZCALL
+    defb    $3c                         ; zblkin
+
+    and     a
+    pop     hl
+    sbc     hl, bc
+    pop     ix                          ;restore caller
+    ret

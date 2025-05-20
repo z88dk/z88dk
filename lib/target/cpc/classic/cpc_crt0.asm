@@ -13,7 +13,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -43,6 +43,11 @@ IF CRT_DISABLE_FIRMWARE_ISR = 0
     defc CRT_EVENT_BLOCKS_NUM = 8
 ENDIF
 
+
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc    CRT_MAX_HEAP_ADDRESS = 0xa600
+ENDIF
+
     ; Floating point accumulator needs to be in middle 32k
     PUBLIC  fa
     defc    fa = 0xa680
@@ -57,6 +62,7 @@ ENDIF
     defc    TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 8
     defc    TAR__clib_banking_stack_size = 16
+    defc    TAR__crt_enable_eidi = $02  ; ei on startup
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
@@ -108,22 +114,17 @@ ENDIF
 
     di
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
 
     ; enable process exx set
     ; install interrupt interposer
     call    cpc_enable_process_exx_set
-    ei
 
-
-IF DEFINED_USING_amalloc
-    defc    CRT_MAX_HEAP_ADDRESS = 0xa600
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     ld      a,CLIB_DEFAULT_SCREEN_MODE
@@ -132,9 +133,12 @@ ENDIF
 
     call    _main
 
-cleanup:
+__Exit:
     call    crt0_exit
-
+IF CLIB_EXIT_SCREEN_MODE != -1
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    cpc_setmode
+ENDIF
 
     di
     call    cpc_enable_fw_exx_set
@@ -288,9 +292,9 @@ loadbanks:
 ENDIF
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm" 
+    INCLUDE "crt/classic/crt_section.inc" 
 
     SECTION code_crt_init
     ld      hl,$c000

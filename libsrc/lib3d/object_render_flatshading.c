@@ -16,7 +16,7 @@
 #include <graphics.h>
 #include <string.h>
 
-void object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, char* stencil, vector_t* light) {
+void object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, unsigned char* stencil, vector_t* light) {
 	int c, diff;
 	//int l, top, bottom;
 	vector_t *i, *j, *k;

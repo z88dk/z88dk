@@ -18,7 +18,7 @@ l_lneg:
    or l
    ld hl,0
    ret nz
-   
+
    scf
    inc l
    ret

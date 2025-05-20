@@ -8,22 +8,22 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_close
-    PUBLIC     _bit_close
+    PUBLIC  bit_close
+    PUBLIC  _bit_close
 
-.bit_close
-._bit_close
+bit_close:
+_bit_close:
 
 ;-----
 ; Stefano Bodrato - fix for new SID, version 8580
-	ld	bc,$d404
-	ld	e,0
+    ld      bc, $d404
+    ld      e, 0
 resetsid:
-	out	(c),e
-	inc	c
-	ld	a,c
-	cp	$15	; loop up to $d414 (all three oscillators)
-	jr	nz,resetsid
+    out     (c), e
+    inc     c
+    ld      a, c
+    cp      $15                         ; loop up to $d414 (all three oscillators)
+    jr      nz, resetsid
 ;-----
 
-ret
+    ret

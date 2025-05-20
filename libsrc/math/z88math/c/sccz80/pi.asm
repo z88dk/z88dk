@@ -11,25 +11,25 @@
 
 ;double pi(void) - returns the value of pi
 
-        SECTION code_fp
-  IF    FORz88
-        INCLUDE "target/z88/def/fpp.def"
-  ELSE
-        INCLUDE "fpp.def"
-  ENDIF
+    SECTION code_fp
+IF  FORz88
+    INCLUDE "target/z88/def/fpp.def"
+ELSE
+    INCLUDE "fpp.def"
+ENDIF
 
-        PUBLIC  pi
+    PUBLIC  pi
 
-        EXTERN  stkequ2
+    EXTERN  stkequ2
 
 pi:
-  IF    FORz88
-        fpp     (FP_PI)
-  ELSE
-        ld      a, +(FP_PI)
-        call    FPP
-  ENDIF
-        jp      stkequ2
+IF  FORz88
+    fpp     (FP_PI)
+ELSE
+    ld      a, +(FP_PI)
+    call    FPP
+ENDIF
+    jp      stkequ2
 
 
 

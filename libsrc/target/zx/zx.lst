@@ -12,6 +12,10 @@ target/zx/games/obj/${TARGET}/bit_open
 target/zx/games/obj/${TARGET}/bit_open_di
 target/zx/games/obj/${TARGET}/bit_close
 target/zx/games/obj/${TARGET}/bit_close_ei
+
+target/zx/far/__far_misc
+target/zx/far/__far_page
+target/zx/far/l_far_mapaddr
 @games/games.lst
 @target/zx/spectrum.lst
 @target/zx/fzx/fzx.lst

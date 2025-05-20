@@ -1,0 +1,6 @@
+10 SET FAST ON: ' Enables turbo mode (clock speed 7.16MHz).
+20 'SCREEN 3: ' Selects the 80-column screen.
+30 'dir
+40 'pause
+50 'load "main.aqx"
+60 run "main.aqx"

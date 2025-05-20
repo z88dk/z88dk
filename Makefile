@@ -35,7 +35,7 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION	= 14648
+SDCC_VERSION	= 15248
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
@@ -87,6 +87,7 @@ else
 	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	patch -d $(SDCC_PATH) -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 endif
+	patch -p1 < support/patches/sdcc-elf-decl.patch
 endif
 
 zsdcc_r$(SDCC_VERSION)_src.tar.gz:
@@ -107,7 +108,7 @@ ifdef BUILD_SDCC
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-mos6502-port --disable-mos65c02-port \
-		--disable-r2k-port \
+		--disable-r2k-port --disable-f8-port \
 		--disable-non-free --disable-device-lib \
 		--disable-ucsim --disable-packihx \
 		--disable-sdcpp --disable-sdcdb --disable-sdbinutil

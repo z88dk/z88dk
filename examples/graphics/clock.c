@@ -6,16 +6,25 @@
  *  be sleep(1) or csleep(95) or a delay loop.
  * 
  *  Build examples
- *  zcc +zx -oclock -lndos -create-app -lm -llib3d -DDETAILED clock.c
- * ZX81, high resolution mod
- *  zcc +zx81ansi -oclock -startup=3 -lgfx81hr192 -lndos -create-app -llib3d -DDETAILED clock.c
- *  zcc +zx81 -oclock -startup=2 -lgfx81 -lndos -create-app -llib3d clock.c
+ *
+ * Standard build, e.g. on a ZX Spectrum 
+ *  zcc +zx -oclock -lndos -create-app -DDETAILED clock.c
+ * ZX81, high resolution mod and low resolution
+ *  zcc +zx81 -oclock -clib=ansi -subtype=wrx -create-app -DDETAILED clock.c
+ *  zcc +zx81 -oclock -lgfx81 -create-app  clock.c
  * Timex Sinclair 2068, double resolution on X axis
- *  zcc +ts2068 -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app -llib3d -Dhires clock.c
+ *  zcc +ts2068 -oclock -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app  -Dhires clock.c
  * SANYO MBC-200, very high resolution
- *  zcc +cpm -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos -llib3d -lm clock.c
- * Visual 1050, very high resolution, CP/M 3 supports time/date
- *  zcc +cpm -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos -llib3d -lm -DHAVE_TIME clock.c
+ *  zcc +cpm -oclock -subtype=mbc200 -DDETAILED -DFULL_HRG -create-app -lndos  clock.c
+ * Otrona attachè, high resolution, supports time/date
+ *  zcc +cpm -oclock -subtype=attache -DDETAILED  -create-app -lndos -DHAVE_TIME clock.c
+ * Visual 1050, very high resolution, CP/M 3 supports time/date (use John Elliott's DATE501 solve Y2K issues)
+ *  zcc +cpm -oclock -subtype=v1050 -DDETAILED -DFULL_HRG -Dhires -create-app -lndos  -DHAVE_TIME clock.c
+ * Commodore 128 (high and low resolution)
+ *  zcc +c128 -oclock -create-app -lgfx128hr -DDETAILED -DFULL_HRG -Dhires  clock.c
+ *  zcc +c128 -oclock -create-app -lgfx128 clock.c
+ * Philips P2000 (mid resolution)
+ *  zcc +p2000 -oclock -create-app clock.c
 
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
@@ -29,6 +38,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+#ifdef __C128__
+#include <c128/cia.h>
+// 4 bytes: Hrs, Min, Sec, Ten
+unsigned char appTOD[4];
+#endif
 
 #ifdef hires
 #define XDIV 128
@@ -65,7 +80,11 @@ int x_hr,y_hr;
 int i,j,k;
 int sz, long_sz, short_sz;
 int cx,cy;
+#ifdef __C128__
+unsigned char tm;
+#else
 long tm;
+#endif
 char hr[10],mn[10];
 
 void main()
@@ -98,6 +117,11 @@ void main()
 	printf("\n  Minutes: ");
 	scanf("%s",hr);
 	j=atoi(hr);
+#endif
+
+#ifdef __C128__
+  // An initial timer setup kicks it off
+  settodcia(cia2,appTOD);
 #endif
 
 	k=k*5+(j/12);
@@ -156,11 +180,14 @@ void main()
 	x=-1;
 
 	i=0;
-	
-	tm=clock();
-	
+
 	while (getk()!=' ') {
-		tm=clock();
+		#ifdef __C128__
+			gettodcia(cia2,appTOD);
+			tm=appTOD[2];   // seconds field
+		#else	
+			tm=clock();
+		#endif
 		if (i++ == 59) i=0;
 		if (i == 45) {
 			if (x != -1) {
@@ -230,10 +257,14 @@ void main()
 		circle(cx,cy,5,1);
 #endif
 
-		//sleep (1);
+#ifdef __C128__
+	while (tm == appTOD[2]) gettodcia(cia2,appTOD);
+	tm=appTOD[2];    // seconds field
+#else
+//		sleep (1);
 		while ((clock() < (tm+CLOCKS_PER_SEC))&&(clock() > CLOCKS_PER_SEC)) {}
 		tm=clock();
-	
+#endif	
 	}
 
 }

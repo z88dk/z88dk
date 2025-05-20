@@ -22,9 +22,9 @@ If you would like to jump to the beginning, click on [installment 1](https://git
 
 ## Z88DK's BiFrost Library
 
-[BiFrost](http://www.worldofspectrum.org/infoseekid.cgi?id=0027405)
+[BiFrost](https://spectrumcomputing.co.uk/entry/27405/ZX-Spectrum/BIFROST*_ENGINE)
 is a multicolour graphics library written by
-[Einar Saukas](https://www.ime.usp.br/~einar/bifrost/), which has
+[Einar Saukas](https://spectrumcomputing.co.uk/list?label_id=1), which has
 been embedded into, and interfaced with, the Z88DK C development
 kit. "Multicolour" means it's capable of drawing blocks of pixels which are 8
 pixels wide by 1 pixel high, each with 2 colour attributes. This works much the
@@ -74,7 +74,8 @@ aligned to 8 pixel horizonal coordinates, at the expense of more memory
 consumption and greater CPU processing requirement over the low resolution
 version.
 
-BiFrost*2 is an improvement on the high resolution version of BiFrost. It can
+[BiFrost*2](https://spectrumcomputing.co.uk/entry/30003/ZX-Spectrum/BIFROST*2_ENGINE)
+is an improvement on the high resolution version of BiFrost. It can
 place a 16x16 pixel multicolour tile at any vertical pixel, on any 8 pixel
 horizontal boundary, and can do so within a 20x22 character grid. That's a
 160x176 pixel area of the screen.
@@ -130,7 +131,7 @@ PAPER in traditional Spectrum terms.
 The ctile data format is very simple: 32 bytes of bitmap data followed by 32
 bytes of attribute data. Even so, a graphical editor makes life a lot easier
 when designing tiles, and [ZX
-Paintbrush](http://www.zx-modules.de/zxpaintbrush/zxpaintbrush.html) supports
+Paintbrush](https://www.alessandrogrussu.it/zx-modules.html) supports
 them natively. Sadly, from a Linux user's perspective, this is a Windows-only
 tool. although it does appear to run under WINE.
 
@@ -188,7 +189,7 @@ bifrost_01.c:
 
 extern unsigned char ctiles[];
 
-int main()
+int main(void)
 {
   unsigned char blank_tile_index;
   unsigned char row, col;
@@ -205,7 +206,7 @@ int main()
     for(col = 1; col <= 17; col+=2)
       BIFROSTL_fillTileAttrL(row, col, INK_WHITE+PAPER_WHITE);
 
-  BIFROSTL_setTile(0, 0, 0+BIFROSTL_STATIC);
+  BIFROSTL_setTile(0, 0, (unsigned char)(0+BIFROSTL_STATIC));
 
   BIFROSTL_start();
 
@@ -250,13 +251,13 @@ return to BASIC BiFrost stops.)
 If you change the line:
 
 ```
-BIFROSTL_setTile(0, 0, 0+BIFROSTL_STATIC);
+BIFROSTL_setTile(0, 0, (unsigned char)(0+BIFROSTL_STATIC));
 ```
 
 to:
 
 ```
-BIFROSTL_setTile(1, 1, 0+BIFROSTL_STATIC);
+BIFROSTL_setTile(1, 1, (unsigned char)(0+BIFROSTL_STATIC));
 ```
 
 and rebuild, you'll see that the ball tile is now placed a complete tile's width
@@ -505,7 +506,7 @@ for the BiFrost high resolution library:
 
 extern unsigned char ctiles[];
 
-int main()
+int main(void)
 {
   unsigned char line, col;
 
@@ -519,7 +520,7 @@ int main()
     for(col = 0; col <= 18; col++)
       BIFROSTH_fillTileAttrH(line, col, INK_WHITE+PAPER_WHITE);
 
-  BIFROSTH_setTile(4, 4, 0+BIFROSTH_STATIC);
+  BIFROSTH_setTile(4, 4, (unsigned char)(0+BIFROSTH_STATIC));
 
   BIFROSTH_start();
 
@@ -560,7 +561,7 @@ The main difference is the screen location positioning. The set tile function wo
 same way as with the low resolution code:
 
 ```
-BIFROSTH_setTile(4, 4, 0+BIFROSTH_STATIC);
+BIFROSTH_setTile(4, 4, (unsigned char)(0+BIFROSTH_STATIC));
 ```
 
 This sets the centre tile's entry in the memory map containing the tiles to be
@@ -626,7 +627,7 @@ horizontally:
 
 extern unsigned char ctiles[];
 
-int main()
+int main(void)
 {
   unsigned char line, col;
 
@@ -723,7 +724,7 @@ Given this basic understanding of how Z88DK and BiFrost work together, the Z88DK
 BiFrost examples are the next logical step. They're
 [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx).
 
-The [advanced tutorials](https://www.ime.usp.br/~einar/bifrost/), from the
+The [advanced tutorials](https://spectrumcomputing.co.uk/zxdb/sinclair/entries/0027405/BIFROSTENGINEV1.2.txt), from the
 BiFrost author, describe further possibilities, including animation and
 pre-shifted tiles for horizontal pixel level precision. The timing contraints of
 BiFrost need to be explored and understood before the library can be expertly

@@ -1,5 +1,6 @@
 
 ; long long strtoll( const char * restrict nptr, char ** restrict endptr, int base)
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 SECTION code_clib
 SECTION code_stdlib
@@ -39,4 +40,5 @@ strtoll_callee:
 IF __CLASSIC
 PUBLIC _strtoll_callee
 defc _strtoll_callee = strtoll_callee
+ENDIF
 ENDIF

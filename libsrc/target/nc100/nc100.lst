@@ -2,7 +2,7 @@ target/nc100/stdio/fgetc_cons
 target/nc100/stdio/fputc_cons
 target/nc100/stdio/getk
 @stdio/stdio.lst
-games/joystick
+@games/games.lst
 target/nc100/fcntl/open
 target/nc100/fcntl/opendir
 target/nc100/fcntl/creat

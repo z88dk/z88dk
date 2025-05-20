@@ -1,4 +1,5 @@
 gfx/common/obj/${TARGET}/__graphics_end
+gfx/common/obj/${TARGET}/__graphics_cmphlde
 gfx/common/obj/${TARGET}/cclg
 gfx/common/obj/${TARGET}/clg
 gfx/common/obj/${TARGET}/cplot
@@ -20,6 +21,11 @@ gfx/common/obj/${TARGET}/rscroll
 gfx/common/obj/${TARGET}/swapgfxbk_noop
 gfx/common/obj/${TARGET}/__graphics_retaddr
 gfx/common/obj/${TARGET}/putsprite_callee
+gfx/common/obj/${TARGET}/flipsprite_v
+gfx/common/obj/${TARGET}/flipsprite_h
+gfx/common/obj/${TARGET}/shiftsprite_r
+gfx/common/obj/${TARGET}/shiftsprite_l
+gfx/common/obj/${TARGET}/invsprite
 gfx/common/obj/${TARGET}/c_plot
 gfx/common/obj/${TARGET}/c_unplot
 gfx/common/obj/${TARGET}/c_xorplot

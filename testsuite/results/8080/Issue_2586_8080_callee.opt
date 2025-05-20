@@ -1,0 +1,128 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	EXTERN	saved_hl
+	SECTION	code_compiler
+
+._size10_i
+	ld	hl,0	;const
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+
+._size10_l
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+
+._size10_d
+	ld	hl,0	;const
+	call	l_int2long_u_float
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+
+._size12_i
+	ld	hl,0	;const
+	pop	bc
+	ex	de,hl
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl
+	push	bc
+	ret
+
+
+
+._size12_l
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	ld	(saved_hl),hl
+	pop	bc
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	push	bc
+	ld	hl,(saved_hl)
+	ret
+
+
+
+._size12_d
+	ld	hl,0	;const
+	call	l_int2long_u_float
+	pop	bc
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	push	bc
+	ret
+
+
+
+._size26_l
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	ld	(saved_hl),hl
+	pop	bc
+	ld	hl,26	;const
+	add	hl,sp
+	ld	sp,hl
+	push	bc
+	ld	hl,(saved_hl)
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_size10_i
+	GLOBAL	_size10_l
+	GLOBAL	_size10_d
+	GLOBAL	_size12_i
+	GLOBAL	_size12_l
+	GLOBAL	_size12_d
+	GLOBAL	_size26_l
+
+
+
+

@@ -50,56 +50,56 @@
 
 
 static struct zx_common zxc = {
-    0,          // help
-    NULL,       // binname
-    NULL,       // crtfile
-    NULL,       // outfile
-    -1,         // origin
-    NULL,       // banked_space
-    NULL,       // excluded_banks
-    NULL,       // excluded_sections
-    0,          // clean
-    -1,         // main_fence applies to banked model compiles only
-    0,          // pages - zx next only
-    NULL        // file
+    .help = 0, 
+    .binname = NULL,
+    .crtfile = NULL,
+    .outfile = NULL,
+    .origin = -1,
+    .banked_space = NULL,
+    .excluded_banks = NULL,
+    .excluded_sections = NULL,
+    .clean = 0,
+    .main_fence = -1,    // main_fence applies to banked model compiles only
+    .pages = 0,          // pages - zx next only
+    .file = NULL
 };
 
 static struct zx_tape zxt = {
-    NULL,       // blockname
-    NULL,       // merge
-    -1,         // patchpos
-    -1,         // clear_address
-    -1,         // usr_address
-    NULL,       // patchdata
-    NULL,       // screen
-    0,          // audio
-    0,          // ts2068
-    0,          // turbo
-    0,          // extreme
-    0,          // fast
-    0,          // dumb
-    0,          // lec_cpm
-    0,          // noloader
-    0,          // noheader
-    0,          // parity
-    0           // khz22
+    .blockname = NULL,
+    .merge = NULL,
+    .patchpos = -1,
+    .clear_address = -1,
+    .usr_address = -1,
+    .patchdata = NULL,
+    .screen = NULL,
+    .audio = 0,
+    .ts2068 = 0,
+    .turbo = 0,
+    .extreme = 0,
+    .fast = 0,
+    .dumb = 0,
+    .lec_cpm = 0,
+    .noloader = 0,
+    .noheader = 0,
+    .parity =  0,
+    .khz22 = 0
 };
 
 static struct zx_sna zxs = {
-    -1,         // stackloc
-    -1,         // intstate
-     0,         // force_128
-     0,         // snx
-     0,         // xsna
-     0          // fsna
+    .stackloc = -1,
+    .intstate = -1,
+    .force_128 = 0, 
+    .snx = 0,
+    .xsna = 0,
+    .fsna = NULL,
 };
 
 static struct zx_bin zxb = {
-    0,          // fullsize
-    0xff,       // romfill
-    0,          // ihex
-    0,          // ipad
-    16,         // recsize
+    .fullsize = 0, 
+    .romfill = 0xff,
+    .ihex = 0,
+    .ipad = 0,
+    .recsize = 16,
 };
 
 static char tap = 0;   // .tap tape

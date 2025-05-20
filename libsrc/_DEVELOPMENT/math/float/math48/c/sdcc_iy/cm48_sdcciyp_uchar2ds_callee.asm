@@ -19,9 +19,11 @@ cm48_sdcciyp_uchar2ds_callee:
    ; uses  : af, bc, de, hl, bc', de', hl'
 
    pop af
-   pop hl
    dec sp
+   pop hl
    push af
+
+   ld l,h
 
    call am48_double8u
    

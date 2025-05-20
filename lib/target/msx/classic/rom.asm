@@ -14,6 +14,8 @@
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = -0xfc4a
+    defc    TAR__crt_enable_eidi = $02 ; ei on entry
+    defc    TAR__crt_on_exit = 0x10001  ;loop forever
     INCLUDE "crt/classic/crt_rules.inc"
 
 ;
@@ -34,7 +36,7 @@ ENDIF
 
 start:
     di
-    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_sp.inc"
     ;; interrupts are enabled later some ROM routines disable them
 
 ; port fixing; required for ROMs
@@ -64,25 +66,24 @@ start:
     call    $0024       ;enable page 2
                         ;beware: this call returns with ints disabled!
 
-    ;; reenable interrupts
-    ei
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
+    call    crt0_init
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
     call    _main
 
 ; end program
 
-cleanup:
-endloop:
-    di
-    halt
-    jr      endloop
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal:	jp	(hl)		;Used for call by function pointer
@@ -198,6 +199,42 @@ banked_call:
   ENDIF
     push    bc
     ret
+
+    ; Paging routines used by far memory
+    PUBLIC  GET_P2
+    PUBLIC  PUT_P2
+    PUBLIC  __far_map_bank
+
+; Used to page in memory for far pointers
+;
+; Entry: hl = physical address
+;       ebc = logical address (i.e. __far)
+;         d = virtual bank (which may be mapped to physical bank)
+; Exit: debchl = preserved
+;       
+__far_map_bank:
+    push    de
+    push    hl
+    ld      a,d
+    inc     a           ;The first valid bank is 1
+    call    PUT_P2
+    pop     hl
+    pop     de
+    ret
+
+
+GET_P2:
+    ld      a,(__current_bank)
+    ret
+
+PUT_P2:
+    ld      (__current_bank),a
+    ld      (MAPPER_ADDRESS_8000),a
+  IF MAPPER_ADDRESS_A000 != 0
+    inc     a
+    ld      (MAPPER_ADDRESS_A000),a
+  ENDIF
+    ret
 ENDIF
 
 
@@ -213,8 +250,9 @@ ENDIF
         defc __crt_model = 1
     ENDIF
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE "crt/classic/crt_section.asm"
+
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION	data_driver
 
@@ -224,7 +262,6 @@ __current_bank:	defb	1
   ELSE
 __current_bank:	defb	2
   ENDIF
-ENDIF
 
    SECTION bss_driver
 
@@ -236,6 +273,5 @@ tempstack:      defs    CLIB_BANKING_STACK_SIZE
 
 tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
 
-IF MAPPER_ADDRESS_8000 != 0
     INCLUDE "target/msx/classic/megarom.asm"
 ENDIF

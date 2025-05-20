@@ -11,14 +11,10 @@
 
 int fdgetpos(int fd, fpos_t *posn)
 {
-	struct	fcb *fc;
-
-	if(fd >= MAXFILE)
-		return -1;
+    struct fcb *fc = (struct fcb *)fd;
 	
-	fc = &_fcb[fd];
-	*posn = (fpos_t)fc->rwptr;
+    *posn = (fpos_t)fc->rwptr;
 	
-	return 0;
+    return 0;
 }
 

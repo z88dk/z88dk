@@ -38,5 +38,4 @@ target/mbc200/games/bit_open
 target/mbc200/games/bit_open_di
 target/mbc200/games/bit_close
 target/mbc200/games/bit_close_ei
-games/joystick
 @games/games.lst

@@ -8,16 +8,16 @@
 ;	$Id: msxbasic.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	msxbasic
-	PUBLIC	_msxbasic
-	EXTERN	msxrompage
+    SECTION code_clib
+    PUBLIC  msxbasic
+    PUBLIC  _msxbasic
+    EXTERN  msxrompage
 
-	INCLUDE "target/msx/def/msxbios.def"
+    INCLUDE "target/msx/def/msxbios.def"
 
 msxbasic:
 _msxbasic:
-         exx
-         ex     af,af'       ; store all registers
-         ld     hl,CALBAS
-         jp	msxrompage
+    exx
+    ex      af, af'                     ; store all registers
+    ld      hl, CALBAS
+    jp      msxrompage

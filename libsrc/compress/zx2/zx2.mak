@@ -25,6 +25,7 @@ $(eval $(call buildnew,compress/zx2,r4k,-mr4k,$(ZX2_NEWLIBGLOBS),$(ZX2_NEWLIBGLO
 $(eval $(call buildnew,compress/zx2,z80n,-mz80n,$(ZX2_NEWLIBGLOBS),$(ZX2_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,compress/zx2,ixiy,-mz80 -IXIY,$(ZX2_NEWLIBGLOBS),$(ZX2_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,compress/zx2,8080,-m8080,$(ZX2_8080_NEWLIBGLOBS),$(ZX2_8080_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,compress/zx2,8085,-m8085,$(ZX2_8080_NEWLIBGLOBS),$(ZX2_8080_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,compress/zx2,gbz80,-mgbz80,$(ZX2_NEWLIBGLOBS),$(ZX2_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,compress/zx2,z180,-mz180,$(ZX2_NEWLIBGLOBS),$(ZX2_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,compress/zx2,ez80_z80,-mez80_z80,$(ZX2_NEWLIBGLOBS),$(ZX2_NEWLIBGLOBS_ex)))

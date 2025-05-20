@@ -5,6 +5,7 @@
 #include <sound.h>
 #include <games.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include <psg/arkos.h>
 #include <psg/wyz.h>
@@ -63,8 +64,12 @@ int main()
 #ifdef __HAVE_PSG_AY_VT2
    ay_vt2_play();
 #endif
+   // Verify that the heap is setup
+   malloc(10);
    // Test that fsync is available everywhere
    fflush(stdin);
+   // Verify that atexit heap is setup ok
+   exit(0);
 }
 
 #if defined(__Z88__) && defined(__Z88_APPLICATION)

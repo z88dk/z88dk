@@ -47,7 +47,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -182,7 +182,7 @@ IF (startup>100)
 ELSE
 
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
+ IF ((startup=3)|(startup=5)|(startup=8)|(startup=13)|(startup=15)|(startup=18)|(startup=20)|(startup=23)|(startup=25))
         ld	a,1
         ld      (hrgbrkflag),a
  ENDIF
@@ -234,23 +234,17 @@ ENDIF
 	; the stack will be moved to make room
 	; for high-resolution graphics.
 	
-        ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
 
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
         call    _main   ;Call user program
         
-cleanup:
+__Exit:
         push    hl		; keep return code
 
         call    crt0_exit
@@ -274,7 +268,7 @@ IF (startup>100)
     ENDIF
 ELSE
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
+ IF ((startup=3)|(startup=5)|(startup=8)|(startup=13)|(startup=15)|(startup=18)|(startup=20)|(startup=23)|(startup=25))
         xor	a
         ld      (hrgbrkflag),a
  ELSE
@@ -351,7 +345,7 @@ ELSE
 ;-------------------------------------------------
 
     IF (startup>=3)
-	IF ((startup<=7)|(startup>=23))
+	IF ((startup<=9)|(startup=20)|(startup>=23))
             INCLUDE "target/zx81/classic/zx81_hrg.asm"
         ENDIF
     ENDIF
@@ -364,7 +358,7 @@ ELSE
 	IF (startup>=23)
 	;
 	ELSE
-	    IF (startup<=17)
+	    IF (startup<=19)
 		INCLUDE "target/zx81/classic/zx81_hrg_arx.asm"
 	    ENDIF
 	ENDIF
@@ -492,15 +486,23 @@ IF (startup>=3)
 text_rows:
 hr_rows:
 _hr_rows:
-  IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
-		defw	8	; Current number of text rows in graphics mode
+  IF (startup=20)
+		defw	48	; Current number of text rows in graphics mode
   ELSE
+    IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
+		defw	8	; Current number of text rows in graphics mode
+    ELSE
+     IF ((startup=8)|(startup=9)|(startup=18)|(startup=19))
+		defw	16
+     ELSE
 		defw	24	; Current number of text rows in graphics mode
+     ENDIF
+    ENDIF
   ENDIF
  ENDIF
 ENDIF
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+	INCLUDE "crt/classic/crt_section.inc"
 

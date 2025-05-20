@@ -5,7 +5,7 @@
 ;	$Id: bas_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
 
 
-    PUBLIC  cleanup               ;jp'd to by exit()
+    PUBLIC  __Exit               ;jp'd to by exit()
     PUBLIC  l_dcal                ;jp(hl)
 
 
@@ -34,23 +34,28 @@
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -0x1ffe	; oz safe place
     defc    CRT_KEY_DEL = 127
+
+IFNDEF CRT_ORG_CODE
+    defc    CRT_ORG_CODE = 0x2300
+ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
 
-    org     $2300
+    org     CRT_ORG_CODE
 
 ;-----------
 ; Dennis Groning's BASIC file header
 ;-----------
 bas_first:
-        DEFB    bas_last - bas_first    ;Line Length
-;       DEFW    0                       ;Row Number 0 can not be listed
-        DEFW    1
-        DEFM    BAS_IF , BAS_PAGE_G , "<>&2300" , BAS_THEN , BAS_NEW
-        DEFM    BAS_ELSE , BAS_LOMEM_P , "=&AFFF" , BAS_CALL , BAS_TO , "P" , CR
+    DEFB    bas_last - bas_first    ;Line Length
+;    DEFW    0                       ;Row Number 0 can not be listed
+    DEFW    1
+    DEFM    BAS_IF , BAS_PAGE_G , "<>&2300" , BAS_THEN , BAS_NEW
+    DEFM    BAS_ELSE , BAS_LOMEM_P , "=&AFFF" , BAS_CALL , BAS_TO , "P" , CR
 bas_last:
-        DEFB    0
-        DEFW    $FFFF           ;End of BASIC program. Next address is TOP.
+    DEFB    0
+    DEFW    $FFFF           ;End of BASIC program. Next address is TOP.
 
 
 ;-----------
@@ -58,20 +63,20 @@ bas_last:
 ;-----------
 start:
     ld      (__restore_sp_onexit+1),sp	;Save starting stack
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_AMALLOC
     ld      hl,(__restore_sp_onexit+1)
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+    defc    CRT_MAX_HEAP_ADDRESS_hl = 1
 ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     call    doerrhan    ;Initialise a laughable error handler
 
     call    _main       ;Run the program
-cleanup:                ;Jump back here from exit() if needed
+__Exit:                ;Jump back here from exit() if needed
     call    crt0_exit
 
     call_oz(gn_nln)     ;Print a new line
@@ -83,46 +88,45 @@ __restore_sp_onexit:
 ; Install the error handler
 ;-----------
 doerrhan:
-        xor     a
-        ld      (exitcount),a
-        ld      b,0
-        ld      hl,errhand
-        call_oz(os_erh)
-        ld      (l_erraddr),hl
-        ld      (l_errlevel),a
-        ret
+    ld      b,0
+    ld      hl,errhand
+    call_oz(os_erh)
+    ld      (l_erraddr),hl
+    ld      (l_errlevel),a
+    ret
 
 ;-----------
 ; Restore BASICs error handler
 ;-----------
 resterrhan:
-        ld      hl,(l_erraddr)
-        ld      a,(l_errlevel)
-        ld      b,0
-        call_oz(os_erh)
-processcmd:			;processcmd is called after os_tin
-        ld      hl,0
-        ret
+    ld      hl,(l_erraddr)
+    ld      a,(l_errlevel)
+    ld      b,0
+    call_oz(os_erh)
+processcmd:
+    ;processcmd is called after os_tin
+    ld      hl,0
+    ret
 
 
 ;-----------
 ; The error handler
 ;-----------
 errhand:
-        ret     z   		;Fatal error
-        cp      RC_Esc
-        jr     z,errescpressed
-        ld      hl,(l_erraddr)	;Pass everything to BASIC's handler
-        scf
+    ret     z   		;Fatal error
+    cp      RC_Esc
+    jr     z,errescpressed
+    ld      hl,(l_erraddr)	;Pass everything to BASIC's handler
+    scf
 l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
-        call_oz(Os_Esc)		;Acknowledge escape pressed
-        jr      cleanup		;Exit the program
+    call_oz(Os_Esc)		;Acknowledge escape pressed
+    jr      crt0_exit		;Exit the program
 
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 ; We can't use far stuff with BASIC cos of paging issues so
 ; We assume all data is in fact near, so this is a dummy fn
@@ -141,7 +145,7 @@ _cpfar2near:
     ret
 
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION  bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

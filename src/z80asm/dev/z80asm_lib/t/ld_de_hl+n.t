@@ -14,13 +14,16 @@ use Modern::Perl;
 
 my $ticks = Ticks->new;
 
-for my $hl (32767, 65535) {
-	for my $u (127, 255) {
-		$ticks->add(<<END, HL=>$hl, DE=>$hl + $u);
-			ld hl, $hl
-			ld de, -1
-			ld de, hl+$u
+for my $base (0, 255, 32767, 0xffff) {
+	for my $add (0, 1, 0x7f, 0x80, 0xff) {
+		for my $op ("ldhi $add", "adi hl, $add", "ld de, hl+$add") {
+			my $res = $base + $add;
+			
+			$ticks->add(<<END, HL=>$base, DE=>$res);
+					ld		hl, $base
+					$op
 END
+		}
 	}
 }
 
@@ -28,4 +31,3 @@ $ticks->run;
 
 unlink_testfiles();
 done_testing();
-

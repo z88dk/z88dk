@@ -6,103 +6,103 @@
 ;	$Id: bkrestore.asm,v 1.2 2016-10-31 07:06:49 stefano Exp $
 ;
 
-	SECTION	  code_clib
+    SECTION code_clib
 
-	EXTERN	zx_rowtab
-	EXTERN	p3_poke
+    EXTERN  zx_rowtab
+    EXTERN  p3_poke
 
 
-    PUBLIC    bkrestore
-    PUBLIC    _bkrestore
-    PUBLIC    bkrestore_fastcall
-    PUBLIC    _bkrestore_fastcall
+    PUBLIC  bkrestore
+    PUBLIC  _bkrestore
+    PUBLIC  bkrestore_fastcall
+    PUBLIC  _bkrestore_fastcall
 
-.bkrestore
-._bkrestore
-    pop de
-    pop hl
-    push hl
-    push de
+bkrestore:
+_bkrestore:
+    pop     de
+    pop     hl
+    push    hl
+    push    de
 
-.bkrestore_fastcall
-._bkrestore_fastcall
+bkrestore_fastcall:
+_bkrestore_fastcall:
 
 ; __FASTCALL__ : sprite ptr in HL
-	push	ix
-	push	hl
-	pop	ix
-	
-	ld	d,(ix+2)
-	ld	e,(ix+3)
-	
-	ld	a,d
-	ld	d,0
-	
-	ld	hl,zx_rowtab
-	add	hl,de
-	add	hl,de
-	ld	(actrow+1),hl	; save row table position
-	
-	ld	e,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,e
-	
-	push	af
-	srl	a
-	srl	a
-	srl	a
-	ld	(actcol+1),a
-	ld	e,a
-	pop	af
+    push    ix
+    push    hl
+    pop     ix
 
-	add	hl,de
-	
-	ld	a,(ix+0)
-	ld	b,(ix+1)
-	
-	dec	a
-	srl	a
-	srl	a
-	srl	a
-	inc	a
-	inc	a		; INT ((Xsize-1)/8+2)
-	ld	(rbytes+1),a
-	di
+    ld      d, (ix+2)
+    ld      e, (ix+3)
 
-.bkrestores
-	push	bc
-	
-.rbytes
-	ld	b,0
-.rloop
-	ld	a,(ix+4)
+    ld      a, d
+    ld      d, 0
+
+    ld      hl, zx_rowtab
+    add     hl, de
+    add     hl, de
+    ld      (actrow+1), hl              ; save row table position
+
+    ld      e, (hl)
+    inc     hl
+    ld      h, (hl)
+    ld      l, e
+
+    push    af
+    srl     a
+    srl     a
+    srl     a
+    ld      (actcol+1), a
+    ld      e, a
+    pop     af
+
+    add     hl, de
+
+    ld      a, (ix+0)
+    ld      b, (ix+1)
+
+    dec     a
+    srl     a
+    srl     a
+    srl     a
+    inc     a
+    inc     a                           ; INT ((Xsize-1)/8+2)
+    ld      (rbytes+1), a
+    di
+
+bkrestores:
+    push    bc
+
+rbytes:
+    ld      b, 0
+rloop:
+    ld      a, (ix+4)
 	;ld	(hl),a
-	push bc
-	call p3_poke
-	pop bc
-	inc	hl
-	inc	ix
-	djnz	rloop
+    push    bc
+    call    p3_poke
+    pop     bc
+    inc     hl
+    inc     ix
+    djnz    rloop
 
 	; ---------
-.actrow
-	ld	hl,0
-	inc	hl
-	inc	hl
-	ld	(actrow+1),hl
-	
-	ld	b,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,b
-.actcol
-	ld	bc,0
-	add	hl,bc
+actrow:
+    ld      hl, 0
+    inc     hl
+    inc     hl
+    ld      (actrow+1), hl
+
+    ld      b, (hl)
+    inc     hl
+    ld      h, (hl)
+    ld      l, b
+actcol:
+    ld      bc, 0
+    add     hl, bc
 	; ---------
 
-	pop	bc
-	djnz	bkrestores
-	ei
-	pop	ix
-	ret
+    pop     bc
+    djnz    bkrestores
+    ei
+    pop     ix
+    ret

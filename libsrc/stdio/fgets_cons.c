@@ -18,13 +18,13 @@ extern unsigned char _cons_state;
 
 // Pick up the delete key as defined by the crt
 extern void *_CRT_KEY_DEL;
-#define KEY_DEL &_CRT_KEY_DEL
+#define KEY_DEL (int)&_CRT_KEY_DEL
 extern void *_CRT_KEY_CAPS_LOCK;
-#define KEY_CAPS_LOCK &_CRT_KEY_CAPS_LOCK
+#define KEY_CAPS_LOCK (int)&_CRT_KEY_CAPS_LOCK
 
 // The soft cursor needs to be disabled for some firmwares
 extern void *_CLIB_DISABLE_FGETS_CURSOR;
-#define CLIB_DISABLE_FGETS_CURSOR &_CLIB_DISABLE_FGETS_CURSOR
+#define CLIB_DISABLE_FGETS_CURSOR (int)&_CLIB_DISABLE_FGETS_CURSOR
 
 extern void fgets_cons_erase_character(unsigned char toerase) __z88dk_fastcall;
 

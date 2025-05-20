@@ -4,16 +4,16 @@
 ;
 
 
-        SECTION code_fp
-        PUBLIC    tan
+    SECTION code_fp
+    PUBLIC  tan
 
-        EXTERN     sin
-        EXTERN     cos
-        EXTERN     ldfabc
+    EXTERN  sin
+    EXTERN  cos
+    EXTERN  ldfabc
 
-        EXTERN     pushfa
-        EXTERN    pushf2
-        EXTERN     div1
+    EXTERN  pushfa
+    EXTERN  pushf2
+    EXTERN  div1
 
 
 
@@ -24,13 +24,14 @@
 
 
 ;
-.tan    CALL    pushfa  
-        CALL    sin    
-        POP     BC
-        POP     IX
-        POP     DE
-        CALL    pushf2
-        EX      DE,HL
-        CALL    ldfabc  
-        CALL    cos    
-        JP      div1    
+tan:
+    CALL    pushfa
+    CALL    sin
+    POP     BC
+    POP     IX
+    POP     DE
+    CALL    pushf2
+    EX      DE, HL
+    CALL    ldfabc
+    CALL    cos
+    JP      div1

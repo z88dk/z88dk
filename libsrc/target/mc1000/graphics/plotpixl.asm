@@ -1,11 +1,11 @@
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE "graphics/grafix.inc"
 
-	SECTION code_clib
-	PUBLIC	plotpixel
+    SECTION code_clib
+    PUBLIC  plotpixel
 
-	EXTERN pixeladdress
-	EXTERN	__gfx_coords
-	EXTERN	pix_return
+    EXTERN  pixeladdress
+    EXTERN  __gfx_coords
+    EXTERN  pix_return
 
 ;
 ;	$Id: plotpixl.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
@@ -25,28 +25,29 @@
 ;  ..bc..../ixiy same
 ;  af..dehl/.... different
 ;
-.plotpixel
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
+plotpixel:
+  IF    maxx<>256
+    ld      a, h
+    cp      maxx
+    ret     nc
+  ENDIF
 
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
-				
-				ld	(__gfx_coords),hl
+    ld      a, l
+    cp      maxy
+    ret     nc                          ; y0	out of range
 
-				push	bc
-				call	pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, or_pixel		; pixel is at bit 0...
-.plot_position			rlca
-				djnz	plot_position
-.or_pixel			;ex	de,hl
-				or	(hl)
-				call	pix_return
-				pop bc
-				ret
+    ld      (__gfx_coords), hl
+
+    push    bc
+    call    pixeladdress
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
+    rlca
+    djnz    plot_position
+or_pixel:                               ;ex	de,hl
+    or      (hl)
+    call    pix_return
+    pop     bc
+    ret

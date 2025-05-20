@@ -17,5 +17,5 @@ _z80_otdr:
    push bc
    push hl
    push af
-   
-   jp asm_z80_otdr
+   otdr
+   ret

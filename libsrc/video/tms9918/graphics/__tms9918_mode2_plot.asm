@@ -16,23 +16,23 @@
 ;
 ; in:  de = (x,y) coordinate of pixel (h,l)
 
-.__tms9918_mode2_plot
-    ex      de,hl
-    ld      a,l
-    cp      192 
-    ret     nc                        ; y0        out of range
-                            
-    ld      (__gfx_coords),hl
+__tms9918_mode2_plot:
+    ex      de, hl
+    ld      a, l
+    cp      192
+    ret     nc                          ; y0        out of range
+
+    ld      (__gfx_coords), hl
 
     push    bc
     call    __tms9918_pixeladdress
-    ld      b,a
-    ld      a,1
-    jr      z, or_pixel                ; pixel is at bit 0...
-.plot_position
+    ld      b, a
+    ld      a, 1
+    jr      z, or_pixel                 ; pixel is at bit 0...
+plot_position:
     rlca
     djnz    plot_position
-.or_pixel
+or_pixel:
     or      (hl)
     jp      __tms9918_pix_return
 

@@ -75,6 +75,28 @@
       ENDIF
    ENDIF
 
+   IFDEF CRT_INTERRUPT_MODE
+      defc __crt_interrupt_mode = CRT_INTERRUPT_MODE
+   ELSE
+      IFDEF TAR__crt_interrupt_mode
+         defc __crt_interrupt_mode = TAR__crt_interrupt_mode
+      ELSE
+         defc __crt_interrupt_mode = DEF__crt_interrupt_mode
+      ENDIF
+   ENDIF
+
+   IFDEF CRT_INTERRUPT_MODE_EXIT
+      defc __crt_interrupt_mode_exit = CRT_INTERRUPT_MODE_EXIT
+   ELSE
+      IFDEF TAR__crt_interrupt_mode_exit
+         defc __crt_interrupt_mode_exit = TAR__crt_interrupt_mode_exit
+      ELSE
+         defc __crt_interrupt_mode_exit = DEF__crt_interrupt_mode_exit
+      ENDIF
+   ENDIF
+
+
+
 
    ; By default we want to have stdio working for us
    IFNDEF CRT_ENABLE_STDIO
@@ -99,6 +121,27 @@
          defc CLIB_BANKING_STACK_SIZE = TAR__clib_banking_stack_size
       ELSE
          defc CLIB_BANKING_STACK_SIZE = DEF__clib_banking_stack_size
+      ENDIF
+   ENDIF
+
+   ;; Some heapsize definitions
+   IFDEF CRT_STACK_SIZE
+      defc __crt_stack_size = CRT_STACK_SIZE
+   ELSE
+      IFDEF TAR__crt_stack_size
+         defc __crt_stack_size = TAR__crt_stack_size
+      ELSE
+         defc __crt_stack_size = DEF__crt_stack_size
+      ENDIF
+   ENDIF
+
+   IFDEF CLIB_MALLOC_HEAP_SIZE
+      defc __clib_malloc_heap_size = CLIB_MALLOC_HEAP_SIZE
+   ELSE
+      IFDEF TAR__clib_malloc_heap_size
+         defc __clib_malloc_heap_size = TAR__clib_malloc_heap_size
+      ELSE
+         defc __clib_malloc_heap_size = DEF__clib_malloc_heap_size
       ENDIF
    ENDIF
 
@@ -164,6 +207,11 @@
        defc __crt_org_graphics = CRT_ORG_GRAPHICS
    ENDIF
 
+   ; Allow far data access code to placed at a different point in memory
+   IF DEFINED_CRT_ORG_FAR
+       defc __crt_org_far = CRT_ORG_FAR
+   ENDIF
+
    ; If 32 bit floats are defined, then we need to indicate to the library
    ; that they are in use (mainly for printf/scanf)
    PUBLIC CLIB_32BIT_FLOATS
@@ -180,8 +228,14 @@
    ; if needed. So default to an unused value if not
    PUBLIC CLIB_DEFAULT_SCREEN_MODE
    IFNDEF CLIB_DEFAULT_SCREEN_MODE
-       defc CLIB_DEFAULT_SCREEN_MODE = 0
+       defc CLIB_DEFAULT_SCREEN_MODE = -1
    ENDIF
+
+   PUBLIC CLIB_EXIT_SCREEN_MODE
+   IFNDEF CLIB_EXIT_SCREEN_MODE
+       defc CLIB_EXIT_SCREEN_MODE = -1
+   ENDIF
+
 
     ; Maximum number of FILEs available
     IF !DEFINED_CLIB_FOPEN_MAX
@@ -246,9 +300,55 @@
    PUBLIC __CLIB_FIRMWARE_KEYBOARD_CLICK
    defc __CLIB_FIRMWARE_KEYBOARD_CLICK = CLIB_FIRMWARE_KEYBOARD_CLICK
 
+   IF CLIB_FARHEAP_BANKS
+      PUBLIC CLIB_FARHEAP_BANKS
+   ENDIF
+
+   IFNDEF CLIB_GFX_FATPIX
+      PUBLIC CLIB_GFX_FATPIX
+      IFDEF TAR__clib_gfx_fatpix
+         defc CLIB_GFX_FATPIX = TAR__clib_gfx_fatpix
+      ELSE
+         defc CLIB_GFX_FATPIX = DEF__clib_gfx_fatpix
+      ENDIF
+   ELSE
+      PUBLIC CLIB_GFX_FATPIX
+   ENDIF
+
    ; Custom memory map
    IF DEFINED_MMAP
        defc __MMAP = MMAP
    ELSE
        defc __MMAP = 0
    ENDIF
+
+
+    ; Macro to allow setting up a FILE * as pointing via a trampoline
+    ;
+    ; n = FILE number (0 = stdin, 1 = stdout, 2 = stderr)
+    ; trampoline = address of trampoline function
+    MACRO setup_fp  n, trampoline
+        ld      hl,+(__sgoioblk + 2 +  (n * 10))
+        ld      (hl),33         ;_IOEXTRA|_IOUSE (stdio.h)
+        inc     hl              ;ungetc
+        inc     hl
+        ld      (hl), +( trampoline % 256)
+        inc     hl
+        ld      (hl), +( trampoline / 256)
+    ENDM
+
+    ; Macro to allow setting up a static FILE 
+    MACRO setup_static_fp  device, trampoline
+        SECTION bss_crt
+        PUBLIC  device
+device:   defs    10
+
+        SECTION code_crt_init
+        ld      hl, device + 2
+        ld      (hl),33         ;_IOEXTRA|_IOUSE (stdio.h)
+        inc     hl              ;ungetc
+        inc     hl
+        ld      (hl), +( trampoline % 256)
+        inc     hl
+        ld      (hl), +( trampoline / 256)
+    ENDM

@@ -9,39 +9,39 @@
 ;	$Id: fgetc_cons.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-	EXTERN	getk
+    EXTERN  getk
 
 ;         INCLUDE "target/pc88/def/n88bios.def"
 
 
-.fgetc_cons
-._fgetc_cons
-	push	ix
+fgetc_cons:
+_fgetc_cons:
+    push    ix
 	;call	CHGET
-.wkey
+wkey:
 ;	call 3241h
 ;	jr nc,wkey
-	call getk
-	and a
-	jr	nz,wkey
-.wkey1
-	call getk
-	and a
-	jr	z,wkey1
-	
-	pop	ix
+    call    getk
+    and     a
+    jr      nz, wkey
+wkey1:
+    call    getk
+    and     a
+    jr      z, wkey1
 
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+    pop     ix
 
-	ld	l,a
-	ld	h,0
-	ret
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+
+    ld      l, a
+    ld      h, 0
+    ret

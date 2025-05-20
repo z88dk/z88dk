@@ -4,6 +4,7 @@
 ;    int f2i (long v) __z88dk_fastcall;
 ;    fixed point 26.6 to integer
 ;
+IF !__CPU_INTEL__
 
     SECTION code_clib
     PUBLIC  f2i
@@ -44,3 +45,4 @@
     rl      h
 
     ret
+ENDIF

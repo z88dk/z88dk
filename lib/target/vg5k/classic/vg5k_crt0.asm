@@ -16,7 +16,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     EXTERN  im1_vectors
@@ -59,14 +59,11 @@ start:
 
     push    hl ; save HL
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     di
     ld      hl,$47D0  ;INTHK - Hook Code for Interrupt
@@ -86,9 +83,9 @@ ENDIF
     ld      ($47D0),a
     ei
 
-cleanup:
+__Exit:
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     pop     hl
@@ -116,9 +113,9 @@ iy_val:
     ret
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION	code_crt_init
     ld      hl,$4000

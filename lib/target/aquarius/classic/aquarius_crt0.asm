@@ -19,15 +19,33 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
-    PUBLIC  CLIB_VIDEO_PAGE_PORT    ;Video paging port for aq+
 
     defc    TAR__no_ansifont = 1
+    PUBLIC  DISPLAY
+IF CLIB_AQUARIUS_PLUS = 1
+    defc    CONSOLE_ROWS = 25
+    defc    DISPLAY = $3000
+ELSE
     defc    CONSOLE_ROWS = 24
+    defc    DISPLAY = $3028
+ENDIF
+    PUBLIC  COLOUR_MAP
+    defc    COLOUR_MAP = DISPLAY + 1024
     defc    CONSOLE_COLUMNS = 40
     defc    __CPU_CLOCK = 4000000
+
+    PUBLIC  CLIB_VIDEO_PAGE_PORT    ;Video paging port for aq+
+    ; Page video into 0xc000 -> 0xffff
+    defc    CLIB_VIDEO_PAGE_PORT = PORT_BANK3
+
+    PUBLIC  CLIB_AQUARIUS_ROM
+IFNDEF CLIB_AQUARIUS_ROM
+    defc    CLIB_AQUARIUS_ROM = 0
+ENDIF
+
 
     PUBLIC  CLIB_AQUARIUS_PLUS
 IFNDEF CLIB_AQUARIUS_PLUS
@@ -47,9 +65,11 @@ IFNDEF CLIB_AQUARIUS_PLUS
     defc    generic_console_ioctl = l_ret
 ENDIF
 
-
-IF startup = 2
+IF CLIB_AQUARIUS_ROM = 1
     INCLUDE	"target/aquarius/classic/rom.asm"
+ELIF CLIB_AQUARIUS_PLUS = 1
+    INCLUDE "target/aquarius/def/maths_mbf.def"
+    INCLUDE	"target/aquarius/classic/aqplusram.asm"
 ELSE
     INCLUDE "target/aquarius/def/maths_mbf.def"
     INCLUDE	"target/aquarius/classic/ram.asm"
@@ -60,16 +80,35 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION code_crt_init
-    ld      hl,$3028
+    ld      hl, DISPLAY
     ld      (base_graphics),hl
 
-IF startup = 3
+IF CLIB_AQUARIUS_PLUS = 1
     INCLUDE	"target/aquarius/classic/banks.asm"
-ENDIF
-    
 
+  IF __HAVE_GENCON = 1
+    INCLUDE "ioctl.def"
+    SECTION code_crt_init
+    EXTERN  set_default_palette
+    EXTERN  generic_console_ioctl
+    EXTERN  __aquarius_mode
+
+    call    set_default_palette
+
+    ; Remap the border color character for aqplus
+    in      a, (IO_VCTRL)
+    or      VCTRL_REMAP_BC
+    ld      de, __aquarius_mode
+    ld      (de), a
+    ld      a, IOCTL_GENCON_SET_MODE
+    ; This will setup the mode and screen size
+    ; so that it matches the hardware during init.
+    call    generic_console_ioctl
+  ENDIF
+
+ENDIF

@@ -11,13 +11,19 @@ EXTERN asm_ltoa
 ltoa_callee:
 
    pop af
-   pop bc
-   pop ix
-   pop hl
+   pop bc   ;radix
+   exx
+   pop bc   ;buf
+   exx 
+   pop hl   ;num
    pop de
    push af
-   
-   jp asm_ltoa
+
+   push bc
+   ex (sp),ix
+   call asm_ltoa
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

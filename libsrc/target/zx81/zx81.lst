@@ -4,9 +4,9 @@ target/zx81/stdio/fgetc_cons_fast
 target/zx81/stdio/getk
 target/zx81/stdio/fputc_cons
 target/zx81/stdio/generic_console
+target/zx81/stdio/__printf_doprint
+target/zx81/stdio/conio/vpeek_screendollar
 @stdio/ansicore.lst
-target/zx81/stdio/ansi/f_ansi_attr
-target/zx81/stdio/ansi/f_ansi_bel
 @stdio/stdio.lst
 @stdlib/stdlib.lst
 target/zx81/time/clock

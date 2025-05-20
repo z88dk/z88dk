@@ -21,7 +21,7 @@
     EXTERN    asm_im1_handler
     EXTERN    asm_load_palette
 
-    PUBLIC    cleanup         ;jp'd to by exit()
+    PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
     IFNDEF CLIB_FGETC_CONS_DELAY
@@ -44,34 +44,30 @@
 
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      hl,0
-    add     hl,sp
-    ld      (exitsp),hl
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-cleanup:
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     ld      hl,0
     push    hl
     push    hl
     call    _main
     pop     bc
     pop     bc
+__Exit:
     push    hl
     call    crt0_exit
     pop     hl
-finished:
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
     ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
+

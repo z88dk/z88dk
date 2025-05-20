@@ -21,7 +21,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
     PUBLIC  EG2000_ENABLED
@@ -66,15 +66,15 @@ ENDIF
 start:
     ld      (cmdline+1),hl
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and himem
 ; on TRS-80 the stack is defined elsewhere
-IF DEFINED_USING_amalloc
+IF DEFINED_CRT_HEAP_ENABLE
+    defc    CRT_MAX_HEAP_ADDRESS_hl = 1
     ld      a,($54)					; Get byte from ROM
     dec     a						; Determine if Mod 1 or 3
     ld      hl,($4411)				; himem ptr on Model III
@@ -82,25 +82,8 @@ IF DEFINED_USING_amalloc
     ld      hl,($4049)				; himem ptr on Model I
 
 set_max_heap_addr:
-    push    hl
-    ld      hl,_heap
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
-    inc     bc
-    xor     a
-    ld      (hl),a
-    dec     hl
-    ld      (hl),a
-    pop     hl	; sp
-    sbc     hl,bc	; hl = total free memory
-
-    push    bc ; main address for malloc area
-    push    hl	; area size
-    EXTERN sbrk_callee
-    call    sbrk_callee
 ENDIF
-
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; Push pointers to argv[n] onto the stack now
     ; We must start from the end 
@@ -124,7 +107,7 @@ find_end:
     xor     a
     ld      (hl),a
     dec     hl
-    INCLUDE	"crt/classic/crt_command_line.asm"
+    INCLUDE	"crt/classic/crt_command_line.inc"
 
     push	hl	;argv for "main"
     push	bc	;argc
@@ -164,13 +147,13 @@ IF CRT_ENABLE_STDIO = 1
 crt_no_reopen:
   ENDIF
 ENDIF
-
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main           ;Call user program
     pop     bc	;kill argv
     pop     bc	;kill argc
-cleanup:
+__Exit:
     call    crt0_exit
-cleanup_exit:
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret
@@ -179,8 +162,8 @@ l_dcal:
     jp      (hl)            ;Used for function pointer calls
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE	"crt/classic/crt_section.inc"
 
 
 

@@ -11,25 +11,25 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	ansi_cls
-	EXTERN	base_graphics
+    SECTION code_clib
+    PUBLIC  ansi_cls
+    EXTERN  base_graphics
 
-	EXTERN     swapgfxbk
-        EXTERN	swapgfxbk1
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
 
-.ansi_cls
+ansi_cls:
 
 
-	call	swapgfxbk
+    call    swapgfxbk
 
-	ld      hl,(base_graphics)
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld      bc,2400-1
-	xor	a
-	ld	(hl),a
-	ldir
+    ld      hl, (base_graphics)
+    ld      d, h
+    ld      e, l
+    inc     de
+    ld      bc, 2400-1
+    xor     a
+    ld      (hl), a
+    ldir
 
-	jp	swapgfxbk1
+    jp      swapgfxbk1

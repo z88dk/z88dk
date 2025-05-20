@@ -155,6 +155,7 @@ section code_SMSlib
 section code_temp_sp1
 
 section code_lib
+section code_home
 section code_compiler
 section code_user
 

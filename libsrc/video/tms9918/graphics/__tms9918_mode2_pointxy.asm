@@ -17,24 +17,24 @@
 ; Check if pixel at        (x,y) coordinate is        set or not.
 ;  in:        de =        (x,y) coordinate of pixel to test
 ; out:        Fz =        0, if pixel is set, otherwise Fz = 1.
-.__tms9918_mode2_pointxy
-    ex      de,hl
-    ld      a,l
+__tms9918_mode2_pointxy:
+    ex      de, hl
+    ld      a, l
     cp      192
-    ret     nc                        ; y0        out of range
+    ret     nc                          ; y0        out of range
 
     push    bc
     push    de
     push    hl
 
     call    __tms9918_pixeladdress
-    ld      b,a
-    ld      a,1
-    jr      z, test_pixel                ; pixel is at bit 0...
-.pixel_position
+    ld      b, a
+    ld      a, 1
+    jr      z, test_pixel               ; pixel is at bit 0...
+pixel_position:
     rlca
     djnz    pixel_position
-.test_pixel
+test_pixel:
     ;ex     de,hl
     and     (hl)
     pop     hl

@@ -81,7 +81,7 @@ check_text_file("$test.lis", <<'END');
 test_t_PHASE.asm:
      1                          	section PART_1
      2                          	part1:
-     3  0000  210000            		ld hl, start
+     3  0000  211200            		ld hl, start
      4  0003  110080            		ld de, 0x8000
      5  0006  010800            		ld bc, end-start
      6  0009  edb0              		ldir

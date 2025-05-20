@@ -9,6 +9,7 @@ INPUT_OBJS := $(addprefix input/obj/z80/, $(INPUT_OBJECTS)) \
 	$(addprefix input/obj/ixiy/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/z80n/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/8080/,$(INPUT_OBJECTS)) \
+	$(addprefix input/obj/8085/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/z180/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/r4k/,$(INPUT_OBJECTS)) \
 	$(addprefix input/obj/kc160/,$(INPUT_OBJECTS)) \
@@ -24,6 +25,7 @@ input: $(INPUT_OBJS)
 $(eval $(call buildbit,input,z80,test))
 $(eval $(call buildbit,input,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,input,8080,test,-clib=8080,-m8080))
+$(eval $(call buildbit,input,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,input,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,input,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,input,r4k,test,-clib=rabbit4k,-mr4k))

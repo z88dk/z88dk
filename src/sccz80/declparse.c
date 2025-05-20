@@ -256,6 +256,7 @@ Type *make_array(Type *base_type,int32_t len)
     Type *type = CALLOC(1,sizeof(*type));
     type->kind = KIND_ARRAY;
     type->ptr = base_type;
+    type->flags = base_type->flags;
     type->len = len;
     if ( len > 0 ) {
         type->size = len * base_type->size;
@@ -694,6 +695,7 @@ static void parse_trailing_modifiers(Type *type)
 
         } else if ( amatch("__nonbanked")) {
             type->flags &= ~BANKED;
+            type->flags |= NONBANKED;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
             type->flags &= ~(SMALLC|FLOATINGDECL);
@@ -1064,7 +1066,6 @@ Node *declare_local(int local_static)
                     }
 
                     check_pointer_namespace(type, expr_type);
-                    
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
                         LVALUE  lval={0};
@@ -1073,6 +1074,18 @@ Node *declare_local(int local_static)
                         lval.val_type = type->kind;
                         lval.const_val = val;
                         load_constant(&lval);
+                    } else if ( ispointer(expr_type) && !ispointer(type) ) {
+                        UT_string  *str;
+                        utstring_new(str);
+                        utstring_printf(str,"Incompatible pointer type to non-pointer. From ");
+                        type_describe(expr_type, str);
+                        utstring_printf(str, " to ");
+                        type_describe(type, str);
+                        warningfmt("incompatible-pointer-types","%s", utstring_body(str));
+                        utstring_free(str); 
+                        clearstage(before, start);
+                        //conv type
+                        force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                     } else {
                         clearstage(before, start);
                         //conv type
@@ -1267,11 +1280,13 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
     char namebuf[NAMESIZE];
     Type *type;
     int   flags = 0;
+    int isfar = 0;
 
     if ( base_type != NULL && *base_type != NULL ) {
         type = CALLOC(1,sizeof(*type));
         *type = **base_type;
     } else {
+        if ( amatch("__banked") ) isfar = 1;
         if ( (type = parse_type()) == NULL ) {
             return NULL;
         }
@@ -1326,6 +1341,8 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
     if ( type->kind == KIND_FUNC ) {
         type->flags |= flags;
+    } else if ( isfar ) {
+        type->flags |= FARACC;
     }
 
     // Validate that structs are not weak if we have an instance
@@ -1548,6 +1565,10 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_shortcall_hl ");
     }
 
+    if ( flags & NONBANKED ) {
+        utstring_printf(output,"__nonbanked ");
+    }
+
     // BANKED_STYLE_TICALC sets type->funcattrs.params_offset
     if ( type->funcattrs.params_offset && 
            ( c_banked_style != BANKED_STYLE_TICALC || !(type->flags & BANKED)  )
@@ -1577,6 +1598,10 @@ void type_describe(Type *type, UT_string *output)
 
     if ( type->isvolatile ) {
         utstring_printf(output,"volatile ");
+    }
+
+    if ( type->flags & FARACC ) {
+        utstring_printf(output,"__banked ");
     }
    
     switch ( type->kind ) {
@@ -1697,7 +1722,6 @@ int type_matches_pointer(Type *t1, Type *t2)
         }
     }
 
-
     if ( p2->kind  == KIND_VOID ) {
         if ( p1->isvolatile == 0 && p2->isvolatile)
             return 0;
@@ -1722,7 +1746,8 @@ int type_matches(Type *t1, Type *t2)
 {
     int i;
 
-    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) )
+    // Allow promotion up to a CPTR
+    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) && !(t1->kind == KIND_CPTR && (t2->kind == KIND_PTR || t2->kind == KIND_ARRAY)))
         return 0;
 
     if ( t1->isunsigned != t2->isunsigned )
@@ -1834,7 +1859,7 @@ static void declfunc(Type *functype, enum storage_type storage)
             }
         }
         // Take the prototype flags
-        functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
+        currfn->flags = functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
         if ( currfn->ctype->funcattrs.params_offset ) 
             functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
@@ -1852,7 +1877,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     // Reset all local variables
     locptr = STARTLOC;
     // Setup local variables
-    gen_switch_section(c_code_section);
+    gen_switch_section(currfn->flags & NONBANKED ? c_home_section : c_code_section);
     
 
 

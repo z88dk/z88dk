@@ -9,20 +9,20 @@
 ;	$Id: f_ansi_scrollup.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
 ;
 
-        SECTION code_clib
-        PUBLIC	ansi_SCROLLUP
+    SECTION code_clib
+    PUBLIC  ansi_SCROLLUP
 
-        INCLUDE "target/cpc/def/cpcfirm.def"
-        EXTERN	__console_h
+    INCLUDE "target/cpc/def/cpcfirm.def"
+    EXTERN  __console_h
 
 
-.ansi_SCROLLUP
-        ld      a,50
-        call    firmware
-        defw    txt_set_row
-        ld      a,10
-        call    firmware
-        defw    txt_output
-        ret
- 
- 
+ansi_SCROLLUP:
+    ld      a, 50
+    call    firmware
+    defw    txt_set_row
+    ld      a, 10
+    call    firmware
+    defw    txt_output
+    ret
+
+
