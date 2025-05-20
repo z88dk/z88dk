@@ -342,6 +342,15 @@
   (if (null l) 0
      (1+ (list-length (cdr l)))))
 
+; compare 2 lists and tells the length
+; of the longest one
+(defun max_len (x y)
+   (progn
+     (setq ll (list-length x))
+     (setq ly (list-length y))
+	 (if (> ly ll) (setq ll ly)))
+	 ll)
+
 ; list union, add items from list2 to list1 avoiding duplicates
 (defun union (x y)
   (cond ((not (consp x)) y)
@@ -455,6 +464,7 @@
             ((< x y) 'first-is-smaller)
             ((> x y)  'first-is-bigger)))
 
+
 ; human friendly algebric operations,
 ;   e.g. (compute 'add 4 5)
 (defun compute (op x y)
@@ -463,5 +473,31 @@
             ((equal op 'multiply) (* x y))
             ((equal op 'divide)   (/ x y))
             (t '(I do not know how to do that))))
+
+
+; Simplicistic 'bignum' operations
+;
+; Takes 2 lists of decimal digits of arbitrary length 
+; and add them mathematically, e.g.
+; (add '(1 2 3) '(9 8 8)) --> (1 1 1 1)
+; (add '(1 2 3) '(1 2 8 9))   -->   (0 1 4 1 2)
+;
+(defun add (n1 n2) (_add (reverse n1) (reverse n2) nil 0))
+
+(defun _add (n1 n2 tot cy)
+  (cond
+    ((and (null n1) (null n2)) (cons cy tot))
+    ((null n1) (progn
+	   (setq d (+ cy (car n2)))
+       (_add n1 (cdr n2) (cons (rem d 10) tot) (/ d 10))))
+    ((null n2) (progn
+	   (setq d (+ cy (car n1)))
+       (_add n2 (cdr n1) (cons (rem d 10) tot) (/ d 10))))
+    (t (progn
+	   (setq d (+ cy (car n1) (car n2)))
+       (_add (cdr n1) (cdr n2) (cons (rem d 10) tot) (/ d 10))))
+   )
+)
+
 
 
