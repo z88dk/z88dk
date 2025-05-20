@@ -477,27 +477,54 @@
 
 ; Simplicistic 'bignum' operations
 ;
+
+; Remove leading zeroes from bignum
+(defun clean (r)
+	(progn
+	(while (eq (car r) 0) (setq r (cdr r)))
+	r))
+
 ; Takes 2 lists of decimal digits of arbitrary length 
 ; and add them mathematically, e.g.
 ; (add '(1 2 3) '(9 8 8)) --> (1 1 1 1)
 ; (add '(1 2 3) '(1 2 8 9))   -->   (0 1 4 1 2)
 ;
-(defun add (n1 n2) (_add (reverse n1) (reverse n2) nil 0))
+(defun add (n1 n2) (clean (_add (reverse n1) (reverse n2) nil 0)))
+
+(defun __add (n1 n2 d)
+(cond ((zerop d)
+   (_add n1 n2 (cons 0 tot) 0)) (t
+  (_add n1 n2 (cons (rem d 10) tot) (/ d 10)))))
 
 (defun _add (n1 n2 tot cy)
   (cond
     ((and (null n1) (null n2)) (cons cy tot))
     ((null n1) (progn
 	   (setq d (+ cy (car n2)))
-       (_add n1 (cdr n2) (cons (rem d 10) tot) (/ d 10))))
+       (__add n1 (cdr n2) d)))
     ((null n2) (progn
 	   (setq d (+ cy (car n1)))
-       (_add n2 (cdr n1) (cons (rem d 10) tot) (/ d 10))))
+       (__add n2 (cdr n1) d)))
     (t (progn
 	   (setq d (+ cy (car n1) (car n2)))
-       (_add (cdr n1) (cdr n2) (cons (rem d 10) tot) (/ d 10))))
+       (__add (cdr n1) (cdr n2) d)))
    )
 )
 
+
+; Multiply a bignum by a small integer value
+; This is just a lame add loop
+
+(defun mul (n m)
+	(progn
+	  (setq r '(0))
+	  (setq s n)
+	  (while (> m 0) (progn
+		 (setq r (add r s))
+		 (setq m (1- m))
+	  ))
+	  (clean r)
+	)
+)
 
 
