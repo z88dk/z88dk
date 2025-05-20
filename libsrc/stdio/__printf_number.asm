@@ -49,10 +49,9 @@ printf_number16:
     and     a
     call    nz,l_int2long_s ;extend it out
 
-; Entry:        a = flag (0=unsigned, 1 = signed)
+; Entry:        c = flag (0=unsigned, 1 = signed)
 ;               dehl =  number
 miniprintn:
-    ld      b,a
 IF handlelong
     ld      a,d
 ELSE
@@ -60,7 +59,7 @@ ELSE
 ENDIF
     rlca
     and     1
-    and     b
+    and     c
     jr      z,noneg
 IF handlelong
     call    l_long_neg
