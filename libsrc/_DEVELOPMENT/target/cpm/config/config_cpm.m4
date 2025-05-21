@@ -37,6 +37,9 @@ define(`__CPM_SUID', 32)      # set/get user id
 define(`__CPM_RRAN', 33)      # read random record
 define(`__CPM_WRAN', 34)      # write random record
 define(`__CPM_CFS',  35)      # compute file size
+define(`__CPM_RREC', 36)      # update random access pointer
+define(`__CPM_SRDS', 37)      # selectively reset disc drives
+define(`__CPM_WRZF', 40)      # write random record with zero fill
 define(`__CPM_DSEG', 51)      # set DMA segment
 
 #
@@ -81,6 +84,9 @@ PUBLIC `__CPM_SUID'
 PUBLIC `__CPM_RRAN'
 PUBLIC `__CPM_WRAN'
 PUBLIC `__CPM_CFS'
+PUBLIC `__CPM_RREC'
+PUBLIC `__CPM_SRDS'
+PUBLIC `__CPM_WRZF'
 PUBLIC `__CPM_DSEG'
 ')
 
@@ -120,6 +126,9 @@ defc `__CPM_SUID' = __CPM_SUID
 defc `__CPM_RRAN' = __CPM_RRAN
 defc `__CPM_WRAN' = __CPM_WRAN
 defc `__CPM_CFS'  = __CPM_CFS
+defc `__CPM_RREC' = __CPM_RREC
+defc `__CPM_SRDS' = __CPM_SRDS
+defc `__CPM_WRZF' = __CPM_WRZF
 defc `__CPM_DSEG' = __CPM_DSEG
 ')
 
@@ -159,5 +168,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__CPM_RRAN'  __CPM_RRAN
 `#define' `__CPM_WRAN'  __CPM_WRAN
 `#define' `__CPM_CFS'   __CPM_CFS
+`#define' `__CPM_RREC'  __CPM_RREC
+`#define' `__CPM_SRDS'  __CPM_SRDS
+`#define' `__CPM_WRZF'  __CPM_WRZF
 `#define' `__CPM_DSEG'  __CPM_DSEG
 ')

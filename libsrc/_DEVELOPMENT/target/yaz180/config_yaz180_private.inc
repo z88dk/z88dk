@@ -1006,6 +1006,9 @@ defc __CPM_SUID = 32
 defc __CPM_RRAN = 33
 defc __CPM_WRAN = 34
 defc __CPM_CFS  = 35
+defc __CPM_RREC = 36
+defc __CPM_SRDS = 37
+defc __CPM_WRZF = 40
 defc __CPM_DSEG = 51
 
 

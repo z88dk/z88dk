@@ -121,7 +121,8 @@ struct dpb {
 extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 
 
-/* BDOS calls */
+/* CP/M 2.2 BDOS calls */
+
 #define CPM_RCON 1               /* read console */
 #define CPM_WCON 2               /* write console */
 #define CPM_RRDR 3               /* read reader */
@@ -151,7 +152,11 @@ extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 #define CPM_RRAN 33              /* read random record */
 #define CPM_WRAN 34              /* write random record */
 #define CPM_CFS  35              /* compute file size */
+#define CPM_RREC 36              /* update random access pointer */
+#define CPM_SRDS 37              /* selectively reset disc drives */
+#define CPM_WRZF 40              /* write random record with zero fill */
 #define CPM_DSEG 51              /* set DMA segment */
+
 #define CPM_GSX 115              /* enter GSX */
 
 
