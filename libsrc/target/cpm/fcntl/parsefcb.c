@@ -40,7 +40,7 @@ void parsefcb(struct fcb *fc, char *name)
 
     /* Now copy the name */
     ptr = fc->name;
-    
+
     /* Copy the name across upto the '.' or a '*' */
     while ( *name != '.' && *name != '*' && *name > ' ' &&
         ptr < &fc->name[8] )
@@ -51,6 +51,7 @@ void parsefcb(struct fcb *fc, char *name)
         c = '?';
     else
         c = ' ';
+
     while ( ptr < &fc->name[8] ) {
         *ptr++ = c;
     }
@@ -69,9 +70,11 @@ void parsefcb(struct fcb *fc, char *name)
         c = '?';
     else
         c = ' ';
+
     while ( ptr < &fc->ext[3] )
         *ptr++ = c;
-    fc->extent = fc->next_record = 0;
+
+    fc->extent = fc->current_record = 0;
 
 #else
 #asm

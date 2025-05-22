@@ -43,16 +43,15 @@ long lseek(int fd,long posn, int whence)
                     pos -= cnt; 
                 } 
             } while (cnt == 128 && pos >= 128); 
-        } 
+        }
         pos = pos + posn; 
         break; 
     }
 
     if (pos < 0L)
         return -1L;
-    
+
     fc->rwptr = pos;
     fc->rnr_dirty = 1;
     return pos;
-    
 }

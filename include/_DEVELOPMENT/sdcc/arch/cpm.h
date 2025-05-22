@@ -54,12 +54,13 @@ struct cpm_fcb
     unsigned char    drive;        // drive code
     unsigned char    name[8];      // file name
     unsigned char    ext[3];       // file type
-    unsigned char    extent;       // file extent
-    unsigned char    filler[2];    // not used
-    unsigned char    records;      // number of records in present extent
+    unsigned char    extent;       // file extent (EX)
+    unsigned char    s1;           // reserved (S1)
+    unsigned char    s2;           // module number, extent high byte (S2)
+    unsigned char    records;      // number of records in present extent (RC)
     unsigned char    discmap[16];  // CP/M disc map
-    unsigned char    next_record;  // next record to read or write
-    unsigned char    ranrec[3];    // random record number (24 bit no. )
+    unsigned char    current_record;  // next record to read or write (CR)
+    unsigned char    ranrec[3];    // random record number (24 bit no. )  (R0, R1, R2)
     unsigned long    rwptr;        // read/write pointer in bytes
     unsigned char    use;          // use flag
     unsigned char    uid;          // user id belonging to this file
