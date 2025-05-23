@@ -73,7 +73,7 @@ int stat(char *filename, struct stat *buf)
 
     /* Date/Time */
     buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
-    if    (bdos(CPM_VERS,0) >= 0x30) {
+    if (bdos(CPM_VERS,0) >= 0x30) {
         sfc=(void *)fc;
         if (bdos(102,sfc)!=0) { /* read file date stamps and password mode */
             buf->st_mtime=doepoch(sfc->date,sfc->hours,sfc->minutes);
