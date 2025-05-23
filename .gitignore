@@ -307,11 +307,7 @@ src/z80asm/t/test_symtab
 src/z80asm/t/test_symtab.out
 src/z80asm/test_t_*
 src/z80asm/z80asm
-src/z80asm/z80asm2
 src/z80asm/z88dk-z80asm
-src/z80asm2/re2c
-src/z80asm2/t/test
-src/z80asm2/z80asm2
 src/z80nm/z80nm
 src/z80nm/z88dk-z80nm
 src/z88dk-lib/z88dk-lib
