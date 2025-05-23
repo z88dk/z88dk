@@ -3,7 +3,7 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - Jan 2001
 ;
-; ZX81 - ARX816 mode version
+; ZX81 - Memotech WRX mode version
 ;
 ;
 ; $Id: mt_putsprite.asm  $
