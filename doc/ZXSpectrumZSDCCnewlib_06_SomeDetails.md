@@ -156,7 +156,7 @@ On the other hand, you can turn off the heap entirely with:
 ```
 
 The default heap size on Spectrum programs is set to -1, which is a special
-value which says "use all the memory above the program's BBS section and the
+value which says "use all the memory above the program's BSS section and the
 below the stack for heap." This is frequently the best option since it allows
 the program to malloc as much memory as it needs. The problem is
 that the heap memory is pre-formatted for allocation with malloc():
