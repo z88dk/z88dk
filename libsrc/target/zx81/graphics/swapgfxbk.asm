@@ -23,8 +23,13 @@ _swapgfxbk:
 		;jp	save81
 swapgfxbk1:
 _swapgfxbk1:
-		; This will become IY when swapped !
-    ld      ix, 16384
+
+; NOTE:  IX now should be preserved, using IY for any kind of ROM call will require "IX"
+;        to be saved, set to 16384 while the ROM is being engaged, and restored back on exit.
+
+; This will become IY when swapped !
+;    ld      ix, 16384
+
 		;jp	$207
     ret
                 ;jp	restore81

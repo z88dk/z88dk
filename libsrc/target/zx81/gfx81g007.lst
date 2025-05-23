@@ -14,6 +14,8 @@ target/zx81/graphics_hr/g007_hrg_on
 target/zx81/graphics_hr/g007_hrg_off
 gfx/narrow/obj/${TARGET}/stencil_render
 gfx/narrow/obj/${TARGET}/putsprite
+gfx/narrow/obj/${TARGET}/bksave
+gfx/narrow/obj/${TARGET}/bkrestore
 gfx/narrow/obj/${TARGET}/clrarea2
 gfx/narrow/obj/${TARGET}/fillarea2
 gfx/narrow/obj/${TARGET}/xorclrarea2
