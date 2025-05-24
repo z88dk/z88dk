@@ -512,7 +512,7 @@ useful information on there about reconfiguring the library too.
 There are lots of example programs in the Z88DK source tree, including
 [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1)
 and
-[here](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/spectrum/examples), although examples from the latter link are older and may need minor changes to compile.
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/deprecated/spectrum/examples), although examples from the latter link are older and may need minor changes to compile.
 
 [Blackstar](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar)
 in particular is a complete game written with SP1, and is an excellent
