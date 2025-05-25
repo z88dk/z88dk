@@ -1,4 +1,3 @@
-TEMPLATE = mkparser.cpp
-
-parser.cpp : parser.y $(TEMPLATE) mkparser.pl Makefile
-	perl mkparser.pl $(TEMPLATE) parser.y
+z80asm.pp: z80asm.cpp mkparser.pl parser.y Makefile
+	perl mkparser.pl z80asm.cpp parser.y
+	touch z80asm.pp

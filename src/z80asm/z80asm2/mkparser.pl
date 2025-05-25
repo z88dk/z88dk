@@ -217,40 +217,6 @@ sub patch_file {
 		copy($template, "$template.bak") or die "copy to $template.bak failed\n";
 		path($template)->spew(@out);
 	}
-	
-	# create output grammar
-	@in = @out;
-	my @out_c;
-	my @out_h;
-	my $out = 'c';
-	for (@in) {
-		if (/\/\/\@\@\.cpp/) {
-			$out = 'c';
-		}
-		elsif (/\/\/\@\@\.h/) {
-			$out = 'h';
-		}
-		elsif ($out eq 'c') {
-			push @out_c, $_;
-		}
-		elsif ($out eq 'h') {
-			push @out_h, $_;
-		}
-		else {
-			die;
-		}
-	}
-	
-	# create files if changed
-	my $p = path("$base_output.h");
-	if (!$p->exists || !$ac->compare([$p->lines], \@out_h)) {
-		$p->spew(@out_h);
-	}
-	
-	$p = path("$base_output.cpp");
-	if (!$p->exists || !$ac->compare([$p->lines], \@out_c)) {
-		$p->spew(@out_c);
-	}
 }
 
 sub c_string {
