@@ -1,26 +1,4 @@
-// Example parser
-
-IDENT ":"
-	define_label($1);
-
-IDENT "equ" EXPR
-	define_const($1, $3);
-	
-IDENT "macro" LIST(IDENT,",")
-	string body = read_text_up_to("endm");
-	add_macro($1, $3, body);
-
-"defb" LIST(EXPR,",")
-	add_bytes($2);
-
-"defw" LIST(EXPR,",")
-	add_words($2);
-
-"defp" LIST(EXPR,",")
-	add_pointers($2);
-
-"defdw" LIST(EXPR,",")
-	add_dwords($2);
+// Parser
 
 "nop"
 	add_opcode_void(0x00);
@@ -47,8 +25,8 @@ IDENT "macro" LIST(IDENT,",")
 	add_opcode_nn(0x3A, $4);
 
 "ld" "a" "," "a"
-	cout << "ld a, a" << endl;
+	add_opcode_void(0x7F);
 
 "ld" "a" "," "b"
-	cout << "ld a, b" << endl;
+	add_opcode_void(0x78);
 

@@ -6,8 +6,6 @@
 
 //@@.h
 
-# pragma once
-
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -381,6 +379,7 @@ public:
 		BIN_XOR,
 		COLON,
 		COMMA,
+		CONST_EXPR,
 		DHASH,
 		DIV,
 		DOT,
@@ -406,6 +405,7 @@ public:
 		MOD,
 		MULT,
 		NE,
+		NEWLINE,
 		PLUS,
 		POWER,
 		QUEST,
@@ -428,22 +428,16 @@ public:
 		KW_BINARY,
 		KW_C,
 		KW_C_LINE,
-		KW_DEFB,
-		KW_DEFDW,
-		KW_DEFP,
-		KW_DEFW,
 		KW_EQU,
 		KW_INCBIN,
 		KW_INCLUDE,
 		KW_JR,
 		KW_LD,
 		KW_LINE,
-		KW_MACRO,
 		KW_NC,
 		KW_NOP,
 		KW_NZ,
 		KW_Z,
-		NODE,
 		//@@END
 	};
 
@@ -490,9 +484,11 @@ private:
 		{ BIN_XOR, "^" },
 		{ COLON, ":" },
 		{ COMMA, "," },
+		{ CONST_EXPR, "" },
 		{ DHASH, "##" },
 		{ DIV, "/" },
 		{ DOT, "." },
+		{ END, "" },
 		{ EQ, "=" },
 		{ EXPR, "" },
 		{ FLOAT, "" },
@@ -515,6 +511,7 @@ private:
 		{ MOD, "%" },
 		{ MULT, "*" },
 		{ NE, "<>" },
+		{ NEWLINE, "\n" },
 		{ PLUS, "+" },
 		{ POWER, "**" },
 		{ QUEST, "?" },
@@ -536,22 +533,17 @@ private:
 		{ "binary", KW_BINARY },
 		{ "c", KW_C },
 		{ "c_line", KW_C_LINE },
-		{ "defb", KW_DEFB },
-		{ "defdw", KW_DEFDW },
-		{ "defp", KW_DEFP },
-		{ "defw", KW_DEFW },
 		{ "equ", KW_EQU },
 		{ "incbin", KW_INCBIN },
 		{ "include", KW_INCLUDE },
 		{ "jr", KW_JR },
 		{ "ld", KW_LD },
 		{ "line", KW_LINE },
-		{ "macro", KW_MACRO },
 		{ "nc", KW_NC },
 		{ "nop", KW_NOP },
 		{ "nz", KW_NZ },
 		{ "z", KW_Z },
-		{ "", NODE },
+		{ "", NONE },
 		//@@END
 	};
 };
@@ -860,18 +852,6 @@ bool Scanner::scan(const string& text) {
 			}
 			break;
 
-			// White space
-		case ' ': case '\t': case '\v': case '\f': case '\r': case '\n':
-			while (isspace(*p))
-				++p;
-			blank_before = true;
-			break;
-
-			// Comments
-		case ';':
-			p += strlen(p);
-			break;
-
 			// String
 		case '"':
 			--p;
@@ -939,7 +919,21 @@ bool Scanner::scan(const string& text) {
 			}
 			break;
 
-		default:
+            // White space
+        case '\n':
+            m_tokens.emplace_back(Token::NEWLINE, blank_before);
+            break;
+
+        case ' ': case '\t': case '\v': case '\f': case '\r':
+            blank_before = true;
+            break;
+
+            // Comments
+        case ';':
+            p += strlen(p);
+            break;
+
+        default:
 			g_error.error_invalid_char(*p);
 			clear();
 			return false;
@@ -1313,7 +1307,7 @@ bool LineParser::parse(const string& line) {
 
     // initialize the possible list of rules with the first token
     list<int> possible_rules;
-    for (int i = 1; i < sizeof(rules) / sizeof(rules[0]); ++i) {
+    for (int i = 1; i < static_cast<int>(sizeof(rules) / sizeof(rules[0])); ++i) {
         if (rules[i][0].keyword != Token::NONE && m_line.peek().is(rules[i][0].keyword)) {
             possible_rules.push_back(i);
         }

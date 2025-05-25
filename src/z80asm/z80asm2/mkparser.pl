@@ -10,6 +10,74 @@ use Path::Tiny;
 use File::Copy;
 use Data::Dump 'dump';
 
+#-------------------------------------------------------------------------------
+# data
+#-------------------------------------------------------------------------------
+
+my %tokens = (
+	END => "",
+	IDENT => "",
+	INT => "",
+	FLOAT => "",
+	EXPR => "",
+	CONST_EXPR => "",
+	STR => "",
+	RAW_STR => "",
+	NEWLINE => "\n",
+	
+	ASMPC => '$',
+	BACKSLASH => "\\",
+	BIN_AND => "&",
+	BIN_NOT => "~",
+	BIN_OR => "|",
+	BIN_XOR => "^",
+	COLON => ":",
+	COMMA => ",",
+	DHASH => "##",
+	DIV => "/",
+	DOT => ".",
+	EQ => "=",
+	GE => ">=",
+	GT => ">",
+	HASH => "#",
+	LBRACE => "{",
+	LE => "<=",
+	LOG_AND => "&&",
+	LOG_NOT => "!",
+	LOG_OR => "||",
+	LOG_XOR => "^^",
+	LPAREN => "(",
+	LSHIFT => "<<",
+	LSQUARE => "[",
+	LT => "<",
+	MINUS => "-",
+	MOD => '%',
+	MULT => "*",
+	NE => "<>",
+	PLUS => "+",
+	POWER => "**",
+	QUEST => "?",
+	RBRACE => "}",
+	RPAREN => ")",
+	RSHIFT => ">>",
+	RSQUARE => "]",
+);
+
+my %keywords = (
+	NONE => "",
+	KW_ASMPC => "asmpc",
+	KW_ASSUME => "assume",
+	KW_BINARY => "binary",
+	KW_C_LINE => "c_line",
+	KW_EQU => "equ",
+	KW_INCBIN => "incbin",
+	KW_INCLUDE => "include",
+	KW_LINE => "line",
+);
+
+#-------------------------------------------------------------------------------
+# main
+#-------------------------------------------------------------------------------
 @ARGV==2 or die "Usage: ",path($0)->basename," template.cpp grammar.y\n";
 my($template_file, $grammar_file) = @ARGV;
 
@@ -26,58 +94,9 @@ patch_file($template_file, path($grammar_file)->basename(".y"));
 sub parse_grammar {
 	my($filename) = @_;
 	open(my $fh, "<", $filename) or die "open file $filename: $!\n";
-	$grammar = {tokens => {
-					ASMPC => '$',
-					BACKSLASH => "\\",
-					BIN_AND => "&",
-					BIN_NOT => "~",
-					BIN_OR => "|",
-					BIN_XOR => "^",
-					COLON => ":",
-					COMMA => ",",
-					DHASH => "##",
-					DIV => "/",
-					DOT => ".",
-					EQ => "=",
-					EXPR => "",
-					FLOAT => "",
-					GE => ">=",
-					GT => ">",
-					HASH => "#",
-					IDENT => "",
-					INT => "",
-					LBRACE => "{",
-					LE => "<=",
-					LOG_AND => "&&",
-					LOG_NOT => "!",
-					LOG_OR => "||",
-					LOG_XOR => "^^",
-					LSHIFT => "<<",
-					LSQUARE => "[",
-					LT => "<",
-					MINUS => "-",
-					MOD => '%',
-					MULT => "*",
-					NE => "<>",
-					PLUS => "+",
-					POWER => "**",
-					QUEST => "?",
-					RAW_STR => "",
-					RBRACE => "}",
-					RSHIFT => ">>",
-					RSQUARE => "]",
-					STR => "",
-				}, keywords => {
-					NODE => "",
-					KW_ASMPC => "asmpc",
-					KW_ASSUME => "assume",
-					KW_BINARY => "binary",
-					KW_C_LINE => "c_line",
-					KW_INCBIN => "incbin",
-					KW_INCLUDE => "include",
-					KW_LINE => "line",
-				}, rules => [], actions => []};
-
+	
+	my @rules = ([]);
+	my @actions = ("");
 	my $rule_nr = 0;
 	while (<$fh>) {
 		if (/^\s*\/\//) {
@@ -86,66 +105,51 @@ sub parse_grammar {
 		elsif (/^\S/) {
 			$rule_nr++;
 			my @tokens = parse_grammar_rule($_);
-			$grammar->{rules}[$rule_nr] = \@tokens;
-			$grammar->{actions}[$rule_nr] = "";
-			for (@tokens) {
-				if ($_->{keyword}) {
-					$grammar->{keywords}{$_->{keyword}} = $_->{string};
-				}
-				elsif ($_->{separator}) {
-					$grammar->{tokens}{$_->{separator}} or die $_->{separator};
-				}
-				elsif ($_->{token}) {
-					$grammar->{tokens}{$_->{token}} = $_->{string};
-				}
-			}
+			$rules[$rule_nr] = \@tokens;
+			$actions[$rule_nr] = "";
 		}
 		else {
 			if ($rule_nr < 1) {
 				die "action code before rules: $_" if /\S/;
 			}
 			else {
-				$grammar->{actions}[$rule_nr] .= $_;
+				$actions[$rule_nr] .= $_;
 			}
 		}
 	}
+	
+	$grammar = {tokens => \%tokens, keywords => \%keywords,
+				rules => \@rules, actions => \@actions};
+
+
 }
 
 sub parse_grammar_rule {
 	my($text) = @_;
+	my %reverse_tokens;
+	while (my($key, $value) = each %tokens) {
+		if ($value ne "") {
+			$reverse_tokens{$value} = $key;
+		}
+	}
+	
 	my @tokens;
 	for (split(' ', $text)) {
-		if (/^(IDENT|INT|EXPR|STR|RAW_STR)$/) {
-			push @tokens, {token => $_, string => ""};
+		if (exists $tokens{$_}) {
+			push @tokens, $_;
 		}
-		elsif (/LIST\((\w+),","\)/) {
-			push @tokens, {token => $1, string => "", separator => 'COMMA'};
+		elsif (/"(.+)"/ && exists $reverse_tokens{$1}) {
+			push @tokens, $reverse_tokens{$1};
 		}
-		elsif (/\$/) {
-			push @tokens, {token => 'END', string => ""};
-		}
-		elsif (/"(\w+)"/) {
-			push @tokens, {token => 'IDENT', keyword => "KW_".uc($1), string => $1};
-		}
-		elsif (/"\."/) {
-			push @tokens, {token => 'DOT', string => "."};
-		}
-		elsif (/","/) {
-			push @tokens, {token => 'COMMA', string => ","};
-		}
-		elsif (/":"/) {
-			push @tokens, {token => 'COLON', string => ":"};
-		}
-		elsif (/"\("/) {
-			push @tokens, {token => 'LPAREN', string => "("};
-		}
-		elsif (/"\)"/) {
-			push @tokens, {token => 'RPAREN', string => ")"};
+		elsif (/"(.+)"/) {
+			push @tokens, "KW_".uc($1);
+			$keywords{"KW_".uc($1)} = $1;
 		}
 		else {
 			die "Undefined token: $_\n";
 		}
 	}
+	
 	return @tokens;
 }
 
@@ -222,5 +226,6 @@ sub patch_file {
 sub c_string {
 	my($text) = @_;
 	$text =~ s/([\\"])/\\$1/g;
+	$text =~ s/\n/\\n/g;
 	return '"'.$text.'"';
 }
