@@ -1,4 +1,13 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Copyright (C) Paulo Custodio, 2011-2024
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
 //@@.h
+
+# pragma once
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -14,16 +23,21 @@
 #include <vector>
 using namespace std;
 
+//-----------------------------------------------------------------------------
 // Utilities
+//-----------------------------------------------------------------------------
 
 string str_to_lower(string input);
 bool str_ends_with(const string& str, const string& ending);
 string binary_to_c_string(const unsigned char* data, size_t length);
 bool is_ident(char c);
+bool read_custom_line(ifstream& stream, string& line);
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // Utilities
+//-----------------------------------------------------------------------------
 
 string str_to_lower(string input) {
 	std::transform(input.begin(), input.end(), input.begin(),
@@ -75,9 +89,35 @@ bool is_ident(char c) {
 	return c == '_' || isalnum(c);
 }
 
+bool read_custom_line(ifstream& stream, string& line) {
+    line.clear();
+    char ch;
+    while (stream.get(ch)) {
+        if (ch == '\n') {
+            // Unix-style \n or part of \r\n (Windows)
+            break;
+        }
+        else if (ch == '\r') {
+            // Could be Mac-style \r or Windows-style \r\n
+            if (stream.peek() == '\n') {
+                stream.get(); // consume the \n
+            }
+            break;
+        }
+        else {
+            line += ch;
+        }
+    }
+    return !line.empty() || !stream.eof();
+}
+
+
 //@@.h
 
+//-----------------------------------------------------------------------------
 // Location of an input line
+//-----------------------------------------------------------------------------
+
 class Location {
 public:
 	Location(const string& filename = "", int line_num = 0);
@@ -106,7 +146,10 @@ extern Location g_location;
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // Location of an input line
+//-----------------------------------------------------------------------------
+
 Location g_location;
 
 Location::Location(const string& filename, int line_num)
@@ -156,7 +199,10 @@ void Location::set_expanded_text(const string& expanded_text) {
 
 //@@.h
 
-// error message output and counting
+//-----------------------------------------------------------------------------
+// Error message output and counting
+//-----------------------------------------------------------------------------
+
 class Error {
 public:
 	int get_count() const { return m_count; }
@@ -179,7 +225,10 @@ extern Error g_error;
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // error message output and counting
+//-----------------------------------------------------------------------------
+
 Error g_error;
 
 void Error::error(const string& message, const string& arg) {
@@ -207,7 +256,10 @@ void Error::output_message(const string& prefix, const string& message, const st
 
 //@@.h
 
+//-----------------------------------------------------------------------------
 // Stack of input files
+//-----------------------------------------------------------------------------
+
 class InputFiles {
 public:
 	InputFiles() {}
@@ -235,7 +287,10 @@ extern InputFiles g_input_files;
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // Stack of input files
+//-----------------------------------------------------------------------------
+
 InputFiles g_input_files;
 
 InputFiles::~InputFiles() {
@@ -282,28 +337,6 @@ bool InputFiles::already_included(const string& filename) {
 	return false;
 }
 
-static bool read_custom_line(ifstream& stream, string& line) {
-	line.clear();
-	char ch;
-	while (stream.get(ch)) {
-		if (ch == '\n') {
-			// Unix-style \n or part of \r\n (Windows)
-			break;
-		}
-		else if (ch == '\r') {
-			// Could be Mac-style \r or Windows-style \r\n
-			if (stream.peek() == '\n') {
-				stream.get(); // consume the \n
-			}
-			break;
-		}
-		else {
-			line += ch;
-		}
-	}
-	return !line.empty() || !stream.eof();
-}
-
 bool InputFiles::getline(string& line) {
 	line.clear();
 	while (!m_files.empty()) {
@@ -331,7 +364,10 @@ bool InputFiles::getline(string& line) {
 
 //@@.h
 
+//-----------------------------------------------------------------------------
 // Tokens returned from Scanner
+//-----------------------------------------------------------------------------
+
 class Token {
 public:
 	enum Type {
@@ -388,6 +424,7 @@ public:
 		KW_A,
 		KW_ASMPC,
 		KW_ASSUME,
+		KW_B,
 		KW_BINARY,
 		KW_C,
 		KW_C_LINE,
@@ -456,7 +493,6 @@ private:
 		{ DHASH, "##" },
 		{ DIV, "/" },
 		{ DOT, "." },
-		{ END, "" },
 		{ EQ, "=" },
 		{ EXPR, "" },
 		{ FLOAT, "" },
@@ -496,6 +532,7 @@ private:
 		{ "a", KW_A },
 		{ "asmpc", KW_ASMPC },
 		{ "assume", KW_ASSUME },
+		{ "b", KW_B },
 		{ "binary", KW_BINARY },
 		{ "c", KW_C },
 		{ "c_line", KW_C_LINE },
@@ -521,7 +558,10 @@ private:
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // Tokens returned from Scanner
+//-----------------------------------------------------------------------------
+
 Token::Token(Type type, bool blank_before)
 	: m_type(type), m_blank_before(blank_before) {
 }
@@ -594,7 +634,10 @@ Token::Keyword Token::lookup_keyword(const string& text) {
 
 //@@.h
 
+//-----------------------------------------------------------------------------
 // Scanner
+//-----------------------------------------------------------------------------
+
 class Scanner {
 public:
 	Scanner() {}
@@ -605,7 +648,7 @@ public:
 	void next(int num = 1);
 	Token& peek(int offset = 0);
 	void push_back(const Token& token) { m_tokens.push_back(token); } // copy
-	void push_back(const Token&& token) { m_tokens.push_back(std::move(token)); } // move
+	void push_back(Token&& token) { m_tokens.push_back(std::move(token)); } // move
 	int get_pos() const { return m_pos; }
 	void set_pos(int pos) { m_pos = pos; }
 	size_t size() const { return m_tokens.size(); }
@@ -624,7 +667,10 @@ private:
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // Scanner
+//-----------------------------------------------------------------------------
+
 Scanner::Scanner(std::initializer_list<Token> tokens) {
 	m_tokens = tokens;
 }
@@ -1043,7 +1089,9 @@ string Scanner::to_string() const {
 
 //@@.h
 
+//-----------------------------------------------------------------------------
 // Macro preprocessor
+//-----------------------------------------------------------------------------
 
 class Preproc {
 public:
@@ -1066,7 +1114,10 @@ extern Preproc g_preproc;
 
 //@@.cpp
 
+//-----------------------------------------------------------------------------
 // Macro preprocessor
+//-----------------------------------------------------------------------------
+
 Preproc g_preproc;
 
 void Preproc::clear() {
@@ -1184,7 +1235,159 @@ void Preproc::check_end() {
 	}
 }
 
+//@@.h
+
+//-----------------------------------------------------------------------------
+// Line parser
+//-----------------------------------------------------------------------------
+
+class LineParser {
+public:
+    bool parse(const string& line);
+
+private:
+    Scanner m_line;         // tokens from the current line
+
+    // each element to match in a rule
+    struct RuleElem {
+        Token::Type type{ Token::END };
+        Token::Keyword keyword{ Token::NONE };
+
+        RuleElem(Token::Type type_) : type(type_) {}
+        RuleElem(Token::Keyword keyword_) : keyword(keyword_) {}
+    };
+
+    // list of rules
+
+    // Rule 1: NOP
+    static inline RuleElem rule_elems_1[] = {
+        RuleElem(Token::KW_NOP),
+        RuleElem(Token::END)
+    };
+
+    // Rule 2: LD A, A
+    static inline RuleElem rule_elems_2[] = {
+        RuleElem(Token::KW_LD),
+        RuleElem(Token::KW_A),
+        RuleElem(Token::COMMA),
+        RuleElem(Token::KW_A),
+        RuleElem(Token::END)
+    };
+
+    // Rule 3: LD A, B
+    static inline RuleElem rule_elems_3[] = {
+        RuleElem(Token::KW_LD),
+        RuleElem(Token::KW_A),
+        RuleElem(Token::COMMA),
+        RuleElem(Token::KW_B),
+        RuleElem(Token::END)
+    };
+
+
+    static inline RuleElem* rules[] = {
+        nullptr,
+        rule_elems_1, // Rule 1: NOP
+        rule_elems_2, // Rule 1: LD A, A
+        rule_elems_3, // Rule 1: LD A, B
+    };
+
+    static void execute_action(int n);
+
+    static void execute_action_1();     // Action 1: NOP
+    static void execute_action_2();     // Action 2: LD A, A
+    static void execute_action_3();     // Action 3: LD A, B
+};
+
+//@@.cpp
+
+//-----------------------------------------------------------------------------
+// Line parser
+//-----------------------------------------------------------------------------
+
+bool LineParser::parse(const string& line) {
+    if (!m_line.scan(line))
+        return false;       // scanning failed
+
+    if (m_line.peek().is(Token::END))
+        return true;        // empty line
+
+    // initialize the possible list of rules with the first token
+    list<int> possible_rules;
+    for (int i = 1; i < sizeof(rules) / sizeof(rules[0]); ++i) {
+        if (rules[i][0].keyword != Token::NONE && m_line.peek().is(rules[i][0].keyword)) {
+            possible_rules.push_back(i);
+        }
+        else if (m_line.peek().is(rules[i][0].type)) {
+            possible_rules.push_back(i);
+        }
+    }
+
+    // search for a matching rule
+    for (int n = 0; true; ++n) {
+        if (possible_rules.empty()) {
+            return false; // no matching rule found
+        }
+
+        for (auto rule : possible_rules) {
+            if (rules[rule][n].keyword != Token::NONE && m_line.peek(n).is(rules[rule][n].keyword)) {
+                // found a matching rule by keyword
+            }
+            else if (rules[rule][n].type == Token::END) {
+                // end of rule reached, check if all tokens matched
+                if (m_line.peek(n).is(rules[rule][n].type)) {
+                    // all tokens matched, rule is valid
+                }
+                else {
+                    possible_rules.remove(rule); // remove rule if it doesn't match
+                }
+            }
+            else if (m_line.peek(n).is(rules[rule][n].type)) {
+                // found a matching rule by type
+            }
+            else {
+                possible_rules.remove(rule); // remove rule if it doesn't match
+            }
+        }
+    }
+
+    if (possible_rules.size() == 1) {
+        // only one rule matched, execute action and return true
+        execute_action(possible_rules.front());
+        return true;
+    }
+    else {
+        // multiple rules matched, return false
+        return false;
+    }
+}
+
+void LineParser::execute_action(int n) {
+    switch (n) {
+    case 1: execute_action_1(); break;
+    default: assert(0);
+    }
+}
+
+// Action 1: NOP
+void LineParser::execute_action_1() {
+    //add_opcode_void(0x00);
+}
+
+// Action 2: LD A, A
+void LineParser::execute_action_2() {
+    //add_opcode_void(0x00);
+}
+
+// Action 2: LD A, B
+void LineParser::execute_action_3() {
+    //add_opcode_void(0x00);
+}
+
 //@@test
+
+//-----------------------------------------------------------------------------
+// Test
+//-----------------------------------------------------------------------------
 
 void parse_file(const string& filename) {
 	g_input_files.push_file(filename);
@@ -1195,6 +1398,9 @@ void parse_file(const string& filename) {
 		while (g_preproc.getline(expanded_line)) {
 			g_location.set_expanded_text(expanded_line);
 			cout << g_location.get_filename() << ":" << g_location.get_line_num() << ": " << line << endl << expanded_line << endl;
+            LineParser parser;
+            if (!parser.parse(expanded_line))
+                cout << "parse failed" << endl;
 		}
 	}
 }
