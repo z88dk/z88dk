@@ -27,3 +27,7 @@ include "./test.inc"
 include ".\test.inc"
 include 'test.inc'
 Include "test.inc" error
+
+; parser
+ld a,a
+ld a,b
