@@ -355,7 +355,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_0
     SECTION CODE_0
     SECTION RODATA_0
+    SECTION RODATA_0_align_256
+    align 256
+    SECTION RODATA_0_align_128
+    align 128
+    SECTION RODATA_0_align_64
+    align 64
+    SECTION RODATA_0_align_32
+    align 32
+    SECTION RODATA_0_align_16
+    align 16
+    SECTION RODATA_0_align_8
+    align 8
+    SECTION RODATA_0_align_4
+    align 4
+    SECTION RODATA_0_align_2
+    align 2
     SECTION DATA_0
+    SECTION DATA_0_align_256
+    align 256
+    SECTION DATA_0_align_128
+    align 128
+    SECTION DATA_0_align_64
+    align 64
+    SECTION DATA_0_align_32
+    align 32
+    SECTION DATA_0_align_16
+    align 16
+    SECTION DATA_0_align_8
+    align 8
+    SECTION DATA_0_align_4
+    align 4
+    SECTION DATA_0_align_2
+    align 2
     SECTION BSS_0
     SECTION BANK_0_END
 
@@ -363,7 +395,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_1
     SECTION CODE_1
     SECTION RODATA_1
+    SECTION RODATA_1_align_256
+    align 256
+    SECTION RODATA_1_align_128
+    align 128
+    SECTION RODATA_1_align_64
+    align 64
+    SECTION RODATA_1_align_32
+    align 32
+    SECTION RODATA_1_align_16
+    align 16
+    SECTION RODATA_1_align_8
+    align 8
+    SECTION RODATA_1_align_4
+    align 4
+    SECTION RODATA_1_align_2
+    align 2
     SECTION DATA_1
+    SECTION DATA_1_align_256
+    align 256
+    SECTION DATA_1_align_128
+    align 128
+    SECTION DATA_1_align_64
+    align 64
+    SECTION DATA_1_align_32
+    align 32
+    SECTION DATA_1_align_16
+    align 16
+    SECTION DATA_1_align_8
+    align 8
+    SECTION DATA_1_align_4
+    align 4
+    SECTION DATA_1_align_2
+    align 2
     SECTION BSS_1
     SECTION BANK_1_END
 
@@ -371,7 +435,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_2
     SECTION CODE_2
     SECTION RODATA_2
+    SECTION RODATA_2_align_256
+    align 256
+    SECTION RODATA_2_align_128
+    align 128
+    SECTION RODATA_2_align_64
+    align 64
+    SECTION RODATA_2_align_32
+    align 32
+    SECTION RODATA_2_align_16
+    align 16
+    SECTION RODATA_2_align_8
+    align 8
+    SECTION RODATA_2_align_4
+    align 4
+    SECTION RODATA_2_align_2
+    align 2
     SECTION DATA_2
+    SECTION DATA_2_align_256
+    align 256
+    SECTION DATA_2_align_128
+    align 128
+    SECTION DATA_2_align_64
+    align 64
+    SECTION DATA_2_align_32
+    align 32
+    SECTION DATA_2_align_16
+    align 16
+    SECTION DATA_2_align_8
+    align 8
+    SECTION DATA_2_align_4
+    align 4
+    SECTION DATA_2_align_2
+    align 2
     SECTION BSS_2
     SECTION BANK_2_END
 
@@ -379,7 +475,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_3
     SECTION CODE_3
     SECTION RODATA_3
+    SECTION RODATA_3_align_256
+    align 256
+    SECTION RODATA_3_align_128
+    align 128
+    SECTION RODATA_3_align_64
+    align 64
+    SECTION RODATA_3_align_32
+    align 32
+    SECTION RODATA_3_align_16
+    align 16
+    SECTION RODATA_3_align_8
+    align 8
+    SECTION RODATA_3_align_4
+    align 4
+    SECTION RODATA_3_align_2
+    align 2
     SECTION DATA_3
+    SECTION DATA_3_align_256
+    align 256
+    SECTION DATA_3_align_128
+    align 128
+    SECTION DATA_3_align_64
+    align 64
+    SECTION DATA_3_align_32
+    align 32
+    SECTION DATA_3_align_16
+    align 16
+    SECTION DATA_3_align_8
+    align 8
+    SECTION DATA_3_align_4
+    align 4
+    SECTION DATA_3_align_2
+    align 2
     SECTION BSS_3
     SECTION BANK_3_END
 
@@ -387,7 +515,39 @@ IF __MMAP != -1
     org 0xc40000 + CRT_ORG_BANK_4
     SECTION CODE_4
     SECTION RODATA_4
+    SECTION RODATA_4_align_256
+    align 256
+    SECTION RODATA_4_align_128
+    align 128
+    SECTION RODATA_4_align_64
+    align 64
+    SECTION RODATA_4_align_32
+    align 32
+    SECTION RODATA_4_align_16
+    align 16
+    SECTION RODATA_4_align_8
+    align 8
+    SECTION RODATA_4_align_4
+    align 4
+    SECTION RODATA_4_align_2
+    align 2
     SECTION DATA_4
+    SECTION DATA_4_align_256
+    align 256
+    SECTION DATA_4_align_128
+    align 128
+    SECTION DATA_4_align_64
+    align 64
+    SECTION DATA_4_align_32
+    align 32
+    SECTION DATA_4_align_16
+    align 16
+    SECTION DATA_4_align_8
+    align 8
+    SECTION DATA_4_align_4
+    align 4
+    SECTION DATA_4_align_2
+    align 2
     SECTION BSS_4
     SECTION BANK_4_END
 
@@ -395,7 +555,39 @@ IF __MMAP != -1
     org 0xc50000 + CRT_ORG_BANK_5
     SECTION CODE_5
     SECTION RODATA_5
+    SECTION RODATA_5_align_256
+    align 256
+    SECTION RODATA_5_align_128
+    align 128
+    SECTION RODATA_5_align_64
+    align 64
+    SECTION RODATA_5_align_32
+    align 32
+    SECTION RODATA_5_align_16
+    align 16
+    SECTION RODATA_5_align_8
+    align 8
+    SECTION RODATA_5_align_4
+    align 4
+    SECTION RODATA_5_align_2
+    align 2
     SECTION DATA_5
+    SECTION DATA_5_align_256
+    align 256
+    SECTION DATA_5_align_128
+    align 128
+    SECTION DATA_5_align_64
+    align 64
+    SECTION DATA_5_align_32
+    align 32
+    SECTION DATA_5_align_16
+    align 16
+    SECTION DATA_5_align_8
+    align 8
+    SECTION DATA_5_align_4
+    align 4
+    SECTION DATA_5_align_2
+    align 2
     SECTION BSS_5
     SECTION BANK_5_END
 
@@ -403,7 +595,39 @@ IF __MMAP != -1
     org 0xc60000 + CRT_ORG_BANK_6
     SECTION CODE_6
     SECTION RODATA_6
+    SECTION RODATA_6_align_256
+    align 256
+    SECTION RODATA_6_align_128
+    align 128
+    SECTION RODATA_6_align_64
+    align 64
+    SECTION RODATA_6_align_32
+    align 32
+    SECTION RODATA_6_align_16
+    align 16
+    SECTION RODATA_6_align_8
+    align 8
+    SECTION RODATA_6_align_4
+    align 4
+    SECTION RODATA_6_align_2
+    align 2
     SECTION DATA_6
+    SECTION DATA_6_align_256
+    align 256
+    SECTION DATA_6_align_128
+    align 128
+    SECTION DATA_6_align_64
+    align 64
+    SECTION DATA_6_align_32
+    align 32
+    SECTION DATA_6_align_16
+    align 16
+    SECTION DATA_6_align_8
+    align 8
+    SECTION DATA_6_align_4
+    align 4
+    SECTION DATA_6_align_2
+    align 2
     SECTION BSS_6
     SECTION BANK_6_END
 
@@ -411,7 +635,42 @@ IF __MMAP != -1
     org 0xc70000 + CRT_ORG_BANK_7
     SECTION CODE_7
     SECTION RODATA_7
+    SECTION RODATA_7_align_256
+    align 256
+    SECTION RODATA_7_align_128
+    align 128
+    SECTION RODATA_7_align_64
+    align 64
+    SECTION RODATA_7_align_32
+    align 32
+    SECTION RODATA_7_align_16
+    align 16
+    SECTION RODATA_7_align_8
+    align 8
+    SECTION RODATA_7_align_4
+    align 4
+    SECTION RODATA_7_align_2
+    align 2
     SECTION DATA_7
+    SECTION DATA_7_align_256
+    align 256
+    SECTION DATA_7_align_128
+    align 128
+    SECTION DATA_7_align_64
+    align 64
+    SECTION DATA_7_align_32
+    align 32
+    SECTION DATA_7_align_16
+    align 16
+    SECTION DATA_7_align_8
+    align 8
+    SECTION DATA_7_align_4
+    align 4
+    SECTION DATA_7_align_2
+    align 2
     SECTION BSS_7
     SECTION BANK_7_END
 ENDIF
+
+    SECTION UNASSIGNED
+    org     0
