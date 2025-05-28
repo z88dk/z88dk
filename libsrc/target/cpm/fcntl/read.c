@@ -5,6 +5,8 @@
  *
  *  May, 2020 - feilipu - added sequential read
  *  Apr, 2021 -dom - remove sequential read
+ *  May, 2025 - feilipu - added sequential read (#2725) again
+ *
  */
 
 #include <fcntl.h>
@@ -82,10 +84,10 @@ ssize_t read(int fd, void *buf, size_t len)
                     size = len;
                 }
                 if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
-                    _putoffset(fc->ranrec,record_nr);
                     uid = swapuid(fc->uid);
+                    setrecord(fc);
                     bdos(CPM_SDMA,buf);
-                    if ( bdos(CPM_RRAN,fc) ) {
+                    if ( bdos(CPM_READ,fc) ) {
                         swapuid(uid);
                         return cnt-len;
                     }

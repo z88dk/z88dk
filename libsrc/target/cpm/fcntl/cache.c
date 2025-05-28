@@ -14,9 +14,9 @@ int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
     uid = swapuid(fcb->uid);
 
     fcb->cached_record = 0xffffffff;
-    _putoffset(fcb->ranrec,record_nr);
+    setrecord(fcb);
     bdos(CPM_SDMA,fcb->buffer);
-    if ( bdos(CPM_RRAN,fcb) ) {
+    if ( bdos(CPM_READ,fcb) ) {
         swapuid(uid);
         if ( for_read ) return -1;
         // It's for a write, unknown sector, fill with EOF marker
@@ -37,10 +37,10 @@ int cpm_cache_flush(struct fcb *fcb)
     int uid;
 
     if ( fcb->dirty ) {
-        _putoffset(fcb->ranrec,fcb->cached_record);
         uid = swapuid(fcb->uid);
+        setrecord(fcb);
         bdos(CPM_SDMA,fcb->buffer);
-        if ( bdos(CPM_WRAN,fcb) == 0 ) {
+        if ( bdos(CPM_WRIT,fcb) == 0 ) {
             swapuid(uid);
             fcb->dirty = 0;
             return 1;

@@ -5,6 +5,7 @@
  *
  *  May, 2020 - feilipu - added sequential write
  *  Apr, 2021 - dom - remove sequential write 
+ *  May, 2025 - feilipu - added sequential write (#2725) again
  */
 
 #include <fcntl.h>
@@ -73,14 +74,14 @@ ssize_t write(int fd, void *buf, size_t len)
                     size = len;
                 }
                 if ( size == SECSIZE ) {
-                    // Write the full sector now, flush whatever we've got cached so we don't 
+                    // Write the full sector now, flush whatever we've got cached so we don't
                     // write out of order
                     cpm_cache_flush(fc);
 
-                    _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                     uid = swapuid(fc->uid);
+                    setrecord(fc);
                     bdos(CPM_SDMA,buf);
-                    if ( bdos(CPM_WRAN,fc) ) {
+                    if ( bdos(CPM_WRIT,fc) ) {
                         swapuid(uid);
                         return cnt-len;
                     }
