@@ -32,6 +32,7 @@ CFILES = \
 	remove.c \
 	rename.c \
 	setfcb.c \
+	setrecord.c \
 	stat.c \
 	swapuid.c \
 	write.c \

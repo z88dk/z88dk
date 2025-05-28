@@ -29,6 +29,7 @@ target/cpm/fcntl/obj/${TYPE}/${DEVICE}/readbyte
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/remove
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/rename
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/setfcb
+target/cpm/fcntl/obj/${TYPE}/${DEVICE}/setrecord
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/stat
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/swapuid
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/write
