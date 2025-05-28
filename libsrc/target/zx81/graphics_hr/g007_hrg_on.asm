@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: g007_hrg_on.asm,v 1.6 2016-06-27 20:26:33 dom Exp $
+;	$Id: g007_hrg_on.asm $
 ;
 
     SECTION code_clib
@@ -61,10 +61,12 @@ zloop:
     dec     a
     jr      nz, floop
 
+;	No linefeed characters in G007 mode
+;	the D-FILE is just a clean raster picture !
+;
 ;	ld (hl),$76
 ;	inc hl
 ;	ld (hl),$76
-
 
 
 	; wait for video sync to reduce flicker
@@ -91,8 +93,15 @@ zloop:
 ;ENDIF
 
 
-
-
+	; In the normal ZX81 ROM BASIC the I register contains 0x1E, pointing
+	; into the character pixel table in the ROM, Bit 0 of I is thus '0'.
+	; In high res mode, the I register has the value 0x1F, where D0 is '1',
+	; The G007 board uses the A8 bit to understand whether the ZX81 must run
+	; in graphics or in text mode. During a refresh cyclem A0..A7 presents the
+	; the contents of the refresh-row register (only D0-D6 count, D7 is just
+	; whatever was last written into R), A8-15 present the contents of the
+	; interrupt vector register.
+	
     ld      a, $1f                      ; ROM address $1F00 +  enable graphics mode and shadow memory blocks
     ld      i, a
 
