@@ -32,8 +32,8 @@ void setrecord( struct fcb *fc) __z88dk_fastcall
 
     fc->records = (char)rwptr & 0x7F;
 
-    fc->current_record = (char)((uint16_t)(rwptr & 0x3FFF) >> 7);
-    fc->extent = (uint8_t)((uint16_t)rwptr >> 14) & 0x1F;
+    fc->current_record = (char)((rwptr & 0x3FFF) >> 7);
+    fc->extent = (uint8_t)(rwptr >> 14) & 0x1F;
 
     fc->s2 &= 0x80;     // preserve the clean/dirty bit 7
     fc->s2 |= (char)(rwptr >> 19);
