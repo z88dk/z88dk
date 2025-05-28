@@ -226,6 +226,7 @@ extern int __LIB__ cpm_cache_flush(struct fcb *fcb);
 /* Fill up the filename stuff */
 extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
 extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
+
 /* Write the file offset into the FCB */
 extern void __LIB__ putoffset(char *dest, long val) __smallc;
 
@@ -238,6 +239,9 @@ extern int __LIB__ swapuid(int reqid) __z88dk_fastcall;
 
 /* Write an offset as 3 bytes */
 extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
+
+/* Update the FCB to use READ #20 and WRITE #21 BDOS functions non-sequentially */
+extern void __LIB__ setrecord(struct fcb *fc) __z88dk_fastcall;
 
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
