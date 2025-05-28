@@ -84,9 +84,10 @@ my($template_file, $grammar_file) = @ARGV;
 my $grammar;
 
 parse_grammar($grammar_file);
+make_state_machine();
 patch_file($template_file, path($grammar_file)->basename(".y"));
 
-#dump $grammar;
+dump $grammar;
 
 #-------------------------------------------------------------------------------
 # parse the grammar file
@@ -228,4 +229,64 @@ sub c_string {
 	$text =~ s/([\\"])/\\$1/g;
 	$text =~ s/\n/\\n/g;
 	return '"'.$text.'"';
+}
+
+#-------------------------------------------------------------------------------
+# make state machine to parse the grammar
+#-------------------------------------------------------------------------------
+sub make_state_machine {
+	my @rules = @{$grammar->{rules}};
+	my @actions = @{$grammar->{actions}};
+	
+	# build a trie for the rules
+	my $trie = {};
+	for my $rule_nr (1 .. $#rules) {
+		my @tokens = @{$rules[$rule_nr]};
+		push @tokens, 'END'; # add END token to the end of the rule
+		my $action = $actions[$rule_nr];
+		
+		my $node = $trie;
+		for my $token (@tokens) {
+			if (!exists $node->{$token}) {
+				$node->{$token} = {};
+			}
+			$node = $node->{$token};
+		}
+		$node->{action} = $rule_nr; # store the action at the end of the path
+	}
+
+	# create states
+	my @states = (undef); # state 0 is empty
+
+	my $traverse;
+	$traverse = sub {	# so that we can use it recursively
+		my($node, $state) = @_;
+
+		if (!defined $states[$state]) {
+			# create a new state
+			$states[$state] = {state => $state, tokens => {}};
+		}
+
+		if (exists $node->{action}) {
+			# this is a valid state
+			$states[$state]{action} = $node->{action};
+		}
+		else {
+			for my $token (sort keys %$node) {
+				next if $token eq 'action'; # skip the action key
+				if (exists $states[$state]{tokens}{$token}) {
+					$state = $states[$state]{tokens}{$token}; # reuse existing state
+				}
+				else {
+					my $new_state = $#states + 1; # create a new state
+					$states[$state]{tokens}{$token} = $new_state;
+					$traverse->($node->{$token}, $new_state);
+				}
+			}
+		}
+	};
+	$traverse->($trie, 1);
+
+	$grammar->{trie} = $trie;
+	$grammar->{states} = \@states;
 }
