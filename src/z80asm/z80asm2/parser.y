@@ -1,5 +1,14 @@
 // Parser
 
+IDENT "equ" EXPR
+	add_const($1, $3)
+
+"assume" EXPR
+	set_assume($2)
+
+IDENT ":"
+	add_label($1)
+
 "nop"
 	add_opcode_void(0x00);
 
