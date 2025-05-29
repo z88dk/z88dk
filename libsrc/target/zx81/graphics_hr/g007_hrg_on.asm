@@ -25,19 +25,19 @@ _hrg_on:
 
   IF    FORzx81g64
 
+	; TODO; find a working way to allocate a lower amount of memory
+	call $2DF8
+
+  ELSE
+
 	; check if we already have reserved graphics memory
 	LD HL,($400C)    ; D-FILE
 	LD A,$76
 	DEC HL
 	DEC HL
 	CP (HL)
-    call z,$2dd9      ; delete graphics page
-	; TODO: find a way to reserve a smaller amount of memory
-    call 11807
-
-  ELSE
-
-    call 11807           ; Set up graphics page if not reserved yet
+	call nz,$2DF8
+    ;call 11807           ; Set up graphics page if not reserved yet
 
   ENDIF
 
@@ -138,6 +138,7 @@ ENDIF
     ld      b, 1
     ld      hl, $2d9a
     call    $2d95
+	
     add     hl, hl
     nop
     ld      e, a
