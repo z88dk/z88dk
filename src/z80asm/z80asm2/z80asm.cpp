@@ -1244,7 +1244,254 @@ public:
 private:
     Scanner m_line;         // tokens from the current line
 
-    // each element to match in a rule
+    // state in the parsing state machine
+	struct State {
+		unordered_map<Token::Keyword, int>	keyword_next;
+		unordered_map<Token::Type, int>		type_next;
+		void(LineParser::*action)();
+	};
+
+	//@@BEGIN:actions_decl
+	void exec_action_ident_kw_equ_expr();
+	void exec_action_kw_assume_expr();
+	void exec_action_ident_colon();
+	void exec_action_kw_nop();
+	void exec_action_kw_jr_expr();
+	void exec_action_kw_jr_kw_nz_comma_expr();
+	void exec_action_kw_jr_kw_z_comma_expr();
+	void exec_action_kw_jr_kw_nc_comma_expr();
+	void exec_action_kw_jr_kw_c_comma_expr();
+	void exec_action_kw_ld_kw_a_comma_expr();
+	void exec_action_kw_ld_kw_a_comma_lparen_expr_rparen();
+	void exec_action_kw_ld_kw_a_comma_kw_a();
+	void exec_action_kw_ld_kw_a_comma_kw_b();
+	//@@END
+	
+	static inline State m_states[] = {
+		//@@BEGIN: states
+		{ /* 0:  */
+		  { {Token::KW_ASSUME,7}, {Token::KW_JR,10}, {Token::KW_LD,29}, {Token::KW_NOP,42}, },
+		  { {Token::IDENT,1}, },
+		  nullptr,
+		},
+		{ /* 1: IDENT */
+		  { {Token::KW_EQU,4}, },
+		  { {Token::COLON,2}, },
+		  nullptr,
+		},
+		{ /* 2: IDENT COLON */
+		  { },
+		  { {Token::END,3}, },
+		  nullptr,
+		},
+		{ /* 3: IDENT COLON END */
+		  { },
+		  { },
+		  exec_action_ident_colon,
+		},
+		{ /* 4: IDENT KW_EQU */
+		  { },
+		  { {Token::EXPR,5}, },
+		  nullptr,
+		},
+		{ /* 5: IDENT KW_EQU EXPR */
+		  { },
+		  { {Token::END,6}, },
+		  nullptr,
+		},
+		{ /* 6: IDENT KW_EQU EXPR END */
+		  { },
+		  { },
+		  exec_action_ident_kw_equ_expr,
+		},
+		{ /* 7: KW_ASSUME */
+		  { },
+		  { {Token::EXPR,8}, },
+		  nullptr,
+		},
+		{ /* 8: KW_ASSUME EXPR */
+		  { },
+		  { {Token::END,9}, },
+		  nullptr,
+		},
+		{ /* 9: KW_ASSUME EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_assume_expr,
+		},
+		{ /* 10: KW_JR */
+		  { {Token::KW_C,13}, {Token::KW_NC,17}, {Token::KW_NZ,21}, {Token::KW_Z,25}, },
+		  { {Token::EXPR,11}, },
+		  nullptr,
+		},
+		{ /* 11: KW_JR EXPR */
+		  { },
+		  { {Token::END,12}, },
+		  nullptr,
+		},
+		{ /* 12: KW_JR EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_jr_expr,
+		},
+		{ /* 13: KW_JR KW_C */
+		  { },
+		  { {Token::COMMA,14}, },
+		  nullptr,
+		},
+		{ /* 14: KW_JR KW_C COMMA */
+		  { },
+		  { {Token::EXPR,15}, },
+		  nullptr,
+		},
+		{ /* 15: KW_JR KW_C COMMA EXPR */
+		  { },
+		  { {Token::END,16}, },
+		  nullptr,
+		},
+		{ /* 16: KW_JR KW_C COMMA EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_jr_kw_c_comma_expr,
+		},
+		{ /* 17: KW_JR KW_NC */
+		  { },
+		  { {Token::COMMA,18}, },
+		  nullptr,
+		},
+		{ /* 18: KW_JR KW_NC COMMA */
+		  { },
+		  { {Token::EXPR,19}, },
+		  nullptr,
+		},
+		{ /* 19: KW_JR KW_NC COMMA EXPR */
+		  { },
+		  { {Token::END,20}, },
+		  nullptr,
+		},
+		{ /* 20: KW_JR KW_NC COMMA EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_jr_kw_nc_comma_expr,
+		},
+		{ /* 21: KW_JR KW_NZ */
+		  { },
+		  { {Token::COMMA,22}, },
+		  nullptr,
+		},
+		{ /* 22: KW_JR KW_NZ COMMA */
+		  { },
+		  { {Token::EXPR,23}, },
+		  nullptr,
+		},
+		{ /* 23: KW_JR KW_NZ COMMA EXPR */
+		  { },
+		  { {Token::END,24}, },
+		  nullptr,
+		},
+		{ /* 24: KW_JR KW_NZ COMMA EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_jr_kw_nz_comma_expr,
+		},
+		{ /* 25: KW_JR KW_Z */
+		  { },
+		  { {Token::COMMA,26}, },
+		  nullptr,
+		},
+		{ /* 26: KW_JR KW_Z COMMA */
+		  { },
+		  { {Token::EXPR,27}, },
+		  nullptr,
+		},
+		{ /* 27: KW_JR KW_Z COMMA EXPR */
+		  { },
+		  { {Token::END,28}, },
+		  nullptr,
+		},
+		{ /* 28: KW_JR KW_Z COMMA EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_jr_kw_z_comma_expr,
+		},
+		{ /* 29: KW_LD */
+		  { {Token::KW_A,30}, },
+		  { },
+		  nullptr,
+		},
+		{ /* 30: KW_LD KW_A */
+		  { },
+		  { {Token::COMMA,31}, },
+		  nullptr,
+		},
+		{ /* 31: KW_LD KW_A COMMA */
+		  { {Token::KW_A,34}, {Token::KW_B,36}, },
+		  { {Token::EXPR,32}, {Token::LPAREN,38}, },
+		  nullptr,
+		},
+		{ /* 32: KW_LD KW_A COMMA EXPR */
+		  { },
+		  { {Token::END,33}, },
+		  nullptr,
+		},
+		{ /* 33: KW_LD KW_A COMMA EXPR END */
+		  { },
+		  { },
+		  exec_action_kw_ld_kw_a_comma_expr,
+		},
+		{ /* 34: KW_LD KW_A COMMA KW_A */
+		  { },
+		  { {Token::END,35}, },
+		  nullptr,
+		},
+		{ /* 35: KW_LD KW_A COMMA KW_A END */
+		  { },
+		  { },
+		  exec_action_kw_ld_kw_a_comma_kw_a,
+		},
+		{ /* 36: KW_LD KW_A COMMA KW_B */
+		  { },
+		  { {Token::END,37}, },
+		  nullptr,
+		},
+		{ /* 37: KW_LD KW_A COMMA KW_B END */
+		  { },
+		  { },
+		  exec_action_kw_ld_kw_a_comma_kw_b,
+		},
+		{ /* 38: KW_LD KW_A COMMA LPAREN */
+		  { },
+		  { {Token::EXPR,39}, },
+		  nullptr,
+		},
+		{ /* 39: KW_LD KW_A COMMA LPAREN EXPR */
+		  { },
+		  { {Token::RPAREN,40}, },
+		  nullptr,
+		},
+		{ /* 40: KW_LD KW_A COMMA LPAREN EXPR RPAREN */
+		  { },
+		  { {Token::END,41}, },
+		  nullptr,
+		},
+		{ /* 41: KW_LD KW_A COMMA LPAREN EXPR RPAREN END */
+		  { },
+		  { },
+		  exec_action_kw_ld_kw_a_comma_lparen_expr_rparen,
+		},
+		{ /* 42: KW_NOP */
+		  { },
+		  { {Token::END,43}, },
+		  nullptr,
+		},
+		{ /* 43: KW_NOP END */
+		  { },
+		  { },
+		  exec_action_kw_nop,
+		},
+		//@@END
+	};
+	
     struct RuleElem {
         Token::Type type{ Token::END };
         Token::Keyword keyword{ Token::NONE };
@@ -1357,27 +1604,86 @@ bool LineParser::parse(const string& line) {
     }
 }
 
-void LineParser::execute_action(int n) {
-    switch (n) {
-    case 1: execute_action_1(); break;
-    default: assert(0);
-    }
+//@@BEGIN:actions_impl
+void LineParser::exec_action_ident_kw_equ_expr() {
+	add_const($1, $3)
+
+
 }
 
-// Action 1: NOP
-void LineParser::execute_action_1() {
-    //add_opcode_void(0x00);
+void LineParser::exec_action_kw_assume_expr() {
+	set_assume($2)
+
+
 }
 
-// Action 2: LD A, A
-void LineParser::execute_action_2() {
-    //add_opcode_void(0x00);
+void LineParser::exec_action_ident_colon() {
+	add_label($1)
+
+
 }
 
-// Action 2: LD A, B
-void LineParser::execute_action_3() {
-    //add_opcode_void(0x00);
+void LineParser::exec_action_kw_nop() {
+	add_opcode_void(0x00);
+
+
 }
+
+void LineParser::exec_action_kw_jr_expr() {
+	add_opcode_jr(0x18, $4);
+
+
+}
+
+void LineParser::exec_action_kw_jr_kw_nz_comma_expr() {
+	add_opcode_jr(0x20, $4);
+
+
+}
+
+void LineParser::exec_action_kw_jr_kw_z_comma_expr() {
+	add_opcode_jr(0x28, $4);
+
+
+}
+
+void LineParser::exec_action_kw_jr_kw_nc_comma_expr() {
+	add_opcode_jr(0x30, $4);
+
+
+}
+
+void LineParser::exec_action_kw_jr_kw_c_comma_expr() {
+	add_opcode_jr(0x38, $4);
+
+
+}
+
+void LineParser::exec_action_kw_ld_kw_a_comma_expr() {
+	add_opcode_n(0x3E, $4);
+
+
+}
+
+void LineParser::exec_action_kw_ld_kw_a_comma_lparen_expr_rparen() {
+	add_opcode_nn(0x3A, $4);
+
+
+}
+
+void LineParser::exec_action_kw_ld_kw_a_comma_kw_a() {
+	add_opcode_void(0x7F);
+
+
+}
+
+void LineParser::exec_action_kw_ld_kw_a_comma_kw_b() {
+	add_opcode_void(0x78);
+
+
+}
+
+//@@END
 
 //@@test
 
