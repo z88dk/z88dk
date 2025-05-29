@@ -211,6 +211,70 @@ sub patch_file {
 				shift @in;
 			}
 		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*actions_decl\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for my $action_id (0 .. @{$grammar->{rules}} - 1) {
+				push @out, $prefix."void ".action_funcname($action_id)."();\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*actions_impl\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for my $action_id (0 .. @{$grammar->{rules}} - 1) {
+				push @out, $prefix."void LineParser::".action_funcname($action_id)."() {\n";
+				my $action = $grammar->{actions}[$action_id];
+				push @out, "$prefix$action\n";
+				push @out, "}\n\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*states\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for my $state (@{$grammar->{states}}) {
+				my $line = $prefix."{ /* ".$state->{state}.": ".
+						   join(" ", @{$state->{path}})." */\n"; 
+				
+				# unordered_map<Token::Keyword, int>	keyword_next;
+				$line .= "$prefix  { "; 
+				for my $token (sort keys %{$state->{tokens}}) {
+					next unless $token =~ /^KW_/;
+					$line .= "{Token::$token,".$state->{tokens}{$token}."}, ";
+				}
+				$line .= "},\n";
+				
+				# unordered_map<Token::Token, int>	token_next;
+				$line .= "$prefix  { "; 
+				for my $token (sort keys %{$state->{tokens}}) {
+					next if $token =~ /^KW_/;
+					$line .= "{Token::$token,".$state->{tokens}{$token}."}, ";
+				}
+				$line .= "},\n";
+				
+				# int action{-1};
+				$line .= "$prefix  ";
+				if (exists $state->{action}) {
+					$line .= action_funcname($state->{action});
+				}
+				else {
+					$line .= "nullptr";
+				}
+				$line .= ",\n";
+				
+				$line .= "$prefix},\n";
+				
+				push @out, $line;
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
 		else {
 			push @out, $_;
 		}
@@ -229,6 +293,13 @@ sub c_string {
 	$text =~ s/([\\"])/\\$1/g;
 	$text =~ s/\n/\\n/g;
 	return '"'.$text.'"';
+}
+
+sub action_funcname {
+	my($action_id) = @_;
+	my @tokens = @{$grammar->{rules}[$action_id]};
+	my $funcname = "exec_action_".lc(join("_", @tokens));
+	return $funcname;
 }
 
 #-------------------------------------------------------------------------------
@@ -260,11 +331,11 @@ sub make_state_machine {
 
 	my $traverse;
 	$traverse = sub {	# so that we can use it recursively
-		my($node, $state) = @_;
+		my($node, $state, @path) = @_;
 
 		if (!defined $states[$state]) {
 			# create a new state
-			$states[$state] = {state => $state, tokens => {}};
+			$states[$state] = {state => $state, tokens => {}, path => [@path]};
 		}
 
 		if (exists $node->{action}) {
@@ -280,7 +351,7 @@ sub make_state_machine {
 				else {
 					my $new_state = $#states + 1; # create a new state
 					$states[$state]{tokens}{$token} = $new_state;
-					$traverse->($node->{$token}, $new_state);
+					$traverse->($node->{$token}, $new_state, @path, $token);
 				}
 			}
 		}
