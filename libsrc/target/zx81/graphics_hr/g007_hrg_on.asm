@@ -13,7 +13,6 @@
     PUBLIC  _hrg_on
     EXTERN  base_graphics
 
-    EXTERN  L0292
     EXTERN  G007_P1
     EXTERN  G007_P2
     EXTERN  G007_P3
@@ -22,8 +21,25 @@
 hrg_on:
 _hrg_on:
 
-    ld      hl, ($2306)                 ; Current HRG page (use CLS 2 / SLOW 4, in BASIC, first)
-    ld      (base_graphics), hl
+
+
+  IF    FORzx81g64
+
+	; check if we already have reserved graphics memory
+	LD HL,($400C)    ; D-FILE
+	LD A,$76
+	DEC HL
+	DEC HL
+	CP (HL)
+    call z,$2dd9      ; delete graphics page
+	; TODO: find a way to reserve a smaller amount of memory
+    call 11807
+
+  ELSE
+
+    call 11807           ; Set up graphics page if not reserved yet
+
+  ENDIF
 
 ;; if hrgpage has not been specified, then set a default value
 ;	ld      hl,(base_graphics)
@@ -36,14 +52,14 @@ _hrg_on:
 ;	ld		hl,25000		; on a 16K system we leave a space of a bit more than 1K for stack
 ;ENDIF
 ;	ld		(base_graphics),hl
+;	ld      ($2306),hl                  ; Current HRG page
 ;gotpage:
 
-;	ld		hl,(base_graphics)
+    ld      hl, ($2306)                 ; Current HRG page
+    ld      (base_graphics), hl
 
-;	ld		($2306),hl		; probably not necessary, bur emulators may like it
     ld      de, 9
     add     hl, de
-;	ld		($2308),hl		; probably not necessary, bur emulators may like it
 
   IF    FORzx81g64
     ld      a, 65                       ; new row counter
@@ -87,12 +103,6 @@ zloop:
     ld      (G007_P3+1), hl
 
 
-;IF FORzx81g64
-;	ld	a,85
-;	ld	(MTCH_P3+1),a	; patch also our custom interrupt handler
-;ENDIF
-
-
 	; In the normal ZX81 ROM BASIC the I register contains 0x1E, pointing
 	; into the character pixel table in the ROM, Bit 0 of I is thus '0'.
 	; In high res mode, the I register has the value 0x1F, where D0 is '1',
@@ -113,6 +123,9 @@ display_3:
 ;  HRG replacement fot DISPLAY-3
     dec     hl
     ld      a, ($4028)
+IF FORzx81g64
+    add		58
+ENDIF
     ld      c, a
     pop     iy                          ;  z80asm will do an IX<>IY swap
     ld      a, ($403B)                  ; test CDFLAG
