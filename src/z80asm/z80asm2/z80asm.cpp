@@ -1141,14 +1141,6 @@ void Preproc::expand(const string & input_line) {
 			collect_statement();
 			push_out();
 		}
-		// EQU
-		else if (m_in.peek(0).is(Token::IDENT) && m_in.peek(1).is(Token::KW_EQU)) {
-			m_out.push_back(m_in.peek(0)); // IDENT
-			m_out.push_back(m_in.peek(1)); // equ
-			m_in.next(2);
-			collect_statement();
-			push_out();
-		}
 		// .ASSUME
 		else if (m_in.peek(0).is(Token::DOT) && m_in.peek(1).is(Token::KW_ASSUME)) {
 			m_out.push_back(m_in.peek(1)); // ASSUME
@@ -1170,6 +1162,13 @@ void Preproc::expand(const string & input_line) {
 			m_in.next(2);
 			push_out();
 		}
+		// #INCLUDE
+		else if (m_in.peek(0).is(Token::HASH) && m_in.peek(1).is(Token::KW_INCLUDE) && m_in.peek(2).is(Token::RAW_STR)) {
+			string filename = m_in.peek(2).get_svalue();
+			m_in.next(3);
+			check_end();
+			g_input_files.push_file(filename);
+		}
 		// INCLUDE
 		else if (m_in.peek(0).is(Token::KW_INCLUDE) && m_in.peek(1).is(Token::RAW_STR)) {
 			string filename = m_in.peek(1).get_svalue();
@@ -1177,6 +1176,7 @@ void Preproc::expand(const string & input_line) {
 			check_end();
 			g_input_files.push_file(filename);
 		}
+		// Handle one statement, possibly empty
 		else {
 			collect_statement();
 			push_out();
@@ -1186,7 +1186,9 @@ void Preproc::expand(const string & input_line) {
 
 void Preproc::collect_statement() {
 	while (!m_in.peek().is(Token::END)) {
-		if (m_in.peek().is(Token::COLON) || m_in.peek().is(Token::BACKSLASH)) {
+		if (m_in.peek().is(Token::NEWLINE) || 
+		    m_in.peek().is(Token::COLON) || 
+			m_in.peek().is(Token::BACKSLASH)) {
 			m_in.next();
 			return;
 		}
