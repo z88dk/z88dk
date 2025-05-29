@@ -11,10 +11,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <cpm.h>
 #include <stdio.h>
 
+// #pragma printf = "%s %d %02u %04x %08lx"
 
 ssize_t write(int fd, void *buf, size_t len)
 {
@@ -79,7 +79,9 @@ ssize_t write(int fd, void *buf, size_t len)
                     cpm_cache_flush(fc);
 
                     uid = swapuid(fc->uid);
+//                  printf("WR - S2 %02x, EX %02x, CR %02x, RC %02x, record_nr %08lx\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, (uint8_t)fc->records, fc->record_nr);
                     setrecord(fc);
+//                  printf("WR - S2 %02x, EX %02x, CR %02x, RC %02x, record_nr %08lx\n\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, (uint8_t)fc->records, fc->record_nr);
                     bdos(CPM_SDMA,buf);
                     if ( bdos(CPM_WRIT,fc) ) {
                         swapuid(uid);
