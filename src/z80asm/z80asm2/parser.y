@@ -1,41 +1,40 @@
 // Parser
 
 IDENT "equ" EXPR
-	add_const($1, $3)
+	g_object_module.add_constant($1.get_svalue(), $3.get_ivalue());
 
 "assume" EXPR
-	set_assume($2)
+	g_object_module.set_assume($2.get_ivalue());
 
 IDENT ":"
-	add_label($1)
+	g_object_module.add_label($1.get_svalue());
 
 "nop"
-	add_opcode_void(0x00);
+	g_object_module.add_opcode_void(0x00);
 
 "jr" EXPR
-	add_opcode_jr(0x18, $4);
+	g_object_module.add_opcode_jr(0x18, $4.get_ivalue());
 
 "jr" "nz" "," EXPR
-	add_opcode_jr(0x20, $4);
+	g_object_module.add_opcode_jr(0x20, $4.get_ivalue());
 
 "jr" "z" "," EXPR
-	add_opcode_jr(0x28, $4);
+	g_object_module.add_opcode_jr(0x28, $4.get_ivalue());
 
 "jr" "nc" "," EXPR
-	add_opcode_jr(0x30, $4);
+	g_object_module.add_opcode_jr(0x30, $4.get_ivalue());
 
 "jr" "c" "," EXPR
-	add_opcode_jr(0x38, $4);
+	g_object_module.add_opcode_jr(0x38, $4.get_ivalue());
 
 "ld" "a" "," EXPR
-	add_opcode_n(0x3E, $4);
+	g_object_module.add_opcode_n(0x3E, $4.get_ivalue());
 
 "ld" "a" "," "(" EXPR ")"
-	add_opcode_nn(0x3A, $4);
+	g_object_module.add_opcode_nn(0x3A, $4.get_ivalue());
 
 "ld" "a" "," "a"
-	add_opcode_void(0x7F);
+	g_object_module.add_opcode_void(0x7F);
 
 "ld" "a" "," "b"
-	add_opcode_void(0x78);
-
+	g_object_module.add_opcode_void(0x78);

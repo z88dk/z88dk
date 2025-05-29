@@ -639,6 +639,7 @@ public:
 	void rewind();
 	void next(int num = 1);
 	Token& peek(int offset = 0);
+    Token& operator[](int pos);
 	void push_back(const Token& token) { m_tokens.push_back(token); } // copy
 	void push_back(Token&& token) { m_tokens.push_back(std::move(token)); } // move
 	int get_pos() const { return m_pos; }
@@ -960,6 +961,14 @@ Token& Scanner::peek(int offset) {
 		return end;
 }
 
+Token& Scanner::operator[](int pos) {
+    static Token end;
+    if (pos >= 0 && pos < static_cast<int>(m_tokens.size()))
+        return m_tokens[pos];
+    else
+        return end;
+}
+
 bool Scanner::parse_raw_string(const char*& p, string& result) {
 	char quote = *p++;
 	result.clear();
@@ -1234,6 +1243,43 @@ void Preproc::check_end() {
 //@@.h
 
 //-----------------------------------------------------------------------------
+// Object Module
+//-----------------------------------------------------------------------------
+
+class ObjectModule {
+public:
+    void clear();
+    void add_constant(const string& name, int value) { m_symbols[name] = value; }
+    void add_label(const string& name) { m_symbols[name] = 0; }
+    void set_assume(int value) { m_assume = value; }
+    void add_opcode_void(long long opcode) { (void)opcode; }
+    void add_opcode_jr(long long opcode, int value) { (void)opcode; (void)value; }
+    void add_opcode_n(long long opcode, int value) { (void)opcode; (void)value; }
+    void add_opcode_nn(long long opcode, int value) { (void)opcode; (void)value; }
+
+private:
+    unordered_map<string, int> m_symbols;
+    int m_assume{ 0 };
+};
+
+extern ObjectModule g_object_module;
+
+//@@.cpp
+
+//-----------------------------------------------------------------------------
+// Object Module
+//-----------------------------------------------------------------------------
+
+ObjectModule g_object_module;
+
+void ObjectModule::clear() {
+    m_symbols.clear();
+    m_assume = 0;
+}
+
+//@@.h
+
+//-----------------------------------------------------------------------------
 // Line parser
 //-----------------------------------------------------------------------------
 
@@ -1287,7 +1333,7 @@ private:
 		{ /* 3: IDENT COLON END */
 		  { },
 		  { },
-		  exec_action_ident_colon,
+		  &LineParser::exec_action_ident_colon,
 		},
 		{ /* 4: IDENT KW_EQU */
 		  { },
@@ -1302,7 +1348,7 @@ private:
 		{ /* 6: IDENT KW_EQU EXPR END */
 		  { },
 		  { },
-		  exec_action_ident_kw_equ_expr,
+		  &LineParser::exec_action_ident_kw_equ_expr,
 		},
 		{ /* 7: KW_ASSUME */
 		  { },
@@ -1317,7 +1363,7 @@ private:
 		{ /* 9: KW_ASSUME EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_assume_expr,
+		  &LineParser::exec_action_kw_assume_expr,
 		},
 		{ /* 10: KW_JR */
 		  { {Token::KW_C,13}, {Token::KW_NC,17}, {Token::KW_NZ,21}, {Token::KW_Z,25}, },
@@ -1332,7 +1378,7 @@ private:
 		{ /* 12: KW_JR EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_jr_expr,
+		  &LineParser::exec_action_kw_jr_expr,
 		},
 		{ /* 13: KW_JR KW_C */
 		  { },
@@ -1352,7 +1398,7 @@ private:
 		{ /* 16: KW_JR KW_C COMMA EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_jr_kw_c_comma_expr,
+		  &LineParser::exec_action_kw_jr_kw_c_comma_expr,
 		},
 		{ /* 17: KW_JR KW_NC */
 		  { },
@@ -1372,7 +1418,7 @@ private:
 		{ /* 20: KW_JR KW_NC COMMA EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_jr_kw_nc_comma_expr,
+		  &LineParser::exec_action_kw_jr_kw_nc_comma_expr,
 		},
 		{ /* 21: KW_JR KW_NZ */
 		  { },
@@ -1392,7 +1438,7 @@ private:
 		{ /* 24: KW_JR KW_NZ COMMA EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_jr_kw_nz_comma_expr,
+		  &LineParser::exec_action_kw_jr_kw_nz_comma_expr,
 		},
 		{ /* 25: KW_JR KW_Z */
 		  { },
@@ -1412,7 +1458,7 @@ private:
 		{ /* 28: KW_JR KW_Z COMMA EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_jr_kw_z_comma_expr,
+		  &LineParser::exec_action_kw_jr_kw_z_comma_expr,
 		},
 		{ /* 29: KW_LD */
 		  { {Token::KW_A,30}, },
@@ -1437,7 +1483,7 @@ private:
 		{ /* 33: KW_LD KW_A COMMA EXPR END */
 		  { },
 		  { },
-		  exec_action_kw_ld_kw_a_comma_expr,
+		  &LineParser::exec_action_kw_ld_kw_a_comma_expr,
 		},
 		{ /* 34: KW_LD KW_A COMMA KW_A */
 		  { },
@@ -1447,7 +1493,7 @@ private:
 		{ /* 35: KW_LD KW_A COMMA KW_A END */
 		  { },
 		  { },
-		  exec_action_kw_ld_kw_a_comma_kw_a,
+		  &LineParser::exec_action_kw_ld_kw_a_comma_kw_a,
 		},
 		{ /* 36: KW_LD KW_A COMMA KW_B */
 		  { },
@@ -1457,7 +1503,7 @@ private:
 		{ /* 37: KW_LD KW_A COMMA KW_B END */
 		  { },
 		  { },
-		  exec_action_kw_ld_kw_a_comma_kw_b,
+		  &LineParser::exec_action_kw_ld_kw_a_comma_kw_b,
 		},
 		{ /* 38: KW_LD KW_A COMMA LPAREN */
 		  { },
@@ -1477,7 +1523,7 @@ private:
 		{ /* 41: KW_LD KW_A COMMA LPAREN EXPR RPAREN END */
 		  { },
 		  { },
-		  exec_action_kw_ld_kw_a_comma_lparen_expr_rparen,
+		  &LineParser::exec_action_kw_ld_kw_a_comma_lparen_expr_rparen,
 		},
 		{ /* 42: KW_NOP */
 		  { },
@@ -1487,58 +1533,10 @@ private:
 		{ /* 43: KW_NOP END */
 		  { },
 		  { },
-		  exec_action_kw_nop,
+		  &LineParser::exec_action_kw_nop,
 		},
 		//@@END
 	};
-	
-    struct RuleElem {
-        Token::Type type{ Token::END };
-        Token::Keyword keyword{ Token::NONE };
-
-        RuleElem(Token::Type type_) : type(type_) {}
-        RuleElem(Token::Keyword keyword_) : keyword(keyword_) {}
-    };
-
-    // list of rules
-
-    // Rule 1: NOP
-    static inline RuleElem rule_elems_1[] = {
-        RuleElem(Token::KW_NOP),
-        RuleElem(Token::END)
-    };
-
-    // Rule 2: LD A, A
-    static inline RuleElem rule_elems_2[] = {
-        RuleElem(Token::KW_LD),
-        RuleElem(Token::KW_A),
-        RuleElem(Token::COMMA),
-        RuleElem(Token::KW_A),
-        RuleElem(Token::END)
-    };
-
-    // Rule 3: LD A, B
-    static inline RuleElem rule_elems_3[] = {
-        RuleElem(Token::KW_LD),
-        RuleElem(Token::KW_A),
-        RuleElem(Token::COMMA),
-        RuleElem(Token::KW_B),
-        RuleElem(Token::END)
-    };
-
-
-    static inline RuleElem* rules[] = {
-        nullptr,
-        rule_elems_1, // Rule 1: NOP
-        rule_elems_2, // Rule 1: LD A, A
-        rule_elems_3, // Rule 1: LD A, B
-    };
-
-    static void execute_action(int n);
-
-    static void execute_action_1();     // Action 1: NOP
-    static void execute_action_2();     // Action 2: LD A, A
-    static void execute_action_3();     // Action 3: LD A, B
 };
 
 //@@.cpp
@@ -1554,132 +1552,111 @@ bool LineParser::parse(const string& line) {
     if (m_line.peek().is(Token::END))
         return true;        // empty line
 
-    // initialize the possible list of rules with the first token
-    list<int> possible_rules;
-    for (int i = 1; i < static_cast<int>(sizeof(rules) / sizeof(rules[0])); ++i) {
-        if (rules[i][0].keyword != Token::NONE && m_line.peek().is(rules[i][0].keyword)) {
-            possible_rules.push_back(i);
+
+    int state = 0;
+    while (true) {
+        Token& token = m_line.peek();
+        if (token.is(Token::END)) {
+            break;  // end of line
         }
-        else if (m_line.peek().is(rules[i][0].type)) {
-            possible_rules.push_back(i);
+        if (state < 0 || state >= static_cast<int>(std::size(m_states))) {
+            //g_error.error_invalid_state(state);
+            return false;
+        }
+        auto& current_state = m_states[state];
+        if (current_state.keyword_next.count(token.get_keyword()) > 0) {
+            state = current_state.keyword_next[token.get_keyword()];
+        }
+        else if (current_state.type_next.count(token.get_type()) > 0) {
+            state = current_state.type_next[token.get_type()];
+        }
+        else {
+            //g_error.error_invalid_token(token.to_string());
+            return false;
+        }
+        if (current_state.action) {
+            (this->*current_state.action)();
         }
     }
 
-    // search for a matching rule
-    for (int n = 0; true; ++n) {
-        if (possible_rules.empty()) {
-            return false; // no matching rule found
-        }
-
-        for (auto rule : possible_rules) {
-            if (rules[rule][n].keyword != Token::NONE && m_line.peek(n).is(rules[rule][n].keyword)) {
-                // found a matching rule by keyword
-            }
-            else if (rules[rule][n].type == Token::END) {
-                // end of rule reached, check if all tokens matched
-                if (m_line.peek(n).is(rules[rule][n].type)) {
-                    // all tokens matched, rule is valid
-                }
-                else {
-                    possible_rules.remove(rule); // remove rule if it doesn't match
-                }
-            }
-            else if (m_line.peek(n).is(rules[rule][n].type)) {
-                // found a matching rule by type
-            }
-            else {
-                possible_rules.remove(rule); // remove rule if it doesn't match
-            }
-        }
-    }
-
-    if (possible_rules.size() == 1) {
-        // only one rule matched, execute action and return true
-        execute_action(possible_rules.front());
-        return true;
-    }
-    else {
-        // multiple rules matched, return false
-        return false;
-    }
+    return true;
 }
 
 //@@BEGIN:actions_impl
 void LineParser::exec_action_ident_kw_equ_expr() {
-	add_const($1, $3)
+	g_object_module.add_constant(m_line[1].get_svalue(), m_line[3].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_assume_expr() {
-	set_assume($2)
+	g_object_module.set_assume(m_line[2].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_ident_colon() {
-	add_label($1)
+	g_object_module.add_label(m_line[1].get_svalue());
 
 
 }
 
 void LineParser::exec_action_kw_nop() {
-	add_opcode_void(0x00);
+	g_object_module.add_opcode_void(0x00);
 
 
 }
 
 void LineParser::exec_action_kw_jr_expr() {
-	add_opcode_jr(0x18, $4);
+	g_object_module.add_opcode_jr(0x18, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_jr_kw_nz_comma_expr() {
-	add_opcode_jr(0x20, $4);
+	g_object_module.add_opcode_jr(0x20, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_jr_kw_z_comma_expr() {
-	add_opcode_jr(0x28, $4);
+	g_object_module.add_opcode_jr(0x28, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_jr_kw_nc_comma_expr() {
-	add_opcode_jr(0x30, $4);
+	g_object_module.add_opcode_jr(0x30, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_jr_kw_c_comma_expr() {
-	add_opcode_jr(0x38, $4);
+	g_object_module.add_opcode_jr(0x38, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_ld_kw_a_comma_expr() {
-	add_opcode_n(0x3E, $4);
+	g_object_module.add_opcode_n(0x3E, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_ld_kw_a_comma_lparen_expr_rparen() {
-	add_opcode_nn(0x3A, $4);
+	g_object_module.add_opcode_nn(0x3A, m_line[4].get_ivalue());
 
 
 }
 
 void LineParser::exec_action_kw_ld_kw_a_comma_kw_a() {
-	add_opcode_void(0x7F);
+	g_object_module.add_opcode_void(0x7F);
 
 
 }
 
 void LineParser::exec_action_kw_ld_kw_a_comma_kw_b() {
-	add_opcode_void(0x78);
-
+	g_object_module.add_opcode_void(0x78);
 
 }
 
@@ -1692,7 +1669,10 @@ void LineParser::exec_action_kw_ld_kw_a_comma_kw_b() {
 //-----------------------------------------------------------------------------
 
 void parse_file(const string& filename) {
-	g_input_files.push_file(filename);
+    g_preproc.clear();
+    g_object_module.clear();
+
+    g_input_files.push_file(filename);
 	string line;
 	while (g_input_files.getline(line)) {
 		g_preproc.expand(line);
@@ -1709,7 +1689,7 @@ void parse_file(const string& filename) {
 
 int main(int argc, char* argv[]) {
 	for (int i = 1; i < argc; i++) {
-		g_preproc.clear();
 		parse_file(argv[i]);
 	}
 }
+
