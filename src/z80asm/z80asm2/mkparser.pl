@@ -96,9 +96,9 @@ sub parse_grammar {
 	my($filename) = @_;
 	open(my $fh, "<", $filename) or die "open file $filename: $!\n";
 	
-	my @rules = ([]);
-	my @actions = ("");
-	my $rule_nr = 0;
+	my @rules;
+	my @actions;
+	my $rule_nr = -1;
 	while (<$fh>) {
 		if (/^\s*\/\//) {
 			next;
@@ -110,7 +110,7 @@ sub parse_grammar {
 			$actions[$rule_nr] = "";
 		}
 		else {
-			if ($rule_nr < 1) {
+			if ($rule_nr < 0) {
 				die "action code before rules: $_" if /\S/;
 			}
 			else {
@@ -240,7 +240,7 @@ sub make_state_machine {
 	
 	# build a trie for the rules
 	my $trie = {};
-	for my $rule_nr (1 .. $#rules) {
+	for my $rule_nr (0 .. $#rules) {
 		my @tokens = @{$rules[$rule_nr]};
 		push @tokens, 'END'; # add END token to the end of the rule
 		my $action = $actions[$rule_nr];
@@ -256,7 +256,7 @@ sub make_state_machine {
 	}
 
 	# create states
-	my @states = (undef); # state 0 is empty
+	my @states;
 
 	my $traverse;
 	$traverse = sub {	# so that we can use it recursively
@@ -285,7 +285,7 @@ sub make_state_machine {
 			}
 		}
 	};
-	$traverse->($trie, 1);
+	$traverse->($trie, 0);
 
 	$grammar->{trie} = $trie;
 	$grammar->{states} = \@states;
