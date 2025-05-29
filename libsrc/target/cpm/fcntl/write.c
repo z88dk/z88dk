@@ -80,7 +80,7 @@ ssize_t write(int fd, void *buf, size_t len)
                     // write out of order
                     cpm_cache_flush(fc);
 
-                    fcb->record_nr = record_nr;
+                    fc->record_nr = record_nr;
                     uid = swapuid(fc->uid);
                     setrecord(fc);
                     bdos(CPM_SDMA,buf);
