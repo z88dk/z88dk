@@ -121,8 +121,6 @@ sub parse_grammar {
 	
 	$grammar = {tokens => \%tokens, keywords => \%keywords,
 				rules => \@rules, actions => \@actions};
-
-
 }
 
 sub parse_grammar_rule {
@@ -226,7 +224,7 @@ sub patch_file {
 			push @out, $_;
 			for my $action_id (0 .. @{$grammar->{rules}} - 1) {
 				push @out, $prefix."void LineParser::".action_funcname($action_id)."() {\n";
-				my $action = $grammar->{actions}[$action_id];
+				my $action = action_function($grammar->{actions}[$action_id]);
 				push @out, "$prefix$action\n";
 				push @out, "}\n\n";
 			}
@@ -260,7 +258,7 @@ sub patch_file {
 				# int action{-1};
 				$line .= "$prefix  ";
 				if (exists $state->{action}) {
-					$line .= action_funcname($state->{action});
+					$line .= "&LineParser::".action_funcname($state->{action});
 				}
 				else {
 					$line .= "nullptr";
@@ -300,6 +298,14 @@ sub action_funcname {
 	my @tokens = @{$grammar->{rules}[$action_id]};
 	my $funcname = "exec_action_".lc(join("_", @tokens));
 	return $funcname;
+}
+
+sub action_function {
+    my($text) = @_;
+    for ($text) {
+        s/\$(\d+)/m_line[$1]/g; # replace $1, $2, ... with m_line[1], m_line[2], ...
+    }
+    return $text;
 }
 
 #-------------------------------------------------------------------------------
