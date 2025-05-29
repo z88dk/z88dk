@@ -18,8 +18,6 @@
 extern void *_CPM_READ_CACHE_ALWAYS;
 #define CPM_READ_CACHE_ALWAYS (int)&_CPM_READ_CACHE_ALWAYS
 
-// #pragma printf = "%s %d %02u %02x %08lx"
-
 ssize_t read(int fd, void *buf, size_t len)
 {
     unsigned char buffer[SECSIZE+2];
@@ -78,18 +76,19 @@ ssize_t read(int fd, void *buf, size_t len)
         } else {
             while ( len ) {
                 unsigned long record_nr = fc->record_nr;
-                
+
                 if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
                 offset = fc->rwptr%SECSIZE;
 
                 if ( ( size = SECSIZE - offset ) > len ) {
                     size = len;
                 }
+
+//              printf("RD - S2 %02x, EX %02x, CR %02x, cached_record %04lx, record_nr %04lx\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, fc->cached_record, fc->record_nr);
+
                 if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
                     uid = swapuid(fc->uid);
-//                  printf("RD - S2 %02x, EX %02x, CR %02x, RC %02x, record_nr %08lx\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, (uint8_t)fc->records, fc->record_nr);
                     setrecord(fc);
-//                  printf("RD - S2 %02x, EX %02x, CR %02x, RC %02x, record_nr %08lx\n\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, (uint8_t)fc->records, fc->record_nr);
                     bdos(CPM_SDMA,buf);
                     if ( bdos(CPM_READ,fc) ) {
                         swapuid(uid);

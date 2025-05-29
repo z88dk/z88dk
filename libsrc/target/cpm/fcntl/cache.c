@@ -14,6 +14,8 @@ int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
     uid = swapuid(fcb->uid);
 
     fcb->cached_record = 0xffffffff;
+    fcb->record_nr = record_nr;
+
     setrecord(fcb);
     bdos(CPM_SDMA,fcb->buffer);
     if ( bdos(CPM_READ,fcb) ) {
@@ -37,6 +39,7 @@ int cpm_cache_flush(struct fcb *fcb)
     int uid;
 
     if ( fcb->dirty ) {
+        fcb->record_nr = fcb->cached_record;
         uid = swapuid(fcb->uid);
         setrecord(fcb);
         bdos(CPM_SDMA,fcb->buffer);

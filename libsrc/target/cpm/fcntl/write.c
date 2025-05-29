@@ -14,8 +14,6 @@
 #include <cpm.h>
 #include <stdio.h>
 
-// #pragma printf = "%s %d %02u %04x %08lx"
-
 ssize_t write(int fd, void *buf, size_t len)
 {
     unsigned char uid;
@@ -67,21 +65,24 @@ ssize_t write(int fd, void *buf, size_t len)
         } else {
             while ( len ) {
                 unsigned long record_nr = fc->record_nr;
-                
+
                 if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
                 offset = fc->rwptr%SECSIZE;
+
                 if ( (size = SECSIZE-offset) > len ) {
                     size = len;
                 }
+
+//              printf("WR - S2 %02x, EX %02x, CR %02x, cached_record %04lx, record_nr %04lx\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, fc->cached_record, fc->record_nr);
+
                 if ( size == SECSIZE ) {
                     // Write the full sector now, flush whatever we've got cached so we don't
                     // write out of order
                     cpm_cache_flush(fc);
 
+                    fcb->record_nr = record_nr;
                     uid = swapuid(fc->uid);
-//                  printf("WR - S2 %02x, EX %02x, CR %02x, RC %02x, record_nr %08lx\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, (uint8_t)fc->records, fc->record_nr);
                     setrecord(fc);
-//                  printf("WR - S2 %02x, EX %02x, CR %02x, RC %02x, record_nr %08lx\n\n", (uint8_t)fc->s2, fc->extent, (uint8_t)fc->current_record, (uint8_t)fc->records, fc->record_nr);
                     bdos(CPM_SDMA,buf);
                     if ( bdos(CPM_WRIT,fc) ) {
                         swapuid(uid);
