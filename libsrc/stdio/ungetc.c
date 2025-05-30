@@ -30,16 +30,12 @@ int ungetc(int c, FILE *fp)
     ld      b,a     ;b=flags
     and     a
     ret     z       ;not being used
-    ld      a,b
     and     _IOEOF |_IOWRITE|_IOUNGETC
     ret     nz      ;cant push back after EOF (or for write stream)
     ld      a,b     ;indicate that we have a character ungot
     or      _IOUNGETC
     ld      (de),a
     inc     de      ;now on ungetc
-    ld      a,(de)
-    and     a
-    ret     nz
     ex      de,hl
     ld      (hl),c  ;store the char
     ld      l,c     ;return it
