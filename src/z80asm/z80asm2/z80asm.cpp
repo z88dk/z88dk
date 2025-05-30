@@ -373,50 +373,58 @@ public:
 		END,
 		ASMPC,
 		BACKSLASH,
-		BIN_AND,
-		BIN_NOT,
-		BIN_OR,
-		BIN_XOR,
 		COLON,
 		COMMA,
 		CONST_EXPR,
 		DHASH,
-		DIV,
 		DOT,
-		EQ,
 		EXPR,
 		FLOAT,
-		GE,
-		GT,
 		HASH,
 		IDENT,
 		INT,
 		LBRACE,
-		LE,
-		LOG_AND,
-		LOG_NOT,
-		LOG_OR,
-		LOG_XOR,
 		LPAREN,
-		LSHIFT,
 		LSQUARE,
-		LT,
-		MINUS,
-		MOD,
-		MULT,
-		NE,
 		NEWLINE,
-		PLUS,
-		POWER,
+		OPERAT,
 		QUEST,
 		RAW_STR,
 		RBRACE,
 		RPAREN,
-		RSHIFT,
 		RSQUARE,
 		STR,
 		//@@END
 	};
+
+    enum Operat {
+        //@@BEGIN: operator
+        OP_NONE,
+        OP_BIN_AND,
+        OP_BIN_NOT,
+        OP_BIN_OR,
+        OP_BIN_XOR,
+        OP_DIV,
+        OP_EQ,
+        OP_GE,
+        OP_GT,
+        OP_LE,
+        OP_LOG_AND,
+        OP_LOG_NOT,
+        OP_LOG_OR,
+        OP_LOG_XOR,
+        OP_LSHIFT,
+        OP_LT,
+        OP_MINUS,
+        OP_MOD,
+        OP_MULT,
+        OP_NE,
+        OP_PLUS,
+        OP_POWER,
+        OP_RSHIFT,
+        OP_TERNARY,
+        //@@END
+    };
 
 	enum Keyword {
 		//@@BEGIN: keyword
@@ -450,24 +458,29 @@ public:
 	double get_fvalue() const { return m_fvalue; }
 	const string& get_svalue() const { return m_svalue; }
 	Keyword get_keyword() const { return m_keyword; }
+    Operat get_operat() const { return m_operat; }
 
 	void set_ivalue(int ivalue) { m_ivalue = ivalue; }
 	void set_fvalue(double fvalue) { m_fvalue = fvalue; }
 	void set_svalue(const string& svalue) { m_svalue = svalue; }
 	void set_keyword(const string& text);
+    void set_operat(Operat operat) { m_operat = operat; }
 
 	bool is(Type type) const { return m_type == type; }
-	bool is(Keyword keyword) { return m_keyword == keyword; }
+	bool is(Keyword keyword) const { return m_keyword == keyword; }
+    bool is_end() const;
 
 	string to_string() const;
 
-	static Keyword lookup_keyword(const string& text);
+    static string lookup_operat(Operat operat);
+    static Keyword lookup_keyword(const string& text);
 	static string concat(const string& s1, const string& s2);
 
 private:
 	Type m_type{ END };
 	bool m_blank_before{ false };
 	Keyword m_keyword{ NONE };
+    Operat m_operat{ OP_NONE };
 	int m_ivalue{ 0 };
 	double m_fvalue{ 0.0 };
 	string m_svalue;
@@ -478,49 +491,57 @@ private:
 		//@@BEGIN: type_map
 		{ ASMPC, "$" },
 		{ BACKSLASH, "\\" },
-		{ BIN_AND, "&" },
-		{ BIN_NOT, "~" },
-		{ BIN_OR, "|" },
-		{ BIN_XOR, "^" },
 		{ COLON, ":" },
 		{ COMMA, "," },
 		{ CONST_EXPR, "" },
 		{ DHASH, "##" },
-		{ DIV, "/" },
 		{ DOT, "." },
 		{ END, "" },
-		{ EQ, "=" },
 		{ EXPR, "" },
 		{ FLOAT, "" },
-		{ GE, ">=" },
-		{ GT, ">" },
 		{ HASH, "#" },
 		{ IDENT, "" },
 		{ INT, "" },
 		{ LBRACE, "{" },
-		{ LE, "<=" },
-		{ LOG_AND, "&&" },
-		{ LOG_NOT, "!" },
-		{ LOG_OR, "||" },
-		{ LOG_XOR, "^^" },
 		{ LPAREN, "(" },
-		{ LSHIFT, "<<" },
 		{ LSQUARE, "[" },
-		{ LT, "<" },
-		{ MINUS, "-" },
-		{ MOD, "%" },
-		{ MULT, "*" },
-		{ NE, "<>" },
 		{ NEWLINE, "\n" },
-		{ PLUS, "+" },
-		{ POWER, "**" },
+		{ OPERAT, "" },
 		{ QUEST, "?" },
 		{ RAW_STR, "" },
 		{ RBRACE, "}" },
 		{ RPAREN, ")" },
-		{ RSHIFT, ">>" },
 		{ RSQUARE, "]" },
 		{ STR, "" },
+		//@@END
+	};
+
+	static inline unordered_map<Operat, string> operators = {
+		//@@BEGIN: operator_map
+		{ OP_BIN_AND, "&" },
+		{ OP_BIN_NOT, "~" },
+		{ OP_BIN_OR, "|" },
+		{ OP_BIN_XOR, "^" },
+		{ OP_DIV, "/" },
+		{ OP_EQ, "=" },
+		{ OP_GE, ">=" },
+		{ OP_GT, ">" },
+		{ OP_LE, "<=" },
+		{ OP_LOG_AND, "&&" },
+		{ OP_LOG_NOT, "!" },
+		{ OP_LOG_OR, "||" },
+		{ OP_LOG_XOR, "^^" },
+		{ OP_LSHIFT, "<<" },
+		{ OP_LT, "<" },
+		{ OP_MINUS, "-" },
+		{ OP_MOD, "%" },
+		{ OP_MULT, "*" },
+		{ OP_NE, "<>" },
+		{ OP_NONE, "" },
+		{ OP_PLUS, "+" },
+		{ OP_POWER, "**" },
+		{ OP_RSHIFT, ">>" },
+		{ OP_TERNARY, "?:" },
 		//@@END
 	};
 
@@ -563,6 +584,10 @@ void Token::set_keyword(const string& text) {
 	m_svalue = text;
 }
 
+bool Token::is_end() const {
+    return is(Token::NEWLINE) || is(Token::COLON) || is(Token::BACKSLASH);
+}
+
 string Token::to_string() const {
 	switch (m_type) {
 	case IDENT:
@@ -575,6 +600,8 @@ string Token::to_string() const {
 		return binary_to_c_string(reinterpret_cast<const unsigned char*>(m_svalue.c_str()), m_svalue.size());
 	case RAW_STR:
 		return "\"" + m_svalue + "\"";		// syntax error in a later stage if string contains '"'
+    case OPERAT:
+        return lookup_operat(m_operat);
 	default:
 		return lookup_type(m_type);
 	}
@@ -611,9 +638,17 @@ string Token::concat(const string& s1, const string& s2) {
 string Token::lookup_type(Type type) {
 	auto it = types.find(type);
 	if (it == types.end())
-		return"";
+		return "";
 	else
 		return it->second;
+}
+
+string Token::lookup_operat(Operat operat) {
+    auto it = operators.find(operat);
+    if (it == operators.end())
+        return "";
+    else
+        return it->second;
 }
 
 Token::Keyword Token::lookup_keyword(const string& text) {
@@ -633,13 +668,15 @@ Token::Keyword Token::lookup_keyword(const string& text) {
 class Scanner {
 public:
 	Scanner() {}
-	Scanner(std::initializer_list<Token> tokens);
+	Scanner(vector<Token>& tokens);
 	bool scan(const string& text);
 	void clear();
 	void rewind();
 	void next(int num = 1);
 	Token& peek(int offset = 0);
     Token& operator[](int pos);
+    Token& front();
+    Token& back();
 	void push_back(const Token& token) { m_tokens.push_back(token); } // copy
 	void push_back(Token&& token) { m_tokens.push_back(std::move(token)); } // move
 	int get_pos() const { return m_pos; }
@@ -664,7 +701,7 @@ private:
 // Scanner
 //-----------------------------------------------------------------------------
 
-Scanner::Scanner(std::initializer_list<Token> tokens) {
+Scanner::Scanner(vector<Token>& tokens) {
 	m_tokens = tokens;
 }
 
@@ -732,11 +769,125 @@ bool Scanner::scan(const string& text) {
 			m_tokens.back().set_ivalue(std::stoi(arg));
 			break;
 
-			// Symbols
-		case '+': m_tokens.emplace_back(Token::PLUS, blank_before); break;
-		case '-': m_tokens.emplace_back(Token::MINUS, blank_before); break;
-		case '/': m_tokens.emplace_back(Token::DIV, blank_before); break;
-		case '%': m_tokens.emplace_back(Token::MOD, blank_before); break;
+            // Operatos
+        case '+': m_tokens.emplace_back(Token::OPERAT, blank_before); m_tokens.back().set_operat(Token::OP_PLUS); break;
+        case '-': m_tokens.emplace_back(Token::OPERAT, blank_before); m_tokens.back().set_operat(Token::OP_MINUS); break;
+        case '/': m_tokens.emplace_back(Token::OPERAT, blank_before); m_tokens.back().set_operat(Token::OP_DIV); break;
+        case '%': m_tokens.emplace_back(Token::OPERAT, blank_before); m_tokens.back().set_operat(Token::OP_MOD); break;
+        case '~': m_tokens.emplace_back(Token::OPERAT, blank_before); m_tokens.back().set_operat(Token::OP_BIN_NOT); break;
+
+        case '*':
+            if (*p == '*') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_POWER);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_MULT);
+            }
+            break;
+
+        case '=':
+            if (*p == '=') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_EQ);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_EQ);
+            }
+            break;
+
+        case '!':
+            if (*p == '=') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_NE);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LOG_NOT);
+            }
+            break;
+
+        case '&':
+            if (*p == '&') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LOG_AND);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_BIN_AND);
+            }
+            break;
+
+        case '<':
+            if (*p == '=') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LE);
+            }
+            else if (*p == '<') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LSHIFT);
+            }
+            else if (*p == '>') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_NE);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LT);
+            }
+            break;
+
+        case '>':
+            if (*p == '=') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_GE);
+            }
+            else if (*p == '>') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_RSHIFT);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_GT);
+            }
+            break;
+
+        case '^':
+            if (*p == '^') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LOG_XOR);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_BIN_XOR);
+            }
+            break;
+
+        case '|':
+            if (*p == '|') {
+                ++p;
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_LOG_OR);
+            }
+            else {
+                m_tokens.emplace_back(Token::OPERAT, blank_before);
+                m_tokens.back().set_operat(Token::OP_BIN_OR);
+            }
+            break;
+
+            // Symbols
 		case '$': m_tokens.emplace_back(Token::ASMPC, blank_before); break;
 		case '(': m_tokens.emplace_back(Token::LPAREN, blank_before); break;
 		case ')': m_tokens.emplace_back(Token::RPAREN, blank_before); break;
@@ -748,18 +899,7 @@ bool Scanner::scan(const string& text) {
 		case '[': m_tokens.emplace_back(Token::LSQUARE, blank_before); break;
 		case '{': m_tokens.emplace_back(Token::LBRACE, blank_before); break;
 		case '}': m_tokens.emplace_back(Token::RBRACE, blank_before); break;
-		case '~': m_tokens.emplace_back(Token::BIN_NOT, blank_before); break;
 		case '\\': m_tokens.emplace_back(Token::BACKSLASH, blank_before); break;
-
-		case '!':
-			if (*p == '=') {
-				++p;
-				m_tokens.emplace_back(Token::NE, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::LOG_NOT, blank_before);
-			}
-			break;
 
 		case '#':
 			if (*p == '#') {
@@ -768,88 +908,6 @@ bool Scanner::scan(const string& text) {
 			}
 			else {
 				m_tokens.emplace_back(Token::HASH, blank_before);
-			}
-			break;
-
-		case '&':
-			if (*p == '&') {
-				++p;
-				m_tokens.emplace_back(Token::LOG_AND, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::BIN_AND, blank_before);
-			}
-			break;
-
-		case '*':
-			if (*p == '*') {
-				++p;
-				m_tokens.emplace_back(Token::POWER, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::MULT, blank_before);
-			}
-			break;
-
-		case '<':
-			if (*p == '=') {
-				++p;
-				m_tokens.emplace_back(Token::LE, blank_before);
-			}
-			else if (*p == '<') {
-				++p;
-				m_tokens.emplace_back(Token::LSHIFT, blank_before);
-			}
-			else if (*p == '>') {
-				++p;
-				m_tokens.emplace_back(Token::NE, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::LT, blank_before);
-			}
-			break;
-
-		case '=':
-			if (*p == '=') {
-				++p;
-				m_tokens.emplace_back(Token::EQ, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::EQ, blank_before);
-			}
-			break;
-
-		case '>':
-			if (*p == '=') {
-				++p;
-				m_tokens.emplace_back(Token::GE, blank_before);
-			}
-			else if (*p == '>') {
-				++p;
-				m_tokens.emplace_back(Token::RSHIFT, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::GT, blank_before);
-			}
-			break;
-
-		case '^':
-			if (*p == '^') {
-				++p;
-				m_tokens.emplace_back(Token::LOG_XOR, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::BIN_XOR, blank_before);
-			}
-			break;
-
-		case '|':
-			if (*p == '|') {
-				++p;
-				m_tokens.emplace_back(Token::LOG_OR, blank_before);
-			}
-			else {
-				m_tokens.emplace_back(Token::BIN_OR, blank_before);
 			}
 			break;
 
@@ -967,6 +1025,22 @@ Token& Scanner::operator[](int pos) {
         return m_tokens[pos];
     else
         return end;
+}
+
+Token& Scanner::front() {
+    static Token end;
+    if (m_tokens.empty())
+        return end;
+    else
+        return m_tokens.front();
+}
+
+Token& Scanner::back() {
+    static Token end;
+    if (m_tokens.empty())
+        return end;
+    else
+        return m_tokens.back();
 }
 
 bool Scanner::parse_raw_string(const char*& p, string& result) {
@@ -1101,12 +1175,16 @@ public:
 	void clear();
 	void expand(const string& input_line);
 	bool getline(string& line);
+    string autolabel();
 
 private:
 	deque<string> m_expanded_lines;
 	Scanner m_in;
 	Scanner m_out;
+    int m_autolabel_id{ 1 };
 
+    void define_asmpc(const string& asmpc);
+    bool has_asmpc();
 	void expand_macros();
 	void collect_statement();
 	void push_out();
@@ -1127,14 +1205,17 @@ void Preproc::clear() {
 	m_expanded_lines.clear();
 	m_in.clear();
 	m_out.clear();
+    m_autolabel_id = 1;
 }
 
 void Preproc::expand(const string & input_line) {
 	m_in.scan(input_line);
-	expand_macros();
+
+    expand_macros();
+
 	while (!m_in.peek().is(Token::END)) {
 		m_out.clear();
-		// EQU
+        // EQU
 		if (m_in.peek(0).is(Token::DOT) && m_in.peek(1).is(Token::IDENT) && m_in.peek(2).is(Token::KW_EQU)) {
 			m_out.push_back(m_in.peek(1)); // IDENT
 			m_out.push_back(m_in.peek(2)); // equ
@@ -1171,6 +1252,18 @@ void Preproc::expand(const string & input_line) {
 			m_in.next(2);
 			push_out();
 		}
+        // ASMPC - needs to be after label:
+        else if (has_asmpc()) {
+            string asmpc = autolabel();
+            
+            // output label
+            m_out.push_back(Token(Token::IDENT, false));
+            m_out.back().set_svalue(asmpc);
+            m_out.push_back(Token(Token::COLON, false)); // :
+
+            // replace ASMPC by label in next statement
+            define_asmpc(asmpc);
+        }
 		// #INCLUDE
 		else if (m_in.peek(0).is(Token::HASH) && m_in.peek(1).is(Token::KW_INCLUDE) && m_in.peek(2).is(Token::RAW_STR)) {
 			string filename = m_in.peek(2).get_svalue();
@@ -1195,9 +1288,7 @@ void Preproc::expand(const string & input_line) {
 
 void Preproc::collect_statement() {
 	while (!m_in.peek().is(Token::END)) {
-		if (m_in.peek().is(Token::NEWLINE) || 
-		    m_in.peek().is(Token::COLON) || 
-			m_in.peek().is(Token::BACKSLASH)) {
+		if (m_in.peek().is_end()) {
 			m_in.next();
 			return;
 		}
@@ -1206,6 +1297,25 @@ void Preproc::collect_statement() {
 			m_in.next();
 		}
 	}
+}
+
+void Preproc::define_asmpc(const string& asmpc) {
+    for (int i = 0; i < static_cast<int>(m_in.size()); ++i) {
+        if (m_in[i].is(Token::ASMPC)) {
+            m_in[i] = Token(Token::IDENT, false);
+            m_in[i].set_svalue(asmpc);
+        }
+    }
+}
+
+bool Preproc::has_asmpc() {
+    for (int i = 0; i < static_cast<int>(m_in.size()); ++i) {
+        if (m_in[i].is_end())
+            return false;
+        else if (m_in[i].is(Token::ASMPC))
+            return true;
+    }
+    return false;
 }
 
 void Preproc::expand_macros() {
@@ -1227,6 +1337,10 @@ bool Preproc::getline(string& line) {
 	}
 }
 
+string Preproc::autolabel() {
+    return string("__") + std::to_string(m_autolabel_id++);
+}
+
 void Preproc::push_out() {
 	string line = m_out.to_string();
 	m_expanded_lines.push_back(line);
@@ -1238,6 +1352,118 @@ void Preproc::check_end() {
 		g_error.error_expected_eol();
 		m_in.clear();
 	}
+}
+
+//@@.h
+
+//-----------------------------------------------------------------------------
+// Expression
+//-----------------------------------------------------------------------------
+
+class Expr {
+public:
+    bool parse(const string& line);
+    bool parse(const Scanner& in) { (void)in; return false; }
+
+private:
+    Scanner m_tokens;
+
+    enum class Associativity {
+        Left,
+        Right
+    };
+
+    enum class Arity {
+        Unary,
+        Binary,
+        Ternary
+    };
+
+    struct OperatorInfo {
+        int precedence;
+        Associativity associativity;
+        Arity arity;
+    };
+
+    class OperatorTable {
+    public:
+        static const OperatorInfo& get_info(Token::Operat operat);
+
+    private:
+        static inline const unordered_map<Token::Operat, OperatorInfo> table = {
+            // Precedence levels based on standard C precedence
+
+            // power
+            {Token::OP_POWER,   {14, Associativity::Right, Arity::Binary}},
+
+            // Unary (prefix): + - ! ~ ++ -- (not * or & here)
+            {Token::OP_PLUS,    {13, Associativity::Right, Arity::Unary}},
+            {Token::OP_MINUS,   {13, Associativity::Right, Arity::Unary}},
+            {Token::OP_LOG_NOT, {13, Associativity::Right, Arity::Unary}},
+            {Token::OP_BIN_NOT, {13, Associativity::Right, Arity::Unary}},
+
+            // Multiplicative
+            {Token::OP_MULT,    {12, Associativity::Left, Arity::Binary}},
+            {Token::OP_DIV,     {12, Associativity::Left, Arity::Binary}},
+            {Token::OP_MOD,     {12, Associativity::Left, Arity::Binary}},
+
+            // Additive
+            {Token::OP_PLUS,    {11, Associativity::Left, Arity::Binary}},
+            {Token::OP_MINUS,   {11, Associativity::Left, Arity::Binary}},
+
+            // Shift
+            {Token::OP_LSHIFT,  {10, Associativity::Left, Arity::Binary}},
+            {Token::OP_RSHIFT,  {10, Associativity::Left, Arity::Binary}},
+
+            // Relational
+            {Token::OP_LT,      {9, Associativity::Left, Arity::Binary}},
+            {Token::OP_LE,      {9, Associativity::Left, Arity::Binary}},
+            {Token::OP_GT,      {9, Associativity::Left, Arity::Binary}},
+            {Token::OP_GE,      {9, Associativity::Left, Arity::Binary}},
+
+            // Equality
+            {Token::OP_EQ,      {8, Associativity::Left, Arity::Binary}},
+            {Token::OP_NE,      {8, Associativity::Left, Arity::Binary}},
+
+            // Bitwise AND, XOR, OR
+            {Token::OP_BIN_AND, {7, Associativity::Left, Arity::Binary}},
+            {Token::OP_BIN_XOR, {6, Associativity::Left, Arity::Binary}},
+            {Token::OP_BIN_OR,  {5, Associativity::Left, Arity::Binary}},
+
+            // Logical AND/OR
+            {Token::OP_LOG_AND, {4, Associativity::Left, Arity::Binary}},
+            {Token::OP_LOG_XOR, {3, Associativity::Left, Arity::Binary}},
+            {Token::OP_LOG_OR,  {2, Associativity::Left, Arity::Binary}},
+
+            // Ternary
+            {Token::OP_TERNARY, {1, Associativity::Right, Arity::Ternary}},
+        };
+    };
+};
+
+//@@.cpp
+
+//-----------------------------------------------------------------------------
+// Expression
+//-----------------------------------------------------------------------------
+
+const Expr::OperatorInfo & Expr::OperatorTable::get_info(Token::Operat operat) {
+    auto it = table.find(operat);
+    if (it == table.end()) throw std::runtime_error("Unknown operator: " + Token::lookup_operat(operat));
+    return it->second;
+}
+
+
+bool Expr::parse(const string& line) {
+    Scanner in;
+    if (!in.scan(line))
+        return false;   // scan failed
+    else if (!parse(in))
+        return false;   // parse failed
+    else if (!in.peek().is_end())
+        return false;   // extra input
+    else
+        return true;
 }
 
 //@@.h
@@ -1290,6 +1516,22 @@ public:
 private:
     Scanner m_line;         // tokens from the current line
 
+    //@@BEGIN:actions_decl
+    void action_ident_colon();
+    void action_ident_kw_equ_expr();
+    void action_kw_assume_expr();
+    void action_kw_nop();
+    void action_kw_jr_expr();
+    void action_kw_jr_kw_nz_comma_expr();
+    void action_kw_jr_kw_z_comma_expr();
+    void action_kw_jr_kw_nc_comma_expr();
+    void action_kw_jr_kw_c_comma_expr();
+    void action_kw_ld_kw_a_comma_expr();
+    void action_kw_ld_kw_a_comma_lparen_expr_rparen();
+    void action_kw_ld_kw_a_comma_kw_a();
+    void action_kw_ld_kw_a_comma_kw_b();
+    //@@END
+
     // state in the parsing state machine
 	struct State {
 		unordered_map<Token::Keyword, int>	keyword_next;
@@ -1297,243 +1539,227 @@ private:
 		void(LineParser::*action)();
 	};
 
-	//@@BEGIN:actions_decl
-	void exec_action_ident_kw_equ_expr();
-	void exec_action_kw_assume_expr();
-	void exec_action_ident_colon();
-	void exec_action_kw_nop();
-	void exec_action_kw_jr_expr();
-	void exec_action_kw_jr_kw_nz_comma_expr();
-	void exec_action_kw_jr_kw_z_comma_expr();
-	void exec_action_kw_jr_kw_nc_comma_expr();
-	void exec_action_kw_jr_kw_c_comma_expr();
-	void exec_action_kw_ld_kw_a_comma_expr();
-	void exec_action_kw_ld_kw_a_comma_lparen_expr_rparen();
-	void exec_action_kw_ld_kw_a_comma_kw_a();
-	void exec_action_kw_ld_kw_a_comma_kw_b();
-	//@@END
-	
 	static inline State m_states[] = {
 		//@@BEGIN: states
 		{ /* 0:  */
-		  { {Token::KW_ASSUME,7}, {Token::KW_JR,10}, {Token::KW_LD,29}, {Token::KW_NOP,42}, },
-		  { {Token::IDENT,1}, },
+		  { {Token::KW_ASSUME, 7}, {Token::KW_JR, 10}, {Token::KW_LD, 29}, {Token::KW_NOP, 42}, },
+		  { {Token::IDENT, 1}, },
 		  nullptr,
 		},
 		{ /* 1: IDENT */
-		  { {Token::KW_EQU,4}, },
-		  { {Token::COLON,2}, },
+		  { {Token::KW_EQU, 4}, },
+		  { {Token::COLON, 2}, },
 		  nullptr,
 		},
 		{ /* 2: IDENT COLON */
 		  { },
-		  { {Token::END,3}, },
+		  { {Token::END, 3}, },
 		  nullptr,
 		},
 		{ /* 3: IDENT COLON END */
 		  { },
 		  { },
-		  &LineParser::exec_action_ident_colon,
+		  &LineParser::action_ident_colon,
 		},
 		{ /* 4: IDENT KW_EQU */
 		  { },
-		  { {Token::EXPR,5}, },
+		  { {Token::EXPR, 5}, },
 		  nullptr,
 		},
 		{ /* 5: IDENT KW_EQU EXPR */
 		  { },
-		  { {Token::END,6}, },
+		  { {Token::END, 6}, },
 		  nullptr,
 		},
 		{ /* 6: IDENT KW_EQU EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_ident_kw_equ_expr,
+		  &LineParser::action_ident_kw_equ_expr,
 		},
 		{ /* 7: KW_ASSUME */
 		  { },
-		  { {Token::EXPR,8}, },
+		  { {Token::EXPR, 8}, },
 		  nullptr,
 		},
 		{ /* 8: KW_ASSUME EXPR */
 		  { },
-		  { {Token::END,9}, },
+		  { {Token::END, 9}, },
 		  nullptr,
 		},
 		{ /* 9: KW_ASSUME EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_assume_expr,
+		  &LineParser::action_kw_assume_expr,
 		},
 		{ /* 10: KW_JR */
-		  { {Token::KW_C,13}, {Token::KW_NC,17}, {Token::KW_NZ,21}, {Token::KW_Z,25}, },
-		  { {Token::EXPR,11}, },
+		  { {Token::KW_C, 13}, {Token::KW_NC, 17}, {Token::KW_NZ, 21}, {Token::KW_Z, 25}, },
+		  { {Token::EXPR, 11}, },
 		  nullptr,
 		},
 		{ /* 11: KW_JR EXPR */
 		  { },
-		  { {Token::END,12}, },
+		  { {Token::END, 12}, },
 		  nullptr,
 		},
 		{ /* 12: KW_JR EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_jr_expr,
+		  &LineParser::action_kw_jr_expr,
 		},
 		{ /* 13: KW_JR KW_C */
 		  { },
-		  { {Token::COMMA,14}, },
+		  { {Token::COMMA, 14}, },
 		  nullptr,
 		},
 		{ /* 14: KW_JR KW_C COMMA */
 		  { },
-		  { {Token::EXPR,15}, },
+		  { {Token::EXPR, 15}, },
 		  nullptr,
 		},
 		{ /* 15: KW_JR KW_C COMMA EXPR */
 		  { },
-		  { {Token::END,16}, },
+		  { {Token::END, 16}, },
 		  nullptr,
 		},
 		{ /* 16: KW_JR KW_C COMMA EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_jr_kw_c_comma_expr,
+		  &LineParser::action_kw_jr_kw_c_comma_expr,
 		},
 		{ /* 17: KW_JR KW_NC */
 		  { },
-		  { {Token::COMMA,18}, },
+		  { {Token::COMMA, 18}, },
 		  nullptr,
 		},
 		{ /* 18: KW_JR KW_NC COMMA */
 		  { },
-		  { {Token::EXPR,19}, },
+		  { {Token::EXPR, 19}, },
 		  nullptr,
 		},
 		{ /* 19: KW_JR KW_NC COMMA EXPR */
 		  { },
-		  { {Token::END,20}, },
+		  { {Token::END, 20}, },
 		  nullptr,
 		},
 		{ /* 20: KW_JR KW_NC COMMA EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_jr_kw_nc_comma_expr,
+		  &LineParser::action_kw_jr_kw_nc_comma_expr,
 		},
 		{ /* 21: KW_JR KW_NZ */
 		  { },
-		  { {Token::COMMA,22}, },
+		  { {Token::COMMA, 22}, },
 		  nullptr,
 		},
 		{ /* 22: KW_JR KW_NZ COMMA */
 		  { },
-		  { {Token::EXPR,23}, },
+		  { {Token::EXPR, 23}, },
 		  nullptr,
 		},
 		{ /* 23: KW_JR KW_NZ COMMA EXPR */
 		  { },
-		  { {Token::END,24}, },
+		  { {Token::END, 24}, },
 		  nullptr,
 		},
 		{ /* 24: KW_JR KW_NZ COMMA EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_jr_kw_nz_comma_expr,
+		  &LineParser::action_kw_jr_kw_nz_comma_expr,
 		},
 		{ /* 25: KW_JR KW_Z */
 		  { },
-		  { {Token::COMMA,26}, },
+		  { {Token::COMMA, 26}, },
 		  nullptr,
 		},
 		{ /* 26: KW_JR KW_Z COMMA */
 		  { },
-		  { {Token::EXPR,27}, },
+		  { {Token::EXPR, 27}, },
 		  nullptr,
 		},
 		{ /* 27: KW_JR KW_Z COMMA EXPR */
 		  { },
-		  { {Token::END,28}, },
+		  { {Token::END, 28}, },
 		  nullptr,
 		},
 		{ /* 28: KW_JR KW_Z COMMA EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_jr_kw_z_comma_expr,
+		  &LineParser::action_kw_jr_kw_z_comma_expr,
 		},
 		{ /* 29: KW_LD */
-		  { {Token::KW_A,30}, },
+		  { {Token::KW_A, 30}, },
 		  { },
 		  nullptr,
 		},
 		{ /* 30: KW_LD KW_A */
 		  { },
-		  { {Token::COMMA,31}, },
+		  { {Token::COMMA, 31}, },
 		  nullptr,
 		},
 		{ /* 31: KW_LD KW_A COMMA */
-		  { {Token::KW_A,34}, {Token::KW_B,36}, },
-		  { {Token::EXPR,32}, {Token::LPAREN,38}, },
+		  { {Token::KW_A, 34}, {Token::KW_B, 36}, },
+		  { {Token::EXPR, 32}, {Token::LPAREN, 38}, },
 		  nullptr,
 		},
 		{ /* 32: KW_LD KW_A COMMA EXPR */
 		  { },
-		  { {Token::END,33}, },
+		  { {Token::END, 33}, },
 		  nullptr,
 		},
 		{ /* 33: KW_LD KW_A COMMA EXPR END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_ld_kw_a_comma_expr,
+		  &LineParser::action_kw_ld_kw_a_comma_expr,
 		},
 		{ /* 34: KW_LD KW_A COMMA KW_A */
 		  { },
-		  { {Token::END,35}, },
+		  { {Token::END, 35}, },
 		  nullptr,
 		},
 		{ /* 35: KW_LD KW_A COMMA KW_A END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_ld_kw_a_comma_kw_a,
+		  &LineParser::action_kw_ld_kw_a_comma_kw_a,
 		},
 		{ /* 36: KW_LD KW_A COMMA KW_B */
 		  { },
-		  { {Token::END,37}, },
+		  { {Token::END, 37}, },
 		  nullptr,
 		},
 		{ /* 37: KW_LD KW_A COMMA KW_B END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_ld_kw_a_comma_kw_b,
+		  &LineParser::action_kw_ld_kw_a_comma_kw_b,
 		},
 		{ /* 38: KW_LD KW_A COMMA LPAREN */
 		  { },
-		  { {Token::EXPR,39}, },
+		  { {Token::EXPR, 39}, },
 		  nullptr,
 		},
 		{ /* 39: KW_LD KW_A COMMA LPAREN EXPR */
 		  { },
-		  { {Token::RPAREN,40}, },
+		  { {Token::RPAREN, 40}, },
 		  nullptr,
 		},
 		{ /* 40: KW_LD KW_A COMMA LPAREN EXPR RPAREN */
 		  { },
-		  { {Token::END,41}, },
+		  { {Token::END, 41}, },
 		  nullptr,
 		},
 		{ /* 41: KW_LD KW_A COMMA LPAREN EXPR RPAREN END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_ld_kw_a_comma_lparen_expr_rparen,
+		  &LineParser::action_kw_ld_kw_a_comma_lparen_expr_rparen,
 		},
 		{ /* 42: KW_NOP */
 		  { },
-		  { {Token::END,43}, },
+		  { {Token::END, 43}, },
 		  nullptr,
 		},
 		{ /* 43: KW_NOP END */
 		  { },
 		  { },
-		  &LineParser::exec_action_kw_nop,
+		  &LineParser::action_kw_nop,
 		},
 		//@@END
 	};
@@ -1583,79 +1809,79 @@ bool LineParser::parse(const string& line) {
 }
 
 //@@BEGIN:actions_impl
-void LineParser::exec_action_ident_kw_equ_expr() {
-	g_object_module.add_constant(m_line[1].get_svalue(), m_line[3].get_ivalue());
-
-
-}
-
-void LineParser::exec_action_kw_assume_expr() {
-	g_object_module.set_assume(m_line[2].get_ivalue());
-
-
-}
-
-void LineParser::exec_action_ident_colon() {
+void LineParser::action_ident_colon() {
 	g_object_module.add_label(m_line[1].get_svalue());
 
 
 }
 
-void LineParser::exec_action_kw_nop() {
+void LineParser::action_ident_kw_equ_expr() {
+	g_object_module.add_constant(m_line[1].get_svalue(), m_line[3].get_ivalue());
+
+
+}
+
+void LineParser::action_kw_assume_expr() {
+	g_object_module.set_assume(m_line[2].get_ivalue());
+
+
+}
+
+void LineParser::action_kw_nop() {
 	g_object_module.add_opcode_void(0x00);
 
 
 }
 
-void LineParser::exec_action_kw_jr_expr() {
+void LineParser::action_kw_jr_expr() {
 	g_object_module.add_opcode_jr(0x18, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_jr_kw_nz_comma_expr() {
+void LineParser::action_kw_jr_kw_nz_comma_expr() {
 	g_object_module.add_opcode_jr(0x20, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_jr_kw_z_comma_expr() {
+void LineParser::action_kw_jr_kw_z_comma_expr() {
 	g_object_module.add_opcode_jr(0x28, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_jr_kw_nc_comma_expr() {
+void LineParser::action_kw_jr_kw_nc_comma_expr() {
 	g_object_module.add_opcode_jr(0x30, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_jr_kw_c_comma_expr() {
+void LineParser::action_kw_jr_kw_c_comma_expr() {
 	g_object_module.add_opcode_jr(0x38, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_ld_kw_a_comma_expr() {
+void LineParser::action_kw_ld_kw_a_comma_expr() {
 	g_object_module.add_opcode_n(0x3E, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_ld_kw_a_comma_lparen_expr_rparen() {
+void LineParser::action_kw_ld_kw_a_comma_lparen_expr_rparen() {
 	g_object_module.add_opcode_nn(0x3A, m_line[4].get_ivalue());
 
 
 }
 
-void LineParser::exec_action_kw_ld_kw_a_comma_kw_a() {
+void LineParser::action_kw_ld_kw_a_comma_kw_a() {
 	g_object_module.add_opcode_void(0x7F);
 
 
 }
 
-void LineParser::exec_action_kw_ld_kw_a_comma_kw_b() {
+void LineParser::action_kw_ld_kw_a_comma_kw_b() {
 	g_object_module.add_opcode_void(0x78);
 
 }

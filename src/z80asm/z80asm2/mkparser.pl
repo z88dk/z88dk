@@ -23,44 +23,50 @@ my %tokens = (
 	CONST_EXPR => "",
 	STR => "",
 	RAW_STR => "",
+    OPERAT => "",
 	NEWLINE => "\n",
 	
 	ASMPC => '$',
 	BACKSLASH => "\\",
-	BIN_AND => "&",
-	BIN_NOT => "~",
-	BIN_OR => "|",
-	BIN_XOR => "^",
 	COLON => ":",
 	COMMA => ",",
 	DHASH => "##",
-	DIV => "/",
 	DOT => ".",
-	EQ => "=",
-	GE => ">=",
-	GT => ">",
 	HASH => "#",
 	LBRACE => "{",
-	LE => "<=",
-	LOG_AND => "&&",
-	LOG_NOT => "!",
-	LOG_OR => "||",
-	LOG_XOR => "^^",
 	LPAREN => "(",
-	LSHIFT => "<<",
 	LSQUARE => "[",
-	LT => "<",
-	MINUS => "-",
-	MOD => '%',
-	MULT => "*",
-	NE => "<>",
-	PLUS => "+",
-	POWER => "**",
 	QUEST => "?",
 	RBRACE => "}",
 	RPAREN => ")",
-	RSHIFT => ">>",
 	RSQUARE => "]",
+);
+
+my %operators = (
+    OP_NONE => "",
+    OP_TERNARY => "?:",
+	OP_RSHIFT => ">>",
+    OP_POWER => "**",
+    OP_PLUS => "+",
+    OP_NE => "<>",
+    OP_MULT => "*",
+    OP_MOD => "%",
+    OP_MINUS => "-",
+    OP_LT => "<",
+	OP_LSHIFT => "<<",
+	OP_LOG_XOR => "^^",
+	OP_LOG_OR => "||",
+	OP_LOG_NOT => "!",
+	OP_LOG_AND => "&&",
+    OP_LE => "<=",
+    OP_GT => ">",
+    OP_GE => ">=",
+    OP_EQ => "=",
+    OP_DIV => "/",
+	OP_BIN_XOR => "^",
+	OP_BIN_OR => "|",
+	OP_BIN_NOT => "~",
+	OP_BIN_AND => "&",
 );
 
 my %keywords = (
@@ -119,7 +125,7 @@ sub parse_grammar {
 		}
 	}
 	
-	$grammar = {tokens => \%tokens, keywords => \%keywords,
+	$grammar = {tokens => \%tokens, keywords => \%keywords, operators => \%operators,
 				rules => \@rules, actions => \@actions};
 }
 
@@ -186,6 +192,29 @@ sub patch_file {
 				shift @in;
 			}
 		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*operator\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			push @out, "${prefix}OP_NONE,\n";	# OP_NONE must be id 0
+			for (sort keys %{$grammar->{operators}}) {
+				next if $_ eq 'OP_NONE';
+				push @out, "$prefix$_,\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*operator_map\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for my $kw (sort keys %{$grammar->{operators}}) {
+				my $string = $grammar->{operators}{$kw};
+				push @out, "${prefix}{ $kw, ".c_string($string)." },\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*keyword\b/) {
 			my $prefix = $1;
 			push @out, $_;
@@ -243,7 +272,7 @@ sub patch_file {
 				$line .= "$prefix  { "; 
 				for my $token (sort keys %{$state->{tokens}}) {
 					next unless $token =~ /^KW_/;
-					$line .= "{Token::$token,".$state->{tokens}{$token}."}, ";
+					$line .= "{Token::$token, ".$state->{tokens}{$token}."}, ";
 				}
 				$line .= "},\n";
 				
@@ -251,7 +280,7 @@ sub patch_file {
 				$line .= "$prefix  { "; 
 				for my $token (sort keys %{$state->{tokens}}) {
 					next if $token =~ /^KW_/;
-					$line .= "{Token::$token,".$state->{tokens}{$token}."}, ";
+					$line .= "{Token::$token, ".$state->{tokens}{$token}."}, ";
 				}
 				$line .= "},\n";
 				
@@ -296,7 +325,7 @@ sub c_string {
 sub action_funcname {
 	my($action_id) = @_;
 	my @tokens = @{$grammar->{rules}[$action_id]};
-	my $funcname = "exec_action_".lc(join("_", @tokens));
+	my $funcname = "action_".lc(join("_", @tokens));
 	return $funcname;
 }
 
