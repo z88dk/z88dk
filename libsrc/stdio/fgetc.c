@@ -67,7 +67,6 @@ fgetc_assign_ret:
     ret
 .no_ungetc
 ; Now do strings
-    dec     de	;de=&fp_flags
     ld      a,(de)
     and     _IOSTRING
     jr      z,no_string	;not a string
