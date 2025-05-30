@@ -1,13 +1,13 @@
 // Parser
 
+IDENT ":"
+	g_object_module.add_label($1.get_svalue());
+
 IDENT "equ" EXPR
 	g_object_module.add_constant($1.get_svalue(), $3.get_ivalue());
 
 "assume" EXPR
 	g_object_module.set_assume($2.get_ivalue());
-
-IDENT ":"
-	g_object_module.add_label($1.get_svalue());
 
 "nop"
 	g_object_module.add_opcode_void(0x00);
