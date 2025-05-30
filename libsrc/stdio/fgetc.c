@@ -36,6 +36,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
     inc     de	
     inc     de
     ld      a,(de)	;de = &fp_flags get flags
+    ld      b,a
     and     a
   IF __CPU_GBZ80__
     jr      z,fgetc_assign_ret
@@ -48,15 +49,16 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
   ELSE
     ret     nz
   ENDIF
-    inc     de      ;de=&fp_ungetc
-    ld      a,(de)	;check for ungot char
-    and     a
+    ld      a,b         ;flags
+    and     _IOUNGETC
     jr      z,no_ungetc
-    ex      de,hl
-    ld      e,a
-    ld      d,0
-    ld      (hl),d	;set no ungetc character
-    ex      de,hl
+    ld      a,b         ;reset ungotc flag
+    and     ~(_IOUNGETC)
+    ld      (de),a
+    inc     de          ;de=&fp_ungetc
+    ld      a,(de)	    ;Pick up ungot character
+    ld      l,a
+    ld      h,0
   IF __CPU_GBZ80__
 fgetc_assign_ret:
     ld      d,h
@@ -150,6 +152,7 @@ not_text_fp:
   ENDIF
 ELSE
 
+  ;;z80 family here, can use ix
   IF __CPU_RABBIT__
     ld      hl,(sp + 2)
     push    ix		;save callers ix
@@ -168,22 +171,20 @@ ELSE
     and     a
     jp      z, is_eof
 	;	Check removed to allow READ+WRITE streams
-    ;and     _IOWRITE | _IOEOF	;check we`re not write/EOF
-	and     _IOEOF	;check we`re not write/EOF
+    bit     3,a     ;_IOEOF
     jp      nz, is_eof
-    ld      a,(ix+fp_ungetc)	;check for ungot char
-    and     a
+    bit     0,a     ;_IOUNGETC
     jr      z,no_ungetc
-    ld      l,a
+    res     0,(ix+fp_flags)     ;reset _IOUNGETC
+    ld      l,(ix+fp_ungetc)
     ld      h,0
-    ld      (ix+fp_ungetc),h
     jp      fgetc_end
 .no_ungetc
-; Now do strings
-    ld      a,(ix+fp_flags)
-    and     _IOSTRING
-    jr      z,no_string	;not a string
-    ld      hl,(ix+fp_extra)	; check the length
+    ; Now check for strings
+    bit     7,a                 ;_IOSTRING
+    jr      z,no_string	        ;
+    ;; It is a string
+    ld      hl,(ix+fp_extra)	; Check to see if there is any string left
     ld      a,h
     or      l
     jp      z,is_eof
@@ -194,13 +195,13 @@ ELSE
     ld      a,(hl)
     inc     hl
     ld      (ix+fp_desc),hl
-    and     a		;test for zero
-    jr      z,is_eof	;return EOF if so
-    ld      l,a		;else return character
+    and     a		            ;test for end of string
+    jr      z,is_eof	        ;return EOF if so
+    ld      l,a		            ;else return character
     ld      h,0
     jr      fgetc_end
 .no_string
-    ld      a,(ix+fp_flags)
+    bit     5,a                 ;_IOEXTRA
     and     _IOEXTRA
     jr      z,not_extra_fp
     ld      hl,(ix + fp_extra)

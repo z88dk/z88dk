@@ -47,7 +47,7 @@ ENDIF
     ld      d,(hl)
     inc     hl
     ld      a,(hl)    ;flags
-    and     _IOUSE
+    and     a
     jr      z,fgetpos_abort
     and     _IOSYSTEM
     jr      nz,fgetpos_abort
@@ -98,7 +98,7 @@ ENDIF
 
 #endasm
 #else
-    if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
+    if ( fp->flags && fchkstd(fp)== 0 ) {
         return (fdgetpos(fp->fd,posn));
     }
     return -1;

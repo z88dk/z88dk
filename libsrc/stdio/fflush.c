@@ -29,8 +29,8 @@ ENDIF
     ld      d,(hl)
     inc     hl
     ld      a,(hl)
-    and     _IOUSE|_IOSYSTEM|_IOWRITE
-    cp      _IOUSE|_IOWRITE
+    and     _IOSYSTEM|_IOWRITE
+    cp      _IOWRITE
 IF __CPU_INTEL__ | __CPU_GBZ80__ 
     jr      nz,fflush_error
 ELSE
@@ -43,8 +43,8 @@ ENDIF
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
 check_extra:
     ld      a,(hl)
-    and     _IOUSE|_IOEXTRA
-    cp      _IOUSE|_IOEXTRA
+    and     _IOEXTRA
+    cp      _IOEXTRA
     jr      nz,fflush_error     ;not used
     push    ix    ;save callers ix
     dec     hl

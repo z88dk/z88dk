@@ -18,9 +18,9 @@ _vsscanf:
 IF !__CPU_INTEL__
     push    ix    ;save callers
 ENDIF
-        ld      bc,65535        ;infinite length
-        push    bc
-    ld      bc,1+2+128      ;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
+    ld      bc,65535        ;infinite length
+    push    bc
+    ld      bc,2+128      ;h=ungetc, l=_IOREAD|_IOSTRING
     push    bc
     ld      c,(hl)        ;get buf
     inc     hl
