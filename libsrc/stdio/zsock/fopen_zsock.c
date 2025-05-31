@@ -45,7 +45,7 @@ FILE *fopen_zsock(char *name)
 	len=open_net1(host,atoi(++next2),proto);
 	if ( len ) {
 		fp->desc.ptr=(uint8_t *)len;
-		fp->flags=_IOEXTRA|_IOUSE;
+		fp->flags=_IOEXTRA;
 		fp->ungetc=0;
 		fp->extra = zsock_trampoline;
 		return fp;

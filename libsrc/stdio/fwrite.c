@@ -8,7 +8,7 @@
 
 #if __8080 || __8085
 int fwrite(void *ptr, size_t size, size_t nmemb, FILE *fp) {
-    if ( (fp->flags & (_IOUSE|_IOWRITE|_IOSYSTEM)) == (_IOUSE|_IOWRITE)) {
+    if ( (fp->flags & (_IOWRITE|_IOSYSTEM)) == (_IOWRITE)) {
     unsigned int len = size * nmemb;
 
     if ( len == 0 ) return 0;
@@ -66,8 +66,8 @@ ELSE
     ld      a,(ix + fp_flags)
     bit     4,a             ; _IOSYSTEM
     jr      nz,fwrite_done
-    and     _IOUSE | _IOWRITE
-    cp      _IOUSE | _IOWRITE
+    and     _IOWRITE
+    cp      _IOWRITE
     jr      nz,fwrite_done
     ; ix = fp
     ; bc = bytes to write

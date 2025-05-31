@@ -33,7 +33,7 @@ ENDIF
     ld      d,(hl)
     inc     hl
     ld      a,(hl)  ; flags
-    and    _IOUSE
+    and     a
     jr      z,ftell_abort
     ld      a,(hl)
     and     _IOSYSTEM
@@ -79,7 +79,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ENDIF
 #endasm
 #else
-    if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
+    if ( fp->flags && fchkstd(fp)== 0 ) {
         return (fdtell(fp->fd));
     }
     return -1L;

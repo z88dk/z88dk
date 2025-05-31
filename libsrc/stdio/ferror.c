@@ -34,7 +34,7 @@ _ferror_fastcall:
     ld      a,(hl)
     ld      hl,1
     
-    and     _IOUSE        ; in use?
+    and     a        ; in use?
     ret     z
     
 ; check EOF only if not WRITE mode
