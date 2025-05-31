@@ -230,18 +230,15 @@ extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 /* Write the file offset into the FCB */
 extern void __LIB__ putoffset(char *dest, long val) __smallc;
 
-/* Set/get userid */
-#define setuid(u)  bdos(CPM_SUID,u)
-#define getuid()   bdos(CPM_SUID,0xFF)
+/* Write an offset as 3 bytes */
+extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
 
 // Set the user number to requid, return the current one
 extern int __LIB__ swapuid(int reqid) __z88dk_fastcall;
 
-/* Write an offset as 3 bytes */
-extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
-
-/* Update the FCB to use READ #20 and WRITE #21 BDOS functions non-sequentially */
-extern void __LIB__ setrecord(struct fcb *fc) __z88dk_fastcall;
+/* Set/get userid */
+#define setuid(u)  bdos(CPM_SUID,u)
+#define getuid()   bdos(CPM_SUID,0xFF)
 
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0

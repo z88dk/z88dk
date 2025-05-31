@@ -22,8 +22,43 @@ hrg_on:
 _hrg_on:
 
 
+; if hrgpage has not been specified, then set a default value
+; TODO: this check should be improved, when the BASIC program is modified, the D-FILE shifts.
+;       We also miss an option to provide a fixed position for the HRG page avoiding the
+;       ROM's MAKE-ROOM approach.
+;
+;	ld      hl,(base_graphics)
+;	ld      a,h
+;	or      l
+;	jr      nz,gotpage
 
   IF    FORzx81g64
+
+	LD HL,($400C)    ; D-FILE
+	LD A,$76
+	DEC HL
+	DEC HL
+	CP (HL)
+	jr z,__zx81g64_no_init
+
+; ;$2DF8  01;92;19    LD BC,$1992         ; 6546 -> (6528+18) -> (34*192+18)
+; ;$2DFB  2A;0C;40    LD HL,($400C)
+; ;$2DFE  2B          DEC HL
+; ;$2DFF  CD;9E;09    CALL $099E          ; [MAKE-ROOM]
+; ;$2E02  3E;76       LD A,$76
+; 
+ 	ld a,64
+ 	ld ($2318),a
+; 	; TODO: find a working way to allocate a lower amount of memory
+; 	;ld bc,34*64+18	;  an $2DF8 it uses to be $1992 (34*192+18)
+; 	ld bc,192*64+18
+; 	inc hl          ; points to D-FILE -1
+; 	call $2DFF
+
+	call $2DF8
+
+__zx81g64_no_init:
+  ELSE
 
 	; check if we already have reserved graphics memory
 	LD HL,($400C)    ; D-FILE
@@ -31,21 +66,11 @@ _hrg_on:
 	DEC HL
 	DEC HL
 	CP (HL)
-    call z,$2dd9      ; delete graphics page
-	; TODO: find a way to reserve a smaller amount of memory
-    call 11807
-
-  ELSE
-
-    call 11807           ; Set up graphics page if not reserved yet
+	call nz,$2DF8
+    ;call 11807           ; Set up graphics page if not reserved yet
 
   ENDIF
 
-;; if hrgpage has not been specified, then set a default value
-;	ld      hl,(base_graphics)
-;	ld      a,h
-;	or      l
-;	jr		nz,gotpage
 ;IF FORzx81g64
 ;	ld		hl,29000		; on a 16K system we leave a space of abt 1.5K bytes for stack
 ;ELSE
@@ -53,8 +78,8 @@ _hrg_on:
 ;ENDIF
 ;	ld		(base_graphics),hl
 ;	ld      ($2306),hl                  ; Current HRG page
-;gotpage:
 
+;gotpage:
     ld      hl, ($2306)                 ; Current HRG page
     ld      (base_graphics), hl
 
@@ -138,6 +163,7 @@ ENDIF
     ld      b, 1
     ld      hl, $2d9a
     call    $2d95
+	
     add     hl, hl
     nop
     ld      e, a

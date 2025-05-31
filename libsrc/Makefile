@@ -569,6 +569,9 @@ gfx81hr64.lib: $(TARGET_CLIB_OBJS) gfx81udg.lib
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr64
 	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx64 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
 	$(call zx81deps)
+	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81g64
+	TARGET=zx81g64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81g64 -DG007 -x$(OUTPUT_DIRECTORY)/gfx81g064 @$(TARGET_DIRECTORY)/zx81/gfx81g007.lst
+	$(call zx81deps)
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81mt64
 	TARGET=zx81mt64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt64 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt64 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
 	$(call zx81deps)
