@@ -5,16 +5,21 @@
  *
  *  May, 2020 - feilipu - added sequential read
  *  Apr, 2021 -dom - remove sequential read
+ *  May, 2025 - feilipu - added sequential read (#2725) again
+ *
  */
 
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <cpm.h>
+#include <stdio.h>
 
 extern void *_CPM_READ_CACHE_ALWAYS;
 #define CPM_READ_CACHE_ALWAYS (int)&_CPM_READ_CACHE_ALWAYS
+
+/* Update the FCB to use READ #20 BDOS function non-sequentially */
+void setrecord_rd(struct fcb *fc) __z88dk_fastcall;
 
 ssize_t read(int fd, void *buf, size_t len)
 {
@@ -74,18 +79,19 @@ ssize_t read(int fd, void *buf, size_t len)
         } else {
             while ( len ) {
                 unsigned long record_nr = fc->record_nr;
-                
+
                 if ( fc->rnr_dirty ) { record_nr = fc->record_nr = fc->rwptr/SECSIZE; fc->rnr_dirty = 0; }
                 offset = fc->rwptr%SECSIZE;
 
                 if ( ( size = SECSIZE - offset ) > len ) {
                     size = len;
                 }
+
                 if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
-                    _putoffset(fc->ranrec,record_nr);
                     uid = swapuid(fc->uid);
+                    setrecord_rd(fc);
                     bdos(CPM_SDMA,buf);
-                    if ( bdos(CPM_RRAN,fc) ) {
+                    if ( bdos(CPM_READ,fc) ) {
                         swapuid(uid);
                         return cnt-len;
                     }
@@ -115,4 +121,22 @@ ssize_t read(int fd, void *buf, size_t len)
         break;
     }
 }
+
+void setrecord_rd(struct fcb *fc) __z88dk_fastcall
+{
+    uint32_t record_nr = fc->record_nr;
+
+    fc->current_record = (char)record_nr & 0x7F;
+
+    if( (record_nr % 0x80 == 0) && (record_nr != 0) ) {
+        fc->current_record = 0x80;
+        record_nr -= 0x80;
+        }
+
+    fc->extent = (uint8_t)(record_nr >> 7) & 0x1F;
+
+    fc->s2 &= 0x80;     // preserve the clean/dirty bit 7
+    fc->s2 |= (char)(record_nr >> 12) & 0x0F;
+}
+
 
