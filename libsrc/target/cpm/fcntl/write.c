@@ -12,7 +12,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <cpm.h>
-#include <stdio.h>
 
 
 ssize_t write(int fd, void *buf, size_t len)
