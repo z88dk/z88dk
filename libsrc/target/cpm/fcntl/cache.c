@@ -3,6 +3,10 @@
 #include <cpm.h>
 #include <string.h>
 
+/* Update the FCB to use READ #20 and WRITE #21 BDOS functions non-sequentially */
+extern void setrecord_rd(struct fcb *fc) __z88dk_fastcall;
+extern void setrecord_wr(struct fcb *fc) __z88dk_fastcall;
+
 int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
 {
     int uid;
@@ -16,7 +20,7 @@ int cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read)
     fcb->cached_record = 0xffffffff;
     fcb->record_nr = record_nr;
 
-    setrecord(fcb);
+    setrecord_rd(fcb);
     bdos(CPM_SDMA,fcb->buffer);
     if ( bdos(CPM_READ,fcb) ) {
         swapuid(uid);
@@ -41,7 +45,7 @@ int cpm_cache_flush(struct fcb *fcb)
     if ( fcb->dirty ) {
         fcb->record_nr = fcb->cached_record;
         uid = swapuid(fcb->uid);
-        setrecord(fcb);
+        setrecord_wr(fcb);
         bdos(CPM_SDMA,fcb->buffer);
         if ( bdos(CPM_WRIT,fcb) == 0 ) {
             swapuid(uid);
