@@ -43,7 +43,7 @@ ELSE
     inc     hl
     ld      (hl),d
     inc     hl
-    ld      (hl),_IOUSE|_IOEXTRA|_IOREAD|_IOWRITE
+    ld      (hl),_IOEXTRA|_IOREAD|_IOWRITE
     inc     hl
     ld      (hl),0      ;ungetc
     inc     hl

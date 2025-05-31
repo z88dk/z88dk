@@ -31,7 +31,7 @@ ENDIF
     ld      d,(hl)
     inc     hl
     ld      a,(hl)
-    and     _IOUSE        ;inuse?
+    and     a        ;inuse?
     jr      nz, fclose_inuse
 fclose_error:
     ld      hl,-1        ;EOF

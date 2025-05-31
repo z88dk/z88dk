@@ -145,7 +145,7 @@ typedef struct filestr FILE;
  * they are read/write always
  */
 
-#define _IOUSE          1
+#define _IOUNGETC       1
 #define _IOREAD         2
 #define _IOWRITE        4
 #define _IOEOF          8

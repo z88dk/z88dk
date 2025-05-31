@@ -6,28 +6,33 @@
 
 #if __8080 || __8085
 int fread(void *ptr, size_t size, size_t nmemb, FILE *fp) {
-    if ( (fp->flags & (_IOUSE|_IOREAD|_IOSYSTEM)) == (_IOUSE|_IOREAD)) {
+    if ( (fp->flags & (_IOREAD|_IOSYSTEM)) == (_IOREAD)) {
         unsigned int len = size * nmemb;
 
         if ( len == 0 ) return len;
 #ifdef STDIO_BINARY
-        unsigned int r;
+        if ( fp->flags & _IOTEXT ) {
+            unsigned int r;
 
-        while ( len ) {
-            unsigned char c = fgetc(fp);
-            if ( c == EOF ) break;
-            *(unsigned char *)ptr++ = c;
-            r++;
+            while ( len ) {
+                unsigned char c = fgetc(fp);
+                if ( c == EOF ) break;
+                *(unsigned char *)ptr++ = c;
+                r++;
+            }
+            return r / size;
         }
-        return r / size;
 #else
-        unsigned int c = fgetc(fp);
-
-        if ( c != EOF ) {
-            *(unsigned char *)ptr = c;
-            --len;
-            len = read(fp->desc.fd, ptr+1, len);
-            return (len+1) / size;
+        if ( fp->flags & _IOUNGETC ) {
+            unsigned int c = fgetc(fp);
+            if  ( c != EOF ) {
+                *ptr++ = c;
+                len = read(fp->desc.fd, ptr+1, len-1);
+                return (len+1) / size;
+            }
+        } else {
+            len = read(fp->desc.fd, ptr, len);
+            return (len) / size;
         }
 #endif
 
@@ -64,7 +69,7 @@ IF __CPU_RABBIT__
     ld      hl,(sp + 10) ;ptr
 ELSE
     ld      ix,0
-    add    ix,sp
+    add     ix,sp
     ld      hl,(ix+6)   ;nmemb
     ld      de,(ix+8)   ;size
     call    l_mult      ;hl = nmemb * size
@@ -83,12 +88,11 @@ ENDIF
     ld      a,(ix + fp_flags)
     bit     4,a         ; _IOSYSTEM
     jr      nz,read_byte_done
-    and     _IOUSE | _IOREAD
-    cp       _IOUSE | _IOREAD
-    jr      nz,read_byte_done
+    bit     1,a         ; _IOREAD
+    jr      z,read_byte_done
 #ifdef __STDIO_BINARY
-    bit    6,(ix + fp_flags)    ; _IOTEXT
-    jp    z,fread_block
+    bit    6,a          ; _IOTEXT
+    jp     z,fread_block
     ; Text mode, read byte byte
     ; ix = fp
     ; hl = ptr
@@ -136,6 +140,16 @@ fread_exit:
 fread_block:
     ; Read from a file using blocks    
     ; Pick up any ungot character
+    bit     0,(ix+fp_flags)
+    jr      nz,consider_ungotc
+
+    ; Just read the block directly
+    ex      de,hl
+    call    fread1
+    ex      de,hl
+    jr      read_byte_done
+
+consider_ungotc:
     push    hl
     push    de
     push    bc
@@ -150,7 +164,7 @@ fread_block:
     jr      z,read_byte_done
     ld      (hl),a      ;save byte
     inc     hl
-    inc     de
+    inc     de          ;increment bytes read
     dec     bc
 
     ; Now call fread1 directly
