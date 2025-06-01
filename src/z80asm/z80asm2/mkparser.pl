@@ -23,7 +23,7 @@ my %tokens = (
 	CONST_EXPR => "",
 	STR => "",
 	RAW_STR => "",
-    OPERAT => "",
+    OPERATOR => "",
 	NEWLINE => "\n",
 	
 	ASMPC => '$',

@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cassert>
 #include <cctype>
 #include <cstring>
 #include <deque>
@@ -15,7 +16,9 @@
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <queue>
 #include <sstream>
+#include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -385,7 +388,7 @@ enum class TType {
     LPAREN,
     LSQUARE,
     NEWLINE,
-    OPERAT,
+    OPERATOR,
     QUEST,
     RAW_STR,
     RBRACE,
@@ -423,7 +426,7 @@ string to_string(TType ttype) {
         { TType::LPAREN, "(" },
         { TType::LSQUARE, "[" },
         { TType::NEWLINE, "\n" },
-        { TType::OPERAT, "" },
+        { TType::OPERATOR, "" },
         { TType::QUEST, "?" },
         { TType::RAW_STR, "" },
         { TType::RBRACE, "}" },
@@ -682,7 +685,7 @@ string to_string(Operator op) {
 const OperatorInfo& OperatorTable::get_info(Operator op) {
     auto it = table.find(op);
     if (it == table.end())
-        throw std::runtime_error("Unknown operator: " + std::to_string(static_cast<int>(op)));
+        assert(0); // Unknown operator
     return it->second;
 }
 
@@ -696,7 +699,7 @@ class Token {
 public:
 	Token() {}
 	Token(TType ttype, bool blank_before);
-	TType get_type() const { return m_ttype; }
+	TType get_ttype() const { return m_ttype; }
 	bool has_blank_before() const { return m_blank_before; }
 	
 	int get_ivalue() const { return m_ivalue; }
@@ -709,7 +712,7 @@ public:
 	void set_fvalue(double fvalue) { m_fvalue = fvalue; }
 	void set_svalue(const string& svalue) { m_svalue = svalue; }
 	void set_keyword(const string& text);
-    void set_operat(Operator op) { m_operator = op; }
+    void set_operator(Operator op) { m_operator = op; }
 
 	bool is(TType ttype) const { return m_ttype == ttype; }
 	bool is(Keyword keyword) const { return m_keyword == keyword; }
@@ -760,7 +763,7 @@ string Token::to_string() const {
 		return binary_to_c_string(reinterpret_cast<const unsigned char*>(m_svalue.c_str()), m_svalue.size());
 	case TType::RAW_STR:
 		return "\"" + m_svalue + "\"";		// syntax error in a later stage if string contains '"'
-    case TType::OPERAT:
+    case TType::OPERATOR:
         return ::to_string(m_operator);
 	default:
 		return ::to_string(m_ttype);
@@ -906,120 +909,120 @@ bool Scanner::scan(const string& text) {
 			break;
 
             // Operatos
-        case '+': m_tokens.emplace_back(TType::OPERAT, blank_before); m_tokens.back().set_operat(Operator::PLUS); break;
-        case '-': m_tokens.emplace_back(TType::OPERAT, blank_before); m_tokens.back().set_operat(Operator::MINUS); break;
-        case '/': m_tokens.emplace_back(TType::OPERAT, blank_before); m_tokens.back().set_operat(Operator::DIV); break;
-        case '%': m_tokens.emplace_back(TType::OPERAT, blank_before); m_tokens.back().set_operat(Operator::MOD); break;
-        case '~': m_tokens.emplace_back(TType::OPERAT, blank_before); m_tokens.back().set_operat(Operator::BIN_NOT); break;
+        case '+': m_tokens.emplace_back(TType::OPERATOR, blank_before); m_tokens.back().set_operator(Operator::PLUS); break;
+        case '-': m_tokens.emplace_back(TType::OPERATOR, blank_before); m_tokens.back().set_operator(Operator::MINUS); break;
+        case '/': m_tokens.emplace_back(TType::OPERATOR, blank_before); m_tokens.back().set_operator(Operator::DIV); break;
+        case '%': m_tokens.emplace_back(TType::OPERATOR, blank_before); m_tokens.back().set_operator(Operator::MOD); break;
+        case '~': m_tokens.emplace_back(TType::OPERATOR, blank_before); m_tokens.back().set_operator(Operator::BIN_NOT); break;
 
         case '*':
             if (*p == '*') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::POWER);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::POWER);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::MULT);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::MULT);
             }
             break;
 
         case '=':
             if (*p == '=') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::EQ);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::EQ);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::EQ);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::EQ);
             }
             break;
 
         case '!':
             if (*p == '=') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::NE);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::NE);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LOG_NOT);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LOG_NOT);
             }
             break;
 
         case '&':
             if (*p == '&') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LOG_AND);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LOG_AND);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::BIN_AND);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::BIN_AND);
             }
             break;
 
         case '<':
             if (*p == '=') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LE);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LE);
             }
             else if (*p == '<') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LSHIFT);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LSHIFT);
             }
             else if (*p == '>') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::NE);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::NE);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LT);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LT);
             }
             break;
 
         case '>':
             if (*p == '=') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::GE);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::GE);
             }
             else if (*p == '>') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::RSHIFT);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::RSHIFT);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::GT);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::GT);
             }
             break;
 
         case '^':
             if (*p == '^') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LOG_XOR);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LOG_XOR);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::BIN_XOR);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::BIN_XOR);
             }
             break;
 
         case '|':
             if (*p == '|') {
                 ++p;
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::LOG_OR);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::LOG_OR);
             }
             else {
-                m_tokens.emplace_back(TType::OPERAT, blank_before);
-                m_tokens.back().set_operat(Operator::BIN_OR);
+                m_tokens.emplace_back(TType::OPERATOR, blank_before);
+                m_tokens.back().set_operator(Operator::BIN_OR);
             }
             break;
 
@@ -1498,11 +1501,27 @@ void Preproc::check_end() {
 
 class Expr {
 public:
+    enum class Status {
+        OK,
+        SCAN_FAILED,
+        EOL_EXPECTED,
+        NO_EXPRESSION,
+        MISMATCHED_PARENS,
+        MISMATCHED_TERNARY,
+    };
+
     bool parse(const string& line);
-    bool parse(const Scanner& in);
+    bool parse(Scanner& in);
+
+    Status get_status() const { return m_status; }
 
 private:
-    Scanner m_tokens;
+    vector<Token> m_infix;
+    vector<Token> m_postfix;
+    Status m_status{ Status::OK };
+
+    bool is_unary(Scanner& in);
+    bool to_RPN(Scanner& in);
 };
 
 //@@.cpp
@@ -1511,16 +1530,171 @@ private:
 // Expression
 //-----------------------------------------------------------------------------
 
+bool Expr::is_unary(Scanner& in) {
+    if (in.get_pos() == 0)
+        return true;
+    const Token& prev = in.peek(-1);
+    switch (prev.get_ttype()) {
+    case TType::OPERATOR:
+    case TType::LPAREN:
+    case TType::QUEST:
+    case TType::COLON:
+    case TType::COMMA:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+// Shunting Yard algotithm to convert infix to postfix (RPN)
+bool Expr::to_RPN(Scanner& in) {
+    stack<Token> op_stack;
+    stack<size_t> ternary_mark; // stack to match ? and :
+
+    while (!in.peek().is(TType::END)) {
+        const Token& token = in.peek();
+        TType ttype = token.get_ttype();
+
+        if (ttype == TType::INT) {
+            m_postfix.push_back(token);
+        }
+        else if (ttype == TType::IDENT) {
+            m_postfix.push_back(token);
+        }
+        else if (ttype == TType::OPERATOR) {
+            Operator op = token.get_operator();
+
+            // Determine arity: if unary, adjust operator
+            if (is_unary(in)) {
+                switch (op) {
+                case Operator::PLUS:
+                    op = Operator::UPLUS;
+                    break;
+                case Operator::MINUS:
+                    op = Operator::UMINUS;
+                    break;
+                default:;
+                }
+            }
+
+            while (!op_stack.empty()) {
+                const Token& top = op_stack.top();
+                if (top.get_ttype() != TType::OPERATOR)
+                    break;
+                Operator top_op = top.get_operator();
+
+                const OperatorInfo& op1 = OperatorTable::get_info(op);
+                const OperatorInfo& op2 = OperatorTable::get_info(top_op);
+
+                if ((op1.associativity == Associativity::Left && op1.precedence <= op2.precedence) ||
+                    (op1.associativity == Associativity::Right && op1.precedence < op2.precedence)) {
+                    m_postfix.push_back(top);
+                    op_stack.pop();
+                }
+                else {
+                    break;
+                }
+            }
+
+            // Push operator (mark unary ops explicitly)
+            Token push_op = token;
+            push_op.set_operator(op);       // set unary operator
+            op_stack.push(push_op);
+        }
+        else if (ttype == TType::LPAREN) {
+            op_stack.push(token);
+        }
+        else if (ttype == TType::RPAREN) {
+            while (!op_stack.empty() && op_stack.top().get_ttype() != TType::LPAREN) {
+                m_postfix.push_back(op_stack.top());
+                op_stack.pop();
+            }
+            if (op_stack.empty()) {
+                m_status = Status::MISMATCHED_PARENS;
+                return false;
+            }
+            op_stack.pop(); // pop '('
+        }
+        else if (ttype == TType::QUEST) {
+            op_stack.push(token);
+            ternary_mark.push(m_postfix.size()); // mark position in m_postfix
+        }
+        else if (ttype == TType::COLON) {
+            while (!op_stack.empty() && op_stack.top().get_ttype() != TType::QUEST) {
+                m_postfix.push_back(op_stack.top());
+                op_stack.pop();
+            }
+            if (op_stack.empty()) {
+                m_status = Status::MISMATCHED_TERNARY;
+                return false;
+            }
+            op_stack.pop(); // Pop '?'
+
+            Token push_op{ TType::OPERATOR, false };
+            push_op.set_operator(Operator::TERNARY);
+            m_postfix.push_back(push_op);
+        }
+        else {
+            break;      // end of expression
+        }
+    }
+
+    while (!op_stack.empty()) {
+        if (op_stack.top().get_ttype() == TType::LPAREN || op_stack.top().get_ttype() == TType::RPAREN) {
+            m_status = Status::MISMATCHED_PARENS;
+            return false;
+        }
+        m_postfix.push_back(op_stack.top());
+        op_stack.pop();
+    }
+
+    if (m_postfix.empty()) {
+        m_status = Status::NO_EXPRESSION;
+        return false;   // no tokens
+    }
+    else {
+        return true;
+    }
+}
+
 bool Expr::parse(const string& line) {
     Scanner in;
-    if (!in.scan(line))
+    m_status = Status::OK;
+
+    if (!in.scan(line)) {
+        m_status = Status::SCAN_FAILED;
         return false;   // scan failed
-    else if (!parse(in))
-        return false;   // parse failed
-    else if (!in.peek().is_end())
+    }
+    else if (!parse(in)) {
+        return false;   // parse failed, m_status is filled
+    }
+    else if (!in.peek().is_end()) {
+        m_status = Status::EOL_EXPECTED;
         return false;   // extra input
-    else
+    }
+    else {
+        assert(m_status == Status::OK);
         return true;
+    }
+}
+
+bool Expr::parse(Scanner& in) {
+    m_infix.clear();
+    m_postfix.clear();
+    m_status = Status::OK;
+    int pos0 = in.get_pos();
+    
+    if (to_RPN(in)) {
+        // copy infix tokens
+        for (int i = 0; i < in.get_pos(); ++i)
+            m_infix.push_back(in[i]);
+        return true;
+    }
+    else {
+        in.set_pos(pos0); // reset to original position
+        return false;
+    }
 }
 
 //@@.h
@@ -1850,8 +2024,8 @@ bool LineParser::parse(const string& line) {
         if (current_state.keyword_next.count(token.get_keyword()) > 0) {
             state = current_state.keyword_next[token.get_keyword()];
         }
-        else if (current_state.ttype_next.count(token.get_type()) > 0) {
-            state = current_state.ttype_next[token.get_type()];
+        else if (current_state.ttype_next.count(token.get_ttype()) > 0) {
+            state = current_state.ttype_next[token.get_ttype()];
         }
         else {
             //g_error.error_invalid_token(token.to_string());
