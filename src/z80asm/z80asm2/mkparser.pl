@@ -23,7 +23,7 @@ my %tokens = (
 	CONST_EXPR => "",
 	STR => "",
 	RAW_STR => "",
-    OPERAT => "",
+    OPERATOR => "",
 	NEWLINE => "\n",
 	
 	ASMPC => '$',
@@ -42,43 +42,66 @@ my %tokens = (
 	RSQUARE => "]",
 );
 
+# Precedence levels based on standard C precedence
 my %operators = (
-    OP_NONE => "",
-    OP_TERNARY => "?:",
-	OP_RSHIFT => ">>",
-    OP_POWER => "**",
-    OP_PLUS => "+",
-    OP_NE => "<>",
-    OP_MULT => "*",
-    OP_MOD => "%",
-    OP_MINUS => "-",
-    OP_LT => "<",
-	OP_LSHIFT => "<<",
-	OP_LOG_XOR => "^^",
-	OP_LOG_OR => "||",
-	OP_LOG_NOT => "!",
-	OP_LOG_AND => "&&",
-    OP_LE => "<=",
-    OP_GT => ">",
-    OP_GE => ">=",
-    OP_EQ => "=",
-    OP_DIV => "/",
-	OP_BIN_XOR => "^",
-	OP_BIN_OR => "|",
-	OP_BIN_NOT => "~",
-	OP_BIN_AND => "&",
+    NONE        => { text => "",    precedence => 0,    associativity => 'Left',    arity => 'Unary' },
+
+    # Power
+    POWER       => { text => "**",  precedence => 14,   associativity => 'Right',   arity => 'Binary' },
+
+    # Unary (prefix): + - ! ~
+    UPLUS       => { text => "+",   precedence => 13,   associativity => 'Right',   arity => 'Unary' },
+    UMINUS      => { text => "-",   precedence => 13,   associativity => 'Right',   arity => 'Unary' },
+	LOG_NOT     => { text => "!",   precedence => 13,   associativity => 'Right',   arity => 'Unary' },
+	BIN_NOT     => { text => "~",   precedence => 13,   associativity => 'Right',   arity => 'Unary' },
+
+    # Multiplicative
+    MULT        => { text => "*",   precedence => 12,   associativity => 'Left',    arity => 'Binary' },
+    DIV         => { text => "/",   precedence => 12,   associativity => 'Left',    arity => 'Binary' },
+    MOD         => { text => "%",   precedence => 12,   associativity => 'Left',    arity => 'Binary' },
+
+    # Additive
+    PLUS        => { text => "+",   precedence => 11,   associativity => 'Left',    arity => 'Binary' },
+    MINUS       => { text => "-",   precedence => 11,   associativity => 'Left',    arity => 'Binary' },
+
+    # Shift
+	LSHIFT      => { text => "<<",  precedence => 10,   associativity => 'Left',    arity => 'Binary' },
+	RSHIFT      => { text => ">>",  precedence => 10,   associativity => 'Left',    arity => 'Binary' },
+
+    # Relational
+    LT          => { text => "<",   precedence => 9,    associativity => 'Left',    arity => 'Binary' },
+    LE          => { text => "<=",  precedence => 9,    associativity => 'Left',    arity => 'Binary' },
+    GT          => { text => ">",   precedence => 9,    associativity => 'Left',    arity => 'Binary' },
+    GE          => { text => ">=",  precedence => 9,    associativity => 'Left',    arity => 'Binary' },
+
+    # Equality
+    EQ          => { text => "=",   precedence => 8,    associativity => 'Left',    arity => 'Binary' },
+    NE          => { text => "<>",  precedence => 8,    associativity => 'Left',    arity => 'Binary' },
+
+    # Bitwise AND, XOR, OR
+	BIN_AND     => { text => "&",   precedence => 7,    associativity => 'Left',    arity => 'Binary' },
+	BIN_XOR     => { text => "^",   precedence => 6,    associativity => 'Left',    arity => 'Binary' },
+	BIN_OR      => { text => "|",   precedence => 5,    associativity => 'Left',    arity => 'Binary' },
+
+    # Logical AND, XOR, OR
+	LOG_AND     => { text => "&&",  precedence => 4,    associativity => 'Left',    arity => 'Binary' },
+	LOG_XOR     => { text => "^^",  precedence => 3,    associativity => 'Left',    arity => 'Binary' },
+	LOG_OR      => { text => "||",  precedence => 2,    associativity => 'Left',    arity => 'Binary' },
+
+    # Ternary
+    TERNARY     => { text => "?:",  precedence => 1,    associativity => 'Right',   arity => 'Ternary' },
 );
 
 my %keywords = (
 	NONE => "",
-	KW_ASMPC => "asmpc",
-	KW_ASSUME => "assume",
-	KW_BINARY => "binary",
-	KW_C_LINE => "c_line",
-	KW_EQU => "equ",
-	KW_INCBIN => "incbin",
-	KW_INCLUDE => "include",
-	KW_LINE => "line",
+	ASMPC => "asmpc",
+	ASSUME => "assume",
+	BINARY => "binary",
+	C_LINE => "c_line",
+	EQU => "equ",
+	INCBIN => "incbin",
+	INCLUDE => "include",
+	LINE => "line",
 );
 
 #-------------------------------------------------------------------------------
@@ -93,7 +116,7 @@ parse_grammar($grammar_file);
 make_state_machine();
 patch_file($template_file, path($grammar_file)->basename(".y"));
 
-dump $grammar;
+#dump $grammar;
 
 #-------------------------------------------------------------------------------
 # parse the grammar file
@@ -147,8 +170,8 @@ sub parse_grammar_rule {
 			push @tokens, $reverse_tokens{$1};
 		}
 		elsif (/"(.+)"/) {
-			push @tokens, "KW_".uc($1);
-			$keywords{"KW_".uc($1)} = $1;
+			push @tokens, uc($1);
+			$keywords{uc($1)} = lc($1);
 		}
 		else {
 			die "Undefined token: $_\n";
@@ -169,7 +192,7 @@ sub patch_file {
 	
 	while (@in) {
 		$_ = shift(@in);
-		if (/^(\s*)\/\/\@\@BEGIN:\s*type\b/) {
+		if (/^(\s*)\/\/\@\@BEGIN:\s*ttype\b/) {
 			my $prefix = $1;
 			push @out, $_;
 			push @out, "${prefix}END,\n";		# END must be id 0
@@ -181,12 +204,12 @@ sub patch_file {
 				shift @in;
 			}
 		}
-		elsif (/^(\s*)\/\/\@\@BEGIN:\s*type_map\b/) {
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*ttype_text\b/) {
 			my $prefix = $1;
 			push @out, $_;
 			for my $kw (sort keys %{$grammar->{tokens}}) {
 				my $string = $grammar->{tokens}{$kw};
-				push @out, "${prefix}{ $kw, ".c_string($string)." },\n";
+				push @out, "${prefix}{ TType::$kw, ".c_string($string)." },\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -195,21 +218,34 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*operator\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			push @out, "${prefix}OP_NONE,\n";	# OP_NONE must be id 0
+			push @out, "${prefix}NONE,\n";	# OP_NONE must be id 0
 			for (sort keys %{$grammar->{operators}}) {
-				next if $_ eq 'OP_NONE';
+				next if $_ eq 'NONE';
 				push @out, "$prefix$_,\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
 			}
 		}
-		elsif (/^(\s*)\/\/\@\@BEGIN:\s*operator_map\b/) {
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*operator_text\b/) {
 			my $prefix = $1;
 			push @out, $_;
 			for my $kw (sort keys %{$grammar->{operators}}) {
-				my $string = $grammar->{operators}{$kw};
-				push @out, "${prefix}{ $kw, ".c_string($string)." },\n";
+				my $info = $grammar->{operators}{$kw};
+				push @out, "${prefix}{ Operator::$kw, ".c_string($info->{text})." },\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*operator_info\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for my $kw (sort keys %{$grammar->{operators}}) {
+				my $info = $grammar->{operators}{$kw};
+				push @out, "${prefix}{ Operator::$kw, { ".$info->{precedence}.", ".
+                            "Associativity::".$info->{associativity}.", ".
+                            "Arity::".$info->{arity}." } },\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -227,12 +263,23 @@ sub patch_file {
 				shift @in;
 			}
 		}
-		elsif (/^(\s*)\/\/\@\@BEGIN:\s*keyword_map\b/) {
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*keyword_text\b/) {
 			my $prefix = $1;
 			push @out, $_;
 			for my $kw (sort keys %{$grammar->{keywords}}) {
 				my $string = $grammar->{keywords}{$kw};
-				push @out, "${prefix}{ ".c_string($string).", $kw },\n";
+				push @out, "${prefix}{ Keyword::$kw, ".c_string($string)." },\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*keyword_lookup\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for my $kw (sort keys %{$grammar->{keywords}}) {
+				my $string = $grammar->{keywords}{$kw};
+				push @out, "${prefix}{ ".c_string($string).", Keyword::$kw },\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -268,19 +315,19 @@ sub patch_file {
 				my $line = $prefix."{ /* ".$state->{state}.": ".
 						   join(" ", @{$state->{path}})." */\n"; 
 				
-				# unordered_map<Token::Keyword, int>	keyword_next;
+				# unordered_map<Keyword, int>	keyword_next;
 				$line .= "$prefix  { "; 
 				for my $token (sort keys %{$state->{tokens}}) {
-					next unless $token =~ /^KW_/;
-					$line .= "{Token::$token, ".$state->{tokens}{$token}."}, ";
+					next unless exists $keywords{$token};
+					$line .= "{Keyword::$token, ".$state->{tokens}{$token}."}, ";
 				}
 				$line .= "},\n";
 				
-				# unordered_map<Token::Token, int>	token_next;
+				# unordered_map<TType::Token, int>	token_next;
 				$line .= "$prefix  { "; 
 				for my $token (sort keys %{$state->{tokens}}) {
-					next if $token =~ /^KW_/;
-					$line .= "{Token::$token, ".$state->{tokens}{$token}."}, ";
+					next if exists $keywords{$token};
+					$line .= "{TType::$token, ".$state->{tokens}{$token}."}, ";
 				}
 				$line .= "},\n";
 				
