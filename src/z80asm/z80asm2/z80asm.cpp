@@ -748,7 +748,7 @@ void Token::set_keyword(const string& text) {
 }
 
 bool Token::is_end() const {
-    return is(TType::NEWLINE) || is(TType::COLON) || is(TType::BACKSLASH);
+    return is(TType::END) || is(TType::NEWLINE) || is(TType::COLON) || is(TType::BACKSLASH);
 }
 
 string Token::to_string() const {
@@ -807,7 +807,7 @@ string Token::concat(const string& s1, const string& s2) {
 class Scanner {
 public:
 	Scanner() {}
-	Scanner(vector<Token>& tokens);
+	Scanner(const vector<Token>& tokens);
 	bool scan(const string& text);
 	void clear();
 	void rewind();
@@ -840,7 +840,7 @@ private:
 // Scanner
 //-----------------------------------------------------------------------------
 
-Scanner::Scanner(vector<Token>& tokens) {
+Scanner::Scanner(const vector<Token>& tokens) {
 	m_tokens = tokens;
 }
 
@@ -1322,8 +1322,6 @@ private:
 	Scanner m_out;
     int m_autolabel_id{ 1 };
 
-    void define_asmpc(const string& asmpc);
-    bool has_asmpc();
 	void expand_macros();
 	void collect_statement();
 	void push_out();
@@ -1391,18 +1389,6 @@ void Preproc::expand(const string & input_line) {
 			m_in.next(2);
 			push_out();
 		}
-        // ASMPC - needs to be after label:
-        else if (has_asmpc()) {
-            string asmpc = autolabel();
-            
-            // output label
-            m_out.push_back(Token(TType::IDENT, false));
-            m_out.back().set_svalue(asmpc);
-            m_out.push_back(Token(TType::COLON, false)); // :
-
-            // replace ASMPC by label in next statement
-            define_asmpc(asmpc);
-        }
 		// #INCLUDE
 		else if (m_in.peek(0).is(TType::HASH) && m_in.peek(1).is(Keyword::INCLUDE) && m_in.peek(2).is(TType::RAW_STR)) {
 			string filename = m_in.peek(2).get_svalue();
@@ -1436,25 +1422,6 @@ void Preproc::collect_statement() {
 			m_in.next();
 		}
 	}
-}
-
-void Preproc::define_asmpc(const string& asmpc) {
-    for (int i = 0; i < static_cast<int>(m_in.size()); ++i) {
-        if (m_in[i].is(TType::ASMPC)) {
-            m_in[i] = Token(TType::IDENT, false);
-            m_in[i].set_svalue(asmpc);
-        }
-    }
-}
-
-bool Preproc::has_asmpc() {
-    for (int i = 0; i < static_cast<int>(m_in.size()); ++i) {
-        if (m_in[i].is_end())
-            return false;
-        else if (m_in[i].is(TType::ASMPC))
-            return true;
-    }
-    return false;
 }
 
 void Preproc::expand_macros() {
@@ -1505,9 +1472,11 @@ public:
         OK,
         SCAN_FAILED,
         EOL_EXPECTED,
-        NO_EXPRESSION,
+        OPERAND_EXPECTED,
         MISMATCHED_PARENS,
         MISMATCHED_TERNARY,
+        INSUFICIENT_OPERANDS,
+        TOO_MANY_OPERANDS,
     };
 
     bool parse(const string& line);
@@ -1515,13 +1484,17 @@ public:
 
     Status get_status() const { return m_status; }
 
+    string to_string() const;
+    string rpn_to_string() const;
+
 private:
     vector<Token> m_infix;
     vector<Token> m_postfix;
     Status m_status{ Status::OK };
 
-    bool is_unary(Scanner& in);
+    bool is_unary(Scanner& in) const;
     bool to_RPN(Scanner& in);
+    bool check_syntax();
 };
 
 //@@.cpp
@@ -1530,7 +1503,7 @@ private:
 // Expression
 //-----------------------------------------------------------------------------
 
-bool Expr::is_unary(Scanner& in) {
+bool Expr::is_unary(Scanner& in) const {
     if (in.get_pos() == 0)
         return true;
     const Token& prev = in.peek(-1);
@@ -1539,9 +1512,7 @@ bool Expr::is_unary(Scanner& in) {
     case TType::LPAREN:
     case TType::QUEST:
     case TType::COLON:
-    case TType::COMMA:
         return true;
-
     default:
         return false;
     }
@@ -1550,30 +1521,24 @@ bool Expr::is_unary(Scanner& in) {
 // Shunting Yard algotithm to convert infix to postfix (RPN)
 bool Expr::to_RPN(Scanner& in) {
     stack<Token> op_stack;
-    stack<size_t> ternary_mark; // stack to match ? and :
 
     while (!in.peek().is(TType::END)) {
         const Token& token = in.peek();
         TType ttype = token.get_ttype();
+        Operator op = token.get_operator();
 
-        if (ttype == TType::INT) {
+        if (ttype == TType::INT || ttype == TType::IDENT|| ttype == TType::ASMPC) {
             m_postfix.push_back(token);
-        }
-        else if (ttype == TType::IDENT) {
-            m_postfix.push_back(token);
+            in.next();
         }
         else if (ttype == TType::OPERATOR) {
-            Operator op = token.get_operator();
 
-            // Determine arity: if unary, adjust operator
-            if (is_unary(in)) {
+            // Adjust to unary operator
+            bool unary = is_unary(in);
+            if (unary) {
                 switch (op) {
-                case Operator::PLUS:
-                    op = Operator::UPLUS;
-                    break;
-                case Operator::MINUS:
-                    op = Operator::UMINUS;
-                    break;
+                case Operator::PLUS: op = Operator::UPLUS; break;
+                case Operator::MINUS: op = Operator::UMINUS; break;
                 default:;
                 }
             }
@@ -1601,9 +1566,11 @@ bool Expr::to_RPN(Scanner& in) {
             Token push_op = token;
             push_op.set_operator(op);       // set unary operator
             op_stack.push(push_op);
+            in.next();
         }
         else if (ttype == TType::LPAREN) {
             op_stack.push(token);
+            in.next();
         }
         else if (ttype == TType::RPAREN) {
             while (!op_stack.empty() && op_stack.top().get_ttype() != TType::LPAREN) {
@@ -1615,10 +1582,11 @@ bool Expr::to_RPN(Scanner& in) {
                 return false;
             }
             op_stack.pop(); // pop '('
+            in.next();
         }
         else if (ttype == TType::QUEST) {
             op_stack.push(token);
-            ternary_mark.push(m_postfix.size()); // mark position in m_postfix
+            in.next();
         }
         else if (ttype == TType::COLON) {
             while (!op_stack.empty() && op_stack.top().get_ttype() != TType::QUEST) {
@@ -1633,7 +1601,8 @@ bool Expr::to_RPN(Scanner& in) {
 
             Token push_op{ TType::OPERATOR, false };
             push_op.set_operator(Operator::TERNARY);
-            m_postfix.push_back(push_op);
+            op_stack.push(push_op);
+            in.next();
         }
         else {
             break;      // end of expression
@@ -1650,8 +1619,52 @@ bool Expr::to_RPN(Scanner& in) {
     }
 
     if (m_postfix.empty()) {
-        m_status = Status::NO_EXPRESSION;
+        m_status = Status::OPERAND_EXPECTED;
         return false;   // no tokens
+    }
+    else {
+        return check_syntax();
+    }
+}
+
+// check if all arguments to all operators were given
+bool Expr::check_syntax() {
+    stack<int> eval_stack;
+    for (auto& token : m_postfix) {
+        TType ttype = token.get_ttype();
+
+        if (ttype == TType::INT || ttype == TType::IDENT || ttype == TType::ASMPC) {
+            eval_stack.push(1); // dummy value
+        }
+        else if (ttype == TType::OPERATOR) {
+            auto info = OperatorTable::get_info(token.get_operator());
+
+            int required = 0;
+            switch (info.arity) {
+            case Arity::Unary: required = 1; break;
+            case Arity::Binary: required = 2; break;
+            case Arity::Ternary: required = 3; break;
+            }
+
+            if (static_cast<int>(eval_stack.size()) < required) {
+                m_status = Status::INSUFICIENT_OPERANDS;
+                return false;
+            }
+
+            // Pop required operands and push result
+            for (int i = 0; i < required; ++i)
+                eval_stack.pop();
+            eval_stack.push(1);
+        }
+    }
+
+    if (eval_stack.size() == 0) {
+        m_status = Status::OPERAND_EXPECTED;
+        return false;   // no tokens
+    }
+    else if (eval_stack.size() > 1) {
+        m_status = Status::TOO_MANY_OPERANDS;
+        return false;
     }
     else {
         return true;
@@ -1664,6 +1677,8 @@ bool Expr::parse(const string& line) {
 
     if (!in.scan(line)) {
         m_status = Status::SCAN_FAILED;
+        m_infix.clear();
+        m_postfix.clear();
         return false;   // scan failed
     }
     else if (!parse(in)) {
@@ -1671,6 +1686,8 @@ bool Expr::parse(const string& line) {
     }
     else if (!in.peek().is_end()) {
         m_status = Status::EOL_EXPECTED;
+        m_infix.clear();
+        m_postfix.clear();
         return false;   // extra input
     }
     else {
@@ -1693,8 +1710,23 @@ bool Expr::parse(Scanner& in) {
     }
     else {
         in.set_pos(pos0); // reset to original position
+        m_infix.clear();
+        m_postfix.clear();
         return false;
     }
+}
+
+string Expr::to_string() const {
+    Scanner expr{ m_infix };
+    return expr.to_string();
+}
+
+string Expr::rpn_to_string() const {
+    string output;
+    for (auto& token : m_postfix) {
+        output += token.to_string() + " ";
+    }
+    return output;
 }
 
 //@@.h
