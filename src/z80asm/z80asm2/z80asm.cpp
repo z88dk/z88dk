@@ -1732,14 +1732,118 @@ string Expr::rpn_to_string() const {
 //@@.h
 
 //-----------------------------------------------------------------------------
+// Symbol table
+//-----------------------------------------------------------------------------
+
+enum class SymType {
+    GLOBAL_DEFINE,
+    CONSTANT,
+    ADDRESS,
+    EXPRESSION,
+};
+
+class Symbol {
+public:
+    Symbol(const string& name);
+    Symbol(const Symbol& other) = delete;
+    virtual ~Symbol();
+    Symbol& operator=(const Symbol& other) = delete;
+
+    const string& get_name() const { return m_name; }
+    SymType get_sym_type() const { return m_sym_type; }
+    int get_value() const { return m_value; }
+    const Expr* get_expr() const { return m_expr; }
+
+    void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
+    void set_value(int value) { m_value = value; }
+    void set_expr(Expr* expr);
+
+private:
+    const string m_name;        // symbol name
+    SymType m_sym_type{ SymType::CONSTANT };
+    int m_value{ 0 };           // constant or address offset
+    Expr* m_expr{ nullptr };    // expression
+};
+
+class Symtab {
+public:
+    Symtab() {}
+    Symtab(const Symtab& other) = delete;
+    virtual ~Symtab();
+    Symtab& operator=(const Symtab& other) = delete;
+
+    void clear();
+    Symbol* get_symbol(const string& name); // nullptr if not found
+    bool add_symbol(const string& name, Symbol* symbol);
+
+private:
+    unordered_map<string, Symbol*> m_table;
+};
+
+//@@.cpp
+
+//-----------------------------------------------------------------------------
+// Symbol table
+//-----------------------------------------------------------------------------
+
+Symbol::Symbol(const string& name)
+    : m_name(name) {
+}
+
+Symbol::~Symbol() {
+    if (m_expr)
+        delete m_expr;
+}
+
+void Symbol::set_expr(Expr* expr) {
+    if (m_expr)
+        delete m_expr;
+    m_expr = expr;
+}
+
+Symtab::~Symtab() {
+    clear();
+}
+
+void Symtab::clear() {
+    for (auto& it : m_table) {
+        delete it.second;
+    }
+    m_table.clear();
+}
+
+Symbol* Symtab::get_symbol(const string& name) {
+    auto it = m_table.find(name);
+    if (it == m_table.end())
+        return nullptr;
+    else
+        return it->second;
+}
+
+bool Symtab::add_symbol(const string& name, Symbol* symbol) {
+    if (get_symbol(name)) {
+        return false;
+    }
+    else {
+        m_table[name] = symbol;
+        return true;
+    }
+}
+
+//@@.h
+
+//-----------------------------------------------------------------------------
 // Object Module
 //-----------------------------------------------------------------------------
 
 class ObjectModule {
 public:
+    ObjectModule() {}
+    virtual ~ObjectModule();
+
     void clear();
-    void add_constant(const string& name, int value) { m_symbols[name] = value; }
-    void add_label(const string& name) { m_symbols[name] = 0; }
+    void add_constant(const string& name, int value) { (void)name; (void)value; }
+    void add_label(const string& name) { (void)name; }
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode) { (void)opcode; }
     void add_opcode_jr(long long opcode, int value) { (void)opcode; (void)value; }
@@ -1747,7 +1851,7 @@ public:
     void add_opcode_nn(long long opcode, int value) { (void)opcode; (void)value; }
 
 private:
-    unordered_map<string, int> m_symbols;
+    unordered_map<string, Expr*> m_symbols;
     int m_assume{ 0 };
 };
 
@@ -1761,7 +1865,14 @@ extern ObjectModule g_object_module;
 
 ObjectModule g_object_module;
 
+ObjectModule::~ObjectModule() {
+    clear();
+}
+
 void ObjectModule::clear() {
+    for (auto& it : m_symbols) {
+        delete it.second;
+    }
     m_symbols.clear();
     m_assume = 0;
 }
