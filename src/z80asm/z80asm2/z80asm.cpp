@@ -33,6 +33,7 @@ bool str_ends_with(const string& str, const string& ending);
 string binary_to_c_string(const unsigned char* data, size_t length);
 bool is_ident(char c);
 bool read_custom_line(ifstream& stream, string& line);
+int ipow(int base, int exp);
 
 //@@.cpp
 
@@ -112,6 +113,18 @@ bool read_custom_line(ifstream& stream, string& line) {
     return !line.empty() || !stream.eof();
 }
 
+int ipow(int base, int exp) {
+    int result = 1;
+    for (;;) {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        if (!exp)
+            break;
+        base *= base;
+    }
+    return result;
+}
 
 //@@.h
 
@@ -214,6 +227,10 @@ public:
 	void error_open_file(const string& filename) { error("file open", filename); }
 	void error_recursive_include(const string& filename) { error("recursive include", filename); }
 	void error_unterminated_string() { error("unterminated string"); }
+    void error_undefined_symbol(const string& name) { error("undefined symbol", name); }
+    void error_division_by_zero() { error("division by zero"); }
+    void error_recursive_evaluation(const string& name) { error("recursive evaluation", name); }
+    void error_duplicate_definition(const string& name) { error("duplicate definition", name); }
 
 private:
 	int m_count{ 0 };
@@ -1463,8 +1480,10 @@ void Preproc::check_end() {
 //@@.h
 
 //-----------------------------------------------------------------------------
-// Expression
+// Expression and symbol table
 //-----------------------------------------------------------------------------
+
+class Symtab;
 
 class Expr {
 public:
@@ -1477,12 +1496,14 @@ public:
         MISMATCHED_TERNARY,
         INSUFICIENT_OPERANDS,
         TOO_MANY_OPERANDS,
+        UNDEFINED_SYMBOL,
     };
+
+    Status get_status() const { return m_status; }
 
     bool parse(const string& line);
     bool parse(Scanner& in);
-
-    Status get_status() const { return m_status; }
+    bool eval(int asmpc, Symtab* symtab, int& result);
 
     string to_string() const;
     string rpn_to_string() const;
@@ -1497,11 +1518,65 @@ private:
     bool check_syntax();
 };
 
+enum class SymType {
+    GLOBAL_DEFINE,
+    CONSTANT,
+    ADDRESS,
+    EXPRESSION,
+};
+
+class Symbol {
+public:
+    Symbol(const string& name);
+    Symbol(const Symbol& other) = delete;
+    virtual ~Symbol();
+    Symbol& operator=(const Symbol& other) = delete;
+
+    const string& get_name() const { return m_name; }
+    SymType get_sym_type() const { return m_sym_type; }
+    int get_value() const { return m_value; }
+    Expr* get_expr() { return m_expr; }
+    bool is_in_eval() const { return m_in_eval; }
+
+    void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
+    void set_value(int value) { m_value = value; }
+    void set_expr(Expr* expr);
+    void set_in_eval() { m_in_eval = true; }
+    void clear_in_eval() { m_in_eval = false; }
+
+private:
+    const string m_name;        // symbol name
+    SymType m_sym_type{ SymType::CONSTANT };
+    int m_value{ 0 };           // constant or address offset
+    Expr* m_expr{ nullptr };    // expression
+    bool m_in_eval{ false };    // detect recursive evaluation
+};
+
+class Symtab {
+public:
+    Symtab() {}
+    Symtab(const Symtab& other) = delete;
+    virtual ~Symtab();
+    Symtab& operator=(const Symtab& other) = delete;
+
+    void clear();
+    Symbol* get_symbol(const string& name); // nullptr if not found
+    bool add_symbol(const string& name, Symbol* symbol);
+    bool eval(int asmpc, const string& name, int& result);
+
+private:
+    unordered_map<string, Symbol*> m_table;
+};
+
+extern Symtab g_global_defines;
+
 //@@.cpp
 
 //-----------------------------------------------------------------------------
-// Expression
+// Expression and symbol table
 //-----------------------------------------------------------------------------
+
+Symtab g_global_defines;
 
 bool Expr::is_unary(Scanner& in) const {
     if (in.get_pos() == 0)
@@ -1639,20 +1714,20 @@ bool Expr::check_syntax() {
         else if (ttype == TType::OPERATOR) {
             auto info = OperatorTable::get_info(token.get_operator());
 
-            int required = 0;
+            size_t required = 0;
             switch (info.arity) {
             case Arity::Unary: required = 1; break;
             case Arity::Binary: required = 2; break;
             case Arity::Ternary: required = 3; break;
             }
 
-            if (static_cast<int>(eval_stack.size()) < required) {
+            if (eval_stack.size() < required) {
                 m_status = Status::INSUFICIENT_OPERANDS;
                 return false;
             }
 
             // Pop required operands and push result
-            for (int i = 0; i < required; ++i)
+            for (size_t i = 0; i < required; ++i)
                 eval_stack.pop();
             eval_stack.push(1);
         }
@@ -1716,6 +1791,228 @@ bool Expr::parse(Scanner& in) {
     }
 }
 
+bool Expr::eval(int asmpc, Symtab* symtab, int& result) {
+    stack<int> eval_stack;
+    result = 0;
+    int x1, x2, x3;
+
+    for (auto& token : m_postfix) {
+        switch (token.get_ttype()) {
+        case TType::INT:
+            eval_stack.push(token.get_ivalue());
+            break;
+
+        case TType::IDENT:
+            if (!symtab->eval(asmpc, token.get_svalue(), x1))
+                return false;
+            else
+                eval_stack.push(x1);
+            break;
+
+        case TType::ASMPC:
+            eval_stack.push(asmpc);
+            break;
+
+        case TType::OPERATOR:
+            switch (token.get_operator()) {
+            case Operator::POWER:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(ipow(x1, x2));
+                break;
+
+            case Operator::UPLUS:
+                assert(eval_stack.size() >= 1);
+                break;
+
+            case Operator::UMINUS:
+                assert(eval_stack.size() >= 1);
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(-x1);
+                break;
+
+            case Operator::LOG_NOT:
+                assert(eval_stack.size() >= 1);
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 ? 0 : 1);
+                break;
+
+            case Operator::BIN_NOT:
+                assert(eval_stack.size() >= 1);
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(~x1);
+                break;
+
+            case Operator::MULT:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 * x2);
+                break;
+
+            case Operator::DIV:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                if (x2 == 0) {
+                    g_error.error_division_by_zero();
+                    eval_stack.push(0);
+                }
+                else {
+                    eval_stack.push(x1 / x2);
+                }
+                break;
+
+            case Operator::MOD:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                if (x2 == 0) {
+                    g_error.error_division_by_zero();
+                    eval_stack.push(0);
+                }
+                else {
+                    eval_stack.push(x1 % x2);
+                }
+                break;
+
+            case Operator::PLUS:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 + x2);
+                break;
+
+            case Operator::MINUS:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 - x2);
+                break;
+
+            case Operator::LSHIFT:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 << x2);
+                break;
+
+            case Operator::RSHIFT:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 >> x2);
+                break;
+
+            case Operator::LT:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 < x2);
+                break;
+
+            case Operator::LE:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 <= x2);
+                break;
+
+            case Operator::GT:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 > x2);
+                break;
+
+            case Operator::GE:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 >= x2);
+                break;
+
+            case Operator::EQ:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 == x2);
+                break;
+
+            case Operator::NE:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 != x2);
+                break;
+
+            case Operator::BIN_AND:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 & x2);
+                break;
+
+            case Operator::BIN_OR:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 | x2);
+                break;
+
+            case Operator::BIN_XOR:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 ^ x2);
+                break;
+
+            case Operator::LOG_AND:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 && x2 ? 1 : 0);
+                break;
+
+            case Operator::LOG_OR:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 || x2 ? 1 : 0);
+                break;
+
+            case Operator::LOG_XOR:
+                assert(eval_stack.size() >= 2);
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 == x2 ? 0 : 1);
+                break;
+
+            case Operator::TERNARY:
+                assert(eval_stack.size() >= 3);
+                x3 = eval_stack.top(); eval_stack.pop();
+                x2 = eval_stack.top(); eval_stack.pop();
+                x1 = eval_stack.top(); eval_stack.pop();
+                eval_stack.push(x1 ? x2 : x3);
+                break;
+
+            default:
+                assert(0);
+            }
+            break;
+
+        default:
+            assert(0);
+        }
+    }
+
+    assert(eval_stack.size() == 1);
+    result = eval_stack.top();
+    eval_stack.pop();
+    return true;
+}
+
 string Expr::to_string() const {
     Scanner expr{ m_infix };
     return expr.to_string();
@@ -1728,63 +2025,6 @@ string Expr::rpn_to_string() const {
     }
     return output;
 }
-
-//@@.h
-
-//-----------------------------------------------------------------------------
-// Symbol table
-//-----------------------------------------------------------------------------
-
-enum class SymType {
-    GLOBAL_DEFINE,
-    CONSTANT,
-    ADDRESS,
-    EXPRESSION,
-};
-
-class Symbol {
-public:
-    Symbol(const string& name);
-    Symbol(const Symbol& other) = delete;
-    virtual ~Symbol();
-    Symbol& operator=(const Symbol& other) = delete;
-
-    const string& get_name() const { return m_name; }
-    SymType get_sym_type() const { return m_sym_type; }
-    int get_value() const { return m_value; }
-    const Expr* get_expr() const { return m_expr; }
-
-    void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
-    void set_value(int value) { m_value = value; }
-    void set_expr(Expr* expr);
-
-private:
-    const string m_name;        // symbol name
-    SymType m_sym_type{ SymType::CONSTANT };
-    int m_value{ 0 };           // constant or address offset
-    Expr* m_expr{ nullptr };    // expression
-};
-
-class Symtab {
-public:
-    Symtab() {}
-    Symtab(const Symtab& other) = delete;
-    virtual ~Symtab();
-    Symtab& operator=(const Symtab& other) = delete;
-
-    void clear();
-    Symbol* get_symbol(const string& name); // nullptr if not found
-    bool add_symbol(const string& name, Symbol* symbol);
-
-private:
-    unordered_map<string, Symbol*> m_table;
-};
-
-//@@.cpp
-
-//-----------------------------------------------------------------------------
-// Symbol table
-//-----------------------------------------------------------------------------
 
 Symbol::Symbol(const string& name)
     : m_name(name) {
@@ -1830,32 +2070,131 @@ bool Symtab::add_symbol(const string& name, Symbol* symbol) {
     }
 }
 
+bool Symtab::eval(int asmpc, const string& name, int& result) {
+    result = 0;
+    Symbol* symbol = get_symbol(name);
+    if (!symbol) {
+        g_error.error_undefined_symbol(name);
+        return false;
+    }
+    else if (symbol->is_in_eval()) {
+        g_error.error_recursive_evaluation(name);
+        return false;
+    }
+    else {
+        bool ok = true;
+        symbol->set_in_eval();
+        switch (symbol->get_sym_type()) {
+        case SymType::GLOBAL_DEFINE:
+        case SymType::CONSTANT:
+        case SymType::ADDRESS:
+            result = symbol->get_value();
+            break;
+
+        case SymType::EXPRESSION:
+            ok = symbol->get_expr()->eval(asmpc, this, result);
+            break;
+
+        default:
+            assert(0);
+        }
+        symbol->clear_in_eval();
+        return ok;
+    }
+
+}
+
+//@@.h
+
+//-----------------------------------------------------------------------------
+// Patch
+//-----------------------------------------------------------------------------
+
+enum class PatchType {
+    JR,
+    N,
+    NN,
+};
+
+class Patch {
+public:
+    Patch(Expr* expr, int offset, PatchType patch_type);
+    Patch(const Patch& other) = delete;
+    virtual ~Patch();
+    Patch& operator=(const Patch& other) = delete;
+
+    Expr* get_expr() { return m_expr; }
+    int get_offset() const { return m_offset; }
+    PatchType get_patch_type() const { return m_patch_type; }
+    int size() const;
+
+private:
+    Expr* m_expr;
+    int m_offset;
+    PatchType m_patch_type;
+};
+
+//@@.cpp
+
+//-----------------------------------------------------------------------------
+// Patch
+//-----------------------------------------------------------------------------
+
+Patch::Patch(Expr* expr, int offset, PatchType patch_type)
+    : m_expr(expr), m_offset(offset), m_patch_type(patch_type) {}
+
+Patch::~Patch() {
+    delete m_expr;
+}
+
+int Patch::size() const {
+    switch (m_patch_type) {
+    case PatchType::JR:
+    case PatchType::N:
+        return 1;
+    case PatchType::NN:
+        return 2;
+    default:
+        assert(0);
+        return 0;
+    }
+}
+
 //@@.h
 
 //-----------------------------------------------------------------------------
 // Object Module
 //-----------------------------------------------------------------------------
 
-class ObjectModule {
+class ObjModule {
 public:
-    ObjectModule() {}
-    virtual ~ObjectModule();
+    ObjModule() {}
+    ObjModule(const ObjModule& other) = delete;
+    virtual ~ObjModule();
+    ObjModule& operator=(const ObjModule& other) = delete;
+
+    int get_asmpc() const { return m_asmpc; }
+    int get_offset() const { return static_cast<int>(m_code.size()); }
 
     void clear();
-    void add_constant(const string& name, int value) { (void)name; (void)value; }
-    void add_label(const string& name) { (void)name; }
+    void next_opcode();
+    void add_constant(const string& name, Expr* expr);
+    void add_label(const string& name);
     void set_assume(int value) { m_assume = value; }
-    void add_opcode_void(long long opcode) { (void)opcode; }
-    void add_opcode_jr(long long opcode, int value) { (void)opcode; (void)value; }
-    void add_opcode_n(long long opcode, int value) { (void)opcode; (void)value; }
-    void add_opcode_nn(long long opcode, int value) { (void)opcode; (void)value; }
+    void add_opcode_void(long long opcode);
+    void add_opcode_jr(long long opcode, Expr* expr);
+    void add_opcode_n(long long opcode, Expr* expr);
+    void add_opcode_nn(long long opcode, Expr* expr);
 
 private:
-    unordered_map<string, Expr*> m_symbols;
+    Symtab m_symtab;
+    vector<unsigned char> m_code;
+    vector<Patch*> m_patches;
+    int m_asmpc{ 0 };
     int m_assume{ 0 };
 };
 
-extern ObjectModule g_object_module;
+extern ObjModule g_obj_module;
 
 //@@.cpp
 
@@ -1863,18 +2202,109 @@ extern ObjectModule g_object_module;
 // Object Module
 //-----------------------------------------------------------------------------
 
-ObjectModule g_object_module;
+ObjModule g_obj_module;
 
-ObjectModule::~ObjectModule() {
+ObjModule::~ObjModule() {
     clear();
 }
 
-void ObjectModule::clear() {
-    for (auto& it : m_symbols) {
-        delete it.second;
-    }
-    m_symbols.clear();
+void ObjModule::clear() {
+    m_symtab.clear();
+    m_code.clear();
+    for (auto& patch : m_patches)
+        delete patch;
+    m_patches.clear();
+    m_asmpc = get_offset();
     m_assume = 0;
+}
+
+void ObjModule::next_opcode() {
+    m_asmpc = get_offset();
+}
+
+void ObjModule::add_constant(const string& name, Expr* expr) {
+    if (m_symtab.get_symbol(name)) {
+        g_error.error_duplicate_definition(name);
+        delete expr;
+    }
+    else {
+        auto symbol = new Symbol(name);
+        symbol->set_sym_type(SymType::CONSTANT);
+        symbol->set_expr(expr);
+        m_symtab.add_symbol(name, symbol);
+    }
+}
+
+void ObjModule::add_label(const string& name) {
+    if (m_symtab.get_symbol(name)) {
+        g_error.error_duplicate_definition(name);
+    }
+    else {
+        auto expr = new Expr;
+        bool ok = expr->parse(std::to_string(m_asmpc));
+        assert(ok);
+        auto symbol = new Symbol(name);
+        symbol->set_sym_type(SymType::ADDRESS);
+        symbol->set_expr(expr);
+        m_symtab.add_symbol(name, symbol);
+    }
+}
+
+void ObjModule::add_opcode_void(long long opcode) {
+    bool out = false;
+    if (out || (opcode & 0xFF00000000000000LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 56) & 0xFF);
+    }
+    if (out || (opcode & 0x00FF000000000000LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 48) & 0xFF);
+    }
+    if (out || (opcode & 0x0000FF0000000000LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 40) & 0xFF);
+    }
+    if (out || (opcode & 0x000000FF00000000LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 32) & 0xFF);
+    }
+    if (out || (opcode & 0x00000000FF000000LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 24) & 0xFF);
+    }
+    if (out || (opcode & 0x0000000000FF0000LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 16) & 0xFF);
+    }
+    if (out || (opcode & 0x000000000000FF00LL) != 0) {
+        out = true;
+        m_code.push_back((opcode >> 8) & 0xFF);
+    }
+    m_code.push_back(opcode & 0xFF);
+}
+
+void ObjModule::add_opcode_jr(long long opcode, Expr* expr) {
+    add_opcode_void(opcode);
+    auto patch = new Patch(expr, get_offset(), PatchType::JR);
+    for (int i = 0; i < patch->size(); ++i)
+        add_opcode_void(0);
+    m_patches.push_back(patch);
+}
+
+void ObjModule::add_opcode_n(long long opcode, Expr* expr) {
+    add_opcode_void(opcode);
+    auto patch = new Patch(expr, get_offset(), PatchType::N);
+    for (int i = 0; i < patch->size(); ++i)
+        add_opcode_void(0);
+    m_patches.push_back(patch);
+}
+
+void ObjModule::add_opcode_nn(long long opcode, Expr* expr) {
+    add_opcode_void(opcode);
+    auto patch = new Patch(expr, get_offset(), PatchType::NN);
+    for (int i = 0; i < patch->size(); ++i)
+        add_opcode_void(0);
+    m_patches.push_back(patch);
 }
 
 //@@.h
@@ -1888,12 +2318,19 @@ public:
     bool parse(const string& line);
 
 private:
-    Scanner m_line;         // tokens from the current line
+    struct Elem {
+        Token token;
+        Expr* expr{ nullptr };
+        int expr_value;
+    };
+
+    Scanner m_in;           // input tokens
+    vector<Elem> m_elems;   // synthatic elements
 
     //@@BEGIN:actions_decl
     void action_ident_colon();
     void action_ident_equ_expr();
-    void action_assume_expr();
+    void action_assume_const_expr();
     void action_nop();
     void action_jr_expr();
     void action_jr_nz_comma_expr();
@@ -1922,18 +2359,18 @@ private:
 		},
 		{ /* 1: ASSUME */
 		  { },
-		  { {TType::EXPR, 2}, },
+		  { {TType::CONST_EXPR, 2}, },
 		  nullptr,
 		},
-		{ /* 2: ASSUME EXPR */
+		{ /* 2: ASSUME CONST_EXPR */
 		  { },
 		  { {TType::END, 3}, },
 		  nullptr,
 		},
-		{ /* 3: ASSUME EXPR END */
+		{ /* 3: ASSUME CONST_EXPR END */
 		  { },
 		  { },
-		  &LineParser::action_assume_expr,
+		  &LineParser::action_assume_const_expr,
 		},
 		{ /* 4: IDENT */
 		  { {Keyword::EQU, 7}, },
@@ -2146,16 +2583,16 @@ private:
 //-----------------------------------------------------------------------------
 
 bool LineParser::parse(const string& line) {
-    if (!m_line.scan(line))
+    if (!m_in.scan(line))
         return false;       // scanning failed
 
-    if (m_line.peek().is(TType::END))
+    if (m_in.peek().is(TType::END))
         return true;        // empty line
 
 
     int state = 0;
     while (true) {
-        Token& token = m_line.peek();
+        Token& token = m_in.peek();
         if (token.is(TType::END)) {
             break;  // end of line
         }
@@ -2175,6 +2612,7 @@ bool LineParser::parse(const string& line) {
             return false;
         }
         if (current_state.action) {
+            g_obj_module.next_opcode();
             (this->*current_state.action)();
         }
     }
@@ -2184,79 +2622,79 @@ bool LineParser::parse(const string& line) {
 
 //@@BEGIN:actions_impl
 void LineParser::action_ident_colon() {
-	g_object_module.add_label(m_line[1].get_svalue());
+	g_obj_module.add_label(m_elems[1].token.get_svalue());
 
 
 }
 
 void LineParser::action_ident_equ_expr() {
-	g_object_module.add_constant(m_line[1].get_svalue(), m_line[3].get_ivalue());
+	g_obj_module.add_constant(m_elems[1].token.get_svalue(), m_elems[3].expr);
 
 
 }
 
-void LineParser::action_assume_expr() {
-	g_object_module.set_assume(m_line[2].get_ivalue());
+void LineParser::action_assume_const_expr() {
+	g_obj_module.set_assume(m_elems[2].expr_value);
 
 
 }
 
 void LineParser::action_nop() {
-	g_object_module.add_opcode_void(0x00);
+	g_obj_module.add_opcode_void(0x00);
 
 
 }
 
 void LineParser::action_jr_expr() {
-	g_object_module.add_opcode_jr(0x18, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_jr(0x18, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_jr_nz_comma_expr() {
-	g_object_module.add_opcode_jr(0x20, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_jr(0x20, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_jr_z_comma_expr() {
-	g_object_module.add_opcode_jr(0x28, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_jr(0x28, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_jr_nc_comma_expr() {
-	g_object_module.add_opcode_jr(0x30, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_jr(0x30, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_jr_c_comma_expr() {
-	g_object_module.add_opcode_jr(0x38, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_jr(0x38, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_ld_a_comma_expr() {
-	g_object_module.add_opcode_n(0x3E, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_n(0x3E, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_ld_a_comma_lparen_expr_rparen() {
-	g_object_module.add_opcode_nn(0x3A, m_line[4].get_ivalue());
+	g_obj_module.add_opcode_nn(0x3A, m_elems[4].expr);
 
 
 }
 
 void LineParser::action_ld_a_comma_a() {
-	g_object_module.add_opcode_void(0x7F);
+	g_obj_module.add_opcode_void(0x7F);
 
 
 }
 
 void LineParser::action_ld_a_comma_b() {
-	g_object_module.add_opcode_void(0x78);
+	g_obj_module.add_opcode_void(0x78);
 
 }
 
@@ -2270,7 +2708,7 @@ void LineParser::action_ld_a_comma_b() {
 
 void parse_file(const string& filename) {
     g_preproc.clear();
-    g_object_module.clear();
+    g_obj_module.clear();
 
     g_input_files.push_file(filename);
 	string line;
