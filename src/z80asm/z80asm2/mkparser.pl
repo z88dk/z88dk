@@ -379,7 +379,7 @@ sub action_funcname {
 sub action_function {
     my($text) = @_;
     for ($text) {
-        s/\$(\d+)/m_line[$1]/g; # replace $1, $2, ... with m_line[1], m_line[2], ...
+        s/\$(\d+)/m_elems[$1]/g;
     }
     return $text;
 }
