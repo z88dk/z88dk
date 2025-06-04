@@ -20,6 +20,10 @@ OPT			?= -O3
 
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(SRCS:.cpp=.o)
+TEMPLATECPP	= ttype.cpp keyword.cpp operator.cpp $(PROJ).cpp 
+TEMPLATEH	= ttype.h   keyword.h   operator.h
+DEPENDS		= $(SRCS:.cpp=.d)
+
 
 all: $(PROJ)$(EXESUFFIX)
 
@@ -29,11 +33,22 @@ $(PROJ)$(EXESUFFIX): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXX_FLAGS) -c -o $@ $<
 
-$(PROJ).o: $(PROJ).pp
+$(TEMPLATECPP:.cpp=.o): $(PROJ).pp
+$(TEMPLATEH:.h=.o):     $(PROJ).pp
 
-$(PROJ).pp: $(PROJ).cpp mkparser.pl parser.y Makefile
-	perl mkparser.pl $(PROJ).cpp parser.y
+$(PROJ).pp: $(TEMPLATECPP) $(TEMPLATEH) $(PROJ).y mkparser.pl Makefile
+	perl mkparser.pl $(PROJ).y $(TEMPLATECPP) $(TEMPLATEH)
 	touch $(PROJ).pp
+
+$(PROJ).y: directives.y opcodes.y
+	cat directives.y opcodes.y > $(PROJ).y
+	dos2unix $(PROJ).y
 
 test: $(PROJ)$(EXESUFFIX)
 	./$(PROJ)$(EXESUFFIX) test.asm
+
+clean::
+	$(RM) $(PROJ)$(EXESUFFIX) $(OBJS) $(PROJ).pp $(PROJ).y $(wildcard *.bak) $(DEPENDS)
+
+# Dependencies
+-include $(DEPENDS)
