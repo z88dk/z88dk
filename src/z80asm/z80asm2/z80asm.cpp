@@ -231,6 +231,7 @@ public:
     void error_division_by_zero() { error("division by zero"); }
     void error_recursive_evaluation(const string& name) { error("recursive evaluation", name); }
     void error_duplicate_definition(const string& name) { error("duplicate definition", name); }
+    void error_syntax() { error("syntax error"); }
 
 private:
 	int m_count{ 0 };
@@ -1164,6 +1165,8 @@ void Scanner::rewind() {
 
 void Scanner::next(int num) {
 	m_pos += num;
+    if (m_pos > static_cast<int>(m_tokens.size()))
+        m_pos = static_cast<int>(m_tokens.size());
 }
 
 Token& Scanner::peek(int offset) {
@@ -1508,6 +1511,8 @@ public:
     string to_string() const;
     string rpn_to_string() const;
 
+    Expr* clone();
+
 private:
     vector<Token> m_infix;
     vector<Token> m_postfix;
@@ -1779,7 +1784,7 @@ bool Expr::parse(Scanner& in) {
     
     if (to_RPN(in)) {
         // copy infix tokens
-        for (int i = 0; i < in.get_pos(); ++i)
+        for (int i = pos0; i < in.get_pos(); ++i)
             m_infix.push_back(in[i]);
         return true;
     }
@@ -2026,13 +2031,20 @@ string Expr::rpn_to_string() const {
     return output;
 }
 
+Expr* Expr::clone() {
+    auto new_expr = new Expr;
+    new_expr->m_infix = m_infix;
+    new_expr->m_postfix = m_postfix;
+    new_expr->m_status = m_status;
+    return new_expr;
+}
+
 Symbol::Symbol(const string& name)
     : m_name(name) {
 }
 
 Symbol::~Symbol() {
-    if (m_expr)
-        delete m_expr;
+    delete m_expr;
 }
 
 void Symbol::set_expr(Expr* expr) {
@@ -2173,6 +2185,7 @@ public:
     virtual ~ObjModule();
     ObjModule& operator=(const ObjModule& other) = delete;
 
+    Symtab* get_symtab() { return &m_symtab; }
     int get_asmpc() const { return m_asmpc; }
     int get_offset() const { return static_cast<int>(m_code.size()); }
 
@@ -2321,11 +2334,49 @@ private:
     struct Elem {
         Token token;
         Expr* expr{ nullptr };
-        int expr_value;
+        int expr_value{ 0 };
+
+        Elem() {}
+        Elem(const Elem& other)
+            : token(other.token), expr(other.expr ? other.expr->clone() : nullptr), expr_value(other.expr_value) {}
+        Elem& operator=(const Elem& other) {
+            if (&other != this) {
+                token = other.token;
+                expr = other.expr->clone();
+                expr_value = other.expr_value;
+            }
+            return *this;
+        }
+        virtual ~Elem() {
+            delete expr;
+        }
     };
 
-    Scanner m_in;           // input tokens
-    vector<Elem> m_elems;   // synthatic elements
+    struct Elems {
+        vector<Elem> elems;
+
+        Elems() {};
+        Elems(const Elems& other) {
+            elems.insert(elems.end(), other.elems.begin(), other.elems.end());
+        }
+        Elems& operator = (const Elems& other) {
+            if (&other != this)
+                elems.insert(elems.end(), other.elems.begin(), other.elems.end());
+            return *this;
+        }
+        virtual ~Elems() {
+            elems.clear();
+        }
+    };
+
+    Scanner m_in;   // input tokens
+    Elems m_elems;  // synthatic elements
+
+    struct ParseQueueElem {
+        int state{ 0 };
+        int in_pos{ 0 };
+        Elems elems;
+    };
 
     //@@BEGIN:actions_decl
     void action_ident_colon();
@@ -2589,52 +2640,134 @@ bool LineParser::parse(const string& line) {
     if (m_in.peek().is(TType::END))
         return true;        // empty line
 
+    vector<ParseQueueElem> parse_queue;
 
-    int state = 0;
-    while (true) {
-        Token& token = m_in.peek();
-        if (token.is(TType::END)) {
-            break;  // end of line
-        }
-        if (state < 0 || state >= static_cast<int>(std::size(m_states))) {
-            //g_error.error_invalid_state(state);
-            return false;
-        }
-        auto& current_state = m_states[state];
-        if (current_state.keyword_next.count(token.get_keyword()) > 0) {
-            state = current_state.keyword_next[token.get_keyword()];
-        }
-        else if (current_state.ttype_next.count(token.get_ttype()) > 0) {
-            state = current_state.ttype_next[token.get_ttype()];
-        }
-        else {
-            //g_error.error_invalid_token(token.to_string());
-            return false;
-        }
+    // add initial state
+    ParseQueueElem queue_elem;
+    queue_elem.state = 0;
+    queue_elem.in_pos = m_in.get_pos();
+    parse_queue.push_back(queue_elem);
+
+    // check all possible paths
+    bool parse_ok = false;
+    while (!parse_queue.empty()) {
+        ParseQueueElem queue_elem = parse_queue.back();
+        parse_queue.pop_back();
+        auto& current_state = m_states[queue_elem.state];
+
+        // check if at final state
         if (current_state.action) {
             g_obj_module.next_opcode();
+            m_elems = queue_elem.elems; // setup data for function call
             (this->*current_state.action)();
+            parse_ok = true;
+            break;
+        }
+
+        // check CONST_EXPR
+        m_in.set_pos(queue_elem.in_pos);
+        auto it = current_state.ttype_next.find(TType::CONST_EXPR);
+        if (it != current_state.ttype_next.end()) {
+            Elem elem;
+            elem.expr = new Expr;
+            bool ok = elem.expr->parse(m_in);
+            if (!ok) {
+                delete elem.expr;
+                elem.expr = nullptr;
+            }
+            else {
+                bool ok = elem.expr->eval(g_obj_module.get_asmpc(), g_obj_module.get_symtab(), elem.expr_value);
+                if (!ok) {
+                    delete elem.expr;
+                    elem.expr = nullptr;
+                }
+                else {
+                    auto new_state = queue_elem;
+                    new_state.state = it->second;
+                    new_state.in_pos = m_in.get_pos();
+                    new_state.elems.elems.push_back(elem);
+                    parse_queue.push_back(new_state);
+                }
+            }
+        }
+
+        // check EXPR
+        m_in.set_pos(queue_elem.in_pos);
+        it = current_state.ttype_next.find(TType::EXPR);
+        if (it != current_state.ttype_next.end()) {
+            Elem elem;
+            elem.token = Token{ TType::EXPR, false };
+            elem.expr = new Expr;
+            bool ok = elem.expr->parse(m_in);
+            if (!ok) {
+                delete elem.expr;
+                elem.expr = nullptr;
+            }
+            else {
+                auto new_state = queue_elem;
+                new_state.state = it->second;
+                new_state.in_pos = m_in.get_pos();
+                new_state.elems.elems.push_back(elem);
+                parse_queue.push_back(new_state);
+            }
+        }
+
+        // check token
+        m_in.set_pos(queue_elem.in_pos);
+        TType ttype = m_in.peek().get_ttype();
+        it = current_state.ttype_next.find(ttype);
+        if (it != current_state.ttype_next.end()) {
+            Elem elem;
+            elem.token = m_in.peek();
+            m_in.next();
+
+            auto new_state = queue_elem;
+            new_state.state = it->second;
+            new_state.in_pos = m_in.get_pos();
+            new_state.elems.elems.push_back(elem);
+            parse_queue.push_back(new_state);
+        }
+
+        // check keyword
+        m_in.set_pos(queue_elem.in_pos);
+        Keyword keyword = m_in.peek().get_keyword();
+        if (keyword != Keyword::NONE) {
+            auto it = current_state.keyword_next.find(keyword);
+            if (it != current_state.keyword_next.end()) {
+                Elem elem;
+                elem.token = m_in.peek();
+                m_in.next();
+
+                auto new_state = queue_elem;
+                new_state.state = it->second;
+                new_state.in_pos = m_in.get_pos();
+                new_state.elems.elems.push_back(elem);
+                parse_queue.push_back(new_state);
+            }
         }
     }
 
-    return true;
+    if (!parse_ok)
+        g_error.error_syntax();
+
+    return parse_ok;
 }
 
 //@@BEGIN:actions_impl
 void LineParser::action_ident_colon() {
-	g_obj_module.add_label(m_elems[1].token.get_svalue());
+	g_obj_module.add_label(m_elems.elems[1-1].token.get_svalue());
 
 
 }
 
 void LineParser::action_ident_equ_expr() {
-	g_obj_module.add_constant(m_elems[1].token.get_svalue(), m_elems[3].expr);
+	g_obj_module.add_constant(m_elems.elems[1-1].token.get_svalue(), m_elems.elems[3-1].expr->clone());
 
 
 }
 
 void LineParser::action_assume_const_expr() {
-	g_obj_module.set_assume(m_elems[2].expr_value);
+	g_obj_module.set_assume(m_elems.elems[2-1].expr_value);
 
 
 }
@@ -2646,43 +2779,43 @@ void LineParser::action_nop() {
 }
 
 void LineParser::action_jr_expr() {
-	g_obj_module.add_opcode_jr(0x18, m_elems[4].expr);
+	g_obj_module.add_opcode_jr(0x18, m_elems.elems[4-1].expr->clone());
 
 
 }
 
 void LineParser::action_jr_nz_comma_expr() {
-	g_obj_module.add_opcode_jr(0x20, m_elems[4].expr);
+	g_obj_module.add_opcode_jr(0x20, m_elems.elems[4-1].expr->clone());
 
 
 }
 
 void LineParser::action_jr_z_comma_expr() {
-	g_obj_module.add_opcode_jr(0x28, m_elems[4].expr);
+	g_obj_module.add_opcode_jr(0x28, m_elems.elems[4-1].expr->clone());
 
 
 }
 
 void LineParser::action_jr_nc_comma_expr() {
-	g_obj_module.add_opcode_jr(0x30, m_elems[4].expr);
+	g_obj_module.add_opcode_jr(0x30, m_elems.elems[4-1].expr->clone());
 
 
 }
 
 void LineParser::action_jr_c_comma_expr() {
-	g_obj_module.add_opcode_jr(0x38, m_elems[4].expr);
+	g_obj_module.add_opcode_jr(0x38, m_elems.elems[4-1].expr->clone());
 
 
 }
 
 void LineParser::action_ld_a_comma_expr() {
-	g_obj_module.add_opcode_n(0x3E, m_elems[4].expr);
+	g_obj_module.add_opcode_n(0x3E, m_elems.elems[4-1].expr->clone());
 
 
 }
 
 void LineParser::action_ld_a_comma_lparen_expr_rparen() {
-	g_obj_module.add_opcode_nn(0x3A, m_elems[4].expr);
+	g_obj_module.add_opcode_nn(0x3A, m_elems.elems[4-1].expr->clone());
 
 
 }
