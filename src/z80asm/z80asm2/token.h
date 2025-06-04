@@ -7,11 +7,66 @@
 
 #pragma once
 
-#include "keyword.h"
 #include "operator.h"
-#include "ttype.h"
 #include <string>
 using namespace std;
+
+enum class TType {
+    //@@BEGIN: ttype
+    END,
+    ASMPC,
+    BACKSLASH,
+    COLON,
+    COMMA,
+    CONST_EXPR,
+    DHASH,
+    DOT,
+    EXPR,
+    FLOAT,
+    HASH,
+    IDENT,
+    INT,
+    LBRACE,
+    LPAREN,
+    LSQUARE,
+    NEWLINE,
+    OPERATOR,
+    QUEST,
+    RAW_STR,
+    RBRACE,
+    RPAREN,
+    RSQUARE,
+    STR,
+    //@@END
+};
+
+string to_string(TType ttype);
+
+enum class Keyword {
+    //@@BEGIN: keyword
+    NONE,
+    A,
+    ASMPC,
+    ASSUME,
+    B,
+    BINARY,
+    C,
+    C_LINE,
+    EQU,
+    INCBIN,
+    INCLUDE,
+    JR,
+    LD,
+    LINE,
+    NC,
+    NOP,
+    NZ,
+    Z,
+    //@@END
+};
+
+string to_string(Keyword keyword);
+Keyword lookup_keyword(const string& text);
 
 class Token {
 public:
