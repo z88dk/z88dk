@@ -107,14 +107,16 @@ my %keywords = (
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
-@ARGV==2 or die "Usage: ",path($0)->basename," template.cpp grammar.y\n";
-my($template_file, $grammar_file) = @ARGV;
+@ARGV>2 or die "Usage: ",path($0)->basename," grammar.y files.cpp...\n";
+my($grammar_file, @source_files) = @ARGV;
 
 my $grammar;
 
 parse_grammar($grammar_file);
 make_state_machine();
-patch_file($template_file, path($grammar_file)->basename(".y"));
+for my $file (@source_files) {
+	patch_file($file);
+}
 
 #dump $grammar;
 
@@ -185,8 +187,8 @@ sub parse_grammar_rule {
 # patch the file with grammar
 #-------------------------------------------------------------------------------
 sub patch_file {
-	my($template, $base_output) = @_;
-	my @in = path($template)->lines;
+	my($file) = @_;
+	my @in = path($file)->lines;
 	my @in0 = @in;
 	my @out;
 	
@@ -357,8 +359,9 @@ sub patch_file {
 	# change template if needed
 	my $ac = Array::Compare->new;
 	if (!$ac->compare(\@in0, \@out)) {
-		copy($template, "$template.bak") or die "copy to $template.bak failed\n";
-		path($template)->spew(@out);
+		copy($file, "$file.bak") or die "copy to $file.bak failed\n";
+		path($file)->spew(@out);
+		system("dos2unix", $file)==0 or die "dos2unix failed: $!";
 	}
 }
 
