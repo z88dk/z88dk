@@ -129,13 +129,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\error.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\input_files.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\keyword.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\operator.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\scanner.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\token.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\ttype.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm\z80asm2\directives.y" />
     <None Include="..\..\src\z80asm\z80asm2\mkparser.pl" />
-    <None Include="..\..\src\z80asm\z80asm2\parser.y" />
+    <None Include="..\..\src\z80asm\z80asm2\opcodes.y" />
     <None Include="..\..\src\z80asm\z80asm2\test.asm" />
     <None Include="..\..\src\z80asm\z80asm2\test.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\error.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\input_files.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\keyword.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\operator.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\scanner.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\token.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\ttype.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

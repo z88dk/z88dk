@@ -1,14 +1,3 @@
-// Parser
-
-IDENT ":"
-	g_obj_module.add_label($1.token.get_svalue());
-
-IDENT "equ" EXPR
-	g_obj_module.add_constant($1.token.get_svalue(), $3.expr->clone());
-
-"assume" CONST_EXPR
-	g_obj_module.set_assume($2.expr_value);
-
 "nop"
 	g_obj_module.add_opcode_void(0x00);
 
