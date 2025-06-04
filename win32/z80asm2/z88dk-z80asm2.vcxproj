@@ -130,14 +130,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\error.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\input_files.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\keyword.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\operator.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scanner.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\symbol.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\token.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\ttype.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
@@ -150,14 +150,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\error.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\input_files.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\keyword.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\operator.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\scanner.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\symbol.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\token.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\ttype.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

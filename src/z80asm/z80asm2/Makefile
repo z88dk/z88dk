@@ -20,8 +20,8 @@ OPT			?= -O3
 
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(SRCS:.cpp=.o)
-TEMPLATECPP	= ttype.cpp keyword.cpp operator.cpp $(PROJ).cpp 
-TEMPLATEH	= ttype.h   keyword.h   operator.h
+TEMPLATECPP	= token.cpp operator.cpp $(PROJ).cpp 
+TEMPLATEH	= token.h   operator.h
 DEPENDS		= $(SRCS:.cpp=.d)
 
 
