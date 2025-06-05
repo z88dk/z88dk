@@ -433,12 +433,12 @@ bool Expr::eval(int asmpc, Symtab* symtab, int& result) {
                 break;
 
             default:
-                assert(0);
+                assert(false && "Unknown operator");
             }
             break;
 
         default:
-            assert(0);
+            assert(false && "Unknown token type");
         }
     }
 

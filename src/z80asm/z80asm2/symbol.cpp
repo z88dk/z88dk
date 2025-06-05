@@ -82,7 +82,7 @@ bool Symtab::eval(int asmpc, const string& name, int& result) {
             break;
 
         default:
-            assert(0);
+            assert(false && "Unknown symbol type");
         }
         symbol->clear_in_eval();
         return ok;

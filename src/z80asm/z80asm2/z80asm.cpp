@@ -32,64 +32,6 @@
 #include <vector>
 using namespace std;
 
-//@@.h
-
-//-----------------------------------------------------------------------------
-// Patch
-//-----------------------------------------------------------------------------
-
-enum class PatchType {
-    JR,
-    N,
-    NN,
-};
-
-class Patch {
-public:
-    Patch(Expr* expr, int offset, PatchType patch_type);
-    Patch(const Patch& other) = delete;
-    virtual ~Patch();
-    Patch& operator=(const Patch& other) = delete;
-
-    Expr* get_expr() { return m_expr; }
-    int get_offset() const { return m_offset; }
-    PatchType get_patch_type() const { return m_patch_type; }
-    int size() const;
-
-private:
-    Expr* m_expr;
-    int m_offset;
-    PatchType m_patch_type;
-};
-
-//@@.cpp
-
-//-----------------------------------------------------------------------------
-// Patch
-//-----------------------------------------------------------------------------
-
-Patch::Patch(Expr* expr, int offset, PatchType patch_type)
-    : m_expr(expr), m_offset(offset), m_patch_type(patch_type) {}
-
-Patch::~Patch() {
-    delete m_expr;
-}
-
-int Patch::size() const {
-    switch (m_patch_type) {
-    case PatchType::JR:
-    case PatchType::N:
-        return 1;
-    case PatchType::NN:
-        return 2;
-    default:
-        assert(0);
-        return 0;
-    }
-}
-
-//@@.h
-
 //-----------------------------------------------------------------------------
 // Object Module
 //-----------------------------------------------------------------------------
@@ -120,10 +62,8 @@ private:
     vector<unsigned char> m_code;
     vector<Patch*> m_patches;
     int m_asmpc{ 0 };
-    int m_assume{ 0 };
 };
 
-extern ObjModule g_obj_module;
 
 //@@.cpp
 
@@ -131,7 +71,6 @@ extern ObjModule g_obj_module;
 // Object Module
 //-----------------------------------------------------------------------------
 
-ObjModule g_obj_module;
 
 ObjModule::~ObjModule() {
     clear();
@@ -180,36 +119,6 @@ void ObjModule::add_label(const string& name) {
 }
 
 void ObjModule::add_opcode_void(long long opcode) {
-    bool out = false;
-    if (out || (opcode & 0xFF00000000000000LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 56) & 0xFF);
-    }
-    if (out || (opcode & 0x00FF000000000000LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 48) & 0xFF);
-    }
-    if (out || (opcode & 0x0000FF0000000000LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 40) & 0xFF);
-    }
-    if (out || (opcode & 0x000000FF00000000LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 32) & 0xFF);
-    }
-    if (out || (opcode & 0x00000000FF000000LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 24) & 0xFF);
-    }
-    if (out || (opcode & 0x0000000000FF0000LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 16) & 0xFF);
-    }
-    if (out || (opcode & 0x000000000000FF00LL) != 0) {
-        out = true;
-        m_code.push_back((opcode >> 8) & 0xFF);
-    }
-    m_code.push_back(opcode & 0xFF);
 }
 
 void ObjModule::add_opcode_jr(long long opcode, Expr* expr) {

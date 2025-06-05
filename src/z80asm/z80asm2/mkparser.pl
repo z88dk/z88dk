@@ -104,6 +104,13 @@ my %keywords = (
 	LINE => "line",
 );
 
+my %patches = (
+    NONE    => { size => 0 },
+    JR      => { size => 1 },
+    N       => { size => 1 },
+    NN      => { size => 2 },
+);
+
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
@@ -150,8 +157,12 @@ sub parse_grammar {
 		}
 	}
 	
-	$grammar = {tokens => \%tokens, keywords => \%keywords, operators => \%operators,
-				rules => \@rules, actions => \@actions};
+	$grammar = {tokens => \%tokens,
+                keywords => \%keywords,
+                operators => \%operators,
+                patches => \%patches, 
+				rules => \@rules,
+                actions => \@actions};
 }
 
 sub parse_grammar_rule {
@@ -287,7 +298,30 @@ sub patch_file {
 				shift @in;
 			}
 		}
-		elsif (/^(\s*)\/\/\@\@BEGIN:\s*actions_decl\b/) {
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			push @out, "${prefix}NONE,\n";		# NONE must be id 0
+			for (sort keys %{$grammar->{patches}}) {
+				next if $_ eq 'NONE';
+				push @out, "$prefix$_,\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+        }
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch_sizes\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort keys %{$grammar->{patches}}) {
+				next if $_ eq 'NONE';
+				push @out, $prefix."{ PatchType::".$_.", ".$grammar->{patches}{$_}{size}." },\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+        }
+        elsif (/^(\s*)\/\/\@\@BEGIN:\s*actions_decl\b/) {
 			my $prefix = $1;
 			push @out, $_;
 			for my $action_id (0 .. @{$grammar->{rules}} - 1) {
