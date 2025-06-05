@@ -51,7 +51,7 @@ string to_string(Operator op) {
 const OperatorInfo& OperatorTable::get_info(Operator op) {
     auto it = table.find(op);
     if (it == table.end())
-        assert(0); // Unknown operator
+        assert(false && "Unknown operator");
     return it->second;
 }
 
