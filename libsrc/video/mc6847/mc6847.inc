@@ -1,0 +1,47 @@
+
+; Macro file to help harmonise code
+
+
+IF FORphc25
+    defc    DISPLAY = $6000
+    INCLUDE "target/phc25/def/phc25.def"
+ENDIF
+
+IF FORsv8000
+    INCLUDE "target/sv8000/def/sv8000.def"
+ENDIF
+
+IF FORmc1000
+    INCLUDE "target/mc1000/def/mc1000.def"
+ENDIF
+
+IF FORvz
+    INCLUDE "target/vz/def/vz.def"
+ENDIF
+
+
+IF FORpc6001
+    INCLUDE "target/pc6001/def/pc6001.def"
+ENDIF
+
+
+; Default size of the text screen
+defc MC6847_CONSOLE_COLUMNS = 32
+defc MC6847_CONSOLE_ROWS = 16
+
+
+MACRO GETSCREENADDRESS
+    IF FORpc6001
+        ld      hl,(SYSVAR_screen-1)
+        ld      l,0
+        inc     h
+        inc     h
+    ELSE
+        ld      hl,DISPLAY
+    ENDIF
+ENDM
+
+
+
+
+
