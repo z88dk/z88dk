@@ -19,7 +19,13 @@
     defc    CLIB_GENCON_CAPS=CAPS_MODE0
 
         ; Text
-    defc    CAPS_MODE0=CAP_GENCON_INVERSE|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
+IF FORpc6001
+    defc    CAPS_MODE0 = CAP_GENCON_INVERSE|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
+ELIF FORvz
+    defc    CAPS_MODE0 = CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
+ELSE
+    defc    CAPS_MODE0 = 0
+ENDIF
         ; Hires
     defc    CAPS_MODE1=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS
         ; Colour
@@ -49,15 +55,21 @@ check_mode:
     jr      nz, failure
     ld      a, c                        ; The mode
     and     31
-    ld      e, 32                       ;columns
+    ld      e, MC6847_CONSOLE_COLUMNS   ;columns
     ld      h, MODE_0
     ld      d, CAPS_MODE0
-    ld      l, 16
+    ld      l, MC6847_CONSOLE_ROWS
     and     a
     jr      z, set_mode
     ld      h, MODE_1
     ld      d, CAPS_MODE1
+    ;; SV8000 has limited memory, so the the full 256x192 screen can't be used, instead we're left with
+    ;; 256x96
+IF FORsv8000
+    ld      l, $0c
+ELSE
     ld      l, 24
+ENDIF
     cp      1                           ;HIRES
     jr      z, set_mode
     ld      e, 16
@@ -84,7 +96,7 @@ not_css:
         ld      hl, dummy_return
         ld      ($f7), hl                   ; cursor flashing and positioning routine
     ELIF FORpc6001
-        ;; MC6947 registers are memory mapped as first byte
+        ;; MC6847 registers are memory mapped as first byte
         ld      hl,(SYSVAR_screen-1)
         ld      l,0
         ld      (hl),a
@@ -93,7 +105,7 @@ not_css:
     ELIF FORvz
         ld      ($783b), a                  ;SYS VAR
         ld      ($6800), a                  ;Latch
-    ELIF __SPC1000__
+    ELIF FORspc1000
         ld      bc, $2000
         out     (c), a
     ENDIF

@@ -51,6 +51,7 @@ generic_console_set_ink:
     rrca
     and     @11000000
     ld      (__mc6847_MODE2_attr), a
+IF FORpc6001
 set_css:
     ld      a, b
     rlca
@@ -61,6 +62,16 @@ set_css:
     and     @11111101
     or      c
     ld      (__mc6847_attr), a
+ELIF FORvz
+    ld      a, b
+    rlca
+    rlca
+    rlca
+    rlca
+    or      128
+    and     @11110000
+    ld      (__ink_colour), a
+ENDIF
     ret
 
 
@@ -71,7 +82,11 @@ generic_console_set_paper:
     rrca
     and     @11000000
     ld      (__mc6847_MODE2_attr+1), a
+IF FORpc6001
     jr      set_css
+ELSE
+    ret
+ENDIF
 
 generic_console_cls:
     GETSCREENADDRESS
@@ -97,7 +112,12 @@ IF FORmc1000
     ld      a,(__mc6847_mode)
     out     ($80), a
 ENDIF
+
+IF FORsv8000
+    ld      hl, 3071                    ;sv8000 has lower res screen
+ELSE
     ld      bc, 6143
+ENDIF
     ld      (hl), 0
     ldir
 IF FORmc1000
@@ -210,7 +230,15 @@ IF FORmc1000
     out     ($80),a
 ENDIF
     ex      af, af
+IF MODE0_CONVERT_CHARACTER
+    push    de
     call    generic_console_text_xypos
+    pop     de
+    rr      e
+    call    nc,convert_character
+ELSE
+    call    generic_console_text_xypos
+ENDIF
     ld      (hl), a
 IF FORpc6001
     dec     h
@@ -283,6 +311,8 @@ generic_console_scrollup_3:
     inc     hl
     djnz    generic_console_scrollup_3
     pop     hl                          ;Get screen back
+
+IF FORpc6001
     dec     h
     dec     h
     ld      d, h
@@ -296,6 +326,8 @@ generic_console_scrollup_4:
     ld      (hl), a
     inc     hl
     djnz    generic_console_scrollup_4
+ENDIF
+
 IF FORmc1000
     ex      af,af
     set     0,a
@@ -314,7 +346,11 @@ IF FORmc1000
 ENDIF
     ld      de,hl
     inc     h
+IF FORsv8000
+    ld      bc, 32*88
+ELSE
     ld      bc, 32*184
+ENDIF
     ldir
     ex      de, hl
     ld      b, 0
@@ -332,6 +368,32 @@ ENDIF
     pop     de
     ret
 
+
+IF FORmc1000
+convert_character:
+    ld      a, d
+    cp      97
+    jr      c, isupper
+    sub     32
+isupper:
+    and     @00111111
+    ld      d, a
+    ld      a, (generic_console_flags)
+    rlca
+    ret     nc
+    set     7, d
+    ret
+ENDIF
+
+IF FORvz
+convert_character:
+    cp      97
+    jr      c, isupper
+    sub     32
+isupper:
+    and     @00111111
+    ret
+ENDIF
 
 
     SECTION data_clib

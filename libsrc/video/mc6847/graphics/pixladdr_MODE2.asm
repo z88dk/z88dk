@@ -31,13 +31,13 @@ pixeladdress_MODE2:
     add     hl, de
     IF FORpc6001
         ld      de,(SYSVAR_screen-1)
+        inc     d
+        inc     d
         ld      e,0
     ELSE
         ld      de,DISPLAY
     ENDIF
     add     hl, de
-    inc     h
-    inc     h
     and     3
     xor     3
     ret

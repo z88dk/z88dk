@@ -1,0 +1,10 @@
+
+    defc DISPLAY = $7000
+
+; Check these values
+
+defc MODE_0 = 0
+
+defc MODE_1 = $0c
+
+defc MODE_2 = $0a

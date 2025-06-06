@@ -9,19 +9,23 @@ ENDIF
 
 IF FORsv8000
     INCLUDE "target/sv8000/def/sv8000.def"
+    defc MODE0_1x2 = 1
 ENDIF
 
 IF FORmc1000
     INCLUDE "target/mc1000/def/mc1000.def"
+    defc    MODE0_CONVERT_CHARACTER = 1
 ENDIF
 
 IF FORvz
     INCLUDE "target/vz/def/vz.def"
+    defc    MODE0_CONVERT_CHARACTER = 1
 ENDIF
 
 
 IF FORpc6001
     INCLUDE "target/pc6001/def/pc6001.def"
+    defc MODE0_3x2 = 1
 ENDIF
 
 

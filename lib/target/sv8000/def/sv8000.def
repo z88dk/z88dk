@@ -7,3 +7,6 @@
 	; gm1 = gm0 = $8
 	defc	MODE_0 = $00
 	defc	MODE_1 = $5a
+
+    ;; TODO CHECK
+    defc    MODE_2 = $5c

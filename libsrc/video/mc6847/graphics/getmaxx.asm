@@ -13,7 +13,13 @@ getmaxx:
 _getmaxx:
     ld      a, (__mc6847_mode)
     and     a
-    ld      hl, +63
+IF MODE0_3x2
+    ld      hl, 63
+ELIF MODE0_1x1
+    ld      hl, 31
+ELSE
+    ld      hl, 63
+ENDIF
     ret     z
     ld      hl, 255
     cp      MODE_1

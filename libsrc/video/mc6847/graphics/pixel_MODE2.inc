@@ -13,7 +13,11 @@
     cp      128
     ret     nc
     ld      a, l
+IF FORsv8000
+    cp      96
+ELSE
     cp      192
+ENDIF
     ret     nc
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value
