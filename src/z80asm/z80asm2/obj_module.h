@@ -85,15 +85,20 @@ public:
     Section& operator=(const Section& other) = delete;
 
     const string& get_name() const { return m_name; }
-    int get_asmpc() const { return m_asmpc; }
-    void set_asmpc(int asmpc) { m_asmpc = asmpc; }
 
-    void add_instruction(Instruction* instruction) { m_instructions.push_back(instruction); }
+    int get_origin() const { return m_origin; }
+    void set_origin(int origin) { m_origin = origin; }
+
+    int get_asmpc() const;
+    int get_size() const;
+
+    void add_instruction();
+    Instruction* get_cur_instruction();
     list<Instruction*>& get_instructions() { return m_instructions; }
 
 private:
     string m_name;
-    int m_asmpc{ 0 };
+    int m_origin{ 0 };
     list<Instruction*> m_instructions;
 };
 
@@ -108,7 +113,10 @@ public:
     void clear();
 
     Symtab* get_symtab() { return &m_symtab; }
-    void next_opcode();
+
+    Section* get_cur_section() { return m_cur_section; }
+    void set_cur_section(const string& name);
+
     void add_constant(const string& name, Expr* expr);
     void add_label(const string& name);
     void set_assume(int value) { m_assume = value; }
