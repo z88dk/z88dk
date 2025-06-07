@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "error.h"
 #include "expr.h"
 #include "obj_module.h"
 #include <cassert>
@@ -68,11 +69,88 @@ void Instruction::add_patch(Patch* patch) {
 
 Section::Section(const string& name)
     : m_name(name) {
+    add_instruction(); // start with an empty instruction
 }
 
 Section::~Section() {
     for (auto& instr : m_instructions)
         delete instr;
     m_instructions.clear();
+}
+
+int Section::get_asmpc() const {
+    if (m_instructions.empty())
+        return 0;
+    else
+        return m_instructions.back()->get_offset();
+}
+
+int Section::get_size() const {
+    if (m_instructions.empty())
+        return 0;
+    else
+        return m_instructions.back()->get_offset() +
+        m_instructions.back()->size();
+}
+
+void Section::add_instruction() {
+    m_instructions.push_back(new Instruction());
+    m_instructions.back()->set_offset(get_size());
+}
+
+Instruction* Section::get_cur_instruction() {
+    if (m_instructions.empty())
+        return nullptr;
+    else
+        return m_instructions.back();
+}
+
+ObjModule::ObjModule() {
+    set_cur_section(""); // default section
+}
+
+ObjModule::~ObjModule() {
+    clear();
+}
+
+void ObjModule::clear() {
+    m_symtab.clear();
+    for (auto& section : m_sections) {
+        delete section;
+    }
+    m_sections.clear();
+    set_cur_section(""); // reset to default section
+    m_assume = 0;
+}
+
+void ObjModule::set_cur_section(const string& name) {
+    if (m_cur_section && m_cur_section->get_name() == name) {
+        return; // already set
+    }
+
+    // Find existing section or create a new one
+    for (auto& section : m_sections) {
+        if (section->get_name() == name) {
+            m_cur_section = section;
+            return;
+        }
+    }
+
+    // Create a new section if not found
+    m_cur_section = new Section(name);
+    m_sections.push_back(m_cur_section);
+}
+
+void ObjModule::add_constant(const string& name, Expr* expr) {
+    if (m_symtab.get_symbol(name)) {
+        g_error.error_duplicate_definition(name);
+        delete expr;
+    }
+    else {
+        auto symbol = new Symbol(name);
+        symbol->set_sym_type(SymType::CONSTANT);
+        symbol->set_expr(expr);
+        m_symtab.add_symbol(name, symbol);
+    }
 }
 

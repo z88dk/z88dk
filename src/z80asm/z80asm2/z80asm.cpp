@@ -30,18 +30,19 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "obj_module.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
 // Object Module
 //-----------------------------------------------------------------------------
 
-class ObjModule {
+class ObjModule1 {
 public:
-    ObjModule() {}
-    ObjModule(const ObjModule& other) = delete;
-    virtual ~ObjModule();
-    ObjModule& operator=(const ObjModule& other) = delete;
+    ObjModule1() {}
+    ObjModule1(const ObjModule1& other) = delete;
+    virtual ~ObjModule1();
+    ObjModule1& operator=(const ObjModule1& other) = delete;
 
     Symtab* get_symtab() { return &m_symtab; }
     int get_asmpc() const { return m_asmpc; }
@@ -71,7 +72,6 @@ private:
 // Object Module
 //-----------------------------------------------------------------------------
 
-
 ObjModule::~ObjModule() {
     clear();
 }
@@ -88,19 +88,6 @@ void ObjModule::clear() {
 
 void ObjModule::next_opcode() {
     m_asmpc = get_offset();
-}
-
-void ObjModule::add_constant(const string& name, Expr* expr) {
-    if (m_symtab.get_symbol(name)) {
-        g_error.error_duplicate_definition(name);
-        delete expr;
-    }
-    else {
-        auto symbol = new Symbol(name);
-        symbol->set_sym_type(SymType::CONSTANT);
-        symbol->set_expr(expr);
-        m_symtab.add_symbol(name, symbol);
-    }
 }
 
 void ObjModule::add_label(const string& name) {
@@ -478,21 +465,21 @@ bool LineParser::parse(const string& line) {
     while (!parse_queue.empty()) {
         ParseQueueElem queue_elem = parse_queue.back();
         parse_queue.pop_back();
-        auto& current_state = m_states[queue_elem.state];
+        auto& cur_state = m_states[queue_elem.state];
 
         // check if at final state
-        if (current_state.action) {
+        if (cur_state.action) {
             g_obj_module.next_opcode();
             m_elems = queue_elem.elems; // setup data for function call
-            (this->*current_state.action)();
+            (this->*cur_state.action)();
             parse_ok = true;
             break;
         }
 
         // check CONST_EXPR
         m_in.set_pos(queue_elem.in_pos);
-        auto it = current_state.ttype_next.find(TType::CONST_EXPR);
-        if (it != current_state.ttype_next.end()) {
+        auto it = cur_state.ttype_next.find(TType::CONST_EXPR);
+        if (it != cur_state.ttype_next.end()) {
             Elem elem;
             elem.expr = new Expr;
             bool ok = elem.expr->parse(m_in);
@@ -518,8 +505,8 @@ bool LineParser::parse(const string& line) {
 
         // check EXPR
         m_in.set_pos(queue_elem.in_pos);
-        it = current_state.ttype_next.find(TType::EXPR);
-        if (it != current_state.ttype_next.end()) {
+        it = cur_state.ttype_next.find(TType::EXPR);
+        if (it != cur_state.ttype_next.end()) {
             Elem elem;
             elem.token = Token{ TType::EXPR, false };
             elem.expr = new Expr;
@@ -540,8 +527,8 @@ bool LineParser::parse(const string& line) {
         // check token
         m_in.set_pos(queue_elem.in_pos);
         TType ttype = m_in.peek().get_ttype();
-        it = current_state.ttype_next.find(ttype);
-        if (it != current_state.ttype_next.end()) {
+        it = cur_state.ttype_next.find(ttype);
+        if (it != cur_state.ttype_next.end()) {
             Elem elem;
             elem.token = m_in.peek();
             m_in.next();
@@ -557,8 +544,8 @@ bool LineParser::parse(const string& line) {
         m_in.set_pos(queue_elem.in_pos);
         Keyword keyword = m_in.peek().get_keyword();
         if (keyword != Keyword::NONE) {
-            auto it = current_state.keyword_next.find(keyword);
-            if (it != current_state.keyword_next.end()) {
+            auto it = cur_state.keyword_next.find(keyword);
+            if (it != cur_state.keyword_next.end()) {
                 Elem elem;
                 elem.token = m_in.peek();
                 m_in.next();
