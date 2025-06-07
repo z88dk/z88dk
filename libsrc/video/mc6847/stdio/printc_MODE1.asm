@@ -1,4 +1,7 @@
 
+IF !MC6847_IOSPACE
+
+
     SECTION code_clib
     PUBLIC  printc_MODE1
 
@@ -85,5 +88,7 @@ ELSE
     ld      (hl), 255
 ENDIF
     ret
+
+ENDIF
 
 

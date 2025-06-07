@@ -4,6 +4,8 @@ IF FORspc1000
     PUBLIC  generic_console_plotc
     PUBLIC  printc_MODE0
 
+    PUBLIC  __spc1000_attr
+
     EXTERN  generic_console_text_xypos
     EXTERN  __tms9918_printc
     EXTERN  __tms9918_set_attribute

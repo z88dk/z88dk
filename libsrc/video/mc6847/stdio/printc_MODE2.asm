@@ -1,4 +1,6 @@
 
+IF !MC6847_IOSPACE
+
     SECTION code_clib
     PUBLIC  printc_MODE2
 
@@ -6,7 +8,7 @@
     EXTERN  generic_console_font32
     EXTERN  generic_console_flags
     EXTERN  __mc6847_MODE2_attr
-    EXTERN  __pc6001_attr
+    EXTERN  generic_console_flags
     EXTERN  __mc6847_mode
     EXTERN  generic_console_text_xypos
 
@@ -39,8 +41,8 @@ not_udg:
     ex      de, hl                      ;de = font
     GETSCREENADDRESS
     add     hl,bc
-    ld      a, (__pc6001_attr)
-    rrca
+    ld      a, (generic_console_flags)
+    rlca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
     ld      b, 8
@@ -129,3 +131,5 @@ div12_done:
 ;	ld	(hl),a
   ENDIF
     ret
+
+ENDIF

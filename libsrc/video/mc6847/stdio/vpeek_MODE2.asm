@@ -1,3 +1,5 @@
+IF !MC6847_IOSPACE
+
 
     SECTION code_clib
 
@@ -89,4 +91,6 @@ no_overflow_MODE2:
     pop     bc
     djnz    handle_MODE2_per_line
     jp      vpeek_screendollar
+
+ENDIF
 

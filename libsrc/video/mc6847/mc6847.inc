@@ -31,8 +31,9 @@ IF FORpc6001
 ENDIF
 
 IF FORspc1000
-    ; SPC1000 uses I/O space, so this library doesn't work
+    ; SPC1000 uses I/O space
     defc DISPLAY = 0
+    defc MC6847_IOSPACE = 1
     INCLUDE "target/spc1000/def/spc1000.def"
 ENDIF
 

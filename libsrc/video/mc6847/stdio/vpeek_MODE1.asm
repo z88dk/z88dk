@@ -1,3 +1,4 @@
+IF !MC6847_IOSPACE
 
     SECTION code_clib
 
@@ -46,3 +47,5 @@ ENDIF
 no_overflow:
     djnz    vpeek_1
     jp      vpeek_screendollar
+
+ENDIF
