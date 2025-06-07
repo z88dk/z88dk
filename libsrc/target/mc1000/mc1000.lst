@@ -1,4 +1,3 @@
-@video/mc6847/mc6847.lst
 target/mc1000/stdio/fgetc_cons
 target/mc1000/stdio/getk
 target/mc1000/stdio/fputc_cons
@@ -6,9 +5,20 @@ target/mc1000/stdio/ansi/f_ansi_attr
 target/mc1000/stdio/ansi/f_ansi_scrollup
 target/mc1000/stdio/ansi/f_ansi_bel
 target/mc1000/stdio/ansi/f_ansi_char
-
 @stdio/ansicore.lst
 @stdio/stdio.lst
+target/mc1000/graphics/clg
+target/mc1000/graphics/pixladdr
+target/mc1000/graphics/plotpixl
+target/mc1000/graphics/respixl
+target/mc1000/graphics/xorpixl
+target/mc1000/graphics/pointxy
+target/mc1000/graphics/dfill
+target/mc1000/graphics/putsprite
+target/mc1000/graphics/bksave
+target/mc1000/graphics/bkrestore
+target/mc1000/graphics/swapgfxbk
+target/mc1000/graphics/stencil_render
 gfx/narrow/obj/${TARGET}/clrarea2
 gfx/narrow/obj/${TARGET}/fillarea2
 gfx/narrow/obj/${TARGET}/xorclrarea2
@@ -31,4 +41,4 @@ target/mc1000/interrupts/add_raster_int
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/vt2/psg_vt2.lst
-
+@video/mc6847/mc6847.lst
