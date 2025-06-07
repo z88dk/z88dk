@@ -30,6 +30,12 @@ IF FORpc6001
     defc MODE0_3x2 = 1
 ENDIF
 
+IF FORspc1000
+    ; SPC1000 uses I/O space, so this library doesn't work
+    defc DISPLAY = 0
+    INCLUDE "target/spc1000/def/spc1000.def"
+ENDIF
+
 
 ; Default size of the text screen
 defc MC6847_CONSOLE_COLUMNS = 32

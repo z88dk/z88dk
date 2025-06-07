@@ -25,7 +25,7 @@ ___scrollup_4px:
 
     ld      c,4
 loopy:
-    ld      b,maxx
+    ld      b,+(maxx % 256)
 loopx:
 
     push    bc
@@ -59,7 +59,7 @@ plot:
 
 	ld      c,4
 loopc:
-    ld      b,maxx
+    ld      b,+(maxx % 256)
 loopb:
     ld      h,b
 	dec     h
