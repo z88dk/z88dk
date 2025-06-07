@@ -50,18 +50,18 @@ check_mode:
     jr      nz, failure
     ld      a, c
     and     31
-    ld      e, MODE_1
+    ld      e, MODE_HIRES
     ld      d, CAPS_MODE1
     ld      hl, $1820                   ;rows cols
     cp      1
     jr      z, set_mode
     ld      hl, $1020
-    ld      e, MODE_0
+    ld      e, MODE_TEXT
     ld      d, CAPS_MODE0
     and     a
     jr      z, set_mode
     ld      hl, $1810
-    ld      e, MODE_2
+    ld      e, MODE_MULTICOLOUR
     ld      d, CAPS_MODE2
     cp      2
     jr      nz, failure

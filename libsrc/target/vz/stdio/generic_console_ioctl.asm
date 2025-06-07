@@ -44,7 +44,7 @@ check_mode:
     jr      nz, failure
     ld      a, c                        ; The mode
     and     31
-    ld      h, 0                        ;MODE_0
+    ld      h, 0                        ;MODE_TEXT
     ld      e, 32                       ;columns
     ld      l, 16
     and     a

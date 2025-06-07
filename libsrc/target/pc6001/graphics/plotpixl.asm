@@ -15,9 +15,9 @@
 plotpixel:
                ; ld	(__gfx_coords),hl
     ld      a, (__pc6001_mode)
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, plot_MODE1
-    cp      MODE_2
+    cp      MODE_MULTICOLOUR
     jp      z, plot_MODE2
     and     a
     ret     nz

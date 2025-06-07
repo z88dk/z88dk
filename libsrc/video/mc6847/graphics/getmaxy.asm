@@ -23,6 +23,8 @@ ENDIF
     ret     z
 IF FORsv8000
     ld      de, 95
+ELIF FORvz
+    ld      de, 63
 ELSE
     ld      hl, 191
 ENDIF

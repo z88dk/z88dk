@@ -1,5 +1,5 @@
 
-    SECTION code_driver
+    SECTION code_clib
 
     PUBLIC  generic_console_printc
 
@@ -19,6 +19,7 @@
 ; a = character to print
 ; e = raw
 generic_console_printc:
+    ex      af, af
     ld      a, (__mc6847_mode)
     and     @11111101
 IF MC6847_HAS_HIRES
@@ -30,5 +31,6 @@ ENDIF
 IF !FORspec1000
     and     a
     ret     nz
+    ex      af,af
 ENDIF
     jp      printc_MODE0

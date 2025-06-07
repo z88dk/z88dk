@@ -18,9 +18,11 @@ generic_console_scrollup:
     ld      a, (__mc6847_mode)
     and     @11111101
     jr      z, scrollup_text
-    cp      MODE_1
+IF MC6847_HAS_HIRES
+    cp      MODE_HIRES
     jr      z, scrollup_hires
-    cp      MODE_2
+ENDIF
+    cp      MODE_MULTICOLOUR
     jr      z, scrollup_hires           ;possibly wrong
     pop     bc
     pop     de
@@ -83,9 +85,11 @@ ENDIF
     ld      de,hl
     inc     h
 IF FORsv8000
-    ld      bc, 32*88
+    ld      bc, 32 * 88
+ELIF FORvz
+    ld      bc, 32 * 56
 ELSE
-    ld      bc, 32*184
+    ld      bc, 32 * 184
 ENDIF
     ldir
     ex      de, hl

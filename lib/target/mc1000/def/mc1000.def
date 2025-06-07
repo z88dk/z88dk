@@ -4,6 +4,6 @@
 
         defc DISPLAY = $8000
 
-        defc    MODE_0 = 0
-        defc    MODE_1 = $9c
-        defc    MODE_2 = $98
+        defc    MODE_TEXT = 0
+        defc    MODE_HIRES = $9c
+        defc    MODE_MULTICOLOUR = $98

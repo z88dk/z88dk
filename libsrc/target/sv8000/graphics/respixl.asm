@@ -11,7 +11,7 @@
 
 respixel:
     ld      a, (__sv8000_mode)
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, res_MODE1
     and     a
     ret     nz

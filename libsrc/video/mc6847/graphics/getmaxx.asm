@@ -21,9 +21,11 @@ ELSE
     ld      hl, 63
 ENDIF
     ret     z
+IF MC6847_HAS_HIRES
     ld      hl, 255
-    cp      MODE_1
+    cp      MODE_HIRES
     ret     z
+ENDIF
     ld      hl, 127
     ret
 

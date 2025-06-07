@@ -15,9 +15,11 @@
 plotpixel:
                ; ld	(__gfx_coords),hl
     ld      a, (__mc6847_mode)
-    cp      MODE_1
+IF MC6847_HAS_HIRES
+    cp      MODE_HIRES
     jp      z, plot_MODE1
-    cp      MODE_2
+ENDIF
+    cp      MODE_MULTICOLOUR
     jp      z, plot_MODE2
     and     a
     ret     nz

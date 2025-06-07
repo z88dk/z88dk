@@ -12,9 +12,11 @@
 
 xorpixel:
     ld      a, (__mc6847_mode)
-    cp      MODE_1
+IF MC6847_HAS_HIRES
+    cp      MODE_HIRES
     jp      z, xor_MODE1
-    cp      MODE_2
+ENDIF
+    cp      MODE_MULTICOLOUR
     jp      z, xor_MODE2
     and     a
     ret     nz

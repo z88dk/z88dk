@@ -5,6 +5,6 @@
     ; ag = css = $10
     ; gm2 = $40
     ; gm1 = gm0 = $8
-    defc    MODE_0 = $00
-    defc    MODE_1 = $58
-    defc    MODE_2 = $5c
+    defc    MODE_TEXT = $00
+    defc    MODE_HIRES = $58
+    defc    MODE_MULTICOLOUR = $5c

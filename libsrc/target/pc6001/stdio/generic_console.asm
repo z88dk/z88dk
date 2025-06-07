@@ -162,9 +162,9 @@ generic_console_printc:
     ex      af, af
     ld      a, (__pc6001_mode)
     and     @11111101
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, printc_MODE1
-    cp      MODE_2
+    cp      MODE_MULTICOLOUR
     jp      z, printc_MODE2
     and     a
     ret     nz
@@ -204,9 +204,9 @@ generic_console_scrollup:
     ld      a, (__pc6001_mode)
     and     @11111101
     jr      z, scrollup_text
-    cp      MODE_1
+    cp      MODE_HIRES
     jr      z, scrollup_hires
-    cp      MODE_2
+    cp      MODE_MULTICOLOUR
     jr      z, scrollup_hires           ;possibly wrong
     pop     bc
     pop     de

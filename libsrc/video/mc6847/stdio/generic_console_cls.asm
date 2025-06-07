@@ -38,7 +38,9 @@ IF FORmc1000
 ENDIF
 
 IF FORsv8000
-    ld      hl, 3071                    ;sv8000 has lower res screen
+    ld      bc, 3071                    ;sv8000 has lower res screen
+ELIF FORvz
+    ld      bc, +(64 * 32)  - 1
 ELSE
     ld      bc, 6143
 ENDIF

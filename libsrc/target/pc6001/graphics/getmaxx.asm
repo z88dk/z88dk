@@ -16,7 +16,7 @@ _getmaxx:
     ld      hl, +63
     ret     z
     ld      hl, 255
-    cp      MODE_1
+    cp      MODE_HIRES
     ret     z
     ld      hl, 127
     ret

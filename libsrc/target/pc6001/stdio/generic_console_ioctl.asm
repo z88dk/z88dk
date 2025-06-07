@@ -50,18 +50,18 @@ check_mode:
     ld      a, c                        ; The mode
     and     31
     ld      e, 32                       ;columns
-    ld      h, MODE_0
+    ld      h, MODE_TEXT
     ld      d, CAPS_MODE0
     ld      l, 16
     and     a
     jr      z, set_mode
-    ld      h, MODE_1
+    ld      h, MODE_HIRES
     ld      d, CAPS_MODE1
     ld      l, 24
     cp      1                           ;HIRES
     jr      z, set_mode
     ld      e, 16
-    ld      h, MODE_2
+    ld      h, MODE_MULTICOLOUR
     ld      d, CAPS_MODE1
     cp      2                           ;Half hires
     jr      nz, failure

@@ -1,6 +1,3 @@
-;
-
-;-----------  GFX paging  -------------
 
     SECTION code_driver
 
@@ -20,9 +17,11 @@
 ; Uses: a, bc, de, hl
 pixeladdress:
     ld      a, (__mc6847_mode)
-    cp      MODE_1
+IF MC6847_HAS_HIRES
+    cp      MODE_HIRES
     jp      z, pixeladdress_MODE1
-    cp      MODE_2
+ENDIF
+    cp      MODE_MULTICOLOUR
     jp      z, pixeladdress_MODE2
     ret
 

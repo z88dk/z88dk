@@ -17,20 +17,20 @@
 
     EXTERN  generic_console_caps
     PUBLIC  CLIB_GENCON_CAPS
-    defc    CLIB_GENCON_CAPS=CAPS_MODE0
+    defc    CLIB_GENCON_CAPS=CAPS_TEXT
 
         ; Text
 IF FORpc6001 | FORspc1000
-    defc    CAPS_MODE0 = CAP_GENCON_INVERSE|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
+    defc    CAPS_TEXT = CAP_GENCON_INVERSE|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
 ELIF FORvz
-    defc    CAPS_MODE0 = CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
+    defc    CAPS_TEXT = CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
 ELSE
-    defc    CAPS_MODE0 = 0
+    defc    CAPS_TEXT = 0
 ENDIF
         ; Hires
-    defc    CAPS_MODE1=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_BOLD|CAP_GENCON_UNDERLINE
+    defc    CAPS_HIRES=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_BOLD|CAP_GENCON_UNDERLINE
         ; Colour
-    defc    CAPS_MODE2=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR|CAP_GENCON_BOLD
+    defc    CAPS_MULTICOLOUR=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR|CAP_GENCON_BOLD
 
 
 ; a = ioctl
@@ -56,28 +56,42 @@ check_mode:
     jr      nz, failure
     ld      a, c                        ; The mode
     and     31
-    ld      e, MC6847_CONSOLE_COLUMNS   ;columns
-    ld      h, MODE_0
-    ld      d, CAPS_MODE0
-    ld      l, MC6847_CONSOLE_ROWS
+
+    ;; Text mode
+    ld      hl, +( (MODE_TEXT << 8) + CAPS_TEXT)
+    ld      de, $1020       ;16 rows, 32 columns
     and     a
     jr      z, set_mode
-    ld      h, MODE_1
-    ld      d, CAPS_MODE1
-    ;; SV8000 has limited memory, so the the full 256x192 screen can't be used, instead we're left with
-    ;; 256x96
-IF FORsv8000
-    ld      l, $0c
+
+IF FORvz
+    ;; On +vz, Mode1=MULTICOLOUR
+    ld      h, MODE_MULTICOLOUR
+    ld      l, CAPS_MULTICOLOUR
+    ld      de, $0810   ;8 rows, 16 columns
+    cp      1
+    jr      nz, failure
+    ;; Fall throught into set_mode
 ELSE
-    ld      l, 24
-ENDIF
+
+    ;; HIRES MODE
+    ld      hl, +( (MODE_HIRES << 8) + CAPS_HIRES)
+  IF FORsv8000
+    ld      de, $0c20       ;12 rows, 32 columns
+  ELSE
+    ld      de, $1820       ;24 rows, 32 columns
+  ENDIF
     cp      1                           ;HIRES
     jr      z, set_mode
-    ld      e, 16
-    ld      h, MODE_2
-    ld      d, CAPS_MODE2
-    cp      2                           ;Half hires
-IF FORspc1000
+
+    ;; MULTICOLOUR MODE
+    ld      hl, +( (MODE_MULTICOLOUR << 8) + CAPS_MULTICOLOUR)
+IF FORsv8000
+    ld      de, $0c10       ;12 rows, 16 columns
+ELSE
+    ld      de, $1810       ;24 rows, 16 columns
+ENDIF
+    cp      2                           ;Half hires/multicolour
+  IF FORspc1000
     jr      z,set_mode
     cp      10                          ;Switch to VDP
     jr      c, failure
@@ -98,9 +112,9 @@ IF FORspc1000
     call    __tms9918_console_ioctl
     pop     hl
     jr      success
-
-ELSE
+  ELSE
     jr      nz, failure
+  ENDIF
 ENDIF
 set_mode:
     bit     5, c
@@ -109,9 +123,9 @@ set_mode:
 not_css:
     ld      a, e
     ld      (__console_w), a
-    ld      a, l
-    ld      (__console_h), a
     ld      a, d
+    ld      (__console_h), a
+    ld      a, l
     ld      (generic_console_caps), a
     ld      a, h
     ld      (__mc6847_mode), a

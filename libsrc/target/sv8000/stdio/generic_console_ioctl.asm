@@ -46,11 +46,11 @@ check_mode:
     ld      a, c                        ; The mode
     and     31
     ld      de, $1020                   ; rows, cols
-    ld      h, MODE_0
+    ld      h, MODE_TEXT
     ld      b, CAPS_MODE0
     and     a
     jr      z, set_mode
-    ld      h, MODE_1
+    ld      h, MODE_HIRES
     ld      b, CAPS_MODE1
     ld      de, $0c20                   ; rows, cols
     cp      1                           ;HIRES

@@ -12,9 +12,9 @@
 
 respixel:
     ld      a, (__pc6001_mode)
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, res_MODE1
-    cp      MODE_2
+    cp      MODE_MULTICOLOUR
     jp      z, res_MODE2
     and     a
     ret     nz

@@ -20,8 +20,8 @@
 ; Uses: a, bc, de, hl
 pixeladdress:
     ld      a, (__pc6001_mode)
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, pixeladdress_MODE1
-    cp      MODE_2
+    cp      MODE_MULTICOLOUR
     jp      z, pixeladdress_MODE2
     ret

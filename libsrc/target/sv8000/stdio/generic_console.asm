@@ -48,7 +48,7 @@ cls_text:
 generic_console_printc:
     ex      af, af
     ld      a, (__sv8000_mode)
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, printc_MODE1
     and     a
     ret     nz

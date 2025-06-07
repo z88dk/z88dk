@@ -17,7 +17,7 @@
 ;        c = failure
 generic_console_vpeek:
     ld      a, (__sv8000_mode)
-    cp      MODE_1
+    cp      MODE_HIRES
     jp      z, vpeek_MODE1
     and     a
     ccf
