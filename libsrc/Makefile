@@ -427,6 +427,7 @@ pc6001_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,pc6001)
 	$(MAKE) -C games TARGET=pc6001
+	$(MAKE) -C video/mc6847 TARGET=pc6001
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(TARGET_DIRECTORY)/pc6001/pc6001.lst
 
 # PC8801 lib - Stefano
@@ -484,6 +485,7 @@ vz_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,vz)
 	$(MAKE) -C games TARGET=vz
+	$(MAKE) -C video/mc6847 TARGET=vz
 	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(TARGET_DIRECTORY)/vz/vz200.lst
 
 
@@ -1211,6 +1213,7 @@ mc1000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,mc1000)
 	$(MAKE) -C games TARGET=mc1000
+	$(MAKE) -C video/mc6847 TARGET=mc1000
 	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(TARGET_DIRECTORY)/mc1000/mc1000.lst
 
 # NASCOM library - Stefano
@@ -1489,6 +1492,7 @@ sv8000_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	$(call buildgeneric,sv8000)
 	$(MAKE) -C games TARGET=sv8000
+	$(MAKE) -C video/mc6847 TARGET=sv8000
 	TARGET=sv8000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsv8000 -x$(OUTPUT_DIRECTORY)/sv8000_clib @$(TARGET_DIRECTORY)/sv8000/sv8000.lst
 
 # Colecovision - dom/stefano
