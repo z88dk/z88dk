@@ -1,6 +1,7 @@
 IF FORspc1000
 
     SECTION code_driver
+
     PUBLIC  generic_console_pointxy
     PUBLIC  generic_console_plotc
     PUBLIC  printc_MODE0

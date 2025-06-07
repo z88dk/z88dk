@@ -6,7 +6,7 @@ IF !MC6847_IOSPACE
 
     EXTERN      __mc6847_mode
     EXTERN      __pc6001_attr
-    EXTERN      __mc1000_modeval
+    EXTERN      __mc6847_mode
 
 
     INCLUDE "video/mc6847/mc6847.inc"

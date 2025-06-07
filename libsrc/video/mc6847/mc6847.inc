@@ -18,7 +18,6 @@ IF FORmc1000
     INCLUDE "target/mc1000/def/mc1000.def"
     defc    MODE0_CONVERT_CHARACTER = 1
     defc    MC6847_HAS_HIRES = 1
-    GLOBAL  __mc1000_modeval
 ENDIF
 
 IF FORvz

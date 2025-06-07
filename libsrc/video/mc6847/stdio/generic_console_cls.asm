@@ -5,7 +5,7 @@ IF !MC6847_IOSPACE
     PUBLIC  generic_console_cls
 
     EXTERN  __mc6847_mode
-    EXTERN  __mc1000_modeval
+    EXTERN  __mc6847_mode
     EXTERN  __pc6001_attr
 
 

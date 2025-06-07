@@ -30,7 +30,7 @@ ENDIF
     ret     nz
     call    generic_console_text_xypos
 IF FORmc1000
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_mode)
     out     ($80), a
     ld      b, (hl)
     set     0, a

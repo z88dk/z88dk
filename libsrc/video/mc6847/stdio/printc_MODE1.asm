@@ -8,6 +8,7 @@ IF !MC6847_IOSPACE
     EXTERN  generic_console_udg32
     EXTERN  generic_console_font32
     EXTERN  generic_console_flags
+    EXTERN  __mc6847_mode
 
 
     INCLUDE "video/mc6847/mc6847.inc"
@@ -18,7 +19,7 @@ IF !MC6847_IOSPACE
 ; e = raw
 printc_MODE1:
 IF FORmc1000
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_mode)
     ex      af, af                      ;save port
 ENDIF
     ld      l, d
@@ -58,7 +59,7 @@ hires_printc_1:
     or      b
  no_32_bold:
     xor     c                           ;Handling inverse
-IF FORmc10000
+IF FORmc1000
     ld      c, a
     ex      af, af
     res     0, a

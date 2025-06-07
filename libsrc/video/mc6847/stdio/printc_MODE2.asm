@@ -20,7 +20,7 @@ IF !MC6847_IOSPACE
 ; e = raw
 printc_MODE2:
 IF FORmc1000
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_mode)
     ex      af, af
 ENDIF
     push    bc

@@ -4,6 +4,7 @@ IF !MC6847_IOSPACE
 
     PUBLIC  vpeek_MODE1
     EXTERN  vpeek_screendollar
+    EXTERN  __mc6847_mode
 
     INCLUDE "video/mc6847/mc6847.inc"
 
@@ -24,7 +25,7 @@ vpeek_MODE1:
     ld      b, 8
 vpeek_1:
 IF FORmc1000
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_mode)
     res     0, a
     out     ($80), a
     ld      c, (hl)
