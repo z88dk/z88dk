@@ -10,6 +10,7 @@
     EXTERN  __mc6847_mode
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
+    EXTERN  __tms9918_console_ioctl
 
     INCLUDE "video/mc6847/mc6847.inc"
     INCLUDE "ioctl.def"
@@ -19,7 +20,7 @@
     defc    CLIB_GENCON_CAPS=CAPS_MODE0
 
         ; Text
-IF FORpc6001
+IF FORpc6001 | FORspc1000
     defc    CAPS_MODE0 = CAP_GENCON_INVERSE|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
 ELIF FORvz
     defc    CAPS_MODE0 = CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
@@ -74,9 +75,33 @@ ENDIF
     jr      z, set_mode
     ld      e, 16
     ld      h, MODE_2
-    ld      d, CAPS_MODE1
+    ld      d, CAPS_MODE2
     cp      2                           ;Half hires
+IF FORspc1000
+    jr      z,set_mode
+    cp      10                          ;Switch to VDP
+    jr      c, failure
+    ld      c, a
+    ld      a, 10
+    ld      (__mc6847_mode), a
+    ld      a, 24
+    ld      (__console_h), a
+    ld      a, c
+    sub     10
+    ld      l, a
+    ld      h, 0
+    push    hl
+    ld      hl, 0
+    add     hl, sp
+    ex      de, hl
+    ld      a, IOCTL_GENCON_SET_MODE
+    call    __tms9918_console_ioctl
+    pop     hl
+    jr      success
+
+ELSE
     jr      nz, failure
+ENDIF
 set_mode:
     bit     5, c
     jr      z, not_css

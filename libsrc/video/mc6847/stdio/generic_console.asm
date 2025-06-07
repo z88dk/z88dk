@@ -109,8 +109,11 @@ generic_console_printc:
     jp      z, printc_MODE1
     cp      MODE_2
     jp      z, printc_MODE2
+IF !FORspec1000
     and     a
     ret     nz
+    ex      af,af
+ENDIF
     jp      printc_MODE0
 
 

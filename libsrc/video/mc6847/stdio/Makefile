@@ -25,7 +25,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	@$(ASSEMBLER) $(ASMFLAGS) -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc -Oobj/$(OBJSUBDIR) $^
+	$(Q)$(ASSEMBLER) $(ASMFLAGS) -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc -Oobj/$(OBJSUBDIR) $^
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
