@@ -4,7 +4,7 @@
 
     INCLUDE "graphics/grafix.inc"
 
-    EXTERN  __MODE2_attr
+    EXTERN  __mc6847_MODE2_attr
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including
@@ -23,7 +23,7 @@ ENDIF
     push    bc                          ;Save callers value
     call    pixeladdress                ;hl = address, a = pixel number
     ld      b, a
-    ld      a, (__MODE2_attr)
+    ld      a, (__mc6847_MODE2_attr)
     rlca
     rlca
     ld      e, a
