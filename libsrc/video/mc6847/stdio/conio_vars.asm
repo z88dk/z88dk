@@ -12,10 +12,6 @@ __mc6847_mode:
 
     SECTION data_clib
 
-__mc6847_attr:
-    defb    32                          ;We use the external character generator
-__ink_colour:
-    defb    7
 
 
     PUBLIC  __mc6847_MODE2_attr

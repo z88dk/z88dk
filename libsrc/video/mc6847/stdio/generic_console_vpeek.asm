@@ -26,6 +26,15 @@ generic_console_vpeek:
     ccf
     ret     nz
     call    generic_console_text_xypos
+IF FORmc1000
+    ld      a, (__mc1000_modeval)
+    out     ($80), a
+    ld      b, (hl)
+    set     0, a
+    out     ($80), a
+    ld      a, b
+ELSE
     ld      a, (hl)
+ENDIF
     and     a
     ret

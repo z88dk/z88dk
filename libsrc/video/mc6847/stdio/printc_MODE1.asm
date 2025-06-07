@@ -14,6 +14,10 @@
 ; a' = d = character to print
 ; e = raw
 printc_MODE1:
+IF FORmc1000
+    ld      a, (__mc1000_modeval)
+    ex      af, af                      ;save port
+ENDIF
     ld      l, d
     ld      h, 0
     ld      de, (generic_console_font32)
@@ -32,37 +36,54 @@ not_udg:
     GETSCREENADDRESS
     add     hl, bc                      ;b = y, c = x
                                         ;hl=screen adddress
+                                        
+
     ld      a, (generic_console_flags)
-    ld      b, a                        ;Save flags
-    rrca
+    rlca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
-    ex      de, hl                      ;hl = font, de screen
-    ld      a, 8
+    ld      b, 8
 hires_printc_1:
+    push    bc
+    ld      a, (de)
+    xor     c
+IF FORmc10000
+    ld      c, a
     ex      af, af
-    ld      a, (hl)
-    bit     4, b
-    jr      z, no_bold
-    rrca
-    or      (hl)
-no_bold:
-    xor     c                           ;Inverse
-    ld      (de), a
-    inc     hl
-    ld      a, e
+    res     0, a
+    out     ($80), a                    ;VRAM -> Z80
+    ld      (hl), c
+    set     0, a
+    out     ($80), a                    ;VRAM -> Chip
+    ex      af, af
+ELSE
+    ld      (hl),a
+ENDIF
+    inc     de
+    ld      a, l
     add     32
-    ld      e, a
+    ld      l, a
     jr      nc, no_overflow
-    inc     d
+    inc     h
 no_overflow:
-    ex      af, af
-    dec     a
-    jr      nz, hires_printc_1
-    bit     3, b                        ;Check underline
+    pop     bc
+    djnz    hires_printc_1
+    ld      a, (generic_console_flags)
+    bit     3,b                         ;Check underline
     ret     z
     ex      de, hl                      ;hl is now screen
     ld      bc, -32
     add     hl, bc
+IF FORmc1000
+    ex      af, af
+    res     0, a
+    out     ($80), a                    ;VRAM -> Z80
     ld      (hl), 255
+    set     0, a
+    out     ($80), a                    ;VRAM -> Chip
+ELSE
+    ld      (hl), 255
+ENDIF
     ret
+
+

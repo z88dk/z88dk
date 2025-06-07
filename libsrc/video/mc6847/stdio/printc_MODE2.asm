@@ -6,7 +6,7 @@
     EXTERN  generic_console_font32
     EXTERN  generic_console_flags
     EXTERN  __mc6847_MODE2_attr
-    EXTERN  __mc6847_attr
+    EXTERN  __pc6001_attr
     EXTERN  __mc6847_mode
     EXTERN  generic_console_text_xypos
 
@@ -17,6 +17,10 @@
 ; a' = d = character to print
 ; e = raw
 printc_MODE2:
+IF FORmc1000
+    ld      a, (__mc1000_modeval)
+    ex      af, af
+ENDIF
     push    bc
     ld      l, d
     ld      h, 0
@@ -35,7 +39,7 @@ not_udg:
     ex      de, hl                      ;de = font
     GETSCREENADDRESS
     add     hl,bc
-    ld      a, (__mc6847_attr)
+    ld      a, (__pc6001_attr)
     rrca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
@@ -68,7 +72,17 @@ is_paper:
     djnz    semihires_3
     ld      a, l                        ;save what's left of character
     pop     hl
+IF FORmc1000
+    ex      af, af
+    res     0, a
+    out     ($80), a                    ;Page VRAM in
     ld      (hl), c
+    set     0, a
+    out     ($80), a                    ;VRAM out
+    ex      af, af
+ELSE
+    ld      (hl), c
+ENDIF
     inc     hl
     pop     bc
     djnz    semihires_2
@@ -99,7 +113,7 @@ div12_done:
     call    generic_console_text_xypos
     dec     h
     dec     h
-    ld      a, (__mc6847_attr)
+    ld      a, (__pc6001_attr)
     and     @00000010
     ld      c, a
     ld      a, (hl)

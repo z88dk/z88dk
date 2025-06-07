@@ -4,25 +4,21 @@
     PUBLIC  generic_console_cls
     PUBLIC  generic_console_scrollup
     PUBLIC  generic_console_printc
-    PUBLIC  generic_console_set_ink
-    PUBLIC  generic_console_set_paper
-    PUBLIC  generic_console_set_attribute
     PUBLIC  generic_console_text_xypos
-    PUBLIC  generic_console_plotc
-    PUBLIC  generic_console_pointxy
 
-    PUBLIC  __mc6847_attr
 
     EXTERN  MC6847_CONSOLE_COLUMNS
     EXTERN  MC6847_CONSOLE_ROWS
 
     EXTERN  __mc6847_mode
     EXTERN  __mc6847_MODE2_attr
+    EXTERN  __pc6001_attr
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
     EXTERN  generic_console_flags
     EXTERN  mc6847_map_colour
 
+    EXTERN  printc_MODE0
     EXTERN  printc_MODE1
     EXTERN  printc_MODE2
 
@@ -31,62 +27,6 @@
 
     INCLUDE "video/mc6847/mc6847.inc"
 
-generic_console_set_attribute:
-    ld      a, (hl)
-    ld      c, 0
-    rlca
-    rl      c
-    ld      a, (__mc6847_attr)
-    and     254
-    or      c
-    ld      (__mc6847_attr), a
-    ret
-
-generic_console_set_ink:
-    call    mc6847_map_colour
-    ld      a, b
-    and     7
-    ld      (__ink_colour), a
-    rrca
-    rrca
-    and     @11000000
-    ld      (__mc6847_MODE2_attr), a
-IF FORpc6001
-set_css:
-    ld      a, b
-    rlca
-    rlca
-    and     @00000010
-    ld      c, a
-    ld      a, (__mc6847_attr)
-    and     @11111101
-    or      c
-    ld      (__mc6847_attr), a
-ELIF FORvz
-    ld      a, b
-    rlca
-    rlca
-    rlca
-    rlca
-    or      128
-    and     @11110000
-    ld      (__ink_colour), a
-ENDIF
-    ret
-
-
-generic_console_set_paper:
-    call    mc6847_map_colour
-    ld      a, b
-    rrca
-    rrca
-    and     @11000000
-    ld      (__mc6847_MODE2_attr+1), a
-IF FORpc6001
-    jr      set_css
-ELSE
-    ret
-ENDIF
 
 generic_console_cls:
     GETSCREENADDRESS
@@ -133,7 +73,7 @@ IF FORpc6001
     ld      d,h
     ld      e,1
     ld      bc, +(MC6847_CONSOLE_COLUMNS*MC6847_CONSOLE_ROWS)-1
-    ld      a, (__mc6847_attr)
+    ld      a, (__pc6001_attr)
     ld      (hl), a
     ldir
     pop     hl
@@ -155,59 +95,6 @@ ENDIF
     ret
 
 
-; Entry point for plotting text graphics
-; c = x
-; b = y
-; a = graphic glyph to print
-; e = 0, 2x2 mode, e = 1, 3x2 mode
-generic_console_plotc:
-    call    generic_console_text_xypos
-    ld      c, a
-IF FORmc1000
-    ld      a,(__mc6847_mode)
-    out     ($80), a
-ENDIF
-    ld      a, (__mc6847_MODE2_attr)           ;It's shifted for us
-    and     @11000000
-    or      c
-    ld      (hl), a
-IF FORpc6001
-    dec     h
-    dec     h
-    ld      a, (__ink_colour)
-    rrca
-    and     2                           ;Set the CSS flag as appropriate
-    or      @01111101                   ;3x2, CSS not set
-    ld      (hl), a
-ENDIF
-
-IF FORmc1000
-    ld      a,(__mc6847_mode)
-    set     0,a
-    out     ($80),a
-ENDIF
-    ret
-
-; Entry point for pointing text graphics
-; c = x
-; b = y
-; Exit: a = graphic glyph
-;	nc = found
-;        c = not found
-generic_console_pointxy:
-    call    generic_console_text_xypos
-    ld      c, (hl)                     ;glyph
-    dec     h
-    dec     h
-    ld      a, (hl)
-    and     @01111101
-    cp      @01111101
-    ld      a, 0                        ;No graphics drawn
-    ret     nz                          ;Not a graphics character
-    ld      a, c
-    and     @00111111
-    ret
-
 
 
 ; c = x
@@ -224,34 +111,8 @@ generic_console_printc:
     jp      z, printc_MODE2
     and     a
     ret     nz
+    jp      printc_MODE0
 
-printc_text:
-IF FORmc1000
-    out     ($80),a
-ENDIF
-    ex      af, af
-IF MODE0_CONVERT_CHARACTER
-    push    de
-    call    generic_console_text_xypos
-    pop     de
-    rr      e
-    call    nc,convert_character
-ELSE
-    call    generic_console_text_xypos
-ENDIF
-    ld      (hl), a
-IF FORpc6001
-    dec     h
-    dec     h
-    ld      a, (__mc6847_attr)
-    ld      (hl), a
-ENDIF
-IF FORmc1000
-    ex      af,af
-    set     0,a
-    out     ($80),a
-ENDIF
-    ret
 
 
 generic_console_text_xypos:
@@ -321,7 +182,7 @@ IF FORpc6001
     ldir
     ex      de, hl
     ld      b, MC6847_CONSOLE_COLUMNS
-    ld      a, (__mc6847_attr)
+    ld      a, (__pc6001_attr)
 generic_console_scrollup_4:
     ld      (hl), a
     inc     hl
@@ -367,38 +228,3 @@ ENDIF
     pop     bc
     pop     de
     ret
-
-
-IF FORmc1000
-convert_character:
-    ld      a, d
-    cp      97
-    jr      c, isupper
-    sub     32
-isupper:
-    and     @00111111
-    ld      d, a
-    ld      a, (generic_console_flags)
-    rlca
-    ret     nc
-    set     7, d
-    ret
-ENDIF
-
-IF FORvz
-convert_character:
-    cp      97
-    jr      c, isupper
-    sub     32
-isupper:
-    and     @00111111
-    ret
-ENDIF
-
-
-    SECTION data_clib
-
-__mc6847_attr:
-    defb    32                          ;We use the external character generator
-__ink_colour:
-    defb    7

@@ -22,9 +22,22 @@ vpeek_MODE1:
 
     ld      b, 8
 vpeek_1:
+IF FORmc1000
+    ld      a, (__mc1000_modeval)
+    res     0, a
+    out     ($80), a
+    ld      c, (hl)
+    set     0, a
+    out     ($80), a
+    ex      de, hl
+    ld      (hl), c
+    inc     hl
+    ex      de, hl
+ELSE
     ld      a, (hl)
     ld      (de), a
     inc     de
+ENDIF
     ld      a, l
     add     32
     ld      l, a

@@ -27,6 +27,10 @@ vpeek_MODE2:
          ; p0-1 p1-1 p2-1 p3-1 p0-0 p1-0 p2-0 p3-0
     ex      de, hl
     ld      b, 8
+IF FORmc1000
+    ld      a, (__mc1000_modeval)
+    ex      af, af
+ENDIF
 handle_MODE2_per_line:
     push    bc
     push    hl                          ;save buffer
@@ -38,12 +42,30 @@ handle_mode1_nibble:
     ld      l, @11000000
     ld      b, 4                        ;4 pixels in a byte
 handle_MODE2_0:
+IF FORmc1000
+    ex      af, af
+    res     0, a
+    out     ($80), a                    ;VRAM in
+    ex      af, af
+    ld      a, (de)
+    ex      af, af
+    set     0, a
+    out     ($80), a                    ;VRAM out
+    ex      af, af
+    and     l
+    jr      z, not_set
+    ld      a, c
+    or      h
+    ld      c, a
+
+ELSE
     ld      a, (de)
     and     l
     jr      z, not_set
     ld      a, c
     or      h
     ld      c, a
+ENDIF
 not_set:
     srl     h
     srl     l
