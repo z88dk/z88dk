@@ -1,6 +1,7 @@
 
 IF FORpc6001
 
+    SECTION code_driver
     PUBLIC  printc_MODE0
     PUBLIC  generic_console_plotc
     PUBLIC  generic_console_pointxy
@@ -58,7 +59,6 @@ generic_console_set_paper:
 
 
 printc_MODE0:
-    ex      af, af
     call    generic_console_text_xypos
     ld      (hl), a
     dec     h

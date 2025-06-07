@@ -1,5 +1,6 @@
 IF FORmc1000
 
+    SECTION code_driver
     PUBLIC  printc_MODE0
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper

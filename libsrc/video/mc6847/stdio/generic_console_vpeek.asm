@@ -1,5 +1,5 @@
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_vpeek
 
@@ -22,6 +22,7 @@ generic_console_vpeek:
     jp      z, vpeek_MODE1
     cp      MODE_2
     jp      z, vpeek_MODE2
+
     and     a
     ccf
     ret     nz

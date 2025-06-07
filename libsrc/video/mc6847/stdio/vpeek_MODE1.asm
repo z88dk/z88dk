@@ -1,6 +1,6 @@
 IF !MC6847_IOSPACE
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  vpeek_MODE1
     EXTERN  vpeek_screendollar

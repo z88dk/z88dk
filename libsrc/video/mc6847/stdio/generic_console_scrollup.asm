@@ -1,6 +1,6 @@
 IF !MC6847_IOSPACE
 
-    SECTION     code_clib
+    SECTION     code_driver
 
     PUBLIC      generic_console_scrollup
 

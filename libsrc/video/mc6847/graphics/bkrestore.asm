@@ -7,7 +7,7 @@
 ; $Id: bkrestore.asm,v 1.3 2016-06-23 19:53:27 dom Exp $
 ;
 
-    SECTION code_clib
+    SECTION code_driver
     EXTERN  pixeladdress
 
     PUBLIC  bkrestore

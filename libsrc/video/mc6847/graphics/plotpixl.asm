@@ -1,5 +1,5 @@
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  plotpixel
 
     EXTERN  plot_MODE0

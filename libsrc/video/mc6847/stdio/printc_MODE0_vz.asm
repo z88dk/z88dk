@@ -1,6 +1,6 @@
 IF FORvz
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_plotc
     PUBLIC  printc_MODE0

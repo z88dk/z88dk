@@ -7,7 +7,7 @@
 ; $Id: bksave.asm,v 1.4 2016-07-02 09:01:36 dom Exp $
 ;
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  bksave
     PUBLIC  _bksave
     EXTERN  pixeladdress

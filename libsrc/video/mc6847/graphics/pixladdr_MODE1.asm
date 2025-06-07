@@ -2,9 +2,12 @@
 
 ;-----------  GFX paging  -------------
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  pixeladdress_MODE1
+
+    EXTERN  __mc1000_modeval
+    EXTERN  pixelbyte
 
     INCLUDE "video/mc6847/mc6847.inc"
 
@@ -39,6 +42,19 @@ pixeladdress_MODE1:
         ld      de,DISPLAY
     ENDIF
     add     hl, de
+IF FORmc1000
+    ex      af,af
+    ld      a,(__mc1000_modeval)
+    out     ($80),a
+    ld      a,(hl)
+    ld      hl,pixelbyte
+    ld      de,hl       ;copmatibililty
+    ld      (hl),a
+    ld      a,(__mc1000_modeval)
+    out     ($80),a
+    ex      af,af
+ENDIF
+
     and     7
     xor     7
     ret

@@ -1,7 +1,7 @@
 
 
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_text_xypos
 
@@ -18,7 +18,7 @@ generic_console_text_xypos:
     add     hl, hl
     add     hl, hl      ;*32
     IF FORpc6001
-        ld      a,(SYSVAR_screen-1)
+        ld      a,(SYSVAR_screen)
         inc     a
         inc     a
     ELSE

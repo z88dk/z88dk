@@ -2,7 +2,7 @@
 IF !MC6847_IOSPACE
 
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  printc_MODE1
 
     EXTERN  generic_console_udg32
@@ -48,8 +48,16 @@ not_udg:
     ld      b, 8
 hires_printc_1:
     push    bc
+    ld      a, (generic_console_flags)
+    bit     4, a
     ld      a, (de)
-    xor     c
+    jr      z, no_32_bold
+    rrca
+    ld      b,a
+    ld      a,(de)
+    or      b
+ no_32_bold:
+    xor     c                           ;Handling inverse
 IF FORmc10000
     ld      c, a
     ex      af, af
@@ -72,9 +80,8 @@ no_overflow:
     pop     bc
     djnz    hires_printc_1
     ld      a, (generic_console_flags)
-    bit     3,b                         ;Check underline
+    bit     3,a                         ;Check underline
     ret     z
-    ex      de, hl                      ;hl is now screen
     ld      bc, -32
     add     hl, bc
 IF FORmc1000

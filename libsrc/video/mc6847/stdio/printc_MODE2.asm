@@ -1,7 +1,7 @@
 
 IF !MC6847_IOSPACE
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  printc_MODE2
 
     EXTERN  generic_console_udg32
@@ -40,6 +40,7 @@ not_udg:
     dec     h
     ex      de, hl                      ;de = font
     GETSCREENADDRESS
+    ld      l,c
     add     hl,bc
     ld      a, (generic_console_flags)
     rlca
@@ -48,7 +49,15 @@ not_udg:
     ld      b, 8
 semihires_1:
     push    bc
+    ld      a,(generic_console_flags)
+    bit     4,a         ;underline
     ld      a, (de)
+    jr      z,nobold
+    rrca
+    ld      b,a
+    ld      a,(de)
+    or      b
+nobold:
     xor     c
     push    de
     ld      b, 2
