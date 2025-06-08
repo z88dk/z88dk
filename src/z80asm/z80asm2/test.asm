@@ -1,3 +1,6 @@
+; .ASSUME
+.Assume 0:.Assume 1
+
 ; backslash
 ld\
 a,\
@@ -16,9 +19,6 @@ ld a , xp ## to
 .l1 ld a,25
 l2:ld a,25
 ld a,25
-
-; .ASSUME
-.Assume 0:.Assume 1
 
 ; include file
 include "xpto.inc"

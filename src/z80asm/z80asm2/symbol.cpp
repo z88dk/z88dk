@@ -7,24 +7,81 @@
 
 #include "error.h"
 #include "expr.h"
+#include "obj_module.h"
 #include "symbol.h"
 #include <cassert>
 using namespace std;
 
 Symtab g_global_defines;
 
-Symbol::Symbol(const string& name)
-    : m_name(name) {
+Symbol::Symbol(const string& name, Symtab* parent)
+    : m_name(name), m_parent(parent) {
 }
 
 Symbol::~Symbol() {
+    clear();
+}
+
+void Symbol::clear() {
+    m_sym_type = SymType::NOT_DEFINED;
+    m_value = 0;
+    m_instr = nullptr;
     delete m_expr;
+    m_expr = nullptr;
+    m_in_eval = false;
+}
+
+void Symbol::set_global_def(int value) {
+    clear();
+    m_sym_type = SymType::GLOBAL_DEF;
+    m_value = value;
+}
+
+void Symbol::set_global_def(Expr* expr) {
+    int value = 0;
+    if (expr->eval_const(m_parent, value)) {
+        set_global_def(value);
+    }
+    else {
+        g_error.error_constant_expression_expected();
+    }
+    delete expr;
+}
+
+void Symbol::set_const(int value) {
+    clear();
+    m_sym_type = SymType::CONST;
+    m_value = value;
+}
+
+void Symbol::set_const(Expr* expr) {
+    int value = 0;
+    if (expr->eval_const(m_parent, value)) {
+        set_const(value);
+    }
+    else {
+        g_error.error_constant_expression_expected();
+    }
+    delete expr;
+}
+
+void Symbol::set_instr(Instr* instr) {
+    clear();
+    m_sym_type = SymType::INSTR;
+    m_instr = instr;
 }
 
 void Symbol::set_expr(Expr* expr) {
-    if (m_expr)
-        delete m_expr;
-    m_expr = expr;
+    clear();
+    int value = 0;
+    if (expr->eval_const(m_parent, value)) {
+        set_const(value);
+        delete expr;
+    }
+    else {
+        m_sym_type = SymType::EXPR;
+        m_expr = expr;
+    }
 }
 
 Symtab::~Symtab() {
@@ -46,47 +103,22 @@ Symbol* Symtab::get_symbol(const string& name) {
         return it->second;
 }
 
-bool Symtab::add_symbol(const string& name, Symbol* symbol) {
+Symbol* Symtab::add_symbol(const string& name) {
     if (get_symbol(name)) {
-        return false;
+        g_error.error_duplicate_definition(name);
+        return nullptr;
     }
     else {
+        Symbol* symbol = new Symbol(name, this);
         m_table[name] = symbol;
-        return true;
+        return symbol;
     }
 }
 
-bool Symtab::eval(int asmpc, const string& name, int& result) {
-    result = 0;
-    Symbol* symbol = get_symbol(name);
-    if (!symbol) {
-        g_error.error_undefined_symbol(name);
-        return false;
+void Symtab::remove_symbol(const string& name) {
+    auto it = m_table.find(name);
+    if (it != m_table.end()) {
+        delete it->second;
+        m_table.erase(it);
     }
-    else if (symbol->is_in_eval()) {
-        g_error.error_recursive_evaluation(name);
-        return false;
-    }
-    else {
-        bool ok = true;
-        symbol->set_in_eval();
-        switch (symbol->get_sym_type()) {
-        case SymType::GLOBAL_DEFINE:
-        case SymType::CONSTANT:
-        case SymType::ADDRESS:
-            result = symbol->get_value();
-            break;
-
-        case SymType::EXPRESSION:
-            ok = symbol->get_expr()->eval(asmpc, this, result);
-            break;
-
-        default:
-            assert(false && "Unknown symbol type");
-        }
-        symbol->clear_in_eval();
-        return ok;
-    }
-
 }
-

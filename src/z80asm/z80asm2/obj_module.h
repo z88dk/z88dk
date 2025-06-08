@@ -47,14 +47,14 @@ private:
     int m_offset;
 };
 
-// Instruction
+// Instr
 
-class Instruction {
+class Instr {
 public:
-    Instruction() {}
-    Instruction(const Instruction& other) = delete;
-    virtual ~Instruction();
-    Instruction& operator=(const Instruction& other) = delete;
+    Instr() {}
+    Instr(const Instr& other) = delete;
+    virtual ~Instr();
+    Instr& operator=(const Instr& other) = delete;
 
     int get_offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
@@ -92,14 +92,14 @@ public:
     int get_asmpc() const;
     int get_size() const;
 
-    void add_instruction();
-    Instruction* get_cur_instruction();
-    list<Instruction*>& get_instructions() { return m_instructions; }
+    Instr* add_instr();
+    Instr* get_cur_instr();
+    list<Instr*>& get_instrs() { return m_instrs; }
 
 private:
     string m_name;
     int m_origin{ 0 };
-    list<Instruction*> m_instructions;
+    list<Instr*> m_instrs;
 };
 
 // Object Module
@@ -116,9 +116,14 @@ public:
 
     Section* get_cur_section() { return m_cur_section; }
     void set_cur_section(const string& name);
+    int get_asmpc();
 
-    void add_constant(const string& name, Expr* expr);
     void add_label(const string& name);
+    void add_define(const string& name, int value);
+    void add_define(const string& name, Expr* expr);
+    void remove_define(const string& name);
+
+    void add_equ(const string& name, Expr* expr);
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);

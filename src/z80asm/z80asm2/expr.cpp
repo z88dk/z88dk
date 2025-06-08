@@ -13,6 +13,68 @@
 #include <stack>
 using namespace std;
 
+void Expr::clear() {
+    m_infix.clear();
+    m_postfix.clear();
+}
+
+bool Expr::parse(const string& line) {
+    Scanner in;
+    if (!in.scan(line)) {
+        clear();
+        return false;   // scan failed
+    }
+    else if (!parse(in, false)) {
+        clear();
+        return false;   // parse failed
+    }
+    else if (!in.peek().is_end()) {
+        g_error.error_expected_eol();
+        clear();
+        return false;   // extra input
+    }
+    else {
+        return true;
+    }
+}
+
+bool Expr::parse(Scanner& in, bool silent) {
+    clear();
+    int pos0 = in.get_pos();
+
+    if (to_RPN(in, silent)) {
+        // copy infix tokens
+        for (int i = pos0; i < in.get_pos(); ++i)
+            m_infix.push_back(in[i]);
+        return true;
+    }
+    else {
+        in.set_pos(pos0); // reset to original position
+        clear();
+        return false;
+    }
+}
+
+string Expr::to_string() const {
+    Scanner tokens{ m_infix };
+    return tokens.to_string();
+}
+
+string Expr::rpn_to_string() const {
+    string output;
+    for (auto& token : m_postfix) {
+        output += token.to_string() + " ";
+    }
+    return output;
+}
+
+Expr* Expr::clone() const {
+    auto new_expr = new Expr;
+    new_expr->m_infix = m_infix;
+    new_expr->m_postfix = m_postfix;
+    return new_expr;
+}
+
 bool Expr::is_unary(Scanner& in) const {
     if (in.get_pos() == 0)
         return true;
@@ -29,7 +91,7 @@ bool Expr::is_unary(Scanner& in) const {
 }
 
 // Shunting Yard algotithm to convert infix to postfix (RPN)
-bool Expr::to_RPN(Scanner& in) {
+bool Expr::to_RPN(Scanner& in, bool silent) {
     stack<Token> op_stack;
 
     while (!in.peek().is(TType::END)) {
@@ -44,8 +106,7 @@ bool Expr::to_RPN(Scanner& in) {
         else if (ttype == TType::OPERATOR) {
 
             // Adjust to unary operator
-            bool unary = is_unary(in);
-            if (unary) {
+            if (is_unary(in)) {
                 switch (op) {
                 case Operator::PLUS: op = Operator::UPLUS; break;
                 case Operator::MINUS: op = Operator::UMINUS; break;
@@ -88,7 +149,8 @@ bool Expr::to_RPN(Scanner& in) {
                 op_stack.pop();
             }
             if (op_stack.empty()) {
-                m_status = Status::MISMATCHED_PARENS;
+                if (!silent) 
+                    g_error.error_unbalanced_parens();
                 return false;
             }
             op_stack.pop(); // pop '('
@@ -104,7 +166,8 @@ bool Expr::to_RPN(Scanner& in) {
                 op_stack.pop();
             }
             if (op_stack.empty()) {
-                m_status = Status::MISMATCHED_TERNARY;
+                if (!silent) 
+                    g_error.error_mismatched_ternary();
                 return false;
             }
             op_stack.pop(); // Pop '?'
@@ -121,7 +184,8 @@ bool Expr::to_RPN(Scanner& in) {
 
     while (!op_stack.empty()) {
         if (op_stack.top().get_ttype() == TType::LPAREN || op_stack.top().get_ttype() == TType::RPAREN) {
-            m_status = Status::MISMATCHED_PARENS;
+            if (!silent)
+                g_error.error_unbalanced_parens();
             return false;
         }
         m_postfix.push_back(op_stack.top());
@@ -129,16 +193,17 @@ bool Expr::to_RPN(Scanner& in) {
     }
 
     if (m_postfix.empty()) {
-        m_status = Status::OPERAND_EXPECTED;
+        if (!silent)
+            g_error.error_operand_expected();
         return false;   // no tokens
     }
     else {
-        return check_syntax();
+        return check_syntax(silent);
     }
 }
 
 // check if all arguments to all operators were given
-bool Expr::check_syntax() {
+bool Expr::check_syntax(bool silent) {
     stack<int> eval_stack;
     for (auto& token : m_postfix) {
         TType ttype = token.get_ttype();
@@ -157,7 +222,8 @@ bool Expr::check_syntax() {
             }
 
             if (eval_stack.size() < required) {
-                m_status = Status::INSUFICIENT_OPERANDS;
+                if (!silent)
+                    g_error.error_insuficient_operands();
                 return false;
             }
 
@@ -169,11 +235,13 @@ bool Expr::check_syntax() {
     }
 
     if (eval_stack.size() == 0) {
-        m_status = Status::OPERAND_EXPECTED;
+        if (!silent)
+            g_error.error_operand_expected();   
         return false;   // no tokens
     }
     else if (eval_stack.size() > 1) {
-        m_status = Status::TOO_MANY_OPERANDS;
+        if (!silent)
+            g_error.error_extra_operands();
         return false;
     }
     else {
@@ -181,55 +249,11 @@ bool Expr::check_syntax() {
     }
 }
 
-bool Expr::parse(const string& line) {
-    Scanner in;
-    m_status = Status::OK;
-
-    if (!in.scan(line)) {
-        m_status = Status::SCAN_FAILED;
-        m_infix.clear();
-        m_postfix.clear();
-        return false;   // scan failed
-    }
-    else if (!parse(in)) {
-        return false;   // parse failed, m_status is filled
-    }
-    else if (!in.peek().is_end()) {
-        m_status = Status::EOL_EXPECTED;
-        m_infix.clear();
-        m_postfix.clear();
-        return false;   // extra input
-    }
-    else {
-        assert(m_status == Status::OK);
-        return true;
-    }
-}
-
-bool Expr::parse(Scanner& in) {
-    m_infix.clear();
-    m_postfix.clear();
-    m_status = Status::OK;
-    int pos0 = in.get_pos();
-
-    if (to_RPN(in)) {
-        // copy infix tokens
-        for (int i = pos0; i < in.get_pos(); ++i)
-            m_infix.push_back(in[i]);
-        return true;
-    }
-    else {
-        in.set_pos(pos0); // reset to original position
-        m_infix.clear();
-        m_postfix.clear();
-        return false;
-    }
-}
-
-bool Expr::eval(int asmpc, Symtab* symtab, int& result) {
+bool Expr::eval_const(Symtab* symtab, int& result) {
     stack<int> eval_stack;
     result = 0;
-    int x1, x2, x3;
+    int x1 = 0, x2 = 0, x3 = 0;
+    Symbol* symbol = nullptr;
 
     for (auto& token : m_postfix) {
         switch (token.get_ttype()) {
@@ -238,14 +262,29 @@ bool Expr::eval(int asmpc, Symtab* symtab, int& result) {
             break;
 
         case TType::IDENT:
-            if (!symtab->eval(asmpc, token.get_svalue(), x1))
-                return false;
-            else
-                eval_stack.push(x1);
+            symbol = symtab->get_symbol(token.get_svalue());
+            if (!symbol)
+                return false;       // symbol not defined
+            switch (symbol->get_sym_type()) {
+            case SymType::NOT_DEFINED:
+                return false;       // symbol not defined
+            case SymType::GLOBAL_DEF:
+                eval_stack.push(symbol->get_value());
+                break;
+            case SymType::CONST:
+                eval_stack.push(symbol->get_value());
+                break;
+            case SymType::INSTR:
+                return false;       // value known only at link time
+            case SymType::EXPR:
+                return false;       // value known only at link time
+            default:
+                assert(false && "Unknown symbol type");
+            }
             break;
 
         case TType::ASMPC:
-            eval_stack.push(asmpc);
+            return false;           // value known only at link time
             break;
 
         case TType::OPERATOR:
@@ -446,26 +485,5 @@ bool Expr::eval(int asmpc, Symtab* symtab, int& result) {
     result = eval_stack.top();
     eval_stack.pop();
     return true;
-}
-
-string Expr::to_string() const {
-    Scanner expr{ m_infix };
-    return expr.to_string();
-}
-
-string Expr::rpn_to_string() const {
-    string output;
-    for (auto& token : m_postfix) {
-        output += token.to_string() + " ";
-    }
-    return output;
-}
-
-Expr* Expr::clone() {
-    auto new_expr = new Expr;
-    new_expr->m_infix = m_infix;
-    new_expr->m_postfix = m_postfix;
-    new_expr->m_status = m_status;
-    return new_expr;
 }
 

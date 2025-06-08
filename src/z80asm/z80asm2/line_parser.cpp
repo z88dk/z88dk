@@ -1,0 +1,262 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Line parser
+// Copyright (C) Paulo Custodio, 2011-2024
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+#include "error.h"
+#include "expr.h"
+#include "line_parser.h"
+#include "obj_module.h"
+using namespace std;
+
+LineParser::Elem::Elem() {
+}
+
+LineParser::Elem::Elem(const Elem& other)
+    : token(other.token)
+    , expr(other.expr ? other.expr->clone() : nullptr)
+    , const_value(other.const_value) {
+}
+
+LineParser::Elem& LineParser::Elem::operator=(const Elem& other) {
+    if (&other != this) {
+        token = other.token;
+        expr = other.expr->clone();
+        const_value = other.const_value;
+    }
+    return *this;
+}
+
+LineParser::Elem::~Elem() {
+    delete expr;
+}
+
+LineParser::Elems::Elems() {}
+
+LineParser::Elems::Elems(const Elems& other) {
+    for (auto& elem : other.elems) {
+        elems.push_back(elem);
+    }
+}
+
+LineParser::Elems& LineParser::Elems::operator=(const Elems& other) {
+    if (&other != this) {
+        elems.clear();
+        for (auto& elem : other.elems) {
+            elems.push_back(elem);
+        }
+    }
+    return *this;
+}
+
+LineParser::Elems::~Elems() {
+    elems.clear();
+}
+
+bool LineParser::parse(const string& line) {
+    if (!m_in.scan(line))
+        return false;       // scanning failed
+
+    if (m_in.peek().is(TType::END))
+        return true;        // empty line
+
+    vector<ParseQueueElem> parse_queue;
+
+    // add initial state
+    ParseQueueElem queue_elem;
+    queue_elem.state = 0;
+    queue_elem.in_pos = m_in.get_pos();
+    parse_queue.push_back(queue_elem);
+
+    // check all possible paths
+    bool parse_ok = false;
+    while (!parse_queue.empty()) {
+        ParseQueueElem queue_elem = parse_queue.back();
+        parse_queue.pop_back();
+        auto& cur_state = m_states[queue_elem.state];
+
+        // check if at final state
+        if (cur_state.action) {
+            m_elems = queue_elem.elems; // setup data for function call
+            (this->*cur_state.action)();
+            parse_ok = true;
+            break;
+        }
+
+        // check CONST_EXPR
+        m_in.set_pos(queue_elem.in_pos);
+        auto it = cur_state.ttype_next.find(TType::CONST_EXPR);
+        if (it != cur_state.ttype_next.end()) {
+            Elem elem;
+            elem.token = Token{ TType::INT, false };
+            Expr* expr = new Expr;
+            if (!expr->parse(m_in, true)) {
+                delete expr;
+            }
+            else if (!expr->eval_const(g_obj_module.get_symtab(), elem.const_value)) {
+                delete expr;
+            }
+            else {
+                elem.token.set_ivalue(elem.const_value);
+                ParseQueueElem new_state = queue_elem;
+                new_state.state = it->second;
+                new_state.in_pos = m_in.get_pos();
+                new_state.elems.elems.push_back(elem);
+                parse_queue.push_back(new_state);
+                delete expr;
+            }
+        }
+
+        // check EXPR
+        m_in.set_pos(queue_elem.in_pos);
+        it = cur_state.ttype_next.find(TType::EXPR);
+        if (it != cur_state.ttype_next.end()) {
+            Elem elem;
+            elem.token = Token{ TType::EXPR, false };
+            elem.expr = new Expr;
+            if (!elem.expr->parse(m_in, true)) {
+                delete elem.expr;
+                elem.expr = nullptr;
+            }
+            else {
+                ParseQueueElem new_state = queue_elem;
+                new_state.state = it->second;
+                new_state.in_pos = m_in.get_pos();
+                new_state.elems.elems.push_back(elem);
+                parse_queue.push_back(new_state);
+            }
+        }
+
+        // check token
+        m_in.set_pos(queue_elem.in_pos);
+        TType ttype = m_in.peek().get_ttype();
+        it = cur_state.ttype_next.find(ttype);
+        if (it != cur_state.ttype_next.end()) {
+            Elem elem;
+            elem.token = m_in.peek();
+            m_in.next();
+
+            ParseQueueElem new_state = queue_elem;
+            new_state.state = it->second;
+            new_state.in_pos = m_in.get_pos();
+            new_state.elems.elems.push_back(elem);
+            parse_queue.push_back(new_state);
+        }
+
+        // check keyword
+        m_in.set_pos(queue_elem.in_pos);
+        Keyword keyword = m_in.peek().get_keyword();
+        if (keyword != Keyword::NONE) {
+            auto it = cur_state.keyword_next.find(keyword);
+            if (it != cur_state.keyword_next.end()) {
+                Elem elem;
+                elem.token = m_in.peek();
+                m_in.next();
+
+                ParseQueueElem new_state = queue_elem;
+                new_state.state = it->second;
+                new_state.in_pos = m_in.get_pos();
+                new_state.elems.elems.push_back(elem);
+                parse_queue.push_back(new_state);
+            }
+        }
+    }
+
+    if (!parse_ok)
+        g_error.error_syntax();
+
+    return parse_ok;
+}
+
+//@@BEGIN:actions_impl
+void LineParser::action_ident_colon() {
+	g_obj_module.add_label(m_elems.elems[1-1].token.get_svalue());
+
+
+}
+
+void LineParser::action_ident_equ_expr() {
+	g_obj_module.add_equ(m_elems.elems[1-1].token.get_svalue(), m_elems.elems[3-1].expr->clone());
+
+
+}
+
+void LineParser::action_assume_const_expr() {
+	g_obj_module.set_assume(m_elems.elems[2-1].const_value);
+
+}
+
+void LineParser::action_nop() {
+	g_obj_module.add_opcode_void(0x00);
+
+
+}
+
+void LineParser::action_jr_expr() {
+	g_obj_module.add_opcode_jr(0x18, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_jr_nz_comma_expr() {
+	g_obj_module.add_opcode_jr(0x20, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_jr_z_comma_expr() {
+	g_obj_module.add_opcode_jr(0x28, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_jr_nc_comma_expr() {
+	g_obj_module.add_opcode_jr(0x30, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_jr_c_comma_expr() {
+	g_obj_module.add_opcode_jr(0x38, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_ld_a_comma_expr() {
+	g_obj_module.add_opcode_n(0x3E, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_ld_b_comma_expr() {
+	g_obj_module.add_opcode_n(0x06, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_ld_c_comma_expr() {
+	g_obj_module.add_opcode_n(0x0E, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_ld_a_comma_lparen_expr_rparen() {
+	g_obj_module.add_opcode_nn(0x3A, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_ld_a_comma_a() {
+	g_obj_module.add_opcode_void(0x7F);
+
+
+}
+
+void LineParser::action_ld_a_comma_b() {
+	g_obj_module.add_opcode_void(0x78);
+
+}
+
+//@@END

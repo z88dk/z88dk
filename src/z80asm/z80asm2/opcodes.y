@@ -19,6 +19,12 @@
 "ld" "a" "," EXPR
 	g_obj_module.add_opcode_n(0x3E, $4.expr->clone());
 
+"ld" "b" "," EXPR
+	g_obj_module.add_opcode_n(0x06, $4.expr->clone());
+
+"ld" "c" "," EXPR
+	g_obj_module.add_opcode_n(0x0E, $4.expr->clone());
+
 "ld" "a" "," "(" EXPR ")"
 	g_obj_module.add_opcode_nn(0x3A, $4.expr->clone());
 
