@@ -15,36 +15,22 @@ class Symtab;
 
 class Expr {
 public:
-    enum class Status {
-        OK,
-        SCAN_FAILED,
-        EOL_EXPECTED,
-        OPERAND_EXPECTED,
-        MISMATCHED_PARENS,
-        MISMATCHED_TERNARY,
-        INSUFICIENT_OPERANDS,
-        TOO_MANY_OPERANDS,
-        UNDEFINED_SYMBOL,
-    };
-
-    Status get_status() const { return m_status; }
-
+    void clear();
     bool parse(const string& line);
-    bool parse(Scanner& in);
-    bool eval(int asmpc, Symtab* symtab, int& result);
+    bool parse(Scanner& in, bool silent);
+    bool eval_const(Symtab* symtab, int& result);
 
     string to_string() const;
     string rpn_to_string() const;
 
-    Expr* clone();
+    Expr* clone() const;
 
 private:
     vector<Token> m_infix;
     vector<Token> m_postfix;
-    Status m_status{ Status::OK };
 
     bool is_unary(Scanner& in) const;
-    bool to_RPN(Scanner& in);
-    bool check_syntax();
+    bool to_RPN(Scanner& in, bool silent);
+    bool check_syntax(bool silent);
 };
 

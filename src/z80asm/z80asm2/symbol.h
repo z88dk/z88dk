@@ -12,37 +12,48 @@
 using namespace std;
 
 class Expr;
+class Instr;
+class Result;
+class Symtab;
 
 enum class SymType {
-    GLOBAL_DEFINE,
-    CONSTANT,
-    ADDRESS,
-    EXPRESSION,
+    NOT_DEFINED,
+    GLOBAL_DEF,
+    CONST,
+    INSTR,
+    EXPR,
 };
 
 class Symbol {
 public:
-    Symbol(const string& name);
+    Symbol(const string& name, Symtab* parent);
     Symbol(const Symbol& other) = delete;
     virtual ~Symbol();
     Symbol& operator=(const Symbol& other) = delete;
+    void clear();
 
     const string& get_name() const { return m_name; }
     SymType get_sym_type() const { return m_sym_type; }
     int get_value() const { return m_value; }
+    Instr* get_instr() { return m_instr; }
     Expr* get_expr() { return m_expr; }
     bool is_in_eval() const { return m_in_eval; }
 
-    void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
-    void set_value(int value) { m_value = value; }
+    void set_global_def(int value);
+    void set_global_def(Expr* expr);
+    void set_const(int value);
+    void set_const(Expr* expr);
+    void set_instr(Instr* instr);
     void set_expr(Expr* expr);
     void set_in_eval() { m_in_eval = true; }
     void clear_in_eval() { m_in_eval = false; }
 
 private:
     const string m_name;        // symbol name
-    SymType m_sym_type{ SymType::CONSTANT };
-    int m_value{ 0 };           // constant or address offset
+    Symtab* m_parent{ nullptr };
+    SymType m_sym_type{ SymType::CONST };
+    int m_value{ 0 };           // constant
+    Instr* m_instr{ nullptr };  // address
     Expr* m_expr{ nullptr };    // expression
     bool m_in_eval{ false };    // detect recursive evaluation
 };
@@ -56,8 +67,15 @@ public:
 
     void clear();
     Symbol* get_symbol(const string& name); // nullptr if not found
-    bool add_symbol(const string& name, Symbol* symbol);
-    bool eval(int asmpc, const string& name, int& result);
+    Symbol* add_symbol(const string& name);
+    void remove_symbol(const string& name);
+
+    auto begin() { return m_table.begin(); }
+    auto end() { return m_table.end(); }
+    auto cbegin() const { return m_table.cbegin(); }
+    auto cend() const { return m_table.cend(); }
+    auto size() const { return m_table.size(); }
+    bool empty() const { return m_table.empty(); }
 
 private:
     unordered_map<string, Symbol*> m_table;
