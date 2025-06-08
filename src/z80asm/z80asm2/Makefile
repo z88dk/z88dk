@@ -14,9 +14,9 @@ endif
 PROJ =		z80asm
 TARGET =	$(PROJ)$(EXESUFFIX)
 
-CXX1		?= g++
+CXX			?= g++
 CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors $(OPT)
-OPT			?= -O3
+OPT			?= -O3 -g
 
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(SRCS:.cpp=.o)
