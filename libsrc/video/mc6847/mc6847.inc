@@ -31,7 +31,7 @@ ENDIF
 
 IF FORpc6001
     INCLUDE "target/pc6001/def/pc6001.def"
-    defc MODE0_3x2 = 1
+    defc    MODE0_3x2 = 1
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
 ENDIF

@@ -2,6 +2,7 @@
     SECTION code_clib
 
     PUBLIC  xor_MODE2
+    INCLUDE "video/mc6847/mc6847.inc"
 
 xor_MODE2:
     ld      a, h

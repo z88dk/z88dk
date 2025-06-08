@@ -3,6 +3,8 @@
 
     PUBLIC  plot_MODE0
 
+    INCLUDE "video/mc6847/mc6847.inc"
+
 plot_MODE0:
     ld      a, l
 IF MODE0_3x2

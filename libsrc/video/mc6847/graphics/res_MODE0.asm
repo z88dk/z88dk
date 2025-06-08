@@ -2,6 +2,7 @@
     SECTION code_clib
 
     PUBLIC  res_MODE0
+    INCLUDE "video/mc6847/mc6847.inc"
 
 res_MODE0:
     ld      a, l

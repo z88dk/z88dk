@@ -2,6 +2,8 @@
     SECTION code_clib
 
     PUBLIC  pointxy_MODE0
+    INCLUDE "video/mc6847/mc6847.inc"
+
 
 pointxy_MODE0:
     ld      a, l
