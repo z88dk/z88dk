@@ -47,8 +47,8 @@ IF FORmc1000
     ld      a,(__mc6847_mode)
     out     ($80),a
     ld      a,(hl)
+    ld      de,hl       ;Load up de for pix_return
     ld      hl,pixelbyte
-    ld      de,hl       ;copmatibililty
     ld      (hl),a
     ld      a,(__mc6847_mode)
     out     ($80),a

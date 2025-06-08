@@ -1,6 +1,7 @@
 
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
+    EXTERN  pix_return
 
     INCLUDE "graphics/grafix.inc"
 
@@ -29,16 +30,28 @@ rotated:
     ld      c, (hl)
 IF  NEEDplot
     or      c
+  IF FORmc1000
+    call    pix_return
+  ELSE
     ld      (hl), a
+  ENDIF
 ENDIF
 IF  NEEDunplot
     cpl
     and     c
+  IF FORmc1000
+    call    pix_return
+  ELSE
     ld      (hl), a
+  ENDIF
 ENDIF
 IF  NEEDxor
     xor     c
+  IF FORmc1000
+    call    pix_return
+  ELSE
     ld      (hl), a
+  ENDIF
 ENDIF
 IF  NEEDpoint
     and     c

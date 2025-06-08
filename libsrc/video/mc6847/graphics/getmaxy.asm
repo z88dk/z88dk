@@ -12,7 +12,7 @@
 getmaxy:
 _getmaxy:
     ld      a, (__mc6847_mode)
-    and     a
+    and     @11111101
 IF MODE0_3x2
     ld      hl, 47
 ELIF MODE0_1x1

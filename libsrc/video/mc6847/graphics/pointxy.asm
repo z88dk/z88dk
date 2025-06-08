@@ -18,6 +18,10 @@ IF MC6847_HAS_HIRES
 ENDIF
     cp      MODE_MULTICOLOUR
     jp      z, pointxy_MODE2
+IF MC6847_HAS_TEXT_GFX
     and     a
     ret     nz
     jp      pointxy_MODE0
+ELSE
+    ret
+ENDIF

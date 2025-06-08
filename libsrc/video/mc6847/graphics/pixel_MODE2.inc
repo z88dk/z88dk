@@ -48,6 +48,7 @@ IF  NEEDplot
     and     c
     or      e
     ld      (hl), a
+    ;; TODO mc1000
 ENDIF
 IF  NEEDunplot
     and     c
