@@ -286,3 +286,6 @@ retest: rebuild
 	$(MAKE) -C ../common test
 	$(MAKE) -C ../z80asm test
 	$(MAKE) -C ../zobjcopy test
+
+cloc:
+	perl -S cloc *.pl dev/cpu/*.pl dev/z80asm_lib/*.asm dev/z80asm_lib/t/*.t src/*.cpp src/*.h src/c/*.c src/c/*.h src/cpp/*.cpp src/cpp/*.h 

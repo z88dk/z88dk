@@ -1,2 +1,2 @@
-test_dbl_hash_concat.asm:2: 	ld a , xp ## to
+LINE 2 "test_t_dbl_hash_concat.asm"
 ld a,xpto

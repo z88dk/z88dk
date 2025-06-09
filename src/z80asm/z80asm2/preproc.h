@@ -19,6 +19,8 @@ public:
     bool getline(string& line);
     string autolabel();
 
+    static void preproc_only(const string& filename);
+
 private:
     deque<string> m_expanded_lines;
     Scanner m_in;

@@ -1,4 +1,4 @@
-test_assume_ok.asm:2: 	.Assume 3*0:.Assume 3/3
+LINE 2 "test_t_assume_ok.asm"
 Assume 3*0
-test_assume_ok.asm:2: 	.Assume 3*0:.Assume 3/3
+LINE 2 "test_t_assume_ok.asm"
 Assume 3/3

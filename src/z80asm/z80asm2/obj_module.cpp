@@ -26,9 +26,20 @@ Patch::~Patch() {
 int Patch::size() const {
     static unordered_map<PatchType, int> patch_sizes = {
         //@@BEGIN: patch_sizes
+        { PatchType::ASSIGN, 0 },
+        { PatchType::D, 1 },
+        { PatchType::D2DD, 2 },
+        { PatchType::D2DDD, 3 },
+        { PatchType::HOFFSET, 1 },
         { PatchType::JR, 1 },
+        { PatchType::JRE, 2 },
         { PatchType::N, 1 },
+        { PatchType::N2NN, 2 },
+        { PatchType::N2NNN, 3 },
         { PatchType::NN, 2 },
+        { PatchType::NNN, 3 },
+        { PatchType::NNNN, 4 },
+        { PatchType::NN_BE, 2 },
         //@@END
     };
 

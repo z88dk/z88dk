@@ -1,0 +1,14 @@
+LINE 1 "test_t_preproc_only.asm"
+line 1
+LINE 4 "test_t_preproc_only.asm"
+line 4
+LINE 4 "test_t_preproc_only.asm"
+statement 2
+LINE 4 "test_t_preproc_only.asm"
+statement 3
+LINE 1 "test_t_preproc_only.inc"
+inc line 1
+LINE 6 "test_t_preproc_only.inc"
+inc line 6
+LINE 6 "test_t_preproc_only.asm"
+line 6

@@ -136,6 +136,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_module.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\operator.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scanner.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbol.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_module.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\operator.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\scanner.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\symbol.h" />

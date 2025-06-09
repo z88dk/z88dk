@@ -1,6 +1,6 @@
-test_equ.asm:2: 	.v1 equ 10:v2: equ 20\v3 equ 30
+LINE 2 "test_t_equ.asm"
 v1 equ 10
-test_equ.asm:2: 	.v1 equ 10:v2: equ 20\v3 equ 30
+LINE 2 "test_t_equ.asm"
 v2 equ 20
-test_equ.asm:2: 	.v1 equ 10:v2: equ 20\v3 equ 30
+LINE 2 "test_t_equ.asm"
 v3 equ 30
