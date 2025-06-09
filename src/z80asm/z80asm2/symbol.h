@@ -32,12 +32,12 @@ public:
     Symbol& operator=(const Symbol& other) = delete;
     void clear();
 
-    const string& get_name() const { return m_name; }
-    SymType get_sym_type() const { return m_sym_type; }
-    int get_value() const { return m_value; }
-    Instr* get_instr() { return m_instr; }
-    Expr* get_expr() { return m_expr; }
-    bool is_in_eval() const { return m_in_eval; }
+    const string& name() const { return m_name; }
+    SymType sym_type() const { return m_sym_type; }
+    int value() const { return m_value; }
+    Instr* instr() { return m_instr; }
+    Expr* expr() { return m_expr; }
+    bool in_eval() const { return m_in_eval; }
 
     void set_global_def(int value);
     void set_global_def(Expr* expr);
@@ -81,4 +81,4 @@ private:
     unordered_map<string, Symbol*> m_table;
 };
 
-extern Symtab g_global_defines;
+extern Symtab* g_global_defines;

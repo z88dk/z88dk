@@ -31,5 +31,5 @@ private:
     void check_end();
 };
 
-extern Preproc g_preproc;
+extern Preproc* g_preproc;
 

@@ -13,7 +13,7 @@
 #include <unordered_map>
 using namespace std;
 
-ObjModule g_obj_module;
+ObjModule* g_obj_module{ nullptr };
 
 Patch::Patch(PatchType patch_type, Expr* expr, int offset)
     : m_patch_type(patch_type), m_expr(expr), m_offset(offset) {
@@ -42,9 +42,27 @@ int Patch::size() const {
     }
 }
 
+int Patch::resolve(int value) const {
+    switch (m_patch_type) {
+        case PatchType::JR:
+            return value & 0xFF;
+        case PatchType::N:
+            return value & 0xFF; // Ensure it's a byte
+        case PatchType::NN:
+            return value & 0xFFFF; // Ensure it's a word
+        default:
+            assert(false && "Unknown patch type");
+            return 0; // Should never reach here
+    }
+}
+
 Instr::~Instr() {
     for (auto& patch : m_patches)
         delete patch;
+}
+
+Symtab* Instr::symtab() {
+    return m_parent->symtab();
 }
 
 void Instr::add_opcode(long long opcode) {
@@ -62,14 +80,27 @@ void Instr::add_opcode(long long opcode) {
 }
 
 void Instr::add_patch(Patch* patch) {
-    m_patches.push_back(patch);
-    for (int i = 0; i < patch->size(); ++i) {
-        add_byte(0); // reserve space for the patch
+    int value = 0;
+    if (patch->expr()->eval_const(m_parent->symtab(), value)) {
+        // If the expression evaluates to a constant, replace it with the value
+        value = patch->resolve(value);
+        int size = patch->size();
+        for (int i = 0; i < size; ++i) {
+            add_byte((value >> (i * 8)) & 0xFF);
+        }
+        delete patch; // No need to keep the patch if it's resolved
+    }
+    else {
+        m_patches.push_back(patch);
+        int size = patch->size();
+        for (int i = 0; i < size; ++i) {
+            add_byte(0); // reserve space for the patch
+        }
     }
 }
 
-Section::Section(const string& name)
-    : m_name(name) {
+Section::Section(ObjModule* parent, const string& name)
+    : m_parent(parent), m_name(name) {
 }
 
 Section::~Section() {
@@ -78,24 +109,28 @@ Section::~Section() {
     m_instrs.clear();
 }
 
-int Section::get_asmpc() const {
+int Section::asmpc() const {
     if (m_instrs.empty())
         return 0;
     else
-        return m_instrs.back()->get_offset();
+        return m_instrs.back()->offset();
 }
 
-int Section::get_size() const {
+int Section::size() const {
     if (m_instrs.empty())
         return 0;
     else
-        return m_instrs.back()->get_offset() +
+        return m_instrs.back()->offset() +
         m_instrs.back()->size();
 }
 
+Symtab* Section::symtab() {
+    return m_parent->symtab();
+}
+
 Instr* Section::add_instr() {
-    auto instr = new Instr();
-    instr->set_offset(get_size());
+    auto instr = new Instr(this);
+    instr->set_offset(size());
     m_instrs.push_back(instr);
     return instr;
 }
@@ -129,39 +164,39 @@ void ObjModule::clear() {
     m_assume = 0;
 
     // copy global symbols to the symbol table
-    for (const auto& it : g_global_defines) {
-        assert(it.second->get_sym_type() == SymType::GLOBAL_DEF);
+    for (const auto& it : *g_global_defines) {
+        assert(it.second->sym_type() == SymType::GLOBAL_DEF);
         Symbol* symbol = m_symtab.add_symbol(it.first);
-        symbol->set_global_def(it.second->get_value());
+        symbol->set_global_def(it.second->value());
     }
 }
 
 void ObjModule::set_cur_section(const string& name) {
-    if (m_cur_section && m_cur_section->get_name() == name) {
+    if (m_cur_section && m_cur_section->name() == name) {
         return; // already set
     }
 
     // Find existing section or create a new one
     for (auto& section : m_sections) {
-        if (section->get_name() == name) {
+        if (section->name() == name) {
             m_cur_section = section;
             return;
         }
     }
 
     // Create a new section if not found
-    m_cur_section = new Section(name);
+    m_cur_section = new Section(this, name);
     m_sections.push_back(m_cur_section);
 }
 
-int ObjModule::get_asmpc() {
-    return get_cur_section()->get_asmpc();
+int ObjModule::asmpc() {
+    return cur_section()->asmpc();
 }
 
 void ObjModule::add_label(const string& name) {
     Symbol* symbol = m_symtab.add_symbol(name);
     if (symbol) {
-        Instr* instr = get_cur_section()->add_instr();
+        Instr* instr = cur_section()->add_instr();
         instr->set_label(symbol);
         symbol->set_instr(instr);
     }
@@ -200,25 +235,25 @@ void ObjModule::add_equ(const string& name, Expr* expr) {
 }
 
 void ObjModule::add_opcode_void(long long opcode) {
-    Instr* instr = get_cur_section()->add_instr();
+    Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
 }
 
 void ObjModule::add_opcode_jr(long long opcode, Expr* expr) {
-    Instr* instr = get_cur_section()->add_instr();
+    Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(PatchType::JR, expr, instr->get_offset()));
+    instr->add_patch(new Patch(PatchType::JR, expr, instr->size()));
 }
 
 void ObjModule::add_opcode_n(long long opcode, Expr* expr) {
-    Instr* instr = get_cur_section()->add_instr();
+    Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(PatchType::N, expr, instr->get_offset()));
+    instr->add_patch(new Patch(PatchType::N, expr, instr->size()));
 }
 
 void ObjModule::add_opcode_nn(long long opcode, Expr* expr) {
-    Instr* instr = get_cur_section()->add_instr();
+    Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(PatchType::NN, expr, instr->get_offset()));
+    instr->add_patch(new Patch(PatchType::NN, expr, instr->size()));
 }
 

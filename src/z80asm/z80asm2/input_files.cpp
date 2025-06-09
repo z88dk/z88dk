@@ -12,7 +12,7 @@
 #include <cassert>
 using namespace std;
 
-InputFiles g_input_files;
+InputFiles* g_input_files{ nullptr };
 
 InputFiles::~InputFiles() {
     while (!m_files.empty())
@@ -23,14 +23,14 @@ void InputFiles::push_file(const string& filename) {
     File* file = new File;
     file->filename = filename;
     if (already_included(filename)) {
-        g_error.error_recursive_include(filename);
+        g_error->error_recursive_include(filename);
     }
     else {
         file->ifs.open(filename, ios::binary);
         if (!file->ifs.is_open())
-            g_error.error_open_file(filename);
+            g_error->error_open_file(filename);
         else
-            g_location = Location(filename);
+            g_location->set_filename(filename);
     }
     m_files.push_back(file);
 }
@@ -43,11 +43,12 @@ void InputFiles::pop_file() {
     m_files.pop_back();
     delete file;
     if (m_files.empty()) {
-        g_location.clear();
+        g_location->clear();
     }
     else {
         file = m_files.back();
-        g_location = Location(file->filename, file->line_num);
+        g_location->set_filename(file->filename);
+        g_location->set_line_num(file->line_num);
     }
 }
 
@@ -72,8 +73,9 @@ bool InputFiles::getline(string& line) {
                     line += cont;
                 }
             }
-            g_location = Location(file->filename, file->line_num);
-            g_location.set_text(line);
+            g_location->set_filename(file->filename);
+            g_location->set_line_num(file->line_num);
+            g_location->set_text(line);
             return true;
         }
         else {

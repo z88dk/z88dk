@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace std;
 
-Error g_error;
+Error* g_error{ nullptr };
 
 void Error::error(const string& message, const string& arg) {
     m_count++;
@@ -22,16 +22,16 @@ void Error::warning(const string& message, const string& arg) {
 }
 
 void Error::output_message(const string& prefix, const string& message, const string& arg) {
-    if (!g_location.empty())
-        cerr << g_location.get_filename() << ":" << g_location.get_line_num() << ": ";
+    if (!g_location->empty())
+        cerr << g_location->filename() << ":" << g_location->line_num() << ": ";
     cerr << prefix << ": " << message;
     if (!arg.empty())
         cerr << ": " << arg;
     cerr << endl;
-    if (!g_location.get_text().empty()) {
-        cerr << "  ^---- " << g_location.get_text() << endl;
-        if (!g_location.get_expanded_text().empty())
-            cerr << "    ^---- " << g_location.get_expanded_text() << endl;
+    if (!g_location->text().empty()) {
+        cerr << "  ^---- " << g_location->text() << endl;
+        if (!g_location->expanded_text().empty())
+            cerr << "    ^---- " << g_location->expanded_text() << endl;
     }
 }
 

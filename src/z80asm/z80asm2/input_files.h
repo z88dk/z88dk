@@ -35,5 +35,5 @@ private:
     bool already_included(const string& filename);
 };
 
-extern InputFiles g_input_files;
+extern InputFiles* g_input_files;
 

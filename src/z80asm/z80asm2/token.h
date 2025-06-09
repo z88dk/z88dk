@@ -72,14 +72,14 @@ class Token {
 public:
     Token() {}
     Token(TType ttype, bool blank_before);
-    TType get_ttype() const { return m_ttype; }
-    bool has_blank_before() const { return m_blank_before; }
+    TType ttype() const { return m_ttype; }
+    bool blank_before() const { return m_blank_before; }
 
-    int get_ivalue() const { return m_ivalue; }
-    double get_fvalue() const { return m_fvalue; }
-    const string& get_svalue() const { return m_svalue; }
-    Keyword get_keyword() const { return m_keyword; }
-    Operator get_operator() const { return m_operator; }
+    int ivalue() const { return m_ivalue; }
+    double fvalue() const { return m_fvalue; }
+    const string& svalue() const { return m_svalue; }
+    Keyword keyword() const { return m_keyword; }
+    Operator operator_() const { return m_operator; }
 
     void set_ivalue(int ivalue) { m_ivalue = ivalue; }
     void set_fvalue(double fvalue) { m_fvalue = fvalue; }

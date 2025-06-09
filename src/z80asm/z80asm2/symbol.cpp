@@ -12,7 +12,7 @@
 #include <cassert>
 using namespace std;
 
-Symtab g_global_defines;
+Symtab* g_global_defines{ nullptr };
 
 Symbol::Symbol(const string& name, Symtab* parent)
     : m_name(name), m_parent(parent) {
@@ -43,7 +43,7 @@ void Symbol::set_global_def(Expr* expr) {
         set_global_def(value);
     }
     else {
-        g_error.error_constant_expression_expected();
+        g_error->error_constant_expression_expected();
     }
     delete expr;
 }
@@ -60,7 +60,7 @@ void Symbol::set_const(Expr* expr) {
         set_const(value);
     }
     else {
-        g_error.error_constant_expression_expected();
+        g_error->error_constant_expression_expected();
     }
     delete expr;
 }
@@ -105,7 +105,7 @@ Symbol* Symtab::get_symbol(const string& name) {
 
 Symbol* Symtab::add_symbol(const string& name) {
     if (get_symbol(name)) {
-        g_error.error_duplicate_definition(name);
+        g_error->error_duplicate_definition(name);
         return nullptr;
     }
     else {
