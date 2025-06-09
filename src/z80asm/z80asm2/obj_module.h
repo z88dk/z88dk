@@ -8,7 +8,6 @@
 #pragma once
 
 #include "symbol.h"
-#include <list>
 #include <vector>
 using namespace std;
 
@@ -63,7 +62,7 @@ public:
     void set_offset(int offset) { m_offset = offset; }
     Byte* data() { return m_bytes.data(); }
     int size() const { return static_cast<int>(m_bytes.size()); }
-    list<Patch*>& patches() { return m_patches; }
+    vector<Patch*>& patches() { return m_patches; }
     Symbol* label() const { return m_label; }
     void set_label(Symbol* label) { m_label = label; }
     Symtab* symtab();
@@ -76,7 +75,7 @@ private:
     Section* m_parent{ nullptr };
     int m_offset{ 0 };
     vector<Byte> m_bytes;
-    list<Patch*> m_patches;
+    vector<Patch*> m_patches;
     Symbol* m_label{ nullptr };
 };
 
@@ -88,6 +87,7 @@ public:
     Section(const Section& other) = delete;
     virtual ~Section();
     Section& operator=(const Section& other) = delete;
+    void clear();
 
     const string& name() const { return m_name; }
 
@@ -100,14 +100,14 @@ public:
     Symtab* symtab();
 
     Instr* add_instr();
-    Instr* get_cur_instr();
-    list<Instr*>& get_instrs() { return m_instrs; }
+    Instr* cur_instr();
+    vector<Instr*>& instrs() { return m_instrs; }
 
 private:
     ObjModule* m_parent{ nullptr };
     string m_name;
     int m_origin{ 0 };
-    list<Instr*> m_instrs;
+    vector<Instr*> m_instrs;
 };
 
 // Object Module
@@ -140,7 +140,7 @@ public:
 
 private:
     Symtab m_symtab;
-    list<Section*> m_sections;
+    vector<Section*> m_sections;
     Section* m_cur_section{ nullptr };
     int m_assume{ 0 };
 };

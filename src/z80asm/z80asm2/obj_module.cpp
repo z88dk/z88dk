@@ -59,6 +59,7 @@ int Patch::resolve(int value) const {
 Instr::~Instr() {
     for (auto& patch : m_patches)
         delete patch;
+    m_patches.clear();
 }
 
 Symtab* Instr::symtab() {
@@ -109,6 +110,13 @@ Section::~Section() {
     m_instrs.clear();
 }
 
+void Section::clear() {
+    for (auto& instr : m_instrs)
+        delete instr;
+    m_instrs.clear();
+    m_origin = 0;
+}
+
 int Section::asmpc() const {
     if (m_instrs.empty())
         return 0;
@@ -120,8 +128,7 @@ int Section::size() const {
     if (m_instrs.empty())
         return 0;
     else
-        return m_instrs.back()->offset() +
-        m_instrs.back()->size();
+        return m_instrs.back()->offset() + m_instrs.back()->size();
 }
 
 Symtab* Section::symtab() {
@@ -135,14 +142,15 @@ Instr* Section::add_instr() {
     return instr;
 }
 
-Instr* Section::get_cur_instr() {
+Instr* Section::cur_instr() {
     if (m_instrs.empty())
         add_instr();
     return m_instrs.back();
 }
 
 ObjModule::ObjModule() {
-    set_cur_section(""); // reset to default section
+    m_cur_section = new Section(this, "");
+    m_sections.push_back(m_cur_section);
 }
 
 ObjModule::~ObjModule() {
@@ -156,11 +164,11 @@ ObjModule::~ObjModule() {
 
 void ObjModule::clear() {
     m_symtab.clear();
-    for (auto& section : m_sections) {
-        delete section;
-    }
-    m_sections.clear();
-    set_cur_section(""); // reset to default section
+    for (size_t i = 1; i < m_sections.size(); ++i)
+        delete m_sections[i];
+    m_sections.resize(1);
+    m_cur_section = m_sections[0];
+    m_cur_section->clear();
     m_assume = 0;
 
     // copy global symbols to the symbol table
