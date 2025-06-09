@@ -29,7 +29,7 @@ bool Expr::parse(const string& line) {
         return false;   // parse failed
     }
     else if (!in.peek().is_end()) {
-        g_error.error_expected_eol();
+        g_error->error_expected_eol();
         clear();
         return false;   // extra input
     }
@@ -40,11 +40,12 @@ bool Expr::parse(const string& line) {
 
 bool Expr::parse(Scanner& in, bool silent) {
     clear();
-    int pos0 = in.get_pos();
+    int pos0 = in.pos();
 
     if (to_RPN(in, silent)) {
         // copy infix tokens
-        for (int i = pos0; i < in.get_pos(); ++i)
+        int pos1 = in.pos();
+        for (int i = pos0; i < pos1; ++i)
             m_infix.push_back(in[i]);
         return true;
     }
@@ -76,10 +77,10 @@ Expr* Expr::clone() const {
 }
 
 bool Expr::is_unary(Scanner& in) const {
-    if (in.get_pos() == 0)
+    if (in.pos() == 0)
         return true;
     const Token& prev = in.peek(-1);
-    switch (prev.get_ttype()) {
+    switch (prev.ttype()) {
     case TType::OPERATOR:
     case TType::LPAREN:
     case TType::QUEST:
@@ -96,8 +97,8 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
 
     while (!in.peek().is(TType::END)) {
         const Token& token = in.peek();
-        TType ttype = token.get_ttype();
-        Operator op = token.get_operator();
+        TType ttype = token.ttype();
+        Operator op = token.operator_();
 
         if (ttype == TType::INT || ttype == TType::IDENT || ttype == TType::ASMPC) {
             m_postfix.push_back(token);
@@ -116,9 +117,9 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
 
             while (!op_stack.empty()) {
                 const Token& top = op_stack.top();
-                if (top.get_ttype() != TType::OPERATOR)
+                if (top.ttype() != TType::OPERATOR)
                     break;
-                Operator top_op = top.get_operator();
+                Operator top_op = top.operator_();
 
                 const OperatorInfo& op1 = OperatorTable::get_info(op);
                 const OperatorInfo& op2 = OperatorTable::get_info(top_op);
@@ -144,13 +145,13 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
             in.next();
         }
         else if (ttype == TType::RPAREN) {
-            while (!op_stack.empty() && op_stack.top().get_ttype() != TType::LPAREN) {
+            while (!op_stack.empty() && op_stack.top().ttype() != TType::LPAREN) {
                 m_postfix.push_back(op_stack.top());
                 op_stack.pop();
             }
             if (op_stack.empty()) {
                 if (!silent) 
-                    g_error.error_unbalanced_parens();
+                    g_error->error_unbalanced_parens();
                 return false;
             }
             op_stack.pop(); // pop '('
@@ -161,13 +162,13 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
             in.next();
         }
         else if (ttype == TType::COLON) {
-            while (!op_stack.empty() && op_stack.top().get_ttype() != TType::QUEST) {
+            while (!op_stack.empty() && op_stack.top().ttype() != TType::QUEST) {
                 m_postfix.push_back(op_stack.top());
                 op_stack.pop();
             }
             if (op_stack.empty()) {
                 if (!silent) 
-                    g_error.error_mismatched_ternary();
+                    g_error->error_mismatched_ternary();
                 return false;
             }
             op_stack.pop(); // Pop '?'
@@ -183,9 +184,9 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
     }
 
     while (!op_stack.empty()) {
-        if (op_stack.top().get_ttype() == TType::LPAREN || op_stack.top().get_ttype() == TType::RPAREN) {
+        if (op_stack.top().ttype() == TType::LPAREN || op_stack.top().ttype() == TType::RPAREN) {
             if (!silent)
-                g_error.error_unbalanced_parens();
+                g_error->error_unbalanced_parens();
             return false;
         }
         m_postfix.push_back(op_stack.top());
@@ -194,7 +195,7 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
 
     if (m_postfix.empty()) {
         if (!silent)
-            g_error.error_operand_expected();
+            g_error->error_operand_expected();
         return false;   // no tokens
     }
     else {
@@ -206,13 +207,13 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
 bool Expr::check_syntax(bool silent) {
     stack<int> eval_stack;
     for (auto& token : m_postfix) {
-        TType ttype = token.get_ttype();
+        TType ttype = token.ttype();
 
         if (ttype == TType::INT || ttype == TType::IDENT || ttype == TType::ASMPC) {
             eval_stack.push(1); // dummy value
         }
         else if (ttype == TType::OPERATOR) {
-            auto info = OperatorTable::get_info(token.get_operator());
+            auto info = OperatorTable::get_info(token.operator_());
 
             size_t required = 0;
             switch (info.arity) {
@@ -223,7 +224,7 @@ bool Expr::check_syntax(bool silent) {
 
             if (eval_stack.size() < required) {
                 if (!silent)
-                    g_error.error_insuficient_operands();
+                    g_error->error_insuficient_operands();
                 return false;
             }
 
@@ -236,12 +237,12 @@ bool Expr::check_syntax(bool silent) {
 
     if (eval_stack.size() == 0) {
         if (!silent)
-            g_error.error_operand_expected();   
+            g_error->error_operand_expected();   
         return false;   // no tokens
     }
     else if (eval_stack.size() > 1) {
         if (!silent)
-            g_error.error_extra_operands();
+            g_error->error_extra_operands();
         return false;
     }
     else {
@@ -256,23 +257,23 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
     Symbol* symbol = nullptr;
 
     for (auto& token : m_postfix) {
-        switch (token.get_ttype()) {
+        switch (token.ttype()) {
         case TType::INT:
-            eval_stack.push(token.get_ivalue());
+            eval_stack.push(token.ivalue());
             break;
 
         case TType::IDENT:
-            symbol = symtab->get_symbol(token.get_svalue());
+            symbol = symtab->get_symbol(token.svalue());
             if (!symbol)
                 return false;       // symbol not defined
-            switch (symbol->get_sym_type()) {
+            switch (symbol->sym_type()) {
             case SymType::NOT_DEFINED:
                 return false;       // symbol not defined
             case SymType::GLOBAL_DEF:
-                eval_stack.push(symbol->get_value());
+                eval_stack.push(symbol->value());
                 break;
             case SymType::CONST:
-                eval_stack.push(symbol->get_value());
+                eval_stack.push(symbol->value());
                 break;
             case SymType::INSTR:
                 return false;       // value known only at link time
@@ -288,7 +289,7 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
             break;
 
         case TType::OPERATOR:
-            switch (token.get_operator()) {
+            switch (token.operator_()) {
             case Operator::POWER:
                 assert(eval_stack.size() >= 2);
                 x2 = eval_stack.top(); eval_stack.pop();
@@ -330,7 +331,7 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
                 x2 = eval_stack.top(); eval_stack.pop();
                 x1 = eval_stack.top(); eval_stack.pop();
                 if (x2 == 0) {
-                    g_error.error_division_by_zero();
+                    g_error->error_division_by_zero();
                     eval_stack.push(0);
                 }
                 else {
@@ -343,7 +344,7 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
                 x2 = eval_stack.top(); eval_stack.pop();
                 x1 = eval_stack.top(); eval_stack.pop();
                 if (x2 == 0) {
-                    g_error.error_division_by_zero();
+                    g_error->error_division_by_zero();
                     eval_stack.push(0);
                 }
                 else {

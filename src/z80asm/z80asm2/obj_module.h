@@ -13,6 +13,8 @@
 using namespace std;
 
 class Expr;
+class ObjModule;
+class Section;
 
 using Byte = unsigned char;
 
@@ -36,10 +38,11 @@ public:
     virtual ~Patch();
     Patch& operator=(const Patch& other) = delete;
 
-    PatchType get_patch_type() const { return m_patch_type; }
-    Expr* get_expr() { return m_expr; }
-    int get_offset() const { return m_offset; }
+    PatchType patch_type() const { return m_patch_type; }
+    Expr* expr() { return m_expr; }
+    int offset() const { return m_offset; }
     int size() const;
+    int resolve(int value) const;
 
 private:
     PatchType m_patch_type;
@@ -51,24 +54,26 @@ private:
 
 class Instr {
 public:
-    Instr() {}
+    Instr(Section* parent) : m_parent(parent) {}
     Instr(const Instr& other) = delete;
     virtual ~Instr();
     Instr& operator=(const Instr& other) = delete;
 
-    int get_offset() const { return m_offset; }
+    int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
     Byte* data() { return m_bytes.data(); }
     int size() const { return static_cast<int>(m_bytes.size()); }
-    list<Patch*>& get_patches() { return m_patches; }
-    Symbol* get_label() const { return m_label; }
+    list<Patch*>& patches() { return m_patches; }
+    Symbol* label() const { return m_label; }
     void set_label(Symbol* label) { m_label = label; }
+    Symtab* symtab();
 
     void add_byte(Byte byte) { m_bytes.push_back(byte); }
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
 
 private:
+    Section* m_parent{ nullptr };
     int m_offset{ 0 };
     vector<Byte> m_bytes;
     list<Patch*> m_patches;
@@ -79,24 +84,27 @@ private:
 
 class Section {
 public:
-    Section(const string& name);
+    Section(ObjModule* parent, const string& name);
     Section(const Section& other) = delete;
     virtual ~Section();
     Section& operator=(const Section& other) = delete;
 
-    const string& get_name() const { return m_name; }
+    const string& name() const { return m_name; }
 
-    int get_origin() const { return m_origin; }
+    int origin() const { return m_origin; }
     void set_origin(int origin) { m_origin = origin; }
 
-    int get_asmpc() const;
-    int get_size() const;
+    int asmpc() const;
+    int size() const;
+
+    Symtab* symtab();
 
     Instr* add_instr();
     Instr* get_cur_instr();
     list<Instr*>& get_instrs() { return m_instrs; }
 
 private:
+    ObjModule* m_parent{ nullptr };
     string m_name;
     int m_origin{ 0 };
     list<Instr*> m_instrs;
@@ -112,11 +120,11 @@ public:
     ObjModule& operator=(const ObjModule& other) = delete;
     void clear();
 
-    Symtab* get_symtab() { return &m_symtab; }
+    Symtab* symtab() { return &m_symtab; }
 
-    Section* get_cur_section() { return m_cur_section; }
+    Section* cur_section() { return m_cur_section; }
     void set_cur_section(const string& name);
-    int get_asmpc();
+    int asmpc();
 
     void add_label(const string& name);
     void add_define(const string& name, int value);
@@ -137,4 +145,4 @@ private:
     int m_assume{ 0 };
 };
 
-extern ObjModule g_obj_module;
+extern ObjModule* g_obj_module;

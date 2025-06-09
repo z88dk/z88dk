@@ -12,7 +12,7 @@ using namespace std;
 
 class Error {
 public:
-    int get_count() const { return m_count; }
+    int count() const { return m_count; }
     void error_constant_expression_expected() { error("constant expression expected"); }
     void error_division_by_zero() { error("division by zero"); }
     void error_duplicate_definition(const string& name) { error("duplicate definition", name); }
@@ -39,5 +39,5 @@ private:
     void output_message(const string& prefix, const string& message, const string& arg = "");
 };
 
-extern Error g_error;
+extern Error* g_error;
 
