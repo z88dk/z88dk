@@ -446,13 +446,13 @@
 ; get - retrive the value associated with a given key
 ;       in a property list
 ;
-;  ] (setq my-plist '((name . John) (age . 30) (city . York)))
+;  ] (setq my-plist '((name John) (age 30) (city York)))
 ;  ] (get 'age my-plist)
 ;  (30)
 ;
 (defun get (object alist)
   (cond ((null (assv object alist)) nil) (t
-  (cdr (cdr (assv object alist))) )))
+  (cdr (assv object alist)) )))
 
 ; sort and splice make up a sorting utility.
 ; ex: (sort '(3 6 7 1 9) '<) => (1 3 6 7 9).
