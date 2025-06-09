@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cpm.h>
-#include <stdio.h>
 
 /* Update the FCB to use WRITE #21 BDOS function non-sequentially */
 void setrecord_wr(struct fcb *fc) __z88dk_fastcall;
