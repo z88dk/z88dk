@@ -31,7 +31,7 @@ IF FORmc1000
 
     EXTERN  __mc6847_mode
     PUBLIC  pixelbyte
-    PUBLIC  pix_return!
+    PUBLIC  pix_return
 
 pix_return:
 
