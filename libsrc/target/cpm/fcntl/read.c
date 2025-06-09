@@ -124,7 +124,7 @@ ssize_t read(int fd, void *buf, size_t len)
 
 void setrecord_rd(struct fcb *fc) __z88dk_fastcall
 {
-    uint32_t record_nr = fc->record_nr;
+    uint16_t record_nr = fc->record_nr;
 
     fc->current_record = (char)record_nr & 0x7F;
 
@@ -135,7 +135,7 @@ void setrecord_rd(struct fcb *fc) __z88dk_fastcall
 
     fc->extent = (uint8_t)(record_nr >> 7) & 0x1F;
 
-    fc->s2 &= 0x80;     // preserve the clean/dirty bit 7
+    // preserve the clean/dirty bit 7
     fc->s2 |= (char)(record_nr >> 12) & 0x0F;
 }
 
