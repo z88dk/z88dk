@@ -98,3 +98,7 @@ int ipow(int base, int exp) {
     return result;
 }
 
+string sanitize_pathname(string path) {
+    std::replace(path.begin(), path.end(), '\\', '/');
+    return path;
+}

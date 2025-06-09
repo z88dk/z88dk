@@ -1,0 +1,2 @@
+test_dbl_hash_concat.asm:2: 	ld a , xp ## to
+ld a,xpto

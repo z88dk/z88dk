@@ -7,8 +7,10 @@
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
   EXESUFFIX 		:= .exe
+  SANITIZE			:= 
 else
   EXESUFFIX 		?=
+  SANITIZE			:= -fsanitize=address
 endif
 
 PROJ =		z80asm
@@ -16,14 +18,16 @@ TARGET =	$(PROJ)$(EXESUFFIX)
 
 CXX			?= g++
 CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors $(OPT)
-OPT			?= -O3 -g -fsanitize=address
-LDFLAGS		+= -fsanitize=address
+OPT			?= -O3 -g $(SANITIZE)
+LDFLAGS		+= $(SANITIZE)
 
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(SRCS:.cpp=.o)
 TEMPLATECPP	= token.cpp operator.cpp obj_module.cpp line_parser.cpp 
 TEMPLATEH	= token.h   operator.h   obj_module.h   line_parser.h
 DEPENDS		= $(SRCS:.cpp=.d)
+
+TASKS 		?= 9
 
 
 all: $(PROJ)$(EXESUFFIX)
@@ -46,10 +50,10 @@ $(PROJ).y: directives.y opcodes.y
 	dos2unix $(PROJ).y
 
 test: $(PROJ)$(EXESUFFIX)
-	./$(PROJ)$(EXESUFFIX) test.asm
+	perl -S prove --state=slow,save -j$(TASKS) t/*.t
 
 clean::
-	$(RM) $(PROJ)$(EXESUFFIX) $(OBJS) $(PROJ).pp $(PROJ).y $(wildcard *.bak) $(DEPENDS)
+	$(RM) $(PROJ) $(PROJ)$(EXESUFFIX) $(OBJS) $(wildcard *.bak t/*.bak) $(DEPENDS)
 
 # Dependencies
 -include $(DEPENDS)

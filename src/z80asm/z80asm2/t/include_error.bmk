@@ -1,0 +1,12 @@
+test_include_error.inc:1: error: file open: test_include_error.2.inc
+  ^---- 	include "test_include_error.2.inc"
+test_include_error.asm:2: error: expected end of line
+  ^---- 	include 'test_include_error.inc' error
+test_include_error.inc:1: error: file open: test_include_error.2.inc
+  ^---- 	include "test_include_error.2.inc"
+test_include_error.asm:3: 	include error
+include error
+test_include_error.asm:3: error: syntax error
+  ^---- 	include error
+    ^---- include error
+parse failed

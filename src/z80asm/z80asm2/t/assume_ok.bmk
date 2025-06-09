@@ -1,0 +1,4 @@
+test_assume_ok.asm:2: 	.Assume 3*0:.Assume 3/3
+Assume 3*0
+test_assume_ok.asm:2: 	.Assume 3*0:.Assume 3/3
+Assume 3/3
