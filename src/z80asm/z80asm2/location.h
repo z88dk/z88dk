@@ -17,10 +17,10 @@ public:
     void clear_text();
     bool empty() const;
 
-    const string& get_filename() const { return m_filename; }
-    int get_line_num() const { return m_line_num; }
-    const string& get_text() const { return m_text; }
-    const string& get_expanded_text() const { return m_expanded_text; }
+    const string& filename() const { return m_filename; }
+    int line_num() const { return m_line_num; }
+    const string& text() const { return m_text; }
+    const string& expanded_text() const { return m_expanded_text; }
 
     void set_filename(const string& filename);
     void set_line_num(int line_num);
@@ -34,5 +34,5 @@ private:
     string m_expanded_text;
 };
 
-extern Location g_location;
+extern Location* g_location;
 

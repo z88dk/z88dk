@@ -25,7 +25,7 @@ public:
     Token& back();
     void push_back(const Token& token) { m_tokens.push_back(token); } // copy
     void push_back(Token&& token) { m_tokens.push_back(std::move(token)); } // move
-    int get_pos() const { return m_pos; }
+    int pos() const { return m_pos; }
     void set_pos(int pos) { m_pos = pos; }
     size_t size() const { return m_tokens.size(); }
     string to_string() const;

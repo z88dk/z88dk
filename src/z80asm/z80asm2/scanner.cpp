@@ -276,7 +276,7 @@ bool Scanner::scan(const string& text) {
                         m_tokens.back().set_ivalue(static_cast<int>(arg[0]));
                     }
                     else {
-                        g_error.error_invalid_quoted_char();
+                        g_error->error_invalid_quoted_char();
                         clear();
                         return false;
                     }
@@ -303,7 +303,7 @@ bool Scanner::scan(const string& text) {
             break;
 
         default:
-            g_error.error_invalid_char(*p);
+            g_error->error_invalid_char(*p);
             clear();
             return false;
         }
@@ -362,7 +362,7 @@ bool Scanner::parse_raw_string(const char*& p, string& result) {
         result += *p++;
     }
     if (*p != quote) {
-        g_error.error_unterminated_string();
+        g_error->error_unterminated_string();
         result.clear();
         return false;
     }
@@ -380,7 +380,7 @@ bool Scanner::parse_c_string(const char*& p, string& result) {
         if (*p == '\\') {
             ++p;
             if (*p == '\0') {
-                g_error.error_unterminated_string();
+                g_error->error_unterminated_string();
                 result.clear();
                 return false;
             }
@@ -407,7 +407,7 @@ bool Scanner::parse_c_string(const char*& p, string& result) {
         }
     }
     if (*p != quote) {
-        g_error.error_unterminated_string();
+        g_error->error_unterminated_string();
         result.clear();
         return false;
     }
@@ -434,7 +434,7 @@ bool Scanner::parse_escape_char(char c, char& result) {
     case '\"': result = '\"'; return true;
     case '?':  result = '\?'; return true;
     default:
-        g_error.error_invalid_escape_char(c);
+        g_error->error_invalid_escape_char(c);
         return false;
     }
 }

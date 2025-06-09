@@ -10,7 +10,7 @@
 #include "preproc.h"
 using namespace std;
 
-Preproc g_preproc;
+Preproc* g_preproc{ nullptr };
 
 void Preproc::clear() {
     m_expanded_lines.clear();
@@ -65,17 +65,17 @@ void Preproc::expand(const string& input_line) {
         }
         // #INCLUDE
         else if (m_in.peek(0).is(TType::HASH) && m_in.peek(1).is(Keyword::INCLUDE) && m_in.peek(2).is(TType::RAW_STR)) {
-            string filename = m_in.peek(2).get_svalue();
+            string filename = m_in.peek(2).svalue();
             m_in.next(3);
             check_end();
-            g_input_files.push_file(filename);
+            g_input_files->push_file(filename);
         }
         // INCLUDE
         else if (m_in.peek(0).is(Keyword::INCLUDE) && m_in.peek(1).is(TType::RAW_STR)) {
-            string filename = m_in.peek(1).get_svalue();
+            string filename = m_in.peek(1).svalue();
             m_in.next(2);
             check_end();
-            g_input_files.push_file(filename);
+            g_input_files->push_file(filename);
         }
         // Handle one statement, possibly empty
         else {
@@ -129,7 +129,7 @@ void Preproc::push_out() {
 
 void Preproc::check_end() {
     if (!m_in.peek().is(TType::END)) {
-        g_error.error_expected_eol();
+        g_error->error_expected_eol();
         m_in.clear();
     }
 }

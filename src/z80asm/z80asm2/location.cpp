@@ -8,7 +8,7 @@
 #include "location.h"
 using namespace std;
 
-Location g_location;
+Location* g_location{ nullptr };
 
 Location::Location(const string& filename, int line_num)
     : m_filename(filename), m_line_num(line_num) {

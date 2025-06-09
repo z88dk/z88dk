@@ -9,6 +9,7 @@
 
 #include "scanner.h"
 #include <string>
+#include <vector>
 using namespace std;
 
 class Symtab;
@@ -33,4 +34,3 @@ private:
     bool to_RPN(Scanner& in, bool silent);
     bool check_syntax(bool silent);
 };
-
