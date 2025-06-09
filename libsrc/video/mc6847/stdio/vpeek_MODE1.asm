@@ -1,4 +1,7 @@
-IF !MC6847_IOSPACE
+    INCLUDE "video/mc6847/mc6847.inc"
+
+
+IFNDEF MC6847_IOSPACE
 
     SECTION code_driver
 
@@ -6,7 +9,6 @@ IF !MC6847_IOSPACE
     EXTERN  vpeek_screendollar
     EXTERN  __mc6847_mode
 
-    INCLUDE "video/mc6847/mc6847.inc"
 
 ;Entry: c = x,
 ;       b = y

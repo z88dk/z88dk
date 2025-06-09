@@ -1,4 +1,6 @@
-IF !MC6847_IOSPACE
+    INCLUDE "video/mc6847/mc6847.inc"
+
+IFNDEF MC6847_IOSPACE
 
     SECTION     code_driver
 
@@ -9,9 +11,6 @@ IF !MC6847_IOSPACE
     EXTERN      __mc6847_mode
 
 
-    INCLUDE "video/mc6847/mc6847.inc"
-
-
 generic_console_scrollup:
     push    de
     push    bc
@@ -19,10 +18,10 @@ generic_console_scrollup:
     and     @11111101
     jr      z, scrollup_text
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES
+    cp      MODE_HIRES & 0xfd
     jr      z, scrollup_hires
 ENDIF
-    cp      MODE_MULTICOLOUR
+    cp      MODE_MULTICOLOUR & 0xfd
     jr      z, scrollup_hires           ;possibly wrong
     pop     bc
     pop     de

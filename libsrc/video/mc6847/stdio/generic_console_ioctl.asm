@@ -119,7 +119,9 @@ ENDIF
 set_mode:
     bit     5, c
     jr      z, not_css
-    set     1, h
+    ld      a,h
+    xor     2
+    ld      h,a
 not_css:
     ld      a, e
     ld      (__console_w), a

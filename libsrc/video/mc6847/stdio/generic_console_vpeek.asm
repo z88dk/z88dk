@@ -7,6 +7,7 @@
     EXTERN  generic_console_text_xypos
     EXTERN  vpeek_MODE1
     EXTERN  vpeek_MODE2
+    EXTERN  __tms9918_console_vpeek
 
     INCLUDE "video/mc6847/mc6847.inc"
 
@@ -18,13 +19,19 @@
 ;        c = failure
 generic_console_vpeek:
     ld      a, (__mc6847_mode)
+    ld      h,a
+    and     0xfd
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES
+    cp      MODE_HIRES & 0xfd
     jp      z, vpeek_MODE1
 ENDIF
-    cp      MODE_MULTICOLOUR
+    cp      MODE_MULTICOLOUR & 0xfd
     jp      z, vpeek_MODE2
-
+IF FORspc1000
+    ld      a,h
+    cp      10
+    jp      nz,__tms9918_console_vpeek
+ENDIF
     and     a
     ccf
     ret     nz
@@ -36,6 +43,9 @@ IF FORmc1000
     set     0, a
     out     ($80), a
     ld      a, b
+ELIF FORspc1000
+    ld      bc,hl
+    in      a,(c)
 ELSE
     ld      a, (hl)
 ENDIF

@@ -2,7 +2,8 @@
     INCLUDE "video/mc6847/mc6847.inc"
 
 
-IFNDEF MC6847_IOSPACE
+IFDEF MC6847_IOSPACE
+
 
     SECTION code_driver
     PUBLIC  printc_MODE2
@@ -11,20 +12,13 @@ IFNDEF MC6847_IOSPACE
     EXTERN  generic_console_font32
     EXTERN  generic_console_flags
     EXTERN  __mc6847_MODE2_attr
-    EXTERN  generic_console_flags
-    EXTERN  __mc6847_mode
-    EXTERN  generic_console_text_xypos
+
 
 ; c = x
 ; b = y
 ; a' = d = character to print
 ; e = raw
 printc_MODE2:
-IF FORmc1000
-    ld      a, (__mc6847_mode)
-    ex      af, af
-ENDIF
-    push    bc
     ld      l, d
     ld      h, 0
     ld      de, (generic_console_font32)
@@ -40,11 +34,13 @@ not_udg:
     add     hl, de
     dec     h
     ex      de, hl                      ;de = font
-    GETSCREENADDRESS
-    ld      l,c
-    add     hl,bc
-    ld      a, (generic_console_flags)
-    rlca
+    ld      h, b                        ;32 * 8
+    ld      l, c
+    ld      bc, 0
+    ld      c, l
+    add     hl, bc                      ;hl=screen
+    ld      a, (generic_console_flags)  ;inverse
+    rrca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
     ld      b, 8
@@ -83,19 +79,11 @@ is_paper:
     srl     e
     djnz    semihires_3
     ld      a, l                        ;save what's left of character
-    pop     hl
-IF FORmc1000
-    ex      af, af
-    res     0, a
-    out     ($80), a                    ;Page VRAM in
-    ld      (hl), c
-    set     0, a
-    out     ($80), a                    ;VRAM out
-    ex      af, af
-ELSE
-    ld      (hl), c
-ENDIF
-    inc     hl
+    ld      h, c
+    pop     bc
+    out     (c), h
+    inc     bc
+    ld      hl,bc
     pop     bc
     djnz    semihires_2
     ld      de, 30
@@ -104,42 +92,6 @@ ENDIF
     inc     de
     pop     bc
     djnz    semihires_1
-    pop     bc                          ;need to convert to appropriate coordinate
-  IF    setCSSoneachchar
-	; This isn't working yet, not sure if it ever will - set the
-	; CSS flag for each character, this has slightly odd effects
-	; since we end up mapping a character into 4 blocks
-    sla     c                           ;column * 2
-    ld      a, b
-    add     a                           ;row * 8
-    add     a
-    add     a
-    ld      b, 0
-div12:
-    sub     12
-    jr      c, div12_done
-    inc     b
-    jr      div12
-
-div12_done:
-    call    generic_console_text_xypos
-    dec     h
-    dec     h
-    ld      a, (__pc6001_attr)
-    and     @00000010
-    ld      c, a
-    ld      a, (hl)
-    and     @11111101
-    or      c
-    ld      (hl), a
-    inc     hl
-;	ld	(hl),a
-    ld      de, 31
-    add     hl, de
-    ld      (hl), a
-    inc     hl
-;	ld	(hl),a
-  ENDIF
     ret
 
 ENDIF

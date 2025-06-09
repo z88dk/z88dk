@@ -20,15 +20,18 @@
 ; e = raw
 generic_console_printc:
     ld      a, (__mc6847_mode)
-    and     @11111101
+    ld      h,a
+    and     0xfd
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES
+    cp      MODE_HIRES & 0xfd
     jp      z, printc_MODE1
 ENDIF
-    cp      MODE_MULTICOLOUR
+    cp      MODE_MULTICOLOUR & 0xfd
     jp      z, printc_MODE2
-IF !FORspec1000
+IFNDEF FORspc1000
+    kkkk
     and     a
     ret     nz
 ENDIF
+    ld      a, h
     jp      printc_MODE0

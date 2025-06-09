@@ -1,13 +1,14 @@
+    INCLUDE "video/mc6847/mc6847.inc"
 
 IF MC6847_IOSPACE
 
     SECTION code_driver
-    PUBLIC  generic_console_cls
+    PUBLIC  generic_console_scrollup
 
+    EXTERN  __mc6847_mode
     EXTERN  __spc1000_attr
     EXTERN  __tms9918_cls
-
-    INCLUDE "video/mc6847/mc6847.inc"
+    EXTERN  __tms9918_scrollup
 
 
 generic_console_scrollup:
@@ -19,8 +20,7 @@ ENDIF
     push    de
     push    bc
     and     a
-    jr      z, scrollup_text
-    jr      scrollup_hires
+    jr      nz,scrollup_hires
 scrollup_text:
     ld      bc, MC6847_CONSOLE_COLUMNS         ;source
     ld      hl, +((MC6847_CONSOLE_ROWS-1)*MC6847_CONSOLE_COLUMNS)

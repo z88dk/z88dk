@@ -4,8 +4,10 @@ IF FORspc1000
 
     PUBLIC  generic_console_pointxy
     PUBLIC  generic_console_plotc
+    PUBLIC  generic_console_set_attribute
+    PUBLIC  generic_console_set_ink
+    PUBLIC  generic_console_set_paper
     PUBLIC  printc_MODE0
-
     PUBLIC  __spc1000_attr
 
     EXTERN  generic_console_text_xypos
@@ -18,7 +20,7 @@ IF FORspc1000
     EXTERN  mc6847_map_colour
 
 
-eneric_console_set_attribute:
+generic_console_set_attribute:
     ld      b, a
     ld      a, (hl)
     ld      c, 0
@@ -117,12 +119,10 @@ generic_console_plotc:
 
 ; c = x
 ; b = y
-; a' = character to print
+; d = character to print
 ; a = screen mode
 ; e = raw
 printc_MODE0:
-    and     a
-    jr      z,print_text
     cp      10
     ld      a,d
     jp      z,__tms9918_printc

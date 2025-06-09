@@ -1,3 +1,5 @@
+    INCLUDE "video/mc6847/mc6847.inc"
+
 IF MC6847_IOSPACE
 
     SECTION code_driver
@@ -5,12 +7,12 @@ IF MC6847_IOSPACE
 
     EXTERN  __spc1000_attr
     EXTERN  __tms9918_cls
+    EXTERN  __mc6847_mode
 
-    INCLUDE "video/mc6847/mc6847.inc"
 
 
 generic_console_cls:
-    ld      a, (__spc1000_mode)
+    ld      a, (__mc6847_mode)
     and     a
     jr      z, cls_text
 IF FORspc1000
