@@ -29,7 +29,6 @@ ENDIF
     cp      MODE_MULTICOLOUR & 0xfd
     jp      z, printc_MODE2
 IFNDEF FORspc1000
-    kkkk
     and     a
     ret     nz
 ENDIF
