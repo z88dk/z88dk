@@ -9,7 +9,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <list>
+#include <vector>
 using namespace std;
 
 class InputFiles {
@@ -29,7 +29,7 @@ private:
         int line_inc{ 1 };
         ifstream ifs;
     };
-    list<File*> m_files; // stack of input files
+    vector<File*> m_files; // stack of input files
 
     void pop_file();
     bool already_included(const string& filename);
