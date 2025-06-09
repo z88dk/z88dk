@@ -6,4 +6,8 @@
 
 xor_MODE1:
     defc    NEEDxor=1
+IFDEF MC6847_IOSPACE
+    INCLUDE "video/mc6847/graphics/pixel_MODE1_IO.inc"
+ELSE
     INCLUDE "video/mc6847/graphics/pixel_MODE1.inc"
+ENDIF

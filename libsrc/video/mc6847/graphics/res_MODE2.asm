@@ -10,4 +10,8 @@ res_MODE2:
     ret     nc
 
     defc    NEEDunplot=1
+IFDEF MC6847_IOSPACE
+    INCLUDE "video/mc6847/graphics/pixel_MODE2_IO.inc"
+ELSE
     INCLUDE "video/mc6847/graphics/pixel_MODE2.inc"
+ENDIF

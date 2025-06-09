@@ -23,7 +23,7 @@ ENDIF
     ret     z
 IF MC6847_HAS_HIRES
     ld      hl, 255
-    cp      MODE_HIRES
+    cp      MODE_HIRES & 0xfd
     ret     z
 ENDIF
     ld      hl, 127

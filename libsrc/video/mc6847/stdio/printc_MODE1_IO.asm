@@ -3,7 +3,7 @@
 
     INCLUDE "video/mc6847/mc6847.inc"
 
-IF MC6847_IOSPACE
+IFDEF MC6847_IOSPACE
 
     SECTION code_driver
 

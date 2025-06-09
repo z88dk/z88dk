@@ -11,4 +11,8 @@ pointxy_MODE2:
     ret     nc
 
     defc    NEEDpoint=1
+IFDEF MC6847_IOSPACE
+    INCLUDE "video/mc6847/graphics/pixel_MODE2_IO.inc"
+ELSE
     INCLUDE "video/mc6847/graphics/pixel_MODE2.inc"
+ENDIF

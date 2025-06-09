@@ -42,6 +42,7 @@ IF FORspc1000
     defc MC6847_IOSPACE = 1
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MODE0_3x2 = 1
     INCLUDE "target/spc1000/def/spc1000.def"
 ENDIF
 

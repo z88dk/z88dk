@@ -17,11 +17,12 @@
 ; Uses: a, bc, de, hl
 pixeladdress:
     ld      a, (__mc6847_mode)
+    and     0xfd
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES
+    cp      MODE_HIRES & 0xfd
     jp      z, pixeladdress_MODE1
 ENDIF
-    cp      MODE_MULTICOLOUR
+    cp      MODE_MULTICOLOUR & 0xfd
     jp      z, pixeladdress_MODE2
     ret
 
@@ -30,7 +31,7 @@ IF FORmc1000
 
     EXTERN  __mc6847_mode
     PUBLIC  pixelbyte
-    PUBLIC  pix_return
+    PUBLIC  pix_return!
 
 pix_return:
 
