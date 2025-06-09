@@ -55,6 +55,9 @@ test: $(PROJ)$(EXESUFFIX)
 clean::
 	$(RM) $(PROJ) $(PROJ)$(EXESUFFIX) $(OBJS) $(wildcard *.bak t/*.bak) $(DEPENDS)
 
+cloc:
+	perl -S cloc *.cpp *.h *.pl t/*.t t/*.pl
+
 # Dependencies
 -include $(DEPENDS)
 

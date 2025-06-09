@@ -21,10 +21,21 @@ using Byte = unsigned char;
 
 enum class PatchType {
     //@@BEGIN: patch
-    NONE,
-    JR,
-    N,
-    NN,
+    NONE = 0,
+    ASSIGN = 11,
+    D = 3,
+    D2DD = 8,
+    D2DDD = 14,
+    HOFFSET = 10,
+    JR = 1,
+    JRE = 12,
+    N = 2,
+    N2NN = 7,
+    N2NNN = 13,
+    NN = 4,
+    NNN = 9,
+    NNNN = 6,
+    NN_BE = 5,
     //@@END
 };
 

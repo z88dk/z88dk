@@ -105,10 +105,21 @@ my %keywords = (
 );
 
 my %patches = (
-    NONE    => { size => 0 },
-    JR      => { size => 1 },
-    N       => { size => 1 },
-    NN      => { size => 2 },
+    NONE    => { id => 0,  size => 0, code => "" },
+    JR      => { id => 1,  size => 1, code => "J" },
+    N       => { id => 2,  size => 1, code => "U" },
+    D       => { id => 3,  size => 1, code => "S" },
+    NN      => { id => 4,  size => 2, code => "W" },
+    NN_BE   => { id => 5,  size => 2, code => "B" },
+    NNNN    => { id => 6,  size => 4, code => "L" },
+    N2NN    => { id => 7,  size => 2, code => "u" },
+    D2DD    => { id => 8,  size => 2, code => "s" },
+    NNN     => { id => 9,  size => 3, code => "p" },
+    HOFFSET => { id => 10, size => 1, code => "H" },
+    ASSIGN  => { id => 11, size => 0, code => "=" },
+    JRE     => { id => 12, size => 2, code => "j" },
+    N2NNN   => { id => 13, size => 3, code => "v" },
+    D2DDD   => { id => 14, size => 3, code => "t" },
 );
 
 #-------------------------------------------------------------------------------
@@ -301,10 +312,10 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			push @out, "${prefix}NONE,\n";		# NONE must be id 0
+			push @out, "${prefix}NONE = 0,\n";      # NONE must be id 0
 			for (sort keys %{$grammar->{patches}}) {
 				next if $_ eq 'NONE';
-				push @out, "$prefix$_,\n";
+				push @out, "$prefix$_ = ".$grammar->{patches}{$_}{id}.",\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
