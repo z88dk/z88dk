@@ -450,8 +450,9 @@
 ;  ] (get 'age my-plist)
 ;  (30)
 ;
-(defun get (object alist) 
-  (cdr (cdr (assv object alist))) )
+(defun get (object alist)
+  (cond ((null (assv object alist)) nil) (t
+  (cdr (cdr (assv object alist))) )))
 
 ; sort and splice make up a sorting utility.
 ; ex: (sort '(3 6 7 1 9) '<) => (1 3 6 7 9).
