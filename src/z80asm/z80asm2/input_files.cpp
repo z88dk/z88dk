@@ -26,7 +26,7 @@ void InputFiles::push_file(const string& filename) {
         g_error->error_recursive_include(filename);
     }
     else {
-        file->ifs.open(filename, ios::binary);
+        file->ifs.open(sanitize_pathname(filename), ios::binary);
         if (!file->ifs.is_open())
             g_error->error_open_file(filename);
         else

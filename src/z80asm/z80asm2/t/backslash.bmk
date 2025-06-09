@@ -1,0 +1,2 @@
+test_backslash.asm:4: 	ld 	a, 	25
+ld a,25

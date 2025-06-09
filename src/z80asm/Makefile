@@ -208,6 +208,7 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 #------------------------------------------------------------------------------
 
 test: $(TARGET_EXE) $(TARGET_LIB)
+	$(MAKE) -C z80asm2 test
 	$(MAKE) -C dev/z80asm_lib test
 	perl -S prove --state=slow,save -j$(TASKS) t/*.t
 
@@ -246,6 +247,7 @@ clean::
 	$(RM) -r $(TARGET_EXE) test*.dir
 	$(RM) $(TARGET_EXE) test*
 	$(RM) t/*.tmp t/dev/*.tmp
+	$(MAKE) -C z80asm2 clean
 
 #------------------------------------------------------------------------------
 # Dependencies

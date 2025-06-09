@@ -1,0 +1,10 @@
+test_label.asm:2: 	.l1 ld a,25
+l1:
+test_label.asm:2: 	.l1 ld a,25
+ld a,25
+test_label.asm:3: 	l2:ld a,25
+l2:
+test_label.asm:3: 	l2:ld a,25
+ld a,25
+test_label.asm:4: 	ld a,25
+ld a,25

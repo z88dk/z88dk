@@ -1,0 +1,22 @@
+test_include_ok.asm:1: 	nop
+nop
+test_include_ok.inc:1: 	nop
+nop
+test_include_ok.asm:3: 	nop
+nop
+./test_include_ok.inc:1: 	nop
+nop
+test_include_ok.asm:5: 	nop
+nop
+.\test_include_ok.inc:1: 	nop
+nop
+test_include_ok.asm:7: 	nop
+nop
+./test_include_ok.inc:1: 	nop
+nop
+test_include_ok.asm:9: 	nop
+nop
+.\test_include_ok.inc:1: 	nop
+nop
+test_include_ok.asm:11: 	nop
+nop

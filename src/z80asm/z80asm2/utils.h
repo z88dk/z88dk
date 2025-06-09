@@ -16,3 +16,4 @@ string binary_to_c_string(const unsigned char* data, size_t length);
 bool is_ident(char c);
 bool read_custom_line(ifstream& stream, string& line);
 int ipow(int base, int exp);
+string sanitize_pathname(string path);
