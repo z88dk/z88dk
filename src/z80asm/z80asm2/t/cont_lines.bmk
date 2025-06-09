@@ -1,6 +1,6 @@
-test_cont_lines.asm:2: 	ld a,25:ld b,30\ld c,40
+LINE 2 "test_t_cont_lines.asm"
 ld a,25
-test_cont_lines.asm:2: 	ld a,25:ld b,30\ld c,40
+LINE 2 "test_t_cont_lines.asm"
 ld b,30
-test_cont_lines.asm:2: 	ld a,25:ld b,30\ld c,40
+LINE 2 "test_t_cont_lines.asm"
 ld c,40

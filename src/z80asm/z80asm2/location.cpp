@@ -15,6 +15,10 @@ Location::Location(const string& filename, int line_num)
     clear_text();
 }
 
+bool Location::operator==(const Location& other) const {
+    return m_filename == other.m_filename && m_line_num == other.m_line_num;
+}
+
 void Location::clear() {
     m_filename.clear();
     m_line_num = 0;
@@ -39,6 +43,12 @@ void Location::set_filename(const string& filename) {
 
 void Location::set_line_num(int line_num) {
     m_line_num = line_num;
+    m_text.clear();
+    m_expanded_text.clear();
+}
+
+void Location::inc_line_num() {
+    m_line_num++;
     m_text.clear();
     m_expanded_text.clear();
 }

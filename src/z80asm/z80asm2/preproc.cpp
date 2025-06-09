@@ -7,6 +7,7 @@
 
 #include "error.h"
 #include "input_files.h"
+#include "location.h"
 #include "preproc.h"
 using namespace std;
 
@@ -119,6 +120,29 @@ bool Preproc::getline(string& line) {
 
 string Preproc::autolabel() {
     return string("__") + std::to_string(m_autolabel_id++);
+}
+
+void Preproc::preproc_only(const string& filename) {
+    g_preproc->clear();
+    Location location;
+
+    g_input_files->push_file(filename);
+    string line;
+    while (g_input_files->getline(line)) {
+        g_preproc->expand(line);
+        string expanded_line;
+        while (g_preproc->getline(expanded_line)) {
+            g_location->set_expanded_text(expanded_line);
+            if (location != *g_location) {
+                cout << "LINE " << g_location->line_num()
+                    << " \"" << g_location->filename() << "\"" << endl;
+                location.set_filename(g_location->filename());
+                location.set_line_num(g_location->line_num());
+            }
+            cout << expanded_line << endl;
+            location.inc_line_num();
+        }
+    }
 }
 
 void Preproc::push_out() {
