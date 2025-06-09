@@ -16,7 +16,8 @@ TARGET =	$(PROJ)$(EXESUFFIX)
 
 CXX			?= g++
 CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors $(OPT)
-OPT			?= -O3 -g
+OPT			?= -O3 -g -fsanitize=address
+LDFLAGS		+= -fsanitize=address
 
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(SRCS:.cpp=.o)
@@ -52,3 +53,4 @@ clean::
 
 # Dependencies
 -include $(DEPENDS)
+
