@@ -8,7 +8,6 @@
 #include "error.h"
 #include "expr.h"
 #include "symbol.h"
-#include "utils.h"
 #include <cassert>
 #include <stack>
 using namespace std;
@@ -195,7 +194,7 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
 
     if (m_postfix.empty()) {
         if (!silent)
-            g_error->error_operand_expected();
+            g_error->error_insufficient_operands(to_string());
         return false;   // no tokens
     }
     else {
@@ -213,7 +212,7 @@ bool Expr::check_syntax(bool silent) {
             eval_stack.push(1); // dummy value
         }
         else if (ttype == TType::OPERATOR) {
-            auto info = OperatorTable::get_info(token.operator_());
+            const OperatorInfo& info = OperatorTable::get_info(token.operator_());
 
             size_t required = 0;
             switch (info.arity) {
@@ -224,7 +223,7 @@ bool Expr::check_syntax(bool silent) {
 
             if (eval_stack.size() < required) {
                 if (!silent)
-                    g_error->error_insuficient_operands();
+                    g_error->error_insufficient_operands(::to_string(token.operator_()));
                 return false;
             }
 
@@ -237,12 +236,12 @@ bool Expr::check_syntax(bool silent) {
 
     if (eval_stack.size() == 0) {
         if (!silent)
-            g_error->error_operand_expected();   
+            g_error->error_insufficient_operands(to_string());
         return false;   // no tokens
     }
     else if (eval_stack.size() > 1) {
         if (!silent)
-            g_error->error_extra_operands();
+            g_error->error_extra_operands(to_string());
         return false;
     }
     else {
@@ -253,8 +252,7 @@ bool Expr::check_syntax(bool silent) {
 bool Expr::eval_const(Symtab* symtab, int& result) {
     stack<int> eval_stack;
     result = 0;
-    int x1 = 0, x2 = 0, x3 = 0;
-    Symbol* symbol = nullptr;
+    Symbol* symbol{ nullptr };
 
     for (auto& token : m_postfix) {
         switch (token.ttype()) {
@@ -289,192 +287,7 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
             break;
 
         case TType::OPERATOR:
-            switch (token.operator_()) {
-            case Operator::POWER:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(ipow(x1, x2));
-                break;
-
-            case Operator::UPLUS:
-                assert(eval_stack.size() >= 1);
-                break;
-
-            case Operator::UMINUS:
-                assert(eval_stack.size() >= 1);
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(-x1);
-                break;
-
-            case Operator::LOG_NOT:
-                assert(eval_stack.size() >= 1);
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 ? 0 : 1);
-                break;
-
-            case Operator::BIN_NOT:
-                assert(eval_stack.size() >= 1);
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(~x1);
-                break;
-
-            case Operator::MULT:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 * x2);
-                break;
-
-            case Operator::DIV:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                if (x2 == 0) {
-                    g_error->error_division_by_zero();
-                    eval_stack.push(0);
-                }
-                else {
-                    eval_stack.push(x1 / x2);
-                }
-                break;
-
-            case Operator::MOD:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                if (x2 == 0) {
-                    g_error->error_division_by_zero();
-                    eval_stack.push(0);
-                }
-                else {
-                    eval_stack.push(x1 % x2);
-                }
-                break;
-
-            case Operator::PLUS:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 + x2);
-                break;
-
-            case Operator::MINUS:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 - x2);
-                break;
-
-            case Operator::LSHIFT:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 << x2);
-                break;
-
-            case Operator::RSHIFT:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 >> x2);
-                break;
-
-            case Operator::LT:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 < x2);
-                break;
-
-            case Operator::LE:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 <= x2);
-                break;
-
-            case Operator::GT:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 > x2);
-                break;
-
-            case Operator::GE:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 >= x2);
-                break;
-
-            case Operator::EQ:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 == x2);
-                break;
-
-            case Operator::NE:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 != x2);
-                break;
-
-            case Operator::BIN_AND:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 & x2);
-                break;
-
-            case Operator::BIN_OR:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 | x2);
-                break;
-
-            case Operator::BIN_XOR:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 ^ x2);
-                break;
-
-            case Operator::LOG_AND:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 && x2 ? 1 : 0);
-                break;
-
-            case Operator::LOG_OR:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 || x2 ? 1 : 0);
-                break;
-
-            case Operator::LOG_XOR:
-                assert(eval_stack.size() >= 2);
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 == x2 ? 0 : 1);
-                break;
-
-            case Operator::TERNARY:
-                assert(eval_stack.size() >= 3);
-                x3 = eval_stack.top(); eval_stack.pop();
-                x2 = eval_stack.top(); eval_stack.pop();
-                x1 = eval_stack.top(); eval_stack.pop();
-                eval_stack.push(x1 ? x2 : x3);
-                break;
-
-            default:
-                assert(false && "Unknown operator");
-            }
+            do_operator(token.operator_(), eval_stack);
             break;
 
         default:
@@ -482,9 +295,18 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
         }
     }
 
-    assert(eval_stack.size() == 1);
-    result = eval_stack.top();
-    eval_stack.pop();
-    return true;
+    if (eval_stack.size() > 1) {
+        g_error->error_extra_operands(to_string());
+        return false;   // too many operands
+    }
+    else if (eval_stack.size() == 0) {
+        g_error->error_insufficient_operands(to_string());
+        return false;   // no operands
+    }
+    else {
+        result = eval_stack.top();
+        eval_stack.pop();
+        return true;
+    }   
 }
 
