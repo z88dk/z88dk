@@ -1,12 +1,12 @@
 test_t_assume_error.asm:2: 	.Assume ASMPC*0:.Assume $/$
 Assume$*0
-test_t_assume_error.asm:2: error: syntax error
+test_t_assume_error.asm:2: error: constant expression expected
   ^---- 	.Assume ASMPC*0:.Assume $/$
     ^---- Assume$*0
 parse failed
 test_t_assume_error.asm:2: 	.Assume ASMPC*0:.Assume $/$
 Assume$/$
-test_t_assume_error.asm:2: error: syntax error
+test_t_assume_error.asm:2: error: constant expression expected
   ^---- 	.Assume ASMPC*0:.Assume $/$
     ^---- Assume$/$
 parse failed

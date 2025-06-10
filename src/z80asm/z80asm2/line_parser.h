@@ -21,6 +21,7 @@ private:
     struct Elem {
         Token token;
         Expr* expr{ nullptr };
+        bool const_expr{ false };
         int const_value{ 0 };
 
         Elem();
@@ -36,6 +37,11 @@ private:
         Elems(const Elems& other);
         Elems& operator=(const Elems& other);
         virtual ~Elems();
+        auto begin() { return elems.begin(); }
+        auto end() { return elems.end(); }
+        auto cbegin() const { return elems.cbegin(); }
+        auto cend() const { return elems.cend(); }
+        auto size() const { return elems.size(); }
     };
 
     Scanner m_in;   // input tokens
