@@ -9,6 +9,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <stack>
 using namespace std;
 
 enum class Operator {
@@ -67,5 +68,6 @@ private:
     static const unordered_map<Operator, OperatorInfo> table;
 };
 
+void do_operator(Operator op, stack<int>& operands);
 string to_string(Operator op);
 
