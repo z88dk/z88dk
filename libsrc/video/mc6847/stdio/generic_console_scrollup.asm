@@ -8,21 +8,26 @@ IFNDEF MC6847_IOSPACE
 
     EXTERN      __mc6847_mode
     EXTERN      __pc6001_attr
-    EXTERN      __mc6847_mode
+    EXTERN      __mc1000_modeval
+    EXTERN      __tms9918_cls
 
 
 generic_console_scrollup:
     push    de
     push    bc
     ld      a, (__mc6847_mode)
-    and     @11111101
+    and     a
     jr      z, scrollup_text
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES & 0xfd
+    cp      1
     jr      z, scrollup_hires
 ENDIF
-    cp      MODE_MULTICOLOUR & 0xfd
+    cp      2
     jr      z, scrollup_hires           ;possibly wrong
+IF FORspc1000
+    cp      10
+    jp      z,__tms9918_cls
+ENDIF
     pop     bc
     pop     de
     ret
@@ -31,7 +36,7 @@ ENDIF
 scrollup_text:
     GETSCREENADDRESS
 IF FORmc1000
-    ld      a,(__mc6847_mode)
+    ld      a,(__mc1000_modeval)
     out     ($80),a
     ex      af,af
 ENDIF
@@ -77,7 +82,7 @@ ENDIF
 scrollup_hires:
     GETSCREENADDRESS
 IF FORmc1000
-    ld      a,(__mc6847_mode)
+    ld      a,(__mc1000_modeval)
     out     ($80),a
     ex      af,af
 ENDIF

@@ -17,32 +17,32 @@
 ; Uses: a, bc, de, hl
 pixeladdress:
     ld      a, (__mc6847_mode)
-    and     0xfd
+    and     a
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES & 0xfd
+    cp      1
     jp      z, pixeladdress_MODE1
 ENDIF
-    cp      MODE_MULTICOLOUR & 0xfd
+    cp      2
     jp      z, pixeladdress_MODE2
     ret
 
 
 IF FORmc1000
 
-    EXTERN  __mc6847_mode
+    EXTERN  __mc1000_modeval
     PUBLIC  pixelbyte
     PUBLIC  pix_return
 
 pix_return:
 
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
-    ld      a, (__mc6847_mode)
+    ld      a, (__mc1000_modeval)
     out     ($80), a
 
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
     ld      (de), a                     ; pixel address
 
-    ld      a, (__mc6847_mode)
+    ld      a, (__mc1000_modeval)
     set     0, a
     out     ($80),a
     ret

@@ -3,7 +3,6 @@
 
 
 IF FORphc25
-    defc    DISPLAY = $6000
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
     INCLUDE "target/phc25/def/phc25.def"

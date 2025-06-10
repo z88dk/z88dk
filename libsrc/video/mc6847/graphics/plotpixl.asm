@@ -19,12 +19,11 @@ IF FORspc1000
     cp      10
     jp      z,__tms9918_plotpixel
 ENDIF
-    and     0xfd
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES & 0xfd
+    cp      1
     jp      z, plot_MODE1
 ENDIF
-    cp      MODE_MULTICOLOUR & 0xfd
+    cp      2
     jp      z, plot_MODE2
 IF MC6847_HAS_TEXT_GFX
     and     a

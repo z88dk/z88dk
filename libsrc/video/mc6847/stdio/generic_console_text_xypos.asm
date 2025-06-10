@@ -21,10 +21,10 @@ generic_console_text_xypos:
         ld      a,(SYSVAR_screen)
         inc     a
         inc     a
+        ld      b,a
     ELSE
-        ld      a,+(DISPLAY / 256)
+        ld      b,+(DISPLAY / 256)
     ENDIF
-    ld      b, a
     add     hl, bc
     pop     af
     ret

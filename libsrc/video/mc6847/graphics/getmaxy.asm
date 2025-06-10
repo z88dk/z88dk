@@ -5,6 +5,7 @@
     PUBLIC  getmaxy
     PUBLIC  _getmaxy
     EXTERN  __mc6847_mode
+    EXTERN  __tms9918_getmaxy
 
     INCLUDE "graphics/grafix.inc"
     INCLUDE "video/mc6847/mc6847.inc"
@@ -12,7 +13,7 @@
 getmaxy:
 _getmaxy:
     ld      a, (__mc6847_mode)
-    and     @11111101
+    and     a
 IF MODE0_3x2
     ld      hl, 47
 ELIF MODE0_1x1
@@ -21,6 +22,10 @@ ELSE
     ld      hl, 31
 ENDIF
     ret     z
+IF FORspc1000
+    cp      10
+    jp      z, __tms9918_getmaxy
+ENDIF
 IF FORsv8000
     ld      de, 95
 ELIF FORvz

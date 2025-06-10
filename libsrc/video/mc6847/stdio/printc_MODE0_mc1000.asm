@@ -9,7 +9,6 @@ IF FORmc1000
     EXTERN  __mc6847_MODE2_attr
     EXTERN  generic_console_flags
     EXTERN  mc6847_map_colour
-    EXTERN  __mc6847_mode
     EXTERN  generic_console_text_xypos
 
 generic_console_set_ink:
@@ -36,7 +35,7 @@ generic_console_set_attribute:
 ; a = d = character to print
 ; e = raw
 printc_MODE0:
-    ld      a, (__mc6847_mode)
+    ld      a, (__mc1000_modeval)
     out     ($80), a
     ex      af, af
     push    de
@@ -63,6 +62,12 @@ isupper:
     ret     nc
     set     7, d
     ret
+
+    SECTION bss_driver
+
+    PUBLIC  __mc1000_modeval
+
+__mc1000_modeval:   defb    0
 
 
 ENDIF

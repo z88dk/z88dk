@@ -7,6 +7,7 @@ IFNDEF MC6847_IOSPACE
     PUBLIC  generic_console_cls
 
     EXTERN  __mc6847_mode
+    EXTERN  __mc1000_modeval
     EXTERN  __mc6847_mode
     EXTERN  __pc6001_attr
 
@@ -33,7 +34,7 @@ ELSE
     ld      e,1
 ENDIF
 IF FORmc1000
-    ld      a,(__mc6847_mode)
+    ld      a,(__mc1000_modeval)
     out     ($80), a
 ENDIF
 
@@ -66,7 +67,7 @@ IF FORpc6001
 ENDIF
 
 IF FORmc1000
-    ld      a,(__mc6847_mode)
+    ld      a,(__mc1000_modeval)
     out     ($80), a
 ENDIF
     ld      d,h

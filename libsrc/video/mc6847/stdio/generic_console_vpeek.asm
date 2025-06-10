@@ -4,6 +4,7 @@
     PUBLIC  generic_console_vpeek
 
     EXTERN  __mc6847_mode
+    EXTERN  __mc1000_modeval
     EXTERN  generic_console_text_xypos
     EXTERN  vpeek_MODE1
     EXTERN  vpeek_MODE2
@@ -19,16 +20,13 @@
 ;        c = failure
 generic_console_vpeek:
     ld      a, (__mc6847_mode)
-    ld      h,a
-    and     0xfd
 IF MC6847_HAS_HIRES
-    cp      MODE_HIRES & 0xfd
+    cp      1
     jp      z, vpeek_MODE1
 ENDIF
-    cp      MODE_MULTICOLOUR & 0xfd
+    cp      2
     jp      z, vpeek_MODE2
 IF FORspc1000
-    ld      a,h
     cp      10
     jp      nz,__tms9918_console_vpeek
 ENDIF
@@ -37,7 +35,7 @@ ENDIF
     ret     nz
     call    generic_console_text_xypos
 IF FORmc1000
-    ld      a, (__mc6847_mode)
+    ld      a, (__mc1000_modeval)
     out     ($80), a
     ld      b, (hl)
     set     0, a

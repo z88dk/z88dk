@@ -8,6 +8,7 @@
     EXTERN  __console_h
     EXTERN  __console_w
     EXTERN  __mc6847_mode
+    EXTERN  __mc1000_modeval
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
     EXTERN  __tms9918_console_ioctl
@@ -129,9 +130,11 @@ not_css:
     ld      (__console_h), a
     ld      a, l
     ld      (generic_console_caps), a
-    ld      a, h
+    ld      a, c
     ld      (__mc6847_mode), a
+    ld      a,h             ;Hardware value
     IF  FORmc1000
+        ld      (__mc1000_modeval),a
         out     ($80), a
         ld      ($f5), a                    ;Keep basic up-to-date with mode
         ld      hl, dummy_return
