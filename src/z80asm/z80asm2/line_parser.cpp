@@ -282,6 +282,7 @@ LineParser::Elem::Elem() {
 LineParser::Elem::Elem(const Elem& other)
     : token(other.token)
     , expr(other.expr ? other.expr->clone() : nullptr)
+    , const_expr(other.const_expr)
     , const_value(other.const_value) {
 }
 
@@ -344,7 +345,21 @@ bool LineParser::parse(const string& line) {
 
         // check if at final state
         if (cur_state.action) {
-            m_elems = queue_elem.elems; // setup data for function call
+            // setup data for function call
+            m_elems = queue_elem.elems;
+            for (auto& elem : queue_elem.elems) {
+                if (elem.const_expr) {
+                    if (!elem.expr->eval_const(g_obj_module->symtab(), elem.const_value)) {
+                        g_error->error_constant_expression_expected();
+                        return false;
+                    }
+                    else {
+                        elem.token.set_ivalue(elem.const_value);
+                    }
+                }
+            }
+
+            // call action
             (this->*cur_state.action)();
             parse_ok = true;
             break;
@@ -356,21 +371,18 @@ bool LineParser::parse(const string& line) {
         if (it != cur_state.ttype_next.end()) {
             Elem elem;
             elem.token = Token{ TType::INT, false };
-            Expr* expr = new Expr;
-            if (!expr->parse(m_in, true)) {
-                delete expr;
-            }
-            else if (!expr->eval_const(g_obj_module->symtab(), elem.const_value)) {
-                delete expr;
+            elem.expr = new Expr;
+            elem.const_expr = true;
+            if (!elem.expr->parse(m_in, true)) {
+                delete elem.expr;
+                elem.expr = nullptr;
             }
             else {
-                elem.token.set_ivalue(elem.const_value);
                 ParseQueueElem new_state = queue_elem;
                 new_state.state = it->second;
                 new_state.in_pos = m_in.pos();
                 new_state.elems.elems.push_back(elem);
                 parse_queue.push_back(new_state);
-                delete expr;
             }
         }
 
