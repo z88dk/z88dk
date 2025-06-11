@@ -8,7 +8,7 @@ LINE 1 "./test_t_include_ok.inc"
 nop
 LINE 5 "test_t_include_ok.asm"
 nop
-LINE 1 ".\test_t_include_ok.inc"
+LINE 1 "./test_t_include_ok.inc"
 nop
 LINE 7 "test_t_include_ok.asm"
 nop
@@ -16,7 +16,7 @@ LINE 1 "./test_t_include_ok.inc"
 nop
 LINE 9 "test_t_include_ok.asm"
 nop
-LINE 1 ".\test_t_include_ok.inc"
+LINE 1 "./test_t_include_ok.inc"
 nop
 LINE 11 "test_t_include_ok.asm"
 nop
