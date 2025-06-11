@@ -16,7 +16,7 @@ path("$test.asm")->spew(<<END);
 	25
 END
 
-run_ok("$exec $test.asm > $test.out 2>&1");
+run_ok("$exec -E $test.asm > $test.out 2>&1");
 run_ok("diff -w $bmk $test.out");
 
 unlink_testfiles();

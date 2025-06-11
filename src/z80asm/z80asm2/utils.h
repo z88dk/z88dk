@@ -17,3 +17,6 @@ bool is_ident(char c);
 bool read_custom_line(ifstream& stream, string& line);
 int ipow(int base, int exp);
 string sanitize_pathname(string path);
+string replace_extension(string path, const string& new_ext);
+string dirname(const string& path);
+string basename(const string& path);

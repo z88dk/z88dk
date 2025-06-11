@@ -99,6 +99,65 @@ int ipow(int base, int exp) {
 }
 
 string sanitize_pathname(string path) {
+    // use only forward slashes
     std::replace(path.begin(), path.end(), '\\', '/');
+
+    // normalize multiple slashes to a single slash
+    size_t pos = 0;
+    while ((pos = path.find("//", pos)) != string::npos) {
+        path.replace(pos, 2, "/");
+    }
+
+    // remove any trailing slashes
+    if (!path.empty() && path.back() == '/') {
+        path.pop_back();
+    }
+
+    // ensure the path is not empty after sanitization
+    if (path.empty()) {
+        path = ".";
+    }
+
     return path;
+}
+
+string replace_extension(string path, const string& new_ext) {
+    path = sanitize_pathname(path);
+    string dir = dirname(path);
+    if (dir != ".") {
+        // Ensure the directory ends with a slash
+        if (!str_ends_with(dir, "/"))
+            dir += '/';
+    }
+    else {
+        dir.clear(); // No directory, just the file name
+    }
+
+    string file = basename(path);
+    size_t pos = file.find_last_of('.');
+    if (pos != string::npos) {
+        file = file.substr(0, pos) + new_ext;
+    }
+    else
+        file += new_ext;
+
+    return dir + file;
+}
+
+string dirname(const string& path) {
+    size_t pos = path.find_last_of("/\\");
+    if (pos != string::npos) {
+        return path.substr(0, pos);
+    }
+    else
+        return ".";
+}
+
+string basename(const string& path) {
+    size_t pos = path.find_last_of("/\\");
+    if (pos != string::npos) {
+        return path.substr(pos + 1);
+    }
+    else
+        return path;
 }

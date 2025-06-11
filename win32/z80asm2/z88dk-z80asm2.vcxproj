@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\error.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\input_files.cpp" />
@@ -152,6 +153,7 @@
     <None Include="..\..\src\z80asm\z80asm2\test.inc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\assembler.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\error.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\input_files.h" />
