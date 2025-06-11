@@ -19,7 +19,8 @@ InputFiles::~InputFiles() {
         pop_file();
 }
 
-void InputFiles::push_file(const string& filename) {
+void InputFiles::push_file(const string& filename_) {
+    string filename = sanitize_pathname(filename_);
     File* file = new File;
     file->filename = filename;
     if (already_included(filename)) {
