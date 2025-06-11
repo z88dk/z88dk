@@ -8,14 +8,14 @@
 #pragma once
 
 #include "symbol.h"
+#include "utils.h"
+#include <cstdint>
 #include <vector>
 using namespace std;
 
 class Expr;
 class ObjModule;
 class Section;
-
-using Byte = unsigned char;
 
 // Patch Type
 
@@ -71,21 +71,21 @@ public:
 
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
-    Byte* data() { return m_bytes.data(); }
+    uint8_t* data() { return m_bytes.data(); }
     int size() const { return static_cast<int>(m_bytes.size()); }
     vector<Patch*>& patches() { return m_patches; }
     Symbol* label() const { return m_label; }
     void set_label(Symbol* label) { m_label = label; }
     Symtab* symtab();
 
-    void add_byte(Byte byte) { m_bytes.push_back(byte); }
+    void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
 
 private:
     Section* m_parent{ nullptr };
     int m_offset{ 0 };
-    vector<Byte> m_bytes;
+    vector<uint8_t> m_bytes;
     vector<Patch*> m_patches;
     Symbol* m_label{ nullptr };
 };

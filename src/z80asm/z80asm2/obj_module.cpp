@@ -184,7 +184,8 @@ void ObjModule::clear() {
 
     // copy global symbols to the symbol table
     for (const auto& it : *g_global_defines) {
-        assert(it.second->sym_type() == SymType::GLOBAL_DEF);
+        assert(it.second->sym_type() == SymType::GLOBAL_DEF
+            && "Only GLOBAL_DEF expected");
         Symbol* symbol = m_symtab.add_symbol(it.first);
         symbol->set_global_def(it.second->value());
     }
