@@ -36,7 +36,7 @@ void InputFiles::push_file(const string& filename) {
 }
 
 void InputFiles::pop_file() {
-    assert(!m_files.empty());
+    assert(!m_files.empty() && "Input file stack is empty");
     File* file = m_files.back();
     if (file->ifs.is_open())
         file->ifs.close();
