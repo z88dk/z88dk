@@ -118,6 +118,14 @@ ENDIF
             ; Transforms upper case to upper case
             defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $26 - 'A'
             defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'A'
+        ELIF ZX_CHAR_XLATE_MODE = 3
+            ; Dk'Tronics 4K graphics ROM
+            ; Lower case output transform to Dk'Tronics chr$ set
+            defc __CLIB_ZX_LOWER_CASE_TRANSFORM = -$60
+            defc __CLIB_ZX_INVERSE_TRANSFORM = $26 - 'A'
+            ; Transforms upper case to upper case
+            defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $26 - 'A'
+            defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'A'
         ENDIF
 
         org     CRT_ORG_CODE
@@ -154,6 +162,14 @@ ENDIF
 start:
 		ld		ix, 16384	; (IXIY swap) when self-relocating IY is corrupt
         call    save81
+
+; When "ZX_CHAR_XLATE_MODE = 3" is selected, select the font with
+; lowercase characters if the Dk'Tronics 4K graphics ROM is available
+IF ZX_CHAR_XLATE_MODE = 3
+		ld a,(11905)
+		cp 32
+		call z,11914
+ENDIF
 
 IF (!DEFINED_startup | (startup=1))
         ; FAST mode, safest way to use the special registers
@@ -303,10 +319,13 @@ ENDIF
         exx
 hl1save:
         ld	hl,0
+index_save:
+        ld	ix,0
+;iysave:
+;        ld	iy,0
         ;ld	bc,(bc1save)
         ;ld	de,(de1save)
         exx
-        ld      ix,16384	; IT WILL BECOME IY  !!
         ret
         
 save81:
@@ -315,6 +334,9 @@ IF (!DEFINED_startup | (startup=1))
         ld      (a1save+1),a
         ex      af,af
 ENDIF
+        ;ld	(iysave + 2),iy
+        ld	(index_save + 2),ix
+        ld      ix,16384	; IT WILL BECOME IY  !!
         exx
         ld	(hl1save + 1),hl
         ;ld	(de1save),de
@@ -504,5 +526,11 @@ ENDIF
 
 
         INCLUDE "crt/classic/crt_runtime_selection.inc"
-	INCLUDE "crt/classic/crt_section.inc"
 
+
+; If we were given an address for the BSS then use it
+IF DEFINED_CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
+ENDIF
+
+    INCLUDE	"crt/classic/crt_section.inc"
