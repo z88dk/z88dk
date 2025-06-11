@@ -1,16 +1,25 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Options
+// Assembler
 // Copyright (C) Paulo Custodio, 2011-2024
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "options.h"
-#include "utils.h"
+#pragma once
+
+#include <string>
 using namespace std;
 
-Options* g_options{ nullptr };
+class Assembler {
+public:
+    bool assemble_file(const string& filename);
 
-void Options::add_input_file(const string& filename) {
-    m_input_files.push_back(sanitize_pathname(filename));
-}
+private:
+    string m_filename;
+    string m_obj_filename;
+
+    void init(const string& filename);
+    bool parse();
+    bool resolve_jr();
+    bool resolve_local_exprs();
+};

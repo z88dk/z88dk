@@ -149,6 +149,8 @@ public:
     void add_opcode_n(long long opcode, Expr* expr);
     void add_opcode_nn(long long opcode, Expr* expr);
 
+    bool write_file(const string& filename) const;
+
 private:
     Symtab m_symtab;
     vector<Section*> m_sections;

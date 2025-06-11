@@ -1,2 +1,2 @@
-test_backslash.asm:4: 	ld 	a, 	25
+LINE 4 "test_backslash.asm"
 ld a,25

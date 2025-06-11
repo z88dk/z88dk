@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "assembler.h"
 #include "error.h"
 #include "input_files.h"
 #include "line_parser.h"
@@ -19,25 +20,6 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // Test
 //-----------------------------------------------------------------------------
-
-void parse_file(const string& filename) {
-    g_preproc->clear();
-    g_obj_module->clear();
-
-    g_input_files->push_file(filename);
-	string line;
-	while (g_input_files->getline(line)) {
-		g_preproc->expand(line);
-		string expanded_line;
-		while (g_preproc->getline(expanded_line)) {
-			g_location->set_expanded_text(expanded_line);
-			cout << g_location->filename() << ":" << g_location->line_num() << ": " << line << endl << expanded_line << endl;
-            LineParser parser;
-            if (!parser.parse(expanded_line))
-                cout << "parse failed" << endl;
-		}
-	}
-}
 
 static void create_globals() {
     g_location = new Location();
@@ -144,7 +126,8 @@ int main(int argc, char* argv[]) {
     }
     else {
         for (auto& filename : g_options->input_files()) {
-            parse_file(filename);
+            Assembler assembler;
+            assembler.assemble_file(filename);
         }
     }
 
