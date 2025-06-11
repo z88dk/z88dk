@@ -104,19 +104,16 @@ string sanitize_pathname(string path) {
 
     // normalize multiple slashes to a single slash
     size_t pos = 0;
-    while ((pos = path.find("//", pos)) != string::npos) {
+    while ((pos = path.find("//", pos)) != string::npos) 
         path.replace(pos, 2, "/");
-    }
 
     // remove any trailing slashes
-    if (!path.empty() && path.back() == '/') {
+    if (!path.empty() && path.back() == '/')
         path.pop_back();
-    }
 
     // ensure the path is not empty after sanitization
-    if (path.empty()) {
+    if (path.empty()) 
         path = ".";
-    }
 
     return path;
 }
