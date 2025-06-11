@@ -276,3 +276,8 @@ void ObjModule::add_opcode_nn(long long opcode, Expr* expr) {
     instr->add_patch(new Patch(PatchType::NN, expr, instr->size()));
 }
 
+bool ObjModule::write_file(const string& filename) const {
+    (void)filename;
+    return false;
+}
+
