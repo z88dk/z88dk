@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "memmap.h"
+#include "utils.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -19,13 +21,20 @@ public:
     StringTable& operator=(const StringTable& other) = delete;
 
     void clear();
-    int add_string(const string& str);
-    const string& get_string(int index) const;
-    bool find_string(const string& str, int& index) const;
+    size_t add_string(const string& str);
+    const string& get_string(size_t index) const;
+    bool find_string(const string& str, size_t& index) const;
     bool find_string(const string& str) const;
-    int size() const;
+    size_t size() const;
+
+    void write(Memmap& memmap) const;
+    bool read(Memmap& memmap);
+
+#ifdef UNIT_TESTS
+    static void test();
+#endif
 
 private:
     vector<string> m_strings;               // string table
-    unordered_map<string, int> m_id_map;    // map from string to index
+    unordered_map<string, size_t> m_id_map; // map from string to index
 };
