@@ -26,7 +26,6 @@ public:
     size_t pos() const;
     void set_pos(size_t pos);
 
-
     void align();
     void write_byte(uint8_t value);
     void write_short(uint16_t value);
@@ -38,7 +37,10 @@ public:
     bool read_long(uint32_t& value);
     bool read_data(uint8_t* data, size_t length);
 
-#ifdef _DEBUG
+    bool write_file(const string& filename);
+    bool read_file(const string& filename);
+
+#ifdef UNIT_TESTS
     static void test();
 #endif
 

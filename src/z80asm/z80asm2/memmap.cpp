@@ -5,10 +5,13 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "error.h"
 #include "memmap.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <fstream>
+#include <iostream>
 using namespace std;
 
 void Memmap::clear() {
@@ -108,15 +111,43 @@ bool Memmap::read_data(uint8_t* data, size_t length) {
     }
 }
 
+bool Memmap::write_file(const string& filename) {
+    ofstream ofs{ filename, ios::binary };
+    if (!ofs.is_open()) {
+        g_error->error_open_file(filename);
+        return false;
+    }
+    else {
+        ofs.write(reinterpret_cast<const char*>(m_data.data()), m_data.size());
+        return true;
+    }
+}
+
+bool Memmap::read_file(const string& filename) {
+    ifstream ifs{ filename,ios::binary };
+    if (!ifs.is_open()) {
+        g_error->error_open_file(filename);
+        return false;
+    }
+    else {
+        clear(); // clear existing data
+        ifs.seekg(0, ios::end);
+        size_t size = ifs.tellg();
+        ifs.seekg(0, ios::beg);
+        m_data.resize(size);
+        ifs.read(reinterpret_cast<char*>(m_data.data()), size);
+        m_pos = 0; // reset position after reading
+        return true;
+    }
+}
+
 void Memmap::extend_data(size_t count) {
     ptrdiff_t padding = m_pos + count - m_data.size();
     if (padding > 0)
         m_data.insert(m_data.end(), padding, 0); // fill with zeros
 }
 
-#ifdef _DEBUG
-#include <iostream>
-
+#ifdef UNIT_TESTS
 void Memmap::test() {
     Memmap mem;
     mem.align();
@@ -128,6 +159,8 @@ void Memmap::test() {
     mem.align();
     mem.write_long(Memmap::LONG_ERROR); // Example write to memory-mapped file
     mem.align();
+    assert(mem.write_file("memmap.bin")); // Write to a binary file
+
     mem.set_pos(0); // Reset position for reading
     uint8_t byte_value;
     assert(mem.read_byte(byte_value) && byte_value == 0x12); // Read back the byte
@@ -141,6 +174,19 @@ void Memmap::test() {
     assert(mem.read_long(long_value) && long_value == Memmap::LONG_ERROR); // Read back the long error value
     mem.align();
     assert(mem.pos() == mem.size()); // Ensure position is at the end
+
+    mem.clear();
+    assert(mem.read_file("memmap.bin")); // Read from the binary file
+    assert(mem.read_byte(byte_value) && byte_value == 0x12); // Read back the byte
+    mem.align();
+    assert(mem.read_short(short_value) && short_value == 0x1234); // Read back the short
+    mem.align();
+    assert(mem.read_long(long_value) && long_value == 0x12345678); // Read back the long
+    mem.align();
+    assert(mem.read_long(long_value) && long_value == Memmap::LONG_ERROR); // Read back the long error value
+    mem.align();
+    assert(mem.pos() == mem.size()); // Ensure position is at the end
+
     mem.clear(); // Clear the memory-mapped file
     assert(mem.size() == 0 && mem.pos() == 0); // Ensure it is empty
     mem.write_data(reinterpret_cast<const uint8_t*>("Test"), 4); // Write some data
@@ -150,6 +196,9 @@ void Memmap::test() {
     assert(data[0] == 'T' && data[1] == 'e' && data[2] == 's' && data[3] == 't'); // Check the data
     mem.clear(); // Clear the memory-mapped file again
     assert(mem.size() == 0 && mem.pos() == 0); // Ensure it is empty again
+
+    remove("memmap.bin");
+
     cout << "Memmap test passed." << endl;
 }
 

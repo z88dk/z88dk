@@ -71,7 +71,7 @@ static int help() {
 }
 
 int main(int argc, char* argv[]) {
-#ifdef _DEBUG
+#ifdef UNIT_TESTS
     Memmap::test();
     return EXIT_SUCCESS;
 #endif
