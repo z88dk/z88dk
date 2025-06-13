@@ -49,8 +49,18 @@ $(PROJ).y: directives.y opcodes.y
 	cat directives.y opcodes.y > $(PROJ).y
 	dos2unix $(PROJ).y
 
-test: $(PROJ)$(EXESUFFIX)
+test: 
+	$(MAKE) unit_tests
+	$(MAKE) system_tests
+
+system_tests: $(PROJ)$(EXESUFFIX)
 	perl -S prove --state=slow,save -j$(TASKS) t/*.t
+
+unit_tests:
+	$(MAKE) clean
+	$(MAKE) OPT=-D_DEBUG $(PROJ)$(EXESUFFIX)
+	./$(PROJ)$(EXESUFFIX)
+	$(MAKE) clean
 
 clean::
 	$(RM) $(PROJ) $(PROJ)$(EXESUFFIX) $(OBJS) $(wildcard *.bak t/*.bak) $(DEPENDS)
