@@ -135,7 +135,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\input_files.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\line_parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\memmap_file.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\memmap.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_module.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\operator.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
@@ -161,7 +161,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\input_files.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\line_parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\memmap_file.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\memmap.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_module.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\operator.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
