@@ -63,7 +63,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\memmap_file.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\memmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -130,7 +130,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\memmap_file.h">
+    <ClInclude Include="..\..\src\z80asm\z80asm2\memmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

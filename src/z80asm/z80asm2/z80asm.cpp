@@ -9,12 +9,14 @@
 #include "input_files.h"
 #include "line_parser.h"
 #include "location.h"
+#include "memmap.h"
 #include "obj_module.h"
 #include "options.h"
 #include "preproc.h"
 #include "symbol.h"
 #include <iostream>
 #include <string>
+#include <cassert>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -69,8 +71,14 @@ static int help() {
 }
 
 int main(int argc, char* argv[]) {
+#ifdef _DEBUG
+    Memmap::test();
+    return EXIT_SUCCESS;
+#endif
+
     create_globals();
     atexit(delete_globals);
+
 
     g_options->set_progname(argv[0]);
     argv++; argc--;
