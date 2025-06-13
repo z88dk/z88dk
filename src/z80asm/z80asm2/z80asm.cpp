@@ -13,10 +13,11 @@
 #include "obj_module.h"
 #include "options.h"
 #include "preproc.h"
+#include "string_table.h"
 #include "symbol.h"
+#include <cassert>
 #include <iostream>
 #include <string>
-#include <cassert>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -73,13 +74,15 @@ static int help() {
 int main(int argc, char* argv[]) {
 #ifdef UNIT_TESTS
     Memmap::test();
+    StringTable::test();
     return EXIT_SUCCESS;
 #endif
 
+    // Initialize global objects
     create_globals();
     atexit(delete_globals);
 
-
+    // parse command line
     g_options->set_progname(argv[0]);
     argv++; argc--;
 

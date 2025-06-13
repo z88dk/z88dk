@@ -20,7 +20,7 @@ void Memmap::clear() {
 }
 
 void Memmap::align() {
-    ptrdiff_t padding = (ALIGN_SIZE - (m_pos % ALIGN_SIZE)) % ALIGN_SIZE;
+    int padding = (ALIGN_SIZE - (m_pos % ALIGN_SIZE)) % ALIGN_SIZE;
     m_pos += padding;
     extend_data();
 }
@@ -199,7 +199,7 @@ void Memmap::test() {
 
     remove("memmap.bin");
 
-    cout << "Memmap test passed." << endl;
+    cout << "Memmap tests passed." << endl;
 }
 
 #endif
