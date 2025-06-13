@@ -58,7 +58,7 @@ system_tests: $(PROJ)$(EXESUFFIX)
 
 unit_tests:
 	$(MAKE) clean
-	$(MAKE) OPT=-D_DEBUG $(PROJ)$(EXESUFFIX)
+	$(MAKE) OPT=-DUNIT_TESTS $(PROJ)$(EXESUFFIX)
 	./$(PROJ)$(EXESUFFIX)
 	$(MAKE) clean
 
