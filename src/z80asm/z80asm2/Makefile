@@ -7,10 +7,10 @@
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
   EXESUFFIX 		:= .exe
-  SANITIZE			:= 
+#  SANITIZE			:= 
 else
   EXESUFFIX 		?=
-  SANITIZE			:= -fsanitize=address
+#  SANITIZE			:= -fsanitize=address
 endif
 
 PROJ =		z80asm
