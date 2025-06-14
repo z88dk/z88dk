@@ -122,6 +122,42 @@ my %patches = (
     D2DDD   => { id => 14, size => 3, code => "t" },
 );
 
+my %cpus = (
+    UNDEF       	=> { id => -1, name => "", 					parent => "" },
+    Z80         	=> { id => 1,  name => "z80", 				parent => "8080" },
+    Z80_STRICT  	=> { id => 2,  name => "z80_strict", 		parent => "8080" },
+    Z180        	=> { id => 3,  name => "z180", 				parent => "8080" },
+    EZ80_Z80    	=> { id => 4,  name => "ez80_z80", 			parent => "UNDEF" },
+    EZ80        	=> { id => 5,  name => "ez80", 				parent => "UNDEF" },
+    Z80N        	=> { id => 6,  name => "z80n", 				parent => "Z80" },
+    R2KA        	=> { id => 7,  name => "r2ka", 				parent => "UNDEF" },
+    R3K         	=> { id => 8,  name => "r3k", 				parent => "R2KA" },
+    GBZ80       	=> { id => 9,  name => "gbz80", 			parent => "UNDEF" },
+    '8080'        	=> { id => 10, name => "8080", 				parent => "UNDEF" },
+    '8085'        	=> { id => 11, name => "8085", 				parent => "8080" },
+    R800        	=> { id => 12, name => "r800", 				parent => "8080" },
+    R4K         	=> { id => 13, name => "r4k", 				parent => "UNDEF" },
+    R5K         	=> { id => 14, name => "r5k", 				parent => "R4K" },
+    KC160       	=> { id => 15, name => "kc160", 			parent => "UNDEF" },
+    KC160_Z80   	=> { id => 16, name => "kc160_z80", 		parent => "8080" },
+    '8080_STRICT'	=> { id => 17, name => "8080_strict", 		parent => "UNDEF" },
+    '8085_STRICT'	=> { id => 18, name => "8085_strict", 		parent => "8080" },
+    GBZ80_STRICT	=> { id => 19, name => "gbz80_strict", 		parent => "UNDEF" },
+	Z180_STRICT		=> { id => 20, name => "z180_strict", 		parent => "8080" },
+    Z80N_STRICT		=> { id => 21, name => "z80n_strict", 		parent => "Z80" },
+    EZ80_Z80_STRICT => { id => 22, name => "ez80_z80_strict", 	parent => "UNDEF" },
+    EZ80_STRICT     => { id => 23, name => "ez80_strict", 		parent => "UNDEF" },
+    R800_STRICT    	=> { id => 24, name => "r800_strict", 		parent => "8080" },
+    KC160_STRICT    => { id => 25, name => "kc160_strict", 		parent => "UNDEF" },
+    KC160_Z80_STRICT=> { id => 26, name => "kc160_z80_strict", 	parent => "8080" },
+    R2KA_STRICT     => { id => 27, name => "r2ka_strict", 		parent => "UNDEF" },
+    R3K_STRICT      => { id => 28, name => "r3k_strict", 		parent => "R2KA" },
+    R4K_STRICT      => { id => 29, name => "r4k_strict", 		parent => "UNDEF" },
+    R5K_STRICT		=> { id => 30, name => "r5k_strict", 		parent => "R4K" },
+	R6K				=> { id => 31, name => "r6k", 				parent => "R5K" },
+	R6K_STRICT		=> { id => 32, name => "r6k_strict", 		parent => "R5K" },
+);
+
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
@@ -173,7 +209,8 @@ sub parse_grammar {
                 operators => \%operators,
                 patches => \%patches, 
 				rules => \@rules,
-                actions => \@actions};
+                actions => \@actions,
+				cpus => \%cpus};
 }
 
 sub parse_grammar_rule {
@@ -391,6 +428,61 @@ sub patch_file {
 				$line .= "$prefix},\n";
 				
 				push @out, $line;
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*cpu_id_CPU\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{cpus}{$a}{id} <=> $grammar->{cpus}{$b}{id}} keys %{$grammar->{cpus}}) {
+				push @out, "${prefix}CPU_$_ = ".$grammar->{cpus}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*cpu_id\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{cpus}{$a}{id} <=> $grammar->{cpus}{$b}{id}} keys %{$grammar->{cpus}}) {
+				my $cpu = $_ =~ s/^(\d)/I$1/r;
+				push @out, "$prefix$cpu = ".$grammar->{cpus}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*cpu_lut\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{cpus}{$a}{id} <=> $grammar->{cpus}{$b}{id}} keys %{$grammar->{cpus}}) {
+				next if $_ eq 'UNDEF';
+				my $id = $grammar->{cpus}{$_}{id};
+				my $cpu = "CPU_$_";
+				my $name = $grammar->{cpus}{$_}{name};
+				my $parent = "CPU_".$grammar->{cpus}{$_}{parent};
+				my $non_strict = $cpu =~ s/_STRICT//r;
+				my $is_strict = $cpu =~ /_STRICT$/ ? 'true' : 'false';
+				push @out, $prefix."{ ".c_string($name).", $cpu, $parent, $non_strict, $is_strict }, // $id\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*cpu_table\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{cpus}{$a}{id} <=> $grammar->{cpus}{$b}{id}} keys %{$grammar->{cpus}}) {
+				next if $_ eq 'UNDEF';
+				my $id = $grammar->{cpus}{$_}{id};
+				my $cpu = $_ =~ s/^(\d)/I$1/r;
+				my $name = $grammar->{cpus}{$_}{name};
+				my $parent = $grammar->{cpus}{$_}{parent} =~ s/^(\d)/I$1/r;
+				my $non_strict = $cpu =~ s/_STRICT//r;
+				my $is_strict = $cpu =~ /_STRICT$/ ? 'true' : 'false';
+				push @out, $prefix."{ ".c_string($name).", Cpu::$cpu, Cpu::$parent, Cpu::$non_strict, $is_strict, -1 }, // $id\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
