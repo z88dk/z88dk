@@ -29,20 +29,20 @@ ENDIF
 
 IF FORmc1000
 
-    EXTERN  __mc1000_modeval
+    EXTERN  __mc6847_modeval
     PUBLIC  pixelbyte
     PUBLIC  pix_return
 
 pix_return:
 
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_modeval)
     out     ($80), a
 
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
     ld      (de), a                     ; pixel address
 
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_modeval)
     set     0, a
     out     ($80),a
     ret

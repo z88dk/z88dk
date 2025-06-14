@@ -1,7 +1,7 @@
 ;
 ; Fast background save
 ;
-; PC6001 version
+; PC6001/main memory version
 ;
 ;
 ; $Id: bksave.asm,v 1.4 2016-07-02 09:01:36 dom Exp $

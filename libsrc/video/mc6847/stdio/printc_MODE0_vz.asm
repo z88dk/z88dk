@@ -52,10 +52,8 @@ generic_console_set_ink:
 generic_console_plotc:
     ld      e, 1
 printc_MODE0:
-    ld      d, a
-    push    de
+    ld      a,d
     call    generic_console_text_xypos
-    pop     de
     rr      e
     call    nc, convert_character
     cp      128

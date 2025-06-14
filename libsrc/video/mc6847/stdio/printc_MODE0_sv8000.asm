@@ -31,7 +31,7 @@ generic_console_set_attribute:
 
 printc_MODE0:
     call    generic_console_text_xypos
-    ld      (hl), a
+    ld      (hl), d
     ret
 
 ENDIF

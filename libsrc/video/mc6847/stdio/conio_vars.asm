@@ -4,8 +4,12 @@
     SECTION bss_clib
 
     PUBLIC  __mc6847_mode
+    PUBLIC  __mc6847_modeval
 
 __mc6847_mode:
+    defb    0
+
+__mc6847_modeval:   
     defb    0
 
     SECTION data_clib

@@ -8,7 +8,7 @@ IFNDEF MC6847_IOSPACE
 
     EXTERN      __mc6847_mode
     EXTERN      __pc6001_attr
-    EXTERN      __mc1000_modeval
+    EXTERN      __mc6847_modeval
     EXTERN      __tms9918_cls
 
 
@@ -36,7 +36,7 @@ ENDIF
 scrollup_text:
     GETSCREENADDRESS
 IF FORmc1000
-    ld      a,(__mc1000_modeval)
+    ld      a,(__mc6847_modeval)
     out     ($80),a
     ex      af,af
 ENDIF
@@ -82,7 +82,7 @@ ENDIF
 scrollup_hires:
     GETSCREENADDRESS
 IF FORmc1000
-    ld      a,(__mc1000_modeval)
+    ld      a,(__mc6847_modeval)
     out     ($80),a
     ex      af,af
 ENDIF

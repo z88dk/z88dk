@@ -4,7 +4,7 @@
     PUBLIC  generic_console_vpeek
 
     EXTERN  __mc6847_mode
-    EXTERN  __mc1000_modeval
+    EXTERN  __mc6847_modeval
     EXTERN  generic_console_text_xypos
     EXTERN  vpeek_MODE1
     EXTERN  vpeek_MODE2
@@ -35,7 +35,7 @@ ENDIF
     ret     nz
     call    generic_console_text_xypos
 IF FORmc1000
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_modeval)
     out     ($80), a
     ld      b, (hl)
     set     0, a

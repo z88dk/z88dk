@@ -6,7 +6,7 @@
 
     PUBLIC  pixeladdress_MODE2
 
-    EXTERN  __mc1000_modeval
+    EXTERN  __mc6847_modeval
     EXTERN  pixelbyte
 
     INCLUDE "video/mc6847/mc6847.inc"
@@ -43,13 +43,13 @@ pixeladdress_MODE2:
     add     hl, de
 IF FORmc1000
     ex      af,af
-    ld      a,(__mc1000_modeval)
+    ld      a,(__mc6847_modeval)
     out     ($80),a
     ld      a,(hl)
     ld      de,hl       ;Load up de for pix_return
     ld      hl,pixelbyte
     ld      (hl),a
-    ld      a,(__mc1000_modeval)
+    ld      a,(__mc6847_modeval)
     out     ($80),a
     ex      af,af
 ENDIF

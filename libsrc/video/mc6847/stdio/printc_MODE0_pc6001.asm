@@ -59,6 +59,7 @@ generic_console_set_paper:
 
 
 printc_MODE0:
+    ld      a,d
     call    generic_console_text_xypos
     ld      (hl), a
     dec     h

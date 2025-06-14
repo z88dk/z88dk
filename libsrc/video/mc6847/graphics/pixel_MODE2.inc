@@ -15,6 +15,8 @@
     ld      a, l
 IF FORsv8000
     cp      96
+ELIF FORvz
+    cp      64
 ELSE
     cp      192
 ENDIF

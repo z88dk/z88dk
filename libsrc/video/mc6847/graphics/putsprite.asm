@@ -14,6 +14,8 @@
     PUBLIC  _putsprite
     EXTERN  cpygraph
     EXTERN  pixeladdress
+    EXTERN  __generic_putsprite
+    EXTERN  __mc6847_mode
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -21,6 +23,9 @@
 
 putsprite:
 _putsprite:
+    ld      a,(__mc6847_mode)
+    cp      1
+    jp      nz,__generic_putsprite
     push    ix                          ;save callers
     ld      hl, 4
     add     hl, sp
@@ -64,6 +69,11 @@ _putsprite:
     ld      h, d
     ld      l, e
 
+IF FORmc1000
+    ld      a,(__mc6847_modeval)
+    ex      af,af
+ENDIF
+
     ld      a, (ix+0)
     cp      9
     jr      nc, putspritew
@@ -86,7 +96,19 @@ _iloop:
 ortype:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
+IF FORmc1000
+    ex      af,af
+    res     0,a
+    out     ($80),a
+    ex      af,af
+    ld      (hl),a
+    ex      af,af
+    set     0,a
+    out     ($80),a
+    ex      af,af
+ELSE
     ld      (hl), a
+ENDIF
     ld      a, e
 _noplot:
     rrca
@@ -125,7 +147,19 @@ wiloop:
 ortype2:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
+IF FORmc1000
+    ex      af,af
+    res     0,a
+    out     ($80),a
+    ex      af,af
+    ld      (hl),a
+    ex      af,af
+    set     0,a
+    out     ($80),a
+    ex      af,af
+ELSE
     ld      (hl), a
+ENDIF
     ld      a, e
 wnoplot:
     rrca

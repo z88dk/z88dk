@@ -7,8 +7,9 @@ IFNDEF MC6847_IOSPACE
     PUBLIC  generic_console_cls
 
     EXTERN  __mc6847_mode
-    EXTERN  __mc1000_modeval
+    EXTERN  __mc6847_modeval
     EXTERN  __mc6847_mode
+    EXTERN  __mc6847_modeval
     EXTERN  __pc6001_attr
 
 
@@ -23,10 +24,11 @@ IF FORpc6001
     dec     h
     dec     h
     ld      l, 0
-    ld      de,hl
-    inc     de
+    ld      d,h
+    ld      e,1
 	; NecTrek needs all characters setting
     ld      bc, 512
+    ld      a,(__mc6847_modeval)
     ld      (hl), a                     ; TODO, Border colour is in here somewhere
     ldir
 ELSE
@@ -34,7 +36,7 @@ ELSE
     ld      e,1
 ENDIF
 IF FORmc1000
-    ld      a,(__mc1000_modeval)
+    ld      a,(__mc6847_modeval)
     out     ($80), a
 ENDIF
 
@@ -52,6 +54,7 @@ IF FORmc1000
     out     ($80), a
 ENDIF
     ret
+    
 cls_text:
 IF FORpc6001
     push    hl
@@ -67,7 +70,7 @@ IF FORpc6001
 ENDIF
 
 IF FORmc1000
-    ld      a,(__mc1000_modeval)
+    ld      a,(__mc6847_modeval)
     out     ($80), a
 ENDIF
     ld      d,h
