@@ -20,7 +20,8 @@ using namespace std;
 
 bool Assembler::assemble_file(const string& filename) {
     init(filename);
-    define_consts();
+    define_global_defs();
+    define_cpu_defs();
 
     bool ok = true;
     if (ok && !parse())
@@ -53,14 +54,16 @@ void Assembler::init(const string& filename) {
     g_input_files->push_file(filename);
 }
 
-void Assembler::define_consts() {
+void Assembler::define_global_defs() {
     // copy global symbols to the symbol table
     for (const auto& it : *g_global_defines) {
         assert(it.second->sym_type() == SymType::GLOBAL_DEF
             && "Only GLOBAL_DEF expected");
         g_obj_module->add_define(it.first, it.second->value());
     }
+}
 
+void Assembler::define_cpu_defs() {
     // create symbols for the current CPU
     for (auto& define : g_cpu_table->all_defines())
         g_obj_module->remove_define(define);
