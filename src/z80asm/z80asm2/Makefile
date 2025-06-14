@@ -8,10 +8,8 @@ PROJ =		z80asm
 
 ifeq ($(OS),Windows_NT)
   EXESUFFIX := .exe
-  SANITIZE	:= 
 else
   EXESUFFIX ?=
-  SANITIZE	:= -fsanitize=address
 endif
 
 # debug release unit_tests
@@ -42,7 +40,7 @@ TEMPLATE_H	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/
 DEPENDS		= $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRCS))
 
 CXX			?= g++
-CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors $(SANITIZE)
+CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors
 
 ifeq ($(BUILD),release)
   CXX_FLAGS += -O3
@@ -54,7 +52,7 @@ else
   endif
 endif
 
-LDFLAGS		+= $(SANITIZE)
+LDFLAGS		+= 
 
 TASKS 		?= 9
 
