@@ -123,3 +123,22 @@ IF CLIB_DISABLE_MODE1 = 1
     defc    pointxy_MODE1 = noop
     defc    pixeladdress_MODE1 = noop
 ENDIF
+
+IF CLIB_DISABLE_MODE2 = 1
+    PUBLIC  vpeek_MODE2
+    PUBLIC  printc_MODE2
+    PUBLIC  plot_MODE2
+    PUBLIC  res_MODE2
+    PUBLIC  xor_MODE2
+    PUBLIC  pointxy_MODE2
+    PUBLIC  pixeladdress_MODE2
+    EXTERN	vpeek_noop
+    defc    vpeek_MODE2 = vpeek_noop
+    defc    printc_MODE2 = noop
+    defc    plot_MODE2 = noop
+    defc    res_MODE2 = noop
+    defc    xor_MODE2 = noop
+    defc    pointxy_MODE2 = noop
+    defc    pixeladdress_MODE2 = noop
+ENDIF
+

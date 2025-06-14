@@ -58,7 +58,7 @@ DSTAR_TARGETS = zx sv8000 coleco laser500
 
 CFLAGS_zx_dstar = -DUSE_UDGS
 CFLAGS_laser500_dstar = -DUSE_UDGS -DSWITCH_MODE=2
-CFLAGS_sv8000_dstar = -DUSE_JOYSTICK -DUSE_UDGS -DSWITCH_MODE=1 -pragma-redirect:CRT_FONT=_font_8x8_bbc_system
+CFLAGS_sv8000_dstar = -DUSE_JOYSTICK -DUSE_UDGS -DSWITCH_MODE=1 -pragma-redirect:CRT_FONT=_font_8x8_bbc_system -pragma-define:CLIB_DISABLE_MODE2=1
 CFLAGS_coleco_dstar = -DUSE_JOYSTICK -DUSE_UDGS -DSWITCH_MODE=2
 
 OUTPUT_BINS += $(foreach target, $(DSTAR_TARGETS),  build/$(target)/dstar.bin )

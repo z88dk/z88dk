@@ -55,13 +55,13 @@ check_mode:
     ld      d, CAPS_MODE0
     and     a
     jr      z, set_mode
-    ld      h, MODE_1
+    ld      h, MODE_HIRES
     ld      l, 24
     ld      c, 32
     ld      d, CAPS_MODE1
     cp      1                           ;HIRES
     jr      z, set_mode
-    ld      h, MODE_2
+    ld      h, MODE_MULTICOLOUR
     ld      l, 24
     ld      c, 16
     ld      d, CAPS_MODE2
