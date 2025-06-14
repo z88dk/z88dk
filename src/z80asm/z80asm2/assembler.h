@@ -19,7 +19,8 @@ private:
     string m_obj_filename;
 
     void init(const string& filename);
-    void define_consts();
+    void define_global_defs();
+    void define_cpu_defs();
     bool parse();
     bool resolve_jr();
     bool resolve_local_exprs();
