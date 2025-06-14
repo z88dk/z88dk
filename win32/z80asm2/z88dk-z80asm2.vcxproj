@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>UNIT_TESTS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -103,7 +103,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>UNIT_TESTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\error.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\input_files.cpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\directives.y" />
+    <None Include="..\..\src\z80asm\z80asm2\line_parser.cpp.bak" />
     <None Include="..\..\src\z80asm\z80asm2\mkparser.pl" />
     <None Include="..\..\src\z80asm\z80asm2\opcodes.y" />
     <None Include="..\..\src\z80asm\z80asm2\test.asm" />
@@ -156,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\assembler.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\error.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\input_files.h" />

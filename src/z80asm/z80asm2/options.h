@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "cpu.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -25,11 +26,15 @@ public:
     bool preproc_only() const { return m_preproc_only; }
     void set_preproc_only(bool f = true) { m_preproc_only = f; }
 
+    Cpu cpu_id() const { return m_cpu_id; }
+    void set_cpu_id(Cpu id) { m_cpu_id = id; }
+
 private:
     string m_progname;
     vector<string> m_input_files;
     bool m_verbose{ false };
     bool m_preproc_only{ false };
+    Cpu m_cpu_id{ Cpu::Z80 };
 };
 
 extern Options* g_options;

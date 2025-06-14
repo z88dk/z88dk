@@ -23,8 +23,9 @@ LDFLAGS		+= $(SANITIZE)
 
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(SRCS:.cpp=.o)
-TEMPLATECPP	= token.cpp operator.cpp obj_module.cpp line_parser.cpp 
-TEMPLATEH	= token.h   operator.h   obj_module.h   line_parser.h
+TEMPLATEC	=                                                       ../../common/z80asm_defs.c
+TEMPLATECPP	= token.cpp operator.cpp obj_module.cpp line_parser.cpp                            cpu.cpp
+TEMPLATEH	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/z80asm_defs.h cpu.h
 DEPENDS		= $(SRCS:.cpp=.d)
 
 TASKS 		?= 9
@@ -38,11 +39,12 @@ $(PROJ)$(EXESUFFIX): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXX_FLAGS) -c -o $@ $<
 
+$(TEMPLATEC:.c=.o): 	$(PROJ).pp
 $(TEMPLATECPP:.cpp=.o): $(PROJ).pp
 $(TEMPLATEH:.h=.o):     $(PROJ).pp
 
-$(PROJ).pp: $(TEMPLATECPP) $(TEMPLATEH) $(PROJ).y mkparser.pl Makefile
-	perl mkparser.pl $(PROJ).y $(TEMPLATECPP) $(TEMPLATEH)
+$(PROJ).pp: $(TEMPLATEC) $(TEMPLATECPP) $(TEMPLATEH) $(PROJ).y mkparser.pl Makefile
+	perl mkparser.pl $(PROJ).y $(TEMPLATEC) $(TEMPLATECPP) $(TEMPLATEH)
 	touch $(PROJ).pp
 
 $(PROJ).y: directives.y opcodes.y
