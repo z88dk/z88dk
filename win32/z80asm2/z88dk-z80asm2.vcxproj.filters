@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\memmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\mkparser.pl">
@@ -82,6 +85,9 @@
     </None>
     <None Include="..\..\src\z80asm\z80asm2\opcodes.y">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\line_parser.cpp.bak">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +137,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\memmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

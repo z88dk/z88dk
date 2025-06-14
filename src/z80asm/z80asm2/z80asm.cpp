@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "assembler.h"
+#include "cpu.h"
 #include "error.h"
 #include "input_files.h"
 #include "line_parser.h"
@@ -25,6 +26,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 static void create_globals() {
+    g_cpu_table = new CpuTable();
     g_location = new Location();
     g_error = new Error();
     g_input_files = new InputFiles();
@@ -35,26 +37,29 @@ static void create_globals() {
 }
 
 static void delete_globals() {
-    delete g_location;
-    g_location = nullptr;
-
-    delete g_error;
-    g_error = nullptr;
-
-    delete g_input_files;
-    g_input_files = nullptr;
-
-    delete g_global_defines;
-    g_global_defines = nullptr;
-
-    delete g_preproc;
-    g_preproc = nullptr;
+    delete g_options;
+    g_options = nullptr;
 
     delete g_obj_module;
     g_obj_module = nullptr;
 
-    delete g_options;
-    g_options = nullptr;
+    delete g_preproc;
+    g_preproc = nullptr;
+
+    delete g_global_defines;
+    g_global_defines = nullptr;
+
+    delete g_input_files;
+    g_input_files = nullptr;
+
+    delete g_error;
+    g_error = nullptr;
+
+    delete g_location;
+    g_location = nullptr;
+
+    delete g_cpu_table;
+    g_cpu_table = nullptr;
 }
 
 static int error_unknown_option(const string& option) {
@@ -63,11 +68,14 @@ static int error_unknown_option(const string& option) {
 }
 
 static int help() {
-    cout << "Usage: z80asm [options] [file...]\n"
-         << "Options:\n"
-         << "  -E          Preprocess only, do not assemble\n"
-         << "  -v          Verbose output\n"
-         << "  --          Stop processing options\n";
+    cout << "Usage: z80asm [options] [file...]" << endl
+        << "Options:" << endl
+        << "  -E          Preprocess only, do not assemble" << endl
+        << "  -h          Show this help message" << endl
+        << "  -mCPU       Select CPU, one of:" << endl
+        << "              " << g_cpu_table->cpu_names(14, 72) << endl
+        << "  -v          Verbose output" << endl
+        << "  --          Stop processing options" << endl;
     return EXIT_SUCCESS;
 }
 
@@ -105,6 +113,22 @@ int main(int argc, char* argv[]) {
         case 'h':
             if (option == "-h")
                 return help();
+            else
+                return error_unknown_option(option);
+            break;
+        case 'm':
+            if (option.size() > 2) {
+                string cpu_name = option.substr(2);
+                const CpuInfo* info = g_cpu_table->get_info(cpu_name);
+                if (!info) {
+                    cerr << "Invalid cpu " << cpu_name << endl
+                        << "Expected one of: " << g_cpu_table->cpu_names() << endl;
+                    return EXIT_FAILURE;
+                }
+                else {
+                    g_options->set_cpu_id(info->id);
+                }
+            }
             else
                 return error_unknown_option(option);
             break;
