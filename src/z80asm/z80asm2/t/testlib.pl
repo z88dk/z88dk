@@ -12,7 +12,7 @@ $ENV{PATH} = join($Config{path_sep},
 
 use vars '$exec', '$test', '$bmk', '$null';
 
-$exec = $^O =~ /MSWin32|msys/ ? "./z80asm.exe" : "./z80asm";
+$exec = $ENV{TARGET} ? $ENV{TARGET} : $^O =~ /MSWin32|msys/ ? "./z80asm.exe" : "./z80asm";
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $bmk = "t/".path($0)->basename(".t").".bmk";
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
