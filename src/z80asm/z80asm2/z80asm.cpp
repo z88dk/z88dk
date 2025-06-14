@@ -63,7 +63,7 @@ static void delete_globals() {
 }
 
 static int error_unknown_option(const string& option) {
-    cerr << "Unknown option: " << option << endl;
+    cerr << "error: unknown option: " << option << endl;
     return EXIT_FAILURE;
 }
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
                 string cpu_name = option.substr(2);
                 const CpuInfo* info = g_cpu_table->get_info(cpu_name);
                 if (!info) {
-                    cerr << "Invalid cpu " << cpu_name << endl
+                    cerr << "error: invalid cpu: " << cpu_name << endl
                         << "Expected one of: " << g_cpu_table->cpu_names() << endl;
                     return EXIT_FAILURE;
                 }
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (g_options->input_files().empty()) {
-        cerr << "No input files specified." << endl;
+        cerr << "error: no input files specified" << endl;
         return EXIT_FAILURE;
     }
 
