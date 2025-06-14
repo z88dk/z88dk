@@ -8,8 +8,10 @@
 #include "error.h"
 #include "expr.h"
 #include "obj_module.h"
+#include "options.h"
 #include "symbol.h"
 #include <cassert>
+#include <iostream>
 #include <unordered_map>
 using namespace std;
 
@@ -181,14 +183,6 @@ void ObjModule::clear() {
     m_cur_section = m_sections[0];
     m_cur_section->clear();
     m_assume = 0;
-
-    // copy global symbols to the symbol table
-    for (const auto& it : *g_global_defines) {
-        assert(it.second->sym_type() == SymType::GLOBAL_DEF
-            && "Only GLOBAL_DEF expected");
-        Symbol* symbol = m_symtab.add_symbol(it.first);
-        symbol->set_global_def(it.second->value());
-    }
 }
 
 void ObjModule::set_cur_section(const string& name) {
@@ -226,14 +220,25 @@ void ObjModule::add_define(const string& name, int value) {
     Symbol* symbol = m_symtab.add_symbol(name);
     if (symbol) {
         symbol->set_const(value);
+        if (g_options->verbose())
+            cout << "define " << name << " = " << value << endl;
     }
 }
 
 void ObjModule::add_define(const string& name, Expr* expr) {
     Symbol* symbol = m_symtab.add_symbol(name);
     if (symbol) {
-        symbol->set_const(expr);
+        int value = 0;
+        if (expr->eval_const(&m_symtab, value)) {
+            symbol->set_const(value);
+            if (g_options->verbose())
+                cout << "define " << name << " = " << value << endl;
+        }
+        else {
+            g_error->error_constant_expression_expected();
+        }
     }
+    delete expr;
 }
 
 void ObjModule::remove_define(const string& name) {

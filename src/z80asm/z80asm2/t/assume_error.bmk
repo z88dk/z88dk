@@ -4,3 +4,4 @@ test_t_assume_error.asm:2: error: constant expression expected
 test_t_assume_error.asm:2: error: constant expression expected
   ^---- 	.Assume ASMPC*0:.Assume $/$
     ^---- Assume$/$
+error: assembly failed for file: test_t_assume_error.asm

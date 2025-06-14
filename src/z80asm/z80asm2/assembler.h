@@ -19,6 +19,7 @@ private:
     string m_obj_filename;
 
     void init(const string& filename);
+    void define_consts();
     bool parse();
     bool resolve_jr();
     bool resolve_local_exprs();

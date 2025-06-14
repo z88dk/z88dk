@@ -1,0 +1,5 @@
+assemble test_t_verbose.asm to test_t_verbose.o
+define __CPU_Z180__ = 1
+define __CPU_ZILOG__ = 1
+
+error: assembly failed for file: test_t_verbose.asm
