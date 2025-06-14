@@ -4,68 +4,107 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-# EXESUFFIX is passed when cross-compiling Win32 on Linux
+PROJ =		z80asm
+
 ifeq ($(OS),Windows_NT)
-  EXESUFFIX 		:= .exe
-#  SANITIZE			:= 
+  EXESUFFIX := .exe
+  SANITIZE	:= 
 else
-  EXESUFFIX 		?=
-#  SANITIZE			:= -fsanitize=address
+  EXESUFFIX ?=
+  SANITIZE	:= -fsanitize=address
 endif
 
-PROJ =		z80asm
-TARGET =	$(PROJ)$(EXESUFFIX)
+# debug release unit_tests
+BUILD		?= release
 
-CXX			?= g++
-CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors $(OPT)
-OPT			?= -O3 -g $(SANITIZE)
-LDFLAGS		+= $(SANITIZE)
+# Set output directories based on build type
+ifeq ($(BUILD),release)
+  OUTDIR 	:= build/release
+else
+  ifeq ($(BUILD),debug)
+    OUTDIR 	:= build/debug
+  else
+    OUTDIR	:= build/unit_tests
+  endif
+endif
+
+OBJDIR 		:= $(OUTDIR)/obj
+BINDIR 		:= $(OUTDIR)/bin
+
+TARGET 		= $(BINDIR)/$(PROJ)$(EXESUFFIX)
 
 SRCS		= $(wildcard *.cpp)
-OBJS		= $(SRCS:.cpp=.o)
-TEMPLATEC	=                                                       ../../common/z80asm_defs.c
-TEMPLATECPP	= token.cpp operator.cpp obj_module.cpp line_parser.cpp                            cpu.cpp
-TEMPLATEH	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/z80asm_defs.h cpu.h
-DEPENDS		= $(SRCS:.cpp=.d)
+OBJS		= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
+
+TEMPLATE_C	=                                                       ../../common/z80asm_defs.c
+TEMPLATE_CPP= token.cpp operator.cpp obj_module.cpp line_parser.cpp                            cpu.cpp
+TEMPLATE_H	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/z80asm_defs.h cpu.h
+DEPENDS		= $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRCS))
+
+CXX			?= g++
+CXX_FLAGS	+= -std=gnu++17 -MMD -Wall -Wextra -Werror -pedantic-errors $(SANITIZE)
+
+ifeq ($(BUILD),release)
+  CXX_FLAGS += -O3
+else
+  ifeq ($(BUILD),debug)
+    CXX_FLAGS+= -g
+  else
+    CXX_FLAGS+= -g -DUNIT_TESTS
+  endif
+endif
+
+LDFLAGS		+= $(SANITIZE)
 
 TASKS 		?= 9
 
+all: $(TARGET)
 
-all: $(PROJ)$(EXESUFFIX)
+all_builds:
+	$(MAKE) BUILD=debug      
+	$(MAKE) BUILD=release    
+	$(MAKE) BUILD=unit_tests 
 
-$(PROJ)$(EXESUFFIX): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) $(LDFLAGS) -o $(PROJ)$(EXESUFFIX)
+# link
+$(TARGET): $(OBJS) | $(BINDIR)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
-%.o: %.cpp
-	$(CXX) $(CXX_FLAGS) -c -o $@ $<
+# compile
+$(OBJDIR)/%.o: %.cpp | $(OBJDIR)
+	$(CXX) $(CXX_FLAGS) -c $< -o $@
 
-$(TEMPLATEC:.c=.o): 	$(PROJ).pp
-$(TEMPLATECPP:.cpp=.o): $(PROJ).pp
-$(TEMPLATEH:.h=.o):     $(PROJ).pp
+# create directories
+$(OBJDIR) $(BINDIR):
+	mkdir -p $@
 
-$(PROJ).pp: $(TEMPLATEC) $(TEMPLATECPP) $(TEMPLATEH) $(PROJ).y mkparser.pl Makefile
-	perl mkparser.pl $(PROJ).y $(TEMPLATEC) $(TEMPLATECPP) $(TEMPLATEH)
+# preprocess
+$(patsubst %.c,$(OBJDIR)/%.o,$(TEMPLATE_C)):		$(PROJ).pp
+$(patsubst %.cpp,$(OBJDIR)/%.o,$(TEMPLATE_CPP)):	$(PROJ).pp
+$(patsubst %.h,$(OBJDIR)/%.o,$(TEMPLATE_H)):		$(PROJ).pp
+
+$(PROJ).pp: $(TEMPLATE_C) $(TEMPLATE_CPP) $(TEMPLATE_H) $(PROJ).y mkparser.pl Makefile
+	perl mkparser.pl $(PROJ).y $(TEMPLATE_C) $(TEMPLATE_CPP) $(TEMPLATE_H)
 	touch $(PROJ).pp
 
 $(PROJ).y: directives.y opcodes.y
 	cat directives.y opcodes.y > $(PROJ).y
 	dos2unix $(PROJ).y
 
-test: 
-	$(MAKE) unit_tests
-	$(MAKE) system_tests
+test: all_builds
+	$(MAKE) BUILD=debug      do_test
+	$(MAKE) BUILD=release    do_test
+	$(MAKE) BUILD=unit_tests do_test
 
-system_tests: $(PROJ)$(EXESUFFIX)
-	perl -S prove --state=slow,save -j$(TASKS) t/*.t
-
-unit_tests:
-	$(MAKE) clean
-	$(MAKE) OPT=-DUNIT_TESTS $(PROJ)$(EXESUFFIX)
-	./$(PROJ)$(EXESUFFIX)
-	$(MAKE) clean
+do_test: $(TARGET)
+ifeq ($(BUILD),unit_tests)
+	$(TARGET)
+else
+	TARGET=$(TARGET) perl -S prove --state=slow,save -j$(TASKS) t/*.t
+endif
 
 clean::
-	$(RM) $(PROJ) $(PROJ)$(EXESUFFIX) $(OBJS) $(wildcard *.bak t/*.bak) $(DEPENDS)
+	$(RM) $(wildcard *.bak t/*.bak)
+	$(RM) -rf build
 
 cloc:
 	perl -S cloc *.cpp *.h *.pl t/*.t t/*.pl
@@ -73,3 +112,4 @@ cloc:
 # Dependencies
 -include $(DEPENDS)
 
+.PHONY: all clean
