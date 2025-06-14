@@ -62,8 +62,8 @@ static void delete_globals() {
     g_cpu_table = nullptr;
 }
 
-static int error_unknown_option(const string& option) {
-    cerr << "error: unknown option: " << option << endl;
+static int error_invalid_option(const string& option) {
+    g_error->error_invalid_option(option);
     return EXIT_FAILURE;
 }
 
@@ -102,27 +102,27 @@ int main(int argc, char* argv[]) {
             if (option == "--")
                 found_dash_dash = true;
             else
-                return error_unknown_option(option);
+                return error_invalid_option(option);
             break;
         case 'E':
             if (option == "-E")
                 g_options->set_preproc_only(true);
             else
-                return error_unknown_option(option);
+                return error_invalid_option(option);
             break;
         case 'h':
             if (option == "-h")
                 return help();
             else
-                return error_unknown_option(option);
+                return error_invalid_option(option);
             break;
         case 'm':
             if (option.size() > 2) {
                 string cpu_name = option.substr(2);
                 const CpuInfo* info = g_cpu_table->get_info(cpu_name);
                 if (!info) {
-                    cerr << "error: invalid cpu: " << cpu_name << endl
-                        << "Expected one of: " << g_cpu_table->cpu_names() << endl;
+                    g_error->error_invalid_cpu(cpu_name);
+                    cerr << "valid CPUs are: " << g_cpu_table->cpu_names() << endl;
                     return EXIT_FAILURE;
                 }
                 else {
@@ -130,16 +130,16 @@ int main(int argc, char* argv[]) {
                 }
             }
             else
-                return error_unknown_option(option);
+                return error_invalid_option(option);
             break;
         case 'v':
             if (option == "-v")
                 g_options->set_verbose(true);
             else
-                return error_unknown_option(option);
+                return error_invalid_option(option);
             break;
         default:
-            return error_unknown_option(option);
+            return error_invalid_option(option);
         }
         argv++; argc--;
     }
@@ -150,9 +150,12 @@ int main(int argc, char* argv[]) {
     }
 
     if (g_options->input_files().empty()) {
-        cerr << "error: no input files specified" << endl;
+        g_error->error_no_input_files();
         return EXIT_FAILURE;
     }
+
+    if (g_error->count())
+        return EXIT_FAILURE;
 
     if (g_options->preproc_only()) {
         for (auto& filename : g_options->input_files()) {
@@ -162,10 +165,11 @@ int main(int argc, char* argv[]) {
     else {
         for (auto& filename : g_options->input_files()) {
             Assembler assembler;
-            assembler.assemble_file(filename);
+            if (!assembler.assemble_file(filename))
+                g_error->error_assembly_failed(filename);
         }
     }
 
-    int exit_code = g_error->count() ? EXIT_FAILURE : EXIT_SUCCESS;
+    int exit_code = (g_error->count() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
     return exit_code;
 }
