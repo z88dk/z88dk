@@ -123,39 +123,39 @@ my %patches = (
 );
 
 my %cpus = (
-    UNDEF       	=> { id => -1, name => "", 					parent => "" },
-    Z80         	=> { id => 1,  name => "z80", 				parent => "8080" },
-    Z80_STRICT  	=> { id => 2,  name => "z80_strict", 		parent => "8080" },
-    Z180        	=> { id => 3,  name => "z180", 				parent => "8080" },
-    EZ80_Z80    	=> { id => 4,  name => "ez80_z80", 			parent => "UNDEF" },
-    EZ80        	=> { id => 5,  name => "ez80", 				parent => "UNDEF" },
-    Z80N        	=> { id => 6,  name => "z80n", 				parent => "Z80" },
-    R2KA        	=> { id => 7,  name => "r2ka", 				parent => "UNDEF" },
-    R3K         	=> { id => 8,  name => "r3k", 				parent => "R2KA" },
-    GBZ80       	=> { id => 9,  name => "gbz80", 			parent => "UNDEF" },
-    '8080'        	=> { id => 10, name => "8080", 				parent => "UNDEF" },
-    '8085'        	=> { id => 11, name => "8085", 				parent => "8080" },
-    R800        	=> { id => 12, name => "r800", 				parent => "8080" },
-    R4K         	=> { id => 13, name => "r4k", 				parent => "UNDEF" },
-    R5K         	=> { id => 14, name => "r5k", 				parent => "R4K" },
-    KC160       	=> { id => 15, name => "kc160", 			parent => "UNDEF" },
-    KC160_Z80   	=> { id => 16, name => "kc160_z80", 		parent => "8080" },
-    '8080_STRICT'	=> { id => 17, name => "8080_strict", 		parent => "UNDEF" },
-    '8085_STRICT'	=> { id => 18, name => "8085_strict", 		parent => "8080" },
-    GBZ80_STRICT	=> { id => 19, name => "gbz80_strict", 		parent => "UNDEF" },
-	Z180_STRICT		=> { id => 20, name => "z180_strict", 		parent => "8080" },
-    Z80N_STRICT		=> { id => 21, name => "z80n_strict", 		parent => "Z80" },
-    EZ80_Z80_STRICT => { id => 22, name => "ez80_z80_strict", 	parent => "UNDEF" },
-    EZ80_STRICT     => { id => 23, name => "ez80_strict", 		parent => "UNDEF" },
-    R800_STRICT    	=> { id => 24, name => "r800_strict", 		parent => "8080" },
-    KC160_STRICT    => { id => 25, name => "kc160_strict", 		parent => "UNDEF" },
-    KC160_Z80_STRICT=> { id => 26, name => "kc160_z80_strict", 	parent => "8080" },
-    R2KA_STRICT     => { id => 27, name => "r2ka_strict", 		parent => "UNDEF" },
-    R3K_STRICT      => { id => 28, name => "r3k_strict", 		parent => "R2KA" },
-    R4K_STRICT      => { id => 29, name => "r4k_strict", 		parent => "UNDEF" },
-    R5K_STRICT		=> { id => 30, name => "r5k_strict", 		parent => "R4K" },
-	R6K				=> { id => 31, name => "r6k", 				parent => "R5K" },
-	R6K_STRICT		=> { id => 32, name => "r6k_strict", 		parent => "R5K" },
+    UNDEF       	=> { id => -1, name => "", 					parent => "",		defines => "" },
+    Z80         	=> { id => 1,  name => "z80", 				parent => "8080",	defines => "__CPU_Z80__ 			__CPU_ZILOG__" 	},
+    Z80_STRICT  	=> { id => 2,  name => "z80_strict", 		parent => "8080",	defines => "__CPU_Z80_STRICT__ 		__CPU_ZILOG__" 	},
+    Z180        	=> { id => 3,  name => "z180", 				parent => "8080",	defines => "__CPU_Z180__			__CPU_ZILOG__"	},
+    EZ80_Z80    	=> { id => 4,  name => "ez80_z80", 			parent => "UNDEF",	defines => "__CPU_EZ80_Z80__		__CPU_ZILOG__" 	},
+    EZ80        	=> { id => 5,  name => "ez80", 				parent => "UNDEF",	defines => "__CPU_EZ80__			__CPU_ZILOG__" 	},
+    Z80N        	=> { id => 6,  name => "z80n", 				parent => "Z80",	defines => "__CPU_Z80N__			__CPU_ZILOG__" 	},
+    R2KA        	=> { id => 7,  name => "r2ka", 				parent => "UNDEF",	defines => "__CPU_R2KA__			__CPU_RABBIT__" },
+    R3K         	=> { id => 8,  name => "r3k", 				parent => "R2KA",	defines => "__CPU_R3K__				__CPU_RABBIT__" },
+    GBZ80       	=> { id => 9,  name => "gbz80", 			parent => "UNDEF",	defines => "__CPU_GBZ80__" 							},
+    '8080'        	=> { id => 10, name => "8080", 				parent => "UNDEF",	defines => "__CPU_8080__			__CPU_INTEL__" 	},
+    '8085'        	=> { id => 11, name => "8085", 				parent => "8080",	defines => "__CPU_8085__			__CPU_INTEL__" 	},
+    R800        	=> { id => 12, name => "r800", 				parent => "8080",	defines => "__CPU_R800__" 							},
+    R4K         	=> { id => 13, name => "r4k", 				parent => "UNDEF",	defines => "__CPU_R4K__				__CPU_RABBIT__" },
+    R5K         	=> { id => 14, name => "r5k", 				parent => "R4K",	defines => "__CPU_R5K__				__CPU_RABBIT__" },
+    KC160       	=> { id => 15, name => "kc160", 			parent => "UNDEF",	defines => "__CPU_KC160__" 							},
+    KC160_Z80   	=> { id => 16, name => "kc160_z80", 		parent => "8080",	defines => "__CPU_KC160_Z80__" 						},
+    '8080_STRICT'	=> { id => 17, name => "8080_strict", 		parent => "UNDEF",	defines => "__CPU_8080_STRICT__		__CPU_INTEL__" 	},
+    '8085_STRICT'	=> { id => 18, name => "8085_strict", 		parent => "8080",	defines => "__CPU_8085_STRICT__		__CPU_INTEL__" 	},
+    GBZ80_STRICT	=> { id => 19, name => "gbz80_strict", 		parent => "UNDEF",	defines => "__CPU_GBZ80_STRICT__" 					},
+	Z180_STRICT		=> { id => 20, name => "z180_strict", 		parent => "8080",	defines => "__CPU_Z180_STRICT__		__CPU_ZILOG__" 	},
+    Z80N_STRICT		=> { id => 21, name => "z80n_strict", 		parent => "Z80",	defines => "__CPU_Z80N_STRICT__		__CPU_ZILOG__" 	},
+    EZ80_Z80_STRICT => { id => 22, name => "ez80_z80_strict", 	parent => "UNDEF",	defines => "__CPU_EZ80_Z80_STRICT__	__CPU_ZILOG__" 	},
+    EZ80_STRICT     => { id => 23, name => "ez80_strict", 		parent => "UNDEF",	defines => "__CPU_EZ80_STRICT__		__CPU_ZILOG__" 	},
+    R800_STRICT    	=> { id => 24, name => "r800_strict", 		parent => "8080",	defines => "__CPU_R800_STRICT__" 					},
+    KC160_STRICT    => { id => 25, name => "kc160_strict", 		parent => "UNDEF",	defines => "__CPU_KC160_STRICT__" 					},
+    KC160_Z80_STRICT=> { id => 26, name => "kc160_z80_strict", 	parent => "8080",	defines => "__CPU_KC160_Z80_STRICT__" 				},
+    R2KA_STRICT     => { id => 27, name => "r2ka_strict", 		parent => "UNDEF",	defines => "__CPU_R2KA_STRICT__		__CPU_RABBIT__" },
+    R3K_STRICT      => { id => 28, name => "r3k_strict", 		parent => "R2KA",	defines => "__CPU_R3K_STRICT__		__CPU_RABBIT__" },
+    R4K_STRICT      => { id => 29, name => "r4k_strict", 		parent => "UNDEF",	defines => "__CPU_R4K_STRICT__		__CPU_RABBIT__" },
+    R5K_STRICT		=> { id => 30, name => "r5k_strict", 		parent => "R4K",	defines => "__CPU_R5K_STRICT__		__CPU_RABBIT__" },
+	R6K				=> { id => 31, name => "r6k", 				parent => "R5K",	defines => "__CPU_R6K__				__CPU_RABBIT__" },
+	R6K_STRICT		=> { id => 32, name => "r6k_strict", 		parent => "R5K",	defines => "__CPU_R6K_STRICT__		__CPU_RABBIT__" },
 );
 
 #-------------------------------------------------------------------------------
@@ -482,7 +482,8 @@ sub patch_file {
 				my $parent = $grammar->{cpus}{$_}{parent} =~ s/^(\d)/I$1/r;
 				my $non_strict = $cpu =~ s/_STRICT//r;
 				my $is_strict = $cpu =~ /_STRICT$/ ? 'true' : 'false';
-				push @out, $prefix."{ ".c_string($name).", Cpu::$cpu, Cpu::$parent, Cpu::$non_strict, $is_strict, -1 }, // $id\n";
+				my $defines = "{".join(",", map {c_string($_)} split(' ', $grammar->{cpus}{$_}{defines}))."}";
+				push @out, $prefix."{ ".c_string($name).", Cpu::$cpu, Cpu::$parent, Cpu::$non_strict, $is_strict, -1, $defines }, // $id\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;

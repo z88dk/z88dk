@@ -11,6 +11,7 @@
 #include <cassert>
 #include <climits>
 #include <iostream>
+#include <set>
 #include <sstream>
 using namespace std;
 
@@ -59,7 +60,7 @@ CpuTable::CpuTable() {
 
 }
 
-const CpuInfo* CpuTable::get_info(Cpu id) {
+const CpuInfo* CpuTable::get_info(Cpu id) const {
     int i = index(id);
     if (i < 0)
         return nullptr;
@@ -67,7 +68,7 @@ const CpuInfo* CpuTable::get_info(Cpu id) {
         return &m_table[i];
 }
 
-const CpuInfo* CpuTable::get_info(const string& name) {
+const CpuInfo* CpuTable::get_info(const string& name) const {
     auto it = m_by_name.find(name);
     if (it == m_by_name.end())
         return nullptr;
@@ -91,7 +92,7 @@ string CpuTable::cpu_names() const {
     return names;
 }
 
-string CpuTable::cpu_names(int lmargin, int rmargin) {
+string CpuTable::cpu_names(int lmargin, int rmargin) const {
     ostringstream oss;
     int col = lmargin;
     for (auto& name : m_cpu_names) {
@@ -113,7 +114,38 @@ string CpuTable::cpu_names(int lmargin, int rmargin) {
     return str;
 }
 
-int CpuTable::index(Cpu id) {
+const vector<string>& CpuTable::cpu_defines(Cpu id) const {
+    static vector<string> empty_defines;
+    const CpuInfo* info = get_info(id);
+    if (info)
+        return info->defines;
+    else
+        return empty_defines;
+}
+
+vector<string> CpuTable::all_defines() const {
+    // Collect in a set to remove duplicates
+    set<string> defines_set;
+    for (const auto& info : m_table) {
+        for (const auto& define : info.defines) {
+            defines_set.insert(define);
+        }
+    }
+
+    // Convert set to vector
+    vector<string> defines;
+    defines.reserve(defines_set.size());
+    for (const auto& define : defines_set) {
+        defines.push_back(define);
+    }
+
+    // Sort the vector
+    sort(defines.begin(), defines.end());
+
+    return defines;
+}
+
+int CpuTable::index(Cpu id) const {
     int i = static_cast<int>(id) - 1;
     if (i >= 0 && i < static_cast<int>(m_table.size()))
         return i;

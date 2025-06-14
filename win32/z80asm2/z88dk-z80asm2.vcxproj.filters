@@ -89,6 +89,9 @@
     <None Include="..\..\src\z80asm\z80asm2\line_parser.cpp.bak">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\..\src\z80asm\z80asm2\Makefile">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h">
