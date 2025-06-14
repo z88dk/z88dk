@@ -10,6 +10,7 @@ IF FORmc1000
     EXTERN  generic_console_flags
     EXTERN  mc6847_map_colour
     EXTERN  generic_console_text_xypos
+    EXTERN  __mc6847_modeval
 
 generic_console_set_ink:
     call    mc6847_map_colour

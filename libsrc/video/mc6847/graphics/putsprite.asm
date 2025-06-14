@@ -16,6 +16,7 @@
     EXTERN  pixeladdress
     EXTERN  __generic_putsprite
     EXTERN  __mc6847_mode
+    EXTERN  __mc6847_modeval
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
