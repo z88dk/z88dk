@@ -70,6 +70,7 @@ static int error_invalid_option(const string& option) {
 static int help() {
     cout << "Usage: z80asm [options] [file...]" << endl
         << "Options:" << endl
+        << "  -DNAME=EXPR Define a constant, EXPR is optional" << endl
         << "  -E          Preprocess only, do not assemble" << endl
         << "  -h          Show this help message" << endl
         << "  -mCPU       Select CPU, one of:" << endl
@@ -101,6 +102,16 @@ int main(int argc, char* argv[]) {
         case '-':
             if (option == "--")
                 found_dash_dash = true;
+            else
+                return error_invalid_option(option);
+            break;
+        case 'D':
+            if (option.size() > 2) {
+                string line = option.substr(2);
+                LineParser parser;
+                if (!parser.parse_define(line))
+                    return EXIT_FAILURE;
+            }
             else
                 return error_invalid_option(option);
             break;

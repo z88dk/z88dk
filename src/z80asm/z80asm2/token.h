@@ -52,6 +52,7 @@ enum class Keyword {
     BINARY,
     C,
     C_LINE,
+    DEFINE,
     EQU,
     INCBIN,
     INCLUDE,

@@ -98,6 +98,7 @@ my %keywords = (
 	ASSUME => "assume",
 	BINARY => "binary",
 	C_LINE => "c_line",
+	DEFINE => "define",
 	EQU => "equ",
 	INCBIN => "incbin",
 	INCLUDE => "include",
