@@ -2,6 +2,9 @@ define um = 1
 define dois = 2
 define tres = 3
 assemble test_t_define_ok.asm to test_t_define_ok.o
+define tres = 1
+define dois = 1
+define um = 1
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
 define one = 1

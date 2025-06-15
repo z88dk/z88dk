@@ -317,7 +317,7 @@ void ObjModule::expand_jrs() {
 }
 
 void ObjModule::add_label(const string& name) {
-    Symbol* symbol = m_symtab.add_symbol(name);
+    Symbol* symbol = g_symtab->add_symbol(name);
     if (symbol) {
         Instr* instr = cur_section()->add_instr();
         instr->set_label(symbol);
@@ -326,36 +326,32 @@ void ObjModule::add_label(const string& name) {
 }
 
 void ObjModule::add_define(const string& name, int value) {
-    Symbol* symbol = m_symtab.add_symbol(name);
+    Symbol* symbol = g_symtab->add_symbol(name);
     if (symbol) {
         symbol->set_const(value);
+        symbol->set_global_def(true);
         if (g_options->verbose())
             cout << "define " << name << " = " << value << endl;
     }
 }
 
 void ObjModule::add_define(const string& name, Expr* expr) {
-    Symbol* symbol = m_symtab.add_symbol(name);
-    if (symbol) {
-        int value = 0;
-        if (expr->eval_const(&m_symtab, value)) {
-            symbol->set_const(value);
-            if (g_options->verbose())
-                cout << "define " << name << " = " << value << endl;
-        }
-        else {
-            g_error->error_constant_expression_expected();
-        }
+    int value = 0;
+    if (expr->eval_const(&m_symtab, value)) {
+        add_define(name, value);
+    }
+    else {
+        g_error->error_constant_expression_expected();
     }
     delete expr;
 }
 
 void ObjModule::remove_define(const string& name) {
-    m_symtab.remove_symbol(name);
+    g_symtab->remove_symbol(name);
 }
 
 void ObjModule::add_equ(const string& name, Expr* expr) {
-    Symbol* symbol = m_symtab.add_symbol(name);
+    Symbol* symbol = g_symtab->add_symbol(name);
     if (symbol) {
         int value = 0;
         if (expr->eval_const(&m_symtab, value)) {

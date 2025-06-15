@@ -91,6 +91,9 @@ int main(int argc, char* argv[]) {
     create_globals();
     atexit(delete_globals);
 
+    // point to global defines during command line parsing
+    g_symtab = g_global_defines;
+
     // parse command line
     g_options->set_progname(argv[0]);
     argv++; argc--;
@@ -164,6 +167,9 @@ int main(int argc, char* argv[]) {
         g_error->error_no_input_files();
         return EXIT_FAILURE;
     }
+
+    // point to obj_module defines during file parsing
+    g_symtab = g_obj_module->symtab();
 
     if (g_error->count())
         return EXIT_FAILURE;

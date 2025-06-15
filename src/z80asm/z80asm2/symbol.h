@@ -98,3 +98,4 @@ private:
 };
 
 extern Symtab* g_global_defines;
+extern Symtab* g_symtab;

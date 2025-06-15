@@ -13,6 +13,7 @@
 using namespace std;
 
 Symtab* g_global_defines{ nullptr };
+Symtab* g_symtab{ nullptr };
 
 Symbol::Symbol(const string& name, Symtab* parent)
     : m_name(name), m_parent(parent) {
