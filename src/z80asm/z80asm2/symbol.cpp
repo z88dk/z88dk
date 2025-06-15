@@ -8,8 +8,10 @@
 #include "error.h"
 #include "expr.h"
 #include "obj_module.h"
+#include "options.h"
 #include "symbol.h"
 #include <cassert>
+#include <iostream>
 using namespace std;
 
 Symtab* g_global_defines{ nullptr };
@@ -23,7 +25,9 @@ Symbol::~Symbol() {
 }
 
 void Symbol::clear() {
+    m_sym_scope = SymScope::NONE;
     m_sym_type = SymType::UNDEFINED;
+    m_is_global_def = false;
     m_value = 0;
     m_instr = nullptr;
     delete m_expr;
@@ -33,6 +37,7 @@ void Symbol::clear() {
 
 void Symbol::set_global_def(int value) {
     clear();
+    m_sym_scope = SymScope::LOCAL;
     m_sym_type = SymType::CONSTANT;
     m_is_global_def = true;
     m_value = value;
@@ -49,16 +54,16 @@ void Symbol::set_global_def(Expr* expr) {
     delete expr;
 }
 
-void Symbol::set_const(int value) {
+void Symbol::set_value(int value) {
     clear();
     m_sym_type = SymType::CONSTANT;
     m_value = value;
 }
 
-void Symbol::set_const(Expr* expr) {
+void Symbol::set_value(Expr* expr) {
     int value = 0;
     if (expr->eval_const(m_parent, value)) {
-        set_const(value);
+        set_value(value);
     }
     else {
         g_error->error_constant_expression_expected();
@@ -76,7 +81,7 @@ void Symbol::set_expr(Expr* expr) {
     clear();
     int value = 0;
     if (expr->eval_const(m_parent, value)) {
-        set_const(value);
+        set_value(value);
         delete expr;
     }
     else {
@@ -121,5 +126,21 @@ void Symtab::remove_symbol(const string& name) {
     if (it != m_table.end()) {
         delete it->second;
         m_table.erase(it);
+    }
+}
+
+void Symtab::add_global_def(const string& name, int value) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+
+    if (symbol->sym_type() != SymType::UNDEFINED)
+        g_error->error_duplicate_definition(name);
+    else {
+        symbol->set_global_def(value);
+
+        // only show global defines
+        if (g_options->verbose() && this == g_global_defines)
+            cout << "define " << name << " = " << value << endl;
     }
 }

@@ -150,7 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\directives.y" />
-    <None Include="..\..\src\z80asm\z80asm2\line_parser.cpp.bak" />
     <None Include="..\..\src\z80asm\z80asm2\Makefile" />
     <None Include="..\..\src\z80asm\z80asm2\mkparser.pl" />
     <None Include="..\..\src\z80asm\z80asm2\opcodes.y" />

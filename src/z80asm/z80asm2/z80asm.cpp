@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
     atexit(delete_globals);
 
     // parse command line
+    g_options->set_parsing_command_line(true);
     g_options->set_progname(argv[0]);
     argv++; argc--;
 
@@ -167,6 +168,9 @@ int main(int argc, char* argv[]) {
 
     if (g_error->count())
         return EXIT_FAILURE;
+
+    // execute required options
+    g_options->set_parsing_command_line(false);
 
     if (g_options->preproc_only()) {
         for (auto& filename : g_options->input_files()) {
