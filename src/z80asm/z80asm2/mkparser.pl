@@ -158,6 +158,21 @@ my %cpus = (
 	R6K_STRICT		=> { id => 32, name => "r6k_strict", 		parent => "R5K",	defines => "__CPU_R6K_STRICT__		__CPU_RABBIT__" },
 );
 
+my %scope = (
+	NONE 	=> { id => 0, },
+	LOCAL 	=> { id => 1, },	# "L"
+	PUBLIC 	=> { id => 2, },	# "G" - defined and exported
+	EXTERN 	=> { id => 3, },	#	   - not defined and imported
+	GLOBAL 	=> { id => 4, },	# "G" - PUBLIC if defined, EXTERN if not
+);
+
+my %type = (
+    UNDEFINED  => { id => 0, },	#     - symbol not defined
+    CONSTANT   => { id => 1, },	# "C" - can be computed
+    ADDRESS    => { id => 2, },	# "A" - depends on ASMPC, can be computed after address allocation
+    COMPUTED   => { id => 3, },	# "=" - depends on the result of an expression
+);
+
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
@@ -204,13 +219,15 @@ sub parse_grammar {
 		}
 	}
 	
-	$grammar = {tokens => \%tokens,
-                keywords => \%keywords,
-                operators => \%operators,
-                patches => \%patches, 
-				rules => \@rules,
-                actions => \@actions,
-				cpus => \%cpus};
+	$grammar = { tokens => \%tokens,
+                 keywords => \%keywords,
+                 operators => \%operators,
+                 patches => \%patches, 
+				 rules => \@rules,
+                 actions => \@actions,
+				 cpus => \%cpus,
+				 scope => \%scope,
+				 type => \%type };
 }
 
 sub parse_grammar_rule {
@@ -484,6 +501,46 @@ sub patch_file {
 				my $is_strict = $cpu =~ /_STRICT$/ ? 'true' : 'false';
 				my $defines = "{".join(",", map {c_string($_)} split(' ', $grammar->{cpus}{$_}{defines}))."}";
 				push @out, $prefix."{ ".c_string($name).", Cpu::$cpu, Cpu::$parent, Cpu::$non_strict, $is_strict, -1, $defines }, // $id\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*sym_scope_t\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{scope}{$a}{id} <=> $grammar->{scope}{$b}{id}} keys %{$grammar->{scope}}) {
+				push @out, $prefix."SCOPE_$_ = ".$grammar->{scope}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*SymScope\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{scope}{$a}{id} <=> $grammar->{scope}{$b}{id}} keys %{$grammar->{scope}}) {
+				push @out, $prefix."$_ = ".$grammar->{scope}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*sym_type_t\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{type}{$a}{id} <=> $grammar->{type}{$b}{id}} keys %{$grammar->{type}}) {
+				push @out, $prefix."TYPE_$_ = ".$grammar->{type}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*SymType\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{type}{$a}{id} <=> $grammar->{type}{$b}{id}} keys %{$grammar->{type}}) {
+				push @out, $prefix."$_ = ".$grammar->{type}{$_}{id}.",\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;

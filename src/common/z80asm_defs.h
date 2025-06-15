@@ -155,11 +155,13 @@ extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixi
 //-----------------------------------------------------------------------------
 
 typedef enum {
-    SCOPE_NONE      = 0,    // 
-    SCOPE_LOCAL     = 1,    // "L"
-    SCOPE_PUBLIC    = 2,    // "G"            - defined and exported
-    SCOPE_EXTERN    = 3,    //                - not defined and imported
-    SCOPE_GLOBAL    = 4,    // "G" if defined - PUBLIC if defined, EXTERN if not defined
+    //@@BEGIN: sym_scope_t
+    SCOPE_NONE = 0,
+    SCOPE_LOCAL = 1,
+    SCOPE_PUBLIC = 2,
+    SCOPE_EXTERN = 3,
+    SCOPE_GLOBAL = 4,
+    //@@END
 } sym_scope_t;
 
 // convert sym_scope_t to text, return NULL if not found
@@ -175,10 +177,12 @@ extern sym_scope_t sym_scope_ofile_code(int code);
 //-----------------------------------------------------------------------------
 
 typedef enum {
-    TYPE_UNDEFINED  = 0,    //     - symbol not defined
-    TYPE_CONSTANT   = 1,    // "C" - can be computed
-    TYPE_ADDRESS    = 2,	// "A" - depends on ASMPC, can be computed after address allocation
-    TYPE_COMPUTED   = 3,	// "=" - depends on the result of an expression
+    //@@BEGIN: sym_type_t
+    TYPE_UNDEFINED = 0,
+    TYPE_CONSTANT = 1,
+    TYPE_ADDRESS = 2,
+    TYPE_COMPUTED = 3,
+    //@@END
 } sym_type_t;
 
 // convert sym_type_t to text, return NULL if not found
