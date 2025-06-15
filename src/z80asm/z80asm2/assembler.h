@@ -20,5 +20,6 @@ private:
 
     void init(const string& filename);
     bool parse();
+    bool has_undefined_symbols();
     bool resolve_local_exprs();
 };

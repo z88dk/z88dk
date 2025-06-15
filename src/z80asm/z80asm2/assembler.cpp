@@ -19,12 +19,15 @@
 using namespace std;
 
 bool Assembler::assemble_file(const string& filename) {
+    bool ok = true;
+
     init(filename);
     g_obj_module->define_global_defs();
     g_obj_module->define_cpu_defs(g_options->cpu_id());
 
-    bool ok = true;
     if (ok && !parse())
+        ok = false;
+    if (ok && has_undefined_symbols())
         ok = false;
     if (ok)
         g_obj_module->expand_jrs();
@@ -68,6 +71,10 @@ bool Assembler::parse() {
         }
     }
     return ok;
+}
+
+bool Assembler::has_undefined_symbols() {
+    return true;
 }
 
 // resolve expressions that are local to the current module

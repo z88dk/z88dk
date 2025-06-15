@@ -152,3 +152,29 @@ int CpuTable::index(Cpu id) const {
     else
         return -1;
 }
+
+bool cpu_compatible(Cpu code_cpu_id, Cpu lib_cpu_id) {
+    // get info
+    const CpuInfo* code_info = g_cpu_table->get_info(code_cpu_id);
+    assert(code_info != nullptr && "code_cpu_id must be valid");
+    const CpuInfo* lib_info = g_cpu_table->get_info(lib_cpu_id);
+    assert(lib_info != nullptr && "lib_cpu_id must be valid");
+
+    // unstrictify
+    code_cpu_id = code_info->non_strict_id;
+    lib_cpu_id = lib_info->non_strict_id;
+
+    if (code_cpu_id == lib_cpu_id) 
+        return true; // same CPU
+
+    Cpu id = code_cpu_id;
+    while (id != Cpu::UNDEF) {
+        if (id == lib_cpu_id)
+            return true; // code CPU is compatible with library CPU
+        const CpuInfo* info = g_cpu_table->get_info(id);
+        assert(info != nullptr && "CPU info must be valid");
+        id = info->compat_parent_id; // go to parent
+    }
+
+    return false; // no compatibility found
+}

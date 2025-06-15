@@ -23,7 +23,7 @@ Symbol::~Symbol() {
 }
 
 void Symbol::clear() {
-    m_sym_type = SymType::NOT_DEFINED;
+    m_sym_type = SymType::UNDEFINED;
     m_value = 0;
     m_instr = nullptr;
     delete m_expr;
@@ -33,7 +33,8 @@ void Symbol::clear() {
 
 void Symbol::set_global_def(int value) {
     clear();
-    m_sym_type = SymType::GLOBAL_DEF;
+    m_sym_type = SymType::CONSTANT;
+    m_is_global_def = true;
     m_value = value;
 }
 
@@ -50,7 +51,7 @@ void Symbol::set_global_def(Expr* expr) {
 
 void Symbol::set_const(int value) {
     clear();
-    m_sym_type = SymType::CONST;
+    m_sym_type = SymType::CONSTANT;
     m_value = value;
 }
 
@@ -67,7 +68,7 @@ void Symbol::set_const(Expr* expr) {
 
 void Symbol::set_instr(Instr* instr) {
     clear();
-    m_sym_type = SymType::INSTR;
+    m_sym_type = SymType::ADDRESS;
     m_instr = instr;
 }
 
@@ -79,7 +80,7 @@ void Symbol::set_expr(Expr* expr) {
         delete expr;
     }
     else {
-        m_sym_type = SymType::EXPR;
+        m_sym_type = SymType::COMPUTED;
         m_expr = expr;
     }
 }
