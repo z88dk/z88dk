@@ -45,8 +45,7 @@ public:
     void set_const(Expr* expr);
     void set_instr(Instr* instr);
     void set_expr(Expr* expr);
-    void set_in_eval() { m_in_eval = true; }
-    void clear_in_eval() { m_in_eval = false; }
+    void set_in_eval(bool f=true) { m_in_eval = f; }
 
 private:
     const string m_name;        // symbol name

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "cpu.h"
+#include "location.h"
 #include "symbol.h"
 #include "utils.h"
 #include <cstdint>
@@ -49,8 +51,10 @@ public:
     Patch& operator=(const Patch& other) = delete;
 
     PatchType patch_type() const { return m_patch_type; }
+    void set_patch_type(PatchType patch_type) { m_patch_type = patch_type; }
     Expr* expr() { return m_expr; }
     int offset() const { return m_offset; }
+    void set_offset(int offset) { m_offset = offset; }
     int size() const;
     int resolve(int value) const;
 
@@ -64,7 +68,7 @@ private:
 
 class Instr {
 public:
-    Instr(Section* parent) : m_parent(parent) {}
+    Instr(Section* parent);
     Instr(const Instr& other) = delete;
     virtual ~Instr();
     Instr& operator=(const Instr& other) = delete;
@@ -81,6 +85,7 @@ public:
     void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
+    void expand_jr();
 
 private:
     Section* m_parent{ nullptr };
@@ -88,6 +93,7 @@ private:
     vector<uint8_t> m_bytes;
     vector<Patch*> m_patches;
     Symbol* m_label{ nullptr };
+    Location m_location;
 };
 
 // Section
@@ -114,6 +120,9 @@ public:
     Instr* cur_instr();
     vector<Instr*>& instrs() { return m_instrs; }
 
+    void expand_jrs();
+    void recompute_offsets();
+
 private:
     ObjModule* m_parent{ nullptr };
     string m_name;
@@ -136,6 +145,10 @@ public:
     Section* cur_section() { return m_cur_section; }
     void set_cur_section(const string& name);
     int asmpc();
+
+    void define_global_defs();
+    void define_cpu_defs(Cpu cpu_id);
+    void expand_jrs();
 
     void add_label(const string& name);
     void add_define(const string& name, int value);

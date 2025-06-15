@@ -7,6 +7,7 @@
 
 #include "error.h"
 #include "expr.h"
+#include "obj_module.h"
 #include "symbol.h"
 #include <cassert>
 #include <stack>
@@ -308,5 +309,88 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
         eval_stack.pop();
         return true;
     }   
+}
+
+bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
+    stack<int> eval_stack;
+    result = 0;
+    Symbol* symbol{ nullptr };
+
+    for (auto& token : m_postfix) {
+        switch (token.ttype()) {
+        case TType::INT:
+            eval_stack.push(token.ivalue());
+            break;
+
+        case TType::IDENT:
+            symbol = symtab->get_symbol(token.svalue());
+            if (!symbol) {
+                if (!silent)
+                    g_error->error_undefined_symbol(token.svalue());
+                return false;
+            }
+            switch (symbol->sym_type()) {
+            case SymType::NOT_DEFINED:
+                if (!silent)
+                    g_error->error_undefined_symbol(token.svalue());
+                return false;
+            case SymType::GLOBAL_DEF:
+                eval_stack.push(symbol->value());
+                break;
+            case SymType::CONST:
+                eval_stack.push(symbol->value());
+                break;
+            case SymType::INSTR:
+                eval_stack.push(symbol->instr()->offset());
+                break;
+            case SymType::EXPR:
+                if (symbol->in_eval()) {
+                    if (!silent)
+                        g_error->error_recursive_evaluation(symbol->name());
+                    return false;   // recursive expression
+                }
+                symbol->set_in_eval(true);
+                {
+                    int sub_result = 0;
+                    if (!symbol->expr()->eval(symtab, asmpc,
+                        sub_result, silent))
+                        return false;   // evaluation failed
+                    eval_stack.push(sub_result);
+                }
+                symbol->set_in_eval(false);
+                break;
+            default:
+                assert(false && "Unknown symbol type");
+            }
+            break;
+
+        case TType::ASMPC:
+            eval_stack.push(asmpc);
+            break;
+
+        case TType::OPERATOR:
+            do_operator(token.operator_(), eval_stack);
+            break;
+
+        default:
+            assert(false && "Unknown token type");
+        }
+    }
+
+    if (eval_stack.size() > 1) {
+        if (!silent)
+            g_error->error_extra_operands(to_string());
+        return false;   // too many operands
+    }
+    else if (eval_stack.size() == 0) {
+        if (!silent)
+            g_error->error_insufficient_operands(to_string());
+        return false;   // no operands
+    }
+    else {
+        result = eval_stack.top();
+        eval_stack.pop();
+        return true;
+    }
 }
 
