@@ -69,6 +69,12 @@ int Patch::resolve(int value) const {
     }
 }
 
+Instr::Instr(Section* parent)
+    : m_parent(parent) {
+    m_location.set_filename(g_location->filename());
+    m_location.set_line_num(g_location->line_num());
+}
+
 Instr::~Instr() {
     for (auto& patch : m_patches)
         delete patch;
@@ -110,6 +116,55 @@ void Instr::add_patch(Patch* patch) {
         for (int i = 0; i < size; ++i) {
             add_byte(0); // reserve space for the patch
         }
+    }
+}
+
+void Instr::expand_jr() {
+    assert(m_patches.size() == 1
+        && "Only one patch expected for expansion");
+    assert(m_patches[0]->patch_type() == PatchType::JR
+        && "Only JR patch expected for expansion");
+    int opcode_index = m_patches[0]->offset() - 1;
+    assert(opcode_index >= 0 && opcode_index < size()
+        && "Opcode index out of bounds");
+    int opcode = m_bytes[opcode_index];
+
+    switch (opcode) {
+    case 0x10: // DJNZ
+        m_bytes[opcode_index] = 0x05; // Change to DEC B
+        m_bytes[opcode_index + 1] = 0xC2; // Change to JP NZ
+        m_patches[0]->set_patch_type(PatchType::NN);
+        m_patches[0]->set_offset(opcode_index + 2);
+        m_bytes.push_back(0x00); // two more bytes
+        m_bytes.push_back(0x00); 
+        break;
+    case 0x18: // JR
+        m_bytes[opcode_index] = 0xC3; // Change to JP
+        m_patches[0]->set_patch_type(PatchType::NN);
+        m_bytes.push_back(0x00); // one more byte
+        break;
+    case 0x20: // JR NZ
+        m_bytes[opcode_index] = 0xC2; // Change to JP NZ
+        m_patches[0]->set_patch_type(PatchType::NN);
+        m_bytes.push_back(0x00); // one more byte
+        break;
+    case 0x28: // JR Z
+        m_bytes[opcode_index] = 0xCA; // Change to JP Z
+        m_patches[0]->set_patch_type(PatchType::NN);
+        m_bytes.push_back(0x00); // one more byte
+        break;
+    case 0x30: // JR NC
+        m_bytes[opcode_index] = 0xD2; // Change to JP NC
+        m_patches[0]->set_patch_type(PatchType::NN);
+        m_bytes.push_back(0x00); // one more byte
+        break;
+    case 0x38: // JR C
+        m_bytes[opcode_index] = 0xDA; // Change to JP C
+        m_patches[0]->set_patch_type(PatchType::NN);
+        m_bytes.push_back(0x00); // one more byte
+        break;
+    default:
+        assert(false && "Unexpected opcode for JR expansion");
     }
 }
 
@@ -161,6 +216,37 @@ Instr* Section::cur_instr() {
     return m_instrs.back();
 }
 
+void Section::expand_jrs() {
+    bool did_expand = false;
+    do {
+        for (auto& instr : m_instrs) {
+            for (auto& patch : instr->patches()) {
+                if (patch->patch_type() == PatchType::JR) {
+                    int target = 0;
+                    if (patch->expr()->eval(m_parent->symtab(), instr->offset(),
+                        target, true)) {
+                        int pos = instr->offset() + instr->size();
+                        int distance = target - pos;
+                        if (distance < -128 || distance > 127) {
+                            instr->expand_jr();
+                            recompute_offsets();
+                            did_expand = true;
+                        }
+                    }
+                }
+            }
+        }
+    } while (did_expand);    
+}
+
+void Section::recompute_offsets() {
+    int offset = 0;
+    for (auto& instr : m_instrs) {
+        instr->set_offset(offset);
+        offset += instr->size();
+    }
+}
+
 ObjModule::ObjModule() {
     m_cur_section = new Section(this, "");
     m_sections.push_back(m_cur_section);
@@ -205,6 +291,30 @@ void ObjModule::set_cur_section(const string& name) {
 
 int ObjModule::asmpc() {
     return cur_section()->asmpc();
+}
+
+// copy global symbols to the symbol table
+void ObjModule::define_global_defs() {
+    for (const auto& it : *g_global_defines) {
+        assert(it.second->sym_type() == SymType::GLOBAL_DEF
+            && "Only GLOBAL_DEF expected");
+        add_define(it.first, it.second->value());
+    }
+}
+
+// create symbols for the current CPU
+void ObjModule::define_cpu_defs(Cpu cpu_id) {
+    for (auto& define : g_cpu_table->all_defines())
+        remove_define(define);
+
+    for (auto& define : g_cpu_table->cpu_defines(cpu_id))
+        add_define(define, 1);
+}
+
+// replace jr to distances too far with jp
+void ObjModule::expand_jrs() {
+    for (auto& section : m_sections)
+        section->expand_jrs();
 }
 
 void ObjModule::add_label(const string& name) {
