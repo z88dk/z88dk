@@ -116,4 +116,5 @@ private:
     int index(Cpu id) const; // -1 if not found
 };
 
+bool cpu_compatible(Cpu code_cpu_id, Cpu lib_cpu_id);
 extern CpuTable* g_cpu_table;

@@ -296,8 +296,7 @@ int ObjModule::asmpc() {
 // copy global symbols to the symbol table
 void ObjModule::define_global_defs() {
     for (const auto& it : *g_global_defines) {
-        assert(it.second->sym_type() == SymType::GLOBAL_DEF
-            && "Only GLOBAL_DEF expected");
+        assert(it.second->is_global_def() && "Only GLOBAL_DEF expected");
         add_define(it.first, it.second->value());
     }
 }

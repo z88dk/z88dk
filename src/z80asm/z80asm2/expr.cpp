@@ -266,17 +266,14 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
             if (!symbol)
                 return false;       // symbol not defined
             switch (symbol->sym_type()) {
-            case SymType::NOT_DEFINED:
+            case SymType::UNDEFINED:
                 return false;       // symbol not defined
-            case SymType::GLOBAL_DEF:
+            case SymType::CONSTANT:
                 eval_stack.push(symbol->value());
                 break;
-            case SymType::CONST:
-                eval_stack.push(symbol->value());
-                break;
-            case SymType::INSTR:
+            case SymType::ADDRESS:
                 return false;       // value known only at link time
-            case SymType::EXPR:
+            case SymType::COMPUTED:
                 return false;       // value known only at link time
             default:
                 assert(false && "Unknown symbol type");
@@ -330,20 +327,17 @@ bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
                 return false;
             }
             switch (symbol->sym_type()) {
-            case SymType::NOT_DEFINED:
+            case SymType::UNDEFINED:
                 if (!silent)
                     g_error->error_undefined_symbol(token.svalue());
                 return false;
-            case SymType::GLOBAL_DEF:
+            case SymType::CONSTANT:
                 eval_stack.push(symbol->value());
                 break;
-            case SymType::CONST:
-                eval_stack.push(symbol->value());
-                break;
-            case SymType::INSTR:
+            case SymType::ADDRESS:
                 eval_stack.push(symbol->instr()->offset());
                 break;
-            case SymType::EXPR:
+            case SymType::COMPUTED:
                 if (symbol->in_eval()) {
                     if (!silent)
                         g_error->error_recursive_evaluation(symbol->name());
