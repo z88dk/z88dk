@@ -1,0 +1,22 @@
+assemble test_t_define_error.asm to test_t_define_error.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_define_error.asm:1: error: expected identifier
+  ^---- 	define 
+    ^---- define
+test_t_define_error.asm:2: error: expected identifier
+  ^---- 	define 27
+    ^---- define 27
+define hello = 1
+test_t_define_error.asm:3: error: expected ','
+  ^---- 	define hello hello
+    ^---- define hello hello
+define world = 1
+test_t_define_error.asm:4: error: expected identifier
+  ^---- 	define world,
+    ^---- define world,
+test_t_define_error.asm:5: error: insufficient operands: *
+  ^---- 	define helloworld=2*
+    ^---- define helloworld=2*
+
+error: assembly failed for file: test_t_define_error.asm

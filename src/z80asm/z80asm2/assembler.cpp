@@ -66,7 +66,7 @@ bool Assembler::parse() {
         while (g_preproc->getline(expanded_line)) {
             g_location->set_expanded_text(expanded_line);
             LineParser parser;
-            if (!parser.parse(expanded_line))
+            if (!parser.parse_line(expanded_line))
                 ok = false;
         }
     }

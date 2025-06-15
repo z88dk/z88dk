@@ -1,5 +1,6 @@
 Usage: z80asm [options] [file...]
 Options:
+  -DNAME=EXPR Define a constant, EXPR is optional
   -E          Preprocess only, do not assemble
   -h          Show this help message
   -mCPU       Select CPU, one of:

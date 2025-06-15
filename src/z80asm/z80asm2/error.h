@@ -17,7 +17,10 @@ public:
     void error_constant_expression_expected() { error("constant expression expected"); }
     void error_division_by_zero() { error("division by zero"); }
     void error_duplicate_definition(const string& name) { error("duplicate definition", name); }
+    void error_expected_comma() { error("expected ','"); }
     void error_expected_eol() { error("expected end of line"); }
+    void error_expected_equal() { error("expected '='"); }
+    void error_expected_ident() { error("expected identifier"); }
     void error_extra_operands(const string& op) { error("extra operands", op); }
     void error_insufficient_operands(const string& op) { error("insufficient operands", op); }
     void error_invalid_char(char c) { error("invalid character", std::to_string(static_cast<int>(c))); }
