@@ -18,6 +18,8 @@
     EXTERN  gfxbyte_get
     EXTERN  swapgfxbk
     EXTERN  swapgfxbk1
+    EXTERN  __mc6847_mode
+    EXTERN  __generic_putsprite
 
     INCLUDE "graphics/grafix.inc"
 
@@ -28,6 +30,9 @@
 
 putsprite:
 _putsprite:
+    ld      a,(__mc6847_mode)
+    cp      1
+    jp      nz,__generic_putsprite
     push    ix                          ;save cllers
     ld      hl, 4
     add     hl, sp
