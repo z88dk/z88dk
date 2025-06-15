@@ -15,7 +15,11 @@ ELSE
 ENDIF
     ret     nc
     ld      a, h
-    cp      64
+IF MODE0_1x1
+    cp      MC6847_CONSOLE_COLUMNS
+ELSE
+    cp      MC6847_CONSOLE_COLUMNS * 2
+ENDIF
     ret     nc
 
     defc    NEEDunplot=1

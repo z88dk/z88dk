@@ -13,13 +13,7 @@
     cp      128
     ret     nc
     ld      a, l
-IF FORsv8000
-    cp      96
-ELIF FORvz
-    cp      64
-ELSE
-    cp      192
-ENDIF
+    cp      MC6847_HIRES_YRES
     ret     nc
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value
@@ -41,7 +35,7 @@ rotated:
     ld      b, a                        ;the pixel mask
     cpl
     ld      c, a                        ;the excluded mask
-	; e = byte holding pixels to plot
+	; e = byte holding pixels to plotwq
 	; b = byte holding pixel mask
 	; c = byte holding mask exlcuding this pixel
 	; hl = address

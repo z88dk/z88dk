@@ -9,11 +9,7 @@
 ; Define NEEDxxx before including
 
     ld      a, l
-IF FORsv8000
-    cp      96
-ELSE
-    cp      192
-ENDIF
+    cp      MC6847_HIRES_YRES
     ret     nc
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value

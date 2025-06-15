@@ -26,12 +26,5 @@ IF FORspc1000
     cp      10
     jp      z, __tms9918_getmaxy
 ENDIF
-IF FORsv8000
-    ld      de, 95
-ELIF FORvz
-    ld      de, 63
-ELSE
-    ld      hl, 191
-ENDIF
+    ld      hl,MC6847_HIRES_YRES - 1
     ret
-

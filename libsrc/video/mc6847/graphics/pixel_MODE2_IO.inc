@@ -13,13 +13,12 @@
     cp      128
     ret     nc
     ld      a, l
-    cp      192
+    cp      MC6847_HIRES_YRES
     ret     nc
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value
     call    pixeladdress                ;hl = address, a = pixel number
-    ld      b, h
-    ld      c, l
+    ld      bc, hl
     ld      h, a
     ld      a, (__mc6847_MODE2_attr)
     rlca

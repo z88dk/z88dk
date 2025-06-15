@@ -6,25 +6,27 @@ IF FORphc25
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
     INCLUDE "target/phc25/def/phc25.def"
+    defc    MC6847_HIRES_YRES = 192
 ENDIF
 
 IF FORsv8000
     INCLUDE "target/sv8000/def/sv8000.def"
-    defc MODE0_1x2 = 1
+    defc    MODE0_1x1 = 1
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MC6847_HIRES_YRES = 96
 ENDIF
 
 IF FORmc1000
     INCLUDE "target/mc1000/def/mc1000.def"
-    defc    MODE0_CONVERT_CHARACTER = 1
     defc    MC6847_HAS_HIRES = 1
+    defc    MC6847_HIRES_YRES = 192
 ENDIF
 
 IF FORvz
     INCLUDE "target/vz/def/vz.def"
-    defc    MODE0_CONVERT_CHARACTER = 1
     defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MC6847_HIRES_YRES = 64
 ENDIF
 
 
@@ -33,6 +35,7 @@ IF FORpc6001
     defc    MODE0_3x2 = 1
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MC6847_HIRES_YRES = 192
 ENDIF
 
 IF FORspc1000
@@ -42,6 +45,7 @@ IF FORspc1000
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
     defc    MODE0_3x2 = 1
+    defc    MC6847_HIRES_YRES = 192
     INCLUDE "target/spc1000/def/spc1000.def"
 ENDIF
 

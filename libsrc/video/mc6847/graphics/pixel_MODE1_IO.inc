@@ -8,7 +8,7 @@
 ; Define NEEDxxx before including
 
     ld      a, l
-    cp      192
+    cp      MC6847_HIRES_YRES
     ret     nc
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value
