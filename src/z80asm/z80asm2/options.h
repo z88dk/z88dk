@@ -29,12 +29,16 @@ public:
     Cpu cpu_id() const { return m_cpu_id; }
     void set_cpu_id(Cpu id) { m_cpu_id = id; }
 
+    bool parsing_command_line() const { return m_parsing_command_line; }
+    void set_parsing_command_line(bool f = true) { m_parsing_command_line = f; }
+
 private:
     string m_progname;
     vector<string> m_input_files;
     bool m_verbose{ false };
     bool m_preproc_only{ false };
     Cpu m_cpu_id{ Cpu::Z80 };
+    bool m_parsing_command_line{ true };
 };
 
 extern Options* g_options;

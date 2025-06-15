@@ -297,17 +297,21 @@ int ObjModule::asmpc() {
 void ObjModule::define_global_defs() {
     for (const auto& it : *g_global_defines) {
         assert(it.second->is_global_def() && "Only GLOBAL_DEF expected");
-        add_define(it.first, it.second->value());
+        m_symtab.add_global_def(it.first, it.second->value());
     }
 }
 
 // create symbols for the current CPU
 void ObjModule::define_cpu_defs(Cpu cpu_id) {
-    for (auto& define : g_cpu_table->all_defines())
-        remove_define(define);
+    for (auto& define : g_cpu_table->all_defines()) {
+        g_global_defines->remove_symbol(define);
+        m_symtab.remove_symbol(define);
+    }
 
-    for (auto& define : g_cpu_table->cpu_defines(cpu_id))
-        add_define(define, 1);
+    for (auto& define : g_cpu_table->cpu_defines(cpu_id)) {
+        g_global_defines->add_global_def(define);
+        m_symtab.add_global_def(define);
+    }
 }
 
 // replace jr to distances too far with jp
@@ -328,24 +332,20 @@ void ObjModule::add_label(const string& name) {
 void ObjModule::add_define(const string& name, int value) {
     Symbol* symbol = m_symtab.add_symbol(name);
     if (symbol) {
-        symbol->set_const(value);
+        symbol->set_value(value);
+        symbol->set_global_def(true);
         if (g_options->verbose())
             cout << "define " << name << " = " << value << endl;
     }
 }
 
 void ObjModule::add_define(const string& name, Expr* expr) {
-    Symbol* symbol = m_symtab.add_symbol(name);
-    if (symbol) {
-        int value = 0;
-        if (expr->eval_const(&m_symtab, value)) {
-            symbol->set_const(value);
-            if (g_options->verbose())
-                cout << "define " << name << " = " << value << endl;
-        }
-        else {
-            g_error->error_constant_expression_expected();
-        }
+    int value = 0;
+    if (expr->eval_const(&m_symtab, value)) {
+        add_define(name, value);
+    }
+    else {
+        g_error->error_constant_expression_expected();
     }
     delete expr;
 }
@@ -359,7 +359,7 @@ void ObjModule::add_equ(const string& name, Expr* expr) {
     if (symbol) {
         int value = 0;
         if (expr->eval_const(&m_symtab, value)) {
-            symbol->set_const(value);
+            symbol->set_value(value);
             delete expr;
         }
         else {

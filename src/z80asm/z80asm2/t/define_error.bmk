@@ -7,11 +7,9 @@ test_t_define_error.asm:1: error: expected identifier
 test_t_define_error.asm:2: error: expected identifier
   ^---- 	define 27
     ^---- define 27
-define hello = 1
 test_t_define_error.asm:3: error: expected ','
   ^---- 	define hello hello
     ^---- define hello hello
-define world = 1
 test_t_define_error.asm:4: error: expected identifier
   ^---- 	define world,
     ^---- define world,
