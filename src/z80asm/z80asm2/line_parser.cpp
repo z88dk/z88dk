@@ -321,12 +321,17 @@ LineParser::Elems::~Elems() {
     elems.clear();
 }
 
-bool LineParser::parse(const string& line) {
+bool LineParser::parse_line(const string& line) {
     if (!m_in.scan(line))
         return false;       // scanning failed
 
-    if (m_in.peek().is(TType::END))
+    if (m_in.peek().is(TType::END)) {
         return true;        // empty line
+    }
+    else if (m_in.peek().keyword() == Keyword::DEFINE) {
+        m_in.next();
+        return parse_define();
+    }
 
     vector<ParseQueueElem> parse_queue;
 
@@ -447,6 +452,40 @@ bool LineParser::parse(const string& line) {
     return parse_ok;
 }
 
+// parse name=expr,name,name=expr
+bool LineParser::parse_define(const string& line) {
+    if (!m_in.scan(line))
+        return false;       // scanning failed
+    else
+        return parse_define();
+}
+
+bool LineParser::parse_define() {
+    while (true) {
+        string name;
+        int value = 0;
+        if (!parse_name(name))
+            return false;
+
+        if (m_in.peek().is(TType::OPERATOR) &&
+            m_in.peek().operator_() == Operator::EQ) {
+            m_in.next();
+            if (!parse_const_expr(value))
+                return false;
+            action_define(name, value);
+        }
+        else {
+            action_define(name);
+        }
+
+        if (m_in.peek().is(TType::END))
+            return true;
+
+        if (!parse_comma())
+            return false;
+    }
+}
+
 //@@BEGIN:actions_impl
 void LineParser::action_ident_colon() {
 	g_obj_module->add_label(m_elems.elems[1-1].token.svalue());
@@ -537,3 +576,70 @@ void LineParser::action_ld_a_comma_b() {
 }
 
 //@@END
+
+bool LineParser::parse_name(string& name) {
+    if (m_in.peek().is(TType::IDENT)) {
+        name = m_in.peek().svalue();
+        m_in.next();
+        return true;
+    }
+    else {
+        g_error->error_expected_ident();
+        return false;
+    }
+}
+
+bool LineParser::parse_const_expr(int& value) {
+    value = 0;
+    Expr* expr = new Expr;
+    if (!expr->parse(m_in, false)) {
+        delete expr;
+        return false;
+    }
+
+    if (!expr->eval_const(g_obj_module->symtab(), value)) {
+        delete expr;
+        g_error->error_constant_expression_expected();
+        return false;
+    }
+    else {
+        delete expr;
+        return true;
+    }
+}
+
+bool LineParser::parse_equal() {
+    if (m_in.peek().is(TType::OPERATOR) && m_in.peek().operator_()==Operator::EQ) {
+        m_in.next();
+        return true;
+    }
+    else {
+        g_error->error_expected_equal();
+        return false;
+    }
+}
+
+bool LineParser::parse_comma() {
+    if (m_in.peek().is(TType::COMMA)) {
+        m_in.next();
+        return true;
+    }
+    else {
+        g_error->error_expected_comma();
+        return false;
+    }
+}
+
+bool LineParser::parse_end() {
+    if (m_in.peek().is(TType::END)) {
+        return true;
+    }
+    else {
+        g_error->error_expected_eol();
+        return false;
+    }
+}
+
+void LineParser::action_define(const string& name, int value) {
+    g_obj_module->add_define(name, value);
+}
