@@ -20,14 +20,14 @@ using namespace std;
 
 bool Assembler::assemble_file(const string& filename) {
     init(filename);
-    define_global_defs();
-    define_cpu_defs();
+    g_obj_module->define_global_defs();
+    g_obj_module->define_cpu_defs(g_options->cpu_id());
 
     bool ok = true;
     if (ok && !parse())
         ok = false;
-    if (ok && !resolve_jr())
-        ok = false;
+    if (ok)
+        g_obj_module->expand_jrs();
     if (ok && !resolve_local_exprs())
         ok = false;
     if (ok && !g_obj_module->write_file(m_filename))
@@ -54,24 +54,6 @@ void Assembler::init(const string& filename) {
     g_input_files->push_file(filename);
 }
 
-void Assembler::define_global_defs() {
-    // copy global symbols to the symbol table
-    for (const auto& it : *g_global_defines) {
-        assert(it.second->sym_type() == SymType::GLOBAL_DEF
-            && "Only GLOBAL_DEF expected");
-        g_obj_module->add_define(it.first, it.second->value());
-    }
-}
-
-void Assembler::define_cpu_defs() {
-    // create symbols for the current CPU
-    for (auto& define : g_cpu_table->all_defines())
-        g_obj_module->remove_define(define);
-
-    for (auto& define : g_cpu_table->cpu_defines(g_options->cpu_id()))
-        g_obj_module->add_define(define, 1);
-}
-
 bool Assembler::parse() {
     bool ok = true;
     string line;
@@ -86,11 +68,6 @@ bool Assembler::parse() {
         }
     }
     return ok;
-}
-
-// replace jr to distances too far with jp
-bool Assembler::resolve_jr() {
-    return false;
 }
 
 // resolve expressions that are local to the current module
