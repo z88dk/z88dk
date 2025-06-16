@@ -22,7 +22,7 @@
     PUBLIC    l_dcal          ;jp(hl)
 
 
-    defc    CRT_ORG_CODE  = $8300	 ; RAM
+    defc    CRT_ORG_CODE  = $c500	 ; RAM
 
     defc    CONSOLE_COLUMNS = 32
     defc    CONSOLE_ROWS = 16
@@ -71,7 +71,7 @@ l_dcal:
 
 
     SECTION bootstrap
-    org     $c200
+    org     $c400
 
 
 
@@ -141,6 +141,8 @@ read_byte:
     pop     hl
     ret
 
+cksum_error:
+    jr      cksum_error
 
 
     EXTERN	vpeek_noop
