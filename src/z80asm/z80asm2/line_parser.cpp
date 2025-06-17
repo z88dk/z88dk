@@ -642,8 +642,5 @@ bool LineParser::parse_end() {
 }
 
 void LineParser::action_define(const string& name, int value) {
-    if (g_options->parsing_command_line())
-        g_global_defines->add_global_def(name, value);
-    else
-        g_obj_module->symtab()->add_global_def(name, value);
+    g_obj_module->add_global_def(name, value);
 }
