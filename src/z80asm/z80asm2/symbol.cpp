@@ -73,12 +73,16 @@ void Symbol::set_instr(Instr* instr) {
     m_instr = instr;
 }
 
-// TODO: check also ADDRESS
-void Symbol::set_expr(Expr* expr) {
+void Symbol::set_expr(Expr* expr, Instr* asmpc) {
     int value = 0;
+    Instr* instr = nullptr;
+
     if (expr->eval_const(m_parent, value)) {
         set_constant(value);
         delete expr;
+    }
+    else if (expr->eval_instr(m_parent, asmpc, instr)) {
+        set_instr(instr);
     }
     else {
         m_sym_type = SymType::COMPUTED;
@@ -162,7 +166,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
     return symbol;
 }
 
-Symbol* Symtab::add_equ(const string& name, Expr* expr) {
+Symbol* Symtab::add_equ(const string& name, Expr* expr, Instr* asmpc) {
     auto symbol = get_symbol(name);
     if (!symbol)
         symbol = add_symbol(name);
@@ -170,7 +174,7 @@ Symbol* Symtab::add_equ(const string& name, Expr* expr) {
     if (symbol->sym_type() != SymType::UNDEFINED)
         g_error->error_duplicate_definition(name);
     else {
-        symbol->set_expr(expr);
+        symbol->set_expr(expr, asmpc);
     }
 
     return symbol;

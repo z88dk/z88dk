@@ -1,6 +1,1 @@
-LINE 2 "test_t_equ.asm"
-v1 equ 10
-LINE 2 "test_t_equ.asm"
-v2 equ 20
-LINE 2 "test_t_equ.asm"
-v3 equ 30
+error: assembly failed for file: test_t_equ.asm
