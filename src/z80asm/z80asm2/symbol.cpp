@@ -25,7 +25,7 @@ Symbol::~Symbol() {
 }
 
 void Symbol::clear() {
-    m_sym_scope = SymScope::NONE;
+    m_sym_scope = SymScope::LOCAL;
     m_sym_type = SymType::UNDEFINED;
     m_is_global_def = false;
     m_value = 0;
@@ -36,11 +36,9 @@ void Symbol::clear() {
 }
 
 void Symbol::set_global_def(int value) {
-    clear();
-    m_sym_scope = SymScope::LOCAL;
     m_sym_type = SymType::CONSTANT;
-    m_is_global_def = true;
     m_value = value;
+    m_is_global_def = true;
 }
 
 void Symbol::set_global_def(Expr* expr) {
@@ -54,16 +52,15 @@ void Symbol::set_global_def(Expr* expr) {
     delete expr;
 }
 
-void Symbol::set_value(int value) {
-    clear();
+void Symbol::set_constant(int value) {
     m_sym_type = SymType::CONSTANT;
     m_value = value;
 }
 
-void Symbol::set_value(Expr* expr) {
+void Symbol::set_constant(Expr* expr) {
     int value = 0;
     if (expr->eval_const(m_parent, value)) {
-        set_value(value);
+        set_constant(value);
     }
     else {
         g_error->error_constant_expression_expected();
@@ -72,16 +69,15 @@ void Symbol::set_value(Expr* expr) {
 }
 
 void Symbol::set_instr(Instr* instr) {
-    clear();
     m_sym_type = SymType::ADDRESS;
     m_instr = instr;
 }
 
+// TODO: check also ADDRESS
 void Symbol::set_expr(Expr* expr) {
-    clear();
     int value = 0;
     if (expr->eval_const(m_parent, value)) {
-        set_value(value);
+        set_constant(value);
         delete expr;
     }
     else {
@@ -99,6 +95,11 @@ void Symtab::clear() {
         delete it.second;
     }
     m_table.clear();
+
+    for (auto& symbol : m_deleted) {
+        delete symbol;
+    }
+    m_deleted.clear();
 }
 
 Symbol* Symtab::get_symbol(const string& name) {
@@ -124,12 +125,12 @@ Symbol* Symtab::add_symbol(const string& name) {
 void Symtab::remove_symbol(const string& name) {
     auto it = m_table.find(name);
     if (it != m_table.end()) {
-        delete it->second;
+        m_deleted.push_back(it->second);    // some expression may still refer to symbol
         m_table.erase(it);
     }
 }
 
-void Symtab::add_global_def(const string& name, int value) {
+Symbol* Symtab::add_global_def(const string& name, int value) {
     auto symbol = get_symbol(name);
     if (!symbol)
         symbol = add_symbol(name);
@@ -143,4 +144,34 @@ void Symtab::add_global_def(const string& name, int value) {
         if (g_options->verbose() && this == g_global_defines)
             cout << "define " << name << " = " << value << endl;
     }
+
+    return symbol;
+}
+
+Symbol* Symtab::add_label(const string& name, Instr* instr) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+
+    if (symbol->sym_type() != SymType::UNDEFINED)
+        g_error->error_duplicate_definition(name);
+    else {
+        symbol->set_instr(instr);
+    }
+
+    return symbol;
+}
+
+Symbol* Symtab::add_equ(const string& name, Expr* expr) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+
+    if (symbol->sym_type() != SymType::UNDEFINED)
+        g_error->error_duplicate_definition(name);
+    else {
+        symbol->set_expr(expr);
+    }
+
+    return symbol;
 }

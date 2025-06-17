@@ -320,52 +320,23 @@ void ObjModule::expand_jrs() {
         section->expand_jrs();
 }
 
+void ObjModule::add_global_def(const string& name, int value) {
+    if (g_options->parsing_command_line())
+        g_global_defines->add_global_def(name, value);
+    else
+       m_symtab.add_global_def(name, value);
+}
+
 void ObjModule::add_label(const string& name) {
-    Symbol* symbol = m_symtab.add_symbol(name);
+    Instr* instr = cur_section()->add_instr();
+    auto symbol = m_symtab.add_label(name, instr);
     if (symbol) {
-        Instr* instr = cur_section()->add_instr();
         instr->set_label(symbol);
-        symbol->set_instr(instr);
     }
-}
-
-void ObjModule::add_define(const string& name, int value) {
-    Symbol* symbol = m_symtab.add_symbol(name);
-    if (symbol) {
-        symbol->set_value(value);
-        symbol->set_global_def(true);
-        if (g_options->verbose())
-            cout << "define " << name << " = " << value << endl;
-    }
-}
-
-void ObjModule::add_define(const string& name, Expr* expr) {
-    int value = 0;
-    if (expr->eval_const(&m_symtab, value)) {
-        add_define(name, value);
-    }
-    else {
-        g_error->error_constant_expression_expected();
-    }
-    delete expr;
-}
-
-void ObjModule::remove_define(const string& name) {
-    m_symtab.remove_symbol(name);
 }
 
 void ObjModule::add_equ(const string& name, Expr* expr) {
-    Symbol* symbol = m_symtab.add_symbol(name);
-    if (symbol) {
-        int value = 0;
-        if (expr->eval_const(&m_symtab, value)) {
-            symbol->set_value(value);
-            delete expr;
-        }
-        else {
-            symbol->set_expr(expr);
-        }
-    }
+    m_symtab.add_equ(name, expr);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

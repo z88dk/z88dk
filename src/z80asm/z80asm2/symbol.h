@@ -56,8 +56,8 @@ public:
     void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
     void set_global_def(int value);
     void set_global_def(Expr* expr);
-    void set_value(int value);
-    void set_value(Expr* expr);
+    void set_constant(int value);
+    void set_constant(Expr* expr);
     void set_instr(Instr* instr);
     void set_expr(Expr* expr);
     void set_in_eval(bool f = true) { m_in_eval = f; }
@@ -65,7 +65,7 @@ public:
 private:
     const string m_name;        // symbol name
     Symtab* m_parent{ nullptr };
-    SymScope m_sym_scope{ SymScope::NONE };
+    SymScope m_sym_scope{ SymScope::LOCAL };
     SymType m_sym_type{ SymType::UNDEFINED };
     bool m_is_global_def{ false }; // true if this is a global define
     int m_value{ 0 };           // constant
@@ -86,7 +86,9 @@ public:
     Symbol* add_symbol(const string& name);
     void remove_symbol(const string& name);
 
-    void add_global_def(const string& name, int value = 1);
+    Symbol* add_global_def(const string& name, int value = 1);
+    Symbol* add_label(const string& name, Instr* instr);
+    Symbol* add_equ(const string& name, Expr* expr);
 
     auto begin() { return m_table.begin(); }
     auto end() { return m_table.end(); }
@@ -97,6 +99,7 @@ public:
 
 private:
     unordered_map<string, Symbol*> m_table;
+    vector<Symbol*> m_deleted;
 };
 
 extern Symtab* g_global_defines;
