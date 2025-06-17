@@ -329,14 +329,11 @@ void ObjModule::add_global_def(const string& name, int value) {
 
 void ObjModule::add_label(const string& name) {
     Instr* instr = cur_section()->add_instr();
-    auto symbol = m_symtab.add_label(name, instr);
-    if (symbol) {
-        instr->set_label(symbol);
-    }
+    m_symtab.add_label(name, instr);
 }
 
 void ObjModule::add_equ(const string& name, Expr* expr) {
-    m_symtab.add_equ(name, expr);
+    m_symtab.add_equ(name, expr, cur_section()->cur_instr());
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

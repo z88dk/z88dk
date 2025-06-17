@@ -16,6 +16,7 @@ using namespace std;
 void Expr::clear() {
     m_infix.clear();
     m_postfix.clear();
+    m_pos0 = 0;
 }
 
 bool Expr::parse(const string& line) {
@@ -40,17 +41,17 @@ bool Expr::parse(const string& line) {
 
 bool Expr::parse(Scanner& in, bool silent) {
     clear();
-    int pos0 = in.pos();
+    m_pos0 = in.pos();
 
     if (to_RPN(in, silent)) {
         // copy infix tokens
         int pos1 = in.pos();
-        for (int i = pos0; i < pos1; ++i)
+        for (int i = m_pos0; i < pos1; ++i)
             m_infix.push_back(in[i]);
         return true;
     }
     else {
-        in.set_pos(pos0); // reset to original position
+        in.set_pos(m_pos0); // reset to original position
         clear();
         return false;
     }
@@ -73,11 +74,12 @@ Expr* Expr::clone() const {
     auto new_expr = new Expr;
     new_expr->m_infix = m_infix;
     new_expr->m_postfix = m_postfix;
+    new_expr->m_pos0 = m_pos0;
     return new_expr;
 }
 
 bool Expr::is_unary(Scanner& in) const {
-    if (in.pos() == 0)
+    if (in.pos() == m_pos0)
         return true;
     const Token& prev = in.peek(-1);
     switch (prev.ttype()) {
@@ -306,6 +308,64 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
         eval_stack.pop();
         return true;
     }   
+}
+
+bool Expr::eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result) {
+    stack<Instr*> eval_stack;
+    result = 0;
+    Symbol* symbol{ nullptr };
+
+    for (auto& token : m_postfix) {
+        switch (token.ttype()) {
+        case TType::INT:
+            return false;
+
+        case TType::IDENT:
+            symbol = symtab->get_symbol(token.svalue());
+            if (!symbol) 
+                return false;
+            
+            switch (symbol->sym_type()) {
+            case SymType::UNDEFINED:
+                return false;
+            case SymType::CONSTANT:
+                return false;
+            case SymType::ADDRESS:
+                eval_stack.push(symbol->instr());
+                break;
+            case SymType::COMPUTED:
+                return false;
+            default:
+                assert(false && "Unknown symbol type");
+            }
+            break;
+
+        case TType::ASMPC:
+            eval_stack.push(asmpc);
+            break;
+
+        case TType::OPERATOR:
+            if (token.operator_() == Operator::UPLUS)
+                break;
+            else
+                return false;
+
+        default:
+            assert(false && "Unknown token type");
+        }
+    }
+
+    if (eval_stack.size() > 1) {
+        return false;   // too many operands
+    }
+    else if (eval_stack.size() == 0) {
+        return false;   // no operands
+    }
+    else {
+        result = eval_stack.top();
+        eval_stack.pop();
+        return true;
+    }
 }
 
 bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
