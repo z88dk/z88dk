@@ -59,7 +59,7 @@ public:
     void set_constant(int value);
     void set_constant(Expr* expr);
     void set_instr(Instr* instr);
-    void set_expr(Expr* expr);
+    void set_expr(Expr* expr, Instr* asmpc);
     void set_in_eval(bool f = true) { m_in_eval = f; }
 
 private:
@@ -88,7 +88,7 @@ public:
 
     Symbol* add_global_def(const string& name, int value = 1);
     Symbol* add_label(const string& name, Instr* instr);
-    Symbol* add_equ(const string& name, Expr* expr);
+    Symbol* add_equ(const string& name, Expr* expr, Instr* asmpc);
 
     auto begin() { return m_table.begin(); }
     auto end() { return m_table.end(); }

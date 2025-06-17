@@ -78,8 +78,6 @@ public:
     uint8_t* data() { return m_bytes.data(); }
     int size() const { return static_cast<int>(m_bytes.size()); }
     vector<Patch*>& patches() { return m_patches; }
-    Symbol* label() const { return m_label; }
-    void set_label(Symbol* label) { m_label = label; }
     Symtab* symtab();
 
     void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
@@ -92,7 +90,6 @@ private:
     int m_offset{ 0 };
     vector<uint8_t> m_bytes;
     vector<Patch*> m_patches;
-    Symbol* m_label{ nullptr };
     Location m_location;
 };
 

@@ -12,6 +12,7 @@
 #include <vector>
 using namespace std;
 
+class Instr;
 class Symtab;
 
 class Expr {
@@ -20,6 +21,7 @@ public:
     bool parse(const string& line);
     bool parse(Scanner& in, bool silent);
     bool eval_const(Symtab* symtab, int& result);
+    bool eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result);
     bool eval(Symtab* symtab, int asmpc, int& result, bool silent = false);
     string to_string() const;
     string rpn_to_string() const;
@@ -29,6 +31,7 @@ public:
 private:
     vector<Token> m_infix;
     vector<Token> m_postfix;
+    int m_pos0{ 0 };
 
     bool is_unary(Scanner& in) const;
     bool to_RPN(Scanner& in, bool silent);
