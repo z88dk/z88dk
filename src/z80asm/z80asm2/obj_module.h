@@ -150,12 +150,10 @@ public:
     void define_cpu_defs(Cpu cpu_id);
     void expand_jrs();
 
+    void add_global_def(const string& name, int value = 1);
     void add_label(const string& name);
-    void add_define(const string& name, int value);
-    void add_define(const string& name, Expr* expr);
-    void remove_define(const string& name);
-
     void add_equ(const string& name, Expr* expr);
+
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);
