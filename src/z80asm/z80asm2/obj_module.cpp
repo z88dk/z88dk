@@ -319,6 +319,10 @@ void ObjModule::expand_jrs() {
         section->expand_jrs();
 }
 
+bool ObjModule::has_undefined_symbols() const {
+    return m_symtab.has_undefined_symbols();
+}
+
 void ObjModule::add_global_def(const string& name, int value) {
     if (g_options->parsing_command_line())
         g_global_defines->add_global_def(name, value);
