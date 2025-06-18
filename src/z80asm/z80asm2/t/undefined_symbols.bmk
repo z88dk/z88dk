@@ -1,0 +1,12 @@
+LINE 1 "test_t_undefined_symbols.asm"
+start:
+LINE 1 "test_t_undefined_symbols.asm"
+jr nz,end
+x1 equ start+size
+assemble test_t_undefined_symbols.asm to test_t_undefined_symbols.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_undefined_symbols.asm:1: error: undefined symbol: end
+test_t_undefined_symbols.asm:2: error: undefined symbol: size
+
+error: assembly failed for file: test_t_undefined_symbols.asm

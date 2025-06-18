@@ -78,7 +78,7 @@ bool Assembler::parse() {
 }
 
 bool Assembler::has_undefined_symbols() {
-    return true;
+    return g_obj_module->has_undefined_symbols();
 }
 
 // resolve expressions that are local to the current module
