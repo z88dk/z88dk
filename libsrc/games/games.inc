@@ -400,8 +400,20 @@ IF FORgal
         ;defc SOUND_ONEBIT_mask   = 4
 ENDIF
 
-; Currently used also for the Lambda clones
+; Mostly used also for the Lambda clones
 IF FORzx81
+        defc SOUND_OUTIN = 1
+        defc SOUND_ONEBIT_port   = 255
+        defc SOUND_ZEROBIT_port  = 254
+        defc SOUND_ONEBIT_bit    = 0
+        defc SOUND_ONEBIT_mask   = 1
+        ;----
+        defc TAPEIN_ONEBIT_port  = 254
+        defc TAPEIN_ONEBIT_mask  = 128
+        ;----
+ENDIF
+
+IF FORlambda
         defc SOUND_OUTIN = 1
         defc SOUND_ONEBIT_port   = 255
         defc SOUND_ZEROBIT_port  = 254
