@@ -27,12 +27,16 @@ bool Assembler::assemble_file(const string& filename) {
 
     if (ok && !parse())
         ok = false;
-    if (ok && has_undefined_symbols())
-        ok = false;
+
     if (ok)
         g_obj_module->expand_jrs();
+
+    if (ok && has_undefined_symbols())
+        ok = false;
+
     if (ok && !resolve_local_exprs())
         ok = false;
+
     if (ok && !g_obj_module->write_file(m_filename))
         ok = false;
 
