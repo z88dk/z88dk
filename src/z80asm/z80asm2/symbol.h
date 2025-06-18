@@ -37,7 +37,7 @@ enum class SymType {
 
 class Symbol {
 public:
-    Symbol(const string& name, Symtab* parent);
+    Symbol(const string& name);
     Symbol(const Symbol& other) = delete;
     virtual ~Symbol();
     Symbol& operator=(const Symbol& other) = delete;
@@ -66,7 +66,6 @@ public:
 
 private:
     const string m_name;        // symbol name
-    Symtab* m_parent{ nullptr };
     SymScope m_sym_scope{ SymScope::LOCAL };
     SymType m_sym_type{ SymType::UNDEFINED };
     bool m_is_global_def{ false }; // true if this is a global define
