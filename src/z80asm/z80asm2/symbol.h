@@ -51,6 +51,7 @@ public:
     Instr* instr() { return m_instr; }
     Expr* expr() { return m_expr; }
     bool in_eval() const { return m_in_eval; }
+    bool touched() const { return m_touched; }
 
     void set_sym_scope(SymScope sym_scope) { m_sym_scope = sym_scope; }
     void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
@@ -59,8 +60,9 @@ public:
     void set_constant(int value);
     void set_constant(Expr* expr);
     void set_instr(Instr* instr);
-    void set_expr(Expr* expr, Instr* asmpc);
+    void set_expr(Expr* expr);
     void set_in_eval(bool f = true) { m_in_eval = f; }
+    void set_touched(bool f = true) { m_touched = f; }
 
 private:
     const string m_name;        // symbol name
@@ -72,6 +74,7 @@ private:
     Instr* m_instr{ nullptr };  // address
     Expr* m_expr{ nullptr };    // expression
     bool m_in_eval{ false };    // detect recursive evaluation
+    bool m_touched{ false };    // used by any expression
 };
 
 class Symtab {
@@ -88,7 +91,8 @@ public:
 
     Symbol* add_global_def(const string& name, int value = 1);
     Symbol* add_label(const string& name, Instr* instr);
-    Symbol* add_equ(const string& name, Expr* expr, Instr* asmpc);
+    Symbol* add_equ(const string& name, Expr* expr);
+    Symbol* touch_symbol(const string& name);
 
     auto begin() { return m_table.begin(); }
     auto end() { return m_table.end(); }

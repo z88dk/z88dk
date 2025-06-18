@@ -43,7 +43,7 @@ void Symbol::set_global_def(int value) {
 
 void Symbol::set_global_def(Expr* expr) {
     int value = 0;
-    if (expr->eval_const(m_parent, value)) {
+    if (expr->eval_const(value)) {
         set_global_def(value);
     }
     else {
@@ -59,7 +59,7 @@ void Symbol::set_constant(int value) {
 
 void Symbol::set_constant(Expr* expr) {
     int value = 0;
-    if (expr->eval_const(m_parent, value)) {
+    if (expr->eval_const(value)) {
         set_constant(value);
     }
     else {
@@ -73,15 +73,15 @@ void Symbol::set_instr(Instr* instr) {
     m_instr = instr;
 }
 
-void Symbol::set_expr(Expr* expr, Instr* asmpc) {
+void Symbol::set_expr(Expr* expr) {
     int value = 0;
     Instr* instr = nullptr;
 
-    if (expr->eval_const(m_parent, value)) {
+    if (expr->eval_const(value)) {
         set_constant(value);
         delete expr;
     }
-    else if (expr->eval_instr(m_parent, asmpc, instr)) {
+    else if (expr->eval_instr(instr)) {
         set_instr(instr);
     }
     else {
@@ -166,7 +166,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
     return symbol;
 }
 
-Symbol* Symtab::add_equ(const string& name, Expr* expr, Instr* asmpc) {
+Symbol* Symtab::add_equ(const string& name, Expr* expr) {
     auto symbol = get_symbol(name);
     if (!symbol)
         symbol = add_symbol(name);
@@ -174,8 +174,16 @@ Symbol* Symtab::add_equ(const string& name, Expr* expr, Instr* asmpc) {
     if (symbol->sym_type() != SymType::UNDEFINED)
         g_error->error_duplicate_definition(name);
     else {
-        symbol->set_expr(expr, asmpc);
+        symbol->set_expr(expr);
     }
 
+    return symbol;
+}
+
+Symbol* Symtab::touch_symbol(const string& name) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+    symbol->set_touched();
     return symbol;
 }

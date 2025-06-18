@@ -8,6 +8,7 @@ path("$test.asm")->spew(<<END);
 END
 
 run_ok("$exec -mz180 -E $test.asm > $test.out 2>&1");
+run_nok("$exec -mz180 -v $test.asm >> $test.out 2>&1");
 run_ok("diff -w $bmk $test.out");
 
 unlink_testfiles();

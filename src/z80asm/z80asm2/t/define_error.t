@@ -12,7 +12,8 @@ path("$test.asm")->spew(<<END);
 	define helloworld=2*
 END
 
-run_nok("$exec -v $test.asm > $test.out 2>&1");
+run_ok("$exec -E $test.asm > $test.out 2>&1");
+run_nok("$exec -v $test.asm >> $test.out 2>&1");
 run_ok("diff -w $bmk $test.out");
 
 unlink_testfiles();

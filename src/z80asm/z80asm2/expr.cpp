@@ -57,6 +57,22 @@ bool Expr::parse(Scanner& in, bool silent) {
     }
 }
 
+void Expr::lookup_symbols(Symtab* symtab, Instr* asmpc) {
+    Symbol* symbol = nullptr;
+    for (auto& token : m_postfix) {
+        switch (token.ttype()) {
+        case TType::IDENT:
+            symbol = symtab->touch_symbol(token.svalue());
+            token.set_symbol(symbol);
+            break;
+        case TType::ASMPC:
+            token.set_asmpc(asmpc);
+            break;
+        default:;
+        }
+    }
+}
+
 string Expr::to_string() const {
     Scanner tokens{ m_infix };
     return tokens.to_string();
@@ -252,7 +268,7 @@ bool Expr::check_syntax(bool silent) {
     }
 }
 
-bool Expr::eval_const(Symtab* symtab, int& result) {
+bool Expr::eval_const(int& result) {
     stack<int> eval_stack;
     result = 0;
     Symbol* symbol{ nullptr };
@@ -264,7 +280,7 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
             break;
 
         case TType::IDENT:
-            symbol = symtab->get_symbol(token.svalue());
+            symbol = token.symbol();
             if (!symbol)
                 return false;       // symbol not defined
             switch (symbol->sym_type()) {
@@ -310,7 +326,7 @@ bool Expr::eval_const(Symtab* symtab, int& result) {
     }   
 }
 
-bool Expr::eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result) {
+bool Expr::eval_instr(Instr*& result) {
     stack<Instr*> eval_stack;
     result = 0;
     Symbol* symbol{ nullptr };
@@ -321,8 +337,8 @@ bool Expr::eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result) {
             return false;
 
         case TType::IDENT:
-            symbol = symtab->get_symbol(token.svalue());
-            if (!symbol) 
+            symbol = token.symbol();
+            if (!symbol)
                 return false;
             
             switch (symbol->sym_type()) {
@@ -341,7 +357,7 @@ bool Expr::eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result) {
             break;
 
         case TType::ASMPC:
-            eval_stack.push(asmpc);
+            eval_stack.push(token.asmpc());
             break;
 
         case TType::OPERATOR:
@@ -368,7 +384,7 @@ bool Expr::eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result) {
     }
 }
 
-bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
+bool Expr::eval(int& result, bool silent) {
     stack<int> eval_stack;
     result = 0;
     Symbol* symbol{ nullptr };
@@ -380,7 +396,7 @@ bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
             break;
 
         case TType::IDENT:
-            symbol = symtab->get_symbol(token.svalue());
+            symbol = token.symbol();
             if (!symbol) {
                 if (!silent)
                     g_error->error_undefined_symbol(token.svalue());
@@ -406,8 +422,7 @@ bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
                 symbol->set_in_eval(true);
                 {
                     int sub_result = 0;
-                    if (!symbol->expr()->eval(symtab, asmpc,
-                        sub_result, silent))
+                    if (!symbol->expr()->eval(sub_result, silent))
                         return false;   // evaluation failed
                     eval_stack.push(sub_result);
                 }
@@ -419,7 +434,7 @@ bool Expr::eval(Symtab* symtab, int asmpc, int& result, bool silent) {
             break;
 
         case TType::ASMPC:
-            eval_stack.push(asmpc);
+            eval_stack.push(token.asmpc()->offset());
             break;
 
         case TType::OPERATOR:

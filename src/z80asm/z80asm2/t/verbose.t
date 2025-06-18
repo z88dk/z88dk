@@ -7,7 +7,8 @@ use Modern::Perl;
 path("$test.asm")->spew(<<END);
 END
 
-run_nok("$exec -v -mz180 $test.asm > $test.out 2>&1");
+run_ok("$exec -E -mz180 $test.asm > $test.out 2>&1");
+run_nok("$exec -v -mz180 $test.asm >> $test.out 2>&1");
 run_ok("diff -w $bmk $test.out");
 
 unlink_testfiles();
