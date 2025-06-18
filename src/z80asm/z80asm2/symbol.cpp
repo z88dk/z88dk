@@ -16,8 +16,8 @@ using namespace std;
 
 Symtab* g_global_defines{ nullptr };
 
-Symbol::Symbol(const string& name, Symtab* parent)
-    : m_name(name), m_parent(parent) {
+Symbol::Symbol(const string& name)
+    : m_name(name) {
 }
 
 Symbol::~Symbol() {
@@ -120,7 +120,7 @@ Symbol* Symtab::add_symbol(const string& name) {
         return nullptr;
     }
     else {
-        Symbol* symbol = new Symbol(name, this);
+        Symbol* symbol = new Symbol(name);
         m_table[name] = symbol;
         return symbol;
     }
