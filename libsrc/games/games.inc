@@ -10,6 +10,7 @@
 ;
 ;       However.... SOUND_INOUT = toggle speaker with in/out (+ace only)
 ;                   SOUND_OUTOUT = toggle speaker accessing to 2 different port addresses (x820ii only)
+;                   SOUND_OUTIN = toggle speaker accessing with in/out to 2 different port addresses (ZX81 family)
 ;                   SOUND_IFF = toggle speaker with ei/di cycle (+sol20 only)
 ;
 ;       $Id: games.inc $
@@ -400,19 +401,25 @@ IF FORgal
 ENDIF
 
 IF FORzx81
-        defc SOUND_ONEBIT_port   = 254
+        defc SOUND_OUTIN = 1
+        defc SOUND_ONEBIT_port   = 255
+        defc SOUND_ZEROBIT_port  = 254
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
 ENDIF
 
 IF FORlambda
-        defc SOUND_ONEBIT_port   = 254
+        defc SOUND_OUTIN = 1
+        defc SOUND_ONEBIT_port   = 255
+        defc SOUND_ZEROBIT_port  = 254
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
 ENDIF
 
 IF FORzx80
-        defc SOUND_ONEBIT_port   = 254
+        defc SOUND_OUTIN = 1
+        defc SOUND_ONEBIT_port   = 255
+        defc SOUND_ZEROBIT_port  = 254
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
 ENDIF
@@ -774,7 +781,7 @@ ENDIF
 ; **********************************************************
 
 MACRO ONEBITOUT
-LOCAL l1, l2, l3, l4, l5, l6
+LOCAL l1, l2, l3, l4, l5, l6, l7
 IF SOUND_INOUT = 1
     ld      c,a
     and     SOUND_ONEBIT_mask
@@ -799,6 +806,14 @@ ELIF SOUND_OUTOUT = 1
     jr      l6
 l5: out     (SOUND_ONEBIT_port2),a 
 l6: ld      a,c
+ELIF SOUND_OUTIN = 1
+    push    af
+    and     SOUND_ONEBIT_mask
+    out     (SOUND_ONEBIT_port), a
+    jr      z,l7
+    in      a, (SOUND_ZEROBIT_port)
+l7:
+    pop     af
 ELIF SOUND_ONEBIT_port >= 256
     exx
     out     (c),a
@@ -809,42 +824,5 @@ ELSE
     out     (SOUND_ONEBIT_port),a 
 ENDIF
 ENDM
-
-
-MACRO ONEBITOUT2
-LOCAL l1, l2, l3, l4, l5, l6
-IF SOUND_INOUT = 1
-    ld      c,a
-    and     SOUND_ONEBIT_mask
-    jr      nz,l1
-    in      a,(SOUND_ONEBIT_port) 
-    jr      l2
-l1: out     (SOUND_ONEBIT_port),a 
-l2: ld      a,c
-ELIF SOUND_IFF = 1
-    ld      c,a
-    and     SOUND_ONEBIT_mask
-    jp      nz,l3
-    di 
-l3: jp      l4
-    ei
-l4: ld      a,c
-ELIF SOUND_OUTOUT = 1
-    ld      c,a
-    and     SOUND_ONEBIT_mask
-    jr      nz,l5
-    out     (SOUND_ONEBIT_port),a
-    jr      l6
-l5: out     (SOUND_ONEBIT_port2),a
-l6: ld      a,c
-ELIF SOUND_ONEBIT_port >= 256
-    out     (c),a
-ELIF SOUND_ONEBIT_port < 0
-    ld      (-SOUND_ONEBIT_port),a
-ELSE
-    out     (SOUND_ONEBIT_port),a 
-ENDIF
-ENDM
-
 
 
