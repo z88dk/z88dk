@@ -11,7 +11,8 @@ path("$test.asm")->spew(<<END);
 v4 equ +start
 END
 
-run_nok("$exec $test.asm > $test.out 2>&1");
+run_ok("$exec -E $test.asm > $test.out 2>&1");
+run_nok("$exec -v $test.asm >> $test.out 2>&1");
 run_ok("diff -w $bmk $test.out");
 
 unlink_testfiles();

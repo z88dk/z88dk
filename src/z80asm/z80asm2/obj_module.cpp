@@ -101,7 +101,7 @@ void Instr::add_opcode(long long opcode) {
 
 void Instr::add_patch(Patch* patch) {
     int value = 0;
-    if (patch->expr()->eval_const(m_parent->symtab(), value)) {
+    if (patch->expr()->eval_const(value)) {
         // If the expression evaluates to a constant, replace it with the value
         value = patch->resolve(value);
         int size = patch->size();
@@ -223,8 +223,7 @@ void Section::expand_jrs() {
             for (auto& patch : instr->patches()) {
                 if (patch->patch_type() == PatchType::JR) {
                     int target = 0;
-                    if (patch->expr()->eval(m_parent->symtab(), instr->offset(),
-                        target, true)) {
+                    if (patch->expr()->eval(target, true)) {
                         int pos = instr->offset() + instr->size();
                         int distance = target - pos;
                         if (distance < -128 || distance > 127) {
@@ -333,7 +332,7 @@ void ObjModule::add_label(const string& name) {
 }
 
 void ObjModule::add_equ(const string& name, Expr* expr) {
-    m_symtab.add_equ(name, expr, cur_section()->cur_instr());
+    m_symtab.add_equ(name, expr);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

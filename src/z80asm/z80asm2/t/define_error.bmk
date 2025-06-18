@@ -1,3 +1,9 @@
+LINE 1 "test_t_define_error.asm"
+define
+define 27
+define hello hello
+define world,
+define helloworld=2*
 assemble test_t_define_error.asm to test_t_define_error.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

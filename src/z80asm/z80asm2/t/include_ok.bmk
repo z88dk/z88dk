@@ -20,3 +20,8 @@ LINE 1 "./test_t_include_ok.inc"
 nop
 LINE 11 "test_t_include_ok.asm"
 nop
+assemble test_t_include_ok.asm to test_t_include_ok.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+
+error: assembly failed for file: test_t_include_ok.asm

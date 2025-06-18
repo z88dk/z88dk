@@ -353,9 +353,17 @@ bool LineParser::parse_line(const string& line) {
         if (cur_state.action) {
             // setup data for function call
             m_elems = queue_elem.elems;
+
+            // compute constant expressions, lookup symbols in expressions
+            Instr* asmpc = nullptr;
             for (auto& elem : queue_elem.elems) {
+                if (elem.expr) {
+                    if (!asmpc)
+                        asmpc = g_obj_module->cur_section()->add_instr();
+                    elem.expr->lookup_symbols(g_obj_module->symtab(), asmpc);
+                }
                 if (elem.const_expr) {
-                    if (!elem.expr->eval_const(g_obj_module->symtab(), elem.const_value)) {
+                    if (!elem.expr->eval_const(elem.const_value)) {
                         g_error->error_constant_expression_expected();
                         return false;
                     }
@@ -598,10 +606,13 @@ bool LineParser::parse_const_expr(int& value) {
         return false;
     }
 
-    if (!expr->eval_const(g_obj_module->symtab(), value)) {
+    Instr* asmpc = g_obj_module->cur_section()->add_instr();
+    expr->lookup_symbols(g_obj_module->symtab(), asmpc);
+    if (!expr->eval_const(value)) {
         delete expr;
         g_error->error_constant_expression_expected();
         return false;
+
     }
     else {
         delete expr;
