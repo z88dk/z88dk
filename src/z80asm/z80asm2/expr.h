@@ -20,9 +20,10 @@ public:
     void clear();
     bool parse(const string& line);
     bool parse(Scanner& in, bool silent);
-    bool eval_const(Symtab* symtab, int& result);
-    bool eval_instr(Symtab* symtab, Instr* asmpc, Instr*& result);
-    bool eval(Symtab* symtab, int asmpc, int& result, bool silent = false);
+    void lookup_symbols(Symtab* symtab, Instr* asmpc);
+    bool eval_const(int& result);
+    bool eval_instr(Instr*& result);
+    bool eval(int& result, bool silent = false);
     string to_string() const;
     string rpn_to_string() const;
 
