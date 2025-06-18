@@ -45,6 +45,13 @@ asm_bit_save_block_zx:
     pop     af
 
     push    ix
+
+  IF    FORzx81
+    ex      af,af
+    push    af
+    ex      af,af
+  ENDIF
+
     push    bc
     pop     ix
 
@@ -55,6 +62,12 @@ asm_bit_save_block_zx:
   ENDIF
 
     CALL    SA_BYTES
+
+  IF    FORzx81
+    ex      af,af
+    pop     af
+    ex      af,af
+  ENDIF
 
     pop     ix
     JP      bit_close_ei
