@@ -18,6 +18,7 @@ Symtab* g_global_defines{ nullptr };
 
 Symbol::Symbol(const string& name)
     : m_name(name) {
+    update_location();
 }
 
 Symbol::~Symbol() {
@@ -25,6 +26,8 @@ Symbol::~Symbol() {
 }
 
 void Symbol::clear() {
+    m_filename.clear();
+    m_line_num = 0;
     m_sym_scope = SymScope::LOCAL;
     m_sym_type = SymType::UNDEFINED;
     m_is_global_def = false;
@@ -33,6 +36,7 @@ void Symbol::clear() {
     delete m_expr;
     m_expr = nullptr;
     m_in_eval = false;
+    m_touched = false;
 }
 
 void Symbol::set_global_def(int value) {
@@ -90,6 +94,11 @@ void Symbol::set_expr(Expr* expr) {
     }
 }
 
+void Symbol::update_location() {
+    m_filename = g_location->filename();
+    m_line_num = g_location->line_num();
+}
+
 Symtab::~Symtab() {
     clear();
 }
@@ -143,6 +152,7 @@ Symbol* Symtab::add_global_def(const string& name, int value) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_global_def(value);
+        symbol->update_location();
 
         // only show global defines
         if (g_options->verbose() && this == g_global_defines)
@@ -161,6 +171,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_instr(instr);
+        symbol->update_location();
     }
 
     return symbol;
@@ -175,6 +186,7 @@ Symbol* Symtab::add_equ(const string& name, Expr* expr) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_expr(expr);
+        symbol->update_location();
     }
 
     return symbol;
@@ -186,4 +198,18 @@ Symbol* Symtab::touch_symbol(const string& name) {
         symbol = add_symbol(name);
     symbol->set_touched();
     return symbol;
+}
+
+bool Symtab::has_undefined_symbols() const {
+    bool ok = true;
+    for (auto& it : m_table) {
+        if (it.second->sym_type() == SymType::UNDEFINED) {
+            g_location->set_filename(it.second->filename());
+            g_location->set_line_num(it.second->line_num());
+            g_error->error_undefined_symbol(it.first);
+            g_location->clear();
+            ok = false;
+        }
+    }
+    return ok;
 }

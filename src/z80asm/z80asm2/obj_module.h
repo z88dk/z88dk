@@ -146,6 +146,7 @@ public:
     void define_global_defs();
     void define_cpu_defs(Cpu cpu_id);
     void expand_jrs();
+    bool has_undefined_symbols() const;
 
     void add_global_def(const string& name, int value = 1);
     void add_label(const string& name);

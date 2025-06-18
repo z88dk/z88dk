@@ -8,7 +8,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include <map>
 using namespace std;
 
 class Expr;
@@ -44,6 +44,8 @@ public:
     void clear();
 
     const string& name() const { return m_name; }
+    const string& filename() const { return m_filename; }
+    int line_num() const { return m_line_num; }
     SymScope sym_scope() const { return m_sym_scope; }
     SymType sym_type() const { return m_sym_type; }
     bool is_global_def() const { return m_is_global_def; } 
@@ -63,9 +65,12 @@ public:
     void set_expr(Expr* expr);
     void set_in_eval(bool f = true) { m_in_eval = f; }
     void set_touched(bool f = true) { m_touched = f; }
+    void update_location();
 
 private:
     const string m_name;        // symbol name
+    string m_filename;          // filename where defined
+    int m_line_num{ 0 };        // line number where defined
     SymScope m_sym_scope{ SymScope::LOCAL };
     SymType m_sym_type{ SymType::UNDEFINED };
     bool m_is_global_def{ false }; // true if this is a global define
@@ -93,6 +98,8 @@ public:
     Symbol* add_equ(const string& name, Expr* expr);
     Symbol* touch_symbol(const string& name);
 
+    bool has_undefined_symbols() const;
+
     auto begin() { return m_table.begin(); }
     auto end() { return m_table.end(); }
     auto cbegin() const { return m_table.cbegin(); }
@@ -101,7 +108,7 @@ public:
     bool empty() const { return m_table.empty(); }
 
 private:
-    unordered_map<string, Symbol*> m_table;
+    map<string, Symbol*> m_table;
     vector<Symbol*> m_deleted;
 };
 
