@@ -9,5 +9,5 @@ define tres = 3
 assemble test_t_define_ok.asm to test_t_define_ok.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-
 error: assembly failed for file: test_t_define_ok.asm
+

@@ -158,3 +158,10 @@ string basename(const string& path) {
     else
         return path;
 }
+
+bool different_sign(int x1, int x2) {
+    if ((x1 < 0 && x2 >= 0) || (x1 >= 0 && x2 < 0))
+        return true;
+    else
+        return false;
+}

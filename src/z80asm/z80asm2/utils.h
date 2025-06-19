@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string>
 using namespace std;
 
@@ -20,3 +23,21 @@ string sanitize_pathname(string path);
 string replace_extension(string path, const string& new_ext);
 string dirname(const string& path);
 string basename(const string& path);
+bool different_sign(int x1, int x2);
+
+// convert int to hex
+template<typename T>
+string int_to_hex(T i, int width) {
+    std::ostringstream ss;
+    if (i <= -10)
+        ss << "-$"
+        << std::setfill('0') << std::setw(width)
+        << std::hex << -i << std::dec;
+    else if (i < 10)
+        ss << i;
+    else
+        ss << "$"
+        << std::setfill('0') << std::setw(width)
+        << std::hex << i << std::dec;
+    return ss.str();
+}

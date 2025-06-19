@@ -22,5 +22,5 @@ test_t_define_error.asm:4: error: expected identifier
 test_t_define_error.asm:5: error: insufficient operands: *
   ^---- 	define helloworld=2*
     ^---- define helloworld=2*
-
 error: assembly failed for file: test_t_define_error.asm
+
