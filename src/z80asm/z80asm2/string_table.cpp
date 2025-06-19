@@ -11,8 +11,7 @@
 using namespace std;
 
 StringTable::StringTable() {
-    m_strings.emplace_back(""); // reserve index 0 for empty string
-    m_id_map[""] = 0; // map empty string to index 0
+    clear();
 }
 
 void StringTable::clear() {
@@ -22,23 +21,23 @@ void StringTable::clear() {
     m_id_map[""] = 0; // map empty string to index 0
 }
 
-size_t StringTable::add_string(const string& str) {
+int StringTable::add_string(const string& str) {
     auto it = m_id_map.find(str);
     if (it != m_id_map.end()) {
         return it->second; // string already exists, return its index
     }
-    size_t index = m_strings.size();
+    int index = size();
     m_strings.push_back(str);
     m_id_map[str] = index;
     return index; // return the new index
 }
 
-const string& StringTable::get_string(size_t index) const {
-    assert(index < m_strings.size() && "Index out of bounds");
+const string& StringTable::get_string(int index) const {
+    assert(index >= 0 && index < size() && "Index out of bounds");
     return m_strings.at(index);
 }
 
-bool StringTable::find_string(const string& str, size_t& index) const {
+bool StringTable::find_string(const string& str, int& index) const {
     auto it = m_id_map.find(str);
     if (it != m_id_map.end()) {
         index = it->second;
@@ -51,38 +50,38 @@ bool StringTable::find_string(const string& str, size_t& index) const {
 }
 
 bool StringTable::find_string(const string& str) const {
-    size_t index = 0;
+    int index = 0;
     return find_string(str, index);
 }
 
-size_t StringTable::size() const {
-    return m_strings.size();
+int StringTable::size() const {
+    return static_cast<int>(m_strings.size());
 }
 
 void StringTable::write(Memmap& memmap) const {
     // write size of table and placeholder for size of strings
-    size_t num_strings = size();
+    int num_strings = size();
     memmap.write_long(static_cast<uint32_t>(num_strings));
-    size_t strings_size_pos = memmap.pos();
+    int strings_size_pos = memmap.pos();
     memmap.write_long(0); // placeholder for size of strings
 
     // write index of each string into array of strings separated by '\0'
-    size_t str_table_pos = 0;
-    for (size_t id = 0; id < num_strings; ++id) {
+    int str_table_pos = 0;
+    for (int id = 0; id < num_strings; ++id) {
         string str = get_string(id);
         memmap.write_long(static_cast<uint32_t>(str_table_pos));    // index into strings
-        str_table_pos += str.size() + 1;    // next position
+        str_table_pos += static_cast<int>(str.size()) + 1;          // next position
     }
 
     // write all strings together
-    size_t strings_pos = memmap.pos();
-    for (size_t id = 0; id < num_strings; ++id) {
+    int strings_pos = memmap.pos();
+    for (int id = 0; id < num_strings; ++id) {
         string str = get_string(id);
         memmap.write_data(reinterpret_cast<const uint8_t*>(str.data()),
-                            str.size() + 1); // write string including '\0'
+                            static_cast<int>(str.size()) + 1); // write string including '\0'
     }
     memmap.align();
-    size_t end_pos = memmap.pos();
+    int end_pos = memmap.pos();
     ptrdiff_t strings_size = end_pos - strings_pos;
 
     // write strings size
@@ -120,7 +119,7 @@ bool StringTable::read(Memmap& memmap) {
 
     for (uint32_t id = 0; id < num_strings; ++id) {
         string str{ strings.c_str() + string_pos[id] };
-        if (id != add_string(str)) // add string to the table
+        if (id != static_cast<uint32_t>(add_string(str))) // add string to the table
             return false;
     }
 
@@ -132,21 +131,21 @@ void StringTable::test() {
     StringTable table;
     assert(table.size() == 1); // only the empty string is present
 
-    size_t index1 = table.add_string("Hello");
+    int index1 = table.add_string("Hello");
     assert(index1 == 1);
     assert(table.get_string(index1) == "Hello");
     assert(table.size() == 2);
 
-    size_t index2 = table.add_string("World");
+    int index2 = table.add_string("World");
     assert(index2 == 2);
     assert(table.get_string(index2) == "World");
     assert(table.size() == 3);
 
-    size_t index3 = table.add_string("Hello");
+    int index3 = table.add_string("Hello");
     assert(index3 == 1); // should return the same index as before
     assert(table.get_string(index3) == "Hello");
 
-    size_t index4;
+    int index4;
     assert(table.find_string("World", index4));
     assert(index4 == 2);
     assert(table.find_string("World"));

@@ -44,8 +44,7 @@ public:
     void clear();
 
     const string& name() const { return m_name; }
-    const string& filename() const { return m_filename; }
-    int line_num() const { return m_line_num; }
+    const Location& location() const { return m_location; }
     SymScope sym_scope() const { return m_sym_scope; }
     SymType sym_type() const { return m_sym_type; }
     bool is_global_def() const { return m_is_global_def; } 
@@ -69,8 +68,7 @@ public:
 
 private:
     const string m_name;        // symbol name
-    string m_filename;          // filename where defined
-    int m_line_num{ 0 };        // line number where defined
+    Location m_location;        // location where defined
     SymScope m_sym_scope{ SymScope::LOCAL };
     SymType m_sym_type{ SymType::UNDEFINED };
     bool m_is_global_def{ false }; // true if this is a global define

@@ -25,13 +25,13 @@ void Memmap::align() {
     extend_data();
 }
 
-size_t Memmap::pos() const {
-    assert(m_pos <= m_data.size() && "Read/write position out of bounds");
+int Memmap::pos() const {
+    assert(m_pos >= 0 && m_pos <= size() && "Read/write position out of bounds");
     return m_pos;
 }
 
-void Memmap::set_pos(size_t pos) {
-    assert(pos <= m_data.size() && "Read/write position out of bounds");
+void Memmap::set_pos(int pos) {
+    assert(m_pos >= 0 && pos <= size() && "Read/write position out of bounds");
     m_pos = pos;
 }
 
@@ -54,7 +54,7 @@ void Memmap::write_long(uint32_t value) {
     m_data[m_pos++] = (value >> 24) & 0xFF;
 }
 
-void Memmap::write_data(const uint8_t* data, size_t length) {
+void Memmap::write_data(const uint8_t* data, int length) {
     if (length == 0)
         return; // nothing to write, but valid
     else {
@@ -66,7 +66,7 @@ void Memmap::write_data(const uint8_t* data, size_t length) {
 }
 
 bool Memmap::read_byte(uint8_t& value) {
-    if (m_pos >= m_data.size())
+    if (m_pos >= size())
         return false; // out of bounds
     else {
         value = m_data[m_pos++];
@@ -75,7 +75,7 @@ bool Memmap::read_byte(uint8_t& value) {
 }
 
 bool Memmap::read_short(uint16_t& value) {
-    if (m_pos + 1 >= m_data.size())
+    if (m_pos + 1 >= size())
         return false; // out of bounds
     else {
         value = static_cast<uint16_t>(m_data[m_pos]) |
@@ -86,7 +86,7 @@ bool Memmap::read_short(uint16_t& value) {
 }
 
 bool Memmap::read_long(uint32_t& value) {
-    if (m_pos + 3 >= m_data.size())
+    if (m_pos + 3 >= size())
         return false; // out of bounds
     else {
         value = static_cast<uint32_t>(m_data[m_pos]) |
@@ -98,8 +98,8 @@ bool Memmap::read_long(uint32_t& value) {
     }
 }
 
-bool Memmap::read_data(uint8_t* data, size_t length) {
-    if (m_pos + length > m_data.size())
+bool Memmap::read_data(uint8_t* data, int length) {
+    if (m_pos + length > size())
         return false; // out of bounds
     else if (length == 0)
         return true; // nothing to read, but valid
@@ -118,7 +118,7 @@ bool Memmap::write_file(const string& filename) {
         return false;
     }
     else {
-        ofs.write(reinterpret_cast<const char*>(m_data.data()), m_data.size());
+        ofs.write(reinterpret_cast<const char*>(m_data.data()), size());
         return true;
     }
 }
@@ -132,7 +132,7 @@ bool Memmap::read_file(const string& filename) {
     else {
         clear(); // clear existing data
         ifs.seekg(0, ios::end);
-        size_t size = ifs.tellg();
+        int size = static_cast<int>(ifs.tellg());
         ifs.seekg(0, ios::beg);
         m_data.resize(size);
         ifs.read(reinterpret_cast<char*>(m_data.data()), size);
@@ -141,8 +141,8 @@ bool Memmap::read_file(const string& filename) {
     }
 }
 
-void Memmap::extend_data(size_t count) {
-    ptrdiff_t padding = m_pos + count - m_data.size();
+void Memmap::extend_data(int count) {
+    int padding = m_pos + count - size();
     if (padding > 0)
         m_data.insert(m_data.end(), padding, 0); // fill with zeros
 }
