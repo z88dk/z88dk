@@ -21,11 +21,11 @@ public:
     StringTable& operator=(const StringTable& other) = delete;
 
     void clear();
-    size_t add_string(const string& str);
-    const string& get_string(size_t index) const;
-    bool find_string(const string& str, size_t& index) const;
+    int add_string(const string& str);
+    const string& get_string(int index) const;
+    bool find_string(const string& str, int& index) const;
     bool find_string(const string& str) const;
-    size_t size() const;
+    int size() const;
 
     void write(Memmap& memmap) const;
     bool read(Memmap& memmap);
@@ -36,5 +36,5 @@ public:
 
 private:
     vector<string> m_strings;               // string table
-    unordered_map<string, size_t> m_id_map; // map from string to index
+    unordered_map<string, int> m_id_map;    // map from string to index
 };

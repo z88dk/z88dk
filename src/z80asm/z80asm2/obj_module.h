@@ -78,7 +78,7 @@ public:
     uint8_t* data() { return m_bytes.data(); }
     int size() const { return static_cast<int>(m_bytes.size()); }
     vector<Patch*>& patches() { return m_patches; }
-    Symtab* symtab();
+    const Location& location() const { return m_location; }
 
     void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
     void add_opcode(long long opcode);

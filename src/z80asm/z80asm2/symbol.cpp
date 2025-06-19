@@ -26,8 +26,7 @@ Symbol::~Symbol() {
 }
 
 void Symbol::clear() {
-    m_filename.clear();
-    m_line_num = 0;
+    m_location.clear();
     m_sym_scope = SymScope::LOCAL;
     m_sym_type = SymType::UNDEFINED;
     m_is_global_def = false;
@@ -95,8 +94,7 @@ void Symbol::set_expr(Expr* expr) {
 }
 
 void Symbol::update_location() {
-    m_filename = g_location->filename();
-    m_line_num = g_location->line_num();
+    m_location = *g_location;
 }
 
 Symtab::~Symtab() {
@@ -204,8 +202,7 @@ bool Symtab::has_undefined_symbols() const {
     bool ok = true;
     for (auto& it : m_table) {
         if (it.second->sym_type() == SymType::UNDEFINED) {
-            g_location->set_filename(it.second->filename());
-            g_location->set_line_num(it.second->line_num());
+            *g_location = it.second->location();
             g_error->error_undefined_symbol(it.first);
             g_location->clear();
             ok = false;
