@@ -12,14 +12,27 @@ using namespace std;
 
 class Assembler {
 public:
-    bool assemble_file(const string& filename);
+    enum class Pass { NOT_ASSEMBLING = 0, PASS1 = 1, PASS2 = 2 };
+
+    void clear();
+    void assemble_file(const string& filename);
+
+    const string& asm_filename() const { return m_asm_filename; }
+    const string& obj_filename() const { return m_obj_filename; }
+
+    Pass pass() const { return m_pass; }
+    void set_pass(Pass pass) { m_pass = pass; }
 
 private:
-    string m_filename;
+    string m_asm_filename;
     string m_obj_filename;
+    Pass m_pass{ Pass::NOT_ASSEMBLING };
 
     void init(const string& filename);
+    bool assemble();
     bool parse();
     bool has_undefined_symbols();
-    bool resolve_local_exprs();
+    void resolve_local_exprs();
 };
+
+extern Assembler* g_assembler;

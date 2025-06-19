@@ -10,6 +10,7 @@
 #include "obj_module.h"
 #include "options.h"
 #include "symbol.h"
+#include "utils.h"
 #include <cassert>
 #include <iostream>
 #include <unordered_map>
@@ -17,8 +18,8 @@ using namespace std;
 
 ObjModule* g_obj_module{ nullptr };
 
-Patch::Patch(PatchType patch_type, Expr* expr, int offset)
-    : m_patch_type(patch_type), m_expr(expr), m_offset(offset) {
+Patch::Patch(Instr* parent, PatchType patch_type, Expr* expr, int offset)
+    : m_parent(parent), m_patch_type(patch_type), m_expr(expr), m_offset(offset) {
 }
 
 Patch::~Patch() {
@@ -55,18 +56,113 @@ int Patch::size() const {
     }
 }
 
-int Patch::resolve(int value) const {
-    switch (m_patch_type) {
-        case PatchType::JR:
-            return value & 0xFF;
-        case PatchType::N:
-            return value & 0xFF; // Ensure it's a byte
-        case PatchType::NN:
-            return value & 0xFFFF; // Ensure it's a word
-        default:
-            assert(false && "Unknown patch type");
-            return 0; // Should never reach here
+void Patch::resolve(int value) {
+    *g_location = m_expr->location();    // prepare for errors
+    switch (m_patch_type)
+    {
+    case PatchType::NONE:
+        assert(false && "PatchType::NONE should not be used");
+        break;
+
+    case PatchType::ASSIGN:
+        assert(false && "PatchType::ASSIGN should not be used here");
+        break;
+
+    case PatchType::D:
+        if (value < -128 || value > 127)
+            g_error->warning_int_range(int_to_hex(value, 2));
+        m_parent->patch_byte(m_offset, value & 0xFF);
+        break;
+
+    case PatchType::D2DD:
+        if (value < -128 || value > 127)
+            g_error->warning_int_range(int_to_hex(value, 2));
+        m_parent->patch_byte(m_offset + 0, value & 0xFF);
+        m_parent->patch_byte(m_offset + 1, value < 0 || value > 127 ? 0xFF : 0);
+        break;
+
+    case PatchType::D2DDD:
+        if (value < -128 || value > 127)
+            g_error->warning_int_range(int_to_hex(value, 2));
+        m_parent->patch_byte(m_offset + 0, value & 0xFF);
+        m_parent->patch_byte(m_offset + 1, value < 0 || value > 127 ? 0xFF : 0);
+        m_parent->patch_byte(m_offset + 2, value < 0 || value > 127 ? 0xFF : 0);
+        break;
+
+    case PatchType::HOFFSET:
+        if ((value & 0xFF00) != 0) {
+            if ((value & 0xFF00) != 0xFF00)
+                g_error->warning_int_range(int_to_hex(value, 2));
+        }
+        m_parent->patch_byte(m_offset, value & 0xFF);
+        break;
+
+    case PatchType::JR:
+        value -= m_parent->offset() + m_parent->size(); // relative to the next instruction
+        if (value < -128 || value > 127)
+            g_error->error_int_range(int_to_hex(value, 2));
+        else
+            m_parent->patch_byte(m_offset, value & 0xFF);
+        break;
+
+    case PatchType::JRE:
+        value -= m_parent->offset() + m_parent->size(); // relative to the next instruction
+        if (value < -0x8000 || value > 0x7FFF)
+            g_error->error_int_range(int_to_hex(value, 4));
+        else {
+            m_parent->patch_byte(m_offset + 0, (value >> 0) & 0xFF);
+            m_parent->patch_byte(m_offset + 1, (value >> 8) & 0xFF);
+        }
+        break;
+
+    case PatchType::N:
+        if (value < -128 || value > 255)
+            g_error->warning_int_range(int_to_hex(value, 2));
+        m_parent->patch_byte(m_offset, value & 0xFF);
+        break;
+
+    case PatchType::N2NN:
+        if (value < 0 || value > 255)
+            g_error->warning_int_range(int_to_hex(value, 2));
+        m_parent->patch_byte(m_offset + 0, value & 0xFF);
+        m_parent->patch_byte(m_offset + 1, 0);
+        break;
+
+    case PatchType::N2NNN:
+        if (value < 0 || value > 255)
+            g_error->warning_int_range(int_to_hex(value, 2));
+        m_parent->patch_byte(m_offset + 0, value & 0xFF);
+        m_parent->patch_byte(m_offset + 1, 0);
+        m_parent->patch_byte(m_offset + 2, 0);
+        break;
+
+    case PatchType::NN:
+        m_parent->patch_byte(m_offset + 0, (value >> 0) & 0xFF);
+        m_parent->patch_byte(m_offset + 1, (value >> 8) & 0xFF);
+        break;
+
+    case PatchType::NNN:
+        m_parent->patch_byte(m_offset + 0, (value >> 0) & 0xFF);
+        m_parent->patch_byte(m_offset + 1, (value >> 8) & 0xFF);
+        m_parent->patch_byte(m_offset + 2, (value >> 16) & 0xFF);
+        break;
+
+    case PatchType::NNNN:
+        m_parent->patch_byte(m_offset + 0, (value >> 0) & 0xFF);
+        m_parent->patch_byte(m_offset + 1, (value >> 8) & 0xFF);
+        m_parent->patch_byte(m_offset + 2, (value >> 16) & 0xFF);
+        m_parent->patch_byte(m_offset + 3, (value >> 24) & 0xFF);
+        break;
+
+    case PatchType::NN_BE:
+        m_parent->patch_byte(m_offset + 0, (value >> 8) & 0xFF);
+        m_parent->patch_byte(m_offset + 1, (value >> 0) & 0xFF);
+        break;
+
+    default:
+        assert(false && "Unknown patch type");
     }
+    g_location->clear();
 }
 
 Instr::Instr(Section* parent)
@@ -78,6 +174,11 @@ Instr::~Instr() {
     for (auto& patch : m_patches)
         delete patch;
     m_patches.clear();
+}
+
+void Instr::patch_byte(int index, uint8_t byte) {
+    assert(index >= 0 && index < static_cast<int>(m_bytes.size()) && "Index out of bounds");
+    m_bytes[index] = byte;
 }
 
 void Instr::add_opcode(long long opcode) {
@@ -95,22 +196,20 @@ void Instr::add_opcode(long long opcode) {
 }
 
 void Instr::add_patch(Patch* patch) {
+    // reserve space for the patch
+    int size = patch->size();
+    for (int i = 0; i < size; ++i) {
+        add_byte(0); 
+    }
+
+    // If the expression evaluates to a constant, replace it with the value
     int value = 0;
     if (patch->expr()->eval_const(value)) {
-        // If the expression evaluates to a constant, replace it with the value
-        value = patch->resolve(value);
-        int size = patch->size();
-        for (int i = 0; i < size; ++i) {
-            add_byte((value >> (i * 8)) & 0xFF);
-        }
+        patch->resolve(value);
         delete patch; // No need to keep the patch if it's resolved
     }
     else {
         m_patches.push_back(patch);
-        int size = patch->size();
-        for (int i = 0; i < size; ++i) {
-            add_byte(0); // reserve space for the patch
-        }
     }
 }
 
@@ -160,6 +259,28 @@ void Instr::expand_jr() {
         break;
     default:
         assert(false && "Unexpected opcode for JR expansion");
+    }
+}
+
+void Instr::resolve_local_exprs() {
+    for (auto it = m_patches.begin(); it != m_patches.end(); ) {
+        Patch* patch = *it;
+        Expr* expr = patch->expr();
+
+        *g_location = expr->location(); // prepare for errors
+
+        int value = 0;
+        if (expr->eval_const(value)) {
+            // If the expression is local, resolve it
+            patch->resolve(value);
+            it = m_patches.erase(it); // Remove the patch
+        }
+        else {
+            // If the expression is not local, keep it for later resolution
+            ++it;
+        }
+
+        g_location->clear();
     }
 }
 
@@ -241,6 +362,12 @@ void Section::recompute_offsets() {
     }
 }
 
+void Section::resolve_local_exprs() {
+    for (auto& instr : m_instrs) {
+        instr->resolve_local_exprs();
+    }
+}
+
 ObjModule::ObjModule() {
     m_cur_section = new Section(this, "");
     m_sections.push_back(m_cur_section);
@@ -318,6 +445,12 @@ bool ObjModule::has_undefined_symbols() const {
     return m_symtab.has_undefined_symbols();
 }
 
+void ObjModule::resolve_local_exprs() const {
+    for (auto& section : m_sections) {
+        section->resolve_local_exprs();
+    }
+}
+
 void ObjModule::add_global_def(const string& name, int value) {
     if (g_options->parsing_command_line())
         g_global_defines->add_global_def(name, value);
@@ -342,19 +475,19 @@ void ObjModule::add_opcode_void(long long opcode) {
 void ObjModule::add_opcode_jr(long long opcode, Expr* expr) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(PatchType::JR, expr, instr->size()));
+    instr->add_patch(new Patch(instr, PatchType::JR, expr, instr->size()));
 }
 
 void ObjModule::add_opcode_n(long long opcode, Expr* expr) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(PatchType::N, expr, instr->size()));
+    instr->add_patch(new Patch(instr, PatchType::N, expr, instr->size()));
 }
 
 void ObjModule::add_opcode_nn(long long opcode, Expr* expr) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(PatchType::NN, expr, instr->size()));
+    instr->add_patch(new Patch(instr, PatchType::NN, expr, instr->size()));
 }
 
 bool ObjModule::write_file(const string& filename) const {

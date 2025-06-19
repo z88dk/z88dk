@@ -7,6 +7,7 @@
 #include "assembler.h"
 #include "cpu.h"
 #include "error.h"
+#include "expr.h"
 #include "input_files.h"
 #include "line_parser.h"
 #include "location.h"
@@ -31,39 +32,24 @@ static void create_globals() {
     g_source_text = new SourceText();
     g_error = new Error();
     g_input_files = new InputFiles();
+    g_options = new Options();
     g_global_defines = new Symtab();
     g_preproc = new Preproc();
     g_obj_module = new ObjModule();
-    g_options = new Options();
+    g_assembler = new Assembler();
 }
 
 static void delete_globals() {
-    delete g_options;
-    g_options = nullptr;
-
-    delete g_obj_module;
-    g_obj_module = nullptr;
-
-    delete g_preproc;
-    g_preproc = nullptr;
-
-    delete g_global_defines;
-    g_global_defines = nullptr;
-
-    delete g_input_files;
-    g_input_files = nullptr;
-
-    delete g_error;
-    g_error = nullptr;
-
-    delete g_source_text;
-    g_source_text = nullptr;
-
-    delete g_location;
-    g_location = nullptr;
-
-    delete g_cpu_table;
-    g_cpu_table = nullptr;
+    delete g_assembler; g_assembler = nullptr;
+    delete g_obj_module; g_obj_module = nullptr;
+    delete g_preproc; g_preproc = nullptr;
+    delete g_global_defines; g_global_defines = nullptr;
+    delete g_options; g_options = nullptr;
+    delete g_input_files; g_input_files = nullptr;
+    delete g_error; g_error = nullptr;
+    delete g_source_text; g_source_text = nullptr;
+    delete g_location; g_location = nullptr;
+    delete g_cpu_table; g_cpu_table = nullptr;
 }
 
 static int error_invalid_option(const string& option) {
@@ -85,15 +71,16 @@ static int help() {
 }
 
 int main(int argc, char* argv[]) {
-#ifdef UNIT_TESTS
-    Memmap::test();
-    StringTable::test();
-    return EXIT_SUCCESS;
-#endif
-
     // Initialize global objects
     create_globals();
     atexit(delete_globals);
+
+#ifdef UNIT_TESTS
+    Memmap::test();
+    StringTable::test();
+    Expr::test();
+    return EXIT_SUCCESS;
+#endif
 
     // parse command line
     g_options->set_parsing_command_line(true);
@@ -183,9 +170,7 @@ int main(int argc, char* argv[]) {
     }
     else {
         for (auto& filename : g_options->input_files()) {
-            Assembler assembler;
-            if (!assembler.assemble_file(filename))
-                g_error->error_assembly_failed(filename);
+            g_assembler->assemble_file(filename);                
         }
     }
 

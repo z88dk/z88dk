@@ -6,7 +6,7 @@ use Modern::Perl;
 
 path("$test.asm")->spew(<<END);
 	; .ASSUME
-	.Assume ASMPC*0:.Assume \$/\$
+	.Assume ASMPC*25:.Assume \$/2
 END
 
 run_nok("$exec $test.asm > $test.out 2>&1");
