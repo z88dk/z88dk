@@ -9,5 +9,5 @@ ld a,25
 assemble test_t_label.asm to test_t_label.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-
 error: assembly failed for file: test_t_label.asm
+

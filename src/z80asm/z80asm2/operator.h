@@ -62,7 +62,7 @@ struct OperatorInfo {
 
 class OperatorTable {
 public:
-    static const OperatorInfo& get_info(Operator op);
+    static const OperatorInfo* get_info(Operator op);
 
 private:
     static const unordered_map<Operator, OperatorInfo> table;

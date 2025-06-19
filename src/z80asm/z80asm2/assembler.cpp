@@ -18,47 +18,60 @@
 #include <cassert>
 using namespace std;
 
-bool Assembler::assemble_file(const string& filename) {
-    bool ok = true;
+Assembler* g_assembler{ nullptr };
 
-    init(filename);
-    g_obj_module->define_global_defs();
-    g_obj_module->define_cpu_defs(g_options->cpu_id());
-
-    if (ok && !parse())
-        ok = false;
-
-    if (ok)
-        g_obj_module->expand_jrs();
-
-    if (ok && has_undefined_symbols())
-        ok = false;
-
-    if (ok && !resolve_local_exprs())
-        ok = false;
-
-    if (ok && !g_obj_module->write_file(m_filename))
-        ok = false;
-
-    if (g_options->verbose() && ok)
-        cout << "assembled " << m_filename << " to " << m_obj_filename << endl;
-
-    if (g_options->verbose())
-        cout << endl;
-
-    return ok;
-}
-
-void Assembler::init(const string& filename) {
-    m_filename = filename;
-    m_obj_filename = replace_extension(filename, ".o");
-
-    if (g_options->verbose())
-        cout << "assemble " << m_filename << " to " << m_obj_filename << endl;
+void Assembler::clear() {
+    m_asm_filename.clear();
+    m_obj_filename.clear();
+    m_pass = Pass::NOT_ASSEMBLING;
 
     g_preproc->clear();
     g_obj_module->clear();
+}
+
+void Assembler::assemble_file(const string& filename) {
+    init(filename);
+
+    if (g_options->verbose())
+        cout << "assemble " << m_asm_filename << " to " << m_obj_filename << endl;
+
+    if (assemble()) {
+        if (g_options->verbose())
+            cout << "assembled " << m_asm_filename << " to " << m_obj_filename << endl;
+    } else {
+        g_error->error_assembly_failed(filename);
+    }
+
+    if (g_options->verbose())
+        cout << endl;
+}
+
+void Assembler::init(const string& filename) {
+    clear();
+    m_asm_filename = filename;
+    m_obj_filename = replace_extension(filename, ".o");
     g_input_files->push_file(filename);
+}
+
+bool Assembler::assemble() {
+    // during pass 1, the addresses are not final
+    m_pass = Pass::PASS1;
+    g_obj_module->define_global_defs();
+    g_obj_module->define_cpu_defs(g_options->cpu_id());
+    if (!parse())
+        return false;
+    g_obj_module->expand_jrs();
+
+    // set pass to 2 after addresses are final
+    m_pass = Pass::PASS2;
+    if (has_undefined_symbols())
+        return false;
+    resolve_local_exprs();
+    if (!g_obj_module->write_file(m_obj_filename))
+        return false;
+
+    m_pass = Pass::NOT_ASSEMBLING;
+    return true;
 }
 
 bool Assembler::parse() {
@@ -81,6 +94,6 @@ bool Assembler::has_undefined_symbols() {
 }
 
 // resolve expressions that are local to the current module
-bool Assembler::resolve_local_exprs() {
-    return false;
+void Assembler::resolve_local_exprs() {
+    g_obj_module->resolve_local_exprs();
 }

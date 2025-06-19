@@ -45,20 +45,22 @@ enum class PatchType {
 
 class Patch {
 public:
-    Patch(PatchType patch_type, Expr* expr, int offset);
+    Patch(Instr* parent, PatchType patch_type, Expr* expr, int offset);
     Patch(const Patch& other) = delete;
     virtual ~Patch();
     Patch& operator=(const Patch& other) = delete;
 
+    Instr* parent() const { return m_parent; }
     PatchType patch_type() const { return m_patch_type; }
     void set_patch_type(PatchType patch_type) { m_patch_type = patch_type; }
     Expr* expr() { return m_expr; }
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
     int size() const;
-    int resolve(int value) const;
+    void resolve(int value);
 
 private:
+    Instr* m_parent{ nullptr };
     PatchType m_patch_type;
     Expr* m_expr;
     int m_offset;
@@ -73,6 +75,7 @@ public:
     virtual ~Instr();
     Instr& operator=(const Instr& other) = delete;
 
+    Section* parent() const { return m_parent; }
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
     uint8_t* data() { return m_bytes.data(); }
@@ -81,9 +84,11 @@ public:
     const Location& location() const { return m_location; }
 
     void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
+    void patch_byte(int index, uint8_t byte);
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
     void expand_jr();
+    void resolve_local_exprs();
 
 private:
     Section* m_parent{ nullptr };
@@ -119,6 +124,7 @@ public:
 
     void expand_jrs();
     void recompute_offsets();
+    void resolve_local_exprs();
 
 private:
     ObjModule* m_parent{ nullptr };
@@ -147,6 +153,7 @@ public:
     void define_cpu_defs(Cpu cpu_id);
     void expand_jrs();
     bool has_undefined_symbols() const;
+    void resolve_local_exprs() const;
 
     void add_global_def(const string& name, int value = 1);
     void add_label(const string& name);

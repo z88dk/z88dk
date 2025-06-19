@@ -55,7 +55,12 @@ enum class Keyword {
     BINARY,
     C,
     C_LINE,
+    DEFB,
+    DEFC,
     DEFINE,
+    DEFP,
+    DEFQ,
+    DEFW,
     EQU,
     INCBIN,
     INCLUDE,
@@ -74,8 +79,11 @@ Keyword lookup_keyword(const string& text);
 
 class Token {
 public:
-    Token() {}
+    Token() = default;
+    Token(const Token& other) = default;
+    Token& operator=(const Token& other) = default;
     Token(TType ttype, bool blank_before);
+
     TType ttype() const { return m_ttype; }
     bool blank_before() const { return m_blank_before; }
 

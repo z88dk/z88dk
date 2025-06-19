@@ -43,10 +43,10 @@ const unordered_map<Operator, OperatorInfo> OperatorTable::table = {
 };
 
 void do_operator(Operator op, stack<int>& operands) {
-    const OperatorInfo& op_info = OperatorTable::get_info(op);
+    const OperatorInfo* op_info = OperatorTable::get_info(op);
     int x1 = 0, x2 = 0, x3 = 0;
 
-    switch (op_info.arity) {
+    switch (op_info->arity) {
     case Arity::Unary:
         if (operands.size() < 1) {
             g_error->error_insufficient_operands(to_string(op));
@@ -161,10 +161,9 @@ string to_string(Operator op) {
         return it->second;
 }
 
-const OperatorInfo& OperatorTable::get_info(Operator op) {
+const OperatorInfo* OperatorTable::get_info(Operator op) {
     auto it = table.find(op);
     if (it == table.end())
         assert(false && "Unknown operator");
-    return it->second;
+    return &it->second;
 }
-
