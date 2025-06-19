@@ -28,6 +28,7 @@ using namespace std;
 static void create_globals() {
     g_cpu_table = new CpuTable();
     g_location = new Location();
+    g_source_text = new SourceText();
     g_error = new Error();
     g_input_files = new InputFiles();
     g_global_defines = new Symtab();
@@ -54,6 +55,9 @@ static void delete_globals() {
 
     delete g_error;
     g_error = nullptr;
+
+    delete g_source_text;
+    g_source_text = nullptr;
 
     delete g_location;
     g_location = nullptr;

@@ -48,8 +48,7 @@ void InputFiles::pop_file() {
     }
     else {
         file = m_files.back();
-        g_location->set_filename(file->filename);
-        g_location->set_line_num(file->line_num);
+        g_location->set(file->filename, file->line_num);
     }
 }
 
@@ -74,15 +73,15 @@ bool InputFiles::getline(string& line) {
                     line += cont;
                 }
             }
-            g_location->set_filename(file->filename);
-            g_location->set_line_num(file->line_num);
-            g_location->set_text(line);
+            g_location->set(file->filename, file->line_num);
+            g_source_text->set_text(line);
             return true;
         }
         else {
             pop_file();
         }
     }
+    g_source_text->clear();
     return false;
 }
 

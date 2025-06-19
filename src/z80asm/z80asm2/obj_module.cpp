@@ -71,18 +71,13 @@ int Patch::resolve(int value) const {
 
 Instr::Instr(Section* parent)
     : m_parent(parent) {
-    m_location.set_filename(g_location->filename());
-    m_location.set_line_num(g_location->line_num());
+    m_location = *g_location;
 }
 
 Instr::~Instr() {
     for (auto& patch : m_patches)
         delete patch;
     m_patches.clear();
-}
-
-Symtab* Instr::symtab() {
-    return m_parent->symtab();
 }
 
 void Instr::add_opcode(long long opcode) {

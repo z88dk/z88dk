@@ -28,10 +28,10 @@ void Error::output_message(const string& prefix, const string& message, const st
     if (!arg.empty())
         cerr << ": " << arg;
     cerr << endl;
-    if (!g_location->text().empty()) {
-        cerr << "  ^---- " << g_location->text() << endl;
-        if (!g_location->expanded_text().empty())
-            cerr << "    ^---- " << g_location->expanded_text() << endl;
+    if (!g_source_text->text().empty()) {
+        cerr << "  ^---- " << g_source_text->text() << endl;
+        if (!g_source_text->expanded_text().empty())
+            cerr << "    ^---- " << g_source_text->expanded_text() << endl;
     }
 }
 

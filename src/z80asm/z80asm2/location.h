@@ -7,36 +7,52 @@
 
 #pragma once
 
+#include "string_table.h"
 #include <string>
 using namespace std;
 
 class Location {
 public:
     Location(const string& filename = "", int line_num = 0);
+    Location(const Location& other);
+    Location& operator=(const Location& other);
     void clear();
-    void clear_text();
     bool empty() const;
 
     bool operator==(const Location& other) const;
     bool operator!=(const Location& other) const { return !(*this == other); }
 
-    const string& filename() const { return m_filename; }
+    const string& filename() const { return m_str_table.get_string(m_filename_id); }
     int line_num() const { return m_line_num; }
-    const string& text() const { return m_text; }
-    const string& expanded_text() const { return m_expanded_text; }
 
+    void set(const string& filename, int line_num);
     void set_filename(const string& filename);
     void set_line_num(int line_num);
     void inc_line_num();
-    void set_text(const string& text);
-    void set_expanded_text(const string& expanded_text);
 
 private:
-    string m_filename;
-    int m_line_num;
-    string m_text;
-    string m_expanded_text;
+    int m_filename_id{ 0 };
+    int m_line_num{ 0 };
+
+    static StringTable m_str_table;
 };
 
 extern Location* g_location;
 
+class SourceText {
+public:
+    SourceText() = default;
+    void clear();
+    void clear_expanded_text();
+    const string& text() const { return m_text; }
+    const string& expanded_text() const { return m_expanded_text; }
+
+    void set_text(const string& text);
+    void set_expanded_text(const string& expanded_text);
+
+private:
+    string m_text;
+    string m_expanded_text;
+};
+
+extern SourceText* g_source_text;

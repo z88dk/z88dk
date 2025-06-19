@@ -107,13 +107,16 @@ bool Preproc::getline(string& line) {
     line.clear();
     while (true) {
         if (m_expanded_lines.empty()) {
+            g_source_text->clear_expanded_text();
             return false;
         }
         else {
             line = m_expanded_lines.front();
             m_expanded_lines.pop_front();
-            if (!line.empty())
+            if (!line.empty()) {
+                g_source_text->set_expanded_text(line);
                 return true;
+            }
         }
     }
 }
@@ -132,12 +135,10 @@ void Preproc::preproc_only(const string& filename) {
         g_preproc->expand(line);
         string expanded_line;
         while (g_preproc->getline(expanded_line)) {
-            g_location->set_expanded_text(expanded_line);
             if (location != *g_location) {
                 cout << "LINE " << g_location->line_num()
                     << " \"" << g_location->filename() << "\"" << endl;
-                location.set_filename(g_location->filename());
-                location.set_line_num(g_location->line_num());
+                location = *g_location;
             }
             cout << expanded_line << endl;
             location.inc_line_num();
