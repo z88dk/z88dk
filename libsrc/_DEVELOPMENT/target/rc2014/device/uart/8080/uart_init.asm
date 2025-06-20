@@ -26,11 +26,11 @@ PUBLIC _uart_init
     out (__IO_UARTA_DLM_REGISTER),a         ; write it to UART A DLM register
     in a,(__IO_UARTA_DLM_REGISTER)          ; read it back
 
-    rrca
+    cpl
     out (__IO_UARTA_SCRATCH_REGISTER),a     ; write it to UART A SCRATCH register
     in a,(__IO_UARTA_SCRATCH_REGISTER)      ; read it back
 
-    rlca
+    cpl
     cp $a5
     jp NZ,uart_enable_b                     ; doesn't exist, try UART B
 
@@ -49,15 +49,15 @@ PUBLIC _uart_init
     ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTA_FCR_REGISTER),a
 
-    ; set up modem control register to enable auto flow control, interrupt line, and RTS
-    ld a,__IO_UART_MCR_AUTO_FLOW_CONTROL|__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS|__IO_UART_MCR_DTR
-    out (__IO_UARTA_MCR_REGISTER),a
-
     call _uarta_flush_rx                    ; clear the software receive buffer
 
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI
     out (__IO_UARTA_IER_REGISTER),a
+
+    ; set up modem control register to enable interrupt line, and RTS + DTR
+    ld a,__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS|__IO_UART_MCR_DTR
+    out (__IO_UARTA_MCR_REGISTER),a
 
     ; set the control flag, to signal that this channel exists
     ld a,__IO_UARTA_DATA_REGISTER
@@ -78,11 +78,11 @@ PUBLIC _uart_init
     out (__IO_UARTB_DLM_REGISTER),a         ; write it to UART B DLM register
     in a,(__IO_UARTB_DLM_REGISTER)          ; read it back
 
-    rrca
+    cpl
     out (__IO_UARTB_SCRATCH_REGISTER),a     ; write it to UART B SCRATCH register
     in a,(__IO_UARTB_SCRATCH_REGISTER)      ; read it back
 
-    rlca
+    cpl
     cp $a5
     ret NZ                                  ; doesn't exist, just return
 
@@ -97,19 +97,19 @@ PUBLIC _uart_init
     ld a,__IO_UART_LCR_STOP|__IO_UART_LCR_8BIT  ; default to 8n2
     out (__IO_UARTB_LCR_REGISTER),a             ; output to LCR
 
+    call _uartb_flush_rx                    ; clear the software receive buffer
+
     ; enable and reset the FIFOs
     ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTB_FCR_REGISTER),a
 
-    ; set up modem control register to enable auto flow control, interrupt line, and RTS
-    ld a,__IO_UART_MCR_AUTO_FLOW_CONTROL|__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS|__IO_UART_MCR_DTR
-    out (__IO_UARTB_MCR_REGISTER),a
-
-    call _uartb_flush_rx                    ; clear the software receive buffer 
-
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI
     out (__IO_UARTB_IER_REGISTER),a
+
+    ; set up modem control register to enable interrupt line, and RTS + DTR
+    ld a,__IO_UART_MCR_INT_ENABLE|__IO_UART_MCR_RTS|__IO_UART_MCR_DTR
+    out (__IO_UARTB_MCR_REGISTER),a
 
     ; set the control flag, to signal that this channel exists
     ld a,__IO_UARTB_DATA_REGISTER

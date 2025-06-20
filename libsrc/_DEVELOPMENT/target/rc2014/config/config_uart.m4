@@ -85,7 +85,7 @@ define(`__IO_UART_LCR_DLAB', 0x80)              # Divisor Latch Access Bit DLAB
 define(`__IO_UART_MCR_DTR', 0x01)
 define(`__IO_UART_MCR_RTS', 0x02)
 define(`__IO_UART_MCR_OUTPUT1', 0x04)
-define(`__IO_UART_MCR_INT_ENABLE', 0x08)        # Enable Interrupt & Output
+define(`__IO_UART_MCR_INT_ENABLE', 0x08)        # Global Interrupt Enable
 define(`__IO_UART_MCR_LOOPBACK', 0x10)          # Loopback Test
 define(`__IO_UART_MCR_AUTO_FLOW_CONTROL', 0x20) # Auto Flow Control Enable AFE
 
