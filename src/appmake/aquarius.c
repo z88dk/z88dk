@@ -26,6 +26,8 @@ static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
 static char              aqex         = 0;
+static int               page         = 0;
+static int               exec         = -1;
 static char              aqx          = 0;
 static int				 origin       = -1;
 
@@ -44,6 +46,8 @@ option_t aquarius_options[] = {
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "aqex",     "Output .aqex file for Aquarius+",  OPT_BOOL,  &aqex },
+    {  0,  "page",     "Page number to load to when --aqex is specified", OPT_INT, &page},
+    {  0,  "exec",     "Specify execution address when --aqex is specified", OPT_INT, &exec},
     {  0,  "aqx",      "Output .aqx file for Aquarius+",   OPT_BOOL,  &aqx },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
@@ -228,22 +232,39 @@ int aquarius_exec(char *target)
 			}
 
 			if (aqex) {
-				// Generate the .aqx header
-				writestring("AQPLUSEXEC", fpout);
+				char *basename = zbasename(filename);
+				writestring("AQPLUS", fpout);	// file header
+				// 64 byte resource header
+				writestring("EXEC", fpout);	// resource type
+				writelong(len,fpout);		// program length
+				// 16 byte resource ID
+				// use filename as resource ID
+				// but truncate to 16 bytes
+				// and pad with 0x00
+				for (i=0;i<16&&i<strlen(basename);i++)
+					writebyte(basename[i],fpout);
+				for (;i<16;i++)
+					writebyte(0x00,fpout);
 				writeword(loadAddr,fpout);	// load address
-				writeword(len,fpout);		// length
-				writeword(loadAddr,fpout);	// exec address
+				if (exec != -1)
+					writeword(exec,fpout);	// exec address
+				else
+					writeword(loadAddr,fpout);	// exec address
+				writebyte(page,fpout);		// page #
+				// padding
+				for (i=0;i<35;i++)
+					writebyte(0x00,fpout);
 			} else {
 				char execAddrStr[16];
 				sprintf(execAddrStr, "($%04x)", loadAddr);
 
 				/* Write out the header  */
-				for	(i=1;i<=12;i++)
+				for (i=1;i<=12;i++)
 					writebyte(0xff,fpout);
 				writebyte(0x00,fpout);
 				writestring("LOADR",fpout);
 				writebyte(0x00,fpout);
-				for	(i=1;i<=12;i++)
+				for (i=1;i<=12;i++)
 					writebyte(0xff,fpout);
 				writebyte(0x00,fpout);
 
