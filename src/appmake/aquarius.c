@@ -27,6 +27,7 @@ static char              loud         = 0;
 static char              help         = 0;
 static char              aqex         = 0;
 static int               page         = 0;
+static int               exec         = -1;
 static char              aqx          = 0;
 static int				 origin       = -1;
 
@@ -46,6 +47,7 @@ option_t aquarius_options[] = {
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "aqex",     "Output .aqex file for Aquarius+",  OPT_BOOL,  &aqex },
     {  0,  "page",     "Page number to load to when --aqex is specified", OPT_INT, &page},
+    {  0,  "exec",     "Specify execution address when --aqex is specified", OPT_INT, &exec},
     {  0,  "aqx",      "Output .aqx file for Aquarius+",   OPT_BOOL,  &aqx },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
@@ -244,7 +246,10 @@ int aquarius_exec(char *target)
 				for (;i<16;i++)
 					writebyte(0x00,fpout);
 				writeword(loadAddr,fpout);	// load address
-				writeword(loadAddr,fpout);	// exec address
+				if (exec != -1)
+					writeword(exec,fpout);	// exec address
+				else
+					writeword(loadAddr,fpout);	// exec address
 				writebyte(page,fpout);		// page #
 				// padding
 				for (i=0;i<35;i++)
