@@ -17,7 +17,7 @@
     EXTERN  generic_console_ioctl
     EXTERN  generic_console_cls
 
-    EXTERN  __mc1000_modeval
+    EXTERN  __mc6847_mode
     INCLUDE "ioctl.def"
 
 
@@ -25,7 +25,7 @@ clg:
 _clg:
 ansi_cls:
 _ansi_cls:
-    ld      a, (__mc1000_modeval)
+    ld      a, (__mc6847_mode)
     and     @00011100
     cp      @00011100
     jp      z, generic_console_cls

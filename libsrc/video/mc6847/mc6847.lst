@@ -1,1 +1,3 @@
-video/mc6847/colour_map
+video/mc6847/obj/${TARGET}/*.o
+video/mc6847/stdio/obj/${TARGET}/*.o
+video/mc6847/graphics/obj/${TARGET}/*.o
