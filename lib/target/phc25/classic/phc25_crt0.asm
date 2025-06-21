@@ -76,10 +76,18 @@ l_dcal:
 
 
     di
-    call    4863h ; 454eh
-    call    4775h ; 445fh
-    call    44deh ; 41d4h
+    ; ld      a,'*'
+    ; call    printc
+    ; call    4863h ; 454eh
+    ; ld      a,'/'
+    ; call    printc
+    ; call    4775h ; 445fh
+    ; ld      a,'+'
+    ; call    printc
+    ; call    44deh ; 41d4h
 
+    ld      hl,play
+    call    prints
     call    read_header_byte
 
 
@@ -131,6 +139,8 @@ read_header_byte:
     call    read_byte
     cp      $3a
     jr      nz, read_header_byte
+    call    printc
+    ld      c,0
     ret
 
 read_byte:
@@ -142,7 +152,35 @@ read_byte:
     ret
 
 cksum_error:
+    ld      hl,cksum
+    call    prints
     jr      cksum_error
+
+
+play:   defm    "Play Tape"
+        defb    0
+
+cksum:  defm    "Chekcsum error"
+        defb    0
+
+prints:
+    ld      a,(hl)
+    and     a
+    ret     z
+    call    printc
+    inc     hl
+    jr      prints
+
+printc:
+    push    hl
+    ld      hl,(vrampos)
+    ld      (hl),a
+    inc     hl
+    ld      (vrampos),hl
+    pop     hl
+    ret
+
+vrampos:    defw    $6080
 
 
     EXTERN	vpeek_noop
