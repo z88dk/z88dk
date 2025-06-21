@@ -110,22 +110,23 @@ my %keywords = (
 	LINE => "line",
 );
 
+# code is stored in obj-file, str is output by z80nm
 my %patches = (
-    NONE    => { id => 0,  size => 0, code => "" },
-    JR      => { id => 1,  size => 1, code => "J" },
-    N       => { id => 2,  size => 1, code => "U" },
-    D       => { id => 3,  size => 1, code => "S" },
-    NN      => { id => 4,  size => 2, code => "W" },
-    NN_BE   => { id => 5,  size => 2, code => "B" },
-    NNNN    => { id => 6,  size => 4, code => "L" },
-    N2NN    => { id => 7,  size => 2, code => "u" },
-    D2DD    => { id => 8,  size => 2, code => "s" },
-    NNN     => { id => 9,  size => 3, code => "p" },
-    HOFFSET => { id => 10, size => 1, code => "H" },
-    ASSIGN  => { id => 11, size => 0, code => "=" },
-    JRE     => { id => 12, size => 2, code => "j" },
-    N2NNN   => { id => 13, size => 3, code => "v" },
-    D2DDD   => { id => 14, size => 3, code => "t" },
+    UNDEFINED				=> { id => 0,  size => -1,code => "?", str => "?" },
+    JR_OFFSET  				=> { id => 1,  size => 1, code => "J", str => "J" },	# 8-bit relative offset for JR
+    BYTE_UNSIGNED   		=> { id => 2,  size => 1, code => "U", str => "U" },	# unsigned byte
+    BYTE_SIGNED				=> { id => 3,  size => 1, code => "S", str => "S" },	# signed byte
+    WORD      				=> { id => 4,  size => 2, code => "C", str => "W" },	# 16-bit value little-endian
+    WORD_BE   				=> { id => 5,  size => 2, code => "B", str => "B" },	# 16-bit value big-endian
+    DWORD    				=> { id => 6,  size => 4, code => "L", str => "L" },	# 32-bit signed
+    BYTE_TO_WORD_UNSIGNED	=> { id => 7,  size => 2, code => "u", str => "u" },	# unsigned byte extended to 16 bits
+    BYTE_TO_WORD_SIGNED		=> { id => 8,  size => 2, code => "s", str => "s" },	# signed byte sign-extended to 16 bits
+    PTR24     				=> { id => 9,  size => 3, code => "P", str => "P" },	# 24-bit pointer
+    HIGH_OFFSET				=> { id => 10, size => 1, code => "H", str => "H" },	# byte offset to 0xFF00
+    ASSIGNMENT 				=> { id => 11, size => 0, code => "=", str => "=" },	# DEFC expression assigning a symbol
+    JRE_OFFSET 				=> { id => 12, size => 2, code => "j", str => "j" },	# 16-bit relative offset for JRE
+    BYTE_TO_PTR_UNSIGNED	=> { id => 13, size => 3, code => "v", str => "v" },	# unsigned byte extended to 24 bits
+    BYTE_TO_PTR_SIGNED		=> { id => 14, size => 3, code => "t", str => "t" },	# signed byte sign-extended to 24 bits
 );
 
 my %cpus = (
@@ -369,12 +370,20 @@ sub patch_file {
 				shift @in;
 			}
 		}
-		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch\b/) {
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*range_t\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			push @out, "${prefix}NONE = 0,\n";      # NONE must be id 0
-			for (sort keys %{$grammar->{patches}}) {
-				next if $_ eq 'NONE';
+			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
+				push @out, $prefix."RANGE_$_ = ".$grammar->{patches}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+        }
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch_type\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
 				push @out, "$prefix$_ = ".$grammar->{patches}{$_}{id}.",\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
@@ -384,9 +393,21 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch_sizes\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			for (sort keys %{$grammar->{patches}}) {
-				next if $_ eq 'NONE';
+			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
 				push @out, $prefix."{ PatchType::".$_.", ".$grammar->{patches}{$_}{size}." },\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+        }
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*range_lookup_t\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
+				push @out, $prefix."{ '".$grammar->{patches}{$_}{code}."', ".
+				           "\"".$grammar->{patches}{$_}{str}."\", ".
+						   $grammar->{patches}{$_}{size}." },".
+						   " // RANGE_$_ = ".$grammar->{patches}{$_}{id}."\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;

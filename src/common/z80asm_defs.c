@@ -313,21 +313,23 @@ sym_type_t sym_type_ofile_code(int code) {
 //-----------------------------------------------------------------------------
 
 static range_lookup_t range_lu[] = {
-    { INT_MAX,  "?",    -1 },     // RANGE_UNDEFINED
-    { 'J',      "J",    1 },      // RANGE_JR_OFFSET
-    { 'U',      "U",    1 },      // RANGE_BYTE_UNSIGNED
-    { 'S',      "S",    1 },      // RANGE_BYTE_SIGNED
-    { 'C',      "W",    2 },      // RANGE_WORD
-    { 'B',      "B",    2 },      // RANGE_WORD_BE
-    { 'L',      "L",    4 },      // RANGE_DWORD
-    { 'u',      "u",    2 },      // RANGE_BYTE_TO_WORD_UNSIGNED
-    { 's',      "s",    2 },      // RANGE_BYTE_TO_WORD_SIGNED
-    { 'P',      "P",    3 },      // RANGE_PTR24
-    { 'H',      "H",    1 },      // RANGE_HIGH_OFFSET
-    { '=',      "=",    2 },      // RANGE_ASSIGNMENT
-    { 'j',      "j",    2 },      // RANGE_JRE_OFFSET
-    { 'v',      "v",    3 },      // RANGE_BYTE_TO_PTR_UNSIGNED
-    { 't',      "t",    3 },      // RANGE_BYTE_TO_PTR_SIGNED
+    //@@BEGIN: range_lookup_t
+    { '?', "?", -1 }, // RANGE_UNDEFINED = 0
+    { 'J', "J", 1 }, // RANGE_JR_OFFSET = 1
+    { 'U', "U", 1 }, // RANGE_BYTE_UNSIGNED = 2
+    { 'S', "S", 1 }, // RANGE_BYTE_SIGNED = 3
+    { 'C', "W", 2 }, // RANGE_WORD = 4
+    { 'B', "B", 2 }, // RANGE_WORD_BE = 5
+    { 'L', "L", 4 }, // RANGE_DWORD = 6
+    { 'u', "u", 2 }, // RANGE_BYTE_TO_WORD_UNSIGNED = 7
+    { 's', "s", 2 }, // RANGE_BYTE_TO_WORD_SIGNED = 8
+    { 'P', "P", 3 }, // RANGE_PTR24 = 9
+    { 'H', "H", 1 }, // RANGE_HIGH_OFFSET = 10
+    { '=', "=", 0 }, // RANGE_ASSIGNMENT = 11
+    { 'j', "j", 2 }, // RANGE_JRE_OFFSET = 12
+    { 'v', "v", 3 }, // RANGE_BYTE_TO_PTR_UNSIGNED = 13
+    { 't', "t", 3 }, // RANGE_BYTE_TO_PTR_SIGNED = 14
+    //@@END
 };
 
 // size of each range in object file
