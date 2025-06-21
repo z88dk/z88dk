@@ -149,7 +149,6 @@ int phc25_exec(char *target)
     int      bootlen;
     long     pos;
     int      len;
-    int      bootstrap = 1;
 
     if ( help )
         return -1;
@@ -174,10 +173,6 @@ int phc25_exec(char *target)
     }
 
 
-    if (parameter_search(crtfile, ".map", "__phc25_bootstrap_built") > 0) {
-        bootstrap = 1;
-    }
-
 
 
    if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
@@ -200,7 +195,7 @@ int phc25_exec(char *target)
 
     write_header(fpout, "PROG  ");
     
-    if ( bootstrap ) {
+    if ( 1 ) {
         char  bootname[FILENAME_MAX+1];
 
         strcpy(bootname, binname);
@@ -295,7 +290,7 @@ static void write_loader(FILE *fpout, int bootstrap_org, FILE *bootstrap, int bo
     fprintf(fpout,"%c", 0x00); // End marker
     fprintf(fpout,"%c%c%c%c", 0xff, 0xff, 0xff, 0xff); // End of tape
 
-    for ( int  i = 0; i < 17; i++ ) {
+    for ( int  i = 0; i < 18; i++ ) {
         fputc(0, fpout);
     }
 }
