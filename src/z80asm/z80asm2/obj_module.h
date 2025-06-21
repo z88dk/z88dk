@@ -22,22 +22,22 @@ class Section;
 // Patch Type
 
 enum class PatchType {
-    //@@BEGIN: patch
-    NONE = 0,
-    ASSIGN = 11,
-    D = 3,
-    D2DD = 8,
-    D2DDD = 14,
-    HOFFSET = 10,
-    JR = 1,
-    JRE = 12,
-    N = 2,
-    N2NN = 7,
-    N2NNN = 13,
-    NN = 4,
-    NNN = 9,
-    NNNN = 6,
-    NN_BE = 5,
+    //@@BEGIN: patch_type
+    UNDEFINED = 0,
+    JR_OFFSET = 1,
+    BYTE_UNSIGNED = 2,
+    BYTE_SIGNED = 3,
+    WORD = 4,
+    WORD_BE = 5,
+    DWORD = 6,
+    BYTE_TO_WORD_UNSIGNED = 7,
+    BYTE_TO_WORD_SIGNED = 8,
+    PTR24 = 9,
+    HIGH_OFFSET = 10,
+    ASSIGNMENT = 11,
+    JRE_OFFSET = 12,
+    BYTE_TO_PTR_UNSIGNED = 13,
+    BYTE_TO_PTR_SIGNED = 14,
     //@@END
 };
 
