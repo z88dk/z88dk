@@ -197,21 +197,23 @@ extern sym_type_t sym_type_ofile_code(int code);
 //-----------------------------------------------------------------------------
 
 typedef enum {
-    RANGE_UNDEFINED             = 0,    // 
-    RANGE_JR_OFFSET             = 1,    // "J"
-    RANGE_BYTE_UNSIGNED         = 2,    // "U"
-    RANGE_BYTE_SIGNED           = 3,    // "S"
-    RANGE_WORD                  = 4,    // "W"  // 16-bit value little-endian
-    RANGE_WORD_BE               = 5,    // "B"  // 16-bit value big-endian
-    RANGE_DWORD                 = 6,    // "L"  // 32-bit signed
-    RANGE_BYTE_TO_WORD_UNSIGNED = 7,    // "u"  // unsigned byte extended to 16 bits
-    RANGE_BYTE_TO_WORD_SIGNED   = 8,    // "s"  // signed byte sign-extended to 16 bits
-    RANGE_PTR24                 = 9,    // "P"  // 24-bit pointer
-    RANGE_HIGH_OFFSET           = 10,   // "H"  // byte offset to 0xFF00
-    RANGE_ASSIGNMENT            = 11,   // "="  // DEFC expression assigning a symbol
-    RANGE_JRE_OFFSET            = 12,   // "j"  // 16-bit relative offset for JRE
-    RANGE_BYTE_TO_PTR_UNSIGNED  = 13,   // "v"  // unsigned byte extended to 24 bits
-    RANGE_BYTE_TO_PTR_SIGNED    = 14,   // "t"  // signed byte sign-extended to 24 bits
+    //@@BEGIN: range_t
+    RANGE_UNDEFINED = 0,
+    RANGE_JR_OFFSET = 1,
+    RANGE_BYTE_UNSIGNED = 2,
+    RANGE_BYTE_SIGNED = 3,
+    RANGE_WORD = 4,
+    RANGE_WORD_BE = 5,
+    RANGE_DWORD = 6,
+    RANGE_BYTE_TO_WORD_UNSIGNED = 7,
+    RANGE_BYTE_TO_WORD_SIGNED = 8,
+    RANGE_PTR24 = 9,
+    RANGE_HIGH_OFFSET = 10,
+    RANGE_ASSIGNMENT = 11,
+    RANGE_JRE_OFFSET = 12,
+    RANGE_BYTE_TO_PTR_UNSIGNED = 13,
+    RANGE_BYTE_TO_PTR_SIGNED = 14,
+    //@@END
 } range_t;
 
 // size of each range in object file
