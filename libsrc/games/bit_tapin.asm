@@ -157,10 +157,14 @@ TAPIN_STARTBIT_0:
 ;------------------ Target specific section --------------------
 ; ZX Spectrum, SAM, TS2068, etc..
   IF    (TAPEIN_ONEBIT_port=$FE)
+  IF    FORzx81
+    OUT     ($FF), A
+  ELSE
     AND     $07
 	;OR      $09
     OR      $0A                         ; Changing the output mask we may alter the color of the data being loaded
     OUT     ($FE), A
+  ENDIF
   ENDIF
 
   IF    FORaquarius
@@ -245,9 +249,13 @@ TAPIN_PERIOD_1:
 ;------------------ Target specific section --------------------
 ; ZX Spectrum, SAM, TS2068, etc..
   IF    (TAPEIN_ONEBIT_port=$FE)
+  IF    FORzx81
+    OUT     ($FF), A
+  ELSE
     AND     $07
     OR      $09
     OUT     ($FE), A
+  ENDIF
   ENDIF
 
   IF    FORaquarius
