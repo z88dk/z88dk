@@ -222,12 +222,11 @@ void error_illegal_cpu(const char* filename, cpu_t got_cpu_id) {
 }
 
 static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
-    switch (swap_ixiy) {
-    case IXIY_NO_SWAP: return "(no option)";
-    case IXIY_SWAP: return "-IXIY";
-    case IXIY_SOFT_SWAP: return "-IXIY-soft";
-    default: xassert(0); return "";
-    }
+    const char* swap_ixiy_option = ixiy_text(swap_ixiy);
+    if (*swap_ixiy_option)
+        return swap_ixiy_option;
+    else
+        return "(no option)";
 }
 
 void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy) {

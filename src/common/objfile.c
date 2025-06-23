@@ -792,12 +792,10 @@ void objfile_read(objfile_t* obj, FILE* fp)
         else
             printf("  CPU:  (invalid %d) ", obj->cpu_id);
 
-        switch (obj->swap_ixiy) {
-        case IXIY_NO_SWAP: break;
-        case IXIY_SWAP: printf("(-IXIY)"); break;
-        case IXIY_SOFT_SWAP: printf("(-IXIY-soft)"); break;
-        default: xassert(0);
-        }
+        const char* swap_ixiy_option = ixiy_text(obj->swap_ixiy);
+        if (*swap_ixiy_option)
+            printf("(%s)", swap_ixiy_option);
+
         printf("\n");
     }
 

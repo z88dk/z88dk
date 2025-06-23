@@ -198,9 +198,9 @@ my %config = (
 );
 
 my %swap_ixiy = (
-    NO_SWAP		=> { id => 0 },	# no swap
-    SWAP		=> { id => 1 },	# swap IX and IY
-    SOFT_SWAP	=> { id => 2 },	# swap IX and IY, but save object file with no swap
+    NO_SWAP		=> { id => 0, text => "" 			},	# no swap
+    SWAP		=> { id => 1, text => "-IXIY" 		},	# swap IX and IY
+    SOFT_SWAP	=> { id => 2, text => "-IXIY-soft" 	},	# swap IX and IY, but save object file with no swap
 );
 
 #-------------------------------------------------------------------------------
@@ -605,6 +605,16 @@ sub patch_file {
 			push @out, $_;
 			for (sort {$grammar->{swap_ixiy}{$a}{id} <=> $grammar->{swap_ixiy}{$b}{id}} keys %{$grammar->{swap_ixiy}}) {
 				push @out, $prefix."IXIY_$_ = ".$grammar->{swap_ixiy}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*swap_ixiy_lu\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{swap_ixiy}{$a}{id} <=> $grammar->{swap_ixiy}{$b}{id}} keys %{$grammar->{swap_ixiy}}) {
+				push @out, $prefix.c_string($grammar->{swap_ixiy}{$_}{text}),", // IXIY_$_ = ".$grammar->{swap_ixiy}{$_}{id}."\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;

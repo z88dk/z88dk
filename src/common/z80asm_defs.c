@@ -225,6 +225,20 @@ bool cpu_compatible(cpu_t code_cpu_id, cpu_t lib_cpu_id) {
     return false;
 }
 
+const char* ixiy_text(swap_ixiy_t swap_ixiy) {
+    static const char* swap_ixiy_lu[] = {
+        //@@BEGIN: swap_ixiy_lu
+        "", // IXIY_NO_SWAP = 0
+        "-IXIY", // IXIY_SWAP = 1
+        "-IXIY-soft", // IXIY_SOFT_SWAP = 2
+        //@@END
+    };
+    int id = (int)swap_ixiy;
+    xassert(id >= 0 && id < sizeof(swap_ixiy_lu) / sizeof(swap_ixiy_lu[0])
+            && "Invalid swap_ixiy_t");
+    return swap_ixiy_lu[id];
+}
+
 // linking with no-swap accepts object files assembled with soft-swap
 bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy) {
     if (code_swap_ixiy == IXIY_NO_SWAP && lib_swap_ixiy == IXIY_SOFT_SWAP)

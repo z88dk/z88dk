@@ -86,6 +86,7 @@ typedef enum {
     //@@END
 } swap_ixiy_t;
 
+extern const char* ixiy_text(swap_ixiy_t swap_ixiy);
 extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy);
 
 //-----------------------------------------------------------------------------
