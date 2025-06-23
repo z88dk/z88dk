@@ -52,11 +52,18 @@ public:
     Patch& operator=(const Patch& other) = delete;
 
     Instr* parent() const { return m_parent; }
+
     PatchType patch_type() const { return m_patch_type; }
     void set_patch_type(PatchType patch_type) { m_patch_type = patch_type; }
+
     Expr* expr() { return m_expr; }
+
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
+
+    const string& target_name() { return m_target_name; }
+    void set_target_name(const string& name) { m_target_name = name; }
+
     int size() const;
     void resolve(int value);
 
@@ -65,6 +72,7 @@ private:
     PatchType m_patch_type;
     Expr* m_expr;
     int m_offset;
+    string m_target_name;
 };
 
 // Instr
