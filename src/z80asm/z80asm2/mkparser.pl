@@ -111,7 +111,7 @@ my %keywords = (
 );
 
 # code is stored in obj-file, str is output by z80nm
-my %patches = (
+my %range = (
     UNDEFINED				=> { id => 0,  size => -1,code => "?", str => "?" },
     JR_OFFSET  				=> { id => 1,  size => 1, code => "J", str => "J" },	# 8-bit relative offset for JR
     BYTE_UNSIGNED   		=> { id => 2,  size => 1, code => "U", str => "U" },	# unsigned byte
@@ -180,6 +180,12 @@ my %type = (
     COMPUTED   => { id => 3, },	# "=" - depends on the result of an expression
 );
 
+my %config = (
+	OBJ_FILE_VERSION	=> 18,
+	OBJ_FILE_SIGNATURE	=> c_string("Z80RMF"),
+	LIB_FILE_SIGNATURE	=> c_string("Z80LMF"),
+);
+	
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
@@ -229,12 +235,14 @@ sub parse_grammar {
 	$grammar = { tokens => \%tokens,
                  keywords => \%keywords,
                  operators => \%operators,
-                 patches => \%patches, 
+                 range => \%range, 
 				 rules => \@rules,
                  actions => \@actions,
 				 cpus => \%cpus,
 				 scope => \%scope,
-				 type => \%type };
+				 type => \%type,
+				 config => \%config, 
+	};
 }
 
 sub parse_grammar_rule {
@@ -277,6 +285,7 @@ sub patch_file {
 	
 	while (@in) {
 		$_ = shift(@in);
+		s/(\/\*\@\@CONFIG:\s*(\w+)\s*\*\/).*(\/\*\@\@END\s*\*\/)/$1 $grammar->{config}{$2} $3/;
 		if (/^(\s*)\/\/\@\@BEGIN:\s*ttype\b/) {
 			my $prefix = $1;
 			push @out, $_;
@@ -373,8 +382,8 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*range_t\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
-				push @out, $prefix."RANGE_$_ = ".$grammar->{patches}{$_}{id}.",\n";
+			for (sort {$grammar->{range}{$a}{id} <=> $grammar->{range}{$b}{id}} keys %{$grammar->{range}}) {
+				push @out, $prefix."RANGE_$_ = ".$grammar->{range}{$_}{id}.",\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -383,8 +392,8 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch_type\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
-				push @out, "$prefix$_ = ".$grammar->{patches}{$_}{id}.",\n";
+			for (sort {$grammar->{range}{$a}{id} <=> $grammar->{range}{$b}{id}} keys %{$grammar->{range}}) {
+				push @out, "$prefix$_ = ".$grammar->{range}{$_}{id}.",\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -393,8 +402,8 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*patch_sizes\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
-				push @out, $prefix."{ PatchType::".$_.", ".$grammar->{patches}{$_}{size}." },\n";
+			for (sort {$grammar->{range}{$a}{id} <=> $grammar->{range}{$b}{id}} keys %{$grammar->{range}}) {
+				push @out, $prefix."{ PatchType::".$_.", ".$grammar->{range}{$_}{size}." },\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -403,11 +412,11 @@ sub patch_file {
 		elsif (/^(\s*)\/\/\@\@BEGIN:\s*range_lookup_t\b/) {
 			my $prefix = $1;
 			push @out, $_;
-			for (sort {$grammar->{patches}{$a}{id} <=> $grammar->{patches}{$b}{id}} keys %{$grammar->{patches}}) {
-				push @out, $prefix."{ '".$grammar->{patches}{$_}{code}."', ".
-				           "\"".$grammar->{patches}{$_}{str}."\", ".
-						   $grammar->{patches}{$_}{size}." },".
-						   " // RANGE_$_ = ".$grammar->{patches}{$_}{id}."\n";
+			for (sort {$grammar->{range}{$a}{id} <=> $grammar->{range}{$b}{id}} keys %{$grammar->{range}}) {
+				push @out, $prefix."{ '".$grammar->{range}{$_}{code}."', ".
+				           "\"".$grammar->{range}{$_}{str}."\", ".
+						   $grammar->{range}{$_}{size}." },".
+						   " // RANGE_$_ = ".$grammar->{range}{$_}{id}."\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;
@@ -477,7 +486,7 @@ sub patch_file {
 				shift @in;
 			}
 		}
-		elsif (/^(\s*)\/\/\@\@BEGIN:\s*cpu_id_CPU\b/) {
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*cpu_t\b/) {
 			my $prefix = $1;
 			push @out, $_;
 			for (sort {$grammar->{cpus}{$a}{id} <=> $grammar->{cpus}{$b}{id}} keys %{$grammar->{cpus}}) {

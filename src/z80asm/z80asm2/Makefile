@@ -34,9 +34,9 @@ TARGET 		= $(BINDIR)/$(PROJ)$(EXESUFFIX)
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
 
-TEMPLATE_C	=                                                       ../../common/z80asm_defs.c
-TEMPLATE_CPP= token.cpp operator.cpp obj_module.cpp line_parser.cpp                            cpu.cpp symbol.cpp
-TEMPLATE_H	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/z80asm_defs.h cpu.h   symbol.h
+TEMPLATE_C	=                                                       ../../common/z80asm_defs.c ../../common/objfile.c
+TEMPLATE_CPP= token.cpp operator.cpp obj_module.cpp line_parser.cpp                                                   cpu.cpp symbol.cpp
+TEMPLATE_H	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/z80asm_defs.h ../../common/objfile.h cpu.h   symbol.h
 DEPENDS		= $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRCS))
 
 CXX			?= g++

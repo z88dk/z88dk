@@ -137,6 +137,13 @@ private:
 
 class ObjModule {
 public:
+    static inline const int OBJ_FILE_VERSION =
+        /*@@CONFIG:OBJ_FILE_VERSION*/ 18 /*@@END*/;
+    static inline const string OBJ_FILE_SIGNATURE =
+        /*@@CONFIG:OBJ_FILE_SIGNATURE*/ "Z80RMF" /*@@END*/;
+    static inline const string LIB_FILE_SIGNATURE =
+        /*@@CONFIG:LIB_FILE_SIGNATURE*/ "Z80LMF" /*@@END*/;
+
     ObjModule();
     ObjModule(const ObjModule& other) = delete;
     virtual ~ObjModule();
