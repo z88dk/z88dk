@@ -48,7 +48,13 @@ ELSE
 ;
 ;TAPION:
 ;------------------ Target specific section --------------------
+  IF    FORzx81
+    extern zx_fast
+    call zx_fast
+    OUT     (0FFh), A                   ;   set output bit high
+  ELSE
     call    bit_open_di
+  ENDIF
 
   IF    FORlynx
     LD      A, $02                      ; MOTOR ON
@@ -83,7 +89,11 @@ ELSE
 
 ; ZX Spectrum, SAM, TS2068, etc..
   IF    (TAPEIN_ONEBIT_port=$FE)
+  IF    FORzx81
+    OUT     ($FF), A
+  ELSE
     out     ($FE), a
+  ENDIF
   ENDIF
 
   IF    FORaquarius

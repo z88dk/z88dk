@@ -50,9 +50,15 @@ ELSE
     ex      af, af
     ld      (13312), a                  ; restore border
   ENDIF
+
+  IF    FORzx81
+    extern zx_slow
+    jp zx_slow
+  ELSE
+    jp      bit_close_ei
+  ENDIF
 ;---------------------------------------------------------------
 
-    jp      bit_close_ei
 
 ;	pop hl		; on exit, keep __LOADLEN
 ;	RET
