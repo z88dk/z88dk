@@ -29,6 +29,9 @@ public:
     Cpu cpu_id() const { return m_cpu_id; }
     void set_cpu_id(Cpu id) { m_cpu_id = id; }
 
+    SwapIXIY swap_ixiy() const { return m_swap_ixiy; }
+    void set_swap_ixiy(SwapIXIY swap_ixiy) { m_swap_ixiy = swap_ixiy; }
+
     bool parsing_command_line() const { return m_parsing_command_line; }
     void set_parsing_command_line(bool f = true) { m_parsing_command_line = f; }
 
@@ -38,6 +41,7 @@ private:
     bool m_verbose{ false };
     bool m_preproc_only{ false };
     Cpu m_cpu_id{ Cpu::Z80 };
+    SwapIXIY m_swap_ixiy{ SwapIXIY::NO_SWAP };
     bool m_parsing_command_line{ true };
 };
 

@@ -475,4 +475,3 @@ string Scanner::to_string() const {
     }
     return result;
 }
-

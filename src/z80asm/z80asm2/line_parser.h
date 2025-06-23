@@ -70,6 +70,8 @@ private:
     void action_ld_a_comma_lparen_expr_rparen();
     void action_ld_a_comma_a();
     void action_ld_a_comma_b();
+    void action_ld_ix_comma_expr();
+    void action_ld_iy_comma_expr();
     //@@END
 
     bool parse_define();

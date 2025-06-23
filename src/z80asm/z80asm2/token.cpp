@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "options.h"
 #include "token.h"
 #include "utils.h"
 #include <unordered_map>
@@ -51,6 +52,8 @@ string to_string(Keyword keyword) {
     static unordered_map<Keyword, string> keywords = {
         //@@BEGIN: keyword_text
         { Keyword::A, "a" },
+        { Keyword::AIX, "aix" },
+        { Keyword::AIY, "aiy" },
         { Keyword::ASMPC, "asmpc" },
         { Keyword::ASSUME, "assume" },
         { Keyword::B, "b" },
@@ -66,6 +69,12 @@ string to_string(Keyword keyword) {
         { Keyword::EQU, "equ" },
         { Keyword::INCBIN, "incbin" },
         { Keyword::INCLUDE, "include" },
+        { Keyword::IX, "ix" },
+        { Keyword::IXH, "ixh" },
+        { Keyword::IXL, "ixl" },
+        { Keyword::IY, "iy" },
+        { Keyword::IYH, "iyh" },
+        { Keyword::IYL, "iyl" },
         { Keyword::JR, "jr" },
         { Keyword::LD, "ld" },
         { Keyword::LINE, "line" },
@@ -73,6 +82,8 @@ string to_string(Keyword keyword) {
         { Keyword::NONE, "" },
         { Keyword::NOP, "nop" },
         { Keyword::NZ, "nz" },
+        { Keyword::XIX, "xix" },
+        { Keyword::YIY, "yiy" },
         { Keyword::Z, "z" },
         //@@END
     };
@@ -89,6 +100,8 @@ Keyword lookup_keyword(const string& text) {
     static unordered_map<string, Keyword> keywords = {
         //@@BEGIN: keyword_lookup
         { "a", Keyword::A },
+        { "aix", Keyword::AIX },
+        { "aiy", Keyword::AIY },
         { "asmpc", Keyword::ASMPC },
         { "assume", Keyword::ASSUME },
         { "b", Keyword::B },
@@ -104,6 +117,12 @@ Keyword lookup_keyword(const string& text) {
         { "equ", Keyword::EQU },
         { "incbin", Keyword::INCBIN },
         { "include", Keyword::INCLUDE },
+        { "ix", Keyword::IX },
+        { "ixh", Keyword::IXH },
+        { "ixl", Keyword::IXL },
+        { "iy", Keyword::IY },
+        { "iyh", Keyword::IYH },
+        { "iyl", Keyword::IYL },
         { "jr", Keyword::JR },
         { "ld", Keyword::LD },
         { "line", Keyword::LINE },
@@ -111,6 +130,8 @@ Keyword lookup_keyword(const string& text) {
         { "", Keyword::NONE },
         { "nop", Keyword::NOP },
         { "nz", Keyword::NZ },
+        { "xix", Keyword::XIX },
+        { "yiy", Keyword::YIY },
         { "z", Keyword::Z },
         //@@END
     };
@@ -129,6 +150,25 @@ Token::Token(TType ttype, bool blank_before)
 void Token::set_keyword(const string& text) {
     m_keyword = ::lookup_keyword(text);
     m_svalue = text;
+	
+	// check SwapIXIY
+	if (g_options->swap_ixiy() != SwapIXIY::NO_SWAP) {
+		switch (m_keyword) {
+		case Keyword::AIX:
+		case Keyword::AIY:
+		case Keyword::IX:
+		case Keyword::IXH:
+		case Keyword::IXL:
+		case Keyword::IY:
+		case Keyword::IYH:
+		case Keyword::IYL:
+		case Keyword::XIX:
+		case Keyword::YIY:
+			m_svalue = swap_x_y(m_svalue);
+			m_keyword = ::lookup_keyword(m_svalue);
+		default:;
+		}
+	}
 }
 
 bool Token::is_end() const {
@@ -138,6 +178,26 @@ bool Token::is_end() const {
 string Token::to_string() const {
     switch (m_ttype) {
     case TType::IDENT:
+		// check SwapIXIY
+		if (g_options->swap_ixiy() != SwapIXIY::NO_SWAP) {
+			string str;
+			switch (m_keyword) {
+			case Keyword::AIX:
+			case Keyword::AIY:
+			case Keyword::IX:
+			case Keyword::IXH:
+			case Keyword::IXL:
+			case Keyword::IY:
+			case Keyword::IYH:
+			case Keyword::IYL:
+			case Keyword::XIX:
+			case Keyword::YIY:
+				str = swap_x_y(m_svalue);
+				return str;
+			default:;
+				// fall through
+			}
+		}
         return m_svalue;
     case TType::INT:
         return std::to_string(m_ivalue);
@@ -182,3 +242,16 @@ string Token::concat(const string& s1, const string& s2) {
         return s1 + s2;
 }
 
+string Token::swap_x_y(string str) {
+    // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
+    for (auto& c : str) {
+        switch (c) {
+        case 'x': c = 'y'; break;
+        case 'X': c = 'Y'; break;
+        case 'y': c = 'x'; break;
+        case 'Y': c = 'X'; break;
+        default:;
+        }
+    }
+    return str;
+}

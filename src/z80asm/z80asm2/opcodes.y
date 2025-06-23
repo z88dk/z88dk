@@ -33,3 +33,9 @@
 
 "ld" "a" "," "b"
 	g_obj_module->add_opcode_void(0x78);
+
+"ld" "ix" "," EXPR
+	g_obj_module->add_opcode_nn(0xDD21, $4.expr->clone());
+
+"ld" "iy" "," EXPR
+	g_obj_module->add_opcode_nn(0xFD21, $4.expr->clone());

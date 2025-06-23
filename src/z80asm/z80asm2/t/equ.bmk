@@ -9,5 +9,9 @@ v4 equ+start
 assemble test_t_equ.asm to test_t_equ.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-error: assembly failed for file: test_t_equ.asm
+assembled test_t_equ.asm to test_t_equ.o
 
+Object  file test_t_equ.o at $0000: Z80RMF18
+  Name: test_t_equ
+  CPU:  z80 
+  Section "": 0 bytes, ORG $0000

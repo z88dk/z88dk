@@ -3,6 +3,8 @@ Options:
   -DNAME=EXPR Define a constant, EXPR is optional
   -E          Preprocess only, do not assemble
   -h          Show this help message
+  -IXIY       Swap IX and IY registers
+  -IXIY-soft  Swap IX and IY registers but write object as unswapped
   -mCPU       Select CPU, one of:
               8080, 8080_strict, 8085, 8085_strict, ez80, ez80_strict, 
               ez80_z80, ez80_z80_strict, gbz80, gbz80_strict, kc160, 

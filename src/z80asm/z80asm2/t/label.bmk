@@ -9,5 +9,10 @@ ld a,25
 assemble test_t_label.asm to test_t_label.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-error: assembly failed for file: test_t_label.asm
+assembled test_t_label.asm to test_t_label.o
 
+Object  file test_t_label.o at $0000: Z80RMF18
+  Name: test_t_label
+  CPU:  z80 
+  Section "": 6 bytes, ORG $0000
+    C $0000: 3E 19 3E 19 3E 19

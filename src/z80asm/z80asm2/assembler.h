@@ -24,6 +24,7 @@ public:
     void set_pass(Pass pass) { m_pass = pass; }
 
 private:
+	string m_basename;
     string m_asm_filename;
     string m_obj_filename;
     Pass m_pass{ Pass::NOT_ASSEMBLING };

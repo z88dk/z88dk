@@ -79,9 +79,11 @@ extern bool cpu_compatible(cpu_t code_cpu_id, cpu_t lib_cpu_id);
 
 // IXIY
 typedef enum {
-    IXIY_NO_SWAP,           // no swap
-    IXIY_SWAP,              // swap IX and IY
-    IXIY_SOFT_SWAP,         // swap IX and IY, but save object file with no swap
+    //@@BEGIN: swap_ixiy_t
+    IXIY_NO_SWAP = 0,
+    IXIY_SWAP = 1,
+    IXIY_SOFT_SWAP = 2,
+    //@@END
 } swap_ixiy_t;
 
 extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy);

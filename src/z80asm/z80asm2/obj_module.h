@@ -9,6 +9,7 @@
 
 #include "cpu.h"
 #include "location.h"
+#include "memmap.h"
 #include "symbol.h"
 #include "utils.h"
 #include <cstdint>
@@ -113,6 +114,9 @@ public:
     int origin() const { return m_origin; }
     void set_origin(int origin) { m_origin = origin; }
 
+    int align() const { return m_align; }
+    void set_align(int align) { m_align = align; }
+
     int asmpc() const;
     int size() const;
 
@@ -120,7 +124,7 @@ public:
 
     Instr* add_instr();
     Instr* cur_instr();
-    vector<Instr*>& instrs() { return m_instrs; }
+    const vector<Instr*>& instrs() const { return m_instrs; }
 
     void expand_jrs();
     void recompute_offsets();
@@ -130,6 +134,7 @@ private:
     ObjModule* m_parent{ nullptr };
     string m_name;
     int m_origin{ 0 };
+    int m_align{ 1 };
     vector<Instr*> m_instrs;
 };
 
@@ -143,6 +148,8 @@ public:
         /*@@CONFIG:OBJ_FILE_SIGNATURE*/ "Z80RMF" /*@@END*/;
     static inline const string LIB_FILE_SIGNATURE =
         /*@@CONFIG:LIB_FILE_SIGNATURE*/ "Z80LMF" /*@@END*/;
+    static inline const int SIGNATURE_SIZE =
+        /*@@CONFIG:SIGNATURE_SIZE*/ 8 /*@@END*/;
 
     ObjModule();
     ObjModule(const ObjModule& other) = delete;
@@ -150,7 +157,11 @@ public:
     ObjModule& operator=(const ObjModule& other) = delete;
     void clear();
 
+	const string& name() const { return m_name; }
+	void set_name(const string& name) { m_name = name; }
+
     Symtab* symtab() { return &m_symtab; }
+    const vector<Section*>& sections() const { return m_sections; }
 
     Section* cur_section() { return m_cur_section; }
     void set_cur_section(const string& name);
@@ -175,10 +186,28 @@ public:
     bool write_file(const string& filename) const;
 
 private:
+	string m_name;
     Symtab m_symtab;
     vector<Section*> m_sections;
     Section* m_cur_section{ nullptr };
     int m_assume{ 0 };
+
+	class FileWriter {
+	public:
+		bool write_file(const string& filename);
+
+	private:
+		Memmap m_mem;
+		StringTable m_str_table;
+		
+		static string file_signature();
+		void write_signature();
+		int write_exprs();
+		int write_symbols();
+		int write_externs();
+		int write_modname();
+		int write_sections();
+	};
 };
 
 extern ObjModule* g_obj_module;

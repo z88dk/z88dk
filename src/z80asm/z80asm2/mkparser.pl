@@ -94,6 +94,8 @@ my %operators = (
 
 my %keywords = (
 	NONE => "",
+	AIX => "aix",
+	AIY => "aiy",
 	ASMPC => "asmpc",
 	ASSUME => "assume",
 	BINARY => "binary",
@@ -107,7 +109,15 @@ my %keywords = (
 	EQU => "equ",
 	INCBIN => "incbin",
 	INCLUDE => "include",
+	IX => "ix",
+	IXH => "ixh",
+	IXL => "ixl",
+	IY => "iy",
+	IYH => "iyh",
+	IYL => "iyl",
 	LINE => "line",
+	XIX => "xix",
+	YIY => "yiy",
 );
 
 # code is stored in obj-file, str is output by z80nm
@@ -184,8 +194,15 @@ my %config = (
 	OBJ_FILE_VERSION	=> 18,
 	OBJ_FILE_SIGNATURE	=> c_string("Z80RMF"),
 	LIB_FILE_SIGNATURE	=> c_string("Z80LMF"),
+	SIGNATURE_SIZE		=> 8,
 );
-	
+
+my %swap_ixiy = (
+    NO_SWAP		=> { id => 0 },	# no swap
+    SWAP		=> { id => 1 },	# swap IX and IY
+    SOFT_SWAP	=> { id => 2 },	# swap IX and IY, but save object file with no swap
+);
+
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
@@ -242,7 +259,8 @@ sub parse_grammar {
 				 scope => \%scope,
 				 type => \%type,
 				 config => \%config, 
-	};
+				 swap_ixiy => \%swap_ixiy,
+			};
 }
 
 sub parse_grammar_rule {
@@ -577,6 +595,26 @@ sub patch_file {
 			push @out, $_;
 			for (sort {$grammar->{type}{$a}{id} <=> $grammar->{type}{$b}{id}} keys %{$grammar->{type}}) {
 				push @out, $prefix."$_ = ".$grammar->{type}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*swap_ixiy_t\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{swap_ixiy}{$a}{id} <=> $grammar->{swap_ixiy}{$b}{id}} keys %{$grammar->{swap_ixiy}}) {
+				push @out, $prefix."IXIY_$_ = ".$grammar->{swap_ixiy}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*SwapIXIY\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{swap_ixiy}{$a}{id} <=> $grammar->{swap_ixiy}{$b}{id}} keys %{$grammar->{swap_ixiy}}) {
+				push @out, $prefix."$_ = ".$grammar->{swap_ixiy}{$_}{id}.",\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;

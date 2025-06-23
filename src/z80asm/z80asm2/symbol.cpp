@@ -199,14 +199,14 @@ Symbol* Symtab::touch_symbol(const string& name) {
 }
 
 bool Symtab::has_undefined_symbols() const {
-    bool ok = true;
+    bool undefined = false;
     for (auto& it : m_table) {
         if (it.second->sym_type() == SymType::UNDEFINED) {
             *g_location = it.second->location();
             g_error->error_undefined_symbol(it.first);
             g_location->clear();
-            ok = false;
+            undefined = true;
         }
     }
-    return ok;
+    return undefined;
 }

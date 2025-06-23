@@ -50,6 +50,14 @@ enum class Cpu {
     //@@END
 };
 
+enum class SwapIXIY {
+    //@@BEGIN: SwapIXIY
+    NO_SWAP = 0,
+    SWAP = 1,
+    SOFT_SWAP = 2,
+    //@@END
+};
+
 struct CpuInfo {
     string name;            // cpu name
     Cpu id;                 // cpu id

@@ -1,1 +1,2 @@
 - AStyle
+- -IXIY text should come from a table and not hard-coded in objfile.c
