@@ -15,7 +15,7 @@ extern "C" {
 // CPUs
 //-----------------------------------------------------------------------------
 typedef enum {
-    //@@BEGIN: cpu_id_CPU
+    //@@BEGIN: cpu_t
     CPU_UNDEF = -1,
     CPU_Z80 = 1,
     CPU_Z80_STRICT = 2,
