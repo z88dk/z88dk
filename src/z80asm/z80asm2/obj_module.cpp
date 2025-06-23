@@ -492,7 +492,94 @@ void ObjModule::add_opcode_nn(long long opcode, Expr* expr) {
 }
 
 bool ObjModule::write_file(const string& filename) const {
-    (void)filename;
-    return false;
+	FileWriter fw;
+	return fw.write_file(filename);
+}
+
+bool ObjModule::FileWriter::write_file(const string& filename) {
+    // write header
+    write_signature();
+
+    // write CPU
+    m_mem.write_long(static_cast<int>(g_options->cpu_id()));
+    m_mem.write_long(static_cast<int>(g_options->swap_ixiy()));
+
+    // write placeholders for 6 pointers
+	int header_ptr = m_mem.pos();
+	for (int i = 0; i < 6; i++)
+		m_mem.write_long(-1);
+
+	// write blocks, return pointers
+	int expr_ptr = write_exprs();           
+	int symbols_ptr = write_symbols();      
+	int externs_ptr = write_externs();      
+	int modname_ptr = write_modname();      
+	int sections_ptr = write_sections();    
+    int st_ptr = m_mem.pos();
+    m_str_table.write(m_mem);
+	int end_ptr = m_mem.pos();
+
+	// write pointers to areas
+	m_mem.set_pos(header_ptr);
+	m_mem.write_long(modname_ptr);
+	m_mem.write_long(expr_ptr);
+	m_mem.write_long(symbols_ptr);
+	m_mem.write_long(externs_ptr);
+	m_mem.write_long(sections_ptr);
+	m_mem.write_long(st_ptr);
+	m_mem.set_pos(end_ptr);
+
+	// dump object file
+    return m_mem.write_file(filename);
+}
+
+string ObjModule::FileWriter::file_signature() {
+    ostringstream oss;
+    oss << OBJ_FILE_SIGNATURE
+        << setw(SIGNATURE_SIZE - OBJ_FILE_SIGNATURE.size()) << setfill('0')
+        << OBJ_FILE_VERSION,
+    assert(oss.str().length() == SIGNATURE_SIZE);
+    return oss.str();
+}
+
+void ObjModule::FileWriter::write_signature() {
+    string signature = file_signature();
+    m_mem.write_data(reinterpret_cast<const uint8_t*>(signature.c_str()), SIGNATURE_SIZE);
+}
+
+int ObjModule::FileWriter::write_exprs() {
+    return -1;
+}
+
+int ObjModule::FileWriter::write_symbols() {
+    return -1;
+}
+
+int ObjModule::FileWriter::write_externs() {
+    return -1;
+}
+
+int ObjModule::FileWriter::write_modname() {
+	int pos0 = m_mem.pos();
+	int str_id = m_str_table.add_string(g_obj_module->name());
+	m_mem.write_long(str_id);
+	return pos0;
+}
+
+int ObjModule::FileWriter::write_sections() {
+    int pos0 = m_mem.pos();
+    for (auto& section : g_obj_module->sections()) {
+        m_mem.write_long(section->size());
+        int str_id = m_str_table.add_string(section->name());
+        m_mem.write_long(str_id);
+        m_mem.write_long(section->origin());
+        m_mem.write_long(section->align());
+        for (auto& instr : section->instrs()) {
+            m_mem.write_data(instr->data(), instr->size());
+        }
+        m_mem.align();
+    }
+    m_mem.write_long(-1);   // end marker
+    return pos0;
 }
 

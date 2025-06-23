@@ -5,5 +5,9 @@ Assume 3/3
 assemble test_t_assume_ok.asm to test_t_assume_ok.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-error: assembly failed for file: test_t_assume_ok.asm
+assembled test_t_assume_ok.asm to test_t_assume_ok.o
 
+Object  file test_t_assume_ok.o at $0000: Z80RMF18
+  Name: test_t_assume_ok
+  CPU:  z80 
+  Section "": 0 bytes, ORG $0000

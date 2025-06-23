@@ -6,5 +6,10 @@ jr nz,start
 assemble test_t_assemble.asm to test_t_assemble.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-error: assembly failed for file: test_t_assemble.asm
+assembled test_t_assemble.asm to test_t_assemble.o
 
+Object  file test_t_assemble.o at $0000: Z80RMF18
+  Name: test_t_assemble
+  CPU:  z80 
+  Section "": 3 bytes, ORG $0000
+    C $0000: 7F 20 00

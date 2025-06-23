@@ -9,7 +9,8 @@ path("$test.asm")->spew(<<END);
 END
 
 run_ok("$exec -v -E -Dum,dois=12/6,tres=9/3 $test.asm > $test.out 2>&1");
-run_nok("$exec -v -Dum,dois=12/6,tres=9/3 $test.asm >> $test.out 2>&1");
+run_ok("$exec -v -Dum,dois=12/6,tres=9/3 $test.asm >> $test.out 2>&1");
+run_ok("z88dk-z80nm -a $test.o >> $test.out 2>&1");
 run_ok("diff -w $bmk $test.out");
 
 unlink_testfiles();

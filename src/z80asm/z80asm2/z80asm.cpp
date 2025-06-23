@@ -63,6 +63,8 @@ static int help() {
         << "  -DNAME=EXPR Define a constant, EXPR is optional" << endl
         << "  -E          Preprocess only, do not assemble" << endl
         << "  -h          Show this help message" << endl
+		<< "  -IXIY       Swap IX and IY registers" << endl
+		<< "  -IXIY-soft  Swap IX and IY registers but write object as unswapped" << endl
         << "  -mCPU       Select CPU, one of:" << endl
         << "              " << g_cpu_table->cpu_names(14, 72) << endl
         << "  -v          Verbose output" << endl
@@ -116,6 +118,14 @@ int main(int argc, char* argv[]) {
         case 'h':
             if (option == "-h")
                 return help();
+            else
+                return error_invalid_option(option);
+            break;
+        case 'I':
+            if (option == "-IXIY")
+                g_options->set_swap_ixiy(SwapIXIY::SWAP);
+            else if (option == "-IXIY-soft")
+                g_options->set_swap_ixiy(SwapIXIY::SOFT_SWAP);
             else
                 return error_invalid_option(option);
             break;

@@ -15,7 +15,7 @@ using namespace std;
 LineParser::State LineParser::m_states[] = {
     //@@BEGIN: states
     { /* 0:  */
-      { {Keyword::ASSUME, 1}, {Keyword::JR, 10}, {Keyword::LD, 29}, {Keyword::NOP, 50}, },
+      { {Keyword::ASSUME, 1}, {Keyword::JR, 10}, {Keyword::LD, 29}, {Keyword::NOP, 58}, },
       { {TType::IDENT, 4}, },
       nullptr,
     },
@@ -160,7 +160,7 @@ LineParser::State LineParser::m_states[] = {
       &LineParser::action_jr_z_comma_expr,
     },
     { /* 29: LD */
-      { {Keyword::A, 30}, {Keyword::B, 42}, {Keyword::C, 46}, },
+      { {Keyword::A, 30}, {Keyword::B, 42}, {Keyword::C, 46}, {Keyword::IX, 50}, {Keyword::IY, 54}, },
       { },
       nullptr,
     },
@@ -264,12 +264,52 @@ LineParser::State LineParser::m_states[] = {
       { },
       &LineParser::action_ld_c_comma_expr,
     },
-    { /* 50: NOP */
+    { /* 50: LD IX */
       { },
-      { {TType::END, 51}, },
+      { {TType::COMMA, 51}, },
       nullptr,
     },
-    { /* 51: NOP END */
+    { /* 51: LD IX COMMA */
+      { },
+      { {TType::EXPR, 52}, },
+      nullptr,
+    },
+    { /* 52: LD IX COMMA EXPR */
+      { },
+      { {TType::END, 53}, },
+      nullptr,
+    },
+    { /* 53: LD IX COMMA EXPR END */
+      { },
+      { },
+      &LineParser::action_ld_ix_comma_expr,
+    },
+    { /* 54: LD IY */
+      { },
+      { {TType::COMMA, 55}, },
+      nullptr,
+    },
+    { /* 55: LD IY COMMA */
+      { },
+      { {TType::EXPR, 56}, },
+      nullptr,
+    },
+    { /* 56: LD IY COMMA EXPR */
+      { },
+      { {TType::END, 57}, },
+      nullptr,
+    },
+    { /* 57: LD IY COMMA EXPR END */
+      { },
+      { },
+      &LineParser::action_ld_iy_comma_expr,
+    },
+    { /* 58: NOP */
+      { },
+      { {TType::END, 59}, },
+      nullptr,
+    },
+    { /* 59: NOP END */
       { },
       { },
       &LineParser::action_nop,
@@ -581,6 +621,18 @@ void LineParser::action_ld_a_comma_a() {
 
 void LineParser::action_ld_a_comma_b() {
 	g_obj_module->add_opcode_void(0x78);
+
+
+}
+
+void LineParser::action_ld_ix_comma_expr() {
+	g_obj_module->add_opcode_nn(0xDD21, m_elems.elems[4-1].expr->clone());
+
+
+}
+
+void LineParser::action_ld_iy_comma_expr() {
+	g_obj_module->add_opcode_nn(0xFD21, m_elems.elems[4-1].expr->clone());
 
 }
 

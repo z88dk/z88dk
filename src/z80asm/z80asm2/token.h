@@ -49,6 +49,8 @@ enum class Keyword {
     //@@BEGIN: keyword
     NONE,
     A,
+    AIX,
+    AIY,
     ASMPC,
     ASSUME,
     B,
@@ -64,12 +66,20 @@ enum class Keyword {
     EQU,
     INCBIN,
     INCLUDE,
+    IX,
+    IXH,
+    IXL,
+    IY,
+    IYH,
+    IYL,
     JR,
     LD,
     LINE,
     NC,
     NOP,
     NZ,
+    XIX,
+    YIY,
     Z,
     //@@END
 };
@@ -122,5 +132,7 @@ private:
     int m_ivalue{ 0 };
     double m_fvalue{ 0.0 };
     string m_svalue;
+	
+	static string swap_x_y(string str);
 };
 

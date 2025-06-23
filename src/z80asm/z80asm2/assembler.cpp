@@ -21,6 +21,7 @@ using namespace std;
 Assembler* g_assembler{ nullptr };
 
 void Assembler::clear() {
+	m_basename.clear();
     m_asm_filename.clear();
     m_obj_filename.clear();
     m_pass = Pass::NOT_ASSEMBLING;
@@ -48,9 +49,12 @@ void Assembler::assemble_file(const string& filename) {
 
 void Assembler::init(const string& filename) {
     clear();
+	m_basename = replace_extension(basename(filename), "");
     m_asm_filename = filename;
     m_obj_filename = replace_extension(filename, ".o");
-    g_input_files->push_file(filename);
+	
+	g_obj_module->set_name(m_basename);
+    g_input_files->push_file(m_asm_filename);
 }
 
 bool Assembler::assemble() {
