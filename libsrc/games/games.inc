@@ -408,7 +408,7 @@ IF FORzx81
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
         ;----
-        defc TAPEIN_ONEBIT_port  = 254
+        defc TAPEIN_ONEBIT_port  = $FE
         defc TAPEIN_ONEBIT_mask  = 128
         ;----
 ENDIF
@@ -420,7 +420,7 @@ IF FORlambda
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
         ;----
-        defc TAPEIN_ONEBIT_port  = 254
+        defc TAPEIN_ONEBIT_port  = $FE
         defc TAPEIN_ONEBIT_mask  = 128
         ;----
 ENDIF
@@ -432,7 +432,7 @@ IF FORzx80
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
         ;----
-        defc TAPEIN_ONEBIT_port  = 254
+        defc TAPEIN_ONEBIT_port  = $FE
         defc TAPEIN_ONEBIT_mask  = 128
         ;----
 ENDIF
