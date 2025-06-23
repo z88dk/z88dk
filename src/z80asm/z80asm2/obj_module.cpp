@@ -66,7 +66,7 @@ void Patch::resolve(int value) {
         break;
 
     case PatchType::ASSIGNMENT:
-        assert(false && "PatchType::ASSIGNMENT should not be used here");
+        // nothing to do
         break;
 
     case PatchType::BYTE_SIGNED:
@@ -205,7 +205,8 @@ void Instr::add_patch(Patch* patch) {
 
     // If the expression evaluates to a constant, replace it with the value
     int value = 0;
-    if (patch->expr()->eval_const(value)) {
+    if (patch->patch_type() != PatchType::ASSIGNMENT &&
+        patch->expr()->eval_const(value)) {
         patch->resolve(value);
         delete patch; // No need to keep the patch if it's resolved
     }
@@ -465,7 +466,11 @@ void ObjModule::add_label(const string& name) {
 }
 
 void ObjModule::add_equ(const string& name, Expr* expr) {
-    m_symtab.add_equ(name, expr);
+    m_symtab.add_equ(name, expr->clone());
+    Instr* instr = cur_section()->add_instr();
+    Patch* patch = new Patch(instr, PatchType::ASSIGNMENT, expr, instr->size());
+    patch->set_target_name(name);
+    instr->add_patch(patch);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {
@@ -548,7 +553,54 @@ void ObjModule::FileWriter::write_signature() {
 }
 
 int ObjModule::FileWriter::write_exprs() {
-    return -1;
+    int pos0 = m_mem.pos();
+    bool has_exprs = false;
+
+    for (auto& section : g_obj_module->sections()) {
+        for (auto& instr : section->instrs()) {
+            for (auto& patch : instr->patches()) {
+                has_exprs = true;
+                Expr* expr = patch->expr();
+                Instr* instr = patch->parent();
+                Section* section = instr->parent();
+                Location location = expr->location();
+                int asmpc = instr->offset();
+                int code_pos = asmpc + patch->offset();
+                int opcode_size = instr->size();
+
+                // store type
+                m_mem.write_long(static_cast<int>(patch->patch_type()));
+
+                // store file name folowed by source line number
+                int str_id = m_str_table.add_string(location.filename());
+                m_mem.write_long(str_id);
+                m_mem.write_long(location.line_num());
+
+                // store section name
+                str_id = m_str_table.add_string(section->name());
+                m_mem.write_long(str_id);
+
+                m_mem.write_long(asmpc);
+                m_mem.write_long(code_pos);
+                m_mem.write_long(opcode_size);
+
+                // target symbol for expression
+                str_id = m_str_table.add_string(patch->target_name());
+                m_mem.write_long(str_id);
+
+                // expression
+                str_id = m_str_table.add_string(expr->to_string());
+                m_mem.write_long(str_id);
+            }
+        }
+    }
+
+    if (has_exprs) {
+        m_mem.write_long(static_cast<int>(PatchType::UNDEFINED)); // store end-terminator
+        return pos0;
+    }
+    else
+        return -1;
 }
 
 int ObjModule::FileWriter::write_symbols() {

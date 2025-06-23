@@ -13,3 +13,5 @@ Object  file test_t_assemble.o at $0000: Z80RMF18
   CPU:  z80 
   Section "": 3 bytes, ORG $0000
     C $0000: 7F 20 00
+  Expressions:
+    E J $0001 $0002 2: start (section "") (file test_t_assemble.asm:2)

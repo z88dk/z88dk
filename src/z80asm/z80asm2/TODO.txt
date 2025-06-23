@@ -1,1 +1,2 @@
 - AStyle
+- JR inside a module should be resolved before outputing the object file
