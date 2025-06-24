@@ -17,6 +17,7 @@ class LineParser {
 public:
     bool parse_line(const string& line);
     bool parse_define(const string& line);
+    bool parse_extern(const string& line);
 
 private:
     struct Elem {
@@ -72,9 +73,11 @@ private:
     void action_ld_a_comma_b();
     void action_ld_ix_comma_expr();
     void action_ld_iy_comma_expr();
+    void action_jp_expr();
     //@@END
 
     bool parse_define();
+    bool parse_extern();
     bool parse_name(string& name);
     bool parse_const_expr(int& value);
     bool parse_equal();
@@ -82,6 +85,7 @@ private:
     bool parse_end();
 
     void action_define(const string& name, int value = 1);
+    void action_extern(const string& name);
 
     // state in the parsing state machine
     struct State {

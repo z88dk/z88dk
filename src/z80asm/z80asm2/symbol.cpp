@@ -147,7 +147,8 @@ Symbol* Symtab::add_global_def(const string& name, int value) {
     if (!symbol)
         symbol = add_symbol(name);
 
-    if (symbol->sym_type() != SymType::UNDEFINED)
+    if (symbol->sym_type() != SymType::UNDEFINED ||
+        symbol->sym_scope() == SymScope::EXTERN)
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_global_def(value);
@@ -166,7 +167,8 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
     if (!symbol)
         symbol = add_symbol(name);
 
-    if (symbol->sym_type() != SymType::UNDEFINED)
+    if (symbol->sym_type() != SymType::UNDEFINED ||
+        symbol->sym_scope() == SymScope::EXTERN)
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_instr(instr);
@@ -181,7 +183,8 @@ Symbol* Symtab::add_equ(const string& name, Expr* expr) {
     if (!symbol)
         symbol = add_symbol(name);
 
-    if (symbol->sym_type() != SymType::UNDEFINED)
+    if (symbol->sym_type() != SymType::UNDEFINED ||
+        symbol->sym_scope() == SymScope::EXTERN)
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_expr(expr);
@@ -199,15 +202,32 @@ Symbol* Symtab::touch_symbol(const string& name) {
     return symbol;
 }
 
+Symbol* Symtab::declare_extern(const string& name) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+
+    if (symbol->sym_type() != SymType::UNDEFINED)
+        g_error->error_duplicate_definition(name);
+    else {
+        symbol->set_sym_scope(SymScope::EXTERN);
+    }
+
+    return symbol;
+
+}
+
 bool Symtab::has_undefined_symbols() const {
-    bool undefined = false;
+    bool has_undefined = false;
     for (auto& it : m_table) {
-        if (it.second->sym_type() == SymType::UNDEFINED) {
-            *g_location = it.second->location();
-            g_error->error_undefined_symbol(it.first);
+        Symbol* symbol = it.second;
+        if (symbol->sym_type() == SymType::UNDEFINED &&
+            symbol->sym_scope() != SymScope::EXTERN) {
+            *g_location = symbol->location();
+            g_error->error_undefined_symbol(symbol->name());
             g_location->clear();
-            undefined = true;
+            has_undefined = true;
         }
     }
-    return undefined;
+    return has_undefined;
 }

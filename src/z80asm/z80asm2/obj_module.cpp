@@ -473,6 +473,10 @@ void ObjModule::add_equ(const string& name, Expr* expr) {
     instr->add_patch(patch);
 }
 
+void ObjModule::declare_extern(const string& name) {
+    m_symtab.declare_extern(name);
+}
+
 void ObjModule::add_opcode_void(long long opcode) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
@@ -612,7 +616,7 @@ int ObjModule::FileWriter::write_symbols() {
         const Section* section = symbol->section();
         Location location = symbol->location();
 
-        if (symbol->touched()) {
+        if (symbol->sym_type() != SymType::UNDEFINED && symbol->touched()) {
             has_symbols = true;
             m_mem.write_long(static_cast<int>(symbol->sym_scope()));
             m_mem.write_long(static_cast<int>(symbol->sym_type()));
@@ -640,10 +644,17 @@ int ObjModule::FileWriter::write_externs() {
     int pos0 = m_mem.pos();
     bool has_externs = false;
 
-    for (auto& name : g_obj_module->externs()) {
-        has_externs = true;
-        int str_id = m_str_table.add_string(name);
-        m_mem.write_long(str_id);
+    for (auto& it : *(g_obj_module->symtab())) {
+        Symbol* symbol = it.second;
+
+        if (symbol->sym_type() == SymType::UNDEFINED &&
+            symbol->sym_scope() == SymScope::EXTERN &&
+            symbol->touched()) {
+            has_externs = true;
+
+            int str_id = m_str_table.add_string(symbol->name());
+            m_mem.write_long(str_id);
+        }
     }
 
     if (has_externs) {

@@ -1,0 +1,23 @@
+LINE 1 "test_t_extern_error.asm"
+extern func1
+func1:
+func2:
+extern func2,func3
+extern,
+extern func4=2
+assemble test_t_extern_error.asm to test_t_extern_error.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_extern_error.asm:2: error: duplicate definition: func1
+  ^---- func1:
+test_t_extern_error.asm:4: error: duplicate definition: func2
+  ^---- 	extern func2,func3
+    ^---- extern func2,func3
+test_t_extern_error.asm:5: error: expected identifier
+  ^---- 	extern ,
+    ^---- extern,
+test_t_extern_error.asm:6: error: expected ','
+  ^---- 	extern func4=2
+    ^---- extern func4=2
+error: assembly failed for file: test_t_extern_error.asm
+

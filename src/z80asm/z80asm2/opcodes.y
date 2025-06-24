@@ -39,3 +39,7 @@
 
 "ld" "iy" "," EXPR
 	g_obj_module->add_opcode_nn(0xFD21, $4.expr->clone());
+
+"jp" EXPR
+	g_obj_module->add_opcode_nn(0xC3, $2.expr->clone());
+
