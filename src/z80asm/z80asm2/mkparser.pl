@@ -107,6 +107,7 @@ my %keywords = (
 	DEFQ => "defq",
 	DEFW => "defw",
 	EQU => "equ",
+	EXTERN => "extern",
 	INCBIN => "incbin",
 	INCLUDE => "include",
 	IX => "ix",

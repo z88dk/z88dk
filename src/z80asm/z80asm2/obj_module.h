@@ -13,7 +13,6 @@
 #include "symbol.h"
 #include "utils.h"
 #include <cstdint>
-#include <set>
 #include <vector>
 using namespace std;
 
@@ -170,7 +169,6 @@ public:
 	void set_name(const string& name) { m_name = name; }
 
     Symtab* symtab() { return &m_symtab; }
-    set<string>& externs() { return m_externs; }
     const vector<Section*>& sections() const { return m_sections; }
 
     Section* cur_section() { return m_cur_section; }
@@ -186,6 +184,7 @@ public:
     void add_global_def(const string& name, int value = 1);
     void add_label(const string& name);
     void add_equ(const string& name, Expr* expr);
+    void declare_extern(const string& name);
 
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
@@ -198,7 +197,6 @@ public:
 private:
 	string m_name;
     Symtab m_symtab;
-    set<string> m_externs;          // extern symbols not yet resolved
     vector<Section*> m_sections;
     Section* m_cur_section{ nullptr };
     int m_assume{ 0 };

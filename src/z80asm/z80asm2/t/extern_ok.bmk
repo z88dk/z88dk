@@ -1,0 +1,21 @@
+LINE 1 "test_t_extern_ok.asm"
+jp func1
+extern func1
+extern func2,func3
+jp func2
+assemble test_t_extern_ok.asm to test_t_extern_ok.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_extern_ok.asm to test_t_extern_ok.o
+
+Object  file test_t_extern_ok.o at $0000: Z80RMF18
+  Name: test_t_extern_ok
+  CPU:  z80 
+  Section "": 6 bytes, ORG $0000
+    C $0000: C3 00 00 C3 00 00
+  Externs:
+    U         func1
+    U         func2
+  Expressions:
+    E W $0000 $0001 3: func1 (section "") (file test_t_extern_ok.asm:1)
+    E W $0003 $0004 3: func2 (section "") (file test_t_extern_ok.asm:4)
