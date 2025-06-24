@@ -15,5 +15,7 @@ Object  file test_t_equ.o at $0000: Z80RMF18
   Name: test_t_equ
   CPU:  z80 
   Section "": 0 bytes, ORG $0000
+  Symbols:
+    L A $0000: start (section "") (file test_t_equ.asm:3)
   Expressions:
     E = $0000 $0000 0: v4 := +start (section "") (file test_t_equ.asm:4)

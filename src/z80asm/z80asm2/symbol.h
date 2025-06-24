@@ -14,6 +14,7 @@ using namespace std;
 class Expr;
 class Instr;
 class Result;
+class Section;
 class Symtab;
 
 enum class SymScope {
@@ -45,6 +46,7 @@ public:
 
     const string& name() const { return m_name; }
     const Location& location() const { return m_location; }
+    const Section* section() const { return m_section; }
     SymScope sym_scope() const { return m_sym_scope; }
     SymType sym_type() const { return m_sym_type; }
     bool is_global_def() const { return m_is_global_def; } 
@@ -64,11 +66,12 @@ public:
     void set_expr(Expr* expr);
     void set_in_eval(bool f = true) { m_in_eval = f; }
     void set_touched(bool f = true) { m_touched = f; }
-    void update_location();
+    void update_definition();
 
 private:
     const string m_name;        // symbol name
     Location m_location;        // location where defined
+    Section* m_section{ nullptr };  // section where defined
     SymScope m_sym_scope{ SymScope::LOCAL };
     SymType m_sym_type{ SymType::UNDEFINED };
     bool m_is_global_def{ false }; // true if this is a global define

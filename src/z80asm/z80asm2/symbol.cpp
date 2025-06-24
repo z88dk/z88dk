@@ -18,7 +18,7 @@ Symtab* g_global_defines{ nullptr };
 
 Symbol::Symbol(const string& name)
     : m_name(name) {
-    update_location();
+    update_definition();
 }
 
 Symbol::~Symbol() {
@@ -93,8 +93,9 @@ void Symbol::set_expr(Expr* expr) {
     }
 }
 
-void Symbol::update_location() {
+void Symbol::update_definition() {
     m_location = *g_location;
+    m_section = g_obj_module->cur_section();
 }
 
 Symtab::~Symtab() {
@@ -150,7 +151,7 @@ Symbol* Symtab::add_global_def(const string& name, int value) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_global_def(value);
-        symbol->update_location();
+        symbol->update_definition();
 
         // only show global defines
         if (g_options->verbose() && this == g_global_defines)
@@ -169,7 +170,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_instr(instr);
-        symbol->update_location();
+        symbol->update_definition();
     }
 
     return symbol;
@@ -184,7 +185,7 @@ Symbol* Symtab::add_equ(const string& name, Expr* expr) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_expr(expr);
-        symbol->update_location();
+        symbol->update_definition();
     }
 
     return symbol;
