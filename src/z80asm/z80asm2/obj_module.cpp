@@ -604,11 +604,55 @@ int ObjModule::FileWriter::write_exprs() {
 }
 
 int ObjModule::FileWriter::write_symbols() {
-    return -1;
+    int pos0 = m_mem.pos();
+    bool has_symbols = false;
+
+    for (auto& it : *(g_obj_module->symtab())) {
+        Symbol* symbol = it.second;
+        const Section* section = symbol->section();
+        Location location = symbol->location();
+
+        if (symbol->touched()) {
+            has_symbols = true;
+            m_mem.write_long(static_cast<int>(symbol->sym_scope()));
+            m_mem.write_long(static_cast<int>(symbol->sym_type()));
+            int str_id = m_str_table.add_string(section->name());
+            m_mem.write_long(str_id);
+            m_mem.write_long(symbol->value());
+            str_id = m_str_table.add_string(symbol->name());
+            m_mem.write_long(str_id);
+            str_id = m_str_table.add_string(location.filename());
+            m_mem.write_long(str_id);
+            m_mem.write_long(location.line_num());
+        }
+    }
+
+    if (has_symbols) {
+        m_mem.write_long(static_cast<int>(SymType::UNDEFINED)); // store end-terminator
+        return pos0;
+    }
+    else
+        return -1;
+
 }
 
 int ObjModule::FileWriter::write_externs() {
-    return -1;
+    int pos0 = m_mem.pos();
+    bool has_externs = false;
+
+    for (auto& name : g_obj_module->externs()) {
+        has_externs = true;
+        int str_id = m_str_table.add_string(name);
+        m_mem.write_long(str_id);
+    }
+
+    if (has_externs) {
+        int str_id = m_str_table.add_string("");
+        m_mem.write_long(str_id);           // store "" as end terminator
+        return pos0;
+    }
+    else
+        return -1;
 }
 
 int ObjModule::FileWriter::write_modname() {
@@ -634,4 +678,3 @@ int ObjModule::FileWriter::write_sections() {
     m_mem.write_long(-1);   // end marker
     return pos0;
 }
-
