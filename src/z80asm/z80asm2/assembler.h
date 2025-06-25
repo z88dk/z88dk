@@ -32,6 +32,7 @@ private:
     void init(const string& filename);
     bool assemble();
     bool parse();
+    void convert_global_to_extern_public();
     bool has_undefined_symbols();
     void resolve_local_exprs();
 };

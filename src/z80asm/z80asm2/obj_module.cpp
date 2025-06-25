@@ -443,6 +443,10 @@ void ObjModule::expand_jrs() {
         section->expand_jrs();
 }
 
+void ObjModule::convert_global_to_extern_public() {
+    m_symtab.convert_global_to_extern_public();
+}
+
 bool ObjModule::has_undefined_symbols() const {
     return m_symtab.has_undefined_symbols();
 }
@@ -479,6 +483,10 @@ void ObjModule::declare_extern(const string& name) {
 
 void ObjModule::declare_public(const string& name) {
     m_symtab.declare_public(name);
+}
+
+void ObjModule::declare_global(const string& name) {
+    m_symtab.declare_global(name);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

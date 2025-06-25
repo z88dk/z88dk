@@ -65,6 +65,7 @@ enum class Keyword {
     DEFW,
     EQU,
     EXTERN,
+    GLOBAL,
     INCBIN,
     INCLUDE,
     IX,

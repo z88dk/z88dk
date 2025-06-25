@@ -396,6 +396,9 @@ bool LineParser::parse_line(const string& line) {
         case Keyword::PUBLIC:
             m_in.next();
             return parse_public_args();
+        case Keyword::GLOBAL:
+            m_in.next();
+            return parse_global_args();
         default:;
             // fall through
         }
@@ -550,6 +553,13 @@ bool LineParser::parse_public_args(const string& line) {
         return parse_public_args();
 }
 
+bool LineParser::parse_global_args(const string& line) {
+    if (!m_in.scan(line))
+        return false;       // scanning failed
+    else
+        return parse_global_args();
+}
+
 bool LineParser::parse_define_args() {
     while (true) {
         string name;
@@ -594,6 +604,17 @@ bool LineParser::parse_public_args() {
 
     for (auto& name : names)
         action_public(name);
+
+    return true;
+}
+
+bool LineParser::parse_global_args() {
+    vector<string> names;
+    if (!parse_ident_list(names))
+        return false;
+
+    for (auto& name : names)
+        action_global(name);
 
     return true;
 }
@@ -801,4 +822,8 @@ void LineParser::action_extern(const string& name) {
 
 void LineParser::action_public(const string& name) {
     g_obj_module->declare_public(name);
+}
+
+void LineParser::action_global(const string& name) {
+    g_obj_module->declare_global(name);
 }

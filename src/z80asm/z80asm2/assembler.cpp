@@ -68,6 +68,7 @@ bool Assembler::assemble() {
 
     // set pass to 2 after addresses are final
     m_pass = Pass::PASS2;
+    convert_global_to_extern_public();
     if (has_undefined_symbols())
         return false;
     resolve_local_exprs();
@@ -91,6 +92,10 @@ bool Assembler::parse() {
         }
     }
     return ok;
+}
+
+void Assembler::convert_global_to_extern_public() {
+    g_obj_module->convert_global_to_extern_public();
 }
 
 bool Assembler::has_undefined_symbols() {
