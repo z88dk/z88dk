@@ -18,4 +18,4 @@ Object  file test_t_label.o at $0000: Z80RMF18
     C $0000: 3E 19 3E 19 3E 19
   Symbols:
     L A $0000: l1 (section "") (file test_t_label.asm:2)
-    L A $0000: l2 (section "") (file test_t_label.asm:3)
+    L A $0002: l2 (section "") (file test_t_label.asm:3)

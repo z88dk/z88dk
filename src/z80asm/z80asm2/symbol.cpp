@@ -38,6 +38,27 @@ void Symbol::clear() {
     m_touched = false;
 }
 
+int Symbol::value() const {
+    int value;
+    bool ok;
+    switch (m_sym_type) {
+    case SymType::UNDEFINED:
+        assert(false && "SymType::UNDEFINED not expected");
+        return 0; // not reached
+    case SymType::CONSTANT:
+        return m_value;
+    case SymType::ADDRESS:
+        return m_instr->offset();
+    case SymType::COMPUTED:
+        ok = m_expr->eval_const(value);
+        assert(ok && "expected a constant expression");
+        return value;
+    default:
+        assert(false && "unknown SymType");
+        return 0; // not reached
+    }
+}
+
 void Symbol::set_global_def(int value) {
     m_sym_type = SymType::CONSTANT;
     m_value = value;
