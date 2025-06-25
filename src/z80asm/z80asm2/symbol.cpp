@@ -172,6 +172,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_instr(instr);
+        symbol->set_touched();
         symbol->update_definition();
     }
 
@@ -207,27 +208,54 @@ Symbol* Symtab::declare_extern(const string& name) {
     if (!symbol)
         symbol = add_symbol(name);
 
-    if (symbol->sym_type() != SymType::UNDEFINED)
+    if (symbol->sym_type() != SymType::UNDEFINED) {
         g_error->error_duplicate_definition(name);
+    }
+    else if (symbol->sym_scope() == SymScope::EXTERN) {
+        // already extern
+    }
+    else if (symbol->sym_scope() != SymScope::LOCAL) {
+        g_error->error_duplicate_definition(name);
+    }
     else {
         symbol->set_sym_scope(SymScope::EXTERN);
     }
 
     return symbol;
+}
 
+Symbol* Symtab::declare_public(const string& name) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+
+    if (symbol->sym_scope() == SymScope::PUBLIC) {
+        // already public
+    }
+    else if (symbol->sym_scope() != SymScope::LOCAL) {
+        g_error->error_duplicate_definition(name);
+    }
+    else {
+        symbol->set_sym_scope(SymScope::PUBLIC);
+    }
+
+    return symbol;
 }
 
 bool Symtab::has_undefined_symbols() const {
     bool has_undefined = false;
     for (auto& it : m_table) {
         Symbol* symbol = it.second;
-        if (symbol->sym_type() == SymType::UNDEFINED &&
-            symbol->sym_scope() != SymScope::EXTERN) {
-            *g_location = symbol->location();
-            g_error->error_undefined_symbol(symbol->name());
-            g_location->clear();
-            has_undefined = true;
+        *g_location = symbol->location();
+
+        if (symbol->sym_type() == SymType::UNDEFINED) {
+            if (symbol->sym_scope() != SymScope::EXTERN) {
+                g_error->error_undefined_symbol(symbol->name());
+                has_undefined = true;
+            }
         }
+
+        g_location->clear();
     }
     return has_undefined;
 }

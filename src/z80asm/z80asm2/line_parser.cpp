@@ -10,6 +10,7 @@
 #include "line_parser.h"
 #include "obj_module.h"
 #include "options.h"
+#include "token.h"
 using namespace std;
 
 LineParser::State LineParser::m_states[] = {
@@ -388,10 +389,13 @@ bool LineParser::parse_line(const string& line) {
         switch (m_in.peek().keyword()) {
         case Keyword::DEFINE:
             m_in.next();
-            return parse_define();
+            return parse_define_args();
         case Keyword::EXTERN:
             m_in.next();
-            return parse_extern();
+            return parse_extern_args();
+        case Keyword::PUBLIC:
+            m_in.next();
+            return parse_public_args();
         default:;
             // fall through
         }
@@ -525,21 +529,28 @@ bool LineParser::parse_line(const string& line) {
 }
 
 // parse name=expr,name,name=expr
-bool LineParser::parse_define(const string& line) {
+bool LineParser::parse_define_args(const string& line) {
     if (!m_in.scan(line))
         return false;       // scanning failed
     else
-        return parse_define();
+        return parse_define_args();
 }
 
-bool LineParser::parse_extern(const string& line) {
+bool LineParser::parse_extern_args(const string& line) {
     if (!m_in.scan(line))
         return false;       // scanning failed
     else
-        return parse_extern();
+        return parse_extern_args();
 }
 
-bool LineParser::parse_define() {
+bool LineParser::parse_public_args(const string& line) {
+    if (!m_in.scan(line))
+        return false;       // scanning failed
+    else
+        return parse_public_args();
+}
+
+bool LineParser::parse_define_args() {
     while (true) {
         string name;
         int value = 0;
@@ -565,13 +576,36 @@ bool LineParser::parse_define() {
     }
 }
 
-bool LineParser::parse_extern() {
+bool LineParser::parse_extern_args() {
+    vector<string> names;
+    if (!parse_ident_list(names))
+        return false;
+
+    for (auto& name : names)
+        action_extern(name);
+
+    return true;
+}
+
+bool LineParser::parse_public_args() {
+    vector<string> names;
+    if (!parse_ident_list(names))
+        return false;
+
+    for (auto& name : names)
+        action_public(name);
+
+    return true;
+}
+
+bool LineParser::parse_ident_list(vector<string>& names) {
+    names.clear();
     while (true) {
         string name;
         if (!parse_name(name))
             return false;
 
-        action_extern(name);
+        names.push_back(name);
 
         if (m_in.peek().is(TType::END))
             return true;
@@ -763,4 +797,8 @@ void LineParser::action_define(const string& name, int value) {
 
 void LineParser::action_extern(const string& name) {
     g_obj_module->declare_extern(name);
+}
+
+void LineParser::action_public(const string& name) {
+    g_obj_module->declare_public(name);
 }

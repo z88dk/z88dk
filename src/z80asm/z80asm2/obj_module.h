@@ -185,6 +185,7 @@ public:
     void add_label(const string& name);
     void add_equ(const string& name, Expr* expr);
     void declare_extern(const string& name);
+    void declare_public(const string& name);
 
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);

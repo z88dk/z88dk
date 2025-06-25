@@ -1,6 +1,8 @@
 LINE 1 "test_t_extern_ok.asm"
 jp func1
 extern func1
+extern func1
+extern func2,func3
 extern func2,func3
 jp func2
 assemble test_t_extern_ok.asm to test_t_extern_ok.o
@@ -18,4 +20,4 @@ Object  file test_t_extern_ok.o at $0000: Z80RMF18
     U         func2
   Expressions:
     E W $0000 $0001 3: func1 (section "") (file test_t_extern_ok.asm:1)
-    E W $0003 $0004 3: func2 (section "") (file test_t_extern_ok.asm:4)
+    E W $0003 $0004 3: func2 (section "") (file test_t_extern_ok.asm:6)

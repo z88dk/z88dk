@@ -80,6 +80,7 @@ enum class Keyword {
     NC,
     NOP,
     NZ,
+    PUBLIC,
     XIX,
     YIY,
     Z,

@@ -5,12 +5,12 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 path("$test.asm")->spew(<<END);
-	jp func1
-	extern func1
-	extern func1
-	extern func2,func3
-	extern func2,func3
-	jp func2
+func1:
+	public func1
+	public func1
+	public func2
+	public func2
+func2:
 END
 
 run_ok("$exec -E $test.asm > $test.out 2>&1");
