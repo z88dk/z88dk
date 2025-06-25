@@ -477,6 +477,10 @@ void ObjModule::declare_extern(const string& name) {
     m_symtab.declare_extern(name);
 }
 
+void ObjModule::declare_public(const string& name) {
+    m_symtab.declare_public(name);
+}
+
 void ObjModule::add_opcode_void(long long opcode) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);

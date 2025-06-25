@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
             if (option.size() > 2) {
                 string line = option.substr(2);
                 LineParser parser;
-                if (!parser.parse_define(line))
+                if (!parser.parse_define_args(line))
                     return EXIT_FAILURE;
             }
             else

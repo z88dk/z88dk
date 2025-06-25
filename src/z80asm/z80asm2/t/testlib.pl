@@ -16,6 +16,7 @@ $exec = $ENV{TARGET} ? $ENV{TARGET} : $^O =~ /MSWin32|msys/ ? "./z80asm.exe" : "
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $bmk = "t/".path($0)->basename(".t").".bmk";
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
+unlink_testfiles();
 
 sub run_ok {
     my($cmd) = @_;
@@ -35,6 +36,12 @@ sub run_nok {
     ok 0!=system($cmd), $cmd;
 	
 	(Test::More->builder->is_passing) or die;
+}
+
+sub append_out {
+	open(my $fh, ">>", "$test.out") or die "open $test.out: $!";
+	say $fh @_ if scalar(@_); 
+	close($fh);
 }
 
 sub unlink_testfiles {

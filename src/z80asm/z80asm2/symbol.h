@@ -99,6 +99,7 @@ public:
     Symbol* add_equ(const string& name, Expr* expr);
     Symbol* touch_symbol(const string& name);
     Symbol* declare_extern(const string& name);
+    Symbol* declare_public(const string& name);
 
     bool has_undefined_symbols() const;
 

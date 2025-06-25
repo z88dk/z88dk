@@ -9,6 +9,8 @@
 
 #include "scanner.h"
 #include "token.h"
+#include <string>
+#include <vector>
 using namespace std;
 
 class Expr;
@@ -16,8 +18,9 @@ class Expr;
 class LineParser {
 public:
     bool parse_line(const string& line);
-    bool parse_define(const string& line);
-    bool parse_extern(const string& line);
+    bool parse_define_args(const string& line);
+    bool parse_extern_args(const string& line);
+    bool parse_public_args(const string& line);
 
 private:
     struct Elem {
@@ -75,9 +78,11 @@ private:
     void action_ld_iy_comma_expr();
     void action_jp_expr();
     //@@END
-
-    bool parse_define();
-    bool parse_extern();
+    
+    bool parse_define_args();
+    bool parse_extern_args();
+    bool parse_public_args();
+    bool parse_ident_list(vector<string>& names);
     bool parse_name(string& name);
     bool parse_const_expr(int& value);
     bool parse_equal();
@@ -86,6 +91,7 @@ private:
 
     void action_define(const string& name, int value = 1);
     void action_extern(const string& name);
+    void action_public(const string& name);
 
     // state in the parsing state machine
     struct State {

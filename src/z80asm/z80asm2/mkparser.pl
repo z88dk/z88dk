@@ -117,6 +117,7 @@ my %keywords = (
 	IYH => "iyh",
 	IYL => "iyl",
 	LINE => "line",
+	PUBLIC => "public",
 	XIX => "xix",
 	YIY => "yiy",
 );
