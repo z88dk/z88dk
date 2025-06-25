@@ -242,6 +242,38 @@ Symbol* Symtab::declare_public(const string& name) {
     return symbol;
 }
 
+Symbol* Symtab::declare_global(const string& name) {
+    auto symbol = get_symbol(name);
+    if (!symbol)
+        symbol = add_symbol(name);
+
+    if (symbol->sym_scope() == SymScope::GLOBAL) {
+        // already global
+    }
+    else if (symbol->sym_scope() != SymScope::LOCAL) {
+        g_error->error_duplicate_definition(name);
+    }
+    else {
+        symbol->set_sym_scope(SymScope::GLOBAL);
+    }
+
+    return symbol;
+}
+
+void Symtab::convert_global_to_extern_public() {
+    for (auto& it : m_table) {
+        Symbol* symbol = it.second;
+        if (symbol->sym_scope() == SymScope::GLOBAL) {
+            if (symbol->sym_type() == SymType::UNDEFINED) {
+                symbol->set_sym_scope(SymScope::EXTERN);
+            }
+            else {
+                symbol->set_sym_scope(SymScope::PUBLIC);
+            }
+        }
+    }
+}
+
 bool Symtab::has_undefined_symbols() const {
     bool has_undefined = false;
     for (auto& it : m_table) {

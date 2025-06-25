@@ -100,7 +100,9 @@ public:
     Symbol* touch_symbol(const string& name);
     Symbol* declare_extern(const string& name);
     Symbol* declare_public(const string& name);
+    Symbol* declare_global(const string& name);
 
+    void convert_global_to_extern_public();
     bool has_undefined_symbols() const;
 
     auto begin() { return m_table.begin(); }

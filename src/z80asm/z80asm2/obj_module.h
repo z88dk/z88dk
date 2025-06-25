@@ -178,6 +178,7 @@ public:
     void define_global_defs();
     void define_cpu_defs(Cpu cpu_id);
     void expand_jrs();
+    void convert_global_to_extern_public();
     bool has_undefined_symbols() const;
     void resolve_local_exprs() const;
 
@@ -186,6 +187,7 @@ public:
     void add_equ(const string& name, Expr* expr);
     void declare_extern(const string& name);
     void declare_public(const string& name);
+    void declare_global(const string& name);
 
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
