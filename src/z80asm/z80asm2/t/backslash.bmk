@@ -8,5 +8,5 @@ assembled test_t_backslash.asm to test_t_backslash.o
 Object  file test_t_backslash.o at $0000: Z80RMF18
   Name: test_t_backslash
   CPU:  z80 
-  Section "": 2 bytes, ORG $0000
+  Section "": 2 bytes
     C $0000: 3E 19

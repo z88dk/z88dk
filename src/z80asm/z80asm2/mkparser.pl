@@ -193,17 +193,19 @@ my %type = (
     COMPUTED   => { id => 3, },	# "=" - depends on the result of an expression
 );
 
+my %swap_ixiy = (
+    NO_SWAP		=> { id => 0, text => "" 			},	# no swap
+    SWAP		=> { id => 1, text => "-IXIY" 		},	# swap IX and IY
+    SOFT_SWAP	=> { id => 2, text => "-IXIY-soft" 	},	# swap IX and IY, but save object file with no swap
+);
+
 my %config = (
 	OBJ_FILE_VERSION	=> 18,
 	OBJ_FILE_SIGNATURE	=> c_string("Z80RMF"),
 	LIB_FILE_SIGNATURE	=> c_string("Z80LMF"),
 	SIGNATURE_SIZE		=> 8,
-);
-
-my %swap_ixiy = (
-    NO_SWAP		=> { id => 0, text => "" 			},	# no swap
-    SWAP		=> { id => 1, text => "-IXIY" 		},	# swap IX and IY
-    SOFT_SWAP	=> { id => 2, text => "-IXIY-soft" 	},	# swap IX and IY, but save object file with no swap
+	ORG_NOT_DEFINED		=> -1,
+	ORG_SECTION_SPLIT	=> -2,
 );
 
 #-------------------------------------------------------------------------------

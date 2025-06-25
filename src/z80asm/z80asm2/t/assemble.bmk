@@ -11,7 +11,7 @@ assembled test_t_assemble.asm to test_t_assemble.o
 Object  file test_t_assemble.o at $0000: Z80RMF18
   Name: test_t_assemble
   CPU:  z80 
-  Section "": 3 bytes, ORG $0000
+  Section "": 3 bytes
     C $0000: 7F 20 00
   Symbols:
     L A $0000: start (section "") (file test_t_assemble.asm:1)

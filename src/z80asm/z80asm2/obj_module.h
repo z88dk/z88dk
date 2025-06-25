@@ -111,6 +111,12 @@ private:
 
 class Section {
 public:
+    static inline const int ORG_NOT_DEFINED =
+        /*@@CONFIG:ORG_NOT_DEFINED*/ -1 /*@@END*/;
+    static inline const int ORG_SECTION_SPLIT =
+        /*@@CONFIG:ORG_SECTION_SPLIT*/ -2 /*@@END*/;
+
+
     Section(ObjModule* parent, const string& name);
     Section(const Section& other) = delete;
     virtual ~Section();
@@ -141,7 +147,7 @@ public:
 private:
     ObjModule* m_parent{ nullptr };
     string m_name;
-    int m_origin{ 0 };
+    int m_origin{ ORG_NOT_DEFINED };
     int m_align{ 1 };
     vector<Instr*> m_instrs;
 };

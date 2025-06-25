@@ -11,7 +11,7 @@ assembled test_t_swap_ixiy.asm to test_t_swap_ixiy.o
 Object  file test_t_swap_ixiy.o at $0000: Z80RMF18
   Name: test_t_swap_ixiy
   CPU:  z80 
-  Section "": 8 bytes, ORG $0000
+  Section "": 8 bytes
     C $0000: DD 21 00 00 FD 21 00 00
 
 
@@ -28,7 +28,7 @@ assembled test_t_swap_ixiy.asm to test_t_swap_ixiy.o
 Object  file test_t_swap_ixiy.o at $0000: Z80RMF18
   Name: test_t_swap_ixiy
   CPU:  z80 (-IXIY)
-  Section "": 8 bytes, ORG $0000
+  Section "": 8 bytes
     C $0000: FD 21 00 00 DD 21 00 00
 
 
@@ -45,7 +45,7 @@ assembled test_t_swap_ixiy.asm to test_t_swap_ixiy.o
 Object  file test_t_swap_ixiy.o at $0000: Z80RMF18
   Name: test_t_swap_ixiy
   CPU:  z80 (-IXIY-soft)
-  Section "": 8 bytes, ORG $0000
+  Section "": 8 bytes
     C $0000: FD 21 00 00 DD 21 00 00
 
 

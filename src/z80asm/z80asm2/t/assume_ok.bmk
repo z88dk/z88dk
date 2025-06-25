@@ -10,4 +10,4 @@ assembled test_t_assume_ok.asm to test_t_assume_ok.o
 Object  file test_t_assume_ok.o at $0000: Z80RMF18
   Name: test_t_assume_ok
   CPU:  z80 
-  Section "": 0 bytes, ORG $0000
+  Section "": 0 bytes

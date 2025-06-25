@@ -12,5 +12,5 @@ assembled test_t_cont_lines.asm to test_t_cont_lines.o
 Object  file test_t_cont_lines.o at $0000: Z80RMF18
   Name: test_t_cont_lines
   CPU:  z80 
-  Section "": 6 bytes, ORG $0000
+  Section "": 6 bytes
     C $0000: 3E 19 06 1E 0E 28

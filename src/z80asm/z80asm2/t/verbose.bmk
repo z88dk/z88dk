@@ -8,5 +8,5 @@ assembled test_t_verbose.asm to test_t_verbose.o
 Object  file test_t_verbose.o at $0000: Z80RMF18
   Name: test_t_verbose
   CPU:  z180 
-  Section "": 1 bytes, ORG $0000
+  Section "": 1 bytes
     C $0000: 00

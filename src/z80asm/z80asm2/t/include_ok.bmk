@@ -28,5 +28,5 @@ assembled test_t_include_ok.asm to test_t_include_ok.o
 Object  file test_t_include_ok.o at $0000: Z80RMF18
   Name: test_t_include_ok
   CPU:  z80 
-  Section "": 11 bytes, ORG $0000
+  Section "": 11 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00
