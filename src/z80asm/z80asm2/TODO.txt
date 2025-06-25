@@ -1,2 +1,5 @@
 - AStyle
 - JR inside a module should be resolved before outputing the object file
+- ORG shold be not-defined if no ORG statement was given
+- global_ok.bmk: func2 should be 0x0003, not 0
+- label_ok.bmk: l2 should be 0x0002, not 0
