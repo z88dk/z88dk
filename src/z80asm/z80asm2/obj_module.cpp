@@ -300,7 +300,8 @@ void Section::clear() {
     for (auto& instr : m_instrs)
         delete instr;
     m_instrs.clear();
-    m_origin = 0;
+    m_origin = ORG_NOT_DEFINED;
+    m_align = 1;
 }
 
 int Section::asmpc() const {

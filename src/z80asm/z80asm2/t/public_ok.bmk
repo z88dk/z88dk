@@ -13,7 +13,7 @@ assembled test_t_public_ok.asm to test_t_public_ok.o
 Object  file test_t_public_ok.o at $0000: Z80RMF18
   Name: test_t_public_ok
   CPU:  z80 
-  Section "": 0 bytes, ORG $0000
+  Section "": 0 bytes
   Symbols:
     G A $0000: func1 (section "") (file test_t_public_ok.asm:1)
     G A $0000: func2 (section "") (file test_t_public_ok.asm:6)
