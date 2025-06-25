@@ -13,7 +13,7 @@ using namespace std;
 
 class Scanner {
 public:
-    Scanner() {}
+    Scanner() = default;
     Scanner(const vector<Token>& tokens);
     bool scan(const string& text);
     void clear();

@@ -86,6 +86,7 @@ bool Assembler::parse() {
         g_preproc->expand(line);
         string expanded_line;
         while (g_preproc->getline(expanded_line)) {
+            g_obj_module->cur_section()->add_instr();
             LineParser parser;
             if (!parser.parse_line(expanded_line))
                 ok = false;

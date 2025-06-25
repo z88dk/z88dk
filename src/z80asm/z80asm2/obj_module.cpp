@@ -59,6 +59,7 @@ int Patch::size() const {
 
 void Patch::resolve(int value) {
     *g_location = m_expr->location();    // prepare for errors
+
     switch (m_patch_type)
     {
     case PatchType::UNDEFINED:
@@ -99,7 +100,6 @@ void Patch::resolve(int value) {
         break;
 
     case PatchType::JR_OFFSET:
-        value -= m_parent->offset() + m_parent->size(); // relative to the next instruction
         if (value < -128 || value > 127)
             g_error->error_int_range(int_to_hex(value, 2));
         else
@@ -107,7 +107,6 @@ void Patch::resolve(int value) {
         break;
 
     case PatchType::JRE_OFFSET:
-        value -= m_parent->offset() + m_parent->size(); // relative to the next instruction
         if (value < -0x8000 || value > 0x7FFF)
             g_error->error_int_range(int_to_hex(value, 4));
         else {
@@ -175,6 +174,10 @@ Instr::~Instr() {
     for (auto& patch : m_patches)
         delete patch;
     m_patches.clear();
+}
+
+bool Instr::empty() const {
+    return m_bytes.empty() && m_patches.empty();
 }
 
 void Instr::patch_byte(int index, uint8_t byte) {
@@ -272,7 +275,12 @@ void Instr::resolve_local_exprs() {
         *g_location = expr->location(); // prepare for errors
 
         int value = 0;
-        if (expr->eval_const(value)) {
+        if (resolve_local_jrs(patch)) {
+            // If the patch was resolved as a local jump, remove it
+            it = m_patches.erase(it);
+            continue;
+        }
+        else if (expr->eval_const(value)) {
             // If the expression is local, resolve it
             patch->resolve(value);
             it = m_patches.erase(it); // Remove the patch
@@ -286,8 +294,27 @@ void Instr::resolve_local_exprs() {
     }
 }
 
+bool Instr::resolve_local_jrs(Patch* patch) {
+    // Check if the patch is a local jump and resolve it
+    if (patch->patch_type() == PatchType::JR_OFFSET) {
+    
+        int target = 0;
+        if (patch->expr()->eval(target, true)) {
+            int pos = m_offset + patch->parent()->size();
+            int distance = target - pos;
+            if (distance >= -128 && distance <= 127) {
+                patch->resolve(distance);
+                return true; // Resolved as a local jump
+            }
+        }
+    }
+    return false; // Not resolved
+}
+
 Section::Section(ObjModule* parent, const string& name)
     : m_parent(parent), m_name(name) {
+    auto instr = new Instr(this);
+    m_instrs.push_back(instr);
 }
 
 Section::~Section() {
@@ -302,20 +329,19 @@ void Section::clear() {
     m_instrs.clear();
     m_origin = ORG_NOT_DEFINED;
     m_align = 1;
+
+    auto instr = new Instr(this);
+    m_instrs.push_back(instr);
 }
 
-int Section::asmpc() const {
-    if (m_instrs.empty())
-        return 0;
-    else
-        return m_instrs.back()->offset();
+Instr* Section::asmpc() const {
+    assert(!m_instrs.empty() && "instrs empty");
+    return m_instrs.back();
 }
 
 int Section::size() const {
-    if (m_instrs.empty())
-        return 0;
-    else
-        return m_instrs.back()->offset() + m_instrs.back()->size();
+    assert(!m_instrs.empty() && "instrs empty");
+    return asmpc()->offset() + asmpc()->size();
 }
 
 Symtab* Section::symtab() {
@@ -323,16 +349,14 @@ Symtab* Section::symtab() {
 }
 
 Instr* Section::add_instr() {
-    auto instr = new Instr(this);
-    instr->set_offset(size());
-    m_instrs.push_back(instr);
+    auto instr = asmpc();
+    if (!instr->empty()) {
+        instr = new Instr(this);
+        instr->set_offset(size());
+        m_instrs.push_back(instr);
+    }
+    instr->set_location(*g_location);
     return instr;
-}
-
-Instr* Section::cur_instr() {
-    if (m_instrs.empty())
-        add_instr();
-    return m_instrs.back();
 }
 
 void Section::expand_jrs() {
@@ -395,6 +419,11 @@ void ObjModule::clear() {
     m_assume = 0;
 }
 
+Section* ObjModule::cur_section() const {
+    assert(m_cur_section != nullptr && "cur_section cannot be nullptr");
+    return m_cur_section;
+}
+
 void ObjModule::set_cur_section(const string& name) {
     if (m_cur_section && m_cur_section->name() == name) {
         return; // already set
@@ -413,7 +442,7 @@ void ObjModule::set_cur_section(const string& name) {
     m_sections.push_back(m_cur_section);
 }
 
-int ObjModule::asmpc() {
+Instr* ObjModule::asmpc() const {
     return cur_section()->asmpc();
 }
 

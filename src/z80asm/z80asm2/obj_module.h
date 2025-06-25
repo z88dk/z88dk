@@ -84,6 +84,8 @@ public:
     virtual ~Instr();
     Instr& operator=(const Instr& other) = delete;
 
+    bool empty() const;
+
     Section* parent() const { return m_parent; }
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
@@ -91,6 +93,7 @@ public:
     int size() const { return static_cast<int>(m_bytes.size()); }
     vector<Patch*>& patches() { return m_patches; }
     const Location& location() const { return m_location; }
+    void set_location(const Location& location) { m_location = location; }
 
     void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
     void patch_byte(int index, uint8_t byte);
@@ -105,6 +108,8 @@ private:
     vector<uint8_t> m_bytes;
     vector<Patch*> m_patches;
     Location m_location;
+
+    bool resolve_local_jrs(Patch* patch);
 };
 
 // Section
@@ -131,13 +136,12 @@ public:
     int align() const { return m_align; }
     void set_align(int align) { m_align = align; }
 
-    int asmpc() const;
+    Instr* asmpc() const;
     int size() const;
 
     Symtab* symtab();
 
     Instr* add_instr();
-    Instr* cur_instr();
     const vector<Instr*>& instrs() const { return m_instrs; }
 
     void expand_jrs();
@@ -177,9 +181,9 @@ public:
     Symtab* symtab() { return &m_symtab; }
     const vector<Section*>& sections() const { return m_sections; }
 
-    Section* cur_section() { return m_cur_section; }
+    Section* cur_section() const;
     void set_cur_section(const string& name);
-    int asmpc();
+    Instr* asmpc() const;
 
     void define_global_defs();
     void define_cpu_defs(Cpu cpu_id);

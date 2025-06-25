@@ -17,7 +17,7 @@ IDENT "equ" EXPR
 	g_obj_module->add_opcode_void(0x00);
 
 "jr" EXPR
-	g_obj_module->add_opcode_jr(0x18, $4.expr->clone());
+	g_obj_module->add_opcode_jr(0x18, $2.expr->clone());
 
 "jr" "nz" "," EXPR
 	g_obj_module->add_opcode_jr(0x20, $4.expr->clone());
