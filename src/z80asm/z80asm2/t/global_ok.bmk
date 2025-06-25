@@ -16,7 +16,7 @@ Object  file test_t_global_ok.o at $0000: Z80RMF18
   Section "": 3 bytes, ORG $0000
     C $0000: C3 00 00
   Symbols:
-    G A $0000: func2 (section "") (file test_t_global_ok.asm:6)
+    G A $0003: func2 (section "") (file test_t_global_ok.asm:6)
   Externs:
     U         func1
   Expressions:

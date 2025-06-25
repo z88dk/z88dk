@@ -50,7 +50,7 @@ public:
     SymScope sym_scope() const { return m_sym_scope; }
     SymType sym_type() const { return m_sym_type; }
     bool is_global_def() const { return m_is_global_def; } 
-    int value() const { return m_value; }
+    int value() const;
     Instr* instr() { return m_instr; }
     Expr* expr() { return m_expr; }
     bool in_eval() const { return m_in_eval; }
