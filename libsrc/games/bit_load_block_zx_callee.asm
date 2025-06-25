@@ -4,10 +4,17 @@
 ;      int __CALLEE__ bit_load_block_zx_callee(void *addr, size_t len, unsigned char type)
 ;
 
+;      TODO: the ZX81 loads wrong data when the audio phase is inverted (??)
+
 
     PUBLIC  bit_load_block_zx_callee
     PUBLIC  _bit_load_block_zx_callee
     PUBLIC  asm_bit_load_block_zx
+
+    EXTERN  bit_open_di
+    EXTERN  bit_close_ei
+
+    EXTERN  __snd_tick
 
     INCLUDE "games/games.inc"
 
@@ -35,6 +42,23 @@ asm_bit_load_block_zx:
 
 
     push    ix
+  IF    FORzx81
+    EX      AF, AF'
+    PUSH    AF
+    EX      AF, AF'
+  ENDIF
+
+    push    af
+  IF    FORzx81
+    push    de
+    EXTERN  zx_fast
+    call    zx_fast
+    pop     de
+    OUT     ($FF), A                   ;   set output bit high
+  ELSE
+    call    bit_open_di
+  ENDIF
+    pop     af
 
     push    bc
     pop     ix
@@ -60,10 +84,6 @@ asm_bit_load_block_zx:
   ENDIF
 
     DEC     D
-    DI                                  ; Disable Interrupts
-
-;        LD      A,$0F
-;        OUT     ($FC),A
 
     CALL    LD_BYTES
 
@@ -76,7 +96,16 @@ asm_bit_load_block_zx:
 ;        LD      A,$7F
 ;        IN      A,($FC)
 ;        RRA
-    EI
+  IF    FORzx81
+    EXTERN  zx_slow
+    call    zx_slow
+  ELSE
+    call    bit_close_ei
+  IF    (TAPEIN_ONEBIT_port=$FE)
+    ld      a, (__snd_tick)             ; Restore border colour
+    ONEBITOUT
+  ENDIF
+  ENDIF
 
   IF    FORmsx
     LD      A, $09
@@ -88,6 +117,11 @@ asm_bit_load_block_zx:
     OUT     ($97), A                    ; MOTOR OFF
   ENDIF
 
+  IF    FORzx81
+    EX      AF, AF'
+    POP     AF
+    EX      AF, AF'
+  ENDIF
     pop     ix
 
 ;		LD      HL,0
@@ -99,13 +133,29 @@ asm_bit_load_block_zx:
 
 
 LD_BYTES:
+
+  IF    FORsam
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+  ENDIF
+
     IN      A, (TAPEIN_ONEBIT_port)
         ;RRA
 
     AND     TAPEIN_ONEBIT_mask
-		;AND     $20
+        ;AND     $20
         ;OR      $02
     LD      C, A
+
+  IF    FORsam
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+  ENDIF
+
     CP      A
 
 
@@ -146,9 +196,9 @@ LD_SYNC:
     CALL    LD_EDGE_1
     JR      NC, LD_BREAK
 
-    LD      A, B
+    LD      A, B            ; Check if we reached the gap between the leader tone and the data trail
     CP      $D4
-    JR      NC, LD_SYNC
+    JR      NC, LD_SYNC     ; If the gap is longer than $D4, we can start loading
 
     CALL    LD_EDGE_1
     RET     NC
@@ -185,7 +235,6 @@ LD_DEC:
     DEC     DE
     EX      AF, AF'
     LD      B, $B2
-
 LD_MARKER:
     LD      L, $01
 
@@ -235,7 +284,13 @@ L05ED:
     INC     B
     RET     Z
 
-        ;LD      A,$7F
+  IF    FORsam
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+  ENDIF
+
         ;RRA
     IN      A, (TAPEIN_ONEBIT_port)
 ;        RET     NC
@@ -247,8 +302,27 @@ L05ED:
     LD      A, C
     CPL
     LD      C, A
+
+  IF    FORsam
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+    ex      (sp), hl
+  ENDIF
+
     AND     $07
-        ;OR      $09
+
+  IF    (TAPEIN_ONEBIT_port=$FE)
+  IF    FORzx81
+    OUT     ($FF), A
+  ELSE
+    AND     $07
+	;OR      $09
+    OR      $0A                         ; Changing the output mask we may alter the color of the data being loaded
+    OUT     ($FE), A
+  ENDIF
+  ENDIF
+          ;OR      $09
         ;OUT     (BORDER),A
 
     SCF                                 ; Set Carry Flag
