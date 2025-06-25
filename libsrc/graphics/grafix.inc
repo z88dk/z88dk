@@ -223,6 +223,12 @@ IF FORzx81g007
     defc maxy    = 185
 ENDIF
 
+IF FORzx81g64
+    DEFINE gotgfx
+    defc maxx    = 256    ; It could be 272 but we should switch to 'wide' mode
+    defc maxy    = 64
+ENDIF
+
 IF FORaceudg
     DEFINE gotgfx
     defc maxx    = 64
@@ -504,6 +510,13 @@ IF FORnascom
     DEFINE gotgfx
     defc maxx    = 96
     defc maxy    = 48
+    defc blankch    = 32
+ENDIF
+
+IF FORrc700
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 75
     defc blankch    = 32
 ENDIF
 

@@ -28,9 +28,9 @@ ENDIF
     ld      c,(hl)
     dec     hl          ;&fmt+1
     ex      de,hl           ;de=&fmt+1
-    ld      hl,65535    ;ininite length
+    ld      hl,65535    ;infinite length
     push    hl 
-    ld      hl,1+2+128  ;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
+    ld      hl,2+128  ;h=ungetc, l=_IOREAD|_IOSTRING
     push    hl
     push    bc          ;buf
     ld      hl,0

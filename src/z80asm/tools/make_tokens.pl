@@ -35,6 +35,12 @@ my @tokens = (
 	'CALL_LTU', 'CALL_LEU', 'CALL_GTU', 'CALL_GEU', 
 	'CALL_LT',  'CALL_LE',  'CALL_GT',  'CALL_GE', 
 
+	'CALL3_NZ', 'CALL3_Z', 'CALL3_NC', 'CALL3_C', 'CALL3_PO', 'CALL3_PE', 'CALL3_P', 'CALL3_M', 
+	'CALL3_LZ', 'CALL3_LO', 'CALL3_NV', 'CALL3_V', 'CALL3_NK', 'CALL3_K', 'CALL3_NX5', 'CALL3_X5',
+	'CALL3_NE', 'CALL3_EQ', 
+	'CALL3_LTU', 'CALL3_LEU', 'CALL3_GTU', 'CALL3_GEU', 
+	'CALL3_LT',  'CALL3_LE',  'CALL3_GT',  'CALL3_GE', 
+
 	'CALL_SIS_NZ', 'CALL_SIS_Z', 'CALL_SIS_NC', 'CALL_SIS_C', 'CALL_SIS_PO', 'CALL_SIS_PE', 'CALL_SIS_P', 'CALL_SIS_M', 
 	'CALL_SIS_LZ', 'CALL_SIS_LO', 'CALL_SIS_NV', 'CALL_SIS_V', 'CALL_SIS_NK', 'CALL_SIS_K', 'CALL_SIS_NX5', 'CALL_SIS_X5',
 	'CALL_SIS_NE', 'CALL_SIS_EQ', 
@@ -71,7 +77,6 @@ my @tokens = (
 	'CALL_IL_LTU', 'CALL_IL_LEU', 'CALL_IL_GTU', 'CALL_IL_GEU', 
 	'CALL_IL_LT',  'CALL_IL_LE',  'CALL_IL_GT',  'CALL_IL_GE', 
 
-	'CALL3_NZ', 'CALL3_Z', 'CALL3_NC', 'CALL3_C', 'CALL3_PO', 'CALL3_PE', 'CALL3_P', 'CALL3_M', 
 	'JR_NZ', 'JR_Z', 'JR_NC', 'JR_C', 'JR_PO', 'JR_PE', 'JR_P', 'JR_M', 
 	'JR_LZ', 'JR_LO', 'JR_NV', 'JR_V', 'JR_NK', 'JR_K', 'JR_NX5', 'JR_X5',
 	'JR_NE', 'JR_EQ', 
@@ -90,6 +95,18 @@ my @tokens = (
 	'JP_LTU', 'JP_LEU', 'JP_GTU', 'JP_GEU', 
 	'JP_LT',  'JP_LE',  'JP_GT',  'JP_GE', 
 
+	'LLJP_NZ', 'LLJP_Z', 'LLJP_NC', 'LLJP_C', 'LLJP_PO', 'LLJP_PE', 'LLJP_P', 'LLJP_M', 
+	'LLJP_LZ', 'LLJP_LO', 'LLJP_NV', 'LLJP_V', 'LLJP_NK', 'LLJP_K', 'LLJP_NX5', 'LLJP_X5',
+	'LLJP_NE', 'LLJP_EQ', 
+	'LLJP_LTU', 'LLJP_LEU', 'LLJP_GTU', 'LLJP_GEU', 
+	'LLJP_LT',  'LLJP_LE',  'LLJP_GT',  'LLJP_GE', 
+
+	'JP3_NZ', 'JP3_Z', 'JP3_NC', 'JP3_C', 'JP3_PO', 'JP3_PE', 'JP3_P', 'JP3_M', 
+	'JP3_LZ', 'JP3_LO', 'JP3_NV', 'JP3_V', 'JP3_NK', 'JP3_K', 'JP3_NX5', 'JP3_X5',
+	'JP3_NE', 'JP3_EQ', 
+	'JP3_LTU', 'JP3_LEU', 'JP3_GTU', 'JP3_GEU', 
+	'JP3_LT',  'JP3_LE',  'JP3_GT',  'JP3_GE', 
+
 	'JP_SIS_NZ', 'JP_SIS_Z', 'JP_SIS_NC', 'JP_SIS_C', 'JP_SIS_PO', 'JP_SIS_PE', 'JP_SIS_P', 'JP_SIS_M', 
 	'JP_SIS_LZ', 'JP_SIS_LO', 'JP_SIS_NV', 'JP_SIS_V', 'JP_SIS_NK', 'JP_SIS_K', 'JP_SIS_NX5', 'JP_SIS_X5',
 	'JP_SIS_NE', 'JP_SIS_EQ', 
@@ -101,12 +118,6 @@ my @tokens = (
 	'JP_LIL_NE', 'JP_LIL_EQ', 
 	'JP_LIL_LTU', 'JP_LIL_LEU', 'JP_LIL_GTU', 'JP_LIL_GEU', 
 	'JP_LIL_LT',  'JP_LIL_LE',  'JP_LIL_GT',  'JP_LIL_GE', 
-
-	'JP3_NZ', 'JP3_Z', 'JP3_NC', 'JP3_C', 'JP3_PO', 'JP3_PE', 'JP3_P', 'JP3_M', 
-	'JP3_LZ', 'JP3_LO', 'JP3_NV', 'JP3_V', 'JP3_NK', 'JP3_K', 'JP3_NX5', 'JP3_X5',
-	'JP3_NE', 'JP3_EQ', 
-	'JP3_LTU', 'JP3_LEU', 'JP3_GTU', 'JP3_GEU', 
-	'JP3_LT',  'JP3_LE',  'JP3_GT',  'JP3_GE', 
 
 	'JMP_NZ', 'JMP_Z', 'JMP_NC', 'JMP_C', 'JMP_PO', 'JMP_PE', 'JMP_P', 'JMP_M', 
 	'JMP_LZ', 'JMP_LO', 'JMP_NV', 'JMP_V', 'JMP_NK', 'JMP_K', 'JMP_NX5', 'JMP_X5',
@@ -131,6 +142,12 @@ my @tokens = (
 	'RET_NE', 'RET_EQ', 
 	'RET_LTU', 'RET_LEU', 'RET_GTU', 'RET_GEU', 
 	'RET_LT',  'RET_LE',  'RET_GT',  'RET_GE', 
+
+	'RET3_NZ', 'RET3_Z', 'RET3_NC', 'RET3_C', 'RET3_PO', 'RET3_PE', 'RET3_P', 'RET3_M', 
+	'RET3_LZ', 'RET3_LO', 'RET3_NV', 'RET3_V', 'RET3_NK', 'RET3_K', 'RET3_NX5', 'RET3_X5',
+	'RET3_NE', 'RET3_EQ', 
+	'RET3_LTU', 'RET3_LEU', 'RET3_GTU', 'RET3_GEU', 
+	'RET3_LT',  'RET3_LE',  'RET3_GT',  'RET3_GE', 
 
 	'RET_L_NZ', 'RET_L_Z', 'RET_L_NC', 'RET_L_C', 'RET_L_PO', 'RET_L_PE', 'RET_L_P', 'RET_L_M', 
 	'RET_L_LZ', 'RET_L_LO', 'RET_L_NV', 'RET_L_V', 'RET_L_NK', 'RET_L_K', 'RET_L_NX5', 'RET_L_X5',
@@ -164,7 +181,6 @@ my @tokens = (
 	
 	# Indirect 16-bit register
 	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
-	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ', 
 	
 	# 8-bit registers
 	'B', 'C', 'D', 'E', 'H', 'L', 'A', 'F', 'I', 'R', 'M',
@@ -190,6 +206,10 @@ my @tokens = (
 	
 	# 32-bit registers
 	'BCDE', 'DEHL', 'JKHL', 'PW', 'PX', 'PY', 'PZ',
+	
+	# Indirect 32-bit registers
+	'IND_BCDE', 'IND_DEHL', 'IND_JKHL', 
+	'IND_PW', 'IND_PX', 'IND_PY', 'IND_PZ',
 	
 	# alternate registers
 	'B1', 'C1', 'D1', 'E1', 'H1', 'L1', 'A1', 'F1', 'BC1', 'DE1', 'JK1', 'HL1', 'AF1',
@@ -237,12 +257,21 @@ my @tokens = (
 	# EZ80 specific opcodes
 	
 	# Rabbit specific opcodes
-	'ALTD', 'BOOL', 'IOE', 'IOI', 'IPRES', 'IPSET', 'IDET', 'LDDSR', 'LDISR', 
+	'ALTD', 'ALTS','ALTSD', 'BOOL', 'IOE', 'IOI', 'IPRES', 'IPSET', 'IDET', 'LDDSR', 'LDISR', 
 	'LDP', 'LSDR', 'LSIR', 'LSDDR', 'LSIDR', 'MUL', 'IP', 'SU', 'RDMODE', 
 	'SETUSR', 'SURES', 'SYSCALL', 'UMA', 'UMS', 'CBM', 'CLR', 'CONVC', 'CONVD',
 	'COPY', 'COPYR', 'DWJNZ', 'EXP', 'FLAG', 'FSYSCALL', 'IBOX', 'JRE', 'LDF',
 	'LDL', 'MULU', 'RLB', 'RRB', 'SBOX', 'SETSYSP', 'SETUSRP', 'SYSRET', 'SRET',
-
+	'LCALL', 'LJP', 'LLCALL', 'LLJP', 'LRET', 'LLRET',
+	'AESIMC', 'AESISR', 'AESMC', 'AESSR', 'CNVC', 'CNVD', 
+	'MD5F1', 'MD5F2', 'MD5F3', 'PLDD', 'PLDDR', 'PLDDSR', 
+	'PLDI', 'PLDIR', 'PLDISR', 'PLSDDR', 'PLSDR', 'PLSIDR', 'PLSIR', 'PUMA', 'PUMS', 
+	'RL1REG', 'RL2REG', 'RL3REG', 'RL4REG', 'RL5REG', 'RL6REG', 'RL7REG', 'RL8REG', 
+	'RR1REG', 'RR2REG', 'RR3REG', 'RR4REG', 'RR5REG', 'RR6REG', 'RR7REG', 'RR8REG', 
+	'SCALL', 'SHAF1', 'SHAF2', 'SHAF3', 'SL1REG', 'SL2REG', 'SL3REG', 'SL4REG', 'SL5REG', 
+	'SL6REG', 'SL7REG', 'SL8REG', 'SR1REG', 'SR2REG', 'SR3REG', 'SR4REG', 'SR5REG', 
+	'SR6REG', 'SR7REG', 'SR8REG', 'TSTNULL',
+	
 	# Z88DK specific opcodes
 	'CALL_OZ', 'CALL_PKG', 'FPP', 'INVOKE',
 

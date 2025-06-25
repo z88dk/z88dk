@@ -607,7 +607,7 @@ defc __IO_SIO_RR1_RX_FRAMING_ERROR      = 0x40
 defc __IO_SIO_RR1_SDLC_EOF      = 0x80
 
 defc __IO_SIO_RX_SIZE      = 0x80
-defc __IO_SIO_RX_FULLISH      = 0x70
+defc __IO_SIO_RX_FULLISH      = 0x68
 defc __IO_SIO_RX_EMPTYISH      = 0x08
 defc __IO_SIO_TX_SIZE      = 0x10
 
@@ -716,7 +716,7 @@ defc __IO_UART_MSR_RING_INDICATOR = 0x40
 defc __IO_UART_MSR_DCD            = 0x80
 
 defc __IO_UART_RX_SIZE        = 0x80
-defc __IO_UART_RX_FULLISH     = 0x70
+defc __IO_UART_RX_FULLISH     = 0x68
 defc __IO_UART_RX_EMPTYISH    = 0x08
 
 defc __IO_UART_DLL_115200     = 0x01
@@ -909,6 +909,9 @@ defc __CPM_SUID = 32
 defc __CPM_RRAN = 33
 defc __CPM_WRAN = 34
 defc __CPM_CFS  = 35
+defc __CPM_RREC = 36
+defc __CPM_SRDS = 37
+defc __CPM_WRZF = 40
 defc __CPM_DSEG = 51
 
 

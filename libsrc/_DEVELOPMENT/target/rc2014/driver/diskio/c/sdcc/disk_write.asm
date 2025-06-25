@@ -13,38 +13,33 @@ EXTERN asm_disk_write
 ;   LBA_t sector,           /* Start sector in LBA */
 ;   UINT count );           /* Number of sectors to write (<256) */
 ;
-; entry
-; a = number of sectors (< 256)
-; bcde = LBA specified by the 4 bytes in BCDE
-; hl = the address pointer to the buffer to read from
-;
+; Entry
+;   a = number of sectors (< 256)
+;   bcde = LBA specified by the 4 bytes in BCDE
+;   hl = the address pointer to the buffer to read from
 
 _disk_write:
-    inc sp      ; pop return address
-    inc sp
+    ld hl,9     ; get count into A
+    add hl,sp
+    ld a,(hl)
 
-    inc sp      ; drop single byte pdrv (not evaluated)
+    dec hl      ; get LBA high into BC
+    ld b,(hl)
+    dec hl
+    ld c,(hl)
 
-    pop hl      ; *buff to hl
-    pop de      ; start sector to bcde
-    pop bc
-    dec sp      ; get BYTE sector count
-    pop af      ; pop sector count into a
+    dec hl      ; get LBA low onto stack
+    ld d,(hl)
+    dec hl
+    ld e,(hl)
+    push de
 
-    dec sp      ; balance pop af
+    dec hl      ; get buffer * onto HL
+    ld d,(hl)
+    dec hl
+    ld e,(hl)
+    ex de,hl
 
-    dec sp      ; balance pop bc
-    dec sp
-
-    dec sp      ; balance pop de
-    dec sp
-
-    dec sp      ; balance pop hl
-    dec sp
-
-    dec sp      ; balance pdrv
-
-    dec sp      ; balance return address
-    dec sp
+    pop de      ; get LBA low from stack
 
     jp asm_disk_write

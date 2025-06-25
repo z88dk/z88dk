@@ -19,15 +19,15 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
     switch (*(unsigned char*)mode++) {
     case 'r':
         access = O_RDONLY;
-        flags = _IOREAD | _IOUSE | _IOTEXT;
+        flags = _IOREAD | _IOTEXT;
         break;
     case 'w':
         access = O_WRONLY | O_TRUNC | O_CREAT;
-        flags = _IOWRITE | _IOUSE | _IOTEXT;
+        flags = _IOWRITE  | _IOTEXT;
         break;
     case 'a':
         access = O_APPEND | O_WRONLY | O_CREAT;
-        flags = _IOWRITE | _IOUSE | _IOTEXT;
+        flags = _IOWRITE  | _IOTEXT;
         break;
     default:
         return NULL;
@@ -37,10 +37,10 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         mode++;
         if (access == O_RDONLY) {
             access = O_RDWR;
-			flags = _IOREAD | _IOWRITE | _IOUSE | _IOTEXT;
+			flags = _IOREAD | _IOWRITE  | _IOTEXT;
         } else if (access & O_TRUNC) {  // 'w'
             access = O_RDWR | O_TRUNC | O_CREAT;
-			flags = _IOREAD | _IOWRITE | _IOUSE | _IOTEXT;
+			flags = _IOREAD | _IOWRITE  | _IOTEXT;
         } else {
             access = O_RDWR | O_CREAT;
         }

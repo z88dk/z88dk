@@ -344,40 +344,40 @@
 %cpu r6k
 	call	l_mult
 =
-	defb	0x59	;mul hl,de
+	mul	hl,de
 
 %cpu r6k
 	call	l_mult_u
 =
-	defb	0x69	;mulu hl,de
+	mulu	hl,de
 
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
 	and	hl,de
 =
-	defb 	0x49,0xca,%1	;and hl,(sp+%1)
+	and	hl,(sp+%1)
 
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
 	or	hl,de
 =
-	defb 	0x49,0xea,%1	;or hl,(sp+%1)
+	or	hl,(sp+%1)
 
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
 	xor	hl,de
 =
-	defb 	0x49,0xda,%1	;xor hl,(sp+%1)
+	xor	hl,(sp+%1)
 
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
 	add	hl,de
 =
-	defb 	0x49,0x8a,%1	;add hl,(sp+%1)
+	add	hl,(sp+%1)
 
 %cpu r6k
 	ex	de,hl
@@ -386,4 +386,4 @@
 	and	a
 	sbc	hl,de
 =
-	defb 	0x49,0xaa,%1	;sub hl,(sp+%1)
+	sub	hl,(sp+%1)

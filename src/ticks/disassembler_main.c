@@ -30,6 +30,7 @@ static void usage(char *program)
     printf("  -o <addr>      Address to load code to\n");
     printf("  -s <addr>      Address to start disassembling from\n");
     printf("  -e <addr>      Address to stop disassembling at\n\n");
+    printf("  -k <count>     Skip count bytes in the input file\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mez80_z80     Disassemble ez80 (short) code\n");
@@ -60,6 +61,7 @@ int main(int argc, char **argv)
     char  *endp;
     unsigned int    org = 0;
     int    start = -1;
+    int    skip = 0;
     int    end = INT_MAX;
     int    loaded = 0;
     int    symbol_addr = -1;
@@ -98,6 +100,10 @@ int main(int argc, char **argv)
                 break;
             case 'a':
                 c_autolabel = 1;
+                break;
+            case 'k':
+                skip = strtol(argv[1], &endp, 0);
+                argc--; argv++;
                 break;
             case 'x':
                 read_symbol_file(argv[1]);
@@ -144,7 +150,13 @@ int main(int argc, char **argv)
                 break;
             }
         } else {
-            FILE *fp = fopen(argv[1],"rb");
+            FILE *fp;
+            
+            if ( strcmp(argv[1],"-") == 0  ) {
+                fp = stdin;
+            } else {
+                fp = fopen(argv[1],"rb");
+            }
 
             if ( fp != NULL ) {
                 size_t amount;
@@ -154,7 +166,7 @@ int main(int argc, char **argv)
                 }
                 amount = end - start;
 
-                fseek(fp, start - org, SEEK_SET);
+                fseek(fp, start - org + skip, SEEK_SET);
                 size_t r = fread(mem + (start % BUFF_SIZE), sizeof(char), (amount % BUFF_SIZE), fp);
                 loaded = 1;
                 fclose(fp);

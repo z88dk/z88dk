@@ -8,7 +8,7 @@
 ;        defw left hand LSW
 ;        defw left hand MSW
 l_f32_swap:
-IF  __CPU_INTEL__||CPU_GBZ80__
+IF  __CPU_INTEL__||__CPU_GBZ80__
     ld      c, l                        ;right lsw
     ld      b, h
     ld      hl, sp+2                    ;points to left hand lsw

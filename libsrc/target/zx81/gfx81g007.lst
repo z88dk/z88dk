@@ -2,6 +2,8 @@
 target/zx81/graphics_hr/clg
 target/zx81/graphics_hr/g007_clg_hr
 target/zx81/graphics_hr/g007_hardcopy
+target/zx81/stdio/ansi/f_ansi_attr
+target/zx81/stdio/ansi/f_ansi_bel
 target/zx81/stdio/ansi/f_ansi_char
 target/zx81/stdio/ansi/f_ansi_cls
 target/zx81/stdio/ansi/f_ansi_dline
@@ -10,8 +12,11 @@ target/zx81/graphics/swapgfxbk
 target/zx81/graphics_hr/g007_pixladdr
 target/zx81/graphics_hr/g007_hrg_on
 target/zx81/graphics_hr/g007_hrg_off
+target/zx81/graphics_hr/g007_invhrg
 gfx/narrow/obj/${TARGET}/stencil_render
 gfx/narrow/obj/${TARGET}/putsprite
+gfx/narrow/obj/${TARGET}/bksave
+gfx/narrow/obj/${TARGET}/bkrestore
 gfx/narrow/obj/${TARGET}/clrarea2
 gfx/narrow/obj/${TARGET}/fillarea2
 gfx/narrow/obj/${TARGET}/xorclrarea2

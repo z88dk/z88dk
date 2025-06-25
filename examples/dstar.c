@@ -114,6 +114,7 @@
  *      zcc +zx81 -O3 -clib=g007  -create-app -Dspritesize=16 dstar.c 
  *      zcc +zx81 -O3 -clib=arx -subtype=arx  -create-app -Dspritesize=16 dstar.c
  *      zcc +zx81 -O3 -clib=wrx -subtype=wrx  -create-app -Dspritesize=16 dstar.c
+ *      zcc +zx81 -O3 -subtype=wrxi -clib=wrxi  -create-app -Dspritesize=32 -pragma-define:hrgpage=32768 dstar.c
  *
  *      To get an 80 pixel graphics version of the game (Mattel Aquarius, TRS80, etc):
  *      zcc +aquarius -Dspritesize=5 -create-app dstar.c
@@ -171,7 +172,12 @@
   #define spritemem 30
 #endif
 #if (spritesize == 15)|(spritesize == 16)
+  // Normal 16x16 sprite
   #define spritemem 34
+#endif
+#if (spritesize == 32)
+  #define xsize 16
+  #define spritemem 66  // wrxi, 256x384
 #endif
 #if (spritesize == 20)
   #define spritemem 62
@@ -280,6 +286,11 @@ void Gamekeys(void)
 			bit_fx6 (1);
 		  #endif
 		  SetupLevel();
+#if (spritesize == 32)  // ZX81 192x384 WRXi
+		case '1':
+		  hrg_phase();
+		  while (getk()=='1') {};
+#endif
 	}
 }
 

@@ -27,16 +27,15 @@ int ungetc(int c, FILE *fp)
     inc     de
     inc     de      ;now on flags
     ld      a,(de)
-    ld      b,a
-    and     _IOUSE
-    ret     z       ;not being used
-    ld      a,b
-    and     _IOEOF |_IOWRITE
-    ret     nz      ;cant push back after EOF (or for write stream)
-    inc     de      ;now on ungetc
-    ld      a,(de)
+    ld      b,a     ;b=flags
     and     a
-    ret     nz
+    ret     z       ;not being used
+    and     _IOEOF |_IOWRITE|_IOUNGETC
+    ret     nz      ;cant push back after EOF (or for write stream)
+    ld      a,b     ;indicate that we have a character ungot
+    or      _IOUNGETC
+    ld      (de),a
+    inc     de      ;now on ungetc
     ex      de,hl
     ld      (hl),c  ;store the char
     ld      l,c     ;return it
@@ -47,9 +46,10 @@ IF __CPU_GBZ80__
 ENDIF
 #endasm
 #else
-    if (fp == 0 || c == EOF || fp->ungetc || fp->flags&_IOWRITE ) return(EOF);
+    if (fp == 0 || c == EOF || fp->ungetc || fp->flags&(_IOEOF|_IOUNGETC|)IOWRITE ) return(EOF);
     
     fp->ungetc=(unsigned char)c;
+    fp->flags |= _IOUNGETC;
     return(c);
 #endif
 }

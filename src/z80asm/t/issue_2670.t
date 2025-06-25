@@ -10,7 +10,12 @@ for my $rst (0, 8, 0x30) {
 rst $rst
 END
 
-	for my $cpu ('r2ka', 'r3k', 'r4k', 'r5k') {
+	for my $cpu ('z80') {
+		capture_ok("z88dk-z80asm -m$cpu -l -b $test.asm", "");
+		check_bin_file("$test.bin", bytes(0xC7+$rst));
+	}
+
+	for my $cpu ('r2ka', 'r3k', 'r4k', 'r5k', 'r6k') {
 		capture_nok("z88dk-z80asm -m$cpu -l -b $test.asm", <<END);
 $test.asm:1: error: integer range: $rst_hex
   ^---- rst $rst
@@ -23,7 +28,7 @@ for my $rst (0x10, 0x18, 0x20, 0x28, 0x38) {
 		rst $rst
 END
 
-	for my $cpu ('r2ka', 'r3k', 'r4k', 'r5k') {
+	for my $cpu ('z80', 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k') {
 		capture_ok("z88dk-z80asm -m$cpu -l -b $test.asm", "");
 		check_bin_file("$test.bin", bytes(0xC7+$rst));
 	}

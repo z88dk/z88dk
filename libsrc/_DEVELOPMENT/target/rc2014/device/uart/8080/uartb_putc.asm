@@ -23,10 +23,11 @@ EXTERN uartbControl
     or a                        ; check it is non-zero
     ret Z                       ; return if it doesn't exist
 
+._uartb_putc_loop
     ; check space is available in the Tx FIFO
     in a,(__IO_UARTB_LSR_REGISTER)      ; read the line status register
     and __IO_UART_LSR_TX_HOLDING_THRE   ; check the THRE is available
-    jp Z,_uartb_putc                    ; keep trying until THR has space
+    jp Z,_uartb_putc_loop               ; keep trying until THR has space
 
     ld a,l                              ; retrieve Tx character
     out (__IO_UARTB_DATA_REGISTER),a    ; output the Tx byte to the UART B

@@ -187,6 +187,9 @@ extern option_t  pc88_options[];
 extern int       pc88disc_exec(char *target);
 extern option_t  pc88disc_options[];
 
+extern int       phc25_exec(char *target);
+extern option_t  phc25_options[];
+
 extern int       p2000_exec(char *target);
 extern option_t  p2000_options[];
 
@@ -506,6 +509,10 @@ struct {
       "Create a PC88 bootable d88 disc",
       NULL,
       pc88disc_exec,    pc88disc_options },
+    { "bin2phc",   "phc25",       "(C) 2025 z88dk",
+      "Create a .phc file for Sanyo PHC-25",
+      NULL,
+      phc25_exec,    phc25_options },
     { "bin2ptp",   "pmd85",       "(C) 2020 z88dk",
       "Create a PMD85 ptp file",
       NULL,

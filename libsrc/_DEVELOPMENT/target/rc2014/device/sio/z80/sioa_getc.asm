@@ -14,9 +14,10 @@
         ; exit     : l = char received
         ;            carry reset if Rx buffer is empty
         ;
-        ; modifies : af, hl
+        ; modifies : af, bc, hl
 
         ld a,(sioaRxCount)          ; get the number of bytes in the Rx buffer
+        ld l,a                      ; and put it in hl
         or a                        ; see if there are zero bytes available
         ret Z                       ; if the count is zero, then return
 
@@ -33,23 +34,22 @@
 
     getc_clean_up:
         ld hl,(sioaRxOut)           ; get the pointer to place where we pop the Rx byte
-        ld a,(hl)                   ; get the Rx byte
+        ld c,(hl)                   ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along
 IF __IO_SIO_RX_SIZE != 0x100
-        push af
         ld a,__IO_SIO_RX_SIZE-1     ; load the buffer size, (n^2)-1
         and l                       ; range check
         or sioaRxBuffer&0xFF        ; locate base
         ld l,a                      ; return the low byte to l
-        pop af
 ENDIF
         ld (sioaRxOut),hl           ; write where the next byte should be popped
 
         ld hl,sioaRxCount
         dec (hl)                    ; atomically decrement Rx count
 
-        ld l,a                      ; put the byte in hl
+        ld l,c                      ; put the byte in hl
+        ld a,c                      ; put byte in a
         scf                         ; indicate char received
         ret
 

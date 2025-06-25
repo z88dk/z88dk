@@ -16,7 +16,7 @@ am48_double8u:
    ;         AC'= (double)(n)
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
-   
+
    ld a,l
    or a
    jp z, am48_derror_znc + 1
@@ -24,13 +24,13 @@ am48_double8u:
 am48_double8u_0:
 
    ld hl,$80 + 8
-   
+
    jp m, normalized
-   
+
 normalize_loop:
 
    dec l
-   
+
    add a,a
    jp p, normalize_loop
 
@@ -40,8 +40,8 @@ normalized:
    ld c,h
    ld d,h
    ld e,h
-   
+
    res 7,b
-   
+
    exx
    ret

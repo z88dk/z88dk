@@ -772,27 +772,43 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_Z80__");
     undefine_static_symbol("__CPU_Z80_STRICT__");
     undefine_static_symbol("__CPU_Z80N__");
+    undefine_static_symbol("__CPU_Z80N_STRICT__");
     undefine_static_symbol("__CPU_Z180__");
+    undefine_static_symbol("__CPU_Z180_STRICT__");
     undefine_static_symbol("__CPU_EZ80__");
+    undefine_static_symbol("__CPU_EZ80_STRICT__");
     undefine_static_symbol("__CPU_EZ80_Z80__");
+    undefine_static_symbol("__CPU_EZ80_Z80_STRICT__");
     undefine_static_symbol("__CPU_ZILOG__");
 
     undefine_static_symbol("__CPU_R800__");
+    undefine_static_symbol("__CPU_R800_STRICT__");
 
     undefine_static_symbol("__CPU_R2KA__");
+    undefine_static_symbol("__CPU_R2KA_STRICT__");
     undefine_static_symbol("__CPU_R3K__");
+    undefine_static_symbol("__CPU_R3K_STRICT__");
     undefine_static_symbol("__CPU_R4K__");
+    undefine_static_symbol("__CPU_R4K_STRICT__");
     undefine_static_symbol("__CPU_R5K__");
+    undefine_static_symbol("__CPU_R5K_STRICT__");
+    undefine_static_symbol("__CPU_R6K__");
+    undefine_static_symbol("__CPU_R6K_STRICT__");
     undefine_static_symbol("__CPU_RABBIT__");
 
     undefine_static_symbol("__CPU_8080__");
     undefine_static_symbol("__CPU_8085__");
+    undefine_static_symbol("__CPU_8080_STRICT__");
+    undefine_static_symbol("__CPU_8085_STRICT__");
     undefine_static_symbol("__CPU_INTEL__");
 
     undefine_static_symbol("__CPU_GBZ80__");
+    undefine_static_symbol("__CPU_GBZ80_STRICT__");
 
     undefine_static_symbol("__CPU_KC160__");
+    undefine_static_symbol("__CPU_KC160_STRICT__");
     undefine_static_symbol("__CPU_KC160_Z80__");
+    undefine_static_symbol("__CPU_KC160_Z80_STRICT__");
 
     switch (cpu) {
     case CPU_Z80:
@@ -810,9 +826,19 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_Z80N__");
         define_static_symbol("__CPU_ZILOG__");
         break;
+    case CPU_Z80N_STRICT:
+        m_cpu = CPU_Z80N_STRICT;
+        define_static_symbol("__CPU_Z80N_STRICT__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
     case CPU_Z180:
         m_cpu = CPU_Z180;
         define_static_symbol("__CPU_Z180__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_Z180_STRICT:
+        m_cpu = CPU_Z180_STRICT;
+        define_static_symbol("__CPU_Z180_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_EZ80:
@@ -820,18 +846,37 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_EZ80__");
         define_static_symbol("__CPU_ZILOG__");
         break;
+    case CPU_EZ80_STRICT:
+        m_cpu = CPU_EZ80_STRICT;
+        define_static_symbol("__CPU_EZ80_STRICT__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
     case CPU_EZ80_Z80:
         m_cpu = CPU_EZ80_Z80;
         define_static_symbol("__CPU_EZ80_Z80__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_EZ80_Z80_STRICT:
+        m_cpu = CPU_EZ80_Z80_STRICT;
+        define_static_symbol("__CPU_EZ80_Z80_STRICT__");
         define_static_symbol("__CPU_ZILOG__");
         break;
     case CPU_R800:
         m_cpu = CPU_R800;
         define_static_symbol("__CPU_R800__");
         break;
+    case CPU_R800_STRICT:
+        m_cpu = CPU_R800_STRICT;
+        define_static_symbol("__CPU_R800_STRICT__");
+        break;
     case CPU_R2KA:
         m_cpu = CPU_R2KA;
         define_static_symbol("__CPU_R2KA__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R2KA_STRICT:
+        m_cpu = CPU_R2KA_STRICT;
+        define_static_symbol("__CPU_R2KA_STRICT__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_R3K:
@@ -839,9 +884,19 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_R3K__");
         define_static_symbol("__CPU_RABBIT__");
         break;
+    case CPU_R3K_STRICT:
+        m_cpu = CPU_R3K_STRICT;
+        define_static_symbol("__CPU_R3K_STRICT__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
     case CPU_R4K:
         m_cpu = CPU_R4K;
         define_static_symbol("__CPU_R4K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R4K_STRICT:
+        m_cpu = CPU_R4K_STRICT;
+        define_static_symbol("__CPU_R4K_STRICT__");
         define_static_symbol("__CPU_RABBIT__");
         break;
     case CPU_R5K:
@@ -849,9 +904,29 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_R5K__");
         define_static_symbol("__CPU_RABBIT__");
         break;
+    case CPU_R5K_STRICT:
+        m_cpu = CPU_R5K_STRICT;
+        define_static_symbol("__CPU_R5K_STRICT__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R6K:
+        m_cpu = CPU_R6K;
+        define_static_symbol("__CPU_R6K__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
+    case CPU_R6K_STRICT:
+        m_cpu = CPU_R6K_STRICT;
+        define_static_symbol("__CPU_R6K_STRICT__");
+        define_static_symbol("__CPU_RABBIT__");
+        break;
     case CPU_8080:
         m_cpu = CPU_8080;
         define_static_symbol("__CPU_8080__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
+    case CPU_8080_STRICT:
+        m_cpu = CPU_8080_STRICT;
+        define_static_symbol("__CPU_8080_STRICT__");
         define_static_symbol("__CPU_INTEL__");
         break;
     case CPU_8085:
@@ -859,17 +934,34 @@ void Options::set_cpu(int cpu) {
         define_static_symbol("__CPU_8085__");
         define_static_symbol("__CPU_INTEL__");
         break;
+    case CPU_8085_STRICT:
+        m_cpu = CPU_8085_STRICT;
+        define_static_symbol("__CPU_8085_STRICT__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
     case CPU_GBZ80:
         m_cpu = CPU_GBZ80;
         define_static_symbol("__CPU_GBZ80__");
+        break;
+    case CPU_GBZ80_STRICT:
+        m_cpu = CPU_GBZ80_STRICT;
+        define_static_symbol("__CPU_GBZ80_STRICT__");
         break;
     case CPU_KC160:
         m_cpu = CPU_KC160;
         define_static_symbol("__CPU_KC160__");
         break;
+    case CPU_KC160_STRICT:
+        m_cpu = CPU_KC160_STRICT;
+        define_static_symbol("__CPU_KC160_STRICT__");
+        break;
     case CPU_KC160_Z80:
         m_cpu = CPU_KC160_Z80;
         define_static_symbol("__CPU_KC160_Z80__");
+        break;
+    case CPU_KC160_Z80_STRICT:
+        m_cpu = CPU_KC160_Z80_STRICT;
+        define_static_symbol("__CPU_KC160_Z80_STRICT__");
         break;
     default:
         xassert(0);
@@ -1080,6 +1172,10 @@ const char* search_includes(const char* filename) {
 
 cpu_t option_cpu() {
 	return g_options.get_cpu();
+}
+
+bool option_no_synth() {
+    return g_options.get_no_synth();
 }
 
 void option_set_cpu(int cpu) {

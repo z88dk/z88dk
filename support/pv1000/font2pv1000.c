@@ -14,12 +14,14 @@ static char usage[] =
 " -f|--fgcolour=value                  set the foreground colour for all tiles\n"
 " -b|--bgcolour=value                  set the background colour for all tiles\n"
 " -c|--charcode=value                  set the initial character code\n"
+" -s|--section[=value]                 output the section directive (default=pv1000_tileset)\n"
 ;
 
 static struct optparse_long longopts[] = {
   { "fgcolour", 'f',  OPTPARSE_REQUIRED },
   { "bgcolour", 'b',  OPTPARSE_REQUIRED },
   { "charcode", 'c',  OPTPARSE_REQUIRED },
+  { "section",  's',  OPTPARSE_OPTIONAL },
   { NULL, 0, 0 }
 };
 
@@ -32,11 +34,13 @@ int main(int argc, char **argv)
 	int   fgcolour = 7;
 	int   bgcolour = 0;
 	int   c = 32;
+        int   writesection = 0;
+        char  *section = NULL;
 
         optparse_init(&options, argv);
 
 	if ( argc < 2 ) {
-		printf("%s",usage);
+		fprintf(stderr, "%s",usage);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -51,20 +55,27 @@ int main(int argc, char **argv)
             case 'c':
                 c = atoi(options.optarg);
                 break;
+            case 's':
+                writesection = 1;
+                section = options.optarg ? options.optarg : "pv1000_tileset";
+                break;
             }
         }
         char *infile = optparse_arg(&options);
 
         if ( infile == NULL ) {
-           printf("No input file specified\n");
+           fprintf(stderr,"No input file specified\n");
            exit(EXIT_FAILURE);
         }
 
         if ( ( fp = fopen(infile, "rb") ) == NULL ) {
-           printf("Cannot open input file <%s>\n",infile);
+           fprintf(stderr, "Cannot open input file <%s>\n",infile);
            exit(EXIT_FAILURE);
         }
 
+        if (writesection) {
+            printf("SECTION %s\n\n",section);
+        }
 	while	( ( fread(buf, 1, sizeof(buf),fp) ) == 8 ) {
 		printf("; Char %d (%02x)\n",c,c);	
 		printf("\tdefb\t0,0,0,0,0,0,0,0\n");

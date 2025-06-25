@@ -10,66 +10,89 @@
 OPTIONS:
 --------
 
-	-DFILES          For targets with file support, get an optional lisp source file as program parameter
-	                 and evaluates it before leaving control to the user.
-	                 A specific LISP command is also available , e.g.:  (load 'eliza.l)
-	
-	-DSHORT          Reduce the 'lisp atom' size to 16 bit to save memory.
-	                 Be aware that the valid numeric range will be only between -2047 and 2048 !
-	                 (untested: the structure tags may interfere with values, use it only as a last resort)
+    -DFILES          For targets with file support, get an optional lisp source file as program parameter
+                     and evaluates it before leaving control to the user.
+                     A specific LISP command is also available , e.g.:  (load 'eliza.l)
+    
+    -DSHORT          Reduce the 'lisp atom' size to 16 bit to save memory.
+                     Be aware that the valid numeric range will be only between -2047 and 2048 !
+                     (untested: the structure tags may interfere with values, use it only as a last resort)
 
-	-DSPECLISP       Lisp dialect syntax used in "Spec Lisp" by Serious Software  ('de' in place of 'defun', etc..)
+    -DSPECLISP       Lisp dialect syntax used in "Spec Lisp" by Serious Software  ('de' in place of 'defun', etc..)
+                     It was loosely based on the Stanford LISP 1.6 for the PDP-6
 
-	-DGRAPHICS       Add turtle graphics functions.
+    -DGRAPHICS       Add turtle graphics functions.
 
-	-DMINIMALISTIC   Remove many hardcoded functions.
-	                 'minimalistic.l' includes alternative native Lisp implementations.
+    -DMINIMALISTIC   Remove many hardcoded functions.
+                     'minimalistic.l' includes alternative native Lisp implementations.
 
-	-DNOINIT         Remove the stucture initialization, it requires a previous dump of a memory image
-	                 created by running the full clisp version.
+    -DNOINIT         Remove the stucture initialization, it requires a previous dump of a memory image
+                     created by running the full clisp version.
 
-	-DINITONLY       Build a limited program intended to initialize the structures in memory and exit.
-					 
-	-DTINYMEM        Shorten the memory structures to a minimal number of objects to save memory 
+    -DINITONLY       Build a limited program intended to initialize the structures in memory and exit.
+                     
+    -DTINYMEM        Shorten the memory structures to a minimal number of objects to save memory 
 
-	-DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
-	
-	-DZEDIT          (ZX81 ONLY), initial LISP code MUST be present @32768, 16K for text available, 48K RAM NEEDED
-	                 At startup a source file is searched in memory and eventually evaluated before getting to the
-					 user prompt.
+    -DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
+    
+    -DZEDIT          (ZX81 ONLY), initial LISP code MUST be present @32768, 16K for text available, 48K RAM NEEDED
+                     At startup a source file is searched in memory and eventually evaluated before getting to the
+                     user prompt.
+
+    -DFORCE_LOWER    Force all the console input to lowercase, useful on very limited targets or to simplify the
+                     user's life when the target is UPPERCASE by default.
 
 
 z88dk build hints:
 ------------------
 
+For size optimization use -DSHORT, otherwise add:
+     --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE
+
+
 Spectrum 
-zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
-zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP clisp.c
+  zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
+  zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP clisp.c
 
 zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DINITONLY clisp.c
   zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOINIT clisp.c
-  
+
+zx81 48K exp with high resolution graphics (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
+  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOTIMER -DSHORT -DGRAPHICS -pragma-output:hrgpage=49152 -DINITONLY clisp.c
+  zcc +zx81 -clib=wrxansi -subtype=wrx -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOTIMER -DSHORT -DGRAPHICS -pragma-output:hrgpage=49152 -DNOINIT clisp.c
+
+zx81 48K exp with ultra-high resolution graphics (POKE 16389,255 | NEW | LOAD "")
+  zcc +zx81 -clib=wrxiansi -subtype=wrxi -O3 -create-app -pragma-define:hrgpage=49152 -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -DGRAPHICS -DZX81PHASE -DLARGEMEM=2000 -DSHORT clisp.c
+
 zx81 16K, minimalistic version, graphics support
-  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81  clisp.c
+  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS  clisp.c
 zx81 48K, minimalistic version, graphics support, initial code must be provided @32768
-  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -lgfx81  -DZEDIT -DZX81_32K clisp.c
+  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -DZEDIT -DZX81_32K clisp.c
 
 zx80 16K, minimalistic version, (add -DGRAPHICS for graphics support)
   zcc +zx80 -DZX81 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC  clisp.c
 
 MicroBee  
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512  clisp.c
-  
+
+Visual 1050
+  zcc +cpm -subtype=v1050 -DFILES --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DLARGEMEM=2400 -DGRAPHICS  clisp.c
+
+Osborne 1
+  zcc +cpm -subtype=osborne1 -DFILES --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE -O3 -create-app -DLARGEMEM=2400 -DGRAPHICS  clisp.c
+
+
 Plain CP/M with file support to load programs
   zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c
   
-For super size optimization, add:
-	 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE
+Sharp PC-G815
+  zcc +g800 -clib=g815 -O3 -create-app -DNOTIMER -DFORCE_LOWER clisp.c  
+
+Sharp PC-G850
+  zcc +g800 -clib=g850 -O3 -create-app -DNOTIMER -DFORCE_LOWER -DGRAPHICS clisp.c
 
 */
-
-#define HRGPAGE 42000
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -101,7 +124,7 @@ For super size optimization, add:
 #ifdef ZEDIT
 #pragma output STACKPTR=65535
 #else
-#pragma output STACKPTR=49152
+#pragma output STACKPTR=49151
 #endif
 unsigned int _sp;
 #endif
@@ -126,8 +149,8 @@ unsigned int _sp;
 #define long int
 
 #else
-	
-/* Data Representation ('int' must be at least 32 bits) */	
+    
+/* Data Representation ('int' must be at least 32 bits) */  
 #define D_MASK_DATA     0x0fffffffUL
 #define D_MASK_TAG      0x70000000UL
 #define D_GC_MARK       0x80000000UL
@@ -274,6 +297,9 @@ enum keywords {
     KW_INCR,    KW_DECR,    KW_EQUAL,   KW_EQMATH
 #endif
 #ifdef GRAPHICS
+#ifdef ZX81PHASE
+   ,KW_PHASE
+#endif
    ,KW_CLS,      KW_PENU,     KW_PEND,
     KW_LEFT,   KW_RIGHT,     KW_FWD
 #endif
@@ -378,7 +404,12 @@ struct s_keywords funcs[] = {
   { "zerop",    FTYPE(FTYPE_SYS,     1),               KW_ZEROP    },
   { "atom",     FTYPE(FTYPE_SYS,     1),               KW_ATOM     },
 #endif
+#ifdef SPECLISP
+  { "rnd",        FTYPE(FTYPE_SYS,     1),               KW_RAND     },
+#else
   { "random",   FTYPE(FTYPE_SYS,     1),               KW_RAND     },
+#endif
+  // Also SPECLISP uses 'rem' and not 'remainder' as the Stanford LISP 1.6 did
   { "rem",      FTYPE(FTYPE_SYS,     2),               KW_REM      },
 #ifdef SPECLISP
   { "add1",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
@@ -393,9 +424,12 @@ struct s_keywords funcs[] = {
   { "equal",    FTYPE(FTYPE_SYS,     2),               KW_EQUAL    },
 #endif
   { "=",        FTYPE(FTYPE_SYS,     2),               KW_EQMATH   },
-#endif	// (non MINIMALISTIC)
+#endif  // (non MINIMALISTIC)
 
 #ifdef GRAPHICS
+#ifdef ZX81PHASE
+  { "phase",      FTYPE(FTYPE_SYS,     0),               KW_PHASE  },
+#endif
   { "cls",      FTYPE(FTYPE_SYS,     0),               KW_CLS      },
   { "penu",     FTYPE(FTYPE_SYS,     0),               KW_PENU     },
   { "pend",     FTYPE(FTYPE_SYS,     0),               KW_PEND     },
@@ -485,28 +519,33 @@ char ug=13;
 char gchar() {
 
 #ifdef FILES
-	if (c!=0 && c!=EOF)
-		c=fgetc(fpin);
-		if (c!=0 && c!=EOF)
-			return (c);
+    if (c!=0 && c!=EOF)
+        c=fgetc(fpin);
+        if (c!=0 && c!=EOF)
+            return (c);
 #endif
 
 #ifdef ZEDIT
-	if (c!=0 && c!=26)
-		c=text[cpt++];
-		if (c!=0 && c!=26)
-			return (c);
+    if (c!=0 && c!=26)
+        c=text[cpt++];
+        if (c!=0 && c!=26)
+            return (c);
 #endif
 
 #ifdef ZX81_32K
-	zx_slow();
+//    zx_slow();
 #endif
     if (ug==13) {
-      while (!gets(buf)) {};
+      while (!gets(buf)||(! *buf)) {};
+#ifdef FORCE_LOWER
+      for(cpt = 0; buf[cpt]; cpt++){
+        buf[cpt] = tolower(buf[cpt]);
+      }
+#endif
       cpt=0;
     }
 #ifdef ZX81_32K
-	zx_fast();
+//    zx_fast();
 #endif
     if ((ug=buf[cpt++]) == 0)  ug=13;
     return (ug);
@@ -516,7 +555,7 @@ char gchar() {
 void ugchar(char ch) {
 #ifdef FILES
 if (c!=0 && c!=EOF)
-		ungetc(ch,fpin);
+        ungetc(ch,fpin);
 else
     cpt--;
 #else
@@ -527,12 +566,12 @@ else
 #else
 
 char gchar() {
-	
+    
 #ifdef FILES
-	if (c!=0 && c!=EOF)
-		c=fgetc(fpin);
-		if (c!=0 && c!=EOF)
-			return (c);
+    if (c!=0 && c!=EOF)
+        c=fgetc(fpin);
+        if (c!=0 && c!=EOF)
+            return (c);
 #endif
 
     return (fgetc (stdin));
@@ -540,7 +579,7 @@ char gchar() {
 
 void ugchar(char ch) {
 #ifndef FILES
-	ungetc(ch,stdin);
+    ungetc(ch,stdin);
 #else
 if (c!=0 && c!=EOF)
     ungetc(ch,fpin);
@@ -555,6 +594,12 @@ void
 main(int argc, char *argv[])
 {
   init();
+
+#ifdef GRAPHICS
+plot(0,getmaxy());
+set_direction (T_NORTH);
+#endif
+
 #ifdef SCHEME
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk SCHEME variant\n",12);
 #else
@@ -585,16 +630,16 @@ printf("GRAPHICS ");
 #ifdef FILES
 printf("FILES ");
 #endif
-printf("]\n");
+printf("]");
 #endif
 
 #ifdef FILES
 if (argc == 2) {
-	fpin = fopen(argv[1],"r");
-	if (fpin == NULL)
-		printf ("File open error: %s\n",argv[1]);
-	else
-		c = 1;
+    fpin = fopen(argv[1],"r");
+    if (fpin == NULL)
+        printf ("File open error: %s\n",argv[1]);
+    else
+        c = 1;
 }
 #endif
 
@@ -701,7 +746,8 @@ l_read(void)
   
   /* skip spaces */
   if ((ch = skip_space()) < 0){  /* eof */
-    return TAG_EOF; 
+    //return TAG_EOF; 
+    return -1;
 
   } else if (ch == ';'){         /* comment */
     while (( ch != '\n' ) && ( ch != '\r') )
@@ -723,12 +769,7 @@ l_read(void)
   } else if (ch != '('){         /* t, nil, symbol, or integer */
     token[0] = ch;
 
-// This is a workaround to skip the extra newline character (CR + LF)
-#ifdef __Z80
-    for (i = 0; ; i++){
-#else
     for (i = 1; ; i++){
-#endif
       ch = gchar();
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
           || (ch == ';') || (ch == '(') || (ch == ')')){
@@ -1034,10 +1075,10 @@ special(long f, long a)
 
 #ifndef MINIMALISTIC
   case KW_AND:
-    for (v = TAG_T, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
+    for (v = TAG_NIL, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if ((v = l_eval(l_car(t))) < 0)
         return -1;
-      if (D_GET_TAG(t) == TAG_NIL)
+      if (D_GET_TAG(v) == TAG_NIL)
         break;
     }
     break;
@@ -1388,27 +1429,32 @@ fcall(long f, long av[2])  /*, int n*/
 #endif
 
 #ifdef GRAPHICS
+#ifdef ZX81PHASE
+  case KW_PHASE:
+    hrg_phase();
+    break;
+#endif
   case KW_CLS:
-	plot(0,getmaxy());
-	printf("\014");
+    plot(0,getmaxy());
+    printf("\014");
     clg();
-	pen_up();
-	set_direction (T_NORTH);
+    pen_up();
+    set_direction (T_NORTH);
     break;
   case KW_PENU:
-	pen_up();
+    pen_up();
     break;
   case KW_PEND:
-	pen_down();
+    pen_down();
     break;
   case KW_RIGHT:
-	turn_right((int)int_get_c(av[0]));
+    turn_right((int)int_get_c(av[0]));
     break;
   case KW_LEFT:
-	turn_left((int)int_get_c(av[0]));
+    turn_left((int)int_get_c(av[0]));
     break;
   case KW_FWD:
-	fwd((int)int_get_c(av[0]));
+    fwd((int)int_get_c(av[0]));
     break;
 #endif
 
@@ -1662,7 +1708,7 @@ int_get_c(long s)
   return (long) ((unsigned long)s | ~D_MASK_DATA);
 }
 
-#endif	//INITONLY
+#endif  //INITONLY
 
 /* Make a new symbol */
 long
@@ -1723,8 +1769,13 @@ l_load(long s)
 void
 quit(void)
 {
+#ifdef ZX81PHASE
+  hrg_off();
+  exit(0);
+#else
   printf("\nBYE\n");
   exit(0);
+#endif
 }
 
 /* END */

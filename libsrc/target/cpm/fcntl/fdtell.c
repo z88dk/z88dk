@@ -1,7 +1,7 @@
 /*
- *	long fdtell(int fd)
+ *  long fdtell(int fd)
  *
- *	$Id: fdtell.c $
+ *  $Id: fdtell.c $
 */
 
 #include <fcntl.h>
@@ -11,13 +11,8 @@
 
 long fdtell(int fd)
 {
-	struct	fcb *fc;
+    struct fcb *fc = (struct fcb *)fd;
 
-	if(fd >= MAXFILE)
-		return -1;
-	
-	fc = &_fcb[fd];
-	
-	return (fc->rwptr);
+    return (fc->rwptr);
 }
 

@@ -1,12 +1,12 @@
 /*
- *	int stat(char *filename, struct stat *buf)
+ *  int stat(char *filename, struct stat *buf)
  *
- *	Return information about a file in CP/M
+ *  Return information about a file in CP/M
  *
- *	TODO: file date/time support for CP/M versions > 3.00 (MP/M II, etc)
+ *  TODO: file date/time support for CP/M versions > 3.00 (MP/M II, etc)
  *
  *
- *	Stefano 2019
+ *  Stefano 2019
  *
  *
  * -----
@@ -40,23 +40,22 @@ int stat(char *filename, struct stat *buf)
 
     /* Test it is a real file, not a device */
     if ( setfcb(fc,filename) != 0 ) {
-        clearfcb(fc);		// equals to fcb->use = 0;
+        clearfcb(fc);           /* equals to fcb->use = 0; */
         return -1;
     }
 
     /* Compute file size */
     bdos(CPM_CFS,fc);
 
-    buf->st_mode=0100777;	/* regular file flag, rwxrwxrwx */
+    buf->st_mode=0100777;       /* regular file flag, rwxrwxrwx */
 
     /* File size and block size, approx. at 128 bytes boundary */
-    buf->st_blksize = 128;		/* Size of a CP/M block */
+    buf->st_blksize = 128;      /* Size of a CP/M block */
     /* NOTE:  file sizes >= 8MB will make st_blocks overflow, but st_size will still work */
     buf->st_blocks = fc->ranrec[0] + 256 * fc->ranrec[1];
     buf->st_size = (unsigned long) buf->st_blocks * 128L;
     if (fc->ranrec[2]&1)
         buf->st_size += 8388608L;
-
 
     /* UID & GID stuff */
     buf->st_gid=0;
@@ -72,10 +71,9 @@ int stat(char *filename, struct stat *buf)
     /* Links */
     buf->st_nlink=0;
 
-
     /* Date/Time */
     buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
-    if	(bdos(CPM_VERS,0) >= 0x30) {
+    if (bdos(CPM_VERS,0) >= 0x30) {
         sfc=(void *)fc;
         if (bdos(102,sfc)!=0) { /* read file date stamps and password mode */
             buf->st_mtime=doepoch(sfc->date,sfc->hours,sfc->minutes);

@@ -403,3 +403,6 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__ultof.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fadd.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/clang/__fsub.asm
+
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_sigdigf.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fssigdig.asm

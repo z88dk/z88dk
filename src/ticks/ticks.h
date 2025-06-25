@@ -47,6 +47,7 @@ extern int c_ioport;
 extern int break_required;
 
 extern int c_rc2014_mode;
+extern int c_z80asm_tests;
 
 extern uint8_t verbose;
 extern char* script_file;
@@ -95,6 +96,7 @@ extern void      hook_io_init(hook_command *cmds);
 extern void      hook_io_set_ide_device(int unit, const char *file);
 extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_cpm(void);
+extern void      hook_cpm_init(hook_command *cmds);
 extern void      hook_rc2014(void);
 extern void      hook_console_init(hook_command *cmds);
 

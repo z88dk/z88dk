@@ -22,6 +22,7 @@ struct fcb *getfcb(void)
             fcb->use   = U_READ;
             fcb->rwptr = 0;
             fcb->cached_record = 0xffffffff;
+            fcb->rnr_dirty = 0;
             return fcb;
         }
     }

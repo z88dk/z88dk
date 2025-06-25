@@ -85,7 +85,7 @@ define(`__IO_UART_LCR_DLAB', 0x80)              # Divisor Latch Access Bit DLAB
 define(`__IO_UART_MCR_DTR', 0x01)
 define(`__IO_UART_MCR_RTS', 0x02)
 define(`__IO_UART_MCR_OUTPUT1', 0x04)
-define(`__IO_UART_MCR_INT_ENABLE', 0x08)        # Enable Interrupt & Output
+define(`__IO_UART_MCR_INT_ENABLE', 0x08)        # Global Interrupt Enable
 define(`__IO_UART_MCR_LOOPBACK', 0x10)          # Loopback Test
 define(`__IO_UART_MCR_AUTO_FLOW_CONTROL', 0x20) # Auto Flow Control Enable AFE
 
@@ -114,7 +114,7 @@ define(`__IO_UART_MSR_DCD', 0x80)
 # 16550 UART driver
 
 define(`__IO_UART_RX_SIZE', 0x80)       # Size of the Rx Buffer (greater than 0x20)
-define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-16,16))
+define(`__IO_UART_RX_FULLISH', 0x`'eval(__IO_UART_RX_SIZE-24,16))
                                         # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__IO_UART_RX_EMPTYISH', 0x08)   # Fullness of the Rx Buffer, when RTS is signalled
 

@@ -1,7 +1,7 @@
 /*
  *   Rename a file - CP/M version
  *
- *	 Stefano Bodrato - Oct. 2004
+ *   Stefano Bodrato - Oct. 2004
  *
  *   $Id: rename.c,v 1.2 2016-04-23 08:05:41 dom Exp $
  */
@@ -17,30 +17,27 @@ char buff[60];
 
 int rename(char *old, char *new)
 {
-	
-	int       retval;
-	unsigned char uid;
 
-	struct fcb *fc1;
-	struct fcb *fc2;
-	
-	fc1=(void *)buff;
-	fc2=(void *)(buff+16);
+    int retval;
+    unsigned char uid;
 
-	uid = getuid();
+    struct fcb *fc1;
+    struct fcb *fc2;
 
-	if ( setfcb(fc1,old) ) 
-	return 0;
+    fc1=(void *)buff;
+    fc2=(void *)(buff+16);
 
-	if ( setfcb(fc2,new) )
-	return 0;
-	
-	setuid(fc2->uid);
-	
+    uid = getuid();
+
+    if ( setfcb(fc1,old) )
+        return 0;
+
+    if ( setfcb(fc2,new) )
+        return 0;
+
+    setuid(fc2->uid);
     bdos(CPM_DEL,fc2);
     retval = bdos(CPM_REN,fc1);
-
     setuid(uid);
-
     return retval;
 }

@@ -1012,6 +1012,9 @@
 #define __CPM_RRAN  33
 #define __CPM_WRAN  34
 #define __CPM_CFS   35
+#define __CPM_RREC  36
+#define __CPM_SRDS  37
+#define __CPM_WRZF  40
 #define __CPM_DSEG  51
 
 

@@ -103,7 +103,7 @@ struct _mapping {
         { "f2uint",  "ifix",  "l_f16_f2uint",  "l_f32_f2uint",  "l_f64_f2uint", "l_fix16_f2uint", "l_fix32_f2uint" },
         { "f2slong", "ifix",  "l_f16_f2slong", "l_f32_f2slong", "l_f64_f2slong", "l_fix16_f2slong", "l_fix32_f2slong" },
         { "f2ulong", "ifix",  "l_f16_f2ulong", "l_f32_f2ulong", "l_f64_f2ulong", "l_fix16_f2ulong", "l_fix32_f2ulong" },
-        { "f2slllong", "l_f48_f2sllong", "l_f16_f2sllong", "l_f32_f2sllong", "l_f64_f2sllong", "l_fix16_f2sllong", "l_fix32_f2sllong" },
+        { "f2sllong", "l_f48_f2sllong", "l_f16_f2sllong", "l_f32_f2sllong", "l_f64_f2sllong", "l_fix16_f2sllong", "l_fix32_f2sllong" },
         { "f2ullong",  "l_f48_f2ullong", "l_f16_f2ullong", "l_f32_f2ullong", "l_f64_f2ullong", "l_fix16_f2ullong", "l_fix32_f2ullong" },
         { "fpush",   "dpush",  NULL,            NULL, "l_f64_dpush", NULL, NULL },
         { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3", NULL, NULL }, // Inlined

@@ -36,9 +36,8 @@
 
 ._func
 	ld	hl,_carray
-	push	hl
-	call	l_gint4sp	;
-	pop	de
+	ex	de,hl
+	call	l_gint2sp
 	add	hl,de
 	call	l_gchar
 	ret

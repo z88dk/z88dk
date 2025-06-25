@@ -33,7 +33,7 @@ EXTERN uartbRxCount, uartbRxBuffer, uartbRxIn, uartbRxOut
 ._uartb_flush_rx
 
     ; enable and reset the Rx FIFO
-    ld a,__IO_UART_FCR_FIFO_08|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
+    ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTB_FCR_REGISTER),a
 
     xor a

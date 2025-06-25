@@ -23,22 +23,33 @@ Define CPU opcodes
 #include "z80asm1.h"
 
 /* add 1 to 4 bytes opcode opcode to object code 
-*  bytes in big-endian format, e.g. 0xCB00 */
-void add_opcode(int opcode)
+*  bytes in big-endian format, e.g. 0xCB00
+*  need 64 bits to be able to code "ld ix, 0" in ez80, 0xDD,0x21,0x00,0x00,0x00 */
+void add_opcode(long long opcode)
 {
 	bool out = false;
 	
-	if (opcode & 0xFF000000) {
+	if (out || (opcode & 0xFF0000000000LL)) {
+		out = true;
+		append_byte( (opcode >> 40) & 0xFF );
+	}
+
+	if (out || (opcode & 0xFF00000000LL)) {
+		out = true;
+		append_byte( (opcode >> 32) & 0xFF );
+	}
+
+	if (out || (opcode & 0xFF000000LL)) {
 		out = true;
 		append_byte( (opcode >> 24) & 0xFF );
 	}
 
-	if (out || (opcode & 0xFF0000)) {
+	if (out || (opcode & 0xFF0000LL)) {
 		out = true;
 		append_byte( (opcode >> 16) & 0xFF );
 	}
 
-	if (out || (opcode & 0xFF00)) {
+	if (out || (opcode & 0xFF00LL)) {
 		out = true;
 		append_byte((opcode >> 8) & 0xFF);
 	}
@@ -47,7 +58,7 @@ void add_opcode(int opcode)
 }
 
 /* add opcode followed by jump relative offset expression */
-void add_opcode_jr(int opcode, Expr1 *expr)
+void add_opcode_jr(long long opcode, Expr1 *expr)
 {
 	if (option_speed()) {
         switch (opcode) {
@@ -87,13 +98,13 @@ void add_opcode_jr(int opcode, Expr1 *expr)
 	}
 }
 
-void add_opcode_jre(int opcode, struct Expr1* expr) {
+void add_opcode_jre(long long opcode, struct Expr1* expr) {
     add_opcode(opcode);
     Pass2infoExpr(RANGE_JRE_OFFSET, expr);
 }
 
 /* add opcodes followed by jump relative offset expression to the same address*/
-void add_opcode_jr_jr(int opcode0, int opcode1, struct Expr1* expr0)
+void add_opcode_jr_jr(long long opcode0, int opcode1, struct Expr1* expr0)
 {
     // build expr1 = expr0
     UT_string* expr1_text;
@@ -110,42 +121,56 @@ void add_opcode_jr_jr(int opcode0, int opcode1, struct Expr1* expr0)
 }
 
 /* add opcode followed by 8-bit unsigned expression */
-void add_opcode_n(int opcode, Expr1* expr)
+void add_opcode_n(long long opcode, Expr1* expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
 }
 
 /* add opcode followed by 8-bit offset to 0xff00 expression */
-void add_opcode_h(int opcode, Expr1* expr)
+void add_opcode_h(long long opcode, Expr1* expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_HIGH_OFFSET, expr);
 }
 
 /* add opcode followed by 8-bit unsigned expression and a zero byte */
-void add_opcode_n_0(int opcode, struct Expr1* expr)
+void add_opcode_n_0(long long opcode, struct Expr1* expr)
 {
     add_opcode(opcode);
     Pass2infoExpr(RANGE_BYTE_TO_WORD_UNSIGNED, expr);
 }
 
+/* add opcode followed by 8-bit unsigned expression and two zero bytes */
+void add_opcode_n_0_0(long long opcode, struct Expr1* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_TO_PTR_UNSIGNED, expr);
+}
+
 /* add opcode followed by 8-bit signed expression and a 0x00/0xFF byte */
-void add_opcode_s_0(int opcode, struct Expr1* expr)
+void add_opcode_s_0(long long opcode, struct Expr1* expr)
 {
     add_opcode(opcode);
     Pass2infoExpr(RANGE_BYTE_TO_WORD_SIGNED, expr);
 }
 
+/* add opcode followed by 8-bit signed expression and two zeros or 0xff bytes depending on sign */
+void add_opcode_s_0_0(long long opcode, struct Expr1* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_TO_PTR_SIGNED, expr);
+}
+
 /* add opcode followed by 8-bit signed expression */
-void add_opcode_d(int opcode, Expr1 *expr)
+void add_opcode_d(long long opcode, Expr1 *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
 }
 
 /* add opcode followed by 16-bit expression */
-void add_opcode_nn(int opcode, Expr1 *expr, int target_offset) {
+void add_opcode_nn(long long opcode, Expr1 *expr, int target_offset) {
 	if (target_offset != 0) {
 		// build expr1 = expr+target_offset
 		UT_string* expr1_text;
@@ -167,7 +192,7 @@ void add_opcode_nn(int opcode, Expr1 *expr, int target_offset) {
 }
 
 /* add opcodes followed by the same 16-bit expression */
-void add_opcode_nn_nn(int opcode0, int opcode1, struct Expr1* expr0)
+void add_opcode_nn_nn(long long opcode0, long long opcode1, struct Expr1* expr0)
 {
     // build expr1 = expr0
     UT_string* expr1_text;
@@ -184,7 +209,7 @@ void add_opcode_nn_nn(int opcode0, int opcode1, struct Expr1* expr0)
 }
 
 /* add opcode followed by 24-bit expression */
-void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset) {
+void add_opcode_nnn(long long opcode, struct Expr1 *expr, int target_offset) {
 	if (target_offset != 0) {
 		// build expr1 = expr+target_offset
 		UT_string* expr1_text;
@@ -195,7 +220,7 @@ void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset) {
 		xassert(expr1);
 		
 		add_opcode(opcode);
-		Pass2infoExpr(RANGE_WORD, expr1);
+		Pass2infoExpr(RANGE_PTR24, expr1);
 
 		utstring_free(expr1_text);
 	}
@@ -206,20 +231,20 @@ void add_opcode_nnn(int opcode, struct Expr1 *expr, int target_offset) {
 }
 
 /* add opcode followed by 32-bit expression */
-void add_opcode_nnnn(int opcode, struct Expr1 *expr) {
+void add_opcode_nnnn(long long opcode, struct Expr1 *expr) {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_DWORD, expr);
 }
 
 /* add opcode followed by big-endian 16-bit expression */
-void add_opcode_NN(int opcode, struct Expr1 *expr)
+void add_opcode_NN(long long opcode, struct Expr1 *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_WORD_BE, expr);
 }
 
 /* add opcode followed by IX/IY offset expression */
-void add_opcode_idx(int opcode, Expr1 *expr)
+void add_opcode_idx(long long opcode, Expr1 *expr)
 {
 	if (opcode & 0xFF0000) 
 	{				/* 3 bytes, insert idx offset as 2nd byte */
@@ -235,7 +260,7 @@ void add_opcode_idx(int opcode, Expr1 *expr)
 }
 
 /* add two (ix+d) and (ix+d+1) opcodes */
-void add_opcode_idx_idx1(int opcode0, int opcode1, struct Expr1* expr0) {
+void add_opcode_idx_idx1(long long opcode0, long long opcode1, struct Expr1* expr0) {
 	// build expr1 = 1+(expr)
 	UT_string* expr1_text;
 	utstring_new(expr1_text);
@@ -250,7 +275,7 @@ void add_opcode_idx_idx1(int opcode0, int opcode1, struct Expr1* expr0) {
 }
 
 /* add opcode followed by IX/IY offset expression and 8 bit expression */
-void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
+void add_opcode_idx_n(long long opcode, struct Expr1 *idx_expr,
 								  struct Expr1 *n_expr )
 {
 	add_opcode(opcode);
@@ -259,12 +284,28 @@ void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
 }
 
 /* add opcode followed by two 8-bit expressions */
-void add_opcode_n_n(int opcode, struct Expr1 *n1_expr,
+void add_opcode_n_n(long long opcode, struct Expr1 *n1_expr,
 								struct Expr1 *n2_expr )
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n1_expr);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n2_expr);
+}
+
+/* add opcode followed by two 16-bit address and 8-bit segment*/
+void add_opcode_x_nn(long long opcode, Expr1* x_expr, Expr1* nn_expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_WORD, nn_expr);
+    Pass2infoExpr(RANGE_BYTE_UNSIGNED, x_expr);
+}
+
+/* add opcode followed by two 16-bit address and 16-bit segment*/
+void add_opcode_xx_nn(long long opcode, Expr1* xx_expr, Expr1* nn_expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_WORD, nn_expr);
+    Pass2infoExpr(RANGE_WORD, xx_expr);
 }
 
 /* add defb opcode with 8-bit data */
@@ -276,32 +317,15 @@ void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
 	Expr1 *emul_expr = parse_expr(emul_func);
-    if (option_cpu() == CPU_EZ80)
+    cpu_t cpu = option_cpu();
+    if (cpu == CPU_EZ80 || cpu == CPU_EZ80_STRICT)
         add_opcode_nnn(0xCD, emul_expr, 0);
     else
         add_opcode_nn(0xCD, emul_expr, 0);
 }
 
-void add_rst_opcode(int arg) {
-    if (arg > 0 && arg < 8)
-        arg *= 8;
-    switch (arg) {
-    case 0x00: case 0x08: case 0x30:
-        if (option_cpu() == CPU_R2KA || option_cpu() == CPU_R3K ||
-            option_cpu() == CPU_R4K || option_cpu() == CPU_R5K)
-            error_hex2(ErrIntRange, arg);
-        else
-            add_opcode(0xC7 + arg);
-        break;
-    case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:
-        add_opcode(0xC7 + arg); break;
-    default:
-        error_hex2(ErrIntRange, arg);
-    }
-}
-
 /* add jump relative to text label - offset */
-void add_opcode_jr_end(int opcode, const char* end_label, int offset)
+void add_opcode_jr_end(long long opcode, const char* end_label, int offset)
 {
 	UT_string* target;
 	utstring_new(target);
@@ -311,7 +335,7 @@ void add_opcode_jr_end(int opcode, const char* end_label, int offset)
 	utstring_free(target);
 }
 
-void add_opcode_nn_end(int opcode, const char* end_label, int offset)
+void add_opcode_jp_nn_end(long long opcode, const char* end_label, int offset)
 {
 	UT_string* target;
 	utstring_new(target);
@@ -321,7 +345,7 @@ void add_opcode_nn_end(int opcode, const char* end_label, int offset)
 	utstring_free(target);
 }
 
-void add_opcode_nnn_end(int opcode, const char* end_label, int offset)
+void add_opcode_jp_nnn_end(long long opcode, const char* end_label, int offset)
 {
 	UT_string* target;
 	utstring_new(target);
@@ -336,12 +360,12 @@ void add_Z88_CALL_OZ(int argument)
 {
 	if (argument > 0 && argument <= 255)
 	{
-        add_rst_opcode(0x20);
+        add_opcode(Z80_RST(0x20));
 		append_byte(argument);
 	}
 	else if (argument > 255)
 	{
-        add_rst_opcode(0x20);
+        add_opcode(Z80_RST(0x20));
 		append_word(argument);
 	}
 	else
@@ -350,20 +374,29 @@ void add_Z88_CALL_OZ(int argument)
 
 void add_Z88_CALL_PKG(int argument)
 {
-	if (argument >= 0)
+    cpu_t cpu = option_cpu();
+    if (cpu == CPU_R2KA || cpu == CPU_R2KA_STRICT ||
+        cpu == CPU_R3K  || cpu == CPU_R3K_STRICT  ||
+        cpu == CPU_R4K  || cpu == CPU_R4K_STRICT  ||
+        cpu == CPU_R5K  || cpu == CPU_R5K_STRICT  ||
+        cpu == CPU_R6K  || cpu == CPU_R6K_STRICT) {
+        error_hex4(ErrIntRange, argument);
+    }
+	else if (argument >= 0)
 	{
-        add_rst_opcode(0x08);
+        add_opcode(Z80_RST(0x08));
 		append_word(argument);
 	}
-	else
+    else {
         error_hex4(ErrIntRange, argument);
+	}
 }
 
 void add_Z88_FPP(int argument)
 {
 	if (argument > 0 && argument < 255)
 	{
-        add_rst_opcode(0x18);
+        add_opcode(Z80_RST(0x18));
 		append_byte(argument);
 	}
 	else
@@ -374,7 +407,7 @@ void add_Z88_INVOKE(int argument)
 {
 	if (option_ti83() || option_ti83plus()) {
 		if (option_ti83plus())
-            add_rst_opcode(0x28);		/* Ti83Plus: RST 28H instruction */
+            add_opcode(Z80_RST(0x28));	/* Ti83Plus: RST 28H instruction */
 		else
 			append_byte(Z80_CALL);		/* Ti83: CALL */
 
@@ -391,7 +424,8 @@ void add_Z88_INVOKE(int argument)
 // (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
 void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 { 
-	if (option_cpu() != CPU_Z80N)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else {
 		char expr_text[MAXLINE];
@@ -409,7 +443,8 @@ void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 // (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
 void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 {
-	if (option_cpu() != CPU_Z80N)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else {
 		char expr_text[MAXLINE];
@@ -427,7 +462,8 @@ void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 // cu.stop   -> 16 - bit encoding 0xffff (impossible cu.wait)
 void add_copper_unit_stop()
 {
-	if (option_cpu() != CPU_Z80N)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else
 		append_word_be(0xFFFF);
@@ -436,7 +472,8 @@ void add_copper_unit_stop()
 // cu.nop  -> 16 - bit encoding 0x0000 (do nothing cu.move)
 void add_copper_unit_nop()
 {
-	if (option_cpu() != CPU_Z80N)
+    cpu_t cpu = option_cpu();
+    if (cpu != CPU_Z80N && cpu != CPU_Z80N_STRICT)
 		error(ErrIllegalIdent, NULL);
 	else
 		append_word_be(0x0000);

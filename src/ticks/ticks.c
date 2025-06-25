@@ -840,6 +840,37 @@ int f(void){
             | pv            // bit 2 parity
             | pv >> 1       // bit 1 v (cheat)
             ;
+    } else if ( is8080() && !c_z80asm_tests ) {
+        // bit 0 = carry
+        // bit 1 = 1
+        // bit 2 = P/V
+        // bit 3 = 0
+        // bit 4 = H half carry
+        // bit 5 = 0
+        // bit 6 = Z
+        // bit 7 = S sign flag
+        return  ff & 128  // S bit 7
+                | 0x02      // bit 1 always set
+                | ff >> 8 & 1 // C bit 0, so value 256
+                | !fr << 6    // Z, bit 6
+                | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
+                | (fa & -256
+                    ? 154020 >> ((fr ^ fr >> 4) & 15)
+                    : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
+                    ;
+    } else if ( isgbz80() && !c_z80asm_tests  ) {
+        // bit 0 = 0 
+        // bit 1 = 0 
+        // bit 2 = 0
+        // bit 3 = 0
+        // bit 4 = carry   0x10
+        // bit 5 = flag h  0x20
+        // bit 6 = flag n  0x40
+        // bit 7 = zero    0x80
+        return ((ff >> 4) & 0x10)  // carry
+                | ((fr ^ fa ^ fb ^ fb >> 8) & 16) << 1 // H 
+                | (fb >> 8 & 2) << 5  // N
+                | (!fr << 7);
     } else {
         // bit 0 = carry
         // bit 1 = N (subtract flag)
@@ -849,15 +880,15 @@ int f(void){
         // bit 5 = copy of A
         // bit 6 = Z
         // bit 7 = S sign flag
-      return  ff & 168  // S, 5, 3: bits 7, 5, 3
-            | ff >> 8 & 1 // C bit 0, so value 256
-            | !fr << 6    // Z, bit 6
-            | fb >> 8 & 2 // N (subtract flag) bit 1, value 512
-            | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
-            | (fa & -256
-                ? 154020 >> ((fr ^ fr >> 4) & 15)
-                : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
-                ;
+        return  ff & 168  // S, 5, 3: bits 7, 5, 3
+                | ff >> 8 & 1 // C bit 0, so value 256
+                | !fr << 6    // Z, bit 6
+                | fb >> 8 & 2 // N (subtract flag) bit 1, value 512
+                | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
+                | (fa & -256
+                    ? 154020 >> ((fr ^ fr >> 4) & 15)
+                    : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
+                    ;
     }
 }
 
@@ -873,10 +904,37 @@ int f_(void){
 }
 
 void setf(int a){
-  fr= ~a & 64;
-  ff= a|= a<<8;
-  fa= 255 & (fb= a & -129 | (a&4)<<5);
-  fk= (a&0x20)>>5;  // 8085 flag
+    if ( isgbz80() && !c_z80asm_tests ) {
+        // Rearrange the flag to match z80
+        // bit 0 = 0 
+        // bit 1 = 0 
+        // bit 2 = 0
+        // bit 3 = 0
+        // bit 4 = carry   0x10
+        // bit 5 = flag h  0x20
+        // bit 6 = flag n  0x40
+        // bit 7 = zero    0x80
+        int v = 0;
+
+        v |= (a >> 4) & 0x01;       // Carry
+        v |= ( a >> 1 ) & 0x40;     // Zero
+        v |= ( a >> 5) & 0x02;      // N
+        v |= ( a >> 1 ) & 0x10;     // H
+        a = v;
+    }
+
+    // bit 0 = carry
+    // bit 1 = N (subtract flag)
+    // bit 2 = P/V
+    // bit 3 = copy of A
+    // bit 4 = H half carry
+    // bit 5 = copy of A
+    // bit 6 = Z
+    // bit 7 = S sign flag
+    fr= ~a & 64;
+    ff= a|= a<<8;
+    fa= 255 & (fb= a & -129 | (a&4)<<5);
+    fk= (a&0x20)>>5;  // 8085 flag
 }
 
 // get each of the flags as bools, pass f() or f_() as argument
@@ -2151,8 +2209,11 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0x91: // SUB C / (R4K) LD BC,HL // (R6K) sbc hl,(ixy+d)
         if (israbbit6k() && ih == 0 ) r6k_alu_hl_xyd(opc, iy);
         else if ( israbbit4k() ) { // LD BC,HL
-            if ( altd ) { b_ = h; c_ = l; }
-            else { b = h; c = l; }
+            uint8_t sh = alts ? h_ : h;
+            uint8_t sl = alts ? l_ : l;
+            
+            if ( altd ) { b_ = sh; c_ = sl; }
+            else { b = sh; c = sl; }
             st+=2; 
         } else SUB(c,ALUr_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -2661,8 +2722,18 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0xf1: // POP AF // (R4K)
         if (israbbit4k() && ih==0) r4k_pop_r32(opc, iy);
         else {
+            uint8_t flags = get_memory_data(sp++);
             st+= isez80() ? 3 : isgbz80() ? 12 : israbbit() ? 7 : isz180() ? 9 : 10;
-            setf(get_memory_data(sp++));
+
+            // 8080: S Z 0 AC 0 P 1 C
+            // 8085: S Z K AC 0 P V C
+            #if 0
+            if ( is8085() ) { flags &= 0xf7; }
+            else if ( is8080() && !c_z80asm_tests ) { flags |= 2; flags &= 0xd7; }
+            else if ( isgbz80() && !c_z80asm_tests ) { flags &= 0xf0; }
+            #endif
+
+            setf(flags);
             a= get_memory_data(sp++);
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -4293,7 +4364,7 @@ static void handle_ed_page(void)
     case 0x59:                                         // OUT (C),E (RCM) LD DE',BC
         if ( israbbit() ) { // LD DE',BC
             d_ = alts ? b_ : b;
-            e_ = alts ? b_ : c;
+            e_ = alts ? c_ : c;
             st += 4;
         } else {
             OUTR(e);

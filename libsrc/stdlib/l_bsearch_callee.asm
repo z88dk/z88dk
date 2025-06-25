@@ -1,6 +1,6 @@
 ; void __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp)
 ; 01.2007 aralbrec
-
+IF !__CPU_GBZ80__ && !__CPU_INTEL__ 
     SECTION code_clib
     PUBLIC  l_bsearch_callee
     PUBLIC  _l_bsearch_callee
@@ -45,4 +45,5 @@ compare:
     pop     bc
     pop     de
     ret
+ENDIF
 

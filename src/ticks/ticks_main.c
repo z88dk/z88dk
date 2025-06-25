@@ -20,7 +20,7 @@ int    c_rc2014_mode = 0;
 int    c_rom_size = 0;
 int    c_ioport = -1;
 int    c_autolabel = 0;
-
+int    c_z80asm_tests = 0;
 
 static char   cmd_arguments[255];
 static int    cmd_arguments_len = 0;
@@ -45,7 +45,10 @@ static void write_output()
     FILE *fh;
     uint8_t t, r, w;
 
+    // Output is used by z80asm tests, pretend that we're a z80 so flags are
+    // written out in that way
     if( c_output ){
+        if (c_z80asm_tests) c_cpu = CPU_Z80;
         fh= fopen(c_output, "wb+");
         if( !fh ) {
             fprintf(stderr, "\nCannot create or write in file: %s\n", c_output);
@@ -171,7 +174,7 @@ static void usage(void)
     printf("  -mr800         Emulate a r800 (ticks may not be accurate)\n");
     printf("  -mkc160        Emulate a kc160\n");
     printf("  -mkc160_z80    Emulate a kc160 (z80 mode)\n");
-    printf("  -ide0 <file>   Set file to be ide device 0\n");
+    printf("  -ide0 <file>    file to be ide device 0\n");
     printf("  -ide1 <file>   Set file to be ide device 1\n");
     printf("  -iochar X      Set port X to be character input/output\n");
     printf("  -output <file> dumps the RAM content to a 64K file\n");
@@ -331,6 +334,13 @@ int main (int argc, char **argv){
             memcpy(get_memory_addr(65281, MEM_TYPE_DATA), cmd_arguments, cmd_arguments_len % 256);
           }
           break;
+        case 'z':
+          if (strcmp(&argv[0][1], "z80asm-tests") == 0) {
+                c_z80asm_tests = 1;
+                argv--;
+                argc++;
+                break;
+          }
         default:
           fprintf(stderr, "\nWrong Argument: %s\n", argv[0]);
           exit(EXIT_FAILURE);

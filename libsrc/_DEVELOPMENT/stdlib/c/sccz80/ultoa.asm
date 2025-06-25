@@ -11,8 +11,10 @@ EXTERN asm_ultoa
 ultoa:
 
    pop af
-   pop bc
-   pop ix
+   pop bc   ;radix
+   exx
+   pop bc   ;buf
+   exx
    pop hl
    pop de
    
@@ -22,8 +24,14 @@ ultoa:
    push bc
    push af
    
-   jp asm_ultoa
-
+   exx
+   push bc
+   exx   
+   ex (sp),ix
+   call asm_ultoa
+   pop ix
+   ret
+   
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ultoa

@@ -10,12 +10,12 @@
 void thread_exit()
 {
 #asm
-   ld          ix,(_threadbase + current)
-   bit	       2,(ix+thread_flags)
-   ret         nz		; System threads cannot exit
-   di
-   res         7,(ix+thread_flags)      ; Thread no available
-   ei				; Enable
-   halt				; We should no longer exist
+    ld      ix,(_threadbase + current)
+    bit	    2,(ix+thread_flags)
+    ret     nz                      ; System threads cannot exit
+    di
+    res     7,(ix+thread_flags)     ; Thread no available
+    ei                              ; Enable
+    halt                            ; We should no longer exist
 #endasm
 }

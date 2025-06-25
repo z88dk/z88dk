@@ -15,6 +15,7 @@
 #endif
 
 #include "debugger.h"
+#include "cpu.h"
 #include "utlist.h"
 
 #include "disassembler.h"
@@ -1497,7 +1498,13 @@ static int cmd_registers(int argc, char **argv)
             FNT_CLR "[sp]" FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n",
 
             bk.f()  | regs.a << 8,  regs.c  | regs.b  << 8, regs.e  | regs.d  << 8, regs.l  | regs.h  << 8, regs.xl | regs.xh << 8,
-            (bk.f()  & 0x80) ? 1 : 0, (bk.f()  & 0x40) ? 1 : 0, (bk.f()  & 0x10) ? 1 : 0, (bk.f()  & 0x04) ? 1 : 0, (bk.f()  & 0x02) ? 1 : 0, (bk.f()  & 0x01) ? 1 : 0,
+            (isgbz80() ? 0 : (bk.f()  & 0x80)) ? 1 : 0, // S: flag
+            (bk.f() & (isgbz80() ? 0x80 : 0x40)) ? 1 : 0,  // Z: flag
+            (bk.f()  & (isgbz80() ? 0x20 : 0x10)) ? 1 : 0, // H  flag
+            (isgbz80() ? 0 : (bk.f()  & 0x04)) ? 1 : 0, // P/V
+            (bk.f()  & (isgbz80() ? 0x40 : 0x02)) ? 1 : 0,  // N
+            (bk.f()  & (isgbz80() ? 0x10 : 0x01)) ? 1 : 0,  // C
+  
 
             bk.f_() | regs.a_ << 8, regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, regs.yl | regs.yh << 8,
 
@@ -1516,8 +1523,15 @@ static int cmd_registers(int argc, char **argv)
                "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d (8085: K=%d)\n",
                pc, bk.get_memory(pc, MEM_TYPE_INST), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
                sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)), regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, bk.f_() | regs.a_ << 8,
-               (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0, (bk.f() & 0x02) ? 1 : 0, (bk.f() & 0x01) ? 1 : 0, (bk.f() & 0x20) ? 1 : 0);
 
+            (isgbz80() ? 0 : (bk.f()  & 0x80)) ? 1 : 0, // S: flag
+            (bk.f() & (isgbz80() ? 0x80 : 0x40)) ? 1 : 0,  // Z: flag
+            (bk.f()  & (isgbz80() ? 0x20 : 0x10)) ? 1 : 0, // H  flag
+            (isgbz80() ? 0 : (bk.f()  & 0x04)) ? 1 : 0, // P/V
+            (bk.f()  & (isgbz80() ? 0x40 : 0x02)) ? 1 : 0,  // N
+            (bk.f()  & (isgbz80() ? 0x10 : 0x01)) ? 1 : 0,  // C
+            (!is8085() ? 0  : (bk.f() & 0x20 )) ? 1 : 0 // K (8085)
+        );
         if (regs.clockh || regs.clockl)
         {
             bk.console("clockh=%04X, clockhl=%04X\n", regs.clockh, regs.clockl);

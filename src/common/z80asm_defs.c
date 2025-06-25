@@ -17,6 +17,8 @@ typedef struct cpu_lookup_s {
     const char* name;           // cpu name
     cpu_t id;                   // cpu id
     cpu_t compat_parent;        // cpu id of compatible parent
+    cpu_t non_strict;           // cpu id of non-strict version
+    bool is_strict;             // true if cpu is strict
     int level;                  // level in dependency tree, 0 not compatible to any
     UT_hash_handle hh;          // hash table
 } cpu_lookup_t;
@@ -38,22 +40,39 @@ typedef struct {
 //-----------------------------------------------------------------------------
 
 static cpu_lookup_t cpu_lut[] = {
-    { "z80",        CPU_Z80,            CPU_Z80_STRICT,     },  // 1
-    { "z80_strict", CPU_Z80_STRICT,     CPU_8080,           },  // 2
-    { "z180",       CPU_Z180,           CPU_Z80_STRICT,     },  // 3
-    { "ez80_z80",   CPU_EZ80_Z80,       CPU_UNDEF,          },  // 4
-    { "ez80",       CPU_EZ80,           CPU_UNDEF,          },  // 5
-    { "z80n",       CPU_Z80N,           CPU_Z80,            },  // 6
-    { "r2ka",       CPU_R2KA,           CPU_UNDEF,          },  // 7
-    { "r3k",        CPU_R3K,            CPU_R2KA,           },  // 8
-    { "gbz80",      CPU_GBZ80,          CPU_UNDEF,          },  // 9
-    { "8080",       CPU_8080,           CPU_UNDEF,          },  // 10
-    { "8085",       CPU_8085,           CPU_8080,           },  // 11
-    { "r800",       CPU_R800,           CPU_Z80_STRICT,     },  // 12
-    { "r4k",        CPU_R4K,            CPU_UNDEF,          },  // 13
-    { "r5k",        CPU_R5K,            CPU_R4K,            },  // 14
-    { "kc160",      CPU_KC160,          CPU_UNDEF,          },  // 15
-    { "kc160_z80",  CPU_KC160_Z80,      CPU_Z80_STRICT,     },  // 16
+//    name          		id                  	parent      non-strict      is-strict
+    { "z80",        		CPU_Z80,            	CPU_8080,   CPU_Z80,        false,  },  // 1
+    { "z80_strict", 		CPU_Z80_STRICT,     	CPU_8080,   CPU_Z80,        true,   },  // 2
+    { "z180",       		CPU_Z180,           	CPU_8080,   CPU_Z180,       false,  },  // 3
+    { "ez80_z80",   		CPU_EZ80_Z80,       	CPU_UNDEF,  CPU_EZ80_Z80,   false,  },  // 4
+    { "ez80",       		CPU_EZ80,           	CPU_UNDEF,  CPU_EZ80,       false,  },  // 5
+    { "z80n",       		CPU_Z80N,           	CPU_Z80,    CPU_Z80N,       false,  },  // 6
+    { "r2ka",       		CPU_R2KA,           	CPU_UNDEF,  CPU_R2KA,       false,  },  // 7
+    { "r3k",        		CPU_R3K,            	CPU_R2KA,   CPU_R3K,        false,  },  // 8
+    { "gbz80",      		CPU_GBZ80,          	CPU_UNDEF,  CPU_GBZ80,      false,  },  // 9
+    { "8080",       		CPU_8080,           	CPU_UNDEF,  CPU_8080,       false,  },  // 10
+    { "8085",       		CPU_8085,           	CPU_8080,   CPU_8085,       false,  },  // 11
+    { "r800",       		CPU_R800,           	CPU_8080,   CPU_R800,       false,  },  // 12
+    { "r4k",        		CPU_R4K,            	CPU_UNDEF,  CPU_R4K,        false,  },  // 13
+    { "r5k",        		CPU_R5K,            	CPU_R4K,    CPU_R5K,        false,  },  // 14
+    { "kc160",      		CPU_KC160,          	CPU_UNDEF,  CPU_KC160,      false,  },  // 15
+    { "kc160_z80",  		CPU_KC160_Z80,      	CPU_8080,   CPU_KC160_Z80,  false,  },  // 16
+    { "8080_strict",		CPU_8080_STRICT,    	CPU_UNDEF,  CPU_8080,       true,   },  // 17
+    { "8085_strict",		CPU_8085_STRICT,    	CPU_8080,   CPU_8085,       true,   },  // 18
+    { "gbz80_strict",		CPU_GBZ80_STRICT,		CPU_UNDEF,  CPU_GBZ80,      true,   },  // 19
+    { "z180_strict",		CPU_Z180_STRICT,  		CPU_8080,   CPU_Z180,       true,   },  // 20
+    { "z80n_strict",		CPU_Z80N_STRICT,  		CPU_Z80,    CPU_Z80N,       true,   },  // 21
+    { "ez80_z80_strict",	CPU_EZ80_Z80_STRICT,	CPU_UNDEF,  CPU_EZ80_Z80,   true,   },  // 22
+    { "ez80_strict",    	CPU_EZ80_STRICT,    	CPU_UNDEF,	CPU_EZ80,       true,   },  // 23
+    { "r800_strict",   		CPU_R800_STRICT,		CPU_8080,   CPU_R800,       true,   },  // 24
+    { "kc160_strict",   	CPU_KC160_STRICT,		CPU_UNDEF,  CPU_KC160,      true,   },  // 25
+    { "kc160_z80_strict",	CPU_KC160_Z80_STRICT,	CPU_8080,   CPU_KC160_Z80,  true,   },  // 26
+    { "r2ka_strict",       	CPU_R2KA_STRICT,        CPU_UNDEF,  CPU_R2KA,       true,   },  // 27
+    { "r3k_strict",        	CPU_R3K_STRICT,         CPU_R2KA,   CPU_R3K,        true,   },  // 28
+    { "r4k_strict",        	CPU_R4K_STRICT,         CPU_UNDEF,  CPU_R4K,        true,   },  // 29
+    { "r5k_strict",			CPU_R5K_STRICT,			CPU_R4K,    CPU_R5K,        true,   },  // 30
+    { "r6k",        		CPU_R6K,            	CPU_R5K,    CPU_R6K,        false,  },  // 31
+    { "r6k_strict",    		CPU_R6K_STRICT,        	CPU_R5K,    CPU_R6K,        true,   },  // 32
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name
@@ -93,7 +112,7 @@ static void init_cpus() {
 
         // init dependency level
         for (size_t i = 0; i < NUM_ELEMS(cpu_lut); i++) {
-            if (cpu_lut[i].compat_parent == CPU_UNDEF)
+            if (cpu_lut[i].compat_parent == CPU_UNDEF || cpu_lut[i].is_strict)
                 cpu_lut[i].level = 0;            // no comaptibility
             else
                 cpu_lut[i].level = -1;           // still to check
@@ -154,6 +173,26 @@ cpu_t cpu_id(const char* name) {
         return CPU_UNDEF;
 }
 
+// check if CPU is strict
+bool cpu_is_strict(cpu_t id) {
+    init_cpus();
+    cpu_lookup_t* found = cpu_id_to_lookup(id);
+    if (found)
+        return found->is_strict;
+    else
+        return false;
+}
+
+// return non-strict version of cpu
+cpu_t cpu_unstrictify(cpu_t id) {
+    init_cpus();
+    cpu_lookup_t* found = cpu_id_to_lookup(id);
+    if (found)
+        return found->non_strict;
+    else
+        return id;
+}
+
 // static comma-separated list of cpu names
 const char* cpu_list() {
     init_cpus();
@@ -169,6 +208,9 @@ const int* cpu_ids() {
 // check if a code cpu is compatible with a library cpu
 bool cpu_compatible(cpu_t code_cpu_id, cpu_t lib_cpu_id) {
     init_cpus();
+    code_cpu_id = cpu_unstrictify(code_cpu_id);
+    lib_cpu_id = cpu_unstrictify(lib_cpu_id);
+
     cpu_t id = code_cpu_id;
     while (id != CPU_UNDEF) {
         if (id == lib_cpu_id)
@@ -181,7 +223,6 @@ bool cpu_compatible(cpu_t code_cpu_id, cpu_t lib_cpu_id) {
     }
     return false;
 }
-
 
 // linking with no-swap accepts object files assembled with soft-swap
 bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy) {
@@ -284,6 +325,8 @@ static range_lookup_t range_lu[] = {
     { 'H',      "H",    1 },      // RANGE_HIGH_OFFSET
     { '=',      "=",    2 },      // RANGE_ASSIGNMENT
     { 'j',      "j",    2 },      // RANGE_JRE_OFFSET
+    { 'v',      "v",    3 },      // RANGE_BYTE_TO_PTR_UNSIGNED
+    { 't',      "t",    3 },      // RANGE_BYTE_TO_PTR_SIGNED
 };
 
 // size of each range in object file

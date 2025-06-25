@@ -315,3 +315,5 @@ ENDIF
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     INCLUDE	"crt/classic/crt_section.inc"
 
+    INCLUDE     "crt/classic/mc6847/mc6847_mode_disable.inc"
+

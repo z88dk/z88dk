@@ -1,6 +1,7 @@
-# We expect rasm and Diskarg to be in the path, if not fully qualify these lines
+# We expect rasm and Disark to be in the path, if not fully qualify these lines
 RASM	= rasm.exe
 DISARK	= disark
+ASMFMT	= z88dk-asmstyle
 
 # tool where the magic happens :-)
 ARKOS2Z88DK = ./arkos-to-z88dk.pl
@@ -30,11 +31,11 @@ update-all-players: $(PLAYERS)
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/target/zx/psg
 	cp -f $(ARKOS_CPC_SMC_ASM) ../../libsrc/target/cpc/psg
 	cp -f $(ARKOS_CPC_ROM_ASM) ../../libsrc/target/cpc/psg
+	cp -f $(ARKOS_AQ_SMC_ASM) ../../libsrc/target/aquarius/psg
 	cp -f $(ARKOS_ZX_SMC_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos	# newlib
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos
 	cp -f $(ARKOS_ZX_SMC_ASM) ../../libsrc/_DEVELOPMENT/arch/zxn/arkos
 	cp -f $(ARKOS_ZX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/zxn/arkos
-	cp -f $(ARKOS_AQ_SMC_ASM) ../../libsrc/target/aquarius/psg
 
 # convert Arkos RASM player source to relocatable Z88DK asm player
 # reference: "Source conversion with Disark" article:
@@ -52,6 +53,7 @@ $(ARKOS_MSX_SMC_ASM): PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t msx $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 # MSX, running in ROM (small buffer in SMC, slightly larger player code), ~3500 bytes ROM code, ~270 bytes RAM vars
 $(ARKOS_MSX_ROM_ASM): PlayerAkg.asm arkos-to-z88dk.pl
@@ -64,6 +66,7 @@ $(ARKOS_MSX_ROM_ASM): PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t msx -r $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 # ZX, running in RAM (self-modifying code), ~3300 bytes
 $(ARKOS_ZX_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
@@ -74,6 +77,7 @@ $(ARKOS_ZX_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 # ZX, running in ROM ~3500 bytes ROM code, ~270 bytes RAM vars
 $(ARKOS_ZX_ROM_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
@@ -86,6 +90,7 @@ $(ARKOS_ZX_ROM_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx -r $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 # CPC running in RAM (self-modifying code), ~3400 bytes
 $(ARKOS_CPC_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
@@ -96,6 +101,7 @@ $(ARKOS_CPC_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 # CPC, running in ROM ~3600 bytes ROM code, ~270 bytes RAM vars
 $(ARKOS_CPC_ROM_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
@@ -108,6 +114,7 @@ $(ARKOS_CPC_ROM_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx -r $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 # Aquarius+ running in RAM (self-modifying code), ~3400 bytes
 $(ARKOS_AQ_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
@@ -118,6 +125,7 @@ $(ARKOS_AQ_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(RASM) conf_PlayerAkg.asm -o AT2Player -s -sl -sq
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx $(PASMO_ASM) > $@
+	$(ASMFMT) $@
 
 clean:
 	@-rm conf_PlayerAkg.asm *.lis *.bin *.tap *.o *.sym $(PASMO_ASM) $(PLAYERS) 2>/dev/null
