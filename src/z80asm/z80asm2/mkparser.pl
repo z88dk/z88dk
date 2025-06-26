@@ -472,8 +472,8 @@ sub patch_file {
 			my $prefix = $1;
 			push @out, $_;
 			for my $state (@{$grammar->{states}}) {
-				my $line = $prefix."{ /* ".$state->{state}.": ".
-						   join(" ", @{$state->{path}})." */\n"; 
+				my $line = $prefix."{ // ".$state->{state}.": ".
+						   join(" ", @{$state->{path}})."\n"; 
 				
 				# unordered_map<Keyword, int>	keyword_next;
 				$line .= "$prefix  { "; 
