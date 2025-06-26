@@ -150,6 +150,7 @@ static void            usage(const char *program);
 static void            print_help_text(const char *program);
 static void            GlobalDefc(option *argument, char *);
 static void            Alias(option *arg, char *);
+static void            OptAllSeg(option* arg, char*);
 static void            PragmaDefine(option *arg, char *);
 static void            PragmaExport(option *arg, char *);
 static void            PragmaRedirect(option *arg, char *);
@@ -192,6 +193,7 @@ static void            configure_maths_library(char **libstring);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
+static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
@@ -403,6 +405,11 @@ static int    aliases_num = 0;
 static char   c_generate_debug_info = 0;
 static char   c_help = 0;
 
+static char *opt_code_seg = NULL;
+static char *opt_const_seg = NULL;
+static char *opt_data_seg = NULL;
+static char *opt_bss_seg = NULL;
+
 static arg_t  config[] = {
     { "OPTIONS", 0, SetStringConfig, &c_options, NULL, "Extra options for port" },
     { "CPP", 0, SetStringConfig, &c_cpp_exe, NULL, "Name of the cpp binary" },
@@ -516,7 +523,6 @@ static option options[] = {
     { 0, "xc", OPT_BOOL,  "Explicitly specify file type as C" , &explicit_file_type_c, NULL, 0},
     { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
 
-
     { 0, "", OPT_HEADER, "M4 options:", NULL, NULL, 0 },
     { 0, "Cm", OPT_FUNCTION,  "Add an option to m4" , &m4arg, AddToArgs, 0},
     { 0, "copy-back-after-m4", OPT_BOOL, "Copy files back after processing with m4",&c_copy_m4_processed_files, NULL, 0 },
@@ -534,16 +540,24 @@ static option options[] = {
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
     { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
+    { 0, "allseg", OPT_FUNCTION|OPT_DOUBLE_DASH, "Redirect all compiler output to the same segment", NULL, OptAllSeg, 0 },  // accesses opt_*_seg vars below
+    { 0, "codeseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler code segment", &opt_code_seg, NULL, 0 },
+    { 0, "constseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler const segment", &opt_const_seg, NULL, 0 },
+    { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler data segment", &opt_data_seg, NULL, 0 },
+    { 0, "bssseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler bss segment", &opt_bss_seg, NULL, 0 },
+
     { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
     { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
     { 0, "Ch", OPT_FUNCTION,  "Add an option to the sccz80 peepholer" , &coptarg, AddToArgs, 0},
+
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
     { 0, "SO", OPT_INT,  "Set the peephole optimiser setting for sdcc-peephole" , &sdccpeepopt, NULL, 0},
     { 0, "fsigned-char", OPT_BOOL|OPT_DOUBLE_DASH,  "Use signed chars by default" , &sdcc_signed_char, NULL, 0},
+
     { 0, "", OPT_HEADER, "Compiler (clang/llvm) options:", NULL, NULL, 0 },
     { 0, "Cg", OPT_FUNCTION,  "Add an option to clang" , &clangarg, AddToArgs, 0},
     { 0, "clang", OPT_BOOL,  "Stop after translating .c files to llvm ir" , &clangonly, NULL, 0},
@@ -551,6 +565,7 @@ static option options[] = {
     { 0, "Co", OPT_FUNCTION,  "Add an option to llvm-opt" , &llvmopt, AddToArgs, 0},
     { 0, "Cv", OPT_FUNCTION,  "Add an option to llvm-cbe" , &llvmarg, AddToArgs, 0},
     { 0, "zopt", OPT_BOOL,  "Enable llvm-optimizer (clang only)" , &zopt, NULL, 0},
+
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
     { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
     { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
@@ -1437,6 +1452,15 @@ int main(int argc, char **argv)
                 /* filter comments out of asz80 asm file see issue #801 on github */
                 if (peepholeopt) zsdcc_asm_filter_comments(i, ".op1");
 
+                /* sdcc section redirect is broken so do it via text substitution instead */
+                /* c_sdccopt1 rules must be applied first because they rename sdcc section names to the standard compiler output names */
+                if (peepholeopt)
+                {
+                    rules[0] = c_sdccopt1;
+                    apply_copt_rules(i, 1, rules, ".op1", ".opt", ".opt");
+                    zsdcc_asm_filter_sections(i, ".op1");
+                }
+
                 /* sdcc_opt.9 bugfixes critical sections and implements RST substitution */
                 /* rules[num_rules++] = c_sdccopt9;                                      */
 
@@ -1446,11 +1470,11 @@ int main(int argc, char **argv)
                     rules[num_rules++] = c_sdccopt9;
                     break;
                 case 1:
-                    rules[num_rules++] = c_sdccopt1;
+                    // rules[num_rules++] = c_sdccopt1;  /* already applied above */
                     rules[num_rules++] = c_sdccopt9;
                     break;
                 default:
-                    rules[num_rules++] = c_sdccopt1;
+                    // rules[num_rules++] = c_sdccopt1;  /* already applied above */
                     rules[num_rules++] = c_sdccopt9;
                     rules[num_rules++] = c_sdccopt2;
                     break;
@@ -1467,8 +1491,6 @@ int main(int argc, char **argv)
                 if ( c_coptrules_user ) {
                     rules[num_rules++] = c_coptrules_user;
                 }
-
-
 
                 if (peepholeopt == 0)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
@@ -1533,6 +1555,7 @@ int main(int argc, char **argv)
         case SFILE:
             if (m4only || clangonly || llvmonly || preprocessonly) continue;
             /* filter comments out of asz80 asm file see issue #801 on github */
+            /* substitute section names for section redirect */
             zsdcc_asm_filter_comments(i, ".s2");
             if (process(".s2", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                 exit(1);
@@ -1949,6 +1972,84 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
     filelist[filenumber] = outname;
 }
 
+
+void zsdcc_asm_filter_sections(int filenumber, char* ext)
+{
+    FILE* fin;
+    FILE* fout;
+    char* outname;
+
+    char* line = NULL;
+    unsigned int len = 0;
+
+    char* outline = NULL;
+    char* procline = NULL;
+
+    outname = changesuffix(temporary_filenames[filenumber], ext);
+
+    if ((fin = fopen(filelist[filenumber], "r")) == NULL)
+    {
+        fprintf(stderr, "Error: Cannot read %s\n", filelist[filenumber]);
+        exit(1);
+    }
+
+    if ((fout = fopen(outname, "w")) == NULL)
+    {
+        fprintf(stderr, "Error: Cannot write %s\n", outname);
+        fclose(fin);
+        exit(1);
+    }
+
+    /* read lines from asm file */
+
+    while (zcc_getdelim(&line, &len, '\n', fin) > 0)
+    {
+        outline = muststrdup(line);
+
+        // section redirect
+
+        if (opt_code_seg != NULL)
+        {
+            procline = replace_str(outline, "code_compiler", opt_code_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        if (opt_const_seg != NULL)
+        {
+            procline = replace_str(outline, "rodata_compiler", opt_const_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        if (opt_data_seg != NULL)
+        {
+            procline = replace_str(outline, "data_compiler", opt_data_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        if (opt_bss_seg != NULL)
+        {
+            procline = replace_str(outline, "bss_compiler", opt_bss_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        // write line to output
+
+        fprintf(fout, "%s\n", zcc_strrstrip(outline));
+        free(outline);
+    }
+
+    free(line);
+
+    fclose(fin);
+    fclose(fout);
+
+    free(filelist[filenumber]);
+    filelist[filenumber] = outname;
+}
 
 
 /* Filter global defc file as it is written to the destination directory.
@@ -2938,6 +3039,9 @@ static void configure_compiler(void)
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
             (opt_code_size ? "--opt-code-size" : ""));
         add_option_to_compiler(buf);
+
+        // section redirect is broken in sdcc so do it via text substitution during file processing instead
+
         if (sdccarg) {
             add_option_to_compiler(sdccarg);
         }
@@ -2959,6 +3063,28 @@ static void configure_compiler(void)
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
+
+        // section redirect is fine in sccz80 so add it as a compiler option
+        if (opt_code_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--codeseg=%s", opt_code_seg);
+            add_option_to_compiler(buf);
+        }
+        if (opt_const_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--constseg=%s", opt_const_seg);
+            add_option_to_compiler(buf);
+        }
+        if (opt_data_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--dataseg=%s", opt_data_seg);
+            add_option_to_compiler(buf);
+        }
+        if (opt_bss_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--bssseg=%s", opt_bss_seg);
+            add_option_to_compiler(buf);
+        }
 
         if (sccz80arg) {
             add_option_to_compiler(sccz80arg);
@@ -2999,6 +3125,23 @@ static void configure_compiler(void)
     }
 }
 
+void OptAllSeg(option* arg, char* val)
+{
+    char *ptr = val;
+
+    while ((*ptr == '=') || (*ptr == ':')) ++ptr;
+
+    if (*ptr != '\0') {
+        free(opt_code_seg);
+        free(opt_const_seg);
+        free(opt_data_seg);
+        free(opt_bss_seg);
+        opt_code_seg = muststrdup(ptr);
+        opt_const_seg = muststrdup(ptr);
+        opt_data_seg = muststrdup(ptr);
+        opt_bss_seg = muststrdup(ptr);
+    }
+}
 
 void PragmaInclude(option *arg, char *val)
 {
