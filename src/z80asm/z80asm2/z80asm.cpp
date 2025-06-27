@@ -22,9 +22,8 @@
 #include <string>
 using namespace std;
 
-//-----------------------------------------------------------------------------
-// Test
-//-----------------------------------------------------------------------------
+// environment valiable that contains options to be passed on every invocation
+static const string Z80ASM_ENV = "Z80ASM";
 
 static void create_globals() {
     g_cpu_table = new CpuTable();
@@ -52,11 +51,6 @@ static void delete_globals() {
     delete g_cpu_table; g_cpu_table = nullptr;
 }
 
-static int error_invalid_option(const string& option) {
-    g_error->error_invalid_option(option);
-    return EXIT_FAILURE;
-}
-
 static int help() {
     cout << "Usage: z80asm [options] [file...]" << endl
         << "Options:" << endl
@@ -70,6 +64,80 @@ static int help() {
         << "  -v          Verbose output" << endl
         << "  --          Stop processing options" << endl;
     return EXIT_SUCCESS;
+}
+
+static void check_verbose_option(const string& option) {
+    if (option == "-v")
+        g_options->set_verbose(true);
+}
+
+static bool parse_option(const string& option) {
+    if (option.size() < 2)
+        return false;
+    else if (option[0] != '-')
+        return false;
+    else {
+        switch (option[1]) {
+        case 'D':
+            if (option.size() > 2) {
+                string line = option.substr(2);
+                LineParser parser;
+                if (!parser.parse_define_args(line))
+                    return false;
+            }
+            else
+                return false;
+            break;
+        case 'E':
+            if (option == "-E")
+                g_options->set_preproc_only(true);
+            else
+                return false;
+            break;
+        case 'h':
+            if (option == "-h") {
+                exit(help());
+                return true; // not reached
+            }
+            else
+                return false;
+            break;
+        case 'I':
+            if (option == "-IXIY")
+                g_options->set_swap_ixiy(SwapIXIY::SWAP);
+            else if (option == "-IXIY-soft")
+                g_options->set_swap_ixiy(SwapIXIY::SOFT_SWAP);
+            else
+                return false;
+            break;
+        case 'm':
+            if (option.size() > 2) {
+                string cpu_name = option.substr(2);
+                const CpuInfo* info = g_cpu_table->get_info(cpu_name);
+                if (!info) {
+                    g_error->error_invalid_cpu(cpu_name);
+                    cerr << "valid CPUs are: " << g_cpu_table->cpu_names() << endl;
+                    exit(EXIT_FAILURE);
+                    return false; // not reached
+                }
+                else {
+                    g_options->set_cpu_id(info->id);
+                }
+            }
+            else
+                return false;
+            break;
+        case 'v':
+            if (option == "-v")
+                g_options->set_verbose(true);
+            else
+                return false;
+            break;
+        default:
+            return false;
+        }
+        return true;
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -86,77 +154,40 @@ int main(int argc, char* argv[]) {
 
     // parse command line
     g_options->set_parsing_command_line(true);
-    g_options->set_progname(argv[0]);
-    argv++; argc--;
+    g_options->set_progname(remove_extension(basename(argv[0])));
 
+    // check for verbose option
+    string z80asm_env_value = get_envvar(Z80ASM_ENV);
+    for (auto& option : split_by_whitespace(z80asm_env_value))
+        check_verbose_option(option);
+    for (int i = 1; i < argc; i++)
+        check_verbose_option(argv[i]);
+
+    // show command line if verbose
+    if (g_options->verbose()) {
+        if (!z80asm_env_value.empty())
+            cout << Z80ASM_ENV << "=" << z80asm_env_value << endl;
+        cout << "% " << g_options->progname();
+        for (int i = 1; i < argc; i++)
+            cout << " " << argv[i];
+        cout << endl;
+    }
+
+    // parse options
     bool found_dash_dash = false;
+    argv++; argc--;
     while (!found_dash_dash && argc > 0 && argv[0][0] == '-') {
         string option = argv[0];
-        switch (argv[0][1]) {
-        case '-':
-            if (option == "--")
-                found_dash_dash = true;
-            else
-                return error_invalid_option(option);
-            break;
-        case 'D':
-            if (option.size() > 2) {
-                string line = option.substr(2);
-                LineParser parser;
-                if (!parser.parse_define_args(line))
-                    return EXIT_FAILURE;
-            }
-            else
-                return error_invalid_option(option);
-            break;
-        case 'E':
-            if (option == "-E")
-                g_options->set_preproc_only(true);
-            else
-                return error_invalid_option(option);
-            break;
-        case 'h':
-            if (option == "-h")
-                return help();
-            else
-                return error_invalid_option(option);
-            break;
-        case 'I':
-            if (option == "-IXIY")
-                g_options->set_swap_ixiy(SwapIXIY::SWAP);
-            else if (option == "-IXIY-soft")
-                g_options->set_swap_ixiy(SwapIXIY::SOFT_SWAP);
-            else
-                return error_invalid_option(option);
-            break;
-        case 'm':
-            if (option.size() > 2) {
-                string cpu_name = option.substr(2);
-                const CpuInfo* info = g_cpu_table->get_info(cpu_name);
-                if (!info) {
-                    g_error->error_invalid_cpu(cpu_name);
-                    cerr << "valid CPUs are: " << g_cpu_table->cpu_names() << endl;
-                    return EXIT_FAILURE;
-                }
-                else {
-                    g_options->set_cpu_id(info->id);
-                }
-            }
-            else
-                return error_invalid_option(option);
-            break;
-        case 'v':
-            if (option == "-v")
-                g_options->set_verbose(true);
-            else
-                return error_invalid_option(option);
-            break;
-        default:
-            return error_invalid_option(option);
+        if (option == "--")
+            found_dash_dash = true;
+        else if (!parse_option(option)) {
+            g_error->error_invalid_option(option);
+            return EXIT_FAILURE;
         }
         argv++; argc--;
     }
 
+    // parse files
     while (argc > 0) {
         g_options->add_input_file(argv[0]);
         argv++; argc--;

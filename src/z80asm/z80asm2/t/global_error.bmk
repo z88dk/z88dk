@@ -13,6 +13,7 @@ global func4
 LINE 13 "test_t_global_error.asm"
 global,
 global func5=2
+% z80asm -v test_t_global_error.asm
 assemble test_t_global_error.asm to test_t_global_error.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

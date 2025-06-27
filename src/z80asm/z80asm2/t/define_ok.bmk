@@ -1,8 +1,10 @@
+% z80asm -v -E -Dum,dois=12/6,tres=9/3 test_t_define_ok.asm
 define um = 1
 define dois = 2
 define tres = 3
 LINE 1 "test_t_define_ok.asm"
 define one,two=12/6,three=9/3
+% z80asm -v -Dum,dois=12/6,tres=9/3 test_t_define_ok.asm
 define um = 1
 define dois = 2
 define tres = 3

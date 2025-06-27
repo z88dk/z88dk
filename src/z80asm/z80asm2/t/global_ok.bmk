@@ -5,6 +5,7 @@ global func1
 global func2,func3
 global func2,func3
 func2:
+% z80asm -v test_t_global_ok.asm
 assemble test_t_global_ok.asm to test_t_global_ok.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

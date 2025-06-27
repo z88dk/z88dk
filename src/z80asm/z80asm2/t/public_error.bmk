@@ -4,6 +4,7 @@ public func2,func3
 LINE 1 "test_t_public_error.2.asm"
 public,
 public func4=2
+% z80asm -v test_t_public_error.1.asm test_t_public_error.2.asm
 assemble test_t_public_error.1.asm to test_t_public_error.1.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

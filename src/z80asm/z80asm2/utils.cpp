@@ -11,11 +11,12 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <vector>
 using namespace std;
 
 string str_to_lower(string input) {
-    std::transform(input.begin(), input.end(), input.begin(),
-        [](unsigned char c) { return std::tolower(c); });
+    transform(input.begin(), input.end(), input.begin(),
+        [](unsigned char c) { return tolower(c); });
     return input;
 }
 
@@ -100,7 +101,7 @@ int ipow(int base, int exp) {
 
 string sanitize_pathname(string path) {
     // use only forward slashes
-    std::replace(path.begin(), path.end(), '\\', '/');
+    replace(path.begin(), path.end(), '\\', '/');
 
     // normalize multiple slashes to a single slash
     size_t pos = 0;
@@ -141,6 +142,10 @@ string replace_extension(string path, const string& new_ext) {
     return dir + file;
 }
 
+string remove_extension(const string& path) {
+    return replace_extension(path, "");
+}
+
 string dirname(const string& path) {
     size_t pos = path.find_last_of("/\\");
     if (pos != string::npos) {
@@ -164,4 +169,19 @@ bool different_sign(int x1, int x2) {
         return true;
     else
         return false;
+}
+
+string get_envvar(const string& key) {
+    const char* val = getenv(key.c_str());
+    return val ? string(val) : "";
+}
+
+vector<string> split_by_whitespace(const string& input) {
+    istringstream iss(input);
+    vector<string> tokens;
+    string word;
+    while (iss >> word) {
+        tokens.push_back(word);
+    }
+    return tokens;
 }
