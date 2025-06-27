@@ -182,6 +182,11 @@ ENDIF
 
 SECTION code_crt_init           ; user and library initialization
 
+    ; The ACIA must be initialized before main is called
+
+    EXTERN _acia_need
+    defc NEED = _acia_need
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -269,8 +269,8 @@ SECTION code_crt_init           ; user and library initialization
 
     ; The UART must be initialized before main is called
 
-EXTERN _uart_need
-defc NEED = _uart_need
+    EXTERN _uart_need
+    defc NEED = _uart_need
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

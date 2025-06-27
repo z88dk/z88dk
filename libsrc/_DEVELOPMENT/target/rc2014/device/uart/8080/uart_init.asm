@@ -97,11 +97,11 @@ PUBLIC _uart_init
     ld a,__IO_UART_LCR_STOP|__IO_UART_LCR_8BIT  ; default to 8n2
     out (__IO_UARTB_LCR_REGISTER),a             ; output to LCR
 
-    call _uartb_flush_rx                    ; clear the software receive buffer
-
     ; enable and reset the FIFOs
     ld a,__IO_UART_FCR_FIFO_04|__IO_UART_FCR_FIFO_TX_RESET|__IO_UART_FCR_FIFO_RX_RESET|__IO_UART_FCR_FIFO_ENABLE
     out (__IO_UARTB_FCR_REGISTER),a
+
+    call _uartb_flush_rx                    ; clear the software receive buffer
 
     ; enable the receive interrupt (only)   XXX To do handle line errors
     ld a,__IO_UART_IER_ERBI
