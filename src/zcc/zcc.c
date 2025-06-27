@@ -1480,16 +1480,19 @@ int main(int argc, char **argv)
                     break;
                 }
 
-                if ( c_coptrules_target ) {
-                    rules[num_rules++] = c_coptrules_target;
-                }
+                if (peepholeopt)
+                {
+                    if (c_coptrules_target) {
+                        rules[num_rules++] = c_coptrules_target;
+                    }
 
-                if ( coptrules_cpu ) {
-                    rules[num_rules++] = coptrules_cpu;
-                }
+                    if (coptrules_cpu) {
+                        rules[num_rules++] = coptrules_cpu;
+                    }
 
-                if ( c_coptrules_user ) {
-                    rules[num_rules++] = c_coptrules_user;
+                    if (c_coptrules_user) {
+                        rules[num_rules++] = c_coptrules_user;
+                    }
                 }
 
                 if (peepholeopt == 0)
@@ -1556,9 +1559,12 @@ int main(int argc, char **argv)
             if (m4only || clangonly || llvmonly || preprocessonly) continue;
             /* filter comments out of asz80 asm file see issue #801 on github */
             /* substitute section names for section redirect */
+
             zsdcc_asm_filter_comments(i, ".s2");
-            if (process(".s2", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+            if (process(".s2", ".s3", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                 exit(1);
+            zsdcc_asm_filter_sections(i, ".asm");
+
         CASE_ASMFILE:
         case ASMFILE:
             if (m4only || clangonly || llvmonly || preprocessonly || assembleonly)
