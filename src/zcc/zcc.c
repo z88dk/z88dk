@@ -1902,70 +1902,85 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
         unsigned int quote_type = 0;
         unsigned int quote_count = 0;
 
-        for (i = 0; i <= strlen(line); ++i)
+        unsigned int dst = 0;
+        unsigned int src = 0;
+
+        // issue #807 on github
+        // nop with comment can be used to inline asm
+
+        sscanf(line, " %n" "nop ; %n", &dst, &src);
+        if (src > dst)
         {
-            if (accept_line == 0)
+            strcpy(line + dst, line + src);
+        }
+        else
+        {
+            for (i = 0; i <= strlen(line); ++i)
             {
-                if (seen_semicolon && (line[i] != '@'))
-                    break;
-
-                seen_semicolon = 0;
-
-                switch (line[i])
+                if (accept_line == 0)
                 {
-                case '\'':
+                    if (seen_semicolon && (line[i] != '@'))
+                        break;
+
+                    seen_semicolon = 0;
+
+                    switch (line[i])
+                    {
+                    case '\'':
 #ifdef WIN32
-                    if ((i >= 2) && (strnicmp(&line[i - 2], "af'", 3) == 0))
+                        if ((i >= 2) && (strnicmp(&line[i - 2], "af'", 3) == 0))
 #else
-                    if ((i >= 2) && (strncasecmp(&line[i - 2], "af'", 3) == 0))
+                        if ((i >= 2) && (strncasecmp(&line[i - 2], "af'", 3) == 0))
 #endif
+                            break;
+                        if (quote_count && ((quote_type & 0x1) == 0))
+                        {
+                            quote_count--;
+                            quote_type >>= 1;
+                        }
+                        else
+                        {
+                            quote_count++;
+                            quote_type <<= 1;
+                        }
                         break;
-                    if (quote_count && ((quote_type & 0x1) == 0))
-                    {
-                        quote_count--;
-                        quote_type >>= 1;
-                    }
-                    else
-                    {
-                        quote_count++;
-                        quote_type <<= 1;
-                    }
-                    break;
 
-                case '"':
-                    if (quote_count && ((quote_type & 0x1) == 1))
-                    {
-                        quote_count--;
-                        quote_type >>= 1;
-                    }
-                    else
-                    {
-                        quote_count++;
-                        quote_type = (quote_type << 1) + 1;
-                    }
-                    break;
-
-                case ';':
-                    if (quote_count)
+                    case '"':
+                        if (quote_count && ((quote_type & 0x1) == 1))
+                        {
+                            quote_count--;
+                            quote_type >>= 1;
+                        }
+                        else
+                        {
+                            quote_count++;
+                            quote_type = (quote_type << 1) + 1;
+                        }
                         break;
-                    if (seen_nonws == 0)
-                    {
-                        accept_line = 1;
+
+                    case ';':
+                        if (quote_count)
+                            break;
+                        if (seen_nonws == 0)
+                        {
+                            accept_line = 1;
+                            break;
+                        }
+                        seen_semicolon = 1;
+                        break;
+
+                    default:
                         break;
                     }
-                    seen_semicolon = 1;
-                    break;
 
-                default:
-                    break;
+                    if (!isspace(line[i]))
+                        seen_nonws = 1;
                 }
-
-                if (!isspace(line[i]))
-                    seen_nonws = 1;
             }
+
+            if (seen_semicolon) line[i - 1] = '\0';                   /* terminate at semicolon */
         }
 
-        if (seen_semicolon) line[i-1] = '\0';                         /* terminate at semicolon */
         fprintf(fout, "%s\n", zcc_ascii_only(zcc_strrstrip(line)));   /* remove trailing whitespace (copt asz80 translator) and ascii-ify source (copt) */
     }
 
