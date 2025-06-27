@@ -278,7 +278,6 @@ void Instr::resolve_local_exprs() {
         if (resolve_local_jrs(patch)) {
             // If the patch was resolved as a local jump, remove it
             it = m_patches.erase(it);
-            continue;
         }
         else if (expr->eval_const(value)) {
             // If the expression is local, resolve it
@@ -298,10 +297,8 @@ bool Instr::resolve_local_jrs(Patch* patch) {
     // Check if the patch is a local jump and resolve it
     if (patch->patch_type() == PatchType::JR_OFFSET) {
     
-        int target = 0;
-        if (patch->expr()->eval(target, true)) {
-            int pos = m_offset + patch->parent()->size();
-            int distance = target - pos;
+        int distance = 0;
+        if (patch->expr()->eval_local_jr_distance(distance)) {
             if (distance >= -128 && distance <= 127) {
                 patch->resolve(distance);
                 return true; // Resolved as a local jump
@@ -360,15 +357,14 @@ Instr* Section::add_instr() {
 }
 
 void Section::expand_jrs() {
-    bool did_expand = false;
+    bool did_expand;
     do {
+        did_expand = false;
         for (auto& instr : m_instrs) {
             for (auto& patch : instr->patches()) {
                 if (patch->patch_type() == PatchType::JR_OFFSET) {
-                    int target = 0;
-                    if (patch->expr()->eval(target, true)) {
-                        int pos = instr->offset() + instr->size();
-                        int distance = target - pos;
+                    int distance = 0;
+                    if (patch->expr()->eval_local_jr_distance(distance)) {
                         if (distance < -128 || distance > 127) {
                             instr->expand_jr();
                             recompute_offsets();

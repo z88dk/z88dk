@@ -82,6 +82,7 @@ enum class Keyword {
     NOP,
     NZ,
     PUBLIC,
+    SECTION,
     XIX,
     YIY,
     Z,
@@ -107,7 +108,6 @@ public:
     Keyword keyword() const { return m_keyword; }
     Operator operator_() const { return m_operator; }
     Symbol* symbol() const { return m_symbol; }
-    Instr* asmpc() const { return m_asmpc; }
 
     void set_ivalue(int ivalue) { m_ivalue = ivalue; }
     void set_fvalue(double fvalue) { m_fvalue = fvalue; }
@@ -115,7 +115,6 @@ public:
     void set_keyword(const string& text);
     void set_operator(Operator op) { m_operator = op; }
     void set_symbol(Symbol* symbol) { m_symbol = symbol; }
-    void set_asmpc(Instr* asmpc) { m_asmpc = asmpc; }
 
     bool is(TType ttype) const { return m_ttype == ttype; }
     bool is(Keyword keyword) const { return m_keyword == keyword; }
@@ -131,7 +130,6 @@ private:
     Keyword m_keyword{ Keyword::NONE };
     Operator m_operator{ Operator::NONE };
     Symbol* m_symbol{ nullptr };
-    Instr* m_asmpc{ nullptr };
 
     int m_ivalue{ 0 };
     double m_fvalue{ 0.0 };

@@ -22,6 +22,7 @@ public:
     bool parse_extern_args(const string& line);
     bool parse_public_args(const string& line);
     bool parse_global_args(const string& line);
+    bool parse_section_args(const string& line);
 
 private:
     struct Elem {
@@ -84,6 +85,7 @@ private:
     bool parse_extern_args();
     bool parse_public_args();
     bool parse_global_args();
+    bool parse_section_args();
     bool parse_ident_list(vector<string>& names);
     bool parse_name(string& name);
     bool parse_const_expr(int& value);
@@ -95,6 +97,7 @@ private:
     void action_extern(const string& name);
     void action_public(const string& name);
     void action_global(const string& name);
+    void action_section(const string& name);
 
     // state in the parsing state machine
     struct State {

@@ -24,10 +24,11 @@ public:
     const Location& location() const { return m_location; }
     bool parse(const string& line);
     bool parse(Scanner& in, bool silent);
-    void lookup_symbols(Symtab* symtab, Instr* asmpc);
+    void lookup_symbols();
     bool eval_const(int& value);
     bool eval_instr(Instr*& instr);
     bool eval(int& result, bool silent = false);
+    bool eval_local_jr_distance(int& distance);
     string to_string() const;
     string rpn_to_string() const;
 
@@ -42,6 +43,7 @@ private:
     vector<Token> m_postfix;
     int m_pos0{ 0 };
     Location m_location;
+    Instr* m_asmpc{ nullptr };
 
     enum class Result {
         Undefined,

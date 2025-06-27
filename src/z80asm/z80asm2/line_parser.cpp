@@ -399,6 +399,9 @@ bool LineParser::parse_line(const string& line) {
         case Keyword::GLOBAL:
             m_in.next();
             return parse_global_args();
+        case Keyword::SECTION:
+            m_in.next();
+            return parse_section_args();
         default:;
             // fall through
         }
@@ -427,15 +430,12 @@ bool LineParser::parse_line(const string& line) {
             // compute constant expressions, lookup symbols in expressions
             for (auto& elem : m_elems) {
                 if (elem.expr) {
-                    elem.expr->lookup_symbols(g_obj_module->symtab(), g_obj_module->asmpc());
+                    elem.expr->lookup_symbols();
                 }
                 if (elem.const_expr) {
                     if (!elem.expr->eval_const(elem.const_value)) {
                         g_error->error_constant_expression_expected();
                         return false;
-                    }
-                    else {
-                        elem.token.set_ivalue(elem.const_value);
                     }
                 }
             }
@@ -557,6 +557,13 @@ bool LineParser::parse_global_args(const string& line) {
         return parse_global_args();
 }
 
+bool LineParser::parse_section_args(const string& line) {
+    if (!m_in.scan(line))
+        return false;       // scanning failed
+    else
+        return parse_section_args();
+}
+
 bool LineParser::parse_define_args() {
     while (true) {
         string name;
@@ -613,6 +620,16 @@ bool LineParser::parse_global_args() {
     for (auto& name : names)
         action_global(name);
 
+    return true;
+}
+
+bool LineParser::parse_section_args() {
+    string name;
+    if (!parse_name(name))
+        return false;
+    if (!parse_end())
+        return false;
+    action_section(name);
     return true;
 }
 
@@ -763,8 +780,8 @@ bool LineParser::parse_const_expr(int& value) {
         return false;
     }
 
-    Instr* asmpc = g_obj_module->cur_section()->add_instr();
-    expr->lookup_symbols(g_obj_module->symtab(), asmpc);
+    g_obj_module->cur_section()->add_instr();
+    expr->lookup_symbols();
     if (!expr->eval_const(value)) {
         delete expr;
         g_error->error_constant_expression_expected();
@@ -823,4 +840,8 @@ void LineParser::action_public(const string& name) {
 
 void LineParser::action_global(const string& name) {
     g_obj_module->declare_global(name);
+}
+
+void LineParser::action_section(const string& name) {
+    g_obj_module->set_cur_section(name);
 }

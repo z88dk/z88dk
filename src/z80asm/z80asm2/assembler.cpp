@@ -64,14 +64,14 @@ bool Assembler::assemble() {
     g_obj_module->define_cpu_defs(g_options->cpu_id());
     if (!parse())
         return false;
-    g_obj_module->expand_jrs();
 
     // set pass to 2 after addresses are final
     m_pass = Pass::PASS2;
-    convert_global_to_extern_public();
-    if (has_undefined_symbols())
+    g_obj_module->expand_jrs();
+    g_obj_module->convert_global_to_extern_public();
+    if (g_obj_module->has_undefined_symbols())
         return false;
-    resolve_local_exprs();
+    g_obj_module->resolve_local_exprs();
     if (!g_obj_module->write_file(m_obj_filename))
         return false;
 
@@ -93,17 +93,4 @@ bool Assembler::parse() {
         }
     }
     return ok;
-}
-
-void Assembler::convert_global_to_extern_public() {
-    g_obj_module->convert_global_to_extern_public();
-}
-
-bool Assembler::has_undefined_symbols() {
-    return g_obj_module->has_undefined_symbols();
-}
-
-// resolve expressions that are local to the current module
-void Assembler::resolve_local_exprs() {
-    g_obj_module->resolve_local_exprs();
 }
