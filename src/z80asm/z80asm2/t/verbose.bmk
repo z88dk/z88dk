@@ -1,5 +1,8 @@
+Options in command line
+
 LINE 1 "test_t_verbose.asm"
 nop
+% z80asm -v -mz180 test_t_verbose.asm
 assemble test_t_verbose.asm to test_t_verbose.o
 define __CPU_Z180__ = 1
 define __CPU_ZILOG__ = 1
@@ -10,3 +13,25 @@ Object  file test_t_verbose.o at $0000: Z80RMF18
   CPU:  z180 
   Section "": 1 bytes
     C $0000: 00
+
+
+Options in environment
+
+Z80ASM=-v
+% z80asm -E -mz180 test_t_verbose.asm
+LINE 1 "test_t_verbose.asm"
+nop
+Z80ASM=-v
+% z80asm -mz180 test_t_verbose.asm
+assemble test_t_verbose.asm to test_t_verbose.o
+define __CPU_Z180__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_verbose.asm to test_t_verbose.o
+
+Object  file test_t_verbose.o at $0000: Z80RMF18
+  Name: test_t_verbose
+  CPU:  z180 
+  Section "": 1 bytes
+    C $0000: 00
+
+

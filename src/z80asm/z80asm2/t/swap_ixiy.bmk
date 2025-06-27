@@ -3,6 +3,7 @@ swap=
 LINE 1 "test_t_swap_ixiy.asm"
 ld ix,0
 ld iy,0
+% z80asm -v test_t_swap_ixiy.asm
 assemble test_t_swap_ixiy.asm to test_t_swap_ixiy.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
@@ -20,6 +21,7 @@ swap=-IXIY
 LINE 1 "test_t_swap_ixiy.asm"
 ld ix,0
 ld iy,0
+% z80asm -v -IXIY test_t_swap_ixiy.asm
 assemble test_t_swap_ixiy.asm to test_t_swap_ixiy.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
@@ -37,6 +39,7 @@ swap=-IXIY-soft
 LINE 1 "test_t_swap_ixiy.asm"
 ld ix,0
 ld iy,0
+% z80asm -v -IXIY-soft test_t_swap_ixiy.asm
 assemble test_t_swap_ixiy.asm to test_t_swap_ixiy.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

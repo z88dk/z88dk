@@ -1,5 +1,6 @@
 Distance 126
 
+% z80asm -v test_t_expand_jrs_1.asm
 assemble test_t_expand_jrs_1.asm to test_t_expand_jrs_1.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
@@ -23,6 +24,7 @@ Object  file test_t_expand_jrs_1.o at $0000: Z80RMF18
 
 Distance 127
 
+% z80asm -v test_t_expand_jrs_1.asm
 assemble test_t_expand_jrs_1.asm to test_t_expand_jrs_1.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
@@ -47,6 +49,7 @@ Object  file test_t_expand_jrs_1.o at $0000: Z80RMF18
 
 Distance 128
 
+% z80asm -v test_t_expand_jrs_1.asm
 assemble test_t_expand_jrs_1.asm to test_t_expand_jrs_1.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
@@ -73,6 +76,7 @@ Object  file test_t_expand_jrs_1.o at $0000: Z80RMF18
 
 Distance 129
 
+% z80asm -v test_t_expand_jrs_1.asm
 assemble test_t_expand_jrs_1.asm to test_t_expand_jrs_1.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

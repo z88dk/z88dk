@@ -1,5 +1,6 @@
 LINE 4 "test_t_backslash.asm"
 ld a,25
+% z80asm -v test_t_backslash.asm
 assemble test_t_backslash.asm to test_t_backslash.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

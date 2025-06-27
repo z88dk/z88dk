@@ -4,6 +4,7 @@ LINE 2 "test_t_cont_lines.asm"
 ld b,30
 LINE 2 "test_t_cont_lines.asm"
 ld c,40
+% z80asm -v test_t_cont_lines.asm
 assemble test_t_cont_lines.asm to test_t_cont_lines.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

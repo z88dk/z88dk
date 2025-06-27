@@ -10,6 +10,7 @@ x2:
 LINE 6 "test_t_cross_section_jr.asm"
 jr x1
 jr x2
+% z80asm -v test_t_cross_section_jr.asm
 assemble test_t_cross_section_jr.asm to test_t_cross_section_jr.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1

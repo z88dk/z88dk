@@ -49,7 +49,7 @@ void Assembler::assemble_file(const string& filename) {
 
 void Assembler::init(const string& filename) {
     clear();
-	m_basename = replace_extension(basename(filename), "");
+	m_basename = remove_extension(basename(filename));
     m_asm_filename = filename;
     m_obj_filename = replace_extension(filename, ".o");
 	

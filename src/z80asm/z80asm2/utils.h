@@ -11,6 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 using namespace std;
 
 string str_to_lower(string input);
@@ -21,9 +22,12 @@ bool read_custom_line(ifstream& stream, string& line);
 int ipow(int base, int exp);
 string sanitize_pathname(string path);
 string replace_extension(string path, const string& new_ext);
+string remove_extension(const string& path);
 string dirname(const string& path);
 string basename(const string& path);
 bool different_sign(int x1, int x2);
+string get_envvar(const string& key);
+vector<string> split_by_whitespace(const string& input);
 
 // convert int to hex
 template<typename T>
