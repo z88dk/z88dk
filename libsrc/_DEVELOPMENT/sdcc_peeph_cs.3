@@ -4226,6 +4226,21 @@ replace restart {
 	; peephole z88dk-intrinsic-retret
 }
 
+replace restart {
+	call	_intrinsic_emit_%1
+} by {
+	nop	; defb %1
+	; peephole z88dk-intrinsic-emit %1
+}
+
+replace restart {
+	jp	_intrinsic_emit_%1
+} by {
+	nop	; defb %1
+	ret
+	; peephole z88dk-intrinsic-emit %1
+}
+
 
 barrier
 

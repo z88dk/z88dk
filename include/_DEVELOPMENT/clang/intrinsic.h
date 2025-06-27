@@ -99,6 +99,20 @@ extern unsigned long intrinsic_swap_word_32(unsigned long n);
 
 
 
+#ifdef __SDCC
+
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
+#endif
+
+#ifdef __SCCZ80
+
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
+#endif
+
 #ifdef __Z180
 
 extern void intrinsic_slp(void);
