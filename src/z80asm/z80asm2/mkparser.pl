@@ -108,6 +108,7 @@ my %keywords = (
 	DEFW => "defw",
 	EQU => "equ",
 	EXTERN => "extern",
+	GLOBAL => "global",
 	INCBIN => "incbin",
 	INCLUDE => "include",
 	IX => "ix",
@@ -118,7 +119,7 @@ my %keywords = (
 	IYL => "iyl",
 	LINE => "line",
 	PUBLIC => "public",
-	GLOBAL => "global",
+	SECTION => "section",
 	XIX => "xix",
 	YIY => "yiy",
 );
