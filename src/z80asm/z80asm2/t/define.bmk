@@ -1,0 +1,52 @@
+DEFINE ok
+% z80asm -v -E -Dum,dois=12/6,tres=9/3 test_t_define.asm
+define um = 1
+define dois = 2
+define tres = 3
+LINE 1 "test_t_define.asm"
+define one,two=12/6,three=9/3
+% z80asm -v -Dum,dois=12/6,tres=9/3 test_t_define.asm
+define um = 1
+define dois = 2
+define tres = 3
+assemble test_t_define.asm to test_t_define.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_define.asm to test_t_define.o
+
+Object  file test_t_define.o at $0000: Z80RMF18
+  Name: test_t_define
+  CPU:  z80 
+  Section "": 0 bytes
+
+
+DEFINE error
+LINE 1 "test_t_define.asm"
+define
+define 27
+define hello hello
+define world,
+define helloworld=2*
+% z80asm -v test_t_define.asm
+assemble test_t_define.asm to test_t_define.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_define.asm:1: error: syntax error
+  ^---- 	define 
+    ^---- define
+test_t_define.asm:2: error: syntax error
+  ^---- 	define 27
+    ^---- define 27
+test_t_define.asm:3: error: syntax error
+  ^---- 	define hello hello
+    ^---- define hello hello
+test_t_define.asm:4: error: syntax error
+  ^---- 	define world,
+    ^---- define world,
+test_t_define.asm:5: error: syntax error
+  ^---- 	define helloworld=2*
+    ^---- define helloworld=2*
+error: assembly failed for file: test_t_define.asm
+
+
+

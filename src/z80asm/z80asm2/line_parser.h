@@ -18,20 +18,22 @@ class Expr;
 class LineParser {
 public:
     bool parse_line(const string& line);
-    bool parse_define_args(const string& line);
-    bool parse_extern_args(const string& line);
-    bool parse_public_args(const string& line);
-    bool parse_global_args(const string& line);
-    bool parse_section_args(const string& line);
 
 private:
+    struct NameValuePair {
+        string name;
+        int value{ 0 };
+    };
+
     struct Elem {
         Token token;
         Expr* expr{ nullptr };
         bool const_expr{ false };
         int const_value{ 0 };
+        vector<string> ident_list;
+        vector<NameValuePair> ident_value_list;
 
-        Elem();
+        Elem() = default;
         Elem(const Elem& other);
         Elem& operator=(const Elem& other);
         virtual ~Elem();
@@ -61,10 +63,15 @@ private:
     };
 
     //@@BEGIN:actions_decl
+    void action_assume_const_expr();
+    void action_define_const_assign_list();
+    void action_extern_ident_list();
+    void action_global_ident_list();
+    void action_org_const_expr();
+    void action_public_ident_list();
+    void action_section_ident();
     void action_ident_colon();
     void action_ident_equ_expr();
-    void action_assume_const_expr();
-    void action_org_const_expr();
     void action_nop();
     void action_jr_expr();
     void action_jr_nz_comma_expr();
@@ -81,24 +88,11 @@ private:
     void action_ld_iy_comma_expr();
     void action_jp_expr();
     //@@END
-    
-    bool parse_define_args();
-    bool parse_extern_args();
-    bool parse_public_args();
-    bool parse_global_args();
-    bool parse_section_args();
-    bool parse_ident_list(vector<string>& names);
-    bool parse_name(string& name);
-    bool parse_const_expr(int& value);
-    bool parse_equal();
-    bool parse_comma();
-    bool parse_end();
 
-    void action_define(const string& name, int value = 1);
-    void action_extern(const string& name);
-    void action_public(const string& name);
-    void action_global(const string& name);
-    void action_section(const string& name);
+    bool collect_ident(string& name);
+    bool collect_optional_const_assignment(int& value);
+    bool collect_ident_list(vector<string>& names);
+    bool collect_const_assign_list(vector<NameValuePair>& nv_list);
 
     // state in the parsing state machine
     struct State {

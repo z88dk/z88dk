@@ -80,9 +80,9 @@ static bool parse_option(const string& option) {
         switch (option[1]) {
         case 'D':
             if (option.size() > 2) {
-                string line = option.substr(2);
+                string line = "define " + option.substr(2);
                 LineParser parser;
-                if (!parser.parse_define_args(line))
+                if (!parser.parse_line(line))
                     return false;
             }
             else

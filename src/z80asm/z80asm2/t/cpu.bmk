@@ -1,2 +1,21 @@
+CPU ok
+LINE 1 "test_t_cpu.asm"
+nop
+% z80asm -mz180 -v test_t_cpu.asm
+assemble test_t_cpu.asm to test_t_cpu.o
+define __CPU_Z180__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_cpu.asm to test_t_cpu.o
+
+Object  file test_t_cpu.o at $0000: Z80RMF18
+  Name: test_t_cpu
+  CPU:  z180 
+  Section "": 1 bytes
+    C $0000: 00
+
+
+CPU error
 error: invalid CPU specified: z180x
 valid CPUs are: 8080, 8080_strict, 8085, 8085_strict, ez80, ez80_strict, ez80_z80, ez80_z80_strict, gbz80, gbz80_strict, kc160, kc160_strict, kc160_z80, kc160_z80_strict, r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, r5k, r5k_strict, r6k, r6k_strict, r800, r800_strict, z180, z180_strict, z80, z80_strict, z80n, z80n_strict.
+
+

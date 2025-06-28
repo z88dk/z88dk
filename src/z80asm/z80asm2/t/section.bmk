@@ -1,0 +1,41 @@
+SECTION ok
+LINE 1 "test_t_section.asm"
+section code
+nop
+section data
+org 1024
+nop
+% z80asm -v test_t_section.asm
+assemble test_t_section.asm to test_t_section.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_section.asm to test_t_section.o
+
+Object  file test_t_section.o at $0000: Z80RMF18
+  Name: test_t_section
+  CPU:  z80 
+  Section "": 0 bytes
+  Section code: 1 bytes
+    C $0000: 00
+  Section data: 1 bytes, ORG $0400
+    C $0000: 00
+
+
+SECTION error
+LINE 1 "test_t_section.asm"
+section
+section func2,func3
+% z80asm -v test_t_section.asm
+assemble test_t_section.asm to test_t_section.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_section.asm:1: error: syntax error
+  ^---- 	section
+    ^---- section
+test_t_section.asm:2: error: syntax error
+  ^---- 	section func2,func3
+    ^---- section func2,func3
+error: assembly failed for file: test_t_section.asm
+
+
+
