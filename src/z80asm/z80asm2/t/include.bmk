@@ -1,0 +1,47 @@
+INCLUDE ok
+LINE 1 "test_t_include.asm"
+nop
+LINE 1 "test_t_include.inc"
+nop
+LINE 3 "test_t_include.asm"
+nop
+LINE 1 "./test_t_include.inc"
+nop
+LINE 5 "test_t_include.asm"
+nop
+LINE 1 "./test_t_include.inc"
+nop
+LINE 7 "test_t_include.asm"
+nop
+LINE 1 "./test_t_include.inc"
+nop
+LINE 9 "test_t_include.asm"
+nop
+LINE 1 "./test_t_include.inc"
+nop
+LINE 11 "test_t_include.asm"
+nop
+% z80asm -v test_t_include.asm
+assemble test_t_include.asm to test_t_include.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_include.asm to test_t_include.o
+
+Object  file test_t_include.o at $0000: Z80RMF18
+  Name: test_t_include
+  CPU:  z80 
+  Section "": 11 bytes
+    C $0000: 00 00 00 00 00 00 00 00 00 00 00
+
+
+INCLUDE error
+test_t_include.inc:1: error: file open: test_t_include.2.inc
+  ^---- 	include "test_t_include.2.inc"
+test_t_include.asm:2: error: expected end of line
+  ^---- 	include 'test_t_include.inc' error
+test_t_include.inc:1: error: file open: test_t_include.2.inc
+  ^---- 	include "test_t_include.2.inc"
+LINE 3 "test_t_include.asm"
+include error
+
+

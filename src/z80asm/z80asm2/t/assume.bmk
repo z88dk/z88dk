@@ -1,0 +1,27 @@
+ASSUME ok
+LINE 2 "test_t_assume.asm"
+Assume 3*0
+LINE 2 "test_t_assume.asm"
+Assume 3/3
+% z80asm -v test_t_assume.asm
+assemble test_t_assume.asm to test_t_assume.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_assume.asm to test_t_assume.o
+
+Object  file test_t_assume.o at $0000: Z80RMF18
+  Name: test_t_assume
+  CPU:  z80 
+  Section "": 0 bytes
+
+
+ASSUME error
+test_t_assume.asm:2: error: constant expression expected
+  ^---- 	.Assume ASMPC*25:.Assume $/2
+    ^---- Assume$*25
+test_t_assume.asm:2: error: constant expression expected
+  ^---- 	.Assume ASMPC*25:.Assume $/2
+    ^---- Assume$/2
+error: assembly failed for file: test_t_assume.asm
+
+

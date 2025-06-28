@@ -1,7 +1,0 @@
-test_t_assume_error.asm:2: error: constant expression expected
-  ^---- 	.Assume ASMPC*25:.Assume $/2
-    ^---- Assume$*25
-test_t_assume_error.asm:2: error: constant expression expected
-  ^---- 	.Assume ASMPC*25:.Assume $/2
-    ^---- Assume$/2
-error: assembly failed for file: test_t_assume_error.asm
