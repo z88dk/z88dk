@@ -13,3 +13,6 @@ IDENT "equ" EXPR
 
 "assume" CONST_EXPR
 	g_obj_module->set_assume($2.const_value);
+
+"org" CONST_EXPR
+    g_obj_module->set_origin($2.const_value);

@@ -16,7 +16,7 @@ using namespace std;
 LineParser::State LineParser::m_states[] = {
     //@@BEGIN: states
     { // 0: 
-      { {Keyword::ASSUME, 1}, {Keyword::JP, 10}, {Keyword::JR, 13}, {Keyword::LD, 32}, {Keyword::NOP, 61}, },
+      { {Keyword::ASSUME, 1}, {Keyword::JP, 10}, {Keyword::JR, 13}, {Keyword::LD, 32}, {Keyword::NOP, 61}, {Keyword::ORG, 63}, },
       { {TType::IDENT, 4}, },
       nullptr,
     },
@@ -329,6 +329,21 @@ LineParser::State LineParser::m_states[] = {
       { },
       { },
       &LineParser::action_nop,
+    },
+    { // 63: ORG
+      { },
+      { {TType::CONST_EXPR, 64}, },
+      nullptr,
+    },
+    { // 64: ORG CONST_EXPR
+      { },
+      { {TType::END, 65}, },
+      nullptr,
+    },
+    { // 65: ORG CONST_EXPR END
+      { },
+      { },
+      &LineParser::action_org_const_expr,
     },
     //@@END
 };
@@ -665,6 +680,12 @@ void LineParser::action_ident_equ_expr() {
 
 void LineParser::action_assume_const_expr() {
 	g_obj_module->set_assume(m_elems.elems[2-1].const_value);
+
+
+}
+
+void LineParser::action_org_const_expr() {
+    g_obj_module->set_origin(m_elems.elems[2-1].const_value);
 
 }
 

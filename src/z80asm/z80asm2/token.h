@@ -81,6 +81,7 @@ enum class Keyword {
     NC,
     NOP,
     NZ,
+    ORG,
     PUBLIC,
     SECTION,
     XIX,

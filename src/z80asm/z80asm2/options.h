@@ -8,6 +8,7 @@
 #pragma once
 
 #include "cpu.h"
+#include "obj_module.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -32,6 +33,9 @@ public:
     SwapIXIY swap_ixiy() const { return m_swap_ixiy; }
     void set_swap_ixiy(SwapIXIY swap_ixiy) { m_swap_ixiy = swap_ixiy; }
 
+    int origin() const { return m_origin; }
+    void set_origin(int origin);
+
     bool parsing_command_line() const { return m_parsing_command_line; }
     void set_parsing_command_line(bool f = true) { m_parsing_command_line = f; }
 
@@ -42,6 +46,7 @@ private:
     bool m_preproc_only{ false };
     Cpu m_cpu_id{ Cpu::Z80 };
     SwapIXIY m_swap_ixiy{ SwapIXIY::NO_SWAP };
+    int m_origin{ Section::ORG_NOT_DEFINED };
     bool m_parsing_command_line{ true };
 };
 

@@ -127,6 +127,21 @@ static bool parse_option(const string& option) {
             else
                 return false;
             break;
+        case 'r':
+            if (option.size() > 2) {
+                string origin_str = option.substr(2);
+                int origin = 0;
+                Expr expr;
+                if (!expr.parse(origin_str) || !expr.eval_const(origin)) {
+                    return false;
+                }
+                else {
+                    g_options->set_origin(origin);
+                }
+            }
+            else
+                return false;
+            break;
         case 'v':
             if (option == "-v")
                 g_options->set_verbose(true);
