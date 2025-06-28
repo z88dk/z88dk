@@ -324,11 +324,36 @@ void Section::clear() {
     for (auto& instr : m_instrs)
         delete instr;
     m_instrs.clear();
-    m_origin = ORG_NOT_DEFINED;
+    if (g_options->origin() != ORG_NOT_DEFINED) {
+        m_origin = g_options->origin();
+        m_origin_option = true;
+    }
+    else {
+        m_origin = ORG_NOT_DEFINED;
+    }
     m_align = 1;
 
     auto instr = new Instr(this);
     m_instrs.push_back(instr);
+}
+
+void Section::set_origin(int origin) {
+    if (m_origin_defined) {
+        g_error->error_origin_redefined();
+    }
+    else {
+        m_origin_defined = true;
+        if (origin == -1)
+            m_section_split = true;
+        else if (origin >= 0) {
+            if (m_origin_option && m_origin != ORG_NOT_DEFINED)
+                ; // ignore ORG as command line overrides
+            else
+                m_origin = origin;
+        }
+        else
+            g_error->error_int_range(int_to_hex(origin, 4));
+    }
 }
 
 Instr* Section::asmpc() const {
@@ -513,6 +538,10 @@ void ObjModule::declare_public(const string& name) {
 
 void ObjModule::declare_global(const string& name) {
     m_symtab.declare_global(name);
+}
+
+void ObjModule::set_origin(int origin) {
+    m_cur_section->set_origin(origin);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {
@@ -717,7 +746,10 @@ int ObjModule::FileWriter::write_sections() {
         m_mem.write_long(section->size());
         int str_id = m_str_table.add_string(section->name());
         m_mem.write_long(str_id);
-        m_mem.write_long(section->origin());
+        if (section->section_split())
+            m_mem.write_long(Section::ORG_SECTION_SPLIT);
+        else
+            m_mem.write_long(section->origin());
         m_mem.write_long(section->align());
         for (auto& instr : section->instrs()) {
             m_mem.write_data(instr->data(), instr->size());

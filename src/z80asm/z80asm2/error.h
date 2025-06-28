@@ -33,6 +33,7 @@ public:
     void error_mismatched_ternary() { error("mismatched ternary operator"); }
     void error_no_input_files() { error("no input files specified"); }
     void error_open_file(const string& filename) { error("file open", filename); }
+    void error_origin_redefined() { error("origin redefined"); }
     void error_recursive_evaluation(const string& name) { error("recursive evaluation", name); }
     void error_recursive_include(const string& filename) { error("recursive include", filename); }
     void error_syntax() { error("syntax error"); }

@@ -131,7 +131,10 @@ public:
     const string& name() const { return m_name; }
 
     int origin() const { return m_origin; }
-    void set_origin(int origin) { m_origin = origin; }
+    void set_origin(int origin);
+
+    bool section_split() const { return m_section_split; }
+    void set_section_split(bool f) { m_section_split = f; }
 
     int align() const { return m_align; }
     void set_align(int align) { m_align = align; }
@@ -152,6 +155,9 @@ private:
     ObjModule* m_parent{ nullptr };
     string m_name;
     int m_origin{ ORG_NOT_DEFINED };
+    bool m_origin_defined{ false };
+    bool m_origin_option{ false };
+    bool m_section_split{ false };
     int m_align{ 1 };
     vector<Instr*> m_instrs;
 };
@@ -199,6 +205,7 @@ public:
     void declare_public(const string& name);
     void declare_global(const string& name);
 
+    void set_origin(int origin);
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);

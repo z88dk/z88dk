@@ -1,0 +1,154 @@
+No ORG
+
+LINE 1 "test_t_org.asm"
+nop
+% z80asm -v test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_org.asm to test_t_org.o
+
+Object  file test_t_org.o at $0000: Z80RMF18
+  Name: test_t_org
+  CPU:  z80 
+  Section "": 1 bytes
+    C $0000: 00
+
+
+ORG defined
+
+LINE 1 "test_t_org.asm"
+org 256
+nop
+% z80asm -v test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_org.asm to test_t_org.o
+
+Object  file test_t_org.o at $0000: Z80RMF18
+  Name: test_t_org
+  CPU:  z80 
+  Section "": 1 bytes, ORG $0100
+    C $0000: 00
+
+
+ORG doubly defined
+
+LINE 1 "test_t_org.asm"
+org 256
+org 256
+nop
+% z80asm -v test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_org.asm:2: error: origin redefined
+  ^---- 		org 256
+    ^---- org 256
+assembled test_t_org.asm to test_t_org.o
+
+
+
+Invalid ORG
+
+LINE 1 "test_t_org.asm"
+org-2
+nop
+% z80asm -v test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_org.asm:1: error: integer out of range: -2
+  ^---- 		org -2
+    ^---- org-2
+assembled test_t_org.asm to test_t_org.o
+
+
+
+ORG in command line
+
+LINE 1 "test_t_org.asm"
+nop
+% z80asm -v -r256 test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_org.asm to test_t_org.o
+
+Object  file test_t_org.o at $0000: Z80RMF18
+  Name: test_t_org
+  CPU:  z80 
+  Section "": 1 bytes, ORG $0100
+    C $0000: 00
+
+
+ORG in command line and in code
+
+LINE 1 "test_t_org.asm"
+org 1024
+nop
+% z80asm -v -r256 test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_org.asm to test_t_org.o
+
+Object  file test_t_org.o at $0000: Z80RMF18
+  Name: test_t_org
+  CPU:  z80 
+  Section "": 1 bytes, ORG $0100
+    C $0000: 00
+
+
+Section split
+
+LINE 1 "test_t_org.asm"
+section code
+org-1
+nop
+section data
+org-1
+nop
+% z80asm -v test_t_org.asm
+assemble test_t_org.asm to test_t_org.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_org.asm to test_t_org.o
+
+Object  file test_t_org.o at $0000: Z80RMF18
+  Name: test_t_org
+  CPU:  z80 
+  Section "": 0 bytes
+  Section code: 1 bytes, section split
+    C $0000: 00
+  Section data: 1 bytes, section split
+    C $0000: 00
+
+
+invalid ORG in command line
+
+LINE 1 "test_t_org.asm"
+nop
+% z80asm -v -r* test_t_org.asm
+error: insufficient operands: *
+error: invalid option: -r*
+
+
+invalid ORG in command line
+
+LINE 1 "test_t_org.asm"
+nop
+% z80asm -v -r2+ test_t_org.asm
+error: insufficient operands: +
+error: invalid option: -r2+
+
+
+invalid ORG in command line
+
+LINE 1 "test_t_org.asm"
+nop
+% z80asm -v -r0-1 test_t_org.asm
+error: integer out of range: -1
+
+
