@@ -780,14 +780,14 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #endif
 
 #ifdef __SDCC
-#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_R_##reg(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); extern void ZXN_NEXTREG_V_##val(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_R_##reg(); ZXN_NEXTREG_V_##val(); }
 #define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
 #define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
 #define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 #ifdef __SCCZ80
-#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_R_##reg(void); extern void ZXN_NEXTREG_V_##val(void); ZXN_NEXTREG_R_##reg(); ZXN_NEXTREG_V_##val(); }
 #define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
 #define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
 #define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
@@ -807,14 +807,28 @@ __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU5,void)
 __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU6,void)
 __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU7,void)
 
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU0,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU1,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU2,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU3,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU4,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU5,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU6,unsigned char page)
-__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU7,unsigned char page)
+#ifdef __SDCC
+#define ZXN_WRITE_MMU0(val)  { extern void ZXN_WRITE_MMU_0(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_0(val); }
+#define ZXN_WRITE_MMU1(val)  { extern void ZXN_WRITE_MMU_1(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_1(val); }
+#define ZXN_WRITE_MMU2(val)  { extern void ZXN_WRITE_MMU_2(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_2(val); }
+#define ZXN_WRITE_MMU3(val)  { extern void ZXN_WRITE_MMU_3(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_3(val); }
+#define ZXN_WRITE_MMU4(val)  { extern void ZXN_WRITE_MMU_4(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_4(val); }
+#define ZXN_WRITE_MMU5(val)  { extern void ZXN_WRITE_MMU_5(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_5(val); }
+#define ZXN_WRITE_MMU6(val)  { extern void ZXN_WRITE_MMU_6(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_6(val); }
+#define ZXN_WRITE_MMU7(val)  { extern void ZXN_WRITE_MMU_7(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_WRITE_MMU_7(val); }
+#endif
+
+#ifdef __SCCZ80
+#define ZXN_WRITE_MMU0(val)  { extern void ZXN_WRITE_MMU_0(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_0(val); }
+#define ZXN_WRITE_MMU1(val)  { extern void ZXN_WRITE_MMU_1(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_1(val); }
+#define ZXN_WRITE_MMU2(val)  { extern void ZXN_WRITE_MMU_2(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_2(val); }
+#define ZXN_WRITE_MMU3(val)  { extern void ZXN_WRITE_MMU_3(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_3(val); }
+#define ZXN_WRITE_MMU4(val)  { extern void ZXN_WRITE_MMU_4(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_4(val); }
+#define ZXN_WRITE_MMU5(val)  { extern void ZXN_WRITE_MMU_5(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_5(val); }
+#define ZXN_WRITE_MMU6(val)  { extern void ZXN_WRITE_MMU_6(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_6(val); }
+#define ZXN_WRITE_MMU7(val)  { extern void ZXN_WRITE_MMU_7(unsigned char) __z88dk_fastcall; ZXN_WRITE_MMU_7(val); }
+#endif
+
 
 // memory - paging and banking state
 

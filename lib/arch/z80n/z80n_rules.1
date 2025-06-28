@@ -2,20 +2,17 @@
 ;; ZXN_NEXTREG(reg,val)
 ;;
 
-%"[ \t]*"0jp%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
+%"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREG_R_%"[A-Fa-f0-9xX]+"2
+%"[ \t]*"3jp%"[ \t]*"4_ZXN_NEXTREG_V_%"[A-Fa-f0-9xX]+"5
 =
-	call	_ZXN_NEXTREG_%2_%3
+	call	_ZXN_NEXTREG_R_%2
+	call	_ZXN_NEXTREG_V_%5
 	ret
 
-%"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
+%"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREG_R_%"[A-Fa-f0-9xX]+"2
+%"[ \t]*"3call%"[ \t]*"4_ZXN_NEXTREG_V_%"[A-Fa-f0-9xX]+"5
 =
-	nextreg	%2,%3
-
-%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"5_%"[A-Fa-f0-9xX]+"6
-=
-%2:
-	call	_ZXN_NEXTREG_%5_%6
-	ret
+	nextreg	%2,%5
 
 ;;
 ;; ZXN_NEXTREGA(reg,val)
@@ -89,6 +86,11 @@
 
 ;; zsdcc
 
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_WRITE_REG_callee
+=
+	call	_ZXN_WRITE_REG_callee
+	ret
+
 %"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_REG_callee
 =
 	pop	hl
@@ -99,6 +101,11 @@
 
 
 ;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_WRITE_REG_callee
+=
+	call	ZXN_WRITE_REG_callee
+	ret
 
 %"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_REG_callee
 =
@@ -160,41 +167,15 @@
 ;; ZXN_WRITE_MMUn(page)
 ;;
 
-;; zsdcc
-
-%"[ \t]*"0jp%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_WRITE_MMU_%"[0-9]+"2
 =
-	call	_ZXN_WRITE_MMU%3_fastcall
+	call	_ZXN_WRITE_MMU_%2
 	ret
 
-%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_WRITE_MMU%"[0-9]+"5_fastcall
-=
-%2:
-	call	_ZXN_WRITE_MMU%5_fastcall
-	ret
-
-%"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+%"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_MMU_%"[0-9]+"2
 =
 	ld	a,l
-	mmu%3	a
-
-;; sccz80
-
-%"[ \t]*"0jp%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
-=
-	call	ZXN_WRITE_MMU%3
-	ret
-
-%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_WRITE_MMU%"[0-9]+"5
-=
-%2:
-	call	ZXN_WRITE_MMU%5
-	ret
-
-%"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
-=
-	ld	a,l
-	mmu%3	a
+	mmu%2	a
 
 ;;
 ;; TEMPORARY AREA

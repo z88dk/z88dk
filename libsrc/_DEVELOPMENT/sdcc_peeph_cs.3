@@ -4241,6 +4241,115 @@ replace restart {
 	; peephole z88dk-intrinsic-emit %1
 }
 
+// ZX NEXT SPECIFIC SEE ISSUE #2757
+// duplicated from lib/arch/z80n/z80n_rules.1
+
+replace restart {
+	call	_ZXN_NEXTREG_R_%1
+	jp	_ZXN_NEXTREG_V_%2
+} by {
+	call	_ZXN_NEXTREG_R_%1
+	call	_ZXN_NEXTREG_V_%2
+	ret
+	; peephole z88dk-intrinsic-nextreg %1,%2
+}
+
+replace restart {
+	call	_ZXN_NEXTREG_R_%1
+	call	_ZXN_NEXTREG_V_%2
+} by {
+	nextreg	#%1,#%2
+	; peephole z88dk-intrinsic-nextreg %1,%2
+}
+
+replace restart {
+	jp	_ZXN_NEXTREGA_%1
+} by {
+	call	_ZXN_NEXTREGA_%1
+	ret
+	; peephole z88dk-intrinsic-nextrega %1
+}
+
+replace restart {
+	call	_ZXN_NEXTREGA_%1
+} by {
+	ld	a,l
+	nextreg	#%1,a
+	; peephole z88dk-intrinsic-nextrega %1
+}
+
+replace restart {
+	jp	_ZXN_READ_REG_fastcall
+} by {
+	call	_ZXN_READ_REG_fastcall
+	ret
+	; peephole z88dk-intrinsic-zxn-read-reg
+}
+
+replace restart {
+	call	_ZXN_READ_REG_fastcall
+} by {
+	ld	bc,#0x243b
+	out	(c),l
+	inc	b
+	in	l,(c)
+	; peephole z88dk-intrinsic-zxn-read-reg
+}
+
+replace restart {
+	jp	_ZXN_WRITE_REG_callee
+} by {
+	call	_ZXN_WRITE_REG_callee
+	ret
+	; peephole z88dk-intrinsic-zxn-write-reg
+}
+
+replace restart {
+	call	_ZXN_WRITE_REG_callee
+} by {
+	pop	hl
+	ld	bc,#0x243b
+	out	(c),l
+	inc	b
+	out	(c),h
+	; peephole z88dk-intrinsic-zxn-write-reg
+}
+
+replace restart {
+	jp	_ZXN_READ_MMU%1
+} by {
+	call	_ZXN_READ_MMU%1
+	ret
+	; peephole z88dk-intrinsic-zxn-read-mmu%1
+}
+
+replace restart {
+	call	_ZXN_READ_MMU%1
+} by {
+	ld	bc,#0x243b
+	ld	a,#0x50+%1
+	out	(c),a
+	inc	b
+	in	l,(c)
+	; peephole z88dk-intrinsic-zxn-read-mmu%1
+}
+
+replace restart {
+	jp	_ZXN_WRITE_MMU_%1
+} by {
+	call	_ZXN_WRITE_MMU_%1
+	ret
+	; peephole z88dk-intrinsic-zxn-write-mmu%1
+}
+
+replace restart {
+	call	_ZXN_WRITE_MMU_%1
+} by {
+	ld	a,l
+	nextreg	#0x50+%1,a
+	; peephole z88dk-intrinsic-zxn-write-mmu%1
+}
+
 
 barrier
 
