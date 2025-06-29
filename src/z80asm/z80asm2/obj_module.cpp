@@ -522,6 +522,17 @@ void ObjModule::define_cpu_defs(Cpu cpu_id) {
         g_global_defines->add_global_def(define);
         m_symtab.add_global_def(define);
     }
+
+    switch (cpu_id) {
+    case Cpu::EZ80:
+    case Cpu::EZ80_STRICT:
+        m_assume = 1;
+        break;
+    case Cpu::EZ80_Z80:
+    case Cpu::EZ80_Z80_STRICT:
+        m_assume = 0;
+    default:;
+    }
 }
 
 // replace jr to distances too far with jp
@@ -587,6 +598,47 @@ void ObjModule::set_align(int align, int filler) {
 void ObjModule::assert_(bool ok, const string& message) {
     if (!ok) 
         g_error->error_assertion_failed(message);
+}
+
+void ObjModule::set_assume(int value) {
+    if (value < 0 || value > 1) {
+        g_error->error_int_range(int_to_hex(value, 1));
+    }
+    else {
+        m_assume = value;
+        switch (g_options->cpu_id()) {
+        case Cpu::EZ80:
+            if (m_assume == 0) {
+                g_options->set_cpu_id(Cpu::EZ80_Z80);
+                define_cpu_defs(g_options->cpu_id());
+            }
+            break;
+
+        case Cpu::EZ80_STRICT:
+            if (m_assume == 0) {
+                g_options->set_cpu_id(Cpu::EZ80_Z80_STRICT);
+                define_cpu_defs(g_options->cpu_id());
+            }
+            break;
+
+        case Cpu::EZ80_Z80:
+            if (m_assume == 1) {
+                g_options->set_cpu_id(Cpu::EZ80);
+                define_cpu_defs(g_options->cpu_id());
+            }
+            break;
+
+        case Cpu::EZ80_Z80_STRICT:
+            if (m_assume  == 1) {
+                g_options->set_cpu_id(Cpu::EZ80_STRICT);
+                define_cpu_defs(g_options->cpu_id());
+            }
+            break;
+
+        default:
+            g_error->error_illegal_opcode();
+        }
+    }
 }
 
 void ObjModule::add_opcode_void(long long opcode) {
