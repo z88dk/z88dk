@@ -36,6 +36,9 @@ public:
     int origin() const { return m_origin; }
     void set_origin(int origin);
 
+    int filler() const { return m_filler; }
+    void set_filler(int filler) { m_filler = filler; }
+
     bool parsing_command_line() const { return m_parsing_command_line; }
     void set_parsing_command_line(bool f = true) { m_parsing_command_line = f; }
 
@@ -47,6 +50,7 @@ private:
     Cpu m_cpu_id{ Cpu::Z80 };
     SwapIXIY m_swap_ixiy{ SwapIXIY::NO_SWAP };
     int m_origin{ Section::ORG_NOT_DEFINED };
+    int m_filler{ Section::DEFAULT_FILLER };
     bool m_parsing_command_line{ true };
 };
 

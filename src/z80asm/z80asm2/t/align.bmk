@@ -1,0 +1,177 @@
+No ALIGN, no filler
+
+LINE 1 "test_t_align.asm"
+ld a,1
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_align.asm to test_t_align.o
+
+Object  file test_t_align.o at $0000: Z80RMF18
+  Name: test_t_align
+  CPU:  z80 
+  Section "": 2 bytes
+    C $0000: 3E 01
+
+
+section ALIGN, no filler
+
+LINE 1 "test_t_align.asm"
+align 8
+ld a,1
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_align.asm to test_t_align.o
+
+Object  file test_t_align.o at $0000: Z80RMF18
+  Name: test_t_align
+  CPU:  z80 
+  Section "": 2 bytes, ALIGN 8
+    C $0000: 3E 01
+
+
+double section ALIGN
+
+LINE 1 "test_t_align.asm"
+align 8
+align 8
+ld a,1
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_align.asm:2: error: align redefined
+  ^---- 		align 8
+    ^---- align 8
+assembled test_t_align.asm to test_t_align.o
+
+
+
+section ALIGN, with filler
+
+LINE 1 "test_t_align.asm"
+align 8,255
+ld a,1
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_align.asm to test_t_align.o
+
+Object  file test_t_align.o at $0000: Z80RMF18
+  Name: test_t_align
+  CPU:  z80 
+  Section "": 2 bytes, ALIGN 8
+    C $0000: 3E 01
+
+
+code ALIGN, no filler
+
+LINE 1 "test_t_align.asm"
+ld a,1
+align 8
+ld a,2
+align 8
+align 8
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_align.asm to test_t_align.o
+
+Object  file test_t_align.o at $0000: Z80RMF18
+  Name: test_t_align
+  CPU:  z80 
+  Section "": 16 bytes
+    C $0000: 3E 01 00 00 00 00 00 00 3E 02 00 00 00 00 00 00
+
+
+code ALIGN, filler
+
+LINE 1 "test_t_align.asm"
+ld a,1
+align 8,255
+ld a,2
+align 8,170
+align 8,255
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_align.asm to test_t_align.o
+
+Object  file test_t_align.o at $0000: Z80RMF18
+  Name: test_t_align
+  CPU:  z80 
+  Section "": 16 bytes
+    C $0000: 3E 01 FF FF FF FF FF FF 3E 02 AA AA AA AA AA AA
+
+
+code ALIGN, filler in options
+
+LINE 1 "test_t_align.asm"
+ld a,1
+align 8
+ld a,2
+align 8,170
+align 8
+% z80asm -v -f255 test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_align.asm to test_t_align.o
+
+Object  file test_t_align.o at $0000: Z80RMF18
+  Name: test_t_align
+  CPU:  z80 
+  Section "": 16 bytes
+    C $0000: 3E 01 FF FF FF FF FF FF 3E 02 AA AA AA AA AA AA
+
+
+ORG and ALIGN not aligned
+LINE 1 "test_t_align.asm"
+align 4
+org 3
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_align.asm:2: error: origin not aligned
+  ^---- 		org 3
+    ^---- org 3
+assembled test_t_align.asm to test_t_align.o
+
+
+
+ORG and ALIGN not aligned
+LINE 1 "test_t_align.asm"
+org 3
+align 4
+% z80asm -v test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_align.asm:2: error: origin not aligned
+  ^---- 		align 4
+    ^---- align 4
+assembled test_t_align.asm to test_t_align.o
+
+
+
+ORG and ALIGN not aligned
+LINE 1 "test_t_align.asm"
+align 4
+% z80asm -v -r3 test_t_align.asm
+assemble test_t_align.asm to test_t_align.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_align.asm:1: error: origin not aligned
+  ^---- 		align 4
+    ^---- align 4
+assembled test_t_align.asm to test_t_align.o
+
+
+
