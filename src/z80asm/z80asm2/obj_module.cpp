@@ -12,6 +12,7 @@
 #include "symbol.h"
 #include "utils.h"
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <unordered_map>
 using namespace std;
@@ -218,6 +219,26 @@ void Instr::add_patch(Patch* patch) {
     }
 }
 
+void Instr::include_binary(const string& filename_) {
+    string filename = sanitize_pathname(filename_);
+    ifstream ifs(filename, ios::binary);
+    if (!ifs.is_open())
+        g_error->error_open_file(filename);
+    else {
+        // find the size of the file
+        ifs.seekg(0, ios::end);
+        auto size = ifs.tellg();
+        ifs.seekg(0, std::ios::beg);
+
+        // append to bytes
+        if (size > 0) {
+            vector<uint8_t> buffer(static_cast<size_t>(size));
+            ifs.read(reinterpret_cast<char*>(buffer.data()), size);
+            m_bytes.insert(m_bytes.end(), buffer.begin(), buffer.end());
+        }
+    }
+}
+
 void Instr::expand_jr() {
     assert(m_patches.size() == 1
         && "Only one patch expected for expansion");
@@ -416,6 +437,12 @@ Instr* Section::add_instr() {
     instr->set_location(*g_location);
     return instr;
 }
+
+void Section::include_binary(const string& filename) {
+    auto instr = add_instr();
+    instr->include_binary(filename);
+}
+
 
 void Section::expand_jrs() {
     bool did_expand;
@@ -639,6 +666,10 @@ void ObjModule::set_assume(int value) {
             g_error->error_illegal_opcode();
         }
     }
+}
+
+void ObjModule::include_binary(const string& filename) {
+    cur_section()->include_binary(filename);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

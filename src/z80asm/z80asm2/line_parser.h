@@ -74,9 +74,11 @@ private:
     void action_assert_const_expr_if();
     void action_assert_const_expr_if_comma_str();
     void action_assume_const_expr();
+    void action_binary_raw_str();
     void action_define_const_assign_list();
     void action_extern_ident_list();
     void action_global_ident_list();
+    void action_incbin_raw_str();
     void action_org_const_expr();
     void action_public_ident_list();
     void action_section_ident();

@@ -99,6 +99,7 @@ public:
     void patch_byte(int index, uint8_t byte);
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
+    void include_binary(const string& filename);
     void expand_jr();
     void resolve_local_exprs();
 
@@ -147,6 +148,8 @@ public:
 
     Instr* add_instr();
     const vector<Instr*>& instrs() const { return m_instrs; }
+
+    void include_binary(const string& filename);
 
     void expand_jrs();
     void recompute_offsets();
@@ -213,6 +216,7 @@ public:
 
     void set_assume(int value);
     int assume() const { return m_assume; }
+    void include_binary(const string& filename);
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);
