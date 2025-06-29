@@ -48,3 +48,6 @@ Thanks to Thorleif Bundgaard (see "MATH48_MANUAL.txt") for preserving this math 
 Thanks to Anders Hejlsberg for writing the package in the first place.  The idea of using BCDEHL and BCDEHL' as floating point accumulators was a good one.  Who knew your work would find application 35 years later?
 
 We hope to contact Anders to gain his permission to use this math package in z88dk.
+
+Anders has responded allowing use of math48 in another project.
+https://github.com/pleumann/pasta80/issues/7
