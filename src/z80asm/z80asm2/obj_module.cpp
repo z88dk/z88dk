@@ -562,6 +562,18 @@ void ObjModule::define_cpu_defs(Cpu cpu_id) {
     }
 }
 
+void ObjModule::define_arch_defs(Arch arch) {
+    for (auto& define : g_arch_table->all_defines()) {
+        g_global_defines->remove_symbol(define);
+        m_symtab.remove_symbol(define);
+    }
+
+    for (auto& define : g_arch_table->arch_defines(arch)) {
+        g_global_defines->add_global_def(define);
+        m_symtab.add_global_def(define);
+    }
+}
+
 // replace jr to distances too far with jp
 void ObjModule::expand_jrs() {
     for (auto& section : m_sections)

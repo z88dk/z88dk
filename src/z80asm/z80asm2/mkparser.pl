@@ -175,6 +175,16 @@ my %cpus = (
 	R6K_STRICT		=> { id => 32, name => "r6k_strict", 		parent => "R5K",	defines => "__CPU_R6K_STRICT__		__CPU_RABBIT__" },
 );
 
+my %arch = (
+	UNDEF		=> { id => -1, name => "", 			cpu => 'Z80',  defines => ""},
+	Z88			=> { id => 1,  name => "z88", 		cpu => 'Z80',  defines => "__ARCH_Z88__"},
+	TI83		=> { id => 2,  name => "ti83",		cpu => 'Z80',  defines => "__ARCH_TI83__"},
+	TI83PLUS	=> { id => 3,  name => "ti83plus",	cpu => 'Z80',  defines => "__ARCH_TI83PLUS__"},
+	ZX			=> { id => 4,  name => "zx",		cpu => 'Z80',  defines => "__ARCH_ZX__"},
+	ZX81		=> { id => 5,  name => "zx81",		cpu => 'Z80',  defines => "__ARCH_ZX81__"},
+	ZXN			=> { id => 6,  name => "zxn", 		cpu => 'Z80N', defines => "__ARCH_ZXN__"},
+);
+
 my %scope = (
 	NONE 	=> { id => 0, },
 	LOCAL 	=> { id => 1, },	# "L"
@@ -258,6 +268,7 @@ sub parse_grammar {
 				 rules => \@rules,
                  actions => \@actions,
 				 cpus => \%cpus,
+				 arch => \%arch,
 				 scope => \%scope,
 				 type => \%type,
 				 config => \%config, 
@@ -556,7 +567,32 @@ sub patch_file {
 				my $non_strict = $cpu =~ s/_STRICT//r;
 				my $is_strict = $cpu =~ /_STRICT$/ ? 'true' : 'false';
 				my $defines = "{".join(",", map {c_string($_)} split(' ', $grammar->{cpus}{$_}{defines}))."}";
-				push @out, $prefix."{ ".c_string($name).", Cpu::$cpu, Cpu::$parent, Cpu::$non_strict, $is_strict, -1, $defines }, // $id\n";
+				push @out, $prefix."{ Cpu::$cpu, ".c_string($name).", Cpu::$parent, Cpu::$non_strict, $is_strict, -1, $defines }, // $id\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*Arch\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{arch}{$a}{id} <=> $grammar->{arch}{$b}{id}} keys %{$grammar->{arch}}) {
+				push @out, "${prefix}$_ = ".$grammar->{arch}{$_}{id}.",\n";
+			}
+			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
+				shift @in;
+			}
+		}
+		elsif (/^(\s*)\/\/\@\@BEGIN:\s*arch_table\b/) {
+			my $prefix = $1;
+			push @out, $_;
+			for (sort {$grammar->{arch}{$a}{id} <=> $grammar->{arch}{$b}{id}} keys %{$grammar->{arch}}) {
+				next if $_ eq 'UNDEF';
+				my $id = $grammar->{arch}{$_}{id};
+				my $name = $grammar->{arch}{$_}{name};
+				my $cpu = $grammar->{arch}{$_}{cpu};
+				my $defines = "{".join(",", map {c_string($_)} split(' ', $grammar->{arch}{$_}{defines}))."}";
+				push @out, $prefix."{ Arch::$_, ".c_string($name).", Cpu::$cpu, $defines }, // $id\n";
 			}
 			while (@in && $in[0] !~ /^\s*\/\/\@\@END/) {
 				shift @in;

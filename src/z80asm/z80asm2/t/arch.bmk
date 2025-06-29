@@ -1,0 +1,42 @@
+ARCHok
+LINE1"test_t_arch.asm"
+nop
+%z80asm-v+zx81test_t_arch.asm
+assembletest_t_arch.asmtotest_t_arch.o
+define__CPU_Z80__=1
+define__CPU_ZILOG__=1
+define__ARCH_ZX81__=1
+assembledtest_t_arch.asmtotest_t_arch.o
+
+Objectfiletest_t_arch.oat$0000:Z80RMF18
+Name:test_t_arch
+CPU:z80
+Section"":1bytes
+C$0000:00
+
+
+ARCHok
+LINE1"test_t_arch.asm"
+nop
+%z80asm-v+zxntest_t_arch.asm
+assembletest_t_arch.asmtotest_t_arch.o
+define__CPU_Z80N__=1
+define__CPU_ZILOG__=1
+define__ARCH_ZXN__=1
+assembledtest_t_arch.asmtotest_t_arch.o
+
+Objectfiletest_t_arch.oat$0000:Z80RMF18
+Name:test_t_arch
+CPU:z80n
+Section"":1bytes
+C$0000:00
+
+
+ARCH error
+LINE 1 "test_t_arch.asm"
+nop
+% z80asm -v +XXX test_t_arch.asm
+error: invalid architecture specified: XXX
+valid architectures are: ti83, ti83plus, z88, zx, zx81, zxn.
+
+

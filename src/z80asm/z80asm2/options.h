@@ -30,6 +30,9 @@ public:
     Cpu cpu_id() const { return m_cpu_id; }
     void set_cpu_id(Cpu id) { m_cpu_id = id; }
 
+    Arch arch() const { return m_arch; }
+    void set_arch(Arch arch) { m_arch = arch; }
+
     SwapIXIY swap_ixiy() const { return m_swap_ixiy; }
     void set_swap_ixiy(SwapIXIY swap_ixiy) { m_swap_ixiy = swap_ixiy; }
 
@@ -48,6 +51,7 @@ private:
     bool m_verbose{ false };
     bool m_preproc_only{ false };
     Cpu m_cpu_id{ Cpu::Z80 };
+    Arch m_arch{ Arch::UNDEF };
     SwapIXIY m_swap_ixiy{ SwapIXIY::NO_SWAP };
     int m_origin{ Section::ORG_NOT_DEFINED };
     int m_filler{ Section::DEFAULT_FILLER };

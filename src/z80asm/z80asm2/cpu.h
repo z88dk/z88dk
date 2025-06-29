@@ -59,8 +59,8 @@ enum class SwapIXIY {
 };
 
 struct CpuInfo {
-    string name;            // cpu name
     Cpu id;                 // cpu id
+    string name;            // cpu name
     Cpu compat_parent_id;   // cpu id of compatible parent
     Cpu non_strict_id;      // cpu id of non-strict version
     bool is_strict;         // true if cpu is strict
@@ -81,40 +81,40 @@ public:
     vector<string> all_defines() const;
 
 private:
-    vector<CpuInfo> m_table = {
+    static inline vector<CpuInfo> m_table = {
         //@@BEGIN: cpu_table
-        { "z80", Cpu::Z80, Cpu::I8080, Cpu::Z80, false, -1, {"__CPU_Z80__","__CPU_ZILOG__"} }, // 1
-        { "z80_strict", Cpu::Z80_STRICT, Cpu::I8080, Cpu::Z80, true, -1, {"__CPU_Z80_STRICT__","__CPU_ZILOG__"} }, // 2
-        { "z180", Cpu::Z180, Cpu::I8080, Cpu::Z180, false, -1, {"__CPU_Z180__","__CPU_ZILOG__"} }, // 3
-        { "ez80_z80", Cpu::EZ80_Z80, Cpu::UNDEF, Cpu::EZ80_Z80, false, -1, {"__CPU_EZ80_Z80__","__CPU_ZILOG__"} }, // 4
-        { "ez80", Cpu::EZ80, Cpu::UNDEF, Cpu::EZ80, false, -1, {"__CPU_EZ80__","__CPU_ZILOG__"} }, // 5
-        { "z80n", Cpu::Z80N, Cpu::Z80, Cpu::Z80N, false, -1, {"__CPU_Z80N__","__CPU_ZILOG__"} }, // 6
-        { "r2ka", Cpu::R2KA, Cpu::UNDEF, Cpu::R2KA, false, -1, {"__CPU_R2KA__","__CPU_RABBIT__"} }, // 7
-        { "r3k", Cpu::R3K, Cpu::R2KA, Cpu::R3K, false, -1, {"__CPU_R3K__","__CPU_RABBIT__"} }, // 8
-        { "gbz80", Cpu::GBZ80, Cpu::UNDEF, Cpu::GBZ80, false, -1, {"__CPU_GBZ80__"} }, // 9
-        { "8080", Cpu::I8080, Cpu::UNDEF, Cpu::I8080, false, -1, {"__CPU_8080__","__CPU_INTEL__"} }, // 10
-        { "8085", Cpu::I8085, Cpu::I8080, Cpu::I8085, false, -1, {"__CPU_8085__","__CPU_INTEL__"} }, // 11
-        { "r800", Cpu::R800, Cpu::I8080, Cpu::R800, false, -1, {"__CPU_R800__"} }, // 12
-        { "r4k", Cpu::R4K, Cpu::UNDEF, Cpu::R4K, false, -1, {"__CPU_R4K__","__CPU_RABBIT__"} }, // 13
-        { "r5k", Cpu::R5K, Cpu::R4K, Cpu::R5K, false, -1, {"__CPU_R5K__","__CPU_RABBIT__"} }, // 14
-        { "kc160", Cpu::KC160, Cpu::UNDEF, Cpu::KC160, false, -1, {"__CPU_KC160__"} }, // 15
-        { "kc160_z80", Cpu::KC160_Z80, Cpu::I8080, Cpu::KC160_Z80, false, -1, {"__CPU_KC160_Z80__"} }, // 16
-        { "8080_strict", Cpu::I8080_STRICT, Cpu::UNDEF, Cpu::I8080, true, -1, {"__CPU_8080_STRICT__","__CPU_INTEL__"} }, // 17
-        { "8085_strict", Cpu::I8085_STRICT, Cpu::I8080, Cpu::I8085, true, -1, {"__CPU_8085_STRICT__","__CPU_INTEL__"} }, // 18
-        { "gbz80_strict", Cpu::GBZ80_STRICT, Cpu::UNDEF, Cpu::GBZ80, true, -1, {"__CPU_GBZ80_STRICT__"} }, // 19
-        { "z180_strict", Cpu::Z180_STRICT, Cpu::I8080, Cpu::Z180, true, -1, {"__CPU_Z180_STRICT__","__CPU_ZILOG__"} }, // 20
-        { "z80n_strict", Cpu::Z80N_STRICT, Cpu::Z80, Cpu::Z80N, true, -1, {"__CPU_Z80N_STRICT__","__CPU_ZILOG__"} }, // 21
-        { "ez80_z80_strict", Cpu::EZ80_Z80_STRICT, Cpu::UNDEF, Cpu::EZ80_Z80, true, -1, {"__CPU_EZ80_Z80_STRICT__","__CPU_ZILOG__"} }, // 22
-        { "ez80_strict", Cpu::EZ80_STRICT, Cpu::UNDEF, Cpu::EZ80, true, -1, {"__CPU_EZ80_STRICT__","__CPU_ZILOG__"} }, // 23
-        { "r800_strict", Cpu::R800_STRICT, Cpu::I8080, Cpu::R800, true, -1, {"__CPU_R800_STRICT__"} }, // 24
-        { "kc160_strict", Cpu::KC160_STRICT, Cpu::UNDEF, Cpu::KC160, true, -1, {"__CPU_KC160_STRICT__"} }, // 25
-        { "kc160_z80_strict", Cpu::KC160_Z80_STRICT, Cpu::I8080, Cpu::KC160_Z80, true, -1, {"__CPU_KC160_Z80_STRICT__"} }, // 26
-        { "r2ka_strict", Cpu::R2KA_STRICT, Cpu::UNDEF, Cpu::R2KA, true, -1, {"__CPU_R2KA_STRICT__","__CPU_RABBIT__"} }, // 27
-        { "r3k_strict", Cpu::R3K_STRICT, Cpu::R2KA, Cpu::R3K, true, -1, {"__CPU_R3K_STRICT__","__CPU_RABBIT__"} }, // 28
-        { "r4k_strict", Cpu::R4K_STRICT, Cpu::UNDEF, Cpu::R4K, true, -1, {"__CPU_R4K_STRICT__","__CPU_RABBIT__"} }, // 29
-        { "r5k_strict", Cpu::R5K_STRICT, Cpu::R4K, Cpu::R5K, true, -1, {"__CPU_R5K_STRICT__","__CPU_RABBIT__"} }, // 30
-        { "r6k", Cpu::R6K, Cpu::R5K, Cpu::R6K, false, -1, {"__CPU_R6K__","__CPU_RABBIT__"} }, // 31
-        { "r6k_strict", Cpu::R6K_STRICT, Cpu::R5K, Cpu::R6K, true, -1, {"__CPU_R6K_STRICT__","__CPU_RABBIT__"} }, // 32
+        { Cpu::Z80, "z80", Cpu::I8080, Cpu::Z80, false, -1, {"__CPU_Z80__","__CPU_ZILOG__"} }, // 1
+        { Cpu::Z80_STRICT, "z80_strict", Cpu::I8080, Cpu::Z80, true, -1, {"__CPU_Z80_STRICT__","__CPU_ZILOG__"} }, // 2
+        { Cpu::Z180, "z180", Cpu::I8080, Cpu::Z180, false, -1, {"__CPU_Z180__","__CPU_ZILOG__"} }, // 3
+        { Cpu::EZ80_Z80, "ez80_z80", Cpu::UNDEF, Cpu::EZ80_Z80, false, -1, {"__CPU_EZ80_Z80__","__CPU_ZILOG__"} }, // 4
+        { Cpu::EZ80, "ez80", Cpu::UNDEF, Cpu::EZ80, false, -1, {"__CPU_EZ80__","__CPU_ZILOG__"} }, // 5
+        { Cpu::Z80N, "z80n", Cpu::Z80, Cpu::Z80N, false, -1, {"__CPU_Z80N__","__CPU_ZILOG__"} }, // 6
+        { Cpu::R2KA, "r2ka", Cpu::UNDEF, Cpu::R2KA, false, -1, {"__CPU_R2KA__","__CPU_RABBIT__"} }, // 7
+        { Cpu::R3K, "r3k", Cpu::R2KA, Cpu::R3K, false, -1, {"__CPU_R3K__","__CPU_RABBIT__"} }, // 8
+        { Cpu::GBZ80, "gbz80", Cpu::UNDEF, Cpu::GBZ80, false, -1, {"__CPU_GBZ80__"} }, // 9
+        { Cpu::I8080, "8080", Cpu::UNDEF, Cpu::I8080, false, -1, {"__CPU_8080__","__CPU_INTEL__"} }, // 10
+        { Cpu::I8085, "8085", Cpu::I8080, Cpu::I8085, false, -1, {"__CPU_8085__","__CPU_INTEL__"} }, // 11
+        { Cpu::R800, "r800", Cpu::I8080, Cpu::R800, false, -1, {"__CPU_R800__"} }, // 12
+        { Cpu::R4K, "r4k", Cpu::UNDEF, Cpu::R4K, false, -1, {"__CPU_R4K__","__CPU_RABBIT__"} }, // 13
+        { Cpu::R5K, "r5k", Cpu::R4K, Cpu::R5K, false, -1, {"__CPU_R5K__","__CPU_RABBIT__"} }, // 14
+        { Cpu::KC160, "kc160", Cpu::UNDEF, Cpu::KC160, false, -1, {"__CPU_KC160__"} }, // 15
+        { Cpu::KC160_Z80, "kc160_z80", Cpu::I8080, Cpu::KC160_Z80, false, -1, {"__CPU_KC160_Z80__"} }, // 16
+        { Cpu::I8080_STRICT, "8080_strict", Cpu::UNDEF, Cpu::I8080, true, -1, {"__CPU_8080_STRICT__","__CPU_INTEL__"} }, // 17
+        { Cpu::I8085_STRICT, "8085_strict", Cpu::I8080, Cpu::I8085, true, -1, {"__CPU_8085_STRICT__","__CPU_INTEL__"} }, // 18
+        { Cpu::GBZ80_STRICT, "gbz80_strict", Cpu::UNDEF, Cpu::GBZ80, true, -1, {"__CPU_GBZ80_STRICT__"} }, // 19
+        { Cpu::Z180_STRICT, "z180_strict", Cpu::I8080, Cpu::Z180, true, -1, {"__CPU_Z180_STRICT__","__CPU_ZILOG__"} }, // 20
+        { Cpu::Z80N_STRICT, "z80n_strict", Cpu::Z80, Cpu::Z80N, true, -1, {"__CPU_Z80N_STRICT__","__CPU_ZILOG__"} }, // 21
+        { Cpu::EZ80_Z80_STRICT, "ez80_z80_strict", Cpu::UNDEF, Cpu::EZ80_Z80, true, -1, {"__CPU_EZ80_Z80_STRICT__","__CPU_ZILOG__"} }, // 22
+        { Cpu::EZ80_STRICT, "ez80_strict", Cpu::UNDEF, Cpu::EZ80, true, -1, {"__CPU_EZ80_STRICT__","__CPU_ZILOG__"} }, // 23
+        { Cpu::R800_STRICT, "r800_strict", Cpu::I8080, Cpu::R800, true, -1, {"__CPU_R800_STRICT__"} }, // 24
+        { Cpu::KC160_STRICT, "kc160_strict", Cpu::UNDEF, Cpu::KC160, true, -1, {"__CPU_KC160_STRICT__"} }, // 25
+        { Cpu::KC160_Z80_STRICT, "kc160_z80_strict", Cpu::I8080, Cpu::KC160_Z80, true, -1, {"__CPU_KC160_Z80_STRICT__"} }, // 26
+        { Cpu::R2KA_STRICT, "r2ka_strict", Cpu::UNDEF, Cpu::R2KA, true, -1, {"__CPU_R2KA_STRICT__","__CPU_RABBIT__"} }, // 27
+        { Cpu::R3K_STRICT, "r3k_strict", Cpu::R2KA, Cpu::R3K, true, -1, {"__CPU_R3K_STRICT__","__CPU_RABBIT__"} }, // 28
+        { Cpu::R4K_STRICT, "r4k_strict", Cpu::UNDEF, Cpu::R4K, true, -1, {"__CPU_R4K_STRICT__","__CPU_RABBIT__"} }, // 29
+        { Cpu::R5K_STRICT, "r5k_strict", Cpu::R4K, Cpu::R5K, true, -1, {"__CPU_R5K_STRICT__","__CPU_RABBIT__"} }, // 30
+        { Cpu::R6K, "r6k", Cpu::R5K, Cpu::R6K, false, -1, {"__CPU_R6K__","__CPU_RABBIT__"} }, // 31
+        { Cpu::R6K_STRICT, "r6k_strict", Cpu::R5K, Cpu::R6K, true, -1, {"__CPU_R6K_STRICT__","__CPU_RABBIT__"} }, // 32
         //@@END
     };
     unordered_map<string, Cpu> m_by_name;
@@ -126,3 +126,53 @@ private:
 
 bool cpu_compatible(Cpu code_cpu_id, Cpu lib_cpu_id);
 extern CpuTable* g_cpu_table;
+
+enum class Arch {
+    //@@BEGIN: Arch
+    UNDEF = -1,
+    Z88 = 1,
+    TI83 = 2,
+    TI83PLUS = 3,
+    ZX = 4,
+    ZX81 = 5,
+    ZXN = 6,
+    //@@END
+};
+
+struct ArchInfo {
+    Arch id;                // architecture id
+    string name;            // architecture name
+    Cpu cpu_id;             // CPU id for this architecture
+    vector<string> defines; // defines for this architecture
+};
+
+class ArchTable {
+public:
+    ArchTable();
+
+    const ArchInfo* get_info(Arch id) const;            // nullptr if not found
+    const ArchInfo* get_info(const string& name) const; // nullptr if not found
+
+    string arch_names() const;
+    string arch_names(int lmargin, int rmargin) const;
+    const vector<string>& arch_defines(Arch id) const;
+    vector<string> all_defines() const;
+
+private:
+    static inline vector<ArchInfo> m_table = {
+        //@@BEGIN: arch_table
+        { Arch::Z88, "z88", Cpu::Z80, {"__ARCH_Z88__"} }, // 1
+        { Arch::TI83, "ti83", Cpu::Z80, {"__ARCH_TI83__"} }, // 2
+        { Arch::TI83PLUS, "ti83plus", Cpu::Z80, {"__ARCH_TI83PLUS__"} }, // 3
+        { Arch::ZX, "zx", Cpu::Z80, {"__ARCH_ZX__"} }, // 4
+        { Arch::ZX81, "zx81", Cpu::Z80, {"__ARCH_ZX81__"} }, // 5
+        { Arch::ZXN, "zxn", Cpu::Z80N, {"__ARCH_ZXN__"} }, // 6
+        //@@END
+    };
+    unordered_map<string, Arch> m_by_name;
+    vector<string> m_arch_names;
+
+    int index(Arch id) const; // -1 if not found
+};
+
+extern ArchTable* g_arch_table;
