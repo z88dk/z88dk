@@ -62,7 +62,14 @@ private:
         Elems elems;
     };
 
+    bool collect_ident(string& name);
+    bool collect_optional_const_assignment(int& value);
+    bool collect_ident_list(vector<string>& names);
+    bool collect_const_assign_list(vector<NameValuePair>& nv_list);
+
     //@@BEGIN:actions_decl
+    void action_align_const_expr_comma_const_expr();
+    void action_align_const_expr();
     void action_assume_const_expr();
     void action_define_const_assign_list();
     void action_extern_ident_list();
@@ -88,11 +95,6 @@ private:
     void action_ld_iy_comma_expr();
     void action_jp_expr();
     //@@END
-
-    bool collect_ident(string& name);
-    bool collect_optional_const_assignment(int& value);
-    bool collect_ident_list(vector<string>& names);
-    bool collect_const_assign_list(vector<NameValuePair>& nv_list);
 
     // state in the parsing state machine
     struct State {

@@ -5,6 +5,12 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+"align" CONST_EXPR "," CONST_EXPR
+    g_obj_module->set_align($2.const_value, $4.const_value);
+
+"align" CONST_EXPR
+    g_obj_module->set_align($2.const_value, g_options->filler());
+
 "assume" CONST_EXPR
 	g_obj_module->set_assume($2.const_value);
 

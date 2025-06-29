@@ -14,6 +14,7 @@ class Error {
 public:
     int count() const { return m_count; }
 
+    void error_align_redefined() { error("align redefined"); }
     void error_assembly_failed(const string& filename) { error("assembly failed for file", filename); }
     void error_constant_expression_expected() { error("constant expression expected"); }
     void error_division_by_zero() { error("division by zero"); }
@@ -33,6 +34,7 @@ public:
     void error_mismatched_ternary() { error("mismatched ternary operator"); }
     void error_no_input_files() { error("no input files specified"); }
     void error_open_file(const string& filename) { error("file open", filename); }
+    void error_org_not_aligned() { error("origin not aligned"); }
     void error_origin_redefined() { error("origin redefined"); }
     void error_recursive_evaluation(const string& name) { error("recursive evaluation", name); }
     void error_recursive_include(const string& filename) { error("recursive include", filename); }

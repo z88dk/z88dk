@@ -54,13 +54,16 @@ static void delete_globals() {
 static int help() {
     cout << "Usage: z80asm [options] [file...]" << endl
         << "Options:" << endl
-        << "  -DNAME=EXPR Define a constant, EXPR is optional" << endl
+        << "  -D[=]SYMBOL[=VALUE]" << endl
+        << "              Define a static symbol in decimal or hex" << endl
         << "  -E          Preprocess only, do not assemble" << endl
+        << "  -fBYTE      Default value to fill in DEFS in decimal or hex" << endl
         << "  -h          Show this help message" << endl
 		<< "  -IXIY       Swap IX and IY registers" << endl
 		<< "  -IXIY-soft  Swap IX and IY registers but write object as unswapped" << endl
         << "  -mCPU       Select CPU, one of:" << endl
         << "              " << g_cpu_table->cpu_names(14, 72) << endl
+        << "  -rADDR      Relocate binary file to given address in decimal or hex" << endl
         << "  -v          Verbose output" << endl
         << "  --          Stop processing options" << endl;
     return EXIT_SUCCESS;
@@ -91,6 +94,24 @@ static bool parse_option(const string& option) {
         case 'E':
             if (option == "-E")
                 g_options->set_preproc_only(true);
+            else
+                return false;
+            break;
+        case 'f':
+            if (option.size() > 2) {
+                string filler_str = option.substr(2);
+                Expr expr;
+                int filler = 0;
+                if (!expr.parse(filler_str))
+                    return false;
+                if (!expr.eval_const(filler))
+                    return false;
+                if (filler < 0 || filler > 0xFF) {
+                    g_error->error_int_range(int_to_hex(filler, 2));
+                    return false;
+                }
+                g_options->set_filler(filler);
+            }
             else
                 return false;
             break;

@@ -1,7 +1,9 @@
 Usage: z80asm [options] [file...]
 Options:
-  -DNAME=EXPR Define a constant, EXPR is optional
+  -D[=]SYMBOL[=VALUE]
+              Define a static symbol in decimal or hex
   -E          Preprocess only, do not assemble
+  -fBYTE      Default value to fill in DEFS in decimal or hex
   -h          Show this help message
   -IXIY       Swap IX and IY registers
   -IXIY-soft  Swap IX and IY registers but write object as unswapped
@@ -12,5 +14,6 @@ Options:
               r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, r5k, 
               r5k_strict, r6k, r6k_strict, r800, r800_strict, z180, 
               z180_strict, z80, z80_strict, z80n, z80n_strict.
+  -rADDR      Relocate binary file to given address in decimal or hex
   -v          Verbose output
   --          Stop processing options

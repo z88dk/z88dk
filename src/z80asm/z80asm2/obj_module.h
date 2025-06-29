@@ -120,7 +120,7 @@ public:
         /*@@CONFIG:ORG_NOT_DEFINED*/ -1 /*@@END*/;
     static inline const int ORG_SECTION_SPLIT =
         /*@@CONFIG:ORG_SECTION_SPLIT*/ -2 /*@@END*/;
-
+    static inline const int DEFAULT_FILLER = 0;
 
     Section(ObjModule* parent, const string& name);
     Section(const Section& other) = delete;
@@ -137,7 +137,8 @@ public:
     void set_section_split(bool f) { m_section_split = f; }
 
     int align() const { return m_align; }
-    void set_align(int align) { m_align = align; }
+    void set_align(int align, int filler);
+    void check_org_align();
 
     Instr* asmpc() const;
     int size() const;
@@ -159,6 +160,7 @@ private:
     bool m_origin_option{ false };
     bool m_section_split{ false };
     int m_align{ 1 };
+    bool m_align_found{ false };
     vector<Instr*> m_instrs;
 };
 
@@ -206,6 +208,7 @@ public:
     void declare_global(const string& name);
 
     void set_origin(int origin);
+    void set_align(int align, int filler);
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);

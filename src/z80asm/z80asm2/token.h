@@ -53,6 +53,7 @@ enum class Keyword {
     A,
     AIX,
     AIY,
+    ALIGN,
     ASMPC,
     ASSUME,
     B,

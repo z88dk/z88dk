@@ -327,6 +327,7 @@ void Section::clear() {
     if (g_options->origin() != ORG_NOT_DEFINED) {
         m_origin = g_options->origin();
         m_origin_option = true;
+        check_org_align();
     }
     else {
         m_origin = ORG_NOT_DEFINED;
@@ -348,12 +349,47 @@ void Section::set_origin(int origin) {
         else if (origin >= 0) {
             if (m_origin_option && m_origin != ORG_NOT_DEFINED)
                 ; // ignore ORG as command line overrides
-            else
+            else {
                 m_origin = origin;
+                check_org_align();
+            }
         }
         else
             g_error->error_int_range(int_to_hex(origin, 4));
     }
+}
+
+void Section::set_align(int align, int filler) {
+    if (align < 1 || align > 0xFFFF) {
+        g_error->error_int_range(int_to_hex(align, 2));
+    }
+    else if (filler < 0 || filler > 0xFF) {
+        g_error->error_int_range(int_to_hex(filler, 2));
+    }
+    else if (size() == 0) {     // define section alignment
+        if (m_align_found)
+            g_error->error_align_redefined();
+        else {
+            m_align_found = true;
+            m_align = align;
+            check_org_align();
+        }
+    }
+    else {                      // reserve space
+        int pc = size();
+        int next = (pc + align - 1) / align * align;
+        int fill = next - pc;
+        if (fill > 0) {
+            Instr* instr = add_instr();
+            for (int i = 0; i < fill; ++i)
+                instr->add_byte(filler);
+        }
+    }
+}
+
+void Section::check_org_align() {
+    if (m_origin >= 0 && m_align > 1 && (m_origin % m_align) != 0)
+        g_error->error_org_not_aligned();
 }
 
 Instr* Section::asmpc() const {
@@ -542,6 +578,10 @@ void ObjModule::declare_global(const string& name) {
 
 void ObjModule::set_origin(int origin) {
     m_cur_section->set_origin(origin);
+}
+
+void ObjModule::set_align(int align, int filler) {
+    m_cur_section->set_align(align, filler);
 }
 
 void ObjModule::add_opcode_void(long long opcode) {
