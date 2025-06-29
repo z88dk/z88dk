@@ -20,6 +20,9 @@
 "assume" CONST_EXPR
 	g_obj_module->set_assume($2.const_value);
 
+"binary" RAW_STR
+    g_obj_module->include_binary($2.token.svalue());
+
 "define" CONST_ASSIGN_LIST
     for (auto& nv_pair : $2.ident_value_list) {
         g_obj_module->add_global_def(nv_pair.name, nv_pair.value);
@@ -34,6 +37,9 @@
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_global(ident);
     }
+
+"incbin" RAW_STR
+    g_obj_module->include_binary($2.token.svalue());
 
 "org" CONST_EXPR
     g_obj_module->set_origin($2.const_value);

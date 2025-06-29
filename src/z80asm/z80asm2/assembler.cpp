@@ -39,7 +39,8 @@ void Assembler::assemble_file(const string& filename) {
     if (assemble()) {
         if (g_options->verbose())
             cout << "assembled " << m_asm_filename << " to " << m_obj_filename << endl;
-    } else {
+    }
+    else {
         g_error->error_assembly_failed(filename);
     }
 
