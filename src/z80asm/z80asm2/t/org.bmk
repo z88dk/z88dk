@@ -46,7 +46,7 @@ define __CPU_ZILOG__ = 1
 test_t_org.asm:2: error: origin redefined
   ^---- 		org 256
     ^---- org 256
-assembled test_t_org.asm to test_t_org.o
+error: assembly failed for file: test_t_org.asm
 
 
 
@@ -62,7 +62,7 @@ define __CPU_ZILOG__ = 1
 test_t_org.asm:1: error: integer out of range: -2
   ^---- 		org -2
     ^---- org-2
-assembled test_t_org.asm to test_t_org.o
+error: assembly failed for file: test_t_org.asm
 
 
 

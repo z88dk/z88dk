@@ -584,6 +584,11 @@ void ObjModule::set_align(int align, int filler) {
     m_cur_section->set_align(align, filler);
 }
 
+void ObjModule::assert_(bool ok, const string& message) {
+    if (!ok) 
+        g_error->error_assertion_failed(message);
+}
+
 void ObjModule::add_opcode_void(long long opcode) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);

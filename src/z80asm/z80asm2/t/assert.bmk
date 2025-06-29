@@ -1,0 +1,101 @@
+ASSERT ok
+
+LINE 1 "test_t_assert.asm"
+assert 1
+nop
+% z80asm -v test_t_assert.asm
+assemble test_t_assert.asm to test_t_assert.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_assert.asm to test_t_assert.o
+
+Object  file test_t_assert.o at $0000: Z80RMF18
+  Name: test_t_assert
+  CPU:  z80 
+  Section "": 1 bytes
+    C $0000: 00
+
+
+ASSERT failure
+
+LINE 1 "test_t_assert.asm"
+assert 0
+nop
+% z80asm -v test_t_assert.asm
+assemble test_t_assert.asm to test_t_assert.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_assert.asm:1: error: assertion failed
+  ^---- 		assert 0
+    ^---- assert 0
+error: assembly failed for file: test_t_assert.asm
+
+
+
+ASSERT failure with message
+
+LINE 1 "test_t_assert.asm"
+assert 0,"this cannot work"
+nop
+% z80asm -v test_t_assert.asm
+assemble test_t_assert.asm to test_t_assert.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_assert.asm:1: error: assertion failed: this cannot work
+  ^---- 		assert 0, "this cannot work"
+    ^---- assert 0,"this cannot work"
+error: assembly failed for file: test_t_assert.asm
+
+
+
+ASSERT ok with define
+
+LINE 1 "test_t_assert.asm"
+assert HAS_ASSERT
+nop
+% z80asm -v -DHAS_ASSERT test_t_assert.asm
+define HAS_ASSERT = 1
+assemble test_t_assert.asm to test_t_assert.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_assert.asm to test_t_assert.o
+
+Object  file test_t_assert.o at $0000: Z80RMF18
+  Name: test_t_assert
+  CPU:  z80 
+  Section "": 1 bytes
+    C $0000: 00
+
+
+ASSERT failure with define
+
+LINE 1 "test_t_assert.asm"
+assert HAS_ASSERT
+nop
+% z80asm -v test_t_assert.asm
+assemble test_t_assert.asm to test_t_assert.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_assert.asm:1: error: assertion failed
+  ^---- 		assert HAS_ASSERT
+    ^---- assert HAS_ASSERT
+error: assembly failed for file: test_t_assert.asm
+
+
+
+ASSERT failure with define and message
+
+LINE 1 "test_t_assert.asm"
+assert HAS_ASSERT,"does not have assert"
+nop
+% z80asm -v test_t_assert.asm
+assemble test_t_assert.asm to test_t_assert.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_assert.asm:1: error: assertion failed: does not have assert
+  ^---- 		assert HAS_ASSERT, "does not have assert"
+    ^---- assert HAS_ASSERT,"does not have assert"
+error: assembly failed for file: test_t_assert.asm
+
+
+

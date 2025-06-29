@@ -25,6 +25,7 @@ public:
     bool parse(const string& line);
     bool parse(Scanner& in, bool silent);
     void lookup_symbols();
+    void lookup_symbols_if();
     bool eval_const(int& value);
     bool eval_instr(Instr*& instr);
     bool eval(int& result, bool silent = false);
@@ -44,6 +45,8 @@ private:
     int m_pos0{ 0 };
     Location m_location;
     Instr* m_asmpc{ nullptr };
+
+    void lookup_symbols(bool touched);
 
     enum class Result {
         Undefined,

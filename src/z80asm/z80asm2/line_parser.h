@@ -29,6 +29,7 @@ private:
         Token token;
         Expr* expr{ nullptr };
         bool const_expr{ false };
+        bool const_expr_if{ false };
         int const_value{ 0 };
         vector<string> ident_list;
         vector<NameValuePair> ident_value_list;
@@ -70,6 +71,8 @@ private:
     //@@BEGIN:actions_decl
     void action_align_const_expr_comma_const_expr();
     void action_align_const_expr();
+    void action_assert_const_expr_if();
+    void action_assert_const_expr_if_comma_str();
     void action_assume_const_expr();
     void action_define_const_assign_list();
     void action_extern_ident_list();

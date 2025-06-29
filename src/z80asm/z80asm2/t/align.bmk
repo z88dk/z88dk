@@ -46,7 +46,7 @@ define __CPU_ZILOG__ = 1
 test_t_align.asm:2: error: align redefined
   ^---- 		align 8
     ^---- align 8
-assembled test_t_align.asm to test_t_align.o
+error: assembly failed for file: test_t_align.asm
 
 
 
@@ -142,7 +142,7 @@ define __CPU_ZILOG__ = 1
 test_t_align.asm:2: error: origin not aligned
   ^---- 		org 3
     ^---- org 3
-assembled test_t_align.asm to test_t_align.o
+error: assembly failed for file: test_t_align.asm
 
 
 
@@ -157,7 +157,7 @@ define __CPU_ZILOG__ = 1
 test_t_align.asm:2: error: origin not aligned
   ^---- 		align 4
     ^---- align 4
-assembled test_t_align.asm to test_t_align.o
+error: assembly failed for file: test_t_align.asm
 
 
 
@@ -171,7 +171,7 @@ define __CPU_ZILOG__ = 1
 test_t_align.asm:1: error: origin not aligned
   ^---- 		align 4
     ^---- align 4
-assembled test_t_align.asm to test_t_align.o
+error: assembly failed for file: test_t_align.asm
 
 
 

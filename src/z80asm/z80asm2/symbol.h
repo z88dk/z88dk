@@ -97,7 +97,7 @@ public:
     Symbol* add_global_def(const string& name, int value = 1);
     Symbol* add_label(const string& name, Instr* instr);
     Symbol* add_equ(const string& name, Expr* expr);
-    Symbol* touch_symbol(const string& name);
+    Symbol* touch_symbol(const string& name, bool touched);
     Symbol* declare_extern(const string& name);
     Symbol* declare_public(const string& name);
     Symbol* declare_global(const string& name);
