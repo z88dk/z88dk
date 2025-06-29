@@ -69,7 +69,7 @@ bool Assembler::assemble() {
 
     // set pass to 2 after addresses are final
     m_pass = Pass::PASS2;
-    g_obj_module->expand_jrs();
+    g_obj_module->expand_jrs(); // modifies addresses
     g_obj_module->convert_global_to_extern_public();
     if (g_obj_module->has_undefined_symbols())
         return false;
@@ -82,6 +82,8 @@ bool Assembler::assemble() {
 }
 
 bool Assembler::parse() {
+    int error_count = g_error->count();
+
     bool ok = true;
     string line;
     while (g_input_files->getline(line)) {
@@ -94,5 +96,5 @@ bool Assembler::parse() {
                 ok = false;
         }
     }
-    return ok;
+    return ok && error_count == g_error->count();
 }

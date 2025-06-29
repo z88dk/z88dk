@@ -25,6 +25,7 @@ public:
     void error_expected_equal() { error("expected '='"); }
     void error_expected_ident() { error("expected identifier"); }
     void error_extra_operands(const string& op) { error("extra operands", op); }
+    void error_illegal_opcode() { error("illegal opcode"); }
     void error_insufficient_operands(const string& op) { error("insufficient operands", op); }
     void error_int_range(const string& hex_value) { error("integer out of range", hex_value); }
     void error_invalid_char(char c) { error("invalid character", std::to_string(static_cast<int>(c))); }
