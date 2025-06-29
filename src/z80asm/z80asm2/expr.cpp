@@ -66,19 +66,11 @@ bool Expr::parse(Scanner& in, bool silent) {
 }
 
 void Expr::lookup_symbols() {
-    Symtab* symtab = g_obj_module->symtab();
-    Symbol* symbol = nullptr;
-    m_asmpc = g_obj_module->cur_section()->asmpc();
-    
-    for (auto& token : m_postfix) {
-        switch (token.ttype()) {
-        case TType::IDENT:
-            symbol = symtab->touch_symbol(token.svalue());
-            token.set_symbol(symbol);
-            break;
-        default:;
-        }
-    }
+    lookup_symbols(true);
+}
+
+void Expr::lookup_symbols_if() {
+    lookup_symbols(false);
 }
 
 string Expr::to_string() const {
@@ -104,6 +96,21 @@ Expr* Expr::clone() const {
     new_expr->m_pos0 = m_pos0;
     new_expr->m_location = m_location;
     return new_expr;
+}
+
+void Expr::lookup_symbols(bool touched) {
+    Symtab* symtab = g_obj_module->symtab();
+    Symbol* symbol = nullptr;
+
+    for (auto& token : m_postfix) {
+        switch (token.ttype()) {
+        case TType::IDENT:
+            symbol = symtab->touch_symbol(token.svalue(), touched);
+            token.set_symbol(symbol);
+            break;
+        default:;
+        }
+    }
 }
 
 Expr::Result Expr::combine_results(Result r1) const {

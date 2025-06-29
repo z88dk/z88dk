@@ -193,7 +193,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
         g_error->error_duplicate_definition(name);
     else {
         symbol->set_instr(instr);
-        symbol->set_touched();
+        symbol->set_touched();  // mut exist in the object file
         symbol->update_definition();
     }
 
@@ -216,11 +216,12 @@ Symbol* Symtab::add_equ(const string& name, Expr* expr) {
     return symbol;
 }
 
-Symbol* Symtab::touch_symbol(const string& name) {
+Symbol* Symtab::touch_symbol(const string& name, bool touched) {
     auto symbol = get_symbol(name);
     if (!symbol)
         symbol = add_symbol(name);
-    symbol->set_touched();
+    if (touched)
+        symbol->set_touched();
     return symbol;
 }
 
@@ -258,6 +259,7 @@ Symbol* Symtab::declare_public(const string& name) {
     }
     else {
         symbol->set_sym_scope(SymScope::PUBLIC);
+        symbol->set_touched(); // must exist in the object file
     }
 
     return symbol;
@@ -301,7 +303,8 @@ bool Symtab::has_undefined_symbols() const {
         Symbol* symbol = it.second;
         *g_location = symbol->location();
 
-        if (symbol->sym_type() == SymType::UNDEFINED) {
+        if (symbol->sym_type() == SymType::UNDEFINED &&
+            symbol->touched()) {
             if (symbol->sym_scope() != SymScope::EXTERN) {
                 g_error->error_undefined_symbol(symbol->name());
                 has_undefined = true;

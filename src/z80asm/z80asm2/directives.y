@@ -11,6 +11,12 @@
 "align" CONST_EXPR
     g_obj_module->set_align($2.const_value, g_options->filler());
 
+"assert" CONST_EXPR_IF
+    g_obj_module->assert_($2.const_value);
+
+"assert" CONST_EXPR_IF "," STR
+    g_obj_module->assert_($2.const_value, $4.token.svalue());
+
 "assume" CONST_EXPR
 	g_obj_module->set_assume($2.const_value);
 

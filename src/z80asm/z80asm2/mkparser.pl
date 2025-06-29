@@ -21,6 +21,7 @@ my %tokens = (
 	FLOAT => "",
 	EXPR => "",
 	CONST_EXPR => "",
+	CONST_EXPR_IF => "",	# can be undefined, evaluates as zero
 	IDENT_LIST => "",
 	CONST_ASSIGN_LIST => "",
 	STR => "",

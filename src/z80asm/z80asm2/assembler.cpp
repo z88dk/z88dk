@@ -58,6 +58,8 @@ void Assembler::init(const string& filename) {
 }
 
 bool Assembler::assemble() {
+    int error_count = g_error->count();
+
     // during pass 1, the addresses are not final
     m_pass = Pass::PASS1;
     g_obj_module->define_global_defs();
@@ -76,7 +78,7 @@ bool Assembler::assemble() {
         return false;
 
     m_pass = Pass::NOT_ASSEMBLING;
-    return true;
+    return error_count == g_error->count();
 }
 
 bool Assembler::parse() {

@@ -16,6 +16,7 @@ public:
 
     void error_align_redefined() { error("align redefined"); }
     void error_assembly_failed(const string& filename) { error("assembly failed for file", filename); }
+    void error_assertion_failed(const string& message) { error("assertion failed", message); }
     void error_constant_expression_expected() { error("constant expression expected"); }
     void error_division_by_zero() { error("division by zero"); }
     void error_duplicate_definition(const string& name) { error("duplicate definition", name); }

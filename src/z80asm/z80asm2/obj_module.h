@@ -209,6 +209,7 @@ public:
 
     void set_origin(int origin);
     void set_align(int align, int filler);
+    void assert_(bool ok, const string& message = "");
     void set_assume(int value) { m_assume = value; }
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);
