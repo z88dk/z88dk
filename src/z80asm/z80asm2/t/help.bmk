@@ -1,5 +1,7 @@
 Usage: z80asm [options] [file...]
 Options:
+  +ARCH       Select architecture, one of:
+              ti83, ti83plus, z88, zx, zx81, zxn.
   -D[=]SYMBOL[=VALUE]
               Define a static symbol in decimal or hex
   -E          Preprocess only, do not assemble

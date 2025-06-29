@@ -65,6 +65,7 @@ bool Assembler::assemble() {
     m_pass = Pass::PASS1;
     g_obj_module->define_global_defs();
     g_obj_module->define_cpu_defs(g_options->cpu_id());
+    g_obj_module->define_arch_defs(g_options->arch());
     if (!parse())
         return false;
 

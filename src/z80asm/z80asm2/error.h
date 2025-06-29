@@ -28,6 +28,7 @@ public:
     void error_illegal_opcode() { error("illegal opcode"); }
     void error_insufficient_operands(const string& op) { error("insufficient operands", op); }
     void error_int_range(const string& hex_value) { error("integer out of range", hex_value); }
+    void error_invalid_arch(const string& arch_name) { error("invalid architecture specified", arch_name); }
     void error_invalid_char(char c) { error("invalid character", std::to_string(static_cast<int>(c))); }
     void error_invalid_cpu(const string& cpu_name) { error("invalid CPU specified", cpu_name); }
     void error_invalid_escape_char(char c) { error("invalid escape character", string(1, c)); }

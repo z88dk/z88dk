@@ -16,6 +16,7 @@
 using namespace std;
 
 CpuTable* g_cpu_table;
+ArchTable* g_arch_table;
 
 CpuTable::CpuTable() {
     // init maps and cpu names
@@ -178,3 +179,106 @@ bool cpu_compatible(Cpu code_cpu_id, Cpu lib_cpu_id) {
 
     return false; // no compatibility found
 }
+
+ArchTable::ArchTable() {
+    for (auto& info : m_table) {
+        m_by_name[info.name] = info.id;
+        m_arch_names.push_back(info.name);
+    }
+
+    sort(m_arch_names.begin(), m_arch_names.end());
+}
+
+const ArchInfo* ArchTable::get_info(Arch id) const {
+    int i = index(id);
+    if (i < 0)
+        return nullptr;
+    else
+        return &m_table[i];
+}
+
+const ArchInfo* ArchTable::get_info(const string& name) const {
+    auto it = m_by_name.find(name);
+    if (it == m_by_name.end())
+        return nullptr;
+    else {
+        int i = index(it->second);
+        if (i < 0)
+            return nullptr;
+        else
+            return &m_table[i];
+    }
+}
+
+string ArchTable::arch_names() const {
+    string names;
+    for (auto& name : m_arch_names) {
+        if (!names.empty())
+            names += ", ";
+        names += name;
+    }
+    names += ".";
+    return names;
+}
+
+string ArchTable::arch_names(int lmargin, int rmargin) const {
+    ostringstream oss;
+    int col = lmargin;
+    for (auto& name : m_arch_names) {
+        if (col + static_cast<int>(name.size()) + 2 > rmargin) {
+            oss << endl << string(lmargin, ' ');
+            col = lmargin;
+        }
+        oss << name << ", ";
+        col += static_cast<int>(name.size()) + 2;
+    }
+
+    string str = oss.str();
+    if (str_ends_with(str, ", ")) {
+        str.pop_back();
+        str.pop_back();
+        str += ".";
+    }
+
+    return str;
+}
+
+const vector<string>& ArchTable::arch_defines(Arch id) const {
+    static vector<string> empty_defines;
+    const ArchInfo* info = get_info(id);
+    if (info)
+        return info->defines;
+    else
+        return empty_defines;
+}
+
+vector<string> ArchTable::all_defines() const {
+    // Collect in a set to remove duplicates
+    set<string> defines_set;
+    for (const auto& info : m_table) {
+        for (const auto& define : info.defines) {
+            defines_set.insert(define);
+        }
+    }
+
+    // Convert set to vector
+    vector<string> defines;
+    defines.reserve(defines_set.size());
+    for (const auto& define : defines_set) {
+        defines.push_back(define);
+    }
+
+    // Sort the vector
+    sort(defines.begin(), defines.end());
+
+    return defines;
+}
+
+int ArchTable::index(Arch id) const {
+    int i = static_cast<int>(id) - 1;
+    if (i >= 0 && i < static_cast<int>(m_table.size()))
+        return i;
+    else
+        return -1;
+}
+

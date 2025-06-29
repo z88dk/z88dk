@@ -198,6 +198,7 @@ public:
 
     void define_global_defs();
     void define_cpu_defs(Cpu cpu_id);
+    void define_arch_defs(Arch arch);
     void expand_jrs();
     void convert_global_to_extern_public();
     bool has_undefined_symbols() const;

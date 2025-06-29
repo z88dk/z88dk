@@ -27,6 +27,7 @@ static const string Z80ASM_ENV = "Z80ASM";
 
 static void create_globals() {
     g_cpu_table = new CpuTable();
+    g_arch_table = new ArchTable();
     g_location = new Location();
     g_source_text = new SourceText();
     g_error = new Error();
@@ -48,12 +49,15 @@ static void delete_globals() {
     delete g_error; g_error = nullptr;
     delete g_source_text; g_source_text = nullptr;
     delete g_location; g_location = nullptr;
+    delete g_arch_table; g_arch_table = nullptr;
     delete g_cpu_table; g_cpu_table = nullptr;
 }
 
 static int help() {
     cout << "Usage: z80asm [options] [file...]" << endl
         << "Options:" << endl
+        << "  +ARCH       Select architecture, one of:" << endl
+        << "              " << g_arch_table->arch_names(14, 72) << endl
         << "  -D[=]SYMBOL[=VALUE]" << endl
         << "              Define a static symbol in decimal or hex" << endl
         << "  -E          Preprocess only, do not assemble" << endl
@@ -77,6 +81,21 @@ static void check_verbose_option(const string& option) {
 static bool parse_option(const string& option) {
     if (option.size() < 2)
         return false;
+    else if (option[0] == '+') {
+        string arch_name = option.substr(1);
+        const ArchInfo* info = g_arch_table->get_info(arch_name);
+        if (!info) {
+            g_error->error_invalid_arch(arch_name);
+            cerr << "valid architectures are: " << g_arch_table->arch_names() << endl;
+            exit(EXIT_FAILURE);
+            return false; // not reached
+        }
+        else {
+            g_options->set_cpu_id(info->cpu_id);
+            g_options->set_arch(info->id);
+            return true;
+        }
+    }
     else if (option[0] != '-')
         return false;
     else {
@@ -212,7 +231,8 @@ int main(int argc, char* argv[]) {
     // parse options
     bool found_dash_dash = false;
     argv++; argc--;
-    while (!found_dash_dash && argc > 0 && argv[0][0] == '-') {
+    while (!found_dash_dash && argc > 0 &&
+        (argv[0][0] == '-' || argv[0][0] == '+')) {
         string option = argv[0];
         if (option == "--")
             found_dash_dash = true;
