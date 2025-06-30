@@ -691,20 +691,30 @@ void ObjModule::include_binary(const string& filename) {
 void ObjModule::call_oz(int value) {
     if (g_options->arch() != Arch::Z88)
         g_error->error_illegal_opcode();
-    else {
-        if (value > 0 && value <= 255) {
-            auto instr = cur_section()->add_instr();
-            instr->add_opcode(Z80_RST(0x20));
-            instr->add_byte(value);
-        }
-        else if (value > 255) {
-            auto instr = cur_section()->add_instr();
-            instr->add_opcode(Z80_RST(0x20));
-            instr->add_word(value);
-        }
-        else
-            g_error->error_int_range(int_to_hex(value, 4));
+    else if (value > 0 && value <= 255) {
+        auto instr = cur_section()->add_instr();
+        instr->add_opcode(Z80_RST(0x20));
+        instr->add_byte(value);
     }
+    else if (value > 255) {
+        auto instr = cur_section()->add_instr();
+        instr->add_opcode(Z80_RST(0x20));
+        instr->add_word(value);
+    }
+    else
+        g_error->error_int_range(int_to_hex(value, 4));
+}
+
+void ObjModule::call_pkg(int value) {
+    if (g_options->arch() != Arch::Z88)
+        g_error->error_illegal_opcode();
+    else if (value >= 0) {
+        auto instr = cur_section()->add_instr();
+        instr->add_opcode(Z80_RST(0x08));
+        instr->add_word(value);
+    }
+    else
+        g_error->error_int_range(int_to_hex(value, 4));
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

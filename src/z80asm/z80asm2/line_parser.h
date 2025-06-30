@@ -85,6 +85,7 @@ private:
     void action_ident_colon();
     void action_ident_equ_expr();
     void action_call_oz_const_expr();
+    void action_call_pkg_const_expr();
     void action_nop();
     void action_jr_expr();
     void action_jr_nz_comma_expr();

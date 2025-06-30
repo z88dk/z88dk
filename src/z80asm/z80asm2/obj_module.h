@@ -220,6 +220,7 @@ public:
     int assume() const { return m_assume; }
     void include_binary(const string& filename);
     void call_oz(int value);
+    void call_pkg(int value);
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);
