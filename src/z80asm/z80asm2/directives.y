@@ -28,6 +28,54 @@
         g_obj_module->add_global_def(nv_pair.name, nv_pair.value);
     }
 
+"defb" BYTE_LIST
+    g_obj_module->add_byte_list($2.exprs);
+
+"db" BYTE_LIST
+    g_obj_module->add_byte_list($2.exprs);
+
+"defm" BYTE_LIST
+    g_obj_module->add_byte_list($2.exprs);
+
+"dm" BYTE_LIST
+    g_obj_module->add_byte_list($2.exprs);
+
+"byte" BYTE_LIST
+    g_obj_module->add_byte_list($2.exprs);
+
+"defw" EXPR_LIST
+    g_obj_module->add_word_list($2.exprs);
+
+"dw" EXPR_LIST
+    g_obj_module->add_word_list($2.exprs);
+
+"word" EXPR_LIST
+    g_obj_module->add_word_list($2.exprs);
+
+"defdb" EXPR_LIST
+    g_obj_module->add_word_be_list($2.exprs);
+
+"ddb" EXPR_LIST
+    g_obj_module->add_word_be_list($2.exprs);
+
+"defp" EXPR_LIST
+    g_obj_module->add_ptr_list($2.exprs);
+
+"dp" EXPR_LIST
+    g_obj_module->add_ptr_list($2.exprs);
+
+"ptr" EXPR_LIST
+    g_obj_module->add_ptr_list($2.exprs);
+
+"defq" EXPR_LIST
+    g_obj_module->add_dword_list($2.exprs);
+
+"dq" EXPR_LIST
+    g_obj_module->add_dword_list($2.exprs);
+
+"dword" EXPR_LIST
+    g_obj_module->add_dword_list($2.exprs);
+
 "extern" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_extern(ident);

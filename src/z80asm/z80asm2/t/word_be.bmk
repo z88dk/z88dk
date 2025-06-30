@@ -1,0 +1,58 @@
+WORD_BE ok
+LINE 1 "test_t_word_be.asm"
+defdb 2,4,8,16,32,64,128,256
+ddb$,$,$,$,$,$,$,$
+% z80asm -v test_t_word_be.asm
+assemble test_t_word_be.asm to test_t_word_be.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_word_be.asm to test_t_word_be.o
+
+Object  file test_t_word_be.o at $0000: Z80RMF18
+  Name: test_t_word_be
+  CPU:  z80 
+  Section "": 32 bytes
+    C $0000: 00 02 00 04 00 08 00 10 00 20 00 40 00 80 01 00
+    C $0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Expressions:
+    E B $0010 $0010 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $0012 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $0014 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $0016 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $0018 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $001A 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $001C 16: $ (section "") (file test_t_word_be.asm:2)
+    E B $0010 $001E 16: $ (section "") (file test_t_word_be.asm:2)
+
+
+WORD_BE errors
+LINE 1 "test_t_word_be.asm"
+defdb 1+
+ddb 1,
+defdb,
+% z80asm -v test_t_word_be.asm
+assemble test_t_word_be.asm to test_t_word_be.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_word_be.asm:1: error: insufficient operands: +
+  ^---- 		defdb 	1+
+    ^---- defdb 1+
+test_t_word_be.asm:1: error: syntax error
+  ^---- 		defdb 	1+
+    ^---- defdb 1+
+test_t_word_be.asm:2: error: insufficient operands
+  ^---- 		ddb 	1,
+    ^---- ddb 1,
+test_t_word_be.asm:2: error: syntax error
+  ^---- 		ddb 	1,
+    ^---- ddb 1,
+test_t_word_be.asm:3: error: insufficient operands
+  ^---- 		defdb 	,
+    ^---- defdb,
+test_t_word_be.asm:3: error: syntax error
+  ^---- 		defdb 	,
+    ^---- defdb,
+error: assembly failed for file: test_t_word_be.asm
+
+
+

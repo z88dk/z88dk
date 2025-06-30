@@ -226,6 +226,11 @@ public:
     void cu_move(int reg, int val);
     void cu_stop();
     void cu_nop();
+    void add_byte_list(const vector<Expr*>& exprs);
+    void add_word_list(const vector<Expr*>& exprs);
+    void add_word_be_list(const vector<Expr*>& exprs);
+    void add_ptr_list(const vector<Expr*>& exprs);
+    void add_dword_list(const vector<Expr*>& exprs);
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);

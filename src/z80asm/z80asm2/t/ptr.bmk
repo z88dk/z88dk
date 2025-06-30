@@ -1,0 +1,56 @@
+PTR ok
+LINE 1 "test_t_ptr.asm"
+defp 1,2,1193046
+dp 1,2,1193046
+ptr 1,2,1193046
+ptr$,$,$
+% z80asm -v test_t_ptr.asm
+assemble test_t_ptr.asm to test_t_ptr.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_ptr.asm to test_t_ptr.o
+
+Object  file test_t_ptr.o at $0000: Z80RMF18
+  Name: test_t_ptr
+  CPU:  z80 
+  Section "": 36 bytes
+    C $0000: 01 00 00 02 00 00 56 34 12 01 00 00 02 00 00 56
+    C $0010: 34 12 01 00 00 02 00 00 56 34 12 00 00 00 00 00
+    C $0020: 00 00 00 00
+  Expressions:
+    E P $001B $001B 9: $ (section "") (file test_t_ptr.asm:4)
+    E P $001B $001E 9: $ (section "") (file test_t_ptr.asm:4)
+    E P $001B $0021 9: $ (section "") (file test_t_ptr.asm:4)
+
+
+PTR errors
+LINE 1 "test_t_ptr.asm"
+defp 1+
+dp 1,
+ptr,
+% z80asm -v test_t_ptr.asm
+assemble test_t_ptr.asm to test_t_ptr.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_ptr.asm:1: error: insufficient operands: +
+  ^---- 		defp 	1+
+    ^---- defp 1+
+test_t_ptr.asm:1: error: syntax error
+  ^---- 		defp 	1+
+    ^---- defp 1+
+test_t_ptr.asm:2: error: insufficient operands
+  ^---- 		dp	 	1,
+    ^---- dp 1,
+test_t_ptr.asm:2: error: syntax error
+  ^---- 		dp	 	1,
+    ^---- dp 1,
+test_t_ptr.asm:3: error: insufficient operands
+  ^---- 		ptr 	,
+    ^---- ptr,
+test_t_ptr.asm:3: error: syntax error
+  ^---- 		ptr 	,
+    ^---- ptr,
+error: assembly failed for file: test_t_ptr.asm
+
+
+

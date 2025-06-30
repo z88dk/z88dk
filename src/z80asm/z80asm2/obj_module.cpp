@@ -766,6 +766,41 @@ void ObjModule::cu_nop() {
     }
 }
 
+void ObjModule::add_byte_list(const vector<Expr*>& exprs) {
+    Instr* instr = cur_section()->add_instr();
+    for (auto& expr : exprs) {
+        instr->add_patch(new Patch(instr, PatchType::BYTE_UNSIGNED, expr->clone(), instr->size()));
+    }
+}
+
+void ObjModule::add_word_list(const vector<Expr*>& exprs) {
+    Instr* instr = cur_section()->add_instr();
+    for (auto& expr : exprs) {
+        instr->add_patch(new Patch(instr, PatchType::WORD, expr->clone(), instr->size()));
+    }
+}
+
+void ObjModule::add_word_be_list(const vector<Expr*>& exprs) {
+    Instr* instr = cur_section()->add_instr();
+    for (auto& expr : exprs) {
+        instr->add_patch(new Patch(instr, PatchType::WORD_BE, expr->clone(), instr->size()));
+    }
+}
+
+void ObjModule::add_ptr_list(const vector<Expr*>& exprs) {
+    Instr* instr = cur_section()->add_instr();
+    for (auto& expr : exprs) {
+        instr->add_patch(new Patch(instr, PatchType::PTR24, expr->clone(), instr->size()));
+    }
+}
+
+void ObjModule::add_dword_list(const vector<Expr*>& exprs) {
+    Instr* instr = cur_section()->add_instr();
+    for (auto& expr : exprs) {
+        instr->add_patch(new Patch(instr, PatchType::DWORD, expr->clone(), instr->size()));
+    }
+}
+
 void ObjModule::add_opcode_void(long long opcode) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);

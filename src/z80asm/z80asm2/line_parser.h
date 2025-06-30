@@ -33,6 +33,7 @@ private:
         int const_value{ 0 };
         vector<string> ident_list;
         vector<NameValuePair> ident_value_list;
+        vector<Expr*> exprs;
 
         Elem() = default;
         Elem(const Elem& other);
@@ -67,6 +68,9 @@ private:
     bool collect_optional_const_assignment(int& value);
     bool collect_ident_list(vector<string>& names);
     bool collect_const_assign_list(vector<NameValuePair>& nv_list);
+    bool collect_byte_or_string(vector<Expr*>& exprs);
+    bool collect_byte_list(vector<Expr*>& exprs);
+    bool collect_expr_list(vector<Expr*>& exprs);
 
     //@@BEGIN:actions_decl
     void action_align_const_expr_comma_const_expr();
@@ -76,6 +80,22 @@ private:
     void action_assume_const_expr();
     void action_binary_raw_str();
     void action_define_const_assign_list();
+    void action_defb_byte_list();
+    void action_db_byte_list();
+    void action_defm_byte_list();
+    void action_dm_byte_list();
+    void action_byte_byte_list();
+    void action_defw_expr_list();
+    void action_dw_expr_list();
+    void action_word_expr_list();
+    void action_defdb_expr_list();
+    void action_ddb_expr_list();
+    void action_defp_expr_list();
+    void action_dp_expr_list();
+    void action_ptr_expr_list();
+    void action_defq_expr_list();
+    void action_dq_expr_list();
+    void action_dword_expr_list();
     void action_extern_ident_list();
     void action_global_ident_list();
     void action_incbin_raw_str();
