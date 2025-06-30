@@ -52,18 +52,18 @@ public:
     bool is_global_def() const { return m_is_global_def; } 
     int value() const;
     Instr* instr() { return m_instr; }
-    Expr* expr() { return m_expr; }
+    const Expr& expr() const { return m_expr; }
     bool in_eval() const { return m_in_eval; }
     bool touched() const { return m_touched; }
 
     void set_sym_scope(SymScope sym_scope) { m_sym_scope = sym_scope; }
     void set_sym_type(SymType sym_type) { m_sym_type = sym_type; }
     void set_global_def(int value);
-    void set_global_def(Expr* expr);
+    void set_global_def(const Expr& expr);
     void set_constant(int value);
-    void set_constant(Expr* expr);
+    void set_constant(const Expr& expr);
     void set_instr(Instr* instr);
-    void set_expr(Expr* expr);
+    bool set_expr(const Expr& expr); // true if expression was resolved
     void set_in_eval(bool f = true) { m_in_eval = f; }
     void set_touched(bool f = true) { m_touched = f; }
     void update_definition();
@@ -77,7 +77,7 @@ private:
     bool m_is_global_def{ false }; // true if this is a global define
     int m_value{ 0 };           // constant
     Instr* m_instr{ nullptr };  // address
-    Expr* m_expr{ nullptr };    // expression
+    Expr m_expr;                // expression
     bool m_in_eval{ false };    // detect recursive evaluation
     bool m_touched{ false };    // used by any expression
 };
@@ -96,7 +96,7 @@ public:
 
     Symbol* add_global_def(const string& name, int value = 1);
     Symbol* add_label(const string& name, Instr* instr);
-    Symbol* add_equ(const string& name, Expr* expr);
+    Symbol* add_equ(const string& name, const Expr& expr);
     Symbol* touch_symbol(const string& name, bool touched);
     Symbol* declare_extern(const string& name);
     Symbol* declare_public(const string& name);

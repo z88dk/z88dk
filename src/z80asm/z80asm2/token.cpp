@@ -15,6 +15,7 @@ string to_string(TType ttype) {
     static unordered_map<TType, string> ttypes = {
         //@@BEGIN: ttype_text
         { TType::ASMPC, "$" },
+        { TType::ASSIGN_LIST, "" },
         { TType::BACKSLASH, "\\" },
         { TType::BYTE_LIST, "" },
         { TType::COLON, ":" },
@@ -72,6 +73,7 @@ string to_string(Keyword keyword) {
         { Keyword::CU, "cu" },
         { Keyword::C_LINE, "c_line" },
         { Keyword::DB, "db" },
+        { Keyword::DC, "dc" },
         { Keyword::DDB, "ddb" },
         { Keyword::DEFB, "defb" },
         { Keyword::DEFC, "defc" },
@@ -146,6 +148,7 @@ Keyword lookup_keyword(const string& text) {
         { "cu", Keyword::CU },
         { "c_line", Keyword::C_LINE },
         { "db", Keyword::DB },
+        { "dc", Keyword::DC },
         { "ddb", Keyword::DDB },
         { "defb", Keyword::DEFB },
         { "defc", Keyword::DEFC },

@@ -19,12 +19,30 @@ using namespace std;
 
 ObjModule* g_obj_module{ nullptr };
 
-Patch::Patch(Instr* parent, PatchType patch_type, Expr* expr, int offset)
+Patch::Patch(Instr* parent, PatchType patch_type, const Expr& expr, int offset)
     : m_parent(parent), m_patch_type(patch_type), m_expr(expr), m_offset(offset) {
 }
 
+Patch::Patch(const Patch& other) {
+    m_parent = other.m_parent;
+    m_patch_type = other.m_patch_type;
+    m_expr = other.m_expr;
+    m_offset = other.m_offset;
+    m_target_name = other.m_target_name; 
+}
+
 Patch::~Patch() {
-    delete m_expr;
+}
+
+Patch& Patch::operator=(const Patch& other) {
+    if (this != &other) {
+        m_parent = other.m_parent;
+        m_patch_type = other.m_patch_type;
+        m_expr = other.m_expr;
+        m_offset = other.m_offset;
+        m_target_name = other.m_target_name;
+    }
+    return *this;
 }
 
 int Patch::size() const {
@@ -58,8 +76,8 @@ int Patch::size() const {
     }
 }
 
-void Patch::resolve(int value) {
-    *g_location = m_expr->location();    // prepare for errors
+void Patch::resolve(int value) const {
+    *g_location = m_expr.location();    // prepare for errors
 
     switch (m_patch_type)
     {
@@ -171,12 +189,6 @@ Instr::Instr(Section* parent)
     m_location = *g_location;
 }
 
-Instr::~Instr() {
-    for (auto& patch : m_patches)
-        delete patch;
-    m_patches.clear();
-}
-
 bool Instr::empty() const {
     return m_bytes.empty() && m_patches.empty();
 }
@@ -210,19 +222,19 @@ void Instr::add_opcode(long long opcode) {
     add_byte(opcode & 0xFF);
 }
 
-void Instr::add_patch(Patch* patch) {
+void Instr::add_patch(const Patch& patch) {
     // reserve space for the patch
-    int size = patch->size();
+    int size = patch.size();
     for (int i = 0; i < size; ++i) {
         add_byte(0); 
     }
 
     // If the expression evaluates to a constant, replace it with the value
     int value = 0;
-    if (patch->patch_type() != PatchType::ASSIGNMENT &&
-        patch->expr()->eval_const(value)) {
-        patch->resolve(value);
-        delete patch; // No need to keep the patch if it's resolved
+    if (patch.patch_type() != PatchType::ASSIGNMENT &&
+        patch.expr().eval_const(value)) {
+        patch.resolve(value);
+        // No need to keep the patch if it's resolved
     }
     else {
         m_patches.push_back(patch);
@@ -252,9 +264,9 @@ void Instr::include_binary(const string& filename_) {
 void Instr::expand_jr() {
     assert(m_patches.size() == 1
         && "Only one patch expected for expansion");
-    assert(m_patches[0]->patch_type() == PatchType::JR_OFFSET
+    assert(m_patches[0].patch_type() == PatchType::JR_OFFSET
         && "Only JR patch expected for expansion");
-    int opcode_index = m_patches[0]->offset() - 1;
+    int opcode_index = m_patches[0].offset() - 1;
     assert(opcode_index >= 0 && opcode_index < size()
         && "Opcode index out of bounds");
     int opcode = m_bytes[opcode_index];
@@ -263,34 +275,34 @@ void Instr::expand_jr() {
     case 0x10: // DJNZ
         m_bytes[opcode_index] = 0x05; // Change to DEC B
         m_bytes[opcode_index + 1] = 0xC2; // Change to JP NZ
-        m_patches[0]->set_patch_type(PatchType::WORD);
-        m_patches[0]->set_offset(opcode_index + 2);
+        m_patches[0].set_patch_type(PatchType::WORD);
+        m_patches[0].set_offset(opcode_index + 2);
         m_bytes.push_back(0x00); // two more bytes
         m_bytes.push_back(0x00); 
         break;
     case 0x18: // JR
         m_bytes[opcode_index] = 0xC3; // Change to JP
-        m_patches[0]->set_patch_type(PatchType::WORD);
+        m_patches[0].set_patch_type(PatchType::WORD);
         m_bytes.push_back(0x00); // one more byte
         break;
     case 0x20: // JR NZ
         m_bytes[opcode_index] = 0xC2; // Change to JP NZ
-        m_patches[0]->set_patch_type(PatchType::WORD);
+        m_patches[0].set_patch_type(PatchType::WORD);
         m_bytes.push_back(0x00); // one more byte
         break;
     case 0x28: // JR Z
         m_bytes[opcode_index] = 0xCA; // Change to JP Z
-        m_patches[0]->set_patch_type(PatchType::WORD);
+        m_patches[0].set_patch_type(PatchType::WORD);
         m_bytes.push_back(0x00); // one more byte
         break;
     case 0x30: // JR NC
         m_bytes[opcode_index] = 0xD2; // Change to JP NC
-        m_patches[0]->set_patch_type(PatchType::WORD);
+        m_patches[0].set_patch_type(PatchType::WORD);
         m_bytes.push_back(0x00); // one more byte
         break;
     case 0x38: // JR C
         m_bytes[opcode_index] = 0xDA; // Change to JP C
-        m_patches[0]->set_patch_type(PatchType::WORD);
+        m_patches[0].set_patch_type(PatchType::WORD);
         m_bytes.push_back(0x00); // one more byte
         break;
     default:
@@ -299,39 +311,51 @@ void Instr::expand_jr() {
 }
 
 void Instr::resolve_local_exprs() {
-    for (auto it = m_patches.begin(); it != m_patches.end(); ) {
-        Patch* patch = *it;
-        Expr* expr = patch->expr();
+    for (auto it = m_patches.begin(); it != m_patches.end();) {
+        Patch& patch = *it;
+        const Expr& expr = patch.expr();
 
-        *g_location = expr->location(); // prepare for errors
+        *g_location = expr.location(); // prepare for errors
 
-        int value = 0;
-        if (resolve_local_jrs(patch)) {
-            // If the patch was resolved as a local jump, remove it
-            it = m_patches.erase(it);
+        if (!patch.target_name().empty()) {     // DEFC
+            assert(patch.patch_type() == PatchType::ASSIGNMENT && "assignment expected");
+            auto symbol = g_obj_module->symtab()->get_symbol(patch.target_name());
+            assert(symbol && "symbol must be defined");
+            if (symbol->set_expr(expr))         // resolve constants and labels
+                it = m_patches.erase(it);
+            else
+                ++it;
         }
-        else if (expr->eval_const(value)) {
-            // If the expression is local, resolve it
-            patch->resolve(value);
-            it = m_patches.erase(it); // Remove the patch
+        else {                                  // patch
+            int value = 0;
+            if (resolve_local_jrs(patch)) {
+                // If the patch was resolved as a local jump, remove it
+                it = m_patches.erase(it);
+            }
+            else if (expr.eval_const(value)) {
+                // If the expression is local, resolve it
+                patch.resolve(value);
+                it = m_patches.erase(it); // Remove the patch
+            }
+            else {
+                // If the expression is not local, keep it for later resolution
+                ++it;
+            }
         }
-        else {
-            // If the expression is not local, keep it for later resolution
-            ++it;
-        }
+        
 
         g_location->clear();
     }
 }
 
-bool Instr::resolve_local_jrs(Patch* patch) {
+bool Instr::resolve_local_jrs(const Patch& patch) {
     // Check if the patch is a local jump and resolve it
-    if (patch->patch_type() == PatchType::JR_OFFSET) {
+    if (patch.patch_type() == PatchType::JR_OFFSET) {
     
         int distance = 0;
-        if (patch->expr()->eval_local_jr_distance(distance)) {
+        if (patch.expr().eval_local_jr_distance(distance)) {
             if (distance >= -128 && distance <= 127) {
-                patch->resolve(distance);
+                patch.resolve(distance);
                 return true; // Resolved as a local jump
             }
         }
@@ -459,9 +483,9 @@ void Section::expand_jrs() {
         did_expand = false;
         for (auto& instr : m_instrs) {
             for (auto& patch : instr->patches()) {
-                if (patch->patch_type() == PatchType::JR_OFFSET) {
+                if (patch.patch_type() == PatchType::JR_OFFSET) {
                     int distance = 0;
-                    if (patch->expr()->eval_local_jr_distance(distance)) {
+                    if (patch.expr().eval_local_jr_distance(distance)) {
                         if (distance < -128 || distance > 127) {
                             instr->expand_jr();
                             recompute_offsets();
@@ -567,6 +591,7 @@ void ObjModule::define_cpu_defs(Cpu cpu_id) {
     case Cpu::EZ80_Z80:
     case Cpu::EZ80_Z80_STRICT:
         m_assume = 0;
+        break;
     default:;
     }
 }
@@ -615,11 +640,11 @@ void ObjModule::add_label(const string& name) {
     m_symtab.add_label(name, instr);
 }
 
-void ObjModule::add_equ(const string& name, Expr* expr) {
-    m_symtab.add_equ(name, expr->clone());
+void ObjModule::add_equ(const string& name, const Expr& expr) {
+    m_symtab.add_equ(name, expr);
     Instr* instr = cur_section()->add_instr();
-    Patch* patch = new Patch(instr, PatchType::ASSIGNMENT, expr, instr->size());
-    patch->set_target_name(name);
+    Patch patch{ instr, PatchType::ASSIGNMENT, expr, instr->size() };
+    patch.set_target_name(name);
     instr->add_patch(patch);
 }
 
@@ -766,38 +791,38 @@ void ObjModule::cu_nop() {
     }
 }
 
-void ObjModule::add_byte_list(const vector<Expr*>& exprs) {
+void ObjModule::add_byte_list(const vector<Expr>& exprs) {
     Instr* instr = cur_section()->add_instr();
     for (auto& expr : exprs) {
-        instr->add_patch(new Patch(instr, PatchType::BYTE_UNSIGNED, expr->clone(), instr->size()));
+        instr->add_patch(Patch(instr, PatchType::BYTE_UNSIGNED, expr, instr->size()));
     }
 }
 
-void ObjModule::add_word_list(const vector<Expr*>& exprs) {
+void ObjModule::add_word_list(const vector<Expr>& exprs) {
     Instr* instr = cur_section()->add_instr();
     for (auto& expr : exprs) {
-        instr->add_patch(new Patch(instr, PatchType::WORD, expr->clone(), instr->size()));
+        instr->add_patch(Patch(instr, PatchType::WORD, expr, instr->size()));
     }
 }
 
-void ObjModule::add_word_be_list(const vector<Expr*>& exprs) {
+void ObjModule::add_word_be_list(const vector<Expr>& exprs) {
     Instr* instr = cur_section()->add_instr();
     for (auto& expr : exprs) {
-        instr->add_patch(new Patch(instr, PatchType::WORD_BE, expr->clone(), instr->size()));
+        instr->add_patch(Patch(instr, PatchType::WORD_BE, expr, instr->size()));
     }
 }
 
-void ObjModule::add_ptr_list(const vector<Expr*>& exprs) {
+void ObjModule::add_ptr_list(const vector<Expr>& exprs) {
     Instr* instr = cur_section()->add_instr();
     for (auto& expr : exprs) {
-        instr->add_patch(new Patch(instr, PatchType::PTR24, expr->clone(), instr->size()));
+        instr->add_patch(Patch(instr, PatchType::PTR24, expr, instr->size()));
     }
 }
 
-void ObjModule::add_dword_list(const vector<Expr*>& exprs) {
+void ObjModule::add_dword_list(const vector<Expr>& exprs) {
     Instr* instr = cur_section()->add_instr();
     for (auto& expr : exprs) {
-        instr->add_patch(new Patch(instr, PatchType::DWORD, expr->clone(), instr->size()));
+        instr->add_patch(Patch(instr, PatchType::DWORD, expr, instr->size()));
     }
 }
 
@@ -806,22 +831,22 @@ void ObjModule::add_opcode_void(long long opcode) {
     instr->add_opcode(opcode);
 }
 
-void ObjModule::add_opcode_jr(long long opcode, Expr* expr) {
+void ObjModule::add_opcode_jr(long long opcode, const Expr& expr) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(instr, PatchType::JR_OFFSET, expr, instr->size()));
+    instr->add_patch(Patch(instr, PatchType::JR_OFFSET, expr, instr->size()));
 }
 
-void ObjModule::add_opcode_n(long long opcode, Expr* expr) {
+void ObjModule::add_opcode_n(long long opcode, const Expr& expr) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(instr, PatchType::BYTE_UNSIGNED, expr, instr->size()));
+    instr->add_patch(Patch(instr, PatchType::BYTE_UNSIGNED, expr, instr->size()));
 }
 
-void ObjModule::add_opcode_nn(long long opcode, Expr* expr) {
+void ObjModule::add_opcode_nn(long long opcode, const Expr& expr) {
     Instr* instr = cur_section()->add_instr();
     instr->add_opcode(opcode);
-    instr->add_patch(new Patch(instr, PatchType::WORD, expr, instr->size()));
+    instr->add_patch(Patch(instr, PatchType::WORD, expr, instr->size()));
 }
 
 bool ObjModule::write_file(const string& filename) const {
@@ -888,16 +913,16 @@ int ObjModule::FileWriter::write_exprs() {
         for (auto& instr : section->instrs()) {
             for (auto& patch : instr->patches()) {
                 has_exprs = true;
-                Expr* expr = patch->expr();
-                Instr* instr = patch->parent();
+                const Expr& expr = patch.expr();
+                Instr* instr = patch.parent();
                 Section* section = instr->parent();
-                Location location = expr->location();
+                Location location = expr.location();
                 int asmpc = instr->offset();
-                int code_pos = asmpc + patch->offset();
+                int code_pos = asmpc + patch.offset();
                 int opcode_size = instr->size();
 
                 // store type
-                m_mem.write_long(static_cast<int>(patch->patch_type()));
+                m_mem.write_long(static_cast<int>(patch.patch_type()));
 
                 // store file name folowed by source line number
                 int str_id = m_str_table.add_string(location.filename());
@@ -913,11 +938,11 @@ int ObjModule::FileWriter::write_exprs() {
                 m_mem.write_long(opcode_size);
 
                 // target symbol for expression
-                str_id = m_str_table.add_string(patch->target_name());
+                str_id = m_str_table.add_string(patch.target_name());
                 m_mem.write_long(str_id);
 
                 // expression
-                str_id = m_str_table.add_string(expr->to_string());
+                str_id = m_str_table.add_string(expr.to_string());
                 m_mem.write_long(str_id);
             }
         }

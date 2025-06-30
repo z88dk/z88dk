@@ -20,20 +20,21 @@ class Section;
 class Expr {
 public:
     Expr();
+    Expr(const Expr& other);
+    Expr& operator=(const Expr& other);
     void clear();
+    bool empty() const;
     const Location& location() const { return m_location; }
     bool parse(const string& line);
     bool parse(Scanner& in, bool silent);
     void lookup_symbols();
     void lookup_symbols_if();
-    bool eval_const(int& value);
-    bool eval_instr(Instr*& instr);
-    bool eval(int& result, bool silent = false);
-    bool eval_local_jr_distance(int& distance);
+    bool eval_const(int& value) const;
+    bool eval_instr(Instr*& instr) const;
+    bool eval(int& result, bool silent = false) const;
+    bool eval_local_jr_distance(int& distance) const;
     string to_string() const;
     string rpn_to_string() const;
-
-    Expr* clone() const;
 
 #ifdef UNIT_TESTS
     static void test();

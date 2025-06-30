@@ -76,6 +76,16 @@
 "dword" EXPR_LIST
     g_obj_module->add_dword_list($2.exprs);
 
+"defc" ASSIGN_LIST
+    for (auto& ne_pair : $2.ident_expr_list) {
+		g_obj_module->add_equ(ne_pair.name, ne_pair.expr);
+	}
+
+"dc" ASSIGN_LIST
+    for (auto& ne_pair : $2.ident_expr_list) {
+		g_obj_module->add_equ(ne_pair.name, ne_pair.expr);
+	}
+
 "extern" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_extern(ident);
@@ -104,4 +114,4 @@ IDENT ":"
 	g_obj_module->add_label($1.token.svalue());
 
 IDENT "equ" EXPR
-	g_obj_module->add_equ($1.token.svalue(), $3.expr->clone());
+	g_obj_module->add_equ($1.token.svalue(), $3.expr);

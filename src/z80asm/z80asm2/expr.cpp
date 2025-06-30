@@ -19,12 +19,35 @@ Expr::Expr()
     , m_asmpc(g_obj_module->cur_section()->asmpc()) {
 }
 
+Expr::Expr(const Expr& other) {
+    m_infix = other.m_infix;
+    m_postfix = other.m_postfix;
+    m_pos0 = other.m_pos0;
+    m_location = other.m_location;
+    m_asmpc = other.m_asmpc;
+}
+
+Expr& Expr::operator=(const Expr& other) {
+    if (&other != this) {
+        m_infix = other.m_infix;
+        m_postfix = other.m_postfix;
+        m_pos0 = other.m_pos0;
+        m_location = other.m_location;
+        m_asmpc = other.m_asmpc;
+    }
+    return *this;
+}
+
 void Expr::clear() {
     m_infix.clear();
     m_postfix.clear();
     m_pos0 = 0;
-    m_location = *g_location;
-    m_asmpc = g_obj_module->cur_section()->asmpc();
+    m_location = g_location ? *g_location : Location();
+    m_asmpc = g_obj_module ? g_obj_module->cur_section()->asmpc() : nullptr;
+}
+
+bool Expr::empty() const {
+    return m_infix.empty() && m_postfix.empty();
 }
 
 bool Expr::parse(const string& line) {
@@ -87,15 +110,6 @@ string Expr::rpn_to_string() const {
         output += token.to_string() + " ";
     }
     return output;
-}
-
-Expr* Expr::clone() const {
-    auto new_expr = new Expr;
-    new_expr->m_infix = m_infix;
-    new_expr->m_postfix = m_postfix;
-    new_expr->m_pos0 = m_pos0;
-    new_expr->m_location = m_location;
-    return new_expr;
 }
 
 void Expr::lookup_symbols(bool touched) {
@@ -362,7 +376,7 @@ Expr::ValueResult Expr::check_eval() const {
                     }
                     symbol->set_in_eval(true);
                     {
-                        ValueResult sub_result = symbol->expr()->check_eval();
+                        ValueResult sub_result = symbol->expr().check_eval();
                         operands.push(sub_result);
                     }
                     symbol->set_in_eval(false);
@@ -754,7 +768,7 @@ Expr::ValueResult Expr::check_eval() const {
     }
 }
 
-bool Expr::eval_const(int& value) {
+bool Expr::eval_const(int& value) const {
     ValueResult r = check_eval();
     if (r.result == Result::Constant) {
         value = r.value;
@@ -765,7 +779,7 @@ bool Expr::eval_const(int& value) {
     }
 }
 
-bool Expr::eval_instr(Instr*& instr) {
+bool Expr::eval_instr(Instr*& instr) const {
     ValueResult r = check_eval();
     if (r.result == Result::Address && r.instr != nullptr) {
         instr = r.instr;
@@ -776,7 +790,7 @@ bool Expr::eval_instr(Instr*& instr) {
     }
 }
 
-bool Expr::eval(int& result, bool silent) {
+bool Expr::eval(int& result, bool silent) const {
     stack<int> eval_stack;
     result = 0;
     Symbol* symbol{ nullptr };
@@ -814,7 +828,7 @@ bool Expr::eval(int& result, bool silent) {
                 symbol->set_in_eval(true);
                 {
                     int sub_result = 0;
-                    if (!symbol->expr()->eval(sub_result, silent))
+                    if (!symbol->expr().eval(sub_result, silent))
                         return false;   // evaluation failed
                     eval_stack.push(sub_result);
                 }
@@ -855,7 +869,7 @@ bool Expr::eval(int& result, bool silent) {
     }
 }
 
-bool Expr::eval_local_jr_distance(int& distance) {
+bool Expr::eval_local_jr_distance(int& distance) const {
     ValueResult r = check_eval();
     if (r.result == Result::Address &&      // target must be address
         r.section == m_asmpc->parent()) {   // in the same section
@@ -870,7 +884,7 @@ bool Expr::eval_local_jr_distance(int& distance) {
 
 #ifdef UNIT_TESTS
 void Expr::test() {
-    Expr* e1 = new Expr;
+    Expr e1;
     Scanner in;
     int value;
     Instr* instr = nullptr;
@@ -882,14 +896,14 @@ void Expr::test() {
     assert(in.peek().is(Keyword::DEFB));
     in.next();
     assert(in.peek().is(TType::OPERATOR) && in.peek().operator_() == Operator::PLUS);
-    assert(e1->parse(in, true));
+    assert(e1.parse(in, true));
     assert(in.peek().is_end());
-    assert(e1->eval_const(value));
+    assert(e1.eval_const(value));
     assert(value == 1);
-    assert(e1->to_string() == "+1");
-    assert(e1->rpn_to_string() == "1 u+ ");
-    assert(e1->m_location.filename() == "");
-    assert(e1->m_location.line_num() == 0);
+    assert(e1.to_string() == "+1");
+    assert(e1.rpn_to_string() == "1 u+ ");
+    assert(e1.m_location.filename() == "");
+    assert(e1.m_location.line_num() == 0);
 
     // expression inside parens
     g_location->clear();
@@ -897,16 +911,16 @@ void Expr::test() {
     assert(in.peek().is(TType::LPAREN));
     in.next();
     assert(in.peek().is(TType::OPERATOR) && in.peek().operator_() == Operator::PLUS);
-    assert(e1->parse(in, true));
+    assert(e1.parse(in, true));
     assert(in.peek().is(TType::RPAREN));
     in.next();
     assert(in.peek().is_end());
-    assert(e1->eval_const(value));
+    assert(e1.eval_const(value));
     assert(value == 1);
-    assert(e1->to_string() == "+1");
-    assert(e1->rpn_to_string() == "1 u+ ");
-    assert(e1->m_location.filename() == "");
-    assert(e1->m_location.line_num() == 0);
+    assert(e1.to_string() == "+1");
+    assert(e1.rpn_to_string() == "1 u+ ");
+    assert(e1.m_location.filename() == "");
+    assert(e1.m_location.line_num() == 0);
 
     // expression inside parens
     g_location->clear();
@@ -914,115 +928,114 @@ void Expr::test() {
     assert(in.peek().is(TType::LPAREN));
     in.next();
     assert(in.peek().is(TType::OPERATOR) && in.peek().operator_() == Operator::PLUS);
-    assert(e1->parse(in, true));
+    assert(e1.parse(in, true));
     assert(in.peek().is(TType::RPAREN));
     in.next();
     assert(in.peek().is_end());
-    assert(e1->eval_const(value));
+    assert(e1.eval_const(value));
     assert(value == 4);
-    assert(e1->to_string() == "+1*(1+3)");
-    assert(e1->rpn_to_string() == "1 u+ 1 3 + * ");
-    assert(e1->m_location.filename() == "");
-    assert(e1->m_location.line_num() == 0);
+    assert(e1.to_string() == "+1*(1+3)");
+    assert(e1.rpn_to_string() == "1 u+ 1 3 + * ");
+    assert(e1.m_location.filename() == "");
+    assert(e1.m_location.line_num() == 0);
 
     // location
     g_location->set("test.asm", 10);
     in.scan(" 2 * 3 ");
-    assert(e1->parse(in, true));
+    assert(e1.parse(in, true));
     assert(in.peek().is_end());
-    assert(e1->eval_const(value));
+    assert(e1.eval_const(value));
     assert(value == 6);
-    assert(e1->to_string() == "2*3");
-    assert(e1->rpn_to_string() == "2 3 * ");
-    assert(e1->m_location.filename() == "test.asm");
-    assert(e1->m_location.line_num() == 10);
+    assert(e1.to_string() == "2*3");
+    assert(e1.rpn_to_string() == "2 3 * ");
+    assert(e1.m_location.filename() == "test.asm");
+    assert(e1.m_location.line_num() == 10);
 
     // clone
-    Expr* e2 = e1->clone();
-    assert(e2->to_string() == e1->to_string());
-    assert(e2->rpn_to_string() == e1->rpn_to_string());
-    assert(e2->m_location.filename() == e1->m_location.filename());
-    assert(e2->m_location.line_num() == e1->m_location.line_num());
-    assert(e2->eval_const(value));
+    Expr e2 = e1;
+    assert(e2.to_string() == e1.to_string());
+    assert(e2.rpn_to_string() == e1.rpn_to_string());
+    assert(e2.m_location.filename() == e1.m_location.filename());
+    assert(e2.m_location.line_num() == e1.m_location.line_num());
+    assert(e2.eval_const(value));
     assert(value == 6);
-    delete e2;
 
     // parse line
-    assert(e1->parse(" 4 + 5 "));
-    assert(e1->to_string() == "4+5");
-    assert(e1->rpn_to_string() == "4 5 + ");
-    assert(e1->eval_const(value));
+    assert(e1.parse(" 4 + 5 "));
+    assert(e1.to_string() == "4+5");
+    assert(e1.rpn_to_string() == "4 5 + ");
+    assert(e1.eval_const(value));
     assert(value == 9);
-    assert(e1->m_location.filename() == "test.asm");
-    assert(e1->m_location.line_num() == 10);
+    assert(e1.m_location.filename() == "test.asm");
+    assert(e1.m_location.line_num() == 10);
 
     // parse line with unary operator
-    assert(e1->parse(" 6 - 7 "));
-    assert(e1->to_string() == "6-7");
-    assert(e1->rpn_to_string() == "6 7 - ");
-    assert(e1->eval_const(value));
+    assert(e1.parse(" 6 - 7 "));
+    assert(e1.to_string() == "6-7");
+    assert(e1.rpn_to_string() == "6 7 - ");
+    assert(e1.eval_const(value));
     assert(value == -1);
-    assert(e1->m_location.filename() == "test.asm");
-    assert(e1->m_location.line_num() == 10);
+    assert(e1.m_location.filename() == "test.asm");
+    assert(e1.m_location.line_num() == 10);
 
     // parse line with unary operator at start
-    assert(e1->parse(" - 8 + 9 "));
-    assert(e1->to_string() == "-8+9");
-    assert(e1->rpn_to_string() == "8 u- 9 + ");
-    assert(e1->eval_const(value));
+    assert(e1.parse(" - 8 + 9 "));
+    assert(e1.to_string() == "-8+9");
+    assert(e1.rpn_to_string() == "8 u- 9 + ");
+    assert(e1.eval_const(value));
     assert(value == 1);
-    assert(e1->m_location.filename() == "test.asm");
-    assert(e1->m_location.line_num() == 10);
+    assert(e1.m_location.filename() == "test.asm");
+    assert(e1.m_location.line_num() == 10);
 
     // parse line with unary operator at end
-    assert(e1->parse(" 10 * - 11 "));
-    assert(e1->to_string() == "10*-11");
-    assert(e1->rpn_to_string() == "10 11 u- * ");
-    assert(e1->eval_const(value));
+    assert(e1.parse(" 10 * - 11 "));
+    assert(e1.to_string() == "10*-11");
+    assert(e1.rpn_to_string() == "10 11 u- * ");
+    assert(e1.eval_const(value));
     assert(value == -110);
-    assert(e1->m_location.filename() == "test.asm");
-    assert(e1->m_location.line_num() == 10);
+    assert(e1.m_location.filename() == "test.asm");
+    assert(e1.m_location.line_num() == 10);
 
-    assert(e1->parse(" 10 * + 11 "));
-    assert(e1->to_string() == "10*+11");
-    assert(e1->rpn_to_string() == "10 11 u+ * ");
-    assert(e1->eval_const(value));
+    assert(e1.parse(" 10 * + 11 "));
+    assert(e1.to_string() == "10*+11");
+    assert(e1.rpn_to_string() == "10 11 u+ * ");
+    assert(e1.eval_const(value));
     assert(value == 110);
-    assert(e1->m_location.filename() == "test.asm");
-    assert(e1->m_location.line_num() == 10);
+    assert(e1.m_location.filename() == "test.asm");
+    assert(e1.m_location.line_num() == 10);
 
     // check_eval
     g_assembler->clear();
-    assert(e1->parse("42"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("42"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 42);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
+    assert(e1.parse("xpto"));
     assert(!g_obj_module->symtab()->get_symbol("xpto"));
-    r = e1->check_eval();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    r = e1->check_eval();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
     g_assembler->clear();
-    e2 = new Expr();
-    assert(e2->parse("40+2"));
-    g_obj_module->add_equ("xpto", e2->clone());
-    delete e2;
+    e2.clear();
+    assert(e2.parse("40+2"));
+    g_obj_module->add_equ("xpto", e2);
+
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 42);
     assert(r.result == Result::Constant);
 
@@ -1030,9 +1043,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_label("xpto");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1042,12 +1055,12 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    g_obj_module->add_equ("x3", e1->clone());
-    assert(e1->parse("x3"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    g_obj_module->add_equ("x3", e1);
+    assert(e1.parse("x3"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 12);
     assert(r.result == Result::Computed);
 
@@ -1056,9 +1069,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1067,37 +1080,37 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
     g_assembler->clear();
-    assert(e1->parse("0**123456789"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0**123456789"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1**0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1**0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2**4"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2**4"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 16);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("+4"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("+4"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
@@ -1106,25 +1119,25 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("+$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("+$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
     g_assembler->clear();
-    assert(e1->parse("-4"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("-4"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == -4);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Undefined);
 
@@ -1133,18 +1146,18 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Undefined);
 
     g_assembler->clear();
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Computed);
 
@@ -1153,16 +1166,16 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Computed);
 
     g_assembler->clear();
-    assert(e1->parse("~123"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("~123"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == ~123);
     assert(r.result == Result::Constant);
 
@@ -1171,9 +1184,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0*$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0*$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
@@ -1182,9 +1195,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$*0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$*0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
@@ -1193,9 +1206,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("1*$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1*$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
@@ -1204,9 +1217,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$*1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
@@ -1215,9 +1228,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$*2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 16);
     assert(r.result == Result::Computed);
 
@@ -1226,9 +1239,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$/1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
@@ -1237,16 +1250,16 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$/2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Computed);
 
     g_assembler->clear();
-    assert(e1->parse("4/2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("4/2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 2);
     assert(r.result == Result::Constant);
 
@@ -1255,9 +1268,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Undefined);
 
@@ -1266,38 +1279,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
-    assert(r.value == 1);
-    assert(r.result == Result::Constant);
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
-    assert(r.value == 0);
-    assert(r.result == Result::Undefined);
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
-    assert(r.value == 0);
-    assert(r.result == Result::Constant);
-
-    g_assembler->clear();
-    assert(e1->parse("10%3"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
@@ -1306,9 +1290,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1317,9 +1301,38 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
+    assert(r.value == 0);
+    assert(r.result == Result::Constant);
+
+    g_assembler->clear();
+    assert(e1.parse("10%3"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
+    assert(r.value == 1);
+    assert(r.result == Result::Constant);
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
+    assert(r.value == 0);
+    assert(r.result == Result::Undefined);
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
@@ -1328,9 +1341,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1339,9 +1352,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 8);
     assert(r.result == Result::Address);
 
@@ -1351,9 +1364,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1363,9 +1376,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
@@ -1375,9 +1388,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
@@ -1390,9 +1403,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Computed);
 
@@ -1404,9 +1417,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
@@ -1416,16 +1429,16 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 12);
     assert(r.result == Result::Computed);
 
     g_assembler->clear();
-    assert(e1->parse("10+3"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("10+3"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 13);
     assert(r.result == Result::Constant);
 
@@ -1435,9 +1448,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x2-x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("x2-x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1447,9 +1460,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2-x1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("x2-x1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
@@ -1459,9 +1472,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1471,9 +1484,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
@@ -1483,9 +1496,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Undefined);
 
@@ -1495,356 +1508,356 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 4);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("10-3"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("10-3"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 7);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1<<4"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1<<4"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 16);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("16>>4"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("16>>4"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0<1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0<1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1<1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1<1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2<1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2<1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0<=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0<=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1<=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1<=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2<=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2<=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0>1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0>1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1>1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1>1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2>1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2>1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0>=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0>=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1>=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1>=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2>=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2>=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0==1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0==1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1==1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1==1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2==1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2==1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0!=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0!=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1!=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1!=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2!=1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2!=1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0<>1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0<>1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1<>1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1<>1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2<>1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2<>1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("-1&16"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("-1&16"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 16);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("2|8"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("2|8"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 10);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("10^15"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("10^15"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 5);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0&&0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0&&0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0&&1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0&&1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1&&0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1&&0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1&&1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1&&1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0||0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0||0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0||1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0||1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1||0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1||0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1||1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1||1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0^^0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0^^0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0^^1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0^^1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1^^0"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1^^0"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 1);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1^^1"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1^^1"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 0);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("0?1:2"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("0?1:2"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 2);
     assert(r.result == Result::Constant);
 
     g_assembler->clear();
-    assert(e1->parse("1?2:3"));
-    e1->lookup_symbols();
-    r = e1->check_eval();
+    assert(e1.parse("1?2:3"));
+    e1.lookup_symbols();
+    r = e1.check_eval();
     assert(r.value == 2);
     assert(r.result == Result::Constant);
 
     // eval_const
     g_assembler->clear();
-    assert(e1->parse("42"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("42"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 42);
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
+    assert(e1.parse("xpto"));
     assert(!g_obj_module->symtab()->get_symbol("xpto"));
-    assert(!e1->eval_const(value));
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(!e1->eval_const(value));
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    e2 = new Expr();
-    assert(e2->parse("40+2"));
-    g_obj_module->add_equ("xpto", e2->clone());
-    delete e2;
+    e2.clear();
+    assert(e2.parse("40+2"));
+    g_obj_module->add_equ("xpto", e2);
+
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 42);
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_label("xpto");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -1852,53 +1865,53 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    g_obj_module->add_equ("x3", e1->clone());
-    assert(e1->parse("x3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    g_obj_module->add_equ("x3", e1);
+    assert(e1.parse("x3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    assert(e1->parse("0**123456789"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0**123456789"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1**0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1**0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("2**4"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2**4"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 16);
 
     g_assembler->clear();
-    assert(e1->parse("+4"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("+4"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
@@ -1906,52 +1919,52 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("+$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("+$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    assert(e1->parse("-4"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("-4"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == -4);
 
     g_assembler->clear();
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    assert(e1->parse("~123"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("~123"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == ~123);
 
     g_assembler->clear();
@@ -1959,9 +1972,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0*$"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0*$"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
@@ -1969,9 +1982,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$*0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("$*0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
@@ -1979,50 +1992,50 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("1*$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("1*$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$*1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$*2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$/1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$/2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    assert(e1->parse("4/2"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("4/2"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 2);
 
     g_assembler->clear();
@@ -2030,18 +2043,18 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
@@ -2049,24 +2062,24 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("10%3"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("10%3"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
@@ -2074,36 +2087,36 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2111,9 +2124,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2121,9 +2134,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
@@ -2132,9 +2145,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
@@ -2146,9 +2159,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->set_cur_section("code");
@@ -2158,9 +2171,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
@@ -2169,14 +2182,14 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
-    assert(e1->parse("10+3"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("10+3"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 13);
 
     g_assembler->clear();
@@ -2185,9 +2198,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x2-x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("x2-x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2195,9 +2208,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2-x1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("x2-x1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
@@ -2206,9 +2219,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2216,9 +2229,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
@@ -2227,9 +2240,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    assert(!e1->eval_const(value));
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    assert(!e1.eval_const(value));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2237,309 +2250,309 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 4);
 
     g_assembler->clear();
-    assert(e1->parse("10-3"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("10-3"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 7);
 
     g_assembler->clear();
-    assert(e1->parse("1<<4"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1<<4"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 16);
 
     g_assembler->clear();
-    assert(e1->parse("16>>4"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("16>>4"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("0<1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0<1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1<1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1<1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("2<1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2<1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0<=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0<=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1<=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1<=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("2<=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2<=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0>1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0>1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1>1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1>1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("2>1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2>1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("0>=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0>=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1>=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1>=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("2>=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2>=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("0=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("2=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0==1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0==1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1==1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1==1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("2==1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2==1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0!=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0!=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1!=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1!=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("2!=1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2!=1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("0<>1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0<>1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1<>1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1<>1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("2<>1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2<>1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("-1&16"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("-1&16"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 16);
 
     g_assembler->clear();
-    assert(e1->parse("2|8"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("2|8"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 10);
 
     g_assembler->clear();
-    assert(e1->parse("10^15"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("10^15"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 5);
 
     g_assembler->clear();
-    assert(e1->parse("0&&0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0&&0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0&&1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0&&1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1&&0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1&&0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("1&&1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1&&1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("0||0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0||0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0||1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0||1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1||0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1||0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1||1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1||1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("0^^0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0^^0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0^^1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0^^1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1^^0"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1^^0"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 1);
 
     g_assembler->clear();
-    assert(e1->parse("1^^1"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1^^1"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0?1:2"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("0?1:2"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 2);
 
     g_assembler->clear();
-    assert(e1->parse("1?2:3"));
-    e1->lookup_symbols();
-    assert(e1->eval_const(value));
+    assert(e1.parse("1?2:3"));
+    e1.lookup_symbols();
+    assert(e1.eval_const(value));
     assert(value == 2);
 
     // eval_instr
     g_assembler->clear();
-    assert(e1->parse("42"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("42"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
+    assert(e1.parse("xpto"));
     assert(!g_obj_module->symtab()->get_symbol("xpto"));
-    assert(!e1->eval_instr(instr));
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(!e1->eval_instr(instr));
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    e2 = new Expr();
-    assert(e2->parse("40+2"));
-    g_obj_module->add_equ("xpto", e2->clone());
-    delete e2;
+    e2.clear();
+    assert(e2.parse("40+2"));
+    g_obj_module->add_equ("xpto", e2);
+    
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_label("xpto");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2547,30 +2560,30 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    g_obj_module->add_equ("x3", e1->clone());
-    assert(e1->parse("x3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    g_obj_module->add_equ("x3", e1);
+    assert(e1.parse("x3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2578,9 +2591,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2588,9 +2601,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2598,9 +2611,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2608,109 +2621,109 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("1?$:0"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("1?$:0"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
-    assert(e1->parse("0**123456789"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0**123456789"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1**0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1**0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2**4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2**4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("+4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("+4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
-    assert(e1->parse("-4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("-4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    assert(e1->parse("~123"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0*$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$*0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("1*$"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    assert(e1.parse("~123"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("0*$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("$*0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("1*$"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2718,9 +2731,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*1"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("$*1"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2728,18 +2741,18 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$*2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/1"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("$/1"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2747,73 +2760,73 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$/2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("4/2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("4/2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
-
-    g_assembler->clear();
-    assert(e1->parse("10%3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    assert(e1.parse("10%3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2821,18 +2834,18 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->cur_section()->asmpc());
 
     g_assembler->clear();
@@ -2841,9 +2854,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2851,9 +2864,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("x1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2861,9 +2874,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2871,9 +2884,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2881,9 +2894,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("x1"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->symtab()->get_symbol("x1")->instr());
 
     g_assembler->clear();
@@ -2892,9 +2905,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_instr(instr));
+    assert(e1.parse("x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_instr(instr));
     assert(instr == g_obj_module->symtab()->get_symbol("x2")->instr());
 
     g_assembler->clear();
@@ -2903,9 +2916,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->set_cur_section("code");
@@ -2916,9 +2929,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->set_cur_section("code");
@@ -2928,9 +2941,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2938,14 +2951,14 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("10+3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("10+3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2953,9 +2966,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x2-x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("x2-x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2963,9 +2976,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2-x1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("x2-x1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2973,9 +2986,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2983,9 +2996,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -2993,9 +3006,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3003,273 +3016,273 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("10-3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("10-3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1<<4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1<<4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("16>>4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("16>>4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0<1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0<1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1<1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1<1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2<1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2<1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0<=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0<=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1<=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1<=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2<=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2<=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0>=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0>=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1>=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1>=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2>=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2>=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0==1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0==1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1==1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1==1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2==1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2==1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0!=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0!=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1!=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1!=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2!=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2!=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0<>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0<>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1<>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1<>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2<>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2<>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("-1&16"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("-1&16"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("2|8"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("2|8"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("10^15"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("10^15"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0&&0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0&&0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0&&1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0&&1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1&&0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1&&0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1&&1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1&&1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0||0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0||0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0||1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0||1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1||0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1||0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1||1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1||1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0^^0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0^^0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0^^1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0^^1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1^^0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1^^0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1^^1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1^^1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("0?1:2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("0?1:2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     g_assembler->clear();
-    assert(e1->parse("1?2:3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_instr(instr));
+    assert(e1.parse("1?2:3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_instr(instr));
 
     // eval_local_jr_distance
     int distance = 0;
     g_assembler->clear();
-    assert(e1->parse("42"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("42"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
+    assert(e1.parse("xpto"));
     assert(!g_obj_module->symtab()->get_symbol("xpto"));
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    e2 = new Expr();
-    assert(e2->parse("40+2"));
-    g_obj_module->add_equ("xpto", e2->clone());
-    delete e2;
+    e2.clear();
+    assert(e2.parse("40+2"));
+    g_obj_module->add_equ("xpto", e2);
+    
     assert(g_obj_module->symtab()->get_symbol("xpto"));
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_label("xpto");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_label("xpto");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("xpto"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("xpto"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3278,30 +3291,30 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    g_obj_module->add_equ("x3", e1->clone());
-    assert(e1->parse("x3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    g_obj_module->add_equ("x3", e1);
+    assert(e1.parse("x3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3309,9 +3322,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3319,9 +3332,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3329,9 +3342,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3339,109 +3352,109 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("1?$:0"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1?$:0"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
-    assert(e1->parse("0**123456789"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0**123456789"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1**0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1**0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2**4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2**4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("+4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("+4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
-    assert(e1->parse("-4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("-4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("!$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    assert(e1->parse("~123"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0*$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$*0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("1*$"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("!$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    assert(e1.parse("~123"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("0*$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("$*0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("1*$"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3449,9 +3462,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*1"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$*1"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3459,18 +3472,18 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$*2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$*2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/1"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$/1"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3478,73 +3491,73 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$/2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("4/2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    g_obj_module->add_opcode_void(0x01020304);
-    g_obj_module->add_opcode_void(0x05060708);
-    g_obj_module->cur_section()->add_instr();
-    g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$/$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("4/2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$%$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
-
-    g_assembler->clear();
-    assert(e1->parse("10%3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$/$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0+$"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$%$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    assert(e1.parse("10%3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS1);
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
+
+    g_assembler->clear();
+    g_obj_module->add_opcode_void(0x01020304);
+    g_obj_module->add_opcode_void(0x05060708);
+    g_obj_module->cur_section()->add_instr();
+    g_assembler->set_pass(Assembler::Pass::PASS2);
+    assert(e1.parse("0+$"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3552,18 +3565,18 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->cur_section()->add_instr();
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("$+0"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("$+0"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3572,9 +3585,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3582,9 +3595,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3592,9 +3605,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3602,9 +3615,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3612,9 +3625,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x1"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == -4);
 
     g_assembler->clear();
@@ -3623,9 +3636,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
 
     g_assembler->clear();
@@ -3634,9 +3647,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->set_cur_section("code");
@@ -3647,9 +3660,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->set_cur_section("code");
@@ -3659,9 +3672,9 @@ void Expr::test() {
     g_obj_module->add_label("x2");
     g_obj_module->set_cur_section("");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0-x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3669,14 +3682,14 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x1+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x1+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("10+3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("10+3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3684,9 +3697,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("x2-x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x2-x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3694,9 +3707,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2-x1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x2-x1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3704,9 +3717,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3714,9 +3727,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("(0-x1)+x2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("(0-x1)+x2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3724,9 +3737,9 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS1);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->add_opcode_void(0x01020304);
@@ -3734,229 +3747,229 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x05060708);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("0-x1+(x2-0)"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0-x1+(x2-0)"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("10-3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("10-3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1<<4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1<<4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("16>>4"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("16>>4"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0<1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0<1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1<1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1<1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2<1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2<1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0<=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0<=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1<=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1<=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2<=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2<=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0>=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0>=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1>=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1>=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2>=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2>=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0==1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0==1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1==1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1==1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2==1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2==1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0!=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0!=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1!=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1!=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2!=1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2!=1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0<>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0<>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1<>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1<>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2<>1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2<>1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("-1&16"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("-1&16"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("2|8"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("2|8"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("10^15"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("10^15"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0&&0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0&&0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0&&1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0&&1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1&&0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1&&0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1&&1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1&&1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0||0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0||0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0||1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0||1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1||0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1||0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1||1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1||1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0^^0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0^^0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0^^1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0^^1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1^^0"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1^^0"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1^^1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1^^1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("0?1:2"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("0?1:2"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
-    assert(e1->parse("1?2:3"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("1?2:3"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
     g_assembler->clear();
     g_obj_module->set_cur_section("code");
@@ -3966,15 +3979,14 @@ void Expr::test() {
     g_obj_module->add_opcode_void(0x01020304);
     g_obj_module->add_label("x2");
     g_assembler->set_pass(Assembler::Pass::PASS2);
-    assert(e1->parse("x2"));
-    e1->lookup_symbols();
-    assert(e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x2"));
+    e1.lookup_symbols();
+    assert(e1.eval_local_jr_distance(distance));
     assert(distance == 0);
-    assert(e1->parse("x1"));
-    e1->lookup_symbols();
-    assert(!e1->eval_local_jr_distance(distance));
+    assert(e1.parse("x1"));
+    e1.lookup_symbols();
+    assert(!e1.eval_local_jr_distance(distance));
 
-    delete e1;
     cout << "Expr tests passed." << endl;
 }
 #endif
