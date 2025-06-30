@@ -52,6 +52,9 @@ static char       **temp_files = NULL;
 static char         tmpnambuf[] = "apmXXXX";
 #endif
 
+static int          num_remove_files = 0;
+static char       **remove_files = NULL;     // files scheduled for deletion on exit similar to temp_files
+static void         delete_scheduled_files(void);
 
 int main(int argc, char *argv[])
 {
@@ -89,6 +92,7 @@ int main(int argc, char *argv[])
     }
 
     atexit(cleanup_temporary_files);
+/*  atexit(delete_scheduled_files);    // choose to delete files only on successful completion  */
 
     /* So, let's check for + style execution */
     av = calloc(argc,sizeof(char*));
@@ -113,6 +117,8 @@ int main(int argc, char *argv[])
         main_usage();
     }
     execute_command(target, ac, av, 2);
+
+    delete_scheduled_files();
     exit(0);
 }
 
@@ -1125,13 +1131,37 @@ static void get_temporary_filename(char *filen)
 }
 
 
-
 static void  cleanup_temporary_files(void)
 {
     int   i;
 
     for ( i = 0; i < num_temp_files; i++ ) {
          remove(temp_files[i]);
+    }
+}
+
+
+// Issue #2756 schedule files for deletion on appmake exit
+// Kept separate from temporary files list in case these files should not be deleted on error exit
+
+void schedule_for_deletion(char* fname)
+{
+    char** temp_remove_files;
+
+    if ((temp_remove_files = realloc(remove_files, (num_remove_files + 1) * sizeof(remove_files[0]))) == NULL)
+        exit_log(1, "Out of Memory");
+
+    remove_files = temp_remove_files;
+    remove_files[num_remove_files++] = must_strdup(fname);
+}
+
+
+static void delete_scheduled_files(void)
+{
+    int i;
+
+    for (i = 0; i < num_remove_files; ++i) {
+        remove(remove_files[i]);
     }
 }
 
@@ -1396,7 +1426,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 
             for (i = 0; i < mb->num; ++i)
             {
-                if (clean) remove(mb->secbin[i].filename);
+                if (clean) schedule_for_deletion(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }
@@ -1422,7 +1452,7 @@ void mb_remove_mainbank(struct memory_bank *mb, int clean)
         struct section_bin *sb = &mb->secbin[i];
 
         if (clean)
-            remove(sb->filename);
+            schedule_for_deletion(sb->filename);
 
         free(sb->filename);
         free(sb->section_name);
@@ -1498,7 +1528,7 @@ int mb_remove_section(struct banked_memory *memory, char *section_name, int clea
         // section has been found
         // free allocated memory, remove it from the section array
 
-        if (clean) remove(mb->secbin[secnum].filename);
+        if (clean) schedule_for_deletion(mb->secbin[secnum].filename);
 
         free(mb->secbin[secnum].filename);
         free(mb->secbin[secnum].section_name);
@@ -1898,7 +1928,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
     // remove main bank binaries
 
     for (i = 0; i < memory->mainbank.num; ++i)
-        remove(memory->mainbank.secbin[i].filename);
+        schedule_for_deletion(memory->mainbank.secbin[i].filename);
 
     // remove binaries from all bank spaces
 
@@ -1909,7 +1939,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
             struct memory_bank *mb = &memory->bankspace[i].membank[j];
 
             for (k = 0; k < mb->num; ++k)
-                remove(mb->secbin[k].filename);
+                schedule_for_deletion(mb->secbin[k].filename);
         }
     }
 }

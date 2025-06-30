@@ -739,6 +739,12 @@ extern uint32_t     num2bcd(uint32_t num);
 #define vsnprintf _vsnprintf
 #endif
 
+
+/* scheduled file deletion */
+
+extern void schedule_for_deletion(char* fname);   // fname is strduped
+
+
 /* memory banks */
 
 #define MAXBANKS  256     // maximum number of memory banks
