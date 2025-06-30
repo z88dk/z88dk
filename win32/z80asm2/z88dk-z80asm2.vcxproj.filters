@@ -89,6 +89,9 @@
     <None Include="..\..\src\z80asm\z80asm2\Makefile">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\src\z80asm\z80asm2\directives_z88.y">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h">

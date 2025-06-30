@@ -34,6 +34,8 @@ TARGET 		= $(BINDIR)/$(PROJ)$(EXESUFFIX)
 SRCS		= $(wildcard *.cpp)
 OBJS		= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
 
+GRAMMAR		= $(filter-out $(PROJ).y, $(wildcard *.y))
+
 TEMPLATE_C	=                                                       ../../common/z80asm_defs.c ../../common/objfile.c
 TEMPLATE_CPP= token.cpp operator.cpp obj_module.cpp line_parser.cpp                                                   cpu.cpp symbol.cpp
 TEMPLATE_H	= token.h   operator.h   obj_module.h   line_parser.h   ../../common/z80asm_defs.h ../../common/objfile.h cpu.h   symbol.h
@@ -84,8 +86,8 @@ $(PROJ).pp: $(TEMPLATE_C) $(TEMPLATE_CPP) $(TEMPLATE_H) $(PROJ).y mkparser.pl Ma
 	perl mkparser.pl $(PROJ).y $(TEMPLATE_C) $(TEMPLATE_CPP) $(TEMPLATE_H)
 	touch $(PROJ).pp
 
-$(PROJ).y: directives.y opcodes.y
-	cat directives.y opcodes.y > $(PROJ).y
+$(PROJ).y: $(GRAMMAR) Makefile
+	cat $(GRAMMAR) > $(PROJ).y
 	dos2unix $(PROJ).y
 
 test: all_builds

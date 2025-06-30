@@ -61,6 +61,7 @@ enum class Keyword {
     B,
     BINARY,
     C,
+    CALL_OZ,
     C_LINE,
     DEFB,
     DEFC,

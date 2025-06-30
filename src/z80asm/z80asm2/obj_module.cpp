@@ -181,6 +181,11 @@ bool Instr::empty() const {
     return m_bytes.empty() && m_patches.empty();
 }
 
+void Instr::add_word(uint16_t word) {
+    add_byte(word & 0xFF);
+    add_byte((word >> 8) & 0xFF);
+}
+
 void Instr::patch_byte(int index, uint8_t byte) {
     assert(index >= 0 && index < static_cast<int>(m_bytes.size()) && "Index out of bounds");
     m_bytes[index] = byte;
@@ -443,7 +448,6 @@ void Section::include_binary(const string& filename) {
     instr->include_binary(filename);
 }
 
-
 void Section::expand_jrs() {
     bool did_expand;
     do {
@@ -682,6 +686,25 @@ void ObjModule::set_assume(int value) {
 
 void ObjModule::include_binary(const string& filename) {
     cur_section()->include_binary(filename);
+}
+
+void ObjModule::call_oz(int value) {
+    if (g_options->arch() != Arch::Z88)
+        g_error->error_illegal_opcode();
+    else {
+        if (value > 0 && value <= 255) {
+            auto instr = cur_section()->add_instr();
+            instr->add_opcode(Z80_RST(0x20));
+            instr->add_byte(value);
+        }
+        else if (value > 255) {
+            auto instr = cur_section()->add_instr();
+            instr->add_opcode(Z80_RST(0x20));
+            instr->add_word(value);
+        }
+        else
+            g_error->error_int_range(int_to_hex(value, 4));
+    }
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

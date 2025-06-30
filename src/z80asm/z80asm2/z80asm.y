@@ -57,6 +57,22 @@ IDENT ":"
 
 IDENT "equ" EXPR
 	g_obj_module->add_equ($1.token.svalue(), $3.expr->clone());
+//-----------------------------------------------------------------------------
+// z80asm
+// Recognized grammar - z88 architecture
+// Copyright (C) Paulo Custodio, 2011-2024
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+"call_oz" CONST_EXPR
+    g_obj_module->call_oz($2.const_value);
+//-----------------------------------------------------------------------------
+// z80asm
+// Recognized grammar - CPU opcodes
+// Copyright (C) Paulo Custodio, 2011-2024
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
 "nop"
 	g_obj_module->add_opcode_void(0x00);
 

@@ -1,0 +1,61 @@
+CALL_OZ ok
+LINE 1 "test_t_call_oz.asm"
+call_oz 1
+call_oz 255
+call_oz 256
+call_oz 65535
+% z80asm -v +z88 test_t_call_oz.asm
+assemble test_t_call_oz.asm to test_t_call_oz.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+define __ARCH_Z88__ = 1
+assembled test_t_call_oz.asm to test_t_call_oz.o
+
+Object  file test_t_call_oz.o at $0000: Z80RMF18
+  Name: test_t_call_oz
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: E7 01 E7 FF E7 00 01 E7 FF FF
+
+
+CALL_OZ illegal
+LINE 1 "test_t_call_oz.asm"
+call_oz 1
+call_oz 255
+call_oz 256
+call_oz 65535
+% z80asm -v test_t_call_oz.asm
+assemble test_t_call_oz.asm to test_t_call_oz.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_call_oz.asm:1: error: illegal opcode
+  ^---- 		call_oz 1
+    ^---- call_oz 1
+test_t_call_oz.asm:2: error: illegal opcode
+  ^---- 		call_oz 255
+    ^---- call_oz 255
+test_t_call_oz.asm:3: error: illegal opcode
+  ^---- 		call_oz 256
+    ^---- call_oz 256
+test_t_call_oz.asm:4: error: illegal opcode
+  ^---- 		call_oz 65535
+    ^---- call_oz 65535
+error: assembly failed for file: test_t_call_oz.asm
+
+
+
+CALL_OZ range
+LINE 1 "test_t_call_oz.asm"
+call_oz 0
+% z80asm -v +z88 test_t_call_oz.asm
+assemble test_t_call_oz.asm to test_t_call_oz.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+define __ARCH_Z88__ = 1
+test_t_call_oz.asm:1: error: integer out of range: 0
+  ^---- 		call_oz 0
+    ^---- call_oz 0
+error: assembly failed for file: test_t_call_oz.asm
+
+
+
