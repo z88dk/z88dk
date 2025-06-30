@@ -76,6 +76,16 @@
 "dword" EXPR_LIST
     g_obj_module->add_dword_list($2.exprs);
 
+"defc" ASSIGN_LIST
+    for (auto& ne_pair : $2.ident_expr_list) {
+		g_obj_module->add_equ(ne_pair.name, ne_pair.expr);
+	}
+
+"dc" ASSIGN_LIST
+    for (auto& ne_pair : $2.ident_expr_list) {
+		g_obj_module->add_equ(ne_pair.name, ne_pair.expr);
+	}
+
 "extern" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_extern(ident);
@@ -104,7 +114,7 @@ IDENT ":"
 	g_obj_module->add_label($1.token.svalue());
 
 IDENT "equ" EXPR
-	g_obj_module->add_equ($1.token.svalue(), $3.expr->clone());
+	g_obj_module->add_equ($1.token.svalue(), $3.expr);
 //-----------------------------------------------------------------------------
 // z80asm
 // Recognized grammar - z80n architecture
@@ -146,31 +156,31 @@ IDENT "equ" EXPR
 	g_obj_module->add_opcode_void(0x00);
 
 "jr" EXPR
-	g_obj_module->add_opcode_jr(0x18, $2.expr->clone());
+	g_obj_module->add_opcode_jr(0x18, $2.expr);
 
 "jr" "nz" "," EXPR
-	g_obj_module->add_opcode_jr(0x20, $4.expr->clone());
+	g_obj_module->add_opcode_jr(0x20, $4.expr);
 
 "jr" "z" "," EXPR
-	g_obj_module->add_opcode_jr(0x28, $4.expr->clone());
+	g_obj_module->add_opcode_jr(0x28, $4.expr);
 
 "jr" "nc" "," EXPR
-	g_obj_module->add_opcode_jr(0x30, $4.expr->clone());
+	g_obj_module->add_opcode_jr(0x30, $4.expr);
 
 "jr" "c" "," EXPR
-	g_obj_module->add_opcode_jr(0x38, $4.expr->clone());
+	g_obj_module->add_opcode_jr(0x38, $4.expr);
 
 "ld" "a" "," EXPR
-	g_obj_module->add_opcode_n(0x3E, $4.expr->clone());
+	g_obj_module->add_opcode_n(0x3E, $4.expr);
 
 "ld" "b" "," EXPR
-	g_obj_module->add_opcode_n(0x06, $4.expr->clone());
+	g_obj_module->add_opcode_n(0x06, $4.expr);
 
 "ld" "c" "," EXPR
-	g_obj_module->add_opcode_n(0x0E, $4.expr->clone());
+	g_obj_module->add_opcode_n(0x0E, $4.expr);
 
 "ld" "a" "," "(" EXPR ")"
-	g_obj_module->add_opcode_nn(0x3A, $4.expr->clone());
+	g_obj_module->add_opcode_nn(0x3A, $4.expr);
 
 "ld" "a" "," "a"
 	g_obj_module->add_opcode_void(0x7F);
@@ -179,11 +189,11 @@ IDENT "equ" EXPR
 	g_obj_module->add_opcode_void(0x78);
 
 "ld" "ix" "," EXPR
-	g_obj_module->add_opcode_nn(0xDD21, $4.expr->clone());
+	g_obj_module->add_opcode_nn(0xDD21, $4.expr);
 
 "ld" "iy" "," EXPR
-	g_obj_module->add_opcode_nn(0xFD21, $4.expr->clone());
+	g_obj_module->add_opcode_nn(0xFD21, $4.expr);
 
 "jp" EXPR
-	g_obj_module->add_opcode_nn(0xC3, $2.expr->clone());
+	g_obj_module->add_opcode_nn(0xC3, $2.expr);
 

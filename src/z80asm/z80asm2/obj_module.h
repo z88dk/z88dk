@@ -8,6 +8,7 @@
 #pragma once
 
 #include "cpu.h"
+#include "expr.h"
 #include "location.h"
 #include "memmap.h"
 #include "symbol.h"
@@ -46,31 +47,31 @@ enum class PatchType {
 
 class Patch {
 public:
-    Patch(Instr* parent, PatchType patch_type, Expr* expr, int offset);
-    Patch(const Patch& other) = delete;
+    Patch(Instr* parent, PatchType patch_type, const Expr& expr, int offset);
+    Patch(const Patch& other);
     virtual ~Patch();
-    Patch& operator=(const Patch& other) = delete;
+    Patch& operator=(const Patch& other);
 
     Instr* parent() const { return m_parent; }
 
     PatchType patch_type() const { return m_patch_type; }
     void set_patch_type(PatchType patch_type) { m_patch_type = patch_type; }
 
-    Expr* expr() { return m_expr; }
+    const Expr& expr() const { return m_expr; }
 
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
 
-    const string& target_name() { return m_target_name; }
+    const string& target_name() const { return m_target_name; }
     void set_target_name(const string& name) { m_target_name = name; }
 
     int size() const;
-    void resolve(int value);
+    void resolve(int value) const;
 
 private:
     Instr* m_parent{ nullptr };
     PatchType m_patch_type;
-    Expr* m_expr;
+    Expr m_expr;
     int m_offset;
     string m_target_name;
 };
@@ -81,7 +82,7 @@ class Instr {
 public:
     Instr(Section* parent);
     Instr(const Instr& other) = delete;
-    virtual ~Instr();
+    virtual ~Instr() = default;
     Instr& operator=(const Instr& other) = delete;
 
     bool empty() const;
@@ -89,9 +90,10 @@ public:
     Section* parent() const { return m_parent; }
     int offset() const { return m_offset; }
     void set_offset(int offset) { m_offset = offset; }
-    uint8_t* data() { return m_bytes.data(); }
+    const vector<uint8_t>& bytes() const { return m_bytes; }
+    const uint8_t* data() const { return m_bytes.data(); }
     int size() const { return static_cast<int>(m_bytes.size()); }
-    vector<Patch*>& patches() { return m_patches; }
+    const vector<Patch>& patches() const { return m_patches; }
     const Location& location() const { return m_location; }
     void set_location(const Location& location) { m_location = location; }
 
@@ -100,7 +102,7 @@ public:
     void add_word_be(uint16_t word);
     void patch_byte(int index, uint8_t byte);
     void add_opcode(long long opcode);
-    void add_patch(Patch* patch);
+    void add_patch(const Patch& patch);
     void include_binary(const string& filename);
     void expand_jr();
     void resolve_local_exprs();
@@ -109,10 +111,10 @@ private:
     Section* m_parent{ nullptr };
     int m_offset{ 0 };
     vector<uint8_t> m_bytes;
-    vector<Patch*> m_patches;
+    vector<Patch> m_patches;
     Location m_location;
 
-    bool resolve_local_jrs(Patch* patch);
+    bool resolve_local_jrs(const Patch& patch);
 };
 
 // Section
@@ -208,7 +210,7 @@ public:
 
     void add_global_def(const string& name, int value = 1);
     void add_label(const string& name);
-    void add_equ(const string& name, Expr* expr);
+    void add_equ(const string& name, const Expr& expr);
     void declare_extern(const string& name);
     void declare_public(const string& name);
     void declare_global(const string& name);
@@ -226,16 +228,16 @@ public:
     void cu_move(int reg, int val);
     void cu_stop();
     void cu_nop();
-    void add_byte_list(const vector<Expr*>& exprs);
-    void add_word_list(const vector<Expr*>& exprs);
-    void add_word_be_list(const vector<Expr*>& exprs);
-    void add_ptr_list(const vector<Expr*>& exprs);
-    void add_dword_list(const vector<Expr*>& exprs);
+    void add_byte_list(const vector<Expr>& exprs);
+    void add_word_list(const vector<Expr>& exprs);
+    void add_word_be_list(const vector<Expr>& exprs);
+    void add_ptr_list(const vector<Expr>& exprs);
+    void add_dword_list(const vector<Expr>& exprs);
 
     void add_opcode_void(long long opcode);
-    void add_opcode_jr(long long opcode, Expr* expr);
-    void add_opcode_n(long long opcode, Expr* expr);
-    void add_opcode_nn(long long opcode, Expr* expr);
+    void add_opcode_jr(long long opcode, const Expr& expr);
+    void add_opcode_n(long long opcode, const Expr& expr);
+    void add_opcode_nn(long long opcode, const Expr& expr);
 
     bool write_file(const string& filename) const;
 

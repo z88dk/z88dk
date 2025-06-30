@@ -18,6 +18,7 @@ enum class TType {
     //@@BEGIN: ttype
     END,
     ASMPC,
+    ASSIGN_LIST,
     BACKSLASH,
     BYTE_LIST,
     COLON,
@@ -69,6 +70,7 @@ enum class Keyword {
     CU,
     C_LINE,
     DB,
+    DC,
     DDB,
     DEFB,
     DEFC,

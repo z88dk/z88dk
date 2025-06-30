@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "expr.h"
 #include "scanner.h"
 #include "token.h"
 #include <string>
@@ -25,29 +26,99 @@ private:
         int value{ 0 };
     };
 
+    struct NameExprPair {
+        string name;
+        Expr expr;
+
+        NameExprPair() = default;
+
+        NameExprPair(const NameExprPair& other) {
+            name = other.name;
+            expr = other.expr;
+        }
+
+        NameExprPair& operator=(const NameExprPair& other) {
+            if (&other != this) {
+                name = other.name;
+                expr = other.expr;
+            }
+            return *this;
+        }
+
+        virtual ~NameExprPair() {
+        }
+        
+    };
+
     struct Elem {
         Token token;
-        Expr* expr{ nullptr };
+        Expr expr;
         bool const_expr{ false };
         bool const_expr_if{ false };
         int const_value{ 0 };
         vector<string> ident_list;
         vector<NameValuePair> ident_value_list;
-        vector<Expr*> exprs;
+        vector<NameExprPair> ident_expr_list;
+        vector<Expr> exprs;
 
         Elem() = default;
-        Elem(const Elem& other);
-        Elem& operator=(const Elem& other);
-        virtual ~Elem();
+
+        Elem(const Elem& other)
+            : token(other.token)
+            , expr(other.expr)
+            , const_expr(other.const_expr)
+            , const_expr_if(other.const_expr_if)
+            , const_value(other.const_value)
+            , ident_list(other.ident_list)
+            , ident_value_list(other.ident_value_list)
+            , ident_expr_list(other.ident_expr_list)
+            , exprs(other.exprs) {
+        }
+
+        Elem& operator=(const Elem& other) {
+            if (&other != this) {
+                token = other.token;
+                expr = other.expr;
+                const_expr = other.const_expr;
+                const_expr_if = other.const_expr_if;
+                const_value = other.const_value;
+                ident_list = other.ident_list;
+                ident_value_list = other.ident_value_list;
+                ident_expr_list = other.ident_expr_list;
+                exprs = other.exprs;
+            }
+            return *this;
+        }
+
+        virtual ~Elem() {
+        }
     };
 
     struct Elems {
         vector<Elem> elems;
 
-        Elems();
-        Elems(const Elems& other);
-        Elems& operator=(const Elems& other);
-        virtual ~Elems();
+        Elems() = default;
+
+        Elems(const Elems& other) {
+            for (auto& elem : other.elems) {
+                elems.push_back(elem);
+            }
+        }
+
+        Elems& operator=(const Elems& other) {
+            if (&other != this) {
+                elems.clear();
+                for (auto& elem : other.elems) {
+                    elems.push_back(elem);
+                }
+            }
+            return *this;
+        }
+
+        virtual ~Elems() {
+            elems.clear();
+        }
+
         auto begin() { return elems.begin(); }
         auto end() { return elems.end(); }
         auto cbegin() const { return elems.cbegin(); }
@@ -68,9 +139,11 @@ private:
     bool collect_optional_const_assignment(int& value);
     bool collect_ident_list(vector<string>& names);
     bool collect_const_assign_list(vector<NameValuePair>& nv_list);
-    bool collect_byte_or_string(vector<Expr*>& exprs);
-    bool collect_byte_list(vector<Expr*>& exprs);
-    bool collect_expr_list(vector<Expr*>& exprs);
+    bool collect_byte_or_string(vector<Expr>& exprs);
+    bool collect_byte_list(vector<Expr>& exprs);
+    bool collect_expr_list(vector<Expr>& exprs);
+    bool collect_assign(vector<NameExprPair>& ne_list);
+    bool collect_assign_list(vector<NameExprPair>& ne_list);
 
     //@@BEGIN:actions_decl
     void action_align_const_expr_comma_const_expr();
@@ -96,6 +169,8 @@ private:
     void action_defq_expr_list();
     void action_dq_expr_list();
     void action_dword_expr_list();
+    void action_defc_assign_list();
+    void action_dc_assign_list();
     void action_extern_ident_list();
     void action_global_ident_list();
     void action_incbin_raw_str();

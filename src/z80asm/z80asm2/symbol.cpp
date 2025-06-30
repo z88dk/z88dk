@@ -32,8 +32,7 @@ void Symbol::clear() {
     m_is_global_def = false;
     m_value = 0;
     m_instr = nullptr;
-    delete m_expr;
-    m_expr = nullptr;
+    m_expr.clear();
     m_in_eval = false;
     m_touched = false;
 }
@@ -50,7 +49,7 @@ int Symbol::value() const {
     case SymType::ADDRESS:
         return m_instr->offset();
     case SymType::COMPUTED:
-        ok = m_expr->eval_const(value);
+        ok = m_expr.eval_const(value);
         assert(ok && "expected a constant expression");
         return value;
     default:
@@ -65,15 +64,14 @@ void Symbol::set_global_def(int value) {
     m_is_global_def = true;
 }
 
-void Symbol::set_global_def(Expr* expr) {
+void Symbol::set_global_def(const Expr& expr) {
     int value = 0;
-    if (expr->eval_const(value)) {
+    if (expr.eval_const(value)) {
         set_global_def(value);
     }
     else {
         g_error->error_constant_expression_expected();
     }
-    delete expr;
 }
 
 void Symbol::set_constant(int value) {
@@ -81,15 +79,14 @@ void Symbol::set_constant(int value) {
     m_value = value;
 }
 
-void Symbol::set_constant(Expr* expr) {
+void Symbol::set_constant(const Expr& expr) {
     int value = 0;
-    if (expr->eval_const(value)) {
+    if (expr.eval_const(value)) {
         set_constant(value);
     }
     else {
         g_error->error_constant_expression_expected();
     }
-    delete expr;
 }
 
 void Symbol::set_instr(Instr* instr) {
@@ -97,20 +94,23 @@ void Symbol::set_instr(Instr* instr) {
     m_instr = instr;
 }
 
-void Symbol::set_expr(Expr* expr) {
+bool Symbol::set_expr(const Expr& expr) {
     int value = 0;
     Instr* instr = nullptr;
 
-    if (expr->eval_const(value)) {
+    if (expr.eval_const(value)) {
         set_constant(value);
-        delete expr;
+        return true;
     }
-    else if (expr->eval_instr(instr)) {
+    else if (expr.eval_instr(instr)) {
         set_instr(instr);
+        m_touched = true; // labels must exist in the object file
+        return true;
     }
     else {
         m_sym_type = SymType::COMPUTED;
         m_expr = expr;
+        return false;
     }
 }
 
@@ -200,7 +200,7 @@ Symbol* Symtab::add_label(const string& name, Instr* instr) {
     return symbol;
 }
 
-Symbol* Symtab::add_equ(const string& name, Expr* expr) {
+Symbol* Symtab::add_equ(const string& name, const Expr& expr) {
     auto symbol = get_symbol(name);
     if (!symbol)
         symbol = add_symbol(name);
