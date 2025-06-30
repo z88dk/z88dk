@@ -1,0 +1,46 @@
+CALL_PKG ok
+LINE 1 "test_t_call_pkg.asm"
+call_pkg 1
+call_pkg 255
+call_pkg 256
+call_pkg 65535
+% z80asm -v +z88 test_t_call_pkg.asm
+assemble test_t_call_pkg.asm to test_t_call_pkg.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+define __ARCH_Z88__ = 1
+assembled test_t_call_pkg.asm to test_t_call_pkg.o
+
+Object  file test_t_call_pkg.o at $0000: Z80RMF18
+  Name: test_t_call_pkg
+  CPU:  z80 
+  Section "": 12 bytes
+    C $0000: CF 01 00 CF FF 00 CF 00 01 CF FF FF
+
+
+CALL_PKG illegal
+LINE 1 "test_t_call_pkg.asm"
+call_pkg 1
+call_pkg 255
+call_pkg 256
+call_pkg 65535
+% z80asm -v test_t_call_pkg.asm
+assemble test_t_call_pkg.asm to test_t_call_pkg.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_call_pkg.asm:1: error: illegal opcode
+  ^---- 		call_pkg 1
+    ^---- call_pkg 1
+test_t_call_pkg.asm:2: error: illegal opcode
+  ^---- 		call_pkg 255
+    ^---- call_pkg 255
+test_t_call_pkg.asm:3: error: illegal opcode
+  ^---- 		call_pkg 256
+    ^---- call_pkg 256
+test_t_call_pkg.asm:4: error: illegal opcode
+  ^---- 		call_pkg 65535
+    ^---- call_pkg 65535
+error: assembly failed for file: test_t_call_pkg.asm
+
+
+
