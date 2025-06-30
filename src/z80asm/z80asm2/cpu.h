@@ -176,3 +176,8 @@ private:
 };
 
 extern ArchTable* g_arch_table;
+
+inline int Z80_RST(int addr) {
+    return 0xC7 + ((addr) < 8 ? (addr) * 8 : (addr));
+}
+

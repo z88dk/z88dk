@@ -95,7 +95,8 @@ public:
     const Location& location() const { return m_location; }
     void set_location(const Location& location) { m_location = location; }
 
-    void add_byte(uint8_t byte) { m_bytes.push_back(byte); }
+    void add_byte(uint8_t byte) { m_bytes.push_back(byte & 0xFF); }
+    void add_word(uint16_t word);
     void patch_byte(int index, uint8_t byte);
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
@@ -218,6 +219,7 @@ public:
     void set_assume(int value);
     int assume() const { return m_assume; }
     void include_binary(const string& filename);
+    void call_oz(int value);
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);
