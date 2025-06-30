@@ -186,6 +186,11 @@ void Instr::add_word(uint16_t word) {
     add_byte((word >> 8) & 0xFF);
 }
 
+void Instr::add_word_be(uint16_t word) {
+    add_byte((word >> 8) & 0xFF);
+    add_byte(word & 0xFF);
+}
+
 void Instr::patch_byte(int index, uint8_t byte) {
     assert(index >= 0 && index < static_cast<int>(m_bytes.size()) && "Index out of bounds");
     m_bytes[index] = byte;
@@ -715,6 +720,50 @@ void ObjModule::call_pkg(int value) {
     }
     else
         g_error->error_int_range(int_to_hex(value, 4));
+}
+
+void ObjModule::cu_wait(int ver, int hor) {
+    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+        g_error->error_illegal_opcode();
+    else if (ver < 0 || ver > 311)
+        g_error->error_int_range(int_to_hex(ver, 4));
+    else if (hor < 0 || hor > 55)
+        g_error->error_int_range(int_to_hex(hor, 4));
+    else {
+        auto instr = cur_section()->add_instr();
+        instr->add_word_be(0x8000 + (hor << 9) + ver);
+    }
+}
+
+void ObjModule::cu_move(int reg, int val) {
+    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+        g_error->error_illegal_opcode();
+    else if (reg < 0 || reg > 127)
+        g_error->error_int_range(int_to_hex(reg, 4));
+    else if (val < 0 || val > 255)
+        g_error->error_int_range(int_to_hex(val, 4));
+    else {
+        auto instr = cur_section()->add_instr();
+        instr->add_word_be((reg << 8) + val);
+    }
+}
+
+void ObjModule::cu_stop() {
+    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+        g_error->error_illegal_opcode();
+    else {
+        auto instr = cur_section()->add_instr();
+        instr->add_word_be(0xFFFF);
+    }
+}
+
+void ObjModule::cu_nop() {
+    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+        g_error->error_illegal_opcode();
+    else {
+        auto instr = cur_section()->add_instr();
+        instr->add_word_be(0x0000);
+    }
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

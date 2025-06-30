@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\directives.y" />
+    <None Include="..\..\src\z80asm\z80asm2\directives_z80n.y" />
     <None Include="..\..\src\z80asm\z80asm2\directives_z88.y" />
     <None Include="..\..\src\z80asm\z80asm2\Makefile" />
     <None Include="..\..\src\z80asm\z80asm2\mkparser.pl" />

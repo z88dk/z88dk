@@ -84,6 +84,10 @@ private:
     void action_section_ident();
     void action_ident_colon();
     void action_ident_equ_expr();
+    void action_cu_dot_wait_const_expr_comma_const_expr();
+    void action_cu_dot_move_const_expr_comma_const_expr();
+    void action_cu_dot_stop();
+    void action_cu_dot_nop();
     void action_call_oz_const_expr();
     void action_call_pkg_const_expr();
     void action_nop();

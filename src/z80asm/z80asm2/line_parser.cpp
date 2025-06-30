@@ -16,8 +16,8 @@ using namespace std;
 LineParser::State LineParser::m_states[] = {
     //@@BEGIN: states
     { // 0: 
-      { {Keyword::ALIGN, 1}, {Keyword::ASSERT, 7}, {Keyword::ASSUME, 13}, {Keyword::BINARY, 16}, {Keyword::CALL_OZ, 19}, {Keyword::CALL_PKG, 22}, {Keyword::DEFINE, 25}, {Keyword::EXTERN, 28}, {Keyword::GLOBAL, 31}, {Keyword::INCBIN, 40}, {Keyword::JP, 43}, {Keyword::JR, 46}, {Keyword::LD, 65}, {Keyword::NOP, 94}, {Keyword::ORG, 96}, {Keyword::PUBLIC, 99}, {Keyword::SECTION, 102}, },
-      { {TType::IDENT, 34}, },
+      { {Keyword::ALIGN, 1}, {Keyword::ASSERT, 7}, {Keyword::ASSUME, 13}, {Keyword::BINARY, 16}, {Keyword::CALL_OZ, 19}, {Keyword::CALL_PKG, 22}, {Keyword::CU, 25}, {Keyword::DEFINE, 41}, {Keyword::EXTERN, 44}, {Keyword::GLOBAL, 47}, {Keyword::INCBIN, 56}, {Keyword::JP, 59}, {Keyword::JR, 62}, {Keyword::LD, 81}, {Keyword::NOP, 110}, {Keyword::ORG, 112}, {Keyword::PUBLIC, 115}, {Keyword::SECTION, 118}, },
+      { {TType::IDENT, 50}, },
       nullptr,
     },
     { // 1: ALIGN
@@ -140,402 +140,482 @@ LineParser::State LineParser::m_states[] = {
       { },
       &LineParser::action_call_pkg_const_expr,
     },
-    { // 25: DEFINE
+    { // 25: CU
       { },
-      { {TType::CONST_ASSIGN_LIST, 26}, },
+      { {TType::DOT, 26}, },
       nullptr,
     },
-    { // 26: DEFINE CONST_ASSIGN_LIST
+    { // 26: CU DOT
+      { {Keyword::MOVE, 27}, {Keyword::NOP, 32}, {Keyword::STOP, 34}, {Keyword::WAIT, 36}, },
       { },
-      { {TType::END, 27}, },
       nullptr,
     },
-    { // 27: DEFINE CONST_ASSIGN_LIST END
+    { // 27: CU DOT MOVE
       { },
-      { },
-      &LineParser::action_define_const_assign_list,
-    },
-    { // 28: EXTERN
-      { },
-      { {TType::IDENT_LIST, 29}, },
+      { {TType::CONST_EXPR, 28}, },
       nullptr,
     },
-    { // 29: EXTERN IDENT_LIST
+    { // 28: CU DOT MOVE CONST_EXPR
       { },
-      { {TType::END, 30}, },
+      { {TType::COMMA, 29}, },
       nullptr,
     },
-    { // 30: EXTERN IDENT_LIST END
+    { // 29: CU DOT MOVE CONST_EXPR COMMA
       { },
-      { },
-      &LineParser::action_extern_ident_list,
-    },
-    { // 31: GLOBAL
-      { },
-      { {TType::IDENT_LIST, 32}, },
+      { {TType::CONST_EXPR, 30}, },
       nullptr,
     },
-    { // 32: GLOBAL IDENT_LIST
+    { // 30: CU DOT MOVE CONST_EXPR COMMA CONST_EXPR
+      { },
+      { {TType::END, 31}, },
+      nullptr,
+    },
+    { // 31: CU DOT MOVE CONST_EXPR COMMA CONST_EXPR END
+      { },
+      { },
+      &LineParser::action_cu_dot_move_const_expr_comma_const_expr,
+    },
+    { // 32: CU DOT NOP
       { },
       { {TType::END, 33}, },
       nullptr,
     },
-    { // 33: GLOBAL IDENT_LIST END
+    { // 33: CU DOT NOP END
+      { },
+      { },
+      &LineParser::action_cu_dot_nop,
+    },
+    { // 34: CU DOT STOP
+      { },
+      { {TType::END, 35}, },
+      nullptr,
+    },
+    { // 35: CU DOT STOP END
+      { },
+      { },
+      &LineParser::action_cu_dot_stop,
+    },
+    { // 36: CU DOT WAIT
+      { },
+      { {TType::CONST_EXPR, 37}, },
+      nullptr,
+    },
+    { // 37: CU DOT WAIT CONST_EXPR
+      { },
+      { {TType::COMMA, 38}, },
+      nullptr,
+    },
+    { // 38: CU DOT WAIT CONST_EXPR COMMA
+      { },
+      { {TType::CONST_EXPR, 39}, },
+      nullptr,
+    },
+    { // 39: CU DOT WAIT CONST_EXPR COMMA CONST_EXPR
+      { },
+      { {TType::END, 40}, },
+      nullptr,
+    },
+    { // 40: CU DOT WAIT CONST_EXPR COMMA CONST_EXPR END
+      { },
+      { },
+      &LineParser::action_cu_dot_wait_const_expr_comma_const_expr,
+    },
+    { // 41: DEFINE
+      { },
+      { {TType::CONST_ASSIGN_LIST, 42}, },
+      nullptr,
+    },
+    { // 42: DEFINE CONST_ASSIGN_LIST
+      { },
+      { {TType::END, 43}, },
+      nullptr,
+    },
+    { // 43: DEFINE CONST_ASSIGN_LIST END
+      { },
+      { },
+      &LineParser::action_define_const_assign_list,
+    },
+    { // 44: EXTERN
+      { },
+      { {TType::IDENT_LIST, 45}, },
+      nullptr,
+    },
+    { // 45: EXTERN IDENT_LIST
+      { },
+      { {TType::END, 46}, },
+      nullptr,
+    },
+    { // 46: EXTERN IDENT_LIST END
+      { },
+      { },
+      &LineParser::action_extern_ident_list,
+    },
+    { // 47: GLOBAL
+      { },
+      { {TType::IDENT_LIST, 48}, },
+      nullptr,
+    },
+    { // 48: GLOBAL IDENT_LIST
+      { },
+      { {TType::END, 49}, },
+      nullptr,
+    },
+    { // 49: GLOBAL IDENT_LIST END
       { },
       { },
       &LineParser::action_global_ident_list,
     },
-    { // 34: IDENT
-      { {Keyword::EQU, 37}, },
-      { {TType::COLON, 35}, },
+    { // 50: IDENT
+      { {Keyword::EQU, 53}, },
+      { {TType::COLON, 51}, },
       nullptr,
     },
-    { // 35: IDENT COLON
-      { },
-      { {TType::END, 36}, },
-      nullptr,
-    },
-    { // 36: IDENT COLON END
-      { },
-      { },
-      &LineParser::action_ident_colon,
-    },
-    { // 37: IDENT EQU
-      { },
-      { {TType::EXPR, 38}, },
-      nullptr,
-    },
-    { // 38: IDENT EQU EXPR
-      { },
-      { {TType::END, 39}, },
-      nullptr,
-    },
-    { // 39: IDENT EQU EXPR END
-      { },
-      { },
-      &LineParser::action_ident_equ_expr,
-    },
-    { // 40: INCBIN
-      { },
-      { {TType::RAW_STR, 41}, },
-      nullptr,
-    },
-    { // 41: INCBIN RAW_STR
-      { },
-      { {TType::END, 42}, },
-      nullptr,
-    },
-    { // 42: INCBIN RAW_STR END
-      { },
-      { },
-      &LineParser::action_incbin_raw_str,
-    },
-    { // 43: JP
-      { },
-      { {TType::EXPR, 44}, },
-      nullptr,
-    },
-    { // 44: JP EXPR
-      { },
-      { {TType::END, 45}, },
-      nullptr,
-    },
-    { // 45: JP EXPR END
-      { },
-      { },
-      &LineParser::action_jp_expr,
-    },
-    { // 46: JR
-      { {Keyword::C, 47}, {Keyword::NC, 53}, {Keyword::NZ, 57}, {Keyword::Z, 61}, },
-      { {TType::EXPR, 51}, },
-      nullptr,
-    },
-    { // 47: JR C
-      { },
-      { {TType::COMMA, 48}, },
-      nullptr,
-    },
-    { // 48: JR C COMMA
-      { },
-      { {TType::EXPR, 49}, },
-      nullptr,
-    },
-    { // 49: JR C COMMA EXPR
-      { },
-      { {TType::END, 50}, },
-      nullptr,
-    },
-    { // 50: JR C COMMA EXPR END
-      { },
-      { },
-      &LineParser::action_jr_c_comma_expr,
-    },
-    { // 51: JR EXPR
+    { // 51: IDENT COLON
       { },
       { {TType::END, 52}, },
       nullptr,
     },
-    { // 52: JR EXPR END
+    { // 52: IDENT COLON END
+      { },
+      { },
+      &LineParser::action_ident_colon,
+    },
+    { // 53: IDENT EQU
+      { },
+      { {TType::EXPR, 54}, },
+      nullptr,
+    },
+    { // 54: IDENT EQU EXPR
+      { },
+      { {TType::END, 55}, },
+      nullptr,
+    },
+    { // 55: IDENT EQU EXPR END
+      { },
+      { },
+      &LineParser::action_ident_equ_expr,
+    },
+    { // 56: INCBIN
+      { },
+      { {TType::RAW_STR, 57}, },
+      nullptr,
+    },
+    { // 57: INCBIN RAW_STR
+      { },
+      { {TType::END, 58}, },
+      nullptr,
+    },
+    { // 58: INCBIN RAW_STR END
+      { },
+      { },
+      &LineParser::action_incbin_raw_str,
+    },
+    { // 59: JP
+      { },
+      { {TType::EXPR, 60}, },
+      nullptr,
+    },
+    { // 60: JP EXPR
+      { },
+      { {TType::END, 61}, },
+      nullptr,
+    },
+    { // 61: JP EXPR END
+      { },
+      { },
+      &LineParser::action_jp_expr,
+    },
+    { // 62: JR
+      { {Keyword::C, 63}, {Keyword::NC, 69}, {Keyword::NZ, 73}, {Keyword::Z, 77}, },
+      { {TType::EXPR, 67}, },
+      nullptr,
+    },
+    { // 63: JR C
+      { },
+      { {TType::COMMA, 64}, },
+      nullptr,
+    },
+    { // 64: JR C COMMA
+      { },
+      { {TType::EXPR, 65}, },
+      nullptr,
+    },
+    { // 65: JR C COMMA EXPR
+      { },
+      { {TType::END, 66}, },
+      nullptr,
+    },
+    { // 66: JR C COMMA EXPR END
+      { },
+      { },
+      &LineParser::action_jr_c_comma_expr,
+    },
+    { // 67: JR EXPR
+      { },
+      { {TType::END, 68}, },
+      nullptr,
+    },
+    { // 68: JR EXPR END
       { },
       { },
       &LineParser::action_jr_expr,
     },
-    { // 53: JR NC
+    { // 69: JR NC
       { },
-      { {TType::COMMA, 54}, },
+      { {TType::COMMA, 70}, },
       nullptr,
     },
-    { // 54: JR NC COMMA
+    { // 70: JR NC COMMA
       { },
-      { {TType::EXPR, 55}, },
+      { {TType::EXPR, 71}, },
       nullptr,
     },
-    { // 55: JR NC COMMA EXPR
+    { // 71: JR NC COMMA EXPR
       { },
-      { {TType::END, 56}, },
+      { {TType::END, 72}, },
       nullptr,
     },
-    { // 56: JR NC COMMA EXPR END
+    { // 72: JR NC COMMA EXPR END
       { },
       { },
       &LineParser::action_jr_nc_comma_expr,
     },
-    { // 57: JR NZ
+    { // 73: JR NZ
       { },
-      { {TType::COMMA, 58}, },
+      { {TType::COMMA, 74}, },
       nullptr,
     },
-    { // 58: JR NZ COMMA
-      { },
-      { {TType::EXPR, 59}, },
-      nullptr,
-    },
-    { // 59: JR NZ COMMA EXPR
-      { },
-      { {TType::END, 60}, },
-      nullptr,
-    },
-    { // 60: JR NZ COMMA EXPR END
-      { },
-      { },
-      &LineParser::action_jr_nz_comma_expr,
-    },
-    { // 61: JR Z
-      { },
-      { {TType::COMMA, 62}, },
-      nullptr,
-    },
-    { // 62: JR Z COMMA
-      { },
-      { {TType::EXPR, 63}, },
-      nullptr,
-    },
-    { // 63: JR Z COMMA EXPR
-      { },
-      { {TType::END, 64}, },
-      nullptr,
-    },
-    { // 64: JR Z COMMA EXPR END
-      { },
-      { },
-      &LineParser::action_jr_z_comma_expr,
-    },
-    { // 65: LD
-      { {Keyword::A, 66}, {Keyword::B, 78}, {Keyword::C, 82}, {Keyword::IX, 86}, {Keyword::IY, 90}, },
-      { },
-      nullptr,
-    },
-    { // 66: LD A
-      { },
-      { {TType::COMMA, 67}, },
-      nullptr,
-    },
-    { // 67: LD A COMMA
-      { {Keyword::A, 68}, {Keyword::B, 70}, },
-      { {TType::EXPR, 72}, {TType::LPAREN, 74}, },
-      nullptr,
-    },
-    { // 68: LD A COMMA A
-      { },
-      { {TType::END, 69}, },
-      nullptr,
-    },
-    { // 69: LD A COMMA A END
-      { },
-      { },
-      &LineParser::action_ld_a_comma_a,
-    },
-    { // 70: LD A COMMA B
-      { },
-      { {TType::END, 71}, },
-      nullptr,
-    },
-    { // 71: LD A COMMA B END
-      { },
-      { },
-      &LineParser::action_ld_a_comma_b,
-    },
-    { // 72: LD A COMMA EXPR
-      { },
-      { {TType::END, 73}, },
-      nullptr,
-    },
-    { // 73: LD A COMMA EXPR END
-      { },
-      { },
-      &LineParser::action_ld_a_comma_expr,
-    },
-    { // 74: LD A COMMA LPAREN
+    { // 74: JR NZ COMMA
       { },
       { {TType::EXPR, 75}, },
       nullptr,
     },
-    { // 75: LD A COMMA LPAREN EXPR
+    { // 75: JR NZ COMMA EXPR
       { },
-      { {TType::RPAREN, 76}, },
+      { {TType::END, 76}, },
       nullptr,
     },
-    { // 76: LD A COMMA LPAREN EXPR RPAREN
+    { // 76: JR NZ COMMA EXPR END
       { },
-      { {TType::END, 77}, },
+      { },
+      &LineParser::action_jr_nz_comma_expr,
+    },
+    { // 77: JR Z
+      { },
+      { {TType::COMMA, 78}, },
       nullptr,
     },
-    { // 77: LD A COMMA LPAREN EXPR RPAREN END
+    { // 78: JR Z COMMA
       { },
-      { },
-      &LineParser::action_ld_a_comma_lparen_expr_rparen,
-    },
-    { // 78: LD B
-      { },
-      { {TType::COMMA, 79}, },
+      { {TType::EXPR, 79}, },
       nullptr,
     },
-    { // 79: LD B COMMA
+    { // 79: JR Z COMMA EXPR
       { },
-      { {TType::EXPR, 80}, },
+      { {TType::END, 80}, },
       nullptr,
     },
-    { // 80: LD B COMMA EXPR
+    { // 80: JR Z COMMA EXPR END
       { },
-      { {TType::END, 81}, },
+      { },
+      &LineParser::action_jr_z_comma_expr,
+    },
+    { // 81: LD
+      { {Keyword::A, 82}, {Keyword::B, 94}, {Keyword::C, 98}, {Keyword::IX, 102}, {Keyword::IY, 106}, },
+      { },
       nullptr,
     },
-    { // 81: LD B COMMA EXPR END
-      { },
-      { },
-      &LineParser::action_ld_b_comma_expr,
-    },
-    { // 82: LD C
+    { // 82: LD A
       { },
       { {TType::COMMA, 83}, },
       nullptr,
     },
-    { // 83: LD C COMMA
-      { },
-      { {TType::EXPR, 84}, },
+    { // 83: LD A COMMA
+      { {Keyword::A, 84}, {Keyword::B, 86}, },
+      { {TType::EXPR, 88}, {TType::LPAREN, 90}, },
       nullptr,
     },
-    { // 84: LD C COMMA EXPR
+    { // 84: LD A COMMA A
       { },
       { {TType::END, 85}, },
       nullptr,
     },
-    { // 85: LD C COMMA EXPR END
+    { // 85: LD A COMMA A END
       { },
       { },
-      &LineParser::action_ld_c_comma_expr,
+      &LineParser::action_ld_a_comma_a,
     },
-    { // 86: LD IX
+    { // 86: LD A COMMA B
       { },
-      { {TType::COMMA, 87}, },
+      { {TType::END, 87}, },
       nullptr,
     },
-    { // 87: LD IX COMMA
+    { // 87: LD A COMMA B END
       { },
-      { {TType::EXPR, 88}, },
-      nullptr,
+      { },
+      &LineParser::action_ld_a_comma_b,
     },
-    { // 88: LD IX COMMA EXPR
+    { // 88: LD A COMMA EXPR
       { },
       { {TType::END, 89}, },
       nullptr,
     },
-    { // 89: LD IX COMMA EXPR END
+    { // 89: LD A COMMA EXPR END
       { },
       { },
-      &LineParser::action_ld_ix_comma_expr,
+      &LineParser::action_ld_a_comma_expr,
     },
-    { // 90: LD IY
+    { // 90: LD A COMMA LPAREN
       { },
-      { {TType::COMMA, 91}, },
+      { {TType::EXPR, 91}, },
       nullptr,
     },
-    { // 91: LD IY COMMA
+    { // 91: LD A COMMA LPAREN EXPR
       { },
-      { {TType::EXPR, 92}, },
+      { {TType::RPAREN, 92}, },
       nullptr,
     },
-    { // 92: LD IY COMMA EXPR
+    { // 92: LD A COMMA LPAREN EXPR RPAREN
       { },
       { {TType::END, 93}, },
       nullptr,
     },
-    { // 93: LD IY COMMA EXPR END
+    { // 93: LD A COMMA LPAREN EXPR RPAREN END
       { },
       { },
-      &LineParser::action_ld_iy_comma_expr,
+      &LineParser::action_ld_a_comma_lparen_expr_rparen,
     },
-    { // 94: NOP
+    { // 94: LD B
       { },
-      { {TType::END, 95}, },
+      { {TType::COMMA, 95}, },
       nullptr,
     },
-    { // 95: NOP END
+    { // 95: LD B COMMA
       { },
-      { },
-      &LineParser::action_nop,
-    },
-    { // 96: ORG
-      { },
-      { {TType::CONST_EXPR, 97}, },
+      { {TType::EXPR, 96}, },
       nullptr,
     },
-    { // 97: ORG CONST_EXPR
+    { // 96: LD B COMMA EXPR
       { },
-      { {TType::END, 98}, },
+      { {TType::END, 97}, },
       nullptr,
     },
-    { // 98: ORG CONST_EXPR END
+    { // 97: LD B COMMA EXPR END
       { },
       { },
-      &LineParser::action_org_const_expr,
+      &LineParser::action_ld_b_comma_expr,
     },
-    { // 99: PUBLIC
+    { // 98: LD C
       { },
-      { {TType::IDENT_LIST, 100}, },
+      { {TType::COMMA, 99}, },
       nullptr,
     },
-    { // 100: PUBLIC IDENT_LIST
+    { // 99: LD C COMMA
+      { },
+      { {TType::EXPR, 100}, },
+      nullptr,
+    },
+    { // 100: LD C COMMA EXPR
       { },
       { {TType::END, 101}, },
       nullptr,
     },
-    { // 101: PUBLIC IDENT_LIST END
+    { // 101: LD C COMMA EXPR END
+      { },
+      { },
+      &LineParser::action_ld_c_comma_expr,
+    },
+    { // 102: LD IX
+      { },
+      { {TType::COMMA, 103}, },
+      nullptr,
+    },
+    { // 103: LD IX COMMA
+      { },
+      { {TType::EXPR, 104}, },
+      nullptr,
+    },
+    { // 104: LD IX COMMA EXPR
+      { },
+      { {TType::END, 105}, },
+      nullptr,
+    },
+    { // 105: LD IX COMMA EXPR END
+      { },
+      { },
+      &LineParser::action_ld_ix_comma_expr,
+    },
+    { // 106: LD IY
+      { },
+      { {TType::COMMA, 107}, },
+      nullptr,
+    },
+    { // 107: LD IY COMMA
+      { },
+      { {TType::EXPR, 108}, },
+      nullptr,
+    },
+    { // 108: LD IY COMMA EXPR
+      { },
+      { {TType::END, 109}, },
+      nullptr,
+    },
+    { // 109: LD IY COMMA EXPR END
+      { },
+      { },
+      &LineParser::action_ld_iy_comma_expr,
+    },
+    { // 110: NOP
+      { },
+      { {TType::END, 111}, },
+      nullptr,
+    },
+    { // 111: NOP END
+      { },
+      { },
+      &LineParser::action_nop,
+    },
+    { // 112: ORG
+      { },
+      { {TType::CONST_EXPR, 113}, },
+      nullptr,
+    },
+    { // 113: ORG CONST_EXPR
+      { },
+      { {TType::END, 114}, },
+      nullptr,
+    },
+    { // 114: ORG CONST_EXPR END
+      { },
+      { },
+      &LineParser::action_org_const_expr,
+    },
+    { // 115: PUBLIC
+      { },
+      { {TType::IDENT_LIST, 116}, },
+      nullptr,
+    },
+    { // 116: PUBLIC IDENT_LIST
+      { },
+      { {TType::END, 117}, },
+      nullptr,
+    },
+    { // 117: PUBLIC IDENT_LIST END
       { },
       { },
       &LineParser::action_public_ident_list,
     },
-    { // 102: SECTION
+    { // 118: SECTION
       { },
-      { {TType::IDENT, 103}, },
+      { {TType::IDENT, 119}, },
       nullptr,
     },
-    { // 103: SECTION IDENT
+    { // 119: SECTION IDENT
       { },
-      { {TType::END, 104}, },
+      { {TType::END, 120}, },
       nullptr,
     },
-    { // 104: SECTION IDENT END
+    { // 120: SECTION IDENT END
       { },
       { },
       &LineParser::action_section_ident,
@@ -941,6 +1021,30 @@ void LineParser::action_ident_colon() {
 
 void LineParser::action_ident_equ_expr() {
 	g_obj_module->add_equ(m_elems.elems[1-1].token.svalue(), m_elems.elems[3-1].expr->clone());
+
+
+}
+
+void LineParser::action_cu_dot_wait_const_expr_comma_const_expr() {
+    g_obj_module->cu_wait(m_elems.elems[4-1].const_value, m_elems.elems[6-1].const_value);
+
+
+}
+
+void LineParser::action_cu_dot_move_const_expr_comma_const_expr() {
+    g_obj_module->cu_move(m_elems.elems[4-1].const_value, m_elems.elems[6-1].const_value);
+
+
+}
+
+void LineParser::action_cu_dot_stop() {
+    g_obj_module->cu_stop();
+
+
+}
+
+void LineParser::action_cu_dot_nop() {
+    g_obj_module->cu_nop();
 
 
 }
