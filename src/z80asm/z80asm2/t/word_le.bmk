@@ -1,0 +1,60 @@
+WORD ok
+LINE 1 "test_t_word_le.asm"
+defw 2,4,8,16,32,64,128,256
+dw 2,4,8,16,32,64,128,256
+word$,$,$,$,$,$,$,$
+% z80asm -v test_t_word_le.asm
+assemble test_t_word_le.asm to test_t_word_le.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_word_le.asm to test_t_word_le.o
+
+Object  file test_t_word_le.o at $0000: Z80RMF18
+  Name: test_t_word_le
+  CPU:  z80 
+  Section "": 48 bytes
+    C $0000: 02 00 04 00 08 00 10 00 20 00 40 00 80 00 00 01
+    C $0010: 02 00 04 00 08 00 10 00 20 00 40 00 80 00 00 01
+    C $0020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Expressions:
+    E W $0020 $0020 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $0022 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $0024 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $0026 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $0028 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $002A 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $002C 16: $ (section "") (file test_t_word_le.asm:3)
+    E W $0020 $002E 16: $ (section "") (file test_t_word_le.asm:3)
+
+
+WORD errors
+LINE 1 "test_t_word_le.asm"
+defw 1+
+dw 1,
+word,
+% z80asm -v test_t_word_le.asm
+assemble test_t_word_le.asm to test_t_word_le.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_word_le.asm:1: error: insufficient operands: +
+  ^---- 		defw 	1+
+    ^---- defw 1+
+test_t_word_le.asm:1: error: syntax error
+  ^---- 		defw 	1+
+    ^---- defw 1+
+test_t_word_le.asm:2: error: insufficient operands
+  ^---- 		dw	 	1,
+    ^---- dw 1,
+test_t_word_le.asm:2: error: syntax error
+  ^---- 		dw	 	1,
+    ^---- dw 1,
+test_t_word_le.asm:3: error: insufficient operands
+  ^---- 		word 	,
+    ^---- word,
+test_t_word_le.asm:3: error: syntax error
+  ^---- 		word 	,
+    ^---- word,
+error: assembly failed for file: test_t_word_le.asm
+
+
+

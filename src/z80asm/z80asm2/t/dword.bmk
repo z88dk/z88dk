@@ -1,0 +1,54 @@
+DWORD ok
+LINE 1 "test_t_dword.asm"
+defq 305419896,305419896
+dq 305419896,305419896
+dword 305419896,305419896
+defq$,$
+% z80asm -v test_t_dword.asm
+assemble test_t_dword.asm to test_t_dword.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_dword.asm to test_t_dword.o
+
+Object  file test_t_dword.o at $0000: Z80RMF18
+  Name: test_t_dword
+  CPU:  z80 
+  Section "": 32 bytes
+    C $0000: 78 56 34 12 78 56 34 12 78 56 34 12 78 56 34 12
+    C $0010: 78 56 34 12 78 56 34 12 00 00 00 00 00 00 00 00
+  Expressions:
+    E L $0018 $0018 8: $ (section "") (file test_t_dword.asm:4)
+    E L $0018 $001C 8: $ (section "") (file test_t_dword.asm:4)
+
+
+DWORD errors
+LINE 1 "test_t_dword.asm"
+defq 1+
+dq 1,
+dword,
+% z80asm -v test_t_dword.asm
+assemble test_t_dword.asm to test_t_dword.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_dword.asm:1: error: insufficient operands: +
+  ^---- 		defq 	1+
+    ^---- defq 1+
+test_t_dword.asm:1: error: syntax error
+  ^---- 		defq 	1+
+    ^---- defq 1+
+test_t_dword.asm:2: error: insufficient operands
+  ^---- 		dq	 	1,
+    ^---- dq 1,
+test_t_dword.asm:2: error: syntax error
+  ^---- 		dq	 	1,
+    ^---- dq 1,
+test_t_dword.asm:3: error: insufficient operands
+  ^---- 		dword 	,
+    ^---- dword,
+test_t_dword.asm:3: error: syntax error
+  ^---- 		dword 	,
+    ^---- dword,
+error: assembly failed for file: test_t_dword.asm
+
+
+

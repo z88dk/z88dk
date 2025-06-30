@@ -1,0 +1,85 @@
+BYTE ok
+LINE 1 "test_t_byte.asm"
+defb 1,2,3,4,"hello",32,"world",0
+db 1,2,3,4,"hello",32,"world",0
+defm 1,2,3,4,"hello",32,"world",0
+dm 1,2,3,4,"hello",32,"world",0
+byte 1,2,3,4,"hello",32,"world",0
+byte$,$,$,$,$,$,$,$,$,$,$,$,$,$,$,$
+% z80asm -v test_t_byte.asm
+assemble test_t_byte.asm to test_t_byte.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_byte.asm to test_t_byte.o
+
+Object  file test_t_byte.o at $0000: Z80RMF18
+  Name: test_t_byte
+  CPU:  z80 
+  Section "": 96 bytes
+    C $0000: 01 02 03 04 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
+    C $0010: 01 02 03 04 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
+    C $0020: 01 02 03 04 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
+    C $0030: 01 02 03 04 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
+    C $0040: 01 02 03 04 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
+    C $0050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Expressions:
+    E U $0050 $0050 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0051 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0052 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0053 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0054 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0055 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0056 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0057 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0058 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $0059 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $005A 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $005B 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $005C 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $005D 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $005E 16: $ (section "") (file test_t_byte.asm:6)
+    E U $0050 $005F 16: $ (section "") (file test_t_byte.asm:6)
+
+
+BYTE errors
+LINE 1 "test_t_byte.asm"
+defb 1+
+db 1,
+defm,
+dm"hello"+3
+byte+"world"
+% z80asm -v test_t_byte.asm
+assemble test_t_byte.asm to test_t_byte.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_byte.asm:1: error: insufficient operands: +
+  ^---- 		defb 	1+
+    ^---- defb 1+
+test_t_byte.asm:1: error: syntax error
+  ^---- 		defb 	1+
+    ^---- defb 1+
+test_t_byte.asm:2: error: insufficient operands
+  ^---- 		db	 	1,
+    ^---- db 1,
+test_t_byte.asm:2: error: syntax error
+  ^---- 		db	 	1,
+    ^---- db 1,
+test_t_byte.asm:3: error: insufficient operands
+  ^---- 		defm 	,
+    ^---- defm,
+test_t_byte.asm:3: error: syntax error
+  ^---- 		defm 	,
+    ^---- defm,
+test_t_byte.asm:4: error: syntax error
+  ^---- 		dm	 	"hello"+3
+    ^---- dm"hello"+3
+test_t_byte.asm:5: error: insufficient operands: +
+  ^---- 		byte 	+"world"
+    ^---- byte+"world"
+test_t_byte.asm:5: error: syntax error
+  ^---- 		byte 	+"world"
+    ^---- byte+"world"
+error: assembly failed for file: test_t_byte.asm
+
+
+
