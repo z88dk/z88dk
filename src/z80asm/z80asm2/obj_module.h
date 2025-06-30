@@ -97,6 +97,7 @@ public:
 
     void add_byte(uint8_t byte) { m_bytes.push_back(byte & 0xFF); }
     void add_word(uint16_t word);
+    void add_word_be(uint16_t word);
     void patch_byte(int index, uint8_t byte);
     void add_opcode(long long opcode);
     void add_patch(Patch* patch);
@@ -221,6 +222,10 @@ public:
     void include_binary(const string& filename);
     void call_oz(int value);
     void call_pkg(int value);
+    void cu_wait(int ver, int hor);
+    void cu_move(int reg, int val);
+    void cu_stop();
+    void cu_nop();
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, Expr* expr);
