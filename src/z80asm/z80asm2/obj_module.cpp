@@ -747,7 +747,7 @@ void ObjModule::call_pkg(int value) {
         g_error->error_int_range(int_to_hex(value, 4));
 }
 
-void ObjModule::cu_wait(int ver, int hor) {
+void ObjModule::add_cu_wait(int ver, int hor) {
     if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
         g_error->error_illegal_opcode();
     else if (ver < 0 || ver > 311)
@@ -760,7 +760,7 @@ void ObjModule::cu_wait(int ver, int hor) {
     }
 }
 
-void ObjModule::cu_move(int reg, int val) {
+void ObjModule::add_cu_move(int reg, int val) {
     if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
         g_error->error_illegal_opcode();
     else if (reg < 0 || reg > 127)
@@ -773,7 +773,7 @@ void ObjModule::cu_move(int reg, int val) {
     }
 }
 
-void ObjModule::cu_stop() {
+void ObjModule::add_cu_stop() {
     if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
         g_error->error_illegal_opcode();
     else {
@@ -782,7 +782,7 @@ void ObjModule::cu_stop() {
     }
 }
 
-void ObjModule::cu_nop() {
+void ObjModule::add_cu_nop() {
     if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
         g_error->error_illegal_opcode();
     else {
@@ -823,6 +823,34 @@ void ObjModule::add_dword_list(const vector<Expr>& exprs) {
     Instr* instr = cur_section()->add_instr();
     for (auto& expr : exprs) {
         instr->add_patch(Patch(instr, PatchType::DWORD, expr, instr->size()));
+    }
+}
+
+void ObjModule::add_defs(int size, int filler) {
+    if (size < 0)
+        g_error->error_int_range(int_to_hex(size, 4));
+    else if (filler < 0 || filler > 0xFF)
+        g_error->error_int_range(int_to_hex(filler, 2));
+    else {
+        Instr* instr = cur_section()->add_instr();
+        for (int i = 0; i < size; ++i)
+            instr->add_byte(filler);
+    }
+}
+
+void ObjModule::add_defs(int size, const string& str) {
+    if (size < 0)
+        g_error->error_int_range(int_to_hex(size, 4));
+    else if (static_cast<int>(str.size()) > size)
+        g_error->error_string_too_long(str);
+    else {
+        Instr* instr = cur_section()->add_instr();
+        for (int i = 0; i < size; ++i) {
+            if (i < static_cast<int>(str.size()))
+                instr->add_byte(str[i]);
+            else
+                instr->add_byte(g_options->filler());
+        }
     }
 }
 

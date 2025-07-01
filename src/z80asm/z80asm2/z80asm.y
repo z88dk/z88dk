@@ -86,6 +86,24 @@
 		g_obj_module->add_equ(ne_pair.name, ne_pair.expr);
 	}
 
+"defs" CONST_EXPR
+    g_obj_module->add_defs($2.const_value, g_options->filler());
+
+"ds" CONST_EXPR
+    g_obj_module->add_defs($2.const_value, g_options->filler());
+
+"defs" CONST_EXPR "," CONST_EXPR
+    g_obj_module->add_defs($2.const_value, $4.const_value);
+
+"ds" CONST_EXPR "," CONST_EXPR
+    g_obj_module->add_defs($2.const_value, $4.const_value);
+
+"defs" CONST_EXPR "," STR
+    g_obj_module->add_defs($2.const_value, $4.token.svalue());
+
+"ds" CONST_EXPR "," STR
+    g_obj_module->add_defs($2.const_value, $4.token.svalue());
+
 "extern" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_extern(ident);
@@ -123,16 +141,16 @@ IDENT "equ" EXPR
 //-----------------------------------------------------------------------------
 
 "cu" "." "wait" CONST_EXPR "," CONST_EXPR
-    g_obj_module->cu_wait($4.const_value, $6.const_value);
+    g_obj_module->add_cu_wait($4.const_value, $6.const_value);
 
 "cu" "." "move" CONST_EXPR "," CONST_EXPR
-    g_obj_module->cu_move($4.const_value, $6.const_value);
+    g_obj_module->add_cu_move($4.const_value, $6.const_value);
 
 "cu" "." "stop"
-    g_obj_module->cu_stop();
+    g_obj_module->add_cu_stop();
 
 "cu" "." "nop"
-    g_obj_module->cu_nop();
+    g_obj_module->add_cu_nop();
 //-----------------------------------------------------------------------------
 // z80asm
 // Recognized grammar - z88 architecture

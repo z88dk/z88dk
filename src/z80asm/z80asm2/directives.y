@@ -86,6 +86,24 @@
 		g_obj_module->add_equ(ne_pair.name, ne_pair.expr);
 	}
 
+"defs" CONST_EXPR
+    g_obj_module->add_defs($2.const_value, g_options->filler());
+
+"ds" CONST_EXPR
+    g_obj_module->add_defs($2.const_value, g_options->filler());
+
+"defs" CONST_EXPR "," CONST_EXPR
+    g_obj_module->add_defs($2.const_value, $4.const_value);
+
+"ds" CONST_EXPR "," CONST_EXPR
+    g_obj_module->add_defs($2.const_value, $4.const_value);
+
+"defs" CONST_EXPR "," STR
+    g_obj_module->add_defs($2.const_value, $4.token.svalue());
+
+"ds" CONST_EXPR "," STR
+    g_obj_module->add_defs($2.const_value, $4.token.svalue());
+
 "extern" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_extern(ident);

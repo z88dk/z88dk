@@ -184,6 +184,12 @@ private:
     void action_dword_expr_list();
     void action_defc_assign_list();
     void action_dc_assign_list();
+    void action_defs_const_expr();
+    void action_ds_const_expr();
+    void action_defs_const_expr_comma_const_expr();
+    void action_ds_const_expr_comma_const_expr();
+    void action_defs_const_expr_comma_str();
+    void action_ds_const_expr_comma_str();
     void action_extern_ident_list();
     void action_global_ident_list();
     void action_incbin_raw_str();

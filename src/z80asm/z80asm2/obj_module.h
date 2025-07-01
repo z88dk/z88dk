@@ -221,18 +221,21 @@ public:
 
     void set_assume(int value);
     int assume() const { return m_assume; }
+
     void include_binary(const string& filename);
     void call_oz(int value);
     void call_pkg(int value);
-    void cu_wait(int ver, int hor);
-    void cu_move(int reg, int val);
-    void cu_stop();
-    void cu_nop();
+    void add_cu_wait(int ver, int hor);
+    void add_cu_move(int reg, int val);
+    void add_cu_stop();
+    void add_cu_nop();
     void add_byte_list(const vector<Expr>& exprs);
     void add_word_list(const vector<Expr>& exprs);
     void add_word_be_list(const vector<Expr>& exprs);
     void add_ptr_list(const vector<Expr>& exprs);
     void add_dword_list(const vector<Expr>& exprs);
+    void add_defs(int size, int filler);
+    void add_defs(int size, const string& str);
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, const Expr& expr);
