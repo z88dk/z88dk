@@ -86,7 +86,7 @@ x1=1 x2
 assemble test_t_defgroup.asm to test_t_defgroup.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
-test_t_defgroup.asm:2: error: syntax error
+test_t_defgroup.asm:2: error: extra operands
   ^---- 		x1=1 x2 
     ^---- x1=1 x2
 error: assembly failed for file: test_t_defgroup.asm

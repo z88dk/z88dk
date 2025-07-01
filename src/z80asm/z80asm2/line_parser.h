@@ -131,6 +131,8 @@ private:
         DEFGROUP1,
         DEFGROUP2,
         DEFGROUP3,
+        DEFVARS1,
+        DEFVARS2,
     };
 
     // LineParser members
@@ -138,6 +140,9 @@ private:
     Scanner m_in;   // input tokens
     Elems m_elems;  // synthatic elements
     int m_defgroup_id{ 0 };
+    int m_defvars_addr{ 0 };
+    int m_defvars_prev_addr{ 0 };
+    bool m_defvars_update{ false };
 
     struct ParseQueueElem {
         int state{ 0 };
@@ -147,8 +152,11 @@ private:
 
     bool parse_main();
     bool parse_defgroup();
+    bool parse_defvars();
 
     bool collect_ident(string& name);
+    bool collect_defvars_size(int& size);
+    bool collect_const_expr(int& value);
     bool collect_optional_const_assignment(int& value, int default_value = 1);
     bool collect_ident_list(vector<string>& names);
     bool collect_const_assign_list(vector<NameValuePair>& nv_list);
