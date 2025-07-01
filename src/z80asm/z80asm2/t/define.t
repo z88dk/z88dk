@@ -7,6 +7,8 @@ use Modern::Perl;
 append_out("DEFINE ok");
 path("$test.asm")->spew(<<END);
 	define one,two=12/6,three=9/3
+	defb um,dois,tres
+	defb one,two,three
 END
 
 run_ok("$exec -v -E -Dum,dois=12/6,tres=9/3 $test.asm >> $test.out 2>&1");
