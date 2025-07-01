@@ -31,9 +31,6 @@ define __CPU_ZILOG__ = 1
 test_t_defc.asm:1: error: insufficient operands: +
   ^---- 	defc v1=1+
     ^---- defc v1=1+
-test_t_defc.asm:1: error: syntax error
-  ^---- 	defc v1=1+
-    ^---- defc v1=1+
 test_t_defc.asm:2: error: syntax error
   ^---- 	dc v3=start,
     ^---- dc v3=start,

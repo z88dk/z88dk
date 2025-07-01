@@ -75,6 +75,7 @@ enum class Keyword {
     DEFB,
     DEFC,
     DEFDB,
+    DEFGROUP,
     DEFINE,
     DEFM,
     DEFP,

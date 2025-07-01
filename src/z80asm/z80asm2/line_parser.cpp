@@ -11,9 +11,10 @@
 #include "obj_module.h"
 #include "options.h"
 #include "token.h"
+#include <cassert>
 using namespace std;
 
-LineParser::State LineParser::m_states[] = {
+LineParser::ParserState LineParser::m_states[] = {
     //@@BEGIN: states
     { // 0: 
       { {Keyword::ALIGN, 1}, {Keyword::ASSERT, 7}, {Keyword::ASSUME, 13}, {Keyword::BINARY, 16}, {Keyword::BYTE, 19}, {Keyword::CALL_OZ, 22}, {Keyword::CALL_PKG, 25}, {Keyword::CU, 28}, {Keyword::DB, 44}, {Keyword::DC, 47}, {Keyword::DDB, 50}, {Keyword::DEFB, 53}, {Keyword::DEFC, 56}, {Keyword::DEFDB, 59}, {Keyword::DEFINE, 62}, {Keyword::DEFM, 65}, {Keyword::DEFP, 68}, {Keyword::DEFQ, 71}, {Keyword::DEFW, 74}, {Keyword::DM, 77}, {Keyword::DP, 80}, {Keyword::DQ, 83}, {Keyword::DW, 86}, {Keyword::DWORD, 89}, {Keyword::EXTERN, 92}, {Keyword::GLOBAL, 95}, {Keyword::INCBIN, 104}, {Keyword::JP, 107}, {Keyword::JR, 110}, {Keyword::LD, 129}, {Keyword::NOP, 158}, {Keyword::ORG, 160}, {Keyword::PTR, 163}, {Keyword::PUBLIC, 166}, {Keyword::SECTION, 169}, {Keyword::WORD, 172}, },
@@ -894,13 +895,47 @@ LineParser::State LineParser::m_states[] = {
 };
 
 bool LineParser::parse_line(const string& line) {
+    bool parse_ok = true;
+    int error_count = g_error->count();
+
     if (!m_in.scan(line))
         return false;       // scanning failed
 
-    if (m_in.peek().is(TType::END)) 
+    if (m_in.peek().is(TType::END))
         return true;        // empty line
 
+    switch (m_line_state) {
+    case LineState::MAIN:
+        parse_ok = parse_main();
+        break;
+
+    case LineState::DEFGROUP1:
+    case LineState::DEFGROUP2:
+    case LineState::DEFGROUP3:
+        parse_ok = parse_defgroup();
+        break;
+
+    default:
+        assert(false && "Undefined state");
+    }
+
+    if (!parse_ok && g_error->count() == error_count)
+        g_error->error_syntax();
+
+    return parse_ok && g_error->count() == error_count;
+}
+
+bool LineParser::parse_main() {
     vector<ParseQueueElem> parse_queue;
+
+    // switch states
+    switch (m_in.peek().keyword()) {
+    case Keyword::DEFGROUP:
+        m_in.next();
+        m_line_state = LineState::DEFGROUP1;
+        return parse_defgroup();
+    default:;
+    }
 
     // add initial state
     ParseQueueElem queue_elem;
@@ -1104,10 +1139,71 @@ bool LineParser::parse_line(const string& line) {
         }
     }
 
-    if (!parse_ok)
-        g_error->error_syntax();
-
     return parse_ok;
+}
+
+bool LineParser::parse_defgroup() {
+    string name;
+    int value = 0;
+
+    while (true) {
+        if (m_in.peek().is_end()) {
+            if (m_line_state == LineState::DEFGROUP3)   // comma at end of line is optional
+                m_line_state = LineState::DEFGROUP2;
+            return true;
+        }
+
+        switch (m_line_state) {
+        case LineState::DEFGROUP1:      // wait of '{'
+            m_defgroup_id = 0;
+            if (m_in.peek().is(TType::LBRACE)) {
+                m_in.next();
+                m_line_state = LineState::DEFGROUP2;
+                continue;
+            }
+            else
+                return false;
+
+        case LineState::DEFGROUP2:      // wait for constant assignment 
+            if (m_in.peek().is(TType::RBRACE)) {
+                m_in.next();
+                m_line_state = LineState::MAIN;
+                if (m_in.peek().is_end())
+                    return true;
+                else
+                    return false;
+            }
+            else if (collect_ident(name) &&
+                collect_optional_const_assignment(value, m_defgroup_id)) {
+                g_obj_module->add_global_def(name, value);
+                m_defgroup_id = value + 1;
+                m_line_state = LineState::DEFGROUP3;
+                continue;
+            }
+            else
+                return false;
+
+        case LineState::DEFGROUP3:      // wait for comma
+            if (m_in.peek().is(TType::RBRACE)) {
+                m_in.next();
+                m_line_state = LineState::MAIN;
+                if (m_in.peek().is_end())
+                    return true;
+                else
+                    return false;
+            }
+            else if (m_in.peek().is(TType::COMMA)) {
+                m_in.next();
+                m_line_state = LineState::DEFGROUP2;
+                continue;
+            }
+            else
+                return false;
+
+        default:
+            assert(false && "invalid LineState");
+        }
+    }
 }
 
 bool LineParser::collect_ident(string& name) {
@@ -1118,8 +1214,8 @@ bool LineParser::collect_ident(string& name) {
     return true;
 }
 
-bool LineParser::collect_optional_const_assignment(int& value) {
-    value = 1;
+bool LineParser::collect_optional_const_assignment(int& value, int default_value) {
+    value = default_value;
     if (m_in.peek().operator_() != Operator::EQ)
         return true; // no assignment, defaults to 1
 
@@ -1128,8 +1224,10 @@ bool LineParser::collect_optional_const_assignment(int& value) {
     Expr expr;
     if (!expr.parse(m_in, true))
         return false; // syntax error
-    if (!expr.eval_const(value))
+    if (!expr.eval_const(value)) {
+        g_error->error_constant_expression_expected();
         return false; // constant expression expected
+    }
 
     return true; // return expression value
 }

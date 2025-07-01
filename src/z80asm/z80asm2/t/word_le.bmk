@@ -39,19 +39,10 @@ define __CPU_ZILOG__ = 1
 test_t_word_le.asm:1: error: insufficient operands: +
   ^---- 		defw 	1+
     ^---- defw 1+
-test_t_word_le.asm:1: error: syntax error
-  ^---- 		defw 	1+
-    ^---- defw 1+
 test_t_word_le.asm:2: error: insufficient operands
   ^---- 		dw	 	1,
     ^---- dw 1,
-test_t_word_le.asm:2: error: syntax error
-  ^---- 		dw	 	1,
-    ^---- dw 1,
 test_t_word_le.asm:3: error: insufficient operands
-  ^---- 		word 	,
-    ^---- word,
-test_t_word_le.asm:3: error: syntax error
   ^---- 		word 	,
     ^---- word,
 error: assembly failed for file: test_t_word_le.asm

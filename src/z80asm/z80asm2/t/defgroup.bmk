@@ -1,0 +1,95 @@
+DEFGROUP ok
+LINE 1 "test_t_defgroup.asm"
+defgroup{x1,x2,x3}
+defb x1,x2,x3
+% z80asm -v test_t_defgroup.asm
+assemble test_t_defgroup.asm to test_t_defgroup.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defgroup.asm to test_t_defgroup.o
+
+Object  file test_t_defgroup.o at $0000: Z80RMF18
+  Name: test_t_defgroup
+  CPU:  z80 
+  Section "": 3 bytes
+    C $0000: 00 01 02
+  Symbols:
+    L C $0000: x1 (section "") (file test_t_defgroup.asm:1)
+    L C $0001: x2 (section "") (file test_t_defgroup.asm:1)
+    L C $0002: x3 (section "") (file test_t_defgroup.asm:1)
+
+
+DEFGROUP ok
+LINE 1 "test_t_defgroup.asm"
+defgroup
+LINE 3 "test_t_defgroup.asm"
+{
+LINE 5 "test_t_defgroup.asm"
+x1=1,
+x2,
+x3
+LINE 9 "test_t_defgroup.asm"
+}
+defb x1,x2,x3
+% z80asm -v test_t_defgroup.asm
+assemble test_t_defgroup.asm to test_t_defgroup.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defgroup.asm to test_t_defgroup.o
+
+Object  file test_t_defgroup.o at $0000: Z80RMF18
+  Name: test_t_defgroup
+  CPU:  z80 
+  Section "": 3 bytes
+    C $0000: 01 02 03
+  Symbols:
+    L C $0001: x1 (section "") (file test_t_defgroup.asm:5)
+    L C $0002: x2 (section "") (file test_t_defgroup.asm:6)
+    L C $0003: x3 (section "") (file test_t_defgroup.asm:7)
+
+
+DEFGROUP ok
+LINE 1 "test_t_defgroup.asm"
+defgroup
+LINE 3 "test_t_defgroup.asm"
+{
+LINE 5 "test_t_defgroup.asm"
+x1=1
+x2
+x3
+LINE 9 "test_t_defgroup.asm"
+}
+defb x1,x2,x3
+% z80asm -v test_t_defgroup.asm
+assemble test_t_defgroup.asm to test_t_defgroup.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defgroup.asm to test_t_defgroup.o
+
+Object  file test_t_defgroup.o at $0000: Z80RMF18
+  Name: test_t_defgroup
+  CPU:  z80 
+  Section "": 3 bytes
+    C $0000: 01 02 03
+  Symbols:
+    L C $0001: x1 (section "") (file test_t_defgroup.asm:5)
+    L C $0002: x2 (section "") (file test_t_defgroup.asm:6)
+    L C $0003: x3 (section "") (file test_t_defgroup.asm:7)
+
+
+DEFGROUP error
+LINE 1 "test_t_defgroup.asm"
+defgroup{
+x1=1 x2
+}
+% z80asm -v test_t_defgroup.asm
+assemble test_t_defgroup.asm to test_t_defgroup.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_defgroup.asm:2: error: syntax error
+  ^---- 		x1=1 x2 
+    ^---- x1=1 x2
+error: assembly failed for file: test_t_defgroup.asm
+
+
+

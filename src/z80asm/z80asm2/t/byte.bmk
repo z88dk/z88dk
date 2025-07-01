@@ -55,28 +55,16 @@ define __CPU_ZILOG__ = 1
 test_t_byte.asm:1: error: insufficient operands: +
   ^---- 		defb 	1+
     ^---- defb 1+
-test_t_byte.asm:1: error: syntax error
-  ^---- 		defb 	1+
-    ^---- defb 1+
 test_t_byte.asm:2: error: insufficient operands
   ^---- 		db	 	1,
     ^---- db 1,
-test_t_byte.asm:2: error: syntax error
-  ^---- 		db	 	1,
-    ^---- db 1,
 test_t_byte.asm:3: error: insufficient operands
-  ^---- 		defm 	,
-    ^---- defm,
-test_t_byte.asm:3: error: syntax error
   ^---- 		defm 	,
     ^---- defm,
 test_t_byte.asm:4: error: syntax error
   ^---- 		dm	 	"hello"+3
     ^---- dm"hello"+3
 test_t_byte.asm:5: error: insufficient operands: +
-  ^---- 		byte 	+"world"
-    ^---- byte+"world"
-test_t_byte.asm:5: error: syntax error
   ^---- 		byte 	+"world"
     ^---- byte+"world"
 error: assembly failed for file: test_t_byte.asm
