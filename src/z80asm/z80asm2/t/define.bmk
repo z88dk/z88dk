@@ -5,6 +5,8 @@ define dois = 2
 define tres = 3
 LINE 1 "test_t_define.asm"
 define one,two=12/6,three=9/3
+defb um,dois,tres
+defb one,two,three
 % z80asm -v -Dum,dois=12/6,tres=9/3 test_t_define.asm
 define um = 1
 define dois = 2
@@ -17,7 +19,15 @@ assembled test_t_define.asm to test_t_define.o
 Object  file test_t_define.o at $0000: Z80RMF18
   Name: test_t_define
   CPU:  z80 
-  Section "": 0 bytes
+  Section "": 6 bytes
+    C $0000: 01 02 03 01 02 03
+  Symbols:
+    L C $0002: dois (section "") (file test_t_define.asm)
+    L C $0001: one (section "") (file test_t_define.asm:1)
+    L C $0003: three (section "") (file test_t_define.asm:1)
+    L C $0003: tres (section "") (file test_t_define.asm)
+    L C $0002: two (section "") (file test_t_define.asm:1)
+    L C $0001: um (section "") (file test_t_define.asm)
 
 
 DEFINE error
