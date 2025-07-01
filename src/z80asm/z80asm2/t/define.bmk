@@ -53,7 +53,7 @@ test_t_define.asm:3: error: syntax error
 test_t_define.asm:4: error: syntax error
   ^---- 	define world,
     ^---- define world,
-test_t_define.asm:5: error: syntax error
+test_t_define.asm:5: error: insufficient operands: *
   ^---- 	define helloworld=2*
     ^---- define helloworld=2*
 error: assembly failed for file: test_t_define.asm

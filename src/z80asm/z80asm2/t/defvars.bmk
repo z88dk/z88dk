@@ -1,0 +1,62 @@
+DEFVARS ok
+LINE 1 "test_t_defvars.asm"
+defvars 16384{
+v1 ds.b 1
+v2 ds.b 3
+v3 ds.w 1
+ds.w 1
+}
+LINE 8 "test_t_defvars.asm"
+defvars 0
+{
+prev ds.w 1
+next ds.w 1
+data ds.w 1
+}
+LINE 15 "test_t_defvars.asm"
+defvars-1
+{
+v4 ds.q 1
+}
+LINE 20 "test_t_defvars.asm"
+defw v1,v2,v3,v4
+defw prev,next,data
+% z80asm -v test_t_defvars.asm
+assemble test_t_defvars.asm to test_t_defvars.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defvars.asm to test_t_defvars.o
+
+Object  file test_t_defvars.o at $0000: Z80RMF18
+  Name: test_t_defvars
+  CPU:  z80 
+  Section "": 14 bytes
+    C $0000: 00 40 01 40 04 40 08 40 00 00 02 00 04 00
+  Symbols:
+    L C $0004: data (section "") (file test_t_defvars.asm:12)
+    L C $0002: next (section "") (file test_t_defvars.asm:11)
+    L C $0000: prev (section "") (file test_t_defvars.asm:10)
+    L C $4000: v1 (section "") (file test_t_defvars.asm:2)
+    L C $4001: v2 (section "") (file test_t_defvars.asm:3)
+    L C $4004: v3 (section "") (file test_t_defvars.asm:4)
+    L C $4008: v4 (section "") (file test_t_defvars.asm:17)
+
+
+DEFVARS error
+LINE 1 "test_t_defvars.asm"
+defvars{
+defvars 0{
+xx.w 1
+}
+% z80asm -v test_t_defvars.asm
+assemble test_t_defvars.asm to test_t_defvars.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_defvars.asm:1: error: insufficient operands
+  ^---- 		defvars {
+    ^---- defvars{
+test_t_defvars.asm:3: error: syntax error
+  ^---- 			xx.w 1
+    ^---- xx.w 1
+error: assembly failed for file: test_t_defvars.asm
+

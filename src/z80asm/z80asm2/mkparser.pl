@@ -105,6 +105,7 @@ my %keywords = (
 	ASMPC => "asmpc",
 	C_LINE => "c_line",
 	DEFGROUP => "defgroup",
+	DEFVARS => "defvars",
 	INCLUDE => "include",
 	IX => "ix",
 	IXH => "ixh",
@@ -113,6 +114,9 @@ my %keywords = (
 	IYH => "iyh",
 	IYL => "iyl",
 	LINE => "line",
+	P => "p",
+	Q => "q",
+	W => "w",
 	XIX => "xix",
 	YIY => "yiy",
 );
