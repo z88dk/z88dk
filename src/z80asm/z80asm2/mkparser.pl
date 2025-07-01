@@ -104,6 +104,7 @@ my %keywords = (
 	AIY => "aiy",
 	ASMPC => "asmpc",
 	C_LINE => "c_line",
+	DEFGROUP => "defgroup",
 	INCLUDE => "include",
 	IX => "ix",
 	IXH => "ixh",

@@ -86,6 +86,7 @@ bool Assembler::assemble() {
 bool Assembler::parse() {
     int error_count = g_error->count();
 
+    LineParser parser;
     bool ok = true;
     string line;
     while (g_input_files->getline(line)) {
@@ -93,7 +94,6 @@ bool Assembler::parse() {
         string expanded_line;
         while (g_preproc->getline(expanded_line)) {
             g_obj_module->cur_section()->add_instr();
-            LineParser parser;
             if (!parser.parse_line(expanded_line))
                 ok = false;
         }

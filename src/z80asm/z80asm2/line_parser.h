@@ -126,8 +126,18 @@ private:
         auto size() const { return elems.size(); }
     };
 
+    enum class LineState {
+        MAIN,
+        DEFGROUP1,
+        DEFGROUP2,
+        DEFGROUP3,
+    };
+
+    // LineParser members
+    LineState m_line_state{ LineState::MAIN };
     Scanner m_in;   // input tokens
     Elems m_elems;  // synthatic elements
+    int m_defgroup_id{ 0 };
 
     struct ParseQueueElem {
         int state{ 0 };
@@ -135,8 +145,11 @@ private:
         Elems elems;
     };
 
+    bool parse_main();
+    bool parse_defgroup();
+
     bool collect_ident(string& name);
-    bool collect_optional_const_assignment(int& value);
+    bool collect_optional_const_assignment(int& value, int default_value = 1);
     bool collect_ident_list(vector<string>& names);
     bool collect_const_assign_list(vector<NameValuePair>& nv_list);
     bool collect_byte_or_string(vector<Expr>& exprs);
@@ -203,12 +216,12 @@ private:
     //@@END
 
     // state in the parsing state machine
-    struct State {
+    struct ParserState {
         unordered_map<Keyword, int> keyword_next;
         unordered_map<TType, int>	ttype_next;
         void(LineParser::* action)();
     };
 
-    static State m_states[];
+    static ParserState m_states[];
 };
 

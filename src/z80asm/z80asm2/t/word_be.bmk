@@ -37,19 +37,10 @@ define __CPU_ZILOG__ = 1
 test_t_word_be.asm:1: error: insufficient operands: +
   ^---- 		defdb 	1+
     ^---- defdb 1+
-test_t_word_be.asm:1: error: syntax error
-  ^---- 		defdb 	1+
-    ^---- defdb 1+
 test_t_word_be.asm:2: error: insufficient operands
   ^---- 		ddb 	1,
     ^---- ddb 1,
-test_t_word_be.asm:2: error: syntax error
-  ^---- 		ddb 	1,
-    ^---- ddb 1,
 test_t_word_be.asm:3: error: insufficient operands
-  ^---- 		defdb 	,
-    ^---- defdb,
-test_t_word_be.asm:3: error: syntax error
   ^---- 		defdb 	,
     ^---- defdb,
 error: assembly failed for file: test_t_word_be.asm
