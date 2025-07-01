@@ -1,0 +1,220 @@
+DEFS no filler
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 0
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 4 bytes
+    C $0000: 3E 01 3E 02
+
+
+DEFS no filler
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 1
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 5 bytes
+    C $0000: 3E 01 00 3E 02
+
+
+DEFS no filler
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: 3E 01 00 00 00 00 00 00 3E 02
+
+
+DEFS filler option
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6
+ld a,2
+% z80asm -v -f255 test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: 3E 01 FF FF FF FF FF FF 3E 02
+
+
+DEFS filler option and argument
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6,170
+ld a,2
+% z80asm -v -f255 test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: 3E 01 AA AA AA AA AA AA 3E 02
+
+
+DEFS string
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6,""
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: 3E 01 00 00 00 00 00 00 3E 02
+
+
+DEFS string
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6,"hello"
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: 3E 01 68 65 6C 6C 6F 00 3E 02
+
+
+DEFS string
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6,"hello!"
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_defs.asm to test_t_defs.o
+
+Object  file test_t_defs.o at $0000: Z80RMF18
+  Name: test_t_defs
+  CPU:  z80 
+  Section "": 10 bytes
+    C $0000: 3E 01 68 65 6C 6C 6F 21 3E 02
+
+
+DEFS string error
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 6,"hello!!"
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_defs.asm:2: error: string too long: hello!!
+  ^---- 		defs 6, "hello!!"
+    ^---- defs 6,"hello!!"
+error: assembly failed for file: test_t_defs.asm
+
+
+
+DEFS range error
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs-1
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_defs.asm:2: error: integer out of range: -1
+  ^---- 		defs -1
+    ^---- defs-1
+error: assembly failed for file: test_t_defs.asm
+
+
+
+DEFS range error
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 0,-1
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_defs.asm:2: error: integer out of range: -1
+  ^---- 		defs 0,-1
+    ^---- defs 0,-1
+error: assembly failed for file: test_t_defs.asm
+
+
+
+DEFS range error
+
+LINE 1 "test_t_defs.asm"
+ld a,1
+defs 0,256
+ld a,2
+% z80asm -v test_t_defs.asm
+assemble test_t_defs.asm to test_t_defs.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_defs.asm:2: error: integer out of range: $100
+  ^---- 		defs 0,256
+    ^---- defs 0,256
+error: assembly failed for file: test_t_defs.asm
+
+
+

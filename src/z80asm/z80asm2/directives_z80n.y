@@ -6,13 +6,13 @@
 //-----------------------------------------------------------------------------
 
 "cu" "." "wait" CONST_EXPR "," CONST_EXPR
-    g_obj_module->cu_wait($4.const_value, $6.const_value);
+    g_obj_module->add_cu_wait($4.const_value, $6.const_value);
 
 "cu" "." "move" CONST_EXPR "," CONST_EXPR
-    g_obj_module->cu_move($4.const_value, $6.const_value);
+    g_obj_module->add_cu_move($4.const_value, $6.const_value);
 
 "cu" "." "stop"
-    g_obj_module->cu_stop();
+    g_obj_module->add_cu_stop();
 
 "cu" "." "nop"
-    g_obj_module->cu_nop();
+    g_obj_module->add_cu_nop();

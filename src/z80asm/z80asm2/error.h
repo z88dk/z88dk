@@ -41,6 +41,7 @@ public:
     void error_origin_redefined() { error("origin redefined"); }
     void error_recursive_evaluation(const string& name) { error("recursive evaluation", name); }
     void error_recursive_include(const string& filename) { error("recursive include", filename); }
+    void error_string_too_long(const string& str) { error("string too long", str); }
     void error_syntax() { error("syntax error"); }
     void error_unbalanced_parens() { error("unbalanced parentheses"); }
     void error_undefined_symbol(const string& name) { error("undefined symbol", name); }
