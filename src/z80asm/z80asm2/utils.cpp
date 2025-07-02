@@ -87,6 +87,8 @@ bool read_custom_line(ifstream& stream, string& line) {
 }
 
 int ipow(int base, int exp) {
+    if (exp < 0)
+        return 0;
     int result = 1;
     for (;;) {
         if (exp & 1)
