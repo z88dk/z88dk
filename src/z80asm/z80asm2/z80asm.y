@@ -109,6 +109,16 @@
         g_obj_module->declare_extern(ident);
     }
 
+"xref" IDENT_LIST
+    for (auto& ident : $2.ident_list) {
+        g_obj_module->declare_extern(ident);
+    }
+
+"lib" IDENT_LIST
+    for (auto& ident : $2.ident_list) {
+        g_obj_module->declare_extern(ident);
+    }
+
 "global" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_global(ident);
@@ -121,6 +131,16 @@
     g_obj_module->set_origin($2.const_value);
 
 "public" IDENT_LIST
+    for (auto& ident : $2.ident_list) {
+        g_obj_module->declare_public(ident);
+    }
+
+"xdef" IDENT_LIST
+    for (auto& ident : $2.ident_list) {
+        g_obj_module->declare_public(ident);
+    }
+
+"xlib" IDENT_LIST
     for (auto& ident : $2.ident_list) {
         g_obj_module->declare_public(ident);
     }

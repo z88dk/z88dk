@@ -1,4 +1,5 @@
-EXTERN ok
+EXTERN=extern ok
+
 LINE 1 "test_t_extern.asm"
 jp func1
 extern func1
@@ -25,7 +26,8 @@ Object  file test_t_extern.o at $0000: Z80RMF18
     E W $0003 $0004 3: func2 (section "") (file test_t_extern.asm:6)
 
 
-EXTERN error
+EXTERN=extern error
+
 LINE 1 "test_t_extern.asm"
 extern func1
 func1:
@@ -38,16 +40,131 @@ assemble test_t_extern.asm to test_t_extern.o
 define __CPU_Z80__ = 1
 define __CPU_ZILOG__ = 1
 test_t_extern.asm:2: error: duplicate definition: func1
-  ^---- func1:
+  ^---- 	func1:
+    ^---- func1:
 test_t_extern.asm:4: error: duplicate definition: func2
-  ^---- 	extern func2,func3
+  ^---- 		extern func2,func3
     ^---- extern func2,func3
 test_t_extern.asm:5: error: syntax error
-  ^---- 	extern ,
+  ^---- 		extern ,
     ^---- extern,
 test_t_extern.asm:6: error: syntax error
-  ^---- 	extern func4=2
+  ^---- 		extern func4=2
     ^---- extern func4=2
+error: assembly failed for file: test_t_extern.asm
+
+
+
+EXTERN=xref ok
+
+LINE 1 "test_t_extern.asm"
+jp func1
+xref func1
+xref func1
+xref func2,func3
+xref func2,func3
+jp func2
+% z80asm -v test_t_extern.asm
+assemble test_t_extern.asm to test_t_extern.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_extern.asm to test_t_extern.o
+
+Object  file test_t_extern.o at $0000: Z80RMF18
+  Name: test_t_extern
+  CPU:  z80 
+  Section "": 6 bytes
+    C $0000: C3 00 00 C3 00 00
+  Externs:
+    U         func1
+    U         func2
+  Expressions:
+    E W $0000 $0001 3: func1 (section "") (file test_t_extern.asm:1)
+    E W $0003 $0004 3: func2 (section "") (file test_t_extern.asm:6)
+
+
+EXTERN=xref error
+
+LINE 1 "test_t_extern.asm"
+xref func1
+func1:
+func2:
+xref func2,func3
+xref,
+xref func4=2
+% z80asm -v test_t_extern.asm
+assemble test_t_extern.asm to test_t_extern.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_extern.asm:2: error: duplicate definition: func1
+  ^---- 	func1:
+    ^---- func1:
+test_t_extern.asm:4: error: duplicate definition: func2
+  ^---- 		xref func2,func3
+    ^---- xref func2,func3
+test_t_extern.asm:5: error: syntax error
+  ^---- 		xref ,
+    ^---- xref,
+test_t_extern.asm:6: error: syntax error
+  ^---- 		xref func4=2
+    ^---- xref func4=2
+error: assembly failed for file: test_t_extern.asm
+
+
+
+EXTERN=lib ok
+
+LINE 1 "test_t_extern.asm"
+jp func1
+lib func1
+lib func1
+lib func2,func3
+lib func2,func3
+jp func2
+% z80asm -v test_t_extern.asm
+assemble test_t_extern.asm to test_t_extern.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+assembled test_t_extern.asm to test_t_extern.o
+
+Object  file test_t_extern.o at $0000: Z80RMF18
+  Name: test_t_extern
+  CPU:  z80 
+  Section "": 6 bytes
+    C $0000: C3 00 00 C3 00 00
+  Externs:
+    U         func1
+    U         func2
+  Expressions:
+    E W $0000 $0001 3: func1 (section "") (file test_t_extern.asm:1)
+    E W $0003 $0004 3: func2 (section "") (file test_t_extern.asm:6)
+
+
+EXTERN=lib error
+
+LINE 1 "test_t_extern.asm"
+lib func1
+func1:
+func2:
+lib func2,func3
+lib,
+lib func4=2
+% z80asm -v test_t_extern.asm
+assemble test_t_extern.asm to test_t_extern.o
+define __CPU_Z80__ = 1
+define __CPU_ZILOG__ = 1
+test_t_extern.asm:2: error: duplicate definition: func1
+  ^---- 	func1:
+    ^---- func1:
+test_t_extern.asm:4: error: duplicate definition: func2
+  ^---- 		lib func2,func3
+    ^---- lib func2,func3
+test_t_extern.asm:5: error: syntax error
+  ^---- 		lib ,
+    ^---- lib,
+test_t_extern.asm:6: error: syntax error
+  ^---- 		lib func4=2
+    ^---- lib func4=2
 error: assembly failed for file: test_t_extern.asm
 
 

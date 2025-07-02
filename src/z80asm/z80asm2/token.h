@@ -105,6 +105,7 @@ enum class Keyword {
     JP,
     JR,
     LD,
+    LIB,
     LINE,
     MOVE,
     NC,
@@ -127,7 +128,10 @@ enum class Keyword {
     WR4,
     WR5,
     WR6,
+    XDEF,
     XIX,
+    XLIB,
+    XREF,
     YIY,
     Z,
     //@@END

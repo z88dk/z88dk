@@ -205,10 +205,14 @@ private:
     void action_defs_const_expr_comma_str();
     void action_ds_const_expr_comma_str();
     void action_extern_ident_list();
+    void action_xref_ident_list();
+    void action_lib_ident_list();
     void action_global_ident_list();
     void action_incbin_raw_str();
     void action_org_const_expr();
     void action_public_ident_list();
+    void action_xdef_ident_list();
+    void action_xlib_ident_list();
     void action_section_ident();
     void action_ident_colon();
     void action_ident_equ_expr();
