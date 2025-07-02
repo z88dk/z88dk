@@ -987,17 +987,31 @@ bool LineParser::parse_line(const string& line) {
     switch (m_line_state) {
     case LineState::MAIN:
         parse_ok = parse_main();
+        if (!parse_ok)
+            m_line_state = LineState::MAIN; // reset state on error
         break;
 
     case LineState::DEFGROUP1:
     case LineState::DEFGROUP2:
     case LineState::DEFGROUP3:
         parse_ok = parse_defgroup();
+        if (!parse_ok)
+            m_line_state = LineState::MAIN; // reset state on error
         break;
 
     case LineState::DEFVARS1:
     case LineState::DEFVARS2:
+    case LineState::DEFVARS3:
         parse_ok = parse_defvars();
+        if (!parse_ok)
+            m_line_state = LineState::MAIN; // reset state on error
+        break;
+
+    case LineState::DMA_PARAMS1:
+    case LineState::DMA_PARAMS2:
+        parse_ok = parse_dma_params();
+        if (!parse_ok)
+            m_line_state = LineState::MAIN; // reset state on error
         break;
 
     default:
@@ -1012,7 +1026,6 @@ bool LineParser::parse_line(const string& line) {
 
 bool LineParser::parse_main() {
     vector<ParseQueueElem> parse_queue;
-    int value = 0;
 
     // switch states
     switch (m_in.peek().keyword()) {
@@ -1023,25 +1036,13 @@ bool LineParser::parse_main() {
 
     case Keyword::DEFVARS:
         m_in.next();
-
-        if (!collect_const_expr(value)) 
-            return false;
-
-        if (value < 0) {
-            m_defvars_addr = m_defvars_prev_addr;
-            m_defvars_update = true;
-        }
-        else if (value == 0) {
-            m_defvars_addr = 0;
-            m_defvars_update = false;
-        }
-        else {
-            m_defvars_addr = value;
-            m_defvars_update = true;
-        }
-
         m_line_state = LineState::DEFVARS1;
         return parse_defvars();
+
+    case Keyword::DMA:
+        m_in.next();
+        m_line_state = LineState::DMA_PARAMS1;
+        return parse_dma_params();
 
     default:;
     }
@@ -1319,23 +1320,46 @@ bool LineParser::parse_defvars() {
     string name;
     int size = 1;
     int count = 0;
+    int value = 0;
 
     while (true) {
-        if (m_in.peek().is_end())
-            return true;
-
         switch (m_line_state) {
-        case LineState::DEFVARS1:      // wait of '{'
-            m_defgroup_id = 0;
+        case LineState::DEFVARS1:       // parse address
+            if (!collect_const_expr(value))
+                return false;
+
+            if (value < 0) {
+                m_defvars_addr = m_defvars_prev_addr;
+                m_defvars_update = true;
+            }
+            else if (value == 0) {
+                m_defvars_addr = 0;
+                m_defvars_update = false;
+            }
+            else {
+                m_defvars_addr = value;
+                m_defvars_update = true;
+            }
+
+            m_line_state = LineState::DEFVARS2;
+            continue;
+
+        case LineState::DEFVARS2:      // wait of '{'
+            if (m_in.peek().is_end())
+                return true;
+
             if (m_in.peek().is(TType::LBRACE)) {
                 m_in.next();
-                m_line_state = LineState::DEFVARS2;
+                m_line_state = LineState::DEFVARS3;
                 continue;
             }
             else
                 return false;
 
-        case LineState::DEFVARS2:       // wait for constant definition 
+        case LineState::DEFVARS3:       // wait for constant definition 
+            if (m_in.peek().is_end())
+                return true;
+
             if (m_in.peek().is(TType::RBRACE)) {
                 m_in.next();
                 m_line_state = LineState::MAIN;
@@ -1344,23 +1368,90 @@ bool LineParser::parse_defvars() {
                 else
                     return false;
             }
-            else if (collect_defvars_size(size) &&
-                collect_const_expr(count) &&
-                m_in.peek().is_end()) {
-                m_defvars_addr += size * count;
-                if (m_defvars_update)
-                    m_defvars_prev_addr = m_defvars_addr;
+            else {
+                int pos0 = m_in.pos();
+                if (collect_defvars_size(size) &&
+                    collect_const_expr(count) &&
+                    m_in.peek().is_end()) {
+                    m_defvars_addr += size * count;
+                    if (m_defvars_update)
+                        m_defvars_prev_addr = m_defvars_addr;
+                    continue;
+                }
+
+                m_in.set_pos(pos0);
+                if (collect_ident(name) &&
+                    collect_defvars_size(size) &&
+                    collect_const_expr(count) &&
+                    m_in.peek().is_end()) {
+                    g_obj_module->add_global_def(name, m_defvars_addr);
+                    m_defvars_addr += size * count;
+                    if (m_defvars_update)
+                        m_defvars_prev_addr = m_defvars_addr;
+                    continue;
+                }
+            }
+
+            return false;
+
+        default:
+            assert(false && "invalid LineState");
+        }
+    }
+}
+
+bool LineParser::parse_dma_params() {
+    int value = 0;
+
+    while (true) {
+        switch (m_line_state) {
+        case LineState::DMA_PARAMS1:        // wait for DMA command
+            if (!m_in.peek().is(TType::DOT)) 
+                return false;
+            
+            m_in.next(); // consume '.'
+
+            m_dma_params.clear();
+            m_dma_cmd = m_in.peek().keyword();
+            switch (m_dma_cmd) {
+            case Keyword::WR0:
+            case Keyword::WR1:
+            case Keyword::WR2:
+            case Keyword::WR3:
+            case Keyword::WR4:
+            case Keyword::WR5:
+            case Keyword::WR6:
+                m_in.next();
+                m_line_state = LineState::DMA_PARAMS2;
+                continue;
+
+            case Keyword::CMD:
+                m_in.next();
+                m_dma_cmd = Keyword::WR6;
+                m_line_state = LineState::DMA_PARAMS2;
+                continue;
+
+            default:
+                return false;
+            }
+
+        case LineState::DMA_PARAMS2:        // wait for DMA parameter
+            if (m_in.peek().is_end())
+                return m_dma_params.empty() ? false : true;
+
+            if (!collect_const_expr(value)) 
+                return false;
+
+            m_dma_params.push_back(value);
+
+            if (m_in.peek().is(TType::COMMA)) {
+                m_in.next(); // consume ','
                 continue;
             }
-            else if (collect_ident(name) &&
-                     collect_defvars_size(size) &&
-                     collect_const_expr(count) &&
-                     m_in.peek().is_end()) {
-                g_obj_module->add_global_def(name, m_defvars_addr);
-                m_defvars_addr += size * count;
-                if (m_defvars_update)
-                    m_defvars_prev_addr = m_defvars_addr;
-                continue;
+            else if (m_in.peek().is_end()) {
+                g_obj_module->add_dma_cmd(m_dma_cmd, m_dma_params);
+                m_line_state = LineState::MAIN;
+                return true;
             }
             else
                 return false;
@@ -1369,6 +1460,8 @@ bool LineParser::parse_defvars() {
             assert(false && "invalid LineState");
         }
     }
+
+    return false;
 }
 
 bool LineParser::collect_ident(string& name) {
@@ -1409,14 +1502,15 @@ bool LineParser::collect_defvars_size(int& size) {
             return false;
         }
     }
-    else
+    else {
         return false;
+    }
 }
 
 bool LineParser::collect_const_expr(int& value) {
     Expr expr;
 
-    if (!expr.parse(m_in, false))
+    if (!expr.parse(m_in, false)) 
         return false;
 
     if (!expr.eval_const(value)) {
@@ -1445,14 +1539,16 @@ bool LineParser::collect_ident_list(vector<string>& names) {
 
     names.clear();
 
-    if (!collect_ident(name))
+    if (!collect_ident(name)) 
         return false;
+
     names.push_back(name);
 
     while (m_in.peek().is(TType::COMMA)) {
         m_in.next();
-        if (!collect_ident(name))
+        if (!collect_ident(name)) 
             return false;
+
         names.push_back(name);
     }
 
@@ -1464,19 +1560,23 @@ bool LineParser::collect_const_assign_list(vector<NameValuePair>& nv_list) {
 
     nv_list.clear();
 
-    if (!collect_ident(nv.name))
+    if (!collect_ident(nv.name)) 
         return false;
-    if (!collect_optional_const_assignment(nv.value))
+
+    if (!collect_optional_const_assignment(nv.value)) 
         return false;
+
     nv_list.push_back(nv);
 
     while (m_in.peek().is(TType::COMMA)) {
         m_in.next(); // consume ','
 
-        if (!collect_ident(nv.name))
+        if (!collect_ident(nv.name)) 
             return false;
-        if (!collect_optional_const_assignment(nv.value))
+
+        if (!collect_optional_const_assignment(nv.value)) 
             return false;
+
         nv_list.push_back(nv);
     }
 
@@ -1510,13 +1610,13 @@ bool LineParser::collect_byte_list(vector<Expr>& exprs) {
 
     exprs.clear();
 
-    if (!collect_byte_or_string(exprs))
+    if (!collect_byte_or_string(exprs)) 
         return false;
 
     while (m_in.peek().is(TType::COMMA)) {
         m_in.next(); // consume ','
 
-        if (!collect_byte_or_string(exprs))
+        if (!collect_byte_or_string(exprs)) 
             return false;
     }
 
@@ -1528,16 +1628,18 @@ bool LineParser::collect_expr_list(vector<Expr>& exprs) {
 
     exprs.clear();
 
-    if (!expr.parse(m_in, false))
+    if (!expr.parse(m_in, false)) 
         return false;
+
     expr.lookup_symbols();
     exprs.push_back(expr);
 
     while (m_in.peek().is(TType::COMMA)) {
         m_in.next(); // consume ','
 
-        if (!expr.parse(m_in, false))
+        if (!expr.parse(m_in, false)) 
             return false;
+
         expr.lookup_symbols();
         exprs.push_back(expr);
     }
@@ -1548,15 +1650,17 @@ bool LineParser::collect_expr_list(vector<Expr>& exprs) {
 bool LineParser::collect_assign(vector<NameExprPair>& ne_list) {
     NameExprPair ne_pair;
 
-    if (!collect_ident(ne_pair.name))
+    if (!collect_ident(ne_pair.name)) 
         return false;
 
-    if (m_in.peek().operator_() != Operator::EQ)
+    if (m_in.peek().operator_() != Operator::EQ) 
         return false;
+
     m_in.next();
 
-    if (!ne_pair.expr.parse(m_in, false))
+    if (!ne_pair.expr.parse(m_in, false)) 
         return false;
+
     ne_pair.expr.lookup_symbols();
     ne_list.push_back(ne_pair);
     return true;
@@ -1564,13 +1668,13 @@ bool LineParser::collect_assign(vector<NameExprPair>& ne_list) {
 
 bool LineParser::collect_assign_list(vector<NameExprPair>& ne_list) {
     ne_list.clear();
-    if (!collect_assign(ne_list))
+    if (!collect_assign(ne_list)) 
         return false;
 
     while (m_in.peek().is(TType::COMMA)) {
         m_in.next(); // consume ','
 
-        if (!collect_assign(ne_list))
+        if (!collect_assign(ne_list)) 
             return false;
     }
 

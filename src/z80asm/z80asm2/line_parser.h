@@ -133,6 +133,9 @@ private:
         DEFGROUP3,
         DEFVARS1,
         DEFVARS2,
+        DEFVARS3,
+        DMA_PARAMS1,
+        DMA_PARAMS2,
     };
 
     // LineParser members
@@ -143,6 +146,8 @@ private:
     int m_defvars_addr{ 0 };
     int m_defvars_prev_addr{ 0 };
     bool m_defvars_update{ false };
+    vector<int> m_dma_params;
+    Keyword m_dma_cmd{ Keyword::NONE };
 
     struct ParseQueueElem {
         int state{ 0 };
@@ -153,6 +158,7 @@ private:
     bool parse_main();
     bool parse_defgroup();
     bool parse_defvars();
+    bool parse_dma_params();
 
     bool collect_ident(string& name);
     bool collect_defvars_size(int& size);
