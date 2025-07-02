@@ -17,7 +17,7 @@ using namespace std;
 LineParser::ParserState LineParser::m_states[] = {
     //@@BEGIN: states
     { // 0: 
-      { {Keyword::ALIGN, 1}, {Keyword::ASSERT, 7}, {Keyword::ASSUME, 13}, {Keyword::BINARY, 16}, {Keyword::BYTE, 19}, {Keyword::CALL_OZ, 22}, {Keyword::CALL_PKG, 25}, {Keyword::CU, 28}, {Keyword::DB, 44}, {Keyword::DC, 47}, {Keyword::DDB, 50}, {Keyword::DEFB, 53}, {Keyword::DEFC, 56}, {Keyword::DEFDB, 59}, {Keyword::DEFINE, 62}, {Keyword::DEFM, 65}, {Keyword::DEFP, 68}, {Keyword::DEFQ, 71}, {Keyword::DEFS, 74}, {Keyword::DEFW, 82}, {Keyword::DM, 85}, {Keyword::DP, 88}, {Keyword::DQ, 91}, {Keyword::DS, 94}, {Keyword::DW, 102}, {Keyword::DWORD, 105}, {Keyword::EXTERN, 108}, {Keyword::GLOBAL, 111}, {Keyword::INCBIN, 120}, {Keyword::JP, 123}, {Keyword::JR, 126}, {Keyword::LD, 145}, {Keyword::NOP, 174}, {Keyword::ORG, 176}, {Keyword::PTR, 179}, {Keyword::PUBLIC, 182}, {Keyword::SECTION, 185}, {Keyword::WORD, 188}, },
+      { {Keyword::ALIGN, 1}, {Keyword::ASSERT, 7}, {Keyword::ASSUME, 13}, {Keyword::BINARY, 16}, {Keyword::BYTE, 19}, {Keyword::CALL_OZ, 22}, {Keyword::CALL_PKG, 25}, {Keyword::CU, 28}, {Keyword::DB, 44}, {Keyword::DC, 47}, {Keyword::DDB, 50}, {Keyword::DEFB, 53}, {Keyword::DEFC, 56}, {Keyword::DEFDB, 59}, {Keyword::DEFINE, 62}, {Keyword::DEFM, 65}, {Keyword::DEFP, 68}, {Keyword::DEFQ, 71}, {Keyword::DEFS, 74}, {Keyword::DEFW, 82}, {Keyword::DM, 85}, {Keyword::DP, 88}, {Keyword::DQ, 91}, {Keyword::DS, 94}, {Keyword::DW, 102}, {Keyword::DWORD, 105}, {Keyword::EXTERN, 108}, {Keyword::GLOBAL, 111}, {Keyword::INCBIN, 120}, {Keyword::JP, 123}, {Keyword::JR, 126}, {Keyword::LD, 145}, {Keyword::LIB, 174}, {Keyword::NOP, 177}, {Keyword::ORG, 179}, {Keyword::PTR, 182}, {Keyword::PUBLIC, 185}, {Keyword::SECTION, 188}, {Keyword::WORD, 191}, {Keyword::XDEF, 194}, {Keyword::XLIB, 197}, {Keyword::XREF, 200}, },
       { {TType::IDENT, 114}, },
       nullptr,
     },
@@ -886,90 +886,150 @@ LineParser::ParserState LineParser::m_states[] = {
       { },
       &LineParser::action_ld_iy_comma_expr,
     },
-    { // 174: NOP
+    { // 174: LIB
       { },
-      { {TType::END, 175}, },
+      { {TType::IDENT_LIST, 175}, },
       nullptr,
     },
-    { // 175: NOP END
+    { // 175: LIB IDENT_LIST
       { },
-      { },
-      &LineParser::action_nop,
-    },
-    { // 176: ORG
-      { },
-      { {TType::CONST_EXPR, 177}, },
+      { {TType::END, 176}, },
       nullptr,
     },
-    { // 177: ORG CONST_EXPR
+    { // 176: LIB IDENT_LIST END
+      { },
+      { },
+      &LineParser::action_lib_ident_list,
+    },
+    { // 177: NOP
       { },
       { {TType::END, 178}, },
       nullptr,
     },
-    { // 178: ORG CONST_EXPR END
+    { // 178: NOP END
       { },
       { },
-      &LineParser::action_org_const_expr,
+      &LineParser::action_nop,
     },
-    { // 179: PTR
+    { // 179: ORG
       { },
-      { {TType::EXPR_LIST, 180}, },
+      { {TType::CONST_EXPR, 180}, },
       nullptr,
     },
-    { // 180: PTR EXPR_LIST
+    { // 180: ORG CONST_EXPR
       { },
       { {TType::END, 181}, },
       nullptr,
     },
-    { // 181: PTR EXPR_LIST END
+    { // 181: ORG CONST_EXPR END
       { },
       { },
-      &LineParser::action_ptr_expr_list,
+      &LineParser::action_org_const_expr,
     },
-    { // 182: PUBLIC
+    { // 182: PTR
       { },
-      { {TType::IDENT_LIST, 183}, },
+      { {TType::EXPR_LIST, 183}, },
       nullptr,
     },
-    { // 183: PUBLIC IDENT_LIST
+    { // 183: PTR EXPR_LIST
       { },
       { {TType::END, 184}, },
       nullptr,
     },
-    { // 184: PUBLIC IDENT_LIST END
+    { // 184: PTR EXPR_LIST END
       { },
       { },
-      &LineParser::action_public_ident_list,
+      &LineParser::action_ptr_expr_list,
     },
-    { // 185: SECTION
+    { // 185: PUBLIC
       { },
-      { {TType::IDENT, 186}, },
+      { {TType::IDENT_LIST, 186}, },
       nullptr,
     },
-    { // 186: SECTION IDENT
+    { // 186: PUBLIC IDENT_LIST
       { },
       { {TType::END, 187}, },
       nullptr,
     },
-    { // 187: SECTION IDENT END
+    { // 187: PUBLIC IDENT_LIST END
       { },
       { },
-      &LineParser::action_section_ident,
+      &LineParser::action_public_ident_list,
     },
-    { // 188: WORD
+    { // 188: SECTION
       { },
-      { {TType::EXPR_LIST, 189}, },
+      { {TType::IDENT, 189}, },
       nullptr,
     },
-    { // 189: WORD EXPR_LIST
+    { // 189: SECTION IDENT
       { },
       { {TType::END, 190}, },
       nullptr,
     },
-    { // 190: WORD EXPR_LIST END
+    { // 190: SECTION IDENT END
+      { },
+      { },
+      &LineParser::action_section_ident,
+    },
+    { // 191: WORD
+      { },
+      { {TType::EXPR_LIST, 192}, },
+      nullptr,
+    },
+    { // 192: WORD EXPR_LIST
+      { },
+      { {TType::END, 193}, },
+      nullptr,
+    },
+    { // 193: WORD EXPR_LIST END
       { },
       { },
       &LineParser::action_word_expr_list,
+    },
+    { // 194: XDEF
+      { },
+      { {TType::IDENT_LIST, 195}, },
+      nullptr,
+    },
+    { // 195: XDEF IDENT_LIST
+      { },
+      { {TType::END, 196}, },
+      nullptr,
+    },
+    { // 196: XDEF IDENT_LIST END
+      { },
+      { },
+      &LineParser::action_xdef_ident_list,
+    },
+    { // 197: XLIB
+      { },
+      { {TType::IDENT_LIST, 198}, },
+      nullptr,
+    },
+    { // 198: XLIB IDENT_LIST
+      { },
+      { {TType::END, 199}, },
+      nullptr,
+    },
+    { // 199: XLIB IDENT_LIST END
+      { },
+      { },
+      &LineParser::action_xlib_ident_list,
+    },
+    { // 200: XREF
+      { },
+      { {TType::IDENT_LIST, 201}, },
+      nullptr,
+    },
+    { // 201: XREF IDENT_LIST
+      { },
+      { {TType::END, 202}, },
+      nullptr,
+    },
+    { // 202: XREF IDENT_LIST END
+      { },
+      { },
+      &LineParser::action_xref_ident_list,
     },
     //@@END
 };
@@ -1882,6 +1942,22 @@ void LineParser::action_extern_ident_list() {
 
 }
 
+void LineParser::action_xref_ident_list() {
+    for (auto& ident : m_elems.elems[2-1].ident_list) {
+        g_obj_module->declare_extern(ident);
+    }
+
+
+}
+
+void LineParser::action_lib_ident_list() {
+    for (auto& ident : m_elems.elems[2-1].ident_list) {
+        g_obj_module->declare_extern(ident);
+    }
+
+
+}
+
 void LineParser::action_global_ident_list() {
     for (auto& ident : m_elems.elems[2-1].ident_list) {
         g_obj_module->declare_global(ident);
@@ -1903,6 +1979,22 @@ void LineParser::action_org_const_expr() {
 }
 
 void LineParser::action_public_ident_list() {
+    for (auto& ident : m_elems.elems[2-1].ident_list) {
+        g_obj_module->declare_public(ident);
+    }
+
+
+}
+
+void LineParser::action_xdef_ident_list() {
+    for (auto& ident : m_elems.elems[2-1].ident_list) {
+        g_obj_module->declare_public(ident);
+    }
+
+
+}
+
+void LineParser::action_xlib_ident_list() {
     for (auto& ident : m_elems.elems[2-1].ident_list) {
         g_obj_module->declare_public(ident);
     }
