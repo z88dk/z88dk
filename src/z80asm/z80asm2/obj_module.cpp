@@ -748,7 +748,9 @@ void ObjModule::call_pkg(int value) {
 }
 
 void ObjModule::add_cu_wait(int ver, int hor) {
-    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+    if (g_options->arch() != Arch::ZXN &&
+        g_options->cpu_id() != Cpu::Z80N &&
+        g_options->cpu_id() != Cpu::Z80N_STRICT)
         g_error->error_illegal_opcode();
     else if (ver < 0 || ver > 311)
         g_error->error_int_range(int_to_hex(ver, 4));
@@ -761,7 +763,9 @@ void ObjModule::add_cu_wait(int ver, int hor) {
 }
 
 void ObjModule::add_cu_move(int reg, int val) {
-    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+    if (g_options->arch() != Arch::ZXN &&
+        g_options->cpu_id() != Cpu::Z80N &&
+        g_options->cpu_id() != Cpu::Z80N_STRICT)
         g_error->error_illegal_opcode();
     else if (reg < 0 || reg > 127)
         g_error->error_int_range(int_to_hex(reg, 4));
@@ -774,7 +778,9 @@ void ObjModule::add_cu_move(int reg, int val) {
 }
 
 void ObjModule::add_cu_stop() {
-    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+    if (g_options->arch() != Arch::ZXN &&
+        g_options->cpu_id() != Cpu::Z80N &&
+        g_options->cpu_id() != Cpu::Z80N_STRICT)
         g_error->error_illegal_opcode();
     else {
         auto instr = cur_section()->add_instr();
@@ -783,7 +789,9 @@ void ObjModule::add_cu_stop() {
 }
 
 void ObjModule::add_cu_nop() {
-    if (g_options->arch() != Arch::ZXN && g_options->cpu_id() != Cpu::Z80N)
+    if (g_options->arch() != Arch::ZXN &&
+        g_options->cpu_id() != Cpu::Z80N &&
+        g_options->cpu_id() != Cpu::Z80N_STRICT)
         g_error->error_illegal_opcode();
     else {
         auto instr = cur_section()->add_instr();
@@ -852,6 +860,385 @@ void ObjModule::add_defs(int size, const string& str) {
                 instr->add_byte(g_options->filler());
         }
     }
+}
+
+bool ObjModule::get_dma_byte(deque<int>& params, int& value) {
+    if (params.empty()) {
+        g_error->error_dma_missing_argument();
+        return false;
+    }
+
+    value = params.front(); params.pop_front();
+    if (value < 0 || value > 0xFF) {
+        g_error->error_int_range(int_to_hex(value, 2));
+        return false;
+    }
+
+    return true;
+}
+
+bool ObjModule::get_dma_word(deque<int>& params, int& value) {
+    if (params.empty()) {
+        g_error->error_dma_missing_argument();
+        return false;
+    }
+
+    value = params.front(); params.pop_front();
+    if (value < 0 || value > 0xFFFF) {
+        g_error->error_int_range(int_to_hex(value, 4));
+        return false;
+    }
+
+    return true;
+}
+
+void ObjModule::add_dma_cmd(Keyword cmd, const vector<int>& params_) {
+    if (g_options->arch() != Arch::ZXN &&
+        g_options->cpu_id() != Cpu::Z80N &&
+        g_options->cpu_id() != Cpu::Z80N_STRICT) {
+        g_error->error_illegal_opcode();
+        return;
+    }
+
+    Instr* instr = cur_section()->add_instr();
+
+    int N, W;
+    deque<int> params(params_.begin(), params_.end());
+
+    // retrieve first constant expression
+    if (!get_dma_byte(params, N))
+        return;
+
+    // retrieve next arguments
+    switch (cmd) {
+    case Keyword::WR0:
+        /*
+        dma.wr0 n [, w, x, y, z] with whitespace following comma including newline and
+        maybe comment to the end of the line so params can be listed on following lines
+        n: bit 7 must be 0, bits 1..0 must be 01 else error "base register byte is illegal"
+
+        If bit 3 of n is set then accept one following byte\
+        If bit 4 of n is set then accept one following byte/ set together, expect word instead
+        If bit 5 of n is set then accept one following byte\
+        If bit 6 of n is set then accept one following byte/ set together, expect word instead
+        */
+        if ((N & 0x83) != 0x01) {
+            g_error->error_dma_base_register_illegal(int_to_hex(N, 2));
+            return;
+        }
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        // parse WR0 parameters: check bits 3,4
+        switch (N & 0x18) {
+        case 0:
+            break;
+
+        case 0x08:      // bit 3
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+            break;
+
+        case 0x10:      // bit 4
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+            break;
+
+        case 0x18:      // bits 3,4
+            if (!get_dma_word(params, W))
+                return;
+            instr->add_word(W & 0xFFFF);
+            break;
+
+        default:
+            assert(false && "Unexpected WR0 parameter bits");
+        }
+
+        // parse WR0 parameters: check bits 5,6
+        switch (N & 0x60) {
+        case 0:
+            break;
+
+        case 0x20:      // bit 5
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+            break;
+
+        case 0x40:      // bit 6
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+            break;
+
+        case 0x60:      // bits 5,6
+            if (!get_dma_word(params, W))
+                return;
+            instr->add_word(W & 0xFFFF);
+            break;
+
+        default:
+            assert(false && "Unexpected WR0 parameter bits");
+        }
+
+        break;
+
+    case Keyword::WR1:
+        /*
+        dma.wr1 n [,w]
+        or 0x04 into n
+        n: bit 7 must be 0, bits 2..0 must be 100 else error "base register byte is illegal"
+        If bit 6 of n is set then accept one following byte w.
+
+        In w bits 5..4 must be 0, bits 1..0 must not be 11 error "port A timing is illegal"
+        In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
+        */
+        if (((N & 0x87) | 0x04) != 0x04) {
+            g_error->error_dma_base_register_illegal(int_to_hex(N, 2));
+            return;
+        }
+        N |= 0x04;
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        if (N & 0x40) {
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+
+            if ((W & 0x30) != 0 || (W & 0x03) == 0x03) {
+                g_error->error_dma_illegal_port_a_timing();
+                return;
+            }
+
+            if (W & 0xCC)
+                g_error->warning_dma_half_cycle_timing();
+        }
+
+        break;
+
+    case Keyword::WR2:
+        /*
+        dma.wr2 n [,w,x]
+        n: bit 7 must be 0, bits 2..0 must be 000 else error "base register byte is illegal"
+        If bit 6 of n is set then accept one following byte w
+
+        In w bit 4 must be 0, bits 1..0 must not be 11 error "port B timing is illegal"
+        In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
+        If bit 5 of w is set then accept one following byte x that can be anything.
+        */
+        if ((N & 0x87) != 0x00) {
+            g_error->error_dma_base_register_illegal(int_to_hex(N, 2));
+            return;
+        }
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        if (N & 0x40) {
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+
+            if ((W & 0x10) != 0 || (W & 0x03) == 0x03) {
+                g_error->error_dma_illegal_port_b_timing();
+                return;
+            }
+
+            if (W & 0xCC)
+                g_error->warning_dma_half_cycle_timing();
+
+            if (W & 0x20) {
+                if (!get_dma_byte(params, W))
+                    return;
+                instr->add_byte(W & 0xFF);
+            }
+        }
+
+        break;
+
+    case Keyword::WR3:
+        /*
+        dma.wr3 n [,w,x]
+        or 0x80 into n
+        n: bit 7 must be 1, bits 1..0 must be 00 else error "base register byte is illegal"
+        If any of bits 6,5,2 of n are set then warning "dma does not support some features"
+
+        If bit 3 of n is set then accept one following byte that can be anything.
+        If bit 4 of n is set then accept one following byte that can be anything.
+        */
+        if (((N & 0x83) | 0x80) != 0x80) {
+            g_error->error_dma_base_register_illegal(int_to_hex(N, 2));
+            return;
+        }
+        N |= 0x80;
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        if (N & 0x64)
+            g_error->warning_dma_unsupported_features();
+
+        if (N & 0x08) {
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+        }
+
+        if (N & 0x10) {
+            if (!get_dma_byte(params, W))
+                return;
+            instr->add_byte(W & 0xFF);
+        }
+
+        break;
+
+    case Keyword::WR4:
+        /*
+        dma.wr4 n, [w,x]
+        or 0x81 into n
+        n: bit 7 must be 1, bits 1..0 must be 01 else error "base register byte is illegal"
+        If bit 4 of n is set then error "dma does not support interrupts"
+        If bits 6..5 of n are 00 or 11 error "dma mode is illegal"
+        If bit 2 of n is set then accept one following byte\
+        If bit 3 of n is set then accept one following byte/ set together, expect word instead
+
+        Again if both bits 2 & 3 are set, w,x must be combined into a single word parameter.
+        */
+        if (((N & 0x83) | 0x81) != 0x81) {
+            g_error->error_dma_base_register_illegal(int_to_hex(N, 2));
+            return;
+        }
+
+        if (N & 0x10) {
+            g_error->error_dma_unsupported_interrupts();
+            return;
+        }
+
+        if ((N & 0x60) == 0 || (N & 0x60) == 0x60) {
+            g_error->error_dma_illegal_mode();
+            return;
+        }
+
+        N |= 0x81;
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        if ((N & 0x0C) == 0x0C) {
+            if (!get_dma_word(params, W))
+                return;
+            instr->add_word(W & 0xFFFF);
+        }
+        else {
+            if (N & 0x04) {
+                if (!get_dma_byte(params, W))
+                    return;
+                instr->add_byte(W & 0xFF);
+            }
+
+            if (N & 0x08) {
+                if (!get_dma_byte(params, W))
+                    return;
+                instr->add_byte(W & 0xFF);
+            }
+        }
+
+        break;
+
+    case Keyword::WR5:
+        /*
+        dma.wr5 n
+        or 0x82 into n
+        n: bits 7..6 must be 10, bits 2..0 must be 010 else error "base register byte is illegal"
+        If bit 3 of n is set then warning "dma does not support ready signals"
+        */
+        if (((N & 0xC7) | 0x82) != 0x82) {
+            g_error->error_dma_base_register_illegal(int_to_hex(N, 2));
+            return;
+        }
+
+        N |= 0x82;
+
+        if (N & 0x08)
+            g_error->warning_dma_unsupported_ready_signal();
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        break;
+
+    case Keyword::WR6:
+        /*
+        dma.wr6 n [,w] or dma.cmd n [,w]
+        n:
+        accept 0xcf, 0xd3, 0x87, 0x83, 0xbb
+        warning on 0xc3, 0xc7, 0xcb, 0xaf, 0xab, 0xa3, 0xb7, 0xbf, 0x8b, 0xa7, 0xb3
+        "dma does not implement this command"
+        anything else error "illegal dma command"
+
+        if n = 0xbb accept a following byte w
+        If bit 7 of w is set error "read mask is illegal"
+
+        If any of these are missing following bytes in the comma list then maybe error
+        "missing register group member(s)".
+        if there are too many bytes "too many arguments".
+        */
+        switch (N) {
+        case 0x83:
+        case 0x87:
+        case 0xBB:
+        case 0xCF:
+        case 0xD3:
+            break;
+
+        case 0x8B:
+        case 0xA3:
+        case 0xA7:
+        case 0xAB:
+        case 0xAF:
+        case 0xB3:
+        case 0xB7:
+        case 0xBF:
+        case 0xC3:
+        case 0xC7:
+        case 0xCB:
+            g_error->warning_dma_unsupported_command();
+            break;
+
+        default:
+            g_error->error_dma_illegal_command();
+            return;
+        }
+
+        // add command byte
+        instr->add_byte(N & 0xFF);
+
+        if (N == 0xBB) {
+            if (!get_dma_byte(params, W))
+                return;
+
+            if (W & 0x80) {
+                g_error->error_dma_illegal_read_mask();
+                return;
+            }
+
+            instr->add_byte(W & 0xFF);
+        }
+
+        break;
+
+    default:
+        assert(false && "invalid DMA command");
+    }
+
+    // check for extra arguments
+    if (!params.empty())
+        g_error->error_dma_too_many_arguments();
 }
 
 void ObjModule::add_opcode_void(long long opcode) {

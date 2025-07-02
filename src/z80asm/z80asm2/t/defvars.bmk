@@ -58,5 +58,8 @@ test_t_defvars.asm:1: error: insufficient operands
 test_t_defvars.asm:3: error: syntax error
   ^---- 			xx.w 1
     ^---- xx.w 1
+test_t_defvars.asm:4: error: syntax error
+  ^---- 		}
+    ^---- }
 error: assembly failed for file: test_t_defvars.asm
 

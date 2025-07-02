@@ -19,6 +19,15 @@ public:
     void error_assertion_failed(const string& message) { error("assertion failed", message); }
     void error_constant_expression_expected() { error("constant expression expected"); }
     void error_division_by_zero() { error("division by zero"); }
+    void error_dma_base_register_illegal(const string& reg) { error("DMA base register illegal", reg); }
+    void error_dma_too_many_arguments() { error("DMA too many arguments"); }
+    void error_dma_illegal_command() { error("DMA illegal command"); }
+    void error_dma_illegal_mode() { error("DMA illegal mode"); }
+    void error_dma_illegal_port_a_timing() { error("DMA illegal port A timing"); }
+    void error_dma_illegal_port_b_timing() { error("DMA illegal port B timing"); }
+    void error_dma_illegal_read_mask() { error("DMA illegal read mask"); }
+    void error_dma_missing_argument() { error("DMA missing argument"); }
+    void error_dma_unsupported_interrupts() { error("DMA unsupported interrupts"); }
     void error_duplicate_definition(const string& name) { error("duplicate definition", name); }
     void error_expected_comma() { error("expected ','"); }
     void error_expected_eol() { error("expected end of line"); }
@@ -46,6 +55,10 @@ public:
     void error_unbalanced_parens() { error("unbalanced parentheses"); }
     void error_undefined_symbol(const string& name) { error("undefined symbol", name); }
     void error_unterminated_string() { error("unterminated string"); }
+    void warning_dma_half_cycle_timing() { warning("DMA half-cycle timing is not supported"); }
+    void warning_dma_unsupported_command() { warning("DMA unsupported command"); }
+    void warning_dma_unsupported_features() { warning("DMA unsupported features"); }
+    void warning_dma_unsupported_ready_signal() { warning("DMA unsupported ready signal"); }
     void warning_int_range(const string& hex_value) { error("integer out of range", hex_value); }
 
 private:

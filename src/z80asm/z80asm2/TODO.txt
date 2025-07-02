@@ -1,3 +1,6 @@
 - AStyle
-- scan unmbers in hexadecimal and binary
+- scan numbers in hexadecimal and binary
 - scan floating point numbers
+- handle lists terminating in a comma and continuing on a next line in the InputFile,
+  simplify LineParser handling DMA
+- copy copper unit tests from issue_0312.t

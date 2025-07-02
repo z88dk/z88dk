@@ -89,6 +89,9 @@ define __CPU_ZILOG__ = 1
 test_t_defgroup.asm:2: error: extra operands
   ^---- 		x1=1 x2 
     ^---- x1=1 x2
+test_t_defgroup.asm:3: error: syntax error
+  ^---- 		}
+    ^---- }
 error: assembly failed for file: test_t_defgroup.asm
 
 

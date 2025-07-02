@@ -236,6 +236,9 @@ public:
     void add_dword_list(const vector<Expr>& exprs);
     void add_defs(int size, int filler);
     void add_defs(int size, const string& str);
+    bool get_dma_byte(deque<int>& params, int& value);
+    bool get_dma_word(deque<int>& params, int& value);
+    void add_dma_cmd(Keyword cmd, const vector<int>& params);
 
     void add_opcode_void(long long opcode);
     void add_opcode_jr(long long opcode, const Expr& expr);
