@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "error.h"
 #include "options.h"
 #include "token.h"
 #include "utils.h"
@@ -58,6 +59,8 @@ string to_string(Keyword keyword) {
     static unordered_map<Keyword, string> keywords = {
         //@@BEGIN: keyword_text
         { Keyword::A, "a" },
+        { Keyword::AF, "af" },
+        { Keyword::AF1, "af'" },
         { Keyword::AIX, "aix" },
         { Keyword::AIY, "aiy" },
         { Keyword::ALIGN, "align" },
@@ -153,6 +156,8 @@ Keyword lookup_keyword(const string& text) {
     static unordered_map<string, Keyword> keywords = {
         //@@BEGIN: keyword_lookup
         { "a", Keyword::A },
+        { "af", Keyword::AF },
+        { "af'", Keyword::AF1 },
         { "aix", Keyword::AIX },
         { "aiy", Keyword::AIY },
         { "align", Keyword::ALIGN },
@@ -266,6 +271,7 @@ void Token::set_keyword(const string& text) {
 		case Keyword::YIY:
 			m_svalue = swap_x_y(m_svalue);
 			m_keyword = ::lookup_keyword(m_svalue);
+            break;
 		default:;
 		}
 	}

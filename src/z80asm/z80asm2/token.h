@@ -55,6 +55,8 @@ enum class Keyword {
     //@@BEGIN: keyword
     NONE,
     A,
+    AF,
+    AF1,
     AIX,
     AIY,
     ALIGN,

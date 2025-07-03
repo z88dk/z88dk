@@ -204,6 +204,7 @@ int main(int argc, char* argv[]) {
     Memmap::test();
     StringTable::test();
     Expr::test();
+    Scanner::test();
     return EXIT_SUCCESS;
 #endif
 
