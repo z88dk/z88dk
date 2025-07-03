@@ -17,16 +17,17 @@ public:
     void error_align_redefined() { error("align redefined"); }
     void error_assembly_failed(const string& filename) { error("assembly failed for file", filename); }
     void error_assertion_failed(const string& message) { error("assertion failed", message); }
+    void error_bitmask_too_long() { error("bitmask too long"); }
     void error_constant_expression_expected() { error("constant expression expected"); }
     void error_division_by_zero() { error("division by zero"); }
     void error_dma_base_register_illegal(const string& reg) { error("DMA base register illegal", reg); }
-    void error_dma_too_many_arguments() { error("DMA too many arguments"); }
     void error_dma_illegal_command() { error("DMA illegal command"); }
     void error_dma_illegal_mode() { error("DMA illegal mode"); }
     void error_dma_illegal_port_a_timing() { error("DMA illegal port A timing"); }
     void error_dma_illegal_port_b_timing() { error("DMA illegal port B timing"); }
     void error_dma_illegal_read_mask() { error("DMA illegal read mask"); }
     void error_dma_missing_argument() { error("DMA missing argument"); }
+    void error_dma_too_many_arguments() { error("DMA too many arguments"); }
     void error_dma_unsupported_interrupts() { error("DMA unsupported interrupts"); }
     void error_duplicate_definition(const string& name) { error("duplicate definition", name); }
     void error_expected_comma() { error("expected ','"); }

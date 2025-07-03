@@ -100,6 +100,8 @@ my %operators = (
 
 my %keywords = (
 	NONE => "",
+	AF => "af",
+	AF1 => "af'",
 	AIX => "aix",
 	AIY => "aiy",
 	ASMPC => "asmpc",
