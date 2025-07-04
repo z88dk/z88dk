@@ -61,6 +61,7 @@ public:
     void warning_dma_unsupported_features() { warning("DMA unsupported features"); }
     void warning_dma_unsupported_ready_signal() { warning("DMA unsupported ready signal"); }
     void warning_int_range(const string& hex_value) { error("integer out of range", hex_value); }
+    void error_illegal_identifier(const string& identifier) { error("illegal identifier", identifier); }
 
 private:
     int m_count{ 0 };

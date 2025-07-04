@@ -37,8 +37,8 @@ const unordered_map<Operator, OperatorInfo> OperatorTable::table = {
     { Operator::POWER, { 14, Associativity::Right, Arity::Binary } },
     { Operator::RSHIFT, { 10, Associativity::Left, Arity::Binary } },
     { Operator::TERNARY, { 1, Associativity::Right, Arity::Ternary } },
-    { Operator::UMINUS, { 13, Associativity::Right, Arity::Unary } },
-    { Operator::UPLUS, { 13, Associativity::Right, Arity::Unary } },
+    { Operator::UNARY_MINUS, { 13, Associativity::Right, Arity::Unary } },
+    { Operator::UNARY_PLUS, { 13, Associativity::Right, Arity::Unary } },
     //@@END
 };
 
@@ -77,8 +77,8 @@ void do_operator(Operator op, stack<int>& operands) {
 
     switch (op) {
     case Operator::POWER: operands.push(ipow(x1, x2)); break;
-    case Operator::UPLUS: operands.push(x1); break;
-    case Operator::UMINUS: operands.push(-x1); break;
+    case Operator::UNARY_PLUS: operands.push(x1); break;
+    case Operator::UNARY_MINUS: operands.push(-x1); break;
     case Operator::LOG_NOT: operands.push(x1 ? 0 : 1); break;
     case Operator::BIN_NOT: operands.push(~x1); break;
     case Operator::MULT: operands.push(x1 * x2); break;
@@ -149,8 +149,8 @@ string to_string(Operator op) {
         { Operator::POWER, "**" },
         { Operator::RSHIFT, ">>" },
         { Operator::TERNARY, "?:" },
-        { Operator::UMINUS, "-" },
-        { Operator::UPLUS, "+" },
+        { Operator::UNARY_MINUS, "-" },
+        { Operator::UNARY_PLUS, "+" },
         //@@END
     };
 

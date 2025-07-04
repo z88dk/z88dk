@@ -77,7 +77,7 @@ private:
     };
 
     bool is_unary(Scanner& in) const;
-    bool to_RPN(Scanner& in, bool silent);
+    bool to_rpn(Scanner& in, bool silent);
     bool check_RPN_syntax(bool silent);
     ValueResult check_eval() const;
 };
