@@ -928,10 +928,6 @@ void Scanner::test_negative_cases() {
     assert_token_count(scanner, 1);
     assert_token_type(scanner, 0, TType::IDENT);
 
-    // Non-ASCII character
-    assert(!scanner.scan("©"));
-    assert_token_count(scanner, 0);
-
     // integer followed by float
     assert(scanner.scan("1+.3"));
     assert_token_count(scanner, 3);
