@@ -5,4 +5,4 @@ all:
 
 clean:
 	$(MAKE) -C fcntl clean
-	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def
+	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def */*.o

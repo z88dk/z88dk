@@ -1653,6 +1653,7 @@ gfxnc100.lib: $(TARGET_CLIB_OBJS) nc_clib.lib
 	@echo ''
 	@echo '--- Building NC-100 Graphics Library ---'
 	@echo ''
+	$(MAKE) -C target/nc100 clean
 	$(MAKE) -C gfx TARGET=nc FLAVOUR="wide"
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(TARGET_DIRECTORY)/nc100/gfxnc.lst
 
@@ -1660,6 +1661,7 @@ gfxzcn.lib: $(TARGET_CLIB_OBJS) gfxnc100.lib
 	@echo ''
 	@echo '--- Building NC-100 Graphics Library (ZCN)---'
 	@echo ''
+	$(MAKE) -C target/nc100 clean
 	$(MAKE) -C gfx TARGET=nc FLAVOUR="wide" SUBTYPE=zcn
 	TARGET=zcn TYPE=z80 $(LIBLINKER) -DFORnc100 -DFORzcn -x$(OUTPUT_DIRECTORY)/gfxzcn @$(TARGET_DIRECTORY)/nc100/gfxnc.lst
 
@@ -1668,6 +1670,7 @@ gfxnc200.lib: $(TARGET_CLIB_OBJS) gfxzcn.lib
 	@echo ''
 	@echo '--- Building NC-200 Graphics Library ---'
 	@echo ''
+	$(MAKE) -C target/nc100 clean
 	$(MAKE) -C gfx TARGET=nc FLAVOUR="wide" SUBTYPE=nc200
 	TARGET=nc200 TYPE=z80 $(LIBLINKER) -DFORnc200 -x$(OUTPUT_DIRECTORY)/gfxnc200 @$(TARGET_DIRECTORY)/nc100/gfxnc.lst
 
