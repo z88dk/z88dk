@@ -1,3 +1,2 @@
 - AStyle
-- scan floating point numbers
 - copy copper unit tests from issue_0312.t

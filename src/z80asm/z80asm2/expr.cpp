@@ -74,7 +74,7 @@ bool Expr::parse(Scanner& in, bool silent) {
     clear();
     m_pos0 = in.pos();
 
-    if (to_RPN(in, silent)) {
+    if (to_rpn(in, silent)) {
         // copy infix tokens
         int pos1 = in.pos();
         for (int i = m_pos0; i < pos1; ++i)
@@ -104,8 +104,8 @@ string Expr::to_string() const {
 string Expr::rpn_to_string() const {
     string output;
     for (auto& token : m_postfix) {
-        if (token.operator_() == Operator::UPLUS ||
-            token.operator_() == Operator::UMINUS)
+        if (token.operator_() == Operator::UNARY_PLUS ||
+            token.operator_() == Operator::UNARY_MINUS)
             output += "u";
         output += token.to_string() + " ";
     }
@@ -167,7 +167,7 @@ bool Expr::is_unary(Scanner& in) const {
 }
 
 // Shunting Yard algotithm to convert infix to postfix (RPN)
-bool Expr::to_RPN(Scanner& in, bool silent) {
+bool Expr::to_rpn(Scanner& in, bool silent) {
     stack<Token> op_stack;
     int open_parens = 0;
 
@@ -185,8 +185,8 @@ bool Expr::to_RPN(Scanner& in, bool silent) {
             // Adjust to unary operator
             if (is_unary(in)) {
                 switch (op) {
-                case Operator::PLUS: op = Operator::UPLUS; break;
-                case Operator::MINUS: op = Operator::UMINUS; break;
+                case Operator::PLUS: op = Operator::UNARY_PLUS; break;
+                case Operator::MINUS: op = Operator::UNARY_MINUS; break;
                 default:;
                 }
             }
@@ -462,11 +462,11 @@ Expr::ValueResult Expr::check_eval() const {
                 }
                 break;
 
-            case Operator::UPLUS:
+            case Operator::UNARY_PLUS:
                 r = x1;
                 break;
 
-            case Operator::UMINUS:
+            case Operator::UNARY_MINUS:
                 r.value = -x1.value;
                 r.result = x1.result;
 				r.section = x1.section;

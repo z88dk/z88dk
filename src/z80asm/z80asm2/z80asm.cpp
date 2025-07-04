@@ -17,6 +17,7 @@
 #include "preproc.h"
 #include "string_table.h"
 #include "symbol.h"
+#include "zfloat.h"
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -204,6 +205,7 @@ int main(int argc, char* argv[]) {
     Memmap::test();
     StringTable::test();
     Expr::test();
+    FloatExpr::test();
     Scanner::test();
     return EXIT_SUCCESS;
 #endif

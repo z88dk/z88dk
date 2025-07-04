@@ -38,8 +38,8 @@ enum class Operator {
     POWER,
     RSHIFT,
     TERNARY,
-    UMINUS,
-    UPLUS,
+    UNARY_MINUS,
+    UNARY_PLUS,
     //@@END
 };
 
