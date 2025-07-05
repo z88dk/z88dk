@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2025
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ Options g_options;
 #define Z88DK_VERSION "build " __DATE__
 #endif
 
-#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2024"
+#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2025"
 
 #define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT
 
