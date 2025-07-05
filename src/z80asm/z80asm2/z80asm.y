@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // Recognized grammar
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2025
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -156,7 +156,7 @@ IDENT "equ" EXPR
 //-----------------------------------------------------------------------------
 // z80asm
 // Recognized grammar - z80n architecture
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2025
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -174,7 +174,7 @@ IDENT "equ" EXPR
 //-----------------------------------------------------------------------------
 // z80asm
 // Recognized grammar - z88 architecture
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2025
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -186,7 +186,7 @@ IDENT "equ" EXPR
 //-----------------------------------------------------------------------------
 // z80asm
 // Recognized grammar - CPU opcodes
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2025
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
