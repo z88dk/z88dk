@@ -250,7 +250,7 @@ void Instr::include_binary(const string& filename_) {
         // find the size of the file
         ifs.seekg(0, ios::end);
         auto size = ifs.tellg();
-        ifs.seekg(0, std::ios::beg);
+        ifs.seekg(0, ios::beg);
 
         // append to bytes
         if (size > 0) {

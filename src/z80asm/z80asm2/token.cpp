@@ -9,9 +9,11 @@
 #include "options.h"
 #include "token.h"
 #include "utils.h"
-#include <unordered_map>
+#include <cassert>
+#include <cmath>
 using namespace std;
 
+//-----------------------------------------------------------------------------
 string to_string(TType ttype) {
     static unordered_map<TType, string> ttypes = {
         //@@BEGIN: ttype_text
@@ -55,6 +57,7 @@ string to_string(TType ttype) {
         return it->second;
 }
 
+//-----------------------------------------------------------------------------
 string to_string(Keyword keyword) {
     static unordered_map<Keyword, string> keywords = {
         //@@BEGIN: keyword_text
@@ -290,6 +293,308 @@ Keyword lookup_keyword(const string& text) {
         return it->second;
 }
 
+//-----------------------------------------------------------------------------
+const unordered_map<Operator, OperatorInfo> OperatorTable::table = {
+    //@@BEGIN: operator_info
+    { Operator::BIN_AND, { 7, Associativity::Left, Arity::Binary } },
+    { Operator::BIN_NOT, { 13, Associativity::Right, Arity::Unary } },
+    { Operator::BIN_OR, { 5, Associativity::Left, Arity::Binary } },
+    { Operator::BIN_XOR, { 6, Associativity::Left, Arity::Binary } },
+    { Operator::DIV, { 12, Associativity::Left, Arity::Binary } },
+    { Operator::EQ, { 8, Associativity::Left, Arity::Binary } },
+    { Operator::GE, { 9, Associativity::Left, Arity::Binary } },
+    { Operator::GT, { 9, Associativity::Left, Arity::Binary } },
+    { Operator::LE, { 9, Associativity::Left, Arity::Binary } },
+    { Operator::LOG_AND, { 4, Associativity::Left, Arity::Binary } },
+    { Operator::LOG_NOT, { 13, Associativity::Right, Arity::Unary } },
+    { Operator::LOG_OR, { 2, Associativity::Left, Arity::Binary } },
+    { Operator::LOG_XOR, { 3, Associativity::Left, Arity::Binary } },
+    { Operator::LSHIFT, { 10, Associativity::Left, Arity::Binary } },
+    { Operator::LT, { 9, Associativity::Left, Arity::Binary } },
+    { Operator::MINUS, { 11, Associativity::Left, Arity::Binary } },
+    { Operator::MOD, { 12, Associativity::Left, Arity::Binary } },
+    { Operator::MULT, { 12, Associativity::Left, Arity::Binary } },
+    { Operator::NE, { 8, Associativity::Left, Arity::Binary } },
+    { Operator::NONE, { 0, Associativity::Left, Arity::Unary } },
+    { Operator::PLUS, { 11, Associativity::Left, Arity::Binary } },
+    { Operator::POWER, { 14, Associativity::Right, Arity::Binary } },
+    { Operator::RSHIFT, { 10, Associativity::Left, Arity::Binary } },
+    { Operator::TERNARY, { 1, Associativity::Right, Arity::Ternary } },
+    { Operator::UNARY_MINUS, { 13, Associativity::Right, Arity::Unary } },
+    { Operator::UNARY_PLUS, { 13, Associativity::Right, Arity::Unary } },
+    //@@END
+};
+
+void do_operator(Operator op, stack<int>& operands) {
+    const OperatorInfo* op_info = OperatorTable::get_info(op);
+    int i1 = 0, i2 = 0, i3 = 0;
+
+    switch (op_info->arity) {
+    case Arity::Unary:
+        if (operands.size() < 1) {
+            g_error->error_insufficient_operands(to_string(op));
+            return;
+        }
+        i1 = operands.top(); operands.pop();
+        break;
+    case Arity::Binary:
+        if (operands.size() < 2) {
+            g_error->error_insufficient_operands(to_string(op));
+            return;
+        }
+        i2 = operands.top(); operands.pop();
+        i1 = operands.top(); operands.pop();
+        break;
+    case Arity::Ternary:
+        if (operands.size() < 3) {
+            g_error->error_insufficient_operands(to_string(op));
+            return;
+        }
+        i3 = operands.top(); operands.pop();
+        i2 = operands.top(); operands.pop();
+        i1 = operands.top(); operands.pop();
+        break;
+    default:
+        assert(false && "Unknown operator arity");
+    }
+
+    switch (op) {
+    case Operator::POWER: operands.push(ipow(i1, i2)); break;
+    case Operator::UNARY_PLUS: operands.push(i1); break;
+    case Operator::UNARY_MINUS: operands.push(-i1); break;
+    case Operator::LOG_NOT: operands.push(i1 ? 0 : 1); break;
+    case Operator::BIN_NOT: operands.push(~i1); break;
+    case Operator::MULT: operands.push(i1 * i2); break;
+    case Operator::PLUS: operands.push(i1 + i2); break;
+    case Operator::MINUS: operands.push(i1 - i2); break;
+    case Operator::LSHIFT: operands.push(i1 << i2); break;
+    case Operator::RSHIFT: operands.push(i1 >> i2); break;
+    case Operator::LT: operands.push(i1 < i2); break;
+    case Operator::LE: operands.push(i1 <= i2); break;
+    case Operator::GT: operands.push(i1 > i2); break;
+    case Operator::GE: operands.push(i1 >= i2); break;
+    case Operator::EQ: operands.push(i1 == i2); break;
+    case Operator::NE: operands.push(i1 != i2); break;
+    case Operator::BIN_AND: operands.push(i1 & i2); break;
+    case Operator::BIN_OR: operands.push(i1 | i2); break;
+    case Operator::BIN_XOR: operands.push(i1 ^ i2); break;
+    case Operator::LOG_AND: operands.push((i1 && i2) ? 1 : 0); break;
+    case Operator::LOG_OR: operands.push((i1 || i2) ? 1 : 0); break;
+    case Operator::LOG_XOR: operands.push((i1 == i2) ? 0 : 1); break;
+    case Operator::TERNARY: operands.push(i1 ? i2 : i3); break;
+    case Operator::DIV:
+        if (i2 == 0) {
+            g_error->error_division_by_zero();
+            operands.push(0);
+        }
+        else {
+            operands.push(i1 / i2);
+        }
+        break;
+    case Operator::MOD:
+        if (i2 == 0) {
+            g_error->error_division_by_zero();
+            operands.push(0);
+        }
+        else {
+            operands.push(i1 % i2);
+        }
+        break;
+    default:
+        assert(false && "Unknown operator");
+    }
+}
+
+void do_operator(Operator op, stack<double>& operands) {
+    const OperatorInfo* info = OperatorTable::get_info(op);
+    double f1 = 0.0, f2 = 0.0, f3 = 0.0;
+
+    switch (info->arity) {
+    case Arity::Unary:
+        if (operands.size() < 1) {
+            g_error->error_insufficient_operands(to_string(op));
+            return;
+        }
+        f1 = operands.top(); operands.pop();
+        break;
+    case Arity::Binary:
+        if (operands.size() < 2) {
+            g_error->error_insufficient_operands(to_string(op));
+            return;
+        }
+        f2 = operands.top(); operands.pop();
+        f1 = operands.top(); operands.pop();
+        break;
+    case Arity::Ternary:
+        if (operands.size() < 3) {
+            g_error->error_insufficient_operands(to_string(op));
+            return;
+        }
+        f3 = operands.top(); operands.pop();
+        f2 = operands.top(); operands.pop();
+        f1 = operands.top(); operands.pop();
+        break;
+    default:
+        assert(false && "Unknown operator arity");
+    }
+
+    switch (op) {
+    case Operator::UNARY_MINUS: operands.push(-f1); break;
+    case Operator::UNARY_PLUS: operands.push(+f1); break;
+    case Operator::LOG_NOT: operands.push((f1 > 1e-9) ? 0 : 1); break;
+    case Operator::BIN_NOT: operands.push(~static_cast<int>(f1)); break;
+    case Operator::PLUS: operands.push(f1 + f2); break;
+    case Operator::MINUS: operands.push(f1 - f2); break;
+    case Operator::MULT: operands.push(f1 * f2); break;
+    case Operator::DIV:
+        if (f2 < 1e-9) {
+            g_error->error_division_by_zero();
+            operands.push(0);
+        }
+        else {
+            operands.push(f1 / f2);
+        }
+        break;
+    case Operator::MOD:
+        if (f2 < 1e-9) {
+            g_error->error_division_by_zero();
+            operands.push(0);
+        }
+        else {
+            operands.push(fmod(f1, f2));
+        }
+        break;
+    case Operator::POWER: operands.push(pow(f1, f2)); break;
+    case Operator::LT: operands.push(f1 < f2); break;
+    case Operator::LE: operands.push(f1 <= f2); break;
+    case Operator::GT: operands.push(f1 > f2); break;
+    case Operator::GE: operands.push(f1 >= f2); break;
+    case Operator::EQ: operands.push(f1 == f2); break;
+    case Operator::NE: operands.push(f1 != f2); break;
+    case Operator::LOG_AND: operands.push((f1 && f2) ? 1 : 0); break;
+    case Operator::LOG_OR: operands.push((f1 || f2) ? 1 : 0); break;
+    case Operator::LOG_XOR: operands.push((f1 != f2) ? 1 : 0); break;
+    case Operator::BIN_AND: operands.push(static_cast<int>(f1) & static_cast<int>(f2)); break;
+    case Operator::BIN_OR: operands.push(static_cast<int>(f1) | static_cast<int>(f2)); break;
+    case Operator::BIN_XOR: operands.push(static_cast<int>(f1) ^ static_cast<int>(f2)); break;
+    case Operator::LSHIFT: operands.push(static_cast<int>(f1) << static_cast<int>(f2)); break;
+    case Operator::RSHIFT: operands.push(static_cast<int>(f1) >> static_cast<int>(f2)); break;
+    case Operator::TERNARY: operands.push(f1 ? f2 : f3); break;
+    default:
+        assert(false && "Unknown operator");
+    }
+}
+
+string to_string(Operator op) {
+    static unordered_map<Operator, string> operators = {
+        //@@BEGIN: operator_text
+        { Operator::BIN_AND, "&" },
+        { Operator::BIN_NOT, "~" },
+        { Operator::BIN_OR, "|" },
+        { Operator::BIN_XOR, "^" },
+        { Operator::DIV, "/" },
+        { Operator::EQ, "=" },
+        { Operator::GE, ">=" },
+        { Operator::GT, ">" },
+        { Operator::LE, "<=" },
+        { Operator::LOG_AND, "&&" },
+        { Operator::LOG_NOT, "!" },
+        { Operator::LOG_OR, "||" },
+        { Operator::LOG_XOR, "^^" },
+        { Operator::LSHIFT, "<<" },
+        { Operator::LT, "<" },
+        { Operator::MINUS, "-" },
+        { Operator::MOD, "%" },
+        { Operator::MULT, "*" },
+        { Operator::NE, "<>" },
+        { Operator::NONE, "" },
+        { Operator::PLUS, "+" },
+        { Operator::POWER, "**" },
+        { Operator::RSHIFT, ">>" },
+        { Operator::TERNARY, "?:" },
+        { Operator::UNARY_MINUS, "-" },
+        { Operator::UNARY_PLUS, "+" },
+        //@@END
+    };
+
+    auto it = operators.find(op);
+    if (it == operators.end())
+        return "";
+    else
+        return it->second;
+}
+
+const OperatorInfo* OperatorTable::get_info(Operator op) {
+    auto it = table.find(op);
+    if (it == table.end())
+        assert(false && "Unknown operator");
+    return &it->second;
+}
+
+static double dummy_unary(double a) { return a; }
+static double dummy_binary(double a, double b) { return a + b; }
+
+const unordered_map<Keyword, FunctionInfo> FunctionTable::table = {
+    { Keyword::SIN, { Arity::Unary, sin, dummy_binary }},
+    { Keyword::COS, { Arity::Unary, cos, dummy_binary }},
+    { Keyword::TAN, { Arity::Unary, tan, dummy_binary }},
+    { Keyword::ASIN, { Arity::Unary, asin, dummy_binary }},
+    { Keyword::ACOS, { Arity::Unary, acos, dummy_binary }},
+    { Keyword::ATAN, { Arity::Unary, atan, dummy_binary }},
+    { Keyword::SINH, { Arity::Unary, sinh, dummy_binary }},
+    { Keyword::COSH, { Arity::Unary, cosh, dummy_binary }},
+    { Keyword::TANH, { Arity::Unary, tanh, dummy_binary }},
+    { Keyword::EXP, { Arity::Unary, exp, dummy_binary }},
+    { Keyword::LOG, { Arity::Unary, log, dummy_binary }},
+    { Keyword::LOG10, { Arity::Unary, log10, dummy_binary }},
+    { Keyword::SQRT, { Arity::Unary, sqrt, dummy_binary }},
+    { Keyword::CEIL, { Arity::Unary, ceil, dummy_binary }},
+    { Keyword::FLOOR, { Arity::Unary, floor, dummy_binary }},
+    { Keyword::FABS, { Arity::Unary, fabs, dummy_binary }},
+    { Keyword::ROUND, { Arity::Unary, round, dummy_binary }},
+    { Keyword::TRUNC, { Arity::Unary, trunc, dummy_binary }},
+    { Keyword::POW, { Arity::Binary, dummy_unary, pow }},
+    { Keyword::ATAN2, { Arity::Binary, dummy_unary, atan2 }},
+    { Keyword::FMOD, { Arity::Binary, dummy_unary, fmod }},
+};
+
+const FunctionInfo* FunctionTable::get_info(Keyword keyword) {
+    auto it = table.find(keyword);
+    if (it == table.end())
+        return nullptr;
+    else
+        return &it->second;
+}
+
+void do_function(Keyword keyword, stack<double>& operands) {
+    const FunctionInfo* info = FunctionTable::get_info(keyword);
+    assert(info != nullptr && "Unknown function");
+    double f1 = 0.0, f2 = 0.0;
+
+    switch (info->arity) {
+    case Arity::Unary:
+        if (operands.size() < 1) {
+            g_error->error_insufficient_operands(to_string(keyword));
+            return;
+        }
+        f1 = operands.top(); operands.pop();
+        operands.push(info->unary_func(f1));
+        break;
+    case Arity::Binary:
+        if (operands.size() < 2) {
+            g_error->error_insufficient_operands(to_string(keyword));
+            return;
+        }
+        f2 = operands.top(); operands.pop();
+        f1 = operands.top(); operands.pop();
+        operands.push(info->binary_func(f1, f2));
+        break;
+    default:
+        assert(false && "Unknown function arity");
+    }
+}
+
+//-----------------------------------------------------------------------------
 Token::Token(TType ttype, bool blank_before)
     : m_ttype(ttype), m_blank_before(blank_before) {
 }
@@ -403,3 +708,4 @@ string Token::swap_x_y(string str) {
     }
     return str;
 }
+

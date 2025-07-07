@@ -740,7 +740,7 @@ void Scanner::assert_token_keyword(const Scanner& scanner, size_t index, const s
 
 void Scanner::assert_token_operator(const Scanner& scanner, size_t index, Operator expected_op) {
     assert(index < scanner.size());
-    assert(scanner[index].operator_() == expected_op);
+    assert(scanner[index].op() == expected_op);
 }
 
 void Scanner::test_scanner_numeric_literals() {
@@ -950,7 +950,7 @@ void Scanner::test_float_scanner() {
         assert(ok);
         assert(scanner.size() == 1);
         assert(scanner[0].ttype() == TType::FLOAT);
-        assert(std::abs(scanner[0].fvalue() - expected) < 1e-10);
+        assert(fabs(scanner[0].fvalue() - expected) < 1e-10);
         };
 
     test("0.5", 0.5);

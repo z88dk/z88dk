@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "operator.h"
 #include "scanner.h"
 #include "token.h"
 #include <set>
@@ -25,6 +24,7 @@ public:
 	bool parse(Scanner& in);
 	double eval() const;
 	string to_string() const;
+	string rpn_to_string() const;
 
 #ifdef UNIT_TESTS
 	static void test();
@@ -62,7 +62,9 @@ private:
 		Keyword::FMOD,
 	};
 
+    bool is_unary(Scanner& in) const;
 	bool to_rpn(Scanner& in);
+    bool check_RPN_syntax();
 	static int precedence(Operator op);
 	static bool is_right_associative(Operator op);
 };

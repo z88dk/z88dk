@@ -63,7 +63,7 @@ private:
     static void assert_token(const Scanner& scanner, TType expected_type, int expected_ivalue);
     static void assert_token_count(const Scanner& scanner, size_t expected);
     static void assert_token_type(const Scanner& scanner, size_t index, TType expected_type);
-    static void assert_token_keyword(const Scanner& scanner, size_t index, const std::string& expected_kw);
+    static void assert_token_keyword(const Scanner& scanner, size_t index, const string& expected_kw);
     static void assert_token_operator(const Scanner& scanner, size_t index, Operator expected_op);
     static void test_scanner_numeric_literals();
     static void test_identifiers_and_keywords();

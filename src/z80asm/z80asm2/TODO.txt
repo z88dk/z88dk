@@ -1,2 +1,5 @@
 - AStyle
 - copy copper unit tests from issue_0312.t
+- Unit tests must capture error messages and check that all have been handled
+- Add unit tests to FloatExpr class
+- Add floating point types and conversion from float to binary
