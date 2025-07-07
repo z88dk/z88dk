@@ -104,8 +104,8 @@ string Expr::to_string() const {
 string Expr::rpn_to_string() const {
     string output;
     for (auto& token : m_postfix) {
-        if (token.operator_() == Operator::UNARY_PLUS ||
-            token.operator_() == Operator::UNARY_MINUS)
+        if (token.op() == Operator::UNARY_PLUS ||
+            token.op() == Operator::UNARY_MINUS)
             output += "u";
         output += token.to_string() + " ";
     }
@@ -171,17 +171,20 @@ bool Expr::to_rpn(Scanner& in, bool silent) {
     stack<Token> op_stack;
     int open_parens = 0;
 
-    while (!in.peek().is(TType::END)) {
-        const Token& token = in.peek();
-        TType ttype = token.ttype();
-        Operator op = token.operator_();
+    bool end_of_expr = false;
+    while (!in.peek().is(TType::END) && !end_of_expr) {
+        const Token& tok = in.peek();
+        Operator op = tok.op();
 
-        if (ttype == TType::INT || ttype == TType::IDENT || ttype == TType::ASMPC) {
-            m_postfix.push_back(token);
+        switch (tok.ttype()) {
+        case TType::INT:
+        case TType::IDENT:
+        case TType::ASMPC:
+            m_postfix.push_back(tok);
             in.next();
-        }
-        else if (ttype == TType::OPERATOR) {
+            break;
 
+        case TType::OPERATOR: {
             // Adjust to unary operator
             if (is_unary(in)) {
                 switch (op) {
@@ -195,7 +198,7 @@ bool Expr::to_rpn(Scanner& in, bool silent) {
                 const Token& top = op_stack.top();
                 if (top.ttype() != TType::OPERATOR)
                     break;
-                Operator top_op = top.operator_();
+                Operator top_op = top.op();
 
                 const OperatorInfo* op1 = OperatorTable::get_info(op);
                 const OperatorInfo* op2 = OperatorTable::get_info(top_op);
@@ -211,43 +214,50 @@ bool Expr::to_rpn(Scanner& in, bool silent) {
             }
 
             // Push operator (mark unary ops explicitly)
-            Token push_op = token;
+            Token push_op = tok;
             push_op.set_operator(op);       // set unary operator
             op_stack.push(push_op);
             in.next();
+            break;
         }
-        else if (ttype == TType::LPAREN) {
+        case TType::LPAREN:
             ++open_parens;
-            op_stack.push(token);
+            op_stack.push(tok);
             in.next();
-        }
-        else if (ttype == TType::RPAREN) {
-            if (open_parens < 1)
-                break;
-            --open_parens;
-            while (!op_stack.empty() && op_stack.top().ttype() != TType::LPAREN) {
-                m_postfix.push_back(op_stack.top());
-                op_stack.pop();
+            break;
+
+        case TType::RPAREN:
+            if (open_parens < 1) {
+                end_of_expr = true;
             }
-            if (op_stack.empty()) {
-                if (!silent) 
-                    g_error->error_unbalanced_parens();
-                return false;
+            else {
+                --open_parens;
+                while (!op_stack.empty() && op_stack.top().ttype() != TType::LPAREN) {
+                    m_postfix.push_back(op_stack.top());
+                    op_stack.pop();
+                }
+                if (op_stack.empty()) {
+                    if (!silent)
+                        g_error->error_unbalanced_parens();
+                    return false;
+                }
+                op_stack.pop(); // pop '('
+                in.next();
             }
-            op_stack.pop(); // pop '('
+            break;
+
+        case TType::QUEST:
+            op_stack.push(tok);
             in.next();
-        }
-        else if (ttype == TType::QUEST) {
-            op_stack.push(token);
-            in.next();
-        }
-        else if (ttype == TType::COLON) {
+            break;
+
+        case TType::COLON: {
             while (!op_stack.empty() && op_stack.top().ttype() != TType::QUEST) {
                 m_postfix.push_back(op_stack.top());
                 op_stack.pop();
             }
             if (op_stack.empty()) {
-                if (!silent) 
+                if (!silent)
                     g_error->error_mismatched_ternary();
                 return false;
             }
@@ -257,9 +267,11 @@ bool Expr::to_rpn(Scanner& in, bool silent) {
             push_op.set_operator(Operator::TERNARY);
             op_stack.push(push_op);
             in.next();
+            break;
         }
-        else {
-            break;      // end of expression
+        default:
+            end_of_expr = true; // end of expression
+            break;
         }
     }
 
@@ -285,15 +297,17 @@ bool Expr::to_rpn(Scanner& in, bool silent) {
 
 // check if all arguments to all operators were given
 bool Expr::check_RPN_syntax(bool silent) {
-    stack<int> eval_stack;
+    stack<int> stack;
     for (auto& token : m_postfix) {
-        TType ttype = token.ttype();
+        switch (token.ttype()) {
+        case TType::INT:
+        case TType::IDENT:
+        case TType::ASMPC:
+            stack.push(1); // dummy value
+            break;
 
-        if (ttype == TType::INT || ttype == TType::IDENT || ttype == TType::ASMPC) {
-            eval_stack.push(1); // dummy value
-        }
-        else if (ttype == TType::OPERATOR) {
-            const OperatorInfo* info = OperatorTable::get_info(token.operator_());
+        case TType::OPERATOR: {
+            const OperatorInfo* info = OperatorTable::get_info(token.op());
 
             size_t required = 0;
             switch (info->arity) {
@@ -302,25 +316,29 @@ bool Expr::check_RPN_syntax(bool silent) {
             case Arity::Ternary: required = 3; break;
             }
 
-            if (eval_stack.size() < required) {
+            if (stack.size() < required) {
                 if (!silent)
-                    g_error->error_insufficient_operands(::to_string(token.operator_()));
+                    g_error->error_insufficient_operands(::to_string(token.op()));
                 return false;
             }
 
             // Pop required operands and push result
             for (size_t i = 0; i < required; ++i)
-                eval_stack.pop();
-            eval_stack.push(1);
+                stack.pop();
+            stack.push(1);
+            break;
+        }
+        default:
+            assert(false && "Unknown token type in RPN syntax check");
         }
     }
 
-    if (eval_stack.size() == 0) {
+    if (stack.size() == 0) {
         if (!silent)
             g_error->error_insufficient_operands(to_string());
         return false;   // no tokens
     }
-    else if (eval_stack.size() > 1) {
+    else if (stack.size() > 1) {
         if (!silent)
             g_error->error_extra_operands(to_string());
         return false;
@@ -403,11 +421,11 @@ Expr::ValueResult Expr::check_eval() const {
 
         case TType::OPERATOR:
             // get operands
-            op_info = OperatorTable::get_info(token.operator_());
+            op_info = OperatorTable::get_info(token.op());
             switch (op_info->arity) {
             case Arity::Unary:
                 if (operands.size() < 1) {
-                    g_error->error_insufficient_operands(::to_string(token.operator_()));
+                    g_error->error_insufficient_operands(::to_string(token.op()));
                     return ValueResult(0, Result::Undefined);
                 }
                 x1 = operands.top(); operands.pop();
@@ -415,7 +433,7 @@ Expr::ValueResult Expr::check_eval() const {
 
             case Arity::Binary:
                 if (operands.size() < 2) {
-                    g_error->error_insufficient_operands(::to_string(token.operator_()));
+                    g_error->error_insufficient_operands(::to_string(token.op()));
                     return ValueResult(0, Result::Undefined);
                 }
                 x2 = operands.top(); operands.pop();
@@ -424,7 +442,7 @@ Expr::ValueResult Expr::check_eval() const {
 
             case Arity::Ternary:
                 if (operands.size() < 3) {
-                    g_error->error_insufficient_operands(::to_string(token.operator_()));
+                    g_error->error_insufficient_operands(::to_string(token.op()));
                     return ValueResult(0, Result::Undefined);
                 }
                 x3 = operands.top(); operands.pop();
@@ -438,7 +456,7 @@ Expr::ValueResult Expr::check_eval() const {
 
             // compute result
             r = ValueResult();
-            switch (token.operator_()) {
+            switch (token.op()) {
             case Operator::POWER:
                 if (x1 == ValueResult(0, Result::Constant) &&
                     x2.value > 0 && x2.result == Result::Constant) {
@@ -791,14 +809,14 @@ bool Expr::eval_instr(Instr*& instr) const {
 }
 
 bool Expr::eval(int& result, bool silent) const {
-    stack<int> eval_stack;
+    stack<int> stack;
     result = 0;
     Symbol* symbol{ nullptr };
 
     for (auto& token : m_postfix) {
         switch (token.ttype()) {
         case TType::INT:
-            eval_stack.push(token.ivalue());
+            stack.push(token.ivalue());
             break;
 
         case TType::IDENT:
@@ -814,10 +832,10 @@ bool Expr::eval(int& result, bool silent) const {
                     g_error->error_undefined_symbol(token.svalue());
                 return false;
             case SymType::CONSTANT:
-                eval_stack.push(symbol->value());
+                stack.push(symbol->value());
                 break;
             case SymType::ADDRESS:
-                eval_stack.push(symbol->instr()->offset());
+                stack.push(symbol->instr()->offset());
                 break;
             case SymType::COMPUTED:
                 if (symbol->in_eval()) {
@@ -830,7 +848,7 @@ bool Expr::eval(int& result, bool silent) const {
                     int sub_result = 0;
                     if (!symbol->expr().eval(sub_result, silent))
                         return false;   // evaluation failed
-                    eval_stack.push(sub_result);
+                    stack.push(sub_result);
                 }
                 symbol->set_in_eval(false);
                 break;
@@ -840,11 +858,11 @@ bool Expr::eval(int& result, bool silent) const {
             break;
 
         case TType::ASMPC:
-            eval_stack.push(m_asmpc->offset());
+            stack.push(m_asmpc->offset());
             break;
 
         case TType::OPERATOR:
-            do_operator(token.operator_(), eval_stack);
+            do_operator(token.op(), stack);
             break;
 
         default:
@@ -852,21 +870,9 @@ bool Expr::eval(int& result, bool silent) const {
         }
     }
 
-    if (eval_stack.size() > 1) {
-        if (!silent)
-            g_error->error_extra_operands(to_string());
-        return false;   // too many operands
-    }
-    else if (eval_stack.size() == 0) {
-        if (!silent)
-            g_error->error_insufficient_operands(to_string());
-        return false;   // no operands
-    }
-    else {
-        result = eval_stack.top();
-        eval_stack.pop();
-        return true;
-    }
+    assert(stack.size() == 1 && "Invalid expression evaluation");
+    result = stack.top(); stack.pop();
+    return true;
 }
 
 bool Expr::eval_local_jr_distance(int& distance) const {
@@ -895,7 +901,7 @@ void Expr::test() {
     in.scan("DEFB + 1 ");
     assert(in.peek().is(Keyword::DEFB));
     in.next();
-    assert(in.peek().is(TType::OPERATOR) && in.peek().operator_() == Operator::PLUS);
+    assert(in.peek().is(TType::OPERATOR) && in.peek().op() == Operator::PLUS);
     assert(e1.parse(in, true));
     assert(in.peek().is_end());
     assert(e1.eval_const(value));
@@ -910,7 +916,7 @@ void Expr::test() {
     in.scan("( + 1 )");
     assert(in.peek().is(TType::LPAREN));
     in.next();
-    assert(in.peek().is(TType::OPERATOR) && in.peek().operator_() == Operator::PLUS);
+    assert(in.peek().is(TType::OPERATOR) && in.peek().op() == Operator::PLUS);
     assert(e1.parse(in, true));
     assert(in.peek().is(TType::RPAREN));
     in.next();
@@ -927,7 +933,7 @@ void Expr::test() {
     in.scan("( + 1 * ( 1 + 3 ) )");
     assert(in.peek().is(TType::LPAREN));
     in.next();
-    assert(in.peek().is(TType::OPERATOR) && in.peek().operator_() == Operator::PLUS);
+    assert(in.peek().is(TType::OPERATOR) && in.peek().op() == Operator::PLUS);
     assert(e1.parse(in, true));
     assert(in.peek().is(TType::RPAREN));
     in.next();

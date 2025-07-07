@@ -32,7 +32,7 @@ vector<string> split_by_whitespace(const string& input);
 // convert int to hex
 template<typename T>
 string int_to_hex(T i, int width) {
-    std::ostringstream ss;
+    ostringstream ss;
     if (i <= -10)
         ss << "-$"
         << std::setfill('0') << std::setw(width)

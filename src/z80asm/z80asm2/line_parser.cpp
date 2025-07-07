@@ -1583,7 +1583,7 @@ bool LineParser::collect_const_expr(int& value) {
 
 bool LineParser::collect_optional_const_assignment(int& value, int default_value) {
     value = default_value;
-    if (m_in.peek().operator_() != Operator::EQ)
+    if (m_in.peek().op() != Operator::EQ)
         return true; // no assignment, defaults to 1
 
     m_in.next(); // consume '='
@@ -1713,7 +1713,7 @@ bool LineParser::collect_assign(vector<NameExprPair>& ne_list) {
     if (!collect_ident(ne_pair.name)) 
         return false;
 
-    if (m_in.peek().operator_() != Operator::EQ) 
+    if (m_in.peek().op() != Operator::EQ) 
         return false;
 
     m_in.next();

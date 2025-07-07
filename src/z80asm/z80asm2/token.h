@@ -7,13 +7,15 @@
 
 #pragma once
 
-#include "operator.h"
+#include <stack>
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 class Symbol;
 class Instr;
 
+//-----------------------------------------------------------------------------
 enum class TType {
     //@@BEGIN: ttype
     END,
@@ -51,6 +53,7 @@ enum class TType {
 
 string to_string(TType ttype);
 
+//-----------------------------------------------------------------------------
 enum class Keyword {
     //@@BEGIN: keyword
     NONE,
@@ -163,6 +166,85 @@ enum class Keyword {
 string to_string(Keyword keyword);
 Keyword lookup_keyword(const string& text);
 
+//-----------------------------------------------------------------------------
+enum class Operator {
+    //@@BEGIN: operator
+    NONE,
+    BIN_AND,
+    BIN_NOT,
+    BIN_OR,
+    BIN_XOR,
+    DIV,
+    EQ,
+    GE,
+    GT,
+    LE,
+    LOG_AND,
+    LOG_NOT,
+    LOG_OR,
+    LOG_XOR,
+    LSHIFT,
+    LT,
+    MINUS,
+    MOD,
+    MULT,
+    NE,
+    PLUS,
+    POWER,
+    RSHIFT,
+    TERNARY,
+    UNARY_MINUS,
+    UNARY_PLUS,
+    //@@END
+};
+
+enum class Associativity {
+    Left,
+    Right,
+};
+
+enum class Arity {
+    Unary,
+    Binary,
+    Ternary,
+};
+
+struct OperatorInfo {
+    int precedence;
+    Associativity associativity;
+    Arity arity;
+};
+
+class OperatorTable {
+public:
+    static const OperatorInfo* get_info(Operator op);
+
+private:
+    static const unordered_map<Operator, OperatorInfo> table;
+};
+
+void do_operator(Operator op, stack<int>& operands);
+void do_operator(Operator op, stack<double>& operands);
+string to_string(Operator op);
+
+//-----------------------------------------------------------------------------
+struct FunctionInfo {
+    Arity arity;
+    double (*unary_func)(double);
+    double (*binary_func)(double, double);
+};
+
+class FunctionTable {
+public:
+    static const FunctionInfo* get_info(Keyword keyword);   // Returns nullptr if not found
+
+private:
+    static const unordered_map<Keyword, FunctionInfo> table;
+};
+
+void do_function(Keyword keyword, stack<double>& operands);
+
+//-----------------------------------------------------------------------------
 class Token {
 public:
     Token() = default;
@@ -177,7 +259,7 @@ public:
     double fvalue() const { return m_fvalue; }
     const string& svalue() const { return m_svalue; }
     Keyword keyword() const { return m_keyword; }
-    Operator operator_() const { return m_operator; }
+    Operator op() const { return m_operator; }
     Symbol* symbol() const { return m_symbol; }
 
     void set_ivalue(int ivalue) { m_ivalue = ivalue; }

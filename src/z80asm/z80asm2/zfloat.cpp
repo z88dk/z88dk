@@ -78,7 +78,7 @@ bool FloatExpr::parse(Scanner& in) {
 }
 
 double FloatExpr::eval() const {
-    std::stack<double> stack;
+    stack<double> stack;
 
     for (const Token& tok : m_postfix) {
         switch (tok.ttype()) {
@@ -86,134 +86,132 @@ double FloatExpr::eval() const {
             stack.push(tok.fvalue());
             break;
 
-        case TType::OPERATOR: {
-            if (tok.operator_() == Operator::UNARY_MINUS ||
-                tok.operator_() == Operator::UNARY_PLUS ||
-                tok.operator_() == Operator::LOG_NOT || 
-                tok.operator_() == Operator::BIN_NOT) {
-                if (stack.empty()) assert(false && "Missing operand for unary operator");
-                double a = stack.top(); stack.pop();
-                switch (tok.operator_()) {
-                case Operator::UNARY_MINUS: stack.push(-a); break;
-                case Operator::UNARY_PLUS:  stack.push(+a); break;
-                case Operator::LOG_NOT:     stack.push(!a); break;
-                case Operator::BIN_NOT:     stack.push(~static_cast<int>(a)); break;
-                default: break;
-                }
-            }
-            else {
-                if (stack.size() < 2) assert(false && "Missing operands for binary operator");
-                double b = stack.top(); stack.pop();
-                double a = stack.top(); stack.pop();
-                switch (tok.operator_()) {
-                case Operator::PLUS: stack.push(a + b); break;
-                case Operator::MINUS: stack.push(a - b); break;
-                case Operator::MULT: stack.push(a * b); break;
-                case Operator::DIV: 
-                    if (b < 1e-9) {
-                        g_error->error_division_by_zero(); 
-						stack.push(0); // handle division by zero
-                    }
-                    else {
-                        stack.push(a / b);
-					}
-                    break;
-                case Operator::MOD:
-                    if (b < 1e-9) {
-                        g_error->error_division_by_zero();
-                        stack.push(0); // handle division by zero
-                    }
-                    else {
-                        stack.push(fmod(a, b));
-                    }
-                    break;
-                case Operator::POWER: stack.push(pow(a, b)); break;
-                case Operator::LT: stack.push(a < b); break;
-                case Operator::GT: stack.push(a > b); break;
-                case Operator::LE: stack.push(a <= b); break;
-                case Operator::GE: stack.push(a >= b); break;
-                case Operator::EQ: stack.push(a == b); break;
-                case Operator::NE: stack.push(a != b); break;
-                case Operator::LOG_AND: stack.push(a && b); break;
-                case Operator::LOG_XOR: stack.push(a != b); break;
-                case Operator::LOG_OR: stack.push(a || b); break;
-                case Operator::BIN_AND: stack.push(static_cast<int>(a) & static_cast<int>(b)); break;
-                case Operator::BIN_OR: stack.push(static_cast<int>(a) | static_cast<int>(b)); break;
-                case Operator::BIN_XOR: stack.push(static_cast<int>(a) ^ static_cast<int>(b)); break;
-                case Operator::LSHIFT: stack.push(static_cast<int>(a) << static_cast<int>(b)); break;
-                case Operator::RSHIFT: stack.push(static_cast<int>(a) >> static_cast<int>(b)); break;
-                default: break;
-                }
-            }
+        case TType::OPERATOR: 
+			do_operator(tok.op(), stack);
             break;
-        }
 
-        case TType::IDENT: {
-            if (stack.empty()) assert(false && "Missing operand for function");
-            double b = stack.top(); stack.pop();
-            if (tok.keyword() == Keyword::POW ||
-                tok.keyword() == Keyword::ATAN2 ||
-                tok.keyword() == Keyword::FMOD) {
-                if (stack.empty()) assert(false && "Missing operand for function");
-                double a = stack.top(); stack.pop();
-                if (tok.keyword() == Keyword::POW) stack.push(pow(a, b));
-                else if (tok.keyword() == Keyword::ATAN2) stack.push(atan2(a, b));
-                else if (tok.keyword() == Keyword::FMOD) stack.push(fmod(a, b));
-            }
-            else {
-                if (tok.keyword() == Keyword::SIN) stack.push(sin(b));
-                else if (tok.keyword() == Keyword::COS) stack.push(cos(b));
-                else if (tok.keyword() == Keyword::TAN) stack.push(tan(b));
-                else if (tok.keyword() == Keyword::ASIN) stack.push(asin(b));
-                else if (tok.keyword() == Keyword::ACOS) stack.push(acos(b));
-                else if (tok.keyword() == Keyword::ATAN) stack.push(atan(b));
-                else if (tok.keyword() == Keyword::SINH) stack.push(sinh(b));
-                else if (tok.keyword() == Keyword::COSH) stack.push(cosh(b));
-                else if (tok.keyword() == Keyword::TANH) stack.push(tanh(b));
-                else if (tok.keyword() == Keyword::EXP) stack.push(exp(b));
-                else if (tok.keyword() == Keyword::LOG) stack.push(log(b));
-                else if (tok.keyword() == Keyword::LOG10) stack.push(log10(b));
-                else if (tok.keyword() == Keyword::SQRT) stack.push(sqrt(b));
-                else if (tok.keyword() == Keyword::CEIL) stack.push(ceil(b));
-                else if (tok.keyword() == Keyword::FLOOR) stack.push(floor(b));
-                else if (tok.keyword() == Keyword::FABS) stack.push(fabs(b));
-                else if (tok.keyword() == Keyword::ROUND) stack.push(round(b));
-                else if (tok.keyword() == Keyword::TRUNC) stack.push(trunc(b));
-                else assert(false && "Unsupported math function");
-            }
+        case TType::IDENT: 
+            do_function(tok.keyword(), stack);
             break;
-        }
 
         default:
             assert(false && "Unsupported token type in RPN");
         }
     }
 
-    if (stack.size() != 1) assert(false && "Invalid expression evaluation");
+    assert(stack.size() == 1 && "Invalid expression evaluation");
     return stack.top();
 }
 
+bool FloatExpr::is_unary(Scanner& in) const {
+    if (in.pos() == m_pos0)
+        return true;
+    const Token& prev = in.peek(-1);
+    switch (prev.ttype()) {
+    case TType::OPERATOR:
+    case TType::LPAREN:
+    case TType::QUEST:
+    case TType::COLON:
+        return true;
+    default:
+        return false;
+    }
+}
+
+// Shunting Yard algotithm to convert infix to postfix (RPN)
 bool FloatExpr::to_rpn(Scanner& in) {
     stack<Token> op_stack;
     int open_parens = 0;
 
-    while (!in.peek().is_end()) {
+    bool end_of_expr = false;
+    while (!in.peek().is(TType::END) && !end_of_expr) {
         const Token& tok = in.peek();
+        Operator op = tok.op();
+
         switch (tok.ttype()) {
+        case TType::INT: {
+            Token push_tok{ TType::FLOAT, false };
+            push_tok.set_fvalue(static_cast<double>(tok.ivalue()));
+            m_postfix.push_back(push_tok);
+            in.next();
+            break;
+        }
         case TType::FLOAT:
             m_postfix.push_back(tok);
             in.next();
             break;
 
-        case TType::IDENT:
-            if (math_functions.count(tok.keyword()) > 0) {
-                op_stack.push(tok); // function name
-                in.next();
+        case TType::OPERATOR: {
+            // Adjust to unary operator
+            if (is_unary(in)) {
+                switch (op) {
+                case Operator::PLUS: op = Operator::UNARY_PLUS; break;
+                case Operator::MINUS: op = Operator::UNARY_MINUS; break;
+                default:;
+                }
+            }
+
+            while (!op_stack.empty()) {
+                const Token& top = op_stack.top();
+                if (top.ttype() != TType::OPERATOR)
+                    break;
+                Operator top_op = top.op();
+
+                const OperatorInfo* op1 = OperatorTable::get_info(op);
+                const OperatorInfo* op2 = OperatorTable::get_info(top_op);
+
+                if ((op1->associativity == Associativity::Left && op1->precedence <= op2->precedence) ||
+                    (op1->associativity == Associativity::Right && op1->precedence < op2->precedence)) {
+                    m_postfix.push_back(top);
+                    op_stack.pop();
+                }
+                else {
+                    break;
+                }
+            }
+
+            // Push operator (mark unary ops explicitly)
+            Token push_op = tok;
+            push_op.set_operator(op);       // set unary operator
+            op_stack.push(push_op);
+            in.next();
+            break;
+        }
+
+        case TType::IDENT: {
+            const FunctionInfo* info = FunctionTable::get_info(tok.keyword());
+            if (!info) {
+                g_error->error_illegal_identifier(::to_string(tok.keyword()));
+                return false;
             }
             else {
-                g_error->error_illegal_identifier(::to_string(tok.keyword()));
-                clear();
-                return false;
+                op_stack.push(tok); // function
+                in.next();
+            }
+            break;
+        }
+        case TType::LPAREN:
+            ++open_parens;
+            op_stack.push(tok);
+            in.next();
+            break;
+
+        case TType::RPAREN:
+            if (open_parens < 1) {
+                end_of_expr = true;
+            }
+            else {
+                --open_parens;
+                while (!op_stack.empty() && op_stack.top().ttype() != TType::LPAREN) {
+                    m_postfix.push_back(op_stack.top());
+                    op_stack.pop();
+                }
+                if (op_stack.empty()) {
+                    g_error->error_unbalanced_parens();
+                    return false;
+                }
+                op_stack.pop(); // pop '('
+                in.next();
             }
             break;
 
@@ -227,73 +225,123 @@ bool FloatExpr::to_rpn(Scanner& in) {
             }
             if (op_stack.empty()) {
                 g_error->error_unbalanced_parens();
-                clear();
                 return false;
             }
             break;
 
-        case TType::OPERATOR: {
-            const Token& current = tok;
-            in.next();
-            while (!op_stack.empty() && op_stack.top().ttype() == TType::OPERATOR) {
-                Operator o1 = current.operator_();
-                Operator o2 = op_stack.top().operator_();
-                if ((is_right_associative(o1) && precedence(o1) < precedence(o2)) ||
-                    (!is_right_associative(o1) && precedence(o1) <= precedence(o2))) {
-                    m_postfix.push_back(op_stack.top());
-                    op_stack.pop();
-                }
-                else {
-                    break;
-                }
-            }
-            op_stack.push(current);
-            break;
-        }
-
-        case TType::LPAREN:
-            ++open_parens;
+        case TType::QUEST:
             op_stack.push(tok);
             in.next();
             break;
 
-        case TType::RPAREN:
-            if (open_parens < 1)
-                break;
-            --open_parens;
-            in.next();
-            while (!op_stack.empty() && op_stack.top().ttype() != TType::LPAREN) {
+        case TType::COLON: {
+            while (!op_stack.empty() && op_stack.top().ttype() != TType::QUEST) {
                 m_postfix.push_back(op_stack.top());
                 op_stack.pop();
             }
             if (op_stack.empty()) {
-				g_error->error_unbalanced_parens();
-                clear();
-				return false;
+                g_error->error_mismatched_ternary();
+                return false;
             }
-            op_stack.pop();
-            if (!op_stack.empty() && op_stack.top().ttype() == TType::IDENT) {
-                m_postfix.push_back(op_stack.top());
-                op_stack.pop();
-            }
-            break;
+            op_stack.pop(); // Pop '?'
 
+            Token push_op{ TType::OPERATOR, false };
+            push_op.set_operator(Operator::TERNARY);
+            op_stack.push(push_op);
+            in.next();
+            break;
+        }
         default:
-            break;  // end of expression
+            end_of_expr = true; // end of expression
+            break;
         }
     }
 
     while (!op_stack.empty()) {
         if (op_stack.top().ttype() == TType::LPAREN || op_stack.top().ttype() == TType::RPAREN) {
             g_error->error_unbalanced_parens();
-            clear();
             return false;
         }
         m_postfix.push_back(op_stack.top());
         op_stack.pop();
     }
 
-    return true;
+    if (m_postfix.empty()) {
+        g_error->error_insufficient_operands(to_string());
+        return false;   // no tokens
+    }
+    else {
+        return check_RPN_syntax();
+    }
+}
+
+bool FloatExpr::check_RPN_syntax() {
+    stack<double> stack;
+    for (auto& tok : m_postfix) {
+        switch (tok.ttype()) {
+        case TType::FLOAT:
+            stack.push(1.0); // dummy value
+            break;
+
+        case TType::OPERATOR: {
+            const OperatorInfo* info = OperatorTable::get_info(tok.op());
+
+            size_t required = 0;
+            switch (info->arity) {
+            case Arity::Unary: required = 1; break;
+            case Arity::Binary: required = 2; break;
+            case Arity::Ternary: required = 3; break;
+            }
+
+            if (stack.size() < required) {
+                g_error->error_insufficient_operands(::to_string(tok.op()));
+                return false;
+            }
+
+            // Pop required operands and push result
+            for (size_t i = 0; i < required; ++i)
+                stack.pop();
+            stack.push(1.0);
+            break;
+        }
+        case TType::IDENT: {
+            const FunctionInfo* info = FunctionTable::get_info(tok.keyword());
+            assert(info && "Invalid function identifier");
+
+            size_t required = 0;
+            switch (info->arity) {
+            case Arity::Unary: required = 1; break;
+            case Arity::Binary: required = 2; break;
+            case Arity::Ternary: required = 3; break;
+            }
+
+            if (stack.size() < required) {
+                g_error->error_insufficient_operands(::to_string(tok.op()));
+                return false;
+            }
+
+            // Pop required operands and push result
+            for (size_t i = 0; i < required; ++i)
+                stack.pop();
+            stack.push(1.0);
+            break;
+        }
+        default:
+            assert(false && "Unknown token type in RPN syntax check");
+        }
+    }
+
+    if (stack.size() == 0) {
+        g_error->error_insufficient_operands(to_string());
+        return false;   // no tokens
+    }
+    else if (stack.size() > 1) {
+        g_error->error_extra_operands(to_string());
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 int FloatExpr::precedence(Operator op) {
@@ -306,6 +354,22 @@ bool FloatExpr::is_right_associative(Operator op) {
     const OperatorInfo* info = OperatorTable::get_info(op);
     assert(info && "Invalid operator");
 	return info->associativity == Associativity::Right;
+}
+
+string FloatExpr::to_string() const {
+    Scanner tokens{ m_infix };
+    return tokens.to_string();
+}
+
+string FloatExpr::rpn_to_string() const {
+    string output;
+    for (auto& token : m_postfix) {
+        if (token.op() == Operator::UNARY_PLUS ||
+            token.op() == Operator::UNARY_MINUS)
+            output += "u";
+        output += token.to_string() + " ";
+    }
+    return output;
 }
 
 #ifdef UNIT_TESTS
@@ -335,7 +399,7 @@ void FloatExpr::test() {
         Scanner scanner{ input };
 		assert(expr.parse(scanner));
         double result = expr.eval();
-        assert(std::abs(result - expected) < 1e-9);
+        assert(abs(result - expected) < 1e-9);
         };
 
     // Basic arithmetic tests
@@ -364,6 +428,6 @@ void FloatExpr::test() {
     test_case({ token(TType::FLOAT, 2), token(TType::OPERATOR, 0, Operator::PLUS), token(TType::FLOAT, 3), token(TType::OPERATOR, 0, Operator::POWER), token(TType::FLOAT, 2) }, 2 + pow(3, 2));
 
 
-    std::cout << "FloatExpr tests passed.\n";
+    cout << "FloatExpr tests passed.\n";
 }
 #endif
