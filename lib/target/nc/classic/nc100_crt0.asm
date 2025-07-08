@@ -32,12 +32,24 @@
     INCLUDE "crt/classic/crt_rules.inc"
 
 
-    IF (startup=2)
+IF (startup=2)
+    ;; Loadable from BASIC
     defc    CRT_ORG_CODE  = $8C00
     org     CRT_ORG_CODE
     jp      start
-ELSE
+ELIF startup  = 3
+    ;; Bootable floppy
+    defc    CRT_ORG_CODE = 0x4000
+    org     CRT_ORG_CODE
 
+    ; Turn off disk motor   
+    ld c, 0x30 ; r_finish
+    call 0xba5e ;diskservice
+
+    ld a, 0x7f
+    out (0x60), a		; set up
+ELSE
+    ;; PCMCIA Card
     defc    CRT_ORG_CODE  = $C000
     org     CRT_ORG_CODE
     jp      start
@@ -68,7 +80,6 @@ ENDIF
 
 
 start:
-    ;Entry point at $c2220
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.inc"
     call	crt0_init
@@ -105,3 +116,7 @@ l_dcal:	jp	(hl)
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     UNDEFINE DEFINED_CRT_HEAP_AMALLOC
     INCLUDE "crt/classic/crt_section.inc"
+
+IF startup = 3
+    INCLUDE "target/nc/classic/nc200_boot.inc"
+ENDIF

@@ -68,6 +68,7 @@
     <ClCompile Include="..\..\src\appmake\mz2500.c" />
     <ClCompile Include="..\..\src\appmake\nascom.c" />
     <ClCompile Include="..\..\src\appmake\nec.c" />
+    <ClCompile Include="..\..\src\appmake\ncboot.c" />
     <ClCompile Include="..\..\src\appmake\newbrain.c" />
     <ClCompile Include="..\..\src\appmake\newext.c" />
     <ClCompile Include="..\..\src\appmake\noop.c" />

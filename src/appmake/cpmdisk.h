@@ -60,7 +60,7 @@ extern int fat_write_file_to_image(const char *disc_format, const char *containe
 extern disc_handle *disc_create(disc_spec *spec);
 extern disc_handle *cpm_create(disc_spec *spec);
 extern disc_handle *fat_create(disc_spec* spec);
-
+extern void fat_mount(disc_handle *h);
 
 extern void disc_write_boot_track(disc_handle *h, void *data, size_t len);
 extern void disc_write_file(disc_handle *h, char filename[11], void *data, size_t len);

@@ -169,6 +169,9 @@ extern option_t  mz2500_options[];
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options[];
 
+extern int       ncboot_exec(char *target);
+extern option_t  ncboot_options[];
+
 extern int       nec_exec(char *target);
 extern option_t  nec_options[];
 
@@ -473,6 +476,10 @@ struct {
       "Generates a .NAS file suitable for use by emulators",
       NULL,
       nascom_exec,    nascom_options },
+    { "bin2ncboot",   "ncboot",       "(C) 2025 z88dk",
+      "Generates a boot NC200 disc image",
+      NULL,
+      ncboot_exec,    ncboot_options },
     { "hex2cas",   "nec",       "(C) 2003,2007 Takahide Matsutsuka",
       "PC-6001 (and others) CAS format conversion utility",
       NULL,

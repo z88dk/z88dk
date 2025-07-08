@@ -94,6 +94,7 @@ disc_handle *disc_create(disc_spec* spec)
     return h;
 }
 
+
 void disc_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
     h->write_file(h, filename, data, len);
@@ -920,6 +921,20 @@ disc_handle *fat_create(disc_spec* spec)
 
     h->write_file = fat_write_file;
     return h;
+}
+
+void fat_mount(disc_handle *h)
+{
+    char         buf[1024];
+    FRESULT      res;
+
+    current_fat_handle = h;
+    // And now we need to mount it
+    if ( (res = f_mount(&h->fatfs, "1", 1)) != FR_OK ) {
+        exit_log(1, "Cannot mount newly create FAT filesystem: %d\n",res);
+    }
+
+    h->write_file = fat_write_file;
 }
 
 static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len)
