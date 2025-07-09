@@ -165,6 +165,10 @@ Z88DKTARGET_hectorhr = hector
 ZCFLAGS_hectorhr = -clib=hectorhr
 ZLDFLAGS_hectorhr = 
 
+Z88DKTARGET_nc200 = nc
+ZCFLAGS_nc200 = -clib=nc200
+ZLDFLAGS_nc200 = 
+
 
 # Setup the CP/M mappings to +cpm
 CPMSUBTYPES = aussie px px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
