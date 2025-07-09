@@ -1,5 +1,0 @@
-target/nc100/graphics/clg
-target/nc100/graphics/w_pixladdr
-target/nc100/graphics/swapgfxbk
-target/nc100/graphics/fill
-@gfx/wide/gfx_wide.lst

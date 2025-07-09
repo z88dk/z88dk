@@ -4,6 +4,8 @@
     SECTION code_clib
     PUBLIC  w_pixeladdress
 
+    EXTERN  NC_VRAM
+
     INCLUDE "graphics/grafix.inc"
 ;
 ;       $Id: w_pixladdr.asm $
@@ -17,8 +19,8 @@
 ;         fz    = 1 if bit number is 0 of pixel position
 ;
 ; registers changed     after return:
-;  ..bc..../ixiy same
-;  af..dehl/.... different
+;  ......../ixiy same
+;  afbcdehl/.... different
 
 w_pixeladdress:
 
@@ -46,15 +48,7 @@ w_pixeladdress:
     rr      e
 
     add     hl, de                      ;hl = (y * 64) + (x / 8)
-  IF    FORzcn
-    ld      de, $C000+$3000             ;base_graphics  in ZCN mode
-  ELSE
-    IF  FORnc100
-    ld      de, $4000+$3000             ;base_graphics  ;)
-    ELSE
-    ld      de, $4000+$2000             ;base_graphics  ;)
-    ENDIF
-  ENDIF
+    ld      de, NC_VRAM
     add     hl, de
 
     ld      a, c                        ;a = x low byte

@@ -1,16 +1,4 @@
-;       Kludgey startup for nc100
-;
-;       djm 17/4/2000
-;
-; 	I've never used one of these brutes so I dunno if it's
-;	correct at all, this is all taken from the file nciospec.doc
-;	on nvg.unit.no, I assume that the PCMCIA RAM card is an
-;	actual fact addressable RAM and we can overwrite variables
-;	etc NB. Values of static variables are not reinitialised on
-;	future entry.
-;
-;       $Id: nc100_crt0.asm,v 1.17+ (now on GIT) $
-;
+; Startup for Amstrad NC100/NC200
 
 
 
@@ -21,10 +9,10 @@
 
 
 
-    EXTERN    _main		;main() is always external to crt0 code
+    EXTERN    _main
 
-    PUBLIC    __Exit		;jp'd to by exit()
-    PUBLIC    l_dcal		;jp(hl)
+    PUBLIC    __Exit
+    PUBLIC    l_dcal
 
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
@@ -39,15 +27,32 @@ IF (startup=2)
     jp      start
 ELIF startup  = 3
     ;; Bootable floppy
+
+    ;; We're on an nc200 for this mode, so export the VRAM settings
+    defc NC_VRAM = 0xc000 + $2000
+    defc NC_VRAM_YSIZE = 128
+    defc NC_VRAM_SEGMENT = 3
+
+    defc CONSOLE_COLUMNS = 80
+    defc CONSOLE_ROWS = 16
+
+    PUBLIC  CONSOLE_ROWS
+    PUBLIC  CONSOLE_COLUMNS
+
+    PUBLIC  NC_VRAM
+    PUBLIC  NC_VRAM_YSIZE
+    PUBLIC  NC_VRAM_SEGMENT
+
     defc    CRT_ORG_CODE = 0x4000
     org     CRT_ORG_CODE
 
     ; Turn off disk motor   
-    ld c, 0x30 ; r_finish
-    call 0xba5e ;diskservice
+    ld      c, 0x30 ; r_finish
+    call    0xba5e ;diskservice
 
-    ld a, 0x7f
-    out (0x60), a		; set up
+    ; Re-enable all interrupts (we enter with keyboard IRQ disabled)
+    ld      a, 0x7f
+    out     (0x60), a
 ELSE
     ;; PCMCIA Card
     defc    CRT_ORG_CODE  = $C000
@@ -90,6 +95,7 @@ start:
 ; the compiled program and the stack pointer
     INCLUDE "crt/classic/crt_init_heap.inc"
 IF DEFINED_CRT_HEAP_AMALLOC || CLIB_MALLOC_HEAP_SIZE > 0 || CRT_STACK_SIZE > 0
+  IF startup == 1
     ; Add in an extra 505 bytes to the heap
     ld      hl,_mblock
     push    hl	; data block
@@ -97,6 +103,7 @@ IF DEFINED_CRT_HEAP_AMALLOC || CLIB_MALLOC_HEAP_SIZE > 0 || CRT_STACK_SIZE > 0
     push    hl	; area size
     EXTERN  sbrk_callee
     call    sbrk_callee
+  ENDIF
 ENDIF
 
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -114,7 +121,9 @@ __restore_sp_onexit:
 l_dcal:	jp	(hl)
 
     INCLUDE "crt/classic/crt_runtime_selection.inc"
+IF startup == 1
     UNDEFINE DEFINED_CRT_HEAP_AMALLOC
+ENDIF
     INCLUDE "crt/classic/crt_section.inc"
 
 IF startup = 3
