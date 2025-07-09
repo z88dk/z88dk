@@ -95,6 +95,7 @@ start:
 ; the compiled program and the stack pointer
     INCLUDE "crt/classic/crt_init_heap.inc"
 IF DEFINED_CRT_HEAP_AMALLOC || CLIB_MALLOC_HEAP_SIZE > 0 || CRT_STACK_SIZE > 0
+  IF startup == 1
     ; Add in an extra 505 bytes to the heap
     ld      hl,_mblock
     push    hl	; data block
@@ -102,6 +103,7 @@ IF DEFINED_CRT_HEAP_AMALLOC || CLIB_MALLOC_HEAP_SIZE > 0 || CRT_STACK_SIZE > 0
     push    hl	; area size
     EXTERN  sbrk_callee
     call    sbrk_callee
+  ENDIF
 ENDIF
 
     INCLUDE "crt/classic/crt_init_eidi.inc"
@@ -119,7 +121,9 @@ __restore_sp_onexit:
 l_dcal:	jp	(hl)
 
     INCLUDE "crt/classic/crt_runtime_selection.inc"
+IF startup == 1
     UNDEFINE DEFINED_CRT_HEAP_AMALLOC
+ENDIF
     INCLUDE "crt/classic/crt_section.inc"
 
 IF startup = 3
