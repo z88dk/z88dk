@@ -1638,15 +1638,15 @@ gl6000_clib.lib: $(TARGET_CLIB_OBJS) gl_clib.lib
 	TARGET=gl6000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(TARGET_DIRECTORY)/gl6000/gl6000.lst
 
 
-# Untested C lib for NC100 machines - dom
+# Common Library for Amstrad NC-100/NC-200
 nc_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
-	@echo '--- Building Amstrad NC100 Library ---'
+	@echo '--- Building Amstrad NC Library ---'
 	@echo ''
 	$(call buildgeneric,nc)
 	$(MAKE) -C target/nc100
 	$(MAKE) -C games TARGET=nc
-	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(TARGET_DIRECTORY)/nc100/nc100.lst
+	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(TARGET_DIRECTORY)/nc100/nc.lst
 
 # NC-100 graphics lib - Stefano
 gfxnc100.lib: $(TARGET_CLIB_OBJS) nc_clib.lib

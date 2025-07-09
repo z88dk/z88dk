@@ -22,6 +22,7 @@
     PUBLIC  swapgfxbk1
     PUBLIC  _swapgfxbk1
 
+    EXTERN  NC_VRAM_SEGMENT
 
 
 swapgfxbk:
@@ -29,11 +30,11 @@ _swapgfxbk:
   IF    FORzcn
     RET
   ELSE
-    LD      A, ($B001)
+    LD      A, ($B000 + NC_VRAM_SEGMENT)
     LD      (pgsave), A
     LD      A, 67
-    LD      ($B001), A
-    OUT     ($11), A                    ; $10=0($b000), $11=$4000($b001), $12=$8000 ($b002), $13=$c000 ($b003)
+    LD      ($B000 + NC_VRAM_SEGMENT), A
+    OUT     ($10 + NC_VRAM_SEGMENT), A                    ; $10=0($b000), $11=$4000($b001), $12=$8000 ($b002), $13=$c000 ($b003)
     RET
   ENDIF
 
@@ -44,8 +45,11 @@ _swapgfxbk1:
     RET
   ELSE
     LD      A, (pgsave)
-    LD      ($B001), A
-    OUT     ($11), A
+    ;; We disable interrupts to cope with the case that NC_VRAM_SEGMENT actually contains $B000
+    di
+    OUT     ($10 + NC_VRAM_SEGMENT), A
+    LD      ($B000 + NC_VRAM_SEGMENT), A
+    ei
     RET
 
     SECTION bss_clib
