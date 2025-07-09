@@ -1,0 +1,9 @@
+target/nc/stdio/generic_console
+target/nc/stdio/generic_console_ioctl
+target/nc/stdio/generic_console_vpeek
+target/nc/graphics/clg
+target/nc/graphics/w_pixladdr
+target/nc/graphics/swapgfxbk
+target/nc/graphics/fill
+target/nc/vram_vars
+@gfx/wide/gfx_wide.lst

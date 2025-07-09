@@ -1,9 +1,0 @@
-target/nc100/stdio/generic_console
-target/nc100/stdio/generic_console_ioctl
-target/nc100/stdio/generic_console_vpeek
-target/nc100/graphics/clg
-target/nc100/graphics/w_pixladdr
-target/nc100/graphics/swapgfxbk
-target/nc100/graphics/fill
-target/nc100/vram_vars
-@gfx/wide/gfx_wide.lst
