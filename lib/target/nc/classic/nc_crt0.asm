@@ -33,7 +33,7 @@ ELIF startup  = 3
     defc NC_VRAM_YSIZE = 128
     defc NC_VRAM_SEGMENT = 3
 
-    defc CONSOLE_COLUMNS = 80
+    defc CONSOLE_COLUMNS = 64
     defc CONSOLE_ROWS = 16
 
     PUBLIC  CONSOLE_ROWS

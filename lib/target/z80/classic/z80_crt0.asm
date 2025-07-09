@@ -90,7 +90,8 @@ l_dcal:
     ; If we were given a model then use it
 IF DEFINED_CRT_MODEL
     defc __crt_model = CRT_MODEL
-ELSE
+ELIF DEFINED_CRT_ORG_BSS
+    ;; If BSS is defined, then assume we're ROM model
     defc __crt_model = 1
 ENDIF
     INCLUDE	"crt/classic/crt_section.inc"
