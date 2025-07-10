@@ -3,3 +3,5 @@
 - Unit tests must capture error messages and check that all have been handled
 - Add unit tests to FloatExpr class
 - Add floating point types and conversion from float to binary
+- Support TASM's SET directive: create a new instance of a variable with 
+  the same name, compute based on the previous value
