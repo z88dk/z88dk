@@ -1,6 +1,5 @@
 target/nc/stdio/fgetc_cons
 target/nc/stdio/fputc_cons
-target/nc/stdio/getk
 target/nc/stdio/CRT_FONT
 @stdio/stdio.lst
 @games/games.lst

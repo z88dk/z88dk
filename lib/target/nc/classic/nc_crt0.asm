@@ -16,6 +16,7 @@
 
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
+    defc    CRT_KEY_DEL = 12
     defc	__CPU_CLOCK = 4606000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -33,7 +34,7 @@ ELIF startup  = 3
     defc NC_VRAM_YSIZE = 128
     defc NC_VRAM_SEGMENT = 3
 
-    defc CONSOLE_COLUMNS = 64
+    defc CONSOLE_COLUMNS = 60
     defc CONSOLE_ROWS = 16
 
     PUBLIC  CONSOLE_ROWS

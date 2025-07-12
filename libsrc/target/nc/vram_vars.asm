@@ -13,12 +13,12 @@ defc CONSOLE_COLUMNS = 60
 
 IF FORzxn
    defc NC_VRAM = 0xc000 + $3000
-   defc NC_VRAM_YSIZE = 64
+   defc NC_VRAM_YSIZE = 60
    defc NC_VRAM_SEGMENT = 3
    defc CONSOLE_ROWS = 8
 ELIF FORnc100
    defc NC_VRAM = 0x4000 + $3000
-   defc NC_VRAM_YSIZE = 64
+   defc NC_VRAM_YSIZE = 60
     defc NC_VRAM_SEGMENT = 1
    defc CONSOLE_ROWS = 8
 ELSE

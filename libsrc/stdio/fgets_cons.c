@@ -65,9 +65,12 @@ char *fgets_cons(char *str, size_t max)
             if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
                 fgets_cons_erase_character('_');
             }
-            fputc_cons(c);
-            if (c == '\n' || c == '\r')
+            if (isprint(c)) fputc_cons(c);
+            else if (c == '\n' || c == '\r') {
+                fputc_cons('\n');
                 break;
+            }
+            else fputc_cons('?');
             docursor();
         }
     }
