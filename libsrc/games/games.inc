@@ -9,6 +9,7 @@
 ;       else 8 bit io
 ;
 ;       However.... SOUND_INOUT = toggle speaker with in/out (+ace only)
+;                   SOUND_IN = toggle speaker when reading on a given address (Apple II only, Z80 reads from memory)
 ;                   SOUND_OUTOUT = toggle speaker accessing to 2 different port addresses (x820ii only)
 ;                   SOUND_OUTIN = toggle speaker accessing with in/out to 2 different port addresses (ZX81 family)
 ;                   SOUND_IFF = toggle speaker with ei/di cycle (+sol20 only)
@@ -16,6 +17,14 @@
 ;       $Id: games.inc $
 ;
 
+
+
+IF FORapple2
+        defc SOUND_IN = 1
+        defc SOUND_ONEBIT_port   = -$E030
+        defc SOUND_ONEBIT_bit    = 0
+        defc SOUND_ONEBIT_mask   = 1         ; (2^SOUND_ONEBIT_bit)
+ENDIF
 
 IF FORc128
         defc SOUND_ONEBIT_port   = 54296	; $D418: addres is a word: uses a special lib version
@@ -794,7 +803,7 @@ ENDIF
 ; **********************************************************
 
 MACRO ONEBITOUT
-LOCAL l1, l2, l3, l4, l5, l6, l7
+LOCAL l1, l2, l3, l4, l5, l6, l7, l8
 IF SOUND_INOUT = 1
     ld      c,a
     and     SOUND_ONEBIT_mask
@@ -827,6 +836,22 @@ ELIF SOUND_OUTIN = 1
     in      a, (SOUND_ZEROBIT_port)
 l7:
     pop     af
+ELIF SOUND_IN = 1
+  IF SOUND_ONEBIT_port >= 256
+    exx
+	ld      d,a
+    in      a,(c)
+	ld      a,d
+    exx
+  ELIF SOUND_ONEBIT_port < 0
+    ld      c,a
+    ld      a,(-SOUND_ONEBIT_port)
+    ld      a,c
+  ELSE
+    ld      c,a
+    in      a,(SOUND_ONEBIT_port)
+    ld      a,c
+  ENDIF
 ELIF SOUND_ONEBIT_port >= 256
     exx
     out     (c),a
