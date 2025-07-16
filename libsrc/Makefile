@@ -30,6 +30,7 @@ TOCREATE += $(call check_target,adam,adam.lib $(CPMLIBS))
 TOCREATE += $(call check_target,agon,agon_clib.lib)
 TOCREATE += $(call check_target,alphatp2,alphatp2_clib.lib)
 TOCREATE += $(call check_target,alphatro,alphatro_clib.lib)
+TOCREATE += $(call check_target,apple2,apple2.lib $(CPMLIBS))
 TOCREATE += $(call check_target,aquarius,aquarius_clib.lib gfxaq48.lib aqplus.lib)
 TOCREATE += $(call check_target,attache,attache.lib $(CPMLIBS))
 TOCREATE += $(call check_target,aussie,aussie.lib $(CPMLIBS))
@@ -450,6 +451,14 @@ pps_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C target/zx TARGET=pps
 	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(TARGET_DIRECTORY)/pps/pps.lst
+
+# Apple II SoftCard CP/M lib - Stefano
+apple2.lib: cpm_clib.lib
+	@echo ''
+	@echo '--- Building Apple II SoftCard Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=apple2
+	TARGET=apple2 TYPE=z80 $(LIBLINKER) -DFORapple2 -x$(OUTPUT_DIRECTORY)/apple2 @$(TARGET_DIRECTORY)/apple2/apple2.lst
 
 # Epson PX4 lib - Stefano
 px4.lib: cpm_clib.lib
