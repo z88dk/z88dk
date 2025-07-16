@@ -56,6 +56,7 @@ beixp3:
 behllp:
     dec     c
     jr      nz, behllp
+
     ld      c, $3F
     dec     b
     jp      nz, behllp
@@ -80,6 +81,11 @@ no_pattern_loop:
     sbc     a, a                        ; 0 or FF
     and     SOUND_ONEBIT_mask
     ld      c, a
+IF SOUND_IN = 1
+    jr      nz,noinvert
+    ONEBITOUT
+noinvert:
+ENDIF
     ld      a, (__snd_tick)
     xor     c
 
