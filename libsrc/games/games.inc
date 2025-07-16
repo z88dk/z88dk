@@ -803,7 +803,7 @@ ENDIF
 ; **********************************************************
 
 MACRO ONEBITOUT
-LOCAL l1, l2, l3, l4, l5, l6, l7, l8
+LOCAL l1, l2, l3, l4, l5, l6, l7
 IF SOUND_INOUT = 1
     ld      c,a
     and     SOUND_ONEBIT_mask
@@ -837,21 +837,18 @@ ELIF SOUND_OUTIN = 1
 l7:
     pop     af
 ELIF SOUND_IN = 1
+    push    af
+    and     SOUND_ONEBIT_mask
   IF SOUND_ONEBIT_port >= 256
     exx
-	ld      d,a
     in      a,(c)
-	ld      a,d
     exx
   ELIF SOUND_ONEBIT_port < 0
-    ld      c,a
     ld      a,(-SOUND_ONEBIT_port)
-    ld      a,c
   ELSE
-    ld      c,a
     in      a,(SOUND_ONEBIT_port)
-    ld      a,c
   ENDIF
+    pop     af
 ELIF SOUND_ONEBIT_port >= 256
     exx
     out     (c),a
