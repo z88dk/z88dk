@@ -104,6 +104,12 @@ ELSE
 
 ;---------------------------------------------------------------
 
+IF SOUND_ONEBIT_port >= 256
+    exx
+    ld      bc,SOUND_ONEBIT_port
+    exx
+ELSE
+
 
 TAPION_0:
   ;LD HL,1111
