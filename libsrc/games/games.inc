@@ -24,6 +24,10 @@ IF FORapple2
         defc SOUND_ONEBIT_port   = -$E030
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1         ; (2^SOUND_ONEBIT_bit)
+        ;----
+        defc TAPEIN_ONEBIT_port  = -$E060
+        defc TAPEIN_ONEBIT_mask  = 128
+        ;----
 ENDIF
 
 IF FORc128
@@ -861,3 +865,14 @@ ENDIF
 ENDM
 
 
+MACRO ONEBITIN
+IF TAPEIN_ONEBIT_port < 0
+    LD      A, (-TAPEIN_ONEBIT_port)
+ELIF SOUND_ONEBIT_port >= 256
+    exx
+    in     a,(c)
+    exx
+ELSE
+    IN      A, (TAPEIN_ONEBIT_port)
+ENDIF
+ENDM
