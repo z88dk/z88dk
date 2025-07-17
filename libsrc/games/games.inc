@@ -45,6 +45,9 @@ IF FORc128
         defc SOUND_ONEBIT_bit    = 3
         defc SOUND_ONEBIT_mask   = 15
         ;----
+        defc TAPEIN_ONEBIT_port  = $DC0D
+        defc TAPEIN_ONEBIT_mask  = 16
+        ;----
         defc PLAY_DATA_LEAD    = 93   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 26    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 2     ; Fine tuning the parameters
