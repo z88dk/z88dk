@@ -139,7 +139,8 @@ TAPIN_STARTBIT_0:
     ex      (sp), hl
   ENDIF
 
-    IN      A, (TAPEIN_ONEBIT_port)
+    ONEBITIN
+
     XOR     E
     AND     TAPEIN_ONEBIT_mask
     JP      Z, TAPIN_STARTBIT_1
@@ -229,7 +230,7 @@ TAPIN_PERIOD_1:
     ex      (sp), hl
   ENDIF
 
-    IN      A, (TAPEIN_ONEBIT_port)
+    ONEBITIN
 
 ;  IN A,(PSG_DATAIN)
     XOR     E
@@ -284,7 +285,7 @@ BREAKX:
     RET
 
   ELSE
-    IN      A, (TAPEIN_ONEBIT_port)
+    ONEBITIN
     and     a                           ; Reset CY, in case break detection is not supported
     RET
   ENDIF
