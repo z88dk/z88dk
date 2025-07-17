@@ -24,6 +24,13 @@ IF  __CPU_GBZ80__||__CPU_INTEL__
 ELSE
 
 ;------------------ Target specific section --------------------
+
+  IF    FORc128
+    IN      a,(1)
+	or      32                          ; Set BIT 5 (address 1 in the zero page)
+    OUT     (1), A                      ; MOTOR OFF
+  ENDIF
+
   IF    FORmsx
     LD      A, $09
     OUT     ($AB), A                    ; MOTOR OFF
