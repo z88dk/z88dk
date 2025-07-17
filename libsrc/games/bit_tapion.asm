@@ -108,7 +108,7 @@ IF SOUND_ONEBIT_port >= 256
     exx
     ld      bc,SOUND_ONEBIT_port
     exx
-ELSE
+ENDIF
 
 
 TAPION_0:
