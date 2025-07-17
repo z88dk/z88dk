@@ -76,6 +76,12 @@ ENDIF
     INC     D
     EX      AF, AF'
 
+  IF    FORc128
+    IN      a,(1)
+	and     223                         ; Reset BIT 5 (address 1 in the zero page)
+    OUT     (1), A                      ; MOTOR ON
+  ENDIF
+
   IF    FORmsx
     LD      A, $08
     OUT     ($AB), A                    ; MOTOR ON
@@ -113,6 +119,12 @@ ENDIF
     ld      a, (__snd_tick)             ; Restore border colour
     ONEBITOUT
   ENDIF
+  ENDIF
+
+  IF    FORc128
+    IN      a,(1)
+	or      32                          ; Set BIT 5 (address 1 in the zero page)
+    OUT     (1), A                      ; MOTOR OFF
   ENDIF
 
   IF    FORmsx
