@@ -141,7 +141,8 @@ LD_BYTES:
     ex      (sp), hl
   ENDIF
 
-    IN      A, (TAPEIN_ONEBIT_port)
+  ONEBITIN
+
         ;RRA
 
     AND     TAPEIN_ONEBIT_mask
@@ -291,9 +292,10 @@ L05ED:
     ex      (sp), hl
   ENDIF
 
+  ONEBITIN
+
         ;RRA
-    IN      A, (TAPEIN_ONEBIT_port)
-;        RET     NC
+        ;RET     NC
 
     XOR     C
     AND     TAPEIN_ONEBIT_mask
