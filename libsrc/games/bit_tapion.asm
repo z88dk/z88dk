@@ -101,8 +101,19 @@ ELSE
     ex      af, af
   ENDIF
 
+  IF    FORc128
+    IN      a,(1)
+	and     223                         ; Reset BIT 5 (address 1 in the zero page)
+    OUT     (1), A                      ; MOTOR ON
+  ENDIF
 
 ;---------------------------------------------------------------
+
+IF SOUND_ONEBIT_port >= 256
+    exx
+    ld      bc,SOUND_ONEBIT_port
+    exx
+ENDIF
 
 
 TAPION_0:

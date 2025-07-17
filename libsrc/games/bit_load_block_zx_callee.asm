@@ -60,6 +60,14 @@ asm_bit_load_block_zx:
   ENDIF
     pop     af
 
+
+IF SOUND_ONEBIT_port >= 256
+    exx
+    ld      bc,SOUND_ONEBIT_port
+    exx
+ENDIF
+
+
     push    bc
     pop     ix
 
@@ -67,6 +75,12 @@ asm_bit_load_block_zx:
 
     INC     D
     EX      AF, AF'
+
+  IF    FORc128
+    IN      a,(1)
+	and     223                         ; Reset BIT 5 (address 1 in the zero page)
+    OUT     (1), A                      ; MOTOR ON
+  ENDIF
 
   IF    FORmsx
     LD      A, $08
@@ -107,6 +121,12 @@ asm_bit_load_block_zx:
   ENDIF
   ENDIF
 
+  IF    FORc128
+    IN      a,(1)
+	or      32                          ; Set BIT 5 (address 1 in the zero page)
+    OUT     (1), A                      ; MOTOR OFF
+  ENDIF
+
   IF    FORmsx
     LD      A, $09
     OUT     ($AB), A                    ; MOTOR OFF
@@ -141,7 +161,8 @@ LD_BYTES:
     ex      (sp), hl
   ENDIF
 
-    IN      A, (TAPEIN_ONEBIT_port)
+  ONEBITIN
+
         ;RRA
 
     AND     TAPEIN_ONEBIT_mask
@@ -291,9 +312,10 @@ L05ED:
     ex      (sp), hl
   ENDIF
 
+  ONEBITIN
+
         ;RRA
-    IN      A, (TAPEIN_ONEBIT_port)
-;        RET     NC
+        ;RET     NC
 
     XOR     C
     AND     TAPEIN_ONEBIT_mask
