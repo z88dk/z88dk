@@ -41,9 +41,10 @@ check_key:
     ld      a,l
     and     15
     add     $b0
+    ld      c,a
     ld      b,0
     in      a,(c)
-    and     h       ;checl with mask
+    and     h       ;check with mask
     jr      z,fail
     ld      hl, 1
     scf
