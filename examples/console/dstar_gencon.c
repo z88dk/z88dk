@@ -17,6 +17,11 @@
 #include <games.h>
 #include <sys/ioctl.h>
 
+
+#ifdef __FP1100__
+#define USE_UDGS
+#endif
+
 #ifdef SOUND
 #include <sound.h>
 #endif
@@ -664,8 +669,8 @@ static void drawboard()
 #ifdef __FP1100__
     // The SubCPU? can't handle repeated draws to the same cell and trails end up left
     // This is workaround - print elsewhere on the screen
-    gotoxy(0, 0);
-    cputs("DSTAR TERMINAL");
+    gotoxy(20, 0);
+    putch(' ');
 #endif
 
     ptr = board;
