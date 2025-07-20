@@ -1,7 +1,7 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.4 - xx.xx.2024
+z88dk v2.4 - xx.xx.2025
 
 Future release changes:
 
@@ -14,20 +14,25 @@ Future release changes:
 - [classic] +cpm: Support for far heap (PCW)
 - [classic] +hector: New target
 - [classic] +msx: Support for far heap (MSXDOS)
+- [classic] +nc: Generic console, graphics fixes
+- [classic] +nc: Bootable disc images for NC200: -subtype=ncboot 
+- [classic] +nc: Inkey keyboard driver
 - [classic] +sam: Support for far heap 
 - [classic] +zx: Support for far heap 
 - [classic] +zx81 ARX hires graphics updates
-- [classic] -llib3d is now integratted into target library
+- [classic] -llib3d is now integrated into target library
 - [classic] More near-heap size choice pragmas
 - [classic] More modularised crt setup
 - [newlib] Resolve and correct library build issues with .asm.m4 files
 - [sccz80] 8080 codegen fixes
+- [ticks] Support for Rabbit 5k and 6k
 - [zsdcc] Upgraded to SDCC 4.5.0 r15248
 - [z80asm] GBZ80 opcode conversion fixes
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
 - [z80asm] add string argument to ASSERT
 - [z80asm] fix expansion of nested macros with same parameter names
 - [z80asm] add local labels
+- [z80asm] Support for Rabbit 5k and 6k
 
 z88dk v2.3 - 20.12.2023
 
