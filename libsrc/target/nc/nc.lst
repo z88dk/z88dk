@@ -1,9 +1,7 @@
 target/nc/stdio/fgetc_cons
 target/nc/stdio/fputc_cons
 target/nc/stdio/CRT_FONT
-target/nc/games/joystick
 @stdio/stdio.lst
-@games/games.lst
 target/nc/fcntl/open
 target/nc/fcntl/opendir
 target/nc/fcntl/creat
