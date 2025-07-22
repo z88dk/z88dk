@@ -69,7 +69,11 @@ IF FORvz
     ld      h, MODE_MULTICOLOUR
     ld      l, CAPS_MULTICOLOUR
     ld      de, $0810   ;8 rows, 16 columns
+    set     1,c
+    res     0,c
     cp      1
+    jr      z,set_mode
+    cp      2
     jr      nz, failure
     ;; Fall throught into set_mode
 ELSE
@@ -86,11 +90,11 @@ ELSE
 
     ;; MULTICOLOUR MODE
     ld      hl, +( (MODE_MULTICOLOUR << 8) + CAPS_MULTICOLOUR)
-IF FORsv8000
+  IF FORsv8000
     ld      de, $0c10       ;12 rows, 16 columns
-ELSE
+  ELSE
     ld      de, $1810       ;24 rows, 16 columns
-ENDIF
+  ENDIF
     cp      2                           ;Half hires/multicolour
   IF FORspc1000
     jr      z,set_mode
