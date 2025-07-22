@@ -25,5 +25,14 @@ extern void __LIB__ a2_ctl(int chr)  __z88dk_fastcall;
 // Send a character (direct BIOS access)
 extern void __LIB__ a2_sendchar(int chr)  __z88dk_fastcall;
 
-  
+
+//////////////////////////
+//   Apple II specific
+//////////////////////////
+
+// Get the current slot number in use by the Z80 SoftCard
+// If the detection fails, -1 is reported
+extern void __LIB__ z80_slot();
+
+
 #endif
