@@ -26,7 +26,7 @@ conio_map_colour:
     SECTION rodata_clib
     ; On the Lviv: 0 = black, 1 = BLUE, 2 = GREEN, 3 = RED
 table:
-    defb    0                   ;BLACK -> GREEN
+    defb    0                   ;BLACK -> BLACK
     defb    1                   ;BLUE -> BLUE
     defb    2                   ;GREEN -> GREEN
     defb    1                   ;CYAN -> BLUE
