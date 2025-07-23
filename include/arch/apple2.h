@@ -9,6 +9,8 @@
 // CP/M screen functions, use a2_ctl(x);
 // They can be modified or disabled with the CONFIGIO program
 
+extern void __LIB__ a2_ctl(int chr)  __z88dk_fastcall;
+
 #define TEXT_CLRHOME  1    // Clear Screen
 #define TEXT_CLREND   2    // Clear to End of Page
 #define TEXT_CLREOL   3    // Clear to End of Line
@@ -19,11 +21,34 @@
 #define TEXT_CURUP    8    // Move Cursor Up
 #define TEXT_CURFWD   9    // Non-destructevly Move Cursor Forward
 
-extern void __LIB__ a2_ctl(int chr)  __z88dk_fastcall;
-
 
 // Send a character (direct BIOS access)
 extern void __LIB__ a2_sendchar(int chr)  __z88dk_fastcall;
+
+
+// MACROS to toggle the video hardware modes
+
+// Display a GAPHICS page
+#define M_GRAPHICS asm("ld\t(0xE050),a\n");
+// Display a TEXT page
+#define M_TEXT asm("ld\t(0xE051),a\n");
+
+// Display a full GRAPHICS or TEXT page (disable MIXED)
+#define M_FULL asm("ld\t(0xE052),a\n");
+// Display a mixed page with text at bottom
+#define M_MIXED asm("ld\t(0xE053),a\n");
+
+// Low resolution graphics mode
+#define M_LO_RES asm("ld\t(0xE056),a\n");
+// High resolution graphics mode
+#define M_HI_RES asm("ld\t(0xE057),a\n");
+
+// Display the primary TEXT or GRAPHICS page ($0400 or $2000)
+#define M_PAGE1 asm("ld\t(0xE054),a\n");
+// Display the secondary TEXT or GRAPHICS page ($0800 or $4000)
+#define M_PAGE2 asm("ld\t(0xE055),a\n");
+
+
 
 
 //////////////////////////
@@ -49,7 +74,7 @@ extern void __LIB__ r6502(int addr)  __z88dk_fastcall;
 #define A2_CLRTOP      0xF836   // Clear only the top 40 lines in Lo-Rez
 #define A2_GBASCALC    0xF847   // Calculate a Lo-Rez plot position
 #define A2_NXTCOL      0xF85F   // Add 3 to the current Lo-Rez color setting
-#define A2_SETCOL      0xF864   // Set the Lo-Rez graphics color mode
+#define A2_SETCOL      0xF864   // Set the color for Lo-Rez graphics mode
 #define A2_SCRN        0xF871   // Determine the color of a Lo-Rez pixel (A = block color)
 #define A2_INSDS1      0xF882   // Print the monitor's current PC (program counter)
 #define A2_INSDS2      0xF88E   // Calculate length of 6502 instruction in A
