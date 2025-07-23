@@ -29,16 +29,16 @@ table:
     defb    0                   ;BLACK -> GREEN
     defb    1                   ;BLUE -> BLUE
     defb    2                   ;GREEN -> GREEN
-    defb    1                   ;CYAN -> CYAN
+    defb    1                   ;CYAN -> BLUE
     defb    3                   ;RED -> RED
-    defb    3                   ;MAGENTA->MAGENTA
+    defb    3                   ;MAGENTA->RED
     defb    3                   ;BROWN->RED
-    defb    2                   ;LIGHTGRAY->WHITE
-    defb    2                   ;DARKGRAY->WHITE
+    defb    2                   ;LIGHTGRAY->GREEN
+    defb    2                   ;DARKGRAY->GREEN
     defb    1                   ;LIGHTBLUE -> BLUE
     defb    2                   ;LIGHTGREEN -> GREEN
-    defb    1                   ;LIGHTCYAN -> CYAN
+    defb    1                   ;LIGHTCYAN -> BLUE
     defb    3                   ;LIGHTRED -> RED
-    defb    3                   ;LIGHTMAGENTA->MAGENTA
-    defb    2                   ;YELLOW -> YELLOW
-    defb    2                   ;WHITE -> WHITE
+    defb    3                   ;LIGHTMAGENTA->RED
+    defb    2                   ;YELLOW -> GREEN
+    defb    2                   ;WHITE -> GREEN
