@@ -3,6 +3,7 @@ target/lviv/stdio/generic_console
 target/lviv/stdio/generic_console_ioctl
 target/lviv/stdio/generic_console_vpeek
 target/lviv/stdio/conio_vars
+target/lviv/stdio/conio_map_colour
 target/lviv/stdio/CRT_FONT
 @stdio/stdio.lst
 
