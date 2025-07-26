@@ -7,6 +7,7 @@ IFDEF MC6847_IOSPACE
 
     PUBLIC  vpeek_MODE2
     EXTERN  vpeek_screendollar
+    EXTERN  __mc6847_MODE2_attr
 
 ;Entry: c = x,
 ;       b = y
@@ -24,52 +25,56 @@ vpeek_MODE2:
     ld      a, c
     add     c
     ld      c, a
-    jr      nc, no_overflow
+    jr      nc, @no_overflow
     inc     b
-no_overflow:
+@no_overflow:
 
-        ; b7   b6   b5   b4   b3   b2   b1   b0
-         ; p0-1 p1-1 p2-1 p3-1 p0-0 p1-0 p2-0 p3-0
+   
     ld      a, 8
-handle_MODE2_per_line:
+@row_loop:
     ex      af, af
     push    hl                          ;save buffer
-    ld      h, @10000000
     ld      e, 0                        ;resulting byte
     ld      a, 2                        ;we need to do this loop twice
-handle_mode1_nibble:
+@nibble_loop:
     push    af
     ld      l, @11000000
+    ld      a,(__mc6847_MODE2_attr+1)
+    ld      h,a
     ld      d, 4                        ;4 pixels in a byte
-handle_MODE2_0:
+@bit_loop:
     in      a, (c)
-    and     l
-    jr      z, not_set
-    ld      a, e
-    or      h
-    ld      e, a
-not_set:
+    and     l                           ;resets carry
+    jr      z, @rotate_in_bit
+    cp      h
+    scf
+    jr      nz,@rotate_in_bit
+    ccf
+@rotate_in_bit:
+    rl      e
+    ;; Rotate the mask and testing
+    srl     h
     srl     h
     srl     l
     srl     l
     dec     d
-    jr      nz, handle_MODE2_0
+    jr      nz, @bit_loop
     inc     bc
     pop     af
     dec     a
-    jr      nz, handle_mode1_nibble
+    jr      nz, @nibble_loop
     pop     hl                          ;buffer
     ld      (hl), e
     inc     hl
     ld      a, c
     add     30
     ld      c, a
-    jr      nc, no_overflow_MODE2
+    jr      nc, @no_overflow2
     inc     b
-no_overflow_MODE2:
+@no_overflow2:
     ex      af, af
     dec     a
-    jr      nz, handle_MODE2_per_line
+    jr      nz, @row_loop
     jp      vpeek_screendollar
 
 ENDIF

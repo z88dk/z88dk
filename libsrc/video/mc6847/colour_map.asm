@@ -6,10 +6,10 @@
 
 ; Map conio colour to colours
 ; Entry:  a = colour
-; Exit:   c = text colour
-;         b = colour colour
+; Exit:   b = mapped colour
 ; Uses:   dehl
 mc6847_map_colour:
+    ld      b,a
     ld      c, __CLIB_CONIO_NATIVE_COLOUR
     rr      c
     ret     c

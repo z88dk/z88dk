@@ -8,6 +8,7 @@ IFNDEF MC6847_IOSPACE
     PUBLIC  vpeek_MODE2
     EXTERN  vpeek_screendollar
     EXTERN  __mc6847_mode
+    EXTERN  __mc6847_MODE2_attr
 
 
 ;Entry: c = x,
@@ -27,25 +28,24 @@ vpeek_MODE2:
     add     hl,bc
 
 
-        ; b7   b6   b5   b4   b3   b2   b1   b0
-         ; p0-1 p1-1 p2-1 p3-1 p0-0 p1-0 p2-0 p3-0
     ex      de, hl
     ld      b, 8
 IF FORmc1000
     ld      a, (__mc6847_mode)
     ex      af, af
 ENDIF
-handle_MODE2_per_line:
+@row_loop:
     push    bc
     push    hl                          ;save buffer
-    ld      h, @10000000
     ld      c, 0                        ;resulting byte
     ld      a, 2                        ;we need to do this loop twice
-handle_mode1_nibble:
+@nibble_loop:
     push    af
     ld      l, @11000000
+    ld      a,(__mc6847_MODE2_attr+1)
+    ld      h,a
     ld      b, 4                        ;4 pixels in a byte
-handle_MODE2_0:
+@bit_loop:
 IF FORmc1000
     ex      af, af
     res     0, a
@@ -56,29 +56,26 @@ IF FORmc1000
     set     0, a
     out     ($80), a                    ;VRAM out
     ex      af, af
-    and     l
-    jr      z, not_set
-    ld      a, c
-    or      h
-    ld      c, a
-
 ELSE
     ld      a, (de)
-    and     l
-    jr      z, not_set
-    ld      a, c
-    or      h
-    ld      c, a
 ENDIF
-not_set:
+    and     l                           ; resets carry
+    jr      z,@rotate_in_bit            ;it's pen 0
+    cp      h
+    scf
+    jr      nz,@rotate_in_bit           ;it's not the background pen
+    ccf
+@rotate_in_bit:
+    rl      c
+    srl     h
     srl     h
     srl     l
     srl     l
-    djnz    handle_MODE2_0
+    djnz    @bit_loop
     inc     de
     pop     af
     dec     a
-    jr      nz, handle_mode1_nibble
+    jr      nz, @nibble_loop
     pop     hl                          ;buffer
     ld      (hl), c
     inc     hl
@@ -87,11 +84,11 @@ not_set:
     ld      a, e
     add     32
     ld      e, a
-    jr      nc, no_overflow_MODE2
+    jr      nc, @no_overflow
     inc     d
-no_overflow_MODE2:
+@no_overflow:
     pop     bc
-    djnz    handle_MODE2_per_line
+    djnz    @row_loop
     jp      vpeek_screendollar
 
 ENDIF
