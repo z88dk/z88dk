@@ -13,6 +13,7 @@
     EXTERN  generic_console_xypos_graphics
     EXTERN  screendollar
     EXTERN  screendollar_with_count
+    EXTERN  __pc88_paper
 
     INCLUDE "target/pc88/def/pc88.def"
 
@@ -35,23 +36,55 @@ vpeek_MODE2:
     pop     de                          ; de = buffer
 
     ld      a, 8
-loop:
+@row_loop:
     push    af
-    xor     a
+    push    de
+
     out     (GVRAM_SEL_0), a            ;Switch to blue
-    or      (hl)
+    ld      d,(hl)
     out     (GVRAM_SEL_1), a            ;Switch to green
-    or      (hl)
+    ld      e,(hl)
     out     (GVRAM_SEL_2), a            ;Switch to red
-    or      (hl)
+    ld      a,(hl)
     out     (MAINRAM_SEL), a            ;Switch to main
-    ld      (de), a
-    inc     de
     ld      bc, 80                      ;Move to next row
     add     hl, bc
+    ld      c,a
+    ; hl is now setup for the next row
+    ex      (sp),hl                     ;(sp) = next row, hl = buffer
+    push    hl
+
+    ld      a,(__pc88_paper)
+    ld      h,a
+    ld      l,0                         ;resulting row
+
+    ; Now create a colour byte for each pixel
+    ld      b,8
+@create_bytes:
+    xor     a
+    rl      c
+    rla
+    rl      e
+    rla
+    rl      d
+    rla
+    and     a
+    jr      z,@rotate_bit               ;pen0 = background
+    cp      h                           ;current background?
+    scf
+    jr      nz,@rotate_bit
+    ccf
+@rotate_bit:
+    rl      l
+    djnz    @create_bytes
+    pop     de                          ;de=buffer
+    ld      a,l
+    ld      (de),a
+    inc     de
+    pop     hl                          ;screen
     pop     af
     dec     a
-    jr      nz, loop
+    jr      nz, @row_loop
     call    l_pop_ei
 
     pop     de                          ;de = buffer of stack
