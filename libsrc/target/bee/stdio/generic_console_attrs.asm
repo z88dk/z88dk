@@ -100,16 +100,16 @@ table_standard_ink:
     defb    3                           ;CYAN -> CYAN
     defb    4                           ;RED -> RED
     defb    5                           ;MAGENTA -> MAGENTA
-    defb    18                          ;BROWN -> DARK YELLOW
-    defb    28                          ;LIGHTGRAY -> WHITE
-    defb    26                          ;DARKGRAY -> GRAY?
-    defb    8                           ;LIGHTBLUE -> BRIGHT BLUE
-    defb    9                           ;LIGHTGREEN -> BRIGHT GREEN
-    defb    28                          ;LIGHTCYAN -> BRIGHT CYAN
-    defb    20                          ;LIGHTRED -> BRIGHT RED
-    defb    21                          ;LIGHTMAGENTA -> BRIGHT MAGENTA
-    defb    6                           ;YELLOW -> BRIGHT YELLOW
-    defb    7                           ;WHITE -> BRIGHT WHITE
+    defb    13                          ;BROWN -
+    defb    14                          ;LIGHTGRAY -> 
+    defb    14                          ;DARKGRAY ->
+    defb    8                           ;LIGHTBLUE -> 
+    defb    9                           ;LIGHTGREEN -> 
+    defb    19                          ;LIGHTCYAN -> 
+    defb    20                          ;LIGHTRED -> 
+    defb    21                          ;LIGHTMAGENTA -> 
+    defb    6                           ;YELLOW -> YELLOW
+    defb    7                           ;WHITE -> WHITE
 
 table_standard_paper:
     defb    0                           ;BLACK -> BLACK
