@@ -7,6 +7,7 @@
     EXTERN  generic_console_udg32
     EXTERN  screendollar
     EXTERN  screendollar_with_count
+    EXTERN  __lviv_paper
 
 generic_console_vpeek:
     ld      hl, -8
@@ -32,29 +33,32 @@ generic_console_vpeek:
 per_line:
     push    bc
     push    hl                          ;save buffer
-    ld      h, @10000000
     ld      c, 0                        ;resulting byte
     ld      a, 2                        ;we need to do this loop twice
 per_nibble:
     push    af
+    ld      a,(__lviv_paper)
+    ld      h,a
     ld      l, @10001000
     ld      b, 4                        ;4 pixels in a byte
 per_byte:
     ld      a, (de)
     and     l
-    jp      z, not_set
-    ld      a, c
-    or      h
-    ld      c, a
-not_set:
-    and     a
-    ld      a, h
-    rra
-    ld      h, a
-    and     a
-    ld      a, l
-    rra
-    ld      l, a
+    jp      z, rotate_in_bit
+    cp      h
+    scf
+    jp      nz,rotate_in_bit
+    ccf
+rotate_in_bit:
+    ld      a,c                         ;Rotate bit into where we want it to be
+    rla
+    ld      c,a
+    ld      a,h
+    rrca
+    ld      h,a
+    ld      a,l
+    rrca
+    ld      l,a
     dec     b
     jp      nz, per_byte
     inc     de

@@ -1,5 +1,5 @@
 
-    SECTION data_clib
+    SECTION data_himem
 
     PUBLIC  __lviv_ink
     PUBLIC  __lviv_paper
