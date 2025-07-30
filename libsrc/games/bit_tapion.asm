@@ -21,9 +21,11 @@
     EXTERN  bit_open_di
     EXTERN  bit_tapiof
     EXTERN  bit_tapin_bit
+    
+	EXTERN  bit_tapion_motor
 
-    PUBLIC  __LOWLIM
-    PUBLIC  __WINWID
+    EXTERN  __LOWLIM
+    EXTERN  __WINWID
 
 
     INCLUDE "games/games.inc"
@@ -36,92 +38,15 @@ IF  __CPU_GBZ80__||__CPU_INTEL__
     ret
 ELSE
 
-;  PUSH HL
-;  PUSH DE
-;  PUSH BC
-;  PUSH AF
-;  CALL TAPION
-;POPALL:
-;  POP AF
-;  JR POPALL_0
-;
-;
-;TAPION:
-;------------------ Target specific section --------------------
-  IF    FORzx81
-    extern zx_fast
-    call zx_fast
-    OUT     (0FFh), A                   ;   set output bit high
-  ELSE
-    call    bit_open_di
-  ENDIF
 
-  IF    FORlynx
-    LD      A, $02                      ; MOTOR ON
-    OUT     ($80), A
-    LD      A, $0C
-    OUT     ($86), A
-  ENDIF
-
-  IF    FORmsx
-    LD      A, $08
-    OUT     ($AB), A                    ; MOTOR ON
-    LD      A, 14
-    OUT     ($A0), A                    ; Set PSG register for data input port
-  ENDIF
-
-  IF    FORsvi
-    LD      A, $08
-    OUT     ($97), A                    ; MOTOR ON
-    LD      A, 14
-    OUT     ($88), A                    ; Set PSG register for data input port
-  ENDIF
-
-  IF    FORvg5k
-    LD      A, 2
-    OUT     ($AF), A                    ; MOTOR ON
-  ENDIF
-
-  IF    FORmc1000
-    LD      A, $0F
-    OUT     ($20), A                    ; Set PSG register for data input port
-  ENDIF
-
-; ZX Spectrum, SAM, TS2068, etc..
-  IF    (TAPEIN_ONEBIT_port=$FE)
-  IF    FORzx81
-    OUT     ($FF), A
-  ELSE
-    out     ($FE), a
-  ENDIF
-  ENDIF
-
-  IF    FORaquarius
-    ld      a, (13312)                  ; save border
-    ex      af, af
-  ENDIF
-
-  IF    FORc128
-    IN      a,(1)
-	and     223                         ; Reset BIT 5 (address 1 in the zero page)
-    OUT     (1), A                      ; MOTOR ON
-  ENDIF
-
-;---------------------------------------------------------------
-
-IF SOUND_ONEBIT_port >= 256
-    exx
-    ld      bc,SOUND_ONEBIT_port
-    exx
-ENDIF
-
+    CALL    bit_tapion_motor
 
 TAPION_0:
   ;LD HL,1111
-    LD      HL, 400
+    LD      HL, 200
 
 TAPION_1:
-    LD      D, C                        ; Get tape block mode
+    LD      D, C
     CALL    bit_tapin_bit
   ;RET C               ; Exit if timeout (or BREAK)
     JP      C, TAPION_ERROR
@@ -187,20 +112,4 @@ TAPION_ERROR:
 
 
 ENDIF
-
-; Those two parameters are intitialized by bit_tapion()
-; in the leading tone sync phase
-;
-
-
-; Mind the "contended memory" when running this on a ZX Spectrum !
-
-;SECTION smc_clib
-    SECTION bss_clib
-
-
-__LOWLIM:
-    DEFB    0
-__WINWID:
-    DEFB    0
 
