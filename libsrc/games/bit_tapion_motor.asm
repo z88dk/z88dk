@@ -35,12 +35,7 @@ ELSE
     OUT     ($FF), A                   ;   set output bit high
   ELSE
 
-; ZX Spectrum, SAM, TS2068, etc..
-  IF    (TAPEIN_ONEBIT_port=$FE)
-    out     ($FE), a
-  ENDIF
-  
-    call    bit_open_di
+    call    bit_open_di       ; it includes also the ZX Spectrum EAR port activation
  
  ENDIF
     pop     af
