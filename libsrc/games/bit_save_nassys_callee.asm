@@ -80,6 +80,13 @@ ENDIF
 
 
 asm_bit_save_nassys:
+
+
+IF  __CPU_GBZ80__||__CPU_INTEL__
+asm_bit_load_block_zx:
+    ret
+ELSE
+
         LD      (ARG1),HL
         INC     DE        ; end address +1
         LD      (ARG2),DE
@@ -262,6 +269,7 @@ HB2:    DJNZ    HB2
         DJNZ    HB0
         RET
 
+ENDIF
 
 
 
