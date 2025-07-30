@@ -11,8 +11,9 @@
     PUBLIC  _bit_load_block_zx_callee
     PUBLIC  asm_bit_load_block_zx
 
-    EXTERN  bit_open_di
-    EXTERN  bit_close_ei
+    EXTERN  bit_tapion_motor
+    EXTERN  bit_tapiof
+
 
     EXTERN  __snd_tick
 
@@ -42,31 +43,14 @@ asm_bit_load_block_zx:
 
 
     push    ix
+
   IF    FORzx81
     EX      AF, AF'
     PUSH    AF
     EX      AF, AF'
   ENDIF
 
-    push    af
-  IF    FORzx81
-    push    de
-    EXTERN  zx_fast
-    call    zx_fast
-    pop     de
-    OUT     ($FF), A                   ;   set output bit high
-  ELSE
-    call    bit_open_di
-  ENDIF
-    pop     af
-
-
-IF SOUND_ONEBIT_port >= 256
-    exx
-    ld      bc,SOUND_ONEBIT_port
-    exx
-ENDIF
-
+    call    bit_tapion_motor
 
     push    bc
     pop     ix
@@ -75,27 +59,6 @@ ENDIF
 
     INC     D
     EX      AF, AF'
-
-  IF    FORc128
-    IN      a,(1)
-	and     223                         ; Reset BIT 5 (address 1 in the zero page)
-    OUT     (1), A                      ; MOTOR ON
-  ENDIF
-
-  IF    FORmsx
-    LD      A, $08
-    OUT     ($AB), A                    ; MOTOR ON
-  ENDIF
-
-  IF    FORsvi
-    LD      A, $08
-    OUT     ($97), A                    ; MOTOR ON
-  ENDIF
-
-  IF    FORmc1000
-    LD      A, $0F
-    OUT     ($20), A                    ; Set PSG register for data input port
-  ENDIF
 
     DEC     D
 
@@ -110,38 +73,15 @@ ENDIF
 ;        LD      A,$7F
 ;        IN      A,($FC)
 ;        RRA
-  IF    FORzx81
-    EXTERN  zx_slow
-    call    zx_slow
-  ELSE
-    call    bit_close_ei
-  IF    (TAPEIN_ONEBIT_port=$FE)
-    ld      a, (__snd_tick)             ; Restore border colour
-    ONEBITOUT
-  ENDIF
-  ENDIF
 
-  IF    FORc128
-    IN      a,(1)
-	or      32                          ; Set BIT 5 (address 1 in the zero page)
-    OUT     (1), A                      ; MOTOR OFF
-  ENDIF
-
-  IF    FORmsx
-    LD      A, $09
-    OUT     ($AB), A                    ; MOTOR OFF
-  ENDIF
-
-  IF    FORsvi
-    LD      A, $09
-    OUT     ($97), A                    ; MOTOR OFF
-  ENDIF
+    call    bit_tapiof
 
   IF    FORzx81
     EX      AF, AF'
     POP     AF
     EX      AF, AF'
   ENDIF
+
     pop     ix
 
 ;		LD      HL,0
@@ -154,7 +94,7 @@ ENDIF
 
 LD_BYTES:
 
-  IF    FORsam
+  IF    TAPE_SPEED_6MHZ
     ex      (sp), hl
     ex      (sp), hl
     ex      (sp), hl
@@ -170,7 +110,7 @@ LD_BYTES:
         ;OR      $02
     LD      C, A
 
-  IF    FORsam
+  IF    TAPE_SPEED_6MHZ
     ex      (sp), hl
     ex      (sp), hl
     ex      (sp), hl
@@ -305,7 +245,7 @@ L05ED:
     INC     B
     RET     Z
 
-  IF    FORsam
+  IF    TAPE_SPEED_6MHZ
     ex      (sp), hl
     ex      (sp), hl
     ex      (sp), hl
@@ -325,7 +265,7 @@ L05ED:
     CPL
     LD      C, A
 
-  IF    FORsam
+  IF    TAPE_SPEED_6MHZ
     ex      (sp), hl
     ex      (sp), hl
     ex      (sp), hl

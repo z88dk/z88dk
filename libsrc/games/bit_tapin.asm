@@ -78,7 +78,7 @@ TAPIN_2:
     LD      A, B
     ADD     A, C
     JP      C, TAPIN_2
-    CP      D
+    CP      D                           ; LOWLIM
     JP      C, TAPIN_2
 ;  LD L,8
     LD      L, 8                        ; <-- on the ZX Spectrum something goes wrong during the first bit 'sync', so we trash one extra bit

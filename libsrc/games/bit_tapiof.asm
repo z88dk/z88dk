@@ -46,24 +46,24 @@ ELSE
     OUT     ($AF), A                    ; MOTOR OFF
   ENDIF
 
-; ZX Spectrum, SAM, TS2068, etc..
-  IF    (TAPEIN_ONEBIT_port=$FE)
-    EXTERN  __snd_tick
-    LD      A, (__snd_tick)
-    out     ($FE), a
-  ENDIF
-
   IF    FORaquarius
     ex      af, af
     ld      (13312), a                  ; restore border
   ENDIF
 
   IF    FORzx81
-    extern zx_slow
-    jp zx_slow
+    EXTERN  zx_slow
+    call    zx_slow
   ELSE
-    jp      bit_close_ei
+; ZX Spectrum, SAM, TS2068, etc..
+    call    bit_close_ei
+  IF    (TAPEIN_ONEBIT_port=$FE)
+    EXTERN  __snd_tick
+    ld      a, (__snd_tick)             ; Restore border colour
+    ONEBITOUT
   ENDIF
+  ENDIF
+
 ;---------------------------------------------------------------
 
 
