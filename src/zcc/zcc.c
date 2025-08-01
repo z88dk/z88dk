@@ -3054,7 +3054,7 @@ static void configure_compiler(void)
 
 
         compiler_type = CC_SDCC;
-        snprintf(buf, sizeof(buf), "%s --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
+        snprintf(buf, sizeof(buf), "%s --legacy-banking --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
             cpuarg, \
             (sdcc_signed_char ? "--fsigned-char" : ""), \
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
