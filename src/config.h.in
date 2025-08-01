@@ -1,0 +1,4 @@
+#define PREFIX "${CMAKE_INSTALL_PREFIX}/share/z88dk"
+#define BINDIR "${CMAKE_INSTALL_PREFIX}/bin"
+#cmakedefine01 UNIX
+#define Z88DK_VERSION "${GIT_COUNT}-${GIT_REV}-${VERSION}"
