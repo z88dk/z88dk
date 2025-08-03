@@ -25,6 +25,8 @@ generic_console_vpeek:
     ld      sp, hl
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
+    ld      a,255
+    ld      (__vpeek_colour),a
     call    swapgfxbk
     call    generic_console_xypos
     call    generic_console_get_mode
@@ -93,14 +95,21 @@ vpeek_MODE2:
     ld      a, 2                        ;Loop twice
 @nibble_loop:
     push    af
-    ld      a,(__MODE2_attr+1)          ;bits 0,1 occupied
+    ld      a,(__vpeek_colour)          ;bits 0,1 occupied
     ld      d,a
     ld      e, @00000011
     ld      b, 4                        ;4 pixels in a byte
 @bit_loop:
+    ld      a,d
+    inc     a
+    jr      nz,@got_paper
     ld      a, (hl)
     and     e
-    jr      z, @rotate_bit
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (hl)
+    and     e
     cp      d
     scf
     jr      nz,@rotate_bit              ;it's ink
@@ -127,13 +136,20 @@ vpeek_MODE3:
     ex      af, af
     push    de
     ld      c, 0                        ;resulting byte
-    ld      a,(__MODE3_attr+1)          ;bits 0-3
+    ld      a,(__vpeek_colour)          ;bits 0-3
     ld      d,a
     ld      b, 4
 @byte_loop:
+    ld      a,d
+    inc     a
+    jr      nz,@got_paper
     ld      a, (hl)
     and     15
-    jr      z, @bit_rotate_in1
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (hl)
+    and     15
     cp      d
     scf
     jr      nz, @bit_rotate_in1
@@ -146,7 +162,6 @@ vpeek_MODE3:
     rrca
     rrca
     and     15
-    jr      z, @bit_rotate_in2
     cp      d
     scf
     jr      nz, @bit_rotate_in2
@@ -161,3 +176,7 @@ vpeek_MODE3:
     pop     de
     ex      af, af
     ret
+
+    SECTION bss_graphics
+
+__vpeek_colour: defb    0

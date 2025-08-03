@@ -35,6 +35,9 @@ vpeek_MODE2:
                                         ; hl = screen
     pop     de                          ; de = buffer
 
+    ld      a,255
+    ld      (__vpeek_colour),a
+
     ld      a, 8
 @row_loop:
     push    af
@@ -54,7 +57,7 @@ vpeek_MODE2:
     ex      (sp),hl                     ;(sp) = next row, hl = buffer
     push    hl
 
-    ld      a,(__pc88_paper)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      l,0                         ;resulting row
 
@@ -68,8 +71,17 @@ vpeek_MODE2:
     rla
     rl      d
     rla
-    and     a
-    jr      z,@rotate_bit               ;pen0 = background
+    push    bc
+    ld      b,a
+    ld      a,h
+    inc     a
+    jr      nz,@paper_set
+    ld      a,b
+    ld      (__vpeek_colour),a
+    ld      h,a
+@paper_set:
+    ld      a,b
+    pop     bc
     cp      h                           ;current background?
     scf
     jr      nz,@rotate_bit
@@ -105,6 +117,9 @@ gotit:
     ret
 
 
+    SECTION bss_driver
+
+__vpeek_colour: defb    0
 
 
 

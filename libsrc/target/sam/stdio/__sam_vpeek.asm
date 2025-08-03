@@ -25,6 +25,8 @@
 
 
 __sam_vpeek:
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      a, (__zx_screenmode)
     and     a
     jp      z, __zx_vpeek               ; Just use the regular +zx code
@@ -45,15 +47,22 @@ vpeek_MODE4:
 @row_loop:
     push    bc
     push    de                          ;Save buffer
-    ld      a,(__sam_MODE4_attr+1)
+    ld      a,(__vpeek_colour)
     ld      d,a
     ld      c, 0                        ;Resultant byte
     ld      a, 4                        ;4 bytes to do
 @nibble_loop:
     ex      af, af
+    ;; See if paper has been set
+    bit     0,d
+    jr      z,@got_paper
     ld      a, (hl)
     and     @11110000
-    jr      z, @rotate_bit_in1
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (hl)
+    and     @11110000
     cp      d
     scf
     jr      nz,@rotate_bit_in1
@@ -66,7 +75,6 @@ vpeek_MODE4:
     rlca
     rlca
     and     @11110000
-    jr      z, @rotate_bit_in2
     cp      d
     scf
     jr      nz,@rotate_bit_in2
@@ -116,14 +124,22 @@ vpeek_MODE3:
     ld      a, 2                        ;We need to do this loop twice
 @byte_loop:
     ex      af, af
-    ld      a,(__sam_MODE3_attr+1)
+    ld      a,(__vpeek_colour)
     ld      d,a
     ld      e, @11000000
     ld      b, 4                        ;4 interations
 @bit_loop:
+    ;; See if paper has been set
+    ld      a,d
+    inc     a
+    jr      nz,@got_paper
     ld      a, (hl)
     and     e
-    jr      z, @rotate_bit_in
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (hl)
+    and     e
     cp      d
     scf
     jr      nz,@rotate_bit_in
@@ -169,3 +185,7 @@ vpeek_MODE2:
     ld      h, a
     djnz    @row_loop
     jr      do_screendollar
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0

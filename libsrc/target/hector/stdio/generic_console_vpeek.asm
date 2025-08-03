@@ -43,6 +43,8 @@ ELSE
     add     hl,bc                       ;+x
 ENDIF
     ex      de, hl
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      b, 8
 @line_loop:
     push    bc
@@ -52,13 +54,20 @@ ENDIF
 @byte_loop:
     push    af
     ld      l, @00000011
-    ld      a,(__MODE1_attr+1)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      b, 4                        ;4 pixels in a byte
 @bit_loop:
+    ld      a,h
+    inc     a
+    jr      nz,@got_paper
     ld      a, (de)
     and     l
-    jr      z, @rotate_bit
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (de)
+    and     l
     cp      h
     scf
     jr      nz, @rotate_bit
@@ -135,3 +144,6 @@ gotit:
     ex      af,af           ; Flags and parameter back
     ret
 
+    SECTION bss_clib
+
+__vpeek_colour: defb    0

@@ -29,6 +29,8 @@ vpeek_MODE2:
 
 
     ex      de, hl
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      b, 8
 IF FORmc1000
     ld      a, (__mc6847_mode)
@@ -42,7 +44,7 @@ ENDIF
 @nibble_loop:
     push    af
     ld      l, @11000000
-    ld      a,(__mc6847_MODE2_attr+1)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      b, 4                        ;4 pixels in a byte
 @bit_loop:
@@ -51,16 +53,31 @@ IF FORmc1000
     res     0, a
     out     ($80), a                    ;VRAM in
     ex      af, af
+    ld      a,h
+    inc     a
+    jr      nz,@got_paper
+    ld      a,(de)
+    and     l
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
     ld      a, (de)
     ex      af, af
     set     0, a
     out     ($80), a                    ;VRAM out
     ex      af, af
 ELSE
+    ld      a,h
+    inc     a
+    jr      nz,@got_paper
+    ld      a,(de)
+    and     l
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
     ld      a, (de)
 ENDIF
     and     l                           ; resets carry
-    jr      z,@rotate_in_bit            ;it's pen 0
     cp      h
     scf
     jr      nz,@rotate_in_bit           ;it's not the background pen
@@ -90,6 +107,10 @@ ENDIF
     pop     bc
     djnz    @row_loop
     jp      vpeek_screendollar
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0
 
 ENDIF
 

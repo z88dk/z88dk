@@ -55,12 +55,12 @@ vpeek_1:
     inc     h
     inc     de
     djnz    vpeek_1
-    pop     de                          ;the buffer on the stack
-    ld      hl, (__zx_32col_font)
-do_screendollar:
   IF    FORsam
     call    __sam_graphics_pageout
   ENDIF
+    pop     de                          ;the buffer on the stack
+    ld      hl, (__zx_32col_font)
+do_screendollar:
     call    screendollar
     jr      nc, gotit
     ld      hl, (__zx_32col_udgs)
@@ -87,13 +87,14 @@ handle_64col:
     ;hl = screen
     ex      de, hl                      ;de = screen, hl=buffer
     ex      af, af
-    ld      c, 0xf0
+    ld      a, 0xf0
     jr      nc, even_column
-    ld      c, 0x0f
+    ld      a, 0x0f
 even_column:
   IF    FORsam
     call    __sam_graphics_pagein
   ENDIF
+    ld      c, a
     ld      b, 8
 vpeek_2:
     ld      a, (de)
@@ -108,6 +109,9 @@ vpeek_2:
     inc     hl
     inc     d
     djnz    vpeek_2
+  IF    FORsam
+    call    __sam_graphics_pageout
+  ENDIF
     pop     de                          ;buffer
     ld      hl, (__zx_64col_font)
     jr      do_screendollar

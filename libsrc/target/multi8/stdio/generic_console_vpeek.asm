@@ -1,5 +1,5 @@
-		; In code_driver so we are low down in memory and hopefully
-		; never paged out
+    ; In code_driver so we are low down in memory and hopefully
+    ; never paged out
     SECTION code_driver
 
     PUBLIC  generic_console_vpeek
@@ -59,6 +59,8 @@ vpeek_graphics:
                                         ; hl = screen
     pop     de                          ; de = buffer
 
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      a, 8
 @row_loop:
     push    af
@@ -85,7 +87,7 @@ vpeek_graphics:
     push    hl
 
 
-    ld      a,(__multi8_paper)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      l,0                         ;resulting row
 
@@ -99,8 +101,17 @@ vpeek_graphics:
     rla
     rl      d
     rla
-    and     a
-    jr      z,@rotate_bit               ;pen0 = background
+    push    bc
+    ld      b,a
+    ld      a,h
+    inc     a
+    jr      nz,@paper_set
+    ld      a,b
+    ld      (__vpeek_colour),a
+    ld      h,a
+@paper_set:
+    ld      a,b
+    pop     bc
     cp      h                           ;current background?
     scf
     jr      nz,@rotate_bit
@@ -139,6 +150,10 @@ gotit:
     ld      sp, hl
     ex      af, af
     ret
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0
 
 
 

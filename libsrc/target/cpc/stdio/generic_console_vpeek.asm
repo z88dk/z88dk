@@ -1,7 +1,7 @@
 
 
     MODULE  generic_console_vpeek
-    SECTION code_clib
+    SECTION code_driver
     EXTERN  generic_console_calc_screen_address
     PUBLIC  generic_console_vpeek
 
@@ -22,11 +22,13 @@ generic_console_vpeek:
     add     hl, sp
     ld      sp, hl
     push    hl                          ;save buffer
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      a, (__cpc_mode)
     cp      2
-    jr      z, handle_mode_2
+    jp      z, handle_mode_2
     and     a
-    jr      z, handle_mode_0
+    jp      z, handle_mode_0
 
 handle_mode_1:
 	 ; b7   b6   b5   b4   b3   b2   b1   b0
@@ -39,14 +41,22 @@ handle_mode_1:
     ld      a, 2                        ;we need to do this loop twice
 @nibble_loop:
     push    af
-    ld      a,(__cpc_paper1)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      l, @10001000
     ld      b, 4                        ;4 pixels in a byte
 @bit_loop:
+    ld      a,h
+    inc     a
+    jr      nz,@got_paper
     ld      a, (de)
     and     l
-    jr      z, @rotate_bit
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (de)
+    and     l
+;    jr      z, @rotate_bit
     cp      h
     scf
     jr      nz,@rotate_bit
@@ -87,14 +97,21 @@ handle_mode_0:
     push    af
 	; 4 bytes in total
  	; 2x for each byte
-    ld      a,(__cpc_paper0)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      l, @10101010
     ld      b, 2
 @bit_loop:
+    ld      a,h
+    cp      255
+    jr      nz,@got_paper
     ld      a, (de)
     and     l
-    jr      z, @rotate_bit
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (de)
+    and     l
     cp      h
     scf
     jr      nz, @rotate_bit
@@ -149,3 +166,7 @@ do_screendollar:
     ld      sp, hl
     ex      af, af
     ret
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0

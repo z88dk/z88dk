@@ -29,6 +29,8 @@ vpeek_MODE2:
     inc     b
 @no_overflow:
 
+    ld      a,255
+    ld      (__vpeek_colour),a
    
     ld      a, 8
 @row_loop:
@@ -39,13 +41,20 @@ vpeek_MODE2:
 @nibble_loop:
     push    af
     ld      l, @11000000
-    ld      a,(__mc6847_MODE2_attr+1)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      d, 4                        ;4 pixels in a byte
 @bit_loop:
+    ld      a,h
+    inc     a
+    jr      nz,@got_paper
+    in      a,(c)
+    and     l
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
     in      a, (c)
     and     l                           ;resets carry
-    jr      z, @rotate_in_bit
     cp      h
     scf
     jr      nz,@rotate_in_bit
@@ -76,5 +85,9 @@ vpeek_MODE2:
     dec     a
     jr      nz, @row_loop
     jp      vpeek_screendollar
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0
 
 ENDIF

@@ -29,6 +29,8 @@ generic_console_vpeek:
     ; p3-1 p2-1 p1-1 p0-1 p3-0 p2-0 p1-0 p0-0
     ld      a, $fd                      ;page vram in
     out     ($c2), a
+    ld      a, 255
+    ld      (__vpeek_colour),a
     ld      b, 8
 per_line:
     push    bc
@@ -37,14 +39,21 @@ per_line:
     ld      a, 2                        ;we need to do this loop twice
 per_nibble:
     push    af
-    ld      a,(__lviv_paper)
+    ld      a,(__vpeek_colour)
     ld      h,a
     ld      l, @10001000
     ld      b, 4                        ;4 pixels in a byte
 per_byte:
+    ld      a,h
+    inc     a
+    jr      nz,paper_set
+    ld      a,(de)
+    and     l
+    ld      h,a
+    ld      (__vpeek_colour),a
+paper_set:
     ld      a, (de)
     and     l
-    jp      z, rotate_in_bit
     cp      h
     scf
     jp      nz,rotate_in_bit
@@ -93,3 +102,7 @@ gotit:
     pop     bc
     pop     bc
     ret
+
+    SECTION bss_himem
+
+__vpeek_colour: defb    0
