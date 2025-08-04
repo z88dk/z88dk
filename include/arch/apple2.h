@@ -28,6 +28,23 @@ extern void __LIB__ a2_sendchar(int chr)  __z88dk_fastcall;
 
 // MACROS to toggle the video hardware modes
 
+// Examples to properly deal with the 80 columns card:
+//
+// TEXT40, PAGE1
+//      M_TEXT; M_PAGE1; M_SNG_RES;
+//
+// TEXT80, PAGE2
+//      M_TEXT; M_PAGE2; M_DBL_RES; M_DBL_PAGE2;
+//
+// HIRES40 mixed with  TEXT40, PAGE1
+//      M_GRAPHICS; M_MIXED; M_PAGE1; M_HI_RES; M_DBL_MIXED; M_SNG_RES;
+//
+// HIRES80, no mix, PAGE1
+//      M_GRAPHICS; M_FULL; M_HI_RES; M_DBL_FULL; M_DBL_PAGE1; M_DBL_RES;
+//
+// LORES40, mixed with TEXT80, PAGE2
+//      M_GRAPHICS; M_MIXED; M_PAGE2; M_LO_RES; M_DBL_MIXED; M_DBL_PAGE2; M_DBL_RES;
+
 // Display a GAPHICS page
 #define M_GRAPHICS asm("ld\t(0xE050),a\n");
 // Display a TEXT page
@@ -48,6 +65,23 @@ extern void __LIB__ a2_sendchar(int chr)  __z88dk_fastcall;
 // Display the secondary TEXT or GRAPHICS page ($0800 or $4000)
 #define M_PAGE2 asm("ld\t(0xE055),a\n");
 
+// 80 columns or double resolution
+// -------------------------------
+
+// 80STORE OFF (disable page2 SCAN)
+#define M_DBL_PAGE1 asm("ld\ta,(0xE001)\n");
+// 80STORE ON (enable page2 SCAN)
+#define M_DBL_PAGE2 asm("ld\ta,(0xE000)\n");
+
+// Single resolution (text and graphics 80COL OFF - no double res)
+#define M_SNG_RES asm("ld\ta,(0xE00C)\n");
+// Double resolution (text or graphics 80COL mode)
+#define M_DBL_RES asm("ld\ta,(0xE00D)");
+
+// AN3 OFF (disable double and low resolution mixing)
+#define M_DBL_FULL asm("ld\t(0xE05E),a\n");
+// AN3 ON  (enable hires "delayed", mix with text or lorez)
+#define M_DBL_MIXED asm("ld\t(0xE05F),a\n");
 
 
 
@@ -96,9 +130,7 @@ extern void __LIB__ r6502(int addr)  __z88dk_fastcall;
 #define A2_REGDSP      0xFAD7   // Display the A, X, Y and system registers
 #define A2_PREAD       0xFB1E   // Return paddle X value (0 to 3) in Y register
 #define A2_PREAD4      0xFB21   // (alternate entry point in PREAD
-
 #define A2_SETTXT1     0xFB2F   // Init text mode entry used by GBASIC
-
 #define A2_SETTXT      0xFB39   // Set text mode and a full width text window
 #define A2_SETGR       0xFB40   // Set Lo-Rez graphics mode
 #define A2_SETWND      0xFB4B   // Set the text window determined by zero page bounds
