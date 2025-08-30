@@ -1049,25 +1049,5 @@ ifelse(__STARTUP, 799,
    include(`startup/zxn_crt_799.asm.m4')
 ')
 
+INCLUDE "startup/zxn_crt_banked.asm"
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Banked calls configuration ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-; MMU Next register to be used for banked calls depending on the value
-; of pragma CRT_BANKING_SEGMENT:
-;   0: MMU 0 and 1
-;   1: MMU 2 and 3
-;   2: MMU 4 and 5
-;   3: MMU 6 and 7
-
-; By default, MMU 6 and 7 are used
-ifdef(`CRT_BANKING_SEGMENT',,`define(`CRT_BANKING_SEGMENT', 3)')
-
-PUBLIC __clib_banking_mmu_low
-PUBLIC __clib_banking_mmu_high
-
-defc __clib_banking_mmu_low = eval(80 + CRT_BANKING_SEGMENT * 2) 
-defc __clib_banking_mmu_high = eval(81 + CRT_BANKING_SEGMENT * 2) 
