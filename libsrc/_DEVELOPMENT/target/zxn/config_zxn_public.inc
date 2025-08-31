@@ -5521,6 +5521,163 @@ defc __IO_FF_HIRES_WHITE = 0x3e
 
 
 
+; ------------------------------------------
+; Hardware tilemap (aka layer 3) registers
+; ------------------------------------------
+
+; Sets and reads the clip-window for Tilemap graphics
+defc __REG_CLIP_WINDOW_TILEMAP = 0x1B
+
+; Sets the X pixel offset (two high bits) used for drawing Tilemap graphics on the screen
+defc __REG_TILEMAP_OFFSET_X_MSB = 0x2f
+
+; Sets the X pixel offset (two low bits) used for drawing Tilemap graphics on the screen
+defc __REG_TILEMAP_OFFSET_X_LSB = 0x3
+
+; Sets the Y pixel offset used for drawing Tilemap graphics on the screen
+defc __REG_TILEMAP_OFFSET_Y = 0x31
+
+; Sets the transparency index for Tilemap graphics
+defc __REG_TILEMAP_TRANSPARENCY_INDEX = 0x4C
+
+; ----------------------------------------------------------------
+; Tilemap values for clip window control (REG_CLIP_WINDOW_CONTROL)
+; ----------------------------------------------------------------
+
+; Reset the tilemap clip index
+defc __RCWC_RESET_TILEMAP_CLIP_INDEX = 0x08
+
+; ------------------------------------------------------------------------
+; Tilemap selection for the palette control register (REG_PALETTE_CONTROL)
+; ------------------------------------------------------------------------
+
+; Tilemap first palette
+defc __RPC_SELECT_TILEMAP_PALETTE_0 = 0x30
+
+; Tilemap second palette
+defc __RPC_SELECT_TILEMAP_PALETTE_1 = 0x70
+
+
+PUBLIC __REG_CLIP_WINDOW_TILEMAP
+PUBLIC __REG_TILEMAP_OFFSET_X_MSB
+PUBLIC __REG_TILEMAP_OFFSET_X_LSB
+PUBLIC __REG_TILEMAP_OFFSET_Y
+PUBLIC __REG_TILEMAP_TRANSPARENCY_INDEX
+PUBLIC __RCWC_RESET_TILEMAP_CLIP_INDEX
+PUBLIC __RPC_SELECT_TILEMAP_PALETTE_0
+PUBLIC __RPC_SELECT_TILEMAP_PALETTE_1
+
+
+
+; ------------------------------------------
+; Hardware sprites registers and flags
+; ------------------------------------------
+
+; Register for selection of the active sprite attribute and pattern slot index
+defc __REG_SPRITE_NUMBER = 0x34
+
+; Low 8 bits of sprite X position registers
+defc __REG_SPRITE_ATTR_X = 0x35
+defc __REG_SPRITE_ATTR_0 = 0x35
+defc __REG_SPRITE_ATTR_X_INCREMENT = 0x75
+defc __REG_SPRITE_ATTR_0_INCREMENT = 0x75
+
+; Low 8 bits of sprite Y position registers
+defc __REG_SPRITE_ATTR_Y = 0x36
+defc __REG_SPRITE_ATTR_1 = 0x36
+defc __REG_SPRITE_ATTR_Y_INCREMENT = 0x76
+defc __REG_SPRITE_ATTR_1_INCREMENT = 0x76
+
+; Sprite attr 2 registers
+defc __REG_SPRITE_ATTR2 = 0x37
+defc __REG_SPRITE_ATTR2_INCREMENT = 0x77
+
+; Sprite attr 2 flags
+defc __RSA2_ENABLE_X_MIRRORING = 0x08
+defc __RSA2_ENABLE_Y_MIRRORING = 0x04
+defc __RSA2_ROTATE_CLOCKWISE = 0x02
+defc __RSA2_RELATIVE_ANCHOR_PALETTE = 0x01
+
+; Sprite attr 3 registers
+defc __REG_SPRITE_ATTR3 = 0x38
+defc __REG_SPRITE_ATTR3_INCREMENT = 0x78
+
+; Sprite attr 3 flags
+defc __RSA3_VISIBLE = 0x80
+defc __RSA3_USE_BYTE_4 = 0x40
+
+; Sprite attr 4 register
+defc __REG_SPRITE_ATTR4 = 0x39
+defc __REG_SPRITE_ATTR4_INCREMENT = 0x79
+
+; Sprite attr 4 flags for anchor sprites
+defc __RSA4_ANCHOR_SPRITE_8BIT = 0b00000000
+defc __RSA4_ANCHOR_SPRITE_4BIT_0_127_PATTERN = 0b10000000
+defc __RSA4_ANCHOR_SPRITE_4BIT_128_255_PATTERN = 0b11000000
+defc __RSA4_ANCHOR_UNIFIED = 0b00100000
+defc __RSA4_ANCHOR_COMPOSITE = 0b00000000
+
+; Sprite attr 4 flags for composite relative sprites
+defc __RSA4_RELATIVE_SPRITE = 0b01000000
+defc __RSA4_RELATIVE_ANCHOR_PATTERN = 0b00000001
+
+; Sprite attr 4 flags for scaling
+defc __RSA4_X_SCALE_2X = 0b00001000
+defc __RSA4_X_SCALE_4X = 0b00010000
+defc __RSA4_X_SCALE_8X = 0b00011000
+defc __RSA4_Y_SCALE_2X = 0b00000100
+defc __RSA4_Y_SCALE_4X = 0b00000010
+defc __RSA4_Y_SCALE_8X = 0b00000110
+
+; ----------------------------------------------------------------------------
+; Sprite flags for Sprite and Layers System register (REG_SPRITE_LAYER_SYSTEM)
+; ----------------------------------------------------------------------------
+
+; Enable cliping of sprites over the border
+defc __RSLS_ENABLE_SPRITES_CLIPING_OVER_BORDER = 0x20
+
+
+PUBLIC __REG_SPRITE_NUMBER
+PUBLIC __REG_SPRITE_ATTR_X
+PUBLIC __REG_SPRITE_ATTR_0
+PUBLIC __REG_SPRITE_ATTR_X_INCREMENT
+PUBLIC __REG_SPRITE_ATTR_0_INCREMENT
+PUBLIC __REG_SPRITE_ATTR_Y
+PUBLIC __REG_SPRITE_ATTR_1
+PUBLIC __REG_SPRITE_ATTR_Y_INCREMENT
+PUBLIC __REG_SPRITE_ATTR_1_INCREMENT
+PUBLIC __REG_SPRITE_ATTR2
+PUBLIC __REG_SPRITE_ATTR2_INCREMENT
+PUBLIC __RSA2_ENABLE_X_MIRRORING
+PUBLIC __RSA2_ENABLE_Y_MIRRORING
+PUBLIC __RSA2_ROTATE_CLOCKWISE
+PUBLIC __RSA2_RELATIVE_ANCHOR_PALETTE
+PUBLIC __REG_SPRITE_ATTR3
+PUBLIC __REG_SPRITE_ATTR3_INCREMENT
+PUBLIC __RSA3_VISIBLE
+PUBLIC __RSA3_USE_BYTE_4
+PUBLIC __REG_SPRITE_ATTR4
+PUBLIC __REG_SPRITE_ATTR4_INCREMENT
+PUBLIC __RSA4_ANCHOR_SPRITE_8BIT
+PUBLIC __RSA4_ANCHOR_SPRITE_4BIT_0_127_PATTERN
+PUBLIC __RSA4_ANCHOR_SPRITE_4BIT_128_255_PATTERN
+PUBLIC __RSA4_ANCHOR_UNIFIED
+PUBLIC __RSA4_ANCHOR_COMPOSITE
+PUBLIC __RSA4_RELATIVE_SPRITE
+PUBLIC __RSA4_RELATIVE_ANCHOR_PATTERN
+PUBLIC __RSA4_X_SCALE_2X
+PUBLIC __RSA4_X_SCALE_4X
+PUBLIC __RSA4_X_SCALE_8X
+PUBLIC __RSA4_Y_SCALE_2X
+PUBLIC __RSA4_Y_SCALE_4X
+PUBLIC __RSA4_Y_SCALE_8X
+PUBLIC __RSLS_ENABLE_SPRITES_CLIPING_OVER_BORDER
+
+
+
+
+
+
 
 
 ENDIF
