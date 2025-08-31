@@ -1049,5 +1049,8 @@ ifelse(__STARTUP, 799,
    include(`startup/zxn_crt_799.asm.m4')
 ')
 
-INCLUDE "startup/zxn_crt_banked.asm"
+IFDEF CRT_BANKING_SEGMENT
 
+   INCLUDE "startup/zxn_crt_banked.asm"
+
+ENDIF

@@ -405,17 +405,15 @@ Z88DK_FOR(`LOOP', `0', `15',
 
 
    ; banked calls configuration 
-   ; MMU Next register to be used for banked calls depending on the value of CRT_BANKING_SEGMENT:
+   ; MMU Next register to be used for banked calls depends on the value of CRT_BANKING_SEGMENT:
    ;   0: MMU 0 and 1
    ;   1: MMU 2 and 3
    ;   2: MMU 4 and 5
    ;   3: MMU 6 and 7
-   ; By default, MMU 6 and 7 are used
+   ; If CRT_BANKING_SEGMENT is not defined, then the banked_call function is not included in the CRT
 
-   PUBLIC CRT_BANKING_SEGMENT
-
-   IFNDEF CRT_BANKING_SEGMENT
-      defc CRT_BANKING_SEGMENT = 3
+   IFDEF CRT_BANKING_SEGMENT
+      PUBLIC CRT_BANKING_SEGMENT
    ENDIF
 
    PUBLIC CRT_BANKING_STACK_SIZE
