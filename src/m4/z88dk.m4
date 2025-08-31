@@ -56,5 +56,17 @@ ifelse($1,, __uniq_, $1_)`'eval(_Z88DK_UNIQ_ID_$1, 10, 4)')
 define(`Z88DK_CLBL', `define(`_Z88DK_UNIQ_ID_$2', ifdef(`_Z88DK_UNIQ_ID_$2', _Z88DK_UNIQ_ID_$2, 0))dnl
 ifelse($2,, __uniq_, $2_)`'ifelse($1,, eval(_Z88DK_UNIQ_ID_$2, 10, 4), `eval(_Z88DK_UNIQ_ID_$2 + $1, 10, 4)')')
 
+define(`Z88DK_H2ASMDEF', `syscmd(`sed -E -e "s/\/\//;/g" -e "s/^#define[ \t]+([A-Z_][A-Z0-9_]*)[ \t]+(.*)$/defc __\1 = \2/" $1')')
+define(`Z88DK_H2ASMPUB', `syscmd(`sed -n -E -e "s/^#define[ \t]+([A-Z_][A-Z0-9_]*)[ \t]+(.*)$/PUBLIC __\1/p" $1')')
+
+# Process a .h file with constants definitions for architecture config files
+define(`Z88DK_PROCESS_CONSTANTS_H', `
+ifdef(`CFG_ASM_DEF', `Z88DK_H2ASMDEF($1)')
+ifdef(`CFG_C_DEF', `include($1)')
+ifdef(`CFG_ASM_PUB',`Z88DK_H2ASMPUB($1)')
+')
+
+
+
 divert(Z88DK_DIVNUM)
 dnl`'popdef(`Z88DK_DIVNUM')

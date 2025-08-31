@@ -55,9 +55,9 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 		else \
 			echo "";  \
 		fi) )
-	m4 -DCFG_ASM_DEF target/$(1)/config.m4 > target/$(1)/config_$(1)_private.inc
-	m4 -DCFG_ASM_PUB target/$(1)/config.m4 > target/$(1)/config_$(1)_public.inc
-	m4 -DCFG_C_DEF target/$(1)/config.m4 > target/$(1)/config_$(1).h
+	m4 -DCFG_ASM_DEF -I../../src/m4 target/$(1)/config.m4 > target/$(1)/config_$(1)_private.inc
+	m4 -DCFG_ASM_PUB  -I../../src/m4 target/$(1)/config.m4 > target/$(1)/config_$(1)_public.inc
+	m4 -DCFG_C_DEF  -I../../src/m4 target/$(1)/config.m4 > target/$(1)/config_$(1).h
 	cp target/$(1)/config_$(1)_private.inc target/$(1)/obj/config_private.inc
 	@if [ "$(1)" = "zx" ]; then \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/obj/bifrost2_engine_48.bin; \
