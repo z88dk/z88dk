@@ -153,7 +153,8 @@ main := |*
 #include "scan_def.h"	
 	
 	/* Comment */
-	';' [^\n]*  				; 
+	';'  [^\n]*  				; 
+	'//' [^\n]*  				; 
 	
 	/* Whitespace is standard ws, newlines and control codes */
 	any - 0x21..0x7e - '\n'		;
