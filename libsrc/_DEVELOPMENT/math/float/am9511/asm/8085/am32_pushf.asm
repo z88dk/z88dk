@@ -38,7 +38,7 @@ PUBLIC asm_am9511_pushf_fastcall
     ; uses      : af, bc
     ; preserves : de, hl
 
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jp C,asm_am9511_pushf
 
@@ -48,11 +48,11 @@ PUBLIC asm_am9511_pushf_fastcall
     ld de,sp+6
 
     ld a,(de)                   ; load LSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     inc de
     ld a,(de)
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     inc de
     ld hl,(de)                  ; get exponent and mantissa MSW
@@ -73,7 +73,7 @@ PUBLIC asm_am9511_pushf_fastcall
     ld a,l                      ; get mantissa to a
     scf                         ; set mantissa MSB to 1
     rra
-    out (__IO_APU_DATA),a       ; load mantissa MSB into APU
+    AM9511_OUT_APU_DATA       ; load mantissa MSB into APU
 
     inc de
     ld a,(de)                   ; get sign
@@ -81,39 +81,39 @@ PUBLIC asm_am9511_pushf_fastcall
 
     ld a,h
     rra
-    out (__IO_APU_DATA),a       ; load exponent into APU
+    AM9511_OUT_APU_DATA       ; load exponent into APU
 
     ld hl,bc
     pop de                      ; recover dehl
     ret
 
 .asm_am9511_max
-    in a,(__IO_APU_DATA)
-    in a,(__IO_APU_DATA)
+    AM9511_IN_APU_DATA
+    AM9511_IN_APU_DATA
     ld a,0ffh                   ; confirm we have maximum
-    out (__IO_APU_DATA),a       ; load mantissa into APU
-    out (__IO_APU_DATA),a
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA       ; load mantissa into APU
+    AM9511_OUT_APU_DATA
+    AM9511_OUT_APU_DATA
 
     inc de
     ld a,(de)                   ; get sign
     rla
     ld a,07eh                   ; max exponent << 1
     rra
-    out (__IO_APU_DATA),a       ; load maximum exponent into APU
+    AM9511_OUT_APU_DATA       ; load maximum exponent into APU
 
     ld hl,bc
     pop de                      ; recover dehl
     ret
 
 .asm_am9511_zero
-    in a,(__IO_APU_DATA)
-    in a,(__IO_APU_DATA)
+    AM9511_IN_APU_DATA
+    AM9511_IN_APU_DATA
     xor a                       ; confirm we have a zero
-    out (__IO_APU_DATA),a       ; load zero mantissa into APU
-    out (__IO_APU_DATA),a
-    out (__IO_APU_DATA),a
-    out (__IO_APU_DATA),a       ; load zero exponent into APU
+    AM9511_OUT_APU_DATA       ; load zero mantissa into APU
+    AM9511_OUT_APU_DATA
+    AM9511_OUT_APU_DATA
+    AM9511_OUT_APU_DATA       ; load zero exponent into APU
 
     ld hl,bc
     pop de                      ; recover dehl
@@ -160,19 +160,19 @@ PUBLIC asm_am9511_pushf_fastcall
     ld e,a
 
 .pushf_fastcall
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jp C,pushf_fastcall
 
     ld a,l                      ; load LSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
     ld a,h
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     ld a,e                      ; load MSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
     ld a,d
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     ret
 

@@ -43,7 +43,7 @@ PUBLIC asm_am9511_popf
     ; 
     ; uses  : af, bc, de, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
+    AM9511_IN_APU_STATUS      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
     jr C,am9511_popf_wait
 

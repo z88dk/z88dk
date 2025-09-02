@@ -43,7 +43,7 @@ PUBLIC asm_am9511_f2ulong
     call asm_am9511_pushf_fastcall  ;float x
 
     ld a,__IO_APU_OP_FIXS
-    out (__IO_APU_CONTROL),a        ;int x
+    AM9511_OUT_APU_CONTROL        ;int x
 
     jp asm_am9511_popi
 
@@ -65,7 +65,7 @@ PUBLIC asm_am9511_f2ulong
     call asm_am9511_pushf_fastcall  ;float x
 
     ld a,__IO_APU_OP_FIXD
-    out (__IO_APU_CONTROL),a        ;long x
+    AM9511_OUT_APU_CONTROL        ;long x
 
     jp asm_am9511_popl
 

@@ -31,7 +31,7 @@ PUBLIC asm_am9511_sqrt, asm_am9511_sqrt_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_SQRT
-    out (__IO_APU_CONTROL),a        ; x^0.5
+    AM9511_OUT_APU_CONTROL        ; x^0.5
 
     jp asm_am9511_popf
 
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_sqrt, asm_am9511_sqrt_fastcall
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_SQRT
-    out (__IO_APU_CONTROL),a        ; x^0.5
+    AM9511_OUT_APU_CONTROL        ; x^0.5
 
     jp asm_am9511_popf
 

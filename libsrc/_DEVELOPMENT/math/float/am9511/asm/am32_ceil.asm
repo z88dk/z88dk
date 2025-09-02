@@ -39,7 +39,7 @@ PUBLIC asm_am9511_ceil_fastcall
     call asm_am9511_pushf_fastcall  ; y
     
     ld a,__IO_APU_OP_FADD
-    out (__IO_APU_CONTROL),a        ; x + y
+    AM9511_OUT_APU_CONTROL        ; x + y
 
     jp asm_am9511_popf
 

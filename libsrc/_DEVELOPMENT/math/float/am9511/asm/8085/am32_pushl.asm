@@ -35,7 +35,7 @@ PUBLIC asm_am9511_pushl_fastcall
     ; 
     ; uses  : af, bc
 
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
 ;   jp C,asm_am9511_pushl_hl
 
@@ -44,17 +44,17 @@ PUBLIC asm_am9511_pushl_fastcall
     ld de,sp+4
 
     ld a,(de)                   ; load LSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
     inc de
     ld a,(de)
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     inc de
     ld a,(de)                   ; load MSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
     inc de
     ld a,(de)
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     ld de,bc                    ; recover dehl
     ret
@@ -72,19 +72,19 @@ PUBLIC asm_am9511_pushl_fastcall
     ; 
     ; uses  : af, de, hl
 
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
 ;   jp C,asm_am9511_pushl_fastcall
 
     ld a,l                      ; load LSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
     ld a,h
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     ld a,e                      ; load MSW into APU
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
     ld a,d
-    out (__IO_APU_DATA),a
+    AM9511_OUT_APU_DATA
 
     ret
 

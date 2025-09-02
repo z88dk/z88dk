@@ -40,21 +40,21 @@ PUBLIC asm_am9511_popf
     ; 
     ; uses  : af, de, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
+    AM9511_IN_APU_STATUS      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
     jp C,am9511_popf_wait
 
-    in a,(__IO_APU_DATA)        ; load MSW from APU
+    AM9511_IN_APU_DATA        ; load MSW from APU
     ld d,a
-    in a,(__IO_APU_DATA)
+    AM9511_IN_APU_DATA
     ld e,a
 
-    in a,(__IO_APU_DATA)        ; load LSW from APU
+    AM9511_IN_APU_DATA        ; load LSW from APU
     ld h,a
-    in a,(__IO_APU_DATA)
+    AM9511_IN_APU_DATA
     ld l,a
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
+    AM9511_IN_APU_STATUS      ; read the APU status register
     and 03eh                    ; errors from status register
     jp NZ,errors
 
