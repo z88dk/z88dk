@@ -41,7 +41,7 @@ PUBLIC asm_am9511_pushf_fastcall
     ; uses      : af, bc', hl'
     ; preserves : de, hl
 
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushf
 
@@ -140,7 +140,7 @@ PUBLIC asm_am9511_pushf_fastcall
     rr e                        ; restore mantissa
 
 .pushf_fastcall
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jr C,pushf_fastcall
 

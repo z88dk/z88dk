@@ -322,6 +322,7 @@
        defc __MMAP = 0
    ENDIF
 
+   INCLUDE "crt/classic/crt_rules_am9511.inc"
 
     ; Macro to allow setting up a FILE * as pointing via a trampoline
     ;

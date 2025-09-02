@@ -31,15 +31,15 @@ PUBLIC asm_am9511_imul
     call asm_am9511_pushl_fastcall  ; x,y
 
     ld a,__IO_APU_OP_PTOD
-    out (__IO_APU_CONTROL),a        ; x,y, x,y
+    AM9511_OUT_APU_CONTROL        ; x,y, x,y
 
     ld a,__IO_APU_OP_SMUU
-    out (__IO_APU_CONTROL),a        ; x * y (upper)
+    AM9511_OUT_APU_CONTROL        ; x * y (upper)
 
     call asm_am9511_popi            ; upper product in hl
 
     ld a,__IO_APU_OP_SMUL
-    out (__IO_APU_CONTROL),a        ; x * y (lower)
+    AM9511_OUT_APU_CONTROL        ; x * y (lower)
 
     ex de,hl
     jp asm_am9511_popi              ; product in dehl

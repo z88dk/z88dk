@@ -31,7 +31,7 @@ PUBLIC asm_am9511_tan, asm_am9511_tan_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_TAN
-    out (__IO_APU_CONTROL),a        ; tan(x)
+    AM9511_OUT_APU_CONTROL        ; tan(x)
 
     jp asm_am9511_popf
 
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_tan, asm_am9511_tan_fastcall
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_TAN
-    out (__IO_APU_CONTROL),a        ; tan(x)
+    AM9511_OUT_APU_CONTROL        ; tan(x)
 
     jp asm_am9511_popf
 

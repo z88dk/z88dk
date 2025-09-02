@@ -53,24 +53,24 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_PTOF
-    out (__IO_APU_CONTROL),a        ; y
+    AM9511_OUT_APU_CONTROL        ; y
 
     ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; y * y
+    AM9511_OUT_APU_CONTROL        ; y * y
 
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_PTOF
-    out (__IO_APU_CONTROL),a        ; x
+    AM9511_OUT_APU_CONTROL        ; x
 
     ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x * x
+    AM9511_OUT_APU_CONTROL        ; x * x
 
     ld a,__IO_APU_OP_FADD
-    out (__IO_APU_CONTROL),a        ; y^2 + x^2
+    AM9511_OUT_APU_CONTROL        ; y^2 + x^2
 
     ld a,__IO_APU_OP_SQRT
-    out (__IO_APU_CONTROL),a        ; (y^2 + x^2)^0.5
+    AM9511_OUT_APU_CONTROL        ; (y^2 + x^2)^0.5
 
     jp asm_am9511_popf
 
@@ -89,10 +89,10 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_PTOF
-    out (__IO_APU_CONTROL),a        ; y
+    AM9511_OUT_APU_CONTROL        ; y
 
     ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; y * y
+    AM9511_OUT_APU_CONTROL        ; y * y
 
     pop hl                          ; ret
     pop de
@@ -101,15 +101,15 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_PTOF
-    out (__IO_APU_CONTROL),a        ; x
+    AM9511_OUT_APU_CONTROL        ; x
 
     ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x * x
+    AM9511_OUT_APU_CONTROL        ; x * x
 
     ld a,__IO_APU_OP_FADD
-    out (__IO_APU_CONTROL),a        ; y^2 + x^2
+    AM9511_OUT_APU_CONTROL        ; y^2 + x^2
 
     ld a,__IO_APU_OP_SQRT
-    out (__IO_APU_CONTROL),a        ; (y^2 + x^2)^0.5
+    AM9511_OUT_APU_CONTROL        ; (y^2 + x^2)^0.5
 
     jp asm_am9511_popf

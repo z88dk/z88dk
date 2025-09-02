@@ -38,7 +38,7 @@ PUBLIC asm_am9511_pushi_fastcall
     ; 
     ; uses  : af, bc', hl'
 
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushi_hl
 
@@ -67,7 +67,7 @@ PUBLIC asm_am9511_pushi_fastcall
     ; 
     ; uses  : af, bc, hl
 
-;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   AM9511_IN_APU_STATUS      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushi_fastcall
 

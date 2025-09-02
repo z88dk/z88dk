@@ -31,7 +31,7 @@ PUBLIC asm_am9511_asin, asm_am9511_asin_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_ASIN
-    out (__IO_APU_CONTROL),a        ; asin(x)
+    AM9511_OUT_APU_CONTROL        ; asin(x)
 
     jp asm_am9511_popf
 
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_asin, asm_am9511_asin_fastcall
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_ASIN
-    out (__IO_APU_CONTROL),a        ; asin(x)
+    AM9511_OUT_APU_CONTROL        ; asin(x)
 
     jp asm_am9511_popf
 

@@ -31,7 +31,7 @@ PUBLIC asm_am9511_exp, asm_am9511_exp_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_EXP
-    out (__IO_APU_CONTROL),a        ; exp(x)
+    AM9511_OUT_APU_CONTROL        ; exp(x)
 
     jp asm_am9511_popf
 
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_exp, asm_am9511_exp_fastcall
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_EXP
-    out (__IO_APU_CONTROL),a        ; exp(x)
+    AM9511_OUT_APU_CONTROL        ; exp(x)
 
     jp asm_am9511_popf
 

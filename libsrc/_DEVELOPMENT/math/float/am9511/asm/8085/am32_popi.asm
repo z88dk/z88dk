@@ -38,13 +38,13 @@ PUBLIC asm_am9511_popi
     ; 
     ; uses  : af, de, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
+    AM9511_IN_APU_STATUS      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
     jp C,am9511_popi_wait
 
-    in a,(__IO_APU_DATA)        ; load LSW from APU
+    AM9511_IN_APU_DATA        ; load LSW from APU
     ld h,a
-    in a,(__IO_APU_DATA)
+    AM9511_IN_APU_DATA
     ld l,a
 
     ret

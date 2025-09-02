@@ -34,7 +34,7 @@ PUBLIC asm_am9511_fdiv, asm_am9511_fdiv_callee
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_FDIV
-    out (__IO_APU_CONTROL),a        ; x / y
+    AM9511_OUT_APU_CONTROL        ; x / y
 
     jp asm_am9511_popf
 
@@ -46,7 +46,7 @@ PUBLIC asm_am9511_fdiv, asm_am9511_fdiv_callee
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_FDIV
-    out (__IO_APU_CONTROL),a        ; x / y
+    AM9511_OUT_APU_CONTROL        ; x / y
 
     pop hl                          ; ret
     pop de

@@ -42,6 +42,46 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+
+IF __CLASSIC
+    EXTERN __am9511_out_data
+    EXTERN __am9511_in_status
+    EXTERN __am9511_in_data
+    EXTERN __am9511_out_control
+ENDIF
+
+MACRO AM9511_IN_APU_DATA
+ IF __CLASSIC
+   call __am9511_in_data
+ ELSE
+    in a,(__IO_APU_DATA)
+ ENDIF
+ENDM
+
+MACRO AM9511_IN_APU_STATUS
+ IF __CLASSIC
+    call __am9511_in_status
+ ELSE
+    in a,(__IO_APU_STATUS)
+ ENDIF
+ENDM
+
+MACRO AM9511_OUT_APU_CONTROL
+ IF __CLASSIC
+    call __am9511_out_control
+ ELSE
+    out (__IO_APU_STATUS),a
+ ENDIF
+ENDM
+
+MACRO AM9511_OUT_APU_DATA
+ IF __CLASSIC
+    call __am9511_out_data
+ ELSE
+    out (__IO_APU_DATA),a
+ ENDIF
+ENDM
+
 defc `__IO_APU_PORT_BASE' = __IO_APU_PORT_BASE
 
 defc `__IO_APU0_PORT_BASE' = __IO_APU0_PORT_BASE
