@@ -359,7 +359,8 @@ main_loop:
             *               { scan_error(ErrInvalidChar); continue; }
             ws+             { m_blank_before = true; continue; }
             nl              { goto end; }
-            ';'	[^\r\n\000]* { continue; }
+            ';'	 [^\r\n\000]* { continue; }
+            '//' [^\r\n\000]* { continue; }
             '#'             { PUSH_TOKEN1(TType::Hash); continue; }
             '##'            { PUSH_TOKEN1(TType::DblHash); continue; }
             '\\' nl         { line_start = p; peek_text_line(line); continue; }

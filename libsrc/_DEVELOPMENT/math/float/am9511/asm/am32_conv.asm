@@ -55,7 +55,7 @@ PUBLIC asm_am9511_float32u
     call asm_am9511_pushi_fastcall
 
     ld a,__IO_APU_OP_FLTS
-    out (__IO_APU_CONTROL),a    ; convert to float 
+    AM9511_OUT_APU_CONTROL    ; convert to float 
 
     jp asm_am9511_popf
 
@@ -72,7 +72,7 @@ PUBLIC asm_am9511_float32u
     call asm_am9511_pushl_fastcall
 
     ld a,__IO_APU_OP_FLTD
-    out (__IO_APU_CONTROL),a    ; convert to float
+    AM9511_OUT_APU_CONTROL    ; convert to float
 
     jp asm_am9511_popf
 

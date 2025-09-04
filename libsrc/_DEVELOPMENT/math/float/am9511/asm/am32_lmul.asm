@@ -34,7 +34,7 @@ PUBLIC asm_am9511_lmul, asm_am9511_lmul_callee
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DMUL
-    out (__IO_APU_CONTROL),a        ; x * y
+    AM9511_OUT_APU_CONTROL        ; x * y
 
     jp asm_am9511_popl              ; product in dehl
 
@@ -46,7 +46,7 @@ PUBLIC asm_am9511_lmul, asm_am9511_lmul_callee
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DMUL
-    out (__IO_APU_CONTROL),a        ; x * y
+    AM9511_OUT_APU_CONTROL        ; x * y
 
     pop hl                          ; ret
     pop de

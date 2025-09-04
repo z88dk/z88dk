@@ -9,6 +9,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <rect.h>
 #include <arch/zx/zx_input.h>
 
 /////////////
@@ -412,12 +413,18 @@ extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
 // p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
 extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
-// Change the paper attr from now on
+
+// Change the ink attr from now on
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-#define zx_setink(i) fputc_cons(16); fputc_cons(48 + i)
+#define zx_setink(i) zx_setink_fastcall(i)
+extern void __LIB__ zx_setink_fastcall(uint i);
+
 // Change the paper attr from now on
 // p can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-#define zx_setpaper(p) fputc_cons(17); fputc_cons(48 + p)
+#define zx_setpaper(p) zx_setpaper_fastcall(p)
+extern void __LIB__ zx_setpaper_fastcall(uint p);
+
+
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __smallc;
 extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __smallc;
@@ -439,6 +446,55 @@ extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88
 
 // Print a string on the screen
 extern int __LIB__ zx_printf(char *fmt, ...);
+
+
+extern void __LIB__ zx_scroll_up(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_up_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_up(a,b) zx_scroll_up_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_up_attr(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_up_attr_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_up_attr(a,b) zx_scroll_up_attr_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_up_pix(unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ zx_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define zx_scroll_up_pix(a,b) zx_scroll_up_pix_callee(a,b)
+
+
+// Rectangle bounded functions
+extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ zx_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __smallc __z88dk_callee;
+#define zx_cls_wc(a,b) zx_cls_wc_callee(a,b)
+
+
+extern void __LIB__ zx_cls_wc_attr(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ zx_cls_wc_attr_callee(struct r_Rect8 *r,unsigned char attr) __smallc __z88dk_callee;
+#define zx_cls_wc_attr(a,b) zx_cls_wc_attr_callee(a,b)
+
+
+extern void __LIB__ zx_cls_wc_pix(struct r_Rect8 *r,unsigned char pix) __smallc;
+extern void __LIB__ zx_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __smallc __z88dk_callee;
+#define zx_cls_wc_pix(a,b) zx_cls_wc_pix_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_wc_up(a,b,c) zx_scroll_wc_up_callee(a,b,c)
+
+
+extern void __LIB__ zx_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_wc_up_attr_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_wc_up_attr(a,b,c) zx_scroll_wc_up_attr_callee(a,b,c)
+
+
+extern void __LIB__ zx_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ zx_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define zx_scroll_wc_up_pix(a,b,c) zx_scroll_wc_up_pix_callee(a,b,c)
+
+
+
 
 // In the following, screen address refers to a pixel address within the display file while
 // attribute address refers to the attributes area.
@@ -472,6 +528,9 @@ extern int __LIB__ zx_printf(char *fmt, ...);
 
 extern uchar __LIB__              *zx_cxy2saddr(uchar row, uchar col) __smallc;
 extern uchar __LIB__  *zx_cy2saddr(uchar row) __z88dk_fastcall;           // cx assumed 0
+
+
+extern unsigned char __LIB__ zx_px2bitmask(unsigned char x) __z88dk_fastcall;
 
 extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord) __smallc;
 extern uchar __LIB__  *zx_py2saddr(uchar ycoord) __z88dk_fastcall;        // px assumed 0
@@ -535,6 +594,12 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 #define zx_cyx2aaddr(a,b)          zx_cxy2aaddr_callee(b,a)
 #define zx_cxy2aaddr(a,b)          zx_cxy2aaddr_callee(a,b)
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
+
+// graphics
+
+extern int __LIB__ zx_pattern_fill(unsigned char x,unsigned char y,void *pattern,unsigned int depth) __smallc;
+extern int __LIB__ zx_pattern_fill_callee(unsigned char x,unsigned char y,void *pattern,unsigned int depth) __smallc __z88dk_callee;
+#define zx_pattern_fill(a,b,c,d) zx_pattern_fill_callee(a,b,c,d)
 
 
 /* Interrupt handling */

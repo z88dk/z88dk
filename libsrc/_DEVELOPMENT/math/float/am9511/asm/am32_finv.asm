@@ -38,7 +38,7 @@ PUBLIC asm_am9511_finv, asm_am9511_finv_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_FDIV
-    out (__IO_APU_CONTROL),a        ; 1 / x
+    AM9511_OUT_APU_CONTROL        ; 1 / x
 
     jp asm_am9511_popf
 
@@ -53,9 +53,9 @@ PUBLIC asm_am9511_finv, asm_am9511_finv_fastcall
     call asm_am9511_pushf_fastcall  ; 1
 
     ld a,__IO_APU_OP_XCHF
-    out (__IO_APU_CONTROL),a        ; swap
+    AM9511_OUT_APU_CONTROL        ; swap
 
     ld a,__IO_APU_OP_FDIV
-    out (__IO_APU_CONTROL),a        ; 1 / x
+    AM9511_OUT_APU_CONTROL        ; 1 / x
 
     jp asm_am9511_popf

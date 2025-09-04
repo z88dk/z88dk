@@ -31,7 +31,7 @@ PUBLIC asm_am9511_log10, asm_am9511_log10_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_LOG
-    out (__IO_APU_CONTROL),a        ; log10(x)
+    AM9511_OUT_APU_CONTROL        ; log10(x)
 
     jp asm_am9511_popf
 
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_log10, asm_am9511_log10_fastcall
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_LOG
-    out (__IO_APU_CONTROL),a        ; log10(x)
+    AM9511_OUT_APU_CONTROL        ; log10(x)
 
     jp asm_am9511_popf
 

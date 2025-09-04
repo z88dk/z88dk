@@ -32,10 +32,10 @@ PUBLIC asm_am9511_sqr, asm_am9511_sqr_fastcall
     call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_PTOF
-    out (__IO_APU_CONTROL),a        ; x
+    AM9511_OUT_APU_CONTROL        ; x
 
     ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x*x
+    AM9511_OUT_APU_CONTROL        ; x*x
 
     jp asm_am9511_popf
 
@@ -44,10 +44,10 @@ PUBLIC asm_am9511_sqr, asm_am9511_sqr_fastcall
     call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_PTOF
-    out (__IO_APU_CONTROL),a        ; x
+    AM9511_OUT_APU_CONTROL        ; x
 
     ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x*x
+    AM9511_OUT_APU_CONTROL        ; x*x
 
     jp asm_am9511_popf
 
