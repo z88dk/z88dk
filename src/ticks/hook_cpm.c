@@ -181,12 +181,13 @@ static void bdos_delete_file(void)
 
     // Get the filename
     for ( i = 1, filenoffs = 0; i < 9; i++ ) {
-        uint8_t c  = get_memory_data(fcb + i );
+        uint8_t c  = get_memory_data(fcb + i ) & 0x7f;
         if ( !isspace(c)) {
             filename[filenoffs++] = tolower(c);
             filename[filenoffs] = 0;
+        } else {
+            break;
         }
-        break;
     }
     for ( i = 9; i < 12; i++ ) {
         uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
