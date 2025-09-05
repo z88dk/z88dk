@@ -403,6 +403,25 @@ Z88DK_FOR(`LOOP', `0', `15',
       defc CRT_OTERM_FZX_SPACE_EXPAND = 0
    ENDIF
 
+
+   ; banked calls configuration 
+   ; MMU Next register to be used for banked calls depends on the value of CRT_BANKING_SEGMENT:
+   ;   0: MMU 0 and 1
+   ;   1: MMU 2 and 3
+   ;   2: MMU 4 and 5
+   ;   3: MMU 6 and 7
+   ; If CRT_BANKING_SEGMENT is not defined, then the banked_call function is not included in the CRT
+
+   IFDEF CRT_BANKING_SEGMENT
+      PUBLIC CRT_BANKING_SEGMENT
+   ENDIF
+
+   PUBLIC CRT_BANKING_STACK_SIZE
+
+   IFNDEF CRT_BANKING_STACK_SIZE
+      defc CRT_BANKING_STACK_SIZE = 100
+   ENDIF
+
    ;
    ; FONT SELECTION
    ; use pragam redirect to change font
