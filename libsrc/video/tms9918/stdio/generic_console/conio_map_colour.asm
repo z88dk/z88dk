@@ -33,13 +33,21 @@ table:
     defb    $8                          ;RED -> MEDIUM RED
     defb    $d                          ;MAGENTA -> MAGENTA
     defb    $6                          ;BROWN -> DARK RED
+IF FORsms
+    defb    $a                          ;LIGHTGRAY -> DARK YELLOW
+ELSE
     defb    $b                          ;LIGHTGRAY -> LIGHT YELLOW
+ENDIF
     defb    $e                          ;DARKGRAY -> GRAY
     defb    $5                          ;LIGHTBLUE -> LIGHT BLUE
     defb    $3                          ;LIGHTGREEN -> LIGHT GREEN
     defb    $7                          ;LIGHTCYAN -> CYAN
     defb    $9                          ;LIGHTRED -> LIGHT RED
     defb    $d                          ;LIGHTMAGENTA -> MAGENTA
+IF FORsms
+    defb    $b                          ;YELLOW -> LIGHT YELLOW
+ELSE
     defb    $a                          ;YELLOW -> DARK YELLOW
+ENDIF
     defb    $f                          ;WHITE -> WHITE
 
