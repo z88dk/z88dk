@@ -65,6 +65,7 @@ include(`target/zxn/config/config_zxn_sprites.m4')
 include(`target/zxn/config/config_zxn_sysvar.m4')
 include(`target/zxn/config/config_zxn_uart.m4')
 include(`target/zxn/config/config_zxn_ula.m4')
+include(`target/zxn/config/config_zxn_from_headers.m4')
 
 dnl############################################################
 dnl# END IF GUARDS
