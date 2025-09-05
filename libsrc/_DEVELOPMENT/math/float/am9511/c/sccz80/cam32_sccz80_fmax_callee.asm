@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_fmax_callee
 
-IFDEF __CPU_8085__
+IFDEF __CPU_INTEL__
 
 EXTERN _am9511_fmax_callee
 defc cam32_sccz80_fmax_callee = _am9511_fmax_callee

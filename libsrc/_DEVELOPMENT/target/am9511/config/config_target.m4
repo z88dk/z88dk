@@ -7,7 +7,12 @@ divert(-1)
 
 # Am9511A APU Definitions
 
+IF __CLASSIC
+EXTERN __IO_AM9511_BASE_PORT
+defc __IO_APU_PORT_BASE = __IO_AM9511_BASE_PORT
+ELSE
 define(`__IO_APU_PORT_BASE', 0x42)  # Port Address for Am9511A Module
+ENDIF
 
 # Am9511A APU Multi Processor Definitions
 
@@ -43,7 +48,7 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 
-IF __CLASSIC
+IF __AM9511_HELPER_FUNC
     EXTERN __am9511_out_data
     EXTERN __am9511_in_status
     EXTERN __am9511_in_data
@@ -51,7 +56,7 @@ IF __CLASSIC
 ENDIF
 
 MACRO AM9511_IN_APU_DATA
- IF __CLASSIC
+ IF __AM9511_HELPER_FUNC
    call __am9511_in_data
  ELSE
     in a,(__IO_APU_DATA)
@@ -59,7 +64,7 @@ MACRO AM9511_IN_APU_DATA
 ENDM
 
 MACRO AM9511_IN_APU_STATUS
- IF __CLASSIC
+ IF __AM9511_HELPER_FUNC
     call __am9511_in_status
  ELSE
     in a,(__IO_APU_STATUS)
@@ -67,7 +72,7 @@ MACRO AM9511_IN_APU_STATUS
 ENDM
 
 MACRO AM9511_OUT_APU_CONTROL
- IF __CLASSIC
+ IF __AM9511_HELPER_FUNC
     call __am9511_out_control
  ELSE
     out (__IO_APU_STATUS),a
@@ -75,7 +80,7 @@ MACRO AM9511_OUT_APU_CONTROL
 ENDM
 
 MACRO AM9511_OUT_APU_DATA
- IF __CLASSIC
+ IF __AM9511_HELPER_FUNC
     call __am9511_out_data
  ELSE
     out (__IO_APU_DATA),a

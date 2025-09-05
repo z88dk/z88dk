@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_fmin
 
-IFDEF __CPU_8085__
+IFDEF __CPU_INTEL__
 
 EXTERN _am9511_fmin
 defc cam32_sccz80_fmin = _am9511_fmin

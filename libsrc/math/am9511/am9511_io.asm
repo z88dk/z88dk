@@ -3,6 +3,7 @@
 ;
 ; Default IO driver - relies on __IO_AM9511_BASE being exported by the CRT
 
+IF __AM9511_HELPER_FUNC
 
     SECTION  code_fp_am9511
 
@@ -29,3 +30,4 @@ __am9511_out_control:
     out     (__IO_AM9511_BASE_PORT+1),a
     ret
 
+ENDIF

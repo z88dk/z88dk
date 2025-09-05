@@ -4,7 +4,7 @@ SECTION code_fp_am9511
 
 PUBLIC  l_f32_swap
 
-IFDEF __CPU_8085__
+IFDEF __CPU_INTEL__
 
 EXTERN  asm_switch_arg
 
