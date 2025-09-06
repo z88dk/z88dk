@@ -385,44 +385,56 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
-// NOTE: remember to compile with -pragma-define:CLIB_CONIO_NATIVE_COLOUR=1
-// in order to use INK_BLACK to INK_WHITE and PAPER_BLACK to PAPER_WHITE.
-// Clear the screen
-
+/// \brief  Clear the screen with the currently set attribute
 extern void __LIB__ zx_cls(void);
 
-// Clears the screen and sets the screen and current attribute to attr
+/// \brief  Clears the screen and sets the screen and current attribute to attr
+//  \param attr - The full attribute byte
 extern void __LIB__ zx_cls_attr(int attr);
 extern void __LIB__ zx_cls_attr_fastcall(int attr) __z88dk_fastcall;
 #define zx_cls_attr(a)                 zx_cls_attr_fastcall(a)
 
 // Set or unset the flash attribute for now on
-#define zx_setattrflash(b)        fputc_cons(18); fputc_cons((b)? 49: 48)
+extern void zx_setattrflash(uint f);
+extern void zx_setattrflash_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrflash(f) zx_setattrflash_fastcall(f)
 
 // Set or unset the bright attribute for now on
-#define zx_setattrbright(b)       fputc_cons(19); fputc_cons((b)? 49: 48)
+extern void zx_setattrbright(uint f);
+extern void zx_setattrbright_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrbright(f) zx_setattrbright_fastcall(f)
 
 // Set or unset the inverse attribute for now on
-#define zx_setattrinverse(b)      fputc_cons(20); fputc_cons((b)? 49: 48)
+extern void zx_setattrinverse(uint f);
+extern void zx_setattrinverse_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrinverse(f) zx_setattrinverse_fastcall(f)
 
 // Set the border color
 // Param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
+extern void  __LIB__  zx_border(uint colour);
+extern void  __LIB__  zx_border_fastcall(uint colour) __z88dk_fastcall;
+#define zx_border(c) zx_border_fastcall(c)
+
+
 // Quickly set the whole screen color attributes
 // Param colour must be in the form i | p, where
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
 // p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
-extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
+extern void  __LIB__  zx_colour(uint colour);
+extern void  __LIB__  zx_colour_fastcall(uint colour) __z88dk_fastcall;
+#define zx_colour(a) zx_colour_fastcall(a)
 
 // Change the ink attr from now on
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+extern void zx_setink(uint i);
+extern void __LIB__ zx_setink_fastcall(uint i) __z88dk_fastcall;
 #define zx_setink(i) zx_setink_fastcall(i)
-extern void __LIB__ zx_setink_fastcall(uint i);
 
 // Change the paper attr from now on
 // p can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+extern void zx_setpaper(uint p);
+extern void __LIB__ zx_setpaper_fastcall(uint p) __z88dk_fastcall;
 #define zx_setpaper(p) zx_setpaper_fastcall(p)
-extern void __LIB__ zx_setpaper_fastcall(uint p);
 
 
 // Get color attribute at given position
