@@ -5,6 +5,11 @@ target/zx/obj/${TARGET}/zx_cls
 target/zx/obj/${TARGET}/zx_border
 target/zx/obj/${TARGET}/zx_break
 target/zx/obj/${TARGET}/zx_colour
+target/zx/obj/${TARGET}/zx_setink
+target/zx/obj/${TARGET}/zx_setpaper
+target/zx/obj/${TARGET}/zx_setattrbright
+target/zx/obj/${TARGET}/zx_setattrflash
+target/zx/obj/${TARGET}/zx_setattrinverse
 target/zx/obj/${TARGET}/zx_screenstr
 target/zx/obj/${TARGET}/zx_screenstr_callee
 target/zx/obj/${TARGET}/zx_lprintc

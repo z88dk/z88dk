@@ -6,12 +6,19 @@
     SECTION code_clib
     PUBLIC  zx_border
     PUBLIC  _zx_border
+    PUBLIC  zx_border_fastcall
+    PUBLIC  _zx_border_fastcall
 
     EXTERN  __SYSVAR_BORDCR
 
 zx_border:
 _zx_border:
+    ld       hl,2
+    add      hl,sp
+    ld       l,(hl)
 
+zx_border_fastcall:
+_zx_border_fastcall:
     in      a, (254)
     and     $40
 
