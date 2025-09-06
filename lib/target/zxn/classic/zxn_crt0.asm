@@ -23,6 +23,10 @@
     PUBLIC  __SYSVAR_BORDCR
     defc    __SYSVAR_BORDCR = 23624
 
+    PUBLIC  __IO_NEXTREG_REG
+    defc __IO_NEXTREG_REG = 0x243b
+
+
 
     PUBLIC    _FRAMES
     IF startup != 2
