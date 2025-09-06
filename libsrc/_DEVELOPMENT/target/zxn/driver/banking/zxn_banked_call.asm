@@ -1,27 +1,18 @@
+   
+   SECTION code_driver
    PUBLIC banked_call
-	EXTERN l_jphl, __IO_NEXTREG_REG
-   EXTERN CRT_BANKING_STACK_SIZE, CRT_BANKING_SEGMENT
+   EXTERN l_jphl, __IO_NEXTREG_REG
+   EXTERN CLIB_BANKING_STACK_SIZE, CLIB_BANKING_SEGMENT
 
-   defc banking_mmu_low = 80 + CRT_BANKING_SEGMENT * 2
-   defc banking_mmu_high = 81 + CRT_BANKING_SEGMENT * 2
+   defc banking_mmu_low = 80 + CLIB_BANKING_SEGMENT * 2
+   defc banking_mmu_high = 81 + CLIB_BANKING_SEGMENT * 2
 
-   SECTION code_crt_init          
-
-   ld a, banking_mmu_low      
-   ld bc, __IO_NEXTREG_REG 
-   out (c), a                 ; set next register
-   inc b                      ; IO_NEXTREG_DATA
-   in a, (c)                  ; read current memory bank
-   ld (cur_bank), a           ; saves it in cur_bank
-
-
-   SECTION code_crt_main	
 
 banked_call:
    di
    pop hl
    ld (mainsp), sp             ; Save the current stack pointer
-   ld sp, (tempsp)             ; Set the stack poin`ter to the temporary stack
+   ld sp, (tempsp)             ; Set the stack pointer to the temporary stack
 
    ld a, (cur_bank)            ; Get the current bank
    push af                     ; Save the current bank in the stack
@@ -76,15 +67,34 @@ set_mmu_no_rom:
    ret
 
 
-   SECTION data_crt
 
-tempsp:     defw tempstack_end 
+   SECTION code_crt_init          
+
+   ld a, banking_mmu_low      
+   ld bc, __IO_NEXTREG_REG 
+   out (c), a                 ; set next register
+   inc b                      ; IO_NEXTREG_DATA
+   in a, (c)                  ; read current memory bank
+   ld (cur_bank), a           ; saves it in cur_bank
+
+_initbankedsp:
+    ;; Classic calls code_crt_init - it's not inlined so we need to preserve
+    ;; the return address
+IF __CLASSIC
+    pop     de
+ENDIF
+    ld      (tempsp),sp
+    ld      hl,-CLIB_BANKING_STACK_SIZE
+    add     hl,sp
+    ld      sp,hl
+IF __CLASSIC
+    push    de
+ENDIF
+
+
+   SECTION bss_driver
+
+tempsp:     defw 0
 cur_bank:   defb 0
-
-
-   SECTION bss_crt
-
-mainsp:     defs 2
-tempstack:  defs CRT_BANKING_STACK_SIZE
-tempstack_end:
+mainsp:     defw 0
 
