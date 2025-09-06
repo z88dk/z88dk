@@ -6,7 +6,7 @@
 ;       Entry: dehl  = right
 ;              stack = left, ret
 
-IFDEF __CPU_8085__
+IFDEF __CPU_INTEL__
 
     EXTERN  asm_am9511_compare_sccz80
 
