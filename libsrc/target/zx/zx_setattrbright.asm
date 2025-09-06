@@ -10,17 +10,18 @@
 
 zx_setattrbright:
 _zx_setattrbright:
-    ld     hl,2
-    add    hl,sp
-    ld     c,(hl)
+    ld      hl,2
+    add     hl,sp
+    ld      l,(hl)
 zx_setattrbright_fastcall:
 _zx_setattrbright_fastcall:
+    ld      c,l
     ld      hl, __zx_console_attr
     ld      a,(hl)
-    and     @10111111
-    rl      c
-    jr      nc,save
-    or      @01000000
+    rlca        ;bit 7 -> bit 0
+    rla         ;dump out the bright bit
+    rr      c
+    rra
 save:
     ld      (hl),a
     ret

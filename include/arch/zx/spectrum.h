@@ -397,17 +397,17 @@ extern void __LIB__ zx_cls_attr_fastcall(int attr) __z88dk_fastcall;
 // Set or unset the flash attribute for now on
 extern void zx_setattrflash(uint f);
 extern void zx_setattrflash_fastcall(uint f) __z88dk_fastcall;
-#define zx_setattrflash(f) zx_settattrflash_fastcall(f)
+#define zx_setattrflash(f) zx_setattrflash_fastcall(f)
 
 // Set or unset the bright attribute for now on
 extern void zx_setattrbright(uint f);
 extern void zx_setattrbright_fastcall(uint f) __z88dk_fastcall;
-#define zx_setattrbright(f) zx_settattrbright_fastcall(f)
+#define zx_setattrbright(f) zx_setattrbright_fastcall(f)
 
 // Set or unset the inverse attribute for now on
 extern void zx_setattrinverse(uint f);
 extern void zx_setattrinverse_fastcall(uint f) __z88dk_fastcall;
-#define zx_setattrinverse(f) zx_settattrinverse_fastcall(f)
+#define zx_setattrinverse(f) zx_setattrinverse_fastcall(f)
 
 // Set the border color
 // Param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
