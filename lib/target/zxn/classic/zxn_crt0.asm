@@ -26,6 +26,10 @@
     PUBLIC  __IO_NEXTREG_REG
     defc __IO_NEXTREG_REG = 0x243b
 
+    ; Always use segment 3 - otherwise we have to redo all the orgs for the banks
+    PUBLIC  CLIB_BANKING_SEGMENT
+    defc    CLIB_BANKING_SEGMENT = 3
+
 
 
     PUBLIC    _FRAMES

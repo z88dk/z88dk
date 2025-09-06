@@ -2,14 +2,11 @@
    SECTION code_driver
    PUBLIC banked_call
    EXTERN l_jphl, __IO_NEXTREG_REG
-   EXTERN CLIB_BANKING_STACK_SIZE, CRT_BANKING_SEGMENT
+   EXTERN CLIB_BANKING_STACK_SIZE, CLIB_BANKING_SEGMENT
 
-   defc banking_mmu_low = 80 + CRT_BANKING_SEGMENT * 2
-   defc banking_mmu_high = 81 + CRT_BANKING_SEGMENT * 2
+   defc banking_mmu_low = 80 + CLIB_BANKING_SEGMENT * 2
+   defc banking_mmu_high = 81 + CLIB_BANKING_SEGMENT * 2
 
-
-
-   SECTION code_crt_main	
 
 banked_call:
    di
