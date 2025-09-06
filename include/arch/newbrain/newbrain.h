@@ -4,8 +4,8 @@
  *      $Id: newbrain.h,v 1.12 2016-06-23 21:11:24 dom Exp $
  */
 
-#ifndef __NEWBRAIN_H__
-#define __NEWBRAIN_H__
+#ifndef __ARCH_NEWBRAIN_H__
+#define __ARCH_NEWBRAIN_H__
 
 #include <sys/compiler.h>
 #include <sys/types.h>
