@@ -14,7 +14,7 @@
     SECTION code_clib
     PUBLIC  ula_plus_mode
     PUBLIC  _ula_plus_mode
-    EXTERN  __IO_ULAP_DATA, __IO_ULAP_REGISTER
+    INCLUDE "target/zx/def/zxports.h"
 
 ula_plus_mode:
 _ula_plus_mode:
