@@ -22,11 +22,11 @@ OBJECTS = $(CLASSIC_OBJECTS)
 all: dirs $(OBJECTS) $(NEWLIB_TARGETS)
 
 bifrost2_engine_48.bin.zx0:
-	$(ZCC) +z80 -vn --no-crt -clib=classic -g -Ca"-DSTRIPVECTOR"  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o bifrost2_engine_48.bin
+	$(ZCC) +z80 -vn --no-crt -clib=nolib -g -Ca"-DSTRIPVECTOR"  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o bifrost2_engine_48.bin
 	$(ZX0) -f bifrost2_engine_48.bin
 
 bifrost2_engine_p3.bin.zx0:
-	$(ZCC) +z80 -vn --no-crt -clib=classic -g -Ca"-DPLUS3 -DSTRIPVECTOR"  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o bifrost2_engine_p3.bin
+	$(ZCC) +z80 -vn --no-crt -clib=nolib -g -Ca"-DPLUS3 -DSTRIPVECTOR"  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o bifrost2_engine_p3.bin
 	$(ZX0) -f bifrost2_engine_p3.bin
 
 
