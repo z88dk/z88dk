@@ -14,15 +14,16 @@
     SECTION code_clib
     PUBLIC  zx_ulaplus
     PUBLIC  _zx_ulaplus
+    INCLUDE "target/zx/def/zxports.h"
 
 zx_ulaplus:
 _zx_ulaplus:
 	; Enter in 64 colour mode
-    ld      bc, $bf3b
+    ld      bc, __IO_ULAP_REGISTER
     ld      a, 64                       ; select mode group (01xxxxxx)
     out     (c), a
 
-    ld      b, $ff
+    ld      b, +(__IO_ULAP_DATA / 256)
     in      a, (c)
     ld      e, a
 

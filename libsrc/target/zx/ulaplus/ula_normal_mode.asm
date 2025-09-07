@@ -11,13 +11,15 @@
     PUBLIC  ula_normal_mode
     PUBLIC  _ula_normal_mode
 
+    INCLUDE "target/zx/def/zxports.h"
+    
 ula_normal_mode:
 _ula_normal_mode:
 	; Enter in 64 colour mode
-    ld      bc, $bf3b
+    ld      bc, __IO_ULAP_REGISTER
     ld      a, 64                       ; select mode group (01xxxxxx)
     out     (c), a
-    ld      b, $ff
+    ld      b, +(__IO_ULAP_DATA / 256)
     ld      a, 0                        ; normal mode
     out     (c), a
     ret

@@ -10,11 +10,12 @@
     SECTION code_clib
     PUBLIC  ulaplus_get
     PUBLIC  _ulaplus_get
+    INCLUDE "target/zx/def/zxports.h"
 
 ulaplus_get:
 _ulaplus_get:
 	;__FASTCALL__
-    ld      bc, $bf3b
+    ld      bc, __IO_ULAP_REGISTER
     ld      a, l
     and     63                          ; mask to be sure we're reading the palette
     in      a, (c)                      ; see if ULAPlus got palette mode

@@ -12,6 +12,7 @@
     SECTION code_clib
     PUBLIC  ulaplus_set
     PUBLIC  _ulaplus_set
+    INCLUDE "target/zx/def/zxports.h"
 
 ulaplus_set:
 _ulaplus_set:
@@ -22,12 +23,12 @@ _ulaplus_set:
     push    de
     push    bc
 
-    ld      bc, $bf3b
+    ld      bc, __IO_ULAP_REGISTER
     ld      a, l
     and     63                          ; mask to be sure we're setting the palette
     out     (c), a
 
-    ld      b, $ff
+    ld      b, +(__IO_ULAP_DATA / 256)
     ld      a, e
     out     (c), a
     ret

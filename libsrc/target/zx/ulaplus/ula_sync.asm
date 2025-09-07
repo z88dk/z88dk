@@ -13,6 +13,7 @@
     SECTION code_clib
     PUBLIC  ula_sync
     PUBLIC  _ula_sync
+    INCLUDE "target/zx/def/zxports.h"
 
 ula_sync:
 _ula_sync:

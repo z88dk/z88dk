@@ -388,6 +388,9 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 /// \brief  Clear the screen with the currently set attribute
 extern void __LIB__ zx_cls(void);
 
+// Compatibility macro for newlib code
+#define zx_cls(a) zx_cls_attr(a)
+
 /// \brief  Clears the screen and sets the screen and current attribute to attr
 //  \param attr - The full attribute byte
 extern void __LIB__ zx_cls_attr(int attr);
@@ -419,6 +422,7 @@ extern void  __LIB__  zx_border_fastcall(uint colour) __z88dk_fastcall;
 // Quickly set the whole screen color attributes
 // Param colour must be in the form i | p, where
 // colour is an or of INK_BLACK ..INK_WHITE | PAPER_BLACK...PAPER_WHITE| [FLASH] | [BRIGHT]
+
 extern void  __LIB__  zx_colour(uint colour);
 extern void  __LIB__  zx_colour_fastcall(uint colour) __z88dk_fastcall;
 #define zx_colour(a) zx_colour_fastcall(a)
