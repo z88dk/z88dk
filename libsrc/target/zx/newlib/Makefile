@@ -8,7 +8,7 @@ NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/arch/zx/display/z80/*.asm" "$(NEWLIB_DIRECTO
 	"$(NEWLIB_DIRECTORY)/arch/zx/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/misc/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/arch/zx/graphics/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/graphics/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/arch/zx/ulaplus/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/ulaplus/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/c/sccz80/*.asm" 
+	"$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/c/sccz80/*.asm" $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 
 
 NEWLIB_TARGETS := obj/newlib-z80
 
