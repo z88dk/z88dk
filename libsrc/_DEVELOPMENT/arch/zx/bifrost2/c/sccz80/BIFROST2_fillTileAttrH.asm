@@ -26,3 +26,10 @@ BIFROST2_fillTileAttrH:
    	ld d,(hl)       ; D=lin
 
    	jp asm_BIFROST2_fillTileAttrH        ; execute 'fill_tile_attr'
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_fillTileAttrH
+defc _BIFROST2_fillTileAttrH = BIFROST2_fillTileAttrH
+ENDIF
+

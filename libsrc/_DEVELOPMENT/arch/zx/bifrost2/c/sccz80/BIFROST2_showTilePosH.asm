@@ -23,3 +23,10 @@ BIFROST2_showTilePosH:
         ld d,(hl)       ; D=lin
 
         jp asm_BIFROST2_showTilePosH        ; execute 'show_tile_pos'
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_showTilePosH
+defc _BIFROST2_showTilePosH = BIFROST2_showTilePosH
+ENDIF
+

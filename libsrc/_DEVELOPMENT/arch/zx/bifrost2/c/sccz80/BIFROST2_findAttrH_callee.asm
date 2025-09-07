@@ -21,3 +21,10 @@ BIFROST2_findAttrH_callee:
         ex (sp),hl      ; HL=lin
 
         jp asm_BIFROST2_findAttrH
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_findAttrH_callee
+defc _BIFROST2_findAttrH_callee = BIFROST2_findAttrH_callee
+ENDIF
+

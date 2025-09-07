@@ -27,3 +27,10 @@ BIFROST2_drawTileH:
    	ld d,(hl)       ; D=lin
 
    	jp asm_BIFROST2_drawTileH        ; execute 'draw_tile'
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_drawTileH
+defc _BIFROST2_drawTileH = BIFROST2_drawTileH
+ENDIF
+

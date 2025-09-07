@@ -21,3 +21,10 @@ BIFROST2_getTile_callee:
         ex (sp),hl      ; HL=px
 
         jp asm_BIFROST2_getTile
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_getTile_callee
+defc _BIFROST2_getTile_callee = BIFROST2_getTile_callee
+ENDIF
+
