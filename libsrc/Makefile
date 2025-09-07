@@ -330,7 +330,7 @@ zxfcntl:
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib: $(TARGET_CLIB_OBJS)
+zx_clib.lib: $(TARGET_CLIB_OBJS) z80_clib.lib
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
