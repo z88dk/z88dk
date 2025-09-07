@@ -16,7 +16,7 @@ zx_setpaper_fastcall:
 _zx_setpaper_fastcall:
     ld      a,l
     and     @00111000
-    jr      z,set_paper
+    jr      nz,set_paper
     ld      a,l
     rlca
     rlca
