@@ -4,6 +4,12 @@
  * $Id: spectrum.h$
  */
 
+
+/** \file Header file for +zx specific functions
+ * 
+ * These functions can also be used on +ts2068 and +zxn
+ */
+
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
 
@@ -385,47 +391,64 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
-/// \brief  Clear the screen with the currently set attribute
+/** \brief  Clear the screen with the currently set attribute
+ */
 extern void __LIB__ zx_cls(void);
 
-// Compatibility macro for newlib code
-#define zx_cls(a) zx_cls_attr(a)
 
-/// \brief  Clears the screen and sets the screen and current attribute to attr
-//  \param attr - The full attribute byte
+/** \brief  Clears the screen and sets the screen and current attribute to attr
+ * \param attr - The full attribute byte
+*/
 extern void __LIB__ zx_cls_attr(int attr);
 extern void __LIB__ zx_cls_attr_fastcall(int attr) __z88dk_fastcall;
 #define zx_cls_attr(a)                 zx_cls_attr_fastcall(a)
 
-// Set or unset the flash attribute for now on - true/false value
+/** \brief Set or unset the flash attribute for printing
+ * 
+ * \param f Values 0/1
+ * 
+ * This function sets the flash flag for the --generic-console screen driver
+ */
 extern void zx_setattrflash(uint f);
 extern void zx_setattrflash_fastcall(uint f) __z88dk_fastcall;
 #define zx_setattrflash(f) zx_setattrflash_fastcall(f)
 
-// Set or unset the bright attribute for now on - true/false value
+/** \brief Set or unset the bright attribute for printing
+ * 
+ * \param f Values 0/1
+ * 
+ * This function sets the bright flag for the --generic-console screen driver
+ */
 extern void zx_setattrbright(uint f);
 extern void zx_setattrbright_fastcall(uint f) __z88dk_fastcall;
 #define zx_setattrbright(f) zx_setattrbright_fastcall(f)
 
-// Set or unset the inverse attribute for now on - true/false value
+/** \brief Set or unset the inverse attribute for printing
+ * 
+ * \param f Values 0/1
+ * 
+ * This function sets the inverse flag for the --generic-console screen driver
+ */
 extern void zx_setattrinverse(uint f);
 extern void zx_setattrinverse_fastcall(uint f) __z88dk_fastcall;
 #define zx_setattrinverse(f) zx_setattrinverse_fastcall(f)
 
-// Set the border color
-// Param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+/** \brief Set the border color
+ *   \param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+ */
 extern void  __LIB__  zx_border(uint colour);
 extern void  __LIB__  zx_border_fastcall(uint colour) __z88dk_fastcall;
 #define zx_border(c) zx_border_fastcall(c)
 
 
-// Quickly set the whole screen color attributes
-// Param colour must be in the form i | p, where
-// colour is an or of INK_BLACK ..INK_WHITE | PAPER_BLACK...PAPER_WHITE| [FLASH] | [BRIGHT]
-
+/** \brief Quickly set the whole screen color attributes (and set the attributes for now on)
+    \param colour Is the full attribute byte
+    \note This is the equivalent of the newlib function zx_cls_attr()
+*/
 extern void  __LIB__  zx_colour(uint colour);
 extern void  __LIB__  zx_colour_fastcall(uint colour) __z88dk_fastcall;
 #define zx_colour(a) zx_colour_fastcall(a)
+
 
 // Change the ink attr from now on
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
