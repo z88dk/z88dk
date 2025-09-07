@@ -3,6 +3,7 @@ target/mz/stdio/fputc_cons
 target/mz/stdio/getk
 target/mz/stdio/generic_console
 target/mz/stdio/sharpmz_conversion
+target/mz/stdio/conio_map_colour
 @stdio/ansicore.lst
 target/mz/stdio/ansi/f_ansi_attr
 target/mz/stdio/ansi/f_ansi_bel
