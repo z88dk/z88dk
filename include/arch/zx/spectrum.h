@@ -394,17 +394,17 @@ extern void __LIB__ zx_cls_attr(int attr);
 extern void __LIB__ zx_cls_attr_fastcall(int attr) __z88dk_fastcall;
 #define zx_cls_attr(a)                 zx_cls_attr_fastcall(a)
 
-// Set or unset the flash attribute for now on
+// Set or unset the flash attribute for now on - true/false value
 extern void zx_setattrflash(uint f);
 extern void zx_setattrflash_fastcall(uint f) __z88dk_fastcall;
 #define zx_setattrflash(f) zx_setattrflash_fastcall(f)
 
-// Set or unset the bright attribute for now on
+// Set or unset the bright attribute for now on - true/false value
 extern void zx_setattrbright(uint f);
 extern void zx_setattrbright_fastcall(uint f) __z88dk_fastcall;
 #define zx_setattrbright(f) zx_setattrbright_fastcall(f)
 
-// Set or unset the inverse attribute for now on
+// Set or unset the inverse attribute for now on - true/false value
 extern void zx_setattrinverse(uint f);
 extern void zx_setattrinverse_fastcall(uint f) __z88dk_fastcall;
 #define zx_setattrinverse(f) zx_setattrinverse_fastcall(f)
@@ -418,8 +418,7 @@ extern void  __LIB__  zx_border_fastcall(uint colour) __z88dk_fastcall;
 
 // Quickly set the whole screen color attributes
 // Param colour must be in the form i | p, where
-// i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
+// colour is an or of INK_BLACK ..INK_WHITE | PAPER_BLACK...PAPER_WHITE| [FLASH] | [BRIGHT]
 extern void  __LIB__  zx_colour(uint colour);
 extern void  __LIB__  zx_colour_fastcall(uint colour) __z88dk_fastcall;
 #define zx_colour(a) zx_colour_fastcall(a)
@@ -431,7 +430,7 @@ extern void __LIB__ zx_setink_fastcall(uint i) __z88dk_fastcall;
 #define zx_setink(i) zx_setink_fastcall(i)
 
 // Change the paper attr from now on
-// p can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPERWHITE
 extern void zx_setpaper(uint p);
 extern void __LIB__ zx_setpaper_fastcall(uint p) __z88dk_fastcall;
 #define zx_setpaper(p) zx_setpaper_fastcall(p)

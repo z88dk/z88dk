@@ -16,6 +16,13 @@ zx_setpaper_fastcall:
 _zx_setpaper_fastcall:
     ld      a,l
     and     @00111000
+    jr      z,set_paper
+    ld      a,l
+    rlca
+    rlca
+    rlca
+set_paper:
+    and     @00111000
     ld      c, a
     ld      hl, __zx_console_attr
     ld      a, (hl)
