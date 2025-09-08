@@ -8,7 +8,14 @@ NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/arch/zx/display/z80/*.asm" "$(NEWLIB_DIRECTO
 	"$(NEWLIB_DIRECTORY)/arch/zx/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/misc/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/arch/zx/graphics/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/graphics/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/arch/zx/ulaplus/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/ulaplus/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/*.asm" "$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/c/sccz80/*.asm" $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 
+	"$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/c/sccz80/*.asm" $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_resetAnim2Frames.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_setTile.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_resetAnim4Frames.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_stop.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_getAnimGroup.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_findAttrH.asm 
 
 NEWLIB_TARGETS := obj/newlib-z80
 
@@ -22,11 +29,11 @@ OBJECTS = $(CLASSIC_OBJECTS)
 all: dirs $(OBJECTS) $(NEWLIB_TARGETS)
 
 bifrost2_engine_48.bin.zx0:
-	$(ZCC) +z80 -vn --no-crt -clib=nolib -g -Ca"-DSTRIPVECTOR"  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o bifrost2_engine_48.bin
+	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -g -I$(Z88DK_LIB) -DSTRIPVECTOR -b -obifrost2_engine_48.bin  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 
 	$(ZX0) -f bifrost2_engine_48.bin
 
-bifrost2_engine_p3.bin.zx0:
-	$(ZCC) +z80 -vn --no-crt -clib=nolib -g -Ca"-DPLUS3 -DSTRIPVECTOR"  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o bifrost2_engine_p3.bin
+bifrost2_engine_p3.bin.zx0: bifrost2_engine_48.bin.zx0
+	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -g -I$(Z88DK_LIB) -DSTRIPVECTOR -DPLUS3 -b -obifrost2_engine_p3.bin  $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 
 	$(ZX0) -f bifrost2_engine_p3.bin
 
 

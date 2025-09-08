@@ -214,7 +214,7 @@ include time/time.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
-TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS)
+TARGET_CLIB_OBJS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS)
 
 # Arg1: target
 # Arg2: Graphics flavour
@@ -330,7 +330,7 @@ zxfcntl:
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib: $(TARGET_CLIB_OBJS) z80_clib.lib
+zx_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
