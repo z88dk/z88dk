@@ -24,3 +24,10 @@ NIRVANAP_paintC_callee:
         push hl
 
 	jp asm_NIRVANAP_paintC
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_paintC_callee
+defc _NIRVANAP_paintC_callee = NIRVANAP_paintC_callee
+ENDIF
+
