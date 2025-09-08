@@ -28,3 +28,10 @@ NIRVANAP_readC:
    	ld b,(hl)       ; attrs
 
    	jp asm_NIRVANAP_readC
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_readC
+defc _NIRVANAP_readC = NIRVANAP_readC
+ENDIF
+

@@ -14,3 +14,10 @@ PUBLIC BIFROST2_stop
 EXTERN asm_BIFROST2_stop
 
 defc BIFROST2_stop = asm_BIFROST2_stop
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_stop
+defc _BIFROST2_stop = BIFROST2_stop
+ENDIF
+

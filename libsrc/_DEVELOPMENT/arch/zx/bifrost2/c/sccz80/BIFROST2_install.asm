@@ -14,3 +14,10 @@ PUBLIC BIFROST2_install
 EXTERN asm_BIFROST2_install
 
 defc BIFROST2_install = asm_BIFROST2_install
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_install
+defc _BIFROST2_install = BIFROST2_install
+ENDIF
+

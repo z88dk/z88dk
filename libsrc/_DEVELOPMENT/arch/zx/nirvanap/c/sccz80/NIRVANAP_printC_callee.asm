@@ -25,3 +25,10 @@ NIRVANAP_printC_callee:
         ld a,l
 
 	jp asm_NIRVANAP_printC
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_printC_callee
+defc _NIRVANAP_printC_callee = NIRVANAP_printC_callee
+ENDIF
+

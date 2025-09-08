@@ -30,3 +30,10 @@ NIRVANAP_printC:
    	ld a,(hl)       ; ch
 
    	jp asm_NIRVANAP_printC
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_printC
+defc _NIRVANAP_printC = NIRVANAP_printC
+ENDIF
+

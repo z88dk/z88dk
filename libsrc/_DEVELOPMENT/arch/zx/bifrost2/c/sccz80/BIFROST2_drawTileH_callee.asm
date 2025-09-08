@@ -25,3 +25,10 @@ BIFROST2_drawTileH_callee:
        	and 127         ; discard BIFROST2STATIC
 
         jp asm_BIFROST2_drawTileH        ; execute 'draw_tile'
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_drawTileH_callee
+defc _BIFROST2_drawTileH_callee = BIFROST2_drawTileH_callee
+ENDIF
+

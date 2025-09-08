@@ -14,3 +14,10 @@ PUBLIC BIFROST2_resetAnim2Frames
 EXTERN asm_BIFROST2_resetAnim2Frames
 
 defc BIFROST2_resetAnim2Frames = asm_BIFROST2_resetAnim2Frames
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_resetAnim2Frames
+defc _BIFROST2_resetAnim2Frames = BIFROST2_resetAnim2Frames
+ENDIF
+

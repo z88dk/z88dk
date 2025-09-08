@@ -16,7 +16,7 @@ GAMES_NEWLIB_TARGETS := games/obj/newlib-z80-games \
 OBJS += $(GAMES_NEWLIB_TARGETS)
 CLEAN += games-clean
 
-games: $(GAMES_NEWLIB_TARGES)
+games: $(GAMES_NEWLIB_TARGETS)
 
 .PHONY: games games-clean
 

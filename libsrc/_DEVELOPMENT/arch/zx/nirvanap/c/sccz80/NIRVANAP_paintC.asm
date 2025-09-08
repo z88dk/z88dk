@@ -28,3 +28,10 @@ NIRVANAP_paintC:
    	ld b,(hl)       ; attrs
 
    	jp asm_NIRVANAP_paintC
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_paintC
+defc _NIRVANAP_paintC = NIRVANAP_paintC
+ENDIF
+

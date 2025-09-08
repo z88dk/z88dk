@@ -24,3 +24,10 @@ NIRVANAP_drawTW_raw_callee:
         ld a,l
 
 	jp asm_NIRVANAP_drawTW
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_drawTW_raw_callee
+defc _NIRVANAP_drawTW_raw_callee = NIRVANAP_drawTW_raw_callee
+ENDIF
+

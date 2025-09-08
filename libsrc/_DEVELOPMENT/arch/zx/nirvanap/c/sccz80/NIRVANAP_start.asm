@@ -14,3 +14,10 @@ PUBLIC NIRVANAP_start
 EXTERN asm_NIRVANAP_start
 
 defc NIRVANAP_start = asm_NIRVANAP_start
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_start
+defc _NIRVANAP_start = NIRVANAP_start
+ENDIF
+

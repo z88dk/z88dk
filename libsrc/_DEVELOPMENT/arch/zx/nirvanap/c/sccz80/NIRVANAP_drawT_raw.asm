@@ -26,3 +26,10 @@ NIRVANAP_drawT_raw:
    	ld a,(hl)       ; tile
    	
    	jp asm_NIRVANAP_drawT
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAP_drawT_raw
+defc _NIRVANAP_drawT_raw = NIRVANAP_drawT_raw
+ENDIF
+

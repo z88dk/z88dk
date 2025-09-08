@@ -14,3 +14,10 @@ PUBLIC BIFROST2_showNextTile
 EXTERN asm_BIFROST2_showNextTile
 
 defc BIFROST2_showNextTile = asm_BIFROST2_showNextTile
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_showNextTile
+defc _BIFROST2_showNextTile = BIFROST2_showNextTile
+ENDIF
+
