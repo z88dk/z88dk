@@ -13,10 +13,9 @@ NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/arch/zx/display/z80/*.asm" "$(NEWLIB_DIRECTO
 	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/asm_NIRVANAP_drawW_di.asm \
 	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/asm_NIRVANAP_fillT_di.asm \
 	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/asm_NIRVANAP_stop.asm \
-	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm \
+	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4 \
 	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/asm_NIRVANAP_drawTW_di.asm \
 	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/asm_NIRVANAP_drawT_di.asm \
-	$(NEWLIB_DIRECTORY)/arch/zx/nirvanap/z80/*.asm.m4 \
 	"$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/c/sccz80/*.asm" $(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
 	$(NEWLIB_DIRECTORY)/arch/zx/bifrost2/z80/asm_BIFROST2_resetAnim2Frames.asm \
