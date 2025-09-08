@@ -26,6 +26,24 @@ __tms9918_map_colour:
 
     SECTION rodata_video_vdp
 table:
+IF FORsms
+    defb    $1                          ;BLACK -> BLACK
+    defb    $5                          ;BLUE -> LIGHT BLUE
+    defb    $3                          ;GREEN -> LIGHT GREEN
+    defb    $7                          ;CYAN -> CYAN
+    defb    $9                          ;RED -> LIGHT RED
+    defb    $d                          ;MAGENTA -> MAGENTA
+    defb    $6                          ;BROWN -> DARK RED
+    defb    $a                          ;LIGHTGRAY -> DARK YELLOW
+    defb    $e                          ;DARKGRAY -> GRAY
+    defb    $4                          ;LIGHTBLUE -> DARK BLUE
+    defb    $c                          ;LIGHTGREEN -> MEDIUM GREEN
+    defb    $7                          ;LIGHTCYAN -> CYAN
+    defb    $8                          ;LIGHTRED -> MEDIUM RED
+    defb    $d                          ;LIGHTMAGENTA -> MAGENTA
+    defb    $b                          ;YELLOW -> LIGHT YELLOW
+    defb    $f                          ;WHITE -> WHITE
+ELSE
     defb    $1                          ;BLACK -> BLACK
     defb    $4                          ;BLUE -> DARK BLUE
     defb    $c                          ;GREEN -> MEDIUM GREEN
@@ -33,21 +51,14 @@ table:
     defb    $8                          ;RED -> MEDIUM RED
     defb    $d                          ;MAGENTA -> MAGENTA
     defb    $6                          ;BROWN -> DARK RED
-IF FORsms
-    defb    $a                          ;LIGHTGRAY -> DARK YELLOW
-ELSE
     defb    $b                          ;LIGHTGRAY -> LIGHT YELLOW
-ENDIF
     defb    $e                          ;DARKGRAY -> GRAY
     defb    $5                          ;LIGHTBLUE -> LIGHT BLUE
     defb    $3                          ;LIGHTGREEN -> LIGHT GREEN
     defb    $7                          ;LIGHTCYAN -> CYAN
     defb    $9                          ;LIGHTRED -> LIGHT RED
     defb    $d                          ;LIGHTMAGENTA -> MAGENTA
-IF FORsms
-    defb    $b                          ;YELLOW -> LIGHT YELLOW
-ELSE
     defb    $a                          ;YELLOW -> DARK YELLOW
-ENDIF
     defb    $f                          ;WHITE -> WHITE
+ENDIF
 
