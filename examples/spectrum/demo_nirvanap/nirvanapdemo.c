@@ -17,7 +17,7 @@
 
 #define printInk(k)          printf("\x10%c", '0'+(k))
 #define printPaper(k)        printf("\x11%c", '0'+(k))
-#define printAt(row, col)    printf("\x16%c%c", (col)+1, (row)+1)
+#define printAt(row, col)    printf("\x16%c%c", (row) + 32, (col) + 32)
 
 extern unsigned char btiles[];
 

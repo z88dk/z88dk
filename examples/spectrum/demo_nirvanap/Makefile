@@ -13,7 +13,7 @@ demo.tap: nirvanap.tap nirvanapdemo.tap
 
 
 nirvanap.tap: nirvanapdemo.tap
-	$(APPMAKE) +zx -b nirvanapdemo_NIRVANAP.bin -o nirvanap.tap --noloader --org 51625 --blockname NIRVANAP
+	$(APPMAKE) +zx -b nirvanapdemo_NIRVANAP.bin -o nirvanap.tap --noloader --org 56323 --blockname NIRVANAP 
 
 
 nirvanapdemo.tap: nirvanapdemo.bin
@@ -21,7 +21,7 @@ nirvanapdemo.tap: nirvanapdemo.bin
 
 
 nirvanapdemo.bin:
-	zcc +zx $(COMPILER) $(CFLAGS)  nirvanapdemo.c btile.asm -o nirvanapdemo.bin -lndos
+	zcc +zx $(COMPILER) $(CFLAGS)  nirvanapdemo.c btile.asm -o nirvanapdemo.bin -lndos -m
 
 
 
