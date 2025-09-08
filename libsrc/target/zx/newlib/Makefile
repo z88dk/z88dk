@@ -31,7 +31,7 @@ bifrost2_engine_p3.bin.zx0:
 
 
 obj/newlib-z80: $(BIFROST2_GEN)
-	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -I$(Z88DK_LIB) -mz80 -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER)  -m4=-I$(Z88DK_LIB)/../src/m4 -d -O=obj/z80/x -I.. -I$(Z88DK_LIB) -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
 	@mkdir -p obj/z80
