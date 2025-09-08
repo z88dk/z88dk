@@ -9,7 +9,7 @@ all: demo.tap
 
 
 demo.tap: bifrost2.tap bifrost2demo.tap
-	cat loader.tap $^ >> demo.tap
+	cat loader.tap $^ > demo.tap
 
 
 bifrost2.tap: bifrost2demo.tap

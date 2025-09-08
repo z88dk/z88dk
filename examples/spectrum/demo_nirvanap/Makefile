@@ -9,7 +9,7 @@ all: demo.tap
 
 
 demo.tap: nirvanap.tap nirvanapdemo.tap
-	cat loader.tap $^ >> demo.tap
+	cat loader.tap $^ > demo.tap
 
 
 nirvanap.tap: nirvanapdemo.tap
