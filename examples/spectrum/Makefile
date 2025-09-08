@@ -1,5 +1,5 @@
 
-SUBDIRS = demo_bifrost2
+SUBDIRS = demo_bifrost2 demo_nirvanap
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
