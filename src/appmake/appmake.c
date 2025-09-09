@@ -249,6 +249,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 
     // Warn if aligned sections are not aligned
 
+#if 0
     for (c = 0x100; c >= 0x2; c >>= 1)
     {
         int start;
@@ -273,6 +274,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
                 fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", (int)strlen(cmdline) - 5, cmdline, start);
         }
     }
+#endif
 
     // Sort out the binary
 
