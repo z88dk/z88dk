@@ -22,6 +22,7 @@
 
     EXTERN  __console_x
     EXTERN  __console_y
+    EXTERN  set_cursor
     ;EXTERN generic_console_flags
 
     EXTERN  v1050_sendchar
@@ -36,7 +37,9 @@ generic_console_cls:
     ld      (hl),32
     ldir
     ld      l, 0x0C
-    jp      v1050_sendchar
+    call    v1050_sendchar
+    ld      hl, 0
+    jp      set_cursor
 
 generic_console_set_attribute:
 		; Set text attribute (underline, inverse, bold)
