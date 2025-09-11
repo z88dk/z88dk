@@ -19,7 +19,8 @@ __v1050_byte:
     call    v1050_sendchar
     pop     af
     ld      l, a
-    call    v1050_sendchar_fast
+    ;call    v1050_sendchar_fast
+	call    v1050_sendchar
     ld      l, 0
-    call    v1050_sendchar
+    call    v1050_sendchar_fast
     ret

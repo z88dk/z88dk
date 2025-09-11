@@ -3,6 +3,7 @@ target/v1050/stdio/CRT_FONT.asm
 target/v1050/stdio/__v1050_byte
 target/v1050/stdio/asm_load_charset
 target/v1050/stdio/generic_console
+target/v1050/stdio/set_cursor
 target/v1050/stdio/ansi/f_ansi_attr
 target/v1050/stdio/ansi/f_ansi_bel
 target/v1050/stdio/ansi/f_ansi_char
