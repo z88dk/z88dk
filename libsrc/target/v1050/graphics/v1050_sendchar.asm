@@ -15,6 +15,8 @@
 
 v1050_sendchar:
 _v1050_sendchar:
+v1050_sendchar_fast:
+_v1050_sendchar_fast:
 
 ; ..using the BIOS
     push    bc
@@ -32,19 +34,26 @@ __chl:
     jp      (hl)
 
 
-v1050_sendchar_fast:
-_v1050_sendchar_fast:
-; ..direct I/O
-MDSPOT:
-    IN      A, (86h)                    ; [P_DISP_C]  GET STATUS
-    AND     1                           ; TEST BIT 0
-    JR      Z, MDSPOT                   ; WAIT IF IT IS
-
-    ld      a, l                        ; GET THE CHARACTER
-    OUT     (85h), A                    ; [P_DISP_OUT]  AND PUT IN THE REG
-    LD      A, 0EH                      ; STROBE
-    OUT     (87h), A                    ; P_DISP_CONTROL..
-    INC     A                           ; STROBE OFF
-    OUT     (87h), A                    ; P_DISP_CONTROL..
-
-    ret
+; ; ..direct I/O
+; MDSPOT:
+;     ; Wait for display section to read previous byte
+;     IN      A, (86h)         ; Read port C
+;     AND     1                ; display ready?
+;     JR      Z, MDSPOT        ; No, PC0=0, loop and wait
+; 
+; ;MDSPOT1:
+; ;    IN      A, (86h)         ; Read port C
+; ;    AND     1                ; display ready?
+; ;    JR      Z, MDSPOT1       ; No, PC0=0, loop and wait
+; 
+; 	; Output byte display section
+;     ld      a, l             ; A=the byte
+;     OUT     (85h), A         ; Output to port B
+; 
+;     ; Strobe PC7 from 1 to 0 andh back to 1
+;     LD      A,0Eh            ; Mask to reset port C bit 7
+;     OUT     (87h), A         ; reset it
+;     INC     A                ; A=0Fh, mask to set port C bit 7
+;     OUT     (87h), A         ; set it
+; 
+;     ret
