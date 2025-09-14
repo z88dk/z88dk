@@ -97,7 +97,6 @@ IF CLIB_AQUARIUS_PLUS = 1
     INCLUDE	"target/aquarius/classic/banks.asm"
 
   IF __HAVE_GENCON = 1
-    INCLUDE "ioctl.def"
     SECTION code_crt_init
     EXTERN  set_default_palette
     EXTERN  generic_console_ioctl
