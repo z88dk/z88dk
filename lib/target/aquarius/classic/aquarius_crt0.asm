@@ -17,6 +17,8 @@
 
     INCLUDE "target/aquarius/def/aqplus.def"
 
+    INCLUDE "ioctl.def"
+
     EXTERN  _main           ;main() is always external to crt0 code
 
     PUBLIC  __Exit         ;jp'd to by exit()
@@ -25,12 +27,15 @@
 
     defc    TAR__no_ansifont = 1
     PUBLIC  DISPLAY
+    PUBLIC  CLIB_GENCON_CAPS
 IF CLIB_AQUARIUS_PLUS = 1
     defc    CONSOLE_ROWS = 25
     defc    DISPLAY = $3000
+    defc    CLIB_GENCON_CAPS=CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
 ELSE
     defc    CONSOLE_ROWS = 24
     defc    DISPLAY = $3028
+    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
 ENDIF
     PUBLIC  COLOUR_MAP
     defc    COLOUR_MAP = DISPLAY + 1024

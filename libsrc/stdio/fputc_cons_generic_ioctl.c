@@ -26,6 +26,7 @@ int console_ioctl(uint16_t cmd, void *arg) __naked
     jr      z,get_console_size
     push	de
     push	af
+    scf             ;Cope with _ioctl being just l_ret
     call    generic_console_ioctl
     jr      nc,success_pop
     pop     af
