@@ -1,7 +1,7 @@
 ;
 ; IO drivers for the am9511 library
 ;
-; Default IO driver - relies on __IO_AM9511_BASE being exported by the CRT
+; Example IO driver
 
 IF __AM9511_HELPER_FUNC
 

@@ -8,7 +8,7 @@ vpath %.c ../cimpl
 
 CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/am9511/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c fromfix16.c tofix16.c
-AFILES = $(wildcard *.asm)
+AFILES = 
 OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 CFLAGS += -fp-mode=ieee
@@ -33,9 +33,14 @@ $(OUTPUT_DIRECTORY)/am9511_8085.lib: $(addprefix obj/8085/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
 	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/am9511_8085 @am9511.lst
 
-$(OUTPUT_DIRECTORY)/am9511h.lib: $(addprefix obj/z80/, $(OBJECTS))
+$(OUTPUT_DIRECTORY)/am9511h.lib: $(addprefix obj/z80h/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80h/x/x  -I.. -mz80 -D__CLASSIC -D__AM9511_HELPER_FUNC @newlibfiles_z80h.lst
 	TYPE=z80h $(LIBLINKER) -mz80 -x$(OUTPUT_DIRECTORY)/am9511h @am9511.lst
+
+
+obj/z80h/%.o: %.c
+	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
+
 
 dirs:
 	@mkdir -p obj/z80/c obj/ixiy/c  obj/8085/c obj/z180 obj/z80h obj/8080
