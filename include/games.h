@@ -210,9 +210,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __MC1000__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick A", "Joystick B"};
+	const unsigned char *joystick_type[] = {"Joystick A", "Joystick B", "QAOP-MN", "8246-05",};
 #endif
-	#define GAME_DEVICES 2
+	#define GAME_DEVICES 4
 #endif
 
 #ifdef __MYVISION__
