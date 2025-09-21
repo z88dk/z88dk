@@ -54,6 +54,10 @@ IF CRT_ORG_CODE = 0x0000
     INCLUDE "crt/classic/crt_z80_rsts.inc"
 ENDIF
 
+IFDEF CRT_INCLUDE_PREAMBLE
+    INCLUDE "crt_preamble.asm"
+ENDIF
+
 start:
     INCLUDE "crt/classic/crt_init_sp.inc"
     ; Setup BSS memory and perform other initialisation
