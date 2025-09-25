@@ -319,6 +319,13 @@ IF FORv1050
     defc maxy    = 300
 ENDIF
 
+IF FORv1050udg
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 75
+    defc blankch    = 160
+ENDIF
+
 IF FORmsx
     DEFINE gotgfx
     defc maxx    = 256
