@@ -20,8 +20,8 @@
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
 
-    EXTERN  __console_x
-    EXTERN  __console_y
+    ;EXTERN  __console_x
+    ;EXTERN  __console_y
     EXTERN  set_cursor
     ;EXTERN generic_console_flags
 
@@ -81,11 +81,11 @@ generic_console_printc:
     call    v1050_sendchar
     ld      l, '='
     call    v1050_sendchar
-    ld      a, (__console_y)
+    ld      a, b    ; y
     add     32
     ld      l, a
     call    v1050_sendchar
-    ld      a, (__console_x)
+    ld      a, c    ; x
     add     32
     ld      l, a
     call    v1050_sendchar
@@ -181,9 +181,16 @@ check_set_udg:
         ;ld      (generic_console_udg32),bc
     ld      l, c
     ld      h, b
+; 96 redefinable characters in G1 mode
     ld      b, 96
     ld      c, 96
     call    asm_load_charset
+
+; 64 redefinable characters in G2 mode
+; we keep them for low resolution graphics (clg6/loadudg6 will load the pseudo-graphics font)
+;    ld      b, 64
+;    ld      c, 192
+;    call    asm_load_charset
 
     jr      success
 
@@ -215,7 +222,7 @@ cls_1:
     call    v1050_sendchar
     ld      l, 32
     call    v1050_sendchar
-		; and send LF
+    ; and send LF
     ld      l, 10
     call    v1050_sendchar
     pop     bc
@@ -228,16 +235,19 @@ generic_console_set_paper:
     ret
 
 
-    SECTION	bss_clib
+    SECTION bss_clib
 
-screen_copy:	
-    defs	80 * 25		;Hopefully big enough?
+screen_copy:
+    defs  80 * 25    ;Hopefully big enough?
 
     SECTION code_crt_init
 
     EXTERN  CRT_FONT
     EXTERN  asm_load_charset
+    EXTERN  base_graphics
 
+    ld      hl, screen_copy
+    ld      (base_graphics),hl
     ld      hl, CRT_FONT
     ld      a, h
     or      l
@@ -246,5 +256,3 @@ screen_copy:
     ld      c, 0
     call    asm_load_charset
 no_custom_font:
-
-
