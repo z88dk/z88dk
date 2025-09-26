@@ -21,5 +21,4 @@
 clg:
 _clg:
     call    loadudg6
-    ld      l, 12
     jp      generic_console_cls
