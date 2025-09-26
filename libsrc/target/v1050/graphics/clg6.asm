@@ -7,6 +7,7 @@
     EXTERN  fputc_cons
     EXTERN  loadudg6
 
+    EXTERN  generic_console_cls
 
 ;
 ;	$Id: clg6.asm $
@@ -21,4 +22,4 @@ clg:
 _clg:
     call    loadudg6
     ld      l, 12
-    jp      fputc_cons
+    jp      generic_console_cls
