@@ -141,9 +141,11 @@ static void            SetStringConfig(arg_t *argument, char *arg);
 static void            LoadConfigFile(arg_t *argument, char *arg);
 static void            parse_cmdline_arg(char *arg);
 static void            AddPreProc(option *arg, char *);
+static void            AddPreProcGen(option *arg, char *);
 static void            AddPreProcIncPath(option *arg, char *);
 static void            AddToArgs(option *arg, char *);
 static void            AddToArgsQuoted(option *arg, char *);
+static void            AddToArgsVerbatim(option *argument, char *arg);
 static void            AddLinkLibrary(option *arg, char *);
 static void            AddLinkSearchPath(option *arg, char *);
 static void            usage(const char *program);
@@ -177,7 +179,7 @@ static int             linkthem(char *);
 static int             get_filetype_by_suffix(char *);
 static void            BuildAsmLine(char *, size_t, char *);
 static void            parse_cmdline_arg(char *option);
-static void            BuildOptions(char **, char *);
+static void            BuildOptions(char **, const char *);
 static void            BuildOptions_start(char **, char *);
 static void            BuildOptionsQuoted(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
@@ -246,6 +248,7 @@ static int             lston = 0;
 static int             mapon = 0;
 static int             globaldefon = 0;
 static char           *globaldefrefile = NULL;
+static int             dependencyonly = 0;
 static int             preprocessonly = 0;
 static int             printmacros = 0;
 static int             relocate = 0;
@@ -385,7 +388,7 @@ static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
-static int    c_stylecpp = outspecified;
+static int    c_stylecpp = outspecified_flag;
 static char  *c_swallow_mf = NULL;
 
 static char  *c_extension = NULL;
@@ -528,6 +531,13 @@ static option options[] = {
     { 0, "copy-back-after-m4", OPT_BOOL, "Copy files back after processing with m4",&c_copy_m4_processed_files, NULL, 0 },
 
     { 0, "", OPT_HEADER, "Preprocessor options:", NULL, NULL, 0 },
+
+    { 0, "M", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies (implies no further processing)", NULL, AddPreProcGen, 0 },
+    { 0, "MM", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies, including system headers (implies no further processing)", NULL, AddPreProcGen, 0 },
+    { 0, "MF", OPT_FUNCTION, "Emit Makefile dependencies, including system headers (implies -E)", &cpparg, AddToArgsVerbatim },
+    { 0, "MD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies, including system headers" , NULL, AddPreProc, 0},
+    { 0, "MMD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies" , NULL, AddPreProc, 0},
+    { 0, "MT", OPT_FUNCTION,  "Specify the dependency target" , &cpparg, AddToArgsVerbatim, 0},
     { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
     { 0, "D", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Define a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "U", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Undefine a preprocessor option" , NULL, AddPreProc, 0},
@@ -718,8 +728,7 @@ static char *changesuffix(char *name, char *suffix)
     if ((p = find_file_ext(name)) == NULL) {
         r = mustmalloc(strlen(name) + strlen(suffix) + 1);
         sprintf(r, "%s%s", name, suffix);
-    }
-    else {
+    } else {
         r = mustmalloc(p - name + strlen(suffix) + 1);
         r[0] = '\0';
         strncat(r, name, p - name);
@@ -1266,7 +1275,7 @@ int main(int argc, char **argv)
     /* m4 include path finds z88dk macro definition file "z88dk.m4" */
     BuildOptions(&m4arg, c_m4opts);
 
-    build_bin = !m4only && !clangonly && !llvmonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
+    build_bin = !m4only && !clangonly && !llvmonly && !dependencyonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
 
     /* Create M4 defines out of some pragmas for the CRT */
     /* Some pragma values need to be known at m4 time in the new c lib CRTs */
@@ -1425,7 +1434,7 @@ int main(int argc, char **argv)
             {
                 char *compiler_arg = NULL;
 
-                if (m4only || clangonly || llvmonly || preprocessonly) continue;
+                if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly) continue;
 
                 if ( get_filetype_by_suffix(original_filenames[i]) == CXXFILE ) {
                     if ( compiler_type != CC_EZ80CLANG) {
@@ -1444,7 +1453,7 @@ int main(int argc, char **argv)
                 free(compiler_arg);
             }
         case OPTFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly) continue;
+            if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly) continue;
             if (compiler_type == CC_SDCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -1556,7 +1565,7 @@ int main(int argc, char **argv)
             /* user wants to stop at the .s file if stopping at assembly translation */
             if (assembleonly) continue;
         case SFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly) continue;
+            if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly) continue;
             /* filter comments out of asz80 asm file see issue #801 on github */
             /* substitute section names for section redirect */
 
@@ -1567,7 +1576,7 @@ int main(int argc, char **argv)
 
         CASE_ASMFILE:
         case ASMFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly || assembleonly)
+            if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly || assembleonly)
                 continue;
 
             /* See #16 on github.                                                                    */
@@ -1711,6 +1720,13 @@ int main(int argc, char **argv)
     if (preprocessonly) {
         if (nfiles > 1) outputfile = NULL;
         copy_output_files_to_destdir(".i", 1);
+        copy_output_files_to_destdir(".d", 1);
+        exit(0);
+    }
+
+    if (dependencyonly) {
+        if (nfiles > 1) outputfile = NULL;
+        copy_output_files_to_destdir(".d", 1);
         exit(0);
     }
 
@@ -1719,6 +1735,7 @@ int main(int argc, char **argv)
         copy_output_files_to_destdir(".asm", 1);
         copy_output_files_to_destdir(".s", 1);
         copy_output_files_to_destdir(".adb", 1);
+        copy_output_files_to_destdir(".d", 1);
         exit(0);
     }
     copy_output_files_to_destdir(".adb", 1);
@@ -1751,6 +1768,7 @@ int main(int argc, char **argv)
         {
             /* independent object files */
             copy_output_files_to_destdir(c_extension, 1);
+            copy_output_files_to_destdir(".d", 1);
         }
         exit(0);
     }
@@ -2468,6 +2486,17 @@ void AddToArgsQuoted(option *argument, char *arg)
     BuildOptionsQuoted(argument->value, arg);
 }
 
+// Add both the argument and the value
+void AddToArgsVerbatim(option *argument, char *arg)
+{
+    char buf[128];
+
+    snprintf(buf,sizeof(buf),"-%s", argument->long_name);
+    BuildOptions(argument->value, buf);
+    BuildOptions(argument->value, arg);
+}
+
+
 void AddPreProcIncPath(option *argument, char *arg)
 {
     /* user-supplied inc path takes precedence over system-supplied inc path */
@@ -2479,6 +2508,13 @@ void AddPreProcIncPath(option *argument, char *arg)
 
 void AddPreProc(option *argument, char *arg)
 {
+    BuildOptions(&cpparg, arg);
+    BuildOptions(&clangarg, arg);
+}
+
+void AddPreProcGen(option *argument, char *arg)
+{
+    dependencyonly = 1;
     BuildOptions(&cpparg, arg);
     BuildOptions(&clangarg, arg);
 }
@@ -2505,7 +2541,7 @@ void AddLinkSearchPath(option *argument, char *arg)
 
 /** \brief Append arg to *list
 */
-void BuildOptions(char **list, char *arg)
+void BuildOptions(char **list, const char *arg)
 {
     char           *val;
     char           *orig = *list;
@@ -3325,13 +3361,20 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
             if (stat(ptr, &tmp) == 0) {
 
                 /* generate output filename */
-                if (outputfile != NULL)
-                    strcpy(fname, outputfile);                                  /* use supplied output filename */
-                else {
+                if (outputfile != NULL ) {
+                    // Kludge for dependency file
+                    if ( strcmp(suffix, ".d") == 0 ) {
+                        name = changesuffix(outputfile, ".d");
+                        strcpy(fname, name);
+                        free(name);
+                    } else {
+                        strcpy(fname, outputfile);                                  /* use supplied output filename */
+                    }
+                } else {
                     /* using original filename to create output filename */
                     name = stripsuffix(original_filenames[j], ".m4");
-                    if (strcmp(suffix, c_extension) == 0) {
-                        p = changesuffix(name, suffix);                         /* for .o, use original filename with extension changed to .o */
+                    if (strcmp(suffix, c_extension) == 0 || strcmp(suffix,".d") == 0) {
+                        p = changesuffix(name, suffix);                         /* for .o and .d, use original filename with extension changed to .o */
                         strcpy(fname, p);
                         free(p);
                     }
@@ -3377,6 +3420,7 @@ void remove_temporary_files(void)
     if (cleanup) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
             remove_file_with_extension(temporary_filenames[j], "");
+            remove_file_with_extension(temporary_filenames[j], ".d");
             remove_file_with_extension(temporary_filenames[j], ".ll");
             remove_file_with_extension(temporary_filenames[j], ".i");
             remove_file_with_extension(temporary_filenames[j], ".i2");
