@@ -82,7 +82,11 @@ int option_parse(option *args, int argc, char **argv)
                     break;
                 } else if ((myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN|OPT_OR) )) {
                     if ( myarg->long_name && strcmp(argstart, myarg->long_name) == 0 && ( (myarg->type&OPT_DOUBLE_DASH) == doubledash)) {
-                        set_option(myarg, NULL);
+                        char *val = NULL;
+                        if ( myarg->type & OPT_INCLUDE_OPT) {
+                            val = argv[i];
+                        }
+                        set_option(myarg, val);
                         break;
                     }
                 } else if (myarg->long_name && strncmp(argstart, myarg->long_name, strlen(myarg->long_name)) == 0 && 

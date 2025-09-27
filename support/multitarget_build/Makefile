@@ -220,9 +220,10 @@ build/$(1)/$(patsubst %.asm,%.o,$(2)): $(2) $(DEPS_ASM_$(3))  $(DEPS_ASM_$(2))
 endef
 
 define build_ofile
+-include build/$(1)/$(patsubst %.c,%.d,$(2))
 build/$(1)/$(patsubst %.c,%.o,$(2)): $(2) $(DEPS_C_$(3)) $(DEPS_C_$(2))
 	@mkdir -p $(dir build/$(1)/$(2))
-	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
+	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) -MD -MT build/$(1)/$(patsubst %.c,%.o,$(2)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
 endef
 
 
