@@ -68,6 +68,7 @@ FILE *emit_output;
 
 char *output_file = NULL;
 char *dependency_target = NULL;
+char *dependency_file = NULL;
 
 #ifdef STAND_ALONE
 static char *system_macros_def[] = { STD_MACROS, 0 };
@@ -2462,21 +2463,16 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 			ls->flags |= GCC_LINE_NUM;
 		} else if (!strcmp(argv[i], "-M")) {
 			ls->flags &= ~KEEP_OUTPUT;
-            emit_output = stdout;
 			emit_dependencies = 1;
 		} else if (!strcmp(argv[i], "-Ma") || !strcmp(argv[i],"-MM")) {
 			ls->flags &= ~KEEP_OUTPUT;
-            emit_output = stdout;
 			emit_dependencies = 2;
 		} else if (!strcmp(argv[i], "-MF")) {
 			if ((++ i) >= argc) {
 				error(-1, "missing filename after -MF");
 				return 2;
 			}
-			if ( (emit_output = fopen(argv[i], "a")) == NULL ) {
-				error(-1, "can't open -MF file");
-				return 2;
-			}
+            dependency_file = argv[i];
 		} else if (!strcmp(argv[i], "-MD")) {
             // -MD is equivalent to -M -MF file, except that -E is not implied. The driver determines file based on whether an -o option is given. 
             // If it is, the driver uses its argument but with a suffix of .d, otherwise it takes the name of the input file, removes any directory components 
@@ -2543,7 +2539,6 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 						"writing: %s", argv[i]);
 					return 2;
 				}
-				emit_output = stdout;
 			} else {
 				error(-1, "spurious filename '%s'", argv[i]);
 				return 2;
@@ -2691,7 +2686,14 @@ int main(int argc, char *argv[])
         if (basename) basename++;
         else basename = fn;
 
-        if ( auto_derive_dependency_file && emit_output == NULL) {
+        if ( dependency_file ) {
+            emit_output = fopen(dependency_file, "w");
+            if ( emit_output == NULL ) {
+                fprintf(stderr, "Cannot open dependency file %s for writing\n", dependency_file);
+                return EXIT_FAILURE;
+            }
+
+        } else if ( auto_derive_dependency_file ) {
             char *file;
             if ( output_file != NULL ) {
                 file = changesuffix(output_file, ".d");
@@ -2702,6 +2704,8 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Cannot open dependency file %s for writing\n", file);
                 return EXIT_FAILURE;
             }
+        } else {
+            emit_output = stdout;
         }
 
         ofile = changesuffix(basename, ".o");
