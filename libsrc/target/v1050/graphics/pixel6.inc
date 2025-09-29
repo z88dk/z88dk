@@ -44,19 +44,19 @@ ENDIF
     push    bc
 
 
-IF  !NEEDpoint
-push hl
-push de
-extern v1050_sendchar
-    ld      l, 27
-    call    v1050_sendchar
-    ld      l, ')'
-    call    v1050_sendchar
-    ld      l, '2'                      ; Select G2 for the extended font (pseudo-graphics)
-    call    v1050_sendchar
-pop de
-pop hl	
-ENDIF
+; IF  !NEEDpoint
+; push hl
+; push de
+; extern v1050_sendchar
+;     ld      l, 27
+;     call    v1050_sendchar
+;     ld      l, ')'
+;     call    v1050_sendchar
+;     ld      l, '2'                      ; Select G2 for the extended font (pseudo-graphics)
+;     call    v1050_sendchar
+; pop de
+; pop hl	
+; ENDIF
 
     ld      hl, div3
     ld      d, 0
