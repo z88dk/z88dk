@@ -65,6 +65,7 @@ void main()
     struct gui_win win;
 
     printf("%c", 12); //clear screen
+    clg();
 
     for (x = 10; x < 39; x = x + 3) //put some trash on screen
     {
