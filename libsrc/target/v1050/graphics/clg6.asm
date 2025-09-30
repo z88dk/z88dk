@@ -6,6 +6,7 @@
 
     EXTERN  fputc_cons
     EXTERN  loadudg6
+    EXTERN  v1050_sendchar
 
     EXTERN  generic_console_cls
 
@@ -21,4 +22,12 @@
 clg:
 _clg:
     call    loadudg6
-    jp      generic_console_cls
+    call    generic_console_cls
+	
+	; Disable auto-linefeed
+	ld      l,27
+	call    v1050_sendchar
+	ld      l,';'
+	call    v1050_sendchar
+	ld      l,'D'
+	jp      v1050_sendchar
