@@ -1,7 +1,7 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.4 - xx.xx.2025
+z88dk v2.4 - 02.10.2025
 
 Headline features for this release:
 
