@@ -444,7 +444,7 @@ void info(void)
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
-    fputs("\n(C) 1980-2023 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
+    fputs("\n(C) 1980-2025 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
