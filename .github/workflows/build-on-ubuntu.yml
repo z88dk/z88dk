@@ -40,7 +40,7 @@ jobs:
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        MAKE_CONCURRENCY=-j2 ./build.sh -v -b
+        MAKE_CONCURRENCY=-j1 ./build.sh -v -b
     - name: Build examples
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
