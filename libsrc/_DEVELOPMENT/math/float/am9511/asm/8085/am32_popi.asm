@@ -18,7 +18,7 @@
 SECTION code_clib
 SECTION code_fp_am9511
 
-INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+INCLUDE "../../_DEVELOPMENT/newlib/target/am9511/config_am9511_private.inc"
 
 PUBLIC asm_am9511_popi
 
