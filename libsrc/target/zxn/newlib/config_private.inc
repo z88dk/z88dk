@@ -1,4 +1,4 @@
 
 ; Placeholder
 
-INCLUDE "../../../_DEVELOPMENT/target/zxn/config_zxn_private.inc"
+INCLUDE "../../../_DEVELOPMENT/newlib/target/zxn/config_zxn_private.inc"
