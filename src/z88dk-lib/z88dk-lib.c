@@ -83,9 +83,9 @@ enum
 };
 
 char *newlib_paths[NEWLIB_SIZE] = {
-    "/../../libsrc/_DEVELOPMENT/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
-    "/../../libsrc/_DEVELOPMENT/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
-    "/../../libsrc/_DEVELOPMENT/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
+    "/../../libsrc/_DEVELOPMENT/newlib/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
+    "/../../libsrc/_DEVELOPMENT/newlib/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
+    "/../../libsrc/_DEVELOPMENT/newlib/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
     0,
     "/../../include/_DEVELOPMENT/sccz80/lib/",        // NEWLIB_HDR_SCCZ80
     "/../../include/_DEVELOPMENT/sdcc/lib/",          // NEWLIB_HDR_SDCC

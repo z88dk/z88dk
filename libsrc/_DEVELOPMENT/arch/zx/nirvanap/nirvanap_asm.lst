@@ -4,4 +4,4 @@ arch/zx/nirvanap/z80/asm_NIRVANAP_drawW_di
 arch/zx/nirvanap/z80/asm_NIRVANAP_fillT_di
 arch/zx/nirvanap/z80/asm_NIRVANAP_spriteT
 arch/zx/nirvanap/z80/asm_NIRVANAP_stop
-arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4
+${LIBSRC_ROOT}/arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4

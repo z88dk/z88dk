@@ -29,7 +29,7 @@ zcc +zx -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPR
 2. NEW LIBRARY WITH FAST INTEGER MATH
 
 Configure the zx library by editing:
-z88dk/libsrc/_DEVELOPMENT/target/zx/config_clib.m4
+z88dk/libsrc/_DEVELOPMENT/newlib/target/zx/config_clib.m4
 
 Change "define(`__CLIB_OPT_IMATH', 0)" to "define(`__CLIB_OPT_IMATH', 75)"
 From z88dk/libsrc/_DEVELOPMENT run "Winmake zx" (windows) or "make TARGET=zx" (other).
@@ -72,7 +72,7 @@ zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC 
 2. NEW LIBRARY WITH FAST INTEGER MATH
 
 Configure the z80 library by editing:
-z88dk/libsrc/_DEVELOPMENT/target/z80/config_clib.m4
+z88dk/libsrc/_DEVELOPMENT/newlib/target/z80/config_clib.m4
 
 Change "define(`__CLIB_OPT_IMATH', 0)" to "define(`__CLIB_OPT_IMATH', 75)"
 From z88dk/libsrc/_DEVELOPMENT run "Winmake z80" (windows) or "make TARGET=z80" (other).

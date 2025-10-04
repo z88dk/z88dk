@@ -238,7 +238,7 @@ passed into an embedded z88dk-z80asm command. Again, details are beyond the scop
 this document, but the value for that argument tells us that the library code is
 coming from:
 ```
- libsrc/_DEVELOPMENT/lib/sdcc_iy
+ libsrc/_DEVELOPMENT/newlib/lib/sdcc_iy
 ```
 The contents of this directory are built during the Z88DK build, so you can't
 browse it online.

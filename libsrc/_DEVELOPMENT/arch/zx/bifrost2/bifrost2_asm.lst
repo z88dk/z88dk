@@ -1,4 +1,4 @@
-arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4
+${LIBSRC_ROOT}/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4
 arch/zx/bifrost2/z80/asm_BIFROST2_findAttrH
 arch/zx/bifrost2/z80/asm_BIFROST2_getAnimGroup
 arch/zx/bifrost2/z80/asm_BIFROST2_getTile
