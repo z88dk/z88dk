@@ -1,6 +1,6 @@
 
 IF __CPU_INTEL__
-INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+INCLUDE "_DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085_private.inc"
 ELIF __CPU_Z80__
 INCLUDE "config_private.inc"
 ENDIF

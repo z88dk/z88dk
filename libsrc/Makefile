@@ -2208,11 +2208,11 @@ rc2014-8085_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building RC2014-8085 Library ---'
 	@echo ''
-	m4 -DCFG_ASM_DEF _DEVELOPMENT/target/rc2014/config_8085.m4 > _DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc
-	m4 -DCFG_ASM_PUB _DEVELOPMENT/target/rc2014/config_8085.m4 > _DEVELOPMENT/target/rc2014/config_rc2014-8085_public.inc
-	m4 -DCFG_C_DEF _DEVELOPMENT/target/rc2014/config_8085.m4 > _DEVELOPMENT/target/rc2014/config_rc2014-8085.h
-	$(RM) _DEVELOPMENT/target/rc2014/driver/ide/asm/*.o
-	$(RM) _DEVELOPMENT/target/rc2014/driver/diskio/8085/*.o
+	m4 -DCFG_ASM_DEF _DEVELOPMENT/newlib/target/rc2014/config_8085.m4 > _DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085_private.inc
+	m4 -DCFG_ASM_PUB _DEVELOPMENT/newlib/target/rc2014/config_8085.m4 > _DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085_public.inc
+	m4 -DCFG_C_DEF _DEVELOPMENT/newlib/target/rc2014/config_8085.m4 > _DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085.h
+	$(RM) _DEVELOPMENT/newlib/target/rc2014/driver/ide/asm/*.o
+	$(RM) _DEVELOPMENT/newlib/target/rc2014/driver/diskio/8085/*.o
 	$(call buildgeneric,rc2014,portable)
 	TARGET=rc2014 TYPE=8085 $(LIBLINKER) -m8085 -DFORrc2014 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rc2014-8085_clib @$(TARGET_DIRECTORY)/rc2014/rc2014-8085.lst
 
