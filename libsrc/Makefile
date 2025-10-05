@@ -179,7 +179,6 @@ include alloc/farmalloc/farmalloc.mak
 include alloc/malloc-classic/malloc.mak
 include alloc/obstack/obstack.mak
 include arch/z80/z80.mak
-include assert/assert.mak
 include compress/aplib/aplib.mak
 include compress/zx0/zx0.mak
 include compress/zx1/zx1.mak

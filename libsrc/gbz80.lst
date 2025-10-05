@@ -1,4 +1,3 @@
-@assert/assert.lst
 @alloc/alloc_gbz80.lst
 @compress/aplib/compress_aplib.lst
 @compress/zx7/zx7.lst
