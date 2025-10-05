@@ -60,14 +60,14 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 	m4 -DCFG_C_DEF   -I$(Z88DK_LIB)/../src/m4 target/$(1)/config.m4 > target/$(1)/config_$(1).h
 	cp target/$(1)/config_$(1)_private.inc target/$(1)/obj/config_private.inc
 	@if [ "$(1)" = "zx" ]; then \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj $(NEWLIB_ROOT)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/obj/bifrost2_engine_48.bin; \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj $(NEWLIB_ROOT)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/obj/bifrost2_engine_p3.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj $(NEWLIB_ROOT)/target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/obj/bifrost2_engine_48.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj $(NEWLIB_ROOT)/target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/obj/bifrost2_engine_p3.bin; \
 		$(ZX0) -f target/zx/obj/bifrost2_engine_48.bin; \
 		$(ZX0) -f target/zx/obj/bifrost2_engine_p3.bin; \
 	fi;
 	@if [ "$(1)" = "zxn" ]; then \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj  $(NEWLIB_ROOT)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zxn/obj/bifrost2_engine_48.bin; \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj $(NEWLIB_ROOT)/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zxn/obj/bifrost2_engine_p3.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj  $(NEWLIB_ROOT)/target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zxn/obj/bifrost2_engine_48.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj $(NEWLIB_ROOT)/target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zxn/obj/bifrost2_engine_p3.bin; \
 		$(ZX0) -f target/zxn/obj/bifrost2_engine_48.bin; \
 		$(ZX0) -f target/zxn/obj/bifrost2_engine_p3.bin; \
 	fi;

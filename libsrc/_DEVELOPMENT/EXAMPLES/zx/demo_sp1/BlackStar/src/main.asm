@@ -8,7 +8,7 @@ SECTION code_user
 ; Sp1 will call asm_malloc and asm_free as needed to deal with memory when creating and deleting sprites.
 ; Hijack the library's malloc and free and provide our own that uses the block memory allocator instead.
 ; To do that you must look up the library API for these functions:
-; (malloc) https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/alloc/malloc/z80
+; (malloc) https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/newlib/alloc/malloc/z80
 ; (balloc) https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/alloc/balloc/z80
 
 PUBLIC asm_malloc
