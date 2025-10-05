@@ -1,6 +1,6 @@
 @../adt/adt_sccz80.lst
 @../alloc/alloc_sccz80.lst
-@../arch/hbios/hbios_sccz80.lst
+@../target/hbios/hbios_sccz80.lst
 @../compress/compress_sccz80.lst
 @../ctype/ctype_sccz80.lst
 @../drivers/drivers.lst
@@ -19,7 +19,7 @@
 @../math/math_float_sccz80.lst
 @../network/network_sccz80.lst
 @../setjmp/setjmp_sccz80.lst
-@../stdio/stdio_sccz80.lst
+@../newlib/stdio/stdio_sccz80.lst
 @../stdlib/stdlib_sccz80.lst
 @../string/string_sccz80.lst
 @target//hbios/driver/driver_sccz80.lst

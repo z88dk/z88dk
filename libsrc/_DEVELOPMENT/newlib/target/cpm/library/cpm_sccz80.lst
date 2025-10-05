@@ -19,7 +19,7 @@
 @../math/math_float_sccz80.lst
 @../network/network_sccz80.lst
 @../setjmp/setjmp_sccz80.lst
-@../stdio/stdio_sccz80.lst
+@../newlib/stdio/stdio_sccz80.lst
 @../stdlib/stdlib_sccz80.lst
 @../string/string_sccz80.lst
 @target//cpm/driver/driver.lst

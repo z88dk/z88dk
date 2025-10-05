@@ -46,11 +46,11 @@
       
       IF __SDCC_IY
       
-         INCLUDE "../../../stdio/z80/asm_vfprintf_unlocked_iy.asm"
+         INCLUDE "../../stdio/z80/asm_vfprintf_unlocked_iy.asm"
       
       ELSE
       
-         INCLUDE "../../../stdio/z80/asm_vfprintf_unlocked.asm"
+         INCLUDE "../../stdio/z80/asm_vfprintf_unlocked.asm"
    
       ENDIF
       
@@ -74,11 +74,11 @@
       
       IF __SDCC_IY
       
-         INCLUDE "../../../stdio/z80/asm_vfscanf_unlocked_iy.asm"
+         INCLUDE "../../stdio/z80/asm_vfscanf_unlocked_iy.asm"
       
       ELSE
       
-         INCLUDE "../../../stdio/z80/asm_vfscanf_unlocked.asm"
+         INCLUDE "../../stdio/z80/asm_vfscanf_unlocked.asm"
    
       ENDIF
    

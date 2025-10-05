@@ -22,7 +22,7 @@
 @../setjmp/setjmp_sdcc_iy.lst
 @../sound/sound_sdcc_iy.lst
 @../sound/ay/ay_sdcc_iy.lst
-@../stdio/stdio_sdcc_iy.lst
+@../newlib/stdio/stdio_sdcc_iy.lst
 @../stdlib/stdlib_sdcc_iy.lst
 @../string/string_sdcc_iy.lst
 @target//zx/driver/driver.lst
