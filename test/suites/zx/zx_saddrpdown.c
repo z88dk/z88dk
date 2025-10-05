@@ -13,7 +13,7 @@ static void dummy()
    INCLUDE "old/asm_zx_saddrpdown.asm"
 
    ; Include new version
-   INCLUDE "../../../libsrc/_DEVELOPMENT/arch/zx/display/z80/asm_zx_saddrpdown.asm"
+   INCLUDE "../../../libsrc/_DEVELOPMENT/target/zx/display/z80/asm_zx_saddrpdown.asm"
 #endasm
 }
 
