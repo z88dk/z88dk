@@ -6,7 +6,7 @@
 @../newlib/drivers/drivers.lst
 @../target/zxn/env/esxdos/esxdos_sccz80.lst
 @../error/error.lst
-@../fcntl/fcntl_sccz80.lst
+@../newlib/fcntl/fcntl_sccz80.lst
 @../font/font_4x8/fonts.lst
 @../font/font_8x8/fonts.lst
 @../font/fzx/fzx_sccz80.lst
