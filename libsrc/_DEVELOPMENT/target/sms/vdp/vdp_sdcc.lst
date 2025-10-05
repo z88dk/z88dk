@@ -1,0 +1,11 @@
+@target/sms/vdp/vdp_asm.lst
+target/sms/vdp/c/sdcc/sms_vdp_feature_disable
+target/sms/vdp/c/sdcc/sms_vdp_feature_disable_fastcall
+target/sms/vdp/c/sdcc/sms_vdp_feature_enable
+target/sms/vdp/c/sdcc/sms_vdp_feature_enable_fastcall
+target/sms/vdp/c/sdcc/sms_vdp_init
+target/sms/vdp/c/sdcc/sms_vdp_init_fastcall
+target/sms/vdp/c/sdcc/sms_vdp_set_read_address
+target/sms/vdp/c/sdcc/sms_vdp_set_read_address_fastcall
+target/sms/vdp/c/sdcc/sms_vdp_set_write_address
+target/sms/vdp/c/sdcc/sms_vdp_set_write_address_fastcall

@@ -1,6 +1,6 @@
 @../adt/adt_sdcc_ix.lst
 @../alloc/alloc_sdcc_ix.lst
-@../arch/sms/sms_sdcc_ix.lst
+@../target/sms/sms_sdcc_ix.lst
 @../compress/compress_sdcc_ix.lst
 @../ctype/ctype_sdcc_ix.lst
 @../newlib/drivers/drivers.lst

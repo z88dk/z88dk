@@ -1,8 +1,0 @@
-@arch/sms/compress/compress_sccz80.lst
-@arch/sms/globals/globals_asm.lst
-@arch/sms/misc/misc_sccz80.lst
-@arch/sms/psg/psg_sccz80.lst
-@arch/sms/registers/registers_asm.lst
-@arch/sms/SMSlib/SMSlib_sccz80.lst
-@arch/sms/vdp/vdp_sccz80.lst
-@arch/sms/vram/vram_sccz80.lst

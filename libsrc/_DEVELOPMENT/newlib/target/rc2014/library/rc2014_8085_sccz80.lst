@@ -2,7 +2,7 @@
 
 ;@adt/adt_sccz80.lst
 ;@alloc/alloc_sccz80.lst
-;@arch/cpm/cpm_sccz80.lst
+;@target/cpm/cpm_sccz80.lst
 ;@compress/compress_sccz80.lst
 ;@ctype/ctype_sccz80.lst
 ;@newlib/drivers/drivers.lst

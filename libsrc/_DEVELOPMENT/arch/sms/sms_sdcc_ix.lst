@@ -1,8 +1,0 @@
-@arch/sms/compress/compress_sdcc.lst
-@arch/sms/globals/globals_asm.lst
-@arch/sms/misc/misc_sdcc_ix.lst
-@arch/sms/psg/psg_sdcc.lst
-@arch/sms/registers/registers_asm.lst
-@arch/sms/SMSlib/SMSlib_sdcc.lst
-@arch/sms/vdp/vdp_sdcc.lst
-@arch/sms/vram/vram_sdcc.lst

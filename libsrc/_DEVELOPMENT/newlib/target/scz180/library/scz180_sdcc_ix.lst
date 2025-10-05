@@ -1,6 +1,6 @@
 @../adt/adt_sdcc_ix.lst
 @../alloc/alloc_sdcc_ix.lst
-@../arch/cpm/cpm_sdcc_ix.lst
+@../target/cpm/cpm_sdcc_ix.lst
 @../target/hbios/hbios_sdcc.lst
 @../compress/compress_sdcc_ix.lst
 @../ctype/ctype_sdcc_ix.lst
