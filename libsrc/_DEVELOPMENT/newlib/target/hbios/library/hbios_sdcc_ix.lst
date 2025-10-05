@@ -3,7 +3,7 @@
 @../target/hbios/hbios_sdcc.lst
 @../compress/compress_sdcc_ix.lst
 @../ctype/ctype_sdcc_ix.lst
-@../drivers/drivers.lst
+@../newlib/drivers/drivers.lst
 @../error/error.lst
 @../fcntl/fcntl_sdcc_ix.lst
 @../font/font_4x8/fonts.lst

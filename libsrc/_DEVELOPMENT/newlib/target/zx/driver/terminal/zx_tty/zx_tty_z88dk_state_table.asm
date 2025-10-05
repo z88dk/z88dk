@@ -15,7 +15,7 @@ zx_tty_z88dk_state_table:
    ; Specifies the z88dk terminal type for the zx target.
    ;
    ; The generic portion of the table common across all targets is:
-   ; fcntl/z80/drivers/terminal/tty/tty_z88dk_state_table
+   ; fcntl/z80/newlib/drivers/terminal/tty/tty_z88dk_state_table
    ;
    ; Target specific command codes are bracketed.
 

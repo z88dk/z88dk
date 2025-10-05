@@ -3,7 +3,7 @@
 @../target/zxn/zxn_sdcc_iy.lst
 @../compress/compress_sdcc_iy.lst
 @../ctype/ctype_sdcc_iy.lst
-@../drivers/drivers.lst
+@../newlib/drivers/drivers.lst
 @../env/esxdos/esxdos_sdcc_iy.lst
 @../error/error.lst
 @../fcntl/fcntl_sdcc_iy.lst

@@ -3,7 +3,7 @@
 @../arch/sms/sms_sdcc_iy.lst
 @../compress/compress_sdcc_iy.lst
 @../ctype/ctype_sdcc_iy.lst
-@../drivers/drivers.lst
+@../newlib/drivers/drivers.lst
 @../error/error.lst
 @../fcntl/fcntl_sdcc_iy.lst
 @../font/font_4x8/fonts.lst
