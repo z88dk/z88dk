@@ -4,7 +4,7 @@
 @../compress/compress_sccz80.lst
 @../ctype/ctype_sccz80.lst
 @../newlib/drivers/drivers.lst
-@../env/esxdos/esxdos_sccz80.lst
+@../target/zxn/env/esxdos/esxdos_sccz80.lst
 @../error/error.lst
 @../fcntl/fcntl_sccz80.lst
 @../font/font_4x8/fonts.lst
