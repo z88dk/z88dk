@@ -12,7 +12,7 @@
    
       ; empty argc,argv
       
-      include "../crt_cmdline_empty.inc"
+      include "crt/newlib/crt_cmdline_empty.inc"
       
       push hl   ; argv
       push bc   ; argc

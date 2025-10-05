@@ -20,9 +20,9 @@ include "config_scz180_public.inc"
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_defaults.inc"
+include "crt/newlib/crt_defaults.inc"
 include "crt_config.inc"
-include(`../crt_rules.inc')
+include(`crt/newlib/crt_rules.inc')
 include(`scz180_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -51,11 +51,11 @@ dnl#include(`driver/terminal/rc_01_output_hbios1.m4')
 dnl
 dnl## file dup
 dnl
-dnl#include(`../m4_file_dup.m4')
+dnl#include(`crt/newlib/m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../m4_file_absent.m4')
+dnl#include(`crt/newlib/m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -72,7 +72,7 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    include(`driver/terminal/rc_01_output_hbios0.m4')
    m4_rc_01_output_hbios0(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
-   include(`../m4_file_dup.m4')
+   include(`crt/newlib/m4_file_dup.m4')
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
 
    include(`driver/terminal/rc_01_input_hbios1.m4')
@@ -81,7 +81,7 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    include(`driver/terminal/rc_01_output_hbios1.m4')
    m4_rc_01_output_hbios1(_ttyout, TTY_OTERM_TERMINAL_FLAGS)
 
-   include(`../m4_file_dup.m4')
+   include(`crt/newlib/m4_file_dup.m4')
    m4_file_dup(_ttyerr, 0x80, __i_fcntl_fdstruct_4)
 ',
 `
@@ -119,18 +119,18 @@ SECTION code_crt_start         ; system initialization
 
 __Start:
 
-   include "../crt_start_di.inc"
-   include "../crt_save_sp.inc"
+   include "crt/newlib/crt_start_di.inc"
+   include "crt/newlib/crt_save_sp.inc"
 
 __Restart:
 
-   include "../crt_init_sp.inc"
+   include "crt/newlib/crt_init_sp.inc"
 
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
 
-   include "../crt_cmdline_empty.inc"
+   include "crt/newlib/crt_cmdline_empty.inc"
 
 ENDIF
 
@@ -145,15 +145,15 @@ ENDIF
 
    ; initialize data section
 
-   include "../clib_init_data.inc"
+   include "crt/newlib/clib_init_data.inc"
 
    ; initialize bss section
 
-   include "../clib_init_bss.inc"
+   include "crt/newlib/clib_init_bss.inc"
 
    ; interrupt mode
 
-   include "../crt_set_interrupt_mode.inc"
+   include "crt/newlib/crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
 
@@ -163,7 +163,7 @@ SECTION code_crt_init          ; user and library initialization
 
 SECTION code_crt_main
 
-   include "../crt_start_ei.inc"
+   include "crt/newlib/crt_start_ei.inc"
 
    ; call user program
 
@@ -193,20 +193,20 @@ SECTION code_crt_return
 
    ; close files
 
-   include "../clib_close.inc"
+   include "crt/newlib/clib_close.inc"
 
    ; terminate
 
-   include "../crt_exit_eidi.inc"
-   include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"
+   include "crt/newlib/crt_exit_eidi.inc"
+   include "crt/newlib/crt_restore_sp.inc"
+   include "crt/newlib/crt_program_exit.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_jump_vectors_z180.inc"
-include "../crt_interrupt_vectors_z180.inc"
+include "crt/newlib/crt_jump_vectors_z180.inc"
+include "crt/newlib/crt_interrupt_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
@@ -215,10 +215,10 @@ IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8)
 
 ENDIF
 
-include "../clib_variables.inc"
+include "crt/newlib/clib_variables.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLIB STUBS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../clib_stubs.inc"
+include "crt/newlib/clib_stubs.inc"

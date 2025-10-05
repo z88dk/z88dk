@@ -12,10 +12,10 @@ org __crt_org_code
 IF (__crt_org_vector_table = -0x80) || (__crt_org_vector_table = -0x100)
 
 section code_crt_interrupt_vector_table
+section code_crt_start
 
 ENDIF
 
-section code_crt_start
 section code_crt_init
 section code_crt_init_exit
 section code_crt_main
@@ -33,7 +33,7 @@ ENDIF
 section code_driver
 section code_font
 section code_clib
-  include "../clib_code.inc"
+  include "crt/newlib/clib_code.inc"
 section code_lib
 section code_home
 section code_compiler
@@ -66,17 +66,12 @@ align 2
 section rodata_driver
 section rodata_font
 section rodata_clib
-  include "../clib_rodata.inc"
+  include "crt/newlib/clib_rodata.inc"
   ;;section rodata_error_strings
   ;;section rodata_error_string_end
   ;;defb 0
 section rodata_lib
 section rodata_compiler
-
-section rodata_page0
-section rodata_common1_data
-section rodata_common1_driver
-
 section rodata_user
 
 SECTION CODE_END
@@ -127,7 +122,7 @@ section smc_jump_vectors
 section smc_driver
 section smc_font
 section smc_clib
-  include "../clib_smc.inc"
+  include "crt/newlib/clib_smc.inc"
 section smc_lib
 section smc_compiler
 section smc_user
@@ -136,7 +131,7 @@ section data_crt
 section data_driver
 section data_font
 section data_clib
-  include "../clib_data.inc"
+  include "crt/newlib/clib_data.inc"
   ;;section data_fcntl_stdio_heap_head
   ;;section data_fcntl_stdio_heap_body
   ;;section data_fcntl_stdio_heap_tail
@@ -193,7 +188,7 @@ section bss_crt
 section bss_driver
 section bss_font
 section bss_clib
-  include "../clib_bss.inc"
+  include "crt/newlib/clib_bss.inc"
 section bss_lib
 section bss_compiler
 section bss_user

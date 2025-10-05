@@ -8,7 +8,7 @@
 
    cmdline_missing:
 
-      include "../crt_cmdline_empty.inc"
+      include "crt/newlib/crt_cmdline_empty.inc"
       jr cmdline_end
 
    cmdline_present:

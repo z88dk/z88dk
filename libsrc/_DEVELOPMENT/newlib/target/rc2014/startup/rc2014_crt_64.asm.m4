@@ -20,10 +20,10 @@ include "config_rc2014-8085_public.inc"
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_defaults.inc"
-include "../crt_defaults_8085.inc"
+include "crt/newlib/crt_defaults.inc"
+include "crt/newlib/crt_defaults_8085.inc"
 include "crt_config.inc"
-include(`../crt_rules.inc')
+include(`crt/newlib/crt_rules.inc')
 include(`rc2014_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -148,18 +148,18 @@ ENDIF
 
 .__Start
 
-    include "../crt_start_di.inc"
-    include "../crt_save_sp.inc"
+    include "crt/newlib/crt_start_di.inc"
+    include "crt/newlib/crt_save_sp.inc"
 
 .__Restart
 
-    include "../crt_init_sp.inc"
+    include "crt/newlib/crt_init_sp.inc"
 
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
 
-    include "../crt_cmdline_empty.inc"
+    include "crt/newlib/crt_cmdline_empty.inc"
 
 ENDIF
 
@@ -246,7 +246,7 @@ ENDIF
 
     ; copy interrupt vector table to final location
 
-    include "../crt_set_interrupt_mode.inc"
+    include "crt/newlib/crt_set_interrupt_mode.inc"
 
     include "../../../../lib/crt/classic/crt_init_heap.inc"
 
@@ -259,7 +259,7 @@ SECTION code_crt_init           ; user and library initialization
 
 SECTION code_crt_main
 
-    include "../crt_start_ei.inc"
+    include "crt/newlib/crt_start_ei.inc"
 
     ; call user program
 
@@ -289,7 +289,7 @@ SECTION code_crt_return
 
     ; close files
 
-    include "../clib_close.inc"
+    include "crt/newlib/clib_close.inc"
 
     ; terminate
 
@@ -318,9 +318,9 @@ IF (__crt_on_exit = 0x10002)
 
 ELSE
 
-    include "../crt_exit_eidi.inc"
-    include "../crt_restore_sp.inc"
-    include "../crt_program_exit.inc"
+    include "crt/newlib/crt_exit_eidi.inc"
+    include "crt/newlib/crt_restore_sp.inc"
+    include "crt/newlib/crt_program_exit.inc"
 
 ENDIF
 

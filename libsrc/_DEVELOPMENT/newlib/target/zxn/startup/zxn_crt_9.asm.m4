@@ -24,9 +24,9 @@ include "config_zxn_public.inc"
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_defaults.inc"
+include "crt/newlib/crt_defaults.inc"
 include "crt_config.inc"
-include(`../crt_rules.inc')
+include(`crt/newlib/crt_rules.inc')
 include(`zxn_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,11 +59,11 @@ dnl#include(`driver/terminal/zx_01_output_fzx_tty_z88dk.m4')dnl
 dnl
 dnl## file dup
 dnl
-dnl#include(`../m4_file_dup.m4')dnl
+dnl#include(`crt/newlib/m4_file_dup.m4')dnl
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../m4_file_absent.m4')dnl
+dnl#include(`crt/newlib/m4_file_absent.m4')dnl
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -87,7 +87,7 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    include(`driver/terminal/zx_01_output_fzx_tty_z88dk.m4')dnl
    m4_zx_01_output_fzx_tty_z88dk(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, CRT_OTERM_FONT_FZX, CRT_OTERM_TEXT_COLOR, CRT_OTERM_TEXT_COLOR_MASK, CRT_OTERM_BACKGROUND_COLOR, CRT_OTERM_FZX_PAPER_X, CRT_OTERM_FZX_PAPER_WIDTH, CRT_OTERM_FZX_PAPER_Y, CRT_OTERM_FZX_PAPER_HEIGHT, M4__CRT_OTERM_FZX_DRAW_MODE, CRT_OTERM_FZX_LINE_SPACING, CRT_OTERM_FZX_LEFT_MARGIN, CRT_OTERM_FZX_SPACE_EXPAND)dnl
 
-   include(`../m4_file_dup.m4')dnl
+   include(`crt/newlib/m4_file_dup.m4')dnl
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
 ',
 `
@@ -123,7 +123,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "../crt_page_zero_z80.inc"
+   include "crt/newlib/crt_page_zero_z80.inc"
 
 ENDIF
 
@@ -133,7 +133,7 @@ ENDIF
 
 __Start:
 
-   include "../crt_start_di.inc"
+   include "crt/newlib/crt_start_di.inc"
 
    IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x20000) && (!(__crt_on_exit & 0x8)) && (__crt_on_exit & 0x2)
    
@@ -151,17 +151,17 @@ __Start:
       
    ENDIF
 
-   include "../crt_save_sp.inc"
+   include "crt/newlib/crt_save_sp.inc"
 
 __Restart:
 
-   include "../crt_init_sp.inc"
+   include "crt/newlib/crt_init_sp.inc"
 
    ; command line
    
    IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
    
-      include "../crt_cmdline_empty.inc"
+      include "crt/newlib/crt_cmdline_empty.inc"
    
    ENDIF
 
@@ -176,20 +176,20 @@ __Restart_2:
    
    ; initialize data section
 
-   include "../clib_init_data.inc"
+   include "crt/newlib/clib_init_data.inc"
 
    ; initialize bss section
 
-   include "../clib_init_bss.inc"
+   include "crt/newlib/clib_init_bss.inc"
 
    ; interrupt mode
    
-   include "../crt_set_interrupt_mode.inc"
+   include "crt/newlib/crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
-   include "../crt_start_ei.inc"
+   include "crt/newlib/crt_start_ei.inc"
 
    ; call user program
    
@@ -219,7 +219,7 @@ SECTION code_crt_return
 
    ; close files
    
-   include "../clib_close.inc"
+   include "crt/newlib/clib_close.inc"
 
    ; terminate
    
@@ -231,9 +231,9 @@ SECTION code_crt_return
 
    ELSE
    
-      include "../crt_exit_eidi.inc"
-      include "../crt_restore_sp.inc"
-      include "../crt_program_exit.inc"   
+      include "crt/newlib/crt_exit_eidi.inc"
+      include "crt/newlib/crt_restore_sp.inc"
+      include "crt/newlib/crt_program_exit.inc"   
 
    ENDIF
 
@@ -241,7 +241,7 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_jump_vectors_z80.inc"
+include "crt/newlib/crt_jump_vectors_z80.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
@@ -250,10 +250,10 @@ IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8)
 
 ENDIF
 
-include "../clib_variables.inc"
+include "crt/newlib/clib_variables.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLIB STUBS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../clib_stubs.inc"
+include "crt/newlib/clib_stubs.inc"

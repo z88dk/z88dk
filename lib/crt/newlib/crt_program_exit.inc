@@ -13,11 +13,11 @@
 
             IF (__register_sp != -1)
 
-               include "../crt_init_sp.inc"
+               include "crt/newlib/crt_init_sp.inc"
 
             ENDIF
 
-            include "../crt_cmdline_empty.inc"
+            include "crt/newlib/crt_cmdline_empty.inc"
 
             jp __Restart_2
 

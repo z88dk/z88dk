@@ -23,7 +23,7 @@ IF __MMAP = 0
    ;; sms rom banks mapped to 0x8000    ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "../crt_memory_model_z80.inc"
+   INCLUDE "crt/newlib/crt_memory_model_z80.inc"
    
    SECTION BANK_02
    org CRT_ORG_BANK_02

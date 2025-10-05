@@ -22,9 +22,9 @@ include "config_zxn_public.inc"
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_defaults.inc"
+include "crt/newlib/crt_defaults.inc"
 include "crt_config.inc"
-include(`../crt_rules.inc')
+include(`crt/newlib/crt_rules.inc')
 include(`zxn_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,13 +41,13 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`../m4_file_absent.m4')dnl
+   include(`crt/newlib/m4_file_absent.m4')dnl
    m4_file_absent
 
    include(`driver/terminal/zx_00_output_rom_rst.m4')dnl
    m4_zx_00_output_rom_rst(_stdout, 0x0010)
 
-   include(`../m4_file_dup.m4')dnl
+   include(`crt/newlib/m4_file_dup.m4')dnl
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
 ',
 `
@@ -588,7 +588,7 @@ alloc_cancel:
    
    IF __register_sp != -1
 
-      include "../crt_init_sp.inc"
+      include "crt/newlib/crt_init_sp.inc"
 
    ENDIF
 
@@ -622,11 +622,11 @@ alloc_cancel:
 
    ; initialize data section
 
-   include "../clib_init_data.inc"
+   include "crt/newlib/clib_init_data.inc"
 
    ; initialize bss section
 
-   include "../clib_init_bss.inc"
+   include "crt/newlib/clib_init_bss.inc"
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; interrupt mode
@@ -634,9 +634,9 @@ alloc_cancel:
 
    ; interrupt mode
    
-   include "../crt_start_di.inc"
+   include "crt/newlib/crt_start_di.inc"
 
-   include "../crt_set_interrupt_mode.inc"
+   include "crt/newlib/crt_set_interrupt_mode.inc"
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; restore original cpu speed
@@ -651,7 +651,7 @@ alloc_cancel:
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
-   include "../crt_start_ei.inc"
+   include "crt/newlib/crt_start_ei.inc"
 
    ; call user program
 
@@ -687,7 +687,7 @@ SECTION code_crt_return
 
    ; close files
    
-   include "../clib_close.inc"
+   include "crt/newlib/clib_close.inc"
    
    pop hl                      ; hl = return status
 
@@ -875,7 +875,7 @@ dealloc_cancel:
    ;; return to basic
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   include "../crt_exit_eidi.inc"
+   include "crt/newlib/crt_exit_eidi.inc"
 
    call turbo_restore          ; restore original z80 speed
 
@@ -1312,10 +1312,10 @@ include(`crt_allocation_dotn.m4')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../clib_variables.inc"
+include "crt/newlib/clib_variables.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLIB STUBS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../clib_stubs.inc"
+include "crt/newlib/clib_stubs.inc"

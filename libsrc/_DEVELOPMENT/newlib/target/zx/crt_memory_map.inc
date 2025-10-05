@@ -22,7 +22,7 @@ IF __MMAP = 0
    ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "../crt_memory_model_z80.inc"
+   INCLUDE "crt/newlib/crt_memory_model_z80.inc"
 
 Z88DK_FOR(`LOOP', `0', `7',
 `

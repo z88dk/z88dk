@@ -730,7 +730,7 @@ ENDIF
 
 __reset:
 
-   include "../crt_start_di.inc"
+   include "crt/newlib/crt_start_di.inc"
 
 IF (REGISTER_SP = -1)
    
