@@ -1,0 +1,6 @@
+@target/hbios/input/input_asm.lst
+target/hbios/input/c/sccz80/in_inkey
+target/hbios/input/c/sccz80/in_pause
+target/hbios/input/c/sccz80/in_test_key
+target/hbios/input/c/sccz80/in_wait_key
+target/hbios/input/c/sccz80/in_wait_nokey

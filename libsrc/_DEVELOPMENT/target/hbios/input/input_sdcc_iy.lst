@@ -1,0 +1,7 @@
+@target/hbios/input/input_asm.lst
+target/hbios/input/c/sdcc_iy/in_inkey
+target/hbios/input/c/sdcc_iy/in_pause
+target/hbios/input/c/sdcc_iy/in_pause_fastcall
+target/hbios/input/c/sdcc_iy/in_test_key
+target/hbios/input/c/sdcc_iy/in_wait_key
+target/hbios/input/c/sdcc_iy/in_wait_nokey
