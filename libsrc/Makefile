@@ -168,12 +168,12 @@ dirs: $(DIRS)
 
 .PHONY: dirs
 
-include adt/heap/heap.mak
-include adt/linkedlist/linkedlist.mak
-include adt/queue/queue.mak
-include adt/stack/stack.mak
+include classic/adt/heap/heap.mak
+include classic/adt/linkedlist/linkedlist.mak
+include classic/adt/queue/queue.mak
+include classic/adt/stack/stack.mak
 include adt-newlib/adtnewlib.mak
-include algorithm/AStarSearch/astar.mak
+include classic/algorithm/AStarSearch/astar.mak
 include alloc/balloc/balloc.mak
 include alloc/farmalloc/farmalloc.mak
 include alloc/malloc-classic/malloc.mak
