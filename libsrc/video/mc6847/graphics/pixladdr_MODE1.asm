@@ -38,8 +38,6 @@ pixeladdress_MODE1:
         ld      e,0
         inc     d
         inc     d
-    ELIF FORphc25
-        ld      de,DISPLAY_HIRES
     ELSE
         ld      de,DISPLAY
     ENDIF

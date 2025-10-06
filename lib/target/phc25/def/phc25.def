@@ -3,7 +3,6 @@
 	; Values used by the library
 
         defc DISPLAY = $6000
-        defc DISPLAY_HIRES = $e000
 
         defc IO_PORT40 = $40
         
@@ -20,5 +19,5 @@
 
 
         defc    MODE_TEXT        = 0b00000000
-        defc    MODE_HIRES       = 0b10010000
-        defc    MODE_MULTICOLOUR = 0b10110000
+        defc    MODE_MULTICOLOUR       = 0b10010000
+        defc    MODE_HIRES = 0b10110000

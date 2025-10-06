@@ -38,7 +38,7 @@ IF FORmc1000
     ld      a,(__mc6847_modeval)
     out     ($80), a
 ENDIF
-    GETSCREENADDRESS_HIRES
+    GETSCREENADDRESS
 IF FORsv8000
     ld      bc, 3071                    ;sv8000 has lower res screen
 ELIF FORvz

@@ -67,19 +67,6 @@ MACRO GETSCREENADDRESS
 ENDM
 
 
-MACRO GETSCREENADDRESS_HIRES
-    IF FORpc6001
-        ld      hl,(SYSVAR_screen-1)
-        ld      l,0
-        inc     h
-        inc     h
-    ELIF FORphc25
-        ld      hl,DISPLAY_HIRES
-    ELSE
-        ld      hl,DISPLAY
-    ENDIF
-ENDM
-
 
 
 

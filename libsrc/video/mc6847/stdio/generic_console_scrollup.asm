@@ -80,7 +80,7 @@ ENDIF
     ret
 
 scrollup_hires:
-    GETSCREENADDRESS_HIRES
+    GETSCREENADDRESS
 IF FORmc1000
     ld      a,(__mc6847_modeval)
     out     ($80),a
