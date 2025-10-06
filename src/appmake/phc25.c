@@ -195,7 +195,7 @@ int phc25_exec(char *target)
 
     write_header(fpout, "PROG  ");
     
-    if ( 1 ) {
+    if ( 0 ) {
         char  bootname[FILENAME_MAX+1];
 
         strcpy(bootname, binname);
@@ -212,16 +212,54 @@ int phc25_exec(char *target)
         fseek(bootstrap_fp,0L,SEEK_SET);
 
         write_loader(fpout, 0xc400, bootstrap_fp, bootlen); // TODO, find parameter
+
+         // TODO: Now write the actual file
+
+    } else {
+        // Alternate approach, it's in one basic program
+        static uint8_t footer[] = {
+            // Pointer and number of the BASIC line code in memory
+            0x00, 0x00, 0x01, 0xc0, 0x0a, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+        int org = 0xc009;
+        int c, i;
+
+        fprintf(fpout, "%c&H%04X%c", TOK_EXEC, org, 0); 
+        i = 0;
+        while ( ( c = fgetc(fpin)) != EOF ) {
+            if ( i < 0x1f ) {       // Magic number
+                fputc(c,fpout);
+            } else if ( c == 0xff ) {
+                fputc(c,fpout);
+                fputc(c,fpout);
+            } else if ( c == 0x00 ) {
+                fputc(0xff,fpout);
+                fputc(c,fpout);
+            } else {
+                fputc(c, fpout);
+            }
+            i++;
+        }
+        fputc(0x00,fpout);  // End marker...
+
+        // File length must be a multiple of 2
+        if ( (ftell(fpout) + sizeof(footer)) %2 ) {
+            fputc(0xff, fpout);
+        }
+
+        // And write the footer
+        fwrite(footer, 1, sizeof(footer), fpout);          
     }
 
     
-    // Now write the actual file
 
     fclose(fpin);
     fclose(fpout);
 
     return 0;
 }
+
 
 
 

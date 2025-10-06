@@ -22,7 +22,7 @@
     PUBLIC    l_dcal          ;jp(hl)
 
 
-    defc    CRT_ORG_CODE  = $c500	 ; RAM
+    defc    CRT_ORG_CODE  = $c009	 ; RAM
 
     defc    CONSOLE_COLUMNS = 32
     defc    CONSOLE_ROWS = 16
@@ -31,8 +31,8 @@
     defc    ansicolumns = 32
 
     defc    TAR__fputc_cons_generic = 1
-    defc	TAR__no_ansifont = 1
-    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__no_ansifont = 1
+    defc    TAR__clib_exit_stack_size = 0
 IFNDEF TAR__register_sp
     defc	TAR__register_sp = -1
 ENDIF
@@ -41,7 +41,27 @@ ENDIF
 
 
     org     CRT_ORG_CODE
+
+    ; Silly bit of compression-ish code
 start:
+    EXTERN  __size
+    ld      hl,real_code
+    ld      de,real_code
+loop:
+    ld      a,(hl)
+    inc     hl
+    and     a
+    jr      z,real_code
+    cp      0xff
+    jr      nz,copy_byte
+    ld      a,(hl)
+    inc     hl
+copy_byte:
+    ld      (de),a
+    inc     de
+    jr      loop
+
+real_code:
 
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
     INCLUDE	"crt/classic/crt_init_sp.inc"
@@ -71,7 +91,7 @@ l_dcal:
 
 
     SECTION bootstrap
-    org     $c400
+    org     $c089
 
 
 

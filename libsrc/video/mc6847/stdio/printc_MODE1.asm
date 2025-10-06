@@ -38,7 +38,7 @@ not_udg:
     add     hl, de
     dec     h
     ex      de, hl                      ;de = font
-    GETSCREENADDRESS
+    GETSCREENADDRESS_HIRES
     add     hl, bc                      ;b = y, c = x
                                         ;hl=screen adddress
                                         

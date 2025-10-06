@@ -124,9 +124,13 @@ ENDIF
 set_mode:
     bit     5, c
     jr      z, not_css
+IF FORphc25
+    set     6,h
+ELSE
     ld      a,h
     xor     2
     ld      h,a
+ENDIF
 not_css:
     ld      a, e
     ld      (__console_w), a
@@ -158,6 +162,12 @@ not_css:
     ELIF FORspc1000
         ld      bc, $2000
         out     (c), a
+    ELIF FORphc25
+        ld      c,a
+        in      a,($40)
+        and     @00001111
+        or      c
+        out     ($40),a
     ENDIF
     call    generic_console_cls
     and     a
