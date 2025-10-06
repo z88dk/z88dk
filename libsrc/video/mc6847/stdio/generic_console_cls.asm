@@ -15,6 +15,7 @@ IFNDEF MC6847_IOSPACE
 
 
 generic_console_cls:
+    GETSCREENADDRESS
     ld      a, (__mc6847_mode)
     and     a
     jr      z, cls_text
@@ -38,7 +39,6 @@ IF FORmc1000
     ld      a,(__mc6847_modeval)
     out     ($80), a
 ENDIF
-    GETSCREENADDRESS
 IF FORsv8000
     ld      bc, 3071                    ;sv8000 has lower res screen
 ELIF FORvz
@@ -55,7 +55,6 @@ ENDIF
     ret
     
 cls_text:
-    GETSCREENADDRESS
 IF FORpc6001
     push    hl
     dec     h
