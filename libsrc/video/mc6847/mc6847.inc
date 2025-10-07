@@ -3,9 +3,10 @@
 
 
 IF FORphc25
+    INCLUDE "target/phc25/def/phc25.def"
     defc    MC6847_HAS_HIRES = 1
     defc    MC6847_HAS_TEXT_GFX = 1
-    INCLUDE "target/phc25/def/phc25.def"
+    defc    MODE0_3x2 = 1
     defc    MC6847_HIRES_YRES = 192
 ENDIF
 

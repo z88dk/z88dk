@@ -426,7 +426,7 @@ pc6001_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
-	$(call buildgeneric,pc6001)
+	$(call buildgeneric,pc6001,"portable")
 	$(MAKE) -C games TARGET=pc6001
 	$(MAKE) -C video/mc6847 TARGET=pc6001
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(TARGET_DIRECTORY)/pc6001/pc6001.lst
@@ -1243,7 +1243,7 @@ phc25_clib.lib: $(TARGET_CLIB_OBJS)
 	$(call buildgeneric,phc25)
 	$(MAKE) -C games TARGET=phc25
 	$(MAKE) -C video/mc6847 TARGET=phc25
-	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
+	TARGET=phc25 TYPE=8080 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
 
 
 # NASCOM library - Stefano

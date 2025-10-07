@@ -8,6 +8,7 @@ IFNDEF MC6847_IOSPACE
 
     EXTERN      __mc6847_mode
     EXTERN      __pc6001_attr
+    EXTERN      __phc25_attr
     EXTERN      __mc6847_modeval
     EXTERN      __tms9918_cls
 
@@ -64,6 +65,21 @@ IF FORpc6001
     ex      de, hl
     ld      b, MC6847_CONSOLE_COLUMNS
     ld      a, (__pc6001_attr)
+generic_console_scrollup_4:
+    ld      (hl), a
+    inc     hl
+    djnz    generic_console_scrollup_4
+ELIF FORphc25
+    ld      a,h
+    add     8
+    ld      h,a
+    ld      d, h
+    ld      e, 0
+    ld      bc, +((MC6847_CONSOLE_COLUMNS)*(MC6847_CONSOLE_ROWS-1))
+    ldir
+    ex      de, hl
+    ld      b, MC6847_CONSOLE_COLUMNS
+    ld      a, (__phc25_attr)
 generic_console_scrollup_4:
     ld      (hl), a
     inc     hl

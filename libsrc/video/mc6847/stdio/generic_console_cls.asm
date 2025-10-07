@@ -11,6 +11,7 @@ IFNDEF MC6847_IOSPACE
     EXTERN  __mc6847_mode
     EXTERN  __mc6847_modeval
     EXTERN  __pc6001_attr
+    EXTERN  __phc25_attr
 
 
 
@@ -63,6 +64,16 @@ IF FORpc6001
     ld      e,1
     ld      bc, +(MC6847_CONSOLE_COLUMNS*MC6847_CONSOLE_ROWS)-1
     ld      a, (__pc6001_attr)
+    ld      (hl), a
+    ldir
+    pop     hl
+ELIF FORphc25
+    push    hl
+    set     3,h
+    ld      d,h
+    ld      e,1
+    ld      bc, +(MC6847_CONSOLE_COLUMNS*MC6847_CONSOLE_ROWS)-1
+    ld      a, (__phc25_attr)
     ld      (hl), a
     ldir
     pop     hl
