@@ -4,12 +4,11 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
-static int               origin       = 1;
+static int               origin       = -1;
 static char              help         = 0;
 
 
 static void write_header(FILE *fpout, char *name);
-static void write_loader(FILE *fpout, int bootstrap_org, FILE *bootstrap, int bootstrap_len);
 
 /* Options that are available for this module */
 option_t phc25_options[] = {
@@ -114,8 +113,8 @@ typedef enum {
     TOK_USR,
     TOK_FRE,
     TOK_INP,
-    TOK_LPOS,
-    TOK_POS,
+    TOK_Lorg,
+    TOK_org,
     TOK_SQR,
     TOK_RND,
     TOK_LOG,
@@ -141,14 +140,17 @@ typedef enum {
 } basictoken;
 
 
+static uint8_t simple_footer[] = {
+            // Pointer and number of the BASIC line code in memory
+            0x00, 0x00, 0x01, 0xc0, 0x0a, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
 int phc25_exec(char *target)
 {
-   char    filename[FILENAME_MAX+1];
+    char    filename[FILENAME_MAX+1];
     FILE    *fpin, *fpout;
-    FILE    *bootstrap_fp = NULL;
-    int      bootlen;
-    long     pos;
-    int      len;
+    long     org;
+    int      c, i;
 
     if ( help )
         return -1;
@@ -165,92 +167,55 @@ int phc25_exec(char *target)
     }
 
     if ( origin != -1 ) {
-        pos = origin;
+        org = origin;
     } else {
-        if ( (pos = get_org_addr(crtfile)) == -1 ) {
+        if ( (org = get_org_addr(crtfile)) == -1 ) {
             exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
         }
     }
+    if ( org != 0xc009 ) {
+        fprintf(stderr, "Origin is $%04x - expected $c009\n", (int)org);
+    }
 
-
-
-
-   if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
+    if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",binname);
     }
-
-    /* Determine size of input file */
-    if ( fseek(fpin,0,SEEK_END) ) {
-        exit_log(1,"Couldn't determine size of file\n");
-        fclose(fpin);
-    }
-
-    len=ftell(fpin);
-    fseek(fpin,0L,SEEK_SET);
-
 
     if ( (fpout=fopen(filename,"wb") ) == NULL ) {
         exit_log(1,"Can't open output file\n");
     }
 
-    write_header(fpout, "PROG  ");
+    write_header(fpout, binname);
     
-    if ( 0 ) {
-        char  bootname[FILENAME_MAX+1];
+    // Alternate approach, it's in one basic program
 
-        strcpy(bootname, binname);
-        suffix_change(bootname, "_BOOTSTRAP.bin");
-        if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
-            exit_log(1,"Can't open bootstrap file %s\n",bootname);
+
+
+    fprintf(fpout, "%c&H%04X%c", TOK_EXEC, (int)org, 0); 
+    i = 0;
+    while ( ( c = fgetc(fpin)) != EOF ) {
+        if ( i < 0x1f ) {       // Magic number
+            fputc(c,fpout);
+        } else if ( c == 0xff ) {
+            fputc(c,fpout);
+            fputc(c,fpout);
+        } else if ( c == 0x00 ) {
+            fputc(0xff,fpout);
+            fputc(c,fpout);
+        } else {
+            fputc(c, fpout);
         }
-        if ( fseek(bootstrap_fp,0,SEEK_END) ) {
-            fclose(bootstrap_fp);
-            exit_log(1,"Couldn't determine size of bootstrap file\n");
-        }
-        bootlen = ftell(bootstrap_fp);
-        printf("Bootstrap is %d bytes\n",bootlen);
-        fseek(bootstrap_fp,0L,SEEK_SET);
-
-        write_loader(fpout, 0xc400, bootstrap_fp, bootlen); // TODO, find parameter
-
-         // TODO: Now write the actual file
-
-    } else {
-        // Alternate approach, it's in one basic program
-        static uint8_t footer[] = {
-            // Pointer and number of the BASIC line code in memory
-            0x00, 0x00, 0x01, 0xc0, 0x0a, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-        int org = 0xc009;
-        int c, i;
-
-        fprintf(fpout, "%c&H%04X%c", TOK_EXEC, org, 0); 
-        i = 0;
-        while ( ( c = fgetc(fpin)) != EOF ) {
-            if ( i < 0x1f ) {       // Magic number
-                fputc(c,fpout);
-            } else if ( c == 0xff ) {
-                fputc(c,fpout);
-                fputc(c,fpout);
-            } else if ( c == 0x00 ) {
-                fputc(0xff,fpout);
-                fputc(c,fpout);
-            } else {
-                fputc(c, fpout);
-            }
-            i++;
-        }
-        fputc(0x00,fpout);  // End marker...
-
-        // File length must be a multiple of 2
-        if ( (ftell(fpout) + sizeof(footer)) %2 ) {
-            fputc(0xff, fpout);
-        }
-
-        // And write the footer
-        fwrite(footer, 1, sizeof(footer), fpout);          
+        i++;
     }
+    fputc(0x00,fpout);  // End marker...
+
+    // File length must be a multiple of 2
+    if ( (ftell(fpout) + sizeof(simple_footer)) %2 ) {
+        fputc(0xff, fpout);
+    }
+
+    // And write the simple_footer
+    fwrite(simple_footer, 1, sizeof(simple_footer), fpout);          
 
     
 
@@ -261,16 +226,16 @@ int phc25_exec(char *target)
 }
 
 
-
-
 static void write_header(FILE *fpout, char *name)
 {
-    fprintf(fpout, "%c%c%c%c%c%c%c%c%c%cZ88DK ", 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5);
+    fprintf(fpout, "%c%c%c%c%c%c%c%c%c%c%6s", 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5,name);
 }
 
 
+// Example of how to write a bootstrap file as a data statement
+#if 0
 #define RECORD_LENGTH 32
-static void write_loader(FILE *fpout, int bootstrap_org, FILE *bootstrap, int bootstrap_len)
+static void write_bootstrap(FILE *fpout, int bootstrap_org, FILE *bootstrap, int bootstrap_len)
 {
     uint8_t  *linebuf, *ptr;
     int linelengths[20]; // Should be enough lines
@@ -332,6 +297,7 @@ static void write_loader(FILE *fpout, int bootstrap_org, FILE *bootstrap, int bo
         fputc(0, fpout);
     }
 }
+#endif
 
 
 // phc images consist of 5 sections
