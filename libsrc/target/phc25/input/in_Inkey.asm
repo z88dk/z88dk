@@ -11,16 +11,7 @@
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code
 ; uses : AF,BC,DE,HL
-;
 
-    defb    '1', 'w', 's', 'x',  11,   8, ':', 255    ;1, w, s, x, UP, BS, ", UN 80
-    defb     27, 'q', 'a', 'z',  10,  13, ':', '/'    ;ESC, q, a, z, DOWN, RET, :, / 81
-    defb    '3', 'r', 'f', 'v',   8, '-', ']', 255    ;3, r, f, v, LEFT, =, }, UN 82
-    defb    '2', 'e', 'd', 'c',   9, '^','\\', ' '    ;2, e, d, c, RIGHT, ~, \, SP 83
-    defb    '5', 'y', 'h', 'n', 130, '0', 'p', 255    ;5, y, h, n, F3, 0, p, UN 84
-    defb    '4', 't', 'g', 'b', 131, '-', '[', 255    ;4, t, g, b, F4, ~, {, UN 85 
-    defb    '6', 'u', 'j', 'm', 129, '9', 'o', 255    ;6, u, j, m, F2, 9, o, UN 86
-    defb    '7', 'i', 'k', ',', 128, '8', 'l', '.'    ;7, i, k, ,, F1, 8, l, STOP 87
 
 in_Inkey:
 _in_Inkey:
