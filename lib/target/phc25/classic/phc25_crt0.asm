@@ -42,9 +42,8 @@ ENDIF
 
     org     CRT_ORG_CODE
 
-    ; Silly bit of compression-ish code
+    ; Undo the silly escaping we had to do in appmake
 start:
-    EXTERN  __size
     ld      hl,real_code
     ld      de,real_code
 loop:
@@ -78,7 +77,6 @@ __Exit:
     INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
-    ;ei
 noop:
     ret
 
@@ -89,118 +87,6 @@ l_dcal:
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     INCLUDE	"crt/classic/crt_section.inc"
 
-
-    SECTION bootstrap
-    org     $c089
-
-
-
-    di
-    ; ld      a,'*'
-    ; call    printc
-    ; call    4863h ; 454eh
-    ; ld      a,'/'
-    ; call    printc
-    ; call    4775h ; 445fh
-    ; ld      a,'+'
-    ; call    printc
-    ; call    44deh ; 41d4h
-
-    ld      hl,play
-    call    prints
-    call    read_header_byte
-
-
-    call    read_byte
-    ld      h,a
-    add     a,c
-    ld      c,a
-    call    read_byte
-    ld      l,a
-    add     c
-    ld      c,a
-    call    read_byte
-    add     c
-    jr      nz,cksum_error
-    push    hl      ;Save entry point
-
-read_block:
-    call    read_header_byte
-    call    read_byte
-    and     a
-    jr      z,block_finished
-    ld      b,a
-    add     a,c
-    ld      c,a
-read_block_bytes:
-    call    read_byte
-    ld      (hl),a
-    inc     hl
-    add     c
-    ld      c,a
-    djnz    read_block_bytes
-    call    read_byte
-    add     c
-    jr      nz,cksum_error
-    jr      read_block
-
-block_finished:
-    call    read_byte
-    and     a
-    jr      nz,cksum_error
-
-    call 486ah; 4555h
-    pop     hl      ;Entry point
-    jp      (hl)
-
-
-
-read_header_byte:
-    call    read_byte
-    cp      $3a
-    jr      nz, read_header_byte
-    call    printc
-    ld      c,0
-    ret
-
-read_byte:
-    push    hl
-    push    bc
-    call 444bh ; 413eh
-    pop     bc
-    pop     hl
-    ret
-
-cksum_error:
-    ld      hl,cksum
-    call    prints
-    jr      cksum_error
-
-
-play:   defm    "Play Tape"
-        defb    0
-
-cksum:  defm    "Chekcsum error"
-        defb    0
-
-prints:
-    ld      a,(hl)
-    and     a
-    ret     z
-    call    printc
-    inc     hl
-    jr      prints
-
-printc:
-    push    hl
-    ld      hl,(vrampos)
-    ld      (hl),a
-    inc     hl
-    ld      (vrampos),hl
-    pop     hl
-    ret
-
-vrampos:    defw    $6080
 
 
     INCLUDE  "crt/classic/mc6847/mc6847_mode_disable.inc"
