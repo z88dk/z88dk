@@ -11,8 +11,9 @@ gfx/narrow/obj/${TARGET}/xorclrarea2
 target/phc25/graphics/textpixl6
 @gfx/narrow/gfx_narrow.lst
 
-
+target/phc25/games/joystick
 #@games/games.lst
+
 target/phc25/psg/set_psg
 target/phc25/psg/set_psg_callee
 target/phc25/psg/get_psg
