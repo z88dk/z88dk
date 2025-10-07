@@ -3,6 +3,8 @@ target/phc25/stdio/fgetc_cons
 target/phc25/stdio/getk
 target/phc25/stdio/fputc_cons
 @stdio/stdio.lst
+@input/input_keyboard.lst
+
 gfx/narrow/obj/${TARGET}/clrarea2
 gfx/narrow/obj/${TARGET}/fillarea2
 gfx/narrow/obj/${TARGET}/xorclrarea2
