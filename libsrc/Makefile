@@ -426,7 +426,7 @@ pc6001_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
-	$(call buildgeneric,pc6001,"portable")
+	$(call buildgeneric,pc6001,"narrow portable")
 	$(MAKE) -C games TARGET=pc6001
 	$(MAKE) -C video/mc6847 TARGET=pc6001
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(TARGET_DIRECTORY)/pc6001/pc6001.lst
