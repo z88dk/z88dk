@@ -194,7 +194,7 @@ int phc25_exec(char *target)
     fprintf(fpout, "%c&H%04X%c", TOK_EXEC, (int)org, 0); 
     i = 0;
     while ( ( c = fgetc(fpin)) != EOF ) {
-        if ( i < 0x1f ) {       // Magic number
+        if ( i < 0x15 ) {       // Magic number
             fputc(c,fpout);
         } else if ( c == 0xff ) {
             fputc(c,fpout);

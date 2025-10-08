@@ -21,6 +21,8 @@
     PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
+    EXTERN      asm_im1_handler
+
 
     defc    CRT_ORG_CODE  = $c009	 ; RAM
 
@@ -33,10 +35,9 @@
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
-IFNDEF TAR__register_sp
-    defc	TAR__register_sp = -1
-ENDIF
-    defc	__CPU_CLOCK = 3800000
+    defc    TAR__register_sp = 0xfdfd       ;Must be below interrupt table
+    defc    TAR__crt_enable_eidi = 2        ;Enable interrupts
+    defc	__CPU_CLOCK = 4000000
     INCLUDE	"crt/classic/crt_rules.inc"
 
 
@@ -61,22 +62,44 @@ copy_byte:
     jr      loop
 
 real_code:
-
-    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    di
     INCLUDE	"crt/classic/crt_init_sp.inc"
     call	crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
+
+IF (__crt_enable_eidi & 0x02)
+    ; Setup im2 since im1 is broken for our purposes
+    ld      de,$fe00        ;im table
+    ld      hl,$fdfd        ;jump address
+    ld      a,d
+    ld      i,a
+    ld      a,h
+imloop:
+    ld      (de),a
+    inc     e
+    jr      nz,imloop
+    inc     d
+    ld      (de),a
+    ld      (hl),0xc3
+    inc     hl
+    ld      de,asm_im1_handler
+    ld      (hl),e
+    inc     l
+    ld      (hl),d
+    im      2
+ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main
 __Exit:
     call    crt0_exit
-    INCLUDE "crt/classic/crt_exit_eidi.inc"
-__restore_sp_onexit:
-    ld      sp,0
+
+    ; We've probably broken all the basic variables, just restart if we get here
+    rst 0
+    
 noop:
     ret
 
