@@ -228,7 +228,17 @@ int phc25_exec(char *target)
 
 static void write_header(FILE *fpout, char *name)
 {
-    fprintf(fpout, "%c%c%c%c%c%c%c%c%c%c%6s", 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5,name);
+    char buf[7];
+    char *ptr = zbasename(name);
+    int  i;
+
+    snprintf(buf,sizeof(buf),"%s",ptr);
+
+    for ( i = 0; i < 6; i++ ) {
+       if ( buf[i] == 0x00 ) buf[i] = 0x20;
+    }
+
+    fprintf(fpout, "%c%c%c%c%c%c%c%c%c%c%6s", 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, buf);
 }
 
 
