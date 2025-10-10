@@ -33,10 +33,6 @@ _bksave:
     ld      l, e
 
     call    pixeladdress
-    xor     7
-
-    ld      h, d
-    ld      l, e
 
     ld      (ix+2), h                   ; we save the current sprite position
     ld      (ix+3), l

@@ -61,11 +61,11 @@ hires_printc_1:
  no_32_bold:
     xor     c                           ;Handling inverse
 IF FORmc1000
-    ld      c, a
+    ld      b, a
     ex      af, af
     res     0, a
     out     ($80), a                    ;VRAM -> Z80
-    ld      (hl), c
+    ld      (hl), b
     set     0, a
     out     ($80), a                    ;VRAM -> Chip
     ex      af, af
