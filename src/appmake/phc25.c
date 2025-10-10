@@ -233,7 +233,7 @@ static void write_header(FILE *fpout, char *name)
     int  i;
 
     memset(buf,0,sizeof(buf));
-    snprintf(buf,sizeof(buf),"%s",ptr);
+    strncpy(buf,ptr,6);
 
     for ( i = 0; i < 6; i++ ) {
        if ( buf[i] == 0x00 ) buf[i] = 0x20;
