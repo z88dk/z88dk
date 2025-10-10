@@ -1,4 +1,4 @@
-IF FORphc25
+IF FORfc100
 
     SECTION code_driver
     PUBLIC  printc_MODE0
@@ -7,7 +7,7 @@ IF FORphc25
     PUBLIC  generic_console_set_attribute
     PUBLIC  generic_console_plotc
     PUBLIC  generic_console_pointxy
-    PUBLIC  __phc25_attr
+    PUBLIC  __fc100_attr
 
     EXTERN  __mc6847_MODE2_attr
     EXTERN  mc6847_map_colour
@@ -18,10 +18,10 @@ generic_console_set_attribute:
     ld      c, 0
     rlca
     rl      c
-    ld      a, (__phc25_attr)
+    ld      a, (__fc100_attr)
     and     254
     or      c
-    ld      (__phc25_attr), a
+    ld      (__fc100_attr), a
     ret
 
 generic_console_set_ink:
@@ -49,8 +49,9 @@ generic_console_set_paper:
 printc_MODE0:
     call    generic_console_text_xypos
     ld      (hl), d
-    set     3,h
-    ld      a,(__phc25_attr)
+    inc     h
+    inc     h
+    ld      a,(__fc100_attr)
     ld      (hl),a
     ret
 
@@ -62,16 +63,16 @@ printc_MODE0:
 generic_console_plotc:
     call    generic_console_text_xypos
     ld      c, a
-    ld      a, (__ink_colour)
-    rrca
-    rrca
+    ld      a, (__mc6847_MODE2_attr)           ;It's shifted for us
     and     @11000000
     or      c
     ld      (hl), a
-    set     3,h
+    inc     h
+    inc     h
     ld      a, (__ink_colour)
-    and     4                           ;Set the CSS flag as appropriate
-    or      @10000010                   ;Indicate graphics mode
+    rrca
+    and     2                           ;Set the CSS flag as appropriate
+    or      @01000000                   ;Indicate graphics mode
     ld      (hl), a
     ret
 
@@ -84,8 +85,9 @@ generic_console_plotc:
 generic_console_pointxy:
     call    generic_console_text_xypos
     ld      c, (hl)                     ;glyph
-    set     3,h
-    bit     1,(hl)
+    inc     h
+    inc     h
+    bit     6,(hl)
     ld      a, 0                        ;No graphics drawn
     ret     z                           ;Not a graphics character
     ld      a, c
@@ -95,7 +97,7 @@ generic_console_pointxy:
 
 SECTION data_driver
 
-__phc25_attr:
+__fc100_attr:
     defb    0x80            ;used to detect a character???
 
 __ink_colour:

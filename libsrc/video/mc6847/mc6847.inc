@@ -10,6 +10,13 @@ IF FORphc25
     defc    MC6847_HIRES_YRES = 192
 ENDIF
 
+IF FORfc100
+    INCLUDE "target/fc100/def/fc100.def"
+    defc    MC6847_HAS_HIRES = 0
+    defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MODE0_3x2 = 1
+ENDIF
+
 IF FORsv8000
     INCLUDE "target/sv8000/def/sv8000.def"
     defc    MODE0_1x1 = 1
