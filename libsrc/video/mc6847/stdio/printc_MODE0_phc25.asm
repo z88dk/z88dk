@@ -69,7 +69,7 @@ generic_console_plotc:
     set     3,h
     ld      a, (__ink_colour)
     and     4                           ;Set the CSS flag as appropriate
-    ld a,      @10000010                   ;Indicate graphics mode
+    or      @10000010                   ;Indicate graphics mode
     ld      (hl), a
     ret
 

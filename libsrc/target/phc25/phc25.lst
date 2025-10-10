@@ -1,3 +1,7 @@
+
+# We have special clg behaviour for mode 0
+target/phc25/graphics/clg
+
 @video/mc6847/mc6847.lst
 target/phc25/stdio/fgetc_cons
 target/phc25/stdio/getk

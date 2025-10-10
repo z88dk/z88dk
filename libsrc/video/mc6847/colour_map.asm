@@ -26,7 +26,7 @@ mc6847_map_colour:
 
 
 table:
-; Bit 7 = bit 2
+; Bit 7 = copy of bit 2
 ; Graphics 3x2 + colour = @11 + attribute bit in 7
     defb    @00000000                   ;BLACK -> GREEN
     defb    @00000010                   ;BLUE -> BLUE

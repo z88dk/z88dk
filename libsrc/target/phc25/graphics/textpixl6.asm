@@ -8,7 +8,6 @@
 ;       32 16
 ;        8  4
 ;        2  1
-; If pixel > 32 then  191 - value
 
 textpixl:
 ;
