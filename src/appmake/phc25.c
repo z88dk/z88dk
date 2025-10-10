@@ -232,6 +232,7 @@ static void write_header(FILE *fpout, char *name)
     char *ptr = zbasename(name);
     int  i;
 
+    memset(buf,0,sizeof(buf));
     snprintf(buf,sizeof(buf),"%s",ptr);
 
     for ( i = 0; i < 6; i++ ) {
