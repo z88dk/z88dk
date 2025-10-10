@@ -9,6 +9,13 @@
 ; $Id: putsprite.asm,v 1.4 2016-07-02 09:01:36 dom Exp $
 ;
 
+
+    INCLUDE "video/mc6847/mc6847.inc"
+
+
+IFNDEF MC6847_IOSPACE
+
+
     SECTION smc_clib
     PUBLIC  putsprite
     PUBLIC  _putsprite
@@ -57,6 +64,7 @@ _putsprite:
     ex      de,hl
 
     call    pixeladdress
+    xor     7
     and     7
     ld      de,hl
 
@@ -168,6 +176,7 @@ wsmc2:
     cp      1
     jr      z, wover_1
     djnz    wiloop
+    pop     de
     pop     hl                          ;Restore address
     ld      bc, 32                      ;Go to next line
     add     hl, bc
@@ -192,3 +201,5 @@ wover_1:
     SECTION rodata_clib
 offsets_table:
     defb    128, 64, 32, 16, 8, 4, 2, 1
+
+ENDIF
