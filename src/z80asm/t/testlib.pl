@@ -304,7 +304,7 @@ sub dwords { return pack("V*", @_); }
 sub unlink_testfiles {
 	my(@additional) = @_;
     unlink(<${test}*>, @additional) 
-        if !$ENV{DEBUG} && Test::More->builder->is_passing;
+        if Test::More->builder->is_passing;
 }
 
 # return object file binary representation
