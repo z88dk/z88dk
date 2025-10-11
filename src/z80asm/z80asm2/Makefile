@@ -21,7 +21,6 @@ endif
 
 PROJ = z88dk-z80asm
 
-
 CXX = g++
 CXXFLAGS = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror -O3
 
