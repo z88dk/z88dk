@@ -20,16 +20,23 @@ _l_setjmp:
    
    ; hl = jmp_buf *env
    ; bc = return address
-
+IFDEF __SDCC_IX
    push ix
+ELSE
+   push iy
+ENDIF
    pop de
    
    ld (hl),e
    inc hl
    ld (hl),d
    inc hl
-   
+
+IFDEF __SDCC_IX
    push iy
+ELSE
+   push ix
+ENDIF
    pop de
    
    ld (hl),e
@@ -52,5 +59,10 @@ _l_setjmp:
    ld (hl),c
    inc hl
    ld (hl),b
-   
-   jp error_znc
+   ld hl,0	;Have to return 0
+IF __CPU_GBZ80__
+   ld d,h
+   ld e,l
+ENDIF
+   and a
+   ret

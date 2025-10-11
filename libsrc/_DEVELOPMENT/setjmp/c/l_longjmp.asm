@@ -6,13 +6,13 @@
 SECTION code_clib
 SECTION code_setjmp
 
-PUBLIC l_longjmp
+PUBLIC _l_longjmp
 
-l_longjmp:
+_l_longjmp:
 
    pop de
-   pop bc
    pop hl
+   pop bc
 
    ; bc = val
    ; hl = jmp_buf *
@@ -27,9 +27,32 @@ val_ok:
 
    ld e,(hl)
    inc hl
-   ld d,(hl)                   ; de = sp
+   ld d,(hl)                   ; de = ix
    inc hl
    
+   push de
+IFDEF __SDCC_IX
+   pop ix
+ELSE
+   pop iy
+ENDIF
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   
+   push de
+IFDEF __SDCC_IX
+   pop iy
+ELSE
+   pop ix
+ENDIF
+
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = sp
+   inc hl
+
    ld a,(hl)
    inc hl
    ld h,(hl)
