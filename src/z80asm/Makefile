@@ -203,6 +203,10 @@ endif
 # re2c
 $(eval $(call MAKE_RE2C,src/cpp/scan2))
 
+
+all: 
+	$(MAKE) -C z80asm2
+
 #------------------------------------------------------------------------------
 # test
 #------------------------------------------------------------------------------
@@ -210,6 +214,7 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 test: $(TARGET_EXE) $(TARGET_LIB)
 	$(MAKE) -C dev/z80asm_lib test
 	perl -S prove --state=slow,save -j$(TASKS) t/*.t
+	$(MAKE) -C z80ams2 test
 
 testzcc : $(TARGET_EXE)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
@@ -246,13 +251,12 @@ clean::
 	$(RM) -r $(TARGET_EXE) test*.dir
 	$(RM) $(TARGET_EXE) test*
 	$(RM) t/*.tmp t/dev/*.tmp
+	$(RM) $(DEPENDS)
+	$(MAKE) -C z80asm2 clean
 
 #------------------------------------------------------------------------------
 # Dependencies
 #------------------------------------------------------------------------------
-clean::
-	$(RM) $(DEPENDS)
-
 -include $(DEPENDS)
 
 #------------------------------------------------------------------------------
@@ -284,3 +288,4 @@ retest: rebuild
 	$(MAKE) -C ../common test
 	$(MAKE) -C ../z80asm test
 	$(MAKE) -C ../zobjcopy test
+
