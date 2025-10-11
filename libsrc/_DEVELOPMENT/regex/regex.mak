@@ -1,6 +1,6 @@
 
-REGEX_CFILES :=  $(notdir $(wildcard _DEVELOPMENT/regex/*.c))
-REGEX_AFILES :=  $(notdir $(wildcard _DEVELOPMENT/regex/*.asm))
+REGEX_CFILES :=  $(patsubst %,cimpl/%,$(notdir $(wildcard _DEVELOPMENT/regex/cimpl/*.c)))
+REGEX_AFILES :=  
 
 REGEX_OBJECTS := $(REGEX_CFILES:.c=.o) $(REGEX_AFILES:.asm=.o)
 
