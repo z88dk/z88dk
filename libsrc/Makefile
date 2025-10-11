@@ -203,7 +203,7 @@ include interrupts/im2/im2.mak
 include interrupts/nmi/nmi.mak
 include classic/lib3d/lib3d.mak
 include _DEVELOPMENT/libgen/libgen.mak
-include math/fix16/fix16.mak
+include _DEVELOPMENT/math/fix16/fix16.mak
 include rect/rect.mak
 include _DEVELOPMENT/regex/regex.mak
 include sdcard/sdcard.mak

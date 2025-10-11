@@ -32,6 +32,6 @@ _DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @arch/z80/z80.lst
 @interrupts/interrupts.lst
 @time/time.lst
-@math/fix16/fix16.lst
+_DEVELOPMENT/math/fix16/obj/${TYPE}/**/*.o
 @z80_crt0s/crt0.lst
 
