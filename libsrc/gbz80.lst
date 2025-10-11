@@ -7,7 +7,6 @@ _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 @libgen/libgen.lst
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
-@classic/string/string.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
 @regex/regex.lst
 @time/time.lst
