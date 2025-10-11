@@ -184,7 +184,7 @@ include compress/zx0/zx0.mak
 include compress/zx1/zx1.mak
 include compress/zx2/zx2.mak
 include compress/zx7/zx7.mak
-include ctype/ctype.mak
+include _DEVELOPMENT/ctype/ctype.mak
 include debug/debug.mak
 include font/font_4x8/font_4x8.mak
 include font/font_8x8/font_8x8.mak

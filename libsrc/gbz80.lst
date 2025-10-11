@@ -1,7 +1,7 @@
 @alloc/alloc_gbz80.lst
 @compress/aplib/compress_aplib.lst
 @compress/zx7/zx7.lst
-@ctype/ctype.lst
+_DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 @font/font.lst
 @classic/lib3d/lib3d.lst
 @libgen/libgen.lst

@@ -1,4 +1,4 @@
-@ctype/ctype.lst
+_DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 @font/font.lst
 @classic/lib3d/lib3d.lst
 @libgen/libgen.lst
