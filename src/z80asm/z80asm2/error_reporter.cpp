@@ -6,8 +6,8 @@
 
 #include "error_reporter.h"
 
-Location::Location(const std::string& filename_, int line_num_)
-    : filename(filename_), line_num(line_num_) {
+Location::Location(const std::string& filename, int line_num)
+    : filename_(filename), line_num_(line_num) {
 }
 
 #define X(code, msg) msg,
@@ -42,20 +42,26 @@ int ErrorReporter::error_count() const {
     return error_count_;
 }
 
+bool ErrorReporter::has_error() const
+{
+    return error_count_ > 0;
+}
+
 void ErrorReporter::print_message(const std::string& prefix,
                                   const std::string& message) {
     std::cerr << prefix << ": " << message << std::endl;
 }
 
 void ErrorReporter::print_message(const Location& loc,
-                                  const std::string& prefix, const std::string& message) {
-    std::cerr << loc.filename << ":" << loc.line_num << ": " << prefix << ": " <<
-              message << std::endl;
-    if (!loc.source_line.empty()) {
-        std::cerr << "   |" << loc.source_line << std::endl;
+                                  const std::string& prefix,
+    const std::string& message) {
+    std::cerr << loc.filename() << ":" << loc.line_num() << ": "
+        << prefix << ": " << message << std::endl;
+    if (!loc.source_line().empty()) {
+        std::cerr << "   |" << loc.source_line() << std::endl;
     }
-    if (!loc.expanded_line.empty()) {
-        std::cerr << "   |" << loc.expanded_line << std::endl;
+    if (!loc.expanded_line().empty()) {
+        std::cerr << "   |" << loc.expanded_line() << std::endl;
     }
 }
 
