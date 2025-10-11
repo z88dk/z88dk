@@ -214,7 +214,7 @@ all:
 test: $(TARGET_EXE) $(TARGET_LIB)
 	$(MAKE) -C dev/z80asm_lib test
 	perl -S prove --state=slow,save -j$(TASKS) t/*.t
-	$(MAKE) -C z80ams2 test
+	$(MAKE) -C z80asm2 test
 
 testzcc : $(TARGET_EXE)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c

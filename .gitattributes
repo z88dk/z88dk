@@ -7,6 +7,7 @@
 *.def   text eol=lf
 *.h     text eol=lf
 *.hh    text eol=lf
+*.hpp   text eol=lf
 *.in    text eol=lf
 *.l     text eol=lf
 *.lst   text eol=lf
