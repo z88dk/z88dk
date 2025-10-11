@@ -199,7 +199,7 @@ include interrupts/common/common.mak
 include interrupts/im1/im1.mak
 include interrupts/im2/im2.mak
 include interrupts/nmi/nmi.mak
-include lib3d/lib3d.mak
+include classic/lib3d/lib3d.mak
 include libgen/libgen.mak
 include math/fix16/fix16.mak
 include rect/rect.mak
