@@ -10,7 +10,7 @@ _DEVELOPMENT/libgen/obj/${TYPE}/**/*.o
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
-@regex/regex.lst
+_DEVELOPMENT/regex/obj/${TYPE}/**/*.o
 @time/time.lst
 @z80_crt0s/crt0.lst
 

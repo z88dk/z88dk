@@ -9,7 +9,7 @@ _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @alloc/alloc.lst
 @classic/string/string.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
-@regex/regex.lst
+_DEVELOPMENT/regex/obj/${TYPE}/**/*.o
 stdio/obj/${TYPE}/ansi/ansifont_f3
 stdio/obj/${TYPE}/ansi/ansifont_f4
 stdio/obj/${TYPE}/ansi/ansifont_f4pack

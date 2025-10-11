@@ -205,7 +205,7 @@ include classic/lib3d/lib3d.mak
 include _DEVELOPMENT/libgen/libgen.mak
 include math/fix16/fix16.mak
 include rect/rect.mak
-include regex/regex.mak
+include _DEVELOPMENT/regex/regex.mak
 include sdcard/sdcard.mak
 include _DEVELOPMENT/setjmp/setjmp.mak
 include classic/string/string.mak
