@@ -25,20 +25,21 @@ generic_console_set_attribute:
     ret
 
 generic_console_set_ink:
+    call    mc6847_map_colour
+    ld      a, b
+    and     7
+    ld      (__ink_colour), a
     ld      b,a
     rrca
     rrca
     and     @11000000
     ld      (__mc6847_MODE2_attr), a
-    ld      a,b
-    call    mc6847_map_colour
-    ld      a, b
-    and     7
-    ld      (__ink_colour), a
     ret
 
 
 generic_console_set_paper:
+    call    mc6847_map_colour
+    ld      a, b
     rrca
     rrca
     and     @11000000
