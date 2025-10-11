@@ -57,8 +57,8 @@ TEST_CASE("ErrorReporter prints warning", "[ErrorReporter]") {
 TEST_CASE("ErrorReporter prints with Location", "[ErrorReporter]") {
     ErrorReporter er;
     Location loc("foo.asm", 42);
-    loc.source_line = "LD A, 42";
-    loc.expanded_line = "LD A,42";
+    loc.set_source_line("LD A, 42");
+    loc.set_expanded_line("LD A,42");
     CerrRedirect redirect;
     er.error(loc, ErrorCode::InvalidSyntax, "bad token");
     std::string output = redirect.str();
