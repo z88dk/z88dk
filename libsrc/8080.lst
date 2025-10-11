@@ -6,7 +6,7 @@
 @font/font.lst
 @classic/lib3d/lib3d.lst
 @libgen/libgen.lst
-@setjmp/setjmp.lst
+_DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
 @strings/string.lst
 @regex/regex.lst

@@ -2,7 +2,7 @@
 @font/font.lst
 @classic/lib3d/lib3d.lst
 @libgen/libgen.lst
-@setjmp/setjmp.lst
+_DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
 
 ; Include alloc before strings so we get the malloc version of strdup, not the 

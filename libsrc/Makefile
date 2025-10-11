@@ -205,7 +205,7 @@ include math/fix16/fix16.mak
 include rect/rect.mak
 include regex/regex.mak
 include sdcard/sdcard.mak
-include setjmp/setjmp.mak
+include _DEVELOPMENT/setjmp/setjmp.mak
 include strings/strings.mak
 include stdio/stdio.mak
 include stdlib/stdlib.mak

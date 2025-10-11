@@ -6,10 +6,12 @@
 SECTION code_clib
 SECTION code_setjmp
 
+PUBLIC l_setjmp
 PUBLIC _l_setjmp
 
 EXTERN error_znc
 
+l_setjmp:
 _l_setjmp:
 
    pop bc
@@ -17,14 +19,15 @@ _l_setjmp:
    
    push hl
    push bc
-   
+
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ 
    ; hl = jmp_buf *env
    ; bc = return address
-IFDEF __SDCC_IX
+ IFDEF __SDCC_IX
    push ix
-ELSE
+ ELSE
    push iy
-ENDIF
+ ENDIF
    pop de
    
    ld (hl),e
@@ -32,31 +35,46 @@ ENDIF
    ld (hl),d
    inc hl
 
-IFDEF __SDCC_IX
+ IFDEF __SDCC_IX
    push iy
-ELSE
+ ELSE
    push ix
-ENDIF
+ ENDIF
    pop de
    
    ld (hl),e
    inc hl
    ld (hl),d
+ELSE
    inc hl
-   
+   inc hl
+   inc hl
+ENDIF
+   inc hl
+
+IF __CPU_GBZ80__
+   ld a,l
+   ld l,e
+   ld e,a
+   ld a,h
+   ld h,d
+   ld d,a
+   ld  hl,sp+2
+ELSE
    ex de,hl
    
    ld hl,2
    add hl,sp
+ENDIF
    
    ex de,hl
    
-   ld (hl),e
+   ld (hl),e        ;SP
    inc hl
    ld (hl),d
    inc hl
 
-   ld (hl),c
+   ld (hl),c        ;PC
    inc hl
    ld (hl),b
    ld hl,0	;Have to return 0

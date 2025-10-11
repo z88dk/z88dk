@@ -6,8 +6,10 @@
 SECTION code_clib
 SECTION code_setjmp
 
+PUBLIC l_longjmp
 PUBLIC _l_longjmp
 
+l_longjmp:
 _l_longjmp:
 
    pop de
@@ -24,6 +26,7 @@ _l_longjmp:
    inc c                       ; not allowed to return 0
 
 val_ok:
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
    ld e,(hl)
    inc hl
@@ -31,21 +34,27 @@ val_ok:
    inc hl
    
    push de
-IFDEF __SDCC_IX
+ IFDEF __SDCC_IX
    pop ix
-ELSE
+ ELSE
    pop iy
-ENDIF
+ ENDIF
    ld e,(hl)
    inc hl
    ld d,(hl)
    inc hl
    
    push de
-IFDEF __SDCC_IX
+ IFDEF __SDCC_IX
    pop iy
-ELSE
+ ELSE
    pop ix
+ ENDIF
+ELSE
+   inc hl
+   inc hl
+   inc hl
+   inc hl
 ENDIF
 
    ld e,(hl)
