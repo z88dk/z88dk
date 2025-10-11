@@ -8,7 +8,8 @@ _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 @libgen/libgen.lst
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
-@strings/string.lst
+@classic/string/string.lst
+_DEVELOPMENT/string/obj/${TYPE}/**/*.o
 @regex/regex.lst
 @interrupts/interrupts_8080.lst
 @time/time.lst

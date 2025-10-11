@@ -5,7 +5,8 @@ _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
 @alloc/alloc.lst
-@strings/string.lst
+@classic/string/string.lst
+_DEVELOPMENT/string/obj/${TYPE}/**/*.o
 @regex/regex.lst
 stdio/obj/${TYPE}/ansi/ansifont_f3
 stdio/obj/${TYPE}/ansi/ansifont_f4
