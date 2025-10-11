@@ -162,9 +162,3 @@ sub norm_filenames {
 	}
 	return @files;
 }
-
-sub show_diff {
-	if ($ENV{DEBUG}) {
-		system "/c/bin/WinMergePortable/WinMergePortable.exe @_";
-	}
-}
