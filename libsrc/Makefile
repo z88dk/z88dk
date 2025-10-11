@@ -176,10 +176,10 @@ include classic/adt/queue/queue.mak
 include classic/adt/stack/stack.mak
 include _DEVELOPMENT/adt/adt.mak
 include classic/algorithm/AStarSearch/astar.mak
-include alloc/balloc/balloc.mak
+include _DEVELOPMENT/alloc/balloc/balloc.mak
 include alloc/farmalloc/farmalloc.mak
 include alloc/malloc-classic/malloc.mak
-include alloc/obstack/obstack.mak
+include _DEVELOPMENT/alloc/obstack/obstack.mak
 include arch/z80/z80.mak
 include _DEVELOPMENT/compress/aplib/aplib.mak
 include _DEVELOPMENT/compress/zx0/zx0.mak

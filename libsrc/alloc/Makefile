@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = balloc obstack malloc-classic farmalloc
+SUBDIRS = malloc-classic farmalloc
 
 all: subdirs-all
 
