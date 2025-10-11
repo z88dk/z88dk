@@ -4,7 +4,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(DEFINE)
-X(INCLUDE)
-X(LINE)
-X(UNDEF)
+X(AF, "AF")
+X(AF_, "AF'")
+X(DEFINE, "DEFINE")
+X(INCLUDE, "INCLUDE")
+X(LINE, "LINE")
+X(UNDEF, "UNDEF")
