@@ -27,6 +27,7 @@
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
+IFNDEF FORphc20
 
 putsprite:
 _putsprite:
@@ -234,3 +235,5 @@ offsets_table:
     SECTION bss_clib
 actcoord:
     defw    0
+
+ENDIF

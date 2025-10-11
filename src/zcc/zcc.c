@@ -138,6 +138,7 @@ static void cmd_free_tokens(struct tokens_list_s* tokens);
 
 static void            SetNumber(arg_t *argument, char *arg);
 static void            SetStringConfig(arg_t *argument, char *arg);
+static void            EmitWarning(arg_t *argument, char *arg);
 static void            LoadConfigFile(arg_t *argument, char *arg);
 static void            parse_cmdline_arg(char *arg);
 static void            AddPreProc(option *arg, char *);
@@ -470,6 +471,7 @@ static arg_t  config[] = {
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
     { "INCLUDE", 0, LoadConfigFile, NULL, NULL, "Load a configuration file"},
+    { "WARNING", 0, EmitWarning, NULL, NULL, "" },
     { "", 0, NULL, NULL }
 };
 
@@ -2427,6 +2429,12 @@ static char *expand_macros(char *arg)
 
     return nval;
 }
+
+void EmitWarning(arg_t *argument, char *arg)
+{
+    fprintf(stderr, "WARNING: %s\n", arg);
+}
+
 
 void SetStringConfig(arg_t *argument, char *arg)
 {

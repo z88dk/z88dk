@@ -3,16 +3,37 @@
 
 
 IF FORphc25
-    defc    MC6847_HAS_HIRES = 1
-    defc    MC6847_HAS_TEXT_GFX = 1
     INCLUDE "target/phc25/def/phc25.def"
+    defc    MC6847_HAS_HIRES = 1
+    defc    MC6847_HAS_CG = 1
+    defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MODE0_3x2 = 1
     defc    MC6847_HIRES_YRES = 192
+ENDIF
+
+
+IF FORphc20
+    INCLUDE "target/phc25/def/phc25.def"
+    defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MODE0_1x1 = 1
+    defc    MC6847_HIRES_YRES = 0
+    defc    MC6847_NO_IOCTL = 1
+ENDIF
+
+IF FORfc100
+    INCLUDE "target/fc100/def/fc100.def"
+    defc    MC6847_HAS_HIRES = 0
+    defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MODE0_3x2 = 1
+    defc    MC6847_HIRES_YRES = 0
+    defc    MC6847_NO_IOCTL = 1 
 ENDIF
 
 IF FORsv8000
     INCLUDE "target/sv8000/def/sv8000.def"
     defc    MODE0_1x1 = 1
     defc    MC6847_HAS_HIRES = 1
+    defc    MC6847_HAS_CG = 1
     defc    MC6847_HAS_TEXT_GFX = 1
     defc    MC6847_HIRES_YRES = 96
 ENDIF
@@ -26,6 +47,7 @@ ENDIF
 IF FORvz
     INCLUDE "target/vz/def/vz.def"
     defc    MC6847_HAS_TEXT_GFX = 1
+    defc    MC6847_HAS_CG = 1
     defc    MC6847_HIRES_YRES = 64
 ENDIF
 
@@ -34,6 +56,7 @@ IF FORpc6001
     INCLUDE "target/pc6001/def/pc6001.def"
     defc    MODE0_3x2 = 1
     defc    MC6847_HAS_HIRES = 1
+    defc    MC6847_HAS_CG = 1
     defc    MC6847_HAS_TEXT_GFX = 1
     defc    MC6847_HIRES_YRES = 192
 ENDIF
@@ -43,6 +66,7 @@ IF FORspc1000
     defc DISPLAY = 0
     defc MC6847_IOSPACE = 1
     defc    MC6847_HAS_HIRES = 1
+    defc    MC6847_HAS_CG = 1
     defc    MC6847_HAS_TEXT_GFX = 1
     defc    MODE0_3x2 = 1
     defc    MC6847_HIRES_YRES = 192
@@ -65,6 +89,7 @@ MACRO GETSCREENADDRESS
         ld      hl,DISPLAY
     ENDIF
 ENDM
+
 
 
 

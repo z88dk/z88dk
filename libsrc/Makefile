@@ -98,6 +98,8 @@ TOCREATE += $(call check_target,pc6001,pc6001_clib.lib)
 TOCREATE += $(call check_target,pc88,pc88_clib.lib)
 TOCREATE += $(call check_target,pcw,pcw.lib $(CPMLIBS))
 TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
+TOCREATE += $(call check_target,phc20,phc20_clib.lib)
+TOCREATE += $(call check_target,phc25,phc25_clib.lib)
 TOCREATE += $(call check_target,pk8000,pk8000_clib.lib)
 TOCREATE += $(call check_target,pmd85,pmd85_clib.lib)
 TOCREATE += $(call check_target,pps,pps_clib.lib)
@@ -426,7 +428,7 @@ pc6001_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
-	$(call buildgeneric,pc6001)
+	$(call buildgeneric,pc6001,"narrow portable")
 	$(MAKE) -C games TARGET=pc6001
 	$(MAKE) -C video/mc6847 TARGET=pc6001
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(TARGET_DIRECTORY)/pc6001/pc6001.lst
@@ -1235,13 +1237,22 @@ mc1000_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C video/mc6847 TARGET=mc1000
 	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(TARGET_DIRECTORY)/mc1000/mc1000.lst
 
+# PHC-20 library 
+phc20_clib.lib: $(TARGET_CLIB_OBJS)
+	@echo ''
+	@echo '--- Building Sanyo PHC-20 Library ---'
+	@echo ''
+	$(call buildgeneric,phc20)
+	$(MAKE) -C video/mc6847 TARGET=phc20
+	TARGET=phc20 TYPE=z80 $(LIBLINKER) -DFORphc20 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc20_clib @$(TARGET_DIRECTORY)/phc20/phc20.lst
+
 # PHC-25 library 
 phc25_clib.lib: $(TARGET_CLIB_OBJS)
 	@echo ''
 	@echo '--- Building Sanyo PHC-25 Library ---'
 	@echo ''
 	$(call buildgeneric,phc25)
-	$(MAKE) -C games TARGET=mc1000
+	$(MAKE) -C games TARGET=phc25
 	$(MAKE) -C video/mc6847 TARGET=phc25
 	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
 

@@ -58,6 +58,23 @@ IF FORpc6001
     defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORphc25
+    DEFINE gotgfx
+    defc maxx    = 256
+    defc maxy    = 192
+    defc blankch    = 32
+    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
+    defc    WANT_swapgfxbk = 0
+ENDIF
+
+IF FORphc20
+    DEFINE gotgfx
+    defc maxx    = 32        ;Text graphics settings
+    defc maxy    = 16 
+    defc blankch    = 32
+    defc    WANT_swapgfxbk = 0
+ENDIF
+
 IF FORpc88
     DEFINE gotgfx
     defc maxx    = 640

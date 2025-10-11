@@ -9,6 +9,13 @@
 ; $Id: putsprite.asm,v 1.4 2016-07-02 09:01:36 dom Exp $
 ;
 
+
+    INCLUDE "video/mc6847/mc6847.inc"
+
+
+IFNDEF MC6847_IOSPACE
+
+
     SECTION smc_clib
     PUBLIC  putsprite
     PUBLIC  _putsprite
@@ -54,11 +61,13 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-    ld      h, d
-    ld      l, e
+    ex      de,hl
 
     call    pixeladdress
     xor     7
+    and     7
+    ld      de,hl
+
     ld      hl, offsets_table
     ld      c, a
     ld      b, 0
@@ -67,8 +76,7 @@ _putsprite:
     ld      (wsmc1+1), a
     ld      (wsmc2+1), a
     ld      (_smc1+1), a
-    ld      h, d
-    ld      l, e
+    ex      de,hl
 
 IF FORmc1000
     ld      a,(__mc6847_modeval)
@@ -113,7 +121,6 @@ ENDIF
     ld      a, e
 _noplot:
     rrca
-    rrca
     jr      nc, _notedge                ;Test if edge of byte reached
     inc     hl                          ;Go to next byte
 _notedge:
@@ -134,10 +141,8 @@ woloop:
     push    bc                          ;Save # of rows
     push    hl                          ;Save screen address
     ld      b, d                        ;Load width
-    push    de
     ld      c, (ix+2)                   ;Load one line of image
     inc     ix
-    ld      d, 2
 wsmc1:
     ld      a, 1
 wiloop:
@@ -164,17 +169,12 @@ ENDIF
     ld      a, e
 wnoplot:
     rrca
-    rrca
     jr      nc, wnotedge                ;Test if edge of byte reached
     inc     hl                          ;Go to next byte
 wnotedge:
 wsmc2:
     cp      1
-    jr      nz, nowover_1
-    dec     d
     jr      z, wover_1
-nowover_1:
-
     djnz    wiloop
     pop     de
     pop     hl                          ;Restore address
@@ -201,3 +201,5 @@ wover_1:
     SECTION rodata_clib
 offsets_table:
     defb    128, 64, 32, 16, 8, 4, 2, 1
+
+ENDIF

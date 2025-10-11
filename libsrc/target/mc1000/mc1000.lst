@@ -9,7 +9,6 @@ target/mc1000/stdio/ansi/f_ansi_char
 @stdio/stdio.lst
 target/mc1000/graphics/clg
 target/mc1000/graphics/dfill
-target/mc1000/graphics/putsprite
 target/mc1000/graphics/bksave
 target/mc1000/graphics/bkrestore
 target/mc1000/graphics/swapgfxbk

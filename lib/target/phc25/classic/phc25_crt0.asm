@@ -21,8 +21,10 @@
     PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
+    EXTERN      asm_im1_handler
 
-    defc    CRT_ORG_CODE  = $c500	 ; RAM
+
+    defc    CRT_ORG_CODE  = $c009	 ; RAM
 
     defc    CONSOLE_COLUMNS = 32
     defc    CONSOLE_ROWS = 16
@@ -31,34 +33,73 @@
     defc    ansicolumns = 32
 
     defc    TAR__fputc_cons_generic = 1
-    defc	TAR__no_ansifont = 1
-    defc    TAR__clib_exit_stack_size = 32
-IFNDEF TAR__register_sp
-    defc	TAR__register_sp = -1
-ENDIF
-    defc	__CPU_CLOCK = 3800000
+    defc    TAR__no_ansifont = 1
+    defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__register_sp = 0xfdfd       ;Must be below interrupt table
+    defc    TAR__crt_enable_eidi = 2        ;Enable interrupts
+    defc	__CPU_CLOCK = 4000000
     INCLUDE	"crt/classic/crt_rules.inc"
 
 
     org     CRT_ORG_CODE
-start:
 
-    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    ; Undo the silly escaping we had to do in appmake
+start:
+    ld      hl,real_code
+    ld      de,real_code
+loop:
+    ld      a,(hl)
+    inc     hl
+    and     a
+    jr      z,real_code
+    cp      0xff
+    jr      nz,copy_byte
+    ld      a,(hl)
+    inc     hl
+copy_byte:
+    ld      (de),a
+    inc     de
+    jr      loop
+
+real_code:
+    di
     INCLUDE	"crt/classic/crt_init_sp.inc"
     call	crt0_init
     INCLUDE	"crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
+
+IF (__crt_enable_eidi & 0x02)
+    ; Setup im2 since im1 is broken for our purposes
+    ld      de,$fe00        ;im table
+    ld      hl,$fdfd        ;jump address
+    ld      a,d
+    ld      i,a
+    ld      a,h
+imloop:
+    ld      (de),a
+    inc     e
+    jr      nz,imloop
+    inc     d
+    ld      (de),a
+    ld      (hl),0xc3
+    inc     hl
+    ld      de,asm_im1_handler
+    ld      (hl),e
+    inc     l
+    ld      (hl),d
+    im      2
+ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main
 __Exit:
     call    crt0_exit
-    INCLUDE "crt/classic/crt_exit_eidi.inc"
-__restore_sp_onexit:
-    ld      sp,0
-    ;ei
+
+    ; We've probably broken all the basic variables, just restart if we get here
+    rst 0
+    
 noop:
     ret
 
@@ -69,118 +110,6 @@ l_dcal:
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     INCLUDE	"crt/classic/crt_section.inc"
 
-
-    SECTION bootstrap
-    org     $c400
-
-
-
-    di
-    ; ld      a,'*'
-    ; call    printc
-    ; call    4863h ; 454eh
-    ; ld      a,'/'
-    ; call    printc
-    ; call    4775h ; 445fh
-    ; ld      a,'+'
-    ; call    printc
-    ; call    44deh ; 41d4h
-
-    ld      hl,play
-    call    prints
-    call    read_header_byte
-
-
-    call    read_byte
-    ld      h,a
-    add     a,c
-    ld      c,a
-    call    read_byte
-    ld      l,a
-    add     c
-    ld      c,a
-    call    read_byte
-    add     c
-    jr      nz,cksum_error
-    push    hl      ;Save entry point
-
-read_block:
-    call    read_header_byte
-    call    read_byte
-    and     a
-    jr      z,block_finished
-    ld      b,a
-    add     a,c
-    ld      c,a
-read_block_bytes:
-    call    read_byte
-    ld      (hl),a
-    inc     hl
-    add     c
-    ld      c,a
-    djnz    read_block_bytes
-    call    read_byte
-    add     c
-    jr      nz,cksum_error
-    jr      read_block
-
-block_finished:
-    call    read_byte
-    and     a
-    jr      nz,cksum_error
-
-    call 486ah; 4555h
-    pop     hl      ;Entry point
-    jp      (hl)
-
-
-
-read_header_byte:
-    call    read_byte
-    cp      $3a
-    jr      nz, read_header_byte
-    call    printc
-    ld      c,0
-    ret
-
-read_byte:
-    push    hl
-    push    bc
-    call 444bh ; 413eh
-    pop     bc
-    pop     hl
-    ret
-
-cksum_error:
-    ld      hl,cksum
-    call    prints
-    jr      cksum_error
-
-
-play:   defm    "Play Tape"
-        defb    0
-
-cksum:  defm    "Chekcsum error"
-        defb    0
-
-prints:
-    ld      a,(hl)
-    and     a
-    ret     z
-    call    printc
-    inc     hl
-    jr      prints
-
-printc:
-    push    hl
-    ld      hl,(vrampos)
-    ld      (hl),a
-    inc     hl
-    ld      (vrampos),hl
-    pop     hl
-    ret
-
-vrampos:    defw    $6080
 
 
     INCLUDE  "crt/classic/mc6847/mc6847_mode_disable.inc"

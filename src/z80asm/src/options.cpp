@@ -545,8 +545,9 @@ void Options::expand_list_glob(const string& pattern_) {
 // run m4 if file is .asm.m4
 bool Options::search_source(const string& filename, string& out_filename) {
     if (str_ends_with(filename, EXT_M4)) {                                     		// file.asm.m4
-        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));	// file.asm
-        string m4_cmd = "m4 " + m4_options + " \"" + filename + "\" > \"" + asm_filename + "\"";
+        string m4_full_path = search_include_path(filename);
+        string asm_filename = m4_full_path.substr(0, m4_full_path.size() - strlen(EXT_M4));	// file.asm
+        string m4_cmd = "m4 " + m4_options + " \"" + m4_full_path + "\" > \"" + asm_filename + "\"";
         if (verbose)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {

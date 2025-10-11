@@ -1,0 +1,16 @@
+; Goldstar Famicom 100
+
+
+; VARAM starts here
+defc DISPLAY = 0xc000
+;
+; Attributes are 0xc200
+;
+; Inverse = bit 0
+; CSS = bit 1 (guess)
+; AS = bit 6
+
+
+defc PSG_AY_ADDRESS_W = 0x23
+defc PSG_AY_DATA_W = 0x21
+defc PSG_AY_DATA_R = 0x22
