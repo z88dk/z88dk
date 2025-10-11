@@ -1,17 +1,17 @@
 STRING_GLOBS := "$(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/string/z80/*.asm"
 STRING_GLOBS_ex := $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/string/z80/*.asm
 
-STRING_TARGETS := _DEVELOPMENT/string/obj/newlib-z80-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-z80n-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-r2ka-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-ixiy-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-8080-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-8085-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-gbz80-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-ez80_z80-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-z180-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-r4k-_DEVELOPMENT-string \
-		_DEVELOPMENT/string/obj/newlib-kc160-_DEVELOPMENT-string
+STRING_TARGETS := _DEVELOPMENT/string/obj/newlib-z80-string \
+		_DEVELOPMENT/string/obj/newlib-z80n-string \
+		_DEVELOPMENT/string/obj/newlib-r2ka-string \
+		_DEVELOPMENT/string/obj/newlib-ixiy-string \
+		_DEVELOPMENT/string/obj/newlib-8080-string \
+		_DEVELOPMENT/string/obj/newlib-8085-string \
+		_DEVELOPMENT/string/obj/newlib-gbz80-string \
+		_DEVELOPMENT/string/obj/newlib-ez80_z80-string \
+		_DEVELOPMENT/string/obj/newlib-z180-string \
+		_DEVELOPMENT/string/obj/newlib-r4k-string \
+		_DEVELOPMENT/string/obj/newlib-kc160-string
 
 OBJS += $(STRING_TARGETS)
 CLEAN += string-clean

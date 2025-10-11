@@ -23,7 +23,7 @@ stdio/obj/${TYPE}/ansi/ansifont_f8
 @compress/zx1/compress_zx1.lst
 @compress/zx2/compress_zx2.lst
 @classic/adt/adt.lst
-@adt-newlib/adt.lst
+_DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @debug/debug.lst
 @rect/rect.lst
 @classic/algorithm/alg.lst

@@ -1,17 +1,17 @@
 CTYPE_GLOBS := "$(NEWLIB_DIRECTORY)/ctype/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/ctype/z80/*.asm"
 CTYPE_GLOBS_ex := $(NEWLIB_DIRECTORY)/ctype/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/ctype/z80/*.asm
 
-CTYPE_TARGETS := _DEVELOPMENT/ctype/obj/newlib-z80-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-z80n-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-r2ka-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-ixiy-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-8080-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-8085-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-gbz80-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-z180-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-r4k-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-kc160-_DEVELOPMENT-ctype \
-		_DEVELOPMENT/ctype/obj/newlib-ez80_z80-_DEVELOPMENT-ctype 
+CTYPE_TARGETS := _DEVELOPMENT/ctype/obj/newlib-z80-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-z80n-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-r2ka-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-ixiy-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-8080-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-8085-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-gbz80-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-z180-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-r4k-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-kc160-ctype \
+		_DEVELOPMENT/ctype/obj/newlib-ez80_z80-ctype 
 		
 
 OBJS += $(CTYPE_TARGETS)

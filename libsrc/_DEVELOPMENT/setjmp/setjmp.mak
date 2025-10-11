@@ -1,17 +1,17 @@
 SETJMP_GLOBS := "$(NEWLIB_DIRECTORY)/setjmp/c/*.asm" 
 SETJMP_GLOBS_ex := $(NEWLIB_DIRECTORY)/setjmp/c/*.asm
 
-SETJMP_TARGETS := _DEVELOPMENT/setjmp/obj/newlib-z80-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-z80n-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-r2ka-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-ixiy-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-8080-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-8085-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-gbz80-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-z180-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-r4k-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-kc160-_DEVELOPMENT-setjmp \
-		_DEVELOPMENT/setjmp/obj/newlib-ez80_z80-_DEVELOPMENT-setjmp 
+SETJMP_TARGETS := _DEVELOPMENT/setjmp/obj/newlib-z80-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-z80n-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-r2ka-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-ixiy-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-8080-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-8085-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-gbz80-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-z180-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-r4k-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-kc160-setjmp \
+		_DEVELOPMENT/setjmp/obj/newlib-ez80_z80-setjmp 
 		
 
 OBJS += $(SETJMP_TARGETS)
