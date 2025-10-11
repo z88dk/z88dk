@@ -4,7 +4,7 @@
 @stdio/stdio.lst
 target/shared/clock
 @target/zx/gfxspectrum.lst
-@font/fzx/fzx.lst
+_DEVELOPMENT/font/fzx/obj/${TYPE}/**/*.o
 
 
 target/zx/games/obj/${TARGET}/joystick

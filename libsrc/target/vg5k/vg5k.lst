@@ -16,7 +16,6 @@ target/vg5k/stdio/conio_map_colour
 target/vg5k/stdio/conio_vars
 @stdio/stdio.lst
 
-@font/font_8x10/font_8x10.lst
 @input/input_keyboard.lst
 target/vg5k/graphics/textpixl6
 target/vg5k/graphics/cleargraphics

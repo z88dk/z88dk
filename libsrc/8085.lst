@@ -3,7 +3,9 @@ _DEVELOPMENT/compress/aplib/obj/${TYPE}/**/*.o
 _DEVELOPMENT/compress/zx0/obj/${TYPE}/**/*.o
 _DEVELOPMENT/compress/zx1/obj/${TYPE}/**/*.o
 _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
-@font/font.lst
+_DEVELOPMENT/font/font_4x8/obj/${TYPE}/**/*.o
+_DEVELOPMENT/font/font_8x8/obj/${TYPE}/**/*.o
+_DEVELOPMENT/font/font_8x10/obj/${TYPE}/**/*.o
 @classic/lib3d/lib3d.lst
 _DEVELOPMENT/libgen/obj/${TYPE}/**/*.o
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o

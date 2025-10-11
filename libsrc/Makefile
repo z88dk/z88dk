@@ -188,10 +188,10 @@ include _DEVELOPMENT/compress/zx2/zx2.mak
 include classic/compress/zx7/zx7.mak
 include _DEVELOPMENT/ctype/ctype.mak
 include debug/debug.mak
-include font/font_4x8/font_4x8.mak
-include font/font_8x8/font_8x8.mak
-include font/font_8x10/font_8x10.mak
-include font/fzx/fzx.mak
+include _DEVELOPMENT/font/font_4x8/font_4x8.mak
+include _DEVELOPMENT/font/font_8x8/font_8x8.mak
+include _DEVELOPMENT/font/font_8x10/font_8x10.mak
+include _DEVELOPMENT/font/fzx/fzx.mak
 include games/games.mak
 include graphics/retrofit/retrofit.mak
 include gfx/portable/portable.mak
