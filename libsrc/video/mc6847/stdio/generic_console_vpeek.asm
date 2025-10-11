@@ -1,5 +1,12 @@
 
+ 
+ 
+ 
     SECTION code_driver
+
+    INCLUDE "video/mc6847/mc6847.inc"
+
+IFNDEF FORphc25
 
     PUBLIC  generic_console_vpeek
 
@@ -10,7 +17,6 @@
     EXTERN  vpeek_MODE2
     EXTERN  __tms9918_console_vpeek
 
-    INCLUDE "video/mc6847/mc6847.inc"
 
 ;Entry: c = x,
 ;       b = y
@@ -24,8 +30,10 @@ IF MC6847_HAS_HIRES
     cp      1
     jp      z, vpeek_MODE1
 ENDIF
+IF MC6847_HAS_CG
     cp      2
     jp      z, vpeek_MODE2
+ENDIF
 IF FORspc1000
     cp      10
     jp      nz,__tms9918_console_vpeek
@@ -49,3 +57,4 @@ ELSE
 ENDIF
     and     a
     ret
+ENDIF

@@ -24,8 +24,10 @@ IF MC6847_HAS_HIRES
     cp      1
     jp      z, printc_MODE1
 ENDIF
+IF MC6847_HAS_CG
     cp      2
     jp      z, printc_MODE2
+ENDIF
 IFNDEF FORspc1000
     and     a
     ret     nz

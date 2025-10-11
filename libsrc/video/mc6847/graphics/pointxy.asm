@@ -21,8 +21,10 @@ IF MC6847_HAS_HIRES
     cp      1
     jp      z, pointxy_MODE1
 ENDIF
+IF MC6847_HAS_CG
     cp      2
     jp      z, pointxy_MODE2
+ENDIF
 IF MC6847_HAS_TEXT_GFX
     and     a
     ret     nz

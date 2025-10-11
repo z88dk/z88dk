@@ -67,6 +67,14 @@ IF FORphc25
     defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORphc20
+    DEFINE gotgfx
+    defc maxx    = 32        ;Text graphics settings
+    defc maxy    = 16 
+    defc blankch    = 32
+    defc    WANT_swapgfxbk = 0
+ENDIF
+
 IF FORpc88
     DEFINE gotgfx
     defc maxx    = 640

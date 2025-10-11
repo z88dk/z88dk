@@ -38,6 +38,13 @@ ENDIF
     defc    CAPS_MULTICOLOUR=CAP_GENCON_INVERSE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR|CAP_GENCON_BOLD
 
 
+IFDEF MC6847_NO_IOCTL
+; phc20 only has text mode, no point doing anything here
+generic_console_ioctl:
+    scf
+    ret
+
+ELSE
 ; a = ioctl
 ; de = arg
 generic_console_ioctl:
@@ -81,48 +88,51 @@ IF FORvz
     jr      nz, failure
     ;; Fall throught into set_mode
 ELSE
-
+  IF MC6847_HAS_HIRES
     ;; HIRES MODE
     ld      hl, +( (MODE_HIRES << 8) + CAPS_HIRES)
-  IF FORsv8000
-    ld      de, $0c20       ;12 rows, 32 columns
-  ELSE
-    ld      de, $1820       ;24 rows, 32 columns
-  ENDIF
+    IF FORsv8000
+        ld      de, $0c20       ;12 rows, 32 columns
+    ELSE
+        ld      de, $1820       ;24 rows, 32 columns
+    ENDIF
     cp      1                           ;HIRES
     jr      z, set_mode
+  ENDIF
 
+  IF MC6847_HAS_CG
     ;; MULTICOLOUR MODE
     ld      hl, +( (MODE_MULTICOLOUR << 8) + CAPS_MULTICOLOUR)
-  IF FORsv8000
-    ld      de, $0c10       ;12 rows, 16 columns
-  ELSE
-    ld      de, $1810       ;24 rows, 16 columns
-  ENDIF
+    IF FORsv8000
+        ld      de, $0c10       ;12 rows, 16 columns
+    ELSE
+        ld      de, $1810       ;24 rows, 16 columns
+    ENDIF
     cp      2                           ;Half hires/multicolour
-  IF FORspc1000
-    jr      z,set_mode
-    cp      10                          ;Switch to VDP
-    jr      c, failure
-    ld      c, a
-    ld      a, 10
-    ld      (__mc6847_mode), a
-    ld      a, 24
-    ld      (__console_h), a
-    ld      a, c
-    sub     10
-    ld      l, a
-    ld      h, 0
-    push    hl
-    ld      hl, 0
-    add     hl, sp
-    ex      de, hl
-    ld      a, IOCTL_GENCON_SET_MODE
-    call    __tms9918_console_ioctl
-    pop     hl
-    jr      success
-  ELSE
-    jr      nz, failure
+    IF FORspc1000
+        jr      z,set_mode
+        cp      10                          ;Switch to VDP
+        jr      c, failure
+        ld      c, a
+        ld      a, 10
+        ld      (__mc6847_mode), a
+        ld      a, 24
+        ld      (__console_h), a
+        ld      a, c
+        sub     10
+        ld      l, a
+        ld      h, 0
+        push    hl
+        ld      hl, 0
+        add     hl, sp
+        ex      de, hl
+        ld      a, IOCTL_GENCON_SET_MODE
+        call    __tms9918_console_ioctl
+        pop     hl
+        jr      success
+    ELSE
+        jr      nz, failure
+    ENDIF
   ENDIF
 ENDIF
 set_mode:
@@ -180,3 +190,4 @@ failure:
     scf
 dummy_return:
     ret
+ENDIF

@@ -23,8 +23,10 @@ IF MC6847_HAS_HIRES
     cp      1
     jr      z, scrollup_hires
 ENDIF
+IF MC6847_HAS_CG
     cp      2
     jr      z, scrollup_hires           ;possibly wrong
+ENDIF
 IF FORspc1000
     cp      10
     jp      z,__tms9918_cls
@@ -95,6 +97,7 @@ ENDIF
     pop     de
     ret
 
+IF MC6847_HAS_CG | MC6847_HAS_HIRES
 scrollup_hires:
     GETSCREENADDRESS
 IF FORmc1000
@@ -127,5 +130,6 @@ ENDIF
     pop     bc
     pop     de
     ret
+ENDIF 
 
 ENDIF
