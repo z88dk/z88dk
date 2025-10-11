@@ -913,7 +913,8 @@ public:
         m_ptr(ptr)
     {}
 
-    template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>> unique_ptr(
+    template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+    unique_ptr(
         unique_ptr<U>&& from):
         m_ptr(from.release())
     {}
@@ -2632,7 +2633,8 @@ template <typename T, typename = void>
 struct StringMaker {
     template <typename Fake = T>
     static
-    std::enable_if_t<::Catch::Detail::IsStreamInsertable_v<Fake>, std::string> convert(
+    std::enable_if_t<::Catch::Detail::IsStreamInsertable_v<Fake>, std::string>
+    convert(
         const Fake& value) {
         ReusableStringStream rss;
         // NB: call using the function-like syntax to avoid ambiguity with
@@ -8527,7 +8529,8 @@ TargetType> fillBitsFrom(Generator& gen) {
  */
 template <typename OriginalType, typename UnsignedType>
 constexpr
-std::enable_if_t<std::is_signed<OriginalType>::value, UnsignedType> transposeToNaturalOrder(
+std::enable_if_t<std::is_signed<OriginalType>::value, UnsignedType>
+transposeToNaturalOrder(
     UnsignedType in ) {
     static_assert(
         sizeof( OriginalType ) == sizeof( UnsignedType ),
@@ -8548,7 +8551,8 @@ std::enable_if_t<std::is_signed<OriginalType>::value, UnsignedType> transposeToN
 template <typename OriginalType,
           typename UnsignedType>
 constexpr
-std::enable_if_t<std::is_unsigned<OriginalType>::value, UnsignedType> transposeToNaturalOrder(
+std::enable_if_t<std::is_unsigned<OriginalType>::value, UnsignedType>
+transposeToNaturalOrder(
     UnsignedType in) {
     static_assert(
         sizeof( OriginalType ) == sizeof( UnsignedType ),
@@ -13278,7 +13282,8 @@ UnorderedRangeEqualsMatcher<RangeLike, Equality> UnorderedRangeEquals(
 template < typename T,
            typename Equality = decltype( std::equal_to<> {} ) >
 constexpr
-UnorderedRangeEqualsMatcher<std::initializer_list<T>, Equality> UnorderedRangeEquals(
+UnorderedRangeEqualsMatcher<std::initializer_list<T>, Equality>
+UnorderedRangeEquals(
     std::initializer_list<T> range,
     Equality&& predicate = std::equal_to<> {} ) {
     return { range, CATCH_FORWARD( predicate ) };

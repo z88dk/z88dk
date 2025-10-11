@@ -23,9 +23,9 @@ public:
     std::vector<uint8_t> getOutput() const;
 private:
     // Components
-    Lexer* lexer_{ nullptr };
-    Parser* parser_{ nullptr };
-    CodeGenerator* codegen_{ nullptr };
-    SymbolTable* symbols_{ nullptr };
-    ErrorReporter* errors_{ nullptr };
+    //Lexer* lexer_{ nullptr };
+    //Parser* parser_{ nullptr };
+    //CodeGenerator* codegen_{ nullptr };
+    //SymbolTable* symbols_{ nullptr };
+    //ErrorReporter* errors_{ nullptr };
 };
