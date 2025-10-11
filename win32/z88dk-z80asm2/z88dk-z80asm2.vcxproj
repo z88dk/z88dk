@@ -130,6 +130,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\error_reporter.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\token.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
@@ -142,11 +143,13 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\error_reporter.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preprocessor.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\symbol_table.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\token.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\error_codes.def" />
+    <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

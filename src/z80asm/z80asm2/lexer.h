@@ -10,6 +10,16 @@
 
 class Token;
 
+#define X(keyword) keyword,
+enum class Keyword {
+    None = 0,
+#include "keywords.def"
+};
+#undef X
+
+std::string to_upper(const std::string& s);
+Keyword to_keyword(const std::string& s);
+
 class Lexer {
 public:
     Lexer();
