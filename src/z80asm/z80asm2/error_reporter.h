@@ -19,13 +19,23 @@ enum class ErrorCode {
 
 class Location {
 public:
-    Location(const std::string& filename_ = "", int line_num_ = 0);
-    std::string filename;
-    int line_num{ 0 };
-    std::string source_line;
-    std::string expanded_line;
-    bool is_c_source{ false };
-    // ...constructors and methods as before
+    Location(const std::string& filename = "", int line_num = 0);
+
+    const std::string& filename() const { return filename_; }
+    int line_num() const { return line_num_; }
+    const std::string& source_line() const { return source_line_; }
+    const std::string& expanded_line() const { return expanded_line_; }
+
+    void set_filename(const std::string& filename) { filename_ = filename; }
+    void set_line_num(int line_num) { line_num_ = line_num; }
+    void set_source_line(const std::string& line) { source_line_ = line; expanded_line_.clear(); }
+    void set_expanded_line(const std::string& line) { expanded_line_ = line; }
+
+private:
+    std::string filename_;
+    int line_num_{ 0 };
+    std::string source_line_;
+    std::string expanded_line_;
 };
 
 class ErrorReporter {
@@ -38,6 +48,7 @@ public:
     void warning(const Location& loc, ErrorCode code, const std::string& arg = "");
 
     int error_count() const;
+    bool has_error() const;
 
 private:
     int error_count_ = 0;
