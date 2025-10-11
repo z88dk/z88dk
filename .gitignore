@@ -1,3 +1,9 @@
+**/*.82p
+**/*.83p
+**/*.85s
+**/*.86p
+**/*.8xk
+**/*.8xp
 **/*.bak
 **/*.bin
 **/*.c.asm
@@ -12,12 +18,6 @@
 **/*.orig
 **/*.output
 **/*.tap
-**/*.8xk
-**/*.82p
-**/*.83p
-**/*.8xp
-**/*.85s
-**/*.86p
 **/*.vcxproj.user
 **/.prove*
 **/.vscode/
@@ -289,6 +289,7 @@ src/z80asm/dev/cpu2/cpu_test_z180_err.asm
 src/z80asm/dev/cpu2/cpu_test_z180_ixiy_ok.asm
 src/z80asm/dev/cpu2/cpu_test_z180_ok.asm
 src/z80asm/dev/z80pack-1.21/z80asm/z80asm
+src/z80asm/old/
 src/z80asm/t/libtestlib.a
 src/z80asm/t/test_codearea
 src/z80asm/t/test_codearea.out
@@ -296,11 +297,7 @@ src/z80asm/t/test_symtab
 src/z80asm/t/test_symtab.out
 src/z80asm/test_t_*
 src/z80asm/z80asm
-src/z80asm/z80asm2
 src/z80asm/z88dk-z80asm
-src/z80asm2/re2c
-src/z80asm2/t/test
-src/z80asm2/z80asm2
 src/z80nm/z80nm
 src/z80nm/z88dk-z80nm
 src/z88dk-lib/z88dk-lib
