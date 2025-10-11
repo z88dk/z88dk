@@ -181,11 +181,11 @@ include alloc/farmalloc/farmalloc.mak
 include alloc/malloc-classic/malloc.mak
 include alloc/obstack/obstack.mak
 include arch/z80/z80.mak
-include compress/aplib/aplib.mak
-include compress/zx0/zx0.mak
-include compress/zx1/zx1.mak
-include compress/zx2/zx2.mak
-include compress/zx7/zx7.mak
+include _DEVELOPMENT/compress/aplib/aplib.mak
+include _DEVELOPMENT/compress/zx0/zx0.mak
+include _DEVELOPMENT/compress/zx1/zx1.mak
+include _DEVELOPMENT/compress/zx2/zx2.mak
+include classic/compress/zx7/zx7.mak
 include _DEVELOPMENT/ctype/ctype.mak
 include debug/debug.mak
 include font/font_4x8/font_4x8.mak

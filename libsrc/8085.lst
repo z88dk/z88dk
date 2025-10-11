@@ -1,7 +1,7 @@
 @alloc/alloc_8080.lst
-@compress/aplib/compress_aplib.lst
-@compress/zx0/compress_zx0.lst
-@compress/zx1/compress_zx1.lst
+_DEVELOPMENT/compress/aplib/obj/${TYPE}/**/*.o
+_DEVELOPMENT/compress/zx0/obj/${TYPE}/**/*.o
+_DEVELOPMENT/compress/zx1/obj/${TYPE}/**/*.o
 _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 @font/font.lst
 @classic/lib3d/lib3d.lst
