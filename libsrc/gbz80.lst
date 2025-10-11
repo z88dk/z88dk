@@ -4,7 +4,7 @@
 _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
 @font/font.lst
 @classic/lib3d/lib3d.lst
-@libgen/libgen.lst
+_DEVELOPMENT/libgen/obj/${TYPE}/**/*.o
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
