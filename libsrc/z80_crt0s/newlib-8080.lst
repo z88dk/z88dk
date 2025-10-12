@@ -43,5 +43,5 @@
 ../_DEVELOPMENT/error/z80/error_onc
 ../_DEVELOPMENT/error/z80/error_zc
 ../_DEVELOPMENT/error/z80/error_znc
-../_DEVELOPMENT/z80/z80/asm_z80_delay_ms
-../_DEVELOPMENT/z80/z80/asm_z80_delay_tstate.asm
+../_DEVELOPMENT/arch/z80/z80/asm_z80_delay_ms
+../_DEVELOPMENT/arch/z80/z80/asm_z80_delay_tstate.asm
