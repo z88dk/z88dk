@@ -31,4 +31,4 @@
 @../temp/sp1/zx/sp1_zx_sccz80.lst
 @../threads/threads_sccz80.lst
 @../time/time_sccz80.lst
-@../z80/z80_sccz80.lst
+@../arch/z80/z80_sccz80.lst

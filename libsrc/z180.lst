@@ -29,7 +29,7 @@ _DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @debug/debug.lst
 @rect/rect.lst
 @classic/algorithm/alg.lst
-@arch/z80/z80.lst
+_DEVELOPMENT/arch/z80/obj/${TYPE}/**/*.o
 @interrupts/interrupts.lst
 @time/time.lst
 _DEVELOPMENT/math/fix16/obj/${TYPE}/**/*.o

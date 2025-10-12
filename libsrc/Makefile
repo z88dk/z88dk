@@ -181,7 +181,7 @@ include _DEVELOPMENT/alloc/balloc/balloc.mak
 include alloc/farmalloc/farmalloc.mak
 include classic/alloc/malloc-classic/malloc.mak
 include _DEVELOPMENT/alloc/obstack/obstack.mak
-include arch/z80/z80.mak
+include _DEVELOPMENT/arch/z80/z80.mak
 include _DEVELOPMENT/compress/aplib/aplib.mak
 include _DEVELOPMENT/compress/zx0/zx0.mak
 include _DEVELOPMENT/compress/zx1/zx1.mak

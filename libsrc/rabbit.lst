@@ -25,6 +25,6 @@ _DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @debug/debug.lst
 @rect/rect.lst
 @classic/algorithm/alg.lst
-arch/z80/obj/${TYPE}/AsmCall
+_DEVELOPMENT/arch/z80/obj/${TYPE}/**/*.o
 _DEVELOPMENT/math/fix16/obj/${TYPE}/**/*.o
 @z80_crt0s/crt0.lst

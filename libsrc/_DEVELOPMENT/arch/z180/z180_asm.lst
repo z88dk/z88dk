@@ -1,0 +1,15 @@
+arch/z180/z180/__Unhandled_Trap
+arch/z180/z180/asm_z180_delay_ms
+arch/z180/z180/asm_z180_delay_tstate
+arch/z180/z180/asm_z180_get_int_state
+arch/z180/z180/asm_z180_indr
+arch/z180/z180/asm_z180_inir
+arch/z180/z180/asm_z180_inp
+arch/z180/z180/asm_z180_otdmr
+arch/z180/z180/asm_z180_otdr
+arch/z180/z180/asm_z180_otimr
+arch/z180/z180/asm_z180_otir
+arch/z180/z180/asm_z180_outp
+arch/z180/z180/asm_z180_pop_ei
+arch/z180/z180/asm_z180_push_di
+arch/z180/z180/asm_z180_set_int_state

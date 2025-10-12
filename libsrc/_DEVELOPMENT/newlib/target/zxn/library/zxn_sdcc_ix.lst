@@ -31,4 +31,4 @@
 @../temp/sp1/zx/sp1_zx_sdcc_ix.lst
 @../threads/threads_sdcc_ix.lst
 @../time/time_sdcc.lst
-@../z80/z80_sdcc.lst
+@../arch/z80/z80_sdcc.lst

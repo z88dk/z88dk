@@ -30,4 +30,4 @@
 @target//cpm/driver/driver.lst
 @../threads/threads_sccz80.lst
 @../time/time_sccz80.lst
-@../z180/z180_sccz80.lst
+@../arch/z180/z180_sccz80.lst
