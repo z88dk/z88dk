@@ -33,7 +33,7 @@ _in_LookupKey:
     cpir
     jr      nz, notfound
 
-    ld      a, +(80*3)-1
+    ld      a, +(72*3)-1
     sub     c                           ;A = position in table
     ld      hl, 0
     cp      72*2
@@ -45,7 +45,7 @@ _in_LookupKey:
 not_function_table:
     cp      72
     jr      c, shift
-    sub     80
+    sub     72
     set     7, l
 
 shift:

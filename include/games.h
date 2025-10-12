@@ -138,9 +138,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __PHC25__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2"};
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursors",  "hjkl-sd"};
 #endif
-	#define GAME_DEVICES 2
+	#define GAME_DEVICES 5
 #endif
 
 #ifdef __M5__

@@ -12,7 +12,7 @@ PUBLIC in_keytranstbl
 ; https://www.oldcomputr.com/wp-content/uploads/2017/01/sanyo_phc_25-8566.jpg
 
 ;Unshifted
-    defb    '1', 'w', 's', 'x',  11,   8, ':', 255    ;1, w, s, x, UP, BS, ", UN
+    defb    '1', 'w', 's', 'x',  11,  12, ':', 255    ;1, w, s, x, UP, BS, ", UN
     defb     27, 'q', 'a', 'z',  10,  13, ':', '/'    ;ESC, q, a, z, DOWN, RET, :, /
     defb    '3', 'r', 'f', 'v',   8, '-', ']', 255    ;3, r, f, v, LEFT, =, }, UN
     defb    '2', 'e', 'd', 'c',   9, '^','\\', ' '    ;2, e, d, c, RIGHT, ~, \, SP
