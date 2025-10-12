@@ -169,6 +169,10 @@ Z88DKTARGET_nc200 = nc
 ZCFLAGS_nc200 = -clib=nc200
 ZLDFLAGS_nc200 = 
 
+Z88DKTARGET_map1010 = phc25
+ZCFLAGS_map1010 = -clib=map1010
+ZLDFLAGS_map1010 = 
+
 
 # Setup the CP/M mappings to +cpm
 CPMSUBTYPES = aussie px px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \

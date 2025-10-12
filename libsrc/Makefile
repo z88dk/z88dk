@@ -72,6 +72,7 @@ TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 TOCREATE += $(call check_target,m100,m100_clib.lib)
 TOCREATE += $(call check_target,m5,m5_clib.lib)
+TOCREATE += $(call check_target,map1010,map1010.lib)
 TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
@@ -1255,6 +1256,13 @@ phc25_clib.lib: $(TARGET_CLIB_OBJS)
 	$(MAKE) -C games TARGET=phc25
 	$(MAKE) -C video/mc6847 TARGET=phc25
 	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
+
+# MAP-1010 override library 
+map1010.lib: phc25_clib.lib
+	@echo ''
+	@echo '--- Building Seiko MAP-1010 Library ---'
+	@echo ''
+	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORmap1010 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/map1010 @$(TARGET_DIRECTORY)/map1010/map1010.lst
 
 
 # NASCOM library - Stefano
