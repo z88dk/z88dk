@@ -24,7 +24,9 @@
     EXTERN      asm_im1_handler
 
 
+IFNDEF CRT_ORG_CODE
     defc    CRT_ORG_CODE  = $c009	 ; RAM
+ENDIF
 
     defc    CONSOLE_COLUMNS = 32
     defc    CONSOLE_ROWS = 16

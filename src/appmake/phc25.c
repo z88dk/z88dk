@@ -1,3 +1,5 @@
+
+
 #include "appmake.h"
 
 
@@ -173,9 +175,9 @@ int phc25_exec(char *target)
             exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
         }
     }
-    if ( org != 0xc009 ) {
-        fprintf(stderr, "Origin is $%04x - expected $c009\n", (int)org);
-    }
+    // if ( org != 0xc009 ) {
+    //     fprintf(stderr, "Origin is $%04x - expected $c009\n", (int)org);
+    // }
 
     if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",binname);
@@ -187,9 +189,6 @@ int phc25_exec(char *target)
 
     write_header(fpout, binname);
     
-    // Alternate approach, it's in one basic program
-
-
 
     fprintf(fpout, "%c&H%04X%c", TOK_EXEC, (int)org, 0); 
     i = 0;
@@ -221,6 +220,8 @@ int phc25_exec(char *target)
 
     fclose(fpin);
     fclose(fpout);
+
+    // TODO: Create a wav file
 
     return 0;
 }

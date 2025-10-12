@@ -18,6 +18,7 @@ target/phc25/graphics/textpixl6
 @gfx/narrow/gfx_narrow.lst
 
 target/phc25/games/joystick
+target/phc25/games/keys_joystick
 @games/games.lst
 
 target/phc25/interrupt/add_raster_int

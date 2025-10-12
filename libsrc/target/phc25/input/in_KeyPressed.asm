@@ -17,29 +17,31 @@ in_KeyPressed:
 _in_KeyPressed:
     in      a,($88)                     ;modifier row
     cpl
-    ld      c,@00001100                 ;shift + ctrl mask
+    and     @00001100                 ;shift + ctrl mask
     bit     7,l
     jr      z,nocaps
     bit     2,a
     jr      z,fail
-    res     2,c
+    res     2,a
 nocaps:
     bit     6,l
     jr      z,noctrl
     bit     3,a
     jr      z,fail
-    res     2,c
+    res     2,a
 
 noctrl:
-    and     c                           ;If we have any modifiers set that we don't want, we fail
+    and     a                           ;If we have any modifiers set that we don't want, we fail
     jr      nz, fail
     ld      a, l
     and     15
+    add     $80
     ld      c, a
     ld      b, $0
     in      a, (c)
+    cpl
     and     h                           ;Check with mask
-    jr      nz, fail
+    jr      z, fail
     ld      hl, 1
     scf
     ret

@@ -5,6 +5,10 @@
     PUBLIC  joystick
     PUBLIC  _joystick
     EXTERN  get_psg
+    EXTERN  keys_qaop
+    EXTERN  keys_vi
+    EXTERN  keys_cursor
+    EXTERN  joystick_sc
 
 
 joystick:
@@ -17,8 +21,23 @@ _joystick:
     dec     l
     jr      z, got_port
 
+    ld      a,l
+    ld      hl, keys_qaop
+    dec     a
+    jp      z, joystick_sc
+    ld      hl, keys_cursor
+    dec     a
+    jp      z, joystick_sc
+    ld      hl, keys_vi
+    dec     a
+    jp      z, joystick_sc
+    ld      hl, 0
+    ret
+
+
     ;; And here we'd do keyboard
     ld      hl, 0
+
     ret
 
 got_port:
