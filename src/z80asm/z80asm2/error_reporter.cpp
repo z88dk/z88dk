@@ -42,8 +42,7 @@ int ErrorReporter::error_count() const {
     return error_count_;
 }
 
-bool ErrorReporter::has_error() const
-{
+bool ErrorReporter::has_error() const {
     return error_count_ > 0;
 }
 
@@ -54,9 +53,9 @@ void ErrorReporter::print_message(const std::string& prefix,
 
 void ErrorReporter::print_message(const Location& loc,
                                   const std::string& prefix,
-    const std::string& message) {
+                                  const std::string& message) {
     std::cerr << loc.filename() << ":" << loc.line_num() << ": "
-        << prefix << ": " << message << std::endl;
+              << prefix << ": " << message << std::endl;
     if (!loc.source_line().empty()) {
         std::cerr << "   |" << loc.source_line() << std::endl;
     }

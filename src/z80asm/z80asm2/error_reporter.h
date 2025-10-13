@@ -21,15 +21,32 @@ class Location {
 public:
     Location(const std::string& filename = "", int line_num = 0);
 
-    const std::string& filename() const { return filename_; }
-    int line_num() const { return line_num_; }
-    const std::string& source_line() const { return source_line_; }
-    const std::string& expanded_line() const { return expanded_line_; }
+    const std::string& filename() const {
+        return filename_;
+    }
+    int line_num() const {
+        return line_num_;
+    }
+    const std::string& source_line() const {
+        return source_line_;
+    }
+    const std::string& expanded_line() const {
+        return expanded_line_;
+    }
 
-    void set_filename(const std::string& filename) { filename_ = filename; }
-    void set_line_num(int line_num) { line_num_ = line_num; }
-    void set_source_line(const std::string& line) { source_line_ = line; expanded_line_.clear(); }
-    void set_expanded_line(const std::string& line) { expanded_line_ = line; }
+    void set_filename(const std::string& filename) {
+        filename_ = filename;
+    }
+    void set_line_num(int line_num) {
+        line_num_ = line_num;
+    }
+    void set_source_line(const std::string& line) {
+        source_line_ = line;
+        expanded_line_.clear();
+    }
+    void set_expanded_line(const std::string& line) {
+        expanded_line_ = line;
+    }
 
 private:
     std::string filename_;
