@@ -39,17 +39,24 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
                 Keyword keyword;
                 size_t after_word;
 
-                // Always set location to the physical line number unless a #line directive was just processed
-                if (!file.line_directive_active) {
-                    file.location.set_line_num(file.lines[file.line_index].physical_line_num);
+                int physical_line_num = file.lines[file.line_index].physical_line_num;
+                if (file.line_directive_active) {
+                    // Off-by-one fix: #line N means the *next* physical line is N
+                    int logical = file.line_directive_value + (physical_line_num -
+                                  file.line_directive_physical_line) - 1;
+                    file.location.set_line_num(logical);
                 }
-                
+                else {
+                    file.location.set_line_num(physical_line_num);
+                }
+
                 out_location = file.location;
                 out_location.set_source_line(file.lines[file.line_index].text);
 
                 std::string line = remove_comments(file);
-                if (line.empty())
+                if (line.empty()) {
                     continue;
+                }
 
                 if (is_directive(line, keyword, after_word)) {
                     if (keyword == Keyword::LINE) {
@@ -57,9 +64,13 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
                             // #line directive: update file.location for future lines
                             file.location = out_location;
                             file.line_directive_active = true;
+                            // Track the value and physical line for #line
+                            file.line_directive_value = out_location.line_num();
+                            file.line_directive_physical_line = physical_line_num;
                             continue;
                         }
-                    } else {
+                    }
+                    else {
                         if (process_directive(keyword, line, after_word, out_location)) {
                             continue;
                         }
@@ -78,10 +89,12 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
                         split_queue_.push_back(split_lines_vec[i]);
                     }
                     // After returning a line, increment logical line number for next line
+                    // (handled by logic above)
                     file.location.set_line_num(file.location.line_num() + 1);
                     return true;
                 }
-            } else {
+            }
+            else {
                 pop_file();
             }
         }
@@ -129,7 +142,8 @@ bool Preprocessor::read_file(const std::string& filename,
             logical_line += trimmed;
             logical_line += " ";
             // Don't increment logical_start_line, as this is a continuation
-        } else {
+        }
+        else {
             logical_line += trimmed;
             lines.push_back(LogicalLine{logical_line, logical_start_line});
             logical_line.clear();
@@ -416,7 +430,7 @@ std::string Preprocessor::expand_macros(const std::string& line,
             if (it != macros_.end()) {
                 const Macro& macro = it->second;
                 if (!macro.params.empty()) {
-                    // Function-like macro: parse arguments
+                    // Function-like macro: parseArguments
                     size_t j = i + 1;
                     while (j < tokens.size() && tokens[j].type == MacroTokenType::Punctuator
                             && tokens[j].text == " ") {
@@ -457,7 +471,7 @@ std::string Preprocessor::expand_macros(const std::string& line,
                         // Expand macro with arguments
                         std::string expanded =
                             expand_macro_with_args(macro, args,
-                                recursion_depth + 1);
+                                                   recursion_depth + 1);
                         output.push_back(expanded);
                         i = j; // skip to after ')'
                         continue;
@@ -470,7 +484,7 @@ std::string Preprocessor::expand_macros(const std::string& line,
                         macro_body += t.text;
                     }
                     output.push_back(expand_macros(macro_body,
-                        recursion_depth + 1));
+                                                   recursion_depth + 1));
                     continue;
                 }
             }
@@ -578,7 +592,8 @@ std::string Preprocessor::remove_comments(InputFile& file) {
                         if (line[i] == '\\' && i + 1 < line.size()) {
                             ++i;
                             result += line[i];
-                        } else if (line[i] == '"') {
+                        }
+                        else if (line[i] == '"') {
                             in_string = false;
                         }
                         ++i;
@@ -594,7 +609,8 @@ std::string Preprocessor::remove_comments(InputFile& file) {
                         if (line[i] == '\\' && i + 1 < line.size()) {
                             ++i;
                             result += line[i];
-                        } else if (line[i] == '\'') {
+                        }
+                        else if (line[i] == '\'') {
                             in_char = false;
                         }
                         ++i;
@@ -619,20 +635,23 @@ std::string Preprocessor::remove_comments(InputFile& file) {
                 }
                 // Normal character
                 result += line[i++];
-            } else {
+            }
+            else {
                 // Inside multi-line comment, look for end
                 if (i + 1 < line.size() && line[i] == '*' && line[i + 1] == '/') {
                     in_multiline_comment = false;
                     i += 2;
-                } else {
+                }
+                else {
                     ++i;
                 }
             }
         }
         ++file.line_index;
         // If we are not in a multi-line comment, break after this line
-        if (!in_multiline_comment)
+        if (!in_multiline_comment) {
             break;
+        }
     }
     return rtrim(result);
 }

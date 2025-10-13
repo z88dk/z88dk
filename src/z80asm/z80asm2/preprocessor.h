@@ -35,6 +35,8 @@ private:
         size_t line_index = 0;
         Location location;
         bool line_directive_active = false;
+        int line_directive_value = 0;
+        int line_directive_physical_line = 0;
     };
 
     struct Macro {
@@ -52,7 +54,7 @@ private:
 
     // Handle file stack
     bool read_file(const std::string& filename,
-        std::vector<LogicalLine>& lines);
+                   std::vector<LogicalLine>& lines);
     void push_file(const std::string& filename);
     void pop_file();
 
