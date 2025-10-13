@@ -214,6 +214,7 @@ include _DEVELOPMENT/string/string.mak
 include stdio/stdio.mak
 include stdlib/stdlib.mak
 include time/time.mak
+include _DEVELOPMENT/sound/ay/ay.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)

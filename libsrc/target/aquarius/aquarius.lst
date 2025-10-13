@@ -43,7 +43,6 @@ target/aquarius/games/bit_close_ei
 target/aquarius/games/joystick
 target/aquarius/games/keys_joystick
 @games/games.lst
-@psg/ay/arkos/psg_arkos.lst
 target/aquarius/psg/asm_arkos_aq_smc
 target/aquarius/psg/asm_wyz_hardware_out
 target/aquarius/psg/asm_vt2_hardware_out
