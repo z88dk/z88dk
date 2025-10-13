@@ -47,8 +47,7 @@ target/pc88/psg/set_psg
 target/pc88/psg/set_psg_callee
 target/pc88/psg/psg_init
 target/pc88/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 target/pc88/interrupt/add_raster_int
 target/pc88/interrupt/im1_init
 

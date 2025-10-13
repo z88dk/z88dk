@@ -7,7 +7,7 @@ target/sv8000/psg/set_psg_callee
 target/sv8000/psg/get_psg
 target/sv8000/psg/psg_init
 target/sv8000/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
+_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 @psg/ay/wyz/psg_wyz.lst
 target/sv8000/games/joystick
 games/obj/sv8000/joystick_type

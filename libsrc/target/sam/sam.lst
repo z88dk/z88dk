@@ -81,7 +81,7 @@ target/sam/sam/sam_set_palette
 
 ; Pull in WYZ player
 target/sam/psg/asm_wyz_hardware_out
-@psg/ay/wyz/psg_wyz.lst
+_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 
 ; What are these used for?
 target/sam/variables

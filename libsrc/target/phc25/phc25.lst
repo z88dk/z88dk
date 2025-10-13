@@ -29,8 +29,4 @@ target/phc25/psg/set_psg
 target/phc25/psg/set_psg_callee
 target/phc25/psg/get_psg
 target/phc25/psg/psg_init
-@psg/ay/vt2/psg_vt2.lst
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/psg.lst
-#@psg/ay/wyz/psg_wyz.lst
-#@psg/ay/vt2/psg_vt2.lst
+_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o

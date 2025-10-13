@@ -57,5 +57,5 @@ target/x1/psg/set_psg_callee
 target/x1/psg/get_psg
 target/x1/psg/psg_init
 target/x1/psg/playzb4
-@psg/ay/psg.lst
+_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 @games/games_joystick.lst

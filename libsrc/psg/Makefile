@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = ay sn76489 saa1099
+SUBDIRS = sn76489 saa1099
 
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 

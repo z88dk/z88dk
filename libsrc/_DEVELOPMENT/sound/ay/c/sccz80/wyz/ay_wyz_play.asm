@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	SECTION	code_sound_ay
 
 	PUBLIC	ay_wyz_play
@@ -28,5 +29,6 @@ defc _ay_wyz_play = ay_wyz_play
 
 PUBLIC  _ay_wyz_play_fastcall
 defc _ay_wyz_play_fastcall = ay_wyz_play_fastcall
+ENDIF
 ENDIF
 	
