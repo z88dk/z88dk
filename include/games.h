@@ -138,7 +138,7 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __PHC25__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursors",  "hjkl-sd"};
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursor",  "hjkl-sd"};
 #endif
 	#define GAME_DEVICES 5
 #endif
@@ -280,7 +280,7 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __SPC1000__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd", "Cursors"};
+	const unsigned char *joystick_type[] = { "Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
 	#define GAME_DEVICES 5
 #endif
