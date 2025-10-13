@@ -31,7 +31,9 @@ static std::string write_temp_file(const std::vector<std::string>& lines) {
     static int counter = 0;
     std::string filename = "test_preproc_tmp_" + std::to_string(counter++) + ".asm";
     std::ofstream ofs(filename);
-    for (const auto& line : lines) ofs << line << "\n";
+    for (const auto& line : lines) {
+        ofs << line << "\n";
+    }
     ofs.close();
     return filename;
 }
@@ -53,7 +55,8 @@ TEST_CASE("Preprocessor: open() and next_line() basic", "[preprocessor]") {
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: open() returns true and next_line() returns false for empty file", "[preprocessor][emptyfile]") {
+TEST_CASE("Preprocessor: open() returns true and next_line() returns false for empty file",
+          "[preprocessor][emptyfile]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {}; // empty file
@@ -85,7 +88,8 @@ TEST_CASE("Preprocessor: removes comments", "[preprocessor]") {
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: removes C-style single-line comments", "[preprocessor]") {
+TEST_CASE("Preprocessor: removes C-style single-line comments",
+          "[preprocessor]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = { "LD A,1 // comment", "LD B,2" };
@@ -102,7 +106,8 @@ TEST_CASE("Preprocessor: removes C-style single-line comments", "[preprocessor]"
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: removes C-style multi-line comments", "[preprocessor]") {
+TEST_CASE("Preprocessor: removes C-style multi-line comments",
+          "[preprocessor]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {
@@ -122,7 +127,8 @@ TEST_CASE("Preprocessor: removes C-style multi-line comments", "[preprocessor]")
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: removes multi-line C-style comments spanning lines", "[preprocessor]") {
+TEST_CASE("Preprocessor: removes multi-line C-style comments spanning lines",
+          "[preprocessor]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {
@@ -144,7 +150,8 @@ TEST_CASE("Preprocessor: removes multi-line C-style comments spanning lines", "[
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: removes C-style comment in the middle of a line", "[preprocessor]") {
+TEST_CASE("Preprocessor: removes C-style comment in the middle of a line",
+          "[preprocessor]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = { "a/**/b" };
@@ -238,7 +245,8 @@ TEST_CASE("Preprocessor: undef macro", "[preprocessor]") {
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: detects include recursion (A includes B, B includes A)", "[preprocessor][error]") {
+TEST_CASE("Preprocessor: detects include recursion (A includes B, B includes A)",
+          "[preprocessor][error]") {
     CerrRedirect redirect;
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
@@ -270,7 +278,8 @@ TEST_CASE("Preprocessor: detects include recursion (A includes B, B includes A)"
     CHECK(output.find("error: Recursive include") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: include directive sets correct Location", "[preprocessor][location]") {
+TEST_CASE("Preprocessor: include directive sets correct Location",
+          "[preprocessor][location]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     // Create included file
@@ -306,7 +315,8 @@ TEST_CASE("Preprocessor: include directive sets correct Location", "[preprocesso
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: Location line numbers stay in sync after multi-line comment", "[preprocessor][location]") {
+TEST_CASE("Preprocessor: Location line numbers stay in sync after multi-line comment",
+          "[preprocessor][location]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {
@@ -342,7 +352,8 @@ TEST_CASE("Preprocessor: Location line numbers stay in sync after multi-line com
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: macro A calls macro B, both with parameters", "[preprocessor][macro]") {
+TEST_CASE("Preprocessor: macro A calls macro B, both with parameters",
+          "[preprocessor][macro]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {
@@ -362,7 +373,8 @@ TEST_CASE("Preprocessor: macro A calls macro B, both with parameters", "[preproc
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: correct physical line number with continuation and empty lines", "[preprocessor][location][continuation]") {
+TEST_CASE("Preprocessor: correct physical line number with continuation and empty lines",
+          "[preprocessor][location][continuation]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {
@@ -402,7 +414,8 @@ TEST_CASE("Preprocessor: correct physical line number with continuation and empt
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-TEST_CASE("Preprocessor: LINE directive updates Location line number and filename", "[preprocessor][line-directive][location]") {
+TEST_CASE("Preprocessor: LINE directive updates Location line number and filename",
+          "[preprocessor][line-directive][location]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
     std::vector<std::string> lines = {
@@ -448,6 +461,51 @@ TEST_CASE("Preprocessor: LINE directive updates Location line number and filenam
     CHECK(out_line == "LD C,5");
     CHECK(out_loc.line_num() == 101);
     CHECK(out_loc.filename() == "other.asm");
+
+    // No more lines
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: LINE directive followed by empty lines and multi-line comments counts physical lines",
+          "[preprocessor][line-directive][location][empty][comment]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "LD A,1",                  // 1
+        "#line 50",                // 2: set logical line to 50
+        "",                        // 3: empty line (physical line 3)
+        "/*",                      // 4: start of multi-line comment (physical line 4)
+        "   still comment",        // 5: inside comment (physical line 5)
+        "   end comment */",       // 6: end of comment (physical line 6)
+        "",                        // 7: another empty line (physical line 7)
+        "LD B,2",                  // 8: should be logical line 56 (50 + (8-3))
+        "LD C,3"                   // 9: should be logical line 57
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First line, before any #line directive
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,1");
+    CHECK(out_loc.line_num() == 1);
+    CHECK(out_loc.filename() == filename);
+
+    // After #line 50, next logical line is at physical line 8
+    // Logical line number should be: 50 + (8 - 3) = 55
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD B,2");
+    CHECK(out_loc.line_num() == 55);
+    CHECK(out_loc.filename() == filename);
+
+    // Next logical line: physical line 9, so 50 + (9 - 3) = 56
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD C,3");
+    CHECK(out_loc.line_num() == 56);
+    CHECK(out_loc.filename() == filename);
 
     // No more lines
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
