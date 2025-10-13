@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdio> // for std::remove
 
 // Helper to capture std::cerr output
 class CerrRedirect {
@@ -26,6 +27,9 @@ public:
     }
 };
 
+// Track all temp files created
+static std::vector<std::string> temp_files;
+
 // Helper: Write lines to a temporary file
 static std::string write_temp_file(const std::vector<std::string>& lines) {
     static int counter = 0;
@@ -35,8 +39,27 @@ static std::string write_temp_file(const std::vector<std::string>& lines) {
         ofs << line << "\n";
     }
     ofs.close();
+    temp_files.push_back(filename);
     return filename;
 }
+
+// Add explicit tracking for manually created files
+static void track_temp_file(const std::string& filename) {
+    temp_files.push_back(filename);
+}
+
+// RAII cleanup for temp files
+struct TempFileCleaner {
+    ~TempFileCleaner() {
+        for (const auto& f : temp_files) {
+            std::remove(f.c_str());
+        }
+        temp_files.clear();
+    }
+};
+
+// Instantiate the cleaner at file scope so it runs after all tests
+static TempFileCleaner temp_file_cleaner;
 
 TEST_CASE("Preprocessor: open() and next_line() basic", "[preprocessor]") {
     ErrorReporter reporter;
@@ -258,11 +281,13 @@ TEST_CASE("Preprocessor: detects include recursion (A includes B, B includes A)"
         std::ofstream ofsB(fileB);
         ofsB << "#include \"" << fileA << "\"\n";
     }
-    // Create file A that includes B
     {
         std::ofstream ofsA(fileA);
         ofsA << "#include \"" << fileB << "\"\n";
     }
+    // Track these files for cleanup
+    track_temp_file(fileA);
+    track_temp_file(fileB);
 
     // Try to open fileA, which should trigger recursive include
     REQUIRE(preproc.open(fileA));
