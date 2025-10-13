@@ -238,5 +238,5 @@ envconvert:
     DEFB 134,132,138,130,142,130,138,140
 
 pitchconvert: 
-    INCLUDE     "ayemul/pitchtable.inc"
+    INCLUDE     "pitchtable.inc"
 ENDIF
