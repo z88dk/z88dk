@@ -8,6 +8,7 @@
 #include "token.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdlib> // for strtod
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
@@ -64,6 +65,36 @@ bool scan_identifier(std::istream& is, std::string& out) {
         std::string test = out + "'";
         if (to_keyword(test) != Keyword::None) {
             out += static_cast<char>(is.get());
+        }
+    }
+
+    return true;
+}
+
+bool scan_identifier(const char*& p, std::string& out) {
+    out.clear();
+    const char* start = p;
+
+    // Skip whitespace using the helper
+    skip_whitespace(p);
+
+    // First character: must be alpha or underscore
+    if (!*p || (!std::isalpha(static_cast<unsigned char>(*p)) && *p != '_')) {
+        p = start;
+        return false;
+    }
+
+    out += *p++;
+    // Subsequent characters: alnum or underscore
+    while (*p && (std::isalnum(static_cast<unsigned char>(*p)) || *p == '_')) {
+        out += *p++;
+    }
+
+    // If next character is a "'" and a keyword with that quote exists, e.g. AF'
+    if (*p == '\'') {
+        std::string test = out + "'";
+        if (to_keyword(test) != Keyword::None) {
+            out += *p++;
         }
     }
 
@@ -164,6 +195,19 @@ std::vector<MacroToken> tokenize_macro_body(const std::string& body) {
     return tokens;
 }
 
+bool scan_whitespace(const char*& p) {
+    const char* start = p;
+    while (*p && std::isspace(static_cast<unsigned char>(*p))) {
+        ++p;
+    }
+    return p != start;
+}
+
+// Helper: skip whitespace using scan_whitespace()
+void skip_whitespace(const char*& p) {
+    scan_whitespace(p);
+}
+
 Lexer::Lexer() {
     // Stub: to be implemented
 }
@@ -175,5 +219,234 @@ void Lexer::reset(const std::string& /*input*/) {
 Token Lexer::next_token() {
     // Stub: to be implemented
     return Token(TokenType::EndOfFile, "");
+}
+
+// Helper: scan digits (with underscores) in the given base, return value in 'out'.
+// Advances p, returns true if at least one digit was found, false otherwise.
+static bool scan_digits(const char*& p, int base, int& out) {
+    out = 0;
+    bool found = false;
+    while (*p) {
+        if (base == 16 && std::isxdigit(static_cast<unsigned char>(*p))) {
+            found = true;
+            out = out * 16 + (std::isdigit(*p) ? *p - '0'
+                              : std::tolower(*p) - 'a' + 10);
+            ++p;
+        }
+        else if (base == 10 && std::isdigit(static_cast<unsigned char>(*p))) {
+            found = true;
+            out = out * 10 + (*p - '0');
+            ++p;
+        }
+        else if (base == 2 && (*p == '0' || *p == '1')) {
+            found = true;
+            out = out * 2 + (*p - '0');
+            ++p;
+        }
+        else if (*p == '_') {
+            ++p; // skip underscore
+        }
+        else {
+            break;
+        }
+    }
+    return found;
+}
+
+bool scan_integer(const char*& p, int& out) {
+    const char* start = p;
+    skip_whitespace(p);
+
+    // Hexadecimal: 0x or 0X prefix
+    if (*p == '0' && (p[1] == 'x' || p[1] == 'X')) {
+        p += 2;
+        int value = 0;
+        if (!scan_digits(p, 16, value)) {
+            p = start;
+            return false;
+        }
+        out = value;
+        return true;
+    }
+
+    // Hexadecimal: $ prefix
+    if (*p == '$') {
+        ++p;
+        int value = 0;
+        if (!scan_digits(p, 16, value)) {
+            p = start;
+            return false;
+        }
+        out = value;
+        return true;
+    }
+
+    // Graphical bitmask: % or @ prefix, then double quote,
+    // then sequence of '-' or '#', then double quote
+    if ((*p == '%' || *p == '@') && p[1] == '"') {
+        ++p; // skip % or @
+        ++p; // skip opening "
+        int value = 0;
+        bool found = false;
+        while (*p && *p != '"') {
+            if (*p == '-' || *p == '#') {
+                found = true;
+                value = value << 1;
+                if (*p == '#') {
+                    value |= 1;
+                }
+                ++p;
+            }
+            else {
+                p = start;
+                return false;
+            }
+        }
+        if (*p == '"') {
+            ++p; // skip closing "
+            if (!found) {
+                p = start;
+                return false;
+            }
+            out = value;
+            return true;
+        }
+        else {
+            p = start;
+            return false;
+        }
+    }
+
+    // Binary: % or @ prefix
+    if (*p == '%' || *p == '@') {
+        ++p;
+        int value = 0;
+        if (!scan_digits(p, 2, value)) {
+            p = start;
+            return false;
+        }
+        out = value;
+        return true;
+    }
+
+    // Bit-mask formats: 0bxxxx_xxxx (accepts "0b" as 0, underscores allowed)
+    if (*p == '0' && (p[1] == 'b' || p[1] == 'B')) {
+        p += 2;
+        int value = 0;
+        bool found = scan_digits(p, 2, value);
+        if (!found) {
+            out = 0;
+            return true;
+        }
+        out = value;
+        return true;
+    }
+
+    // Binary: sequence of 0s and 1s (with underscores) followed by 'b' or 'B' (at least one digit)
+    if (*p == '0' || *p == '1') {
+        const char* bin_start = p;
+        int value = 0;
+        bool found = scan_digits(p, 2, value);
+        if ((*p == 'b' || *p == 'B') && found) {
+            ++p;
+            out = value;
+            return true;
+        }
+        // If not followed by 'b' or 'B', rewind and continue with other formats
+        p = bin_start;
+    }
+
+    // Hexadecimal: digits (with underscores) followed by 'h' or 'H'
+    if (std::isdigit(static_cast<unsigned char>(*p))) {
+        const char* digits_start = p;
+        int value = 0;
+        bool found = scan_digits(p, 16, value);
+        // If next char is 'h' or 'H' and at least one digit was found, treat as hex
+        if ((*p == 'h' || *p == 'H') && found) {
+            ++p;
+            out = value;
+            return true;
+        }
+        // Otherwise, treat as decimal (only if all were digits and underscores)
+        p = digits_start;
+        value = 0;
+        found = scan_digits(p, 10, value);
+        // Check for 'd' or 'D' suffix (decimal explicit)
+        if ((*p == 'd' || *p == 'D') && found) {
+            ++p;
+        }
+        if (found) {
+            out = value;
+            return true;
+        }
+    }
+
+    // No valid integer found
+    p = start;
+    return false;
+}
+
+bool scan_float(const char*& p, double& out) {
+    const char* start = p;
+    skip_whitespace(p);
+
+    // Number must start with a digit or a '.''
+    if (!std::isdigit(static_cast<unsigned char>(*p)) && *p != '.') {
+        return false;
+    }
+
+    const char* s = p;
+    bool has_digits = false;
+    bool has_dot = false;
+    bool has_exp = false;
+
+    // Digits before decimal point
+    while (std::isdigit(static_cast<unsigned char>(*s))) {
+        has_digits = true;
+        ++s;
+    }
+
+    // Decimal point
+    if (*s == '.') {
+        has_dot = true;
+        ++s;
+        // Digits after decimal point
+        while (std::isdigit(static_cast<unsigned char>(*s))) {
+            has_digits = true;
+            ++s;
+        }
+    }
+
+    // Exponent
+    if (*s == 'e' || *s == 'E') {
+        has_exp = true;
+        ++s;
+        // Optional sign in exponent
+        if (*s == '+' || *s == '-') {
+            ++s;
+        }
+        bool exp_digits = false;
+        while (std::isdigit(static_cast<unsigned char>(*s))) {
+            exp_digits = true;
+            ++s;
+        }
+        if (!exp_digits) {
+            p = start;
+            return false;
+        }
+    }
+
+    // Must have at least a dot or exponent, and at least one digit somewhere
+    if ((has_dot || has_exp) && has_digits) {
+        char* endptr = nullptr;
+        out = std::strtod(p, &endptr);
+        if (endptr != p) {
+            p = endptr;
+            return true;
+        }
+    }
+
+    p = start;
+    return false;
 }
 
