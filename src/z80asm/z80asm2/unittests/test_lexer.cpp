@@ -160,3 +160,397 @@ TEST_CASE("tokenize_macro_body returns empty for empty input",
     auto tokens = tokenize_macro_body("");
     CHECK(tokens.empty());
 }
+
+TEST_CASE("scan_whitespace detects and skips whitespace", "[scan_whitespace]") {
+    SECTION("No whitespace at start") {
+        const char* p = "abc";
+        REQUIRE_FALSE(scan_whitespace(p));
+        CHECK(*p == 'a');
+    }
+    SECTION("Single space") {
+        const char* p = " abc";
+        REQUIRE(scan_whitespace(p));
+        CHECK(*p == 'a');
+    }
+    SECTION("Multiple spaces and tabs") {
+        const char* p = " \t  \txyz";
+        REQUIRE(scan_whitespace(p));
+        CHECK(*p == 'x');
+    }
+    SECTION("Whitespace only") {
+        const char* p = "   \t\n";
+        REQUIRE(scan_whitespace(p));
+        CHECK(*p == '\0');
+    }
+    SECTION("Empty string") {
+        const char* p = "";
+        REQUIRE_FALSE(scan_whitespace(p));
+        CHECK(*p == '\0');
+    }
+}
+
+TEST_CASE("skip_whitespace always skips whitespace if present",
+          "[skip_whitespace]") {
+    SECTION("No whitespace at start") {
+        const char* p = "foo";
+        skip_whitespace(p);
+        CHECK(*p == 'f');
+    }
+    SECTION("Whitespace at start") {
+        const char* p = "   bar";
+        skip_whitespace(p);
+        CHECK(*p == 'b');
+    }
+    SECTION("Whitespace only") {
+        const char* p = "   \t\n";
+        skip_whitespace(p);
+        CHECK(*p == '\0');
+    }
+    SECTION("Empty string") {
+        const char* p = "";
+        skip_whitespace(p);
+        CHECK(*p == '\0');
+    }
+}
+
+TEST_CASE("scan_identifier (C-string version) extracts valid identifiers",
+          "[scan_identifier_cstr]") {
+    std::string out;
+
+    SECTION("Simple identifier") {
+        const char* p = "foo";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "foo");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Identifier with quote and keyword") {
+        const char* p = "af'";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "af'");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Identifier with quote but not keyword") {
+        const char* p = "define'";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "define");
+        CHECK(*p == '\'');
+    }
+
+    SECTION("Identifier with digits and underscores") {
+        const char* p = "_bar123 rest";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "_bar123");
+        CHECK(*p == ' ');
+    }
+
+    SECTION("Identifier at start of string") {
+        const char* p = "abc123";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "abc123");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("No identifier at start (digit)") {
+        const char* p = " 123abc";
+        REQUIRE_FALSE(scan_identifier(p, out));
+        CHECK(*p == ' ');
+    }
+
+    SECTION("No identifier at start (punctuation)") {
+        const char* p = ";foo";
+        REQUIRE_FALSE(scan_identifier(p, out));
+        CHECK(*p == ';');
+    }
+
+    SECTION("Empty input") {
+        const char* p = "";
+        REQUIRE_FALSE(scan_identifier(p, out));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Identifier with leading whitespace") {
+        const char* p = "   foo";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "foo");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Identifier followed by punctuation") {
+        const char* p = "foo_bar;next";
+        REQUIRE(scan_identifier(p, out));
+        CHECK(out == "foo_bar");
+        CHECK(*p == ';');
+    }
+}
+
+TEST_CASE("scan_integer parses all supported number formats",
+          "[scan_integer]") {
+    int out;
+
+    SECTION("Hexadecimal: 0x/0X prefix") {
+        const char* p = "0x1A3f";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0x1A3F);
+        CHECK(*p == '\0');
+
+        p = "0Xdead_beef";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == static_cast<int>(0xDEADBEEF));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Hexadecimal: $ prefix") {
+        const char* p = "$1A3f";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0x1A3F);
+        CHECK(*p == '\0');
+
+        p = "$dead_beef";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == static_cast<int>(0xDEADBEEF));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Hexadecimal: h/H suffix") {
+        const char* p = "1A3Fh";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0x1A3F);
+        CHECK(*p == '\0');
+
+        p = "0dead_beefH";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == static_cast<int>(0xDEADBEEF));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Binary: % prefix") {
+        const char* p = "%1010_1100";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b10101100);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Binary: @ prefix") {
+        const char* p = "@1101_0011";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b11010011);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Binary: 0b/0B prefix") {
+        const char* p = "0b1010_1100";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b10101100);
+        CHECK(*p == '\0');
+
+        p = "0B1101_0011";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b11010011);
+        CHECK(*p == '\0');
+
+        p = "0b";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Binary: b/B suffix") {
+        const char* p = "1010_1100b";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b10101100);
+        CHECK(*p == '\0');
+
+        p = "1101_0011B";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b11010011);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Binary: graphical bitmask %\"-#-#\"") {
+        const char* p = "%\"-#-#\"";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b0101);
+        CHECK(*p == '\0');
+
+        p = "%\"##--_#-\""; // invalid char '_'
+        REQUIRE_FALSE(scan_integer(p, out));
+
+        p = "%\"#-#-#-#-\"";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b10101010);
+        CHECK(*p == '\0');
+
+        p = "@\"#--#\"";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0b1001);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Decimal: plain digits") {
+        const char* p = "123456";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 123456);
+        CHECK(*p == '\0');
+
+        p = "1_234_567";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 1234567);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Decimal: d/D suffix") {
+        const char* p = "123456d";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 123456);
+        CHECK(*p == '\0');
+
+        p = "1_234_567D";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 1234567);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Invalid formats") {
+        const char* p = "0x";
+        REQUIRE_FALSE(scan_integer(p, out));
+
+        p = "$";
+        REQUIRE_FALSE(scan_integer(p, out));
+
+        p = "%";
+        REQUIRE_FALSE(scan_integer(p, out));
+
+        p = "@";
+        REQUIRE_FALSE(scan_integer(p, out));
+
+        p = "0b2";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0);
+
+        p = "0b_";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0);
+
+        p = "%\"\"";
+        REQUIRE_FALSE(scan_integer(p, out));
+
+        p = "%\"-#-#";
+        REQUIRE_FALSE(scan_integer(p, out));
+    }
+}
+
+TEST_CASE("scan_float parses all supported floating-point formats",
+          "[scan_float]") {
+    double out;
+
+    SECTION("Simple decimal with dot") {
+        const char* p = "123.456";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(123.456));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Leading dot") {
+        const char* p = ".789";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(0.789));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Trailing dot") {
+        const char* p = "42.";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(42.0));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("With exponent, no dot") {
+        const char* p = "1e3";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(1000.0));
+        CHECK(*p == '\0');
+
+        p = "7E-2";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(0.07));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("With dot and exponent") {
+        const char* p = "3.14e2";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(314.0));
+        CHECK(*p == '\0');
+
+        p = ".5E1";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(5.0));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("With exponent and sign") {
+        const char* p = "2.5e+2";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(250.0));
+        CHECK(*p == '\0');
+
+        p = "2.5e-2";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(0.025));
+        CHECK(*p == '\0');
+    }
+
+    SECTION("With leading/trailing whitespace") {
+        const char* p = "   6.022e23";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(6.022e23));
+        CHECK(*p == '\0');
+
+        p = "1.0e-10   ";
+        REQUIRE(scan_float(p, out));
+        CHECK(out == Catch::Approx(1.0e-10));
+        CHECK(*p == ' ');
+    }
+
+    SECTION("No dot or exponent (should fail)") {
+        const char* p = "12345";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == '1');
+    }
+
+    SECTION("No digits (should fail)") {
+        const char* p = ".";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == '.');
+
+        p = "e10";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == 'e');
+    }
+
+    SECTION("Exponent with no digits (should fail)") {
+        const char* p = "1e";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == '1');
+    }
+
+    SECTION("Exponent with no digits after sign (should fail)") {
+        const char* p = "1e+";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == '1');
+    }
+
+    SECTION("Negative numbers (should fail, no sign allowed)") {
+        const char* p = "-1.23";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == '-');
+    }
+
+    SECTION("Plus sign (should fail, no sign allowed)") {
+        const char* p = "+4.56";
+        REQUIRE_FALSE(scan_float(p, out));
+        CHECK(*p == '+');
+    }
+}
