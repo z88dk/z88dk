@@ -18,9 +18,6 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_preprocesssor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -31,6 +28,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\error_reporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_preprocessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
