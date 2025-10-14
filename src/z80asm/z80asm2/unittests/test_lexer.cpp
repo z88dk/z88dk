@@ -554,3 +554,381 @@ TEST_CASE("scan_float parses all supported floating-point formats",
         CHECK(*p == '+');
     }
 }
+
+TEST_CASE("scan_integer parses single-quoted character literals as integers",
+          "[scan_integer][char_literal]") {
+    int out;
+
+    SECTION("Empty quoted string (should fail)") {
+        const char* p = "''";
+        REQUIRE_FALSE(scan_integer(p, out));
+        CHECK(*p == '\'');
+    }
+
+    SECTION("More than one character (should fail)") {
+        const char* p = "'ab'";
+        REQUIRE_FALSE(scan_integer(p, out));
+        CHECK(*p == '\'');
+    }
+
+    SECTION("Single ASCII character") {
+        const char* p = "'A'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 65);
+        CHECK(*p == '\0');
+
+        p = "' '";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 32);
+        CHECK(*p == '\0');
+    }
+
+    SECTION("C escape: \\n") {
+        const char* p = "'\\n'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 10);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\r") {
+        const char* p = "'\\r'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 13);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\t") {
+        const char* p = "'\\t'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 9);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\b") {
+        const char* p = "'\\b'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 8);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\f") {
+        const char* p = "'\\f'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 12);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\a") {
+        const char* p = "'\\a'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 7);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\v") {
+        const char* p = "'\\v'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 11);
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\\\'") {
+        const char* p = "'\\''";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == '\'');
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\\"") {
+        const char* p = "'\\\"'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == '\"');
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\\\") {
+        const char* p = "'\\\\'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == '\\');
+        CHECK(*p == '\0');
+    }
+    SECTION("C escape: \\e (escape char)") {
+        const char* p = "'\\e'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0x1B);
+        CHECK(*p == '\0');
+    }
+    SECTION("Octal escape: \\0") {
+        const char* p = "'\\0'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 0);
+        CHECK(*p == '\0');
+    }
+    SECTION("Octal escape: \\101 (A)") {
+        const char* p = "'\\101'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 65);
+        CHECK(*p == '\0');
+    }
+    SECTION("Hex escape: \\x41 (A)") {
+        const char* p = "'\\x41'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 65);
+        CHECK(*p == '\0');
+    }
+    SECTION("Hex escape: \\x0a (newline)") {
+        const char* p = "'\\x0a'";
+        REQUIRE(scan_integer(p, out));
+        CHECK(out == 10);
+        CHECK(*p == '\0');
+    }
+}
+
+TEST_CASE("scan_string_literal parses double-quoted strings with C-escapes and \\e",
+          "[scan_string_literal]") {
+    std::string out;
+
+    SECTION("Simple string") {
+        const char* p = "\"hello\"";
+        REQUIRE(scan_string_literal(p, out));
+        CHECK(out == "\"hello\"");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("String with C-escapes") {
+        const char* p = "\"line1\\nline2\\tend\"";
+        REQUIRE(scan_string_literal(p, out));
+        CHECK(out == "\"line1\\nline2\\tend\"");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("String with \\e escape") {
+        const char* p = "\"escape\\echar\"";
+        REQUIRE(scan_string_literal(p, out));
+        CHECK(out == "\"escape\\echar\"");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("String with hex and octal escapes") {
+        const char* p = "\"hex\\x41 octal\\101\"";
+        REQUIRE(scan_string_literal(p, out));
+        CHECK(out == "\"hex\\x41 octal\\101\"");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("String with escaped quote and backslash") {
+        const char* p = "\"\\\"quoted\\\" and \\\\backslash\"";
+        REQUIRE(scan_string_literal(p, out));
+        CHECK(out == "\"\\\"quoted\\\" and \\\\backslash\"");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Unterminated string (should fail)") {
+        const char* p = "\"unterminated";
+        REQUIRE_FALSE(scan_string_literal(p, out));
+        CHECK(*p == '\"');
+    }
+
+    SECTION("Empty string") {
+        const char* p = "\"\"";
+        REQUIRE(scan_string_literal(p, out));
+        CHECK(out == "\"\"");
+        CHECK(*p == '\0');
+    }
+}
+
+TEST_CASE("scan_operator parses C operators, punctuators, ^^ and **",
+          "[scan_operator]") {
+    std::string out;
+
+    // 2-char operators
+    SECTION("Double char operators") {
+        const char* p = "&&";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "&&");
+        CHECK(*p == '\0');
+
+        p = "||";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "||");
+        CHECK(*p == '\0');
+
+        p = "^^";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "^^");
+        CHECK(*p == '\0');
+
+        p = "<=";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "<=");
+        CHECK(*p == '\0');
+
+        p = ">=";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == ">=");
+        CHECK(*p == '\0');
+
+        p = "==";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "==");
+        CHECK(*p == '\0');
+
+        p = "!=";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "!=");
+        CHECK(*p == '\0');
+
+        p = "<>";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "<>");
+        CHECK(*p == '\0');
+
+        p = "##";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "##");
+        CHECK(*p == '\0');
+
+        p = "**";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "**");
+        CHECK(*p == '\0');
+    }
+
+    // 1-char operators and punctuators
+    SECTION("Single char operators and punctuators") {
+        const char* p = "+";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "+");
+        CHECK(*p == '\0');
+
+        p = "-";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "-");
+        CHECK(*p == '\0');
+
+        p = "*";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "*");
+        CHECK(*p == '\0');
+
+        p = "/";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "/");
+        CHECK(*p == '\0');
+
+        p = "%";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "%");
+        CHECK(*p == '\0');
+
+        p = "&";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "&");
+        CHECK(*p == '\0');
+
+        p = "|";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "|");
+        CHECK(*p == '\0');
+
+        p = "^";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "^");
+        CHECK(*p == '\0');
+
+        p = "!";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "!");
+        CHECK(*p == '\0');
+
+        p = "~";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "~");
+        CHECK(*p == '\0');
+
+        p = "=";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "=");
+        CHECK(*p == '\0');
+
+        p = "<";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "<");
+        CHECK(*p == '\0');
+
+        p = ">";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == ">");
+        CHECK(*p == '\0');
+
+        p = "?";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "?");
+        CHECK(*p == '\0');
+
+        p = ":";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == ":");
+        CHECK(*p == '\0');
+
+        p = ",";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == ",");
+        CHECK(*p == '\0');
+
+        p = ".";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == ".");
+        CHECK(*p == '\0');
+
+        p = "(";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "(");
+        CHECK(*p == '\0');
+
+        p = ")";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == ")");
+        CHECK(*p == '\0');
+
+        p = "{";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "{");
+        CHECK(*p == '\0');
+
+        p = "}";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "}");
+        CHECK(*p == '\0');
+
+        p = "[";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "[");
+        CHECK(*p == '\0');
+
+        p = "]";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "]");
+        CHECK(*p == '\0');
+
+        p = "#";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "#");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Operator with trailing text") {
+        const char* p = "&&foo";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "&&");
+        CHECK(std::string(p) == "foo");
+
+        p = "+bar";
+        REQUIRE(scan_operator(p, out));
+        CHECK(out == "+");
+        CHECK(std::string(p) == "bar");
+    }
+
+    SECTION("No operator at start") {
+        const char* p = "abc";
+        REQUIRE_FALSE(scan_operator(p, out));
+        CHECK(out.empty());
+        CHECK(std::string(p) == "abc");
+
+        p = "";
+        REQUIRE_FALSE(scan_operator(p, out));
+        CHECK(out.empty());
+        CHECK(std::string(p) == "");
+    }
+}
