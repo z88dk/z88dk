@@ -61,6 +61,90 @@ struct TempFileCleaner {
 // Instantiate the cleaner at file scope so it runs after all tests
 static TempFileCleaner temp_file_cleaner;
 
+TEST_CASE("Preprocessor normalizes all line endings to NL",
+          "[preprocessor][line_endings]") {
+    ErrorReporter reporter;
+    std::string line;
+    Location loc;
+
+    SECTION("Handles LF (\\n) only") {
+        std::string filename = write_temp_file({});
+        {
+            std::ofstream ofs(filename, std::ios::binary);
+            ofs << "line1\nline2\nline3\n";
+        }
+        Preprocessor pp(reporter);
+        REQUIRE(pp.open(filename));
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line1");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line2");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line3");
+        REQUIRE_FALSE(pp.next_line(line, loc));
+    }
+
+    SECTION("Handles CR (\\r) only") {
+        std::string filename = write_temp_file({});
+        {
+            std::ofstream ofs(filename, std::ios::binary);
+            ofs << "line1\rline2\rline3\r";
+        }
+        Preprocessor pp(reporter);
+        REQUIRE(pp.open(filename));
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line1");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line2");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line3");
+        REQUIRE_FALSE(pp.next_line(line, loc));
+    }
+
+    SECTION("Handles CRLF (\\r\\n) only") {
+        std::string filename = write_temp_file({});
+        {
+            std::ofstream ofs(filename, std::ios::binary);
+            ofs << "line1\r\nline2\r\nline3\r\n";
+        }
+        Preprocessor pp(reporter);
+        REQUIRE(pp.open(filename));
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line1");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line2");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line3");
+        REQUIRE_FALSE(pp.next_line(line, loc));
+    }
+
+    SECTION("Handles mixed line endings") {
+        std::string filename = write_temp_file({});
+        {
+            std::ofstream ofs(filename, std::ios::binary);
+            ofs << "line1\rline2\nline3\r\nline4";
+        }
+        Preprocessor pp(reporter);
+        REQUIRE(pp.open(filename));
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line1");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line2");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line3");
+        REQUIRE(pp.next_line(line, loc));
+        CHECK(line == "line4");
+        REQUIRE_FALSE(pp.next_line(line, loc));
+    }
+
+    SECTION("Handles empty input") {
+        std::string filename = write_temp_file({});
+        Preprocessor pp(reporter);
+        REQUIRE(pp.open(filename));
+        REQUIRE_FALSE(pp.next_line(line, loc));
+    }
+}
+
 TEST_CASE("Preprocessor: open() and next_line() basic", "[preprocessor]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
