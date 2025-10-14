@@ -72,12 +72,8 @@ bool scan_float(const char*& p, double& out);
 // Scan a string literal (C-style, double quotes, supports escapes)
 bool scan_string_literal(const char*& p, std::string& out);
 
-// Scan a character literal (C-style, single quotes, supports escapes)
-bool scan_char_literal(const char*& p, char& out);
-
 // Scan an operator or punctuator (e.g., "+", "-", "==", "&&", etc.)
 bool scan_operator(const char*& p, std::string& out);
-
 
 class Lexer {
 public:
