@@ -132,7 +132,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\token.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_preprocesssor.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_preprocessor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
