@@ -8,7 +8,7 @@
 #include "token.h"
 #include <algorithm>
 #include <cctype>
-#include <cstdlib> // for strtod
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
@@ -253,9 +253,116 @@ static bool scan_digits(const char*& p, int base, int& out) {
     return found;
 }
 
+// Helper: scan a single-quoted character literal, including C escapes and '\e' for Escape (0x1B).
+// Advances p, returns true and sets out if successful, false otherwise.
+static bool scan_char_as_int(const char*& p, int& out) {
+    const char* start = p;
+    if (*p != '\'') {
+        return false;
+    }
+    ++p; // skip opening quote
+
+    if (*p == '\0' || *p == '\'') { // empty char literal
+        p = start;
+        return false;
+    }
+
+    char value = 0;
+    if (*p == '\\') {
+        ++p;
+        if (*p == 'n')      {
+            value = '\n';
+            ++p;
+        }
+        else if (*p == 'r') {
+            value = '\r';
+            ++p;
+        }
+        else if (*p == 't') {
+            value = '\t';
+            ++p;
+        }
+        else if (*p == 'b') {
+            value = '\b';
+            ++p;
+        }
+        else if (*p == 'f') {
+            value = '\f';
+            ++p;
+        }
+        else if (*p == 'a') {
+            value = '\a';
+            ++p;
+        }
+        else if (*p == 'v') {
+            value = '\v';
+            ++p;
+        }
+        else if (*p == '\\') {
+            value = '\\';
+            ++p;
+        }
+        else if (*p == '\'') {
+            value = '\'';
+            ++p;
+        }
+        else if (*p == '\"') {
+            value = '\"';
+            ++p;
+        }
+        else if (*p == 'e') {
+            value = 0x1B;
+            ++p;
+        }
+        else if (*p >= '0' && *p <= '7') { // octal escape: \o, \oo, \ooo
+            int oct = 0, count = 0;
+            while (count < 3 && *p >= '0' && *p <= '7') {
+                oct = oct * 8 + (*p - '0');
+                ++p;
+                ++count;
+            }
+            value = static_cast<char>(oct);
+        }
+        else if (*p == 'x') { // hex escape: \xNN
+            ++p;
+            int hex = 0, count = 0;
+            while (count < 2 && std::isxdigit(static_cast<unsigned char>(*p))) {
+                hex = hex * 16 + (std::isdigit(*p) ? *p - '0' : std::tolower(*p) - 'a' + 10);
+                ++p;
+                ++count;
+            }
+            value = static_cast<char>(hex);
+        }
+        else {
+            // Unrecognized escape, treat as literal char
+            value = *p;
+            if (*p) {
+                ++p;
+            }
+        }
+    }
+    else {
+        value = *p;
+        ++p;
+    }
+
+    if (*p != '\'') { // must end with closing quote
+        p = start;
+        return false;
+    }
+    ++p; // skip closing quote
+    out = static_cast<unsigned char>(value);
+    return true;
+}
+
 bool scan_integer(const char*& p, int& out) {
     const char* start = p;
     skip_whitespace(p);
+
+    // Single-quoted character literal as integer
+    if (scan_char_as_int(p, out)) {
+        return true;
+    }
 
     // Hexadecimal: 0x or 0X prefix
     if (*p == '0' && (p[1] == 'x' || p[1] == 'X')) {
@@ -450,3 +557,215 @@ bool scan_float(const char*& p, double& out) {
     return false;
 }
 
+bool scan_string_literal(const char*& p, std::string& out) {
+    const char* start = p;
+    out.clear();
+
+    if (*p != '"') {
+        return false;
+    }
+
+    out += *p++; // add opening quote
+
+    while (*p) {
+        if (*p == '"') {
+            out += *p++; // add closing quote
+            return true;
+        }
+        if (*p == '\\') {
+            out += *p++; // add backslash
+            if (!*p) {
+                // unterminated escape
+                p = start;
+                return false;
+            }
+            char esc = *p;
+            out += *p++; // add escape char
+            // Optionally, validate escape sequences here
+            // Accept C-escapes plus \e
+            if (esc == 'x') {
+                // Hex escape: \xNN (up to 2 hex digits)
+                int count = 0;
+                while (count < 2 && std::isxdigit(static_cast<unsigned char>(*p))) {
+                    out += *p++;
+                    ++count;
+                }
+            }
+            else if (esc >= '0' && esc <= '7') {
+                // Octal escape: \o, \oo, \ooo (up to 3 octal digits)
+                int count = 1;
+                while (count < 3 && *p >= '0' && *p <= '7') {
+                    out += *p++;
+                    ++count;
+                }
+            }
+            // else: single-char escape, already added
+        }
+        else {
+            out += *p++;
+        }
+    }
+
+    // If we reach here, no closing quote found
+    p = start;
+    return false;
+}
+
+bool scan_operator(const char*& p, std::string& out) {
+    const char* start = p;
+    out.clear();
+
+    switch (*p) {
+    case '&':
+        if (p[1] == '&') {
+            out = "&&";
+            p += 2;
+            return true;
+        }
+        out = "&";
+        ++p;
+        return true;
+    case '|':
+        if (p[1] == '|') {
+            out = "||";
+            p += 2;
+            return true;
+        }
+        out = "|";
+        ++p;
+        return true;
+    case '^':
+        if (p[1] == '^') {
+            out = "^^";
+            p += 2;
+            return true;
+        }
+        out = "^";
+        ++p;
+        return true;
+    case '<':
+        if (p[1] == '=') {
+            out = "<=";
+            p += 2;
+            return true;
+        }
+        if (p[1] == '>') {
+            out = "<>";
+            p += 2;
+            return true;
+        }
+        out = "<";
+        ++p;
+        return true;
+    case '>':
+        if (p[1] == '=') {
+            out = ">=";
+            p += 2;
+            return true;
+        }
+        out = ">";
+        ++p;
+        return true;
+    case '=':
+        if (p[1] == '=') {
+            out = "==";
+            p += 2;
+            return true;
+        }
+        out = "=";
+        ++p;
+        return true;
+    case '!':
+        if (p[1] == '=') {
+            out = "!=";
+            p += 2;
+            return true;
+        }
+        out = "!";
+        ++p;
+        return true;
+    case '+':
+        out = "+";
+        ++p;
+        return true;
+    case '-':
+        out = "-";
+        ++p;
+        return true;
+    case '*':
+        if (p[1] == '*') {
+            out = "**";
+            p += 2;
+            return true;
+        }
+        out = "*";
+        ++p;
+        return true;
+    case '/':
+        out = "/";
+        ++p;
+        return true;
+    case '%':
+        out = "%";
+        ++p;
+        return true;
+    case '#':
+        if (p[1] == '#') {
+            out = "##";
+            p += 2;
+            return true;
+        }
+        out = "#";
+        ++p;
+        return true;
+    case '~':
+        out = "~";
+        ++p;
+        return true;
+    case '?':
+        out = "?";
+        ++p;
+        return true;
+    case ':':
+        out = ":";
+        ++p;
+        return true;
+    case ',':
+        out = ",";
+        ++p;
+        return true;
+    case '.':
+        out = ".";
+        ++p;
+        return true;
+    case '(':
+        out = "(";
+        ++p;
+        return true;
+    case ')':
+        out = ")";
+        ++p;
+        return true;
+    case '{':
+        out = "{";
+        ++p;
+        return true;
+    case '}':
+        out = "}";
+        ++p;
+        return true;
+    case '[':
+        out = "[";
+        ++p;
+        return true;
+    case ']':
+        out = "]";
+        ++p;
+        return true;
+    default:
+        break;
+    }
+
+    p = start;
+    return false;
+}
