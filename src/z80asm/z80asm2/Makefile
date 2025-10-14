@@ -31,7 +31,7 @@ DEPENDS := $(SRCS:.cpp=.d) $(COMMON_SRCS:.cpp=.d) $(TEST_SRCS:.cpp=.d)
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
 		  --max-code-length=80 --lineend=linux --formatted \
-		  --recursive "*.cpp" "*.h" "*.hpp"
+		  --recursive "*.cpp" "*.h"
 
 
 all: $(PROJ)$(EXE) $(TEST_BINS)
