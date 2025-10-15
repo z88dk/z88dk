@@ -536,15 +536,7 @@ bool Preprocessor::handle_macro_operators(
             return true;
         }
     }
-
-    if (tok.type == MacroTokenType::Operator && tok.text == "##") {
-        if (!output.empty() && i + 1 < tokens.size()) {
-            output.back() += tokens[i + 1].text;
-            ++i;
-            return true;
-        }
-    }
-
+    // Do not handle ## here!
     return false;
 }
 
@@ -634,11 +626,38 @@ void Preprocessor::expand_macro_token_with_args(
         }
     }
     else if (tok.type == MacroTokenType::Operator && tok.text == "##") {
-        // Token pasting: concatenate previous and next token
-        if (!output.empty() && i + 1 < body_tokens.size()) {
-            output.back() += body_tokens[i + 1].text;
-            ++i;
+        // Token pasting: concatenate previous and next token,
+        // skipping whitespace
+
+        // Remove trailing whitespace from output
+        while (!output.empty() && output.back() == " ") {
+            output.pop_back();
         }
+
+        // Skip whitespace tokens after ##
+        size_t j = i + 1;
+        while (j < body_tokens.size() &&
+                body_tokens[j].type == MacroTokenType::Punctuator &&
+                body_tokens[j].text == " ") {
+            ++j;
+        }
+
+        if (!output.empty() && j < body_tokens.size()) {
+            const MacroToken& next_tok = body_tokens[j];
+            if (next_tok.type == MacroTokenType::Identifier
+                    && param_map.count(next_tok.text)) {
+                // Paste the full argument value
+                output.back() += param_map.at(next_tok.text);
+            }
+            else {
+                output.back() += next_tok.text;
+            }
+            i = j; // skip to pasted token
+        }
+    }
+    else if (tok.type == MacroTokenType::Punctuator && tok.text == " ") {
+        // Only add space if not pasting
+        output.push_back(tok.text);
     }
     else {
         // Copy token as is
@@ -800,7 +819,7 @@ void Preprocessor::split_lines(const std::string& line,
             continue;
         }
 
-        if (!in_string && c == '\'' && (p == start || *(p - 1) != '\\')) {
+        if (!in_string && c == '\'') {
             in_char = !in_char;
             current += c;
             ++p;
@@ -837,7 +856,8 @@ void Preprocessor::split_lines(const std::string& line,
 
         // Handle backslash as split, only if not in string/char and not an escape
         if (c == '\\') {
-            split_lines.push_back(current);
+            // Trim whitespace before pushing
+            split_lines.push_back(rtrim(ltrim(current)));
             current.clear();
             ++p;
             continue;
@@ -851,7 +871,7 @@ void Preprocessor::split_lines(const std::string& line,
                 first_colon_after_id = false;
             }
             else if (ternary_depth == 0) {
-                split_lines.push_back(current);
+                split_lines.push_back(rtrim(ltrim(current)));
                 current.clear();
             }
             else {
@@ -865,7 +885,7 @@ void Preprocessor::split_lines(const std::string& line,
         ++p;
     }
 
-    // Add the last segment
-    split_lines.push_back(current);
+    // Add the last segment, trimmed
+    split_lines.push_back(rtrim(ltrim(current)));
 }
 
