@@ -12,8 +12,8 @@
 
 // Helper to capture std::cerr output
 class CerrRedirect {
-    std::streambuf* old;
     std::ostringstream ss;
+    std::streambuf* old;
 public:
     CerrRedirect() : old(std::cerr.rdbuf(ss.rdbuf())) {}
     ~CerrRedirect() {
