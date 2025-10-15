@@ -638,3 +638,52 @@ TEST_CASE("Preprocessor: colon in ternary expression is not split",
     CHECK(out_line == "LD A, cond ? 1 : 2");
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
+
+TEST_CASE("Preprocessor: macro with line continuations expands to multiple lines",
+          "[preprocessor][macro][continuation]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "#define pushall \\",
+        "    push bc \\ \\",
+        "    push de \\ \\",
+        "    push hl",
+        "pushall"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // The macro should expand to three lines: "push bc", "push de", "push hl"
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push bc");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push de");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push hl");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: macro token pasting with ## operator",
+          "[preprocessor][macro][tokenpaste]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "#define cat(a, b) a ## b",
+        "cat(aa,bb)"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // The macro should expand to: aabb
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "aabb");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
