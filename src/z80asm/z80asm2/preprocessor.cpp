@@ -38,7 +38,8 @@ bool Preprocessor::next_line(std::string& out_line,
         while (!file_stack_.empty()) {
             InputFile& file = file_stack_.back();
             if (file.line_index < file.lines.size()) {
-                int physical_line_num = file.lines[file.line_index].physical_line_num;
+                int physical_line_num =
+                    file.lines[file.line_index].physical_line_num;
                 if (file.line_directive_active) {
                     file.location.set_logical_line_num(
                         file.line_directive_value,
@@ -51,7 +52,8 @@ bool Preprocessor::next_line(std::string& out_line,
                 }
 
                 out_location = file.location;
-                out_location.set_source_line(file.lines[file.line_index].text);
+                out_location.set_source_line(
+                    file.lines[file.line_index].text);
 
                 std::string line = remove_comments(file);
                 if (line.empty()) {
@@ -64,12 +66,15 @@ bool Preprocessor::next_line(std::string& out_line,
                 if (is_directive(p, keyword)) {
                     if (keyword == Keyword::LINE) {
                         if (process_directive(keyword, p, out_location)) {
-                            // #line directive: update file.location for future lines
+                            // #line directive: update file.location
+                            // for future lines
                             file.location = out_location;
                             file.line_directive_active = true;
                             // Track the value and physical line for #line
-                            file.line_directive_value = out_location.line_num();
-                            file.line_directive_physical_line = physical_line_num;
+                            file.line_directive_value =
+                                out_location.line_num();
+                            file.line_directive_physical_line =
+                                physical_line_num;
                             continue;
                         }
                     }
@@ -91,7 +96,8 @@ bool Preprocessor::next_line(std::string& out_line,
                     for (size_t i = 1; i < split_lines_vec.size(); ++i) {
                         split_queue_.push_back(split_lines_vec[i]);
                     }
-                    // After returning a line, increment logical line number for next line
+                    // After returning a line, increment
+                    // logical line number for next line
                     file.location.inc_line_num();
                     return true;
                 }
@@ -449,6 +455,99 @@ static std::string stringify(const std::string& arg) {
     return result;
 }
 
+// Helper: Expand an object-like macro recursively
+std::string Preprocessor::expand_object_macro(const Macro& macro,
+        int recursion_depth) {
+    std::string macro_body;
+    for (const auto& t : macro.body_tokens) {
+        macro_body += t.text;
+    }
+    return expand_macros(macro_body, recursion_depth + 1);
+}
+
+// Helper: Expand a function-like macro invocation
+std::string Preprocessor::expand_function_macro(const Macro& macro,
+        const std::vector<MacroToken>& tokens,
+        size_t& i, int recursion_depth) {
+    size_t j = i + 1;
+    // Skip whitespace
+    while (j < tokens.size() &&
+            tokens[j].type == MacroTokenType::Punctuator &&
+            tokens[j].text == " ") {
+        ++j;
+    }
+
+    if (j >= tokens.size() ||
+            tokens[j].type != MacroTokenType::Punctuator ||
+            tokens[j].text != "(") {
+        return tokens[i].text; // Not a macro call, just return identifier
+    }
+
+    ++j; // skip '('
+    std::vector<std::string> args;
+    std::string arg;
+    int paren_depth = 1;
+    for (; j < tokens.size() && paren_depth > 0; ++j) {
+        if (tokens[j].type == MacroTokenType::Punctuator &&
+                tokens[j].text == "(") {
+            ++paren_depth;
+            arg += tokens[j].text;
+        }
+        else if (tokens[j].type == MacroTokenType::Punctuator &&
+                 tokens[j].text == ")") {
+            --paren_depth;
+            if (paren_depth == 0) {
+                args.push_back(expand_macros(arg,
+                                             recursion_depth + 1)); // Expand argument
+                break;
+            }
+            else {
+                arg += tokens[j].text;
+            }
+        }
+        else if (tokens[j].type == MacroTokenType::Punctuator &&
+                 tokens[j].text == "," && paren_depth == 1) {
+            args.push_back(expand_macros(arg,
+                                         recursion_depth + 1)); // Expand argument
+            arg.clear();
+        }
+        else {
+            arg += tokens[j].text;
+        }
+    }
+
+    std::string expanded = expand_macro_with_args(macro, args,
+                           recursion_depth + 1);
+    i = j; // skip to after ')'
+    return expanded;
+}
+
+// Helper: Handle # and ## operators in macro expansion
+bool Preprocessor::handle_macro_operators(
+    const std::vector<MacroToken>& tokens,
+    size_t& i, std::vector<std::string>& output) {
+    const MacroToken& tok = tokens[i];
+
+    if (tok.type == MacroTokenType::Operator && tok.text == "#") {
+        if (i + 1 < tokens.size() &&
+                tokens[i + 1].type == MacroTokenType::Identifier) {
+            output.push_back(stringify(tokens[i + 1].text));
+            ++i;
+            return true;
+        }
+    }
+
+    if (tok.type == MacroTokenType::Operator && tok.text == "##") {
+        if (!output.empty() && i + 1 < tokens.size()) {
+            output.back() += tokens[i + 1].text;
+            ++i;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 std::string Preprocessor::expand_macros(const std::string& line,
                                         int recursion_depth) {
     if (recursion_depth > MAX_MACRO_RECURSION) {
@@ -466,81 +565,20 @@ std::string Preprocessor::expand_macros(const std::string& line,
             if (it != macros_.end()) {
                 const Macro& macro = it->second;
                 if (!macro.params.empty()) {
-                    // Function-like macro: parseArguments
-                    size_t j = i + 1;
-                    while (j < tokens.size() && tokens[j].type == MacroTokenType::Punctuator
-                            && tokens[j].text == " ") {
-                        ++j;
-                    }
-                    if (j < tokens.size() && tokens[j].type == MacroTokenType::Punctuator
-                            && tokens[j].text == "(") {
-                        ++j; // skip '('
-                        std::vector<std::string> args;
-                        std::string arg;
-                        int paren_depth = 1;
-                        for (; j < tokens.size() && paren_depth > 0; ++j) {
-                            if (tokens[j].type == MacroTokenType::Punctuator && tokens[j].text == "(") {
-                                ++paren_depth;
-                                arg += tokens[j].text;
-                            }
-                            else if (tokens[j].type == MacroTokenType::Punctuator
-                                     && tokens[j].text == ")") {
-                                --paren_depth;
-                                if (paren_depth == 0) {
-                                    args.push_back(expand_macros(arg, recursion_depth + 1)); // Expand argument
-                                    break;
-                                }
-                                else {
-                                    arg += tokens[j].text;
-                                }
-                            }
-                            else if (tokens[j].type == MacroTokenType::Punctuator && tokens[j].text == ","
-                                     && paren_depth == 1) {
-                                args.push_back(expand_macros(arg, recursion_depth + 1)); // Expand argument
-                                arg.clear();
-                            }
-                            else {
-                                arg += tokens[j].text;
-                            }
-                        }
-
-                        // Expand macro with arguments
-                        std::string expanded =
-                            expand_macro_with_args(macro, args,
-                                                   recursion_depth + 1);
-                        output.push_back(expanded);
-                        i = j; // skip to after ')'
-                        continue;
-                    }
+                    output.push_back(expand_function_macro(
+                                         macro, tokens, i, recursion_depth));
+                    continue;
                 }
                 else {
-                    // Object-like macro: expand recursively
-                    std::string macro_body;
-                    for (const auto& t : macro.body_tokens) {
-                        macro_body += t.text;
-                    }
-                    output.push_back(expand_macros(macro_body,
-                                                   recursion_depth + 1));
+                    output.push_back(expand_object_macro(
+                                         macro, recursion_depth));
                     continue;
                 }
             }
         }
 
-        // Handle # and ##
-        if (tok.type == MacroTokenType::Operator && tok.text == "#") {
-            if (i + 1 < tokens.size() && tokens[i + 1].type == MacroTokenType::Identifier) {
-                output.push_back(stringify(tokens[i + 1].text));
-                ++i;
-                continue;
-            }
-        }
-
-        if (tok.type == MacroTokenType::Operator && tok.text == "##") {
-            if (!output.empty() && i + 1 < tokens.size()) {
-                output.back() += tokens[i + 1].text;
-                ++i;
-                continue;
-            }
+        if (handle_macro_operators(tokens, i, output)) {
+            continue;
         }
 
         // Default: copy token
@@ -552,14 +590,15 @@ std::string Preprocessor::expand_macros(const std::string& line,
     for (const auto& s : output) {
         result += s;
     }
+
     return result;
 }
 
-std::string Preprocessor::expand_macro_with_args(const Macro& macro,
-        const std::vector<std::string>& args, int recursion_depth) {
+// Helper: Map macro parameters to their argument values
+std::unordered_map<std::string, std::string> Preprocessor::make_param_map(
+    const Macro& macro,
+    const std::vector<std::string>& args) {
     std::unordered_map<std::string, std::string> param_map;
-
-    // Map parameter names to their (already expanded) argument values
     for (size_t i = 0; i < macro.params.size(); ++i) {
         if (i < args.size()) {
             param_map[macro.params[i]] = args[i];
@@ -568,34 +607,55 @@ std::string Preprocessor::expand_macro_with_args(const Macro& macro,
             param_map[macro.params[i]] = "";
         }
     }
+    return param_map;
+}
+
+// Helper: Expand a single macro token in macro body with arguments
+void Preprocessor::expand_macro_token_with_args(
+    const std::unordered_map<std::string, std::string>& param_map,
+    const std::vector<MacroToken>& body_tokens,
+    size_t& i,
+    std::vector<std::string>& output) {
+    const MacroToken& tok = body_tokens[i];
+    if (tok.type == MacroTokenType::Identifier &&
+            param_map.count(tok.text)) {
+        // Substitute parameter with its argument value
+        output.push_back(param_map.at(tok.text));
+    }
+    else if (tok.type == MacroTokenType::Operator &&
+             tok.text == "#") {
+        // Stringize the next parameter
+        if (i + 1 < body_tokens.size() &&
+                body_tokens[i + 1].type == MacroTokenType::Identifier &&
+                param_map.count(body_tokens[i + 1].text)) {
+            output.push_back(
+                stringify(param_map.at(body_tokens[i + 1].text)));
+            ++i;
+        }
+    }
+    else if (tok.type == MacroTokenType::Operator && tok.text == "##") {
+        // Token pasting: concatenate previous and next token
+        if (!output.empty() && i + 1 < body_tokens.size()) {
+            output.back() += body_tokens[i + 1].text;
+            ++i;
+        }
+    }
+    else {
+        // Copy token as is
+        output.push_back(tok.text);
+    }
+}
+
+std::string Preprocessor::expand_macro_with_args(
+    const Macro& macro,
+    const std::vector<std::string>& args,
+    int recursion_depth) {
+    auto param_map = make_param_map(macro, args);
 
     std::vector<std::string> output;
     for (size_t i = 0; i < macro.body_tokens.size(); ++i) {
-        const MacroToken& tok = macro.body_tokens[i];
-        if (tok.type == MacroTokenType::Identifier && param_map.count(tok.text)) {
-            // Substitute parameter with its argument value
-            output.push_back(param_map[tok.text]);
-        }
-        else if (tok.type == MacroTokenType::Operator && tok.text == "#") {
-            // Stringize the next parameter
-            if (i + 1 < macro.body_tokens.size()
-                    && macro.body_tokens[i + 1].type == MacroTokenType::Identifier
-                    && param_map.count(macro.body_tokens[i + 1].text)) {
-                output.push_back(stringify(param_map[macro.body_tokens[i + 1].text]));
-                ++i;
-            }
-        }
-        else if (tok.type == MacroTokenType::Operator && tok.text == "##") {
-            // Token pasting: concatenate previous and next token
-            if (!output.empty() && i + 1 < macro.body_tokens.size()) {
-                output.back() += macro.body_tokens[i + 1].text;
-                ++i;
-            }
-        }
-        else {
-            // Copy token as is
-            output.push_back(tok.text);
-        }
+        expand_macro_token_with_args(param_map, macro.body_tokens,
+                                     i, output);
     }
 
     std::string result;
@@ -619,77 +679,87 @@ std::string Preprocessor::remove_comments(InputFile& file) {
         size_t i = 0;
         while (i < line.size()) {
             if (!in_multiline_comment) {
-                // String literal
                 if (!in_char && line[i] == '"') {
-                    result += line[i++];
-                    in_string = !in_string;
-                    while (in_string && i < line.size()) {
-                        result += line[i];
-                        if (line[i] == '\\' && i + 1 < line.size()) {
-                            ++i;
-                            result += line[i];
-                        }
-                        else if (line[i] == '"') {
-                            in_string = false;
-                        }
-                        ++i;
-                    }
+                    handle_string_literal(line, i, result, in_string);
                     continue;
                 }
-                // Char literal
                 if (!in_string && line[i] == '\'') {
-                    result += line[i++];
-                    in_char = !in_char;
-                    while (in_char && i < line.size()) {
-                        result += line[i];
-                        if (line[i] == '\\' && i + 1 < line.size()) {
-                            ++i;
-                            result += line[i];
-                        }
-                        else if (line[i] == '\'') {
-                            in_char = false;
-                        }
-                        ++i;
-                    }
+                    handle_char_literal(line, i, result, in_char);
                     continue;
                 }
-                // Start of multi-line comment
                 if (i + 1 < line.size() && line[i] == '/' && line[i + 1] == '*') {
                     in_multiline_comment = true;
                     i += 2;
                     continue;
                 }
-                // Single-line C++ comment
                 if (i + 1 < line.size() && line[i] == '/' && line[i + 1] == '/') {
-                    i = line.size();
                     break;
                 }
-                // Assembly comment
                 if (line[i] == ';') {
-                    i = line.size();
                     break;
                 }
-                // Normal character
                 result += line[i++];
             }
             else {
-                // Inside multi-line comment, look for end
-                if (i + 1 < line.size() && line[i] == '*' && line[i + 1] == '/') {
-                    in_multiline_comment = false;
-                    i += 2;
+                if (handle_multiline_comment_end(line, i, in_multiline_comment)) {
+                    continue;
                 }
-                else {
-                    ++i;
-                }
+                ++i;
             }
         }
         ++file.line_index;
-        // If we are not in a multi-line comment, break after this line
         if (!in_multiline_comment) {
             break;
         }
     }
     return rtrim(result);
+}
+
+// Handles a string literal, updating result and i, toggling in_string.
+void Preprocessor::handle_string_literal(const std::string& line,
+        size_t& i, std::string& result, bool& in_string) {
+    result += line[i++];
+    in_string = !in_string;
+    while (in_string && i < line.size()) {
+        result += line[i];
+        if (line[i] == '\\' && i + 1 < line.size()) {
+            ++i;
+            result += line[i];
+        }
+        else if (line[i] == '"') {
+            in_string = false;
+        }
+        ++i;
+    }
+}
+
+// Handles a character literal, updating result and i, toggling in_char.
+void Preprocessor::handle_char_literal(const std::string& line,
+                                       size_t& i, std::string& result, bool& in_char) {
+    result += line[i++];
+    in_char = !in_char;
+    while (in_char && i < line.size()) {
+        result += line[i];
+        if (line[i] == '\\' && i + 1 < line.size()) {
+            ++i;
+            result += line[i];
+        }
+        else if (line[i] == '\'') {
+            in_char = false;
+        }
+        ++i;
+    }
+}
+
+// Handles the end of a multi-line comment. Returns true if the end was found and handled.
+bool Preprocessor::handle_multiline_comment_end(const std::string& line,
+        size_t& i, bool& in_multiline_comment) {
+    if (i + 1 < line.size() && line[i] == '*' && line[i + 1] == '/') {
+        in_multiline_comment = false;
+        i += 2;
+        return true;
+    }
+    return false;
 }
 
 // Returns true if the line starts with an identifier (possibly after whitespace) followed by a colon.

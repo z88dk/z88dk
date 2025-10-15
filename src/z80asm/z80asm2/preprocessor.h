@@ -75,13 +75,33 @@ private:
     static const inline int MAX_MACRO_RECURSION = 32;
     std::string expand_macros(const std::string& line,
                               int recursion_depth = 0);
+    std::string expand_object_macro(const Macro& macro, int recursion_depth);
+    std::string expand_function_macro(const Macro& macro,
+                                      const std::vector<MacroToken>& tokens,
+                                      size_t& i, int recursion_depth);
+    bool handle_macro_operators(const std::vector<MacroToken>& tokens,
+                                size_t& i, std::vector<std::string>& output);
 
     // Helper: Expand macro body with arguments
     std::string expand_macro_with_args(const Macro& macro,
-                                       const std::vector<std::string>& args, int recursion_depth);
+                                       const std::vector<std::string>& args,
+                                       int recursion_depth);
+    std::unordered_map<std::string, std::string> make_param_map(
+        const Macro& macro, const std::vector<std::string>& args);
+    void expand_macro_token_with_args(
+        const std::unordered_map<std::string, std::string>& param_map,
+        const std::vector<MacroToken>& body_tokens,
+        size_t& i,
+        std::vector<std::string>& output);
 
     // Remove all comments from a line (handles multi-line comments with state)
     std::string remove_comments(InputFile& file);
+    void handle_string_literal(const std::string& line,
+                               size_t& i, std::string& result, bool& in_string);
+    void handle_char_literal(const std::string& line,
+                             size_t& i, std::string& result, bool& in_char);
+    bool handle_multiline_comment_end(const std::string& line,
+                                      size_t& i, bool& in_multiline_comment);
 
     // split line at colons and backslashes, except the first colon
     // if it's part of a label
