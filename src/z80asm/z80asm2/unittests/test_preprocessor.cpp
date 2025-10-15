@@ -619,3 +619,22 @@ TEST_CASE("Preprocessor: LINE directive followed by empty lines and multi-line c
     // No more lines
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
+
+TEST_CASE("Preprocessor: colon in ternary expression is not split",
+          "[preprocessor][colon][ternary]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "LD A, cond ? 1 : 2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    // The colon in the ternary should not cause a split; the line should be unchanged
+    CHECK(out_line == "LD A, cond ? 1 : 2");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
