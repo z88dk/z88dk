@@ -40,13 +40,14 @@ bool Preprocessor::next_line(std::string& out_line,
             if (file.line_index < file.lines.size()) {
                 int physical_line_num = file.lines[file.line_index].physical_line_num;
                 if (file.line_directive_active) {
-                    // Off-by-one fix: #line N means the *next* physical line is N
-                    int logical = file.line_directive_value + (physical_line_num -
-                                  file.line_directive_physical_line) - 1;
-                    file.location.set_line_num(logical);
+                    file.location.set_logical_line_num(
+                        file.line_directive_value,
+                        file.line_directive_physical_line,
+                        physical_line_num
+                    );
                 }
                 else {
-                    file.location.set_line_num(physical_line_num);
+                    file.location.set_physical_line_num(physical_line_num);
                 }
 
                 out_location = file.location;
@@ -91,8 +92,7 @@ bool Preprocessor::next_line(std::string& out_line,
                         split_queue_.push_back(split_lines_vec[i]);
                     }
                     // After returning a line, increment logical line number for next line
-                    // (handled by logic above)
-                    file.location.set_line_num(file.location.line_num() + 1);
+                    file.location.inc_line_num();
                     return true;
                 }
             }
