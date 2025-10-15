@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "keywords.h"
 #include "lexer.h"
 #include "token.h"
 #include <algorithm>
@@ -13,62 +14,92 @@
 #include <sstream>
 #include <unordered_map>
 
-std::string to_upper(const std::string& s) {
-    std::string result = s;
-    std::transform(result.begin(), result.end(), result.begin(), ::toupper);
-    return result;
+static bool has_dot_eE(const std::string& s) {
+    return s.find_first_of(".eE") != std::string::npos;
 }
 
-std::string ltrim(const std::string& s) {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    return (start == std::string::npos) ? "" : s.substr(start);
-}
+std::vector<MacroToken> tokenize_macro_body(const std::string& body) {
+    std::vector<MacroToken> tokens;
+    const char* p = body.c_str();
 
-std::string rtrim(const std::string& s) {
-    size_t end = s.find_last_not_of(" \t\r\n");
-    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
-}
-
-#define X(id, text) { text, Keyword::id },
-Keyword to_keyword(const std::string& s) {
-    static const std::unordered_map<std::string, Keyword> keyword_map = {
-#include "keywords.def"
-    };
-    auto it = keyword_map.find(to_upper(s));
-    return it != keyword_map.end() ? it->second : Keyword::None;
-}
-#undef X
-
-bool scan_identifier(std::istream& is, std::string& out) {
-    out.clear();
-
-    // Skip whitespace
-    while (is && std::isspace(is.peek())) {
-        is.get();
-    }
-
-    // First character: must be alpha or underscore
-    if (!is || (!std::isalpha(is.peek()) && is.peek() != '_')) {
-        return false;
-    }
-
-    out += static_cast<char>(is.get());
-
-    // Subsequent characters: alnum or underscore
-    while (is && (std::isalnum(is.peek()) || is.peek() == '_')) {
-        out += static_cast<char>(is.get());
-    }
-
-    // if next character is a "'" and a keyword with that quote exists, e.g. AF'
-    // include the quote in the identifier
-    if (is && is.peek() == '\'') {
-        std::string test = out + "'";
-        if (to_keyword(test) != Keyword::None) {
-            out += static_cast<char>(is.get());
+    while (*p) {
+        // Whitespace
+        if (scan_whitespace(p)) {
+            tokens.push_back({ MacroTokenType::Punctuator, " " });
+            continue;
         }
+
+        // Identifier
+        std::string ident;
+        if (scan_identifier(p, ident)) {
+            tokens.push_back({ MacroTokenType::Identifier, ident });
+            continue;
+        }
+
+        // Floating point umber
+        double fvalue;
+        if (scan_float(p, fvalue)) {
+            std::string str = std::to_string(fvalue);
+            // must have dot or e to distinguish form integer
+            if (!has_dot_eE(str)) {
+                str += ".0";
+            }
+            tokens.push_back({ MacroTokenType::Number, str });
+        }
+
+        // Integer
+        int ivalue;
+        if (scan_integer(p, ivalue)) {
+            std::string str = std::to_string(ivalue);
+            tokens.push_back({ MacroTokenType::Number, str });
+            continue;
+        }
+
+        // String literal
+        std::string str;
+        if (scan_string_literal(p, str)) {
+            tokens.push_back({ MacroTokenType::StringLiteral, str });
+            continue;
+        }
+
+        // Operators and punctuators (handle ## and # specially)
+        if (*p == '#') {
+            if (p[1] == '#') {
+                tokens.push_back({ MacroTokenType::Operator, "##" });
+                p += 2;
+            }
+            else {
+                tokens.push_back({ MacroTokenType::Operator, "#" });
+                ++p;
+            }
+            continue;
+        }
+
+        if (scan_operator(p, str)) {
+            tokens.push_back({ MacroTokenType::Punctuator, str });
+            continue;
+        }
+
+        // Single-character catch-all
+        tokens.push_back({ MacroTokenType::Punctuator,
+                           std::string(1, *p) });
+        ++p;
     }
 
-    return true;
+    return tokens;
+}
+
+bool scan_whitespace(const char*& p) {
+    const char* start = p;
+    while (*p && std::isspace(static_cast<unsigned char>(*p))) {
+        ++p;
+    }
+    return p != start;
+}
+
+// Helper: skip whitespace using scan_whitespace()
+void skip_whitespace(const char*& p) {
+    scan_whitespace(p);
 }
 
 bool scan_identifier(const char*& p, std::string& out) {
@@ -99,126 +130,6 @@ bool scan_identifier(const char*& p, std::string& out) {
     }
 
     return true;
-}
-
-std::vector<MacroToken> tokenize_macro_body(const std::string& body) {
-    std::vector<MacroToken> tokens;
-    std::istringstream is(body);
-
-    while (is) {
-        // Skip whitespace
-        if (is && std::isspace(is.peek())) {
-            tokens.push_back({ MacroTokenType::Punctuator, " " });
-            while (is && std::isspace(is.peek())) {
-                is.get();
-            }
-            continue;
-        }
-
-        if (!is) {
-            break;
-        }
-
-        // Identifier
-        std::string ident;
-        if (scan_identifier(is, ident)) {
-            tokens.push_back({ MacroTokenType::Identifier, ident });
-            continue;
-        }
-
-        // Number
-        if (std::isdigit(is.peek())) {
-            std::string num;
-            while (is && std::isdigit(is.peek())) {
-                num += static_cast<char>(is.get());
-            }
-            tokens.push_back({ MacroTokenType::Number, num });
-            continue;
-        }
-
-        // String literal
-        if (is.peek() == '"') {
-            std::string str;
-            str += static_cast<char>(is.get());
-            while (is && is.peek() != EOF) {
-                char c = static_cast<char>(is.get());
-                str += c;
-                if (c == '\\' && is.peek() != EOF) {
-                    str += static_cast<char>(is.get());
-                }
-                else if (c == '"') {
-                    break;
-                }
-            }
-            tokens.push_back({ MacroTokenType::StringLiteral, str });
-            continue;
-        }
-
-        // Char literal
-        if (is.peek() == '\'') {
-            std::string str;
-            str += static_cast<char>(is.get());
-            while (is && is.peek() != EOF) {
-                char c = static_cast<char>(is.get());
-                str += c;
-                if (c == '\\' && is.peek() != EOF) {
-                    str += static_cast<char>(is.get());
-                }
-                else if (c == '\'') {
-                    break;
-                }
-            }
-            tokens.push_back({ MacroTokenType::CharLiteral, str });
-            continue;
-        }
-
-        // Operators and punctuators (handle ## and # specially)
-        if (is.peek() == '#') {
-            is.get();
-            if (is.peek() == '#') {
-                is.get();
-                tokens.push_back({ MacroTokenType::Operator, "##" });
-            }
-            else {
-                tokens.push_back({ MacroTokenType::Operator, "#" });
-            }
-            continue;
-        }
-
-        // Single-character punctuators/operators
-        char c = static_cast<char>(is.get());
-        if (is) {
-            tokens.push_back({ MacroTokenType::Punctuator, std::string(1, c) });
-        }
-    }
-
-    return tokens;
-}
-
-bool scan_whitespace(const char*& p) {
-    const char* start = p;
-    while (*p && std::isspace(static_cast<unsigned char>(*p))) {
-        ++p;
-    }
-    return p != start;
-}
-
-// Helper: skip whitespace using scan_whitespace()
-void skip_whitespace(const char*& p) {
-    scan_whitespace(p);
-}
-
-Lexer::Lexer() {
-    // Stub: to be implemented
-}
-
-void Lexer::reset(const std::string& /*input*/) {
-    // Stub: to be implemented
-}
-
-Token Lexer::next_token() {
-    // Stub: to be implemented
-    return Token(TokenType::EndOfFile, "");
 }
 
 // Helper: scan digits (with underscores) in the given base, return value in 'out'.
@@ -497,7 +408,7 @@ bool scan_float(const char*& p, double& out) {
     const char* start = p;
     skip_whitespace(p);
 
-    // Number must start with a digit or a '.''
+    // Number must start with a digit or a .
     if (!std::isdigit(static_cast<unsigned char>(*p)) && *p != '.') {
         return false;
     }
@@ -769,3 +680,18 @@ bool scan_operator(const char*& p, std::string& out) {
     p = start;
     return false;
 }
+
+
+Lexer::Lexer() {
+    // Stub: to be implemented
+}
+
+void Lexer::reset(const std::string& /*input*/) {
+    // Stub: to be implemented
+}
+
+Token Lexer::next_token() {
+    // Stub: to be implemented
+    return Token(TokenType::EndOfFile, "");
+}
+
