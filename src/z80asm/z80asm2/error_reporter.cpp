@@ -6,15 +6,68 @@
 
 #include "error_reporter.h"
 
-Location::Location(const std::string& filename, int line_num)
-    : filename_(filename), line_num_(line_num) {
-}
-
 #define X(code, msg) msg,
 const char* ErrorReporter::error_messages[] = {
 #include "error_codes.def"
 };
 #undef X
+
+Location::Location(const std::string& filename, int line_num)
+    : filename_(filename), line_num_(line_num) {
+}
+
+const std::string& Location::filename() const {
+    return filename_;
+}
+
+int Location::line_num() const {
+    return line_num_;
+}
+
+const std::string& Location::source_line() const {
+    return source_line_;
+}
+
+const std::string& Location::expanded_line() const {
+    return expanded_line_;
+}
+
+void Location::set_filename(const std::string& filename) {
+    filename_ = filename;
+}
+
+void Location::set_line_num(int line_num) {
+    line_num_ = line_num;
+}
+
+void Location::set_source_line(const std::string& line) {
+    source_line_ = line;
+    expanded_line_.clear();
+}
+
+void Location::set_expanded_line(const std::string& line) {
+    expanded_line_ = line;
+}
+
+// Computes and sets the logical line number based on #line directive
+void Location::set_logical_line_num(int line_directive_value,
+                                    int line_directive_physical_line,
+                                    int physical_line_num) {
+    // #line N means the *next* physical line is N
+    int logical = line_directive_value +
+                  (physical_line_num - line_directive_physical_line) - 1;
+    line_num_ = logical;
+}
+
+// Sets the line number to the physical line number
+void Location::set_physical_line_num(int physical_line_num) {
+    line_num_ = physical_line_num;
+}
+
+// Increments the logical line number
+void Location::inc_line_num() {
+    ++line_num_;
+}
 
 ErrorReporter::ErrorReporter() = default;
 
