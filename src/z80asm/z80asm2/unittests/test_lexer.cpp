@@ -8,6 +8,7 @@
 #include "catch_amalgamated.hpp"
 #include "../lexer.h"
 #include "../token.h"
+#include "../keywords.h"
 #include <sstream>
 #include <string>
 
@@ -53,55 +54,55 @@ TEST_CASE("scan_identifier extracts valid identifiers", "[read_identifier]") {
     std::string out;
 
     SECTION("Simple identifier") {
-        std::istringstream is("foo");
-        REQUIRE(scan_identifier(is, out));
+        const char* p = "foo";
+        REQUIRE(scan_identifier(p, out));
         CHECK(out == "foo");
-        CHECK(is.peek() == EOF);
+        CHECK(*p == '\0');
     }
 
     SECTION("Identifier with quote") {
-        std::istringstream is("af'");
-        REQUIRE(scan_identifier(is, out));
+        const char* p = "af'";
+        REQUIRE(scan_identifier(p, out));
         CHECK(out == "af'");
-        CHECK(is.peek() == EOF);
+        CHECK(*p == '\0');
     }
 
     SECTION("Identifier without quote") {
-        std::istringstream is("define'");
-        REQUIRE(scan_identifier(is, out));
+        const char* p = "define'";
+        REQUIRE(scan_identifier(p, out));
         CHECK(out == "define");
-        CHECK(is.peek() == '\'');
+        CHECK(*p == '\'');
     }
 
     SECTION("Identifier with digits and underscores") {
-        std::istringstream is("_bar123 rest");
-        REQUIRE(scan_identifier(is, out));
+        const char* p = "_bar123 rest";
+        REQUIRE(scan_identifier(p, out));
         CHECK(out == "_bar123");
-        char next = static_cast<char>(is.get());
+        char next = *p;
         CHECK(next == ' ');
     }
 
     SECTION("Identifier at start of stream") {
-        std::istringstream is("abc123");
-        REQUIRE(scan_identifier(is, out));
+        const char* p = "abc123";
+        REQUIRE(scan_identifier(p, out));
         CHECK(out == "abc123");
     }
 
     SECTION("No identifier at start") {
-        std::istringstream is(" 123abc");
-        REQUIRE_FALSE(scan_identifier(is, out));
+        const char* p = " 123abc";
+        REQUIRE_FALSE(scan_identifier(p, out));
     }
 
     SECTION("Empty input") {
-        std::istringstream is("");
-        REQUIRE_FALSE(scan_identifier(is, out));
+        const char* p = "";
+        REQUIRE_FALSE(scan_identifier(p, out));
     }
 
     SECTION("Identifier followed by punctuation") {
-        std::istringstream is("foo_bar;next");
-        REQUIRE(scan_identifier(is, out));
+        const char* p = "foo_bar;next";
+        REQUIRE(scan_identifier(p, out));
         CHECK(out == "foo_bar");
-        char next = static_cast<char>(is.get());
+        char next = *p;
         CHECK(next == ';');
     }
 }
@@ -134,8 +135,8 @@ TEST_CASE("tokenize_macro_body handles string and char literals",
     CHECK(tokens[0].text == "\"hello\"");
     CHECK(tokens[1].type == MacroTokenType::Punctuator);
     CHECK(tokens[1].text == " ");
-    CHECK(tokens[2].type == MacroTokenType::CharLiteral);
-    CHECK(tokens[2].text == "'a'");
+    CHECK(tokens[2].type == MacroTokenType::Number);
+    CHECK(tokens[2].text == "97");
 }
 
 TEST_CASE("tokenize_macro_body handles punctuators", "[tokenize_macro_body]") {

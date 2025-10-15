@@ -4,10 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(AF, "AF")
-X(AF_, "AF'")
-X(DEFINE, "DEFINE")
-X(INCLUDE, "INCLUDE")
-X(LD, "LD")
-X(LINE, "LINE")
-X(UNDEF, "UNDEF")
+X(AF, "AF", 0)
+X(AF_, "AF'", 0)
+X(DEFINE, "DEFINE", IS_DIRECTIVE)
+X(INCLUDE, "INCLUDE", IS_DIRECTIVE)
+X(LD, "LD", 0)
+X(LINE, "LINE", IS_DIRECTIVE)
+X(UNDEF, "UNDEF", IS_DIRECTIVE)

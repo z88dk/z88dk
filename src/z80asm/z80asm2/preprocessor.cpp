@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "keywords.h"
 #include "lexer.h"
 #include "preprocessor.h"
 #include <algorithm>
@@ -25,7 +26,8 @@ bool Preprocessor::open(const std::string& filename) {
     return !file_stack_.empty();
 }
 
-bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
+bool Preprocessor::next_line(std::string& out_line,
+                             Location& out_location) {
     while (true) {
         if (!split_queue_.empty()) {
             out_line = split_queue_.front();
@@ -36,9 +38,6 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
         while (!file_stack_.empty()) {
             InputFile& file = file_stack_.back();
             if (file.line_index < file.lines.size()) {
-                Keyword keyword;
-                size_t after_word;
-
                 int physical_line_num = file.lines[file.line_index].physical_line_num;
                 if (file.line_directive_active) {
                     // Off-by-one fix: #line N means the *next* physical line is N
@@ -58,9 +57,12 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
                     continue;
                 }
 
-                if (is_directive(line, keyword, after_word)) {
+                // Use pointer-based directive detection and processing
+                const char* p = line.c_str();
+                Keyword keyword;
+                if (is_directive(p, keyword)) {
                     if (keyword == Keyword::LINE) {
-                        if (process_directive(keyword, line, after_word, out_location)) {
+                        if (process_directive(keyword, p, out_location)) {
                             // #line directive: update file.location for future lines
                             file.location = out_location;
                             file.line_directive_active = true;
@@ -71,7 +73,7 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
                         }
                     }
                     else {
-                        if (process_directive(keyword, line, after_word, out_location)) {
+                        if (process_directive(keyword, p, out_location)) {
                             continue;
                         }
                     }
@@ -103,35 +105,29 @@ bool Preprocessor::next_line(std::string& out_line, Location& out_location) {
     }
 }
 
-bool Preprocessor::read_file(const std::string& filename,
-                             std::vector<LogicalLine>& lines) {
-    std::ifstream in(filename.c_str(), std::ios::binary);
-    if (!in) {
-        reporter_.error(ErrorCode::FileNotFound, filename);
-        return false;
-    }
-
-    // read the entire file content
-    std::string content(
-        (std::istreambuf_iterator<char>(in)),
-        std::istreambuf_iterator<char>());
-
-    // Normalize line endings to '\n'
-    std::string normalized;
-    for (size_t i = 0; i < content.size(); ++i) {
-        if (content[i] == '\r') {
-            normalized += '\n';
-            if (i + 1 < content.size() && content[i + 1] == '\n') {
-                ++i;
+// Helper: Normalize all line endings in-place to '\n' (NL).
+// Accepts a mutable null-terminated C string.
+static void normalize_line_endings(char* s) {
+    char* src = s;
+    char* dst = s;
+    while (*src) {
+        if (*src == '\r') {
+            *dst++ = '\n';
+            if (src[1] == '\n') {
+                ++src; // skip LF after CR
             }
+            ++src;
         }
         else {
-            normalized += content[i];
+            *dst++ = *src++;
         }
     }
+    *dst = '\0';
+}
 
-    // Split into logical lines (handling backslash continuations)
-    std::istringstream iss(normalized);
+void Preprocessor::split_logical_lines(const char* buffer,
+                                       std::vector<LogicalLine>& lines) {
+    std::istringstream iss(buffer);
     std::string logical_line, physical_line;
     int physical_line_num = 1;
     int logical_start_line = 1;
@@ -145,25 +141,65 @@ bool Preprocessor::read_file(const std::string& filename,
         }
         else {
             logical_line += trimmed;
-            lines.push_back(LogicalLine{logical_line, logical_start_line});
+            if (!logical_line.empty()) { // Only push non-empty logical lines
+                lines.push_back(LogicalLine{logical_line,
+                                            logical_start_line});
+            }
             logical_line.clear();
             logical_start_line = physical_line_num + 1;
         }
         ++physical_line_num;
     }
     if (!logical_line.empty()) {
-        lines.push_back(LogicalLine{logical_line, logical_start_line});
+        lines.push_back(LogicalLine{logical_line,
+                                    logical_start_line});
     }
+}
+
+bool Preprocessor::read_file(const std::string& filename,
+                             std::vector<LogicalLine>& lines) {
+    std::ifstream in(filename.c_str(), std::ios::binary);
+    if (!in) {
+        reporter_.error(ErrorCode::FileNotFound, filename);
+        return false;
+    }
+
+    // Read the entire file content directly into a mutable buffer
+    in.seekg(0, std::ios::end);
+    std::streamsize filesize = in.tellg();
+    in.seekg(0, std::ios::beg);
+
+    std::vector<char> buffer;
+    if (filesize > 0) {
+        buffer.resize(static_cast<size_t>(filesize));
+        in.read(buffer.data(), filesize);
+    }
+    buffer.push_back('\0'); // null-terminate
+
+    // Normalize line endings in-place
+    normalize_line_endings(buffer.data());
+
+    // Use the member function to split into logical lines
+    split_logical_lines(buffer.data(), lines);
+
     return true;
 }
 
-void Preprocessor::push_file(const std::string& filename) {
-    // Check for recursive include
+// Add this private member function to Preprocessor (declare in preprocessor.h as well)
+bool Preprocessor::is_recursive_include(const std::string& filename) const {
     for (const auto& f : file_stack_) {
         if (f.filename == filename) {
-            reporter_.error(ErrorCode::RecursiveInclude, filename);
-            return;
+            return true;
         }
+    }
+    return false;
+}
+
+void Preprocessor::push_file(const std::string& filename) {
+    // Check for recursive include using the new member function
+    if (is_recursive_include(filename)) {
+        reporter_.error(ErrorCode::RecursiveInclude, filename);
+        return;
     }
 
     // read the whole file
@@ -193,90 +229,84 @@ void Preprocessor::pop_file() {
     }
 }
 
-bool Preprocessor::is_directive(const std::string& line,
-                                Keyword& keyword, size_t& after_word) const {
-    size_t i = 0;
+bool Preprocessor::is_directive(const char*& p, Keyword& keyword) const {
+    keyword = Keyword::None;
+    const char* start = p;
 
     // Skip leading whitespace
-    while (i < line.size() &&
-            std::isspace(static_cast<unsigned char>(line[i]))) {
-        ++i;
-    }
+    skip_whitespace(p);
 
     // Optional hash
-    if (i < line.size() && line[i] == '#') {
-        ++i;
-
-        // Skip whitespace after hash
-        while (i < line.size() &&
-                std::isspace(static_cast<unsigned char>(line[i]))) {
-            ++i;
-        }
+    if (*p == '#') {
+        ++p;
+        skip_whitespace(p);
     }
 
-    // Use scan_identifier to extract the first word
-    std::istringstream iss(line.substr(i));
+    // Try to scan an identifier
     std::string word;
-    std::streampos before = iss.tellg();
-    if (!scan_identifier(iss, word)) {
-        return false;    // No word found
+    if (!scan_identifier(p, word)) {
+        p = start;
+        return false;
     }
-    std::streampos after = iss.tellg();
+
     keyword = to_keyword(word);
-    if (keyword != Keyword::None) {
-        // after_word is the index in the original line after the keyword
-        after_word = i + static_cast<size_t>(after);
+    if (keyword_is_directive(keyword)) {
+        // Found a directive keyword
         return true;
     }
     else {
+        p = start;
         return false;
     }
 }
 
-bool Preprocessor::process_directive(Keyword keyword,
-                                     const std::string& line,
-                                     size_t after_word, Location& location) {
-    // rest = line after the directive word
-    std::string rest = line.substr(after_word);
-    size_t rest_start = rest.find_first_not_of(" \t");
-    if (rest_start != std::string::npos) {
-        rest = rest.substr(rest_start);
-    }
-    else {
-        rest.clear();
-    }
+bool Preprocessor::process_directive(Keyword keyword, const char*& p,
+                                     Location& location) {
+
+    // Skip leading whitespace
+    skip_whitespace(p);
 
     switch (keyword) {
     case Keyword::INCLUDE:
-        return process_include(rest, location);
+        return process_include(p, location);
     case Keyword::DEFINE:
-        return process_define(rest, location);
+        return process_define(p, location);
     case Keyword::UNDEF:
-        return process_undef(rest, location);
+        return process_undef(p, location);
     case Keyword::LINE:
-        return process_line(rest, location);
+        return process_line(p, location);
     default:
         return false;
     }
 }
 
-bool Preprocessor::process_include(const std::string& rest,
-                                   Location& location) {
-    if (!rest.empty() && (rest.front() == '"' || rest.front() == '<')) {
-        char quote = rest.front();
-        // Find the closing quote, skipping the first character
-        size_t end = rest.find((quote == '"') ? '"' : '>', 1);
-        if (end != std::string::npos && end > 1) {
-            std::string filename = rest.substr(1, end - 1);
-            push_file(filename);
-            return true;
-        }
-    }
+bool Preprocessor::process_include(const char*& p, Location& location) {
+    skip_whitespace(p);
 
-    std::istringstream iss(rest);
     std::string filename;
 
-    iss >> filename;
+    // Handle quoted include: #include "file" or #include <file>
+    if (*p == '"' || *p == '<') {
+        char open = *p++;
+        char close = (open == '"') ? '"' : '>';
+        while (*p && *p != close) {
+            filename += *p++;
+        }
+        if (*p == close) {
+            ++p;    // skip closing quote/bracket
+        }
+        if (filename.empty()) {
+            reporter_.error(location, ErrorCode::InvalidSyntax, "Empty INCLUDE filename");
+            return true;
+        }
+        push_file(filename);
+        return true;
+    }
+
+    // Fallback: read until whitespace
+    while (*p && !isspace(static_cast<unsigned char>(*p))) {
+        filename += *p++;
+    }
     if (!filename.empty()) {
         push_file(filename);
         return true;
@@ -287,68 +317,54 @@ bool Preprocessor::process_include(const std::string& rest,
     return true;
 }
 
-bool Preprocessor::process_define(const std::string& rest, Location& location) {
-    std::istringstream iss(rest);
-    std::string name;
+bool Preprocessor::process_define(const char*& p, Location& location) {
+    skip_whitespace(p);
 
-    if (!scan_identifier(iss, name)) {
+    // Parse macro name
+    std::string name;
+    if (!scan_identifier(p, name)) {
         reporter_.error(location, ErrorCode::InvalidSyntax,
                         "Malformed DEFINE directive");
         return true;
     }
 
-    // Save stream position after macro name
-    std::streampos after_name = iss.tellg();
-
-    // Peek next character (without skipping whitespace)
-    char next = iss.peek();
-
     std::vector<std::string> params;
-    std::string body;
-
-    if (next == '(') {
-        // Function-like macro: no whitespace between name and '('
-        iss.get(); // consume '('
+    // Check for function-like macro: no whitespace between name and '('
+    const char* after_name = p;
+    skip_whitespace(p);
+    if (*p == '(' && after_name == p) {
+        ++p; // consume '('
         while (true) {
-            // Skip whitespace
-            iss >> std::ws;
-
-            // Check for end of parameter list
-            if (iss.peek() == ')') {
-                iss.get(); // consume ')'
+            skip_whitespace(p);
+            if (*p == ')') {
+                ++p; // consume ')'
                 break;
             }
-
             std::string param;
-            if (!scan_identifier(iss, param)) {
+            if (!scan_identifier(p, param)) {
                 reporter_.error(location, ErrorCode::InvalidSyntax,
                                 "Malformed macro parameter list");
                 return true;
             }
-
             params.push_back(param);
-
-            // Skip whitespace
-            iss >> std::ws;
-            if (iss.peek() == ',') {
-                iss.get();
+            skip_whitespace(p);
+            if (*p == ',') {
+                ++p;
                 continue;
             }
-
-            // If next is ')', will be handled in next loop
+            if (*p == ')') {
+                ++p;
+                break;
+            }
         }
-    }
-    else {
-        // Object-like macro: restore stream to after name, body is the rest
-        iss.clear();
-        iss.seekg(after_name);
     }
 
     // Skip whitespace before macro body
-    iss >> std::ws;
-    std::getline(iss, body);
+    skip_whitespace(p);
 
-    // Trim trailing whitespace from macro body
+    // The rest of the line is the macro body
+    std::string body = p;
+    // Remove trailing whitespace
     body = rtrim(body);
 
     // Store macro
@@ -359,11 +375,11 @@ bool Preprocessor::process_define(const std::string& rest, Location& location) {
     return true;
 }
 
-bool Preprocessor::process_undef(const std::string& rest, Location& location) {
-    std::istringstream iss(rest);
-    std::string name;
+bool Preprocessor::process_undef(const char*& p, Location& location) {
+    skip_whitespace(p);
 
-    if (!scan_identifier(iss, name)) {
+    std::string name;
+    if (!scan_identifier(p, name)) {
         reporter_.error(location, ErrorCode::InvalidSyntax,
                         "Malformed UNDEF directive");
         return true;
@@ -373,26 +389,46 @@ bool Preprocessor::process_undef(const std::string& rest, Location& location) {
     return true;
 }
 
-bool Preprocessor::process_line(const std::string& rest, Location& location) {
-    std::istringstream iss(rest);
-    int new_line = 0;
-    std::string filename;
+bool Preprocessor::process_line(const char*& p, Location& location) {
+    skip_whitespace(p);
 
-    iss >> new_line;
-    iss >> filename;
-    if (!filename.empty() && filename.front() == '"') {
-        if (filename.size() > 1 && filename.back() == '"') {
-            filename = filename.substr(1, filename.size() - 2);
+    // Parse line number
+    int new_line = 0;
+    if (!scan_integer(p, new_line)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed LINE directive (missing line number)");
+        return true;
+    }
+
+    skip_whitespace(p);
+
+    // Parse filename (optional)
+    std::string filename;
+    if (*p == '"') {
+        ++p; // skip opening quote
+        while (*p && *p != '"') {
+            if (*p == '\\' && p[1]) {
+                filename += *p++;
+                filename += *p++;
+            }
+            else {
+                filename += *p++;
+            }
         }
-        else {
-            filename = filename.substr(1);
+        if (*p == '"') {
+            ++p;    // skip closing quote
+        }
+    }
+    else if (*p) {
+        // Unquoted filename: read until whitespace
+        while (*p && !isspace(static_cast<unsigned char>(*p))) {
+            filename += *p++;
         }
     }
 
     if (new_line > 0) {
-        location.set_line_num( new_line);
+        location.set_line_num(new_line);
     }
-
     if (!filename.empty()) {
         location.set_filename(filename);
     }
@@ -656,37 +692,29 @@ std::string Preprocessor::remove_comments(InputFile& file) {
     return rtrim(result);
 }
 
+// Returns true if the line starts with an identifier (possibly after whitespace) followed by a colon.
+// Sets first_colon_after_id to true if a label is detected.
+static bool has_label(const std::string& line) {
+    const char* p = line.c_str();
+    skip_whitespace(p);
+
+    std::string ident;
+    if (scan_identifier(p, ident)) {
+        skip_whitespace(p);
+        if (*p == ':') {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Preprocessor::split_lines(const std::string& line,
                                std::vector<std::string>& split_lines) {
     split_lines.clear();
     std::string current;
     bool in_string = false, in_char = false;
-    bool first_colon_after_id = false;
+    bool first_colon_after_id = has_label(line);
     size_t i = 0;
-
-    // Use a stream to call scan_identifier
-    std::istringstream iss(line);
-    std::string ident;
-    size_t start = 0;
-
-    // Skip leading whitespace
-    while (start < line.size()
-            && std::isspace(static_cast<unsigned char>(line[start]))) {
-        ++start;
-    }
-    iss.seekg(start);
-
-    if (scan_identifier(iss, ident)) {
-        // Skip whitespace after identifier
-        while (iss && std::isspace(iss.peek())) {
-            iss.get();
-        }
-
-        if (iss && iss.peek() == ':') {
-            // This is a label definition, skip the first colon
-            first_colon_after_id = true;
-        }
-    }
 
     for (i = 0; i < line.size(); ++i) {
         char c = line[i];
