@@ -784,34 +784,54 @@ void Preprocessor::split_lines(const std::string& line,
     std::string current;
     bool in_string = false, in_char = false;
     bool first_colon_after_id = has_label(line);
-    size_t i = 0;
+    int ternary_depth = 0;
 
-    for (i = 0; i < line.size(); ++i) {
-        char c = line[i];
+    const char* p = line.c_str();
+    const char* start = p;
+
+    while (*p) {
+        char c = *p;
 
         // Handle string and char literals, with escape support
-        if (!in_char && c == '"' && (i == 0 || line[i - 1] != '\\')) {
+        if (!in_char && c == '"' && (p == start || *(p - 1) != '\\')) {
             in_string = !in_string;
             current += c;
+            ++p;
             continue;
         }
 
-        if (!in_string && c == '\'' && (i == 0 || line[i - 1] != '\\')) {
+        if (!in_string && c == '\'' && (p == start || *(p - 1) != '\\')) {
             in_char = !in_char;
             current += c;
+            ++p;
             continue;
         }
 
         if (in_string || in_char) {
             // If this is a backslash and not the last character, skip the next character (escaped)
-            if (c == '\\' && (i + 1 < line.size())) {
+            if (c == '\\' && *(p + 1)) {
                 current += c;
-                ++i;
-                current += line[i];
+                ++p;
+                current += *p;
+                ++p;
                 continue;
             }
-
             current += c;
+            ++p;
+            continue;
+        }
+
+        // Track ternary operator depth
+        if (c == '?') {
+            ++ternary_depth;
+            current += c;
+            ++p;
+            continue;
+        }
+        if (c == ':' && ternary_depth > 0) {
+            --ternary_depth;
+            current += c;
+            ++p;
             continue;
         }
 
@@ -819,23 +839,30 @@ void Preprocessor::split_lines(const std::string& line,
         if (c == '\\') {
             split_lines.push_back(current);
             current.clear();
+            ++p;
             continue;
         }
 
-        // Handle colon as split, except first colon after identifier at start
+        // Handle colon as split, except first colon after identifier at start,
+        // and except when inside a ternary expression
         if (c == ':') {
             if (first_colon_after_id) {
                 current += c;
                 first_colon_after_id = false;
             }
-            else {
+            else if (ternary_depth == 0) {
                 split_lines.push_back(current);
                 current.clear();
             }
+            else {
+                current += c;
+            }
+            ++p;
             continue;
         }
 
         current += c;
+        ++p;
     }
 
     // Add the last segment
