@@ -7,6 +7,7 @@
 #pragma once
 
 #include "error_reporter.h"
+#include "keywords.h"
 #include "lexer.h"
 #include <deque>
 #include <string>
@@ -57,16 +58,17 @@ private:
                    std::vector<LogicalLine>& lines);
     void push_file(const std::string& filename);
     void pop_file();
+    bool is_recursive_include(const std::string& filename) const;
+    void split_logical_lines(const char* buffer,
+                             std::vector<LogicalLine>& lines);
 
     // Process directives
-    bool is_directive(const std::string& line,
-                      Keyword& keyword, size_t& after_word) const;
-    bool process_directive(Keyword keyword, const std::string& line,
-                           size_t after_word, Location& location);
-    bool process_include(const std::string& rest, Location& location);
-    bool process_define(const std::string& rest, Location& location);
-    bool process_undef(const std::string& rest, Location& location);
-    bool process_line(const std::string& rest, Location& location);
+    bool is_directive(const char*& p, Keyword& keyword) const;
+    bool process_directive(Keyword keyword, const char*& p, Location& location);
+    bool process_include(const char*& p, Location& location);
+    bool process_define(const char*& p, Location& location);
+    bool process_undef(const char*& p, Location& location);
+    bool process_line(const char*& p, Location& location);
 
     // Expands a macro invocation (object-like or function-like) in a line.
     // Returns the expanded string.
