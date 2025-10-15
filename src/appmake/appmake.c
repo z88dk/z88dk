@@ -43,7 +43,6 @@ static void         set_option_by_type(option_t *options, type_t type, char *val
 static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
 static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
-static void         get_temporary_filename(char *filen);
 static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
@@ -1094,7 +1093,7 @@ int bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, i
 }
 
 
-static void get_temporary_filename(char *filen)
+void get_temporary_filename(char *filen)
 {
 #ifdef _WIN32
     char   *ptr;
