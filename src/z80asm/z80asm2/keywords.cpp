@@ -19,20 +19,31 @@ Keyword to_keyword(const std::string& s) {
 #undef X
 
 #define X(id, text, flags) flags,
-bool keyword_is_directive(Keyword kw) {
-    static const int keyword_flags[] = {
-        0,
+static const int keyword_flags[] = {
+    0,
 #include "keywords.def"
-    };
+};
+#undef X
 
+bool keyword_is_directive(Keyword kw) {
     int flags = keyword_flags[static_cast<int>(kw)];
     return (flags & IS_DIRECTIVE) != 0;
 }
-#undef X
+
+bool keyword_is_name_directive(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_NAME_DIRECTIVE) != 0;
+}
 
 std::string to_upper(const std::string& s) {
     std::string result = s;
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
+    return result;
+}
+
+std::string to_lower(const std::string& s) {
+    std::string result = s;
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
     return result;
 }
 
@@ -44,5 +55,9 @@ std::string ltrim(const std::string& s) {
 std::string rtrim(const std::string& s) {
     size_t end = s.find_last_not_of(" \t\r\n");
     return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+std::string trim(const std::string& s) {
+    return ltrim(rtrim(s));
 }
 

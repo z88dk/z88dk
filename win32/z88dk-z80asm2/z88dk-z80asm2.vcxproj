@@ -134,6 +134,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\error_reporter.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\error_reporter.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preprocessor.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\symbol_table.h" />
