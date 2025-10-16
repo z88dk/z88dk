@@ -71,6 +71,15 @@ private:
     bool process_undef(const char*& p, Location& location);
     bool process_line(const char*& p, Location& location);
 
+    // Checks for "name DIRECTIVE value" syntax.
+    // If found, sets 'name' and 'keyword' and returns true. Advances 'p' past the directive.
+    bool is_name_directive(const char*& p, std::string& name,
+                           Keyword& keyword) const;
+    bool process_name_directive(Keyword keyword, const std::string& name,
+                                const char*& p);
+    bool process_name_defl(const char*& p, const std::string& name);
+    bool process_name_define(const char*& p, const std::string& name);
+
     // Expands a macro invocation (object-like or function-like) in a line.
     // Returns the expanded string.
     static const inline int MAX_MACRO_RECURSION = 32;

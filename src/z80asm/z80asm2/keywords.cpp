@@ -19,16 +19,21 @@ Keyword to_keyword(const std::string& s) {
 #undef X
 
 #define X(id, text, flags) flags,
-bool keyword_is_directive(Keyword kw) {
-    static const int keyword_flags[] = {
-        0,
+static const int keyword_flags[] = {
+    0,
 #include "keywords.def"
-    };
+};
+#undef X
 
+bool keyword_is_directive(Keyword kw) {
     int flags = keyword_flags[static_cast<int>(kw)];
     return (flags & IS_DIRECTIVE) != 0;
 }
-#undef X
+
+bool keyword_is_name_directive(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_NAME_DIRECTIVE) != 0;
+}
 
 std::string to_upper(const std::string& s) {
     std::string result = s;

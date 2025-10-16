@@ -862,8 +862,80 @@ TEST_CASE("Preprocessor: DEFL can extend an existing DEFINE value",
     std::string out_line;
     Location out_loc;
 
-    // First emitted line is the result of expansion
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "LD A,2+1");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name DEFL value creates and extends macro",
+          "[preprocessor][defl][name-directive]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Case 1: name is undefined, DEFL should substitute previous (empty) -> "+1"
+    // Case 2: name is defined, DEFL should paste previous "+1" -> "+1+1"
+    std::vector<std::string> lines = {
+        "var DEFL var+1",
+        "LD A,var",
+        "var DEFL var+1",
+        "LD B,var"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,+1");       // first DEFL produced "+1"
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD B,+1+1");     // second DEFL produced "+1+1"
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name DEFL value extends an existing DEFINE value",
+          "[preprocessor][defl][name-directive]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Start with var defined as "2". DEFL should paste previous "2" producing "2+1".
+    std::vector<std::string> lines = {
+        "#define var 2",
+        "var DEFL var+1",
+        "LD A,var"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,2+1");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name DEFINE value creates macro",
+          "[preprocessor][define][name-directive]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Use alternative syntax: name DEFINE value
+    std::vector<std::string> lines = {
+        "FOO DEFINE 42",
+        "LD A,FOO"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Macro FOO should expand to 42
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,42");
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
