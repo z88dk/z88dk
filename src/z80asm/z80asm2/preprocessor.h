@@ -67,6 +67,7 @@ private:
     bool process_directive(Keyword keyword, const char*& p, Location& location);
     bool process_include(const char*& p, Location& location);
     bool process_define(const char*& p, Location& location);
+    bool process_defl(const char*& p, Location& location);
     bool process_undef(const char*& p, Location& location);
     bool process_line(const char*& p, Location& location);
 
