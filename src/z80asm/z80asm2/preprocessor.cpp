@@ -61,8 +61,10 @@ bool Preprocessor::next_line(std::string& out_line,
                 }
 
                 // Use pointer-based directive detection and processing
-                const char* p = line.c_str();
+                std::string name;
                 Keyword keyword;
+
+                const char* p = line.c_str();
                 if (is_directive(p, keyword)) {
                     if (keyword == Keyword::LINE) {
                         if (process_directive(keyword, p, out_location)) {
@@ -82,6 +84,13 @@ bool Preprocessor::next_line(std::string& out_line,
                         if (process_directive(keyword, p, out_location)) {
                             continue;
                         }
+                    }
+                }
+
+                p = line.c_str();
+                if (is_name_directive(p, name, keyword)) {
+                    if (process_name_directive(keyword, name, p)) {
+                        continue;
                     }
                 }
 
@@ -314,42 +323,8 @@ bool Preprocessor::process_defl(const char*& p, Location& location) {
     }
     ++p; // skip '='
 
-    // Skip whitespace before macro body
-    skip_whitespace(p);
-
-    // Read RHS as raw text (rest of the line)
-    std::string rhs = p;
-    rhs = rtrim(rhs);
-
-    // Determine previous textual value (concatenate token.text of existing macro body)
-    std::string prev_text;
-    auto it_prev = macros_.find(name);
-    if (it_prev != macros_.end()) {
-        for (const auto& t : it_prev->second.body_tokens) {
-            prev_text += t.text;
-        }
-    }
-
-    // Tokenize RHS and perform pure text substitution for identifier tokens equal to name
-    std::vector<MacroToken> rhs_tokens = tokenize_macro_body(rhs);
-    std::string new_body_text;
-    for (const auto& tok : rhs_tokens) {
-        if (tok.type == MacroTokenType::Identifier && tok.text == name) {
-            // paste previous textual value
-            new_body_text += prev_text;
-        }
-        else {
-            new_body_text += tok.text;
-        }
-    }
-
-    // Store as an object-like macro (no params)
-    Macro macro;
-    macro.params.clear();
-    macro.body_tokens = tokenize_macro_body(new_body_text);
-    macros_[name] = std::move(macro);
-
-    return true;
+    // continue into process_name_defl
+    return process_name_defl(p, name);
 }
 
 bool Preprocessor::process_include(const char*& p, Location& location) {
@@ -505,6 +480,111 @@ bool Preprocessor::process_line(const char*& p, Location& location) {
         location.set_filename(filename);
     }
 
+    return true;
+}
+
+bool Preprocessor::is_name_directive(const char*& p, std::string& name,
+                                     Keyword& keyword) const {
+    const char* start = p;
+    name.clear();
+    std::string directive;
+
+    // Scan first identifier (name)
+    if (!scan_identifier(p, name)) {
+        p = start;
+        keyword = Keyword::None;
+        return false;
+    }
+
+    // Scan second identifier (directive)
+    if (!scan_identifier(p, directive)) {
+        p = start;
+        keyword = Keyword::None;
+        return false;
+    }
+
+    // Convert to keyword and check if it's a name-directive
+    keyword = to_keyword(directive);
+    if (!keyword_is_name_directive(keyword)) {
+        p = start;
+        keyword = Keyword::None;
+        return false;
+    }
+
+    return true;
+}
+
+bool Preprocessor::process_name_directive(Keyword keyword,
+        const std::string& name, const char*& p) {
+    // Skip leading whitespace
+    skip_whitespace(p);
+
+    switch (keyword) {
+    case Keyword::DEFL:
+        return process_name_defl(p, name);
+    case Keyword::DEFINE:
+        return process_name_define(p, name);
+    default:
+        return false;
+    }
+}
+
+bool Preprocessor::process_name_defl(const char*& p,
+                                     const std::string& name) {
+
+    // Skip whitespace before macro body
+    skip_whitespace(p);
+
+    // Read RHS as raw text (rest of the line)
+    std::string rhs = p;
+    rhs = rtrim(rhs);
+
+    // Determine previous textual value (concatenate token.text of existing macro body)
+    std::string prev_text;
+    auto it_prev = macros_.find(name);
+    if (it_prev != macros_.end()) {
+        for (const auto& t : it_prev->second.body_tokens) {
+            prev_text += t.text;
+        }
+    }
+
+    // Tokenize RHS and perform pure text substitution for identifier tokens equal to name
+    std::vector<MacroToken> rhs_tokens = tokenize_macro_body(rhs);
+    std::string new_body_text;
+    for (const auto& tok : rhs_tokens) {
+        if (tok.type == MacroTokenType::Identifier && tok.text == name) {
+            // paste previous textual value
+            new_body_text += prev_text;
+        }
+        else {
+            new_body_text += tok.text;
+        }
+    }
+
+    // Store as an object-like macro (no params)
+    Macro macro;
+    macro.params.clear();
+    macro.body_tokens = tokenize_macro_body(new_body_text);
+    macros_[name] = std::move(macro);
+
+    return true;
+}
+
+bool Preprocessor::process_name_define(const char*& p,
+                                       const std::string& name) {
+    // Skip whitespace before macro body
+    skip_whitespace(p);
+
+    // The rest of the line is the macro body
+    std::string body = p;
+    // Remove trailing whitespace
+    body = rtrim(body);
+
+    // Store macro
+    Macro macro;
+    macro.params.clear();
+    macro.body_tokens = tokenize_macro_body(body);
+    macros_[name] = macro;
     return true;
 }
 
