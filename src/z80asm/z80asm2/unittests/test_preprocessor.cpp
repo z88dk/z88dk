@@ -687,3 +687,130 @@ TEST_CASE("Preprocessor: macro token pasting with ## operator",
     CHECK(out_line == "aabb");
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
+
+// New test: ensure all input formats accepted by scan_integer are converted to decimal
+TEST_CASE("Preprocessor: scan_integer formats in macros are converted to decimal",
+          "[preprocessor][scan_integer]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Define macros using the various integer input formats supported by scan_integer.
+    // Then emit lines using those macros; Preprocessor should expand macros and the numbers
+    // should already be converted to their decimal equivalent by tokenize_macro_body.
+    std::vector<std::string> lines = {
+        "#define D_DEC 42",            // decimal
+        "#define D_0x 0x2A",          // 0x hex
+        "#define D_DOLLAR $2A",       // $ hex
+        "#define D_HSUFFIX 2Ah",      // hex with h suffix
+        "#define D_BIN1 %101010",     // binary with % prefix
+        "#define D_BIN2 @101010",     // binary with @ prefix
+        "#define D_0b 0b101010",      // binary with 0b prefix
+        "#define D_BSUFFIX 101010b",  // binary with trailing b
+        "#define D_GRAPH1 %\"#-#\"",  // graphical bitmask: '#-#' => binary 101 => 5
+        "#define D_GRAPH2 @\"#-#\"",  // graphical bitmask: '#-#' => binary 101 => 5
+        "#define D_CHAR 'A'",         // quoted character => ASCII 65
+        // Use the macros in instructions so preprocessor returns expanded decimal numbers
+        "LD A,D_DEC",
+        "LD B,D_0x",
+        "LD C,D_DOLLAR",
+        "LD D,D_HSUFFIX",
+        "LD E,D_BIN1",
+        "LD E,D_BIN2",
+        "LD H,D_0b",
+        "LD L,D_BSUFFIX",
+        "LD M,D_GRAPH1",
+        "LD M,D_GRAPH2",
+        "LD X,D_CHAR"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expected outputs after macro expansion: decimals only
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD B,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD C,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD D,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD E,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD E,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD H,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD L,42");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD M,5");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD M,5");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD X,65");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+// New test: ensure all input formats accepted by scan_float are recognized and output contains '.' or 'e'
+TEST_CASE("Preprocessor: scan_float formats are recognized and output contains dot or e",
+          "[preprocessor][scan_float]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Define macros using representative float formats accepted by scan_float.
+    std::vector<std::string> lines = {
+        "#define F1 1.0",       // standard decimal with fraction
+        "#define F2 1.",        // trailing dot
+        "#define F3 .5",        // leading dot
+        "#define F4 1e3",       // exponent without dot
+        "#define F5 1E+3",      // exponent with sign and uppercase E
+        "#define F6 1.0e-2",    // fraction with exponent
+        "#define F7 .0",        // zero with leading dot
+        "#define F8 0.0",       // explicit zero with fraction
+        // Use the macros to force expansion into output lines
+        "LD A,F1",
+        "LD B,F2",
+        "LD C,F3",
+        "LD D,F4",
+        "LD E,F5",
+        "LD H,F6",
+        "LD L,F7",
+        "LD M,F8"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    auto check_has_dot_or_e = [&](const std::string & s) {
+        CHECK(((s.find('.') != std::string::npos) ||
+               (s.find('e') != std::string::npos) ||
+               (s.find('E') != std::string::npos)));
+    };
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F1
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F2
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F3
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F4
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F5
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F6
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F7
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    check_has_dot_or_e(out_line); // F8
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
