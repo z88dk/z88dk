@@ -814,3 +814,56 @@ TEST_CASE("Preprocessor: scan_float formats are recognized and output contains d
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
+
+// New DEFL tests: verify text-substitution semantics and accumulation of previous value
+
+TEST_CASE("Preprocessor: DEFL creates text macro using previous (undefined -> accumulates)",
+          "[preprocessor][defl]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Start with var undefined. DEFL should substitute previous (empty) -> becomes "+1"
+    // Second DEFL concatenates previous "+1" -> "+1+1"
+    std::vector<std::string> lines = {
+        "#defl var = var+1",
+        "LD A,var",
+        "#defl var = var+1",
+        "LD B,var"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,+1");       // first DEFL produced "+1"
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD B,+1+1");     // second DEFL produced "+1+1"
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: DEFL can extend an existing DEFINE value",
+          "[preprocessor][defl]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Start with var defined as "2". DEFL should paste previous "2" producing "2+1".
+    std::vector<std::string> lines = {
+        "#define var 2",
+        "#defl var = var+1",
+        "LD A,var"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First emitted line is the result of expansion
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,2+1");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
