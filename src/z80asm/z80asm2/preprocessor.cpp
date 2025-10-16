@@ -277,6 +277,8 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         return process_include(p, location);
     case Keyword::DEFINE:
         return process_define(p, location);
+    case Keyword::DEFL:
+        return process_defl(p, location);
     case Keyword::UNDEF:
         return process_undef(p, location);
     case Keyword::LINE:
@@ -284,6 +286,70 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
     default:
         return false;
     }
+}
+
+// DEFL: define-or-redefine a pure text macro where occurrences of the macro
+// name in the RHS are replaced by the previous textual value of the macro.
+// Example:
+//   DEFL var = var+1   // -> var becomes "+1"
+//   DEFL var = var+1   // -> var becomes "+1+1"
+bool Preprocessor::process_defl(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    // Parse macro name
+    std::string name;
+    if (!scan_identifier(p, name)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed DEFL directive (missing name)");
+        return true;
+    }
+
+    skip_whitespace(p);
+
+    // Expect '='
+    if (*p != '=') {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed DEFL directive (missing '=')");
+        return true;
+    }
+    ++p; // skip '='
+
+    // Skip whitespace before macro body
+    skip_whitespace(p);
+
+    // Read RHS as raw text (rest of the line)
+    std::string rhs = p;
+    rhs = rtrim(rhs);
+
+    // Determine previous textual value (concatenate token.text of existing macro body)
+    std::string prev_text;
+    auto it_prev = macros_.find(name);
+    if (it_prev != macros_.end()) {
+        for (const auto& t : it_prev->second.body_tokens) {
+            prev_text += t.text;
+        }
+    }
+
+    // Tokenize RHS and perform pure text substitution for identifier tokens equal to name
+    std::vector<MacroToken> rhs_tokens = tokenize_macro_body(rhs);
+    std::string new_body_text;
+    for (const auto& tok : rhs_tokens) {
+        if (tok.type == MacroTokenType::Identifier && tok.text == name) {
+            // paste previous textual value
+            new_body_text += prev_text;
+        }
+        else {
+            new_body_text += tok.text;
+        }
+    }
+
+    // Store as an object-like macro (no params)
+    Macro macro;
+    macro.params.clear();
+    macro.body_tokens = tokenize_macro_body(new_body_text);
+    macros_[name] = std::move(macro);
+
+    return true;
 }
 
 bool Preprocessor::process_include(const char*& p, Location& location) {
