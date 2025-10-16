@@ -620,6 +620,10 @@ bool scan_operator(const char*& p, std::string& out) {
         out = "%";
         ++p;
         return true;
+    case '@':
+        out = "@";
+        ++p;
+        return true;
     case '#':
         if (p[1] == '#') {
             out = "##";
