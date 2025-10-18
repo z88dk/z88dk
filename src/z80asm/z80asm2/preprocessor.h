@@ -82,6 +82,7 @@ private:
     bool process_line(const char*& p, Location& location);
     bool process_rept(const char*& p, Location& location);
     bool process_reptc(const char*& p, Location& location);
+    bool process_repti(const char*& p, Location& location);
     bool process_macro(const char*& p, Location& location);
 
     // Checks for "name DIRECTIVE value" syntax.
@@ -94,6 +95,7 @@ private:
     bool process_name_define(const char*& p, const std::string& name);
     bool process_name_macro(const char*& p, const std::string& name);
     bool process_name_reptc(const char*& p, const std::string& name);
+    bool process_name_repti(const char*& p, const std::string& name);
 
     // Parameter parsing helpers used by both `process_macro` and `process_name_macro`.
     bool parse_param_list_parenthesized(const char*& p,
@@ -222,5 +224,8 @@ private:
     // after the directive. If 'name' is null the normal syntax
     // (`REPTC var, arg`) is used and `p` should point after the directive.
     bool do_reptc_common(const char*& p,
+                         const std::string* name, Location& location);
+
+    bool do_repti_common(const char*& p,
                          const std::string* name, Location& location);
 };
