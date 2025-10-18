@@ -546,6 +546,8 @@ bool Preprocessor::process_name_directive(Keyword keyword,
         return process_name_defl(p, name);
     case Keyword::DEFINE:
         return process_name_define(p, name);
+    case Keyword::MACRO:
+        return process_name_macro(p, name);
     default:
         return false;
     }
@@ -609,6 +611,117 @@ bool Preprocessor::process_name_define(const char*& p,
     macro.params.clear();
     macro.body_lines.push_back(tokenize_macro_body(body));
     macros_[name] = macro;
+    return true;
+}
+
+// Handle "name MACRO ..." alternative syntax.
+bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
+    // p is positioned after the 'MACRO' keyword (is_name_directive advanced it).
+    skip_whitespace(p);
+
+    // Parse parameters: support both '(a,b,...)' or 'a,b,...' forms (same semantics as process_macro)
+    std::vector<std::string> params;
+    const char* after_directive = p;
+    skip_whitespace(p);
+    if (*p == '(' && after_directive == p) {
+        ++p; // consume '('
+        while (true) {
+            skip_whitespace(p);
+            if (*p == ')') {
+                ++p; // consume ')'
+                break;
+            }
+            std::string param;
+            if (!scan_identifier(p, param)) {
+                // Report malformed parameter list
+                if (!file_stack_.empty()) {
+                    Location loc = file_stack_.back().location;
+                    reporter_.error(loc, ErrorCode::InvalidSyntax,
+                                    "Malformed MACRO parameter list (name-first form)");
+                }
+                return true;
+            }
+            params.push_back(param);
+            skip_whitespace(p);
+            if (*p == ',') {
+                ++p;
+                continue;
+            }
+            if (*p == ')') {
+                ++p;
+                break;
+            }
+        }
+    }
+    else {
+        // Try simple comma separated identifiers until end-of-line
+        const char* q = p;
+        while (true) {
+            skip_whitespace(q);
+            std::string param;
+            if (!scan_identifier(q, param)) {
+                break;
+            }
+            params.push_back(param);
+            skip_whitespace(q);
+            if (*q == ',') {
+                ++q;
+                continue;
+            }
+            break;
+        }
+        // Advance original pointer to q (we only looked ahead)
+        p = q;
+    }
+    // Now read lines from the current input file until ENDM is found.
+    if (file_stack_.empty()) {
+        // Shouldn't happen, but handle gracefully
+        reporter_.error(ErrorCode::FileNotFound,
+                        "Internal: no input file during MACRO definition (name-first)");
+        return true;
+    }
+
+    InputFile& file = file_stack_.back();
+    Macro macro;
+    macro.params = params;
+
+    while (file.line_index < file.lines.size()) {
+        int physical_line_num = file.lines[file.line_index].physical_line_num;
+        if (file.line_directive_active) {
+            file.location.set_logical_line_num(
+                file.line_directive_value,
+                file.line_directive_physical_line,
+                physical_line_num);
+        }
+        else {
+            file.location.set_physical_line_num(physical_line_num);
+        }
+        Location line_location = file.location;
+        line_location.set_source_line(file.lines[file.line_index].text);
+
+        std::string raw = remove_comments(file);
+        if (raw.empty()) {
+            continue;
+        }
+
+        // Check for ENDM directive
+        const char* rp = raw.c_str();
+        Keyword kw;
+        if (is_directive(rp, kw) && kw == Keyword::ENDM) {
+            // Macro definition ended.
+            macros_[name] = std::move(macro);
+            return true;
+        }
+
+        // Tokenize line and store as one macro body logical line
+        std::vector<MacroToken> tokens = tokenize_macro_body(raw);
+        macro.body_lines.push_back(std::move(tokens));
+    }
+
+    // If we reach EOF without ENDM, report error but store macro anyway
+    reporter_.error(file.location, ErrorCode::InvalidSyntax,
+                    "Missing ENDM for MACRO " + name);
+    macros_[name] = std::move(macro);
     return true;
 }
 
@@ -926,7 +1039,8 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string>
+Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1447,8 +1561,7 @@ int Preprocessor::get_invocation_physical_line_num() const {
 }
 
 // Build virtual logical lines for a macro using combined_param_map and a physical line number.
-std::vector<Preprocessor::LogicalLine>
-Preprocessor::build_virt_lines_from_macro(
+std::vector<Preprocessor::LogicalLine> Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
     int phys_line_num) const {
