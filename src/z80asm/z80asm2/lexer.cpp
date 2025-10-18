@@ -565,12 +565,22 @@ bool scan_operator(const char*& p, std::string& out) {
             p += 2;
             return true;
         }
+        if (p[1] == '<') {
+            out = "<<";
+            p += 2;
+            return true;
+        }
         out = "<";
         ++p;
         return true;
     case '>':
         if (p[1] == '=') {
             out = ">=";
+            p += 2;
+            return true;
+        }
+        if (p[1] == '>') {
+            out = ">>";
             p += 2;
             return true;
         }

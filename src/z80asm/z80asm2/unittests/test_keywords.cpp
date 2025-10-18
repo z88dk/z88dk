@@ -76,3 +76,12 @@ TEST_CASE("keyword_is_directive recognizes directive keywords",
     REQUIRE_FALSE(keyword_is_directive(to_keyword("NONEXISTENT")));
 }
 
+TEST_CASE("keyword_to_string returns the keyword text", "[keyword_to_string]") {
+    REQUIRE(keyword_to_string(Keyword::None) == "None");
+    REQUIRE(keyword_to_string(Keyword::LD) == "LD");
+    REQUIRE(keyword_to_string(Keyword::AF) == "AF");
+    REQUIRE(keyword_to_string(Keyword::AF_) == "AF'");
+    REQUIRE(keyword_to_string(Keyword::DEFINE) == "DEFINE");
+    REQUIRE(keyword_to_string(Keyword::REPT) == "REPT");
+}
+
