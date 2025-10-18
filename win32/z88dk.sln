@@ -106,6 +106,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_lexer", "z80asm
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_preprocessor", "z80asm_test_preprocessor\z80asm_test_preprocessor.vcxproj", "{8D4B4DD1-5861-447D-8B6B-B64E8B1A8D9F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_keywords", "z80asm_test_keywords\z80asm_test_keywords.vcxproj", "{DEE20430-34A2-438B-88A3-0C10A682492F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -346,6 +348,14 @@ Global
 		{8D4B4DD1-5861-447D-8B6B-B64E8B1A8D9F}.Release|Win32.Build.0 = Release|Win32
 		{8D4B4DD1-5861-447D-8B6B-B64E8B1A8D9F}.Release|x64.ActiveCfg = Release|x64
 		{8D4B4DD1-5861-447D-8B6B-B64E8B1A8D9F}.Release|x64.Build.0 = Release|x64
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Debug|Win32.Build.0 = Debug|Win32
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Debug|x64.ActiveCfg = Debug|x64
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Debug|x64.Build.0 = Debug|x64
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Release|Win32.ActiveCfg = Release|Win32
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Release|Win32.Build.0 = Release|Win32
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Release|x64.ActiveCfg = Release|x64
+		{DEE20430-34A2-438B-88A3-0C10A682492F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
