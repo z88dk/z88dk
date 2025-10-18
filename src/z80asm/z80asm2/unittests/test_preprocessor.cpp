@@ -11,7 +11,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cstdio> // for std::remove
+#include <cstdio>
 
 // Helper to capture std::cerr output
 class CerrRedirect {
@@ -937,5 +937,674 @@ TEST_CASE("Preprocessor: name DEFINE value creates macro",
     // Macro FOO should expand to 42
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "LD A,42");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+// ------------------------- New MACRO tests -------------------------
+
+TEST_CASE("Preprocessor: MACRO (multi-line) expands to multiple output lines",
+          "[preprocessor][macro][multiline]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "MACRO pushall",
+        "    push bc",
+        "    push de",
+        "    push hl",
+        "ENDM",
+        "pushall"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect the three push instructions produced by the macro expansion
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push bc");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push de");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push hl");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: empty multi-line object-like MACRO expands to nothing",
+          "[preprocessor][macro][multiline][empty]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "MACRO empty",
+        "ENDM",
+        "LD BEFORE,1",
+        "empty",
+        "LD AFTER,2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // The empty macro invocation should produce no lines; we should see the surrounding lines only.
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD BEFORE,1");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: empty multi-line function-like MACRO expands to nothing",
+          "[preprocessor][macro][multiline][empty][function]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "MACRO emptyfn(x)",
+        "ENDM",
+        "LD BEFORE,1",
+        "emptyfn(1)",
+        "LD AFTER,2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // The empty function-like macro invocation should produce no lines; we should see the surrounding lines only.
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD BEFORE,1");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: MACRO with parameters expands each body line using args",
+          "[preprocessor][macro][params]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "MACRO two_loads(x,y)",
+        "    ld a,x",
+        "    ld b,y",
+        "ENDM",
+        "two_loads(1,2)"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: MACRO EXITM aborts expansion (no lines emitted when EXITM is first)",
+          "[preprocessor][macro][exitm]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "MACRO abortme",
+        "    EXITM",
+        "    ld a,1",
+        "ENDM",
+        "abortme",
+        "ld a,after"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // abortme should produce no lines because EXITM appears before any output
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,after");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: MACRO LOCAL makes identifiers unique per expansion",
+          "[preprocessor][macro][local]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    std::vector<std::string> lines = {
+        "MACRO inc(n)",
+        "    LOCAL tmp",
+        "    ld tmp,n",
+        "    ld a,tmp",
+        "ENDM",
+        "inc(1)",
+        "inc(2)"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    // tmp should have been renamed to a unique identifier; check it contains "tmp_" and the argument
+    size_t p_tmp = out_line.find("tmp_");
+    REQUIRE(p_tmp != std::string::npos);
+    size_t p_tmp_end = out_line.find_first_of(", \t", p_tmp);
+    if (p_tmp_end == std::string::npos) {
+        p_tmp_end = out_line.size();
+    }
+    std::string tmp_suffix1 = out_line.substr(p_tmp + 4, p_tmp_end - (p_tmp + 4));
+
+    CHECK(out_line == std::string("ld tmp_") + tmp_suffix1 + ",1");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == std::string("ld a,tmp_") + tmp_suffix1);
+
+    // Second expansion should use a different tmp_<M>
+    REQUIRE(preproc.next_line(out_line, out_loc));
+
+    p_tmp = out_line.find("tmp_");
+    REQUIRE(p_tmp != std::string::npos);
+    p_tmp_end = out_line.find_first_of(", \t", p_tmp);
+    if (p_tmp_end == std::string::npos) {
+        p_tmp_end = out_line.size();
+    }
+    std::string tmp_suffix2 = out_line.substr(p_tmp + 4, p_tmp_end - (p_tmp + 4));
+
+    CHECK(out_line == std::string("ld tmp_") + tmp_suffix2 + ",2");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == std::string("ld a,tmp_") + tmp_suffix2);
+
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consistently",
+          "[preprocessor][macro][local][multiple]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MACRO multi_local(n)",
+        "    LOCAL tmp",
+        "    ld tmp,n",
+        "    LOCAL tmp2, tmp3",
+        "    ld tmp2,tmp3",
+        "ENDM",
+        "multi_local(1)",
+        "multi_local(2)"
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First expansion (n==1)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    // Expect "ld tmp_<id>,1"
+    size_t p_tmp = out_line.find("tmp_");
+    REQUIRE(p_tmp != std::string::npos);
+    size_t p_tmp_end = out_line.find_first_of(", \t", p_tmp);
+    if (p_tmp_end == std::string::npos) {
+        p_tmp_end = out_line.size();
+    }
+    std::string tmp_suffix1 = out_line.substr(p_tmp + 4, p_tmp_end - (p_tmp + 4));
+    CHECK(out_line == std::string("ld tmp_") + tmp_suffix1 + ",1");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    // Expect "ld tmp2_<id>,tmp3_<id>" with same suffix as tmp_
+    size_t p_tmp2 = out_line.find("tmp2_");
+    size_t p_tmp3 = out_line.find("tmp3_");
+    REQUIRE(p_tmp2 != std::string::npos);
+    REQUIRE(p_tmp3 != std::string::npos);
+    size_t p_tmp2_end = out_line.find_first_of(", \t", p_tmp2);
+    if (p_tmp2_end == std::string::npos) {
+        p_tmp2_end = out_line.size();
+    }
+    size_t p_tmp3_end = out_line.find_first_of(", \t", p_tmp3);
+    if (p_tmp3_end == std::string::npos) {
+        p_tmp3_end = out_line.size();
+    }
+    std::string tmp2_suffix1 = out_line.substr(p_tmp2 + 5,
+                               p_tmp2_end - (p_tmp2 + 5));
+    std::string tmp3_suffix1 = out_line.substr(p_tmp3 + 5,
+                               p_tmp3_end - (p_tmp3 + 5));
+    // tmp2/tmp3 should share the same expansion suffix (within the same macro expansion)
+    CHECK(tmp2_suffix1 == tmp3_suffix1);
+    // Suffixes for tmp and tmp2/tmp3 should be the same base id (they may be different names but the unique id must match per expansion)
+    CHECK(tmp_suffix1 == tmp2_suffix1);
+
+    CHECK(out_line == std::string("ld tmp2_") + tmp_suffix1 + ",tmp3_" +
+          tmp_suffix1);
+
+    // Second expansion (n==2)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    // Expect "ld tmp_<id2>,2"
+    size_t p_tmp_b = out_line.find("tmp_");
+    REQUIRE(p_tmp_b != std::string::npos);
+    size_t p_tmp_b_end = out_line.find_first_of(", \t", p_tmp_b);
+    if (p_tmp_b_end == std::string::npos) {
+        p_tmp_b_end = out_line.size();
+    }
+    std::string tmp_suffix2 = out_line.substr(p_tmp_b + 4,
+                              p_tmp_b_end - (p_tmp_b + 4));
+    CHECK(out_line == std::string("ld tmp_") + tmp_suffix2 + ",2");
+
+    // New expansion must use a different unique id than the first
+    CHECK(tmp_suffix2 != tmp_suffix1);
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    // Expect "ld tmp2_<id2>,tmp3_<id2>"
+    size_t p_tmp2_b = out_line.find("tmp2_");
+    size_t p_tmp3_b = out_line.find("tmp3_");
+    REQUIRE(p_tmp2_b != std::string::npos);
+    REQUIRE(p_tmp3_b != std::string::npos);
+    size_t p_tmp2_b_end = out_line.find_first_of(", \t", p_tmp2_b);
+    if (p_tmp2_b_end == std::string::npos) {
+        p_tmp2_b_end = out_line.size();
+    }
+    size_t p_tmp3_b_end = out_line.find_first_of(", \t", p_tmp3_b);
+    if (p_tmp3_b_end == std::string::npos) {
+        p_tmp3_b_end = out_line.size();
+    }
+    std::string tmp2_suffix2 = out_line.substr(p_tmp2_b + 5,
+                               p_tmp2_b_end - (p_tmp2_b + 5));
+    std::string tmp3_suffix2 = out_line.substr(p_tmp3_b + 5,
+                               p_tmp3_b_end - (p_tmp3_b + 5));
+    CHECK(tmp2_suffix2 == tmp3_suffix2);
+    CHECK(tmp2_suffix2 == tmp_suffix2);
+
+    CHECK(out_line == std::string("ld tmp2_") + tmp_suffix2 + ",tmp3_" +
+          tmp_suffix2);
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: label before multi-line object-like macro expansion",
+          "[preprocessor][macro][label][object]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MACRO mobj",
+        "    ld a,1",
+        "    ld b,2",
+        "ENDM",
+        "label: mobj",
+        "nop"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Label should appear before first macro body line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "label: ld a,1");
+
+    // Second macro line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+
+    // Then the following normal line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "nop");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: label before multi-line function-like macro expansion",
+          "[preprocessor][macro][label][function]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MACRO mfn(x)",
+        "    ld a,x",
+        "    ld b,x",
+        "ENDM",
+        "label: mfn(5)",
+        "nop"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Label should be preserved and placed before the first expanded macro line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "label: ld a,5");
+
+    // Second macro line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,5");
+
+    // Then the following normal line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "nop");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: Location line numbers for object-like multi-line macro expansion",
+          "[preprocessor][macro][location][object]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MACRO mobj",
+        "    ld a,1",
+        "    ld b,2",
+        "ENDM",
+        "LD BEFORE,1", // physical line 5
+        "mobj",         // physical line 6 -> invocation
+        "LD AFTER,2"   // physical line 7
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First non-macro logical line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD BEFORE,1");
+    CHECK(out_loc.line_num() == 5);
+
+    // First macro expansion line should report the invocation's physical line number (6)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
+    CHECK(out_loc.line_num() == 6);
+
+    // Second macro expansion line should have the same reported line number (6)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+    CHECK(out_loc.line_num() == 6);
+
+    // Back to following normal line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+    CHECK(out_loc.line_num() == 7);
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: Location line numbers for function-like multi-line macro expansion",
+          "[preprocessor][macro][location][function]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MACRO mfn(x)",
+        "    ld a,x",
+        "    ld b,x",
+        "ENDM",
+        "LD BEFORE,1", // physical line 5
+        "mfn(5)",       // physical line 6 -> invocation
+        "LD AFTER,2"   // physical line 7
+    };
+
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First normal line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD BEFORE,1");
+    CHECK(out_loc.line_num() == 5);
+
+    // First macro expansion line should report the invocation's physical line number (6)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,5");
+    CHECK(out_loc.line_num() == 6);
+
+    // Second macro expansion line should have the same reported line number (6)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,5");
+    CHECK(out_loc.line_num() == 6);
+
+    // Back to following normal line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+    CHECK(out_loc.line_num() == 7);
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: split line with object-like then function-like macros expands sequentially",
+          "[preprocessor][macro][split]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // M1 is an object-like single-line macro, FN is a function-like single-line macro.
+    // The source line contains "M1 : FN(2,3)" — after expansion and splitting at ':'
+    // we should get the expansion of M1 first, then the expansion of FN.
+    std::vector<std::string> lines = {
+        "#define M1 ld a,1",
+        "#define FN(x,y) ld b,x",
+        "M1 : FN(2,3)"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First segment: expansion of M1
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
+
+    // Second segment: expansion of FN(2,3)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: split line with function-like then object-like macros expands sequentially",
+          "[preprocessor][macro][split]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // FOO(5) is a function-like single-line macro, M2 is an object-like single-line macro.
+    // The source line "FOO(5) : M2" should expand FOO first, then M2.
+    std::vector<std::string> lines = {
+        "#define FOO(x) ld a,x",
+        "#define M2 ld b,2",
+        "FOO(5) : M2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // First segment: expansion of FOO(5)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,5");
+
+    // Second segment: expansion of M2
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: split line with multi-line object-like then multi-line function-like macros expands sequentially",
+          "[preprocessor][macro][split][multiline]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // M1 is a multi-line object-like macro; FN is a multi-line function-like macro.
+    // The source line contains "M1 : FN(2,3)" — after expansion we expect M1's body lines
+    // followed by FN's body lines (with arguments substituted).
+    std::vector<std::string> lines = {
+        "MACRO M1",
+        "    ld a,1",
+        "    ld b,2",
+        "ENDM",
+        "MACRO FN(x,y)",
+        "    ld b,x",
+        "    ld c,y",
+        "ENDM",
+        "M1 : FN(2,3)"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // M1 body lines
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+
+    // FN body lines (with args)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld c,3");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: split line with multi-line function-like then multi-line object-like macros expands sequentially",
+          "[preprocessor][macro][split][multiline]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // FOO is a multi-line function-like macro; M2 is a multi-line object-like macro.
+    // The source line "FOO(5) : M2" should expand FOO first, then M2.
+    std::vector<std::string> lines = {
+        "MACRO FOO(x)",
+        "    ld a,x",
+        "    ld a2,x",
+        "ENDM",
+        "MACRO M2",
+        "    ld b,2",
+        "    ld b2,22",
+        "ENDM",
+        "FOO(5) : M2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // FOO body lines
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,5");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a2,5");
+
+    // M2 body lines
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b2,22");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: split line with multi-line empty function-like then empty object-like macros expands to nothing",
+          "[preprocessor][macro][split][multiline][empty]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Both macros contain two blank body lines -> effectively empty expansions.
+    // Surround with lines to ensure the invocation produces no intermediate output.
+    std::vector<std::string> lines = {
+        "MACRO FOO(x)",
+        "    ",
+        "    ",
+        "ENDM",
+        "MACRO MAC",
+        "    ",
+        "    ",
+        "ENDM",
+        "LD BEFORE,1",
+        "FOO(1) : MAC",
+        "LD AFTER,2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Only the surrounding lines should be present; the invocation produces no intermediate output.
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD BEFORE,1");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: split line with multi-line empty object-like then empty function-like macros expands to nothing",
+          "[preprocessor][macro][split][multiline][empty]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Same as above but object-like first, function-like second.
+    std::vector<std::string> lines = {
+        "#define EMPTY_MACRO", // single-line empty macro
+        "MACRO MAC",
+        "    EMPTY_MACRO : EMPTY_MACRO",
+        "    EMPTY_MACRO : EMPTY_MACRO",
+        "ENDM",
+        "MACRO FOO(x)",
+        "    EMPTY_MACRO : EMPTY_MACRO",
+        "    EMPTY_MACRO : EMPTY_MACRO",
+        "ENDM",
+        "LD BEFORE,1",
+        "MAC : FOO(1)",
+        "LD AFTER,2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Invocation should produce nothing; only surrounding lines remain.
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD BEFORE,1");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }

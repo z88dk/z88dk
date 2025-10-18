@@ -1,2 +1,0 @@
-- change scan_xxxx functions to receive const char*& p
-- factor parsing of strings and quoted characters

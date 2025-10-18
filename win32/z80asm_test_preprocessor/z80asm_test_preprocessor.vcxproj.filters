@@ -36,5 +36,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
