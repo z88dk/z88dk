@@ -304,6 +304,8 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         return process_macro(p, location);
     case Keyword::REPT:
         return process_rept(p, location);
+    case Keyword::REPTC:
+        return process_reptc(p, location);
     case Keyword::EXITM:
         // If we are inside a macro virtual file, EXITM aborts the current macro expansion.
         if (!file_stack_.empty()) {
@@ -552,6 +554,8 @@ bool Preprocessor::process_name_directive(Keyword keyword,
         return process_name_define(p, name);
     case Keyword::MACRO:
         return process_name_macro(p, name);
+    case Keyword::REPTC:
+        return process_name_reptc(p, name);
     default:
         return false;
     }
@@ -653,6 +657,12 @@ bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
     macros_[name] = std::move(macro);
     // read_macro_body already reports missing ENDM if it reached EOF.
     return true;
+}
+
+bool Preprocessor::process_name_reptc(const char*& p, const std::string& name) {
+    static Location dummy_location;
+    return do_reptc_common(p, &name,
+                           file_stack_.empty() ? dummy_location : file_stack_.back().location);
 }
 
 // Helper: parse a parenthesized parameter list. Expects p at '(' and advances past ')'.
@@ -1286,7 +1296,7 @@ bool Preprocessor::process_macro(const char*& p, Location& location) {
         }
     }
     else {
-        // Comma-separated identifiers (name-first style) — look ahead and advance `p`.
+        // Comma-separated identifiers (name-first style) - look ahead and advance `p`.
         parse_param_list_comma_separated(p, params);
     }
 
@@ -1551,7 +1561,7 @@ void Preprocessor::push_virtual_macro_file(const std::string& name,
 // Helper: read raw logical lines until the given end directive
 // (e.g. ENDR or ENDM).
 // Fills out_lines with raw logical lines (no comment removal
-// performed here — each line is obtained by remove_comments which
+// performed here - each line is obtained by remove_comments which
 // advances the current file line_index). Returns true if the end
 // directive was found, false on EOF (and reports a missing-end error).
 bool Preprocessor::read_raw_block_until(Keyword endDirective,
@@ -1741,6 +1751,10 @@ bool Preprocessor::process_rept(const char*& p, Location& location) {
     return true;
 }
 
+bool Preprocessor::process_reptc(const char*& p, Location& location) {
+    return do_reptc_common(p, nullptr, location);
+}
+
 // Helper: expand macros in the text starting at p and scan the resulting text
 // for a constant integer. Returns true and sets 'value' on success.
 bool Preprocessor::get_constant_value(const char*& p, int& value) {
@@ -1769,5 +1783,111 @@ bool Preprocessor::get_constant_value(const char*& p, int& value) {
         return false; // extra junk after expression
     }
 
+    return true;
+}
+
+bool Preprocessor::do_reptc_common(const char*& p,
+                                   const std::string* name, Location& location) {
+    // If name==nullptr: syntax is "REPTC var, arg"
+    // If name!=nullptr: syntax is "var REPTC arg" (name holds var)
+    skip_whitespace(p);
+
+    std::string var;
+    if (name == nullptr) {
+        // Expect identifier then comma
+        if (!scan_identifier(p, var)) {
+            reporter_.error(location, ErrorCode::InvalidSyntax,
+                            "Malformed REPTC directive (missing variable name)");
+            // try to consume block to avoid resync problems
+            std::vector<LogicalLine> tmp;
+            read_raw_block_until(Keyword::ENDR, tmp);
+            return true;
+        }
+        skip_whitespace(p);
+        if (*p != ',') {
+            reporter_.error(location, ErrorCode::InvalidSyntax,
+                            "Malformed REPTC directive (missing comma)");
+            std::vector<LogicalLine> tmp;
+            read_raw_block_until(Keyword::ENDR, tmp);
+            return true;
+        }
+        ++p; // skip comma
+    }
+    else {
+        var = *name;
+    }
+
+    // Now parse the argument expression/text starting at p
+    const char* q = p;
+    skip_whitespace(q);
+    if (*q == '\0') {
+        // Missing argument -> report error and consume block like REPT handling
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed REPTC directive (missing argument)");
+        std::vector<LogicalLine> tmp;
+        read_raw_block_until(Keyword::ENDR, tmp);
+        return true;
+    }
+
+    // Capture the rest of the logical text (p -> end)
+    std::string tail = q;
+    tail = trim(tail);
+
+    // Expand macros in tail first. If expansion needs to push a virtual file
+    // expand_macros may return empty string -> treat as syntax failure.
+    std::string expanded = expand_macros(tail);
+    if (expanded.empty()) {
+        // If expanded is empty but there was input, it might be a macro that expanded to empty.
+        // Treat that as empty iteration (no output) but still consume the block.
+        std::vector<LogicalLine> body_lines;
+        read_raw_block_until(Keyword::ENDR, body_lines);
+        return true;
+    }
+
+    // Determine the string to iterate over.
+    std::string iter_str;
+    std::string quoted_str;
+    const char* pp = expanded.c_str();
+    skip_whitespace(pp);
+    if (*pp == '"' && scan_string_literal(pp, quoted_str)) {
+        iter_str = unescape_string(quoted_str);
+    }
+    else {
+        iter_str = expanded;
+    }
+
+    // Collect body up to ENDR
+    std::vector<LogicalLine> body_lines;
+    read_raw_block_until(Keyword::ENDR, body_lines);
+
+    // If iter_str is empty -> produces no output (consume block already done)
+    if (iter_str.empty()) {
+        return true;
+    }
+
+    // Build virtual lines. For each character: undef var; define var <code>; then body lines
+    int phys_line_num = get_invocation_physical_line_num();
+    std::vector<LogicalLine> virt_lines;
+    virt_lines.reserve(iter_str.size() * (2 + body_lines.size()));
+
+    for (unsigned char c : iter_str) {
+        // #undef var
+        std::string uline = std::string("#undef ") + var;
+        virt_lines.push_back(LogicalLine{ uline, phys_line_num });
+
+        // #define var <num>
+        std::string dline = std::string("#define ") + var + " " + std::to_string(
+                                static_cast<int>(c));
+        virt_lines.push_back(LogicalLine{ dline, phys_line_num });
+
+        // append body lines
+        for (const auto& bl : body_lines) {
+            virt_lines.push_back(LogicalLine{ bl.text, phys_line_num });
+        }
+    }
+
+    // Push a virtual file with these lines
+    int uniq_id = ++macro_expansion_counter_;
+    push_virtual_macro_file("REPTC", uniq_id, std::move(virt_lines));
     return true;
 }
