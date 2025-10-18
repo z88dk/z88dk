@@ -6,6 +6,7 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static char             *blockname    = NULL;
 static int               origin       = -1;
 static int               fence        = 0xfd00;
 static char              help         = 0;
@@ -21,6 +22,7 @@ option_t phc25_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "fence",    "Highest address to use",     OPT_INT,   &fence },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    {  0 , "blockname", "Name of the program in phc file", OPT_STR, &blockname},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -219,7 +221,7 @@ int phc25_exec(char *target)
         exit_log(1,"Can't open output file\n");
     }
 
-    write_header(fpout, binname);
+    write_header(fpout, blockname ? blockname : binname);
 
     fprintf(fpout, "%c&H%04X%c", TOK_EXEC, (int)org, 0); 
 
@@ -241,7 +243,7 @@ int phc25_exec(char *target)
         
         // Read the rest of the file into a temporary file
         if ( (temp = fopen(utname, "wb")) == NULL ) {
-            exit_log(1, "Cannot open temporary for compression\n");
+            exit_log(1, "Cannot open temporary compression file\n");
         }
         while ( (c = fgetc(fpin))!= EOF ) {
             fputc(c, temp);
