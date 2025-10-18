@@ -33,8 +33,6 @@ ENDIF
 ;----------------------
 start:
    // di
-
-
     ld      hl,__x07_program_entry_point
     ld      de,__x07_program_entry_point
 loop:
@@ -57,7 +55,9 @@ copy_byte:
 decompress:
 
 __x07_program_entry_point:
-    ld      (__restore_sp_onexit+1),sp	;Save entry stack
+    ld      hl,0
+    add     hl,sp
+    ld      (__restore_sp_onexit+1),hl
     INCLUDE "crt/classic/crt_init_sp.inc"
     call	crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
