@@ -89,6 +89,7 @@ private:
                                 const char*& p);
     bool process_name_defl(const char*& p, const std::string& name);
     bool process_name_define(const char*& p, const std::string& name);
+    bool process_name_macro(const char*& p, const std::string& name);
 
     // Expands a macro invocation (object-like or function-like) in a line.
     // Returns the expanded string.
