@@ -4,11 +4,13 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "expr.h"
 #include "keywords.h"
 #include "lexer.h"
 #include "preprocessor.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <fstream>
 #include <regex>
 #include <sstream>
@@ -300,6 +302,8 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         return process_line(p, location);
     case Keyword::MACRO:
         return process_macro(p, location);
+    case Keyword::REPT:
+        return process_rept(p, location);
     case Keyword::EXITM:
         // If we are inside a macro virtual file, EXITM aborts the current macro expansion.
         if (!file_stack_.empty()) {
@@ -642,11 +646,10 @@ bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
         return true;
     }
 
-    InputFile& file = file_stack_.back();
     Macro macro;
     macro.params = params;
 
-    read_macro_body(file, macro, name);
+    read_macro_body(macro);
     macros_[name] = std::move(macro);
     // read_macro_body already reports missing ENDM if it reached EOF.
     return true;
@@ -704,45 +707,21 @@ void Preprocessor::parse_param_list_comma_separated(const char*& p,
     p = q;
 }
 
-// Helper: read macro body lines from `file` into `macro` until ENDM directive or EOF.
-bool Preprocessor::read_macro_body(InputFile& file, Macro& macro,
-                                   const std::string& name) {
-    while (file.line_index < file.lines.size()) {
-        int physical_line_num = file.lines[file.line_index].physical_line_num;
-        if (file.line_directive_active) {
-            file.location.set_logical_line_num(
-                file.line_directive_value,
-                file.line_directive_physical_line,
-                physical_line_num);
-        }
-        else {
-            file.location.set_physical_line_num(physical_line_num);
-        }
-        Location line_location = file.location;
-        line_location.set_source_line(file.lines[file.line_index].text);
+// Helper: read macro body lines `macro` until ENDM directive or EOF.
+bool Preprocessor::read_macro_body(Macro& macro) {
+    // Reuse centralized raw-block reader to collect logical lines up to ENDM.
+    std::vector<LogicalLine> raw_lines;
+    bool found_end = read_raw_block_until(Keyword::ENDM, raw_lines);
 
-        std::string raw = remove_comments(file);
-        if (raw.empty()) {
-            continue;
-        }
-
-        // Check for ENDM directive
-        const char* rp = raw.c_str();
-        Keyword kw;
-        if (is_directive(rp, kw) && kw == Keyword::ENDM) {
-            // Macro definition ended.
-            return true;
-        }
-
-        // Tokenize line and store as one macro body logical line
-        std::vector<MacroToken> tokens = tokenize_macro_body(raw);
+    // Tokenize each collected raw logical line into macro body tokens.
+    for (const auto& ll : raw_lines) {
+        std::vector<MacroToken> tokens = tokenize_macro_body(ll.text);
         macro.body_lines.push_back(std::move(tokens));
     }
 
-    // EOF reached without ENDM
-    reporter_.error(file.location, ErrorCode::InvalidSyntax,
-                    "Missing ENDM for MACRO " + name);
-    return false;
+    // If the terminating ENDM was not found, read_raw_block_until already reported
+    // the missing terminator. Propagate failure to the caller.
+    return found_end;
 }
 
 // Helper: Stringify a macro argument
@@ -1318,12 +1297,11 @@ bool Preprocessor::process_macro(const char*& p, Location& location) {
         return true;
     }
 
-    InputFile& file = file_stack_.back();
     Macro macro;
     macro.params = params;
 
     // Delegate the body-read to helper
-    read_macro_body(file, macro, name);
+    read_macro_body(macro);
     macros_[name] = std::move(macro);
     // read_macro_body already reports missing ENDM if it reached EOF.
     return true;
@@ -1570,6 +1548,55 @@ void Preprocessor::push_virtual_macro_file(const std::string& name,
     file_stack_.push_back(std::move(virt));
 }
 
+// Helper: read raw logical lines until the given end directive
+// (e.g. ENDR or ENDM).
+// Fills out_lines with raw logical lines (no comment removal
+// performed here — each line is obtained by remove_comments which
+// advances the current file line_index). Returns true if the end
+// directive was found, false on EOF (and reports a missing-end error).
+bool Preprocessor::read_raw_block_until(Keyword endDirective,
+                                        std::vector<LogicalLine>& out_lines) {
+    out_lines.clear();
+    if (file_stack_.empty()) {
+        return false;
+    }
+    InputFile& file = file_stack_.back();
+    while (file.line_index < file.lines.size()) {
+        int physical_line_num = file.lines[file.line_index].physical_line_num;
+        if (file.line_directive_active) {
+            file.location.set_logical_line_num(
+                file.line_directive_value,
+                file.line_directive_physical_line,
+                physical_line_num
+            );
+        }
+        else {
+            file.location.set_physical_line_num(physical_line_num);
+        }
+
+        std::string raw = remove_comments(file);
+        if (raw.empty()) {
+            continue;
+        }
+
+        const char* rp = raw.c_str();
+        Keyword kw;
+        if (is_directive(rp, kw) && kw == endDirective) {
+            // found terminating directive
+            return true;
+        }
+
+        // store the raw logical line and its physical line number
+        out_lines.push_back(LogicalLine{ raw, physical_line_num });
+    }
+
+    // EOF reached without endDirective
+    std::string name = keyword_to_string(endDirective);
+    reporter_.error(file.location, ErrorCode::InvalidSyntax,
+                    "Missing " + name);
+    return false;
+}
+
 // Parse macro argument list starting at tokens[start_index].
 // Returns true if a parenthesized argument list was parsed; out_index is set to the
 // token index after ')' and out_args is filled with expanded argument strings.
@@ -1673,4 +1700,74 @@ void Preprocessor::push_macro_and_suffix_files(const std::string& name,
 
     // Now push the macro virtual file (will be processed immediately)
     push_virtual_macro_file(name, uniq_id, std::move(virt_lines));
+}
+
+// REPT directive: REPT <count> ... ENDR
+// Count must be a constant integer. If not, report error and skip block.
+bool Preprocessor::process_rept(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    int count = 0;
+    if (!get_constant_value(p, count)) {
+        // Non-constant count -> report error and skip until ENDR
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "REPT requires a constant integer count");
+        std::vector<LogicalLine> tmp;
+        read_raw_block_until(Keyword::ENDR,
+                             tmp); // consume block (reports missing ENDR if needed)
+        return true;
+    }
+
+    // Collect body lines up to ENDR
+    std::vector<LogicalLine> body_lines;
+    read_raw_block_until(Keyword::ENDR, body_lines);
+
+    // Build virtual lines repeated 'count' times, associating the
+    // invocation physical line
+    int phys_line_num = get_invocation_physical_line_num();
+    std::vector<LogicalLine> virt_lines;
+    if (count > 0) {
+        virt_lines.reserve(body_lines.size() * static_cast<size_t>(count));
+        for (int r = 0; r < count; ++r) {
+            for (const auto& ll : body_lines) {
+                virt_lines.push_back(LogicalLine{ ll.text, phys_line_num });
+            }
+        }
+    }
+
+    // Push a virtual file for the repeated body
+    int uniq_id = ++macro_expansion_counter_;
+    push_virtual_macro_file("REPT", uniq_id, std::move(virt_lines));
+    return true;
+}
+
+// Helper: expand macros in the text starting at p and scan the resulting text
+// for a constant integer. Returns true and sets 'value' on success.
+bool Preprocessor::get_constant_value(const char*& p, int& value) {
+    // Do not modify caller's p. Work on a copy/snapshot of the remaining text.
+    const char* pp = p;
+    skip_whitespace(pp);
+    std::string tail = pp;
+    tail = trim(tail);
+    if (tail.empty()) {
+        return false;
+    }
+
+    // Expand any macros in the tail. If expansion requires pushing a virtual file
+    // expand_macros will return an empty string; treat that as failure here.
+    std::string expanded = expand_macros(tail);
+    if (expanded.empty()) {
+        return false;
+    }
+
+    const char* q = expanded.c_str();
+    if (!eval_const_expr(q, value)) {
+        return false;
+    }
+    skip_whitespace(q);
+    if (*q != '\0') {
+        return false; // extra junk after expression
+    }
+
+    return true;
 }
