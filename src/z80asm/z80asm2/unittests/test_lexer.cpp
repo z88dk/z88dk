@@ -895,3 +895,113 @@ TEST_CASE("scan_operator parses C operators, punctuators, ^^ and **",
         CHECK(std::string(p) == "");
     }
 }
+
+// Additional tests for unescape_string
+TEST_CASE("unescape_string: quoted and unquoted strings, C-style escapes, octal and hex",
+          "[unescape_string]") {
+    SECTION("Empty input") {
+        CHECK(unescape_string("") == "");
+    }
+
+    SECTION("Quoted empty string") {
+        CHECK(unescape_string("\"\"") == "");
+    }
+
+    SECTION("Unquoted simple string remains unchanged") {
+        CHECK(unescape_string("hello") == "hello");
+    }
+
+    SECTION("Quoted simple string strips quotes") {
+        CHECK(unescape_string("\"hello\"") == "hello");
+    }
+
+    SECTION("C escapes inside quoted string (newline and tab)") {
+        std::string out = unescape_string("\"line1\\nline2\\tend\"");
+        CHECK(out == std::string("line1\nline2\tend"));
+    }
+
+    SECTION("C escapes inside unquoted string are processed too") {
+        std::string out = unescape_string("line1\\nline2\\tend");
+        CHECK(out == std::string("line1\nline2\tend"));
+    }
+
+    SECTION("Escaped quote and backslash in quoted string") {
+        std::string out = unescape_string("\"\\\"quoted\\\" and \\\\backslash\"");
+        CHECK(out == std::string("\"quoted\" and \\backslash"));
+    }
+
+    SECTION("Escape for ESC (\\e)") {
+        std::string out = unescape_string("\"escape\\echar\"");
+        REQUIRE(out.size() >= 1);
+        CHECK((static_cast<unsigned char>(out[0]) == 0x1B ||
+               out.find(static_cast<char>(0x1B)) != std::string::npos));
+        // trailing text present
+        CHECK(out.find("char") != std::string::npos);
+    }
+
+    SECTION("Octal escapes: single, multi-digit and full examples") {
+        // \0 -> NUL
+        std::string o1 = unescape_string("\"\\0\"");
+        CHECK(o1.size() == 1);
+        CHECK(static_cast<unsigned char>(o1[0]) == 0);
+
+        // \101 -> 'A' (65)
+        std::string o2 = unescape_string("\"\\101\"");
+        CHECK(o2.size() == 1);
+        CHECK(static_cast<unsigned char>(o2[0]) == 65);
+
+        // mixed text + octal
+        std::string o3 = unescape_string("\"X\\101Y\"");
+        CHECK(o3.size() == 3);
+        CHECK(o3 == std::string("XAY"));
+    }
+
+    SECTION("Hex escapes: \\xNN and single hex digit") {
+        std::string h1 = unescape_string("\"\\x41\"");
+        CHECK(h1.size() == 1);
+        CHECK(static_cast<unsigned char>(h1[0]) == 0x41); // 'A'
+
+        std::string h2 = unescape_string("\"\\x0a\"");
+        CHECK(h2.size() == 1);
+        CHECK(static_cast<unsigned char>(h2[0]) == 0x0a); // newline
+
+        // single hex digit (treated as value 0x4)
+        std::string h3 = unescape_string("\"\\x4\"");
+        CHECK(h3.size() == 1);
+        CHECK(static_cast<unsigned char>(h3[0]) == 0x04);
+    }
+
+    SECTION("Unknown escape sequence treated as literal escaped char") {
+        CHECK(unescape_string("\"\\q\"") == std::string("q"));
+        CHECK(unescape_string("\\q") == std::string("q"));
+    }
+
+    SECTION("Trailing backslash in unquoted input is retained as a backslash") {
+        std::string s = "abc\\";
+        std::string out = unescape_string(s);
+        REQUIRE(out.size() == 4);
+        CHECK(out.substr(0, 3) == "abc");
+        CHECK(out[3] == '\\');
+    }
+
+    SECTION("Quoted string with escaped backslash before closing quote") {
+        // C++ literal: "\"endslash\\\""
+        std::string in = "\"endslash\\\\\"\""; // represents "endslash\""
+        // This is a tricky case; ensure function handles escapes and quotes correctly.
+        // Build simpler: a quoted string containing a trailing backslash character before closing
+        std::string in2 = "\"endslash\\\\\"";
+        std::string out2 = unescape_string(in2);
+        // out2 should be: endslash\  (single backslash at end)
+        REQUIRE(!out2.empty());
+        CHECK(out2.size() == 9);
+        CHECK(out2.substr(0, 8) == "endslash");
+        CHECK(out2.back() == '\\');
+    }
+
+    SECTION("Mixed content: unquoted plus hex and octal together") {
+        std::string out = unescape_string("A\\x41\\101B");
+        // A \x41 -> A A ; \101 -> 'A' ; so result "AAA B"? Let's inspect:
+        // "A" + 0x41('A') + octal 101 ('A') + 'B' => "AAAB"
+        CHECK(out == std::string("AAAB"));
+    }
+}
