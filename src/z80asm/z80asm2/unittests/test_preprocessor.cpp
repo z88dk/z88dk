@@ -1052,6 +1052,59 @@ TEST_CASE("Preprocessor: MACRO with parameters expands each body line using args
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
+TEST_CASE("Preprocessor: name-first MACRO with parameters expands each body line using args",
+          "[preprocessor][macro][params][name-directive]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+    // Alternative syntax: "name MACRO arg1,arg2,..."
+    std::vector<std::string> lines = {
+        "two_loads MACRO x,y",
+        "    ld a,x",
+        "    ld b,y",
+        "ENDM",
+        "two_loads(1,2)"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name-first MACRO (object-like) expands to multiple output lines",
+          "[preprocessor][macro][multiline][name-directive]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Alternative syntax: "name MACRO" (object-like multi-line macro)
+    std::vector<std::string> lines = {
+        "two_lines MACRO",
+        "    ld a,1",
+        "    ld b,2",
+        "ENDM",
+        "two_lines"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld b,2");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
 TEST_CASE("Preprocessor: MACRO EXITM aborts expansion (no lines emitted when EXITM is first)",
           "[preprocessor][macro][exitm]") {
     ErrorReporter reporter;
