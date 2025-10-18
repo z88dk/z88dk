@@ -80,6 +80,7 @@ private:
     bool process_defl(const char*& p, Location& location);
     bool process_undef(const char*& p, Location& location);
     bool process_line(const char*& p, Location& location);
+    bool process_rept(const char*& p, Location& location);
     bool process_macro(const char*& p, Location& location);
 
     // Checks for "name DIRECTIVE value" syntax.
@@ -99,7 +100,7 @@ private:
                                           std::vector<std::string>& params);
     // Read macro body (lines) from the current input file into `macro` until ENDM.
     // Returns true if ENDM was found, false on EOF (still fills macro.body_lines).
-    bool read_macro_body(InputFile& file, Macro& macro, const std::string& name);
+    bool read_macro_body(Macro& macro);
 
     // Expands a macro invocation (object-like or function-like) in a line.
     // Returns the expanded string.
@@ -184,6 +185,15 @@ private:
     void apply_prefix_to_virt_lines(std::vector<LogicalLine>& virt_lines,
                                     const std::string& prefix) const;
 
+    // Helper: read raw logical lines until the given end directive
+    // (e.g. ENDR or ENDM).
+    // Fills out_lines with raw logical lines (no comment removal
+    // performed here — each line is obtained by remove_comments which
+    // advances the current file line_index). Returns true if the end
+    // directive was found, false on EOF (and reports a missing-end error).
+    bool read_raw_block_until(Keyword endDirective,
+                              std::vector<LogicalLine>& out_lines);
+
     // Parse macro argument list starting at tokens[start_index].
     // On success returns true, sets out_index to the token index after ')'
     // and fills out_args with expanded argument strings.
@@ -198,4 +208,10 @@ private:
     std::vector<std::string> collect_local_names(const Macro& macro) const;
     std::unordered_map<std::string, std::string> make_local_rename_map(
         const Macro& macro, int uniq_id) const;
+
+    // Parse a constant expression from the text starting at p.
+    // Expands any macros in the text first, then scans the expanded text
+    // for a constant expression. Returns true on success and fills 'value'.
+    // Does not advance the caller's 'p'.
+    bool get_constant_value(const char*& p, int& value);
 };

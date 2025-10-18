@@ -25,6 +25,16 @@ static const int keyword_flags[] = {
 };
 #undef X
 
+#define X(id, text, flags) text,
+std::string keyword_to_string(Keyword kw) {
+    static const char* keyword_strings[] = {
+        "None",
+#include "keywords.def"
+    };
+    return keyword_strings[static_cast<int>(kw)];
+}
+#undef X
+
 bool keyword_is_directive(Keyword kw) {
     int flags = keyword_flags[static_cast<int>(kw)];
     return (flags & IS_DIRECTIVE) != 0;

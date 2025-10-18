@@ -21,6 +21,7 @@ enum class Keyword {
 
 // Convert string to Keyword enum, returns Keyword::None if not found
 Keyword to_keyword(const std::string& s);
+std::string keyword_to_string(Keyword kw);
 
 // Check if a keyword type
 bool keyword_is_directive(Keyword kw);
