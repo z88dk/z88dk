@@ -81,6 +81,7 @@ private:
     bool process_undef(const char*& p, Location& location);
     bool process_line(const char*& p, Location& location);
     bool process_rept(const char*& p, Location& location);
+    bool process_reptc(const char*& p, Location& location);
     bool process_macro(const char*& p, Location& location);
 
     // Checks for "name DIRECTIVE value" syntax.
@@ -92,6 +93,7 @@ private:
     bool process_name_defl(const char*& p, const std::string& name);
     bool process_name_define(const char*& p, const std::string& name);
     bool process_name_macro(const char*& p, const std::string& name);
+    bool process_name_reptc(const char*& p, const std::string& name);
 
     // Parameter parsing helpers used by both `process_macro` and `process_name_macro`.
     bool parse_param_list_parenthesized(const char*& p,
@@ -188,7 +190,7 @@ private:
     // Helper: read raw logical lines until the given end directive
     // (e.g. ENDR or ENDM).
     // Fills out_lines with raw logical lines (no comment removal
-    // performed here — each line is obtained by remove_comments which
+    // performed here - each line is obtained by remove_comments which
     // advances the current file line_index). Returns true if the end
     // directive was found, false on EOF (and reports a missing-end error).
     bool read_raw_block_until(Keyword endDirective,
@@ -214,4 +216,11 @@ private:
     // for a constant expression. Returns true on success and fills 'value'.
     // Does not advance the caller's 'p'.
     bool get_constant_value(const char*& p, int& value);
+
+    // Common implementation for REPTC handling. If 'name' is non-null the
+    // name-first syntax (`name REPTC arg`) is used and `p` is positioned
+    // after the directive. If 'name' is null the normal syntax
+    // (`REPTC var, arg`) is used and `p` should point after the directive.
+    bool do_reptc_common(const char*& p,
+                         const std::string* name, Location& location);
 };

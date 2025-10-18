@@ -522,6 +522,117 @@ bool scan_string_literal(const char*& p, std::string& out) {
     return false;
 }
 
+std::string unescape_string(const std::string& str) {
+    std::string out;
+    if (str.empty()) {
+        return out;
+    }
+
+    // Work on the interior if the string is quoted, otherwise use entire input
+    size_t i = 0;
+    size_t len = str.size();
+    if (str.front() == '"' && len >= 2) {
+        i = 1;
+        len = (str.back() == '"' ? str.size() - 1 : str.size());
+    }
+    else {
+        i = 0;
+        len = str.size();
+    }
+
+    for (; i < len; ++i) {
+        char c = str[i];
+        if (c != '\\') {
+            out.push_back(c);
+            continue;
+        }
+
+        // Escape sequence
+        if (i + 1 >= len) {
+            // Trailing backslash, treat literally
+            out.push_back('\\');
+            break;
+        }
+
+        char esc = str[++i];
+        switch (esc) {
+        case 'n':
+            out.push_back('\n');
+            break;
+        case 'r':
+            out.push_back('\r');
+            break;
+        case 't':
+            out.push_back('\t');
+            break;
+        case 'b':
+            out.push_back('\b');
+            break;
+        case 'f':
+            out.push_back('\f');
+            break;
+        case 'a':
+            out.push_back('\a');
+            break;
+        case 'v':
+            out.push_back('\v');
+            break;
+        case '\\':
+            out.push_back('\\');
+            break;
+        case '\'':
+            out.push_back('\'');
+            break;
+        case '"':
+            out.push_back('"');
+            break;
+        case 'e':
+            out.push_back(static_cast<char>(0x1B));
+            break;
+        case '0': // fallthrough to octal parsing starting with this digit
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7': {
+            // Octal escape: up to 3 octal digits (we already consumed first)
+            int val = esc - '0';
+            int count = 1;
+            while (count < 3 && i + 1 < len && str[i + 1] >= '0' && str[i + 1] <= '7') {
+                ++i;
+                val = (val << 3) + (str[i] - '0');
+                ++count;
+            }
+            out.push_back(static_cast<char>(val));
+            break;
+        }
+        case 'x': {
+            // Hex escape: up to 2 hex digits
+            int val = 0;
+            int count = 0;
+            while (count < 2 && i + 1 < len
+                    && std::isxdigit(static_cast<unsigned char>(str[i + 1]))) {
+                ++i;
+                char h = str[i];
+                val = val * 16 + (std::isdigit(static_cast<unsigned char>
+                                               (h)) ? h - '0' : std::tolower(h) - 'a' + 10);
+                ++count;
+            }
+            out.push_back(static_cast<char>(val));
+            break;
+        }
+        default:
+            // Unknown escape: treat as literal escaped character
+            out.push_back(esc);
+            break;
+        }
+    }
+
+    return out;
+}
+
 bool scan_operator(const char*& p, std::string& out) {
     const char* start = p;
     out.clear();
