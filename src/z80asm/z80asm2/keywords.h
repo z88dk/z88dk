@@ -26,9 +26,11 @@ Keyword to_keyword(const std::string& s);
 bool keyword_is_directive(Keyword kw);
 bool keyword_is_name_directive(Keyword kw);
 
-// Convert string to upper case
+// Convert string to upper/lower case
 std::string to_upper(const std::string& s);
+std::string to_lower(const std::string& s);
 
 // trim whitspace at the beginnint and at the end
 std::string ltrim(const std::string& s);
 std::string rtrim(const std::string& s);
+std::string trim(const std::string& s);
