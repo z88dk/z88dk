@@ -65,6 +65,7 @@ cloc:
 
 clean:
 	$(RM) $(PROJ) $(PROJ)$(EXE) $(TEST_BINS) $(OBJS) $(DEPENDS) \
-		  $(wildcard *.o *.d *.i *.exe *.orig *.core *.bak *~)
+		  $(wildcard *.o *.d *.i *.exe *.orig *.core *.bak *~) \
+		  $(wildcard $(TEST_DIR)/*.o $(TEST_DIR)/*.d $(TEST_DIR)/*.i $(TEST_DIR)/*.exe $(TEST_DIR)/*.orig $(TEST_DIR)/*.core $(TEST_DIR)/*.bak $(TEST_DIR)/*~)
 
 -include $(DEPENDS)
