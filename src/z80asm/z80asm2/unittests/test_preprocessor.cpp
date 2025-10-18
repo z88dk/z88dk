@@ -294,6 +294,203 @@ TEST_CASE("Preprocessor: include directive", "[preprocessor]") {
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
+TEST_CASE("Preprocessor: REPT repeats body N times",
+          "[preprocessor][directive][rept]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Repeat the two instruction lines 3 times => 6 output lines
+    std::vector<std::string> lines = {
+        "REPT 3",
+        "ld a,1",
+        "ld b,2",
+        "ENDR"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect the block repeated 3 times in order
+    for (int rep = 0; rep < 3; ++rep) {
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "ld a,1");
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "ld b,2");
+    }
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPT with non-constant count reports error",
+          "[preprocessor][directive][rept][error]") {
+    CerrRedirect redirect;
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // 'foo' is not a constant integer expression -> should produce an error
+    std::vector<std::string> lines = {
+        "REPT foo",
+        "ld a,1",
+        "ENDR"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+    // Drive the preprocessor until EOF or error
+    while (preproc.next_line(out_line, out_loc)) {
+        // consume
+    }
+
+    // The preprocessor must have reported an error for the non-constant count
+    CHECK(reporter.has_error());
+    std::string errout = redirect.str();
+    CHECK(((errout.find("REPT") != std::string::npos) || reporter.has_error()));
+}
+
+TEST_CASE("Preprocessor: REPT with zero count produces no output",
+          "[preprocessor][directive][rept][zero]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "REPT 0",
+        "ld a,1",
+        "ld b,2",
+        "ENDR",
+        "LD AFTER,2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Since count is zero the body should not be emitted; next output is the following normal line.
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPT with negative count produces no output",
+          "[preprocessor][directive][rept][negative]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "REPT -1",
+        "ld a,1",
+        "ENDR",
+        "LD AFTER,2"
+    };
+    std::string filename = write_temp_file(lines);
+
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Since count is negative the body should not be emitted; next output is the following normal line.
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPT with macro-defined count (DEFINE)",
+          "[preprocessor][directive][rept][macro_count]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // FOO is defined as a numeric macro; REPT FOO should repeat the body FOO times.
+    std::vector<std::string> lines = {
+        "#define FOO 3",
+        "REPT FOO",
+        "ld a,1",
+        "ENDR"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect the block repeated 3 times
+    for (int rep = 0; rep < 3; ++rep) {
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "ld a,1");
+    }
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPT with macro-defined count (name-first DEFINE)",
+          "[preprocessor][directive][rept][macro_count]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Alternative name-first DEFINE syntax
+    std::vector<std::string> lines = {
+        "BAR DEFINE 2",
+        "REPT BAR",
+        "nop",
+        "ENDR",
+        "LD AFTER,1"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect two 'nop' lines produced by REPT BAR
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "nop");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "nop");
+
+    // Then the following normal line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,1");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPT with arithmetic expression argument",
+          "[preprocessor][directive][rept][expression]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Expression: -1 + 2*3  -> -1 + 6 = 5  (wait: typical arithmetic precedence yields -1 + (2*3) = 5)
+    // Use a smaller body to make checks concise; ensure evaluation is performed by preprocessor.
+    std::vector<std::string> lines = {
+        "REPT -1+2*3",
+        "ld a,1",
+        "ld b,2",
+        "ENDR"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect the two-instruction block repeated 5 times (if expression evaluated as -1 + (2*3) = 5)
+    for (int rep = 0; rep < 5; ++rep) {
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "ld a,1");
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "ld b,2");
+    }
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
 TEST_CASE("Preprocessor: macro object-like expansion", "[preprocessor]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
@@ -1452,7 +1649,7 @@ TEST_CASE("Preprocessor: split line with object-like then function-like macros e
     Preprocessor preproc(reporter);
 
     // M1 is an object-like single-line macro, FN is a function-like single-line macro.
-    // The source line contains "M1 : FN(2,3)" — after expansion and splitting at ':'
+    // The source line contains "M1 : FN(2,3)" - after expansion and splitting at ':'
     // we should get the expansion of M1 first, then the expansion of FN.
     std::vector<std::string> lines = {
         "#define M1 ld a,1",
@@ -1513,7 +1710,7 @@ TEST_CASE("Preprocessor: split line with multi-line object-like then multi-line 
     Preprocessor preproc(reporter);
 
     // M1 is a multi-line object-like macro; FN is a multi-line function-like macro.
-    // The source line contains "M1 : FN(2,3)" — after expansion we expect M1's body lines
+    // The source line contains "M1 : FN(2,3)" - after expansion we expect M1's body lines
     // followed by FN's body lines (with arguments substituted).
     std::vector<std::string> lines = {
         "MACRO M1",
