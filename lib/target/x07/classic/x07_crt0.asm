@@ -18,7 +18,7 @@
 
 
 IF      !DEFINED_CRT_ORG_CODE
-    defc    CRT_ORG_CODE  = $800
+    defc    CRT_ORG_CODE  = 1380
 ENDIF
 
     defc    TAR__clib_exit_stack_size = 32
@@ -32,8 +32,31 @@ ENDIF
 ; Execution starts here
 ;----------------------
 start:
-    ;di
+   // di
 
+
+    ld      hl,__x07_program_entry_point
+    ld      de,__x07_program_entry_point
+loop:
+    ld      a,(hl)
+    inc     hl
+    and     a
+    jr      z,decompress
+    cp      0xff
+    jr      nz,copy_byte
+    ld      a,(hl)
+    inc     hl
+    cp      0xff
+    jr      z,copy_byte
+    xor     a
+copy_byte:
+    ld      (de),a
+    inc     de
+    jr      loop
+
+decompress:
+
+__x07_program_entry_point:
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.inc"
     call	crt0_init
