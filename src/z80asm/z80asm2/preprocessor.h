@@ -80,6 +80,7 @@ private:
     bool process_defl(const char*& p, Location& location);
     bool process_undef(const char*& p, Location& location);
     bool process_line(const char*& p, Location& location);
+    bool process_macro(const char*& p, Location& location);
 
     // Checks for "name DIRECTIVE value" syntax.
     // If found, sets 'name' and 'keyword' and returns true. Advances 'p' past the directive.
@@ -90,6 +91,15 @@ private:
     bool process_name_defl(const char*& p, const std::string& name);
     bool process_name_define(const char*& p, const std::string& name);
     bool process_name_macro(const char*& p, const std::string& name);
+
+    // Parameter parsing helpers used by both `process_macro` and `process_name_macro`.
+    bool parse_param_list_parenthesized(const char*& p,
+                                        std::vector<std::string>& params);
+    void parse_param_list_comma_separated(const char*& p,
+                                          std::vector<std::string>& params);
+    // Read macro body (lines) from the current input file into `macro` until ENDM.
+    // Returns true if ENDM was found, false on EOF (still fills macro.body_lines).
+    bool read_macro_body(InputFile& file, Macro& macro, const std::string& name);
 
     // Expands a macro invocation (object-like or function-like) in a line.
     // Returns the expanded string.
@@ -132,8 +142,6 @@ private:
     // Global counter used to uniquify LOCAL identifiers per expansion
     static inline int macro_expansion_counter_ = 0;
 
-    // Handle multi-line macro definition (MACRO ... ENDM)
-    bool process_macro(const char*& p, Location& location);
     // Helper: invoke a multi-line macro during expansion (pushes a virtual InputFile)
     std::string expand_multiline_macro_invocation(const std::string& name,
             const Macro& macro,
