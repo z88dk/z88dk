@@ -306,6 +306,8 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         return process_rept(p, location);
     case Keyword::REPTC:
         return process_reptc(p, location);
+    case Keyword::REPTI:
+        return process_repti(p, location);
     case Keyword::EXITM:
         // If we are inside a macro virtual file, EXITM aborts the current macro expansion.
         if (!file_stack_.empty()) {
@@ -556,6 +558,8 @@ bool Preprocessor::process_name_directive(Keyword keyword,
         return process_name_macro(p, name);
     case Keyword::REPTC:
         return process_name_reptc(p, name);
+    case Keyword::REPTI:
+        return process_name_repti(p, name);
     default:
         return false;
     }
@@ -662,7 +666,17 @@ bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
 bool Preprocessor::process_name_reptc(const char*& p, const std::string& name) {
     static Location dummy_location;
     return do_reptc_common(p, &name,
-                           file_stack_.empty() ? dummy_location : file_stack_.back().location);
+                           file_stack_.empty() ?
+                           dummy_location :
+                           file_stack_.back().location);
+}
+
+bool Preprocessor::process_name_repti(const char*& p, const std::string& name) {
+    static Location dummy_location;
+    return do_repti_common(p, &name,
+                           file_stack_.empty() ?
+                           dummy_location :
+                           file_stack_.back().location);
 }
 
 // Helper: parse a parenthesized parameter list. Expects p at '(' and advances past ')'.
@@ -1755,6 +1769,10 @@ bool Preprocessor::process_reptc(const char*& p, Location& location) {
     return do_reptc_common(p, nullptr, location);
 }
 
+bool Preprocessor::process_repti(const char*& p, Location& location) {
+    return do_repti_common(p, nullptr, location);
+}
+
 // Helper: expand macros in the text starting at p and scan the resulting text
 // for a constant integer. Returns true and sets 'value' on success.
 bool Preprocessor::get_constant_value(const char*& p, int& value) {
@@ -1889,5 +1907,151 @@ bool Preprocessor::do_reptc_common(const char*& p,
     // Push a virtual file with these lines
     int uniq_id = ++macro_expansion_counter_;
     push_virtual_macro_file("REPTC", uniq_id, std::move(virt_lines));
+    return true;
+}
+
+bool Preprocessor::do_repti_common(const char*& p, const std::string* name,
+                                   Location& location) {
+    // If name==nullptr: syntax is "REPTI var, a, b, c"
+    // If name!=nullptr: syntax is "var REPTI a, b, c" (name holds var)
+    skip_whitespace(p);
+
+    std::string var;
+    if (name == nullptr) {
+        // Expect identifier then comma
+        if (!scan_identifier(p, var)) {
+            reporter_.error(location, ErrorCode::InvalidSyntax,
+                            "Malformed REPTI directive (missing variable name)");
+            // consume block to stay in sync
+            std::vector<LogicalLine> tmp;
+            read_raw_block_until(Keyword::ENDR, tmp);
+            return true;
+        }
+        skip_whitespace(p);
+        if (*p != ',') {
+            // Treat missing list as empty (no iterations) but consume block
+            std::vector<LogicalLine> tmp;
+            read_raw_block_until(Keyword::ENDR, tmp);
+            return true;
+        }
+        ++p; // skip comma
+    }
+    else {
+        var = *name;
+    }
+
+    // Parse remaining text (the list) from p
+    const char* q = p;
+    skip_whitespace(q);
+
+    // If no list present treat as empty list (consume block and no output)
+    if (*q == '\0') {
+        std::vector<LogicalLine> tmp;
+        read_raw_block_until(Keyword::ENDR, tmp);
+        return true;
+    }
+
+    // Capture the rest of the logical text (p -> end) and expand macros in it.
+    std::string tail = q;
+    tail = trim(tail);
+
+    std::string expanded = expand_macros(tail);
+    if (expanded.empty()) {
+        // Expansion resulted in empty string (e.g. macros expanded to nothing)
+        // Consume the block and produce no output.
+        std::vector<LogicalLine> tmp;
+        read_raw_block_until(Keyword::ENDR, tmp);
+        return true;
+    }
+
+    // Split expanded list into comma-separated items while respecting strings/parentheses.
+    std::vector<std::string> items;
+    std::string cur;
+    int paren_depth = 0;
+    std::vector<MacroToken> tokens = tokenize_macro_body(expanded);
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        const MacroToken& tok = tokens[i];
+        if (tok.type == MacroTokenType::Identifier ||
+                tok.type == MacroTokenType::Number ||
+                tok.type == MacroTokenType::StringLiteral ||
+                tok.type == MacroTokenType::Operator) {
+            cur += tok.text;
+            continue;
+        }
+
+        if (tok.type == MacroTokenType::Punctuator && tok.text == "(") {
+            ++paren_depth;
+            cur += tok.text;
+            continue;
+        }
+
+        if (tok.type == MacroTokenType::Punctuator && tok.text == ")") {
+            if (paren_depth > 0) {
+                --paren_depth;
+            }
+            cur += tok.text;
+            continue;
+        }
+
+        if (tok.type == MacroTokenType::Punctuator && tok.text == "," &&
+                paren_depth == 0) {
+            std::string t = trim(cur);
+            items.push_back(t);
+            cur.clear();
+            continue;
+        }
+
+        // default
+        cur += tok.text;
+    }
+
+    if (!cur.empty()) {
+        items.push_back(trim(cur));
+    }
+
+    // Read the body lines up to ENDR
+    std::vector<LogicalLine> body_lines;
+    read_raw_block_until(Keyword::ENDR, body_lines);
+
+    // If no items (empty list) produce no output
+    bool any_nonempty = false;
+    for (const auto& it : items) {
+        if (!it.empty()) {
+            any_nonempty = true;
+            break;
+        }
+    }
+    if (!any_nonempty) {
+        return true;
+    }
+
+    // Build virtual lines. For each item: undef var; define var <item>; then body lines
+    int phys_line_num = get_invocation_physical_line_num();
+    std::vector<LogicalLine> virt_lines;
+    // Reserve a reasonable amount
+    virt_lines.reserve(items.size() * (2 + body_lines.size()));
+
+    for (const auto& it : items) {
+        if (it.empty()) {
+            continue; // skip empty elements
+        }
+
+        // #undef var
+        std::string uline = std::string("#undef ") + var;
+        virt_lines.push_back(LogicalLine{ uline, phys_line_num });
+
+        // #define var <item>
+        std::string dline = std::string("#define ") + var + " " + it;
+        virt_lines.push_back(LogicalLine{ dline, phys_line_num });
+
+        // append body lines
+        for (const auto& bl : body_lines) {
+            virt_lines.push_back(LogicalLine{ bl.text, phys_line_num });
+        }
+    }
+
+    // Push a virtual file with these lines
+    int uniq_id = ++macro_expansion_counter_;
+    push_virtual_macro_file("REPTI", uniq_id, std::move(virt_lines));
     return true;
 }

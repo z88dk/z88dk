@@ -2308,3 +2308,110 @@ TEST_CASE("Preprocessor: REPTC with macro-defined string of spaces expands corre
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
+
+TEST_CASE("Preprocessor: REPTI repeats body for each expression (normal syntax)",
+          "[preprocessor][directive][repti][basic]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "REPTI reg, bc, de, hl, af",
+        "push reg",
+        "ENDR"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push bc");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push de");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push hl");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push af");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPTI name-first syntax repeats body for each expression",
+          "[preprocessor][directive][repti][name-first]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "reg REPTI bc, de, hl, af",
+        "push reg",
+        "ENDR"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push bc");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push de");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push hl");
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "push af");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes)",
+          "[preprocessor][directive][repti][empty]") {
+    // Normal syntax: trailing comma -> empty list
+    {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        std::vector<std::string> lines = {
+            "REPTI reg,",
+            "push reg",
+            "ENDR",
+            "LD AFTER,1"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // No push lines should be emitted; next output is the following normal line.
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD AFTER,1");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(reporter.has_error());
+    }
+
+    // Name-first syntax: missing list after REPTI -> empty list
+    {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        std::vector<std::string> lines = {
+            "reg REPTI",
+            "push reg",
+            "ENDR",
+            "LD AFTER,2"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // No push lines should be emitted; next output is the following normal line.
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD AFTER,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(reporter.has_error());
+    }
+}
