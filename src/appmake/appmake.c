@@ -373,13 +373,15 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         fclose(fdata);
     }
 
-    // If we have a HIMEM then append it as well
-    strcpy(name, fname);
-    suffix_change(name, "_HIMEM.bin");
-    if ( ( fhimem = fopen(name, "rb")) != NULL ) {
-        while ((c = fgetc(fhimem)) != EOF)
-            fputc(c, fin);
-        fclose(fhimem);
+    // If we have a HIMEM then append it as well - but only if defined by crt
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__HIMEM_head ")) > 0)) {
+        strcpy(name, fname);
+        suffix_change(name, "_HIMEM.bin");
+        if ( ( fhimem = fopen(name, "rb")) != NULL ) {
+            while ((c = fgetc(fhimem)) != EOF)
+                fputc(c, fin);
+            fclose(fhimem);
+        }
     }
 
 

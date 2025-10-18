@@ -248,11 +248,13 @@ int phc25_exec(char *target)
         }
         fclose(temp);
 
+    
         // invoke z88dk-zx0 -b on the file
         snprintf(cmdline,sizeof(cmdline),"z88dk-zx0 -f %s %s",utname, ctname);
     
-        if (system(cmdline) != 0)
+        if (system(cmdline) != 0) {
             exit_log(1, "ERROR: Unable to compress %s\n", binname);
+        }
 
         // Read that file back in
         if ( (temp = fopen(ctname, "rb")) == NULL ) {
