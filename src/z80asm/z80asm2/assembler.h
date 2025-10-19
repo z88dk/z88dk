@@ -6,26 +6,40 @@
 
 #pragma once
 
+#include "error_reporter.h"
+#include "preprocessor.h"
+#include "symbol_table.h"
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 class Lexer;
 class Parser;
 class CodeGenerator;
-class SymbolTable;
-class ErrorReporter;
 
 class Assembler {
 public:
     Assembler();
     void assemble(const std::string& input);
-    std::vector<uint8_t> getOutput() const;
+    std::vector<uint8_t> get_output() const;
+
+    // Expose the preprocessor for other users of Assembler if needed.
+    Preprocessor& preprocessor() {
+        return preprocessor_;
+    }
+
 private:
-    // Components
-    //Lexer* lexer_{ nullptr };
-    //Parser* parser_{ nullptr };
-    //CodeGenerator* codegen_{ nullptr };
-    //SymbolTable* symbols_{ nullptr };
-    //ErrorReporter* errors_{ nullptr };
+    // Components used by the assembler. Minimal placeholders here so the
+    // assembler can register the evaluation callback for the preprocessor.
+    ErrorReporter errors_;
+    Preprocessor preprocessor_{ errors_ };
+    SymbolTable symbols_;
+
+    // Callback invoked by Preprocessor when it cannot evaluate a constant
+    // expression locally and asks the assembler to try. Implemented in
+    // assembler.cpp.
+    Preprocessor::EvalResult eval_for_preproc(const std::string& expr,
+            const Location& loc);
+
+    // other components (lexer, parser, codegen, ...) can be added later
 };
