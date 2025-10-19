@@ -2156,6 +2156,7 @@ TEST_CASE("Preprocessor: REPTC iterates escape sequences (CR and LF)",
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
+
     REQUIRE(preproc.open(filename));
 
     std::string out_line;
@@ -2512,6 +2513,7 @@ TEST_CASE("Preprocessor: REPTC with missing argument produces no output and repo
         CerrRedirect redirect;
         ErrorReporter reporter;
         Preprocessor preproc(reporter);
+
         std::vector<std::string> lines = {
             "var REPTC",
             "defb var",
@@ -3254,3 +3256,157 @@ TEST_CASE("Preprocessor: angle-bracket include searches include paths in order (
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
+TEST_CASE("Preprocessor: IF / ELIF / ELSE / ENDIF directives (nesting + branches)",
+          "[preprocessor][directive][if][elif][else][endif]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    SECTION("Simple IF/ELSE selects IF branch when true") {
+        std::vector<std::string> lines = {
+            "IF 1",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELIF chain picks the first true ELIF") {
+        std::vector<std::string> lines = {
+            "IF 0",
+            "LD A,1",
+            "ELIF 0",
+            "LD A,2",
+            "ELIF 1",
+            "LD A,3",
+            "ELSE",
+            "LD A,4",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,3");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Nested IF/ELSE works correctly") {
+        std::vector<std::string> lines = {
+            "IF 1",
+            "  IF 0",
+            "    LD A,1",
+            "  ELSE",
+            "    LD A,2",
+            "  ENDIF",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELSE taken when no IF/ELIF branch true") {
+        std::vector<std::string> lines = {
+            "IF 0",
+            "LD A,1",
+            "ELIF 0",
+            "LD A,2",
+            "ELSE",
+            "LD A,3",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,3");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+}
+
+TEST_CASE("Preprocessor: IF expression callback integration (assembler evaluation)",
+          "[preprocessor][directive][if][callback]") {
+    // Two scenarios:
+    // 1) callback evaluates expression -> branch selected
+    // 2) callback fails to evaluate -> branch treated false
+
+    SECTION("Callback returns true -> IF branch executed") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Register callback that resolves "EXPR" -> 1, anything else not handled.
+        preproc.set_eval_callback([](const std::string & expr,
+        const Location&)->Preprocessor::EvalResult {
+            Preprocessor::EvalResult r;
+            if (expr == "EXPR") {
+                r.ok = true;
+                r.value = 1;
+                r.unknown_link_time = false;
+            }
+            return r;
+        });
+
+        std::vector<std::string> lines = {
+            "IF EXPR",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(reporter.has_error());
+    }
+
+    SECTION("Callback returns false -> syntax error and IF treated false") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Callback that never evaluates anything (always returns ok==false)
+        preproc.set_eval_callback([](const std::string&,
+        const Location&)->Preprocessor::EvalResult {
+            return Preprocessor::EvalResult{}; // ok=false
+        });
+
+        std::vector<std::string> lines = {
+            "IF EXPR",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(reporter.has_error());
+    }
+}
