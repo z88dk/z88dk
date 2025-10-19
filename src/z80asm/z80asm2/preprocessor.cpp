@@ -322,6 +322,9 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         reporter_.warning(location, ErrorCode::InvalidSyntax,
                           "ENDM outside of macro epansion");
         return true;
+    case Keyword::BINARY:
+    case Keyword::INCBIN:
+        return process_binary(p, location);
     default:
         return false;
     }
@@ -357,40 +360,51 @@ bool Preprocessor::process_defl(const char*& p, Location& location) {
     return process_name_defl(p, name);
 }
 
-bool Preprocessor::process_include(const char*& p, Location& location) {
+// Helper: scan a filename (quoted "file" or <file> or unquoted token) from p.
+// Advances p past the filename and returns true on success. Does not report errors.
+static bool scan_filename_from_p(const char*& p, std::string& out_filename) {
+    const char* start = p;
     skip_whitespace(p);
+    out_filename.clear();
 
-    std::string filename;
-
-    // Handle quoted include: #include "file" or #include <file>
     if (*p == '"' || *p == '<') {
         char open = *p++;
         char close = (open == '"') ? '"' : '>';
         while (*p && *p != close) {
-            filename += *p++;
+            out_filename += *p++;
         }
         if (*p == close) {
-            ++p;    // skip closing quote/bracket
+            ++p; // skip closing quote/bracket
         }
-        if (filename.empty()) {
-            reporter_.error(location, ErrorCode::InvalidSyntax, "Empty INCLUDE filename");
-            return true;
+    }
+    else {
+        // Unquoted filename: read until whitespace
+        const char* q = p;
+        while (*q && !isspace(static_cast<unsigned char>(*q))) {
+            ++q;
         }
-        push_file(filename);
+        out_filename.assign(p, q - p);
+        p = q;
+    }
+
+    out_filename = trim(out_filename);
+    if (out_filename.empty()) {
+        p = start; // restore on failure
+        return false;
+    }
+    return true;
+}
+
+bool Preprocessor::process_include(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    std::string filename;
+    if (!scan_filename_from_p(p, filename)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax, "Empty INCLUDE filename");
         return true;
     }
 
-    // Fallback: read until whitespace
-    while (*p && !isspace(static_cast<unsigned char>(*p))) {
-        filename += *p++;
-    }
-    if (!filename.empty()) {
-        push_file(filename);
-        return true;
-    }
-
-    reporter_.error(location, ErrorCode::InvalidSyntax,
-                    "Malformed INCLUDE directive");
+    push_file(filename);
     return true;
 }
 
@@ -1347,6 +1361,74 @@ bool Preprocessor::process_macro(const char*& p, Location& location) {
     read_macro_body(macro);
     macros_[name] = std::move(macro);
     // read_macro_body already reports missing ENDM if it reached EOF.
+    return true;
+}
+
+bool Preprocessor::process_binary(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    std::string filename;
+    if (!scan_filename_from_p(p, filename)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed BINARY/INCBIN directive (missing filename)");
+        return true;
+    }
+
+    // Try to open binary file
+    std::ifstream in(filename.c_str(), std::ios::binary);
+    if (!in) {
+        // Report file-not-found using location for context
+        reporter_.error(location, ErrorCode::FileNotFound, filename);
+        return true;
+    }
+
+    // Read file contents
+    in.seekg(0, std::ios::end);
+    std::streamsize filesize = in.tellg();
+    in.seekg(0, std::ios::beg);
+
+    std::vector<unsigned char> data;
+    if (filesize > 0) {
+        data.resize(static_cast<size_t>(filesize));
+        in.read(reinterpret_cast<char*>(data.data()), filesize);
+    }
+
+    // If no data, nothing to emit
+    if (data.empty()) {
+        return true;
+    }
+
+    // Build DEFB lines: 16 bytes per line, decimal values separated by commas (no spaces).
+    int phys_line_num = get_invocation_physical_line_num();
+    std::vector<LogicalLine> virt_lines;
+    const size_t per_line = 16;
+    size_t idx = 0;
+    while (idx < data.size()) {
+        size_t chunk = std::min(per_line, data.size() - idx);
+        std::string line = "DEFB ";
+        for (size_t j = 0; j < chunk; ++j) {
+            if (j > 0) {
+                line += ",";
+            }
+            line += std::to_string(static_cast<int>(data[idx + j]));
+        }
+        virt_lines.push_back(LogicalLine{ line, phys_line_num });
+        idx += chunk;
+    }
+
+    // Push a virtual InputFile for these lines so regular pipeline emits them
+    int uniq_id = ++macro_expansion_counter_;
+    InputFile virt;
+    virt.filename = "<binary:" + filename + ":" + std::to_string(uniq_id) + ">";
+    virt.lines = std::move(virt_lines);
+    virt.line_index = 0;
+    virt.location = Location(virt.filename, 0);
+    // Do not advance parent's logical line number when processing this virtual file.
+    virt.location.set_increment_line_numbers(false);
+    virt.line_directive_active = false;
+    virt.is_macro_expansion = false;
+
+    file_stack_.push_back(std::move(virt));
     return true;
 }
 

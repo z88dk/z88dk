@@ -304,7 +304,7 @@ TEST_CASE("Preprocessor: REPT repeats body N times",
         "REPT 3",
         "ld a,1",
         "ld b,2",
-        "ENDR"
+        "ENDR",
     };
     std::string filename = write_temp_file(lines);
 
@@ -334,7 +334,7 @@ TEST_CASE("Preprocessor: REPT with non-constant count reports error",
     std::vector<std::string> lines = {
         "REPT foo",
         "ld a,1",
-        "ENDR"
+        "ENDR",
     };
     std::string filename = write_temp_file(lines);
 
@@ -412,7 +412,7 @@ TEST_CASE("Preprocessor: REPT with macro-defined count (DEFINE)",
         "#define FOO 3",
         "REPT FOO",
         "ld a,1",
-        "ENDR"
+        "ENDR",
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -440,7 +440,7 @@ TEST_CASE("Preprocessor: REPT with macro-defined count (name-first DEFINE)",
         "REPT BAR",
         "nop",
         "ENDR",
-        "LD AFTER,1"
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -456,7 +456,7 @@ TEST_CASE("Preprocessor: REPT with macro-defined count (name-first DEFINE)",
 
     // Then the following normal line
     REQUIRE(preproc.next_line(out_line, out_loc));
-    CHECK(out_line == "LD AFTER,1");
+    CHECK(out_line == "LD AFTER,2");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
@@ -472,7 +472,7 @@ TEST_CASE("Preprocessor: REPT with arithmetic expression argument",
         "REPT -1+2*3",
         "ld a,1",
         "ld b,2",
-        "ENDR"
+        "ENDR",
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -969,7 +969,7 @@ TEST_CASE("Preprocessor: scan_float formats are recognized and output contains d
         "#define F6 1.0e-2",    // fraction with exponent
         "#define F7 .0",        // zero with leading dot
         "#define F8 0.0",       // explicit zero with fraction
-        // Use the macros to force expansion into output lines
+        // Use the macros in instructions so preprocessor returns expanded float numbers
         "LD A,F1",
         "LD B,F2",
         "LD C,F3",
@@ -1158,7 +1158,7 @@ TEST_CASE("Preprocessor: MACRO (multi-line) expands to multiple output lines",
     std::string out_line;
     Location out_loc;
 
-    // Expect the three push instructions produced by the macro expansion
+    // The macro should expand to three lines: "push bc", "push de", "push hl"
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "push bc");
     REQUIRE(preproc.next_line(out_line, out_loc));
@@ -1253,7 +1253,8 @@ TEST_CASE("Preprocessor: name-first MACRO with parameters expands each body line
           "[preprocessor][macro][params][name-directive]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
-    // Alternative syntax: "name MACRO arg1,arg2,..."
+
+    // Alternative name-first DEFINE syntax
     std::vector<std::string> lines = {
         "two_loads MACRO x,y",
         "    ld a,x",
@@ -1280,7 +1281,7 @@ TEST_CASE("Preprocessor: name-first MACRO (object-like) expands to multiple outp
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
 
-    // Alternative syntax: "name MACRO" (object-like multi-line macro)
+    // Alternative name-first DEFINE syntax
     std::vector<std::string> lines = {
         "two_lines MACRO",
         "    ld a,1",
@@ -1505,14 +1506,13 @@ TEST_CASE("Preprocessor: label before multi-line object-like macro expansion",
     std::string out_line;
     Location out_loc;
 
-    // Label should appear before first macro body line
+    // Expect the label on its own logical line first
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == ".label");
 
+    // Then the macro body lines
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "ld a,1");
-
-    // Second macro line
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "ld b,2");
 
@@ -1543,14 +1543,13 @@ TEST_CASE("Preprocessor: label before multi-line function-like macro expansion",
     std::string out_line;
     Location out_loc;
 
-    // Label should be preserved and placed before the first expanded macro line
+    // Label should appear before first macro body line
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == ".label");
 
+    // Then the macro body lines
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "ld a,5");
-
-    // Second macro line
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "ld b,5");
 
@@ -1818,7 +1817,7 @@ TEST_CASE("Preprocessor: split line with multi-line empty function-like then emp
     std::string out_line;
     Location out_loc;
 
-    // Only the surrounding lines should be present; the invocation produces no intermediate output.
+    // The empty macro invocation should produce no lines; we should see the surrounding lines only.
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "LD BEFORE,1");
 
@@ -1835,14 +1834,14 @@ TEST_CASE("Preprocessor: split line with multi-line empty object-like then empty
 
     // Same as above but object-like first, function-like second.
     std::vector<std::string> lines = {
-        "#define EMPTY_MACRO", // single-line empty macro
+        "#define EMPTY",
         "MACRO MAC",
-        "    EMPTY_MACRO : EMPTY_MACRO",
-        "    EMPTY_MACRO : EMPTY_MACRO",
+        "    EMPTY : EMPTY",
+        "    EMPTY : EMPTY",
         "ENDM",
         "MACRO FOO(x)",
-        "    EMPTY_MACRO : EMPTY_MACRO",
-        "    EMPTY_MACRO : EMPTY_MACRO",
+        "    EMPTY : EMPTY",
+        "    EMPTY : EMPTY",
         "ENDM",
         "LD BEFORE,1",
         "MAC : FOO(1)",
@@ -1865,8 +1864,6 @@ TEST_CASE("Preprocessor: split line with multi-line empty object-like then empty
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
-// REPTC tests: repeat a block for each character of a string, identifier or number
-
 TEST_CASE("Preprocessor: REPTC with string literal iterates characters",
           "[preprocessor][directive][reptc][string]") {
     ErrorReporter reporter;
@@ -1875,7 +1872,8 @@ TEST_CASE("Preprocessor: REPTC with string literal iterates characters",
     std::vector<std::string> lines = {
         "REPTC var, \"hi\"",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -1889,6 +1887,9 @@ TEST_CASE("Preprocessor: REPTC with string literal iterates characters",
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 105");
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -1901,7 +1902,8 @@ TEST_CASE("Preprocessor: REPTC with identifier/string macro iterates expanded ch
         "#defl text = \"abc\"",
         "REPTC var, text",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -1917,6 +1919,9 @@ TEST_CASE("Preprocessor: REPTC with identifier/string macro iterates expanded ch
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 99");
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -1930,7 +1935,8 @@ TEST_CASE("Preprocessor: REPTC with numeric macro iterates over digits' characte
         "#define version 23",
         "REPTC var, version",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -1942,6 +1948,9 @@ TEST_CASE("Preprocessor: REPTC with numeric macro iterates over digits' characte
     CHECK(out_line == "defb 50"); // '2'
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 51"); // '3'
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
@@ -1957,7 +1966,8 @@ TEST_CASE("Preprocessor: REPTC iterates escape sequences (CR and LF)",
     std::vector<std::string> lines = {
         "REPTC var, \"X\\r\\nY\"",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -1974,6 +1984,9 @@ TEST_CASE("Preprocessor: REPTC iterates escape sequences (CR and LF)",
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 89"); // 'Y'
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -1986,7 +1999,8 @@ TEST_CASE("Preprocessor: REPTC iterates escaped backslash correctly",
     std::vector<std::string> lines = {
         "REPTC var, \"a\\\\b\"",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2001,11 +2015,14 @@ TEST_CASE("Preprocessor: REPTC iterates escaped backslash correctly",
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 98"); // 'b'
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
 TEST_CASE("Preprocessor: REPTC with bare identifier iterates identifier characters",
-          "[preprocessor][directive][reptc][identifier][bare]") {
+          "[preprocessor][directive][reptc][name-first][identifier]") {
     ErrorReporter reporter;
     Preprocessor preproc(reporter);
 
@@ -2013,7 +2030,8 @@ TEST_CASE("Preprocessor: REPTC with bare identifier iterates identifier characte
     std::vector<std::string> lines = {
         "REPTC var, hello",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2032,6 +2050,9 @@ TEST_CASE("Preprocessor: REPTC with bare identifier iterates identifier characte
     CHECK(out_line == "defb 108");
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 111");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
@@ -2047,7 +2068,8 @@ TEST_CASE("Preprocessor: name-first REPTC with bare identifier iterates identifi
     std::vector<std::string> lines = {
         "var REPTC hello",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2067,6 +2089,9 @@ TEST_CASE("Preprocessor: name-first REPTC with bare identifier iterates identifi
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 111");
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -2078,7 +2103,8 @@ TEST_CASE("Preprocessor: name-first REPTC with string literal iterates character
     std::vector<std::string> lines = {
         "var REPTC \"hi\"",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2092,6 +2118,9 @@ TEST_CASE("Preprocessor: name-first REPTC with string literal iterates character
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 105");
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -2104,7 +2133,8 @@ TEST_CASE("Preprocessor: name-first REPTC with identifier macro iterates expande
         "#defl text = \"abc\"",
         "var REPTC text",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2120,6 +2150,9 @@ TEST_CASE("Preprocessor: name-first REPTC with identifier macro iterates expande
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 99");
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -2133,7 +2166,8 @@ TEST_CASE("Preprocessor: name-first REPTC with numeric macro iterates over digit
         "#define version 23",
         "var REPTC version",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2145,6 +2179,9 @@ TEST_CASE("Preprocessor: name-first REPTC with numeric macro iterates over digit
     CHECK(out_line == "defb 50"); // '2'
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 51"); // '3'
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
@@ -2160,14 +2197,18 @@ TEST_CASE("Preprocessor: REPTC with empty string produces no output (both syntax
         std::vector<std::string> lines = {
             "REPTC var, \"\"",
             "defb var",
-            "ENDR"
+            "ENDR",
+            "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
 
         std::string out_line;
         Location out_loc;
-        // No iterations -> no output
+
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD AFTER,2");
+
         CHECK_FALSE(preproc.next_line(out_line, out_loc));
     }
 
@@ -2178,14 +2219,18 @@ TEST_CASE("Preprocessor: REPTC with empty string produces no output (both syntax
         std::vector<std::string> lines = {
             "var REPTC \"\"",
             "defb var",
-            "ENDR"
+            "ENDR",
+            "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
 
         std::string out_line;
         Location out_loc;
-        // No iterations -> no output
+
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD AFTER,2");
+
         CHECK_FALSE(preproc.next_line(out_line, out_loc));
     }
 }
@@ -2196,18 +2241,23 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
     {
         ErrorReporter reporter;
         Preprocessor preproc(reporter);
+
         std::vector<std::string> lines = {
             "#define EMPTY",
             "REPTC var, EMPTY",
             "defb var",
-            "ENDR"
+            "ENDR",
+            "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
 
         std::string out_line;
         Location out_loc;
-        // EMPTY expands to empty string -> no iterations -> no output
+
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD AFTER,2");
+
         CHECK_FALSE(preproc.next_line(out_line, out_loc));
     }
 
@@ -2215,17 +2265,23 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
     {
         ErrorReporter reporter;
         Preprocessor preproc(reporter);
+
         std::vector<std::string> lines = {
             "#define EMPTY",
             "var REPTC EMPTY",
             "defb var",
-            "ENDR"
+            "ENDR",
+            "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
 
         std::string out_line;
         Location out_loc;
+
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD AFTER,2");
+
         CHECK_FALSE(preproc.next_line(out_line, out_loc));
     }
 }
@@ -2240,7 +2296,7 @@ TEST_CASE("Preprocessor: REPTC with missing argument produces no output and repo
         std::vector<std::string> lines = {
             "REPTC var,",
             "defb var",
-            "ENDR"
+            "ENDR",
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
@@ -2267,7 +2323,7 @@ TEST_CASE("Preprocessor: REPTC with missing argument produces no output and repo
         std::vector<std::string> lines = {
             "var REPTC",
             "defb var",
-            "ENDR"
+            "ENDR",
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
@@ -2298,7 +2354,8 @@ TEST_CASE("Preprocessor: REPTC with macro-defined string of spaces expands corre
         "#define FOO \"   \"",
         "REPTC var, FOO",
         "defb var",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2312,6 +2369,9 @@ TEST_CASE("Preprocessor: REPTC with macro-defined string of spaces expands corre
         CHECK(out_line == "defb 32");
     }
 
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
+
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -2323,7 +2383,8 @@ TEST_CASE("Preprocessor: REPTI repeats body for each expression (normal syntax)"
     std::vector<std::string> lines = {
         "REPTI reg, bc, de, hl, af",
         "push reg",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2339,6 +2400,9 @@ TEST_CASE("Preprocessor: REPTI repeats body for each expression (normal syntax)"
     CHECK(out_line == "push hl");
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "push af");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
@@ -2351,7 +2415,8 @@ TEST_CASE("Preprocessor: REPTI name-first syntax repeats body for each expressio
     std::vector<std::string> lines = {
         "reg REPTI bc, de, hl, af",
         "push reg",
-        "ENDR"
+        "ENDR",
+        "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
     REQUIRE(preproc.open(filename));
@@ -2367,6 +2432,9 @@ TEST_CASE("Preprocessor: REPTI name-first syntax repeats body for each expressio
     CHECK(out_line == "push hl");
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "push af");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD AFTER,2");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
@@ -2382,7 +2450,7 @@ TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes
             "REPTI reg,",
             "push reg",
             "ENDR",
-            "LD AFTER,1"
+            "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
         REQUIRE(preproc.open(filename));
@@ -2392,7 +2460,7 @@ TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes
 
         // No push lines should be emitted; next output is the following normal line.
         REQUIRE(preproc.next_line(out_line, out_loc));
-        CHECK(out_line == "LD AFTER,1");
+        CHECK(out_line == "LD AFTER,2");
         CHECK_FALSE(preproc.next_line(out_line, out_loc));
         CHECK_FALSE(reporter.has_error());
     }
@@ -2649,4 +2717,261 @@ TEST_CASE("Preprocessor: whitespace-tolerant 'name EQU text' and 'name = text' c
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
+// BINARY / INCBIN tests: include a 256-byte binary (0..255) and expect DEFB lines with 16 bytes each.
 
+TEST_CASE("Preprocessor: BINARY includes 256-byte file and emits DEFB lines (BINARY)",
+          "[preprocessor][directive][binary][incbin]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Create 256-byte binary file with values 0..255
+    std::string binname = "test_preproc_bin_256.bin";
+    {
+        std::ofstream bos(binname, std::ios::binary);
+        for (int i = 0; i < 256; ++i) {
+            char c = static_cast<char>(i & 0xFF);
+            bos.put(c);
+        }
+    }
+    // Track for cleanup
+    track_temp_file(binname);
+
+    // Create asm file that includes the binary
+    std::vector<std::string> lines = {
+        "BINARY \"" + binname + "\""
+    };
+    std::string asmfile = write_temp_file(lines);
+
+    REQUIRE(preproc.open(asmfile));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect 256 bytes emitted as 16 lines of 16 bytes each
+    for (int line_idx = 0; line_idx < 16; ++line_idx) {
+        REQUIRE(preproc.next_line(out_line, out_loc));
+
+        // Split mnemonic and data
+        size_t sp = out_line.find(' ');
+        REQUIRE(sp != std::string::npos);
+        std::string mnemonic = out_line.substr(0, sp);
+        std::string data = out_line.substr(sp + 1);
+
+        // mnemonic should be "defb" case-insensitive
+        std::string lower = to_lower(mnemonic);
+        CHECK(lower == "defb");
+
+        // trim data (both ends)
+        data = trim(data);
+
+        // parse comma-separated integers
+        std::vector<int> vals;
+        size_t pos = 0;
+        while (pos < data.size()) {
+            size_t comma = data.find(',', pos);
+            std::string tok = (comma == std::string::npos) ? data.substr(pos) : data.substr(
+                                  pos, comma - pos);
+            tok = trim(tok);
+            REQUIRE(!tok.empty());
+            vals.push_back(std::stoi(tok));
+            if (comma == std::string::npos) {
+                break;
+            }
+            pos = comma + 1;
+        }
+
+        CHECK(vals.size() == 16);
+        for (size_t j = 0; j < 16; ++j) {
+            int expected = line_idx * 16 + static_cast<int>(j);
+            CHECK(vals[j] == expected);
+        }
+    }
+
+    // No more lines
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: INCBIN includes 256-byte file and emits DEFB lines (INCBIN)",
+          "[preprocessor][directive][incbin][binary]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Create 256-byte binary file with values 0..255 (reuse name)
+    std::string binname2 = "test_preproc_bin_256_2.bin";
+    {
+        std::ofstream bos(binname2, std::ios::binary);
+        for (int i = 0; i < 256; ++i) {
+            char c = static_cast<char>(i & 0xFF);
+            bos.put(c);
+        }
+    }
+    track_temp_file(binname2);
+
+    // Create asm file that uses INCBIN (alternative directive name)
+    std::vector<std::string> lines = {
+        "INCBIN \"" + binname2 + "\""
+    };
+    std::string asmfile2 = write_temp_file(lines);
+
+    REQUIRE(preproc.open(asmfile2));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect 16 lines, 16 values each
+    for (int line_idx = 0; line_idx < 16; ++line_idx) {
+        REQUIRE(preproc.next_line(out_line, out_loc));
+
+        size_t sp = out_line.find(' ');
+        REQUIRE(sp != std::string::npos);
+        std::string mnemonic = out_line.substr(0, sp);
+        std::string data = out_line.substr(sp + 1);
+
+        // mnemonic should be "defb" case-insensitive
+        std::string lower = to_lower(mnemonic);
+        CHECK(lower == "defb");
+
+        // trim data
+        data = trim(data);
+
+        std::vector<int> vals;
+        size_t pos = 0;
+        while (pos < data.size()) {
+            size_t comma = data.find(',', pos);
+            std::string tok = (comma == std::string::npos) ? data.substr(pos) : data.substr(
+                                  pos, comma - pos);
+            tok = trim(tok);
+            REQUIRE(!tok.empty());
+            vals.push_back(std::stoi(tok));
+            if (comma == std::string::npos) {
+                break;
+            }
+            pos = comma + 1;
+        }
+
+        CHECK(vals.size() == 16);
+        for (size_t j = 0; j < 16; ++j) {
+            int expected = line_idx * 16 + static_cast<int>(j);
+            CHECK(vals[j] == expected);
+        }
+    }
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor::open fails for missing file (simple filename)",
+          "[preprocessor][open][file_not_found]") {
+    CerrRedirect redirect;
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Ensure file does not exist
+    std::string filename = "test_preproc_missing_file_001.asm";
+    std::remove(filename.c_str());
+
+    // open() should fail and reporter should have recorded an error
+    CHECK_FALSE(preproc.open(filename));
+
+    CHECK(reporter.has_error());
+    std::string err = redirect.str();
+    CHECK(((err.find(filename) != std::string::npos) || reporter.has_error()));
+}
+
+TEST_CASE("Preprocessor::open fails for missing file (nonexistent path)",
+          "[preprocessor][open][file_not_found][path]") {
+    CerrRedirect redirect;
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // Use a path that almost certainly doesn't exist
+    std::string filename = "no_such_dir/test_preproc_missing_file_002.asm";
+    // Remove in case of previous runs (no-op if not present)
+    std::remove(filename.c_str());
+
+    CHECK_FALSE(preproc.open(filename));
+
+    CHECK(reporter.has_error());
+    std::string err = redirect.str();
+    CHECK(((err.find(filename) != std::string::npos) || reporter.has_error()));
+}
+
+TEST_CASE("Preprocessor: INCLUDE reports error for missing file",
+          "[preprocessor][include][file_not_found]") {
+    CerrRedirect redirect;
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::string missing = "no_such_include_zzz.asm";
+    std::vector<std::string> lines = {
+        "#include \"" + missing + "\"",
+        "LD AFTER,2"
+    };
+    std::string asmfile = write_temp_file(lines);
+
+    REQUIRE(preproc.open(asmfile));
+
+    std::string out_line;
+    Location out_loc;
+    // Drive the preprocessor until EOF so the include is attempted.
+    while (preproc.next_line(out_line, out_loc)) {
+        (void)out_line;
+    }
+
+    CHECK(reporter.has_error());
+    std::string err = redirect.str();
+    CHECK(((err.find(missing) != std::string::npos) || reporter.has_error()));
+}
+
+TEST_CASE("Preprocessor: BINARY reports error for missing file",
+          "[preprocessor][directive][binary][file_not_found]") {
+    CerrRedirect redirect;
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::string missing = "no_such_binary_zzz.bin";
+    std::vector<std::string> lines = {
+        "BINARY \"" + missing + "\"",
+        "LD AFTER,2"
+    };
+    std::string asmfile = write_temp_file(lines);
+
+    REQUIRE(preproc.open(asmfile));
+
+    std::string out_line;
+    Location out_loc;
+    // Drive the preprocessor so the BINARY directive is processed.
+    while (preproc.next_line(out_line, out_loc)) {
+        (void)out_line;
+    }
+
+    CHECK(reporter.has_error());
+    std::string err = redirect.str();
+    CHECK(((err.find(missing) != std::string::npos) || reporter.has_error()));
+}
+
+TEST_CASE("Preprocessor: INCBIN reports error for missing file",
+          "[preprocessor][directive][incbin][file_not_found]") {
+    CerrRedirect redirect;
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::string missing = "no_such_incbin_zzz.bin";
+    std::vector<std::string> lines = {
+        "INCBIN \"" + missing + "\"",
+        "LD AFTER,3"
+    };
+    std::string asmfile = write_temp_file(lines);
+
+    REQUIRE(preproc.open(asmfile));
+
+    std::string out_line;
+    Location out_loc;
+    // Drive the preprocessor so the INCBIN directive is processed.
+    while (preproc.next_line(out_line, out_loc)) {
+        (void)out_line;
+    }
+
+    CHECK(reporter.has_error());
+    std::string err = redirect.str();
+    CHECK(((err.find(missing) != std::string::npos) || reporter.has_error()));
+}
