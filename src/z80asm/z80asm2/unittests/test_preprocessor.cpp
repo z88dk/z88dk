@@ -1507,7 +1507,10 @@ TEST_CASE("Preprocessor: label before multi-line object-like macro expansion",
 
     // Label should appear before first macro body line
     REQUIRE(preproc.next_line(out_line, out_loc));
-    CHECK(out_line == "label: ld a,1");
+    CHECK(out_line == ".label");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,1");
 
     // Second macro line
     REQUIRE(preproc.next_line(out_line, out_loc));
@@ -1542,7 +1545,10 @@ TEST_CASE("Preprocessor: label before multi-line function-like macro expansion",
 
     // Label should be preserved and placed before the first expanded macro line
     REQUIRE(preproc.next_line(out_line, out_loc));
-    CHECK(out_line == "label: ld a,5");
+    CHECK(out_line == ".label");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "ld a,5");
 
     // Second macro line
     REQUIRE(preproc.next_line(out_line, out_loc));
@@ -2479,6 +2485,58 @@ TEST_CASE("Preprocessor: macro-defined string with escapes expands to char codes
 
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "defb 88,13,10,89");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+// New tests: labels are split into their own logical line so assembler sees label on a separate line.
+
+TEST_CASE("Preprocessor: splits 'name: instr' into label line then instruction",
+          "[preprocessor][label][split]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "start: LD A,1",
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Expect the label on its own logical line first
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == ".start");
+
+    // Then the instruction on the next line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,1");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: splits '.name instr' (dot-label) into label line then instruction",
+          "[preprocessor][label][split][dotlabel]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        ".local LD A,1",
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // Dot-label should be separated and emitted as its own logical line (preserve the leading dot)
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == ".local");
+
+    // Then the instruction on the next line
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,1");
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
