@@ -526,6 +526,14 @@ bool Preprocessor::is_name_directive(const char*& p, std::string& name,
         return false;
     }
 
+    // special case "foo = 42"
+    skip_whitespace(p);
+    if (*p == '=') {
+        ++p; // skip '='
+        keyword = Keyword::EQU;
+        return true;
+    }
+
     // Scan second identifier (directive)
     if (!scan_identifier(p, directive)) {
         p = start;
@@ -560,6 +568,8 @@ bool Preprocessor::process_name_directive(Keyword keyword,
         return process_name_reptc(p, name);
     case Keyword::REPTI:
         return process_name_repti(p, name);
+    case Keyword::EQU:
+        return process_name_equ(p, name);
     default:
         return false;
     }
@@ -677,6 +687,63 @@ bool Preprocessor::process_name_repti(const char*& p, const std::string& name) {
                            file_stack_.empty() ?
                            dummy_location :
                            file_stack_.back().location);
+}
+
+bool Preprocessor::process_name_equ(const char*& p, const std::string& name) {
+    // p is positioned after the directive token (either after 'EQU' or after '=')
+    skip_whitespace(p);
+
+    // Capture RHS (rest of logical line) and trim trailing whitespace
+    std::string rhs = p;
+    rhs = rtrim(rhs);
+
+    // Determine location for error reporting if needed
+    Location loc;
+    bool have_loc = false;
+    if (!file_stack_.empty()) {
+        loc = file_stack_.back().location;
+        have_loc = true;
+    }
+
+    if (rhs.empty()) {
+        if (have_loc) {
+            reporter_.error(loc, ErrorCode::InvalidSyntax,
+                            "Malformed EQU directive (missing RHS)");
+        }
+        else {
+            reporter_.error(ErrorCode::InvalidSyntax,
+                            "Malformed EQU directive (missing RHS)");
+        }
+        return true;
+    }
+
+    // Expand macros in RHS. If expansion returns empty (e.g. pushed a virtual file),
+    // fall back to the original RHS so we still produce a DEFC line.
+    std::string expanded = expand_macros(rhs);
+    if (expanded.empty()) {
+        expanded = rhs;
+    }
+    expanded = trim(expanded);
+
+    // Build DEFC line: "DEFC name = <expanded>"
+    std::string defc_line = std::string("DEFC ") + name + "=" + expanded;
+
+    // Create a small virtual input file that yields the DEFC line so the rest of the
+    // preprocessor pipeline (location tracking, splitting, etc.) handles it uniformly.
+    InputFile virt;
+    int uniq_id = ++macro_expansion_counter_;
+    virt.filename = "<EQU:" + name + ":" + std::to_string(uniq_id) + ">";
+    int phys_line_num = get_invocation_physical_line_num();
+    virt.lines.push_back(LogicalLine{ defc_line, phys_line_num });
+    virt.line_index = 0;
+    virt.location = Location(virt.filename, 0);
+    // Do not advance the parent's logical line number when this virtual file is processed.
+    virt.location.set_increment_line_numbers(false);
+    virt.line_directive_active = false;
+    virt.is_macro_expansion = false;
+
+    file_stack_.push_back(std::move(virt));
+    return true;
 }
 
 // Helper: parse a parenthesized parameter list. Expects p at '(' and advances past ')'.

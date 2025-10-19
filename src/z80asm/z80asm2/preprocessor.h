@@ -96,6 +96,7 @@ private:
     bool process_name_macro(const char*& p, const std::string& name);
     bool process_name_reptc(const char*& p, const std::string& name);
     bool process_name_repti(const char*& p, const std::string& name);
+    bool process_name_equ(const char*& p, const std::string& name);
 
     // Parameter parsing helpers used by both `process_macro` and `process_name_macro`.
     bool parse_param_list_parenthesized(const char*& p,
