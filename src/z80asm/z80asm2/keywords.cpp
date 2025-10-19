@@ -45,6 +45,11 @@ bool keyword_is_name_directive(Keyword kw) {
     return (flags & IS_NAME_DIRECTIVE) != 0;
 }
 
+bool keyword_is_conditional_directive(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_CONDITIONAL_DIRECTIVE) != 0;
+}
+
 std::string to_upper(const std::string& s) {
     std::string result = s;
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
