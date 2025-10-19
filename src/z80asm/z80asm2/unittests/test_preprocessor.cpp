@@ -2415,3 +2415,70 @@ TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes
         CHECK_FALSE(reporter.has_error());
     }
 }
+
+// Preprocessor: output string literals become lists of integer character codes
+
+TEST_CASE("Preprocessor: macro-defined string expands to list of char codes",
+          "[preprocessor][string][macro][defb]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "#define S \"abc\"",
+        "defb S"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // 'a' 'b' 'c' -> 97,98,99
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "defb 97,98,99");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: direct string literal expands to list of char codes",
+          "[preprocessor][string][literal][defb]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "defb \"hi\""
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    // 'h' 'i' -> 104,105
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "defb 104,105");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: macro-defined string with escapes expands to char codes",
+          "[preprocessor][string][escape][defb]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    // "X\r\nY" -> 'X' (88), '\r' (13), '\n' (10), 'Y' (89)
+    std::vector<std::string> lines = {
+        "#define STR \"X\\r\\nY\"",
+        "defb STR"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "defb 88,13,10,89");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
