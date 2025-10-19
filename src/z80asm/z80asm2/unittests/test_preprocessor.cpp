@@ -3830,3 +3830,109 @@ TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler 
         CHECK_FALSE(preproc.next_line(out_line, out_loc));
     }
 }
+
+TEST_CASE("Preprocessor: C_LINE directive updates Location line number and filename without incrementing",
+          "[preprocessor][c_line][line-directive][location]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    SECTION("Hash-prefixed C_LINE") {
+        std::vector<std::string> lines = {
+            "LD A,1",
+            "#C_LINE 42",
+            "LD B,2",
+            "LD B,3",
+            "#C_LINE 100 \"other.c\"",
+            "LD C,4",
+            "LD C,5"
+        };
+        std::string filename = write_temp_file(lines);
+
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // First line, before any C_LINE directive
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK(out_loc.line_num() == 1);
+        CHECK(out_loc.filename() == normalize_expected_path(filename));
+
+        // After "#C_LINE 42": first logical output should report 42
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,2");
+        CHECK(out_loc.line_num() == 42);
+        CHECK(out_loc.filename() == normalize_expected_path(filename));
+
+        // Next logical line should NOT have incremented (still 42)
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,3");
+        CHECK(out_loc.line_num() == 42);
+        CHECK(out_loc.filename() == normalize_expected_path(filename));
+
+        // After "#C_LINE 100 \"other.c\"": filename changed and line set to 100
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD C,4");
+        CHECK(out_loc.line_num() == 100);
+        CHECK(out_loc.filename() == "other.c");
+
+        // Should remain 100 for the following logical line as well
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD C,5");
+        CHECK(out_loc.line_num() == 100);
+        CHECK(out_loc.filename() == "other.c");
+
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Name-first (no hash) C_LINE") {
+        std::vector<std::string> lines = {
+            "LD A,1",
+            "C_LINE 42",
+            "LD B,2",
+            "LD B,3",
+            "C_LINE 100 \"other.c\"",
+            "LD C,4",
+            "LD C,5"
+        };
+        std::string filename = write_temp_file(lines);
+
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // First line, before any C_LINE directive
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK(out_loc.line_num() == 1);
+        CHECK(out_loc.filename() == normalize_expected_path(filename));
+
+        // After "C_LINE 42": first logical output should report 42
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,2");
+        CHECK(out_loc.line_num() == 42);
+        CHECK(out_loc.filename() == normalize_expected_path(filename));
+
+        // Next logical line should NOT have incremented (still 42)
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,3");
+        CHECK(out_loc.line_num() == 42);
+        CHECK(out_loc.filename() == normalize_expected_path(filename));
+
+        // After "C_LINE 100 \"other.c\"": filename changed and line set to 100
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD C,4");
+        CHECK(out_loc.line_num() == 100);
+        CHECK(out_loc.filename() == "other.c");
+
+        // Should remain 100 for the following logical line as well
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD C,5");
+        CHECK(out_loc.line_num() == 100);
+        CHECK(out_loc.filename() == "other.c");
+
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+}

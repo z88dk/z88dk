@@ -85,13 +85,17 @@ bool Preprocessor::next_line(std::string& out_line,
 
                 const char* p = line.c_str();
                 if (is_directive(p, keyword)) {
-                    if (keyword == Keyword::LINE) {
+                    // Treat both LINE and C_LINE specially so we can persist the
+                    // directive into the InputFile (like #line) and also handle
+                    // C_LINE's "don't increment" behaviour here.
+                    if (keyword == Keyword::LINE ||
+                            keyword == Keyword::C_LINE) {
                         if (process_directive(keyword, p, out_location)) {
-                            // #line directive: update file.location
+                            // #line / #c_line directive: update file.location
                             // for future lines
                             file.location = out_location;
                             file.line_directive_active = true;
-                            // Track the value and physical line for #line
+                            // Track the value and physical line for #line / #c_line
                             file.line_directive_value =
                                 out_location.line_num();
                             file.line_directive_physical_line =
@@ -136,7 +140,7 @@ bool Preprocessor::next_line(std::string& out_line,
                         split_queue_.push_back(split_lines_vec[i]);
                     }
                     // After returning a line, increment
-                    // logical line number for next line
+                    // logical line number for next line (unless disabled in Location)
                     file.location.inc_line_num();
                     return true;
                 }
@@ -392,6 +396,8 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         return process_undef(p, location);
     case Keyword::LINE:
         return process_line(p, location);
+    case Keyword::C_LINE:
+        return process_c_line(p, location);
     case Keyword::MACRO:
         return process_macro(p, location);
     case Keyword::REPT:
@@ -649,29 +655,11 @@ bool Preprocessor::process_line(const char*& p, Location& location) {
 
     skip_whitespace(p);
 
-    // Parse filename (optional)
+    // Parse optional filename using the shared helper (quoted, <...> or unquoted token)
     std::string filename;
-    if (*p == '"') {
-        ++p; // skip opening quote
-        while (*p && *p != '"') {
-            if (*p == '\\' && p[1]) {
-                filename += *p++;
-                filename += *p++;
-            }
-            else {
-                filename += *p++;
-            }
-        }
-        if (*p == '"') {
-            ++p;    // skip closing quote
-        }
-    }
-    else if (*p) {
-        // Unquoted filename: read until whitespace
-        while (*p && !isspace(static_cast<unsigned char>(*p))) {
-            filename += *p++;
-        }
-    }
+    bool is_angle = false;
+    // filename is optional; we ignore the return value - on failure `p` is restored
+    scan_filename_from_p(p, filename, is_angle);
 
     if (new_line > 0) {
         location.set_line_num(new_line);
@@ -679,6 +667,40 @@ bool Preprocessor::process_line(const char*& p, Location& location) {
     if (!filename.empty()) {
         location.set_filename(filename);
     }
+
+    return true;
+}
+
+bool Preprocessor::process_c_line(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    // Parse line number
+    int new_line = 0;
+    if (!scan_integer(p, new_line)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed C_LINE directive (missing line number)");
+        return true;
+    }
+
+    skip_whitespace(p);
+
+    // Parse optional filename using the shared helper (quoted, <...> or unquoted token)
+    std::string filename;
+    bool is_angle = false;
+    // filename is optional; we ignore the return value - on failure `p` is restored
+    scan_filename_from_p(p, filename, is_angle);
+
+    if (new_line > 0) {
+        location.set_line_num(new_line);
+    }
+    if (!filename.empty()) {
+        location.set_filename(filename);
+    }
+
+    // C_LINE: disable incrementing logical line numbers while in effect.
+    // Do not modify file_stack_ here; next_line's directive handling will
+    // persist the Location into the InputFile (and we handle disabling there).
+    location.set_increment_line_numbers(false);
 
     return true;
 }
@@ -1318,8 +1340,7 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string>
-Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1796,8 +1817,7 @@ int Preprocessor::get_invocation_physical_line_num() const {
 }
 
 // Build virtual logical lines for a macro using combined_param_map and a physical line number.
-std::vector<Preprocessor::LogicalLine>
-Preprocessor::build_virt_lines_from_macro(
+std::vector<Preprocessor::LogicalLine> Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
     int phys_line_num
