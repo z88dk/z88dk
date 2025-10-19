@@ -84,6 +84,7 @@ private:
     bool process_reptc(const char*& p, Location& location);
     bool process_repti(const char*& p, Location& location);
     bool process_macro(const char*& p, Location& location);
+    bool process_binary(const char*& p, Location& location);
 
     // Checks for "name DIRECTIVE value" syntax.
     // If found, sets 'name' and 'keyword' and returns true. Advances 'p' past the directive.
