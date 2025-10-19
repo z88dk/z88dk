@@ -24,6 +24,9 @@ public:
     // Get the next preprocessed line, returns false at EOF
     bool next_line(std::string& out_line, Location& out_location);
 
+    // Add a directory to the include search path (ordered)
+    void add_include_path(const std::string& path);
+
 private:
     struct LogicalLine {
         std::string text;
@@ -62,6 +65,14 @@ private:
     std::vector<InputFile> file_stack_;
     std::unordered_map<std::string, Macro> macros_;
     std::deque<std::string> split_queue_;
+
+    // include search paths (in order)
+    std::vector<std::string> include_paths_;
+
+    // Resolve an include/binary filename using include paths and the current file's directory.
+    // Returns a normalized absolute path if found, or an empty string if not found.
+    std::string resolve_include_path(const std::string& filename,
+                                     bool is_angle) const;
 
     // Handle file stack
     bool read_file(const std::string& filename,
@@ -167,9 +178,16 @@ private:
         const Macro& macro,
         const std::unordered_map<std::string, std::string>& combined_param_map,
         int phys_line_num) const;
+
+    // Push a virtual InputFile constructed from virt_lines for macro expansion.
+    // invocation_filename: optional filename to record as the origin of the expansion
+    // (usually the including / invoking file). If empty, the current top of file_stack_
+    // will be used when available.
     void push_virtual_macro_file(const std::string& name,
                                  int uniq_id,
-                                 std::vector<LogicalLine>&& virt_lines);
+                                 std::vector<LogicalLine>&& virt_lines,
+                                 const std::string& invocation_filename = std::string());
+
     // Push a macro virtual file plus an optional suffix virtual file that will be
     // processed after the macro body. `virt_lines` should already have the
     // caller-provided prefix applied (if any). If `suffix` is empty no suffix file
