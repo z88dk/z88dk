@@ -132,12 +132,6 @@ private:
 
     // Remove all comments from a line (handles multi-line comments with state)
     std::string remove_comments(InputFile& file);
-    void handle_string_literal(const std::string& line,
-                               size_t& i, std::string& result, bool& in_string);
-    void handle_char_literal(const std::string& line,
-                             size_t& i, std::string& result, bool& in_char);
-    bool handle_multiline_comment_end(const std::string& line,
-                                      size_t& i, bool& in_multiline_comment);
 
     // split line at colons and backslashes, except the first colon
     // if it's part of a label
