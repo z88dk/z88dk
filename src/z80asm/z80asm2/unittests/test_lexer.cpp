@@ -5,10 +5,10 @@
 //-----------------------------------------------------------------------------
 
 #define CATCH_CONFIG_MAIN
-#include "catch_amalgamated.hpp"
+#include "../keywords.h"
 #include "../lexer.h"
 #include "../token.h"
-#include "../keywords.h"
+#include "catch_amalgamated.hpp"
 #include <sstream>
 #include <string>
 

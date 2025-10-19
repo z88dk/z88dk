@@ -5,10 +5,10 @@
 //-----------------------------------------------------------------------------
 
 #define CATCH_CONFIG_MAIN
-#include "catch_amalgamated.hpp"
 #include "../error_reporter.h"
-#include <sstream>
+#include "catch_amalgamated.hpp"
 #include <iostream>
+#include <sstream>
 
 // Helper to capture std::cerr output
 class CerrRedirect {
