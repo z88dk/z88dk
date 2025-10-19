@@ -4,8 +4,8 @@
 ; b) Haven't implemented it yet
 ;
 
-	SECTION		code_clib
-	PUBLIC		conio_map_colour
+    SECTION code_clib
+    PUBLIC  conio_map_colour
 
 conio_map_colour:
-	ret
+    ret

@@ -32,5 +32,4 @@ IFNDEF FORspc1000
     and     a
     ret     nz
 ENDIF
-    ld      a, h
     jp      printc_MODE0

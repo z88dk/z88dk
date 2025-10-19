@@ -8,6 +8,8 @@ IFNDEF MC6847_IOSPACE
     PUBLIC  vpeek_MODE1
     EXTERN  vpeek_screendollar
     EXTERN  __mc6847_mode
+    EXTERN  __console_font_h 
+    EXTERN  generic_console_gfx_xypos_MODE1
 
 
 ;Entry: c = x,
@@ -21,10 +23,10 @@ vpeek_MODE1:
     ld      sp, hl
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
-    GETSCREENADDRESS
-    add     hl, bc                      ;hl = screen
+    call    generic_console_gfx_xypos_MODE1
 
-    ld      b, 8
+    ld      a, (__console_font_h)
+    ld      b, a
 vpeek_1:
 IF FORmc1000
     ld      a, (__mc6847_mode)
@@ -50,5 +52,4 @@ ENDIF
 no_overflow:
     djnz    vpeek_1
     jp      vpeek_screendollar
-
 ENDIF

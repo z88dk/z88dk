@@ -6,11 +6,14 @@ IFNDEF MC6847_IOSPACE
 
     PUBLIC      generic_console_scrollup
 
+    EXTERN      generic_console_gfx_xypos_MODE1
+
     EXTERN      __mc6847_mode
     EXTERN      __pc6001_attr
     EXTERN      __phc25_attr
     EXTERN      __mc6847_modeval
     EXTERN      __tms9918_cls
+    EXTERN      __console_font_h
 
 
 generic_console_scrollup:
@@ -19,21 +22,17 @@ generic_console_scrollup:
     ld      a, (__mc6847_mode)
     and     a
     jr      z, scrollup_text
-IF MC6847_HAS_HIRES
-    cp      1
-    jr      z, scrollup_hires
-ENDIF
-IF MC6847_HAS_CG
-    cp      2
-    jr      z, scrollup_hires           ;possibly wrong
-ENDIF
 IF FORspc1000
     cp      10
     jp      z,__tms9918_cls
 ENDIF
+IF MC6847_HAS_HIRES | MC6847_HAS_CG
+    jr      scrollup_hires
+ELSE
     pop     bc
     pop     de
     ret
+ENDIF
 
 
 scrollup_text:
@@ -87,7 +86,7 @@ generic_console_scrollup_4:
     inc     hl
     djnz    generic_console_scrollup_4
 ENDIF
-
+scrollup_return:
 IF FORmc1000
     ex      af,af
     set     0,a
@@ -99,37 +98,39 @@ ENDIF
 
 IF MC6847_HAS_CG | MC6847_HAS_HIRES
 scrollup_hires:
-    GETSCREENADDRESS
+    ld      hl,(__console_font_h)
+    ld      h,0
+    ld      a,MC6847_HIRES_YRES
+    sub     l
+    ld      l,a
+    ; Now multiple by 32
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    add     hl,hl
+    ld      bc,hl
+    GETSCREENADDRESS_de
 IF FORmc1000
     ld      a,(__mc6847_modeval)
     out     ($80),a
     ex      af,af
 ENDIF
-    ld      de,hl
-    inc     h
-IF FORsv8000
-    ld      bc, 32 * 88
-ELIF FORvz
-    ld      bc, 32 * 56
-ELSE
-    ld      bc, 32 * 184
-ENDIF
+    push    bc
+    ld      bc, $0100       ;row 1, column 0
+    call    generic_console_gfx_xypos_MODE1     ;It's column 0, so mode is irrelevant
+    pop     bc
+    ld      a,l             ;save number of bytes to clear
     ldir
-    ex      de, hl
-    ld      b, 0
+    ; And we have to fill in 
+    ld      b, a            ;a = __console_font_h * 32 (if rows <= 8)
     xor     a
 scrollup_hires_1:
-    ld      (hl), a
-    inc     hl
+    ld      (de), a
+    inc     de
     djnz    scrollup_hires_1
-IF FORmc1000
-    ex      af,af
-    set     0,a
-    out     ($80),a
+    jr      scrollup_return
+
 ENDIF
-    pop     bc
-    pop     de
-    ret
-ENDIF 
 
 ENDIF

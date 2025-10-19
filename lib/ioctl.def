@@ -8,6 +8,7 @@ defc IOCTL_GENCON_SET_FONT64   = 4  ; Set the 64 column font (int *)
 defc IOCTL_GENCON_SET_UDGS     = 5  ; Set the 32 columns udgs (int *) 
 defc IOCTL_GENCON_SET_MODE     = 6  ; Set the mode (int *) 
 defc IOCTL_GENCON_GET_CAPS     = 7  ; Get the capabilities (int *) 
+defc IOCTL_GENCON_SET_FONT_H   = 8  ; Set the font height in gfx modes (int *)
 
 ; Capabilities for gencon 
 defc CAP_GENCON_CUSTOM_FONT = 1
