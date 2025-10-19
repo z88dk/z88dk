@@ -1062,7 +1062,8 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string>
+Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1170,91 +1171,55 @@ void Preprocessor::split_lines(const std::string& line,
                                std::vector<std::string>& split_lines) {
     split_lines.clear();
     std::string current;
-    bool in_string = false, in_char = false;
     bool first_colon_after_id = has_label(line);
     int ternary_depth = 0;
-
-    const char* p = line.c_str();
-    const char* start = p;
-
-    while (*p) {
-        char c = *p;
-
-        // Handle string and char literals, with escape support
-        if (!in_char && c == '"' && (p == start || *(p - 1) != '\\')) {
-            in_string = !in_string;
-            current += c;
-            ++p;
-            continue;
-        }
-
-        if (!in_string && c == '\'') {
-            in_char = !in_char;
-            current += c;
-            ++p;
-            continue;
-        }
-
-        if (in_string || in_char) {
-            // If this is a backslash and not the last character, skip the next character (escaped)
-            if (c == '\\' && *(p + 1)) {
-                current += c;
-                ++p;
-                current += *p;
-                ++p;
-                continue;
-            }
-            current += c;
-            ++p;
-            continue;
-        }
-
-        // Track ternary operator depth
-        if (c == '?') {
+    std::vector<MacroToken> tokens = tokenize_macro_body(line);
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        const MacroToken& tok = tokens[i];
+        if (tok.type == MacroTokenType::Punctuator &&
+                tok.text == "?") {
             ++ternary_depth;
-            current += c;
-            ++p;
-            continue;
+            current += tok.text;
         }
-        if (c == ':' && ternary_depth > 0) {
-            --ternary_depth;
-            current += c;
-            ++p;
-            continue;
-        }
-
-        // Handle backslash as split, only if not in string/char and not an escape
-        if (c == '\\') {
-            // Trim whitespace before pushing
-            split_lines.push_back(trim((current)));
-            current.clear();
-            ++p;
-            continue;
-        }
-
-        // Handle colon as split, except first colon after identifier at start,
-        // and except when inside a ternary expression
-        if (c == ':') {
+        else if (tok.type == MacroTokenType::Punctuator &&
+                 tok.text == ":") {
             if (first_colon_after_id) {
-                current += c;
                 first_colon_after_id = false;
+                current += tok.text;
             }
-            else if (ternary_depth == 0) {
+            else if (ternary_depth > 0) {
+                --ternary_depth;
+                current += tok.text;
+            }
+            else {
                 current = trim(current);
                 if (!current.empty()) {
                     split_lines.push_back(current);
                 }
                 current.clear();
             }
-            else {
-                current += c;
-            }
-            ++p;
-            continue;
         }
-
-        current += c;
-        ++p;
+        else if (tok.type == MacroTokenType::Punctuator &&
+                 tok.text == "\\") {
+            current = trim(current);
+            if (!current.empty()) {
+                split_lines.push_back(current);
+            }
+            current.clear();
+        }
+        else if (tok.type == MacroTokenType::StringLiteral) {
+            std::string bytes = unescape_string(tok.text);
+            for (size_t i = 0; i < bytes.size(); ++i) {
+                int c = static_cast<unsigned char>(bytes[i]);
+                if (i > 0) {
+                    current += ",";
+                }
+                current += std::to_string(c);
+            }
+        }
+        else {
+            current += tok.text;
+        }
     }
 
     // Add the last segment, trimmed
@@ -1495,8 +1460,7 @@ int Preprocessor::get_invocation_physical_line_num() const {
 }
 
 // Build virtual logical lines for a macro using combined_param_map and a physical line number.
-std::vector<Preprocessor::LogicalLine>
-Preprocessor::build_virt_lines_from_macro(
+std::vector<Preprocessor::LogicalLine> Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
     int phys_line_num) const {
