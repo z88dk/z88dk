@@ -69,7 +69,7 @@ check_font_h:
     jr      nz, check_mode
     ld      a,(__mc6847_mode)
     and     a
-    jr      z,failure
+    jp      z,failure
     ld      a,c
     ld      b,MC6847_HIRES_YRES/8
     cp      8
