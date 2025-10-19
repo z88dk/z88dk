@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 #define CATCH_CONFIG_MAIN
-#include "catch_amalgamated.hpp"
 #include "../keywords.h"
+#include "catch_amalgamated.hpp"
 
 TEST_CASE("to_keyword converts strings to Keyword enum", "[to_keyword]") {
     REQUIRE(to_keyword("LD") == Keyword::LD);
