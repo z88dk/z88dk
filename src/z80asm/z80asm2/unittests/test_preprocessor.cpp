@@ -415,6 +415,7 @@ TEST_CASE("Preprocessor: REPT with macro-defined count (DEFINE)",
         "ENDR",
     };
     std::string filename = write_temp_file(lines);
+
     REQUIRE(preproc.open(filename));
 
     std::string out_line;
@@ -546,6 +547,126 @@ TEST_CASE("Preprocessor: undef macro", "[preprocessor]") {
     // #define and #undef are not output
     REQUIRE(preproc.next_line(out_line, out_loc));
     CHECK(out_line == "LD A,FOO");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: DEFINE without value defines name = 1 (hash-define form)",
+          "[preprocessor][define][default]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "#define FLAG",
+        "LD A,FLAG"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,1");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: DEFINE accepts optional '=' and evaluates expression (hash-define form)",
+          "[preprocessor][define][expression][equals]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "#define VAL = -1+2*3",
+        "LD A,VAL"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,5");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: DEFINE accepts expression without '=' and evaluates it (hash-define form)",
+          "[preprocessor][define][expression][no_equals]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "#define VAL2 -1+2*3",
+        "LD A,VAL2"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,5");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name-first DEFINE without value defines name = 1 (name-first form)",
+          "[preprocessor][define][name-directive][default]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "FLAG DEFINE",
+        "LD A,FLAG"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,1");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name-first DEFINE accepts optional '=' and evaluates expression (name-first form)",
+          "[preprocessor][define][name-directive][expression]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MYDEF DEFINE = -1+2*3",
+        "LD A,MYDEF"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,5");
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: name-first DEFINE accepts expression without '=' and evaluates it (name-first form)",
+          "[preprocessor][define][name-directive][expression][no_equals]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "MYDEF2 DEFINE -1+2*3",
+        "LD A,MYDEF2"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "LD A,5");
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
 
@@ -1834,7 +1955,7 @@ TEST_CASE("Preprocessor: split line with multi-line empty object-like then empty
 
     // Same as above but object-like first, function-like second.
     std::vector<std::string> lines = {
-        "#define EMPTY",
+        "#define EMPTY \"\"",
         "MACRO MAC",
         "    EMPTY : EMPTY",
         "    EMPTY : EMPTY",
@@ -2243,7 +2364,8 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
         Preprocessor preproc(reporter);
 
         std::vector<std::string> lines = {
-            "#define EMPTY",
+            "MACRO EMPTY",
+            "ENDM",
             "REPTC var, EMPTY",
             "defb var",
             "ENDR",
@@ -2267,7 +2389,8 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
         Preprocessor preproc(reporter);
 
         std::vector<std::string> lines = {
-            "#define EMPTY",
+            "MACRO EMPTY",
+            "ENDM",
             "var REPTC EMPTY",
             "defb var",
             "ENDR",
