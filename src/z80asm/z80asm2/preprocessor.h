@@ -93,7 +93,8 @@ private:
     bool process_name_directive(Keyword keyword, const std::string& name,
                                 const char*& p);
     bool process_name_defl(const char*& p, const std::string& name);
-    bool process_name_define(const char*& p, const std::string& name);
+    bool process_name_define(const char*& p, const std::string& name,
+                             std::vector<std::string> params);
     bool process_name_macro(const char*& p, const std::string& name);
     bool process_name_reptc(const char*& p, const std::string& name);
     bool process_name_repti(const char*& p, const std::string& name);
