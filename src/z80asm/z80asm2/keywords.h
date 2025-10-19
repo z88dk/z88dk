@@ -11,6 +11,7 @@
 // Keyword flags
 static const int IS_DIRECTIVE = 1 << 0;
 static const int IS_NAME_DIRECTIVE = 1 << 1;
+static const int IS_CONDITIONAL_DIRECTIVE = 1 << 2;
 
 #define X(id, text, flags) id,
 enum class Keyword {
@@ -26,6 +27,7 @@ std::string keyword_to_string(Keyword kw);
 // Check if a keyword type
 bool keyword_is_directive(Keyword kw);
 bool keyword_is_name_directive(Keyword kw);
+bool keyword_is_conditional_directive(Keyword kw);
 
 // Convert string to upper/lower case
 std::string to_upper(const std::string& s);

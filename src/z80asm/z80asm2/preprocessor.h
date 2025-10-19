@@ -10,6 +10,7 @@
 #include "keywords.h"
 #include "lexer.h"
 #include <deque>
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -27,7 +28,26 @@ public:
     // Add a directory to the include search path (ordered)
     void add_include_path(const std::string& path);
 
+    // Callback-based interface so the caller (assembler) can evaluate
+    // expressions that depend on assembler symbols.
+    struct EvalResult {
+        bool ok = false;                // true: evaluation succeeded
+        int value = 0;                  // evaluated integer value
+        bool unknown_link_time = false; // true if value depends on link-time symbols
+        std::string message;            // optional diagnostic text
+    };
+
+    using EvalCallback =
+        std::function<EvalResult(const std::string& expr, const Location& loc)>;
+
+    // Register the assembler-supplied evaluator. Can be nullptr to disable.
+    void set_eval_callback(EvalCallback cb) {
+        eval_callback_ = std::move(cb);
+    }
+
 private:
+    static const inline int MAX_MACRO_RECURSION = 32;
+
     struct LogicalLine {
         std::string text;
         int physical_line_num; // 1-based
@@ -61,13 +81,30 @@ private:
         }
     };
 
+    struct IfEntry {
+        // any previous branch of this if/elif chain was true
+        bool any_branch_taken = false;
+        // is the current branch active (lines inside should be processed)
+        bool active = true;
+        // else already encountered -> further elif/else invalid
+        bool else_seen = false;
+        // location where IF started (for diagnostics)
+        Location location;
+
+        IfEntry() = default;
+
+        IfEntry(bool a, const Location& loc) :
+            any_branch_taken(a), active(a), else_seen(false), location(loc) {}
+    };
+
+    // member data
     ErrorReporter& reporter_;
     std::vector<InputFile> file_stack_;
     std::unordered_map<std::string, Macro> macros_;
     std::deque<std::string> split_queue_;
-
-    // include search paths (in order)
+    std::vector<IfEntry> if_stack_;
     std::vector<std::string> include_paths_;
+    EvalCallback eval_callback_;
 
     // Resolve an include/binary filename using include paths and the current file's directory.
     // Returns a normalized absolute path if found, or an empty string if not found.
@@ -122,7 +159,6 @@ private:
 
     // Expands a macro invocation (object-like or function-like) in a line.
     // Returns the expanded string.
-    static const inline int MAX_MACRO_RECURSION = 32;
     std::string expand_macros(const std::string& line,
                               int recursion_depth = 0);
     std::string expand_object_macro(const Macro& macro, int recursion_depth);
@@ -228,12 +264,6 @@ private:
     std::unordered_map<std::string, std::string> make_local_rename_map(
         const Macro& macro, int uniq_id) const;
 
-    // Parse a constant expression from the text starting at p.
-    // Expands any macros in the text first, then scans the expanded text
-    // for a constant expression. Returns true on success and fills 'value'.
-    // Does not advance the caller's 'p'.
-    bool get_constant_value(const char*& p, int& value);
-
     // Common implementation for REPTC handling. If 'name' is non-null the
     // name-first syntax (`name REPTC arg`) is used and `p` is positioned
     // after the directive. If 'name' is null the normal syntax
@@ -243,4 +273,24 @@ private:
 
     bool do_repti_common(const char*& p,
                          const std::string* name, Location& location);
+
+    // Parse a constant expression from the text starting at p.
+    // Expands any macros in the text first, then scans the expanded text
+    // for a constant expression. Returns true on success and fills 'value'.
+    // Does not advance the caller's 'p'.
+    bool get_constant_value(const char*& p, int& value);
+
+    // IF / ELIF / ELSE / ENDIF support
+    // These directives allow conditional inclusion of logical lines.
+    // Implemented so directives themselves are always processed (to keep nesting),
+    // while non-control directives and normal lines are skipped when any enclosing
+    // condition is inactive.
+    bool process_if(const char*& p, Location& location);
+    bool process_elif(const char*& p, Location& location);
+    bool process_else(const char*& p, Location& location);
+    bool process_endif(const char*& p, Location& location);
+
+    // Helper to test whether all enclosing IFs are currently active (true).
+    bool ifs_all_active() const;
+
 };

@@ -9,10 +9,12 @@
 #include "lexer.h"
 #include "preprocessor.h"
 #include <algorithm>
+#include <cassert>
 #include <cctype>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <regex>
 #include <sstream>
 #include <stack>
@@ -35,7 +37,9 @@ void Preprocessor::add_include_path(const std::string& path) {
 
 bool Preprocessor::open(const std::string& filename) {
     file_stack_.clear();
-    macros_.clear(); // clear macros
+    macros_.clear();
+    split_queue_.clear();
+    if_stack_.clear();
 
     push_file(filename);
     return !file_stack_.empty();
@@ -100,6 +104,11 @@ bool Preprocessor::next_line(std::string& out_line,
                             continue;
                         }
                     }
+                }
+
+                // If any enclosing IF is inactive, skip rest of processing
+                if (!ifs_all_active()) {
+                    continue;
                 }
 
                 p = line.c_str();
@@ -338,6 +347,32 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
     // Skip leading whitespace
     skip_whitespace(p);
 
+    // Control directives related to conditional compilation must always be
+    // processed so nesting is tracked even when outer branches are inactive.
+    if (keyword_is_conditional_directive(keyword)) {
+        switch (keyword) {
+        case Keyword::IF:
+            return process_if(p, location);
+        case Keyword::ELIF:
+            return process_elif(p, location);
+        case Keyword::ELSE:
+            return process_else(p, location);
+        case Keyword::ENDIF:
+            return process_endif(p, location);
+        default:
+            assert(0);
+            return false; // not reached
+        }
+    }
+
+    // If any enclosing IF is inactive, skip non-control directives and lines.
+    if (!ifs_all_active()) {
+        // We still need to consume/ignore the directive line. Returning true
+        // signals to the caller that the directive was handled (skipped).
+        return true;
+    }
+
+    // now check the other directives
     switch (keyword) {
     case Keyword::INCLUDE:
         return process_include(p, location);
@@ -375,7 +410,8 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
     case Keyword::INCBIN:
         return process_binary(p, location);
     default:
-        return false;
+        assert(0);
+        return false; // not reached
     }
 }
 
@@ -2041,6 +2077,8 @@ bool Preprocessor::process_repti(const char*& p, Location& location) {
 // Helper: expand macros in the text starting at p and scan the resulting text
 // for a constant integer. Returns true and sets 'value' on success.
 bool Preprocessor::get_constant_value(const char*& p, int& value) {
+    value = 0;
+
     // Do not modify caller's p. Work on a copy/snapshot of the remaining text.
     const char* pp = p;
     skip_whitespace(pp);
@@ -2061,9 +2099,23 @@ bool Preprocessor::get_constant_value(const char*& p, int& value) {
     if (eval_const_expr(q, value) && *q == '\0') {
         return true;
     }
-    else {
-        return false;
+
+    // Local constant evaluation failed. Ask caller (assembler) via callback, if registered.
+    if (eval_callback_) {
+        // Determine a best-effort Location for context: use top of file_stack_ if any.
+        Location loc;
+        if (!file_stack_.empty()) {
+            loc = file_stack_.back().location;
+        }
+        EvalResult res = eval_callback_(expanded, loc);
+        if (res.ok) {
+            value = res.value;
+            return true;
+        }
     }
+
+    // If assembler couldn't evaluate, fall through and return false.
+    return false;
 }
 
 bool Preprocessor::do_reptc_common(const char*& p,
@@ -2315,5 +2367,115 @@ bool Preprocessor::do_repti_common(const char*& p, const std::string* name,
     // Push a virtual file with these lines
     int uniq_id = ++macro_expansion_counter_;
     push_virtual_macro_file("REPTI", uniq_id, std::move(virt_lines));
+    return true;
+}
+
+// Return true if every entry on the if_stack_ is currently active.
+bool Preprocessor::ifs_all_active() const {
+    for (const auto& e : if_stack_) {
+        if (!e.active) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// IF directive: evaluate the expression (macro-expanded) and push an IfEntry.
+// If expression cannot be parsed, report a syntax error.
+bool Preprocessor::process_if(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    int value = 0;
+    if (!get_constant_value(p, value)) {
+        // Treat as false (no branch taken) but still push an entry so nesting is correct.
+        if_stack_.emplace_back(false, location);
+    }
+    else {
+        bool cond = (value != 0);
+        if_stack_.emplace_back(cond, location);
+    }
+    return true;
+}
+
+// ELIF directive: only meaningful if inside an IF. Evaluate expression and
+// update the top-of-stack entry accordingly.
+bool Preprocessor::process_elif(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    if (if_stack_.empty()) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "unbalanced control structure");
+        return true;
+    }
+
+    IfEntry& top = if_stack_.back();
+    if (top.else_seen) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "ELIF after ELSE");
+        return true;
+    }
+
+    int value = 0;
+    if (!get_constant_value(p, value)) {
+        // Ensure current branch inactive if any previous branch already taken.
+        if (!top.any_branch_taken) {
+            top.active = false;
+        }
+        else {
+            top.active = false;
+        }
+    }
+    else {
+        bool cond = (value != 0);
+        if (top.any_branch_taken) {
+            // a previous branch was true -> this and subsequent branches inactive
+            top.active = false;
+        }
+        else {
+            top.active = cond;
+            top.any_branch_taken = cond;
+        }
+    }
+
+    return true;
+}
+
+// ELSE directive: only meaningful if inside an IF. Toggle active based on previous branches.
+bool Preprocessor::process_else(const char*& p, Location& location) {
+    (void)p;
+    if (if_stack_.empty()) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "unbalanced control structure");
+        return true;
+    }
+
+    IfEntry& top = if_stack_.back();
+    if (top.else_seen) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Multiple ELSE in conditional");
+        return true;
+    }
+
+    if (top.any_branch_taken) {
+        // some previous branch already taken -> ELSE branch inactive
+        top.active = false;
+    }
+    else {
+        top.active = true;
+        top.any_branch_taken = true;
+    }
+    top.else_seen = true;
+    return true;
+}
+
+// ENDIF directive: pop the if stack. Unbalanced ENDIF reported as error.
+bool Preprocessor::process_endif(const char*& p, Location& location) {
+    (void)p;
+    if (if_stack_.empty()) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "unbalanced control structure");
+        return true;
+    }
+    if_stack_.pop_back();
     return true;
 }
