@@ -41,6 +41,11 @@ void skip_whitespace(const char*& p);
 // Scan a C identifier: [_a-zA-Z][_a-zA-Z0-9]*
 bool scan_identifier(const char*& p, std::string& out);
 
+// Scan an assemnbler label:
+// '@' identifier (local label, refers to previous non-local label)
+// identifier '@' identifier (local label fully qualified)
+bool scan_label(const char*& p, std::string& out);
+
 // Scan an integer literal (decimal, hex with 0x/0X, binary with 0b/0B, octal with 0 prefix)
 bool scan_integer(const char*& p, int& out);
 

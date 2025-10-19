@@ -1005,3 +1005,85 @@ TEST_CASE("unescape_string: quoted and unquoted strings, C-style escapes, octal 
         CHECK(out == std::string("AAAB"));
     }
 }
+
+// Additional tests for scan_label
+TEST_CASE("scan_label extracts labels with various forms and leaves pointer correctly",
+          "[scan_label]") {
+    std::string out;
+
+    SECTION("Simple identifier label") {
+        const char* p = "start";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "start");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Identifier followed by colon leaves pointer at colon") {
+        const char* p = "start: LD A,1";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "start");
+        CHECK(*p == ':'); // caller can detect ':' delim and split later
+    }
+
+    SECTION("Label with leading @ prefix") {
+        const char* p = "@global";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "@global");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Label with @ and intervening whitespace") {
+        const char* p = "@ global";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "@global");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Qualified label name with '@' in middle (module@label)") {
+        const char* p = "mod@lab rest";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "mod@lab");
+        CHECK(*p == ' '); // pointer should stop at the separator before next token
+    }
+
+    SECTION("Dangling '@' after identifier reverts and leaves pointer at '@'") {
+        const char* p = "foo@";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "foo");
+        CHECK(*p == '@'); // scan_label rewinds to start2 when second ident is missing
+    }
+
+    SECTION("Non-identifier at start fails and does not advance pointer") {
+        const char* p = "123abc";
+        const char* before = p;
+        REQUIRE_FALSE(scan_label(p, out));
+        CHECK(p == before);
+        CHECK(*p == '1');
+    }
+
+    SECTION("Identifier containing trailing quote and qualified with '@'") {
+        const char* p = "af'@inner";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "af'@inner");
+        CHECK(*p == '\0');
+    }
+
+    SECTION("Identifier with surrounding whitespace is accepted") {
+        const char* p = "   lbl123   ";
+        REQUIRE(scan_label(p, out));
+        CHECK(out == "lbl123");
+        // After parsing label, pointer will point at terminating NUL (since input only had spaces)
+        // but scan_label does not skip trailing whitespace after the identifier, so it's okay if pointer
+        // points at whitespace; check that next non-space is '\0'
+        const char* q = p;
+        while (*q && std::isspace(static_cast<unsigned char>(*q))) {
+            ++q;
+        }
+        // q now at 'l'
+        // Advance past label using original scan logic to confirm behavior
+        const char* pp = "   lbl123   ";
+        REQUIRE(scan_label(pp, out));
+        // After parsing, pp points at the whitespace after the identifier
+        CHECK(std::isspace(static_cast<unsigned char>(*pp)));
+    }
+}

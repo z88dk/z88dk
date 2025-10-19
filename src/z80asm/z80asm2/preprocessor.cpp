@@ -1062,8 +1062,7 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string>
-Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1151,29 +1150,40 @@ std::string Preprocessor::remove_comments(InputFile& file) {
     return trim((result));
 }
 
-// Returns true if the line starts with an identifier (possibly after whitespace) followed by a colon.
-// Sets first_colon_after_id to true if a label is detected.
-static bool has_label(const std::string& line) {
+// Splits a labbel at the start of the line to its own split_lines entry
+// Returns the text after the label.
+static std::string split_label(const std::string& line,
+                               std::vector<std::string>& split_lines) {
     const char* p = line.c_str();
-    skip_whitespace(p);
-
     std::string ident;
-    if (scan_identifier(p, ident)) {
-        skip_whitespace(p);
-        if (*p == ':') {
-            return true;
+
+    skip_whitespace(p);
+    if (*p == '.') {
+        ++p; // eat dot
+        if (scan_label(p, ident)) {
+            split_lines.push_back("." + ident);
+            return std::string(p);
         }
     }
-    return false;
+    if (scan_label(p, ident)) {
+        skip_whitespace(p);
+        if (*p == ':') {
+            ++p; // eat colon
+            split_lines.push_back("." + ident);
+            return std::string(p);
+        }
+    }
+
+    return line;
 }
 
 void Preprocessor::split_lines(const std::string& line,
                                std::vector<std::string>& split_lines) {
     split_lines.clear();
     std::string current;
-    bool first_colon_after_id = has_label(line);
     int ternary_depth = 0;
-    std::vector<MacroToken> tokens = tokenize_macro_body(line);
+    std::string rest = split_label(line, split_lines);
+    std::vector<MacroToken> tokens = tokenize_macro_body(rest);
     for (size_t i = 0; i < tokens.size(); ++i) {
         const MacroToken& tok = tokens[i];
         if (tok.type == MacroTokenType::Punctuator &&
@@ -1183,11 +1193,7 @@ void Preprocessor::split_lines(const std::string& line,
         }
         else if (tok.type == MacroTokenType::Punctuator &&
                  tok.text == ":") {
-            if (first_colon_after_id) {
-                first_colon_after_id = false;
-                current += tok.text;
-            }
-            else if (ternary_depth > 0) {
+            if (ternary_depth > 0) {
                 --ternary_depth;
                 current += tok.text;
             }
@@ -1460,7 +1466,8 @@ int Preprocessor::get_invocation_physical_line_num() const {
 }
 
 // Build virtual logical lines for a macro using combined_param_map and a physical line number.
-std::vector<Preprocessor::LogicalLine> Preprocessor::build_virt_lines_from_macro(
+std::vector<Preprocessor::LogicalLine>
+Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
     int phys_line_num) const {
