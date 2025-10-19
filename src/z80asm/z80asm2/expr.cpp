@@ -6,9 +6,9 @@
 
 #include "expr.h"
 #include "lexer.h"
+#include <cinttypes>
 
-
-// ----------------------- Expression evaluator (shunting-yard) -----------------------
+// ------------------- Expression evaluator (shunting-yard) -------------------
 // Token types used by the expression parser
 enum class ExprTokType { Number, Op, LParen, RParen, Question, Colon };
 struct ExprTok {
