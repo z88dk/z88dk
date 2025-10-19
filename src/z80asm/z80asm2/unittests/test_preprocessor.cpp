@@ -3410,3 +3410,423 @@ TEST_CASE("Preprocessor: IF expression callback integration (assembler evaluatio
         CHECK_FALSE(reporter.has_error());
     }
 }
+
+// IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF tests
+TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
+          "[preprocessor][directive][ifdef][elifdef][elifndef][else][endif]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    SECTION("Simple IFDEF selects IF branch when defined") {
+        std::vector<std::string> lines = {
+            "#define FOO",
+            "IFDEF FOO",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("IFDEF with no define falls through to ELSE") {
+        std::vector<std::string> lines = {
+            "IFDEF BAR",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELIFDEF chain picks the first true ELIFDEF") {
+        std::vector<std::string> lines = {
+            "IFDEF X",
+            "LD A,1",
+            "ELIFDEF Y",
+            "LD A,2",
+            "ELIFDEF Z",
+            "LD A,3",
+            "ELSE",
+            "LD A,4",
+            "ENDIF"
+        };
+        // define Z only
+        lines.insert(lines.begin(), "#define Z");
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,3");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELIFNDEF taken when previous conditions false and symbol not defined") {
+        std::vector<std::string> lines = {
+            "IFDEF NONEXIST",
+            "LD A,1",
+            "ELIFNDEF ALSO_MISSING",
+            "LD A,2",
+            "ELSE",
+            "LD A,3",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Nested IFDEF/ELSE works correctly") {
+        std::vector<std::string> lines = {
+            "#define OUTER",
+            "IFDEF OUTER",
+            "  IFDEF INNER",
+            "    LD A,1",
+            "  ELSE",
+            "    LD A,2",
+            "  ENDIF",
+            "ELSE",
+            "  LD A,3",
+            "ENDIF"
+        };
+        // INNER is not defined, OUTER is defined -> expect inner ELSE
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Hash-prefixed directives (#ifdef/#ifndef) are accepted") {
+        std::vector<std::string> lines = {
+            "#define HASHSYM",
+            "#ifdef HASHSYM",
+            "LD A,1",
+            "#else",
+            "LD A,2",
+            "#endif",
+            "#ifndef HASHSYM",
+            "LD B,1",
+            "#else",
+            "LD B,2",
+            "#endif"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // from #ifdef branch
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+
+        // from #ifndef branch (HASHSYM is defined -> else taken)
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,2");
+
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+// New IFNDEF / ELIFNDEF / #ifndef / #elifndef tests
+    SECTION("Simple IFNDEF selects IF branch when undefined") {
+        std::vector<std::string> lines = {
+            "IFNDEF BAR",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("IFNDEF with symbol defined falls through to ELSE") {
+        std::vector<std::string> lines = {
+            "#define FOO",
+            "IFNDEF FOO",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELIFNDEF chain picks the first true ELIFNDEF") {
+        std::vector<std::string> lines = {
+            "#define AA",
+            "IFNDEF AA",
+            "LD A,1",
+            "ELIFNDEF BB",
+            "LD A,2",
+            "ELIFNDEF CC",
+            "LD A,3",
+            "ELSE",
+            "LD A,4",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line ==
+              "LD A,2"); // A defined -> IFNDEF false; B undefined -> first ELIFNDEF true
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Nested IFNDEF/ELSE works correctly") {
+        std::vector<std::string> lines = {
+            "#define INNER",
+            "IFNDEF OUTER",
+            "  IFNDEF INNER",
+            "    LD A,1",
+            "  ELSE",
+            "    LD A,2",
+            "  ENDIF",
+            "ELSE",
+            "  LD A,3",
+            "ENDIF"
+        };
+        // OUTER is not defined, INNER is defined -> outer true, inner false -> inner ELSE taken
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Hash-prefixed directives (#ifndef/#elifndef) are accepted") {
+        std::vector<std::string> lines = {
+            "#define HASHSYM",
+            "#ifndef HASHSYM",
+            "LD A,1",
+            "#else",
+            "LD A,2",
+            "#endif",
+            "#ifndef OTHER",
+            "LD B,1",
+            "#elifndef MISSING2",
+            "LD B,2",
+            "#endif"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // First #ifndef: HASHSYM is defined -> else taken
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+
+        // Second block: OTHER undefined -> first branch should be taken
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,1");
+
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+}
+
+// Tests: IFDEF / IFNDEF / ELIFDEF / ELIFNDEF using assembler-provided symbol-defined callback
+TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler symbol callback",
+          "[preprocessor][directive][ifdef][symbol-callback]") {
+    SECTION("IFDEF sees assembler-defined symbol (no macro)") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Callback claims symbol SYM_CB is defined
+        preproc.set_symbol_defined_callback([](const std::string & name,
+        const Location&) -> bool {
+            return name == "SYM_CB";
+        });
+
+        std::vector<std::string> lines = {
+            "IFDEF SYM_CB",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("IFNDEF treats assembler-defined symbol as defined (falls to ELSE)") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Callback claims symbol HAS is defined
+        preproc.set_symbol_defined_callback([](const std::string & name,
+        const Location&) -> bool {
+            return name == "HAS";
+        });
+
+        std::vector<std::string> lines = {
+            "IFNDEF HAS",
+            "LD A,1",
+            "ELSE",
+            "LD A,2",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELIFDEF chain can pick branch by assembler symbol (no macro)") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Callback reports ZSYM defined only
+        preproc.set_symbol_defined_callback([](const std::string & name,
+        const Location&) -> bool {
+            return name == "ZSYM";
+        });
+
+        std::vector<std::string> lines = {
+            "IFDEF XSYM",
+            "LD A,1",
+            "ELIFDEF YSYM",
+            "LD A,2",
+            "ELIFDEF ZSYM",
+            "LD A,3",
+            "ELSE",
+            "LD A,4",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,3");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("ELIFNDEF chain: assembler-defined name disables IFNDEF, next ELIFNDEF may trigger") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Callback defines ONLY 'ADEF' so IFNDEF ADEF is false; B and C are not defined.
+        preproc.set_symbol_defined_callback([](const std::string & name,
+        const Location&) -> bool {
+            return name == "ADEF";
+        });
+
+        std::vector<std::string> lines = {
+            "IFNDEF ADEF",
+            "LD A,1",
+            "ELIFNDEF BDEF",
+            "LD A,2",
+            "ELIFNDEF CDEF",
+            "LD A,3",
+            "ELSE",
+            "LD A,4",
+            "ENDIF"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+        // ADEF defined -> IFNDEF false; BDEF undefined -> first ELIFNDEF true -> LD A,2
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,2");
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+
+    SECTION("Hash-prefixed #ifdef/#ifndef accept assembler callback definitions") {
+        ErrorReporter reporter;
+        Preprocessor preproc(reporter);
+
+        // Callback defines HAS_CB only
+        preproc.set_symbol_defined_callback([](const std::string & name,
+        const Location&) -> bool {
+            return name == "HAS_CB";
+        });
+
+        std::vector<std::string> lines = {
+            "#ifdef HAS_CB",
+            "LD A,1",
+            "#else",
+            "LD A,2",
+            "#endif",
+            "#ifndef MISSING_CB",
+            "LD B,1",
+            "#else",
+            "LD B,2",
+            "#endif"
+        };
+        std::string filename = write_temp_file(lines);
+        REQUIRE(preproc.open(filename));
+
+        std::string out_line;
+        Location out_loc;
+
+        // #ifdef HAS_CB -> true
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD A,1");
+
+        // #ifndef MISSING_CB -> true (missing) -> LD B,1
+        REQUIRE(preproc.next_line(out_line, out_loc));
+        CHECK(out_line == "LD B,1");
+
+        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    }
+}

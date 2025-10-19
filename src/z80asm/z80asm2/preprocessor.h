@@ -45,6 +45,17 @@ public:
         eval_callback_ = std::move(cb);
     }
 
+    // Callback to ask the assembler whether a given symbol name is defined.
+    // This is used by IFDEF/IFNDEF/ELIFDEF/ELIFNDEF to consider both preprocessor
+    // macros and assembler symbols as "defined".
+    using SymbolDefinedCallback =
+        std::function<bool(const std::string& name, const Location& loc)>;
+
+    // Register the assembler-provided symbol-defined predicate. Can be nullptr to disable.
+    void set_symbol_defined_callback(SymbolDefinedCallback cb) {
+        symbol_defined_callback_ = std::move(cb);
+    }
+
 private:
     static const inline int MAX_MACRO_RECURSION = 32;
 
@@ -105,6 +116,7 @@ private:
     std::vector<IfEntry> if_stack_;
     std::vector<std::string> include_paths_;
     EvalCallback eval_callback_;
+    SymbolDefinedCallback symbol_defined_callback_;
 
     // Resolve an include/binary filename using include paths and the current file's directory.
     // Returns a normalized absolute path if found, or an empty string if not found.
@@ -287,8 +299,17 @@ private:
     // condition is inactive.
     bool process_if(const char*& p, Location& location);
     bool process_elif(const char*& p, Location& location);
+    bool process_ifdef(const char*& p, Location& location);
+    bool process_ifndef(const char*& p, Location& location);
+    bool process_elifdef(const char*& p, Location& location);
+    bool process_elifndef(const char*& p, Location& location);
     bool process_else(const char*& p, Location& location);
     bool process_endif(const char*& p, Location& location);
+
+    // Helper: test whether the given name is considered "defined".
+    // Returns true if either a preprocessor macro exists or the optional
+    // assembler-provided symbol-defined callback reports the name as defined.
+    bool is_name_defined(const std::string& name, const Location& loc) const;
 
     // Helper to test whether all enclosing IFs are currently active (true).
     bool ifs_all_active() const;
