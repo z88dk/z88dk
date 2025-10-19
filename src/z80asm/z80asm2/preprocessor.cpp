@@ -11,13 +11,26 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <regex>
 #include <sstream>
 #include <stack>
 
+// Forward-declare the file-local helper so member functions that call it
+// (e.g. resolve_include_path) can be defined earlier in the file.
+static std::string resolve_include_candidate(const std::string& filename,
+        bool is_angle,
+        const std::vector<std::string>& include_paths,
+        const std::string& current_dir);
+
 Preprocessor::Preprocessor(ErrorReporter& reporter)
     : reporter_(reporter) {
+}
+
+void Preprocessor::add_include_path(const std::string& path) {
+    // Store as given; resolution will use std::filesystem when searching.
+    include_paths_.push_back(path);
 }
 
 bool Preprocessor::open(const std::string& filename) {
@@ -179,6 +192,25 @@ void Preprocessor::split_logical_lines(const char* buffer,
     }
 }
 
+// Resolve an include/binary filename using include paths and the current file directory.
+// Returns the resolved normalized absolute path or empty string if not found.
+std::string Preprocessor::resolve_include_path(const std::string& filename,
+        bool is_angle) const {
+    // Determine current include directory (directory of the file that contains the directive)
+    std::string current_dir;
+    if (!file_stack_.empty()) {
+        try {
+            std::filesystem::path pf(file_stack_.back().filename);
+            current_dir = pf.parent_path().string();
+        }
+        catch (...) {
+            current_dir.clear();
+        }
+    }
+    return resolve_include_candidate(filename, is_angle, include_paths_,
+                                     current_dir);
+}
+
 bool Preprocessor::read_file(const std::string& filename,
                              std::vector<LogicalLine>& lines) {
     std::ifstream in(filename.c_str(), std::ios::binary);
@@ -219,20 +251,37 @@ bool Preprocessor::is_recursive_include(const std::string& filename) const {
 }
 
 void Preprocessor::push_file(const std::string& filename) {
+    // Convert filename to a canonical absolute form when possible to improve
+    // recursive-include detection and diagnostics. If filesystem operations
+    // fail, fall back to the original string.
+    std::string resolved = filename;
+    try {
+        std::filesystem::path p(filename);
+        if (!p.is_absolute()) {
+            p = std::filesystem::absolute(p);
+        }
+        // Lexically normalize to remove ../ etc.
+        resolved = p.lexically_normal().string();
+    }
+    catch (...) {
+        // ignore filesystem errors, keep original filename
+        resolved = filename;
+    }
+
     // Check for recursive include using the new member function
-    if (is_recursive_include(filename)) {
+    if (is_recursive_include(resolved)) {
         reporter_.error(ErrorCode::RecursiveInclude, filename);
         return;
     }
 
     // read the whole file
     std::vector<LogicalLine> lines;
-    if (read_file(filename, lines)) {
+    if (read_file(resolved, lines)) {
         InputFile file;
-        file.filename = filename;
+        file.filename = resolved;
         file.lines = std::move(lines);
         file.line_index = 0;
-        file.location = Location(filename, 0);
+        file.location = Location(resolved, 0);
         file_stack_.push_back(std::move(file));
     }
 }
@@ -362,14 +411,18 @@ bool Preprocessor::process_defl(const char*& p, Location& location) {
 
 // Helper: scan a filename (quoted "file" or <file> or unquoted token) from p.
 // Advances p past the filename and returns true on success. Does not report errors.
-static bool scan_filename_from_p(const char*& p, std::string& out_filename) {
+// Also returns via out_angle whether the include used angle brackets "<...>".
+static bool scan_filename_from_p(const char*& p, std::string& out_filename,
+                                 bool& out_angle) {
     const char* start = p;
     skip_whitespace(p);
     out_filename.clear();
+    out_angle = false;
 
     if (*p == '"' || *p == '<') {
         char open = *p++;
         char close = (open == '"') ? '"' : '>';
+        out_angle = (open == '<');
         while (*p && *p != close) {
             out_filename += *p++;
         }
@@ -395,16 +448,88 @@ static bool scan_filename_from_p(const char*& p, std::string& out_filename) {
     return true;
 }
 
+// Helper: try candidates according to include semantics and include_paths_,
+// return resolved path if found or empty string if not found.
+static std::string resolve_include_candidate(const std::string& filename,
+        bool is_angle,
+        const std::vector<std::string>& include_paths,
+        const std::string& current_dir) {
+    namespace fs = std::filesystem;
+
+    std::vector<fs::path> candidates;
+
+    fs::path fname(filename);
+    // If the filename is absolute, try it directly
+    if (fname.is_absolute()) {
+        candidates.push_back(fname);
+    }
+    else {
+        // For quoted includes: search current file directory first, then include_paths, then CWD
+        if (!is_angle) {
+            if (!current_dir.empty()) {
+                candidates.push_back(fs::path(current_dir) / fname);
+            }
+            for (const auto& p : include_paths) {
+                candidates.push_back(fs::path(p) / fname);
+            }
+            candidates.push_back(fs::current_path() / fname);
+            candidates.push_back(fname); // finally try as given (relative to caller)
+        }
+        else {
+            // For angle includes: search include_paths, then CWD, then as-given
+            for (const auto& p : include_paths) {
+                candidates.push_back(fs::path(p) / fname);
+            }
+            candidates.push_back(fs::current_path() / fname);
+            candidates.push_back(fname);
+        }
+    }
+
+    for (const auto& c : candidates) {
+        try {
+            fs::path norm = c;
+            // Do not require file to be accessible by canonical (it may throw), use exists
+            if (fs::exists(norm) && fs::is_regular_file(norm)) {
+                try {
+                    // Prefer lexically_normal absolute path
+                    if (!norm.is_absolute()) {
+                        norm = fs::absolute(norm);
+                    }
+                    return norm.lexically_normal().string();
+                }
+                catch (...) {
+                    return norm.string();
+                }
+            }
+        }
+        catch (...) {
+            // ignore path errors and move on
+        }
+    }
+
+    return std::string();
+}
+
 bool Preprocessor::process_include(const char*& p, Location& location) {
     skip_whitespace(p);
 
     std::string filename;
-    if (!scan_filename_from_p(p, filename)) {
+    bool is_angle = false;
+    if (!scan_filename_from_p(p, filename, is_angle)) {
         reporter_.error(location, ErrorCode::InvalidSyntax, "Empty INCLUDE filename");
         return true;
     }
 
-    push_file(filename);
+    // Resolve using include search semantics (current file dir, include paths, CWD, etc.)
+    std::string resolved = resolve_include_path(filename, is_angle);
+
+    if (resolved.empty()) {
+        // Not found -> report using original filename (as before)
+        reporter_.error(location, ErrorCode::FileNotFound, filename);
+        return true;
+    }
+
+    push_file(resolved);
     return true;
 }
 
@@ -1149,7 +1274,8 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string>
+Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1374,17 +1500,25 @@ bool Preprocessor::process_binary(const char*& p, Location& location) {
     skip_whitespace(p);
 
     std::string filename;
-    if (!scan_filename_from_p(p, filename)) {
+    bool is_angle = false;
+    if (!scan_filename_from_p(p, filename, is_angle)) {
         reporter_.error(location, ErrorCode::InvalidSyntax,
                         "Malformed BINARY/INCBIN directive (missing filename)");
         return true;
     }
 
-    // Try to open binary file
-    std::ifstream in(filename.c_str(), std::ios::binary);
+    // Resolve binary path using the same semantics as include (current file dir, include paths, CWD, etc.)
+    std::string resolved = resolve_include_path(filename, is_angle);
+    if (resolved.empty()) {
+        reporter_.error(location, ErrorCode::FileNotFound, filename);
+        return true;
+    }
+
+    // Try to open binary file using resolved path
+    std::ifstream in(resolved.c_str(), std::ios::binary);
     if (!in) {
         // Report file-not-found using location for context
-        reporter_.error(location, ErrorCode::FileNotFound, filename);
+        reporter_.error(location, ErrorCode::FileNotFound, resolved);
         return true;
     }
 
@@ -1422,19 +1556,16 @@ bool Preprocessor::process_binary(const char*& p, Location& location) {
         idx += chunk;
     }
 
-    // Push a virtual InputFile for these lines so regular pipeline emits them
+    // Push a virtual InputFile for these lines so regular pipeline emits them.
+    // Use push_macro_and_suffix_files to keep behavior consistent with other virtual files
+    // and ensure the resulting Location.filename() is the invoking file.
     int uniq_id = ++macro_expansion_counter_;
-    InputFile virt;
-    virt.filename = "<binary:" + filename + ":" + std::to_string(uniq_id) + ">";
-    virt.lines = std::move(virt_lines);
-    virt.line_index = 0;
-    virt.location = Location(virt.filename, 0);
-    // Do not advance parent's logical line number when processing this virtual file.
-    virt.location.set_increment_line_numbers(false);
-    virt.line_directive_active = false;
-    virt.is_macro_expansion = false;
+    // Include resolved path in the internal macro name for traceability, but the Location
+    // filename will be set to the invocation file by the helper.
+    std::string internal_name = std::string("binary:") + resolved;
+    push_macro_and_suffix_files(internal_name, uniq_id, std::move(virt_lines),
+                                std::string(), phys_line_num);
 
-    file_stack_.push_back(std::move(virt));
     return true;
 }
 
@@ -1625,7 +1756,8 @@ std::vector<Preprocessor::LogicalLine>
 Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
-    int phys_line_num) const {
+    int phys_line_num
+) const {
     std::vector<LogicalLine> virt_lines;
     virt_lines.reserve(macro.body_lines.size());
 
@@ -1665,16 +1797,28 @@ Preprocessor::build_virt_lines_from_macro(
 // Push a virtual InputFile constructed from virt_lines for macro expansion.
 void Preprocessor::push_virtual_macro_file(const std::string& name,
         int uniq_id,
-        std::vector<LogicalLine>&& virt_lines) {
+        std::vector<LogicalLine>&& virt_lines,
+        const std::string& invocation_filename) {
     InputFile virt;
     virt.filename = "<macro:" + name + ":" + std::to_string(uniq_id) + ">";
     virt.lines = std::move(virt_lines);
     virt.line_index = 0;
+
+    // Initialize location with the virtual filename but override the filename
+    // with the invocation filename when available so Location reports the
+    // original source file where the macro was invoked.
     virt.location = Location(virt.filename, 0);
-    // Virtual macro files should not advance the parent's logical line counter.
     virt.location.set_increment_line_numbers(false);
     virt.line_directive_active = false;
     virt.is_macro_expansion = true;
+
+    if (!invocation_filename.empty()) {
+        virt.location.set_filename(invocation_filename);
+    }
+    else if (!file_stack_.empty()) {
+        // If caller didn't supply invocation_filename, use the current top-of-stack file.
+        virt.location.set_filename(file_stack_.back().filename);
+    }
 
     file_stack_.push_back(std::move(virt));
 }
@@ -1814,6 +1958,12 @@ void Preprocessor::push_macro_and_suffix_files(const std::string& name,
         std::vector<LogicalLine>&& virt_lines,
         const std::string& suffix,
         int phys_line_num) {
+    // Capture invocation filename (the file that triggered this macro expansion)
+    std::string invocation_filename;
+    if (!file_stack_.empty()) {
+        invocation_filename = file_stack_.back().filename;
+    }
+
     // virt_lines are expected to already have the caller prefix applied.
     // If a suffix is present, push a suffix virtual InputFile first (so it is processed after macro).
     if (!suffix.empty()) {
@@ -1826,11 +1976,19 @@ void Preprocessor::push_macro_and_suffix_files(const std::string& name,
         suffix_virt.location.set_increment_line_numbers(false);
         suffix_virt.line_directive_active = false;
         suffix_virt.is_macro_expansion = false;
+
+        // Record invocation filename for diagnostics on the suffix as well
+        if (!invocation_filename.empty()) {
+            suffix_virt.location.set_filename(invocation_filename);
+        }
+
         file_stack_.push_back(std::move(suffix_virt));
     }
 
-    // Now push the macro virtual file (will be processed immediately)
-    push_virtual_macro_file(name, uniq_id, std::move(virt_lines));
+    // Now push the macro virtual file (will be processed immediately).
+    // Pass the invocation filename so the virtual file reports the original source.
+    push_virtual_macro_file(name, uniq_id, std::move(virt_lines),
+                            invocation_filename);
 }
 
 // REPT directive: REPT <count> ... ENDR

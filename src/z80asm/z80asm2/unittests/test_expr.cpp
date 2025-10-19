@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 #define CATCH_CONFIG_MAIN
-#include "catch_amalgamated.hpp"
 #include "../expr.h"
+#include "catch_amalgamated.hpp"
 
 TEST_CASE("eval_const_expr: simple numbers and pointer advancement", "[expr]") {
     {
