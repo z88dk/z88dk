@@ -47,10 +47,12 @@ void Location::set_expanded_line(const std::string& line) {
 void Location::set_logical_line_num(int line_directive_value,
                                     int line_directive_physical_line,
                                     int physical_line_num) {
-    // #line N means the *next* physical line is N
-    int logical = line_directive_value +
-                  (physical_line_num - line_directive_physical_line) - 1;
-    line_num_ = logical;
+    if (increment_line_numbers_) {
+        // #line N means the *next* physical line is N
+        int logical = line_directive_value +
+                      (physical_line_num - line_directive_physical_line) - 1;
+        line_num_ = logical;
+    }
 }
 
 // Sets the line number to the physical line number
