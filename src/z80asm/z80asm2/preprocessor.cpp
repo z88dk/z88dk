@@ -1078,95 +1078,76 @@ std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map
 // Advances file.line_index as needed to consume multi-line comments.
 std::string Preprocessor::remove_comments(InputFile& file) {
     std::string result;
-    bool in_string = false, in_char = false;
     bool in_multiline_comment = false;
 
     while (file.line_index < file.lines.size()) {
         const std::string& line = file.lines[file.line_index].text;
-        size_t i = 0;
-        while (i < line.size()) {
+        std::vector<MacroToken> tokens = tokenize_macro_body(line);
+        for (size_t i = 0; i < tokens.size(); ++i) {
             if (!in_multiline_comment) {
-                if (!in_char && line[i] == '"') {
-                    handle_string_literal(line, i, result, in_string);
-                    continue;
+                if (i + 1 < tokens.size() &&
+                        tokens[i].type == MacroTokenType::Punctuator &&
+                        tokens[i].text == "/" &&
+                        tokens[i + 1].type == MacroTokenType::Punctuator &&
+                        tokens[i + 1].text.front() == '*') {    // may be "*" or "**"
+                    std::string rest;
+                    for (size_t j = i; j < tokens.size(); ++j) {
+                        rest += tokens[j].text;
+                    }
+                    rest = rest.substr(2);
+                    size_t end_pos = rest.find("*/");
+                    if (end_pos != std::string::npos) {
+                        rest = rest.substr(end_pos + 2);
+                        tokens = tokenize_macro_body(rest);
+                        i = -1; // will become 0 in next loop iteration
+                        in_multiline_comment = false;
+                    }
+                    else {
+                        // Entire rest of line is in comment
+                        in_multiline_comment = true;
+                        break;
+                    }
                 }
-                if (!in_string && line[i] == '\'') {
-                    handle_char_literal(line, i, result, in_char);
-                    continue;
-                }
-                if (i + 1 < line.size() && line[i] == '/' && line[i + 1] == '*') {
-                    in_multiline_comment = true;
-                    i += 2;
-                    continue;
-                }
-                if (i + 1 < line.size() && line[i] == '/' && line[i + 1] == '/') {
+                else if (i + 1 < tokens.size() &&
+                         tokens[i].type == MacroTokenType::Punctuator &&
+                         tokens[i].text == "/" &&
+                         tokens[i + 1].type == MacroTokenType::Punctuator &&
+                         tokens[i + 1].text == "/") {
                     break;
                 }
-                if (line[i] == ';') {
+                else if (tokens[i].type == MacroTokenType::Punctuator &&
+                         tokens[i].text == ";") {
                     break;
                 }
-                result += line[i++];
+                else {
+                    result += tokens[i].text;
+                }
             }
             else {
-                if (handle_multiline_comment_end(line, i, in_multiline_comment)) {
-                    continue;
+                std::string rest;
+                for (size_t j = i; j < tokens.size(); ++j) {
+                    rest += tokens[j].text;
                 }
-                ++i;
+                size_t end_pos = rest.find("*/");
+                if (end_pos != std::string::npos) {
+                    rest = rest.substr(end_pos + 2);
+                    tokens = tokenize_macro_body(rest);
+                    i = -1; // will become 0 in next loop iteration
+                    in_multiline_comment = false;
+                }
+                else {
+                    // Entire rest of line is in comment
+                    break;
+                }
             }
         }
+
         ++file.line_index;
         if (!in_multiline_comment) {
             break;
         }
     }
     return trim((result));
-}
-
-// Handles a string literal, updating result and i, toggling in_string.
-void Preprocessor::handle_string_literal(const std::string& line,
-        size_t& i, std::string& result, bool& in_string) {
-    result += line[i++];
-    in_string = !in_string;
-    while (in_string && i < line.size()) {
-        result += line[i];
-        if (line[i] == '\\' && i + 1 < line.size()) {
-            ++i;
-            result += line[i];
-        }
-        else if (line[i] == '"') {
-            in_string = false;
-        }
-        ++i;
-    }
-}
-
-// Handles a character literal, updating result and i, toggling in_char.
-void Preprocessor::handle_char_literal(const std::string& line,
-                                       size_t& i, std::string& result, bool& in_char) {
-    result += line[i++];
-    in_char = !in_char;
-    while (in_char && i < line.size()) {
-        result += line[i];
-        if (line[i] == '\\' && i + 1 < line.size()) {
-            ++i;
-            result += line[i];
-        }
-        else if (line[i] == '\'') {
-            in_char = false;
-        }
-        ++i;
-    }
-}
-
-// Handles the end of a multi-line comment. Returns true if the end was found and handled.
-bool Preprocessor::handle_multiline_comment_end(const std::string& line,
-        size_t& i, bool& in_multiline_comment) {
-    if (i + 1 < line.size() && line[i] == '*' && line[i + 1] == '/') {
-        in_multiline_comment = false;
-        i += 2;
-        return true;
-    }
-    return false;
 }
 
 // Returns true if the line starts with an identifier (possibly after whitespace) followed by a colon.
