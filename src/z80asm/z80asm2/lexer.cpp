@@ -266,6 +266,47 @@ static bool scan_char_as_int(const char*& p, int& out) {
     return true;
 }
 
+bool scan_label(const char*& p, std::string& out) {
+    std::string ident1, ident2;
+    const char* start = p;
+
+    skip_whitespace(p);
+    if (*p == '@') {
+        ++p; // skip '@'
+        if (!scan_identifier(p, ident1)) {
+            p = start;
+            return false;
+        }
+        out = "@" + ident1;
+        return true;
+    }
+    else {
+        if (!scan_identifier(p, ident1)) {
+            p = start;
+            return false;
+        }
+        const char* start2 = p;
+        skip_whitespace(p);
+        if (*p == '@') {
+            ++p; // skip '@'
+            if (!scan_identifier(p, ident2)) {
+                p = start2;
+                out = ident1;
+                return true;
+            }
+            out = ident1 + "@" + ident2;
+            return true;
+        }
+        else {
+            p = start2;
+            out = ident1;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool scan_integer(const char*& p, int& out) {
     const char* start = p;
     skip_whitespace(p);
