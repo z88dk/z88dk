@@ -353,8 +353,16 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
         switch (keyword) {
         case Keyword::IF:
             return process_if(p, location);
+        case Keyword::IFDEF:
+            return process_ifdef(p, location);
+        case Keyword::IFNDEF:
+            return process_ifndef(p, location);
         case Keyword::ELIF:
             return process_elif(p, location);
+        case Keyword::ELIFDEF:
+            return process_elifdef(p, location);
+        case Keyword::ELIFNDEF:
+            return process_elifndef(p, location);
         case Keyword::ELSE:
             return process_else(p, location);
         case Keyword::ENDIF:
@@ -2440,6 +2448,115 @@ bool Preprocessor::process_elif(const char*& p, Location& location) {
     return true;
 }
 
+// IFDEF directive: check whether macro name is defined and push an IfEntry.
+bool Preprocessor::process_ifdef(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    std::string name;
+    if (!scan_identifier(p, name)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed IFDEF directive (missing name)");
+        // push a false entry to keep nesting balanced
+        if_stack_.emplace_back(false, location);
+        return true;
+    }
+
+    bool defined = is_name_defined(name, location);
+    if_stack_.emplace_back(defined, location);
+    return true;
+}
+
+// IFNDEF directive: push true when name is not defined.
+bool Preprocessor::process_ifndef(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    std::string name;
+    if (!scan_identifier(p, name)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed IFNDEF directive (missing name)");
+        if_stack_.emplace_back(false, location);
+        return true;
+    }
+
+    bool defined = is_name_defined(name, location);
+    if_stack_.emplace_back(!defined, location);
+    return true;
+}
+
+// ELIFDEF directive: only meaningful inside an IF. Activate branch if name is defined.
+bool Preprocessor::process_elifdef(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    if (if_stack_.empty()) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "unbalanced control structure");
+        return true;
+    }
+
+    IfEntry& top = if_stack_.back();
+    if (top.else_seen) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "ELIFDEF after ELSE");
+        return true;
+    }
+
+    std::string name;
+    if (!scan_identifier(p, name)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed ELIFDEF directive (missing name)");
+        // treat as false branch
+        top.active = false;
+        return true;
+    }
+
+    bool defined = is_name_defined(name, location);
+    if (top.any_branch_taken) {
+        top.active = false;
+    }
+    else {
+        top.active = defined;
+        top.any_branch_taken = defined;
+    }
+    return true;
+}
+
+// ELIFNDEF directive: activate when name is not defined and no prior branch taken.
+bool Preprocessor::process_elifndef(const char*& p, Location& location) {
+    skip_whitespace(p);
+
+    if (if_stack_.empty()) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "unbalanced control structure");
+        return true;
+    }
+
+    IfEntry& top = if_stack_.back();
+    if (top.else_seen) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "ELIFNDEF after ELSE");
+        return true;
+    }
+
+    std::string name;
+    if (!scan_identifier(p, name)) {
+        reporter_.error(location, ErrorCode::InvalidSyntax,
+                        "Malformed ELIFNDEF directive (missing name)");
+        top.active = false;
+        return true;
+    }
+
+    bool defined = is_name_defined(name, location);
+    bool cond = !defined;
+    if (top.any_branch_taken) {
+        top.active = false;
+    }
+    else {
+        top.active = cond;
+        top.any_branch_taken = cond;
+    }
+    return true;
+}
+
 // ELSE directive: only meaningful if inside an IF. Toggle active based on previous branches.
 bool Preprocessor::process_else(const char*& p, Location& location) {
     (void)p;
@@ -2478,4 +2595,19 @@ bool Preprocessor::process_endif(const char*& p, Location& location) {
     }
     if_stack_.pop_back();
     return true;
+}
+
+// Helper: test whether the given name is considered "defined".
+// Returns true if either a preprocessor macro exists or the optional
+// assembler-provided symbol-defined callback reports the name as defined.
+bool Preprocessor::is_name_defined(const std::string& name,
+                                   const Location& loc) const {
+    if (macros_.find(name) != macros_.end()) {
+        return true;
+    }
+    if (symbol_defined_callback_) {
+        // callback may use Location for diagnostics/context
+        return symbol_defined_callback_(name, loc);
+    }
+    return false;
 }
