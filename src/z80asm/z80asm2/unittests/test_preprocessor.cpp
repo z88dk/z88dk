@@ -2540,3 +2540,113 @@ TEST_CASE("Preprocessor: splits '.name instr' (dot-label) into label line then i
 
     CHECK_FALSE(preproc.next_line(out_line, out_loc));
 }
+
+// New tests: convert "name EQU text" and "name = text" to "DEFC name = <macro-expanded(text)>"
+
+TEST_CASE("Preprocessor: 'name EQU text' is converted to DEFC form (simple)",
+          "[preprocessor][directive][equ][defc]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "label EQU 42"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "DEFC label=42");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: 'name EQU text' macro-expands RHS before emitting DEFC",
+          "[preprocessor][directive][equ][defc][macro]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "#define VAL 23",
+        "myequ EQU VAL+1"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "DEFC myequ=23+1");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: 'name = text' is converted to DEFC form (simple)",
+          "[preprocessor][directive][assign][defc]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "foo = 5+6"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "DEFC foo=5+6");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: 'name = text' macro-expands RHS before emitting DEFC",
+          "[preprocessor][directive][assign][defc][macro]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "#define N 2",
+        "bar = N*3"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "DEFC bar=2*3");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+TEST_CASE("Preprocessor: whitespace-tolerant 'name EQU text' and 'name = text' conversions",
+          "[preprocessor][directive][equ][assign][whitespace]") {
+    ErrorReporter reporter;
+    Preprocessor preproc(reporter);
+
+    std::vector<std::string> lines = {
+        "   lbl   EQU    7   ",
+        "   another    =    8+  1"
+    };
+    std::string filename = write_temp_file(lines);
+    REQUIRE(preproc.open(filename));
+
+    std::string out_line;
+    Location out_loc;
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "DEFC lbl=7");
+
+    REQUIRE(preproc.next_line(out_line, out_loc));
+    CHECK(out_line == "DEFC another=8+ 1");
+
+    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+}
+
+
