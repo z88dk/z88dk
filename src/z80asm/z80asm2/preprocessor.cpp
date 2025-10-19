@@ -450,20 +450,7 @@ bool Preprocessor::process_define(const char*& p, Location& location) {
         }
     }
 
-    // Skip whitespace before macro body
-    skip_whitespace(p);
-
-    // The rest of the line is the macro body
-    std::string body = p;
-    // Remove trailing whitespace
-    body = rtrim(body);
-
-    // Store macro
-    Macro macro;
-    macro.params = params;
-    macro.body_lines.push_back(tokenize_macro_body(body));
-    macros_[name] = macro;
-    return true;
+    return process_name_define(p, name, params);
 }
 
 bool Preprocessor::process_undef(const char*& p, Location& location) {
@@ -575,7 +562,7 @@ bool Preprocessor::process_name_directive(Keyword keyword,
     case Keyword::DEFL:
         return process_name_defl(p, name);
     case Keyword::DEFINE:
-        return process_name_define(p, name);
+        return process_name_define(p, name, {});
     case Keyword::MACRO:
         return process_name_macro(p, name);
     case Keyword::REPTC:
@@ -633,18 +620,37 @@ bool Preprocessor::process_name_defl(const char*& p,
 }
 
 bool Preprocessor::process_name_define(const char*& p,
-                                       const std::string& name) {
-    // Skip whitespace before macro body
+                                       const std::string& name,
+                                       std::vector<std::string> params) {
+
+    // scan optional '=' for compatibility
     skip_whitespace(p);
+    if (*p == '=') {
+        ++p; // skip '='
+    }
 
     // The rest of the line is the macro body
     std::string body = p;
-    // Remove trailing whitespace
-    body = rtrim(body);
+
+    // Remove whitespace
+    body = trim(body);
+
+    p = body.c_str();
+    int value = 0;
+
+    if (body.empty()) {
+        body = "1"; // default body
+    }
+    else if (eval_const_expr(p, value) && *p == '\0') {
+        body = std::to_string(value);
+    }
+    else {
+        // keep body as is
+    }
 
     // Store macro
     Macro macro;
-    macro.params.clear();
+    macro.params = params;
     macro.body_lines.push_back(tokenize_macro_body(body));
     macros_[name] = macro;
     return true;
@@ -1894,15 +1900,12 @@ bool Preprocessor::get_constant_value(const char*& p, int& value) {
     }
 
     const char* q = expanded.c_str();
-    if (!eval_const_expr(q, value)) {
+    if (eval_const_expr(q, value) && *q == '\0') {
+        return true;
+    }
+    else {
         return false;
     }
-    skip_whitespace(q);
-    if (*q != '\0') {
-        return false; // extra junk after expression
-    }
-
-    return true;
 }
 
 bool Preprocessor::do_reptc_common(const char*& p,
