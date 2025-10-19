@@ -4,8 +4,15 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+X(CommandFailed, "Command failed")
 X(FileNotFound, "File not found")
+X(FileOpenError, "Error opening file")
+X(InvalidInteger, "Invalid integer")
+X(InvalidOption, "Invalid option")
 X(InvalidSyntax, "Invalid syntax")
 X(MissingOperand, "Missing operand")
+X(NoInputFiles, "No input files specified")
 X(RecursiveInclude, "Recursive include")
 X(UnknownInstruction, "Unknown instruction")
+X(UnterminatedComment, "Unterminated comment")
+X(UnterminatedString, "Unterminated string")

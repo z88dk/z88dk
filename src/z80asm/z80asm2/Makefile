@@ -93,11 +93,11 @@ $(TEST_OBJ_DIR):
 	$(MKDIR) -p $(TEST_OBJ_DIR)
 
 # Rule to produce .cpp from .re using re2c
-#$(PROJ)$(EXE): $(OBJ_DIR)/scan.o
-#
-#scan.cpp: scan.re Makefile
-#	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
-#	$(DOS2UNIX) scan.cpp
+$(PROJ)$(EXE): $(OBJ_DIR)/scan.o
+
+scan.cpp: scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
+	$(DOS2UNIX) scan.cpp
 
 # $(1) = list of test binaries
 define run-tests
