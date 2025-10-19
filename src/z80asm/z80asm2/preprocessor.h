@@ -140,6 +140,7 @@ private:
     bool process_defl(const char*& p, Location& location);
     bool process_undef(const char*& p, Location& location);
     bool process_line(const char*& p, Location& location);
+    bool process_c_line(const char*& p, Location& location);
     bool process_rept(const char*& p, Location& location);
     bool process_reptc(const char*& p, Location& location);
     bool process_repti(const char*& p, Location& location);
