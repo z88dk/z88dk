@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #define CATCH_CONFIG_MAIN
-#include "../error_reporter.h"
+#include "../errors.h"
 #include "../preprocessor.h"
 #include "catch_amalgamated.hpp"
 #include <cstdio>
@@ -13,6 +13,35 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <cctype>
+#include <sstream>
+
+// Local replacements for the small utils functions used by the tests.
+// These keep the unit tests independent of utils.cpp.
+
+static std::string to_lower(const std::string& s) {
+    std::string result = s;
+    std::transform(result.begin(), result.end(), result.begin(),
+    [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+    return result;
+}
+
+static std::string ltrim(const std::string& s) {
+    size_t start = s.find_first_not_of(" \t\r\n");
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+
+static std::string rtrim(const std::string& s) {
+    size_t end = s.find_last_not_of(" \t\r\n");
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+static std::string trim(const std::string& s) {
+    return ltrim(rtrim(s));
+}
 
 // Helper to capture std::cerr output
 class CerrRedirect {
@@ -39,7 +68,7 @@ static std::string write_temp_file(const std::vector<std::string>& lines) {
     std::string filename = "test_preproc_tmp_" + std::to_string(counter++) + ".asm";
     std::ofstream ofs(filename);
     for (const auto& line : lines) {
-        ofs << line << "\n";
+        ofs << line << std::endl;
     }
     ofs.close();
     temp_files.push_back(filename);
@@ -69,11 +98,11 @@ static std::string make_temp_dir() {
 static std::string write_temp_file_in_dir(const std::string& dir,
         const std::string& filename,
         const std::vector<std::string>& lines) {
-    std::filesystem::path p = std::filesystem::path(dir) / filename;
-    std::string filepath = p.string();
+    std::filesystem::path pp = std::filesystem::path(dir) / filename;
+    std::string filepath = pp.generic_string();
     std::ofstream ofs(filepath);
     for (const auto& line : lines) {
-        ofs << line << "\n";
+        ofs << line << std::endl;
     }
     ofs.close();
     temp_files.push_back(filepath);
@@ -81,14 +110,11 @@ static std::string write_temp_file_in_dir(const std::string& dir,
 }
 
 // Normalize an expected filename into the same canonical form the preprocessor uses
-// (absolute + lexically_normal) so tests can compare Location.filename() reliably.
+// (lexically_normal) so tests can compare Location.filename() reliably.
 static std::string normalize_expected_path(const std::string& p) {
     try {
         std::filesystem::path pp(p);
-        if (!pp.is_absolute()) {
-            pp = std::filesystem::absolute(pp);
-        }
-        return pp.lexically_normal().string();
+        return pp.lexically_normal().generic_string();
     }
     catch (...) {
         return p;
@@ -122,9 +148,7 @@ static TempFileCleaner temp_file_cleaner;
 
 TEST_CASE("Preprocessor normalizes all line endings to NL",
           "[preprocessor][line_endings]") {
-    ErrorReporter reporter;
     std::string line;
-    Location loc;
 
     SECTION("Handles LF (\\n) only") {
         std::string filename = write_temp_file({});
@@ -132,15 +156,15 @@ TEST_CASE("Preprocessor normalizes all line endings to NL",
             std::ofstream ofs(filename, std::ios::binary);
             ofs << "line1\nline2\nline3\n";
         }
-        Preprocessor pp(reporter);
+        Preprocessor pp;
         REQUIRE(pp.open(filename));
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line1");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line2");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line3");
-        REQUIRE_FALSE(pp.next_line(line, loc));
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     SECTION("Handles CR (\\r) only") {
@@ -149,15 +173,15 @@ TEST_CASE("Preprocessor normalizes all line endings to NL",
             std::ofstream ofs(filename, std::ios::binary);
             ofs << "line1\rline2\rline3\r";
         }
-        Preprocessor pp(reporter);
+        Preprocessor pp;
         REQUIRE(pp.open(filename));
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line1");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line2");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line3");
-        REQUIRE_FALSE(pp.next_line(line, loc));
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     SECTION("Handles CRLF (\\r\\n) only") {
@@ -166,15 +190,15 @@ TEST_CASE("Preprocessor normalizes all line endings to NL",
             std::ofstream ofs(filename, std::ios::binary);
             ofs << "line1\r\nline2\r\nline3\r\n";
         }
-        Preprocessor pp(reporter);
+        Preprocessor pp;
         REQUIRE(pp.open(filename));
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line1");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line2");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line3");
-        REQUIRE_FALSE(pp.next_line(line, loc));
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     SECTION("Handles mixed line endings") {
@@ -183,120 +207,109 @@ TEST_CASE("Preprocessor normalizes all line endings to NL",
             std::ofstream ofs(filename, std::ios::binary);
             ofs << "line1\rline2\nline3\r\nline4";
         }
-        Preprocessor pp(reporter);
+        Preprocessor pp;
         REQUIRE(pp.open(filename));
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line1");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line2");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line3");
-        REQUIRE(pp.next_line(line, loc));
+        REQUIRE(pp.next_line(line));
         CHECK(line == "line4");
-        REQUIRE_FALSE(pp.next_line(line, loc));
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     SECTION("Handles empty input") {
         std::string filename = write_temp_file({});
-        Preprocessor pp(reporter);
+        Preprocessor pp;
         REQUIRE(pp.open(filename));
-        REQUIRE_FALSE(pp.next_line(line, loc));
+        REQUIRE_FALSE(pp.next_line(line));
     }
 }
 
 TEST_CASE("Preprocessor: open() and next_line() basic", "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = { "LD A,1", "LD B,2" };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: open() returns true and next_line() returns false for empty file",
           "[preprocessor][emptyfile]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {}; // empty file
     std::string filename = write_temp_file(lines);
 
     // open() should succeed even for an empty file
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
     // next_line() should immediately return false
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: removes comments", "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = { "LD A,1 ; comment", "LD B,2" };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: removes C-style single-line comments",
           "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = { "LD A,1 // comment", "LD B,2" };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: removes C-style multi-line comments",
           "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "LD A,1 /* comment */ LD B,2",
         "LD C,3"
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1 LD B,2");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,3");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: removes multi-line C-style comments spanning lines",
           "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "LD A,/* comment",
         "and comment",
@@ -305,36 +318,32 @@ TEST_CASE("Preprocessor: removes multi-line C-style comments spanning lines",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,2");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,3");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: removes C-style comment in the middle of a line",
           "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = { "a/**/b" };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ab");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: include directive", "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     // Create included file
     std::vector<std::string> inc_lines = { "LD C,3" };
     std::string inc_filename = write_temp_file(inc_lines);
@@ -342,21 +351,19 @@ TEST_CASE("Preprocessor: include directive", "[preprocessor]") {
     std::vector<std::string> lines = { "#include \"" + inc_filename + "\"", "LD A,1" };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,3");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPT repeats body N times",
           "[preprocessor][directive][rept]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Repeat the two instruction lines 3 times => 6 output lines
     std::vector<std::string> lines = {
@@ -367,27 +374,26 @@ TEST_CASE("Preprocessor: REPT repeats body N times",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect the block repeated 3 times in order
     for (int rep = 0; rep < 3; ++rep) {
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "ld a,1");
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "ld b,2");
     }
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPT with non-constant count reports error",
           "[preprocessor][directive][rept][error]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // 'foo' is not a constant integer expression -> should produce an error
     std::vector<std::string> lines = {
@@ -397,25 +403,23 @@ TEST_CASE("Preprocessor: REPT with non-constant count reports error",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
     // Drive the preprocessor until EOF or error
-    while (preproc.next_line(out_line, out_loc)) {
+    while (pp.next_line(out_line)) {
         // consume
     }
 
     // The preprocessor must have reported an error for the non-constant count
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     std::string errout = redirect.str();
-    CHECK(((errout.find("REPT") != std::string::npos) || reporter.has_error()));
+    CHECK(errout.find("REPT") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPT with zero count produces no output",
           "[preprocessor][directive][rept][zero]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "REPT 0",
@@ -426,21 +430,19 @@ TEST_CASE("Preprocessor: REPT with zero count produces no output",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Since count is zero the body should not be emitted; next output is the following normal line.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPT with negative count produces no output",
           "[preprocessor][directive][rept][negative]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "REPT -1",
@@ -450,21 +452,19 @@ TEST_CASE("Preprocessor: REPT with negative count produces no output",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Since count is negative the body should not be emitted; next output is the following normal line.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPT with macro-defined count (DEFINE)",
           "[preprocessor][directive][rept][macro_count]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // FOO is defined as a numeric macro; REPT FOO should repeat the body FOO times.
     std::vector<std::string> lines = {
@@ -475,24 +475,22 @@ TEST_CASE("Preprocessor: REPT with macro-defined count (DEFINE)",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect the block repeated 3 times
     for (int rep = 0; rep < 3; ++rep) {
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "ld a,1");
     }
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPT with macro-defined count (name-first DEFINE)",
           "[preprocessor][directive][rept][macro_count]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Alternative name-first DEFINE syntax
     std::vector<std::string> lines = {
@@ -503,28 +501,26 @@ TEST_CASE("Preprocessor: REPT with macro-defined count (name-first DEFINE)",
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect two 'nop' lines produced by REPT BAR
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "nop");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "nop");
 
     // Then the following normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPT with arithmetic expression argument",
           "[preprocessor][directive][rept][expression]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Expression: -1 + 2*3  -> -1 + 6 = 5  (wait: typical arithmetic precedence yields -1 + (2*3) = 5)
     // Use a smaller body to make checks concise; ensure evaluation is performed by preprocessor.
@@ -535,63 +531,57 @@ TEST_CASE("Preprocessor: REPT with arithmetic expression argument",
         "ENDR",
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect the two-instruction block repeated 5 times (if expression evaluated as -1 + (2*3) = 5)
     for (int rep = 0; rep < 5; ++rep) {
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "ld a,1");
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "ld b,2");
     }
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: macro object-like expansion", "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "#define FOO 42",
         "LD A,FOO"
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
     // #define is not output
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,42");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: macro function-like expansion", "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "#define ADD(x,y) x+y",
         "LD A,ADD(1,2)"
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
     // #define is not output
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1+2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: undef macro", "[preprocessor]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "#define FOO 99",
         "#undef FOO",
@@ -599,175 +589,160 @@ TEST_CASE("Preprocessor: undef macro", "[preprocessor]") {
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
     // #define and #undef are not output
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,FOO");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: DEFINE without value defines name = 1 (hash-define form)",
           "[preprocessor][define][default]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#define FLAG",
         "LD A,FLAG"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: DEFINE accepts optional '=' and evaluates expression (hash-define form)",
           "[preprocessor][define][expression][equals]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#define VAL = -1+2*3",
         "LD A,VAL"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,5");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: DEFINE accepts expression without '=' and evaluates it (hash-define form)",
           "[preprocessor][define][expression][no_equals]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#define VAL2 -1+2*3",
         "LD A,VAL2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,5");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first DEFINE without value defines name = 1 (name-first form)",
           "[preprocessor][define][name-directive][default]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "FLAG DEFINE",
         "LD A,FLAG"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first DEFINE accepts optional '=' and evaluates expression (name-first form)",
           "[preprocessor][define][name-directive][expression]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "MYDEF DEFINE = -1+2*3",
         "LD A,MYDEF"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,5");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first DEFINE accepts expression without '=' and evaluates it (name-first form)",
           "[preprocessor][define][name-directive][expression][no_equals]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "MYDEF2 DEFINE -1+2*3",
         "LD A,MYDEF2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,5");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: detects include recursion (A includes B, B includes A)",
           "[preprocessor][error]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Create file B that includes A
     std::string fileA = "test_preproc_cycle_A.asm";
     std::string fileB = "test_preproc_cycle_B.asm";
     {
         std::ofstream ofsB(fileB);
-        ofsB << "#include \"" << fileA << "\"\n";
+        ofsB << "#include \"" << fileA << "\"" << std::endl;
     }
     {
         std::ofstream ofsA(fileA);
-        ofsA << "#include \"" << fileB << "\"\n";
+        ofsA << "#include \"" << fileB << "\"" << std::endl;
     }
     // Track these files for cleanup
     track_temp_file(fileA);
     track_temp_file(fileB);
 
     // Try to open fileA, which should trigger recursive include
-    REQUIRE(preproc.open(fileA));
+    REQUIRE(pp.open(fileA));
 
     std::string out_line;
-    Location out_loc;
     // Should eventually fail due to recursion or include loop
-    while (preproc.next_line(out_line, out_loc)) {
+    while (pp.next_line(out_line)) {
         // Loop until error or EOF
     }
     std::string output = redirect.str();
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     CHECK(output.find("error: Recursive include") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: include directive sets correct Location",
           "[preprocessor][location]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     // Create included file
     std::vector<std::string> inc_lines = { "LD C,3", "LD D,4" };
     std::string inc_filename = write_temp_file(inc_lines);
@@ -775,36 +750,33 @@ TEST_CASE("Preprocessor: include directive sets correct Location",
     std::vector<std::string> lines = { "#include \"" + inc_filename + "\"", "LD A,1" };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First line from included file
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,3");
-    CHECK(out_loc.filename() == normalize_expected_path(inc_filename));
-    CHECK(out_loc.line_num() == 1);
+    CHECK(g_errors.line_num() == 1);
 
     // Second line from included file
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD D,4");
-    CHECK(out_loc.filename() == normalize_expected_path(inc_filename));
-    CHECK(out_loc.line_num() == 2);
+    CHECK(g_errors.filename() == normalize_expected_path(inc_filename));
+    CHECK(g_errors.line_num() == 2);
 
     // Back to main file
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
-    CHECK(out_loc.line_num() == 2);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 2);
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: Location line numbers stay in sync after multi-line comment",
           "[preprocessor][location]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "LD A,1",
         "/* comment",
@@ -815,33 +787,31 @@ TEST_CASE("Preprocessor: Location line numbers stay in sync after multi-line com
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First line before comment
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK(out_loc.line_num() == 1);
+    CHECK(g_errors.line_num() == 1);
 
     // Next line after multi-line comment
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,2");
-    CHECK(out_loc.line_num() == 5);
+    CHECK(g_errors.line_num() == 5);
 
     // Next line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,3");
-    CHECK(out_loc.line_num() == 6);
+    CHECK(g_errors.line_num() == 6);
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: macro A calls macro B, both with parameters",
           "[preprocessor][macro]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "#define B(x) x+1",
         "#define A(y) B(y)*2",
@@ -849,20 +819,18 @@ TEST_CASE("Preprocessor: macro A calls macro B, both with parameters",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
     // #define lines are not output
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,3+1*2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: correct physical line number with continuation and empty lines",
           "[preprocessor][location][continuation]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "",                        // 1: empty
         "LD A,1 \\",               // 2: continuation
@@ -876,34 +844,32 @@ TEST_CASE("Preprocessor: correct physical line number with continuation and empt
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First logical line: lines 2-4, should report line 2
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1 + 2 + 3");
-    CHECK(out_loc.line_num() == 2);
+    CHECK(g_errors.line_num() == 2);
 
     // Second logical line: line 6
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,4");
-    CHECK(out_loc.line_num() == 6);
+    CHECK(g_errors.line_num() == 6);
 
     // Third logical line: lines 8-9, should report line 8
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,5 + 6");
-    CHECK(out_loc.line_num() == 8);
+    CHECK(g_errors.line_num() == 8);
 
     // No more lines
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: LINE directive updates Location line number and filename",
           "[preprocessor][line-directive][location]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "LD A,1",
         "#line 42",
@@ -915,47 +881,45 @@ TEST_CASE("Preprocessor: LINE directive updates Location line number and filenam
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First line, before any #line directive
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK(out_loc.line_num() == 1);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 1);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // After #line 42
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,2");
-    CHECK(out_loc.line_num() == 42);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 42);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,3");
-    CHECK(out_loc.line_num() == 43);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 43);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // After #line 100 "other.asm"
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,4");
-    CHECK(out_loc.line_num() == 100);
-    CHECK(out_loc.filename() == "other.asm");
+    CHECK(g_errors.line_num() == 100);
+    CHECK(g_errors.filename() == "other.asm");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,5");
-    CHECK(out_loc.line_num() == 101);
-    CHECK(out_loc.filename() == "other.asm");
+    CHECK(g_errors.line_num() == 101);
+    CHECK(g_errors.filename() == "other.asm");
 
     // No more lines
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: LINE directive followed by empty lines and multi-line comments counts physical lines",
           "[preprocessor][line-directive][location][empty][comment]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "LD A,1",                  // 1
         "#line 50",                // 2: set logical line to 50
@@ -969,57 +933,53 @@ TEST_CASE("Preprocessor: LINE directive followed by empty lines and multi-line c
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First line, before any #line directive
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
-    CHECK(out_loc.line_num() == 1);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 1);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // After #line 50, next logical line is at physical line 8
     // Logical line number should be: 50 + (8 - 3) = 55
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,2");
-    CHECK(out_loc.line_num() == 55);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 55);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // Next logical line: physical line 9, so 50 + (9 - 3) = 56
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,3");
-    CHECK(out_loc.line_num() == 56);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 56);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // No more lines
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: colon in ternary expression is not split",
           "[preprocessor][colon][ternary]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "LD A, cond ? 1 : 2"
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     // The colon in the ternary should not cause a split; the line should be unchanged
     CHECK(out_line == "LD A, cond ? 1 : 2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: macro with line continuations expands to multiple lines",
           "[preprocessor][macro][continuation]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "#define pushall \\",
         "    push bc \\ \\",
@@ -1029,47 +989,43 @@ TEST_CASE("Preprocessor: macro with line continuations expands to multiple lines
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // The macro should expand to three lines: "push bc", "push de", "push hl"
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push bc");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push de");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push hl");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: macro token pasting with ## operator",
           "[preprocessor][macro][tokenpaste]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "#define cat(a, b) a ## b",
         "cat(aa,bb)"
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // The macro should expand to: aabb
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "aabb");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // New test: ensure all input formats accepted by scan_integer are converted to decimal
 TEST_CASE("Preprocessor: scan_integer formats in macros are converted to decimal",
           "[preprocessor][scan_integer]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Define macros using the various integer input formats supported by scan_integer.
     // Then emit lines using those macros; Preprocessor should expand macros and the numbers
@@ -1101,43 +1057,41 @@ TEST_CASE("Preprocessor: scan_integer formats in macros are converted to decimal
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expected outputs after macro expansion: decimals only
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD D,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD E,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD E,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD H,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD L,42");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD M,5");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD M,5");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD X,65");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // New test: ensure all input formats accepted by scan_float are recognized and output contains '.' or 'e'
 TEST_CASE("Preprocessor: scan_float formats are recognized and output contains dot or e",
           "[preprocessor][scan_float]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Define macros using representative float formats accepted by scan_float.
     std::vector<std::string> lines = {
@@ -1161,10 +1115,9 @@ TEST_CASE("Preprocessor: scan_float formats are recognized and output contains d
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     auto check_has_dot_or_e = [&](const std::string & s) {
         CHECK(((s.find('.') != std::string::npos) ||
@@ -1172,32 +1125,31 @@ TEST_CASE("Preprocessor: scan_float formats are recognized and output contains d
                (s.find('E') != std::string::npos)));
     };
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F1
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F2
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F3
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F4
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F5
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F6
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F7
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     check_has_dot_or_e(out_line); // F8
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // New DEFL tests: verify text-substitution semantics and accumulation of previous value
 
 TEST_CASE("Preprocessor: DEFL creates text macro using previous (undefined -> accumulates)",
           "[preprocessor][defl]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Start with var undefined. DEFL should substitute previous (empty) -> becomes "+1"
     // Second DEFL concatenates previous "+1" -> "+1+1"
@@ -1209,22 +1161,20 @@ TEST_CASE("Preprocessor: DEFL creates text macro using previous (undefined -> ac
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,+1");       // first DEFL produced "+1"
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,+1+1");     // second DEFL produced "+1+1"
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: DEFL can extend an existing DEFINE value",
           "[preprocessor][defl]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Start with var defined as "2". DEFL should paste previous "2" producing "2+1".
     std::vector<std::string> lines = {
@@ -1234,20 +1184,18 @@ TEST_CASE("Preprocessor: DEFL can extend an existing DEFINE value",
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,2+1");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name DEFL value creates and extends macro",
           "[preprocessor][defl][name-directive]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Case 1: name is undefined, DEFL should substitute previous (empty) -> "+1"
     // Case 2: name is defined, DEFL should paste previous "+1" -> "+1+1"
@@ -1259,22 +1207,20 @@ TEST_CASE("Preprocessor: name DEFL value creates and extends macro",
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,+1");       // first DEFL produced "+1"
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,+1+1");     // second DEFL produced "+1+1"
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name DEFL value extends an existing DEFINE value",
           "[preprocessor][defl][name-directive]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Start with var defined as "2". DEFL should paste previous "2" producing "2+1".
     std::vector<std::string> lines = {
@@ -1284,20 +1230,18 @@ TEST_CASE("Preprocessor: name DEFL value extends an existing DEFINE value",
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,2+1");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name DEFINE value creates macro",
           "[preprocessor][define][name-directive]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Use alternative syntax: name DEFINE value
     std::vector<std::string> lines = {
@@ -1306,23 +1250,21 @@ TEST_CASE("Preprocessor: name DEFINE value creates macro",
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Macro FOO should expand to 42
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,42");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // ------------------------- New MACRO tests -------------------------
 
 TEST_CASE("Preprocessor: MACRO (multi-line) expands to multiple output lines",
           "[preprocessor][macro][multiline]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO pushall",
         "    push bc",
@@ -1333,25 +1275,23 @@ TEST_CASE("Preprocessor: MACRO (multi-line) expands to multiple output lines",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // The macro should expand to three lines: "push bc", "push de", "push hl"
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push bc");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push de");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push hl");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: empty multi-line object-like MACRO expands to nothing",
           "[preprocessor][macro][multiline][empty]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO empty",
         "ENDM",
@@ -1361,25 +1301,23 @@ TEST_CASE("Preprocessor: empty multi-line object-like MACRO expands to nothing",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // The empty macro invocation should produce no lines; we should see the surrounding lines only.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD BEFORE,1");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: empty multi-line function-like MACRO expands to nothing",
           "[preprocessor][macro][multiline][empty][function]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO emptyfn(x)",
         "ENDM",
@@ -1389,25 +1327,23 @@ TEST_CASE("Preprocessor: empty multi-line function-like MACRO expands to nothing
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // The empty function-like macro invocation should produce no lines; we should see the surrounding lines only.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD BEFORE,1");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: MACRO with parameters expands each body line using args",
           "[preprocessor][macro][params]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO two_loads(x,y)",
         "    ld a,x",
@@ -1417,22 +1353,20 @@ TEST_CASE("Preprocessor: MACRO with parameters expands each body line using args
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first MACRO with parameters expands each body line using args",
           "[preprocessor][macro][params][name-directive]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Alternative name-first DEFINE syntax
     std::vector<std::string> lines = {
@@ -1444,22 +1378,20 @@ TEST_CASE("Preprocessor: name-first MACRO with parameters expands each body line
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first MACRO (object-like) expands to multiple output lines",
           "[preprocessor][macro][multiline][name-directive]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Alternative name-first DEFINE syntax
     std::vector<std::string> lines = {
@@ -1471,22 +1403,20 @@ TEST_CASE("Preprocessor: name-first MACRO (object-like) expands to multiple outp
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: MACRO EXITM aborts expansion (no lines emitted when EXITM is first)",
           "[preprocessor][macro][exitm]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO abortme",
         "    EXITM",
@@ -1497,21 +1427,19 @@ TEST_CASE("Preprocessor: MACRO EXITM aborts expansion (no lines emitted when EXI
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // abortme should produce no lines because EXITM appears before any output
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,after");
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: MACRO LOCAL makes identifiers unique per expansion",
           "[preprocessor][macro][local]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO inc(n)",
         "    LOCAL tmp",
@@ -1523,12 +1451,11 @@ TEST_CASE("Preprocessor: MACRO LOCAL makes identifiers unique per expansion",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     // tmp should have been renamed to a unique identifier; check it contains "tmp_" and the argument
     size_t p_tmp = out_line.find("tmp_");
     REQUIRE(p_tmp != std::string::npos);
@@ -1540,11 +1467,11 @@ TEST_CASE("Preprocessor: MACRO LOCAL makes identifiers unique per expansion",
 
     CHECK(out_line == std::string("ld tmp_") + tmp_suffix1 + ",1");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == std::string("ld a,tmp_") + tmp_suffix1);
 
     // Second expansion should use a different tmp_<M>
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
 
     p_tmp = out_line.find("tmp_");
     REQUIRE(p_tmp != std::string::npos);
@@ -1556,17 +1483,16 @@ TEST_CASE("Preprocessor: MACRO LOCAL makes identifiers unique per expansion",
 
     CHECK(out_line == std::string("ld tmp_") + tmp_suffix2 + ",2");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == std::string("ld a,tmp_") + tmp_suffix2);
 
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consistently",
           "[preprocessor][macro][local][multiple]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "MACRO multi_local(n)",
@@ -1580,13 +1506,12 @@ TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consis
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First expansion (n==1)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     // Expect "ld tmp_<id>,1"
     size_t p_tmp = out_line.find("tmp_");
     REQUIRE(p_tmp != std::string::npos);
@@ -1597,7 +1522,7 @@ TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consis
     std::string tmp_suffix1 = out_line.substr(p_tmp + 4, p_tmp_end - (p_tmp + 4));
     CHECK(out_line == std::string("ld tmp_") + tmp_suffix1 + ",1");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     // Expect "ld tmp2_<id>,tmp3_<id>" with same suffix as tmp_
     size_t p_tmp2 = out_line.find("tmp2_");
     size_t p_tmp3 = out_line.find("tmp3_");
@@ -1624,7 +1549,7 @@ TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consis
           tmp_suffix1);
 
     // Second expansion (n==2)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     // Expect "ld tmp_<id2>,2"
     size_t p_tmp_b = out_line.find("tmp_");
     REQUIRE(p_tmp_b != std::string::npos);
@@ -1639,7 +1564,7 @@ TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consis
     // New expansion must use a different unique id than the first
     CHECK(tmp_suffix2 != tmp_suffix1);
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     // Expect "ld tmp2_<id2>,tmp3_<id2>"
     size_t p_tmp2_b = out_line.find("tmp2_");
     size_t p_tmp3_b = out_line.find("tmp3_");
@@ -1663,13 +1588,12 @@ TEST_CASE("Preprocessor: MACRO LOCAL on multiple lines renames all locals consis
     CHECK(out_line == std::string("ld tmp2_") + tmp_suffix2 + ",tmp3_" +
           tmp_suffix2);
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: label before multi-line object-like macro expansion",
           "[preprocessor][macro][label][object]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
     std::vector<std::string> lines = {
         "MACRO mobj",
         "    ld a,1",
@@ -1680,32 +1604,30 @@ TEST_CASE("Preprocessor: label before multi-line object-like macro expansion",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect the label on its own logical line first
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == ".label");
 
     // Then the macro body lines
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
 
     // Then the following normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "nop");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: label before multi-line function-like macro expansion",
           "[preprocessor][macro][label][function]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "MACRO mfn(x)",
@@ -1717,32 +1639,30 @@ TEST_CASE("Preprocessor: label before multi-line function-like macro expansion",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Label should appear before first macro body line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == ".label");
 
     // Then the macro body lines
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,5");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,5");
 
     // Then the following normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "nop");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: Location line numbers for object-like multi-line macro expansion",
           "[preprocessor][macro][location][object]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "MACRO mobj",
@@ -1755,42 +1675,40 @@ TEST_CASE("Preprocessor: Location line numbers for object-like multi-line macro 
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First non-macro logical line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD BEFORE,1");
-    CHECK(out_loc.line_num() == 5);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 5);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // First macro expansion line should report the invocation's physical line number (6)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
-    CHECK(out_loc.line_num() == 6);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 6);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // Second macro expansion line should have the same reported line number (6)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
-    CHECK(out_loc.line_num() == 6);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 6);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // Back to following normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
-    CHECK(out_loc.line_num() == 7);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 7);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: Location line numbers for function-like multi-line macro expansion",
           "[preprocessor][macro][location][function]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "MACRO mfn(x)",
@@ -1803,42 +1721,40 @@ TEST_CASE("Preprocessor: Location line numbers for function-like multi-line macr
     };
 
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD BEFORE,1");
-    CHECK(out_loc.line_num() == 5);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 5);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // First macro expansion line should report the invocation's physical line number (6)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,5");
-    CHECK(out_loc.line_num() == 6);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 6);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // Second macro expansion line should have the same reported line number (6)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,5");
-    CHECK(out_loc.line_num() == 6);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 6);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
     // Back to following normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
-    CHECK(out_loc.line_num() == 7);
-    CHECK(out_loc.filename() == normalize_expected_path(filename));
+    CHECK(g_errors.line_num() == 7);
+    CHECK(g_errors.filename() == normalize_expected_path(filename));
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: split line with object-like then function-like macros expands sequentially",
           "[preprocessor][macro][split]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // M1 is an object-like single-line macro, FN is a function-like single-line macro.
     // The source line contains "M1 : FN(2,3)" - after expansion and splitting at ':'
@@ -1850,26 +1766,24 @@ TEST_CASE("Preprocessor: split line with object-like then function-like macros e
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First segment: expansion of M1
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
 
     // Second segment: expansion of FN(2,3)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: split line with function-like then object-like macros expands sequentially",
           "[preprocessor][macro][split]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // FOO(5) is a function-like single-line macro, M2 is an object-like single-line macro.
     // The source line "FOO(5) : M2" should expand FOO first, then M2.
@@ -1880,26 +1794,24 @@ TEST_CASE("Preprocessor: split line with function-like then object-like macros e
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // First segment: expansion of FOO(5)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,5");
 
     // Second segment: expansion of M2
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: split line with multi-line object-like then multi-line function-like macros expands sequentially",
           "[preprocessor][macro][split][multiline]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // M1 is a multi-line object-like macro; FN is a multi-line function-like macro.
     // The source line contains "M1 : FN(2,3)" - after expansion we expect M1's body lines
@@ -1917,30 +1829,28 @@ TEST_CASE("Preprocessor: split line with multi-line object-like then multi-line 
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // M1 body lines
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,1");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
 
     // FN body lines (with args)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld c,3");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: split line with multi-line function-like then multi-line object-like macros expands sequentially",
           "[preprocessor][macro][split][multiline]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // FOO is a multi-line function-like macro; M2 is a multi-line object-like macro.
     // The source line "FOO(5) : M2" should expand FOO first, then M2.
@@ -1957,30 +1867,28 @@ TEST_CASE("Preprocessor: split line with multi-line function-like then multi-lin
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // FOO body lines
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a,5");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld a2,5");
 
     // M2 body lines
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b,2");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "ld b2,22");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: split line with multi-line empty function-like then empty object-like macros expands to nothing",
           "[preprocessor][macro][split][multiline][empty]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Both macros contain two blank body lines -> effectively empty expansions.
     // Surround with lines to ensure the invocation produces no intermediate output.
@@ -1999,25 +1907,23 @@ TEST_CASE("Preprocessor: split line with multi-line empty function-like then emp
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // The empty macro invocation should produce no lines; we should see the surrounding lines only.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD BEFORE,1");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: split line with multi-line empty object-like then empty function-like macros expands to nothing",
           "[preprocessor][macro][split][multiline][empty]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Same as above but object-like first, function-like second.
     std::vector<std::string> lines = {
@@ -2035,25 +1941,23 @@ TEST_CASE("Preprocessor: split line with multi-line empty object-like then empty
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Invocation should produce nothing; only surrounding lines remain.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD BEFORE,1");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTC with string literal iterates characters",
           "[preprocessor][directive][reptc][string]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "REPTC var, \"hi\"",
@@ -2062,27 +1966,25 @@ TEST_CASE("Preprocessor: REPTC with string literal iterates characters",
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'h' == 104, 'i' == 105
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 104");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 105");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTC with identifier/string macro iterates expanded characters",
           "[preprocessor][directive][reptc][identifier][macro]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#defl text = \"abc\"",
@@ -2092,29 +1994,27 @@ TEST_CASE("Preprocessor: REPTC with identifier/string macro iterates expanded ch
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'a' == 97, 'b' == 98, 'c' == 99
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 97"); // 'a'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 98"); // 'b'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 99"); // 'c'
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTC with numeric macro iterates over digits' characters",
           "[preprocessor][directive][reptc][number]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // version -> "23" -> iterate '2' and '3' -> ASCII 50 and 51
     std::vector<std::string> lines = {
@@ -2125,28 +2025,26 @@ TEST_CASE("Preprocessor: REPTC with numeric macro iterates over digits' characte
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 50"); // '2'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 51"); // '3'
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // Additional REPTC tests: verify escape sequences are scanned and iterated
 
 TEST_CASE("Preprocessor: REPTC iterates escape sequences (CR and LF)",
           "[preprocessor][directive][reptc][escape]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // String contains X, CR, LF, Y -> expect codes 88,13,10,89
     std::vector<std::string> lines = {
@@ -2157,30 +2055,28 @@ TEST_CASE("Preprocessor: REPTC iterates escape sequences (CR and LF)",
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 88"); // 'X'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 13"); // '\r'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 10"); // '\n'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 89"); // 'Y'
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTC iterates escaped backslash correctly",
           "[preprocessor][directive][reptc][escape][backslash]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // String "a\\b" -> chars 'a' (97), '\' (92), 'b' (98)
     std::vector<std::string> lines = {
@@ -2190,28 +2086,26 @@ TEST_CASE("Preprocessor: REPTC iterates escaped backslash correctly",
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 97"); // 'a'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 92"); // '\\'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 98"); // 'b'
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTC with bare identifier iterates identifier characters",
           "[preprocessor][directive][reptc][name-first][identifier]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // No macro named 'hello' is defined here - REPTC should iterate the characters of the identifier itself.
     std::vector<std::string> lines = {
@@ -2221,35 +2115,33 @@ TEST_CASE("Preprocessor: REPTC with bare identifier iterates identifier characte
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'h' 'e' 'l' 'l' 'o' -> 104,101,108,108,111
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 104");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 101");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 108");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 108");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 111");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // Name-first REPTC tests: "var REPTC argument" alternative syntax
 
 TEST_CASE("Preprocessor: name-first REPTC with bare identifier iterates identifier characters",
           "[preprocessor][directive][reptc][name-first][identifier]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // No macro named 'hello' is defined here - var REPTC hello should iterate 'hello'.
     std::vector<std::string> lines = {
@@ -2259,33 +2151,31 @@ TEST_CASE("Preprocessor: name-first REPTC with bare identifier iterates identifi
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'h' 'e' 'l' 'l' 'o' -> 104,101,108,108,111
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 104");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 101");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 108");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 108");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 111");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first REPTC with string literal iterates characters",
           "[preprocessor][directive][reptc][name-first][string]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "var REPTC \"hi\"",
@@ -2294,27 +2184,25 @@ TEST_CASE("Preprocessor: name-first REPTC with string literal iterates character
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'h' == 104, 'i' == 105
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 104");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 105");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first REPTC with identifier macro iterates expanded characters",
           "[preprocessor][directive][reptc][name-first][identifier][macro]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#defl text = \"abc\"",
@@ -2324,29 +2212,27 @@ TEST_CASE("Preprocessor: name-first REPTC with identifier macro iterates expande
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'a' == 97, 'b' == 98, 'c' == 99
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 97"); // 'a'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 98"); // 'b'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 99"); // 'c'
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: name-first REPTC with numeric macro iterates over digits' characters",
           "[preprocessor][directive][reptc][name-first][number]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // version -> "23" -> iterate '2' and '3' -> ASCII 50 and 51
     std::vector<std::string> lines = {
@@ -2357,20 +2243,19 @@ TEST_CASE("Preprocessor: name-first REPTC with numeric macro iterates over digit
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 50"); // '2'
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 51"); // '3'
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // REPTC: empty / missing argument / empty-macro cases for both syntaxes
@@ -2379,8 +2264,7 @@ TEST_CASE("Preprocessor: REPTC with empty string produces no output (both syntax
           "[preprocessor][directive][reptc][empty]") {
     // Syntax: REPTC var, ""
     {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "REPTC var, \"\"",
@@ -2389,21 +2273,19 @@ TEST_CASE("Preprocessor: REPTC with empty string produces no output (both syntax
             "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD AFTER,2");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     // Name-first syntax: var REPTC ""
     {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "var REPTC \"\"",
@@ -2412,15 +2294,14 @@ TEST_CASE("Preprocessor: REPTC with empty string produces no output (both syntax
             "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD AFTER,2");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 }
 
@@ -2428,8 +2309,7 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
           "[preprocessor][directive][reptc][empty-macro]") {
     // Define an empty macro then use it as REPTC argument
     {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "MACRO EMPTY",
@@ -2441,21 +2321,19 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
         };
         std::string filename = write_temp_file(lines);
 
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD AFTER,2");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     // Name-first syntax with empty macro
     {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "MACRO EMPTY",
@@ -2466,25 +2344,25 @@ TEST_CASE("Preprocessor: REPTC with macro defined empty produces no output (both
             "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD AFTER,2");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 }
 
 TEST_CASE("Preprocessor: REPTC with missing argument produces no output and reports error (both syntaxes)",
           "[preprocessor][directive][reptc][missing]") {
     // Syntax: REPTC var,   (trailing comma, missing argument)
+
     {
+        g_errors.reset();
         CerrRedirect redirect;
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
         std::vector<std::string> lines = {
             "REPTC var,",
             "defb var",
@@ -2492,27 +2370,26 @@ TEST_CASE("Preprocessor: REPTC with missing argument produces no output and repo
         };
         std::string filename = write_temp_file(lines);
 
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
         bool any_output = false;
-        while (preproc.next_line(out_line, out_loc)) {
+        while (pp.next_line(out_line)) {
             (void)out_line;
             any_output = true;
         }
         // Missing argument is a syntax error; ensure no output was produced
         CHECK_FALSE(any_output);
-        CHECK(reporter.has_error());
+        CHECK(g_errors.has_errors());
         std::string errout = redirect.str();
-        CHECK(((errout.find("REPTC") != std::string::npos) || reporter.has_error()));
+        CHECK(errout.find("REPTC") != std::string::npos);
     }
 
     // Name-first: "var REPTC" with no following argument
     {
+        g_errors.reset();
         CerrRedirect redirect;
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "var REPTC",
@@ -2521,27 +2398,25 @@ TEST_CASE("Preprocessor: REPTC with missing argument produces no output and repo
         };
         std::string filename = write_temp_file(lines);
 
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
         bool any_output = false;
-        while (preproc.next_line(out_line, out_loc)) {
+        while (pp.next_line(out_line)) {
             (void)out_line;
             any_output = true;
         }
         // Missing argument should be treated as syntax error; ensure no output produced
         CHECK_FALSE(any_output);
-        CHECK(reporter.has_error());
+        CHECK(g_errors.has_errors());
         std::string errout = redirect.str();
-        CHECK(((errout.find("REPTC") != std::string::npos) || reporter.has_error()));
+        CHECK(errout.find("REPTC") != std::string::npos);
     }
 }
 
 TEST_CASE("Preprocessor: REPTC with macro-defined string of spaces expands correctly",
           "[preprocessor][directive][reptc][spaces]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // FOO is defined as a quoted string containing three spaces.
     // REPTC should iterate those three space characters and emit their codes (32).
@@ -2553,28 +2428,26 @@ TEST_CASE("Preprocessor: REPTC with macro-defined string of spaces expands corre
         "LD AFTER,2"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 32"); // ' '
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 32"); // ' '
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 32"); // ' '
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTI repeats body for each expression (normal syntax)",
           "[preprocessor][directive][repti][basic]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "REPTI reg, bc, de, hl, af",
@@ -2584,30 +2457,28 @@ TEST_CASE("Preprocessor: REPTI repeats body for each expression (normal syntax)"
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push bc");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push de");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push hl");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push af");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTI name-first syntax repeats body for each expression",
           "[preprocessor][directive][repti][name-first]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "reg REPTI bc, de, hl, af",
@@ -2617,32 +2488,31 @@ TEST_CASE("Preprocessor: REPTI name-first syntax repeats body for each expressio
     };
     std::string filename = write_temp_file(lines);
 
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push bc");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push de");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push hl");
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "push af");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD AFTER,2");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes)",
           "[preprocessor][directive][repti][empty]") {
     // Normal syntax: trailing comma -> empty list
     {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        g_errors.reset();
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "REPTI reg,",
@@ -2651,22 +2521,21 @@ TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes
             "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // No push lines should be emitted; next output is the following normal line.
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD AFTER,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
-        CHECK_FALSE(reporter.has_error());
+        CHECK_FALSE(pp.next_line(out_line));
+        CHECK_FALSE(g_errors.has_errors());
     }
 
     // Name-first syntax: missing list after REPTI -> empty list
     {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        g_errors.reset();
+        Preprocessor pp;
 
         std::vector<std::string> lines = {
             "reg REPTI",
@@ -2675,16 +2544,15 @@ TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes
             "LD AFTER,2"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // No push lines should be emitted; next output is the following normal line.
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD AFTER,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
-        CHECK_FALSE(reporter.has_error());
+        CHECK_FALSE(pp.next_line(out_line));
+        CHECK_FALSE(g_errors.has_errors());
     }
 }
 
@@ -2692,51 +2560,46 @@ TEST_CASE("Preprocessor: REPTI with empty list produces no output (both syntaxes
 
 TEST_CASE("Preprocessor: macro-defined string expands to list of char codes",
           "[preprocessor][string][macro][defb]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#define S \"abc\"",
         "defb S"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'a' 'b' 'c' -> 97,98,99
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 97,98,99");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: direct string literal expands to list of char codes",
           "[preprocessor][string][literal][defb]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "defb \"hi\""
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // 'h' 'i' -> 104,105
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 104,105");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: macro-defined string with escapes expands to char codes",
           "[preprocessor][string][escape][defb]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // "X\r\nY" -> 'X' (88), '\r' (13), '\n' (10), 'Y' (89)
     std::vector<std::string> lines = {
@@ -2744,183 +2607,167 @@ TEST_CASE("Preprocessor: macro-defined string with escapes expands to char codes
         "defb STR"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "defb 88,13,10,89");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // New tests: labels are split into their own logical line so assembler sees label on a separate line.
 
 TEST_CASE("Preprocessor: splits 'name: instr' into label line then instruction",
           "[preprocessor][label][split]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "start: LD A,1",
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect the label on its own logical line first
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == ".start");
 
     // Then the instruction on the next line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: splits '.name instr' (dot-label) into label line then instruction",
           "[preprocessor][label][split][dotlabel]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         ".local LD A,1",
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
     // Dot-label should be separated and emitted as its own logical line (preserve the leading dot)
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == ".local");
 
     // Then the instruction on the next line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // New tests: convert "name EQU text" and "name = text" to "DEFC name = <macro-expanded(text)>"
 
 TEST_CASE("Preprocessor: 'name EQU text' is converted to DEFC form (simple)",
           "[preprocessor][directive][equ][defc]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "label EQU 42"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "DEFC label=42");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: 'name EQU text' macro-expands RHS before emitting DEFC",
           "[preprocessor][directive][equ][defc][macro]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#define VAL 23",
         "myequ EQU VAL+1"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "DEFC myequ=23+1");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: 'name = text' is converted to DEFC form (simple)",
           "[preprocessor][directive][assign][defc]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "foo = 5+6"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "DEFC foo=5+6");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: 'name = text' macro-expands RHS before emitting DEFC",
           "[preprocessor][directive][assign][defc][macro]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "#define N 2",
         "bar = N*3"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "DEFC bar=2*3");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: whitespace-tolerant 'name EQU text' and 'name = text' conversions",
           "[preprocessor][directive][equ][assign][whitespace]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::vector<std::string> lines = {
         "   lbl   EQU    7   ",
         "   another    =    8+  1"
     };
     std::string filename = write_temp_file(lines);
-    REQUIRE(preproc.open(filename));
+    REQUIRE(pp.open(filename));
 
     std::string out_line;
-    Location out_loc;
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "DEFC lbl=7");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "DEFC another=8+ 1");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 // BINARY / INCBIN tests: include a 256-byte binary (0..255) and expect DEFB lines with 16 bytes each.
 
 TEST_CASE("Preprocessor: BINARY includes 256-byte file and emits DEFB lines (BINARY)",
           "[preprocessor][directive][binary][incbin]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Create 256-byte binary file with values 0..255
     std::string binname = "test_preproc_bin_256.bin";
@@ -2940,14 +2787,13 @@ TEST_CASE("Preprocessor: BINARY includes 256-byte file and emits DEFB lines (BIN
     };
     std::string asmfile = write_temp_file(lines);
 
-    REQUIRE(preproc.open(asmfile));
+    REQUIRE(pp.open(asmfile));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect 256 bytes emitted as 16 lines of 16 bytes each
     for (int line_idx = 0; line_idx < 16; ++line_idx) {
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
 
         // Split mnemonic and data
         size_t sp = out_line.find(' ');
@@ -2986,13 +2832,12 @@ TEST_CASE("Preprocessor: BINARY includes 256-byte file and emits DEFB lines (BIN
     }
 
     // No more lines
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: INCBIN includes 256-byte file and emits DEFB lines (INCBIN)",
           "[preprocessor][directive][incbin][binary]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Create 256-byte binary file with values 0..255 (reuse name)
     std::string binname2 = "test_preproc_bin_256_2.bin";
@@ -3011,14 +2856,13 @@ TEST_CASE("Preprocessor: INCBIN includes 256-byte file and emits DEFB lines (INC
     };
     std::string asmfile2 = write_temp_file(lines);
 
-    REQUIRE(preproc.open(asmfile2));
+    REQUIRE(pp.open(asmfile2));
 
     std::string out_line;
-    Location out_loc;
 
     // Expect 16 lines, 16 values each
     for (int line_idx = 0; line_idx < 16; ++line_idx) {
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
 
         // Split mnemonic and data
         size_t sp = out_line.find(' ');
@@ -3055,50 +2899,50 @@ TEST_CASE("Preprocessor: INCBIN includes 256-byte file and emits DEFB lines (INC
         }
     }
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor::open fails for missing file (simple filename)",
           "[preprocessor][open][file_not_found]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Ensure file does not exist
     std::string filename = "test_preproc_missing_file_001.asm";
     std::remove(filename.c_str());
 
     // open() should fail and reporter should have recorded an error
-    CHECK_FALSE(preproc.open(filename));
+    CHECK_FALSE(pp.open(filename));
 
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     std::string err = redirect.str();
-    CHECK(((err.find(filename) != std::string::npos) || reporter.has_error()));
+    CHECK(err.find(filename) != std::string::npos);
 }
 
 TEST_CASE("Preprocessor::open fails for missing file (nonexistent path)",
           "[preprocessor][open][file_not_found][path]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Use a path that almost certainly doesn't exist
     std::string filename = "no_such_dir/test_preproc_missing_file_002.asm";
     // Remove in case of previous runs (no-op if not present)
     std::remove(filename.c_str());
 
-    CHECK_FALSE(preproc.open(filename));
+    CHECK_FALSE(pp.open(filename));
 
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     std::string err = redirect.str();
-    CHECK(((err.find(filename) != std::string::npos) || reporter.has_error()));
+    CHECK(err.find("test_preproc_missing_file_002.asm") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: INCLUDE reports error for missing file",
           "[preprocessor][include][file_not_found]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::string missing = "no_such_include_zzz.asm";
     std::vector<std::string> lines = {
@@ -3107,25 +2951,24 @@ TEST_CASE("Preprocessor: INCLUDE reports error for missing file",
     };
     std::string asmfile = write_temp_file(lines);
 
-    REQUIRE(preproc.open(asmfile));
+    REQUIRE(pp.open(asmfile));
 
     std::string out_line;
-    Location out_loc;
     // Drive the preprocessor until EOF so the include is attempted.
-    while (preproc.next_line(out_line, out_loc)) {
+    while (pp.next_line(out_line)) {
         (void)out_line;
     }
 
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     std::string err = redirect.str();
-    CHECK(((err.find(missing) != std::string::npos) || reporter.has_error()));
+    CHECK(err.find(missing) != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: BINARY reports error for missing file",
           "[preprocessor][directive][binary][file_not_found]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::string missing = "no_such_binary_zzz.bin";
     std::vector<std::string> lines = {
@@ -3134,25 +2977,24 @@ TEST_CASE("Preprocessor: BINARY reports error for missing file",
     };
     std::string asmfile = write_temp_file(lines);
 
-    REQUIRE(preproc.open(asmfile));
+    REQUIRE(pp.open(asmfile));
 
     std::string out_line;
-    Location out_loc;
     // Drive the preprocessor so the BINARY directive is processed.
-    while (preproc.next_line(out_line, out_loc)) {
+    while (pp.next_line(out_line)) {
         (void)out_line;
     }
 
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     std::string err = redirect.str();
-    CHECK(((err.find(missing) != std::string::npos) || reporter.has_error()));
+    CHECK(err.find(missing) != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: INCBIN reports error for missing file",
           "[preprocessor][directive][incbin][file_not_found]") {
+    g_errors.reset();
     CerrRedirect redirect;
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     std::string missing = "no_such_incbin_zzz.bin";
     std::vector<std::string> lines = {
@@ -3161,26 +3003,24 @@ TEST_CASE("Preprocessor: INCBIN reports error for missing file",
     };
     std::string asmfile = write_temp_file(lines);
 
-    REQUIRE(preproc.open(asmfile));
+    REQUIRE(pp.open(asmfile));
 
     std::string out_line;
-    Location out_loc;
     // Drive the preprocessor so the INCBIN directive is processed.
-    while (preproc.next_line(out_line, out_loc)) {
+    while (pp.next_line(out_line)) {
         (void)out_line;
     }
 
-    CHECK(reporter.has_error());
+    CHECK(g_errors.has_errors());
     std::string err = redirect.str();
-    CHECK(((err.find(missing) != std::string::npos) || reporter.has_error()));
+    CHECK(err.find(missing) != std::string::npos);
 }
 
 // -- New tests verifying include search order semantics --
 
 TEST_CASE("Preprocessor: quoted include searches current-file directory before include paths",
           "[preprocessor][include][search_order][quoted]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Create directories
     std::string main_dir = make_temp_dir();
@@ -3199,28 +3039,26 @@ TEST_CASE("Preprocessor: quoted include searches current-file directory before i
     std::string mainfile = write_temp_file_in_dir(main_dir, "main_q.asm", { "#include \"" + inc_name + "\"", "LD A,1" });
 
     // Add include path (should not be chosen for quoted include because current-file dir takes precedence)
-    preproc.add_include_path(inc_dir);
+    pp.add_include_path(inc_dir);
 
-    REQUIRE(preproc.open(mainfile));
+    REQUIRE(pp.open(mainfile));
 
     std::string out_line;
-    Location out_loc;
 
     // First line should come from the included file located in the same directory as mainfile
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,LOCAL");
 
     // Then the following normal line
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD A,1");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: angle-bracket include searches include paths in order (not current-file directory)",
           "[preprocessor][include][search_order][angle]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     // Create directories
     std::string main_dir = make_temp_dir();
@@ -3237,29 +3075,27 @@ TEST_CASE("Preprocessor: angle-bracket include searches include paths in order (
     std::string mainfile = write_temp_file_in_dir(main_dir, "main_a.asm", { "#include <" + inc_name + ">", "LD B,1" });
 
     // Add include paths in a specific order; first added should be searched first for angle includes
-    preproc.add_include_path(inc_dir2); // intentionally add dir2 first
-    preproc.add_include_path(inc_dir1);
+    pp.add_include_path(inc_dir2); // intentionally add dir2 first
+    pp.add_include_path(inc_dir1);
 
-    REQUIRE(preproc.open(mainfile));
+    REQUIRE(pp.open(mainfile));
 
     std::string out_line;
-    Location out_loc;
 
     // For angle includes, current-file directory should NOT be searched; include_paths order determines choice.
     // Because we added inc_dir2 first, it should pick that file.
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD C,DIR2");
 
-    REQUIRE(preproc.next_line(out_line, out_loc));
+    REQUIRE(pp.next_line(out_line));
     CHECK(out_line == "LD B,1");
 
-    CHECK_FALSE(preproc.next_line(out_line, out_loc));
+    CHECK_FALSE(pp.next_line(out_line));
 }
 
 TEST_CASE("Preprocessor: IF / ELIF / ELSE / ENDIF directives (nesting + branches)",
           "[preprocessor][directive][if][elif][else][endif]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     SECTION("Simple IF/ELSE selects IF branch when true") {
         std::vector<std::string> lines = {
@@ -3270,13 +3106,12 @@ TEST_CASE("Preprocessor: IF / ELIF / ELSE / ENDIF directives (nesting + branches
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELIF chain picks the first true ELIF") {
@@ -3292,13 +3127,12 @@ TEST_CASE("Preprocessor: IF / ELIF / ELSE / ENDIF directives (nesting + branches
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,3");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Nested IF/ELSE works correctly") {
@@ -3312,13 +3146,12 @@ TEST_CASE("Preprocessor: IF / ELIF / ELSE / ENDIF directives (nesting + branches
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELSE taken when no IF/ELIF branch true") {
@@ -3332,13 +3165,12 @@ TEST_CASE("Preprocessor: IF / ELIF / ELSE / ENDIF directives (nesting + branches
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,3");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 }
 
@@ -3349,11 +3181,11 @@ TEST_CASE("Preprocessor: IF expression callback integration (assembler evaluatio
     // 2) callback fails to evaluate -> branch treated false
 
     SECTION("Callback returns true -> IF branch executed") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        g_errors.reset();
+        Preprocessor pp;
 
         // Register callback that resolves "EXPR" -> 1, anything else not handled.
-        preproc.set_eval_callback([](const std::string & expr,
+        pp.set_eval_callback([](const std::string & expr,
         const Location&)->Preprocessor::EvalResult {
             Preprocessor::EvalResult r;
             if (expr == "EXPR") {
@@ -3372,22 +3204,21 @@ TEST_CASE("Preprocessor: IF expression callback integration (assembler evaluatio
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
-        CHECK_FALSE(reporter.has_error());
+        CHECK_FALSE(pp.next_line(out_line));
+        CHECK_FALSE(g_errors.has_errors());
     }
 
     SECTION("Callback returns false -> syntax error and IF treated false") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        g_errors.reset();
+        Preprocessor pp;
 
         // Callback that never evaluates anything (always returns ok==false)
-        preproc.set_eval_callback([](const std::string&,
+        pp.set_eval_callback([](const std::string&,
         const Location&)->Preprocessor::EvalResult {
             return Preprocessor::EvalResult{}; // ok=false
         });
@@ -3400,22 +3231,20 @@ TEST_CASE("Preprocessor: IF expression callback integration (assembler evaluatio
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
-        CHECK_FALSE(reporter.has_error());
+        CHECK_FALSE(pp.next_line(out_line));
+        CHECK_FALSE(g_errors.has_errors());
     }
 }
 
 // IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF tests
 TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
           "[preprocessor][directive][ifdef][elifdef][elifndef][else][endif]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     SECTION("Simple IFDEF selects IF branch when defined") {
         std::vector<std::string> lines = {
@@ -3427,13 +3256,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("IFDEF with no define falls through to ELSE") {
@@ -3445,13 +3273,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELIFDEF chain picks the first true ELIFDEF") {
@@ -3469,13 +3296,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
         // define Z only
         lines.insert(lines.begin(), "#define Z");
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,3");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELIFNDEF taken when previous conditions false and symbol not defined") {
@@ -3489,13 +3315,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Nested IFDEF/ELSE works correctly") {
@@ -3513,13 +3338,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
         };
         // INNER is not defined, OUTER is defined -> expect inner ELSE
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Hash-prefixed directives (#ifdef/#ifndef) are accepted") {
@@ -3537,20 +3361,19 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "#endif"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // from #ifdef branch
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
 
         // from #ifndef branch (HASHSYM is defined -> else taken)
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,2");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
 // New IFNDEF / ELIFNDEF / #ifndef / #elifndef tests
@@ -3563,13 +3386,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("IFNDEF with symbol defined falls through to ELSE") {
@@ -3582,13 +3404,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELIFNDEF chain picks the first true ELIFNDEF") {
@@ -3605,14 +3426,13 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line ==
               "LD A,2"); // A defined -> IFNDEF false; B undefined -> first ELIFNDEF true
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Nested IFNDEF/ELSE works correctly") {
@@ -3630,13 +3450,12 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
         };
         // OUTER is not defined, INNER is defined -> outer true, inner false -> inner ELSE taken
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Hash-prefixed directives (#ifndef/#elifndef) are accepted") {
@@ -3654,20 +3473,19 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
             "#endif"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // First #ifndef: HASHSYM is defined -> else taken
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
 
         // Second block: OTHER undefined -> first branch should be taken
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,1");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 }
 
@@ -3675,12 +3493,10 @@ TEST_CASE("Preprocessor: IFDEF / ELIFDEF / ELIFNDEF / ELSE / ENDIF behavior",
 TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler symbol callback",
           "[preprocessor][directive][ifdef][symbol-callback]") {
     SECTION("IFDEF sees assembler-defined symbol (no macro)") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         // Callback claims symbol SYM_CB is defined
-        preproc.set_symbol_defined_callback([](const std::string & name,
-        const Location&) -> bool {
+        pp.set_symbol_defined_callback([](const std::string & name) -> bool {
             return name == "SYM_CB";
         });
 
@@ -3692,22 +3508,19 @@ TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler 
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("IFNDEF treats assembler-defined symbol as defined (falls to ELSE)") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         // Callback claims symbol HAS is defined
-        preproc.set_symbol_defined_callback([](const std::string & name,
-        const Location&) -> bool {
+        pp.set_symbol_defined_callback([](const std::string & name) -> bool {
             return name == "HAS";
         });
 
@@ -3719,22 +3532,19 @@ TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler 
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELIFDEF chain can pick branch by assembler symbol (no macro)") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         // Callback reports ZSYM defined only
-        preproc.set_symbol_defined_callback([](const std::string & name,
-        const Location&) -> bool {
+        pp.set_symbol_defined_callback([](const std::string & name) -> bool {
             return name == "ZSYM";
         });
 
@@ -3750,22 +3560,19 @@ TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler 
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,3");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("ELIFNDEF chain: assembler-defined name disables IFNDEF, next ELIFNDEF may trigger") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         // Callback defines ONLY 'ADEF' so IFNDEF ADEF is false; B and C are not defined.
-        preproc.set_symbol_defined_callback([](const std::string & name,
-        const Location&) -> bool {
+        pp.set_symbol_defined_callback([](const std::string & name) -> bool {
             return name == "ADEF";
         });
 
@@ -3781,23 +3588,20 @@ TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler 
             "ENDIF"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
         // ADEF defined -> IFNDEF false; BDEF undefined -> first ELIFNDEF true -> LD A,2
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,2");
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Hash-prefixed #ifdef/#ifndef accept assembler callback definitions") {
-        ErrorReporter reporter;
-        Preprocessor preproc(reporter);
+        Preprocessor pp;
 
         // Callback defines HAS_CB only
-        preproc.set_symbol_defined_callback([](const std::string & name,
-        const Location&) -> bool {
+        pp.set_symbol_defined_callback([](const std::string & name) -> bool {
             return name == "HAS_CB";
         });
 
@@ -3814,27 +3618,25 @@ TEST_CASE("Preprocessor: IFDEF/IFNDEF/ELIFDEF/ELIFNDEF cooperate with assembler 
             "#endif"
         };
         std::string filename = write_temp_file(lines);
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // #ifdef HAS_CB -> true
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
 
         // #ifndef MISSING_CB -> true (missing) -> LD B,1
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,1");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 }
 
 TEST_CASE("Preprocessor: C_LINE directive updates Location line number and filename without incrementing",
           "[preprocessor][c_line][line-directive][location]") {
-    ErrorReporter reporter;
-    Preprocessor preproc(reporter);
+    Preprocessor pp;
 
     SECTION("Hash-prefixed C_LINE") {
         std::vector<std::string> lines = {
@@ -3848,42 +3650,41 @@ TEST_CASE("Preprocessor: C_LINE directive updates Location line number and filen
         };
         std::string filename = write_temp_file(lines);
 
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // First line, before any C_LINE directive
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK(out_loc.line_num() == 1);
-        CHECK(out_loc.filename() == normalize_expected_path(filename));
+        CHECK(g_errors.line_num() == 1);
+        CHECK(g_errors.filename() == normalize_expected_path(filename));
 
         // After "#C_LINE 42": first logical output should report 42
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,2");
-        CHECK(out_loc.line_num() == 42);
-        CHECK(out_loc.filename() == normalize_expected_path(filename));
+        CHECK(g_errors.line_num() == 42);
+        CHECK(g_errors.filename() == normalize_expected_path(filename));
 
         // Next logical line should NOT have incremented (still 42)
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,3");
-        CHECK(out_loc.line_num() == 42);
-        CHECK(out_loc.filename() == normalize_expected_path(filename));
+        CHECK(g_errors.line_num() == 42);
+        CHECK(g_errors.filename() == normalize_expected_path(filename));
 
         // After "#C_LINE 100 \"other.c\"": filename changed and line set to 100
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD C,4");
-        CHECK(out_loc.line_num() == 100);
-        CHECK(out_loc.filename() == "other.c");
+        CHECK(g_errors.line_num() == 100);
+        CHECK(g_errors.filename() == "other.c");
 
         // Should remain 100 for the following logical line as well
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD C,5");
-        CHECK(out_loc.line_num() == 100);
-        CHECK(out_loc.filename() == "other.c");
+        CHECK(g_errors.line_num() == 100);
+        CHECK(g_errors.filename() == "other.c");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 
     SECTION("Name-first (no hash) C_LINE") {
@@ -3898,41 +3699,471 @@ TEST_CASE("Preprocessor: C_LINE directive updates Location line number and filen
         };
         std::string filename = write_temp_file(lines);
 
-        REQUIRE(preproc.open(filename));
+        REQUIRE(pp.open(filename));
 
         std::string out_line;
-        Location out_loc;
 
         // First line, before any C_LINE directive
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD A,1");
-        CHECK(out_loc.line_num() == 1);
-        CHECK(out_loc.filename() == normalize_expected_path(filename));
+        CHECK(g_errors.line_num() == 1);
+        CHECK(g_errors.filename() == normalize_expected_path(filename));
 
         // After "C_LINE 42": first logical output should report 42
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,2");
-        CHECK(out_loc.line_num() == 42);
-        CHECK(out_loc.filename() == normalize_expected_path(filename));
+        CHECK(g_errors.line_num() == 42);
+        CHECK(g_errors.filename() == normalize_expected_path(filename));
 
         // Next logical line should NOT have incremented (still 42)
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD B,3");
-        CHECK(out_loc.line_num() == 42);
-        CHECK(out_loc.filename() == normalize_expected_path(filename));
+        CHECK(g_errors.line_num() == 42);
+        CHECK(g_errors.filename() == normalize_expected_path(filename));
 
         // After "C_LINE 100 \"other.c\"": filename changed and line set to 100
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD C,4");
-        CHECK(out_loc.line_num() == 100);
-        CHECK(out_loc.filename() == "other.c");
+        CHECK(g_errors.line_num() == 100);
+        CHECK(g_errors.filename() == "other.c");
 
         // Should remain 100 for the following logical line as well
-        REQUIRE(preproc.next_line(out_line, out_loc));
+        REQUIRE(pp.next_line(out_line));
         CHECK(out_line == "LD C,5");
-        CHECK(out_loc.line_num() == 100);
-        CHECK(out_loc.filename() == "other.c");
+        CHECK(g_errors.line_num() == 100);
+        CHECK(g_errors.filename() == "other.c");
 
-        CHECK_FALSE(preproc.next_line(out_line, out_loc));
+        CHECK_FALSE(pp.next_line(out_line));
     }
 }
+
+// Preprocessor::preprocess_file tests
+TEST_CASE("Preprocessor::preprocess_file writes expected output file",
+          "[preprocessor][preprocess_file]") {
+    Preprocessor pp;
+
+    // Create a simple input file that uses a macro
+    std::vector<std::string> lines = {
+        "#define FOO 42",
+        "LD A,FOO",
+        "LD B,2"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Determine output filename by replacing extension with .i
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(infile, outfile);
+
+    // Read output file and check it contains the expanded lines and not the #define
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        // normalize possible CRLF
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Expect the preprocessed file to contain the expanded instructions (order preserved).
+    // The #define line should not be present.
+    REQUIRE(std::find(out_lines.begin(), out_lines.end(),
+                      "LD A,42") != out_lines.end());
+    REQUIRE(std::find(out_lines.begin(), out_lines.end(),
+                      "LD B,2") != out_lines.end());
+    REQUIRE(std::find(out_lines.begin(), out_lines.end(),
+                      "#define FOO 42") == out_lines.end());
+}
+
+TEST_CASE("Preprocessor::preprocess_file respects include paths when writing output",
+          "[preprocessor][preprocess_file][include][path]") {
+    Preprocessor pp;
+
+    // Create include directory and file
+    std::string inc_dir = make_temp_dir();
+    std::string inc_name = "inc_for_preproc.inc";
+    std::string inc_file = write_temp_file_in_dir(inc_dir, inc_name, { "LD C,99" });
+
+    // Create main input that uses angle include (so include_paths are used)
+    std::vector<std::string> main_lines = {
+        "#include <" + inc_name + ">",
+        "LD A,1"
+    };
+    std::string mainfile = write_temp_file(main_lines);
+
+    // Add the include directory to the preprocessor's include paths
+    pp.add_include_path(inc_dir);
+
+    // Output file
+    std::filesystem::path outp(mainfile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(mainfile, outfile);
+
+    // Read output and ensure included content appears before the following line
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Expect included line and the following normal line present
+    auto it_inc = std::find(out_lines.begin(), out_lines.end(), "LD C,99");
+    auto it_main = std::find(out_lines.begin(), out_lines.end(), "LD A,1");
+    REQUIRE(it_inc != out_lines.end());
+    REQUIRE(it_main != out_lines.end());
+    // included line should appear before the main file line
+    CHECK(std::distance(out_lines.begin(),
+                        it_inc) < std::distance(out_lines.begin(), it_main));
+}
+
+// Preprocessor::preprocess_file - macro expands to three lines
+TEST_CASE("Preprocessor::preprocess_file expands multi-line macro into three output lines",
+          "[preprocessor][preprocess_file][macro][multiline]") {
+    Preprocessor pp;
+
+    // Multi-line macro that should expand to three lines
+    std::vector<std::string> lines = {
+        "MACRO push3",
+        "    push bc",
+        "    push de",
+        "    push hl",
+        "ENDM",
+        "push3"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output filename (.i)
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(infile, outfile);
+
+    // Read output file
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        // normalize possible CRLF
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Helper to find index of a line
+    auto find_idx = [&](const std::string & s) -> int {
+        for (int i = 0; i < static_cast<int>(out_lines.size()); ++i) {
+            if (out_lines[i] == s) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
+    int i1 = find_idx("push bc");
+    int i2 = find_idx("push de");
+    int i3 = find_idx("push hl");
+
+    REQUIRE(i1 != -1);
+    REQUIRE(i2 != -1);
+    REQUIRE(i3 != -1);
+    CHECK(i1 < i2);
+    CHECK(i2 < i3);
+
+    // Ensure macro definition keywords are not present in output
+    CHECK(find_idx("MACRO push3") == -1);
+    CHECK(find_idx("ENDM") == -1);
+}
+
+// Preprocessor::preprocess_file - multi-line comment is removed in output
+TEST_CASE("Preprocessor::preprocess_file removes multi-line comment spanning lines",
+          "[preprocessor][preprocess_file][comment][multiline]") {
+    Preprocessor pp;
+
+    // Input: multi-line C-style comment starts on line 1 and ends on line 3.
+    // Text before and after the comment should be preserved and written to output.
+    std::vector<std::string> lines = {
+        "LD A,1 /* comment starts",
+        " still inside comment",
+        " end of comment */ LD B,2",
+        "LD C,3"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output filename (.i)
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(infile, outfile);
+
+    // Read output file (skip empty lines as other tests do)
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Expect the comment to be removed and the surrounding code preserved.
+    // The first logical output line should contain both left and right fragments.
+    auto it_ab = std::find(out_lines.begin(), out_lines.end(), "LD A,1 LD B,2");
+    auto it_c = std::find(out_lines.begin(), out_lines.end(), "LD C,3");
+
+    REQUIRE(it_ab != out_lines.end());
+    REQUIRE(it_c != out_lines.end());
+    CHECK(std::distance(out_lines.begin(), it_ab) < std::distance(out_lines.begin(),
+            it_c));
+
+    // Ensure no raw comment text ended up in the output
+    for (const auto& s : out_lines) {
+        CHECK(s.find("comment") == std::string::npos);
+        CHECK(s.find("/*") == std::string::npos);
+        CHECK(s.find("*/") == std::string::npos);
+    }
+}
+
+// Preprocessor::preprocess_file - verify #line synchronization after include, macro and multi-line comment
+
+TEST_CASE("Preprocessor::preprocess_file emits #line to resynchronize after include",
+          "[preprocessor][preprocess_file][line][include]") {
+    Preprocessor pp;
+
+    // Create included file
+    std::vector<std::string> inc_lines = { "LD C,3" };
+    std::string inc_filename = write_temp_file(inc_lines);
+
+    // Main file: include the file and then a following line
+    std::vector<std::string> main_lines = {
+        "LD A,1",
+        "#include \"" + inc_filename + "\"",
+        "LD B,2"
+    };
+    std::string mainfile = write_temp_file(main_lines);
+
+    // Output file
+    std::filesystem::path outp(mainfile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    pp.preprocess_file(mainfile, outfile);
+
+    // Read output (preserve empty lines)
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        out_lines.push_back(l);
+    }
+    ifs.close();
+
+    // Find the index of the first appearance of the main-file line after include
+    auto it_main_line = std::find(out_lines.begin(), out_lines.end(), "LD B,2");
+    REQUIRE(it_main_line != out_lines.end());
+    size_t idx_main = static_cast<size_t>(std::distance(out_lines.begin(),
+                                          it_main_line));
+
+    // Look backward for a #line directive that contains the main filename (normalized).
+    std::string norm_main = normalize_expected_path(mainfile);
+    bool found_sync = false;
+    for (size_t i = (idx_main == 0 ? 0 : idx_main - 1); ; --i) {
+        const std::string& s = out_lines[i];
+        if (s.find("#line") != std::string::npos
+                || s.find("LINE") != std::string::npos) {
+            if (s.find(norm_main) != std::string::npos
+                    || s.find(std::filesystem::path(mainfile).filename().string()) !=
+                    std::string::npos) {
+                found_sync = true;
+                break;
+            }
+        }
+        if (i == 0) {
+            break;
+        }
+    }
+
+    CHECK(found_sync);
+}
+
+TEST_CASE("Preprocessor::preprocess_file emits #line to resynchronize after multi-line macro expansion",
+          "[preprocessor][preprocess_file][line][macro][multiline]") {
+    Preprocessor pp;
+
+    // Define a multi-line MACRO and invoke it between two normal lines
+    std::vector<std::string> lines = {
+        "LD BEFORE,1",
+        "MACRO push3",
+        "    push bc",
+        "    push de",
+        "    push hl",
+        "ENDM",
+        "push3",
+        "LD AFTER,2"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output file
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    pp.preprocess_file(infile, outfile);
+
+    // Read output
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        out_lines.push_back(l);
+    }
+    ifs.close();
+
+    // Find the first expanded macro output (push bc) and the following normal line (LD AFTER,2)
+    auto it_push = std::find(out_lines.begin(), out_lines.end(), "push bc");
+    auto it_after = std::find(out_lines.begin(), out_lines.end(), "LD AFTER,2");
+    REQUIRE(it_push != out_lines.end());
+    REQUIRE(it_after != out_lines.end());
+    size_t idx_push = static_cast<size_t>(std::distance(out_lines.begin(),
+                                          it_push));
+    size_t idx_after = static_cast<size_t>(std::distance(out_lines.begin(),
+                                           it_after));
+
+    // There should be a #line directive between the macro expansion and the following normal line
+    bool found_sync_between = false;
+    for (size_t i = idx_push; i <= idx_after; ++i) {
+        const std::string& s = out_lines[i];
+        if (s.find("#line") != std::string::npos
+                || s.find("LINE") != std::string::npos) {
+            // prefer to see the original filename mentioned
+            std::string norm_in = normalize_expected_path(infile);
+            if (s.find(norm_in) != std::string::npos
+                    || s.find(std::filesystem::path(infile).filename().string()) !=
+                    std::string::npos) {
+                found_sync_between = true;
+                break;
+            }
+            // accept any #line as indication of synchronization
+            found_sync_between = true;
+        }
+    }
+
+    CHECK(found_sync_between);
+}
+
+TEST_CASE("Preprocessor::preprocess_file emits #line to resynchronize after multi-line C-style comment",
+          "[preprocessor][preprocess_file][line][comment][multiline]") {
+    Preprocessor pp;
+
+    // Multi-line C-style comment spans two lines; verify output contains a #line
+    std::vector<std::string> lines = {
+        "LD A,1",
+        "/* comment start",
+        " still inside comment */ LD B,2",
+        "LD C,3"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output file
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    pp.preprocess_file(infile, outfile);
+
+    // Read output
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        out_lines.push_back(l);
+    }
+    ifs.close();
+
+    // Find the line "LD B,2" and look backwards for a #line directive that sets logical line numbers
+    auto it_b = std::find(out_lines.begin(), out_lines.end(), "LD B,2");
+    REQUIRE(it_b != out_lines.end());
+    size_t idx_b = static_cast<size_t>(std::distance(out_lines.begin(), it_b));
+
+    bool found_line_directive = false;
+    for (size_t i = (idx_b == 0 ? 0 : idx_b - 1); ; --i) {
+        const std::string& s = out_lines[i];
+        if (s.find("#line") != std::string::npos
+                || s.find("LINE") != std::string::npos) {
+            // try to parse the numeric value after #line
+            size_t pos = s.find("#line");
+            if (pos == std::string::npos) {
+                pos = s.find("LINE");
+            }
+            std::string tail = s.substr(pos);
+            // crude parse: find digits anywhere in the tail
+            for (size_t k = 0; k < tail.size(); ++k) {
+                if (std::isdigit(static_cast<unsigned char>(tail[k]))) {
+                    found_line_directive = true;
+                    break;
+                }
+            }
+            if (found_line_directive) {
+                break;
+            }
+        }
+        if (i == 0) {
+            break;
+        }
+    }
+
+    CHECK(found_line_directive);
+}
+

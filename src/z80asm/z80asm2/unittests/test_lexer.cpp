@@ -7,10 +7,145 @@
 #define CATCH_CONFIG_MAIN
 #include "../keywords.h"
 #include "../lexer.h"
-#include "../token.h"
 #include "catch_amalgamated.hpp"
 #include <sstream>
 #include <string>
+
+// Token class constructor / accessor tests
+TEST_CASE("Token constructors and read-only accessors", "[token]") {
+    SECTION("Default values from basic constructor") {
+        Token t(TokenType::Identifier, "foo");
+        CHECK(t.type() == TokenType::Identifier);
+        CHECK(t.text() == "foo");
+        CHECK(t.int_value() == 0);
+        CHECK(t.float_value() == 0.0);
+        CHECK(t.string_value().empty());
+        CHECK(t.op() == OperatorType::None);
+        CHECK(t.keyword() == Keyword::None);
+    }
+
+    SECTION("Integer-token constructor") {
+        Token t(TokenType::Integer, "123", 123);
+        CHECK(t.type() == TokenType::Integer);
+        CHECK(t.text() == "123");
+        CHECK(t.int_value() == 123);
+        // other fields remain default
+        CHECK(t.float_value() == 0.0);
+        CHECK(t.op() == OperatorType::None);
+    }
+
+    SECTION("Float-token constructor") {
+        Token t(TokenType::Float, "1.23", 1.23);
+        CHECK(t.type() == TokenType::Float);
+        CHECK(t.text() == "1.23");
+        CHECK(t.float_value() == Catch::Approx(1.23));
+        CHECK(t.int_value() == 0);
+    }
+
+    SECTION("Keyword-token constructor") {
+        Token t(TokenType::Identifier, "DEFINE", Keyword::DEFINE);
+        CHECK(t.type() == TokenType::Identifier);
+        CHECK(t.text() == "DEFINE");
+        CHECK(t.keyword() == Keyword::DEFINE);
+        // defaults
+        CHECK(t.op() == OperatorType::None);
+    }
+
+    SECTION("Operator-token constructor") {
+        Token t(TokenType::Operator, "+", OperatorType::Plus);
+        CHECK(t.type() == TokenType::Operator);
+        CHECK(t.text() == "+");
+        CHECK(t.op() == OperatorType::Plus);
+        CHECK(t.keyword() == Keyword::None);
+    }
+}
+
+// TokenizedLine tests
+TEST_CASE("TokenizedLine push/peek/advance/rewind/at_end", "[TokenizedLine]") {
+    TokenizedLine tl(42);
+    CHECK(tl.line_num() == 42);
+
+    // push three tokens
+    tl.push_back(Token(TokenType::Identifier, "foo"));
+    tl.push_back(Token(TokenType::Integer, "123", 123));
+    tl.push_back(Token(TokenType::Operator, "+", OperatorType::Plus));
+
+    // peek at tokens without advancing
+    const Token& t0 = tl.peek();
+    CHECK(t0.type() == TokenType::Identifier);
+    CHECK(t0.text() == "foo");
+
+    const Token& t1 = tl.peek(1);
+    CHECK(t1.type() == TokenType::Integer);
+    CHECK(t1.int_value() == 123);
+
+    const Token& t2 = tl.peek(2);
+    CHECK(t2.type() == TokenType::Operator);
+    CHECK(t2.op() == OperatorType::Plus);
+
+    // peek beyond end returns EOF token
+    const Token& te = tl.peek(3);
+    CHECK(te.type() == TokenType::EndOfFile);
+    CHECK(te.text() == "");
+
+    // at_end false initially
+    CHECK_FALSE(tl.at_end());
+
+    // advance and inspect progress
+    tl.advance(); // now at token 1
+    CHECK(tl.peek().text() == "123");
+    tl.advance(); // now at token 2
+    CHECK(tl.peek().text() == "+");
+
+    // advance to end
+    tl.advance();
+    CHECK(tl.at_end());
+    // advancing past end stays at end
+    tl.advance();
+    CHECK(tl.at_end());
+
+    // rewind resets position
+    tl.rewind();
+    CHECK_FALSE(tl.at_end());
+    CHECK(tl.peek().text() == "foo");
+}
+
+// TokenizedLine skip_spaces and to_string tests
+TEST_CASE("TokenizedLine skip_spaces and to_string", "[TokenizedLine]") {
+    TokenizedLine tl(10);
+
+    // tokens: " " "foo" "  " "123" "+"
+    tl.push_back(Token(TokenType::Whitespace, " "));
+    tl.push_back(Token(TokenType::Identifier, "foo"));
+    tl.push_back(Token(TokenType::Whitespace, "  "));
+    tl.push_back(Token(TokenType::Integer, "123", 123));
+    tl.push_back(Token(TokenType::Operator, "+", OperatorType::Plus));
+
+    // to_string should reconstruct original token texts in order
+    CHECK(tl.to_string() == " foo  123+");
+
+    // initially at first token (whitespace)
+    CHECK(tl.peek().type() == TokenType::Whitespace);
+    tl.skip_spaces();
+    // skip_spaces should move to the first non-whitespace token
+    CHECK(tl.peek().type() == TokenType::Identifier);
+    CHECK(tl.peek().text() == "foo");
+
+    // advance to whitespace after 'foo'
+    tl.advance();
+    CHECK(tl.peek().type() == TokenType::Whitespace);
+    tl.skip_spaces();
+    // now should be at integer token
+    CHECK(tl.peek().type() == TokenType::Integer);
+    CHECK(tl.peek().int_value() == 123);
+
+    // ensure skip_spaces moves to end when only whitespace tokens remain
+    TokenizedLine only_spaces(11);
+    only_spaces.push_back(Token(TokenType::Whitespace, " "));
+    only_spaces.push_back(Token(TokenType::Whitespace, "\t"));
+    only_spaces.skip_spaces();
+    CHECK(only_spaces.at_end());
+}
 
 TEST_CASE("scan_identifier extracts valid identifiers", "[read_identifier]") {
     std::string out;

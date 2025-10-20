@@ -14,6 +14,10 @@ endif
 CXX = g++
 CXXFLAGS = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror -O3
 
+# re2c: generate C/C++ sources from .re files
+RE2C ?= re2c
+RE2CFLAGS ?= -W --no-debug-info --no-generation-date 
+
 TEST_DIR = unittests
 
 SRCS := $(wildcard *.cpp)
@@ -56,6 +60,13 @@ $(TEST_DIR)/test_%$(EXE): $(TEST_DIR)/test_%.o $(COMMON_OBJS)
 
 $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+# Rule to produce .cpp from .re using re2c
+$(PROJ)$(EXE): scan.o
+
+scan.cpp: scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
+	dos2unix scan.cpp 2> /dev/null
 
 astyle:
 	$(ASTYLE)

@@ -6,7 +6,7 @@
 
 #include "assembler.h"
 #include "code_generator.h"
-#include "error_reporter.h"
+#include "errors.h"
 #include "lexer.h"
 #include "parser.h"
 #include "symbol_table.h"

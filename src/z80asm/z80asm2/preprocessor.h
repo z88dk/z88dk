@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "error_reporter.h"
+#include "errors.h"
 #include "keywords.h"
 #include "lexer.h"
 #include <deque>
@@ -17,13 +17,13 @@
 
 class Preprocessor {
 public:
-    Preprocessor(ErrorReporter& reporter);
+    Preprocessor();
 
     // Open the main file and start processing
     bool open(const std::string& filename);
 
     // Get the next preprocessed line, returns false at EOF
-    bool next_line(std::string& out_line, Location& out_location);
+    bool next_line(std::string& out_line);
 
     // Add a directory to the include search path (ordered)
     void add_include_path(const std::string& path);
@@ -48,13 +48,16 @@ public:
     // Callback to ask the assembler whether a given symbol name is defined.
     // This is used by IFDEF/IFNDEF/ELIFDEF/ELIFNDEF to consider both preprocessor
     // macros and assembler symbols as "defined".
-    using SymbolDefinedCallback =
-        std::function<bool(const std::string& name, const Location& loc)>;
+    using SymbolDefinedCallback = std::function<bool(const std::string& name)>;
 
     // Register the assembler-provided symbol-defined predicate. Can be nullptr to disable.
     void set_symbol_defined_callback(SymbolDefinedCallback cb) {
         symbol_defined_callback_ = std::move(cb);
     }
+
+    // preprocess one input file, generate file.i
+    void preprocess_file(const std::string& input_filename,
+                         const std::string& output_filename);
 
 private:
     static const inline int MAX_MACRO_RECURSION = 32;
@@ -99,17 +102,14 @@ private:
         bool active = true;
         // else already encountered -> further elif/else invalid
         bool else_seen = false;
-        // location where IF started (for diagnostics)
-        Location location;
 
         IfEntry() = default;
 
-        IfEntry(bool a, const Location& loc) :
-            any_branch_taken(a), active(a), else_seen(false), location(loc) {}
+        IfEntry(bool a) :
+            any_branch_taken(a), active(a), else_seen(false) {}
     };
 
     // member data
-    ErrorReporter& reporter_;
     std::vector<InputFile> file_stack_;
     std::unordered_map<std::string, Macro> macros_;
     std::deque<std::string> split_queue_;
@@ -117,6 +117,7 @@ private:
     std::vector<std::string> include_paths_;
     EvalCallback eval_callback_;
     SymbolDefinedCallback symbol_defined_callback_;
+    Location line_location_;    // set by #LINE / #C_LINE directives
 
     // Resolve an include/binary filename using include paths and the current file's directory.
     // Returns a normalized absolute path if found, or an empty string if not found.
@@ -134,18 +135,18 @@ private:
 
     // Process directives
     bool is_directive(const char*& p, Keyword& keyword) const;
-    bool process_directive(Keyword keyword, const char*& p, Location& location);
-    bool process_include(const char*& p, Location& location);
-    bool process_define(const char*& p, Location& location);
-    bool process_defl(const char*& p, Location& location);
-    bool process_undef(const char*& p, Location& location);
-    bool process_line(const char*& p, Location& location);
-    bool process_c_line(const char*& p, Location& location);
-    bool process_rept(const char*& p, Location& location);
-    bool process_reptc(const char*& p, Location& location);
-    bool process_repti(const char*& p, Location& location);
-    bool process_macro(const char*& p, Location& location);
-    bool process_binary(const char*& p, Location& location);
+    bool process_directive(Keyword keyword, const char*& p);
+    bool process_include(const char*& p);
+    bool process_define(const char*& p);
+    bool process_defl(const char*& p);
+    bool process_undef(const char*& p);
+    bool process_line(const char*& p);
+    bool process_c_line(const char*& p);
+    bool process_rept(const char*& p);
+    bool process_reptc(const char*& p);
+    bool process_repti(const char*& p);
+    bool process_macro(const char*& p);
+    bool process_binary(const char*& p);
 
     // Checks for "name DIRECTIVE value" syntax.
     // If found, sets 'name' and 'keyword' and returns true. Advances 'p' past the directive.
@@ -282,10 +283,10 @@ private:
     // after the directive. If 'name' is null the normal syntax
     // (`REPTC var, arg`) is used and `p` should point after the directive.
     bool do_reptc_common(const char*& p,
-                         const std::string* name, Location& location);
+                         const std::string* name);
 
     bool do_repti_common(const char*& p,
-                         const std::string* name, Location& location);
+                         const std::string* name);
 
     // Parse a constant expression from the text starting at p.
     // Expands any macros in the text first, then scans the expanded text
@@ -298,21 +299,23 @@ private:
     // Implemented so directives themselves are always processed (to keep nesting),
     // while non-control directives and normal lines are skipped when any enclosing
     // condition is inactive.
-    bool process_if(const char*& p, Location& location);
-    bool process_elif(const char*& p, Location& location);
-    bool process_ifdef(const char*& p, Location& location);
-    bool process_ifndef(const char*& p, Location& location);
-    bool process_elifdef(const char*& p, Location& location);
-    bool process_elifndef(const char*& p, Location& location);
-    bool process_else(const char*& p, Location& location);
-    bool process_endif(const char*& p, Location& location);
+    bool process_if(const char*& p);
+    bool process_elif(const char*& p);
+    bool process_ifdef(const char*& p);
+    bool process_ifndef(const char*& p);
+    bool process_elifdef(const char*& p);
+    bool process_elifndef(const char*& p);
+    bool process_else(const char*& p);
+    bool process_endif(const char*& p);
 
     // Helper: test whether the given name is considered "defined".
     // Returns true if either a preprocessor macro exists or the optional
     // assembler-provided symbol-defined callback reports the name as defined.
-    bool is_name_defined(const std::string& name, const Location& loc) const;
+    bool is_name_defined(const std::string& name) const;
 
     // Helper to test whether all enclosing IFs are currently active (true).
     bool ifs_all_active() const;
 
 };
+
+void preprocess_only();

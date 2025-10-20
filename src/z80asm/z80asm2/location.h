@@ -11,16 +11,22 @@
 class Location {
 public:
     Location(const std::string& filename = "", int line_num = 0);
+    void clear();
+    bool empty() const;
 
-    const std::string& filename() const;
-    int line_num() const;
-    const std::string& source_line() const;
-    const std::string& expanded_line() const;
+    const std::string& filename() const {
+        return filename_;
+    }
+    int line_num() const {
+        return line_num_;
+    }
 
-    void set_filename(const std::string& filename);
-    void set_line_num(int line_num);
-    void set_source_line(const std::string& line);
-    void set_expanded_line(const std::string& line);
+    void set_filename(const std::string& filename) {
+        filename_ = filename;
+    }
+    void set_line_num(int line_num) {
+        line_num_ = line_num;
+    }
 
     // Computes and sets the logical line number based on #line directive
     void set_logical_line_num(int line_directive_value,
@@ -35,15 +41,12 @@ public:
 
     // Control whether inc_line_num actually increments the stored number.
     // Default is true. Virtual files (macro expansions) can disable increments.
-    void set_increment_line_numbers(bool enable);
-    bool increment_line_numbers() const;
+    void set_inc_line_nums(bool enable);
 
 private:
     std::string filename_;
     int line_num_ = 0;
-    std::string source_line_;
-    std::string expanded_line_;
-    bool increment_line_numbers_ = true;
+    bool inc_line_nums_ = true;
 };
 
 

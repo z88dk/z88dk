@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "error_reporter.h"
+#include "errors.h"
 #include "preprocessor.h"
 #include "symbol_table.h"
 #include <cstdint>
@@ -31,8 +31,7 @@ public:
 private:
     // Components used by the assembler. Minimal placeholders here so the
     // assembler can register the evaluation callback for the preprocessor.
-    ErrorReporter errors_;
-    Preprocessor preprocessor_{ errors_ };
+    Preprocessor preprocessor_;
     SymbolTable symbols_;
 
     // Callback invoked by Preprocessor when it cannot evaluate a constant
