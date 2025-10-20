@@ -1,6 +1,8 @@
 
 ; Macro file to help harmonise code
 
+; Support a 8x4 font
+; defc MC6857_SUPPORT_8x4_FONT = 1
 
 IF FORphc25
     INCLUDE "target/phc25/def/phc25.def"

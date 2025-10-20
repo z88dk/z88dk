@@ -19,14 +19,17 @@ generic_console_gfx_xypos_MODE1:
     ld      a,(__console_font_h)
     cp      6
     jr      z,handle_6
+IF MC6857_SUPPORT_8x4_FONT
     cp      4
     jr      z,handle_4
+ENDIF
     ;; Just fall through to 8
 handle_8:          
     GETSCREENADDRESS
     add     hl,bc
     ret
 
+IF MC6857_SUPPORT_8x4_FONT
 handle_4:
     ; We need to multiple the row by 128
     ld      h,b
@@ -38,6 +41,7 @@ handle_4:
     GETSCREENADDRESS_bc
     add     hl,bc
     ret
+ENDIF
 
 handle_6:
     ; We need to multiple the row by 192

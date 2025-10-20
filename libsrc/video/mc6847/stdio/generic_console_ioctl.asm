@@ -74,9 +74,11 @@ check_font_h:
     ld      b,MC6847_HIRES_YRES/8
     cp      8
     jr      z,set_fonth
+IF MC6857_SUPPORT_8x4_FONT
     ld      b,MC6847_HIRES_YRES/4
     cp      4
     jr      z,set_fonth
+ENDIF
     cp      6
     jr      nz,failure
     ld      b,MC6847_HIRES_YRES/6
