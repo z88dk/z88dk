@@ -102,11 +102,18 @@ define run-tests
   )
 endef
 
-test:: $(TEST_BINS)
+test:: $(TEST_BINS) $(TEST_OBJS)
 	$(call run-tests,$(TEST_BINS))
 
 test:: $(PROJ)$(EXE)
 	$(PERL) -S prove --state=slow,save t/*.t
+
+# Rule to produce .cpp from .re using re2c
+$(PROJ)$(EXE): scan.o
+
+scan.cpp: scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
+	dos2unix scan.cpp 2> /dev/null
 
 astyle:
 	$(ASTYLE)
