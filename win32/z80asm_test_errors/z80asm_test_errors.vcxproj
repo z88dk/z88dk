@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d6a521fb-f4b7-4073-b127-347c5fcba503}</ProjectGuid>
-    <RootNamespace>z80asmtesterrorreporter</RootNamespace>
+    <ProjectGuid>{13908832-02b4-4b56-b046-b44cb291200b}</ProjectGuid>
+    <RootNamespace>z80asmtesterrors</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,13 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\error_reporter.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_error_reporter.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.hpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_errors.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

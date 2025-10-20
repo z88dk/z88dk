@@ -12,6 +12,9 @@
 static const int IS_DIRECTIVE = 1 << 0;
 static const int IS_NAME_DIRECTIVE = 1 << 1;
 static const int IS_CONDITIONAL_DIRECTIVE = 1 << 2;
+static const int IS_REGISTER = 1 << 3;
+static const int IS_FLAG = 1 << 4;
+static const int IS_OPCODE = 1 << 5;
 
 #define X(id, text, flags) id,
 enum class Keyword {
@@ -21,19 +24,15 @@ enum class Keyword {
 #undef X
 
 // Convert string to Keyword enum, returns Keyword::None if not found
-Keyword to_keyword(const std::string& s);
+Keyword keyword_lookup(const std::string& s);
 std::string keyword_to_string(Keyword kw);
 
 // Check if a keyword type
 bool keyword_is_directive(Keyword kw);
 bool keyword_is_name_directive(Keyword kw);
 bool keyword_is_conditional_directive(Keyword kw);
+bool keywrord_is_register(Keyword kw);
+bool keyword_is_flag(Keyword kw);
+bool keyword_is_opcode(Keyword kw);
 
-// Convert string to upper/lower case
-std::string to_upper(const std::string& s);
-std::string to_lower(const std::string& s);
 
-// trim whitspace at the beginnint and at the end
-std::string ltrim(const std::string& s);
-std::string rtrim(const std::string& s);
-std::string trim(const std::string& s);

@@ -4,9 +4,11 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
+BEGIN { use lib 't'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
 
 ok 1;
 
+unlink_testfiles if Test::More->builder->is_passing;
 done_testing;

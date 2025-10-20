@@ -106,6 +106,13 @@ test:: $(TEST_BINS) $(TEST_OBJS)
 test:: $(PROJ)$(EXE)
 	$(PERL) -S prove --state=slow,save t/*.t
 
+# Rule to produce .cpp from .re using re2c
+$(PROJ)$(EXE): scan.o
+
+scan.cpp: scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
+	$(DOS2UNIX) scan.cpp
+
 astyle:
 	$(ASTYLE)
 

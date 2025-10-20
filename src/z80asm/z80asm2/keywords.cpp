@@ -5,11 +5,12 @@
 //-----------------------------------------------------------------------------
 
 #include "keywords.h"
+#include "utils.h"
 #include <algorithm>
 #include <unordered_map>
 
 #define X(id, text, flags) { text, Keyword::id },
-Keyword to_keyword(const std::string& s) {
+Keyword keyword_lookup(const std::string& s) {
     static const std::unordered_map<std::string, Keyword> keyword_map = {
 #include "keywords.def"
     };
@@ -50,29 +51,18 @@ bool keyword_is_conditional_directive(Keyword kw) {
     return (flags & IS_CONDITIONAL_DIRECTIVE) != 0;
 }
 
-std::string to_upper(const std::string& s) {
-    std::string result = s;
-    std::transform(result.begin(), result.end(), result.begin(), ::toupper);
-    return result;
+bool keywrord_is_register(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_REGISTER) != 0;
 }
 
-std::string to_lower(const std::string& s) {
-    std::string result = s;
-    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
-    return result;
+bool keyword_is_flag(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_FLAG) != 0;
 }
 
-std::string ltrim(const std::string& s) {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    return (start == std::string::npos) ? "" : s.substr(start);
-}
-
-std::string rtrim(const std::string& s) {
-    size_t end = s.find_last_not_of(" \t\r\n");
-    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
-}
-
-std::string trim(const std::string& s) {
-    return ltrim(rtrim(s));
+bool keyword_is_opcode(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_OPCODE) != 0;
 }
 
