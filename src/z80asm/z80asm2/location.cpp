@@ -7,47 +7,24 @@
 #include "location.h"
 
 Location::Location(const std::string& filename, int line_num)
-    : filename_(filename), line_num_(line_num), increment_line_numbers_(true) {
+    : filename_(filename), line_num_(line_num), inc_line_nums_(true) {
 }
 
-const std::string& Location::filename() const {
-    return filename_;
+void Location::clear() {
+    filename_.clear();
+    line_num_ = 0;
+    inc_line_nums_ = true;
 }
 
-int Location::line_num() const {
-    return line_num_;
-}
-
-const std::string& Location::source_line() const {
-    return source_line_;
-}
-
-const std::string& Location::expanded_line() const {
-    return expanded_line_;
-}
-
-void Location::set_filename(const std::string& filename) {
-    filename_ = filename;
-}
-
-void Location::set_line_num(int line_num) {
-    line_num_ = line_num;
-}
-
-void Location::set_source_line(const std::string& line) {
-    source_line_ = line;
-    expanded_line_.clear();
-}
-
-void Location::set_expanded_line(const std::string& line) {
-    expanded_line_ = line;
+bool Location::empty() const {
+    return filename_.empty() && line_num_ == 0;
 }
 
 // Computes and sets the logical line number based on #line directive
 void Location::set_logical_line_num(int line_directive_value,
                                     int line_directive_physical_line,
                                     int physical_line_num) {
-    if (increment_line_numbers_) {
+    if (inc_line_nums_) {
         // #line N means the *next* physical line is N
         int logical = line_directive_value +
                       (physical_line_num - line_directive_physical_line) - 1;
@@ -62,16 +39,12 @@ void Location::set_physical_line_num(int physical_line_num) {
 
 // Increments the logical line number (only when enabled)
 void Location::inc_line_num() {
-    if (increment_line_numbers_) {
+    if (inc_line_nums_) {
         ++line_num_;
     }
 }
 
-void Location::set_increment_line_numbers(bool enable) {
-    increment_line_numbers_ = enable;
-}
-
-bool Location::increment_line_numbers() const {
-    return increment_line_numbers_;
+void Location::set_inc_line_nums(bool enable) {
+    inc_line_nums_ = enable;
 }
 
