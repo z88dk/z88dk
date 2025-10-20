@@ -30,7 +30,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\error_reporter.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp">
@@ -71,7 +71,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\code_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\error_reporter.h">
+    <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h">
@@ -100,7 +100,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\z80asm\z80asm2\error_codes.def">
+    <None Include="..\..\src\z80asm\z80asm2\errors.def">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\src\z80asm\z80asm2\keywords.def">

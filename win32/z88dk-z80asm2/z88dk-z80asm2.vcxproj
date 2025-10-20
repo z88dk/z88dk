@@ -131,7 +131,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\ast_node.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\error_reporter.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
@@ -147,7 +147,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\ast_node.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\code_generator.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\error_reporter.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
@@ -158,7 +158,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\token.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\z80asm\z80asm2\error_codes.def" />
+    <None Include="..\..\src\z80asm\z80asm2\errors.def" />
     <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

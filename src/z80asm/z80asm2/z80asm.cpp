@@ -5,21 +5,21 @@
 //-----------------------------------------------------------------------------
 
 #include <iostream>
-#include "error_reporter.h"
+#include "errors.h"
 #include "preprocessor.h"
 
-ErrorReporter error_reporter;
+Errors error_reporter;
 
 int main() {
-    Preprocessor pp(error_reporter);
+    Preprocessor pp;
     if (!pp.open("main.asm")) {
         exit(EXIT_FAILURE);
     }
     std::string line;
-    Location loc;
-    while (pp.next_line(line, loc)) {
-        // Pass line and loc to assembler
-        std::cout << loc.filename() << ":" << loc.line_num() << ": "
+    while (pp.next_line(line)) {
+        // Pass line assembler
+        std::cout << g_errors.filename() << ":"
+                  << g_errors.line_num() << ": "
                   << line << std::endl;
     }
 }

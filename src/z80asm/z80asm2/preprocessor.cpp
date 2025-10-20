@@ -26,9 +26,7 @@ static std::string resolve_include_candidate(const std::string& filename,
         const std::vector<std::string>& include_paths,
         const std::string& current_dir);
 
-Preprocessor::Preprocessor(ErrorReporter& reporter)
-    : reporter_(reporter) {
-}
+Preprocessor::Preprocessor() = default;
 
 void Preprocessor::add_include_path(const std::string& path) {
     // Store as given; resolution will use std::filesystem when searching.
@@ -42,15 +40,16 @@ bool Preprocessor::open(const std::string& filename) {
     if_stack_.clear();
 
     push_file(filename);
+    g_errors.set_location(Location(filename));
     return !file_stack_.empty();
 }
 
-bool Preprocessor::next_line(std::string& out_line,
-                             Location& out_location) {
+bool Preprocessor::next_line(std::string& out_line) {
     while (true) {
         if (!split_queue_.empty()) {
             out_line = split_queue_.front();
             split_queue_.pop_front();
+            g_errors.set_expanded_line(out_line);
             return true;
         }
 
@@ -70,9 +69,8 @@ bool Preprocessor::next_line(std::string& out_line,
                     file.location.set_physical_line_num(physical_line_num);
                 }
 
-                out_location = file.location;
-                out_location.set_source_line(
-                    file.lines[file.line_index].text);
+                g_errors.set_location(file.location);
+                g_errors.set_source_line(file.lines[file.line_index].text);
 
                 std::string line = remove_comments(file);
                 if (line.empty()) {
@@ -90,21 +88,25 @@ bool Preprocessor::next_line(std::string& out_line,
                     // C_LINE's "don't increment" behaviour here.
                     if (keyword == Keyword::LINE ||
                             keyword == Keyword::C_LINE) {
-                        if (process_directive(keyword, p, out_location)) {
+                        if (process_directive(keyword, p)) {
                             // #line / #c_line directive: update file.location
                             // for future lines
-                            file.location = out_location;
+                            if (line_location_.filename().empty()) {
+                                line_location_.set_filename(file.location.filename());
+                            }
+
+                            file.location = line_location_;
                             file.line_directive_active = true;
                             // Track the value and physical line for #line / #c_line
                             file.line_directive_value =
-                                out_location.line_num();
+                                line_location_.line_num();
                             file.line_directive_physical_line =
                                 physical_line_num;
                             continue;
                         }
                     }
                     else {
-                        if (process_directive(keyword, p, out_location)) {
+                        if (process_directive(keyword, p)) {
                             continue;
                         }
                     }
@@ -129,13 +131,15 @@ bool Preprocessor::next_line(std::string& out_line,
                     continue;
                 }
 
-                out_location.set_expanded_line(expanded);
+                g_errors.set_expanded_line(expanded);
 
                 std::vector<std::string> split_lines_vec;
                 split_lines(expanded, split_lines_vec);
 
                 if (!split_lines_vec.empty()) {
                     out_line = split_lines_vec[0];
+                    g_errors.set_expanded_line(out_line);
+
                     for (size_t i = 1; i < split_lines_vec.size(); ++i) {
                         split_queue_.push_back(split_lines_vec[i]);
                     }
@@ -228,7 +232,7 @@ bool Preprocessor::read_file(const std::string& filename,
                              std::vector<LogicalLine>& lines) {
     std::ifstream in(filename.c_str(), std::ios::binary);
     if (!in) {
-        reporter_.error(ErrorCode::FileNotFound, filename);
+        g_errors.error(ErrorCode::FileNotFound, filename);
         return false;
     }
 
@@ -283,7 +287,7 @@ void Preprocessor::push_file(const std::string& filename) {
 
     // Check for recursive include using the new member function
     if (is_recursive_include(resolved)) {
-        reporter_.error(ErrorCode::RecursiveInclude, filename);
+        g_errors.error(ErrorCode::RecursiveInclude, filename);
         return;
     }
 
@@ -345,8 +349,7 @@ bool Preprocessor::is_directive(const char*& p, Keyword& keyword) const {
     }
 }
 
-bool Preprocessor::process_directive(Keyword keyword, const char*& p,
-                                     Location& location) {
+bool Preprocessor::process_directive(Keyword keyword, const char*& p) {
 
     // Skip leading whitespace
     skip_whitespace(p);
@@ -356,21 +359,21 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
     if (keyword_is_conditional_directive(keyword)) {
         switch (keyword) {
         case Keyword::IF:
-            return process_if(p, location);
+            return process_if(p);
         case Keyword::IFDEF:
-            return process_ifdef(p, location);
+            return process_ifdef(p);
         case Keyword::IFNDEF:
-            return process_ifndef(p, location);
+            return process_ifndef(p);
         case Keyword::ELIF:
-            return process_elif(p, location);
+            return process_elif(p);
         case Keyword::ELIFDEF:
-            return process_elifdef(p, location);
+            return process_elifdef(p);
         case Keyword::ELIFNDEF:
-            return process_elifndef(p, location);
+            return process_elifndef(p);
         case Keyword::ELSE:
-            return process_else(p, location);
+            return process_else(p);
         case Keyword::ENDIF:
-            return process_endif(p, location);
+            return process_endif(p);
         default:
             assert(0);
             return false; // not reached
@@ -387,25 +390,25 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
     // now check the other directives
     switch (keyword) {
     case Keyword::INCLUDE:
-        return process_include(p, location);
+        return process_include(p);
     case Keyword::DEFINE:
-        return process_define(p, location);
+        return process_define(p);
     case Keyword::DEFL:
-        return process_defl(p, location);
+        return process_defl(p);
     case Keyword::UNDEF:
-        return process_undef(p, location);
+        return process_undef(p);
     case Keyword::LINE:
-        return process_line(p, location);
+        return process_line(p);
     case Keyword::C_LINE:
-        return process_c_line(p, location);
+        return process_c_line(p);
     case Keyword::MACRO:
-        return process_macro(p, location);
+        return process_macro(p);
     case Keyword::REPT:
-        return process_rept(p, location);
+        return process_rept(p);
     case Keyword::REPTC:
-        return process_reptc(p, location);
+        return process_reptc(p);
     case Keyword::REPTI:
-        return process_repti(p, location);
+        return process_repti(p);
     case Keyword::EXITM:
         // If we are inside a macro virtual file, EXITM aborts the current macro expansion.
         if (!file_stack_.empty()) {
@@ -417,12 +420,12 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
             }
         }
         // If not in a macro file, just ignore (or report warning)
-        reporter_.warning(location, ErrorCode::InvalidSyntax,
-                          "ENDM outside of macro epansion");
+        g_errors.warning(ErrorCode::InvalidSyntax,
+                         "ENDM outside of macro epansion");
         return true;
     case Keyword::BINARY:
     case Keyword::INCBIN:
-        return process_binary(p, location);
+        return process_binary(p);
     default:
         assert(0);
         return false; // not reached
@@ -434,14 +437,14 @@ bool Preprocessor::process_directive(Keyword keyword, const char*& p,
 // Example:
 //   DEFL var = var+1   // -> var becomes "+1"
 //   DEFL var = var+1   // -> var becomes "+1+1"
-bool Preprocessor::process_defl(const char*& p, Location& location) {
+bool Preprocessor::process_defl(const char*& p) {
     skip_whitespace(p);
 
     // Parse macro name
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed DEFL directive (missing name)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed DEFL directive (missing name)");
         return true;
     }
 
@@ -449,8 +452,8 @@ bool Preprocessor::process_defl(const char*& p, Location& location) {
 
     // Expect '='
     if (*p != '=') {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed DEFL directive (missing '=')");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed DEFL directive (missing '=')");
         return true;
     }
     ++p; // skip '='
@@ -560,13 +563,13 @@ static std::string resolve_include_candidate(const std::string& filename,
     return std::string();
 }
 
-bool Preprocessor::process_include(const char*& p, Location& location) {
+bool Preprocessor::process_include(const char*& p) {
     skip_whitespace(p);
 
     std::string filename;
     bool is_angle = false;
     if (!scan_filename_from_p(p, filename, is_angle)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax, "Empty INCLUDE filename");
+        g_errors.error(ErrorCode::InvalidSyntax, "Empty INCLUDE filename");
         return true;
     }
 
@@ -575,7 +578,7 @@ bool Preprocessor::process_include(const char*& p, Location& location) {
 
     if (resolved.empty()) {
         // Not found -> report using original filename (as before)
-        reporter_.error(location, ErrorCode::FileNotFound, filename);
+        g_errors.error(ErrorCode::FileNotFound, filename);
         return true;
     }
 
@@ -583,14 +586,14 @@ bool Preprocessor::process_include(const char*& p, Location& location) {
     return true;
 }
 
-bool Preprocessor::process_define(const char*& p, Location& location) {
+bool Preprocessor::process_define(const char*& p) {
     skip_whitespace(p);
 
     // Parse macro name
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed DEFINE directive");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed DEFINE directive");
         return true;
     }
 
@@ -608,8 +611,8 @@ bool Preprocessor::process_define(const char*& p, Location& location) {
             }
             std::string param;
             if (!scan_identifier(p, param)) {
-                reporter_.error(location, ErrorCode::InvalidSyntax,
-                                "Malformed macro parameter list");
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               "Malformed macro parameter list");
                 return true;
             }
             params.push_back(param);
@@ -628,13 +631,13 @@ bool Preprocessor::process_define(const char*& p, Location& location) {
     return process_name_define(p, name, params);
 }
 
-bool Preprocessor::process_undef(const char*& p, Location& location) {
+bool Preprocessor::process_undef(const char*& p) {
     skip_whitespace(p);
 
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed UNDEF directive");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed UNDEF directive");
         return true;
     }
 
@@ -642,14 +645,14 @@ bool Preprocessor::process_undef(const char*& p, Location& location) {
     return true;
 }
 
-bool Preprocessor::process_line(const char*& p, Location& location) {
+bool Preprocessor::process_line(const char*& p) {
     skip_whitespace(p);
 
     // Parse line number
     int new_line = 0;
     if (!scan_integer(p, new_line)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed LINE directive (missing line number)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed LINE directive (missing line number)");
         return true;
     }
 
@@ -661,24 +664,25 @@ bool Preprocessor::process_line(const char*& p, Location& location) {
     // filename is optional; we ignore the return value - on failure `p` is restored
     scan_filename_from_p(p, filename, is_angle);
 
+    line_location_.clear();
     if (new_line > 0) {
-        location.set_line_num(new_line);
+        line_location_.set_line_num(new_line);
     }
     if (!filename.empty()) {
-        location.set_filename(filename);
+        line_location_.set_filename(filename);
     }
 
     return true;
 }
 
-bool Preprocessor::process_c_line(const char*& p, Location& location) {
+bool Preprocessor::process_c_line(const char*& p) {
     skip_whitespace(p);
 
     // Parse line number
     int new_line = 0;
     if (!scan_integer(p, new_line)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed C_LINE directive (missing line number)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed C_LINE directive (missing line number)");
         return true;
     }
 
@@ -690,17 +694,18 @@ bool Preprocessor::process_c_line(const char*& p, Location& location) {
     // filename is optional; we ignore the return value - on failure `p` is restored
     scan_filename_from_p(p, filename, is_angle);
 
+    line_location_.clear();
     if (new_line > 0) {
-        location.set_line_num(new_line);
+        line_location_.set_line_num(new_line);
     }
     if (!filename.empty()) {
-        location.set_filename(filename);
+        line_location_.set_filename(filename);
     }
 
     // C_LINE: disable incrementing logical line numbers while in effect.
     // Do not modify file_stack_ here; next_line's directive handling will
     // persist the Location into the InputFile (and we handle disabling there).
-    location.set_increment_line_numbers(false);
+    line_location_.set_inc_line_nums(false);
 
     return true;
 }
@@ -859,8 +864,8 @@ bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
     if (*p == '(' && after_directive == p) {
         if (!parse_param_list_parenthesized(p, params)) {
             if (!file_stack_.empty()) {
-                reporter_.error(file_stack_.back().location, ErrorCode::InvalidSyntax,
-                                "Malformed MACRO parameter list (name-first form)");
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               "Malformed MACRO parameter list (name-first form)");
             }
             return true;
         }
@@ -870,8 +875,8 @@ bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
     }
 
     if (file_stack_.empty()) {
-        reporter_.error(ErrorCode::FileNotFound,
-                        "Internal: no input file during MACRO definition (name-first)");
+        g_errors.error(ErrorCode::FileNotFound,
+                       "Internal: no input file during MACRO definition (name-first)");
         return true;
     }
 
@@ -885,19 +890,11 @@ bool Preprocessor::process_name_macro(const char*& p, const std::string& name) {
 }
 
 bool Preprocessor::process_name_reptc(const char*& p, const std::string& name) {
-    static Location dummy_location;
-    return do_reptc_common(p, &name,
-                           file_stack_.empty() ?
-                           dummy_location :
-                           file_stack_.back().location);
+    return do_reptc_common(p, &name);
 }
 
 bool Preprocessor::process_name_repti(const char*& p, const std::string& name) {
-    static Location dummy_location;
-    return do_repti_common(p, &name,
-                           file_stack_.empty() ?
-                           dummy_location :
-                           file_stack_.back().location);
+    return do_repti_common(p, &name);
 }
 
 bool Preprocessor::process_name_equ(const char*& p, const std::string& name) {
@@ -908,23 +905,9 @@ bool Preprocessor::process_name_equ(const char*& p, const std::string& name) {
     std::string rhs = p;
     rhs = rtrim(rhs);
 
-    // Determine location for error reporting if needed
-    Location loc;
-    bool have_loc = false;
-    if (!file_stack_.empty()) {
-        loc = file_stack_.back().location;
-        have_loc = true;
-    }
-
     if (rhs.empty()) {
-        if (have_loc) {
-            reporter_.error(loc, ErrorCode::InvalidSyntax,
-                            "Malformed EQU directive (missing RHS)");
-        }
-        else {
-            reporter_.error(ErrorCode::InvalidSyntax,
-                            "Malformed EQU directive (missing RHS)");
-        }
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed EQU directive (missing RHS)");
         return true;
     }
 
@@ -949,7 +932,7 @@ bool Preprocessor::process_name_equ(const char*& p, const std::string& name) {
     virt.line_index = 0;
     virt.location = Location(virt.filename, 0);
     // Do not advance the parent's logical line number when this virtual file is processed.
-    virt.location.set_increment_line_numbers(false);
+    virt.location.set_inc_line_nums(false);
     virt.line_directive_active = false;
     virt.is_macro_expansion = false;
 
@@ -1340,7 +1323,8 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string>
+Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1516,14 +1500,14 @@ void Preprocessor::split_lines(const std::string& line,
 // Process multi-line macro definition:
 // Syntax: MACRO name [ (param,...) | param1, param2, ... ]
 // The lines up to ENDM (directive) are stored tokenized as body_lines.
-bool Preprocessor::process_macro(const char*& p, Location& location) {
+bool Preprocessor::process_macro(const char*& p) {
     skip_whitespace(p);
 
     // Parse macro name
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed MACRO directive (missing name)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed MACRO directive (missing name)");
         return true;
     }
 
@@ -1534,8 +1518,8 @@ bool Preprocessor::process_macro(const char*& p, Location& location) {
     if (*p == '(' && after_name == p) {
         // Parenthesized form with no whitespace between name and '('
         if (!parse_param_list_parenthesized(p, params)) {
-            reporter_.error(location, ErrorCode::InvalidSyntax,
-                            "Malformed macro parameter list");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Malformed macro parameter list");
             return true;
         }
     }
@@ -1546,8 +1530,8 @@ bool Preprocessor::process_macro(const char*& p, Location& location) {
 
     // Now read lines from the current input file until ENDM is found.
     if (file_stack_.empty()) {
-        reporter_.error(location, ErrorCode::FileNotFound,
-                        "Internal: no input file during MACRO definition");
+        g_errors.error(ErrorCode::FileNotFound,
+                       "Internal: no input file during MACRO definition");
         return true;
     }
 
@@ -1561,21 +1545,21 @@ bool Preprocessor::process_macro(const char*& p, Location& location) {
     return true;
 }
 
-bool Preprocessor::process_binary(const char*& p, Location& location) {
+bool Preprocessor::process_binary(const char*& p) {
     skip_whitespace(p);
 
     std::string filename;
     bool is_angle = false;
     if (!scan_filename_from_p(p, filename, is_angle)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed BINARY/INCBIN directive (missing filename)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed BINARY/INCBIN directive (missing filename)");
         return true;
     }
 
     // Resolve binary path using the same semantics as include (current file dir, include paths, CWD, etc.)
     std::string resolved = resolve_include_path(filename, is_angle);
     if (resolved.empty()) {
-        reporter_.error(location, ErrorCode::FileNotFound, filename);
+        g_errors.error(ErrorCode::FileNotFound, filename);
         return true;
     }
 
@@ -1583,7 +1567,7 @@ bool Preprocessor::process_binary(const char*& p, Location& location) {
     std::ifstream in(resolved.c_str(), std::ios::binary);
     if (!in) {
         // Report file-not-found using location for context
-        reporter_.error(location, ErrorCode::FileNotFound, resolved);
+        g_errors.error(ErrorCode::FileNotFound, resolved);
         return true;
     }
 
@@ -1817,7 +1801,8 @@ int Preprocessor::get_invocation_physical_line_num() const {
 }
 
 // Build virtual logical lines for a macro using combined_param_map and a physical line number.
-std::vector<Preprocessor::LogicalLine> Preprocessor::build_virt_lines_from_macro(
+std::vector<Preprocessor::LogicalLine>
+Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
     int phys_line_num
@@ -1872,7 +1857,7 @@ void Preprocessor::push_virtual_macro_file(const std::string& name,
     // with the invocation filename when available so Location reports the
     // original source file where the macro was invoked.
     virt.location = Location(virt.filename, 0);
-    virt.location.set_increment_line_numbers(false);
+    virt.location.set_inc_line_nums(false);
     virt.line_directive_active = false;
     virt.is_macro_expansion = true;
 
@@ -1931,8 +1916,8 @@ bool Preprocessor::read_raw_block_until(Keyword endDirective,
 
     // EOF reached without endDirective
     std::string name = keyword_to_string(endDirective);
-    reporter_.error(file.location, ErrorCode::InvalidSyntax,
-                    "Missing " + name);
+    g_errors.error(ErrorCode::InvalidSyntax,
+                   "Missing " + name);
     return false;
 }
 
@@ -2037,7 +2022,7 @@ void Preprocessor::push_macro_and_suffix_files(const std::string& name,
         suffix_virt.lines.push_back(LogicalLine{ suffix, phys_line_num });
         suffix_virt.line_index = 0;
         suffix_virt.location = Location(suffix_virt.filename, 0);
-        suffix_virt.location.set_increment_line_numbers(false);
+        suffix_virt.location.set_inc_line_nums(false);
         suffix_virt.line_directive_active = false;
         suffix_virt.is_macro_expansion = false;
 
@@ -2057,14 +2042,14 @@ void Preprocessor::push_macro_and_suffix_files(const std::string& name,
 
 // REPT directive: REPT <count> ... ENDR
 // Count must be a constant integer. If not, report error and skip block.
-bool Preprocessor::process_rept(const char*& p, Location& location) {
+bool Preprocessor::process_rept(const char*& p) {
     skip_whitespace(p);
 
     int count = 0;
     if (!get_constant_value(p, count)) {
         // Non-constant count -> report error and skip until ENDR
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "REPT requires a constant integer count");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "REPT requires a constant integer count");
         std::vector<LogicalLine> tmp;
         read_raw_block_until(Keyword::ENDR,
                              tmp); // consume block (reports missing ENDR if needed)
@@ -2094,12 +2079,12 @@ bool Preprocessor::process_rept(const char*& p, Location& location) {
     return true;
 }
 
-bool Preprocessor::process_reptc(const char*& p, Location& location) {
-    return do_reptc_common(p, nullptr, location);
+bool Preprocessor::process_reptc(const char*& p) {
+    return do_reptc_common(p, nullptr);
 }
 
-bool Preprocessor::process_repti(const char*& p, Location& location) {
-    return do_repti_common(p, nullptr, location);
+bool Preprocessor::process_repti(const char*& p) {
+    return do_repti_common(p, nullptr);
 }
 
 // Helper: expand macros in the text starting at p and scan the resulting text
@@ -2147,7 +2132,7 @@ bool Preprocessor::get_constant_value(const char*& p, int& value) {
 }
 
 bool Preprocessor::do_reptc_common(const char*& p,
-                                   const std::string* name, Location& location) {
+                                   const std::string* name) {
     // If name==nullptr: syntax is "REPTC var, arg"
     // If name!=nullptr: syntax is "var REPTC arg" (name holds var)
     skip_whitespace(p);
@@ -2156,8 +2141,8 @@ bool Preprocessor::do_reptc_common(const char*& p,
     if (name == nullptr) {
         // Expect identifier then comma
         if (!scan_identifier(p, var)) {
-            reporter_.error(location, ErrorCode::InvalidSyntax,
-                            "Malformed REPTC directive (missing variable name)");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Malformed REPTC directive (missing variable name)");
             // try to consume block to avoid resync problems
             std::vector<LogicalLine> tmp;
             read_raw_block_until(Keyword::ENDR, tmp);
@@ -2165,8 +2150,8 @@ bool Preprocessor::do_reptc_common(const char*& p,
         }
         skip_whitespace(p);
         if (*p != ',') {
-            reporter_.error(location, ErrorCode::InvalidSyntax,
-                            "Malformed REPTC directive (missing comma)");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Malformed REPTC directive (missing comma)");
             std::vector<LogicalLine> tmp;
             read_raw_block_until(Keyword::ENDR, tmp);
             return true;
@@ -2182,8 +2167,8 @@ bool Preprocessor::do_reptc_common(const char*& p,
     skip_whitespace(q);
     if (*q == '\0') {
         // Missing argument -> report error and consume block like REPT handling
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed REPTC directive (missing argument)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed REPTC directive (missing argument)");
         std::vector<LogicalLine> tmp;
         read_raw_block_until(Keyword::ENDR, tmp);
         return true;
@@ -2252,8 +2237,7 @@ bool Preprocessor::do_reptc_common(const char*& p,
     return true;
 }
 
-bool Preprocessor::do_repti_common(const char*& p, const std::string* name,
-                                   Location& location) {
+bool Preprocessor::do_repti_common(const char*& p, const std::string* name) {
     // If name==nullptr: syntax is "REPTI var, a, b, c"
     // If name!=nullptr: syntax is "var REPTI a, b, c" (name holds var)
     skip_whitespace(p);
@@ -2262,8 +2246,8 @@ bool Preprocessor::do_repti_common(const char*& p, const std::string* name,
     if (name == nullptr) {
         // Expect identifier then comma
         if (!scan_identifier(p, var)) {
-            reporter_.error(location, ErrorCode::InvalidSyntax,
-                            "Malformed REPTI directive (missing variable name)");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Malformed REPTI directive (missing variable name)");
             // consume block to stay in sync
             std::vector<LogicalLine> tmp;
             read_raw_block_until(Keyword::ENDR, tmp);
@@ -2410,36 +2394,36 @@ bool Preprocessor::ifs_all_active() const {
 
 // IF directive: evaluate the expression (macro-expanded) and push an IfEntry.
 // If expression cannot be parsed, report a syntax error.
-bool Preprocessor::process_if(const char*& p, Location& location) {
+bool Preprocessor::process_if(const char*& p) {
     skip_whitespace(p);
 
     int value = 0;
     if (!get_constant_value(p, value)) {
         // Treat as false (no branch taken) but still push an entry so nesting is correct.
-        if_stack_.emplace_back(false, location);
+        if_stack_.emplace_back(false);
     }
     else {
         bool cond = (value != 0);
-        if_stack_.emplace_back(cond, location);
+        if_stack_.emplace_back(cond);
     }
     return true;
 }
 
 // ELIF directive: only meaningful if inside an IF. Evaluate expression and
 // update the top-of-stack entry accordingly.
-bool Preprocessor::process_elif(const char*& p, Location& location) {
+bool Preprocessor::process_elif(const char*& p) {
     skip_whitespace(p);
 
     if (if_stack_.empty()) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "unbalanced control structure");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "unbalanced control structure");
         return true;
     }
 
     IfEntry& top = if_stack_.back();
     if (top.else_seen) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "ELIF after ELSE");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "ELIF after ELSE");
         return true;
     }
 
@@ -2469,67 +2453,67 @@ bool Preprocessor::process_elif(const char*& p, Location& location) {
 }
 
 // IFDEF directive: check whether macro name is defined and push an IfEntry.
-bool Preprocessor::process_ifdef(const char*& p, Location& location) {
+bool Preprocessor::process_ifdef(const char*& p) {
     skip_whitespace(p);
 
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed IFDEF directive (missing name)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed IFDEF directive (missing name)");
         // push a false entry to keep nesting balanced
-        if_stack_.emplace_back(false, location);
+        if_stack_.emplace_back(false);
         return true;
     }
 
-    bool defined = is_name_defined(name, location);
-    if_stack_.emplace_back(defined, location);
+    bool defined = is_name_defined(name);
+    if_stack_.emplace_back(defined);
     return true;
 }
 
 // IFNDEF directive: push true when name is not defined.
-bool Preprocessor::process_ifndef(const char*& p, Location& location) {
+bool Preprocessor::process_ifndef(const char*& p) {
     skip_whitespace(p);
 
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed IFNDEF directive (missing name)");
-        if_stack_.emplace_back(false, location);
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed IFNDEF directive (missing name)");
+        if_stack_.emplace_back(false);
         return true;
     }
 
-    bool defined = is_name_defined(name, location);
-    if_stack_.emplace_back(!defined, location);
+    bool defined = is_name_defined(name);
+    if_stack_.emplace_back(!defined);
     return true;
 }
 
 // ELIFDEF directive: only meaningful inside an IF. Activate branch if name is defined.
-bool Preprocessor::process_elifdef(const char*& p, Location& location) {
+bool Preprocessor::process_elifdef(const char*& p) {
     skip_whitespace(p);
 
     if (if_stack_.empty()) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "unbalanced control structure");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "unbalanced control structure");
         return true;
     }
 
     IfEntry& top = if_stack_.back();
     if (top.else_seen) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "ELIFDEF after ELSE");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "ELIFDEF after ELSE");
         return true;
     }
 
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed ELIFDEF directive (missing name)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed ELIFDEF directive (missing name)");
         // treat as false branch
         top.active = false;
         return true;
     }
 
-    bool defined = is_name_defined(name, location);
+    bool defined = is_name_defined(name);
     if (top.any_branch_taken) {
         top.active = false;
     }
@@ -2541,31 +2525,31 @@ bool Preprocessor::process_elifdef(const char*& p, Location& location) {
 }
 
 // ELIFNDEF directive: activate when name is not defined and no prior branch taken.
-bool Preprocessor::process_elifndef(const char*& p, Location& location) {
+bool Preprocessor::process_elifndef(const char*& p) {
     skip_whitespace(p);
 
     if (if_stack_.empty()) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "unbalanced control structure");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "unbalanced control structure");
         return true;
     }
 
     IfEntry& top = if_stack_.back();
     if (top.else_seen) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "ELIFNDEF after ELSE");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "ELIFNDEF after ELSE");
         return true;
     }
 
     std::string name;
     if (!scan_identifier(p, name)) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Malformed ELIFNDEF directive (missing name)");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Malformed ELIFNDEF directive (missing name)");
         top.active = false;
         return true;
     }
 
-    bool defined = is_name_defined(name, location);
+    bool defined = is_name_defined(name);
     bool cond = !defined;
     if (top.any_branch_taken) {
         top.active = false;
@@ -2578,18 +2562,18 @@ bool Preprocessor::process_elifndef(const char*& p, Location& location) {
 }
 
 // ELSE directive: only meaningful if inside an IF. Toggle active based on previous branches.
-bool Preprocessor::process_else(const char*& p, Location& location) {
+bool Preprocessor::process_else(const char*& p) {
     (void)p;
     if (if_stack_.empty()) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "unbalanced control structure");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "unbalanced control structure");
         return true;
     }
 
     IfEntry& top = if_stack_.back();
     if (top.else_seen) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "Multiple ELSE in conditional");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Multiple ELSE in conditional");
         return true;
     }
 
@@ -2606,11 +2590,11 @@ bool Preprocessor::process_else(const char*& p, Location& location) {
 }
 
 // ENDIF directive: pop the if stack. Unbalanced ENDIF reported as error.
-bool Preprocessor::process_endif(const char*& p, Location& location) {
+bool Preprocessor::process_endif(const char*& p) {
     (void)p;
     if (if_stack_.empty()) {
-        reporter_.error(location, ErrorCode::InvalidSyntax,
-                        "unbalanced control structure");
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "unbalanced control structure");
         return true;
     }
     if_stack_.pop_back();
@@ -2620,14 +2604,13 @@ bool Preprocessor::process_endif(const char*& p, Location& location) {
 // Helper: test whether the given name is considered "defined".
 // Returns true if either a preprocessor macro exists or the optional
 // assembler-provided symbol-defined callback reports the name as defined.
-bool Preprocessor::is_name_defined(const std::string& name,
-                                   const Location& loc) const {
+bool Preprocessor::is_name_defined(const std::string& name) const {
     if (macros_.find(name) != macros_.end()) {
         return true;
     }
     if (symbol_defined_callback_) {
         // callback may use Location for diagnostics/context
-        return symbol_defined_callback_(name, loc);
+        return symbol_defined_callback_(name);
     }
     return false;
 }
