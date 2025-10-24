@@ -31,23 +31,31 @@ IFNDEF      CRT_ORG_CODE
     ENDIF
 ENDIF
 
+
 ; Default, don't change the stack pointer
 IFDEF __HECTORHR
     defc    TAR__register_sp = 0xc000
     defc    __CPU_CLOCK = 5000000
     defc    CONSOLE_COLUMNS = 30
     defc    CONSOLE_ROWS = 28
+    defc    HECTOR_GRAPHICS_W = 240
+    defc    HECTOR_GRAPHICS_H = 226
 ELSE
     defc    TAR__register_sp = 0x5fc0
     defc    __CPU_CLOCK = 2000000
     ; 64 column fonts
     defc    CONSOLE_COLUMNS = 28
     defc    CONSOLE_ROWS = 9
+    defc    HECTOR_GRAPHICS_W = 112
+    defc    HECTOR_GRAPHICS_H = 77
 ENDIF
     ; Default, 2 functions can be registered for atexit()
     defc    TAR__clib_exit_stack_size = 2
     ; Default, return to caller
     defc    TAR__crt_on_exit = 0x10002
+
+    PUBLIC  HECTOR_GRAPHICS_W
+    PUBLIC  HECTOR_GRAPHICS_H
 
     INCLUDE "crt/classic/crt_rules.inc"
 

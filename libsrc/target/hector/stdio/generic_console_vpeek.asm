@@ -3,11 +3,12 @@
 
     EXTERN  screendollar
     EXTERN  screendollar_with_count
+    EXTERN  generic_console_xypos_hector1
     EXTERN  generic_console_font32
     EXTERN  generic_console_font64
     EXTERN  generic_console_udg32
     EXTERN  __MODE1_attr
-
+    EXTERN  __console_font_h
 
     INCLUDE "target/hector/def/hector1.def"
 
@@ -26,12 +27,7 @@ generic_console_vpeek:
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
 IF FORhector1
-    ; 64 column font
-    ld      h, b                        ; 32 * 8
-    ld      l, c
-    ld      bc, HEC_SCREEN
-    ld      c, l
-    add     hl, bc                      ;hl = screen
+    call    generic_console_xypos_hector1
 ELSE
     ; 32 column font
     ld      h,b                         ;*256
@@ -45,7 +41,8 @@ ENDIF
     ex      de, hl
     ld      a,255
     ld      (__vpeek_colour),a
-    ld      b, 8
+    ld      a,(__console_font_h)
+    ld      b, a
 @line_loop:
     push    bc
     push    hl                          ;save buffer
