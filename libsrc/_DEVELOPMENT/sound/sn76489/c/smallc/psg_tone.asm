@@ -16,7 +16,7 @@ IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
 ; Sets the sound frequency for a given channel
 ;==============================================================
 
-    INCLUDE "sn76489.inc"
+    INCLUDE "../../sn76489.inc"
 
 set_sound_freq:
 _set_sound_freq:
@@ -45,12 +45,12 @@ ___psg_tone:
 
     or      a, $80
     or      a, b                        ; Prepares the first byte of the command
-  IF    HAVE16bitbus
-    ld      bc, psgport
+  IF    SN76489_HAS_16BIT_IO
+    ld      bc, PSGPort
     out     (c), a
   ELSE
-    out     (psgport), a                ; Sends it
-    IF  PSGLatchPort
+    out     (PSGPort), a                ; Sends it
+    IF  SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
     ENDIF
   ENDIF
@@ -71,12 +71,12 @@ ___psg_tone:
     and     a, $30                      ; Bits 8, 9 of the frequency go to bytes 4,5 of the register
 
     or      a, b                        ; Puts them together
-  IF    HAVE16bitbus
-    ld      bc, psgport
+  IF    SN76489_HAS_16BIT_IO
+    ld      bc, PSGPort
     out     (c), a
   ELSE
-    out     (psgport), a                ; Sends the second byte of the command
-    IF  PSGLatchPort
+    out     (PSGPort), a                ; Sends the second byte of the command
+    IF  SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
     ENDIF
   ENDIF

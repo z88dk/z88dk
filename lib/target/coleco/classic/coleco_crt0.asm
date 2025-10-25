@@ -22,6 +22,11 @@ ENDIF
 
     defc    __CPU_CLOCK = 3579545
 
+
+    PUBLIC  IO_SN76489_PORT
+    defc    IO_SN76489_PORT = $ff
+
+
 IF (!DEFINED_startup || (startup=1))
     INCLUDE "target/coleco/classic/rom.asm"
 ELSE

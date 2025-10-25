@@ -18,7 +18,7 @@ IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
     PUBLIC  asm_set_psg
 
 
-    INCLUDE "sn76489.inc"
+    INCLUDE "../../sn76489.inc"
 
 
 set_psg_callee:
@@ -29,13 +29,13 @@ _set_psg_callee:
     ex      (sp), hl
 asm_set_psg:
 
-    LD      BC, psgport
+    LD      BC, PSGPort
     OUT     (C), L
-  IF    PSGLatchPort
+  IF    SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
   ENDIF
     OUT     (C), E
-  IF    PSGLatchPort
+  IF    SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
   ENDIF
     ret

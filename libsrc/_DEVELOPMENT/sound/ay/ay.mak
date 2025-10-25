@@ -20,7 +20,6 @@ SOUND_AY_GLOBS_ex := $(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/wyz/*.asm $(NEWLIB_DI
 
 
 SOUND_AY_TARGETS := _DEVELOPMENT/sound/ay/obj/newlib-z80-sound-ay \
-		_DEVELOPMENT/sound/ay/obj/newlib-z80n-sound-ay \
 		_DEVELOPMENT/sound/ay/obj/newlib-8080-sound-ay \
 		_DEVELOPMENT/sound/ay/obj/newlib-8085-sound-ay \
 		_DEVELOPMENT/sound/ay/obj/newlib-gbz80-sound-ay \

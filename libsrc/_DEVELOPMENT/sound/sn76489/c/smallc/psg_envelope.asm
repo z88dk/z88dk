@@ -15,7 +15,7 @@ IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
 ;  foo entry, envelope is not avaliable on SN76489
 ;==============================================================
 
-    INCLUDE "sn76489.inc"
+    INCLUDE "../../sn76489.inc"
 
 psg_envelope:
 _psg_envelope:
@@ -36,12 +36,12 @@ ___psg_envelope:
 
     or      a, $90
     or      a, b                        ; Prepares the first byte of the command
-  IF    HAVE16bitbus
-    ld      bc, psgport
+  IF    SN76489_HAS_16BIT_IO
+    ld      bc, PSGPort
     out     (c), a
   ELSE
-    out     (psgport), a                ; Sends it
-    IF  PSGLatchPort
+    out     (PSGPort), a                ; Sends it
+    IF  SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
     ENDIF
   ENDIF

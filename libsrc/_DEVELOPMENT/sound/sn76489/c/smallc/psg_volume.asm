@@ -16,7 +16,7 @@ IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
 ; Sets the sound volume for a given channel
 ;==============================================================
 
-    INCLUDE "sn76489.inc"
+    INCLUDE "../../sn76489.inc"
 
 set_sound_volume:
 _set_sound_volume:
@@ -45,12 +45,12 @@ ___psg_volume:
 
     or      a, $90
     or      a, b                        ; Prepares the first byte of the command
-  IF    HAVE16bitbus
-    ld      bc, psgport
+  IF    SN76489_HAS_16BIT_IO
+    ld      bc, PSGPort
     out     (c), a
   ELSE
-    out     (psgport), a                ; Sends it
-    IF  PSGLatchPort
+    out     (PSGPort), a                ; Sends it
+    IF  SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
     ENDIF
   ENDIF

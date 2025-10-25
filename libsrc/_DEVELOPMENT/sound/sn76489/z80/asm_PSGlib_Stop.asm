@@ -3,7 +3,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "PSGlib_private.inc"
+INCLUDE "../sn76489.inc"
 
 SECTION code_clib
 SECTION code_PSGlib
@@ -24,27 +24,27 @@ asm_PSGlib_Stop:
    ret z
    
    ld a,PSGLatch|PSGChannel0|PSGVolumeData|0x0f    ; // latch channel 0, volume=0xF (silent)
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
    
    ld a,PSGLatch|PSGChannel1|PSGVolumeData|0x0f    ; // latch channel 1, volume=0xF (silent)
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -55,14 +55,14 @@ ENDIF
    jr nz, skip00
    
    ld a,PSGLatch|PSGChannel2|PSGVolumeData|0x0f    ; // latch channel 2, volume=0xF (silent)
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -74,14 +74,14 @@ skip00:
    jr nz, skip01
    
    ld a,PSGLatch|PSGChannel3|PSGVolumeData|0x0f    ; // latch channel 3, volume=0xF (silent)
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF

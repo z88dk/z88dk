@@ -54,7 +54,7 @@ _bit_open:
 
     ld      a, $BF                      ; channel 1 ($20) + set volume command ($90) + max attenuation ($0F)
     ld      (__snd_tick), a
-	;out	(psgport), a	; Sends it, but I think it is not necessary, the OUT instruction will happen in bit_* library
+	;out	(PSGPort), a	; Sends it, but I think it is not necessary, the OUT instruction will happen in bit_* library
 
     ret
 

@@ -2,7 +2,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "PSGlib_private.inc"
+INCLUDE "../sn76489.inc"
 
 SECTION code_clib
 SECTION code_PSGlib

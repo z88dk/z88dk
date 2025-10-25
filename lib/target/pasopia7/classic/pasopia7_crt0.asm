@@ -34,6 +34,10 @@
     PUBLIC	GRAPHICS_CHAR_UNSET
 
 
+    PUBLIC  IO_SN76489_PORT
+    defc    IO_SN76489_PORT = $3a
+
+
     ; We want to intercept rst38 to our interrupt routine
     defc    TAR__crt_enable_rst = $8080
     EXTERN  asm_im1_handler

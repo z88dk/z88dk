@@ -2,7 +2,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "PSGlib_private.inc"
+INCLUDE "../sn76489.inc"
 
 SECTION code_clib
 SECTION code_PSGlib
@@ -57,7 +57,7 @@ _SFXvolumechn3:
   ld (__PSGlib_SFXChan3Volume),a
 
 _SFXoutbyte:
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a

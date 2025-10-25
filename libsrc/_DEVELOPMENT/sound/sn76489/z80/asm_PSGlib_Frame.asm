@@ -2,7 +2,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "PSGlib_private.inc"
+INCLUDE "../sn76489.inc"
 
 SECTION code_clib
 SECTION code_PSGlib
@@ -76,14 +76,14 @@ _continue:
   jr z,_send2PSG_B               ; if no SFX is playing jump
   ld (__PSGlib_Channel3SFX),a         ; otherwise mark channel 3 as occupied
   ld a,PSGLatch|PSGChannel3|PSGVolumeData|0x0F   ; and silence channel 3
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGDataPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -161,14 +161,14 @@ _otherCommands:
 _send2PSG_B:
   ld a,b
 _send2PSG_A:
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGDataPort),a              ; output the byte
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -190,14 +190,14 @@ _no_overflow:
   ld a,c                           ; retrieve PSG command
   and 0xF0                         ; keep upper nibble
   or b                             ; set attenuated volume
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGDataPort),a              ; output the byte
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF

@@ -3,7 +3,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "PSGlib_private.inc"
+INCLUDE "../sn76489.inc"
 
 SECTION code_clib
 SECTION code_PSGlib
@@ -46,14 +46,14 @@ asm_PSGlib_RestoreVolumes:
 outchan0:
 
    or PSGLatch|PSGChannel0|PSGVolumeData
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -69,14 +69,14 @@ ENDIF
 outchan1:
 
    or PSGLatch|PSGChannel1|PSGVolumeData
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -104,14 +104,14 @@ skipchan01:
 outchan2:
 
    or PSGLatch|PSGChannel2|PSGVolumeData
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -138,14 +138,14 @@ skipchan2:
 outchan3:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF

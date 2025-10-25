@@ -215,17 +215,17 @@ include stdio/stdio.mak
 include stdlib/stdlib.mak
 include time/time.mak
 include _DEVELOPMENT/sound/ay/ay.mak
+include _DEVELOPMENT/sound/sn76489/sn76489.mak
 include _DEVELOPMENT/sound/saa1099/saa1099.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
-TARGET_CLIB_DEPS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS) $(SOUND_SAA1099_TARGETS) $(SOUND_AY_TARGETS)
+TARGET_CLIB_DEPS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS) $(SOUND_SAA1099_TARGETS) $(SOUND_AY_TARGETS) $(SOUND_SN76489_TARGETS)
 
 # Arg1: target
 # Arg2: Graphics flavour
 define buildgeneric
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
-	$(MAKE) -C psg TARGET=$(1) 
 endef
 
 define buildcrt
@@ -441,7 +441,6 @@ pc88_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
-	$(MAKE) -C psg TARGET=pc88
 	$(call buildgeneric,pc88,"wide")
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(TARGET_DIRECTORY)/pc88/pc88.lst
@@ -742,7 +741,6 @@ attache.lib: cpm_clib.lib
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
 	$(MAKE) -C games TARGET=cpm SUBTYPE=attache
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=attache
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(TARGET_DIRECTORY)/attache/attache.lst
 
@@ -1044,7 +1042,6 @@ svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib
 	$(MAKE) -C target/svi TARGET=svi
 	$(MAKE) -C video/tms9918 TARGET=svi
 	$(MAKE) -C video/mc6845 TARGET=svi
-	$(MAKE) -C psg TARGET=svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @$(TARGET_DIRECTORY)/svi/arch_svibios.lst
 
@@ -1059,7 +1056,6 @@ msx_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C target/msx
 	$(MAKE) -C video/tms9918 TARGET=msx
-	$(MAKE) -C psg TARGET=msx
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @$(TARGET_DIRECTORY)/msx/arch_msxbios.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/cpm_msx @$(TARGET_DIRECTORY)/msx/cpm_msx.lst
@@ -1139,7 +1135,6 @@ einstein.lib: cpm_clib.lib
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/mc6845 TARGET=einstein
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(TARGET_DIRECTORY)/einstein/einstein.lst
 
 einstein256.lib: cpm_clib.lib
@@ -1165,7 +1160,6 @@ smc777_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=smc777 FLAVOUR=wide
-	$(MAKE) -C psg TARGET=smc777
 	$(MAKE) -C games TARGET=smc777
 	$(MAKE) -C video/mc6845 TARGET=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(TARGET_DIRECTORY)/smc777/smc777.lst
@@ -1175,7 +1169,6 @@ smc777_cpm.lib: smc777_clib.lib
 	@echo '--- Building Sony SMC-70/SMC-777 CP/M Library ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=smc777
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
 	$(MAKE) -C video/mc6845 TARGET=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(TARGET_DIRECTORY)/smc777/smc777_cpm.lst
@@ -1187,7 +1180,6 @@ bic.lib: cpm_clib.lib
 	@echo ''
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bic
 	$(MAKE) -C video/upd7220 TARGET=bic
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=bic
 	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(TARGET_DIRECTORY)/bic/bic.lst
 
 # QX10 library
@@ -1208,7 +1200,6 @@ adam.lib: coleco_clib.lib
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C gfx TARGET=coleco FLAVOUR=narrow
-	$(MAKE) -C psg TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(TARGET_DIRECTORY)/adam/adam.lst
 
 # SORD M5 library - Stefano
@@ -1816,7 +1807,6 @@ tiki100.lib: cpm_clib.lib
 	@echo '--- Building TIKI-100 Library ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=tiki100
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=tiki100
 	$(MAKE) -C games TARGET=cpm SUBTYPE=tiki100
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(TARGET_DIRECTORY)/tiki100/tiki100.lst
 
@@ -2406,7 +2396,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C games clean

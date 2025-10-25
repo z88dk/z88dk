@@ -25,7 +25,7 @@ IF  !__CPU_INTEL__&!__CPU_RABBIT__&!__CPU_GBZ80__
     EXTERN  bit_open
 
 
-    INCLUDE "sn76489.inc"
+    INCLUDE "../../sn76489.inc"
 
 
 
@@ -101,24 +101,24 @@ rep1b:                                  ;repeat
 ; channel 0 ($00) + set volume command ($90) + attenuation (max=$0F)
 	ld a,$9F
 	xor e
-	out (psgport),a
-  IF    PSGLatchPort
+	out (PSGPort),a
+  IF    SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
   ENDIF
 
 ; channel 1 ($20) + set volume command ($90) + attenuation (max=$0F)
 	ld a,$20+$9F
 	xor d
-	out (psgport),a
-  IF    PSGLatchPort
+	out (PSGPort),a
+  IF    SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
   ENDIF
 
 ; channel 2 ($30) + set volume command ($90) + attenuation (max=$0F)
 	ld a,$40+$9F
 	xor h
-	out (psgport),a
-  IF    PSGLatchPort
+	out (PSGPort),a
+  IF    SN76489_HAS_LATCH_PORT
     in      a, (PSGLatchPort)
   ENDIF
 

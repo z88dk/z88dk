@@ -3,7 +3,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "PSGlib_private.inc"
+INCLUDE "../sn76489.inc"
 
 SECTION code_clib
 SECTION code_PSGlib
@@ -44,28 +44,28 @@ asm_PSGlib_SFXStop:
    ld a,(__PSGlib_Chan2LowTone)
    and 0x0f
    or PSGLatch|PSGChannel2
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
    
    ld a,(__PSGlib_Chan2HighTone)
    and 0x3f
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -84,14 +84,14 @@ silchan2:
 outchan2:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -112,14 +112,14 @@ skipchan2:
    ld a,(__PSGlib_Chan3LowTone)
    and 0x0f
    or PSGLatch|PSGChannel3
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
@@ -138,14 +138,14 @@ silchan3:
 outchan3:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
-IF HAVE16bitbus
+IF SN76489_HAS_16BIT_IO
   push bc
   ld bc,PSGDataPort
   out (c),a
   pop bc
 ELSE
   out (PSGPort),a
- IF PSGLatchPort
+ IF SN76489_HAS_LATCH_PORT
   in a,(PSGLatchPort)
  ENDIF
 ENDIF
