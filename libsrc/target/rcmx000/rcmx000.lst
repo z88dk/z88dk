@@ -3,4 +3,4 @@ target/rcmx000/stdio/cnvtab
 target/rcmx000/stdio/getk
 target/rcmx000/stdio/fputc_cons
 @classic/stdio/stdio.lst
-@time/time.lst
+DEVELOPMENT/time/obj/${TYPE}/**/*.o
