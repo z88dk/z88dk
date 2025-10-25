@@ -112,6 +112,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_errors", "z80as
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_location", "z80asm_test_location\z80asm_test_location.vcxproj", "{783A1C27-EDD0-4A50-940E-47937395861D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_utils", "z80asm_test_utils\z80asm_test_utils.vcxproj", "{CA62AFF5-1857-4061-B5E5-EF89EED955DF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_options", "z80asm_test_options\z80asm_test_options.vcxproj", "{576D9828-EB70-486E-911A-0E8100C80CEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -376,6 +380,22 @@ Global
 		{783A1C27-EDD0-4A50-940E-47937395861D}.Release|Win32.Build.0 = Release|Win32
 		{783A1C27-EDD0-4A50-940E-47937395861D}.Release|x64.ActiveCfg = Release|x64
 		{783A1C27-EDD0-4A50-940E-47937395861D}.Release|x64.Build.0 = Release|x64
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Debug|Win32.Build.0 = Debug|Win32
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Debug|x64.ActiveCfg = Debug|x64
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Debug|x64.Build.0 = Debug|x64
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Release|Win32.ActiveCfg = Release|Win32
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Release|Win32.Build.0 = Release|Win32
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Release|x64.ActiveCfg = Release|x64
+		{CA62AFF5-1857-4061-B5E5-EF89EED955DF}.Release|x64.Build.0 = Release|x64
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Debug|Win32.Build.0 = Debug|Win32
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Debug|x64.ActiveCfg = Debug|x64
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Debug|x64.Build.0 = Debug|x64
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Release|Win32.ActiveCfg = Release|Win32
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Release|Win32.Build.0 = Release|Win32
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Release|x64.ActiveCfg = Release|x64
+		{576D9828-EB70-486E-911A-0E8100C80CEA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

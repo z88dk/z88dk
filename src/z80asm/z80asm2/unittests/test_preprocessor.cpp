@@ -13,6 +13,35 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <cctype>
+#include <sstream>
+
+// Local replacements for the small utils functions used by the tests.
+// These keep the unit tests independent of utils.cpp.
+
+static std::string to_lower(const std::string& s) {
+    std::string result = s;
+    std::transform(result.begin(), result.end(), result.begin(),
+    [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+    return result;
+}
+
+static std::string ltrim(const std::string& s) {
+    size_t start = s.find_first_not_of(" \t\r\n");
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+
+static std::string rtrim(const std::string& s) {
+    size_t end = s.find_last_not_of(" \t\r\n");
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+static std::string trim(const std::string& s) {
+    return ltrim(rtrim(s));
+}
 
 // Helper to capture std::cerr output
 class CerrRedirect {
@@ -39,7 +68,7 @@ static std::string write_temp_file(const std::vector<std::string>& lines) {
     std::string filename = "test_preproc_tmp_" + std::to_string(counter++) + ".asm";
     std::ofstream ofs(filename);
     for (const auto& line : lines) {
-        ofs << line << "\n";
+        ofs << line << std::endl;
     }
     ofs.close();
     temp_files.push_back(filename);
@@ -70,10 +99,10 @@ static std::string write_temp_file_in_dir(const std::string& dir,
         const std::string& filename,
         const std::vector<std::string>& lines) {
     std::filesystem::path p = std::filesystem::path(dir) / filename;
-    std::string filepath = p.string();
+    std::string filepath = p.generic_string();
     std::ofstream ofs(filepath);
     for (const auto& line : lines) {
-        ofs << line << "\n";
+        ofs << line << std::endl;
     }
     ofs.close();
     temp_files.push_back(filepath);
@@ -88,7 +117,7 @@ static std::string normalize_expected_path(const std::string& p) {
         if (!pp.is_absolute()) {
             pp = std::filesystem::absolute(pp);
         }
-        return pp.lexically_normal().string();
+        return pp.lexically_normal().generic_string();
     }
     catch (...) {
         return p;
@@ -691,11 +720,11 @@ TEST_CASE("Preprocessor: detects include recursion (A includes B, B includes A)"
     std::string fileB = "test_preproc_cycle_B.asm";
     {
         std::ofstream ofsB(fileB);
-        ofsB << "#include \"" << fileA << "\"\n";
+        ofsB << "#include \"" << fileA << "\"" << std::endl;
     }
     {
         std::ofstream ofsA(fileA);
-        ofsA << "#include \"" << fileB << "\"\n";
+        ofsA << "#include \"" << fileB << "\"" << std::endl;
     }
     // Track these files for cleanup
     track_temp_file(fileA);
@@ -3710,3 +3739,434 @@ TEST_CASE("Preprocessor: C_LINE directive updates Location line number and filen
         CHECK_FALSE(pp.next_line(out_line));
     }
 }
+
+// Preprocessor::preprocess_file tests
+TEST_CASE("Preprocessor::preprocess_file writes expected output file",
+          "[preprocessor][preprocess_file]") {
+    Preprocessor pp;
+
+    // Create a simple input file that uses a macro
+    std::vector<std::string> lines = {
+        "#define FOO 42",
+        "LD A,FOO",
+        "LD B,2"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Determine output filename by replacing extension with .i
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(infile, outfile);
+
+    // Read output file and check it contains the expanded lines and not the #define
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        // normalize possible CRLF
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Expect the preprocessed file to contain the expanded instructions (order preserved).
+    // The #define line should not be present.
+    REQUIRE(std::find(out_lines.begin(), out_lines.end(),
+                      "LD A,42") != out_lines.end());
+    REQUIRE(std::find(out_lines.begin(), out_lines.end(),
+                      "LD B,2") != out_lines.end());
+    REQUIRE(std::find(out_lines.begin(), out_lines.end(),
+                      "#define FOO 42") == out_lines.end());
+}
+
+TEST_CASE("Preprocessor::preprocess_file respects include paths when writing output",
+          "[preprocessor][preprocess_file][include][path]") {
+    Preprocessor pp;
+
+    // Create include directory and file
+    std::string inc_dir = make_temp_dir();
+    std::string inc_name = "inc_for_preproc.inc";
+    std::string inc_file = write_temp_file_in_dir(inc_dir, inc_name, { "LD C,99" });
+
+    // Create main input that uses angle include (so include_paths are used)
+    std::vector<std::string> main_lines = {
+        "#include <" + inc_name + ">",
+        "LD A,1"
+    };
+    std::string mainfile = write_temp_file(main_lines);
+
+    // Add the include directory to the preprocessor's include paths
+    pp.add_include_path(inc_dir);
+
+    // Output file
+    std::filesystem::path outp(mainfile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(mainfile, outfile);
+
+    // Read output and ensure included content appears before the following line
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Expect included line and the following normal line present
+    auto it_inc = std::find(out_lines.begin(), out_lines.end(), "LD C,99");
+    auto it_main = std::find(out_lines.begin(), out_lines.end(), "LD A,1");
+    REQUIRE(it_inc != out_lines.end());
+    REQUIRE(it_main != out_lines.end());
+    // included line should appear before the main file line
+    CHECK(std::distance(out_lines.begin(),
+                        it_inc) < std::distance(out_lines.begin(), it_main));
+}
+
+// Preprocessor::preprocess_file - macro expands to three lines
+TEST_CASE("Preprocessor::preprocess_file expands multi-line macro into three output lines",
+          "[preprocessor][preprocess_file][macro][multiline]") {
+    Preprocessor pp;
+
+    // Multi-line macro that should expand to three lines
+    std::vector<std::string> lines = {
+        "MACRO push3",
+        "    push bc",
+        "    push de",
+        "    push hl",
+        "ENDM",
+        "push3"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output filename (.i)
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(infile, outfile);
+
+    // Read output file
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        // normalize possible CRLF
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Helper to find index of a line
+    auto find_idx = [&](const std::string & s) -> int {
+        for (int i = 0; i < static_cast<int>(out_lines.size()); ++i) {
+            if (out_lines[i] == s) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
+    int i1 = find_idx("push bc");
+    int i2 = find_idx("push de");
+    int i3 = find_idx("push hl");
+
+    REQUIRE(i1 != -1);
+    REQUIRE(i2 != -1);
+    REQUIRE(i3 != -1);
+    CHECK(i1 < i2);
+    CHECK(i2 < i3);
+
+    // Ensure macro definition keywords are not present in output
+    CHECK(find_idx("MACRO push3") == -1);
+    CHECK(find_idx("ENDM") == -1);
+}
+
+// Preprocessor::preprocess_file - multi-line comment is removed in output
+TEST_CASE("Preprocessor::preprocess_file removes multi-line comment spanning lines",
+          "[preprocessor][preprocess_file][comment][multiline]") {
+    Preprocessor pp;
+
+    // Input: multi-line C-style comment starts on line 1 and ends on line 3.
+    // Text before and after the comment should be preserved and written to output.
+    std::vector<std::string> lines = {
+        "LD A,1 /* comment starts",
+        " still inside comment",
+        " end of comment */ LD B,2",
+        "LD C,3"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output filename (.i)
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    // Run preprocess_file
+    pp.preprocess_file(infile, outfile);
+
+    // Read output file (skip empty lines as other tests do)
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        if (!l.empty()) {
+            out_lines.push_back(l);
+        }
+    }
+    ifs.close();
+
+    // Expect the comment to be removed and the surrounding code preserved.
+    // The first logical output line should contain both left and right fragments.
+    auto it_ab = std::find(out_lines.begin(), out_lines.end(), "LD A,1 LD B,2");
+    auto it_c = std::find(out_lines.begin(), out_lines.end(), "LD C,3");
+
+    REQUIRE(it_ab != out_lines.end());
+    REQUIRE(it_c != out_lines.end());
+    CHECK(std::distance(out_lines.begin(), it_ab) < std::distance(out_lines.begin(),
+            it_c));
+
+    // Ensure no raw comment text ended up in the output
+    for (const auto& s : out_lines) {
+        CHECK(s.find("comment") == std::string::npos);
+        CHECK(s.find("/*") == std::string::npos);
+        CHECK(s.find("*/") == std::string::npos);
+    }
+}
+
+// Preprocessor::preprocess_file - verify #line synchronization after include, macro and multi-line comment
+
+TEST_CASE("Preprocessor::preprocess_file emits #line to resynchronize after include",
+          "[preprocessor][preprocess_file][line][include]") {
+    Preprocessor pp;
+
+    // Create included file
+    std::vector<std::string> inc_lines = { "LD C,3" };
+    std::string inc_filename = write_temp_file(inc_lines);
+
+    // Main file: include the file and then a following line
+    std::vector<std::string> main_lines = {
+        "LD A,1",
+        "#include \"" + inc_filename + "\"",
+        "LD B,2"
+    };
+    std::string mainfile = write_temp_file(main_lines);
+
+    // Output file
+    std::filesystem::path outp(mainfile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    pp.preprocess_file(mainfile, outfile);
+
+    // Read output (preserve empty lines)
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        out_lines.push_back(l);
+    }
+    ifs.close();
+
+    // Find the index of the first appearance of the main-file line after include
+    auto it_main_line = std::find(out_lines.begin(), out_lines.end(), "LD B,2");
+    REQUIRE(it_main_line != out_lines.end());
+    size_t idx_main = static_cast<size_t>(std::distance(out_lines.begin(),
+                                          it_main_line));
+
+    // Look backward for a #line directive that contains the main filename (normalized).
+    std::string norm_main = normalize_expected_path(mainfile);
+    bool found_sync = false;
+    for (size_t i = (idx_main == 0 ? 0 : idx_main - 1); ; --i) {
+        const std::string& s = out_lines[i];
+        if (s.find("#line") != std::string::npos
+                || s.find("LINE") != std::string::npos) {
+            if (s.find(norm_main) != std::string::npos
+                    || s.find(std::filesystem::path(mainfile).filename().string()) !=
+                    std::string::npos) {
+                found_sync = true;
+                break;
+            }
+        }
+        if (i == 0) {
+            break;
+        }
+    }
+
+    CHECK(found_sync);
+}
+
+TEST_CASE("Preprocessor::preprocess_file emits #line to resynchronize after multi-line macro expansion",
+          "[preprocessor][preprocess_file][line][macro][multiline]") {
+    Preprocessor pp;
+
+    // Define a multi-line MACRO and invoke it between two normal lines
+    std::vector<std::string> lines = {
+        "LD BEFORE,1",
+        "MACRO push3",
+        "    push bc",
+        "    push de",
+        "    push hl",
+        "ENDM",
+        "push3",
+        "LD AFTER,2"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output file
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    pp.preprocess_file(infile, outfile);
+
+    // Read output
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        out_lines.push_back(l);
+    }
+    ifs.close();
+
+    // Find the first expanded macro output (push bc) and the following normal line (LD AFTER,2)
+    auto it_push = std::find(out_lines.begin(), out_lines.end(), "push bc");
+    auto it_after = std::find(out_lines.begin(), out_lines.end(), "LD AFTER,2");
+    REQUIRE(it_push != out_lines.end());
+    REQUIRE(it_after != out_lines.end());
+    size_t idx_push = static_cast<size_t>(std::distance(out_lines.begin(),
+                                          it_push));
+    size_t idx_after = static_cast<size_t>(std::distance(out_lines.begin(),
+                                           it_after));
+
+    // There should be a #line directive between the macro expansion and the following normal line
+    bool found_sync_between = false;
+    for (size_t i = idx_push; i <= idx_after; ++i) {
+        const std::string& s = out_lines[i];
+        if (s.find("#line") != std::string::npos
+                || s.find("LINE") != std::string::npos) {
+            // prefer to see the original filename mentioned
+            std::string norm_in = normalize_expected_path(infile);
+            if (s.find(norm_in) != std::string::npos
+                    || s.find(std::filesystem::path(infile).filename().string()) !=
+                    std::string::npos) {
+                found_sync_between = true;
+                break;
+            }
+            // accept any #line as indication of synchronization
+            found_sync_between = true;
+        }
+    }
+
+    CHECK(found_sync_between);
+}
+
+TEST_CASE("Preprocessor::preprocess_file emits #line to resynchronize after multi-line C-style comment",
+          "[preprocessor][preprocess_file][line][comment][multiline]") {
+    Preprocessor pp;
+
+    // Multi-line C-style comment spans two lines; verify output contains a #line
+    std::vector<std::string> lines = {
+        "LD A,1",
+        "/* comment start",
+        " still inside comment */ LD B,2",
+        "LD C,3"
+    };
+    std::string infile = write_temp_file(lines);
+
+    // Output file
+    std::filesystem::path outp(infile);
+    outp.replace_extension(".i");
+    std::string outfile = outp.generic_string();
+    track_temp_file(outfile);
+
+    pp.preprocess_file(infile, outfile);
+
+    // Read output
+    std::ifstream ifs(outfile);
+    REQUIRE(ifs.good());
+    std::vector<std::string> out_lines;
+    std::string l;
+    while (std::getline(ifs, l)) {
+        if (!l.empty() && l.back() == '\r') {
+            l.pop_back();
+        }
+        out_lines.push_back(l);
+    }
+    ifs.close();
+
+    // Find the line "LD B,2" and look backwards for a #line directive that sets logical line numbers
+    auto it_b = std::find(out_lines.begin(), out_lines.end(), "LD B,2");
+    REQUIRE(it_b != out_lines.end());
+    size_t idx_b = static_cast<size_t>(std::distance(out_lines.begin(), it_b));
+
+    bool found_line_directive = false;
+    for (size_t i = (idx_b == 0 ? 0 : idx_b - 1); ; --i) {
+        const std::string& s = out_lines[i];
+        if (s.find("#line") != std::string::npos
+                || s.find("LINE") != std::string::npos) {
+            // try to parse the numeric value after #line
+            size_t pos = s.find("#line");
+            if (pos == std::string::npos) {
+                pos = s.find("LINE");
+            }
+            std::string tail = s.substr(pos);
+            // crude parse: find digits anywhere in the tail
+            for (size_t k = 0; k < tail.size(); ++k) {
+                if (std::isdigit(static_cast<unsigned char>(tail[k]))) {
+                    found_line_directive = true;
+                    break;
+                }
+            }
+            if (found_line_directive) {
+                break;
+            }
+        }
+        if (i == 0) {
+            break;
+        }
+    }
+
+    CHECK(found_line_directive);
+}
+

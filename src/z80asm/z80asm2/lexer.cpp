@@ -4,15 +4,176 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "keywords.h"
 #include "lexer.h"
-#include "token.h"
+#include "utils.h"
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+
+TokenizedLine::TokenizedLine(int line_num)
+    : line_num_(line_num), cur_index_(0) {
+}
+
+void TokenizedLine::clear() {
+    tokens_.clear();
+    cur_index_ = 0;
+}
+
+void TokenizedLine::push_back(const Token& token) {
+    tokens_.push_back(token);
+}
+
+void TokenizedLine::push_back(Token&& token) {
+    tokens_.push_back(std::move(token));
+}
+
+const Token& TokenizedLine::peek(int ahead) const {
+    int index = cur_index_ + ahead;
+    if (index < 0 || static_cast<size_t>(index) >= tokens_.size()) {
+        static Token eof_token(TokenType::EndOfFile, "");
+        return eof_token;
+    }
+    else {
+        return tokens_[index];
+    }
+}
+
+void TokenizedLine::advance() {
+    if (cur_index_ < static_cast<int>(tokens_.size())) {
+        ++cur_index_;
+    }
+}
+
+void TokenizedLine::rewind() {
+    cur_index_ = 0;
+}
+
+bool TokenizedLine::at_end() const {
+    return cur_index_ >= static_cast<int>(tokens_.size());
+}
+
+void TokenizedLine::skip_spaces() {
+    // Advance current index past any whitespace tokens.
+    while (cur_index_ < static_cast<int>(tokens_.size()) &&
+            tokens_[cur_index_].type() == TokenType::Whitespace) {
+        ++cur_index_;
+    }
+}
+
+// Reconstruct the line by concatenating the original token texts in order.
+std::string TokenizedLine::to_string() const {
+    std::string out;
+    out.reserve(tokens_.size() * 4);
+    for (const auto& tok : tokens_) {
+        out += tok.text();
+    }
+    return out;
+}
+
+
+TokenizedFile::TokenizedFile(const std::string& filename,
+                             int first_line_num) :
+    filename_(filename),
+    first_line_num_(first_line_num),
+    inc_line_nums_(true) {
+    std::string content;
+    try {
+        content = read_file_to_string(filename);
+    }
+    catch (...) {
+        // file read error
+        g_errors.error(ErrorCode::FileNotFound,
+                       "Could not open file: " + filename_);
+        content.clear();
+    }
+
+    tokenize(content);
+}
+
+TokenizedFile::TokenizedFile(const std::string& content,
+                             const std::string& filename, int first_line_num) :
+    filename_(filename),
+    first_line_num_(first_line_num),
+    inc_line_nums_(false) {
+    tokenize(content);
+}
+
+const std::string& TokenizedFile::get_line(int index) const {
+    if (index < 0 || static_cast<size_t>(index) >= text_lines_.size()) {
+        static std::string empty;
+        return empty;
+    }
+    else {
+        return text_lines_[index];
+    }
+}
+
+const TokenizedLine& TokenizedFile::get_tokenized_line(int index) const {
+    if (index < 0 || static_cast<size_t>(index) >= tok_lines_.size()) {
+        static TokenizedLine empty_line(0);
+        return empty_line;
+    }
+    else {
+        return tok_lines_[index];
+    }
+}
+
+void TokenizedFile::clear() {
+    text_lines_.clear();
+    tok_lines_.clear();
+}
+
+void TokenizedFile::split_lines(const char*& p) {
+    text_lines_.clear();
+    while (*p) {
+        const char* line_start = p;
+        while (*p && *p != '\r' && *p != '\n') {
+            ++p;
+        }
+        text_lines_.emplace_back(line_start, p - line_start);
+        // Handle line endings
+        if (*p == '\r') {
+            ++p;
+            if (*p == '\n') {
+                ++p;
+            }
+        }
+        else if (*p == '\n') {
+            ++p;
+        }
+    }
+}
+
+void TokenizedFile::tokenize(const std::string& content) {
+    // Split content into lines
+    const char* p = content.c_str();
+    split_lines(p);
+
+    // Tokenize each line
+    Location location(filename_, first_line_num_);
+    for (int i = 0; i < static_cast<int>(text_lines_.size()); ++i) {
+        // notify error reporter of current line
+        int line_num = first_line_num_ + (inc_line_nums_ ? i : 0);
+        location.set_line_num(line_num);
+        g_errors.set_location(location);
+        g_errors.set_source_line(text_lines_[i]);
+
+        // split in tokens, possibly advancing i for line continuations
+        // and multi-line comments
+        TokenizedLine tok_line(line_num);
+        tokenize_line(i, tok_line);
+        if (!tok_line.empty()) {
+            tok_lines_.push_back(std::move(tok_line));
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 
 static bool has_dot_eE(const std::string& s) {
     return s.find_first_of(".eE") != std::string::npos;
@@ -124,7 +285,7 @@ bool scan_identifier(const char*& p, std::string& out) {
     // If next character is a "'" and a keyword with that quote exists, e.g. AF'
     if (*p == '\'') {
         std::string test = out + "'";
-        if (to_keyword(test) != Keyword::None) {
+        if (keyword_lookup(test) != Keyword::None) {
             out += *p++;
         }
     }

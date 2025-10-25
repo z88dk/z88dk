@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ed9d0a27-5d35-46d4-8c58-45995f0f5482}</ProjectGuid>
-    <RootNamespace>z88dkz80asm2</RootNamespace>
+    <ProjectGuid>{576d9828-eb70-486e-911a-0e8100c80cea}</ProjectGuid>
+    <RootNamespace>z80asmtestoptions</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,43 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\ast_node.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\assembler.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\ast_node.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\code_generator.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\preprocessor.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\symbol_table.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\src\z80asm\z80asm2\errors.def" />
-    <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
-    <None Include="..\..\src\z80asm\z80asm2\scan.re" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

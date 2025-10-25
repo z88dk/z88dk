@@ -55,6 +55,10 @@ public:
         symbol_defined_callback_ = std::move(cb);
     }
 
+    // preprocess one input file, generate file.i
+    void preprocess_file(const std::string& input_filename,
+                         const std::string& output_filename);
+
 private:
     static const inline int MAX_MACRO_RECURSION = 32;
 
@@ -313,3 +317,5 @@ private:
     bool ifs_all_active() const;
 
 };
+
+void preprocess_only();

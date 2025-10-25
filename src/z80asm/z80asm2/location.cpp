@@ -20,22 +20,6 @@ bool Location::empty() const {
     return filename_.empty() && line_num_ == 0;
 }
 
-const std::string& Location::filename() const {
-    return filename_;
-}
-
-int Location::line_num() const {
-    return line_num_;
-}
-
-void Location::set_filename(const std::string& filename) {
-    filename_ = filename;
-}
-
-void Location::set_line_num(int line_num) {
-    line_num_ = line_num;
-}
-
 // Computes and sets the logical line number based on #line directive
 void Location::set_logical_line_num(int line_directive_value,
                                     int line_directive_physical_line,

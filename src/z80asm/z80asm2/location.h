@@ -14,11 +14,19 @@ public:
     void clear();
     bool empty() const;
 
-    const std::string& filename() const;
-    int line_num() const;
+    const std::string& filename() const {
+        return filename_;
+    }
+    int line_num() const {
+        return line_num_;
+    }
 
-    void set_filename(const std::string& filename);
-    void set_line_num(int line_num);
+    void set_filename(const std::string& filename) {
+        filename_ = filename;
+    }
+    void set_line_num(int line_num) {
+        line_num_ = line_num;
+    }
 
     // Computes and sets the logical line number based on #line directive
     void set_logical_line_num(int line_directive_value,

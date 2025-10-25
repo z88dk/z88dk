@@ -7,7 +7,9 @@
 #include "expr.h"
 #include "keywords.h"
 #include "lexer.h"
+#include "options.h"
 #include "preprocessor.h"
+#include "utils.h"
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -33,6 +35,52 @@ void Preprocessor::add_include_path(const std::string& path) {
     include_paths_.push_back(path);
 }
 
+void Preprocessor::preprocess_file(const std::string& input_filename,
+                                   const std::string& output_filename) {
+    if(g_options.verbose) {
+        std::cout << "Preprocessing file: " << input_filename
+                  << " -> " << output_filename << std::endl;
+    }
+
+    if (!open(input_filename)) {
+        return;
+    }
+
+    std::ofstream ofs(output_filename, std::ios::out | std::ios::binary);
+    if (!ofs) {
+        g_errors.error(ErrorCode::FileOpenError, output_filename);
+        return;
+    }
+
+    Location location(input_filename, 0);
+    std::string line;
+    while (next_line(line)) {
+        if (g_errors.filename() != location.filename()) {
+            // filename changed (e.g. due to #include)
+            location.set_filename(g_errors.filename());
+            location.set_line_num(g_errors.line_num());
+            ofs << "#line " << location.line_num() << " \"" << location.filename() << "\""
+                <<
+                std::endl;
+        }
+        else if (g_errors.line_num() < location.line_num()) {
+            // Line number decreased (e.g. due to #line directive)
+            location.set_line_num(g_errors.line_num());
+            ofs << "#line " << location.line_num() << std::endl;
+        }
+        else {
+            // Normal line increment
+            while (g_errors.line_num() > location.line_num()) {
+                ofs << std::endl;
+                location.inc_line_num();
+            }
+            location.set_line_num(g_errors.line_num());
+        }
+        ofs << line << std::endl;
+        location.inc_line_num();
+    }
+}
+
 bool Preprocessor::open(const std::string& filename) {
     file_stack_.clear();
     macros_.clear();
@@ -40,7 +88,7 @@ bool Preprocessor::open(const std::string& filename) {
     if_stack_.clear();
 
     push_file(filename);
-    g_errors.set_location(Location(filename));
+    //g_errors.set_location(Location(filename));
     return !file_stack_.empty();
 }
 
@@ -218,7 +266,7 @@ std::string Preprocessor::resolve_include_path(const std::string& filename,
     if (!file_stack_.empty()) {
         try {
             std::filesystem::path pf(file_stack_.back().filename);
-            current_dir = pf.parent_path().string();
+            current_dir = pf.parent_path().generic_string();
         }
         catch (...) {
             current_dir.clear();
@@ -268,22 +316,7 @@ bool Preprocessor::is_recursive_include(const std::string& filename) const {
 }
 
 void Preprocessor::push_file(const std::string& filename) {
-    // Convert filename to a canonical absolute form when possible to improve
-    // recursive-include detection and diagnostics. If filesystem operations
-    // fail, fall back to the original string.
-    std::string resolved = filename;
-    try {
-        std::filesystem::path p(filename);
-        if (!p.is_absolute()) {
-            p = std::filesystem::absolute(p);
-        }
-        // Lexically normalize to remove ../ etc.
-        resolved = p.lexically_normal().string();
-    }
-    catch (...) {
-        // ignore filesystem errors, keep original filename
-        resolved = filename;
-    }
+    std::string resolved = normalize_path(filename);
 
     // Check for recursive include using the new member function
     if (is_recursive_include(resolved)) {
@@ -338,7 +371,7 @@ bool Preprocessor::is_directive(const char*& p, Keyword& keyword) const {
         return false;
     }
 
-    keyword = to_keyword(word);
+    keyword = keyword_lookup(word);
     if (keyword_is_directive(keyword)) {
         // Found a directive keyword
         return true;
@@ -548,10 +581,10 @@ static std::string resolve_include_candidate(const std::string& filename,
                     if (!norm.is_absolute()) {
                         norm = fs::absolute(norm);
                     }
-                    return norm.lexically_normal().string();
+                    return norm.lexically_normal().generic_string();
                 }
                 catch (...) {
-                    return norm.string();
+                    return norm.generic_string();
                 }
             }
         }
@@ -739,7 +772,7 @@ bool Preprocessor::is_name_directive(const char*& p, std::string& name,
     }
 
     // Convert to keyword and check if it's a name-directive
-    keyword = to_keyword(directive);
+    keyword = keyword_lookup(directive);
     if (!keyword_is_name_directive(keyword)) {
         p = start;
         keyword = Keyword::None;
@@ -1294,7 +1327,7 @@ std::vector<std::string> Preprocessor::collect_local_names(
         }
         if (t < body_line.size() &&
                 body_line[t].type == MacroTokenType::Identifier &&
-                to_keyword(body_line[t].text) == Keyword::LOCAL) {
+                keyword_lookup(body_line[t].text) == Keyword::LOCAL) {
             // collect following identifiers (comma separated)
             ++t;
             while (t < body_line.size()) {
@@ -1820,7 +1853,7 @@ Preprocessor::build_virt_lines_from_macro(
         }
         if (t < body_line.size() &&
                 body_line[t].type == MacroTokenType::Identifier &&
-                to_keyword(body_line[t].text) == Keyword::LOCAL) {
+                keyword_lookup(body_line[t].text) == Keyword::LOCAL) {
             continue; // don't emit LOCAL lines
         }
 
@@ -2613,4 +2646,12 @@ bool Preprocessor::is_name_defined(const std::string& name) const {
         return symbol_defined_callback_(name);
     }
     return false;
+}
+
+void preprocess_only() {
+    for (auto& input_file : g_input_files) {
+        std::string output_file = get_i_filename(input_file);
+        Preprocessor pp;
+        pp.preprocess_file(input_file, output_file);
+    }
 }
