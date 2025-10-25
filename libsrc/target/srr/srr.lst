@@ -4,7 +4,7 @@ target/srr/stdio/getk
 target/srr/stdio/CRT_FONT
 target/srr/stdio/generic_console
 target/srr/stdio/generic_console_ioctl
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 @input/input_keyboard.lst
 target/srr/graphics/textpixl

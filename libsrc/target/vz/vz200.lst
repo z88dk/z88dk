@@ -8,8 +8,8 @@ target/vz/stdio/ansi/f_ansi_char
 target/vz/stdio/ansi/f_ansi_cls
 target/vz/stdio/ansi/f_ansi_dline
 target/vz/stdio/ansi/f_ansi_scrollup
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 
 target/vz/graphics/textpixl
 @gfx/narrow/gfx_narrow.lst

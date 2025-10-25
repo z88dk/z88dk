@@ -3,14 +3,14 @@ target/pps/stdio/fputc_cons
 target/pps/stdio/getk
 target/pps/stdio/generic_console
 target/pps/stdio/conio_vars
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/pps/stdio/ansi/f_ansi_attr
 target/pps/stdio/ansi/f_ansi_bel
 target/pps/stdio/ansi/f_ansi_char
 target/pps/stdio/ansi/f_ansi_cls
 target/pps/stdio/ansi/f_ansi_dline
 target/pps/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/pps/time/clock
 target/pps/time/time
 target/pps/fcntl/close

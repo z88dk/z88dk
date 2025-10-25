@@ -8,8 +8,8 @@ target/ts2068/stdio/ansi/f_ansi_scrollup
 target/ts2068/obj/ts2068/ts_vmod
 target/ts2068/obj/ts2068/call_extrom
 @target/zx/stdio/stdio.lst
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 target/ts2068/graphics_hr/zx_hardcopy
 @target/zx-common/timex_zxn_graphics.lst
 ;gfx/wide/obj/ts2068/w_stencil_render2

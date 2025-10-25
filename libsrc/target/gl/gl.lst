@@ -1,4 +1,4 @@
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/gl/stdio/fgetc_cons
 target/gl/stdio/getk
 target/gl/video/asm_lcd_get_ddram_addr_gl4000

@@ -1,2 +1,0 @@
-stdio/obj/${TYPE}/*.o
-stdio/obj/${TYPE}/conio/**

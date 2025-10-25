@@ -1,7 +1,7 @@
 target/enterprise/stdio/fgetc_cons
 target/enterprise/stdio/getk
 target/enterprise/stdio/fputc_cons
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/enterprise/time/clock
 target/enterprise/games/joystick
 target/enterprise/games/bit_open

@@ -1,9 +1,9 @@
 target/homelab/stdio/generic_console
 target/homelab/stdio/fgetc_cons
 target/homelab/stdio/getk
-@stdio/stdio.lst
-stdio/obj/${TYPE}/inkey/getk
-stdio/obj/${TYPE}/inkey/fgetc_cons
+@classic/stdio/stdio.lst
+classic/stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 @input/input_keyboard.lst
 target/homelab/games/joystick.asm
 target/homelab/games/keys_joystick.asm

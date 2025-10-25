@@ -48,8 +48,8 @@
     defc __IO_VDP_COMMAND           = 0xbf
     defc __IO_VDP_STATUS            = 0xbf
 
-    PUBLIC  IO_SN76489_PORT
-    defc    IO_SN76489_PORT = $7f
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $7f
 
     if __GAMEGEAR__
         defc CONSOLE_XOFFSET = 6

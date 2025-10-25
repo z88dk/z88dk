@@ -21,14 +21,14 @@ target/aquarius/stdio/vpeek_BITMAP
 target/aquarius/stdio/vpeek_TEXT
 target/aquarius/stdio/xypos_BITMAP
 target/aquarius/stdio/xypos_TEXT
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/aquarius/stdio/ansi/f_ansi_attr
 target/aquarius/stdio/ansi/f_ansi_bel
 target/aquarius/stdio/ansi/f_ansi_char
 target/aquarius/stdio/ansi/f_ansi_cls
 target/aquarius/stdio/ansi/f_ansi_dline
 target/aquarius/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/aquarius/input/in_Inkey
 target/aquarius/input/in_KeyPressed
 target/aquarius/input/in_LookupKey

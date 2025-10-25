@@ -123,8 +123,8 @@ target/sam/far/__far_page_mixed
 
 
 ; Just some standard stuff now
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 @games/games.lst
 
 

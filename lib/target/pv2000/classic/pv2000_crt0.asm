@@ -44,8 +44,8 @@ IFNDEF CLIB_DEFAULT_SCREEN_MODE
     defc    CLIB_DEFAULT_SCREEN_MODE = 2
 ENDIF
 
-    PUBLIC  IO_SN76489_PORT
-    defc    IO_SN76489_PORT = $40
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $40
 
     INCLUDE "crt/classic/crt_rules.inc"
 

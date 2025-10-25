@@ -6,8 +6,8 @@ target/zx81/stdio/fputc_cons
 target/zx81/stdio/generic_console
 target/zx81/stdio/__printf_doprint
 target/zx81/stdio/conio/vpeek_screendollar
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 @stdlib/stdlib.lst
 target/zx81/time/clock
 @target/zx81/arch_zx81.lst

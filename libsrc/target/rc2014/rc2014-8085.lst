@@ -10,5 +10,5 @@ target/rc2014/stdio/fgetc_cons_uartb
 @_DEVELOPMENT/newlib/target/rc2014/device/device_8085_sccz80.lst
 @_DEVELOPMENT/newlib/target/rc2014/driver/driver_8085_sccz80.lst
 
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 

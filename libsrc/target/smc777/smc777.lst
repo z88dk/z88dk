@@ -30,4 +30,4 @@ target/smc777/games/joystick
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}_16bit/**/*.o
 @games/games.lst
 @video/mc6845/mc6845.lst
-@stdio/stdio.lst
+@classic/stdio/stdio.lst

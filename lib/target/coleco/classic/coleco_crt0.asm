@@ -23,8 +23,8 @@ ENDIF
     defc    __CPU_CLOCK = 3579545
 
 
-    PUBLIC  IO_SN76489_PORT
-    defc    IO_SN76489_PORT = $ff
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $ff
 
 
 IF (!DEFINED_startup || (startup=1))

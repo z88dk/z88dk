@@ -1,11 +1,11 @@
 target/sc3000/stdio/fgetc_cons
 target/sc3000/stdio/getk
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 
 target/sc3000/time/clock
 @input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
 target/sc3000/games/joystick

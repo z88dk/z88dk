@@ -1,10 +1,10 @@
-@stdio/ansicore.lst
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+@classic/stdio/ansicore.lst
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
 
 @input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 target/myvision/games/joystick.asm
 @games/games.lst

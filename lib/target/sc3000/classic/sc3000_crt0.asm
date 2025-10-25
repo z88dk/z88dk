@@ -21,8 +21,8 @@ IF !DEFINED_CONSOLE_ROWS
 ENDIF
     defc    CRT_KEY_DEL = 12
 
-    PUBLIC  IO_SN76489_PORT
-    defc    IO_SN76489_PORT = $7f
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $7f
 
 IF startup = 2
 	INCLUDE	"target/sc3000/classic/rom.asm"

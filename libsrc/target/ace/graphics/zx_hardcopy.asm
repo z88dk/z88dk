@@ -250,7 +250,7 @@ L08DE:
 
 acefont:
     defs    256
-		;binary "stdio/ansi/f8.bin"
+		;binary "classic/stdio/ansi/f8.bin"
     defs    768
 
 

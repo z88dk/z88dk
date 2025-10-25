@@ -9,13 +9,13 @@ target/gal/stdio/conio_vars
 target/gal/stdio/printc_MODE1
 target/gal/stdio/vpeek_MODE1
 target/gal/stdio/scrollup_MODE1
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/gal/scrolluptxt
 target/gal/scrolldowntxt
 target/gal/invtxt
 target/gal/filltxt
 
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/gal/stdio/ansi/f_ansi_attr
 target/gal/stdio/ansi/f_ansi_char
 target/gal/stdio/ansi/f_ansi_cls

@@ -1,4 +1,4 @@
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/cpc/stdio/ansi/f_ansi_attr
 target/cpc/stdio/ansi/f_ansi_bel
 target/cpc/stdio/ansi/f_ansi_char

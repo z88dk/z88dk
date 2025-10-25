@@ -1,7 +1,7 @@
 target/pacman/stdio/fgetc_cons
 target/pacman/stdio/fputc_cons
 target/pacman/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/pacman/graphics/clsgraph
 target/pacman/graphics/char_address
 target/pacman/graphics/plotpixl

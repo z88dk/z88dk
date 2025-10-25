@@ -1,10 +1,10 @@
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/lm80c/stdio/fputc_cons_native
 target/lm80c/stdio/fgetc_cons
 target/lm80c/stdio/getk
 
 @video/tms9918/video_tms9918_nmi.lst
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 target/lm80c/psg/set_psg

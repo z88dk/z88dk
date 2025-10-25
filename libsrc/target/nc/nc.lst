@@ -1,7 +1,7 @@
 target/nc/stdio/fgetc_cons
 target/nc/stdio/fputc_cons
 target/nc/stdio/CRT_FONT
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/nc/fcntl/open
 target/nc/fcntl/opendir
 target/nc/fcntl/creat

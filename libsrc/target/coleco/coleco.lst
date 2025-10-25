@@ -1,9 +1,9 @@
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/coleco/stdio/CRT_FONT
 target/coleco/stdio/fgetc_cons
 target/coleco/stdio/getk
 @video/tms9918/video_tms9918_nmi.lst
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 @gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o

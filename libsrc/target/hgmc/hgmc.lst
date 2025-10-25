@@ -5,7 +5,7 @@ target/hgmc/stdio/CRT_FONT
 target/hgmc/stdio/fputc_cons_native
 target/hgmc/stdio/getk
 target/hgmc/stdio/fgetc_cons
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 target/hgmc/graphics/pixladdr
 target/hgmc/graphics/clg

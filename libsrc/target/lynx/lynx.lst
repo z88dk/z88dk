@@ -9,7 +9,7 @@ target/lynx/stdio/conio_vars
 target/lynx/stdio/CRT_FONT
 
 @input/input_keyboard.lst
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/lynx/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst
 @video/mc6845/mc6845.lst

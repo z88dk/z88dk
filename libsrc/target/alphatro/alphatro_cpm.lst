@@ -1,5 +1,5 @@
-stdio/obj/${TYPE}/inkey/getk
-@stdio/ansicore.lst
+classic/stdio/obj/${TYPE}/inkey/getk
+@classic/stdio/ansicore.lst
 target/alphatro/stdio/ansi/f_ansi_attr
 target/alphatro/stdio/ansi/f_ansi_bel
 target/alphatro/stdio/ansi/f_ansi_char

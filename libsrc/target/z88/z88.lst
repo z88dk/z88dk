@@ -1,5 +1,5 @@
 target/z88/stdio/fgets_cons
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/z88/stdio/ansi/f_ansi_attr
 target/z88/stdio/ansi/f_ansi_bel
 target/z88/stdio/ansi/f_ansi_char
@@ -10,8 +10,8 @@ target/z88/stdio/fgetc_cons
 target/z88/stdio/fputc_cons
 target/z88/stdio/getcmd
 target/z88/stdio/getk
-@stdio/stdio.lst
-@stdio/stdio_net.lst
+@classic/stdio/stdio.lst
+@classic/stdio/stdio_net.lst
 target/z88/fcntl/fdgetpos
 target/z88/fcntl/fdtell
 target/z88/fcntl/rename

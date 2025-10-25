@@ -29,6 +29,10 @@ IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
 ENDIF
 
+
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $ff
+
     defc    CRT_ORG_BSS = 0x7000	
     defc    CRT_ORG_CODE = 0x8000
 

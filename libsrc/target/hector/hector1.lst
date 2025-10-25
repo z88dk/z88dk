@@ -1,5 +1,5 @@
 target/hector/obj/${TARGET}/**/*.o
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 input/obj/${TYPE}/in_WaitForKey
 input/obj/${TYPE}/in_GetKey

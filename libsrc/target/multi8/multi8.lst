@@ -12,7 +12,7 @@ target/multi8/stdio/CRT_FONT
 target/multi8/tape_load
 target/multi8/asm_tape_load
 target/multi8/load_palette
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/multi8/graphics/clg
 target/multi8/graphics/w_pixladdr
 target/multi8/graphics/w_plotpixl

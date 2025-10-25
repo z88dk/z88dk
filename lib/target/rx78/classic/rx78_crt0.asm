@@ -29,8 +29,8 @@
     defc    CONSOLE_ROWS = 23
     defc    CONSOLE_COLUMNS = 24
 
-    PUBLIC  IO_SN76489_PORT
-    defc    IO_SN76489_PORT = $ff
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $ff
 
 
     defc    TAR__fputc_cons_generic = 1

@@ -1,5 +1,5 @@
 target/dai/stdio/fputc_cons_native
 target/dai/stdio/fgetc_cons
 target/dai/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 

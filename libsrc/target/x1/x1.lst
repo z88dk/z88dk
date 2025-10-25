@@ -1,4 +1,4 @@
 @target/x1/x1_common.lst
 target/x1/stdio/getk
 target/x1/stdio/fgetc_cons
-@stdio/stdio.lst
+@classic/stdio/stdio.lst

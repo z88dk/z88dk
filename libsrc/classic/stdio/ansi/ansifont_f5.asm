@@ -5,4 +5,4 @@
 	PUBLIC	ansifont_f5
 
 ansifont_f5:
-	BINARY	"stdio/ansi/F5.BIN"
+	BINARY	"classic/stdio/ansi/F5.BIN"

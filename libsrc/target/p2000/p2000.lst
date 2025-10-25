@@ -1,14 +1,14 @@
 target/p2000/stdio/fgetc_cons
 target/p2000/stdio/getk
 target/p2000/stdio/fputc_cons
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/p2000/stdio/ansi/f_ansi_attr
 target/p2000/stdio/ansi/f_ansi_bel
 target/p2000/stdio/ansi/f_ansi_char
 target/p2000/stdio/ansi/f_ansi_cls
 target/p2000/stdio/ansi/f_ansi_dline
 target/p2000/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/p2000/time/clock
 target/p2000/graphics/clsgraph
 target/p2000/graphics/plotpixl

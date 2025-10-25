@@ -2,14 +2,14 @@ target/ticalc/obj/${TARGET}/stdio/fputc_cons
 target/ticalc/obj/${TARGET}/stdio/fgetc_cons
 target/ticalc/obj/${TARGET}/stdio/getk
 target/ticalc/obj/${TARGET}/stdio/getk_decode
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/ticalc/obj/${TARGET}/stdio/ansi/f_ansi_attr
 target/ticalc/obj/${TARGET}/stdio/ansi/f_ansi_bel
 target/ticalc/obj/${TARGET}/stdio/ansi/f_ansi_char
 target/ticalc/obj/${TARGET}/stdio/ansi/f_ansi_cls
 target/ticalc/obj/${TARGET}/stdio/ansi/f_ansi_dline
 target/ticalc/obj/${TARGET}/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 @target/ticalc/tigray.lst
 target/ticalc/obj/${TARGET}/graphics/clg
 target/ticalc/obj/${TARGET}/graphics/pixladdr

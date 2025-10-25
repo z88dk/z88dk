@@ -1,7 +1,7 @@
 @target/zx/input_zx.lst
 @target/zx/stdio/stdio.lst
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 target/shared/clock
 target/zxn/stdio/generic_console_zxn
 @target/zxn/newlib/newlib.lst

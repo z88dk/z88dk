@@ -4,14 +4,14 @@ target/mz/stdio/getk
 target/mz/stdio/generic_console
 target/mz/stdio/sharpmz_conversion
 target/mz/stdio/conio_map_colour
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/mz/stdio/ansi/f_ansi_attr
 target/mz/stdio/ansi/f_ansi_bel
 target/mz/stdio/ansi/f_ansi_char
 target/mz/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/mz/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
 target/mz/graphics/clsgraph
 target/mz/graphics/plotpixl

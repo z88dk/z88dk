@@ -14,7 +14,7 @@ target/mbc200/stdio/ansi/f_ansi_char
 target/mbc200/stdio/ansi/f_ansi_cls
 target/mbc200/stdio/ansi/f_ansi_dline
 target/mbc200/stdio/ansi/f_ansi_scrollup
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/mbc200/graphics/__mbc_pixel
 target/mbc200/graphics/__mbc_line
 target/mbc200/graphics/w_plotpixl

@@ -1,4 +1,4 @@
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/einstein/stdio/generic_console
 
 @video/tms9918/video_tms9918.lst

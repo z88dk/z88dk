@@ -1,6 +1,6 @@
 target/laser500/im1_init
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
 target/laser500/stdio/generic_console
 target/laser500/stdio/generic_console_ioctl
 target/laser500/stdio/generic_console_vpeek
@@ -9,7 +9,7 @@ target/laser500/stdio/fputc_cons
 target/laser500/stdio/conio_map_colour
 target/laser500/stdio/bordercolour
 target/laser500/stdio/CRT_FONT
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 @input/input_keyboard.lst
 target/laser500/graphics/clg

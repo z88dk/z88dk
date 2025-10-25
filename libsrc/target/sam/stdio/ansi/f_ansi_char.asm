@@ -1,7 +1,7 @@
 ;
-;       SAM Coupé C Library
+;       SAM Coupï¿½ C Library
 ;
-; 	ANSI Video handling for SAM Coupé
+; 	ANSI Video handling for SAM Coupï¿½
 ;
 ;
 ; 	Handles colors referring to current PAPER/INK/etc. settings
@@ -19,7 +19,7 @@
 ;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
-;       Frode Tennebø - 29/12/2002
+;       Frode Tennebï¿½ - 29/12/2002
 ;
 ;
 ;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
@@ -248,7 +248,7 @@ nounderline:
 ; 	; nothing here !
 ; ELSE
 ; .font
-;         BINARY  "stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
+;         BINARY  "classic/stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
 ; ENDIF
 
     SECTION bss_clib

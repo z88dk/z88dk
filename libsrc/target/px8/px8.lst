@@ -27,12 +27,12 @@ target/px8/graphics/w_fillb_callee
 target/px8/graphics/w_xorclga_callee
 target/px8/graphics/w_area
 @gfx/wide/gfx_wide.lst
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/px8/stdio/ansi/f_ansi_attr
 target/px8/stdio/ansi/f_ansi_bel
 target/px8/stdio/ansi/f_ansi_char
 target/px8/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/px8/stdio/ansi/f_ansi_scrollup
 target/px8/stdio/ansi/_font_8x6_px
 @games/games.lst

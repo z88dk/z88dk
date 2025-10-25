@@ -17,7 +17,7 @@ target/x1/stdio/generic_console
 target/x1/stdio/conio_vars
 target/x1/stdio/conio_map_colour
 target/x1/stdio/CRT_FONT
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 
 target/x1/stdio/ansi/f_ansi_attr
 target/x1/stdio/ansi/f_ansi_bel

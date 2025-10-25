@@ -4,7 +4,7 @@ target/z80tvgame/stdio/generic_console_ioctl
 target/z80tvgame/stdio/CRT_FONT
 target/z80tvgame/stdio/getk
 target/z80tvgame/stdio/fgetc_cons
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 target/z80tvgame/games/joystick
 @games/games.lst

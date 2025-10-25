@@ -22,8 +22,8 @@ ENDIF
     defc    __CPU_CLOCK = 3579999
     defc    CRT_KEY_DEL = 12
 
-    PUBLIC  IO_SN76489_PORT
-    defc    IO_SN76489_PORT = $20
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $20
 
 IF startup = 2
     INCLUDE	"target/m5/classic/rom.asm"

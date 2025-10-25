@@ -1,7 +1,7 @@
 target/msx/fcntl/msxdos1/__bdos.asm
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 @video/tms9918/video_tms9918.lst
-@stdio/stdio_binary.lst
+@classic/stdio/stdio_binary.lst
 target/msx/time/clock
 target/msx/time/time
 target/msx/time/target_read_structtm

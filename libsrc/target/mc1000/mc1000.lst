@@ -5,8 +5,8 @@ target/mc1000/stdio/ansi/f_ansi_attr
 target/mc1000/stdio/ansi/f_ansi_scrollup
 target/mc1000/stdio/ansi/f_ansi_bel
 target/mc1000/stdio/ansi/f_ansi_char
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 target/mc1000/graphics/clg
 target/mc1000/graphics/dfill
 target/mc1000/graphics/bksave

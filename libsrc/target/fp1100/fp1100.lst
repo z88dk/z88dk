@@ -6,7 +6,7 @@ target/fp1100/stdio/conio_map_colour
 target/fp1100/stdio/fputc_cons_native
 target/fp1100/stdio/fgetc_cons
 target/fp1100/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/fp1100/graphics/clg
 target/fp1100/graphics/textpixl
 target/fp1100/graphics/getmaxx

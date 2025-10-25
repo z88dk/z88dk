@@ -31,6 +31,9 @@ ENDIF
     defc    CONSOLE_COLUMNS = 40
     defc    CONSOLE_ROWS = 25
 
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $f2
+
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
