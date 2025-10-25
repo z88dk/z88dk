@@ -2644,15 +2644,14 @@ void cpm_create_filename(const char* binary, char* cpm_filename, char force_com_
 
     ptr = zbasename((char *)binary);
 
-    while (count < 8 && count < strlen(ptr) && ptr[count] != '.') {
-        if (ptr[count] > 127) {
-            cpm_filename[count] = '_';
-        } else {
-            cpm_filename[count] = toupper(ptr[count]);
-        }
-        count++;
+    while (dest < 8 && count < strlen(ptr) && ptr[count] != '.') {
+        if ( isalnum(ptr[count])) {
+            cpm_filename[dest++] = toupper(ptr[count++]);
+        } else count++;
     }
-    dest = count;
+    if ( dest == 0 ) {
+        cpm_filename[dest++] = 'A';
+    }
 
     if ( include_dot ) {
         cpm_filename[dest++] = '.';
