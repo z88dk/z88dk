@@ -1,8 +1,8 @@
 #
 
-include ../../Make.config
+include ../../../Make.config
 
-vpath %.c ../../_DEVELOPMENT/math/float/math32/c
+vpath %.c $(NEWLIB_DIRECTORY)/math/float/math32/c
 vpath %.c ../cimpl
 
 

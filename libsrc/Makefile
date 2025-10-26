@@ -247,46 +247,46 @@ genmath.lib:
 	@echo ''
 	@echo '--- Building Z80 Generic Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/genmath
+	$(MAKE) -C math/float/genmath
 
 mbf32.lib:
 	@echo ''
 	@echo '--- Building Microsoft Single Precision Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/mbf32
+	$(MAKE) -C math/float/mbf32
 
 # math16 build - @feilipu
 math16.lib:
 	@echo ''
 	@echo '--- Building IEEE Half Precision Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/math16
+	$(MAKE) -C math/float/math16
 
 # math32 build - @feilipu
 math32.lib:
 	@echo ''
 	@echo '--- Building IEEE Single Precision Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/math32
+	$(MAKE) -C math/float/math32
 
 mbf64.lib:
 	@echo ''
 	@echo '--- Building Microsoft Double Precision Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/mbf64
+	$(MAKE) -C math/float/mbf64
 
 daimath32.lib:
 	@echo ''
 	@echo '--- Building DAI 32-bit 8080 Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/daimath32
+	$(MAKE) -C math/float/daimath32
 
 # am9511 build - @feilipu
 am9511.lib:
 	@echo ''
 	@echo '--- Building Am9511 APU Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/am9511
+	$(MAKE) -C math/float/am9511
 
 
 # Math48
@@ -294,14 +294,14 @@ math48.lib:
 	@echo ''
 	@echo '--- Building Z80 math48 Library ---'
 	@echo ''
-	$(MAKE) -C math/math48
+	$(MAKE) -C math/float/math48
 
 # Z88 maths build - dom
 z88_math.lib:
 	@echo ''
 	@echo '--- Building Z88 Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/z88math
+	$(MAKE) -C math/float/z88math
 
 ndos.lib:
 	$(MAKE) -C classic/fcntl/dummy

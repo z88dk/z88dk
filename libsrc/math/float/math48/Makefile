@@ -2,7 +2,7 @@
 # Wahey, a messed up makefile for building libraries!
 #
 
-include ../../Make.config
+include ../../../Make.config
 
 TARGET ?= test
 
