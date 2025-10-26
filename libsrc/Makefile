@@ -2403,7 +2403,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
 	$(MAKE) -C classic/gfx clean
-	$(RM) gfx/retrofit/*.o
 	$(RM) *.lib
 
 new-clean:

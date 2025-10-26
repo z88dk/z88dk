@@ -1,6 +1,6 @@
 include ../../Make.config
 
-ALLSUBDIRS = common narrow wide portable x11 gencon 
+ALLSUBDIRS = common narrow wide portable x11 gencon retrofit
 
 SUBDIRS = common 
 # Directories that need a target passed down
@@ -25,7 +25,6 @@ clean: subdirs-clean
 	$(MAKE) -C text clean
 	$(MAKE) -C text6 clean
 	$(MAKE) -C text clean
-	$(MAKE) -C gray clean
 
 subdirs-clean: $(CLEANDIRS)
 
