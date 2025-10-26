@@ -412,3 +412,85 @@ TEST_CASE("Preprocessor: LINE with unquoted filename after comma reports error",
             std::string::npos);
     REQUIRE(msg.find("line_bad_fname:1:") != std::string::npos);
 }
+
+// New tests: C_LINE directive behavior and errors
+
+TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for following lines",
+          "[preprocessor][cline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // C_LINE 400 then two ordinary lines
+    const std::string content = "C_LINE 400\none_line\ntwo_line\n";
+    pp.push_virtual_file(content, "cline_test", 1);
+
+    TokensLine line;
+    // first returned line should be "one_line" with logical line 400
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "one_line");
+    REQUIRE(line.location().line_num() == 400);
+    REQUIRE(line.location().filename() == "cline_test");
+
+    // next returned line should be "two_line" with the same logical line 400
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "two_line");
+    REQUIRE(line.location().line_num() == 400);
+    REQUIRE(line.location().filename() == "cline_test");
+}
+
+TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and line number",
+          "[preprocessor][cline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // C_LINE 300, "cfile.c" then a line
+    const std::string content = "C_LINE 300, \"cfile.c\"\nonly_c_line\n";
+    pp.push_virtual_file(content, "orig_c_line", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "only_c_line");
+    REQUIRE(line.location().line_num() == 300);
+    REQUIRE(line.location().filename() == "cfile.c");
+}
+
+TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
+          "[preprocessor][cline][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "C_LINE\n";
+    pp.push_virtual_file(content, "cline_missing_arg", 1);
+
+    TokensLine line;
+    // consume produced lines (none expected)
+    while (pp.next_line(line)) { }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Expected line number in C_LINE directive") !=
+            std::string::npos);
+    REQUIRE(msg.find("cline_missing_arg:1:") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: C_LINE with unquoted filename after comma reports error",
+          "[preprocessor][cline][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "C_LINE 20, badname\n";
+    pp.push_virtual_file(content, "cline_bad_fname", 1);
+
+    TokensLine line;
+    // consume produced lines (none expected)
+    while (pp.next_line(line)) { }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Expected quoted filename after comma in C_LINE directive") !=
+            std::string::npos);
+    REQUIRE(msg.find("cline_bad_fname:1:") != std::string::npos);
+}
