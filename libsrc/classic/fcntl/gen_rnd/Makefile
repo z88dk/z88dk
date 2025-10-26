@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.3 2016-07-02 15:41:39 dom Exp $
 
 
-include ../../Make.config
+include ../../../Make.config
 
 
 OBJECTS = open.o  close.o lseek.o read.o write.o readbyte.o writebyte.o remove.o rename.o fdtell.o

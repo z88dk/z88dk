@@ -304,10 +304,10 @@ z88_math.lib:
 	$(MAKE) -C math/z88math
 
 ndos.lib:
-	$(MAKE) -C fcntl/dummy
+	$(MAKE) -C classic/fcntl/dummy
 
 gendos.lib:
-	$(MAKE) -C fcntl/gen_rnd
+	$(MAKE) -C classic/fcntl/gen_rnd
 
 # micro8085 library - ahjelm
 micro8085_clib.lib: $(TARGET_CLIB_DEPS)
@@ -2393,7 +2393,7 @@ clean: classic-clean new-clean
 install-clean: classic-clean new-install-clean
 
 classic-clean: $(CLEAN)
-	$(MAKE) -C fcntl clean
+	$(MAKE) -C classic/fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C threading/preempt clean
