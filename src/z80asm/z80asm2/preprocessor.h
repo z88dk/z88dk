@@ -76,6 +76,7 @@ private:
     void process_name_directive(const TokensLine& line, int& i,
                                 Keyword keyword, const std::string& name);
     void process_include(const TokensLine& line, int& i);
+    void do_include(const std::string& filename, bool is_angle);
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);
     void split_line(const Location& location, const TokensLine& expanded);
