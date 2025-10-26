@@ -9,8 +9,8 @@
 @../font/font_4x8/fonts.lst
 @../font/font_8x8/fonts.lst
 @../font/fzx/fzx_sdcc_iy.lst
-@../im2/im2_sdcc.lst
-@../input/sms/input_sdcc.lst
+@../newlib/im2/im2_sdcc.lst
+@../newlib/input/sms/input_sdcc.lst
 @../inttypes/inttypes_sdcc_iy.lst
 @../l/l_z80.lst
 @../libgen/libgen_sdcc.lst
@@ -24,6 +24,6 @@
 @../stdlib/stdlib_sdcc_iy.lst
 @../string/string_sdcc_iy.lst
 @target//sms/driver/driver.lst
-@../threads/threads_sdcc_iy.lst
+@../newlib/threads/threads_sdcc_iy.lst
 @../time/time_sdcc.lst
 @../arch/z80/z80_sdcc.lst

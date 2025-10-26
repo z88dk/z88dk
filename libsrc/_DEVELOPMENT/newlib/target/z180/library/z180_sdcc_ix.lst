@@ -9,8 +9,8 @@
 @../font/font_4x8/fonts.lst
 @../font/font_8x8/fonts.lst
 @../font/fzx/fzx_sdcc_ix.lst
-@../im2/im2_sdcc.lst
-@../input/cpm/input_sdcc_ix.lst
+@../newlib/im2/im2_sdcc.lst
+@../newlib/input/cpm/input_sdcc_ix.lst
 @../inttypes/inttypes_sdcc_ix.lst
 @../l/l_z180.lst
 @../libgen/libgen_sdcc.lst
@@ -23,6 +23,6 @@
 @../newlib/stdio/stdio_sdcc_ix.lst
 @../stdlib/stdlib_sdcc_ix.lst
 @../string/string_sdcc_ix.lst
-@../threads/threads_sdcc_ix.lst
+@../newlib/threads/threads_sdcc_ix.lst
 @../time/time_sdcc.lst
 @../arch/z180/z180_sdcc.lst

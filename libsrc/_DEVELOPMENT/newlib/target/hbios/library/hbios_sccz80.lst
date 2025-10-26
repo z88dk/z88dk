@@ -9,7 +9,7 @@
 @../font/font_4x8/fonts.lst
 @../font/font_8x8/fonts.lst
 @../font/fzx/zx/zx_sccz80.lst
-@../im2/im2_sccz80.lst
+@../newlib/im2/im2_sccz80.lst
 @../target/hbios/input/input_sccz80.lst
 @../inttypes/inttypes_sccz80.lst
 @../l/l_z80.lst
@@ -23,6 +23,6 @@
 @../stdlib/stdlib_sccz80.lst
 @../string/string_sccz80.lst
 @target//hbios/driver/driver_sccz80.lst
-@../threads/threads_sccz80.lst
+@../newlib/threads/threads_sccz80.lst
 @../time/time_sccz80.lst
 @../arch/z80/z80_sccz80.lst

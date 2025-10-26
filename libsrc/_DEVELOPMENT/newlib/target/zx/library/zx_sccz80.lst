@@ -10,8 +10,8 @@
 @../font/font_8x8/fonts.lst
 @../font/fzx/fzx_sccz80.lst
 @../font/fzx/zx/zx_sccz80.lst
-@../im2/im2_sccz80.lst
-@../input/zx/input_sccz80.lst
+@../newlib/im2/im2_sccz80.lst
+@../newlib/input/zx/input_sccz80.lst
 @../inttypes/inttypes_sccz80.lst
 @../l/l_z80.lst
 @../libgen/libgen_sccz80.lst
@@ -27,6 +27,6 @@
 @../string/string_sccz80.lst
 @target//zx/driver/driver.lst
 @../temp/sp1/zx/sp1_zx_sccz80.lst
-@../threads/threads_sccz80.lst
+@../newlib/threads/threads_sccz80.lst
 @../time/time_sccz80.lst
 @../arch/z80/z80_sccz80.lst

@@ -1,0 +1,10 @@
+newlib/threads/mutex/z80/asm_call_once
+newlib/threads/mutex/z80/asm_mtx_destroy
+newlib/threads/mutex/z80/asm_mtx_init
+newlib/threads/mutex/z80/asm_mtx_lock
+newlib/threads/mutex/z80/asm_mtx_timedlock
+newlib/threads/mutex/z80/asm_mtx_trylock
+newlib/threads/mutex/z80/asm_mtx_unlock
+newlib/threads/mutex/z80/asm_spinlock_acquire
+newlib/threads/mutex/z80/asm_spinlock_release
+newlib/threads/mutex/z80/asm_spinlock_tryacquire

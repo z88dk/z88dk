@@ -10,8 +10,8 @@
 @../font/font_4x8/fonts.lst
 @../font/font_8x8/fonts.lst
 @../font/fzx/fzx_sccz80.lst
-@../im2/im2_sccz80.lst
-@../input/cpm/input_sccz80.lst
+@../newlib/im2/im2_sccz80.lst
+@../newlib/input/cpm/input_sccz80.lst
 @../inttypes/inttypes_sccz80.lst
 @../l/l_z180.lst
 @../libgen/libgen_sccz80.lst
@@ -28,6 +28,6 @@
 @target//scz180/device/device_sccz80.lst
 @target//scz180/driver/driver_sccz80.lst
 @target//cpm/driver/driver.lst
-@../threads/threads_sccz80.lst
+@../newlib/threads/threads_sccz80.lst
 @../time/time_sccz80.lst
 @../arch/z180/z180_sccz80.lst
