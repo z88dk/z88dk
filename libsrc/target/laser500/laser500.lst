@@ -29,7 +29,7 @@ target/laser500/graphics/w_respixl
 target/laser500/graphics/w_xorpixel
 target/laser500/graphics/xor_MODE0
 target/laser500/graphics/xor_MODE2
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/laser500/games/bit_open
 target/laser500/games/bit_close
 target/laser500/games/joystick

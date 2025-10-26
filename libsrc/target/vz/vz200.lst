@@ -12,7 +12,7 @@ target/vz/stdio/ansi/f_ansi_scrollup
 @classic/stdio/stdio.lst
 
 target/vz/graphics/textpixl
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/vz/games/bit_open
 target/vz/games/bit_open_di
 target/vz/games/bit_close

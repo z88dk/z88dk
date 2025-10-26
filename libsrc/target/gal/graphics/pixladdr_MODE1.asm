@@ -5,7 +5,7 @@
     SECTION code_clib
     PUBLIC  pixeladdress_MODE1
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 ; Entry  h = x

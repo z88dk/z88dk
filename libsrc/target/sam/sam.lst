@@ -66,8 +66,8 @@ target/zx-common/graphics/obj/${TARGET}/xor_MODE0
 target/zx-common/graphics/obj/${TARGET}/plot_MODE0
 target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE0
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
-gfx/wide/obj/${TARGET}/w_dcircle_square
-@gfx/wide/gfx_wide.lst
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+@classic/gfx/wide/gfx_wide.lst
 ; Fatpix setting
 target/sam/sam/sam_set_fatpix
 

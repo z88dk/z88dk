@@ -16,7 +16,7 @@
     EXTERN  __bdos
     
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 cleargraphics:
 _cleargraphics:

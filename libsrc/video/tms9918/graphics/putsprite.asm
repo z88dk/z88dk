@@ -22,7 +22,7 @@
     EXTERN  __graphics_end
     EXTERN  __generic_putsprite
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "video/tms9918/vdp.inc"
 
 

@@ -38,4 +38,4 @@ target/z1013/graphics/textpixl
 target/z1013/graphics/xor_MODE0
 target/z1013/graphics/xor_MODE1
 target/z1013/graphics/xorpixl
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst

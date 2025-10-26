@@ -4,7 +4,7 @@
     SECTION code_graphics
     PUBLIC  w_pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 ;
 ;       $Id: w_pixladdr.asm,v 1.3 2016-10-14 06:40:26 stefano Exp $
 ;

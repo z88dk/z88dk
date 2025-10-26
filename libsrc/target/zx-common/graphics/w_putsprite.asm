@@ -20,7 +20,7 @@ ENDIF
 
     EXTERN  swapgfxbk
     EXTERN  __graphics_end
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 putsprite:

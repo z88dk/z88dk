@@ -30,10 +30,10 @@ target/mbc200/graphics/w_circle_callee
 target/mbc200/graphics/w_uncircle_callee
 target/mbc200/graphics/w_dcircle_square
 target/mbc200/graphics/clg
-gfx/wide/obj/${TARGET}/w_putsprite2
-gfx/wide/obj/${TARGET}/__generic_w_putsprite
-gfx/wide/obj/${TARGET}/__generic_w_stencil_render
-@gfx/wide/gfx_wide.lst
+classic/gfx/wide/obj/${TARGET}/w_putsprite2
+classic/gfx/wide/obj/${TARGET}/__generic_w_putsprite
+classic/gfx/wide/obj/${TARGET}/__generic_w_stencil_render
+@classic/gfx/wide/gfx_wide.lst
 target/mbc200/games/bit_open
 target/mbc200/games/bit_open_di
 target/mbc200/games/bit_close

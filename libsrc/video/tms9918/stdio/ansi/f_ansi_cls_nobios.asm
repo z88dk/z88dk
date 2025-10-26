@@ -23,7 +23,7 @@
 
     EXTERN  FILVRM
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 ansi_cls:

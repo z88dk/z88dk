@@ -1,5 +1,5 @@
 target/ace/graphics/udg/clsgraph
 target/ace/graphics/udg/textpixl6
 target/ace/graphics/udg/zx_hardcopy
-gfx/text6/obj/${TARGET}/loadudg6
-@gfx/gencon/gfx_gencon6.lst
+classic/gfx/text6/obj/${TARGET}/loadudg6
+@classic/gfx/gencon/gfx_gencon6.lst

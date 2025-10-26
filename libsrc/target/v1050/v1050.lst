@@ -28,5 +28,5 @@ target/v1050/graphics/w_drawto_callee
 target/v1050/graphics/w_undrawto_callee
 target/v1050/graphics/w_xordrawto_callee
 target/v1050/graphics/clg
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 @games/games.lst

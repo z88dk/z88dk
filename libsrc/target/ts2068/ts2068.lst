@@ -13,7 +13,7 @@ target/ts2068/obj/ts2068/call_extrom
 target/ts2068/graphics_hr/zx_hardcopy
 @target/zx-common/timex_zxn_graphics.lst
 ;gfx/wide/obj/ts2068/w_stencil_render2
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/shared/clock
 
 target/ts2068/psg/playzb4

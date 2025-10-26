@@ -9,7 +9,7 @@ target/osca/stdio/ansi//f_ansi_cls
 classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/osca/stdio/ansi/f_ansi_scrollup
 @classic/stdio/stdio.lst
-gfx/wide/obj/osca/w_dcircle_square.asm
+classic/gfx/wide/obj/osca/w_dcircle_square.asm
 target/osca/graphics/drawb
 target/osca/graphics/undrawb
 target/osca/graphics//xorborder
@@ -24,7 +24,7 @@ target/osca/graphics/cclg
 target/osca/graphics/cplot
 target/osca/graphics/cplot_callee
 target/osca/graphics/cplotpixel
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/osca/games/joystick
 @games/games.lst
 target/osca/time/clock

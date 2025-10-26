@@ -15,7 +15,7 @@ target/p2000/graphics/plotpixl
 target/p2000/graphics/respixl
 target/p2000/graphics/xorpixl
 target/p2000/graphics/pointxy
-@gfx/text6/gfx_text6.lst
+@classic/gfx/text6/gfx_text6.lst
 target/p2000/games/bit_open
 target/p2000/games/bit_open_di
 target/p2000/games/bit_close

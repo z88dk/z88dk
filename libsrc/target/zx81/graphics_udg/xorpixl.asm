@@ -12,7 +12,7 @@
 ;
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     SECTION code_clib
     PUBLIC  xorpixel
 

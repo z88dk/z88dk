@@ -5,7 +5,7 @@ target/lm80c/stdio/getk
 
 @video/tms9918/video_tms9918_nmi.lst
 @classic/stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 target/lm80c/psg/set_psg
 target/lm80c/psg/set_psg_callee

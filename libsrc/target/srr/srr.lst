@@ -8,7 +8,7 @@ target/srr/stdio/generic_console_ioctl
 
 @input/input_keyboard.lst
 target/srr/graphics/textpixl
-@gfx/gencon/gfx_gencon.lst
+@classic/gfx/gencon/gfx_gencon.lst
 target/srr/games/keys_joystick
 @games/games.lst
 target/srr/srr/obj/${TARGET}/getplot

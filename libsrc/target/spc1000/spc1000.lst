@@ -10,7 +10,7 @@ target/spc1000/tms9918
 target/spc1000/games/joystick
 target/spc1000/games/keys_joystick
 @games/games.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @video/tms9918/video_tms9918.lst
 target/spc1000/psg/set_psg
 target/spc1000/psg/set_psg_callee

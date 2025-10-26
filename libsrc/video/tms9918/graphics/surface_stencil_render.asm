@@ -11,7 +11,7 @@
 ;	surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_video_vdp
     PUBLIC  surface_stencil_render

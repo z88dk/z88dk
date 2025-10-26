@@ -16,7 +16,7 @@ target/alphatro/stdio/conio_map_colour
 @input/input_keyboard.lst
 target/alphatro/graphics/textpixl6
 target/alphatro/graphics/cleargraphics
-@gfx/gencon/gfx_gencon6.lst
+@classic/gfx/gencon/gfx_gencon6.lst
 @video/mc6845/mc6845.lst
 target/alphatro/games/keys_joystick
 @games/games.lst

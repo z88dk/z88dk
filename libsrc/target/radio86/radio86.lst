@@ -6,5 +6,5 @@ target/radio86/graphics/textpixl
 target/radio86/graphics/getmaxy1
 @classic/stdio/stdio.lst
 
-@gfx/gencon/gfx_gencon1_portable.lst
+@classic/gfx/gencon/gfx_gencon1_portable.lst
 

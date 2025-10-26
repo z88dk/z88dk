@@ -2,7 +2,7 @@
 ;	MSX extension for "GFX - a small graphics library" by Jannone
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_video_vdp
     PUBLIC  surface_plotpixel

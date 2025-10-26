@@ -11,7 +11,7 @@
     EXTERN  w_draw_circle
     EXTERN  __do_w_plot
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 circle_callee:

@@ -8,7 +8,7 @@ target/svi/stdio/generic_console
 target/msx/time/clock
 @video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/svi/games/joystick
 target/svi/games/keys_joystick
 target/msx/games/bit_open

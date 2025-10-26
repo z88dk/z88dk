@@ -13,7 +13,7 @@ target/oz/graphics/putsprite
 target/oz/graphics/pixladdr
 target/oz/graphics/stencil_render
 target/oz/graphics/swapgfxbk
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @games/games.lst
 
 target/oz/oz/obj/oz/restore_a000

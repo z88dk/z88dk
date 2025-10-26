@@ -20,7 +20,7 @@
 
     EXTERN  base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  pixeladdress
     EXTERN  __pixeladdress_hl

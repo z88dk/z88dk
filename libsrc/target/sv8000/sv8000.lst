@@ -1,6 +1,6 @@
 @video/mc6847/mc6847.lst
 @classic/stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/sv8000/interrupts/add_raster_int
 target/sv8000/psg/set_psg
 target/sv8000/psg/set_psg_callee

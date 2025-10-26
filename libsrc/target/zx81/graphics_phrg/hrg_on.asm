@@ -22,7 +22,7 @@
     EXTERN  L0292
     EXTERN  MTCH_P3
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 ;hrgmode:	defb	2

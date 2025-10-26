@@ -33,7 +33,7 @@ target/cpc/graphics/w_plotpixl
 target/cpc/graphics/w_respixl
 target/cpc/graphics/w_xorpixl
 target/cpc/graphics/w_pointxy
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/cpc/time/clock
 target/cpc/games/joystick
 target/cpc/cpcrslib/cpmfirmware

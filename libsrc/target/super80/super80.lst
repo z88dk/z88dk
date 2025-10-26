@@ -3,7 +3,7 @@ classic/stdio/obj/${TYPE}/inkey/getk
 target/super80/stdio/generic_console
 target/super80/stdio/conio_map_colour
 target/super80/graphics/textpixl6
-@gfx/gencon/gfx_gencon6.lst
+@classic/gfx/gencon/gfx_gencon6.lst
 @input/input_keyboard.lst
 @classic/stdio/stdio.lst
 target/super80/games/bit_open

@@ -5,7 +5,7 @@ classic/stdio/obj/${TYPE}/inkey/getk
 @input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/myvision/games/joystick.asm
 @games/games.lst
 target/myvision/psg/set_psg

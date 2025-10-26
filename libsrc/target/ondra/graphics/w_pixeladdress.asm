@@ -3,7 +3,7 @@
     SECTION code_clib
     PUBLIC  w_pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 

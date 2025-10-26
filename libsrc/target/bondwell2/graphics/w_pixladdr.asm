@@ -8,7 +8,7 @@
 
     PUBLIC  w_pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 		;EXTERN   base_graphics
 

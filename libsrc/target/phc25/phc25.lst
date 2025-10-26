@@ -11,11 +11,11 @@ target/phc25/stdio/fputc_cons
 @classic/stdio/stdio.lst
 @input/input_keyboard.lst
 
-gfx/narrow/obj/${TARGET}/clrarea2
-gfx/narrow/obj/${TARGET}/fillarea2
-gfx/narrow/obj/${TARGET}/xorclrarea2
+classic/gfx/narrow/obj/${TARGET}/clrarea2
+classic/gfx/narrow/obj/${TARGET}/fillarea2
+classic/gfx/narrow/obj/${TARGET}/xorclrarea2
 target/phc25/graphics/textpixl6
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 
 target/phc25/games/joystick
 target/phc25/games/keys_joystick

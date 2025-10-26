@@ -10,5 +10,5 @@ target/z80tvgame/games/joystick
 @games/games.lst
 target/z80tvgame/graphics/pixladdr
 target/z80tvgame/graphics/clsgraph
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 

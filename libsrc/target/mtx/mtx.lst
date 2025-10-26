@@ -6,7 +6,7 @@ target/mtx/stdio/getk
 target/mtx/time/clock
 @video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/mtx/games/joystick
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}_latch/**/*.o
 @games/games.lst

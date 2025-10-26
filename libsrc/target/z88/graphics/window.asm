@@ -29,7 +29,7 @@
 
 
 
-    INCLUDE "graphics/grafix.inc"       ; Contains fn defs
+    INCLUDE "classic/gfx/grafix.inc"       ; Contains fn defs
 
     INCLUDE "stdio.def"
     INCLUDE "map.def"

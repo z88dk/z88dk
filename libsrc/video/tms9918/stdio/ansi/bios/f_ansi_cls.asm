@@ -16,7 +16,7 @@
     EXTERN  msxbios
     EXTERN  __tms9918_attribute
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 IF  FORmsx

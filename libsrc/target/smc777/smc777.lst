@@ -24,7 +24,7 @@ target/smc777/graphics/w_respixl_MODE8
 target/smc777/graphics/w_xorpixl
 target/smc777/graphics/w_xorpixl_MODE4
 target/smc777/graphics/w_xorpixl_MODE8
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/smc777/games/joystick
 
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}_16bit/**/*.o

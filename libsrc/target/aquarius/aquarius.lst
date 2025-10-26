@@ -35,7 +35,7 @@ target/aquarius/input/in_LookupKey
 target/aquarius/input/in_keytranstbl
 @input/input_keyboard.lst
 target/aquarius/graphics/textpixl6
-@gfx/text6/gfx_text6.lst
+@classic/gfx/text6/gfx_text6.lst
 target/aquarius/games/bit_open
 target/aquarius/games/bit_open_di
 target/aquarius/games/bit_close

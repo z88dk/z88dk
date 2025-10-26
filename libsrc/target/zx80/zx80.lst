@@ -22,7 +22,7 @@ target/zx80/graphics/plotpixl
 target/zx80/graphics/respixl
 target/zx80/graphics/xorpixl
 target/zx80/graphics/pointxy
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @target/zx81/arch_zx81.lst
 target/zx81/psg/set_psg
 target/zx81/psg/set_psg_callee

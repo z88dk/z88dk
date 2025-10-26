@@ -5,7 +5,7 @@
 target/shared/clock
 target/zxn/stdio/generic_console_zxn
 @target/zxn/newlib/newlib.lst
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 _DEVELOPMENT/font/fzx/obj/${TYPE}/**/*.o
 
 

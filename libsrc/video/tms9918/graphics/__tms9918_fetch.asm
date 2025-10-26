@@ -7,7 +7,7 @@
     EXTERN  l_tms9918_disable_interrupts
     EXTERN  l_tms9918_enable_interrupts
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "video/tms9918/vdp.inc"
 
 ;

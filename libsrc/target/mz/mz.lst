@@ -38,6 +38,6 @@ target/mz/tape/obj/${TARGET}/bit_load_block_zx
 target/mz/tape/obj/${TARGET}/bit_load_block_zx_callee
 target/mz/tape/obj/${TARGET}/bit_save_block_zx
 target/mz/tape/obj/${TARGET}/bit_save_block_zx_callee
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @games/games.lst
 

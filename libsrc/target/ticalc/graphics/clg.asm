@@ -9,7 +9,7 @@
 
     SECTION code_graphics
 
-    INCLUDE "graphics/grafix.inc"       ; Contains fn defs
+    INCLUDE "classic/gfx/grafix.inc"       ; Contains fn defs
 
     PUBLIC  clg
     PUBLIC  _clg

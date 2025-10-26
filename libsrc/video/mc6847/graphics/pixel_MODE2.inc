@@ -2,7 +2,7 @@
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __mc6847_MODE2_attr
 

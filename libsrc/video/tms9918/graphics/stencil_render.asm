@@ -11,7 +11,7 @@
 ;        stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "video/tms9918/vdp.inc"
 
     SECTION smc_video_vdp

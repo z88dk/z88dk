@@ -9,7 +9,7 @@
     EXTERN  KRT_PORT
     EXTERN  KRT_BANK_SELECTOR
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including

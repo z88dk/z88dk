@@ -13,7 +13,7 @@
     PUBLIC  clg
     PUBLIC  _clg
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 clg:

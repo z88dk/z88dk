@@ -6,7 +6,7 @@ target/msx/time/clock
 target/msx/time/time
 target/msx/time/target_read_structtm
 @target/cpm/fcntl/fcntl.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/msx/psg/playzb4
 target/msx/psg/psg_init
 target/msx/psg/get_psg

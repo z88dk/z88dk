@@ -16,7 +16,7 @@
 
     EXTERN  __generic_clrarea
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "video/tms9918/vdp.inc"
 
 ;

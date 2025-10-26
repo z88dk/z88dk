@@ -6,7 +6,7 @@ target/nc/graphics/w_pixladdr
 target/nc/graphics/swapgfxbk
 target/nc/graphics/fill
 target/nc/vram_vars
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 input/obj/${TYPE}/in_WaitForKey
 target/nc/input/in_Inkey
 input/obj/${TYPE}/in_GetKey

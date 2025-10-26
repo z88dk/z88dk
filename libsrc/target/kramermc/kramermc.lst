@@ -3,5 +3,5 @@ target/kramermc/stdio/fputc_cons_native
 target/kramermc/stdio/getk
 target/kramermc/stdio/fgetc_cons
 @classic/stdio/stdio.lst
-@gfx/gencon/gfx_gencon1.lst
+@classic/gfx/gencon/gfx_gencon1.lst
 

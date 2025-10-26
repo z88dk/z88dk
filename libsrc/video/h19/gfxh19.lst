@@ -6,5 +6,5 @@ video/h19/graphics/xorpixl
 video/h19/graphics/pointxy
 video/h19/graphics/h19_backbuffer
 video/h19/graphics/h19_sendchar
-gfx/narrow/obj/${TARGET}/getsprite2
-@gfx/narrow/gfx_narrow.lst
+classic/gfx/narrow/obj/${TARGET}/getsprite2
+@classic/gfx/narrow/gfx_narrow.lst

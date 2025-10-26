@@ -5,5 +5,5 @@ target/pv1000/stdio/getk
 target/pv1000/games/joystick
 games/obj/pv1000/joystick_type
 target/pv1000/graphics/textpixl
-@gfx/gencon/gfx_gencon.lst
+@classic/gfx/gencon/gfx_gencon.lst
 

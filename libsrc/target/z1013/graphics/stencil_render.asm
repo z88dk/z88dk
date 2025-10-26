@@ -11,7 +11,7 @@
 ;    stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     MODULE  __z1013_stencil_render
     SECTION smc_clib

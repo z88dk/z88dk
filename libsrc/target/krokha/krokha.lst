@@ -3,7 +3,7 @@ target/krokha/graphics/textpixl
 target/krokha/games/joystick
 target/krokha/games/joystick
 @games/games.lst
-@gfx/gencon/gfx_gencon_portable.lst
+@classic/gfx/gencon/gfx_gencon_portable.lst
 @classic/stdio/stdio.lst
 
 

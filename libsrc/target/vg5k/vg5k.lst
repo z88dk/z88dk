@@ -19,7 +19,7 @@ target/vg5k/stdio/conio_vars
 @input/input_keyboard.lst
 target/vg5k/graphics/textpixl6
 target/vg5k/graphics/cleargraphics
-@gfx/gencon/gfx_gencon6.lst
+@classic/gfx/gencon/gfx_gencon6.lst
 target/vg5k/games/joystick
 target/vg5k/games/keys_joystick
 target/vg5k/games/bit_open

@@ -14,7 +14,7 @@ target/abc80/time/clock
 target/abc80/graphics/clsgraph
 target/abc80/graphics/pixel
 target/abc80/graphics/pointxy
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 games/obj/${TARGET}/joystick
 games/obj/${TARGET}/joystick_type
 target/abc80/abc80/abc_inv

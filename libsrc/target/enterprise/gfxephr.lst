@@ -30,8 +30,8 @@ target/enterprise/graphics_hr/xorplot
 graphics/retrofit/obj/${TYPE}/xorplot_callee
 target/enterprise/graphics_hr/setxy
 target/enterprise/graphics_hr/move
-gfx/wide/obj/${TARGET}/w_putsprite4
+classic/gfx/wide/obj/${TARGET}/w_putsprite4
 graphics/retrofit/obj/${TYPE}/w_plotpixl
 graphics/retrofit/obj/${TYPE}/w_respixl
 graphics/retrofit/obj/${TYPE}/w_setxy
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst

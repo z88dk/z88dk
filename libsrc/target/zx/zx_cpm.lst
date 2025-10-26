@@ -7,7 +7,7 @@ target/zx/graphics/rowtab
 target/zx/graphics/pixladdr
 target/zx/graphics_cpm/pixel
 target/zx/graphics_cpm/pointxy
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/zx/games/joystick
 target/zx/games/bit_open_cpm
 target/zx/games/bit_open_di_cpm

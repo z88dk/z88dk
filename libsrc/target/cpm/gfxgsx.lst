@@ -45,7 +45,7 @@ graphics/retrofit/obj/${TYPE}/w_setxy
 target/cpm/graphics/obj/${TYPE}/move
 target/cpm/graphics/obj/${TYPE}/putc_gsx
 target/cpm/graphics/obj/${TYPE}/stencil_render
-gfx/wide/obj/${TARGET}/draw_profile_vy
-gfx/wide/obj/${TARGET}/stencil_init_vy
-gfx/wide/obj/${TARGET}/stencil_add_pixel_vy
-@gfx/wide/gfx_wide.lst
+classic/gfx/wide/obj/${TARGET}/draw_profile_vy
+classic/gfx/wide/obj/${TARGET}/stencil_init_vy
+classic/gfx/wide/obj/${TARGET}/stencil_add_pixel_vy
+@classic/gfx/wide/gfx_wide.lst

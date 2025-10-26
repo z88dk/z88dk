@@ -15,7 +15,7 @@
     EXTERN  loadudg6
     EXTERN  generic_console_cls
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 cleargraphics:

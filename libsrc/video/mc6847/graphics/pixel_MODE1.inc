@@ -3,7 +3,7 @@
     EXTERN  __gfx_coords
     EXTERN  pix_return
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including

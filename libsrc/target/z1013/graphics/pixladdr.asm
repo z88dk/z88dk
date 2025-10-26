@@ -8,7 +8,7 @@
     EXTERN  KRT_PORT
     EXTERN  KRT_ADDRESS
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ; ******************************************************************

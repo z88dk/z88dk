@@ -5,7 +5,7 @@
 
     EXTERN  __tms9918_graphics_point
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "video/tms9918/vdp.inc"
 
 IF  VDP_EXPORT_GFX_DIRECT=1

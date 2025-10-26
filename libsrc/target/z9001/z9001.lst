@@ -41,5 +41,5 @@ target/z9001/graphics/xor_MODE0
 target/z9001/graphics/xor_MODE1
 target/z9001/graphics/w_xorpixl
 @video/krt/video_krt.lst
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 

@@ -14,7 +14,7 @@
     EXTERN  update
     EXTERN  row
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ; ******************************************************************

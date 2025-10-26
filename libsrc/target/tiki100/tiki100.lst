@@ -16,7 +16,7 @@ target/tiki100/graphics/getmaxy
 target/tiki100/graphics/fill
 target/tiki100/graphics/w_putsprite
 target/tiki100/graphics/w_stencil_render
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/tiki100/gr_setpalette
 target/tiki100/gr_defmod
 target/tiki100/gr_scroll

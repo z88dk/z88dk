@@ -2,7 +2,7 @@
 
 @video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/nabu/psg/asm_vt2_hardware_out
 target/nabu/psg/set_psg_callee
 target/nabu/psg/psg_init

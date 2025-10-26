@@ -18,8 +18,8 @@ target/special/graphics/w_plotpixl
 target/special/graphics/w_respixl
 target/special/graphics/w_xorpixl
 target/special/graphics/w_pointxy
-@gfx/portable/gfx_portable_w.lst
-@gfx/wide/gfx_wide.lst
+@classic/gfx/portable/gfx_portable_w.lst
+@classic/gfx/wide/gfx_wide.lst
 ;@input/input_keyboard.lst
 ;target/special/games/joystick
 ;target/special/games/keys_joystick

@@ -7,7 +7,7 @@
     EXTERN  __mc6847_mode
     EXTERN  __tms9918_getmaxx
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "video/mc6847/mc6847.inc"
 
 getmaxx:

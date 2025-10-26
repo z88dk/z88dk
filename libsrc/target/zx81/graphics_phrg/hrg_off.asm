@@ -18,7 +18,7 @@
     EXTERN  MTCH_P3
     EXTERN  zx_slow
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 

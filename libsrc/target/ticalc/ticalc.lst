@@ -17,7 +17,7 @@ target/ticalc/obj/${TARGET}/graphics/putsprite
 target/ticalc/obj/${TARGET}/graphics/bksave
 target/ticalc/obj/${TARGET}/graphics/bkrestore
 target/ticalc/obj/${TARGET}/graphics/swapgfxbk
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/ticalc/obj/${TARGET}/games/joystick
 target/ticalc/obj/${TARGET}/games/bit_open
 target/ticalc/obj/${TARGET}/games/bit_open_di

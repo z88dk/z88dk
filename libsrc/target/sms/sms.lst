@@ -22,7 +22,7 @@ target/sms/add_pause_int
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
 @games/games.lst
 @video/tms9918/video_tms9918.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @classic/stdio/stdio.lst
 @classic/stdio/ansicore.lst
 

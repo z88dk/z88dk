@@ -2,7 +2,7 @@
 target/einstein/stdio/generic_console
 
 @video/tms9918/video_tms9918.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/einstein/psg/asm_vt2_hardware_out
 target/einstein/psg/asm_wyz_hardware_out
 target/einstein/psg/psg_init

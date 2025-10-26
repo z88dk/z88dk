@@ -8,7 +8,7 @@ target/m5/stdio/fputc_cons_rom
 @classic/stdio/stdio.lst
 
 @input/input_keyboard.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick
 target/m5/games/keys_joystick
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
