@@ -17,305 +17,70 @@
 
 class Preprocessor {
 public:
-    Preprocessor();
+    Preprocessor() = default;
 
-    // Open the main file and start processing
-    bool open(const std::string& filename);
+    // Push a TokensFile constructed from a file.
+    void push_file(const std::string& filename);
 
-    // Get the next preprocessed line, returns false at EOF
-    bool next_line(std::string& out_line);
+    // Push a TokensFile constructed from a string (virtual file).
+    void push_virtual_file(const std::string& content,
+                           const std::string& filename,
+                           int first_line_num = 1);
 
-    // Add a directory to the include search path (ordered)
-    void add_include_path(const std::string& path);
+    // Pop and return the next processed TokensLine.
+    bool next_line(TokensLine& out_line);
 
-    // Callback-based interface so the caller (assembler) can evaluate
-    // expressions that depend on assembler symbols.
-    struct EvalResult {
-        bool ok = false;                // true: evaluation succeeded
-        int value = 0;                  // evaluated integer value
-        bool unknown_link_time = false; // true if value depends on link-time symbols
-        std::string message;            // optional diagnostic text
-    };
+    // Register a simple macro replacement (no parameters). Replacement may be
+    // one or more TokensLine objects (multi-line macro).
+    void define_macro(const std::string& name,
+                      const std::vector<TokensLine>& replacement);
 
-    using EvalCallback =
-        std::function<EvalResult(const std::string& expr, const Location& loc)>;
-
-    // Register the assembler-supplied evaluator. Can be nullptr to disable.
-    void set_eval_callback(EvalCallback cb) {
-        eval_callback_ = std::move(cb);
-    }
-
-    // Callback to ask the assembler whether a given symbol name is defined.
-    // This is used by IFDEF/IFNDEF/ELIFDEF/ELIFNDEF to consider both preprocessor
-    // macros and assembler symbols as "defined".
-    using SymbolDefinedCallback = std::function<bool(const std::string& name)>;
-
-    // Register the assembler-provided symbol-defined predicate. Can be nullptr to disable.
-    void set_symbol_defined_callback(SymbolDefinedCallback cb) {
-        symbol_defined_callback_ = std::move(cb);
-    }
-
-    // preprocess one input file, generate file.i
-    void preprocess_file(const std::string& input_filename,
-                         const std::string& output_filename);
+    // Clear all state (stack, macros, recursion counters)
+    void clear();
 
 private:
     static const inline int MAX_MACRO_RECURSION = 32;
 
-    struct LogicalLine {
-        std::string text;
-        int physical_line_num; // 1-based
-    };
-
-    struct InputFile {
-        std::string filename;
-        std::vector<LogicalLine> lines;
-        size_t line_index = 0;
-        Location location;
-        bool line_directive_active = false;
-        int line_directive_value = 0;
-        int line_directive_physical_line = 0;
-        bool is_macro_expansion = false;
-    };
-
     struct Macro {
-        // parameter names (empty for object-like)
-        std::vector<std::string> params;
-
-        // tokenized macro body as multiple logical lines
-        // each entry is the token vector for one logical line
-        std::vector<std::vector<MacroToken>> body_lines;
-
-        bool is_function_like() const {
-            return !params.empty();
-        }
-
-        bool is_multi_line() const {
-            return body_lines.size() > 1;
-        }
+        std::vector<TokensLine> replacement; // replacement token lines
+        std::vector<std::string> params;     // parameter names (empty => object-like)
+        bool is_function = false;
     };
 
-    struct IfEntry {
-        // any previous branch of this if/elif chain was true
-        bool any_branch_taken = false;
-        // is the current branch active (lines inside should be processed)
-        bool active = true;
-        // else already encountered -> further elif/else invalid
-        bool else_seen = false;
-
-        IfEntry() = default;
-
-        IfEntry(bool a) :
-            any_branch_taken(a), active(a), else_seen(false) {}
+    struct File {
+        TokensFile tokens_file;
+        int line_index = 0;
     };
 
-    // member data
-    std::vector<InputFile> file_stack_;
+    // Queue of tokenized lines waiting to be processed/consumed.
+    std::deque<TokensLine> input_queue_;
+
+    // Stack of source files currently open (keeps ownership of
+    // TokensFile objects).
+    std::vector<File> file_stack_;
+
+    // Macro table
     std::unordered_map<std::string, Macro> macros_;
-    std::deque<std::string> split_queue_;
-    std::vector<IfEntry> if_stack_;
-    std::vector<std::string> include_paths_;
-    EvalCallback eval_callback_;
-    SymbolDefinedCallback symbol_defined_callback_;
-    Location line_location_;    // set by #LINE / #C_LINE directives
 
-    // Resolve an include/binary filename using include paths and the current file's directory.
-    // Returns a normalized absolute path if found, or an empty string if not found.
-    std::string resolve_include_path(const std::string& filename,
-                                     bool is_angle) const;
+    // Track macro expansion recursion depth per macro name
+    // (to avoid infinite recursion).
+    std::unordered_map<std::string, int> macro_recursion_count_;
 
-    // Handle file stack
-    bool read_file(const std::string& filename,
-                   std::vector<LogicalLine>& lines);
-    void push_file(const std::string& filename);
-    void pop_file();
-    bool is_recursive_include(const std::string& filename) const;
-    void split_logical_lines(const char* buffer,
-                             std::vector<LogicalLine>& lines);
-
-    // Process directives
-    bool is_directive(const char*& p, Keyword& keyword) const;
-    bool process_directive(Keyword keyword, const char*& p);
-    bool process_include(const char*& p);
-    bool process_define(const char*& p);
-    bool process_defl(const char*& p);
-    bool process_undef(const char*& p);
-    bool process_line(const char*& p);
-    bool process_c_line(const char*& p);
-    bool process_rept(const char*& p);
-    bool process_reptc(const char*& p);
-    bool process_repti(const char*& p);
-    bool process_macro(const char*& p);
-    bool process_binary(const char*& p);
-
-    // Checks for "name DIRECTIVE value" syntax.
-    // If found, sets 'name' and 'keyword' and returns true. Advances 'p' past the directive.
-    bool is_name_directive(const char*& p, std::string& name,
-                           Keyword& keyword) const;
-    bool process_name_directive(Keyword keyword, const std::string& name,
-                                const char*& p);
-    bool process_name_defl(const char*& p, const std::string& name);
-    bool process_name_define(const char*& p, const std::string& name,
-                             std::vector<std::string> params);
-    bool process_name_macro(const char*& p, const std::string& name);
-    bool process_name_reptc(const char*& p, const std::string& name);
-    bool process_name_repti(const char*& p, const std::string& name);
-    bool process_name_equ(const char*& p, const std::string& name);
-
-    // Parameter parsing helpers used by both `process_macro` and `process_name_macro`.
-    bool parse_param_list_parenthesized(const char*& p,
-                                        std::vector<std::string>& params);
-    void parse_param_list_comma_separated(const char*& p,
-                                          std::vector<std::string>& params);
-    // Read macro body (lines) from the current input file into `macro` until ENDM.
-    // Returns true if ENDM was found, false on EOF (still fills macro.body_lines).
-    bool read_macro_body(Macro& macro);
-
-    // Expands a macro invocation (object-like or function-like) in a line.
-    // Returns the expanded string.
-    std::string expand_macros(const std::string& line,
-                              int recursion_depth = 0);
-    std::string expand_object_macro(const Macro& macro, int recursion_depth);
-    std::string expand_function_macro(const Macro& macro,
-                                      const std::vector<MacroToken>& tokens,
-                                      size_t& i, int recursion_depth);
-    bool handle_macro_operators(const std::vector<MacroToken>& tokens,
-                                size_t& i, std::vector<std::string>& output);
-
-    // Helper: Expand macro body with arguments
-    std::string expand_macro_with_args(const Macro& macro,
-                                       const std::vector<std::string>& args,
-                                       int recursion_depth);
-    std::unordered_map<std::string, std::string> make_param_map(
-        const Macro& macro, const std::vector<std::string>& args);
-    void expand_macro_token_with_args(
-        const std::unordered_map<std::string, std::string>& param_map,
-        const std::vector<MacroToken>& body_tokens,
-        size_t& i,
-        std::vector<std::string>& output) const;
-
-    // Remove all comments from a line (handles multi-line comments with state)
-    std::string remove_comments(InputFile& file);
-
-    // split line at colons and backslashes, except the first colon
-    // if it's part of a label
-    void split_lines(const std::string& line,
-                     std::vector<std::string>& split_lines);
-
-    // Global counter used to uniquify LOCAL identifiers per expansion
-    static inline int macro_expansion_counter_ = 0;
-
-    // Helper: invoke a multi-line macro during expansion (pushes a virtual InputFile)
-    std::string expand_multiline_macro_invocation(const std::string& name,
-            const Macro& macro,
-            const std::vector<MacroToken>& tokens,
-            size_t& i,
-            int recursion_depth,
-            const std::string& prefix = std::string());
-    // For object-like multi-line invocation we need tokens and index so any trailing
-    // tokens on the same logical line can be captured and pushed for later expansion.
-    std::string expand_multiline_object_macro_invocation(
-        const std::string& name,
-        const Macro& macro,
-        const std::vector<MacroToken>& tokens,
-        size_t& i,
-        int recursion_depth,
-        const std::string& prefix = std::string());
-
-    // New helpers to remove duplication between the two expand_multiline_* methods
-    int get_invocation_physical_line_num() const;
-    std::vector<LogicalLine> build_virt_lines_from_macro(
-        const Macro& macro,
-        const std::unordered_map<std::string, std::string>& combined_param_map,
-        int phys_line_num) const;
-
-    // Push a virtual InputFile constructed from virt_lines for macro expansion.
-    // invocation_filename: optional filename to record as the origin of the expansion
-    // (usually the including / invoking file). If empty, the current top of file_stack_
-    // will be used when available.
-    void push_virtual_macro_file(const std::string& name,
-                                 int uniq_id,
-                                 std::vector<LogicalLine>&& virt_lines,
-                                 const std::string& invocation_filename = std::string());
-
-    // Push a macro virtual file plus an optional suffix virtual file that will be
-    // processed after the macro body. `virt_lines` should already have the
-    // caller-provided prefix applied (if any). If `suffix` is empty no suffix file
-    // is pushed. `phys_line_num` is used for the suffix logical line.
-    void push_macro_and_suffix_files(const std::string& name,
-                                     int uniq_id,
-                                     std::vector<LogicalLine>&& virt_lines,
-                                     const std::string& suffix,
-                                     int phys_line_num);
-
-    // Apply a caller-provided prefix (text before the macro on the same logical line)
-    // to the first virtual line produced by a macro expansion.
-    // Ensures a separating space is inserted when necessary.
-    void apply_prefix_to_virt_lines(std::vector<LogicalLine>& virt_lines,
-                                    const std::string& prefix) const;
-
-    // Helper: read raw logical lines until the given end directive
-    // (e.g. ENDR or ENDM).
-    // Fills out_lines with raw logical lines (no comment removal
-    // performed here - each line is obtained by remove_comments which
-    // advances the current file line_index). Returns true if the end
-    // directive was found, false on EOF (and reports a missing-end error).
-    bool read_raw_block_until(Keyword endDirective,
-                              std::vector<LogicalLine>& out_lines);
-
-    // Parse macro argument list starting at tokens[start_index].
-    // On success returns true, sets out_index to the token index after ')'
-    // and fills out_args with expanded argument strings.
-    bool parse_macro_args(const std::vector<MacroToken>& tokens,
-                          size_t start_index,
-                          size_t& out_index,
-                          std::vector<std::string>& out_args,
-                          int recursion_depth);
-
-    // Helpers to extract LOCAL identifiers from a macro and build a map of
-    // unique local names for a given expansion id.
-    std::vector<std::string> collect_local_names(const Macro& macro) const;
-    std::unordered_map<std::string, std::string> make_local_rename_map(
-        const Macro& macro, int uniq_id) const;
-
-    // Common implementation for REPTC handling. If 'name' is non-null the
-    // name-first syntax (`name REPTC arg`) is used and `p` is positioned
-    // after the directive. If 'name' is null the normal syntax
-    // (`REPTC var, arg`) is used and `p` should point after the directive.
-    bool do_reptc_common(const char*& p,
-                         const std::string* name);
-
-    bool do_repti_common(const char*& p,
-                         const std::string* name);
-
-    // Parse a constant expression from the text starting at p.
-    // Expands any macros in the text first, then scans the expanded text
-    // for a constant expression. Returns true on success and fills 'value'.
-    // Does not advance the caller's 'p'.
-    bool get_constant_value(const char*& p, int& value);
-
-    // IF / ELIF / ELSE / ENDIF support
-    // These directives allow conditional inclusion of logical lines.
-    // Implemented so directives themselves are always processed (to keep nesting),
-    // while non-control directives and normal lines are skipped when any enclosing
-    // condition is inactive.
-    bool process_if(const char*& p);
-    bool process_elif(const char*& p);
-    bool process_ifdef(const char*& p);
-    bool process_ifndef(const char*& p);
-    bool process_elifdef(const char*& p);
-    bool process_elifndef(const char*& p);
-    bool process_else(const char*& p);
-    bool process_endif(const char*& p);
-
-    // Helper: test whether the given name is considered "defined".
-    // Returns true if either a preprocessor macro exists or the optional
-    // assembler-provided symbol-defined callback reports the name as defined.
-    bool is_name_defined(const std::string& name) const;
-
-    // Helper to test whether all enclosing IFs are currently active (true).
-    bool ifs_all_active() const;
-
+    // Internal helpers
+    void expect_end(const TokensLine& line, int i) const;
+    void skip_spaces(const TokensLine& line, int& i) const;
+    bool is_directive(const TokensLine& line, int& i, Keyword& keyword) const;
+    bool is_name_directive(const TokensLine& line, int& i,
+                           Keyword& keyword, std::string& name) const;
+    void process_directive(const TokensLine& line, int& i, Keyword keyword);
+    void process_name_directive(const TokensLine& line, int& i,
+                                Keyword keyword, const std::string& name);
+    void process_include(const TokensLine& line, int& i);
+    void split_lines(const Location& location,
+                     const std::vector<TokensLine>& expanded);
+    void split_line(const Location& location, const TokensLine& expanded);
+    void split_label(const Location& location,
+                     const TokensLine& expanded, int& i);
+    std::vector<TokensLine> expand_macros(const std::vector<TokensLine>& lines);
 };
 
-void preprocess_only();
