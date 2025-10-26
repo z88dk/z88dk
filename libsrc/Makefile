@@ -212,7 +212,7 @@ include _DEVELOPMENT/setjmp/setjmp.mak
 include classic/string/string.mak
 include _DEVELOPMENT/string/string.mak
 include classic/stdio/stdio.mak
-include stdlib/stdlib.mak
+include classic/stdlib/stdlib.mak
 include _DEVELOPMENT/time/time.mak
 include _DEVELOPMENT/sound/ay/ay.mak
 include _DEVELOPMENT/sound/sn76489/sn76489.mak

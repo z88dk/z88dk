@@ -8,7 +8,7 @@ target/zx81/stdio/__printf_doprint
 target/zx81/stdio/conio/vpeek_screendollar
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
-@stdlib/stdlib.lst
+@classic/stdlib/stdlib.lst
 target/zx81/time/clock
 @target/zx81/arch_zx81.lst
 target/zx81/psg/set_psg
