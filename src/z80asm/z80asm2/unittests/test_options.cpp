@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 #include <cstdio>
+#include <iostream>
+#include <sstream>
 
 // Small helper to write a file with given contents.
 static std::string write_text_file(const std::filesystem::path& path,
@@ -22,6 +24,23 @@ static std::string write_text_file(const std::filesystem::path& path,
     ofs.close();
     return path.generic_string();
 }
+
+// Helper to capture std::cerr output
+class CerrRedirect {
+    std::ostringstream ss;
+    std::streambuf* old;
+public:
+    CerrRedirect() : old(std::cerr.rdbuf(ss.rdbuf())) {}
+    ~CerrRedirect() {
+        std::cerr.rdbuf(old);
+    }
+    std::string str() const {
+        return ss.str();
+    }
+};
+
+// Global capture for this translation unit to prevent tests from printing to the console.
+static CerrRedirect g_cerr_silencer;
 
 TEST_CASE("get_asm_filename and get_i_filename replace extensions",
           "[options][replace_extension]") {

@@ -159,3 +159,174 @@ TEST_CASE("Preprocessor: include with angle brackets treated as string; missing 
     REQUIRE(msg.find("Expected filename string in include directive") ==
             std::string::npos);
 }
+
+TEST_CASE("Preprocessor: string escape sequences are converted to integer list",
+          "[preprocessor][strings][escapes]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // The assembly string contains many escape sequences. Use a C++ literal
+    // where backslashes are escaped so the assembler sees the intended escapes.
+    const std::string content =
+        "db \"A\\a\\b\\e\\f\\n\\r\\t\\v\\x41\\101\\\\\\\"\\'\"\n";
+    pp.push_virtual_file(content, "escape_test", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+
+    const auto& toks = line.tokens();
+
+    // Collect integer token values produced from the string
+    std::vector<int> ints;
+    int comma_count = 0;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer)) {
+            ints.push_back(t.int_value());
+        }
+        else if (t.is(TokenType::Comma)) {
+            ++comma_count;
+        }
+    }
+
+    // Expected interpreted character codes:
+    // 'A', '\a'(7), '\b'(8), '\e'(27), '\f'(12), '\n'(10), '\r'(13),
+    // '\t'(9), '\v'(11), '\x41'(65), '\101'(65), '\\'(92), '"' (34), '\'' (39)
+    std::vector<int> expected = {
+        static_cast<int>('A'),
+        7, 8, 27, 12, 10, 13, 9, 11,
+        0x41, 0101, static_cast<int>('\\'), static_cast<int>('"'),
+        static_cast<int>('\'')
+    };
+
+    REQUIRE(ints.size() == expected.size());
+    REQUIRE(ints == expected);
+
+    // Ensure commas separate the numbers (n-1 commas for n characters)
+    REQUIRE(comma_count == static_cast<int>(expected.size()) - 1);
+}
+
+// New test: include accepts quoted, angle and plain filename forms
+TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms",
+          "[preprocessor][include][forms]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fq = "inc_quoted.tmp";
+    const std::string fa = "inc_angle.tmp";
+    const std::string fp = "inc_plain.tmp";
+
+    // create the three files with distinct first lines
+    {
+        std::ofstream ofs(fq, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "from_quoted\n";
+        std::ofstream ofs2(fa, std::ios::binary);
+        REQUIRE(ofs2.is_open());
+        ofs2 << "from_angle\n";
+        std::ofstream ofs3(fp, std::ios::binary);
+        REQUIRE(ofs3.is_open());
+        ofs3 << "from_plain\n";
+    }
+
+    // Build virtual file with three include directives using the three forms,
+    // then a sentinel line to ensure we continue after includes.
+    std::string content;
+    content += "#include \"" + fq + "\"\n";
+    content += "#include <" + fa + ">\n";
+    content += "#include " + fp + "\n";
+    content += "sentinel\n";
+
+    pp.push_virtual_file(content, "include_forms", 1);
+
+    TokensLine line;
+
+    // Expect included contents to appear in the same order
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "from_quoted");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "from_angle");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "from_plain");
+
+    // finally the sentinel from the original virtual file
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "sentinel");
+
+    // cleanup
+    std::remove(fq.c_str());
+    std::remove(fa.c_str());
+    std::remove(fp.c_str());
+}
+
+// New tests: trailing extra text after include filename should produce an error
+TEST_CASE("Preprocessor: include with trailing extra token after filename is flagged as error",
+          "[preprocessor][include][error][trailing]") {
+    const std::string fq = "inc_trail_quoted.tmp";
+    const std::string fa = "inc_trail_angle.tmp";
+    const std::string fp = "inc_trail_plain.tmp";
+
+    // create files to be referenced
+    {
+        std::ofstream ofs(fq, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "Q\n";
+        std::ofstream ofs2(fa, std::ios::binary);
+        REQUIRE(ofs2.is_open());
+        ofs2 << "A\n";
+        std::ofstream ofs3(fp, std::ios::binary);
+        REQUIRE(ofs3.is_open());
+        ofs3 << "P\n";
+    }
+
+    TokensLine line;
+
+    // Quoted form with trailing token
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        std::string content = "#include \"" + fq + "\" trailing\n";
+        pp.push_virtual_file(content, "inc_trail_q", 1);
+        while (pp.next_line(line)) { }
+        REQUIRE(g_errors.has_errors());
+        std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Unexpected token") != std::string::npos);
+        REQUIRE(msg.find("trailing") != std::string::npos);
+    }
+
+    // Angle-bracket form with trailing token
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        std::string content = "#include <" + fa + "> trailing\n";
+        pp.push_virtual_file(content, "inc_trail_a", 1);
+        while (pp.next_line(line)) { }
+        REQUIRE(g_errors.has_errors());
+        std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Unexpected token") != std::string::npos);
+        REQUIRE(msg.find("trailing") != std::string::npos);
+    }
+
+    // Plain filename form with trailing token
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        std::string content = "#include " + fp + " trailing\n";
+        pp.push_virtual_file(content, "inc_trail_p", 1);
+        while (pp.next_line(line)) { }
+        REQUIRE(g_errors.has_errors());
+        std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Unexpected token") != std::string::npos);
+        REQUIRE(msg.find("trailing") != std::string::npos);
+    }
+
+    // cleanup
+    std::remove(fq.c_str());
+    std::remove(fa.c_str());
+    std::remove(fp.c_str());
+}
