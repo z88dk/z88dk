@@ -1,9 +1,9 @@
 STDLIB_AFILES := $(notdir $(wildcard classic/stdlib/*.asm))
 STDLIB_CFILES := unbcd.c wcmatch.c getopt.c
 
-STDLIB_8080_AFILES := $(notdir $(filter-out $(wildcard classic/stdlib/*sqrt*.asm classic/stdlib/*inp*.asm classic/stdlib/*outp*.asm classic/stdlib/*extract*.asm) , $(wildcard classic/stdlib/*.asm))) $(patsubstclassic/stdlib/%,%,$(wildcard classic/stdlib/8080/*.asm))
-STDLIB_8085_AFILES := $(notdir $(filter-out $(wildcard classic/stdlib/*sqrt*.asm classic/stdlib/*inp*.asm classic/stdlib/*outp*.asm classic/stdlib/*extract*.asm) , $(wildcard classic/stdlib/*.asm))) $(patsubstclassic/stdlib/%,%,$(wildcard classic/stdlib/8080/*.asm))
-STDLIB_GBZ80_AFILES := $(notdir $(filter-out $(wildcard classic/stdlib/*sqrt*.asm classic/stdlib/*inp*.asm classic/stdlib/*outp*.asm classic/stdlib/*extract*.asm) , $(wildcard classic/stdlib/*.asm))) $(patsubstclassic/stdlib/%,%,$(wildcard classic/stdlib/8080/*.asm))
+STDLIB_8080_AFILES := $(notdir $(filter-out $(wildcard classic/stdlib/*sqrt*.asm classic/stdlib/*inp*.asm classic/stdlib/*outp*.asm classic/stdlib/*extract*.asm) , $(wildcard classic/stdlib/*.asm))) $(patsubst classic/stdlib/%,%,$(wildcard classic/stdlib/8080/*.asm))
+STDLIB_8085_AFILES := $(notdir $(filter-out $(wildcard classic/stdlib/*sqrt*.asm classic/stdlib/*inp*.asm classic/stdlib/*outp*.asm classic/stdlib/*extract*.asm) , $(wildcard classic/stdlib/*.asm))) $(patsubst classic/stdlib/%,%,$(wildcard classic/stdlib/8080/*.asm))
+STDLIB_GBZ80_AFILES := $(notdir $(filter-out $(wildcard classic/stdlib/*sqrt*.asm classic/stdlib/*inp*.asm classic/stdlib/*outp*.asm classic/stdlib/*extract*.asm) , $(wildcard classic/stdlib/*.asm))) $(patsubs tclassic/stdlib/%,%,$(wildcard classic/stdlib/8080/*.asm))
 
 
 STDLIB_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_AFILES:.asm=.o)
