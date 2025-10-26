@@ -12,5 +12,5 @@ target/mikro80/graphics/textpixl
 @classic/gfx/narrow/gfx_narrow.lst
 target/mikro80/games/joystick
 target/mikro80/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 

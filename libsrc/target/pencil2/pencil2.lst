@@ -8,7 +8,7 @@ target/pencil2/stdio/CRT_FONT
 @classic/gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
 target/pencil2/games/keys_joystick
-games/obj/pencil2/joystick_type
-@games/games.lst
+classic/games/obj/pencil2/joystick_type
+@classic/games/games.lst
 @input/input_keyboard.lst
 

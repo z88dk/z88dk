@@ -17,7 +17,7 @@
 
     EXTERN  __snd_tick
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 bit_load_block_zx_callee:
 _bit_load_block_zx_callee:

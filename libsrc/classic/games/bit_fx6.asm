@@ -12,7 +12,7 @@ IF  !__CPU_GBZ80__
     SECTION code_clib
     PUBLIC  bit_fx6
     PUBLIC  _bit_fx6
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  bit_open
     EXTERN  bit_open_di

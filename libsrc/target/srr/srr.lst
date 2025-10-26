@@ -10,7 +10,7 @@ target/srr/stdio/generic_console_ioctl
 target/srr/graphics/textpixl
 @classic/gfx/gencon/gfx_gencon.lst
 target/srr/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 target/srr/srr/obj/${TARGET}/getplot
 target/srr/srr/obj/${TARGET}/invid
 target/srr/srr/obj/${TARGET}/monitor

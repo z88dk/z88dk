@@ -10,7 +10,7 @@ target/pasopia7/stdio/generic_console_ioctl
 @input/input_keyboard.lst
 target/pasopia7/games/joystick
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
-@games/games.lst
+@classic/games/games.lst
 @classic/gfx/gencon/gfx_gencon1.lst
 @video/mc6845/mc6845.lst
 

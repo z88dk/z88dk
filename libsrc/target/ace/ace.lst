@@ -16,7 +16,7 @@ target/ace/stdio/ansi/f_ansi_scrollup
 target/ace/time/clock
 
 target/ace/games/joystick
-@games/games.lst
+@classic/games/games.lst
 @target/ace/ace/ace.lst
 target/ace/tape/obj/${TARGET}/tape_load_block
 target/ace/tape/obj/${TARGET}/tape_load_block_callee

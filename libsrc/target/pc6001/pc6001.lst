@@ -12,7 +12,7 @@ target/pc6001/stdio/ansi/f_ansi_scrollup
 @classic/stdio/stdio.lst
 
 target/pc6001/games/joystick
-games/obj/pc6001/joystick_type
+classic/games/obj/pc6001/joystick_type
 target/pc6001/graphics/textpixl6
 @classic/gfx/narrow/gfx_narrow.lst
 target/pc6001/psg/set_psg

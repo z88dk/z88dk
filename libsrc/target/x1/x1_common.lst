@@ -58,4 +58,4 @@ target/x1/psg/get_psg
 target/x1/psg/psg_init
 target/x1/psg/playzb4
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@games/games_joystick.lst
+@classic/games/games_joystick.lst

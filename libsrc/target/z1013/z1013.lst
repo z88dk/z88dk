@@ -15,7 +15,7 @@ classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/z1013/stdio/ansi/f_ansi_scrollup
 @classic/stdio/stdio.lst
 target/z1013/games/joystick.asm
-@games/games_joystick.lst
+@classic/games/games_joystick.lst
 
 
 @video/krt/video_krt.lst

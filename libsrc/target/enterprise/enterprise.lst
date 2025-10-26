@@ -8,7 +8,7 @@ target/enterprise/games/bit_open
 target/enterprise/games/bit_open_di
 target/enterprise/games/bit_close
 target/enterprise/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/enterprise/tape/tape_load_block
 target/enterprise/tape/tape_save_block
 target/enterprise/tape/tape_save

@@ -6,7 +6,7 @@
     SECTION code_clib
     PUBLIC  beeper
     PUBLIC  _beeper
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     ;EXTERN      bit_open_di
     ;EXTERN      bit_close_ei

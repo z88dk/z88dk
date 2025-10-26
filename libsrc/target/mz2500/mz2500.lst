@@ -4,4 +4,4 @@ target/mz2500/stdio/getk
 target/mz2500/stdio/conio_map_colour
 target/mz2500/stdio/generic_console
 @classic/stdio/stdio.lst
-@games/games.lst
+@classic/games/games.lst

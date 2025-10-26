@@ -12,7 +12,7 @@ IF  !__CPU_GBZ80__
     SECTION code_clib
     PUBLIC  bit_click
     PUBLIC  _bit_click
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  __snd_tick
 

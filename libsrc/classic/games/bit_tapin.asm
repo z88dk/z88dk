@@ -25,7 +25,7 @@
     EXTERN  __WINWID
 
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 
 IF  __CPU_GBZ80__||__CPU_INTEL__

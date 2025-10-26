@@ -15,7 +15,7 @@ IF  !__CPU_GBZ80__&&!__CPU_INTEL__
     EXTERN  __snd_tick
     EXTERN  __bit_irqstatus
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 bit_open_di:
 _bit_open_di:

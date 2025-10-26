@@ -7,7 +7,7 @@
 ; Stefano Bodrato - 2001..2013
 ;
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
     SECTION code_clib
     PUBLIC  bit_open
     PUBLIC  _bit_open

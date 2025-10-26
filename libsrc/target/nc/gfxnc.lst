@@ -19,4 +19,4 @@ input/obj/${TYPE}/in_GetKeyVariables
 input/obj/${TYPE}/fgetc_cons_inkey
 target/nc/games/joystick
 target/nc/games/keys_joystick
-@games/games_joystick.lst
+@classic/games/games_joystick.lst

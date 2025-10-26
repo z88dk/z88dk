@@ -13,7 +13,7 @@
 
     EXTERN  bit_close_ei
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 
 bit_tapiof:

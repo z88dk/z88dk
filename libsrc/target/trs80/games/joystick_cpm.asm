@@ -2,4 +2,4 @@
 
 
 UNDEFINE FORtrs80
-INCLUDE "games/joystick.asm"
+INCLUDE "classic/games/joystick.asm"

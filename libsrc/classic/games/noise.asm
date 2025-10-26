@@ -7,7 +7,7 @@ IF  !__CPU_GBZ80__&&!__CPU_INTEL__
     SECTION code_clib
     PUBLIC  noise
     PUBLIC  _noise
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     ;EXTERN      bit_open_di
     ;EXTERN      bit_close_ei

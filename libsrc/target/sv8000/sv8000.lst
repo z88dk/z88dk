@@ -9,6 +9,6 @@ target/sv8000/psg/psg_init
 target/sv8000/psg/asm_wyz_hardware_out
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 target/sv8000/games/joystick
-games/obj/sv8000/joystick_type
-@games/games.lst
+classic/games/obj/sv8000/joystick_type
+@classic/games/games.lst
 

@@ -26,7 +26,7 @@ target/mc1000/games/bit_open
 target/mc1000/games/bit_open_di
 target/mc1000/games/bit_close
 target/mc1000/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/mc1000/psg/set_psg
 target/mc1000/psg/set_psg_callee
 target/mc1000/psg/get_psg

@@ -11,7 +11,7 @@
     PUBLIC  _bit_close_ei
     EXTERN  __snd_tick
     EXTERN  __bit_irqstatus
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 bit_close_ei:
 _bit_close_ei:

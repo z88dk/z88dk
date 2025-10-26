@@ -12,5 +12,5 @@ classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 @classic/stdio/stdio.lst
 target/ondra/games/joystick
 target/ondra/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 

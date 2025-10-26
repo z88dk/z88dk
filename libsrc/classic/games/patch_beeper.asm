@@ -9,7 +9,7 @@ IF  !__CPU_GBZ80__&&!__CPU_INTEL__
 
     PUBLIC  patch_beeper
     PUBLIC  _patch_beeper
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     ;EXTERN      bit_open_di
     ;EXTERN      bit_close_ei

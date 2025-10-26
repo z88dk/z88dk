@@ -7,5 +7,5 @@ classic/stdio/obj/${TYPE}/inkey/getk
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
-@games/games.lst
+@classic/games/games.lst
 

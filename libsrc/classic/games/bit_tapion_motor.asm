@@ -14,7 +14,7 @@
 
     EXTERN  bit_open_di
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 
 bit_tapion_motor:

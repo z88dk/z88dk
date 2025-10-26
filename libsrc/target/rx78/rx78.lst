@@ -21,5 +21,5 @@ target/rx78/graphics/pointxy
 @classic/gfx/narrow/gfx_narrow.lst
 target/rx78/games/joystick
 target/rx78/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 

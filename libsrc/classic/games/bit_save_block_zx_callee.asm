@@ -11,7 +11,7 @@
     PUBLIC  _bit_save_block_zx_callee
     PUBLIC  asm_bit_save_block_zx
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  bit_open_di
     EXTERN  bit_close_ei

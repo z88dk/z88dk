@@ -1,5 +1,5 @@
 
-include ../Make.config
+include ../../Make.config
 
 
 TARGET ?= test
@@ -32,7 +32,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../ -Ca-DFOR$(SUBTYPE)
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../../ -Ca-DFOR$(SUBTYPE)
 
 obj/zxn/%.o: %.c
 	$(ZCC) +$(TARGET) -clib=classic $(CFLAGS) -o $@  $^

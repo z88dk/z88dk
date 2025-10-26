@@ -7,4 +7,4 @@ input/obj/${TYPE}/in_WaitForNoKey
 input/obj/${TYPE}/in_GetKeyReset
 input/obj/${TYPE}/in_GetKeyVariables
 input/obj/${TYPE}/fgetc_cons_inkey
-@games/games.lst
+@classic/games/games.lst

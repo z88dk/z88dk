@@ -56,5 +56,5 @@ target/shared/clock
 target/sam/time/target_read_structtm
 
 ; Just some standard stuff now
-@games/games.lst
+@classic/games/games.lst
 

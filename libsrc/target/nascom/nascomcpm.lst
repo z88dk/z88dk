@@ -9,4 +9,4 @@ target/nascom/stdio/ansi/f_ansi_scrollup
 target/nascom/graphics/textpixl6
 @classic/stdio/ansicore.lst
 @classic/gfx/gencon/gfx_gencon6.lst
-@games/games.lst
+@classic/games/games.lst

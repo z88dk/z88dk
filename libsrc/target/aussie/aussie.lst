@@ -10,4 +10,4 @@ target/aussie/games/bit_open
 target/aussie/games/bit_open_di
 target/aussie/games/bit_close
 target/aussie/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst

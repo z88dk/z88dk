@@ -23,4 +23,4 @@ classic/gfx/retrofit/obj/${TYPE}/xordrawr_callee
 classic/gfx/retrofit/obj/${TYPE}/xordrawto_callee
 @classic/gfx/portable/gfx_portable_draw_w.lst
 @classic/gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/games/games.lst

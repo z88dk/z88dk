@@ -4,4 +4,4 @@ target/rc700/graphics/textpixl6
 target/rc700/graphics/clsgraph
 target/rc700/graphics/swapgfxbk
 @classic/gfx/text6/gfx_text6.lst
-@games/games.lst
+@classic/games/games.lst

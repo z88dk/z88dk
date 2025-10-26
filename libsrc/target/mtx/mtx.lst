@@ -9,6 +9,6 @@ target/mtx/time/clock
 @classic/gfx/narrow/gfx_narrow.lst
 target/mtx/games/joystick
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}_latch/**/*.o
-@games/games.lst
+@classic/games/games.lst
 @target/mtx/rs232/rs232.lst
 

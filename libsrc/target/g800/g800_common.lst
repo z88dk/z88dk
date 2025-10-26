@@ -6,7 +6,7 @@ target/g800/games/bit_open
 target/g800/games/bit_open_di
 target/g800/games/bit_close
 target/g800/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 classic/gfx/narrow/obj/${TARGET}/getsprite2
 classic/gfx/narrow/obj/${TARGET}/putsprite2
 target/g800/graphics/obj/${TARGET}/plotpixel

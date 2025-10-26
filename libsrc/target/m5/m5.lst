@@ -12,5 +12,5 @@ target/m5/stdio/fputc_cons_rom
 target/m5/games/joystick
 target/m5/games/keys_joystick
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
-@games/games.lst
+@classic/games/games.lst
 

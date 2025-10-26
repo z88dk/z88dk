@@ -11,7 +11,7 @@
     EXTERN  joystick_inkey
     EXTERN  getk
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 .joystick
 ._joystick
@@ -21,11 +21,11 @@
 IF INPUT_JOY_useinkey = 0
     cp      1	 ; Stick emulation 1 (qaop-mn)
     jr      nz,j_no1
-    INCLUDE "games/joystick_qaop.as1"
+    INCLUDE "classic/games/joystick_qaop.as1"
 .j_no1
     cp      2   ; Stick emulation 2 (8246-05)
     jr      nz,j_no2
-    INCLUDE "games/joystick_8246.as1"
+    INCLUDE "classic/games/joystick_8246.as1"
 .j_no2
     ld	    hl,0
     ret

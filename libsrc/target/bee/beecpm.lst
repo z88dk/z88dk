@@ -13,6 +13,6 @@ target/bee/stdio/CRT_FONT
 target/shared/copy_font
 
 target/bee/games/joystick
-@games/games.lst
+@classic/games/games.lst
 target/bee/graphics/textpixl
 @classic/gfx/gencon/gfx_gencon.lst

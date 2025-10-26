@@ -23,5 +23,5 @@ target/special/graphics/w_pointxy
 ;@input/input_keyboard.lst
 ;target/special/games/joystick
 ;target/special/games/keys_joystick
-;@games/games.lst
+;@classic/games/games.lst
 

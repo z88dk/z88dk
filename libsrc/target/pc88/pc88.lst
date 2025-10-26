@@ -42,7 +42,7 @@ target/pc88/games/bit_open_di
 target/pc88/games/bit_close
 target/pc88/games/bit_close_ei
 target/pc88/time/clock
-@games/games.lst
+@classic/games/games.lst
 target/pc88/psg/set_psg
 target/pc88/psg/set_psg_callee
 target/pc88/psg/psg_init

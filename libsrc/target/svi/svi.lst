@@ -15,7 +15,7 @@ target/msx/games/bit_open
 target/msx/games/bit_open_di
 target/msx/games/bit_close
 target/msx/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/msx/psg/playzb4
 target/msx/psg/psg_init
 target/msx/psg/get_psg

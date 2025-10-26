@@ -16,7 +16,7 @@ classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/z9001/stdio/ansi/f_ansi_scrollup
 @classic/stdio/stdio.lst
 target/z9001/games/joystick
-@games/games.lst
+@classic/games/games.lst
 target/z9001/graphics/textpixl
 
 

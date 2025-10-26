@@ -29,4 +29,4 @@ target/v1050/graphics/w_undrawto_callee
 target/v1050/graphics/w_xordrawto_callee
 target/v1050/graphics/clg
 @classic/gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/games/games.lst

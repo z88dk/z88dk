@@ -13,4 +13,4 @@ classic/gfx/narrow/obj/gl6000/putsprite
 
 @input/input_keyboard.lst
 target/gl6000/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst

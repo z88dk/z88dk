@@ -13,7 +13,7 @@ target/zx/games/bit_open_cpm
 target/zx/games/bit_open_di_cpm
 target/zx/games/bit_close
 target/zx/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/zx/graphics/rowtab
 target/zx/zx_attr
 target/zx/cpm/zx_attr_callee

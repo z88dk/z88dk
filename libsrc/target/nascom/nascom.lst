@@ -12,5 +12,5 @@ target/nascom/stdio/ansi/f_ansi_scrollup
 @classic/stdio/stdio.lst
 target/nascom/graphics/textpixl6
 @classic/gfx/gencon/gfx_gencon6.lst
-@games/games.lst
+@classic/games/games.lst
 

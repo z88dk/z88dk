@@ -35,7 +35,7 @@ IF  !__CPU_GBZ80__&&!__CPU_INTEL__
     PUBLIC  FR_3
     PUBLIC  FR_4
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  bit_open_di
     EXTERN  bit_close_ei

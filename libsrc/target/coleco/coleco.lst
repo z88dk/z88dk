@@ -9,6 +9,6 @@ target/coleco/stdio/getk
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
 target/coleco/games/joystick
 target/coleco/games/coleco_joypad
-games/obj/coleco/joystick_type
-@games/games.lst
+classic/games/obj/coleco/joystick_type
+@classic/games/games.lst
 

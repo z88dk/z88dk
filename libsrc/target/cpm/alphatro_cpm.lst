@@ -9,4 +9,4 @@ target/alphatro/graphics/cleargraphics
 @classic/gfx/gencon/gfx_gencon6.lst
 @video/mc6845/mc6845.lst
 target/alphatro/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst

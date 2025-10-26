@@ -7,7 +7,7 @@ target/kc/stdio/generic_console_vpeek
 target/kc/stdio/conio_map_colour
 target/kc/stdio/CRT_FONT
 @classic/stdio/stdio.lst
-games/obj/${TARGET}/joystick
+classic/games/obj/${TARGET}/joystick
 target/kc/graphics/clg
 target/kc/graphics/w_pixladdr
 target/kc/graphics/swapgfxbk
@@ -18,5 +18,5 @@ classic/gfx/wide/obj/${TARGET}/w_xorclga_callee_smc
 classic/gfx/wide/obj/${TARGET}/w_fillb_callee_smc
 classic/gfx/wide/obj/${TARGET}/w_dcircle_square
 @classic/gfx/wide/gfx_wide.lst
-@games/games_joystick.lst
+@classic/games/games_joystick.lst
 

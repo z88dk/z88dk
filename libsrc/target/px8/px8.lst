@@ -35,4 +35,4 @@ target/px8/stdio/ansi/f_ansi_cls
 classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/px8/stdio/ansi/f_ansi_scrollup
 target/px8/stdio/ansi/_font_8x6_px
-@games/games.lst
+@classic/games/games.lst

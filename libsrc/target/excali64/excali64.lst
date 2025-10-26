@@ -13,4 +13,4 @@ target/excali64/stdio/loadudg6
 @classic/gfx/gencon/gfx_gencon6.lst
 @video/mc6845/mc6845.lst
 @classic/stdio/stdio.lst
-@games/games.lst
+@classic/games/games.lst

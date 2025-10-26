@@ -13,4 +13,4 @@ target/pcw/psg/psg_init
 target/pcw/far/__far_misc
 target/pcw/far/__far_page
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@games/games.lst
+@classic/games/games.lst

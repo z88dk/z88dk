@@ -10,7 +10,7 @@ target/lviv/stdio/CRT_FONT
 
 target/lviv/games/joystick
 target/lviv/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 target/lviv/graphics/clg
 target/lviv/graphics/pixladdr
 target/lviv/graphics/plotpixl

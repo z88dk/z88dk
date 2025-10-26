@@ -12,4 +12,4 @@ target/nabu/psg/get_psg
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
 target/nabu/games/joystick.asm
 target/nabu/games/paddle.asm
-@games/games.lst
+@classic/games/games.lst

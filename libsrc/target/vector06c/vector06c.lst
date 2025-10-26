@@ -15,7 +15,7 @@ classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 @input/input_keyboard.lst
 
 
-@games/games.lst
+@classic/games/games.lst
 target/vector06c/graphics/clg
 target/vector06c/graphics/w_pixladdr
 target/vector06c/graphics/w_plotpixl

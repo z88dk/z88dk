@@ -6,4 +6,4 @@ target/bic/psg/psg_init
 target/bic/psg/asm_wyz_hardware_out
 target/bic/psg/asm_vt2_hardware_out
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@games/games.lst
+@classic/games/games.lst

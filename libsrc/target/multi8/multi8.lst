@@ -27,5 +27,5 @@ target/multi8/psg/get_psg
 target/multi8/psg/psg_init
 target/multi8/psg/asm_wyz_hardware_out
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@games/games_joystick.lst
+@classic/games/games_joystick.lst
 

@@ -43,4 +43,4 @@ target/agon/agon/agon_set_palette
 target/agon/agon/agon_set_cursor_state
 @classic/stdio/stdio.lst
 @classic/gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/games/games.lst

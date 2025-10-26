@@ -9,7 +9,7 @@ IF  !__CPU_GBZ80__
     SECTION code_clib
     PUBLIC  bit_fx5
     PUBLIC  _bit_fx5
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  beeper
     EXTERN  noise

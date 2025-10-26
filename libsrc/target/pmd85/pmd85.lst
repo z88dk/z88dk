@@ -12,7 +12,7 @@ classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 
 target/pmd85/games/joystick
 target/pmd85/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 target/pmd85/graphics/clg
 target/pmd85/graphics/w_pixladdr
 target/pmd85/graphics/w_plotpixl

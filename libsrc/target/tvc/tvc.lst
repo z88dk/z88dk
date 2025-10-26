@@ -7,7 +7,7 @@ target/tvc/games/bit_open
 target/tvc/games/bit_open_di
 target/tvc/games/bit_close
 target/tvc/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/tvc/time/clock
 target/tvc/tvc_cls
 target/tvc/tvc_ed_cfix

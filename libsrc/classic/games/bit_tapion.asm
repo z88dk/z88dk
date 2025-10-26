@@ -28,7 +28,7 @@
     EXTERN  __WINWID
 
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 
 bit_tapion:

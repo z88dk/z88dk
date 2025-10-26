@@ -7,5 +7,5 @@ target/homelab2/graphics/textpixl
 @input/input_keyboard.lst
 target/homelab2/games/joystick.asm
 target/homelab2/games/keys_joystick.asm
-@games/games.lst
+@classic/games/games.lst
 

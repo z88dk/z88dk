@@ -30,7 +30,7 @@ target/pps/fcntl/rmdir
 target/pps/fcntl/mkdir
 target/pps/fcntl/getwd
 target/pps/fcntl/getcwd
-@games/games.lst
+@classic/games/games.lst
 target/zx/psg/set_psg
 target/zx/psg/set_psg_callee
 target/zx/psg/get_psg

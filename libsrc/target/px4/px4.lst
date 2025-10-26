@@ -15,4 +15,4 @@ target/px4/stdio/ansi/f_ansi_char
 target/px4/stdio/ansi/f_ansi_cls
 target/px4/stdio/ansi/f_ansi_dline
 target/px4/stdio/ansi/f_ansi_scrollup
-@games/games.lst
+@classic/games/games.lst

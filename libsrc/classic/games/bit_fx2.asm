@@ -8,7 +8,7 @@ IF  !__CPU_GBZ80__
     SECTION smc_clib
     PUBLIC  bit_fx2
     PUBLIC  _bit_fx2
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  bit_open
     EXTERN  bit_open_di

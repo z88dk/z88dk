@@ -7,7 +7,7 @@ classic/stdio/obj/${TYPE}/inkey/getk
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/myvision/games/joystick.asm
-@games/games.lst
+@classic/games/games.lst
 target/myvision/psg/set_psg
 target/myvision/psg/set_psg_callee
 target/myvision/psg/get_psg
