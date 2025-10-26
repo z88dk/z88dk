@@ -77,14 +77,12 @@ TEST_CASE("normalize_path returns absolute lexically-normal path and parent_dir 
 
     // normalize_path should return an absolute lexically_normal generic string
     std::string norm = normalize_path(file.generic_string());
-    std::string expected = std::filesystem::absolute(
-                               file).lexically_normal().generic_string();
+    std::string expected = file.lexically_normal().generic_string();
     CHECK(norm == expected);
 
     // parent_dir should return the parent directory (absolute)
     std::string parent = parent_dir(file.generic_string());
-    std::string expected_parent = std::filesystem::absolute(
-                                      file).parent_path().generic_string();
+    std::string expected_parent = file.parent_path().generic_string();
     CHECK(parent == expected_parent);
 
     // cleanup
@@ -114,8 +112,7 @@ TEST_CASE("search_source_file finds files in include_paths and returns normalize
     REQUIRE_FALSE(result.empty());
 
     // result should be the absolute lexically-normal path to the file we created
-    std::string expected = std::filesystem::absolute(
-                               inc_file).lexically_normal().generic_string();
+    std::string expected = inc_file.lexically_normal().generic_string();
     CHECK(result == expected);
 
     // cleanup

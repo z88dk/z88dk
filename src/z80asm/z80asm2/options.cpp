@@ -108,15 +108,20 @@ std::string get_i_filename(const std::string& filename) {
     return replace_extension(filename, i_extension);
 }
 
-// Convert filename to a canonical absolute form when possible to improve
+bool is_asm_filename(const std::string& filename) {
+    return str_ends_with(filename, asm_extension);
+}
+
+bool is_o_filename(const std::string& filename) {
+    return str_ends_with(filename, o_extension);
+}
+
+// Convert filename to a canonical form when possible to improve
 // recursive-include detection and diagnostics. If filesystem operations
 // fail, fall back to the original string.
 std::string normalize_path(const std::string& path) {
     try {
         std::filesystem::path p(path);
-        if (!p.is_absolute()) {
-            p = std::filesystem::absolute(p);
-        }
         return p.lexically_normal().generic_string();
     }
     catch (...) {
@@ -127,9 +132,6 @@ std::string normalize_path(const std::string& path) {
 std::string parent_dir(const std::string& path) {
     try {
         std::filesystem::path p(path);
-        if (!p.is_absolute()) {
-            p = std::filesystem::absolute(p);
-        }
         return p.parent_path().generic_string();
     }
     catch (...) {
@@ -162,8 +164,6 @@ std::string resolve_include_candidate(const std::string& filename,
             for (const auto& p : g_options.include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
-            candidates.push_back(fs::current_path() / fname);
-
             // finally try as given (relative to caller)
             candidates.push_back(fname);
         }
@@ -172,7 +172,6 @@ std::string resolve_include_candidate(const std::string& filename,
             for (const auto& p : g_options.include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
-            candidates.push_back(fs::current_path() / fname);
             candidates.push_back(fname);
         }
     }
@@ -185,10 +184,6 @@ std::string resolve_include_candidate(const std::string& filename,
             // (it may throw), use exists
             if (fs::exists(norm) && fs::is_regular_file(norm)) {
                 try {
-                    // Prefer lexically_normal absolute path
-                    if (!norm.is_absolute()) {
-                        norm = fs::absolute(norm);
-                    }
                     return norm.lexically_normal().generic_string();
                 }
                 catch (...) {
@@ -216,12 +211,12 @@ static std::string check_source(const std::string& filename) {
     fs::path src_file, obj_file;
     bool got_obj = false;
 
-    if (str_ends_with(filename, o_extension)) {
+    if (is_o_filename(filename)) {
         got_obj = true;
         obj_file = file_path;
         src_file = replace_extension(filename, asm_extension);
     }
-    else if (str_ends_with(filename, asm_extension)) {
+    else if (is_asm_filename(filename)) {
         got_obj = false;
         src_file = file_path;
         obj_file = replace_extension(filename, o_extension);
@@ -387,7 +382,23 @@ std::string search_source_file(const std::string& filename) {
             }
         }
 
-        // check obejct file in output_dir
+        // check source file
+        asm_filename = get_asm_filename(filename);
+        out_filename = check_source(asm_filename);
+        if (!out_filename.empty()) {
+            return out_filename;
+        }
+
+        // check filename with .asm extension in include path
+        out_filename = resolve_include_candidate(asm_filename);
+        if (!out_filename.empty()) {
+            out_filename = check_source(out_filename);
+            if (!out_filename.empty()) {
+                return out_filename;
+            }
+        }
+
+        // check object file in output_dir
         o_filename = get_o_filename(filename);
         out_filename = check_source(o_filename);
         if (!out_filename.empty()) {

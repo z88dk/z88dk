@@ -98,8 +98,8 @@ static std::string make_temp_dir() {
 static std::string write_temp_file_in_dir(const std::string& dir,
         const std::string& filename,
         const std::vector<std::string>& lines) {
-    std::filesystem::path p = std::filesystem::path(dir) / filename;
-    std::string filepath = p.generic_string();
+    std::filesystem::path pp = std::filesystem::path(dir) / filename;
+    std::string filepath = pp.generic_string();
     std::ofstream ofs(filepath);
     for (const auto& line : lines) {
         ofs << line << std::endl;
@@ -110,13 +110,10 @@ static std::string write_temp_file_in_dir(const std::string& dir,
 }
 
 // Normalize an expected filename into the same canonical form the preprocessor uses
-// (absolute + lexically_normal) so tests can compare Location.filename() reliably.
+// (lexically_normal) so tests can compare Location.filename() reliably.
 static std::string normalize_expected_path(const std::string& p) {
     try {
         std::filesystem::path pp(p);
-        if (!pp.is_absolute()) {
-            pp = std::filesystem::absolute(pp);
-        }
         return pp.lexically_normal().generic_string();
     }
     catch (...) {

@@ -151,7 +151,8 @@ int main(int argc, char* argv[]) {
         preprocess_only();
     }
     else {
-        std::cerr << "Full assemble not implemented yet." << std::endl;
+        g_errors.error(ErrorCode::UnknownInstruction,
+                       "Full assemble not implemented yet");
     }
 
     return g_errors.has_errors() ? EXIT_FAILURE : EXIT_SUCCESS;

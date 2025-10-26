@@ -37,11 +37,6 @@ void Preprocessor::add_include_path(const std::string& path) {
 
 void Preprocessor::preprocess_file(const std::string& input_filename,
                                    const std::string& output_filename) {
-    if(g_options.verbose) {
-        std::cout << "Preprocessing file: " << input_filename
-                  << " -> " << output_filename << std::endl;
-    }
-
     if (!open(input_filename)) {
         return;
     }
@@ -52,7 +47,7 @@ void Preprocessor::preprocess_file(const std::string& input_filename,
         return;
     }
 
-    Location location(input_filename, 0);
+    Location location;
     std::string line;
     while (next_line(line)) {
         if (g_errors.filename() != location.filename()) {
@@ -558,7 +553,6 @@ static std::string resolve_include_candidate(const std::string& filename,
             for (const auto& p : include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
-            candidates.push_back(fs::current_path() / fname);
             candidates.push_back(fname); // finally try as given (relative to caller)
         }
         else {
@@ -566,7 +560,6 @@ static std::string resolve_include_candidate(const std::string& filename,
             for (const auto& p : include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
-            candidates.push_back(fs::current_path() / fname);
             candidates.push_back(fname);
         }
     }
@@ -577,10 +570,6 @@ static std::string resolve_include_candidate(const std::string& filename,
             // Do not require file to be accessible by canonical (it may throw), use exists
             if (fs::exists(norm) && fs::is_regular_file(norm)) {
                 try {
-                    // Prefer lexically_normal absolute path
-                    if (!norm.is_absolute()) {
-                        norm = fs::absolute(norm);
-                    }
                     return norm.lexically_normal().generic_string();
                 }
                 catch (...) {
@@ -1356,8 +1345,7 @@ std::vector<std::string> Preprocessor::collect_local_names(
 
 // Create a map from local identifier -> unique renamed identifier using uniq_id.
 // Ensures same local name maps to same unique name.
-std::unordered_map<std::string, std::string>
-Preprocessor::make_local_rename_map(
+std::unordered_map<std::string, std::string> Preprocessor::make_local_rename_map(
     const Macro& macro, int uniq_id) const {
     std::unordered_map<std::string, std::string> renames;
     auto local_names = collect_local_names(macro);
@@ -1834,8 +1822,7 @@ int Preprocessor::get_invocation_physical_line_num() const {
 }
 
 // Build virtual logical lines for a macro using combined_param_map and a physical line number.
-std::vector<Preprocessor::LogicalLine>
-Preprocessor::build_virt_lines_from_macro(
+std::vector<Preprocessor::LogicalLine> Preprocessor::build_virt_lines_from_macro(
     const Macro& macro,
     const std::unordered_map<std::string, std::string>& combined_param_map,
     int phys_line_num
@@ -2650,8 +2637,22 @@ bool Preprocessor::is_name_defined(const std::string& name) const {
 
 void preprocess_only() {
     for (auto& input_file : g_input_files) {
-        std::string output_file = get_i_filename(input_file);
-        Preprocessor pp;
-        pp.preprocess_file(input_file, output_file);
+        if (is_o_filename(input_file)) {
+            if(g_options.verbose) {
+                std::cout << "Skipping preprocessing for non-object file: " << input_file <<
+                          std::endl;
+            }
+        }
+        else {
+            std::string output_file = get_i_filename(input_file);
+
+            if (g_options.verbose) {
+                std::cout << "Preprocessing file: " << input_file
+                          << " -> " << output_file << std::endl;
+            }
+
+            Preprocessor pp;
+            pp.preprocess_file(input_file, output_file);
+        }
     }
 }
