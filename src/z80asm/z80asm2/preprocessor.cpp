@@ -8,6 +8,8 @@
 #include "preprocessor.h"
 #include <algorithm>
 #include <cassert>
+#include <fstream>
+#include <sstream>
 
 void Preprocessor::clear() {
     input_queue_.clear();
@@ -36,6 +38,76 @@ void Preprocessor::push_virtual_file(const std::string& content,
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
     file_stack_.push_back(std::move(vf));
+}
+
+void Preprocessor::push_binary_file(const std::string& bin_filename) {
+    // Try to open the binary file. If we fail, fall back to push_file so the
+    // normal file-not-found handling (and error messages) still apply.
+    std::ifstream ifs(bin_filename, std::ios::binary);
+    if (!ifs) {
+        g_errors.error(ErrorCode::FileNotFound,
+                       "Could not read file: " + bin_filename);
+        return;
+    }
+
+    // Read all bytes
+    std::vector<unsigned char> bytes((std::istreambuf_iterator<char>(ifs)),
+                                     std::istreambuf_iterator<char>());
+
+    // Determine logical filename and starting line number from the top file on stack.
+    std::string virt_filename = bin_filename;
+    int first_line_num = 1;
+    if (!file_stack_.empty()) {
+        File& top = file_stack_.back();
+        // logical filename: prefer forced filename if set, otherwise the tokens_file filename
+        if (top.has_forced_location) {
+            if (!top.forced_filename.empty()) {
+                virt_filename = top.forced_filename;
+            }
+            else {
+                virt_filename = top.tokens_file.filename();
+            }
+
+            if (top.forced_constant_line_numbers) {
+                first_line_num = top.forced_start_line_num;
+            }
+            else {
+                // At the moment process_binary is called, the file's line_index has
+                // already been incremented past the directive line. Use the physical
+                // index of the directive (line_index - 1) so the generated virtual
+                // file maps to the same logical line as the directive.
+                int physical_index = std::max(0, top.line_index - 1);
+                int offset = physical_index - top.forced_from_index;
+                first_line_num = top.forced_start_line_num + offset;
+            }
+        }
+        else {
+            virt_filename = top.tokens_file.filename();
+            // As above, use the physical index of the directive (line_index - 1)
+            // so the virtual file lines share the directive's logical line.
+            int physical_index = std::max(0, top.line_index - 1);
+            first_line_num = top.tokens_file.first_line_num() + physical_index;
+        }
+    }
+
+    // Build virtual file content: DEFB lines, up to 16 bytes per line.
+    std::ostringstream oss;
+    const size_t BYTES_PER_LINE = 16;
+    for (size_t i = 0; i < bytes.size(); i += BYTES_PER_LINE) {
+        size_t end = std::min(bytes.size(), i + BYTES_PER_LINE);
+        oss << "DEFB ";
+        for (size_t j = i; j < end; ++j) {
+            if (j != i) {
+                oss << ",";
+            }
+            oss << static_cast<int>(bytes[j]);
+        }
+        oss << "\n";
+    }
+
+    std::string content = oss.str();
+    // Push the generated virtual file with the computed logical location.
+    push_virtual_file(content, virt_filename, first_line_num);
 }
 
 bool Preprocessor::next_line(TokensLine& line) {
@@ -190,6 +262,10 @@ void Preprocessor::process_directive(const TokensLine& line, int& i,
     case Keyword::INCLUDE:
         process_include(line, i);
         break;
+    case Keyword::BINARY:
+    case Keyword::INCBIN:
+        process_binary(line, i);
+        break;
     case Keyword::LINE:
         process_line(line, i);
         break;
@@ -199,6 +275,67 @@ void Preprocessor::process_directive(const TokensLine& line, int& i,
     default:
         assert(0);
     }
+}
+
+void Preprocessor::process_binary(const TokensLine& line, int& i) {
+    // Accept quoted or plain filename for BINARY/INCBIN.
+    std::string filename;
+    bool is_angle = false;
+    if (!parse_filename(line, i, filename, is_angle)) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected filename in BINARY/INCBIN directive");
+        return;
+    }
+
+    expect_end(line, i);
+    // Resolve include-path candidates first so BINARY/INCBIN honor include
+    // search directories the same way #include does.
+    filename = search_include_path(filename, is_angle);
+    // Push a virtual file containing DEFB directives with the binary bytes.
+    push_binary_file(filename);
+}
+
+std::string Preprocessor::search_include_path(const std::string& filename,
+        bool is_angle) const {
+    // Wrapper for include resolution. Centralizes search logic so callers
+    // (process_include/do_include/process_binary) all use the same routine.
+    // Return the resolved path if found; otherwise return the original filename
+    // so callers can simply assign the result and proceed.
+    std::string resolved = resolve_include_candidate(filename, is_angle);
+    if (resolved.empty()) {
+        return filename;
+    }
+    return resolved;
+}
+
+bool Preprocessor::parse_filename(const TokensLine& line, int& i,
+                                  std::string& out_filename, bool& out_is_angle) const {
+    skip_spaces(line, i);
+    out_filename.clear();
+    out_is_angle = false;
+
+    if (i < line.size() && line[i].is(TokenType::String)) {
+        out_filename = line[i].string_value();
+        const std::string txt = line[i].text();
+        if (!txt.empty() && txt.front() == '<') {
+            out_is_angle = true;
+        }
+        ++i;
+        return true;
+    }
+
+    // Plain filename: consume tokens up to whitespace
+    std::string filename;
+    while (i < line.size() && line[i].is_not(TokenType::Whitespace)) {
+        filename += line[i].text();
+        ++i;
+    }
+    if (filename.empty()) {
+        return false;
+    }
+    out_filename = filename;
+    out_is_angle = false;
+    return true;
 }
 
 void Preprocessor::process_name_directive(const TokensLine& line, int& i,
@@ -215,46 +352,26 @@ void Preprocessor::process_name_directive(const TokensLine& line, int& i,
 }
 
 void Preprocessor::process_include(const TokensLine& line, int& i) {
-    skip_spaces(line, i);
-    if (i < line.size() && line[i].is(TokenType::String)) {
-        // double-quoted or angle-bracketed filename
-        std::string filename = line[i].string_value();
-        bool is_angle = line[i].text().front() == '<';
-        ++i;
-        expect_end(line, i);
-
-        do_include(filename, is_angle);
+    // Reuse filename parsing helper. Plain and quoted forms are both accepted.
+    std::string filename;
+    bool is_angle = false;
+    if (!parse_filename(line, i, filename, is_angle)) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected filename in include directive");
+        return;
     }
-    else {
-        // whitespace separated filename (plain)
-        std::string filename;
-        while (i < line.size() && line[i].is_not(TokenType::Whitespace)) {
-            filename += line[i].text();
-            ++i;
-        }
-        expect_end(line, i);
 
-        if (filename.empty()) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           "Expected filename string in include directive");
-        }
-        else {
-            // plain filename
-            do_include(filename, false);
-        }
-    }
+    expect_end(line, i);
+    do_include(filename, is_angle);
 }
 
 void Preprocessor::do_include(const std::string& filename,
                               bool is_angle) {
-    // search include file
-    std::string resolved = resolve_include_candidate(filename, is_angle);
-    if (resolved.empty()) { // file not found
-        push_file(filename);
-    }
-    else {
-        push_file(resolved);
-    }
+    // Use centralized search helper so callers (include/binary/etc.) all use
+    // the same include-path resolution logic. search_include_path now
+    // returns a non-empty filename (resolved path or the original candidate).
+    std::string resolved = search_include_path(filename, is_angle);
+    push_file(resolved);
 }
 
 // Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
@@ -278,13 +395,11 @@ bool Preprocessor::parse_line_args(const TokensLine& line, int& i,
     if (i < line.size() && line[i].is(TokenType::Comma)) {
         ++i;
         skip_spaces(line, i);
-        if (i < line.size() && line[i].is(TokenType::String)) {
-            out_filename = line[i].string_value();
-            ++i;
-        }
-        else {
+        // Accept quoted or plain filename after comma.
+        bool is_angle = false;
+        if (!parse_filename(line, i, out_filename, is_angle)) {
             g_errors.error(ErrorCode::InvalidSyntax,
-                           std::string("Expected quoted filename after comma in ") + directive_name +
+                           std::string("Expected filename after comma in ") + directive_name +
                            " directive");
             return false;
         }
