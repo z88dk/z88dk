@@ -16,6 +16,12 @@ TIME_TARGETS := _DEVELOPMENT/time/obj/newlib-z80-time \
 		_DEVELOPMENT/time/obj/newlib-8085-time \
 		_DEVELOPMENT/time/obj/newlib-gbz80-time \
 		_DEVELOPMENT/time/obj/newlib-z80n-time \
+		_DEVELOPMENT/time/obj/newlib-r2ka-time \
+		_DEVELOPMENT/time/obj/newlib-r4k-time \
+		_DEVELOPMENT/time/obj/newlib-kc160-time \
+		_DEVELOPMENT/time/obj/newlib-z180-time \
+		_DEVELOPMENT/time/obj/newlib-ez80_z80-time \
+		_DEVELOPMENT/time/obj/newlib-kc160-time \
 		_DEVELOPMENT/time/obj/newlib-ixiy-time  
 
 TIME_OBJECTS := $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
