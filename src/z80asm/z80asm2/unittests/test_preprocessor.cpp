@@ -126,7 +126,7 @@ TEST_CASE("Preprocessor: include without filename reports invalid-syntax",
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     // should report the specific invalid-syntax message
-    REQUIRE(msg.find("Expected filename string in include directive") !=
+    REQUIRE(msg.find("Expected filename in include directive") !=
             std::string::npos);
     // should include the source line and location
     REQUIRE(msg.find("#include") != std::string::npos);
@@ -394,25 +394,6 @@ TEST_CASE("Preprocessor: LINE with missing argument reports error",
     REQUIRE(msg.find("line_missing_arg:1:") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: LINE with unquoted filename after comma reports error",
-          "[preprocessor][line][error]") {
-    g_errors.reset();
-    Preprocessor pp;
-
-    const std::string content = "LINE 10, foo\n";
-    pp.push_virtual_file(content, "line_bad_fname", 1);
-
-    TokensLine line;
-    // consume produced lines (none expected)
-    while (pp.next_line(line)) { }
-
-    REQUIRE(g_errors.has_errors());
-    const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Expected quoted filename after comma in LINE directive") !=
-            std::string::npos);
-    REQUIRE(msg.find("line_bad_fname:1:") != std::string::npos);
-}
-
 // New tests: C_LINE directive behavior and errors
 
 TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for following lines",
@@ -476,21 +457,378 @@ TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
     REQUIRE(msg.find("cline_missing_arg:1:") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: C_LINE with unquoted filename after comma reports error",
-          "[preprocessor][cline][error]") {
+// New test: push_binary_file should produce DEFB lines for a 256-byte file
+// containing values 0..255 (16 bytes per line -> 16 lines).
+TEST_CASE("Preprocessor: push_binary_file reads 0..255 bytes and emits DEFB lines",
+          "[preprocessor][binary]") {
     g_errors.reset();
     Preprocessor pp;
 
-    const std::string content = "C_LINE 20, badname\n";
-    pp.push_virtual_file(content, "cline_bad_fname", 1);
+    const std::string fname = "pp_0_255.bin";
+    // create binary file with bytes 0..255
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        for (int i = 0; i < 256; ++i) {
+            char c = static_cast<char>(i);
+            ofs.write(&c, 1);
+        }
+    }
+
+    // Push the binary file as a virtual file (DEFB lines)
+    pp.push_binary_file(fname);
 
     TokensLine line;
-    // consume produced lines (none expected)
-    while (pp.next_line(line)) { }
+    std::vector<int> ints;
+    int returned_lines = 0;
 
-    REQUIRE(g_errors.has_errors());
-    const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Expected quoted filename after comma in C_LINE directive") !=
-            std::string::npos);
-    REQUIRE(msg.find("cline_bad_fname:1:") != std::string::npos);
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        // collect integer tokens from the DEFB lines
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+        ++returned_lines;
+    }
+
+    // Expect 256 bytes, values 0..255, and 16 lines (256/16)
+    REQUIRE(ints.size() == 256);
+    for (int i = 0; i < 256; ++i) {
+        REQUIRE(ints[i] == i);
+    }
+    REQUIRE(returned_lines == 16);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("Preprocessor: BINARY directive is parsed and replaced by 16 DEFB lines at directive logical location",
+          "[preprocessor][binary][directive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fname = "pp_bin_directive.bin";
+    // write 0..255
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        for (int i = 0; i < 256; ++i) {
+            char c = static_cast<char>(i);
+            ofs.write(&c, 1);
+        }
+    }
+
+    // Set a LINE directive with a logical filename so we can assert locations.
+    const int logical_start = 300;
+    const std::string logical_fname = "binary_logic.asm";
+    std::string content;
+    content += "LINE " + std::to_string(logical_start) + ", \"" + logical_fname +
+               "\"\n";
+    content += "BINARY \"" + fname + "\"\n";
+    content += "after_directive\n";
+
+    pp.push_virtual_file(content, "virtual_binary_dir", 1);
+
+    TokensLine line;
+    std::vector<int> ints;
+    int defb_lines = 0;
+    bool saw_after = false;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (toks.empty()) {
+            continue;
+        }
+        const std::string first = toks[0].text();
+        if (first == "DEFB") {
+            // check that each DEFB line has the same logical location as the BINARY directive
+            REQUIRE(line.location().line_num() == logical_start);
+            REQUIRE(line.location().filename() == logical_fname);
+            ++defb_lines;
+            for (const auto& t : toks) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+        else if (first == "after_directive") {
+            saw_after = true;
+            break;
+        }
+    }
+
+    REQUIRE(defb_lines == 16);
+    REQUIRE(ints.size() == 256);
+    for (int i = 0; i < 256; ++i) {
+        REQUIRE(ints[i] == i);
+    }
+    REQUIRE(saw_after);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("Preprocessor: INCBIN directive is parsed and replaced by 16 DEFB lines at directive logical location",
+          "[preprocessor][binary][directive][incbin]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fname = "pp_incbin_directive.bin";
+    // write 0..255
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        for (int i = 0; i < 256; ++i) {
+            char c = static_cast<char>(i);
+            ofs.write(&c, 1);
+        }
+    }
+
+    const int logical_start = 400;
+    const std::string logical_fname = "incbin_logic.asm";
+    std::string content;
+    content += "LINE " + std::to_string(logical_start) + ", \"" + logical_fname +
+               "\"\n";
+    content += "INCBIN \"" + fname + "\"\n";
+    content += "after_incbin\n";
+
+    pp.push_virtual_file(content, "virtual_incbin_dir", 1);
+
+    TokensLine line;
+    std::vector<int> ints;
+    int defb_lines = 0;
+    bool saw_after = false;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (toks.empty()) {
+            continue;
+        }
+        const std::string first = toks[0].text();
+        if (first == "DEFB") {
+            REQUIRE(line.location().line_num() == logical_start);
+            REQUIRE(line.location().filename() == logical_fname);
+            ++defb_lines;
+            for (const auto& t : toks) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+        else if (first == "after_incbin") {
+            saw_after = true;
+            break;
+        }
+    }
+
+    REQUIRE(defb_lines == 16);
+    REQUIRE(ints.size() == 256);
+    for (int i = 0; i < 256; ++i) {
+        REQUIRE(ints[i] == i);
+    }
+    REQUIRE(saw_after);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("Preprocessor: LINE accepts quoted, angle-bracketed and plain filename forms",
+          "[preprocessor][line][forms]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    std::string content;
+    content += "LINE 10, \"line_q.asm\"\nline_q\n";
+    content += "LINE 20, <line_a.asm>\nline_a\n";
+    content += "LINE 30, line_p.asm\nline_p\n";
+
+    pp.push_virtual_file(content, "virtual_line_forms", 1);
+
+    TokensLine line;
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "line_q");
+    REQUIRE(line.location().line_num() == 10);
+    REQUIRE(line.location().filename() == "line_q.asm");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "line_a");
+    REQUIRE(line.location().line_num() == 20);
+    REQUIRE(line.location().filename() == "line_a.asm");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "line_p");
+    REQUIRE(line.location().line_num() == 30);
+    REQUIRE(line.location().filename() == "line_p.asm");
+}
+
+TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filename forms",
+          "[preprocessor][cline][forms]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    std::string content;
+    content += "C_LINE 101, \"cline_q.c\"\ncline_q\n";
+    content += "C_LINE 202, <cline_a.c>\ncline_a\n";
+    content += "C_LINE 303, cline_p.c\ncline_p\n";
+
+    pp.push_virtual_file(content, "virtual_cline_forms", 1);
+
+    TokensLine line;
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "cline_q");
+    REQUIRE(line.location().line_num() == 101);
+    REQUIRE(line.location().filename() == "cline_q.c");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "cline_a");
+    REQUIRE(line.location().line_num() == 202);
+    REQUIRE(line.location().filename() == "cline_a.c");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "cline_p");
+    REQUIRE(line.location().line_num() == 303);
+    REQUIRE(line.location().filename() == "cline_p.c");
+}
+
+TEST_CASE("Preprocessor: BINARY accepts quoted, angle-bracketed and plain filename forms",
+          "[preprocessor][binary][forms]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fq = "bin_q.dat";
+    const std::string fa = "bin_a.dat";
+    const std::string fp = "bin_p.dat";
+    // create small binary files with distinct contents
+    {
+        std::ofstream ofs(fq, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        unsigned char data[] = { 10, 11, 12 };
+        ofs.write(reinterpret_cast<const char*>(data), sizeof(data));
+        std::ofstream ofs2(fa, std::ios::binary);
+        REQUIRE(ofs2.is_open());
+        unsigned char data2[] = { 20, 21 };
+        ofs2.write(reinterpret_cast<const char*>(data2), sizeof(data2));
+        std::ofstream ofs3(fp, std::ios::binary);
+        REQUIRE(ofs3.is_open());
+        unsigned char data3[] = { 30 };
+        ofs3.write(reinterpret_cast<const char*>(data3), sizeof(data3));
+    }
+
+    std::string content;
+    content += "BINARY \"" + fq + "\"\n";
+    content += "BINARY <" + fa + ">\n";
+    content += "BINARY " + fp + "\n";
+    content += "after_binary\n";
+
+    pp.push_virtual_file(content, "virtual_binary_forms", 1);
+
+    TokensLine line;
+    std::vector<std::vector<int>> groups;
+    bool saw_after = false;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (toks.empty()) {
+            continue;
+        }
+        const std::string first = toks[0].text();
+        if (first == "DEFB") {
+            std::vector<int> g;
+            for (const auto& t : toks) {
+                if (t.is(TokenType::Integer)) {
+                    g.push_back(t.int_value());
+                }
+            }
+            groups.push_back(g);
+        }
+        else if (first == "after_binary") {
+            saw_after = true;
+            break;
+        }
+    }
+
+    REQUIRE(groups.size() == 3);
+    REQUIRE(groups[0] == std::vector<int>({10, 11, 12}));
+    REQUIRE(groups[1] == std::vector<int>({20, 21}));
+    REQUIRE(groups[2] == std::vector<int>({30}));
+    REQUIRE(saw_after);
+
+    std::remove(fq.c_str());
+    std::remove(fa.c_str());
+    std::remove(fp.c_str());
+}
+
+TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filename forms",
+          "[preprocessor][binary][forms][incbin]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fq = "inc_q.dat";
+    const std::string fa = "inc_a.dat";
+    const std::string fp = "inc_p.dat";
+    // create small binary files with distinct contents
+    {
+        std::ofstream ofs(fq, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        unsigned char data[] = { 1, 2, 3, 4 };
+        ofs.write(reinterpret_cast<const char*>(data), sizeof(data));
+        std::ofstream ofs2(fa, std::ios::binary);
+        REQUIRE(ofs2.is_open());
+        unsigned char data2[] = { 5, 6 };
+        ofs2.write(reinterpret_cast<const char*>(data2), sizeof(data2));
+        std::ofstream ofs3(fp, std::ios::binary);
+        REQUIRE(ofs3.is_open());
+        unsigned char data3[] = { 7 };
+        ofs3.write(reinterpret_cast<const char*>(data3), sizeof(data3));
+    }
+
+    std::string content;
+    content += "INCBIN \"" + fq + "\"\n";
+    content += "INCBIN <" + fa + ">\n";
+    content += "INCBIN " + fp + "\n";
+    content += "after_incbin\n";
+
+    pp.push_virtual_file(content, "virtual_incbin_forms", 1);
+
+    TokensLine line;
+    std::vector<std::vector<int>> groups;
+    bool saw_after = false;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (toks.empty()) {
+            continue;
+        }
+        const std::string first = toks[0].text();
+        if (first == "DEFB") {
+            std::vector<int> g;
+            for (const auto& t : toks) {
+                if (t.is(TokenType::Integer)) {
+                    g.push_back(t.int_value());
+                }
+            }
+            groups.push_back(g);
+        }
+        else if (first == "after_incbin") {
+            saw_after = true;
+            break;
+        }
+    }
+
+    REQUIRE(groups.size() == 3);
+    REQUIRE(groups[0] == std::vector<int>({1, 2, 3, 4}));
+    REQUIRE(groups[1] == std::vector<int>({5, 6}));
+    REQUIRE(groups[2] == std::vector<int>({7}));
+    REQUIRE(saw_after);
+
+    std::remove(fq.c_str());
+    std::remove(fa.c_str());
+    std::remove(fp.c_str());
 }
