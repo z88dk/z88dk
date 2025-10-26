@@ -17,7 +17,7 @@
     jp      nz,w_respixel_BITMAP
     ld      h,l
     ld      l,e
-    INCLUDE	"gfx/gencon/pixel.inc"
+    INCLUDE	"classic/gfx/gencon/pixel.inc"
 
 
 

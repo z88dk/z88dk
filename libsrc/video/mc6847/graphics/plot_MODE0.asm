@@ -25,9 +25,9 @@ ENDIF
 
     defc    NEEDplot=1
 IF MODE0_3x2
-    INCLUDE "gfx/gencon/pixel6.inc"
+    INCLUDE "classic/gfx/gencon/pixel6.inc"
 ELIF MODE0_1x1
-    INCLUDE "gfx/gencon/pixel1.inc"
+    INCLUDE "classic/gfx/gencon/pixel1.inc"
 ELSE
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"
 ENDIF

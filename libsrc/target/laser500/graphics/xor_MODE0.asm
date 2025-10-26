@@ -5,4 +5,4 @@
 
 xor_MODE0:
     defc    NEEDxor=1
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"
