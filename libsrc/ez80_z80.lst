@@ -27,7 +27,7 @@ _DEVELOPMENT/compress/zx2/obj/${TYPE}/**/*.o
 @classic/adt/adt.lst
 _DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @debug/debug.lst
-@rect/rect.lst
+@classic/rect/rect.lst
 @classic/algorithm/alg.lst
 _DEVELOPMENT/arch/z80/obj/${TYPE}/**/*.o
 @interrupts/interrupts.lst
