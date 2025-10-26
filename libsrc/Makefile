@@ -207,7 +207,7 @@ include _DEVELOPMENT/libgen/libgen.mak
 include _DEVELOPMENT/math/fix16/fix16.mak
 include rect/rect.mak
 include _DEVELOPMENT/regex/regex.mak
-include sdcard/sdcard.mak
+include classic/sdcard/sdcard.mak
 include _DEVELOPMENT/setjmp/setjmp.mak
 include classic/string/string.mak
 include _DEVELOPMENT/string/string.mak
@@ -2068,7 +2068,7 @@ sos_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(TARGET_DIRECTORY)/sos/sos.lst
 
 # OSCA / FLOS - Stefano
-osca_clib.lib: $(TARGET_CLIB_DEPS)
+osca_clib.lib: $(TARGET_CLIB_DEPS) $(SDCARD_OBJS)
 	@echo ''
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''
