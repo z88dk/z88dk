@@ -50,6 +50,16 @@ private:
     struct File {
         TokensFile tokens_file;
         int line_index = 0;
+
+        // Optional forced logical location produced by a LINE directive.
+        // When has_forced_location is true the logical location for the
+        // token lines starting at forced_from_index will be:
+        //   filename = forced_filename (if not empty)
+        //   line_num = forced_start_line_num + (physical_index - forced_from_index)
+        bool has_forced_location = false;
+        int forced_from_index = 0;
+        int forced_start_line_num = 0;
+        std::string forced_filename;
     };
 
     // Queue of tokenized lines waiting to be processed/consumed.
@@ -77,11 +87,14 @@ private:
                                 Keyword keyword, const std::string& name);
     void process_include(const TokensLine& line, int& i);
     void do_include(const std::string& filename, bool is_angle);
+    void process_line(const TokensLine& line, int& i);
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);
     void split_line(const Location& location, const TokensLine& expanded);
     void split_label(const Location& location,
                      const TokensLine& expanded, int& i);
     std::vector<TokensLine> expand_macros(const std::vector<TokensLine>& lines);
+
+    // New: process LINE directive: LINE linenum or LINE linenum, "filename"
 };
 
