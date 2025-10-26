@@ -1349,7 +1349,7 @@ fastmath.lib: kc160_clib.lib
 	@echo ''
 	@echo '--- Building fast integer maths library ---'
 	@echo ''
-	$(MAKE) -C math/fastmath
+	$(MAKE) -C math/integer/fastmath
 
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano

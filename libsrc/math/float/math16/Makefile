@@ -1,6 +1,6 @@
 #
 
-include ../../Make.config
+include ../../../Make.config
 
 vpath %.c ../cimpl
 
