@@ -33,12 +33,4 @@ private:
     // assembler can register the evaluation callback for the preprocessor.
     Preprocessor preprocessor_;
     SymbolTable symbols_;
-
-    // Callback invoked by Preprocessor when it cannot evaluate a constant
-    // expression locally and asks the assembler to try. Implemented in
-    // assembler.cpp.
-    Preprocessor::EvalResult eval_for_preproc(const std::string& expr,
-            const Location& loc);
-
-    // other components (lexer, parser, codegen, ...) can be added later
 };

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "keywords.h"
+#include "location.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -65,76 +66,28 @@ enum class OperatorType {
 
 class Token {
 public:
-    Token(TokenType type, const std::string& text)
-        : type_(type), text_(text) {
-    }
+    Token(TokenType type, const std::string& text);
+    explicit Token(TokenType type, const std::string& text, int value);
+    explicit Token(TokenType type, const std::string& text, double value);
+    explicit Token(TokenType type, const std::string& text, std::string value);
+    explicit Token(TokenType type, const std::string& text, Keyword keyword);
+    explicit Token(TokenType type, const std::string& text, OperatorType op);
 
-    explicit Token(TokenType type, const std::string& text, int value)
-        : type_(type), text_(text), int_value_(value) {
-    }
-
-    explicit Token(TokenType type, const std::string& text, double value)
-        : type_(type), text_(text), float_value_(value) {
-    }
-
-    explicit Token(TokenType type, const std::string& text, std::string value)
-        : type_(type), text_(text), string_value_(value) {
-    }
-
-    explicit Token(TokenType type, const std::string& text, Keyword keyword)
-        : type_(type), text_(text), keyword_(keyword) {
-    }
-
-    explicit Token(TokenType type, const std::string& text, OperatorType op)
-        : type_(type), text_(text), op_(op) {
-    }
-
-    bool is(TokenType t) const {
-        return type_ == t;
-    }
-
-    bool is_not(TokenType t) const {
-        return type_ != t;
-    }
-
-    bool is(Keyword kw) const {
-        return keyword_ == kw;
-    }
-
-    bool is_not(Keyword kw) const {
-        return keyword_ != kw;
-    }
-
-    bool is(OperatorType op) const {
-        return op_ == op;
-    }
-
-    bool is_not(OperatorType op) const {
-        return op_ != op;
-    }
+    bool is(TokenType t) const;
+    bool is_not(TokenType t) const;
+    bool is(Keyword kw) const;
+    bool is_not(Keyword kw) const;
+    bool is(OperatorType op) const;
+    bool is_not(OperatorType op) const;
 
     // Read-only accessors
-    TokenType type() const {
-        return type_;
-    }
-    const std::string& text() const {
-        return text_;
-    }
-    int int_value() const {
-        return int_value_;
-    }
-    double float_value() const {
-        return float_value_;
-    }
-    const std::string& string_value() const {
-        return string_value_;
-    }
-    OperatorType op() const {
-        return op_;
-    }
-    Keyword keyword() const {
-        return keyword_;
-    }
+    TokenType type() const;
+    const std::string& text() const;
+    int int_value() const;
+    double float_value() const;
+    const std::string& string_value() const;
+    OperatorType op() const;
+    Keyword keyword() const;
 
 private:
     TokenType type_;
@@ -146,139 +99,61 @@ private:
     Keyword keyword_ = Keyword::None; // Used if type == Identifier and is a keyword
 };
 
-class TokenizedLine {
+class TokensLine {
 public:
-    TokenizedLine(int line_num);
+    TokensLine() = default;
+    TokensLine(const Location& location);
+    TokensLine(const Location& location, const std::vector<Token>& tokens);
 
     void clear();
-    bool empty() const {
-        return tokens_.empty();
-    }
-    int line_num() const {
-        return line_num_;
-    }
-    auto front() const {
-        return tokens_.front();
-    }
-    auto back() const {
-        return tokens_.back();
-    }
-    void pop_back() {
-        tokens_.pop_back();
-    }
-
+    bool empty() const;
+    const Location& location() const;
+    void set_location(const Location& location);
     void push_back(const Token& token);
     void push_back(Token&& token);
-    const Token& peek(int ahead = 0) const;
-    void advance();
-    void rewind();
-    bool at_end() const;
-    void skip_spaces();
+    void pop_back();
+    const Token& back() const;
+    const Token& operator[](int index) const;
+    const std::vector<Token>& tokens() const;
+    int size() const;
     std::string to_string() const;
 
 private:
-    int line_num_ = 0;              // 1-based line number
+    Location location_;             // Location of this line
     std::vector<Token> tokens_;     // Tokens found in this line
-    int cur_index_ = 0;             // Current token index for parsing
 };
 
-class TokenizedFile {
+class TokensFile {
 public:
+    TokensFile() = default;
+
     // read a text file
-    TokenizedFile(const std::string& filename,
-                  int first_line_num = 1);
+    TokensFile(const std::string& filename,
+               int first_line_num = 1);
 
     // virtual file from a string content
-    TokenizedFile(const std::string& content,
-                  const std::string& filename,
-                  int first_line_num);
-
-    const std::string& get_line(int index) const;
-    int line_count() const {
-        return static_cast<int>(text_lines_.size());
-    }
-
-    const TokenizedLine& get_tokenized_line(int index) const;
-    int tokenized_line_count() const {
-        return static_cast<int>(tok_lines_.size());
-    }
+    TokensFile(const std::string& content,
+               const std::string& filename,
+               int first_line_num);
 
     void clear();
-
-    const std::string& filename() const {
-        return filename_;
-    }
-    int first_line_num() const {
-        return first_line_num_;
-    }
-    bool inc_line_nums() const {
-        return inc_line_nums_;
-    }
+    const std::string& filename() const;
+    int first_line_num() const;
+    bool inc_line_nums() const;
+    int line_count() const;
+    const std::string& get_line(int index) const;
+    int tok_lines_count() const;
+    const TokensLine& get_tok_line(int index) const;
 
 private:
-    std::string filename_;              // Source file name
-    int first_line_num_ = 1;            // Initial line number
-    bool inc_line_nums_ = true;         // Whether to increment line numbers
+    std::string filename_;                  // Source file name
+    int first_line_num_ = 1;                // Initial line number
+    bool inc_line_nums_ = true;             // Whether to increment line numbers
     std::vector<std::string> text_lines_;   // input text lines
-    std::vector<TokenizedLine> tok_lines_;  // All not-empty tokenized lines
+    std::vector<TokensLine> tok_lines_;     // All not-empty tokenized lines
 
     void split_lines(const char*& p);
     void tokenize(const std::string& content);
-    void tokenize_line(int& line_index, TokenizedLine& output);
-};
-
-
-// macro tokens
-enum class MacroTokenType {
-    Identifier,
-    Number,
-    StringLiteral,
-    Operator,
-    Punctuator,
-};
-
-struct MacroToken {
-    MacroTokenType type;
-    std::string text;
-};
-
-// tokenize the macro body into a list of MacroToken
-std::vector<MacroToken> tokenize_macro_body(const std::string& body);
-
-// Scanning functions for null-terminated strings (C-style)
-// Each function advances 'p' if successful, returns true and sets 'out'.
-// If not successful, 'p' is unchanged and returns false.
-
-// Scan one or more whitespace characters (space, tab, etc.)
-// Advances 'p' past the whitespace, returns true if at least one was found, false otherwise.
-bool scan_whitespace(const char*& p);
-void skip_whitespace(const char*& p);
-
-// Scan a C identifier: [_a-zA-Z][_a-zA-Z0-9]*
-bool scan_identifier(const char*& p, std::string& out);
-
-// Scan an assemnbler label:
-// '@' identifier (local label, refers to previous non-local label)
-// identifier '@' identifier (local label fully qualified)
-bool scan_label(const char*& p, std::string& out);
-
-// Scan an integer literal (decimal, hex with 0x/0X, binary with 0b/0B, octal with 0 prefix)
-bool scan_integer(const char*& p, int& out);
-
-// Scan a floating-point literal (C-style)
-bool scan_float(const char*& p, double& out);
-
-// Scan a string literal (C-style, double quotes, supports escapes)
-bool scan_string_literal(const char*& p, std::string& out);
-std::string unescape_string(const std::string& str);
-
-// Scan an operator or punctuator (e.g., "+", "-", "==", "&&", etc.)
-bool scan_operator(const char*& p, std::string& out);
-
-class Lexer {
-public:
-    Lexer();
-    void reset(const std::string& input);
-    Token next_token();
+    void tokenize_line(int& line_index, TokensLine& output);
 };
 

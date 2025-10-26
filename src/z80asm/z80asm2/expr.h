@@ -6,7 +6,3 @@
 
 #pragma once
 
-// Evaluate a C-style constant expression starting at p.
-// Advances p to the first character after the parsed expression.
-// Returns true on success and the evaluated integer
-bool eval_const_expr(const char*& p, int& value);

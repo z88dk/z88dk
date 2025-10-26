@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
     // execute requested actions
     if (g_options.preprocess_only) {
-        preprocess_only();
+        //preprocess_only();
     }
     else {
         g_errors.error(ErrorCode::UnknownInstruction,
