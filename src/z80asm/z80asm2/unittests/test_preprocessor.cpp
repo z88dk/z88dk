@@ -330,3 +330,85 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
     std::remove(fa.c_str());
     std::remove(fp.c_str());
 }
+
+// New tests: LINE directive handling and errors
+
+TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines",
+          "[preprocessor][line]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // LINE 100 then two ordinary lines
+    const std::string content = "LINE 100\nfirst_line\nsecond_line\n";
+    pp.push_virtual_file(content, "line_test", 1);
+
+    TokensLine line;
+    // first returned line should be "first_line" with logical line 100
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "first_line");
+    REQUIRE(line.location().line_num() == 100);
+    REQUIRE(line.location().filename() == "line_test");
+
+    // next returned line should be "second_line" with logical line 101
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "second_line");
+    REQUIRE(line.location().line_num() == 101);
+    REQUIRE(line.location().filename() == "line_test");
+}
+
+TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line numbers",
+          "[preprocessor][line]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // LINE 200, "other.asm" then a line
+    const std::string content = "LINE 200, \"other.asm\"\nonly_line\n";
+    pp.push_virtual_file(content, "orig_file", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "only_line");
+    REQUIRE(line.location().line_num() == 200);
+    REQUIRE(line.location().filename() == "other.asm");
+}
+
+TEST_CASE("Preprocessor: LINE with missing argument reports error",
+          "[preprocessor][line][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "LINE\n";
+    pp.push_virtual_file(content, "line_missing_arg", 1);
+
+    TokensLine line;
+    // consume produced lines (none expected)
+    while (pp.next_line(line)) { }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Expected line number in LINE directive") !=
+            std::string::npos);
+    REQUIRE(msg.find("line_missing_arg:1:") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: LINE with unquoted filename after comma reports error",
+          "[preprocessor][line][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "LINE 10, foo\n";
+    pp.push_virtual_file(content, "line_bad_fname", 1);
+
+    TokensLine line;
+    // consume produced lines (none expected)
+    while (pp.next_line(line)) { }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Expected quoted filename after comma in LINE directive") !=
+            std::string::npos);
+    REQUIRE(msg.find("line_bad_fname:1:") != std::string::npos);
+}
