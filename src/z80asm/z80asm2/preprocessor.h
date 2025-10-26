@@ -56,10 +56,13 @@ private:
         // token lines starting at forced_from_index will be:
         //   filename = forced_filename (if not empty)
         //   line_num = forced_start_line_num + (physical_index - forced_from_index)
+        // If forced_constant_line_numbers is true the line_num will always be
+        // equal to forced_start_line_num for all subsequent lines.
         bool has_forced_location = false;
         int forced_from_index = 0;
         int forced_start_line_num = 0;
         std::string forced_filename;
+        bool forced_constant_line_numbers = false;
     };
 
     // Queue of tokenized lines waiting to be processed/consumed.
@@ -88,6 +91,16 @@ private:
     void process_include(const TokensLine& line, int& i);
     void do_include(const std::string& filename, bool is_angle);
     void process_line(const TokensLine& line, int& i);
+    void process_c_line(const TokensLine& line, int& i);
+
+    // Helper to parse arguments common to LINE and C_LINE.
+    // Parses: <linenum> [ , "filename" ]
+    // On success returns true and sets linenum/filename (filename may be empty).
+    // On failure it emits an appropriate error message using directive_name and returns false.
+    bool parse_line_args(const TokensLine& line, int& i,
+                         int& out_linenum, std::string& out_filename,
+                         const char* directive_name) const;
+
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);
     void split_line(const Location& location, const TokensLine& expanded);
