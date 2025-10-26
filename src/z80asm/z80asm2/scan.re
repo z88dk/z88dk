@@ -547,6 +547,8 @@ string_loop:
                     output.clear();
                     return;
                 }
+
+                str_content.push_back(static_cast<char>(value));
             }
             continue;
         }
@@ -564,6 +566,8 @@ string_loop:
                     output.clear();
                     return;
                 }
+
+                str_content.push_back(static_cast<char>(value));
             }
             continue;
         }

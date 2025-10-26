@@ -24,6 +24,10 @@ public:
     }
 };
 
+// Global capture for this translation unit to prevent tests from printing to the console.
+// Individual tests can still create their own local CerrRedirect if they need to inspect output.
+static CerrRedirect g_cerr_silencer;
+
 TEST_CASE("Errors counts errors", "[Errors]") {
     Errors er;
     CerrRedirect redirect;
