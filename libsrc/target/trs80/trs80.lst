@@ -7,7 +7,7 @@ target/trs80/stdio/conio_map_colour
 target/trs80/stdio/CRT_FONT
 @classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/trs80/psg/set_psg
 target/trs80/psg/set_psg_callee
 target/trs80/psg/get_psg

@@ -11,7 +11,7 @@ target/laser500/stdio/bordercolour
 target/laser500/stdio/CRT_FONT
 @classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/laser500/graphics/clg
 target/laser500/graphics/getmaxx
 target/laser500/graphics/getmaxy

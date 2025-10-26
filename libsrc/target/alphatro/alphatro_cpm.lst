@@ -10,7 +10,7 @@ target/alphatro/stdio/generic_console
 target/alphatro/stdio/generic_console_ioctl
 target/alphatro/stdio/conio_vars
 target/alphatro/stdio/conio_map_colour
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/alphatro/graphics/textpixl6
 target/alphatro/graphics/cleargraphics
 @classic/gfx/gencon/gfx_gencon6.lst

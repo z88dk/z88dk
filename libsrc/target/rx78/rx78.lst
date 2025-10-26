@@ -9,7 +9,7 @@ target/rx78/stdio/fputc_cons_native
 target/rx78/stdio/conio_vars
 @classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
 target/rx78/load_palette
 target/rx78/graphics/clg

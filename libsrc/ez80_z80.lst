@@ -30,7 +30,7 @@ _DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @classic/rect/rect.lst
 @classic/algorithm/alg.lst
 _DEVELOPMENT/arch/z80/obj/${TYPE}/**/*.o
-@interrupts/interrupts.lst
+@classic/interrupts/interrupts.lst
 _DEVELOPMENT/time/obj/${TYPE}/**/*.o
 _DEVELOPMENT/math/fix16/obj/${TYPE}/**/*.o
 @z80_crt0s/crt0.lst

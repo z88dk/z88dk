@@ -1,4 +1,4 @@
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/bit90/games/joystick
 target/bit90/games/keys_joystick
 classic/games/obj/bit90/joystick_type

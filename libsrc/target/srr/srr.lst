@@ -6,7 +6,7 @@ target/srr/stdio/generic_console
 target/srr/stdio/generic_console_ioctl
 @classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/srr/graphics/textpixl
 @classic/gfx/gencon/gfx_gencon.lst
 target/srr/games/keys_joystick

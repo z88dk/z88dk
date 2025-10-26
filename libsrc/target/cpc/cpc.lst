@@ -138,5 +138,5 @@ target/cpc/interrupts/__fast_isr
 target/cpc/interrupts/firmware_isr
 target/cpc/interrupts/add_raster_int
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/cpc/input/__cpc_scan_allrows

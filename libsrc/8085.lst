@@ -12,6 +12,6 @@ _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @classic/stdlib/stdlib.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
 _DEVELOPMENT/regex/obj/${TYPE}/**/*.o
-@interrupts/interrupts_8080.lst
+@classic/interrupts/interrupts_8080.lst
 _DEVELOPMENT/time/obj/${TYPE}/**/*.o
 @z80_crt0s/crt0.lst

@@ -7,7 +7,7 @@ target/m5/stdio/fputc_cons_rom
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick
 target/m5/games/keys_joystick

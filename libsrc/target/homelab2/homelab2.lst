@@ -4,7 +4,7 @@ classic/stdio/obj/${TYPE}/inkey/getk
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 target/homelab2/graphics/textpixl
 @classic/gfx/gencon/gfx_gencon.lst
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/homelab2/games/joystick.asm
 target/homelab2/games/keys_joystick.asm
 @classic/games/games.lst

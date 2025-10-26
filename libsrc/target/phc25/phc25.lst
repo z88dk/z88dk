@@ -9,7 +9,7 @@ target/phc25/stdio/fgetc_cons_rom
 target/phc25/stdio/getk_rom
 target/phc25/stdio/fputc_cons
 @classic/stdio/stdio.lst
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 
 classic/gfx/narrow/obj/${TARGET}/clrarea2
 classic/gfx/narrow/obj/${TARGET}/fillarea2

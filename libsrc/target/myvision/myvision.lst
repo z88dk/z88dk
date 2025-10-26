@@ -2,7 +2,7 @@
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 classic/stdio/obj/${TYPE}/inkey/getk
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst

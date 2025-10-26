@@ -19,7 +19,7 @@ CLEAN += classic-gfx-retrofit-clean
 
 classic-gfx-retrofit: $(RETROFIT_OBJS)
 
-.PHONY: classic/gfx/retrofit classic/gfx/retrofit-clean
+.PHONY: classic-gfx-retrofit classic-gfx-retrofit-clean
 
 $(eval $(call buildbit,classic/gfx/retrofit,z80,test))
 $(eval $(call buildbit,classic/gfx/retrofit,ixiy,test,-Ca-IXIY,-IXIY))

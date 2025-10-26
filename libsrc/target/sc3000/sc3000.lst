@@ -3,7 +3,7 @@ target/sc3000/stdio/getk
 @classic/stdio/ansicore.lst
 
 target/sc3000/time/clock
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 @video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst

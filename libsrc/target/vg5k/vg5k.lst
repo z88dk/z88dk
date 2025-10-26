@@ -16,7 +16,7 @@ target/vg5k/stdio/conio_map_colour
 target/vg5k/stdio/conio_vars
 @classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/vg5k/graphics/textpixl6
 target/vg5k/graphics/cleargraphics
 @classic/gfx/gencon/gfx_gencon6.lst

@@ -4,8 +4,8 @@ target/zx/stdio/console_vars
 
 ; Keyboard is like +zx, but extended, so needs new routines
 ; Pull it in before zxstdio so we get keyboard reading
-input/fgetc_cons
-@input/input_keyboard.lst
+classic/input/fgetc_cons
+@classic/input/input_keyboard.lst
 
 ; We only want bits of +zx stdio, but take it all to keep
 ; things simple (Our versions are above)

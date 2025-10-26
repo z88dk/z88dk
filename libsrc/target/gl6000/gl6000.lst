@@ -11,6 +11,6 @@ classic/gfx/narrow/obj/gl6000/stencil_render
 classic/gfx/narrow/obj/gl6000/putsprite
 @classic/gfx/narrow/gfx_narrow.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/gl6000/games/keys_joystick
 @classic/games/games.lst

@@ -19,7 +19,7 @@ target/vz/games/bit_close
 target/vz/games/bit_close_ei
 target/vz/games/joystick
 @classic/games/games.lst
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/vz/vz_bgrd
 target/vz/vz_brick
 target/vz/vz_brick_callee

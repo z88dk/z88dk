@@ -1,6 +1,6 @@
 include ../../Make.config
 
-ALLSUBDIRS = common narrow wide portable x11 gencon retrofit
+ALLSUBDIRS = common narrow wide portable x11 gencon 
 
 SUBDIRS = common 
 # Directories that need a target passed down

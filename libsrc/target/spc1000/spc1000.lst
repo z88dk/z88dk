@@ -5,7 +5,7 @@ target/spc1000/graphics/textpixl6
 
 @video/mc6847/mc6847.lst
 @classic/stdio/stdio.lst
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/spc1000/tms9918
 target/spc1000/games/joystick
 target/spc1000/games/keys_joystick

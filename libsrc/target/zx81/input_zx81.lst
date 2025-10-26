@@ -1,11 +1,11 @@
-input/obj/${TYPE}/in_WaitForKey
+classic/input/obj/${TYPE}/in_WaitForKey
 target/zx81/input/in_Inkey
-input/obj/${TYPE}/in_GetKey
+classic/input/obj/${TYPE}/in_GetKey
 target/zx81/input/in_keytranstbl
 target/zx81/input/in_KeyPressed
-input/obj/${TYPE}/in_WaitForNoKey
+classic/input/obj/${TYPE}/in_WaitForNoKey
 target/zx81/input/in_LookupKey
-input/obj/${TYPE}/fgetc_cons_inkey
+classic/input/obj/${TYPE}/fgetc_cons_inkey
 target/zx81/input/in_JoyKeyboard
 target/zx81/input/in_MouseSim
 target/zx81/input/in_MouseSim_callee

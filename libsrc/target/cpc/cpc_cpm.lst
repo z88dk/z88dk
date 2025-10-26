@@ -128,5 +128,5 @@ target/cpc/psg/asm_vt2_hardware_out
 target/cpc/psg/asm_arkos_cpc_rom
 target/cpc/psg/asm_arkos_cpc_smc
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/cpc/input/__cpc_scan_allrows

@@ -8,7 +8,7 @@ target/shared/copy_font
 
 target/super80/graphics/textpixl
 @classic/gfx/gencon/gfx_gencon.lst
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 @classic/stdio/stdio.lst
 target/super80/games/bit_open
 target/super80/games/bit_close

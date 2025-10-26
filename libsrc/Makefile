@@ -197,11 +197,11 @@ include classic/games/games.mak
 include classic/gfx/retrofit/retrofit.mak
 include classic/gfx/portable/portable.mak
 include classic/gfx/x11/x11.mak
-include input/input.mak
-include interrupts/common/common.mak
-include interrupts/im1/im1.mak
-include interrupts/im2/im2.mak
-include interrupts/nmi/nmi.mak
+include classic/input/input.mak
+include classic/interrupts/common/common.mak
+include classic/interrupts/im1/im1.mak
+include classic/interrupts/im2/im2.mak
+include classic/interrupts/nmi/nmi.mak
 include classic/lib3d/lib3d.mak
 include _DEVELOPMENT/libgen/libgen.mak
 include _DEVELOPMENT/math/fix16/fix16.mak
@@ -2284,7 +2284,7 @@ preempt.lib:
 	@echo ''
 	@echo '--- Building Preemptive threading Library ---'
 	@echo ''
-	$(MAKE) -C threading/preempt
+	$(MAKE) -C classic/threading/preempt
 
 # SP1 sprite library - aralbrec
 sp1-all:
@@ -2396,7 +2396,7 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C classic/fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C threading/preempt clean
+	$(MAKE) -C classic/threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C classic/games clean
 	$(MAKE) -C math clean

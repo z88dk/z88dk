@@ -20,7 +20,7 @@ target/special/graphics/w_xorpixl
 target/special/graphics/w_pointxy
 @classic/gfx/portable/gfx_portable_w.lst
 @classic/gfx/wide/gfx_wide.lst
-;@input/input_keyboard.lst
+;@classic/input/input_keyboard.lst
 ;target/special/games/joystick
 ;target/special/games/keys_joystick
 ;@classic/games/games.lst

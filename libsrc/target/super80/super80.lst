@@ -4,7 +4,7 @@ target/super80/stdio/generic_console
 target/super80/stdio/conio_map_colour
 target/super80/graphics/textpixl6
 @classic/gfx/gencon/gfx_gencon6.lst
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 @classic/stdio/stdio.lst
 target/super80/games/bit_open
 target/super80/games/bit_close

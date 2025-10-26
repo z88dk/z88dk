@@ -27,8 +27,8 @@ target/sam/stdio/ansi/f_ansi_scrollup
 
 ; Keyboard is like +zx, but extended, so needs new routines
 ; Pull it in before zxstdio so we get keyboard reading
-input/obj/${TYPE}/fgetc_cons
-@input/input_keyboard.lst
+classic/input/obj/${TYPE}/fgetc_cons
+@classic/input/input_keyboard.lst
 
 ; We only want bits of +zx stdio, but take it all to keep
 ; things simple (Our versions are above)
