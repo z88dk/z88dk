@@ -10,4 +10,4 @@ target/trs80/games/bit_close_ei
 classic/games/obj/${TARGET}/playzb4
 target/trs80/games/joystick_cpm
 @classic/games/games.lst
-@video/mc6845/mc6845.lst
+@classic/video/mc6845/mc6845.lst

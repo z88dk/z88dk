@@ -1,0 +1,2 @@
+classic/video/regis/obj/**/*.o
+@classic/gfx/wide/gfx_wide.lst

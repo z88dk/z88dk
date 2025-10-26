@@ -17,7 +17,7 @@ classic/gfx/narrow/obj/${TARGET}/clrarea2
 classic/gfx/narrow/obj/${TARGET}/fillarea2
 classic/gfx/narrow/obj/${TARGET}/xorclrarea2
 @classic/gfx/narrow/gfx_narrow.lst
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 
 
 target/mc1000/time/clock

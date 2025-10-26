@@ -11,6 +11,6 @@ target/excali64/stdio/loadudg6
 
 @classic/input/input_keyboard.lst
 @classic/gfx/gencon/gfx_gencon6.lst
-@video/mc6845/mc6845.lst
+@classic/video/mc6845/mc6845.lst
 @classic/stdio/stdio.lst
 @classic/games/games.lst

@@ -1,6 +1,6 @@
 @classic/stdio/ansicore.lst
 
-@video/tms9918/video_tms9918.lst
+@classic/video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/nabu/psg/asm_vt2_hardware_out

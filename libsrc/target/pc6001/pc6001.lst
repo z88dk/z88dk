@@ -1,4 +1,4 @@
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 target/pc6001/stdio/fgetc_cons
 target/pc6001/stdio/getk
 target/pc6001/stdio/fputc_cons

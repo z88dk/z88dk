@@ -18,7 +18,7 @@ target/z1013/games/joystick.asm
 @classic/games/games_joystick.lst
 
 
-@video/krt/video_krt.lst
+@classic/video/krt/video_krt.lst
 target/z1013/graphics/cleargraphics
 target/z1013/graphics/getmaxx
 target/z1013/graphics/getmaxy

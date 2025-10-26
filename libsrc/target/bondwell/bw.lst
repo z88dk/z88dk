@@ -7,4 +7,4 @@ target/bondwell/ioctl/generic_console_ioctl
 target/bondwell/playzb4
 @classic/gfx/gencon/gfx_gencon6.lst
 @classic/games/games.lst
-@video/mc6845/mc6845.lst
+@classic/video/mc6845/mc6845.lst

@@ -1,4 +1,4 @@
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/sv8000/interrupts/add_raster_int

@@ -20,5 +20,5 @@ target/trs80/games/bit_close_ei
 target/trs80/games/keys_joystick
 classic/games/obj/${TARGET}/playzb4
 @classic/games/games.lst
-@video/mc6845/mc6845.lst
+@classic/video/mc6845/mc6845.lst
 

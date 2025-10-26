@@ -6,7 +6,7 @@ target/svi/stdio/generic_console
 @classic/stdio/ansicore.lst
 @classic/input/input_keyboard.lst
 target/msx/time/clock
-@video/tms9918/video_tms9918.lst
+@classic/video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/svi/games/joystick
@@ -22,7 +22,7 @@ target/msx/psg/get_psg
 target/msx/psg/set_psg
 target/msx/psg/set_psg_callee
 _DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
-@video/mc6845/mc6845.lst
+@classic/video/mc6845/mc6845.lst
 target/svi/rs232/rs232_close
 target/svi/rs232/rs232_get
 target/svi/rs232/rs232_init

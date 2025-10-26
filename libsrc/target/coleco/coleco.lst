@@ -2,7 +2,7 @@
 target/coleco/stdio/CRT_FONT
 target/coleco/stdio/fgetc_cons
 target/coleco/stdio/getk
-@video/tms9918/video_tms9918_nmi.lst
+@classic/video/tms9918/video_tms9918_nmi.lst
 @classic/stdio/stdio.lst
 
 @classic/gfx/narrow/gfx_narrow.lst

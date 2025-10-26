@@ -4,7 +4,7 @@ target/sc3000/stdio/getk
 
 target/sc3000/time/clock
 @classic/input/input_keyboard.lst
-@video/tms9918/video_tms9918.lst
+@classic/video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 _DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o

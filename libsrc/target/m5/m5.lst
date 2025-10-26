@@ -3,7 +3,7 @@ classic/stdio/obj/${TYPE}/inkey/getk
 target/m5/stdio/fgetc_cons_rom
 target/m5/stdio/getk_rom
 target/m5/stdio/fputc_cons_rom
-@video/tms9918/video_tms9918.lst
+@classic/video/tms9918/video_tms9918.lst
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 

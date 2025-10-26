@@ -3,7 +3,7 @@ classic/stdio/obj/${TYPE}/inkey/getk
 target/spc1000/stdio/fputc_cons_native
 target/spc1000/graphics/textpixl6
 
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 @classic/stdio/stdio.lst
 @classic/input/input_keyboard.lst
 target/spc1000/tms9918
@@ -11,7 +11,7 @@ target/spc1000/games/joystick
 target/spc1000/games/keys_joystick
 @classic/games/games.lst
 @classic/gfx/narrow/gfx_narrow.lst
-@video/tms9918/video_tms9918.lst
+@classic/video/tms9918/video_tms9918.lst
 target/spc1000/psg/set_psg
 target/spc1000/psg/set_psg_callee
 target/spc1000/psg/get_psg

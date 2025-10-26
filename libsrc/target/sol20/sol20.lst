@@ -1,7 +1,7 @@
 target/sol20/stdio/getk
 target/sol20/stdio/fgetc_cons
 target/sol20/games/bit_open_close
-@video/vdm/video_vdm.lst
+@classic/video/vdm/video_vdm.lst
 @classic/stdio/stdio.lst
 @classic/games/games.lst
 
