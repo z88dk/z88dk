@@ -23,6 +23,7 @@ void Preprocessor::push_file(const std::string& filename) {
     f.tokens_file = TokensFile(filename, 1);
     f.line_index = 0;
     f.has_forced_location = false;
+    f.forced_constant_line_numbers = false;
     file_stack_.push_back(std::move(f));
 }
 
@@ -33,6 +34,7 @@ void Preprocessor::push_virtual_file(const std::string& content,
     vf.tokens_file = TokensFile(content, filename, first_line_num);
     vf.line_index = 0;
     vf.has_forced_location = false;
+    vf.forced_constant_line_numbers = false;
     file_stack_.push_back(std::move(vf));
 }
 
@@ -64,17 +66,22 @@ bool Preprocessor::next_line(TokensLine& line) {
         line = file.tokens_file.get_tok_line(file.line_index);
         ++file.line_index;
 
-        // If a LINE directive previously set a forced logical location for this file,
+        // If a LINE/C_LINE directive previously set a forced logical location for this file,
         // apply it to the TokensLine we just retrieved so subsequent processing sees the
         // updated logical filename/line numbers.
         if (file.has_forced_location) {
             int physical_index = file.line_index - 1; // index of the line we just took
-            int offset = physical_index - file.forced_from_index;
             Location loc = line.location();
             if (!file.forced_filename.empty()) {
                 loc.set_filename(file.forced_filename);
             }
-            loc.set_line_num(file.forced_start_line_num + offset);
+            if (file.forced_constant_line_numbers) {
+                loc.set_line_num(file.forced_start_line_num);
+            }
+            else {
+                int offset = physical_index - file.forced_from_index;
+                loc.set_line_num(file.forced_start_line_num + offset);
+            }
             line.set_location(loc);
         }
 
@@ -186,6 +193,9 @@ void Preprocessor::process_directive(const TokensLine& line, int& i,
     case Keyword::LINE:
         process_line(line, i);
         break;
+    case Keyword::C_LINE:
+        process_c_line(line, i);
+        break;
     default:
         assert(0);
     }
@@ -247,38 +257,50 @@ void Preprocessor::do_include(const std::string& filename,
     }
 }
 
-void Preprocessor::process_line(const TokensLine& line, int& i) {
+// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
+bool Preprocessor::parse_line_args(const TokensLine& line, int& i,
+                                   int& out_linenum, std::string& out_filename,
+                                   const char* directive_name) const {
     skip_spaces(line, i);
 
-    // Expect an integer token for the line number
     if (!(i < line.size() && line[i].is(TokenType::Integer))) {
         g_errors.error(ErrorCode::InvalidSyntax,
-                       "Expected line number in LINE directive");
-        return;
+                       std::string("Expected line number in ") + directive_name + " directive");
+        return false;
     }
 
-    int linenum = line[i].int_value();
+    out_linenum = line[i].int_value();
     ++i;
 
     skip_spaces(line, i);
 
-    std::string filename; // optional
-
+    out_filename.clear();
     if (i < line.size() && line[i].is(TokenType::Comma)) {
         ++i;
         skip_spaces(line, i);
         if (i < line.size() && line[i].is(TokenType::String)) {
-            filename = line[i].string_value();
+            out_filename = line[i].string_value();
             ++i;
         }
         else {
             g_errors.error(ErrorCode::InvalidSyntax,
-                           "Expected quoted filename after comma in LINE directive");
-            return;
+                           std::string("Expected quoted filename after comma in ") + directive_name +
+                           " directive");
+            return false;
         }
     }
 
     expect_end(line, i);
+
+    return true;
+}
+
+void Preprocessor::process_line(const TokensLine& line, int& i) {
+    int linenum = 0;
+    std::string filename;
+    if (!parse_line_args(line, i, linenum, filename, "LINE")) {
+        return;
+    }
 
     // Apply forced logical location for the top file so subsequent lines
     // will report the specified filename/line numbers.
@@ -291,6 +313,35 @@ void Preprocessor::process_line(const TokensLine& line, int& i) {
     file.has_forced_location = true;
     file.forced_from_index = file.line_index; // next physical index to be read
     file.forced_start_line_num = linenum;
+    file.forced_constant_line_numbers = false;
+    if (!filename.empty()) {
+        file.forced_filename = filename;
+    }
+    else {
+        // If no filename provided, keep existing logical filename
+        file.forced_filename = file.tokens_file.filename();
+    }
+}
+
+void Preprocessor::process_c_line(const TokensLine& line, int& i) {
+    int linenum = 0;
+    std::string filename;
+    if (!parse_line_args(line, i, linenum, filename, "C_LINE")) {
+        return;
+    }
+
+    // Apply forced logical location for the top file so subsequent lines
+    // will report the specified filename and the same line number for all lines.
+    if (file_stack_.empty()) {
+        // nothing to apply to
+        return;
+    }
+
+    File& file = file_stack_.back();
+    file.has_forced_location = true;
+    file.forced_from_index = file.line_index; // next physical index to be read
+    file.forced_start_line_num = linenum;
+    file.forced_constant_line_numbers = true;
     if (!filename.empty()) {
         file.forced_filename = filename;
     }
