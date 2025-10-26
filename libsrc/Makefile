@@ -188,7 +188,7 @@ include _DEVELOPMENT/compress/zx1/zx1.mak
 include _DEVELOPMENT/compress/zx2/zx2.mak
 include classic/compress/zx7/zx7.mak
 include _DEVELOPMENT/ctype/ctype.mak
-include debug/debug.mak
+include classic/debug/debug.mak
 include _DEVELOPMENT/font/font_4x8/font_4x8.mak
 include _DEVELOPMENT/font/font_8x8/font_8x8.mak
 include _DEVELOPMENT/font/font_8x10/font_8x10.mak
