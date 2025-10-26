@@ -197,23 +197,43 @@ void Preprocessor::process_name_directive(const TokensLine& line, int& i,
 void Preprocessor::process_include(const TokensLine& line, int& i) {
     skip_spaces(line, i);
     if (i < line.size() && line[i].is(TokenType::String)) {
+        // double-quoted or angle-bracketed filename
         std::string filename = line[i].string_value();
         bool is_angle = line[i].text().front() == '<';
         ++i;
         expect_end(line, i);
 
-        // search include file
-        std::string resolved = resolve_include_candidate(filename, is_angle);
-        if (resolved.empty()) { // file not found
-            push_file(filename);
-        }
-        else {
-            push_file(resolved);
-        }
+        do_include(filename, is_angle);
     }
     else {
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       "Expected filename string in include directive");
+        // whitespace separated filename (plain)
+        std::string filename;
+        while (i < line.size() && line[i].is_not(TokenType::Whitespace)) {
+            filename += line[i].text();
+            ++i;
+        }
+        expect_end(line, i);
+
+        if (filename.empty()) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Expected filename string in include directive");
+        }
+        else {
+            // plain filename
+            do_include(filename, false);
+        }
+    }
+}
+
+void Preprocessor::do_include(const std::string& filename,
+                              bool is_angle) {
+    // search include file
+    std::string resolved = resolve_include_candidate(filename, is_angle);
+    if (resolved.empty()) { // file not found
+        push_file(filename);
+    }
+    else {
+        push_file(resolved);
     }
 }
 
