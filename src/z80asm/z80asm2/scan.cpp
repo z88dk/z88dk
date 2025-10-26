@@ -25,7 +25,7 @@
         output.push_back(t); \
     } while (0)
 
-#define YYFILL() 0
+#define YYFILL() 1
 
 static void swap_x_y(std::string& str) {
     // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
@@ -75,8 +75,7 @@ static void swap_ix_iy(std::string& str, Keyword& keyword) {
     }
 }
 
-void TokenizedFile::tokenize_line(int& line_index, TokenizedLine& output) {
-    output.clear();
+void TokensFile::tokenize_line(int& line_index, TokensLine& output) {
     if (line_index < 0 || line_index >= line_count()) {
         return;
     }
