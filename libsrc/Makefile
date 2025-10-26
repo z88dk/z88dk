@@ -2232,7 +2232,7 @@ gfxvti.lib: $(TARGET_CLIB_DEPS)
 	@echo '--- Building VTI graphics Library ---'
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=altair8800 SUBTYPE=vti FLAVOUR="gencon portable"
-	TARGET=vti TYPE=8080 $(LIBLINKER) -m8080 -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/classic/video/vti/video_vti.lst
+	TARGET=vti TYPE=8080 $(LIBLINKER) -m8080 -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(Z88DK_LIBSRC)/classic/video/vti/video_vti.lst
 
 gfxtek.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
@@ -2240,7 +2240,7 @@ gfxtek.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=test SUBTYPE=tek FLAVOUR="wide"
 	$(MAKE) -C classic/video/tek401x TARGET=test 
-	TARGET=tek TYPE=z80 $(LIBLINKER) -mz80 -DFORtek -x$(OUTPUT_DIRECTORY)/gfxtek @$(LISTFILE_DIRECTORY)/classic/video/tek401x/video_tek.lst
+	TARGET=tek TYPE=z80 $(LIBLINKER) -mz80 -DFORtek -x$(OUTPUT_DIRECTORY)/gfxtek @$(Z88DK_LIBSRC)/classic/video/tek401x/video_tek.lst
 
 gfxregis.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
@@ -2248,28 +2248,28 @@ gfxregis.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=test SUBTYPE=regis FLAVOUR="wide"
 	$(MAKE) -C classic/video/regis TARGET=test 
-	TARGET=regis TYPE=z80 $(LIBLINKER) -mz80 -DFORregis -x$(OUTPUT_DIRECTORY)/gfxregis @$(LISTFILE_DIRECTORY)/classic/video/regis/video_regis.lst
+	TARGET=regis TYPE=z80 $(LIBLINKER) -mz80 -DFORregis -x$(OUTPUT_DIRECTORY)/gfxregis @$(Z88DK_LIBSRC)/classic/video/regis/video_regis.lst
 
 gfxh19.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building Heath/Zenith H19 graphics Library ---'
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=cpm SUBTYPE=h19 FLAVOUR="narrow"
-	TARGET=h19 TYPE=z80 $(LIBLINKER) -DFORh19 -x$(OUTPUT_DIRECTORY)/gfxh19 @$(LISTFILE_DIRECTORY)/classic/video/h19/gfxh19.lst
+	TARGET=h19 TYPE=z80 $(LIBLINKER) -DFORh19 -x$(OUTPUT_DIRECTORY)/gfxh19 @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19.lst
 
 gfxvio.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building VIO graphics Library ---'
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=altair8800 SUBTYPE=vio FLAVOUR="gencon portable"
-	TARGET=vio TYPE=8080 $(LIBLINKER) -m8080 -DFORvio -x$(OUTPUT_DIRECTORY)/gfxvio @$(LISTFILE_DIRECTORY)/classic/video/vio/video_vio.lst
+	TARGET=vio TYPE=8080 $(LIBLINKER) -m8080 -DFORvio -x$(OUTPUT_DIRECTORY)/gfxvio @$(Z88DK_LIBSRC)/classic/video/vio/video_vio.lst
 
 gfxvdm.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building VDM graphics Library ---'
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=altair8800 SUBTYPE=vdm FLAVOUR="gencon portable"
-	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(LISTFILE_DIRECTORY)/classic/video/vdm/video_vdm.lst
+	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(Z88DK_LIBSRC)/classic/video/vdm/video_vdm.lst
 
 nanos.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
@@ -2277,7 +2277,7 @@ nanos.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	$(MAKE) -C classic/games TARGET=cpm SUBTYPE=nanos
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="narrow gencon" SUBTYPE=nanos
-	TARGET=nanos TYPE=z80 $(LIBLINKER) -mz80 -DFORnanos -x$(OUTPUT_DIRECTORY)/nanos @$(LISTFILE_DIRECTORY)/target/nanos/nanos.lst
+	TARGET=nanos TYPE=z80 $(LIBLINKER) -mz80 -DFORnanos -x$(OUTPUT_DIRECTORY)/nanos @$(Z88DK_LIBSRC)/target/nanos/nanos.lst
 
 # Preempt multitasking library - dom
 preempt.lib:
