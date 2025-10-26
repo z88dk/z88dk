@@ -138,7 +138,7 @@ TEST_CASE("Preprocessor: include with angle brackets treated as string; missing 
     g_errors.reset();
     Preprocessor pp;
 
-    // angle-bracket include — lexer reports the name as a string token
+    // angle-bracket include - lexer reports the name as a string token
     const std::string missing = "pp_angle_missing.tmp";
     const std::string content = "#include <" + missing + ">\n";
     pp.push_virtual_file(content, "virtual_angle", 1);
