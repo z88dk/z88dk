@@ -1,4 +1,4 @@
-@alloc/alloc_gbz80.lst
+@classic/alloc/alloc_gbz80.lst
 _DEVELOPMENT/compress/aplib/obj/${TYPE}/**/*.o
 @classic/compress/zx7/zx7.lst
 _DEVELOPMENT/ctype/obj/${TYPE}/**/*.o

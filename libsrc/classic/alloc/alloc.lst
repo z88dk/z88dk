@@ -1,4 +1,4 @@
 _DEVELOPMENT/alloc/balloc/obj/${TYPE}/**/*.o
 _DEVELOPMENT/alloc/obstack/obj/${TYPE}/**/*.o
 @classic/alloc/malloc-classic/malloc.lst
-@alloc/farmalloc/farmalloc.lst
+@classic/alloc/farmalloc/farmalloc.lst

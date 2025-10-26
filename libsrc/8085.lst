@@ -1,4 +1,4 @@
-@alloc/alloc_8080.lst
+@classic/alloc/alloc_8080.lst
 _DEVELOPMENT/compress/aplib/obj/${TYPE}/**/*.o
 _DEVELOPMENT/compress/zx0/obj/${TYPE}/**/*.o
 _DEVELOPMENT/compress/zx1/obj/${TYPE}/**/*.o

@@ -6,7 +6,7 @@ _DEVELOPMENT/font/font_8x10/obj/${TYPE}/**/*.o
 _DEVELOPMENT/libgen/obj/${TYPE}/**/*.o
 _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 @stdlib/stdlib.lst
-@alloc/alloc.lst
+@classic/alloc/alloc.lst
 @classic/string/string.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
 _DEVELOPMENT/regex/obj/${TYPE}/**/*.o

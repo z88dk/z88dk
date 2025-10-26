@@ -9,7 +9,7 @@ _DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
 
 ; Include alloc before strings so we get the malloc version of strdup, not the 
 ; one inherited form newlib
-@alloc/alloc.lst
+@classic/alloc/alloc.lst
 @classic/string/string.lst
 _DEVELOPMENT/string/obj/${TYPE}/**/*.o
 _DEVELOPMENT/regex/obj/${TYPE}/**/*.o

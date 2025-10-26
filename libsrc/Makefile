@@ -178,7 +178,7 @@ include classic/adt/stack/stack.mak
 include _DEVELOPMENT/adt/adt.mak
 include classic/algorithm/AStarSearch/astar.mak
 include _DEVELOPMENT/alloc/balloc/balloc.mak
-include alloc/farmalloc/farmalloc.mak
+include classic/alloc/farmalloc/farmalloc.mak
 include classic/alloc/malloc-classic/malloc.mak
 include _DEVELOPMENT/alloc/obstack/obstack.mak
 include _DEVELOPMENT/arch/z80/z80.mak
