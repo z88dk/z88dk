@@ -1,9 +1,4 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
-
-include ../../Make.config
+include ../../../Make.config
 
 TARGET ?= test
 
