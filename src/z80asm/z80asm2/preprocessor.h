@@ -27,6 +27,12 @@ public:
                            const std::string& filename,
                            int first_line_num = 1);
 
+    // Push a virtual file constructed from a binary file. The virtual file
+    // contains DEFB statements for the bytes of the binary file, up to 16
+    // bytes per line. The virtual file uses the same logical location
+    // (filename / start line) as the current top file on the stack when present.
+    void push_binary_file(const std::string& bin_filename);
+
     // Pop and return the next processed TokensLine.
     bool next_line(TokensLine& out_line);
 
@@ -79,6 +85,8 @@ private:
     // (to avoid infinite recursion).
     std::unordered_map<std::string, int> macro_recursion_count_;
 
+    // parse and process directives
+
     // Internal helpers
     void expect_end(const TokensLine& line, int i) const;
     void skip_spaces(const TokensLine& line, int& i) const;
@@ -89,6 +97,22 @@ private:
     void process_name_directive(const TokensLine& line, int& i,
                                 Keyword keyword, const std::string& name);
     void process_include(const TokensLine& line, int& i);
+    // Process BINARY / INCBIN directive followed by a quoted filename.
+    // On success calls push_binary_file(filename).
+    void process_binary(const TokensLine& line, int& i);
+    // Parse a filename from the tokens at position i.
+    // Supports:
+    //  - quoted string token (double-quoted or angle-bracketed)
+    //  - plain filename parsed up to whitespace
+    // On success returns true, sets out_filename and out_is_angle and advances i.
+    // On failure returns false and does not emit errors (caller should emit appropriate message).
+    bool parse_filename(const TokensLine& line, int& i,
+                        std::string& out_filename, bool& out_is_angle) const;
+    // Search include path for a candidate filename. Returns resolved path or
+    // original file name if not found. Uses the same semantics as
+    // resolve_include_candidate.
+    std::string search_include_path(const std::string& filename,
+                                    bool is_angle) const;
     void do_include(const std::string& filename, bool is_angle);
     void process_line(const TokensLine& line, int& i);
     void process_c_line(const TokensLine& line, int& i);
