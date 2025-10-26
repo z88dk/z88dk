@@ -229,7 +229,7 @@ define buildgeneric
 endef
 
 define buildcrt
-	$(MAKE) -C z80_crt0s
+	$(MAKE) -C classic/z80_crt0s
 endef
 
 #  short script to sort out ticalc dependencies
@@ -2332,7 +2332,7 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
 	@echo ''
 	@echo '--- Building 8080 optimised crt routines---'
 	@echo ''
-	$(MAKE) -C z80_crt0s
+	$(MAKE) -C classic/z80_crt0s
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
 8085_crt0.lib: $(DIRS) $(OBJS) 8080_opt.lib
@@ -2346,7 +2346,7 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
 	@echo ''
 	@echo '--- Building 8085 optimised crt routines---'
 	@echo ''
-	$(MAKE) -C z80_crt0s
+	$(MAKE) -C classic/z80_crt0s
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
 
 z80n_crt0.lib: $(DIRS) $(OBJS) 8085_opt.lib
@@ -2395,7 +2395,7 @@ install-clean: classic-clean new-install-clean
 classic-clean: $(CLEAN)
 	$(MAKE) -C classic/fcntl clean
 	$(MAKE) -C math clean
-	$(MAKE) -C z80_crt0s clean
+	$(MAKE) -C classic/z80_crt0s clean
 	$(MAKE) -C classic/threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C classic/games clean

@@ -27,4 +27,4 @@ _DEVELOPMENT/adt/obj/${TYPE}/**/*.o
 @classic/algorithm/alg.lst
 _DEVELOPMENT/arch/z80/obj/${TYPE}/**/*.o
 _DEVELOPMENT/math/fix16/obj/${TYPE}/**/*.o
-@z80_crt0s/crt0.lst
+@classic/z80_crt0s/crt0.lst
