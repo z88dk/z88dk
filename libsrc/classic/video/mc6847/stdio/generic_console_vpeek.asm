@@ -6,7 +6,7 @@
 
     INCLUDE "classic/video/mc6847/mc6847.inc"
 
-IFNDEF FORphc25
+IFNDEF FORphc20
 
     PUBLIC  generic_console_vpeek
 

@@ -6,7 +6,9 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static char             *blockname    = NULL;
 static int               origin       = -1;
+static int               fence        = 0xfd00;
 static char              help         = 0;
 
 
@@ -18,7 +20,9 @@ option_t phc25_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0,  "fence",    "Highest address to use",     OPT_INT,   &fence },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    {  0 , "blockname", "Name of the program in phc file", OPT_STR, &blockname},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -149,10 +153,14 @@ static uint8_t simple_footer[] = {
 
 int phc25_exec(char *target)
 {
+    uint8_t buffer[32768 + sizeof(simple_footer)];
+    size_t  buffer_offs = 0;
     char    filename[FILENAME_MAX+1];
     FILE    *fpin, *fpout;
     long     org;
-    int      c, i;
+    long     compressed_size_instr, entry_point;
+    size_t   program_size;
+    int      c, i, w, compress = 1;
 
     if ( help )
         return -1;
@@ -175,38 +183,130 @@ int phc25_exec(char *target)
             exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
         }
     }
-    // if ( org != 0xc009 ) {
-    //     fprintf(stderr, "Origin is $%04x - expected $c009\n", (int)org);
-    // }
+
+    if ( parameter_search(crtfile, ".map", "CRT_NO_COMPRESSION") != -1 ) {
+        compress = 0;
+    }
+
+
+    if ( compress ) {
+        if ( ( compressed_size_instr = parameter_search(crtfile, ".map", "__phc25_compressed_size") ) <0 ) {
+            exit_log(1,"Could not find parameter __phc25_compressed_size\n");
+        }
+    }
+
+    if ( ( entry_point = parameter_search(crtfile, ".map", "__phc25_program_entry_point") ) <0 ) {
+        exit_log(1,"Could not find parameter __phc25_program_entry_point\n");
+    }
 
     if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",binname);
     }
 
+    if (fseek(fpin, 0, SEEK_END)) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
+
+    program_size = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+
+    if ( org + program_size > fence ) {
+        exit_log(1, "Program too large - would pass 0x%x\n",fence);
+    }
+
+
+
     if ( (fpout=fopen(filename,"wb") ) == NULL ) {
         exit_log(1,"Can't open output file\n");
     }
 
-    write_header(fpout, binname);
-    
+    write_header(fpout, blockname ? blockname : binname);
 
     fprintf(fpout, "%c&H%04X%c", TOK_EXEC, (int)org, 0); 
-    i = 0;
-    while ( ( c = fgetc(fpin)) != EOF ) {
-        if ( i < 0x15 ) {       // Magic number
+
+
+    for ( i = 0; i < (entry_point - org); i++ ) {
+        c = fgetc(fpin);
+        buffer[buffer_offs++] = c;
+    }
+
+    if ( compress ) {
+        char utname[FILENAME_MAX+1];
+        char ctname[FILENAME_MAX+1];
+        char cmdline[FILENAME_MAX+1];
+        FILE *temp;
+        int clen;
+
+        get_temporary_filename(utname);
+        get_temporary_filename(ctname);
+        
+        // Read the rest of the file into a temporary file
+        if ( (temp = fopen(utname, "wb")) == NULL ) {
+            exit_log(1, "Cannot open temporary compression file\n");
+        }
+        while ( (c = fgetc(fpin))!= EOF ) {
+            fputc(c, temp);
+        }
+        fclose(temp);
+
+    
+        // invoke z88dk-zx0 -b on the file
+        snprintf(cmdline,sizeof(cmdline),"z88dk-zx0 -f %s %s",utname, ctname);
+    
+        if (system(cmdline) != 0) {
+            exit_log(1, "ERROR: Unable to compress %s\n", binname);
+        }
+
+        // Read that file back in
+        if ( (temp = fopen(ctname, "rb")) == NULL ) {
+            exit_log(1, "Cannot open compressed filen");
+        }
+        clen = 0;
+        while ( (c = fgetc(temp))!= EOF ) {
+            buffer[buffer_offs++] = c;
+            clen++;
+        }
+        fclose(temp);
+
+        // And now we have to set the end compression address in the file
+        buffer[ compressed_size_instr - org  + 1] = clen % 256;
+        buffer[ compressed_size_instr - org  + 2] = clen / 256;
+
+        remove(utname);
+        remove(ctname);
+    } else {
+        while ( ( c =fgetc(fpin)) != EOF) {
+            buffer[buffer_offs++] = c;
+        }
+    }
+
+
+    // And now write it to a file, escaping after the prologue code
+    for ( i = 0, w = 0; i < buffer_offs; i++ ) {
+        c = buffer[i];
+        if ( i < (entry_point - org ) ) {       // Don't pack the header/decompressor
             fputc(c,fpout);
+            w++;
         } else if ( c == 0xff ) {
             fputc(c,fpout);
             fputc(c,fpout);
+            w += 2;
         } else if ( c == 0x00 ) {
             fputc(0xff,fpout);
             fputc(c,fpout);
+            w += 2;
         } else {
             fputc(c, fpout);
+            w++;
         }
-        i++;
     }
     fputc(0x00,fpout);  // End marker...
+
+    // Issue a warning if we think the file is going to overwrite the stack
+    if ( ( w + 1 ) + org > 0xf700 ) {
+        printf("WARNING: File is probably too large to load\n");
+    }
 
     // File length must be a multiple of 2
     if ( (ftell(fpout) + sizeof(simple_footer)) %2 ) {
@@ -215,8 +315,6 @@ int phc25_exec(char *target)
 
     // And write the simple_footer
     fwrite(simple_footer, 1, sizeof(simple_footer), fpout);          
-
-    
 
     fclose(fpin);
     fclose(fpout);
@@ -251,7 +349,7 @@ static void write_bootstrap(FILE *fpout, int bootstrap_org, FILE *bootstrap, int
 {
     uint8_t  *linebuf, *ptr;
     int linelengths[20]; // Should be enough lines
-    int num_lines = 0, offset = 0;
+    int num_lines = 0, buffer_offset = 0;
 
     // CLEAR 100,&H(loader_address-1)
     linelengths[num_lines++] = fprintf(fpout, "%c100,&H%04X%c", TOK_CLEAR, bootstrap_org - 1, 0);  
@@ -287,18 +385,18 @@ static void write_bootstrap(FILE *fpout, int bootstrap_org, FILE *bootstrap, int
     fprintf(fpout, "%c", 0x00); // BASIC line end marker
 
 
-    // Now move onto the offsets
+    // Now move onto the buffer_offsets
 
     // Line numbers seem to be in reverse order...fab
     linebuf = calloc(num_lines, 4);
     ptr = linebuf + (num_lines-1) * 4;
-    offset = 1;
+    buffer_offset = 1;
     for ( int  i = 0, linenum = 10 ; i < num_lines; i++, linenum+=10 ) {
-        ptr[0] = (offset) & 0xff;
-        ptr[1] = ((offset >> 8 ) & 0xff) | 0xc0;
+        ptr[0] = (buffer_offset) & 0xff;
+        ptr[1] = ((buffer_offset >> 8 ) & 0xff) | 0xc0;
         ptr[2] = (linenum ) & 0xff;
         ptr[3] = (linenum >> 8 ) & 0xff;
-        offset += linelengths[i];
+        buffer_offset += linelengths[i];
         ptr -= 4;
     }
     fwrite(linebuf, 4, num_lines, fpout);

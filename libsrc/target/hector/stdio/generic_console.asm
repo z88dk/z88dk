@@ -6,7 +6,6 @@
 
     PUBLIC  generic_console_cls
     PUBLIC  generic_console_printc
-    PUBLIC  generic_console_scrollup
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute
@@ -52,22 +51,6 @@ generic_console_cls:
     ldir
     ret
 
-generic_console_scrollup:
-    push    bc
-    push    de
-    ld      hl,HEC_SCREEN+(HEC_STRIDE*8)
-    ld      de,HEC_SCREEN
-    ld      bc,+(HEC_STRIDE * (HEC_MAXY-8-1))
-    ldir
-    ld      d,h
-    ld      e,l
-    inc     de
-    xor     a
-    ld      bc,HEC_STRIDE*8 - 1
-    ldir
-    pop     de
-    pop     bc
-    ret
 
 
 

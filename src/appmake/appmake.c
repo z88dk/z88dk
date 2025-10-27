@@ -43,7 +43,6 @@ static void         set_option_by_type(option_t *options, type_t type, char *val
 static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
 static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
-static void         get_temporary_filename(char *filen);
 static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
@@ -374,13 +373,15 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         fclose(fdata);
     }
 
-    // If we have a HIMEM then append it as well
-    strcpy(name, fname);
-    suffix_change(name, "_HIMEM.bin");
-    if ( ( fhimem = fopen(name, "rb")) != NULL ) {
-        while ((c = fgetc(fhimem)) != EOF)
-            fputc(c, fin);
-        fclose(fhimem);
+    // If we have a HIMEM then append it as well - but only if defined by crt
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__HIMEM_head ")) > 0)) {
+        strcpy(name, fname);
+        suffix_change(name, "_HIMEM.bin");
+        if ( ( fhimem = fopen(name, "rb")) != NULL ) {
+            while ((c = fgetc(fhimem)) != EOF)
+                fputc(c, fin);
+            fclose(fhimem);
+        }
     }
 
 
@@ -1094,7 +1095,7 @@ int bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, i
 }
 
 
-static void get_temporary_filename(char *filen)
+void get_temporary_filename(char *filen)
 {
 #ifdef _WIN32
     char   *ptr;

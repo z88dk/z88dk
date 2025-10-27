@@ -11,7 +11,9 @@ IFNDEF MC6847_IOSPACE
     EXTERN  generic_console_udg32
     EXTERN  generic_console_font32
     EXTERN  generic_console_flags
+    EXTERN  generic_console_gfx_xypos_MODE1
     EXTERN  __mc6847_mode
+    EXTERN  __console_font_h
 
 
 ; c = x
@@ -38,16 +40,13 @@ not_udg:
     add     hl, de
     dec     h
     ex      de, hl                      ;de = font
-    GETSCREENADDRESS
-    add     hl, bc                      ;b = y, c = x
-                                        ;hl=screen adddress
-                                        
-
+    call    generic_console_gfx_xypos_MODE1
     ld      a, (generic_console_flags)
     rlca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
-    ld      b, 8
+    ld      a,(__console_font_h)
+    ld      b, a
 hires_printc_1:
     push    bc
     ld      a, (generic_console_flags)
@@ -73,12 +72,8 @@ ELSE
     ld      (hl),a
 ENDIF
     inc     de
-    ld      a, l
-    add     32
-    ld      l, a
-    jr      nc, no_overflow
-    inc     h
-no_overflow:
+    ld      bc,32
+    add     hl,bc
     pop     bc
     djnz    hires_printc_1
     ld      a, (generic_console_flags)

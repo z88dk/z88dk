@@ -7,7 +7,9 @@ PUBLIC  generic_console_printc64
 EXTERN  generic_console_font64
 EXTERN  generic_console_udg32
 EXTERN  generic_console_flags
+EXTERN  generic_console_xypos_hector1
 EXTERN  __MODE1_attr
+EXTERN  __console_font_h
 
 INCLUDE "target/hector/def/hector1.def"
 
@@ -28,10 +30,10 @@ printc64_notudg:
     dec     h
     add     hl,de
     ex      de,hl
-    ld      hl,HEC_SCREEN
 IF FORhector1
-    add     hl,bc
+    call    generic_console_xypos_hector1
 ELSE
+    ld      hl,HEC_SCREEN
     ; 64 bytes a row
     add     hl,bc
     ld      c,0
@@ -44,7 +46,8 @@ ENDIF
     rlca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
-    ld      b, 8
+    ld      a,(__console_font_h)
+    ld      b, a
 printc64_1:
     push    bc
     ld      a,(de)

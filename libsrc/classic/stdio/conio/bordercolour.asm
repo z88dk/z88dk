@@ -4,10 +4,10 @@
 ; b) Haven't implemented it yet
 ;
 
-	SECTION		code_clib
-	PUBLIC		bordercolor
-	PUBLIC		_bordercolor
+    SECTION code_clib
+    PUBLIC  bordercolor
+    PUBLIC  _bordercolor
 
 bordercolor:
 _bordercolor:
-	ret
+    ret

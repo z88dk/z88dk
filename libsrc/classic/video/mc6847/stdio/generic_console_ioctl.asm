@@ -9,6 +9,7 @@
     EXTERN  __console_w
     EXTERN  __mc6847_mode
     EXTERN  __mc6847_modeval
+    EXTERN  __console_font_h
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
     EXTERN  __tms9918_console_ioctl
@@ -60,9 +61,33 @@ success:
     ret
 check_set_udg:
     cp      IOCTL_GENCON_SET_UDGS
-    jr      nz, check_mode
+    jr      nz, check_font_h
     ld      (generic_console_udg32), bc
     jr      success
+check_font_h:
+    cp      IOCTL_GENCON_SET_FONT_H
+    jr      nz, check_mode
+    ld      a,(__mc6847_mode)
+    and     a
+    jp      z,failure
+    ld      a,c
+    ld      b,MC6847_HIRES_YRES/8
+    cp      8
+    jr      z,set_fonth
+IF MC6857_SUPPORT_8x4_FONT
+    ld      b,MC6847_HIRES_YRES/4
+    cp      4
+    jr      z,set_fonth
+ENDIF
+    cp      6
+    jr      nz,failure
+    ld      b,MC6847_HIRES_YRES/6
+set_fonth:
+    ld      (__console_font_h),a
+    ld      a,b
+    ld      (__console_h),a
+    jr      success
+
 check_mode:
     cp      IOCTL_GENCON_SET_MODE
     jr      nz, failure
@@ -146,19 +171,17 @@ ELSE
     ld      h,a
 ENDIF
 not_css:
-    ld      a, e
-    ld      (__console_w), a
-    ld      a, d
-    ld      (__console_h), a
+    ld      (__console_w), de       ;Stored w, then h
     ld      a, l
     ld      (generic_console_caps), a
     ld      a, c
     and     31              ;Remove the CSS setting flag
     ld      (__mc6847_mode), a
     ld      a,h             ;Hardware value
-    ld      (__mc6847_modeval),a
-    IF  FORmc1000
+    IF FORmc1000 | FORpc6001
         ld      (__mc6847_modeval),a
+    ENDIF
+    IF  FORmc1000
         out     ($80), a
         ld      ($f5), a                    ;Keep basic up-to-date with mode
         ld      hl, dummy_return
@@ -183,6 +206,8 @@ not_css:
         or      c
         out     ($40),a
     ENDIF
+    ld      a,8
+    ld      (__console_font_h),a
     call    generic_console_cls
     and     a
     ret

@@ -13,7 +13,9 @@ IFNDEF MC6847_IOSPACE
     EXTERN  __mc6847_MODE2_attr
     EXTERN  generic_console_flags
     EXTERN  __mc6847_mode
+    EXTERN  __console_font_h
     EXTERN  generic_console_text_xypos
+    EXTERN  generic_console_gfx_xypos_MODE2
 
 ; c = x
 ; b = y
@@ -40,14 +42,13 @@ not_udg:
     add     hl, de
     dec     h
     ex      de, hl                      ;de = font
-    GETSCREENADDRESS
-    ld      l,c
-    add     hl,bc
+    call    generic_console_gfx_xypos_MODE2
     ld      a, (generic_console_flags)
     rlca
     sbc     a, a
     ld      c, a                        ;x = 0 / 255
-    ld      b, 8
+    ld      a,(__console_font_h)
+    ld      b, a
 semihires_1:
     push    bc
     ld      a,(generic_console_flags)

@@ -30,7 +30,7 @@ CONIO_TARGETS = abc80 ace adam alphatro aquarius aqplus bee cpc coleco cpm fp110
 	kramermc laser500 mc1000 mikro80 nabu \
 	nascom ondra pmd85 pv1000 pps rx78 sam spc1000 srr super80 super80_vduem trs80 vg5k vz z1013 zx80 zx81 \
 	map1010 msx msx2_rom phc25 pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx \
-	cpm_einstein cpm_einstein256
+	cpm_einstein cpm_einstein256 lviv cpm_x820
 
 CFLAGS_world_conio = --generic-console
 CFLAGS_cpm_world_conio = -pragma-define:CONSOLE_ROWS=25 -pragma-define:CONSOLE_COLUMNS=80
@@ -58,7 +58,7 @@ DSTAR_TARGETS = zx sv8000 coleco laser500
 
 CFLAGS_zx_dstar = -DUSE_UDGS
 CFLAGS_laser500_dstar = -DUSE_UDGS -DSWITCH_MODE=2
-CFLAGS_sv8000_dstar = -DUSE_JOYSTICK -DUSE_UDGS -DSWITCH_MODE=1 -pragma-redirect:CRT_FONT=_font_8x8_bbc_system -pragma-define:CLIB_DISABLE_MODE2=1 -DMINMEMORY
+CFLAGS_sv8000_dstar = -DUSE_JOYSTICK -DUSE_UDGS -DSWITCH_MODE=1 -pragma-redirect:CRT_FONT=_font_8x8_bbc_system -pragma-define:CLIB_DISABLE_MODE2=1 -DMINMEMORY -pragma-define:CRT_ENABLE_STDIO=0 -pragma-define:CLIB_FOPEN_MAX=0 -pragma-redirect:generic_console_scrollup=noop
 CFLAGS_coleco_dstar = -DUSE_JOYSTICK -DUSE_UDGS -DSWITCH_MODE=2
 
 OUTPUT_BINS += $(foreach target, $(DSTAR_TARGETS),  build/$(target)/dstar.bin )

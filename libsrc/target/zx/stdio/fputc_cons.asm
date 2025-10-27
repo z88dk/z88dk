@@ -353,10 +353,6 @@ code_table:
 
 ; And now the magic routines
 
-; No operation
-
-noop:
-    ret
 
 ; Move print position left
 left:
@@ -371,6 +367,8 @@ doleft:
     add     l
     ld      l, a
     ld      (chrloc), hl
+    
+noop: ; No operation
     ret
 
 ;Move print position right

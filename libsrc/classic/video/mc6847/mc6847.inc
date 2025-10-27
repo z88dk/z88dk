@@ -1,6 +1,8 @@
 
 ; Macro file to help harmonise code
 
+; Support a 8x4 font
+; defc MC6857_SUPPORT_8x4_FONT = 1
 
 IF FORphc25
     INCLUDE "target/phc25/def/phc25.def"
@@ -87,6 +89,29 @@ MACRO GETSCREENADDRESS
         inc     h
     ELSE
         ld      hl,DISPLAY
+    ENDIF
+ENDM
+
+
+MACRO GETSCREENADDRESS_bc
+    IF FORpc6001
+        ld      bc,(SYSVAR_screen-1)
+        ld      c,0
+        inc     b
+        inc     b
+    ELSE
+        ld      bc,DISPLAY
+    ENDIF
+ENDM
+
+MACRO GETSCREENADDRESS_de
+    IF FORpc6001
+        ld      de,(SYSVAR_screen-1)
+        ld      e,0
+        inc     d
+        inc     d
+    ELSE
+        ld      de,DISPLAY
     ENDIF
 ENDM
 

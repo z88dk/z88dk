@@ -176,7 +176,6 @@ wsmc2:
     cp      1
     jr      z, wover_1
     djnz    wiloop
-    pop     de
     pop     hl                          ;Restore address
     ld      bc, 32                      ;Go to next line
     add     hl, bc

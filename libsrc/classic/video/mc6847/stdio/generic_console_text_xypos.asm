@@ -9,7 +9,6 @@
 
 
 generic_console_text_xypos:
-    push    af
     ld      l, b
     ld      h, 0
     add     hl, hl
@@ -26,5 +25,4 @@ generic_console_text_xypos:
         ld      b,+(DISPLAY / 256)
     ENDIF
     add     hl, bc
-    pop     af
     ret

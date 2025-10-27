@@ -13,21 +13,19 @@ IF FORsv8000
 
 generic_console_set_ink:
     call    mc6847_map_colour
+    ld      hl,__mc6847_MODE2_attr
+set_attr:
     ld      a, b
     rrca
     rrca
     and     @11000000
-    ld      (__mc6847_MODE2_attr), a
+    ld      (hl), a
+generic_console_set_attribute:
     ret
 generic_console_set_paper:
     call    mc6847_map_colour
-    ld      a, b
-    rrca
-    rrca
-    and     @11000000
-    ld      (__mc6847_MODE2_attr+1), a
-generic_console_set_attribute:
-    ret
+    ld      hl,__mc6847_MODE2_attr
+    jr      set_attr
 
 printc_MODE0:
     call    generic_console_text_xypos
