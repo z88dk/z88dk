@@ -52,8 +52,8 @@ static void swap_ix_iy(std::string& str, Keyword & keyword) {
     }
 }
 
-void TokensFile::tokenize_line(int& line_index, TokensLine& output) {
-    if (line_index < 0 || line_index >= line_count()) {
+void TokensFile::tokenize_line(unsigned& line_index, TokensLine& output) {
+    if (line_index >= line_count()) {
         return;
     }
 
