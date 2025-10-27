@@ -129,8 +129,8 @@ const Token& TokensLine::back() const {
     return tokens_.back();
 }
 
-const Token& TokensLine::operator[](int index) const {
-    if (index < 0 || static_cast<size_t>(index) >= tokens_.size()) {
+const Token& TokensLine::operator[](unsigned index) const {
+    if (index >= tokens_.size()) {
         static Token empty_token(TokenType::EndOfFile, "");
         return empty_token;
     }
@@ -143,8 +143,8 @@ const std::vector<Token>& TokensLine::tokens() const {
     return tokens_;
 }
 
-int TokensLine::size() const {
-    return static_cast<int>(tokens_.size());
+unsigned TokensLine::size() const {
+    return static_cast<unsigned>(tokens_.size());
 }
 
 // Reconstruct the line by concatenating the original token texts in order.
@@ -206,12 +206,12 @@ bool TokensFile::inc_line_nums() const {
     return inc_line_nums_;
 }
 
-int TokensFile::line_count() const {
-    return static_cast<int>(text_lines_.size());
+unsigned TokensFile::line_count() const {
+    return static_cast<unsigned>(text_lines_.size());
 }
 
-const std::string& TokensFile::get_line(int index) const {
-    if (index < 0 || static_cast<size_t>(index) >= text_lines_.size()) {
+const std::string& TokensFile::get_line(unsigned index) const {
+    if (index >= text_lines_.size()) {
         static std::string empty;
         return empty;
     }
@@ -220,12 +220,12 @@ const std::string& TokensFile::get_line(int index) const {
     }
 }
 
-int TokensFile::tok_lines_count() const {
-    return static_cast<int>(tok_lines_.size());
+unsigned TokensFile::tok_lines_count() const {
+    return static_cast<unsigned>(tok_lines_.size());
 }
 
-const TokensLine& TokensFile::get_tok_line(int index) const {
-    if (index < 0 || static_cast<size_t>(index) >= tok_lines_.size()) {
+const TokensLine& TokensFile::get_tok_line(unsigned index) const {
+    if (index >= tok_lines_.size()) {
         static TokensLine empty_line;
         return empty_line;
     }
@@ -262,7 +262,7 @@ void TokensFile::tokenize(const std::string& content) {
 
     // Tokenize each line
     Location location(filename_, first_line_num_);
-    for (int i = 0; i < static_cast<int>(text_lines_.size()); ++i) {
+    for (unsigned i = 0; i < text_lines_.size(); ++i) {
         // notify error reporter of current line
         int line_num = first_line_num_ + (inc_line_nums_ ? i : 0);
         location.set_line_num(line_num);
