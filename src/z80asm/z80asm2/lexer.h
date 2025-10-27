@@ -113,9 +113,9 @@ public:
     void push_back(Token&& token);
     void pop_back();
     const Token& back() const;
-    const Token& operator[](int index) const;
+    const Token& operator[](unsigned index) const;
     const std::vector<Token>& tokens() const;
-    int size() const;
+    unsigned size() const;
     std::string to_string() const;
 
 private:
@@ -140,10 +140,10 @@ public:
     const std::string& filename() const;
     int first_line_num() const;
     bool inc_line_nums() const;
-    int line_count() const;
-    const std::string& get_line(int index) const;
-    int tok_lines_count() const;
-    const TokensLine& get_tok_line(int index) const;
+    unsigned line_count() const;
+    const std::string& get_line(unsigned index) const;
+    unsigned tok_lines_count() const;
+    const TokensLine& get_tok_line(unsigned index) const;
 
 private:
     std::string filename_;                  // Source file name
@@ -154,6 +154,6 @@ private:
 
     void split_lines(const char*& p);
     void tokenize(const std::string& content);
-    void tokenize_line(int& line_index, TokensLine& output);
+    void tokenize_line(unsigned& line_index, TokensLine& output);
 };
 
