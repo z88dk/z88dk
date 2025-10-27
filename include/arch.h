@@ -5,11 +5,11 @@
 
 
 #ifdef __SPECTRUM
-#include <../libsrc/_DEVELOPMENT/newlib/target/zx/config_zx.h>
+#include <../libsrc/newlib/target/zx/config_zx.h>
 #endif
 
 #ifdef __ZXNEXT
-#include <../libsrc/_DEVELOPMENT/newlib/target/zxn/config_zxn.h>
+#include <../libsrc/newlib/target/zxn/config_zxn.h>
 #endif
 
 
