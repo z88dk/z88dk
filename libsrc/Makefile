@@ -406,7 +406,7 @@ m2068.lib:
 	@echo ''
 	@echo '--- Building Timex TS2068 Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath m2068
+	$(MAKE) -C math/float/zxmath m2068
 
 # PacMan lib - Stefano
 pacman_clib.lib: $(TARGET_CLIB_DEPS)
@@ -642,7 +642,7 @@ m81.lib:
 	@echo ''
 	@echo '--- Building ZX 81 Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath m81
+	$(MAKE) -C math/float/zxmath m81
 
 m81_tiny.lib:
 	@echo ''
@@ -655,17 +655,17 @@ mlambda.lib:
 	@echo ''
 	@echo '--- Building Lambda 8300 Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath mlambda
-	$(MAKE) -C math/zxmath mlambdav1
-	$(MAKE) -C math/zxmath mlambdav3
+	$(MAKE) -C math/float/zxmath mlambda
+	$(MAKE) -C math/float/zxmath mlambdav1
+	$(MAKE) -C math/float/zxmath mlambdav3
 
 mlambda_tiny.lib:
 	@echo ''
 	@echo '--- Building Lambda 8300 Tiny Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath mlambda_tiny
-	$(MAKE) -C math/zxmath mlambdav1_tiny
-	$(MAKE) -C math/zxmath mlambdav3_tiny
+	$(MAKE) -C math/float/zxmath mlambda_tiny
+	$(MAKE) -C math/float/zxmath mlambdav1_tiny
+	$(MAKE) -C math/float/zxmath mlambdav3_tiny
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
@@ -1727,7 +1727,7 @@ cpc_math.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC Maths Libraries ---'
 	@echo ''
-	$(MAKE) -C math/cpcmath
+	$(MAKE) -C math/float/cpcmath
 
 # Amstrad PCW libraries - Stefano
 pcw.lib: cpm_clib.lib
@@ -2399,7 +2399,6 @@ classic-clean: $(CLEAN)
 	$(MAKE) -C classic/threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C classic/games clean
-	$(MAKE) -C math clean
 	$(MAKE) -C target clean
 	$(MAKE) -C classic/video clean
 	$(MAKE) -C classic/gfx clean
