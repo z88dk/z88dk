@@ -832,3 +832,188 @@ TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filena
     std::remove(fa.c_str());
     std::remove(fp.c_str());
 }
+
+// Added define-related unit tests
+TEST_CASE("Preprocessor: object-like #define and name define expand to replacement",
+          "[preprocessor][define][object]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // #define form
+    {
+        const std::string content = "#define X 5\nX\n";
+        pp.push_virtual_file(content, "def_obj_hash", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        // Expect integer token 5 as replacement
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 5);
+    }
+
+    // name define form
+    {
+        const std::string content = "Y define 6\nY\n";
+        pp.push_virtual_file(content, "def_obj_name", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 6);
+    }
+}
+
+TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are macro-expanded)",
+          "[preprocessor][define][function][args]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Argument A is an object-like macro; ensure it's expanded when passed to F
+    {
+        const std::string content =
+            "#define A 10\n"
+            "#define F(x) x\n"
+            "F(A)\n";
+        pp.push_virtual_file(content, "def_func_arg_expand", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        // Expect the expanded token to be integer 10
+        bool found10 = false;
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer) && t.int_value() == 10) {
+                found10 = true;
+                break;
+            }
+        }
+        REQUIRE(found10);
+    }
+
+    // Multi-argument example: ADD(1,TWO) -> should contain both 1 and 2 after expansion
+    {
+        const std::string content =
+            "#define TWO 2\n"
+            "#define ADD(a,b) a + b\n"
+            "ADD(1,TWO)\n";
+        pp.push_virtual_file(content, "def_func_multiarg", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        int found1 = 0, found2 = 0;
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer) && t.int_value() == 1) {
+                ++found1;
+            }
+            if (t.is(TokenType::Integer) && t.int_value() == 2) {
+                ++found2;
+            }
+        }
+        REQUIRE(found1 >= 1);
+        REQUIRE(found2 >= 1);
+    }
+}
+
+TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntaxes, object and function)",
+          "[preprocessor][define][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // #define with empty body
+    {
+        const std::string content = "#define EMPTY\nEMPTY\n";
+        pp.push_virtual_file(content, "def_empty_hash", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 1);
+    }
+
+    // name define with empty body
+    {
+        const std::string content = "E define\nE\n";
+        pp.push_virtual_file(content, "def_empty_name", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 1);
+    }
+
+    // function-like macro with empty body should also expand to 1
+    {
+        const std::string content = "#define F(x)\nF(2)\n";
+        pp.push_virtual_file(content, "def_empty_func", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 1);
+    }
+}
+
+TEST_CASE("Preprocessor: macro recursion limit is enforced for self-recursive macro",
+          "[preprocessor][define][recursion]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Self-recursive macro R -> R should eventually trigger recursion limit
+    const std::string content =
+        "#define R R\n"
+        "R\n";
+    pp.push_virtual_file(content, "def_recursion", 1);
+
+    TokensLine line;
+    // consume produced lines (there will be at least one)
+    while (pp.next_line(line)) { }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro recursion limit") != std::string::npos);
+}
+
+// Tests for UNDEF (both "name undef" and "#undef name" forms)
+TEST_CASE("Preprocessor: name undef removes macro (name UNDEF syntax)",
+          "[preprocessor][define][undef]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "M define 42\nM undef\nM\n";
+    pp.push_virtual_file(content, "def_name_undef", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    // After undef the token should be the identifier 'M', not the expansion 42
+    REQUIRE(toks[0].text() == "M");
+}
+
+TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
+          "[preprocessor][define][undef][hash]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "#define N 99\n#undef N\nN\n";
+    pp.push_virtual_file(content, "def_hash_undef", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    // After #undef the token should be the identifier 'N', not the expansion 99
+    REQUIRE(toks[0].text() == "N");
+}
