@@ -6,7 +6,7 @@ vpath %.c $(NEWLIB_DIRECTORY)/math/float/math32/c
 vpath %.c ../cimpl
 
 
-CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
+CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 
 

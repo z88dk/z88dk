@@ -12,5 +12,5 @@ target/attache/time/time
 target/attache/psg/set_psg
 target/attache/psg/set_psg_callee
 target/attache/psg/psg_init
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 @classic/games/games_joystick.lst

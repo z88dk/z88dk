@@ -2,7 +2,7 @@
 
 include ../../../Make.config
 
-vpath %.c ../../_DEVELOPMENT/math/float/am9511/c
+vpath %.c ../../math/float/am9511/c
 vpath %.c ../cimpl
 
 

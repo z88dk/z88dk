@@ -6,7 +6,7 @@ target/pencil2/stdio/CRT_FONT
 @classic/video/tms9918/video_tms9918_nmi.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
+sound/sn76489/obj/${TYPE}/**/*.o
 target/pencil2/games/keys_joystick
 classic/games/obj/pencil2/joystick_type
 @classic/games/games.lst

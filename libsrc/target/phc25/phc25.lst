@@ -29,4 +29,4 @@ target/phc25/psg/set_psg
 target/phc25/psg/set_psg_callee
 target/phc25/psg/get_psg
 target/phc25/psg/psg_init
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o

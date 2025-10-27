@@ -52,5 +52,5 @@ target/aquarius/psg/get_psg
 target/aquarius/psg/psg_init
 target/aquarius/tape/tape_load_block
 target/aquarius/tape/tape_load_block_callee
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 

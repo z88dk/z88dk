@@ -1,5 +1,0 @@
-target/cpm/z80/asm_cpm_bdos
-target/cpm/z80/asm_cpm_bdos_alt
-target/cpm/z80/asm_cpm_bdos_hl
-target/cpm/z80/asm_cpm_get_offset
-target/cpm/z80/asm_cpm_set_offset

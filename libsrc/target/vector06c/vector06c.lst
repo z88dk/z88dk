@@ -28,5 +28,5 @@ target/vector06c/psg/set_psg
 target/vector06c/psg/set_psg_callee
 target/vector06c/psg/get_psg
 target/vector06c/psg/psg_init
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 

@@ -3,7 +3,7 @@ include ../../../Make.config
 
 TARGET ?= test
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/font/fzx/zx/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx/display/z80/*.asm"
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/font/fzx/zx/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/display/z80/*.asm"
 NEWLIB_TARGETS := obj/newlib-z80  obj/newlib-z80n
 
 space :=

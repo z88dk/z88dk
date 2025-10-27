@@ -4,7 +4,7 @@
 @classic/stdio/stdio.lst
 target/shared/clock
 @target/zx/gfxspectrum.lst
-_DEVELOPMENT/font/fzx/obj/${TYPE}/**/*.o
+font/fzx/obj/${TYPE}/**/*.o
 
 
 target/zx/games/obj/${TARGET}/joystick
@@ -27,5 +27,5 @@ target/zx/psg/asm_wyz_hardware_out
 target/zx/psg/asm_vt2_hardware_out
 target/zx/psg/asm_arkos_zx_smc
 target/zx/psg/asm_arkos_zx_rom
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 

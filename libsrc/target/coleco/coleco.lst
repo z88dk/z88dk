@@ -6,7 +6,7 @@ target/coleco/stdio/getk
 @classic/stdio/stdio.lst
 
 @classic/gfx/narrow/gfx_narrow.lst
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
+sound/sn76489/obj/${TYPE}/**/*.o
 target/coleco/games/joystick
 target/coleco/games/coleco_joypad
 classic/games/obj/coleco/joystick_type

@@ -1,0 +1,15 @@
+@target/zx-libs/bifrost_h/bifrost_h_sdcc.lst
+@target/zx-libs/bifrost_l/bifrost_l_sdcc.lst
+@target/zx-libs/bifrost2/bifrost2_sdcc.lst
+@target/zx-libs/display/display_sdcc.lst
+;@target/zx-libs/esxdos/esxdos_sdcc_iy.lst
+@target/zxn-libs/esxdos/esxdos_sdcc_iy.lst
+@target/zx-libs/globals/globals_asm.lst
+@target/zx-libs/graphics/graphics_sdcc_iy.lst
+@target/zx-libs/misc/misc_sdcc_iy.lst
+@target/zx-libs/nirvanam/nirvanam_sdcc_iy.lst
+@target/zx-libs/nirvanap/nirvanap_sdcc_iy.lst
+target/zx-libs/sysvar/system_variables
+@target/zx-libs/tape/tape_sdcc_iy.lst
+@target/zx-libs/ulaplus/ulaplus_sdcc.lst
+@target/zx-libs/arkos/arkos_sdcc_iy.lst

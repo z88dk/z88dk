@@ -1,16 +1,16 @@
 @classic/alloc/alloc_gbz80.lst
-_DEVELOPMENT/compress/aplib/obj/${TYPE}/**/*.o
+compress/aplib/obj/${TYPE}/**/*.o
 @classic/compress/zx7/zx7.lst
-_DEVELOPMENT/ctype/obj/${TYPE}/**/*.o
-_DEVELOPMENT/font/font_4x8/obj/${TYPE}/**/*.o
-_DEVELOPMENT/font/font_8x8/obj/${TYPE}/**/*.o
-_DEVELOPMENT/font/font_8x10/obj/${TYPE}/**/*.o
+ctype/obj/${TYPE}/**/*.o
+font/font_4x8/obj/${TYPE}/**/*.o
+font/font_8x8/obj/${TYPE}/**/*.o
+font/font_8x10/obj/${TYPE}/**/*.o
 @classic/lib3d/lib3d.lst
-_DEVELOPMENT/libgen/obj/${TYPE}/**/*.o
-_DEVELOPMENT/setjmp/obj/${TYPE}/**/*.o
+libgen/obj/${TYPE}/**/*.o
+setjmp/obj/${TYPE}/**/*.o
 @classic/stdlib/stdlib.lst
-_DEVELOPMENT/string/obj/${TYPE}/**/*.o
-_DEVELOPMENT/regex/obj/${TYPE}/**/*.o
-_DEVELOPMENT/time/obj/${TYPE}/**/*.o
+string/obj/${TYPE}/**/*.o
+regex/obj/${TYPE}/**/*.o
+time/obj/${TYPE}/**/*.o
 @classic/z80_crt0s/crt0.lst
 

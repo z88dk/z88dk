@@ -20,5 +20,5 @@ target/pc6001/psg/set_psg_callee
 target/pc6001/psg/get_psg
 target/pc6001/psg/psg_init
 target/pc6001/psg/asm_wyz_hardware_out
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 

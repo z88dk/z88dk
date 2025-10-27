@@ -11,6 +11,6 @@ target/m5/stdio/fputc_cons_rom
 @classic/gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick
 target/m5/games/keys_joystick
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
+sound/sn76489/obj/${TYPE}/**/*.o
 @classic/games/games.lst
 

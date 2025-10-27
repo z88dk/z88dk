@@ -9,7 +9,7 @@ target/nabu/psg/psg_init
 target/nabu/psg/asm_wyz_hardware_out
 target/nabu/psg/set_psg
 target/nabu/psg/get_psg
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 target/nabu/games/joystick.asm
 target/nabu/games/paddle.asm
 @classic/games/games.lst

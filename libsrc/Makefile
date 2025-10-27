@@ -175,24 +175,24 @@ include classic/adt/heap/heap.mak
 include classic/adt/linkedlist/linkedlist.mak
 include classic/adt/queue/queue.mak
 include classic/adt/stack/stack.mak
-include _DEVELOPMENT/adt/adt.mak
+include adt/adt.mak
 include classic/algorithm/AStarSearch/astar.mak
-include _DEVELOPMENT/alloc/balloc/balloc.mak
+include alloc/balloc/balloc.mak
 include classic/alloc/farmalloc/farmalloc.mak
 include classic/alloc/malloc-classic/malloc.mak
-include _DEVELOPMENT/alloc/obstack/obstack.mak
-include _DEVELOPMENT/arch/z80/z80.mak
-include _DEVELOPMENT/compress/aplib/aplib.mak
-include _DEVELOPMENT/compress/zx0/zx0.mak
-include _DEVELOPMENT/compress/zx1/zx1.mak
-include _DEVELOPMENT/compress/zx2/zx2.mak
+include alloc/obstack/obstack.mak
+include arch/z80/z80.mak
+include compress/aplib/aplib.mak
+include compress/zx0/zx0.mak
+include compress/zx1/zx1.mak
+include compress/zx2/zx2.mak
 include classic/compress/zx7/zx7.mak
-include _DEVELOPMENT/ctype/ctype.mak
+include ctype/ctype.mak
 include classic/debug/debug.mak
-include _DEVELOPMENT/font/font_4x8/font_4x8.mak
-include _DEVELOPMENT/font/font_8x8/font_8x8.mak
-include _DEVELOPMENT/font/font_8x10/font_8x10.mak
-include _DEVELOPMENT/font/fzx/fzx.mak
+include font/font_4x8/font_4x8.mak
+include font/font_8x8/font_8x8.mak
+include font/font_8x10/font_8x10.mak
+include font/fzx/fzx.mak
 include classic/games/games.mak
 include classic/gfx/retrofit/retrofit.mak
 include classic/gfx/portable/portable.mak
@@ -203,20 +203,20 @@ include classic/interrupts/im1/im1.mak
 include classic/interrupts/im2/im2.mak
 include classic/interrupts/nmi/nmi.mak
 include classic/lib3d/lib3d.mak
-include _DEVELOPMENT/libgen/libgen.mak
-include _DEVELOPMENT/math/fix16/fix16.mak
+include libgen/libgen.mak
+include math/fix16/fix16.mak
 include classic/rect/rect.mak
-include _DEVELOPMENT/regex/regex.mak
+include regex/regex.mak
 include classic/sdcard/sdcard.mak
-include _DEVELOPMENT/setjmp/setjmp.mak
+include setjmp/setjmp.mak
 include classic/string/string.mak
-include _DEVELOPMENT/string/string.mak
+include string/string.mak
 include classic/stdio/stdio.mak
 include classic/stdlib/stdlib.mak
-include _DEVELOPMENT/time/time.mak
-include _DEVELOPMENT/sound/ay/ay.mak
-include _DEVELOPMENT/sound/sn76489/sn76489.mak
-include _DEVELOPMENT/sound/saa1099/saa1099.mak
+include time/time.mak
+include sound/ay/ay.mak
+include sound/sn76489/sn76489.mak
+include sound/saa1099/saa1099.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
@@ -2219,11 +2219,11 @@ rc2014-8085_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building RC2014-8085 Library ---'
 	@echo ''
-	m4 -DCFG_ASM_DEF _DEVELOPMENT/newlib/target/rc2014/config_8085.m4 > _DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085_private.inc
-	m4 -DCFG_ASM_PUB _DEVELOPMENT/newlib/target/rc2014/config_8085.m4 > _DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085_public.inc
-	m4 -DCFG_C_DEF _DEVELOPMENT/newlib/target/rc2014/config_8085.m4 > _DEVELOPMENT/newlib/target/rc2014/config_rc2014-8085.h
-	$(RM) _DEVELOPMENT/newlib/target/rc2014/driver/ide/asm/*.o
-	$(RM) _DEVELOPMENT/newlib/target/rc2014/driver/diskio/8085/*.o
+	m4 -DCFG_ASM_DEF newlib/target/rc2014/config_8085.m4 > newlib/target/rc2014/config_rc2014-8085_private.inc
+	m4 -DCFG_ASM_PUB newlib/target/rc2014/config_8085.m4 > newlib/target/rc2014/config_rc2014-8085_public.inc
+	m4 -DCFG_C_DEF newlib/target/rc2014/config_8085.m4 > newlib/target/rc2014/config_rc2014-8085.h
+	$(RM) newlib/target/rc2014/driver/ide/asm/*.o
+	$(RM) newlib/target/rc2014/driver/diskio/8085/*.o
 	$(call buildgeneric,rc2014,portable)
 	TARGET=rc2014 TYPE=8085 $(LIBLINKER) -m8085 -DFORrc2014 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rc2014-8085_clib @$(TARGET_DIRECTORY)/rc2014/rc2014-8085.lst
 

@@ -2,15 +2,15 @@ include ../../../Make.config
 
 TARGET ?= test
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/target/zxn/memory/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zxn/memory/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zxn/globals/z80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zxn/sysvar/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zxn/version/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zxn/version/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/ts2068/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068/misc/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/ts2068/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068/display/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zx/graphics/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx/graphics/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zx/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx/display/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zx/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx/misc/c/sccz80/*.asm" \
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/target/zxn-libs/memory/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zxn-libs/memory/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zxn-libs/globals/z80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zxn-libs/sysvar/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zxn-libs/version/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zxn-libs/version/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/ts2068-libs/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068-libs/misc/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/ts2068-libs/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068-libs/display/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zx-libs/graphics/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/graphics/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zx-libs/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/display/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zx-libs/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/misc/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/newlib/target/zxn/driver/banking/zxn_banked_call.asm"
 
 NEWLIB_TARGETS := obj/newlib-z80n

@@ -16,7 +16,7 @@ target/msx/psg/asm_wyz_hardware_out
 target/msx/psg/asm_vt2_hardware_out
 target/msx/psg/asm_arkos_msx_smc
 target/msx/psg/asm_arkos_msx_rom
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o
 target/msx/games/joystick
 target/msx/games/bit_open
 target/msx/games/bit_open_di

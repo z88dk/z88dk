@@ -1,0 +1,13 @@
+newlib/target/rc2014/device/acia/8080/__acia_data_ctl
+newlib/target/rc2014/device/acia/8080/__acia_data_Rx
+newlib/target/rc2014/device/acia/8080/__acia_data_Tx
+newlib/target/rc2014/device/acia/8080/__acia_need
+newlib/target/rc2014/device/acia/8080/acia_flush_Rx
+newlib/target/rc2014/device/acia/8080/acia_flush_Tx
+newlib/target/rc2014/device/acia/8080/acia_getc
+newlib/target/rc2014/device/acia/8080/acia_init
+newlib/target/rc2014/device/acia/8080/acia_interrupt
+newlib/target/rc2014/device/acia/8080/acia_peekc
+newlib/target/rc2014/device/acia/8080/acia_pollc
+newlib/target/rc2014/device/acia/8080/acia_putc
+newlib/target/rc2014/device/acia/8080/acia_reset

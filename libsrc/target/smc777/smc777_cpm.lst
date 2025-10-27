@@ -25,6 +25,6 @@ target/smc777/graphics/w_xorpixl_MODE8
 @classic/gfx/wide/gfx_wide.lst
 target/smc777/games/joystick
 
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
+sound/sn76489/obj/${TYPE}/**/*.o
 @classic/games/games.lst
 @classic/video/mc6845/mc6845.lst

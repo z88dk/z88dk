@@ -2,7 +2,7 @@
 
 target/coleco/games/joystick
 classic/games/obj/coleco/joystick_type
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
+sound/sn76489/obj/${TYPE}/**/*.o
 @classic/video/tms9918/video_tms9918.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/adam/cpm_platform_init

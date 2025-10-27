@@ -33,11 +33,11 @@ target/zx/diagnostic/zx_timexsound
 target/zx/diagnostic/zx_zxmmc
 target/zx/diagnostic/zx_ulaplus
 @target/zx/newlib/newlib.lst
-target/zx/ulaplus/ula_normal_mode
-target/zx/ulaplus/ula_plus_mode
-target/zx/ulaplus/ula_sync
-target/zx/ulaplus/ulaplus_set
-target/zx/ulaplus/ulaplus_get
+target/zx-libs/ulaplus/ula_normal_mode
+target/zx-libs/ulaplus/ula_plus_mode
+target/zx-libs/ulaplus/ula_sync
+target/zx-libs/ulaplus/ulaplus_set
+target/zx-libs/ulaplus/ulaplus_get
 target/zx/uspeech/currah_direct
 target/zx/zxmmc/__mmc_card_select
 target/zx/zxmmc/clock32
@@ -61,4 +61,4 @@ target/zx/psg/set_psg
 target/zx/psg/set_psg_callee
 target/zx/psg/get_psg
 target/zx/psg/psg_init
-_DEVELOPMENT/sound/ay/obj/${TYPE}/**/*.o
+sound/ay/obj/${TYPE}/**/*.o

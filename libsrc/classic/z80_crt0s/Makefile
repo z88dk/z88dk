@@ -1,7 +1,7 @@
 
 include ../../Make.config
 
-NEWLIB_ROOT=../../_DEVELOPMENT/
+NEWLIB_ROOT=../../
 
 all: obj/z80-crt0 obj/ixiy-crt0 obj/8080-crt0 obj/8085-crt0 \
 	obj/r2ka-crt0 obj/gbz80-crt0 obj/z180-crt0 \

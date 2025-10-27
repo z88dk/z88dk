@@ -8,7 +8,7 @@ target/mtx/time/clock
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
 target/mtx/games/joystick
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}_latch/**/*.o
+sound/sn76489/obj/${TYPE}_latch/**/*.o
 @classic/games/games.lst
 @target/mtx/rs232/rs232.lst
 

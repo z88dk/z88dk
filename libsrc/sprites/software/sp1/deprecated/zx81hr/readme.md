@@ -1,4 +1,4 @@
-The new c library contains a [more recent version of sp1](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1) that is compatible with zsdcc.  sp1 is being updated again and that version will be included in the classic library.
+The new c library contains a [more recent version of sp1](https://github.com/z88dk/z88dk/tree/master/libsrc/EXAMPLES/zx/demo_sp1) that is compatible with zsdcc.  sp1 is being updated again and that version will be included in the classic library.
 
 In order to compile the examples, "sp1.lib" must be copied to z88dk/lib/clibs and "zx81hr-sp1.h" must be copied to z88dk/include/sprites and renamed to "sp1.h".
 

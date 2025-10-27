@@ -7,7 +7,7 @@ target/sc3000/time/clock
 @classic/video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
-_DEVELOPMENT/sound/sn76489/obj/${TYPE}/**/*.o
+sound/sn76489/obj/${TYPE}/**/*.o
 target/sc3000/games/joystick
 target/sc3000/games/keys_joystick
 @classic/games/games.lst

@@ -20,7 +20,7 @@
 
 // ZXN UNIVERSAL DOT
 
-#define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/_DEVELOPMENT/newlib/target/zxn/zxn_universal_dot.bin"
+#define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/newlib/target/zxn/zxn_universal_dot.bin"
 
 /*
     ffs
