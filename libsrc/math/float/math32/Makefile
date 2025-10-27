@@ -30,7 +30,7 @@ $(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/math32_ixiy @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS))
-	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80n/x/x  -I.. -mz80n -D__CLASSIC @newlibfiles_z80n.lst
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80n/x/x/x  -I.. -mz80n -D__CLASSIC @newlibfiles_z80n.lst
 	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/math32_z80n @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_z180.lib: $(addprefix obj/z180/, $(OBJECTS))
