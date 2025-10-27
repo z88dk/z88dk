@@ -7,7 +7,8 @@
 Z80ASM = z88dk-z80asm
 ZX0 = z88dk-zx0
 
-TARGET = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx zxn 
+ALLTARGETS = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx zxn 
+TARGET = $(ALLTARGETS)
 
 Z88DK_LIB := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib/
 
@@ -109,4 +110,4 @@ define build_targets
 	)
 endef
 
-$(eval $(call build_targets,$(TARGET)))
+$(eval $(call build_targets,$(ALLTARGETS)))

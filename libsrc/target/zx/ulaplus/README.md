@@ -6,4 +6,4 @@ It acts as a 64-colour GRB332 palette that assigns colours to attribute values n
 
 [Original Website](https://sites.google.com/site/ulaplus/)  
 [Colour Gamut for ULA+ RGB332](http://unwind.se/bgr233/)  
-[Z88DK's Unadorned ULA+ Header](https://github.com/z88dk/z88dk/blob/master/include/clang/target/zx-libs/ulaplus.h)
+[Z88DK's Unadorned ULA+ Header](https://github.com/z88dk/z88dk/blob/master/include/clang/target/zx/ulaplus.h)

@@ -10,6 +10,6 @@
 @target/zx-libs/nirvanam/nirvanam_sdcc_iy.lst
 @target/zx-libs/nirvanap/nirvanap_sdcc_iy.lst
 target/zxn-libs/sysvar/system_variables
-@target/zx-libs/tape/tape_sdcc_iy.lst
+@target/zx/tape/tape_sdcc_iy.lst
 @target/zxn-libs/version/version_sdcc.lst
 @target/zxn-libs/arkos/arkos_sdcc_iy.lst

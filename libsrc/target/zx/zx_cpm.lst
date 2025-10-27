@@ -33,11 +33,7 @@ target/zx/diagnostic/zx_timexsound
 target/zx/diagnostic/zx_zxmmc
 target/zx/diagnostic/zx_ulaplus
 @target/zx/newlib/newlib.lst
-target/zx-libs/ulaplus/ula_normal_mode
-target/zx-libs/ulaplus/ula_plus_mode
-target/zx-libs/ulaplus/ula_sync
-target/zx-libs/ulaplus/ulaplus_set
-target/zx-libs/ulaplus/ulaplus_get
+@target/zx/ulaplus/ulaplus_sccz80.lst
 target/zx/uspeech/currah_direct
 target/zx/zxmmc/__mmc_card_select
 target/zx/zxmmc/clock32

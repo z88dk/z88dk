@@ -7,7 +7,6 @@ BIFROST2_GEN = bifrost2_engine_48.bin.zx0 bifrost2_engine_p3.bin.zx0
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/target/zx-libs/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/display/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/target/zx-libs/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/misc/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/target/zx-libs/graphics/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/graphics/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/zx-libs/ulaplus/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx-libs/ulaplus/c/sccz80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/target/zx-libs/nirvanap/c/sccz80/*.asm" \
 	$(NEWLIB_DIRECTORY)/target/zx-libs/nirvanap/z80/asm_NIRVANAP_spriteT.asm \
 	$(NEWLIB_DIRECTORY)/target/zx-libs/nirvanap/z80/asm_NIRVANAP_drawW_di.asm \

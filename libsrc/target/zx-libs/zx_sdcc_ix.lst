@@ -10,6 +10,6 @@
 @target/zx-libs/nirvanam/nirvanam_sdcc_ix.lst
 @target/zx-libs/nirvanap/nirvanap_sdcc_ix.lst
 target/zx-libs/sysvar/system_variables
-@target/zx-libs/tape/tape_sdcc_ix.lst
-@target/zx-libs/ulaplus/ulaplus_sdcc.lst
+@target/zx/tape/tape_sdcc_ix.lst
+@target/zx/ulaplus/ulaplus_sdcc.lst
 @target/zx-libs/arkos/arkos_sdcc_ix.lst

@@ -343,8 +343,8 @@ zx_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C target/zx
 	$(MAKE) -C target/zx-common TARGET=zx
 	$(MAKE) -C classic/games TARGET=zx
-	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
-	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
+	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
+	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
 zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib
 	@echo ''
@@ -355,7 +355,7 @@ zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib
 	$(MAKE) -C target/zx-common TARGET=zxn
 	$(MAKE) -C classic/games TARGET=zxn
 	$(MAKE) -C target/zxn TARGET=zxn
-	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
+	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
@@ -369,7 +369,7 @@ ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib
 	$(MAKE) -C target/zx TARGET=ts2068
 	$(MAKE) -C target/ts2068 TARGET=ts2068
 	$(MAKE) -C target/zx-common TARGET=ts2068
-	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
+	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
 
 # ZXROM - stefano
 zxrom.lib: zx_clib.lib

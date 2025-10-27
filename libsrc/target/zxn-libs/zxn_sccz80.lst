@@ -10,6 +10,6 @@
 @target/zx-libs/nirvanam/nirvanam_sccz80.lst
 @target/zx-libs/nirvanap/nirvanap_sccz80.lst
 target/zxn-libs/sysvar/system_variables
-@target/zx-libs/tape/tape_sccz80.lst
+@target/zx/tape/tape_sccz80.lst
 @target/zxn-libs/version/version_sccz80.lst
 @target/zxn-libs/arkos/arkos_sccz80.lst
