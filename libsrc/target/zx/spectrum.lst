@@ -97,6 +97,7 @@ target/zx/opus/opus_getsect_callee
 target/zx/opus/opus_putsect
 target/zx/opus/opus_putsect_callee
 @target/zx/tape/tape_sccz80.lst
+target/zx/tape/obj/${TARGET}/*.o
 @target/zx/ulaplus/ulaplus_sccz80.lst
 target/zx/uspeech/currah_detect
 target/zx/uspeech/currah_direct
