@@ -393,13 +393,13 @@ mzx.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath mzx
+	$(MAKE) -C math/float/zxmath mzx
 
 mzx_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath mzx_tiny
+	$(MAKE) -C math/float/zxmath mzx_tiny
 
 # TS2068 maths library - Stefano
 m2068.lib:
@@ -648,7 +648,7 @@ m81_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX 81 Tiny Maths Library ---'
 	@echo ''
-	$(MAKE) -C math/zxmath m81_tiny
+	$(MAKE) -C math/float/zxmath m81_tiny
 
 # Lambda 8300 maths library - Stefano
 mlambda.lib:
