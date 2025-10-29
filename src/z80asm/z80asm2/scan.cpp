@@ -1882,6 +1882,8 @@ c_comment:
         while (p < pe) {
             if (*p == '*' && (p + 1) < pe && *(p + 1) == '/') {
                 p += 2;
+                Token t(TokenType::Whitespace, " ");
+                output.push_back(t);
                 goto main_loop;
             }
             ++p;

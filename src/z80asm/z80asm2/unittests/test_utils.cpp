@@ -136,3 +136,92 @@ TEST_CASE("parse_int_from_chars invalid inputs and edge cases",
     REQUIRE_FALSE(parse_int_from_chars(overflow_str, 10, out));
 }
 
+// -----------------------------------------------------------------------------
+// Tests for escape_string (added earlier)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("escape_string escapes control characters to C-style sequences",
+          "[escape_string][controls]") {
+    // build a string with common control characters
+    std::string in;
+    in.push_back('\a');
+    in.push_back('\b');
+    in.push_back('\f');
+    in.push_back('\n');
+    in.push_back('\r');
+    in.push_back('\t');
+    in.push_back('\v');
+
+    std::string expected;
+    expected += "\\a";
+    expected += "\\b";
+    expected += "\\f";
+    expected += "\\n";
+    expected += "\\r";
+    expected += "\\t";
+    expected += "\\v";
+
+    REQUIRE(escape_string(in) == expected);
+}
+
+TEST_CASE("escape_string escapes double-quotes and backslashes correctly",
+          "[escape_string][quotes][backslash]") {
+    std::string in;
+    in.push_back('"');   // "
+    in += "hi";
+    in.push_back('"');   // "
+    in.push_back('\\');  // backslash at end
+
+    // expected: \"hi\"\\  (each " becomes \" and backslash becomes \\)
+    std::string expected;
+    expected += "\\\"";
+    expected += "hi";
+    expected += "\\\"";
+    expected += "\\\\";
+
+    REQUIRE(escape_string(in) == expected);
+
+    // also test a single backslash -> becomes double backslash
+    REQUIRE(escape_string(std::string("\\", 1)) == std::string("\\\\"));
+}
+
+TEST_CASE("escape_string converts non-printable bytes to \\xHH (uppercase hex)",
+          "[escape_string][hex]") {
+    std::string in;
+    in.push_back(static_cast<char>(1));     // 0x01
+    in.push_back(static_cast<char>(0x80));  // 0x80 (non-printable, > 0x7f)
+
+    // expected: \x01\x80 (uppercase hex)
+    std::string expected;
+    expected += "\\x01";
+    expected += "\\x80";
+
+    REQUIRE(escape_string(in) == expected);
+}
+
+TEST_CASE("escape_string leaves printable ASCII unchanged",
+          "[escape_string][printable]") {
+    std::string s = "Hello, 123! ~";
+    REQUIRE(escape_string(s) == s);
+}
+
+TEST_CASE("escape_string returns empty string for empty input",
+          "[escape_string][empty]") {
+    REQUIRE(escape_string(std::string()) == std::string());
+}
+
+// -----------------------------------------------------------------------------
+// New tests for str_ends_with
+// -----------------------------------------------------------------------------
+
+TEST_CASE("str_ends_with detects suffix correctly", "[str_ends_with]") {
+    REQUIRE(str_ends_with("filename.asm", ".asm"));
+    REQUIRE(str_ends_with("hello", "lo"));
+    REQUIRE_FALSE(str_ends_with("hello", "Hello")); // case-sensitive
+    REQUIRE(str_ends_with("abc", ""));              // empty ending should match
+    REQUIRE_FALSE(str_ends_with("",
+                                "a"));          // non-empty ending can't match empty string
+    REQUIRE(str_ends_with("", ""));                 // empty ends-with empty -> true
+    REQUIRE_FALSE(str_ends_with("short", "longer_suffix"));
+}
+
