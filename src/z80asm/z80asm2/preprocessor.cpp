@@ -3,34 +3,6 @@
 // Copyright (C) Paulo Custodio, 2011-2025
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
-//
-// PSEUDOCODE / PLAN (detailed):
-// - Fix incorrect use of TokenType::Newline inside TokensLine handling.
-// - TokensLine represents one full input line and does NOT include a newline token.
-// - Replace all logic that removes/relies on trailing Newline tokens with logic that
-//   removes trailing Whitespace tokens instead (for trimming macro bodies).
-// - Remove insertion of artificial Newline tokens when preparing argument TokensLine
-//   for recursive expansion; simply pass the TokensLine as-is to expand_macros.
-// - When copying tokens from expanded argument lines or macro replacement lines,
-//   do not skip tokens based on TokenType::Newline (they no longer exist). Copy all tokens.
-// - When a macro expansion yields multiple TokensLine results, append the first
-//   line's tokens into the current output `out`, and for each subsequent expanded
-//   line push the current `out` to `result` and start a fresh `out` initialized
-//   with the tokens of that expanded line.
-// - At the end of processing an input line, push `out` into `result` (no newline token).
-// - Replace all occurrences of checks/removals for TokenType::Newline with loops
-//   that remove trailing TokenType::Whitespace tokens.
-// - Keep recursion guards and other logic unchanged except for newline handling.
-//
-// Implementation notes:
-// - Use while-loop to pop trailing whitespace tokens from body_tokens.
-// - When building `expanded_args_flat`, do not append a Newline token to argument lines.
-// - Copy all tokens from expanded argument lines during parameter substitution.
-// - When merging multi-line expansion results, use result.push_back(out) and reinitialize `out`
-//   with the subsequent expanded line's tokens (no inserted newline tokens).
-// - Ensure behavior still returns one TokensLine per logical output line.
-//
-// The rest of the file is the original code with the above fixes applied.
 
 #include "options.h"
 #include "preprocessor.h"
@@ -828,23 +800,27 @@ void Preprocessor::split_lines(const Location& location,
 
 void Preprocessor::split_line(const Location& location,
                               const TokensLine& expanded) {
+    // Make a mutable copy so we can apply merging of '##' operator
+    TokensLine line_to_process = expanded;
+    merge_double_hash(line_to_process);
+
     TokensLine current(location);
     int ternary_depth = 0;
     unsigned i = 0;
 
-    // check for label at start of line
-    split_label(location, expanded, i);
+    // check for label at start of line (uses processed line)
+    split_label(location, line_to_process, i);
 
     // process rest of line
-    while (i < expanded.size()) {
-        const Token& t = expanded[i];
+    while (i < line_to_process.size()) {
+        const Token& t = line_to_process[i];
         if (t.is(OperatorType::Colon) && ternary_depth == 0) {
             // end of current line; push current line to queue
             input_queue_.push_back(std::move(current));
             current = TokensLine(location);
             ++i;
             // skip spaces after colon
-            skip_spaces(expanded, i);
+            skip_spaces(line_to_process, i);
             continue;
         }
         else if (t.is(OperatorType::Quest)) {
@@ -861,7 +837,7 @@ void Preprocessor::split_line(const Location& location,
             current = TokensLine(location);
             ++i;
             // skip spaces after colon
-            skip_spaces(expanded, i);
+            skip_spaces(line_to_process, i);
             continue;
         }
         else if (t.is(TokenType::String)) {
@@ -941,6 +917,49 @@ void Preprocessor::split_label(const Location& location,
     i = 0; // rewind
     skip_spaces(expanded, i);
 }
+
+void Preprocessor::merge_double_hash(TokensLine& line) {
+    // Build a new TokensLine with merged tokens
+    TokensLine out(line.location());
+
+    unsigned idx = 0;
+    while (idx < line.size()) {
+        const Token& cur = line[idx];
+
+        // Candidate: identifier on the left
+        if (cur.is(TokenType::Identifier)) {
+            unsigned j = idx + 1;
+            // skip optional whitespace
+            skip_spaces(line, j);
+
+            // require DoubleHash operator token
+            if (j < line.size() && line[j].is(OperatorType::DoubleHash)) {
+                unsigned k = j + 1;
+                // skip optional whitespace after ##
+                skip_spaces(line, k);
+
+                // right side must be identifier or integer
+                if (k < line.size() && (line[k].is(TokenType::Identifier)
+                                        || line[k].is(TokenType::Integer))) {
+                    // concatenate texts (no added space)
+                    std::string glued = cur.text() + line[k].text();
+                    out.push_back(Token(TokenType::Identifier, glued));
+                    // advance past the matched sequence
+                    idx = k + 1;
+                    continue;
+                }
+            }
+        }
+
+        // default: copy current token
+        out.push_back(cur);
+        ++idx;
+    }
+
+    // replace original line with merged result
+    line = out;
+}
+
 
 // ------------------- Refactored helpers for expand_macros --------------------
 

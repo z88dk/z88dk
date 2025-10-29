@@ -1187,3 +1187,79 @@ TEST_CASE("Preprocessor: multi-line /* */ comment replaced by single Whitespace 
     REQUIRE(toks[2].is(TokenType::Identifier));
     REQUIRE(toks[2].text() == "B");
 }
+
+// -----------------------------------------------------------------------------
+// New tests for the '##' token pasting operator
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: DoubleHash '##' concatenates two identifiers into one identifier token",
+          "[preprocessor][tokenpaste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "A ## B\n";
+    pp.push_virtual_file(content, "paste_ids", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Expect a single identifier token 'AB' (whitespace and other tokens may be preserved)
+    bool foundAB = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier) && t.text() == "AB") {
+            foundAB = true;
+            break;
+        }
+    }
+    REQUIRE(foundAB);
+}
+
+TEST_CASE("Preprocessor: DoubleHash '##' concatenates identifier and integer into single identifier token",
+          "[preprocessor][tokenpaste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "P##1\n";
+    pp.push_virtual_file(content, "paste_id_int", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    bool foundP1 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier) && t.text() == "P1") {
+            foundP1 = true;
+            break;
+        }
+    }
+    REQUIRE(foundP1);
+}
+
+TEST_CASE("Preprocessor: DoubleHash '##' supports multiple pastes in the same line",
+          "[preprocessor][tokenpaste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "A##B C##D\n";
+    pp.push_virtual_file(content, "paste_multi", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    bool foundAB = false, foundCD = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier)) {
+            if (t.text() == "AB") {
+                foundAB = true;
+            }
+            if (t.text() == "CD") {
+                foundCD = true;
+            }
+        }
+    }
+    REQUIRE(foundAB);
+    REQUIRE(foundCD);
+}
