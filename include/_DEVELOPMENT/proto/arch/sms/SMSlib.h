@@ -340,10 +340,10 @@ void SMS_VDPSetPNTLocation (unsigned int location);
 void SMS_VDPSetSpritesLocation (unsigned int location);
 
 In z88dk these constants can be set in the devkitSMS configuration file:
-  z88dk/libsrc/_DEVELOPMENT/target/sms/config_devkitSMS.m4
+  z88dk/libsrc/newlib/target/sms/config_devkitSMS.m4
 
 After changes are made the sms library must be rebuilt from directory:
-  z88dk/libsrc/_DEVELOPMENT
+  z88dk/libsrc/newlib
 
 By running:
   Winmake sms     (windows)

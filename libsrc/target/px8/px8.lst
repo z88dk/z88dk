@@ -5,7 +5,7 @@ target/px8/adcvrt
 target/px8/esc_sequence
 target/px8/lcd_set_udg
 target/px8/px8_break
-gfx/wide/obj/px8/w_dcircle_square.asm
+classic/gfx/wide/obj/px8/w_dcircle_square.asm
 target/px8/graphics/draw
 target/px8/graphics/drawr_callee
 target/px8/graphics/undraw
@@ -26,13 +26,13 @@ target/px8/graphics/w_clga_callee
 target/px8/graphics/w_fillb_callee
 target/px8/graphics/w_xorclga_callee
 target/px8/graphics/w_area
-@gfx/wide/gfx_wide.lst
-@stdio/ansicore.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/stdio/ansicore.lst
 target/px8/stdio/ansi/f_ansi_attr
 target/px8/stdio/ansi/f_ansi_bel
 target/px8/stdio/ansi/f_ansi_char
 target/px8/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/px8/stdio/ansi/f_ansi_scrollup
 target/px8/stdio/ansi/_font_8x6_px
-@games/games.lst
+@classic/games/games.lst

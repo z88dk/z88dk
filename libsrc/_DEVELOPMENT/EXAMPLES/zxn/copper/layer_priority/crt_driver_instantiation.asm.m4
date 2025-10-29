@@ -6,7 +6,7 @@
 
    ;# fd=0, stdin
    
-   include(`../m4_file_absent.m4')dnl
+   include(`crt/newlib/m4_file_absent.m4')dnl
    m4_file_absent
 
    ;# fd=1, window_1, (x,width,y,height) = (2,28,2,16) in 64-col chars

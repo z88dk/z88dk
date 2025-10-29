@@ -62,17 +62,17 @@ for %%t in (%targets%) do (
       copy /Y target\%%t\config_%%t_private.inc config_private.inc 1> nul
 
       if "%%t" == "zx" (
-         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         z88dk-zx0 -f target/zx/bifrost2/z80/bifrost2_engine_48.bin
+         z88dk-zx0 -f target/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
       if "%%t" == "zxn" (
-         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o target/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         z88dk-zx0 -f target/zx/bifrost2/z80/bifrost2_engine_48.bin
+         z88dk-zx0 -f target/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
       if exist target\%%t\library\%%t_macro.lst (

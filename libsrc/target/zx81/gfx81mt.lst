@@ -18,9 +18,9 @@ target/zx81/graphics_hr/mt_hrg_off
 target/zx81/graphics_hr/mt_invhrg
 target/zx81/graphics_hr/mt_stencil_render
 target/zx81/graphics_hr/mt_putsprite
-gfx/narrow/obj/${TARGET}/bksave
-gfx/narrow/obj/${TARGET}/bkrestore
-gfx/narrow/obj/${TARGET}/clrarea2
-gfx/narrow/obj/${TARGET}/fillarea2
-gfx/narrow/obj/${TARGET}/xorclrarea2
-@gfx/narrow/gfx_narrow.lst
+classic/gfx/narrow/obj/${TARGET}/bksave
+classic/gfx/narrow/obj/${TARGET}/bkrestore
+classic/gfx/narrow/obj/${TARGET}/clrarea2
+classic/gfx/narrow/obj/${TARGET}/fillarea2
+classic/gfx/narrow/obj/${TARGET}/xorclrarea2
+@classic/gfx/narrow/gfx_narrow.lst

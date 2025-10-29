@@ -7,13 +7,13 @@ target/zx/graphics/rowtab
 target/zx/graphics/pixladdr
 target/zx/graphics_cpm/pixel
 target/zx/graphics_cpm/pointxy
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/zx/games/joystick
 target/zx/games/bit_open_cpm
 target/zx/games/bit_open_di_cpm
 target/zx/games/bit_close
 target/zx/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/zx/graphics/rowtab
 target/zx/zx_attr
 target/zx/cpm/zx_attr_callee
@@ -33,11 +33,7 @@ target/zx/diagnostic/zx_timexsound
 target/zx/diagnostic/zx_zxmmc
 target/zx/diagnostic/zx_ulaplus
 @target/zx/newlib/newlib.lst
-target/zx/ulaplus/ula_normal_mode
-target/zx/ulaplus/ula_plus_mode
-target/zx/ulaplus/ula_sync
-target/zx/ulaplus/ulaplus_set
-target/zx/ulaplus/ulaplus_get
+@target/zx/ulaplus/ulaplus_sccz80.lst
 target/zx/uspeech/currah_direct
 target/zx/zxmmc/__mmc_card_select
 target/zx/zxmmc/clock32
@@ -61,4 +57,4 @@ target/zx/psg/set_psg
 target/zx/psg/set_psg_callee
 target/zx/psg/get_psg
 target/zx/psg/psg_init
-@psg/ay/psg.lst
+sound/ay/obj/${TYPE}/**/*.o

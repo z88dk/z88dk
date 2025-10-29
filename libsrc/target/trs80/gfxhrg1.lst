@@ -5,4 +5,4 @@ target/trs80/gfxhrg1/w_respixl
 target/trs80/gfxhrg1/w_pointxy
 target/trs80/gfxhrg1/w_pixladdr
 target/trs80/gfxhrg1/w_putsprite
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst

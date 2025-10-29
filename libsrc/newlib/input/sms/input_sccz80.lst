@@ -1,0 +1,7 @@
+@newlib/input/sms/input_asm.lst
+newlib/input/sms/c/sccz80/in_pause
+newlib/input/sms/c/sccz80/in_stick_1
+newlib/input/sms/c/sccz80/in_stick_2
+newlib/input/sms/c/sccz80/in_test_key
+newlib/input/sms/c/sccz80/in_wait_key
+newlib/input/sms/c/sccz80/in_wait_nokey

@@ -16,7 +16,7 @@
     EXTERN  swapgfxbk
 			;EXTERN	base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 cleargraphics:

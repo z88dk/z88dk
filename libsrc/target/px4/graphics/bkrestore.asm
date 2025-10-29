@@ -10,7 +10,7 @@
     SECTION code_clib
     EXTERN  pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     PUBLIC  bkrestore
     PUBLIC  _bkrestore
     PUBLIC  bkrestore_fastcall

@@ -19,10 +19,10 @@ target/sms/read_joypad2
 target/sms/gotoxy
 target/sms/add_raster_int
 target/sms/add_pause_int
-@psg/sn76489/sn76489.lst
-@games/games.lst
-@video/tms9918/video_tms9918.lst
-@gfx/narrow/gfx_narrow.lst
-@stdio/stdio.lst
-@stdio/ansicore.lst
+sound/sn76489/obj/${TYPE}/**/*.o
+@classic/games/games.lst
+@classic/video/tms9918/video_tms9918.lst
+@classic/gfx/narrow/gfx_narrow.lst
+@classic/stdio/stdio.lst
+@classic/stdio/ansicore.lst
 

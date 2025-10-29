@@ -1,4 +1,4 @@
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
     EXTERN  __rx78_ink

@@ -13,7 +13,7 @@
     EXTERN  __bit_irqstatus
     EXTERN  RG0SAV
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 bit_open_di:
 _bit_open_di:

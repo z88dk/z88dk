@@ -11,7 +11,7 @@
 ;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     PUBLIC  stencil_render
     PUBLIC  _stencil_render

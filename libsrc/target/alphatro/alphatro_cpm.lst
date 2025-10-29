@@ -1,5 +1,5 @@
-stdio/obj/${TYPE}/inkey/getk
-@stdio/ansicore.lst
+classic/stdio/obj/${TYPE}/inkey/getk
+@classic/stdio/ansicore.lst
 target/alphatro/stdio/ansi/f_ansi_attr
 target/alphatro/stdio/ansi/f_ansi_bel
 target/alphatro/stdio/ansi/f_ansi_char
@@ -10,11 +10,11 @@ target/alphatro/stdio/generic_console
 target/alphatro/stdio/generic_console_ioctl
 target/alphatro/stdio/conio_vars
 target/alphatro/stdio/conio_map_colour
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/alphatro/graphics/textpixl6
 target/alphatro/graphics/cleargraphics
-@gfx/gencon/gfx_gencon6.lst
-@video/mc6845/mc6845.lst
+@classic/gfx/gencon/gfx_gencon6.lst
+@classic/video/mc6845/mc6845.lst
 target/alphatro/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 

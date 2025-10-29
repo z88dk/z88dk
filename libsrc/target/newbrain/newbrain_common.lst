@@ -14,4 +14,4 @@ target/newbrain/nb_puts
 target/newbrain/nb_putblock
 target/newbrain/nb_putval
 target/newbrain/time/clock
-@games/games.lst
+@classic/games/games.lst

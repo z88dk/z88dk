@@ -24,7 +24,7 @@ IF  !__CPU_GBZ80__
     EXTERN  bit_close_ei
     EXTERN  __snd_tick
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 
 playzb4:

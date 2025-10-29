@@ -194,7 +194,7 @@ standard C library, as described
 On Linux you can confirm this with a command such as:
 
 ```
->z88dk-z80nm $ZCCCFG/../../libsrc/_DEVELOPMENT/lib/sdcc_iy/zx.lib | less
+>z88dk-z80nm $ZCCCFG/../../libsrc/newlib/lib/sdcc_iy/zx.lib | less
 ```
 
 and search for 'sp1' in the output.

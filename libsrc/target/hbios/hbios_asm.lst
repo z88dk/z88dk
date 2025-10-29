@@ -1,0 +1,3 @@
+target/hbios/z80/asm_hbios
+target/hbios/z80/asm_hbios_a
+target/hbios/z80/asm_hbios_e

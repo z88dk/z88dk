@@ -9,13 +9,13 @@ target/gal/stdio/conio_vars
 target/gal/stdio/printc_MODE1
 target/gal/stdio/vpeek_MODE1
 target/gal/stdio/scrollup_MODE1
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/gal/scrolluptxt
 target/gal/scrolldowntxt
 target/gal/invtxt
 target/gal/filltxt
 
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/gal/stdio/ansi/f_ansi_attr
 target/gal/stdio/ansi/f_ansi_char
 target/gal/stdio/ansi/f_ansi_cls
@@ -44,13 +44,13 @@ target/gal/graphics/pointxy_MODE1
 target/gal/graphics/textpixl6
 target/gal/graphics/putsprite
 target/gal/graphics/putsprite_MODE1
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/gal/games/bit_open
 target/gal/games/bit_open_di
 target/gal/games/bit_close
 target/gal/games/bit_close_ei
 target/gal/games/joystick
-@games/games.lst
+@classic/games/games.lst
 target/gal/interrupt/im1_init
 target/gal/interrupt/add_raster_int
 target/gal/psg/set_psg
@@ -59,7 +59,5 @@ target/gal/psg/get_psg
 target/gal/psg/psg_init
 target/gal/psg/asm_wyz_hardware_out
 target/gal/psg/asm_vt2_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/vt2/psg_vt2.lst
+sound/ay/obj/${TYPE}/**/*.o
 

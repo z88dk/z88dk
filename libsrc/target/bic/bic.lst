@@ -1,11 +1,9 @@
-@video/upd7220/video_upd7220.lst
+@classic/video/upd7220/video_upd7220.lst
 target/bic/psg/set_psg
 target/bic/psg/set_psg_callee
 target/bic/psg/get_psg
 target/bic/psg/psg_init
 target/bic/psg/asm_wyz_hardware_out
 target/bic/psg/asm_vt2_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/vt2/psg_vt2.lst
-@games/games.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/games/games.lst

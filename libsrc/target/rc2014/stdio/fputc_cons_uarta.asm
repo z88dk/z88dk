@@ -1,5 +1,5 @@
 
-    INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+    INCLUDE "newlib/target/rc2014/config_rc2014-8085_private.inc"
 
     SECTION code_driver
     SECTION code_driver_character_output

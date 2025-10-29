@@ -1,0 +1,7 @@
+classic/gfx/text/obj/${TARGET}/pointxy
+classic/gfx/text/obj/${TARGET}/plotpixl
+classic/gfx/text/obj/${TARGET}/respixl
+classic/gfx/text/obj/${TARGET}/xorpixl
+classic/gfx/text/obj/${TARGET}/clsgraph
+classic/gfx/narrow/obj/${TARGET}/getsprite2
+@classic/gfx/narrow/gfx_narrow.lst

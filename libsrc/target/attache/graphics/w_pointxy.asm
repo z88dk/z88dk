@@ -12,7 +12,7 @@
 ;
 
 
-			INCLUDE	"graphics/grafix.inc"
+			INCLUDE	"classic/gfx/grafix.inc"
 
 			SECTION smc_clib
 			PUBLIC	w_pointxy

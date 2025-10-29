@@ -19,7 +19,7 @@
 
     EXTERN  hrg_on
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 _clg_hr:

@@ -3,4 +3,4 @@ target/c128/graphics/udg/plotpixl
 target/c128/graphics/udg/respixl
 target/c128/graphics/udg/xorpixl
 target/c128/graphics/udg/pointxy
-@gfx/text6/gfx_text6.lst
+@classic/gfx/text6/gfx_text6.lst

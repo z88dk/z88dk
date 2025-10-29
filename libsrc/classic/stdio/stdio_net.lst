@@ -1,0 +1,4 @@
+classic/stdio/obj/${TYPE}/zsock/fgetc_net
+classic/stdio/obj/${TYPE}/zsock/fputc_net
+classic/stdio/obj/${TYPE}/zsock/fopen_zsock
+classic/stdio/obj/${TYPE}/zsock/zsock_trampoline

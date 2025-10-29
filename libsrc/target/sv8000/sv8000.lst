@@ -1,15 +1,14 @@
-@video/mc6847/mc6847.lst
-@stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/video/mc6847/mc6847.lst
+@classic/stdio/stdio.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/sv8000/interrupts/add_raster_int
 target/sv8000/psg/set_psg
 target/sv8000/psg/set_psg_callee
 target/sv8000/psg/get_psg
 target/sv8000/psg/psg_init
 target/sv8000/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+sound/ay/obj/${TYPE}/**/*.o
 target/sv8000/games/joystick
-games/obj/sv8000/joystick_type
-@games/games.lst
+classic/games/obj/sv8000/joystick_type
+@classic/games/games.lst
 

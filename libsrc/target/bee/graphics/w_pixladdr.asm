@@ -13,7 +13,7 @@
     EXTERN  div5
     EXTERN  div11
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 ;
 ;
 ; ******************************************************************

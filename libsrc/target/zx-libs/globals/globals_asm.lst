@@ -1,0 +1,4 @@
+target/zx-libs/globals/z80/_GLOBAL_ZX_DIVMMC_PAGE_OFFSET
+target/zx-libs/globals/z80/_GLOBAL_ZX_PORT_1FFD
+target/zx-libs/globals/z80/_GLOBAL_ZX_PORT_7FFD
+target/zx-libs/globals/z80/_GLOBAL_ZX_PORT_FE

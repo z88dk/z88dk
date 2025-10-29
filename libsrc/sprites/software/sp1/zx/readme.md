@@ -1,5 +1,5 @@
 The new c library contains a [more recent version of
-sp1](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1)
+sp1](https://github.com/z88dk/z88dk/tree/master/libsrc/EXAMPLES/zx/demo_sp1)
 that is compatible with zsdcc.  sp1 is being updated again and that version
 will be included in the classic library.
 

@@ -1,5 +1,5 @@
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
 target/super80/stdio/generic_console_vduem
 target/super80/stdio/generic_console_vduem_ioctl
 target/super80/stdio/conio_map_colour
@@ -7,12 +7,12 @@ target/super80/stdio/CRT_FONT
 target/shared/copy_font
 
 target/super80/graphics/textpixl
-@gfx/gencon/gfx_gencon.lst
-@input/input_keyboard.lst
-@stdio/stdio.lst
+@classic/gfx/gencon/gfx_gencon.lst
+@classic/input/input_keyboard.lst
+@classic/stdio/stdio.lst
 target/super80/games/bit_open
 target/super80/games/bit_close
 target/super80/games/keys_joystick
-@games/games.lst
-@video/mc6845/mc6845.lst
+@classic/games/games.lst
+@classic/video/mc6845/mc6845.lst
 

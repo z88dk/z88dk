@@ -27,8 +27,8 @@ target/sam/stdio/ansi/f_ansi_scrollup
 
 ; Keyboard is like +zx, but extended, so needs new routines
 ; Pull it in before zxstdio so we get keyboard reading
-input/obj/${TYPE}/fgetc_cons
-@input/input_keyboard.lst
+classic/input/obj/${TYPE}/fgetc_cons
+@classic/input/input_keyboard.lst
 
 ; We only want bits of +zx stdio, but take it all to keep
 ; things simple (Our versions are above)
@@ -66,8 +66,8 @@ target/zx-common/graphics/obj/${TARGET}/xor_MODE0
 target/zx-common/graphics/obj/${TARGET}/plot_MODE0
 target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE0
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
-gfx/wide/obj/${TARGET}/w_dcircle_square
-@gfx/wide/gfx_wide.lst
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+@classic/gfx/wide/gfx_wide.lst
 ; Fatpix setting
 target/sam/sam/sam_set_fatpix
 
@@ -77,11 +77,11 @@ target/sam/sam/sam_load_palette
 target/sam/sam/sam_set_palette
 
 ; Lets pull in etracker + ay emulator for the sound chip
-@psg/saa1099/saa1099.lst
+sound/saa1099/obj/${TYPE}/**/*.o
 
 ; Pull in WYZ player
 target/sam/psg/asm_wyz_hardware_out
-@psg/ay/wyz/psg_wyz.lst
+sound/ay/obj/${TYPE}/**/*.o
 
 ; What are these used for?
 target/sam/variables
@@ -123,9 +123,9 @@ target/sam/far/__far_page_mixed
 
 
 ; Just some standard stuff now
-@stdio/ansicore.lst
-@stdio/stdio.lst
-@games/games.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
+@classic/games/games.lst
 
 
 

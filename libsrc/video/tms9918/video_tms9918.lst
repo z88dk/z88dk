@@ -1,3 +1,0 @@
-video/tms9918/obj/${TARGET}/*
-video/tms9918/stdio/**/obj/${TARGET}/*
-video/tms9918/graphics/obj/${TARGET}/*

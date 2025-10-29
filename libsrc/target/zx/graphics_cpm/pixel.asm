@@ -6,7 +6,7 @@
 ;	$Id: pixel.asm,v 1.1 2016-10-26 13:03:30 stefano Exp $
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  pixel

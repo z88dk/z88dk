@@ -4,7 +4,7 @@
     PUBLIC  _bit_open
     EXTERN  __snd_tick
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
 bit_open:
 _bit_open:

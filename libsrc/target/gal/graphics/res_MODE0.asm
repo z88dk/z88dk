@@ -12,4 +12,4 @@ res_MODE0:
     ret     nc
 
     defc    NEEDunplot=1
-    INCLUDE "gfx/gencon/pixel6.inc"
+    INCLUDE "classic/gfx/gencon/pixel6.inc"

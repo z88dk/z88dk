@@ -1,20 +1,20 @@
 target/oz/stdio/fgetc_cons
 target/oz/stdio/getk
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/oz/stdio/ansi/f_ansi_attr
 target/oz/stdio/ansi/f_ansi_bel
 target/oz/stdio/ansi/f_ansi_char
 target/oz/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/oz/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/oz/graphics/clg
 target/oz/graphics/putsprite
 target/oz/graphics/pixladdr
 target/oz/graphics/stencil_render
 target/oz/graphics/swapgfxbk
-@gfx/narrow/gfx_narrow.lst
-@games/games.lst
+@classic/gfx/narrow/gfx_narrow.lst
+@classic/games/games.lst
 
 target/oz/oz/obj/oz/restore_a000
 target/oz/oz/obj/oz/ozcopy

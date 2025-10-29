@@ -1,0 +1,10 @@
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_initialize_fastcall
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_ioctl
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_ioctl_callee
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_status_fastcall
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_read
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_read_callee
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_write
+newlib/target/rc2014/driver/diskio/c/sccz80/disk_write_callee
+
+@newlib/target/rc2014/driver/diskio/diskio_8085_asm.lst

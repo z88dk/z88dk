@@ -16,7 +16,7 @@
     SECTION code_clib
     PUBLIC  bit_synth
     PUBLIC  _bit_synth
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  bit_open_di
     EXTERN  bit_close_ei

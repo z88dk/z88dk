@@ -15,7 +15,7 @@
     EXTERN setx
     EXTERN sety
     
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 scrollup_1px:

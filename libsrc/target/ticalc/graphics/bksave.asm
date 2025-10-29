@@ -12,7 +12,7 @@
     PUBLIC  _bksave
     EXTERN  pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 bksave:
 _bksave:

@@ -15,7 +15,7 @@ w_plotpixel:
     ld      h, l
     ld      l, e
     defc    WIDE_GFX=1
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"
 
 hires:
     INCLUDE "w_pixel.inc"

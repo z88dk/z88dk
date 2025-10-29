@@ -1,5 +1,0 @@
-games/obj/${TARGET}/joystick
-games/obj/${TARGET}/joystick_type
-games/obj/${TARGET}/joystick_sc
-games/obj/${TARGET}/kjoystick
-games/obj/${TARGET}/joystick_inkey

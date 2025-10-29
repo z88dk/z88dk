@@ -1,0 +1,21 @@
+@target/zx/ulaplus/ulaplus_asm.lst
+target/zx/ulaplus/c/sccz80/ulap_attr_from_pentp_penti
+target/zx/ulaplus/c/sccz80/ulap_attr_from_pentp_penti_callee
+target/zx/ulaplus/c/sccz80/ulap_disable
+target/zx/ulaplus/c/sccz80/ulap_enable
+target/zx/ulaplus/c/sccz80/ulap_pent_from_attr_ink
+target/zx/ulaplus/c/sccz80/ulap_pent_from_attr_paper
+target/zx/ulaplus/c/sccz80/ulap_read_color
+target/zx/ulaplus/c/sccz80/ulap_read_palette
+target/zx/ulaplus/c/sccz80/ulap_read_palette_callee
+target/zx/ulaplus/c/sccz80/ulap_write_color
+target/zx/ulaplus/c/sccz80/ulap_write_color_callee
+target/zx/ulaplus/c/sccz80/ulap_write_palette
+target/zx/ulaplus/c/sccz80/ulap_write_palette_callee
+
+# The original classic variants of the functions
+target/zx/ulaplus/c/smallc/ulaplus_set
+target/zx/ulaplus/c/smallc/ula_normal_mode
+target/zx/ulaplus/c/smallc/ula_plus_mode
+target/zx/ulaplus/c/smallc/ulaplus_get
+target/zx/ulaplus/c/smallc/ula_sync

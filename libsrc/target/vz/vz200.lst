@@ -1,4 +1,4 @@
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 target/vz/stdio/fgetc_cons
 target/vz/stdio/fputc_cons
 target/vz/stdio/getk
@@ -8,18 +8,18 @@ target/vz/stdio/ansi/f_ansi_char
 target/vz/stdio/ansi/f_ansi_cls
 target/vz/stdio/ansi/f_ansi_dline
 target/vz/stdio/ansi/f_ansi_scrollup
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 
 target/vz/graphics/textpixl
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/vz/games/bit_open
 target/vz/games/bit_open_di
 target/vz/games/bit_close
 target/vz/games/bit_close_ei
 target/vz/games/joystick
-@games/games.lst
-@input/input_keyboard.lst
+@classic/games/games.lst
+@classic/input/input_keyboard.lst
 target/vz/vz_bgrd
 target/vz/vz_brick
 target/vz/vz_brick_callee

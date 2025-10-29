@@ -11,6 +11,6 @@ target/bondwell2/stdio/generic_console_vpeek
 target/bondwell2/stdio/generic_console_ioctl
 target/bondwell2/stdio/CRT_FONT
 
-@gfx/wide/gfx_wide.lst
-@video/msm6255/msm6255.lst
-@games/games.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/video/msm6255/msm6255.lst
+@classic/games/games.lst

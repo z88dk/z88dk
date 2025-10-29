@@ -9,13 +9,13 @@ target/zx81/graphics_hr/i_putsprite
 target/zx81/graphics_hr/i_clga_callee
 target/zx81/graphics_hr/i_xorclga_callee
 target/zx81/graphics_hr/i_fillb_callee
-gfx/wide/obj/${TARGET}/w_dcircle_square
-gfx/wide/obj/${TARGET}/w_stencil_render2
-gfx/wide/obj/${TARGET}/draw_profile_vy
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+classic/gfx/wide/obj/${TARGET}/w_stencil_render2
+classic/gfx/wide/obj/${TARGET}/draw_profile_vy
 target/zx81/stdio/ansi/f_ansi_attr
 target/zx81/stdio/ansi/f_ansi_bel
 target/zx81/stdio/ansi/f_ansi_char_wrxi
 target/zx81/stdio/ansi/f_ansi_cls_wrxi
 target/zx81/stdio/ansi/f_ansi_dline_wrxi
 target/zx81/stdio/ansi/f_ansi_scrollup_wrxi
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst

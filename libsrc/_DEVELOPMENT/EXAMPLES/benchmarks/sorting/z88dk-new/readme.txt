@@ -40,8 +40,8 @@ rebuild), but for qsort() use in own projects mind the library configuration.
 
 To build libraries for particular configuration, edit these two files:
 
-z88dk/libsrc/_DEVELOPMENT/target/z80/config_clib.m4
-z88dk/libsrc/_DEVELOPMENT/target/zx/config_clib.m4
+z88dk/libsrc/_DEVELOPMENT/newlib/target/z80/config_clib.m4
+z88dk/libsrc/_DEVELOPMENT/newlib/target/zx/config_clib.m4
 
 At about line 469 in both files change "define(`__CLIB_OPT_SORT', 1)" and
 "define(`__CLIB_OPT_SORT_QSORT', 0x0c)" to your liking.

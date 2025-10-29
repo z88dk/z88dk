@@ -5,7 +5,7 @@
     EXTERN  swapgfxbk
     EXTERN  swapgfxbk1
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 ;	EXTERN		l_cmp
 
 ;.sline 	defs	1024 * 2 * 3

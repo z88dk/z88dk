@@ -21,7 +21,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)

@@ -1,6 +1,6 @@
 
-REGEX_CFILES := $(notdir $(wildcard regex/*.c))
-REGEX_AFILES := $(notdir $(wildcard regex/*.asm))
+REGEX_CFILES :=  $(patsubst %,cimpl/%,$(notdir $(wildcard regex/cimpl/*.c)))
+REGEX_AFILES :=  
 
 REGEX_OBJECTS := $(REGEX_CFILES:.c=.o) $(REGEX_AFILES:.asm=.o)
 
@@ -37,4 +37,4 @@ $(eval $(call buildbit,regex,kc160,test,-clib=kc160,-mkc160))
 
 
 regex-clean:
-	$(RM) -fr regex/obj regex/*.o
+	$(RM) -fr regex/obj 

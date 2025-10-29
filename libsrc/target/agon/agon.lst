@@ -41,6 +41,6 @@ target/agon/fcntl/fdtell
 target/agon/time/target_read_structtm
 target/agon/agon/agon_set_palette
 target/agon/agon/agon_set_cursor_state
-@stdio/stdio.lst
-@gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/stdio/stdio.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst

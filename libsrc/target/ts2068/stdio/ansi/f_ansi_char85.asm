@@ -315,5 +315,5 @@ font:
   IF    ROMFONT
 	; nothing here !
   ELSE
-    BINARY  "stdio/ansi/F6.BIN"
+    BINARY  "classic/stdio/ansi/F6.BIN"
   ENDIF

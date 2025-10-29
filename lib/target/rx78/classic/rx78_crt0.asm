@@ -29,6 +29,10 @@
     defc    CONSOLE_ROWS = 23
     defc    CONSOLE_COLUMNS = 24
 
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $ff
+
+
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xebff

@@ -24,7 +24,7 @@
     PUBLIC  _swapgfxbk1
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 swapgfxbk:
 _swapgfxbk:

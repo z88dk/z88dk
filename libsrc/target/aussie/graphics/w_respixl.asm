@@ -3,7 +3,7 @@
 ;
 ;	by Stefano Bodrato  - 2016
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  w_respixel

@@ -7,7 +7,7 @@ It is a sophisticated engine that is not completely documented, however if you a
 * [Brief Overview of the Engine](https://www.z88dk.org/wiki/doku.php?id=library:sprites:sp1)
 * [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/sp1.h)
 * [Discussion of SP1's Memory Map and Configuration](https://www.z88dk.org/wiki/doku.php?id=libnew:examples:sp1_ex1)  
-SP1 configuration is now done through z88dk/libsrc/_DEVELOPMENT/target/zx/config_sp1.m4
+SP1 configuration is now done through z88dk/libsrc/_DEVELOPMENT/newlib/target/zx/config_sp1.m4
 * [Set of Old Tutorial Programs](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/spectrum/examples) showing how part of the SP1 library works.  
   I am a little hesitant to link these because Z88DK has been simplified since then so these programs will not compile as-is.  Changes concern how SP1 allocates memory (it is now implied to be through malloc/free) and how data is defined in asm (it should be done in a separate .asm file).  The ideas and API calls are the same so seeing these examples and reading the comments in the .c source should be of value to understand how things work.
 

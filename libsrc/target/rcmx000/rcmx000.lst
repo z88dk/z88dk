@@ -2,5 +2,5 @@ target/rcmx000/stdio/fgetc_cons
 target/rcmx000/stdio/cnvtab
 target/rcmx000/stdio/getk
 target/rcmx000/stdio/fputc_cons
-@stdio/stdio.lst
-@time/time.lst
+@classic/stdio/stdio.lst
+time/obj/${TYPE}/**/*.o

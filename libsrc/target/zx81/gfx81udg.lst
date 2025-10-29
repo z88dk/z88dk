@@ -9,5 +9,5 @@ target/zx81/graphics_udg/pointxy
 target/zx81/graphics/swapgfxbk
 target/zx81/stdio/ansi_text/f_ansi_lorez
 target/zx81/stdio/ansi_text/f_ansi_bel
-@stdio/ansicore.lst
-@gfx/text6/gfx_text6.lst
+@classic/stdio/ansicore.lst
+@classic/gfx/text6/gfx_text6.lst

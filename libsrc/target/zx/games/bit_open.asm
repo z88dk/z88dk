@@ -7,7 +7,7 @@
 ; Stefano Bodrato - 28/9/2001
 ;
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     SECTION code_clib
     PUBLIC  bit_open

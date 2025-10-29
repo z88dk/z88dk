@@ -17,7 +17,7 @@
     EXTERN  swapgfxbk
     EXTERN  __graphics_end
     EXTERN  w_pixeladdress
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 clga_callee:

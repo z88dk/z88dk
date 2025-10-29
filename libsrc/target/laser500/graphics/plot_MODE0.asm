@@ -8,4 +8,4 @@
 
 plot_MODE0:
     defc    NEEDplot=1
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"

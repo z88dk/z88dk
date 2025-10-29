@@ -18,9 +18,9 @@ FIX16_OBJS = $(addprefix math/fix16/obj/z80/, $(FIX16_OBJECTS)) \
 OBJS += $(FIX16_OBJS)
 CLEAN += fix16-clean
 
-fix16: $(FIX16_OBJS)
+math-fix16: $(FIX16_OBJS)
 
-.PHONY: math/fix16 math/fix16-clean
+.PHONY: math-fix16 math-fix16-clean
 
 $(eval $(call buildbit,math/fix16,z80,test))
 $(eval $(call buildbit,math/fix16,ixiy,test,-Ca-IXIY,-IXIY))

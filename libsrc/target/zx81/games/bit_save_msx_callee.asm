@@ -12,7 +12,7 @@
     PUBLIC  _bit_save_msx_callee
     PUBLIC  asm_bit_save_msx
 
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
 
     EXTERN  bit_open_di
     EXTERN  bit_close_ei

@@ -1,6 +1,6 @@
 target/trs80/graphics/m2_swapgfxbk
 target/trs80/graphics/m2_textpixl3
 target/trs80/stdio/m2_generic_console
-@gfx/text6/gfx_text6.lst
-@video/mc6845/mc6845.lst
+@classic/gfx/text6/gfx_text6.lst
+@classic/video/mc6845/mc6845.lst
 target/trs80/cpm/cpm_platform_init

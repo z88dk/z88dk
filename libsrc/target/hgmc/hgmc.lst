@@ -5,12 +5,12 @@ target/hgmc/stdio/CRT_FONT
 target/hgmc/stdio/fputc_cons_native
 target/hgmc/stdio/getk
 target/hgmc/stdio/fgetc_cons
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 target/hgmc/graphics/pixladdr
 target/hgmc/graphics/clg
 ; Take the optimised bitmapped stencil render
-gfx/narrow/obj/hgmc/stencil_render
-gfx/narrow/obj/hgmc/putsprite
-@gfx/narrow/gfx_narrow.lst
-@games/games_joystick.lst
+classic/gfx/narrow/obj/hgmc/stencil_render
+classic/gfx/narrow/obj/hgmc/putsprite
+@classic/gfx/narrow/gfx_narrow.lst
+@classic/games/games_joystick.lst

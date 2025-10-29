@@ -17,7 +17,7 @@
     EXTERN  swapgfxbk
     EXTERN  swapgfxbk1
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)

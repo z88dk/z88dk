@@ -8,7 +8,7 @@
     EXTERN  __v1050_line
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 undrawto_callee:
 _undrawto_callee:

@@ -9,14 +9,14 @@ target/cpc/stdio/conio_map_colour
 target/cpc/stdio/conio_vars
 target/cpc/stdio/CRT_FONT
 
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/cpc/stdio/ansi/f_ansi_attr
 target/cpc/stdio/ansi/f_ansi_bel
 target/cpc/stdio/ansi/f_ansi_char
 target/cpc/stdio/ansi/f_ansi_cls
 target/cpc/stdio/ansi/f_ansi_dline
 target/cpc/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/cpc/graphics/cleargraphics
 target/cpc/graphics/getmaxx
 target/cpc/graphics/getmaxy
@@ -37,10 +37,10 @@ target/cpc/graphics/w_plotpixl
 target/cpc/graphics/w_respixl
 target/cpc/graphics/w_xorpixl
 target/cpc/graphics/w_pointxy
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/cpc/time/clock
 target/cpc/games/joystick
-games/obj/${TARGET}/joystick_type
+classic/games/obj/${TARGET}/joystick_type
 target/cpc/cpcrslib/firmware
 target/cpc/cpcrslib/bios_msg
 target/cpc/cpcrslib/cpc_fdc
@@ -137,9 +137,6 @@ target/cpc/interrupts/fast_vectors
 target/cpc/interrupts/__fast_isr
 target/cpc/interrupts/firmware_isr
 target/cpc/interrupts/add_raster_int
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/vt2/psg_vt2.lst
-@psg/ay/arkos/psg_arkos.lst
-@input/input_keyboard.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/input/input_keyboard.lst
 target/cpc/input/__cpc_scan_allrows

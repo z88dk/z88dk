@@ -9,24 +9,24 @@ target/vector06c/games/joystick
 target/vector06c/games/keys_joystick
 target/vector06c/load_palette
 target/vector06c/asm_load_palette
-@stdio/stdio.lst
-stdio/obj/${TYPE}/inkey/getk
-stdio/obj/${TYPE}/inkey/fgetc_cons
-@input/input_keyboard.lst
+@classic/stdio/stdio.lst
+classic/stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+@classic/input/input_keyboard.lst
 
 
-@games/games.lst
+@classic/games/games.lst
 target/vector06c/graphics/clg
 target/vector06c/graphics/w_pixladdr
 target/vector06c/graphics/w_plotpixl
 target/vector06c/graphics/w_respixl
 target/vector06c/graphics/w_xorpixl
 target/vector06c/graphics/w_pointxy
-@gfx/portable/gfx_portable_w.lst
-@gfx/wide/gfx_wide.lst
+@classic/gfx/portable/gfx_portable_w.lst
+@classic/gfx/wide/gfx_wide.lst
 target/vector06c/psg/set_psg
 target/vector06c/psg/set_psg_callee
 target/vector06c/psg/get_psg
 target/vector06c/psg/psg_init
-@psg/ay/psg.lst
+sound/ay/obj/${TYPE}/**/*.o
 

@@ -8,7 +8,6 @@
 #define setjmp(env)         l_setjmp(&(env))
 #define longjmp(env, val)   l_longjmp(&(env), val)
 
-#ifdef __CLANG
 
 typedef struct
 {
@@ -20,33 +19,7 @@ typedef struct
 
 } jmp_buf;
 
-#endif
 
-#ifdef __SDCC
-
-typedef struct
-{
-
-   void *ix;
-   void *iy;
-   void *sp;
-   void *pc;
-
-} jmp_buf;
-
-#endif
-
-#ifdef __SCCZ80
-
-typedef struct
-{
-
-   void *sp;
-   void *pc;
-
-} jmp_buf;
-
-#endif
 
 // must not use callee or fastcall linkage
 
