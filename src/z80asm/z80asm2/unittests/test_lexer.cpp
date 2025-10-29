@@ -58,6 +58,34 @@ TEST_CASE("TokensLine basic operations", "[lexer]") {
     REQUIRE(last.text() == "123");
 }
 
+// New test: verify that creating an Identifier token sets the keyword attribute
+TEST_CASE("Token constructor sets keyword for identifiers",
+          "[lexer][token][keyword]") {
+    g_options = Options();
+
+    // Known keyword should map to corresponding Keyword enum (DEFINE)
+    Token t_define(TokenType::Identifier, "DEFINE");
+    REQUIRE(t_define.is(Keyword::DEFINE));
+    REQUIRE(t_define.keyword() == Keyword::DEFINE);
+
+    Token t_define2(TokenType::Identifier, "define");
+    REQUIRE(t_define2.is(Keyword::DEFINE));
+    REQUIRE(t_define2.keyword() == Keyword::DEFINE);
+
+    // Non-keyword identifier should map to Keyword::None
+    Token t_custom(TokenType::Identifier, "myIdentifier");
+    REQUIRE(t_custom.is(Keyword::None));
+    REQUIRE(t_custom.keyword() == Keyword::None);
+
+    // Case-insensitive mapping: when options cause uppercasing, keyword mapping still works.
+    g_options = Options();
+    g_options.ucase_labels = true;
+    Token t_ucase(TokenType::Identifier, "define"); // lowercase input
+    REQUIRE(t_ucase.keyword() == Keyword::DEFINE);
+    // restore options
+    g_options = Options();
+}
+
 TEST_CASE("TokensFile from string, counts and bounds", "[lexer]") {
     g_options = Options();
 
