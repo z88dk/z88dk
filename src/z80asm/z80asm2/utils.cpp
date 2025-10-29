@@ -11,6 +11,8 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 std::string to_upper(const std::string& s) {
     std::string result = s;
@@ -53,6 +55,63 @@ bool str_ends_with(const std::string& str, const std::string& ending) {
     else {
         return false;
     }
+}
+
+std::string escape_string(const std::string& s) {
+    // Convert a raw string to a C-style escaped representation suitable for
+    // emitting as a quoted string token. Behavior mirrors str_expand_escapes:
+    // - common control characters are escaped (\a, \b, \f, \n, \r, \t, \v)
+    // - backslash and double-quote are escaped
+    // - printable ASCII (0x20..0x7e) are left as-is
+    // - other bytes are emitted as "\xHH"
+    std::string out;
+    out.reserve(s.size() + 8); // small reservation to reduce reallocs
+
+    for (unsigned char uc : s) {
+        switch (uc) {
+        case '\a':
+            out += "\\a";
+            break;
+        case '\b':
+            out += "\\b";
+            break;
+        case '\f':
+            out += "\\f";
+            break;
+        case '\n':
+            out += "\\n";
+            break;
+        case '\r':
+            out += "\\r";
+            break;
+        case '\t':
+            out += "\\t";
+            break;
+        case '\v':
+            out += "\\v";
+            break;
+        case '\\':
+            out += "\\\\";
+            break;
+        case '"':
+            out += "\\\"";
+            break;
+        default:
+            if (uc >= 0x20 && uc < 0x7f) {
+                out.push_back(static_cast<char>(uc));
+            }
+            else {
+                std::ostringstream ss;
+                ss << "\\x"
+                   << std::hex << std::uppercase << std::setw(2) << std::setfill('0')
+                   << (static_cast<int>(uc) & 0xFF)
+                   << std::dec;
+                out += ss.str();
+            }
+        }
+    }
+
+    return out;
 }
 
 std::string read_file_to_string(const std::string& filename) {
