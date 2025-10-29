@@ -20,6 +20,9 @@ std::string trim(const std::string& s);
 // check string ending
 bool str_ends_with(const std::string& str, const std::string& ending);
 
+// convert string to C-style escaped string
+std::string escape_string(const std::string& s);
+
 // convert string to int of given base (2..36), returns false on error
 bool parse_int_from_chars(const std::string& s, int base, int& out);
 

@@ -34,6 +34,7 @@
 
 #include "options.h"
 #include "preprocessor.h"
+#include "utils.h"
 #include <algorithm>
 #include <cassert>
 #include <fstream>
@@ -286,7 +287,6 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
         }
         else {
             // after an identifier: expect comma or closing parenthesis (if any) or stop
-            skip_spaces(line, j);
             if (j < line.size() && line[j].is(TokenType::Comma)) {
                 ++j; // consume comma and expect next identifier
                 expect_ident = true;
@@ -946,25 +946,26 @@ void Preprocessor::split_label(const Location& location,
 
 bool Preprocessor::is_macro_call(const TokensLine& in_line, unsigned idx,
                                  const Macro& macro,
-                                 unsigned& args_start_idx, bool& is_call) const {
-    is_call = false;
+                                 unsigned& args_start_idx) const {
     args_start_idx = idx + 1;
     if (macro.params.size() != 0 && args_start_idx < in_line.size()) {
         const Token& nextTok = in_line[args_start_idx];
         if (nextTok.is(TokenType::LeftParen)) {
-            is_call = true;
+            return true;
         }
     }
-    return is_call;
+    return false;
 }
 
 // Parse macro args and expand each argument (expand macros inside arguments).
 // On success: fills expanded_args_flat with one TokensLine per argument (first line of expansion or empty line),
 // sets out_after_idx to index after consumed args and returns true.
-// On failure returns false (syntax error); out_after_idx may be unmodified.
+// Also fills out_original_args with the trimmed original (unexpanded, trimmed) TokensLine for each arg
+// (used for '#' stringizing). On failure returns false (syntax error).
 bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
         unsigned args_start_idx,
         std::vector<TokensLine>& expanded_args_flat,
+        std::vector<TokensLine>& out_original_args,
         unsigned& out_after_idx) {
     unsigned j = args_start_idx;
     std::vector<TokensLine> parsed_args;
@@ -973,7 +974,13 @@ bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
     }
 
     expanded_args_flat.clear();
+    out_original_args.clear();
+
     for (const TokensLine& argline : parsed_args) {
+        // keep original trimmed argument tokens for '#' stringize operator
+        out_original_args.push_back(argline);
+
+        // expand macros inside argument (we only keep the first expanded logical line)
         std::vector<TokensLine> expanded = expand_macros(std::vector<TokensLine> { argline });
         if (!expanded.empty()) {
             expanded_args_flat.push_back(expanded.front());
@@ -988,11 +995,74 @@ bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
     return true;
 }
 
+// Helper: handle '#' stringize operator in macro replacement.
+// If `rep_line[pidx]` is '#' followed by a parameter identifier, produces
+// the corresponding string token into `new_line`, advances `pidx` past
+// both tokens and returns true. Otherwise returns false and does not
+// modify `new_line` or `pidx`.
+bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
+        unsigned& pidx,
+        const Macro& macro,
+        const std::vector<TokensLine>& original_args,
+        TokensLine& new_line) {
+    // Expect '#' at pidx (caller ensures this), confirm next token exists and is identifier.
+    if (!(pidx < rep_line.size() && rep_line[pidx].is(OperatorType::Hash))) {
+        return false;
+    }
+    if (pidx + 1 >= rep_line.size()) {
+        return false;
+    }
+    const Token& next = rep_line[pidx + 1];
+    if (!next.is(TokenType::Identifier)) {
+        return false;
+    }
+
+    // Find matching parameter name
+    for (unsigned pi = 0; pi < macro.params.size(); ++pi) {
+        if (next.text() == macro.params[pi]) {
+            // Build stringized argument from original_args[pi]
+            const TokensLine& orig = original_args[pi];
+
+            // Collapse whitespace tokens into a single space and join token texts.
+            std::string joined;
+            bool pending_space = false;
+            for (unsigned k = 0; k < orig.size(); ++k) {
+                const Token& tok = orig[k];
+                if (tok.is(TokenType::Whitespace)) {
+                    pending_space = true;
+                    continue;
+                }
+                if (!joined.empty() && pending_space) {
+                    joined += ' ';
+                }
+                joined += tok.text();
+                pending_space = false;
+            }
+
+            // Escape and quote
+            std::string escaped = escape_string(joined);
+            std::string quoted_text = std::string("\"") + escaped + std::string("\"");
+
+            // Create a string token: text with quotes/escapes, string_value as unescaped joined
+            new_line.push_back(Token(TokenType::String, quoted_text, joined));
+
+            // consume both '#' and the identifier
+            pidx += 2;
+            return true;
+        }
+    }
+
+    // Not a parameter -> not handled here
+    return false;
+}
+
 // Substitute parameters into macro replacement and then expand the substituted result.
 // Returns the fully expanded replacement (may be multiple TokensLine elements).
+// Supports the '#' operator via try_stringize_parameter above.
 std::vector<TokensLine> Preprocessor::substitute_and_expand(
     const Macro& macro,
     const std::vector<TokensLine>& expanded_args_flat,
+    const std::vector<TokensLine>& original_args,
     const std::string& name) {
     // Perform textual parameter substitution
     std::vector<TokensLine> substituted;
@@ -1002,6 +1072,20 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
         while (pidx < rep_line.size()) {
             const Token& rt = rep_line[pidx];
             bool substituted_flag = false;
+
+            // Handle stringize operator: '#' followed by parameter identifier
+            if (rt.is(OperatorType::Hash)) {
+                if (try_stringize_parameter(rep_line, pidx, macro, original_args, new_line)) {
+                    // handled and pidx advanced inside helper
+                    continue;
+                }
+                // If not handled (not followed by a matching param), fall through to copy '#'
+                new_line.push_back(rt);
+                ++pidx;
+                continue;
+            }
+
+            // Normal parameter substitution: identifier matching a parameter
             if (rt.is(TokenType::Identifier)) {
                 for (unsigned pi = 0; pi < macro.params.size(); ++pi) {
                     if (rt.text() == macro.params[pi]) {
@@ -1112,16 +1196,17 @@ std::vector<TokensLine> Preprocessor::expand_macros(
 
             // Determine if this is a function-like call (immediate '(')
             unsigned args_start_idx = 0;
-            bool is_call = false;
-            is_macro_call(in_line, idx, macro, args_start_idx, is_call);
+            bool is_call = is_macro_call(in_line, idx, macro, args_start_idx);
 
             if (macro.params.size() != 0 && is_call) {
                 // parse and expand args
                 std::vector<TokensLine> expanded_args_flat;
+                std::vector<TokensLine> original_args;
                 unsigned after_idx = 0;
                 if (!parse_and_expand_macro_args(in_line,
                                                  args_start_idx,
                                                  expanded_args_flat,
+                                                 original_args,
                                                  after_idx)) {
                     // syntax error in args -> treat as plain identifier
                     out.push_back(tok);
@@ -1142,6 +1227,7 @@ std::vector<TokensLine> Preprocessor::expand_macros(
                 std::vector<TokensLine> further_expanded =
                     substitute_and_expand(macro,
                                           expanded_args_flat,
+                                          original_args,
                                           name);
 
                 // Append expanded result into out/result following multi-line rules

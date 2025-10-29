@@ -160,19 +160,30 @@ private:
                      const TokensLine& expanded, unsigned& i);
 
     // Refactored helpers for expand_macros (logical blocks)
-    bool is_macro_call(const TokensLine& in_line, unsigned idx, const Macro& macro,
-                       unsigned& args_start_idx, bool& is_call) const;
+    bool is_macro_call(const TokensLine& in_line, unsigned idx,
+                       const Macro& macro,
+                       unsigned& args_start_idx) const;
     bool parse_and_expand_macro_args(const TokensLine& in_line,
                                      unsigned args_start_idx,
                                      std::vector<TokensLine>& expanded_args_flat,
+                                     std::vector<TokensLine>& out_original_args,
                                      unsigned& out_after_idx);
-    std::vector<TokensLine> substitute_and_expand(const Macro& macro,
-            const std::vector<TokensLine>& expanded_args_flat,
-            const std::string& name);
-    void append_expansion_into_out(const std::vector<TokensLine>& further_expanded,
-                                   TokensLine& out,
-                                   std::vector<TokensLine>& result,
-                                   const Location& in_location);
+    bool try_stringize_parameter(
+        const TokensLine& rep_line,
+        unsigned& pidx,
+        const Macro& macro,
+        const std::vector<TokensLine>& original_args,
+        TokensLine& new_line);
+    std::vector<TokensLine> substitute_and_expand(
+        const Macro& macro,
+        const std::vector<TokensLine>& expanded_args_flat,
+        const std::vector<TokensLine>& original_args,
+        const std::string& name);
+    void append_expansion_into_out(
+        const std::vector<TokensLine>& further_expanded,
+        TokensLine& out,
+        std::vector<TokensLine>& result,
+        const Location& in_location);
 
     std::vector<TokensLine> expand_macros(const std::vector<TokensLine>& lines);
 };
