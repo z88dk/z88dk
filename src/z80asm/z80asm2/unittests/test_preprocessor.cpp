@@ -1017,3 +1017,173 @@ TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
     // After #undef the token should be the identifier 'N', not the expansion 99
     REQUIRE(toks[0].text() == "N");
 }
+
+// -----------------------------------------------------------------------------
+// New tests exercising the '#' (stringize) operator in function-like macros
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: stringize operator '#' produces a string token for a simple identifier",
+          "[preprocessor][define][stringize]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define S(x) #x\n"
+        "S(Hello)\n";
+    pp.push_virtual_file(content, "str_simple", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    REQUIRE(toks.size() >= 9);
+
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 'H');
+    REQUIRE(toks[1].is(TokenType::Comma));
+
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 'e');
+    REQUIRE(toks[3].is(TokenType::Comma));
+
+    REQUIRE(toks[4].is(TokenType::Integer));
+    REQUIRE(toks[4].int_value() == 'l');
+    REQUIRE(toks[5].is(TokenType::Comma));
+
+    REQUIRE(toks[6].is(TokenType::Integer));
+    REQUIRE(toks[6].int_value() == 'l');
+    REQUIRE(toks[7].is(TokenType::Comma));
+
+    REQUIRE(toks[8].is(TokenType::Integer));
+    REQUIRE(toks[8].int_value() == 'o');
+}
+
+TEST_CASE("Preprocessor: stringize '#' uses the original (unexpanded) argument",
+          "[preprocessor][define][stringize][unexpanded]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A X\n"
+        "#define S(x) #x\n"
+        "S(A)\n";
+    pp.push_virtual_file(content, "str_unexpanded", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() >= 1);
+
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 'A');
+}
+
+TEST_CASE("Preprocessor: stringize '#' escapes double-quotes and backslashes in emitted token.text and preserves original token text in string_value",
+          "[preprocessor][define][stringize][escape]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Argument is a string literal token "\"hi\"" in source; after stringize:
+    // - string_value should be the original token text including its quotes: "\"hi\""
+    // - token.text() should be the quoted/escaped form emitted by the preprocessor:
+    //   outer quotes plus escaped inner quotes -> "\"\\\"hi\\\"\""
+    const std::string content =
+        "#define S(x) #x\n"
+        "S(\"hi\")\n";
+    pp.push_virtual_file(content, "str_escape", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() >= 7);
+
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == '"');
+    REQUIRE(toks[1].is(TokenType::Comma));
+
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 'h');
+    REQUIRE(toks[3].is(TokenType::Comma));
+
+    REQUIRE(toks[4].is(TokenType::Integer));
+    REQUIRE(toks[4].int_value() == 'i');
+    REQUIRE(toks[5].is(TokenType::Comma));
+
+    REQUIRE(toks[6].is(TokenType::Integer));
+    REQUIRE(toks[6].int_value() == '"');
+}
+
+// New test: verify stringize with multiple tokens containing a space produces "A B" -> 65,32,66
+TEST_CASE("Preprocessor: stringize '#' preserves spaces between tokens producing 65,32,66 for S(A B)",
+          "[preprocessor][define][stringize][space]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define S(x) #x\n"
+        "S(A B)\n";
+    pp.push_virtual_file(content, "str_space", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    REQUIRE(toks.size() >= 5);
+
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 'A');
+    REQUIRE(toks[1].is(TokenType::Comma));
+
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == ' ');
+    REQUIRE(toks[3].is(TokenType::Comma));
+
+    REQUIRE(toks[4].is(TokenType::Integer));
+    REQUIRE(toks[4].int_value() == 'B');
+}
+
+// Test: block comments replaced by a single Whitespace token (single-line)
+TEST_CASE("Preprocessor: single-line /* */ comment replaced by single Whitespace token",
+          "[preprocessor][comment]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "A/*single*/B\n";
+    pp.push_virtual_file(content, "comment_single", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Expect: Identifier 'A', one Whitespace token, Identifier 'B'
+    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "A");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+    REQUIRE(toks[1].text() == " ");
+    REQUIRE(toks[2].is(TokenType::Identifier));
+    REQUIRE(toks[2].text() == "B");
+}
+
+// Test: block comments that span lines are also replaced by a single Whitespace token
+TEST_CASE("Preprocessor: multi-line /* */ comment replaced by single Whitespace token",
+          "[preprocessor][comment][multiline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "A/*multi\nline\ncomment*/B\n";
+    pp.push_virtual_file(content, "comment_multi", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Expect: Identifier 'A', one Whitespace token, Identifier 'B'
+    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "A");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+    REQUIRE(toks[1].text() == " ");
+    REQUIRE(toks[2].is(TokenType::Identifier));
+    REQUIRE(toks[2].text() == "B");
+}
