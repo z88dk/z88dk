@@ -49,7 +49,7 @@ static void dummy()
 #endif
 
    ; Include newlib sorts
-   INCLUDE "../../../libsrc/_stdlib/z80/sort/__sort_parameters.asm"
+   INCLUDE "../../../libsrc/stdlib/z80/sort/__sort_parameters.asm"
    INCLUDE "../../../libsrc/stdlib/z80/sort/asm_insertion_sort.asm"
    INCLUDE "../../../libsrc/stdlib/z80/sort/asm_shellsort.asm"
    INCLUDE "../../../libsrc/stdlib/z80/sort/asm_quicksort.asm"
