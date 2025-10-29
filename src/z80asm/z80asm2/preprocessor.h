@@ -158,6 +158,7 @@ private:
     void split_line(const Location& location, const TokensLine& expanded);
     void split_label(const Location& location,
                      const TokensLine& expanded, unsigned& i);
+    void merge_double_hash(TokensLine& line);
 
     // Refactored helpers for expand_macros (logical blocks)
     bool is_macro_call(const TokensLine& in_line, unsigned idx,
