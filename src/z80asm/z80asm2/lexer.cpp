@@ -10,6 +10,9 @@
 
 Token::Token(TokenType type, const std::string& text)
     : type_(type), text_(text) {
+    if (type == TokenType::Identifier) {
+        keyword_ = keyword_lookup(text);
+    }
 }
 
 Token::Token(TokenType type, const std::string& text, int value)
