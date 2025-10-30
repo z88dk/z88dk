@@ -52,9 +52,21 @@ void Preprocessor::push_binary_file(const std::string& bin_filename) {
         return;
     }
 
-    // Read all bytes
-    std::vector<unsigned char> bytes((std::istreambuf_iterator<char>(ifs)),
-                                     std::istreambuf_iterator<char>());
+    // Read file contents
+    ifs.seekg(0, std::ios::end);
+    std::streamsize filesize = ifs.tellg();
+    ifs.seekg(0, std::ios::beg);
+
+    std::vector<unsigned char> bytes;
+    if (filesize > 0) {
+        bytes.resize(static_cast<size_t>(filesize));
+        ifs.read(reinterpret_cast<char*>(bytes.data()), filesize);
+    }
+
+    // If no data, nothing to emit
+    if (bytes.empty()) {
+        return;
+    }
 
     // Determine logical filename and starting line number from the top file on stack.
     std::string virt_filename = bin_filename;
@@ -202,7 +214,6 @@ void Preprocessor::define_macro(const std::string& name,
     Macro m;
     m.replacement = replacement;
     m.params.clear();
-    m.is_function = false;
     macros_[name] = std::move(m);
 }
 
@@ -485,6 +496,7 @@ bool Preprocessor::is_directive(const TokensLine& line,
         keyword = line[i].keyword();
         if (keyword_is_directive(keyword)) {
             ++i;
+            line.skip_spaces(i);
             return true;
         }
     }
@@ -507,6 +519,7 @@ bool Preprocessor::is_name_directive(const TokensLine& line, unsigned& i,
             keyword = line[i].keyword();
             if (keyword_is_name_directive(keyword)) {
                 ++i;
+                line.skip_spaces(i);
                 return true;
             }
         }
@@ -693,12 +706,10 @@ void Preprocessor::process_define(const TokensLine& line, unsigned& i) {
     ++i;
 
     // Determine if function-like: must have '(' immediately after name (no space)
-    bool has_args = false;
     std::vector<std::string> params;
     if (i < line.size() && line[i].is(TokenType::LeftParen)) {
         // '(' is immediate -> function-like macro. Delegate parsing to parse_params_list,
         // which will advance `i` past the parameter list on success.
-        has_args = true;
         if (!parse_params_list(line, i, params)) {
             g_errors.error(ErrorCode::InvalidSyntax,
                            "Invalid macro parameter list");
@@ -707,7 +718,7 @@ void Preprocessor::process_define(const TokensLine& line, unsigned& i) {
     }
 
     // Delegate the remaining common work to do_define (consumes rest of line)
-    do_define(line, i, name, has_args, params);
+    do_define(line, i, name, params);
 }
 
 void Preprocessor::process_name_define(const TokensLine& line, unsigned& i,
@@ -718,18 +729,24 @@ void Preprocessor::process_name_define(const TokensLine& line, unsigned& i,
     unsigned j = i;
 
     // Delegate the remaining common work to do_define using local index j.
-    bool has_args = false;
     std::vector<std::string> params;
-    do_define(line, j, name, has_args, params);
+    do_define(line, j, name, params);
 
     // advance caller index past what we consumed
     i = j;
 }
 
 void Preprocessor::do_define(const TokensLine& line, unsigned& i,
-                             const std::string& name, bool has_args,
+                             const std::string& name,
                              const std::vector<std::string>& params) {
     line.skip_spaces(i);
+
+    // scan optional '=' for compatibility
+    line.skip_spaces(i);
+    if (i < line.size() && line[i].is(TokenType::EQ)) {
+        ++i; // skip '='
+        line.skip_spaces(i);
+    }
 
     // collect body tokens (rest of line)
     std::vector<Token> body_tokens;
@@ -756,7 +773,6 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
     }
 
     Macro macro;
-    macro.is_function = has_args;
     macro.params = params;
     macro.replacement.clear();
     macro.replacement.push_back(rep);
@@ -877,7 +893,6 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     const bool consumed_all = is_const && expanded.at_end(ei);
 
     Macro macro;
-    macro.is_function = false;
     macro.params.clear();
     macro.replacement.clear();
 
