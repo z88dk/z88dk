@@ -47,7 +47,14 @@ private:
     struct Macro {
         std::vector<TokensLine> replacement; // replacement token lines
         std::vector<std::string> params;     // parameter names (empty => object-like)
-        bool is_function = false;
+
+        bool is_function_like() const {
+            return !params.empty();
+        }
+
+        bool is_multi_line() const {
+            return replacement.size() > 1;
+        }
     };
 
     struct File {
@@ -141,7 +148,7 @@ private:
     // Consumes the rest of the tokens from `i` (or the provided index) and
     // registers the macro `name`. `i` is updated to the index after what was consumed.
     void do_define(const TokensLine& line, unsigned& i,
-                   const std::string& name, bool has_args,
+                   const std::string& name,
                    const std::vector<std::string>& params);
 
     // UNDEF
