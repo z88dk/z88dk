@@ -13,11 +13,11 @@ target/mc1000/graphics/bksave
 target/mc1000/graphics/bkrestore
 target/mc1000/graphics/swapgfxbk
 target/mc1000/graphics/stencil_render
+@video/mc6847/mc6847.lst
 gfx/narrow/obj/${TARGET}/clrarea2
 gfx/narrow/obj/${TARGET}/fillarea2
 gfx/narrow/obj/${TARGET}/xorclrarea2
 @gfx/narrow/gfx_narrow.lst
-@video/mc6847/mc6847.lst
 
 
 target/mc1000/time/clock
