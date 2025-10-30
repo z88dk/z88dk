@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "expr.h"
 #include "options.h"
 #include "preprocessor.h"
 #include "utils.h"
@@ -537,6 +538,9 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::UNDEF:
         process_undef(line, i);
         break;
+    case Keyword::DEFL:
+        process_defl(line, i);
+        break;
     default:
         assert(0);
     }
@@ -553,6 +557,9 @@ void Preprocessor::process_name_directive(const TokensLine& line,
         break;
     case Keyword::UNDEF:
         process_name_undef(line, i, name);
+        break;
+    case Keyword::DEFL:
+        process_name_defl(line, i, name);
         break;
     default:
         assert(0);
@@ -782,6 +789,113 @@ void Preprocessor::do_undef(const std::string& name, const TokensLine& line,
     expect_end(line, i);
     macros_.erase(name);
     macro_recursion_count_.erase(name);
+}
+
+void Preprocessor::process_defl(const TokensLine& line, unsigned& i) {
+    line.skip_spaces(i);
+    if (!(i < line.size() && line[i].is(TokenType::Identifier))) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected identifier after DEFL");
+    }
+    else {
+        std::string name = line[i].text();
+        ++i;
+        line.skip_spaces(i);
+        if (i < line.size() && line[i].is(TokenType::EQ)) {
+            ++i; // consume '='
+            line.skip_spaces(i);
+        }
+
+        do_defl(line, i, name);
+    }
+}
+
+void Preprocessor::process_name_defl(const TokensLine& line, unsigned& i,
+                                     const std::string& name) {
+    // In the "<name> DEFL" form the identifier to define is provided as `name`.
+    do_defl(line, i, name);
+}
+
+void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
+                           const std::string& name) {
+    // 1) Predefine name as an empty macro if it does not exist, so that
+    //    occurrences of <name> in the body expand to the previous value (if any)
+    //    or to empty otherwise.
+    const bool had_prev = (macros_.find(name) != macros_.end());
+    if (!had_prev) {
+        TokensLine empty(line.location());
+        std::vector<TokensLine> empty_rep{ empty };
+        define_macro(name, empty_rep);
+    }
+
+    // 2) Collect all tokens up to end-of-line from current index.
+    TokensLine body(line.location());
+    {
+        line.skip_spaces(i);
+        while (i < line.size()) {
+            body.push_back(line[i]);
+            ++i;
+        }
+
+        if (body.empty()) {
+            // If no body, replace it with integer token '1'
+            body.push_back(Token(TokenType::Integer, "1", 1));
+        }
+    }
+
+    // 3) Expand macros in the body (if 'name' is used here, it expands to the
+    //    previous value, or empty when none existed).
+    std::vector<TokensLine> expanded_lines = expand_macros(std::vector<TokensLine> { body });
+
+    // 4) Flatten expanded lines into a single TokensLine (insert a single space between lines)
+    TokensLine expanded(line.location());
+    for (size_t li = 0; li < expanded_lines.size(); ++li) {
+        const TokensLine& el = expanded_lines[li];
+        if (li > 0) {
+            // insert a space between lines to avoid token merging
+            expanded.push_back(Token(TokenType::Whitespace, " "));
+        }
+        for (unsigned t = 0; t < el.size(); ++t) {
+            expanded.push_back(el[t]);
+        }
+    }
+
+    // Trim trailing whitespace for cleanliness (does not change semantics)
+    while (expanded.size() > 0
+            && expanded[expanded.size() - 1].is(TokenType::Whitespace)) {
+        expanded.pop_back();
+    }
+
+    // 5) Try to evaluate as a constant expression.
+    //    If it parses successfully AND consumes the whole body, define <name>
+    //    as the resulting integer. Otherwise, define <name> as the whole expanded body.
+    int value = 0;
+    unsigned ei = 0;
+    bool is_const = eval_const_expr(expanded, ei, value);
+
+    // Check that the expression consumed the whole body (ignoring trailing spaces).
+    const bool consumed_all = is_const && expanded.at_end(ei);
+
+    Macro macro;
+    macro.is_function = false;
+    macro.params.clear();
+    macro.replacement.clear();
+
+    if (consumed_all) {
+        // define as integer result
+        TokensLine rep(expanded.location());
+        rep.push_back(Token(TokenType::Integer, std::to_string(value), value));
+        macro.replacement.push_back(rep);
+    }
+    else {
+        // define with the whole expanded body (as-is)
+        macro.replacement.push_back(expanded);
+    }
+
+    // 6) Register/overwrite the macro definition of <name>.
+    macros_[name] = std::move(macro);
+    // Reset recursion guard counter for this macro name (safe guard)
+    macro_recursion_count_[name] = 0;
 }
 
 void Preprocessor::split_lines(const Location& location,

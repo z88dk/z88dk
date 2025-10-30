@@ -151,6 +151,13 @@ private:
     // New helper for shared UNDEF behavior
     void do_undef(const std::string& name, const TokensLine& line, unsigned& i);
 
+    // DEFL
+    void process_defl(const TokensLine& line, unsigned& i);
+    void process_name_defl(const TokensLine& line, unsigned& i,
+                           const std::string& name);
+    void do_defl(const TokensLine& line, unsigned& i,
+                 const std::string& name);
+
     // Macro expansion and line splitting
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);
