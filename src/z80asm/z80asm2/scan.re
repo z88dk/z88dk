@@ -136,8 +136,7 @@ main_loop:
                 goto string_loop;
             }
             else {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LT);
+                PUSH_TOKEN1(TokenType::LT);
                 continue; 
             }
         }
@@ -153,56 +152,31 @@ main_loop:
         '{'		{ PUSH_TOKEN1(TokenType::LeftBrace); continue; }
         '}'		{ PUSH_TOKEN1(TokenType::RightBrace); continue; }
 
-        '#'     { PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Hash); continue; }
-        '##'    { PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::DoubleHash); continue; }
-        ':'     { PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Colon); continue; }
-        '?'     { PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Quest); continue; }
-        '!'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalNot); continue; }
-        '%'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Modulus); continue; }
-        '&'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseAnd); continue; }
-        '&&'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalAnd); continue; }
-        '*'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Multiply); continue; }
-        '**'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Power); continue; }
-        '+'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Plus); continue; }
-        '-'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Minus); continue; }
-        '/'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Divide); continue; }
-        '<='		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LE); continue; }
-        '<<'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::ShiftLeft); continue; }
-        '='  | '=='		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::EQ); continue; }
-        '!=' | '<>'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::NE); continue; }
-        '>'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::GT); continue; }
-        '>='		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::GE); continue; }
-        '>>'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::ShiftRight); continue; }
-        '^'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseXor); continue; }
-        '^^'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalXor); continue; }
-        '|'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseOr); continue; }
-        '||'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalOr); continue; }
-        '~'		{ PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseNot); continue; }
+        '#'     { PUSH_TOKEN1(TokenType::Hash); continue; }
+        '##'    { PUSH_TOKEN1(TokenType::DoubleHash); continue; }
+        ':'     { PUSH_TOKEN1(TokenType::Colon); continue; }
+        '?'     { PUSH_TOKEN1(TokenType::Quest); continue; }
+        '!'		{ PUSH_TOKEN1(TokenType::LogicalNot); continue; }
+        '%'		{ PUSH_TOKEN1(TokenType::Modulus); continue; }
+        '&'		{ PUSH_TOKEN1(TokenType::BitwiseAnd); continue; }
+        '&&'		{ PUSH_TOKEN1(TokenType::LogicalAnd); continue; }
+        '*'		{ PUSH_TOKEN1(TokenType::Multiply); continue; }
+        '**'		{ PUSH_TOKEN1(TokenType::Power); continue; }
+        '+'		{ PUSH_TOKEN1(TokenType::Plus); continue; }
+        '-'		{ PUSH_TOKEN1(TokenType::Minus); continue; }
+        '/'		{ PUSH_TOKEN1(TokenType::Divide); continue; }
+        '<='		{ PUSH_TOKEN1(TokenType::LE); continue; }
+        '<<'		{ PUSH_TOKEN1(TokenType::ShiftLeft); continue; }
+        '='  | '=='		{ PUSH_TOKEN1(TokenType::EQ); continue; }
+        '!=' | '<>'		{ PUSH_TOKEN1(TokenType::NE); continue; }
+        '>'		{ PUSH_TOKEN1(TokenType::GT); continue; }
+        '>='		{ PUSH_TOKEN1(TokenType::GE); continue; }
+        '>>'		{ PUSH_TOKEN1(TokenType::ShiftRight); continue; }
+        '^'		{ PUSH_TOKEN1(TokenType::BitwiseXor); continue; }
+        '^^'		{ PUSH_TOKEN1(TokenType::LogicalXor); continue; }
+        '|'		{ PUSH_TOKEN1(TokenType::BitwiseOr); continue; }
+        '||'		{ PUSH_TOKEN1(TokenType::LogicalOr); continue; }
+        '~'		{ PUSH_TOKEN1(TokenType::BitwiseNot); continue; }
 
         mantissa exp? 	{
             PUSH_TOKEN2(TokenType::Float, std::stod(str));

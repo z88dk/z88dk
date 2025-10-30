@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "lexer.h"
 #include "utils.h"
+#include <algorithm>
 
 Token::Token(TokenType type, const std::string& text)
     : type_(type), text_(text) {
@@ -31,10 +32,6 @@ Token::Token(TokenType type, const std::string& text, Keyword keyword)
     : type_(type), text_(text), keyword_(keyword) {
 }
 
-Token::Token(TokenType type, const std::string& text, OperatorType op)
-    : type_(type), text_(text), op_(op) {
-}
-
 bool Token::is(TokenType t) const {
     return type_ == t;
 }
@@ -49,14 +46,6 @@ bool Token::is(Keyword kw) const {
 
 bool Token::is_not(Keyword kw) const {
     return keyword_ != kw;
-}
-
-bool Token::is(OperatorType op) const {
-    return op_ == op;
-}
-
-bool Token::is_not(OperatorType op) const {
-    return op_ != op;
 }
 
 // Read-only accessors
@@ -78,10 +67,6 @@ double Token::float_value() const {
 
 const std::string& Token::string_value() const {
     return string_value_;
-}
-
-OperatorType Token::op() const {
-    return op_;
 }
 
 Keyword Token::keyword() const {
@@ -151,13 +136,69 @@ unsigned TokensLine::size() const {
 }
 
 // Reconstruct the line by concatenating the original token texts in order.
+// Insert spaces where necessary to avoid accidental re-scanning into different tokens:
+//  - always insert a space between Identifier, Integer and Float tokens when adjacent
+//  - insert a space between tokens whose concatenation would form a multi-character operator
 std::string TokensLine::to_string() const {
     std::string out;
     out.reserve(tokens_.size() * 4);
-    for (const auto& tok : tokens_) {
+
+    // list of multi-character operator strings that must not be produced by direct concatenation
+    static const std::vector<std::string> problematic = {
+        "<<", ">>", "<=", ">=", "==", "!=", "<>",
+        "&&", "||", "^^", "**", "##"
+    };
+
+    auto is_idnum = [](TokenType t) {
+        return t == TokenType::Identifier || t == TokenType::Integer
+               || t == TokenType::Float;
+    };
+
+    for (unsigned i = 0; i < tokens_.size(); ++i) {
+        const auto& tok = tokens_[i];
+
+        // If this is not the first token, consider inserting a separator space.
+        if (!out.empty()) {
+            const auto& prev = tokens_[i - 1];
+
+            bool need_space = false;
+
+            // If either token is explicit whitespace, just concatenate token.text() (whitespace preserved).
+            if (!prev.is(TokenType::Whitespace) && !tok.is(TokenType::Whitespace)) {
+                // Insert space between identifier/number-like tokens to avoid e.g. "foo123" -> "foo 123"
+                if (is_idnum(prev.type()) && is_idnum(tok.type())) {
+                    need_space = true;
+                }
+                else {
+                    // If concatenation of texts would form a problematic multi-char operator, insert space.
+                    std::string concat = prev.text() + tok.text();
+                    if (std::find(problematic.begin(), problematic.end(),
+                                  concat) != problematic.end()) {
+                        need_space = true;
+                    }
+                }
+            }
+
+            if (need_space) {
+                out += ' ';
+            }
+        }
+
         out += tok.text();
     }
+
     return out;
+}
+
+void TokensLine::skip_spaces(unsigned& i) const {
+    while (i < size() && tokens_[i].is(TokenType::Whitespace)) {
+        ++i;
+    }
+}
+
+bool TokensLine::at_end(unsigned& i) const {
+    skip_spaces(i);
+    return i >= size();
 }
 
 //-----------------------------------------------------------------------------

@@ -18,7 +18,6 @@ enum class TokenType {
     Integer,
     Float,
     String,
-    Operator,
     Backslash,
     Comma,
     Dot,
@@ -29,10 +28,6 @@ enum class TokenType {
     LeftBrace,
     RightBrace,
     Whitespace,
-};
-
-enum class OperatorType {
-    None,
     Power,
     UnaryPlus,
     UnaryMinus,
@@ -71,14 +66,11 @@ public:
     explicit Token(TokenType type, const std::string& text, double value);
     explicit Token(TokenType type, const std::string& text, std::string value);
     explicit Token(TokenType type, const std::string& text, Keyword keyword);
-    explicit Token(TokenType type, const std::string& text, OperatorType op);
 
     bool is(TokenType t) const;
     bool is_not(TokenType t) const;
     bool is(Keyword kw) const;
     bool is_not(Keyword kw) const;
-    bool is(OperatorType op) const;
-    bool is_not(OperatorType op) const;
 
     // Read-only accessors
     TokenType type() const;
@@ -86,7 +78,6 @@ public:
     int int_value() const;
     double float_value() const;
     const std::string& string_value() const;
-    OperatorType op() const;
     Keyword keyword() const;
 
 private:
@@ -95,7 +86,6 @@ private:
     int int_value_ = 0;           // Used if type == Integer
     double float_value_ = 0.0;    // Used if type == Float
     std::string string_value_;    // Used if type == String (escape-resolved)
-    OperatorType op_ = OperatorType::None; // Used if type == Operator
     Keyword keyword_ = Keyword::None; // Used if type == Identifier and is a keyword
 };
 
@@ -117,6 +107,8 @@ public:
     const std::vector<Token>& tokens() const;
     unsigned size() const;
     std::string to_string() const;
+    void skip_spaces(unsigned& i) const;
+    bool at_end(unsigned& i) const;
 
 private:
     Location location_;             // Location of this line

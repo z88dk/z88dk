@@ -6,3 +6,10 @@
 
 #pragma once
 
+#include "lexer.h"
+
+// Evaluate a C-style constant expression starting at p.
+// Advances p to the first character after the parsed expression.
+// Returns true on success and the evaluated integer
+// return false and p unchanged on failure.
+bool eval_const_expr(const TokensLine& line, unsigned& i, int& value);
