@@ -136,6 +136,59 @@ TEST_CASE("parse_int_from_chars invalid inputs and edge cases",
     REQUIRE_FALSE(parse_int_from_chars(overflow_str, 10, out));
 }
 
+TEST_CASE("parse_int_from_chars ignores underscores in digit strings (valid cases)",
+          "[parse_int_from_chars][underscores]") {
+    int out = 0;
+
+    // Decimal (with and without sign)
+    REQUIRE(parse_int_from_chars("1_234", 10, out));
+    REQUIRE(out == 1234);
+    REQUIRE(parse_int_from_chars("-1_234", 10, out));
+    REQUIRE(out == -1234);
+
+    // Decimal with multiple, clustered underscores
+    REQUIRE(parse_int_from_chars("1___2__3", 10, out));
+    REQUIRE(out == 123);
+
+    // Hex (explicit base 16)
+    REQUIRE(parse_int_from_chars("1A_2F", 16, out));
+    REQUIRE(out == 0x1A2F);
+
+    // Hex with 0x/0X prefix (base argument will be overridden to 16)
+    REQUIRE(parse_int_from_chars("0xAB_CD", 10, out));
+    REQUIRE(out == 0xABCD);
+    REQUIRE(parse_int_from_chars("0X_E_AD_BE_EF", 16, out));
+    REQUIRE(out == 0xEADBEEF);
+
+    // Binary
+    REQUIRE(parse_int_from_chars("1010_1100", 2, out));
+    REQUIRE(out == 0b10101100);
+
+    // Octal
+    REQUIRE(parse_int_from_chars("7_5", 8, out));
+    REQUIRE(out == 075);
+}
+
+TEST_CASE("parse_int_from_chars with underscores: invalid inputs and overflow",
+          "[parse_int_from_chars][underscores][invalid]") {
+    int out = 0;
+
+    // Invalid character remains invalid after removing underscores
+    REQUIRE_FALSE(parse_int_from_chars("12_3G", 10,
+                                       out));   // 'G' invalid for base 10
+    REQUIRE_FALSE(parse_int_from_chars("1Z_2", 16, out));    // 'Z' invalid hex
+
+    // Overflow even with separators
+    const long long over = static_cast<long long>(std::numeric_limits<int>::max()) +
+                           1LL;
+    std::string over_str = std::to_string(over);
+    // Insert some underscores into the string (e.g., 2147_483_648 for INT_MAX+1 on 32-bit)
+    if (over_str.size() > 4) {
+        over_str.insert(over_str.begin() + 4, '_');
+    }
+    REQUIRE_FALSE(parse_int_from_chars(over_str, 10, out));
+}
+
 // -----------------------------------------------------------------------------
 // Tests for escape_string (added earlier)
 // -----------------------------------------------------------------------------
