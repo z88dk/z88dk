@@ -25,6 +25,7 @@ std::string escape_string(const std::string& s);
 
 // convert string to int of given base (2..36), returns false on error
 bool parse_int_from_chars(const std::string& s, int base, int& out);
+bool parse_float_from_chars(const std::string& s, double& out);
 
 // read/write whole file to/from a string (throws std::runtime_error on error)
 std::string read_file_to_string(const std::string& filename);

@@ -179,3 +179,58 @@ TEST_CASE("Division or modulus by zero fails and leaves index unchanged",
     REQUIRE(idx == 0);
 }
 
+// Additional error coverage for expression parsing
+
+TEST_CASE("Empty expression fails to tokenize", "[expr][error][empty]") {
+    g_options = Options();
+    std::string content = "\n";
+    TokensFile tf(content, "expr_empty", 1);
+    REQUIRE(tf.tok_lines_count() == 0);
+}
+
+TEST_CASE("Expression syntax errors return false and leave index unchanged",
+          "[expr][error][syntax]") {
+    g_options = Options();
+
+    // Each expression below should tokenize to one line, eval_const_expr should fail,
+    // and the evaluation index must remain at 0 (unchanged).
+    const std::vector<std::string> cases = {
+        ")",            // unexpected closing paren
+        "(",            // unterminated opening paren
+        "(1 + 2",       // missing closing paren
+        "1 + (2 * 3",   // missing closing paren in nested expression
+        "1 +",          // missing RHS operand
+        "* 1",          // missing LHS operand (prefix '*' without operand)
+        "1 <<",         // missing RHS shift amount
+        "<< 1",         // missing LHS value for shift
+        "!",            // missing operand for logical not
+        "~",            // missing operand for bitwise not
+        ":",            // lone colon
+        "1 ?",          // ternary missing true/false parts
+        "1 ? 2",        // ternary missing ':' and false part
+        "1 ? : 2",      // ternary missing true part
+        "? 2 : 3",      // ternary missing condition
+        "1 ? 2 : "      // ternary missing false part
+        "foo"           // not a number or valid expression start
+    };
+
+    for (const auto& expr : cases) {
+        INFO("Expr: [" << expr << "]");
+        std::string content = expr + "\n";
+        TokensFile tf(content, "expr_err", 1);
+
+        // If lexing failed entirely, skip this entry (covered by other lexer tests).
+        if (tf.tok_lines_count() == 0) {
+            continue;
+        }
+
+        const TokensLine& tl = tf.get_tok_line(0);
+
+        unsigned idx = 0;
+        int val = 0;
+        bool ok = eval_const_expr(tl, idx, val);
+        REQUIRE(ok == false);
+        REQUIRE(idx == 0); // on failure, parser should not advance
+    }
+}
+

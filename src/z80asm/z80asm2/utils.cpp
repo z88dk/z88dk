@@ -147,8 +147,7 @@ void write_string_to_file(const std::string& filename,
     }
 }
 
-bool parse_int_from_chars(const std::string& s, int base, int& out) {
-    // Copy input and remove all underscore separators
+static std::string remove_underscores(const std::string& s) {
     std::string t;
     t.reserve(s.size());
     for (char c : s) {
@@ -156,6 +155,12 @@ bool parse_int_from_chars(const std::string& s, int base, int& out) {
             t.push_back(c);
         }
     }
+    return t;
+}
+
+bool parse_int_from_chars(const std::string& s, int base, int& out) {
+    // Copy input and remove all underscore separators
+    std::string t = trim(remove_underscores(s));
 
     // Handle 0x/0X hexadecimal prefix
     if (t.size() >= 2 && t[0] == '0' && (t[1] == 'x' || t[1] == 'X')) {
@@ -173,4 +178,31 @@ bool parse_int_from_chars(const std::string& s, int base, int& out) {
     }
     out = value;
     return true;
+}
+
+bool parse_float_from_chars(const std::string& s, double& out) {
+    // Copy input and remove all underscore separators
+    std::string t = trim(remove_underscores(s));
+    if (t.empty()) {
+        return false;
+    }
+
+    size_t pos = 0;
+    try {
+        double v = std::stod(t, &pos);
+        // Reject if stod didn't consume the whole string (e.g., "1.23foo")
+        if (pos != t.size()) {
+            return false;
+        }
+        out = v;
+        return true;
+    }
+    catch (const std::invalid_argument&) {
+        // No conversion could be performed (e.g., ".", "e10", "1.e+")
+        return false;
+    }
+    catch (const std::out_of_range&) {
+        // Value out of range for double
+        return false;
+    }
 }

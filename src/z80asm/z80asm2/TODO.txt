@@ -1,4 +1,3 @@
-- tokenize lines as they are read from file
-- use enum-tokens instead of string compare
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
+- ## must be handled in macro expansion, as the pasted token can be a macro name
