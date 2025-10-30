@@ -1263,3 +1263,109 @@ TEST_CASE("Preprocessor: DoubleHash '##' supports multiple pastes in the same li
     REQUIRE(foundAB);
     REQUIRE(foundCD);
 }
+
+// -----------------------------------------------------------------------------
+// New tests for DEFL directive (both variants) and using previous value
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: DEFL infix 'name DEFL expr' defines and replaces symbol",
+          "[preprocessor][defl][infix]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "idx DEFL 7\n"
+        "idx\n";
+    pp.push_virtual_file(content, "defl_infix", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 7);
+}
+
+TEST_CASE("Preprocessor: DEFL prefix 'DEFL name=expr' defines and replaces symbol",
+          "[preprocessor][defl][prefix]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "DEFL count=9\n"
+        "count\n";
+    pp.push_virtual_file(content, "defl_prefix", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 9);
+}
+
+TEST_CASE("Preprocessor: DEFL can use previous value (DEFL index=index+1)",
+          "[preprocessor][defl][previous]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "index DEFL 0\n"
+        "DEFL index=index+1\n"
+        "DEFL index=index+1\n"
+        "index\n";
+    pp.push_virtual_file(content, "defl_prev", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 2);
+}
+
+// -----------------------------------------------------------------------------
+// New test: DEFL with non-constant expression stores macro-expanded body
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma list) and expands at use sites",
+          "[preprocessor][defl][nonconst]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // LIST expands to "10, 20" (a non-constant expression for eval_const_expr).
+    // DEFL P=LIST should store the expanded body so that "db P" becomes "db 10,20".
+    const std::string content =
+        "#define A 10\n"
+        "#define B 20\n"
+        "#define LIST A, B\n"
+        "DEFL P=LIST\n"
+        "db P\n";
+    pp.push_virtual_file(content, "defl_nonconst", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(
+                line)); // expect the "db P" line after directives are consumed
+
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() >= 5);
+    // First token should be the directive/identifier "db"
+    REQUIRE(toks[0].text() == "db");
+
+    // Collect integers and commas after "db"
+    std::vector<int> ints;
+    int commas = 0;
+    for (size_t i = 1; i < toks.size(); ++i) {
+        if (toks[i].is(TokenType::Integer)) {
+            ints.push_back(toks[i].int_value());
+        }
+        else if (toks[i].is(TokenType::Comma)) {
+            ++commas;
+        }
+    }
+
+    REQUIRE(ints.size() == 2);
+    REQUIRE(ints[0] == 10);
+    REQUIRE(ints[1] == 20);
+    REQUIRE(commas == 1);
+}
