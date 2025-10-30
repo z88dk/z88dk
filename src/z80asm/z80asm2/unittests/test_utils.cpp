@@ -95,6 +95,12 @@ TEST_CASE("parse_int_from_chars valid conversions", "[parse_int_from_chars]") {
     REQUIRE(parse_int_from_chars("123", 10, out));
     REQUIRE(out == 123);
 
+    REQUIRE(parse_int_from_chars("  123", 10, out));
+    REQUIRE(out == 123);
+
+    REQUIRE(parse_int_from_chars("123  ", 10, out));
+    REQUIRE(out == 123);
+
     REQUIRE(parse_int_from_chars("-42", 10, out));
     REQUIRE(out == -42);
 
@@ -117,10 +123,6 @@ TEST_CASE("parse_int_from_chars invalid inputs and edge cases",
 
     // empty string
     REQUIRE_FALSE(parse_int_from_chars("", 10, out));
-
-    // leading or trailing whitespace is not accepted (function expects exact match)
-    REQUIRE_FALSE(parse_int_from_chars(" 42", 10, out));
-    REQUIRE_FALSE(parse_int_from_chars("42 ", 10, out));
 
     // trailing non-numeric characters
     REQUIRE_FALSE(parse_int_from_chars("123abc", 10, out));
@@ -276,5 +278,99 @@ TEST_CASE("str_ends_with detects suffix correctly", "[str_ends_with]") {
                                 "a"));          // non-empty ending can't match empty string
     REQUIRE(str_ends_with("", ""));                 // empty ends-with empty -> true
     REQUIRE_FALSE(str_ends_with("short", "longer_suffix"));
+}
+
+// -----------------------------------------------------------------------------
+// Tests for parse_float_from_chars (previously untested)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("parse_float_from_chars valid conversions (mantissa and exponent)",
+          "[parse_float_from_chars][valid]") {
+    double out = 0.0;
+
+    // Basic forms
+    REQUIRE(parse_float_from_chars("123.0", out));
+    REQUIRE(out == Catch::Approx(123.0).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("  123.0", out));
+    REQUIRE(out == Catch::Approx(123.0).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("123.0  ", out));
+    REQUIRE(out == Catch::Approx(123.0).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars(".5", out));
+    REQUIRE(out == Catch::Approx(0.5).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("1.", out));
+    REQUIRE(out == Catch::Approx(1.0).epsilon(1e-12));
+
+    // Exponents
+    REQUIRE(parse_float_from_chars("1e2", out));
+    REQUIRE(out == Catch::Approx(100.0).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("1E+3", out));
+    REQUIRE(out == Catch::Approx(1000.0).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("-2.5e-1", out));
+    REQUIRE(out == Catch::Approx(-0.25).epsilon(1e-12));
+}
+
+TEST_CASE("parse_float_from_chars accepts underscores anywhere (they are ignored)",
+          "[parse_float_from_chars][underscores]") {
+    double out = 0.0;
+
+    // Underscores in integer and fractional parts
+    REQUIRE(parse_float_from_chars("1_234.5", out));
+    REQUIRE(out == Catch::Approx(1234.5).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("12.3_45", out));
+    REQUIRE(out == Catch::Approx(12.345).epsilon(1e-12));
+
+    // Underscores in exponent part
+    REQUIRE(parse_float_from_chars("1.25e1_2", out));
+    REQUIRE(out == Catch::Approx(1.25e12).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("3.0e-0_3", out));
+    REQUIRE(out == Catch::Approx(3.0e-3).epsilon(1e-12));
+
+    // Combined underscore usage (permissive in utils: underscores are simply removed)
+    REQUIRE(parse_float_from_chars("4_2.e0_0", out));
+    REQUIRE(out == Catch::Approx(42.0).epsilon(1e-12));
+
+    // Edge underscore placements that are rejected by the lexer are still accepted by utils
+    REQUIRE(parse_float_from_chars("1_.2", out));  // becomes "1.2"
+    REQUIRE(out == Catch::Approx(1.2).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("1._", out));   // becomes "1."
+    REQUIRE(out == Catch::Approx(1.0).epsilon(1e-12));
+
+    REQUIRE(parse_float_from_chars("._5", out));   // becomes ".5"
+    REQUIRE(out == Catch::Approx(0.5).epsilon(1e-12));
+}
+
+TEST_CASE("parse_float_from_chars invalid inputs and edge cases",
+          "[parse_float_from_chars][invalid]") {
+    double out = 0.0;
+
+    // Empty string
+    REQUIRE_FALSE(parse_float_from_chars("", out));
+
+    // Trailing non-numeric characters
+    REQUIRE_FALSE(parse_float_from_chars("1.23foo", out));
+
+    // Missing exponent digits
+    REQUIRE_FALSE(parse_float_from_chars("1.e", out));
+    REQUIRE_FALSE(parse_float_from_chars("1.e+", out));
+    REQUIRE_FALSE(parse_float_from_chars("1.e-", out));
+    REQUIRE_FALSE(parse_float_from_chars(".5E", out));
+    REQUIRE_FALSE(parse_float_from_chars(".5E+", out));
+
+    // Multiple exponent signs or duplicated 'e'
+    REQUIRE_FALSE(parse_float_from_chars("1.2e++3", out));
+    REQUIRE_FALSE(parse_float_from_chars("1.2e--3", out));
+    REQUIRE_FALSE(parse_float_from_chars("1.2ee3", out));
+
+    // Out of range for double (platform-dependent, but 1e309 should overflow IEEE-754 double)
+    REQUIRE_FALSE(parse_float_from_chars("1e309", out));
 }
 

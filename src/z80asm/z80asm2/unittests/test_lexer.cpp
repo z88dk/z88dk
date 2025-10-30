@@ -1056,7 +1056,7 @@ TEST_CASE("TokensFile parses integer literals with underscores as digit separato
     // - hex with '$' and '0x' prefixes
     // - binary with trailing 'b', and '%' / '@' / '0b' prefixes
     const std::string content =
-        "1_234 1_234d 1A_2h 1a_2H $FF_FF 0xAB_CD 1010_1100b %1010_1100 @1010_1100 0b1010_1100\n";
+        "1_234 1_234d 1_234D 1A_2h 1a_2H $FF_FF 0xAB_CD 1010_1100b %1010_1100 @1010_1100 0b1010_1100\n";
     TokensFile tf(content, "int_underscores", 1);
 
     REQUIRE(tf.tok_lines_count() == 1);
@@ -1073,6 +1073,7 @@ TEST_CASE("TokensFile parses integer literals with underscores as digit separato
     std::vector<int> expected = {
         1234,         // "1_234"
         1234,         // "1_234d"
+        1234,         // "1_234D"
         0x1A2,        // "1A_2h"
         0x1A2,        // "1a_2H"
         0xFFFF,       // "$FF_FF"
@@ -1155,3 +1156,434 @@ TEST_CASE("Lexer parses floats with underscores in exponent part (and combined)"
         REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
     }
 }
+
+// New tests: verify invalid digit sequences are rejected
+
+TEST_CASE("Lexer rejects invalid underscore placements in integer/hex/binary literals",
+          "[lexer][integers][underscores][invalid]") {
+    g_options = Options();
+
+    // Each case should trigger a lex error and produce no tokenized lines
+    std::vector<std::string> cases = {
+        "1_\n",         // decimal trailing underscore
+        "123_d\n",      // underscore before optional 'd' suffix
+        "$FF_\n",       // hex ($) with trailing underscore
+        "0xAB__\n",     // hex (0x) with trailing underscores
+        "1010_b\n",     // underscore before 'b' suffix
+        "%1010_\n",     // prefixed binary with trailing underscore
+        "@1010_\n",     // prefixed binary (@) with trailing underscore
+        "0b1010_\n"     // 0b with trailing underscore
+    };
+
+    for (const auto& content : cases) {
+        g_errors.reset();
+        TokensFile tf(content, "invalid_num_underscores", 1);
+        REQUIRE(tf.tok_lines_count() == 0);
+        REQUIRE(g_errors.has_errors());
+    }
+}
+
+TEST_CASE("Lexer rejects invalid underscore placements in floats",
+          "[lexer][float][underscores][invalid]") {
+    g_options = Options();
+
+    // Invalid placements around dot or exponent
+    std::vector<std::string> cases = {
+        "1_.2\n",     // underscore at end of integer part before '.'
+        "1._2\n",     // underscore immediately after '.'
+        ".1_\n",      // trailing underscore after fractional part
+        "1._\n",      // underscore after '.' with no fractional digit
+        "1.2e_3\n",   // underscore starts exponent digits
+        "1.2e+_3\n"   // underscore immediately after exponent sign
+    };
+
+    for (const auto& content : cases) {
+        g_errors.reset();
+        TokensFile tf(content, "invalid_float_underscores", 1);
+        REQUIRE(tf.tok_lines_count() == 0);
+        REQUIRE(g_errors.has_errors());
+    }
+}
+
+// New tests: verify all supported floating-point formats (with and without exponent) parse correctly
+TEST_CASE("Lexer parses canonical floating-point formats (mantissa with optional exponent)",
+          "[lexer][float][canonical]") {
+    g_options = Options();
+
+    // Supported forms (a dot is required by the grammar):
+    //  - dec+ '.' dec*        -> "123."      (fractional part optional)
+    //  - dec* '.' dec+        -> ".789"      (integer part optional)
+    //  - mantissa [eE][+-]?dec -> "1.e2", ".5E-2", "42.e+0"
+    const std::string content = "123.456 123. .789 1.e2 .5E-2 42.e+0\n";
+    TokensFile tf(content, "float_canonical", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    std::vector<double> found;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Float)) {
+            found.push_back(t.float_value());
+        }
+    }
+
+    std::vector<double> expected = {
+        123.456,   // "123.456"
+        123.0,     // "123."
+        0.789,     // ".789"
+        100.0,     // "1.e2"
+        0.005,     // ".5E-2"
+        42.0       // "42.e+0"
+    };
+
+    REQUIRE(found.size() == expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
+    }
+}
+
+// New test: verify that a number immediately followed by letters is rejected (e.g., 123abc)
+TEST_CASE("Lexer rejects numbers immediately followed by letters",
+          "[lexer][invalid][trailing]") {
+    g_options = Options();
+
+    // Each case should trigger an error: "Invalid character"
+    // Use forms across all numeric syntaxes to ensure consistent behavior.
+    std::vector<std::string> cases = {
+        "123abc\n",        // decimal + letters
+        "12dxyz\n",        // decimal with optional 'd' then letters
+        "1.23foo\n",       // float with letters
+        "1.e2bar\n",       // float with exponent then letters
+        "0x12ABxyz\n",     // hex 0x... then letters
+        "$C0DExyz\n",      // hex $... then letters
+        "1A2hBAD\n",       // hex with trailing 'h' then letters
+        "1010bfoo\n",      // binary with trailing 'b' then letters
+        "%1010bar\n",      // binary with % prefix then letters
+        "@1010bar\n",      // binary with @ prefix then letters
+        "0b1010bar\n"      // binary with 0b prefix then letters
+    };
+
+    for (const auto& content : cases) {
+        g_errors.reset();
+        TokensFile tf(content, "num_trailing_letters", 1);
+        REQUIRE(tf.tok_lines_count() == 0);
+        REQUIRE(g_errors.has_errors());
+        const std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Invalid character") != std::string::npos);
+        REQUIRE(msg.find("num_trailing_letters:1:") != std::string::npos);
+    }
+}
+
+// New test: verify that 0x without following digits is rejected
+TEST_CASE("Lexer rejects 0x prefix without digits",
+          "[lexer][invalid][prefix]") {
+    g_options = Options();
+
+    struct Case {
+        const char* text;
+        const char* fname;
+    } cases[] = {
+        { "0x\n", "hex_prefix_no_digits" },
+    };
+
+    for (const auto& c : cases) {
+        g_errors.reset();
+        TokensFile tf(c.text, c.fname, 1);
+
+        // Tokenization should fail and produce no token lines
+        REQUIRE(tf.tok_lines_count() == 0);
+        REQUIRE(g_errors.has_errors());
+
+        const std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Invalid character") != std::string::npos);
+        REQUIRE(msg.find(std::string(c.fname) + ":1:") != std::string::npos);
+    }
+}
+
+// New test: verify that "0b" is accepted as a valid binary zero
+TEST_CASE("Lexer accepts '0b' as binary zero",
+          "[lexer][binary][zero]") {
+    g_options = Options();
+
+    const std::string content = "0b\n";
+    TokensFile tf(content, "zero_0b", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 0);
+    REQUIRE(toks[0].text() == "0b");
+}
+
+// New tests: verify malformed floats (missing exponent digits, multiple signs, dangling e/E) are rejected
+TEST_CASE("Lexer rejects malformed floats (missing exponent digits, multiple signs, dangling e/E)",
+          "[lexer][float][invalid][malformed]") {
+    g_options = Options();
+
+    struct Case {
+        const char* text;
+        const char* fname;
+    } cases[] = {
+        { "1.e\n",          "malformed_float_1" },  // 'e' without digits
+        { "1.e+\n",         "malformed_float_2" },  // 'e+' without digits
+        { "1.e-\n",         "malformed_float_3" },  // 'e-' without digits
+        { "1.23e\n",        "malformed_float_4" },  // missing exponent digits
+        { ".5E\n",          "malformed_float_5" },  // missing exponent digits (uppercase E)
+        { ".5E+\n",         "malformed_float_6" },  // sign but no digits
+        { "1.2e++3\n",      "malformed_float_7" },  // multiple signs in exponent
+        { "1.2e--3\n",      "malformed_float_8" },  // multiple signs in exponent
+        { "1.2ee3\n",       "malformed_float_9" },  // double 'e'
+        { "0.ee\n",         "malformed_float_10" }, // mantissa with '.' then dangling 'ee'
+        { "0._e2\n",        "malformed_float_11" }  // underscore after '.' then 'e' (already invalid, ensure rejected)
+    };
+
+    for (const auto& c : cases) {
+        g_errors.reset();
+        TokensFile tf(c.text, c.fname, 1);
+
+        // Tokenization should fail and produce no token lines
+        REQUIRE(tf.tok_lines_count() == 0);
+        REQUIRE(g_errors.has_errors());
+
+        const std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Invalid character") != std::string::npos);
+        REQUIRE(msg.find(std::string(c.fname) + ":1:") != std::string::npos);
+    }
+}
+
+// New tests: verify single-quoted character constants are Integer and accept C-escapes plus \e
+TEST_CASE("Single-quoted C escape sequences are converted to Integer (including \\e)",
+          "[lexer][char][escapes]") {
+    g_options = Options();
+
+    struct Case {
+        const char* line;     // one line input including newline
+        int expected;         // expected integer value
+        const char* text;     // expected token original text
+    } cases[] = {
+        { "'\\a'\n",   static_cast<int>('\a'), "'\\a'" },
+        { "'\\b'\n",   static_cast<int>('\b'), "'\\b'" },
+        { "'\\e'\n",   0x1B,                    "'\\e'" }, // non-standard C, supported by lexer
+        { "'\\f'\n",   static_cast<int>('\f'), "'\\f'" },
+        { "'\\n'\n",   static_cast<int>('\n'), "'\\n'" },
+        { "'\\r'\n",   static_cast<int>('\r'), "'\\r'" },
+        { "'\\t'\n",   static_cast<int>('\t'), "'\\t'" },
+        { "'\\v'\n",   static_cast<int>('\v'), "'\\v'" },
+        { "'\\\\'\n",  static_cast<int>('\\'), "'\\\\'" },
+        { "'\\''\n",   static_cast<int>('\''), "'\\''" },
+        { "'\"'\n",    static_cast<int>('\"'), "'\"'"   }, // double-quote does not require escaping
+        { "'\\\"'\n",  static_cast<int>('\"'), "'\\\"'" }  // escaped double-quote also accepted
+    };
+
+    // Build a multi-line content string
+    std::string content;
+    for (const auto& c : cases) {
+        content += c.line;
+    }
+
+    TokensFile tf(content, "char_escapes", 1);
+    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(toks.size() == 1);
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == cases[i].expected);
+        REQUIRE(toks[0].text() == cases[i].text);
+    }
+}
+
+TEST_CASE("Single-quoted octal and hex escape sequences are converted to Integer",
+          "[lexer][char][escapes][octhex]") {
+    g_options = Options();
+
+    struct Case {
+        const char* line;
+        int expected;
+        const char* text;
+    } cases[] = {
+        // Octal: 1 to 3 digits
+        { "'\\7'\n",     7,        "'\\7'"   },
+        { "'\\101'\n",   65,       "'\\101'" }, // 'A'
+        // Hex: \x followed by 1 or 2 hex digits
+        { "'\\x7'\n",    0x07,     "'\\x7'"  },
+        { "'\\x41'\n",   0x41,     "'\\x41'" }  // 'A'
+    };
+
+    std::string content;
+    for (const auto& c : cases) {
+        content += c.line;
+    }
+
+    TokensFile tf(content, "char_escapes_octhex", 1);
+    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(toks.size() == 1);
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == cases[i].expected);
+        REQUIRE(toks[0].text() == cases[i].text);
+    }
+}
+
+// New tests: verify that string literals accept all C-escapes plus \e, preserve original text(), and resolve into string_value()
+
+TEST_CASE("String literals accept C escapes plus \\e and resolve to binary contents",
+          "[lexer][string][escapes]") {
+    g_options = Options();
+
+    struct Case {
+        const char*
+        literal;   // input literal as it appears in source (including quotes)
+    } cases[] = {
+        { "\"\\a\"" },
+        { "\"\\b\"" },
+        { "\"\\e\"" },   // ESC (0x1B) supported by lexer
+        { "\"\\f\"" },
+        { "\"\\n\"" },
+        { "\"\\r\"" },
+        { "\"\\t\"" },
+        { "\"\\v\"" },
+        { "\"\\\\\"" },  // backslash
+        { "\"\\\"\"" },  // double quote
+        { "\"\\'\"" },   // single quote escaped
+        { "\"ABC\"" },   // plain string
+        { "\"A\\101B\"" }, // octal: \101 == 'A' -> "AAB"
+        { "\"X\\x41Y\"" }, // hex: \x41 == 'A' -> "XAY"
+        { "\"\\x7\\7\"" }  // hex one digit and octal one digit
+    };
+
+    // Build content with one literal per line
+    std::string content;
+    for (const auto& c : cases) {
+        content += c.literal;
+        content += "\n";
+    }
+
+    TokensFile tf(content, "string_escapes", 1);
+    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+
+    // Expected resolved contents built programmatically to avoid C++ escape confusion
+    std::vector<std::string> expected;
+    expected.reserve(sizeof(cases) / sizeof(cases[0]));
+    {
+        std::string s;
+        s.push_back('\a');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\b');
+        expected.push_back(s);
+        s.clear();
+        s.push_back(static_cast<char>(0x1B));
+        expected.push_back(s); // \e -> ESC
+        s.clear();
+        s.push_back('\f');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\n');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\r');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\t');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\v');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\\');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\"');
+        expected.push_back(s);
+        s.clear();
+        s.push_back('\'');
+        expected.push_back(s);
+        s.clear();
+        s.append("ABC");
+        expected.push_back(s);
+        s.clear();
+        s.push_back('A');
+        s.push_back('A');
+        s.push_back('B');
+        expected.push_back(s); // "A\101B"
+        s.clear();
+        s.push_back('X');
+        s.push_back('A');
+        s.push_back('Y');
+        expected.push_back(s); // "X\x41Y"
+        s.clear();
+        s.push_back(static_cast<char>(0x07));
+        s.push_back(static_cast<char>(0x07));
+        expected.push_back(s); // "\x7\7"
+    }
+
+    for (size_t i = 0; i < expected.size(); ++i) {
+        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(toks.size() == 1);
+        const auto& t = toks[0];
+        REQUIRE(t.is(TokenType::String));
+
+        // text() must preserve the original source literal, including quotes and backslashes
+        REQUIRE(t.text() == cases[i].literal);
+
+        // string_value() must contain the resolved bytes (no quotes, escapes resolved)
+        REQUIRE(t.string_value() == expected[i]);
+    }
+}
+
+TEST_CASE("String literals resolve octal (1-3 digits) and hex (1-2 digits) escapes",
+          "[lexer][string][escapes][octhex]") {
+    g_options = Options();
+
+    struct Case {
+        const char* literal;
+        std::string expected;
+    } cases[] = {
+        { "\"\\7\"",     std::string(1, static_cast<char>(7)) },
+        { "\"\\101\"",   std::string(1, static_cast<char>(65)) },   // 'A'
+        { "\"\\x7\"",    std::string(1, static_cast<char>(0x07)) },
+        { "\"\\x41\"",   std::string(1, static_cast<char>(0x41)) }, // 'A'
+        { "\"Z\\101\\x41Z\"", std::string("ZA" "A" "Z") }           // "ZAAZ"
+    };
+
+    std::string content;
+    for (const auto& c : cases) {
+        content += c.literal;
+        content += "\n";
+    }
+
+    TokensFile tf(content, "string_octhex", 1);
+    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(toks.size() == 1);
+        const auto& t = toks[0];
+        REQUIRE(t.is(TokenType::String));
+        REQUIRE(t.text() == cases[i].literal);
+        REQUIRE(t.string_value() == cases[i].expected);
+    }
+}
+
+// New test: verify that an empty double-quoted string is accepted
+TEST_CASE("Empty string literal is accepted and resolves to empty contents",
+          "[lexer][string][empty]") {
+    g_options = Options();
+
+    const std::string content = "\"\"\n";
+    TokensFile tf(content, "str_empty", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::String));
+    REQUIRE(toks[0].text() == "\"\"");
+    REQUIRE(toks[0].string_value().empty());
+}
+
