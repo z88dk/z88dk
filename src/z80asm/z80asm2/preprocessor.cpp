@@ -206,16 +206,9 @@ void Preprocessor::define_macro(const std::string& name,
 }
 
 void Preprocessor::expect_end(const TokensLine& line, unsigned i) const {
-    skip_spaces(line, i);
-    if (i < line.size()) {
+    if (!line.at_end(i)) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected token: '" + line[i].text() + "'");
-    }
-}
-
-void Preprocessor::skip_spaces(const TokensLine& line, unsigned& i) const {
-    while (i < line.size() && line[i].is(TokenType::Whitespace)) {
-        ++i;
     }
 }
 
@@ -224,7 +217,7 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
                                     ) const {
     out_params.clear();
     unsigned j = i;
-    skip_spaces(line, j);
+    line.skip_spaces(j);
 
     // Optional surrounding parentheses
     bool has_paren = false;
@@ -234,7 +227,7 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
     }
 
     // If we have immediate ')' it's an empty list
-    skip_spaces(line, j);
+    line.skip_spaces(j);
     if (has_paren && j < line.size() && line[j].is(TokenType::RightParen)) {
         ++j; // consume ')'
         i = j;
@@ -244,7 +237,7 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
     // Parse zero or more identifiers separated by commas
     bool expect_ident = true;
     while (j < line.size()) {
-        skip_spaces(line, j);
+        line.skip_spaces(j);
         if (expect_ident) {
             if (j < line.size() && line[j].is(TokenType::Identifier)) {
                 out_params.push_back(line[j].text());
@@ -265,7 +258,7 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
                 continue;
             }
             if (has_paren) {
-                skip_spaces(line, j);
+                line.skip_spaces(j);
                 if (j < line.size() && line[j].is(TokenType::RightParen)) {
                     ++j; // consume ')'
                     i = j;
@@ -302,7 +295,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
                                     std::vector<TokensLine>& out_args) {
     out_args.clear();
     unsigned j = i;
-    skip_spaces(line, j);
+    line.skip_spaces(j);
 
     bool has_paren = false;
     if (j < line.size() && line[j].is(TokenType::LeftParen)) {
@@ -311,7 +304,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
     }
 
     // If parenthesized and immediate ')' -> empty list
-    skip_spaces(line, j);
+    line.skip_spaces(j);
     if (has_paren && j < line.size() && line[j].is(TokenType::RightParen)) {
         ++j; // consume ')'
         i = j;
@@ -413,7 +406,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
 bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    int& out_linenum, std::string& out_filename,
                                    const char* directive_name) const {
-    skip_spaces(line, i);
+    line.skip_spaces(i);
 
     if (!(i < line.size() && line[i].is(TokenType::Integer))) {
         g_errors.error(ErrorCode::InvalidSyntax,
@@ -424,12 +417,12 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
     out_linenum = line[i].int_value();
     ++i;
 
-    skip_spaces(line, i);
+    line.skip_spaces(i);
 
     out_filename.clear();
     if (i < line.size() && line[i].is(TokenType::Comma)) {
         ++i;
-        skip_spaces(line, i);
+        line.skip_spaces(i);
         // Accept quoted or plain filename after comma.
         bool is_angle = false;
         if (!parse_filename(line, i, out_filename, is_angle)) {
@@ -447,7 +440,7 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
 
 bool Preprocessor::parse_filename(const TokensLine& line, unsigned& i,
                                   std::string& out_filename, bool& out_is_angle) const {
-    skip_spaces(line, i);
+    line.skip_spaces(i);
     out_filename.clear();
     out_is_angle = false;
 
@@ -477,12 +470,12 @@ bool Preprocessor::parse_filename(const TokensLine& line, unsigned& i,
 
 bool Preprocessor::is_directive(const TokensLine& line,
                                 unsigned& i, Keyword& keyword) const {
-    skip_spaces(line, i);
+    line.skip_spaces(i);
 
     // skip optional #
-    if (i < line.size() && line[i].is(OperatorType::Hash)) {
+    if (i < line.size() && line[i].is(TokenType::Hash)) {
         ++i;
-        skip_spaces(line, i);
+        line.skip_spaces(i);
     }
 
     // check for directive keywords
@@ -502,12 +495,12 @@ bool Preprocessor::is_directive(const TokensLine& line,
 bool Preprocessor::is_name_directive(const TokensLine& line, unsigned& i,
                                      Keyword& keyword,
                                      std::string& name) const {
-    skip_spaces(line, i);
+    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::Identifier)) {
         name = line[i].text();
         ++i;
 
-        skip_spaces(line, i);
+        line.skip_spaces(i);
         keyword = Keyword::None;
         if (i < line.size() && line[i].is(TokenType::Identifier)) {
             keyword = line[i].keyword();
@@ -684,7 +677,7 @@ void Preprocessor::process_c_line(const TokensLine& line, unsigned& i) {
 
 void Preprocessor::process_define(const TokensLine& line, unsigned& i) {
     // #define form: parse name and body after directive
-    skip_spaces(line, i);
+    line.skip_spaces(i);
     if (!(i < line.size() && line[i].is(TokenType::Identifier))) {
         g_errors.error(ErrorCode::InvalidSyntax, "Expected identifier after DEFINE");
         return;
@@ -729,7 +722,7 @@ void Preprocessor::process_name_define(const TokensLine& line, unsigned& i,
 void Preprocessor::do_define(const TokensLine& line, unsigned& i,
                              const std::string& name, bool has_args,
                              const std::vector<std::string>& params) {
-    skip_spaces(line, i);
+    line.skip_spaces(i);
 
     // collect body tokens (rest of line)
     std::vector<Token> body_tokens;
@@ -764,7 +757,7 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
 }
 
 void Preprocessor::process_undef(const TokensLine& line, unsigned& i) {
-    skip_spaces(line, i);
+    line.skip_spaces(i);
     if (!(i < line.size() && line[i].is(TokenType::Identifier))) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Expected identifier after UNDEF");
@@ -814,19 +807,19 @@ void Preprocessor::split_line(const Location& location,
     // process rest of line
     while (i < line_to_process.size()) {
         const Token& t = line_to_process[i];
-        if (t.is(OperatorType::Colon) && ternary_depth == 0) {
+        if (t.is(TokenType::Colon) && ternary_depth == 0) {
             // end of current line; push current line to queue
             input_queue_.push_back(std::move(current));
             current = TokensLine(location);
             ++i;
             // skip spaces after colon
-            skip_spaces(line_to_process, i);
+            line_to_process.skip_spaces(i);
             continue;
         }
-        else if (t.is(OperatorType::Quest)) {
+        else if (t.is(TokenType::Quest)) {
             ++ternary_depth;
         }
-        else if (t.is(OperatorType::Colon)) {
+        else if (t.is(TokenType::Colon)) {
             if (ternary_depth > 0) {
                 --ternary_depth;
             }
@@ -837,7 +830,7 @@ void Preprocessor::split_line(const Location& location,
             current = TokensLine(location);
             ++i;
             // skip spaces after colon
-            skip_spaces(line_to_process, i);
+            line_to_process.skip_spaces(i);
             continue;
         }
         else if (t.is(TokenType::String)) {
@@ -878,29 +871,29 @@ void Preprocessor::split_label(const Location& location,
 
     // label:
     i = 0; // rewind
-    skip_spaces(expanded, i);
+    expanded.skip_spaces(i);
     if (i < expanded.size() && expanded[i].is(TokenType::Identifier)) {
         std::string label_name = expanded[i].text();
         ++i;
-        skip_spaces(expanded, i);
-        if (i < expanded.size() && expanded[i].is(OperatorType::Colon)) {
+        expanded.skip_spaces(i);
+        if (i < expanded.size() && expanded[i].is(TokenType::Colon)) {
             ++i;
             // found label
             label_line.push_back(Token(TokenType::Dot, "."));
             label_line.push_back(Token(TokenType::Identifier, label_name));
             input_queue_.push_back(std::move(label_line));
 
-            skip_spaces(expanded, i);
+            expanded.skip_spaces(i);
             return;
         }
     }
 
     // .label
     i = 0; // rewind
-    skip_spaces(expanded, i);
+    expanded.skip_spaces(i);
     if (i < expanded.size() && expanded[i].is(TokenType::Dot)) {
         ++i;
-        skip_spaces(expanded, i);
+        expanded.skip_spaces(i);
         if (i < expanded.size() && expanded[i].is(TokenType::Identifier)) {
             std::string label_name = expanded[i].text();
             ++i;
@@ -909,13 +902,13 @@ void Preprocessor::split_label(const Location& location,
             label_line.push_back(Token(TokenType::Identifier, label_name));
             input_queue_.push_back(std::move(label_line));
 
-            skip_spaces(expanded, i);
+            expanded.skip_spaces(i);
             return;
         }
     }
 
     i = 0; // rewind
-    skip_spaces(expanded, i);
+    expanded.skip_spaces(i);
 }
 
 void Preprocessor::merge_double_hash(TokensLine& line) {
@@ -930,13 +923,13 @@ void Preprocessor::merge_double_hash(TokensLine& line) {
         if (cur.is(TokenType::Identifier)) {
             unsigned j = idx + 1;
             // skip optional whitespace
-            skip_spaces(line, j);
+            line.skip_spaces(j);
 
             // require DoubleHash operator token
-            if (j < line.size() && line[j].is(OperatorType::DoubleHash)) {
+            if (j < line.size() && line[j].is(TokenType::DoubleHash)) {
                 unsigned k = j + 1;
                 // skip optional whitespace after ##
-                skip_spaces(line, k);
+                line.skip_spaces(k);
 
                 // right side must be identifier or integer
                 if (k < line.size() && (line[k].is(TokenType::Identifier)
@@ -1025,7 +1018,7 @@ bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
         const std::vector<TokensLine>& original_args,
         TokensLine& new_line) {
     // Expect '#' at pidx (caller ensures this), confirm next token exists and is identifier.
-    if (!(pidx < rep_line.size() && rep_line[pidx].is(OperatorType::Hash))) {
+    if (!(pidx < rep_line.size() && rep_line[pidx].is(TokenType::Hash))) {
         return false;
     }
     if (pidx + 1 >= rep_line.size()) {
@@ -1093,7 +1086,7 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
             bool substituted_flag = false;
 
             // Handle stringize operator: '#' followed by parameter identifier
-            if (rt.is(OperatorType::Hash)) {
+            if (rt.is(TokenType::Hash)) {
                 if (try_stringize_parameter(rep_line, pidx, macro, original_args, new_line)) {
                     // handled and pidx advanced inside helper
                     continue;

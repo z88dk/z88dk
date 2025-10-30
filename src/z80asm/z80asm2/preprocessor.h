@@ -86,7 +86,6 @@ private:
 
     // Internal helpers
     void expect_end(const TokensLine& line, unsigned i) const;
-    void skip_spaces(const TokensLine& line, unsigned& i) const;
     bool parse_params_list(const TokensLine& line, unsigned& i,
                            std::vector<std::string>& out_params) const;
     bool parse_macro_args(const TokensLine& line, unsigned& i,
@@ -164,11 +163,12 @@ private:
     bool is_macro_call(const TokensLine& in_line, unsigned idx,
                        const Macro& macro,
                        unsigned& args_start_idx) const;
-    bool parse_and_expand_macro_args(const TokensLine& in_line,
-                                     unsigned args_start_idx,
-                                     std::vector<TokensLine>& expanded_args_flat,
-                                     std::vector<TokensLine>& out_original_args,
-                                     unsigned& out_after_idx);
+    bool parse_and_expand_macro_args(
+        const TokensLine& in_line,
+        unsigned args_start_idx,
+        std::vector<TokensLine>& expanded_args_flat,
+        std::vector<TokensLine>& out_original_args,
+        unsigned& out_after_idx);
     bool try_stringize_parameter(
         const TokensLine& rep_line,
         unsigned& pidx,
