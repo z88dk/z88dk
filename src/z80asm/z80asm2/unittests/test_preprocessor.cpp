@@ -1369,3 +1369,133 @@ TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma lis
     REQUIRE(ints[1] == 20);
     REQUIRE(commas == 1);
 }
+
+// New tests: DEFINE accepts and ignores optional '=' before the body
+
+TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like body",
+          "[preprocessor][define][equals][object]") {
+    // Form with space before '='
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        const std::string content = "A DEFINE = 5\nA\n";
+        pp.push_virtual_file(content, "def_eq_obj_spaced", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line)); // expanded "A"
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 5);
+    }
+
+    // Form without spaces around '='
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        const std::string content = "B define=6\nB\n";
+        pp.push_virtual_file(content, "def_eq_obj_nospaces", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line)); // expanded "B"
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 6);
+    }
+}
+
+TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and function forms)",
+          "[preprocessor][define][equals][empty]") {
+    // Object-like empty body with '='
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        const std::string content = "E DEFINE =\nE\n";
+        pp.push_virtual_file(content, "def_eq_empty_obj", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line)); // expanded "E"
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 1);
+    }
+}
+
+// New tests: DEFINE name = body (prefix form) accepts and ignores optional '=' before the body
+
+TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like body",
+          "[preprocessor][define][equals][prefix][object]") {
+    // Spaced form: "DEFINE A = 5"
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        const std::string content = "DEFINE A = 5\nA\n";
+        pp.push_virtual_file(content, "def_prefix_eq_obj_spaced", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line)); // expanded "A"
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 5);
+    }
+
+    // Tight form: "DEFINE B=6"
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        const std::string content = "DEFINE B=6\nB\n";
+        pp.push_virtual_file(content, "def_prefix_eq_obj_nospaces", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line)); // expanded "B"
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 6);
+    }
+}
+
+TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
+          "[preprocessor][define][equals][prefix][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Object-like empty body: "DEFINE E ="
+    const std::string content = "DEFINE E =\nE\n";
+    pp.push_virtual_file(content, "def_prefix_eq_empty_obj", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expanded "E"
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 1);
+}
+
+TEST_CASE("Preprocessor: prefix DEFINE function-like accepts optional '=' before body",
+          "[preprocessor][define][equals][prefix][function]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Function-like: "DEFINE ID(x) = x"
+    const std::string content =
+        "DEFINE ID(x) = x\n"
+        "ID(7)\n";
+    pp.push_virtual_file(content, "def_prefix_eq_func", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expanded "ID(7)"
+    const auto& toks = line.tokens();
+
+    bool found7 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 7) {
+            found7 = true;
+            break;
+        }
+    }
+    REQUIRE(found7);
+}

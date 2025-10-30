@@ -24,7 +24,22 @@
         output.push_back(t); \
     } while (0)
 
+#define CHECK_TRAILING_CHAR() \
+    do { \
+        if (p < pe && is_ident(*p)) { \
+            g_errors.error(ErrorCode::InvalidSyntax, \
+                    "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p + 1) + "'"); \
+            output.clear(); \
+            return; \
+        } \
+    } while (0)
+
 #define YYFILL() 1
+
+static bool is_ident(char c) {
+    return (std::isalnum(static_cast<unsigned char>(c)) ||
+        c == '_' || c == '@');
+}
 
 static void swap_x_y(std::string & str) {
     // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
@@ -184,18 +199,22 @@ main_loop:
         '~'		{ PUSH_TOKEN1(TokenType::BitwiseNot); continue; }
 
         mantissau expu? 	{
+            CHECK_TRAILING_CHAR();
             // floats: allow underscores in integer, fractional and exponent parts
-            // strip underscores before conversion
-            std::string s(tok, p);
-            std::string clean;
-            clean.reserve(s.size());
-            for (char c : s) if (c != '_') clean.push_back(c);
+            std::string digits = std::string(tok, p);
+            double value = 0.0;
+            if (!parse_float_from_chars(digits, value)) {
+                g_errors.error(ErrorCode::InvalidFloat, digits);
+                output.clear();
+                return;
+            }
 
-            PUSH_TOKEN2(TokenType::Float, std::stod(clean));
+            PUSH_TOKEN2(TokenType::Float, value);
             continue;
         }
 
         decu 'd'?		{
+            CHECK_TRAILING_CHAR();
             // decimal: allow underscores, optional 'd' suffix
             std::string digits = std::string(tok, p);
             if (!digits.empty() && (digits.back() == 'd' || digits.back() == 'D')) {
@@ -214,6 +233,7 @@ main_loop:
         }
 
         decu ('_'* hex)* 'h'    	{
+            CHECK_TRAILING_CHAR();
             // hex with trailing 'h' (first char must be dec digit, then hex; underscores allowed)
             std::string digits = std::string(tok, p - 1);
             int value = 0;
@@ -229,6 +249,7 @@ main_loop:
         }
 
         "$" hexu		    {
+            CHECK_TRAILING_CHAR();
             // hex with '$' prefix
             std::string digits = std::string(tok + 1, p);
             int value = 0;
@@ -244,6 +265,7 @@ main_loop:
         }
 
         '0x' hexu		{
+            CHECK_TRAILING_CHAR();
             // hex with '0x' prefix
             std::string digits = std::string(tok + 2, p);
             int value = 0;
@@ -259,6 +281,7 @@ main_loop:
         }
 
         binu 'b'		    {
+            CHECK_TRAILING_CHAR();
             // binary with trailing 'b'
             std::string digits = std::string(tok, p - 1);
             int value = 0;
@@ -274,6 +297,7 @@ main_loop:
         }
 
         [%@] binu		{
+            CHECK_TRAILING_CHAR();
             // binary with '%' or '@' prefix
             std::string digits = std::string(tok + 1, p);
             int value = 0;
@@ -289,6 +313,7 @@ main_loop:
         }
 
         '0b' binu		{
+            CHECK_TRAILING_CHAR();
             // binary with '0b' prefix
             std::string digits = std::string(tok + 2, p);
             int value = 0;
