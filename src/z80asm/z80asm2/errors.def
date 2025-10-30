@@ -5,15 +5,17 @@
 //-----------------------------------------------------------------------------
 
 X(CommandFailed, "Command failed")
+X(DivisionByZero, "Division by zero")
 X(FileNotFound, "File not found")
 X(FileOpenError, "Error opening file")
 X(InvalidInteger, "Invalid integer")
 X(InvalidOption, "Invalid option")
 X(InvalidSyntax, "Invalid syntax")
+X(MacroRecursionLimit, "Macro recursion limit exceeded")
 X(MissingOperand, "Missing operand")
 X(NoInputFiles, "No input files specified")
 X(RecursiveInclude, "Recursive include")
 X(UnknownInstruction, "Unknown instruction")
 X(UnterminatedComment, "Unterminated comment")
 X(UnterminatedString, "Unterminated string")
-X(MacroRecursionLimit, "Macro recursion limit exceeded")
+X(UnbalancedParens, "Unbalanced parentheses")
