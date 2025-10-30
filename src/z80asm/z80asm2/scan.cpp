@@ -292,8 +292,7 @@ yyFillLabel2:
                 goto yy6;
             }
 yy6: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalNot);
+                PUSH_TOKEN1(TokenType::LogicalNot);
                 continue;
             }
 yy7:
@@ -319,8 +318,7 @@ yyFillLabel3:
                 goto yy9;
             }
 yy9: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Hash);
+                PUSH_TOKEN1(TokenType::Hash);
                 continue;
             }
 yy10:
@@ -384,8 +382,7 @@ yyFillLabel5:
                 goto yy13;
             }
 yy13: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Modulus);
+                PUSH_TOKEN1(TokenType::Modulus);
                 continue;
             }
 yy14:
@@ -404,8 +401,7 @@ yyFillLabel6:
                 goto yy15;
             }
 yy15: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseAnd);
+                PUSH_TOKEN1(TokenType::BitwiseAnd);
                 continue;
             }
 yy16:
@@ -443,15 +439,13 @@ yyFillLabel7:
                 goto yy20;
             }
 yy20: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Multiply);
+                PUSH_TOKEN1(TokenType::Multiply);
                 continue;
             }
 yy21:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Plus);
+                PUSH_TOKEN1(TokenType::Plus);
                 continue;
             }
 yy22:
@@ -463,8 +457,7 @@ yy22:
 yy23:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Minus);
+                PUSH_TOKEN1(TokenType::Minus);
                 continue;
             }
 yy24:
@@ -513,8 +506,7 @@ yyFillLabel9:
                 goto yy27;
             }
 yy27: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Divide);
+                PUSH_TOKEN1(TokenType::Divide);
                 continue;
             }
 yy28:
@@ -649,8 +641,7 @@ yyFillLabel12:
 yy33:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Colon);
+                PUSH_TOKEN1(TokenType::Colon);
                 continue;
             }
 yy34:
@@ -684,8 +675,7 @@ yy36: {
                     goto string_loop;
                 }
                 else {
-                    PUSH_TOKEN2(TokenType::Operator,
-                                OperatorType::LT);
+                    PUSH_TOKEN1(TokenType::LT);
                     continue;
                 }
             }
@@ -705,8 +695,7 @@ yyFillLabel14:
                 goto yy38;
             }
 yy38: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::EQ);
+                PUSH_TOKEN1(TokenType::EQ);
                 continue;
             }
 yy39:
@@ -727,15 +716,13 @@ yyFillLabel15:
                 goto yy40;
             }
 yy40: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::GT);
+                PUSH_TOKEN1(TokenType::GT);
                 continue;
             }
 yy41:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Quest);
+                PUSH_TOKEN1(TokenType::Quest);
                 continue;
             }
 yy42:
@@ -994,8 +981,7 @@ yyFillLabel19:
                 goto yy50;
             }
 yy50: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseXor);
+                PUSH_TOKEN1(TokenType::BitwiseXor);
                 continue;
             }
 yy51:
@@ -1020,8 +1006,7 @@ yyFillLabel20:
                 goto yy53;
             }
 yy53: {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseOr);
+                PUSH_TOKEN1(TokenType::BitwiseOr);
                 continue;
             }
 yy54:
@@ -1033,22 +1018,19 @@ yy54:
 yy55:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::BitwiseNot);
+                PUSH_TOKEN1(TokenType::BitwiseNot);
                 continue;
             }
 yy56:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::NE);
+                PUSH_TOKEN1(TokenType::NE);
                 continue;
             }
 yy57:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::DoubleHash);
+                PUSH_TOKEN1(TokenType::DoubleHash);
                 continue;
             }
 yy58:
@@ -1170,15 +1152,13 @@ yy63: {
 yy64:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalAnd);
+                PUSH_TOKEN1(TokenType::LogicalAnd);
                 continue;
             }
 yy65:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::Power);
+                PUSH_TOKEN1(TokenType::Power);
                 continue;
             }
 yy66:
@@ -1448,15 +1428,13 @@ yyFillLabel29:
 yy77:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::ShiftLeft);
+                PUSH_TOKEN1(TokenType::ShiftLeft);
                 continue;
             }
 yy78:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LE);
+                PUSH_TOKEN1(TokenType::LE);
                 continue;
             }
 yy79:
@@ -1465,15 +1443,13 @@ yy79:
 yy80:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::GE);
+                PUSH_TOKEN1(TokenType::GE);
                 continue;
             }
 yy81:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::ShiftRight);
+                PUSH_TOKEN1(TokenType::ShiftRight);
                 continue;
             }
 yy82:
@@ -1661,15 +1637,13 @@ yyFillLabel32:
 yy87:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalXor);
+                PUSH_TOKEN1(TokenType::LogicalXor);
                 continue;
             }
 yy88:
             ++p;
             {
-                PUSH_TOKEN2(TokenType::Operator,
-                            OperatorType::LogicalOr);
+                PUSH_TOKEN1(TokenType::LogicalOr);
                 continue;
             }
 yy89:
