@@ -87,8 +87,13 @@ main_loop:
         oct		    = [0-7];
         dec		    = [0-9];
         hex		    = [0-9a-fA-F];
-        mantissa    = dec+ '.' dec* | dec* '.' dec+;
-        exp		    = 'e' [-+]? dec+;
+
+        decu        = dec ('_'* dec)*;
+        hexu        = hex ('_'* hex)*;
+        binu        = bin ('_'* bin)*;
+
+        mantissau   = decu '.' decu* | decu* '.' decu+;
+        expu        = [eE] [-+]? decu;
 
         * {
             g_errors.error(ErrorCode::InvalidSyntax,
@@ -178,14 +183,22 @@ main_loop:
         '||'		{ PUSH_TOKEN1(TokenType::LogicalOr); continue; }
         '~'		{ PUSH_TOKEN1(TokenType::BitwiseNot); continue; }
 
-        mantissa exp? 	{
-            PUSH_TOKEN2(TokenType::Float, std::stod(str));
+        mantissau expu? 	{
+            // floats: allow underscores in integer, fractional and exponent parts
+            // strip underscores before conversion
+            std::string s(tok, p);
+            std::string clean;
+            clean.reserve(s.size());
+            for (char c : s) if (c != '_') clean.push_back(c);
+
+            PUSH_TOKEN2(TokenType::Float, std::stod(clean));
             continue;
         }
 
-        dec+ 'd'?		{
+        decu 'd'?		{
+            // decimal: allow underscores, optional 'd' suffix
             std::string digits = std::string(tok, p);
-            if (digits.back() == 'd' || digits.back() == 'D') {
+            if (!digits.empty() && (digits.back() == 'd' || digits.back() == 'D')) {
                 digits.pop_back();
             }
             int value = 0;
@@ -200,7 +213,8 @@ main_loop:
             continue;
         }
 
-        dec hex* 'h'    	{
+        decu ('_'* hex)* 'h'    	{
+            // hex with trailing 'h' (first char must be dec digit, then hex; underscores allowed)
             std::string digits = std::string(tok, p - 1);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -214,7 +228,8 @@ main_loop:
             continue;
         }
 
-        "$" hex+		    {
+        "$" hexu		    {
+            // hex with '$' prefix
             std::string digits = std::string(tok + 1, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -228,7 +243,8 @@ main_loop:
             continue;
         }
 
-        '0x' hex+		{
+        '0x' hexu		{
+            // hex with '0x' prefix
             std::string digits = std::string(tok + 2, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -242,7 +258,8 @@ main_loop:
             continue;
         }
 
-        bin+ 'b'		    {
+        binu 'b'		    {
+            // binary with trailing 'b'
             std::string digits = std::string(tok, p - 1);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -256,7 +273,8 @@ main_loop:
             continue;
         }
 
-        [%@] bin+		{
+        [%@] binu		{
+            // binary with '%' or '@' prefix
             std::string digits = std::string(tok + 1, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -270,7 +288,8 @@ main_loop:
             continue;
         }
 
-        '0b' bin+		{
+        '0b' binu		{
+            // binary with '0b' prefix
             std::string digits = std::string(tok + 2, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {

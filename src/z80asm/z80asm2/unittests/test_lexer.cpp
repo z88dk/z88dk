@@ -366,7 +366,8 @@ TEST_CASE("TokensFile parses all integer literal formats",
     // - binary with '%' prefix: %1011
     // - binary with '@' prefix: @1011
     // - binary with '0b' prefix: 0b1011
-    const std::string content = "123 123d 1Ah $FF 0xAB 1011b %1011 @1011 0b1011\n";
+    const std::string content =
+        "123 123d 1Ah 1aH $FF 0xAB 1011b %1011 @1011 0b1011\n";
     TokensFile tf(content, "int_formats", 1);
 
     REQUIRE(tf.tok_lines_count() == 1);
@@ -384,6 +385,7 @@ TEST_CASE("TokensFile parses all integer literal formats",
         123,      // "123"
         123,      // "123d"
         0x1A,     // "1Ah"
+        0x1A,     // "1aH"
         0xFF,     // "$FF"
         0xAB,     // "0xAB"
         11,       // "1011b"
@@ -907,4 +909,249 @@ TEST_CASE("Lexer identifier forms allow underscores and digits after the first c
     };
 
     REQUIRE(ids == expected);
+}
+
+// New tests: verify all runs of any whitespace chars collapse to a single Whitespace token
+TEST_CASE("Lexer collapses mixed whitespace run into one Whitespace token",
+          "[lexer][whitespace]") {
+    g_options = Options();
+
+    // Between A and B we place a contiguous run of space, tab, vertical-tab, form-feed, space
+    const std::string content = "A \t\v\f B\n";
+    TokensFile tf(content, "ws_mixed", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "A");
+
+    REQUIRE(toks[1].is(TokenType::Whitespace)); // single token for the whole run
+
+    REQUIRE(toks[2].is(TokenType::Identifier));
+    REQUIRE(toks[2].text() == "B");
+}
+
+TEST_CASE("Lexer collapses multiple whitespace runs each to one Whitespace token",
+          "[lexer][whitespace]") {
+    g_options = Options();
+
+    // Three runs of whitespace separating A, B, C, D
+    // 1) spaces, 2) tabs, 3) vertical-tab + form-feed
+    const std::string content = "A   B\t\tC\v\fD\n";
+    TokensFile tf(content, "ws_runs", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    // Expect: A, WS, B, WS, C, WS, D
+    REQUIRE(toks.size() == 7);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "A");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+
+    REQUIRE(toks[2].is(TokenType::Identifier));
+    REQUIRE(toks[2].text() == "B");
+    REQUIRE(toks[3].is(TokenType::Whitespace));
+
+    REQUIRE(toks[4].is(TokenType::Identifier));
+    REQUIRE(toks[4].text() == "C");
+    REQUIRE(toks[5].is(TokenType::Whitespace));
+
+    REQUIRE(toks[6].is(TokenType::Identifier));
+    REQUIRE(toks[6].text() == "D");
+}
+
+TEST_CASE("Lexer collapses leading and trailing whitespace runs to single tokens",
+          "[lexer][whitespace][edges]") {
+    g_options = Options();
+
+    // Leading run: space+tab, trailing run: tab+space
+    const std::string content = " \tA\t \n";
+    TokensFile tf(content, "ws_edges", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    // Expect: WS, A, WS
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].is(TokenType::Whitespace));
+
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "A");
+
+    REQUIRE(toks[2].is(TokenType::Whitespace));
+}
+
+// New tests: verify bitmask forms %"... and @ "..." are scanned into Integer with correct value
+TEST_CASE("Lexer scans bitmask %\"-#-#\" and @\"-#-#\" into Integer tokens",
+          "[lexer][bitmask]") {
+    g_options = Options();
+
+    const std::string content = "%\"-#-#\" @\"-#-#\"\n";
+    TokensFile tf(content, "bitmask_basic", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    // Collect integer tokens
+    std::vector<const Token*> ints;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer)) {
+            ints.push_back(&t);
+        }
+    }
+
+    // Expect two Integer tokens, both representing binary -#-# => 0101b => 5
+    REQUIRE(ints.size() == 2);
+    REQUIRE(ints[0]->int_value() == 5);
+    REQUIRE(ints[1]->int_value() == 5);
+
+    // Text should be preserved exactly (including leading %/@ and quotes)
+    REQUIRE(ints[0]->text() == "%\"-#-#\"");
+    REQUIRE(ints[1]->text() == "@\"-#-#\"");
+}
+
+TEST_CASE("Lexer bitmask handles empty and single-bit sequences",
+          "[lexer][bitmask][edge]") {
+    g_options = Options();
+
+    // Empty -> 0, "#" -> 1, "-#" -> 1, "#-" -> 2
+    const std::string content = "%\"\" %\"#\" %\"-#\" %\"#-\"\n";
+    TokensFile tf(content, "bitmask_edges", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    std::vector<int> values;
+    std::vector<std::string> texts;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer)) {
+            values.push_back(t.int_value());
+            texts.push_back(t.text());
+        }
+    }
+
+    REQUIRE(values.size() == 4);
+    REQUIRE(values[0] == 0); // %""    -> empty
+    REQUIRE(values[1] == 1); // %"#"   -> 001b
+    REQUIRE(values[2] == 1); // "%-#" -> 01b
+    REQUIRE(values[3] == 2); // "%#-" -> 10b
+
+    REQUIRE(texts[0] == "%\"\"");
+    REQUIRE(texts[1] == "%\"#\"");
+    REQUIRE(texts[2] == "%\"-#\"");
+    REQUIRE(texts[3] == "%\"#-\"");
+}
+
+// New tests: verify underscores digit separators are ignored inside numeric literals
+TEST_CASE("TokensFile parses integer literals with underscores as digit separators",
+          "[lexer][integers][underscores]") {
+    g_options = Options();
+
+    // Include underscores in all supported integer formats:
+    // - decimal with/without 'd'
+    // - hex with trailing 'h' (both cases)
+    // - hex with '$' and '0x' prefixes
+    // - binary with trailing 'b', and '%' / '@' / '0b' prefixes
+    const std::string content =
+        "1_234 1_234d 1A_2h 1a_2H $FF_FF 0xAB_CD 1010_1100b %1010_1100 @1010_1100 0b1010_1100\n";
+    TokensFile tf(content, "int_underscores", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const TokensLine& tl = tf.get_tok_line(0);
+    const auto& toks = tl.tokens();
+
+    std::vector<int> found;
+    for (const auto& t : toks) {
+        if (t.type() == TokenType::Integer) {
+            found.push_back(t.int_value());
+        }
+    }
+
+    std::vector<int> expected = {
+        1234,         // "1_234"
+        1234,         // "1_234d"
+        0x1A2,        // "1A_2h"
+        0x1A2,        // "1a_2H"
+        0xFFFF,       // "$FF_FF"
+        0xABCD,       // "0xAB_CD"
+        0b10101100,   // "1010_1100b"
+        0b10101100,   // "%1010_1100"
+        0b10101100,   // "@1010_1100"
+        0b10101100    // "0b1010_1100"
+    };
+
+    REQUIRE(found.size() == expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(found[i] == expected[i]);
+    }
+}
+
+// New tests: verify floats accept underscores as digit separators in integer, fractional and exponent parts
+TEST_CASE("Lexer parses floats with underscores in integer and fractional parts",
+          "[lexer][float][underscores]") {
+    g_options = Options();
+
+    // Three floats:
+    // 1) underscore in integer part: 1_234.5 -> 1234.5
+    // 2) underscore in fractional part: 12.3_45 -> 12.345
+    // 3) multiple underscores within fractional digits: 0.0_5 -> 0.05
+    const std::string content = "1_234.5 12.3_45 0.0_5\n";
+    TokensFile tf(content, "float_underscores_if", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    std::vector<double> found;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Float)) {
+            found.push_back(t.float_value());
+        }
+    }
+
+    std::vector<double> expected = {
+        1234.5,   // "1_234.5"
+        12.345,   // "12.3_45"
+        0.05      // "0.0_5"
+    };
+
+    REQUIRE(found.size() == expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
+    }
+}
+
+TEST_CASE("Lexer parses floats with underscores in exponent part (and combined)",
+          "[lexer][float][underscores][exponent]") {
+    g_options = Options();
+
+    // Three floats:
+    // 1) underscore in exponent: 1.25e1_2 -> 1.25e12
+    // 2) underscore with negative exponent: 3.0e-0_3 -> 3.0e-3
+    // 3) underscores in integer part and exponent: 4_2.0e0_0 -> 42.0
+    const std::string content = "1.25e1_2 3.0e-0_3 4_2.0e0_0\n";
+    TokensFile tf(content, "float_underscores_exp", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    std::vector<double> found;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Float)) {
+            found.push_back(t.float_value());
+        }
+    }
+
+    std::vector<double> expected = {
+        1.25e12,  // "1.25e1_2"
+        3.0e-3,   // "3.0e-0_3"
+        42.0      // "4_2.0e0_0"
+    };
+
+    REQUIRE(found.size() == expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
+    }
 }
