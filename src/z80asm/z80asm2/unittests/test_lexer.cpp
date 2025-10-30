@@ -852,3 +852,59 @@ TEST_CASE("TokensFile get_tok_line out-of-range returns empty TokensLine",
     // out.tokens() should be empty
     REQUIRE(out.tokens().empty());
 }
+
+// New tests: verify identifier forms '@ident', 'ident@ident' and 'ident' (C identifier rules)
+TEST_CASE("Lexer detects identifiers '@ident', 'ident@ident' and 'ident'",
+          "[lexer][ident]") {
+    g_options = Options(); // default options (no upper-casing)
+
+    // ident1 = [_a-zA-Z][_a-zA-Z0-9]*
+    // ident  = '@' ident1 | ident1 '@' ident1 | ident1
+    const std::string content = "@foo  _ok1@bar2  normal\n";
+    TokensFile tf(content, "ident_forms", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    std::vector<std::string> ids;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier)) {
+            ids.push_back(t.text());
+        }
+    }
+
+    std::vector<std::string> expected = {
+        "@foo",       // '@' ident1
+        "_ok1@bar2",  // ident1 '@' ident1
+        "normal"      // ident1
+    };
+
+    REQUIRE(ids == expected);
+}
+
+TEST_CASE("Lexer identifier forms allow underscores and digits after the first character",
+          "[lexer][ident][chars]") {
+    g_options = Options(); // default options
+
+    // More thorough coverage of allowed characters within ident1
+    const std::string content = "@_AbC123  A_B@C9_d  Z9\n";
+    TokensFile tf(content, "ident_forms_chars", 1);
+
+    REQUIRE(tf.tok_lines_count() == 1);
+    const auto& toks = tf.get_tok_line(0).tokens();
+
+    std::vector<std::string> ids;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier)) {
+            ids.push_back(t.text());
+        }
+    }
+
+    std::vector<std::string> expected = {
+        "@_AbC123",  // '@' + ident1 with underscores/digits allowed after first char
+        "A_B@C9_d",  // ident1 '@' ident1
+        "Z9"         // ident1
+    };
+
+    REQUIRE(ids == expected);
+}
