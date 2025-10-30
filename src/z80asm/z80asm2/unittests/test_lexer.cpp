@@ -51,8 +51,8 @@ TEST_CASE("TokensLine basic operations", "[lexer]") {
     REQUIRE(toks[0].text() == "foo");
     REQUIRE(toks[1].text() == "123");
 
-    // to_string concatenates original token texts
-    REQUIRE(line.to_string() == "foo123");
+    // to_string concatenates original token texts, inseritng spaces where needed
+    REQUIRE(line.to_string() == "foo 123");
 
     const Token& last = line.back();
     REQUIRE(last.text() == "123");
@@ -166,7 +166,6 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
         TokenType::Integer,
         TokenType::Float,
         TokenType::String,
-        TokenType::Operator,
         TokenType::Backslash,
         TokenType::Comma,
         TokenType::Dot,
@@ -203,7 +202,7 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
     REQUIRE(foundFloat);
 }
 
-TEST_CASE("TokensFile tokenizes all OperatorType values",
+TEST_CASE("TokensFile tokenizes all TokenType values",
           "[lexer][operator_types]") {
     g_options = Options();
 
@@ -218,41 +217,41 @@ TEST_CASE("TokensFile tokenizes all OperatorType values",
     const TokensLine& tl = tf.get_tok_line(0);
     const auto& toks = tl.tokens();
 
-    // Collect operator token OperatorType values in the order they appear.
-    std::vector<OperatorType> seen;
+    // Collect operator token TokenType values in the order they appear.
+    std::vector<TokenType> seen;
     for (const auto& t : toks) {
-        if (t.type() == TokenType::Operator) {
-            seen.push_back(t.op());
+        if (t.is_not(TokenType::Whitespace)) {
+            seen.push_back(t.type());
         }
     }
 
-    std::vector<OperatorType> expected = {
-        OperatorType::LogicalNot,   // "!"
-        OperatorType::NE,           // "!="
-        OperatorType::BitwiseNot,   // "~"
-        OperatorType::BitwiseXor,   // "^" (single)
-        OperatorType::LogicalXor,   // "^^"
-        OperatorType::BitwiseAnd,   // "&"
-        OperatorType::LogicalAnd,   // "&&"
-        OperatorType::Multiply,     // "*"
-        OperatorType::Power,        // "**"
-        OperatorType::Divide,       // "/"
-        OperatorType::Modulus,      // "%"
-        OperatorType::Plus,         // "+"
-        OperatorType::Minus,        // "-"
-        OperatorType::ShiftLeft,    // "<<"
-        OperatorType::ShiftRight,   // ">>"
-        OperatorType::LT,           // "<"
-        OperatorType::LE,           // "<="
-        OperatorType::GT,           // ">"
-        OperatorType::GE,           // ">="
-        OperatorType::EQ,           // "="
-        OperatorType::Quest,        // "?"
-        OperatorType::Colon,        // ":"
-        OperatorType::Hash,         // "#"
-        OperatorType::DoubleHash,   // "##"
-        OperatorType::BitwiseOr,    // "|"
-        OperatorType::LogicalOr     // "||"
+    std::vector<TokenType> expected = {
+        TokenType::LogicalNot,   // "!"
+        TokenType::NE,           // "!="
+        TokenType::BitwiseNot,   // "~"
+        TokenType::BitwiseXor,   // "^" (single)
+        TokenType::LogicalXor,   // "^^"
+        TokenType::BitwiseAnd,   // "&"
+        TokenType::LogicalAnd,   // "&&"
+        TokenType::Multiply,     // "*"
+        TokenType::Power,        // "**"
+        TokenType::Divide,       // "/"
+        TokenType::Modulus,      // "%"
+        TokenType::Plus,         // "+"
+        TokenType::Minus,        // "-"
+        TokenType::ShiftLeft,    // "<<"
+        TokenType::ShiftRight,   // ">>"
+        TokenType::LT,           // "<"
+        TokenType::LE,           // "<="
+        TokenType::GT,           // ">"
+        TokenType::GE,           // ">="
+        TokenType::EQ,           // "="
+        TokenType::Quest,        // "?"
+        TokenType::Colon,        // ":"
+        TokenType::Hash,         // "#"
+        TokenType::DoubleHash,   // "##"
+        TokenType::BitwiseOr,    // "|"
+        TokenType::LogicalOr     // "||"
     };
 
     REQUIRE(seen.size() == expected.size());
@@ -700,4 +699,156 @@ TEST_CASE("g_options.swap_ix_iy swaps IX/IY keywords and token text",
 
     // restore options
     g_options = Options();
+}
+
+// -----------------------------------------------------------------------------
+// Added tests: bounds, skip_spaces/at_end, to_string preserving whitespace,
+// get_tok_line out-of-range behavior, spacing rules for to_string, and
+// operator-pair spacing tests.
+// -----------------------------------------------------------------------------
+
+TEST_CASE("TokensLine operator[] out-of-range returns EndOfFile token",
+          "[lexer][tokensline][bounds]") {
+    g_options = Options();
+
+    TokensLine tl(Location("file", 1));
+    REQUIRE(tl.empty());
+    const Token& t = tl[0]; // out-of-range
+    REQUIRE(t.is(TokenType::EndOfFile));
+    REQUIRE(t.text().empty());
+}
+
+TEST_CASE("TokensLine skip_spaces and at_end behave correctly",
+          "[lexer][tokensline][spaces]") {
+    g_options = Options();
+
+    TokensLine only_spaces(Location("loc", 1));
+    only_spaces.push_back(Token(TokenType::Whitespace, " "));
+    only_spaces.push_back(Token(TokenType::Whitespace, "\t"));
+    unsigned idx = 0;
+    // at_end should skip spaces and report end
+    REQUIRE(only_spaces.at_end(idx));
+    // idx should have been advanced by skip_spaces (>= size)
+    REQUIRE(idx >= only_spaces.size());
+
+    TokensLine mixed(Location("loc", 2));
+    mixed.push_back(Token(TokenType::Whitespace, " "));
+    mixed.push_back(Token(TokenType::Identifier, "a"));
+    unsigned j = 0;
+    // skip_spaces should advance j to first non-space token index (1)
+    mixed.skip_spaces(j);
+    REQUIRE(j == 1u);
+    // at_end should return false because a non-space token exists after skipping
+    unsigned k = 0;
+    REQUIRE_FALSE(mixed.at_end(k));
+}
+
+TEST_CASE("TokensLine to_string preserves original token text including whitespace",
+          "[lexer][tokensline][to_string]") {
+    g_options = Options();
+
+    TokensLine tl(Location("l", 1));
+    tl.push_back(Token(TokenType::Identifier, "mov"));
+    tl.push_back(Token(TokenType::Whitespace, " "));
+    tl.push_back(Token(TokenType::Identifier, "a"));
+    tl.push_back(Token(TokenType::Comma, ","));
+    tl.push_back(Token(TokenType::Whitespace, " "));
+    tl.push_back(Token(TokenType::Identifier, "b"));
+
+    REQUIRE(tl.to_string() == "mov a, b");
+}
+
+// New tests: verify that to_string inserts spaces between Identifier/Integer/Float
+TEST_CASE("TokensLine to_string inserts spaces between Identifier, Integer and Float tokens",
+          "[lexer][tokensline][to_string_spacing]") {
+    g_options = Options();
+
+    // Identifier followed by Integer
+    TokensLine tl_id_int(Location("l", 1));
+    tl_id_int.push_back(Token(TokenType::Identifier, "foo"));
+    tl_id_int.push_back(Token(TokenType::Integer, "123"));
+    REQUIRE(tl_id_int.to_string() == "foo 123");
+
+    // Identifier followed by Float
+    TokensLine tl_id_float(Location("l", 2));
+    tl_id_float.push_back(Token(TokenType::Identifier, "foo"));
+    tl_id_float.push_back(Token(TokenType::Float, "1.23"));
+    REQUIRE(tl_id_float.to_string() == "foo 1.23");
+
+    // Integer followed by Identifier
+    TokensLine tl_int_id(Location("l", 3));
+    tl_int_id.push_back(Token(TokenType::Integer, "123"));
+    tl_int_id.push_back(Token(TokenType::Identifier, "bar"));
+    REQUIRE(tl_int_id.to_string() == "123 bar");
+
+    // Integer followed by Float
+    TokensLine tl_int_float(Location("l", 4));
+    tl_int_float.push_back(Token(TokenType::Integer, "123"));
+    tl_int_float.push_back(Token(TokenType::Float, "1.23"));
+    REQUIRE(tl_int_float.to_string() == "123 1.23");
+
+    // Float followed by Identifier
+    TokensLine tl_float_id(Location("l", 5));
+    tl_float_id.push_back(Token(TokenType::Float, "1.23"));
+    tl_float_id.push_back(Token(TokenType::Identifier, "x"));
+    REQUIRE(tl_float_id.to_string() == "1.23 x");
+
+    // Mixed with non-identifier/number tokens should not insert extra spaces beyond token text
+    TokensLine tl_mixed(Location("l", 6));
+    tl_mixed.push_back(Token(TokenType::Identifier, "mov"));
+    tl_mixed.push_back(Token(TokenType::LeftParen, "("));
+    tl_mixed.push_back(Token(TokenType::Integer, "1"));
+    tl_mixed.push_back(Token(TokenType::RightParen, ")"));
+    // Expect "mov(1)" if no whitespace tokens were present in original tokens
+    REQUIRE(tl_mixed.to_string() == "mov(1)");
+}
+
+// New tests: verify that to_string inserts spaces between tokens that would combine
+// into multi-character operator tokens when concatenated.
+TEST_CASE("TokensLine to_string inserts spaces between tokens that form multi-char operators",
+          "[lexer][tokensline][to_string_op_spacing]") {
+    g_options = Options();
+
+    struct Pair {
+        TokenType a;
+        const char* ta;
+        TokenType b;
+        const char* tb;
+    };
+    std::vector<Pair> pairs = {
+        { TokenType::LT, "<", TokenType::LT, "<" },          // "<" + "<" -> "<<"
+        { TokenType::GT, ">", TokenType::GT, ">" },          // ">" + ">" -> ">>"
+        { TokenType::LT, "<", TokenType::EQ, "=" },          // "<" + "=" -> "<="
+        { TokenType::GT, ">", TokenType::EQ, "=" },          // ">" + "=" -> ">="
+        { TokenType::LogicalNot, "!", TokenType::EQ, "=" },  // "!" + "=" -> "!="
+        { TokenType::BitwiseAnd, "&", TokenType::BitwiseAnd, "&" }, // "&" + "&" -> "&&"
+        { TokenType::BitwiseOr, "|", TokenType::BitwiseOr, "|" },   // "|" + "|" -> "||"
+        { TokenType::BitwiseXor, "^", TokenType::BitwiseXor, "^" }, // "^" + "^" -> "^^"
+        { TokenType::Multiply, "*", TokenType::Multiply, "*" },     // "*" + "*" -> "**"
+        { TokenType::Hash, "#", TokenType::Hash, "#" },             // "#" + "#" -> "##"
+        { TokenType::EQ, "=", TokenType::EQ, "=" },                 // "=" + "=" -> "=="
+        { TokenType::LT, "<", TokenType::GT, ">" }                  // "<" + ">" -> "<>"
+    };
+
+    for (const auto& p : pairs) {
+        TokensLine tl(Location("op", 1));
+        tl.push_back(Token(p.a, p.ta));
+        tl.push_back(Token(p.b, p.tb));
+        std::string want = std::string(p.ta) + " " + std::string(p.tb);
+        INFO("Checking pair: '" << p.ta << "' + '" << p.tb << "' -> to_string()");
+        REQUIRE(tl.to_string() == want);
+    }
+}
+
+TEST_CASE("TokensFile get_tok_line out-of-range returns empty TokensLine",
+          "[lexer][tokensfile][bounds]") {
+    g_options = Options();
+
+    const std::string content = "one\n";
+    TokensFile tf(content, "v", 1);
+    REQUIRE(tf.tok_lines_count() == 1);
+    const TokensLine& out = tf.get_tok_line(99);
+    REQUIRE(out.empty());
+    // out.tokens() should be empty
+    REQUIRE(out.tokens().empty());
 }
