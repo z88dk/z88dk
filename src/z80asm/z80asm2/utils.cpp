@@ -148,12 +148,21 @@ void write_string_to_file(const std::string& filename,
 }
 
 bool parse_int_from_chars(const std::string& s, int base, int& out) {
-    std::string t = s;
-    if (t.size() >= 2 && t[0] == '0' &&
-            (t[1] == 'x' || t[1] == 'X')) {
+    // Copy input and remove all underscore separators
+    std::string t;
+    t.reserve(s.size());
+    for (char c : s) {
+        if (c != '_') {
+            t.push_back(c);
+        }
+    }
+
+    // Handle 0x/0X hexadecimal prefix
+    if (t.size() >= 2 && t[0] == '0' && (t[1] == 'x' || t[1] == 'X')) {
         t.erase(0, 2);
         base = 16;
     }
+
     int value = 0;
     auto res = std::from_chars(t.data(), t.data() + t.size(), value, base);
     if (res.ec != std::errc()) {
