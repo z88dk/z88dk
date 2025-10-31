@@ -32,17 +32,23 @@
  *  Build and RUN hints
  *  ===================
  *
- *  ZX Spectrum 16K (non-joystick mode saves more memory)
- *     zcc +zx -lndos -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
+ *  ZX Spectrum 16K (non-joystick mode to save memory)
+ *     zcc +zx -lndos -create-app -DFASTCLGA -Dspritesize=8  -DSOUND -zorg=24550 -O3 wall.c
  *
  *  ZX Spectrum 48K
- *     zcc +zx -lndos -create-app -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
+ *     zcc +zx -lndos -create-app -DJOYSTICK -DBANNERS -DFASTCLGA -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
+ *
+ *  ZX Spectrum with paddle on DAC0809 interface, I/O port 1, pot. on channel 0
+ *     zcc +zx -lndos -create-app -DPADDLE=1 -DFASTCLGA -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
  *
  *  Lambda 8300
  *     zcc +lambda -create-app -Dspritesize=2 wall.c
  *
- *  ZX81
+ *  ZX81 ("BORDERS" is optional)
  *     zcc +zx81 -create-app -Dspritesize=2 -DBORDERS wall.c
+ *
+ *  ZX81 with paddle, I/O port 31 (Mageco, DCP Microdevelopments, etc..), pot. on channel 0
+ *     zcc +zx81 -create-app -DPADDLE=31 -Dspritesize=2 -DCLOCK wall.c
  *
  *  ZX81 UDG (programmable characters board is required)
  *     zcc +zx81 -clib=udg -create-app -Dspritesize=2 -Dspritesizeh=3 wall.c
@@ -466,7 +472,26 @@ void move_ball() {
 }
 
 
+#ifdef PADDLE
 
+void move_paddle()
+{
+		//putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
+#ifdef FASTCLGA
+		clga(0,(21*spritesizeh)-1,getmaxx()-1,spritesizeh);
+#else
+#if (spritesize == 2)
+		putsprite(spr_and,(a*spritesize),(21*spritesizeh)-1,paddle);
+#else
+		putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
+#endif
+#endif
+		a=inp(PADDLE)/9;
+		putsprite(spr_or,(a*spritesize),(21*spritesizeh)-1,paddle);
+		outp(PADDLE,0);
+}
+
+#else
 
 void move_left() {
 	if (a>0) {
@@ -496,6 +521,7 @@ void move_right() {
 	}
 }
 
+#endif
 
 
 
@@ -668,7 +694,7 @@ start_level:
 
 		g=200;
 
-		/* Let's show where the ball stars before the dance begins */
+		/* Let's show where the ball starts before the dance begins */
 		putsprite(spr_or,(n*spritesize),(m*spritesizeh),ball);
 
 		hit_border();
@@ -714,6 +740,9 @@ start_level:
 	#endif
 */
 
+#ifdef PADDLE
+			move_paddle();
+#else
 #ifdef JOYSTICK
 			if (joystick(stick) & MOVE_LEFT) {
 				move_left();
@@ -744,14 +773,20 @@ start_level:
 					break;
 			}
 #endif
+#endif
 		}
 		/* ball is lost */
 
+#ifdef FASTCLGA
+		clga(0,(21*spritesizeh)-1,getmaxx()-1,spritesizeh);
+#else
 #if (spritesize == 2)
 	  putsprite(spr_and,(a*spritesize),(21*spritesizeh)-1,paddle);
 #else
 	  putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
 #endif
+#endif
+
   }
 
 
