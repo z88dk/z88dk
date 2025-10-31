@@ -2106,3 +2106,82 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
     REQUIRE(!line.tokens().empty());
     REQUIRE(line.tokens()[0].text() == "after_ml2");
 }
+
+// -----------------------------------------------------------------------------
+// Additional tests: ensure token-paste result is recognized as a macro name
+// and expanded when appropriate.
+// -----------------------------------------------------------------------------
+TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expands to an object-like macro",
+          "[preprocessor][tokenpaste][macro][object]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define object-like macro AB -> 777, then use token paste A ## B
+    const std::string content =
+        "#define AB 777\n"
+        "A ## B\n";
+    pp.push_virtual_file(content, "paste_then_expand_obj", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    bool found777 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 777) {
+            found777 = true;
+            break;
+        }
+    }
+    REQUIRE(found777);
+}
+
+TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expands to a function-like macro when followed by parentheses",
+          "[preprocessor][tokenpaste][macro][function]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define function-like macro P1(x) -> x, then paste P ## 1 and call it with (99)
+    const std::string content =
+        "#define P1(x) x\n"
+        "P##1(99)\n";
+    pp.push_virtual_file(content, "paste_then_expand_func", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    bool found99 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 99) {
+            found99 = true;
+            break;
+        }
+    }
+    REQUIRE(found99);
+}
+
+TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces macro name and expands correctly",
+          "[preprocessor][tokenpaste][macro][idint]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define macro Q2 -> 202, then use token paste Q ## 2
+    const std::string content =
+        "#define Q2 202\n"
+        "Q ## 2\n";
+    pp.push_virtual_file(content, "paste_id_int_expand", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    bool found202 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 202) {
+            found202 = true;
+            break;
+        }
+    }
+    REQUIRE(found202);
+}
