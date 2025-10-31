@@ -127,12 +127,60 @@ void Preprocessor::push_binary_file(const std::string& bin_filename) {
 bool Preprocessor::next_line(TokensLine& line) {
     line.clear();
     while (true) {
-        // read lines from input queue if any
+        // If we have queued lines, process them as full input (including directives)
         if (!input_queue_.empty()) {
             line = std::move(input_queue_.front());
             input_queue_.pop_front();
+
+            // Keep error context consistent with normal path
+            g_errors.set_location(line.location());
+            g_errors.set_source_line(line.to_string());
+
+            if (line.empty()) {
+                continue;
+            }
+
+            // Process directives appearing in queued lines (e.g., MACRO created by macro expansion)
+            Keyword keyword = Keyword::None;
+            unsigned i = 0;
+            if (is_directive(line, i, keyword)) {
+                reading_queue_for_directive_ = true;
+                process_directive(line, i, keyword);
+                reading_queue_for_directive_ = false;
+                continue; // consume and continue
+            }
+
+            // Process name-directive form from queued lines as well
+            std::string name;
+            keyword = Keyword::None;
+            i = 0;
+            if (is_name_directive(line, i, keyword, name)) {
+                reading_queue_for_directive_ = true;
+                process_name_directive(line, i, keyword, name);
+                reading_queue_for_directive_ = false;
+                continue; // consume and continue
+            }
+
+            // Not a directive -> return this logical line.
+            // Since we are returning a user-visible line, cancel any pending compensation.
+            pending_line_without_output_ = false;
+
             g_errors.set_expanded_line(line.to_string());
             return true;
+        }
+
+        // Nothing queued. If the last physical source line produced no output
+        // (expanded only to directives), compensate LINE-based numbering by
+        // shifting the forced_from_index so the next returned line keeps the
+        // same logical line number.
+        if (pending_line_without_output_) {
+            if (!file_stack_.empty()) {
+                File& file = file_stack_.back();
+                if (file.has_forced_location && !file.forced_constant_line_numbers) {
+                    ++file.forced_from_index;
+                }
+            }
+            pending_line_without_output_ = false;
         }
 
         // read lines from top file in stack
@@ -201,11 +249,22 @@ bool Preprocessor::next_line(TokensLine& line) {
         std::vector<TokensLine> input_lines{ line };
         std::vector<TokensLine> expanded = expand_macros(input_lines);
         if (expanded.empty()) {
+            // This physical source line produced no output (e.g., expands only to directives or nothing).
+            // Keep the same logical line number for the next returned line by compensating
+            // the physical advance used by forced location.
+            if (file.has_forced_location && !file.forced_constant_line_numbers) {
+                ++file.forced_from_index;
+            }
             continue; // get next line
         }
 
         // split expanded lines into input queue
         split_lines(location, expanded);
+
+        // We consumed a physical source line and enqueued expansions but did not
+        // return anything yet. Mark pending compensation in case those queued
+        // lines are all directives and yield no user-visible output.
+        pending_line_without_output_ = true;
     }
 }
 
@@ -549,10 +608,14 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
         process_define(line, i);
         break;
     case Keyword::UNDEF:
+    case Keyword::UNDEFINE:
         process_undef(line, i);
         break;
     case Keyword::DEFL:
         process_defl(line, i);
+        break;
+    case Keyword::MACRO:
+        process_macro(line, i);
         break;
     default:
         assert(0);
@@ -569,10 +632,14 @@ void Preprocessor::process_name_directive(const TokensLine& line,
         process_name_define(line, i, name);
         break;
     case Keyword::UNDEF:
+    case Keyword::UNDEFINE:
         process_name_undef(line, i, name);
         break;
     case Keyword::DEFL:
         process_name_defl(line, i, name);
+        break;
+    case Keyword::MACRO:
+        process_name_macro(line, i, name);
         break;
     default:
         assert(0);
@@ -707,9 +774,9 @@ void Preprocessor::process_define(const TokensLine& line, unsigned& i) {
 
     // Determine if function-like: must have '(' immediately after name (no space)
     std::vector<std::string> params;
+    bool had_func_parens = false;
     if (i < line.size() && line[i].is(TokenType::LeftParen)) {
-        // '(' is immediate -> function-like macro. Delegate parsing to parse_params_list,
-        // which will advance `i` past the parameter list on success.
+        had_func_parens = true;
         if (!parse_params_list(line, i, params)) {
             g_errors.error(ErrorCode::InvalidSyntax,
                            "Invalid macro parameter list");
@@ -718,19 +785,17 @@ void Preprocessor::process_define(const TokensLine& line, unsigned& i) {
     }
 
     // Delegate the remaining common work to do_define (consumes rest of line)
-    do_define(line, i, name, params);
+    do_define(line, i, name, params, had_func_parens);
 }
 
 void Preprocessor::process_name_define(const TokensLine& line, unsigned& i,
                                        const std::string& name) {
-    // name define ...  -> treat as "#define name ..." (object-like)
-    // In the name-directive form the '(' would appear after the directive token;
-    // for simplicity assume name define (no function params) in this form.
+    // name define ... -> treat as "#define name ..." (object-like)
     unsigned j = i;
 
-    // Delegate the remaining common work to do_define using local index j.
+    // No function-like params recognized in name-directive form
     std::vector<std::string> params;
-    do_define(line, j, name, params);
+    do_define(line, j, name, params, false);
 
     // advance caller index past what we consumed
     i = j;
@@ -738,7 +803,8 @@ void Preprocessor::process_name_define(const TokensLine& line, unsigned& i,
 
 void Preprocessor::do_define(const TokensLine& line, unsigned& i,
                              const std::string& name,
-                             const std::vector<std::string>& params) {
+                             const std::vector<std::string>& params,
+                             bool had_func_parens) {
     line.skip_spaces(i);
 
     // scan optional '=' for compatibility
@@ -751,29 +817,26 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
     // collect body tokens (rest of line)
     std::vector<Token> body_tokens;
     while (i < line.size()) {
-        // collect body tokens (including whitespace); will trim trailing whitespace below
         body_tokens.push_back(line[i]);
         ++i;
     }
-    // remove trailing whitespace tokens if present in body_tokens
     while (!body_tokens.empty() && body_tokens.back().is(TokenType::Whitespace)) {
         body_tokens.pop_back();
     }
 
-    // Build replacement TokensLine(s)
     TokensLine rep;
     rep.set_location(line.location());
     for (const Token& t : body_tokens) {
         rep.push_back(t);
     }
 
-    // If nothing in body, replace it with integer token '1'
     if (rep.empty()) {
         rep.push_back(Token(TokenType::Integer, "1", 1));
     }
 
     Macro macro;
     macro.params = params;
+    macro.is_function_like = (!macro.params.empty()) || had_func_parens;
     macro.replacement.clear();
     macro.replacement.push_back(rep);
     macros_[name] = std::move(macro);
@@ -910,6 +973,149 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     // 6) Register/overwrite the macro definition of <name>.
     macros_[name] = std::move(macro);
     // Reset recursion guard counter for this macro name (safe guard)
+    macro_recursion_count_[name] = 0;
+}
+
+bool Preprocessor::fetch_line_for_macro_body(TokensLine& out) {
+    if (reading_queue_for_directive_) {
+        if (input_queue_.empty()) {
+            return false;
+        }
+        out = std::move(input_queue_.front());
+        input_queue_.pop_front();
+        return true;
+    }
+
+    if (file_stack_.empty()) {
+        return false;
+    }
+
+    File& file = file_stack_.back();
+    if (file.line_index >= file.tokens_file.tok_lines_count()) {
+        return false;
+    }
+
+    out = file.tokens_file.get_tok_line(file.line_index);
+    ++file.line_index;
+
+    // Apply forced logical location if any
+    if (file.has_forced_location) {
+        int physical_index = file.line_index - 1; // index of the line we just took
+        Location loc = out.location();
+        if (!file.forced_filename.empty()) {
+            loc.set_filename(file.forced_filename);
+        }
+        if (file.forced_constant_line_numbers) {
+            loc.set_line_num(file.forced_start_line_num);
+        }
+        else {
+            int offset = physical_index - file.forced_from_index;
+            loc.set_line_num(file.forced_start_line_num + offset);
+        }
+        out.set_location(loc);
+    }
+
+    return true;
+}
+
+void Preprocessor::process_macro(const TokensLine& line, unsigned& i) {
+    // Expect: MACRO name(param, ...) or MACRO name param, ...
+    line.skip_spaces(i);
+    if (!(i < line.size() && line[i].is(TokenType::Identifier))) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Expected identifier after MACRO");
+        return;
+    }
+    std::string name = line[i].text();
+    ++i;
+
+    // Delegate to common handler starting at params position
+    do_macro(line, i, name);
+}
+
+void Preprocessor::process_name_macro(const TokensLine& line,
+                                      unsigned& i, const std::string& name) {
+    // Form: <name> MACRO (param, ...) or <name> MACRO param, ...
+    do_macro(line, i, name);
+}
+
+void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
+                            const std::string& name) {
+    // Parse optional parameter list (accepts with or without surrounding parentheses)
+    std::vector<std::string> params;
+    unsigned j = i;
+    line.skip_spaces(j);
+
+    const bool had_paren = (j < line.size() && line[j].is(TokenType::LeftParen));
+    if (j < line.size()) {
+        if (!parse_params_list(line, j, params)) {
+            g_errors.error(ErrorCode::InvalidSyntax, "Invalid macro parameter list");
+            return;
+        }
+    }
+    expect_end(line, j);
+
+    // Collect body lines verbatim until ENDM
+    std::vector<TokensLine> body;
+    int nest = 0;
+
+    while (true) {
+        TokensLine raw;
+        if (!fetch_line_for_macro_body(raw)) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Unexpected end of input in MACRO (missing ENDM)");
+            return;
+        }
+
+        // Check for a line that is exactly "ENDM" (ignoring leading/trailing whitespace)
+        bool is_endm_line = false;
+        unsigned k = 0;
+        Keyword kw = Keyword::None;
+        if (is_directive(raw, k, kw)) {
+            if (kw == Keyword::ENDM) {
+                ++k;
+                raw.skip_spaces(k);
+                if (raw.at_end(k)) {
+                    is_endm_line = true;
+                }
+            }
+        }
+
+        if (is_endm_line) {
+            if (nest == 0) {
+                break;
+            }
+            --nest;
+        }
+        else {
+            // Detect nested MACRO starts to handle matching ENDM
+            k = 0;
+            kw = Keyword::None;
+            if (is_directive(raw, k, kw)) {
+                if (kw == Keyword::MACRO) {
+                    ++nest;
+                }
+            }
+            else {
+                // Also honor the "<name> MACRO ..." form
+                std::string dummyName;
+                k = 0;
+                if (is_name_directive(raw, k, kw, dummyName)) {
+                    if (kw == Keyword::MACRO) {
+                        ++nest;
+                    }
+                }
+            }
+        }
+
+        body.push_back(raw);
+    }
+
+    Macro macro;
+    macro.params = std::move(params);
+    macro.is_function_like = (!macro.params.empty())
+                             || had_paren; // true if params or empty ()
+    macro.replacement = std::move(body);
+    macros_[name] = std::move(macro);
     macro_recursion_count_[name] = 0;
 }
 
@@ -1089,13 +1295,25 @@ bool Preprocessor::is_macro_call(const TokensLine& in_line, unsigned idx,
                                  const Macro& macro,
                                  unsigned& args_start_idx) const {
     args_start_idx = idx + 1;
-    if (macro.params.size() != 0 && args_start_idx < in_line.size()) {
-        const Token& nextTok = in_line[args_start_idx];
-        if (nextTok.is(TokenType::LeftParen)) {
-            return true;
-        }
+
+    // Only function-like macros use call syntax
+    if (!macro.is_function_like) {
+        return false;
     }
-    return false;
+
+    // Must have something after the macro name to be considered a call candidate
+    if (args_start_idx >= in_line.size()) {
+        return false;
+    }
+
+    // Classic form: immediate '('
+    if (in_line[args_start_idx].is(TokenType::LeftParen)) {
+        return true;
+    }
+
+    // Also allow non-parenthesized calls where arguments follow and are separated by commas
+    // The actual argument-count validation will be done after parsing.
+    return true;
 }
 
 // Parse macro args and expand each argument (expand macros inside arguments).
@@ -1288,24 +1506,18 @@ void Preprocessor::append_expansion_into_out(const std::vector<TokensLine>&
 
 // ------------------- expand_macros (refactored) -------------------------------
 
-// Expand macros in-place according to simple C-like semantics described.
-// This implementation supports object-like and function-like macros (no varargs),
-// expands macro parameters before substitution, and prevents infinite recursion
-// using macro_recursion_count_. Returned TokensLine objects represent logical lines.
 std::vector<TokensLine> Preprocessor::expand_macros(
     const std::vector<TokensLine>& lines) {
 
     std::vector<TokensLine> result;
 
     for (const TokensLine& in_line : lines) {
-        // We'll produce exactly one output TokensLine per input line (preserve lines).
         TokensLine out(in_line.location());
         unsigned idx = 0;
 
         while (idx < in_line.size()) {
             const Token& tok = in_line[idx];
 
-            // If token isn't an identifier, copy it and continue.
             if (!tok.is(TokenType::Identifier)) {
                 out.push_back(tok);
                 ++idx;
@@ -1315,32 +1527,31 @@ std::vector<TokensLine> Preprocessor::expand_macros(
             std::string name = tok.text();
             auto mit = macros_.find(name);
             if (mit == macros_.end()) {
-                // not a macro
                 out.push_back(tok);
                 ++idx;
                 continue;
             }
 
-            // Found macro
             Macro& macro = mit->second;
 
-            // Recursion guard for this macro
             int& rc = macro_recursion_count_[name];
             if (rc >= MAX_MACRO_RECURSION) {
                 g_errors.error(ErrorCode::MacroRecursionLimit,
                                "Macro recursion limit reached for: " + name);
-                // emit original identifier literally
                 out.push_back(tok);
                 ++idx;
                 continue;
             }
 
-            // Determine if this is a function-like call (immediate '(')
+            // Determine if this is a function-like call (parenthesized or not)
             unsigned args_start_idx = 0;
             bool is_call = is_macro_call(in_line, idx, macro, args_start_idx);
+            bool had_paren = (is_call && args_start_idx < in_line.size() &&
+                              in_line[args_start_idx].is(TokenType::LeftParen));
 
-            if (macro.params.size() != 0 && is_call) {
-                // parse and expand args
+            // Handle function-like macros (even with zero params, e.g. MACRO())
+            if (macro.is_function_like && is_call) {
+                // Try to parse and expand arguments (supports optional parentheses)
                 std::vector<TokensLine> expanded_args_flat;
                 std::vector<TokensLine> original_args;
                 unsigned after_idx = 0;
@@ -1349,16 +1560,20 @@ std::vector<TokensLine> Preprocessor::expand_macros(
                                                  expanded_args_flat,
                                                  original_args,
                                                  after_idx)) {
-                    // syntax error in args -> treat as plain identifier
+                    // If parenthesized form was used, treat as a syntax error-like scenario
+                    // and fall back to literal; for non-paren ambiguous usage, keep literal.
                     out.push_back(tok);
                     ++idx;
                     continue;
                 }
 
-                // Validate argument count
+                // Validate argument count; if no parentheses were used and count doesn't match,
+                // treat as plain identifier (avoid spurious errors for ambiguous non-paren usage).
                 if (expanded_args_flat.size() != macro.params.size()) {
-                    g_errors.error(ErrorCode::InvalidSyntax,
-                                   "Macro argument count mismatch for: " + name);
+                    if (had_paren) {
+                        g_errors.error(ErrorCode::InvalidSyntax,
+                                       "Macro argument count mismatch for: " + name);
+                    }
                     out.push_back(tok);
                     ++idx;
                     continue;
@@ -1374,12 +1589,11 @@ std::vector<TokensLine> Preprocessor::expand_macros(
                 // Append expanded result into out/result following multi-line rules
                 append_expansion_into_out(further_expanded, out, result, in_line.location());
 
-                // advance idx past args
+                // advance idx past the consumed args (works for both paren and non-paren forms)
                 idx = after_idx;
             }
             else if (macro.params.empty()) {
                 // Object-like macro
-                // Copy replacement and expand (with recursion guard)
                 std::vector<TokensLine> substituted = macro.replacement;
 
                 rc++;
@@ -1388,17 +1602,15 @@ std::vector<TokensLine> Preprocessor::expand_macros(
 
                 append_expansion_into_out(further_expanded, out, result, in_line.location());
 
-                // consume the identifier token
                 ++idx;
             }
             else {
-                // macro has params but not invoked as call -> treat as identifier literal
+                // macro has params but is not considered a call -> treat name literally
                 out.push_back(tok);
                 ++idx;
             }
-        } // end scanning tokens of a line
+        }
 
-        // Push the resulting logical line (TokensLine represents a whole line; no newline token)
         result.push_back(out);
     }
 
