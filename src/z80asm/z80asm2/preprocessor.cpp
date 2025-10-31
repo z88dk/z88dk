@@ -1323,7 +1323,7 @@ bool Preprocessor::is_macro_call(const TokensLine& in_line, unsigned idx,
 // (used for '#' stringizing). On failure returns false (syntax error).
 bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
         unsigned args_start_idx,
-        std::vector<TokensLine>& expanded_args_flat,
+        std::vector<std::vector<TokensLine>>& expanded_args_flat,
         std::vector<TokensLine>& out_original_args,
         unsigned& out_after_idx) {
     unsigned j = args_start_idx;
@@ -1339,14 +1339,14 @@ bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
         // keep original trimmed argument tokens for '#' stringize operator
         out_original_args.push_back(argline);
 
-        // expand macros inside argument (we only keep the first expanded logical line)
+        // expand macros inside argument and keep all expanded logical lines
         std::vector<TokensLine> expanded = expand_macros(std::vector<TokensLine> { argline });
         if (!expanded.empty()) {
-            expanded_args_flat.push_back(expanded.front());
+            expanded_args_flat.push_back(expanded);
         }
         else {
             TokensLine emptyline(in_line.location());
-            expanded_args_flat.push_back(emptyline);
+            expanded_args_flat.push_back(std::vector<TokensLine> { emptyline });
         }
     }
 
@@ -1420,50 +1420,76 @@ bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
 // Supports the '#' operator via try_stringize_parameter above.
 std::vector<TokensLine> Preprocessor::substitute_and_expand(
     const Macro& macro,
-    const std::vector<TokensLine>& expanded_args_flat,
+    const std::vector<std::vector<TokensLine>>& expanded_args_flat,
     const std::vector<TokensLine>& original_args,
     const std::string& name) {
     // Perform textual parameter substitution
     std::vector<TokensLine> substituted;
     for (const TokensLine& rep_line : macro.replacement) {
-        TokensLine new_line(rep_line.location());
+        // temp_lines holds 1..N TokensLine resulting from substituting this rep_line
+        std::vector<TokensLine> temp_lines;
+        temp_lines.emplace_back(rep_line.location());
+
         unsigned pidx = 0;
         while (pidx < rep_line.size()) {
             const Token& rt = rep_line[pidx];
-            bool substituted_flag = false;
 
             // Handle stringize operator: '#' followed by parameter identifier
             if (rt.is(TokenType::Hash)) {
-                if (try_stringize_parameter(rep_line, pidx, macro, original_args, new_line)) {
+                // try_stringize_parameter expects a TokensLine to append into.
+                if (try_stringize_parameter(rep_line, pidx, macro, original_args,
+                                            temp_lines.back())) {
                     // handled and pidx advanced inside helper
                     continue;
                 }
-                // If not handled (not followed by a matching param), fall through to copy '#'
-                new_line.push_back(rt);
+                // If not handled (not followed by a matching param), copy '#'
+                temp_lines.back().push_back(rt);
                 ++pidx;
                 continue;
             }
+
+            bool substituted_flag = false;
 
             // Normal parameter substitution: identifier matching a parameter
             if (rt.is(TokenType::Identifier)) {
                 for (unsigned pi = 0; pi < macro.params.size(); ++pi) {
                     if (rt.text() == macro.params[pi]) {
-                        const TokensLine& argline = expanded_args_flat[pi];
-                        for (unsigned at = 0; at < argline.size(); ++at) {
-                            const Token& atok = argline[at];
-                            new_line.push_back(atok);
+                        // expanded_args_flat[pi] is a vector<TokensLine>
+                        const auto& arg_lines = expanded_args_flat[pi];
+
+                        if (!arg_lines.empty()) {
+                            // Append first expanded line into current last temp line
+                            const TokensLine& first_arg = arg_lines.front();
+                            for (unsigned at = 0; at < first_arg.size(); ++at) {
+                                temp_lines.back().push_back(first_arg[at]);
+                            }
+
+                            // For subsequent expanded lines, create new temp lines
+                            for (size_t al = 1; al < arg_lines.size(); ++al) {
+                                temp_lines.emplace_back(rep_line.location());
+                                const TokensLine& later_arg = arg_lines[al];
+                                for (unsigned at = 0; at < later_arg.size(); ++at) {
+                                    temp_lines.back().push_back(later_arg[at]);
+                                }
+                            }
                         }
                         substituted_flag = true;
                         break;
                     }
                 }
             }
+
             if (!substituted_flag) {
-                new_line.push_back(rt);
+                // Copy token into current last temp line
+                temp_lines.back().push_back(rt);
             }
             ++pidx;
         }
-        substituted.push_back(new_line);
+
+        // Append all produced temp lines for this replacement line
+        for (const TokensLine& tln : temp_lines) {
+            substituted.push_back(tln);
+        }
     }
 
     // Guard recursion while expanding substituted replacement
@@ -1552,7 +1578,7 @@ std::vector<TokensLine> Preprocessor::expand_macros(
             // Handle function-like macros (even with zero params, e.g. MACRO())
             if (macro.is_function_like && is_call) {
                 // Try to parse and expand arguments (supports optional parentheses)
-                std::vector<TokensLine> expanded_args_flat;
+                std::vector<std::vector<TokensLine>> expanded_args_flat;
                 std::vector<TokensLine> original_args;
                 unsigned after_idx = 0;
                 if (!parse_and_expand_macro_args(in_line,
