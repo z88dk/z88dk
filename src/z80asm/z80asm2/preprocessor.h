@@ -171,7 +171,7 @@ private:
     bool parse_and_expand_macro_args(
         const TokensLine& in_line,
         unsigned args_start_idx,
-        std::vector<TokensLine>& expanded_args_flat,
+        std::vector<std::vector<TokensLine>>& expanded_args_flat,
         std::vector<TokensLine>& out_original_args,
         unsigned& out_after_idx);
     bool try_stringize_parameter(
@@ -182,7 +182,7 @@ private:
         TokensLine& new_line);
     std::vector<TokensLine> substitute_and_expand(
         const Macro& macro,
-        const std::vector<TokensLine>& expanded_args_flat,
+        const std::vector<std::vector<TokensLine>>& expanded_args_flat,
         const std::vector<TokensLine>& original_args,
         const std::string& name);
     void append_expansion_into_out(
@@ -193,4 +193,5 @@ private:
 
     std::vector<TokensLine> expand_macros(const std::vector<TokensLine>& lines);
 };
+
 
