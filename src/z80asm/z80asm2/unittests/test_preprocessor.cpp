@@ -2018,3 +2018,91 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
     REQUIRE(line.tokens()[0].text() == "tail");
 }
 
+// -----------------------------------------------------------------------------
+// Macro arguments: argument may expand to multiple lines before insertion
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lines (parenthesized call)",
+          "[preprocessor][macro][args][multiline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // INNER() expands to two lines: "A" and "B".
+    // OUTER(x) pastes its single argument as-is; calling OUTER(INNER())
+    // must yield both lines from INNER at the call-site location.
+    const std::string content =
+        "MACRO INNER()\n"
+        "A\n"
+        "B\n"
+        "ENDM\n"
+        "MACRO OUTER(x)\n"
+        "x\n"
+        "ENDM\n"
+        "LINE 700, \"arg_multiline_1.asm\"\n"
+        "OUTER(INNER())\n"
+        "after_ml\n";
+    pp.push_virtual_file(content, "macro_arg_multiline_paren", 1);
+
+    TokensLine line;
+
+    // First line from INNER()
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
+    REQUIRE(line.location().line_num() == 700);
+    REQUIRE(line.location().filename() == "arg_multiline_1.asm");
+
+    // Second line from INNER()
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
+    REQUIRE(line.location().line_num() == 700);
+    REQUIRE(line.location().filename() == "arg_multiline_1.asm");
+
+    // Line after the macro call
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_ml");
+}
+
+TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lines (unparenthesized call)",
+          "[preprocessor][macro][args][multiline][no-parens-call]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Same as previous test but call OUT without parentheses:
+    // "OUT INNER()" -> the argument is the token sequence INNER().
+    const std::string content =
+        "MACRO INNER()\n"
+        "X\n"
+        "Y\n"
+        "ENDM\n"
+        "MACRO OUT(z)\n"
+        "z\n"
+        "ENDM\n"
+        "LINE 710, \"arg_multiline_2.asm\"\n"
+        "OUT INNER()\n"
+        "after_ml2\n";
+    pp.push_virtual_file(content, "macro_arg_multiline_noparen", 1);
+
+    TokensLine line;
+
+    // First line from INNER()
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "X");
+    REQUIRE(line.location().line_num() == 710);
+    REQUIRE(line.location().filename() == "arg_multiline_2.asm");
+
+    // Second line from INNER()
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "Y");
+    REQUIRE(line.location().line_num() == 710);
+    REQUIRE(line.location().filename() == "arg_multiline_2.asm");
+
+    // Line after the macro call
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_ml2");
+}
