@@ -1499,3 +1499,522 @@ TEST_CASE("Preprocessor: prefix DEFINE function-like accepts optional '=' before
     }
     REQUIRE(found7);
 }
+
+// Synonym tests: UNDEFINE behaves the same as UNDEF
+
+TEST_CASE("Preprocessor: name UNDEFINE removes macro (synonym to UNDEF)",
+          "[preprocessor][define][undef][undefine][synonym]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "M define 42\nM UNDEFINE\nM\n";
+    pp.push_virtual_file(content, "def_name_undefine", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    // After UNDEFINE the token should be the identifier 'M', not the expansion 42
+    REQUIRE(toks[0].text() == "M");
+}
+
+TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
+          "[preprocessor][define][undef][undefine][synonym][hash]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "#define N 99\n#UNDEFINE N\nN\n";
+    pp.push_virtual_file(content, "def_hash_undefine", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    // After #UNDEFINE the token should be the identifier 'N', not the expansion 99
+    REQUIRE(toks[0].text() == "N");
+}
+
+// -----------------------------------------------------------------------------
+// MACRO multi-line expansion tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at call-site location",
+          "[preprocessor][macro][multiline][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define a multi-line macro with one parameter, then set a logical location
+    // and invoke it. Each expanded line must carry the macro call's location.
+    const std::string content =
+        "MACRO TWOLINES(x)\n"
+        "one x\n"
+        "two x\n"
+        "ENDM\n"
+        "LINE 123, \"callsite1.asm\"\n"
+        "TWOLINES(5)\n"
+        "after\n";
+    pp.push_virtual_file(content, "macro_multiline_dir", 1);
+
+    TokensLine line;
+
+    // 1st expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "one");
+    {
+        bool has5 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 5) {
+                has5 = true;
+                break;
+            }
+        }
+        REQUIRE(has5);
+    }
+    REQUIRE(line.location().line_num() == 123);
+    REQUIRE(line.location().filename() == "callsite1.asm");
+
+    // 2nd expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "two");
+    {
+        bool has5 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 5) {
+                has5 = true;
+                break;
+            }
+        }
+        REQUIRE(has5);
+    }
+    REQUIRE(line.location().line_num() == 123);
+    REQUIRE(line.location().filename() == "callsite1.asm");
+
+    // Next line after macro expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
+}
+
+TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines at call-site location",
+          "[preprocessor][macro][multiline][location][name-directive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define using the "<name> MACRO(...)" form, then set a logical location and invoke it.
+    const std::string content =
+        "TM MACRO(y)\n"
+        "A y\n"
+        "B y\n"
+        "ENDM\n"
+        "LINE 200, \"callsite2.asm\"\n"
+        "TM(9)\n"
+        "after2\n";
+    pp.push_virtual_file(content, "macro_multiline_name", 1);
+
+    TokensLine line;
+
+    // 1st expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
+    {
+        bool has9 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 9) {
+                has9 = true;
+                break;
+            }
+        }
+        REQUIRE(has9);
+    }
+    REQUIRE(line.location().line_num() == 200);
+    REQUIRE(line.location().filename() == "callsite2.asm");
+
+    // 2nd expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
+    {
+        bool has9 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 9) {
+                has9 = true;
+                break;
+            }
+        }
+        REQUIRE(has9);
+    }
+    REQUIRE(line.location().line_num() == 200);
+    REQUIRE(line.location().filename() == "callsite2.asm");
+
+    // Next line after macro expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after2");
+}
+
+// -----------------------------------------------------------------------------
+// MACRO header: parentheses around parameters are optional
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parses params and expands correctly",
+          "[preprocessor][macro][params][optional-parens][directive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO NOPAREN a,b\n"
+        "L1 a\n"
+        "L2 b\n"
+        "ENDM\n"
+        "LINE 321, \"opt_paren1.asm\"\n"
+        "NOPAREN(11,22)\n"
+        "after_np\n";
+    pp.push_virtual_file(content, "macro_params_no_paren_dir", 1);
+
+    TokensLine line;
+
+    // First expanded line: L1 11
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "L1");
+    {
+        bool has11 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 11) {
+                has11 = true;
+                break;
+            }
+        }
+        REQUIRE(has11);
+    }
+    REQUIRE(line.location().line_num() == 321);
+    REQUIRE(line.location().filename() == "opt_paren1.asm");
+
+    // Second expanded line: L2 22
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "L2");
+    {
+        bool has22 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 22) {
+                has22 = true;
+                break;
+            }
+        }
+        REQUIRE(has22);
+    }
+    REQUIRE(line.location().line_num() == 321);
+    REQUIRE(line.location().filename() == "opt_paren1.asm");
+
+    // Next line after macro expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_np");
+}
+
+TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) parses params and expands correctly",
+          "[preprocessor][macro][params][optional-parens][name-directive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "PAIR MACRO x,y\n"
+        "A x\n"
+        "B y\n"
+        "ENDM\n"
+        "LINE 654, \"opt_paren2.asm\"\n"
+        "PAIR(7,8)\n"
+        "after_pair\n";
+    pp.push_virtual_file(content, "macro_params_no_paren_name", 1);
+
+    TokensLine line;
+
+    // First expanded line: A 7
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
+    {
+        bool has7 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 7) {
+                has7 = true;
+                break;
+            }
+        }
+        REQUIRE(has7);
+    }
+    REQUIRE(line.location().line_num() == 654);
+    REQUIRE(line.location().filename() == "opt_paren2.asm");
+
+    // Second expanded line: B 8
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
+    {
+        bool has8 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 8) {
+                has8 = true;
+                break;
+            }
+        }
+        REQUIRE(has8);
+    }
+    REQUIRE(line.location().line_num() == 654);
+    REQUIRE(line.location().filename() == "opt_paren2.asm");
+
+    // Next line after macro expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_pair");
+}
+
+// -----------------------------------------------------------------------------
+// MACRO header: "MACRO name param1,param2" (no parentheses) is accepted
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is accepted and expands",
+          "[preprocessor][macro][params][no-parens-header]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO H a,b\n"
+        "LHS a\n"
+        "RHS b\n"
+        "ENDM\n"
+        "LINE 77, \"hdr_noparen.asm\"\n"
+        "H(3,4)\n"
+        "done\n";
+    pp.push_virtual_file(content, "macro_header_no_parens", 1);
+
+    TokensLine line;
+
+    // First expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "LHS");
+    {
+        bool has3 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 3) {
+                has3 = true;
+                break;
+            }
+        }
+        REQUIRE(has3);
+    }
+    REQUIRE(line.location().line_num() == 77);
+    REQUIRE(line.location().filename() == "hdr_noparen.asm");
+
+    // Second expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "RHS");
+    {
+        bool has4 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 4) {
+                has4 = true;
+                break;
+            }
+        }
+        REQUIRE(has4);
+    }
+    REQUIRE(line.location().line_num() == 77);
+    REQUIRE(line.location().filename() == "hdr_noparen.asm");
+
+    // After expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "done");
+}
+
+TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parentheses are accepted",
+          "[preprocessor][macro][params][no-parens-header][no-parens-call]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO G x,y\n"
+        "A x\n"
+        "B y\n"
+        "ENDM\n"
+        "LINE 88, \"noparen_call.asm\"\n"
+        "G 10,20\n"  // call without parentheses
+        "end2\n";
+    pp.push_virtual_file(content, "macro_header_call_no_parens", 1);
+
+    TokensLine line;
+
+    // First expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
+    {
+        bool has10 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 10) {
+                has10 = true;
+                break;
+            }
+        }
+        REQUIRE(has10);
+    }
+    REQUIRE(line.location().line_num() == 88);
+    REQUIRE(line.location().filename() == "noparen_call.asm");
+
+    // Second expanded line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
+    {
+        bool has20 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 20) {
+                has20 = true;
+                break;
+            }
+        }
+        REQUIRE(has20);
+    }
+    REQUIRE(line.location().line_num() == 88);
+    REQUIRE(line.location().filename() == "noparen_call.asm");
+
+    // After expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "end2");
+}
+
+// -----------------------------------------------------------------------------
+// MACRO nesting: inner MACRO/ENDM in a macro body is defined when outer expands
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer expansion",
+          "[preprocessor][macro][nested][directive-inner]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // OUT defines an inner macro IN(a) in its body. Calling OUT() must define IN,
+    // so the subsequent IN(12) expands to two lines at the call-site location.
+    const std::string content =
+        "MACRO OUT()\n"
+        "MACRO IN(a)\n"
+        "L a\n"
+        "M a\n"
+        "ENDM\n"
+        "ENDM\n"
+        "LINE 500, \"nested_dir_inner.asm\"\n"
+        "OUT()\n"
+        "IN(12)\n"
+        "after_nested\n";
+    pp.push_virtual_file(content, "macro_nested_dir_inner", 1);
+
+    TokensLine line;
+
+    // Expect expansion of IN(12) produced by the nested macro definition
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "L");
+    {
+        bool has12 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 12) {
+                has12 = true;
+                break;
+            }
+        }
+        REQUIRE(has12);
+    }
+    REQUIRE(line.location().line_num() == 500);
+    REQUIRE(line.location().filename() == "nested_dir_inner.asm");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "M");
+    {
+        bool has12 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 12) {
+                has12 = true;
+                break;
+            }
+        }
+        REQUIRE(has12);
+    }
+    REQUIRE(line.location().line_num() == 500);
+    REQUIRE(line.location().filename() == "nested_dir_inner.asm");
+
+    // Next ordinary line after the nested macro expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_nested");
+}
+
+TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during outer expansion",
+          "[preprocessor][macro][nested][name-inner]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // OUTN defines inner macro INN(t) using the name-directive form. After OUTN(),
+    // INN(3) must be recognized and expanded at the call-site location.
+    const std::string content =
+        "MACRO OUTN()\n"
+        "INN MACRO(t)\n"
+        "X t\n"
+        "Y t\n"
+        "ENDM\n"
+        "ENDM\n"
+        "LINE 600, \"nested_name_inner.asm\"\n"
+        "OUTN()\n"
+        "INN(3)\n"
+        "tail\n";
+    pp.push_virtual_file(content, "macro_nested_name_inner", 1);
+
+    TokensLine line;
+
+    // First expanded line from INN(3)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "X");
+    {
+        bool has3 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 3) {
+                has3 = true;
+                break;
+            }
+        }
+        REQUIRE(has3);
+    }
+    REQUIRE(line.location().line_num() == 600);
+    REQUIRE(line.location().filename() == "nested_name_inner.asm");
+
+    // Second expanded line from INN(3)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "Y");
+    {
+        bool has3 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 3) {
+                has3 = true;
+                break;
+            }
+        }
+        REQUIRE(has3);
+    }
+    REQUIRE(line.location().line_num() == 600);
+    REQUIRE(line.location().filename() == "nested_name_inner.asm");
+
+    // Next ordinary line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "tail");
+}
+
