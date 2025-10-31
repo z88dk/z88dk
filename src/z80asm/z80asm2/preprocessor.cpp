@@ -1132,6 +1132,44 @@ void Preprocessor::split_line(const Location& location,
     TokensLine line_to_process = expanded;
     merge_double_hash(line_to_process);
 
+    // After token-paste, an identifier produced by '##' may form a macro name.
+    // Run macro expansion on the pasted result and, if it changes the line
+    // (or produces multiple logical lines), process those expanded results
+    // instead of the original pasted line. This ensures that token-paste
+    // followed by a macro name will cause that macro to be expanded.
+    {
+        std::vector<TokensLine> post_paste_expanded =
+            expand_macros(std::vector<TokensLine> { line_to_process });
+
+        // Determine if expansion changed the content in a meaningful way.
+        bool changed = false;
+        if (post_paste_expanded.size() != 1) {
+            changed = true;
+        }
+        else {
+            const TokensLine& p0 = post_paste_expanded.front();
+            if (p0.size() != line_to_process.size()) {
+                changed = true;
+            }
+            else {
+                for (unsigned k = 0; k < p0.size(); ++k) {
+                    if (p0[k].text() != line_to_process[k].text()) {
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (changed) {
+            // Process each expanded logical line resulting from macro expansion
+            for (const TokensLine& el : post_paste_expanded) {
+                split_line(location, el);
+            }
+            return;
+        }
+    }
+
     TokensLine current(location);
     int ternary_depth = 0;
     unsigned i = 0;
