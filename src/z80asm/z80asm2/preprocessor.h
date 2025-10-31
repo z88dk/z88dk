@@ -46,12 +46,9 @@ private:
 
     struct Macro {
         std::vector<TokensLine> replacement; // replacement token lines
-        std::vector<std::string> params;     // parameter names (empty => object-like)
-
-        bool is_function_like() const {
-            return !params.empty();
-        }
-
+        std::vector<std::string> params;     // parameter names
+        bool is_function_like =
+            false;       // true if definition had params or used empty ()
         bool is_multi_line() const {
             return replacement.size() > 1;
         }
@@ -61,13 +58,7 @@ private:
         TokensFile tokens_file;
         unsigned line_index = 0;
 
-        // Optional forced logical location produced by a LINE directive.
-        // When has_forced_location is true the logical location for the
-        // token lines starting at forced_from_index will be:
-        //   filename = forced_filename (if not empty)
-        //   line_num = forced_start_line_num + (physical_index - forced_from_index)
-        // If forced_constant_line_numbers is true the line_num will always be
-        // equal to forced_start_line_num for all subsequent lines.
+        // Optional forced logical location (from LINE/C_LINE)
         bool has_forced_location = false;
         unsigned forced_from_index = 0;
         int forced_start_line_num = 0;
@@ -78,18 +69,27 @@ private:
     // Queue of tokenized lines waiting to be processed/consumed.
     std::deque<TokensLine> input_queue_;
 
-    // Stack of source files currently open (keeps ownership of
-    // TokensFile objects).
+    // Stack of source files currently open (keeps ownership of TokensFile objects).
     std::vector<File> file_stack_;
 
     // Macro table
     std::unordered_map<std::string, Macro> macros_;
 
-    // Track macro expansion recursion depth per macro name
-    // (to avoid infinite recursion).
+    // Track macro expansion recursion depth per macro name (to avoid infinite recursion).
     std::unordered_map<std::string, int> macro_recursion_count_;
 
-    // parse and process directives
+    // When true, a directive is being processed from input_queue_ (not from file_stack_).
+    // Used so MACRO can read its body from the queue produced by macro expansion.
+    bool reading_queue_for_directive_ = false;
+
+    // If true, the last physical source line read produced no user-visible output yet.
+    // Used to compensate LINE-based logical numbering when a line expands only to directives.
+    bool pending_line_without_output_ = false;
+
+    // Fetch a raw next logical line for MACRO body parsing, from the proper source:
+    // - input_queue_ when reading_queue_for_directive_ is true
+    // - file_stack_ otherwise (and applies forced location if needed).
+    bool fetch_line_for_macro_body(TokensLine& out);
 
     // Internal helpers
     void expect_end(const TokensLine& line, unsigned i) const;
@@ -97,19 +97,9 @@ private:
                            std::vector<std::string>& out_params) const;
     bool parse_macro_args(const TokensLine& line, unsigned& i,
                           std::vector<TokensLine>& out_args);
-    // Helper to parse arguments common to LINE and C_LINE.
-    // Parses: <linenum> [ , "filename" ]
-    // On success returns true and sets linenum/filename (filename may be empty).
-    // On failure it emits an appropriate error message using directive_name and returns false.
     bool parse_line_args(const TokensLine& line, unsigned& i,
                          int& out_linenum, std::string& out_filename,
                          const char* directive_name) const;
-    // Parse a filename from the tokens at position i.
-    // Supports:
-    //  - quoted string token (double-quoted or angle-bracketed)
-    //  - plain filename parsed up to whitespace
-    // On success returns true, sets out_filename and out_is_angle and advances i.
-    // On failure returns false and does not emit errors (caller should emit appropriate message).
     bool parse_filename(const TokensLine& line, unsigned& i,
                         std::string& out_filename, bool& out_is_angle) const;
 
@@ -126,9 +116,6 @@ private:
     // INCLUDE
     void process_include(const TokensLine& line, unsigned& i);
     void do_include(const std::string& filename, bool is_angle);
-    // Search include path for a candidate filename. Returns resolved path or
-    // original file name if not found. Uses the same semantics as
-    // resolve_include_candidate.
     std::string search_include_path(const std::string& filename,
                                     bool is_angle) const;
 
@@ -144,18 +131,15 @@ private:
     void process_define(const TokensLine& line, unsigned& i);
     void process_name_define(const TokensLine& line, unsigned& i,
                              const std::string& name);
-    // New helper that contains the common trailing work after argument parsing.
-    // Consumes the rest of the tokens from `i` (or the provided index) and
-    // registers the macro `name`. `i` is updated to the index after what was consumed.
     void do_define(const TokensLine& line, unsigned& i,
                    const std::string& name,
-                   const std::vector<std::string>& params);
+                   const std::vector<std::string>& params,
+                   bool had_func_parens);
 
-    // UNDEF
+    // UNDEFINE / UNDEF
     void process_undef(const TokensLine& line, unsigned& i);
     void process_name_undef(const TokensLine& line, unsigned& i,
                             const std::string& name);
-    // New helper for shared UNDEF behavior
     void do_undef(const std::string& name, const TokensLine& line, unsigned& i);
 
     // DEFL
@@ -164,6 +148,13 @@ private:
                            const std::string& name);
     void do_defl(const TokensLine& line, unsigned& i,
                  const std::string& name);
+
+    // MACRO
+    void process_macro(const TokensLine& line, unsigned& i);
+    void process_name_macro(const TokensLine& line, unsigned& i,
+                            const std::string& name);
+    void do_macro(const TokensLine& line, unsigned& i,
+                  const std::string& name);
 
     // Macro expansion and line splitting
     void split_lines(const Location& location,
