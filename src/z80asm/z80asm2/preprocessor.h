@@ -65,6 +65,9 @@ private:
         int forced_start_line_num = 0;
         std::string forced_filename;
         bool forced_constant_line_numbers = false;
+
+        // True when this file represents an expanded macro "virtual file".
+        bool is_macro_expansion = false;
     };
 
     // Queue of tokenized lines waiting to be processed/consumed.
