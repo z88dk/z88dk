@@ -141,6 +141,12 @@ public:
     const std::string& get_line(unsigned index) const;
     unsigned tok_lines_count() const;
     const TokensLine& get_tok_line(unsigned index) const;
+    const std::vector<std::string> text_lines() const {
+        return text_lines_;
+    }
+    const std::vector<TokensLine> tok_lines() const {
+        return tok_lines_;
+    }
 
 private:
     std::string filename_;
