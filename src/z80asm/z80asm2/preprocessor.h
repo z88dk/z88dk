@@ -45,6 +45,9 @@ public:
     // Register a simple macro replacement (no parameters). Replacement may be
     // one or more TokensLine objects (multi-line macro).
     void define_macro(const std::string& name,
+                      const std::string replacement);
+
+    void define_macro(const std::string& name,
                       const std::vector<TokensLine>& replacement);
 
 private:

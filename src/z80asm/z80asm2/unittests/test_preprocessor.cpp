@@ -2487,3 +2487,368 @@ TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
     REQUIRE(!pp.next_line(line));
     REQUIRE(!g_errors.has_errors());
 }
+
+// -----------------------------------------------------------------------------
+// Macro redefinition diagnostics
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: #define redefines existing #define -> MacroRedefined error",
+          "[preprocessor][define][redefine][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 1\n"
+        "#define A 2\n"
+        "A\n";
+    pp.push_virtual_file(content, "redef_define_hash", 1, true);
+
+    TokensLine line;
+    // Consume all lines so diagnostics are emitted
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro redefined") != std::string::npos);
+    REQUIRE(msg.find("A") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined error",
+          "[preprocessor][define][name][redefine][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "B define 10\n"
+        "B define 20\n"
+        "B\n";
+    pp.push_virtual_file(content, "redef_define_name", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro redefined") != std::string::npos);
+    REQUIRE(msg.find("B") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: MACRO (directive form) redefines existing MACRO -> MacroRedefined error",
+          "[preprocessor][macro][directive][redefine][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M()\n"
+        "ENDM\n"
+        "MACRO M()\n"
+        "ENDM\n"
+        "M()\n";
+    pp.push_virtual_file(content, "redef_macro_dir", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro redefined") != std::string::npos);
+    REQUIRE(msg.find("M") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: MACRO (name-directive form) redefines existing MACRO -> MacroRedefined error",
+          "[preprocessor][macro][name][redefine][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "N MACRO()\n"
+        "ENDM\n"
+        "N MACRO()\n"
+        "ENDM\n"
+        "N()\n";
+    pp.push_virtual_file(content, "redef_macro_name", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro redefined") != std::string::npos);
+    REQUIRE(msg.find("N") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then #define) produce MacroRedefined",
+          "[preprocessor][macro][define][mixed][redefine][error]") {
+    // #define first, then MACRO
+    {
+        g_errors.reset();
+        Preprocessor pp;
+
+        const std::string content =
+            "#define X 1\n"
+            "MACRO X()\n"
+            "ENDM\n"
+            "X\n";
+        pp.push_virtual_file(content, "redef_mixed_def_then_macro", 1, true);
+
+        TokensLine line;
+        while (pp.next_line(line)) {}
+
+        REQUIRE(g_errors.has_errors());
+        const std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Macro redefined") != std::string::npos);
+        REQUIRE(msg.find("X") != std::string::npos);
+    }
+
+    // MACRO first, then #define
+    {
+        g_errors.reset();
+        Preprocessor pp;
+
+        const std::string content =
+            "MACRO Y()\n"
+            "ENDM\n"
+            "#define Y 2\n"
+            "Y\n";
+        pp.push_virtual_file(content, "redef_mixed_macro_then_def", 1, true);
+
+        TokensLine line;
+        while (pp.next_line(line)) {}
+
+        REQUIRE(g_errors.has_errors());
+        const std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Macro redefined") != std::string::npos);
+        REQUIRE(msg.find("Y") != std::string::npos);
+    }
+}
+
+TEST_CASE("Preprocessor: DEFL redefinition does NOT raise MacroRedefined",
+          "[preprocessor][defl][redefine][noerror]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "Z DEFL 1\n"
+        "Z DEFL 2\n"
+        "Z\n";
+    pp.push_virtual_file(content, "redef_defl", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    // DEFL redefinitions should not be flagged as MacroRedefined
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// Preprocessor::define_macro(string content) multi-line expansion tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: define_macro from string content with multiple lines expands at call-site location",
+          "[preprocessor][define_macro][string][multiline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Build a multi-line macro body from a string (two lines).
+    const std::string macro_text =
+        "LHS 10\n"
+        "RHS 20\n";
+
+    // Tokenize the string and define an object-like macro that expands to multiple lines.
+    // This emulates Preprocessor::define_macro(name, std::string).
+    TokensFile tf(macro_text, "<macro_define_string>", 1, false);
+    pp.define_macro("ML", tf.tok_lines());
+
+    // Use a LINE directive to fix the call-site logical location and then invoke the macro.
+    const std::string content =
+        "LINE 777, \"call_ml.asm\"\n"
+        "ML\n"
+        "tail\n";
+    pp.push_virtual_file(content, "ml_call_site", 1, true);
+
+    TokensLine line;
+
+    // First expanded line: "LHS 10"
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "LHS");
+    {
+        bool has10 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 10) {
+                has10 = true;
+                break;
+            }
+        }
+        REQUIRE(has10);
+    }
+    REQUIRE(line.location().line_num() == 777);
+    REQUIRE(line.location().filename() == "call_ml.asm");
+
+    // Second expanded line: "RHS 20"
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "RHS");
+    {
+        bool has20 = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && t.int_value() == 20) {
+                has20 = true;
+                break;
+            }
+        }
+        REQUIRE(has20);
+    }
+    REQUIRE(line.location().line_num() == 777);
+    REQUIRE(line.location().filename() == "call_ml.asm");
+
+    // Next original line after the macro expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "tail");
+}
+
+TEST_CASE("Preprocessor: define_macro from string content with label splits label and keeps call-site location",
+          "[preprocessor][define_macro][string][label][multiline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Macro content includes a label and two instructions.
+    const std::string macro_text =
+        "LBL: nop\n"
+        "ret\n";
+
+    // Tokenize string and define macro.
+    TokensFile tf(macro_text, "<macro_define_label>", 1, false);
+    pp.define_macro("BLK", tf.tok_lines());
+
+    // Fix call-site location and invoke the macro.
+    const std::string content =
+        "LINE 1234, \"call_define_label.asm\"\n"
+        "BLK\n"
+        "after\n";
+    pp.push_virtual_file(content, "blk_call_site", 1, true);
+
+    TokensLine line;
+
+    // Label line emitted first: ". LBL"
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "LBL");
+    REQUIRE(line.location().line_num() == 1234);
+    REQUIRE(line.location().filename() == "call_define_label.asm");
+
+    // Instruction line following the label: "nop"
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_nop = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "nop") {
+                saw_nop = true;
+                break;
+            }
+        }
+        REQUIRE(saw_nop);
+    }
+    REQUIRE(line.location().line_num() == 1234);
+    REQUIRE(line.location().filename() == "call_define_label.asm");
+
+    // Second instruction line: "ret"
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_ret = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "ret") {
+                saw_ret = true;
+                break;
+            }
+        }
+        REQUIRE(saw_ret);
+    }
+    REQUIRE(line.location().line_num() == 1234);
+    REQUIRE(line.location().filename() == "call_define_label.asm");
+
+    // Next original line after expansion
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
+}
+
+// -----------------------------------------------------------------------------
+// Preprocessor::define_macro(name, string) - multi-line content expands properly
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: define_macro(name, string) expands multi-line body at call-site location",
+          "[preprocessor][define_macro][string][multiline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define an object-like macro from a raw multi-line string
+    pp.define_macro("S", "text\nwith\nseveral\nlines");
+
+    // Fix the call-site location; invoking S should emit four lines at line 42
+    const std::string content =
+        "LINE 42, \"call_define_string.asm\"\n"
+        "S\n"
+        "after\n";
+    pp.push_virtual_file(content, "define_string_call", 1, true);
+
+    TokensLine line;
+
+    const std::vector<std::string> expected = { "text", "with", "several", "lines" };
+    for (const auto& word : expected) {
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == word);
+        REQUIRE(line.location().line_num() == 42);
+        REQUIRE(line.location().filename() == "call_define_string.asm");
+    }
+
+    // Next ordinary line from the original file
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
+}
+
+// -----------------------------------------------------------------------------
+// define_macro API redefinition diagnostics
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: define_macro(name, string) reports MacroRedefined on redefinition",
+          "[preprocessor][define_macro][redefine][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    pp.define_macro("A", "1\n");
+    pp.define_macro("A", "2\n"); // redefinition should be reported
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro redefined") != std::string::npos);
+    REQUIRE(msg.find("A") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: define_macro(name, tok_lines) reports MacroRedefined on redefinition",
+          "[preprocessor][define_macro][vector][redefine][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // first definition via tok_lines
+    {
+        TokensFile tf("X 10\n", "<macro_vec_1>", 1, false);
+        pp.define_macro("B", tf.tok_lines());
+    }
+
+    // second definition via tok_lines (same name) triggers error
+    {
+        TokensFile tf2("X 20\n", "<macro_vec_2>", 1, false);
+        pp.define_macro("B", tf2.tok_lines());
+    }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Macro redefined") != std::string::npos);
+    REQUIRE(msg.find("B") != std::string::npos);
+}
+
