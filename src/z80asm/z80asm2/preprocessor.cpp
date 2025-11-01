@@ -34,9 +34,11 @@ void Preprocessor::push_file(const std::string& filename) {
 
 void Preprocessor::push_virtual_file(const std::string& content,
                                      const std::string& filename,
-                                     int first_line_num) {
+                                     int first_line_num,
+                                     bool inc_line_nums) {
     File vf;
-    vf.tokens_file = TokensFile(content, filename, first_line_num);
+    vf.tokens_file = TokensFile(content, filename,
+                                first_line_num, inc_line_nums);
     vf.line_index = 0;
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
@@ -46,9 +48,11 @@ void Preprocessor::push_virtual_file(const std::string& content,
 
 void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
                                      const std::string& filename,
-                                     int first_line_num) {
+                                     int first_line_num,
+                                     bool inc_line_nums) {
     File vf;
-    vf.tokens_file = TokensFile(tok_lines, filename, first_line_num);
+    vf.tokens_file = TokensFile(tok_lines, filename,
+                                first_line_num, inc_line_nums);
     vf.line_index = 0;
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
@@ -56,9 +60,9 @@ void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
     file_stack_.push_back(std::move(vf));
 }
 
-void Preprocessor::push_binary_file(const std::string& bin_filename) {
-    // Try to open the binary file. If we fail, fall back to push_file so the
-    // normal file-not-found handling (and error messages) still apply.
+void Preprocessor::push_binary_file(const std::string& bin_filename,
+                                    const Location& base) {
+    // Try to open the binary file. If we fail, report and return.
     std::ifstream ifs(bin_filename, std::ios::binary);
     if (!ifs) {
         g_errors.error(ErrorCode::FileNotFound,
@@ -77,45 +81,8 @@ void Preprocessor::push_binary_file(const std::string& bin_filename) {
         ifs.read(reinterpret_cast<char*>(bytes.data()), filesize);
     }
 
-    // If no data, nothing to emit
     if (bytes.empty()) {
-        return;
-    }
-
-    // Determine logical filename and starting line number from the top file on stack.
-    std::string virt_filename = bin_filename;
-    int first_line_num = 1;
-    if (!file_stack_.empty()) {
-        File& top = file_stack_.back();
-        // logical filename: prefer forced filename if set, otherwise the tokens_file filename
-        if (top.has_forced_location) {
-            if (!top.forced_filename.empty()) {
-                virt_filename = top.forced_filename;
-            }
-            else {
-                virt_filename = top.tokens_file.filename();
-            }
-
-            if (top.forced_constant_line_numbers) {
-                first_line_num = top.forced_start_line_num;
-            }
-            else {
-                // At the moment process_binary is called, the file's line_index has
-                // already been incremented past the directive line. Use the physical
-                // index of the directive (line_index - 1) so the generated virtual
-                // file maps to the same logical line as the directive.
-                int physical_index = top.line_index < 1 ? 0 : top.line_index - 1;
-                int offset = physical_index - top.forced_from_index;
-                first_line_num = top.forced_start_line_num + offset;
-            }
-        }
-        else {
-            virt_filename = top.tokens_file.filename();
-            // As above, use the physical index of the directive (line_index - 1)
-            // so the virtual file lines share the directive's logical line.
-            int physical_index = top.line_index < 1 ? 0 : top.line_index - 1;
-            first_line_num = top.tokens_file.first_line_num() + physical_index;
-        }
+        return; // nothing to emit
     }
 
     // Build virtual file content: DEFB lines, up to 16 bytes per line.
@@ -133,9 +100,9 @@ void Preprocessor::push_binary_file(const std::string& bin_filename) {
         oss << "\n";
     }
 
-    std::string content = oss.str();
-    // Push the generated virtual file with the computed logical location.
-    push_virtual_file(content, virt_filename, first_line_num);
+    // Start the generated lines exactly at the directive's logical location.
+    push_virtual_file(oss.str(), base.filename(),
+                      base.line_num(), false);
 }
 
 bool Preprocessor::next_line(TokensLine& line) {
@@ -146,15 +113,14 @@ bool Preprocessor::next_line(TokensLine& line) {
             line = std::move(input_queue_.front());
             input_queue_.pop_front();
 
-            // Keep error context consistent with normal path
             g_errors.set_location(line.location());
-            g_errors.set_source_line(line.to_string());
+            g_errors.set_expanded_line(line.to_string());
 
             if (line.empty()) {
                 continue;
             }
 
-            // Process directives appearing in queued lines (e.g., MACRO created by macro expansion)
+            // Process directives appearing in queued lines
             Keyword keyword = Keyword::None;
             unsigned i = 0;
             if (is_directive(line, i, keyword)) {
@@ -176,25 +142,7 @@ bool Preprocessor::next_line(TokensLine& line) {
             }
 
             // Not a directive -> return this logical line.
-            // Since we are returning a user-visible line, cancel any pending compensation.
-            pending_line_without_output_ = false;
-
-            g_errors.set_expanded_line(line.to_string());
             return true;
-        }
-
-        // Nothing queued. If the last physical source line produced no output
-        // (expanded only to directives), compensate LINE-based numbering by
-        // shifting the forced_from_index so the next returned line keeps the
-        // same logical line number.
-        if (pending_line_without_output_) {
-            if (!file_stack_.empty()) {
-                File& file = file_stack_.back();
-                if (file.has_forced_location && !file.forced_constant_line_numbers) {
-                    ++file.forced_from_index;
-                }
-            }
-            pending_line_without_output_ = false;
         }
 
         // read lines from top file in stack
@@ -210,26 +158,49 @@ bool Preprocessor::next_line(TokensLine& line) {
             continue;
         }
 
-        // get next line from file
+        // get next line from file (physical or virtual)
         line = file.tokens_file.get_tok_line(file.line_index);
         ++file.line_index;
 
-        // If a LINE/C_LINE directive previously set a forced logical location for this file,
-        // apply it to the TokensLine we just retrieved so subsequent processing sees the
-        // updated logical filename/line numbers.
-        if (file.has_forced_location) {
-            int physical_index = file.line_index - 1; // index of the line we just took
+        // Compute logical location here based on current file mapping.
+        // Rules:
+        // - If LINE/C_LINE was seen in this file: use forced_filename (if set) and
+        //   either constant line (C_LINE) or LINE + (physical_index - forced_from_index)
+        // - Otherwise: use file's own filename() and first_line_num() + physical_index
+        {
+            // true physical line number from source
+            const int physical_line = line.location().line_num();
+
             Location loc = line.location();
-            if (!file.forced_filename.empty()) {
-                loc.set_filename(file.forced_filename);
-            }
-            if (file.forced_constant_line_numbers) {
-                loc.set_line_num(file.forced_start_line_num);
+
+            if (file.has_forced_location) {
+                if (!file.forced_filename.empty()) {
+                    loc.set_filename(file.forced_filename);
+                }
+                else {
+                    loc.set_filename(file.tokens_file.filename());
+                }
+
+                if (file.forced_constant_line_numbers) {
+                    // C_LINE: keep constant line number
+                    loc.set_line_num(file.forced_start_line_num);
+                }
+                else {
+                    // LINE: compute offset using physical line numbers
+                    int start_physical = file.forced_at_line_num;
+                    int offset = physical_line - start_physical - 1;
+                    if (offset < 0) {
+                        offset = 0;    // safety
+                    }
+                    loc.set_line_num(file.forced_start_line_num + offset);
+                }
             }
             else {
-                int offset = physical_index - file.forced_from_index;
-                loc.set_line_num(file.forced_start_line_num + offset);
+                // Default mapping uses the physical line number provided by TokensLine
+                loc.set_filename(file.tokens_file.filename());
+                loc.set_line_num(physical_line);
             }
+
             line.set_location(loc);
         }
 
@@ -246,11 +217,6 @@ bool Preprocessor::next_line(TokensLine& line) {
         unsigned i = 0;
         if (is_directive(line, i, keyword)) {
             process_directive(line, i, keyword);
-            // This physical line produced no user-visible output.
-            // Mark pending so we compensate LINE-based mapping on the next iteration.
-            if (keyword != Keyword::LINE) {
-                pending_line_without_output_ = true;
-            }
             continue; // get next line
         }
 
@@ -260,10 +226,6 @@ bool Preprocessor::next_line(TokensLine& line) {
         i = 0;
         if (is_name_directive(line, i, keyword, name)) {
             process_name_directive(line, i, keyword, name);
-            // Same reasoning as above for directives read from the real file.
-            if (keyword != Keyword::LINE) {
-                pending_line_without_output_ = true;
-            }
             continue; // get next line
         }
 
@@ -272,12 +234,7 @@ bool Preprocessor::next_line(TokensLine& line) {
         std::vector<TokensLine> input_lines{ line };
         std::vector<TokensLine> expanded = expand_macros(input_lines);
         if (expanded.empty()) {
-            // This physical source line produced no output (e.g., expands only to directives or nothing).
-            // Keep the same logical line number for the next returned line by compensating
-            // the physical advance used by forced location.
-            if (file.has_forced_location && !file.forced_constant_line_numbers) {
-                ++file.forced_from_index;
-            }
+            // nothing to emit from this physical line
             continue; // get next line
         }
 
@@ -721,15 +678,21 @@ void Preprocessor::process_binary(const TokensLine& line, unsigned& i) {
     }
 
     expect_end(line, i);
-    do_binary(filename, is_angle);
+
+    // Use the directive's own logical location (already accounts for LINE/C_LINE)
+    const Location base = line.location();
+    do_binary(filename, is_angle, base);
 }
 
-void Preprocessor::do_binary(const std::string& filename, bool is_angle) {
+void Preprocessor::do_binary(const std::string& filename, bool is_angle,
+                             const Location& base) {
     // Resolve include-path candidates first so BINARY/INCBIN honor include
     // search directories the same way #include does.
     std::string resolved = search_include_path(filename, is_angle);
-    // Push a virtual file containing DEFB directives with the binary bytes.
-    push_binary_file(resolved);
+
+    // Push a virtual file containing DEFB directives with the binary bytes,
+    // starting exactly at the directive's logical location.
+    push_binary_file(resolved, base);
 }
 
 void Preprocessor::process_line(const TokensLine& line, unsigned& i) {
@@ -748,7 +711,7 @@ void Preprocessor::process_line(const TokensLine& line, unsigned& i) {
 
     File& file = file_stack_.back();
     file.has_forced_location = true;
-    file.forced_from_index = file.line_index; // next physical index to be read
+    file.forced_at_line_num = line.location().line_num();
     file.forced_start_line_num = linenum;
     file.forced_constant_line_numbers = false;
     if (!filename.empty()) {
@@ -776,7 +739,7 @@ void Preprocessor::process_c_line(const TokensLine& line, unsigned& i) {
 
     File& file = file_stack_.back();
     file.has_forced_location = true;
-    file.forced_from_index = file.line_index; // next physical index to be read
+    file.forced_at_line_num = line.location().line_num();
     file.forced_start_line_num = linenum;
     file.forced_constant_line_numbers = true;
     if (!filename.empty()) {
@@ -1024,25 +987,9 @@ bool Preprocessor::fetch_line_for_macro_body(TokensLine& out) {
         return false;
     }
 
+    // Return the raw stored line; next_line() will handle user-visible mapping.
     out = file.tokens_file.get_tok_line(file.line_index);
     ++file.line_index;
-
-    // Apply forced logical location if any
-    if (file.has_forced_location) {
-        int physical_index = file.line_index - 1; // index of the line we just took
-        Location loc = out.location();
-        if (!file.forced_filename.empty()) {
-            loc.set_filename(file.forced_filename);
-        }
-        if (file.forced_constant_line_numbers) {
-            loc.set_line_num(file.forced_start_line_num);
-        }
-        else {
-            int offset = physical_index - file.forced_from_index;
-            loc.set_line_num(file.forced_start_line_num + offset);
-        }
-        out.set_location(loc);
-    }
 
     return true;
 }
@@ -1178,109 +1125,7 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
 // carry the macro call-site logical location (constant line number).
 void Preprocessor::split_lines(const Location& location,
                                const std::vector<TokensLine>& expanded) {
-    // Scan expanded lines and decide if any will produce user-visible output.
-    // Rules:
-    // - Lines inside MACRO..ENDM regions are non-visible (body is consumed).
-    // - Plain non-visible directives at top-level: DEFINE, UNDEF/UNDEFINE, DEFL, LINE, C_LINE, LOCAL, EXITM.
-    // - INCLUDE/BINARY/INCBIN are visible (they eventually emit lines).
-    // - Non-directive tokens at top-level are visible.
-    auto classify_line = [&](const TokensLine & ln, bool in_macro_region) -> bool {
-        if (ln.tokens().empty()) {
-            return false;    // empty -> non-visible
-        }
-
-        if (in_macro_region) {
-            return false;    // MACRO body content is non-visible
-        }
-
-        unsigned i = 0;
-        Keyword kw = Keyword::None;
-        std::string name;
-
-        // Name-directive: "<name> MACRO"
-        if (is_name_directive(ln, i, kw, name)) {
-            if (kw == Keyword::MACRO) {
-                return false;    // header itself is non-visible
-            }
-            // other name-directives (DEFINE/DEFL/UNDEF) already handled by plain directive scan below
-        }
-
-        // Plain directive
-        i = 0;
-        if (is_directive(ln, i, kw)) {
-            switch (kw) {
-            case Keyword::MACRO:
-            case Keyword::ENDM:
-            case Keyword::DEFINE:
-            case Keyword::UNDEF:
-            case Keyword::UNDEFINE:
-            case Keyword::DEFL:
-            case Keyword::LINE:
-            case Keyword::C_LINE:
-            case Keyword::LOCAL:
-            case Keyword::EXITM:
-                return false; // non-visible at top-level
-            case Keyword::INCLUDE:
-            case Keyword::BINARY:
-            case Keyword::INCBIN:
-                return true;  // visible (pushes content)
-            default:
-                break;
-            }
-        }
-
-        // Not a directive at top-level -> visible
-        return true;
-    };
-
-    bool any_visible = false;
-    int macro_nest = 0;
-    for (const auto& ln : expanded) {
-        // Detect MACRO/ENDM to manage macro_nest
-        unsigned i = 0;
-        Keyword kw = Keyword::None;
-        std::string name;
-        bool is_name_macro = is_name_directive(ln, i, kw, name) && kw == Keyword::MACRO;
-
-        i = 0;
-        bool is_plain_macro = is_directive(ln, i, kw) && kw == Keyword::MACRO;
-        bool is_plain_endm  = (kw == Keyword::ENDM);
-
-        if (is_name_macro || is_plain_macro) {
-            // MACRO header line -> non-visible, enter region
-            if (classify_line(ln, macro_nest > 0)) {
-                any_visible = true; // should never happen for MACRO header
-            }
-            macro_nest++;
-            continue;
-        }
-
-        if (macro_nest > 0) {
-            // Inside MACRO region: everything is non-visible, but track nesting on ENDM
-            if (is_plain_endm) {
-                macro_nest = std::max(0, macro_nest - 1);
-            }
-            continue;
-        }
-
-        // Top-level line: classify visibility
-        if (classify_line(ln, false)) {
-            any_visible = true;
-            break;
-        }
-    }
-
-    // If the macro call's physical line produced no visible output,
-    // compensate the original file's LINE mapping now.
-    if (!file_stack_.empty()) {
-        File& orig = file_stack_.back();
-        if (!any_visible && orig.has_forced_location
-                && !orig.forced_constant_line_numbers) {
-            ++orig.forced_from_index;
-        }
-    }
-
-    // Fast path: single line -> split inline, no virtual file (EXITM has no effect here by design)
+    // Fast path: single line -> split inline (no EXITM impact)
     if (expanded.size() <= 1) {
         if (!expanded.empty()) {
             split_line(location, expanded[0]);
@@ -1288,22 +1133,15 @@ void Preprocessor::split_lines(const Location& location,
         return;
     }
 
-    const std::string virt_filename =
-        location.filename().empty() ? "<macro-expansion>" : location.filename();
+    // Preserve per-line locations (call-site) already present in expanded lines.
+    push_virtual_file(expanded, location.filename(),
+                      location.line_num(), false);
 
-    // Reuse tokens directly (no stringify/tokenize loop)
-    push_virtual_file(expanded, virt_filename, /*first_line_num*/ 1);
-
+    // Mark as macro-expansion so EXITM can discard the rest of this virtual file.
     if (!file_stack_.empty()) {
         File& top = file_stack_.back();
         top.is_macro_expansion = true;
-        top.has_forced_location = true;
-        top.forced_from_index = 0;
-        top.forced_start_line_num =
-            location.line_num(); // constant logical line = call-site
-        top.forced_filename = location.filename();       // logical filename = call-site
-        top.forced_constant_line_numbers =
-            true;         // do not advance line number per line
+        // No forced logical mapping here; each TokensLine already carries its call-site location.
     }
 }
 

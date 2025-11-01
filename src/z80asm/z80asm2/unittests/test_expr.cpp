@@ -20,7 +20,7 @@ static bool eval_expr_from_string(const std::string& expr,
                                   unsigned& outLineSize) {
     g_options = Options(); // ensure default options
     std::string content = expr + "\n";
-    TokensFile tf(content, "expr_test", 1);
+    TokensFile tf(content, "expr_test", 1, false);
     if (tf.tok_lines_count() == 0) {
         outLineSize = 0;
         return false;
@@ -160,7 +160,7 @@ TEST_CASE("Division or modulus by zero fails and leaves index unchanged",
     g_options = Options();
     std::string expr = "1 / 0";
     std::string content = expr + "\n";
-    TokensFile tf(content, "expr_fail", 1);
+    TokensFile tf(content, "expr_fail", 1, false);
     REQUIRE(tf.tok_lines_count() == 1);
     const TokensLine& tl = tf.get_tok_line(0);
 
@@ -184,7 +184,7 @@ TEST_CASE("Division or modulus by zero fails and leaves index unchanged",
 TEST_CASE("Empty expression fails to tokenize", "[expr][error][empty]") {
     g_options = Options();
     std::string content = "\n";
-    TokensFile tf(content, "expr_empty", 1);
+    TokensFile tf(content, "expr_empty", 1, false);
     REQUIRE(tf.tok_lines_count() == 0);
 }
 
@@ -217,7 +217,7 @@ TEST_CASE("Expression syntax errors return false and leave index unchanged",
     for (const auto& expr : cases) {
         INFO("Expr: [" << expr << "]");
         std::string content = expr + "\n";
-        TokensFile tf(content, "expr_err", 1);
+        TokensFile tf(content, "expr_err", 1, false);
 
         // If lexing failed entirely, skip this entry (covered by other lexer tests).
         if (tf.tok_lines_count() == 0) {
