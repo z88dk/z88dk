@@ -11,6 +11,8 @@
 class SymbolTable {
 public:
     SymbolTable();
-    void addSymbol(const std::string& name, int value);
+    void add_symbol(const std::string& name, int value);
     int lookup(const std::string& name) const;
 };
+
+extern SymbolTable g_symbol_table;

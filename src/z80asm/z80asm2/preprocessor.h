@@ -169,6 +169,22 @@ private:
     void do_macro(const TokensLine& line, unsigned& i,
                   const std::string& name);
 
+    // REPT / REPTC / REPTI
+    void process_rept(const TokensLine& line, unsigned& i);
+    void process_reptc(const TokensLine& line, unsigned& i);
+    void process_name_reptc(const TokensLine& line, unsigned& i,
+                            const std::string& var_name);
+    void do_reptc(const std::string& var_name,
+                  const TokensLine& arg_line,
+                  const TokensLine& directive_line);
+
+    void process_repti(const TokensLine& line, unsigned& i);
+    void process_name_repti(const TokensLine& line, unsigned& i,
+                            const std::string& var_name);
+    void do_repti(const std::string& var_name,
+                  const std::vector<TokensLine>& arg_list,
+                  const TokensLine& directive_line);
+
     // EXITM
     void process_exitm(const TokensLine& line, unsigned& i);
     void do_exitm();
