@@ -2407,3 +2407,56 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     REQUIRE(!line.tokens().empty());
     REQUIRE(line.tokens()[0].text() == "after_nested_locals");
 }
+
+// -----------------------------------------------------------------------------
+// NEW TESTS: EXITM
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion", "[preprocessor][macro][exitm]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M()\n"
+        "A\n"
+        "EXITM\n"
+        "B\n"
+        "ENDM\n"
+        "LINE 111, \"exitm_call.asm\"\n"
+        "M()\n"
+        "after\n";
+    pp.push_virtual_file(content, "exitm_test", 1);
+
+    TokensLine line;
+
+    // Only the lines before EXITM ("A") should be emitted from the macro
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
+    REQUIRE(line.location().line_num() == 111);
+    REQUIRE(line.location().filename() == "exitm_call.asm");
+
+    // Next should be the line after the macro call in the original file
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
+}
+
+TEST_CASE("Preprocessor: EXITM outside of macro is ignored", "[preprocessor][exitm][outside]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "EXITM\n"
+        "X\n";
+    pp.push_virtual_file(content, "exitm_outside", 1);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "X");
+
+    // No other lines
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
