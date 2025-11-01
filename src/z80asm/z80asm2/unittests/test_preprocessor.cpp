@@ -2852,3 +2852,590 @@ TEST_CASE("Preprocessor: define_macro(name, tok_lines) reports MacroRedefined on
     REQUIRE(msg.find("B") != std::string::npos);
 }
 
+// ... existing tests ...
+
+// -----------------------------------------------------------------------------
+// REPT directive tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
+          "[preprocessor][rept][zero][negative]") {
+    // Zero count
+    {
+        g_errors.reset();
+        Preprocessor pp;
+
+        const std::string content =
+            "REPT 0\n"
+            "Z0\n"
+            "ENDR\n"
+            "after0\n";
+        pp.push_virtual_file(content, "rept_zero", 1, true);
+
+        TokensLine line;
+
+        // First returned line should be the one after the REPT block (no Z0 lines)
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "after0");
+
+        // No further lines
+        REQUIRE(!pp.next_line(line));
+        // No errors expected
+        REQUIRE(!g_errors.has_errors());
+    }
+
+    // Negative count
+    {
+        g_errors.reset();
+        Preprocessor pp;
+
+        const std::string content =
+            "REPT -3\n"
+            "NEG\n"
+            "ENDR\n"
+            "after_neg\n";
+        pp.push_virtual_file(content, "rept_negative", 1, true);
+
+        TokensLine line;
+
+        // First returned line should be the one after the REPT block (no NEG lines)
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "after_neg");
+
+        // No further lines
+        REQUIRE(!pp.next_line(line));
+        // No errors expected
+        REQUIRE(!g_errors.has_errors());
+    }
+}
+
+TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body consumed",
+          "[preprocessor][rept][error][nonconst]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // 'A' is undefined -> non-constant expression for REPT count
+    const std::string content =
+        "REPT A\n"
+        "X\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "rept_nonconst", 1, true);
+
+    TokensLine line;
+    // Consume any produced lines (none expected)
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    REQUIRE(produced == 0);
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Constant expression expected in REPT") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: nested REPT repeats inner body correctly",
+          "[preprocessor][rept][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Outer repeats 2x; inner repeats 3x -> total 6 lines "N"
+    const std::string content =
+        "REPT 2\n"
+        "REPT 3\n"
+        "N\n"
+        "ENDR\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "rept_nested", 1, true);
+
+    TokensLine line;
+    int countN = 0;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (!toks.empty() && toks[0].text() == "N") {
+            ++countN;
+        }
+    }
+
+    REQUIRE(countN == 6);
+    // No errors expected
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// REPTC directive tests (both syntaxes; string, number and token-sequence args)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPTC (directive) with string argument produces character codes",
+          "[preprocessor][reptc][directive][string]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC var, \"ABC\"\n"
+        "defb var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_dir_string", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    // 'A','B','C'
+    REQUIRE(ints == std::vector<int>({ 'A', 'B', 'C' }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (name-directive) with string argument produces character codes",
+          "[preprocessor][reptc][name][string]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "ch REPTC \"XY\"\n"
+        "defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_name_string", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    // 'X','Y'
+    REQUIRE(ints == std::vector<int>({ 'X', 'Y' }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (directive) with numeric argument iterates over decimal digits",
+          "[preprocessor][reptc][directive][number]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC d, 2305\n"
+        "defb d\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_dir_number", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    // '2','3','0','5'
+    REQUIRE(ints == std::vector<int>({ '2', '3', '0', '5' }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (name-directive) with numeric argument iterates over decimal digits",
+          "[preprocessor][reptc][name][number]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "v REPTC 47\n"
+        "defb v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_name_number", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    // '4','7'
+    REQUIRE(ints == std::vector<int>({ '4', '7' }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (directive) with identifier token sequence produces character codes",
+          "[preprocessor][reptc][directive][tokens]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Bare identifier "hello" becomes the sequence 'h','e','l','l','o'
+    const std::string content =
+        "REPTC var, hello\n"
+        "defb var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_dir_ident", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    const std::vector<int> expected = { 'h', 'e', 'l', 'l', 'o' };
+    REQUIRE(ints == expected);
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (name-directive) with identifier token sequence produces character codes",
+          "[preprocessor][reptc][name][tokens]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "x REPTC world\n"
+        "defb x\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_name_ident", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    const std::vector<int> expected = { 'w', 'o', 'r', 'l', 'd' };
+    REQUIRE(ints == expected);
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string source (directive form)",
+          "[preprocessor][reptc][directive][tokens][paste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define cat(a, b) a ## b\n"
+        "REPTC v, cat(hell, o)\n"
+        "defb v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_dir_cat", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    const std::vector<int> expected = { 'h', 'e', 'l', 'l', 'o' };
+    REQUIRE(ints == expected);
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string source (name-directive form)",
+          "[preprocessor][reptc][name][tokens][paste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define cat(a, b) a ## b\n"
+        "v REPTC cat(AB, C)\n"
+        "defb v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_name_cat", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    const std::vector<int> expected = { 'A', 'B', 'C' };
+    REQUIRE(ints == expected);
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC with DEFL numeric symbol iterates over digits",
+          "[preprocessor][reptc][defl][number]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "DEFL version=23\n"
+        "REPTC var, version\n"
+        "defb var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_defl_number", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                ints.push_back(t.int_value());
+            }
+        }
+    }
+    // '2','3'
+    REQUIRE(ints == std::vector<int>({ '2', '3' }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// REPTI directive tests (both syntaxes; macro expansion, token-paste, nesting)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPTI (directive) enumerates identifier list into body",
+          "[preprocessor][repti][directive][idents]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI reg, bc, de, hl, af\n"
+        "push reg\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_dir_idents", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> seen;
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "push");
+        REQUIRE(toks[1].is(TokenType::Whitespace));
+        seen.push_back(toks[2].text());
+    }
+
+    REQUIRE(seen == std::vector<std::string>({ "bc", "de", "hl", "af" }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI (name-directive) enumerates identifier list into body",
+          "[preprocessor][repti][name][idents]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "r REPTI ix, iy\n"
+        "use r\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_idents", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> seen;
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "use");
+        REQUIRE(toks[1].is(TokenType::Whitespace));
+        seen.push_back(toks[2].text());
+    }
+
+    REQUIRE(seen == std::vector<std::string>({ "ix", "iy" }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI duplicates body for integer expression arguments (no evaluation, textual)",
+          "[preprocessor][repti][directive][numbers]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI v, 10, 20+1\n"
+        "db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_dir_numbers", 1, true);
+
+    TokensLine line;
+    int line_no = 0;
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].text() == "db");
+        REQUIRE(toks[1].is(TokenType::Whitespace));
+        if (line_no == 0) {
+            REQUIRE(toks.size() >= 3);
+            REQUIRE(toks[2].is(TokenType::Integer));
+            REQUIRE(toks[2].int_value() == 10);
+        }
+        else if (line_no == 1) {
+            REQUIRE(toks.size() >= 4);
+            REQUIRE(toks[2].is(TokenType::Integer));
+            REQUIRE(toks[2].int_value() == 20);
+            REQUIRE(toks[3].text() == "+");
+            REQUIRE(toks[4].is(TokenType::Integer));
+            REQUIRE(toks[4].int_value() == 1);
+        }
+        else {
+            // Only two output lines expected
+            REQUIRE(false);
+        }
+        ++line_no;
+    }
+    REQUIRE(line_no == 2);
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI expands macros in arguments before substitution",
+          "[preprocessor][repti][macro-arg]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define R1 bc\n"
+        "#define R2 de\n"
+        "REPTI r, R1, R2\n"
+        "push r\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_dir_macro_args", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> seen;
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "push");
+        REQUIRE(toks[1].is(TokenType::Whitespace));
+        seen.push_back(toks[2].text());
+    }
+
+    REQUIRE(seen == std::vector<std::string>({ "bc", "de" }));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens",
+          "[preprocessor][repti][macro-arg][multitokens]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define EXPR 1 + 2\n"
+        "REPTI x, EXPR\n"
+        "X x\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_dir_macro_expr", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() >= 7);
+    REQUIRE(toks[0].text() == "X");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 1);
+    REQUIRE(toks[3].is(TokenType::Whitespace));
+    REQUIRE(toks[4].text() == "+");
+    REQUIRE(toks[5].is(TokenType::Whitespace));
+    REQUIRE(toks[6].is(TokenType::Integer));
+    REQUIRE(toks[6].int_value() == 2);
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI accepts token-paste result in argument via macro",
+          "[preprocessor][repti][tokens][paste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define cat(a,b) a ## b\n"
+        "REPTI reg, cat(H, L)\n"
+        "push reg\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_dir_cat", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks[0].text() == "push");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+    REQUIRE(toks[2].is(TokenType::Identifier));
+    REQUIRE(toks[2].text() == "HL");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI accepts token-paste in name-directive form via macro",
+          "[preprocessor][repti][name][tokens][paste]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define cat(a,b) a ## b\n"
+        "r REPTI cat(A, B)\n"
+        "emit r\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_cat", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks[0].text() == "emit");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+    REQUIRE(toks[2].is(TokenType::Identifier));
+    REQUIRE(toks[2].text() == "AB");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product of arguments",
+          "[preprocessor][repti][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Outer over 1,2; inner over A,B -> pairs in order:
+    // (1,A), (1,B), (2,A), (2,B)
+    const std::string content =
+        "REPTI o, 1, 2\n"
+        "REPTI i, A, B\n"
+        "PAIR o i\n"
+        "ENDR\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_nested", 1, true);
+
+    TokensLine line;
+    std::vector<std::pair<int, std::string>> pairs;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (toks.empty()) {
+            continue;
+        }
+        REQUIRE(toks.size() >= 5);
+        REQUIRE(toks[0].text() == "PAIR");
+        REQUIRE(toks[1].is(TokenType::Whitespace));
+        REQUIRE(toks[2].is(TokenType::Integer));
+        int left = toks[2].int_value();
+        REQUIRE(toks[3].is(TokenType::Whitespace));
+        REQUIRE(toks[4].is(TokenType::Identifier));
+        std::string right = toks[4].text();
+        pairs.emplace_back(left, right);
+    }
+
+    REQUIRE(pairs.size() == 4);
+    REQUIRE(pairs[0] == std::make_pair(1, std::string("A")));
+    REQUIRE(pairs[1] == std::make_pair(1, std::string("B")));
+    REQUIRE(pairs[2] == std::make_pair(2, std::string("A")));
+    REQUIRE(pairs[3] == std::make_pair(2, std::string("B")));
+    REQUIRE(!g_errors.has_errors());
+}

@@ -613,6 +613,23 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::EXITM:
         process_exitm(line, i);
         break;
+    case Keyword::REPT:
+        process_rept(line, i);
+        break;
+    case Keyword::REPTC:
+        process_reptc(line, i);
+        break;
+    case Keyword::REPTI:
+        process_repti(line, i);
+        break;
+    case Keyword::ENDM:
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unexpected ENDM directive without matching MACRO");
+        break;
+    case Keyword::ENDR:
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unexpected ENDR directive without matching REPT");
+        break;
     default:
         assert(0);
     }
@@ -636,6 +653,12 @@ void Preprocessor::process_name_directive(const TokensLine& line,
         break;
     case Keyword::MACRO:
         process_name_macro(line, i, name);
+        break;
+    case Keyword::REPTC:
+        process_name_reptc(line, i, name);
+        break;
+    case Keyword::REPTI:
+        process_name_repti(line, i, name);
         break;
     default:
         assert(0);
@@ -1087,8 +1110,8 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
         else {
             k = 0;
             kw = Keyword::None;
-            std::string dummyName;
-            if (is_name_directive(raw, k, kw, dummyName) && kw == Keyword::MACRO) {
+            std::string dummy_name;
+            if (is_name_directive(raw, k, kw, dummy_name) && kw == Keyword::MACRO) {
                 ++nest;
             }
         }
@@ -1110,6 +1133,510 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
 
     macros_[name] = std::move(macro);
     macro_recursion_count_[name] = 0;
+}
+
+void Preprocessor::process_rept(const TokensLine& line, unsigned& i) {
+    // 1) Collect the count expression from the rest of the line
+    TokensLine count_line(line.location());
+    {
+        line.skip_spaces(i);
+        while (i < line.size()) {
+            count_line.push_back(line[i]);
+            ++i;
+        }
+    }
+
+    if (count_line.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Expected count in REPT");
+        return;
+    }
+
+    // 2) Expand macros in the count expression
+    std::vector<TokensLine> expanded_lines =
+        expand_macros(std::vector<TokensLine> { count_line });
+
+    // 3) Flatten into a single TokensLine (insert single space between lines)
+    TokensLine flattened(line.location());
+    for (size_t li = 0; li < expanded_lines.size(); ++li) {
+        const TokensLine& el = expanded_lines[li];
+        if (li > 0) {
+            flattened.push_back(Token(TokenType::Whitespace, " "));
+        }
+        for (unsigned t = 0; t < el.size(); ++t) {
+            flattened.push_back(el[t]);
+        }
+    }
+    // Trim trailing whitespace
+    while (flattened.size() > 0
+            && flattened[flattened.size() - 1].is(TokenType::Whitespace)) {
+        flattened.pop_back();
+    }
+
+    // 4) Evaluate as a constant expression
+    int count_value = 0;
+    unsigned ei = 0;
+    bool is_const = eval_const_expr(flattened, ei, count_value);
+    const bool consumed_all = is_const && flattened.at_end(ei);
+    if (!consumed_all) {
+        // Still need to consume the body up to ENDR even on error
+        int dummy_nest = 0;
+        std::vector<TokensLine> discard_body;
+        while (true) {
+            TokensLine raw;
+            if (!fetch_line_for_macro_body(raw)) {
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               "Unexpected end of input in REPT (missing ENDR)");
+                return;
+            }
+            // Detect ENDR / nested REPT
+            unsigned k = 0;
+            Keyword kw = Keyword::None;
+            if (is_directive(raw, k, kw)) {
+                if (kw == Keyword::ENDR) {
+                    expect_end(raw, k);
+                    if (dummy_nest == 0) {
+                        break;
+                    }
+                    --dummy_nest;
+                    continue;
+                }
+                else if (kw == Keyword::REPT
+                         || kw == Keyword::REPTC
+                         || kw == Keyword::REPTI) {
+                    ++dummy_nest;
+                }
+            }
+            else {
+                // Also consider name-directive forms for REPTC/REPTI nesting
+                k = 0;
+                kw = Keyword::None;
+                std::string dummy_name;
+                if (is_name_directive(raw, k, kw, dummy_name)) {
+                    if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
+                        ++dummy_nest;
+                    }
+                }
+            }
+            discard_body.push_back(raw);
+        }
+
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Constant expression expected in REPT");
+        return;
+    }
+
+    // 5) Collect body lines until matching ENDR, with nesting support
+    std::vector<TokensLine> body;
+    int nest = 0;
+    while (true) {
+        TokensLine raw;
+        if (!fetch_line_for_macro_body(raw)) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Unexpected end of input in REPT (missing ENDR)");
+            return;
+        }
+
+        unsigned k = 0;
+        Keyword kw = Keyword::None;
+        if (is_directive(raw, k, kw)) {
+            if (kw == Keyword::ENDR) {
+                expect_end(raw, k);
+                if (nest == 0) {
+                    break; // end of this REPT block
+                }
+                else {
+                    --nest;
+                }
+            }
+            else if (kw == Keyword::REPT
+                     || kw == Keyword::REPTC
+                     || kw == Keyword::REPTI) {
+                ++nest;
+            }
+        }
+        else {
+            // Also consider name-directive forms for REPTC/REPTI nesting
+            k = 0;
+            kw = Keyword::None;
+            std::string dummy_name;
+            if (is_name_directive(raw, k, kw, dummy_name)) {
+                if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
+                    ++nest;
+                }
+            }
+        }
+
+        body.push_back(raw);
+    }
+
+    // 6) If count <= 0, nothing to emit (but body was consumed)
+    if (count_value <= 0) {
+        return;
+    }
+
+    // 7) Repeat body count_value times and push as a virtual file
+    std::vector<TokensLine> repeated;
+    repeated.reserve(body.size() * static_cast<size_t>(count_value));
+    for (int c = 0; c < count_value; ++c) {
+        for (const TokensLine& b : body) {
+            repeated.push_back(b);
+        }
+    }
+
+    // Start generated lines at the REPT directive's logical location
+    push_virtual_file(repeated, line.location().filename(),
+                      line.location().line_num(), false);
+}
+
+// REPTC: directive form "REPTC var, string"
+void Preprocessor::process_reptc(const TokensLine& line, unsigned& i) {
+    line.skip_spaces(i);
+    if (!(i < line.size() && line[i].is(TokenType::Identifier))) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Expected variable name after REPTC");
+        return;
+    }
+    std::string var_name = line[i].text();
+    ++i;
+
+    line.skip_spaces(i);
+    if (!(i < line.size() && line[i].is(TokenType::Comma))) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected ',' after REPTC variable name");
+        return;
+    }
+    ++i;
+
+    // Collect argument tokens up to end-of-line
+    TokensLine arg(line.location());
+    line.skip_spaces(i);
+    while (i < line.size()) {
+        arg.push_back(line[i]);
+        ++i;
+    }
+    if (arg.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected string/identifier/number in REPTC");
+        return;
+    }
+
+    do_reptc(var_name, arg, line);
+}
+
+// REPTC: name-directive form "var REPTC string"
+void Preprocessor::process_name_reptc(const TokensLine& line, unsigned& i,
+                                      const std::string& var_name) {
+    // For name-directive form, accept the rest of the line as the string expression (no comma required)
+    TokensLine arg(line.location());
+    line.skip_spaces(i);
+    while (i < line.size()) {
+        arg.push_back(line[i]);
+        ++i;
+    }
+    if (arg.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected string/identifier/number after REPTC");
+        return;
+    }
+
+    do_reptc(var_name, arg, line);
+}
+
+void Preprocessor::do_reptc(const std::string& var_name,
+                            const TokensLine& arg_line,
+                            const TokensLine& directive_line) {
+    // 1) Expand macros in the argument and flatten to a single line
+    std::vector<TokensLine> expanded_args = expand_macros(std::vector<TokensLine> { arg_line });
+
+    TokensLine flat(arg_line.location());
+    for (size_t li = 0; li < expanded_args.size(); ++li) {
+        const TokensLine& el = expanded_args[li];
+        if (li > 0) {
+            flat.push_back(Token(TokenType::Whitespace, " "));
+        }
+        for (unsigned t = 0; t < el.size(); ++t) {
+            flat.push_back(el[t]);
+        }
+    }
+
+    // 2) Derive the source string to iterate:
+    // - If exactly one String token (ignoring spaces): use string_value().
+    // - Else if exactly one Integer token: use decimal text of its value.
+    // - Else: concatenate texts of all non-whitespace tokens.
+    std::string iter_text;
+
+    auto is_only_token_type = [&](TokenType tt) -> bool {
+        unsigned count = 0;
+        for (unsigned k = 0; k < flat.size(); ++k) {
+            const Token& tk = flat[k];
+            if (tk.is(TokenType::Whitespace)) {
+                continue;
+            }
+            if (!tk.is(tt)) {
+                return false;
+            }
+            ++count;
+        }
+        return count == 1;
+    };
+
+    if (is_only_token_type(TokenType::String)) {
+        for (unsigned k = 0; k < flat.size(); ++k) {
+            const Token& tk = flat[k];
+            if (tk.is(TokenType::String)) {
+                iter_text = tk.string_value();
+                break;
+            }
+        }
+    }
+    else if (is_only_token_type(TokenType::Integer)) {
+        for (unsigned k = 0; k < flat.size(); ++k) {
+            const Token& tk = flat[k];
+            if (tk.is(TokenType::Integer)) {
+                iter_text = std::to_string(tk.int_value());
+                break;
+            }
+        }
+    }
+    else {
+        // Concatenate non-whitespace token texts
+        for (unsigned k = 0; k < flat.size(); ++k) {
+            const Token& tk = flat[k];
+            if (tk.is(TokenType::Whitespace)) {
+                continue;
+            }
+            iter_text += tk.text();
+        }
+    }
+
+    // 3) Collect body lines until ENDR, supporting nesting
+    std::vector<TokensLine> body;
+    int nest = 0;
+    while (true) {
+        TokensLine raw;
+        if (!fetch_line_for_macro_body(raw)) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Unexpected end of input in REPTC (missing ENDR)");
+            return;
+        }
+
+        unsigned k = 0;
+        Keyword kw = Keyword::None;
+        if (is_directive(raw, k, kw)) {
+            if (kw == Keyword::ENDR) {
+                expect_end(raw, k);
+                if (nest == 0) {
+                    break; // end of this REPTC block
+                }
+                else {
+                    --nest;
+                }
+            }
+            else if (kw == Keyword::REPT || kw == Keyword::REPTC || kw == Keyword::REPTI) {
+                ++nest;
+            }
+        }
+        else {
+            k = 0;
+            kw = Keyword::None;
+            std::string dummy_name;
+            if (is_name_directive(raw, k, kw, dummy_name)) {
+                if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
+                    ++nest;
+                }
+            }
+        }
+
+        body.push_back(raw);
+    }
+
+    // 4) Build substituted lines for each character of iter_text
+    if (iter_text.empty()) {
+        // Nothing to emit (but body consumed)
+        return;
+    }
+
+    std::vector<TokensLine> out_lines;
+    out_lines.reserve(static_cast<size_t>(iter_text.size()) * std::max<size_t>(1,
+                      body.size()));
+
+    for (unsigned ci = 0; ci < iter_text.size(); ++ci) {
+        unsigned char ch = static_cast<unsigned char>(iter_text[ci]);
+        for (const TokensLine& bline : body) {
+            TokensLine sub(directive_line.location());
+            for (unsigned t = 0; t < bline.size(); ++t) {
+                const Token& tok = bline[t];
+                if (tok.is(TokenType::Identifier) && tok.text() == var_name) {
+                    // Replace var with integer token of the character code
+                    sub.push_back(Token(TokenType::Integer, std::to_string((int)ch), (int)ch));
+                }
+                else {
+                    sub.push_back(tok);
+                }
+            }
+            out_lines.push_back(std::move(sub));
+        }
+    }
+
+    // 5) Emit the substituted lines at the directive's logical location
+    push_virtual_file(out_lines, directive_line.location().filename(),
+                      directive_line.location().line_num(), false);
+}
+
+// REPTI: directive form "REPTI var, list"
+void Preprocessor::process_repti(const TokensLine& line, unsigned& i) {
+    line.skip_spaces(i);
+    if (!(i < line.size() && line[i].is(TokenType::Identifier))) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Expected variable name after REPTI");
+        return;
+    }
+    std::string var_name = line[i].text();
+    ++i;
+
+    line.skip_spaces(i);
+    if (!(i < line.size() && line[i].is(TokenType::Comma))) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected ',' after REPTI variable name");
+        return;
+    }
+    ++i;
+
+    // Parse the comma-separated argument list (unparenthesized)
+    TokensLine args_line(line.location());
+    line.skip_spaces(i);
+    while (i < line.size()) {
+        args_line.push_back(line[i]);
+        ++i;
+    }
+
+    std::vector<TokensLine> arg_list;
+    unsigned ai = 0;
+    if (!parse_macro_args(args_line, ai, arg_list)) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Invalid argument list in REPTI");
+        return;
+    }
+
+    do_repti(var_name, arg_list, line);
+}
+
+// REPTI: name-directive form "var REPTI list"
+void Preprocessor::process_name_repti(const TokensLine& line, unsigned& i,
+                                      const std::string& var_name) {
+    // The rest of the line is the list
+    TokensLine args_line(line.location());
+    line.skip_spaces(i);
+    while (i < line.size()) {
+        args_line.push_back(line[i]);
+        ++i;
+    }
+
+    std::vector<TokensLine> arg_list;
+    unsigned ai = 0;
+    if (!parse_macro_args(args_line, ai, arg_list)) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Invalid argument list after REPTI");
+        return;
+    }
+
+    do_repti(var_name, arg_list, line);
+}
+
+void Preprocessor::do_repti(const std::string& var_name,
+                            const std::vector<TokensLine>& arg_list,
+                            const TokensLine& directive_line) {
+    // 1) Expand macros in each argument and flatten to a single TokensLine
+    std::vector<TokensLine> flat_args;
+    flat_args.reserve(arg_list.size());
+
+    for (const TokensLine& raw_arg : arg_list) {
+        std::vector<TokensLine> expanded = expand_macros(std::vector<TokensLine> { raw_arg });
+
+        // Flatten expanded lines into one line (insert a single space between lines)
+        TokensLine flat(raw_arg.location());
+        for (size_t li = 0; li < expanded.size(); ++li) {
+            const TokensLine& el = expanded[li];
+            if (li > 0) {
+                flat.push_back(Token(TokenType::Whitespace, " "));
+            }
+            for (unsigned t = 0; t < el.size(); ++t) {
+                flat.push_back(el[t]);
+            }
+        }
+        // Trim trailing whitespace
+        while (flat.size() > 0 && flat[flat.size() - 1].is(TokenType::Whitespace)) {
+            flat.pop_back();
+        }
+        flat_args.push_back(std::move(flat));
+    }
+
+    // 2) Collect body lines until matching ENDR, with nesting support (REPT/REPTC/REPTI)
+    std::vector<TokensLine> body;
+    int nest = 0;
+    while (true) {
+        TokensLine raw;
+        if (!fetch_line_for_macro_body(raw)) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Unexpected end of input in REPTI (missing ENDR)");
+            return;
+        }
+
+        unsigned k = 0;
+        Keyword kw = Keyword::None;
+        if (is_directive(raw, k, kw)) {
+            if (kw == Keyword::ENDR) {
+                expect_end(raw, k);
+                if (nest == 0) {
+                    break;
+                }
+                else {
+                    --nest;
+                }
+            }
+            else if (kw == Keyword::REPT || kw == Keyword::REPTC || kw == Keyword::REPTI) {
+                ++nest;
+            }
+        }
+        else {
+            k = 0;
+            kw = Keyword::None;
+            std::string dummy_name;
+            if (is_name_directive(raw, k, kw, dummy_name)) {
+                if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
+                    ++nest;
+                }
+            }
+        }
+
+        body.push_back(raw);
+    }
+
+    // 3) If no arguments, nothing to emit (but body consumed)
+    if (flat_args.empty()) {
+        return;
+    }
+
+    // 4) For each argument, duplicate the body substituting occurrences of var_name
+    std::vector<TokensLine> out_lines;
+    for (const TokensLine& argtokens : flat_args) {
+        for (const TokensLine& bline : body) {
+            TokensLine sub(directive_line.location());
+            for (unsigned t = 0; t < bline.size(); ++t) {
+                const Token& tok = bline[t];
+                if (tok.is(TokenType::Identifier) && tok.text() == var_name) {
+                    // Insert all tokens from the argument
+                    for (unsigned at = 0; at < argtokens.size(); ++at) {
+                        sub.push_back(argtokens[at]);
+                    }
+                }
+                else {
+                    sub.push_back(tok);
+                }
+            }
+            out_lines.push_back(std::move(sub));
+        }
+    }
+
+    // 5) Emit the substituted lines at the directive's logical location
+    push_virtual_file(out_lines, directive_line.location().filename(),
+                      directive_line.location().line_num(), false);
 }
 
 void Preprocessor::process_exitm(const TokensLine& line, unsigned& i) {
@@ -1592,8 +2119,9 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
             ++pidx;
         }
 
-        // Append all produced temp lines for this replacement line
-        for (const TokensLine& tln : temp_lines) {
+        // Apply token-paste (##) after parameter substitution on each produced line
+        for (TokensLine& tln : temp_lines) {
+            merge_double_hash(tln);
             substituted.push_back(tln);
         }
     }

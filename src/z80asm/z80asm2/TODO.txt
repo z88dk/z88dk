@@ -1,2 +1,5 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
+- refactor reading of body, copying arguments, expanding macros, flattening result
+- add eval_const_expr to evaluate expression and issue syntax errors
+- add lookup of constant symbols from symbol table in eval expression
