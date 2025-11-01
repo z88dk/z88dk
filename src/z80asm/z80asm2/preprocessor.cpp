@@ -247,10 +247,23 @@ bool Preprocessor::next_line(TokensLine& line) {
 }
 
 void Preprocessor::define_macro(const std::string& name,
+                                const std::string replacement) {
+    TokensFile tf(replacement, "<macro>", 1, false);
+    define_macro(name, tf.tok_lines());
+}
+
+void Preprocessor::define_macro(const std::string& name,
                                 const std::vector<TokensLine>& replacement) {
+    // Report redefinition to keep behavior consistent with DEFINE/MACRO directives
+    if (macros_.find(name) != macros_.end()) {
+        g_errors.error(ErrorCode::MacroRedefined, name);
+    }
+
     Macro m;
     m.replacement = replacement;
     m.params.clear();
+    m.locals.clear();
+    m.is_function_like = false;
     macros_[name] = std::move(m);
 }
 
@@ -828,6 +841,12 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
     macro.is_function_like = (!macro.params.empty()) || had_func_parens;
     macro.replacement.clear();
     macro.replacement.push_back(rep);
+
+    // Report redefinition for DEFINE (not for DEFL)
+    if (macros_.find(name) != macros_.end()) {
+        g_errors.error(ErrorCode::MacroRedefined, name);
+    }
+
     macros_[name] = std::move(macro);
 }
 
@@ -1083,6 +1102,12 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     macro.is_function_like = (!macro.params.empty())
                              || had_paren; // true if params or empty ()
     macro.replacement = std::move(body);
+
+    // Report redefinition for MACRO (not for DEFL)
+    if (macros_.find(name) != macros_.end()) {
+        g_errors.error(ErrorCode::MacroRedefined, name);
+    }
+
     macros_[name] = std::move(macro);
     macro_recursion_count_[name] = 0;
 }

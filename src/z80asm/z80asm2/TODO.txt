@@ -1,5 +1,2 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
-- Macro redefinition error
-- Refactor line-number tracking logic
-- Refactor Macro expansion
