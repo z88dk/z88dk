@@ -172,6 +172,10 @@ private:
     void process_exitm(const TokensLine& line, unsigned& i);
     void do_exitm();
 
+    // LOCAL
+    void process_local(const TokensLine& line, unsigned& i,
+                       std::vector<std::string>& out_locals);
+
     // Macro expansion and line splitting
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);
