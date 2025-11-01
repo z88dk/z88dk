@@ -28,15 +28,16 @@ public:
     // Push a TokensFile constructed from a string (virtual file).
     void push_virtual_file(const std::string& content,
                            const std::string& filename,
-                           int first_line_num = 1);
+                           int first_line_num, bool inc_line_nums);
 
     // Push a TokensFile constructed directly from tokenized lines (no re-tokenization).
     void push_virtual_file(const std::vector<TokensLine>& tok_lines,
                            const std::string& filename,
-                           int first_line_num = 1);
+                           int first_line_num, bool inc_line_nums);
 
     // Push a virtual file constructed from a binary file.
-    void push_binary_file(const std::string& bin_filename);
+    void push_binary_file(const std::string& bin_filename,
+                          const Location& base);
 
     // Pop and return the next processed TokensLine.
     bool next_line(TokensLine& out_line);
@@ -66,7 +67,7 @@ private:
 
         // Optional forced logical location (from LINE/C_LINE)
         bool has_forced_location = false;
-        unsigned forced_from_index = 0;
+        unsigned forced_at_line_num = 0;
         int forced_start_line_num = 0;
         std::string forced_filename;
         bool forced_constant_line_numbers = false;
@@ -93,10 +94,6 @@ private:
     // When true, a directive is being processed from input_queue_ (not from file_stack_).
     // Used so MACRO can read its body from the queue produced by macro expansion.
     bool reading_queue_for_directive_ = false;
-
-    // If true, the last physical source line read produced no user-visible output yet.
-    // Used to compensate LINE-based logical numbering when a line expands only to directives.
-    bool pending_line_without_output_ = false;
 
     // Fetch a raw next logical line for MACRO body parsing, from the proper source:
     // - input_queue_ when reading_queue_for_directive_ is true
@@ -133,7 +130,8 @@ private:
 
     // BINARY / INCBIN
     void process_binary(const TokensLine& line, unsigned& i);
-    void do_binary(const std::string& filename, bool is_angle);
+    void do_binary(const std::string& filename, bool is_angle,
+                   const Location& base);
 
     // LINE / C_LINE
     void process_line(const TokensLine& line, unsigned& i);
