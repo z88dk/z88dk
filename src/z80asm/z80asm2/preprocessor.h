@@ -168,6 +168,10 @@ private:
     void do_macro(const TokensLine& line, unsigned& i,
                   const std::string& name);
 
+    // EXITM
+    void process_exitm(const TokensLine& line, unsigned& i);
+    void do_exitm();
+
     // Macro expansion and line splitting
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);

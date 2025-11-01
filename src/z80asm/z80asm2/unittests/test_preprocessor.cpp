@@ -2408,7 +2408,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
     REQUIRE(line.tokens()[0].text() == ".");
-    REQUIRE(line.tokens()[1].text() == "J_2"); // inner local renamed on its own expansion
+    REQUIRE(line.tokens()[1].text() ==
+            "J_2"); // inner local renamed on its own expansion
     REQUIRE(line.location().line_num() == 1001);
     REQUIRE(line.location().filename() == "local_nested.asm");
 
@@ -2436,7 +2437,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
 // NEW TESTS: EXITM
 // -----------------------------------------------------------------------------
 
-TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion", "[preprocessor][macro][exitm]") {
+TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
+          "[preprocessor][macro][exitm]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -2466,7 +2468,8 @@ TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
     REQUIRE(line.tokens()[0].text() == "after");
 }
 
-TEST_CASE("Preprocessor: EXITM outside of macro is ignored", "[preprocessor][exitm][outside]") {
+TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
+          "[preprocessor][exitm][outside]") {
     g_errors.reset();
     Preprocessor pp;
 

@@ -639,17 +639,9 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
         process_macro(line, i);
         break;
     case Keyword::LOCAL:
-        break; // only valid inside MACRO bodies
+        break;
     case Keyword::EXITM:
-        // EXITM: when inside a macro-expansion virtual file, abort it by popping the file.
-        expect_end(line, i);
-        if (!file_stack_.empty()) {
-            File& top = file_stack_.back();
-            if (top.is_macro_expansion) {
-                // Discard the rest of this macro-expansion file
-                file_stack_.pop_back();
-            }
-        }
+        process_exitm(line, i);
         break;
     default:
         assert(0);
@@ -1150,10 +1142,26 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     Macro macro;
     macro.params = std::move(params);
     macro.locals = std::move(locals);
-    macro.is_function_like = (!macro.params.empty()) || had_paren; // true if params or empty ()
+    macro.is_function_like = (!macro.params.empty())
+                             || had_paren; // true if params or empty ()
     macro.replacement = std::move(body);
     macros_[name] = std::move(macro);
     macro_recursion_count_[name] = 0;
+}
+
+void Preprocessor::process_exitm(const TokensLine& line, unsigned& i) {
+    expect_end(line, i);
+    do_exitm();
+}
+
+void Preprocessor::do_exitm() {
+    if (!file_stack_.empty()) {
+        File& top = file_stack_.back();
+        if (top.is_macro_expansion) {
+            // Discard the rest of this macro-expansion file
+            file_stack_.pop_back();
+        }
+    }
 }
 
 // Replace previous split_lines implementation with a macro-expansion "virtual file" wrapper
@@ -1257,7 +1265,8 @@ void Preprocessor::split_lines(const Location& location,
     // compensate the original file's LINE mapping now.
     if (!file_stack_.empty()) {
         File& orig = file_stack_.back();
-        if (!any_visible && orig.has_forced_location && !orig.forced_constant_line_numbers) {
+        if (!any_visible && orig.has_forced_location
+                && !orig.forced_constant_line_numbers) {
             ++orig.forced_from_index;
         }
     }
@@ -1281,9 +1290,11 @@ void Preprocessor::split_lines(const Location& location,
         top.is_macro_expansion = true;
         top.has_forced_location = true;
         top.forced_from_index = 0;
-        top.forced_start_line_num = location.line_num(); // constant logical line = call-site
+        top.forced_start_line_num =
+            location.line_num(); // constant logical line = call-site
         top.forced_filename = location.filename();       // logical filename = call-site
-        top.forced_constant_line_numbers = true;         // do not advance line number per line
+        top.forced_constant_line_numbers =
+            true;         // do not advance line number per line
     }
 }
 
