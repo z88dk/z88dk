@@ -1067,6 +1067,7 @@ void Preprocessor::process_name_macro(const TokensLine& line,
     do_macro(line, i, name);
 }
 
+// Factor LOCAL parsing into process_local and use it from do_macro
 void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
                             const std::string& name) {
     // Parse optional parameter list (accepts with or without surrounding parentheses)
@@ -1112,18 +1113,8 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
                 ++nest;
             }
             else if (kw == Keyword::LOCAL && nest == 0) {
-                // parse LOCAL names using parse_params_list (with or without parentheses)
-                std::vector<std::string> local_names;
-                unsigned prev_k = k;
-                if (parse_params_list(raw, k, local_names)) {
-                    locals.insert(locals.end(), local_names.begin(), local_names.end());
-                }
-                else {
-                    // Preserve previous behavior on empty/unparenthesized cases:
-                    // leave k unchanged and let expect_end validate possible trailing tokens.
-                    k = prev_k;
-                }
-                expect_end(raw, k);
+                // Delegate LOCAL parsing
+                process_local(raw, k, locals);
                 continue;
             }
         }
@@ -1162,6 +1153,24 @@ void Preprocessor::do_exitm() {
             file_stack_.pop_back();
         }
     }
+}
+
+void Preprocessor::process_local(const TokensLine& line, unsigned& i,
+                                 std::vector<std::string>& out_locals) {
+    // `i` is positioned right after the LOCAL keyword (spaces skipped by is_directive).
+    // Accept identifiers list with or without parentheses. If parsing fails, accept bare "LOCAL".
+    unsigned before = i;
+    std::vector<std::string> local_names;
+    if (parse_params_list(line, i, local_names)) {
+        // Append parsed names
+        out_locals.insert(out_locals.end(), local_names.begin(), local_names.end());
+    }
+    else {
+        // Restore to allow "LOCAL" with no params
+        i = before;
+    }
+    // Validate no trailing tokens
+    expect_end(line, i);
 }
 
 // Replace previous split_lines implementation with a macro-expansion "virtual file" wrapper
