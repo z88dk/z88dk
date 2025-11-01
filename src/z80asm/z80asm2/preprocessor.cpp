@@ -617,6 +617,8 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::MACRO:
         process_macro(line, i);
         break;
+    case Keyword::LOCAL:
+        break; // only valid inside MACRO bodies
     default:
         assert(0);
     }
@@ -1042,8 +1044,11 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
                             const std::string& name) {
     // Parse optional parameter list (accepts with or without surrounding parentheses)
     std::vector<std::string> params;
+    std::vector<std::string> locals;
+    std::vector<TokensLine> body;
     unsigned j = i;
     line.skip_spaces(j);
+    int nest = 0;
 
     const bool had_paren = (j < line.size() && line[j].is(TokenType::LeftParen));
     if (j < line.size()) {
@@ -1055,9 +1060,6 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     expect_end(line, j);
 
     // Collect body lines verbatim until ENDM
-    std::vector<TokensLine> body;
-    int nest = 0;
-
     while (true) {
         TokensLine raw;
         if (!fetch_line_for_macro_body(raw)) {
@@ -1067,43 +1069,43 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
         }
 
         // Check for a line that is exactly "ENDM" (ignoring leading/trailing whitespace)
-        bool is_endm_line = false;
         unsigned k = 0;
         Keyword kw = Keyword::None;
         if (is_directive(raw, k, kw)) {
             if (kw == Keyword::ENDM) {
-                ++k;
-                raw.skip_spaces(k);
-                if (raw.at_end(k)) {
-                    is_endm_line = true;
+                expect_end(raw, k);
+                if (nest == 0) {
+                    break;
+                }
+                else {
+                    --nest;
                 }
             }
-        }
-
-        if (is_endm_line) {
-            if (nest == 0) {
-                break;
+            else if (kw == Keyword::MACRO) {
+                ++nest;
             }
-            --nest;
+            else if (kw == Keyword::LOCAL && nest == 0) {
+                // parse LOCAL names using parse_params_list (with or without parentheses)
+                std::vector<std::string> local_names;
+                unsigned prev_k = k;
+                if (parse_params_list(raw, k, local_names)) {
+                    locals.insert(locals.end(), local_names.begin(), local_names.end());
+                }
+                else {
+                    // Preserve previous behavior on empty/unparenthesized cases:
+                    // leave k unchanged and let expect_end validate possible trailing tokens.
+                    k = prev_k;
+                }
+                expect_end(raw, k);
+                continue;
+            }
         }
         else {
-            // Detect nested MACRO starts to handle matching ENDM
             k = 0;
             kw = Keyword::None;
-            if (is_directive(raw, k, kw)) {
-                if (kw == Keyword::MACRO) {
-                    ++nest;
-                }
-            }
-            else {
-                // Also honor the "<name> MACRO ..." form
-                std::string dummyName;
-                k = 0;
-                if (is_name_directive(raw, k, kw, dummyName)) {
-                    if (kw == Keyword::MACRO) {
-                        ++nest;
-                    }
-                }
+            std::string dummyName;            
+            if (is_name_directive(raw, k, kw, dummyName) && kw == Keyword::MACRO) {
+                ++nest;
             }
         }
 
@@ -1112,8 +1114,8 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
 
     Macro macro;
     macro.params = std::move(params);
-    macro.is_function_like = (!macro.params.empty())
-                             || had_paren; // true if params or empty ()
+    macro.locals = std::move(locals);
+    macro.is_function_like = (!macro.params.empty()) || had_paren; // true if params or empty ()
     macro.replacement = std::move(body);
     macros_[name] = std::move(macro);
     macro_recursion_count_[name] = 0;
@@ -1461,6 +1463,17 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
     const std::vector<std::vector<TokensLine>>& expanded_args_flat,
     const std::vector<TokensLine>& original_args,
     const std::string& name) {
+    // Prepare LOCAL renaming map for this expansion, if any locals declared.
+    std::unordered_map<std::string, std::string> local_rename;
+    if (!macro.locals.empty()) {
+        // Each macro expansion gets a new unique id
+        ++local_id_counter_;
+        const std::string suffix = "_" + std::to_string(local_id_counter_);
+        for (const std::string& ln : macro.locals) {
+            local_rename[ln] = ln + suffix;
+        }
+    }
+
     // Perform textual parameter substitution
     std::vector<TokensLine> substituted;
     for (const TokensLine& rep_line : macro.replacement) {
@@ -1476,11 +1489,12 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
             if (rt.is(TokenType::Hash)) {
                 // try_stringize_parameter expects a TokensLine to append into.
                 if (try_stringize_parameter(rep_line, pidx, macro, original_args,
-                                            temp_lines.back())) {
+                                             temp_lines.back())) {
                     // handled and pidx advanced inside helper
                     continue;
                 }
                 // If not handled (not followed by a matching param), copy '#'
+                // If '#' appears in replacement (not stringize), copy as-is
                 temp_lines.back().push_back(rt);
                 ++pidx;
                 continue;
@@ -1519,7 +1533,19 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
 
             if (!substituted_flag) {
                 // Copy token into current last temp line
-                temp_lines.back().push_back(rt);
+                // If this identifier is declared LOCAL for the macro, rename it.
+                if (rt.is(TokenType::Identifier)) {
+                    auto it = local_rename.find(rt.text());
+                    if (it != local_rename.end()) {
+                        temp_lines.back().push_back(Token(TokenType::Identifier, it->second));
+                    }
+                    else {
+                        temp_lines.back().push_back(rt);
+                    }
+                }
+                else {
+                    temp_lines.back().push_back(rt);
+                }
             }
             ++pidx;
         }

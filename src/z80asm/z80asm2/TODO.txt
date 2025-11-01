@@ -1,5 +1,4 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
-- LOCAL
 - EXITM
-
+- Macro redefinition error

@@ -47,6 +47,7 @@ private:
     struct Macro {
         std::vector<TokensLine> replacement; // replacement token lines
         std::vector<std::string> params;     // parameter names
+        std::vector<std::string> locals;     // LOCAL names declared in macro body
         bool is_function_like =
             false;       // true if definition had params or used empty ()
         bool is_multi_line() const {
@@ -77,6 +78,9 @@ private:
 
     // Track macro expansion recursion depth per macro name (to avoid infinite recursion).
     std::unordered_map<std::string, int> macro_recursion_count_;
+
+    // Global counter used to produce unique names for LOCAL symbols on each macro expansion.
+    unsigned local_id_counter_ = 0;
 
     // When true, a directive is being processed from input_queue_ (not from file_stack_).
     // Used so MACRO can read its body from the queue produced by macro expansion.
