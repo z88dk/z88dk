@@ -44,6 +44,18 @@ void Preprocessor::push_virtual_file(const std::string& content,
     file_stack_.push_back(std::move(vf));
 }
 
+void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
+                                     const std::string& filename,
+                                     int first_line_num) {
+    File vf;
+    vf.tokens_file = TokensFile(tok_lines, filename, first_line_num);
+    vf.line_index = 0;
+    vf.has_forced_location = false;
+    vf.forced_constant_line_numbers = false;
+    vf.is_macro_expansion = false;
+    file_stack_.push_back(std::move(vf));
+}
+
 void Preprocessor::push_binary_file(const std::string& bin_filename) {
     // Try to open the binary file. If we fail, fall back to push_file so the
     // normal file-not-found handling (and error messages) still apply.
@@ -1251,16 +1263,11 @@ void Preprocessor::split_lines(const Location& location,
         return;
     }
 
-    // Multi-line: wrap in a macro-expansion virtual file so EXITM can abort it
-    std::ostringstream oss;
-    for (const auto& ln : expanded) {
-        oss << ln.to_string() << "\n";
-    }
-
     const std::string virt_filename =
         location.filename().empty() ? "<macro-expansion>" : location.filename();
 
-    push_virtual_file(oss.str(), virt_filename, /*first_line_num*/ 1);
+    // Reuse tokens directly (no stringify/tokenize loop)
+    push_virtual_file(expanded, virt_filename, /*first_line_num*/ 1);
 
     if (!file_stack_.empty()) {
         File& top = file_stack_.back();
