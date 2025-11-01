@@ -230,6 +230,16 @@ TokensFile::TokensFile(const std::string& content,
     tokenize(content);
 }
 
+TokensFile::TokensFile(const std::vector<TokensLine>& tok_lines,
+                       const std::string& filename, int first_line_num)
+    : filename_(filename),
+      first_line_num_(first_line_num),
+      inc_line_nums_(false),
+      tok_lines_(tok_lines) {
+    // Do not alter token/locations; caller (Preprocessor) may override via forced location.
+    // text_lines_ intentionally left empty.
+}
+
 void TokensFile::clear() {
     filename_.clear();
     first_line_num_ = 1;
