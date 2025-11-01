@@ -2235,7 +2235,10 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
     // instruction 'nop' should follow (label removed from instruction line)
     bool saw_nop = false;
     for (const auto& t : line.tokens()) {
-        if (t.text() == "nop") { saw_nop = true; break; }
+        if (t.text() == "nop") {
+            saw_nop = true;
+            break;
+        }
     }
     REQUIRE(saw_nop);
 
@@ -2249,7 +2252,10 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
     REQUIRE(!line.tokens().empty());
     saw_nop = false;
     for (const auto& t : line.tokens()) {
-        if (t.text() == "nop") { saw_nop = true; break; }
+        if (t.text() == "nop") {
+            saw_nop = true;
+            break;
+        }
     }
     REQUIRE(saw_nop);
 
@@ -2281,9 +2287,15 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per
     REQUIRE(pp.next_line(line));
     bool found_mov = false, found_tmp1 = false, found_5 = false;
     for (const auto& t : line.tokens()) {
-        if (t.text() == "mov") found_mov = true;
-        if (t.text() == "tmp_1") found_tmp1 = true;
-        if (t.is(TokenType::Integer) && t.int_value() == 5) found_5 = true;
+        if (t.text() == "mov") {
+            found_mov = true;
+        }
+        if (t.text() == "tmp_1") {
+            found_tmp1 = true;
+        }
+        if (t.is(TokenType::Integer) && t.int_value() == 5) {
+            found_5 = true;
+        }
     }
     REQUIRE(found_mov);
     REQUIRE(found_tmp1);
@@ -2293,9 +2305,15 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per
     REQUIRE(pp.next_line(line));
     found_mov = found_tmp1 = found_5 = false;
     for (const auto& t : line.tokens()) {
-        if (t.text() == "mov") found_mov = true;
-        if (t.text() == "tmp_2") found_tmp1 = true;
-        if (t.is(TokenType::Integer) && t.int_value() == 6) found_5 = true;
+        if (t.text() == "mov") {
+            found_mov = true;
+        }
+        if (t.text() == "tmp_2") {
+            found_tmp1 = true;
+        }
+        if (t.is(TokenType::Integer) && t.int_value() == 6) {
+            found_5 = true;
+        }
     }
     REQUIRE(found_mov);
     REQUIRE(found_tmp1);
@@ -2340,7 +2358,7 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
 // -----------------------------------------------------------------------------
 
 TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner LOCAL handled when sub-macro is parsed",
-    "[preprocessor][macro][local][nested]") {
+          "[preprocessor][macro][local][nested]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -2376,7 +2394,10 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     {
         bool saw_nop = false;
         for (const auto& t : line.tokens()) {
-            if (t.text() == "nop") { saw_nop = true; break; }
+            if (t.text() == "nop") {
+                saw_nop = true;
+                break;
+            }
         }
         REQUIRE(saw_nop);
     }
@@ -2387,7 +2408,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
     REQUIRE(line.tokens()[0].text() == ".");
-    REQUIRE(line.tokens()[1].text() == "J_2"); // inner local renamed on its own expansion
+    REQUIRE(line.tokens()[1].text() ==
+            "J_2"); // inner local renamed on its own expansion
     REQUIRE(line.location().line_num() == 1001);
     REQUIRE(line.location().filename() == "local_nested.asm");
 
@@ -2395,7 +2417,10 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     {
         bool saw_nop = false;
         for (const auto& t : line.tokens()) {
-            if (t.text() == "nop") { saw_nop = true; break; }
+            if (t.text() == "nop") {
+                saw_nop = true;
+                break;
+            }
         }
         REQUIRE(saw_nop);
     }
@@ -2412,7 +2437,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
 // NEW TESTS: EXITM
 // -----------------------------------------------------------------------------
 
-TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion", "[preprocessor][macro][exitm]") {
+TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
+          "[preprocessor][macro][exitm]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -2442,7 +2468,8 @@ TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
     REQUIRE(line.tokens()[0].text() == "after");
 }
 
-TEST_CASE("Preprocessor: EXITM outside of macro is ignored", "[preprocessor][exitm][outside]") {
+TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
+          "[preprocessor][exitm][outside]") {
     g_errors.reset();
     Preprocessor pp;
 

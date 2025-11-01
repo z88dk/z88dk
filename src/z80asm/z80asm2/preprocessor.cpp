@@ -248,8 +248,9 @@ bool Preprocessor::next_line(TokensLine& line) {
             process_directive(line, i, keyword);
             // This physical line produced no user-visible output.
             // Mark pending so we compensate LINE-based mapping on the next iteration.
-            if (keyword != Keyword::LINE)
+            if (keyword != Keyword::LINE) {
                 pending_line_without_output_ = true;
+            }
             continue; // get next line
         }
 
@@ -260,8 +261,9 @@ bool Preprocessor::next_line(TokensLine& line) {
         if (is_name_directive(line, i, keyword, name)) {
             process_name_directive(line, i, keyword, name);
             // Same reasoning as above for directives read from the real file.
-            if (keyword != Keyword::LINE)
+            if (keyword != Keyword::LINE) {
                 pending_line_without_output_ = true;
+            }
             continue; // get next line
         }
 
@@ -637,17 +639,9 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
         process_macro(line, i);
         break;
     case Keyword::LOCAL:
-        break; // only valid inside MACRO bodies
+        break;
     case Keyword::EXITM:
-        // EXITM: when inside a macro-expansion virtual file, abort it by popping the file.
-        expect_end(line, i);
-        if (!file_stack_.empty()) {
-            File& top = file_stack_.back();
-            if (top.is_macro_expansion) {
-                // Discard the rest of this macro-expansion file
-                file_stack_.pop_back();
-            }
-        }
+        process_exitm(line, i);
         break;
     default:
         assert(0);
@@ -1136,7 +1130,7 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
         else {
             k = 0;
             kw = Keyword::None;
-            std::string dummyName;            
+            std::string dummyName;
             if (is_name_directive(raw, k, kw, dummyName) && kw == Keyword::MACRO) {
                 ++nest;
             }
@@ -1148,28 +1142,47 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     Macro macro;
     macro.params = std::move(params);
     macro.locals = std::move(locals);
-    macro.is_function_like = (!macro.params.empty()) || had_paren; // true if params or empty ()
+    macro.is_function_like = (!macro.params.empty())
+                             || had_paren; // true if params or empty ()
     macro.replacement = std::move(body);
     macros_[name] = std::move(macro);
     macro_recursion_count_[name] = 0;
+}
+
+void Preprocessor::process_exitm(const TokensLine& line, unsigned& i) {
+    expect_end(line, i);
+    do_exitm();
+}
+
+void Preprocessor::do_exitm() {
+    if (!file_stack_.empty()) {
+        File& top = file_stack_.back();
+        if (top.is_macro_expansion) {
+            // Discard the rest of this macro-expansion file
+            file_stack_.pop_back();
+        }
+    }
 }
 
 // Replace previous split_lines implementation with a macro-expansion "virtual file" wrapper
 // so directives like EXITM can abort the current expansion and all expanded lines
 // carry the macro call-site logical location (constant line number).
 void Preprocessor::split_lines(const Location& location,
-                               const std::vector<TokensLine>& expanded)
-{
+                               const std::vector<TokensLine>& expanded) {
     // Scan expanded lines and decide if any will produce user-visible output.
     // Rules:
     // - Lines inside MACRO..ENDM regions are non-visible (body is consumed).
     // - Plain non-visible directives at top-level: DEFINE, UNDEF/UNDEFINE, DEFL, LINE, C_LINE, LOCAL, EXITM.
     // - INCLUDE/BINARY/INCBIN are visible (they eventually emit lines).
     // - Non-directive tokens at top-level are visible.
-    auto classify_line = [&](const TokensLine& ln, bool in_macro_region) -> bool {
-        if (ln.tokens().empty()) return false; // empty -> non-visible
+    auto classify_line = [&](const TokensLine & ln, bool in_macro_region) -> bool {
+        if (ln.tokens().empty()) {
+            return false;    // empty -> non-visible
+        }
 
-        if (in_macro_region) return false;     // MACRO body content is non-visible
+        if (in_macro_region) {
+            return false;    // MACRO body content is non-visible
+        }
 
         unsigned i = 0;
         Keyword kw = Keyword::None;
@@ -1177,7 +1190,9 @@ void Preprocessor::split_lines(const Location& location,
 
         // Name-directive: "<name> MACRO"
         if (is_name_directive(ln, i, kw, name)) {
-            if (kw == Keyword::MACRO) return false; // header itself is non-visible
+            if (kw == Keyword::MACRO) {
+                return false;    // header itself is non-visible
+            }
             // other name-directives (DEFINE/DEFL/UNDEF) already handled by plain directive scan below
         }
 
@@ -1185,23 +1200,23 @@ void Preprocessor::split_lines(const Location& location,
         i = 0;
         if (is_directive(ln, i, kw)) {
             switch (kw) {
-                case Keyword::MACRO:
-                case Keyword::ENDM:
-                case Keyword::DEFINE:
-                case Keyword::UNDEF:
-                case Keyword::UNDEFINE:
-                case Keyword::DEFL:
-                case Keyword::LINE:
-                case Keyword::C_LINE:
-                case Keyword::LOCAL:
-                case Keyword::EXITM:
-                    return false; // non-visible at top-level
-                case Keyword::INCLUDE:
-                case Keyword::BINARY:
-                case Keyword::INCBIN:
-                    return true;  // visible (pushes content)
-                default:
-                    break;
+            case Keyword::MACRO:
+            case Keyword::ENDM:
+            case Keyword::DEFINE:
+            case Keyword::UNDEF:
+            case Keyword::UNDEFINE:
+            case Keyword::DEFL:
+            case Keyword::LINE:
+            case Keyword::C_LINE:
+            case Keyword::LOCAL:
+            case Keyword::EXITM:
+                return false; // non-visible at top-level
+            case Keyword::INCLUDE:
+            case Keyword::BINARY:
+            case Keyword::INCBIN:
+                return true;  // visible (pushes content)
+            default:
+                break;
             }
         }
 
@@ -1250,7 +1265,8 @@ void Preprocessor::split_lines(const Location& location,
     // compensate the original file's LINE mapping now.
     if (!file_stack_.empty()) {
         File& orig = file_stack_.back();
-        if (!any_visible && orig.has_forced_location && !orig.forced_constant_line_numbers) {
+        if (!any_visible && orig.has_forced_location
+                && !orig.forced_constant_line_numbers) {
             ++orig.forced_from_index;
         }
     }
@@ -1274,9 +1290,11 @@ void Preprocessor::split_lines(const Location& location,
         top.is_macro_expansion = true;
         top.has_forced_location = true;
         top.forced_from_index = 0;
-        top.forced_start_line_num = location.line_num(); // constant logical line = call-site
+        top.forced_start_line_num =
+            location.line_num(); // constant logical line = call-site
         top.forced_filename = location.filename();       // logical filename = call-site
-        top.forced_constant_line_numbers = true;         // do not advance line number per line
+        top.forced_constant_line_numbers =
+            true;         // do not advance line number per line
     }
 }
 
@@ -1641,7 +1659,7 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
             if (rt.is(TokenType::Hash)) {
                 // try_stringize_parameter expects a TokensLine to append into.
                 if (try_stringize_parameter(rep_line, pidx, macro, original_args,
-                                             temp_lines.back())) {
+                                            temp_lines.back())) {
                     // handled and pidx advanced inside helper
                     continue;
                 }

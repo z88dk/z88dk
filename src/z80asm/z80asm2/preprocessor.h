@@ -32,8 +32,8 @@ public:
 
     // Push a TokensFile constructed directly from tokenized lines (no re-tokenization).
     void push_virtual_file(const std::vector<TokensLine>& tok_lines,
-        const std::string& filename,
-        int first_line_num = 1);
+                           const std::string& filename,
+                           int first_line_num = 1);
 
     // Push a virtual file constructed from a binary file.
     void push_binary_file(const std::string& bin_filename);
@@ -167,6 +167,10 @@ private:
                             const std::string& name);
     void do_macro(const TokensLine& line, unsigned& i,
                   const std::string& name);
+
+    // EXITM
+    void process_exitm(const TokensLine& line, unsigned& i);
+    void do_exitm();
 
     // Macro expansion and line splitting
     void split_lines(const Location& location,

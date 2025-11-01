@@ -1,9 +1,7 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
 - EXITM
-	- on its own function
 	- same for LOCAL
-	- do not convert to text and to tokens again
 - Macro redefinition error
 - Refactor line-number tracking logic
 - Refactor Macro expansion
