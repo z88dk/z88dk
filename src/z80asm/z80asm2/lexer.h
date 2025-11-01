@@ -128,6 +128,11 @@ public:
                const std::string& filename,
                int first_line_num);
 
+    // virtual file directly from pre-tokenized lines (no tokenize())
+    TokensFile(const std::vector<TokensLine>& tok_lines,
+               const std::string& filename,
+               int first_line_num);
+
     void clear();
     const std::string& filename() const;
     int first_line_num() const;
@@ -138,11 +143,11 @@ public:
     const TokensLine& get_tok_line(unsigned index) const;
 
 private:
-    std::string filename_;                  // Source file name
-    int first_line_num_ = 1;                // Initial line number
-    bool inc_line_nums_ = true;             // Whether to increment line numbers
-    std::vector<std::string> text_lines_;   // input text lines
-    std::vector<TokensLine> tok_lines_;     // All not-empty tokenized lines
+    std::string filename_;
+    int first_line_num_ = 1;
+    bool inc_line_nums_ = true;
+    std::vector<std::string> text_lines_;
+    std::vector<TokensLine> tok_lines_;
 
     void split_lines(const char*& p);
     void tokenize(const std::string& content);
