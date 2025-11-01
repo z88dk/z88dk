@@ -126,12 +126,12 @@ public:
     // virtual file from a string content
     TokensFile(const std::string& content,
                const std::string& filename,
-               int first_line_num);
+               int first_line_num, bool inc_line_nums);
 
     // virtual file directly from pre-tokenized lines (no tokenize())
     TokensFile(const std::vector<TokensLine>& tok_lines,
                const std::string& filename,
-               int first_line_num);
+               int first_line_num, bool inc_line_nums);
 
     void clear();
     const std::string& filename() const;

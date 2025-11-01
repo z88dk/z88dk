@@ -39,7 +39,7 @@ TEST_CASE("Preprocessor: split label produces label line then instruction line",
     Preprocessor pp;
 
     const std::string content = "start: nop\n";
-    pp.push_virtual_file(content, "virtual_label", 1);
+    pp.push_virtual_file(content, "virtual_label", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line)); // label line
@@ -60,7 +60,7 @@ TEST_CASE("Preprocessor: transform string to list of integer tokens",
     Preprocessor pp;
 
     const std::string content = "db \"AB\"\n";
-    pp.push_virtual_file(content, "virtual_db", 1);
+    pp.push_virtual_file(content, "virtual_db", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -92,7 +92,7 @@ TEST_CASE("Preprocessor: include directive pushes included file contents",
 
     // virtual file that includes the temp file and then has another line
     const std::string content = "#include \"" + fname + "\"\nafter\n";
-    pp.push_virtual_file(content, "virtual_include", 1);
+    pp.push_virtual_file(content, "virtual_include", 1, true);
 
     TokensLine line;
     // first non-directive line should come from the included file
@@ -117,7 +117,7 @@ TEST_CASE("Preprocessor: include without filename reports invalid-syntax",
     Preprocessor pp;
 
     const std::string content = "#include\n";
-    pp.push_virtual_file(content, "virtual_noarg", 1);
+    pp.push_virtual_file(content, "virtual_noarg", 1, true);
 
     TokensLine line;
     // consume all produced lines (there should be none)
@@ -141,7 +141,7 @@ TEST_CASE("Preprocessor: include with angle brackets treated as string; missing 
     // angle-bracket include - lexer reports the name as a string token
     const std::string missing = "pp_angle_missing.tmp";
     const std::string content = "#include <" + missing + ">\n";
-    pp.push_virtual_file(content, "virtual_angle", 1);
+    pp.push_virtual_file(content, "virtual_angle", 1, true);
 
     TokensLine line;
     // consume produced lines (none expected because include is processed as directive)
@@ -169,7 +169,7 @@ TEST_CASE("Preprocessor: string escape sequences are converted to integer list",
     // where backslashes are escaped so the assembler sees the intended escapes.
     const std::string content =
         "db \"A\\a\\b\\e\\f\\n\\r\\t\\v\\x41\\101\\\\\\\"\\'\"\n";
-    pp.push_virtual_file(content, "escape_test", 1);
+    pp.push_virtual_file(content, "escape_test", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -236,7 +236,7 @@ TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms"
     content += "#include " + fp + "\n";
     content += "sentinel\n";
 
-    pp.push_virtual_file(content, "include_forms", 1);
+    pp.push_virtual_file(content, "include_forms", 1, true);
 
     TokensLine line;
 
@@ -291,7 +291,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
         g_errors.reset();
         Preprocessor pp;
         std::string content = "#include \"" + fq + "\" trailing\n";
-        pp.push_virtual_file(content, "inc_trail_q", 1);
+        pp.push_virtual_file(content, "inc_trail_q", 1, true);
         while (pp.next_line(line)) { }
         REQUIRE(g_errors.has_errors());
         std::string msg = g_errors.last_error_message();
@@ -304,7 +304,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
         g_errors.reset();
         Preprocessor pp;
         std::string content = "#include <" + fa + "> trailing\n";
-        pp.push_virtual_file(content, "inc_trail_a", 1);
+        pp.push_virtual_file(content, "inc_trail_a", 1, true);
         while (pp.next_line(line)) { }
         REQUIRE(g_errors.has_errors());
         std::string msg = g_errors.last_error_message();
@@ -317,7 +317,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
         g_errors.reset();
         Preprocessor pp;
         std::string content = "#include " + fp + " trailing\n";
-        pp.push_virtual_file(content, "inc_trail_p", 1);
+        pp.push_virtual_file(content, "inc_trail_p", 1, true);
         while (pp.next_line(line)) { }
         REQUIRE(g_errors.has_errors());
         std::string msg = g_errors.last_error_message();
@@ -340,7 +340,7 @@ TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines"
 
     // LINE 100 then two ordinary lines
     const std::string content = "LINE 100\nfirst_line\nsecond_line\n";
-    pp.push_virtual_file(content, "line_test", 1);
+    pp.push_virtual_file(content, "line_test", 1, true);
 
     TokensLine line;
     // first returned line should be "first_line" with logical line 100
@@ -365,7 +365,7 @@ TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line n
 
     // LINE 200, "other.asm" then a line
     const std::string content = "LINE 200, \"other.asm\"\nonly_line\n";
-    pp.push_virtual_file(content, "orig_file", 1);
+    pp.push_virtual_file(content, "orig_file", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -381,7 +381,7 @@ TEST_CASE("Preprocessor: LINE with missing argument reports error",
     Preprocessor pp;
 
     const std::string content = "LINE\n";
-    pp.push_virtual_file(content, "line_missing_arg", 1);
+    pp.push_virtual_file(content, "line_missing_arg", 1, true);
 
     TokensLine line;
     // consume produced lines (none expected)
@@ -403,7 +403,7 @@ TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for follow
 
     // C_LINE 400 then two ordinary lines
     const std::string content = "C_LINE 400\none_line\ntwo_line\n";
-    pp.push_virtual_file(content, "cline_test", 1);
+    pp.push_virtual_file(content, "cline_test", 1, true);
 
     TokensLine line;
     // first returned line should be "one_line" with logical line 400
@@ -428,7 +428,7 @@ TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and lin
 
     // C_LINE 300, "cfile.c" then a line
     const std::string content = "C_LINE 300, \"cfile.c\"\nonly_c_line\n";
-    pp.push_virtual_file(content, "orig_c_line", 1);
+    pp.push_virtual_file(content, "orig_c_line", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -444,7 +444,7 @@ TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
     Preprocessor pp;
 
     const std::string content = "C_LINE\n";
-    pp.push_virtual_file(content, "cline_missing_arg", 1);
+    pp.push_virtual_file(content, "cline_missing_arg", 1, true);
 
     TokensLine line;
     // consume produced lines (none expected)
@@ -476,7 +476,7 @@ TEST_CASE("Preprocessor: push_binary_file reads 0..255 bytes and emits DEFB line
     }
 
     // Push the binary file as a virtual file (DEFB lines)
-    pp.push_binary_file(fname);
+    pp.push_binary_file(fname, Location(fname, 1));
 
     TokensLine line;
     std::vector<int> ints;
@@ -528,7 +528,7 @@ TEST_CASE("Preprocessor: BINARY directive is parsed and replaced by 16 DEFB line
     content += "BINARY \"" + fname + "\"\n";
     content += "after_directive\n";
 
-    pp.push_virtual_file(content, "virtual_binary_dir", 1);
+    pp.push_virtual_file(content, "virtual_binary_dir", 1, true);
 
     TokensLine line;
     std::vector<int> ints;
@@ -592,7 +592,7 @@ TEST_CASE("Preprocessor: INCBIN directive is parsed and replaced by 16 DEFB line
     content += "INCBIN \"" + fname + "\"\n";
     content += "after_incbin\n";
 
-    pp.push_virtual_file(content, "virtual_incbin_dir", 1);
+    pp.push_virtual_file(content, "virtual_incbin_dir", 1, true);
 
     TokensLine line;
     std::vector<int> ints;
@@ -641,7 +641,7 @@ TEST_CASE("Preprocessor: LINE accepts quoted, angle-bracketed and plain filename
     content += "LINE 20, <line_a.asm>\nline_a\n";
     content += "LINE 30, line_p.asm\nline_p\n";
 
-    pp.push_virtual_file(content, "virtual_line_forms", 1);
+    pp.push_virtual_file(content, "virtual_line_forms", 1, true);
 
     TokensLine line;
 
@@ -674,7 +674,7 @@ TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filena
     content += "C_LINE 202, <cline_a.c>\ncline_a\n";
     content += "C_LINE 303, cline_p.c\ncline_p\n";
 
-    pp.push_virtual_file(content, "virtual_cline_forms", 1);
+    pp.push_virtual_file(content, "virtual_cline_forms", 1, true);
 
     TokensLine line;
 
@@ -727,7 +727,7 @@ TEST_CASE("Preprocessor: BINARY accepts quoted, angle-bracketed and plain filena
     content += "BINARY " + fp + "\n";
     content += "after_binary\n";
 
-    pp.push_virtual_file(content, "virtual_binary_forms", 1);
+    pp.push_virtual_file(content, "virtual_binary_forms", 1, true);
 
     TokensLine line;
     std::vector<std::vector<int>> groups;
@@ -795,7 +795,7 @@ TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filena
     content += "INCBIN " + fp + "\n";
     content += "after_incbin\n";
 
-    pp.push_virtual_file(content, "virtual_incbin_forms", 1);
+    pp.push_virtual_file(content, "virtual_incbin_forms", 1, true);
 
     TokensLine line;
     std::vector<std::vector<int>> groups;
@@ -842,7 +842,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
     // #define form
     {
         const std::string content = "#define X 5\nX\n";
-        pp.push_virtual_file(content, "def_obj_hash", 1);
+        pp.push_virtual_file(content, "def_obj_hash", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -856,7 +856,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
     // name define form
     {
         const std::string content = "Y define 6\nY\n";
-        pp.push_virtual_file(content, "def_obj_name", 1);
+        pp.push_virtual_file(content, "def_obj_name", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -878,7 +878,7 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
             "#define A 10\n"
             "#define F(x) x\n"
             "F(A)\n";
-        pp.push_virtual_file(content, "def_func_arg_expand", 1);
+        pp.push_virtual_file(content, "def_func_arg_expand", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -901,7 +901,7 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
             "#define TWO 2\n"
             "#define ADD(a,b) a + b\n"
             "ADD(1,TWO)\n";
-        pp.push_virtual_file(content, "def_func_multiarg", 1);
+        pp.push_virtual_file(content, "def_func_multiarg", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -928,7 +928,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
     // #define with empty body
     {
         const std::string content = "#define EMPTY\nEMPTY\n";
-        pp.push_virtual_file(content, "def_empty_hash", 1);
+        pp.push_virtual_file(content, "def_empty_hash", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -941,7 +941,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
     // name define with empty body
     {
         const std::string content = "E define\nE\n";
-        pp.push_virtual_file(content, "def_empty_name", 1);
+        pp.push_virtual_file(content, "def_empty_name", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -954,7 +954,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
     // function-like macro with empty body should also expand to 1
     {
         const std::string content = "#define F(x)\nF(2)\n";
-        pp.push_virtual_file(content, "def_empty_func", 1);
+        pp.push_virtual_file(content, "def_empty_func", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -974,7 +974,7 @@ TEST_CASE("Preprocessor: macro recursion limit is enforced for self-recursive ma
     const std::string content =
         "#define R R\n"
         "R\n";
-    pp.push_virtual_file(content, "def_recursion", 1);
+    pp.push_virtual_file(content, "def_recursion", 1, true);
 
     TokensLine line;
     // consume produced lines (there will be at least one)
@@ -992,7 +992,7 @@ TEST_CASE("Preprocessor: name undef removes macro (name UNDEF syntax)",
     Preprocessor pp;
 
     const std::string content = "M define 42\nM undef\nM\n";
-    pp.push_virtual_file(content, "def_name_undef", 1);
+    pp.push_virtual_file(content, "def_name_undef", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1008,7 +1008,7 @@ TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
     Preprocessor pp;
 
     const std::string content = "#define N 99\n#undef N\nN\n";
-    pp.push_virtual_file(content, "def_hash_undef", 1);
+    pp.push_virtual_file(content, "def_hash_undef", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1030,7 +1030,7 @@ TEST_CASE("Preprocessor: stringize operator '#' produces a string token for a si
     const std::string content =
         "#define S(x) #x\n"
         "S(Hello)\n";
-    pp.push_virtual_file(content, "str_simple", 1);
+    pp.push_virtual_file(content, "str_simple", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1067,7 +1067,7 @@ TEST_CASE("Preprocessor: stringize '#' uses the original (unexpanded) argument",
         "#define A X\n"
         "#define S(x) #x\n"
         "S(A)\n";
-    pp.push_virtual_file(content, "str_unexpanded", 1);
+    pp.push_virtual_file(content, "str_unexpanded", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1090,7 +1090,7 @@ TEST_CASE("Preprocessor: stringize '#' escapes double-quotes and backslashes in 
     const std::string content =
         "#define S(x) #x\n"
         "S(\"hi\")\n";
-    pp.push_virtual_file(content, "str_escape", 1);
+    pp.push_virtual_file(content, "str_escape", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1122,7 +1122,7 @@ TEST_CASE("Preprocessor: stringize '#' preserves spaces between tokens producing
     const std::string content =
         "#define S(x) #x\n"
         "S(A B)\n";
-    pp.push_virtual_file(content, "str_space", 1);
+    pp.push_virtual_file(content, "str_space", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1149,7 +1149,7 @@ TEST_CASE("Preprocessor: single-line /* */ comment replaced by single Whitespace
     Preprocessor pp;
 
     const std::string content = "A/*single*/B\n";
-    pp.push_virtual_file(content, "comment_single", 1);
+    pp.push_virtual_file(content, "comment_single", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1172,7 +1172,7 @@ TEST_CASE("Preprocessor: multi-line /* */ comment replaced by single Whitespace 
     Preprocessor pp;
 
     const std::string content = "A/*multi\nline\ncomment*/B\n";
-    pp.push_virtual_file(content, "comment_multi", 1);
+    pp.push_virtual_file(content, "comment_multi", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1198,7 +1198,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' concatenates two identifiers into one i
     Preprocessor pp;
 
     const std::string content = "A ## B\n";
-    pp.push_virtual_file(content, "paste_ids", 1);
+    pp.push_virtual_file(content, "paste_ids", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1221,7 +1221,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' concatenates identifier and integer int
     Preprocessor pp;
 
     const std::string content = "P##1\n";
-    pp.push_virtual_file(content, "paste_id_int", 1);
+    pp.push_virtual_file(content, "paste_id_int", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1243,7 +1243,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' supports multiple pastes in the same li
     Preprocessor pp;
 
     const std::string content = "A##B C##D\n";
-    pp.push_virtual_file(content, "paste_multi", 1);
+    pp.push_virtual_file(content, "paste_multi", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1276,7 +1276,7 @@ TEST_CASE("Preprocessor: DEFL infix 'name DEFL expr' defines and replaces symbol
     const std::string content =
         "idx DEFL 7\n"
         "idx\n";
-    pp.push_virtual_file(content, "defl_infix", 1);
+    pp.push_virtual_file(content, "defl_infix", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1294,7 +1294,7 @@ TEST_CASE("Preprocessor: DEFL prefix 'DEFL name=expr' defines and replaces symbo
     const std::string content =
         "DEFL count=9\n"
         "count\n";
-    pp.push_virtual_file(content, "defl_prefix", 1);
+    pp.push_virtual_file(content, "defl_prefix", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1314,7 +1314,7 @@ TEST_CASE("Preprocessor: DEFL can use previous value (DEFL index=index+1)",
         "DEFL index=index+1\n"
         "DEFL index=index+1\n"
         "index\n";
-    pp.push_virtual_file(content, "defl_prev", 1);
+    pp.push_virtual_file(content, "defl_prev", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1341,7 +1341,7 @@ TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma lis
         "#define LIST A, B\n"
         "DEFL P=LIST\n"
         "db P\n";
-    pp.push_virtual_file(content, "defl_nonconst", 1);
+    pp.push_virtual_file(content, "defl_nonconst", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(
@@ -1379,7 +1379,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
         g_errors.reset();
         Preprocessor pp;
         const std::string content = "A DEFINE = 5\nA\n";
-        pp.push_virtual_file(content, "def_eq_obj_spaced", 1);
+        pp.push_virtual_file(content, "def_eq_obj_spaced", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -1394,7 +1394,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
         g_errors.reset();
         Preprocessor pp;
         const std::string content = "B define=6\nB\n";
-        pp.push_virtual_file(content, "def_eq_obj_nospaces", 1);
+        pp.push_virtual_file(content, "def_eq_obj_nospaces", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
@@ -1412,7 +1412,7 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
         g_errors.reset();
         Preprocessor pp;
         const std::string content = "E DEFINE =\nE\n";
-        pp.push_virtual_file(content, "def_eq_empty_obj", 1);
+        pp.push_virtual_file(content, "def_eq_empty_obj", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "E"
@@ -1427,7 +1427,7 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
         g_errors.reset();
         Preprocessor pp;
         const std::string content = "#define F(x)\nF(2)\n";
-        pp.push_virtual_file(content, "def_eq_empty_func", 1);
+        pp.push_virtual_file(content, "def_eq_empty_func", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "F(2)"
@@ -1447,7 +1447,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
         g_errors.reset();
         Preprocessor pp;
         const std::string content = "DEFINE A = 5\nA\n";
-        pp.push_virtual_file(content, "def_prefix_eq_obj_spaced", 1);
+        pp.push_virtual_file(content, "def_prefix_eq_obj_spaced", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "A"
@@ -1462,7 +1462,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
         g_errors.reset();
         Preprocessor pp;
         const std::string content = "DEFINE B=6\nB\n";
-        pp.push_virtual_file(content, "def_prefix_eq_obj_nospaces", 1);
+        pp.push_virtual_file(content, "def_prefix_eq_obj_nospaces", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "B"
@@ -1480,7 +1480,7 @@ TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
 
     // Object-like empty body: "DEFINE E ="
     const std::string content = "DEFINE E =\nE\n";
-    pp.push_virtual_file(content, "def_prefix_eq_empty_obj", 1);
+    pp.push_virtual_file(content, "def_prefix_eq_empty_obj", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line)); // expanded "E"
@@ -1499,7 +1499,7 @@ TEST_CASE("Preprocessor: prefix DEFINE function-like accepts optional '=' before
     const std::string content =
         "DEFINE ID(x) = x\n"
         "ID(7)\n";
-    pp.push_virtual_file(content, "def_prefix_eq_func", 1);
+    pp.push_virtual_file(content, "def_prefix_eq_func", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line)); // expanded "ID(7)"
@@ -1523,7 +1523,7 @@ TEST_CASE("Preprocessor: name UNDEFINE removes macro (synonym to UNDEF)",
     Preprocessor pp;
 
     const std::string content = "M define 42\nM UNDEFINE\nM\n";
-    pp.push_virtual_file(content, "def_name_undefine", 1);
+    pp.push_virtual_file(content, "def_name_undefine", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1539,7 +1539,7 @@ TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
     Preprocessor pp;
 
     const std::string content = "#define N 99\n#UNDEFINE N\nN\n";
-    pp.push_virtual_file(content, "def_hash_undefine", 1);
+    pp.push_virtual_file(content, "def_hash_undefine", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -1568,7 +1568,7 @@ TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at cal
         "LINE 123, \"callsite1.asm\"\n"
         "TWOLINES(5)\n"
         "after\n";
-    pp.push_virtual_file(content, "macro_multiline_dir", 1);
+    pp.push_virtual_file(content, "macro_multiline_dir", 1, true);
 
     TokensLine line;
 
@@ -1626,7 +1626,7 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines a
         "LINE 200, \"callsite2.asm\"\n"
         "TM(9)\n"
         "after2\n";
-    pp.push_virtual_file(content, "macro_multiline_name", 1);
+    pp.push_virtual_file(content, "macro_multiline_name", 1, true);
 
     TokensLine line;
 
@@ -1687,7 +1687,7 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parse
         "LINE 321, \"opt_paren1.asm\"\n"
         "NOPAREN(11,22)\n"
         "after_np\n";
-    pp.push_virtual_file(content, "macro_params_no_paren_dir", 1);
+    pp.push_virtual_file(content, "macro_params_no_paren_dir", 1, true);
 
     TokensLine line;
 
@@ -1744,7 +1744,7 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) 
         "LINE 654, \"opt_paren2.asm\"\n"
         "PAIR(7,8)\n"
         "after_pair\n";
-    pp.push_virtual_file(content, "macro_params_no_paren_name", 1);
+    pp.push_virtual_file(content, "macro_params_no_paren_name", 1, true);
 
     TokensLine line;
 
@@ -1805,7 +1805,7 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is acc
         "LINE 77, \"hdr_noparen.asm\"\n"
         "H(3,4)\n"
         "done\n";
-    pp.push_virtual_file(content, "macro_header_no_parens", 1);
+    pp.push_virtual_file(content, "macro_header_no_parens", 1, true);
 
     TokensLine line;
 
@@ -1862,7 +1862,7 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parent
         "LINE 88, \"noparen_call.asm\"\n"
         "G 10,20\n"  // call without parentheses
         "end2\n";
-    pp.push_virtual_file(content, "macro_header_call_no_parens", 1);
+    pp.push_virtual_file(content, "macro_header_call_no_parens", 1, true);
 
     TokensLine line;
 
@@ -1928,7 +1928,7 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
         "OUT()\n"
         "IN(12)\n"
         "after_nested\n";
-    pp.push_virtual_file(content, "macro_nested_dir_inner", 1);
+    pp.push_virtual_file(content, "macro_nested_dir_inner", 1, true);
 
     TokensLine line;
 
@@ -1946,7 +1946,7 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
         }
         REQUIRE(has12);
     }
-    REQUIRE(line.location().line_num() == 500);
+    REQUIRE(line.location().line_num() == 501);
     REQUIRE(line.location().filename() == "nested_dir_inner.asm");
 
     REQUIRE(pp.next_line(line));
@@ -1962,7 +1962,7 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
         }
         REQUIRE(has12);
     }
-    REQUIRE(line.location().line_num() == 500);
+    REQUIRE(line.location().line_num() == 501);
     REQUIRE(line.location().filename() == "nested_dir_inner.asm");
 
     // Next ordinary line after the nested macro expansion
@@ -1989,7 +1989,7 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
         "OUTN()\n"
         "INN(3)\n"
         "tail\n";
-    pp.push_virtual_file(content, "macro_nested_name_inner", 1);
+    pp.push_virtual_file(content, "macro_nested_name_inner", 1, true);
 
     TokensLine line;
 
@@ -2007,7 +2007,7 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
         }
         REQUIRE(has3);
     }
-    REQUIRE(line.location().line_num() == 600);
+    REQUIRE(line.location().line_num() == 601);
     REQUIRE(line.location().filename() == "nested_name_inner.asm");
 
     // Second expanded line from INN(3)
@@ -2024,7 +2024,7 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
         }
         REQUIRE(has3);
     }
-    REQUIRE(line.location().line_num() == 600);
+    REQUIRE(line.location().line_num() == 601);
     REQUIRE(line.location().filename() == "nested_name_inner.asm");
 
     // Next ordinary line
@@ -2056,7 +2056,7 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
         "LINE 700, \"arg_multiline_1.asm\"\n"
         "OUTER(INNER())\n"
         "after_ml\n";
-    pp.push_virtual_file(content, "macro_arg_multiline_paren", 1);
+    pp.push_virtual_file(content, "macro_arg_multiline_paren", 1, true);
 
     TokensLine line;
 
@@ -2098,7 +2098,7 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
         "LINE 710, \"arg_multiline_2.asm\"\n"
         "OUT INNER()\n"
         "after_ml2\n";
-    pp.push_virtual_file(content, "macro_arg_multiline_noparen", 1);
+    pp.push_virtual_file(content, "macro_arg_multiline_noparen", 1, true);
 
     TokensLine line;
 
@@ -2135,7 +2135,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expand
     const std::string content =
         "#define AB 777\n"
         "A ## B\n";
-    pp.push_virtual_file(content, "paste_then_expand_obj", 1);
+    pp.push_virtual_file(content, "paste_then_expand_obj", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -2160,7 +2160,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expand
     const std::string content =
         "#define P1(x) x\n"
         "P##1(99)\n";
-    pp.push_virtual_file(content, "paste_then_expand_func", 1);
+    pp.push_virtual_file(content, "paste_then_expand_func", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -2185,7 +2185,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces m
     const std::string content =
         "#define Q2 202\n"
         "Q ## 2\n";
-    pp.push_virtual_file(content, "paste_id_int_expand", 1);
+    pp.push_virtual_file(content, "paste_id_int_expand", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
@@ -2220,7 +2220,7 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
         "M()\n"
         "M()\n"
         "after_local\n";
-    pp.push_virtual_file(content, "macro_local_labels", 1);
+    pp.push_virtual_file(content, "macro_local_labels", 1, true);
 
     TokensLine line;
 
@@ -2279,7 +2279,7 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per
         "U(5)\n"
         "U(6)\n"
         "done_local\n";
-    pp.push_virtual_file(content, "macro_local_idents", 1);
+    pp.push_virtual_file(content, "macro_local_idents", 1, true);
 
     TokensLine line;
 
@@ -2337,7 +2337,7 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
     const std::string content =
         "LOCAL tmp\n"
         "after\n";
-    pp.push_virtual_file(content, "local_outside_test", 1);
+    pp.push_virtual_file(content, "local_outside_test", 1, true);
 
     TokensLine line;
 
@@ -2378,7 +2378,7 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
         "OUT()\n"
         "IN()\n"
         "after_nested_locals\n";
-    pp.push_virtual_file(content, "macro_local_nested", 1);
+    pp.push_virtual_file(content, "macro_local_nested", 1, true);
 
     TokensLine line;
 
@@ -2451,7 +2451,7 @@ TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
         "LINE 111, \"exitm_call.asm\"\n"
         "M()\n"
         "after\n";
-    pp.push_virtual_file(content, "exitm_test", 1);
+    pp.push_virtual_file(content, "exitm_test", 1, true);
 
     TokensLine line;
 
@@ -2476,7 +2476,7 @@ TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
     const std::string content =
         "EXITM\n"
         "X\n";
-    pp.push_virtual_file(content, "exitm_outside", 1);
+    pp.push_virtual_file(content, "exitm_outside", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
