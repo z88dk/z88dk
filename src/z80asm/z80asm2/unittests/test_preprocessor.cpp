@@ -1382,7 +1382,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
         pp.push_virtual_file(content, "def_eq_obj_spaced", 1);
 
         TokensLine line;
-        REQUIRE(pp.next_line(line)); // expanded "A"
+        REQUIRE(pp.next_line(line));
         const auto& toks = line.tokens();
         REQUIRE(!toks.empty());
         REQUIRE(toks[0].is(TokenType::Integer));
@@ -1397,7 +1397,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
         pp.push_virtual_file(content, "def_eq_obj_nospaces", 1);
 
         TokensLine line;
-        REQUIRE(pp.next_line(line)); // expanded "B"
+        REQUIRE(pp.next_line(line));
         const auto& toks = line.tokens();
         REQUIRE(!toks.empty());
         REQUIRE(toks[0].is(TokenType::Integer));
@@ -1416,6 +1416,21 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "E"
+        const auto& toks = line.tokens();
+        REQUIRE(!toks.empty());
+        REQUIRE(toks[0].is(TokenType::Integer));
+        REQUIRE(toks[0].int_value() == 1);
+    }
+
+    // Function-like empty body with '='
+    {
+        g_errors.reset();
+        Preprocessor pp;
+        const std::string content = "#define F(x)\nF(2)\n";
+        pp.push_virtual_file(content, "def_eq_empty_func", 1);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line)); // expanded "F(2)"
         const auto& toks = line.tokens();
         REQUIRE(!toks.empty());
         REQUIRE(toks[0].is(TokenType::Integer));
@@ -2184,4 +2199,211 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces m
         }
     }
     REQUIRE(found202);
+}
+
+// -----------------------------------------------------------------------------
+// NEW TESTS: LOCAL symbol support inside macros
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expansion (labels)",
+          "[preprocessor][macro][local][labels]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Macro defines local label 'L' and uses it. Each expansion should rename L -> L_1, L_2, ...
+    const std::string content =
+        "MACRO M()\n"
+        "LOCAL L\n"
+        "L: nop\n"
+        "ENDM\n"
+        "LINE 900, \"local_labels.asm\"\n"
+        "M()\n"
+        "M()\n"
+        "after_local\n";
+    pp.push_virtual_file(content, "macro_local_labels", 1);
+
+    TokensLine line;
+
+    // First expansion: label line ('. L_1') then 'nop' line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_1");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    // instruction 'nop' should follow (label removed from instruction line)
+    bool saw_nop = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "nop") { saw_nop = true; break; }
+    }
+    REQUIRE(saw_nop);
+
+    // Second expansion: label 'L_2'
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_2");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    saw_nop = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "nop") { saw_nop = true; break; }
+    }
+    REQUIRE(saw_nop);
+
+    // After expansions: next original line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_local");
+}
+
+TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per expansion",
+          "[preprocessor][macro][local][idents]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO U(x)\n"
+        "LOCAL tmp\n"
+        "mov tmp, x\n"
+        "ENDM\n"
+        "LINE 910, \"local_idents.asm\"\n"
+        "U(5)\n"
+        "U(6)\n"
+        "done_local\n";
+    pp.push_virtual_file(content, "macro_local_idents", 1);
+
+    TokensLine line;
+
+    // First expansion: mov tmp_1,5  (tmp renamed)
+    REQUIRE(pp.next_line(line));
+    bool found_mov = false, found_tmp1 = false, found_5 = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "mov") found_mov = true;
+        if (t.text() == "tmp_1") found_tmp1 = true;
+        if (t.is(TokenType::Integer) && t.int_value() == 5) found_5 = true;
+    }
+    REQUIRE(found_mov);
+    REQUIRE(found_tmp1);
+    REQUIRE(found_5);
+
+    // Second expansion: mov tmp_2,6
+    REQUIRE(pp.next_line(line));
+    found_mov = found_tmp1 = found_5 = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "mov") found_mov = true;
+        if (t.text() == "tmp_2") found_tmp1 = true;
+        if (t.is(TokenType::Integer) && t.int_value() == 6) found_5 = true;
+    }
+    REQUIRE(found_mov);
+    REQUIRE(found_tmp1);
+    REQUIRE(found_5);
+
+    // After expansions
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "done_local");
+}
+
+// New test: LOCAL outside a macro definition is ignored (not emitted)
+TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
+          "[preprocessor][local][outside]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // LOCAL appears outside any MACRO; it should be treated as a directive-like
+    // construct and not produce any output line. Only the subsequent 'after' line
+    // should be returned by the preprocessor.
+    const std::string content =
+        "LOCAL tmp\n"
+        "after\n";
+    pp.push_virtual_file(content, "local_outside_test", 1);
+
+    TokensLine line;
+
+    // First returned logical line must be the 'after' line.
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
+
+    // No further output expected.
+    REQUIRE(!pp.next_line(line));
+
+    // No errors should have been reported.
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// MACRO local symbols in nested macros
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner LOCAL handled when sub-macro is parsed",
+    "[preprocessor][macro][local][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // OUT has its own LOCAL L and defines a sub-macro IN with its own LOCAL J.
+    // Only L is handled during OUT() expansion. J is handled when IN() is parsed/defined,
+    // and renamed when IN() is expanded.
+    const std::string content =
+        "MACRO OUT()\n"
+        "LOCAL L\n"
+        "L: nop\n"
+        "MACRO IN()\n"
+        "LOCAL J\n"
+        "J: nop\n"
+        "ENDM\n"
+        "ENDM\n"
+        "LINE 1000, \"local_nested.asm\"\n"
+        "OUT()\n"
+        "IN()\n"
+        "after_nested_locals\n";
+    pp.push_virtual_file(content, "macro_local_nested", 1);
+
+    TokensLine line;
+
+    // OUT() expansion at call-site line 1000
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_1");
+    REQUIRE(line.location().line_num() == 1000);
+    REQUIRE(line.location().filename() == "local_nested.asm");
+
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_nop = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "nop") { saw_nop = true; break; }
+        }
+        REQUIRE(saw_nop);
+    }
+    REQUIRE(line.location().line_num() == 1000);
+    REQUIRE(line.location().filename() == "local_nested.asm");
+
+    // IN() is invoked on the next physical line -> call-site line 1001
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "J_2"); // inner local renamed on its own expansion
+    REQUIRE(line.location().line_num() == 1001);
+    REQUIRE(line.location().filename() == "local_nested.asm");
+
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_nop = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "nop") { saw_nop = true; break; }
+        }
+        REQUIRE(saw_nop);
+    }
+    REQUIRE(line.location().line_num() == 1001);
+    REQUIRE(line.location().filename() == "local_nested.asm");
+
+    // Next ordinary line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_nested_locals");
 }
