@@ -10,7 +10,7 @@ SymbolTable::SymbolTable() {
     // Stub: to be implemented
 }
 
-void SymbolTable::addSymbol(const std::string& /*name*/, int /*value*/) {
+void SymbolTable::add_symbol(const std::string& /*name*/, int /*value*/) {
     // Stub: to be implemented
 }
 
@@ -18,3 +18,5 @@ int SymbolTable::lookup(const std::string& /*name*/) const {
     // Stub: to be implemented
     return 0;
 }
+
+extern SymbolTable g_symbol_table;
