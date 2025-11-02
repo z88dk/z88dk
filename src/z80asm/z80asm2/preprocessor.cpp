@@ -7,6 +7,7 @@
 #include "expr.h"
 #include "options.h"
 #include "preprocessor.h"
+#include "symbol_table.h"
 #include "utils.h"
 #include <algorithm>
 #include <cassert>
@@ -18,6 +19,7 @@ void Preprocessor::clear() {
     file_stack_.clear();
     macros_.clear();
     macro_recursion_count_.clear();
+    if_stack_.clear();
 }
 
 void Preprocessor::push_file(const std::string& filename) {
@@ -126,6 +128,37 @@ bool Preprocessor::next_line(TokensLine& line) {
             Keyword keyword = Keyword::None;
             unsigned i = 0;
             if (is_directive(line, i, keyword)) {
+                // Conditional directives always execute
+                if (keyword == Keyword::IF) {
+                    reading_queue_for_directive_ = true;
+                    process_if(line, i);
+                    reading_queue_for_directive_ = false;
+                    continue;
+                }
+                if (keyword == Keyword::ELIF) {
+                    reading_queue_for_directive_ = true;
+                    process_elif(line, i);
+                    reading_queue_for_directive_ = false;
+                    continue;
+                }
+                if (keyword == Keyword::ELSE) {
+                    reading_queue_for_directive_ = true;
+                    process_else(line, i);
+                    reading_queue_for_directive_ = false;
+                    continue;
+                }
+                if (keyword == Keyword::ENDIF) {
+                    reading_queue_for_directive_ = true;
+                    process_endif(line, i);
+                    reading_queue_for_directive_ = false;
+                    continue;
+                }
+
+                // Other directives only execute when all IFs are active
+                if (!all_ifs_active()) {
+                    continue; // skip directive content entirely
+                }
+
                 reading_queue_for_directive_ = true;
                 process_directive(line, i, keyword);
                 reading_queue_for_directive_ = false;
@@ -137,13 +170,20 @@ bool Preprocessor::next_line(TokensLine& line) {
             keyword = Keyword::None;
             i = 0;
             if (is_name_directive(line, i, keyword, name)) {
+                // Name directives are not conditional keywords; gate by IF-state
+                if (!all_ifs_active()) {
+                    continue; // skip
+                }
                 reading_queue_for_directive_ = true;
                 process_name_directive(line, i, keyword, name);
                 reading_queue_for_directive_ = false;
                 continue; // consume and continue
             }
 
-            // Not a directive -> return this logical line.
+            // Not a directive -> return this logical line only if active
+            if (!all_ifs_active()) {
+                continue;
+            }
             return true;
         }
 
@@ -218,17 +258,63 @@ bool Preprocessor::next_line(TokensLine& line) {
         Keyword keyword = Keyword::None;
         unsigned i = 0;
         if (is_directive(line, i, keyword)) {
+            // Conditional directives always execute
+            if (keyword == Keyword::IF) {
+                process_if(line, i);
+                continue;
+            }
+            if (keyword == Keyword::IFDEF) {
+                process_ifdef(line, i, false);
+                continue;
+            }
+            if (keyword == Keyword::IFNDEF) {
+                process_ifdef(line, i, true);
+                continue;
+            }
+            if (keyword == Keyword::ELIF) {
+                process_elif(line, i);
+                continue;
+            }
+            if (keyword == Keyword::ELIFDEF) {
+                process_elifdef(line, i, false);
+                continue;
+            }
+            if (keyword == Keyword::ELIFNDEF) {
+                process_elifdef(line, i, true);
+                continue;
+            }
+            if (keyword == Keyword::ELSE) {
+                process_else(line, i);
+                continue;
+            }
+            if (keyword == Keyword::ENDIF) {
+                process_endif(line, i);
+                continue;
+            }
+
+            // non-conditional directives only when active
+            if (!all_ifs_active()) {
+                continue;
+            }
             process_directive(line, i, keyword);
             continue; // get next line
         }
 
-        // check for name directive and process
+        // check for name directive and process (only when active)
         std::string name;
         keyword = Keyword::None;
         i = 0;
         if (is_name_directive(line, i, keyword, name)) {
+            if (!all_ifs_active()) {
+                continue;
+            }
             process_name_directive(line, i, keyword, name);
             continue; // get next line
+        }
+
+        // If not active, skip normal lines
+        if (!all_ifs_active()) {
+            continue;
         }
 
         // expand macros in the line
@@ -605,6 +691,46 @@ bool Preprocessor::eval_const_expr(const TokensLine& expr_tokens,
     return true;
 }
 
+bool Preprocessor::eval_if_expr(const TokensLine& line, unsigned& i,
+                                Keyword keyword) {
+    TokensLine expr_line = collect_tokens(line, i);
+    if (expr_line.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected expression in " + keyword_to_string(keyword));
+    }
+    TokensLine expr_tokens = expand_macros_in_line(expr_line);
+
+    // evaluate the expression in silent mode, use 0 if it fails
+    int cond_value = 0;
+    if (!eval_const_expr(expr_tokens, cond_value, true)) {
+        cond_value = 0;
+    }
+
+    return (cond_value != 0);
+}
+
+bool Preprocessor::eval_ifdef_name(const TokensLine& line, unsigned& i,
+                                   bool negated, Keyword keyword) {
+    std::string name;
+    if (!parse_identifier(line, i, name)) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected identifier in " + keyword_to_string(keyword));
+        return false;
+    }
+    expect_end(line, i);
+
+    // check the macros
+    bool is_def = macros_.find(name) != macros_.end();
+    if (!is_def) {
+        // also check symbol table
+        const Symbol& sym = g_symbol_table.get_symbol(name);
+        is_def = sym.is_defined;
+    }
+
+    bool cond = negated ? !is_def : is_def;
+    return cond;
+}
+
 bool Preprocessor::is_directive(const TokensLine& line,
                                 unsigned& i, Keyword& keyword) const {
     line.skip_spaces(i);
@@ -700,17 +826,28 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
         process_equ(line, i);
         break;
     case Keyword::IF:
-    case Keyword::IFDEF:
-    case Keyword::IFNDEF:
+        process_if(line, i);
+        break;
     case Keyword::ELIF:
-    case Keyword::ELIFDEF:
-    case Keyword::ELIFNDEF:
+        process_elif(line, i);
+        break;
     case Keyword::ELSE:
+        process_else(line, i);
+        break;
     case Keyword::ENDIF:
-        // Minimal placeholder: report as unsupported to avoid hitting default assert.
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       std::string("Unsupported conditional directive: ") + keyword_to_string(
-                           keyword));
+        process_endif(line, i);
+        break;
+    case Keyword::IFDEF:
+        process_ifdef(line, i, /*negated*/false);
+        break;
+    case Keyword::IFNDEF:
+        process_ifdef(line, i, /*negated*/true);
+        break;
+    case Keyword::ELIFDEF:
+        process_elifdef(line, i, /*negated*/false);
+        break;
+    case Keyword::ELIFNDEF:
+        process_elifdef(line, i, /*negated*/true);
         break;
     case Keyword::ENDM:
         g_errors.error(ErrorCode::InvalidSyntax,
@@ -721,7 +858,6 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
                        "Unexpected ENDR directive without matching REPT");
         break;
     default:
-        // Gracefully report unsupported name-directives flagged as IS_DIRECTIVE
         g_errors.error(ErrorCode::InvalidSyntax,
                        std::string("Unsupported directive: ") + keyword_to_string(keyword));
         break;
@@ -1110,6 +1246,15 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     macros_[name] = std::move(macro);
     // Reset recursion guard counter for this macro name (safe guard)
     macro_recursion_count_[name] = 0;
+}
+
+bool Preprocessor::all_ifs_active() const {
+    for (size_t n = 0; n < if_stack_.size(); ++n) {
+        if (!if_stack_[n].branch_active) {
+            return false;
+        }
+    }
+    return true;
 }
 
 // Fetch a raw next logical line for MACRO body parsing, from the proper source:
@@ -1630,6 +1775,96 @@ void Preprocessor::do_repti(const std::string& var_name,
     // 5) Emit the substituted lines at the directive's logical location
     push_virtual_file(out_lines, directive_line.location().filename(),
                       directive_line.location().line_num(), false);
+}
+
+// --- IF / ELIF / ELSE / ENDIF (no virtual files) --------------------------------
+
+void Preprocessor::process_if(const TokensLine& line, unsigned& i) {
+    bool cond_value = eval_if_expr(line, i, Keyword::IF);
+
+    IfFrame fr;
+    fr.branch_active = cond_value;
+    fr.any_taken = cond_value;
+    fr.seen_else = false;
+    if_stack_.push_back(fr);
+}
+
+void Preprocessor::process_elif(const TokensLine& line, unsigned& i) {
+    if (if_stack_.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unexpected ELIF directive without matching IF");
+        return;
+    }
+
+    IfFrame& fr = if_stack_.back();
+    if (fr.seen_else) {
+        g_errors.error(ErrorCode::InvalidSyntax, "ELIF after ELSE");
+        // still parse remaining tokens to consume the line
+    }
+
+    bool cond_value = eval_if_expr(line, i, Keyword::ELIF);
+    bool active_now = (!fr.any_taken) && cond_value;
+    fr.branch_active = active_now;
+    if (active_now) {
+        fr.any_taken = true;
+    }
+}
+
+void Preprocessor::process_else(const TokensLine& line, unsigned& i) {
+    if (if_stack_.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unexpected ELSE directive without matching IF");
+        return;
+    }
+
+    IfFrame& fr = if_stack_.back();
+    expect_end(line, i);
+    if (fr.seen_else) {
+        g_errors.error(ErrorCode::InvalidSyntax, "Multiple ELSE in IF block");
+    }
+
+    fr.branch_active = !fr.any_taken;
+    fr.any_taken = true;
+    fr.seen_else = true;
+}
+
+void Preprocessor::process_endif(const TokensLine& line, unsigned& i) {
+    if (if_stack_.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unexpected ENDIF directive without matching IF");
+        return;
+    }
+    expect_end(line, i);
+    if_stack_.pop_back();
+}
+
+// --- IFDEF / IFNDEF / ELIFDEF / ELIFNDEF ---------------------------------------
+
+void Preprocessor::process_ifdef(const TokensLine& line, unsigned& i,
+                                 bool negated) {
+    bool cond = eval_ifdef_name(line, i, negated, Keyword::IFDEF);
+
+    IfFrame fr;
+    fr.branch_active = cond;
+    fr.any_taken = cond;
+    fr.seen_else = false;
+    if_stack_.push_back(fr);
+}
+
+void Preprocessor::process_elifdef(const TokensLine& line, unsigned& i,
+                                   bool negated) {
+    IfFrame& fr = if_stack_.back();
+    if (fr.seen_else) {
+        g_errors.error(ErrorCode::InvalidSyntax, "ELIFDEF/ELIFNDEF after ELSE");
+        // still parse identifier to consume line
+    }
+
+    bool cond = eval_ifdef_name(line, i, negated, Keyword::ELIFDEF);
+    bool active_now = (!fr.any_taken) && cond;
+    fr.branch_active = active_now;
+    if (active_now) {
+        fr.any_taken = true;
+    }
 }
 
 void Preprocessor::process_exitm(const TokensLine& line, unsigned& i) {
