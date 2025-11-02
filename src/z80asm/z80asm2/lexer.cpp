@@ -89,6 +89,10 @@ void TokensLine::clear() {
     tokens_.clear();
 }
 
+void TokensLine::clear_tokens() {
+    tokens_.clear();
+}
+
 bool TokensLine::empty() const {
     return tokens_.empty();
 }

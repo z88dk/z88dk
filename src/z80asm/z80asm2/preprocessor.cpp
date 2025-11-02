@@ -457,12 +457,13 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
 // Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
 bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    int& out_linenum, std::string& out_filename,
-                                   const char* directive_name) const {
+                                   Keyword keyword) const {
     line.skip_spaces(i);
 
     if (!(i < line.size() && line[i].is(TokenType::Integer))) {
         g_errors.error(ErrorCode::InvalidSyntax,
-                       std::string("Expected line number in ") + directive_name + " directive");
+                       std::string("Expected line number in ") +
+                       keyword_to_string(keyword) + " directive");
         return false;
     }
 
@@ -479,7 +480,7 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
         bool is_angle = false;
         if (!parse_filename(line, i, out_filename, is_angle)) {
             g_errors.error(ErrorCode::InvalidSyntax,
-                           std::string("Expected filename after comma in ") + directive_name +
+                           std::string("Expected filename after comma in ") + keyword_to_string(keyword) +
                            " directive");
             return false;
         }
@@ -562,6 +563,35 @@ TokensLine Preprocessor::collect_tokens(const TokensLine& line,
         result.pop_back();
     }
     return result;
+}
+
+// expand macros and check if the whole line is a constant expression
+// return its value
+bool Preprocessor::eval_const_expr(const TokensLine& expr_tokens,
+                                   int& out_value, bool silent) {
+    // try to evaluate as a constant expression.
+    Expr expr;
+    expr.set_silent(silent);
+    unsigned i = 0;
+
+    if (!expr.parse(expr_tokens, i)) {
+        return false;
+    }
+
+    if (!expr_tokens.at_end(i)) {
+        if (!silent) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Unexpected token in expression: '" + expr_tokens[i].text() + "'");
+        }
+        return false;
+    }
+
+    out_value = 0;
+    if (!expr.evaluate(out_value)) {
+        return false;
+    }
+
+    return true;
 }
 
 bool Preprocessor::is_directive(const TokensLine& line,
@@ -761,7 +791,7 @@ void Preprocessor::do_binary(const std::string& filename, bool is_angle,
 void Preprocessor::process_line(const TokensLine& line, unsigned& i) {
     int linenum = 0;
     std::string filename;
-    if (!parse_line_args(line, i, linenum, filename, "LINE")) {
+    if (!parse_line_args(line, i, linenum, filename, Keyword::LINE)) {
         return;
     }
 
@@ -789,7 +819,7 @@ void Preprocessor::process_line(const TokensLine& line, unsigned& i) {
 void Preprocessor::process_c_line(const TokensLine& line, unsigned& i) {
     int linenum = 0;
     std::string filename;
-    if (!parse_line_args(line, i, linenum, filename, "C_LINE")) {
+    if (!parse_line_args(line, i, linenum, filename, Keyword::C_LINE)) {
         return;
     }
 
@@ -946,33 +976,22 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
 
     // 3) Expand macros in the body (if 'name' is used here, it expands to the
     //    previous value, or empty when none existed).
-    // 4) Flatten expanded lines into a single TokensLine (insert a single space between lines)
-    TokensLine expanded = expand_macros_in_line(body);
+    TokensLine expr_tokens = expand_macros_in_line(body);
 
+    // 4) Flatten expanded lines into a single TokensLine (insert a single space between lines)
     // 5) Try to evaluate as a constant expression.
     //    If it parses successfully AND consumes the whole body, define <name>
     //    as the resulting integer. Otherwise, define <name> as the whole expanded body.
     int value = 0;
-    unsigned ei = 0;
-    bool is_const = eval_const_expr(expanded, ei, value);
-
-    // Check that the expression consumed the whole body (ignoring trailing spaces).
-    const bool consumed_all = is_const && expanded.at_end(ei);
+    if (eval_const_expr(expr_tokens, value, false)) {
+        body.clear_tokens();
+        body.push_back(Token(TokenType::Integer, std::to_string(value), value));
+    }
 
     Macro macro;
     macro.params.clear();
     macro.replacement.clear();
-
-    if (consumed_all) {
-        // define as integer result
-        TokensLine rep(expanded.location());
-        rep.push_back(Token(TokenType::Integer, std::to_string(value), value));
-        macro.replacement.push_back(rep);
-    }
-    else {
-        // define with the whole expanded body (as-is)
-        macro.replacement.push_back(expanded);
-    }
+    macro.replacement.push_back(body);
 
     // 6) Register/overwrite the macro definition of <name>.
     macros_[name] = std::move(macro);
@@ -1009,6 +1028,87 @@ bool Preprocessor::fetch_line_for_macro_body(TokensLine& out) {
     return true;
 }
 
+bool Preprocessor::collect_macro_body(std::vector<TokensLine>& out_body,
+                                      std::vector<std::string>& out_locals,
+                                      Keyword start_keyword, Keyword end_keyword) {
+    out_body.clear();
+    std::vector<Keyword> nesting_end{ end_keyword };
+    TokensLine line;
+    bool ok = true;
+
+    // Collect body lines verbatim until ENDM
+    while (true) {
+        TokensLine raw;
+        if (!fetch_line_for_macro_body(raw)) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Unexpected end of input in " +
+                           keyword_to_string(start_keyword) +
+                           " (expected " + keyword_to_string(end_keyword) + ")");
+            return false;
+        }
+
+        // Check for directives that may affect nesting
+        unsigned k = 0;
+        Keyword kw = Keyword::None;
+        if (is_directive(raw, k, kw)) {
+            if (kw == nesting_end.back()) {
+                expect_end(raw, k);     // error if extra tokens
+                nesting_end.pop_back();
+                if (nesting_end.empty()) {
+                    break;
+                }
+                // else continue collecting
+            }
+            else if (kw == Keyword::ENDM || kw == Keyword::ENDR) {
+                // mismatched end directive
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               std::string("Unexpected ") +
+                               keyword_to_string(kw) +
+                               " directive without matching " +
+                               (kw == Keyword::ENDM ? "MACRO" : "REPT"));
+                ok = false;
+                nesting_end.pop_back();
+                if (nesting_end.empty()) {
+                    break;
+                }
+                // else continue collecting
+            }
+            else if (kw == Keyword::MACRO) {
+                nesting_end.push_back(Keyword::ENDM);
+            }
+            else if (kw == Keyword::REPT ||
+                     kw == Keyword::REPTC ||
+                     kw == Keyword::REPTI) {
+                nesting_end.push_back(Keyword::ENDR);
+            }
+            else if (kw == Keyword::LOCAL && nesting_end.size() == 1) {
+                // Delegate LOCAL parsing
+                process_local(raw, k, out_locals);
+                continue;   // do not store the LOCAL line
+            }
+        }
+        else {
+            k = 0;
+            kw = Keyword::None;
+            std::string dummy_name;
+            if (is_name_directive(raw, k, kw, dummy_name)) {
+                if (kw == Keyword::MACRO) {
+                    nesting_end.push_back(Keyword::ENDM);
+                }
+                else if (kw == Keyword::REPTC ||
+                         kw == Keyword::REPTI) {
+                    nesting_end.push_back(Keyword::ENDR);
+                }
+            }
+        }
+
+        // colect line as-is
+        out_body.push_back(raw);
+    }
+
+    return ok;
+}
+
 void Preprocessor::process_macro(const TokensLine& line, unsigned& i) {
     // Expect: MACRO name(param, ...) or MACRO name param, ...
     std::string name;
@@ -1036,7 +1136,6 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     std::vector<TokensLine> body;
     unsigned j = i;
     line.skip_spaces(j);
-    int nest = 0;
 
     const bool had_paren = (j < line.size() && line[j].is(TokenType::LeftParen));
     if (j < line.size()) {
@@ -1048,46 +1147,8 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     expect_end(line, j);
 
     // Collect body lines verbatim until ENDM
-    while (true) {
-        TokensLine raw;
-        if (!fetch_line_for_macro_body(raw)) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           "Unexpected end of input in MACRO (missing ENDM)");
-            return;
-        }
-
-        // Check for a line that is exactly "ENDM" (ignoring leading/trailing whitespace)
-        unsigned k = 0;
-        Keyword kw = Keyword::None;
-        if (is_directive(raw, k, kw)) {
-            if (kw == Keyword::ENDM) {
-                expect_end(raw, k);
-                if (nest == 0) {
-                    break;
-                }
-                else {
-                    --nest;
-                }
-            }
-            else if (kw == Keyword::MACRO) {
-                ++nest;
-            }
-            else if (kw == Keyword::LOCAL && nest == 0) {
-                // Delegate LOCAL parsing
-                process_local(raw, k, locals);
-                continue;
-            }
-        }
-        else {
-            k = 0;
-            kw = Keyword::None;
-            std::string dummy_name;
-            if (is_name_directive(raw, k, kw, dummy_name) && kw == Keyword::MACRO) {
-                ++nest;
-            }
-        }
-
-        body.push_back(raw);
+    if (!collect_macro_body(body, locals, Keyword::MACRO, Keyword::ENDM)) {
+        return;
     }
 
     Macro macro;
@@ -1116,103 +1177,19 @@ void Preprocessor::process_rept(const TokensLine& line, unsigned& i) {
 
     // 2) Expand macros in the count expression
     // 3) Flatten into a single TokensLine (insert single space between lines)
-    TokensLine flattened = expand_macros_in_line(count_line);
+    TokensLine expr_tokens = expand_macros_in_line(count_line);
 
     // 4) Evaluate as a constant expression
     int count_value = 0;
-    unsigned ei = 0;
-    bool is_const = eval_const_expr(flattened, ei, count_value);
-    const bool consumed_all = is_const && flattened.at_end(ei);
-    if (!consumed_all) {
-        // Still need to consume the body up to ENDR even on error
-        int dummy_nest = 0;
-        std::vector<TokensLine> discard_body;
-        while (true) {
-            TokensLine raw;
-            if (!fetch_line_for_macro_body(raw)) {
-                g_errors.error(ErrorCode::InvalidSyntax,
-                               "Unexpected end of input in REPT (missing ENDR)");
-                return;
-            }
-            // Detect ENDR / nested REPT
-            unsigned k = 0;
-            Keyword kw = Keyword::None;
-            if (is_directive(raw, k, kw)) {
-                if (kw == Keyword::ENDR) {
-                    expect_end(raw, k);
-                    if (dummy_nest == 0) {
-                        break;
-                    }
-                    --dummy_nest;
-                    continue;
-                }
-                else if (kw == Keyword::REPT
-                         || kw == Keyword::REPTC
-                         || kw == Keyword::REPTI) {
-                    ++dummy_nest;
-                }
-            }
-            else {
-                // Also consider name-directive forms for REPTC/REPTI nesting
-                k = 0;
-                kw = Keyword::None;
-                std::string dummy_name;
-                if (is_name_directive(raw, k, kw, dummy_name)) {
-                    if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
-                        ++dummy_nest;
-                    }
-                }
-            }
-            discard_body.push_back(raw);
-        }
-
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       "Constant expression expected in REPT");
-        return;
+    if (!eval_const_expr(expr_tokens, count_value, false)) {
+        count_value = 0;    // continue to collect the body
     }
 
     // 5) Collect body lines until matching ENDR, with nesting support
     std::vector<TokensLine> body;
-    int nest = 0;
-    while (true) {
-        TokensLine raw;
-        if (!fetch_line_for_macro_body(raw)) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           "Unexpected end of input in REPT (missing ENDR)");
-            return;
-        }
-
-        unsigned k = 0;
-        Keyword kw = Keyword::None;
-        if (is_directive(raw, k, kw)) {
-            if (kw == Keyword::ENDR) {
-                expect_end(raw, k);
-                if (nest == 0) {
-                    break; // end of this REPT block
-                }
-                else {
-                    --nest;
-                }
-            }
-            else if (kw == Keyword::REPT
-                     || kw == Keyword::REPTC
-                     || kw == Keyword::REPTI) {
-                ++nest;
-            }
-        }
-        else {
-            // Also consider name-directive forms for REPTC/REPTI nesting
-            k = 0;
-            kw = Keyword::None;
-            std::string dummy_name;
-            if (is_name_directive(raw, k, kw, dummy_name)) {
-                if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
-                    ++nest;
-                }
-            }
-        }
-
-        body.push_back(raw);
+    std::vector<std::string> dummy_locals;
+    if (!collect_macro_body(body, dummy_locals, Keyword::REPT, Keyword::ENDR)) {
+        return;
     }
 
     // 6) If count <= 0, nothing to emit (but body was consumed)
@@ -1334,43 +1311,10 @@ void Preprocessor::do_reptc(const std::string& var_name,
 
     // 3) Collect body lines until ENDR, supporting nesting
     std::vector<TokensLine> body;
-    int nest = 0;
-    while (true) {
-        TokensLine raw;
-        if (!fetch_line_for_macro_body(raw)) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           "Unexpected end of input in REPTC (missing ENDR)");
-            return;
-        }
-
-        unsigned k = 0;
-        Keyword kw = Keyword::None;
-        if (is_directive(raw, k, kw)) {
-            if (kw == Keyword::ENDR) {
-                expect_end(raw, k);
-                if (nest == 0) {
-                    break; // end of this REPTC block
-                }
-                else {
-                    --nest;
-                }
-            }
-            else if (kw == Keyword::REPT || kw == Keyword::REPTC || kw == Keyword::REPTI) {
-                ++nest;
-            }
-        }
-        else {
-            k = 0;
-            kw = Keyword::None;
-            std::string dummy_name;
-            if (is_name_directive(raw, k, kw, dummy_name)) {
-                if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
-                    ++nest;
-                }
-            }
-        }
-
-        body.push_back(raw);
+    std::vector<std::string> dummy_locals;
+    if (!collect_macro_body(body, dummy_locals,
+                            Keyword::REPTC, Keyword::ENDR)) {
+        return;
     }
 
     // 4) Build substituted lines for each character of iter_text
@@ -1466,43 +1410,10 @@ void Preprocessor::do_repti(const std::string& var_name,
 
     // 2) Collect body lines until matching ENDR, with nesting support (REPT/REPTC/REPTI)
     std::vector<TokensLine> body;
-    int nest = 0;
-    while (true) {
-        TokensLine raw;
-        if (!fetch_line_for_macro_body(raw)) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           "Unexpected end of input in REPTI (missing ENDR)");
-            return;
-        }
-
-        unsigned k = 0;
-        Keyword kw = Keyword::None;
-        if (is_directive(raw, k, kw)) {
-            if (kw == Keyword::ENDR) {
-                expect_end(raw, k);
-                if (nest == 0) {
-                    break;
-                }
-                else {
-                    --nest;
-                }
-            }
-            else if (kw == Keyword::REPT || kw == Keyword::REPTC || kw == Keyword::REPTI) {
-                ++nest;
-            }
-        }
-        else {
-            k = 0;
-            kw = Keyword::None;
-            std::string dummy_name;
-            if (is_name_directive(raw, k, kw, dummy_name)) {
-                if (kw == Keyword::REPTC || kw == Keyword::REPTI) {
-                    ++nest;
-                }
-            }
-        }
-
-        body.push_back(raw);
+    std::vector<std::string> dummy_locals;
+    if (!collect_macro_body(body, dummy_locals,
+                            Keyword::REPTI, Keyword::ENDR)) {
+        return;
     }
 
     // 3) If no arguments, nothing to emit (but body consumed)
