@@ -14,6 +14,7 @@ struct Symbol {
     int value = 0;
     bool is_defined = false;
     bool is_constant = false;
+    bool is_extern = false;
     Location location;
 };
 

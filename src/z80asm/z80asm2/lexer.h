@@ -95,6 +95,7 @@ public:
     TokensLine(const Location& location, const std::vector<Token>& tokens);
 
     void clear();
+    void clear_tokens();
     bool empty() const;
     const Location& location() const;
     void set_location(const Location& location);

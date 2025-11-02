@@ -9,12 +9,6 @@
 #include "lexer.h"
 #include <vector>
 
-// Evaluate a C-style constant expression starting at p.
-// Advances p to the first character after the parsed expression.
-// Returns true on success and the evaluated integer
-// return false and p unchanged on failure.
-bool eval_const_expr(const TokensLine& line, unsigned& i, int& value);
-
 class Expr {
 public:
     Expr() = default;
@@ -35,6 +29,9 @@ public:
     // (e.g. division by zero, undefined symbol)
     // sets flags to tell if expression is defined and/or constant
     bool evaluate(int& out_value);
+    bool is_extern() const {
+        return is_extern_;
+    }
     bool is_undefined() const {
         return is_undefined_;
     }
@@ -60,11 +57,16 @@ private:
     };
 
     bool silent_ = false;
+    bool is_extern_ = false;
     bool is_undefined_ = false;
     bool is_constant_ = true;
     TokensLine line_;
     std::vector<RPNItem> rpn_items_;
 
+    static int prec(TokenType type, bool unary);
+    static bool is_right_assoc(TokenType type, bool unary);
+    static bool is_operator_token(TokenType tt);
+    static bool can_start_operand_sequence(const TokensLine& line, unsigned j);
     bool try_parse(const TokensLine& line, unsigned& i,
                    std::vector<RPNItem>& out);
     void collapse_ops_while(std::vector<RPNOp>& ops,
