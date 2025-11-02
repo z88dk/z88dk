@@ -143,6 +143,9 @@ private:
                            Keyword keyword);
     void process_name_directive(const TokensLine& line, unsigned& i,
                                 Keyword keyword, const std::string& name);
+    void process_contitional_directive(const TokensLine& line,
+                                       unsigned& i,
+                                       Keyword keyword);
 
     // INCLUDE
     void process_include(const TokensLine& line, unsigned& i);
