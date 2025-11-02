@@ -102,6 +102,10 @@ private:
     // - input_queue_ when reading_queue_for_directive_ is true
     // - file_stack_ otherwise (and applies forced location if needed).
     bool fetch_line_for_macro_body(TokensLine& out);
+    // collect the body of a macro or REPT block until ENDM/ENDR
+    bool collect_macro_body(std::vector<TokensLine>& out_body,
+                            std::vector<std::string>& out_locals,
+                            Keyword start_keyword, Keyword end_keyword);
 
     // Internal helpers
     void expect_end(const TokensLine& line, unsigned i) const;
@@ -111,7 +115,7 @@ private:
                           std::vector<TokensLine>& out_args);
     bool parse_line_args(const TokensLine& line, unsigned& i,
                          int& out_linenum, std::string& out_filename,
-                         const char* directive_name) const;
+                         Keyword keyword) const;
     bool parse_filename(const TokensLine& line, unsigned& i,
                         std::string& out_filename, bool& out_is_angle) const;
     bool parse_identifier(const TokensLine& line, unsigned& i,
@@ -119,6 +123,9 @@ private:
     bool parse_keyword(const TokensLine& line, unsigned& i,
                        Keyword& out_keyword) const;
     TokensLine collect_tokens(const TokensLine& line, unsigned& i);
+    // try to evaluate constant expression with the rest of the line
+    bool eval_const_expr(const TokensLine& expr_tokens, int& out_value,
+                         bool silent);
 
     // parse directives
     bool is_directive(const TokensLine& line, unsigned& i,
