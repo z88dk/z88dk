@@ -129,28 +129,8 @@ bool Preprocessor::next_line(TokensLine& line) {
             unsigned i = 0;
             if (is_directive(line, i, keyword)) {
                 // Conditional directives always execute
-                if (keyword == Keyword::IF) {
-                    reading_queue_for_directive_ = true;
-                    process_if(line, i);
-                    reading_queue_for_directive_ = false;
-                    continue;
-                }
-                if (keyword == Keyword::ELIF) {
-                    reading_queue_for_directive_ = true;
-                    process_elif(line, i);
-                    reading_queue_for_directive_ = false;
-                    continue;
-                }
-                if (keyword == Keyword::ELSE) {
-                    reading_queue_for_directive_ = true;
-                    process_else(line, i);
-                    reading_queue_for_directive_ = false;
-                    continue;
-                }
-                if (keyword == Keyword::ENDIF) {
-                    reading_queue_for_directive_ = true;
-                    process_endif(line, i);
-                    reading_queue_for_directive_ = false;
+                if (keyword_is_conditional_directive(keyword)) {
+                    process_contitional_directive(line, i, keyword);
                     continue;
                 }
 
@@ -259,36 +239,8 @@ bool Preprocessor::next_line(TokensLine& line) {
         unsigned i = 0;
         if (is_directive(line, i, keyword)) {
             // Conditional directives always execute
-            if (keyword == Keyword::IF) {
-                process_if(line, i);
-                continue;
-            }
-            if (keyword == Keyword::IFDEF) {
-                process_ifdef(line, i, false);
-                continue;
-            }
-            if (keyword == Keyword::IFNDEF) {
-                process_ifdef(line, i, true);
-                continue;
-            }
-            if (keyword == Keyword::ELIF) {
-                process_elif(line, i);
-                continue;
-            }
-            if (keyword == Keyword::ELIFDEF) {
-                process_elifdef(line, i, false);
-                continue;
-            }
-            if (keyword == Keyword::ELIFNDEF) {
-                process_elifdef(line, i, true);
-                continue;
-            }
-            if (keyword == Keyword::ELSE) {
-                process_else(line, i);
-                continue;
-            }
-            if (keyword == Keyword::ENDIF) {
-                process_endif(line, i);
+            if (keyword_is_conditional_directive(keyword)) {
+                process_contitional_directive(line, i, keyword);
                 continue;
             }
 
@@ -296,6 +248,7 @@ bool Preprocessor::next_line(TokensLine& line) {
             if (!all_ifs_active()) {
                 continue;
             }
+
             process_directive(line, i, keyword);
             continue; // get next line
         }
@@ -825,30 +778,6 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::EQU:
         process_equ(line, i);
         break;
-    case Keyword::IF:
-        process_if(line, i);
-        break;
-    case Keyword::ELIF:
-        process_elif(line, i);
-        break;
-    case Keyword::ELSE:
-        process_else(line, i);
-        break;
-    case Keyword::ENDIF:
-        process_endif(line, i);
-        break;
-    case Keyword::IFDEF:
-        process_ifdef(line, i, /*negated*/false);
-        break;
-    case Keyword::IFNDEF:
-        process_ifdef(line, i, /*negated*/true);
-        break;
-    case Keyword::ELIFDEF:
-        process_elifdef(line, i, /*negated*/false);
-        break;
-    case Keyword::ELIFNDEF:
-        process_elifdef(line, i, /*negated*/true);
-        break;
     case Keyword::ENDM:
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected ENDM directive without matching MACRO");
@@ -858,9 +787,7 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
                        "Unexpected ENDR directive without matching REPT");
         break;
     default:
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       std::string("Unsupported directive: ") + keyword_to_string(keyword));
-        break;
+        assert(0);
     }
 }
 
@@ -894,10 +821,39 @@ void Preprocessor::process_name_directive(const TokensLine& line,
         process_name_equ(line, i, name);
         break;
     default:
-        // Gracefully report unsupported name-directives flagged as IS_NAME_DIRECTIVE
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       std::string("Unsupported directive: ") + keyword_to_string(keyword));
+        assert(0);
+    }
+}
+
+void Preprocessor::process_contitional_directive(const TokensLine& line,
+        unsigned& i, Keyword keyword) {
+    switch (keyword) {
+    case Keyword::IF:
+        process_if(line, i);
         break;
+    case Keyword::IFDEF:
+        process_ifdef(line, i, false);
+        break;
+    case Keyword::IFNDEF:
+        process_ifdef(line, i, true);
+        break;
+    case Keyword::ELIF:
+        process_elif(line, i);
+        break;
+    case Keyword::ELIFDEF:
+        process_elifdef(line, i, false);
+        break;
+    case Keyword::ELIFNDEF:
+        process_elifdef(line, i, true);
+        break;
+    case Keyword::ELSE:
+        process_else(line, i);
+        break;
+    case Keyword::ENDIF:
+        process_endif(line, i);
+        break;
+    default:
+        assert(0);
     }
 }
 
