@@ -7,11 +7,12 @@
 #define CATCH_CONFIG_MAIN
 #include "../errors.h"
 #include "../preprocessor.h"
+#include "../symbol_table.h"
 #include "catch_amalgamated.hpp"
-#include <fstream>
 #include <cstdio>
-#include <string>
+#include <fstream>
 #include <sstream>
+#include <string>
 
 namespace {
 // Redirect std::cerr to an internal buffer for the duration of these tests
@@ -2911,9 +2912,42 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
     }
 }
 
+TEST_CASE("Preprocessor: REPT with undefined expression is rejected and body consumed",
+          "[preprocessor][rept][error][nonconst]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+    Preprocessor pp;
+
+    // 'A' is undefined -> undefined expression for REPT count
+    const std::string content =
+        "REPT A\n"
+        "X\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "rept_nonconst", 1, true);
+
+    TokensLine line;
+    // Consume any produced lines (none expected)
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    REQUIRE(produced == 0);
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Undefined symbol: A") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
+}
+
 TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body consumed",
           "[preprocessor][rept][error][nonconst]") {
     g_errors.reset();
+    g_symbol_table.clear();
+    Symbol a;
+    a.name = "A";
+    a.is_defined = true;
+    a.is_constant = false;
+    g_symbol_table.add_symbol("A", a);
     Preprocessor pp;
 
     // 'A' is undefined -> non-constant expression for REPT count
@@ -2933,7 +2967,38 @@ TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body 
     REQUIRE(produced == 0);
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Constant expression expected in REPT") != std::string::npos);
+    REQUIRE(msg.find("Not constant symbol: A") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consumed",
+          "[preprocessor][rept][error][nonconst]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+    Symbol a;
+    a.name = "A";
+    a.is_extern = true;
+    g_symbol_table.add_symbol("A", a);
+    Preprocessor pp;
+
+    // 'A' is undefined -> non-constant expression for REPT count
+    const std::string content =
+        "REPT A\n"
+        "X\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "rept_nonconst", 1, true);
+
+    TokensLine line;
+    // Consume any produced lines (none expected)
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    REQUIRE(produced == 0);
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Extern symbol: A") != std::string::npos);
     REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
 }
 
