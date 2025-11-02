@@ -54,7 +54,6 @@ enum class TokenType {
     BitwiseXor,
     Quest,
     Colon,
-    Ternary,
     Hash,
     DoubleHash,
 };

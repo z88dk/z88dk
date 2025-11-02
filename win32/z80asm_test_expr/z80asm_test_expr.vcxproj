@@ -134,6 +134,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
