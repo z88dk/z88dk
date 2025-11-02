@@ -4,7 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "expr.h"
+#include "symbol_table.h"
+#include "utils.h"
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -389,13 +392,13 @@ static bool eval_rpn(const std::vector<RPNItem>& rpn, int& value) {
                 if (stack.size() < 3) {
                     return false;
                 }
-                int falseVal = stack.back();
+                int false_val = stack.back();
                 stack.pop_back();
-                int trueVal  = stack.back();
+                int true_val  = stack.back();
                 stack.pop_back();
                 int cond     = stack.back();
                 stack.pop_back();
-                int res = (cond != 0) ? trueVal : falseVal;
+                int res = (cond != 0) ? true_val : false_val;
                 stack.push_back(res);
                 continue;
             }
@@ -508,4 +511,429 @@ bool eval_const_expr(const TokensLine& line, unsigned& i, int& value) {
 
     // success: i already points after last consumed token (or at colon/comma)
     return true;
+}
+
+void Expr::clear() {
+    line_.clear();
+    rpn_items_.clear();
+}
+
+bool Expr::parse(const TokensLine& line, unsigned& i) {
+    clear();
+    line_.set_location(line.location());
+
+    unsigned start = i;
+    line.skip_spaces(i);
+    std::vector<RPNItem> items;
+    bool ok = try_parse(line, i, items);
+    if (!ok) {
+        i = start;
+        return false;
+    }
+    else {
+        // copy operators and tokens to expression
+        rpn_items_.insert(rpn_items_.end(), items.begin(), items.end());
+        unsigned end = i;
+        for (unsigned j = start; j < end; ++j) {
+            line_.push_back(line[j]);
+        }
+        return true;
+    }
+}
+
+bool Expr::evaluate(int& out_value) {
+    out_value = 0;
+    is_undefined_ = false;
+    is_constant_ = true;
+
+    std::vector<int> stack;
+    stack.reserve(rpn_items_.size());
+
+    for (const auto& it : rpn_items_) {
+        if (it.kind == RPNItem::Value) {
+            stack.push_back(it.value);
+            continue;
+        }
+
+        // lookup symbol table
+        if (it.kind == RPNItem::Symbol) {
+            const Symbol& symbol = g_symbol_table.get_symbol(it.name);
+            if (!symbol.is_defined) {
+                is_undefined_ = true;
+                return false;
+            }
+            if (!symbol.is_constant) {
+                is_constant_ = false;
+            }
+            stack.push_back(symbol.value);
+            continue;
+        }
+
+        // Operator
+        if (it.unary) {
+            if (stack.empty()) {
+                return false;
+            }
+            int a = stack.back();
+            stack.pop_back();
+            int r = 0;
+            switch (it.op) {
+            case TokenType::Plus:
+                r = +a;
+                break;
+            case TokenType::Minus:
+                r = -a;
+                break;
+            case TokenType::BitwiseNot:
+                r = ~a;
+                break;
+            case TokenType::LogicalNot:
+                r = (!a) ? 1 : 0;
+                break;
+            default:
+                return false;
+            }
+            stack.push_back(r);
+        }
+        else {
+            if (it.op == TokenType::Quest) {
+                // ternary: expects 3 operands: cond true false (in that order in RPN)
+                if (stack.size() < 3) {
+                    return false;
+                }
+                int false_val = stack.back();
+                stack.pop_back();
+                int true_val = stack.back();
+                stack.pop_back();
+                int cond = stack.back();
+                stack.pop_back();
+                int res = (cond != 0) ? true_val : false_val;
+                stack.push_back(res);
+                continue;
+            }
+
+            if (stack.size() < 2) {
+                return false;
+            }
+            int b = stack.back();
+            stack.pop_back();
+            int a = stack.back();
+            stack.pop_back();
+
+            // guard division/mod by zero
+            if ((it.op == TokenType::Divide ||
+                    it.op == TokenType::Modulus) && b == 0) {
+                g_errors.error(ErrorCode::DivisionByZero);
+                return false;
+            }
+
+            int r = 0;
+            switch (it.op) {
+            case TokenType::Multiply:
+                r = a * b;
+                break;
+            case TokenType::Divide:
+                r = a / b;
+                break;
+            case TokenType::Modulus:
+                r = a % b;
+                break;
+            case TokenType::Plus:
+                r = a + b;
+                break;
+            case TokenType::Minus:
+                r = a - b;
+                break;
+            case TokenType::ShiftLeft:
+                r = static_cast<int>(static_cast<unsigned int>(a) << (b & 31));
+                break;
+            case TokenType::ShiftRight:
+                r = a >> (b & 31);
+                break;
+            case TokenType::LT:
+                r = (a < b) ? 1 : 0;
+                break;
+            case TokenType::LE:
+                r = (a <= b) ? 1 : 0;
+                break;
+            case TokenType::GT:
+                r = (a > b) ? 1 : 0;
+                break;
+            case TokenType::GE:
+                r = (a >= b) ? 1 : 0;
+                break;
+            case TokenType::EQ:
+                r = (a == b) ? 1 : 0;
+                break;
+            case TokenType::NE:
+                r = (a != b) ? 1 : 0;
+                break;
+            case TokenType::BitwiseAnd:
+                r = a & b;
+                break;
+            case TokenType::BitwiseXor:
+                r = a ^ b;
+                break;
+            case TokenType::BitwiseOr:
+                r = a | b;
+                break;
+            case TokenType::LogicalAnd:
+                r = (a && b) ? 1 : 0;
+                break;
+            case TokenType::LogicalOr:
+                r = (a || b) ? 1 : 0;
+                break;
+            case TokenType::LogicalXor:
+                r = (a != b) ? 1 : 0;
+                break;
+            case TokenType::Power:
+                r = ipow(a, b);
+                break;
+            default:
+                return false;
+            }
+            stack.push_back(r);
+        }
+    }
+
+    if (stack.empty()) {
+        return false;
+    }
+    out_value = stack.back();
+    return true;
+}
+
+std::string Expr::to_string() const {
+    std::string out;
+    for (auto& t : line_.tokens()) {
+        out += t.text();
+    }
+    return trim(out);
+}
+
+// Convert infix TokensLine starting at 'i' to RPN vector 'rpn_items_'.
+// Stops when it reaches end-of-line, or a token that is not part of
+// the expression.
+// Advances 'i' to the token following the last consumed token
+bool Expr::try_parse(const TokensLine& line, unsigned& i,
+                     std::vector<RPNItem>& out) {
+    auto size = line.size();
+    if (i >= size) {
+        if (!silent_)
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           "Expression expected");
+        return false;
+    }
+
+    std::vector<RPNOp> ops;
+    bool expect_operand = true;
+    bool any_token_consumed = false;
+
+    while (i < size) {
+        line.skip_spaces(i);
+        if (i >= size) {
+            break;
+        }
+
+        const Token& tk = line[i];
+        TokenType tt = tk.type();
+
+        // Accept integer operand
+        if (tt == TokenType::Integer) {
+            RPNItem it;
+            it.kind = RPNItem::Value;
+            it.value = tk.int_value();
+            out.push_back(it);
+            ++i;
+            expect_operand = false;
+            any_token_consumed = true;
+            continue;
+        }
+
+        // Accept identifier operand
+        if (tt == TokenType::Identifier) {
+            RPNItem it;
+            it.kind = RPNItem::Symbol;
+            it.name = tk.text();
+            out.push_back(it);
+            ++i;
+            expect_operand = false;
+            any_token_consumed = true;
+            continue;
+        }
+
+        // Parenthesis
+        if (tt == TokenType::LeftParen) {
+            ops.push_back({ TokenType::LeftParen, false });
+            ++i;
+            expect_operand = true;
+            any_token_consumed = true;
+            continue;
+        }
+
+        if (tt == TokenType::RightParen) {
+            // collapse until LParen
+            bool found = false;
+            while (!ops.empty()) {
+                RPNOp top = ops.back();
+                ops.pop_back();
+                if (top.op == TokenType::LeftParen) {
+                    found = true;
+                    break;
+                }
+                RPNItem item;
+                item.kind = RPNItem::Op;
+                item.op = top.op;
+                item.unary = top.unary;
+                out.push_back(item);
+            }
+            if (!found) {   // closing parens after expression - success
+                return true;
+            }
+            ++i;
+            expect_operand = false;
+            any_token_consumed = true;
+            continue;
+        }
+
+        // Ternary operator '?'
+        if (tt == TokenType::Quest) {
+            // condition must already be present in output (like values stack)
+            if (out.empty()) {
+                if (!silent_)
+                    g_errors.error(ErrorCode::InvalidSyntax,
+                                   "Unexpected '?'");
+                return false;
+            }
+            ++i; // consume '?'
+
+            // parse true branch RPN until colon (do not consume colon)
+            std::vector<RPNItem> true_rpn;
+            if (!try_parse(line, i, true_rpn)) {
+                if (!silent_)
+                    g_errors.error(ErrorCode::InvalidSyntax,
+                                   "Ternary expression");
+                return false;
+            }
+
+            line.skip_spaces(i);
+            if (i >= size || line[i].type() != TokenType::Colon) {
+                if (!silent_)
+                    g_errors.error(ErrorCode::InvalidSyntax,
+                                   "Expected ':'");
+                return false;
+            }
+            ++i; // consume ':'
+
+            // parse false branch RPN (stops at colon/comma/end)
+            std::vector<RPNItem> false_rpn;
+            if (!try_parse(line, i, false_rpn)) {
+                if (!silent_)
+                    g_errors.error(ErrorCode::InvalidSyntax,
+                                   "Ternary expression");
+                return false;
+            }
+
+            // append true then false RPN, then ternary op
+            out.insert(out.end(), true_rpn.begin(), true_rpn.end());
+            out.insert(out.end(), false_rpn.begin(), false_rpn.end());
+            RPNItem tern;
+            tern.kind = RPNItem::Op;
+            tern.op = TokenType::Quest; // treat as a 3-operand operator in evaluation
+            tern.unary = false;
+            out.push_back(tern);
+            expect_operand = false;
+            any_token_consumed = true;
+            continue;
+        }
+
+        // Operators (binary or unary)
+        bool is_unary = false;
+        if (tt == TokenType::Plus || tt == TokenType::Minus) {
+            is_unary = expect_operand;
+        }
+        else if (tt == TokenType::BitwiseNot || tt == TokenType::LogicalNot) {
+            is_unary = true;
+        }
+        else {
+            is_unary = false;
+        }
+
+        // Use the factored-out helper to detect operator tokens
+        if (!is_operator_token(tt)) {
+            // Not part of expression -> stop parsing
+            break;
+        }
+
+        RPNOp cur{ tt, is_unary };
+        if (is_unary) {
+            ops.push_back(cur);
+            ++i;
+            expect_operand = true;
+            any_token_consumed = true;
+            continue;
+        }
+        else {
+            // Binary operator: collapse according to precedence
+            // and associativity
+            collapse_ops_while(ops, cur, out);
+            ops.push_back(cur);
+            ++i;
+            expect_operand = true;
+            any_token_consumed = true;
+            continue;
+        }
+
+    } // main parsing loop
+
+    if (!any_token_consumed) {
+        if (!silent_) {
+            g_errors.error(ErrorCode::InvalidSyntax, "Expression expected");
+        }
+        return false;
+    }
+
+    // Collapse remaining operators to output
+    while (!ops.empty()) {
+        RPNOp top = ops.back();
+        ops.pop_back();
+        if (top.op == TokenType::LeftParen) {
+            if (!silent_)
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               "Mismatched parenthesis");
+            return false;
+        }
+        RPNItem item;
+        item.kind = RPNItem::Op;
+        item.op = top.op;
+        item.unary = top.unary;
+        out.push_back(item);
+    }
+
+    return true;
+}
+
+// Collapse operators from the ops stack into the RPN output according to precedence/associativity.
+void Expr::collapse_ops_while(std::vector<RPNOp>& ops,
+                              const RPNOp& incoming, std::vector<RPNItem>& out) {
+    while (!ops.empty()) {
+        RPNOp top = ops.back();
+        if (top.op == TokenType::LeftParen) {
+            break;
+        }
+        int ptop = prec(top.op, top.unary);
+        int pin = prec(incoming.op, incoming.unary);
+        if ((ptop > pin) ||
+                (ptop == pin && !is_right_assoc(incoming.op, incoming.unary))) {
+            ops.pop_back();
+            RPNItem item;
+            item.kind = RPNItem::Op;
+            item.op = top.op;
+            item.unary = top.unary;
+            out.push_back(item);
+        }
+        else {
+            break;
+        }
+    }
 }

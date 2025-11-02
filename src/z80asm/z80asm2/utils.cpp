@@ -147,6 +147,53 @@ void write_string_to_file(const std::string& filename,
     }
 }
 
+std::vector<unsigned char> read_file_to_bytes(const std::string& filename) {
+    std::ifstream file(filename, std::ios::in | std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    if (size < 0) {
+        throw std::runtime_error("Error determining file size: " + filename);
+    }
+
+    std::vector<unsigned char> bytes(static_cast<size_t>(size));
+    file.seekg(0, std::ios::beg);
+
+    if (size > 0) {
+        file.read(reinterpret_cast<char*>(bytes.data()), size);
+        if (!file) {
+            throw std::runtime_error("Error reading file: " + filename);
+        }
+    }
+
+    return bytes;
+}
+
+void write_bytes_to_file(const std::string& filename,
+                         const std::vector<unsigned char>& bytes) {
+    std::ofstream file(filename,
+                       std::ios::out | std::ios::binary | std::ios::trunc);
+    if (!file) {
+        throw std::runtime_error("Failed to open file for writing: " + filename);
+    }
+
+    if (!bytes.empty()) {
+        file.write(reinterpret_cast<const char*>(bytes.data()),
+                   static_cast<std::streamsize>(bytes.size()));
+        if (!file) {
+            throw std::runtime_error("Error writing file: " + filename);
+        }
+    }
+
+    file.close();
+    if (!file) {
+        throw std::runtime_error("Error finalizing file: " + filename);
+    }
+}
+
 static std::string remove_underscores(const std::string& s) {
     std::string t;
     t.reserve(s.size());

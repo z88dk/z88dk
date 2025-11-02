@@ -374,3 +374,81 @@ TEST_CASE("parse_float_from_chars invalid inputs and edge cases",
     REQUIRE_FALSE(parse_float_from_chars("1e309", out));
 }
 
+//-----------------------------------------------------------------------------
+// z80asm2 utils.h - binary file I/O tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("read_file_to_bytes and write_bytes_to_file roundtrip",
+          "[utils][bytes][io]") {
+    const std::string fname = "test_utils_bytes.bin";
+
+    // Data with zeros and high-bit values
+    const std::vector<unsigned char> data = { 0x00, 0x41, 0xFF, 0x20, 0x00, 0x7E };
+
+    // Write and read back
+    write_bytes_to_file(fname, data);
+    std::vector<unsigned char> read_back = read_file_to_bytes(fname);
+
+    REQUIRE(read_back == data);
+
+    // Overwrite with different content (shorter)
+    const std::vector<unsigned char> data2 = { 0x12, 0x34, 0x56 };
+    write_bytes_to_file(fname, data2);
+    std::vector<unsigned char> read_back2 = read_file_to_bytes(fname);
+    REQUIRE(read_back2 == data2);
+
+    // Cleanup
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("write_bytes_to_file handles empty content and read back is empty",
+          "[utils][bytes][empty]") {
+    const std::string fname = "test_utils_bytes_empty.bin";
+
+    const std::vector<unsigned char> empty;
+    write_bytes_to_file(fname, empty);
+
+    std::vector<unsigned char> read_back = read_file_to_bytes(fname);
+    REQUIRE(read_back.empty());
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("read_file_to_bytes throws on missing file",
+          "[utils][bytes][error]") {
+    const std::string missing = "this_binary_should_not_exist_98765.tmp";
+    // ensure file does not exist before test
+    std::remove(missing.c_str());
+    REQUIRE_THROWS_AS(read_file_to_bytes(missing), std::runtime_error);
+}
+
+TEST_CASE("String/file cross-compatibility between text and bytes helpers",
+          "[utils][bytes][string][io]") {
+    const std::string fname = "test_utils_cross.tmp";
+
+    // Write using string helper (with embedded NUL) and read using bytes helper
+    std::string s;
+    s.push_back('A');
+    s.push_back('\0');
+    s.push_back('Z');
+
+    write_string_to_file(fname, s);
+    std::vector<unsigned char> bytes = read_file_to_bytes(fname);
+    REQUIRE(bytes.size() == s.size());
+    for (size_t i = 0; i < s.size(); ++i) {
+        REQUIRE(bytes[i] == static_cast<unsigned char>(s[i]));
+    }
+
+    // Now write using bytes helper and read using string helper
+    const std::vector<unsigned char> b2 = { 0xDE, 0xAD, 0x00, 0xBE, 0xEF };
+    write_bytes_to_file(fname, b2);
+    std::string s2 = read_file_to_string(
+                         fname); // read_file_to_string is binary-safe
+    REQUIRE(s2.size() == b2.size());
+    for (size_t i = 0; i < b2.size(); ++i) {
+        REQUIRE(static_cast<unsigned char>(s2[i]) == b2[i]);
+    }
+
+    std::remove(fname.c_str());
+}
+
