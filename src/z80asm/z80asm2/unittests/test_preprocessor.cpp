@@ -3804,3 +3804,353 @@ TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument
     REQUIRE(!pp.next_line(line));
 }
 
+// -----------------------------------------------------------------------------
+// EQU directive tests (both directive and name-directive forms)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: name-directive EQU 'X EQU 5' emits 'DEFC X = 5' tokens",
+          "[preprocessor][equ][name]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "X EQU 5\n";
+    pp.push_virtual_file(content, "equ_name_basic", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 6);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].is(TokenType::Identifier));
+    REQUIRE(t[2].text() == "X");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+
+    // RHS: integer 5
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 5);
+
+    // No further lines
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tokens",
+          "[preprocessor][equ][name][expand]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 10\n"
+        "#define B 20\n"
+        "SUM EQU A + B\n";
+    pp.push_virtual_file(content, "equ_name_expand", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expect the DEFC line
+
+    const auto& t = line.tokens();
+    REQUIRE(t.size() >= 11);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].text() == "SUM");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    // RHS must be: 10 <sp> + <sp> 20 (macro-expanded)
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 10);
+    REQUIRE(t[7].is(TokenType::Whitespace));
+    REQUIRE(t[8].text() == "+");
+    REQUIRE(t[9].is(TokenType::Whitespace));
+    REQUIRE(t[10].is(TokenType::Integer));
+    REQUIRE(t[10].int_value() == 20);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: directive EQU 'EQU Y = 7' emits 'DEFC Y = 7' tokens",
+          "[preprocessor][equ][directive][eq]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "EQU Y = 7\n";
+    pp.push_virtual_file(content, "equ_dir_eq", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].text() == "Y");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 7);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits 'DEFC Z = 42'",
+          "[preprocessor][equ][directive][no-eq]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 42\n"
+        "EQU Z A\n";
+    pp.push_virtual_file(content, "equ_dir_noeq", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].text() == "Z");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 42);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
+          "[preprocessor][equ][name][optional-eq]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 3\n"
+        "W EQU = A\n";
+    pp.push_virtual_file(content, "equ_name_opt_eq", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[2].text() == "W");
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 3);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: EQU emitted DEFC line carries directive logical location",
+          "[preprocessor][equ][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LINE 123, \"equ_loc.asm\"\n"
+        "V EQU 9\n";
+    pp.push_virtual_file(content, "equ_loc", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+
+    REQUIRE(line.location().line_num() == 123);
+    REQUIRE(line.location().filename() == "equ_loc.asm");
+
+    const auto& t = line.tokens();
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[2].text() == "V");
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 9);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// '=' synonym to EQU tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: '=' synonym converts 'x = 10' to 'DEFC x = 10' tokens",
+          "[preprocessor][equ][eq-synonym]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "x = 10\n";
+    pp.push_virtual_file(content, "eqsyn_basic", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].is(TokenType::Identifier));
+    REQUIRE(t[2].text() == "x");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 10);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: '=' synonym accepts tight form 'y=7'",
+          "[preprocessor][equ][eq-synonym][tight]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "y=7\n";
+    pp.push_virtual_file(content, "eqsyn_tight", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].is(TokenType::Identifier));
+    REQUIRE(t[2].text() == "y");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 7);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
+          "[preprocessor][equ][eq-synonym][expand]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 5\n"
+        "x = A\n";
+    pp.push_virtual_file(content, "eqsyn_expand", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // DEFC line
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[2].text() == "x");
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 5);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: '=' synonym DEFC line carries directive logical location",
+          "[preprocessor][equ][eq-synonym][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LINE 250, \"eqsyn_loc.asm\"\n"
+        "v = 9\n";
+    pp.push_virtual_file(content, "eqsyn_loc_src", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+
+    REQUIRE(line.location().line_num() == 250);
+    REQUIRE(line.location().filename() == "eqsyn_loc.asm");
+
+    const auto& t = line.tokens();
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[2].text() == "v");
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 9);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// DEFC synonym to EQU tests (both directive and name-directive forms)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: directive DEFC 'DEFC Y = 7' emits 'DEFC Y = 7' tokens",
+          "[preprocessor][defc][directive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "DEFC Y = 7\n";
+    pp.push_virtual_file(content, "defc_dir_eq", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].is(TokenType::Identifier));
+    REQUIRE(t[2].text() == "Y");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 7);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' tokens",
+          "[preprocessor][defc][name]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "W DEFC 3\n";
+    pp.push_virtual_file(content, "defc_name_basic", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& t = line.tokens();
+
+    REQUIRE(t.size() >= 7);
+    REQUIRE(t[0].text() == "DEFC");
+    REQUIRE(t[1].is(TokenType::Whitespace));
+    REQUIRE(t[2].is(TokenType::Identifier));
+    REQUIRE(t[2].text() == "W");
+    REQUIRE(t[3].is(TokenType::Whitespace));
+    REQUIRE(t[4].is(TokenType::EQ));
+    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[6].is(TokenType::Integer));
+    REQUIRE(t[6].int_value() == 3);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+

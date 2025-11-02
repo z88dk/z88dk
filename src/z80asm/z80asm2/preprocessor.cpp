@@ -76,23 +76,34 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
         return; // nothing to emit
     }
 
-    // Build virtual file content: DEFB lines, up to 16 bytes per line.
-    std::ostringstream oss;
+    // Build virtual file content: DEFB lines, up to 16 bytes per line, as pre-tokenized lines.
+    std::vector<TokensLine> tok_lines;
     const size_t BYTES_PER_LINE = 16;
+    tok_lines.reserve((bytes.size() + BYTES_PER_LINE - 1) / BYTES_PER_LINE);
+
     for (size_t i = 0; i < bytes.size(); i += BYTES_PER_LINE) {
         size_t end = std::min(bytes.size(), i + BYTES_PER_LINE);
-        oss << "DEFB ";
+
+        TokensLine line(location);
+        // DEFB <space>
+        line.push_back(Token(TokenType::Identifier, "DEFB"));
+        line.push_back(Token(TokenType::Whitespace, " "));
+
+        bool first = true;
         for (size_t j = i; j < end; ++j) {
-            if (j != i) {
-                oss << ",";
+            if (!first) {
+                line.push_back(Token(TokenType::Comma, ","));
             }
-            oss << static_cast<int>(bytes[j]);
+            first = false;
+            int v = static_cast<int>(bytes[j]);
+            line.push_back(Token(TokenType::Integer, std::to_string(v), v));
         }
-        oss << "\n";
+
+        tok_lines.push_back(std::move(line));
     }
 
-    // Start the generated lines exactly at the directive's logical location.
-    push_virtual_file(oss.str(), location.filename(),
+    // Start the generated lines exactly at the directive's logical location, with constant line number.
+    push_virtual_file(tok_lines, location.filename(),
                       location.line_num(), false);
 }
 
@@ -624,7 +635,13 @@ bool Preprocessor::is_name_directive(const TokensLine& line, unsigned& i,
     if (parse_identifier(line, i, name)) {
         line.skip_spaces(i);
         keyword = Keyword::None;
-        if (parse_keyword(line, i, keyword)) {
+        if (line[i].is(TokenType::EQ)) {    // synonym for EQU
+            keyword = Keyword::EQU;
+            ++i;
+            line.skip_spaces(i);
+            return true;
+        }
+        else if (parse_keyword(line, i, keyword)) {
             line.skip_spaces(i);
             if (keyword_is_name_directive(keyword)) {
                 return true;
@@ -679,6 +696,22 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::REPTI:
         process_repti(line, i);
         break;
+    case Keyword::EQU:
+        process_equ(line, i);
+        break;
+    case Keyword::IF:
+    case Keyword::IFDEF:
+    case Keyword::IFNDEF:
+    case Keyword::ELIF:
+    case Keyword::ELIFDEF:
+    case Keyword::ELIFNDEF:
+    case Keyword::ELSE:
+    case Keyword::ENDIF:
+        // Minimal placeholder: report as unsupported to avoid hitting default assert.
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       std::string("Unsupported conditional directive: ") + keyword_to_string(
+                           keyword));
+        break;
     case Keyword::ENDM:
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected ENDM directive without matching MACRO");
@@ -688,7 +721,10 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
                        "Unexpected ENDR directive without matching REPT");
         break;
     default:
-        assert(0);
+        // Gracefully report unsupported name-directives flagged as IS_DIRECTIVE
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       std::string("Unsupported directive: ") + keyword_to_string(keyword));
+        break;
     }
 }
 
@@ -717,8 +753,15 @@ void Preprocessor::process_name_directive(const TokensLine& line,
     case Keyword::REPTI:
         process_name_repti(line, i, name);
         break;
+    case Keyword::EQU:
+    case Keyword::DEFC:
+        process_name_equ(line, i, name);
+        break;
     default:
-        assert(0);
+        // Gracefully report unsupported name-directives flagged as IS_NAME_DIRECTIVE
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       std::string("Unsupported directive: ") + keyword_to_string(keyword));
+        break;
     }
 }
 
@@ -907,6 +950,76 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
     }
 
     macros_[name] = std::move(macro);
+}
+
+void Preprocessor::process_equ(const TokensLine& line, unsigned& i) {
+    // Form: EQU name = value   or   EQU name value
+    std::string name;
+    if (!parse_identifier(line, i, name)) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected identifier after EQU");
+        return;
+    }
+
+    line.skip_spaces(i);
+    if (i < line.size() && line[i].is(TokenType::EQ)) {
+        ++i; // skip '=' if present
+        line.skip_spaces(i);
+    }
+
+    // Collect value tokens and expand/collapse to one line
+    TokensLine value = collect_tokens(line, i);
+    TokensLine expanded = expand_macros_in_line(value);
+
+    // Build a pre-tokenized DEFC line: DEFC <name> = <expanded>
+    TokensLine defc(line.location());
+    defc.push_back(Token(TokenType::Identifier, "DEFC"));
+    defc.push_back(Token(TokenType::Whitespace, " "));
+    defc.push_back(Token(TokenType::Identifier, name));
+    defc.push_back(Token(TokenType::Whitespace, " "));
+    defc.push_back(Token(TokenType::EQ, "="));
+    defc.push_back(Token(TokenType::Whitespace, " "));
+    for (const auto& t : expanded.tokens()) {
+        defc.push_back(t);
+    }
+
+    std::vector<TokensLine> one_line;
+    one_line.push_back(std::move(defc));
+
+    // Emit DEFC at the directive's logical location
+    push_virtual_file(one_line, line.location().filename(),
+                      line.location().line_num(), false);
+}
+
+void Preprocessor::process_name_equ(const TokensLine& line, unsigned& i,
+                                    const std::string& name) {
+    // Form: name EQU value   (accept optional '=' after EQU)
+    line.skip_spaces(i);
+    if (i < line.size() && line[i].is(TokenType::EQ)) {
+        ++i; // optional '='
+        line.skip_spaces(i);
+    }
+
+    TokensLine value = collect_tokens(line, i);
+    TokensLine expanded = expand_macros_in_line(value);
+
+    // Build a pre-tokenized DEFC line: DEFC <name> = <expanded>
+    TokensLine defc(line.location());
+    defc.push_back(Token(TokenType::Identifier, "DEFC"));
+    defc.push_back(Token(TokenType::Whitespace, " "));
+    defc.push_back(Token(TokenType::Identifier, name));
+    defc.push_back(Token(TokenType::Whitespace, " "));
+    defc.push_back(Token(TokenType::EQ, "="));
+    defc.push_back(Token(TokenType::Whitespace, " "));
+    for (const auto& t : expanded.tokens()) {
+        defc.push_back(t);
+    }
+
+    std::vector<TokensLine> one_line;
+    one_line.push_back(std::move(defc));
+
+    push_virtual_file(one_line, line.location().filename(),
+                      line.location().line_num(), false);
 }
 
 void Preprocessor::process_undef(const TokensLine& line, unsigned& i) {
