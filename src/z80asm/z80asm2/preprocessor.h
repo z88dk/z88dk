@@ -37,7 +37,7 @@ public:
 
     // Push a virtual file constructed from a binary file.
     void push_binary_file(const std::string& bin_filename,
-                          const Location& base);
+                          const Location& location);
 
     // Pop and return the next processed TokensLine.
     bool next_line(TokensLine& out_line);
@@ -114,6 +114,11 @@ private:
                          const char* directive_name) const;
     bool parse_filename(const TokensLine& line, unsigned& i,
                         std::string& out_filename, bool& out_is_angle) const;
+    bool parse_identifier(const TokensLine& line, unsigned& i,
+                          std::string& out_name) const;
+    bool parse_keyword(const TokensLine& line, unsigned& i,
+                       Keyword& out_keyword) const;
+    TokensLine collect_tokens(const TokensLine& line, unsigned& i);
 
     // parse directives
     bool is_directive(const TokensLine& line, unsigned& i,
@@ -134,7 +139,7 @@ private:
     // BINARY / INCBIN
     void process_binary(const TokensLine& line, unsigned& i);
     void do_binary(const std::string& filename, bool is_angle,
-                   const Location& base);
+                   const Location& location);
 
     // LINE / C_LINE
     void process_line(const TokensLine& line, unsigned& i);
@@ -228,7 +233,9 @@ private:
         std::vector<TokensLine>& result,
         const Location& in_location);
 
+    std::vector<TokensLine> expand_macros(const TokensLine& line);
     std::vector<TokensLine> expand_macros(const std::vector<TokensLine>& lines);
+    TokensLine expand_macros_in_line(const TokensLine& line);
 };
 
 
