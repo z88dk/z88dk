@@ -1187,8 +1187,8 @@ void Preprocessor::process_rept(const TokensLine& line, unsigned& i) {
 
     // 5) Collect body lines until matching ENDR, with nesting support
     std::vector<TokensLine> body;
-    std::vector<std::string> dummy_locals;
-    if (!collect_macro_body(body, dummy_locals, Keyword::REPT, Keyword::ENDR)) {
+    std::vector<std::string> locals; // collect LOCALs for this block
+    if (!collect_macro_body(body, locals, Keyword::REPT, Keyword::ENDR)) {
         return;
     }
 
@@ -1197,12 +1197,43 @@ void Preprocessor::process_rept(const TokensLine& line, unsigned& i) {
         return;
     }
 
-    // 7) Repeat body count_value times and push as a virtual file
+    // Helper to rename identifiers in one line according to a map
+    auto rename_line = [](const TokensLine & src,
+    const std::unordered_map<std::string, std::string>& rmap) {
+        TokensLine out(src.location());
+        for (unsigned t = 0; t < src.size(); ++t) {
+            const Token& tk = src[t];
+            if (tk.is(TokenType::Identifier)) {
+                auto it = rmap.find(tk.text());
+                if (it != rmap.end()) {
+                    out.push_back(Token(TokenType::Identifier, it->second));
+                    continue;
+                }
+            }
+            out.push_back(tk);
+        }
+        return out;
+    };
+
+    // 7) Repeat body count_value times with LOCAL renaming per iteration
     std::vector<TokensLine> repeated;
     repeated.reserve(body.size() * static_cast<size_t>(count_value));
     for (int c = 0; c < count_value; ++c) {
+        std::unordered_map<std::string, std::string> rmap;
+        if (!locals.empty()) {
+            ++local_id_counter_;
+            const std::string suffix = "_" + std::to_string(local_id_counter_);
+            for (const std::string& ln : locals) {
+                rmap.emplace(ln, ln + suffix);
+            }
+        }
         for (const TokensLine& b : body) {
-            repeated.push_back(b);
+            if (rmap.empty()) {
+                repeated.push_back(b);
+            }
+            else {
+                repeated.push_back(rename_line(b, rmap));
+            }
         }
     }
 
@@ -1309,10 +1340,10 @@ void Preprocessor::do_reptc(const std::string& var_name,
         }
     }
 
-    // 3) Collect body lines until ENDR, supporting nesting
+    // 3) Collect body lines until ENDR, supporting nesting and LOCAL
     std::vector<TokensLine> body;
-    std::vector<std::string> dummy_locals;
-    if (!collect_macro_body(body, dummy_locals,
+    std::vector<std::string> locals; // collect LOCALs
+    if (!collect_macro_body(body, locals,
                             Keyword::REPTC, Keyword::ENDR)) {
         return;
     }
@@ -1329,17 +1360,38 @@ void Preprocessor::do_reptc(const std::string& var_name,
 
     for (unsigned ci = 0; ci < iter_text.size(); ++ci) {
         unsigned char ch = static_cast<unsigned char>(iter_text[ci]);
+
+        // Per-iteration LOCAL rename map
+        std::unordered_map<std::string, std::string> rmap;
+        if (!locals.empty()) {
+            ++local_id_counter_;
+            const std::string suffix = "_" + std::to_string(local_id_counter_);
+            for (const std::string& ln : locals) {
+                rmap.emplace(ln, ln + suffix);
+            }
+        }
+
         for (const TokensLine& bline : body) {
             TokensLine sub(directive_line.location());
             for (unsigned t = 0; t < bline.size(); ++t) {
                 const Token& tok = bline[t];
+
+                // Substitute iteration variable first
                 if (tok.is(TokenType::Identifier) && tok.text() == var_name) {
-                    // Replace var with integer token of the character code
                     sub.push_back(Token(TokenType::Integer, std::to_string((int)ch), (int)ch));
+                    continue;
                 }
-                else {
-                    sub.push_back(tok);
+
+                // Apply LOCAL renaming
+                if (tok.is(TokenType::Identifier) && !rmap.empty()) {
+                    auto it = rmap.find(tok.text());
+                    if (it != rmap.end()) {
+                        sub.push_back(Token(TokenType::Identifier, it->second));
+                        continue;
+                    }
                 }
+
+                sub.push_back(tok);
             }
             out_lines.push_back(std::move(sub));
         }
@@ -1410,8 +1462,8 @@ void Preprocessor::do_repti(const std::string& var_name,
 
     // 2) Collect body lines until matching ENDR, with nesting support (REPT/REPTC/REPTI)
     std::vector<TokensLine> body;
-    std::vector<std::string> dummy_locals;
-    if (!collect_macro_body(body, dummy_locals,
+    std::vector<std::string> locals; // collect LOCALs
+    if (!collect_macro_body(body, locals,
                             Keyword::REPTI, Keyword::ENDR)) {
         return;
     }
@@ -1421,22 +1473,42 @@ void Preprocessor::do_repti(const std::string& var_name,
         return;
     }
 
-    // 4) For each argument, duplicate the body substituting occurrences of var_name
+    // 4) For each argument, duplicate the body substituting var_name and renaming LOCALs
     std::vector<TokensLine> out_lines;
     for (const TokensLine& argtokens : flat_args) {
+        // Per-iteration LOCAL rename map
+        std::unordered_map<std::string, std::string> rmap;
+        if (!locals.empty()) {
+            ++local_id_counter_;
+            const std::string suffix = "_" + std::to_string(local_id_counter_);
+            for (const std::string& ln : locals) {
+                rmap.emplace(ln, ln + suffix);
+            }
+        }
+
         for (const TokensLine& bline : body) {
             TokensLine sub(directive_line.location());
             for (unsigned t = 0; t < bline.size(); ++t) {
                 const Token& tok = bline[t];
+
+                // Substitute var_name (argument tokens inserted as-is; do not rename inside)
                 if (tok.is(TokenType::Identifier) && tok.text() == var_name) {
-                    // Insert all tokens from the argument
                     for (unsigned at = 0; at < argtokens.size(); ++at) {
                         sub.push_back(argtokens[at]);
                     }
+                    continue;
                 }
-                else {
-                    sub.push_back(tok);
+
+                // Apply LOCAL renaming outside of argument substitution
+                if (tok.is(TokenType::Identifier) && !rmap.empty()) {
+                    auto it = rmap.find(tok.text());
+                    if (it != rmap.end()) {
+                        sub.push_back(Token(TokenType::Identifier, it->second));
+                        continue;
+                    }
                 }
+
+                sub.push_back(tok);
             }
             out_lines.push_back(std::move(sub));
         }
