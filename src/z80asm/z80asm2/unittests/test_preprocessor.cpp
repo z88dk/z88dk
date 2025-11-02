@@ -3504,3 +3504,303 @@ TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product 
     REQUIRE(pairs[3] == std::make_pair(2, std::string("B")));
     REQUIRE(!g_errors.has_errors());
 }
+
+// -----------------------------------------------------------------------------
+// REPT* + LOCAL tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
+          "[preprocessor][rept][local][labels]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPT 2\n"
+        "LOCAL L\n"
+        "L: nop\n"
+        "ENDR\n"
+        "after_rept_local\n";
+    pp.push_virtual_file(content, "rept_local_labels", 1, true);
+
+    TokensLine line;
+
+    // 1st iteration label
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_1");
+
+    // 1st iteration body line
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_nop = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "nop") {
+                saw_nop = true;
+                break;
+            }
+        }
+        REQUIRE(saw_nop);
+    }
+
+    // 2nd iteration label
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_2");
+
+    // 2nd iteration body line
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_nop = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "nop") {
+                saw_nop = true;
+                break;
+            }
+        }
+        REQUIRE(saw_nop);
+    }
+
+    // After block
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_rept_local");
+}
+
+TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
+          "[preprocessor][rept][local][idents]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPT 2\n"
+        "LOCAL t\n"
+        "use t\n"
+        "ENDR\n"
+        "after_rept_local_id\n";
+    pp.push_virtual_file(content, "rept_local_idents", 1, true);
+
+    TokensLine line;
+
+    // 1st iteration: 'use t_1'
+    REQUIRE(pp.next_line(line));
+    bool saw_use = false, saw_t1 = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "use") {
+            saw_use = true;
+        }
+        if (t.text() == "t_1") {
+            saw_t1 = true;
+        }
+    }
+    REQUIRE(saw_use);
+    REQUIRE(saw_t1);
+
+    // 2nd iteration: 'use t_2'
+    REQUIRE(pp.next_line(line));
+    saw_use = false;
+    bool saw_t2 = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "use") {
+            saw_use = true;
+        }
+        if (t.text() == "t_2") {
+            saw_t2 = true;
+        }
+    }
+    REQUIRE(saw_use);
+    REQUIRE(saw_t2);
+
+    // After block
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_rept_local_id");
+}
+
+TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substitutes variable",
+          "[preprocessor][reptc][local]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // For each character, we get a unique label and 'defb <charcode>'
+    const std::string content =
+        "REPTC ch, \"AZ\"\n"
+        "LOCAL lab\n"
+        "lab: defb ch\n"
+        "ENDR\n"
+        "after_reptc_local\n";
+    pp.push_virtual_file(content, "reptc_local", 1, true);
+
+    TokensLine line;
+
+    // 1st iter label '. lab_1'
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "lab_1");
+
+    // 1st iter body: 'defb 65'
+    REQUIRE(pp.next_line(line));
+    {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "defb");
+        bool hasA = false;
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer) && t.int_value() == static_cast<int>('A')) {
+                hasA = true;
+                break;
+            }
+        }
+        REQUIRE(hasA);
+    }
+
+    // 2nd iter label '. lab_2'
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "lab_2");
+
+    // 2nd iter body: 'defb 90'
+    REQUIRE(pp.next_line(line));
+    {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "defb");
+        bool hasZ = false;
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer) && t.int_value() == static_cast<int>('Z')) {
+                hasZ = true;
+                break;
+            }
+        }
+        REQUIRE(hasZ);
+    }
+
+    // After block
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_reptc_local");
+}
+
+TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitutes variable",
+          "[preprocessor][repti][local]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI v, 7, 8\n"
+        "LOCAL p\n"
+        "p: db v\n"
+        "ENDR\n"
+        "after_repti_local\n";
+    pp.push_virtual_file(content, "repti_local", 1, true);
+
+    TokensLine line;
+
+    // 1st iter label '. p_1'
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "p_1");
+
+    // 1st iter body: 'db 7'
+    REQUIRE(pp.next_line(line));
+    {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "db");
+        bool has7 = false;
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer) && t.int_value() == 7) {
+                has7 = true;
+                break;
+            }
+        }
+        REQUIRE(has7);
+    }
+
+    // 2nd iter label '. p_2'
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "p_2");
+
+    // 2nd iter body: 'db 8'
+    REQUIRE(pp.next_line(line));
+    {
+        const auto& toks = line.tokens();
+        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks[0].text() == "db");
+        bool has8 = false;
+        for (const auto& t : toks) {
+            if (t.is(TokenType::Integer) && t.int_value() == 8) {
+                has8 = true;
+                break;
+            }
+        }
+        REQUIRE(has8);
+    }
+
+    // After block
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_repti_local");
+}
+
+TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument tokens",
+          "[preprocessor][repti][local][arg-preserve]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Local name equals an argument value; ensure inserted argument token is not renamed.
+    const std::string content =
+        "REPTI v, tmp, foo\n"
+        "LOCAL tmp\n"
+        "emit v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_local_arg_preserve", 1, true);
+
+    TokensLine line;
+
+    // First output line: 'emit tmp' (not 'tmp_1')
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_emit = false, saw_tmp_literal = false, saw_tmp_renamed = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "emit") {
+                saw_emit = true;
+            }
+            if (t.text() == "tmp") {
+                saw_tmp_literal = true;
+            }
+            if (t.text() == "tmp_1") {
+                saw_tmp_renamed = true;
+            }
+        }
+        REQUIRE(saw_emit);
+        REQUIRE(saw_tmp_literal);
+        REQUIRE_FALSE(saw_tmp_renamed);
+    }
+
+    // Second output line: 'emit foo'
+    REQUIRE(pp.next_line(line));
+    {
+        bool saw_emit = false, saw_foo = false;
+        for (const auto& t : line.tokens()) {
+            if (t.text() == "emit") {
+                saw_emit = true;
+            }
+            if (t.text() == "foo") {
+                saw_foo = true;
+            }
+        }
+        REQUIRE(saw_emit);
+        REQUIRE(saw_foo);
+    }
+
+    // No more lines
+    REQUIRE(!pp.next_line(line));
+}
+
