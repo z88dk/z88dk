@@ -57,11 +57,8 @@ private:
         std::vector<TokensLine> replacement; // replacement token lines
         std::vector<std::string> params;     // parameter names
         std::vector<std::string> locals;     // LOCAL names declared in macro body
-        bool is_function_like =
-            false;       // true if definition had params or used empty ()
-        bool is_multi_line() const {
-            return replacement.size() > 1;
-        }
+        // true if definition had params or used empty ()
+        bool is_function_like = false;
     };
 
     struct File {
@@ -79,35 +76,41 @@ private:
         bool is_macro_expansion = false;
     };
 
+    struct IfFrame {
+        bool branch_active = false; // whether this level currently includes text
+        bool any_taken = false;     // whether any previous branch in this chain matched
+        bool seen_else = false;     // whether ELSE already occurred
+    };
+
     // Queue of tokenized lines waiting to be processed/consumed.
     std::deque<TokensLine> input_queue_;
 
-    // Stack of source files currently open (keeps ownership of TokensFile objects).
+    // Stack of source files currently open.
     std::vector<File> file_stack_;
 
     // Macro table
     std::unordered_map<std::string, Macro> macros_;
 
-    // Track macro expansion recursion depth per macro name (to avoid infinite recursion).
+    // Track macro expansion recursion depth per macro name.
     std::unordered_map<std::string, int> macro_recursion_count_;
 
-    // Global counter used to produce unique names for LOCAL symbols on each macro expansion.
+    // Counter for LOCAL renaming.
     unsigned local_id_counter_ = 0;
 
     // When true, a directive is being processed from input_queue_ (not from file_stack_).
-    // Used so MACRO can read its body from the queue produced by macro expansion.
     bool reading_queue_for_directive_ = false;
 
-    // Fetch a raw next logical line for MACRO body parsing, from the proper source:
-    // - input_queue_ when reading_queue_for_directive_ is true
-    // - file_stack_ otherwise (and applies forced location if needed).
+    // Conditional inclusion stack
+    std::vector<IfFrame> if_stack_;
+    bool all_ifs_active() const;
+
+    // Fetch a raw next logical line for MACRO/REPT bodies.
     bool fetch_line_for_macro_body(TokensLine& out);
-    // collect the body of a macro or REPT block until ENDM/ENDR
     bool collect_macro_body(std::vector<TokensLine>& out_body,
                             std::vector<std::string>& out_locals,
                             Keyword start_keyword, Keyword end_keyword);
 
-    // Internal helpers
+    // Helpers
     void expect_end(const TokensLine& line, unsigned i) const;
     bool parse_params_list(const TokensLine& line, unsigned& i,
                            std::vector<std::string>& out_params) const;
@@ -126,6 +129,10 @@ private:
     // try to evaluate constant expression with the rest of the line
     bool eval_const_expr(const TokensLine& expr_tokens, int& out_value,
                          bool silent);
+    bool eval_if_expr(const TokensLine& line, unsigned& i,
+                      Keyword keyword);
+    bool eval_ifdef_name(const TokensLine& line, unsigned& i,
+                         bool negated, Keyword keyword);
 
     // parse directives
     bool is_directive(const TokensLine& line, unsigned& i,
@@ -161,12 +168,12 @@ private:
                    const std::vector<std::string>& params,
                    bool had_func_parens);
 
-    // EQU
+    // EQU / name EQU (includes DEFC synonym)
     void process_equ(const TokensLine& line, unsigned& i);
     void process_name_equ(const TokensLine& line, unsigned& i,
                           const std::string& name);
 
-    // UNDEFINE / UNDEF
+    // UNDEF / UNDEFINE
     void process_undef(const TokensLine& line, unsigned& i);
     void process_name_undef(const TokensLine& line, unsigned& i,
                             const std::string& name);
@@ -202,6 +209,16 @@ private:
                   const std::vector<TokensLine>& arg_list,
                   const TokensLine& directive_line);
 
+    // IF / ELIF / ELSE / ENDIF
+    void process_if(const TokensLine& line, unsigned& i);
+    void process_elif(const TokensLine& line, unsigned& i);
+    void process_else(const TokensLine& line, unsigned& i);
+    void process_endif(const TokensLine& line, unsigned& i);
+
+    // IFDEF / IFNDEF / ELIFDEF / ELIFNDEF
+    void process_ifdef(const TokensLine& line, unsigned& i, bool negated);
+    void process_elifdef(const TokensLine& line, unsigned& i, bool negated);
+
     // EXITM
     void process_exitm(const TokensLine& line, unsigned& i);
     void do_exitm();
@@ -218,7 +235,7 @@ private:
                      const TokensLine& expanded, unsigned& i);
     void merge_double_hash(TokensLine& line);
 
-    // Refactored helpers for expand_macros (logical blocks)
+    // expand_macros helpers
     bool is_macro_call(const TokensLine& in_line, unsigned idx,
                        const Macro& macro,
                        unsigned& args_start_idx) const;

@@ -4154,3 +4154,512 @@ TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' token
     REQUIRE(!g_errors.has_errors());
 }
 
+// -----------------------------------------------------------------------------
+// IF / ELIF / ELSE / ENDIF nested conditionals
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
+          "[preprocessor][if][elif][else][endif][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LINE 100, \"ifnest.asm\"\n"
+        "#define A 1\n"
+        "IF A\n"
+        "X\n"
+        "IF 0\n"
+        "Y\n"
+        "ELIF 1\n"
+        "Z\n"
+        "ENDIF\n"
+        "ENDIF\n"
+        "after\n";
+    pp.push_virtual_file(content, "if_nested_src", 1, true);
+
+    TokensLine line;
+
+    // Outer IF true -> "X" emitted
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "X");
+    REQUIRE(line.location().line_num() == 102);
+    REQUIRE(line.location().filename() == "ifnest.asm");
+
+    // Inner IF false, ELIF true -> "Z" emitted
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "Z");
+    REQUIRE(line.location().line_num() == 106);
+    REQUIRE(line.location().filename() == "ifnest.asm");
+
+    // After the whole IF block
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
+
+    // No more lines
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELIF branch and inner ELSE",
+          "[preprocessor][if][elif][else][endif][nested][mix]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 0\n"
+        "#define B 1\n"
+        "IF A\n"
+        "OUTER_TRUE\n"
+        "ELIF B\n"
+        "ELIF_BRANCH\n"
+        "IF 0\n"
+        "INNER_TRUE_SHOULD_NOT\n"
+        "ELSE\n"
+        "INNER_ELSE\n"
+        "ENDIF\n"
+        "ELSE\n"
+        "OUTER_ELSE\n"
+        "ENDIF\n"
+        "done\n";
+    pp.push_virtual_file(content, "if_elif_nested", 1, true);
+
+    TokensLine line;
+
+    // Should select ELIF branch
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELIF_BRANCH");
+
+    // Inside ELIF branch the inner IF 0 -> ELSE path selected
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "INNER_ELSE");
+
+    // After full conditional group
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "done");
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: IF with multiple ELIF selects first true and ignores the rest",
+          "[preprocessor][if][elif][else][endif]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define v 2\n"
+        "IF v==1\n"
+        "ONE\n"
+        "ELIF v==2\n"
+        "TWO\n"
+        "ELIF 1\n"
+        "THREE_SHOULD_NOT\n"
+        "ELSE\n"
+        "ELSE_SHOULD_NOT\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "if_chain", 1, true);
+
+    TokensLine line;
+
+    // Only the first matching ELIF branch ("TWO") should be emitted
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "TWO");
+
+    // No more lines from this block
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// IF tests using symbols from the global symbol table
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
+          "[preprocessor][if][symtab][true]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+
+    // Define A as a constant with value 1
+    Symbol A;
+    A.name = "A";
+    A.value = 1;
+    A.is_defined = true;
+    A.is_constant = true;
+    g_symbol_table.add_symbol("A", A);
+
+    Preprocessor pp;
+    const std::string content =
+        "IF A\n"
+        "OK1\n"
+        "ELSE\n"
+        "BAD\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "if_sym_true", 1, true);
+
+    TokensLine line;
+
+    // Expect IF branch selected
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK1");
+
+    // No more lines
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects ELSE",
+          "[preprocessor][if][symtab][false]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+
+    // Define Z as a constant with value 0
+    Symbol Z;
+    Z.name = "Z";
+    Z.value = 0;
+    Z.is_defined = true;
+    Z.is_constant = true;
+    g_symbol_table.add_symbol("Z", Z);
+
+    Preprocessor pp;
+    const std::string content =
+        "IF Z\n"
+        "BAD\n"
+        "ELSE\n"
+        "OK0\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "if_sym_false", 1, true);
+
+    TokensLine line;
+
+    // Expect ELSE branch selected
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK0");
+
+    // No more lines
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: IF with undefined symbol does not report error and selects ELSE",
+          "[preprocessor][if][symtab][undefined]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+
+    Preprocessor pp;
+    const std::string content =
+        "IF U\n"
+        "SHOULD_NOT\n"
+        "ELSE\n"
+        "ELSE_OK\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "if_sym_undef", 1, true);
+
+    TokensLine line;
+
+    // Expect ELSE branch selected due to undefined symbol evaluating as false
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELSE_OK");
+
+    // No more lines
+    REQUIRE(!pp.next_line(line));
+
+    // No error reported for undefined symbol U (silent evaluation)
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// IFDEF / IFNDEF / ELIFDEF / ELIFNDEF tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
+          "[preprocessor][ifdef]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define M 1\n"
+        "IFDEF M\n"
+        "T\n"
+        "ELSE\n"
+        "F\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "ifdef_true", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "T");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
+          "[preprocessor][ifndef]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "IFNDEF X\n"
+        "MISSING_TRUE\n"
+        "ELSE\n"
+        "MISSING_FALSE\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "ifndef_true", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "MISSING_TRUE");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
+          "[preprocessor][elifdef]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 1\n"
+        "IF 0\n"
+        "IF_FALSE\n"
+        "ELIFDEF A\n"
+        "ELIFDEF_TRUE\n"
+        "ELSE\n"
+        "ELSE_SHOULD_NOT\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "elifdef_case", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELIFDEF_TRUE");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ELIFNDEF after false IF selects when macro is not defined",
+          "[preprocessor][elifndef]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "IF 0\n"
+        "IF_FALSE\n"
+        "ELIFNDEF ZZZ\n"
+        "ELIFNDEF_TRUE\n"
+        "ELSE\n"
+        "ELSE_SHOULD_NOT\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "elifndef_case", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELIFNDEF_TRUE");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: IFDEF/ELIFDEF nested with ELSE/ENDIF behave correctly",
+          "[preprocessor][ifdef][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define OUT 1\n"
+        "IFDEF OUT\n"
+        "O\n"
+        "IFNDEF IN\n"
+        "INNER_TRUE\n"
+        "ELIFDEF IN\n"
+        "INNER_ELIF_SHOULD_NOT\n"
+        "ELSE\n"
+        "INNER_ELSE_SHOULD_NOT\n"
+        "ENDIF\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "ifdef_nested", 1, true);
+
+    TokensLine line;
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "O");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "INNER_TRUE");
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// IFDEF/IFNDEF/ELIFDEF/ELIFNDEF with global symbol table
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: IFDEF uses symbol table definition when macro is absent",
+          "[preprocessor][ifdef][symtab]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+
+    // Define symbol S in the global symbol table (no macro named S)
+    Symbol s;
+    s.name = "S";
+    s.is_defined = true;
+    s.is_constant = true;
+    s.value = 1;
+    g_symbol_table.add_symbol("S", s);
+
+    Preprocessor pp;
+    const std::string content =
+        "IFDEF S\n"
+        "OK_S_DEFINED\n"
+        "ELSE\n"
+        "BAD\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "ifdef_symtab", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK_S_DEFINED");
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: IFNDEF is false when symbol is defined in symbol table",
+          "[preprocessor][ifndef][symtab]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+
+    // Define symbol Z as present in the symbol table
+    Symbol z;
+    z.name = "Z";
+    z.is_defined = true;
+    z.is_constant = true;
+    z.value = 0;
+    g_symbol_table.add_symbol("Z", z);
+
+    Preprocessor pp;
+    const std::string content =
+        "IFNDEF Z\n"
+        "BAD\n"
+        "ELSE\n"
+        "OK_Z_DEFINED\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "ifndef_symtab", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK_Z_DEFINED");
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ELIFDEF selects when symbol is defined in symbol table",
+          "[preprocessor][elifdef][symtab]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+
+    // Define A in the symbol table
+    Symbol a;
+    a.name = "A";
+    a.is_defined = true;
+    a.is_constant = true;
+    a.value = 123;
+    g_symbol_table.add_symbol("A", a);
+
+    Preprocessor pp;
+    const std::string content =
+        "IF 0\n"
+        "IF_FALSE\n"
+        "ELIFDEF A\n"
+        "ELIFDEF_OK\n"
+        "ELSE\n"
+        "ELSE_SHOULD_NOT\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "elifdef_symtab", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELIFDEF_OK");
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol table and skips when it is",
+          "[preprocessor][elifndef][symtab]") {
+    // Case 1: Symbol B is NOT defined -> ELIFNDEF branch chosen
+    {
+        g_errors.reset();
+        g_symbol_table.clear();
+
+        Preprocessor pp;
+        const std::string content =
+            "IF 0\n"
+            "IF_FALSE\n"
+            "ELIFNDEF B\n"
+            "ELIFNDEF_OK\n"
+            "ELSE\n"
+            "ELSE_SHOULD_NOT\n"
+            "ENDIF\n";
+        pp.push_virtual_file(content, "elifndef_symtab_undef", 1, true);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "ELIFNDEF_OK");
+
+        REQUIRE(!pp.next_line(line));
+        REQUIRE(!g_errors.has_errors());
+    }
+
+    // Case 2: Symbol B is defined -> ELIFNDEF should NOT match, hit ELSE
+    {
+        g_errors.reset();
+        g_symbol_table.clear();
+
+        Symbol b;
+        b.name = "B";
+        b.is_defined = true;
+        b.is_constant = true;
+        b.value = 7;
+        g_symbol_table.add_symbol("B", b);
+
+        Preprocessor pp;
+        const std::string content =
+            "IF 0\n"
+            "IF_FALSE\n"
+            "ELIFNDEF B\n"
+            "BAD\n"
+            "ELSE\n"
+            "ELSE_OK\n"
+            "ENDIF\n";
+        pp.push_virtual_file(content, "elifndef_symtab_def", 1, true);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "ELSE_OK");
+
+        REQUIRE(!pp.next_line(line));
+        REQUIRE(!g_errors.has_errors());
+    }
+}
+
