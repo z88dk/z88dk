@@ -45,5 +45,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

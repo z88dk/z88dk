@@ -4,19 +4,33 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "symbol_table.h"
 
-SymbolTable::SymbolTable() {
-    // Stub: to be implemented
+SymbolTable g_symbol_table;
+
+void SymbolTable::clear() {
+    symbols_.clear();
 }
 
-void SymbolTable::add_symbol(const std::string& /*name*/, int /*value*/) {
-    // Stub: to be implemented
+bool SymbolTable::add_symbol(const std::string& name, const Symbol& symbol) {
+    if (symbols_.find(name) != symbols_.end()) {
+        g_errors.error(ErrorCode::SymbolRedefined, name);
+        return false; // symbol already exists
+    }
+    else {
+        symbols_[name] = symbol;
+        return true;
+    }
 }
 
-int SymbolTable::lookup(const std::string& /*name*/) const {
-    // Stub: to be implemented
-    return 0;
+const Symbol& SymbolTable::get_symbol(const std::string& name) const {
+    if (symbols_.find(name) == symbols_.end()) {
+        static Symbol undefined_symbol;
+        return undefined_symbol;
+    }
+    else {
+        return symbols_.at(name);
+    }
 }
 
-extern SymbolTable g_symbol_table;
