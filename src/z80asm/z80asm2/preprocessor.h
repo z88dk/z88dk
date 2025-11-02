@@ -161,6 +161,11 @@ private:
                    const std::vector<std::string>& params,
                    bool had_func_parens);
 
+    // EQU
+    void process_equ(const TokensLine& line, unsigned& i);
+    void process_name_equ(const TokensLine& line, unsigned& i,
+                          const std::string& name);
+
     // UNDEFINE / UNDEF
     void process_undef(const TokensLine& line, unsigned& i);
     void process_name_undef(const TokensLine& line, unsigned& i,
