@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 // Convert string to upper/lower case
 std::string to_upper(const std::string& s);
@@ -31,3 +32,8 @@ bool parse_float_from_chars(const std::string& s, double& out);
 std::string read_file_to_string(const std::string& filename);
 void write_string_to_file(const std::string& filename,
                           const std::string& content);
+
+// read/write binary file to/from a vector of bytes (throws std::runtime_error on error)
+std::vector<unsigned char> read_file_to_bytes(const std::string& filename);
+void write_bytes_to_file(const std::string& filename,
+                         const std::vector<unsigned char>& bytes);
