@@ -18,10 +18,6 @@
 
 swapgfxbk:
 _swapgfxbk:
-    di
-    ret
-
 swapgfxbk1:
 _swapgfxbk1:
-    ei
     ret
