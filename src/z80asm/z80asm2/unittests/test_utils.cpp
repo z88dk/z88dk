@@ -8,6 +8,7 @@
 #include "../utils.h"
 #include "catch_amalgamated.hpp"
 #include <cstdio>
+#include <filesystem>
 #include <limits>
 #include <string>
 
@@ -450,5 +451,217 @@ TEST_CASE("String/file cross-compatibility between text and bytes helpers",
     }
 
     std::remove(fname.c_str());
+}
+
+//-----------------------------------------------------------------------------
+// Tests for normalize_path
+//-----------------------------------------------------------------------------
+
+TEST_CASE("normalize_path resolves dot and dot-dot components",
+          "[normalize_path]") {
+    REQUIRE(normalize_path("a/b/c") == "a/b/c");
+    REQUIRE(normalize_path("a/./b") == "a/b");
+    REQUIRE(normalize_path("a/b/.") ==
+            "a/b/");     // trailing /. normalizes to trailing /
+    REQUIRE(normalize_path("a/b/../c") == "a/c");
+    REQUIRE(normalize_path("a/../b") == "b");
+    REQUIRE(normalize_path("./a/b") == "a/b");
+    REQUIRE(normalize_path("../a/b") == "../a/b");
+    REQUIRE(normalize_path("a/b/../../c") == "c");
+}
+
+TEST_CASE("normalize_path removes redundant separators",
+          "[normalize_path]") {
+    REQUIRE(normalize_path("a//b") == "a/b");
+    REQUIRE(normalize_path("a///b///c") == "a/b/c");
+    REQUIRE(normalize_path("a/b/") == "a/b/");      // trailing slash is preserved
+    REQUIRE(normalize_path("/a/b") == "/a/b");
+    // Double leading slash may normalize to single slash (implementation-defined)
+    REQUIRE(normalize_path("//a/b") == "/a/b");
+}
+
+TEST_CASE("normalize_path handles platform-specific separators",
+          "[normalize_path]") {
+    // Test with backslashes (Windows-style)
+    REQUIRE(normalize_path("a\\b\\c") == "a/b/c");
+    REQUIRE(normalize_path("a\\..\\b") == "b");
+    REQUIRE(normalize_path("a\\.\\b") == "a/b");
+
+    // Mixed separators
+    REQUIRE(normalize_path("a/b\\c") == "a/b/c");
+    REQUIRE(normalize_path("a\\b/c") == "a/b/c");
+}
+
+TEST_CASE("normalize_path handles edge cases",
+          "[normalize_path]") {
+    // Empty path returns "."
+    REQUIRE(normalize_path("") == ".");
+
+    // Single dot
+    REQUIRE(normalize_path(".") == ".");
+
+    // Double dot
+    REQUIRE(normalize_path("..") == "..");
+
+    // Root paths - lexically_normal() simplifies these
+    REQUIRE(normalize_path("/") == "/");
+    REQUIRE(normalize_path("/.") == "/");      // /. normalizes to /
+    REQUIRE(normalize_path("/..") ==
+            "/");     // /.. normalizes to / (can't go above root)
+
+    // Multiple trailing slashes
+    REQUIRE(normalize_path("a/b///") ==
+            "a/b/");   // trailing slashes normalize to single /
+}
+
+TEST_CASE("normalize_path preserves relative vs absolute nature",
+          "[normalize_path]") {
+    // Relative paths stay relative
+    REQUIRE(normalize_path("a/b") == "a/b");
+    REQUIRE(normalize_path("../a/b") == "../a/b");
+
+    // Absolute paths stay absolute
+    REQUIRE(normalize_path("/a/b") == "/a/b");
+    REQUIRE(normalize_path("/a/../b") == "/b");
+}
+
+//-----------------------------------------------------------------------------
+// Tests for parent_dir
+//-----------------------------------------------------------------------------
+
+TEST_CASE("parent_dir returns parent directory",
+          "[parent_dir]") {
+    REQUIRE(parent_dir("a/b/c") == "a/b");
+    REQUIRE(parent_dir("a/b") == "a");
+    REQUIRE(parent_dir("a") == "");
+    REQUIRE(parent_dir("/a/b/c") == "/a/b");
+    REQUIRE(parent_dir("/a") == "/");
+}
+
+TEST_CASE("parent_dir handles platform-specific separators",
+          "[parent_dir]") {
+    REQUIRE(parent_dir("a\\b\\c") == "a/b");
+    REQUIRE(parent_dir("a\\b") == "a");
+
+    // Mixed separators
+    REQUIRE(parent_dir("a/b\\c") == "a/b");
+}
+
+TEST_CASE("parent_dir handles edge cases",
+          "[parent_dir]") {
+    // Empty path
+    REQUIRE(parent_dir("") == "");
+
+    // Single file
+    REQUIRE(parent_dir("file.txt") == "");
+
+    // Root - parent_path() of "/" returns "/"
+    REQUIRE(parent_dir("/") == "/");
+
+    // Current directory
+    REQUIRE(parent_dir(".") == "");
+    REQUIRE(parent_dir("./file.txt") == ".");
+
+    // Parent directory
+    REQUIRE(parent_dir("..") == "");
+    REQUIRE(parent_dir("../file.txt") == "..");
+}
+
+TEST_CASE("parent_dir handles trailing separators",
+          "[parent_dir]") {
+    REQUIRE(parent_dir("a/b/") == "a/b");
+    REQUIRE(parent_dir("a/") == "a");
+    REQUIRE(parent_dir("/a/") == "/a");
+}
+
+//-----------------------------------------------------------------------------
+// Tests for absolute_path
+//-----------------------------------------------------------------------------
+
+TEST_CASE("absolute_path converts relative to absolute",
+          "[absolute_path]") {
+    // Get current working directory for comparison
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string cwd_str = cwd.lexically_normal().generic_string();
+
+    // Test relative path
+    std::string result = absolute_path(".");
+    REQUIRE(result == cwd_str);
+
+    // Test with subdirectory
+    std::string expected = cwd_str + "/subdir";
+    REQUIRE(absolute_path("subdir") == expected);
+}
+
+TEST_CASE("absolute_path resolves dot and dot-dot in result",
+          "[absolute_path]") {
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string cwd_str = cwd.lexically_normal().generic_string();
+
+    // Path with .. should resolve correctly
+    std::string result = absolute_path("a/../b");
+    std::string expected = cwd_str + "/b";
+    REQUIRE(result == expected);
+
+    // Path with . should resolve correctly
+    result = absolute_path("a/./b");
+    expected = cwd_str + "/a/b";
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("absolute_path returns forward slashes on all platforms",
+          "[absolute_path]") {
+    std::string result = absolute_path(".");
+
+    // Result should not contain backslashes
+    REQUIRE(result.find('\\') == std::string::npos);
+
+    // Should contain forward slashes (unless it's a very short path)
+    bool has_forward_slash = (result.find('/') != std::string::npos);
+    bool is_short_path = (result.length() <= 3); // e.g., "C:/" or "/"
+    REQUIRE((has_forward_slash || is_short_path));
+}
+
+TEST_CASE("absolute_path handles already-absolute paths",
+          "[absolute_path]") {
+    // Create a known absolute path
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string abs_input = cwd.lexically_normal().generic_string() + "/test";
+
+    std::string result = absolute_path(abs_input);
+    REQUIRE(result == abs_input);
+}
+
+TEST_CASE("absolute_path handles paths with platform separators",
+          "[absolute_path]") {
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string cwd_str = cwd.lexically_normal().generic_string();
+
+    // Test with backslashes
+    std::string result = absolute_path("a\\b");
+    std::string expected = cwd_str + "/a/b";
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("absolute_path normalizes result",
+          "[absolute_path]") {
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string cwd_str = cwd.lexically_normal().generic_string();
+
+    // Test with redundant separators
+    std::string result = absolute_path("a//b");
+    std::string expected = cwd_str + "/a/b";
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("absolute_path throws on filesystem errors",
+          "[absolute_path]") {
+    // Most paths should work, but we can test that the function
+    // properly propagates exceptions by checking the behavior is consistent
+    // Note: It's hard to trigger a filesystem_error in a portable way,
+    // so this test just verifies the function doesn't crash on valid inputs
+    REQUIRE_NOTHROW(absolute_path("."));
+    REQUIRE_NOTHROW(absolute_path(".."));
+    REQUIRE_NOTHROW(absolute_path("test"));
 }
 

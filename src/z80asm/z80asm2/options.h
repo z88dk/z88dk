@@ -35,8 +35,6 @@ std::string get_i_filename(const std::string& filename);
 bool is_asm_filename(const std::string& filename);
 bool is_o_filename(const std::string& filename);
 
-std::string normalize_path(const std::string& path);
-std::string parent_dir(const std::string& path);
 std::string resolve_include_candidate(const std::string& filename,
                                       bool is_angle = false);
 std::string search_source_file(const std::string& filename);

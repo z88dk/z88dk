@@ -23,10 +23,25 @@ void Preprocessor::clear() {
 }
 
 void Preprocessor::push_file(const std::string& filename) {
+    // Normalize the path to ensure consistent filenames in locations
+    std::string normalized_filename = normalize_path(filename);
+
+    // Check if this file is already on the stack (recursive include detection)
+    for (const File& f : file_stack_) {
+        if (f.tokens_file.filename() == normalized_filename) {
+            g_errors.error(ErrorCode::RecursiveInclude, normalized_filename);
+
+            // Clear the file stack and input queue to stop all processing
+            file_stack_.clear();
+            input_queue_.clear();
+            return;
+        }
+    }
+
     // Take ownership copy of the file on the file stack
     // so its token lines remain valid.
     File f;
-    f.tokens_file = TokensFile(filename, 1);
+    f.tokens_file = TokensFile(normalized_filename, 1);
     f.line_index = 0;
     f.has_forced_location = false;
     f.forced_constant_line_numbers = false;
