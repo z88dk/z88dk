@@ -116,29 +116,6 @@ bool is_o_filename(const std::string& filename) {
     return str_ends_with(filename, o_extension);
 }
 
-// Convert filename to a canonical form when possible to improve
-// recursive-include detection and diagnostics. If filesystem operations
-// fail, fall back to the original string.
-std::string normalize_path(const std::string& path) {
-    try {
-        std::filesystem::path p(path);
-        return p.lexically_normal().generic_string();
-    }
-    catch (...) {
-        return path;
-    }
-}
-
-std::string parent_dir(const std::string& path) {
-    try {
-        std::filesystem::path p(path);
-        return p.parent_path().generic_string();
-    }
-    catch (...) {
-        return std::string();
-    }
-}
-
 // Try candidates according to include semantics and include_paths,
 // return resolved path if found or empty string if not found.
 std::string resolve_include_candidate(const std::string& filename,
