@@ -4663,3 +4663,239 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
     }
 }
 
+// -----------------------------------------------------------------------------
+// Recursive include tests (direct and indirect)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: direct recursive include is detected and triggers RecursiveInclude error",
+          "[preprocessor][include][recursive][direct]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Create a file that includes itself
+    const std::string fname = "recursive_self.asm";
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fname << "\"\n";
+        ofs << "after_include\n";
+    }
+
+    pp.push_file(fname);
+
+    TokensLine line;
+    // Consume all produced lines (none expected due to error)
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    // No lines should be produced from the recursive include
+    REQUIRE(produced == 0);
+
+    // Must have reported a RecursiveInclude error
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Recursive include") != std::string::npos);
+    REQUIRE(msg.find(fname) != std::string::npos);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("Preprocessor: indirect recursive include (A->B->A) is detected and triggers RecursiveInclude error",
+          "[preprocessor][include][recursive][indirect]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fileA = "rec_a.asm";
+    const std::string fileB = "rec_b.asm";
+
+    // A includes B
+    {
+        std::ofstream ofs(fileA, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileB << "\"\n";
+        ofs << "in_A\n";
+    }
+
+    // B includes A (creating the cycle)
+    {
+        std::ofstream ofs(fileB, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileA << "\"\n";
+        ofs << "in_B\n";
+    }
+
+    pp.push_file(fileA);
+
+    TokensLine line;
+    // Consume all produced lines
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    // No normal lines should be produced due to recursive include
+    REQUIRE(produced == 0);
+
+    // Must have reported a RecursiveInclude error
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Recursive include") != std::string::npos);
+    // Should mention one of the files involved in the cycle
+    bool mentions_cycle = (msg.find(fileA) != std::string::npos) ||
+                          (msg.find(fileB) != std::string::npos);
+    REQUIRE(mentions_cycle);
+
+    std::remove(fileA.c_str());
+    std::remove(fileB.c_str());
+}
+
+TEST_CASE("Preprocessor: longer cycle (A->B->C->A) is detected and triggers RecursiveInclude error",
+          "[preprocessor][include][recursive][indirect][long]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fileA = "cycle_a.asm";
+    const std::string fileB = "cycle_b.asm";
+    const std::string fileC = "cycle_c.asm";
+
+    // A includes B
+    {
+        std::ofstream ofs(fileA, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileB << "\"\n";
+        ofs << "in_A\n";
+    }
+
+    // B includes C
+    {
+        std::ofstream ofs(fileB, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileC << "\"\n";
+        ofs << "in_B\n";
+    }
+
+    // C includes A (closing the cycle)
+    {
+        std::ofstream ofs(fileC, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileA << "\"\n";
+        ofs << "in_C\n";
+    }
+
+    pp.push_file(fileA);
+
+    TokensLine line;
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    // No normal lines should be produced
+    REQUIRE(produced == 0);
+
+    // Must have reported a RecursiveInclude error
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Recursive include") != std::string::npos);
+
+    std::remove(fileA.c_str());
+    std::remove(fileB.c_str());
+    std::remove(fileC.c_str());
+}
+
+TEST_CASE("Preprocessor: same file can be included multiple times if not recursive (A->B, A->B again after B closes)",
+          "[preprocessor][include][multiple][nonrecursive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fileA = "multi_a.asm";
+    const std::string fileB = "multi_b.asm";
+
+    // A includes B twice (non-recursive: B doesn't include A)
+    {
+        std::ofstream ofs(fileA, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileB << "\"\n";
+        ofs << "middle_A\n";
+        ofs << "#include \"" << fileB << "\"\n";
+        ofs << "end_A\n";
+    }
+
+    // B is simple
+    {
+        std::ofstream ofs(fileB, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "in_B\n";
+    }
+
+    pp.push_file(fileA);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should get: in_B, middle_A, in_B, end_A
+    REQUIRE(lines.size() == 4);
+    REQUIRE(lines[0] == "in_B");
+    REQUIRE(lines[1] == "middle_A");
+    REQUIRE(lines[2] == "in_B");
+    REQUIRE(lines[3] == "end_A");
+
+    // No errors expected
+    REQUIRE(!g_errors.has_errors());
+
+    std::remove(fileA.c_str());
+    std::remove(fileB.c_str());
+}
+
+TEST_CASE("Preprocessor: path normalization prevents redundant path forms from avoiding cycle detection",
+          "[preprocessor][include][recursive][normalize]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fileA = "norm_a.asm";
+    const std::string fileB = "norm_b.asm";
+
+    // A includes B using relative path
+    {
+        std::ofstream ofs(fileA, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fileB << "\"\n";
+        ofs << "in_A\n";
+    }
+
+    // B includes A using a different form that normalizes to the same path
+    // e.g., "./norm_a.asm" should normalize to "norm_a.asm"
+    {
+        std::ofstream ofs(fileB, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"./norm_a.asm\"\n";
+        ofs << "in_B\n";
+    }
+
+    pp.push_file(fileA);
+
+    TokensLine line;
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    // No lines should be produced
+    REQUIRE(produced == 0);
+
+    // Must have reported a RecursiveInclude error
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Recursive include") != std::string::npos);
+
+    std::remove(fileA.c_str());
+    std::remove(fileB.c_str());
+}
+

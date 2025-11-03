@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include <charconv>
+#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -251,5 +252,45 @@ bool parse_float_from_chars(const std::string& s, double& out) {
     catch (const std::out_of_range&) {
         // Value out of range for double
         return false;
+    }
+}
+
+std::string normalize_path(const std::string& path) {
+    if (path.empty()) {
+        return ".";
+    }
+
+    try {
+        std::filesystem::path p(path);
+        return p.lexically_normal().generic_string();
+    }
+    catch (...) {
+        return path;
+    }
+}
+
+std::string parent_dir(const std::string& path) {
+    try {
+        std::filesystem::path p(path);
+        return p.parent_path().generic_string();
+    }
+    catch (...) {
+        return std::string();
+    }
+}
+
+std::string absolute_path(const std::string& path) {
+    try {
+        std::filesystem::path p(path);
+        p = std::filesystem::absolute(p);
+
+        // Convert to string with forward slashes for platform independence
+        std::string result = p.lexically_normal().generic_string();
+
+        return result;
+    }
+    catch (const std::filesystem::filesystem_error& e) {
+        throw std::runtime_error("Error resolving absolute path: " +
+                                 std::string(e.what()));
     }
 }
