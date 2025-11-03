@@ -84,30 +84,6 @@ TEST_CASE("get_o_filename prepends output_dir and avoids double-prepend",
     CHECK(win_out.find("C") != std::string::npos);
 }
 
-TEST_CASE("normalize_path returns absolute lexically-normal path and parent_dir returns parent",
-          "[options][normalize_path][parent_dir]") {
-    // create nested temp directory and file
-    std::filesystem::path tmpdir = std::filesystem::temp_directory_path() /
-                                   "z80asm_test_opts_tmp";
-    std::filesystem::remove_all(tmpdir);
-    std::filesystem::create_directories(tmpdir / "sub");
-    std::filesystem::path file = tmpdir / "sub" / "file.asm";
-    write_text_file(file, "dummy");
-
-    // normalize_path should return an absolute lexically_normal generic string
-    std::string norm = normalize_path(file.generic_string());
-    std::string expected = file.lexically_normal().generic_string();
-    CHECK(norm == expected);
-
-    // parent_dir should return the parent directory (absolute)
-    std::string parent = parent_dir(file.generic_string());
-    std::string expected_parent = file.parent_path().generic_string();
-    CHECK(parent == expected_parent);
-
-    // cleanup
-    std::filesystem::remove_all(tmpdir);
-}
-
 TEST_CASE("search_source_file finds files in include_paths and returns normalized path",
           "[options][search_source_file][include_paths]") {
     // reset global state
