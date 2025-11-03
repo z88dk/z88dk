@@ -1,3 +1,2 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
-- check for recursive includes in process_include

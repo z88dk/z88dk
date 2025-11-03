@@ -37,3 +37,15 @@ void write_string_to_file(const std::string& filename,
 std::vector<unsigned char> read_file_to_bytes(const std::string& filename);
 void write_bytes_to_file(const std::string& filename,
                          const std::vector<unsigned char>& bytes);
+
+// normalize path lexicographically (resolves . and .., removes redundant separators)
+// returns platform-independent string with forward slashes
+std::string normalize_path(const std::string& path);
+
+// return parent directory of path, empty string if none
+std::string parent_dir(const std::string& path);
+
+// convert path to absolute path (throws std::runtime_error on error)
+// returns platform-independent string with forward slashes
+std::string absolute_path(const std::string& path);
+
