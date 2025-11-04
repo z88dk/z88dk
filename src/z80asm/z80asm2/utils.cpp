@@ -255,13 +255,28 @@ bool parse_float_from_chars(const std::string& s, double& out) {
     }
 }
 
+// On Linux, lexically_normal() does not regard backslashes as path separators
+static std::string nomalize_slashes(const std::string& path) {
+    std::string result;
+    result.reserve(path.size());
+    for (auto c : path) {
+        if (c == '\\') {
+            result.push_back('/');
+        }
+        else {
+            result.push_back(c);
+        }
+    }
+    return result;
+}
+
 std::string normalize_path(const std::string& path) {
     if (path.empty()) {
         return ".";
     }
 
     try {
-        std::filesystem::path p(path);
+        std::filesystem::path p(nomalize_slashes(path));
         return p.lexically_normal().generic_string();
     }
     catch (...) {
@@ -271,7 +286,7 @@ std::string normalize_path(const std::string& path) {
 
 std::string parent_dir(const std::string& path) {
     try {
-        std::filesystem::path p(path);
+        std::filesystem::path p(nomalize_slashes(path));
         return p.parent_path().generic_string();
     }
     catch (...) {
@@ -281,7 +296,7 @@ std::string parent_dir(const std::string& path) {
 
 std::string absolute_path(const std::string& path) {
     try {
-        std::filesystem::path p(path);
+        std::filesystem::path p(nomalize_slashes(path));
         p = std::filesystem::absolute(p);
 
         // Convert to string with forward slashes for platform independence
