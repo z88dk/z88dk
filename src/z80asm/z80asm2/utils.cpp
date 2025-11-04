@@ -302,6 +302,12 @@ std::string absolute_path(const std::string& path) {
         // Convert to string with forward slashes for platform independence
         std::string result = p.lexically_normal().generic_string();
 
+        // absolute path ends in / if the result is a directory
+        // Remove trailing slash unless it's the root "/"
+        if (result.length() > 1 && result.back() == '/') {
+            result.pop_back();
+        }
+
         return result;
     }
     catch (const std::filesystem::filesystem_error& e) {
