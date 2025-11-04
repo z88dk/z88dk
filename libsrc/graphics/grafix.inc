@@ -143,7 +143,7 @@ ENDIF
 IF FOReinstein
     defc    _GFX_MAXX    = 256
     defc    _GFX_MAXY    = 192
-    defc _GFX_MSX_FILL_COLOUR    = 1
+    defc    _GFX_MSX_FILL_COLOUR    = 1
 ENDIF
 
 IF FORenterprise
@@ -162,7 +162,7 @@ IF FORexcali64
     defc    _GFX_MAXY = 72
     defc    _GFX_TEXT_BLANK_CHAR = 32
     defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc USEindex = 1
+    defc    _GFX_TEXT_USE_INDEX = 1
 ENDIF
 
 IF FORfp1100
@@ -189,7 +189,7 @@ IF FORgal
     ; This size reflects the Gal+ screen mode
     IF textgraphics
         defc    _GFX_MAXX    = 64
-        efc _GFX_MAXY    = 48
+        defc    _GFX_MAXY    = 48
     ELSE
         defc    _GFX_MAXX    = 256
         defc    _GFX_MAXY    = 208

@@ -51,7 +51,7 @@
         ld      e, 1                    ;raw mode
         call    generic_console_vpeek
     ENDIF
-    IF  USEindex
+    IF  _GFX_TEXT_USE_INDEX
         cp      64
         jr      c, inrange
         xor     a
@@ -114,7 +114,7 @@ evencol:
         and     e
         pop     bc                      ;Dump reduced coordinates
     ELSE
-      IF    USEindex
+      IF    _GFX_TEXT_USE_INDEX
     ; The character is the index
       ELSE
         ld      hl, textpixl
