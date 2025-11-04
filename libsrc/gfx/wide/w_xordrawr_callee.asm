@@ -23,12 +23,12 @@ _xordrawr_callee:
 
 asm_xordrawr:
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      ix, w_xorpixel
     call    w_line_r
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

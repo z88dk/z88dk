@@ -44,7 +44,7 @@ _stencil_add_side:
     ld      e, (ix+8)
     ld      d, (ix+9)
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     call    stencil_add_pixel
@@ -56,7 +56,7 @@ _stencil_add_side:
 
     ld      ix, stencil_add_pixel
     call    w_line
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

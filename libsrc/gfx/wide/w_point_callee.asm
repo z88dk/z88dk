@@ -24,11 +24,11 @@ _point_callee:
 
 asm_point:
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     call    w_pointxy
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     push    af
     call    swapgfxbk1
     pop     af

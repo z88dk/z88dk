@@ -27,12 +27,12 @@ ___cleargraphics:
 
     ld      hl, (base_graphics)
 IF  GFXTEXT3
-    ld      bc, maxx*maxy/3-1
+    ld      bc, _GFX_MAXX*_GFX_MAXY/3-1
 ELSE
-    ld      bc, maxx*maxy/6-1
+    ld      bc, _GFX_MAXX*_GFX_MAXY/6-1
 ENDIF
 clean:
-    ld      (hl), blankch
+    ld      (hl), _GFX_TEXT_BLANK_CHAR
     inc     hl
     dec     bc
     ld      a, b

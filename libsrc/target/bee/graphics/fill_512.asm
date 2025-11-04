@@ -19,7 +19,7 @@ _fill:
 ;		cp e
 ;		ret c
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     ret     nc                          ; Return if Y overflows

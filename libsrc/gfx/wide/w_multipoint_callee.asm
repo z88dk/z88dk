@@ -33,7 +33,7 @@ _multipoint_callee:
 asm_multipoint:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      a, b
@@ -80,7 +80,7 @@ jh:
     dec     a
     jr      nz, horizontal
 exit:
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk1
   ENDIF
     pop     ix

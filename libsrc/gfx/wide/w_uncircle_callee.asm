@@ -38,11 +38,11 @@ _uncircle_callee:
 asm_uncircle:
     push    ix
     ld      ix, w_respixel
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     call    w_draw_circle
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

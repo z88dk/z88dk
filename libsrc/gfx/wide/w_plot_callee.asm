@@ -27,11 +27,11 @@ _plot_callee:
 
 asm_plot:
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     call    w_plotpixel
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

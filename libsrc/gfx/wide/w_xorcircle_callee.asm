@@ -32,13 +32,13 @@ _xorcircle_callee:
 asm_xorcircle:
     push    ix
     push    af
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     pop     af
     ld      ix, w_xorpixel
     call    w_draw_circle
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

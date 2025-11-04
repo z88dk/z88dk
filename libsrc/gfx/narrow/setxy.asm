@@ -24,14 +24,14 @@
 ;  af....../.... different
 ;
 setxy:
-IF  maxx<>256
+IF  _GFX_MAXX<>256
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
 ENDIF
-IF  maxy<>256
+IF  _GFX_MAXY<>256
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                          ; out of range...
 ENDIF
     ld      (__gfx_coords), hl

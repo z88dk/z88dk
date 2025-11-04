@@ -24,11 +24,11 @@ _cplot_callee:
 asm_cplot:
     ld      a, c
     ld      (__gfx_color), a
-IF  NEED_swapgfxbk=1
+IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
 ENDIF
     call    w_cplotpixel
-IF  NEED_swapgfxbk=1
+IFDEF _GFX_PAGE_VRAM
     jp      swapgfxbk1
 ELSE
     ret

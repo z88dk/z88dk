@@ -46,7 +46,7 @@ _stencil_render:
 
 		;call	swapgfxbk
 
-    ld      c, maxy
+    ld      c, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
@@ -63,7 +63,7 @@ yloop:
     add     hl, de
     ld      a, (hl)                     ;X1
 
-    ld      e, maxy
+    ld      e, _GFX_MAXY
     add     hl, de
     cp      (hl)                        ; if x1>x2, return
     jr      nc, yloop

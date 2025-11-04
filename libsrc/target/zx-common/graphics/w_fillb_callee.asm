@@ -55,13 +55,13 @@ IF FORzxn
 ENDIF
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      ix, w_plotpixel
     call    w_area
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix
@@ -89,7 +89,7 @@ ENDIF
 
 ;;   TS2068 High Resolution and standard mode
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
@@ -103,7 +103,7 @@ ENDIF
     ld      a, 1
     cp      h
     jp      c, __graphics_end
-    ld      a, maxy
+    ld      a, _GFX_MAXY
     cp      e
     jp      c, __graphics_end
 

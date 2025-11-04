@@ -28,12 +28,12 @@ _lscroll_8px:
 ___lscroll_8px:
 
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
 ; clear 1 byte column on the left
-    ld      b,maxy
+    ld      b,_GFX_MAXY
 loop2:
     ld      h,0
     ld      l,b
@@ -53,7 +53,7 @@ loop2:
     ld      l,e
     inc     hl
 
-    ld      bc,maxx*maxy/8
+    ld      bc,_GFX_MAXX*_GFX_MAXY/8
 
 
 ; now, the actual scroll
@@ -78,7 +78,7 @@ loop:
 end_loop:
     ld (de),a
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     call    swapgfxbk1
   ENDIF
     ret

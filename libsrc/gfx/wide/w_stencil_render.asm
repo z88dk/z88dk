@@ -51,7 +51,7 @@ ___stencil_render:
 
     ;call    swapgfxbk
 
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
@@ -81,7 +81,7 @@ yloop:
     cp      127
     jr      z, yloop                    ; ...loop if nothing to be drawn
 
-    ld      bc, maxy*2
+    ld      bc, _GFX_MAXY*2
     add     hl, bc
     ld      a, (hl)
     inc     hl

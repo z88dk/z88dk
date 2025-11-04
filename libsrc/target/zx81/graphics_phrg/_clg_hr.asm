@@ -42,7 +42,7 @@ __clg_hr:
 
     ld      hl, (base_graphics)
 
-    ld      a, maxy
+    ld      a, _GFX_MAXY
     ld      c, a
 	;push af
 

@@ -3,7 +3,6 @@ target/px4/graphics/pixladdr
 target/px4/graphics/putsprite
 target/px4/graphics/bksave
 target/px4/graphics/bkrestore
-target/px4/graphics/swapgfxbk
 gfx/narrow/obj/${TARGET}/clrarea2
 gfx/narrow/obj/${TARGET}/fillarea2
 gfx/narrow/obj/${TARGET}/xorclrarea2

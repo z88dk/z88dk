@@ -33,10 +33,10 @@ __generic_stencil_render:
     push    ix                          ;save callers
     ld      ix, 4
     add     ix, sp
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     ld      hl, (__gfx_coords)
     push    hl
     ld      de, (__gfx_coords+2)
@@ -74,7 +74,7 @@ noret:
     cp      127
     jr      z, yloop                    ; ...loop if nothing to be drawn
 
-    ld      bc, maxy*2                  ; for X2, shift to the right Y vector
+    ld      bc, _GFX_MAXY*2                  ; for X2, shift to the right Y vector
     add     hl, bc
     ld      a, (hl)
     inc     hl

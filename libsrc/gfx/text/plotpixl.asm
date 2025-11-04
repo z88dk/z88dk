@@ -22,10 +22,10 @@
 
 plotpixel:
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                          ; y0	out of range
 
     ld      (__gfx_coords), hl
@@ -44,7 +44,7 @@ plotpixel:
     ld      c, b                        ; !!
     and     a
     ld      b, a
-    ld      de, maxx/2
+    ld      de, _GFX_MAXX/2
     jr      z, r_zero
 r_loop:
     add     hl, de

@@ -73,7 +73,7 @@ nolower:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
 ENDIF
-IF  NEED_swapgfxbk=1
+IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
 ENDIF
     ld      a, (chr)
@@ -161,8 +161,8 @@ lrloop:
     djnz    lrloop
     ld      a, e                        ; new x position
 
-IF  maxx<>256
-    cp      maxx
+IF  _GFX_MAXX<>256
+    cp      _GFX_MAXX
     call    nc, do_nl
 ELSE
     and     a
@@ -175,7 +175,7 @@ ENDIF
     sub     5
     ld      (y_4x6), a
 
-IF  NEED_swapgfxbk
+IF  _GFX_PAGE_VRAM
     jp      __graphics_end
 ELSE
   IF    !__CPU_INTEL__&!__CPU_GBZ80__

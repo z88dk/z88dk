@@ -29,7 +29,7 @@ _xorborder_callee:
 asm_xorborder:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     push    hl
@@ -115,7 +115,7 @@ yloop1:
     jr      nz, yloop1
 endyloop:
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

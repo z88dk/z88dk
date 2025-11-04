@@ -43,7 +43,7 @@
         ld      a, GRAPHICS_CHAR_UNSET
   ENDIF
   IF    NEEDxor
-    IF  USEplotc
+    IF  _GFX_GENCON_USEPLOTC
         call    generic_console_pointxy
     ELSE
         ld      e, 1                    ;raw mode
@@ -57,7 +57,7 @@ xor_done:
         ld      a, b
   ENDIF
   IF    NEEDpoint
-    IF  USEplotc
+    IF  _GFX_GENCON_USEPLOTC
         call    generic_console_pointxy
     ELSE
         ld      e, 1                    ;raw mode
@@ -67,7 +67,7 @@ xor_done:
         pop     bc
   ELSE
         pop     bc                      ;original coordinates
-    IF  USEplotc
+    IF  _GFX_GENCON_USEPLOTC
         ld      d, a
         ld      e, 0                    ;pixel4 mode
         call    generic_console_plotc

@@ -28,14 +28,14 @@ _rscroll_8px:
 ___rscroll_8px:
 
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
 ; clear 1 byte column on the right
-    ld      b,maxy
+    ld      b,_GFX_MAXY
 loop2:
-    ld      h,maxx-1
+    ld      h,_GFX_MAXX-1
     ld      l,b
     dec     l
     push    bc
@@ -46,14 +46,14 @@ loop2:
     djnz    loop2
 
 ; get the display memory position and size
-    ld      h,maxx-1
-    ld      l,maxy-1
+    ld      h,_GFX_MAXX-1
+    ld      l,_GFX_MAXY-1
     call    pixeladdress
     ld      h,d
     ld      l,e
     dec     hl
 
-    ld      bc,maxx*maxy/8
+    ld      bc,_GFX_MAXX*_GFX_MAXY/8
 
 
 ; now, the actual scroll
@@ -78,7 +78,7 @@ loop:
 end_loop:
     ld (de),a
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     call    swapgfxbk1
   ENDIF
     ret

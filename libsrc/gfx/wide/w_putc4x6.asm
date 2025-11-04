@@ -75,7 +75,7 @@ nolower:
     ld      (chr), a
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      a, (chr)
@@ -153,7 +153,7 @@ lrloop:
     djnz    lrloop
 
     push    hl
-    ld      hl, maxx
+    ld      hl, _GFX_MAXX
     call    l_graphics_cmp
     pop     hl
     call    nc, do_nl
@@ -167,7 +167,7 @@ lrloop:
     ld      (y_4x6), hl
     pop     hl
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

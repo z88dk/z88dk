@@ -25,12 +25,12 @@ _drawr_callee:
 
 asm_drawr:
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      ix, plotpixel
     call    Line_r
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

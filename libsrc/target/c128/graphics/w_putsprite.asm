@@ -55,7 +55,7 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
         ; @@@@@@@@@@@@

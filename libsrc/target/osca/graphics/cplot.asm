@@ -13,29 +13,29 @@
 ;Usage: cplot(int x, int y, int color)
 
 
-                SECTION   code_clib
-				
-                PUBLIC    cplot
-                PUBLIC    _cplot
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+        SECTION code_clib
 
-                EXTERN     cplotpixel
+        PUBLIC  cplot
+        PUBLIC  _cplot
+        EXTERN  swapgfxbk
+        EXTERN  swapgfxbk1
 
-.cplot
-._cplot
-		pop	af
-		pop	bc
-		pop	de
-		pop	hl
-		push  hl
-		push  de
-		push  bc
-		push  af
-		ld	a,c
-		ex af,af
+        EXTERN  cplotpixel
 
-                call    swapgfxbk
-                call    cplotpixel
-                jp      swapgfxbk1
+cplot:
+_cplot:
+        pop     af
+        pop     bc
+        pop     de
+        pop     hl
+        push    hl
+        push    de
+        push    bc
+        push    af
+        ld      a, c
+        ex      af, af
+
+        call    swapgfxbk
+        call    cplotpixel
+        jp      swapgfxbk1
 

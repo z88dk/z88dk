@@ -30,7 +30,7 @@ ___move:
     ld      l, (ix+4)
     ld      h, (ix+5)
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      a, (__pen)
@@ -41,7 +41,7 @@ ___move:
 pen_up:
 
     call    w_line_r
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

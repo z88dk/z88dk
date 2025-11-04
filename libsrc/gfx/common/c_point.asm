@@ -31,11 +31,11 @@ ELSE
     ld      l, (ix+2)
     ld      h, (ix+4)
 ENDIF
-IF  NEED_swapgfxbk=1
+IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
 ENDIF
     call    c_pointxy
-IF  NEED_swapgfxbk=1
+IFDEF _GFX_PAGE_VRAM
     push    af
     call    swapgfxbk1
     pop     af

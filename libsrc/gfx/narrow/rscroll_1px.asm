@@ -28,14 +28,14 @@ _rscroll_1px:
 ___rscroll_1px:
 
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
 ; clear 1 pixel column on the right
-    ld      b,maxy
+    ld      b,_GFX_MAXY
 loop2:
-    ld      h,maxx-1
+    ld      h,_GFX_MAXX-1
     ld      l,b
     dec     l
     push    bc
@@ -52,7 +52,7 @@ loop2:
     ld      h,d
     ld      l,e
 
-    ld      bc,maxx*maxy/64
+    ld      bc,_GFX_MAXX*_GFX_MAXY/64
 
     sub     a
     push    af    ; CY reset, to be used in the scroll loop
@@ -86,7 +86,7 @@ loop:
     
     pop    af
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     call    swapgfxbk1
   ENDIF
     ret

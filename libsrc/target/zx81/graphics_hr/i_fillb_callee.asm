@@ -35,7 +35,7 @@ _fillb_callee:
 asm_fillb:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
@@ -46,12 +46,12 @@ asm_fillb:
     exx  ; hl=x
          ; de=y
 
-    ld      a,h                         ; chech for maxx
+    ld      a,h                         ; chech for _GFX_MAXX
     and     a
     jp      nz, __graphics_end          ; Return if Y overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows
@@ -76,12 +76,12 @@ asm_fillb:
     add     hl,bc
     ex      de,hl
     
-    ld      a,h                         ; chech for maxx
+    ld      a,h                         ; chech for _GFX_MAXX
     and     a
     jp      nz, __graphics_end          ; Return if Y overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows

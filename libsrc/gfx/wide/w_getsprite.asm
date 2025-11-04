@@ -58,7 +58,7 @@ getsprite_sub:
     dec     h
     ld      c, h                        ; keep copy of X position
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      b, (ix+0)                   ; x size (iloop)
@@ -134,7 +134,7 @@ noinc:
     dec     d
     jr      nz, oloop
 
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

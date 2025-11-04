@@ -35,7 +35,7 @@
 putsprite:
 _putsprite:
 ___putsprite:
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      hl, 2
@@ -175,7 +175,7 @@ noblockx:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloopx
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     ret

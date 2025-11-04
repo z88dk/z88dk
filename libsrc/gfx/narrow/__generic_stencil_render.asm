@@ -35,13 +35,13 @@ __generic_stencil_render:
     ld      ix, 4
     add     ix, sp
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ;ld    bc,__graphics_end
     ;push bc
 
-    ld      c, maxy%256
+    ld      c, _GFX_MAXY%256
     ld      hl, (__gfx_coords)
     push    hl
     push    bc
@@ -53,7 +53,7 @@ yloop:
     jr      nz, noret
     pop     hl
     ld      (__gfx_coords), hl
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -72,8 +72,8 @@ noret:
     add     hl, de
     ld      a, (hl)                     ;X1
 
-  IF    maxy<>256
-    ld      e, maxy
+  IF    _GFX_MAXY<>256
+    ld      e, _GFX_MAXY
     add     hl, de
   ELSE
     ld      e, 0

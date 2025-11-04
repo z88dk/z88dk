@@ -13,25 +13,25 @@
 ;Usage: cplot_callee(int x, int y, int color)
 
 
-                SECTION   code_clib
-                PUBLIC    cplot_callee
-                PUBLIC    _cplot_callee
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+        SECTION code_clib
+        PUBLIC  cplot_callee
+        PUBLIC  _cplot_callee
+        EXTERN  swapgfxbk
+        EXTERN  swapgfxbk1
 
-                EXTERN     cplotpixel
+        EXTERN  cplotpixel
 
-.cplot_callee
-._cplot_callee
-		pop	af
-		pop	bc
-		pop	de
-		pop	hl
-		push  af
-		ld	a,c
-		ex af,af
+cplot_callee:
+_cplot_callee:
+        pop     af
+        pop     bc
+        pop     de
+        pop     hl
+        push    af
+        ld      a, c
+        ex      af, af
 
-                call    swapgfxbk
-                call    cplotpixel
-                jp      swapgfxbk1
+        call    swapgfxbk
+        call    cplotpixel
+        jp      swapgfxbk1
 

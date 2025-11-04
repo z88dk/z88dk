@@ -44,7 +44,7 @@ _xorclga_callee:
 asm_xorclga:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
@@ -58,13 +58,13 @@ asm_xorclga:
 ;;;   TODO_ check for Y + Ysz overflow
 
     push    de
-    ld      de, maxx+1
+    ld      de, _GFX_MAXX+1
     call    l_cmp
     pop     de
     jp      c, __graphics_end          ; Return if X overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows
@@ -86,7 +86,7 @@ asm_xorclga:
     dec     bc     ;;  Something is wrong, fix 1px horizontal gap
     add     hl,bc                       ; x2 pos
 
-    ld      de, maxx+1
+    ld      de, _GFX_MAXX+1
     call    l_cmp
     jp      c, __graphics_end          ; Return if X overflows
     

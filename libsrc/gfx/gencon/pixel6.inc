@@ -45,7 +45,7 @@
         rra
         ld      c, a
         push    bc                      ;Save reduced coordinates
-    IF  USEplotc
+    IF  _GFX_GENCON_USEPLOTC
         call    generic_console_pointxy
     ELSE
         ld      e, 1                    ;raw mode
@@ -124,7 +124,7 @@ evencol:
         ld      a, (hl)
       ENDIF
         pop     bc                      ;Get back reduced coordinates
-      IF    USEplotc
+      IF    _GFX_GENCON_USEPLOTC
         ld      d, a
         ld      e, 1                    ;pixel6 mode
         call    generic_console_plotc

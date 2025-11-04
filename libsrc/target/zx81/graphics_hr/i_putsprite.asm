@@ -61,7 +61,7 @@ ___putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF                                 ; @@@@@@@@@@@@
     ld      h, b
@@ -212,7 +212,7 @@ _evenrow2:
 
     pop     bc                          ;Restore data
     djnz    woloop
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

@@ -35,7 +35,7 @@ _clga_callee:
 asm_clga:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
@@ -46,12 +46,12 @@ asm_clga:
     exx  ; hl=x
          ; de=y
 
-    ld      a,h                         ; chech for maxx
+    ld      a,h                         ; chech for _GFX_MAXX
     and     a
     jp      nz, __graphics_end          ; Return if Y overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows
@@ -75,12 +75,12 @@ asm_clga:
     add     hl,bc
     ex      de,hl
     
-    ld      a,h                         ; chech for maxx
+    ld      a,h                         ; chech for _GFX_MAXX
     and     a
     jp      nz, __graphics_end          ; Return if Y overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows

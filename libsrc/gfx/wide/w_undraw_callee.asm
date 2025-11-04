@@ -32,7 +32,7 @@ asm_undraw:
     push    hl                          ;x1
     push    de                          ;y1
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     call    w_respixel
@@ -50,7 +50,7 @@ asm_undraw:
 
     ld      ix, w_respixel
     call    w_line_r
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

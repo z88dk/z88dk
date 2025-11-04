@@ -8,7 +8,7 @@
 
 
 __graphics_end:
-IF  NEED_swapgfxbk=1
+IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk1
 ENDIF
 IF  !__CPU_INTEL__&!__CPU_GBZ80__

@@ -32,7 +32,7 @@ _drawb_callee:
 asm_drawb:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      ix, w_plotpixel

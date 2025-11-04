@@ -39,7 +39,7 @@ _clga_callee:
 asm_clga:
 
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
 
@@ -51,13 +51,13 @@ asm_clga:
          ; de=y
 
     push    de
-    ld      de, maxx+1
+    ld      de, _GFX_MAXX+1
     call    l_cmp
     pop     de
     jp      c, __graphics_end          ; Return if X overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows
@@ -75,7 +75,7 @@ asm_clga:
 	dec     bc     ;;  Something is wrong, fix 1px horizontal gap
     add     hl,bc                       ; x2 pos
 
-    ld      de, maxx+1
+    ld      de, _GFX_MAXX+1
     call    l_cmp
     jp      c, __graphics_end          ; Return if X overflows
 	
@@ -158,7 +158,7 @@ clear_nextrow:
 ;;;   check for Y + Ysz overflow
 ;;	ex      de,hl
 ;;  ld      hl, (_vdcDispMem)
-;;	ld      bc, maxy*80
+;;	ld      bc, _GFX_MAXY*80
 ;;	add	    hl,bc
 ;;	sbc	    hl,de
 ;;	bit     7,h

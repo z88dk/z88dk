@@ -40,7 +40,7 @@ _stencil_add_pixel:
     jr      nc, lo_higher
     ld      (hl), a
 lo_higher:
-    ld      de, maxy
+    ld      de, _GFX_MAXY
     add     hl, de
 
     cp      (hl)

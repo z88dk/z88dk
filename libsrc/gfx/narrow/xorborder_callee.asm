@@ -44,7 +44,7 @@ _xorborder_callee:
 asm_xorborder:
 
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     push    bc
@@ -98,7 +98,7 @@ vrowloop:
     inc     h
     pop     bc
     djnz    vrowloop
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     jp      swapgfxbk1
   ELSE
     ret

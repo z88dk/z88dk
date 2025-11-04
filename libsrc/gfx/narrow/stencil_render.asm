@@ -35,14 +35,14 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     ld      bc, __graphics_end
     push    bc
 
-  IF    maxy<>256
-    ld      c, maxy
+  IF    _GFX_MAXY<>256
+    ld      c, _GFX_MAXY
   ELSE
     ld      c, 0
   ENDIF
@@ -63,8 +63,8 @@ yloop:
     ld      a, (hl)                     ;X1
 
 
-  IF    maxy<>256
-    ld      e, maxy
+  IF    _GFX_MAXY<>256
+    ld      e, _GFX_MAXY
     add     hl, de
   ELSE
     ld      e, 0

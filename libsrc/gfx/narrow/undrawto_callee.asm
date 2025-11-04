@@ -30,7 +30,7 @@ _undrawto_callee:
 asm_undrawto:
     ld      hl, (__gfx_coords)
     push    ix
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     push    hl
@@ -40,7 +40,7 @@ asm_undrawto:
     pop     hl
     ld      ix, respixel
     call    Line
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

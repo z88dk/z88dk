@@ -28,7 +28,7 @@ asm_draw:
     push    ix
     push    hl                          ;x1
     push    de                          ;y1
-  IF    NEED_swapgfxbk=1
+  IFDEF _GFX_PAGE_VRAM
     call    swapgfxbk
   ENDIF
     call    w_plotpixel
@@ -46,7 +46,7 @@ asm_draw:
 
     ld      ix, w_plotpixel
     call    w_line_r
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
