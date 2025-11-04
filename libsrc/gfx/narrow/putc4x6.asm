@@ -19,7 +19,7 @@
     PUBLIC  putc4x6
     PUBLIC  _putc4x6
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  plot
@@ -74,7 +74,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
 ENDIF
 IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 ENDIF
     ld      a, (chr)
     rra

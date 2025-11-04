@@ -13,7 +13,7 @@
 
     EXTERN  l_tms9918_disable_interrupts
     EXTERN  l_tms9918_enable_interrupts
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     EXTERN  __tms9918_screen_mode
 
@@ -45,7 +45,7 @@ dorender:
     push    ix                          ;save callers
     push    hl
     pop     ix
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 
     ld      h, (ix+2)
     ld      l, (ix+3)

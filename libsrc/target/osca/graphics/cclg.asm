@@ -13,8 +13,8 @@
         PUBLIC  cclg
         PUBLIC  _cclg
 
-        EXTERN  swapgfxbk
-        EXTERN  swapgfxbk1
+        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_page_vram_out
 
 ;	EXTERN y_offset_list
 ;	EXTERN	base_graphics
@@ -52,7 +52,7 @@ _cclg:
 
 ;-------------------------------------------------------------------------------
         call    kjt_wait_vrt            ; wait for last line of display
-        call    swapgfxbk
+        call    __gfx_page_vram_in
 
         xor     a                       ; clear first 128KB of VRAM
         ld      d, a
@@ -95,6 +95,6 @@ clgloop:
         jr      nz, clrv_lp
         ld      sp, hl
 
-        jp      swapgfxbk1
+        jp      __gfx_page_vram_out
 
 

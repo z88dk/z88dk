@@ -17,10 +17,10 @@
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-	;EXTERN swapgfxbk
+	;EXTERN __gfx_page_vram_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN swapgfxbk1
+	;EXTERN __gfx_page_vram_out
 
 ;
 ;	$Id: stencil_render_arx.asm,v 1.4 2017-01-02 22:58:00 aralbrec Exp $
@@ -31,14 +31,14 @@ _stencil_render:
     ld      ix, 2
     add     ix, sp
 
-		;call	swapgfxbk
+		;call	__gfx_page_vram_in
 
     ld      c, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
     dec     c
-		;jp	z,swapgfxbk1
+		;jp	z,__gfx_page_vram_out
     ret     z
     push    bc
 

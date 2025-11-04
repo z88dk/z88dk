@@ -1,11 +1,11 @@
 
 
         SECTION code_clib
-        EXTERN  swapgfxbk1
+        EXTERN  __gfx_page_vram_out
         PUBLIC  __oz_gfxend
 
 __oz_gfxend:
-        call    swapgfxbk1
+        call    __gfx_page_vram_out
         pop     ix                      ;restore callers
         ret
 

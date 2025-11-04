@@ -10,7 +10,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  drawbox
     EXTERN  respixel
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -30,7 +30,7 @@ asm_undrawb:
     push    ix
     ld      ix, respixel
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    drawbox
   IF    _GFX_PAGE_VRAM

@@ -17,8 +17,8 @@
         PUBLIC  putsprite
         PUBLIC  _putsprite
         EXTERN  pixeladdress
-        EXTERN  swapgfxbk
-        EXTERN  swapgfxbk1
+        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_page_vram_out
 
         INCLUDE "graphics/grafix.inc"
 
@@ -58,7 +58,7 @@ _putsprite:
         ld      h, d
         ld      l, e
 
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         call    pixeladdress
 	;xor	7
         ld      hl, offsets_table
@@ -105,7 +105,7 @@ _notedge:
         pop     bc                      ;Restore data
         djnz    _oloop
          ;ret
-        jp      swapgfxbk1
+        jp      __gfx_page_vram_out
 
 
 putspritew:
@@ -141,7 +141,7 @@ wsmc2:  cp      1
         pop     bc                      ;Restore data
         djnz    woloop
          ;ret
-        jp      swapgfxbk1
+        jp      __gfx_page_vram_out
 wover_1:
         ld      c, (ix+2)
         inc     ix
@@ -153,7 +153,7 @@ wover_1:
         pop     bc
         djnz    woloop
          ;ret
-        jp      swapgfxbk1
+        jp      __gfx_page_vram_out
 
 
         SECTION rodata_clib

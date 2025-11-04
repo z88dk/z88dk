@@ -6,8 +6,8 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _draw_callee
     PUBLIC  asm_draw
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
     EXTERN  w_line_r
     EXTERN  w_plotpixel
     EXTERN  __graphics_end
@@ -18,7 +18,7 @@ _draw_callee:
     pop     af
     pop     de                          ;y2
     pop     hl                          ;x2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
     pop     de                          ;y1
     pop     hl                          ;x1
     push    af                          ; ret addr
@@ -29,7 +29,7 @@ asm_draw:
     push    hl                          ;x1
     push    de                          ;y1
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    w_plotpixel
 

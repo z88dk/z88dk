@@ -18,8 +18,8 @@
         PUBLIC  clga
         PUBLIC  _clga
         EXTERN  w_pixeladdress
-        EXTERN  swapgfxbk
-        EXTERN  swapgfxbk1
+        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_page_vram_out
 
 clga:
 _clga:
@@ -35,7 +35,7 @@ _clga:
         cp      e
         jr      c, clga_exit
 
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         ld      a, (ix+2)               ; height
         ld      c, (ix+4)               ; width
         ld      b, (ix+5)               ; width

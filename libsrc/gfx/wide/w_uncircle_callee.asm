@@ -12,7 +12,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     EXTERN  w_draw_circle
     EXTERN  w_respixel
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -39,7 +39,7 @@ asm_uncircle:
     push    ix
     ld      ix, w_respixel
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    w_draw_circle
   IF    _GFX_PAGE_VRAM

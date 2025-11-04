@@ -14,7 +14,7 @@ IF  !__CPU_INTEL__
     EXTERN  w_draw_circle
     EXTERN  w_plotpixel
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -40,7 +40,7 @@ asm_circle:
     push    ix
     push    af
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     pop     af
     ld      ix, w_plotpixel

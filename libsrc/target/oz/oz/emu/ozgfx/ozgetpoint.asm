@@ -13,7 +13,7 @@
         PUBLIC  _ozgetpoint
 
         EXTERN  pointxy
-        EXTERN  swapgfxbk
+        EXTERN  __gfx_page_vram_in
 
 
 ozgetpoint:
@@ -23,10 +23,10 @@ _ozgetpoint:
         add     ix, sp
         ld      l, (ix+2)
         ld      h, (ix+4)
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         call    pointxy
         ex      af, af'
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         ex      af, af'
         ld      hl, 0
         pop     ix

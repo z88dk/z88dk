@@ -16,7 +16,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___putsprite
     EXTERN  w_pixeladdress
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  base_graphics
@@ -62,7 +62,7 @@ ___putsprite:
     ld      (ortype2), a                ; Self modifying code
 
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF                                 ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c

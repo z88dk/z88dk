@@ -22,8 +22,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  asm_multipoint
 
     EXTERN  pointxy
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
     INCLUDE "graphics/grafix.inc"
 
 
@@ -42,7 +42,7 @@ _multipoint_callee:
 asm_multipoint:
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      de, 0
     rr      c
@@ -80,7 +80,7 @@ jh:
     djnz    horizontal
 exit:
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
   ENDIF
     pop     ix
     ld      h, d

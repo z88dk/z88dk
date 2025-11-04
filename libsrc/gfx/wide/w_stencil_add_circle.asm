@@ -22,8 +22,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  w_draw_circle
     EXTERN  stencil_add_pixel
 
-    ;EXTERN    swapgfxbk
-    ;EXTERN    swapgfxbk1
+    ;EXTERN    __gfx_page_vram_in
+    ;EXTERN    __gfx_page_vram_out
 
     EXTERN  stencil_ptr
     ;EXTERN    __graphics_end
@@ -50,7 +50,7 @@ _stencil_add_circle:
     ld      e, (ix+10)                  ;x
     ld      d, (ix+11)
 
-    ;call    swapgfxbk
+    ;call    __gfx_page_vram_in
 
     ld      ix, stencil_add_pixel
     call    w_draw_circle

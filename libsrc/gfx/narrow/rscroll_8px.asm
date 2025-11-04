@@ -14,8 +14,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _rscroll_8px
     PUBLIC  ___rscroll_8px
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
 
     INCLUDE "graphics/grafix.inc"
 
@@ -29,7 +29,7 @@ ___rscroll_8px:
 
 
   IF    _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
 
 ; clear 1 byte column on the right
@@ -79,7 +79,7 @@ end_loop:
     ld (de),a
 
   IF    _GFX_PAGE_VRAM
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
   ENDIF
     ret
 

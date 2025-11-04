@@ -10,21 +10,21 @@
 ;       Stefano - 6/2023
 ;
 ;
-;	$Id: m2_swapgfxbk.asm $
+;	$Id: m2___gfx_page_vram_in.asm $
 ;
 
 
     SECTION code_clib
 
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_page_vram_in
+    PUBLIC  ___gfx_page_vram_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_page_vram_out
+    PUBLIC  ___gfx_page_vram_out
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_page_vram_in:
+___gfx_page_vram_in:
 
     di
     push    hl
@@ -52,8 +52,8 @@ vram_map:
     ret
 
 
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_page_vram_out:
+___gfx_page_vram_out:
 
     push    hl
     push    de

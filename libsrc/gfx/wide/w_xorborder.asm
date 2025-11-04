@@ -16,7 +16,7 @@ ___xorborder:
     pop     af
     pop     de
     pop     hl
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
     pop     de
     pop     hl
 

@@ -16,8 +16,8 @@
     EXTERN  generic_console_get_mode
     EXTERN  __generic_putsprite
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
 
     INCLUDE "graphics/grafix.inc"
 
@@ -99,7 +99,7 @@ _oloop:
     inc     ix
 _smc1:
     ld      a, 1                        ;Load pixel mask
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 _iloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, _noplot                 ;See if a plot is needed
@@ -122,7 +122,7 @@ _noplot:
 
 _notedge:
     djnz    _iloop
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
 
 	;@@@@@@@@@@
 	;Go to next line
@@ -153,7 +153,7 @@ woloop:
     inc     ix
 wsmc1:
     ld      a, 1                        ;Load pixel mask
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 wiloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, wnoplot                 ;See if a plot is needed
@@ -179,7 +179,7 @@ wsmc2:
     jp      z, wover_1
 
     djnz    wiloop
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
 
 	;@@@@@@@@@@
 	;Go to next line
@@ -202,12 +202,12 @@ row2:
 
 
 wover_1:
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
     ld      c, (ix+2)
-    call    swapgfxbk
+    call    __gfx_page_vram_in
     inc     ix
     djnz    wiloop
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
     dec     ix
 
 	;@@@@@@@@@@

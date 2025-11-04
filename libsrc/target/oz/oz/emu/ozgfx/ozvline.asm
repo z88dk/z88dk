@@ -12,7 +12,7 @@
         PUBLIC  ozvline
         PUBLIC  _ozvline
 
-        EXTERN  swapgfxbk
+        EXTERN  __gfx_page_vram_in
         EXTERN  __oz_gfxend
 
         EXTERN  line
@@ -36,7 +36,7 @@ _ozvline:
         add     l
         ld      d, a                    ;y1 (y0 + len)
 
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         push    hl
         push    de
         call    ozplotpixel

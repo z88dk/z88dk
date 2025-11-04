@@ -8,8 +8,8 @@
     PUBLIC  ___c_point
 
     EXTERN  c_pointxy
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
     INCLUDE "graphics/grafix.inc"
 
 
@@ -32,12 +32,12 @@ ELSE
     ld      h, (ix+4)
 ENDIF
 IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 ENDIF
     call    c_pointxy
 IFDEF _GFX_PAGE_VRAM
     push    af
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
     pop     af
 ENDIF
 IF  !__CPU_INTEL__&!__CPU_GBZ80__

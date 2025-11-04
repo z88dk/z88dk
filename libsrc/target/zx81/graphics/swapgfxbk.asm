@@ -3,26 +3,26 @@
 ;
 ;	ZX 81 version By Stefano Bodrato
 ;
-;	$Id: swapgfxbk.asm,v 1.11 2017-01-02 22:58:00 aralbrec Exp $
+;	$Id: __gfx_page_vram_in.asm,v 1.11 2017-01-02 22:58:00 aralbrec Exp $
 ;
 
     SECTION code_clib
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_page_vram_in
+    PUBLIC  ___gfx_page_vram_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_page_vram_out
+    PUBLIC  ___gfx_page_vram_out
 
 		;EXTERN	save81
 		;EXTERN	restore81
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_page_vram_in:
+___gfx_page_vram_in:
 	        ;jp	$2E7	;setfast
     ret
 		;jp	save81
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_page_vram_out:
+___gfx_page_vram_out:
 
 ; NOTE:  IX now should be preserved, using IY for any kind of ROM call will require "IX"
 ;        to be saved, set to 16384 while the ROM is being engaged, and restored back on exit.

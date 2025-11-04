@@ -12,7 +12,7 @@ IF  !__CPU_INTEL__
     EXTERN  w_respixel
     EXTERN  w_area
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -23,7 +23,7 @@ _clga_callee:
     pop     af
     pop     de
     pop     hl
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
     pop     de
     pop     hl
     push    af                          ; ret addr
@@ -33,7 +33,7 @@ asm_clga:
 
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      ix, w_respixel
     call    w_area

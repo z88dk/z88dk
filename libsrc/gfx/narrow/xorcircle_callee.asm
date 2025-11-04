@@ -12,7 +12,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  draw_circle
     EXTERN  xorpixel
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -33,7 +33,7 @@ _xorcircle_callee:
 
 asm_xorcircle:
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      hl, xorpixel
     call    draw_circle

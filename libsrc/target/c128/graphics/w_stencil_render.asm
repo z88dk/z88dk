@@ -22,10 +22,10 @@
     EXTERN  dither_pattern
 	;EXTERN	l_cmp
 
-	EXTERN swapgfxbk
+	EXTERN __gfx_page_vram_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN swapgfxbk1
+	;EXTERN __gfx_page_vram_out
     EXTERN  __graphics_end
 
     EXTERN  __c128_vaddr
@@ -39,13 +39,13 @@ _stencil_render:
 
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
 
     ld      ix, 4
     add     ix, sp
 
-		;call	swapgfxbk
+		;call	__gfx_page_vram_in
 
     ld      bc, _GFX_MAXY
     push    bc

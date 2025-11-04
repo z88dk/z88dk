@@ -10,7 +10,7 @@
     PUBLIC  c_xorplot
     PUBLIC  _c_xorplot
     PUBLIC  ___c_xorplot
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  c_xorpixel
@@ -35,7 +35,7 @@ ELSE
     ld      h, (ix+4)
 ENDIF
 IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 ENDIF
     call    c_xorpixel
 IF  _GFX_PAGE_VRAM

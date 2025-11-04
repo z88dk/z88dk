@@ -18,7 +18,7 @@ IF    FORts2068|FORzxn
     EXTERN  __gfx_fatpix
 ENDIF
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -81,7 +81,7 @@ fast_putsprite:
     ld      (ortype2), a                ; Self modifying code
 
   IF    _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
       ; @@@@@@@@@@@@
     ld      h, b

@@ -11,7 +11,7 @@
     EXTERN  __gfx_coords
 
     EXTERN  __graphics_end
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
 
 ;
 ;	$Id: surface_plotpixl.asm $
@@ -44,7 +44,7 @@ ENDIF
 
     ld      (__gfx_coords), hl
 
-    call    swapgfxbk
+    call    __gfx_page_vram_in
     push    ix
 
     push    bc

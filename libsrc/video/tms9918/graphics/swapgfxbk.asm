@@ -3,14 +3,14 @@
 ;       Doesn't really page on the MSX.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.7 2017-01-02 22:57:58 aralbrec Exp $
+;	$Id: __gfx_page_vram_in.asm,v 1.7 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
-    MODULE  __tms9918_swapgfxbk
+    MODULE  __tms9918___gfx_page_vram_in
     SECTION code_video_vdp
-    PUBLIC  swapgfxbk
-    PUBLIC  swapgfxbk1
+    PUBLIC  __gfx_page_vram_in
+    PUBLIC  __gfx_page_vram_out
 
-swapgfxbk:
-swapgfxbk1:
+__gfx_page_vram_in:
+__gfx_page_vram_out:
     ret

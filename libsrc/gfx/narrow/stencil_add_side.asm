@@ -22,8 +22,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  Line
     EXTERN  stencil_add_pixel
-        ;EXTERN    swapgfxbk
-        ;EXTERN    swapgfxbk1
+        ;EXTERN    __gfx_page_vram_in
+        ;EXTERN    __gfx_page_vram_out
     ;EXTERN    __graphics_end
     EXTERN  stencil_ptr
 
@@ -42,7 +42,7 @@ _stencil_add_side:
     ld      e, (ix+4)                   ;y1
     ld      d, (ix+6)                   ;x1
 
-    ;call    swapgfxbk
+    ;call    __gfx_page_vram_in
     ld      ix, stencil_add_pixel
     call    Line
         ;jp    __graphics_end

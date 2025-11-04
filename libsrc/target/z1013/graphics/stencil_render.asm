@@ -19,7 +19,7 @@
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
     EXTERN  KRT_BANK_SELECTOR

@@ -14,8 +14,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _lscroll_1px
     PUBLIC  ___lscroll_1px
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
 
     INCLUDE "graphics/grafix.inc"
 
@@ -29,7 +29,7 @@ ___lscroll_1px:
 
 
   IF    _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
 
 ; clear 1 pixel column on the left
@@ -90,7 +90,7 @@ loop:
     pop    af
 
   IF    _GFX_PAGE_VRAM
-    call    swapgfxbk1
+    call    __gfx_page_vram_out
   ENDIF
     ret
 

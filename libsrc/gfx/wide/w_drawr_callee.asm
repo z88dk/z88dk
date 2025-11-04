@@ -7,7 +7,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _drawr_callee
     PUBLIC  asm_drawr
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  w_line_r
     EXTERN  w_plotpixel
     EXTERN  __graphics_end
@@ -25,7 +25,7 @@ _drawr_callee:
 asm_drawr:
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      ix, w_plotpixel
     call    w_line_r

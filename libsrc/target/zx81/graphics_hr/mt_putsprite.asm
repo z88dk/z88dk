@@ -16,7 +16,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _putsprite
     PUBLIC  ___putsprite
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     INCLUDE "graphics/grafix.inc"
@@ -62,7 +62,7 @@ ___putsprite:
     ld      l, e
 
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    pixeladdress
 

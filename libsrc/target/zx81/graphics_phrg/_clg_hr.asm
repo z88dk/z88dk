@@ -88,9 +88,9 @@ zloop:
   ENDIF
 
 
-    DEFC    BASE_VRAM=TOPOFRAM-(maxy*33)
+    DEFC    BASE_VRAM=TOPOFRAM-(_GFX_MAXY*33)
     DEFC    NEW_RAMTOP=BASE_VRAM-128
-    DEFC    WHOLEMEM=(maxy*33)+128      ; size of graphics map in 256x192 mode
+    DEFC    WHOLEMEM=(_GFX_MAXY*33)+128      ; size of graphics map in 256x192 mode
 
 
 

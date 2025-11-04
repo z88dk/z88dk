@@ -8,7 +8,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _xorplot_callee
     PUBLIC  asm_xorplot
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     EXTERN  w_xorpixel
     INCLUDE "graphics/grafix.inc"
@@ -24,7 +24,7 @@ _xorplot_callee:
 asm_xorplot:
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    w_xorpixel
   IF    _GFX_PAGE_VRAM

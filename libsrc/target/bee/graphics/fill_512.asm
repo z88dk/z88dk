@@ -44,12 +44,12 @@ loop3:
 cont:
 ;		ld hl,sline
 
-    ld      hl, -maxx*2*3               ; create buffer 2 on stack
+    ld      hl, -_GFX_MAXX*2*3               ; create buffer 2 on stack
     add     hl, sp                      ; The stack size depends on the display height.
     ld      (sl2ptr+1), hl              ; We don't undersize it because we have lots of RAM
     ld      sp, hl
 
-    ld      hl, -maxx*2*3               ; create buffer 1 on stack
+    ld      hl, -_GFX_MAXX*2*3               ; create buffer 1 on stack
     add     hl, sp
     ld      sp, hl
     ld      (w_sline+3), hl

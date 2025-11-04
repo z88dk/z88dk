@@ -24,7 +24,7 @@ IF    FORts2068|FORzxn
     EXTERN  __gfx_fatpix
 ENDIF
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -35,7 +35,7 @@ _xorclga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_xorpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_xorpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -56,7 +56,7 @@ ENDIF
 
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      ix, w_xorpixel
     call    w_area
@@ -90,7 +90,7 @@ ENDIF
 ;;   TS2068 High Resolution and standard mode
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
 
     ld      a,e          ; height

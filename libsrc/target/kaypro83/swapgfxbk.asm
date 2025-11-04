@@ -9,16 +9,16 @@
 ;
 
     SECTION code_graphics
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_page_vram_in
+    PUBLIC  ___gfx_page_vram_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_page_vram_out
+    PUBLIC  ___gfx_page_vram_out
 
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_page_vram_in:
+___gfx_page_vram_in:
     ex      af, af
     in      a, ($1c)
     set     7, a                        ; video page on
@@ -26,8 +26,8 @@ _swapgfxbk:
     ex      af, af
     ret
 
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_page_vram_out:
+___gfx_page_vram_out:
     ex      af, af
     in      a, ($1c)
     res     7, a                        ; video page off

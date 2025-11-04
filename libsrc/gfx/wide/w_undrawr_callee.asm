@@ -7,7 +7,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _undrawr_callee
     PUBLIC  asm_undrawr
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  w_line_r
     EXTERN  w_respixel
     EXTERN  __graphics_end
@@ -24,7 +24,7 @@ _undrawr_callee:
 asm_undrawr:
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      ix, w_respixel
     call    w_line_r

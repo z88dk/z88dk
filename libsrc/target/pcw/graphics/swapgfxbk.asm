@@ -9,16 +9,16 @@
 
     SECTION code_graphics
 
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_page_vram_in
+    PUBLIC  ___gfx_page_vram_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_page_vram_out
+    PUBLIC  ___gfx_page_vram_out
 
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_page_vram_in:
+___gfx_page_vram_in:
     di
     ld      a, 81h
     out     (0F1h), a                   ; 04000h = Bank 1 R/W - Screen/BIOS
@@ -27,8 +27,8 @@ _swapgfxbk:
     ret
 
 
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_page_vram_out:
+___gfx_page_vram_out:
     ld      a, 85h
     out     (0F1h), a                   ; 04000h = Bank 5 R/W - TPA
     ld      a, 86h

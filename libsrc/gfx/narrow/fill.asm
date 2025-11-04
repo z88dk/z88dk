@@ -18,7 +18,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___fill
 
     EXTERN  do_fill
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -31,7 +31,7 @@ ___fill:
     ld      d, (ix+2)                   ;y
     ld      e, (ix+4)                   ;x
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    do_fill
   IF    _GFX_PAGE_VRAM

@@ -8,7 +8,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     PUBLIC  asm_xordraw
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  Line
@@ -30,7 +30,7 @@ _xordraw_callee:
 asm_xordraw:
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     push    hl
     push    de

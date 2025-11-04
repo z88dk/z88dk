@@ -12,7 +12,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  draw_circle
     EXTERN  respixel
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -33,7 +33,7 @@ _uncircle_callee:
 
 asm_uncircle:
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      hl, respixel
     call    draw_circle

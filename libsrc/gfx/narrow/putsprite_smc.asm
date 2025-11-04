@@ -19,7 +19,7 @@
     PUBLIC  _putsprite
     PUBLIC  ___putsprite
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  pixel
@@ -32,7 +32,7 @@ putsprite:
 _putsprite:
 ___putsprite:
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      hl, 2
     add     hl, sp

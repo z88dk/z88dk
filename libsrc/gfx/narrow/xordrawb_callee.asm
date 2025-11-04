@@ -11,7 +11,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  drawbox
     EXTERN  xorpixel
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
 
@@ -30,7 +30,7 @@ asm_xordrawb:
     push    ix
     ld      ix, xorpixel
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    drawbox
   IF    _GFX_PAGE_VRAM

@@ -12,7 +12,7 @@
         PUBLIC  ozpoint
         PUBLIC  _ozpoint
 
-        EXTERN  swapgfxbk
+        EXTERN  __gfx_page_vram_in
         EXTERN  __oz_gfxend
 
         EXTERN  ozplotpixel
@@ -30,6 +30,6 @@ _ozpoint:
 
         ld      l, (ix+4)
         ld      h, (ix+6)
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         call    ozplotpixel
         jp      __oz_gfxend

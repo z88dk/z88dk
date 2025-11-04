@@ -10,7 +10,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  move
     PUBLIC  _move
     PUBLIC  ___move
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  __pen
@@ -32,7 +32,7 @@ ___move:
     ld      h, (ix+5)
 
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
 
     ld      a, (__pen)

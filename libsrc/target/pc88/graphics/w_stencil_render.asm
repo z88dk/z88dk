@@ -25,10 +25,10 @@
     EXTERN  l_push_di
     EXTERN  l_pop_ei
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_out
 
     INCLUDE "target/pc88/def/pc88.def"
 
@@ -58,7 +58,7 @@ _stencil_render:
     ld      a, (__pc88_ink)
     out     (EXPANDED_ALU_CTRL), a
 
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 
     ld      bc, _GFX_MAXY
     push    bc

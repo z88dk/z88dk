@@ -6,7 +6,7 @@
     PUBLIC  c_unplot
     PUBLIC  _c_unplot
     PUBLIC  ___c_unplot
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  c_respixel
@@ -33,7 +33,7 @@ ELSE
     ld      h, (ix+4)
 ENDIF
 IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 ENDIF
     call    c_respixel
 IF  _GFX_PAGE_VRAM

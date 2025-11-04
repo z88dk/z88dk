@@ -6,8 +6,8 @@
     PUBLIC  _cplot_callee
     PUBLIC  asm_cplot
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
     EXTERN  __gfx_color
     EXTERN  w_cplotpixel
     INCLUDE "graphics/grafix.inc"
@@ -25,11 +25,11 @@ asm_cplot:
     ld      a, c
     ld      (__gfx_color), a
 IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
 ENDIF
     call    w_cplotpixel
 IFDEF _GFX_PAGE_VRAM
-    jp      swapgfxbk1
+    jp      __gfx_page_vram_out
 ELSE
     ret
 ENDIF

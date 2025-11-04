@@ -21,7 +21,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ;;    EXTERN  __gfx_fatpix
 
     EXTERN  l_cmp
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN __generic_w_curx
@@ -35,7 +35,7 @@ _xorclga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -45,7 +45,7 @@ asm_xorclga:
 
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
 
 

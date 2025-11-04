@@ -22,10 +22,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  dither_pattern
     ;EXTERN    l_graphics_cmp
 
-    ;EXTERN swapgfxbk
+    ;EXTERN __gfx_page_vram_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    ;EXTERN swapgfxbk1
+    ;EXTERN __gfx_page_vram_out
 	
 	EXTERN __generic_w_curx
 	EXTERN __generic_w_cury
@@ -49,7 +49,7 @@ ___stencil_render:
     ld      ix, 4
     add     ix, sp
 
-    ;call    swapgfxbk
+    ;call    __gfx_page_vram_in
 
     ld      bc, _GFX_MAXY
     push    bc

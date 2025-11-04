@@ -10,7 +10,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     PUBLIC  asm_fillb
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  fillarea
@@ -30,7 +30,7 @@ _fillb_callee:
 asm_fillb:
     push    ix
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     call    fillarea
   IF    _GFX_PAGE_VRAM

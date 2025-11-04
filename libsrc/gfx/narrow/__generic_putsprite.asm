@@ -15,7 +15,7 @@
     SECTION code_graphics
     PUBLIC  __generic_putsprite
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
     EXTERN  plotpixel
@@ -28,7 +28,7 @@
 
 __generic_putsprite:
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      hl, 2
     add     hl, sp

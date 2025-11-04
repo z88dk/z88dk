@@ -22,7 +22,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
 
     EXTERN  w_pointxy
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -59,7 +59,7 @@ getsprite_sub:
     ld      c, h                        ; keep copy of X position
 
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ld      b, (ix+0)                   ; x size (iloop)
     ld      d, (ix+1)                   ; y size (oloop)

@@ -16,8 +16,8 @@
         SECTION code_clib
         PUBLIC  cplot_callee
         PUBLIC  _cplot_callee
-        EXTERN  swapgfxbk
-        EXTERN  swapgfxbk1
+        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_page_vram_out
 
         EXTERN  cplotpixel
 
@@ -31,7 +31,7 @@ _cplot_callee:
         ld      a, c
         ex      af, af
 
-        call    swapgfxbk
+        call    __gfx_page_vram_in
         call    cplotpixel
-        jp      swapgfxbk1
+        jp      __gfx_page_vram_out
 

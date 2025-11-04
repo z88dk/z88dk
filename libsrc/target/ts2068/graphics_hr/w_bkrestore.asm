@@ -13,7 +13,7 @@
 
     EXTERN  zx_saddrpdown
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
 
@@ -36,7 +36,7 @@ _bkrestore_fastcall:
 ; __FASTCALL__ : sprite ptr in HL
 
     push    hl
-    call    swapgfxbk
+    call    __gfx_page_vram_in
     pop     ix
 
     ld      l, (ix+2)                   ; x

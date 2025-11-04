@@ -16,8 +16,8 @@
     EXTERN  pixelbyte
     EXTERN  pix_return
     EXTERN  gfxbyte_get
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_page_vram_out
     EXTERN  __mc6847_mode
     EXTERN  __generic_putsprite
 
@@ -67,7 +67,7 @@ _putsprite:
 
     ld      (actcoord), hl              ; save current coordinates
 
-    call    swapgfxbk
+    call    __gfx_page_vram_in
     call    pixeladdress
 
     ld      hl, offsets_table
@@ -119,7 +119,7 @@ _noplot:
     pop     bc                          ;Restore data
     djnz    _oloop
     pop     ix                          ;restore callers
-    jp      swapgfxbk1
+    jp      __gfx_page_vram_out
 
 
 putspritew:
@@ -160,7 +160,7 @@ wsmc2:
     pop     bc                          ;Restore data
     djnz    woloop
     pop     ix                          ;restore callers
-    jp      swapgfxbk1
+    jp      __gfx_page_vram_out
 
 
 wover_1:
@@ -175,7 +175,7 @@ wover_1:
 
     pop     bc
     djnz    woloop
-    jp      swapgfxbk1
+    jp      __gfx_page_vram_out
 
 
 ; Edge of byte reached, save its content,

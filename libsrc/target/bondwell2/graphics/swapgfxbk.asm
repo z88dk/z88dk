@@ -9,17 +9,17 @@
 
     SECTION code_graphics
 
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_page_vram_in
+    PUBLIC  ___gfx_page_vram_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_page_vram_out
+    PUBLIC  ___gfx_page_vram_out
     EXTERN  __bdos
 
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_page_vram_in:
+___gfx_page_vram_in:
     in      a, (2)                      ; PPIC, get current bank
     ld      (bankval), a
 
@@ -30,8 +30,8 @@ _swapgfxbk:
     ret
 
 
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_page_vram_out:
+___gfx_page_vram_out:
     ld      a, (bankval)
     out     (2), a                      ; PPIC, restore previous memory bank
     ret

@@ -23,7 +23,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  plotpixel, respixel
     EXTERN  __gfx_coords
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_page_vram_in
     EXTERN  __graphics_end
 
 ;
@@ -36,7 +36,7 @@ __generic_stencil_render:
     add     ix, sp
 
   IFDEF _GFX_PAGE_VRAM
-    call    swapgfxbk
+    call    __gfx_page_vram_in
   ENDIF
     ;ld    bc,__graphics_end
     ;push bc
@@ -49,7 +49,7 @@ __generic_stencil_render:
 yloop:
     pop     bc
     dec     c
-    ;jp    z,swapgfxbk1
+    ;jp    z,__gfx_page_vram_out
     jr      nz, noret
     pop     hl
     ld      (__gfx_coords), hl
