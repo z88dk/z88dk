@@ -122,41 +122,41 @@ yyFillLabel0:
             case '\f':
             case '\r':
             case ' ':
-                goto yy3;
+                goto yy2;
             case '!':
-                goto yy5;
+                goto yy4;
             case '"':
-                goto yy7;
+                goto yy6;
             case '#':
-                goto yy8;
+                goto yy7;
             case '$':
-                goto yy10;
+                goto yy9;
             case '%':
-                goto yy12;
+                goto yy11;
             case '&':
-                goto yy14;
+                goto yy13;
             case '\'':
-                goto yy16;
+                goto yy15;
             case '(':
-                goto yy17;
+                goto yy16;
             case ')':
-                goto yy18;
+                goto yy17;
             case '*':
-                goto yy19;
+                goto yy18;
             case '+':
-                goto yy21;
+                goto yy20;
             case ',':
-                goto yy22;
+                goto yy21;
             case '-':
-                goto yy23;
+                goto yy22;
             case '.':
-                goto yy24;
+                goto yy23;
             case '/':
-                goto yy26;
+                goto yy25;
             case '0':
-                goto yy28;
+                goto yy27;
             case '1':
-                goto yy30;
+                goto yy29;
             case '2':
             case '3':
             case '4':
@@ -165,21 +165,21 @@ yyFillLabel0:
             case '7':
             case '8':
             case '9':
-                goto yy32;
+                goto yy31;
             case ':':
-                goto yy33;
+                goto yy32;
             case ';':
-                goto yy34;
+                goto yy33;
             case '<':
-                goto yy35;
+                goto yy34;
             case '=':
-                goto yy37;
+                goto yy36;
             case '>':
-                goto yy39;
+                goto yy38;
             case '?':
-                goto yy41;
+                goto yy40;
             case '@':
-                goto yy42;
+                goto yy41;
             case 'A':
             case 'B':
             case 'C':
@@ -261,13 +261,13 @@ yyFillLabel0:
             }
 yy1:
             ++p;
-yy2: {
+            {
                 g_errors.error(ErrorCode::InvalidSyntax,
                                "Unexpected character: '" + std::string(tok, p) + "'");
                 output.clear();
                 return;
             }
-yy3:
+yy2:
             ++p;
 yyFillLabel1:
             yych = *p;
@@ -278,20 +278,20 @@ yyFillLabel1:
             case '\f':
             case '\r':
             case ' ':
-                goto yy3;
+                goto yy2;
             default:
                 if (pe <= p) {
                     if (YYFILL() == 0) {
                         goto yyFillLabel1;
                     }
                 }
-                goto yy4;
+                goto yy3;
             }
-yy4: {
+yy3: {
                 PUSH_TOKEN1(TokenType::Whitespace);
                 continue;
             }
-yy5:
+yy4:
             ++p;
 yyFillLabel2:
             yych = *p;
@@ -304,20 +304,20 @@ yyFillLabel2:
                         goto yyFillLabel2;
                     }
                 }
-                goto yy6;
+                goto yy5;
             }
-yy6: {
+yy5: {
                 PUSH_TOKEN1(TokenType::LogicalNot);
                 continue;
             }
-yy7:
+yy6:
             ++p;
             {
                 end_quote = '"';
                 string_start = tok;
                 goto string_loop;
             }
-yy8:
+yy7:
             ++p;
 yyFillLabel3:
             yych = *p;
@@ -330,13 +330,13 @@ yyFillLabel3:
                         goto yyFillLabel3;
                     }
                 }
-                goto yy9;
+                goto yy8;
             }
-yy9: {
+yy8: {
                 PUSH_TOKEN1(TokenType::Hash);
                 continue;
             }
-yy10:
+yy9:
             ++p;
 yyFillLabel4:
             yych = *p;
@@ -370,14 +370,13 @@ yyFillLabel4:
                         goto yyFillLabel4;
                     }
                 }
-                goto yy11;
+                goto yy10;
             }
-yy11: {
-                str = "ASMPC";
-                Token t(TokenType::Identifier, str, keyword_lookup(str));
-                output.push_back(t);
+yy10: {
+                PUSH_TOKEN1(TokenType::Dollar);
+                continue;
             }
-yy12:
+yy11:
             yyaccept = 0;
             marker = ++p;
 yyFillLabel5:
@@ -394,13 +393,13 @@ yyFillLabel5:
                         goto yyFillLabel5;
                     }
                 }
-                goto yy13;
+                goto yy12;
             }
-yy13: {
+yy12: {
                 PUSH_TOKEN1(TokenType::Modulus);
                 continue;
             }
-yy14:
+yy13:
             ++p;
 yyFillLabel6:
             yych = *p;
@@ -413,32 +412,32 @@ yyFillLabel6:
                         goto yyFillLabel6;
                     }
                 }
-                goto yy15;
+                goto yy14;
             }
-yy15: {
+yy14: {
                 PUSH_TOKEN1(TokenType::BitwiseAnd);
                 continue;
             }
-yy16:
+yy15:
             ++p;
             {
                 end_quote = '\'';
                 string_start = tok;
                 goto string_loop;
             }
-yy17:
+yy16:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::LeftParen);
                 continue;
             }
-yy18:
+yy17:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::RightParen);
                 continue;
             }
-yy19:
+yy18:
             ++p;
 yyFillLabel7:
             yych = *p;
@@ -451,31 +450,31 @@ yyFillLabel7:
                         goto yyFillLabel7;
                     }
                 }
-                goto yy20;
+                goto yy19;
             }
-yy20: {
+yy19: {
                 PUSH_TOKEN1(TokenType::Multiply);
                 continue;
             }
-yy21:
+yy20:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::Plus);
                 continue;
             }
-yy22:
+yy21:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::Comma);
                 continue;
             }
-yy23:
+yy22:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::Minus);
                 continue;
             }
-yy24:
+yy23:
             ++p;
 yyFillLabel8:
             yych = *p;
@@ -497,13 +496,13 @@ yyFillLabel8:
                         goto yyFillLabel8;
                     }
                 }
-                goto yy25;
+                goto yy24;
             }
-yy25: {
+yy24: {
                 PUSH_TOKEN1(TokenType::Dot);
                 continue;
             }
-yy26:
+yy25:
             ++p;
 yyFillLabel9:
             yych = *p;
@@ -518,13 +517,13 @@ yyFillLabel9:
                         goto yyFillLabel9;
                     }
                 }
-                goto yy27;
+                goto yy26;
             }
-yy27: {
+yy26: {
                 PUSH_TOKEN1(TokenType::Divide);
                 continue;
             }
-yy28:
+yy27:
             yyaccept = 1;
             marker = ++p;
 yyFillLabel10:
@@ -536,7 +535,7 @@ yyFillLabel10:
                         goto yyFillLabel10;
                     }
                 }
-                goto yy29;
+                goto yy28;
             case 'B':
             case 'b':
                 goto yy73;
@@ -544,9 +543,9 @@ yyFillLabel10:
             case 'x':
                 goto yy77;
             default:
-                goto yy31;
+                goto yy30;
             }
-yy29: {
+yy28: {
                 CHECK_TRAILING_CHAR();
                 // decimal: allow underscores, optional 'd' suffix
                 std::string digits = std::string(tok, p);
@@ -564,18 +563,18 @@ yy29: {
                 PUSH_TOKEN2(TokenType::Integer, value);
                 continue;
             }
-yy30:
+yy29:
             yyaccept = 1;
             marker = ++p;
 yyFillLabel11:
             yych = *p;
-yy31:
+yy30:
             switch (yych) {
             case '.':
                 goto yy71;
             case '0':
             case '1':
-                goto yy30;
+                goto yy29;
             case '2':
             case '3':
             case '4':
@@ -584,7 +583,7 @@ yy31:
             case '7':
             case '8':
             case '9':
-                goto yy32;
+                goto yy31;
             case 'A':
             case 'C':
             case 'E':
@@ -611,9 +610,9 @@ yy31:
                         goto yyFillLabel11;
                     }
                 }
-                goto yy29;
+                goto yy28;
             }
-yy32:
+yy31:
             yyaccept = 1;
             marker = ++p;
 yyFillLabel12:
@@ -631,7 +630,7 @@ yyFillLabel12:
             case '7':
             case '8':
             case '9':
-                goto yy32;
+                goto yy31;
             case 'A':
             case 'B':
             case 'C':
@@ -657,20 +656,20 @@ yyFillLabel12:
                         goto yyFillLabel12;
                     }
                 }
-                goto yy29;
+                goto yy28;
             }
-yy33:
+yy32:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::Colon);
                 continue;
             }
-yy34:
+yy33:
             ++p;
             {
                 goto eof;
             }
-yy35:
+yy34:
             ++p;
 yyFillLabel13:
             yych = *p;
@@ -687,9 +686,9 @@ yyFillLabel13:
                         goto yyFillLabel13;
                     }
                 }
-                goto yy36;
+                goto yy35;
             }
-yy36: {
+yy35: {
                 if (raw_strings) {
                     end_quote = '>';
                     string_start = tok;
@@ -700,7 +699,7 @@ yy36: {
                     continue;
                 }
             }
-yy37:
+yy36:
             ++p;
 yyFillLabel14:
             yych = *p;
@@ -713,13 +712,13 @@ yyFillLabel14:
                         goto yyFillLabel14;
                     }
                 }
-                goto yy38;
+                goto yy37;
             }
-yy38: {
+yy37: {
                 PUSH_TOKEN1(TokenType::EQ);
                 continue;
             }
-yy39:
+yy38:
             ++p;
 yyFillLabel15:
             yych = *p;
@@ -734,19 +733,19 @@ yyFillLabel15:
                         goto yyFillLabel15;
                     }
                 }
-                goto yy40;
+                goto yy39;
             }
-yy40: {
+yy39: {
                 PUSH_TOKEN1(TokenType::GT);
                 continue;
             }
-yy41:
+yy40:
             ++p;
             {
                 PUSH_TOKEN1(TokenType::Quest);
                 continue;
             }
-yy42:
+yy41:
             yyaccept = 2;
             marker = ++p;
 yyFillLabel16:
@@ -817,7 +816,11 @@ yyFillLabel16:
                         goto yyFillLabel16;
                     }
                 }
-                goto yy2;
+                goto yy42;
+            }
+yy42: {
+                PUSH_TOKEN1(TokenType::At);
+                continue;
             }
 yy43:
             yyaccept = 3;
@@ -1130,11 +1133,11 @@ yy61:
             p = marker;
             switch (yyaccept) {
             case 0:
-                goto yy13;
+                goto yy12;
             case 1:
-                goto yy29;
+                goto yy28;
             case 2:
-                goto yy2;
+                goto yy42;
             case 3:
                 goto yy44;
             case 4:
@@ -1407,7 +1410,7 @@ yyFillLabel28:
                         goto yyFillLabel28;
                     }
                 }
-                goto yy29;
+                goto yy28;
             }
 yy76:
             ++p;
@@ -1469,7 +1472,7 @@ yyFillLabel30:
             switch (yych) {
             case '0':
             case '1':
-                goto yy30;
+                goto yy29;
             case '2':
             case '3':
             case '4':
@@ -1478,7 +1481,7 @@ yyFillLabel30:
             case '7':
             case '8':
             case '9':
-                goto yy32;
+                goto yy31;
             case 'A':
             case 'B':
             case 'C':
@@ -1559,7 +1562,7 @@ yyFillLabel32:
             case '7':
             case '8':
             case '9':
-                goto yy32;
+                goto yy31;
             case 'A':
             case 'B':
             case 'C':
@@ -1597,7 +1600,7 @@ yy82:
             }
 yy83:
             ++p;
-            goto yy38;
+            goto yy37;
 yy84:
             ++p;
             {
