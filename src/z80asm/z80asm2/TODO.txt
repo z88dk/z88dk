@@ -1,6 +1,6 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
-- fix tests for path normalization failing on other platforms
+- fix tests for path normalization failing on other platforms (Ubuntu, MacOS)
 - issue error if IF stack is not empty at the end of input
 - keep cache of all TokensFile's read indexed by absolute pathname
   use a pointer to the object in the cache in the FileStack
