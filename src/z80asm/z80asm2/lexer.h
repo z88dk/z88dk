@@ -56,6 +56,8 @@ enum class TokenType {
     Colon,
     Hash,
     DoubleHash,
+    At,
+    Dollar,
 };
 
 class Token {

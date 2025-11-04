@@ -12,7 +12,13 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <set>
 #include <sstream>
+#include <sys/stat.h>
+
+// Initialize static file cache
+std::unordered_map<std::string, Preprocessor::CachedFile>
+Preprocessor::file_cache_;
 
 void Preprocessor::clear() {
     input_queue_.clear();
@@ -22,26 +28,36 @@ void Preprocessor::clear() {
     if_stack_.clear();
 }
 
+void Preprocessor::clear_file_cache() {
+    file_cache_.clear();
+}
+
 void Preprocessor::push_file(const std::string& filename) {
     // Normalize the path to ensure consistent filenames in locations
     std::string normalized_filename = normalize_path(filename);
 
     // Check if this file is already on the stack (recursive include detection)
     for (const File& f : file_stack_) {
-        if (f.tokens_file.filename() == normalized_filename) {
-            g_errors.error(ErrorCode::RecursiveInclude, normalized_filename);
+        if (f.tokens_file &&
+                f.tokens_file->filename() == normalized_filename) {
+            g_errors.error(ErrorCode::RecursiveInclude,
+                           normalized_filename);
 
             // Clear the file stack and input queue to stop all processing
             file_stack_.clear();
             input_queue_.clear();
+            if_stack_.clear();
             return;
         }
     }
 
-    // Take ownership copy of the file on the file stack
-    // so its token lines remain valid.
+    // Get or create cached file
+    std::shared_ptr<TokensFile> cached_tokens = get_cached_file(
+                normalized_filename);
+
+    // Take ownership via shared_ptr
     File f;
-    f.tokens_file = TokensFile(normalized_filename, 1);
+    f.tokens_file = cached_tokens;
     f.line_index = 0;
     f.has_forced_location = false;
     f.forced_constant_line_numbers = false;
@@ -54,8 +70,9 @@ void Preprocessor::push_virtual_file(const std::string& content,
                                      int first_line_num,
                                      bool inc_line_nums) {
     File vf;
-    vf.tokens_file = TokensFile(content, filename,
-                                first_line_num, inc_line_nums);
+    vf.tokens_file = std::make_shared<TokensFile>(content, filename,
+                     first_line_num,
+                     inc_line_nums);
     vf.line_index = 0;
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
@@ -68,8 +85,8 @@ void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
                                      int first_line_num,
                                      bool inc_line_nums) {
     File vf;
-    vf.tokens_file = TokensFile(tok_lines, filename,
-                                first_line_num, inc_line_nums);
+    vf.tokens_file = std::make_shared<TokensFile>(tok_lines, filename,
+                     first_line_num, inc_line_nums);
     vf.line_index = 0;
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
@@ -189,14 +206,14 @@ bool Preprocessor::next_line(TokensLine& line) {
         }
 
         File& file = file_stack_.back();
-        if (file.line_index >= file.tokens_file.tok_lines_count()) {
+        if (file.line_index >= file.tokens_file->tok_lines_count()) {
             // end of file reached; pop file from stack
             file_stack_.pop_back();
             continue;
         }
 
         // get next line from file (physical or virtual)
-        line = file.tokens_file.get_tok_line(file.line_index);
+        line = file.tokens_file->get_tok_line(file.line_index);
         ++file.line_index;
 
         // Compute logical location here based on current file mapping.
@@ -215,7 +232,7 @@ bool Preprocessor::next_line(TokensLine& line) {
                     loc.set_filename(file.forced_filename);
                 }
                 else {
-                    loc.set_filename(file.tokens_file.filename());
+                    loc.set_filename(file.tokens_file->filename());
                 }
 
                 if (file.forced_constant_line_numbers) {
@@ -234,7 +251,7 @@ bool Preprocessor::next_line(TokensLine& line) {
             }
             else {
                 // Default mapping uses the physical line number provided by TokensLine
-                loc.set_filename(file.tokens_file.filename());
+                loc.set_filename(file.tokens_file->filename());
                 loc.set_line_num(physical_line);
             }
 
@@ -333,6 +350,7 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
                                      std::vector<std::string>& out_params
                                     ) const {
     out_params.clear();
+    std::set<std::string> seen_params;
     unsigned j = i;
     line.skip_spaces(j);
 
@@ -357,7 +375,15 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
         line.skip_spaces(j);
         if (expect_ident) {
             if (j < line.size() && line[j].is(TokenType::Identifier)) {
-                out_params.push_back(line[j].text());
+                const std::string& param_name = line[j].text();
+
+                // Check for duplicate parameter name
+                if (seen_params.find(param_name) != seen_params.end()) {
+                    g_errors.error(ErrorCode::DuplicateDefinition,
+                                   param_name);
+                }
+                seen_params.insert(param_name);
+                out_params.push_back(param_name);
                 ++j;
                 expect_ident = false;
                 continue;
@@ -962,7 +988,7 @@ void Preprocessor::process_line(const TokensLine& line, unsigned& i) {
     }
     else {
         // If no filename provided, keep existing logical filename
-        file.forced_filename = file.tokens_file.filename();
+        file.forced_filename = file.tokens_file->filename();
     }
 }
 
@@ -990,7 +1016,7 @@ void Preprocessor::process_c_line(const TokensLine& line, unsigned& i) {
     }
     else {
         // If no filename provided, keep existing logical filename
-        file.forced_filename = file.tokens_file.filename();
+        file.forced_filename = file.tokens_file->filename();
     }
 }
 
@@ -1246,12 +1272,12 @@ bool Preprocessor::fetch_line_for_macro_body(TokensLine& out) {
     }
 
     File& file = file_stack_.back();
-    if (file.line_index >= file.tokens_file.tok_lines_count()) {
+    if (file.line_index >= file.tokens_file->tok_lines_count()) {
         return false;
     }
 
     // Return the raw stored line; next_line() will handle user-visible mapping.
-    out = file.tokens_file.get_tok_line(file.line_index);
+    out = file.tokens_file->get_tok_line(file.line_index);
     ++file.line_index;
 
     return true;
@@ -1338,6 +1364,56 @@ bool Preprocessor::collect_macro_body(std::vector<TokensLine>& out_body,
     return ok;
 }
 
+// Helper to get file modification time
+static std::time_t get_file_mod_time(const std::string& filename) {
+#ifdef _WIN32
+    struct _stat file_stat;
+    if (_stat(filename.c_str(), &file_stat) == 0) {
+        return file_stat.st_mtime;
+    }
+#else
+    struct stat file_stat;
+    if (stat(filename.c_str(), &file_stat) == 0) {
+        return file_stat.st_mtime;
+    }
+#endif
+    return 0; // Return 0 if stat fails
+}
+
+std::shared_ptr<TokensFile> Preprocessor::get_cached_file(
+    const std::string& normalized_filename) {
+    // Get the absolute path for cache indexing
+    std::string abs_path = absolute_path(normalized_filename);
+
+    // Get current modification time
+    std::time_t current_mod_time = get_file_mod_time(abs_path);
+
+    // Check if file is in cache
+    auto it = file_cache_.find(abs_path);
+    if (it != file_cache_.end()) {
+        // Check if cached version is still valid
+        if (it->second.mod_time >= current_mod_time &&
+                current_mod_time != 0) {
+            // Cache hit - file hasn't been modified
+            return it->second.tokens_file;
+        }
+        // File was modified - remove stale entry
+        file_cache_.erase(it);
+    }
+
+    // Cache miss or stale entry - read and tokenize the file
+    auto tokens_file = std::make_shared<TokensFile>(
+                           normalized_filename, 1);
+
+    // Add to cache
+    CachedFile cached;
+    cached.tokens_file = tokens_file;
+    cached.mod_time = current_mod_time;
+    file_cache_[abs_path] = cached;
+
+    return tokens_file;
+}
+
 void Preprocessor::process_macro(const TokensLine& line, unsigned& i) {
     // Expect: MACRO name(param, ...) or MACRO name param, ...
     std::string name;
@@ -1370,7 +1446,6 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     if (j < line.size()) {
         if (!parse_params_list(line, j, params)) {
             g_errors.error(ErrorCode::InvalidSyntax, "Invalid macro parameter list");
-            return;
         }
     }
     expect_end(line, j);
@@ -1945,7 +2020,9 @@ void Preprocessor::split_line(const Location& location,
     unsigned i = 0;
 
     // check for label at start of line (uses processed line)
-    split_label(location, line_to_process, i);
+    while (split_label(location, line_to_process, i)) {
+        ;
+    }
 
     // process rest of line
     while (i < line_to_process.size()) {
@@ -2007,13 +2084,13 @@ void Preprocessor::split_line(const Location& location,
     }
 }
 
-void Preprocessor::split_label(const Location& location,
+bool Preprocessor::split_label(const Location& location,
                                const TokensLine& expanded, unsigned& i) {
-
+    unsigned start = i;
     TokensLine label_line(location);
 
     // label:
-    i = 0; // rewind
+    i = start; // rewind
     expanded.skip_spaces(i);
     if (i < expanded.size() && expanded[i].is(TokenType::Identifier)) {
         std::string label_name = expanded[i].text();
@@ -2027,12 +2104,12 @@ void Preprocessor::split_label(const Location& location,
             input_queue_.push_back(std::move(label_line));
 
             expanded.skip_spaces(i);
-            return;
+            return true;
         }
     }
 
     // .label
-    i = 0; // rewind
+    i = start; // rewind
     expanded.skip_spaces(i);
     if (i < expanded.size() && expanded[i].is(TokenType::Dot)) {
         ++i;
@@ -2046,12 +2123,13 @@ void Preprocessor::split_label(const Location& location,
             input_queue_.push_back(std::move(label_line));
 
             expanded.skip_spaces(i);
-            return;
+            return true;
         }
     }
 
-    i = 0; // rewind
+    i = start; // rewind
     expanded.skip_spaces(i);
+    return false;
 }
 
 void Preprocessor::merge_double_hash(TokensLine& line) {
