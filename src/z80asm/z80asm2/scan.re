@@ -126,12 +126,6 @@ main_loop:
             continue;
         }
 
-        '$'		{
-            str = "ASMPC";
-            Token t(TokenType::Identifier, str, keyword_lookup(str));
-            output.push_back(t);
-        }
-
         $       { goto eof; }
         ';'     { goto eof; }
         '//'    { goto eof; }
@@ -197,6 +191,8 @@ main_loop:
         '|'		{ PUSH_TOKEN1(TokenType::BitwiseOr); continue; }
         '||'		{ PUSH_TOKEN1(TokenType::LogicalOr); continue; }
         '~'		{ PUSH_TOKEN1(TokenType::BitwiseNot); continue; }
+        '@'		{ PUSH_TOKEN1(TokenType::At); continue; }
+        '$'		{ PUSH_TOKEN1(TokenType::Dollar); continue; }
 
         mantissau expu? 	{
             CHECK_TRAILING_CHAR();
