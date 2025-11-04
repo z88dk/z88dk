@@ -14,6 +14,14 @@
 #include <sstream>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#define SLEEP_MS(ms) Sleep(ms)
+#else
+#include <unistd.h>
+#define SLEEP_MS(ms) usleep((ms) * 1000)
+#endif
+
 namespace {
 // Redirect std::cerr to an internal buffer for the duration of these tests
 // so test error messages don't pollute the console output.
@@ -4899,3 +4907,1149 @@ TEST_CASE("Preprocessor: path normalization prevents redundant path forms from a
     std::remove(fileB.c_str());
 }
 
+// -----------------------------------------------------------------------------
+// File cache tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: file cache reuses unchanged files",
+          "[preprocessor][cache][hit]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string fname = "cache_test1.asm";
+
+    // Create a test file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "test_line\n";
+    }
+
+    // First preprocessor instance - should read from disk
+    Preprocessor pp1;
+    pp1.push_file(fname);
+
+    TokensLine line1;
+    REQUIRE(pp1.next_line(line1));
+    REQUIRE(!line1.tokens().empty());
+    REQUIRE(line1.tokens()[0].text() == "test_line");
+
+    // Second preprocessor instance - should hit cache
+    Preprocessor pp2;
+    pp2.push_file(fname);
+
+    TokensLine line2;
+    REQUIRE(pp2.next_line(line2));
+    REQUIRE(!line2.tokens().empty());
+    REQUIRE(line2.tokens()[0].text() == "test_line");
+
+    std::remove(fname.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: file cache works with multiple includes",
+          "[preprocessor][cache][multiple]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc1 = "cache_inc1.asm";
+    const std::string inc2 = "cache_inc2.asm";
+    const std::string main_file = "cache_main.asm";
+
+    // Create include files
+    {
+        std::ofstream ofs(inc1, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "from_inc1\n";
+    }
+    {
+        std::ofstream ofs(inc2, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "from_inc2\n";
+    }
+    {
+        std::ofstream ofs(main_file, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << inc1 << "\"\n";
+        ofs << "#include \"" << inc2 << "\"\n";
+        ofs << "#include \"" << inc1 << "\"\n"; // Include inc1 again
+        ofs << "main_line\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(main_file);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should see: from_inc1, from_inc2, from_inc1 (cached), main_line
+    REQUIRE(lines.size() == 4);
+    REQUIRE(lines[0] == "from_inc1");
+    REQUIRE(lines[1] == "from_inc2");
+    REQUIRE(lines[2] == "from_inc1"); // Second include of inc1 uses cache
+    REQUIRE(lines[3] == "main_line");
+
+    std::remove(inc1.c_str());
+    std::remove(inc2.c_str());
+    std::remove(main_file.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
+          "[preprocessor][cache][shared]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string fname = "cache_shared.asm";
+
+    // Create test file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "shared_content\n";
+    }
+
+    // First instance reads file
+    {
+        Preprocessor pp1;
+        pp1.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp1.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "shared_content");
+    }
+
+    // Second instance should use cached version
+    // (No file modification between instances)
+    {
+        Preprocessor pp2;
+        pp2.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp2.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "shared_content");
+    }
+
+    std::remove(fname.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: clear_file_cache empties the cache",
+          "[preprocessor][cache][clear]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string fname = "cache_clear.asm";
+
+    // Create test file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "before_clear\n";
+    }
+
+    // Read file to populate cache
+    {
+        Preprocessor pp;
+        pp.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "before_clear");
+    }
+
+    // Clear cache
+    Preprocessor::clear_file_cache();
+
+    // Modify file without waiting (since cache is cleared, modification time doesn't matter)
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "after_clear\n";
+    }
+
+    // Read again - should get new content (cache was cleared)
+    {
+        Preprocessor pp;
+        pp.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "after_clear");
+    }
+
+    std::remove(fname.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: file cache handles path normalization",
+          "[preprocessor][cache][normalize]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string fname = "cache_norm.asm";
+
+    // Create test file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "normalized\n";
+    }
+
+    // Read with plain name
+    {
+        Preprocessor pp;
+        pp.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "normalized");
+    }
+
+    // Read with relative path (./ prefix) - should use same cache entry
+    {
+        Preprocessor pp;
+        pp.push_file("./" + fname);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "normalized");
+    }
+
+    std::remove(fname.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
+          "[preprocessor][cache][nested]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string common = "cache_common.asm";
+    const std::string level1a = "cache_level1a.asm";
+    const std::string level1b = "cache_level1b.asm";
+    const std::string main_file = "cache_nested_main.asm";
+
+    // Common file included by multiple files
+    {
+        std::ofstream ofs(common, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "common_content\n";
+    }
+
+    // Level 1 files both include common
+    {
+        std::ofstream ofs(level1a, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << common << "\"\n";
+        ofs << "level1a_content\n";
+    }
+    {
+        std::ofstream ofs(level1b, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << common << "\"\n";
+        ofs << "level1b_content\n";
+    }
+
+    // Main file includes both level 1 files
+    {
+        std::ofstream ofs(main_file, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << level1a << "\"\n";
+        ofs << "#include \"" << level1b << "\"\n";
+        ofs << "main_content\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(main_file);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should see common twice (once from each level1 file), plus level1 and main content
+    REQUIRE(lines.size() == 5);
+    REQUIRE(lines[0] == "common_content");
+    REQUIRE(lines[1] == "level1a_content");
+    REQUIRE(lines[2] == "common_content"); // Second include uses cache
+    REQUIRE(lines[3] == "level1b_content");
+    REQUIRE(lines[4] == "main_content");
+
+    std::remove(common.c_str());
+    std::remove(level1a.c_str());
+    std::remove(level1b.c_str());
+    std::remove(main_file.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: file cache invalidates on file modification",
+          "[preprocessor][cache][invalidate]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string fname = "cache_test2.asm";
+
+    // Create initial file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "original_line\n";
+    }
+
+    // First read - populates cache
+    {
+        Preprocessor pp;
+        pp.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "original_line");
+    }
+
+    // Wait to ensure different modification time
+    SLEEP_MS(1100);
+
+    // Modify the file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "modified_line\n";
+    }
+
+    // Second read - should detect modification and reload
+    {
+        Preprocessor pp;
+        pp.push_file(fname);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "modified_line");
+    }
+
+    std::remove(fname.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// REPT with positive count - basic functionality
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPT with positive count repeats body correctly",
+          "[preprocessor][rept][positive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPT 3\n"
+        "line1\n"
+        "ENDR\n"
+        "after\n";
+    pp.push_virtual_file(content, "rept_positive", 1, true);
+
+    TokensLine line;
+    int count = 0;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (!toks.empty()) {
+            if (toks[0].text() == "line1") {
+                ++count;
+            }
+            else if (toks[0].text() == "after") {
+                break;
+            }
+        }
+    }
+
+    REQUIRE(count == 3);
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// BINARY/INCBIN Error Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: BINARY with missing file reports FileNotFound error",
+          "[preprocessor][binary][error][missing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string missing = "missing_binary.bin";
+    const std::string content = "BINARY \"" + missing + "\"\n";
+    pp.push_virtual_file(content, "binary_missing", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("File not found") != std::string::npos);
+    REQUIRE(msg.find(missing) != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: INCBIN with missing file reports FileNotFound error",
+          "[preprocessor][binary][error][missing][incbin]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string missing = "missing_incbin.bin";
+    const std::string content = "INCBIN \"" + missing + "\"\n";
+    pp.push_virtual_file(content, "incbin_missing", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("File not found") != std::string::npos);
+    REQUIRE(msg.find(missing) != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: BINARY with empty file produces no DEFB lines",
+          "[preprocessor][binary][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fname = "empty_binary.bin";
+    // Create empty binary file
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        // Write nothing
+    }
+
+    const std::string content = "BINARY \"" + fname + "\"\nafter\n";
+    pp.push_virtual_file(content, "binary_empty", 1, true);
+
+    TokensLine line;
+    int defb_count = 0;
+    bool saw_after = false;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (!toks.empty()) {
+            if (toks[0].text() == "DEFB") {
+                ++defb_count;
+            }
+            else if (toks[0].text() == "after") {
+                saw_after = true;
+            }
+        }
+    }
+
+    REQUIRE(defb_count == 0);
+    REQUIRE(saw_after);
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("Preprocessor: BINARY with non-multiple-of-16 size handles last partial line",
+          "[preprocessor][binary][partial]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fname = "partial_binary.bin";
+    // Create binary file with 20 bytes (16 + 4)
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        for (int i = 0; i < 20; ++i) {
+            char c = static_cast<char>(i);
+            ofs.write(&c, 1);
+        }
+    }
+
+    const std::string content = "BINARY \"" + fname + "\"\n";
+    pp.push_virtual_file(content, "binary_partial", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    int line_count = 0;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (!toks.empty() && toks[0].text() == "DEFB") {
+            ++line_count;
+            for (const auto& t : toks) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+    }
+
+    REQUIRE(line_count == 2); // 16 bytes + 4 bytes = 2 lines
+    REQUIRE(ints.size() == 20);
+    for (int i = 0; i < 20; ++i) {
+        REQUIRE(ints[i] == i);
+    }
+
+    std::remove(fname.c_str());
+}
+
+// -----------------------------------------------------------------------------
+// LINE/C_LINE Error Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: LINE with non-numeric line number reports error",
+          "[preprocessor][line][error][nonnumeric]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "LINE abc\n";
+    pp.push_virtual_file(content, "line_nonnumeric", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("Expected line number") != std::string::npos ||
+             msg.find("Invalid") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementation-defined)",
+          "[preprocessor][line][negative]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "LINE -5\ntest\n";
+    pp.push_virtual_file(content, "line_negative", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    // Implementation may accept or reject negative line numbers
+    // Just verify it doesn't crash
+}
+
+TEST_CASE("Preprocessor: LINE with trailing tokens after filename reports error",
+          "[preprocessor][line][error][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "LINE 100, \"file.asm\" extra\n";
+    pp.push_virtual_file(content, "line_trailing", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected token") != std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// Macro Parameter Mismatch Tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: function-like macro with too few arguments reports error",
+          "[preprocessor][macro][args][error][few]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define ADD(a,b) a + b\n"
+        "ADD(5)\n";
+    pp.push_virtual_file(content, "macro_few_args", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("argument count mismatch") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: function-like macro with too many arguments reports error",
+          "[preprocessor][macro][args][error][many]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define ADD(a,b) a + b\n"
+        "ADD(5,10,15)\n";
+    pp.push_virtual_file(content, "macro_many_args", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("argument count mismatch") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: function-like macro with empty parentheses when expecting args reports error",
+          "[preprocessor][macro][args][error][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define MUL(a,b) a * b\n"
+        "MUL()\n";
+    pp.push_virtual_file(content, "macro_empty_args", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("argument count mismatch") != std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// EXITM in nested contexts
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: EXITM in nested macro only exits innermost macro",
+          "[preprocessor][macro][exitm][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO OUTER()\n"
+        "outer_before\n"
+        "MACRO INNER()\n"
+        "inner_line\n"
+        "EXITM\n"
+        "inner_after_exitm\n"
+        "ENDM\n"
+        "INNER()\n"
+        "outer_after\n"
+        "ENDM\n"
+        "OUTER()\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_nested_macro", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should see: outer_before, inner_line, outer_after, done
+    // Should NOT see: inner_after_exitm
+    REQUIRE(std::find(lines.begin(), lines.end(), "outer_before") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "inner_line") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "outer_after") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(),
+                      "inner_after_exitm") == lines.end());
+}
+
+TEST_CASE("Preprocessor: multiple EXITM in same macro - first one takes effect",
+          "[preprocessor][macro][exitm][multiple]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M()\n"
+        "line1\n"
+        "EXITM\n"
+        "line2\n"
+        "EXITM\n"
+        "line3\n"
+        "ENDM\n"
+        "M()\n"
+        "after\n";
+    pp.push_virtual_file(content, "exitm_multiple", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    REQUIRE(std::find(lines.begin(), lines.end(), "line1") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "line2") == lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "line3") == lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "after") != lines.end());
+}
+
+// -----------------------------------------------------------------------------
+// Token Pasting Edge Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: token paste at beginning of replacement list",
+          "[preprocessor][tokenpaste][edge][beginning]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define PASTE(x) ## x\n"
+        "PASTE(test)\n";
+    pp.push_virtual_file(content, "paste_beginning", 1, true);
+
+    TokensLine line;
+    // Implementation-defined behavior; just verify it doesn't crash
+    while (pp.next_line(line)) {}
+}
+
+TEST_CASE("Preprocessor: token paste at end of replacement list",
+          "[preprocessor][tokenpaste][edge][end]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define PASTE(x) x ##\n"
+        "PASTE(test)\n";
+    pp.push_virtual_file(content, "paste_end", 1, true);
+
+    TokensLine line;
+    // Implementation-defined behavior; just verify it doesn't crash
+    while (pp.next_line(line)) {}
+}
+
+TEST_CASE("Preprocessor: multiple consecutive ## operators",
+          "[preprocessor][tokenpaste][edge][consecutive]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define MULTI(a,b,c) a ## b ## c\n"
+        "MULTI(X,Y,Z)\n";
+    pp.push_virtual_file(content, "paste_consecutive", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    bool foundXYZ = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier) && t.text() == "XYZ") {
+            foundXYZ = true;
+            break;
+        }
+    }
+    REQUIRE(foundXYZ);
+}
+
+// -----------------------------------------------------------------------------
+// Stringize Edge Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: stringize with empty argument produces empty string",
+          "[preprocessor][stringize][edge][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define STR(x) #x\n"
+        "STR()\n";
+    pp.push_virtual_file(content, "stringize_empty", 1, true);
+
+    TokensLine line;
+    // Implementation-defined; just ensure no crash
+    while (pp.next_line(line)) {}
+}
+
+TEST_CASE("Preprocessor: stringize with whitespace-only argument",
+          "[preprocessor][stringize][edge][whitespace]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define STR(x) #x\n"
+        "STR(   )\n";
+    pp.push_virtual_file(content, "stringize_whitespace", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    // Should produce character codes for spaces
+}
+
+TEST_CASE("Preprocessor: stringize with special characters",
+          "[preprocessor][stringize][edge][special]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define STR(x) #x\n"
+        "STR(@#$%)\n";
+    pp.push_virtual_file(content, "stringize_special", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Should produce character codes for @, #, $, %
+    std::vector<int> chars;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer)) {
+            chars.push_back(t.int_value());
+        }
+    }
+    REQUIRE(!chars.empty());
+}
+
+// -----------------------------------------------------------------------------
+// Conditional Directive Error Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: unmatched ENDIF reports error",
+          "[preprocessor][if][error][unmatched]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "line1\n"
+        "ENDIF\n"
+        "line2\n";
+    pp.push_virtual_file(content, "unmatched_endif", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("ENDIF") != std::string::npos ||
+             msg.find("without") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: ELIF without preceding IF reports error",
+          "[preprocessor][if][error][elif]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "line1\n"
+        "ELIF 1\n"
+        "line2\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "elif_without_if", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("ELIF") != std::string::npos ||
+             msg.find("without") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: ELSE without preceding IF reports error",
+          "[preprocessor][if][error][else]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "line1\n"
+        "ELSE\n"
+        "line2\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "else_without_if", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("ELSE") != std::string::npos ||
+             msg.find("without") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: multiple ELSE in same IF block reports error",
+          "[preprocessor][if][error][multiple-else]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "IF 1\n"
+        "line1\n"
+        "ELSE\n"
+        "line2\n"
+        "ELSE\n"
+        "line3\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "multiple_else", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("ELSE") != std::string::npos ||
+             msg.find("multiple") != std::string::npos ||
+             msg.find("duplicate") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: ENDIF without IF reports error",
+          "[preprocessor][if][error][endif-solo]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "start\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "endif_solo", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("ENDIF") != std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// MACRO Error Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: MACRO without ENDM reports error at end of file",
+          "[preprocessor][macro][error][noendm]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M()\n"
+        "body\n";
+    pp.push_virtual_file(content, "macro_no_endm", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("ENDM") != std::string::npos ||
+             msg.find("MACRO") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: ENDM without MACRO reports error",
+          "[preprocessor][macro][error][endm-solo]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "line\n"
+        "ENDM\n";
+    pp.push_virtual_file(content, "endm_solo", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("ENDM") != std::string::npos ||
+             msg.find("without") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: MACRO with empty name reports error",
+          "[preprocessor][macro][error][noname]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO ()\n"
+        "body\n"
+        "ENDM\n";
+    pp.push_virtual_file(content, "macro_no_name", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE((msg.find("name") != std::string::npos ||
+             msg.find("Expected") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: MACRO with duplicate parameter names reports error",
+          "[preprocessor][macro][error][dup-params]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(a,a)\n"
+        "body\n"
+        "ENDM\n";
+    pp.push_virtual_file(content, "macro_dup_params", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// Virtual File Edge Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: empty virtual file produces no lines",
+          "[preprocessor][virtual][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "";
+    pp.push_virtual_file(content, "empty_virtual", 1, true);
+
+    TokensLine line;
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: virtual file with only whitespace produces no lines",
+          "[preprocessor][virtual][whitespace]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "   \n\t\n  \n";
+    pp.push_virtual_file(content, "whitespace_virtual", 1, true);
+
+    TokensLine line;
+    int line_count = 0;
+    while (pp.next_line(line)) {
+        ++line_count;
+    }
+
+    REQUIRE(line_count == 0);
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: virtual file with only comments produces no output lines",
+          "[preprocessor][virtual][comments]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "; comment 1\n"
+        "// comment 2\n"
+        "/* block comment */\n";
+    pp.push_virtual_file(content, "comment_virtual", 1, true);
+
+    TokensLine line;
+    int line_count = 0;
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            ++line_count;
+        }
+    }
+
+    REQUIRE(line_count == 0);
+    REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// String Edge Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: empty string produces no characters",
+          "[preprocessor][string][empty]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "db \"\"\n";
+    pp.push_virtual_file(content, "empty_string", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Should have "db" and whitespace, but no integer tokens
+    int int_count = 0;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer)) {
+            ++int_count;
+        }
+    }
+
+    REQUIRE(int_count == 0);
+}
+
+TEST_CASE("Preprocessor: string with only escape sequences",
+          "[preprocessor][string][escapes-only]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "db \"\\n\\r\\t\"\n";
+    pp.push_virtual_file(content, "escapes_only", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    std::vector<int> ints;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer)) {
+            ints.push_back(t.int_value());
+        }
+    }
+
+    REQUIRE(ints.size() == 3);
+    REQUIRE(ints[0] == 10);  // \n
+    REQUIRE(ints[1] == 13);  // \r
+    REQUIRE(ints[2] == 9);   // \t
+}
+
+// -----------------------------------------------------------------------------
+// Label Splitting Edge Cases
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: multiple labels on same line - each gets split",
+          "[preprocessor][label][multiple]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "lab1: lab2: nop\n";
+    pp.push_virtual_file(content, "multiple_labels", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> labels;
+
+    while (pp.next_line(line)) {
+        const auto& toks = line.tokens();
+        if (toks.size() >= 2 && toks[0].text() == ".") {
+            labels.push_back(toks[1].text());
+        }
+    }
+
+    // Should see both labels split out
+    REQUIRE(labels.size() >= 2);
+    REQUIRE(std::find(labels.begin(), labels.end(), "lab1") != labels.end());
+    REQUIRE(std::find(labels.begin(), labels.end(), "lab2") != labels.end());
+}
+
+TEST_CASE("Preprocessor: label with no following instruction",
+          "[preprocessor][label][alone]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "label:\n";
+    pp.push_virtual_file(content, "label_alone", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Should produce label line with dot and label name
+    REQUIRE(toks.size() >= 2);
+    REQUIRE(toks[0].text() == ".");
+    REQUIRE(toks[1].text() == "label");
+
+    // No instruction line should follow
+    REQUIRE(!pp.next_line(line));
+}

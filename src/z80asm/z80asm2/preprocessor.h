@@ -14,6 +14,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <memory>
+#include <ctime>
 
 class Preprocessor {
 public:
@@ -21,6 +23,9 @@ public:
 
     // Clear all state (stack, macros, recursion counters)
     void clear();
+
+    // Clear the global file cache
+    static void clear_file_cache();
 
     // Push a TokensFile constructed from a file.
     void push_file(const std::string& filename);
@@ -61,8 +66,14 @@ private:
         bool is_function_like = false;
     };
 
+    // Cache entry for a file
+    struct CachedFile {
+        std::shared_ptr<TokensFile> tokens_file;
+        std::time_t mod_time;
+    };
+
     struct File {
-        TokensFile tokens_file;
+        std::shared_ptr<TokensFile> tokens_file; // Pointer to cached or virtual file
         unsigned line_index = 0;
 
         // Optional forced logical location (from LINE/C_LINE)
@@ -81,6 +92,9 @@ private:
         bool any_taken = false;     // whether any previous branch in this chain matched
         bool seen_else = false;     // whether ELSE already occurred
     };
+
+    // Global file cache (static, shared across all Preprocessor instances)
+    static std::unordered_map<std::string, CachedFile> file_cache_;
 
     // Queue of tokenized lines waiting to be processed/consumed.
     std::deque<TokensLine> input_queue_;
@@ -109,6 +123,10 @@ private:
     bool collect_macro_body(std::vector<TokensLine>& out_body,
                             std::vector<std::string>& out_locals,
                             Keyword start_keyword, Keyword end_keyword);
+
+    // Helper to get or create a cached file
+    std::shared_ptr<TokensFile> get_cached_file(const std::string&
+            normalized_filename);
 
     // Helpers
     void expect_end(const TokensLine& line, unsigned i) const;
@@ -234,7 +252,7 @@ private:
     void split_lines(const Location& location,
                      const std::vector<TokensLine>& expanded);
     void split_line(const Location& location, const TokensLine& expanded);
-    void split_label(const Location& location,
+    bool split_label(const Location& location,
                      const TokensLine& expanded, unsigned& i);
     void merge_double_hash(TokensLine& line);
 
