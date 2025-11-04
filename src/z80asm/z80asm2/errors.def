@@ -6,6 +6,7 @@
 
 X(CommandFailed, "Command failed")
 X(DivisionByZero, "Division by zero")
+X(DuplicateDefinition, "Duplicate definition")
 X(ExternSymbol, "Extern symbol")
 X(FileNotFound, "File not found")
 X(FileOpenError, "Error opening file")
