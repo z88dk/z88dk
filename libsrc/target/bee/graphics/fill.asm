@@ -65,7 +65,7 @@ petelka:
     bit     3, c                        ; indeks_ws1 == 0
     jr      nz, noret
 
-    ld      hl, _GFX__GFX_MAXX*2*3*2
+    ld      hl, _GFX_MAXX*2*3*2
     add     hl, sp
     ld      sp, hl
     ret
