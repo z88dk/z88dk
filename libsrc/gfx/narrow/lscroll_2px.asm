@@ -14,8 +14,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _lscroll_2px
     PUBLIC  ___lscroll_2px
     EXTERN  pixeladdress
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "graphics/grafix.inc"
 
@@ -28,8 +28,8 @@ _lscroll_2px:
 ___lscroll_2px:
 
 
-  IF    _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
 ; 2 blank pixel columns on the left
@@ -145,8 +145,8 @@ loop:
     or c
     jr nz,loop
 
-  IF    _GFX_PAGE_VRAM
-    call    __gfx_page_vram_out
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_out
   ENDIF
     ret
 

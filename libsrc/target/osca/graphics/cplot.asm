@@ -17,8 +17,8 @@
 
         PUBLIC  cplot
         PUBLIC  _cplot
-        EXTERN  __gfx_page_vram_in
-        EXTERN  __gfx_page_vram_out
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
 
         EXTERN  cplotpixel
 
@@ -35,7 +35,7 @@ _cplot:
         ld      a, c
         ex      af, af
 
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
         call    cplotpixel
-        jp      __gfx_page_vram_out
+        jp      __gfx_vram_page_out
 

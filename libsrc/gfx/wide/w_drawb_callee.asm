@@ -9,7 +9,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     EXTERN  w_plotpixel
     EXTERN  drawbox
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -21,7 +21,7 @@ _drawb_callee:
 
     pop     de
     pop     hl
-    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de
     pop     hl
 
@@ -32,8 +32,8 @@ _drawb_callee:
 asm_drawb:
 
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      ix, w_plotpixel
     call    drawbox

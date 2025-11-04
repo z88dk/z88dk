@@ -3,7 +3,7 @@
     SECTION code_graphics
     PUBLIC  __graphics_cmphlde
 
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_out
     INCLUDE "graphics/grafix.inc"
 
 

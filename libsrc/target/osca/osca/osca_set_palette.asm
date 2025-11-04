@@ -11,8 +11,8 @@
         SECTION code_clib
 	PUBLIC	osca_set_palette
 	PUBLIC	_osca_set_palette
-	EXTERN     __gfx_page_vram_in
-	EXTERN    __gfx_page_vram_out
+	EXTERN     __gfx_vram_page_in
+	EXTERN    __gfx_vram_page_out
 	
     INCLUDE "target/osca/def/osca.def"
 
@@ -21,7 +21,7 @@ osca_set_palette:
 _osca_set_palette:
 ; __FASTCALL__, table ptr already in HL
 
-	call __gfx_page_vram_in
+	call __gfx_vram_page_in
 
 	ld a,(vreg_palette_ctrl)
 	push af
@@ -35,4 +35,4 @@ _osca_set_palette:
 	pop af
 	ld	(vreg_palette_ctrl),a
 
-	jp __gfx_page_vram_out
+	jp __gfx_vram_page_out

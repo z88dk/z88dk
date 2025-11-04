@@ -9,16 +9,16 @@
 
     SECTION code_graphics
 
-    PUBLIC  __gfx_page_vram_in
-    PUBLIC  ___gfx_page_vram_in
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  __gfx_page_vram_out
-    PUBLIC  ___gfx_page_vram_out
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
     di
     ld      a, 81h
     out     (0F1h), a                   ; 04000h = Bank 1 R/W - Screen/BIOS
@@ -27,8 +27,8 @@ ___gfx_page_vram_in:
     ret
 
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     ld      a, 85h
     out     (0F1h), a                   ; 04000h = Bank 5 R/W - TPA
     ld      a, 86h

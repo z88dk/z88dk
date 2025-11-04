@@ -57,7 +57,7 @@ _putsprite:
     ld      a, (hl)
     ld      (ortype2), a                ; Self modifying code
 
-        ;call    __gfx_page_vram_in
+        ;call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c

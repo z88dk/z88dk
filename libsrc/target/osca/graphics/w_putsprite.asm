@@ -14,8 +14,8 @@
         PUBLIC  _putsprite
         EXTERN  w_pixeladdress
 
-        EXTERN  __gfx_page_vram_in
-        EXTERN  __gfx_page_vram_out
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
 
         INCLUDE "graphics/grafix.inc"
 
@@ -54,7 +54,7 @@ _putsprite:
         ld      (ortype), a             ; Self modifying code
         ld      (ortype2), a            ; Self modifying code
 
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
         ld      h, b
         ld      l, c
@@ -131,7 +131,7 @@ _notedge:
         pop     bc                      ;Restore data
         djnz    _oloop
         pop     ix                      ;restore callers
-        jp      __gfx_page_vram_out
+        jp      __gfx_vram_page_out
 
 
 putspritew:
@@ -185,7 +185,7 @@ wsmc2:  cp      1
         pop     bc                      ;Restore data
         djnz    woloop
         pop     ix                      ;restore callers
-        jp      __gfx_page_vram_out
+        jp      __gfx_vram_page_out
 
 
 wover_1:
@@ -215,7 +215,7 @@ wover_1:
         pop     bc
         djnz    woloop
         pop     ix                      ;restore callers
-        jp      __gfx_page_vram_out
+        jp      __gfx_vram_page_out
 
         SECTION rodata_clib
 offsets_table:

@@ -14,7 +14,7 @@
     EXTERN  pixeladdress
     EXTERN  zx_saddrpdown
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 
@@ -22,7 +22,7 @@
 bksave:
 _bksave:
     push    ix
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      hl, 4
     add     hl, sp
     ld      e, (hl)

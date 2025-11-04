@@ -7,22 +7,22 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: __gfx_page_vram_in6.asm $
+;	$Id: __gfx_vram_page_in6.asm $
 ;
 
 
     SECTION code_clib
-    PUBLIC  __gfx_page_vram_in
-    PUBLIC  ___gfx_page_vram_in
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  __gfx_page_vram_out
-    PUBLIC  ___gfx_page_vram_out
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 	
     EXTERN  v1050_sendchar
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
 	push    hl
 	push    af
     ld      l, 27
@@ -35,8 +35,8 @@ ___gfx_page_vram_in:
 	pop     hl
 	ret
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
 	push    hl
 	push    af
     ld      l, 27

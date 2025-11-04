@@ -16,7 +16,7 @@
         ;EXTERN    vdcset
         ;EXTERN    vdcget
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     INCLUDE "graphics/grafix.inc"
@@ -55,8 +55,8 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
         ; @@@@@@@@@@@@
     ld      h, b

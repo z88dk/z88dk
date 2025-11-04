@@ -9,17 +9,17 @@
 
     SECTION code_graphics
 
-    PUBLIC  __gfx_page_vram_in
-    PUBLIC  ___gfx_page_vram_in
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  __gfx_page_vram_out
-    PUBLIC  ___gfx_page_vram_out
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
     EXTERN  __bdos
 
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
     in      a, (2)                      ; PPIC, get current bank
     ld      (bankval), a
 
@@ -30,8 +30,8 @@ ___gfx_page_vram_in:
     ret
 
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     ld      a, (bankval)
     out     (2), a                      ; PPIC, restore previous memory bank
     ret

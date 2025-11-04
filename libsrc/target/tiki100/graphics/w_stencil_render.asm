@@ -22,8 +22,8 @@
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 ;
 ;	$Id: w_stencil_render.asm,v 1.3 2017-01-02 22:57:59 aralbrec Exp $
@@ -34,7 +34,7 @@ _stencil_render:
     ld      ix, 2
     add     ix, sp
 
-;	call	__gfx_page_vram_in
+;	call	__gfx_vram_page_in
 
     ld      bc, _GFX_MAXY
     push    bc
@@ -119,9 +119,9 @@ yloop:
     jr      z, onebyte
 noobt:
     ld      a, b
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      (hl), a                     ; (offset) = (offset) AND bitmask0
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
 
     inc     hl
 
@@ -144,9 +144,9 @@ pattern2:
     ld      b, a
 fill_row_loop:                          ; do
     ld      a, b
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      (hl), a                     ; (offset) = pattern
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
 
     inc     hl
 
@@ -168,9 +168,9 @@ fill_row_loop:                          ; do
 bitmaskr:
     ld      a, 0
     call    mask_pattern
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      (hl), a
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     jp      yloop
 
 onebyte:
@@ -184,9 +184,9 @@ onebyte:
 mask_pattern:
     push    de
     ld      d, a                        ; keep a copy of mask
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     and     (hl)                        ; mask data on screen
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     ld      e, a                        ; save masked data
     ld      a, d                        ; retrieve mask
     cpl                                 ; invert it

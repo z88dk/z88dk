@@ -11,7 +11,7 @@
 ;
 ;
 ; The Bondwell2 requires  paging to access to the graphics memory
-; we need to move __gfx_page_vram_in/__gfx_page_vram_out in order to permit
+; we need to move __gfx_vram_page_in/__gfx_vram_page_out in order to permit
 ; the sprite data to be still accessible.
 ;
 ;
@@ -24,8 +24,8 @@
     PUBLIC  _putsprite
     EXTERN  w_pixeladdress
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
         ;EXTERN    __graphics_end
 
     INCLUDE "graphics/grafix.inc"
@@ -67,7 +67,7 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-        ;call    __gfx_page_vram_in
+        ;call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
@@ -106,13 +106,13 @@ _iloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, _noplot                 ;See if a plot is needed
     ld      e, a
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, e
 ortype:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
     ld      (hl), a
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     ld      a, e
 _noplot:
     rrca
@@ -159,13 +159,13 @@ wiloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, wnoplot                 ;See if a plot is needed
     ld      e, a
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, e
 ortype2:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
     ld      (hl), a
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     ld      a, e
 wnoplot:
     rrca

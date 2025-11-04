@@ -6,21 +6,21 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: __gfx_page_vram_in.asm,v 1.4 2017-01-02 22:57:58 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.4 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
-        PUBLIC  __gfx_page_vram_in
-        PUBLIC  ___gfx_page_vram_in
-        PUBLIC  __gfx_page_vram_out
-        PUBLIC  ___gfx_page_vram_out
+        PUBLIC  __gfx_vram_page_in
+        PUBLIC  ___gfx_vram_page_in
+        PUBLIC  __gfx_vram_page_out
+        PUBLIC  ___gfx_vram_page_out
 
         EXTERN  ozactivepage
 
 ;.iysave		defw	0
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
         push    bc
         ld      bc, (ozactivepage)
         ld      a, c
@@ -31,8 +31,8 @@ ___gfx_page_vram_in:
 ;	        ld	(iysave),iy
         ret
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
         ld      a, 7
         out     (3), a
         ld      a, 4

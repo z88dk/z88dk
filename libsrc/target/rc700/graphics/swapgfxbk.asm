@@ -8,29 +8,29 @@
 ;       Stefano Bodrato - 2025
 ;
 ;
-;	$Id: __gfx_page_vram_in.asm $
+;	$Id: __gfx_vram_page_in.asm $
 ;
 
 
     SECTION code_clib
 
-    PUBLIC  __gfx_page_vram_in
-    PUBLIC  ___gfx_page_vram_in
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  __gfx_page_vram_out
-    PUBLIC  ___gfx_page_vram_out
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
 
  ;   di
     ret
 
 
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
 extern __bdos
 
     ld      e,6         ; Home cursor

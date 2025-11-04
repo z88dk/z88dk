@@ -9,8 +9,8 @@
     EXTERN  generic_console_get_mode
     EXTERN  screendollar
     EXTERN  screendollar_with_count
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  __MODE2_attr
     EXTERN  __MODE3_attr
@@ -27,7 +27,7 @@ generic_console_vpeek:
     ex      de, hl                      ;get it into de
     ld      a,255
     ld      (__vpeek_colour),a
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     call    generic_console_xypos
     call    generic_console_get_mode
     ex      af, af
@@ -61,7 +61,7 @@ vpeek_1:
     inc     de
     pop     bc
     djnz    vpeek_1
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     pop     de                          ;the buffer on the stack
     ld      hl, (generic_console_font32)
 do_screendollar:

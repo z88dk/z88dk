@@ -15,13 +15,13 @@
     PUBLIC  ansi_cls
     EXTERN  base_graphics
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 ansi_cls:
 
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 
     ld      hl, (base_graphics)
     ld      d, h
@@ -32,4 +32,4 @@ ansi_cls:
     ld      (hl), a
     ldir
 
-    jp      __gfx_page_vram_out
+    jp      __gfx_vram_page_out

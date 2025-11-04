@@ -19,7 +19,7 @@
     EXTERN  _vdcDispMem
 
     EXTERN  l_cmp
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -30,7 +30,7 @@ _xorclga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -39,8 +39,8 @@ _xorclga_callee:
 asm_xorclga:
 
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
 

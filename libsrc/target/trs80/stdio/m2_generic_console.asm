@@ -13,8 +13,8 @@
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  base_graphics
 
@@ -29,7 +29,7 @@ generic_console_set_attribute:
     ret
 
 generic_console_cls:
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      hl, (base_graphics)
     ld      d, h
     ld      e, l
@@ -37,7 +37,7 @@ generic_console_cls:
     ld      bc, 1919
     ld      (hl), 32
     ldir
-    jp      __gfx_page_vram_out
+    jp      __gfx_vram_page_out
 
 ; c = x
 ; b = y
@@ -48,9 +48,9 @@ generic_console_printc:
     call    xypos
     pop     de
     ld      d, a
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      (hl), d
-    jp      __gfx_page_vram_out
+    jp      __gfx_vram_page_out
 
 
 ;Entry: c = x,
@@ -64,11 +64,11 @@ generic_console_vpeek:
     call    xypos
     ld      e, a
 	push    de
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 	pop     de
     ld      d, (hl)
 	push    de
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
 	pop     de
     rr      e
     call    nc, vpeek_unmap
@@ -99,7 +99,7 @@ generic_console_printc_3:
 generic_console_scrollup:
     push    de
     push    bc
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      hl, CONSOLE_COLUMNS
     ld      de, (base_graphics)
     add     hl, de
@@ -111,7 +111,7 @@ generic_console_scrollup_3:
     ld      (hl), 32
     inc     hl
     djnz    generic_console_scrollup_3
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     pop     bc
     pop     de
     ret

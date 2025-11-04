@@ -19,10 +19,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_out
     EXTERN  __graphics_end
 
 ;
@@ -35,8 +35,8 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      bc, __graphics_end
     push    bc
@@ -50,7 +50,7 @@ _stencil_render:
 yloop:
     pop     bc
     dec     c
-    ;jp    z,__gfx_page_vram_out
+    ;jp    z,__gfx_vram_page_out
     ret     z
     push    bc
 

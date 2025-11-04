@@ -13,21 +13,21 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: __gfx_page_vram_in.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ;    INCLUDE "target/osca/def/flos.def"
         INCLUDE "target/osca/def/osca.def"
 
         SECTION code_clib
-        PUBLIC  __gfx_page_vram_in
-        PUBLIC  ___gfx_page_vram_in
-        PUBLIC  __gfx_page_vram_out
-        PUBLIC  ___gfx_page_vram_out
+        PUBLIC  __gfx_vram_page_in
+        PUBLIC  ___gfx_vram_page_in
+        PUBLIC  __gfx_vram_page_out
+        PUBLIC  ___gfx_vram_page_out
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
 		;call kjt_wait_vrt		; wait for last line of display
 		;call kjt_page_in_video	; page video RAM in at $2000-$3fff
 
@@ -39,8 +39,8 @@ ___gfx_page_vram_in:
         ld      a, (asave)
         ret
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
         ld      (asave), a
         in      a, (sys_mem_select)     ; page in video RAM
         and     $bf

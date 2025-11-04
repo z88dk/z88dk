@@ -13,8 +13,8 @@
         PUBLIC  clg
         PUBLIC  _clg
 
-        EXTERN  __gfx_page_vram_in
-        EXTERN  __gfx_page_vram_out
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
         EXTERN  base_graphics
 
 clg:
@@ -79,7 +79,7 @@ paltv:
 
 
         call    kjt_wait_vrt            ; wait for last line of display
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
 
         ld      hl, $2000
         ld      (base_graphics), hl
@@ -116,4 +116,4 @@ clgloop:
 
         ld      sp, hl
 
-        jp      __gfx_page_vram_out
+        jp      __gfx_vram_page_out

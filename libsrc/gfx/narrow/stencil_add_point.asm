@@ -22,8 +22,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  line
     EXTERN  stencil_add_pixel
 
-        ;EXTERN    __gfx_page_vram_in
-        ;EXTERN    __gfx_page_vram_out
+        ;EXTERN    __gfx_vram_page_in
+        ;EXTERN    __gfx_vram_page_out
 
     EXTERN  stencil_ptr
 

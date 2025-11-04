@@ -19,10 +19,10 @@
     EXTERN  base_graphics
     EXTERN  dither_pattern
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  surface_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN __gfx_page_vram_out
+	;EXTERN __gfx_vram_page_out
 
     EXTERN  __graphics_end
 
@@ -45,14 +45,14 @@ _surface_stencil_render:
     ld      d, (hl)
     ld      (base_graphics), de
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 
     ld      c, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
     dec     c
-		;jp	z,__gfx_page_vram_out
+		;jp	z,__gfx_vram_page_out
     jp      z, __graphics_end
 
     push    bc

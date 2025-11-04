@@ -57,7 +57,7 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-        ;call    __gfx_page_vram_in
+        ;call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
@@ -119,13 +119,13 @@ _iloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, _noplot                 ;See if a plot is needed
     ld      e, a
-         ;call    __gfx_page_vram_in
+         ;call    __gfx_vram_page_in
     ld      a, e
 ortype:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
     ld      (hl), a
-         ;call    __gfx_page_vram_out
+         ;call    __gfx_vram_page_out
     ld      a, e
 _noplot:
     rrca
@@ -190,13 +190,13 @@ wiloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, wnoplot                 ;See if a plot is needed
     ld      e, a
-         ;call    __gfx_page_vram_in
+         ;call    __gfx_vram_page_in
     ld      a, e
 ortype2:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
     ld      (hl), a
-         ;call    __gfx_page_vram_out
+         ;call    __gfx_vram_page_out
     ld      a, e
 wnoplot:
     rrca

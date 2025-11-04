@@ -21,8 +21,8 @@
     PUBLIC  surface_circle
     PUBLIC  _surface_circle
 
-    EXTERN  __gfx_page_vram_in
-                ;EXTERN    __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+                ;EXTERN    __gfx_vram_page_out
     EXTERN  __graphics_end
 
     EXTERN  base_graphics
@@ -51,10 +51,10 @@ _surface_circle:
     ld      c, (ix+6)                   ;y
     ld      b, (ix+8)                   ;x
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      ix, surface_plotpixel
     call    draw_circle
-                ;jp      __gfx_page_vram_out
+                ;jp      __gfx_vram_page_out
 		;pop	ix		;restore callers
         ;        ret
 

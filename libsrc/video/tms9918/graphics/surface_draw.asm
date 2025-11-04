@@ -21,8 +21,8 @@
     PUBLIC  surface_draw
     PUBLIC  _surface_draw
 
-    EXTERN  __gfx_page_vram_in
-                ;EXTERN    __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+                ;EXTERN    __gfx_vram_page_out
 
     EXTERN  __graphics_end
 
@@ -53,7 +53,7 @@ _surface_draw:
     ld      h, (ix+10)                  ;x0
     ld      e, (ix+4)                   ;y1
     ld      d, (ix+6)                   ;x1
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     push    hl
     push    de
     call    surface_plotpixel
@@ -61,7 +61,7 @@ _surface_draw:
     pop     hl
     ld      ix, surface_plotpixel
     call    Line
-                ;jp      __gfx_page_vram_out
+                ;jp      __gfx_vram_page_out
 
     jp      __graphics_end
 		;pop	ix	;restore callers

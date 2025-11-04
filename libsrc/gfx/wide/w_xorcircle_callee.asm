@@ -10,7 +10,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
 
     EXTERN  w_draw_circle
     EXTERN  w_xorpixel
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -32,13 +32,13 @@ _xorcircle_callee:
 asm_xorcircle:
     push    ix
     push    af
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     pop     af
     ld      ix, w_xorpixel
     call    w_draw_circle
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

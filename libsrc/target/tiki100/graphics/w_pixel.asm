@@ -5,8 +5,8 @@
     EXTERN  getmaxy
     EXTERN  getmaxx
     EXTERN  l_graphics_cmp
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
     EXTERN  generic_console_get_mode
     EXTERN  __gfx_coords
 
@@ -63,7 +63,7 @@ rotated:
 ; c = byte holding pixel mask
 ; d = ink to use
 ; hl = address
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
   IF    NEEDplot
     ld      a, (hl)
     and     c
@@ -93,6 +93,6 @@ do_xor_plot:
     cpl
     and     (hl)
   ENDIF
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     pop     bc                          ;Restore callers
     ret

@@ -17,8 +17,8 @@
     PUBLIC  cleargraphics
     PUBLIC  _cleargraphics
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "graphics/grafix.inc"
 
@@ -26,7 +26,7 @@
 cleargraphics:
 _cleargraphics:
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 
     ld      a, 64
     out     (8), a
@@ -48,7 +48,7 @@ pcg_loop:
     call    setattr
     djnz    pcg_loop
 
-    jp      __gfx_page_vram_out
+    jp      __gfx_vram_page_out
 
 
 setattr:

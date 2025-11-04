@@ -29,7 +29,7 @@
     EXTERN  pix_return_pixelbyte
 
 
-;	EXTERN  __gfx_page_vram_in
+;	EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 
@@ -73,7 +73,7 @@ _putsprite:
 
     ld      (actcoord), hl              ; save current coordinates
 
-	;call    __gfx_page_vram_in
+	;call    __gfx_vram_page_in
     call    pixeladdress
 
     ld      hl, offsets_table

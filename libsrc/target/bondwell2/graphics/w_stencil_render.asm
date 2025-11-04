@@ -5,7 +5,7 @@
 ;
 
 ; The Bondwell 2 requires  paging to access to the graphics memory
-; we need to move __gfx_page_vram_in/__gfx_page_vram_out in order to permit
+; we need to move __gfx_vram_page_in/__gfx_vram_page_out in order to permit
 ; the stencil/pattern data to be still accessible.
 
 ;
@@ -28,10 +28,10 @@
     EXTERN  dither_pattern
 	;EXTERN	l_graphics_cmp
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_out
 
 ;
 ;	$Id: w_stencil_render.asm $
@@ -48,7 +48,7 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-		;call	__gfx_page_vram_in
+		;call	__gfx_vram_page_in
 
     ld      bc, _GFX_MAXY
     push    bc
@@ -132,10 +132,10 @@ yloop:
     cp      e
     jr      z, onebyte
 noobt:
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, b
     ld      (hl), a                     ; (offset) = (offset) AND bitmask0
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
 
 
     inc     hl
@@ -151,10 +151,10 @@ pattern2:
     jr      z, bitmaskr
     ld      b, a
 fill_row_loop:                          ; do
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, b
     ld      (hl), a                     ; (offset) = pattern
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
 
     inc     hl
 
@@ -170,10 +170,10 @@ bitmaskr:
     ld      a, 0
     call    mask_pattern
     ex      af, af
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ex      af, af
     ld      (hl), a
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
 
     jp      yloop
 
@@ -189,11 +189,11 @@ onebyte:
 mask_pattern:
     push    de
     ld      d, a                        ; keep a copy of mask
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, d
     and     (hl)                        ; mask data on screen
     ld      e, a                        ; save masked data
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     ld      a, d                        ; retrieve mask
     cpl                                 ; invert it
 pattern1:

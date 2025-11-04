@@ -8,8 +8,8 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _point_callee
     PUBLIC  asm_point
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  w_pointxy
     INCLUDE "graphics/grafix.inc"
@@ -24,13 +24,13 @@ _point_callee:
 
 asm_point:
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     call    w_pointxy
-  IFDEF _GFX_PAGE_VRAM
+  IFDEF _gfx_vram_page
     push    af
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     pop     af
   ENDIF
     pop     ix

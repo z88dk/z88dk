@@ -15,7 +15,7 @@
     EXTERN  pixeladdress_MODE2
 
     EXTERN  __cpc_mode
-    EXTERN   __gfx_page_vram_in
+    EXTERN   __gfx_vram_page_in
     EXTERN  __graphics_end
     EXTERN  __generic_putsprite
 
@@ -57,7 +57,7 @@
         ld      (ortype),a      ; Self modifying code
         ld      (ortype2),a     ; Self modifying code
 
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c

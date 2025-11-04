@@ -12,8 +12,8 @@
 
 
     EXTERN  w_pixeladdress
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
     PUBLIC  bkrestore
@@ -69,10 +69,10 @@ rbytes:
 rloop:
     ld      a, (ix+6)
     ld      h, a
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, h
     ld      (de), a
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     inc     de
     inc     ix
     djnz    rloop

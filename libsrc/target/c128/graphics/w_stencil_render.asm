@@ -22,10 +22,10 @@
     EXTERN  dither_pattern
 	;EXTERN	l_cmp
 
-	EXTERN __gfx_page_vram_in
+	EXTERN __gfx_vram_page_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN __gfx_page_vram_out
+	;EXTERN __gfx_vram_page_out
     EXTERN  __graphics_end
 
     EXTERN  __c128_vaddr
@@ -38,14 +38,14 @@ stencil_render:
 _stencil_render:
 
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
     ld      ix, 4
     add     ix, sp
 
-		;call	__gfx_page_vram_in
+		;call	__gfx_vram_page_in
 
     ld      bc, _GFX_MAXY
     push    bc

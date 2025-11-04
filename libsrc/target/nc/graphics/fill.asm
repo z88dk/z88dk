@@ -14,8 +14,8 @@
     EXTERN  w_pixeladdress
     EXTERN  l_cmp
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
 fill:
@@ -37,7 +37,7 @@ _fill:
     pop     de
     ret     c                           ; Return if X overflows
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 
     call    w_pixeladdress
     ld      b, a
@@ -68,7 +68,7 @@ cont:
 petelka:
     pop     ix                          ;restore callers
     bit     3, c                        ; indeks_ws1 == 0
-    jp      z, __gfx_page_vram_out
+    jp      z, __gfx_vram_page_out
 
     res     3, c                        ; indeks_ws1 = 0
     push    ix                          ;save callers

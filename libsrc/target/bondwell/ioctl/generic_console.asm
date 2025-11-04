@@ -12,15 +12,15 @@
     PUBLIC  generic_console_set_attribute
 
     EXTERN  generic_console_xypos
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
     EXTERN  cleargraphics
 
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
 
-    defc    pagein=__gfx_page_vram_in
-    defc    pageout=__gfx_page_vram_out
+    defc    pagein=__gfx_vram_page_in
+    defc    pageout=__gfx_vram_page_out
     defc    DISPLAY=0xF800
 
 

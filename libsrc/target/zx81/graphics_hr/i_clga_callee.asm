@@ -14,7 +14,7 @@
     EXTERN  leftbitmask
     EXTERN  rightbitmask
     EXTERN  l_cmp
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     EXTERN  w_pixeladdress
     INCLUDE "graphics/grafix.inc"
@@ -26,7 +26,7 @@ _clga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -35,8 +35,8 @@ _clga_callee:
 asm_clga:
 
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
 ;    push    hl           ; width

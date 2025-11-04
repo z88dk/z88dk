@@ -8,21 +8,21 @@
 ;       Stefano - 6/2023
 ;
 ;
-;	$Id: m4___gfx_page_vram_in.asm $
+;	$Id: m4___gfx_vram_page_in.asm $
 ;
 
 
     SECTION code_clib
 
-    PUBLIC  __gfx_page_vram_in
-    PUBLIC  ___gfx_page_vram_in
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  __gfx_page_vram_out
-    PUBLIC  ___gfx_page_vram_out
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
     di
     push    af
     ld      a, $86                      ; page in the video bank, TRS80 character set
@@ -31,8 +31,8 @@ ___gfx_page_vram_in:
     ret
 
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     push    af
     ld      a, $87                      ; page out the video bank, TRS80 character set
     out     ($84), a                    ; optreg

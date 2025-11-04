@@ -19,7 +19,7 @@
     PUBLIC  _putsprite
     PUBLIC  ___putsprite
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  pixel
@@ -31,8 +31,8 @@
 putsprite:
 _putsprite:
 ___putsprite:
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      hl, 2
     add     hl, sp
@@ -179,7 +179,7 @@ noblock:
     pop     af
     pop     bc                          ;Restore data
     djnz    oloop
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

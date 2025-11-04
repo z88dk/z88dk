@@ -15,7 +15,7 @@
 
     EXTERN  subcpu_call
 
-        ;EXTERN    __gfx_page_vram_in
+        ;EXTERN    __gfx_vram_page_in
         ;EXTERN    __graphics_end
 
     INCLUDE "graphics/grafix.inc"

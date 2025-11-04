@@ -9,7 +9,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
 
     EXTERN  w_xorpixel
     EXTERN  w_area
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "graphics/grafix.inc"
 
@@ -19,7 +19,7 @@ _xorclga_callee:
     pop     af
     pop     de
     pop     hl
-    exx                                 ; w_plotpixel and __gfx_page_vram_in must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de
     pop     hl
     push    af                          ; ret addr
@@ -28,12 +28,12 @@ _xorclga_callee:
 
 asm_xorclga:
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      ix, w_xorpixel
     call    w_area
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

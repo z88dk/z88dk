@@ -12,7 +12,7 @@
         PUBLIC  ozcircle
         PUBLIC  _ozcircle
 
-        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_vram_page_in
         EXTERN  __oz_gfxend
 
         EXTERN  draw_circle
@@ -37,7 +37,7 @@ _ozcircle:
         ld      c, (ix+6)               ;y
         ld      b, (ix+8)               ;x
         ld      ix, ozplotpixel
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
         pop     af
         jr      nz, filloop
         call    draw_circle

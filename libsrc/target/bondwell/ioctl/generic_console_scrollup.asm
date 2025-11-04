@@ -2,8 +2,8 @@
     SECTION code_graphics
     PUBLIC  generic_console_scrollup
 
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
     EXTERN  clsgraph
 
 
@@ -11,8 +11,8 @@
     EXTERN  CONSOLE_COLUMNS
 
     defc    DISPLAY=0xF800
-    defc    pagein=__gfx_page_vram_in
-    defc    pageout=__gfx_page_vram_out
+    defc    pagein=__gfx_vram_page_in
+    defc    pageout=__gfx_vram_page_out
 
 
 generic_console_scrollup:

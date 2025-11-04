@@ -12,7 +12,7 @@
     EXTERN  pixeladdress
     EXTERN  zx_saddrpdown
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     PUBLIC  bkrestore
     PUBLIC  _bkrestore
@@ -30,7 +30,7 @@ bkrestore_fastcall:
 _bkrestore_fastcall:
 ; __FASTCALL__ : sprite ptr in HL
     push    ix
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     push    hl
     pop     ix
 

@@ -45,7 +45,7 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-    ;call	__gfx_page_vram_in
+    ;call	__gfx_vram_page_in
 
     ld      bc, _GFX_MAXY
     push    bc

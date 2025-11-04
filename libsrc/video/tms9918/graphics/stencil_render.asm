@@ -19,7 +19,7 @@
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __tms9918_screen_mode
     EXTERN  __tms9918_pixeladdress
     EXTERN  __tms9918_pixelbyte
@@ -29,7 +29,7 @@
     EXTERN  leftbitmask, rightbitmask
     EXTERN  __graphics_end
     EXTERN  __generic_stencil_render
-         ;EXTERN __gfx_page_vram_out
+         ;EXTERN __gfx_vram_page_out
 
 ;
 ;        $Id: stencil_render.asm $
@@ -50,7 +50,7 @@ dorender:
     ld      ix, 4
     add     ix, sp
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 		;ld	bc,__graphics_end
 		;push bc
 

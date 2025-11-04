@@ -2,8 +2,8 @@
     PUBLIC  fill
     PUBLIC  _fill
     EXTERN  w_pixeladdress
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "graphics/grafix.inc"
 ;	EXTERN		l_cmp
@@ -112,17 +112,17 @@ write:
     ret
 
 test_up_down:
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, (de)
     or      b
     ld      (de), a                     ; plot(x,y)
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     push    de
     call    decy
     jr      c, down
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     and     b                           ; point(x, y - 1)
     jr      z, test_write
     set     0, c
@@ -140,9 +140,9 @@ down:
     call    incy
     jr      c, wypad
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     and     b                           ; point(x, y + 1)
     jr      z, test_write2
     set     1, c
@@ -167,9 +167,9 @@ segm:
     ld      a, b
     push    af
 loop1:
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     and     b
     jr      nz, right
     call    test_up_down
@@ -183,9 +183,9 @@ right:
 loop2:
     call    incx
     ret     c
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     and     b
     ret     nz
     call    test_up_down

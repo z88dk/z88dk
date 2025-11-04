@@ -9,8 +9,8 @@
     EXTERN  generic_console_udg32
     EXTERN  screendollar
     EXTERN  screendollar_with_count
-    EXTERN  __gfx_page_vram_in
-    EXTERN  __gfx_page_vram_out
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 generic_console_vpeek:
     ld      hl, -8
@@ -19,7 +19,7 @@ generic_console_vpeek:
     push    hl                          ;save buffer
     ex      de, hl
     call    generic_console_xypos
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
         ; hl = screen address, de = buffer
     ld      a, 8
 loop:
@@ -32,7 +32,7 @@ loop:
     ex      af, af
     dec     a
     jr      nz, loop
-    call    __gfx_page_vram_out
+    call    __gfx_vram_page_out
     pop     de                          ;buffer
     ld      hl, (generic_console_font32)
     call    screendollar

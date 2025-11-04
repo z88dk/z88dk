@@ -13,7 +13,7 @@
     PUBLIC  cleargraphics
     PUBLIC  _cleargraphics
     EXTERN  loadudg6
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
 			;EXTERN	base_graphics
 
     INCLUDE "graphics/grafix.inc"
@@ -22,7 +22,7 @@
 cleargraphics:
 _cleargraphics:
 
-    call    __gfx_page_vram_in
+    call    __gfx_vram_page_in
 
     ld      c, 0                        ; first UDG chr$ to load
     ld      b, 64                       ; number of characters to load

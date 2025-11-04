@@ -12,7 +12,7 @@
         PUBLIC  ozfilledbox
         PUBLIC  _ozfilledbox
 
-        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_vram_page_in
         EXTERN  __oz_gfxend
 
         EXTERN  drawbox
@@ -34,7 +34,7 @@ _ozfilledbox:
         ld      l, (ix+8)               ; y
         ld      h, (ix+10)              ; x
         ld      ix, ozplotpixel
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
 
 
         ld      a, c

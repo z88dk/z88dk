@@ -14,13 +14,13 @@
         PUBLIC  _clg
         EXTERN  base_graphics
 
-        EXTERN  __gfx_page_vram_in
-        EXTERN  __gfx_page_vram_out
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
 
 clg:
 _clg:
 
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
 
         ld      hl, (base_graphics)
         ld      d, h
@@ -31,4 +31,4 @@ _clg:
         ld      (hl), a
         ldir
 
-        jp      __gfx_page_vram_out
+        jp      __gfx_vram_page_out

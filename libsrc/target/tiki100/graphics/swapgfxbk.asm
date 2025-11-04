@@ -10,23 +10,23 @@
 ;       Simply does a swap...
 ;
 ;	CAVEAT
-;	CAVEAT	Always call __gfx_page_vram_out IMMEDIATELY after you are
-;	CAVEAT	done with accessing video RAM using __gfx_page_vram_in.
+;	CAVEAT	Always call __gfx_vram_page_out IMMEDIATELY after you are
+;	CAVEAT	done with accessing video RAM using __gfx_vram_page_in.
 ;	CAVEAT
 ;
-;	$Id: __gfx_page_vram_in.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
     SECTION code_graphics
-    PUBLIC  __gfx_page_vram_in
-    PUBLIC  ___gfx_page_vram_in
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  __gfx_page_vram_out
-    PUBLIC  ___gfx_page_vram_out
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
-__gfx_page_vram_in:
-___gfx_page_vram_in:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
     di
     ex      af, af
     ld      a, ($FFC8)                  ; Copy of system register
@@ -35,8 +35,8 @@ ___gfx_page_vram_in:
     ex      af, af
     ret
 
-__gfx_page_vram_out:
-___gfx_page_vram_out:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     ex      af, af
     ld      a, ($FFC8)                  ; Copy of system register
     out     ($1C), a                    ; System register (page-out gfx RAM)

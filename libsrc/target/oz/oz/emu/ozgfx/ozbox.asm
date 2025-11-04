@@ -12,8 +12,8 @@
         PUBLIC  ozbox
         PUBLIC  _ozbox
 
-        EXTERN  __gfx_page_vram_in
-        EXTERN  __gfx_page_vram_out
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
         EXTERN  __oz_gfxend
 
         EXTERN  drawbox
@@ -32,6 +32,6 @@ _ozbox:
         ld      l, (ix+4)
         ld      h, (ix+2)
         ld      ix, plotpixel
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
         call    drawbox
         jp      __oz_gfxend

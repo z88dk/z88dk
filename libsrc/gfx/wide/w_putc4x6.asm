@@ -18,7 +18,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  putc4x6
     PUBLIC  _putc4x6
 
-    EXTERN  __gfx_page_vram_in
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  plot
@@ -75,8 +75,8 @@ nolower:
     ld      (chr), a
 
     push    ix
-  IFDEF _GFX_PAGE_VRAM
-    call    __gfx_page_vram_in
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      a, (chr)
     rra
@@ -167,7 +167,7 @@ lrloop:
     ld      (y_4x6), hl
     pop     hl
 
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

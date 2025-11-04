@@ -12,7 +12,7 @@
         PUBLIC  ozline
         PUBLIC  _ozline
 
-        EXTERN  __gfx_page_vram_in
+        EXTERN  __gfx_vram_page_in
         EXTERN  __oz_gfxend
 
         EXTERN  line
@@ -32,7 +32,7 @@ _ozline:
         ld      h, (ix+10)              ;x0
         ld      e, (ix+4)               ;y1
         ld      d, (ix+6)               ;x1
-        call    __gfx_page_vram_in
+        call    __gfx_vram_page_in
         push    hl
         push    de
         call    ozplotpixel
