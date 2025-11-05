@@ -202,6 +202,12 @@ bool Preprocessor::next_line(TokensLine& line) {
         // read lines from top file in stack
         if (file_stack_.empty()) {
             // no more input
+            if (!if_stack_.empty()) {
+                // Report unclosed conditional at end of input
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               "Unexpected end of input in IF (expected ENDIF)");
+                if_stack_.clear();
+            }
             return false;
         }
 

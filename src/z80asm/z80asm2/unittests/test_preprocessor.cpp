@@ -6399,3 +6399,54 @@ TEST_CASE("Preprocessor: multiple EXITMs in different IF branches - only execute
     REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
     REQUIRE(std::find(lines.begin(), lines.end(), "never_reached") == lines.end());
 }
+
+TEST_CASE("Preprocessor: IF without ENDIF reports error at end of input",
+          "[preprocessor][if][error][noendif]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Unclosed IF; EOF reached without ENDIF
+    const std::string content =
+        "IF 1\n"
+        "OK\n";
+    pp.push_virtual_file(content, "if_no_endif", 1, true);
+
+    TokensLine line;
+    // Consume all output to trigger end-of-input checks
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    // Accept flexible wording: look for ENDIF or IF-related untermination
+    REQUIRE((msg.find("ENDIF") != std::string::npos ||
+             msg.find("unterminated") != std::string::npos ||
+             msg.find("IF") != std::string::npos));
+}
+
+TEST_CASE("Preprocessor: outer IF missing ENDIF is reported even when inner blocks close",
+          "[preprocessor][if][error][noendif][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Outer IF is missing ENDIF; inner IF/ELSE/ENDIF is correctly closed
+    const std::string content =
+        "IF 1\n"
+        "X\n"
+        "IF 0\n"
+        "Y\n"
+        "ELSE\n"
+        "Z\n"
+        "ENDIF\n";
+    pp.push_virtual_file(content, "if_outer_no_endif", 1, true);
+
+    TokensLine line;
+    // Consume all output to trigger end-of-input checks
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    // Accept flexible wording: look for ENDIF or IF-related untermination
+    REQUIRE((msg.find("ENDIF") != std::string::npos ||
+             msg.find("unterminated") != std::string::npos ||
+             msg.find("IF") != std::string::npos));
+}
