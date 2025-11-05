@@ -275,8 +275,7 @@ private:
     std::vector<TokensLine> substitute_and_expand(
         const Macro& macro,
         const std::vector<std::vector<TokensLine>>& expanded_args_flat,
-        const std::vector<TokensLine>& original_args,
-        const std::string& name);
+        const std::vector<TokensLine>& original_args);
     void append_expansion_into_out(
         const std::vector<TokensLine>& further_expanded,
         TokensLine& out,

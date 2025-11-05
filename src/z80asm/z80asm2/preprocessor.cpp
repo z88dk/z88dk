@@ -1947,19 +1947,38 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
 }
 
 // Replace previous split_lines implementation with a macro-expansion "virtual file" wrapper
-// so directives like EXITM can abort the current expansion and all expanded lines
-// carry the macro call-site logical location (constant line number).
+// so directives like IFDEF are processed correctly within macro expansions, preventing them
+// from being expanded into literal values. All expanded lines carry the macro call-site
+// logical location (constant line number), and directives like EXITM can abort the current
+// expansion.
 void Preprocessor::split_lines(const Location& location,
                                const std::vector<TokensLine>& expanded) {
-    // Fast path: single line -> split inline (no EXITM impact)
-    if (expanded.size() <= 1) {
-        if (!expanded.empty()) {
-            split_line(location, expanded[0]);
-        }
+    // Fast path: empty expansion
+    if (expanded.empty()) {
         return;
     }
 
-    // Preserve per-line locations (call-site) already present in expanded lines.
+    // Fast path: single line without directives -> split inline (no EXITM impact, no directive processing needed)
+    if (expanded.size() == 1) {
+        const TokensLine& single = expanded[0];
+        unsigned check_idx = 0;
+        Keyword kw = Keyword::None;
+        std::string dummy_name;
+
+        // Check if this line contains a directive or name-directive
+        bool has_directive = is_directive(single, check_idx, kw) ||
+                             is_name_directive(single, check_idx, kw, dummy_name);
+
+        if (!has_directive) {
+            // No directives -> safe to split inline
+            split_line(location, single);
+            return;
+        }
+    }
+
+    // Multi-line expansion or contains directives:
+    // Route through virtual file so directives (IF/IFDEF/EXITM/etc.) are processed correctly
+    // and don't get macro-expanded into literal values.
     push_virtual_file(expanded, location.filename(),
                       location.line_num(), false);
 
@@ -2307,8 +2326,7 @@ bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
 std::vector<TokensLine> Preprocessor::substitute_and_expand(
     const Macro& macro,
     const std::vector<std::vector<TokensLine>>& expanded_args_flat,
-    const std::vector<TokensLine>& original_args,
-    const std::string& name) {
+    const std::vector<TokensLine>& original_args) {
     // Prepare LOCAL renaming map for this expansion, if any locals declared.
     std::unordered_map<std::string, std::string> local_rename;
     if (!macro.locals.empty()) {
@@ -2403,15 +2421,10 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
         }
     }
 
-    // Guard recursion while expanding substituted replacement
-    int& rc = macro_recursion_count_[name];
-    rc++;
-    std::vector<TokensLine> further_expanded = expand_macros(substituted);
-    rc--;
-    return further_expanded;
+    return substituted;
 }
 
-// Append expanded results into `out` and `result` following multi-line semantics.
+// Append expanded result into `out` and `result` following multi-line semantics.
 // first line of further_expanded is merged into current `out`
 // each subsequent line causes current `out` to be pushed into `result` and `out` reinitialized
 // with that subsequent line.
@@ -2522,12 +2535,11 @@ std::vector<TokensLine> Preprocessor::expand_macros(
                     continue;
                 }
 
-                // Substitute parameters and expand the replacement (handles nested macros)
+                // Substitute parameters and expand the replacement
                 std::vector<TokensLine> further_expanded =
                     substitute_and_expand(macro,
                                           expanded_args_flat,
-                                          original_args,
-                                          name);
+                                          original_args);
 
                 // Append expanded result into out/result following multi-line rules
                 append_expansion_into_out(further_expanded, out, result, in_line.location());
