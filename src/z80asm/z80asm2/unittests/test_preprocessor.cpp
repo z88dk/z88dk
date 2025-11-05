@@ -6053,3 +6053,349 @@ TEST_CASE("Preprocessor: label with no following instruction",
     // No instruction line should follow
     REQUIRE(!pp.next_line(line));
 }
+
+// Add these tests after the existing EXITM tests (around line 4120)
+
+// -----------------------------------------------------------------------------
+// EXITM with conditional execution tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: EXITM inside IF with true condition exits macro",
+          "[preprocessor][macro][exitm][if][true]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(cond)\n"
+        "before\n"
+        "IF cond\n"
+        "EXITM\n"
+        "ENDIF\n"
+        "after\n"
+        "ENDM\n"
+        "LINE 100, \"exitm_if_true.asm\"\n"
+        "M(1)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_if_true", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should see: before, done
+    // Should NOT see: after (EXITM was executed)
+    REQUIRE(std::find(lines.begin(), lines.end(), "before") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "after") == lines.end());
+}
+
+TEST_CASE("Preprocessor: EXITM inside IF with false condition does not exit macro",
+          "[preprocessor][macro][exitm][if][false]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(cond)\n"
+        "before\n"
+        "IF cond\n"
+        "EXITM\n"
+        "ENDIF\n"
+        "after\n"
+        "ENDM\n"
+        "LINE 200, \"exitm_if_false.asm\"\n"
+        "M(0)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_if_false", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should see: before, after, done
+    // All lines should be present (EXITM was not executed)
+    REQUIRE(std::find(lines.begin(), lines.end(), "before") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "after") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+}
+
+TEST_CASE("Preprocessor: EXITM in ELSE branch exits when IF condition is false",
+          "[preprocessor][macro][exitm][if][else]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(cond)\n"
+        "before\n"
+        "IF cond\n"
+        "in_if\n"
+        "ELSE\n"
+        "in_else\n"
+        "EXITM\n"
+        "ENDIF\n"
+        "after\n"
+        "ENDM\n"
+        "LINE 300, \"exitm_else.asm\"\n"
+        "M(0)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_else", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // Should see: before, in_else, done
+    // Should NOT see: in_if, after (EXITM in ELSE was executed)
+    REQUIRE(std::find(lines.begin(), lines.end(), "before") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "in_else") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "in_if") == lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "after") == lines.end());
+}
+
+TEST_CASE("Preprocessor: nested IF with EXITM - inner condition controls exit",
+          "[preprocessor][macro][exitm][if][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(outer, inner)\n"
+        "start\n"
+        "IF outer\n"
+        "outer_block\n"
+        "IF inner\n"
+        "EXITM\n"
+        "ENDIF\n"
+        "after_inner\n"
+        "ENDIF\n"
+        "end\n"
+        "ENDM\n"
+        "LINE 400, \"exitm_nested_if.asm\"\n"
+        "M(1, 0)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_nested_if", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // outer=1, inner=0: Should execute outer block and continue to end
+    // Should see: start, outer_block, after_inner, end, done
+    REQUIRE(std::find(lines.begin(), lines.end(), "start") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "outer_block") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "after_inner") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "end") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+}
+
+TEST_CASE("Preprocessor: nested IF with EXITM - inner true condition exits macro",
+          "[preprocessor][macro][exitm][if][nested][exit]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(outer, inner)\n"
+        "start\n"
+        "IF outer\n"
+        "outer_block\n"
+        "IF inner\n"
+        "EXITM\n"
+        "ENDIF\n"
+        "after_inner\n"
+        "ENDIF\n"
+        "end\n"
+        "ENDM\n"
+        "LINE 500, \"exitm_nested_if_exit.asm\"\n"
+        "M(1, 1)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_nested_if_exit", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // outer=1, inner=1: Should exit at inner EXITM
+    // Should see: start, outer_block, done
+    // Should NOT see: after_inner, end
+    REQUIRE(std::find(lines.begin(), lines.end(), "start") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "outer_block") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "after_inner") == lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "end") == lines.end());
+}
+
+TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
+          "[preprocessor][macro][exitm][ifdef]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Test with IFDEF (symbol defined - should exit)
+    {
+        const std::string content =
+            "#define SYM 1\n"
+            "MACRO M()\n"
+            "before\n"
+            "IFDEF SYM\n"
+            "EXITM\n"
+            "ENDIF\n"
+            "after\n"
+            "ENDM\n"
+            "M()\n"
+            "done\n";
+        pp.push_virtual_file(content, "exitm_ifdef_defined", 1, true);
+
+        TokensLine line;
+        std::vector<std::string> lines;
+
+        while (pp.next_line(line)) {
+            if (!line.tokens().empty()) {
+                lines.push_back(line.tokens()[0].text());
+            }
+        }
+
+        REQUIRE(std::find(lines.begin(), lines.end(), "before") != lines.end());
+        REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+        REQUIRE(std::find(lines.begin(), lines.end(), "after") == lines.end());
+    }
+
+    // Test with IFNDEF (symbol not defined - should exit)
+    {
+        g_errors.reset();
+        Preprocessor pp2;
+
+        const std::string content =
+            "MACRO M()\n"
+            "before\n"
+            "IFNDEF UNDEF_SYM\n"
+            "EXITM\n"
+            "ENDIF\n"
+            "after\n"
+            "ENDM\n"
+            "M()\n"
+            "done\n";
+        pp2.push_virtual_file(content, "exitm_ifndef_undef", 1, true);
+
+        TokensLine line;
+        std::vector<std::string> lines;
+
+        while (pp2.next_line(line)) {
+            if (!line.tokens().empty()) {
+                lines.push_back(line.tokens()[0].text());
+            }
+        }
+
+        REQUIRE(std::find(lines.begin(), lines.end(), "before") != lines.end());
+        REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+        REQUIRE(std::find(lines.begin(), lines.end(), "after") == lines.end());
+    }
+}
+
+TEST_CASE("Preprocessor: EXITM with ELIF branch",
+          "[preprocessor][macro][exitm][elif]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(val)\n"
+        "start\n"
+        "IF val == 1\n"
+        "branch1\n"
+        "ELIF val == 2\n"
+        "branch2\n"
+        "EXITM\n"
+        "ELIF val == 3\n"
+        "branch3\n"
+        "ENDIF\n"
+        "end\n"
+        "ENDM\n"
+        "LINE 600, \"exitm_elif.asm\"\n"
+        "M(2)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_elif", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // val=2: Should execute ELIF branch with EXITM
+    // Should see: start, branch2, done
+    // Should NOT see: branch1, branch3, end
+    REQUIRE(std::find(lines.begin(), lines.end(), "start") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "branch2") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "branch1") == lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "branch3") == lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "end") == lines.end());
+}
+
+TEST_CASE("Preprocessor: multiple EXITMs in different IF branches - only executed one is effective",
+          "[preprocessor][macro][exitm][if][multiple]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(cond)\n"
+        "start\n"
+        "IF cond\n"
+        "true_branch\n"
+        "EXITM\n"
+        "ELSE\n"
+        "false_branch\n"
+        "EXITM\n"
+        "ENDIF\n"
+        "never_reached\n"
+        "ENDM\n"
+        "LINE 700, \"exitm_multi_if.asm\"\n"
+        "M(1)\n"
+        "M(0)\n"
+        "done\n";
+    pp.push_virtual_file(content, "exitm_multi_if", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
+        }
+    }
+
+    // M(1): start, true_branch
+    // M(0): start, false_branch
+    // done
+    // never_reached should never appear
+    REQUIRE(std::find(lines.begin(), lines.end(), "start") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "true_branch") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "false_branch") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
+    REQUIRE(std::find(lines.begin(), lines.end(), "never_reached") == lines.end());
+}
