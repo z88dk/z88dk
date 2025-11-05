@@ -1587,3 +1587,35 @@ TEST_CASE("Empty string literal is accepted and resolves to empty contents",
     REQUIRE(toks[0].string_value().empty());
 }
 
+TEST_CASE("TokensLine trim removes whitespace and returns change status",
+          "[lexer][trim]") {
+    g_options = Options();
+
+    TokensLine line;
+
+    // Add leading whitespace
+    line.push_back(Token(TokenType::Whitespace, " "));
+    line.push_back(Token(TokenType::Whitespace, "\t"));
+
+    // Add meaningful tokens
+    line.push_back(Token(TokenType::Identifier, "foo"));
+    line.push_back(Token(TokenType::Integer, "123"));
+
+    // Add trailing whitespace
+    line.push_back(Token(TokenType::Whitespace, " "));
+    line.push_back(Token(TokenType::Whitespace, "\n"));
+
+    REQUIRE(line.size() == 6);
+
+    bool changed = line.trim();
+
+    // After trimming, only the meaningful tokens should remain
+    REQUIRE(changed == true);
+    REQUIRE(line.size() == 2);
+    REQUIRE(line[0].text() == "foo");
+    REQUIRE(line[1].text() == "123");
+
+    // Now trimming again should return false (no change)
+    changed = line.trim();
+    REQUIRE(changed == false);
+}

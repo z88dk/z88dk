@@ -111,6 +111,7 @@ public:
     std::string to_string() const;
     void skip_spaces(unsigned& i) const;
     bool at_end(unsigned& i) const;
+    bool trim();
 
 private:
     Location location_;             // Location of this line
