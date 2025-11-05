@@ -205,6 +205,22 @@ bool TokensLine::at_end(unsigned& i) const {
     return i >= size();
 }
 
+bool TokensLine::trim() {
+    bool changed = false;
+    // Remove leading whitespace
+    while (!tokens_.empty() && tokens_.front().is(TokenType::Whitespace)) {
+        tokens_.erase(tokens_.begin());
+        changed = true;
+    }
+
+    // Remove trailing whitespace
+    while (!tokens_.empty() && tokens_.back().is(TokenType::Whitespace)) {
+        tokens_.pop_back();
+        changed = true;
+    }
+    return changed;
+}
+
 //-----------------------------------------------------------------------------
 
 TokensFile::TokensFile(const std::string& filename,

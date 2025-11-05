@@ -58,6 +58,17 @@ bool str_ends_with(const std::string& str, const std::string& ending) {
     }
 }
 
+bool str_starts_with(const std::string& str, const std::string& beginning) {
+    if (beginning.size() > str.size()) {
+        return false;
+    }
+    // empty beginning matches anything
+    if (beginning.empty()) {
+        return true;
+    }
+    return str.compare(0, beginning.size(), beginning) == 0;
+}
+
 std::string escape_string(const std::string& s) {
     // Convert a raw string to a C-style escaped representation suitable for
     // emitting as a quoted string token. Behavior mirrors str_expand_escapes:
@@ -270,14 +281,34 @@ static std::string nomalize_slashes(const std::string& path) {
     return result;
 }
 
-std::string normalize_path(const std::string& path) {
+std::string normalize_path(const std::string& path_) {
+    std::string path = nomalize_slashes(path_);
+
     if (path.empty()) {
         return ".";
     }
 
+    // Preserve UNC prefix: if original path starts with // or \\,
+    // ensure the normalized result also starts with a double slash.
+    const bool had_unc_prefix = str_starts_with(path, "//");
+
     try {
-        std::filesystem::path p(nomalize_slashes(path));
-        return p.lexically_normal().generic_string();
+        std::filesystem::path p(path);
+        std::string result = p.lexically_normal().generic_string();
+
+        if (had_unc_prefix) {
+            // If normalization collapsed the leading // to / (or removed it),
+            // put it back so UNC paths are preserved consistently across platforms.
+            if (!str_starts_with(result, "//")) {
+                if (str_starts_with(result, "/")) {
+                    result = "/" + result;  // make it begin with "//"
+                }
+                else {
+                    result = "//" + result; // add full UNC prefix if missing
+                }
+            }
+        }
+        return result;
     }
     catch (...) {
         return path;
