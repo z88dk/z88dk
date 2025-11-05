@@ -66,3 +66,10 @@ bool keyword_is_opcode(Keyword kw) {
     return (flags & IS_OPCODE) != 0;
 }
 
+bool keyword_is_instruction(Keyword kw) {
+    return keyword_is_directive(kw) ||
+           keyword_is_name_directive(kw) ||
+           keyword_is_conditional_directive(kw) ||
+           keyword_is_opcode(kw);
+}
+

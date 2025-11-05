@@ -11,10 +11,10 @@
 #include "lexer.h"
 #include <deque>
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <memory>
 #include <ctime>
 
 class Preprocessor {
@@ -55,6 +55,14 @@ public:
     void define_macro(const std::string& name,
                       const std::vector<TokensLine>& replacement);
 
+    // Dependency collection API
+    // Returns the list of files that were pushed via push_file/push_binary_file,
+    // in the order they were recorded (duplicates preserved).
+    const std::vector<std::string>& dependency_filenames() const;
+
+    // Clears the collected dependency filenames.
+    void clear_dependencies();
+
 private:
     static const inline int MAX_MACRO_RECURSION = 32;
 
@@ -73,8 +81,12 @@ private:
     };
 
     struct File {
-        std::shared_ptr<TokensFile> tokens_file; // Pointer to cached or virtual file
+        // Pointer to cached or virtual file
+        std::shared_ptr<TokensFile> tokens_file;
         unsigned line_index = 0;
+
+        // Queue of split lines
+        std::deque<TokensLine> split_queue_;
 
         // Optional forced logical location (from LINE/C_LINE)
         bool has_forced_location = false;
@@ -116,14 +128,28 @@ private:
 
     // Conditional inclusion stack
     std::vector<IfFrame> if_stack_;
-    bool all_ifs_active() const;
+
+    // Makefile dependency collection (order-preserving, duplicates allowed)
+    std::vector<std::string> dep_files_;
+
+
+    // Fetch a line from the input file, or file_input_queue_ if not empty.
+    bool fetch_line(TokensLine& out);
+    Location compute_location(const File& file, const TokensLine& out);
+
+    // Pre-split a raw physical line into colon or backslahs-separated segments
+    // Returns true if the line was split and segments were produced.
+    bool split_line(const TokensLine& line,
+                    std::vector<TokensLine>& out_segments);
+    bool split_label(const Location& location,
+                     const TokensLine& line, unsigned& i,
+                     std::vector<TokensLine>& out_segments);
 
     // Fetch a raw next logical line for MACRO/REPT bodies.
     bool fetch_line_for_macro_body(TokensLine& out);
     bool collect_macro_body(std::vector<TokensLine>& out_body,
                             std::vector<std::string>& out_locals,
                             Keyword start_keyword, Keyword end_keyword);
-
     // Helper to get or create a cached file
     std::shared_ptr<TokensFile> get_cached_file(const std::string&
             normalized_filename);
@@ -153,6 +179,7 @@ private:
                          bool negated, Keyword keyword);
 
     // parse directives
+    bool all_ifs_active() const;
     bool is_directive(const TokensLine& line, unsigned& i,
                       Keyword& keyword) const;
     bool is_name_directive(const TokensLine& line, unsigned& i,
@@ -249,12 +276,11 @@ private:
                        std::vector<std::string>& out_locals);
 
     // Macro expansion and line splitting
-    void split_lines(const Location& location,
-                     const std::vector<TokensLine>& expanded);
-    void split_line(const Location& location, const TokensLine& expanded);
-    bool split_label(const Location& location,
-                     const TokensLine& expanded, unsigned& i);
-    void merge_double_hash(TokensLine& line);
+    // Replace string tokens by comma-separated integers.
+    // Returns true if any change was made; the (possibly) transformed line is written to 'out'.
+    bool post_process_line(const TokensLine& line, TokensLine& out);
+    void add_virtual_file(std::vector<TokensLine> expanded);
+    bool merge_double_hash(const TokensLine& line, TokensLine& out);
 
     // expand_macros helpers
     bool is_macro_call(const TokensLine& in_line, unsigned idx,
@@ -272,19 +298,24 @@ private:
         const Macro& macro,
         const std::vector<TokensLine>& original_args,
         TokensLine& new_line);
-    std::vector<TokensLine> substitute_and_expand(
+    bool substitute_and_expand(
         const Macro& macro,
         const std::vector<std::vector<TokensLine>>& expanded_args_flat,
-        const std::vector<TokensLine>& original_args);
+        const std::vector<TokensLine>& original_args,
+        const std::string& name,
+        std::vector<TokensLine>& out_expanded);
     void append_expansion_into_out(
         const std::vector<TokensLine>& further_expanded,
         TokensLine& out,
         std::vector<TokensLine>& result,
         const Location& in_location);
 
-    std::vector<TokensLine> expand_macros(const TokensLine& line);
-    std::vector<TokensLine> expand_macros(const std::vector<TokensLine>& lines);
+    // Expand macros in a single line. Returns true if any macro expansion
+    // or token-paste changed the input. Result lines placed in 'out'.
+    bool expand_macros(const TokensLine& line, bool at_start,
+                       std::vector<TokensLine>& out);
+    // Expand macros in multiple lines. Returns true if any change occurred.
+    bool expand_macros(const std::vector<TokensLine>& lines, bool at_start,
+                       std::vector<TokensLine>& out);
     TokensLine expand_macros_in_line(const TokensLine& line);
 };
-
-
