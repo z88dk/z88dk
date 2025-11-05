@@ -1,4 +1,3 @@
 - cache read input files to avoid repeating tokenization
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
-- issue error if IF stack is not empty at the end of input
 - add option -MMD and generate input file for Makefile target.d
