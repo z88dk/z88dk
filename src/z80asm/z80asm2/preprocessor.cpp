@@ -8,6 +8,7 @@
 #include "options.h"
 #include "preprocessor.h"
 #include "symbol_table.h"
+#include "keywords.h"
 #include "utils.h"
 #include <algorithm>
 #include <cassert>
@@ -26,6 +27,7 @@ void Preprocessor::clear() {
     macros_.clear();
     macro_recursion_count_.clear();
     if_stack_.clear();
+    dep_files_.clear(); // also reset collected dependencies
 }
 
 void Preprocessor::clear_file_cache() {
@@ -54,6 +56,9 @@ void Preprocessor::push_file(const std::string& filename) {
     // Get or create cached file
     std::shared_ptr<TokensFile> cached_tokens = get_cached_file(
                 normalized_filename);
+
+    // Record dependency (keep order, allow duplicates)
+    dep_files_.push_back(normalized_filename);
 
     // Take ownership via shared_ptr
     File f;
@@ -96,6 +101,9 @@ void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
 
 void Preprocessor::push_binary_file(const std::string& bin_filename,
                                     const Location& location) {
+
+    // Record dependency first (order-preserving, duplicates allowed)
+    dep_files_.push_back(normalize_path(bin_filename));
 
     std::vector<unsigned char> bytes;
     try {
@@ -144,33 +152,39 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
 bool Preprocessor::next_line(TokensLine& line) {
     line.clear();
     while (true) {
-        // If we have queued lines, process them as full input (including directives)
+        // If we have queued lines, process them as full input
+        // (including directives)
         if (!input_queue_.empty()) {
             line = std::move(input_queue_.front());
             input_queue_.pop_front();
-
-            g_errors.set_location(line.location());
-            g_errors.set_expanded_line(line.to_string());
 
             if (line.empty()) {
                 continue;
             }
 
+            g_errors.set_location(line.location());
+            g_errors.set_expanded_line(line.to_string());
+
             // Process directives appearing in queued lines
             Keyword keyword = Keyword::None;
             unsigned i = 0;
+            bool found_directive = false;
             if (is_directive(line, i, keyword)) {
+                found_directive = true;
+
                 // Conditional directives always execute
                 if (keyword_is_conditional_directive(keyword)) {
                     process_contitional_directive(line, i, keyword);
                     continue;
                 }
+            }
 
-                // Other directives only execute when all IFs are active
-                if (!all_ifs_active()) {
-                    continue; // skip directive content entirely
-                }
+            // Other directives only execute when all IFs are active
+            if (!all_ifs_active()) {
+                continue; // skip directive content entirely
+            }
 
+            if (found_directive) {
                 reading_queue_for_directive_ = true;
                 process_directive(line, i, keyword);
                 reading_queue_for_directive_ = false;
@@ -192,101 +206,36 @@ bool Preprocessor::next_line(TokensLine& line) {
                 continue; // consume and continue
             }
 
-            // Not a directive -> return this logical line only if active
-            if (!all_ifs_active()) {
-                continue;
-            }
             return true;
         }
 
         // read lines from top file in stack
-        if (file_stack_.empty()) {
+        if (!fetch_line(line)) {
             // no more input
-            if (!if_stack_.empty()) {
-                // Report unclosed conditional at end of input
-                g_errors.error(ErrorCode::InvalidSyntax,
-                               "Unexpected end of input in IF (expected ENDIF)");
-                if_stack_.clear();
-            }
+            line.clear();
             return false;
-        }
-
-        File& file = file_stack_.back();
-        if (file.line_index >= file.tokens_file->tok_lines_count()) {
-            // end of file reached; pop file from stack
-            file_stack_.pop_back();
-            continue;
-        }
-
-        // get next line from file (physical or virtual)
-        line = file.tokens_file->get_tok_line(file.line_index);
-        ++file.line_index;
-
-        // Compute logical location here based on current file mapping.
-        // Rules:
-        // - If LINE/C_LINE was seen in this file: use forced_filename (if set) and
-        //   either constant line (C_LINE) or LINE + (physical_index - forced_from_index)
-        // - Otherwise: use file's own filename() and first_line_num() + physical_index
-        {
-            // true physical line number from source
-            const int physical_line = line.location().line_num();
-
-            Location loc = line.location();
-
-            if (file.has_forced_location) {
-                if (!file.forced_filename.empty()) {
-                    loc.set_filename(file.forced_filename);
-                }
-                else {
-                    loc.set_filename(file.tokens_file->filename());
-                }
-
-                if (file.forced_constant_line_numbers) {
-                    // C_LINE: keep constant line number
-                    loc.set_line_num(file.forced_start_line_num);
-                }
-                else {
-                    // LINE: compute offset using physical line numbers
-                    int start_physical = file.forced_at_line_num;
-                    int offset = physical_line - start_physical - 1;
-                    if (offset < 0) {
-                        offset = 0;    // safety
-                    }
-                    loc.set_line_num(file.forced_start_line_num + offset);
-                }
-            }
-            else {
-                // Default mapping uses the physical line number provided by TokensLine
-                loc.set_filename(file.tokens_file->filename());
-                loc.set_line_num(physical_line);
-            }
-
-            line.set_location(loc);
-        }
-
-        g_errors.set_location(line.location());
-        g_errors.set_source_line(line.to_string());
-
-        if (line.empty()) {
-            // skip empty lines
-            continue;
         }
 
         // check for directives and process
         Keyword keyword = Keyword::None;
         unsigned i = 0;
+        bool found_directive = false;
         if (is_directive(line, i, keyword)) {
+            found_directive = true;
+
             // Conditional directives always execute
             if (keyword_is_conditional_directive(keyword)) {
                 process_contitional_directive(line, i, keyword);
                 continue;
             }
+        }
 
-            // non-conditional directives only when active
-            if (!all_ifs_active()) {
-                continue;
-            }
+        // non-conditional directives only when active
+        if (!all_ifs_active()) {
+            continue;
+        }
 
+        if (found_directive) {
             process_directive(line, i, keyword);
             continue; // get next line
         }
@@ -303,24 +252,30 @@ bool Preprocessor::next_line(TokensLine& line) {
             continue; // get next line
         }
 
-        // If not active, skip normal lines
-        if (!all_ifs_active()) {
-            continue;
-        }
-
         // expand macros in the line
         Location location = line.location();
-        std::vector<TokensLine> expanded = expand_macros(line);
+        std::vector<TokensLine> expanded;
+        bool changed_line = expand_macros(line, true, expanded);
+        if (!changed_line) {
+            // no macros expanded, keep original line
+            TokensLine out1;
+            merge_double_hash(line, out1);
+            if (!expand_macros(out1, true, expanded)) {
+                TokensLine out2;
+                post_process_line(out1, out2);
+                line = out2;
+                return true;
+            }
+            // else fall through
+        }
+
         if (expanded.empty()) {
             // nothing to emit from this physical line
             continue; // get next line
         }
 
-        // split expanded lines into input queue
-        split_lines(location, expanded);
-
-        // Continue loop; either queued lines will be returned next, or the virtual
-        // file we pushed will be read on the next iteration.
+        // split expanded lines into vitual file
+        add_virtual_file(expanded);
     }
 }
 
@@ -343,6 +298,18 @@ void Preprocessor::define_macro(const std::string& name,
     m.locals.clear();
     m.is_function_like = false;
     macros_[name] = std::move(m);
+}
+
+// Dependency collection API
+// Returns the list of files that were pushed via push_file/push_binary_file,
+// in the order they were recorded (duplicates preserved).
+const std::vector<std::string>& Preprocessor::dependency_filenames() const {
+    return dep_files_;
+}
+
+// Clears the collected dependency filenames.
+void Preprocessor::clear_dependencies() {
+    dep_files_.clear();
 }
 
 void Preprocessor::expect_end(const TokensLine& line, unsigned i) const {
@@ -656,9 +623,7 @@ TokensLine Preprocessor::collect_tokens(const TokensLine& line,
         result.push_back(line[i]);
         ++i;
     }
-    while (!result.empty() && result.back().is(TokenType::Whitespace)) {
-        result.pop_back();
-    }
+    result.trim();
     return result;
 }
 
@@ -756,6 +721,7 @@ bool Preprocessor::is_directive(const TokensLine& line,
 bool Preprocessor::is_name_directive(const TokensLine& line, unsigned& i,
                                      Keyword& keyword,
                                      std::string& name) const {
+    unsigned start = i;
     line.skip_spaces(i);
     name.clear();
     if (parse_identifier(line, i, name)) {
@@ -775,7 +741,7 @@ bool Preprocessor::is_name_directive(const TokensLine& line, unsigned& i,
         }
     }
 
-    i = 0;  // rewind
+    i = start;  // rewind
     return false;
 }
 
@@ -1260,6 +1226,229 @@ bool Preprocessor::all_ifs_active() const {
     return true;
 }
 
+bool Preprocessor::fetch_line(TokensLine& out) {
+    while (!file_stack_.empty()) {
+        out.clear();
+        File& file = file_stack_.back();
+
+        // get from split queue
+        if (!file.split_queue_.empty()) {
+            out = std::move(file.split_queue_.front());
+            file.split_queue_.pop_front();
+            if (out.empty()) {
+                // skip empty lines
+                continue;
+            }
+
+            g_errors.set_location(out.location());
+            g_errors.set_expanded_line(out.to_string());
+            return true;
+        }
+
+        // get from inout file
+        if (file.line_index >= file.tokens_file->tok_lines_count()) {
+            // end of file reached; pop file from stack
+            file_stack_.pop_back();
+            continue;
+        }
+
+        // get next line from file (physical or virtual)
+        out = file.tokens_file->get_tok_line(file.line_index);
+        out.trim();
+        ++file.line_index;
+
+        // skip empty lines
+        if (out.empty()) {
+            continue;
+        }
+
+        // compute Location
+        Location loc = compute_location(file, out);
+        out.set_location(loc);
+
+        g_errors.set_location(out.location());
+        g_errors.set_source_line(out.to_string());
+
+        // split line
+        std::vector<TokensLine> segments;
+        if (!split_line(out, segments)) {
+            return true;    // did not split
+        }
+
+        for (auto& segment : segments) {
+            file.split_queue_.push_back(std::move(segment));
+        }
+    }
+
+    // no more input
+    if (!if_stack_.empty()) {
+        // Report unclosed conditional at end of input
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unexpected end of input in IF (expected ENDIF)");
+        if_stack_.clear();
+    }
+
+    out.clear();
+    return false;
+}
+
+// Compute logical location here based on current file mapping.
+// Rules:
+// - If LINE/C_LINE was seen in this file: use forced_filename (if set) and
+//   either constant line number (C_LINE) or LINE + (physical_index - forced_from_index)
+// - Otherwise: use file's own filename() and first_line_num() + physical_index
+Location Preprocessor::compute_location(const File& file,
+                                        const TokensLine& out) {
+    // true physical line number from source
+    const int physical_line = out.location().line_num();
+
+    Location loc = out.location();
+
+    if (file.has_forced_location) {
+        if (!file.forced_filename.empty()) {
+            loc.set_filename(file.forced_filename);
+        }
+        else {
+            loc.set_filename(file.tokens_file->filename());
+        }
+
+        if (file.forced_constant_line_numbers) {
+            // C_LINE: keep constant line number
+            loc.set_line_num(file.forced_start_line_num);
+        }
+        else {
+            // LINE: compute offset using physical line numbers
+            int start_physical = file.forced_at_line_num;
+            int offset = physical_line - start_physical - 1;
+            if (offset < 0) {
+                offset = 0;    // safety
+            }
+            loc.set_line_num(file.forced_start_line_num + offset);
+        }
+    }
+    else {
+        // Default mapping uses the physical line number provided by TokensLine
+        loc.set_filename(file.tokens_file->filename());
+        loc.set_line_num(physical_line);
+    }
+
+    return loc;
+}
+
+bool Preprocessor::split_line(const TokensLine& line,
+                              std::vector<TokensLine>& out_segments) {
+    out_segments.clear();
+    if (line.empty()) {
+        return false;
+    }
+
+    // first identify labels at start of line
+    bool did_split = false;
+    int ternary_depth = 0;
+    unsigned i = 0;
+
+    while (split_label(line.location(), line, i, out_segments)) {
+        did_split = true;
+    }
+
+    TokensLine segment(line.location());
+    line.skip_spaces(i);
+    while (i < line.size()) {
+        const Token& t = line[i];
+        if ((t.is(TokenType::Colon) && ternary_depth == 0) ||
+                t.is(TokenType::Backslash)) {
+            // end of current line; push current line to queue
+            did_split = true;
+            segment.trim();
+            if (!segment.empty()) {
+                out_segments.push_back(std::move(segment));
+            }
+            segment = TokensLine(line.location());
+            ++i;
+            // skip spaces after colon/backslash
+            line.skip_spaces(i);
+            continue;
+        }
+        else if (t.is(TokenType::Quest)) {
+            ++ternary_depth;
+        }
+        else if (t.is(TokenType::Colon)) {
+            if (ternary_depth > 0) {
+                --ternary_depth;
+            }
+        }
+
+        segment.push_back(t);
+        ++i;
+    }
+
+    segment.trim();
+    if (!segment.empty()) {
+        out_segments.push_back(std::move(segment));
+    }
+
+    return did_split;
+}
+
+bool Preprocessor::split_label(const Location& location,
+                               const TokensLine& line, unsigned& i,
+                               std::vector<TokensLine>& out_segments) {
+    unsigned start = i;
+    TokensLine label_line(location);
+
+    // label:
+    i = start; // rewind
+    line.skip_spaces(i);
+    if (i < line.size() && line[i].is(TokenType::Identifier)) {
+        std::string label_name = line[i].text();
+        Keyword label_kw = line[i].keyword();
+        if (keyword_is_instruction(label_kw)) {
+            // Not a label
+            i = start;
+            line.skip_spaces(i);
+            return false;
+        }
+        ++i;
+        line.skip_spaces(i);
+        // A plain identifier is only a label if followed by a colon
+        if (i < line.size() && line[i].is(TokenType::Colon)) {
+            ++i; // consume ':'
+
+            // found label
+            label_line.push_back(Token(TokenType::Dot, "."));
+            label_line.push_back(Token(TokenType::Identifier, label_name));
+            out_segments.push_back(std::move(label_line));
+
+            line.skip_spaces(i);
+            return true;
+        }
+    }
+
+    // .label
+    i = start; // rewind
+    line.skip_spaces(i);
+    if (i < line.size() && line[i].is(TokenType::Dot)) {
+        ++i;
+        line.skip_spaces(i);
+        if (i < line.size() && line[i].is(TokenType::Identifier)) {
+            std::string label_name = line[i].text();
+            ++i;
+
+            // found label
+            label_line.push_back(Token(TokenType::Dot, "."));
+            label_line.push_back(Token(TokenType::Identifier, label_name));
+            out_segments.push_back(std::move(label_line));
+
+            line.skip_spaces(i);
+            return true;
+        }
+    }
+
+    i = start; // rewind
+    line.skip_spaces(i);
+    return false;
+}
+
 // Fetch a raw next logical line for MACRO body parsing, from the proper source:
 // - input_queue_ when reading_queue_for_directive_ is true
 // - file_stack_ otherwise (and applies forced location if needed).
@@ -1452,6 +1641,7 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     if (j < line.size()) {
         if (!parse_params_list(line, j, params)) {
             g_errors.error(ErrorCode::InvalidSyntax, "Invalid macro parameter list");
+            return;
         }
     }
     expect_end(line, j);
@@ -1461,6 +1651,7 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
         return;
     }
 
+    // Register the macro definition
     Macro macro;
     macro.params = std::move(params);
     macro.locals = std::move(locals);
@@ -1942,7 +2133,8 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
     std::vector<std::string> local_names;
     if (parse_params_list(line, i, local_names)) {
         // Append parsed names
-        out_locals.insert(out_locals.end(), local_names.begin(), local_names.end());
+        out_locals.insert(out_locals.end(), local_names.begin(),
+                          local_names.end());
     }
     else {
         // Restore to allow "LOCAL" with no params
@@ -1952,134 +2144,16 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
     expect_end(line, i);
 }
 
-// Replace previous split_lines implementation with a macro-expansion "virtual file" wrapper
-// so directives like IFDEF are processed correctly within macro expansions, preventing them
-// from being expanded into literal values. All expanded lines carry the macro call-site
-// logical location (constant line number), and directives like EXITM can abort the current
-// expansion.
-void Preprocessor::split_lines(const Location& location,
-                               const std::vector<TokensLine>& expanded) {
-    // Fast path: empty expansion
-    if (expanded.empty()) {
-        return;
-    }
-
-    // Fast path: single line without directives -> split inline (no EXITM impact, no directive processing needed)
-    if (expanded.size() == 1) {
-        const TokensLine& single = expanded[0];
-        unsigned check_idx = 0;
-        Keyword kw = Keyword::None;
-        std::string dummy_name;
-
-        // Check if this line contains a directive or name-directive
-        bool has_directive = is_directive(single, check_idx, kw) ||
-                             is_name_directive(single, check_idx, kw, dummy_name);
-
-        if (!has_directive) {
-            // No directives -> safe to split inline
-            split_line(location, single);
-            return;
-        }
-    }
-
-    // Multi-line expansion or contains directives:
-    // Route through virtual file so directives (IF/IFDEF/EXITM/etc.) are processed correctly
-    // and don't get macro-expanded into literal values.
-    push_virtual_file(expanded, location.filename(),
-                      location.line_num(), false);
-
-    // Mark as macro-expansion so EXITM can discard the rest of this virtual file.
-    if (!file_stack_.empty()) {
-        File& top = file_stack_.back();
-        top.is_macro_expansion = true;
-        // No forced logical mapping here; each TokensLine already carries its call-site location.
-    }
-}
-
-void Preprocessor::split_line(const Location& location,
-                              const TokensLine& expanded) {
-    // Make a mutable copy so we can apply merging of '##' operator
-    TokensLine line_to_process = expanded;
-    merge_double_hash(line_to_process);
-
-    // After token-paste, an identifier produced by '##' may form a macro name.
-    // Run macro expansion on the pasted result and, if it changes the line
-    // (or produces multiple logical lines), process those expanded results
-    // instead of the original pasted line. This ensures that token-paste
-    // followed by a macro name will cause that macro to be expanded.
-    {
-        std::vector<TokensLine> post_paste_expanded =
-            expand_macros(line_to_process);
-
-        // Determine if expansion changed the content in a meaningful way.
-        bool changed = false;
-        if (post_paste_expanded.size() != 1) {
-            changed = true;
-        }
-        else {
-            const TokensLine& p0 = post_paste_expanded.front();
-            if (p0.size() != line_to_process.size()) {
-                changed = true;
-            }
-            else {
-                for (unsigned k = 0; k < p0.size(); ++k) {
-                    if (p0[k].text() != line_to_process[k].text()) {
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (changed) {
-            // Process each expanded logical line resulting from macro expansion
-            for (const TokensLine& el : post_paste_expanded) {
-                split_line(location, el);
-            }
-            return;
-        }
-    }
-
-    TokensLine current(location);
-    int ternary_depth = 0;
+// Replace strings by comma-separated integers
+bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
+    out = TokensLine(line.location());
+    bool changed = false;
     unsigned i = 0;
-
-    // check for label at start of line (uses processed line)
-    while (split_label(location, line_to_process, i)) {
-        ;
-    }
-
-    // process rest of line
-    while (i < line_to_process.size()) {
-        const Token& t = line_to_process[i];
-        if (t.is(TokenType::Colon) && ternary_depth == 0) {
-            // end of current line; push current line to queue
-            input_queue_.push_back(std::move(current));
-            current = TokensLine(location);
-            ++i;
-            // skip spaces after colon
-            line_to_process.skip_spaces(i);
-            continue;
-        }
-        else if (t.is(TokenType::Quest)) {
-            ++ternary_depth;
-        }
-        else if (t.is(TokenType::Colon)) {
-            if (ternary_depth > 0) {
-                --ternary_depth;
-            }
-        }
-        else if (t.is(TokenType::Backslash)) {
-            // end of current line; push current line to queue
-            input_queue_.push_back(std::move(current));
-            current = TokensLine(location);
-            ++i;
-            // skip spaces after colon
-            line_to_process.skip_spaces(i);
-            continue;
-        }
-        else if (t.is(TokenType::String)) {
-            // transform strings in lists of numbers separated by commas
+    while (i < line.size()) {
+        const Token& t = line[i];
+        if (t.is(TokenType::String)) {
+            changed = true;
+            // transform strings into lists of numbers separated by commas
             std::string str_val = t.string_value();
             ++i;
             bool is_first = true;
@@ -2087,79 +2161,100 @@ void Preprocessor::split_line(const Location& location,
                 if (!is_first) {
                     // add comma token
                     Token comma_tok(TokenType::Comma, ",");
-                    current.push_back(comma_tok);
+                    out.push_back(comma_tok);
                 }
                 // add character as integer token
                 int char_int = static_cast<int>(
                                    static_cast<unsigned char>(c));
                 Token char_tok(TokenType::Integer,
                                std::to_string(char_int), char_int);
-                current.push_back(char_tok);
+                out.push_back(char_tok);
                 is_first = false;
             }
-            continue;
         }
-
-        current.push_back(t);
-        ++i;
+        else {
+            out.push_back(t);
+            ++i;
+        }
     }
 
-    if (!current.empty()) {
-        input_queue_.push_back(std::move(current));
+    // trim whitespace
+    if (out.trim()) {
+        changed = true;
+    }
+
+    // If nothing changed, preserve exact original tokens (avoids unnecessary differences)
+    if (!changed) {
+        out = line;
+    }
+
+    return changed;
+}
+
+void Preprocessor::add_virtual_file(std::vector<TokensLine> expanded) {
+    // Fast path: empty expansion
+    if (expanded.empty()) {
+        return;
+    }
+
+    std::vector<TokensLine> out;
+
+    // create segments for each expanded line
+    std::vector<TokensLine> segments;
+    for (auto& tkl : expanded) {
+        // run token-paste (##) and macro expansion on each line
+        TokensLine tkl_tokpaste;
+        merge_double_hash(tkl, tkl_tokpaste);
+        std::vector<TokensLine> expanded_tokpaste;
+        expand_macros(tkl_tokpaste, true, expanded_tokpaste);
+
+        // split segments on the result of token-pasting + macro expansion
+        for (auto& tkl2 : expanded_tokpaste) {
+            if (split_line(tkl2, segments)) {
+                // line was split into segments
+                for (auto& seg : segments) {
+                    TokensLine pp_seg;
+                    post_process_line(seg, pp_seg);
+                    out.push_back(pp_seg);
+                }
+                segments.clear();
+            }
+            else {
+                // no splitting; push original expanded line (after post-process)
+                TokensLine pp_tkl2;
+                post_process_line(tkl2, pp_tkl2);
+                out.push_back(pp_tkl2);
+            }
+        }
+    }
+
+    // Fast path and exit from recursion - if only one segment, push
+    // to input queue directly
+    if (out.empty()) {
+        return;
+    }
+    else if (out.size() == 1) {
+        input_queue_.push_back(out.front());
+        return;
+    }
+
+    // Create virtual file so that EXITM can abort the expansion
+    push_virtual_file(out,
+                      expanded[0].location().filename(),
+                      expanded[0].location().line_num(), false);
+
+    // Mark as macro-expansion so EXITM can discard the rest of this virtual file.
+    if (expanded.size() > 1) {
+        if (!file_stack_.empty()) {
+            File& top = file_stack_.back();
+            top.is_macro_expansion = true;
+        }
     }
 }
 
-bool Preprocessor::split_label(const Location& location,
-                               const TokensLine& expanded, unsigned& i) {
-    unsigned start = i;
-    TokensLine label_line(location);
-
-    // label:
-    i = start; // rewind
-    expanded.skip_spaces(i);
-    if (i < expanded.size() && expanded[i].is(TokenType::Identifier)) {
-        std::string label_name = expanded[i].text();
-        ++i;
-        expanded.skip_spaces(i);
-        if (i < expanded.size() && expanded[i].is(TokenType::Colon)) {
-            ++i;
-            // found label
-            label_line.push_back(Token(TokenType::Dot, "."));
-            label_line.push_back(Token(TokenType::Identifier, label_name));
-            input_queue_.push_back(std::move(label_line));
-
-            expanded.skip_spaces(i);
-            return true;
-        }
-    }
-
-    // .label
-    i = start; // rewind
-    expanded.skip_spaces(i);
-    if (i < expanded.size() && expanded[i].is(TokenType::Dot)) {
-        ++i;
-        expanded.skip_spaces(i);
-        if (i < expanded.size() && expanded[i].is(TokenType::Identifier)) {
-            std::string label_name = expanded[i].text();
-            ++i;
-            // found label
-            label_line.push_back(Token(TokenType::Dot, "."));
-            label_line.push_back(Token(TokenType::Identifier, label_name));
-            input_queue_.push_back(std::move(label_line));
-
-            expanded.skip_spaces(i);
-            return true;
-        }
-    }
-
-    i = start; // rewind
-    expanded.skip_spaces(i);
-    return false;
-}
-
-void Preprocessor::merge_double_hash(TokensLine& line) {
-    // Build a new TokensLine with merged tokens
-    TokensLine out(line.location());
+bool Preprocessor::merge_double_hash(const TokensLine& line, TokensLine& out) {
+    out = TokensLine(line.location());
+    bool merged_any = false;
 
     unsigned idx = 0;
     while (idx < line.size()) {
@@ -2185,6 +2280,7 @@ void Preprocessor::merge_double_hash(TokensLine& line) {
                     out.push_back(Token(TokenType::Identifier, glued));
                     // advance past the matched sequence
                     idx = k + 1;
+                    merged_any = true;
                     continue;
                 }
             }
@@ -2195,12 +2291,8 @@ void Preprocessor::merge_double_hash(TokensLine& line) {
         ++idx;
     }
 
-    // replace original line with merged result
-    line = out;
+    return merged_any;
 }
-
-
-// ------------------- Refactored helpers for expand_macros --------------------
 
 bool Preprocessor::is_macro_call(const TokensLine& in_line, unsigned idx,
                                  const Macro& macro,
@@ -2231,7 +2323,7 @@ bool Preprocessor::is_macro_call(const TokensLine& in_line, unsigned idx,
 // On success: fills expanded_args_flat with one TokensLine per argument (first line of expansion or empty line),
 // sets out_after_idx to index after consumed args and returns true.
 // Also fills out_original_args with the trimmed original (unexpanded, trimmed) TokensLine for each arg
-// (used for '#' stringizing). On failure returns false (syntax error).
+// (used for '#' stringize). On failure returns false (syntax error).
 bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
         unsigned args_start_idx,
         std::vector<std::vector<TokensLine>>& expanded_args_flat,
@@ -2251,7 +2343,8 @@ bool Preprocessor::parse_and_expand_macro_args(const TokensLine& in_line,
         out_original_args.push_back(argline);
 
         // expand macros inside argument and keep all expanded logical lines
-        std::vector<TokensLine> expanded = expand_macros(argline);
+        std::vector<TokensLine> expanded;
+        expand_macros(argline, false, expanded);
         if (!expanded.empty()) {
             expanded_args_flat.push_back(expanded);
         }
@@ -2329,14 +2422,19 @@ bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
 // Substitute parameters into macro replacement and then expand the substituted result.
 // Returns the fully expanded replacement (may be multiple TokensLine elements).
 // Supports the '#' operator via try_stringize_parameter above.
-std::vector<TokensLine> Preprocessor::substitute_and_expand(
+bool Preprocessor::substitute_and_expand(
     const Macro& macro,
     const std::vector<std::vector<TokensLine>>& expanded_args_flat,
-    const std::vector<TokensLine>& original_args) {
-    // Prepare LOCAL renaming map for this expansion, if any locals declared.
+    const std::vector<TokensLine>& original_args,
+    const std::string& name,
+    std::vector<TokensLine>& out_expanded) {
+
+    out_expanded.clear();
+    bool did_substitute = false; // track any transformation
+
+    // LOCAL renaming map (mark did_substitute only on actual local substitution later)
     std::unordered_map<std::string, std::string> local_rename;
     if (!macro.locals.empty()) {
-        // Each macro expansion gets a new unique id
         ++local_id_counter_;
         const std::string suffix = "_" + std::to_string(local_id_counter_);
         for (const std::string& ln : macro.locals) {
@@ -2344,10 +2442,11 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
         }
     }
 
-    // Perform textual parameter substitution
+    // Collect substituted (before recursive macro expansion)
     std::vector<TokensLine> substituted;
+    substituted.reserve(macro.replacement.size());
+
     for (const TokensLine& rep_line : macro.replacement) {
-        // temp_lines holds 1..N TokensLine resulting from substituting this rep_line
         std::vector<TokensLine> temp_lines;
         temp_lines.emplace_back(rep_line.location());
 
@@ -2355,38 +2454,33 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
         while (pidx < rep_line.size()) {
             const Token& rt = rep_line[pidx];
 
-            // Handle stringize operator: '#' followed by parameter identifier
+            // Stringize operator #
             if (rt.is(TokenType::Hash)) {
-                // try_stringize_parameter expects a TokensLine to append into.
-                if (try_stringize_parameter(rep_line, pidx, macro, original_args,
-                                            temp_lines.back())) {
-                    // handled and pidx advanced inside helper
+                if (try_stringize_parameter(rep_line, pidx, macro,
+                                            original_args, temp_lines.back())) {
+                    did_substitute = true;
                     continue;
                 }
-                // If not handled (not followed by a matching param), copy '#'
-                // If '#' appears in replacement (not stringize), copy as-is
+                // literal '#'
                 temp_lines.back().push_back(rt);
                 ++pidx;
                 continue;
             }
 
-            bool substituted_flag = false;
+            bool param_substituted = false;
 
-            // Normal parameter substitution: identifier matching a parameter
+            // Parameter substitution
             if (rt.is(TokenType::Identifier)) {
                 for (unsigned pi = 0; pi < macro.params.size(); ++pi) {
                     if (rt.text() == macro.params[pi]) {
-                        // expanded_args_flat[pi] is a vector<TokensLine>
                         const auto& arg_lines = expanded_args_flat[pi];
-
                         if (!arg_lines.empty()) {
-                            // Append first expanded line into current last temp line
+                            // first line
                             const TokensLine& first_arg = arg_lines.front();
                             for (unsigned at = 0; at < first_arg.size(); ++at) {
                                 temp_lines.back().push_back(first_arg[at]);
                             }
-
-                            // For subsequent expanded lines, create new temp lines
+                            // subsequent lines become new temp lines
                             for (size_t al = 1; al < arg_lines.size(); ++al) {
                                 temp_lines.emplace_back(rep_line.location());
                                 const TokensLine& later_arg = arg_lines[al];
@@ -2395,19 +2489,20 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
                                 }
                             }
                         }
-                        substituted_flag = true;
+                        param_substituted = true;
+                        did_substitute = true;
                         break;
                     }
                 }
             }
 
-            if (!substituted_flag) {
-                // Copy token into current last temp line
-                // If this identifier is declared LOCAL for the macro, rename it.
+            if (!param_substituted) {
+                // LOCAL rename or literal copy
                 if (rt.is(TokenType::Identifier)) {
                     auto it = local_rename.find(rt.text());
                     if (it != local_rename.end()) {
                         temp_lines.back().push_back(Token(TokenType::Identifier, it->second));
+                        did_substitute = true; // mark only on actual local substitution
                     }
                     else {
                         temp_lines.back().push_back(rt);
@@ -2417,20 +2512,40 @@ std::vector<TokensLine> Preprocessor::substitute_and_expand(
                     temp_lines.back().push_back(rt);
                 }
             }
+
             ++pidx;
         }
 
-        // Apply token-paste (##) after parameter substitution on each produced line
+        // Token-paste (##) after substitution; return value indicates if a merge happened
         for (TokensLine& tln : temp_lines) {
-            merge_double_hash(tln);
-            substituted.push_back(tln);
+            TokensLine merged;
+            bool merged_any = merge_double_hash(tln, merged);
+            if (merged_any) {
+                did_substitute = true;
+            }
+            substituted.push_back(std::move(merged));
         }
     }
 
-    return substituted;
+    // Decide if we need another macro expansion pass inside substituted lines:
+    // Only if some substitution/token-paste happened.
+    if (!did_substitute) {
+        out_expanded = substituted;
+        return false;
+    }
+
+    // Further macro expansion (may create additional lines)
+    int& rc = macro_recursion_count_[name];
+    rc++;
+    std::vector<TokensLine> further_expanded;
+    expand_macros(substituted, false, further_expanded);
+    rc--;
+
+    out_expanded = std::move(further_expanded);
+    return true;
 }
 
-// Append expanded result into `out` and `result` following multi-line semantics.
+// Append expanded results into `out` and `result` following multi-line semantics.
 // first line of further_expanded is merged into current `out`
 // each subsequent line causes current `out` to be pushed into `result` and `out` reinitialized
 // with that subsequent line.
@@ -2460,28 +2575,46 @@ void Preprocessor::append_expansion_into_out(const std::vector<TokensLine>&
     }
 }
 
-// ------------------- expand_macros (refactored) -------------------------------
-
-std::vector<TokensLine> Preprocessor::expand_macros(
-    const TokensLine& line) {
+bool Preprocessor::expand_macros(const TokensLine& line, bool at_start,
+                                 std::vector<TokensLine>& out) {
     std::vector<TokensLine> lines{ line };
-    return expand_macros(lines);
+    return expand_macros(lines, at_start, out);
 }
 
-std::vector<TokensLine> Preprocessor::expand_macros(
-    const std::vector<TokensLine>& lines) {
+bool Preprocessor::expand_macros(const std::vector<TokensLine>& lines,
+                                 bool at_start,
+                                 std::vector<TokensLine>& out) {
 
-    std::vector<TokensLine> result;
+    out.clear();
+    bool any_changed = false;
 
     for (const TokensLine& in_line : lines) {
-        TokensLine out(in_line.location());
+        // Skip macro expansion only for lines that start with a directive.
+        if (at_start) {
+            unsigned di = 0;
+            Keyword dkw = Keyword::None;
+            std::string name;
+            if (is_directive(in_line, di, dkw)) {
+                out.push_back(in_line); // leave directive line untouched
+                continue;
+            }
+            di = 0;
+            if(is_name_directive(in_line, di, dkw, name)) {
+                out.push_back(in_line); // leave name-directive line untouched
+                continue;
+            }
+        }
+
+        TokensLine expanded_line(in_line.location());
+        TokensLine current(in_line.location());
+        std::vector<TokensLine> multi_line_result;
         unsigned idx = 0;
 
         while (idx < in_line.size()) {
             const Token& tok = in_line[idx];
 
             if (!tok.is(TokenType::Identifier)) {
-                out.push_back(tok);
+                current.push_back(tok);
                 ++idx;
                 continue;
             }
@@ -2489,18 +2622,17 @@ std::vector<TokensLine> Preprocessor::expand_macros(
             std::string name = tok.text();
             auto mit = macros_.find(name);
             if (mit == macros_.end()) {
-                out.push_back(tok);
+                current.push_back(tok);
                 ++idx;
                 continue;
             }
 
             Macro& macro = mit->second;
-
             int& rc = macro_recursion_count_[name];
             if (rc >= MAX_MACRO_RECURSION) {
                 g_errors.error(ErrorCode::MacroRecursionLimit,
                                "Macro recursion limit reached for: " + name);
-                out.push_back(tok);
+                current.push_back(tok);
                 ++idx;
                 continue;
             }
@@ -2513,7 +2645,7 @@ std::vector<TokensLine> Preprocessor::expand_macros(
 
             // Handle function-like macros (even with zero params, e.g. MACRO())
             if (macro.is_function_like && is_call) {
-                // Try to parse and expand arguments (supports optional parentheses)
+                // Parse & expand arguments
                 std::vector<std::vector<TokensLine>> expanded_args_flat;
                 std::vector<TokensLine> original_args;
                 unsigned after_idx = 0;
@@ -2522,9 +2654,7 @@ std::vector<TokensLine> Preprocessor::expand_macros(
                                                  expanded_args_flat,
                                                  original_args,
                                                  after_idx)) {
-                    // If parenthesized form was used, treat as a syntax error-like scenario
-                    // and fall back to literal; for non-paren ambiguous usage, keep literal.
-                    out.push_back(tok);
+                    current.push_back(tok);
                     ++idx;
                     continue;
                 }
@@ -2536,51 +2666,70 @@ std::vector<TokensLine> Preprocessor::expand_macros(
                         g_errors.error(ErrorCode::InvalidSyntax,
                                        "Macro argument count mismatch for: " + name);
                     }
-                    out.push_back(tok);
+                    current.push_back(tok);
                     ++idx;
                     continue;
                 }
 
                 // Substitute parameters and expand the replacement
-                std::vector<TokensLine> further_expanded =
-                    substitute_and_expand(macro,
-                                          expanded_args_flat,
-                                          original_args);
+                std::vector<TokensLine> further_expanded;
+                substitute_and_expand(macro,
+                                      expanded_args_flat,
+                                      original_args,
+                                      name,
+                                      further_expanded);
 
-                // Append expanded result into out/result following multi-line rules
-                append_expansion_into_out(further_expanded, out, result, in_line.location());
+                any_changed = true; // macro invocation always considered a change
+
+                append_expansion_into_out(further_expanded, current, multi_line_result,
+                                          in_line.location());
 
                 // advance idx past the consumed args (works for both paren and non-paren forms)
                 idx = after_idx;
             }
             else if (macro.params.empty()) {
-                // Object-like macro
-                std::vector<TokensLine> substituted = macro.replacement;
+                // Object-like macro always counts as a change
+                any_changed = true;
 
+                std::vector<TokensLine> substituted = macro.replacement;
                 rc++;
-                std::vector<TokensLine> further_expanded =
-                    expand_macros(substituted);
+                std::vector<TokensLine> further_expanded;
+                bool inner_changed = expand_macros(substituted, at_start, further_expanded);
+                any_changed = any_changed || inner_changed;
                 rc--;
 
-                append_expansion_into_out(further_expanded, out, result, in_line.location());
+                append_expansion_into_out(further_expanded, current, multi_line_result,
+                                          in_line.location());
 
                 ++idx;
             }
             else {
-                // macro has params but is not considered a call -> treat name literally
-                out.push_back(tok);
+                // has params but not a call -> treat literally
+                current.push_back(tok);
                 ++idx;
             }
         }
 
-        result.push_back(out);
+        multi_line_result.push_back(current);
+
+        // If no macro was applied, multi_line_result contains exactly one line identical to in_line.
+        if (!any_changed) {
+            out.push_back(in_line);
+        }
+        else {
+            // Post-process each produced line (no string->int here; caller does later if needed)
+            for (const TokensLine& ml : multi_line_result) {
+                out.push_back(ml);
+            }
+        }
     }
 
-    return result;
+    return any_changed;
 }
 
 TokensLine Preprocessor::expand_macros_in_line(const TokensLine& line) {
-    std::vector<TokensLine> expanded_lines = expand_macros(line);
+    std::vector<TokensLine> expanded_lines;
+    expand_macros(line, false, expanded_lines);
     TokensLine expanded(line.location());
     for (size_t li = 0; li < expanded_lines.size(); ++li) {
         const TokensLine& el = expanded_lines[li];
@@ -2594,10 +2743,7 @@ TokensLine Preprocessor::expand_macros_in_line(const TokensLine& line) {
     }
 
     // Trim trailing whitespace for cleanliness (does not change semantics)
-    while (expanded.size() > 0
-            && expanded[expanded.size() - 1].is(TokenType::Whitespace)) {
-        expanded.pop_back();
-    }
+    expanded.trim();
 
     return expanded;
 }

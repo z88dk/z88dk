@@ -34,5 +34,6 @@ bool keyword_is_conditional_directive(Keyword kw);
 bool keywrord_is_register(Keyword kw);
 bool keyword_is_flag(Keyword kw);
 bool keyword_is_opcode(Keyword kw);
+bool keyword_is_instruction(Keyword kw);
 
 
