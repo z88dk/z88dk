@@ -904,12 +904,12 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
         REQUIRE(found10);
     }
 
-    // Multi-argument example: ADD(1,TWO) -> should contain both 1 and 2 after expansion
+    // Multi-argument example: ADD1(1,TWO) -> should contain both 1 and 2 after expansion
     {
         const std::string content =
             "#define TWO 2\n"
-            "#define ADD(a,b) a + b\n"
-            "ADD(1,TWO)\n";
+            "#define ADD1(a,b) a + b\n"
+            "ADD1(1,TWO)\n";
         pp.push_virtual_file(content, "def_func_multiarg", 1, true);
 
         TokensLine line;
@@ -5466,8 +5466,8 @@ TEST_CASE("Preprocessor: function-like macro with too few arguments reports erro
     Preprocessor pp;
 
     const std::string content =
-        "#define ADD(a,b) a + b\n"
-        "ADD(5)\n";
+        "#define ADD1(a,b) a + b\n"
+        "ADD1(5)\n";
     pp.push_virtual_file(content, "macro_few_args", 1, true);
 
     TokensLine line;
@@ -5484,8 +5484,8 @@ TEST_CASE("Preprocessor: function-like macro with too many arguments reports err
     Preprocessor pp;
 
     const std::string content =
-        "#define ADD(a,b) a + b\n"
-        "ADD(5,10,15)\n";
+        "#define ADD1(a,b) a + b\n"
+        "ADD1(5,10,15)\n";
     pp.push_virtual_file(content, "macro_many_args", 1, true);
 
     TokensLine line;
@@ -6450,3 +6450,634 @@ TEST_CASE("Preprocessor: outer IF missing ENDIF is reported even when inner bloc
              msg.find("unterminated") != std::string::npos ||
              msg.find("IF") != std::string::npos));
 }
+
+TEST_CASE("Preprocessor: dependency_filenames captures push_file and #include in order with duplicates",
+          "[preprocessor][deps][include][order][dups]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+    Preprocessor pp;
+
+    const std::string inc1 = "dep_inc1.asm";
+    const std::string inc2 = "dep_inc2.asm";
+    const std::string mainf = "dep_main.asm";
+
+    // Create include files
+    {
+        std::ofstream ofs1(inc1, std::ios::binary);
+        REQUIRE(ofs1.is_open());
+        ofs1 << "from_inc1\n";
+    }
+    {
+        std::ofstream ofs2(inc2, std::ios::binary);
+        REQUIRE(ofs2.is_open());
+        ofs2 << "from_inc2\n";
+    }
+    // Main includes inc1, inc2, inc1 again (duplicate)
+    {
+        std::ofstream ofs(mainf, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << inc1 << "\"\n";
+        ofs << "#include \"" << inc2 << "\"\n";
+        ofs << "#include \"" << inc1 << "\"\n";
+        ofs << "done\n";
+    }
+
+    // Push main file (records main), then process includes (records incs)
+    pp.push_file(mainf);
+
+    TokensLine line;
+    while (pp.next_line(line)) {
+        // drain
+    }
+
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 4);
+    // Order preserved, duplicates allowed
+    REQUIRE(deps[0] == mainf);
+    REQUIRE(deps[1] == inc1);
+    REQUIRE(deps[2] == inc2);
+    REQUIRE(deps[3] == inc1);
+
+    std::remove(inc1.c_str());
+    std::remove(inc2.c_str());
+    std::remove(mainf.c_str());
+}
+
+TEST_CASE("Preprocessor: dependency_filenames captures BINARY/INCBIN in order (including missing files)",
+          "[preprocessor][deps][binary][incbin][order]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string ok1 = "dep_ok1.bin";
+    const std::string ok2 = "dep_ok2.bin";
+    const std::string missing = "dep_missing.bin";
+
+    // Create two small binary files; leave 'missing' absent on purpose
+    {
+        std::ofstream o1(ok1, std::ios::binary);
+        REQUIRE(o1.is_open());
+        unsigned char data1[] = { 1, 2, 3 };
+        o1.write(reinterpret_cast<const char*>(data1), sizeof(data1));
+    }
+    {
+        std::ofstream o2(ok2, std::ios::binary);
+        REQUIRE(o2.is_open());
+        unsigned char data2[] = { 4 };
+        o2.write(reinterpret_cast<const char*>(data2), sizeof(data2));
+    }
+
+    // Use a virtual file to emit BINARY/INCBIN directives
+    std::string content;
+    content += "BINARY \"" + ok1 + "\"\n";
+    content += "INCBIN \"" + missing + "\"\n"; // should still be recorded in deps
+    content += "BINARY \"" + ok2 + "\"\n";
+    pp.push_virtual_file(content, "deps_binary_script", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) {
+        // drain
+    }
+
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[0] == ok1);
+    REQUIRE(deps[1] == missing);
+    REQUIRE(deps[2] == ok2);
+
+    std::remove(ok1.c_str());
+    std::remove(ok2.c_str());
+}
+
+TEST_CASE("Preprocessor: clear() resets dependency_filenames",
+          "[preprocessor][deps][clear]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Record a dependency via push_binary_file (file may not exist)
+    const std::string dep = "dep_clear_dummy.bin";
+    pp.push_binary_file(dep, Location("loc", 1));
+
+    {
+        const auto& deps = pp.dependency_filenames();
+        REQUIRE(!deps.empty());
+        REQUIRE(deps.front() == dep);
+    }
+
+    // Now clear and verify dependencies are empty
+    pp.clear();
+    REQUIRE(pp.dependency_filenames().empty());
+}
+
+TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-statements line (parenthesized call)",
+          "[preprocessor][macro][multiline][split][colon]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define a 2-line macro and call it between two colon-separated statements
+    const std::string content =
+        "MYMACRO MACRO a,b\n"
+        "DEFB a\n"
+        "DEFB b\n"
+        "ENDM\n"
+        "NOP : MYMACRO(10,20) : HALT\n";
+    pp.push_virtual_file(content, "macro_midline_parenthesized.asm", 1, true);
+
+    std::vector<std::string> outs;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        outs.push_back(line.to_string());
+    }
+
+    // Expect: one line with code before, then all macro lines, then one line with code after
+    REQUIRE(outs.size() == 4);
+    // Trim simple leading/trailing spaces to make matching robust
+    auto trim = [](std::string s) {
+        auto issp = [](unsigned char c) {
+            return std::isspace(c) != 0;
+        };
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](char c) {
+            return !issp((unsigned char)c);
+        }));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [&](char c) {
+            return !issp((unsigned char)c);
+        }).base(), s.end());
+        return s;
+    };
+
+    REQUIRE(trim(outs[0]) == "NOP");
+    REQUIRE(trim(outs[1]) == "DEFB 10");
+    REQUIRE(trim(outs[2]) == "DEFB 20");
+    REQUIRE(trim(outs[3]) == "HALT");
+}
+
+TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-statements line (unparenthesized call)",
+          "[preprocessor][macro][multiline][split][colon][noparen]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Same macro, unparenthesized call form
+    const std::string content =
+        "MYMACRO MACRO a,b\n"
+        "DEFB a\n"
+        "DEFB b\n"
+        "ENDM\n"
+        "NOP : MYMACRO 10, 20 : HALT\n";
+    pp.push_virtual_file(content, "macro_midline_noparen.asm", 1, true);
+
+    std::vector<std::string> outs;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        outs.push_back(line.to_string());
+    }
+
+    // The preprocessor must still split into: before, expanded lines, after
+    REQUIRE(outs.size() == 4);
+    auto trim = [](std::string s) {
+        auto issp = [](unsigned char c) {
+            return std::isspace(c) != 0;
+        };
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](char c) {
+            return !issp((unsigned char)c);
+        }));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [&](char c) {
+            return !issp((unsigned char)c);
+        }).base(), s.end());
+        return s;
+    };
+
+    REQUIRE(trim(outs[0]) == "NOP");
+    REQUIRE(trim(outs[1]) == "DEFB 10");
+    REQUIRE(trim(outs[2]) == "DEFB 20");
+    REQUIRE(trim(outs[3]) == "HALT");
+}
+
+TEST_CASE("Preprocessor: identifier before ':' is a label only when not a directive/name-directive/conditional/opcode",
+          "[preprocessor][labels][colon][keywords]") {
+    auto trim = [](std::string s) {
+        auto issp = [](unsigned char c) {
+            return std::isspace(c) != 0;
+        };
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](char c) {
+            return !issp((unsigned char)c);
+        }));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [&](char c) {
+            return !issp((unsigned char)c);
+        }).base(), s.end());
+        return s;
+    };
+
+    SECTION("Non-keyword: parsed as label, then following statement") {
+        g_errors.reset();
+        Preprocessor pp;
+
+        // 'LBL' is not a keyword; should be parsed as a label, then 'NOP' as a separate line
+        const std::string content =
+            "LBL : NOP\n";
+        pp.push_virtual_file(content, "label_ok.asm", 1, true);
+
+        std::vector<std::string> outs;
+        TokensLine line;
+        while (pp.next_line(line)) {
+            outs.push_back(line.to_string());
+        }
+
+        REQUIRE(outs.size() == 2);
+        // Label line is emitted as ".<label>"
+        REQUIRE(trim(outs[0]) == ".LBL");
+        REQUIRE(trim(outs[1]) == "NOP");
+    }
+
+    SECTION("Opcode keyword: NOT a label; ':' is a separator") {
+        g_errors.reset();
+        Preprocessor pp;
+
+        // 'LD' is an opcode; must not be treated as a label
+        const std::string content =
+            "LD : NOP\n";
+        pp.push_virtual_file(content, "label_opcode.asm", 1, true);
+
+        std::vector<std::string> outs;
+        TokensLine line;
+        while (pp.next_line(line)) {
+            outs.push_back(line.to_string());
+        }
+
+        // Expect two logical lines: "LD" and "NOP" (no label line)
+        REQUIRE(outs.size() == 2);
+        REQUIRE(trim(outs[0]) == "LD");
+        REQUIRE(trim(outs[1]) == "NOP");
+    }
+
+    SECTION("Directive keyword: NOT a label; ':' is a separator") {
+        g_errors.reset();
+        Preprocessor pp;
+
+        // 'EQU' is a (name) directive; must not be treated as a label.
+        // The directive itself is consumed by the preprocessor and will likely error due to missing identifier,
+        // but 'NOP' after ':' must still be emitted as the next logical line.
+        const std::string content =
+            "EQU : NOP\n";
+        pp.push_virtual_file(content, "label_directive.asm", 1, true);
+
+        std::vector<std::string> outs;
+        TokensLine line;
+        while (pp.next_line(line)) {
+            outs.push_back(line.to_string());
+        }
+
+        // Directive part is consumed; we only see the statement after ':'
+        REQUIRE_FALSE(outs.empty());
+        REQUIRE(trim(outs.back()) == "NOP");
+        // And no label line like ".EQU" was produced
+        for (const auto& s : outs) {
+            REQUIRE(s.find(".EQU") == std::string::npos);
+        }
+    }
+
+    SECTION("Conditional directive keyword: NOT a label; ':' is a separator") {
+        g_errors.reset();
+        Preprocessor pp;
+
+        // 'IF' is a conditional directive; must not be treated as a label.
+        // Provide a valid IF so the directive can be consumed cleanly.
+        const std::string content =
+            "IF 1 : NOP\n"
+            "ENDIF\n";
+        pp.push_virtual_file(content, "label_conditional.asm", 1, true);
+
+        std::vector<std::string> outs;
+        TokensLine line;
+        while (pp.next_line(line)) {
+            outs.push_back(line.to_string());
+        }
+
+        // Only the 'NOP' from the active branch should be emitted, with no label line like '.IF'
+        REQUIRE_FALSE(outs.empty());
+        // Filter out potential empty/whitespace-only lines defensively
+        std::vector<std::string> trimmed;
+        trimmed.reserve(outs.size());
+        for (auto& s : outs) {
+            auto t = trim(s);
+            if (!t.empty()) {
+                trimmed.push_back(std::move(t));
+            }
+        }
+        REQUIRE(trimmed.size() == 1);
+        REQUIRE(trimmed[0] == "NOP");
+    }
+}
+
+TEST_CASE("Preprocessor: object-like macros cascade (A -> B -> C -> 123)",
+          "[preprocessor][macro][cascade][object]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A B\n"
+        "#define B C\n"
+        "#define C 123\n"
+        "A\n";
+    pp.push_virtual_file(content, "macro_cascade_object", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expanded "A"
+    const auto& toks = line.tokens();
+
+    bool found123 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 123) {
+            found123 = true;
+            break;
+        }
+    }
+    REQUIRE(found123);
+}
+
+TEST_CASE("Preprocessor: function-like macro expands to object-like macro and recurses (M() -> N -> 42)",
+          "[preprocessor][macro][cascade][function->object]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define N 42\n"
+        "#define M() N\n"
+        "M()\n";
+    pp.push_virtual_file(content, "macro_cascade_func_to_obj", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expanded "M()"
+    const auto& toks = line.tokens();
+
+    bool found42 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 42) {
+            found42 = true;
+            break;
+        }
+    }
+    REQUIRE(found42);
+}
+
+TEST_CASE("Preprocessor: function-like macro expands to another function-like call and recurses (F() -> ID(7) -> 7)",
+          "[preprocessor][macro][cascade][function->function]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define ID(x) x\n"
+        "#define F() ID(7)\n"
+        "F()\n";
+    pp.push_virtual_file(content, "macro_cascade_func_to_func", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expanded "F()"
+    const auto& toks = line.tokens();
+
+    bool found7 = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Integer) && t.int_value() == 7) {
+            found7 = true;
+            break;
+        }
+    }
+    REQUIRE(found7);
+}
+
+TEST_CASE("Preprocessor: 'NOP:' is not treated as a label (labels cannot be instructions)",
+          "[preprocessor][label][instruction][colon]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "NOP: HALT\n";
+    pp.push_virtual_file(content, "nop_colon.asm", 1, true);
+
+    std::vector<TokensLine> lines;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        lines.push_back(line);
+    }
+
+    // Expect two logical lines: "NOP" and "HALT"
+    REQUIRE(lines.size() == 2);
+
+    // First line must start with identifier "NOP" (not a label line ".NOP")
+    REQUIRE(lines[0].size() >= 1);
+    REQUIRE(lines[0][0].is(TokenType::Identifier));
+    REQUIRE(lines[0][0].text() == "NOP");
+
+    // Ensure no emitted label line ".NOP"
+    for (const auto& l : lines) {
+        REQUIRE(!(l.size() >= 2 &&
+                  l[0].is(TokenType::Dot) &&
+                  l[1].is(TokenType::Identifier) &&
+                  l[1].text() == "NOP"));
+    }
+}
+
+TEST_CASE("Preprocessor: '.NOP' is not treated as a label (instruction after dot)",
+          "[preprocessor][label][instruction][dot]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        ".NOP\n";
+    pp.push_virtual_file(content, "dot_nop.asm", 1, true);
+
+    std::vector<TokensLine> lines;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        lines.push_back(line);
+    }
+
+    // Single logical line expected
+    REQUIRE(lines.size() == 1);
+
+    // Line tokens should be '.' followed by 'NOP'
+    REQUIRE(lines[0].size() >= 2);
+    REQUIRE(lines[0][0].is(TokenType::Dot));
+    REQUIRE(lines[0][1].is(TokenType::Identifier));
+    REQUIRE(lines[0][1].text() == "NOP");
+
+    // Because 'NOP' is an instruction, this must NOT have been converted into a label definition
+    // (label definitions would be indistinguishable by content here, so we assert that no second
+    // logical line was emitted as would happen for ".name : ..." patterns).
+}
+
+TEST_CASE("Preprocessor: normal label 'LBL:' still recognized (control case)",
+          "[preprocessor][label][control]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LBL: NOP\n";
+    pp.push_virtual_file(content, "label_control.asm", 1, true);
+
+    std::vector<TokensLine> lines;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        lines.push_back(line);
+    }
+
+    // Expect two lines: label definition ".LBL" and instruction "NOP"
+    REQUIRE(lines.size() == 2);
+
+    REQUIRE(lines[0].size() >= 2);
+    REQUIRE(lines[0][0].is(TokenType::Dot));
+    REQUIRE(lines[0][1].is(TokenType::Identifier));
+    REQUIRE(lines[0][1].text() == "LBL");
+
+    REQUIRE(lines[1].size() >= 1);
+    REQUIRE(lines[1][0].is(TokenType::Identifier));
+    REQUIRE(lines[1][0].text() == "NOP");
+}
+
+// Labels and colon-separators with leading opcode followed by a one-identifier statement
+TEST_CASE("Preprocessor: opcode before ':' is not a label but following statement is split",
+          "[preprocessor][label][opcode-first][chain]") {
+    g_errors.reset();
+    Preprocessor pp;
+    const std::string content = "NOP: L2: X\n";
+    pp.push_virtual_file(content, "label_chain_opcode_first.asm", 1, true);
+
+    std::vector<std::string> outs;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        outs.push_back(line.to_string());
+    }
+
+    // Expect three logical outputs:
+    // 1) "NOP" (no '.NOP' label line)
+    // 2) ".L2" (label split)
+    // 3) "X"
+    auto trim = [](std::string s) {
+        auto issp = [](unsigned char c) {
+            return std::isspace(c) != 0;
+        };
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](char c) {
+            return !issp((unsigned char)c);
+        }));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [&](char c) {
+            return !issp((unsigned char)c);
+        }).base(), s.end());
+        return s;
+    };
+    REQUIRE(outs.size() == 3);
+    REQUIRE(trim(outs[0]) == "NOP");
+    REQUIRE(trim(outs[1]) == "L2");
+    REQUIRE(trim(outs[2]) == "X");
+}
+
+// -----------------------------------------------------------------------------
+// New tests: directive groups entirely on one physical line using ':' separators
+// Verify conditional directives embedded in colon-separated statement lists work.
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: single-line colon-separated IF true yields branch body",
+          "[preprocessor][if][colon][singleline][true]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "IF 1 : NOP : ENDIF\n";
+    pp.push_virtual_file(content, "if_colon_true.asm", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "NOP");
+    // No more output
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: single-line colon-separated IF false with ELSE selects ELSE branch",
+          "[preprocessor][if][else][colon][singleline][false]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "IF 0 : SHOULD_NOT : ELSE : OK : ENDIF\n";
+    pp.push_virtual_file(content, "if_colon_else.asm", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: single-line colon-separated IF with multiple ELIF picks first true only",
+          "[preprocessor][if][elif][colon][singleline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "IF 0 : A : ELIF 1 : B : ELIF 1 : C : ENDIF\n";
+    pp.push_virtual_file(content, "if_colon_elif_chain.asm", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
+    // Ensure subsequent true ELIF branch 'C' was ignored
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: single-line colon-separated IF/ELIF/ELSE chain picks ELSE when no prior true",
+          "[preprocessor][if][elif][else][colon][singleline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "IF 0 : A : ELIF 0 : B : ELSE : FALLBACK : ENDIF\n";
+    pp.push_virtual_file(content, "if_colon_full_chain.asm", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "FALLBACK");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: single-line colon-separated nested IF works",
+          "[preprocessor][if][nested][colon][singleline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Inner IF is false so ELIF emits Z; outer IF true so both inner result and outer ENDIF processed.
+    const std::string content =
+        "IF 1 : IF 0 : Y : ELIF 1 : Z : ENDIF : ENDIF\n";
+    pp.push_virtual_file(content, "if_colon_nested.asm", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "Z");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing tokens after ENDIF",
+          "[preprocessor][if][colon][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "IF 1 : OK : ENDIF : EXTRA_SHOULD_BE_STATEMENT\n";
+    pp.push_virtual_file(content, "if_colon_trailing.asm", 1, true);
+
+    TokensLine line;
+    // First: OK (from IF)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK");
+    // Second: EXTRA_SHOULD_BE_STATEMENT (standalone after ENDIF)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "EXTRA_SHOULD_BE_STATEMENT");
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
