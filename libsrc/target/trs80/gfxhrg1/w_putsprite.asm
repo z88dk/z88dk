@@ -57,7 +57,7 @@ _putsprite:
     ld      a, (hl)
     ld      (ortype2), a                ; Self modifying code
 
-        ;call    swapgfxbk
+        ;call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c

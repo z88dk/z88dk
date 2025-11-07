@@ -14,8 +14,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _lscroll_8px
     PUBLIC  ___lscroll_8px
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "graphics/grafix.inc"
 
@@ -28,12 +28,12 @@ _lscroll_8px:
 ___lscroll_8px:
 
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
 ; clear 1 byte column on the left
-    ld      b,maxy
+    ld      b,_GFX_MAXY
 loop2:
     ld      h,0
     ld      l,b
@@ -53,7 +53,7 @@ loop2:
     ld      l,e
     inc     hl
 
-    ld      bc,maxx*maxy/8
+    ld      bc,_GFX_MAXX*_GFX_MAXY/8
 
 
 ; now, the actual scroll
@@ -78,8 +78,8 @@ loop:
 end_loop:
     ld (de),a
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk1
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_out
   ENDIF
     ret
 

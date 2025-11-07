@@ -1,8 +1,8 @@
-	INCLUDE	"graphics/grafix.inc"
+        INCLUDE "graphics/grafix.inc"
 
-                SECTION         code_clib
-	PUBLIC	cleargraphics
-   PUBLIC   _cleargraphics
+        SECTION code_clib
+        PUBLIC  cleargraphics
+        PUBLIC  _cleargraphics
 
 ;
 ;	$Id: clsgraph.asm $
@@ -18,8 +18,8 @@
 ;		a.bcdehl/ixiy	same
 ;		.f....../....	different
 ;
-.cleargraphics
-._cleargraphics
-	ld	e,$1a
-	ld	c,2
-	jp 5
+cleargraphics:
+_cleargraphics:
+        ld      e, $1a
+        ld      c, 2
+        jp      5

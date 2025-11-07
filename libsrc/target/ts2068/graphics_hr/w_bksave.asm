@@ -14,14 +14,14 @@
 
     EXTERN  zx_saddrpdown
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 
 bksave:
 _bksave:
     push    ix
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, 4
     add     hl, sp
     ld      e, (hl)

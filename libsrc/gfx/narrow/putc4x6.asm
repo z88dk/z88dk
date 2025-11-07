@@ -19,7 +19,7 @@
     PUBLIC  putc4x6
     PUBLIC  _putc4x6
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  plot
@@ -73,8 +73,8 @@ nolower:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
 ENDIF
-IF  NEED_swapgfxbk=1
-    call    swapgfxbk
+IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
 ENDIF
     ld      a, (chr)
     rra
@@ -161,8 +161,8 @@ lrloop:
     djnz    lrloop
     ld      a, e                        ; new x position
 
-IF  maxx<>256
-    cp      maxx
+IF  _GFX_MAXX<>256
+    cp      _GFX_MAXX
     call    nc, do_nl
 ELSE
     and     a
@@ -175,7 +175,7 @@ ENDIF
     sub     5
     ld      (y_4x6), a
 
-IF  NEED_swapgfxbk
+IF  _gfx_vram_page
     jp      __graphics_end
 ELSE
   IF    !__CPU_INTEL__&!__CPU_GBZ80__

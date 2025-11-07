@@ -43,6 +43,7 @@ ENDIF
 IF FORmc1000
     INCLUDE "target/mc1000/def/mc1000.def"
     defc    MC6847_HAS_HIRES = 1
+    defc    MC6847_HAS_CG = 1
     defc    MC6847_HIRES_YRES = 192
 ENDIF
 

@@ -26,7 +26,7 @@ _stencil_init:
     ld      e, l
     inc     de
     ld      (hl), 255
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     push    bc
     ldir
     pop     bc

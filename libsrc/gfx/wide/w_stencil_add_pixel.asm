@@ -34,13 +34,13 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 stencil_add_pixel:
 _stencil_add_pixel:
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_graphics_cmp
     pop     hl
     ret     nc                          ; Return if Y overflows
 
     push    de
-    ld      de, maxx
+    ld      de, _GFX_MAXX
     call    l_graphics_cmp
     pop     de
     ret     c                           ; Return if X overflows
@@ -67,7 +67,7 @@ _stencil_add_pixel:
     dec     hl
 noplot:
     push    de                          ; X
-    ld      de, maxy*2
+    ld      de, _GFX_MAXY*2
     add     hl, de                      ; move to the right side vector
     ;ld    de,(__gfx_coords)
     ;push de

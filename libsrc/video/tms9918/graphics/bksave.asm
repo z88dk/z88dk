@@ -13,7 +13,7 @@
     PUBLIC  bkpixeladdress
     EXTERN  l_tms9918_disable_interrupts
     EXTERN  l_tms9918_enable_interrupts
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     EXTERN  __tms9918_screen_mode
 
@@ -29,7 +29,7 @@ _bksave:
     ret     nz
 dorender:
     push    ix                          ;save callers
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, 4
     add     hl, sp
     ld      e, (hl)

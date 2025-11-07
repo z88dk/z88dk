@@ -61,7 +61,7 @@
 fatpix0:
         push    bc                      ;save reduced cooardinates
         push    hl                      ;save original coordinates
-  IF    USEplotc
+  IF    _GFX_GENCON_USEPLOTC
         call    generic_console_pointxy
   ELSE
         ld      e, 1                    ;raw mode
@@ -113,7 +113,7 @@ fatpix:
         add     hl, de
         ld      a, (hl)
         pop     bc                      ;reduced coordinates
-    IF  USEplotc
+    IF  _GFX_GENCON_USEPLOTC
         ld      d, a
         ld      e, 0                    ;pixel4 mode
         call    generic_console_plotc

@@ -10,8 +10,8 @@
     PUBLIC  clg
     PUBLIC  _clg
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 clg:
 _clg:
   IF    FORzcn

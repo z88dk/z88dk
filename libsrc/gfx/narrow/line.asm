@@ -45,21 +45,21 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 Line:
     push    de
     push    hl
-IFNDEF GFX_noclip
-  IF    maxx<>256
+IFNDEF _GFX_LINE_NOCLIP
+  IF    _GFX_MAXX<>256
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     jr      nc, exit_line               ; x0    coordinate out    of range
     ld      a, d
-    cp      maxx
+    cp      _GFX_MAXX
     jr      nc, exit_line               ; x1    coordinate out    of range
   ENDIF
-  IF    maxy<>256
+  IF    _GFX_MAXY<>256
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     jr      nc, exit_line               ; y0    coordinate out    of range
     ld      a, e
-    cp      maxy
+    cp      _GFX_MAXY
     jr      nc, exit_line               ; y1    coordinate out    of range
   ENDIF
 ENDIF

@@ -21,6 +21,5 @@ target/gemini/graphics/plotpixl
 target/gemini/graphics/respixl
 target/gemini/graphics/xorpixl
 target/gemini/graphics/pointxy
-target/gemini/graphics/swapgfxbk
 @gfx/narrow/gfx_narrow.lst
 @games/games.lst

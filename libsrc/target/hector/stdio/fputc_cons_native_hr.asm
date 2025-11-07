@@ -37,9 +37,9 @@ dolf:
     ld      a,l
     add     8
     ld      l,a
-    cp      maxy
+    cp      _GFX_MAXY
     jr      c,continue
-    ld      h,maxy - 8
+    ld      h,_GFX_MAXY - 8
 continue:
     ld      (putc_coords),hl
     ld      (IO_MODE_HR_VRAM),a

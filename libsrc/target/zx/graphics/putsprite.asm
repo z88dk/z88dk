@@ -18,7 +18,7 @@
     EXTERN  pixeladdress
     EXTERN  zx_saddrpdown
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     INCLUDE "graphics/grafix.inc"
@@ -61,7 +61,7 @@ _putsprite:
     push    af
     ld      h, a
     ld      l, e
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    pixeladdress
     ld      h, d
     ld      l, e

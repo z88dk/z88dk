@@ -8,7 +8,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _plot_callee
     PUBLIC  asm_plot
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  plotpixel
@@ -16,18 +16,18 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 plot_callee:
 _plot_callee:
-    pop     af                          ; ret addr
+    pop     bc                          ; ret addr
     pop     hl                          ; y
     pop     de                          ; x
     ld      h, e
-    push    af                          ; ret addr
+    push    bc                          ; ret addr
 asm_plot:
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     call    plotpixel
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

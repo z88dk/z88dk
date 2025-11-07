@@ -11,8 +11,8 @@
     SECTION smc_clib
 
     EXTERN  w_pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
     PUBLIC  bkrestore
@@ -48,9 +48,9 @@ _bkrestore_fastcall:
 
     push    hl
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    w_pixeladdress
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
 
     pop     hl                          ;x0
 
@@ -73,10 +73,10 @@ rbytes:
 rloop:
     ld      a, (ix+6)
     ex      af, af
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ex      af, af
     ld      (de), a
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
 
 	;inc	de
     ld      d, 0
@@ -84,9 +84,9 @@ rloop:
     add     hl, de
     ld      e, c
     push    hl
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    w_pixeladdress
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     hl
 
     inc     ix
@@ -98,9 +98,9 @@ rloop:
 x_coord:
     ld      hl, 0
     push    hl
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    w_pixeladdress
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     hl
 
     pop     bc

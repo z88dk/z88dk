@@ -5,7 +5,7 @@
     PUBLIC  clg
     PUBLIC  _clg
     PUBLIC  ___clg
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  cleargraphics
@@ -18,11 +18,11 @@ ___clg:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
 ENDIF
-IF  NEED_swapgfxbk=1
-    call    swapgfxbk
+IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
 ENDIF
     call    cleargraphics
-IF  NEED_swapgfxbk
+IF  _gfx_vram_page
     jp      __graphics_end
 ELSE
   IF    !__CPU_INTEL__&!__CPU_GBZ80__

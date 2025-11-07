@@ -21,7 +21,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  w_respixel
     EXTERN  __gfx_coords
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 
@@ -33,10 +33,10 @@ __generic_stencil_render:
     push    ix                          ;save callers
     ld      ix, 4
     add     ix, sp
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     ld      hl, (__gfx_coords)
     push    hl
     ld      de, (__gfx_coords+2)
@@ -74,7 +74,7 @@ noret:
     cp      127
     jr      z, yloop                    ; ...loop if nothing to be drawn
 
-    ld      bc, maxy*2                  ; for X2, shift to the right Y vector
+    ld      bc, _GFX_MAXY*2                  ; for X2, shift to the right Y vector
     add     hl, bc
     ld      a, (hl)
     inc     hl

@@ -429,7 +429,7 @@ nolblack:
 ;	ld a,(hl)
 ;	and a
 ;	jr z,slimit
-;	cp maxx-1
+;	cp _GFX_MAXX-1
 ;	jr z,slimit
 ;	add e
 ;	ld (hl),a

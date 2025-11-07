@@ -45,9 +45,9 @@ dolf:
     ld      a,l
     add     6
     ld      l,a
-    cp      maxy
+    cp      _GFX_MAXY
     jr      c,continue
-    ld      l,maxy - 6
+    ld      l,_GFX_MAXY - 6
 continue:
     ld      (putc_coords),hl
     ret

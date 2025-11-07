@@ -8,8 +8,8 @@
     EXTERN  generic_console_xypos
     EXTERN  screendollar
     EXTERN  screendollar_with_count
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
@@ -23,7 +23,7 @@ generic_console_vpeek:
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
     push    de
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    generic_console_xypos
     pop     de
     ld      b, 8
@@ -36,7 +36,7 @@ vpeek_1:
     add     hl, bc
     pop     bc
     djnz    vpeek_1
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     de                          ;the buffer on the stack
     ld      hl, (generic_console_font32)
 do_screendollar:

@@ -19,10 +19,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
-;    EXTERN  swapgfxbk1
+;    EXTERN  __gfx_vram_page_out
     EXTERN  __graphics_end
 
 ;
@@ -35,14 +35,14 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      bc, __graphics_end
     push    bc
 
-  IF    maxy<>256
-    ld      c, maxy
+  IF    _GFX_MAXY<>256
+    ld      c, _GFX_MAXY
   ELSE
     ld      c, 0
   ENDIF
@@ -50,7 +50,7 @@ _stencil_render:
 yloop:
     pop     bc
     dec     c
-    ;jp    z,swapgfxbk1
+    ;jp    z,__gfx_vram_page_out
     ret     z
     push    bc
 
@@ -63,8 +63,8 @@ yloop:
     ld      a, (hl)                     ;X1
 
 
-  IF    maxy<>256
-    ld      e, maxy
+  IF    _GFX_MAXY<>256
+    ld      e, _GFX_MAXY
     add     hl, de
   ELSE
     ld      e, 0

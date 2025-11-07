@@ -16,7 +16,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___putsprite
     EXTERN  w_pixeladdress
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 	EXTERN __generic_w_curx
@@ -63,8 +63,8 @@ ___putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF                                 ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
@@ -141,7 +141,7 @@ _notedge:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix
@@ -205,7 +205,7 @@ nextline:
 
     pop     bc                          ;Restore data
     djnz    woloop
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

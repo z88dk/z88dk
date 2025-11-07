@@ -8,8 +8,8 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _point_callee
     PUBLIC  asm_point
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  w_pointxy
     INCLUDE "graphics/grafix.inc"
@@ -24,13 +24,13 @@ _point_callee:
 
 asm_point:
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     call    w_pointxy
-  IF    NEED_swapgfxbk=1
+  IFDEF _gfx_vram_page
     push    af
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     af
   ENDIF
     pop     ix

@@ -8,7 +8,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _unplot_callee
     PUBLIC  asm_unplot
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  respixel
@@ -17,19 +17,19 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 unplot_callee:
 _unplot_callee:
-    pop     af                          ; ret addr
+    pop     bc                          ; ret addr
     pop     hl                          ; y
     pop     de                          ; x
     ld      h, e
-    push    af                          ; ret addr
+    push    bc                          ; ret addr
 
 asm_unplot:
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     call    respixel
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

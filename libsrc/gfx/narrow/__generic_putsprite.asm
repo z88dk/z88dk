@@ -15,7 +15,7 @@
     SECTION code_graphics
     PUBLIC  __generic_putsprite
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  plotpixel
@@ -27,8 +27,8 @@
 ; sprite: (ix)
 
 __generic_putsprite:
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      hl, 2
     add     hl, sp
@@ -188,7 +188,7 @@ noblockx:
     pop     bc                          ;Restore data
     djnz    oloopx
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -299,7 +299,7 @@ noblocka:
     pop     bc                          ;Restore data
     djnz    oloopa
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -413,7 +413,7 @@ noblocko:
     pop     bc                          ;Restore data
     djnz    oloopo
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
