@@ -13,6 +13,7 @@
 ;	$Id: f_ansi_dline.asm,v 1.4 2016-04-04 18:31:23 dom Exp $
 ;
 
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  ansi_del_line
     EXTERN  __zx_console_attr
@@ -67,3 +68,5 @@ loop_dl:
     ld      bc, 31
     ldir
     ret
+
+ENDIF

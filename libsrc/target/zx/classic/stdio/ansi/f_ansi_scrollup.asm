@@ -11,6 +11,7 @@
 ;	$Id: f_ansi_scrollup.asm $
 ;
 
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  ansi_SCROLLUP
 
@@ -19,3 +20,5 @@
 
 ansi_SCROLLUP:
     jp      generic_console_scrollup
+
+ENDIF

@@ -15,6 +15,8 @@
 ;	$Id: f_ansi_attr.asm,v 1.6 2016-04-04 18:31:23 dom Exp $
 ;
 
+
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  ansi_attr
     EXTERN  INVRS
@@ -144,3 +146,4 @@ noback:
     SECTION bss_clib
 oldattr:
     defb    0
+ENDIF

@@ -22,6 +22,7 @@
 ;	$Id: f_ansi_char.asm,v 1.12 2016-06-13 22:07:53 dom Exp $
 ;
 
+IFNDEF FORsam
     SECTION smc_clib
     PUBLIC  ansi_CHAR
 
@@ -265,4 +266,5 @@ NEXT:
 ; 3 dots: MAX 85 columns Just readable!
 ; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
 ; Address 15360 for ROM Font
+ENDIF
 

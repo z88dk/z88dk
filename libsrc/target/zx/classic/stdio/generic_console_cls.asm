@@ -1,6 +1,8 @@
 ;
 ; Clear the screen for the ZX/TS2068 terminal
 ;
+
+IFNDEF FORsam
     MODULE  generic_console_cls
 
     SECTION code_driver
@@ -12,12 +14,8 @@
     EXTERN  __zx_screenmode
 
 
-; TODO: Have a separate implementation for SAM, it doesn't need this complexity
-  IF    FORsam
-    EXTERN  SCREEN_BASE
-  ELSE
-    defc    SCREEN_BASE=16384
-  ENDIF
+
+    defc  SCREEN_BASE=16384
 
 
 generic_console_cls:
@@ -72,3 +70,5 @@ done:
     pop     bc
     pop     de
     ret
+
+ENDIF

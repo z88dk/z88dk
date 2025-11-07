@@ -12,6 +12,7 @@
 ;	$Id: f_ansi_cls.asm,v 1.5 2016-04-04 18:31:23 dom Exp $
 ;
 
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  ansi_cls
 
@@ -31,4 +32,5 @@ ansi_cls:
     ld      bc, 767
     ldir
     ret
+ENDIF
 

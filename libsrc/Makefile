@@ -86,7 +86,7 @@ TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
 TOCREATE += $(call check_target,nanos,nanos.lib)
 TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib)
-TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
+TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib)
 TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
 TOCREATE += $(call check_target,osborne,gfxosborne1.lib $(CPMLIBS))
 TOCREATE += $(call check_target,ondra,ondra_clib.lib)
@@ -156,7 +156,7 @@ TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib zxrom.lib)
 TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 TOCREATE += $(call check_target,zx80, zx80_clib.lib)
 TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib)
-TOCREATE += $(call check_target,zxn, zxn_clib.lib zxfcntl)
+TOCREATE += $(call check_target,zxn, zxn_clib.lib)
 
 
 TOCREATE += 
@@ -328,10 +328,6 @@ z88_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
-
-# ZX Spectrum fcntl - dom/stefano
-zxfcntl:
-	$(MAKE) -C target/zx/fcntl
 
 # 64/32 column library for ZX Spectrum - dom/stefano
 # ansi flags

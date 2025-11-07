@@ -12,6 +12,7 @@
 ;	$Id: f_ansi_bel.asm,v 1.4 2016-04-04 18:31:23 dom Exp $
 ;
 
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  ansi_BEL
 
@@ -43,4 +44,4 @@ BEL_FR_2:
     ld      l, 180
     djnz    BEL_loop
     ret
-
+ENDIF
