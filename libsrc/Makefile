@@ -217,6 +217,8 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+include target/sam/sam.mak
+include target/zx/zx.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
@@ -335,7 +337,7 @@ zxfcntl:
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib: $(TARGET_CLIB_DEPS)
+zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
@@ -346,7 +348,7 @@ zx_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
-zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib
+zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib target-zx
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
@@ -360,7 +362,7 @@ zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib
+ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib target-zx
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
@@ -1019,14 +1021,14 @@ rex_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(TARGET_DIRECTORY)/rex/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
-sam_clib.lib: $(TARGET_CLIB_DEPS) ts2068_clib.lib
+sam_clib.lib: $(TARGET_CLIB_DEPS) target-sam
 	@echo ''
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
 	$(call buildgeneric,sam,wide)
 	$(MAKE) -C classic/games TARGET=sam
-	$(MAKE) -C target/zx TARGET=sam
-	$(MAKE) -C target/zx-common TARGET=sam
+#	$(MAKE) -C target/zx TARGET=sam
+#	$(MAKE) -C target/zx-common TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
 

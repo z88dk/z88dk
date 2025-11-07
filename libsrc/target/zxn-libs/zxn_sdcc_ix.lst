@@ -1,14 +1,14 @@
 @target/zx-libs/bifrost_h/bifrost_h_sdcc.lst
 @target/zx-libs/bifrost_l/bifrost_l_sdcc.lst
-@target/zx-libs/bifrost2/bifrost2_sdcc.lst
+@target/zx/bifrost2/bifrost2_sdcc.lst
 @target/zxn-libs/display/display_sdcc.lst
 @target/zxn-libs/esxdos/esxdos_sdcc_ix.lst
 @target/zxn-libs/globals/globals_asm.lst
 @target/zx-libs/graphics/graphics_sdcc_ix.lst
 @target/zxn-libs/memory/memory_sdcc_ix.lst
 @target/zxn-libs/misc/misc_sdcc_ix.lst
-@target/zx-libs/nirvanam/nirvanam_sdcc_ix.lst
-@target/zx-libs/nirvanap/nirvanap_sdcc_ix.lst
+@target/zx/nirvanam/nirvanam_sdcc_ix.lst
+@target/zx/nirvanap/nirvanap_sdcc_ix.lst
 target/zxn-libs/sysvar/system_variables
 @target/zx/tape/tape_sdcc_ix.lst
 @target/zxn-libs/version/version_sdcc.lst

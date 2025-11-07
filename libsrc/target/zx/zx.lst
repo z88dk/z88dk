@@ -1,5 +1,3 @@
-@target/zx/input_zx.lst
-@target/zx/stdio/stdio.lst
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 target/shared/clock

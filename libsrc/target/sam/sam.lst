@@ -33,7 +33,7 @@ classic/input/obj/${TYPE}/fgetc_cons
 ; We only want bits of +zx stdio, but take it all to keep
 ; things simple (Our versions are above)
 @target/zx/stdio/stdio.lst
-target/zx/obj/${TARGET}/zx_border
+target/classic/zx/zx_border
 
 ; Pixel level routines for Sam
 target/sam/graphics/cleargraphics
@@ -58,14 +58,14 @@ target/sam/graphics/w_xorpixl
 target/sam/graphics/xor_MODE2
 target/sam/graphics/xor_MODE3
 target/sam/graphics/xor_MODE4
-target/zx/graphics/rowtab
-; Use MODE0 from zx-common
-target/zx-common/graphics/obj/${TARGET}/res_MODE0
-target/zx-common/graphics/obj/${TARGET}/pointxy_MODE0
-target/zx-common/graphics/obj/${TARGET}/xor_MODE0
-target/zx-common/graphics/obj/${TARGET}/plot_MODE0
-target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE0
-target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
+; Use MODE0 from zx
+target/zx/classic/graphics/rowtab
+target/zx/classic/graphics/obj/${TARGET}/res_MODE0
+target/zx/classic/graphics/obj/${TARGET}/pointxy_MODE0
+target/zx/classic/graphics/obj/${TARGET}/xor_MODE0
+target/zx/classic/graphics/obj/${TARGET}/plot_MODE0
+target/zx/classic/graphics/obj/${TARGET}/pixladdr_MODE0
+target/zx/classic/graphics/obj/${TARGET}/__set_zx_pixel_colour
 classic/gfx/wide/obj/${TARGET}/w_dcircle_square
 @classic/gfx/wide/gfx_wide.lst
 ; Fatpix setting
@@ -87,7 +87,7 @@ sound/ay/obj/${TYPE}/**/*.o
 target/sam/variables
 
 ; Need to rewrite the MODE0 scroll, then kill this include
-target/zx/graphics/rowtab
+target/zx/classic/graphics/rowtab
 
 
 ; Games.h uses different joystick routines
@@ -95,14 +95,14 @@ target/sam/games/joystick
 ; Joysticks on the SAM are +zx Sinclair sticks (we just alias them)
 target/sam/input/in_Joystick1
 target/sam/input/in_Joystick2
-target/zx/input/in_JoySinclair1
-target/zx/input/in_JoySinclair2
+target/zx/classic/input/in_JoySinclair1
+target/zx/classic/input/in_JoySinclair2
 
 ; Beeper sound is the same as +zx
-target/zx/games/bit_open
-target/zx/games/bit_open_di
-target/zx/games/bit_close
-target/zx/games/bit_close_ei
+target/zx/classic/games/bit_open
+target/zx/classic/games/bit_open_di
+target/zx/classic/games/bit_close
+target/zx/classic/games/bit_close_ei
 
 ; Some extra interrupt code
 target/sam/interrupt/add_raster_int
