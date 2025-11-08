@@ -15,8 +15,8 @@ static void dummy()
    INCLUDE "old/asm_zx_py2saddr.asm"
 
    ; Include new version
-   INCLUDE "../../../libsrc/target/ts2068-libs/display/z80/asm_tshc_py2aaddr.asm"
-   INCLUDE "../../../libsrc/target/zx-libs/display/z80/asm_zx_py2saddr.asm"
+   INCLUDE "../../../libsrc/target/ts2068/display/z80/asm_tshc_py2aaddr.asm"
+   INCLUDE "../../../libsrc/target/zx/display/z80/asm_zx_py2saddr.asm"
 #endasm
 }
 

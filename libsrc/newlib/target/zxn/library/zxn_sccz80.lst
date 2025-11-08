@@ -1,10 +1,10 @@
 @../adt/adt_sccz80.lst
 @../alloc/alloc_sccz80.lst
-@../target/zxn-libs/zxn_sccz80.lst
+@../target/zxn/zxn_sccz80.lst
 @../compress/compress_sccz80.lst
 @../ctype/ctype_sccz80.lst
 @../newlib/drivers/drivers.lst
-@../target/zxn-libs/env/esxdos/esxdos_sccz80.lst
+@../target/zxn/env/esxdos/esxdos_sccz80.lst
 @../error/error.lst
 @../newlib/fcntl/fcntl_sccz80.lst
 @../font/font_4x8/fonts.lst

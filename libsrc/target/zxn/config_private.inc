@@ -1,4 +1,4 @@
-
+; config_private for classic
 
 INCLUDE "target/zx/def/zxports.h"
 

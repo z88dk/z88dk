@@ -1,18 +1,18 @@
 # +zxn builds heavily on +zx
 ZXN_GLOBS := $(ZX_GLOBS) \
-	"target/zxn-libs/memory/z80/*.asm" "target/zxn-libs/memory/c/sccz80/*.asm" \
-        "target/zxn-libs/globals/z80/*.asm" \
-        "target/zxn-libs/sysvar/*.asm" \
-        "target/zxn-libs/version/z80/*.asm" "target/zxn-libs/version/c/sccz80/*.asm" \
+	"target/zxn/memory/z80/*.asm" "target/zxn/memory/c/sccz80/*.asm" \
+        "target/zxn/globals/z80/*.asm" \
+        "target/zxn/sysvar/*.asm" \
+        "target/zxn/version/z80/*.asm" "target/zxn/version/c/sccz80/*.asm" \
         "target/ts2068/misc/z80/*.asm" "target/ts2068/misc/c/sccz80/*.asm" \
         "target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
         "newlib/target/zxn/driver/banking/zxn_banked_call.asm"	
 
 ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
-	target/zxn-libs/memory/z80/*.asm target/zxn-libs/memory/c/sccz80/*.asm \
-        target/zxn-libs/globals/z80/*.asm \
-        target/zxn-libs/sysvar/*.asm \
-        target/zxn-libs/version/z80/*.asm target/zxn-libs/version/c/sccz80/*.asm \
+	target/zxn/memory/z80/*.asm target/zxn/memory/c/sccz80/*.asm \
+        target/zxn/globals/z80/*.asm \
+        target/zxn/sysvar/*.asm \
+        target/zxn/version/z80/*.asm target/zxn/version/c/sccz80/*.asm \
         target/ts2068/misc/z80/*.asm target/ts2068/misc/c/sccz80/*.asm \
         target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
         newlib/target/zxn/driver/banking/zxn_banked_call.asm	

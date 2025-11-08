@@ -1,4 +1,0 @@
-@target/zxn-libs/version/version_asm.lst
-target/zxn-libs/version/c/sccz80/check_version_core
-target/zxn-libs/version/c/sccz80/check_version_esxdos
-target/zxn-libs/version/c/sccz80/check_version_nextzxos
