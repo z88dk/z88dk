@@ -21,3 +21,10 @@ PUBLIC _BIFROST2_install
 defc _BIFROST2_install = BIFROST2_install
 ENDIF
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_install
+defc _BIFROST2_install = BIFROST2_install
+ENDIF
+

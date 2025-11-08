@@ -24,3 +24,10 @@ NIRVANAM_readC_callee:
         push hl
 
 	jp asm_NIRVANAM_readC
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAM_readC_callee
+defc _NIRVANAM_readC_callee = NIRVANAM_readC_callee
+ENDIF
+

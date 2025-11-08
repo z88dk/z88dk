@@ -30,3 +30,10 @@ PUBLIC _BIFROST2_fillTileAttrH_callee
 defc _BIFROST2_fillTileAttrH_callee = BIFROST2_fillTileAttrH_callee
 ENDIF
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_fillTileAttrH_callee
+defc _BIFROST2_fillTileAttrH_callee = BIFROST2_fillTileAttrH_callee
+ENDIF
+

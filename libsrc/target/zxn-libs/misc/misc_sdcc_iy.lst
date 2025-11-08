@@ -1,2 +1,2 @@
-@target/zx-libs/misc/misc_asm.lst
-@target/ts2068-libs/misc/misc_sdcc_iy.lst
+@target/zx/misc/misc_asm.lst
+@target/ts2068/misc/misc_sdcc_iy.lst

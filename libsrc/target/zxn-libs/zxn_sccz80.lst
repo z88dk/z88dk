@@ -1,5 +1,5 @@
-@target/zx-libs/bifrost_h/bifrost_h_sccz80.lst
-@target/zx-libs/bifrost_l/bifrost_l_sccz80.lst
+@target/zx/bifrost_h/bifrost_h_sccz80.lst
+@target/zx/bifrost_l/bifrost_l_sccz80.lst
 @target/zx/bifrost2/bifrost2_sccz80.lst
 @target/zxn-libs/display/display_sccz80.lst
 @target/zxn-libs/esxdos/esxdos_sccz80.lst

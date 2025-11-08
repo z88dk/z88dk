@@ -26,3 +26,10 @@ NIRVANAM_fillT_raw:
    	ld a,(hl)       ; attr
 
    	jp asm_NIRVANAM_fillT
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAM_fillT_raw
+defc _NIRVANAM_fillT_raw = NIRVANAM_fillT_raw
+ENDIF
+

@@ -1,5 +1,7 @@
 ZX_GLOBS := "$(Z88DK_LIBSRC)/target/zx/ulaplus/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/ulaplus/z80/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/ulaplus/c/smallc/*.asm" \
+	"$(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/display/z80/*.asm" \
+	"$(Z88DK_LIBSRC)/target/zx/misc/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/misc/z80/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/classic/diagnostic/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/classic/basic/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/classic/opus/*.asm" \
@@ -22,6 +24,8 @@ MULTICOLOUR_GLOBS := "$(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm" $(Z88DK
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_stop.asm \
         $(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_getAnimGroup.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_findAttrH.asm \
+	"$(NEWLIB_DIRECTORY)/target/zx/bifrost_h/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx/bifrost_h/z80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/zx/bifrost_l/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/target/zx/bifrost_l/z80/*.asm" \
 	"$(NEWLIB_DIRECTORY)/target/zx/nirvanap/c/sccz80/*.asm" \
 	$(NEWLIB_DIRECTORY)/target/zx/nirvanap/z80/asm_NIRVANAP_spriteT.asm \
 	$(NEWLIB_DIRECTORY)/target/zx/nirvanap/z80/asm_NIRVANAP_drawW_di.asm \
@@ -33,6 +37,8 @@ MULTICOLOUR_GLOBS := "$(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm" $(Z88DK
 
 ZX_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/ulaplus/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/ulaplus/z80/*.asm \
 	$(Z88DK_LIBSRC)/target/zx/ulaplus/c/smallc/*.asm \
+	$(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/display/z80/*.asm \
+	$(Z88DK_LIBSRC)/target/zx/misc/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/misc/z80/*.asm \
 	$(Z88DK_LIBSRC)/target/zx/classic/diagnostic/*.asm \
         $(Z88DK_LIBSRC)/target/zx/classic/basic/*.asm \
 	$(Z88DK_LIBSRC)/target/zx/classic/opus/*.asm \
@@ -55,6 +61,8 @@ MULTICOLOUR_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm $(Z88D
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_stop.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_getAnimGroup.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_findAttrH.asm \
+	$(NEWLIB_DIRECTORY)/target/zx/bifrost_h/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/target/zx/bifrost_h/z80/*.asm \
+	$(NEWLIB_DIRECTORY)/target/zx/bifrost_l/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/target/zx/bifrost_l/z80/*.asm \
 	$(NEWLIB_DIRECTORY)/target/zx/nirvanap/c/sccz80/*.asm \
 	$(NEWLIB_DIRECTORY)/target/zx/nirvanap/z80/asm_NIRVANAP_spriteT.asm \
 	$(NEWLIB_DIRECTORY)/target/zx/nirvanap/z80/asm_NIRVANAP_drawW_di.asm \
@@ -100,11 +108,9 @@ endef
 
 
 $(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
-$(eval $(call buildtargetasm,target/zx,z80,ts2068,-mz80,$(ZX_GLOBS),$(ZX_GLOBS_ex)))
 $(eval $(call buildtargetasm,target/zx,z80n,zxn,-mz80n,$(ZX_GLOBS) $(MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(MULTICOLOUR_GLOBS_ex) $(addprefix target/zx/obj/zxn/, $(BIFROST2_GEN))))
 $(eval $(call buildtargetc,target/zx,zx))
 $(eval $(call buildtargetc,target/zx,zxn,-clib=classic))
-$(eval $(call buildtargetc,target/zx,ts2068))
 $(eval $(call bifrost_zx0,zx))
 $(eval $(call bifrost_zx0,zxn))
 

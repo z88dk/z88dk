@@ -24,3 +24,10 @@ NIRVANAM_fillT_callee:
         ld a,l
 
 	jp asm_NIRVANAM_fillT_di
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAM_fillT_callee
+defc _NIRVANAM_fillT_callee = NIRVANAM_fillT_callee
+ENDIF
+

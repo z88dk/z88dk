@@ -32,3 +32,10 @@ PUBLIC _BIFROST2_findAttrH
 defc _BIFROST2_findAttrH = BIFROST2_findAttrH
 ENDIF
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_findAttrH
+defc _BIFROST2_findAttrH = BIFROST2_findAttrH
+ENDIF
+

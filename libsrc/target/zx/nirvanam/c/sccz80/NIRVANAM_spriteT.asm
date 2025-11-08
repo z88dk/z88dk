@@ -30,3 +30,10 @@ NIRVANAM_spriteT:
    	ld h,0
 
    	jp asm_NIRVANAM_spriteT
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAM_spriteT
+defc _NIRVANAM_spriteT = NIRVANAM_spriteT
+ENDIF
+

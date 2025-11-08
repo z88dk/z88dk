@@ -3,8 +3,8 @@ include ../../../Make.config
 TARGET ?= test
 
 NEWLIBGLOBS := \
-	"$(NEWLIB_DIRECTORY)/target/ts2068-libs/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068-libs/misc/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/target/ts2068-libs/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068-libs/display/c/sccz80/*.asm"
+	"$(NEWLIB_DIRECTORY)/target/ts2068/misc/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068/misc/c/sccz80/*.asm" \
+	"$(NEWLIB_DIRECTORY)/target/ts2068/display/z80/*.asm" "$(NEWLIB_DIRECTORY)/target/ts2068/display/c/sccz80/*.asm"
 
 NEWLIB_TARGETS := obj/newlib-z80
 

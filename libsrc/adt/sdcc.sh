@@ -1,6 +1,6 @@
 
 
-for file in `ls */c/sccz80/*.asm`; do
+for file in `ls c/sccz80/*.asm`; do
 modulename=`basename $file | sed s,.asm,,g`
 cat >> $file << EOD
 

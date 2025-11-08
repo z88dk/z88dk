@@ -33,3 +33,10 @@ PUBLIC _BIFROST2_setTile
 defc _BIFROST2_setTile = BIFROST2_setTile
 ENDIF
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_setTile
+defc _BIFROST2_setTile = BIFROST2_setTile
+ENDIF
+

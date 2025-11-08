@@ -1,5 +1,5 @@
-@target/zx-libs/bifrost_h/bifrost_h_sdcc.lst
-@target/zx-libs/bifrost_l/bifrost_l_sdcc.lst
+@target/zx/bifrost_h/bifrost_h_sdcc.lst
+@target/zx/bifrost_l/bifrost_l_sdcc.lst
 @target/zx/bifrost2/bifrost2_sdcc.lst
 @target/zxn-libs/display/display_sdcc.lst
 @target/zxn-libs/esxdos/esxdos_sdcc_ix.lst

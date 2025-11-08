@@ -21,3 +21,10 @@ PUBLIC _BIFROST2_showNextTile
 defc _BIFROST2_showNextTile = BIFROST2_showNextTile
 ENDIF
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_showNextTile
+defc _BIFROST2_showNextTile = BIFROST2_showNextTile
+ENDIF
+

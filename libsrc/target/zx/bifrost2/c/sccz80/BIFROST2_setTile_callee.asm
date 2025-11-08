@@ -29,3 +29,10 @@ PUBLIC _BIFROST2_setTile_callee
 defc _BIFROST2_setTile_callee = BIFROST2_setTile_callee
 ENDIF
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _BIFROST2_setTile_callee
+defc _BIFROST2_setTile_callee = BIFROST2_setTile_callee
+ENDIF
+

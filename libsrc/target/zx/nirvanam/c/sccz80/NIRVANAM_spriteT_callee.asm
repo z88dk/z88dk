@@ -25,3 +25,10 @@ NIRVANAM_spriteT_callee:
         ex (sp),hl      ; sprite
 
 	jp asm_NIRVANAM_spriteT
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _NIRVANAM_spriteT_callee
+defc _NIRVANAM_spriteT_callee = NIRVANAM_spriteT_callee
+ENDIF
+

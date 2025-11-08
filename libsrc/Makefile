@@ -218,6 +218,7 @@ include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
 include target/sam/sam.mak
+include target/ts2068/ts2068.mak
 include target/zx/zx.mak
 
 
