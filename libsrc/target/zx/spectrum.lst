@@ -1,2 +1,0 @@
-target/zx/obj/${TARGET}/**/*.o
-font/fzx/obj/${TYPE}/**/*.o

@@ -1,14 +1,14 @@
 PPS_GLOBS := \
-	"$(Z88DK_LIBSRC)/target/zx/classic//psg/*.asm"  \
-	"$(Z88DK_LIBSRC)/target/pps/stdio/*.asm"  \
-	"$(Z88DK_LIBSRC)/target/pps/stdio/ansi/*.asm"  \
-	"$(Z88DK_LIBSRC)/target/pps/fcntl/*.asm"  
+	"target/zx/classic//psg/*.asm"  \
+	"target/pps/stdio/*.asm"  \
+	"target/pps/stdio/ansi/*.asm"  \
+	"target/pps/fcntl/*.asm"  
 
 PPS_GLOBS_ex := \
-	$(Z88DK_LIBSRC)/target/zx/classic//psg/*.asm  \
-	$(Z88DK_LIBSRC)/target/pps/stdio/*.asm  \
-	$(Z88DK_LIBSRC)/target/pps/stdio/ansi/*.asm  \
-	$(Z88DK_LIBSRC)/target/pps/fcntl/*.asm  
+	target/zx/classic//psg/*.asm  \
+	target/pps/stdio/*.asm  \
+	target/pps/stdio/ansi/*.asm  \
+	target/pps/fcntl/*.asm  
 
 
 PPS_CFILES = $(wildcard target/pps/fcntl/*.c) $(wildard target/pps/time/*.c)

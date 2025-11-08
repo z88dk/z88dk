@@ -15,6 +15,7 @@ $(SUBDIRS):
 
 clean: $(CLEANDIRS)
 	$(RM) */*.o 
+	$(RM) */obj
 	$(RM) */*/*.o 
 	$(RM) */*/*/*.o 
 	$(RM) */*/*/*/*.o 

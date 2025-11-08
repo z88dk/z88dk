@@ -1,38 +1,38 @@
-TS2068_GLOBS := "$(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/display/z80/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/misc/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/misc/z80/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/diagnostic/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/basic/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/opus/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/specdrum/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/uspeech/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/games/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/input/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/if1/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/zxmmc/*.asm" \
-	"$(Z88DK_LIBSRC)/target/zx/classic/stdio/*.asm"\
-	"$(Z88DK_LIBSRC)/target/zx/classic/graphics/*.asm" \
-	"$(Z88DK_LIBSRC)/target/ts2068/psg/*.asm"  \
-	"$(Z88DK_LIBSRC)/target/ts2068/stdio/*.asm"  \
-	"$(Z88DK_LIBSRC)/target/ts2068/stdio/ansi/*.asm"  \
-	"$(Z88DK_LIBSRC)/target/ts2068/*.asm"  
+TS2068_GLOBS := "target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm" \
+	"target/zx/misc/c/sccz80/*.asm" "target/zx/misc/z80/*.asm" \
+	"target/zx/classic/diagnostic/*.asm" \
+	"target/zx/classic/basic/*.asm" \
+	"target/zx/classic/opus/*.asm" \
+	"target/zx/classic/specdrum/*.asm" \
+	"target/zx/classic/uspeech/*.asm" \
+	"target/zx/classic/games/*.asm" \
+	"target/zx/classic/input/*.asm" \
+	"target/zx/classic/if1/*.asm" \
+	"target/zx/classic/zxmmc/*.asm" \
+	"target/zx/classic/stdio/*.asm"\
+	"target/zx/classic/graphics/*.asm" \
+	"target/ts2068/psg/*.asm"  \
+	"target/ts2068/stdio/*.asm"  \
+	"target/ts2068/stdio/ansi/*.asm"  \
+	"target/ts2068/*.asm"  
 
-TS2068_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/display/z80/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/misc/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/misc/z80/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/diagnostic/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/basic/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/opus/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/specdrum/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/uspeech/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/games/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/input/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/if1/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/zxmmc/*.asm \
-	$(Z88DK_LIBSRC)/target/zx/classic/stdio/*.asm\
-	$(Z88DK_LIBSRC)/target/zx/classic/graphics/*.asm \
-	$(Z88DK_LIBSRC)/target/ts2068/psg/*.asm  \
-	$(Z88DK_LIBSRC)/target/ts2068/stdio/*.asm  \
-	$(Z88DK_LIBSRC)/target/ts2068/stdio/ansi/*.asm  \
-	$(Z88DK_LIBSRC)/target/ts2068/*.asm  
+TS2068_GLOBS_ex := target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
+	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
+	target/zx/classic/diagnostic/*.asm \
+	target/zx/classic/basic/*.asm \
+	target/zx/classic/opus/*.asm \
+	target/zx/classic/specdrum/*.asm \
+	target/zx/classic/uspeech/*.asm \
+	target/zx/classic/games/*.asm \
+	target/zx/classic/input/*.asm \
+	target/zx/classic/if1/*.asm \
+	target/zx/classic/zxmmc/*.asm \
+	target/zx/classic/stdio/*.asm\
+	target/zx/classic/graphics/*.asm \
+	target/ts2068/psg/*.asm  \
+	target/ts2068/stdio/*.asm  \
+	target/ts2068/stdio/ansi/*.asm  \
+	target/ts2068/*.asm  
 
 
 TS2068_CFILES = target/zx/tape/tape_save.c

@@ -1,21 +1,21 @@
 # +zxn builds heavily on +zx
 ZXN_GLOBS := $(ZX_GLOBS) \
-	"$(Z88DK_LIBSRC)/target/zxn-libs/memory/z80/*.asm" "$(Z88DK_LIBSRC)/target/zxn-libs/memory/c/sccz80/*.asm" \
-        "$(Z88DK_LIBSRC)/target/zxn-libs/globals/z80/*.asm" \
-        "$(Z88DK_LIBSRC)/target/zxn-libs/sysvar/*.asm" \
-        "$(Z88DK_LIBSRC)/target/zxn-libs/version/z80/*.asm" "$(Z88DK_LIBSRC)/target/zxn-libs/version/c/sccz80/*.asm" \
-        "$(Z88DK_LIBSRC)/target/ts2068/misc/z80/*.asm" "$(Z88DK_LIBSRC)/target/ts2068/misc/c/sccz80/*.asm" \
-        "$(Z88DK_LIBSRC)/target/ts2068/display/z80/*.asm" "$(Z88DK_LIBSRC)/target/ts2068/display/c/sccz80/*.asm" \
-        "$(Z88DK_LIBSRC)/newlib/target/zxn/driver/banking/zxn_banked_call.asm"	
+	"target/zxn-libs/memory/z80/*.asm" "target/zxn-libs/memory/c/sccz80/*.asm" \
+        "target/zxn-libs/globals/z80/*.asm" \
+        "target/zxn-libs/sysvar/*.asm" \
+        "target/zxn-libs/version/z80/*.asm" "target/zxn-libs/version/c/sccz80/*.asm" \
+        "target/ts2068/misc/z80/*.asm" "target/ts2068/misc/c/sccz80/*.asm" \
+        "target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
+        "newlib/target/zxn/driver/banking/zxn_banked_call.asm"	
 
 ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
-	$(Z88DK_LIBSRC)/target/zxn-libs/memory/z80/*.asm $(Z88DK_LIBSRC)/target/zxn-libs/memory/c/sccz80/*.asm \
-        $(Z88DK_LIBSRC)/target/zxn-libs/globals/z80/*.asm \
-        $(Z88DK_LIBSRC)/target/zxn-libs/sysvar/*.asm \
-        $(Z88DK_LIBSRC)/target/zxn-libs/version/z80/*.asm $(Z88DK_LIBSRC)/target/zxn-libs/version/c/sccz80/*.asm \
-        $(Z88DK_LIBSRC)/target/ts2068/misc/z80/*.asm $(Z88DK_LIBSRC)/target/ts2068/misc/c/sccz80/*.asm \
-        $(Z88DK_LIBSRC)/target/ts2068/display/z80/*.asm $(Z88DK_LIBSRC)/target/ts2068/display/c/sccz80/*.asm \
-        $(Z88DK_LIBSRC)/newlib/target/zxn/driver/banking/zxn_banked_call.asm	
+	target/zxn-libs/memory/z80/*.asm target/zxn-libs/memory/c/sccz80/*.asm \
+        target/zxn-libs/globals/z80/*.asm \
+        target/zxn-libs/sysvar/*.asm \
+        target/zxn-libs/version/z80/*.asm target/zxn-libs/version/c/sccz80/*.asm \
+        target/ts2068/misc/z80/*.asm target/ts2068/misc/c/sccz80/*.asm \
+        target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
+        newlib/target/zxn/driver/banking/zxn_banked_call.asm	
 
 
 

@@ -1,7 +1,0 @@
-target/zx/graphics/rom_putsprite
-classic/games/obj/zx/beeper
-target/zx/stdio/generic_console_scrollup
-target/zx/stdio/fgetc_cons_rom
-target/zx/stdio/getk_rom
-target/zx/tape/c/smallc/tape_load_block_callee_rom
-target/zx/tape/c/smallc/tape_save_block_callee_rom

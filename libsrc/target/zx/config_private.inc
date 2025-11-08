@@ -1,4 +1,6 @@
-
+; This is config_private.inc for classic
+;
+; "commented" out m4 defines are used
 
     INCLUDE "target/zx/def/zxports.h"
 
