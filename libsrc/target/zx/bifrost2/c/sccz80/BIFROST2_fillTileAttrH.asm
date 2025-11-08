@@ -33,10 +33,3 @@ PUBLIC _BIFROST2_fillTileAttrH
 defc _BIFROST2_fillTileAttrH = BIFROST2_fillTileAttrH
 ENDIF
 
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_fillTileAttrH
-defc _BIFROST2_fillTileAttrH = BIFROST2_fillTileAttrH
-ENDIF
-

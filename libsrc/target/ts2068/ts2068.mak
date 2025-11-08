@@ -14,6 +14,7 @@ TS2068_GLOBS := "$(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm" "$(Z88DK_LIBS
 	"$(Z88DK_LIBSRC)/target/ts2068/psg/*.asm"  \
 	"$(Z88DK_LIBSRC)/target/ts2068/stdio/*.asm"  \
 	"$(Z88DK_LIBSRC)/target/ts2068/stdio/ansi/*.asm"  \
+	"$(Z88DK_LIBSRC)/target/ts2068/*.asm"  
 
 TS2068_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/display/z80/*.asm \
 	$(Z88DK_LIBSRC)/target/zx/misc/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/misc/z80/*.asm \
@@ -31,6 +32,7 @@ TS2068_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm $(Z88DK_LIBS
 	$(Z88DK_LIBSRC)/target/ts2068/psg/*.asm  \
 	$(Z88DK_LIBSRC)/target/ts2068/stdio/*.asm  \
 	$(Z88DK_LIBSRC)/target/ts2068/stdio/ansi/*.asm  \
+	$(Z88DK_LIBSRC)/target/ts2068/*.asm  
 
 
 TS2068_CFILES = target/zx/tape/tape_save.c

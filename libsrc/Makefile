@@ -152,7 +152,7 @@ TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 808
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
-TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib zxrom.lib)
+TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib) 
 TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 TOCREATE += $(call check_target,zx80, zx80_clib.lib)
 TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib)
@@ -220,6 +220,7 @@ include sound/saa1099/saa1099.mak
 include target/sam/sam.mak
 include target/ts2068/ts2068.mak
 include target/zx/zx.mak
+include target/zxn/zxn.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
@@ -339,21 +340,18 @@ zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(call buildgeneric,zx)
-	$(MAKE) -C target/zx
 	$(MAKE) -C target/zx-common TARGET=zx
 	$(MAKE) -C classic/games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
-	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
+	#TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
 zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib target-zx
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
 	$(call buildgeneric,zxn,wide)
-	$(MAKE) -C target/zx TARGET=zxn
 	$(MAKE) -C target/zx-common TARGET=zxn
 	$(MAKE) -C classic/games TARGET=zxn
-	$(MAKE) -C target/zxn TARGET=zxn
 	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
@@ -365,20 +363,8 @@ ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib target-zx
 	@echo ''
 	$(call buildgeneric,ts2068,wide)
 	$(MAKE) -C classic/games TARGET=ts2068
-	$(MAKE) -C target/zx TARGET=ts2068
-	$(MAKE) -C target/ts2068 TARGET=ts2068
 	$(MAKE) -C target/zx-common TARGET=ts2068
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
-
-# ZXROM - stefano
-zxrom.lib: zx_clib.lib
-	@echo ''
-	@echo '--- Building ZXROM Library ---'
-	@echo ''
-	$(RM) target/zx/stdio/generic_console_scrollup.o
-	$(MAKE) -C classic/games TARGET=zx
-	$(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(TARGET_DIRECTORY)/zx/zxrom.lst
-	$(RM) target/zx/stdio/generic_console_scrollup.o
 
 # ZXVGS - yarek
 zxvgs.lib:
@@ -1024,10 +1010,8 @@ sam_clib.lib: $(TARGET_CLIB_DEPS) target-sam
 	@echo ''
 	$(call buildgeneric,sam,wide)
 	$(MAKE) -C classic/games TARGET=sam
-#	$(MAKE) -C target/zx TARGET=sam
-#	$(MAKE) -C target/zx-common TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
-	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
+	#TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
 
 # Spectravideo SVI library - Stefano
 svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib

@@ -20,11 +20,3 @@ IF __CLASSIC
 PUBLIC _BIFROST2_resetAnim2Frames
 defc _BIFROST2_resetAnim2Frames = BIFROST2_resetAnim2Frames
 ENDIF
-
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_resetAnim2Frames
-defc _BIFROST2_resetAnim2Frames = BIFROST2_resetAnim2Frames
-ENDIF
-

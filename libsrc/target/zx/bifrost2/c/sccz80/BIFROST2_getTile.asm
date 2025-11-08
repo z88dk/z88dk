@@ -30,11 +30,3 @@ IF __CLASSIC
 PUBLIC _BIFROST2_getTile
 defc _BIFROST2_getTile = BIFROST2_getTile
 ENDIF
-
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_getTile
-defc _BIFROST2_getTile = BIFROST2_getTile
-ENDIF
-

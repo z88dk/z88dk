@@ -29,11 +29,3 @@ IF __CLASSIC
 PUBLIC _BIFROST2_showTilePosH
 defc _BIFROST2_showTilePosH = BIFROST2_showTilePosH
 ENDIF
-
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_showTilePosH
-defc _BIFROST2_showTilePosH = BIFROST2_showTilePosH
-ENDIF
-

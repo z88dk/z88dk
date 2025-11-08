@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET ?= zx 
 
-SUBDIRS = graphics fcntl
+SUBDIRS = fcntl
 
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 

@@ -20,11 +20,3 @@ IF __CLASSIC
 PUBLIC _BIFROST2_start
 defc _BIFROST2_start = BIFROST2_start
 ENDIF
-
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_start
-defc _BIFROST2_start = BIFROST2_start
-ENDIF
-

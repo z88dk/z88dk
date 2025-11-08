@@ -20,11 +20,3 @@ IF __CLASSIC
 PUBLIC _BIFROST2_getAnimGroup
 defc _BIFROST2_getAnimGroup = BIFROST2_getAnimGroup
 ENDIF
-
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_getAnimGroup
-defc _BIFROST2_getAnimGroup = BIFROST2_getAnimGroup
-ENDIF
-

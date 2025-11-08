@@ -1,2 +1,2 @@
 target/zx/obj/${TARGET}/**/*.o
-@target/zx/newlib/newlib.lst
+font/fzx/obj/${TYPE}/**/*.o

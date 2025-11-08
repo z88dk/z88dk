@@ -1,6 +1,7 @@
 ZX_GLOBS := "$(Z88DK_LIBSRC)/target/zx/ulaplus/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/ulaplus/z80/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/ulaplus/c/smallc/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/display/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/display/z80/*.asm" \
+	"$(Z88DK_LIBSRC)/target/zx/graphics/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/graphics/z80/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/misc/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx/misc/z80/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/classic/diagnostic/*.asm" \
 	"$(Z88DK_LIBSRC)/target/zx/classic/basic/*.asm" \
@@ -16,7 +17,7 @@ ZX_GLOBS := "$(Z88DK_LIBSRC)/target/zx/ulaplus/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/
 	"$(Z88DK_LIBSRC)/target/zx/classic/stdio/*.asm"\
 	"$(Z88DK_LIBSRC)/target/zx/classic/graphics/*.asm" 
 
-MULTICOLOUR_GLOBS := "$(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm" $(Z88DK_LIBSRC)/target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
+ZX_MULTICOLOUR_GLOBS := "$(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm" $(Z88DK_LIBSRC)/target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_resetAnim2Frames.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_setTile.asm \
@@ -53,7 +54,7 @@ ZX_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/ulaplus/c/sccz80/*.asm $(Z88DK_LIBSRC)/
 	$(Z88DK_LIBSRC)/target/zx/classic/stdio/*.asm  \
 	$(Z88DK_LIBSRC)/target/zx/classic/graphics/*.asm
 
-MULTICOLOUR_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
+ZX_MULTICOLOUR_GLOBS_ex := $(Z88DK_LIBSRC)/target/zx/bifrost2/c/sccz80/*.asm $(Z88DK_LIBSRC)/target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_resetAnim2Frames.asm \
 	$(Z88DK_LIBSRC)/target/zx/bifrost2/z80/asm_BIFROST2_setTile.asm \
@@ -96,23 +97,20 @@ target-zx: $(ZX_TARGETS)
 
 # Arg1: machine
 define bifrost_zx0
-target/zx/obj/$(1)/bifrost2_engine_48.bin.zx0: 
-	@mkdir -p target/zx/obj/$(1)
+target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0: 
+	@mkdir -p target/$(1)/obj/$(1)
 	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
 	$(ZX0) -f $$(@:.zx0=)
 
-target/zx/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/zx/obj/$(1)/bifrost2_engine_48.bin.zx0 
+target/$(1)/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/zx/obj/$(1)/bifrost2_engine_48.bin.zx0 
 	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -DPLUS3 -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
 	$(ZX0) -f $$(@:.zx0=)
 endef
 
 
-$(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
-$(eval $(call buildtargetasm,target/zx,z80n,zxn,-mz80n,$(ZX_GLOBS) $(MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(MULTICOLOUR_GLOBS_ex) $(addprefix target/zx/obj/zxn/, $(BIFROST2_GEN))))
+$(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
 $(eval $(call buildtargetc,target/zx,zx))
-$(eval $(call buildtargetc,target/zx,zxn,-clib=classic))
 $(eval $(call bifrost_zx0,zx))
-$(eval $(call bifrost_zx0,zxn))
 
 target-zx-clean:
 	$(RM) -fr target/zx/obj

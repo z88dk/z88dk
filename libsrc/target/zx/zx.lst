@@ -1,29 +1,9 @@
+target/zx/obj/zx/**/*.o
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 target/shared/clock
-@target/zx/gfxspectrum.lst
 font/fzx/obj/${TYPE}/**/*.o
 
-
-target/zx/games/obj/${TARGET}/joystick
-target/zx/games/obj/${TARGET}/bit_open
-target/zx/games/obj/${TARGET}/bit_open_di
-target/zx/games/obj/${TARGET}/bit_close
-target/zx/games/obj/${TARGET}/bit_close_ei
-
-target/zx/far/__far_misc
-target/zx/far/__far_page
-target/zx/far/l_far_mapaddr
 @classic/games/games.lst
-@target/zx/spectrum.lst
-@target/zx/fzx/fzx.lst
-target/zx/psg/set_psg
-target/zx/psg/set_psg_callee
-target/zx/psg/get_psg
-target/zx/psg/psg_init
-target/zx/psg/asm_wyz_hardware_out
-target/zx/psg/asm_vt2_hardware_out
-target/zx/psg/asm_arkos_zx_smc
-target/zx/psg/asm_arkos_zx_rom
 sound/ay/obj/${TYPE}/**/*.o
 

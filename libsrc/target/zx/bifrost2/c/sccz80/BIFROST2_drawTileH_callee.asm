@@ -33,9 +33,3 @@ defc _BIFROST2_drawTileH_callee = BIFROST2_drawTileH_callee
 ENDIF
 
 
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _BIFROST2_drawTileH_callee
-defc _BIFROST2_drawTileH_callee = BIFROST2_drawTileH_callee
-ENDIF
-
