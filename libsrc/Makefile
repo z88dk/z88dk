@@ -432,7 +432,7 @@ pc88_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(TARGET_DIRECTORY)/pc88/pc88.lst
 
 # Native for sprinter - dom
-pps_clib.lib: $(TARGET_CLIB_DEPS)
+pps_clib.lib: $(TARGET_CLIB_DEPS) target-pps
 	@echo ''
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
