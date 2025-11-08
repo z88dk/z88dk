@@ -1,957 +1,832 @@
-;
-;       Z88 Graphics Functions - Small C+ stubbs
-;
-;       Written around the Interlogic Standard Library
-;
-;       Stubs Written by D Morris - 30/9/98
-;
-;
-;       Define for graphics and other standard library functions
-;       See also text/textgfx.inc and text6/textgfx.inc
-;
-;
-;    $Id: grafix.inc $
-;
+; Compile time constants for building the graphics library
 
-
-IF FORti82
-    DEFINE gotgfx
-    defc row_bytes    = 12
-    defc maxx    = 96
-    defc maxy    = 64
-ENDIF
-
-IF FORti83
-    DEFINE gotgfx
-    defc row_bytes    = 12
-    defc maxx    = 96
-    defc maxy    = 64
-ENDIF
-
-IF FORti83p
-    DEFINE gotgfx
-    defc row_bytes    = 12
-    defc maxx    = 96
-    defc maxy    = 64
-ENDIF
-
-IF FORti85
-    DEFINE gotgfx
-    defc row_bytes    = 16
-    defc maxx    = 128
-    defc maxy    = 64
-ENDIF
-
-IF FORti86
-    DEFINE gotgfx
-    defc row_bytes    = 16
-    defc maxx    = 128
-    defc maxy    = 64
-ENDIF
-
-IF FORpc6001
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-    defc blankch    = 0
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORphc25
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-    defc blankch    = 32
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORphc20
-    DEFINE gotgfx
-    defc maxx    = 32        ;Text graphics settings
-    defc maxy    = 16 
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORpc88
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORvz
-    DEFINE gotgfx
-    IF BLOCKgfx
-        defc maxx    = 64
-              defc maxy    = 32
-    ELSE
-        defc maxx    = 128
-              defc maxy    = 64
-    ENDIF
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORg850
-    DEFINE gotgfx
-    defc maxx    = 144    ; display size of the PC-G850
-    defc maxy    = 48
-ENDIF
-
-IF FORg815
-    DEFINE gotgfx
-    defc maxx    = 144    ; display size of the PC-G815
-    defc maxy    = 32
-ENDIF
-
-IF FORe200
-    DEFINE gotgfx
-    defc maxx    = 120    ; display size of the PC-E200
-    defc maxy    = 28
-ENDIF
-
-IF FORh19
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 72
-    defc    WANT_swapgfxbk = 0
-ENDIF
 
 IF FORabc80
-    DEFINE gotgfx
-    defc maxx    = 78
-    defc maxy    = 72
-ENDIF
-
-IF FORbee
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 75
-    defc blankch    = 128
-ENDIF
-
-IF FORbeehr
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 275
-ENDIF
-
-IF FORbeehr320
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 275
-ENDIF
-
-IF FORbeehr512
-    DEFINE gotgfx
-    defc maxx    = 512
-    defc maxy    = 256
-ENDIF
-
-IF FORgemini
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 75
-    defc blankch    = 128
-ENDIF
-
-IF FORgeminihr
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 256
-    defc blankch    = 128
-ENDIF
-
-IF FORzx80
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 48
-ENDIF
-
-IF FORzx81
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 48
-    defc blankch    = 0
-ENDIF
-
-IF FORlambda
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 48
-    defc blankch    = 0
-ENDIF
-
-IF FORzx81udg
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 71
-    defc blankch    = 0
-ENDIF
-
-IF FORzx81phrg
-    DEFINE gotgfx
-    defc maxx    = 128
-    defc maxy    = 96    ; This one can be changed !  1..200 are theorical valid values !
-ENDIF
-
-IF FORzx81hr64
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 64
-ENDIF
-
-IF FORzx81hr128
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 128
-ENDIF
-
-IF FORzx81hr192
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-ENDIF
-
-IF FORzx81hr384
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 384
-ENDIF
-
-IF FORzx81mt64
-    DEFINE gotgfx
-    defc maxx    = 248
-    defc maxy    = 64
-ENDIF
-
-IF FORzx81mt192
-    DEFINE gotgfx
-    defc maxx    = 248
-    defc maxy    = 192
-ENDIF
-
-IF FORzx81g007
-    DEFINE gotgfx
-    defc maxx    = 256    ; It could be 272 but we should switch to 'wide' mode
-    defc maxy    = 185
-ENDIF
-
-IF FORzx81g64
-    DEFINE gotgfx
-    defc maxx    = 256    ; It could be 272 but we should switch to 'wide' mode
-    defc maxy    = 64
+    defc    _GFX_MAXX    = 78
+    defc    _GFX_MAXY    = 72
 ENDIF
 
 IF FORaceudg
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 72
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
 ENDIF
 
 IF FORace
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 48
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
 ENDIF
 
-IF FORkaypro
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 100
-ENDIF
-
-IF FORbondwell
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 75
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORbondwell2
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-ENDIF
-
-IF FORkaypro83
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 50
-ENDIF
-
-IF FORosborne1
-    DEFINE gotgfx
-    defc maxx    = 104
-    defc maxy    = 48
-    defc blankch    = 32
-ENDIF
-
-IF FORzx
- IF !FORts2068
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-    defc    WANT_swapgfxbk = 0
- ENDIF
-ENDIF
-
-IF FORcpc
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORpcw
-    DEFINE gotgfx
-    defc maxx    = 720
-    defc maxy    = 256
-ENDIF
-
-IF FOReinstein
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-    defc fcolor    = 1
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORmbc200
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 400
-ENDIF
-
-IF FORv1050
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 300
-ENDIF
-
-IF FORv1050udg
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 75
-    defc blankch    = 160
-ENDIF
-
-IF FORmsx
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-    defc fcolor    = 1
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORmz
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 50
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORattache
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 240
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORsvi
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 192
-    defc fcolor    = 1
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORsam
-    DEFINE gotgfx
-    defc maxx    = 512
-    defc maxy    = 192
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORoz
-    DEFINE gotgfx
-    defc row_bytes    = 30
-    defc maxx    = 239
-    defc maxy    = 80
-ENDIF
-
-IF FORosca
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 200
-    ; untested 240 lines resolution, see 'libsrc/graphics/osca'
-    ;defc maxy    = 240
-ENDIF
-
-IF FORc128hr
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-ENDIF
-
-IF FORc128hr480
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 480
-ENDIF
-
-IF FORts2068
-    DEFINE gotgfx
-    defc maxx       = 512
-    defc maxy       = 192
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORzxn
-    DEFINE gotgfx
-    defc maxx       = 512
-    defc maxy       = 192
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORtiki100
-    DEFINE gotgfx
-    defc maxx       = 1024
-    defc maxy       = 256
-ENDIF
-
-IF FORenterprise
-    DEFINE gotgfx
-    defc maxx       = 336
-    defc maxy       = 243
-ENDIF
-
-IF FORenterprisehr
-    DEFINE gotgfx
-    defc maxx       = 672
-    defc maxy       = 243
-ENDIF
-
-IF FORz88
-    DEFINE gotgfx
-    defc    maxx    = 256
-    defc    maxy     = 64
-ENDIF
-
-IF FORz9001
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 192
-    defc    WANT_swapgfxbk = 0
-    defc blankch = 32
-ENDIF
-
-IF FORkc
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 256
-ENDIF
-
-IF FORaussie
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 576
-ENDIF
-
-IF FORaquarius
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 72
-    defc blankch    = 160
-ENDIF
-
-IF FORaqplus
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 299
-ENDIF
-
-IF FORaq48
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 48
-    defc blankch    = 160
-ENDIF
-
-IF FORz1013
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 256
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-
-IF FORc128
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 50
-    defc blankch    = 32
-ENDIF
-
-IF FORc128udg
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 75
-    defc blankch    = 0
-ENDIF
-
-IF FORfp1100
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-    defc blankch    = 32
-    defc USEplotc   = 1
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORgal
-    DEFINE gotgfx
-    ; This size reflects the Gal+ screen mode
-        IF textgraphics
-            defc maxx    = 64
-        defc maxy    = 48
-        ELSE
-            defc maxx    = 256
-        defc maxy    = 208
-        ENDIF
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORnascom
-    DEFINE gotgfx
-    defc maxx    = 96
-    defc maxy    = 48
-    defc blankch    = 32
-ENDIF
-
-IF FORrc700
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 75
-    defc blankch    = 32
-ENDIF
-
-IF FORtrs80
-    DEFINE gotgfx
-    defc maxx    = 128
-    defc maxy    = 48
-    defc blankch    = 128
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORtrs80m2
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 72
-    defc blankch    = 32
-    defc GFXTEXT3 = 1
-ENDIF
-
-IF FORtrs80m4
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 72
-    defc blankch    = 128
-ENDIF
-
-IF FOReg2000
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 102
-ENDIF
-
-IF FORhrg1
-    DEFINE gotgfx
-    defc maxx    = 384
-    defc maxy    = 192
-ENDIF
-
-IF FORgrafyx3
-    DEFINE gotgfx
-    defc maxx    = 512
-    defc maxy    = 192
-ENDIF
-
-IF FORgrafyx4
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 240
-ENDIF
-
-IF FORp2000
-    DEFINE gotgfx
-    defc maxx    = 78
-    defc maxy    = 72
-    defc blankch    = 0
-ENDIF
-
-IF FORpx4
-    DEFINE gotgfx
-    defc maxx    = 240
-    defc maxy    = 64
-ENDIF
-
-IF FORpx8
-    DEFINE gotgfx
-    defc maxx    = 480
-    defc maxy    = 64
-ENDIF
-
-IF FORnc100
-    DEFINE gotgfx
-    defc maxx    = 480
-    defc maxy    = 64
-ENDIF
-
-IF FORnc200
-    DEFINE gotgfx
-    defc maxx    = 480
-    defc maxy    = 128
-ENDIF
-
-IF FORvg5k
-    DEFINE gotgfx
-    defc maxx    = 80
-    defc maxy    = 75
-    defc blankch    = 0
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORsorcerer
-    DEFINE gotgfx
-    defc maxx    = 128
-    defc maxy    = 60
-    defc blankch    = 32
-ENDIF
-
-IF FORpacman
-    DEFINE gotgfx
-    defc maxx    = 84
-    defc maxy    = 72
-    defc blankch    = 192
-ENDIF
-
-IF FORpv1000
-    DEFINE gotgfx
-    defc maxx    = 56
-    defc maxy    = 48
-    defc    WANT_swapgfxbk = 0
+IF FORagon
+   defc    _GFX_MAXX = 1024
+   defc    _GFX_MAXY = 768
 ENDIF
 
 IF FORalphatro
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 72
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORhemc
-    DEFINE gotgfx
-    defc maxx    = 64        ;Text graphics settings
-    defc maxy    = 24 
-    defc blankch    = 32
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORhgmc
-    DEFINE    gotgfx
-    defc    maxx = 256
-    defc    maxy = 256
-    defc    WANT_swapgfxbk = 0
-    defc    BITS_reversed = 1
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
 ENDIF
 
 
-IF FORspc1000
-    DEFINE gotgfx
-    ;defc maxx    = 64        ;Text graphics settings
-    ;defc maxy    = 48
-    defc maxx    = 256        ;Graphics/VDP
-    defc maxy    = 192
-    defc blankch    = 32
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
+IF FORaquarius
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 160
 ENDIF
 
-IF FORsmc777
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-    defc    WANT_swapgfxbk = 0
+IF FORaqplus
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 299
 ENDIF
 
-IF FORmulti8
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-    defc    WANT_swapgfxbk = 0
+IF FORaq48
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 160
 ENDIF
 
-IF FORrx78
-    DEFINE gotgfx
-    defc maxx    = 192
-    defc maxy    = 184
-    defc    WANT_swapgfxbk = 0
+IF FORattache
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 240
 ENDIF
 
-IF FORlynx
-    DEFINE gotgfx
-    defc maxx    = 64        ;Text graphics settings
-    defc maxy    = 64
-    defc blankch    = 0
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
+IF FORaussie
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 576
 ENDIF
 
-IF FORx1
-    DEFINE gotgfx
-    defc maxx    = 640
-    defc maxy    = 200
-    defc    WANT_swapgfxbk = 0
+IF FORbee
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR    = 128
+    defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-IF FORlaser500
-    DEFINE gotgfx
-    defc maxx = 320
-    defc maxy = 192
-    defc blankch = 32
-    defc    WANT_swapgfxbk = 0
+IF FORbeehr
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 275
+    defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-IF FORexcali64
-    DEFINE gotgfx
-    defc maxx = 160
-    defc maxy = 72
-    defc blankch = 32
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc USEindex = 1
-    defc    WANT_swapgfxbk = 0
+IF FORbeehr320
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 275
+    defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-IF FORz80tvgame
-    DEFINE gotgfx
-    defc maxx = 168
-    defc maxy = 208
-    defc blankch = 32
-    defc    WANT_swapgfxbk = 0
+IF FORbeehr512
+    defc    _GFX_MAXX    = 512
+    defc    _GFX_MAXY    = 256
+    defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-IF FORsv8000
-    DEFINE gotgfx
-    defc maxx = 256
-    defc maxy = 96
-    defc blankch = 32
-    defc    WANT_swapgfxbk = 0
+IF FORbondwell
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 75
 ENDIF
 
-IF FORpmd85
-    DEFINE gotgfx
-    defc maxx = 288
-    defc maxy = 256
-    defc blankch = 32
-    defc    WANT_swapgfxbk = 0
+IF FORbondwell2
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+    defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-IF FORm100
-    DEFINE gotgfx
-    defc maxx = 240
-    defc maxy = 64
+IF FORc128
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 50
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
 ENDIF
 
-IF FORvector06c
-    DEFINE gotgfx
-    defc maxx = 256
-    defc maxy = 256
-    defc blankch = 32
-    defc    WANT_swapgfxbk = 0
+IF FORc128udg
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
 ENDIF
 
-IF FORspecial
-    DEFINE gotgfx
-    defc maxx = 384
-    defc maxy = 256
-    defc blankch = 32
-    defc    WANT_swapgfxbk = 0
+
+IF FORc128hr
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
 ENDIF
 
-IF FORhomelab
-    DEFINE gotgfx
-    defc maxx = 128
-    defc maxy = 64
-    defc    WANT_swapgfxbk = 0
+IF FORc128hr480
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 480
 ENDIF
 
-IF FORhomelab2
-    DEFINE gotgfx
-    defc maxx = 80
-    defc maxy = 50
-    defc    WANT_swapgfxbk = 0
+
+IF FORcpc
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
 ENDIF
 
-IF FORgb
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
-ENDIF
 
-IF FORmikro80
-    defc USEplotc = 1
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORondra
-    DEFINE gotgfx
-    defc maxx    = 320
-    defc maxy    = 256
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORlviv
-    DEFINE gotgfx
-    defc maxx    = 256
-    defc maxy    = 256
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORvti
-    DEFINE gotgfx
-    defc maxx    = 128
-    defc maxy    = 48
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc blankch    = 160
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORvio
-    DEFINE gotgfx
-    defc maxx    = 160
-    defc maxy    = 72
-    defc blankch    = 32
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORvdm
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 16
-    defc USEplotc   = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORkrokha
-    DEFINE gotgfx
-    defc maxx    = 96 
-    defc maxy    = 64
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORgl6000
-    DEFINE gotgfx
-    defc maxx    = 240
-    defc maxy    = 100
-    defc    WANT_swapgfxbk = 0
-ENDIF
-
-IF FORsol20
-    DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 16
-    defc USEplotc = 1
-ENDIF
 
 ; GSX virtual window is (32768 x 32768)
 ; HiRez display should stay between 512..800 px.
 ; We keep an average value
 IF FORcpm
   IF FORgsx
-    DEFINE gotgfx
-    defc maxx    = 1920        ; foo value hopefully larger than the max X resolution
-    defc maxy    = 768        ; we keep unbalanced proportions, assuming non-square pixels
+    defc    _GFX_MAXX    = 1920        ; foo value hopefully larger than the max X resolution
+    defc    _GFX_MAXY    = 768        ; we keep unbalanced proportions, assuming non-square pixels
   ENDIF
 ENDIF
 
-; =============================================
 
-IF FORtek
-   DEFINE gotgfx
-   defc maxx = 1024
-   defc maxy = 768
-   defc    WANT_swapgfxbk = 0
+IF FORe200
+    defc    _GFX_MAXX    = 120    ; display size of the PC-E200
+    defc    _GFX_MAXY    = 28
 ENDIF
 
-IF FORregis
-   DEFINE gotgfx
-   defc maxx = 768
-   defc maxy = 480
+IF FOReinstein
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+    defc    _GFX_MSX_FILL_COLOUR    = 1
 ENDIF
 
-IF FORagon
-   DEFINE gotgfx
-   defc maxx = 1024
-   defc maxy = 768
-   defc    WANT_swapgfxbk = 0
+IF FORenterprise
+    defc    _GFX_MAXX       = 336
+    defc    _GFX_MAXY       = 243
 ENDIF
 
-IF FORtim011
-   DEFINE gotgfx
-   defc maxx = 512
-   defc maxy = 256
-   defc    WANT_swapgfxbk = 0
+IF FORenterprisehr
+    defc    _GFX_MAXX       = 672
+    defc    _GFX_MAXY       = 243
 ENDIF
 
-IF FORinteract
-   DEFINE gotgfx
-   defc maxx = 112
-   defc maxy = 77
-   defc    WANT_swapgfxbk = 0
+
+IF FORexcali64
+    defc    _GFX_MAXX = 160
+    defc    _GFX_MAXY = 72
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+    defc    _GFX_TEXT_USE_INDEX = 1
+ENDIF
+
+IF FORfp1100
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+    defc    _GFX_GENCON_USEPLOTC   = 1
+ENDIF
+
+
+IF FORg850
+    defc    _GFX_MAXX    = 144    ; display size of the PC-G850
+    defc    _GFX_MAXY    = 48
+ENDIF
+
+IF FORg815
+    defc    _GFX_MAXX    = 144    ; display size of the PC-G815
+    defc    _GFX_MAXY    = 32
+ENDIF
+
+
+
+IF FORgal
+    ; This size reflects the Gal+ screen mode
+    IF textgraphics
+        defc    _GFX_MAXX    = 64
+        defc    _GFX_MAXY    = 48
+    ELSE
+        defc    _GFX_MAXX    = 256
+        defc    _GFX_MAXY    = 208
+    ENDIF
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
+
+
+
+IF FORgb
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORgemini
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR    = 128
+ENDIF
+
+IF FORgeminihr
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 256
+    defc    _GFX_TEXT_BLANK_CHAR    = 128
+ENDIF
+
+
+
+IF FORgl6000
+    defc    _GFX_MAXX    = 240
+    defc    _GFX_MAXY    = 100
+ENDIF
+
+IF FORh19
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 72
 ENDIF
 
 IF FORhector1
-   DEFINE gotgfx
-   DEFINE GFX_noclip
-   defc maxx = 112
-   defc maxy = 77
-   defc    WANT_swapgfxbk = 0
+   DEFINE  _GFX_LINE_NOCLIP
+   defc    _GFX_MAXX = 112
+   defc    _GFX_MAXY = 77
 ENDIF
 
 IF FORhectorhr
-   DEFINE gotgfx
-   defc maxx = 240
-   defc maxy = 226
-   defc    WANT_swapgfxbk = 0
+   defc    _GFX_MAXX = 240
+   defc    _GFX_MAXY = 226
 ENDIF
 
-; Catch all to sort things out
-
-IF !gotgfx
-    defc    maxx = 256
-    defc    maxy = 192
+IF FORhemc
+    defc    _GFX_MAXX    = 64        ;Text graphics settings
+    defc    _GFX_MAXY    = 24 
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
-IF WANT_swapgfxbk
-    defc    NEED_swapgfxbk = 0
-ELSE
-    defc    NEED_swapgfxbk = 1
+IF FORhgmc
+    defc    _GFX_MAXX = 256
+    defc    _GFX_MAXY = 256
+    defc    BITS_reversed = 1
+ENDIF
+
+IF FORhomelab
+    defc    _GFX_MAXX = 128
+    defc    _GFX_MAXY = 64
+ENDIF
+
+IF FORhomelab2
+    defc    _GFX_MAXX = 80
+    defc    _GFX_MAXY = 50
+ENDIF
+
+IF FORinteract
+   defc    _GFX_MAXX = 112
+   defc    _GFX_MAXY = 77
+ENDIF
+
+
+IF FORkaypro
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 100
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+
+IF FORkaypro83
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 50
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORkc
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 256
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORkrokha
+    defc    _GFX_MAXX    = 96 
+    defc    _GFX_MAXY    = 64
+ENDIF
+
+IF FORlaser500
+    defc    _GFX_MAXX = 320
+    defc    _GFX_MAXY = 192
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+IF FORlviv
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 256
+ENDIF
+
+IF FORlynx
+    defc    _GFX_MAXX    = 64        ;Text graphics settings
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_TEXT_BLANK_CHAR   = 0
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORm100
+    defc    _GFX_MAXX = 240
+    defc    _GFX_MAXY = 64
+ENDIF
+
+IF FORmbc200
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 400
+ENDIF
+
+IF FORmc1000
+    defc    _GFX_MAXX = 256
+    defc    _GFX_MAXY = 192
+ENDIF
+
+IF FORmikro80
+    defc    _GFX_GENCON_USEPLOTC = 1
+ENDIF
+
+IF FORmsx
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+    defc _GFX_MSX_FILL_COLOUR    = 1
+ENDIF
+
+IF FORmulti8
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+ENDIF
+
+
+IF FORmz
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 50
+ENDIF
+
+
+IF FORnascom
+    defc    _GFX_MAXX    = 96
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
+
+IF FORnc100
+    defc    _GFX_MAXX    = 480
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORnc200
+    defc    _GFX_MAXX    = 480
+    defc    _GFX_MAXY    = 128
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+
+
+IF FORondra
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 256
+ENDIF
+
+
+IF FORosborne1
+    defc    _GFX_MAXX    = 104
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
+
+IF FORosca
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 200
+    ; untested 240 lines resolution, see 'libsrc/graphics/osca'
+    ;defc    _GFX_MAXY    = 240
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORoz
+    defc row_bytes    = 30
+    defc    _GFX_MAXX    = 239
+    defc    _GFX_MAXY    = 80
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+
+
+IF FORp2000
+    defc    _GFX_MAXX    = 78
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
+ENDIF
+
+
+IF FORpacman
+    defc    _GFX_MAXX    = 84
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 192
+ENDIF
+
+IF FORpc88
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+ENDIF
+
+IF FORpc6001
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORpcw
+    defc    _GFX_MAXX    = 720
+    defc    _GFX_MAXY    = 256
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORphc25
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORphc20
+    defc    _GFX_MAXX    = 32        ;Text graphics settings
+    defc    _GFX_MAXY    = 16 
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
+
+IF FORpmd85
+    defc    _GFX_MAXX = 288
+    defc    _GFX_MAXY = 256
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+
+IF FORpv1000
+    defc    _GFX_MAXX    = 56
+    defc    _GFX_MAXY    = 48
+ENDIF
+
+IF FORpx4
+    defc    _GFX_MAXX    = 240
+    defc    _GFX_MAXY    = 64
+ENDIF
+
+IF FORpx8
+    defc    _GFX_MAXX    = 480
+    defc    _GFX_MAXY    = 64
+ENDIF
+
+
+IF FORrc700
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORregis
+   defc    _GFX_MAXX = 768
+   defc    _GFX_MAXY = 480
+ENDIF
+
+IF FORrx78
+    defc    _GFX_MAXX    = 192
+    defc    _GFX_MAXY    = 184
+ENDIF
+
+
+IF FORsam
+    defc    _GFX_MAXX    = 512
+    defc    _GFX_MAXY    = 192
+ENDIF
+
+
+IF FORsmc777
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+ENDIF
+
+
+IF FORsol20
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 16
+    defc    _GFX_GENCON_USEPLOTC = 1
+ENDIF
+
+IF FORsorcerer
+    defc    _GFX_MAXX    = 128
+    defc    _GFX_MAXY    = 60
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
+
+IF FORspc1000
+    ;defc    _GFX_MAXX    = 64        ;Text graphics settings
+    ;defc    _GFX_MAXY    = 48
+    defc    _GFX_MAXX    = 256        ;Graphics/VDP
+    defc    _GFX_MAXY    = 192
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORspecial
+    defc    _GFX_MAXX = 384
+    defc    _GFX_MAXY = 256
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+IF FORsv8000
+    defc    _GFX_MAXX = 256
+    defc    _GFX_MAXY = 96
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+IF FORsvi
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+    defc _GFX_MSX_FILL_COLOUR    = 1
+ENDIF
+
+
+IF FORtek
+   defc    _GFX_MAXX = 1024
+   defc    _GFX_MAXY = 768
+ENDIF
+
+
+IF FORti82
+    defc row_bytes    = 12
+    defc    _GFX_MAXX    = 96
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORti83
+    defc row_bytes    = 12
+    defc    _GFX_MAXX    = 96
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORti83p
+    defc row_bytes    = 12
+    defc    _GFX_MAXX    = 96
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORti85
+    defc row_bytes    = 16
+    defc    _GFX_MAXX    = 128
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORti86
+    defc row_bytes    = 16
+    defc    _GFX_MAXX    = 128
+    defc    _GFX_MAXY    = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORtiki100
+    defc    _GFX_MAXX       = 1024
+    defc    _GFX_MAXY       = 256
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORtim011
+   defc    _GFX_MAXX = 512
+   defc    _GFX_MAXY = 256
+ENDIF
+
+
+IF FORtrs80
+    defc    _GFX_MAXX    = 128
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 128
+ENDIF
+
+IF FORtrs80m2
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+    defc GFXTEXT3 = 1
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORtrs80m4
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 128
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+; TRS80
+IF FOReg2000
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 102
+ENDIF
+
+; TRS80
+IF FORhrg1
+    defc    _GFX_MAXX    = 384
+    defc    _GFX_MAXY    = 192
+ENDIF
+
+; TRS80
+IF FORgrafyx3
+    defc    _GFX_MAXX    = 512
+    defc    _GFX_MAXY    = 192
+ENDIF
+
+; TRS80
+IF FORgrafyx4
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 240
+ENDIF
+
+
+IF FORts2068
+    defc    _GFX_MAXX       = 512
+    defc    _GFX_MAXY       = 192
+ENDIF
+
+
+IF FORv1050
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 300
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORv1050udg
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR    = 160
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+
+IF FORvdm
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 16
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORvector06c
+    defc    _GFX_MAXX = 256
+    defc    _GFX_MAXY = 256
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+
+IF FORvg5k
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
+ENDIF
+
+IF FORvio
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
+
+IF FORvti
+    defc    _GFX_MAXX    = 128
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+    defc    _GFX_TEXT_BLANK_CHAR    = 160
+ENDIF
+
+
+IF FORvz
+    IF BLOCKgfx
+        defc    _GFX_MAXX    = 64
+        defc    _GFX_MAXY    = 32
+    ELSE
+        defc    _GFX_MAXX    = 128
+        defc    _GFX_MAXY    = 64
+    ENDIF
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+
+IF FORx1
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+ENDIF
+
+
+IF FORz1013
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 256
+ENDIF
+
+IF FORz80tvgame
+    defc    _GFX_MAXX = 168
+    defc    _GFX_MAXY = 208
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+
+
+IF FORz88
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY     = 64
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
+
+IF FORz9001
+    defc    _GFX_MAXX    = 320
+    defc    _GFX_MAXY    = 192
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+ENDIF
+
+IF FORzx
+ IF !FORts2068
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+ ENDIF
+ENDIF
+
+
+IF FORzxn
+    defc    _GFX_MAXX       = 512
+    defc    _GFX_MAXY       = 192
+ENDIF
+
+
+
+IF FORzx80
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 48
+ENDIF
+
+IF FORzx81
+
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
+ENDIF
+
+IF FORlambda
+
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 48
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
+ENDIF
+
+IF FORzx81udg
+    defc    _GFX_MAXX    = 64
+    defc    _GFX_MAXY    = 71
+    defc    _GFX_TEXT_BLANK_CHAR    = 0
+ENDIF
+
+IF FORzx81phrg
+    defc    _GFX_MAXX    = 128
+    defc    _GFX_MAXY    = 96    ; This one can be changed !  1..200 are theorical valid values !
+ENDIF
+
+IF FORzx81hr64
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 64
+ENDIF
+
+IF FORzx81hr128
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 128
+ENDIF
+
+IF FORzx81hr192
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 192
+ENDIF
+
+IF FORzx81hr384
+    defc    _GFX_MAXX    = 256
+    defc    _GFX_MAXY    = 384
+ENDIF
+
+IF FORzx81mt64
+    defc    _GFX_MAXX    = 248
+    defc    _GFX_MAXY    = 64
+ENDIF
+
+IF FORzx81mt192
+    defc    _GFX_MAXX    = 248
+    defc    _GFX_MAXY    = 192
+ENDIF
+
+IF FORzx81g007
+    defc    _GFX_MAXX    = 256    ; It could be 272 but we should switch to 'wide' mode
+    defc    _GFX_MAXY    = 185
+ENDIF
+
+IF FORzx81g64
+    defc    _GFX_MAXX    = 256    ; It could be 272 but we should switch to 'wide' mode
+    defc    _GFX_MAXY    = 64
+ENDIF
+
+
+
+
+; Defaults
+IFNDEF _GFX_MAXX
+    defc    _GFX_MAXX = 256
+ENDIF
+
+IFNDEF _GFX_MAXY
+    defc    _GFX_MAXY = 192
 ENDIF
 
 
 
 ;       Structure for open window       struct *window
-
 DEFVARS 0
 {
         windnum ds.b    1

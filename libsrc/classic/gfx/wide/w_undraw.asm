@@ -14,7 +14,7 @@ ___undraw:
     pop     af
     pop     de                          ;y2
     pop     hl                          ;x2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de                          ;y1
     pop     hl                          ;x1
     push    hl

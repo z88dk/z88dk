@@ -18,7 +18,7 @@ IF    FORts2068|FORzxn
     EXTERN  __gfx_fatpix
 ENDIF
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -80,8 +80,8 @@ fast_putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
       ; @@@@@@@@@@@@
     ld      h, b
@@ -175,7 +175,7 @@ _saddr:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix
@@ -240,7 +240,7 @@ _saddr1:
 
     pop     bc                          ;Restore data
     djnz    woloop
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

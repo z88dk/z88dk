@@ -12,21 +12,21 @@
 ;       Amstrad NC version by Stefano - 2017
 ;
 ;
-;	$Id: swapgfxbk.asm $
+;	$Id: __gfx_vram_page_in.asm $
 ;
 
     SECTION code_clib
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
     EXTERN  NC_VRAM_SEGMENT
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
   IF    FORzcn
     RET
   ELSE
@@ -39,8 +39,8 @@ _swapgfxbk:
   ENDIF
 
 
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
   IF    FORzcn
     RET
   ELSE

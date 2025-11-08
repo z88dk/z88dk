@@ -6,8 +6,8 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     PUBLIC  _xordraw_callee
     PUBLIC  asm_xordraw
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  w_line_r
     EXTERN  w_xorpixel
@@ -20,7 +20,7 @@ _xordraw_callee:
     pop     af
     pop     de                          ;y2
     pop     hl                          ;x2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de                          ;y1
     pop     hl                          ;x1
     push    af                          ; ret addr
@@ -29,8 +29,8 @@ asm_xordraw:
     push    ix
     push    hl                          ;x1
     push    de                          ;y1
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     call    w_xorpixel
     exx
@@ -44,7 +44,7 @@ asm_xordraw:
     sbc     hl, bc
     ld      ix, w_xorpixel
     call    w_line_r
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

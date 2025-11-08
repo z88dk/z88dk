@@ -18,5 +18,5 @@
 getmaxy:
 _getmaxy:
 ___getmaxy:
-    ld      hl, maxy-1
+    ld      hl, _GFX_MAXY-1
     ret

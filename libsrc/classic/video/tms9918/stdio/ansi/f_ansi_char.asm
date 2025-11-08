@@ -30,7 +30,7 @@
     EXTERN  __console_y
     EXTERN  __console_x
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     INCLUDE "classic/video/tms9918/vdp.inc"
@@ -45,7 +45,7 @@
 ansi_CHAR:
 
     push    ix
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     ld      b, a                        ;save character
     ld      a, ansicharacter_pixelwidth

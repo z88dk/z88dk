@@ -26,7 +26,7 @@ cleargraphics:
     inc     de
 ;	ld	bc,+(maxx/2)*(maxy/2)
     ld      bc, $400
-    ld      (hl), blankch
+    ld      (hl), _GFX_TEXT_BLANK_CHAR
     ldir
     ld      b, $4
     ld      (hl), 20                    ; palette

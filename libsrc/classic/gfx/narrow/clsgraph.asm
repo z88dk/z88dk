@@ -31,7 +31,7 @@ _cleargraphics:
     ld      d, h
     ld      e, l
     inc     de                          ; de    = base_graphics+1
-    ld      bc, maxx*maxy/8-1
+    ld      bc, _GFX_MAXX*_GFX_MAXY/8-1
     ldir                                ; reset graphics window (2K)
     pop     hl
     pop     de

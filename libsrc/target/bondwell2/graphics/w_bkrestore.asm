@@ -12,8 +12,8 @@
 
 
     EXTERN  w_pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
     PUBLIC  bkrestore
@@ -69,10 +69,10 @@ rbytes:
 rloop:
     ld      a, (ix+6)
     ld      h, a
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, h
     ld      (de), a
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     inc     de
     inc     ix
     djnz    rloop

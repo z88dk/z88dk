@@ -3,7 +3,7 @@
     SECTION code_graphics
     PUBLIC  __graphics_cmphlde
 
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_out
     INCLUDE "classic/gfx/grafix.inc"
 
 

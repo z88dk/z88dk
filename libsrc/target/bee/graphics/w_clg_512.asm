@@ -13,7 +13,7 @@
     PUBLIC  clg
     PUBLIC  _clg
     EXTERN  cleargraphics
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
 
 
 vdutab:                                 ; 64x16
@@ -23,7 +23,7 @@ vdutab:                                 ; 64x16
 clg:
 _clg:
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
 	; Set 64x16 mode
     LD      HL, vdutab

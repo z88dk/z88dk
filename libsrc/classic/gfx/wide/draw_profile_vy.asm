@@ -58,7 +58,7 @@ getx:
     and     $fe
     jp      z, getparm
 
-;IF maxx > 320
+;IF _GFX_MAXX > 320
 ;	add hl,hl	; double size for X in wide mode !
 ;ENDIF
 
@@ -503,7 +503,7 @@ resize:
 ;	ld a,(hl)
 ;	and a
 ;	jr z,slimit
-;	cp maxx-1
+;	cp _GFX_MAXX-1
 ;	jr z,slimit
 ;	add e
 ;	ld (hl),a

@@ -50,7 +50,7 @@ getx:
     and     $fe
     jp      z, getparm
 
-;IF maxx > 320
+;IF _GFX_MAXX > 320
 ;	add hl,hl	; double size for X in wide mode !
 ;ENDIF
 
@@ -62,7 +62,7 @@ getx:
     ld      l, a
     call    l_mult
 
-  IF    ((maxx/(maxy+1))>1)
+  IF    ((_GFX_MAXX/(_GFX_MAXY+1))>1)
     ld      de, 25                      ; 50/2
   ELSE
     ld      de, 50
@@ -116,20 +116,20 @@ _draw_profile:
     rr      l
     ld      (_percent), hl
     ld      l, (ix+6)
-  IF    (maxx>256)
+  IF    (_GFX_MAXX>256)
     ld      h, (ix+7)
   ENDIF
     ld      (_vy), hl
     ld      l, (ix+8)
-  IF    (maxx>256)
+  IF    (_GFX_MAXX>256)
     ld      h, (ix+9)
   ENDIF
     ld      (_vx), hl
 
-  IF    (maxx>256)
-    ld      hl, -maxy*4                 ; create space for stencil on stack
+  IF    (_GFX_MAXX>256)
+    ld      hl, -_GFX_MAXY*4                 ; create space for stencil on stack
   ELSE
-    ld      hl, -maxy*2                 ; create space for stencil on stack
+    ld      hl, -_GFX_MAXY*2                 ; create space for stencil on stack
   ENDIF
     add     hl, sp                      ; The stack usage depends on the display height.
     ld      sp, hl
@@ -150,10 +150,10 @@ norepeat:
 	;******
 	; EXIT
 	;******
-  IF    (maxx>256)
-    ld      hl, maxy*4                  ; release the stack space for _stencil
+  IF    (_GFX_MAXX>256)
+    ld      hl, _GFX_MAXY*4                  ; release the stack space for _stencil
   ELSE
-    ld      hl, maxy*2                  ; release the stack space for _stencil
+    ld      hl, _GFX_MAXY*2                  ; release the stack space for _stencil
   ENDIF
     add     hl, sp
     ld      sp, hl
@@ -382,10 +382,10 @@ plend2:
 
     push    hl
     ld      hl, (_stencil)              ; adjust the right side
-  IF    (maxx>256)
-    ld      de, maxy*2
+  IF    (_GFX_MAXX>256)
+    ld      de, _GFX_MAXY*2
   ELSE
-    ld      de, maxy
+    ld      de, _GFX_MAXY
   ENDIF
     add     hl, de
     ld      e, 1                        ; 1 bit larger
@@ -466,7 +466,7 @@ nolblack:
 
 resize:
 
-  IF    (maxx>256)
+  IF    (_GFX_MAXX>256)
 
 	;EXTERN  l_graphics_cmp
 	; TODO
@@ -474,12 +474,12 @@ resize:
 
   ELSE
 
-    ld      b, maxy-1
+    ld      b, _GFX_MAXY-1
 rslp:
     ld      a, (hl)
     and     a
     jr      z, slimit
-    cp      maxx-1
+    cp      _GFX_MAXX-1
     jr      z, slimit
     add     e
     ld      (hl), a

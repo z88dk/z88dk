@@ -41,18 +41,20 @@ pixeladdress_MODE2:
         ld      de,DISPLAY
     ENDIF
     add     hl, de
+    and     3
+    xor     3
 IF FORmc1000
     ex      af,af
     ld      a,(__mc6847_modeval)
+    res     0,a
     out     ($80),a
     ld      a,(hl)
     ld      de,hl       ;Load up de for pix_return
     ld      hl,pixelbyte
     ld      (hl),a
     ld      a,(__mc6847_modeval)
+    set     0,a
     out     ($80),a
     ex      af,af
 ENDIF
-    and     3
-    xor     3
     ret

@@ -14,11 +14,11 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 drawr:
 _drawr:
 ___drawr:
-    pop     af                          ; ret addr
+    pop     bc                          ; ret addr
     pop     de                          ; y
     pop     hl                          ; x
     push    hl
     push    de
-    push    af                          ; ret addr
+    push    bc                          ; ret addr
     jp      asm_drawr
 ENDIF

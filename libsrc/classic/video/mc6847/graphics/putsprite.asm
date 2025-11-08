@@ -60,13 +60,13 @@ _putsprite:
     ld      a, (hl)
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
-
     ex      de,hl
-
     call    pixeladdress
     xor     7
     and     7
+IFNDEF FORmc1000
     ld      de,hl
+ENDIF
 
     ld      hl, offsets_table
     ld      c, a
@@ -102,21 +102,22 @@ _iloop:
     jr      nc, _noplot                 ;See if a plot is needed
     ld      e, a
 
-ortype:
-    nop                                 ; changed into nop / cpl
-    nop                                 ; changed into and/or/xor (hl)
 IF FORmc1000
     ex      af,af
     res     0,a
     out     ($80),a
     ex      af,af
-    ld      (hl),a
+ENDIF
+
+ortype:
+    nop                                 ; changed into nop / cpl
+    nop                                 ; changed into and/or/xor (hl)
+    ld      (hl), a
+IF FORmc1000
     ex      af,af
     set     0,a
     out     ($80),a
     ex      af,af
-ELSE
-    ld      (hl), a
 ENDIF
     ld      a, e
 _noplot:
@@ -150,21 +151,22 @@ wiloop:
     jr      nc, wnoplot                 ;See if a plot is needed
     ld      e, a
 
-ortype2:
-    nop                                 ; changed into nop / cpl
-    nop                                 ; changed into and/or/xor (hl)
 IF FORmc1000
     ex      af,af
     res     0,a
     out     ($80),a
     ex      af,af
-    ld      (hl),a
+ENDIF
+
+ortype2:
+    nop                                 ; changed into nop / cpl
+    nop                                 ; changed into and/or/xor (hl)
+    ld      (hl), a
+IF FORmc1000
     ex      af,af
     set     0,a
     out     ($80),a
     ex      af,af
-ELSE
-    ld      (hl), a
 ENDIF
     ld      a, e
 wnoplot:

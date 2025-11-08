@@ -25,7 +25,7 @@ ___scrollup_4px:
 
     ld      c,4
 loopy:
-    ld      b,+(maxx % 256)
+    ld      b,+(_GFX_MAXX % 256)
 loopx:
 
     push    bc
@@ -53,17 +53,17 @@ plot:
     pop     bc
     djnz    loopx
     inc     c
-    ld      a,maxy
+    ld      a,_GFX_MAXY
     cp      c
     jr      nz,loopy
 
 	ld      c,4
 loopc:
-    ld      b,+(maxx % 256)
+    ld      b,+(_GFX_MAXX % 256)
 loopb:
     ld      h,b
 	dec     h
-	ld      a,maxy
+	ld      a,_GFX_MAXY
 	sub     c
     ld      l,a
     push    bc

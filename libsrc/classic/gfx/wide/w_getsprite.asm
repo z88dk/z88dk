@@ -22,7 +22,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
 
     EXTERN  w_pointxy
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -58,8 +58,8 @@ getsprite_sub:
     dec     h
     ld      c, h                        ; keep copy of X position
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      b, (ix+0)                   ; x size (iloop)
     ld      d, (ix+1)                   ; y size (oloop)
@@ -134,7 +134,7 @@ noinc:
     dec     d
     jr      nz, oloop
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

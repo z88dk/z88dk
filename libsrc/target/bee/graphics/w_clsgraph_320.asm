@@ -17,8 +17,8 @@
     PUBLIC  cleargraphics
     PUBLIC  _cleargraphics
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -26,7 +26,7 @@
 cleargraphics:
 _cleargraphics:
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     ld      a, 64
     out     (8), a
@@ -48,7 +48,7 @@ pcg_loop:
     call    setattr
     djnz    pcg_loop
 
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 setattr:

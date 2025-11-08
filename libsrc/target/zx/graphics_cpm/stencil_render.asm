@@ -19,10 +19,10 @@
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_out
     EXTERN  __graphics_end
 
     EXTERN  p3_poke
@@ -38,16 +38,16 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      bc, __graphics_end
     push    bc
 
-    ld      c, maxy
+    ld      c, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
     dec     c
-		;jp	z,swapgfxbk1
+		;jp	z,__gfx_vram_page_out
     ret     z
     push    bc
 
@@ -59,7 +59,7 @@ yloop:
     add     hl, de
     ld      a, (hl)                     ;X1
 
-    ld      e, maxy
+    ld      e, _GFX_MAXY
     add     hl, de
     cp      (hl)                        ; if x1>x2, return
     jr      nc, yloop

@@ -23,7 +23,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  plotpixel, respixel
     EXTERN  __gfx_coords
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 ;
@@ -35,13 +35,13 @@ __generic_stencil_render:
     ld      ix, 4
     add     ix, sp
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ;ld    bc,__graphics_end
     ;push bc
 
-    ld      c, maxy%256
+    ld      c, _GFX_MAXY%256
     ld      hl, (__gfx_coords)
     push    hl
     push    bc
@@ -49,11 +49,11 @@ __generic_stencil_render:
 yloop:
     pop     bc
     dec     c
-    ;jp    z,swapgfxbk1
+    ;jp    z,__gfx_vram_page_out
     jr      nz, noret
     pop     hl
     ld      (__gfx_coords), hl
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -72,8 +72,8 @@ noret:
     add     hl, de
     ld      a, (hl)                     ;X1
 
-  IF    maxy<>256
-    ld      e, maxy
+  IF    _GFX_MAXY<>256
+    ld      e, _GFX_MAXY
     add     hl, de
   ELSE
     ld      e, 0

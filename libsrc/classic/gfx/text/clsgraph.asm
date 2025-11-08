@@ -28,8 +28,8 @@ ___cleargraphics:
     ld      d, h
     ld      e, l
     inc     de
-    ld      bc, +(maxx/2)*(maxy/2)
-    ld      (hl), blankch
+    ld      bc, +(_GFX_MAXX/2)*(_GFX_MAXY/2)
+    ld      (hl), _GFX_TEXT_BLANK_CHAR
     ldir
 
     ret

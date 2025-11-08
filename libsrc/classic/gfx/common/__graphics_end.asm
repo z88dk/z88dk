@@ -3,13 +3,13 @@
     SECTION code_graphics
     PUBLIC  __graphics_end
 
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_out
     INCLUDE "classic/gfx/grafix.inc"
 
 
 __graphics_end:
-IF  NEED_swapgfxbk=1
-    call    swapgfxbk1
+IFDEF _gfx_vram_page
+    call    __gfx_vram_page_out
 ENDIF
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix

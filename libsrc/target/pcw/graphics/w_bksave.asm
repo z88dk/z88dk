@@ -14,8 +14,8 @@
     PUBLIC  _bksave
 
     EXTERN  w_pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
 bksave:
@@ -53,9 +53,9 @@ _bksave:
 
     push    hl
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    w_pixeladdress
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
 
     pop     hl                          ;x0
 
@@ -77,10 +77,10 @@ bksaves:
 rbytes:
     ld      b, 0
 rloop:
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, (de)
     ex      af, af
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     ex      af, af
     ld      (ix+6), a
 
@@ -90,9 +90,9 @@ rloop:
     add     hl, de
     ld      e, c
     push    hl
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    w_pixeladdress
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     hl
 
     inc     ix
@@ -104,9 +104,9 @@ rloop:
 x_coord:
     ld      hl, 0
     push    hl
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    w_pixeladdress
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     hl
 
     pop     bc

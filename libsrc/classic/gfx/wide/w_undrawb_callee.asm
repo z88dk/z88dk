@@ -11,7 +11,7 @@ IF  !__CPU_INTEL__&&!__CPU_GBZ80__
     EXTERN  w_respixel
     EXTERN  drawbox
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -21,19 +21,19 @@ _undrawb_callee:
     pop     af
     pop     de
     pop     hl
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de
     pop     hl
     push    af                          ; ret addr
     exx
 asm_undrawb:
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     ld      ix, w_respixel
     call    drawbox
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     pop     ix

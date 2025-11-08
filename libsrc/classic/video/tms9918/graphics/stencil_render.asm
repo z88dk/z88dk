@@ -19,7 +19,7 @@
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __tms9918_screen_mode
     EXTERN  __tms9918_pixeladdress
     EXTERN  __tms9918_pixelbyte
@@ -29,7 +29,7 @@
     EXTERN  leftbitmask, rightbitmask
     EXTERN  __graphics_end
     EXTERN  __generic_stencil_render
-         ;EXTERN swapgfxbk1
+         ;EXTERN __gfx_vram_page_out
 
 ;
 ;        $Id: stencil_render.asm $
@@ -50,11 +50,11 @@ dorender:
     ld      ix, 4
     add     ix, sp
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 		;ld	bc,__graphics_end
 		;push bc
 
-    ld      c, maxy
+    ld      c, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
@@ -72,7 +72,7 @@ yloop:
     add     hl, de
     ld      a, (hl)                     ;X1
 
-    ld      e, maxy
+    ld      e, _GFX_MAXY
     add     hl, de
     cp      (hl)                        ; if x1>x2, return
     jr      nc, yloop

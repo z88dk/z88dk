@@ -11,16 +11,16 @@
 ; Entry h = x
 ;       l = y
 ;
-  IF    maxx/4<=256&&maxy/4<=256
+  IF    _GFX_MAXX/4<=256&&maxy/4<=256
 
-    IF  maxx/4<>256
+    IF  _GFX_MAXX/4<>256
         ld      a, h
-        cp      maxx/4
+        cp      _GFX_MAXX/4
         ret     nc
     ENDIF
-    IF  maxx/4<>256
+    IF  _GFX_MAXX/4<>256
         ld      a, l
-        cp      maxy/4
+        cp      _GFX_MAXY/4
         ret     nc
     ENDIF
         ex      de, hl

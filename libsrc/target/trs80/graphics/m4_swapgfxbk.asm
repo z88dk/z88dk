@@ -8,21 +8,21 @@
 ;       Stefano - 6/2023
 ;
 ;
-;	$Id: m4_swapgfxbk.asm $
+;	$Id: m4___gfx_vram_page_in.asm $
 ;
 
 
     SECTION code_clib
 
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
     di
     push    af
     ld      a, $86                      ; page in the video bank, TRS80 character set
@@ -31,8 +31,8 @@ _swapgfxbk:
     ret
 
 
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     push    af
     ld      a, $87                      ; page out the video bank, TRS80 character set
     out     ($84), a                    ; optreg

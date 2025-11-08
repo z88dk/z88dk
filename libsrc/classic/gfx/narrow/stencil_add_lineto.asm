@@ -24,8 +24,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  __gfx_coords
 
-        ;EXTERN    swapgfxbk
-        ;EXTERN    swapgfxbk1
+        ;EXTERN    __gfx_vram_page_in
+        ;EXTERN    __gfx_vram_page_out
 
     EXTERN  stencil_ptr
     ;EXTERN    __graphics_end
@@ -44,7 +44,7 @@ _stencil_add_lineto:
     ld      e, (ix+4)                   ;y1
     ld      d, (ix+6)                   ;x1
 
-    ;call    swapgfxbk
+    ;call    __gfx_vram_page_in
 
     ld      ix, stencil_add_pixel
     call    Line

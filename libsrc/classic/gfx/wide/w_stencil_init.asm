@@ -26,7 +26,7 @@ _stencil_init:
     ld      e, l
     inc     de
     ld      (hl), 127                   ; big enough but stay in the positive range !
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     push    bc
     ldir
     pop     bc
