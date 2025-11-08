@@ -217,6 +217,7 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+include target/pps/pps.mak
 include target/sam/sam.mak
 include target/ts2068/ts2068.mak
 include target/zx/zx.mak
@@ -436,8 +437,6 @@ pps_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
 	$(call buildgeneric,pps)
-	$(MAKE) -C target/pps
-	$(MAKE) -C target/zx TARGET=pps
 	$(MAKE) -C classic/games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(TARGET_DIRECTORY)/pps/pps.lst
 
