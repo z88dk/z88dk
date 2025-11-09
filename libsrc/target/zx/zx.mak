@@ -18,6 +18,42 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/classic/graphics/*.asm" \
 	"target/shared/clock.asm"
 
+ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
+	target/zx/ulaplus/c/smallc/*.asm \
+	target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
+	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
+	target/zx/classic/diagnostic/*.asm \
+        target/zx/classic/basic/*.asm \
+	target/zx/classic/opus/*.asm \
+	target/zx/classic/specdrum/*.asm \
+	target/zx/classic/uspeech/*.asm \
+	target/zx/classic/games/*.asm \
+	target/zx/classic/psg/*.asm \
+	target/zx/classic/input/*.asm \
+	target/zx/classic/if1/*.asm \
+	target/zx/classic/zxmmc/*.asm \
+	target/zx/classic/misc/*.asm \
+	target/zx/classic/stdio/*.asm  \
+	target/zx/classic/graphics/*.asm \
+	target/shared/clock.asm
+
+ZXCPM_GLOBS := \
+	"target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm" \
+	"target/zx/graphics/c/sccz80/*.asm" "target/zx/graphics/z80/*.asm" \
+	"target/zx/misc/c/sccz80/*.asm" "target/zx/misc/z80/*.asm" \
+	"target/zx/classic/cpm/*.asm" \
+	"target/zx/classic/graphics_cpm/*.asm" \
+	"target/zx/classic/games/*.asm" 
+
+ZXCPM_GLOBS_ex := \
+	target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
+	target/zx/graphics/c/sccz80/*.asm target/zx/graphics/z80/*.asm \
+	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
+	target/zx/classic/cpm/*.asm \
+	target/zx/classic/graphics_cpm/*.asm \
+	target/zx/classic/games/*.asm 
+	
+
 ZX_MULTICOLOUR_GLOBS := "target/zx/bifrost2/c/sccz80/*.asm" target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	target/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
 	target/zx/bifrost2/z80/asm_BIFROST2_resetAnim2Frames.asm \
@@ -37,24 +73,6 @@ ZX_MULTICOLOUR_GLOBS := "target/zx/bifrost2/c/sccz80/*.asm" target/zx/bifrost2/z
 	target/zx/nirvanap/z80/asm_NIRVANAP_drawTW_di.asm \
 	target/zx/nirvanap/z80/asm_NIRVANAP_drawT_di.asm
 
-ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
-	target/zx/ulaplus/c/smallc/*.asm \
-	target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
-	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
-	target/zx/classic/diagnostic/*.asm \
-        target/zx/classic/basic/*.asm \
-	target/zx/classic/opus/*.asm \
-	target/zx/classic/specdrum/*.asm \
-	target/zx/classic/uspeech/*.asm \
-	target/zx/classic/games/*.asm \
-	target/zx/classic/psg/*.asm \
-	target/zx/classic/input/*.asm \
-	target/zx/classic/if1/*.asm \
-	target/zx/classic/zxmmc/*.asm \
-	target/zx/classic/misc/*.asm \
-	target/zx/classic/stdio/*.asm  \
-	target/zx/classic/graphics/*.asm \
-	target/shared/clock.asm
 
 ZX_MULTICOLOUR_GLOBS_ex := target/zx/bifrost2/c/sccz80/*.asm target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	target/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
@@ -83,7 +101,7 @@ ZX_OFILES = $(addprefix target/zx/obj/zx/, $(ZX_CFILES:.c=.o))
 BIFROST2_GEN = bifrost2_engine_48.bin.zx0 bifrost2_engine_p3.bin.zx0
 
 
-ZX_TARGETS := target/zx/obj/target-zx-zx $(ZX_OFILES)
+ZX_TARGETS := target/zx/obj/target-zx-zx $(ZX_OFILES) target/zx/obj/target-zx-zxcpm
 		
 
 CLEAN += target-zx-clean
@@ -108,6 +126,8 @@ endef
 $(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
 $(eval $(call buildtargetc,target/zx,zx))
 $(eval $(call bifrost_zx0,zx))
+
+$(eval $(call buildtargetasm,target/zx,z80,zxcpm,-mz80,$(ZXCPM_GLOBS),$(ZXCPM_GLOBS_ex)))
 
 target-zx-clean:
 	$(RM) -fr target/zx/obj

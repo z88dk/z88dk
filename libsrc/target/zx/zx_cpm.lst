@@ -1,14 +1,4 @@
-target/zx/graphics_cpm/clg
-target/zx/graphics_cpm/stencil_render
-target/zx/graphics_cpm/putsprite
-target/zx/graphics_cpm/bksave
-target/zx/graphics_cpm/bkrestore
-target/zx/graphics_cpm/pixel
-target/zx/graphics_cpm/pointxy
+target/zx/obj/zxcpm/**/*.o
 @classic/gfx/narrow/gfx_narrow.lst
 @classic/games/games.lst
-target/zx/cpm/zx_attr_callee
-target/zx/cpm/zx_border
-@target/zx/newlib/newlib.lst
-target/zx/obj/${TARGET}/**/*.o
 sound/ay/obj/${TYPE}/**/*.o

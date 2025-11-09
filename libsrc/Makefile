@@ -152,7 +152,7 @@ TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 808
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
-TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib) 
+TOCREATE += $(call check_target,zx, zx_clib.lib zxcpm.lib mzx.lib mzx_tiny.lib) 
 TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 TOCREATE += $(call check_target,zx80, zx80_clib.lib)
 TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib)
@@ -342,17 +342,22 @@ zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(call buildgeneric,zx)
-	$(MAKE) -C target/zx-common TARGET=zx
 	$(MAKE) -C classic/games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
-	#TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
+
+zxcpm.lib:  $(TARGET_CLIB_DEPS) target-zx
+	@echo ''
+	@echo '--- Building ZX Spectrum CP/M Library ---'
+	@echo ''
+	$(call buildgeneric,zx)
+	$(MAKE) -C classic/games TARGET=zx
+	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
 zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib target-zxn
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
 	$(call buildgeneric,zxn,wide)
-	$(MAKE) -C target/zx-common TARGET=zxn
 	$(MAKE) -C classic/games TARGET=zxn
 	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
 
@@ -365,7 +370,6 @@ ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib target-ts2068
 	@echo ''
 	$(call buildgeneric,ts2068,wide)
 	$(MAKE) -C classic/games TARGET=ts2068
-	$(MAKE) -C target/zx-common TARGET=ts2068
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
 
 # ZXVGS - yarek
