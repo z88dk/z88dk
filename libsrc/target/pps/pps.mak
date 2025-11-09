@@ -11,7 +11,7 @@ PPS_GLOBS_ex := \
 	target/pps/fcntl/*.asm  
 
 
-PPS_CFILES = $(wildcard target/pps/fcntl/*.c) $(wildard target/pps/time/*.c)
+PPS_CFILES = $(wildcard target/pps/fcntl/*.c) $(wildcard target/pps/time/*.c)
 
 PPS_OFILES = $(addprefix target/pps/obj/pps/, $(PPS_CFILES:.c=.o)) 
 
