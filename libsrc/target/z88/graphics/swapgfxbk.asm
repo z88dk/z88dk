@@ -10,26 +10,26 @@
 ;       Simply does a swap...
 
 ;
-;	$Id: swapgfxbk.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
     SECTION code_clib
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
     EXTERN  gfx_bank
     EXTERN  z88_map_bank
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
     INCLUDE "classic/gfx/grafix.inc"
 
-swapgfxbk:
-_swapgfxbk:
-swapgfxbk1:
-_swapgfxbk1:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     push    hl
     push    de
     ld      hl, z88_map_bank            ;$4Dx

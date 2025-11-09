@@ -14,9 +14,9 @@
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including
 
-IF maxx > 256
+IF _GFX_MAXX > 256
     push    hl        ;save x
-    call    getmaxy        ;hl = maxy
+    call    getmaxy        ;hl = _GFX_MAXY
     inc     hl
     call    l_cmp
     pop     hl

@@ -11,10 +11,10 @@
 ;       l = y
 ;
         ld      a, h
-        cp      maxx/4
+        cp      _GFX_MAXX/4
         ret     nc
         ld      a, l
-        cp      maxy/4
+        cp      _GFX_MAXY/4
         ret     nc
   IF    __CPU_INTEL__
         rlca

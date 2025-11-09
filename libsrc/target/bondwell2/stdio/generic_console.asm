@@ -13,8 +13,8 @@
     EXTERN  generic_console_udg32
     EXTERN  generic_console_flags
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
 
@@ -64,7 +64,7 @@ not_udg:
     rlca
     sbc     a
     ld      c, a
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      b, 8
     exx
     bit     3, h                        ;underline
@@ -97,7 +97,7 @@ printc_cleanup:
     jr      z, no_underline
     ld      (hl), 255
 no_underline:
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
 	; And cleanup the buffer
     ld      hl, 8
     add     hl, sp
@@ -128,7 +128,7 @@ generic_console_xypos:
 generic_console_scrollup:
     push    bc
     push    de
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, 8*80
     ld      de, 0
     ld      bc, 192*80
@@ -138,7 +138,7 @@ generic_console_scrollup:
     ld      (hl), 0
     ld      bc, 639
     ldir
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     de
     pop     bc
     ret

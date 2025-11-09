@@ -14,8 +14,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _lscroll_2px
     PUBLIC  ___lscroll_2px
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -28,13 +28,13 @@ _lscroll_2px:
 ___lscroll_2px:
 
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
 ; 2 blank pixel columns on the left
 ; to avoid the picture to get back in on the right side
-    ld      b,maxy
+    ld      b,_GFX_MAXY
 loop2:
     ld      h,0
     ld      l,b
@@ -48,13 +48,13 @@ loop2:
     djnz    loop2
 
 ; get the display memory position and size
-    ld      h,maxx-1
-    ld      l,maxy-1
+    ld      h,_GFX_MAXX-1
+    ld      l,_GFX_MAXY-1
     call    pixeladdress
     ld      h,d
     ld      l,e
 
-    ld      bc,maxx*maxy/64
+    ld      bc,_GFX_MAXX*_GFX_MAXY/64
 
     
 ; now, the actual scroll
@@ -145,8 +145,8 @@ loop:
     or c
     jr nz,loop
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk1
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_out
   ENDIF
     ret
 

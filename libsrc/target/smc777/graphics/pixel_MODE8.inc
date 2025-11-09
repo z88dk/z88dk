@@ -17,7 +17,7 @@
 ; 2 bits per pixel in MODE8
 
     push    hl                          ;save x
-    call    getmaxy                     ;hl = maxy
+    call    getmaxy                     ;hl = _GFX_MAXY
     inc     hl
     call    l_cmp
     pop     hl

@@ -26,11 +26,11 @@
 
 pointxy:
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc                          ; x0        out of range
 
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                          ; y0        out of range
 
     push    bc

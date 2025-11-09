@@ -19,7 +19,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___getsprite
     PUBLIC  getsprite_sub
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     INCLUDE "classic/gfx/grafix.inc"
@@ -57,8 +57,8 @@ getsprite_sub:
 
     ld      (actcoord), hl              ; save current coordinates
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     call    pixeladdress
     xor     7
@@ -119,7 +119,7 @@ zpos:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-  IF    NEED_swapgfxbk
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

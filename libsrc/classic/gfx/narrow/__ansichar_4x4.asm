@@ -53,8 +53,8 @@ __ansichar_4x4:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
 ENDIF
-IF  NEED_swapgfxbk=1
-    call    swapgfxbk
+IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
 ENDIF
 
     ld      a, (chr)
@@ -124,7 +124,7 @@ nores:
     pop     bc
     djnz    rowloop
 
-IF  NEED_swapgfxbk
+IF  _gfx_vram_page
     jp      __graphics_end
 ELSE
   IF    !__CPU_INTEL__&!__CPU_GBZ80__

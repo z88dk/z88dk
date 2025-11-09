@@ -16,8 +16,8 @@
 
     EXTERN  generic_console_flags
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
     EXTERN  NC_VRAM
@@ -32,7 +32,7 @@ generic_console_set_paper:
 generic_console_scrollup:
     push    de
     push    bc
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, +(NC_VRAM+(64*8))
     ld      de, NC_VRAM
     ld      bc, +((NC_VRAM_YSIZE-8) * 64)
@@ -44,20 +44,20 @@ generic_console_scrollup:
     ld      bc, +(64*8)-1
     ld      (hl), 0
     ldir
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     bc
     pop     de
     ret
 
 
 generic_console_cls:
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, NC_VRAM
     ld      de, NC_VRAM+1
     ld      bc, +(64 * NC_VRAM_YSIZE)-1
     ld      (hl), 0x00
     ldir
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     ret
 
 ; c = x
@@ -81,7 +81,7 @@ printc_rejoin:
     ex      de, hl                      ;de = font
     call    generic_console_xypos       ;-> hl = screen
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     ld      a, (generic_console_flags)
     rlca
@@ -113,7 +113,7 @@ not_bold:
     add     hl, bc
     ld      (hl), 255
 finished:
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ret
 
 

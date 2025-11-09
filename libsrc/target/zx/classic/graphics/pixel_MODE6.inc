@@ -9,7 +9,7 @@
 
 ; We enter here with: hl = x, de = y
     push    hl                          ;save x
-    ld      hl, 192                     ;hl = maxy
+    ld      hl, 192                     ;hl = _GFX_MAXY
     inc     hl
     call    l_cmp
     pop     hl

@@ -14,8 +14,8 @@
     EXTERN  w_pixeladdress
     EXTERN  l_cmp
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
 fill:
@@ -27,17 +27,17 @@ _fill:
     push    de
     push    bc
 
-    ld      a, maxy
+    ld      a, _GFX_MAXY
     cp      e
     ret     c
 
     push    de
-    ld      de, maxx
+    ld      de, _GFX_MAXX
     call    l_cmp
     pop     de
     ret     c                           ; Return if X overflows
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     call    w_pixeladdress
     ld      b, a
@@ -49,12 +49,12 @@ loop3:
 cont:
 		;ld hl,sline
 
-    ld      hl, -maxx*2*3               ; create buffer 2 on stack
+    ld      hl, -_GFX_MAXX*2*3               ; create buffer 2 on stack
     add     hl, sp                      ; The stack size depends on the display height.
     ld      (sl2ptr+1), hl              ; We don't undersize it because we have lots of RAM
     ld      sp, hl
 
-    ld      hl, -maxx*2*3               ; create buffer 1 on stack
+    ld      hl, -_GFX_MAXX*2*3               ; create buffer 1 on stack
     add     hl, sp
     ld      sp, hl
     ld      (w_sline+3), hl
@@ -68,7 +68,7 @@ cont:
 petelka:
     pop     ix                          ;restore callers
     bit     3, c                        ; indeks_ws1 == 0
-    jp      z, swapgfxbk1
+    jp      z, __gfx_vram_page_out
 
     res     3, c                        ; indeks_ws1 = 0
     push    ix                          ;save callers

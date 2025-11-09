@@ -32,18 +32,18 @@ _stencil_init:
     push    hl
 
     call    getmaxy
-    inc     hl                          ; maxy+1 = vector size for one side
+    inc     hl                          ; _GFX_MAXY+1 = vector size for one side
     add     hl, hl                      ; HL = total stencil size
 
     pop     de
-    push    hl                          ; maxy*2
+    push    hl                          ; _GFX_MAXY*2
 
     ld      h, d                        ; hl=de=vector ptr
     ld      l, e
     inc     de
 
     ld      (hl), 127                   ; big enough but stay in the positive range !
-    pop     bc                          ; maxy*2
+    pop     bc                          ; _GFX_MAXY*2
     push    bc
     ldir
 

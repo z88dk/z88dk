@@ -14,8 +14,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  _rscroll_4px
     PUBLIC  ___rscroll_4px
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -28,15 +28,15 @@ _rscroll_4px:
 ___rscroll_4px:
 
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
 
 ; 4 blank pixel columns on the right
 ; to avoid the picture to get back in on the right side
-    ld      b,maxy
+    ld      b,_GFX_MAXY
 loop2:
-    ld      h,maxx-1
+    ld      h,_GFX_MAXX-1
     ld      l,b
     dec     l
     push    bc
@@ -53,7 +53,7 @@ loop2:
     ld      h,d
     ld      l,e
 
-    ld      bc,maxx*maxy/64
+    ld      bc,_GFX_MAXX*_GFX_MAXY/64
     
     sub     a
     push    af    ; CY reset, to be used in the scroll loop
@@ -87,8 +87,8 @@ loop:
     pop    af
 
 
-  IF    NEED_swapgfxbk
-    call    swapgfxbk1
+  IF    _gfx_vram_page
+    call    __gfx_vram_page_out
   ENDIF
     ret
 

@@ -8,8 +8,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  asm_xorborder
 
     EXTERN  xorpixel
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
     INCLUDE "classic/gfx/grafix.inc"
 
 
@@ -44,8 +44,8 @@ _xorborder_callee:
 asm_xorborder:
 
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _gfx_vram_page
+    call    __gfx_vram_page_in
   ENDIF
     push    bc
     push    hl
@@ -98,8 +98,8 @@ vrowloop:
     inc     h
     pop     bc
     djnz    vrowloop
-  IF    NEED_swapgfxbk=1
-    jp      swapgfxbk1
+  IFDEF _gfx_vram_page
+    jp      __gfx_vram_page_out
   ELSE
     ret
   ENDIF

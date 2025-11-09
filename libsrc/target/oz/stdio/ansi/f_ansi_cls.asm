@@ -15,13 +15,13 @@
     PUBLIC  ansi_cls
     EXTERN  base_graphics
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 ansi_cls:
 
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     ld      hl, (base_graphics)
     ld      d, h
@@ -32,4 +32,4 @@ ansi_cls:
     ld      (hl), a
     ldir
 
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out

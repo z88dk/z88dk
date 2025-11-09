@@ -37,6 +37,7 @@ pix_return:
 
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
     ld      a, (__mc6847_modeval)
+    res     0,a
     out     ($80), a
 
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
@@ -47,8 +48,6 @@ pix_return:
     out     ($80),a
     ret
 
-
-    ; Needs to stay in code_driver
     PUBLIC  pixelbyte
 pixelbyte:  defb    0
 ENDIF

@@ -22,9 +22,9 @@ _joystick:
     jr      z, j_p1
     cp      2
     jr      z, j_p2
-    dec     a
+    cp      3
     jr      z, j_qaop
-    dec     a
+    cp      4
     jr      z, j_8246
     jr      j_nop
 

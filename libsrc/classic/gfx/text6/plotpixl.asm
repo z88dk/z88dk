@@ -24,10 +24,10 @@
 
 plotpixel:
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                          ; y0	out of range
     inc     a
 
@@ -58,9 +58,9 @@ ENDIF
     and     a
 
 IF  GFXTEXT3
-    ld      de, maxx
+    ld      de, _GFX_MAXX
 ELSE
-    ld      de, maxx/2
+    ld      de, _GFX_MAXX/2
 ENDIF
     sbc     hl, de
 

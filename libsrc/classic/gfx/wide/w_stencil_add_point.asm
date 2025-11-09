@@ -21,8 +21,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  stencil_add_pixel
 
-    ;EXTERN    swapgfxbk
-    ;EXTERN    swapgfxbk1
+    ;EXTERN    __gfx_vram_page_in
+    ;EXTERN    __gfx_vram_page_out
 
     EXTERN  stencil_ptr
 
@@ -44,10 +44,10 @@ _stencil_add_point:
     ld      d, (ix+5)                   ;y0
     ld      l, (ix+6)                   ;x0
     ld      h, (ix+7)                   ;x0
-    ; call    swapgfxbk
+    ; call    __gfx_vram_page_in
     pop     ix
     jp      stencil_add_pixel
 
-       ; jp     swapgfxbk1
+       ; jp     __gfx_vram_page_out
 
 ENDIF
