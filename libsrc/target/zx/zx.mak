@@ -15,6 +15,7 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/classic/zxmmc/*.asm" \
 	"target/zx/classic/misc/*.asm" \
 	"target/zx/classic/stdio/*.asm"\
+	"target/zx/classic/stdio/ansi/*.asm" \
 	"target/zx/classic/graphics/*.asm" \
 	"target/shared/clock.asm"
 
@@ -34,6 +35,7 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/classic/zxmmc/*.asm \
 	target/zx/classic/misc/*.asm \
 	target/zx/classic/stdio/*.asm  \
+	target/zx/classic/stdio/ansi/*.asm \
 	target/zx/classic/graphics/*.asm \
 	target/shared/clock.asm
 
