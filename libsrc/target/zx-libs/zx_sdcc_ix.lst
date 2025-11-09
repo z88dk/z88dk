@@ -5,7 +5,7 @@
 ;@target/zx-libs/esxdos/esxdos_sdcc_ix.lst
 @target/zxn/esxdos/esxdos_sdcc_ix.lst
 @target/zx-libs/globals/globals_asm.lst
-@target/zx-libs/graphics/graphics_sdcc_ix.lst
+@target/zx/graphics/graphics_sdcc_ix.lst
 @target/zx/misc/misc_sdcc_ix.lst
 @target/zx/nirvanam/nirvanam_sdcc_ix.lst
 @target/zx/nirvanap/nirvanap_sdcc_ix.lst

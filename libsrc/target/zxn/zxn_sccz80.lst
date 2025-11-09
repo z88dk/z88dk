@@ -4,7 +4,7 @@
 @target/zxn/display/display_sccz80.lst
 @target/zxn/esxdos/esxdos_sccz80.lst
 @target/zxn/globals/globals_asm.lst
-@target/zx-libs/graphics/graphics_sccz80.lst
+@target/zx/graphics/graphics_sccz80.lst
 @target/zxn/memory/memory_sccz80.lst
 @target/zxn/misc/misc_sccz80.lst
 @target/zx/nirvanam/nirvanam_sccz80.lst

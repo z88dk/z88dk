@@ -5,7 +5,7 @@
 ;@target/zx-libs/esxdos/esxdos_sccz80.lst
 @target/zxn/esxdos/esxdos_sccz80.lst
 @target/zx-libs/globals/globals_asm.lst
-@target/zx-libs/graphics/graphics_sccz80.lst
+@target/zx/graphics/graphics_sccz80.lst
 @target/zx/misc/misc_sccz80.lst
 @target/zx/nirvanam/nirvanam_sccz80.lst
 @target/zx/nirvanap/nirvanap_sccz80.lst

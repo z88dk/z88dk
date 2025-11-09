@@ -4,7 +4,7 @@
 @target/zxn/display/display_sdcc.lst
 @target/zxn/esxdos/esxdos_sdcc_iy.lst
 @target/zxn/globals/globals_asm.lst
-@target/zx-libs/graphics/graphics_sdcc_iy.lst
+@target/zx/graphics/graphics_sdcc_iy.lst
 @target/zxn/memory/memory_sdcc_iy.lst
 @target/zxn/misc/misc_sdcc_iy.lst
 @target/zx/nirvanam/nirvanam_sdcc_iy.lst
