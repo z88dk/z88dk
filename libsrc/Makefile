@@ -343,6 +343,7 @@ zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx
 	@echo ''
 	$(call buildgeneric,zx)
 	$(MAKE) -C classic/games TARGET=zx
+	$(MAKE) -C target/zx/classic/fcntl TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
 
 zxcpm.lib:  $(TARGET_CLIB_DEPS) target-zx
