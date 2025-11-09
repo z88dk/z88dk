@@ -116,7 +116,7 @@ TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
 TOCREATE += $(call check_target,rex,rex_clib.lib)
 TOCREATE += $(call check_target,rx78,rx78_clib.lib)
 TOCREATE += $(call check_target,s1mp3,s1mp3_clib.lib)
-TOCREATE += $(call check_target,sam,sam_clib.lib)
+TOCREATE += $(call check_target,sam,sam_clib.lib sam_cpm.lib)
 TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
 TOCREATE += $(call check_target,smc777,smc777_clib.lib smc777_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,sms,sms_clib.lib)
@@ -1015,7 +1015,14 @@ sam_clib.lib: $(TARGET_CLIB_DEPS) target-sam
 	$(call buildgeneric,sam,wide)
 	$(MAKE) -C classic/games TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
-	#TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
+
+sam_cpm.lib: $(TARGET_CLIB_DEPS) target-sam
+	@echo ''
+	@echo '--- Building Sam Coupe CP/M Library ---'
+	@echo ''
+	$(call buildgeneric,sam,wide)
+	$(MAKE) -C classic/games TARGET=sam
+	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
 
 # Spectravideo SVI library - Stefano
 svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib

@@ -44,12 +44,38 @@ SAM_GLOBS_ex := \
 	target/zx/classic/stdio/*.asm \
 	target/shared/clock.asm
 
+SAM_CPM_GLOBS := \
+	"target/sam/dac/*.asm" \
+	"target/sam/far/*.asm" \
+	"target/sam/games/*.asm" \
+	"target/sam/input/*.asm" \
+	"target/sam/interrupt/*.asm" \
+	"target/sam/psg/*.asm" \
+	"target/sam/sam/*.asm" \
+	"target/sam/time/*.asm" \
+	"target/sam/*.asm" \
+	"target/zx/classic/games/bit*.asm"
+	
+
+SAM_CPM_GLOBS_ex := \
+	target/sam/dac/*.asm \
+	target/sam/far/*.asm \
+	target/sam/games/*.asm \
+	target/sam/input/*.asm \
+	target/sam/interrupt/*.asm \
+	target/sam/psg/*.asm \
+	target/sam/sam/*.asm \
+	target/sam/time/*.asm \
+	target/sam/*.asm \
+	target/zx/classic/games/bit*.asm  
+	
+
 SAM_CFILES = 
 
 SAM_OFILES = $(addprefix target/sam/obj/sam/, $(SAM_CFILES:.c=.o))
 
 
-SAM_TARGETS := target/sam/obj/target-sam-sam \
+SAM_TARGETS := target/sam/obj/target-sam-sam target/sam/obj/target-sam-samcpm \
 	$(SAM_OFILES)
 		
 
@@ -60,6 +86,7 @@ target-sam: $(SAM_TARGETS)
 .PHONY: target-sam target-sam-clean
 
 $(eval $(call buildtargetasm,target/sam,z80,sam,-mz80,$(SAM_GLOBS),$(SAM_GLOBS_ex)))
+$(eval $(call buildtargetasm,target/sam,z80,samcpm,-mz80,$(SAM_CPM_GLOBS),$(SAM_CPM_GLOBS_ex)))
 $(eval $(call buildtargetc,target/sam,sam))
 
 target-sam-clean:
