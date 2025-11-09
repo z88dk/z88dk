@@ -1,5 +1,5 @@
-ADT_GLOBS := "$(NEWLIB_DIRECTORY)/adt/*/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/adt/*/z80/*.asm"
-ADT_GLOBS_ex := $(NEWLIB_DIRECTORY)/adt/*/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/adt/*/z80/*.asm
+ADT_GLOBS := "adt/*/c/sccz80/*.asm" "adt/*/z80/*.asm"
+ADT_GLOBS_ex := adt/*/c/sccz80/*.asm adt/*/z80/*.asm
 
 ADT_TARGETS := adt/obj/newlib-z80-adt \
 	adt/obj/newlib-z80n-adt \

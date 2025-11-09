@@ -2,14 +2,14 @@ include ../../../Make.config
 
 TARGET ?= test
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/math/integer/fast/*.asm" "$(NEWLIB_DIRECTORY)/math/integer/small/*.asm" "$(NEWLIB_DIRECTORY)/math/integer/*.asm"
-NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/math/integer/fast/*.asm $(NEWLIB_DIRECTORY)/math/integer/small/*.asm $(NEWLIB_DIRECTORY)/math/integer/*.asm
-NEWLIBZ180GLOBS := "$(NEWLIB_DIRECTORY)/math/integer/z180/*.asm"
-NEWLIBZ180GLOBS_ex := $(NEWLIB_DIRECTORY)/math/integer/z180/*.asm
-NEWLIBZXNGLOBS := "$(NEWLIB_DIRECTORY)/math/integer/z80n/*.asm"
-NEWLIBZXNGLOBS_ex := $(NEWLIB_DIRECTORY)/math/integer/z80n/*.asm
-NEWLIBR2KAGLOBS := "$(NEWLIB_DIRECTORY)/math/integer/r2ka/*.asm"
-NEWLIBR2KAGLOBS_ex := $(NEWLIB_DIRECTORY)/math/integer/r2ka/*.asm
+NEWLIBGLOBS := "$(Z88DK_LIBSRC)/math/integer/fast/*.asm" "$(Z88DK_LIBSRC)/math/integer/small/*.asm" "$(Z88DK_LIBSRC)/math/integer/*.asm"
+NEWLIBGLOBS_ex := $(Z88DK_LIBSRC)/math/integer/fast/*.asm $(Z88DK_LIBSRC)/math/integer/small/*.asm $(Z88DK_LIBSRC)/math/integer/*.asm
+NEWLIBZ180GLOBS := "$(Z88DK_LIBSRC)/math/integer/z180/*.asm"
+NEWLIBZ180GLOBS_ex := $(Z88DK_LIBSRC)/math/integer/z180/*.asm
+NEWLIBZXNGLOBS := "$(Z88DK_LIBSRC)/math/integer/z80n/*.asm"
+NEWLIBZXNGLOBS_ex := $(Z88DK_LIBSRC)/math/integer/z80n/*.asm
+NEWLIBR2KAGLOBS := "$(Z88DK_LIBSRC)/math/integer/r2ka/*.asm"
+NEWLIBR2KAGLOBS_ex := $(Z88DK_LIBSRC)/math/integer/r2ka/*.asm
 
 NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2ka obj/newlib-ixiy obj/newlib-z180 obj/newlib-ez80_z80
 

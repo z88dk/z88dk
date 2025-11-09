@@ -1,7 +1,7 @@
 
 
-BALLOC_GLOBS := "$(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/balloc/c/classic/*.asm" 
-BALLOC_GLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm $(NEWLIB_DIRECTORY)/alloc/balloc/c/classic/*.asm 
+BALLOC_GLOBS := "alloc/balloc/c/sccz80/*.asm" "alloc/balloc/z80/*.asm" "alloc/balloc/c/classic/*.asm" 
+BALLOC_GLOBS_ex := alloc/balloc/c/sccz80/*.asm alloc/balloc/z80/*.asm alloc/balloc/c/classic/*.asm 
 
 BALLOC_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc \
 		alloc/balloc/obj/newlib-z80n-alloc-balloc \

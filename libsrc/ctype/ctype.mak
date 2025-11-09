@@ -1,5 +1,5 @@
-CTYPE_GLOBS := "$(NEWLIB_DIRECTORY)/ctype/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/ctype/z80/*.asm"
-CTYPE_GLOBS_ex := $(NEWLIB_DIRECTORY)/ctype/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/ctype/z80/*.asm
+CTYPE_GLOBS := "ctype/c/sccz80/*.asm" "ctype/z80/*.asm"
+CTYPE_GLOBS_ex := ctype/c/sccz80/*.asm ctype/z80/*.asm
 
 CTYPE_TARGETS := ctype/obj/newlib-z80-ctype \
 		ctype/obj/newlib-z80n-ctype \

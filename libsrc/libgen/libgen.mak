@@ -1,5 +1,5 @@
-LIBGEN_GLOBS := "$(NEWLIB_DIRECTORY)/libgen/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/libgen/z80/*.asm"
-LIBGEN_GLOBS_ex := $(NEWLIB_DIRECTORY)/libgen/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/libgen/z80/*.asm
+LIBGEN_GLOBS := "libgen/c/sccz80/*.asm" "libgen/z80/*.asm"
+LIBGEN_GLOBS_ex := libgen/c/sccz80/*.asm libgen/z80/*.asm
 
 LIBGEN_TARGETS := libgen/obj/newlib-z80-libgen \
 		libgen/obj/newlib-z80n-libgen \

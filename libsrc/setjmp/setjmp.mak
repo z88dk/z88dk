@@ -1,5 +1,5 @@
-SETJMP_GLOBS := "$(NEWLIB_DIRECTORY)/setjmp/c/*.asm" 
-SETJMP_GLOBS_ex := $(NEWLIB_DIRECTORY)/setjmp/c/*.asm
+SETJMP_GLOBS := "setjmp/c/*.asm" 
+SETJMP_GLOBS_ex := setjmp/c/*.asm
 
 SETJMP_TARGETS := setjmp/obj/newlib-z80-setjmp \
 		setjmp/obj/newlib-z80n-setjmp \
@@ -34,4 +34,4 @@ $(eval $(call buildnew,setjmp,ez80_z80,-mez80_z80,$(SETJMP_GLOBS),$(SETJMP_GLOBS
 $(eval $(call buildnew,setjmp,kc160,-mkc160,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 
 setjmp-clean:
-	$(RM) -fr $(NEWLIB_DIRECTORY)/setjmp/obj
+	$(RM) -fr setjmp/obj

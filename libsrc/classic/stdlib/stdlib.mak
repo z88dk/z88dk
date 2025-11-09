@@ -11,42 +11,42 @@ STDLIB_8080_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_8080_AFILES:.asm=.o)
 STDLIB_8085_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_8085_AFILES:.asm=.o)
 STDLIB_GBZ80_OBJECTS := $(STDLIB_CFILES:.c=.o) $(STDLIB_GBZ80_AFILES:.asm=.o)
 
-STDLIB_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
-STDLIB_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/*.asm $(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm
+STDLIB_NEWLIBGLOBS := "stdlib/c/sccz80/*.asm" "stdlib/z80/*.asm" "stdlib/z80/random/*.asm"
+STDLIB_NEWLIBGLOBS_ex := stdlib/c/sccz80/*.asm stdlib/z80/*.asm stdlib/z80/random/*.asm
 
 STDLIB_8080_NEWLIBGLOBS := \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol_fastcall.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol_callee.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul_callee.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/z80/*abs*.asm" \
-        "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm" \
-        $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
+        "stdlib/c/sccz80/*rand*.asm" \
+        "stdlib/c/sccz80/abs*.asm" \
+        "stdlib/c/sccz80/labs*.asm" \
+        "stdlib/c/sccz80/atoi*.asm" \
+        "stdlib/c/sccz80/atol.asm" \
+        "stdlib/c/sccz80/atol_fastcall.asm" \
+        "stdlib/c/sccz80/itoa*.asm" \
+        "stdlib/c/sccz80/strtol.asm" \
+        "stdlib/c/sccz80/strtol_callee.asm" \
+        "stdlib/c/sccz80/strtoul.asm" \
+        "stdlib/c/sccz80/strtoul_callee.asm" \
+        "stdlib/z80/*rand*.asm" \
+        "stdlib/z80/*abs*.asm" \
+        "stdlib/z80/random/*.asm" \
+        stdlib/z80/__stdlib_seed.asm
 
 STDLIB_8080_NEWLIBGLOBS_ex := \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm) \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs*.asm) \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs*.asm) \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi*.asm) \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol_fastcall.asm \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm) \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol.asm \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol_callee.asm \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul.asm \
-        $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul_callee.asm \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm) \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/*abs*.asm) \
-        $(wildcard $(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm) \
-        $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
+        $(wildcard stdlib/c/sccz80/*rand*.asm) \
+        $(wildcard stdlib/c/sccz80/abs*.asm) \
+        $(wildcard stdlib/c/sccz80/labs*.asm) \
+        $(wildcard stdlib/c/sccz80/atoi*.asm) \
+        stdlib/c/sccz80/atol.asm \
+        stdlib/c/sccz80/atol_fastcall.asm \
+        $(wildcard stdlib/c/sccz80/itoa*.asm) \
+        stdlib/c/sccz80/strtol.asm \
+        stdlib/c/sccz80/strtol_callee.asm \
+        stdlib/c/sccz80/strtoul.asm \
+        stdlib/c/sccz80/strtoul_callee.asm \
+        $(wildcard stdlib/z80/*rand*.asm) \
+        $(wildcard stdlib/z80/*abs*.asm) \
+        $(wildcard stdlib/z80/random/*.asm) \
+        stdlib/z80/__stdlib_seed.asm
 
 STDLIB_8085_NEWLIBGLOBS := $(STDLIB_8080_NEWLIBGLOBS)
 STDLIB_8085_NEWLIBGLOBS_ex := $(STDLIB_8080_NEWLIBGLOBS_ex)

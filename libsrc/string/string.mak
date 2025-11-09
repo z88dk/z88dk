@@ -1,5 +1,5 @@
-STRING_GLOBS := "$(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/string/z80/*.asm"
-STRING_GLOBS_ex := $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/string/z80/*.asm
+STRING_GLOBS := "string/c/sccz80/*.asm" "string/z80/*.asm"
+STRING_GLOBS_ex := string/c/sccz80/*.asm string/z80/*.asm
 
 STRING_TARGETS := string/obj/newlib-z80-string \
 		string/obj/newlib-z80n-string \

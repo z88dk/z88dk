@@ -1,8 +1,8 @@
-APLIB_GLOBS := "$(NEWLIB_DIRECTORY)/compress/aplib//c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/aplib//z80/*.asm"
-APLIB_GLOBS_ex := $(NEWLIB_DIRECTORY)/compress/aplib//c/sccz80/*.asm $(NEWLIB_DIRECTORY)/compress/aplib//z80/*.asm
+APLIB_GLOBS := "compress/aplib//c/sccz80/*.asm" "compress/aplib//z80/*.asm"
+APLIB_GLOBS_ex := compress/aplib//c/sccz80/*.asm compress/aplib//z80/*.asm
 
-APLIB_8080_GLOBS := "$(NEWLIB_DIRECTORY)/compress/aplib//c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/aplib//8080/*.asm"
-APLIB_8080_GLOBS_ex := $(NEWLIB_DIRECTORY)/compress/aplib//c/sccz80/*.asm $(NEWLIB_DIRECTORY)/compress/aplib//8080/*.asm
+APLIB_8080_GLOBS := "compress/aplib//c/sccz80/*.asm" "compress/aplib//8080/*.asm"
+APLIB_8080_GLOBS_ex := compress/aplib//c/sccz80/*.asm compress/aplib//8080/*.asm
 
 APLIB_TARGETS := compress/aplib/obj/newlib-z80-compress-aplib \
 	compress/aplib/obj/newlib-z80n-compress-aplib \
