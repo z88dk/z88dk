@@ -8,6 +8,7 @@ TS2068_GLOBS := "target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm"
 	"target/zx/classic/games/*.asm" \
 	"target/zx/classic/input/*.asm" \
 	"target/zx/classic/if1/*.asm" \
+	"target/zx/classic/misc/*.asm" \
 	"target/zx/classic/zxmmc/*.asm" \
 	"target/zx/classic/stdio/*.asm"\
 	"target/zx/classic/stdio/ansi/f_ansi_bel.asm" \
@@ -28,6 +29,7 @@ TS2068_GLOBS_ex := target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm 
 	target/zx/classic/games/*.asm \
 	target/zx/classic/input/*.asm \
 	target/zx/classic/if1/*.asm \
+	target/zx/classic/misc/*.asm \
 	target/zx/classic/zxmmc/*.asm \
 	target/zx/classic/stdio/*.asm\
 	target/zx/classic/stdio/ansi/f_ansi_bel.asm \
