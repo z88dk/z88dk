@@ -19,7 +19,7 @@
 hl_inc_x_MODE6:
     ld      a, (__zx_screenmode)
 	and     7
-  IF    FORts2068|zxn
+  IF    FORts2068|FORzxn
     cp      6
     jr      z,MODE6_no_color            ;No colour in hires
   ENDIF
@@ -36,7 +36,7 @@ hl_inc_x_MODE6:
 standard_modes:
     ; We are on a standard zx screen
     push    hl
-  IF    FORts2068|zxn
+  IF    FORts2068|FORzxn
     ld      a, h
     and     @00100000
     ld      c, a                        ;Save page flag
@@ -51,7 +51,7 @@ standard_modes:
   ELSE
     or      88
   ENDIF
-  IF    FORts2068|zxn
+  IF    FORts2068|FORzxn
     or      c                           ;Add in screen 1 bit
   ENDIF
     ld      h, a
@@ -63,7 +63,7 @@ standard_modes:
 
     ret
 
-  IF    FORts2068|zxn
+  IF    FORts2068|FORzxn
 MODE6_no_color:
     ld      a, h
     xor     @00100000

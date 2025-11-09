@@ -33,7 +33,7 @@ ENDIF
 _mode0:
     ; We are on a standard zx screen
     push    de
-;;  IF    FORts2068|zxn
+;;  IF    FORts2068|FORzxn
 ;;    ld      a, d
 ;;    and     @00100000
 ;;    ld      c, a                        ;Save page flag   (BC should be preserved!!)
@@ -44,7 +44,7 @@ _mode0:
     rrca
     and     3
     or      88
-;;  IF    FORts2068|zxn
+;;  IF    FORts2068|FORzxn
 ;;    or      c                           ;Add in screen 1 bit
 ;;  ENDIF
     ld      d, a

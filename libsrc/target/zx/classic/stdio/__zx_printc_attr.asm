@@ -45,7 +45,7 @@ not_hi_colour:
   ELSE
     or      88
   ENDIF
-  IF    FORts2068|zxn
+  IF    FORts2068|FORzxn
     or      l                           ;Add in screen 1 bit
   ENDIF
     ld      d, a

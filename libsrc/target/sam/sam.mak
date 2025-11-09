@@ -16,6 +16,7 @@ SAM_GLOBS := \
 	"target/zx/classic/graphics/xor_MODE0.asm" \
 	"target/zx/classic/graphics/plot_MODE0.asm" \
 	"target/zx/classic/graphics/pixladdr_MODE0.asm" \
+	"target/zx/classic/graphics/__set_zx_pixel_colour.asm" \
 	"target/zx/classic/games/bit*.asm" \
 	"target/zx/classic/input/in_JoySinclair*.asm" \
 	"target/zx/classic/stdio/*.asm" \
@@ -39,6 +40,7 @@ SAM_GLOBS_ex := \
 	target/zx/classic/graphics/xor_MODE0.asm \
 	target/zx/classic/graphics/plot_MODE0.asm \
 	target/zx/classic/graphics/pixladdr_MODE0.asm \
+	target/zx/classic/graphics/__set_zx_pixel_colour.asm \
 	target/zx/classic/games/bit*.asm  \
 	target/zx/classic/input/in_JoySinclair*.asm \
 	target/zx/classic/stdio/*.asm \
