@@ -18,7 +18,8 @@ SAM_GLOBS := \
 	"target/zx/classic/graphics/pixladdr_MODE0.asm" \
 	"target/zx/classic/games/bit*.asm" \
 	"target/zx/classic/input/in_JoySinclair*.asm" \
-	"target/zx/classic/stdio/*.asm" 
+	"target/zx/classic/stdio/*.asm" \
+	"target/shared/clock.asm" 
 
 SAM_GLOBS_ex := \
 	target/sam/dac/*.asm \
@@ -40,7 +41,8 @@ SAM_GLOBS_ex := \
 	target/zx/classic/graphics/pixladdr_MODE0.asm \
 	target/zx/classic/games/bit*.asm  \
 	target/zx/classic/input/in_JoySinclair*.asm \
-	target/zx/classic/stdio/*.asm
+	target/zx/classic/stdio/*.asm \
+	target/shared/clock.asm
 
 SAM_CFILES = 
 

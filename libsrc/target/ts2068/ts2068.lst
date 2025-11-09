@@ -2,6 +2,5 @@ target/ts2068/obj/ts2068/**/*.o
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 @classic/gfx/wide/gfx_wide.lst
-target/shared/clock
 sound/ay/obj/${TYPE}/**/*.o
 @classic/games/games.lst

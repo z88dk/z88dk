@@ -15,7 +15,8 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/classic/zxmmc/*.asm" \
 	"target/zx/classic/misc/*.asm" \
 	"target/zx/classic/stdio/*.asm"\
-	"target/zx/classic/graphics/*.asm" 
+	"target/zx/classic/graphics/*.asm" \
+	"target/shared/clock.asm"
 
 ZX_MULTICOLOUR_GLOBS := "target/zx/bifrost2/c/sccz80/*.asm" target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	target/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \
@@ -52,7 +53,8 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/classic/zxmmc/*.asm \
 	target/zx/classic/misc/*.asm \
 	target/zx/classic/stdio/*.asm  \
-	target/zx/classic/graphics/*.asm
+	target/zx/classic/graphics/*.asm \
+	target/shared/clock.asm
 
 ZX_MULTICOLOUR_GLOBS_ex := target/zx/bifrost2/c/sccz80/*.asm target/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 \
 	target/zx/bifrost2/z80/asm_BIFROST2_getTile.asm \

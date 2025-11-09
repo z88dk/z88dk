@@ -1,7 +1,6 @@
 target/zxn/obj/zxn/**/*.o
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
-target/shared/clock
 @classic/gfx/wide/gfx_wide.lst
 font/fzx/obj/${TYPE}/**/*.o
 

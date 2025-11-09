@@ -10,8 +10,6 @@ sound/saa1099/obj/${TYPE}/**/*.o
 ; Pull in WYZ player
 sound/ay/obj/${TYPE}/**/*.o
 
-; ??
-target/shared/clock
 
 ; Just some standard stuff now
 @classic/stdio/ansicore.lst

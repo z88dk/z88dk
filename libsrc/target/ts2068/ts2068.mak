@@ -14,7 +14,8 @@ TS2068_GLOBS := "target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm"
 	"target/ts2068/psg/*.asm"  \
 	"target/ts2068/stdio/*.asm"  \
 	"target/ts2068/stdio/ansi/*.asm"  \
-	"target/ts2068/*.asm"  
+	"target/ts2068/*.asm"  \
+	"target/shared/clock.asm"
 
 TS2068_GLOBS_ex := target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
 	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
@@ -32,7 +33,8 @@ TS2068_GLOBS_ex := target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm 
 	target/ts2068/psg/*.asm  \
 	target/ts2068/stdio/*.asm  \
 	target/ts2068/stdio/ansi/*.asm  \
-	target/ts2068/*.asm  
+	target/ts2068/*.asm  \
+	target/shared/clock.asm
 
 
 TS2068_CFILES = target/zx/tape/tape_save.c
