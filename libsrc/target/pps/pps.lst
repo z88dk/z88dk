@@ -1,4 +1,6 @@
 target/pps/obj/pps/**/*.o
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 @classic/games/games.lst
 sound/ay/obj/${TYPE}/**/*.o
 
