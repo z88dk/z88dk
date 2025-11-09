@@ -1,9 +1,9 @@
 
-SOUND_SAA1099_GLOBS := "$(NEWLIB_DIRECTORY)/sound/saa1099/c/smallc/*.asm" \
-		"$(NEWLIB_DIRECTORY)/sound/saa1099/z80/*.asm"
+SOUND_SAA1099_GLOBS := "sound/saa1099/c/smallc/*.asm" \
+		"sound/saa1099/z80/*.asm"
 
-SOUND_SAA1099_GLOBS_ex := $(NEWLIB_DIRECTORY)/sound/saa1099/c/smallc/*.asm \
-		$(NEWLIB_DIRECTORY)/sound/saa1099/z80/*.asm
+SOUND_SAA1099_GLOBS_ex := sound/saa1099/c/smallc/*.asm \
+		sound/saa1099/z80/*.asm
 
 
 SOUND_SAA1099_TARGETS := sound/saa1099/obj/newlib-z80-sound-saa1099 \

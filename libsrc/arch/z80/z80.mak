@@ -8,8 +8,8 @@ ARCHZ80_R2KA_CFILES := $(patsubst %,cimpl/%,$(notdir $(wildcard arch/z80/cimpl/*
 ARCHZ80_OBJECTS := $(ARCHZ80_CFILES:.c=.o) $(ARCHZ80_AFILES:.asm=.o)
 ARCHZ80_R2KA_OBJECTS := $(ARCHZ80_R2KA_CFILES:.c=.o) $(ARCHZ80_R2KA_AFILES:.asm=.o)
 
-ARCHZ80_GLOBS := "$(NEWLIB_DIRECTORY)/arch/z80/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/arch/z80/z80/*.asm"
-ARCHZ80_GLOBS_ex := $(NEWLIB_DIRECTORY)/arch/z80/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/arch/z80/z80/*.asm
+ARCHZ80_GLOBS := "arch/z80/c/sccz80/*.asm" "arch/z80/z80/*.asm"
+ARCHZ80_GLOBS_ex := arch/z80/c/sccz80/*.asm arch/z80/z80/*.asm
 
 
 ARCHZ80_TARGETS := arch/z80/obj/newlib-z80-arch-z80 \

@@ -1,8 +1,8 @@
-ZX0_GLOBS := "$(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx0//z80/*.asm"
-ZX0_GLOBS_ex := $(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm $(NEWLIB_DIRECTORY)/compress/zx0//z80/*.asm
+ZX0_GLOBS := "compress/zx0//c/sccz80/*.asm" "compress/zx0//z80/*.asm"
+ZX0_GLOBS_ex := compress/zx0//c/sccz80/*.asm compress/zx0//z80/*.asm
 
-ZX0_8080_GLOBS := "$(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx0//8080/*.asm"
-ZX0_8080_GLOBS_ex := $(NEWLIB_DIRECTORY)/compress/zx0//c/sccz80/*.asm $(NEWLIB_DIRECTORY)/compress/zx0//8080/*.asm
+ZX0_8080_GLOBS := "compress/zx0//c/sccz80/*.asm" "compress/zx0//8080/*.asm"
+ZX0_8080_GLOBS_ex := compress/zx0//c/sccz80/*.asm compress/zx0//8080/*.asm
 
 ZX0_TARGETS := compress/zx0/obj/newlib-z80-compress-zx0 \
 	compress/zx0/obj/newlib-z80n-compress-zx0 \

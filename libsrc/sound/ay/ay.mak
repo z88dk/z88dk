@@ -8,15 +8,15 @@ SOUND_AY_R2KA_CFILES := $(patsubst %,cimpl/%,$(notdir $(wildcard sound/ay/cimpl/
 SOUND_AY_OBJECTS := $(SOUND_AY_CFILES:.c=.o) $(SOUND_AY_AFILES:.asm=.o)
 SOUND_AY_R2KA_OBJECTS := $(SOUND_AY_R2KA_CFILES:.c=.o) $(SOUND_AY_R2KA_AFILES:.asm=.o)
 
-SOUND_AY_GLOBS := "$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/wyz/*.asm" "$(NEWLIB_DIRECTORY)/sound/ay/z80/wyz/*.asm" \
-		 "$(NEWLIB_DIRECTORY)/sound/ay/z80/vt2/*.asm" \
-		"$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/arkos/*.asm" \
-		"$(NEWLIB_DIRECTORY)/sound/ay/c/smallc/*.asm" 
+SOUND_AY_GLOBS := "sound/ay/c/sccz80/wyz/*.asm" "sound/ay/z80/wyz/*.asm" \
+		 "sound/ay/z80/vt2/*.asm" \
+		"sound/ay/c/sccz80/arkos/*.asm" \
+		"sound/ay/c/smallc/*.asm" 
 
-SOUND_AY_GLOBS_ex := $(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/wyz/*.asm $(NEWLIB_DIRECTORY)/sound/ay/z80/wyz/*.asm \
-		$(NEWLIB_DIRECTORY)/sound/ay/z80/vt2/*.asm \
-		$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/arkos/*.asm \
-		$(NEWLIB_DIRECTORY)/sound/ay/c/smallc/*.asm
+SOUND_AY_GLOBS_ex := sound/ay/c/sccz80/wyz/*.asm sound/ay/z80/wyz/*.asm \
+		sound/ay/z80/vt2/*.asm \
+		sound/ay/c/sccz80/arkos/*.asm \
+		sound/ay/c/smallc/*.asm
 
 
 SOUND_AY_TARGETS := sound/ay/obj/newlib-z80-sound-ay \

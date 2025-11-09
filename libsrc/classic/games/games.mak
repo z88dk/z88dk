@@ -1,5 +1,5 @@
-GAMES_NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/sound/bit/z80/asm_bit_beepfx/*.asm"
-GAMES_NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/sound/bit/z80/asm_bit_beepfx/*.asm
+GAMES_NEWLIBGLOBS := "sound/bit/z80/asm_bit_beepfx/*.asm"
+GAMES_NEWLIBGLOBS_ex := sound/bit/z80/asm_bit_beepfx/*.asm
 
 
 GAMES_NEWLIB_TARGETS := classic/games/obj/newlib-z80-classic-games \

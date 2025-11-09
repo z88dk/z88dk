@@ -2,7 +2,7 @@
 
 include ../../../Make.config
 
-vpath %.c $(NEWLIB_DIRECTORY)/math/float/math32/c
+vpath %.c $(Z88DK_LIBSRC)/math/float/math32/c
 vpath %.c ../cimpl
 
 

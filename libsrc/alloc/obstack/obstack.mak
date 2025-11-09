@@ -1,7 +1,7 @@
 
 
-OBSTACK_GLOBS := "$(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm"
-OBSTACK_GLOBS_ex := $(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm $(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm
+OBSTACK_GLOBS := "alloc/obstack/c/sccz80/*.asm" "alloc/obstack/z80/*.asm"
+OBSTACK_GLOBS_ex := alloc/obstack/c/sccz80/*.asm alloc/obstack/z80/*.asm
 
 
 OBSTACK_TARGETS := alloc/obstack/obj/newlib-z80-alloc-obstack \

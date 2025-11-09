@@ -6,7 +6,7 @@ include ../../../Make.config
 
 TARGET ?= test
 
-#NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/math/float/math48/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/c/sdcc_ix/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/c/sdcc_ix/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/z80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/z80/*.asm"
+#NEWLIBGLOBS := "$(Z88DK_LIBSRC)/math/float/math48/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/c/sdcc_ix/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/lm/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/lm/c/sdcc_ix/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/lm/z80/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/z80/*.asm"
 
 AFILES = $(wildcard *.asm)
 CFILES  = $(wildcard *.c) 

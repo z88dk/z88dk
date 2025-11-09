@@ -1,10 +1,10 @@
 @../adt/adt_sdcc_iy.lst
 @../alloc/alloc_sdcc_iy.lst
-@../target/zxn-libs/zxn_sdcc_iy.lst
+@../target/zxn/zxn_sdcc_iy.lst
 @../compress/compress_sdcc_iy.lst
 @../ctype/ctype_sdcc_iy.lst
 @../newlib/drivers/drivers.lst
-@../target/zxn-libs/env/esxdos/esxdos_sdcc_iy.lst
+@../target/zxn/env/esxdos/esxdos_sdcc_iy.lst
 @../error/error.lst
 @../newlib/fcntl/fcntl_sdcc_iy.lst
 @../font/font_4x8/fonts.lst

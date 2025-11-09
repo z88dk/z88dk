@@ -1,5 +1,5 @@
-ZX2_GLOBS := "$(NEWLIB_DIRECTORY)/compress/zx2//c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx2//z80/*.asm"
-ZX2_GLOBS_ex := $(NEWLIB_DIRECTORY)/compress/zx2//c/sccz80/*.asm $(NEWLIB_DIRECTORY)/compress/zx2//z80/*.asm
+ZX2_GLOBS := "compress/zx2//c/sccz80/*.asm" "compress/zx2//z80/*.asm"
+ZX2_GLOBS_ex := compress/zx2//c/sccz80/*.asm compress/zx2//z80/*.asm
 
 
 ZX2_TARGETS := compress/zx2/obj/newlib-z80-compress-zx2 \

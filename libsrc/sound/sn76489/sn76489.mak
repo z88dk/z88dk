@@ -1,12 +1,12 @@
 
 
-SOUND_SN76489_GLOBS := "$(NEWLIB_DIRECTORY)/sound/sn76489/z80/*.asm" \
-		"$(NEWLIB_DIRECTORY)/sound/sn76489/c/sccz80/*.asm" \
-		"$(NEWLIB_DIRECTORY)/sound/sn76489/c/smallc/*.asm" 
+SOUND_SN76489_GLOBS := "sound/sn76489/z80/*.asm" \
+		"sound/sn76489/c/sccz80/*.asm" \
+		"sound/sn76489/c/smallc/*.asm" 
 
-SOUND_SN76489_GLOBS_ex := $(NEWLIB_DIRECTORY)/sound/sn76489/z80/*.asm \
-		$(NEWLIB_DIRECTORY)/sound/sn76489/c/sccz80/*.asm \
-		$(NEWLIB_DIRECTORY)/sound/sn76489/c/smallc/*.asm
+SOUND_SN76489_GLOBS_ex := sound/sn76489/z80/*.asm \
+		sound/sn76489/c/sccz80/*.asm \
+		sound/sn76489/c/smallc/*.asm
 
 
 SOUND_SN76489_TARGETS := sound/sn76489/obj/newlib-z80-sound-sn76489 \

@@ -2,10 +2,10 @@ include ../../Make.config
 
 TARGET ?= zx
 
-SUBDIRS = tape games stdio newlib
+SUBDIRS = newlib
 
 ifeq ($(TARGET),zx)
-  SUBDIRS += fzx fcntl rs232
+  SUBDIRS += classic/fcntl classic/rs232
 endif
 
 ifeq ($(TARGET),zxn)

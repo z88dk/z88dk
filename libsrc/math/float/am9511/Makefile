@@ -6,7 +6,7 @@ vpath %.c ../../math/float/am9511/c
 vpath %.c ../cimpl
 
 
-CFILES  = $(notdir $(wildcard $(NEWLIB_DIRECTORY)/math/float/am9511/c/*.c)) atof.c ftoa.c ftoe.c
+CFILES  = $(notdir $(wildcard $(Z88DK_LIBSRC)/math/float/am9511/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c fromfix16.c tofix16.c
 AFILES = 
 OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)

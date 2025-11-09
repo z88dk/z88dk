@@ -86,7 +86,7 @@ TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
 TOCREATE += $(call check_target,nanos,nanos.lib)
 TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib)
-TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
+TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib)
 TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
 TOCREATE += $(call check_target,osborne,gfxosborne1.lib $(CPMLIBS))
 TOCREATE += $(call check_target,ondra,ondra_clib.lib)
@@ -116,7 +116,7 @@ TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
 TOCREATE += $(call check_target,rex,rex_clib.lib)
 TOCREATE += $(call check_target,rx78,rx78_clib.lib)
 TOCREATE += $(call check_target,s1mp3,s1mp3_clib.lib)
-TOCREATE += $(call check_target,sam,sam_clib.lib)
+TOCREATE += $(call check_target,sam,sam_clib.lib sam_cpm.lib)
 TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
 TOCREATE += $(call check_target,smc777,smc777_clib.lib smc777_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,sms,sms_clib.lib)
@@ -152,11 +152,11 @@ TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 808
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
-TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib zxrom.lib)
+TOCREATE += $(call check_target,zx, zx_clib.lib zxcpm.lib mzx.lib mzx_tiny.lib) 
 TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 TOCREATE += $(call check_target,zx80, zx80_clib.lib)
 TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib)
-TOCREATE += $(call check_target,zxn, zxn_clib.lib zxfcntl)
+TOCREATE += $(call check_target,zxn, zxn_clib.lib)
 
 
 TOCREATE += 
@@ -217,6 +217,12 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+include target/hector/hector.mak
+include target/pps/pps.mak
+include target/sam/sam.mak
+include target/ts2068/ts2068.mak
+include target/zx/zx.mak
+include target/zxn/zxn.mak
 
 
 # Targets depend on some common code + target specific (include stdio in here)
@@ -327,59 +333,45 @@ z88_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
 
-# ZX Spectrum fcntl - dom/stefano
-zxfcntl:
-	$(MAKE) -C target/zx/fcntl
-
 # 64/32 column library for ZX Spectrum - dom/stefano
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib: $(TARGET_CLIB_DEPS)
+zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(call buildgeneric,zx)
-	$(MAKE) -C target/zx
-	$(MAKE) -C target/zx-common TARGET=zx
 	$(MAKE) -C classic/games TARGET=zx
+	$(MAKE) -C target/zx/classic/fcntl TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
+
+zxcpm.lib:  $(TARGET_CLIB_DEPS) target-zx
+	@echo ''
+	@echo '--- Building ZX Spectrum CP/M Library ---'
+	@echo ''
+	$(call buildgeneric,zx)
+	$(MAKE) -C classic/games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
-zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib
+zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib target-zxn
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
 	$(call buildgeneric,zxn,wide)
-	$(MAKE) -C target/zx TARGET=zxn
-	$(MAKE) -C target/zx-common TARGET=zxn
 	$(MAKE) -C classic/games TARGET=zxn
-	$(MAKE) -C target/zxn TARGET=zxn
 	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib
+ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib target-ts2068
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
 	$(call buildgeneric,ts2068,wide)
 	$(MAKE) -C classic/games TARGET=ts2068
-	$(MAKE) -C target/zx TARGET=ts2068
-	$(MAKE) -C target/ts2068 TARGET=ts2068
-	$(MAKE) -C target/zx-common TARGET=ts2068
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
-
-# ZXROM - stefano
-zxrom.lib: zx_clib.lib
-	@echo ''
-	@echo '--- Building ZXROM Library ---'
-	@echo ''
-	$(RM) target/zx/stdio/generic_console_scrollup.o
-	$(MAKE) -C classic/games TARGET=zx
-	$(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(TARGET_DIRECTORY)/zx/zxrom.lst
-	$(RM) target/zx/stdio/generic_console_scrollup.o
 
 # ZXVGS - yarek
 zxvgs.lib:
@@ -446,13 +438,11 @@ pc88_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(TARGET_DIRECTORY)/pc88/pc88.lst
 
 # Native for sprinter - dom
-pps_clib.lib: $(TARGET_CLIB_DEPS)
+pps_clib.lib: $(TARGET_CLIB_DEPS) target-pps
 	@echo ''
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
 	$(call buildgeneric,pps)
-	$(MAKE) -C target/pps
-	$(MAKE) -C target/zx TARGET=pps
 	$(MAKE) -C classic/games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(TARGET_DIRECTORY)/pps/pps.lst
 
@@ -1019,15 +1009,20 @@ rex_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(TARGET_DIRECTORY)/rex/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
-sam_clib.lib: $(TARGET_CLIB_DEPS) ts2068_clib.lib
+sam_clib.lib: $(TARGET_CLIB_DEPS) target-sam
 	@echo ''
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
 	$(call buildgeneric,sam,wide)
 	$(MAKE) -C classic/games TARGET=sam
-	$(MAKE) -C target/zx TARGET=sam
-	$(MAKE) -C target/zx-common TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
+
+sam_cpm.lib: $(TARGET_CLIB_DEPS) target-sam
+	@echo ''
+	@echo '--- Building Sam Coupe CP/M Library ---'
+	@echo ''
+	$(call buildgeneric,sam,wide)
+	$(MAKE) -C classic/games TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
 
 # Spectravideo SVI library - Stefano
@@ -1615,25 +1610,23 @@ z80retro_cpm.lib: cpm_clib.lib
 	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
 
 # Hector/Victor/Lambda - dom
-hector1_clib.lib: $(TARGET_CLIB_DEPS) 
+hector1_clib.lib: $(TARGET_CLIB_DEPS) target-hector
 	@echo ''
 	@echo '--- Building Hector/Victor/Lambda Library ---'
 	@echo ''
 	$(call buildgeneric,hector)
 	$(MAKE) -C classic/games TARGET=hector SUBTYPE=hector1
 	$(MAKE) -C classic/gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hector1
-	$(MAKE) -C target/hector SUBTYPE=hector1
 	TARGET=hector1 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Hector/Victor/Lambda - dom
-hectorhr_clib.lib: $(TARGET_CLIB_DEPS) hector1_clib.lib
+hectorhr_clib.lib: $(TARGET_CLIB_DEPS) target-hector
 	@echo ''
 	@echo '--- Building HectorHR Library ---'
 	@echo ''	
 	$(call buildgeneric,hector)
 	$(MAKE) -C classic/games TARGET=hector SUBTYPE=hectorhr
 	$(MAKE) -C classic/gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr
-	$(MAKE) -C target/hector SUBTYPE=hectorhr
 	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Alphatro P2 - dom
@@ -2405,7 +2398,7 @@ classic-clean: $(CLEAN)
 	$(RM) *.lib
 
 new-clean:
-	$(MAKE) -C _DEVELOPMENT clean
+	$(MAKE) -C newlib clean
 
 new-install-clean:
-	$(MAKE) -C _DEVELOPMENT install-clean
+	$(MAKE) -C newlib install-clean

@@ -4,11 +4,11 @@ TIME_CFILES := $(patsubst %,cimpl/%,$(notdir $(wildcard time/cimpl/*.c)))
 
 TIME_OBJECTS := $(TIME_CFILES:.c=.o) $(TIME_AFILES:.asm=.o)
 
-TIME_GLOBS := "$(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/time/z80/*.asm" \
+TIME_GLOBS := "time/c/sccz80/*.asm" "time/z80/*.asm" \
 
 TIME_GLOBS_ex := \
-		$(NEWLIB_DIRECTORY)/time/z80/*.asm \
-		$(NEWLIB_DIRECTORY)/time/c/sccz80/*.asm 
+		time/z80/*.asm \
+		time/c/sccz80/*.asm 
 
 
 TIME_TARGETS := time/obj/newlib-z80-time \

@@ -1,7 +1,0 @@
-@target/zxn-libs/version/version_asm.lst
-target/zxn-libs/version/c/sdcc/check_version_core
-target/zxn-libs/version/c/sdcc/check_version_core_fastcall
-target/zxn-libs/version/c/sdcc/check_version_esxdos
-target/zxn-libs/version/c/sdcc/check_version_esxdos_fastcall
-target/zxn-libs/version/c/sdcc/check_version_nextzxos
-target/zxn-libs/version/c/sdcc/check_version_nextzxos_fastcall
