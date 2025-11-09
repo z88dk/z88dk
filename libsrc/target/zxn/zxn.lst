@@ -1,3 +1,4 @@
+target/zxn/obj/zxn/**/*.o
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
 target/shared/clock
