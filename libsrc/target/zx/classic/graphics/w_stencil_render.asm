@@ -11,6 +11,7 @@
 ;    stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
+IF FORts2068|FORzxn
     INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_graphics
@@ -175,3 +176,4 @@ pattern1:
     pop     de
     ret
 
+ENDIF

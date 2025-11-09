@@ -3,6 +3,7 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm" \
 	"target/zx/graphics/c/sccz80/*.asm" "target/zx/graphics/z80/*.asm" \
 	"target/zx/misc/c/sccz80/*.asm" "target/zx/misc/z80/*.asm" \
+	"target/zx/tape/c/sccz80/*.asm" "target/zx/tape/z80/*.asm" "target/zx/tape/c/smallc/*.asm" \
 	"target/zx/classic/diagnostic/*.asm" \
 	"target/zx/classic/basic/*.asm" \
 	"target/zx/classic/opus/*.asm" \
@@ -23,6 +24,7 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/ulaplus/c/smallc/*.asm \
 	target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
 	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
+	target/zx/tape/c/sccz80/*.asm target/zx/tape/z80/*.asm target/zx/tape/c/smallc/*.asm \
 	target/zx/classic/diagnostic/*.asm \
         target/zx/classic/basic/*.asm \
 	target/zx/classic/opus/*.asm \

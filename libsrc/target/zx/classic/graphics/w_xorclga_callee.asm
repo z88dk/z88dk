@@ -4,6 +4,7 @@
 ;
 ; Usage: xorclga(int tlx, int tly, int tlx2, int tly2)
 
+IF FORts2068|FORzxn
     SECTION code_graphics
 
     PUBLIC  xorclga_callee
@@ -192,3 +193,4 @@ wypad:
     jr      outer_loop
 
 
+ENDIF

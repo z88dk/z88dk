@@ -1,6 +1,8 @@
 
 ; $Id: w_putsprite.asm $
 
+
+IF FORts2068|FORzxn
     SECTION smc_clib
 
     PUBLIC  putsprite
@@ -260,3 +262,4 @@ wover_1:
 offsets_table:
     defb    1, 2, 4, 8, 16, 32, 64, 128
 
+ENDIF

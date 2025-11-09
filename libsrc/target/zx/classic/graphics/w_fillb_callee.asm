@@ -4,6 +4,7 @@
 ;
 ; Usage: fillb(int tlx, int tly, int tlx2, int tly2)
 
+IF FORts2068|FORzxn
     SECTION code_graphics
 
     PUBLIC  fillb_callee
@@ -188,4 +189,4 @@ wypad:
     jp      c, __graphics_end
     jr      outer_loop
 
-
+ENDIF
