@@ -1,10 +1,4 @@
-classic/input/obj/${TYPE}/in_WaitForKey
 target/${TARGET}/input/in_Inkey
-classic/input/obj/${TYPE}/in_GetKey
 target/${TARGET}/input/in_keytranstbl
 target/${TARGET}/input/in_KeyPressed
-classic/input/obj/${TYPE}/in_WaitForNoKey
 target/${TARGET}/input/in_LookupKey
-classic/input/obj/${TYPE}/in_GetKeyReset
-classic/input/obj/${TYPE}/in_GetKeyVariables
-classic/input/obj/${TYPE}/fgetc_cons_inkey

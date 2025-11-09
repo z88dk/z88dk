@@ -6,6 +6,12 @@ ctype/obj/${TYPE}/**/*.o
 font/font_4x8/obj/${TYPE}/**/*.o
 font/font_8x8/obj/${TYPE}/**/*.o
 font/font_8x10/obj/${TYPE}/**/*.o
+classic/input/obj/${TYPE}/in_WaitForKey
+classic/input/obj/${TYPE}/in_GetKey
+classic/input/obj/${TYPE}/in_WaitForNoKey
+classic/input/obj/${TYPE}/in_GetKeyReset
+classic/input/obj/${TYPE}/in_GetKeyVariables
+classic/input/obj/${TYPE}/fgetc_cons_inkey
 @classic/lib3d/lib3d.lst
 libgen/obj/${TYPE}/**/*.o
 setjmp/obj/${TYPE}/**/*.o
@@ -15,3 +21,5 @@ regex/obj/${TYPE}/**/*.o
 @classic/interrupts/interrupts_8080.lst
 time/obj/${TYPE}/**/*.o
 @classic/z80_crt0s/crt0.lst
+
+

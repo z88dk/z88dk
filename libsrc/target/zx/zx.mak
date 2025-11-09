@@ -97,7 +97,7 @@ target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0:
 	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
 	$(ZX0) -f $$(@:.zx0=)
 
-target/$(1)/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/zx/obj/$(1)/bifrost2_engine_48.bin.zx0 
+target/$(1)/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0 
 	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -DPLUS3 -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
 	$(ZX0) -f $$(@:.zx0=)
 endef

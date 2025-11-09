@@ -217,6 +217,7 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+include target/hector/hector.mak
 include target/pps/pps.mak
 include target/sam/sam.mak
 include target/ts2068/ts2068.mak
@@ -1597,25 +1598,23 @@ z80retro_cpm.lib: cpm_clib.lib
 	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
 
 # Hector/Victor/Lambda - dom
-hector1_clib.lib: $(TARGET_CLIB_DEPS) 
+hector1_clib.lib: $(TARGET_CLIB_DEPS) target-hector
 	@echo ''
 	@echo '--- Building Hector/Victor/Lambda Library ---'
 	@echo ''
 	$(call buildgeneric,hector)
 	$(MAKE) -C classic/games TARGET=hector SUBTYPE=hector1
 	$(MAKE) -C classic/gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hector1
-	$(MAKE) -C target/hector SUBTYPE=hector1
 	TARGET=hector1 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Hector/Victor/Lambda - dom
-hectorhr_clib.lib: $(TARGET_CLIB_DEPS) hector1_clib.lib
+hectorhr_clib.lib: $(TARGET_CLIB_DEPS) target-hector
 	@echo ''
 	@echo '--- Building HectorHR Library ---'
 	@echo ''	
 	$(call buildgeneric,hector)
 	$(MAKE) -C classic/games TARGET=hector SUBTYPE=hectorhr
 	$(MAKE) -C classic/gfx TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr
-	$(MAKE) -C target/hector SUBTYPE=hectorhr
 	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Alphatro P2 - dom
