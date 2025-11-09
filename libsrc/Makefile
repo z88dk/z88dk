@@ -2386,7 +2386,7 @@ classic-clean: $(CLEAN)
 	$(RM) *.lib
 
 new-clean:
-	$(MAKE) -C _DEVELOPMENT clean
+	$(MAKE) -C newlib clean
 
 new-install-clean:
-	$(MAKE) -C _DEVELOPMENT install-clean
+	$(MAKE) -C newlib install-clean
