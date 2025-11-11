@@ -112,6 +112,8 @@ public:
     void skip_spaces(unsigned& i) const;
     bool at_end(unsigned& i) const;
     bool trim();
+    void reserve(size_t capacity); // reserve storage in tokens_ vector
+    bool has_token_type(TokenType tt) const; // check if any token matches type
 
 private:
     Location location_;             // Location of this line
