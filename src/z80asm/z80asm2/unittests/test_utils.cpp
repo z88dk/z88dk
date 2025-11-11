@@ -282,6 +282,22 @@ TEST_CASE("str_ends_with detects suffix correctly", "[str_ends_with]") {
 }
 
 // -----------------------------------------------------------------------------
+// New tests for str_starts_with
+// -----------------------------------------------------------------------------
+
+TEST_CASE("str_starts_with detects prefix correctly", "[str_starts_with]") {
+    REQUIRE(str_starts_with("filename.asm", "file"));
+    REQUIRE(str_starts_with("hello", "he"));
+    REQUIRE_FALSE(str_starts_with("hello", "He")); // case-sensitive
+    REQUIRE(str_starts_with("abc", ""));           // empty beginning matches
+    REQUIRE_FALSE(str_starts_with("",
+                                  "a"));       // non-empty beginning can't match empty
+    REQUIRE(str_starts_with("",
+                            ""));              // empty starts-with empty -> true
+    REQUIRE_FALSE(str_starts_with("short", "shorter_prefix"));
+}
+
+//-----------------------------------------------------------------------------
 // Tests for parse_float_from_chars (previously untested)
 // -----------------------------------------------------------------------------
 
