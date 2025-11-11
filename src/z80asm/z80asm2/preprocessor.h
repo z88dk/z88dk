@@ -72,12 +72,14 @@ private:
         std::vector<std::string> locals;     // LOCAL names declared in macro body
         // true if definition had params or used empty ()
         bool is_function_like = false;
+        // recursion depth counter per macro (avoid global map lookups)
+        int recursion_depth = 0;
     };
 
     // Cache entry for a file
     struct CachedFile {
         std::shared_ptr<TokensFile> tokens_file;
-        std::time_t mod_time;
+        std::time_t mod_time = 0;
     };
 
     struct File {
@@ -116,9 +118,6 @@ private:
 
     // Macro table
     std::unordered_map<std::string, Macro> macros_;
-
-    // Track macro expansion recursion depth per macro name.
-    std::unordered_map<std::string, int> macro_recursion_count_;
 
     // Counter for LOCAL renaming.
     unsigned local_id_counter_ = 0;
@@ -264,8 +263,10 @@ private:
     void process_endif(const TokensLine& line, unsigned& i);
 
     // IFDEF / IFNDEF / ELIFDEF / ELIFNDEF
-    void process_ifdef(const TokensLine& line, unsigned& i, bool negated);
-    void process_elifdef(const TokensLine& line, unsigned& i, bool negated);
+    void process_ifdef(const TokensLine& line, unsigned& i,
+                       bool negated);
+    void process_elifdef(const TokensLine& line, unsigned& i,
+                         bool negated);
 
     // EXITM
     void process_exitm(const TokensLine& line, unsigned& i);
@@ -299,11 +300,11 @@ private:
         const std::vector<TokensLine>& original_args,
         TokensLine& new_line);
     bool substitute_and_expand(
-        const Macro& macro,
+        Macro& macro,
         const std::vector<std::vector<TokensLine>>& expanded_args_flat,
         const std::vector<TokensLine>& original_args,
-        const std::string& name,
         std::vector<TokensLine>& out_expanded);
+
     void append_expansion_into_out(
         const std::vector<TokensLine>& further_expanded,
         TokensLine& out,
