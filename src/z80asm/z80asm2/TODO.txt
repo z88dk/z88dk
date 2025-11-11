@@ -1,6 +1,5 @@
 - parse #pragma once and IFNDEF / DEFINE guards to skip includes
 - add option -M (cout) -MD (.d file) and generate input file for Makefile target.d
-- add trim to TokensLine, replace all the scattered trimming from the preprocessor
 - Fixed unitended expansion of directives inside macros causing IFDEF SYM to
   be translated to IFDEF 1 on macro expansion.
 - Refactoring.
