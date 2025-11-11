@@ -20,6 +20,7 @@ std::string trim(const std::string& s);
 
 // check string ending
 bool str_ends_with(const std::string& str, const std::string& ending);
+bool str_starts_with(const std::string& str, const std::string& beginning);
 
 // convert string to C-style escaped string
 std::string escape_string(const std::string& s);
