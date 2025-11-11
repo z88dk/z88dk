@@ -221,6 +221,19 @@ bool TokensLine::trim() {
     return changed;
 }
 
+void TokensLine::reserve(size_t capacity) {
+    tokens_.reserve(capacity);
+}
+
+bool TokensLine::has_token_type(TokenType tt) const {
+    for (const auto& t : tokens_) {
+        if (t.is(tt)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 //-----------------------------------------------------------------------------
 
 TokensFile::TokensFile(const std::string& filename,
