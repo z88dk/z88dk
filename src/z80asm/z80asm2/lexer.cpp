@@ -341,6 +341,22 @@ void TokensFile::set_has_pragma_once(bool v) {
     has_pragma_once_ = v;
 }
 
+bool TokensFile::has_ifndef_guard() const {
+    return has_ifndef_guard_;
+}
+
+void TokensFile::set_has_ifndef_guard(bool v) {
+    has_ifndef_guard_ = v;
+}
+
+const std::string& TokensFile::ifndef_guard_symbol() const {
+    return ifndef_guard_symbol_;
+}
+
+void TokensFile::set_ifndef_guard_symbol(const std::string& symbol) {
+    ifndef_guard_symbol_ = symbol;
+}
+
 void TokensFile::split_lines(const char*& p) {
     text_lines_.clear();
     while (*p) {

@@ -45,11 +45,25 @@ void Preprocessor::push_file(const std::string& filename) {
     // If file cached with pragma_once and already included in this instance, skip
     auto cit = file_cache_.find(abs_path);
     if (cit != file_cache_.end() &&
-            cit->second.tokens_file->has_pragma_once() &&
+            cit->second.tokens_file &&
             included_once_.find(abs_path) != included_once_.end()) {
-        // Record dependency even when skipped
-        dep_files_.push_back(normalized_filename);
-        return; // skip include entirely
+        // check for #pragma once
+        if (cit->second.tokens_file->has_pragma_once()) {
+            // Record dependency even when skipped
+            dep_files_.push_back(normalized_filename);
+            return; // skip include entirely
+        }
+        // check for #ifndef/#define
+        if (cit->second.tokens_file->has_ifndef_guard()) {
+            const std::string& guard_symbol =
+                cit->second.tokens_file->ifndef_guard_symbol();
+            auto mit = macros_.find(guard_symbol);
+            if (mit != macros_.end()) {
+                // Record dependency even when skipped
+                dep_files_.push_back(normalized_filename);
+                return; // skip include entirely
+            }
+        }
     }
 
     // Check if this file is already on the stack (recursive include detection)
@@ -84,6 +98,14 @@ void Preprocessor::push_file(const std::string& filename) {
     f.has_forced_location = false;
     f.forced_constant_line_numbers = false;
     f.is_macro_expansion = false;
+
+    // detect #ifndef/#define guard
+    std::string symbol;
+    if (detect_ifndef_guard(f, symbol)) {
+        f.tokens_file->set_has_ifndef_guard(true);
+        f.tokens_file->set_ifndef_guard_symbol(symbol);
+    }
+
     file_stack_.push_back(std::move(f));
 }
 
@@ -2156,12 +2178,13 @@ void Preprocessor::process_pragma(const TokensLine& line, unsigned& i) {
         expect_end(line, i);
         if (!file_stack_.empty()) {
             File& top = file_stack_.back();
-            top.tokens_file->set_has_pragma_once();
+            if (top.tokens_file) {
+                top.tokens_file->set_has_pragma_once();
+            }
         }
     }
     else {
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       "Unknown pragma directive");
+        // ignore unknown pragmata
     }
 }
 
@@ -2775,4 +2798,80 @@ TokensLine Preprocessor::expand_macros_in_line(const TokensLine& line) {
     expanded.trim();
 
     return expanded;
+}
+
+bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
+    out_symbol.clear();
+
+    TokensLine line;
+    unsigned line_index = 0;
+
+    // no more lines
+    if (line_index >= file.tokens_file->tok_lines_count()) {
+        return false;
+    }
+
+    std::string ifndef_name, define_name;
+    std::vector<TokensLine> segments;
+
+    // Lambda to fill 'segments' from subsequent non-empty physical lines.
+    auto fill_segments = [&]() {
+        while (segments.empty() &&
+                line_index < file.tokens_file->tok_lines_count()) {
+            line = file.tokens_file->get_tok_line(line_index++);
+            line.trim();
+            if (line.empty()) {
+                continue;
+            }
+            split_line(line, segments);
+            while (!segments.empty() && segments.front().empty()) {
+                segments.erase(segments.begin());
+            }
+        }
+    };
+
+    // Read first line and split into segments
+    fill_segments();
+    if (segments.empty()) {
+        return false;
+    }
+
+    // First line must be #ifndef <name>
+    Keyword kw = Keyword::None;
+    unsigned pos = 0;
+    if (!(pos < segments[0].size() && is_directive(line, pos, kw) &&
+            kw == Keyword::IFNDEF)) {
+        return false;
+    }
+    ++pos;
+    if (!parse_identifier(line, pos, ifndef_name)) {
+        return false;
+    }
+    segments.erase(segments.begin());
+
+    // Read second line or second segment of first line
+    fill_segments();
+    if (segments.empty()) {
+        return false;
+    }
+
+    // Second must be #define <same_name>
+    kw = Keyword::None;
+    pos = 0;
+    if (!(pos < segments[0].size() && is_directive(line, pos, kw) &&
+            kw == Keyword::DEFINE)) {
+        return false;
+    }
+    ++pos;
+    if (!parse_identifier(line, pos, define_name)) {
+        return false;
+    }
+
+    if (ifndef_name != define_name) {
+        return false;
+    }
+
+    // found #ifndef/#define
+    out_symbol = define_name;
+    return true;
 }
