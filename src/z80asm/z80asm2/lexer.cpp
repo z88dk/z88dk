@@ -281,6 +281,7 @@ void TokensFile::clear() {
     inc_line_nums_ = true;
     text_lines_.clear();
     tok_lines_.clear();
+    has_pragma_once_ = false;
 }
 
 const std::string& TokensFile::filename() const {
@@ -321,6 +322,23 @@ const TokensLine& TokensFile::get_tok_line(unsigned index) const {
     else {
         return tok_lines_[index];
     }
+}
+
+const std::vector<std::string> TokensFile::text_lines() const {
+    return text_lines_;
+}
+
+const std::vector<TokensLine> TokensFile::tok_lines() const {
+    return tok_lines_;
+}
+
+// PRAGMA ONCE support
+bool TokensFile::has_pragma_once() const {
+    return has_pragma_once_;
+}
+
+void TokensFile::set_has_pragma_once(bool v) {
+    has_pragma_once_ = v;
 }
 
 void TokensFile::split_lines(const char*& p) {
