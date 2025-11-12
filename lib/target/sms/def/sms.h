@@ -21,7 +21,7 @@
 #define	VDP_SET_REG         0x80
 
 
-
+#define  __IO_MEMORY_ENABLES        0x3e
 #define __IO_JOYSTICK_PORT_CONTROL  0x3f
 #define __IO_GUN_SPOT_VERTICAL      0x7e
 #define __IO_GUN_SPOT_HORIZONTAL    0x7f
