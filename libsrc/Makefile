@@ -220,6 +220,7 @@ include sound/saa1099/saa1099.mak
 include target/hector/hector.mak
 include target/pps/pps.mak
 include target/sam/sam.mak
+include target/sms/sms.mak
 include target/ts2068/ts2068.mak
 include target/zx/zx.mak
 include target/zxn/zxn.mak
@@ -1860,7 +1861,7 @@ lynx_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(TARGET_DIRECTORY)/lynx/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
-sms_clib.lib: $(TARGET_CLIB_DEPS)
+sms_clib.lib: $(TARGET_CLIB_DEPS) target-sms
 	@echo ''
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''

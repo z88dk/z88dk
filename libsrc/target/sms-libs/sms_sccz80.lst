@@ -1,8 +1,0 @@
-@target/sms-libs/compress/compress_sccz80.lst
-@target/sms-libs/globals/globals_asm.lst
-@target/sms-libs/misc/misc_sccz80.lst
-@target/sms-libs/psg/psg_sccz80.lst
-@target/sms-libs/registers/registers_asm.lst
-@target/sms-libs/SMSlib/SMSlib_sccz80.lst
-@target/sms-libs/vdp/vdp_sccz80.lst
-@target/sms-libs/vram/vram_sccz80.lst

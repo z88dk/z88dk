@@ -1,8 +1,0 @@
-@target/sms-libs/compress/compress_sdcc.lst
-@target/sms-libs/globals/globals_asm.lst
-@target/sms-libs/misc/misc_sdcc_iy.lst
-@target/sms-libs/psg/psg_sdcc.lst
-@target/sms-libs/registers/registers_asm.lst
-@target/sms-libs/SMSlib/SMSlib_sdcc.lst
-@target/sms-libs/vdp/vdp_sdcc.lst
-@target/sms-libs/vram/vram_sdcc.lst

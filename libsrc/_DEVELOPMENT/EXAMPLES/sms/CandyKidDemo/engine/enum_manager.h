@@ -41,6 +41,6 @@ enum
 {
 	lifecycle_idle,		// 0
 	lifecycle_move,		// 1
-} enum_direction_type;
+} enum_lifecycle_type;
 
 #endif//_ENUM_MANAGER_H_

@@ -12,6 +12,9 @@
 #include <../libsrc/newlib/target/zxn/config_zxn.h>
 #endif
 
+#ifdef __SMS
+#include <../lib/target/sms/def/sms.h>
+#endif
 
 #endif
 

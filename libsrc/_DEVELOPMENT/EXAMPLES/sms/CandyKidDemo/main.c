@@ -4,7 +4,7 @@
 bool global_pause;
 unsigned char hacker_debug, hacker_splash;
 unsigned char hacker_steps, hacker_delay, hacker_hands, hacker_music, hacker_sound, hacker_paths;
-unsigned char enum_curr_screen_type, enum_next_screen_type;
+unsigned char curr_screen_type, next_screen_type;
 
 void custom_initialize();
 void custom_load_content();
@@ -32,8 +32,8 @@ void main (void)
 
 	SMS_displayOn();
 
-	enum_curr_screen_type = SCREEN_TYPE_NONE;
-	enum_next_screen_type = SCREEN_TYPE_SPLASH;
+	curr_screen_type = SCREEN_TYPE_NONE;
+	next_screen_type = SCREEN_TYPE_SPLASH;
 	for (;;)
 	{
 		if (SMS_queryPauseRequested())
@@ -57,16 +57,16 @@ void main (void)
 			continue;
 		}
 
-		if (enum_curr_screen_type != enum_next_screen_type)
+		if (curr_screen_type != next_screen_type)
 		{
-			enum_curr_screen_type = enum_next_screen_type;
-			custom_screen_manager_load(enum_curr_screen_type);
+			curr_screen_type = next_screen_type;
+			custom_screen_manager_load(curr_screen_type);
 		}
 
 		SMS_initSprites();
 
 		curr_joypad1 = SMS_getKeysStatus();
-		custom_screen_manager_update(&enum_next_screen_type, curr_joypad1, prev_joypad1);
+		custom_screen_manager_update(&next_screen_type, curr_joypad1, prev_joypad1);
 
 		SMS_finalizeSprites();
 		SMS_waitForVBlank();
