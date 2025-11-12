@@ -1,2 +1,1 @@
-- parse #pragma once and IFNDEF / DEFINE guards to skip includes
 - add option -M (cout) -MD (.d file) and generate input file for Makefile target.d

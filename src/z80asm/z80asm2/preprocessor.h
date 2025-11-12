@@ -326,4 +326,7 @@ private:
     bool expand_macros(const std::vector<TokensLine>& lines, bool at_start,
                        std::vector<TokensLine>& out);
     TokensLine expand_macros_in_line(const TokensLine& line);
+
+    // #ifndef/#define detector
+    bool detect_ifndef_guard(File& file, std::string& out_symbol);
 };
