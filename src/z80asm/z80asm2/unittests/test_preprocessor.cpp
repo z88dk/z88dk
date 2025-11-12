@@ -7081,3 +7081,152 @@ TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing t
     REQUIRE(!g_errors.has_errors());
 }
 
+//-----------------------------------------------------------------------------
+// z80asm preprocessor PRAGMA ONCE unit tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance",
+          "[preprocessor][pragma_once][single]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+    const std::string inc = "po_once.inc";
+    const std::string mainf = "po_main_once.asm";
+    {
+        std::ofstream o(inc);
+        REQUIRE(o.is_open());
+        o << "PRAGMA ONCE\nVAL1\n";
+    }
+    {
+        std::ofstream o(mainf);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inc << "\"\n#include \"" << inc << "\"\nAFTER\n";
+    }
+    Preprocessor pp;
+    pp.push_file(mainf);
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) if (!line.tokens().empty()) {
+            out.push_back(line.tokens()[0].text());
+        }
+    REQUIRE(out.size() == 2);
+    REQUIRE(out[0] == "VAL1");
+    REQUIRE(out[1] == "AFTER");
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[0] == mainf);
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
+          "[preprocessor][pragma_once][instances]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+    const std::string inc = "po_once_instance.inc";
+    {
+        std::ofstream o(inc);
+        REQUIRE(o.is_open());
+        o << "PRAGMA ONCE\nDATA\n";
+    }
+    {
+        Preprocessor p1;
+        p1.push_file(inc);
+        TokensLine l;
+        std::vector<std::string> v;
+        while (p1.next_line(l)) if (!l.tokens().empty()) {
+                v.push_back(l.tokens()[0].text());
+            }
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == "DATA");
+    }
+    {
+        Preprocessor p2;
+        p2.push_file(inc);
+        TokensLine l;
+        std::vector<std::string> v;
+        while (p2.next_line(l)) if (!l.tokens().empty()) {
+                v.push_back(l.tokens()[0].text());
+            }
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == "DATA");
+    }
+    std::remove(inc.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
+          "[preprocessor][pragma_once][absent]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+    const std::string inc = "po_no_once.inc";
+    const std::string mainf = "po_no_once_main.asm";
+    {
+        std::ofstream o(inc);
+        REQUIRE(o.is_open());
+        o << "VALX\n";
+    }
+    {
+        std::ofstream o(mainf);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inc << "\"\n#include \"" << inc << "\"\n";
+    }
+    Preprocessor pp;
+    pp.push_file(mainf);
+    TokensLine l;
+    std::vector<std::string> v;
+    while (pp.next_line(l)) if (!l.tokens().empty()) {
+            v.push_back(l.tokens()[0].text());
+        }
+    REQUIRE(v.size() == 2);
+    REQUIRE(v[0] == "VALX");
+    REQUIRE(v[1] == "VALX");
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
+          "[preprocessor][pragma_once][nested]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+    const std::string inner = "po_inner_once.inc";
+    const std::string outer = "po_outer_once.asm";
+    {
+        std::ofstream o(inner);
+        REQUIRE(o.is_open());
+        o << "PRAGMA ONCE\nINNER_LINE\n";
+    }
+    {
+        std::ofstream o(outer);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inner << "\"\n#include \"" << inner <<
+          "\"\nAFTER_OUTER\n";
+    }
+    Preprocessor pp;
+    pp.push_file(outer);
+    TokensLine l;
+    std::vector<std::string> v;
+    while (pp.next_line(l)) if (!l.tokens().empty()) {
+            v.push_back(l.tokens()[0].text());
+        }
+    REQUIRE(v.size() == 2);
+    REQUIRE(v[0] == "INNER_LINE");
+    REQUIRE(v[1] == "AFTER_OUTER");
+    std::remove(inner.c_str());
+    std::remove(outer.c_str());
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: PRAGMA ONCE trailing tokens error",
+          "[preprocessor][pragma_once][error][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+    pp.push_virtual_file("PRAGMA ONCE extra\n", "po_trailing", 1, true);
+    TokensLine l;
+    while (pp.next_line(l)) {} REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unexpected token") !=
+            std::string::npos);
+}

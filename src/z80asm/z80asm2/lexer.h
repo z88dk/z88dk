@@ -146,12 +146,12 @@ public:
     const std::string& get_line(unsigned index) const;
     unsigned tok_lines_count() const;
     const TokensLine& get_tok_line(unsigned index) const;
-    const std::vector<std::string> text_lines() const {
-        return text_lines_;
-    }
-    const std::vector<TokensLine> tok_lines() const {
-        return tok_lines_;
-    }
+    const std::vector<std::string> text_lines() const;
+    const std::vector<TokensLine> tok_lines() const;
+
+    // PRAGMA ONCE support
+    bool has_pragma_once() const;
+    void set_has_pragma_once(bool v = true);
 
 private:
     std::string filename_;
@@ -159,6 +159,7 @@ private:
     bool inc_line_nums_ = true;
     std::vector<std::string> text_lines_;
     std::vector<TokensLine> tok_lines_;
+    bool has_pragma_once_ = false; // set true when PRAGMA ONCE seen in this file
 
     void split_lines(const char*& p);
     void tokenize(const std::string& content);
