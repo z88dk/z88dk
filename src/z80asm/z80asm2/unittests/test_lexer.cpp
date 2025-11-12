@@ -852,7 +852,7 @@ TEST_CASE("TokensFile get_tok_line out-of-range returns empty TokensLine",
     const TokensLine& out = tf.get_tok_line(99);
     REQUIRE(out.empty());
     // out.tokens() should be empty
-    REQUIRE(out.tokens().empty());
+    REQUIRE(out.empty());
 }
 
 // New tests: verify identifier forms '@ident', 'ident@ident' and 'ident' (C identifier rules)

@@ -153,13 +153,23 @@ public:
     bool has_pragma_once() const;
     void set_has_pragma_once(bool v = true);
 
+    // IFNDEF/DEFINE guard support
+    bool has_ifndef_guard() const;
+    void set_has_ifndef_guard(bool v = true);
+    const std::string& ifndef_guard_symbol() const;
+    void set_ifndef_guard_symbol(const std::string& symbol);
+
 private:
     std::string filename_;
     int first_line_num_ = 1;
     bool inc_line_nums_ = true;
     std::vector<std::string> text_lines_;
     std::vector<TokensLine> tok_lines_;
-    bool has_pragma_once_ = false; // set true when PRAGMA ONCE seen in this file
+    // set true when PRAGMA ONCE seen in this file
+    bool has_pragma_once_ = false;
+    // set true when IFNDEF/DEFINE guard seen in this file
+    bool has_ifndef_guard_ = false;
+    std::string ifndef_guard_symbol_;
 
     void split_lines(const char*& p);
     void tokenize(const std::string& content);
