@@ -28,6 +28,7 @@ void Preprocessor::clear() {
     macros_.clear();
     if_stack_.clear();
     dep_files_.clear(); // also reset collected dependencies
+    included_once_.clear(); // reset per-instance included-once tracking
 }
 
 void Preprocessor::clear_file_cache() {
@@ -37,6 +38,19 @@ void Preprocessor::clear_file_cache() {
 void Preprocessor::push_file(const std::string& filename) {
     // Normalize the path to ensure consistent filenames in locations
     std::string normalized_filename = normalize_path(filename);
+
+    // Absolute path for cache key
+    std::string abs_path = absolute_path(normalized_filename);
+
+    // If file cached with pragma_once and already included in this instance, skip
+    auto cit = file_cache_.find(abs_path);
+    if (cit != file_cache_.end() &&
+            cit->second.tokens_file->has_pragma_once() &&
+            included_once_.find(abs_path) != included_once_.end()) {
+        // Record dependency even when skipped
+        dep_files_.push_back(normalized_filename);
+        return; // skip include entirely
+    }
 
     // Check if this file is already on the stack (recursive include detection)
     for (const File& f : file_stack_) {
@@ -59,6 +73,9 @@ void Preprocessor::push_file(const std::string& filename) {
 
     // Record dependency (keep order, allow duplicates)
     dep_files_.push_back(normalized_filename);
+
+    // Track inclusion for pragma once logic
+    included_once_.insert(abs_path);
 
     // Take ownership via shared_ptr
     File f;
@@ -803,6 +820,9 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
         break;
     case Keyword::EQU:
         process_equ(line, i);
+        break;
+    case Keyword::PRAGMA:
+        process_pragma(line, i);
         break;
     case Keyword::ENDM:
         g_errors.error(ErrorCode::InvalidSyntax,
@@ -2127,6 +2147,22 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
     }
     // Validate no trailing tokens
     expect_end(line, i);
+}
+
+void Preprocessor::process_pragma(const TokensLine& line, unsigned& i) {
+    line.skip_spaces(i);
+    if (i < line.size() && line[i].is(Keyword::ONCE)) {
+        ++i;
+        expect_end(line, i);
+        if (!file_stack_.empty()) {
+            File& top = file_stack_.back();
+            top.tokens_file->set_has_pragma_once();
+        }
+    }
+    else {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Unknown pragma directive");
+    }
 }
 
 // Replace strings by comma-separated integers
