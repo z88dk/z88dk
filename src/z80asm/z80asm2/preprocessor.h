@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <ctime>
 
@@ -130,6 +131,9 @@ private:
 
     // Makefile dependency collection (order-preserving, duplicates allowed)
     std::vector<std::string> dep_files_;
+
+    // Set of absolute paths this Preprocessor instance has already included.
+    std::unordered_set<std::string> included_once_;
 
 
     // Fetch a line from the input file, or file_input_queue_ if not empty.
@@ -276,6 +280,9 @@ private:
     void process_local(const TokensLine& line, unsigned& i,
                        std::vector<std::string>& out_locals);
 
+    // PRAGMA
+    void process_pragma(const TokensLine& line, unsigned& i);
+
     // Macro expansion and line splitting
     // Replace string tokens by comma-separated integers.
     // Returns true if any change was made; the (possibly) transformed line is written to 'out'.
@@ -284,9 +291,10 @@ private:
     bool merge_double_hash(const TokensLine& line, TokensLine& out);
 
     // expand_macros helpers
-    bool is_macro_call(const TokensLine& in_line, unsigned idx,
-                       const Macro& macro,
-                       unsigned& args_start_idx) const;
+    bool is_macro_call(
+        const TokensLine& in_line, unsigned idx,
+        const Macro& macro,
+        unsigned& args_start_idx) const;
     bool parse_and_expand_macro_args(
         const TokensLine& in_line,
         unsigned args_start_idx,
@@ -304,7 +312,6 @@ private:
         const std::vector<std::vector<TokensLine>>& expanded_args_flat,
         const std::vector<TokensLine>& original_args,
         std::vector<TokensLine>& out_expanded);
-
     void append_expansion_into_out(
         const std::vector<TokensLine>& further_expanded,
         TokensLine& out,
