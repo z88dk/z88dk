@@ -18,6 +18,7 @@ static const std::string copyright =
     "Copyright (C) Paulo Custodio, 2011-2025\n";
 
 static const std::string asm_extension = ".asm";
+static const std::string d_extension = ".d";
 static const std::string o_extension = ".o";
 static const std::string m4_extension = ".m4";
 static const std::string perl_extension = ".pl";
@@ -35,11 +36,12 @@ void exit_show_usage(int exit_code) {
             << "Options:\n"
             // #-------#-------#-------#-------#-------#-------#-------#-------#
             << "  -d           Do not assemble if .o is newer\n"
-            << "  -E           Only run the preprocessor\n"
+            << "  -E           Only run the preprocessor, generate file.i\n"
             << "  -h           Show this screen\n"
             << "  -Ipath       Add path to search for source/include files\n"
             << "  -IXIY        Swap IX and IY registers\n"
             << "  -m4OPTS      Options when calling m4\n"
+            << "  -MD          Generate Makefile dependency file.d\n"
             << "  -perlOPTS    Options when calling perl\n"
             << "  -ucase       Convert labels to uppercase\n"
             << "  -v           Enable verbose output\n"
@@ -98,6 +100,10 @@ static std::string prepend_output_dir(const std::string& filename) {
 
 std::string get_asm_filename(const std::string& filename) {
     return replace_extension(filename, asm_extension);
+}
+
+std::string get_d_filename(const std::string& filename) {
+    return replace_extension(filename, d_extension);
 }
 
 std::string get_o_filename(const std::string& filename) {

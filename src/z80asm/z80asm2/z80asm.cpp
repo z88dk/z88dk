@@ -67,6 +67,14 @@ int main(int argc, char* argv[]) {
                     exit_invalid_option(arg);
                 }
                 break;
+            case 'M':
+                if (arg == "-MD") {
+                    g_options.gen_dependencies = true;
+                }
+                else {
+                    exit_invalid_option(arg);
+                }
+                break;
             case 'O':
                 if (is_option_arg(arg, "-O", option_arg)) {
                     g_options.output_dir = option_arg;
@@ -148,7 +156,7 @@ int main(int argc, char* argv[]) {
 
     // execute requested actions
     if (g_options.preprocess_only) {
-        //preprocess_only();
+        preprocess_only();
     }
     else {
         g_errors.error(ErrorCode::UnknownInstruction,

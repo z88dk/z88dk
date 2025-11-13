@@ -117,13 +117,29 @@ main_loop:
             return;
         }
 
-        '\\' ws* end {
-            Token t(TokenType::Whitespace, " ");
-            output.push_back(t);
+        '\\' {
+            const char* q = p;
+            while (*q && isspace(static_cast<unsigned char>(*q))) {
+                ++q;
+            }
+            if (*q == '\0') {
+                // line continuation
+                Token t(TokenType::Whitespace, " ");
+                output.push_back(t);
 
-            p = text_lines_[line_index].c_str();
-            pe = p + text_lines_[line_index].size();
-            continue;
+                ++line_index;
+                if (line_index >= line_count()) {
+                    return;
+                }
+                p = text_lines_[line_index].c_str();
+                pe = p + text_lines_[line_index].size();
+                continue;
+            }
+            else {
+                // not a line continuation
+                PUSH_TOKEN1(TokenType::Backslash);
+                continue;
+            }
         }
 
         $       { goto eof; }
@@ -156,7 +172,6 @@ main_loop:
         }
 
         ws+     { PUSH_TOKEN1(TokenType::Whitespace); continue; }
-        '\\'    { PUSH_TOKEN1(TokenType::Backslash); continue; }
         '('		{ PUSH_TOKEN1(TokenType::LeftParen); continue; }
         ')'		{ PUSH_TOKEN1(TokenType::RightParen); continue; }
         ','		{ PUSH_TOKEN1(TokenType::Comma); continue; }
