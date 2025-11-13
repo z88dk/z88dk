@@ -64,6 +64,14 @@ public:
     // Clears the collected dependency filenames.
     void clear_dependencies();
 
+    // preprocess one file and generate dependency information
+    static void preprocess_file(
+        const std::string& input_filename,
+        const std::string& output_filename,
+        bool gen_dependency);
+
+    void generate_dependency_file();
+
 private:
     static const inline int MAX_MACRO_RECURSION = 32;
 
@@ -139,6 +147,10 @@ private:
     // Fetch a line from the input file, or file_input_queue_ if not empty.
     bool fetch_line(TokensLine& out);
     Location compute_location(const File& file, const TokensLine& out);
+
+    // collect segments from the input file
+    void collect_guard_segments(File& file, TokensLine& line,
+        unsigned& line_index, std::vector<TokensLine>& segments);
 
     // Pre-split a raw physical line into colon or backslahs-separated segments
     // Returns true if the line was split and segments were produced.
@@ -330,3 +342,6 @@ private:
     // #ifndef/#define detector
     bool detect_ifndef_guard(File& file, std::string& out_symbol);
 };
+
+// called when command line -E is given
+void preprocess_only();
