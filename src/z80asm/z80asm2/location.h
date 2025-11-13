@@ -19,6 +19,7 @@ public:
 
     void set_filename(const std::string& filename);
     void set_line_num(int line_num);
+    void inc_line_num();
 
 private:
     std::string filename_;

@@ -34,3 +34,7 @@ void Location::set_filename(const std::string& filename) {
 void Location::set_line_num(int line_num) {
     line_num_ = line_num;
 }
+
+void Location::inc_line_num() {
+    line_num_++;
+}

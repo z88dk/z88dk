@@ -36,9 +36,9 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 1 "$test.asm"
+#line 1, "$test.asm"
 LD BEFORE,1
-#line 2 "$test.inc"
+#line 2, "$test.inc"
 LD A,42
 
 
@@ -52,9 +52,9 @@ LD H,5
 LD L,6
 #line 10
 LD HL,7
-#line 3 "$test.asm"
+#line 3, "$test.asm"
 LD BEFORE,2
-#line 2 "$test.inc"
+#line 2, "$test.inc"
 LD A,42
 
 
@@ -68,9 +68,9 @@ LD H,5
 LD L,6
 #line 10
 LD HL,7
-#line 5 "$test.asm"
+#line 5, "$test.asm"
 LD BEFORE,3
-#line 2 "$test.inc"
+#line 2, "$test.inc"
 LD A,42
 
 
@@ -84,7 +84,7 @@ LD H,5
 LD L,6
 #line 10
 LD HL,7
-#line 7 "$test.asm"
+#line 7, "$test.asm"
 LD BEFORE,4
 END
 
