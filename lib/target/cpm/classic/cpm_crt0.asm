@@ -76,7 +76,7 @@ start:
 IF !DEFINED_noprotectmsdos
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
-	jp	begin-start+$100
+	jp	begin-start+CRT_ORG_CODE
 	defb	$b4,$09		;DOS protection... MOV AH,9
 	defb	$ba
 	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
