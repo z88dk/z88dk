@@ -9,6 +9,7 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 spew("$test.inc", <<END);
+#undef FOO
 #define FOO 42 /*comment*/
 LD A,/*
 
@@ -38,8 +39,8 @@ END
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 LD BEFORE,1
-#line 2, "$test.inc"
-LD A,42
+#line 3, "$test.inc"
+LD A, 42
 
 
 
@@ -48,14 +49,14 @@ LD C,3
 LD D, 4
 
 LD H,5
-#line 10
+#line 11
 LD L,6
-#line 10
+#line 11
 LD HL,7
 #line 3, "$test.asm"
 LD BEFORE,2
-#line 2, "$test.inc"
-LD A,42
+#line 3, "$test.inc"
+LD A, 42
 
 
 
@@ -64,14 +65,14 @@ LD C,3
 LD D, 4
 
 LD H,5
-#line 10
+#line 11
 LD L,6
-#line 10
+#line 11
 LD HL,7
 #line 5, "$test.asm"
 LD BEFORE,3
-#line 2, "$test.inc"
-LD A,42
+#line 3, "$test.inc"
+LD A, 42
 
 
 
@@ -80,9 +81,9 @@ LD C,3
 LD D, 4
 
 LD H,5
-#line 10
+#line 11
 LD L,6
-#line 10
+#line 11
 LD HL,7
 #line 7, "$test.asm"
 LD BEFORE,4

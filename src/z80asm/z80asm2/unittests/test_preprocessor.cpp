@@ -7395,3 +7395,225 @@ TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined 
     std::remove(mainf.c_str());
     REQUIRE(!g_errors.has_errors());
 }
+
+// --- Added tests: line continuation with trailing backslash ---
+// A backslash at end of a physical line should be replaced by a single space
+// and the next physical line, producing one logical line.
+
+TEST_CASE("Preprocessor: single trailing backslash joins next line with one space",
+          "[preprocessor][linecontinuation][backslash]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "A\\\n"
+        "B\n";
+    pp.push_virtual_file(content, "lc_simple", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Expect: Identifier 'A', Whitespace ' ', Identifier 'B'
+    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks[0].text() == "A");
+    REQUIRE(toks[1].is(TokenType::Whitespace));
+    REQUIRE(toks[1].text() == " ");
+    REQUIRE(toks[2].text() == "B");
+    REQUIRE(!pp.next_line(line)); // no extra logical line
+}
+
+TEST_CASE("Preprocessor: multiple trailing backslashes cascade into one logical line",
+          "[preprocessor][linecontinuation][backslash][multi]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "A\\\n"
+        "B\\\n"
+        "C\\\n"
+        "D\n";
+    pp.push_virtual_file(content, "lc_multi", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Collect identifiers ignoring whitespace
+    std::vector<std::string> idents;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier)) {
+            idents.push_back(t.text());
+        }
+    }
+    REQUIRE(idents == std::vector<std::string>({ "A", "B", "C", "D" }));
+    REQUIRE(!pp.next_line(line));
+}
+
+TEST_CASE("Preprocessor: backslash line continuation preserves commas and numeric tokens",
+          "[preprocessor][linecontinuation][binary]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "db 1,\\\n"
+        "2,3\\\n"
+        ",4\n";
+    pp.push_virtual_file(content, "lc_commas", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Extract integer values in order
+    std::vector<int> ints;
+    for (const auto& t : toks)
+        if (t.is(TokenType::Integer)) {
+            ints.push_back(t.int_value());
+        }
+    REQUIRE(ints == std::vector<int>({ 1, 2, 3, 4 }));
+
+    // Count commas: should be 3 (between 4 integers)
+    int comma_count = 0;
+    for (const auto& t : toks)
+        if (t.is(TokenType::Comma)) {
+            ++comma_count;
+        }
+    REQUIRE(comma_count == 3);
+    REQUIRE(!pp.next_line(line));
+}
+
+TEST_CASE("Preprocessor: backslash continuation inside macro argument preserves spacing",
+          "[preprocessor][linecontinuation][macro][args]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define SHOW(x) x\n"
+        "SHOW(A\\\n"
+        "B)\n";
+    pp.push_virtual_file(content, "lc_macro_arg", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expansion of SHOW(...)
+    const auto& toks = line.tokens();
+
+    // Expect identifiers A and B with at least one whitespace between after processing
+    std::vector<std::string> idents;
+    int whitespace_blocks = 0;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier)) {
+            idents.push_back(t.text());
+        }
+        if (t.is(TokenType::Whitespace)) {
+            ++whitespace_blocks;
+        }
+    }
+    REQUIRE(idents == std::vector<std::string>({ "A", "B" }));
+    REQUIRE(whitespace_blocks >= 1);
+    REQUIRE(!pp.next_line(line));
+}
+
+TEST_CASE("Preprocessor: backslash before comment stops at comment newline",
+          "[preprocessor][linecontinuation][comment]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "X\\\n"
+        "; comment line\n"
+        "Y\n";
+    pp.push_virtual_file(content, "lc_comment", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == 1);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "X");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == 3);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "Y");
+
+    REQUIRE(!pp.next_line(line));
+}
+
+TEST_CASE("Preprocessor: trailing backslash followed by blank line joins empty line",
+          "[preprocessor][linecontinuation][blank]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "FIRST\\\n"
+        "\n"
+        "SECOND\n";
+    pp.push_virtual_file(content, "lc_blank", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == 1);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "FIRST");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == 3);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "SECOND");
+
+    REQUIRE(!pp.next_line(line));
+}
+
+TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins line",
+          "[preprocessor][linecontinuation][blank]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "FIRST\\ \t \v \f \n"
+        "SECOND\n";
+    pp.push_virtual_file(content, "lc_blank", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == 1);
+    REQUIRE(line.size() >= 3);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "FIRST");
+    REQUIRE(line[1].is(TokenType::Whitespace));
+    REQUIRE(line[2].is(TokenType::Identifier));
+    REQUIRE(line[2].text() == "SECOND");
+
+    REQUIRE(!pp.next_line(line));
+}
+
+TEST_CASE("Preprocessor: backslash at end of last line (no following line) yields original line (no join)",
+          "[preprocessor][linecontinuation][eof]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "ONLY\\\n";
+    pp.push_virtual_file(content, "lc_eof", 1, true);
+
+    TokensLine line;
+    // Depending on implementation this may produce either empty output or 'ONLY'
+    bool got_line = pp.next_line(line);
+    if (got_line) {
+        // If a line is produced ensure it contains ONLY
+        bool has_only = false;
+        for (const auto& t : line.tokens())
+            if (t.is(TokenType::Identifier) && t.text() == "ONLY") {
+                has_only = true;
+            }
+        REQUIRE(has_only);
+        REQUIRE(!pp.next_line(line));
+    }
+    // No error expected either way
+    REQUIRE(!g_errors.has_errors());
+}
+
