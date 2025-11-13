@@ -23,7 +23,11 @@ bool str_ends_with(const std::string& str, const std::string& ending);
 bool str_starts_with(const std::string& str, const std::string& beginning);
 
 // convert string to C-style escaped string
-std::string escape_string(const std::string& s);
+std::string escape_c_string(const std::string& s);
+
+// convert C-style escaped string back to raw bytes
+// (accepts with or without surrounding quotes)
+std::string unescape_c_string(const std::string& s);
 
 // convert string to int of given base (2..36), returns false on error
 bool parse_int_from_chars(const std::string& s, int base, int& out);

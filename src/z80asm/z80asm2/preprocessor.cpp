@@ -358,7 +358,8 @@ void Preprocessor::clear_dependencies() {
     dep_files_.clear();
 }
 
-void Preprocessor::preprocess_file(const std::string& input_filename, const std::string& output_filename, bool gen_dependency) {
+void Preprocessor::preprocess_file(const std::string& input_filename,
+                                   const std::string& output_filename, bool gen_dependency) {
     Preprocessor pp;
 
     pp.push_file(input_filename);
@@ -396,16 +397,18 @@ void Preprocessor::preprocess_file(const std::string& input_filename, const std:
         location.inc_line_num();
     }
 
-    if (gen_dependency)
+    if (gen_dependency) {
         pp.generate_dependency_file();
+    }
 }
 
 void Preprocessor::generate_dependency_file() {
     const unsigned LINE_WIDTH = 80;
 
     std::vector<std::string> deps = dependency_filenames();
-    if (deps.empty())
+    if (deps.empty()) {
         return;
+    }
 
     // get main source file
     std::string target = deps.front();
@@ -1327,7 +1330,7 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     //    If it parses successfully AND consumes the whole body, define <name>
     //    as the resulting integer. Otherwise, define <name> as the whole expanded body.
     int value = 0;
-    if (eval_const_expr(expr_tokens, value, false)) {
+    if (eval_const_expr(expr_tokens, value, true)) {
         body.clear_tokens();
         body.push_back(Token(TokenType::Integer, std::to_string(value), value));
     }
@@ -1460,7 +1463,8 @@ Location Preprocessor::compute_location(const File& file,
     return loc;
 }
 
-void Preprocessor::collect_guard_segments(File& file, TokensLine& line, unsigned& line_index, std::vector<TokensLine>& segments) {
+void Preprocessor::collect_guard_segments(File& file, TokensLine& line,
+        unsigned& line_index, std::vector<TokensLine>& segments) {
     while (segments.empty() && line_index < file.tokens_file->tok_lines_count()) {
         line = file.tokens_file->get_tok_line(line_index++);
         line.trim();
@@ -2540,7 +2544,7 @@ bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
             }
 
             // Escape and quote
-            std::string escaped = escape_string(joined);
+            std::string escaped = escape_c_string(joined);
             std::string quoted_text = std::string("\"") + escaped + std::string("\"");
 
             // Create a string token: text with quotes/escapes, string_value as unescaped joined
@@ -2963,7 +2967,7 @@ void preprocess_only() {
         if (is_o_filename(asm_filename)) {
             if (g_options.verbose) {
                 std::cout << "Skipping preprocessing for object file: "
-                    << asm_filename << std::endl;
+                          << asm_filename << std::endl;
             }
         }
         else {
@@ -2971,7 +2975,7 @@ void preprocess_only() {
 
             if (g_options.verbose) {
                 std::cout << "Preprocessing file: " << asm_filename
-                    << " -> " << i_filename << std::endl;
+                          << " -> " << i_filename << std::endl;
             }
 
             Preprocessor pp;

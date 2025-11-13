@@ -52,9 +52,6 @@ test:: $(TEST_BINS)
 		./$$test || exit 1; \
 	done
 
-x:
-	echo $(COMMON_OBJS)
-
 $(TEST_DIR)/test_%$(EXE): $(TEST_DIR)/test_%.o $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
@@ -77,6 +74,7 @@ cloc:
 clean:
 	$(RM) $(PROJ) $(PROJ)$(EXE) $(TEST_BINS) $(OBJS) $(DEPENDS) \
 		  $(wildcard *.o *.d *.i *.exe *.orig *.core *.bak *~) \
-		  $(wildcard $(TEST_DIR)/*.o $(TEST_DIR)/*.d $(TEST_DIR)/*.i $(TEST_DIR)/*.exe $(TEST_DIR)/*.orig $(TEST_DIR)/*.core $(TEST_DIR)/*.bak $(TEST_DIR)/*~)
+		  $(wildcard $(TEST_DIR)/*.o $(TEST_DIR)/*.d $(TEST_DIR)/*.i $(TEST_DIR)/*.exe $(TEST_DIR)/*.orig $(TEST_DIR)/*.core $(TEST_DIR)/*.bak $(TEST_DIR)/*~) \
+		  $(wildcard t/*.o t/*.d t/*.i t/*.exe t/*.orig t/*.core t/*.bak t/*~)
 
 -include $(DEPENDS)

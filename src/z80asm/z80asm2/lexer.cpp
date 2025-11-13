@@ -11,8 +11,31 @@
 
 Token::Token(TokenType type, const std::string& text)
     : type_(type), text_(text) {
-    if (type == TokenType::Identifier) {
+    switch (type) {
+    case TokenType::Identifier:
         keyword_ = keyword_lookup(text);
+        break;
+    case TokenType::Integer: {
+        size_t pos = 0;
+        int_value_ = std::stoi(text, &pos);
+        if (pos != text.size()) {
+            throw std::invalid_argument("Trailing chars in integer: " + text);
+        }
+        break;
+    }
+    case TokenType::Float: {
+        size_t pos = 0;
+        float_value_ = std::stod(text, &pos);
+        if (pos != text.size()) {
+            throw std::invalid_argument("Trailing chars in float: " + text);
+        }
+        break;
+    }
+    case TokenType::String:
+        string_value_ = unescape_c_string(text);
+        break;
+    default:
+        ;
     }
 }
 
@@ -196,7 +219,7 @@ std::string TokensLine::to_string() const {
             out += std::to_string(tok.int_value());
             break;
         default:
-	        out += tok.text();
+            out += tok.text();
             break;
         }
     }
@@ -406,6 +429,7 @@ void TokensFile::tokenize(const std::string& content) {
         // and multi-line comments
         TokensLine tok_line(location);
         tokenize_line(i, tok_line);
+        tok_line.trim();
         if (!tok_line.empty()) {
             tok_lines_.push_back(std::move(tok_line));
         }
