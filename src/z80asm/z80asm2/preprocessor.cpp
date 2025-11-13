@@ -358,6 +358,90 @@ void Preprocessor::clear_dependencies() {
     dep_files_.clear();
 }
 
+void Preprocessor::preprocess_file(const std::string& input_filename, const std::string& output_filename, bool gen_dependency) {
+    Preprocessor pp;
+
+    pp.push_file(input_filename);
+
+    std::ofstream ofs(output_filename, std::ios::out | std::ios::binary);
+    if (!ofs) {
+        g_errors.error(ErrorCode::FileOpenError, output_filename);
+        return;
+    }
+
+    Location location;
+    TokensLine line;
+    while (pp.next_line(line)) {
+        if (g_errors.filename() != location.filename()) {
+            // filename changed (e.g. due to #include)
+            location.set_filename(g_errors.filename());
+            location.set_line_num(g_errors.line_num());
+            ofs << "#line " << location.line_num() << ", \"" << location.filename() << "\""
+                << std::endl;
+        }
+        else if (g_errors.line_num() < location.line_num()) {
+            // Line number decreased (e.g. due to #line directive)
+            location.set_line_num(g_errors.line_num());
+            ofs << "#line " << location.line_num() << std::endl;
+        }
+        else {
+            // Normal line increment
+            while (g_errors.line_num() > location.line_num()) {
+                ofs << std::endl;
+                location.inc_line_num();
+            }
+            location.set_line_num(g_errors.line_num());
+        }
+        ofs << line.to_string() << std::endl;
+        location.inc_line_num();
+    }
+
+    if (gen_dependency)
+        pp.generate_dependency_file();
+}
+
+void Preprocessor::generate_dependency_file() {
+    const unsigned LINE_WIDTH = 80;
+
+    std::vector<std::string> deps = dependency_filenames();
+    if (deps.empty())
+        return;
+
+    // get main source file
+    std::string target = deps.front();
+
+    // get dependency file name and target file name
+    std::string d_filename = get_d_filename(target);
+    std::string o_filename = get_o_filename(target);
+
+    // generate dependency file
+    std::ofstream ofs(d_filename, std::ios::out | std::ios::binary);
+    if (!ofs) {
+        g_errors.error(ErrorCode::FileOpenError, d_filename);
+        return;
+    }
+
+    if (g_options.verbose) {
+        std::cout << "Generating dependency file: " << d_filename << std::endl;
+    }
+
+    // output file names
+    size_t pos = 0;
+    ofs << o_filename << ":";
+    pos += o_filename.size() + 1;
+
+    for (auto& f : deps) {
+        if (pos + f.size() + 1 + 2 >= LINE_WIDTH) { // +2: account for space-backslash
+            pos = 7;
+            ofs << " \\" << std::endl << std::string(pos, ' ');
+        }
+
+        ofs << " " << f;
+        pos += f.size() + 1;
+    }
+    ofs << std::endl;
+}
+
 void Preprocessor::expect_end(const TokensLine& line, unsigned i) const {
     if (!line.at_end(i)) {
         g_errors.error(ErrorCode::InvalidSyntax,
@@ -1374,6 +1458,20 @@ Location Preprocessor::compute_location(const File& file,
     }
 
     return loc;
+}
+
+void Preprocessor::collect_guard_segments(File& file, TokensLine& line, unsigned& line_index, std::vector<TokensLine>& segments) {
+    while (segments.empty() && line_index < file.tokens_file->tok_lines_count()) {
+        line = file.tokens_file->get_tok_line(line_index++);
+        line.trim();
+        if (line.empty()) {
+            continue;
+        }
+        split_line(line, segments);
+        while (!segments.empty() && segments.front().empty()) {
+            segments.erase(segments.begin());
+        }
+    }
 }
 
 bool Preprocessor::split_line(const TokensLine& line,
@@ -2814,24 +2912,8 @@ bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     std::string ifndef_name, define_name;
     std::vector<TokensLine> segments;
 
-    // Lambda to fill 'segments' from subsequent non-empty physical lines.
-    auto fill_segments = [&]() {
-        while (segments.empty() &&
-                line_index < file.tokens_file->tok_lines_count()) {
-            line = file.tokens_file->get_tok_line(line_index++);
-            line.trim();
-            if (line.empty()) {
-                continue;
-            }
-            split_line(line, segments);
-            while (!segments.empty() && segments.front().empty()) {
-                segments.erase(segments.begin());
-            }
-        }
-    };
-
     // Read first line and split into segments
-    fill_segments();
+    collect_guard_segments(file, line, line_index, segments);
     if (segments.empty()) {
         return false;
     }
@@ -2850,7 +2932,7 @@ bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     segments.erase(segments.begin());
 
     // Read second line or second segment of first line
-    fill_segments();
+    collect_guard_segments(file, line, line_index, segments);
     if (segments.empty()) {
         return false;
     }
@@ -2874,4 +2956,26 @@ bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     // found #ifndef/#define
     out_symbol = define_name;
     return true;
+}
+
+void preprocess_only() {
+    for (auto& asm_filename : g_input_files) {
+        if (is_o_filename(asm_filename)) {
+            if (g_options.verbose) {
+                std::cout << "Skipping preprocessing for object file: "
+                    << asm_filename << std::endl;
+            }
+        }
+        else {
+            std::string i_filename = get_i_filename(asm_filename);
+
+            if (g_options.verbose) {
+                std::cout << "Preprocessing file: " << asm_filename
+                    << " -> " << i_filename << std::endl;
+            }
+
+            Preprocessor pp;
+            pp.preprocess_file(asm_filename, i_filename, g_options.gen_dependencies);
+        }
+    }
 }
