@@ -30,6 +30,8 @@
     PUBLIC    __Exit		;jumped to by exit()
     PUBLIC    l_dcal		;jp(hl)
 
+    PUBLIC    __cpm_base_address
+
     defc    TAR__clib_exit_stack_size = 32
     ; Set sp to be &bdos, this sorts out CP/M 3 compatibility
     defc    TAR__register_sp = -6
@@ -38,6 +40,8 @@
     IF !DEFINED_CRT_ORG_CODE
         defc    CRT_ORG_CODE  = $100
     ENDIF
+
+    defc    __cpm_base_address = CRT_ORG_CODE - $100
 
     IF !DEFINED_CLIB_OPEN_MAX
         defc    DEFINED_CLIB_OPEN_MAX = 1
