@@ -51,7 +51,8 @@ LD A,5
 END
 
 check_text_file("$test.d", <<END);
-$test.o: $test.asm $test.1.inc $test.2.inc $test.3.inc $test.4.inc
+$test.o: $test.asm $test.1.inc \\
+        $test.2.inc $test.3.inc $test.4.inc
 END
 
 unlink_testfiles if Test::More->builder->is_passing;
