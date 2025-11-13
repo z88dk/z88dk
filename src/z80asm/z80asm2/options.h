@@ -14,6 +14,7 @@ struct Options {
     bool preprocess_only = false;
     bool swap_ix_iy = false;
     bool date_stamp = false;
+    bool gen_dependencies = false;
     std::string m4_options;
     std::string perl_options;
     std::string output_dir;
@@ -29,6 +30,7 @@ void exit_invalid_option(const std::string& option);
 
 // manipulate filenames and paths
 std::string get_asm_filename(const std::string& filename);
+std::string get_d_filename(const std::string& filename);
 std::string get_o_filename(const std::string& filename);
 std::string get_i_filename(const std::string& filename);
 
