@@ -124,13 +124,16 @@
     <None Include="..\..\src\z80asm\z80asm2\t\depends.t">
       <Filter>Resource Files\t</Filter>
     </None>
-    <None Include="..\..\src\z80asm\z80asm2\t\preproc.t">
-      <Filter>Resource Files\t</Filter>
-    </None>
     <None Include="..\..\src\z80asm\z80asm2\t\search_source_file.t">
       <Filter>Resource Files\t</Filter>
     </None>
     <None Include="..\..\src\z80asm\z80asm2\t\template.t">
+      <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\preprocessor.t">
+      <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\testlib.pl">
       <Filter>Resource Files\t</Filter>
     </None>
   </ItemGroup>

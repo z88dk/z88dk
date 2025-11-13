@@ -150,7 +150,7 @@ private:
 
     // collect segments from the input file
     void collect_guard_segments(File& file, TokensLine& line,
-        unsigned& line_index, std::vector<TokensLine>& segments);
+                                unsigned& line_index, std::vector<TokensLine>& segments);
 
     // Pre-split a raw physical line into colon or backslahs-separated segments
     // Returns true if the line was split and segments were produced.

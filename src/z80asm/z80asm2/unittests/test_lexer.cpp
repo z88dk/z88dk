@@ -963,7 +963,7 @@ TEST_CASE("Lexer collapses multiple whitespace runs each to one Whitespace token
     REQUIRE(toks[6].text() == "D");
 }
 
-TEST_CASE("Lexer collapses leading and trailing whitespace runs to single tokens",
+TEST_CASE("Lexer trims leading and trailing whitespace runs",
           "[lexer][whitespace][edges]") {
     g_options = Options();
 
@@ -975,13 +975,9 @@ TEST_CASE("Lexer collapses leading and trailing whitespace runs to single tokens
     const auto& toks = tf.get_tok_line(0).tokens();
 
     // Expect: WS, A, WS
-    REQUIRE(toks.size() == 3);
-    REQUIRE(toks[0].is(TokenType::Whitespace));
-
-    REQUIRE(toks[1].is(TokenType::Identifier));
-    REQUIRE(toks[1].text() == "A");
-
-    REQUIRE(toks[2].is(TokenType::Whitespace));
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "A");
 }
 
 // New tests: verify bitmask forms %"... and @ "..." are scanned into Integer with correct value
@@ -1619,3 +1615,121 @@ TEST_CASE("TokensLine trim removes whitespace and returns change status",
     changed = line.trim();
     REQUIRE(changed == false);
 }
+
+// New tests: direct Token::Token(TokenType, const std::string&) constructor behavior
+TEST_CASE("Token ctor infers keyword for Identifier and leaves others as None",
+          "[token][ctor][identifier]") {
+    // Known keyword (case-insensitive mapping performed in keyword_lookup)
+    Token t1(TokenType::Identifier, "define");
+    REQUIRE(t1.is(TokenType::Identifier));
+    REQUIRE(t1.is(Keyword::DEFINE));
+
+    // Non-keyword identifier
+    Token t2(TokenType::Identifier, "NotAKeyword123");
+    REQUIRE(t2.is(TokenType::Identifier));
+    REQUIRE(t2.is(Keyword::None));
+}
+
+TEST_CASE("Token ctor parses Integer text into int_value_",
+          "[token][ctor][integer]") {
+    Token t_dec(TokenType::Integer, "123");
+    REQUIRE(t_dec.is(TokenType::Integer));
+    REQUIRE(t_dec.int_value() == 123);
+    REQUIRE(t_dec.text() == "123");
+
+    Token t_neg(TokenType::Integer, "-45");
+    REQUIRE(t_neg.int_value() == -45);
+
+    // Leading/trailing spaces are not trimmed here; stoi will throw if invalid.
+    // Provide only well-formed numeric text.
+    Token t_zero(TokenType::Integer, "0");
+    REQUIRE(t_zero.int_value() == 0);
+}
+
+TEST_CASE("Token ctor parses Float text into float_value_",
+          "[token][ctor][float]") {
+    Token t_f1(TokenType::Float, "1.25");
+    REQUIRE(t_f1.is(TokenType::Float));
+    REQUIRE(t_f1.float_value() == Catch::Approx(1.25).epsilon(1e-12));
+
+    Token t_f2(TokenType::Float, "-0.5");
+    REQUIRE(t_f2.float_value() == Catch::Approx(-0.5).epsilon(1e-12));
+
+    Token t_f3(TokenType::Float, "123."); // trailing dot form
+    REQUIRE(t_f3.float_value() == Catch::Approx(123.0).epsilon(1e-12));
+}
+
+TEST_CASE("Token ctor unescapes String text into string_value_",
+          "[token][ctor][string]") {
+    // Raw source literal content (no surrounding quotes passed to constructor).
+    // lexer passes original text including escapes but without enclosing quotes for TokenType::String.
+    // Here we simulate that by giving an escaped interior; unescape_c_string should resolve it.
+    Token t_str(TokenType::String, "\\n\\tA\\x41\\101\\\"");
+    std::string expected;
+    expected.push_back('\n');
+    expected.push_back('\t');
+    expected.push_back('A');
+    expected.push_back('A');          // \x41
+    expected.push_back('A');          // \101
+    expected.push_back('\"');         // \"
+    REQUIRE(t_str.is(TokenType::String));
+    REQUIRE(t_str.string_value() == expected);
+
+    // Empty string
+    Token t_empty(TokenType::String, "");
+    REQUIRE(t_empty.string_value().empty());
+}
+
+TEST_CASE("Token ctor leaves unrelated fields at defaults for non-matching types",
+          "[token][ctor][defaults]") {
+    Token t_ws(TokenType::Whitespace, " ");
+    REQUIRE(t_ws.is(TokenType::Whitespace));
+    // Should not parse as integer/float/string/keyword
+    REQUIRE(t_ws.int_value() == 0);
+    REQUIRE(t_ws.float_value() == 0.0);
+    REQUIRE(t_ws.keyword() == Keyword::None);
+    REQUIRE(t_ws.string_value().empty());
+
+    Token t_plus(TokenType::Plus, "+");
+    REQUIRE(t_plus.is(TokenType::Plus));
+    REQUIRE(t_plus.int_value() == 0);
+    REQUIRE(t_plus.float_value() == 0.0);
+    REQUIRE(t_plus.keyword() == Keyword::None);
+    REQUIRE(t_plus.string_value().empty());
+}
+
+TEST_CASE("Token ctor preserves original text() for all types",
+          "[token][ctor][text]") {
+    std::vector<std::pair<TokenType, std::string>> samples = {
+        { TokenType::Identifier, "abc" },
+        { TokenType::Integer, "789" },
+        { TokenType::Float, "3.14" },
+        { TokenType::String, "XYZ" },
+        { TokenType::Plus, "+" },
+        { TokenType::Whitespace, " \t" }
+    };
+    for (const auto& s : samples) {
+        Token t(s.first, s.second);
+        REQUIRE(t.text() == s.second);
+    }
+}
+
+TEST_CASE("Token ctor integer/float throws on invalid numeric text (no catch here)",
+          "[token][ctor][error][numeric]") {
+    // Provide invalid integer; constructor should throw std::invalid_argument from stoi.
+    REQUIRE_THROWS(Token(TokenType::Integer, "12x"));
+    // Provide invalid float
+    REQUIRE_THROWS(Token(TokenType::Float, "1.2.3"));
+}
+
+TEST_CASE("Token ctor string unescape handles hex and octal edge cases",
+          "[token][ctor][string][escapes]") {
+    // \x7 and \x4F plus octal \377
+    Token t(TokenType::String, "\\x7\\x4F\\377");
+    std::string expected;
+    expected.push_back(static_cast<char>(0x07));
+    expected.push_back(static_cast<char>(0x4F));
+    expected.push_back(static_cast<char>(0xFF));
+    REQUIRE(t.string_value() == expected);
+}
+
