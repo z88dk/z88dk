@@ -22,6 +22,8 @@ IF !__CPU_INTEL__
    PUBLIC    _putsprite
 
 	EXTERN	plot
+	
+	EXTERN	__bdos
 
 ; GSX structure used to alter the 'write mode'
 	EXTERN	gios_ctl
@@ -180,7 +182,7 @@ setdrwmode:
 
 	ld	de,gios_pb
 	ld	c,115   ; GSX
-	call	5
+	call	__bdos
 
 	pop ix
 	pop bc

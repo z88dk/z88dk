@@ -30,6 +30,8 @@
     PUBLIC    __Exit		;jumped to by exit()
     PUBLIC    l_dcal		;jp(hl)
 
+    PUBLIC    __cpm_base_address
+
     defc    TAR__clib_exit_stack_size = 32
     ; Set sp to be &bdos, this sorts out CP/M 3 compatibility
     defc    TAR__register_sp = -6
@@ -38,6 +40,8 @@
     IF !DEFINED_CRT_ORG_CODE
         defc    CRT_ORG_CODE  = $100
     ENDIF
+
+    defc    __cpm_base_address = CRT_ORG_CODE - $100
 
     IF !DEFINED_CLIB_OPEN_MAX
         defc    DEFINED_CLIB_OPEN_MAX = 1
@@ -76,7 +80,7 @@ start:
 IF !DEFINED_noprotectmsdos
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
-	jp	begin-start+$100
+	jp	begin-start+CRT_ORG_CODE
 	defb	$b4,$09		;DOS protection... MOV AH,9
 	defb	$ba
 	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
@@ -151,7 +155,7 @@ ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF CRT_ENABLE_COMMANDLINE = 1
-    ld      hl,$80
+    ld      hl,CRT_ORG_CODE-100h+$80
     ld      a,(hl)
     ;ld      b,0
     ld      b,h
@@ -177,7 +181,7 @@ ENDIF
     pop     bc	;kill argc
 
 __Exit:
-    ld      (0x80),hl   ;Save exit value for CP/M 2.2
+    ld      (CRT_ORG_CODE-100h+$80),hl   ;Save exit value for CP/M 2.2
     push    hl		;Save return value
     call    crt0_exit
     pop     hl
