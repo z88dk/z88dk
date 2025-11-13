@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\t">
+      <UniqueIdentifier>{50693bb0-9f80-4454-9e80-141dfb8eee1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp">
@@ -117,6 +120,18 @@
     </None>
     <None Include="..\..\src\z80asm\z80asm2\scan.re">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\depends.t">
+      <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\preproc.t">
+      <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\search_source_file.t">
+      <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\template.t">
+      <Filter>Resource Files\t</Filter>
     </None>
   </ItemGroup>
 </Project>

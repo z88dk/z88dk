@@ -230,7 +230,6 @@ capture_ok("z88dk-z80asm -v -E -d $test.o", <<END);
 Preprocessing file: $test.asm -> $test.i
 END
 
-
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles if Test::More->builder->is_passing;
 done_testing;

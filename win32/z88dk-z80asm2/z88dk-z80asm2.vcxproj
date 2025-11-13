@@ -164,6 +164,10 @@
     <None Include="..\..\src\z80asm\z80asm2\errors.def" />
     <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.re" />
+    <None Include="..\..\src\z80asm\z80asm2\t\depends.t" />
+    <None Include="..\..\src\z80asm\z80asm2\t\preproc.t" />
+    <None Include="..\..\src\z80asm\z80asm2\t\search_source_file.t" />
+    <None Include="..\..\src\z80asm\z80asm2\t\template.t" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

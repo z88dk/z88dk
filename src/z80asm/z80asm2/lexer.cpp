@@ -188,7 +188,17 @@ std::string TokensLine::to_string() const {
             }
         }
 
-        out += tok.text();
+        switch (tok.type()) {
+        case TokenType::Whitespace:
+            out += " ";
+            break;
+        case TokenType::Integer:
+            out += std::to_string(tok.int_value());
+            break;
+        default:
+	        out += tok.text();
+            break;
+        }
     }
 
     return out;
