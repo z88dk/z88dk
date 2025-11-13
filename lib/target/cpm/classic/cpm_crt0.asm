@@ -25,6 +25,7 @@
 
 
     EXTERN	cpm_platform_init
+    EXTERN	__bdos
     EXTERN    _main		;main() is always external to crt0
 
     PUBLIC    __Exit		;jumped to by exit()
@@ -41,7 +42,11 @@
         defc    CRT_ORG_CODE  = $100
     ENDIF
 
-    defc    __cpm_base_address = CRT_ORG_CODE - $100
+    IF !DEFINED_CPM_BASE_ADDRESS
+        defc    __cpm_base_address = CRT_ORG_CODE - $100
+	ELSE
+        defc    __cpm_base_address = CPM_BASE_ADDRESS
+	ENDIF
 
     IF !DEFINED_CLIB_OPEN_MAX
         defc    DEFINED_CLIB_OPEN_MAX = 1
@@ -102,7 +107,7 @@ IF DEFINED_protect8080
 
 	ld	c,9		; print string
 	ld	de,err8080
-	call	CRT_ORG_CODE-100h+5	; BDOS
+	call	__bdos	; BDOS
 	jp	0
 	
 err8080:
@@ -155,7 +160,7 @@ ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF CRT_ENABLE_COMMANDLINE = 1
-    ld      hl,CRT_ORG_CODE-100h+$80
+    ld      hl,__cpm_base_address+$80
     ld      a,(hl)
     ;ld      b,0
     ld      b,h
@@ -181,7 +186,7 @@ ENDIF
     pop     bc	;kill argc
 
 __Exit:
-    ld      (CRT_ORG_CODE-100h+$80),hl   ;Save exit value for CP/M 2.2
+    ld      (__cpm_base_address+$80),hl   ;Save exit value for CP/M 2.2
     push    hl		;Save return value
     call    crt0_exit
     pop     hl
@@ -192,9 +197,9 @@ PUBLIC __restore_sp_onexit
 __restore_sp_onexit:
     ld      sp,0	;Pick up entry sp
     ld      c,12        ;Get CPM version
-    call    CRT_ORG_CODE-100h+5
+    call    __bdos
     cp      $30 
-    jp      c,0         ;Warm boot for CP/M < 3
+    jp      c,__cpm_base_address    ;Warm boot for CP/M < 3
     ld      a,l
     and     127
     ld      e,a
@@ -205,8 +210,8 @@ __restore_sp_onexit:
 do_exit_v3:
     ld      d,a
     ld      c,108
-    call    CRT_ORG_CODE-100h+5           ;Report error
-    rst     0
+    call    __bdos           ;Report error
+    jp      __cpm_base_address
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
@@ -373,7 +378,7 @@ ENDIF
 
     SECTION code_crt_init
     ld      c,25
-    call    CRT_ORG_CODE-100h+5
+    call    __bdos
     ld      (defltdsk),a
 
 IF __HAVE_TMS99X8
@@ -387,5 +392,5 @@ ENDIF
     ld      a,(defltdsk)        ;Restore default disc
     ld      e,a
     ld      c,14
-    call    CRT_ORG_CODE-100h+5
+    call    __bdos
 
