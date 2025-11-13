@@ -8,14 +8,14 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.43 2016-10-31 16:16:33 stefano Exp $
+;       $Id: cpm_crt0.asm $
 ;
-; 	There are a couple of #pragma commands which affect
-;	this file:
+; 	There are a couple of #pragma commands which affect this file:
 ;
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output protect8080 - add a check to block the program when on an 8080 CPU (not compatible)
 ;
+
 
     MODULE  cpm_crt0
 
@@ -98,7 +98,7 @@ IF DEFINED_protect8080
 
 	ld	c,9		; print string
 	ld	de,err8080
-	call	5	; BDOS
+	call	CRT_ORG_CODE-100h+5	; BDOS
 	jp	0
 	
 err8080:
@@ -188,7 +188,7 @@ PUBLIC __restore_sp_onexit
 __restore_sp_onexit:
     ld      sp,0	;Pick up entry sp
     ld      c,12        ;Get CPM version
-    call    5
+    call    CRT_ORG_CODE-100h+5
     cp      $30 
     jp      c,0         ;Warm boot for CP/M < 3
     ld      a,l
@@ -201,7 +201,7 @@ __restore_sp_onexit:
 do_exit_v3:
     ld      d,a
     ld      c,108
-    call    5           ;Report error
+    call    CRT_ORG_CODE-100h+5           ;Report error
     rst     0
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
@@ -358,9 +358,18 @@ IF WANT_DEVICE_STDLST
     setup_static_fp(__stdlst,_stdlst_device)
 ENDIF
 
+    ; Memory hole for the Apple II high resolution graphics
+    ; This quick and dirty approach wastes about 7K of memory
+	; which could be recovered by moving the STACK or
+	; the DATA section here
+IF  (startup=2)
+ DEFS $2000-CRT_ORG_CODE-ASMPC
+  defs $2000
+ENDIF
+
     SECTION code_crt_init
     ld      c,25
-    call    5
+    call    CRT_ORG_CODE-100h+5
     ld      (defltdsk),a
 
 IF __HAVE_TMS99X8
@@ -374,5 +383,5 @@ ENDIF
     ld      a,(defltdsk)        ;Restore default disc
     ld      e,a
     ld      c,14
-    call    5
+    call    CRT_ORG_CODE-100h+5
 
