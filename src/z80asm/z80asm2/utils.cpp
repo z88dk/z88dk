@@ -69,7 +69,7 @@ bool str_starts_with(const std::string& str, const std::string& beginning) {
     return str.compare(0, beginning.size(), beginning) == 0;
 }
 
-std::string escape_string(const std::string& s) {
+std::string escape_c_string(const std::string& s) {
     // Convert a raw string to a C-style escaped representation suitable for
     // emitting as a quoted string token. Behavior mirrors str_expand_escapes:
     // - common control characters are escaped (\a, \b, \f, \n, \r, \t, \v)
@@ -215,6 +215,145 @@ static std::string remove_underscores(const std::string& s) {
         }
     }
     return t;
+}
+
+std::string unescape_c_string(const std::string& s) {
+    // Reverse of escape_c_string:
+    // - supports: \a \b \f \n \r \t \v \\ \" \'
+    // - supports: \xHH (1-2 hex digits; escape_c_string emits 2)
+    // - supports: \NNN (1-3 octal digits)
+    // - supports: \e (ESC, 27) for compatibility with lexer
+    // - unknown escapes decode to the escaped character (e.g., \z -> 'z')
+    // Accepts optional surrounding single or double quotes.
+    auto hex_val = [](char c) -> int {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'a' && c <= 'f') {
+            return 10 + (c - 'a');
+        }
+        if (c >= 'A' && c <= 'F') {
+            return 10 + (c - 'A');
+        }
+        return -1;
+    };
+
+    std::string out;
+    if (s.empty()) {
+        return out;
+    }
+
+    size_t start = 0;
+    size_t end = s.size();
+
+    // Strip matching surrounding quotes if present
+    if (end >= 2 && ((s.front() == '"' && s.back() == '"') ||
+                     (s.front() == '\'' && s.back() == '\''))) {
+        start = 1;
+        end -= 1;
+        if (end <= start) {
+            return out;
+        }
+    }
+
+    out.reserve(end - start);
+
+    for (size_t i = start; i < end; ++i) {
+        char c = s[i];
+        if (c != '\\') {
+            out.push_back(c);
+            continue;
+        }
+
+        // Backslash at end -> keep it literal
+        if (i + 1 >= end) {
+            out.push_back('\\');
+            break;
+        }
+
+        char e = s[++i];
+        switch (e) {
+        case 'a':
+            out.push_back('\a');
+            break;
+        case 'b':
+            out.push_back('\b');
+            break;
+        case 'f':
+            out.push_back('\f');
+            break;
+        case 'n':
+            out.push_back('\n');
+            break;
+        case 'r':
+            out.push_back('\r');
+            break;
+        case 't':
+            out.push_back('\t');
+            break;
+        case 'v':
+            out.push_back('\v');
+            break;
+        case '\\':
+            out.push_back('\\');
+            break;
+        case '"':
+            out.push_back('"');
+            break;
+        case '\'':
+            out.push_back('\'');
+            break;
+        case 'e':
+            out.push_back(static_cast<char>(27));
+            break; // ESC (compat)
+        case 'x':
+        case 'X': {
+            // Parse up to 2 hex digits
+            int value = 0;
+            int digits = 0;
+            size_t j = i + 1;
+            while (j < end && digits < 2) {
+                int hv = hex_val(s[j]);
+                if (hv < 0) {
+                    break;
+                }
+                value = (value << 4) | hv;
+                ++j;
+                ++digits;
+            }
+            if (digits > 0) {
+                out.push_back(static_cast<char>(value & 0xFF));
+                i = j - 1;
+            }
+            else {
+                // No hex digits after \x -> treat as literal 'x'
+                out.push_back('x');
+            }
+            break;
+        }
+        default:
+            if (e >= '0' && e <= '7') {
+                // Octal: up to 3 digits including the one we already consumed
+                int value = e - '0';
+                int digits = 1;
+                size_t j = i + 1;
+                while (j < end && digits < 3 && s[j] >= '0' && s[j] <= '7') {
+                    value = (value << 3) + (s[j] - '0');
+                    ++j;
+                    ++digits;
+                }
+                out.push_back(static_cast<char>(value & 0xFF));
+                i = j - 1;
+            }
+            else {
+                // Unknown escape -> decode as the escaped character
+                out.push_back(e);
+            }
+            break;
+        }
+    }
+
+    return out;
 }
 
 bool parse_int_from_chars(const std::string& s, int base, int& out) {

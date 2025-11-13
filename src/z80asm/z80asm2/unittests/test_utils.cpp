@@ -193,11 +193,11 @@ TEST_CASE("parse_int_from_chars with underscores: invalid inputs and overflow",
 }
 
 // -----------------------------------------------------------------------------
-// Tests for escape_string (added earlier)
+// Tests for escape_c_string (added earlier)
 // -----------------------------------------------------------------------------
 
-TEST_CASE("escape_string escapes control characters to C-style sequences",
-          "[escape_string][controls]") {
+TEST_CASE("escape_c_string escapes control characters to C-style sequences",
+          "[escape_c_string][controls]") {
     // build a string with common control characters
     std::string in;
     in.push_back('\a');
@@ -217,11 +217,11 @@ TEST_CASE("escape_string escapes control characters to C-style sequences",
     expected += "\\t";
     expected += "\\v";
 
-    REQUIRE(escape_string(in) == expected);
+    REQUIRE(escape_c_string(in) == expected);
 }
 
-TEST_CASE("escape_string escapes double-quotes and backslashes correctly",
-          "[escape_string][quotes][backslash]") {
+TEST_CASE("escape_c_string escapes double-quotes and backslashes correctly",
+          "[escape_c_string][quotes][backslash]") {
     std::string in;
     in.push_back('"');   // "
     in += "hi";
@@ -235,14 +235,14 @@ TEST_CASE("escape_string escapes double-quotes and backslashes correctly",
     expected += "\\\"";
     expected += "\\\\";
 
-    REQUIRE(escape_string(in) == expected);
+    REQUIRE(escape_c_string(in) == expected);
 
     // also test a single backslash -> becomes double backslash
-    REQUIRE(escape_string(std::string("\\", 1)) == std::string("\\\\"));
+    REQUIRE(escape_c_string(std::string("\\", 1)) == std::string("\\\\"));
 }
 
-TEST_CASE("escape_string converts non-printable bytes to \\xHH (uppercase hex)",
-          "[escape_string][hex]") {
+TEST_CASE("escape_c_string converts non-printable bytes to \\xHH (uppercase hex)",
+          "[escape_c_string][hex]") {
     std::string in;
     in.push_back(static_cast<char>(1));     // 0x01
     in.push_back(static_cast<char>(0x80));  // 0x80 (non-printable, > 0x7f)
@@ -252,18 +252,79 @@ TEST_CASE("escape_string converts non-printable bytes to \\xHH (uppercase hex)",
     expected += "\\x01";
     expected += "\\x80";
 
-    REQUIRE(escape_string(in) == expected);
+    REQUIRE(escape_c_string(in) == expected);
 }
 
-TEST_CASE("escape_string leaves printable ASCII unchanged",
-          "[escape_string][printable]") {
+TEST_CASE("escape_c_string leaves printable ASCII unchanged",
+          "[escape_c_string][printable]") {
     std::string s = "Hello, 123! ~";
-    REQUIRE(escape_string(s) == s);
+    REQUIRE(escape_c_string(s) == s);
 }
 
-TEST_CASE("escape_string returns empty string for empty input",
-          "[escape_string][empty]") {
-    REQUIRE(escape_string(std::string()) == std::string());
+TEST_CASE("escape_c_string returns empty string for empty input",
+          "[escape_c_string][empty]") {
+    REQUIRE(escape_c_string(std::string()) == std::string());
+}
+
+// -----------------------------------------------------------------------------
+// Tests for unescape_c_string (reverse of escape_c_string)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("unescape_c_string reverses escape_c_string (roundtrip)",
+          "[unescape][roundtrip]") {
+    // Build a raw string with control chars, quotes, backslash and high-bit byte
+    std::string raw;
+    raw.push_back('\a');
+    raw.push_back('\b');
+    raw.push_back('\f');
+    raw.push_back('\n');
+    raw.push_back('\r');
+    raw.push_back('\t');
+    raw.push_back('\v');
+    raw.push_back('"');
+    raw.push_back('\\');
+    raw.push_back(static_cast<char>(0x80));
+
+    std::string esc = escape_c_string(raw);
+    std::string got = unescape_c_string(esc);
+    REQUIRE(got.size() == raw.size());
+    REQUIRE(got == raw);
+
+    // Also works when wrapped in quotes
+    std::string quoted = std::string("\"") + esc + std::string("\"");
+    REQUIRE(unescape_c_string(quoted) == raw);
+}
+
+TEST_CASE("unescape_c_string handles hex and octal escapes and \\e",
+          "[unescape][escapes]") {
+    // Hex: \x41\x42 -> "AB"
+    REQUIRE(unescape_c_string("\\x41\\x42") == std::string("AB"));
+
+    // Single hex digit after \x also accepted
+    REQUIRE(unescape_c_string("\\x4A") == std::string("J"));
+
+    // Octal: \101\102 -> "AB"
+    REQUIRE(unescape_c_string("\\101\\102") == std::string("AB"));
+
+    // \e -> ESC (27)
+    std::string esc;
+    esc.push_back(static_cast<char>(27));
+    REQUIRE(unescape_c_string("\\e") == esc);
+}
+
+TEST_CASE("unescape_c_string handles unknown escapes as the escaped character",
+          "[unescape][unknown]") {
+    // \z -> 'z'
+    REQUIRE(unescape_c_string("\\z") == std::string("z"));
+    // Trailing backslash is kept literal
+    REQUIRE(unescape_c_string("A\\") == std::string("A\\"));
+}
+
+TEST_CASE("unescape_c_string accepts already unescaped content and quoted strings",
+          "[unescape][input-forms]") {
+    REQUIRE(unescape_c_string("Plain") == std::string("Plain"));
+    REQUIRE(unescape_c_string("\"Plain\"") == std::string("Plain"));
+    REQUIRE(unescape_c_string("'Plain'") == std::string("Plain"));
 }
 
 // -----------------------------------------------------------------------------
