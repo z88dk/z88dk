@@ -151,7 +151,7 @@ ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF CRT_ENABLE_COMMANDLINE = 1
-    ld      hl,$80
+    ld      hl,CRT_ORG_CODE-100h+$80
     ld      a,(hl)
     ;ld      b,0
     ld      b,h
@@ -177,7 +177,7 @@ ENDIF
     pop     bc	;kill argc
 
 __Exit:
-    ld      (0x80),hl   ;Save exit value for CP/M 2.2
+    ld      (CRT_ORG_CODE-100h+$80),hl   ;Save exit value for CP/M 2.2
     push    hl		;Save return value
     call    crt0_exit
     pop     hl
