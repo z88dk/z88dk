@@ -2,6 +2,7 @@
 #ifndef __ARCH_SMSV2_H__
 #define __ARCH_SMSV2_H__
 
+#include <sys/compiler.h>
 #include <arch.h>
 #include <rect.h>
 

@@ -5,6 +5,7 @@
 #ifndef __SMS_SMSLIB_H__
 #define __SMS_SMSLIB_H__
 
+#include <sys/compiler.h>
 #include <arch.h>
 
 /* **************************************************
