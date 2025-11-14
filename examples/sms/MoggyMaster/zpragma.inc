@@ -10,3 +10,8 @@
 #pragma redirect SDSC_HDR_AUTHOR      = _wtf_author
 #pragma redirect SDSC_HDR_NAME        = _wtf_name
 #pragma redirect SDSC_HDR_DESCRIPTION = _wtf_description
+
+
+#pragma output CRT_ENABLE_STDIO = 0
+
+#pragma export fputc_cons = 0
