@@ -1,0 +1,8 @@
+@target/sms/compress/compress_sccz80.lst
+@target/sms/globals/globals_asm.lst
+@target/sms/misc/misc_sccz80.lst
+@target/sms/psg/psg_sccz80.lst
+@target/sms/registers/registers_asm.lst
+@target/sms/SMSlib/SMSlib_sccz80.lst
+@target/sms/vdp/vdp_sccz80.lst
+@target/sms/vram/vram_sccz80.lst

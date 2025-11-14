@@ -2,11 +2,15 @@
 COMPILER ?= sccz80
 CFLAGS = -vn
 
+DIRS = 3dcity MoggyMaster BalubaBalok
+
+CLEANDIRS = $(DIRS:%=%-clean)
+
 ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc -SO3 --max-allocs-per-node200000 --fsigned-char
-all: test.sms libctest.sms pongmstr.sms pngmstr2.sms chicken.sms testsnd.sms libpsgtest.sms
+all: test.sms libctest.sms pongmstr.sms pngmstr2.sms chicken.sms testsnd.sms libpsgtest.sms $(DIRS)
 else
-all: test.sms libctest.sms pongmstr.sms pngmstr2.sms apktest.sms chicken.sms testsnd.sms libpsgtest.sms
+all: test.sms libctest.sms pongmstr.sms pngmstr2.sms apktest.sms chicken.sms testsnd.sms libpsgtest.sms  $(DIRS)
 endif
 
 
@@ -51,5 +55,15 @@ testsnd.sms: testsnd.c
 libpsgtest.sms: libpsgtest.c music.asm my_mission.psg
 	zcc +sms $(CFLAGS) libpsgtest.c music.asm -o $@ -create-app
 
-clean:
+
+$(DIRS):
+	$(MAKE) -C $@
+
+.PHONY:	$(DIRS)
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:%-clean=%) clean
+
+clean: $(CLEANDIRS)
 	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def *.sms *.map *.ram
+

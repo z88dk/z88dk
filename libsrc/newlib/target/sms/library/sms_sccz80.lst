@@ -1,6 +1,6 @@
 @../adt/adt_sccz80.lst
 @../alloc/alloc_sccz80.lst
-@../target/sms-libs/sms_sccz80.lst
+@../target/sms/sms_sccz80.lst
 @../compress/compress_sccz80.lst
 @../ctype/ctype_sccz80.lst
 @../newlib/drivers/drivers.lst
