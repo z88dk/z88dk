@@ -108,6 +108,7 @@ private:
 
         // True when this file represents an expanded macro "virtual file".
         bool is_macro_expansion = false;
+        bool exitm_found = false;
     };
 
     struct IfFrame {
@@ -194,7 +195,7 @@ private:
                          bool negated, Keyword keyword);
 
     // parse directives
-    bool all_ifs_active() const;
+    bool output_active() const;
     bool is_directive(const TokensLine& line, unsigned& i,
                       Keyword& keyword) const;
     bool is_name_directive(const TokensLine& line, unsigned& i,
