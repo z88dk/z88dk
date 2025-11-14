@@ -98,6 +98,7 @@ void Preprocessor::push_file(const std::string& filename) {
     f.has_forced_location = false;
     f.forced_constant_line_numbers = false;
     f.is_macro_expansion = false;
+    f.exitm_found = false;
 
     // detect #ifndef/#define guard
     std::string symbol;
@@ -121,6 +122,7 @@ void Preprocessor::push_virtual_file(const std::string& content,
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
     vf.is_macro_expansion = false;
+    vf.exitm_found = false;
     file_stack_.push_back(std::move(vf));
 }
 
@@ -135,6 +137,7 @@ void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
     vf.has_forced_location = false;
     vf.forced_constant_line_numbers = false;
     vf.is_macro_expansion = false;
+    vf.exitm_found = false;
     file_stack_.push_back(std::move(vf));
 }
 
@@ -222,7 +225,7 @@ bool Preprocessor::next_line(TokensLine& line) {
             }
 
             // Other directives only execute when all IFs are active
-            if (!all_ifs_active()) {
+            if (!output_active()) {
                 continue; // skip directive content entirely
             }
 
@@ -239,7 +242,7 @@ bool Preprocessor::next_line(TokensLine& line) {
             i = 0;
             if (is_name_directive(line, i, keyword, name)) {
                 // Name directives are not conditional keywords; gate by IF-state
-                if (!all_ifs_active()) {
+                if (!output_active()) {
                     continue; // skip
                 }
                 reading_queue_for_directive_ = true;
@@ -273,7 +276,7 @@ bool Preprocessor::next_line(TokensLine& line) {
         }
 
         // non-conditional directives only when active
-        if (!all_ifs_active()) {
+        if (!output_active()) {
             continue;
         }
 
@@ -287,7 +290,7 @@ bool Preprocessor::next_line(TokensLine& line) {
         keyword = Keyword::None;
         i = 0;
         if (is_name_directive(line, i, keyword, name)) {
-            if (!all_ifs_active()) {
+            if (!output_active()) {
                 continue;
             }
             process_name_directive(line, i, keyword, name);
@@ -1345,7 +1348,19 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     macros_[name] = std::move(macro);
 }
 
-bool Preprocessor::all_ifs_active() const {
+bool Preprocessor::output_active() const {
+    // check for exitm called
+    if (!file_stack_.empty()) {
+        const File& top = file_stack_.back();
+        if (top.is_macro_expansion && top.exitm_found) {
+            return false;
+        }
+    }
+
+    // check IF stack
+    if (if_stack_.empty()) {
+        return true;
+    }
     for (size_t n = 0; n < if_stack_.size(); ++n) {
         if (!if_stack_[n].branch_active) {
             return false;
@@ -2248,8 +2263,7 @@ void Preprocessor::do_exitm() {
     if (!file_stack_.empty()) {
         File& top = file_stack_.back();
         if (top.is_macro_expansion) {
-            // Discard the rest of this macro-expansion file
-            file_stack_.pop_back();
+            top.exitm_found = true;
         }
     }
 }

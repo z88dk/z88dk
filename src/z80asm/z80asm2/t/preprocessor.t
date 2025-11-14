@@ -767,11 +767,9 @@ END
 check_text_file("$test.i", <<END);
 #line 8, "$test.asm"
 db 0
-db 1
-
-
-
+#line 8
 db 255
+db 1
 END
 
 
