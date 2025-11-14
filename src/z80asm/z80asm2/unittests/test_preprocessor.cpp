@@ -61,6 +61,8 @@ TEST_CASE("Preprocessor: split label produces label line then instruction line",
     const auto& toks2 = line.tokens();
     REQUIRE(toks2.size() >= 1);
     REQUIRE(toks2[0].text() == "nop");
+
+    REQUIRE(!g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: transform string to list of integer tokens",
@@ -84,6 +86,8 @@ TEST_CASE("Preprocessor: transform string to list of integer tokens",
     REQUIRE(toks[2].int_value() == static_cast<int>('A'));
     REQUIRE(toks[3].text() == ",");
     REQUIRE(toks[4].int_value() == static_cast<int>('B'));
+
+    REQUIRE(!g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: include directive pushes included file contents",
@@ -271,6 +275,8 @@ TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms"
     std::remove(fq.c_str());
     std::remove(fa.c_str());
     std::remove(fp.c_str());
+
+    REQUIRE(!g_errors.has_errors());
 }
 
 // New tests: trailing extra text after include filename should produce an error
@@ -365,6 +371,8 @@ TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines"
     REQUIRE(line[0].text() == "second_line");
     REQUIRE(line.location().line_num() == 101);
     REQUIRE(line.location().filename() == "line_test");
+
+    REQUIRE(!g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line numbers",
@@ -428,6 +436,8 @@ TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for follow
     REQUIRE(line[0].text() == "two_line");
     REQUIRE(line.location().line_num() == 400);
     REQUIRE(line.location().filename() == "cline_test");
+
+    REQUIRE(!g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and line number",
@@ -6092,6 +6102,7 @@ TEST_CASE("Preprocessor: EXITM inside IF with true condition exits macro",
     REQUIRE(std::find(lines.begin(), lines.end(), "before") != lines.end());
     REQUIRE(std::find(lines.begin(), lines.end(), "done") != lines.end());
     REQUIRE(std::find(lines.begin(), lines.end(), "after") == lines.end());
+    REQUIRE(!g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: EXITM inside IF with false condition does not exit macro",
@@ -7615,5 +7626,126 @@ TEST_CASE("Preprocessor: backslash at end of last line (no following line) yield
     }
     // No error expected either way
     REQUIRE(!g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// Added tests: DEFL with comma-separated list body should preserve list tokens
+// -----------------------------------------------------------------------------
+TEST_CASE("Preprocessor: DEFL preserves non-constant comma-separated list",
+          "[preprocessor][defl][list]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // First line defines X as list 1,2 (directive produces no output line)
+    // Second line uses X -> should expand to "1,2"
+    const std::string content =
+        "X DEFL 1,2\n"
+        "X\n";
+    pp.push_virtual_file(content, "defl_list", 1, true);
+
+    TokensLine line;
+    // Consume expanded output (skip directive)
+    REQUIRE(pp.next_line(line));          // expansion of X
+    REQUIRE(line.to_string() == "1,2");
+
+    // Tokens: Integer 1 , Comma , Integer 2
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 1);
+    REQUIRE(toks[1].is(TokenType::Comma));
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 2);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: DEFL list expands inside another line (db macro usage)",
+          "[preprocessor][defl][list][db]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "VAL DEFL 1,2\n"
+        "db VAL\n";
+    pp.push_virtual_file(content, "defl_list_db", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expansion of db VAL
+    REQUIRE(line.to_string() == "db 1,2");
+
+    const auto& toks = line.tokens();
+    // Expect: Identifier 'db', Whitespace, Integer 1, Comma, Integer 2
+    REQUIRE(toks.size() == 5);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "db");
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 1);
+    REQUIRE(toks[3].is(TokenType::Comma));
+    REQUIRE(toks[4].is(TokenType::Integer));
+    REQUIRE(toks[4].int_value() == 2);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
+          "[preprocessor][defl][list][macro]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define A 5\n"
+        "Y DEFL A,6\n"
+        "Y\n";
+    pp.push_virtual_file(content, "defl_list_macro", 1, true);
+
+    TokensLine line;
+
+    // First non-empty expanded output should be "5,6"
+    // Skip any lines produced by #define (none) then expansion of Y
+    REQUIRE(pp.next_line(line)); // expansion of Y
+    REQUIRE(line.to_string() == "5,6");
+
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 5);
+    REQUIRE(toks[1].is(TokenType::Comma));
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 6);
+
+    REQUIRE(!pp.next_line(line));
+    REQUIRE(!g_errors.has_errors());
+}
+
+// Replace the self-redefinition test with a non-recursive variant that uses a previous symbol.
+
+TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list elements",
+          "[preprocessor][defl][list][prev]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Avoid self-reference recursion: build new symbol from previous symbol
+    const std::string content =
+        "Z0 DEFL 1\n"
+        "Z1 DEFL Z0,2\n"
+        "Z1\n";
+    pp.push_virtual_file(content, "defl_list_prev", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line)); // expansion of Z1
+    REQUIRE(line.to_string() == "1,2");
+
+    const auto& toks = line.tokens();
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].is(TokenType::Integer));
+    REQUIRE(toks[0].int_value() == 1);
+    REQUIRE(toks[1].is(TokenType::Comma));
+    REQUIRE(toks[2].is(TokenType::Integer));
+    REQUIRE(toks[2].int_value() == 2);
+
+    REQUIRE(!pp.next_line(line));
 }
 

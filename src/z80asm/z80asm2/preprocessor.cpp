@@ -1330,7 +1330,7 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     //    If it parses successfully AND consumes the whole body, define <name>
     //    as the resulting integer. Otherwise, define <name> as the whole expanded body.
     int value = 0;
-    if (eval_const_expr(expr_tokens, value, false)) {
+    if (eval_const_expr(expr_tokens, value, true)) {
         body.clear_tokens();
         body.push_back(Token(TokenType::Integer, std::to_string(value), value));
     }
