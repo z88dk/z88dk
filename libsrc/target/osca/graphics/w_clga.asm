@@ -13,12 +13,12 @@
 ;Usage: clga(struct *pixels)
 
 
-        INCLUDE "graphics/grafix.inc"
-        SECTION code_clib
-        PUBLIC  clga
-        PUBLIC  _clga
-        EXTERN  w_pixeladdress
-        EXTERN  __gfx_vram_page_in
+	INCLUDE	"classic/gfx/grafix.inc"
+        SECTION   code_clib
+	PUBLIC    clga
+	PUBLIC    _clga
+	EXTERN	w_pixeladdress
+	EXTERN  __gfx_vram_page_in
         EXTERN  __gfx_vram_page_out
 
 clga:

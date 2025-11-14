@@ -4,13 +4,13 @@ target/srr/stdio/getk
 target/srr/stdio/CRT_FONT
 target/srr/stdio/generic_console
 target/srr/stdio/generic_console_ioctl
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/srr/graphics/textpixl
-@gfx/gencon/gfx_gencon.lst
+@classic/gfx/gencon/gfx_gencon.lst
 target/srr/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 target/srr/srr/obj/${TARGET}/getplot
 target/srr/srr/obj/${TARGET}/invid
 target/srr/srr/obj/${TARGET}/monitor

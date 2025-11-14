@@ -1,4 +1,4 @@
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/bee/stdio/ansi/f_ansi_attr
 target/bee/stdio/ansi/f_ansi_bel
 target/bee/stdio/ansi/f_ansi_char
@@ -13,6 +13,6 @@ target/bee/stdio/CRT_FONT
 target/shared/copy_font
 
 target/bee/games/joystick
-@games/games.lst
+@classic/games/games.lst
 target/bee/graphics/textpixl
-@gfx/gencon/gfx_gencon.lst
+@classic/gfx/gencon/gfx_gencon.lst

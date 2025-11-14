@@ -12,7 +12,7 @@ target/aquarius/graphicsp/w_respixl
 target/aquarius/graphicsp/w_respixl_BITMAP
 target/aquarius/graphicsp/w_xorpixl
 target/aquarius/graphicsp/w_xorpixl_BITMAP
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/aquarius/far/__far_misc
 target/aquarius/far/__far_page
 target/aquarius/far/l_far_mapaddr

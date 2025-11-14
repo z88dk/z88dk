@@ -24,7 +24,7 @@
     PUBLIC  ___gfx_vram_page_out
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 __gfx_vram_page_in:
 ___gfx_vram_page_in:

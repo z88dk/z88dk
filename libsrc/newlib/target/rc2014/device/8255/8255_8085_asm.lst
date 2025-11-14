@@ -1,0 +1,4 @@
+newlib/target/rc2014/device/8255/8080/8255_read_block
+newlib/target/rc2014/device/8255/8080/8255_write_block
+newlib/target/rc2014/device/8255/8080/8255_read_byte
+newlib/target/rc2014/device/8255/8080/8255_write_byte

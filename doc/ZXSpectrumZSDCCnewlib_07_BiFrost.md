@@ -428,10 +428,10 @@ occupies the bytes from 58625 to 65280, inclusive. By default, the BiFrost tile
 map, which is the 81 byte map which BiFrost uses to map which tiles are
 onscreen, goes at address 65281. (See the __BIFROSTL_TILE_MAP entry in the
 [default BiFrost low resolution configuration
-file](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/config/config_bifrost_l.m4)).
+file](https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zx/config/config_bifrost_l.m4)).
 Those tiles occupy the 81 bytes from 65281 to 65361 inclusive. But look where
 Z88DK puts the program's stack by default: [address
-65368](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/crt_config.inc#L28). That's
+65368](https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zx/crt_config.inc#L28). That's
 only 7 bytes above the tile map, which means the stack is bound to overwrite the
 tile map data as it grows downwards.
 
@@ -611,7 +611,7 @@ grid. That's 160 pixels wide by 176 pixels deep:
 
 At 13KB the library is considerably larger than the high resolution variant of
 BiFrost, although you can reduce its display size by tweaking its [library build
-time](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/config/config_bifrost_2.m4)
+time](https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zx/config/config_bifrost_2.m4)
 options. By default it loads at address 51625.
 
 Here's an example which animates our ball twice, once vertically and once

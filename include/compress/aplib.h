@@ -17,7 +17,7 @@
 // http://www.ibsensoftware.com/products_aPLib.html             //
 //                                                              //
 // Further information:                                         //
-// https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/compress/aplib/readme.txt
+// https://github.com/z88dk/z88dk/blob/master/libsrc/compress/aplib/readme.txt
 //                                                              //
 //////////////////////////////////////////////////////////////////
 

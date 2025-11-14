@@ -64,3 +64,6 @@
     ; Write only port
     defc HEPR = $81
         
+
+    defc IO_SAA1099_DATA_PORT    = 0x00ff
+    defc IO_SAA1099_ADDRESS_PORT = 0x01ff

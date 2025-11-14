@@ -1,13 +1,13 @@
 target/tvc/stdio/fputc_cons
 target/tvc/stdio/fgetc_cons
 target/tvc/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/tvc/games/joystick
 target/tvc/games/bit_open
 target/tvc/games/bit_open_di
 target/tvc/games/bit_close
 target/tvc/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst
 target/tvc/time/clock
 target/tvc/tvc_cls
 target/tvc/tvc_ed_cfix

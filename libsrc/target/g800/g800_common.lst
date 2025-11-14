@@ -6,9 +6,9 @@ target/g800/games/bit_open
 target/g800/games/bit_open_di
 target/g800/games/bit_close
 target/g800/games/bit_close_ei
-@games/games.lst
-gfx/narrow/obj/${TARGET}/getsprite2
-gfx/narrow/obj/${TARGET}/putsprite2
+@classic/games/games.lst
+classic/gfx/narrow/obj/${TARGET}/getsprite2
+classic/gfx/narrow/obj/${TARGET}/putsprite2
 target/g800/graphics/obj/${TARGET}/plotpixel
 target/g800/graphics/obj/${TARGET}/point
 target/g800/graphics/obj/${TARGET}/pointxy
@@ -21,4 +21,4 @@ target/g800/graphics/obj/${TARGET}/clsgraph
 target/g800/graphics/obj/${TARGET}/plotpixel
 target/g800/graphics/obj/${TARGET}/scrollup_1px
 target/g800/graphics/obj/${TARGET}/scrollup_4px
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst

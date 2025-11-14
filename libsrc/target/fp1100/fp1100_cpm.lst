@@ -13,5 +13,5 @@ target/fp1100/graphics/w_plotpixl
 target/fp1100/graphics/w_respixl
 target/fp1100/graphics/w_xorpixl
 target/fp1100/graphics/w_pointxy
-@gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst

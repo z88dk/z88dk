@@ -15,7 +15,7 @@
 ;Close the map screen and restore memory map to normal
 
 
-    INCLUDE "graphics/grafix.inc"       ; Contains fn defs
+    INCLUDE "classic/gfx/grafix.inc"       ; Contains fn defs
     INCLUDE "map.def"
 
     SECTION code_clib

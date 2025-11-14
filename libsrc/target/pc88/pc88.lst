@@ -33,22 +33,21 @@ target/pc88/graphics/getmaxx
 ;target/pc88/graphics/w_putsprite
 target/pc88/graphics/w_plotpixl
 target/pc88/graphics/clsgraph
-@gfx/wide/gfx_wide.lst
-@stdio/stdio_binary.lst
-@stdio/ansicore.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/stdio/stdio_binary.lst
+@classic/stdio/ansicore.lst
 
 target/pc88/games/bit_open
 target/pc88/games/bit_open_di
 target/pc88/games/bit_close
 target/pc88/games/bit_close_ei
 target/pc88/time/clock
-@games/games.lst
+@classic/games/games.lst
 target/pc88/psg/set_psg
 target/pc88/psg/set_psg_callee
 target/pc88/psg/psg_init
 target/pc88/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+sound/ay/obj/${TYPE}/**/*.o
 target/pc88/interrupt/add_raster_int
 target/pc88/interrupt/im1_init
 

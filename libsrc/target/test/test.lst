@@ -1,7 +1,7 @@
 target/test/stdio/fgetc_cons
 target/test/stdio/fputc_cons
 target/test/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/test/time/time
 target/test/time/clock
 

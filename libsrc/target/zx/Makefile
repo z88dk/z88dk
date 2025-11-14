@@ -2,10 +2,10 @@ include ../../Make.config
 
 TARGET ?= zx
 
-SUBDIRS = tape games stdio newlib
+SUBDIRS = newlib
 
 ifeq ($(TARGET),zx)
-  SUBDIRS += fzx fcntl rs232
+  SUBDIRS += classic/fcntl classic/rs232
 endif
 
 ifeq ($(TARGET),zxn)
@@ -26,9 +26,7 @@ subdirs-clean: $(SUBDIRS_CLEAN)
 
 
 clean: subdirs-clean
-	$(RM) -r obj
-	$(RM) zcc_opt.def *.err *.o
-	$(RM) */*.o */*/*.o
+	$(RM) */*.o */*/*.o */*/*/*.o
 
 subdirs-clean: $(CLEANDIRS)
 

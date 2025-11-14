@@ -5,12 +5,12 @@ target/pcw/graphics/w_bkrestore
 target/pcw/graphics/w_pixladdr
 target/pcw/graphics/w_putsprite
 target/pcw/graphics/w_stencil_render
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/pcw/psg/set_psg
 target/pcw/psg/set_psg_callee
 target/pcw/psg/get_psg
 target/pcw/psg/psg_init
 target/pcw/far/__far_misc
 target/pcw/far/__far_page
-@psg/ay/psg.lst
-@games/games.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/games/games.lst

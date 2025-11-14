@@ -21,7 +21,7 @@
     EXTERN  __mc6847_mode
     EXTERN  __generic_putsprite
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 ; __gfx_coords: d,e (vert-horz)

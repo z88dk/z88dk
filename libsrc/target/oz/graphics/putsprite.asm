@@ -14,13 +14,12 @@
 
         SECTION smc_clib
 
+	INCLUDE	"classic/gfx/grafix.inc"
         PUBLIC  putsprite
         PUBLIC  _putsprite
         EXTERN  pixeladdress
         EXTERN  __gfx_vram_page_in
         EXTERN  __gfx_vram_page_out
-
-        INCLUDE "graphics/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)

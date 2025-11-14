@@ -18,11 +18,11 @@ _joystick:
     jr      z, read_stick
     cp      3
     jr      nz, no_stick_qaop
-    INCLUDE "games/joystick_qaop.as1"
+    INCLUDE "classic/games/joystick_qaop.as1"
 no_stick_qaop:
     cp      4
     jr      nz, no_stick_8246
-    INCLUDE "games/joystick_8246.as1"
+    INCLUDE "classic/games/joystick_8246.as1"
 no_stick_8246:
     ld      hl, 0
     ret

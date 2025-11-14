@@ -5,4 +5,4 @@ target/c128/games/bit_open
 target/c128/games/bit_open_di
 target/c128/games/bit_close
 target/c128/games/bit_close_ei
-@games/games.lst
+@classic/games/games.lst

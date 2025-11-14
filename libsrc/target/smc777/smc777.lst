@@ -24,10 +24,10 @@ target/smc777/graphics/w_respixl_MODE8
 target/smc777/graphics/w_xorpixl
 target/smc777/graphics/w_xorpixl_MODE4
 target/smc777/graphics/w_xorpixl_MODE8
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/smc777/games/joystick
 
-@psg/sn76489/sn76489.lst
-@games/games.lst
-@video/mc6845/mc6845.lst
-@stdio/stdio.lst
+sound/sn76489/obj/${TYPE}_16bit/**/*.o
+@classic/games/games.lst
+@classic/video/mc6845/mc6845.lst
+@classic/stdio/stdio.lst

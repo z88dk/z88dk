@@ -1,60 +1,11 @@
-
-; Found to be necessary on SAM
-target/zx/stdio/console_vars
-
-; Keyboard is like +zx, but extended, so needs new routines
-; Pull it in before zxstdio so we get keyboard reading
-input/fgetc_cons
-@input/input_keyboard.lst
-
-; We only want bits of +zx stdio, but take it all to keep
-; things simple (Our versions are above)
-target/zx/cpm/zx_attr_callee
-target/zx/cpm/zx_border
-target/zx/zx_break
-target/zx/cpm/zx_colour
-
-
-; Sam hardware functions
-target/sam/sam/SAM_PALETTE_VALUES
-target/sam/sam/sam_load_palette
-target/sam/sam/sam_set_palette
+target/sam/obj/samcpm/**/*.o
 
 ; Lets pull in etracker + ay emulator for the sound chip
-@psg/saa1099/saa1099.lst
+sound/saa1099/obj/${TYPE}/**/*.o
 
 ; Pull in WYZ player
-target/sam/psg/asm_wyz_hardware_out
-@psg/ay/wyz/psg_wyz.lst
-
-; What are these used for?
-target/sam/variables
-
-; Games.h uses different joystick routines
-target/sam/games/joystick
-; Joysticks on the SAM are +zx Sinclair sticks (we just alias them)
-target/sam/input/in_Joystick1
-target/sam/input/in_Joystick2
-target/zx/input/in_JoySinclair1
-target/zx/input/in_JoySinclair2
-
-; Beeper sound is the same as +zx (CP/M)
-target/zx/games/bit_open_cpm
-target/zx/games/bit_open_di_cpm
-target/zx/games/bit_close
-target/zx/games/bit_close_ei
-
-; Some extra interrupt code
-target/sam/interrupt/add_raster_int
-target/sam/interrupt/line_vectors
-target/sam/interrupt/sam_install_line_isr
-target/sam/interrupt/sam_uninstall_line_isr
-
-; ??
-target/shared/clock
-
-target/sam/time/target_read_structtm
+sound/ay/obj/${TYPE}/**/*.o
 
 ; Just some standard stuff now
-@games/games.lst
+@classic/games/games.lst
 

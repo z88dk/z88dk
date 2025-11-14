@@ -19,7 +19,7 @@
 ;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
   IF    !__CPU_INTEL__
     SECTION code_graphics

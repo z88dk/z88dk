@@ -19,7 +19,7 @@
     EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)

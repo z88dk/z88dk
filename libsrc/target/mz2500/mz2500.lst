@@ -3,5 +3,5 @@ target/mz2500/stdio/fputc_cons_native
 target/mz2500/stdio/getk
 target/mz2500/stdio/conio_map_colour
 target/mz2500/stdio/generic_console
-@stdio/stdio.lst
-@games/games.lst
+@classic/stdio/stdio.lst
+@classic/games/games.lst

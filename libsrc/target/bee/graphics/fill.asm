@@ -7,7 +7,7 @@
 
     EXTERN  l_cmp
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;.sline 	defs 320 * 2 * 3
 ;.sline2	defs 320 * 2 * 3

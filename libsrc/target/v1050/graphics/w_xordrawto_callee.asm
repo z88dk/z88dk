@@ -8,7 +8,7 @@
     EXTERN  __v1050_line
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 xordrawto_callee:
 _xordrawto_callee:

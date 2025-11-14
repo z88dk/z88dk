@@ -1,0 +1,5 @@
+target/cpm-libs/z80/asm_cpm_bdos
+target/cpm-libs/z80/asm_cpm_bdos_alt
+target/cpm-libs/z80/asm_cpm_bdos_hl
+target/cpm-libs/z80/asm_cpm_get_offset
+target/cpm-libs/z80/asm_cpm_set_offset

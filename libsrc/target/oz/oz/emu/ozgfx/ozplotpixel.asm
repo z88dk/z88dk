@@ -15,7 +15,7 @@
         EXTERN  COORDS
 
 
-        INCLUDE "graphics/grafix.inc"
+	INCLUDE	"classic/gfx/grafix.inc"
 
 
 ozplotpixel:

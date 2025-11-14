@@ -1,8 +1,8 @@
-        INCLUDE "graphics/grafix.inc"
-        SECTION code_clib
-        PUBLIC  undrawb
-        PUBLIC  _undrawb
-        EXTERN  w_pixeladdress
+	INCLUDE "classic/gfx/grafix.inc"
+	SECTION code_clib
+	PUBLIC	undrawb
+	PUBLIC	_undrawb
+	EXTERN	w_pixeladdress
 ;	EXTERN	l_cmp
 
 ;

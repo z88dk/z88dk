@@ -1,4 +1,4 @@
-@stdio/ansicore.lst
-@video/tms9918/video_tms9918.lst
-@gfx/narrow/gfx_narrow.lst
-@games/games_joystick.lst
+@classic/stdio/ansicore.lst
+@classic/video/tms9918/video_tms9918.lst
+@classic/gfx/narrow/gfx_narrow.lst
+@classic/games/games_joystick.lst

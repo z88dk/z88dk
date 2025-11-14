@@ -10,4 +10,4 @@ target/c128/graphics/w_stencil_render
 target/c128/graphics/w_clga_callee
 target/c128/graphics/w_xorclga_callee
 target/c128/graphics/w_fillb_callee
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst

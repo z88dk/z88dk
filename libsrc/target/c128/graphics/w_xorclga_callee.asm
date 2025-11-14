@@ -21,7 +21,7 @@
     EXTERN  l_cmp
     EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 xorclga_callee:

@@ -1,0 +1,5 @@
+newlib/input/basic/z80/asm_in_inkey
+newlib/input/basic/z80/asm_in_pause
+newlib/input/basic/z80/asm_in_test_key
+newlib/input/basic/z80/asm_in_wait_key
+newlib/input/basic/z80/asm_in_wait_nokey

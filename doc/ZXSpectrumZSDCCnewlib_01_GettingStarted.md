@@ -238,7 +238,7 @@ passed into an embedded z88dk-z80asm command. Again, details are beyond the scop
 this document, but the value for that argument tells us that the library code is
 coming from:
 ```
- libsrc/_DEVELOPMENT/lib/sdcc_iy
+ libsrc/newlib/lib/sdcc_iy
 ```
 The contents of this directory are built during the Z88DK build, so you can't
 browse it online.
@@ -254,7 +254,7 @@ can inspect the contents of the library with the z88dk-z80nm command:
 ```
 Do a search and you'll find the zx_border() function listed in there.
 
-The actual source code used to build the library is rooted in [z88dk/libsrc/_DEVELOPMENT](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT)
-and a search using the header path `arch/zx` as a clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/arch/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
+The actual source code used to build the library is rooted in [z88dk/libsrc/](https://github.com/z88dk/z88dk/tree/master/libsrc/)
+and a search using the header path `arch/zx` as a clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/target/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
 
 [... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)

@@ -1,0 +1,4 @@
+classic/video/vio/stdio/generic_console
+classic/video/vio/stdio/VIO_DISPLAY
+classic/video/vio/graphics/textpixl6
+@classic/gfx/gencon/gfx_gencon6_portable.lst

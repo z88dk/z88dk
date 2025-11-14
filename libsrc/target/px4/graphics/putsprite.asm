@@ -10,7 +10,7 @@
     PUBLIC  _putsprite
     EXTERN  pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ;	$Id: putsprite.asm,v 1.4 2016-07-02 09:01:36 dom Exp $

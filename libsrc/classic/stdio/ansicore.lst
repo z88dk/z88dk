@@ -1,0 +1,13 @@
+classic/stdio/obj/${TYPE}/ansi/f_ansi
+classic/stdio/obj/${TYPE}/ansi/f_ansi_lf
+classic/stdio/obj/${TYPE}/ansi/f_ansi_putc
+classic/stdio/obj/${TYPE}/ansi/fputc_cons
+classic/stdio/obj/${TYPE}/ansi/f_ansi_dsr6
+classic/stdio/obj/${TYPE}/ansi/vtrendition
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline_generic
+classic/stdio/obj/${TYPE}/ansi/gencon/f_ansi_char
+classic/stdio/obj/${TYPE}/ansi/gencon/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/gencon/f_ansi_attr
+classic/stdio/obj/${TYPE}/ansi/gencon/f_ansi_cls
+classic/stdio/obj/${TYPE}/ansi/gencon/f_ansi_bel
+classic/stdio/obj/${TYPE}/ansi/gencon/f_ansi_scrollup

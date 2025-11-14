@@ -1,2 +1,2 @@
 
-    INCLUDE "target/zx/stdio/fputc_cons.asm"
+    INCLUDE "target/zx/classic/stdio/fputc_cons.asm"

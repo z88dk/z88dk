@@ -14,4 +14,4 @@ xor_MODE0:
     ret     nc
 
     defc    NEEDxor=1
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"

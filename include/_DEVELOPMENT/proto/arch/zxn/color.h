@@ -21,7 +21,7 @@ include(__link__.m4)
    Use the m4 colour macros in macro/zxn-color.m4 to convert
    from various RGB spaces to the Next's RGB332 and RGB333 formats.
 
-   https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zxn/macro/zxn-color.m4
+   https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zxn/macro/zxn-color.m4
 */
 
 // NEXTOS INITIAL COLOURS

@@ -1,4 +1,4 @@
-@games/games.lst
+@classic/games/games.lst
 target/apple2/stdio/a2_ctl
 target/apple2/stdio/fputc_cons
 target/apple2/stdio/gotoxy_callee

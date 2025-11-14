@@ -125,6 +125,23 @@ extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
 
 )')')
 
+define(`__SPROTO', `ifdef(`m4_SDCC',dnl
+ifelse(`$2',,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))');
+,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))') __preserves_regs(`$2');
+)dnl
+,dnl
+`ifdef(`m4_SCCZ80',dnl
+extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __stdc;
+
+,dnl
+extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
+
+)')')
+
+
+
 
 # VARARG PROTOTYPES
 

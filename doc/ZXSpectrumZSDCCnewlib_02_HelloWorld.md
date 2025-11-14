@@ -285,10 +285,10 @@ concatenation to work around this:
 
 Documentation for control codes, as implemented by the new Z88DK libraries,
 hasn't been completed yet. Reading the source files is the only way to get
-definitive documentation. They're [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk):
+definitive documentation. They're [here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk):
 
 ```
-  libsrc/_DEVELOPMENT/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk
+  libsrc/newlib/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk
 ```
 
 The filenames of the files in that source tree indicate what codes do what.

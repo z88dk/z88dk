@@ -5,7 +5,7 @@
     EXTERN  __sam_graphics_pagein
     EXTERN  __sam_graphics_pageout
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __zx_console_attr
 

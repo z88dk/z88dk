@@ -6,6 +6,6 @@ target/g800/stdio/ansi/f_ansi_char
 target/g800/stdio/ansi/f_ansi_cls
 target/g800/stdio/ansi/f_ansi_dline
 target/g800/stdio/ansi/f_ansi_scrollup
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 @target/g800/g800_common.lst

@@ -1,0 +1,5 @@
+@newlib/drivers/character/character_00.lst
+@newlib/drivers/general/general.lst
+@newlib/drivers/memstream/memstream.lst
+@newlib/drivers/terminal/console_01.lst
+@newlib/drivers/tty/tty.lst

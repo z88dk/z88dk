@@ -13,7 +13,7 @@
     PUBLIC  clsgraph
     PUBLIC  _clsgraph
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 clsgraph:

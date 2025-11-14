@@ -83,15 +83,15 @@ enum
 };
 
 char *newlib_paths[NEWLIB_SIZE] = {
-    "/../../libsrc/_DEVELOPMENT/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
-    "/../../libsrc/_DEVELOPMENT/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
-    "/../../libsrc/_DEVELOPMENT/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
+    "/../../libsrc/newlib/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
+    "/../../libsrc/newlib/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
+    "/../../libsrc/newlib/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
     0,
-    "/../../include/_DEVELOPMENT/sccz80/lib/",        // NEWLIB_HDR_SCCZ80
-    "/../../include/_DEVELOPMENT/sdcc/lib/",          // NEWLIB_HDR_SDCC
-    "/../../include/_DEVELOPMENT/clang/lib/",         // NEWLIB_HDR_CLANG
+    "/../../include/sccz80/lib/",        // NEWLIB_HDR_SCCZ80
+    "/../../include/sdcc/lib/",          // NEWLIB_HDR_SDCC
+    "/../../include/clang/lib/",         // NEWLIB_HDR_CLANG
     0,
-    "/../../include/_DEVELOPMENT/proto/lib/",         // NEWLIB_HDR_PROTO
+    "/../../include/proto/lib/",         // NEWLIB_HDR_PROTO
     "/../../include/_DEVELOPMENT"                     // NEWLIB_HDR_MAKE
 };
 

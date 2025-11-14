@@ -6,7 +6,7 @@ target/excali64/stdio/CRT_FONT
 target/excali64/stdio/copy_font
 target/excali64/stdio/loadudg6
 
-@input/input_keyboard.lst
-@gfx/gencon/gfx_gencon6.lst
-@video/mc6845/mc6845.lst
-@games/games.lst
+@classic/input/input_keyboard.lst
+@classic/gfx/gencon/gfx_gencon6.lst
+@classic/video/mc6845/mc6845.lst
+@classic/games/games.lst

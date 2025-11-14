@@ -1,0 +1,4 @@
+newlib/drivers/general/device_reset_error
+newlib/drivers/general/device_return_error
+newlib/drivers/general/device_set_error
+newlib/drivers/general/driver_error_enolck_zc

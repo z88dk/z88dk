@@ -1,2 +1,2 @@
-gfx/narrow/obj/${TARGET}/dcircle2
-gfx/narrow/obj/${TARGET}/getsprite2
+classic/gfx/narrow/obj/${TARGET}/dcircle2
+classic/gfx/narrow/obj/${TARGET}/getsprite2

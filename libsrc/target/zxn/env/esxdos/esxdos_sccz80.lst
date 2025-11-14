@@ -1,0 +1,9 @@
+@target/zxn/env/esxdos/esxdos_asm.lst
+target/zxn/env/esxdos/c/sccz80/env_getenv
+target/zxn/env/esxdos/c/sccz80/env_getenv_callee
+target/zxn/env/esxdos/c/sccz80/getenv
+target/zxn/env/esxdos/c/sccz80/getenv_ex
+target/zxn/env/esxdos/c/sccz80/getenv_ex_callee
+target/zxn/env/esxdos/c/sccz80/mkstemp_ex
+target/zxn/env/esxdos/c/sccz80/tmpnam
+target/zxn/env/esxdos/c/sccz80/tmpnam_ex

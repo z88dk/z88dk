@@ -34,7 +34,7 @@ jobs:
     - name: Build libraries
       run: |
         export PATH=/usr/local/bin:$PATH
-        MAKE_CONCURRENCY=-j3 ./build.sh -v -b
+        MAKE_CONCURRENCY=-j1 ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/usr/local/bin:$PATH

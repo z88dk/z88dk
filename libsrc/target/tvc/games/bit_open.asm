@@ -6,7 +6,7 @@
 
     SECTION code_clib
     INCLUDE "target/tvc/def/tvc.def"
-    INCLUDE "games/games.inc"
+    INCLUDE "classic/games/games.inc"
     PUBLIC  bit_open
     PUBLIC  _bit_open
     EXTERN  __snd_tick

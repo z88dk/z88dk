@@ -6,6 +6,7 @@
     SECTION code_crt_exit
     SECTION code_crt_exit_exit
     SECTION code_driver
+    SECTION code_crt_common
     SECTION code_l		;Keep these in "low" memory
     SECTION code_l_sdcc
     SECTION code_l_sccz80
@@ -73,5 +74,6 @@ IF !__crt_org_graphics
 ENDIF
     SECTION code_video_vdp
     SECTION code_bifrost2
+    SECTION code_SMSlib
     SECTION code_user
     SECTION CODE_END

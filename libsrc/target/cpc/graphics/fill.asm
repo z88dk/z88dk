@@ -35,7 +35,7 @@
 
         INCLUDE "target/cpc/def/cpcfirm.def"
         
-        INCLUDE	"graphics/grafix.inc"
+        INCLUDE	"classic/gfx/grafix.inc"
 
 
 .fill

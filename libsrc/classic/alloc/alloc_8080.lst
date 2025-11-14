@@ -1,0 +1,2 @@
+alloc/obstack/obj/${TYPE}/**/*.o
+@classic/alloc/malloc-classic/malloc.lst

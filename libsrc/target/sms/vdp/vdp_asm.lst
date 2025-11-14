@@ -1,0 +1,8 @@
+target/sms/vdp/z80/__sms_vdp_reg_array
+target/sms/vdp/z80/asm_sms_display_off
+target/sms/vdp/z80/asm_sms_display_on
+target/sms/vdp/z80/asm_sms_vdp_feature_disable
+target/sms/vdp/z80/asm_sms_vdp_feature_enable
+target/sms/vdp/z80/asm_sms_vdp_init
+target/sms/vdp/z80/asm_sms_vdp_set_read_address
+target/sms/vdp/z80/asm_sms_vdp_set_write_address

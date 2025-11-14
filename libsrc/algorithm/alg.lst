@@ -1,7 +1,0 @@
-algorithm/AStarSearch/obj/${TYPE}/astar_CleanUp
-algorithm/AStarSearch/obj/${TYPE}/astar_DeletePath
-algorithm/AStarSearch/obj/${TYPE}/astar_PathLength
-algorithm/AStarSearch/obj/${TYPE}/astar_Search
-algorithm/AStarSearch/obj/${TYPE}/astar_SearchResume
-algorithm/AStarSearch/obj/${TYPE}/astar_WalkPath
-algorithm/AStarSearch/obj/${TYPE}/astar_WalkPath_callee

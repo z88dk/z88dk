@@ -1,0 +1,4 @@
+@target/zxn/version/version_asm.lst
+target/zxn/version/c/sccz80/check_version_core
+target/zxn/version/c/sccz80/check_version_esxdos
+target/zxn/version/c/sccz80/check_version_nextzxos

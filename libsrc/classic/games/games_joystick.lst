@@ -1,0 +1,5 @@
+classic/games/obj/${TARGET}/joystick
+classic/games/obj/${TARGET}/joystick_type
+classic/games/obj/${TARGET}/joystick_sc
+classic/games/obj/${TARGET}/kjoystick
+classic/games/obj/${TARGET}/joystick_inkey

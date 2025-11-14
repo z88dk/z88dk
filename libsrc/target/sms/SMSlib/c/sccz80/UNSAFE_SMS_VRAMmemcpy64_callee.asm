@@ -1,0 +1,23 @@
+; void UNSAFE_SMS_VRAMmemcpy64(unsigned int dst,void *src)
+
+SECTION code_clib
+SECTION code_SMSlib
+
+PUBLIC UNSAFE_SMS_VRAMmemcpy64_callee
+
+EXTERN asm_SMSlib_UNSAFE_VRAMmemcpy64
+
+UNSAFE_SMS_VRAMmemcpy64_callee:
+
+   pop hl
+	pop de
+	ex (sp),hl
+
+   jp asm_SMSlib_UNSAFE_VRAMmemcpy64
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _UNSAFE_SMS_VRAMmemcpy64_callee
+defc _UNSAFE_SMS_VRAMmemcpy64_callee = UNSAFE_SMS_VRAMmemcpy64_callee
+ENDIF
+

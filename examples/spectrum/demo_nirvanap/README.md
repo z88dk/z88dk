@@ -1,6 +1,6 @@
 # ZX SPECTRUM NIRVANA+ DEMO
 [Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)  
-[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/nirvanap)  
+[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/target/zx/nirvanap)  
 [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/nirvana%2B.h)
 
 Some games using Nirvana+ not listed on the author's website:  Pietro Bros, Snake

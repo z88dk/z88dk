@@ -49,10 +49,10 @@ static void dummy()
 #endif
 
    ; Include newlib sorts
-   INCLUDE "../../../libsrc/_DEVELOPMENT/stdlib/z80/sort/__sort_parameters.asm"
-   INCLUDE "../../../libsrc/_DEVELOPMENT/stdlib/z80/sort/asm_insertion_sort.asm"
-   INCLUDE "../../../libsrc/_DEVELOPMENT/stdlib/z80/sort/asm_shellsort.asm"
-   INCLUDE "../../../libsrc/_DEVELOPMENT/stdlib/z80/sort/asm_quicksort.asm"
+   INCLUDE "../../../libsrc/stdlib/z80/sort/__sort_parameters.asm"
+   INCLUDE "../../../libsrc/stdlib/z80/sort/asm_insertion_sort.asm"
+   INCLUDE "../../../libsrc/stdlib/z80/sort/asm_shellsort.asm"
+   INCLUDE "../../../libsrc/stdlib/z80/sort/asm_quicksort.asm"
 
    #define read_qsort_small_c_args \
          pop af \ pop ix \ pop de \ pop hl \ pop bc \ \

@@ -12,7 +12,7 @@
 ;	$Id: dfill.asm,v 1.4 2016-06-21 20:16:35 dom Exp $
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  do_fill

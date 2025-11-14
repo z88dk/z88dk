@@ -1,0 +1,6 @@
+classic/debug/obj/${TYPE}/disz80
+classic/debug/obj/${TYPE}/dump
+classic/debug/obj/${TYPE}/z80genuine
+classic/debug/obj/${TYPE}/z80rabbit
+classic/debug/obj/${TYPE}/z80type
+classic/debug/obj/${TYPE}/z80undoc

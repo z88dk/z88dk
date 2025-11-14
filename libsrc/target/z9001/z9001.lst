@@ -7,16 +7,16 @@ target/z9001/stdio/generic_console_ioctl
 target/z9001/stdio/CRT_FONT
 target/z9001/stdio/conio_vars
 target/z9001/stdio/conio_map_colour
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/z9001/stdio/ansi/f_ansi_attr
 target/z9001/stdio/ansi/f_ansi_bel
 target/z9001/stdio/ansi/f_ansi_char
 target/z9001/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/z9001/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/z9001/games/joystick
-@games/games.lst
+@classic/games/games.lst
 target/z9001/graphics/textpixl
 
 
@@ -40,6 +40,6 @@ target/z9001/graphics/w_stencil_render
 target/z9001/graphics/xor_MODE0
 target/z9001/graphics/xor_MODE1
 target/z9001/graphics/w_xorpixl
-@video/krt/video_krt.lst
-@gfx/wide/gfx_wide.lst
+@classic/video/krt/video_krt.lst
+@classic/gfx/wide/gfx_wide.lst
 

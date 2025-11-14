@@ -1,4 +1,4 @@
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/cpc/stdio/ansi/f_ansi_attr
 target/cpc/stdio/ansi/f_ansi_bel
 target/cpc/stdio/ansi/f_ansi_char
@@ -33,7 +33,7 @@ target/cpc/graphics/w_plotpixl
 target/cpc/graphics/w_respixl
 target/cpc/graphics/w_xorpixl
 target/cpc/graphics/w_pointxy
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/cpc/time/clock
 target/cpc/games/joystick
 target/cpc/cpcrslib/cpmfirmware
@@ -127,9 +127,6 @@ target/cpc/psg/asm_wyz_hardware_out
 target/cpc/psg/asm_vt2_hardware_out
 target/cpc/psg/asm_arkos_cpc_rom
 target/cpc/psg/asm_arkos_cpc_smc
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/vt2/psg_vt2.lst
-@psg/ay/arkos/psg_arkos.lst
-@input/input_keyboard.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/input/input_keyboard.lst
 target/cpc/input/__cpc_scan_allrows

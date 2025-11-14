@@ -4,7 +4,7 @@ target/cpm/stdio/obj/${TYPE}/fputc_cons
 target/cpm/stdio/obj/${TYPE}/generic_console
 target/cpm/cpm/obj/${TYPE}/cpm_platform_init
 target/cpm/cpm/obj/${TYPE}/__bdos
-@stdio/stdio_binary.lst
+@classic/stdio/stdio_binary.lst
 
 target/cpm/time/obj/${TYPE}/clock
 target/cpm/time/obj/${TYPE}/time

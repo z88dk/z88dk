@@ -5,21 +5,21 @@ target/lviv/stdio/generic_console_vpeek
 target/lviv/stdio/conio_vars
 target/lviv/stdio/conio_map_colour
 target/lviv/stdio/CRT_FONT
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 
 target/lviv/games/joystick
 target/lviv/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 target/lviv/graphics/clg
 target/lviv/graphics/pixladdr
 target/lviv/graphics/plotpixl
 target/lviv/graphics/respixl
 target/lviv/graphics/xorpixl
 target/lviv/graphics/pointxy
-@gfx/portable/gfx_portable.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/portable/gfx_portable.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/lviv/input/in_keytranstbl_qwerty
-stdio/obj/${TYPE}/inkey/getk
-stdio/obj/${TYPE}/inkey/fgetc_cons
-@input/input_keyboard.lst
+classic/stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+@classic/input/input_keyboard.lst
