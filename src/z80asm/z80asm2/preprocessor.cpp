@@ -241,10 +241,6 @@ bool Preprocessor::next_line(TokensLine& line) {
             keyword = Keyword::None;
             i = 0;
             if (is_name_directive(line, i, keyword, name)) {
-                // Name directives are not conditional keywords; gate by IF-state
-                if (!output_active()) {
-                    continue; // skip
-                }
                 reading_queue_for_directive_ = true;
                 process_name_directive(line, i, keyword, name);
                 reading_queue_for_directive_ = false;
@@ -290,9 +286,6 @@ bool Preprocessor::next_line(TokensLine& line) {
         keyword = Keyword::None;
         i = 0;
         if (is_name_directive(line, i, keyword, name)) {
-            if (!output_active()) {
-                continue;
-            }
             process_name_directive(line, i, keyword, name);
             continue; // get next line
         }
@@ -660,8 +653,15 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
 bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    int& out_linenum, std::string& out_filename,
                                    Keyword keyword) const {
+    // accept negative line numbers
+    int sign = 1;
     line.skip_spaces(i);
+    if (i < line.size() && line[i].is(TokenType::Minus)) {
+        ++i;
+        sign = -1;
+    }
 
+    line.skip_spaces(i);
     if (!(i < line.size() && line[i].is(TokenType::Integer))) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        std::string("Expected line number in ") +
@@ -669,7 +669,7 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
         return false;
     }
 
-    out_linenum = line[i].int_value();
+    out_linenum = sign * line[i].int_value();
     ++i;
 
     line.skip_spaces(i);
