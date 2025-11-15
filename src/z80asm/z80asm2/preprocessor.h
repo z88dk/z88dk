@@ -6,23 +6,21 @@
 
 #pragma once
 
-#include "errors.h"
 #include "keywords.h"
 #include "lexer.h"
+#include <ctime>
 #include <deque>
-#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <ctime>
 
 class Preprocessor {
 public:
     Preprocessor() = default;
 
-    // Clear all state (stack, macros, recursion counters)
+    // Clear all state (stack, macros)
     void clear();
 
     // Clear the global file cache
@@ -342,6 +340,26 @@ private:
 
     // #ifndef/#define detector
     bool detect_ifndef_guard(File& file, std::string& out_symbol);
+
+    // NEW: handle directives for a line (both queued and fetched paths)
+    // Returns true if the line was fully handled (consumed) and the caller should continue the loop.
+    // Returns false if no directive/name-directive consumed the line, so the caller
+    // should: for queued lines -> emit the line; for fetched lines -> expand macros and emit.
+    bool handle_directives_for_line(TokensLine& line, bool reading_from_queue);
+
+    // NEW helper: normalize a line after initial macro expansion.
+    // full_processing == false:
+    //   - Fast path identical to previous next_line logic:
+    //     * If no ## present, just post_process_line (no splitting).
+    //     * If ## present, perform token-paste, second macro expansion and
+    //       (only if expansion produced additional lines) split & post-process.
+    // full_processing == true (used from add_virtual_file):
+    //   - Always perform token-paste (if needed), second macro expansion,
+    //     colon/backslash splitting and post_process_line on each resulting segment.
+    // Output lines appended to out_lines (cleared first).
+    void finalize_line(const TokensLine& in,
+                       bool full_processing,
+                       std::vector<TokensLine>& out_lines);
 };
 
 // called when command line -E is given

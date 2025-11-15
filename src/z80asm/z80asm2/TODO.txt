@@ -1,4 +1,0 @@
-- add option -MD (.d file) and generate input file for Makefile target.d
-- add tests for dependency generation
-- add tests for preprocessor stand-alone run
-- add tests for options -E, -MD, -I
