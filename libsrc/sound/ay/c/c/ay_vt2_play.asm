@@ -1,5 +1,5 @@
 
-	SECTION	code_psg
+	SECTION	code_sound_ay
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
@@ -39,7 +39,7 @@ _ay_vt2_stop:
 
 
 
-    SECTION	data_psg
+    SECTION	data_sound_ay
 
 __ay_vt2_play_enabled:	defb	1
 

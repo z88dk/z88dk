@@ -39,7 +39,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__ & !__CPU_RABBIT__ & !__CPU_Z180__
 ;Call MUTE or INIT one more time to mute sound after stopping
 ;playing 
 
-SECTION code_psg
+SECTION code_sound_ay
 ;	ORG $C000
 
 ;Test codes (commented)

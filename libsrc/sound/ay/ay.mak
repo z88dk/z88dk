@@ -11,12 +11,12 @@ SOUND_AY_R2KA_OBJECTS := $(SOUND_AY_R2KA_CFILES:.c=.o) $(SOUND_AY_R2KA_AFILES:.a
 SOUND_AY_GLOBS := "sound/ay/c/sccz80/wyz/*.asm" "sound/ay/z80/wyz/*.asm" \
 		 "sound/ay/z80/vt2/*.asm" \
 		"sound/ay/c/sccz80/arkos/*.asm" \
-		"sound/ay/c/smallc/*.asm" 
+		"sound/ay/c/c/*.asm" 
 
 SOUND_AY_GLOBS_ex := sound/ay/c/sccz80/wyz/*.asm sound/ay/z80/wyz/*.asm \
 		sound/ay/z80/vt2/*.asm \
 		sound/ay/c/sccz80/arkos/*.asm \
-		sound/ay/c/smallc/*.asm
+		sound/ay/c/c/*.asm
 
 
 SOUND_AY_TARGETS := sound/ay/obj/newlib-z80-sound-ay \

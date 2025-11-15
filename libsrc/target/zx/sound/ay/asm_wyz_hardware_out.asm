@@ -4,7 +4,7 @@
 ;
 ;
 
-    SECTION code_psg
+    SECTION code_sound_ay
 
     PUBLIC  asm_wyz_hardware_out
 

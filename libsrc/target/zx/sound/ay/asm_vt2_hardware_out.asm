@@ -1,6 +1,6 @@
 ; ZX Implementation of the hardware out for VortexTracker/z80
 
-    SECTION code_psg
+    SECTION code_sound_ay
 
     PUBLIC  asm_vt_hardware_out
     PUBLIC  asm_vt_hardware_out_A0
