@@ -149,7 +149,7 @@ TEST_CASE("resolve_include_candidate picks absolute path directly",
                std::to_string(std::rand()) + ".inc");
     std::string abs_path = write_text_file(tmp, "LD A,1");
     // resolve should return the normalized absolute path when given an absolute path
-    std::string resolved = resolve_include_candidate(abs_path, false);
+    std::string resolved = resolve_include_candidate(abs_path, "", false);
     REQUIRE_FALSE(resolved.empty());
     CHECK(std::filesystem::absolute(tmp).lexically_normal().generic_string() ==
           resolved);
@@ -180,7 +180,7 @@ TEST_CASE("resolve_include_candidate honors include_paths order for angle includ
     g_options.include_paths.push_back(inc1.generic_string());
 
     // Angle include: should search include_paths in order and pick inc2
-    std::string resolved = resolve_include_candidate(name, true);
+    std::string resolved = resolve_include_candidate(name, "", true);
     REQUIRE_FALSE(resolved.empty());
     CHECK(resolved == std::filesystem::absolute(inc2 /
             name).lexically_normal().generic_string());
