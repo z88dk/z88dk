@@ -143,7 +143,6 @@ TEST_CASE("Preprocessor: include without filename reports invalid-syntax",
     // should include the source line and location
     REQUIRE(msg.find("#include") != std::string::npos);
     REQUIRE(msg.find("virtual_noarg:1:") != std::string::npos);
-    REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: include with angle brackets treated as string; missing file reports FileNotFound",
@@ -2902,7 +2901,6 @@ TEST_CASE("Preprocessor: define_macro(name, string) reports MacroRedefined on re
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Macro redefined") != std::string::npos);
     REQUIRE(msg.find("A") != std::string::npos);
-    REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: define_macro(name, tok_lines) reports MacroRedefined on redefinition",
@@ -5690,8 +5688,15 @@ TEST_CASE("Preprocessor: token paste at beginning of replacement list",
     pp.push_virtual_file(content, "paste_beginning", 1, true);
 
     TokensLine line;
-    // Implementation-defined behavior; just verify it doesn't crash
-    while (pp.next_line(line)) {}
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() >= 3);
+    REQUIRE(line[0].is(TokenType::DoubleHash));
+    REQUIRE(line[1].is(TokenType::Whitespace));
+    REQUIRE(line[2].is(TokenType::Identifier));
+    REQUIRE(line[2].text() == "test");
+
+    REQUIRE_FALSE(pp.next_line(line));
+
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -5709,7 +5714,7 @@ TEST_CASE("Preprocessor: token paste at end of replacement list",
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() >= 3);
     REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text()=="x");
+    REQUIRE(line[0].text() == "test");
     REQUIRE(line[1].is(TokenType::Whitespace));
     REQUIRE(line[2].is(TokenType::DoubleHash));
 
@@ -6677,7 +6682,8 @@ TEST_CASE("Preprocessor: clear() resets dependency_filenames",
     // Now clear and verify dependencies are empty
     pp.clear();
     REQUIRE(pp.dependency_filenames().empty());
-    REQUIRE_FALSE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("File not found: " + dep) != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-statements line (parenthesized call)",
@@ -6832,22 +6838,27 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
         // The directive itself is consumed by the preprocessor and will likely error due to missing identifier,
         // but 'NOP' after ':' must still be emitted as the next logical line.
         const std::string content =
-            "EQU : NOP\n";
+            "EQU : NOP : HALT\n";
         pp.push_virtual_file(content, "label_directive.asm", 1, true);
 
-        std::vector<std::string> outs;
         TokensLine line;
-        while (pp.next_line(line)) {
-            outs.push_back(line.to_string());
-        }
+        REQUIRE(pp.next_line(line));
+        // EQU is not output because of the missing identifier; error expected
+        // It is not treated as a label.
+        REQUIRE(g_errors.has_errors());
+        std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Expected identifier after EQU") != std::string::npos);
+        g_errors.reset();
 
-        // Directive part is consumed; we only see the statement after ':'
-        REQUIRE_FALSE(outs.empty());
-        REQUIRE(trim(outs.back()) == "NOP");
-        // And no label line like ".EQU" was produced
-        for (const auto& s : outs) {
-            REQUIRE(s.find(".EQU") == std::string::npos);
-        }
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(Keyword::NOP));
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(Keyword::HALT));
+
+        REQUIRE_FALSE(pp.next_line(line));
+
         REQUIRE_FALSE(g_errors.has_errors());
     }
 
