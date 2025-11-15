@@ -772,6 +772,443 @@ db 255
 db 1
 END
 
+#------------------------------------------------------------------------------
+# New tests: REPT / REPTC / REPTI
+#------------------------------------------------------------------------------
+
+# Simple REPT repetition: REPT 3 should emit 3 copies of the body at directive location
+spew("$test.asm", <<END);
+REPT 3
+X
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+X
+#line 2
+X
+#line 2
+X
+END
+
+# REPT with zero count: body consumed but nothing emitted; following line should appear
+spew("$test.asm", <<END);
+REPT 0
+SKIPME
+ENDR
+AFTER
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# AFTER should be emitted at its logical location (line 4)
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER
+END
+
+# REPTC iterates over characters of a string argument and substitutes variable
+spew("$test.asm", <<END);
+REPTC ch, "AZ"
+defb ch
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect defb 65 and defb 90 (ASCII 'A' and 'Z')
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+defb 65
+#line 1
+defb 90
+END
+
+# REPTI enumerates a list of arguments into the body
+spew("$test.asm", <<END);
+REPTI v, 7,8
+db v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect two db lines with values 7 and 8
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 7
+#line 1
+db 8
+END
+
+# REPT with LOCAL renaming: local label L should be uniquified per iteration
+spew("$test.asm", <<END);
+REPT 2
+LOCAL L
+L: nop
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect two iterations with labels renamed L_1 and L_2 and corresponding nop lines
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+.L_1
+#line 3
+nop
+#line 3
+.L_2
+#line 3
+nop
+END
+
+#------------------------------------------------------------------------------
+# New tests: IF / ELIF / ELSE / ENDIF
+#------------------------------------------------------------------------------
+
+# IF true: emit THEN branch, then following lines
+spew("$test.asm", <<END);
+IF 1
+A
+ENDIF
+X
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+A
+
+X
+END
+
+# IF false with ELSE: emit ELSE branch
+spew("$test.asm", <<END);
+IF 0
+A
+ELSE
+B
+ENDIF
+C
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+B
+
+C
+END
+
+# IF with multiple ELIF: first true ELIF wins; later branches ignored
+spew("$test.asm", <<END);
+IF 0
+ONE
+ELIF 0
+TWO_SHOULD_NOT
+ELIF 1
+THREE
+ELSE
+FOUR_SHOULD_NOT
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6, "$test.asm"
+THREE
+END
+
+# Nested IF: inner ELSE selected, outer IF true; then following line
+spew("$test.asm", <<END);
+IF 1
+X
+IF 0
+Y
+ELSE
+Z
+ENDIF
+ENDIF
+W
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+X
+
+
+
+Z
+
+
+W
+END
+
+# Single-line colon-separated IF true -> THEN branch
+spew("$test.asm", <<END);
+IF 1 : OK : ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+OK
+END
+
+# Single-line colon-separated IF false with ELSE -> ELSE branch
+spew("$test.asm", <<END);
+IF 0 : BAD : ELSE : GOOD : ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+GOOD
+END
+
+# Single-line colon-separated IF with multiple ELIF -> first true ELIF only
+spew("$test.asm", <<END);
+IF 0 : A : ELIF 1 : B : ELIF 1 : C : ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+B
+END
+
+#------------------------------------------------------------------------------
+# New tests: IFDEF / IFNDEF / ELIFDEF / ELIFNDEF
+#------------------------------------------------------------------------------
+
+# IFDEF true when macro is defined -> THEN branch emitted
+spew("$test.asm", <<END);
+#define A 1
+IFDEF A
+T
+ELSE
+F
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'T' is on physical line 3
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+T
+END
+
+# IFDEF false -> ELSE branch emitted
+spew("$test.asm", <<END);
+IFDEF UNDEF_MAC
+T
+ELSE
+F
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'F' is on physical line 4
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+F
+END
+
+# IFNDEF true when macro is NOT defined -> THEN branch emitted
+spew("$test.asm", <<END);
+IFNDEF X
+YES
+ELSE
+NO
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'YES' is on physical line 2
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+YES
+END
+
+# IFNDEF false when macro is defined -> ELSE branch emitted
+spew("$test.asm", <<END);
+#define B 1
+IFNDEF B
+YES_SHOULD_NOT
+ELSE
+NO_OK
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'NO_OK' is on physical line 6
+check_text_file("$test.i", <<END);
+#line 5, "$test.asm"
+NO_OK
+END
+
+# ELIFDEF after false IF: selects when macro is defined
+spew("$test.asm", <<END);
+#define A 1
+IF 0
+X
+ELIFDEF A
+Y
+ELSE
+Z
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'Y' is on physical line 5
+check_text_file("$test.i", <<END);
+#line 5, "$test.asm"
+Y
+END
+
+# ELIFDEF not taken when macro is undefined -> ELSE branch
+spew("$test.asm", <<END);
+IF 0
+X
+ELIFDEF MISSING
+Y_SHOULD_NOT
+ELSE
+Z_OK
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'Z_OK' is on physical line 6
+check_text_file("$test.i", <<END);
+#line 6, "$test.asm"
+Z_OK
+END
+
+# ELIFNDEF after false IF: selects when macro is not defined
+spew("$test.asm", <<END);
+IF 0
+A
+ELIFNDEF B
+BDEF
+ELSE
+ELSE_BAD
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'BDEF' is on physical line 4
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+BDEF
+END
+
+# ELIFNDEF not taken when macro is defined -> ELSE branch
+spew("$test.asm", <<END);
+#define FLAG 1
+IF 0
+THEN_BAD
+ELIFNDEF FLAG
+ELIFNDEF_BAD
+ELSE
+ELSE_OK
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'ELSE_OK' is on physical line 8
+check_text_file("$test.i", <<END);
+#line 7, "$test.asm"
+ELSE_OK
+END
+
+# Single-line colon-separated IFDEF true -> THEN branch
+spew("$test.asm", <<END);
+#define C 1
+IFDEF C : OK : ELSE : BAD : ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+OK
+END
+
+# Single-line colon-separated IFNDEF true (macro missing) -> THEN branch
+spew("$test.asm", <<END);
+IFNDEF M : MISSING_OK : ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+MISSING_OK
+END
 
 # clean up
 unlink_testfiles if Test::More->builder->is_passing;

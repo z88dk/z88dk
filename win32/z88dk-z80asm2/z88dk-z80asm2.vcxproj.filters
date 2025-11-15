@@ -136,5 +136,8 @@
     <None Include="..\..\src\z80asm\z80asm2\t\testlib.pl">
       <Filter>Resource Files\t</Filter>
     </None>
+    <None Include="..\..\src\z80asm\z80asm2\t\include.t">
+      <Filter>Resource Files\t</Filter>
+    </None>
   </ItemGroup>
 </Project>
