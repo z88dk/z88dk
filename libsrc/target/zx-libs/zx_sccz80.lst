@@ -2,7 +2,7 @@
 @target/zx/bifrost_l/bifrost_l_sccz80.lst
 @target/zx/bifrost2/bifrost2_sccz80.lst
 @target/zx/display/display_sccz80.lst
-;@target/zx-libs/esxdos/esxdos_sccz80.lst
+;@target/zx/esxdos/esxdos_sccz80.lst
 @target/zxn/esxdos/esxdos_sccz80.lst
 @target/zx-libs/globals/globals_asm.lst
 @target/zx/graphics/graphics_sccz80.lst

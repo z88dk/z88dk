@@ -3,6 +3,7 @@
 ; "commented" out m4 defines are used
 
     INCLUDE "target/zx/def/zxports.h"
+    INCLUDE "target/zx/def/esxdos.def"
 
 
 
@@ -26,3 +27,5 @@ defc __NIRVANAP_CHAR_TABLE  = 15360   ; default location of character set (8x8 p
 ; define(`__NIRVANAP_TOTAL_ROWS', 23)      # total number of rows drawn by nirvana+ 1-23
 ; define(`__NIRVANAP_OPTIONS_WIDE_DRAW',    0x01)
 ; define(`__NIRVANAP_OPTIONS_WIDE_SPRITES', 0x02)
+
+

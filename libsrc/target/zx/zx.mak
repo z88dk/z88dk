@@ -2,6 +2,7 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/ulaplus/c/smallc/*.asm" \
 	"target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm" \
 	"target/zx/graphics/c/sccz80/*.asm" "target/zx/graphics/z80/*.asm" \
+	"target/zx/esxdos/c/sccz80/*.asm" "target/zx/esxdos/z80/*.asm" \
 	"target/zx/misc/c/sccz80/*.asm" "target/zx/misc/z80/*.asm" \
 	"target/zx/tape/c/sccz80/*.asm" "target/zx/tape/z80/*.asm" "target/zx/tape/c/smallc/*.asm" \
 	"target/zx/sound/ay/*.asm" \
@@ -25,6 +26,7 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/ulaplus/c/smallc/*.asm \
 	target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm \
+	target/zx/esxdos/c/sccz80/*.asm target/zx/esxdos/z80/*.asm \
 	target/zx/misc/c/sccz80/*.asm target/zx/misc/z80/*.asm \
 	target/zx/tape/c/sccz80/*.asm target/zx/tape/z80/*.asm target/zx/tape/c/smallc/*.asm \
 	target/zx/sound/ay/*.asm \
@@ -44,6 +46,14 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/classic/stdio/ansi/*.asm \
 	target/zx/classic/graphics/*.asm \
 	target/shared/clock.asm
+
+
+# These shouldn't be shared with ZXN
+ZX_ONLY_GLOBS = \
+	"target/zx/esxdos/c/sccz80/*.asm" "target/zx/esxdos/z80/*.asm"
+
+ZX_ONLY_GLOBS_ex = \
+	target/zx/esxdos/c/sccz80/*.asm target/zx/esxdos/z80/*.asm
 
 ZXCPM_GLOBS := \
 	"target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm" \
@@ -131,7 +141,7 @@ target/$(1)/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/$(1)/obj/$(1)/bifrost2_e
 endef
 
 
-$(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
+$(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(ZX_ONLY_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(ZX_ONLY_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
 $(eval $(call buildtargetc,target/zx,zx))
 $(eval $(call bifrost_zx0,zx))
 
