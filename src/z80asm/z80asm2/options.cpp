@@ -124,13 +124,13 @@ bool is_o_filename(const std::string& filename) {
 
 // Try candidates according to include semantics and include_paths,
 // return resolved path if found or empty string if not found.
+// including_filename: the file which contains the include directive (can be empty if unknown)
 std::string resolve_include_candidate(const std::string& filename,
-                                      bool is_angle) {
+                                      const std::string& including_filename, bool is_angle) {
     namespace fs = std::filesystem;
 
     std::vector<fs::path> candidates;
 
-    std::string current_dir = parent_dir(filename);
     fs::path fname(filename);
 
     // If the filename is absolute, try it directly
@@ -138,20 +138,26 @@ std::string resolve_include_candidate(const std::string& filename,
         candidates.push_back(fname);
     }
     else {
-        // For quoted includes: search current file directory first,
-        // then include_paths, then CWD
+        // Determine including file directory, if provided
+        std::string including_dir = parent_dir(including_filename);
+        if (including_dir.empty()) {
+            including_dir = ".";
+        }
+
         if (!is_angle) {
-            if (!current_dir.empty()) {
-                candidates.push_back(fs::path(current_dir) / fname);
+            // Quoted or plain include: try including file directory first (if known)
+            if (!including_dir.empty()) {
+                candidates.push_back(fs::path(including_dir) / fname);
             }
+            // Then user-provided include paths
             for (const auto& p : g_options.include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
-            // finally try as given (relative to caller)
+            // Finally as-given (relative to current working dir of the process)
             candidates.push_back(fname);
         }
         else {
-            // For angle includes: search include_paths, then CWD, then as-given
+            // Angle includes: search include paths, then as-given
             for (const auto& p : g_options.include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
@@ -251,7 +257,7 @@ static std::string check_source(const std::string& filename) {
 
 // run m4 preprocessor
 static std::string run_m4(const std::string& filename) {
-    std::string m4_full_path = resolve_include_candidate(filename);
+    std::string m4_full_path = resolve_include_candidate(filename, "", false);
     if (m4_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
         return std::string();
@@ -280,7 +286,7 @@ static std::string run_m4(const std::string& filename) {
 
 // run perl preprocessor
 static std::string run_perl(const std::string& filename) {
-    std::string perl_full_path = resolve_include_candidate(filename);
+    std::string perl_full_path = resolve_include_candidate(filename, "", false);
     if (perl_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
         return std::string();
@@ -324,8 +330,8 @@ std::string search_source_file(const std::string& filename) {
             return out_filename;
         }
 
-        // check plain file in include path
-        out_filename = resolve_include_candidate(filename);
+        // check plain file in include path (and CWD)
+        out_filename = resolve_include_candidate(filename, "", false);
         if (!out_filename.empty()) {
             out_filename = check_source(out_filename);
             if (!out_filename.empty()) {
@@ -341,7 +347,7 @@ std::string search_source_file(const std::string& filename) {
         }
 
         // check filename with .asm extension in include path
-        out_filename = resolve_include_candidate(asm_filename);
+        out_filename = resolve_include_candidate(asm_filename, "", false);
         if (!out_filename.empty()) {
             out_filename = check_source(out_filename);
             if (!out_filename.empty()) {
@@ -357,7 +363,7 @@ std::string search_source_file(const std::string& filename) {
         }
 
         // check filename with .o extension in include path
-        out_filename = resolve_include_candidate(o_filename);
+        out_filename = resolve_include_candidate(o_filename, "", false);
         if (!out_filename.empty()) {
             out_filename = check_source(out_filename);
             if (!out_filename.empty()) {
@@ -373,7 +379,7 @@ std::string search_source_file(const std::string& filename) {
         }
 
         // check filename with .asm extension in include path
-        out_filename = resolve_include_candidate(asm_filename);
+        out_filename = resolve_include_candidate(asm_filename, "", false);
         if (!out_filename.empty()) {
             out_filename = check_source(out_filename);
             if (!out_filename.empty()) {
@@ -389,7 +395,7 @@ std::string search_source_file(const std::string& filename) {
         }
 
         // check obejct file in output_dir in include path
-        out_filename = resolve_include_candidate(o_filename);
+        out_filename = resolve_include_candidate(o_filename, "", false);
         if (!out_filename.empty()) {
             out_filename = check_source(out_filename);
             if (!out_filename.empty()) {
