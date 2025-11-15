@@ -109,7 +109,7 @@ TEST_CASE("TokensFile from string, counts and bounds", "[lexer]") {
     REQUIRE(tf.tok_lines_count() == 3);
 
     // get_tok_line bounds
-    REQUIRE(tf.get_tok_line(-1).empty());
+    REQUIRE(tf.get_tok_line(static_cast<unsigned>(-1)).empty());
     REQUIRE(tf.get_tok_line(999).empty());
 
     // each non-empty tokenized line should have a location set to first_line_num (virtual file)
