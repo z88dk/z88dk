@@ -1044,7 +1044,13 @@ std::string Preprocessor::search_include_path(const std::string& filename,
     // (process_include/do_include/process_binary) all use the same routine.
     // Return the resolved path if found; otherwise return the original filename
     // so callers can simply assign the result and proceed.
-    std::string resolved = resolve_include_candidate(filename, is_angle);
+    std::string including_filename;
+    if (!file_stack_.empty()) {
+        const File& top_file = file_stack_.back();
+        including_filename = top_file.tokens_file->filename();
+    }
+    std::string resolved = resolve_include_candidate(filename, including_filename,
+                           is_angle);
     if (resolved.empty()) {
         return filename;
     }
