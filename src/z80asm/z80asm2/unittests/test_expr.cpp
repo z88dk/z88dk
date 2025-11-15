@@ -487,9 +487,9 @@ TEST_CASE("Expr: unary operators parse and evaluate", "[expr][ops][unary]") {
     g_errors.reset();
     g_symbol_table.clear();
 
-    int v;
-    bool undef;
-    bool cst;
+    int v = 0;
+    bool undef = false;
+    bool cst = false;
 
     REQUIRE(parse_and_eval("+5", v, undef, cst));
     REQUIRE(v == +5);
@@ -518,9 +518,9 @@ TEST_CASE("Expr: arithmetic operators parse and evaluate",
     g_errors.reset();
     g_symbol_table.clear();
 
-    int v;
-    bool undef;
-    bool cst;
+    int v = 0;
+    bool undef = false;
+    bool cst = false;
 
     REQUIRE(parse_and_eval("2+3", v, undef, cst));
     REQUIRE(v == 5);
@@ -548,9 +548,9 @@ TEST_CASE("Expr: shift, bitwise, and logical operators",
     g_errors.reset();
     g_symbol_table.clear();
 
-    int v;
-    bool undef;
-    bool cst;
+    int v = 0;
+    bool undef = false;
+    bool cst = false;
 
     REQUIRE(parse_and_eval("1<<3", v, undef, cst));
     REQUIRE(v == (1 << 3));
@@ -582,9 +582,9 @@ TEST_CASE("Expr: comparison operators", "[expr][ops][compare]") {
     g_errors.reset();
     g_symbol_table.clear();
 
-    int v;
-    bool undef;
-    bool cst;
+    int v = 0;
+    bool undef = false;
+    bool cst = false;
 
     REQUIRE(parse_and_eval("3<4", v, undef, cst));
     REQUIRE(v == 1);
@@ -607,9 +607,9 @@ TEST_CASE("Expr: ternary operator", "[expr][ops][ternary]") {
     g_errors.reset();
     g_symbol_table.clear();
 
-    int v;
-    bool undef;
-    bool cst;
+    int v = 0;
+    bool undef = false;
+    bool cst = false;
 
     REQUIRE(parse_and_eval("1?2:3", v, undef, cst));
     REQUIRE(v == 2);
@@ -639,9 +639,9 @@ TEST_CASE("Expr: symbol lookup defined/undefined and constant flag",
     REQUIRE(g_symbol_table.add_symbol("A", s_const));
     REQUIRE(g_symbol_table.add_symbol("B", s_var));
 
-    int v;
-    bool undef;
-    bool cst;
+    int v = 0;
+    bool undef = false;
+    bool cst = false;
 
     // Defined constant only -> constant result
     REQUIRE(parse_and_eval("A+2", v, undef, cst));
