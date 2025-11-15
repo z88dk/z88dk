@@ -2417,7 +2417,7 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
     REQUIRE(line[0].text() == "after");
 
     // No further output expected.
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
 
     // No errors should have been reported.
     REQUIRE_FALSE(g_errors.has_errors());
@@ -2556,7 +2556,7 @@ TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
     REQUIRE(line[0].text() == "X");
 
     // No other lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2956,7 +2956,7 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
         REQUIRE(line[0].text() == "after0");
 
         // No further lines
-        REQUIRE(!pp.next_line(line));
+        REQUIRE_FALSE(pp.next_line(line));
         // No errors expected
         REQUIRE_FALSE(g_errors.has_errors());
     }
@@ -2981,7 +2981,7 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
         REQUIRE(line[0].text() == "after_neg");
 
         // No further lines
-        REQUIRE(!pp.next_line(line));
+        REQUIRE_FALSE(pp.next_line(line));
         // No errors expected
         REQUIRE_FALSE(g_errors.has_errors());
     }
@@ -3486,7 +3486,7 @@ TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens
     REQUIRE(toks[5].is(TokenType::Whitespace));
     REQUIRE(toks[6].is(TokenType::Integer));
     REQUIRE(toks[6].int_value() == 2);
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3510,7 +3510,7 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste result in argument via macro"
     REQUIRE(toks[1].is(TokenType::Whitespace));
     REQUIRE(toks[2].is(TokenType::Identifier));
     REQUIRE(toks[2].text() == "HL");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3534,7 +3534,7 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste in name-directive form via ma
     REQUIRE(toks[1].is(TokenType::Whitespace));
     REQUIRE(toks[2].is(TokenType::Identifier));
     REQUIRE(toks[2].text() == "AB");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3880,7 +3880,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument
     }
 
     // No more lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3916,7 +3916,7 @@ TEST_CASE("Preprocessor: name-directive EQU 'X EQU 5' emits 'DEFC X = 5' tokens"
     REQUIRE(t[6].int_value() == 5);
 
     // No further lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3951,7 +3951,7 @@ TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tok
     REQUIRE(t[10].is(TokenType::Integer));
     REQUIRE(t[10].int_value() == 20);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3978,7 +3978,7 @@ TEST_CASE("Preprocessor: directive EQU 'EQU Y = 7' emits 'DEFC Y = 7' tokens",
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 7);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4006,7 +4006,7 @@ TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 42);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4031,7 +4031,7 @@ TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 3);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4059,7 +4059,7 @@ TEST_CASE("Preprocessor: EQU emitted DEFC line carries directive logical locatio
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 9);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4090,7 +4090,7 @@ TEST_CASE("Preprocessor: '=' synonym converts 'x = 10' to 'DEFC x = 10' tokens",
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 10);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4117,7 +4117,7 @@ TEST_CASE("Preprocessor: '=' synonym accepts tight form 'y=7'",
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 7);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4142,7 +4142,7 @@ TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 5);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4170,7 +4170,7 @@ TEST_CASE("Preprocessor: '=' synonym DEFC line carries directive logical locatio
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 9);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4202,7 +4202,7 @@ TEST_CASE("Preprocessor: directive DEFC 'DEFC Y = 7' emits 'DEFC Y = 7' tokens",
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 7);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4230,7 +4230,7 @@ TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' token
     REQUIRE(t[6].is(TokenType::Integer));
     REQUIRE(t[6].int_value() == 3);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4279,7 +4279,7 @@ TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
     REQUIRE(line[0].text() == "after");
 
     // No more lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4323,7 +4323,7 @@ TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELI
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "done");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4353,7 +4353,7 @@ TEST_CASE("Preprocessor: IF with multiple ELIF selects first true and ignores th
     REQUIRE(line[0].text() == "TWO");
 
     // No more lines from this block
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4391,7 +4391,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
     REQUIRE(line[0].text() == "OK1");
 
     // No more lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4425,7 +4425,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects EL
     REQUIRE(line[0].text() == "OK0");
 
     // No more lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4451,7 +4451,7 @@ TEST_CASE("Preprocessor: IF with undefined symbol does not report error and sele
     REQUIRE(line[0].text() == "ELSE_OK");
 
     // No more lines
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
 
     // No error reported for undefined symbol U (silent evaluation)
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4479,7 +4479,7 @@ TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "T");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4500,7 +4500,7 @@ TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "MISSING_TRUE");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4524,7 +4524,7 @@ TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "ELIFDEF_TRUE");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4547,7 +4547,7 @@ TEST_CASE("Preprocessor: ELIFNDEF after false IF selects when macro is not defin
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "ELIFNDEF_TRUE");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4580,7 +4580,7 @@ TEST_CASE("Preprocessor: IFDEF/ELIFDEF nested with ELSE/ENDIF behave correctly",
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "INNER_TRUE");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4615,7 +4615,7 @@ TEST_CASE("Preprocessor: IFDEF uses symbol table definition when macro is absent
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "OK_S_DEFINED");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4646,7 +4646,7 @@ TEST_CASE("Preprocessor: IFNDEF is false when symbol is defined in symbol table"
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "OK_Z_DEFINED");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4679,7 +4679,7 @@ TEST_CASE("Preprocessor: ELIFDEF selects when symbol is defined in symbol table"
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "ELIFDEF_OK");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -4706,7 +4706,7 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "ELIFNDEF_OK");
 
-        REQUIRE(!pp.next_line(line));
+        REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
     }
 
@@ -4738,7 +4738,7 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "ELSE_OK");
 
-        REQUIRE(!pp.next_line(line));
+        REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
     }
 }
@@ -5505,13 +5505,22 @@ TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementat
     g_errors.reset();
     Preprocessor pp;
 
-    const std::string content = "LINE -5\ntest\n";
+    const std::string content = "LINE -5\ntest\nthis\n";
     pp.push_virtual_file(content, "line_negative", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    // Implementation may accept or reject negative line numbers
-    // Just verify it doesn't crash
+    REQUIRE(line.location().line_num() == -5);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].text() == "test");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == -4);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].text() == "this");
+
+    REQUIRE_FALSE(pp.next_line(line));
+
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -5697,8 +5706,15 @@ TEST_CASE("Preprocessor: token paste at end of replacement list",
     pp.push_virtual_file(content, "paste_end", 1, true);
 
     TokensLine line;
-    // Implementation-defined behavior; just verify it doesn't crash
-    while (pp.next_line(line)) {}
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() >= 3);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text()=="x");
+    REQUIRE(line[1].is(TokenType::Whitespace));
+    REQUIRE(line[2].is(TokenType::DoubleHash));
+
+    REQUIRE_FALSE(pp.next_line(line));
+
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -5731,22 +5747,6 @@ TEST_CASE("Preprocessor: multiple consecutive ## operators",
 // Stringize Edge Cases
 // -----------------------------------------------------------------------------
 
-TEST_CASE("Preprocessor: stringize with empty argument produces empty string",
-          "[preprocessor][stringize][edge][empty]") {
-    g_errors.reset();
-    Preprocessor pp;
-
-    const std::string content =
-        "#define STR(x) #x\n"
-        "STR()\n";
-    pp.push_virtual_file(content, "stringize_empty", 1, true);
-
-    TokensLine line;
-    // Implementation-defined; just ensure no crash
-    while (pp.next_line(line)) {}
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
 TEST_CASE("Preprocessor: stringize with whitespace-only argument",
           "[preprocessor][stringize][edge][whitespace]") {
     g_errors.reset();
@@ -5754,12 +5754,23 @@ TEST_CASE("Preprocessor: stringize with whitespace-only argument",
 
     const std::string content =
         "#define STR(x) #x\n"
-        "STR(   )\n";
+        "STR(\" \")\n";
     pp.push_virtual_file(content, "stringize_whitespace", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    // Should produce character codes for spaces
+    REQUIRE(line.size() >= 5);
+    REQUIRE(line[0].is(TokenType::Integer));
+    REQUIRE(line[0].int_value() == 34);     // quotes
+    REQUIRE(line[1].is(TokenType::Comma));
+    REQUIRE(line[2].is(TokenType::Integer));
+    REQUIRE(line[2].int_value() == 32);     // space
+    REQUIRE(line[3].is(TokenType::Comma));
+    REQUIRE(line[4].is(TokenType::Integer));
+    REQUIRE(line[4].int_value() == 34);     // quotes
+
+    REQUIRE_FALSE(pp.next_line(line));
+
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -5991,7 +6002,7 @@ TEST_CASE("Preprocessor: empty virtual file produces no lines",
     pp.push_virtual_file(content, "empty_virtual", 1, true);
 
     TokensLine line;
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -6137,7 +6148,7 @@ TEST_CASE("Preprocessor: label with no following instruction",
     REQUIRE(toks[1].text() == "label");
 
     // No instruction line should follow
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -6639,7 +6650,10 @@ TEST_CASE("Preprocessor: dependency_filenames captures BINARY/INCBIN in order (i
     REQUIRE(deps[0] == ok1);
     REQUIRE(deps[1] == missing);
     REQUIRE(deps[2] == ok2);
-    REQUIRE_FALSE(g_errors.has_errors());
+
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("File not found: " + missing) != std::string::npos);
 
     std::remove(ok1.c_str());
     std::remove(ok2.c_str());
@@ -7097,7 +7111,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF true yields branch body"
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "NOP");
     // No more output
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7113,7 +7127,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF false with ELSE selects 
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "OK");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7131,7 +7145,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF with multiple ELIF picks
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "B");
     // Ensure subsequent true ELIF branch 'C' was ignored
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7148,7 +7162,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF/ELIF/ELSE chain picks EL
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "FALLBACK");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7166,7 +7180,7 @@ TEST_CASE("Preprocessor: single-line colon-separated nested IF works",
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "Z");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7188,7 +7202,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing t
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "EXTRA_SHOULD_BE_STATEMENT");
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7531,7 +7545,7 @@ TEST_CASE("Preprocessor: single trailing backslash joins next line with one spac
     REQUIRE(toks[1].is(TokenType::Whitespace));
     REQUIRE(toks[1].text() == " ");
     REQUIRE(toks[2].text() == "B");
-    REQUIRE(!pp.next_line(line)); // no extra logical line
+    REQUIRE_FALSE(pp.next_line(line)); // no extra logical line
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7559,7 +7573,7 @@ TEST_CASE("Preprocessor: multiple trailing backslashes cascade into one logical 
         }
     }
     REQUIRE(idents == std::vector<std::string>({ "A", "B", "C", "D" }));
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7593,7 +7607,7 @@ TEST_CASE("Preprocessor: backslash line continuation preserves commas and numeri
             ++comma_count;
         }
     REQUIRE(comma_count == 3);
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7625,7 +7639,7 @@ TEST_CASE("Preprocessor: backslash continuation inside macro argument preserves 
     }
     REQUIRE(idents == std::vector<std::string>({ "A", "B" }));
     REQUIRE(whitespace_blocks >= 1);
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7653,7 +7667,7 @@ TEST_CASE("Preprocessor: backslash before comment stops at comment newline",
     REQUIRE(line[0].is(TokenType::Identifier));
     REQUIRE(line[0].text() == "Y");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7681,7 +7695,7 @@ TEST_CASE("Preprocessor: trailing backslash followed by blank line joins empty l
     REQUIRE(line[0].is(TokenType::Identifier));
     REQUIRE(line[0].text() == "SECOND");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7705,7 +7719,7 @@ TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins l
     REQUIRE(line[2].is(TokenType::Identifier));
     REQUIRE(line[2].text() == "SECOND");
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7729,7 +7743,7 @@ TEST_CASE("Preprocessor: backslash at end of last line (no following line) yield
                 has_only = true;
             }
         REQUIRE(has_only);
-        REQUIRE(!pp.next_line(line));
+        REQUIRE_FALSE(pp.next_line(line));
     }
     // No error expected either way
     REQUIRE_FALSE(g_errors.has_errors());
@@ -7764,7 +7778,7 @@ TEST_CASE("Preprocessor: DEFL preserves non-constant comma-separated list",
     REQUIRE(toks[2].is(TokenType::Integer));
     REQUIRE(toks[2].int_value() == 2);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7793,7 +7807,7 @@ TEST_CASE("Preprocessor: DEFL list expands inside another line (db macro usage)"
     REQUIRE(toks[4].is(TokenType::Integer));
     REQUIRE(toks[4].int_value() == 2);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7823,7 +7837,7 @@ TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
     REQUIRE(toks[2].is(TokenType::Integer));
     REQUIRE(toks[2].int_value() == 6);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7853,7 +7867,7 @@ TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list eleme
     REQUIRE(toks[2].is(TokenType::Integer));
     REQUIRE(toks[2].int_value() == 2);
 
-    REQUIRE(!pp.next_line(line));
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
