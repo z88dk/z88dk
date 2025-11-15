@@ -4,19 +4,20 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "expr.h"
+#include "keywords.h"
 #include "options.h"
 #include "preprocessor.h"
 #include "symbol_table.h"
-#include "keywords.h"
 #include "utils.h"
 #include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <set>
-#include <unordered_set>
 #include <sstream>
 #include <sys/stat.h>
+#include <unordered_set>
 
 // Initialize static file cache
 std::unordered_map<std::string, Preprocessor::CachedFile>
@@ -203,51 +204,12 @@ bool Preprocessor::next_line(TokensLine& line) {
             line = std::move(input_queue_.front());
             input_queue_.pop_front();
 
-            if (line.empty()) {
+            if (handle_directives_for_line(line, true)) {
                 continue;
             }
-
-            g_errors.set_location(line.location());
-            g_errors.set_expanded_line(line.to_string());
-
-            // Process directives appearing in queued lines
-            Keyword keyword = Keyword::None;
-            unsigned i = 0;
-            bool found_directive = false;
-            if (is_directive(line, i, keyword)) {
-                found_directive = true;
-
-                // Conditional directives always execute
-                if (keyword_is_conditional_directive(keyword)) {
-                    process_contitional_directive(line, i, keyword);
-                    continue;
-                }
+            else {
+                return true;
             }
-
-            // Other directives only execute when all IFs are active
-            if (!output_active()) {
-                continue; // skip directive content entirely
-            }
-
-            if (found_directive) {
-                reading_queue_for_directive_ = true;
-                process_directive(line, i, keyword);
-                reading_queue_for_directive_ = false;
-                continue; // consume and continue
-            }
-
-            // Process name-directive form from queued lines as well
-            std::string name;
-            keyword = Keyword::None;
-            i = 0;
-            if (is_name_directive(line, i, keyword, name)) {
-                reading_queue_for_directive_ = true;
-                process_name_directive(line, i, keyword, name);
-                reading_queue_for_directive_ = false;
-                continue; // consume and continue
-            }
-
-            return true;
         }
 
         // read lines from top file in stack
@@ -257,37 +219,8 @@ bool Preprocessor::next_line(TokensLine& line) {
             return false;
         }
 
-        // check for directives and process
-        Keyword keyword = Keyword::None;
-        unsigned i = 0;
-        bool found_directive = false;
-        if (is_directive(line, i, keyword)) {
-            found_directive = true;
-
-            // Conditional directives always execute
-            if (keyword_is_conditional_directive(keyword)) {
-                process_contitional_directive(line, i, keyword);
-                continue;
-            }
-        }
-
-        // non-conditional directives only when active
-        if (!output_active()) {
+        if (handle_directives_for_line(line, false)) {
             continue;
-        }
-
-        if (found_directive) {
-            process_directive(line, i, keyword);
-            continue; // get next line
-        }
-
-        // check for name directive and process (only when active)
-        std::string name;
-        keyword = Keyword::None;
-        i = 0;
-        if (is_name_directive(line, i, keyword, name)) {
-            process_name_directive(line, i, keyword, name);
-            continue; // get next line
         }
 
         // expand macros in the line
@@ -296,27 +229,21 @@ bool Preprocessor::next_line(TokensLine& line) {
 
         bool changed_line = expand_macros(line, true, expanded);
         if (!changed_line) {
-            if (!line.has_token_type(TokenType::DoubleHash)) {
-                TokensLine out2;
-                out2.reserve(line.size());
-                post_process_line(line, out2);
-                line = out2;
+            // Refactored path: fast handling of unchanged line (and optional ## re-pass)
+            std::vector<TokensLine> final_lines;
+            finalize_line(line, false, final_lines);
+            if (final_lines.size() == 1) {
+                line = final_lines.front();
                 return true;
             }
-            TokensLine out1;
-            out1.reserve(line.size());
-            merge_double_hash(line, out1);
-            if (!expand_macros(out1, true, expanded)) {
-                TokensLine out2;
-                out2.reserve(out1.size());
-                post_process_line(out1, out2);
-                line = out2;
-                return true;
-            }
+            add_virtual_file(final_lines);
+            continue;
         }
+
         if (expanded.empty()) {
             continue;
         }
+
         add_virtual_file(expanded);
     }
 }
@@ -2375,36 +2302,17 @@ void Preprocessor::add_virtual_file(std::vector<TokensLine> expanded) {
     if (expanded.empty()) {
         return;
     }
+
+    // Refactored: reuse finalize_line for each expanded line with full processing.
     std::vector<TokensLine> out;
-    std::vector<TokensLine> segments;
+    out.reserve(expanded.size() * 2);
+
     for (auto& tkl : expanded) {
-        TokensLine tkl_tokpaste;
-        if (tkl.has_token_type(TokenType::DoubleHash)) {
-            merge_double_hash(tkl, tkl_tokpaste);
-        }
-        else {
-            tkl_tokpaste = tkl;
-        }
-        std::vector<TokensLine> expanded_tokpaste;
-        expand_macros(tkl_tokpaste, true, expanded_tokpaste);
-        for (auto& tkl2 : expanded_tokpaste) {
-            if (split_line(tkl2, segments)) {
-                for (auto& seg : segments) {
-                    TokensLine pp_seg;
-                    pp_seg.reserve(seg.size());
-                    post_process_line(seg, pp_seg);
-                    out.push_back(pp_seg);
-                }
-                segments.clear();
-            }
-            else {
-                TokensLine pp_tkl2;
-                pp_tkl2.reserve(tkl2.size());
-                post_process_line(tkl2, pp_tkl2);
-                out.push_back(pp_tkl2);
-            }
-        }
+        std::vector<TokensLine> processed;
+        finalize_line(tkl, true, processed);
+        out.insert(out.end(), processed.begin(), processed.end());
     }
+
     if (out.empty()) {
         return;
     }
@@ -2412,13 +2320,13 @@ void Preprocessor::add_virtual_file(std::vector<TokensLine> expanded) {
         input_queue_.push_back(out.front());
         return;
     }
+
     push_virtual_file(out, expanded[0].location().filename(),
                       expanded[0].location().line_num(), false);
-    if (expanded.size() > 1) {
-        if (!file_stack_.empty()) {
-            File& top = file_stack_.back();
-            top.is_macro_expansion = true;
-        }
+
+    if (expanded.size() > 1 && !file_stack_.empty()) {
+        File& top = file_stack_.back();
+        top.is_macro_expansion = true;
     }
 }
 
@@ -2980,6 +2888,147 @@ bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     // found #ifndef/#define
     out_symbol = define_name;
     return true;
+}
+
+bool Preprocessor::handle_directives_for_line(TokensLine& line,
+        bool reading_from_queue) {
+    // skip empty lines
+    if (line.empty()) {
+        return true;
+    }
+
+    // if from queue, notify errors of expanded line
+    if (reading_from_queue) {
+        g_errors.set_location(line.location());
+        g_errors.set_expanded_line(line.to_string());
+    }
+
+    // check for directives
+    Keyword keyword = Keyword::None;
+    unsigned i = 0;
+    bool found_directive = false;
+    if (is_directive(line, i, keyword)) {
+        found_directive = true;
+
+        // Conditional directives always execute
+        if (keyword_is_conditional_directive(keyword)) {
+            process_contitional_directive(line, i, keyword);
+            return true;
+        }
+    }
+
+    // Other directives only execute when all IFs are active
+    if (!output_active()) {
+        return true; // skip line
+    }
+
+    // process other directives
+    if (found_directive) {
+        if (reading_from_queue) {
+            reading_queue_for_directive_ = true;
+        }
+        process_directive(line, i, keyword);
+        if (reading_from_queue) {
+            reading_queue_for_directive_ = false;
+        }
+        return true; // consume and continue
+    }
+
+    // Process name-directive
+    std::string name;
+    keyword = Keyword::None;
+    i = 0;
+    if (is_name_directive(line, i, keyword, name)) {
+        if (reading_from_queue) {
+            reading_queue_for_directive_ = true;
+        }
+        process_name_directive(line, i, keyword, name);
+        if (reading_from_queue) {
+            reading_queue_for_directive_ = false;
+        }
+        return true; // consume and continue
+    }
+
+    // ask caller to process normal line
+    return false;
+}
+
+// NEW helper implementation
+void Preprocessor::finalize_line(const TokensLine& in,
+                                 bool full_processing,
+                                 std::vector<TokensLine>& out_lines) {
+    out_lines.clear();
+
+    // Decide whether full processing (splitting + second expansion) is needed.
+    bool has_tokpaste = in.has_token_type(TokenType::DoubleHash);
+    bool advanced_path = full_processing || has_tokpaste;
+
+    TokensLine after_paste;
+    const TokensLine* base = &in;
+    if (has_tokpaste) {
+        merge_double_hash(in, after_paste);
+        base = &after_paste;
+    }
+
+    if (!advanced_path) {
+        // Fast path: identical to old next_line branch (no splitting)
+        TokensLine pp;
+        pp.reserve(base->size());
+        post_process_line(*base, pp);
+        out_lines.push_back(std::move(pp));
+        return;
+    }
+
+    // Second macro expansion (only meaningful if token-paste occurred or full processing requested)
+    std::vector<TokensLine> further;
+    expand_macros(*base, true, further);
+
+    if (further.empty()) {
+        // Treat (possibly pasted) base line as single candidate
+        further.push_back(*base);
+    }
+
+    for (const TokensLine& candidate : further) {
+        if (full_processing) {
+            // Always split in full processing mode (matches previous add_virtual_file behavior)
+            std::vector<TokensLine> segments;
+            if (split_line(candidate, segments)) {
+                for (auto& seg : segments) {
+                    TokensLine pp_seg;
+                    pp_seg.reserve(seg.size());
+                    post_process_line(seg, pp_seg);
+                    out_lines.push_back(std::move(pp_seg));
+                }
+                continue;
+            }
+        }
+        // In fast mode (next_line, no full_processing), only split if we arrived
+        // here due to token-paste AND expansion produced new lines (i.e., further.size()>1).
+        if (!full_processing && further.size() == 1) {
+            TokensLine pp_single;
+            pp_single.reserve(candidate.size());
+            post_process_line(candidate, pp_single);
+            out_lines.push_back(std::move(pp_single));
+            continue;
+        }
+
+        // Split when there are multiple lines (macro generated extra lines) even in fast mode.
+        std::vector<TokensLine> segments;
+        if (split_line(candidate, segments)) {
+            for (auto& seg : segments) {
+                TokensLine pp_seg;
+                pp_seg.reserve(seg.size());
+                post_process_line(seg, pp_seg);
+                out_lines.push_back(std::move(pp_seg));
+            }
+        }
+        else {
+            TokensLine pp_line;
+            pp_line.reserve(candidate.size());
+            post_process_line(candidate, pp_line);
+            out_lines.push_back(std::move(pp_line));
+        }
+    }
 }
 
 void preprocess_only() {
