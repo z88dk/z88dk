@@ -269,5 +269,9 @@
     <ClCompile Include="..\..\src\appmake\primo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\alphatp2.c" />
+    <ClCompile Include="..\..\src\appmake\hector.c" />
+    <ClCompile Include="..\..\src\appmake\ncboot.c" />
+    <ClCompile Include="..\..\src\appmake\phc25.c" />
   </ItemGroup>
 </Project>
