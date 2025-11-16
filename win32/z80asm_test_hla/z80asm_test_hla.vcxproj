@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
+    <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ed9d0a27-5d35-46d4-8c58-45995f0f5482}</ProjectGuid>
-    <RootNamespace>z88dkz80asm2</RootNamespace>
+    <ProjectGuid>{da470020-5885-439a-9f42-803ce6839b88}</ProjectGuid>
+    <RootNamespace>z80asmtesthla</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,30 +70,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,14 +85,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,12 +100,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,14 +113,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,10 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\ast_node.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\hla.cpp" />
@@ -160,42 +136,12 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_hla.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\assembler.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\ast_node.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\code_generator.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\hla.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\hla_codegen.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\hla_parser.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\preprocessor.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\symbol_table.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\src\z80asm\z80asm2\errors.def" />
-    <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
-    <None Include="..\..\src\z80asm\z80asm2\scan.re" />
-    <None Include="..\..\src\z80asm\z80asm2\t\depends.t" />
-    <None Include="..\..\src\z80asm\z80asm2\t\include.t" />
-    <None Include="..\..\src\z80asm\z80asm2\t\preprocessor.t" />
-    <None Include="..\..\src\z80asm\z80asm2\t\search_source_file.t" />
-    <None Include="..\..\src\z80asm\z80asm2\t\template.t" />
-    <None Include="..\..\src\z80asm\z80asm2\t\testlib.pl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

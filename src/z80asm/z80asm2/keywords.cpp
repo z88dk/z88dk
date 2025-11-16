@@ -51,9 +51,19 @@ bool keyword_is_conditional_directive(Keyword kw) {
     return (flags & IS_CONDITIONAL_DIRECTIVE) != 0;
 }
 
-bool keywrord_is_register(Keyword kw) {
+bool keyword_is_hla_directive(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_HLA_DIRECTIVE) != 0;
+}
+
+bool keyword_is_register(Keyword kw) {
     int flags = keyword_flags[static_cast<int>(kw)];
     return (flags & IS_REGISTER) != 0;
+}
+
+bool keyword_is_register_8bit(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_REGISTER_8BIT) != 0;
 }
 
 bool keyword_is_flag(Keyword kw) {
