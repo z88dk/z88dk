@@ -1359,6 +1359,8 @@ bool Preprocessor::fetch_line(TokensLine& out) {
     // no more input
     if (!if_stack_.empty()) {
         // Report unclosed conditional at end of input
+        const IfFrame& top_frame = if_stack_.back();
+        g_errors.set_location(top_frame.location);
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected end of input in IF (expected ENDIF)");
         if_stack_.clear();
