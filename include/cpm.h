@@ -148,6 +148,8 @@ extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 #define CPM_ILOG 24              /* get bit map of logged in disks */
 #define CPM_IDRV 25              /* interrogate drive number */
 #define CPM_SDMA 26              /* set DMA address for i/o */
+
+/* The following functions are available on CP/M v2 and later */
 #define CPM_SUID 32              /* set/get user id */
 #define CPM_RRAN 33              /* read random record */
 #define CPM_WRAN 34              /* write random record */
@@ -155,8 +157,8 @@ extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 #define CPM_RREC 36              /* update random access pointer */
 #define CPM_SRDS 37              /* selectively reset disc drives */
 #define CPM_WRZF 40              /* write random record with zero fill */
-#define CPM_DSEG 51              /* set DMA segment */
 
+/* Available only if the graphics extension has been applied */
 #define CPM_GSX 115              /* enter GSX */
 
 
