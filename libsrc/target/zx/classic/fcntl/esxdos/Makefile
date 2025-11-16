@@ -10,15 +10,13 @@ AFILES = $(wildcard *.asm)
 
 CLASSIC_OBJECTS = $(addprefix obj/,$(CFILES:.c=.o)) $(addprefix obj/,$(AFILES:.asm=.o))
 
-NEWLIBGLOBS := "$(Z88DK_LIBSRC)/target/zxn/esxdos/z80/*.asm"  "$(Z88DK_LIBSRC)/target/zxn/esxdos/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx-libs/esxdos/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/target/zx-libs/esxdos/z80/*.asm"
-
-NEWLIB_TARGETS := obj/newlib-z80
+NEWLIBGLOBS := 
 
 all: dirs $(OUTPUT_DIRECTORY)/esxdos.lib
 
-.PHONY: dirs $(NEWLIB_TARGETS)
+.PHONY: dirs 
 
-$(OUTPUT_DIRECTORY)/esxdos.lib: $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS) esxdos.lst
+$(OUTPUT_DIRECTORY)/esxdos.lib: $(CLASSIC_OBJECTS) esxdos.lst
 	$(LIBLINKER) -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/esxdos @esxdos.lst
 
 obj/%.o: %.c
@@ -26,9 +24,6 @@ obj/%.o: %.c
 
 obj/%.o: %.asm
 	$(ZCC) +zx $(CFLAGS) -DESXDOS -o $@ $^
-
-obj/newlib-z80:
-	$(Q)$(ASSEMBLER) -I$(Z88DK_LIB) -d -O=obj/z80/x -I$(Z88DK_LIBSRC) -I../.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
 	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k

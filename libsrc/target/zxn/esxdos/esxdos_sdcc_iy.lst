@@ -1,5 +1,5 @@
 @target/zxn/esxdos/esxdos_asm.lst
-@target/zx-libs/esxdos/esxdos_sdcc_iy.lst
+@target/zx/esxdos/esxdos_sdcc_iy.lst
 target/zxn/esxdos/c/sdcc_iy/esx_disk_filemap
 target/zxn/esxdos/c/sdcc_iy/esx_disk_filemap_callee
 target/zxn/esxdos/c/sdcc_iy/esx_disk_stream_bytes

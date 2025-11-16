@@ -12,4 +12,7 @@
 target/zxn/sysvar/system_variables
 @target/zx/tape/tape_sdcc_ix.lst
 @target/zxn/version/version_sdcc.lst
-@target/zxn/arkos/arkos_sdcc_ix.lst
+target/zx/sound/ay/asm_arkos_zx_rom
+target/zx/sound/ay/asm_arkos_zx_smc
+target/zx/sound/ay/asm_wyz_hardware_out
+target/zx/sound/ay/asm_vt2_hardware_out
