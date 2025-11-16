@@ -12,9 +12,11 @@
 static const int IS_DIRECTIVE = 1 << 0;
 static const int IS_NAME_DIRECTIVE = 1 << 1;
 static const int IS_CONDITIONAL_DIRECTIVE = 1 << 2;
-static const int IS_REGISTER = 1 << 3;
-static const int IS_FLAG = 1 << 4;
-static const int IS_OPCODE = 1 << 5;
+static const int IS_HLA_DIRECTIVE = 1 << 3;
+static const int IS_REGISTER = 1 << 4;
+static const int IS_REGISTER_8BIT = 1 << 5;
+static const int IS_FLAG = 1 << 6;
+static const int IS_OPCODE = 1 << 7;
 
 #define X(id, text, flags) id,
 enum class Keyword {
@@ -31,7 +33,9 @@ std::string keyword_to_string(Keyword kw);
 bool keyword_is_directive(Keyword kw);
 bool keyword_is_name_directive(Keyword kw);
 bool keyword_is_conditional_directive(Keyword kw);
-bool keywrord_is_register(Keyword kw);
+bool keyword_is_hla_directive(Keyword kw);
+bool keyword_is_register(Keyword kw);
+bool keyword_is_register_8bit(Keyword kw);
 bool keyword_is_flag(Keyword kw);
 bool keyword_is_opcode(Keyword kw);
 bool keyword_is_instruction(Keyword kw);
