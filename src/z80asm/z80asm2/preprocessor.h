@@ -110,6 +110,7 @@ private:
     };
 
     struct IfFrame {
+        Location location;          // location of the IF/ELIF/ELSE
         bool branch_active = false; // whether this level currently includes text
         bool any_taken = false;     // whether any previous branch in this chain matched
         bool seen_else = false;     // whether ELSE already occurred
