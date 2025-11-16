@@ -8,7 +8,6 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/sound/ay/*.asm" \
 	"target/zx/classic/diagnostic/*.asm" \
 	"target/zx/classic/basic/*.asm" \
-	"target/zx/classic/far/*.asm" \
 	"target/zx/classic/opus/*.asm" \
 	"target/zx/classic/specdrum/*.asm" \
 	"target/zx/classic/uspeech/*.asm" \
@@ -32,7 +31,6 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/sound/ay/*.asm \
 	target/zx/classic/diagnostic/*.asm \
 	target/zx/classic/basic/*.asm \
-	target/zx/classic/far/*.asm \
 	target/zx/classic/opus/*.asm \
 	target/zx/classic/specdrum/*.asm \
 	target/zx/classic/uspeech/*.asm \
@@ -50,9 +48,13 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 
 # These shouldn't be shared with ZXN
 ZX_ONLY_GLOBS = \
+	"target/zx/far/*.asm" \
+	"target/zx/classic/far/*.asm" \
 	"target/zx/esxdos/c/sccz80/*.asm" "target/zx/esxdos/z80/*.asm"
 
 ZX_ONLY_GLOBS_ex = \
+	target/zx/far/*.asm \
+	target/zx/classic/far/*.asm \
 	target/zx/esxdos/c/sccz80/*.asm target/zx/esxdos/z80/*.asm
 
 ZXCPM_GLOBS := \
