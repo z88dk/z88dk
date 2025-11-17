@@ -42,6 +42,38 @@ private:
 static StderrSilencer g_stderr_silencer;
 }
 
+// Local helper: run the preprocessor on an in-memory string and collect tokenized lines
+static std::vector<TokensLine> run_pp_on_text(const std::string& src,
+        const std::string& fname) {
+    Preprocessor pp;
+    pp.clear();
+    pp.push_virtual_file(src, fname, 1, true);
+
+    TokensLine line;
+    std::vector<TokensLine> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line);
+        }
+    }
+    return out;
+}
+
+// Extract first integer found from a 'DEFB <int>' line
+static int find_defb_value(const std::vector<TokensLine>& lines) {
+    for (const auto& l : lines) {
+        if (!l.empty() && l[0].is(Keyword::DEFB)) {
+            for (const auto& t : l.tokens()) {
+                if (t.is(TokenType::Integer)) {
+                    return t.int_value();
+                }
+            }
+        }
+    }
+    REQUIRE(false); // Should have found a DEFB line
+    return -1;
+}
+
 TEST_CASE("Preprocessor: split label produces label line then instruction line",
           "[preprocessor]") {
     g_errors.reset();
@@ -7880,5 +7912,167 @@ TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list eleme
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ELSEIF is a synonym of ELIF in IF/ELSEIF.../ELSE/ENDIF chain",
+          "[preprocessor][if][elseif][elif]") {
+    auto run_chain = [](const std::string & syn,
+    const std::vector<std::string>& defines) -> int {
+        Preprocessor pp;
+        g_errors.reset();
+
+        std::string content;
+        // Optional defines (empty body expands to 1)
+        for (const auto& d : defines) {
+            content += "#define " + d + "\n";
+        }
+
+        // Condition chain using the provided synonym (ELIF or ELSEIF)
+        content +=
+        "IF ONE\n"
+        "defb 1\n"
+        + syn + " TWO\n"
+        "defb 2\n"
+        + syn + " THREE\n"
+        "defb 3\n"
+        "ELSE\n"
+        "defb 0\n"
+        "ENDIF\n";
+
+        pp.push_virtual_file(content, "elseif_chain", 1, true);
+
+        TokensLine line;
+        while (pp.next_line(line)) {
+            const auto& toks = line.tokens();
+            if (toks.empty()) {
+                continue;
+            }
+            if (toks[0].text() == "defb") {
+                for (const auto& t : toks) {
+                    if (t.is(TokenType::Integer)) {
+                        return t.int_value();
+                    }
+                }
+            }
+        }
+        // If we didn't find a defb line, surface a failure
+        REQUIRE_FALSE(true);
+        return -1;
+    };
+
+    // Assert ELSEIF works and yields expected selection
+    REQUIRE(run_chain("ELSEIF", {}) == 0);
+    REQUIRE(run_chain("ELSEIF", { "ONE" }) == 1);
+    REQUIRE(run_chain("ELSEIF", { "TWO" }) == 2);
+    REQUIRE(run_chain("ELSEIF", { "THREE" }) == 3);
+
+    // Compare ELIF vs ELSEIF results across the same define sets
+    std::vector<std::vector<std::string>> cases = {
+        {},
+        {"ONE"},
+        {"TWO"},
+        {"THREE"},
+    };
+
+    for (const auto& defs : cases) {
+        int r_elif = run_chain("ELIF", defs);
+        int r_elseif = run_chain("ELSEIF", defs);
+        REQUIRE(r_elif == r_elseif);
+    }
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ELSEIFDEF is a synonym of ELIFDEF",
+          "[preprocessor][elifdef][elseifdef]") {
+    auto run_chain = [](const std::string & syn,
+    const std::vector<std::string>& defines) -> int {
+        g_errors.reset();
+
+        std::string content;
+        for (const auto& d : defines) {
+            content += "#DEFINE " + d + "\n";
+        }
+
+        content +=
+        "IFDEF ONE\n"
+        "DEFB 1\n"
+        + syn + " TWO\n"
+        "DEFB 2\n"
+        + syn + " THREE\n"
+        "DEFB 3\n"
+        "ELSE\n"
+        "DEFB 0\n"
+        "ENDIF\n";
+
+        auto lines = run_pp_on_text(content, "pp_elifdef_synonyms.asm");
+        REQUIRE_FALSE(g_errors.has_errors());
+        return find_defb_value(lines);
+    };
+
+    // Baseline expectations using ELSEIFDEF
+    REQUIRE(run_chain("ELSEIFDEF", {}) == 0);
+    REQUIRE(run_chain("ELSEIFDEF", { "ONE" }) == 1);
+    REQUIRE(run_chain("ELSEIFDEF", { "TWO" }) == 2);
+    REQUIRE(run_chain("ELSEIFDEF", { "THREE" }) == 3);
+
+    // Ensure ELIFDEF yields the same result set as ELSEIFDEF
+    std::vector<std::vector<std::string>> cases = { {}, {"ONE"}, {"TWO"}, {"THREE"} };
+    for (const auto& defs : cases) {
+        int r_else = run_chain("ELSEIFDEF", defs);
+        int r_elif = run_chain("ELIFDEF", defs);
+        REQUIRE(r_else == r_elif);
+    }
+}
+
+TEST_CASE("Preprocessor: ELSEIFNDEF is a synonym of ELIFNDEF",
+          "[preprocessor][elifndef][elseifndef]") {
+    auto run_chain = [](const std::string & syn,
+    const std::vector<std::string>& defines) -> int {
+        g_errors.reset();
+
+        std::string content;
+        for (const auto& d : defines) {
+            content += "#DEFINE " + d + "\n";
+        }
+
+        content +=
+        "IFNDEF ONE\n"
+        "DEFB 1\n"
+        + syn + " TWO\n"
+        "DEFB 2\n"
+        + syn + " THREE\n"
+        "DEFB 3\n"
+        "ELSE\n"
+        "DEFB 0\n"
+        "ENDIF\n";
+
+        auto lines = run_pp_on_text(content, "pp_elifndef_synonyms.asm");
+        REQUIRE_FALSE(g_errors.has_errors());
+        return find_defb_value(lines);
+    };
+
+    // Baseline expectations using ELSEIFNDEF
+    REQUIRE(run_chain("ELSEIFNDEF", {}) ==
+            1);               // ONE not defined -> first branch
+    REQUIRE(run_chain("ELSEIFNDEF", { "ONE" }) ==
+            2);          // ONE defined, TWO not defined -> second branch
+    REQUIRE(run_chain("ELSEIFNDEF", { "ONE", "TWO" }) ==
+            3);   // ONE & TWO defined, THREE not defined -> third branch
+    REQUIRE(run_chain("ELSEIFNDEF", { "ONE", "TWO", "THREE" }) ==
+            0); // All defined -> ELSE
+
+    // Ensure ELIFNDEF yields the same result set as ELSEIFNDEF
+    std::vector<std::vector<std::string>> cases = {
+        {},
+        {"ONE"},
+        {"ONE", "TWO"},
+        {"ONE", "TWO", "THREE"}
+    };
+    for (const auto& defs : cases) {
+        int r_else = run_chain("ELSEIFNDEF", defs);
+        int r_elif = run_chain("ELIFNDEF", defs);
+        REQUIRE(r_else == r_elif);
+    }
 }
 
