@@ -65,6 +65,7 @@ bool HLA::next_line(TokensLine& out_line) {
                 process_if(line, i);
                 continue;
             case Keyword::ELIF:
+            case Keyword::ELSEIF:
                 process_elif(line, i);
                 continue;
             case Keyword::ELSE:
@@ -77,6 +78,8 @@ bool HLA::next_line(TokensLine& out_line) {
                 process_while(line, i);
                 continue;
             case Keyword::WEND:
+            case Keyword::ENDW:
+            case Keyword::ENDWHILE:
                 process_wend(line, i);
                 continue;
             default:
