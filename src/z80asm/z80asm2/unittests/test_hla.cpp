@@ -71,13 +71,6 @@ static void expect_jp_label(const TokensLine& l, const std::string& label) {
     REQUIRE(l[1].text() == label);
 }
 
-static void expect_djnz_label(const TokensLine& l, const std::string& label) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::DJNZ));
-    REQUIRE(l[1].is(TokenType::Identifier));
-    REQUIRE(l[1].text() == label);
-}
-
 static void expect_dot_label_def(const TokensLine& l,
                                  const std::string& label) {
     REQUIRE(l.size() == 2);
@@ -91,7 +84,6 @@ static void expect_nop(const TokensLine& l) {
     REQUIRE(l[0].is(Keyword::NOP));
 }
 
-// Add helpers for CP with register and memory operands
 static void expect_cp_reg(const TokensLine& l, Keyword reg) {
     REQUIRE(l.size() == 2);
     REQUIRE(l[0].is(Keyword::CP));
@@ -115,7 +107,6 @@ static void expect_cp_mem_abs(const TokensLine& l, int addr) {
     REQUIRE(l[3].is(TokenType::RightParen));
 }
 
-// Helper: expect conditional JP with any target label; return captured label
 static std::string expect_jp_cond_any_label(const TokensLine& l, Keyword cond) {
     REQUIRE(l.size() == 4);
     REQUIRE(l[0].is(Keyword::JP));
@@ -141,6 +132,12 @@ static void expect_or_c(const TokensLine& l) {
     REQUIRE(l.size() == 2);
     REQUIRE(l[0].is(Keyword::OR));
     REQUIRE(l[1].is(Keyword::C));
+}
+
+static void expect_dec_b(const TokensLine& l) {
+    REQUIRE(l.size() == 2);
+    REQUIRE(l[0].is(Keyword::DEC));
+    REQUIRE(l[1].is(Keyword::B));
 }
 
 TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
@@ -1046,10 +1043,10 @@ TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
 }
 
 // -----------------------------------------------------------------------------
-// %REPEAT / %UNTILB tests
+// %REPEAT / %UNTILB tests (modified for DEC B / JP NZ scheme)
 // -----------------------------------------------------------------------------
 
-TEST_CASE("%REPEAT / %UNTILB basic emits DJNZ back to top and end label",
+TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label",
           "[hla][repeat][untilb]") {
     const std::string src =
         "%REPEAT\n"
@@ -1060,13 +1057,15 @@ TEST_CASE("%REPEAT / %UNTILB basic emits DJNZ back to top and end label",
     // Expect:
     // .HLA_REPEAT_0_TOP
     // NOP
-    // DJNZ HLA_REPEAT_0_TOP
+    // DEC B
+    // JP NZ, HLA_REPEAT_0_TOP
     // .HLA_REPEAT_0_END
-    REQUIRE(lines.size() >= 4);
+    REQUIRE(lines.size() >= 5);
     size_t idx = 0;
     expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
     expect_nop(lines[idx++]);
-    expect_djnz_label(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_dec_b(lines[idx++]);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_REPEAT_0_TOP");
     expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
 }
 
