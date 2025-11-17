@@ -9,3 +9,10 @@ PUBLIC strtoumax_callee
 EXTERN strtoul_callee
 
 defc strtoumax_callee = strtoul_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtoumax_callee
+defc _strtoumax_callee = strtoumax_callee
+ENDIF
+

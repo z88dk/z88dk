@@ -9,3 +9,10 @@ PUBLIC _imaxdiv_
 EXTERN _ldiv_
 
 defc _imaxdiv_ = _ldiv_
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __imaxdiv_
+defc __imaxdiv_ = _imaxdiv_
+ENDIF
+

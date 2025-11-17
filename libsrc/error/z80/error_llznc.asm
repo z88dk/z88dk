@@ -2,6 +2,7 @@
 SECTION code_clib
 SECTION code_error
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 PUBLIC error_llznc
 
 EXTERN error_lznc
@@ -18,3 +19,4 @@ error_llznc:
    exx
    jp error_lznc
 
+ENDIF

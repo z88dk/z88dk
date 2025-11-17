@@ -9,6 +9,9 @@ classic/input/obj/${TYPE}/in_GetKeyReset
 classic/input/obj/${TYPE}/in_GetKeyVariables
 classic/input/obj/${TYPE}/fgetc_cons_inkey
 @classic/lib3d/lib3d.lst
+error/obj/${TYPE}/**/*.o
+inttypes/obj/${TYPE}/**/*.o
+locale/obj/${TYPE}/**/*.o
 libgen/obj/${TYPE}/**/*.o
 setjmp/obj/${TYPE}/**/*.o
 @classic/stdlib/stdlib.lst

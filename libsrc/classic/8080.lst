@@ -3,6 +3,9 @@ compress/aplib/obj/${TYPE}/**/*.o
 compress/zx0/obj/${TYPE}/**/*.o
 compress/zx1/obj/${TYPE}/**/*.o
 ctype/obj/${TYPE}/**/*.o
+error/obj/${TYPE}/**/*.o
+inttypes/obj/${TYPE}/**/*.o
+locale/obj/${TYPE}/**/*.o
 font/font_4x8/obj/${TYPE}/**/*.o
 font/font_8x8/obj/${TYPE}/**/*.o
 font/font_8x10/obj/${TYPE}/**/*.o

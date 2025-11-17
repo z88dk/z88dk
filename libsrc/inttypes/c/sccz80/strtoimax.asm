@@ -9,3 +9,10 @@ PUBLIC strtoimax
 EXTERN strtol
 
 defc strtoimax = strtol
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtoimax
+defc _strtoimax = strtoimax
+ENDIF
+
