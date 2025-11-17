@@ -71,6 +71,13 @@ static void expect_jp_label(const TokensLine& l, const std::string& label) {
     REQUIRE(l[1].text() == label);
 }
 
+static void expect_djnz_label(const TokensLine& l, const std::string& label) {
+    REQUIRE(l.size() == 2);
+    REQUIRE(l[0].is(Keyword::DJNZ));
+    REQUIRE(l[1].is(TokenType::Identifier));
+    REQUIRE(l[1].text() == label);
+}
+
 static void expect_dot_label_def(const TokensLine& l,
                                  const std::string& label) {
     REQUIRE(l.size() == 2);
@@ -1017,6 +1024,54 @@ TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
     (void)run_hla_on_text(src, "z80asm_hla_repeat_no_until.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unclosed HLA block") !=
+            std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// %REPEAT / %UNTILB tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("%REPEAT / %UNTILB basic emits DJNZ back to top and end label",
+          "[hla][repeat][untilb]") {
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTILB\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_untilb_basic.asm");
+    // Expect:
+    // .HLA_REPEAT_0_TOP
+    // NOP
+    // DJNZ HLA_REPEAT_0_TOP
+    // .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 4);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_djnz_label(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%UNTILB without %REPEAT reports error",
+          "[hla][repeat][untilb][error]") {
+    g_errors.reset();
+    const std::string src = "%UNTILB\n";
+    (void)run_hla_on_text(src, "z80asm_hla_untilb_no_repeat.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("%UNTILB without matching %REPEAT")
+            != std::string::npos);
+}
+
+TEST_CASE("%UNTILB with trailing tokens reports error",
+          "[hla][repeat][untilb][error][trailing]") {
+    g_errors.reset();
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTILB extra\n";
+    (void)run_hla_on_text(src, "z80asm_hla_untilb_trailing.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %UNTILB") !=
             std::string::npos);
 }
 
