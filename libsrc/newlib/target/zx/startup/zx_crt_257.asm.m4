@@ -41,7 +41,7 @@ ifndef CRT_OTERM_FONT_8X8
 
 endif
 
-include(`../clib_instantiate_begin.m4')
+include(`crt/newlib/clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
@@ -58,7 +58,7 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    include(`crt_driver_instantiation.asm.m4')
 ')
 
-include(`../clib_instantiate_end.m4')
+include(`crt/newlib/clib_instantiate_end.m4')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
