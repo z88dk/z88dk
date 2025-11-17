@@ -44,6 +44,11 @@ struct Or  : Expr {
     std::unique_ptr<Expr> l, r;
 };
 
+// New: standalone Z80 flag test, e.g. Z, NZ, C, NC, PO, PE, P, M
+struct FlagTest : Expr {
+    Keyword cond; // one of Z, NZ, C, NC, PO, PE, P, M
+};
+
 class Parser {
 public:
     Parser(const TokensLine& line, unsigned i = 0);
@@ -63,7 +68,6 @@ private:
     std::unique_ptr<Expr> parse_not();
     Operand parse_operand();
     std::unique_ptr<Expr> parse_rel();
-
 };
 
 } // namespace hla
