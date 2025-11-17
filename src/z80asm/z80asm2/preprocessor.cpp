@@ -923,12 +923,15 @@ void Preprocessor::process_contitional_directive(const TokensLine& line,
         process_ifdef(line, i, true);
         break;
     case Keyword::ELIF:
+    case Keyword::ELSEIF:
         process_elif(line, i);
         break;
     case Keyword::ELIFDEF:
+    case Keyword::ELSEIFDEF:
         process_elifdef(line, i, false);
         break;
     case Keyword::ELIFNDEF:
+    case Keyword::ELSEIFNDEF:
         process_elifdef(line, i, true);
         break;
     case Keyword::ELSE:
