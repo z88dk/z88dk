@@ -268,7 +268,7 @@ std::unique_ptr<Expr> Parser::parse_and() {
     return left;
 }
 
-// Parse NOT or parenthesized boolean expression or comparison
+// Parse NOT or parenthesized boolean expression or comparison or flag test
 std::unique_ptr<Expr> Parser::parse_not() {
     if (match(TokenType::LogicalNot)) {
         auto inner = parse_not();
@@ -289,6 +289,28 @@ std::unique_ptr<Expr> Parser::parse_not() {
         auto inner = parse_or();
         expect(TokenType::RightParen, "')' after parenthesized boolean expression");
         return inner;
+    }
+
+    // Standalone flag condition: Z, NZ, C, NC, PO, PE, P, M
+    const Token* tf = peek();
+    if (tf && tf->type() == TokenType::Identifier) {
+        switch (tf->keyword()) {
+        case Keyword::Z:
+        case Keyword::NZ:
+        case Keyword::C:
+        case Keyword::NC:
+        case Keyword::PO:
+        case Keyword::PE:
+        case Keyword::P:
+        case Keyword::M: {
+            auto f = std::make_unique<FlagTest>();
+            f->cond = tf->keyword();
+            ++i_;
+            return f;
+        }
+        default:
+            break;
+        }
     }
 
     // Comparison
