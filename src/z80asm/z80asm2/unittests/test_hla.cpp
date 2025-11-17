@@ -928,3 +928,95 @@ TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
     }
 }
 
+// Add after existing while tests (just before %IF accepts constant expressions section or at end)
+
+TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTIL A == 3\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_until_basic.asm");
+    // Expected:
+    // .HLA_REPEAT_0_TOP
+    // NOP
+    // CP 3
+    // JP NZ, HLA_REPEAT_0_TOP
+    // .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 5);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_cp_imm(lines[idx++], 3);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm)",
+          "[hla][repeat][until][rel]") {
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTIL A <= 7\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_until_le.asm");
+    // Expected false jumps: NZ and NC back to top
+    // .HLA_REPEAT_0_TOP
+    // NOP
+    // CP 7
+    // JP NZ, HLA_REPEAT_0_TOP
+    // JP NC, HLA_REPEAT_0_TOP
+    // .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 6);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_cp_imm(lines[idx++], 7);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_REPEAT_0_TOP");
+    expect_jp_cond_label(lines[idx++], Keyword::NC, "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
+          "[hla][repeat][until][rhsA]") {
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTIL 2 < A\n"; // normalized to A > 2 -> false if Z or C
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_until_rhs_a.asm");
+    // .HLA_REPEAT_0_TOP
+    // NOP
+    // CP 2
+    // JP Z, HLA_REPEAT_0_TOP
+    // JP C, HLA_REPEAT_0_TOP
+    // .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 6);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_cp_imm(lines[idx++], 2);
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_REPEAT_0_TOP");
+    expect_jp_cond_label(lines[idx++], Keyword::C, "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%UNTIL without %REPEAT reports error",
+          "[hla][repeat][until][error]") {
+    const std::string src = "%UNTIL A==1\n";
+    (void)run_hla_on_text(src, "z80asm_hla_until_no_repeat.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("%UNTIL without matching %REPEAT") !=
+            std::string::npos);
+}
+
+TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
+          "[hla][repeat][until][error][eof]") {
+    g_errors.reset();
+    const std::string src = "%REPEAT\nNOP\n";
+    (void)run_hla_on_text(src, "z80asm_hla_repeat_no_until.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unclosed HLA block") !=
+            std::string::npos);
+}
+
