@@ -897,3 +897,34 @@ TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
     expect_dot_label_def(lines[idx++], "HLA_IF_0_ELSE");
     expect_dot_label_def(lines[idx++], "HLA_IF_0_END");
 }
+
+TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
+          "[hla][while][synonyms]") {
+    const std::vector<std::string> ends = { "WEND", "ENDW", "ENDWHILE" };
+
+    for (const auto& endkw : ends) {
+        const std::string src =
+            "%WHILE A == 5\n"
+            "NOP\n"
+            "%" + endkw + "\n";
+
+        auto lines = run_hla_on_text(src, "z80asm_hla_while_end_synonyms.asm");
+
+        // Expect:
+        // .HLA_WHILE_0_TOP
+        // CP 5
+        // JP NZ, HLA_WHILE_0_END
+        // NOP
+        // JP HLA_WHILE_0_TOP
+        // .HLA_WHILE_0_END
+        REQUIRE(lines.size() >= 6);
+        size_t idx = 0;
+        expect_dot_label_def(lines[idx++], "HLA_WHILE_0_TOP");
+        expect_cp_imm(lines[idx++], 5);
+        expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_WHILE_0_END");
+        expect_nop(lines[idx++]);
+        expect_jp_label(lines[idx++], "HLA_WHILE_0_TOP");
+        expect_dot_label_def(lines[idx++], "HLA_WHILE_0_END");
+    }
+}
+
