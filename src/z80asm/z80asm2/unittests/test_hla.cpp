@@ -125,6 +125,24 @@ static std::string expect_jp_cond_any_label(const TokensLine& l, Keyword cond) {
     return l[3].text();
 }
 
+static void expect_dec_bc(const TokensLine& l) {
+    REQUIRE(l.size() == 2);
+    REQUIRE(l[0].is(Keyword::DEC));
+    REQUIRE(l[1].is(Keyword::BC));
+}
+static void expect_ld_a_b(const TokensLine& l) {
+    REQUIRE(l.size() == 4);
+    REQUIRE(l[0].is(Keyword::LD));
+    REQUIRE(l[1].is(Keyword::A));
+    REQUIRE(l[2].is(TokenType::Comma));
+    REQUIRE(l[3].is(Keyword::B));
+}
+static void expect_or_c(const TokensLine& l) {
+    REQUIRE(l.size() == 2);
+    REQUIRE(l[0].is(Keyword::OR));
+    REQUIRE(l[1].is(Keyword::C));
+}
+
 TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
           "[hla]") {
     namespace fs = std::filesystem;
@@ -1073,5 +1091,120 @@ TEST_CASE("%UNTILB with trailing tokens reports error",
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %UNTILB") !=
             std::string::npos);
+}
+
+TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to top then end label",
+          "[hla][repeat][untilbc]") {
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTILBC\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_untilbc_basic.asm");
+    // Expect:
+    // 0 .HLA_REPEAT_0_TOP
+    // 1 NOP
+    // 2 DEC BC
+    // 3 LD A,B
+    // 4 OR C
+    // 5 JP NZ, HLA_REPEAT_0_TOP
+    // 6 .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 7);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_dec_bc(lines[idx++]);
+    expect_ld_a_b(lines[idx++]);
+    expect_or_c(lines[idx++]);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%UNTILBC without %REPEAT reports error",
+          "[hla][repeat][untilbc][error]") {
+    g_errors.reset();
+    const std::string src = "%UNTILBC\n";
+    (void)run_hla_on_text(src, "z80asm_hla_untilbc_no_repeat.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("%UNTILBC without matching %REPEAT")
+            != std::string::npos);
+}
+
+TEST_CASE("%UNTILBC with trailing tokens reports error",
+          "[hla][repeat][untilbc][error][trailing]") {
+    g_errors.reset();
+    const std::string src =
+        "%REPEAT\n"
+        "NOP\n"
+        "%UNTILBC extra\n";
+    (void)run_hla_on_text(src, "z80asm_hla_untilbc_trailing.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %UNTILBC")
+            != std::string::npos);
+}
+
+TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
+          "[hla][repeat][untilbc][nested]") {
+    g_errors.reset();
+    const std::string src =
+        "%REPEAT\n"              // outer
+        "NOP\n"
+        "%REPEAT\n"              // inner
+        "NOP\n"
+        "%UNTILBC\n"             // end inner
+        "NOP\n"
+        "%UNTILBC\n";            // end outer
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_untilbc_nested.asm");
+    // We only check ordering of the two sequences and distinct labels
+    // Collect top labels
+    std::string outer_top = "HLA_REPEAT_0_TOP";
+    std::string inner_top = "HLA_REPEAT_1_TOP";
+
+    // Find indices of sequences
+    // Expect pattern:
+    // .outer_top
+    // NOP
+    // .inner_top
+    // NOP
+    // DEC BC
+    // LD A,B
+    // OR C
+    // JP NZ, inner_top
+    // .HLA_REPEAT_1_END
+    // NOP
+    // DEC BC
+    // LD A,B
+    // OR C
+    // JP NZ, outer_top
+    // .HLA_REPEAT_0_END
+
+    // Minimal sanity checks
+    REQUIRE(lines.size() >= 14);
+    // outer start
+    expect_dot_label_def(lines[0], outer_top);
+    expect_nop(lines[1]);
+    // inner start
+    expect_dot_label_def(lines[2], inner_top);
+    expect_nop(lines[3]);
+    // inner untilbc sequence
+    expect_dec_bc(lines[4]);
+    expect_ld_a_b(lines[5]);
+    expect_or_c(lines[6]);
+    expect_jp_cond_label(lines[7], Keyword::NZ, inner_top);
+    // inner end label
+    REQUIRE(lines[8].size() == 2);
+    REQUIRE(lines[8][1].text().find("HLA_REPEAT_1_END") != std::string::npos);
+    // middle NOP
+    expect_nop(lines[9]);
+    // outer untilbc sequence
+    expect_dec_bc(lines[10]);
+    expect_ld_a_b(lines[11]);
+    expect_or_c(lines[12]);
+    expect_jp_cond_label(lines[13], Keyword::NZ, outer_top);
+    // outer end (last line)
+    REQUIRE(lines.back().size() == 2);
+    REQUIRE(lines.back()[1].text().find("HLA_REPEAT_0_END") != std::string::npos);
+    REQUIRE_FALSE(g_errors.has_errors());
 }
 
