@@ -92,6 +92,9 @@ bool HLA::next_line(TokensLine& out_line) {
             case Keyword::UNTILB:
                 process_untilb(line, i);
                 continue;
+            case Keyword::UNTILBC:
+                process_untilbc(line, i);
+                continue;
             default:
                 out_line = std::move(line);
                 return true;
@@ -429,6 +432,61 @@ void HLA::process_untilb(const TokensLine& line, unsigned& i) {
     }
 
     // Place end label
+    hla::CodeGen cg(label_counter_);
+    cg.emit_label(blk.end_label, line.location(), out_queue_);
+}
+
+void HLA::process_untilbc(const TokensLine& line, unsigned& i) {
+    // %UNTILBC ends a %REPEAT loop by: dec bc; ld a, b; or c; jp nz, <top>
+    if (block_stack_.empty()
+            || block_stack_.back().kind != hla::Block::Kind::Repeat) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "%UNTILBC without matching %REPEAT");
+        return;
+    }
+    // No extra tokens allowed after %UNTILBC
+    if (i < line.size()) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Unexpected tokens after %UNTILBC");
+    }
+
+    hla::Block blk = block_stack_.back();
+    block_stack_.pop_back();
+
+    // dec bc
+    {
+        TokensLine t(line.location());
+        t.push_back(kw_tok(Keyword::DEC));
+        t.push_back(kw_tok(Keyword::BC));
+        out_queue_.push_back(std::move(t));
+    }
+    // ld a, b
+    {
+        TokensLine t(line.location());
+        t.push_back(kw_tok(Keyword::LD));
+        t.push_back(kw_tok(Keyword::A));
+        t.push_back(Token(TokenType::Comma, ","));
+        t.push_back(kw_tok(Keyword::B));
+        out_queue_.push_back(std::move(t));
+    }
+    // or c
+    {
+        TokensLine t(line.location());
+        t.push_back(kw_tok(Keyword::OR));
+        t.push_back(kw_tok(Keyword::C));
+        out_queue_.push_back(std::move(t));
+    }
+    // jp nz, <top_label>
+    {
+        TokensLine t(line.location());
+        t.push_back(kw_tok(Keyword::JP));
+        t.push_back(kw_tok(Keyword::NZ));
+        t.push_back(Token(TokenType::Comma, ","));
+        t.push_back(Token(TokenType::Identifier, blk.top_label));
+        out_queue_.push_back(std::move(t));
+    }
+
+    // place end label
     hla::CodeGen cg(label_counter_);
     cg.emit_label(blk.end_label, line.location(), out_queue_);
 }
