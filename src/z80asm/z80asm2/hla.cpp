@@ -89,6 +89,9 @@ bool HLA::next_line(TokensLine& out_line) {
             case Keyword::UNTIL:
                 process_until(line, i);
                 continue;
+            case Keyword::UNTILB:
+                process_untilb(line, i);
+                continue;
             default:
                 out_line = std::move(line);
                 return true;
@@ -398,4 +401,34 @@ void HLA::process_until(const TokensLine& line, unsigned& i) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        std::string("Error parsing %UNTIL expression: ") + ex.what());
     }
+}
+
+void HLA::process_untilb(const TokensLine& line, unsigned& i) {
+    // %UNTILB ends a %REPEAT loop using DJNZ (counted loop in register B)
+    if (block_stack_.empty() ||
+            block_stack_.back().kind != hla::Block::Kind::Repeat) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "%UNTILB without matching %REPEAT");
+        return;
+    }
+    // No extra tokens allowed after %UNTILB
+    if (i < line.size()) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Unexpected tokens after %UNTILB");
+    }
+
+    hla::Block blk = block_stack_.back();
+    block_stack_.pop_back();
+
+    // Emit: DJNZ <top_label>
+    {
+        TokensLine dj(line.location());
+        dj.push_back(kw_tok(Keyword::DJNZ));
+        dj.push_back(Token(TokenType::Identifier, blk.top_label));
+        out_queue_.push_back(std::move(dj));
+    }
+
+    // Place end label
+    hla::CodeGen cg(label_counter_);
+    cg.emit_label(blk.end_label, line.location(), out_queue_);
 }
