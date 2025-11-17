@@ -407,7 +407,9 @@ void HLA::process_until(const TokensLine& line, unsigned& i) {
 }
 
 void HLA::process_untilb(const TokensLine& line, unsigned& i) {
-    // %UNTILB ends a %REPEAT loop using DJNZ (counted loop in register B)
+    // %UNTILB ends a %REPEAT loop using a B counter:
+    //   dec b
+    //   jp nz, <top_label>
     if (block_stack_.empty() ||
             block_stack_.back().kind != hla::Block::Kind::Repeat) {
         g_errors.set_location(line.location());
@@ -423,12 +425,21 @@ void HLA::process_untilb(const TokensLine& line, unsigned& i) {
     hla::Block blk = block_stack_.back();
     block_stack_.pop_back();
 
-    // Emit: DJNZ <top_label>
+    // DEC B
     {
-        TokensLine dj(line.location());
-        dj.push_back(kw_tok(Keyword::DJNZ));
-        dj.push_back(Token(TokenType::Identifier, blk.top_label));
-        out_queue_.push_back(std::move(dj));
+        TokensLine dec(line.location());
+        dec.push_back(kw_tok(Keyword::DEC));
+        dec.push_back(kw_tok(Keyword::B));
+        out_queue_.push_back(std::move(dec));
+    }
+    // JP NZ, <top_label>
+    {
+        TokensLine jp(line.location());
+        jp.push_back(kw_tok(Keyword::JP));
+        jp.push_back(kw_tok(Keyword::NZ));
+        jp.push_back(Token(TokenType::Comma, ","));
+        jp.push_back(Token(TokenType::Identifier, blk.top_label));
+        out_queue_.push_back(std::move(jp));
     }
 
     // Place end label
