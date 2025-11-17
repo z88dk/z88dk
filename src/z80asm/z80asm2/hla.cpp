@@ -55,7 +55,8 @@ bool HLA::next_line(TokensLine& out_line) {
         }
 
         // 3) Check for HLA directives beginning with '%'.
-        if (line.size() >= 2 && line[0].is(TokenType::Modulus) &&
+        if (line.size() >= 2 &&
+                line[0].is(TokenType::Modulus) &&
                 line[1].is(TokenType::Identifier) &&
                 keyword_is_hla_directive(line[1].keyword())) {
 
@@ -81,6 +82,12 @@ bool HLA::next_line(TokensLine& out_line) {
             case Keyword::ENDW:
             case Keyword::ENDWHILE:
                 process_wend(line, i);
+                continue;
+            case Keyword::REPEAT:
+                process_repeat(line, i);
+                continue;
+            case Keyword::UNTIL:
+                process_until(line, i);
                 continue;
             default:
                 out_line = std::move(line);
@@ -308,8 +315,8 @@ void HLA::process_while(const TokensLine& line, unsigned& i) {
 
 void HLA::process_wend(const TokensLine& line, unsigned& i) {
     // Validate context
-    if (block_stack_.empty()
-            || block_stack_.back().kind != hla::Block::Kind::While) {
+    if (block_stack_.empty() ||
+            block_stack_.back().kind != hla::Block::Kind::While) {
         g_errors.set_location(line.location());
         g_errors.error(ErrorCode::InvalidSyntax, "%WEND without matching %WHILE");
         return;
@@ -335,4 +342,60 @@ void HLA::process_wend(const TokensLine& line, unsigned& i) {
     // Place: .end_label
     hla::CodeGen cg(label_counter_);
     cg.emit_label(blk.end_label, line.location(), out_queue_);
+}
+
+void HLA::process_repeat(const TokensLine& line, unsigned& i) {
+    // %REPEAT must not have trailing tokens
+    if (i < line.size()) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Unexpected tokens after %REPEAT");
+        return;
+    }
+
+    const unsigned id = label_counter_++;
+    const std::string top_label = "HLA_REPEAT_" + std::to_string(id) + "_TOP";
+    const std::string end_label = "HLA_REPEAT_" + std::to_string(id) + "_END";
+
+    hla::CodeGen cg(label_counter_);
+    cg.emit_label(top_label, line.location(), out_queue_);
+
+    hla::Block blk;
+    blk.kind = hla::Block::Kind::Repeat;
+    blk.location = line.location();
+    blk.top_label = top_label;
+    blk.end_label = end_label;
+    block_stack_.push_back(std::move(blk));
+}
+
+void HLA::process_until(const TokensLine& line, unsigned& i) {
+    if (block_stack_.empty() ||
+            block_stack_.back().kind != hla::Block::Kind::Repeat) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "%UNTIL without matching %REPEAT");
+        return;
+    }
+    if (i >= line.size()) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Expected expression after %UNTIL");
+        return;
+    }
+
+    hla::Block blk = block_stack_.back();
+    block_stack_.pop_back();
+
+    try {
+        hla::Parser parser(line, i);
+        auto expr = parser.parse_bool_expr();
+
+        // Branch back to top if expression is false
+        hla::CodeGen cg(label_counter_);
+        cg.emit_bif(*expr, blk.top_label, line.location(), out_queue_);
+        // Place end label
+        cg.emit_label(blk.end_label, line.location(), out_queue_);
+    }
+    catch (const std::exception& ex) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       std::string("Error parsing %UNTIL expression: ") + ex.what());
+    }
 }

@@ -15,11 +15,11 @@
 namespace hla {
 
 struct Block {
-    enum class Kind { If, While } kind;
+    enum class Kind { If, While, Repeat } kind;  // added Repeat
     Location location;
     std::string else_label; // If only
     std::string end_label;
-    std::string top_label; // While only
+    std::string top_label; // While / Repeat
     bool saw_else = false;
 };
 
@@ -35,10 +35,8 @@ public:
     void emit_label(const std::string& label, const Location& loc,
                     std::deque<TokensLine>& out);
 
-    // Convenience emitters (LD/CP/JP/label)
 private:
     unsigned& counter_;
-    // helpers to map Compare to instruction sequence
 };
 
 } // namespace hla
