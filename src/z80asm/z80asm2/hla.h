@@ -36,4 +36,5 @@ private:
     void process_wend(const TokensLine& line, unsigned& i);
     void process_repeat(const TokensLine& line, unsigned& i);
     void process_until(const TokensLine& line, unsigned& i);
+    void process_untilb(const TokensLine& line, unsigned& i);
 };
