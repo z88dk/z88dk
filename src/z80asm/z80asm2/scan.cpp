@@ -11,6 +11,11 @@
 #include "options.h"
 #include "utils.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant (expected in re2c-generated YYFILL() checks)
+#endif
+
 #define PUSH_TOKEN1(type) \
     do { \
         str = std::string(tok, p); \
@@ -2653,3 +2658,7 @@ yy133: {
     output.clear();
     return;
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
