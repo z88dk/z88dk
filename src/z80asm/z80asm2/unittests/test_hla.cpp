@@ -1207,3 +1207,95 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
+// Add near other boolean tests
+
+TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
+          "[hla][flags]") {
+    struct Case {
+        const char* flag_src;
+        Keyword inverted;
+    };
+    const Case cases[] = {
+        { "Z",  Keyword::NZ },
+        { "NZ", Keyword::Z  },
+        { "C",  Keyword::NC },
+        { "NC", Keyword::C  },
+        { "PO", Keyword::PE },
+        { "PE", Keyword::PO },
+        { "P",  Keyword::M  },
+        { "M",  Keyword::P  },
+    };
+
+    for (const auto& c : cases) {
+        const std::string src =
+            std::string("%IF ") + c.flag_src + "\n"
+            "NOP\n"
+            "%ENDIF\n";
+
+        auto lines = run_hla_on_text(src,
+                                     std::string("z80asm_hla_if_flag_") + c.flag_src + ".asm");
+        // Expect:
+        // 0: JP <inverted>, HLA_IF_0_ELSE
+        // 1: NOP
+        // 2: .HLA_IF_0_ELSE
+        // 3: .HLA_IF_0_END
+        REQUIRE(lines.size() >= 4);
+        expect_jp_cond_label(lines[0], c.inverted, "HLA_IF_0_ELSE");
+        expect_nop(lines[1]);
+        expect_dot_label_def(lines[2], "HLA_IF_0_ELSE");
+        expect_dot_label_def(lines[3], "HLA_IF_0_END");
+    }
+}
+
+TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
+          "[hla][flags][and]") {
+    const std::string src =
+        "%IF Z && (A == 5)\n"
+        "NOP\n"
+        "%ENDIF\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_if_flag_and_cmp.asm");
+    // Expected:
+    // 0: JP NZ, HLA_IF_0_ELSE      ; Z false -> else
+    // 1: CP 5
+    // 2: JP NZ, HLA_IF_0_ELSE      ; A==5 false -> else
+    // 3: NOP
+    // 4: .HLA_IF_0_ELSE
+    // 5: .HLA_IF_0_END
+    REQUIRE(lines.size() >= 6);
+    size_t idx = 0;
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_IF_0_ELSE");
+    expect_cp_imm(lines[idx++], 5);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_IF_0_ELSE");
+    expect_nop(lines[idx++]);
+    expect_dot_label_def(lines[idx++], "HLA_IF_0_ELSE");
+    expect_dot_label_def(lines[idx++], "HLA_IF_0_END");
+}
+
+TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
+          "[hla][flags][or]") {
+    const std::string src =
+        "%IF C || (A < 5)\n"
+        "NOP\n"
+        "%ENDIF\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_if_flag_or_cmp.asm");
+    // Expected:
+    // 0: JP C, <skip_label>        ; if C true -> skip RHS
+    // 1: CP 5
+    // 2: JP NC, HLA_IF_0_ELSE      ; A<5 false -> else
+    // 3: .<skip_label>
+    // 4: NOP
+    // 5: .HLA_IF_0_ELSE
+    // 6: .HLA_IF_0_END
+    REQUIRE(lines.size() >= 7);
+    size_t idx = 0;
+    std::string skip_lbl = expect_jp_cond_any_label(lines[idx++], Keyword::C);
+    expect_cp_imm(lines[idx++], 5);
+    expect_jp_cond_label(lines[idx++], Keyword::NC, "HLA_IF_0_ELSE");
+    expect_dot_label_def(lines[idx++], skip_lbl);
+    expect_nop(lines[idx++]);
+    expect_dot_label_def(lines[idx++], "HLA_IF_0_ELSE");
+    expect_dot_label_def(lines[idx++], "HLA_IF_0_END");
+}
+

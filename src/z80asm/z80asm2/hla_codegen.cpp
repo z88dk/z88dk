@@ -8,6 +8,7 @@
 // HLA code generation: emit branch-if-false (BIF) for boolean expressions
 // Supports nested boolean expressions composed of:
 //   - Comparisons (operand relop operand)
+//   - Flag tests (Z, NZ, C, NC, PO, PE, P, M)
 //   - Logical NOT / AND / OR with short-circuit semantics
 // Generates code that jumps to false_label when the expression evaluates false.
 //-----------------------------------------------------------------------------
@@ -103,6 +104,30 @@ static void emit_jp_cond(const Location& loc, Keyword cond,
     out.push_back(std::move(line));
 }
 
+// Invert a single-condition keyword (for flag tests)
+static Keyword invert_cond(Keyword k) {
+    switch (k) {
+    case Keyword::Z:
+        return Keyword::NZ;
+    case Keyword::NZ:
+        return Keyword::Z;
+    case Keyword::C:
+        return Keyword::NC;
+    case Keyword::NC:
+        return Keyword::C;
+    case Keyword::PE:
+        return Keyword::PO;
+    case Keyword::PO:
+        return Keyword::PE;
+    case Keyword::P:
+        return Keyword::M;
+    case Keyword::M:
+        return Keyword::P;
+    default:
+        throw std::runtime_error("Invalid condition keyword for inversion");
+    }
+}
+
 // RelOp condition mapping.
 // Returns list of condition codes that should cause a jump when (want_true).
 static std::vector<Keyword> relop_conditions(RelOp op, bool want_true) {
@@ -161,6 +186,11 @@ void CodeGen::emit_bif(const Expr& e, const std::string& false_label,
             emit_compare_branch(*cmp, true, tgt, loc, out);
             return;
         }
+        if (const FlagTest* ft = dynamic_cast<const FlagTest*>(&ex)) {
+            // Jump when flag condition is true
+            emit_jp_cond(loc, ft->cond, tgt, out);
+            return;
+        }
         if (const Not* n = dynamic_cast<const Not*>(&ex)) {
             // TRUE of !E == FALSE of E
             gen_false(*n->e, tgt);
@@ -189,6 +219,11 @@ void CodeGen::emit_bif(const Expr& e, const std::string& false_label,
     gen_false = [&](const Expr & ex, const std::string & tgt) {
         if (const Compare* cmp = dynamic_cast<const Compare*>(&ex)) {
             emit_compare_branch(*cmp, false, tgt, loc, out);
+            return;
+        }
+        if (const FlagTest* ft = dynamic_cast<const FlagTest*>(&ex)) {
+            // Jump when flag condition is false: invert the condition
+            emit_jp_cond(loc, invert_cond(ft->cond), tgt, out);
             return;
         }
         if (const Not* n = dynamic_cast<const Not*>(&ex)) {
