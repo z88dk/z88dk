@@ -1299,3 +1299,239 @@ TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
     expect_dot_label_def(lines[idx++], "HLA_IF_0_END");
 }
 
+TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
+    const std::string src =
+        "%WHILE A == 5\n"
+        "NOP\n"
+        "%BREAK\n"
+        "NOP\n"
+        "%WEND\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_break_basic.asm");
+    // .HLA_WHILE_0_TOP
+    // CP 5
+    // JP NZ, HLA_WHILE_0_END
+    // NOP
+    // JP HLA_WHILE_0_END          (break)
+    // NOP
+    // JP HLA_WHILE_0_TOP
+    // .HLA_WHILE_0_END
+    REQUIRE(lines.size() >= 8);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_cp_imm(lines[idx++], 5);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_WHILE_0_END");
+    expect_nop(lines[idx++]);
+    expect_jp_label(lines[idx++], "HLA_WHILE_0_END");
+    expect_nop(lines[idx++]);
+    expect_jp_label(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_END");
+}
+
+TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
+          "[hla][break][if]") {
+    const std::string src =
+        "%WHILE A != 9\n"
+        "%BREAK IF A == 3\n"
+        "NOP\n"
+        "%WEND\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_break_if.asm");
+    // .HLA_WHILE_0_TOP
+    // CP 9
+    // JP Z, HLA_WHILE_0_END        (A != 9 false)
+    // CP 3
+    // JP Z, HLA_WHILE_0_END        (break if A==3)
+    // NOP
+    // JP HLA_WHILE_0_TOP
+    // .HLA_WHILE_0_END
+    REQUIRE(lines.size() >= 8);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_cp_imm(lines[idx++], 9);
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_WHILE_0_END");
+    expect_cp_imm(lines[idx++], 3);
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_WHILE_0_END");
+    expect_nop(lines[idx++]);
+    expect_jp_label(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_END");
+}
+
+TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
+          "[hla][break][flags]") {
+    const std::string src =
+        "%REPEAT\n"
+        "%BREAK IF Z\n"
+        "%UNTILB\n"; // loop end marker
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_break_if_flag.asm");
+    // .HLA_REPEAT_0_TOP
+    // JP NZ, HLA_REPEAT_0_END   (break if Z -> jump when Z true -> JP Z end via inversion logic)
+    // DEC B
+    // JP NZ, HLA_REPEAT_0_TOP
+    // .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 5);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    // Break IF Z expands to: JP Z, end_label (since we wrap NOT we get JP Z)
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_REPEAT_0_END");
+    expect_dec_b(lines[idx++]);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
+    g_errors.reset();
+    const std::string src = "%BREAK\n";
+    (void)run_hla_on_text(src, "z80asm_hla_break_outside.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("%BREAK outside loop") !=
+            std::string::npos);
+}
+
+TEST_CASE("%BREAK with unexpected trailing tokens reports error",
+          "[hla][break][error][trailing]") {
+    g_errors.reset();
+    const std::string src =
+        "%WHILE A == 1\n"
+        "%BREAK extra\n"
+        "%WEND\n";
+    (void)run_hla_on_text(src, "z80asm_hla_break_trailing.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %BREAK") !=
+            std::string::npos);
+}
+
+TEST_CASE("%BREAK IF missing expression reports error",
+          "[hla][break][error][missingexpr]") {
+    g_errors.reset();
+    const std::string src =
+        "%WHILE A == 1\n"
+        "%BREAK IF\n"
+        "%WEND\n";
+    (void)run_hla_on_text(src, "z80asm_hla_break_if_missing.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Expected expression after %BREAK IF")
+            != std::string::npos);
+}
+
+// Add after %BREAK tests
+
+TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
+    const std::string src =
+        "%WHILE A == 5\n"
+        "NOP\n"
+        "%CONTINUE\n"
+        "NOP\n"
+        "%WEND\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_continue_basic.asm");
+    // .HLA_WHILE_0_TOP
+    // CP 5
+    // JP NZ, HLA_WHILE_0_END
+    // NOP
+    // JP HLA_WHILE_0_TOP          (continue)
+    // NOP
+    // JP HLA_WHILE_0_TOP
+    // .HLA_WHILE_0_END
+    REQUIRE(lines.size() >= 8);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_cp_imm(lines[idx++], 5);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_WHILE_0_END");
+    expect_nop(lines[idx++]);
+    expect_jp_label(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_jp_label(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_END");
+}
+
+TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
+          "[hla][continue][if]") {
+    const std::string src =
+        "%WHILE A != 9\n"
+        "%CONTINUE IF A == 3\n"
+        "NOP\n"
+        "%WEND\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_continue_if.asm");
+    // .HLA_WHILE_0_TOP
+    // CP 9
+    // JP Z, HLA_WHILE_0_END         (A != 9 false)
+    // CP 3
+    // JP Z, HLA_WHILE_0_TOP         (continue if A==3)
+    // NOP
+    // JP HLA_WHILE_0_TOP
+    // .HLA_WHILE_0_END
+    REQUIRE(lines.size() >= 8);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_cp_imm(lines[idx++], 9);
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_WHILE_0_END");
+    expect_cp_imm(lines[idx++], 3);
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_WHILE_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_jp_label(lines[idx++], "HLA_WHILE_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_WHILE_0_END");
+}
+
+TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
+          "[hla][continue][flags]") {
+    const std::string src =
+        "%REPEAT\n"
+        "%CONTINUE IF Z\n"
+        "NOP\n"
+        "%UNTILB\n";
+
+    auto lines = run_hla_on_text(src, "z80asm_hla_continue_if_flag.asm");
+    // .HLA_REPEAT_0_TOP
+    // JP Z, HLA_REPEAT_0_TOP     (continue if Z)
+    // NOP
+    // DEC B
+    // JP NZ, HLA_REPEAT_0_TOP
+    // .HLA_REPEAT_0_END
+    REQUIRE(lines.size() >= 6);
+    size_t idx = 0;
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_TOP");
+    expect_jp_cond_label(lines[idx++], Keyword::Z, "HLA_REPEAT_0_TOP");
+    expect_nop(lines[idx++]);
+    expect_dec_b(lines[idx++]);
+    expect_jp_cond_label(lines[idx++], Keyword::NZ, "HLA_REPEAT_0_TOP");
+    expect_dot_label_def(lines[idx++], "HLA_REPEAT_0_END");
+}
+
+TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
+    g_errors.reset();
+    const std::string src = "%CONTINUE\n";
+    (void)run_hla_on_text(src, "z80asm_hla_continue_outside.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("%CONTINUE outside loop") !=
+            std::string::npos);
+}
+
+TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
+          "[hla][continue][error][trailing]") {
+    g_errors.reset();
+    const std::string src =
+        "%WHILE A == 1\n"
+        "%CONTINUE extra\n"
+        "%WEND\n";
+    (void)run_hla_on_text(src, "z80asm_hla_continue_trailing.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %CONTINUE")
+            != std::string::npos);
+}
+
+TEST_CASE("%CONTINUE IF missing expression reports error",
+          "[hla][continue][error][missingexpr]") {
+    g_errors.reset();
+    const std::string src =
+        "%WHILE A == 1\n"
+        "%CONTINUE IF\n"
+        "%WEND\n";
+    (void)run_hla_on_text(src, "z80asm_hla_continue_if_missing.asm");
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Expected expression after %CONTINUE IF")
+            != std::string::npos);
+}
+
