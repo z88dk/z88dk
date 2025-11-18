@@ -95,6 +95,12 @@ bool HLA::next_line(TokensLine& out_line) {
             case Keyword::UNTILBC:
                 process_untilbc(line, i);
                 continue;
+            case Keyword::BREAK:
+                process_break(line, i);
+                continue;
+            case Keyword::CONTINUE:
+                process_continue(line, i);
+                continue;
             default:
                 out_line = std::move(line);
                 return true;
@@ -500,4 +506,110 @@ void HLA::process_untilbc(const TokensLine& line, unsigned& i) {
     // place end label
     hla::CodeGen cg(label_counter_);
     cg.emit_label(blk.end_label, line.location(), out_queue_);
+}
+
+void HLA::process_break(const TokensLine& line, unsigned& i) {
+    // Must be inside a WHILE or REPEAT block
+    if (block_stack_.empty() ||
+            !(block_stack_.back().kind == hla::Block::Kind::While ||
+              block_stack_.back().kind == hla::Block::Kind::Repeat)) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "%BREAK outside loop");
+        return;
+    }
+    const hla::Block& blk = block_stack_.back();
+
+    // Plain %BREAK with no tokens after
+    if (i >= line.size()) {
+        TokensLine jp(line.location());
+        jp.push_back(kw_tok(Keyword::JP));
+        jp.push_back(Token(TokenType::Identifier, blk.end_label));
+        out_queue_.push_back(std::move(jp));
+        return;
+    }
+
+    // Expect: IF <bool-expr>
+    if (!(line[i].is(TokenType::Identifier) &&
+            line[i].keyword() == Keyword::IF)) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Unexpected tokens after %BREAK");
+        return;
+    }
+    ++i; // consume IF
+    if (i >= line.size()) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Expected expression after %BREAK IF");
+        return;
+    }
+
+    try {
+        hla::Parser parser(line, i);
+        auto expr = parser.parse_bool_expr(); // expression E
+
+        // Wrap in NOT so emit_bif branches on TRUE of E to end_label
+        auto not_node = std::make_unique<hla::Not>();
+        not_node->e = std::move(expr);
+
+        hla::CodeGen cg(label_counter_);
+        cg.emit_bif(*not_node, blk.end_label, line.location(), out_queue_);
+    }
+    catch (const std::exception& ex) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       std::string("Error parsing %BREAK IF expression: ") + ex.what());
+    }
+}
+
+void HLA::process_continue(const TokensLine& line, unsigned& i) {
+    // Must be inside a WHILE or REPEAT block
+    if (block_stack_.empty() ||
+            !(block_stack_.back().kind == hla::Block::Kind::While ||
+              block_stack_.back().kind == hla::Block::Kind::Repeat)) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "%CONTINUE outside loop");
+        return;
+    }
+    const hla::Block& blk = block_stack_.back();
+
+    // Plain %CONTINUE (no IF): unconditional jump to top label
+    if (i >= line.size()) {
+        TokensLine jp(line.location());
+        jp.push_back(kw_tok(Keyword::JP));
+        jp.push_back(Token(TokenType::Identifier, blk.top_label));
+        out_queue_.push_back(std::move(jp));
+        return;
+    }
+
+    // Expect: IF <bool-expr>
+    if (!(line[i].is(TokenType::Identifier) &&
+            line[i].keyword() == Keyword::IF)) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax, "Unexpected tokens after %CONTINUE");
+        return;
+    }
+    ++i; // consume IF
+    if (i >= line.size()) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Expected expression after %CONTINUE IF");
+        return;
+    }
+
+    try {
+        hla::Parser parser(line, i);
+        auto expr = parser.parse_bool_expr(); // expression E
+
+        // We want to jump when E is TRUE. emit_bif branches on FALSE.
+        // Wrap in NOT so branch-if-false of !E == branch-if-true of E.
+        auto not_node = std::make_unique<hla::Not>();
+        not_node->e = std::move(expr);
+
+        hla::CodeGen cg(label_counter_);
+        cg.emit_bif(*not_node, blk.top_label, line.location(), out_queue_);
+    }
+    catch (const std::exception& ex) {
+        g_errors.set_location(line.location());
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       std::string("Error parsing %CONTINUE IF expression: ") + ex.what());
+    }
 }
