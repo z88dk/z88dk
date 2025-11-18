@@ -133,7 +133,7 @@ std::string read_file_to_string(const std::string& filename) {
     }
 
     file.seekg(0, std::ios::end);
-    size_t size = file.tellg();
+    std::streampos size = file.tellg();
     std::string content(size, '\0');
     file.seekg(0);
     file.read(&content[0], size);
