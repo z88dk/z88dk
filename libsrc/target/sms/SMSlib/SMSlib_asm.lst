@@ -48,7 +48,7 @@ target/sms/SMSlib/z80/asm_SMSlib_setLineInterruptHandler
 target/sms/SMSlib/z80/asm_SMSlib_setSpriteMode
 target/sms/SMSlib/z80/asm_SMSlib_setSpritePaletteColor
 target/sms/SMSlib/z80/asm_SMSlib_UNSAFE_copySpritestoSAT
-${LIBSRC_ROOT}/target/sms/SMSlib/z80/asm_SMSlib_UNSAFE_outi.asm.m4
+target/sms/SMSlib/z80/asm_SMSlib_UNSAFE_outi.asm.m4
 target/sms/SMSlib/z80/asm_SMSlib_UNSAFE_VRAMmemcpy32
 target/sms/SMSlib/z80/asm_SMSlib_UNSAFE_VRAMmemcpy64
 target/sms/SMSlib/z80/asm_SMSlib_UNSAFE_VRAMmemcpy128

@@ -5,4 +5,4 @@ target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim2Frames
 target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim4Frames
 target/zx/bifrost_h/z80/asm_BIFROSTH_setTile
 target/zx/bifrost_h/z80/asm_BIFROSTH_stop
-${LIBSRC_ROOT}/target/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4
+target/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4
