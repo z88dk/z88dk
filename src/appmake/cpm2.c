@@ -931,6 +931,7 @@ static disc_spec pasopia_spec = {
 
 
 // NEC PC-6001/6601
+// Triumph-Adler P2
 static disc_spec pc6001_spec = {
     .name = "NEC PC6001",
     .disk_mode = MFM250,
@@ -2353,7 +2354,7 @@ static struct formats {
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
     { "philips",   "Philips P2012/P2000C",  &philips_spec, 0, NULL, 1 },
-    { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
+    { "pc6001",    "NEC PC6001/6601,TA-P2", &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
