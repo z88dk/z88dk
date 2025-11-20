@@ -139,9 +139,6 @@
     <None Include="..\..\src\z80asm\z80asm2\scan.re">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\src\z80asm\z80asm2\t\depends.t">
-      <Filter>Resource Files\t</Filter>
-    </None>
     <None Include="..\..\src\z80asm\z80asm2\t\search_source_file.t">
       <Filter>Resource Files\t</Filter>
     </None>
