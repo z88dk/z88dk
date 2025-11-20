@@ -753,6 +753,56 @@ TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filena
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
+// Added test: C_LINE then ordinary lines then LINE then ordinary lines
+TEST_CASE("Preprocessor: sequence C_LINE then lines then LINE then lines applies constant then incrementing logical line numbers",
+    "[preprocessor][cline][line][sequence]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "C_LINE 500, \"c_fixed.asm\"\n"
+        "A\n"
+        "B\n"
+        "LINE 700, \"l_start.asm\"\n"
+        "C\n"
+        "D\n";
+    pp.push_virtual_file(content, "cline_line_sequence", 1, true);
+
+    TokensLine line;
+
+    // First logical output: A at 500 (fixed)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "A");
+    REQUIRE(line.location().line_num() == 500);
+    REQUIRE(line.location().filename() == "c_fixed.asm");
+
+    // Second logical output: B still at 500 (C_LINE does not increment)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "B");
+    REQUIRE(line.location().line_num() == 500);
+    REQUIRE(line.location().filename() == "c_fixed.asm");
+
+    // Third logical output: C at 700 (LINE sets start)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "C");
+    REQUIRE(line.location().line_num() == 700);
+    REQUIRE(line.location().filename() == "l_start.asm");
+
+    // Fourth logical output: D at 701 (LINE increments)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "D");
+    REQUIRE(line.location().line_num() == 701);
+    REQUIRE(line.location().filename() == "l_start.asm");
+
+    // No further lines
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
 TEST_CASE("Preprocessor: BINARY accepts quoted, angle-bracketed and plain filename forms",
           "[preprocessor][binary][forms]") {
     g_errors.reset();
@@ -8074,5 +8124,33 @@ TEST_CASE("Preprocessor: ELSEIFNDEF is a synonym of ELIFNDEF",
         int r_elif = run_chain("ELIFNDEF", defs);
         REQUIRE(r_else == r_elif);
     }
+}
+
+// Added test: chained token pasting outside macros (A##B##C -> ABC)
+TEST_CASE("Preprocessor: chained token pasting A##B##C produces single identifier ABC",
+          "[preprocessor][tokenpaste][chained][outside-macro]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content = "A##B##C\n";
+    pp.push_virtual_file(content, "paste_chained", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    // Expect one identifier token 'ABC' somewhere in the line
+    bool foundABC = false;
+    for (const auto& t : toks) {
+        if (t.is(TokenType::Identifier) && t.text() == "ABC") {
+            foundABC = true;
+            break;
+        }
+    }
+    REQUIRE(foundABC);
+
+    // No further logical lines
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
 }
 

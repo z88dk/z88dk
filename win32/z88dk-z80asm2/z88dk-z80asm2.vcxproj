@@ -190,7 +190,6 @@
     <None Include="..\..\src\z80asm\z80asm2\errors.def" />
     <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.re" />
-    <None Include="..\..\src\z80asm\z80asm2\t\depends.t" />
     <None Include="..\..\src\z80asm\z80asm2\t\include.t" />
     <None Include="..\..\src\z80asm\z80asm2\t\preprocessor.t" />
     <None Include="..\..\src\z80asm\z80asm2\t\search_source_file.t" />
