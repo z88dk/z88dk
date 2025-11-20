@@ -252,7 +252,6 @@ Y1
 Y2
 #line 900, "mix_after.asm"
 Z1
-#line 900
 Z2
 END
 
@@ -385,7 +384,6 @@ check_text_file("$test.i", <<END);
 1 + 2
 END
 
-
 #------------------------------------------------------------------------------
 # Tests for EQU, '=' synonym, and DEFC directives (object-like forms, cascading, macro expansion)
 #------------------------------------------------------------------------------
@@ -483,7 +481,6 @@ DEFC VAL = 1 + 2 + 3 + 4
 DEFC SUM = 1 + 2 + 3 + 5
 DEFC OUT = 1 + 2 + 3 + 6
 END
-
 
 #------------------------------------------------------------------------------
 # Tests for UNDEF / UNDEFINE (both name-directive and hash forms)
@@ -588,7 +585,6 @@ check_text_file("$test.i", <<END);
 #line 4, "$test.asm"
 3
 END
-
 
 #------------------------------------------------------------------------------
 # Tests for DEFL directive (infix, prefix, previous value, non-constant body, redefinition)
@@ -773,7 +769,7 @@ db 1
 END
 
 #------------------------------------------------------------------------------
-# New tests: REPT / REPTC / REPTI
+# REPT / REPTC / REPTI
 #------------------------------------------------------------------------------
 
 # Simple REPT repetition: REPT 3 should emit 3 copies of the body at directive location
@@ -877,7 +873,7 @@ nop
 END
 
 #------------------------------------------------------------------------------
-# New tests: IF / ELIF / ELSE / ENDIF
+# IF / ELIF / ELSE / ENDIF
 #------------------------------------------------------------------------------
 
 # IF true: emit THEN branch, then following lines
@@ -1014,7 +1010,7 @@ B
 END
 
 #------------------------------------------------------------------------------
-# New tests: IFDEF / IFNDEF / ELIFDEF / ELIFNDEF
+# IFDEF / IFNDEF / ELIFDEF / ELIFNDEF
 #------------------------------------------------------------------------------
 
 # IFDEF true when macro is defined -> THEN branch emitted
@@ -1210,6 +1206,558 @@ check_text_file("$test.i", <<END);
 MISSING_OK
 END
 
-# clean up
+#------------------------------------------------------------------------------
+# PRAGMA ONCE (#pragma once) include skipping
+#------------------------------------------------------------------------------
+
+# Create a header with #pragma once and some content
+spew("$test.inc", <<END);
+#pragma once
+ONCE_VALUE
+END
+
+# Include it multiple times; only first inclusion should emit its body
+spew("$test.asm", <<END);
+PRE
+#include "$test.inc"
+MID
+#include "$test.inc"
+POST
+#include "$test.inc"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect ONCE_VALUE only once; subsequent includes skipped (no duplicate emission)
+# Logical line mapping: first include switches to $test.inc then returns.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE
+#line 2, "$test.inc"
+ONCE_VALUE
+#line 3, "$test.asm"
+MID
+
+POST
+END
+
+# Control test: same content without pragma once should repeat
+spew("$test.inc", <<END);
+REPEAT_VALUE
+END
+
+spew("$test.asm", <<END);
+A
+#include "$test.inc"
+B
+#include "$test.inc"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+A
+#line 1, "$test.inc"
+REPEAT_VALUE
+#line 3, "$test.asm"
+B
+#line 1, "$test.inc"
+REPEAT_VALUE
+END
+
+#------------------------------------------------------------------------------
+# #ifndef / #define include guard detection and skip
+#------------------------------------------------------------------------------
+
+# Guarded header: #ifndef NAME / #define NAME pattern
+spew("$test.guard", <<END);
+#ifndef TEST_GUARD_INC
+#define TEST_GUARD_INC
+GUARD_CONTENT
+#endif
+END
+
+# Include guarded header multiple times
+spew("$test.asm", <<END);
+PRE_G
+#include "$test.guard"
+MID_G
+#include "$test.guard"
+POST_G
+#include "$test.guard"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect GUARD_CONTENT only once (line 3 of header); later includes skipped
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_G
+#line 3, "$test.guard"
+GUARD_CONTENT
+#line 3, "$test.asm"
+MID_G
+
+POST_G
+END
+
+# Bad guard (names differ) should NOT skip: included twice
+spew("$test.badguard", <<END);
+#ifndef BAD_GUARD_A
+#define BAD_GUARD_B
+BAD_GUARD_CONTENT
+#endif
+#undef BAD_GUARD_B
+END
+
+spew("$test.asm", <<END);
+BG1
+#include "$test.badguard"
+BG2
+#include "$test.badguard"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect BAD_GUARD_CONTENT twice
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+BG1
+#line 3, "$test.badguard"
+BAD_GUARD_CONTENT
+#line 3, "$test.asm"
+BG2
+#line 3, "$test.badguard"
+BAD_GUARD_CONTENT
+END
+
+# Re-include after explicit UNDEF of guard macro should re-emit content
+spew("$test.reincl", <<END);
+#ifndef REINCL_G
+#define REINCL_G
+REINCL_CONTENT
+#endif
+END
+
+spew("$test.asm", <<END);
+R1
+#include "$test.reincl"
+UNDEF REINCL_G
+R2
+#include "$test.reincl"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect content twice: once before UNDEF and once after
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+R1
+#line 3, "$test.reincl"
+REINCL_CONTENT
+#line 4, "$test.asm"
+R2
+#line 3, "$test.reincl"
+REINCL_CONTENT
+END
+
+#------------------------------------------------------------------------------
+# Recursive include detection (RecursiveInclude)
+#------------------------------------------------------------------------------
+
+# Ensure no stale .i survives from previous tests
+unlink("$test.i");
+
+# Create two headers that include each other to force recursion
+spew("$test.rec1", <<END);
+#include "$test.rec2"
+END
+
+spew("$test.rec2", <<END);
+#include "$test.rec1"
+END
+
+# Main file that starts the recursive include chain
+spew("$test.asm", <<END);
+#include "$test.rec1"
+END
+
+# Expect a Recursive include error reported at the line in $test.rec2 that tries to re-include $test.rec1
+# No .i file should be produced.
+
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.rec2:1: error: Recursive include: $test.rec1
+   |#include "$test.rec1"
+END
+ok ! -f "$test.i", "output file not produced on error";
+
+#------------------------------------------------------------------------------
+# Dependency file generation (-MD)
+#------------------------------------------------------------------------------
+
+# Create dependency inputs
+spew("$test.depinc1", <<END);
+#include "$test.depinc2"
+END
+spew("$test.depinc2", <<END);
+#include "$test.depinc3"
+END
+spew("$test.depinc3", <<END);
+INC
+END
+
+spew("$test.depbin1", pack('C*', 1));
+spew("$test.depbin2", pack('C*', 2));
+
+# Main references include and binaries, then re-includes to produce a duplicate dep
+spew("$test.asm", <<END);
+#include "$test.depinc1"
+BINARY $test.depbin1
+INCBIN $test.depbin2
+#include "$test.depinc1"
+END
+
+# Expect verbose preprocess message and dependency generation message
+capture_ok("z88dk-z80asm -v -E -MD $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+Generating dependency file: $test.d
+END
+
+# Dependency file lists:
+#   - target object (left side)
+#   - deps in recorded order (duplicates preserved):
+#       $test.asm, $test.depinc, $test.depbin1, $test.depbin2, $test.depinc
+check_text_file("$test.d", <<END);
+$test.o: $test.asm $test.depinc1 \\
+        $test.depinc2 $test.depinc3 \\
+        $test.depbin1 $test.depbin2 \\
+        $test.depinc1 $test.depinc2 \\
+        $test.depinc3
+END
+
+#------------------------------------------------------------------------------
+# Do not generate dependency file when errors occur (-MD)
+#------------------------------------------------------------------------------
+
+# Ensure no stale .d survives from previous tests
+unlink("$test.d");
+
+# Create a source with a preprocessing error (unterminated IF)
+spew("$test.asm", <<END);
+IF 1
+X
+END
+
+# Run with -MD and expect failure, and verify $test.d was NOT generated
+capture_nok("z88dk-z80asm -E -MD $test.asm", <<END);
+error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
+   |X
+END
+ok ! -f "$test.d", "dependency file not generated on error";
+
+#------------------------------------------------------------------------------
+# Token pasting operator (##) in macros
+#------------------------------------------------------------------------------
+
+# Object-like macro with ## in replacement
+spew("$test.asm", <<END);
+#define AB foo##bar
+AB
+#define JOIN(x,y) x##y
+JOIN(f,oo)
+JOIN(foo,1)
+#define X foo
+#define Y bar
+JOIN(X,Y)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected expansions:
+#  AB            -> foobar
+#  JOIN(f,oo)    -> foo
+#  JOIN(foo,1)   -> foo1
+#  JOIN(X,Y)     -> foobar (after parameter substitution then paste)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+foobar
+
+foo
+foo1
+
+
+foobar
+END
+
+#------------------------------------------------------------------------------
+# Token pasting operator (##) outside macros
+#------------------------------------------------------------------------------
+
+spew("$test.asm", <<END);
+foo##bar
+foo ## bar
+foo##1
+A##B##C
+X ## Y ## 2
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected merges (with blank line spacing to match physical line advancement):
+#  foo##bar      -> foobar
+#  foo ## bar    -> foobar
+#  foo##1        -> foo1
+#  A##B##C       -> ABC (chained paste)
+#  X ## Y ## 2   -> XY2 (identifier + identifier + integer)
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+foobar
+foobar
+foo1
+ABC
+XY2
+END
+
+#------------------------------------------------------------------------------
+# Stringize operator (#param) in macros
+#------------------------------------------------------------------------------
+
+# Basic stringize: turn argument tokens into a string, then db expands to bytes
+spew("$test.asm", <<END);
+#define STR(x) db #x
+STR(Hello)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# "Hello" -> 72,101,108,108,111
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 72,101,108,108,111
+END
+
+# Stringize uses original (unexpanded) argument text
+spew("$test.asm", <<END);
+#define A X
+#define STR(x) db #x
+STR(A)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Argument is 'A' (not expanded to X) -> 'A' == 65
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+db 65
+END
+
+# Stringize escapes quotes/backslashes: argument is a string literal
+spew("$test.asm", <<END);
+#define STR(x) db #x
+STR("hi")
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect db 34,"h","i",34 -> 34,104,105,34
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 34,104,105,34
+END
+
+# Stringize preserves spaces between tokens inside argument
+spew("$test.asm", <<END);
+#define STR(x) db #x
+STR(A B)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect "A B" -> 65,32,66
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 65,32,66
+END
+
+#------------------------------------------------------------------------------
+# Macro recursion limit (MacroRecursionLimit)
+#------------------------------------------------------------------------------
+
+# Self-recursive macro triggers MacroRecursionLimit and should not produce .i
+spew("$test.asm", <<END);
+#define R R
+R
+END
+
+# Expect an error referring to the recursive macro name and the offending line
+unlink("$test.i");
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Macro recursion limit exceeded: R
+   |R
+END
+ok ! -f "$test.i", "output file not produced on error";
+
+# Mutual recursion also triggers MacroRecursionLimit; first macro name reported
+spew("$test.asm", <<END);
+#define A B
+#define B A
+A
+END
+
+unlink("$test.i");
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Macro recursion limit exceeded: A
+   |A
+END
+ok ! -f "$test.i", "output file not produced on error";
+
+#------------------------------------------------------------------------------
+# Function-like macro calls without parentheses (unparenthesized argument form)
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+#define ID(x) x
+ID 7
+#define ADD(a,b) a + b
+ADD 3,4
+#define VAL 9
+#define WRAP(x) x
+WRAP VAL
+#define F(a,b) a + b
+F 1
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected:
+#  ID 7          -> 7             (one argument, no parentheses)
+#  ADD 3,4       -> 3 + 4         (two arguments, no parentheses)
+#  WRAP VAL      -> 9             (argument macro expands inside wrapper)
+#  F 1           -> F 1           (wrong arg count without parens: treated as literal)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+7
+
+3 + 4
+
+
+9
+
+F 1
+END
+
+#------------------------------------------------------------------------------
+# String token post-processing (automatic expansion to comma-separated integers)
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+db "A"
+db "ABC"
+LD A,"Z"
+DEFB "Hi"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected:
+# db "A"   -> db 65
+# db "ABC" -> db 65,66,67
+# LD A,"Z" -> LD A, 90
+# DEFB "Hi"-> DEFB 72,105
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 65
+db 65,66,67
+LD A,90
+DEFB 72,105
+END
+
+#------------------------------------------------------------------------------
+# Negative line numbers in LINE / C_LINE directives
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+LINE -10, "neg_line.asm"
+A
+B
+C_LINE -20, <neg_cangle.asm>
+C
+C_LINE -30, neg_cplain.asm
+D
+LINE -5, neg_mix.asm
+E
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+# LINE -10 => first logical line -10 then increments (-9) on next physical line.
+# C_LINE -20 => all following physical lines keep -20 until next directive.
+# Subsequent C_LINE -30 sets constant -30.
+# LINE -5 => sets -5 then (if more lines followed) would increment; only one line emitted.
+check_text_file("$test.i", <<END);
+#line -10, "neg_line.asm"
+A
+B
+#line -20, "neg_cangle.asm"
+C
+#line -30, "neg_cplain.asm"
+D
+#line -5, "neg_mix.asm"
+E
+END
+
+# Negative line numbers without explicit filename (should default to current file name for first occurrence)
+spew("$test.asm", <<END);
+LINE -15
+X
+C_LINE -25
+Y
+Z
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+# LINE -15 (no filename) => uses source file name then increments.
+# C_LINE -25 keeps constant -25; second physical line after C_LINE prints #line -25 again (no filename).
+check_text_file("$test.i", <<END);
+#line -15, "$test.asm"
+X
+#line -25
+Y
+#line -25
+Z
+END
+
+# Clean up
 unlink_testfiles if Test::More->builder->is_passing;
 done_testing;

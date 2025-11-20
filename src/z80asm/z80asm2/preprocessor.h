@@ -81,6 +81,7 @@ private:
         bool is_function_like = false;
         // recursion depth counter per macro (avoid global map lookups)
         int recursion_depth = 0;
+        bool emitted_recursion_error = false;   // prevent multiple errors
     };
 
     // Cache entry for a file
@@ -103,6 +104,9 @@ private:
         int forced_start_line_num = 0;
         std::string forced_filename;
         bool forced_constant_line_numbers = false;
+
+        // remembers raw physical line number of the most recently fetched line
+        unsigned last_physical_line_num = 0;
 
         // True when this file represents an expanded macro "virtual file".
         bool is_macro_expansion = false;
