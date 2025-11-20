@@ -38,7 +38,7 @@ generic_console_set_attribute:
 generic_console_cls:
     ld      hl, DISPLAY
     ld      de,128
-    ld      c, ROWS
+    ld      c, CONSOLE_ROWS
 generic_console_cls_1:
     push    hl
     ld      b, CONSOLE_COLUMNS
@@ -53,7 +53,7 @@ generic_console_cls_2:
 
 	ld	hl,screen_copy
 	ld	de,screen_copy+1
-	ld	bc,+((ROWS+1) * CONSOLE_COLUMNS) - 1
+	ld	bc,+((CONSOLE_ROWS+1) * CONSOLE_COLUMNS) - 1
 	ld	(hl),0
 	ldir
 
@@ -114,7 +114,7 @@ generic_console_scrollup:
 
 	ld	hl,screen_copy + CONSOLE_COLUMNS
 	ld	de,screen_copy
-	ld	bc,+((ROWS) * CONSOLE_COLUMNS)   ; 1 more row to wipe the bottom row
+	ld	bc,+((CONSOLE_ROWS) * CONSOLE_COLUMNS)   ; 1 more row to wipe the bottom row
 	ldir
 ;	ex	de,hl
 
@@ -124,7 +124,7 @@ generic_console_scrollup:
 
     ld      hl, DISPLAY
 	ld      de, screen_copy
-    ld      c,ROWS-1
+    ld      c,CONSOLE_ROWS-1
 
 generic_console_scrollup_1:
 
@@ -170,7 +170,7 @@ screen_copy:
 
     ld      a, CONSOLE_COLUMNS
     ld      (__console_w), a
-    ld      a, ROWS
+    ld      a, CONSOLE_ROWS
     ld      (__console_h), a
 
 
