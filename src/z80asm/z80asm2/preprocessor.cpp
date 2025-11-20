@@ -284,6 +284,7 @@ void Preprocessor::clear_dependencies() {
 void Preprocessor::preprocess_file(const std::string& input_filename,
                                    const std::string& output_filename, bool gen_dependency) {
     Preprocessor pp;
+    int start_errors = g_errors.error_count();
 
     pp.push_file(input_filename);
 
@@ -320,7 +321,14 @@ void Preprocessor::preprocess_file(const std::string& input_filename,
         location.inc_line_num();
     }
 
-    if (gen_dependency) {
+    // remove output file if errors occurred
+    if (g_errors.error_count() > start_errors) {
+        ofs.close();
+        std::remove(output_filename.c_str());
+    }
+
+    // only generate dependency file if no errors occurred
+    if (gen_dependency && g_errors.error_count() == start_errors) {
         pp.generate_dependency_file();
     }
 }
@@ -1033,7 +1041,8 @@ void Preprocessor::process_line(const TokensLine& line, unsigned& i) {
 
     File& file = file_stack_.back();
     file.has_forced_location = true;
-    file.forced_at_line_num = line.location().line_num();
+    // Use captured physical line number instead of current logical mapping
+    file.forced_at_line_num = file.last_physical_line_num;
     file.forced_start_line_num = linenum;
     file.forced_constant_line_numbers = false;
     if (!filename.empty()) {
@@ -1061,7 +1070,8 @@ void Preprocessor::process_c_line(const TokensLine& line, unsigned& i) {
 
     File& file = file_stack_.back();
     file.has_forced_location = true;
-    file.forced_at_line_num = line.location().line_num();
+    // Use physical line number for start reference
+    file.forced_at_line_num = file.last_physical_line_num;
     file.forced_start_line_num = linenum;
     file.forced_constant_line_numbers = true;
     if (!filename.empty()) {
@@ -1324,14 +1334,13 @@ bool Preprocessor::fetch_line(TokensLine& out) {
             return true;
         }
 
-        // get from inout file
+        // end of file?
         if (file.line_index >= file.tokens_file->tok_lines_count()) {
-            // end of file reached; pop file from stack
             file_stack_.pop_back();
             continue;
         }
 
-        // get next line from file (physical or virtual)
+        // Fetch next physical line (raw location still physical here)
         out = file.tokens_file->get_tok_line(file.line_index);
         out.trim();
         ++file.line_index;
@@ -1341,19 +1350,21 @@ bool Preprocessor::fetch_line(TokensLine& out) {
             continue;
         }
 
-        // compute Location
+        // Capture physical line number BEFORE logical remap
+        file.last_physical_line_num = out.location().line_num();
+
+        // Compute logical location (may remap due to LINE/C_LINE)
         Location loc = compute_location(file, out);
         out.set_location(loc);
 
         g_errors.set_location(out.location());
         g_errors.set_source_line(out.to_string());
 
-        // split line
+        // Potentially split line into segments
         std::vector<TokensLine> segments;
         if (!split_line(out, segments)) {
             return true;    // did not split
         }
-
         for (auto& segment : segments) {
             file.split_queue_.push_back(std::move(segment));
         }
@@ -2340,31 +2351,93 @@ bool Preprocessor::merge_double_hash(const TokensLine& line, TokensLine& out) {
         out = line;
         return false;
     }
+
     out = TokensLine(line.location());
     out.reserve(line.size());
     bool merged_any = false;
     unsigned idx = 0;
+
     while (idx < line.size()) {
-        const Token& cur = line[idx];
-        if (cur.is(TokenType::Identifier)) {
+        const Token& first = line[idx];
+
+        // Attempt to build a chained paste sequence starting from an identifier
+        if (first.is(TokenType::Identifier)) {
+            std::string glued = first.text();
             unsigned j = idx + 1;
-            line.skip_spaces(j);
-            if (j < line.size() && line[j].is(TokenType::DoubleHash)) {
-                unsigned k = j + 1;
-                line.skip_spaces(k);
-                if (k < line.size() && (line[k].is(TokenType::Identifier)
-                                        || line[k].is(TokenType::Integer))) {
-                    std::string glued = cur.text() + line[k].text();
-                    out.push_back(Token(TokenType::Identifier, glued));
-                    idx = k + 1;
-                    merged_any = true;
-                    continue;
+            unsigned paste_start_ws_begin = 0;
+            unsigned paste_start_ws_end = 0;
+            bool found_any_paste = false;
+
+            // Try to consume zero or more "## <ident|integer>" pairs.
+            while (true) {
+                // Record whitespace between previous glued token and next ##
+                unsigned ws_begin = j;
+                while (j < line.size() && line[j].is(TokenType::Whitespace)) {
+                    ++j;
                 }
+                unsigned ws_end = j;
+
+                if (j >= line.size() || !line[j].is(TokenType::DoubleHash)) {
+                    // No more paste operator
+                    break;
+                }
+
+                // Save first inter-token whitespace span so we can preserve it
+                if (!found_any_paste) {
+                    paste_start_ws_begin = ws_begin;
+                    paste_start_ws_end = ws_end;
+                }
+
+                // Skip '##'
+                ++j;
+
+                // Skip whitespace after ##
+                while (j < line.size() && line[j].is(TokenType::Whitespace)) {
+                    ++j;
+                }
+                if (j >= line.size() ||
+                        !(line[j].is(TokenType::Identifier) || line[j].is(TokenType::Integer))) {
+                    // Invalid continuation: abort paste here (leave tokens untouched)
+                    // Emit original identifier and any whitespace we skipped so far
+                    out.push_back(first);
+                    // Rewind to original next token (we consumed spaces and maybe ## incorrectly)
+                    // We cannot easily rewind; safest is to restart from idx+1 original position
+                    // so treat everything as normal tokens.
+                    // Reconstruct: emit whitespace sequence and the '##' token we consumed partially.
+                    // Simpler: fall back to copying tokens from idx+1 to current j treating them verbatim.
+                    for (unsigned k = paste_start_ws_begin; k < j; ++k) {
+                        out.push_back(line[k]);
+                    }
+                    idx = j;
+                    goto next_iteration;
+                }
+
+                // Valid continuation
+                glued += line[j].text();
+                ++j;
+                found_any_paste = true;
+            }
+
+            if (found_any_paste) {
+                // Preserve the whitespace between the first identifier and the first ##
+                for (unsigned k = paste_start_ws_begin; k < paste_start_ws_end; ++k) {
+                    out.push_back(line[k]); // original inter-token whitespace retained
+                }
+                out.push_back(Token(TokenType::Identifier, glued));
+                merged_any = true;
+                idx = j;
+                continue;
             }
         }
-        out.push_back(cur);
+
+        // Not part of (or failed) paste sequence
+        out.push_back(first);
         ++idx;
+
+next_iteration:
+        continue;
     }
+
     return merged_any;
 }
 
@@ -2710,8 +2783,11 @@ bool Preprocessor::expand_macros(const std::vector<TokensLine>& lines,
             Macro& macro = mit->second;
             int& rc = macro.recursion_depth;
             if (rc >= MAX_MACRO_RECURSION) {
-                g_errors.error(ErrorCode::MacroRecursionLimit,
-                               "Macro recursion limit reached for: " + name);
+                if (!macro.emitted_recursion_error) {
+                    g_errors.error(ErrorCode::MacroRecursionLimit,
+                                   name);
+                    macro.emitted_recursion_error = true;
+                }
                 current.push_back(tok);
                 ++idx;
                 continue;
