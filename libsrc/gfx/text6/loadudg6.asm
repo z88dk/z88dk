@@ -1,22 +1,22 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
-;	Version for the 2x3 graphics symbols
+;   Version for the 2x3 graphics symbols
 ;
 ;       Written by Stefano Bodrato 2014
 ;
 ;
-;	Load a 2x3 pseudo-graphics at HL position,
+;   Load a 2x3 pseudo-graphics at HL position,
 ;   starting from character C up to character B-1
 ;
 ;
-;	$Id: loadudg6.asm $
+;   $Id: loadudg6.asm $
 ;
 
     SECTION code_clib
     PUBLIC  loadudg6
 
 loadudg6:
-	;push bc
+    ;push bc
     ld      d, c
     call    setbyte
     ld      (hl), a
@@ -25,7 +25,7 @@ loadudg6:
     call    setbyte
     ld      (hl), a
     inc     hl
-	;pop  bc
+    ;pop  bc
     ld      c, d
     inc     c
     ld      a, b
@@ -37,12 +37,12 @@ loadudg6:
 setbyte:
     call    setbyte2
 IF  __CPU_INTEL__
-	push    af
-	ld      a,c
-	rra
-	rra
-	ld      c,a
-	pop     af
+    push    af
+    ld      a,c
+    rra
+    rra
+    ld      c,a
+    pop     af
 ELSE
     rr      c
     rr      c
@@ -54,22 +54,22 @@ ENDIF
     ret
 setbyte2:
 IF  __CPU_INTEL__
-	push    de
-	ld      e,0
-	ld      d,0
-	ld      a,c
-	rra
+    push    de
+    ld      e,0
+    ld      d,0
+    ld      a,c
+    rra
     jr      nc, noright
-	ld      d,$0f
+    ld      d,$0f
 noright:
-	rra
+    rra
     jr      nc, noleft
-	ld      e,$f0
+    ld      e,$f0
 noleft:
-	ld      a,d
-	or      e
-	pop     de
-	ret
+    ld      a,d
+    or      e
+    pop     de
+    ret
 ELSE
     xor     a
     bit     0, c
