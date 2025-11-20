@@ -9,7 +9,7 @@
 ;   starting from character C up to character B-1
 ;
 ;
-;	$Id: loadudg6.asm,v 1.5 2016-06-16 19:53:50 dom Exp $
+;	$Id: loadudg6.asm $
 ;
 
     SECTION code_clib
@@ -36,14 +36,41 @@ loadudg6:
 
 setbyte:
     call    setbyte2
+IF  __CPU_INTEL__
+	push    af
+	ld      a,c
+	rra
+	rra
+	ld      c,a
+	pop     af
+ELSE
     rr      c
     rr      c
+ENDIF
     ld      (hl), a
     inc     hl
     ld      (hl), a
     inc     hl
     ret
 setbyte2:
+IF  __CPU_INTEL__
+	push    de
+	ld      e,0
+	ld      d,0
+	ld      a,c
+	rra
+    jr      nc, noright
+	ld      d,$0f
+noright:
+	rra
+    jr      nc, noleft
+	ld      e,$f0
+noleft:
+	ld      a,d
+	or      e
+	pop     de
+	ret
+ELSE
     xor     a
     bit     0, c
     jr      z, noright
@@ -53,3 +80,4 @@ noright:
     ret     z
     add     $f0
     ret
+ENDIF
