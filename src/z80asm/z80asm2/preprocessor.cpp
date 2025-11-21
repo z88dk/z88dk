@@ -28,8 +28,10 @@ void Preprocessor::clear() {
     file_stack_.clear();
     macros_.clear();
     if_stack_.clear();
-    dep_files_.clear(); // also reset collected dependencies
-    included_once_.clear(); // reset per-instance included-once tracking
+    dep_files_.clear();
+    included_once_.clear();
+    macro_fixpoint_iterations_ = 0;
+    current_line_chain_.reset();
 }
 
 void Preprocessor::clear_file_cache() {
@@ -198,23 +200,19 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
 bool Preprocessor::next_line(TokensLine& line) {
     line.clear();
     while (true) {
-        // If we have queued lines, process them as full input
-        // (including directives)
         if (!input_queue_.empty()) {
             line = std::move(input_queue_.front());
             input_queue_.pop_front();
-
             if (handle_directives_for_line(line, true)) {
                 continue;
             }
             else {
+                macro_fixpoint_iterations_ = 0;
                 return true;
             }
         }
 
-        // read lines from top file in stack
         if (!fetch_line(line)) {
-            // no more input
             line.clear();
             return false;
         }
@@ -223,28 +221,56 @@ bool Preprocessor::next_line(TokensLine& line) {
             continue;
         }
 
-        // expand macros in the line
-        Location location = line.location();
-        std::vector<TokensLine> expanded;
+        // --- Single-pass macro expansion with iterative feed-back ---
+        {
+            std::vector<TokensLine> expanded_once;
+            std::string last_macro;
+            bool changed = expand_macros_single_pass(line, expanded_once, last_macro);
 
-        bool changed_line = expand_macros(line, true, expanded);
-        if (!changed_line) {
-            // Refactored path: fast handling of unchanged line (and optional ## re-pass)
-            std::vector<TokensLine> final_lines;
-            finalize_line(line, false, final_lines);
-            if (final_lines.size() == 1) {
+            if (expanded_once.empty()) {
+                continue;
+            }
+
+            if (!changed) {
+                std::vector<TokensLine> final_lines;
+                finalize_line(expanded_once.front(), false, final_lines);
                 line = final_lines.front();
+                current_line_chain_.reset();
+                macro_fixpoint_iterations_ = 0;
                 return true;
             }
-            add_virtual_file(final_lines);
-            continue;
-        }
 
-        if (expanded.empty()) {
-            continue;
-        }
+            // Macro expansion occurred: force all expanded lines to use call-site logical location
+            Location callsite = line.location();
+            for (auto& l : expanded_once) {
+                l.set_location(callsite);
+            }
 
-        add_virtual_file(expanded);
+            ++macro_fixpoint_iterations_;
+            if (macro_fixpoint_iterations_ > MAX_FIXPOINT_ITERATIONS) {
+                std::string macro_name =
+                    last_macro.empty() ? "<macro>" : last_macro;
+                g_errors.error(ErrorCode::MacroRecursionLimit,
+                               macro_name);
+
+                current_line_chain_.reset();
+                std::vector<TokensLine> final_lines;
+                finalize_line(line, false, final_lines);
+                line = final_lines.front();
+                macro_fixpoint_iterations_ = 0;
+                return true;
+            }
+            // Push expansion as virtual file located at the call-site (constant line number)
+            push_virtual_file(expanded_once,
+                              callsite.filename(),
+                              callsite.line_num(),
+                              false);
+            if (!file_stack_.empty()) {
+                file_stack_.back().is_macro_expansion = true;
+            }
+
+            continue; // fetch first expanded line
+        }
     }
 }
 
@@ -1163,6 +1189,7 @@ void Preprocessor::process_equ(const TokensLine& line, unsigned& i) {
     }
     TokensLine value = collect_tokens(line, i);
     TokensLine expanded = expand_macros_in_line(value);
+
     TokensLine defc(line.location());
     defc.reserve(6 + expanded.size());
     defc.push_back(Token(TokenType::Identifier, "DEFC"));
@@ -1263,34 +1290,37 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
         define_macro(name, "");
     }
 
-    // 2) Collect all tokens up to end-of-line from current index.
-    TokensLine body = collect_tokens(line, i);
-    if (body.empty()) {
-        // If no body, replace it with integer token '1'
-        body.push_back(Token(TokenType::Integer, "1", 1));
+    // 2) Collect raw body tokens (unexpanded)
+    TokensLine raw_body = collect_tokens(line, i);
+    if (raw_body.empty()) {
+        // Empty body defaults to integer 1
+        raw_body.clear_tokens();
+        raw_body.push_back(Token(TokenType::Integer, "1", 1));
     }
 
-    // 3) Expand macros in the body (if 'name' is used here, it expands to the
-    //    previous value, or empty when none existed).
-    TokensLine expr_tokens = expand_macros_in_line(body);
+    // 3) Expand macros in the body so stored value reflects current expansions
+    //    (including previous value of <name> if referenced).
+    TokensLine expanded_body = expand_macros_in_line(raw_body);
 
-    // 4) Flatten expanded lines into a single TokensLine (insert a single space between lines)
-    // 5) Try to evaluate as a constant expression.
-    //    If it parses successfully AND consumes the whole body, define <name>
-    //    as the resulting integer. Otherwise, define <name> as the whole expanded body.
+    // 4) Attempt constant-expression evaluation on the fully expanded body.
+    //    If successful, store the numeric result. Otherwise store the expanded body as-is
+    //    (supports lists like "5,6" and other non-constant sequences).
     int value = 0;
-    if (eval_const_expr(expr_tokens, value, true)) {
-        body.clear_tokens();
-        body.push_back(Token(TokenType::Integer, std::to_string(value), value));
+    TokensLine final_body(expanded_body.location());
+    if (eval_const_expr(expanded_body, value, true)) {
+        final_body.clear_tokens();
+        final_body.push_back(Token(TokenType::Integer, std::to_string(value), value));
+    }
+    else {
+        final_body = expanded_body; // preserve list / complex tokens
     }
 
+    // 5) Register/overwrite the macro definition with the chosen body.
     Macro macro;
     macro.params.clear();
     macro.replacement.clear();
-    macro.replacement.push_back(body);
+    macro.replacement.push_back(final_body);
     macro.recursion_depth = 0;
-
-    // 6) Register/overwrite the macro definition of <name>.
     macros_[name] = std::move(macro);
 }
 
@@ -1298,7 +1328,7 @@ bool Preprocessor::output_active() const {
     // check for exitm called
     if (!file_stack_.empty()) {
         const File& top = file_stack_.back();
-        if (top.is_macro_expansion && top.exitm_found) {
+        if (top.exitm_found) {
             return false;
         }
     }
@@ -2209,12 +2239,23 @@ void Preprocessor::process_exitm(const TokensLine& line, unsigned& i) {
 }
 
 void Preprocessor::do_exitm() {
-    if (!file_stack_.empty()) {
-        File& top = file_stack_.back();
-        if (top.is_macro_expansion) {
-            top.exitm_found = true;
+    if (file_stack_.empty()) {
+        return;
+    }
+
+    // Find the latest (top-most) macro-expansion frame scanning downward.
+    // If the bottom (index 0) is the only macro-expansion, we still mark it and all above.
+    size_t pos = file_stack_.size();
+    while (pos > 0) {
+        --pos; // candidate index
+        if (file_stack_[pos].is_macro_expansion) {
+            for (size_t j = pos; j < file_stack_.size(); ++j) {
+                file_stack_[j].exitm_found = true;
+            }
+            return;
         }
     }
+    // No macro-expansion frame found: nothing to mark.
 }
 
 void Preprocessor::process_local(const TokensLine& line, unsigned& i,
@@ -2583,7 +2624,7 @@ bool Preprocessor::substitute_and_expand(
     if (!macro.locals.empty()) {
         ++local_id_counter_;
         const std::string suffix = "_" + std::to_string(local_id_counter_);
-        for (const std::string& ln : macro.locals) {
+        for (const auto& ln : macro.locals) {
             local_rename[ln] = ln + suffix;
         }
     }
@@ -2722,6 +2763,278 @@ void Preprocessor::append_expansion_into_out(const std::vector<TokensLine>&
             out.push_back(el[kk]);
         }
     }
+}
+
+bool Preprocessor::expand_macros_single_pass(const TokensLine& in_line,
+        std::vector<TokensLine>& out_lines, std::string& last_macro_name) {
+
+    out_lines.clear();
+    last_macro_name.clear();
+
+    unsigned di = 0;
+    Keyword kw = Keyword::None;
+    std::string dummy;
+    if (is_directive(in_line, di, kw)
+            || is_name_directive(in_line, di, kw, dummy)) {
+        out_lines.push_back(in_line);
+        return false;
+    }
+
+    TokensLine current(in_line.location());
+    bool any_change = false;
+
+    for (unsigned idx = 0; idx < in_line.size(); ++idx) {
+        const Token& tok = in_line[idx];
+        if (!tok.is(TokenType::Identifier)) {
+            current.push_back(tok);
+            continue;
+        }
+
+        auto mit = macros_.find(tok.text());
+        if (mit == macros_.end()) {
+            current.push_back(tok);
+            continue;
+        }
+
+        Macro& macro = mit->second;
+        last_macro_name = tok.text();
+
+        unsigned args_start = idx + 1;
+        bool had_paren = (macro.is_function_like &&
+                          args_start < in_line.size() &&
+                          in_line[args_start].is(TokenType::LeftParen));
+        bool is_call = macro.is_function_like && (args_start < in_line.size());
+
+        std::vector<std::vector<TokensLine>> expanded_args_flat;
+        std::vector<TokensLine> original_args;
+        unsigned after_idx = args_start;
+
+        if (macro.is_function_like && is_call) {
+            if (!parse_and_expand_macro_args(in_line,
+                                             args_start,
+                                             expanded_args_flat,
+                                             original_args,
+                                             after_idx) ||
+                    expanded_args_flat.size() != macro.params.size()) {
+                if (had_paren) {
+                    g_errors.error(ErrorCode::InvalidSyntax,
+                                   "Macro argument count mismatch for: " + last_macro_name);
+                }
+                current.push_back(tok);
+                continue;
+            }
+        }
+
+        // Recursion detection for simple self or cyclic object-like chains
+        if (!macro.is_function_like) {
+            if (macro.replacement.size() == 1 &&
+                    macro.replacement[0].size() == 1 &&
+                    macro.replacement[0][0].is(TokenType::Identifier) &&
+                    macro.replacement[0][0].text() == last_macro_name) {
+                g_errors.error(ErrorCode::MacroRecursionLimit, last_macro_name);
+                current.push_back(tok);
+                continue;
+            }
+            if (macro.replacement.size() == 1 &&
+                    macro.replacement[0].size() == 1 &&
+                    macro.replacement[0][0].is(TokenType::Identifier)) {
+                std::string target = macro.replacement[0][0].text();
+                if (current_line_chain_.has_cycle(target)) {
+                    g_errors.error(ErrorCode::MacroRecursionLimit, last_macro_name);
+                    current.push_back(tok);
+                    continue;
+                }
+                current_line_chain_.add(last_macro_name);
+            }
+        }
+
+        any_change = true;
+
+        if (macro.is_function_like && is_call) {
+            // Function-like substitution (no recursive expansion this pass)
+            std::unordered_map<std::string, std::string> local_rename;
+            if (!macro.locals.empty()) {
+                ++local_id_counter_;
+                std::string suffix = "_" + std::to_string(local_id_counter_);
+                for (const auto& ln : macro.locals) {
+                    local_rename[ln] = ln + suffix;
+                }
+            }
+
+            // Substitute each replacement line
+            bool first_rep = true;
+            for (const TokensLine& rep_line : macro.replacement) {
+                TokensLine out(rep_line.location());
+                for (unsigned p = 0; p < rep_line.size(); ++p) {
+                    const Token& rt = rep_line[p];
+
+                    // Stringize
+                    if (rt.is(TokenType::Hash) && p + 1 < rep_line.size() &&
+                            rep_line[p + 1].is(TokenType::Identifier)) {
+                        std::string pname = rep_line[p + 1].text();
+                        auto pit = std::find(macro.params.begin(), macro.params.end(), pname);
+                        if (pit != macro.params.end()) {
+                            size_t arg_index = std::distance(macro.params.begin(), pit);
+                            const TokensLine& orig = original_args[arg_index];
+                            std::string joined;
+                            bool space_pending = false;
+                            for (const auto& at : orig.tokens()) {
+                                if (at.is(TokenType::Whitespace)) {
+                                    space_pending = true;
+                                    continue;
+                                }
+                                if (!joined.empty() && space_pending) {
+                                    joined += ' ';
+                                }
+                                joined += at.text();
+                                space_pending = false;
+                            }
+                            std::string escaped = escape_c_string(joined);
+                            std::string quoted = "\"" + escaped + "\"";
+                            out.push_back(Token(TokenType::String, quoted, joined));
+                            ++p;
+                            continue;
+                        }
+                    }
+
+                    // Parameter substitution
+                    if (rt.is(TokenType::Identifier)) {
+                        auto pit = std::find(macro.params.begin(), macro.params.end(), rt.text());
+                        if (pit != macro.params.end()) {
+                            size_t arg_index = std::distance(macro.params.begin(), pit);
+                            const auto& arg_lines = expanded_args_flat[arg_index];
+                            // First argument line
+                            for (const auto& tkl : arg_lines.front().tokens()) {
+                                out.push_back(tkl);
+                            }
+                            // Additional argument lines become separate logical lines
+                            for (size_t al = 1; al < arg_lines.size(); ++al) {
+                                // Commit merged (with any preceding tokens)
+                                if (first_rep) {
+                                    // Merge current (tokens before macro) with out
+                                    TokensLine merged(out.location());
+                                    for (const auto& ct : current.tokens()) {
+                                        merged.push_back(ct);
+                                    }
+                                    for (const auto& ot : out.tokens()) {
+                                        merged.push_back(ot);
+                                    }
+                                    TokensLine pasted;
+                                    merge_double_hash(merged, pasted);
+                                    out_lines.push_back(pasted);
+                                    current.clear_tokens();
+                                }
+                                else {
+                                    TokensLine pasted2;
+                                    merge_double_hash(out, pasted2);
+                                    out_lines.push_back(pasted2);
+                                }
+                                out = TokensLine(rep_line.location());
+                                for (const auto& tkl : arg_lines[al].tokens()) {
+                                    out.push_back(tkl);
+                                }
+                                first_rep = false;
+                            }
+                            continue;
+                        }
+                        // LOCAL rename
+                        auto lit = local_rename.find(rt.text());
+                        if (lit != local_rename.end()) {
+                            out.push_back(Token(TokenType::Identifier, lit->second));
+                            continue;
+                        }
+                    }
+
+                    out.push_back(rt);
+                }
+
+                TokensLine merged_line;
+                merge_double_hash(out, merged_line);
+
+                if (first_rep) {
+                    // Merge into current (replace macro token)
+                    for (const auto& t : merged_line.tokens()) {
+                        current.push_back(t);
+                    }
+                    first_rep = false;
+                }
+                else {
+                    // Commit previous accumulated line, start new current with merged_line
+                    out_lines.push_back(current);
+                    current = merged_line;
+                }
+            }
+
+            idx = after_idx;
+        }
+        else { // object-like macro
+            std::unordered_map<std::string, std::string> local_rename;
+            if (!macro.locals.empty()) {
+                ++local_id_counter_;
+                std::string suffix = "_" + std::to_string(local_id_counter_);
+                for (const auto& ln : macro.locals) {
+                    local_rename[ln] = ln + suffix;
+                }
+            }
+
+            bool first_rep = true;
+            for (const TokensLine& rep_line : macro.replacement) {
+                TokensLine substituted(rep_line.location());
+                for (unsigned p = 0; p < rep_line.size(); ++p) {
+                    const Token& rt = rep_line[p];
+                    if (rt.is(TokenType::Identifier)) {
+                        auto lr = local_rename.find(rt.text());
+                        if (lr != local_rename.end()) {
+                            substituted.push_back(Token(TokenType::Identifier, lr->second));
+                            continue;
+                        }
+                    }
+                    substituted.push_back(rt);
+                }
+
+                TokensLine merged_line;
+                merge_double_hash(substituted, merged_line);
+
+                if (first_rep) {
+                    // Append into current (replacing macro token)
+                    for (const auto& t : merged_line.tokens()) {
+                        current.push_back(t);
+                    }
+                    first_rep = false;
+                }
+                else {
+                    // Commit previous accumulated line, start new one
+                    out_lines.push_back(current);
+                    current = merged_line;
+                }
+            }
+        }
+
+        // (Do not push current yet; continue scanning rest of original line)
+    }
+
+    // Final commit
+    if (!current.empty()) {
+        out_lines.push_back(current);
+    }
+
+    // If no change, return original line
+    if (!any_change) {
+        out_lines.clear();
+        out_lines.push_back(in_line);
+        return false;
+    }
+
+    // Post-process (string -> bytes) each resulting line
+    std::vector<TokensLine> final;
+    final.reserve(out_lines.size());
+    for (auto& ln : out_lines) {
+        TokensLine processed;
+        post_process_line(ln, processed);
+        final.push_back(processed);
+    }
+    out_lines.swap(final);
+    return true;
 }
 
 bool Preprocessor::expand_macros(const TokensLine& line, bool at_start,
@@ -3061,15 +3374,15 @@ void Preprocessor::finalize_line(const TokensLine& in,
     }
 
     // Second macro expansion (only meaningful if token-paste occurred or full processing requested)
-    std::vector<TokensLine> further;
-    expand_macros(*base, true, further);
+    std::vector<TokensLine> further_expanded;
+    expand_macros(*base, true, further_expanded);
 
-    if (further.empty()) {
+    if (further_expanded.empty()) {
         // Treat (possibly pasted) base line as single candidate
-        further.push_back(*base);
+        further_expanded.push_back(*base);
     }
 
-    for (const TokensLine& candidate : further) {
+    for (const TokensLine& candidate : further_expanded) {
         if (full_processing) {
             // Always split in full processing mode (matches previous add_virtual_file behavior)
             std::vector<TokensLine> segments;
@@ -3085,7 +3398,7 @@ void Preprocessor::finalize_line(const TokensLine& in,
         }
         // In fast mode (next_line, no full_processing), only split if we arrived
         // here due to token-paste AND expansion produced new lines (i.e., further.size()>1).
-        if (!full_processing && further.size() == 1) {
+        if (!full_processing && further_expanded.size() == 1) {
             TokensLine pp_single;
             pp_single.reserve(candidate.size());
             post_process_line(candidate, pp_single);
