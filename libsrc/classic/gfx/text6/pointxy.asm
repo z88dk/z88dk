@@ -50,7 +50,16 @@ pointxy:
     ld      c, a                        ; y/3
 
 IF  !GFXTEXT3
+IF  __CPU_INTEL__
+    push    af
+    ld      a,0
+    add     b        ; A=B, Carry=0
+    rra
+    ld      b,a
+    pop     af
+ELSE
     srl     b                           ; x/2
+ENDIF
 ENDIF
     ld      hl, (base_graphics)
     ld      a, c
@@ -117,8 +126,21 @@ chfound:
     ld      a, 1                        ; the pixel we want to draw
 
     jr      z, iszero
+IF  __CPU_INTEL__
+    push    af
+    ld      a,1
+    and     h
+    ld      h,a
+    ld      a,1
+    and     l
+    ld      l,a
+    pop     af
+    dec     l
+    jr      z, is1
+ELSE
     bit     0, l
     jr      nz, is1
+ENDIF
 IF  !GFXTEXT3
     add     a, a
 ENDIF
@@ -131,9 +153,14 @@ ENDIF
 iszero:
 
 IF  !GFXTEXT3
+IF  __CPU_INTEL__
+    dec     h
+    jr      nz, evenrow
+ELSE
     bit     0, h
     jr      z, evenrow
     add     a, a                        ; move down the bit
+ENDIF
 evenrow:
 ENDIF
 

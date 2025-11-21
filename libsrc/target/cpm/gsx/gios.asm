@@ -15,6 +15,7 @@ PUBLIC	_gios
 EXTERN	gios_ctl
 EXTERN	gios_pb
 
+EXTERN	__bdos
 
 
 SECTION code_clib
@@ -33,7 +34,7 @@ _gios:
 	ld	c,115   ; GSX
 IF !__CPU_INTEL__
 	push	ix
-	call	5
+	call	__bdos
 	pop	ix
 	ret
 ELSE

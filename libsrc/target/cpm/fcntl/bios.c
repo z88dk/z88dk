@@ -8,6 +8,10 @@
 
 
 #asm
+
+	EXTERN	__cpm_base_address
+	EXTERN	__bdos
+
 cpm_bios:
 
 	ld	hl,4
@@ -15,7 +19,7 @@ cpm_bios:
 
 	push hl
 	ld c,12		; S_BDOSVER
-	call 5
+	call __bdos
 	cp 30h		; check for CP/M version below 3.0
 	pop hl
 
@@ -39,7 +43,7 @@ ENDIF
 
 	ld de,BIOSPB
 	ld c,50  	; 32h (S_BIOS)
-	call 5
+	call __bdos
 IF !__CPU_INTEL__
 	pop	ix
 ENDIF
@@ -57,7 +61,7 @@ BIOSPB:
 ; if CP/M version is < 2.5, we spot the BIOS JP table
 ; using the WBOOT entry (at position $0000, points to BIOS+3)
 use_vector:
-	ld hl,(1)   ; base+1 = addr of jump table + 3
+	ld hl,(__cpm_base_address+1)   ; base+1 = addr of jump table + 3
 
 	dec hl	; -3
 	dec hl

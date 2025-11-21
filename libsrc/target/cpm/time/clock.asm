@@ -32,6 +32,7 @@ PUBLIC  clock
 PUBLIC  _clock
 
 EXTERN  l_mult, l_long_mult, l_long_add, __bdos
+EXTERN  __cpm_base_address
 
 clock:
 _clock:
@@ -48,7 +49,7 @@ ELSE
     ld      de,hl
     ret     C           ; return if earlier than MP/M II (i.e. CP/M 2.2)
 
-    ld    hl,(1)
+    ld    hl,(__cpm_base_address+1)
 
     push hl
     ld de,057h          ; CPM Plus "userf" custom Amstrad BIOS calls
@@ -84,7 +85,7 @@ timegot:
     
 cpm3_bios:
     ; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
-    ld    hl,(1)
+    ld    hl,(__cpm_base_address+1)
     ld    de,(-0ch)     ; System Control Block
     add    hl,de
     ld    de,jdate

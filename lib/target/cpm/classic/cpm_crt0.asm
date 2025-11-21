@@ -8,14 +8,14 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.43 2016-10-31 16:16:33 stefano Exp $
+;       $Id: cpm_crt0.asm $
 ;
-; 	There are a couple of #pragma commands which affect
-;	this file:
+; 	There are a couple of #pragma commands which affect this file:
 ;
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output protect8080 - add a check to block the program when on an 8080 CPU (not compatible)
 ;
+
 
     MODULE  cpm_crt0
 
@@ -25,10 +25,13 @@
 
 
     EXTERN	cpm_platform_init
+    EXTERN	__bdos
     EXTERN    _main		;main() is always external to crt0
 
     PUBLIC    __Exit		;jumped to by exit()
     PUBLIC    l_dcal		;jp(hl)
+
+    PUBLIC    __cpm_base_address
 
     defc    TAR__clib_exit_stack_size = 32
     ; Set sp to be &bdos, this sorts out CP/M 3 compatibility
@@ -38,6 +41,12 @@
     IF !DEFINED_CRT_ORG_CODE
         defc    CRT_ORG_CODE  = $100
     ENDIF
+
+    IF !DEFINED_CPM_BASE_ADDRESS
+        defc    __cpm_base_address = CRT_ORG_CODE - $100
+	ELSE
+        defc    __cpm_base_address = CPM_BASE_ADDRESS
+	ENDIF
 
     IF !DEFINED_CLIB_OPEN_MAX
         defc    DEFINED_CLIB_OPEN_MAX = 1
@@ -76,7 +85,7 @@ start:
 IF !DEFINED_noprotectmsdos
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
-	jp	begin-start+$100
+	jp	begin-start+CRT_ORG_CODE
 	defb	$b4,$09		;DOS protection... MOV AH,9
 	defb	$ba
 	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
@@ -98,7 +107,7 @@ IF DEFINED_protect8080
 
 	ld	c,9		; print string
 	ld	de,err8080
-	call	5	; BDOS
+	call	__bdos	; BDOS
 	jp	0
 	
 err8080:
@@ -151,7 +160,7 @@ ENDIF
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF CRT_ENABLE_COMMANDLINE = 1
-    ld      hl,$80
+    ld      hl,__cpm_base_address+$80
     ld      a,(hl)
     ;ld      b,0
     ld      b,h
@@ -177,7 +186,7 @@ ENDIF
     pop     bc	;kill argc
 
 __Exit:
-    ld      (0x80),hl   ;Save exit value for CP/M 2.2
+    ld      (__cpm_base_address+$80),hl   ;Save exit value for CP/M 2.2
     push    hl		;Save return value
     call    crt0_exit
     pop     hl
@@ -188,9 +197,9 @@ PUBLIC __restore_sp_onexit
 __restore_sp_onexit:
     ld      sp,0	;Pick up entry sp
     ld      c,12        ;Get CPM version
-    call    5
+    call    __bdos
     cp      $30 
-    jp      c,0         ;Warm boot for CP/M < 3
+    jp      c,__cpm_base_address    ;Warm boot for CP/M < 3
     ld      a,l
     and     127
     ld      e,a
@@ -201,8 +210,8 @@ __restore_sp_onexit:
 do_exit_v3:
     ld      d,a
     ld      c,108
-    call    5           ;Report error
-    rst     0
+    call    __bdos           ;Report error
+    jp      __cpm_base_address
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
@@ -358,9 +367,18 @@ IF WANT_DEVICE_STDLST
     setup_static_fp(__stdlst,_stdlst_device)
 ENDIF
 
+    ; Memory hole for the Apple II high resolution graphics
+    ; This quick and dirty approach wastes about 7K of memory
+	; which could be recovered by moving the STACK or
+	; the DATA section here
+IF  (startup=2)
+ DEFS $2000-CRT_ORG_CODE-ASMPC
+  defs $2000
+ENDIF
+
     SECTION code_crt_init
     ld      c,25
-    call    5
+    call    __bdos
     ld      (defltdsk),a
 
 IF __HAVE_TMS99X8
@@ -374,5 +392,5 @@ ENDIF
     ld      a,(defltdsk)        ;Restore default disc
     ld      e,a
     ld      c,14
-    call    5
+    call    __bdos
 

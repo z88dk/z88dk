@@ -29,6 +29,11 @@ IF FORalphatro
     defc    _GFX_TEXT_BLANK_CHAR    = 32
 ENDIF
 
+IF FORalphatp2
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 72
+    defc    _GFX_TEXT_BLANK_CHAR    = 32
+ENDIF
 
 IF FORaquarius
     defc    _GFX_MAXX    = 80
