@@ -3,6 +3,9 @@
 #ifndef __ARCH_H__
 #define __ARCH_H__
 
+#ifdef __R2KA
+#include <./arch/r2ka.h>
+#endif
 
 #ifdef __SPECTRUM
 #include <../libsrc/_DEVELOPMENT/target/zx/config_zx.h>
