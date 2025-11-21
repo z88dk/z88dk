@@ -755,7 +755,7 @@ TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filena
 
 // Added test: C_LINE then ordinary lines then LINE then ordinary lines
 TEST_CASE("Preprocessor: sequence C_LINE then lines then LINE then lines applies constant then incrementing logical line numbers",
-    "[preprocessor][cline][line][sequence]") {
+          "[preprocessor][cline][line][sequence]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8154,3 +8154,128 @@ TEST_CASE("Preprocessor: chained token pasting A##B##C produces single identifie
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
+// Added test: outer macro calls inner macro that uses EXITM; outer continues after each call
+TEST_CASE("Preprocessor: outer macro continues after inner macro EXITM (multiple inner calls)",
+          "[preprocessor][macro][exitm][nested][continue]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // INNER(n): emits inner_start then EXITM (inner_end suppressed)
+    // OUTER(a,b): emits pre_a, calls INNER(a), emits mid_b, calls INNER(b), emits post
+    const std::string content =
+        "MACRO INNER(n)\n"
+        "inner_start n\n"
+        "EXITM\n"
+        "inner_end n\n"      // should never appear
+        "ENDM\n"
+        "MACRO OUTER(a,b)\n"
+        "pre_a a\n"
+        "INNER(a)\n"
+        "mid_b b\n"
+        "INNER(b)\n"
+        "post\n"
+        "ENDM\n"
+        "LINE 123, \"outer_inner_exitm.asm\"\n"
+        "OUTER(1,2)\n"
+        "done\n";
+
+    pp.push_virtual_file(content, "outer_inner_exitm_test", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> lines;
+
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            // Capture first token text from each logical output line
+            lines.push_back(line[0].text());
+        }
+    }
+
+    // Expected sequence (order matters):
+    // pre_a, inner_start, mid_b, inner_start, post, done
+    const std::vector<std::string> expected = {
+        "pre_a", "inner_start", "mid_b", "inner_start", "post", "done"
+    };
+    REQUIRE(lines.size() == expected.size());
+    REQUIRE(lines == expected);
+
+    // Ensure suppressed tokens (inner_end) do not appear
+    REQUIRE(std::find(lines.begin(), lines.end(), "inner_end") == lines.end());
+
+    // All expanded lines share logical location line 123 except the final 'done'
+    // (location checks optional; only verify no errors)
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: EXITM inside REPT inside MACRO aborts macro after first REPT iteration",
+          "[preprocessor][macro][exitm][rept][iteration-cut]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Macro M(val):
+    //  REPT 3
+    //    db val
+    //    EXITM          (should abort entire macro on first iteration)
+    //    db 999         (skipped)
+    //  ENDR
+    //  db 888           (skipped)
+    // After expansion only a single 'db <val>' line must be emitted.
+    const std::string content =
+        "MACRO M(val)\n"
+        "REPT 3\n"
+        "db val\n"
+        "EXITM\n"
+        "db 999\n"
+        "ENDR\n"
+        "db 888\n"
+        "ENDM\n"
+        "LINE 321, \"exitm_rept_macro.asm\"\n"
+        "M(7)\n"
+        "after\n";
+
+    pp.push_virtual_file(content, "exitm_rept_macro_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> first_tokens;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            first_tokens.push_back(line[0].text());
+        }
+    }
+
+    // Expect exactly two logical output lines: 'db' (with 7) and 'after'
+    REQUIRE(first_tokens.size() == 2);
+    REQUIRE(first_tokens[0] == "db");
+    REQUIRE(first_tokens[1] == "after");
+
+    // Verify the first line contains integer 7 and does NOT contain 999 or 888
+    {
+        bool has7 = false, has999 = false, has888 = false;
+        for (const auto& t : pp.dependency_filenames()) {
+            (void)t; // silence unused if dependency_filenames not needed
+        }
+        // Re-run inspection on stored tokens of the first emitted line
+        // (We can reconstruct by re-running the preprocessor, simpler: re-parse content)
+        Preprocessor pp2;
+        pp2.push_virtual_file(content, "exitm_rept_macro_src2", 1, true);
+        REQUIRE(pp2.next_line(line)); // db 7
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                if (t.int_value() == 7) {
+                    has7 = true;
+                }
+                if (t.int_value() == 999) {
+                    has999 = true;
+                }
+                if (t.int_value() == 888) {
+                    has888 = true;
+                }
+            }
+        }
+        REQUIRE(has7);
+        REQUIRE_FALSE(has999);
+        REQUIRE_FALSE(has888);
+    }
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
