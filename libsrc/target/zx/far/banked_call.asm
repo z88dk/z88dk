@@ -4,7 +4,11 @@
     PUBLIC  banked_call
     EXTERN  l_jphl
 
+IF __CLASSIC
     EXTERN  CLIB_BANKING_STACK_SIZE
+ELSE
+    defc CLIB_BANKING_STACK_SIZE = 100
+ENDIF
 
     INCLUDE "target/zx/def/sysvar.def"
 
@@ -50,12 +54,16 @@ banked_call:
 
     SECTION code_crt_init
 
+IF __CLASSIC
     pop     de
+ENDIF
     ld      (tempsp), sp
     ld      hl, -CLIB_BANKING_STACK_SIZE
     add     hl, sp
     ld      sp, hl
+IF __CLASSIC
     push    de
+ENDIF
 
     SECTION bss_driver
 

@@ -258,7 +258,7 @@ ENDIF
 
     include "crt/newlib/crt_set_interrupt_mode.inc"
 
-    include "../../../../lib/crt/classic/crt_init_heap.inc"
+    include "crt/classic/crt_init_heap.inc"
 
     ; set interrupt mode
 
@@ -325,7 +325,7 @@ SECTION code_crt_return
 
     SECTION data_crt
 
-include "../../../../lib/crt/classic/crt_runtime_selection.inc" 
+include "crt/classic/crt_runtime_selection.inc" 
 
 PUBLIC _8085_int65
 EXTERN _acia_interrupt

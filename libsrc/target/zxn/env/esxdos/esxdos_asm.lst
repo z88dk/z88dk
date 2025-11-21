@@ -1,11 +1,11 @@
 target/zxn/env/esxdos/z80/__ENV_BUF
-${LIBSRC_ROOT}/target/zxn/env/esxdos/z80/__ENV_FNAME.asm.m4
+target/zxn/env/esxdos/z80/__ENV_FNAME.asm.m4
 target/zxn/env/esxdos/z80/__ENV_GETENV_VALUE
 target/zxn/env/esxdos/z80/__ENV_MKSNAM
 target/zxn/env/esxdos/z80/__env_name_sm
 target/zxn/env/esxdos/z80/__env_qualify_name
 target/zxn/env/esxdos/z80/__ENV_TMPNAM
-${LIBSRC_ROOT}/target/zxn/env/esxdos/z80/__ENV_TMPNAM_TEMPLATE.asm.m4
+target/zxn/env/esxdos/z80/__ENV_TMPNAM_TEMPLATE.asm.m4
 target/zxn/env/esxdos/z80/__env_value_sm
 target/zxn/env/esxdos/z80/asm_env_getenv
 target/zxn/env/esxdos/z80/asm_env_mkstemp

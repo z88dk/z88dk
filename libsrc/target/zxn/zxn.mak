@@ -2,24 +2,22 @@
 ZXN_GLOBS := $(ZX_GLOBS) \
 	"target/zxn/esxdos/z80/*.asm" "target/zxn/esxdos/c/sccz80/*.asm" \
 	"target/zxn/memory/z80/*.asm" "target/zxn/memory/c/sccz80/*.asm" \
-        "target/zxn/globals/z80/*.asm" \
-        "target/zxn/sysvar/*.asm" \
-#        "target/zxn/nextos/z80/*.asm" \
-        "target/zxn/version/z80/*.asm" "target/zxn/version/c/sccz80/*.asm" \
-        "target/ts2068/misc/z80/*.asm" "target/ts2068/misc/c/sccz80/*.asm" \
-        "target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
-        "newlib/target/zxn/driver/banking/zxn_banked_call.asm"	
+	"target/zxn/globals/z80/*.asm" \
+	"target/zxn/sysvar/*.asm" \
+	"target/zxn/far/*.asm" \
+	"target/zxn/version/z80/*.asm" "target/zxn/version/c/sccz80/*.asm" \
+	"target/ts2068/misc/z80/*.asm" "target/ts2068/misc/c/sccz80/*.asm" \
+	"target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
 
 ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/zxn/esxdos/z80/*.asm target/zxn/esxdos/c/sccz80/*.asm \
 	target/zxn/memory/z80/*.asm target/zxn/memory/c/sccz80/*.asm \
-        target/zxn/globals/z80/*.asm \
-        target/zxn/sysvar/*.asm \
-#        target/zxn/nextos/z80/*.asm \
-        target/zxn/version/z80/*.asm target/zxn/version/c/sccz80/*.asm \
-        target/ts2068/misc/z80/*.asm target/ts2068/misc/c/sccz80/*.asm \
-        target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
-        newlib/target/zxn/driver/banking/zxn_banked_call.asm	
+	target/zxn/globals/z80/*.asm \
+	target/zxn/sysvar/*.asm \
+	target/zxn/far/*.asm \
+	target/zxn/version/z80/*.asm target/zxn/version/c/sccz80/*.asm \
+	target/ts2068/misc/z80/*.asm target/ts2068/misc/c/sccz80/*.asm \
+	target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
 
 
 

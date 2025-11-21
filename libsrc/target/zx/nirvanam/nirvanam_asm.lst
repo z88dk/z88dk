@@ -4,4 +4,4 @@ target/zx/nirvanam/z80/asm_NIRVANAM_drawW_di
 target/zx/nirvanam/z80/asm_NIRVANAM_fillT_di
 target/zx/nirvanam/z80/asm_NIRVANAM_spriteT
 target/zx/nirvanam/z80/asm_NIRVANAM_stop
-${LIBSRC_ROOT}/target/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4
+target/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4

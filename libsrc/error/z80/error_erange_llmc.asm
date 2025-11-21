@@ -2,6 +2,7 @@
 SECTION code_clib
 SECTION code_error
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 PUBLIC error_erange_llmc
 
 EXTERN error_erange_lmc, error_lmc
@@ -18,3 +19,4 @@ error_erange_llmc:
    call error_erange_lmc
    exx
    jp error_lmc
+ENDIF

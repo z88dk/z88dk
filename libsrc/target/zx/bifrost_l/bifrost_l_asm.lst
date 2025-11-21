@@ -5,4 +5,4 @@ target/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim2Frames
 target/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim4Frames
 target/zx/bifrost_l/z80/asm_BIFROSTL_setTile
 target/zx/bifrost_l/z80/asm_BIFROSTL_stop
-${LIBSRC_ROOT}/target/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4
+target/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4

@@ -3,6 +3,7 @@
 #ifndef __ARCH_H__
 #define __ARCH_H__
 
+#include <sys/compiler.h>
 
 #ifdef __SPECTRUM
 #include <../libsrc/newlib/target/zx/config_zx.h>

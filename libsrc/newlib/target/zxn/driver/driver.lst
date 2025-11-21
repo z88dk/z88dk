@@ -12,4 +12,3 @@ target/zx/driver/terminal/_font_8x8_rom
 @target//zxn/driver/terminal/tshr_01_output_char_64.lst
 @target//zxn/driver/terminal/tshr_01_output_char_128.lst
 @target//zxn/driver/terminal/tshr_01_output_fzx.lst
-target/zxn/driver/banking/zxn_banked_call

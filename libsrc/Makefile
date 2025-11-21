@@ -18,7 +18,6 @@ check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(
 
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
-GENLIBS += 8080_opt.lib 8085_opt.lib
 GENLIBS += gfxtek.lib gfxregis.lib
 
 
@@ -189,6 +188,7 @@ include compress/zx2/zx2.mak
 include classic/compress/zx7/zx7.mak
 include ctype/ctype.mak
 include classic/debug/debug.mak
+include error/error.mak
 include font/font_4x8/font_4x8.mak
 include font/font_8x8/font_8x8.mak
 include font/font_8x10/font_8x10.mak
@@ -203,7 +203,9 @@ include classic/interrupts/im1/im1.mak
 include classic/interrupts/im2/im2.mak
 include classic/interrupts/nmi/nmi.mak
 include classic/lib3d/lib3d.mak
+include inttypes/inttypes.mak
 include libgen/libgen.mak
+include locale/locale.mak
 include math/fix16/fix16.mak
 include classic/rect/rect.mak
 include regex/regex.mak
@@ -2322,28 +2324,14 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
 	$(call buildcrt)
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_crt0 @$(LISTFILE_DIRECTORY)/8080.lst
 
-8080_opt.lib: $(DIRS) $(OBJS) 8080_crt0.lib
-	@echo ''
-	@echo '--- Building 8080 optimised crt routines---'
-	@echo ''
-	$(MAKE) -C classic/z80_crt0s
-	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
-
-8085_crt0.lib: $(DIRS) $(OBJS) 8080_opt.lib
+8085_crt0.lib: $(DIRS) $(OBJS) 8080_crt0.lib
 	@echo ''
 	@echo '--- Building 8085 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_crt0 @$(LISTFILE_DIRECTORY)/8085.lst
 
-8085_opt.lib: $(DIRS) $(OBJS) 8085_crt0.lib
-	@echo ''
-	@echo '--- Building 8085 optimised crt routines---'
-	@echo ''
-	$(MAKE) -C classic/z80_crt0s
-	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
-
-z80n_crt0.lib: $(DIRS) $(OBJS) 8085_opt.lib
+z80n_crt0.lib: $(DIRS) $(OBJS) 8085_crt0.lib
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''

@@ -16,4 +16,5 @@ target/zx/sound/ay/asm_arkos_zx_rom
 target/zx/sound/ay/asm_arkos_zx_smc
 target/zx/sound/ay/asm_wyz_hardware_out
 target/zx/sound/ay/asm_vt2_hardware_out
+target/zx/far/banked_call
 
