@@ -71,7 +71,11 @@ public:
     void generate_dependency_file();
 
 private:
-    static const inline int MAX_MACRO_RECURSION = 32;
+    // limit macro recursion depth
+    static constexpr int MAX_MACRO_RECURSION = 32;
+
+    // limit total single-pass iterations for one physical line
+    static constexpr int MAX_FIXPOINT_ITERATIONS = 256;
 
     struct Macro {
         std::vector<TokensLine> replacement; // replacement token lines
@@ -120,6 +124,24 @@ private:
         bool seen_else = false;     // whether ELSE already occurred
     };
 
+    // tracking single-line expansion chain (for recursion detection)
+    struct ExpansionChain {
+        // sequence of macro names expanded (object-like single-token expansions)
+        std::vector<std::string> names;
+        void reset() {
+            names.clear();
+        }
+        void add(const std::string& n) {
+            names.push_back(n);
+        }
+        bool has_cycle(const std::string& n) const {
+            for (const auto& x : names) if (x == n) {
+                    return true;
+                }
+            return false;
+        }
+    };
+
     // Global file cache (static, shared across all Preprocessor instances)
     static std::unordered_map<std::string, CachedFile> file_cache_;
 
@@ -147,6 +169,9 @@ private:
     // Set of absolute paths this Preprocessor instance has already included.
     std::unordered_set<std::string> included_once_;
 
+    // current single-line expansion chain
+    int macro_fixpoint_iterations_ = 0;
+    ExpansionChain current_line_chain_;
 
     // Fetch a line from the input file, or file_input_queue_ if not empty.
     bool fetch_line(TokensLine& out);
@@ -334,10 +359,19 @@ private:
         std::vector<TokensLine>& result,
         const Location& in_location);
 
+    // Single pass: scan tokens left to right; perform at most one substitution per identifier occurrence;
+    // do NOT recursively expand replacements in the same pass.
+    // Any further expansion happens because the line is fed again through next_line mechanics until fixpoint.
+    bool expand_macros_single_pass(const TokensLine& in_line,
+                                   std::vector<TokensLine>& out_lines,
+                                   std::string& last_macro_name);
+
+
     // Expand macros in a single line. Returns true if any macro expansion
     // or token-paste changed the input. Result lines placed in 'out'.
     bool expand_macros(const TokensLine& line, bool at_start,
                        std::vector<TokensLine>& out);
+
     // Expand macros in multiple lines. Returns true if any change occurred.
     bool expand_macros(const std::vector<TokensLine>& lines, bool at_start,
                        std::vector<TokensLine>& out);

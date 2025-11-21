@@ -1629,8 +1629,8 @@ END
 
 unlink("$test.i");
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:3: error: Macro recursion limit exceeded: A
-   |A
+$test.asm:3: error: Macro recursion limit exceeded: B
+   |B
 END
 ok ! -f "$test.i", "output file not produced on error";
 
@@ -1757,6 +1757,280 @@ Y
 #line -25
 Z
 END
+
+#------------------------------------------------------------------------------
+# LINE / C_LINE without filename argument (positive line numbers)
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+LINE 10
+A
+B
+C_LINE 5
+C
+C
+LINE 8
+D
+E
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+# LINE 10 (no filename) -> logical line set to 10, filename remains $test.asm
+# A at 10, B at 11.
+# C_LINE 5 (no filename) -> constant line number 5; each emitted line at 5.
+# Second C_LINE line shows #line 5 again (line number decreased).
+# LINE 8 -> jump forward to 8 (no filename change, so only blank lines inserted for 6 and 7).
+# D at 8, E at 9.
+check_text_file("$test.i", <<END);
+#line 10, "$test.asm"
+A
+B
+#line 5
+C
+#line 5
+C
+
+
+D
+E
+END
+
+#------------------------------------------------------------------------------
+# REPTC with LOCAL label renaming per character iteration
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+REPTC ch, "AB"
+LOCAL L
+L: defb ch
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect two iterations:
+#  1st: .L_1 then defb 65 ('A')
+#  2nd: .L_2 then defb 66 ('B')
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+.L_1
+#line 1
+defb 65
+#line 1
+.L_2
+#line 1
+defb 66
+END
+
+#------------------------------------------------------------------------------
+# REPTI with LOCAL label renaming per list element iteration
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+REPTI v, 7,8
+LOCAL L
+L: db v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect two iterations:
+#  1st: .L_1 then db 7
+#  2nd: .L_2 then db 8
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+.L_1
+#line 1
+db 7
+#line 1
+.L_2
+#line 1
+db 8
+END
+
+#------------------------------------------------------------------------------
+# REPTC / REPTI empty iteration sources (no output from loop body)
+#------------------------------------------------------------------------------
+
+# REPTC empty string => zero iterations, body skipped, next line appears
+spew("$test.asm", <<END);
+REPTC ch, ""
+defb ch
+ENDR
+AFTER_C
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 4 physical lines; only AFTER_C emitted
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER_C
+END
+
+# REPTC empty string with LOCAL label => still zero iterations, no .L_n labels
+spew("$test.asm", <<END);
+REPTC ch, ""
+LOCAL L
+L: defb ch
+ENDR
+AFTER_C_LOCAL
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 5 physical lines; only AFTER_C_LOCAL emitted
+check_text_file("$test.i", <<END);
+#line 5, "$test.asm"
+AFTER_C_LOCAL
+END
+
+# REPTI empty list => zero iterations
+spew("$test.asm", <<END);
+REPTI v,
+db v
+ENDR
+AFTER_I
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 4 physical lines; only AFTER_I emitted
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER_I
+END
+
+# REPTI empty list with LOCAL label
+spew("$test.asm", <<END);
+REPTI v,
+LOCAL L
+L: db v
+ENDR
+AFTER_I_LOCAL
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 5 physical lines; only AFTER_I_LOCAL emitted
+check_text_file("$test.i", <<END);
+#line 5, "$test.asm"
+AFTER_I_LOCAL
+END
+
+#------------------------------------------------------------------------------
+# EXITM inside nested macro scenarios
+#------------------------------------------------------------------------------
+
+# 1) EXITM in inner macro called from outer macro: only terminates inner macro,
+#    outer macro continues after the call.
+spew("$test.asm", <<END);
+MACRO INNER(a)
+db a
+EXITM
+db 999 ; should not appear
+ENDM
+
+MACRO OUTER(x,y)
+db x        ; before inner
+INNER(y)    ; inner stops after first db
+db y+1      ; outer continues
+ENDM
+
+OUTER(1,10)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect:
+#   db 1         (outer pre)
+#   db 10        (inner before EXITM)
+#   db 11        (outer after inner call)
+check_text_file("$test.i", <<END);
+#line 13, "$test.asm"
+db 1
+#line 13
+db 10
+#line 13
+db 10+1
+END
+
+# 2) EXITM inside a REPT loop in a macro: terminates the whole macro expansion
+#    at first EXITM encounter (remaining REPT iterations and trailing lines skipped).
+spew("$test.asm", <<END);
+MACRO LOOPCUT(n)
+REPT 3
+db n
+EXITM          ; should stop macro after first iteration
+db 777         ; skipped
+ENDR
+db 888          ; skipped (after REPT)
+ENDM
+LOOPCUT(5)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect only first "db 5" emitted.
+check_text_file("$test.i", <<END);
+#line 9, "$test.asm"
+db 5
+END
+
+# 3) EXITM inside inner macro called from within REPT in outer macro:
+#    REPT continues after inner macro call (EXITM only affects inner macro).
+spew("$test.asm", <<END);
+MACRO CUT_ONCE(v)
+db v
+EXITM
+db 123       ; skipped
+ENDM
+MACRO OUT_REPT(val)
+REPT 2
+CUT_ONCE(val)
+db val+1     ; emitted for each iteration; inner EXITM does not abort outer macro
+ENDR
+ENDM
+OUT_REPT(7)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect per iteration:
+#   db 7       (from CUT_ONCE before EXITM)
+#   db 8       (outer macro after inner call)
+# Two iterations total.
+check_text_file("$test.i", <<END);
+#line 12, "$test.asm"
+db 7
+#line 12
+db 7+1
+#line 12
+db 7
+#line 12
+db 7+1
+END
+
 
 # Clean up
 unlink_testfiles if Test::More->builder->is_passing;
