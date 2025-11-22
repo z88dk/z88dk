@@ -1932,6 +1932,76 @@ AFTER_I_LOCAL
 END
 
 #------------------------------------------------------------------------------
+# LOCAL duplicate names inside a single MACRO / REPT / REPTC / REPTI body
+# Should raise Duplicate definition error and produce no .i output.
+#------------------------------------------------------------------------------
+
+# Duplicate LOCAL in MACRO
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO DUPM()
+LOCAL L
+LOCAL L
+L: nop
+ENDM
+DUPM()
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Duplicate definition: L
+   |MACRO DUPM()
+   |LOCAL L
+END
+ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside MACRO";
+
+# Duplicate LOCAL in REPT
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPT 1
+LOCAL L
+LOCAL L
+L: nop
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Duplicate definition: L
+   |REPT 1
+   |LOCAL L
+END
+ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPT";
+
+# Duplicate LOCAL in REPTC
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTC ch, "A"
+LOCAL L
+LOCAL L
+L: defb ch
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Duplicate definition: L
+   |REPTC ch, "A"
+   |LOCAL L
+END
+ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPTC";
+
+# Duplicate LOCAL in REPTI
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTI v, 1
+LOCAL L
+LOCAL L
+L: db v
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Duplicate definition: L
+   |REPTI v, 1
+   |LOCAL L
+END
+ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPTI";
+
+#------------------------------------------------------------------------------
 # EXITM inside nested macro scenarios
 #------------------------------------------------------------------------------
 
