@@ -2002,6 +2002,57 @@ END
 ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPTI";
 
 #------------------------------------------------------------------------------
+# LOCAL label appearing also as a parameter / iteration variable name (rename collision)
+# Should raise Duplicate definition error and produce no .i output.
+#------------------------------------------------------------------------------
+
+# MACRO parameter name collides with LOCAL label
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO M(p)
+LOCAL p
+p: db p
+ENDM
+M(1)
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Duplicate definition: p
+   |MACRO M(p)
+   |LOCAL p
+END
+ok ! -f "$test.i", "no .i file produced on parameter/local collision in MACRO";
+
+# REPTC iteration variable collides with LOCAL label
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTC ch, "A"
+LOCAL ch
+ch: defb ch
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Duplicate definition: ch
+   |REPTC ch, "A"
+   |LOCAL ch
+END
+ok ! -f "$test.i", "no .i file produced on iteration/local collision in REPTC";
+
+# REPTI iteration variable collides with LOCAL label
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTI v, 1
+LOCAL v
+v: db v
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Duplicate definition: v
+   |REPTI v, 1
+   |LOCAL v
+END
+ok ! -f "$test.i", "no .i file produced on iteration/local collision in REPTI";
+
+#------------------------------------------------------------------------------
 # EXITM inside nested macro scenarios
 #------------------------------------------------------------------------------
 
