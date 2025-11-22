@@ -173,6 +173,14 @@ private:
     int macro_fixpoint_iterations_ = 0;
     ExpansionChain current_line_chain_;
 
+    // Context for LOCAL duplicate checking:
+    // - current_params_ptr_ points to the vector of parameter names while a MACRO body
+    //   is being collected (nullptr otherwise).
+    // - current_iteration_var_ holds the iteration variable name while collecting
+    //   a REPTC / REPTI body (empty otherwise).
+    std::vector<std::string>* current_params_ptr_ = nullptr;
+    std::string current_iteration_var_;
+
     // Fetch a line from the input file, or file_input_queue_ if not empty.
     bool fetch_line(TokensLine& out);
     Location compute_location(const File& file, const TokensLine& out);
