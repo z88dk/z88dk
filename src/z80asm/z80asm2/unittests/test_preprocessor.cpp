@@ -8739,7 +8739,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
  * -------------------------------------------------------------------------- */
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefinition error",
-    "[preprocessor][local][duplicate][macro]") {
+          "[preprocessor][local][duplicate][macro]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8763,7 +8763,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefin
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefinition error",
-    "[preprocessor][local][duplicate][rept]") {
+          "[preprocessor][local][duplicate][rept]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8786,7 +8786,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefini
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefinition error",
-    "[preprocessor][local][duplicate][reptc]") {
+          "[preprocessor][local][duplicate][reptc]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8809,7 +8809,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefin
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefinition error",
-    "[preprocessor][local][duplicate][repti]") {
+          "[preprocessor][local][duplicate][repti]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8829,5 +8829,74 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefin
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Duplicate definition") != std::string::npos);
     REQUIRE(msg.find("L") != std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// NEW TESTS: LOCAL name collision with parameter / iteration variable
+// Should raise Duplicate definition error and produce no expansion.
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports Duplicate definition",
+          "[preprocessor][macro][local][collision][param]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(p)\n"
+        "LOCAL p\n"          // collision: p is both parameter and LOCAL
+        "p: db p\n"
+        "ENDM\n"
+        "M(1)\n";
+    pp.push_virtual_file(content, "macro_local_param_collision", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("p") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label reports Duplicate definition",
+          "[preprocessor][reptc][local][collision][iter]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC ch, \"A\"\n"
+        "LOCAL ch\n"          // collision: ch is iteration variable and LOCAL
+        "ch: defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_local_iter_collision", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("ch") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label reports Duplicate definition",
+          "[preprocessor][repti][local][collision][iter]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI v, 1\n"
+        "LOCAL v\n"          // collision: v is iteration variable and LOCAL
+        "v: db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_local_iter_collision", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("v") != std::string::npos);
 }
 
