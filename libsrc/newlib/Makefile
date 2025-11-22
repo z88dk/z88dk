@@ -37,10 +37,10 @@ target/zxn/obj/config_private.inc: lib/sccz80/zx.lib
 
 # Convenience target (eg make zx to build the zx libraries)
 .PHONY: $(1)
-$(1): lib/sccz80/$(1).lib lib/sdcc_ix/$(1).lib lib/sdcc_iy/$(1).lib
+$(1): lib/sccz80/$(1).lib lib/sdcc_iy/$(1).lib
 
 target/$(1)/obj/config_private.inc: target/$(1)/config.m4
-	@mkdir -p target/$(1)/obj/sccz80 target/$(1)/obj/sdcc_ix target/$(1)/obj/sdcc_iy
+	@mkdir -p target/$(1)/obj/sccz80 target/$(1)/obj/sdcc_iy
 	$(eval cpu := $(shell \
 		if [ "$(1)" = "z180" ]; then \
 			echo "z180"; \
@@ -81,9 +81,6 @@ define build_libs
 lib/sccz80/$(1).lib: target/$(1)/obj/config_private.inc
 	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sccz80 -Itarget/$(1)/obj -I.. -xlib/sccz80/$(1) -I$(Z88DK_LIB) @target/$(1)/library/$(1)_sccz80.lst
 
-lib/sdcc_ix/$(1).lib: target/$(1)/obj/config_private.inc
-	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sdcc_ix -Itarget/$(1)/obj -I.. -xlib/sdcc_ix/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(1)/library/$(1)_sdcc_ix.lst
-
 lib/sdcc_iy/$(1).lib: target/$(1)/obj/config_private.inc
 	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sdcc_iy -Itarget/$(1)/obj -I.. -IXIY-soft -xlib/sdcc_iy/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(1)/library/$(1)_sdcc_iy.lst
 endef
@@ -94,7 +91,6 @@ define make_clean
 $(1)-clean:
 	@$(RM) -r target/$(1)/obj
 	@$(RM) lib/sccz80/$(1).lib
-	@$(RM) lib/sdcc_ix/$(1).lib
 	@$(RM) lib/sdcc_iy/$(1).lib
 endef
 
