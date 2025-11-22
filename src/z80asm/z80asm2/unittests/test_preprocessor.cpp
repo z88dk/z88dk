@@ -8732,3 +8732,102 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
     REQUIRE(locs[2] >= locs[1]);
     REQUIRE_FALSE(g_errors.has_errors());
 }
+
+/* --------------------------------------------------------------------------
+ * NEW TESTS: Duplicate LOCAL names inside MACRO / REPT / REPTC / REPTI bodies
+ * Should issue a "Duplicate definition" (redefinition) error and stop expansion.
+ * -------------------------------------------------------------------------- */
+
+TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefinition error",
+    "[preprocessor][local][duplicate][macro]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO DUPM()\n"
+        "LOCAL L\n"
+        "LOCAL L\n"            // duplicate
+        "L: nop\n"
+        "ENDM\n"
+        "DUPM()\n";
+
+    pp.push_virtual_file(content, "dup_local_macro", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* consume */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("L") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefinition error",
+    "[preprocessor][local][duplicate][rept]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPT 1\n"
+        "LOCAL L\n"
+        "LOCAL L\n"            // duplicate
+        "L: nop\n"
+        "ENDR\n";
+
+    pp.push_virtual_file(content, "dup_local_rept", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* consume */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("L") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefinition error",
+    "[preprocessor][local][duplicate][reptc]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC ch, \"A\"\n"
+        "LOCAL L\n"
+        "LOCAL L\n"            // duplicate
+        "L: defb ch\n"
+        "ENDR\n";
+
+    pp.push_virtual_file(content, "dup_local_reptc", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* consume */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("L") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefinition error",
+    "[preprocessor][local][duplicate][repti]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI v, 1\n"
+        "LOCAL L\n"
+        "LOCAL L\n"            // duplicate
+        "L: db v\n"
+        "ENDR\n";
+
+    pp.push_virtual_file(content, "dup_local_repti", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* consume */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("L") != std::string::npos);
+}
+
