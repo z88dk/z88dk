@@ -325,56 +325,18 @@ private:
     void process_pragma(const TokensLine& line, unsigned& i);
 
     // Macro expansion and line splitting
-    // Replace string tokens by comma-separated integers.
-    // Returns true if any change was made; the (possibly) transformed line is written to 'out'.
     bool post_process_line(const TokensLine& line, TokensLine& out);
-    void add_virtual_file(std::vector<TokensLine> expanded);
     bool merge_double_hash(const TokensLine& line, TokensLine& out);
-
-    // expand_macros helpers
-    bool is_macro_call(
-        const TokensLine& in_line, unsigned idx,
-        const Macro& macro,
-        unsigned& args_start_idx) const;
     bool parse_and_expand_macro_args(
         const TokensLine& in_line,
         unsigned args_start_idx,
         std::vector<std::vector<TokensLine>>& expanded_args_flat,
         std::vector<TokensLine>& out_original_args,
         unsigned& out_after_idx);
-    bool try_stringize_parameter(
-        const TokensLine& rep_line,
-        unsigned& pidx,
-        const Macro& macro,
-        const std::vector<TokensLine>& original_args,
-        TokensLine& new_line);
-    bool substitute_and_expand(
-        Macro& macro,
-        const std::vector<std::vector<TokensLine>>& expanded_args_flat,
-        const std::vector<TokensLine>& original_args,
-        std::vector<TokensLine>& out_expanded);
-    void append_expansion_into_out(
-        const std::vector<TokensLine>& further_expanded,
-        TokensLine& out,
-        std::vector<TokensLine>& result,
-        const Location& in_location);
-
-    // Single pass: scan tokens left to right; perform at most one substitution per identifier occurrence;
-    // do NOT recursively expand replacements in the same pass.
-    // Any further expansion happens because the line is fed again through next_line mechanics until fixpoint.
     bool expand_macros_single_pass(const TokensLine& in_line,
                                    std::vector<TokensLine>& out_lines,
-                                   std::string& last_macro_name);
-
-
-    // Expand macros in a single line. Returns true if any macro expansion
-    // or token-paste changed the input. Result lines placed in 'out'.
-    bool expand_macros(const TokensLine& line, bool at_start,
-                       std::vector<TokensLine>& out);
-
-    // Expand macros in multiple lines. Returns true if any change occurred.
-    bool expand_macros(const std::vector<TokensLine>& lines, bool at_start,
-                       std::vector<TokensLine>& out);
+                                   std::string& last_macro_name,
+                                   bool at_start_of_line);
     TokensLine expand_macros_in_line(const TokensLine& line);
 
     // #ifndef/#define detector
