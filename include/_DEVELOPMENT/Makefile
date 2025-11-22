@@ -37,6 +37,5 @@ classic:
 dirs:
 	@mkdir -p $(dir $(SCCZ80_HEADERS))
 	@mkdir -p $(dir $(SDCC_HEADERS))
-	@mkdir -p $(dir $(CLANG_HEADERS))
 
 .PHONY: dirs classic
