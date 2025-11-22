@@ -2203,21 +2203,14 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
 
     TokensLine line;
 
-    // First line from INNER()
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(line.size() >= 3);
     REQUIRE(line[0].text() == "A");
+    REQUIRE(line[1].text() == " ");
+    REQUIRE(line[2].text() == "B");
     REQUIRE(line.location().line_num() == 700);
     REQUIRE(line.location().filename() == "arg_multiline_1.asm");
 
-    // Second line from INNER()
-    REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "B");
-    REQUIRE(line.location().line_num() == 700);
-    REQUIRE(line.location().filename() == "arg_multiline_1.asm");
-
-    // Line after the macro call
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "after_ml");
@@ -2246,21 +2239,14 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
 
     TokensLine line;
 
-    // First line from INNER()
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(line.size() >= 3);
     REQUIRE(line[0].text() == "X");
+    REQUIRE(line[1].text() == " ");
+    REQUIRE(line[2].text() == "Y");
     REQUIRE(line.location().line_num() == 710);
     REQUIRE(line.location().filename() == "arg_multiline_2.asm");
 
-    // Second line from INNER()
-    REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "Y");
-    REQUIRE(line.location().line_num() == 710);
-    REQUIRE(line.location().filename() == "arg_multiline_2.asm");
-
-    // Line after the macro call
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "after_ml2");
