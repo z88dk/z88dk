@@ -70,12 +70,10 @@ char *classic_paths[CLASSIC_SIZE] = {
 enum
 {
     NEWLIB_LIB_SCCZ80 = 0,
-    NEWLIB_LIB_SDCC_IX,
     NEWLIB_LIB_SDCC_IY,
     NEWLIB_LIB_END,
     NEWLIB_HDR_SCCZ80,
     NEWLIB_HDR_SDCC,
-    NEWLIB_HDR_CLANG,
     NEWLIB_HDR_END,
     NEWLIB_HDR_PROTO,
     NEWLIB_HDR_MAKE,
@@ -84,12 +82,10 @@ enum
 
 char *newlib_paths[NEWLIB_SIZE] = {
     "/../../libsrc/newlib/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
-    "/../../libsrc/newlib/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
     "/../../libsrc/newlib/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
     0,
     "/../../include/sccz80/lib/",        // NEWLIB_HDR_SCCZ80
     "/../../include/sdcc/lib/",          // NEWLIB_HDR_SDCC
-    "/../../include/clang/lib/",         // NEWLIB_HDR_CLANG
     0,
     "/../../include/proto/lib/",         // NEWLIB_HDR_PROTO
     "/../../include/_DEVELOPMENT"                     // NEWLIB_HDR_MAKE
@@ -429,16 +425,10 @@ int main(int argc, char **argv)
         snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SDCC]);
         listlibs("newlib hdr sdcc", src);
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_CLANG]);
-        listlibs("newlib hdr clang", src);
-
         // newlib library
 
         snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SCCZ80]);
         listlibs("newlib lib sccz80", src);
-
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SDCC_IX]);
-        listlibs("newlib lib sdcc_ix", src);
 
         snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SDCC_IY]);
         listlibs("newlib lib sdcc_iy", src);
@@ -502,8 +492,6 @@ int main(int argc, char **argv)
                     snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SDCC], basename, ".h");
                     uninstall("newlib hdr sdcc", dst);
 
-                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_CLANG], basename, ".h");
-                    uninstall("newlib hdr clang", dst);
                 }
 
                 generate_newlib += newlib;
@@ -517,14 +505,6 @@ int main(int argc, char **argv)
                     change_made += !uninstall("newlib lib sccz80", dst);
                 else
                     change_made += !install("newlib lib sccz80", dst, src);
-
-                snprintf(src, sizeof(src), "%s/%s/lib/newlib/sdcc_ix/%s%s", name, target, basename, ".lib");
-                snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_LIB_SDCC_IX], basename, ".lib");
-
-                if (delete)
-                    change_made += !uninstall("newlib lib sdcc_ix", dst);
-                else
-                    change_made += !install("newlib lib sdcc_ix", dst, src);
 
                 snprintf(src, sizeof(src), "%s/%s/lib/newlib/sdcc_iy/%s%s", name, target, basename, ".lib");
                 snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_LIB_SDCC_IY], basename, ".lib");
