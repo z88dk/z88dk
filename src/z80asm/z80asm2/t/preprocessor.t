@@ -2592,6 +2592,222 @@ END
 ok ! -f "$test.i", "no .i file produced on macro call bad nesting";
 
 #------------------------------------------------------------------------------
+# Duplicate parameter names in function-like macros (DuplicateDefinition)
+#------------------------------------------------------------------------------
+
+# MACRO form: duplicate parameter 'a' triggers Duplicate definition error
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO M(a,a)
+db 0
+ENDM
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Duplicate definition: a
+   |MACRO M(a,a)
+END
+ok ! -f "$test.i", "no .i file produced on duplicate MACRO parameters";
+
+# #define form: duplicate parameter 'a' triggers Duplicate definition error
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define F(a,a) 1
+F(2)
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Duplicate definition: a
+   |#define F(a,a) 1
+$test.asm:2: error: Invalid syntax: Macro argument count mismatch for: F
+   |F(2)
+END
+ok ! -f "$test.i", "no .i file produced on duplicate #define parameters";
+
+#------------------------------------------------------------------------------
+# Function-like macro arity: fewer args without parentheses, and empty ()
+#------------------------------------------------------------------------------
+
+# Fewer args without parentheses: treated as literal (no error)
+# Define a two-arg macro, invoke with only one arg without parentheses
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define F(a,b) a + b
+F 1
+END
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+# Expect the call to remain literal since there are no parentheses (graceful fallback)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+F 1
+END
+
+# Empty parentheses when params are required: should raise arg count mismatch
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define F(a) a
+F()
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Macro argument count mismatch for: F
+   |F()
+END
+ok ! -f "$test.i", "no .i file produced on empty () for required-arg macro";
+
+#------------------------------------------------------------------------------
+# Function-like macro with empty parameter list invoked with arguments (mismatch)
+#------------------------------------------------------------------------------
+
+# H() defined with no parameters; invoking H(1) should raise arg count mismatch
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define H() 0
+H(1)
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Macro argument count mismatch for: H
+   |H(1)
+END
+ok ! -f "$test.i", "no .i file produced when calling zero-param macro with arguments";
+
+#------------------------------------------------------------------------------
+# MACRO parameter list without parentheses (e.g., MACRO M a,b)
+#------------------------------------------------------------------------------
+
+# Define a function-like MACRO with unparenthesized parameters and call it
+# both without and with parentheses.
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO SUM a,b
+db a + b
+ENDM
+SUM 3,4
+SUM(5,6)
+END
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+# Expect both calls to expand correctly at the call-site line
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+db 3 + 4
+db 5 + 6
+END
+
+#------------------------------------------------------------------------------
+# Macro recursion: longer mutual cycle (>2 macros) should report an error
+#------------------------------------------------------------------------------
+
+# A -> B -> C -> A cycle; invoking A should trigger MacroRecursionLimit on C
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define A B
+#define B C
+#define C A
+A
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:4: error: Macro recursion limit exceeded: C
+   |C
+END
+ok ! -f "$test.i", "output file not produced on longer macro cycle";
+
+#------------------------------------------------------------------------------
+# Multi-line macro argument expansion (':' and '\' inside argument)
+# Flattening and extra-line insertion when an argument expands to multiple lines
+#------------------------------------------------------------------------------
+
+# ':' inside argument -> two logical lines at the call site
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define ARG A : B
+#define EDB(x) db x
+EDB(ARG)
+END
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+db A
+#line 3
+B
+END
+
+# '\' inside argument -> two logical lines at the call site
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define ARG2 10 \\ 20
+#define EDB2(x) db x
+EDB2(ARG2)
+END
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+db 10
+#line 3
+20
+END
+
+#------------------------------------------------------------------------------
+# DEFINE macros with multi-line bodies split by ':' or '\' expand to several lines
+#------------------------------------------------------------------------------
+
+# Object-like and function-like #define bodies using ':' and '\' split into multiple lines.
+# Also cover name-directive DEFINE with ':' and '\'.
+unlink("$test.i");
+spew("$test.asm", <<'END');
+#define TWOC db 1 : db 2
+TWOC
+#define TWOB db 3 \ db 4
+TWOB
+#define F2(a,b) db a : db b
+F2(9,10)
+#define F2B(a,b) db a \ db b
+F2B(11,12)
+M DEFINE db 13 : db 14
+M
+N DEFINE db 15 \ db 16
+N
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Each macro call occurs at its physical call-site line; the split parts are emitted
+# as separate logical lines at the same call-site. When the logical line decreases,
+# a #line directive without filename appears.
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 1
+#line 2
+db 2
+
+db 3
+#line 4
+db 4
+
+db 9
+#line 6
+db 10
+
+db 11
+#line 8
+db 12
+
+db 13
+#line 10
+db 14
+
+db 15
+#line 12
+db 16
+END
+
+#------------------------------------------------------------------------------
 # Clean up
 #------------------------------------------------------------------------------
 unlink_testfiles if Test::More->builder->is_passing;
