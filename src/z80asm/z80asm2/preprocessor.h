@@ -185,8 +185,7 @@ private:
     // Returns true if the line was split and segments were produced.
     bool split_line(const TokensLine& line,
                     std::vector<TokensLine>& out_segments);
-    bool split_label(const Location& location,
-                     const TokensLine& line, unsigned& i,
+    bool split_label(const TokensLine& line, unsigned& i,
                      std::vector<TokensLine>& out_segments);
 
     // Fetch a raw next logical line for MACRO/REPT bodies.

@@ -1509,7 +1509,7 @@ bool Preprocessor::split_line(const TokensLine& line,
 
     // do not split labels
     i = 0;
-    while (split_label(line.location(), line, i, out_segments)) {
+    while (split_label(line, i, out_segments)) {
         did_split = true;
     }
 
@@ -1554,11 +1554,10 @@ bool Preprocessor::split_line(const TokensLine& line,
     return did_split;
 }
 
-bool Preprocessor::split_label(const Location& location,
-                               const TokensLine& line, unsigned& i,
+bool Preprocessor::split_label(const TokensLine& line, unsigned& i,
                                std::vector<TokensLine>& out_segments) {
     unsigned start = i;
-    TokensLine label_line(location);
+    TokensLine label_line(line.location());
     label_line.reserve(2);
     i = start;
     line.skip_spaces(i);
