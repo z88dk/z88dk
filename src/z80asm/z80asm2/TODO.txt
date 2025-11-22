@@ -1,2 +1,73 @@
 - preprocess_only must call HLA
-- possible to remove the recursive version of macro expansion and replace by the single pass in a loop?
+- add tests of processing of .asm.m4 file
+- add tests of processing of .asm.pl file
+- g_errors.set_source_line must ust the actual source line, not the to_string() conversion
+
+Edge cases in preprocessor.cpp not covered by preprocessor.t
+Macros / definitions:
+•	Stringize of an empty argument (macro invoked with empty token list: STR()).
+•	Stringize of argument containing escaped newline/backslash sequences (testing escape_c_string beyond quotes/backslash).
+•	Macro body containing only '#' before an identifier that is not a parameter (should emit literal '#').
+Directive parsing / syntax errors:
+•	Trailing tokens after LINE / C_LINE directives (e.g. LINE 10 extra).
+•	Trailing tokens after EXITM, ELSE, ENDIF, ENDM/ENDR mismatches already partly tested, but not stray ELSE / ELIF / ELIFDEF / ELIFNDEF / ENDIF without any preceding IF family.
+•	REPT / REPTC / REPTI with negative count/value (-3) (REPT <=0 skip path tests only zero).
+•	REPTC argument as a single integer token (iterating over digits stringified from number).
+•	REPTC argument that is a multi-token non-string/non-integer expression (e.g. "A" + "B") invoking concatenation branch.
+•	REPTI arguments containing nested parentheses and commas inside them (parse_macro_args depth logic).
+•	REPTI arguments that expand to multiple lines (flattening behavior).
+•	REPTI with whitespace-only arguments (empty after trimming) vs truly empty list.
+•	LOCAL used outside a macro/REPT construct (should be ignored or cause no output).
+•	Unknown #pragma (ignored path not tested, only pragma once success path).
+•	Multiple #pragma once in same file (idempotence).
+•	INCLUDE of same file via different relative paths resolving to same absolute path (cache + included_once_ behavior).
+•	Self-include (#include of the current file) versus mutual include (only mutual tested).
+•	Binary include missing file (FileNotFound via BINARY/INCBIN) — tests only missing source includes.
+•	Angle include resolution failure with -I provided but ambiguous; also include search precedence (current dir vs -I) ordering not stressed.
+Include guards / pragma once:
+•	#ifndef / #define guard with intervening blank/comment lines (detection requires first two non-empty segments).
+•	Guard using colon/backslash split on single physical line (#ifndef X : #define X).
+•	Repeated include after guard macro explicitly redefined (different behavior than UNDEF) not tested.
+•	Guard where macro defined before include (should skip immediately).
+•	File with both #pragma once and #ifndef guard (precedence and skip logic combined).
+File caching:
+•	Modification of an included file after initial preprocessing (cache invalidation via mod time).
+•	clear_file_cache() effects (not invoked in tests).
+•	Multiple Preprocessor instances sharing cache (lifetime correctness).
+Location mapping:
+•	Switching from C_LINE to LINE when C_LINE constant number equals or differs (test covers one transition; missing multiple sequential alternations).
+•	Forced location with LINE where physical offset computation produces negative offset (safety clamp path).
+•	LINE/C_LINE directives inside a macro expansion body (should not affect caller file_stack forced location—currently they’re treated as directives during expansion queue path).
+•	#line emission logic when line number jumps forward (inserting blank lines) — partially tested, but not very large forward jumps or backward jump after multiple increments.
+Expression evaluation:
+•	IF/ELIF constant expression with invalid tokens producing silent 0 (error-suppressed path).
+•	DEFL with negative expression result (storing negative integer token).
+•	DEFL with floating-point tokens (if lexer supports) falling back to non-constant storage.
+•	IFDEF/IFNDEF recognition of symbols defined in symbol table (non-macro), only macro definitions tested.
+String post-processing:
+•	Empty string literal alone on a line (produces no integers) vs inside operand lists (interaction with commas before/after).
+•	Multiple string literals separated by commas (only single literal per line examples).
+•	Mixed string + pasted tokens causing merge before expansion (ordering).
+Double-hash merging:
+•	Preservation of first inter-token whitespace span only; tests do not assert whitespace retention semantics.
+•	Sequence containing integer then ## then integer (should not merge because start not identifier).
+•	Fallback path when invalid sequence encountered mid chain (re-emission logic).
+Guard detection side-effects:
+•	detect_ifndef_guard consuming lines from file when pattern partially matches but fails second line (potential off-by-one in file advancement) — not validated.
+Dependency generation:
+•	Source file with no includes/binaries (deps empty -> no .d file generation path).
+•	Very long file path names stressing line wrapping and backslash logic beyond two continuations.
+•	Duplicate binary includes shifting order vs includes interleaving.
+EXITM / conditional:
+•	EXITM inside inactive conditional branch (branch skipped; EXITM not processed).
+•	EXITM after prior EXITM in same macro (exitm_found already set path).
+•	EXITM in macro that produces multiple virtual file frames (multi-level marking) beyond tested patterns.
+Error handling:
+•	Multiple distinct errors on a single line (only some composite cases shown).
+•	expect_end triggered for directives with trailing garbage (e.g. UNDEF X extra) not covered.
+Miscellaneous:
+•	Object-like macro replacement that is empty (already tested) but used inside another macro causing concatenation with identifiers (token adjacency after removal).
+•	Macro whose replacement is only whitespace (trim producing empty -> maybe skipped) not tested.
+•	Macro parameter substitution producing adjacent identifiers that then should be pasted by explicit ## (interaction order).
+•	Using '#' or '##' tokens produced by macro arguments themselves (stringize / paste tokens injected via arguments).
+These cases represent branches, fallback paths, or combined interactions present in preprocessor.cpp logic but absent from the current test suite.

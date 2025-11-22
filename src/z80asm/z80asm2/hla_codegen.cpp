@@ -22,17 +22,17 @@ namespace hla {
 
 // Helper: create a keyword token
 static Token kw(Keyword k) {
-    return Token(TokenType::Identifier, keyword_to_string(k), k);
+    return Token(TokenType::Identifier, keyword_to_string(k), k, false);
 }
 
 // Helper: create integer token
 static Token int_tok(int v) {
-    return Token(TokenType::Integer, std::to_string(v), v);
+    return Token(TokenType::Integer, std::to_string(v), v, false);
 }
 
 // Helper: simple comma token
 static Token comma_tok() {
-    return Token(TokenType::Comma, ",");
+    return Token(TokenType::Comma, ",", false);
 }
 
 // Make a new instruction line
@@ -56,14 +56,14 @@ static void emit_operand_tokens(const Operand& op, std::vector<Token>& out) {
         out.push_back(int_tok(op.imm));
         break;
     case Operand::Kind::MemHL:
-        out.push_back(Token(TokenType::LeftParen, "("));
+        out.push_back(Token(TokenType::LeftParen, "(", false));
         out.push_back(kw(Keyword::HL));
-        out.push_back(Token(TokenType::RightParen, ")"));
+        out.push_back(Token(TokenType::RightParen, ")", false));
         break;
     case Operand::Kind::MemAbs:
-        out.push_back(Token(TokenType::LeftParen, "("));
+        out.push_back(Token(TokenType::LeftParen, "(", false));
         out.push_back(int_tok(op.addr));
-        out.push_back(Token(TokenType::RightParen, ")"));
+        out.push_back(Token(TokenType::RightParen, ")", false));
         break;
     default:
         throw std::runtime_error("Unsupported operand kind");
@@ -100,7 +100,7 @@ static void emit_jp_cond(const Location& loc, Keyword cond,
     line.push_back(kw(Keyword::JP));
     line.push_back(kw(cond));
     line.push_back(comma_tok());
-    line.push_back(Token(TokenType::Identifier, label)); // label
+    line.push_back(Token(TokenType::Identifier, label, false)); // label
     out.push_back(std::move(line));
 }
 
@@ -169,8 +169,8 @@ static void emit_compare_branch(const Compare& cmp, bool branch_on_true,
 void CodeGen::emit_label(const std::string& label, const Location& loc,
                          std::deque<TokensLine>& out) {
     TokensLine lbl(loc);
-    lbl.push_back(Token(TokenType::Dot, "."));
-    lbl.push_back(Token(TokenType::Identifier, label));
+    lbl.push_back(Token(TokenType::Dot, ".", false));
+    lbl.push_back(Token(TokenType::Identifier, label, false));
     out.push_back(std::move(lbl));
 }
 

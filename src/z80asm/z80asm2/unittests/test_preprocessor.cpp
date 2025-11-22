@@ -111,12 +111,11 @@ TEST_CASE("Preprocessor: transform string to list of integer tokens",
     // Expect first token to be the directive/identifier 'db'
     REQUIRE(toks.size() >= 4);
     REQUIRE(toks[0].text() == "db");
-    REQUIRE(toks[1].text() == " ");
 
     // Following tokens should represent 'A' (65), comma, 'B' (66)
-    REQUIRE(toks[2].int_value() == static_cast<int>('A'));
-    REQUIRE(toks[3].text() == ",");
-    REQUIRE(toks[4].int_value() == static_cast<int>('B'));
+    REQUIRE(toks[1].int_value() == static_cast<int>('A'));
+    REQUIRE(toks[2].text() == ",");
+    REQUIRE(toks[3].int_value() == static_cast<int>('B'));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -1258,8 +1257,8 @@ TEST_CASE("Preprocessor: stringize '#' preserves spaces between tokens producing
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-// Test: block comments replaced by a single Whitespace token (single-line)
-TEST_CASE("Preprocessor: single-line /* */ comment replaced by single Whitespace token",
+// Test: block comments removed
+TEST_CASE("Preprocessor: single-line /* */ comment removed",
           "[preprocessor][comment]") {
     g_errors.reset();
     Preprocessor pp;
@@ -1271,19 +1270,17 @@ TEST_CASE("Preprocessor: single-line /* */ comment replaced by single Whitespace
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
-    // Expect: Identifier 'A', one Whitespace token, Identifier 'B'
-    REQUIRE(toks.size() >= 3);
+    // Expect: Identifier 'A', Identifier 'B'
+    REQUIRE(toks.size() >= 2);
     REQUIRE(toks[0].is(TokenType::Identifier));
     REQUIRE(toks[0].text() == "A");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-    REQUIRE(toks[1].text() == " ");
-    REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "B");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "B");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-// Test: block comments that span lines are also replaced by a single Whitespace token
-TEST_CASE("Preprocessor: multi-line /* */ comment replaced by single Whitespace token",
+// Test: block comments that span lines are also removed
+TEST_CASE("Preprocessor: multi-line /* */ comment removed",
           "[preprocessor][comment][multiline]") {
     g_errors.reset();
     Preprocessor pp;
@@ -1295,14 +1292,12 @@ TEST_CASE("Preprocessor: multi-line /* */ comment replaced by single Whitespace 
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
-    // Expect: Identifier 'A', one Whitespace token, Identifier 'B'
-    REQUIRE(toks.size() >= 3);
+    // Expect: Identifier 'A', Identifier 'B'
+    REQUIRE(toks.size() >= 2);
     REQUIRE(toks[0].is(TokenType::Identifier));
     REQUIRE(toks[0].text() == "A");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-    REQUIRE(toks[1].text() == " ");
-    REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "B");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "B");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -1472,7 +1467,7 @@ TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma lis
                 line)); // expect the "db P" line after directives are consumed
 
     const auto& toks = line.tokens();
-    REQUIRE(toks.size() >= 5);
+    REQUIRE(toks.size() >= 4);
     // First token should be the directive/identifier "db"
     REQUIRE(toks[0].text() == "db");
 
@@ -1485,6 +1480,9 @@ TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma lis
         }
         else if (toks[i].is(TokenType::Comma)) {
             ++commas;
+        }
+        else {
+            FAIL();
         }
     }
 
@@ -2204,10 +2202,9 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
     TokensLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 3);
+    REQUIRE(line.size() >= 2);
     REQUIRE(line[0].text() == "A");
-    REQUIRE(line[1].text() == " ");
-    REQUIRE(line[2].text() == "B");
+    REQUIRE(line[1].text() == "B");
     REQUIRE(line.location().line_num() == 700);
     REQUIRE(line.location().filename() == "arg_multiline_1.asm");
 
@@ -2240,10 +2237,9 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
     TokensLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 3);
+    REQUIRE(line.size() >= 2);
     REQUIRE(line[0].text() == "X");
-    REQUIRE(line[1].text() == " ");
-    REQUIRE(line[2].text() == "Y");
+    REQUIRE(line[1].text() == "Y");
     REQUIRE(line.location().line_num() == 710);
     REQUIRE(line.location().filename() == "arg_multiline_2.asm");
 
@@ -3423,10 +3419,9 @@ TEST_CASE("Preprocessor: REPTI (directive) enumerates identifier list into body"
     std::vector<std::string> seen;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "push");
-        REQUIRE(toks[1].is(TokenType::Whitespace));
-        seen.push_back(toks[2].text());
+        seen.push_back(toks[1].text());
     }
 
     REQUIRE(seen == std::vector<std::string>({ "bc", "de", "hl", "af" }));
@@ -3448,10 +3443,9 @@ TEST_CASE("Preprocessor: REPTI (name-directive) enumerates identifier list into 
     std::vector<std::string> seen;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "use");
-        REQUIRE(toks[1].is(TokenType::Whitespace));
-        seen.push_back(toks[2].text());
+        seen.push_back(toks[1].text());
     }
 
     REQUIRE(seen == std::vector<std::string>({ "ix", "iy" }));
@@ -3475,19 +3469,18 @@ TEST_CASE("Preprocessor: REPTI duplicates body for integer expression arguments 
         const auto& toks = line.tokens();
         REQUIRE(!toks.empty());
         REQUIRE(toks[0].text() == "db");
-        REQUIRE(toks[1].is(TokenType::Whitespace));
         if (line_no == 0) {
-            REQUIRE(toks.size() >= 3);
-            REQUIRE(toks[2].is(TokenType::Integer));
-            REQUIRE(toks[2].int_value() == 10);
+            REQUIRE(toks.size() >= 2);
+            REQUIRE(toks[1].is(TokenType::Integer));
+            REQUIRE(toks[1].int_value() == 10);
         }
         else if (line_no == 1) {
             REQUIRE(toks.size() >= 4);
-            REQUIRE(toks[2].is(TokenType::Integer));
-            REQUIRE(toks[2].int_value() == 20);
-            REQUIRE(toks[3].text() == "+");
-            REQUIRE(toks[4].is(TokenType::Integer));
-            REQUIRE(toks[4].int_value() == 1);
+            REQUIRE(toks[1].is(TokenType::Integer));
+            REQUIRE(toks[1].int_value() == 20);
+            REQUIRE(toks[2].text() == "+");
+            REQUIRE(toks[3].is(TokenType::Integer));
+            REQUIRE(toks[3].int_value() == 1);
         }
         else {
             // Only two output lines expected
@@ -3516,10 +3509,9 @@ TEST_CASE("Preprocessor: REPTI expands macros in arguments before substitution",
     std::vector<std::string> seen;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "push");
-        REQUIRE(toks[1].is(TokenType::Whitespace));
-        seen.push_back(toks[2].text());
+        seen.push_back(toks[1].text());
     }
 
     REQUIRE(seen == std::vector<std::string>({ "bc", "de" }));
@@ -3541,16 +3533,13 @@ TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens
     TokensLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
-    REQUIRE(toks.size() >= 7);
+    REQUIRE(toks.size() >= 4);
     REQUIRE(toks[0].text() == "X");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-    REQUIRE(toks[2].is(TokenType::Integer));
-    REQUIRE(toks[2].int_value() == 1);
-    REQUIRE(toks[3].is(TokenType::Whitespace));
-    REQUIRE(toks[4].text() == "+");
-    REQUIRE(toks[5].is(TokenType::Whitespace));
-    REQUIRE(toks[6].is(TokenType::Integer));
-    REQUIRE(toks[6].int_value() == 2);
+    REQUIRE(toks[1].is(TokenType::Integer));
+    REQUIRE(toks[1].int_value() == 1);
+    REQUIRE(toks[2].text() == "+");
+    REQUIRE(toks[3].is(TokenType::Integer));
+    REQUIRE(toks[3].int_value() == 2);
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -3570,11 +3559,10 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste result in argument via macro"
     TokensLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
-    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks.size() >= 2);
     REQUIRE(toks[0].text() == "push");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-    REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "HL");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "HL");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -3594,11 +3582,10 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste in name-directive form via ma
     TokensLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
-    REQUIRE(toks.size() >= 3);
+    REQUIRE(toks.size() >= 2);
     REQUIRE(toks[0].text() == "emit");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-    REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "AB");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "AB");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -3626,14 +3613,12 @@ TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product 
         if (toks.empty()) {
             continue;
         }
-        REQUIRE(toks.size() >= 5);
+        REQUIRE(toks.size() >= 3);
         REQUIRE(toks[0].text() == "PAIR");
-        REQUIRE(toks[1].is(TokenType::Whitespace));
-        REQUIRE(toks[2].is(TokenType::Integer));
-        int left = toks[2].int_value();
-        REQUIRE(toks[3].is(TokenType::Whitespace));
-        REQUIRE(toks[4].is(TokenType::Identifier));
-        std::string right = toks[4].text();
+        REQUIRE(toks[1].is(TokenType::Integer));
+        int left = toks[1].int_value();
+        REQUIRE(toks[2].is(TokenType::Identifier));
+        std::string right = toks[2].text();
         pairs.emplace_back(left, right);
     }
 
@@ -3786,7 +3771,7 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
     REQUIRE(pp.next_line(line));
     {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "defb");
         bool hasA = false;
         for (const auto& t : toks) {
@@ -3808,7 +3793,7 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
     REQUIRE(pp.next_line(line));
     {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "defb");
         bool hasZ = false;
         for (const auto& t : toks) {
@@ -3852,7 +3837,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
     REQUIRE(pp.next_line(line));
     {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "db");
         bool has7 = false;
         for (const auto& t : toks) {
@@ -3874,7 +3859,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
     REQUIRE(pp.next_line(line));
     {
         const auto& toks = line.tokens();
-        REQUIRE(toks.size() >= 3);
+        REQUIRE(toks.size() >= 2);
         REQUIRE(toks[0].text() == "db");
         bool has8 = false;
         for (const auto& t : toks) {
@@ -3966,19 +3951,17 @@ TEST_CASE("Preprocessor: name-directive EQU 'X EQU 5' emits 'DEFC X = 5' tokens"
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 6);
+    REQUIRE(t.size() >= 3);
+    REQUIRE(t[0].is(TokenType::Identifier));
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].is(TokenType::Identifier));
-    REQUIRE(t[2].text() == "X");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
+    REQUIRE(t[1].is(TokenType::Identifier));
+    REQUIRE(t[1].text() == "X");
+    REQUIRE(t[2].is(TokenType::EQ));
 
     // RHS: integer 5
-    REQUIRE(t.size() >= 7);
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 5);
+    REQUIRE(t.size() >= 4);
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 5);
 
     // No further lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -4000,21 +3983,16 @@ TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tok
     REQUIRE(pp.next_line(line)); // expect the DEFC line
 
     const auto& t = line.tokens();
-    REQUIRE(t.size() >= 11);
+    REQUIRE(t.size() >= 6);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].text() == "SUM");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    // RHS must be: 10 <sp> + <sp> 20 (macro-expanded)
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 10);
-    REQUIRE(t[7].is(TokenType::Whitespace));
-    REQUIRE(t[8].text() == "+");
-    REQUIRE(t[9].is(TokenType::Whitespace));
-    REQUIRE(t[10].is(TokenType::Integer));
-    REQUIRE(t[10].int_value() == 20);
+    REQUIRE(t[1].text() == "SUM");
+    REQUIRE(t[2].is(TokenType::EQ));
+    // RHS must be: 10 + 20 (macro-expanded)
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 10);
+    REQUIRE(t[4].text() == "+");
+    REQUIRE(t[5].is(TokenType::Integer));
+    REQUIRE(t[5].int_value() == 20);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4033,15 +4011,12 @@ TEST_CASE("Preprocessor: directive EQU 'EQU Y = 7' emits 'DEFC Y = 7' tokens",
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].text() == "Y");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 7);
+    REQUIRE(t[1].text() == "Y");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 7);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4061,15 +4036,12 @@ TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].text() == "Z");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 42);
+    REQUIRE(t[1].text() == "Z");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 42);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4089,12 +4061,12 @@ TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[2].text() == "W");
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 3);
+    REQUIRE(t[1].text() == "W");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 3);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4117,12 +4089,12 @@ TEST_CASE("Preprocessor: EQU emitted DEFC line carries directive logical locatio
     REQUIRE(line.location().filename() == "equ_loc.asm");
 
     const auto& t = line.tokens();
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[2].text() == "V");
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 9);
+    REQUIRE(t[1].text() == "V");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 9);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4144,16 +4116,13 @@ TEST_CASE("Preprocessor: '=' synonym converts 'x = 10' to 'DEFC x = 10' tokens",
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].is(TokenType::Identifier));
-    REQUIRE(t[2].text() == "x");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 10);
+    REQUIRE(t[1].is(TokenType::Identifier));
+    REQUIRE(t[1].text() == "x");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 10);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4171,16 +4140,13 @@ TEST_CASE("Preprocessor: '=' synonym accepts tight form 'y=7'",
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].is(TokenType::Identifier));
-    REQUIRE(t[2].text() == "y");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 7);
+    REQUIRE(t[1].is(TokenType::Identifier));
+    REQUIRE(t[1].text() == "y");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 7);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4200,12 +4166,12 @@ TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
     REQUIRE(pp.next_line(line)); // DEFC line
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[2].text() == "x");
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 5);
+    REQUIRE(t[1].text() == "x");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 5);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4228,12 +4194,12 @@ TEST_CASE("Preprocessor: '=' synonym DEFC line carries directive logical locatio
     REQUIRE(line.location().filename() == "eqsyn_loc.asm");
 
     const auto& t = line.tokens();
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[2].text() == "v");
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 9);
+    REQUIRE(t[1].text() == "v");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 9);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4256,16 +4222,13 @@ TEST_CASE("Preprocessor: directive DEFC 'DEFC Y = 7' emits 'DEFC Y = 7' tokens",
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].is(TokenType::Identifier));
-    REQUIRE(t[2].text() == "Y");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 7);
+    REQUIRE(t[1].is(TokenType::Identifier));
+    REQUIRE(t[1].text() == "Y");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 7);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4284,16 +4247,13 @@ TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' token
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
-    REQUIRE(t.size() >= 7);
+    REQUIRE(t.size() >= 4);
     REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].is(TokenType::Whitespace));
-    REQUIRE(t[2].is(TokenType::Identifier));
-    REQUIRE(t[2].text() == "W");
-    REQUIRE(t[3].is(TokenType::Whitespace));
-    REQUIRE(t[4].is(TokenType::EQ));
-    REQUIRE(t[5].is(TokenType::Whitespace));
-    REQUIRE(t[6].is(TokenType::Integer));
-    REQUIRE(t[6].int_value() == 3);
+    REQUIRE(t[1].is(TokenType::Identifier));
+    REQUIRE(t[1].text() == "W");
+    REQUIRE(t[2].is(TokenType::EQ));
+    REQUIRE(t[3].is(TokenType::Integer));
+    REQUIRE(t[3].int_value() == 3);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -5756,11 +5716,10 @@ TEST_CASE("Preprocessor: token paste at beginning of replacement list",
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 3);
+    REQUIRE(line.size() >= 2);
     REQUIRE(line[0].is(TokenType::DoubleHash));
-    REQUIRE(line[1].is(TokenType::Whitespace));
-    REQUIRE(line[2].is(TokenType::Identifier));
-    REQUIRE(line[2].text() == "test");
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "test");
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -5779,11 +5738,10 @@ TEST_CASE("Preprocessor: token paste at end of replacement list",
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 3);
+    REQUIRE(line.size() >= 2);
     REQUIRE(line[0].is(TokenType::Identifier));
     REQUIRE(line[0].text() == "test");
-    REQUIRE(line[1].is(TokenType::Whitespace));
-    REQUIRE(line[2].is(TokenType::DoubleHash));
+    REQUIRE(line[1].is(TokenType::DoubleHash));
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -7600,10 +7558,10 @@ TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined 
 }
 
 // --- Added tests: line continuation with trailing backslash ---
-// A backslash at end of a physical line should be replaced by a single space
-// and the next physical line, producing one logical line.
+// A backslash at end of a physical line should be joined to
+// the next physical line, producing one logical line.
 
-TEST_CASE("Preprocessor: single trailing backslash joins next line with one space",
+TEST_CASE("Preprocessor: single trailing backslash joins next line with",
           "[preprocessor][linecontinuation][backslash]") {
     g_errors.reset();
     Preprocessor pp;
@@ -7617,12 +7575,10 @@ TEST_CASE("Preprocessor: single trailing backslash joins next line with one spac
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
-    // Expect: Identifier 'A', Whitespace ' ', Identifier 'B'
-    REQUIRE(toks.size() >= 3);
+    // Expect: Identifier 'A', Identifier 'B'
+    REQUIRE(toks.size() >= 2);
     REQUIRE(toks[0].text() == "A");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-    REQUIRE(toks[1].text() == " ");
-    REQUIRE(toks[2].text() == "B");
+    REQUIRE(toks[1].text() == "B");
     REQUIRE_FALSE(pp.next_line(line)); // no extra logical line
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7646,9 +7602,7 @@ TEST_CASE("Preprocessor: multiple trailing backslashes cascade into one logical 
     // Collect identifiers ignoring whitespace
     std::vector<std::string> idents;
     for (const auto& t : toks) {
-        if (t.is(TokenType::Identifier)) {
-            idents.push_back(t.text());
-        }
+        idents.push_back(t.text());
     }
     REQUIRE(idents == std::vector<std::string>({ "A", "B", "C", "D" }));
     REQUIRE_FALSE(pp.next_line(line));
@@ -7706,17 +7660,10 @@ TEST_CASE("Preprocessor: backslash continuation inside macro argument preserves 
 
     // Expect identifiers A and B with at least one whitespace between after processing
     std::vector<std::string> idents;
-    int whitespace_blocks = 0;
     for (const auto& t : toks) {
-        if (t.is(TokenType::Identifier)) {
-            idents.push_back(t.text());
-        }
-        if (t.is(TokenType::Whitespace)) {
-            ++whitespace_blocks;
-        }
+        idents.push_back(t.text());
     }
     REQUIRE(idents == std::vector<std::string>({ "A", "B" }));
-    REQUIRE(whitespace_blocks >= 1);
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7790,12 +7737,11 @@ TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins l
     TokensLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
-    REQUIRE(line.size() >= 3);
+    REQUIRE(line.size() >= 2);
     REQUIRE(line[0].is(TokenType::Identifier));
     REQUIRE(line[0].text() == "FIRST");
-    REQUIRE(line[1].is(TokenType::Whitespace));
-    REQUIRE(line[2].is(TokenType::Identifier));
-    REQUIRE(line[2].text() == "SECOND");
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "SECOND");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -7876,14 +7822,14 @@ TEST_CASE("Preprocessor: DEFL list expands inside another line (db macro usage)"
 
     const auto& toks = line.tokens();
     // Expect: Identifier 'db', Whitespace, Integer 1, Comma, Integer 2
-    REQUIRE(toks.size() == 5);
+    REQUIRE(toks.size() == 4);
     REQUIRE(toks[0].is(TokenType::Identifier));
     REQUIRE(toks[0].text() == "db");
-    REQUIRE(toks[2].is(TokenType::Integer));
-    REQUIRE(toks[2].int_value() == 1);
-    REQUIRE(toks[3].is(TokenType::Comma));
-    REQUIRE(toks[4].is(TokenType::Integer));
-    REQUIRE(toks[4].int_value() == 2);
+    REQUIRE(toks[1].is(TokenType::Integer));
+    REQUIRE(toks[1].int_value() == 1);
+    REQUIRE(toks[2].is(TokenType::Comma));
+    REQUIRE(toks[3].is(TokenType::Integer));
+    REQUIRE(toks[3].int_value() == 2);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -7935,7 +7881,7 @@ TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list eleme
 
     TokensLine line;
     REQUIRE(pp.next_line(line)); // expansion of Z1
-    REQUIRE(line.to_string() == "1,2");
+    REQUIRE(line.to_string() == "1 ,2");
 
     const auto& toks = line.tokens();
     REQUIRE(toks.size() == 3);
@@ -8739,7 +8685,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
  * -------------------------------------------------------------------------- */
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefinition error",
-    "[preprocessor][local][duplicate][macro]") {
+          "[preprocessor][local][duplicate][macro]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8763,7 +8709,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefin
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefinition error",
-    "[preprocessor][local][duplicate][rept]") {
+          "[preprocessor][local][duplicate][rept]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8786,7 +8732,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefini
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefinition error",
-    "[preprocessor][local][duplicate][reptc]") {
+          "[preprocessor][local][duplicate][reptc]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8809,7 +8755,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefin
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefinition error",
-    "[preprocessor][local][duplicate][repti]") {
+          "[preprocessor][local][duplicate][repti]") {
     g_errors.reset();
     Preprocessor pp;
 
@@ -8829,5 +8775,74 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefin
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Duplicate definition") != std::string::npos);
     REQUIRE(msg.find("L") != std::string::npos);
+}
+
+// -----------------------------------------------------------------------------
+// NEW TESTS: LOCAL name collision with parameter / iteration variable
+// Should raise Duplicate definition error and produce no expansion.
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports Duplicate definition",
+          "[preprocessor][macro][local][collision][param]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO M(p)\n"
+        "LOCAL p\n"          // collision: p is both parameter and LOCAL
+        "p: db p\n"
+        "ENDM\n"
+        "M(1)\n";
+    pp.push_virtual_file(content, "macro_local_param_collision", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("p") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label reports Duplicate definition",
+          "[preprocessor][reptc][local][collision][iter]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC ch, \"A\"\n"
+        "LOCAL ch\n"          // collision: ch is iteration variable and LOCAL
+        "ch: defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_local_iter_collision", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("ch") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label reports Duplicate definition",
+          "[preprocessor][repti][local][collision][iter]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI v, 1\n"
+        "LOCAL v\n"          // collision: v is iteration variable and LOCAL
+        "v: db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_local_iter_collision", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("v") != std::string::npos);
 }
 

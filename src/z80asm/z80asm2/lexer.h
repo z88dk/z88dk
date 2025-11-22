@@ -13,7 +13,7 @@
 #include <vector>
 
 enum class TokenType {
-    EndOfFile,
+    EndOfLine,
     Identifier,
     Integer,
     Float,
@@ -27,7 +27,6 @@ enum class TokenType {
     RightBracket,
     LeftBrace,
     RightBrace,
-    Whitespace,
     Power,
     UnaryPlus,
     UnaryMinus,
@@ -58,15 +57,20 @@ enum class TokenType {
     DoubleHash,
     At,
     Dollar,
+    ASMPC,
 };
 
 class Token {
 public:
-    Token(TokenType type, const std::string& text);
-    explicit Token(TokenType type, const std::string& text, int value);
-    explicit Token(TokenType type, const std::string& text, double value);
-    explicit Token(TokenType type, const std::string& text, std::string value);
-    explicit Token(TokenType type, const std::string& text, Keyword keyword);
+    Token(TokenType type, const std::string& text, bool has_space_after);
+    explicit Token(TokenType type, const std::string& text,
+                   int value, bool has_space_after);
+    explicit Token(TokenType type, const std::string& text,
+                   double value, bool has_space_after);
+    explicit Token(TokenType type, const std::string& text,
+                   std::string value, bool has_space_after);
+    explicit Token(TokenType type, const std::string& text,
+                   Keyword keyword, bool has_space_after);
 
     bool is(TokenType t) const;
     bool is_not(TokenType t) const;
@@ -80,6 +84,7 @@ public:
     double float_value() const;
     const std::string& string_value() const;
     Keyword keyword() const;
+    bool has_space_after() const;
 
 private:
     TokenType type_;
@@ -88,6 +93,8 @@ private:
     double float_value_ = 0.0;    // Used if type == Float
     std::string string_value_;    // Used if type == String (escape-resolved)
     Keyword keyword_ = Keyword::None; // Used if type == Identifier and is a keyword
+    bool has_space_after_ =
+        false; // true if original source had space after this token
 };
 
 class TokensLine {
@@ -109,9 +116,7 @@ public:
     const std::vector<Token>& tokens() const;
     unsigned size() const;
     std::string to_string() const;
-    void skip_spaces(unsigned& i) const;
-    bool at_end(unsigned& i) const;
-    bool trim();
+    bool at_end(unsigned i) const;
     void reserve(size_t capacity); // reserve storage in tokens_ vector
     bool has_token_type(TokenType tt) const; // check if any token matches type
 
