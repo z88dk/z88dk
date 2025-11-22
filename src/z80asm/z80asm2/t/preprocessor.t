@@ -784,11 +784,11 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 2, "$test.asm"
+#line 1, "$test.asm"
 X
-#line 2
+#line 1
 X
-#line 2
+#line 1
 X
 END
 
@@ -862,13 +862,13 @@ END
 
 # Expect two iterations with labels renamed L_1 and L_2 and corresponding nop lines
 check_text_file("$test.i", <<END);
-#line 3, "$test.asm"
+#line 1, "$test.asm"
 .L_1
-#line 3
+#line 1
 nop
-#line 3
+#line 1
 .L_2
-#line 3
+#line 1
 nop
 END
 
@@ -1461,8 +1461,7 @@ END
 
 # Run with -MD and expect failure, and verify $test.d was NOT generated
 capture_nok("z88dk-z80asm -E -MD $test.asm", <<END);
-error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
-   |X
+$test.asm:1: error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
 END
 ok ! -f "$test.d", "dependency file not generated on error";
 
@@ -2031,7 +2030,569 @@ db 7
 db 7+1
 END
 
+#------------------------------------------------------------------------------
+# Angle form for BINARY / INCBIN include-path resolution
+#------------------------------------------------------------------------------
+# Create a subdirectory with binary resources and use angle bracket form
+# with only the bare filename; ensure -I search resolves them.
+path("$test.binpath")->mkpath;
 
+spew("$test.binpath/abin.bin", pack('C*', 1,2,3));      # 3 bytes -> 1 line
+spew("$test.binpath/bbin.bin", pack('C*', 4,5));        # 2 bytes -> 1 line
+
+spew("$test.asm", <<END);
+C_LINE 50, "angle_bin.asm"
+BINARY <abin.bin>
+INCBIN <bbin.bin>
+END
+
+capture_ok("z88dk-z80asm -v -E -I$test.binpath $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect constant logical line number (C_LINE): second emitted logical line
+# repeats #line 50 (no filename) because the line number decreased.
+check_text_file("$test.i", <<END);
+#line 50, "angle_bin.asm"
+DEFB 1,2,3
+#line 50
+DEFB 4,5
+END
+
+#------------------------------------------------------------------------------
+# Angle vs quoted/plain forms without -I when files are in the same directory
+#------------------------------------------------------------------------------
+# Place source and binaries together; angle <file> should still resolve.
+spew("$test.abin", pack('C*', 7,8));          # single DEFB line
+spew("$test.bbin", pack('C*', 9,10,11));      # single DEFB line
+
+spew("$test.asm", <<END);
+BINARY <$test.abin>
+INCBIN "$test.bbin"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected: first directive establishes logical line mapping (#line 1, "$test.asm"),
+# second directive continues at next logical line without needing another #line.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB 7,8
+DEFB 9,10,11
+END
+
+# Clean up temporary path
+path("$test.binpath")->remove_tree if Test::More->builder->is_passing;
+
+#------------------------------------------------------------------------------
+# Plain include path search failures (FileNotFound error case)
+#------------------------------------------------------------------------------
+
+# 1) Plain (unquoted) form: #include missing_plain.inc
+unlink("$test.i");
+spew("$test.asm", <<END);
+#include missing_plain.inc
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: File not found: missing_plain.inc
+   |#include missing_plain.inc
+END
+ok ! -f "$test.i", "no .i file produced on plain missing include";
+
+# 2) Quoted form: #include "missing_quoted.inc"
+unlink("$test.i");
+spew("$test.asm", <<END);
+#include "missing_quoted.inc"
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: File not found: missing_quoted.inc
+   |#include "missing_quoted.inc"
+END
+ok ! -f "$test.i", "no .i file produced on quoted missing include";
+
+# 3) Angle form: #include <missing_angle.inc>
+unlink("$test.i");
+spew("$test.asm", <<END);
+#include <missing_angle.inc>
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: File not found: missing_angle.inc
+   |#include <missing_angle.inc>
+END
+ok ! -f "$test.i", "no .i file produced on angle missing include";
+
+# 4) Plain form with -I search path provided but file absent
+# Create empty search directory
+path("$test.incpath")->mkpath;
+unlink("$test.i");
+spew("$test.asm", <<END);
+#include missing_in_path.inc
+END
+capture_nok("z88dk-z80asm -E -I$test.incpath $test.asm", <<END);
+$test.asm:1: error: File not found: missing_in_path.inc
+   |#include missing_in_path.inc
+END
+ok ! -f "$test.i", "no .i file produced when -I path does not contain file";
+path("$test.incpath")->remove_tree if Test::More->builder->is_passing;
+
+#------------------------------------------------------------------------------
+# C_LINE constant line number behavior after multi-line macro / REPT expansions
+#------------------------------------------------------------------------------
+
+# Multi-line macro under C_LINE: every emitted line should retain the same logical line
+spew("$test.asm", <<END);
+MACRO MULTI()
+db 10
+db 20
+db 30
+ENDM
+C_LINE 6000, "const_macro.asm"
+MULTI()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6000, "const_macro.asm"
+db 10
+#line 6000
+db 20
+#line 6000
+db 30
+END
+
+# REPT expansion under C_LINE: each iteration keeps constant logical line number
+spew("$test.asm", <<END);
+C_LINE 6100, "const_rept.asm"
+REPT 3
+X
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6100, "const_rept.asm"
+X
+#line 6100
+X
+#line 6100
+X
+END
+
+# Nested macro expansion under C_LINE: inner and outer expansions all share constant line number
+spew("$test.asm", <<END);
+MACRO INNER()
+db 99
+db 100
+ENDM
+MACRO OUTER()
+INNER()
+db 101
+ENDM
+C_LINE 6200, "const_nested.asm"
+OUTER()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6200, "const_nested.asm"
+db 99
+#line 6200
+db 100
+#line 6200
+db 101
+END
+
+# Additional tests: C_LINE constant line number after multi-line macro / REPT / REPTC / REPTI / mixed nested expansions
+
+# C_LINE then REPTC: every emitted character iteration keeps constant logical line
+spew("$test.asm", <<END);
+C_LINE 6300, "const_reptc.asm"
+REPTC ch, "XYZ"
+defb ch
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6300, "const_reptc.asm"
+defb 88
+#line 6300
+defb 89
+#line 6300
+defb 90
+END
+
+# C_LINE then REPTI: every emitted argument iteration keeps constant logical line
+spew("$test.asm", <<END);
+C_LINE 6400, "const_repti.asm"
+REPTI v, 5,6,7
+db v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6400, "const_repti.asm"
+db 5
+#line 6400
+db 6
+#line 6400
+db 7
+END
+
+# C_LINE then macro invoking REPT: all lines from nested expansion share constant line
+spew("$test.asm", <<END);
+MACRO R3()
+REPT 3
+X
+ENDR
+ENDM
+C_LINE 6500, "const_macro_rept.asm"
+R3()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6500, "const_macro_rept.asm"
+X
+#line 6500
+X
+#line 6500
+X
+END
+
+# C_LINE with macro + LOCAL labels: label and instruction lines keep constant line
+spew("$test.asm", <<END);
+MACRO LABS(n)
+LOCAL L
+L:
+db n
+db n+1
+ENDM
+C_LINE 6600, "const_local_macro.asm"
+LABS(10)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect:
+# .L_1, db 10, db 10+1 all at 6600
+check_text_file("$test.i", <<END);
+#line 6600, "const_local_macro.asm"
+.L_1
+#line 6600
+db 10
+#line 6600
+db 10+1
+END
+
+# C_LINE then nested macro calling REPTC and REPTI: all emitted lines constant
+spew("$test.asm", <<END);
+MACRO MIX()
+REPTC ch, "AB"
+defb ch
+ENDR
+REPTI v, 1,2
+db v
+ENDR
+ENDM
+C_LINE 6700, "const_mix.asm"
+MIX()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6700, "const_mix.asm"
+defb 65
+#line 6700
+defb 66
+#line 6700
+db 1
+#line 6700
+db 2
+END
+
+# Transition test: C_LINE followed by LINE after expansions
+spew("$test.asm", <<END);
+MACRO TWO()
+db 1
+db 2
+ENDM
+C_LINE 6800, "const_then_line.asm"
+TWO()
+LINE 50, "after_line.asm"
+A
+B
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect first two lines constant at 6800, then LINE 50 starts increment (50,51)
+check_text_file("$test.i", <<END);
+#line 6800, "const_then_line.asm"
+db 1
+#line 6800
+db 2
+#line 50, "after_line.asm"
+A
+B
+END
+
+#------------------------------------------------------------------------------
+# Unclosed structure errors: each open construct at EOF should report an error
+# with the line of the opening statement.
+#------------------------------------------------------------------------------
+
+# Unclosed MACRO (missing ENDM)
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO M()
+db 1
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected end of input in MACRO (expected ENDM)
+   |MACRO M()
+END
+ok ! -f "$test.i", "no .i file produced on unclosed MACRO";
+
+# Unclosed REPT (missing ENDR)
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPT 3
+X
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected end of input in REPT (expected ENDR)
+   |REPT 3
+END
+ok ! -f "$test.i", "no .i file produced on unclosed REPT";
+
+# Unclosed REPTC (missing ENDR)
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTC ch, "AB"
+defb ch
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected end of input in REPTC (expected ENDR)
+   |REPTC ch, "AB"
+END
+ok ! -f "$test.i", "no .i file produced on unclosed REPTC";
+
+# Unclosed REPTI (missing ENDR)
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTI v, 1,2
+db v
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected end of input in REPTI (expected ENDR)
+   |REPTI v, 1,2
+END
+ok ! -f "$test.i", "no .i file produced on unclosed REPTI";
+
+# Multiple different unclosed constructs: only the innermost (last opened) IF should report,
+# followed by earlier MACRO still expecting ENDM once IF block ends (macro body collection).
+# (Demonstrates that each structure produces its own error when reached.)
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO OUT()
+REPT 2
+IF 1
+X
+ENDM
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected ENDM directive without matching MACRO
+   |MACRO OUT()
+$test.asm:1: error: Invalid syntax: Unexpected end of input in MACRO (expected ENDM)
+   |MACRO OUT()
+END
+# Note: current implementation reports only the unclosed IF; OUT() / REPT error
+# messages are not emitted after EOF, so .i is not produced.
+ok ! -f "$test.i", "no .i file produced on nested unclosed structures";
+
+# Additional tests: missing ENDIF for IF / IFDEF / IFNDEF directives
+
+# Unclosed IF (already tested elsewhere, but explicit standalone verification)
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF 1
+A
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
+END
+ok ! -f "$test.i", "no .i file produced on unclosed IF";
+
+# Unclosed IFDEF (missing ENDIF)
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define FLAG 1
+IFDEF FLAG
+GOOD
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
+END
+ok ! -f "$test.i", "no .i file produced on unclosed IFDEF";
+
+# Unclosed IFNDEF (missing ENDIF)
+unlink("$test.i");
+spew("$test.asm", <<END);
+IFNDEF MISSING
+FALLBACK
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
+END
+ok ! -f "$test.i", "no .i file produced on unclosed IFNDEF";
+
+#------------------------------------------------------------------------------
+# String escape sequences: octal / hex / standard escapes and unknown escapes
+#------------------------------------------------------------------------------
+spew("$test.asm", <<END);
+db "\\a\\b\\e\\f\\n\\r\\t\\v"
+db "\\101\\12\\x41\\x4A\\xA"
+db "QUOTE: \\\" BACKSLASH: \\\\ UNKNOWN: \\q"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected expansions:
+#  \a 7, \b 8, \e 27, \f 12, \n 10, \r 13, \t 9, \v 11
+#  \101 'A' 65, \12 newline 10, \x41 'A' 65, \x4A 'J' 74, \xA 10
+#  "QUOTE: \" BACKSLASH: \\ UNKNOWN: \q" -> numeric bytes of each character
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 7,8,27,12,10,13,9,11
+db 65,10,65,74,10
+db 81,85,79,84,69,58,32,34,32,66,65,67,75,83,76,65,83,72,58,32,92,32,85,78,75,78,79,87,78,58,32,113
+END
+
+#------------------------------------------------------------------------------
+# parse_macro_args negative tests: trailing comma and bad nesting
+#------------------------------------------------------------------------------
+
+# REPTI trailing comma -> Invalid argument list in REPTI
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTI v, 1,2,
+db v
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
+   |REPTI v, 1,2,
+$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
+   |ENDR
+END
+ok ! -f "$test.i", "no .i file produced on REPTI trailing comma";
+
+# REPTI bad nesting (unclosed parenthesis) -> Invalid argument list in REPTI
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPTI v, (1,2
+db v
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
+   |REPTI v, (1,2
+$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
+   |ENDR
+END
+ok ! -f "$test.i", "no .i file produced on REPTI bad nesting";
+
+# Name-directive REPTI trailing comma -> Invalid argument list after REPTI
+unlink("$test.i");
+spew("$test.asm", <<END);
+val REPTI 3,4,
+db val
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Invalid argument list after REPTI
+   |val REPTI 3,4,
+$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
+   |ENDR
+END
+ok ! -f "$test.i", "no .i file produced on name-directive REPTI trailing comma";
+
+# Name-directive REPTI bad nesting -> Invalid argument list after REPTI
+unlink("$test.i");
+spew("$test.asm", <<END);
+val REPTI (7,8
+db val
+ENDR
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Invalid argument list after REPTI
+   |val REPTI (7,8
+$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
+   |ENDR
+END
+ok ! -f "$test.i", "no .i file produced on name-directive REPTI bad nesting";
+
+# Function-like macro trailing comma inside parentheses -> Macro argument count mismatch
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO F(a,b)
+db a,b
+ENDM
+F(1,2,)
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:4: error: Invalid syntax: Macro argument count mismatch for: F
+   |F(1,2,)
+END
+ok ! -f "$test.i", "no .i file produced on macro call trailing comma";
+
+# Function-like macro bad nesting (unclosed parenthesis) -> Macro argument count mismatch
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO G(x,y)
+db x,y
+ENDM
+G(1,(2,3
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:4: error: Invalid syntax: Macro argument count mismatch for: G
+   |G(1,(2,3
+END
+ok ! -f "$test.i", "no .i file produced on macro call bad nesting";
+
+#------------------------------------------------------------------------------
 # Clean up
+#------------------------------------------------------------------------------
 unlink_testfiles if Test::More->builder->is_passing;
 done_testing;

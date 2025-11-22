@@ -30,8 +30,8 @@ void Preprocessor::clear() {
     if_stack_.clear();
     dep_files_.clear();
     included_once_.clear();
-    macro_fixpoint_iterations_ = 0;
     current_line_chain_.reset();
+    macro_fixpoint_iterations_ = 0;
 }
 
 void Preprocessor::clear_file_cache() {
@@ -207,6 +207,10 @@ bool Preprocessor::next_line(TokensLine& line) {
                 continue;
             }
             else {
+                TokensLine final_line;
+                post_process_line(line, final_line);
+                line = final_line;
+                current_line_chain_.reset();
                 macro_fixpoint_iterations_ = 0;
                 return true;
             }
@@ -223,21 +227,29 @@ bool Preprocessor::next_line(TokensLine& line) {
 
         // --- Single-pass macro expansion with iterative feed-back ---
         {
+            // merge ## operators first, then expand macros once
+            TokensLine merged_line;
             std::vector<TokensLine> expanded_once;
             std::string last_macro;
-            bool changed = expand_macros_single_pass(line, expanded_once, last_macro);
-
+            bool changed = false;
+            if (merge_double_hash(line, merged_line)) {
+                changed = true;
+            }
+            if (expand_macros_single_pass(merged_line, expanded_once,
+                                          last_macro)) {
+                changed = true;
+            }
             if (expanded_once.empty()) {
                 continue;
             }
 
-            if (!changed) {
-                std::vector<TokensLine> final_lines;
-                finalize_line(expanded_once.front(), false, final_lines);
-                line = final_lines.front();
+            if (!changed && expanded_once.size() == 1) {
+                // Do not finalize here. Queue the (possibly directive) line back so it goes
+                // through normal directive handling first, then finalization happens at dequeue.
+                input_queue_.push_front(expanded_once.front());
                 current_line_chain_.reset();
                 macro_fixpoint_iterations_ = 0;
-                return true;
+                continue;
             }
 
             // Macro expansion occurred: force all expanded lines to use call-site logical location
@@ -254,12 +266,11 @@ bool Preprocessor::next_line(TokensLine& line) {
                                macro_name);
 
                 current_line_chain_.reset();
-                std::vector<TokensLine> final_lines;
-                finalize_line(line, false, final_lines);
-                line = final_lines.front();
                 macro_fixpoint_iterations_ = 0;
+                line.clear_tokens();
                 return true;
             }
+
             // Push expansion as virtual file located at the call-site (constant line number)
             push_virtual_file(expanded_once,
                               callsite.filename(),
@@ -1405,6 +1416,7 @@ bool Preprocessor::fetch_line(TokensLine& out) {
         // Report unclosed conditional at end of input
         const IfFrame& top_frame = if_stack_.back();
         g_errors.set_location(top_frame.location);
+        g_errors.set_source_line("");
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected end of input in IF (expected ENDIF)");
         if_stack_.clear();
@@ -1791,78 +1803,64 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
 }
 
 void Preprocessor::process_rept(const TokensLine& line, unsigned& i) {
-    // 1) Collect the count expression from the rest of the line
+    // Parse and evaluate count expression (macro expanded).
     TokensLine count_line = collect_tokens(line, i);
     if (count_line.empty()) {
         g_errors.error(ErrorCode::InvalidSyntax, "Expected count in REPT");
         return;
     }
-
-    // 2) Expand macros in the count expression
-    // 3) Flatten into a single TokensLine (insert single space between lines)
     TokensLine expr_tokens = expand_macros_in_line(count_line);
-
-    // 4) Evaluate as a constant expression
     int count_value = 0;
     if (!eval_const_expr(expr_tokens, count_value, false)) {
-        count_value = 0;    // continue to collect the body
+        count_value = 0; // still consume body
     }
 
-    // 5) Collect body lines until matching ENDR, with nesting support
+    // Collect body (with nesting + LOCAL).
     std::vector<TokensLine> body;
-    std::vector<std::string> locals; // collect LOCALs for this block
+    std::vector<std::string> locals;
     if (!collect_macro_body(body, locals, Keyword::REPT, Keyword::ENDR)) {
         return;
     }
-
-    // 6) If count <= 0, nothing to emit (but body was consumed)
     if (count_value <= 0) {
-        return;
+        return; // nothing to emit
     }
 
-    // Helper to rename identifiers in one line according to a map
-    auto rename_line = [](const TokensLine & src,
-    const std::unordered_map<std::string, std::string>& rmap) {
-        TokensLine out(src.location());
-        for (unsigned t = 0; t < src.size(); ++t) {
-            const Token& tk = src[t];
-            if (tk.is(TokenType::Identifier)) {
-                auto it = rmap.find(tk.text());
-                if (it != rmap.end()) {
-                    out.push_back(Token(TokenType::Identifier, it->second));
-                    continue;
-                }
-            }
-            out.push_back(tk);
-        }
-        return out;
-    };
-
-    // 7) Repeat body count_value times with LOCAL renaming per iteration
+    // Build repeated lines using the REPT directive's logical location
+    // (same logic as REPTC / REPTI for clarity).
     std::vector<TokensLine> repeated;
-    repeated.reserve(body.size() * static_cast<size_t>(count_value));
-    for (int c = 0; c < count_value; ++c) {
+    repeated.reserve(static_cast<size_t>(count_value) * body.size());
+
+    for (int iter = 0; iter < count_value; ++iter) {
         std::unordered_map<std::string, std::string> rmap;
         if (!locals.empty()) {
             ++local_id_counter_;
             const std::string suffix = "_" + std::to_string(local_id_counter_);
-            for (const std::string& ln : locals) {
+            for (const auto& ln : locals) {
                 rmap.emplace(ln, ln + suffix);
             }
         }
-        for (const TokensLine& b : body) {
-            if (rmap.empty()) {
-                repeated.push_back(b);
+        for (const TokensLine& src : body) {
+            TokensLine out(line.location()); // force directive location
+            out.reserve(src.size());
+            for (unsigned ti = 0; ti < src.size(); ++ti) {
+                const Token& tk = src[ti];
+                if (tk.is(TokenType::Identifier) && !rmap.empty()) {
+                    auto it = rmap.find(tk.text());
+                    if (it != rmap.end()) {
+                        out.push_back(Token(TokenType::Identifier, it->second));
+                        continue;
+                    }
+                }
+                out.push_back(tk);
             }
-            else {
-                repeated.push_back(rename_line(b, rmap));
-            }
+            repeated.push_back(std::move(out));
         }
     }
 
-    // Start generated lines at the REPT directive's logical location
-    push_virtual_file(repeated, line.location().filename(),
-                      line.location().line_num(), false);
+    push_virtual_file(repeated,
+                      line.location().filename(),
+                      line.location().line_num(),
+                      false);
 }
 
 // REPTC: directive form "REPTC var, string"
@@ -2149,6 +2147,7 @@ void Preprocessor::process_if(const TokensLine& line, unsigned& i) {
     bool cond_value = eval_if_expr(line, i, Keyword::IF);
 
     IfFrame fr;
+    fr.location = line.location();
     fr.branch_active = cond_value;
     fr.any_taken = cond_value;
     fr.seen_else = false;
@@ -2211,6 +2210,7 @@ void Preprocessor::process_ifdef(const TokensLine& line, unsigned& i,
     bool cond = eval_ifdef_name(line, i, negated, Keyword::IFDEF);
 
     IfFrame fr;
+    fr.location = line.location();
     fr.branch_active = cond;
     fr.any_taken = cond;
     fr.seen_else = false;
@@ -2359,29 +2359,15 @@ void Preprocessor::add_virtual_file(std::vector<TokensLine> expanded) {
     if (expanded.empty()) {
         return;
     }
-
-    // Refactored: reuse finalize_line for each expanded line with full processing.
-    std::vector<TokensLine> out;
-    out.reserve(expanded.size() * 2);
-
-    for (auto& tkl : expanded) {
-        std::vector<TokensLine> processed;
-        finalize_line(tkl, true, processed);
-        out.insert(out.end(), processed.begin(), processed.end());
-    }
-
-    if (out.empty()) {
-        return;
-    }
-    else if (out.size() == 1) {
-        input_queue_.push_back(out.front());
+    else if (expanded.size() == 1) {
+        input_queue_.push_back(expanded.front());
         return;
     }
 
-    push_virtual_file(out, expanded[0].location().filename(),
+    push_virtual_file(expanded, expanded[0].location().filename(),
                       expanded[0].location().line_num(), false);
 
-    if (expanded.size() > 1 && !file_stack_.empty()) {
+    if (!file_stack_.empty()) {
         File& top = file_stack_.back();
         top.is_macro_expansion = true;
     }
@@ -2576,18 +2562,18 @@ bool Preprocessor::try_stringize_parameter(const TokensLine& rep_line,
 
             // Collapse whitespace tokens into a single space and join token texts.
             std::string joined;
-            bool pending_space = false;
+            bool space_pending = false;
             for (unsigned k = 0; k < orig.size(); ++k) {
                 const Token& tok = orig[k];
                 if (tok.is(TokenType::Whitespace)) {
-                    pending_space = true;
+                    space_pending = true;
                     continue;
                 }
-                if (!joined.empty() && pending_space) {
+                if (!joined.empty() && space_pending) {
                     joined += ' ';
                 }
                 joined += tok.text();
-                pending_space = false;
+                space_pending = false;
             }
 
             // Escape and quote
@@ -2952,7 +2938,7 @@ bool Preprocessor::expand_macros_single_pass(const TokensLine& in_line,
                 merge_double_hash(out, merged_line);
 
                 if (first_rep) {
-                    // Merge into current (replace macro token)
+                    // Merge into current (replacing macro token)
                     for (const auto& t : merged_line.tokens()) {
                         current.push_back(t);
                     }
@@ -3025,15 +3011,7 @@ bool Preprocessor::expand_macros_single_pass(const TokensLine& in_line,
         return false;
     }
 
-    // Post-process (string -> bytes) each resulting line
-    std::vector<TokensLine> final;
-    final.reserve(out_lines.size());
-    for (auto& ln : out_lines) {
-        TokensLine processed;
-        post_process_line(ln, processed);
-        final.push_back(processed);
-    }
-    out_lines.swap(final);
+    // return out_lines
     return true;
 }
 
@@ -3345,84 +3323,6 @@ bool Preprocessor::handle_directives_for_line(TokensLine& line,
 
     // ask caller to process normal line
     return false;
-}
-
-// NEW helper implementation
-void Preprocessor::finalize_line(const TokensLine& in,
-                                 bool full_processing,
-                                 std::vector<TokensLine>& out_lines) {
-    out_lines.clear();
-
-    // Decide whether full processing (splitting + second expansion) is needed.
-    bool has_tokpaste = in.has_token_type(TokenType::DoubleHash);
-    bool advanced_path = full_processing || has_tokpaste;
-
-    TokensLine after_paste;
-    const TokensLine* base = &in;
-    if (has_tokpaste) {
-        merge_double_hash(in, after_paste);
-        base = &after_paste;
-    }
-
-    if (!advanced_path) {
-        // Fast path: identical to old next_line branch (no splitting)
-        TokensLine pp;
-        pp.reserve(base->size());
-        post_process_line(*base, pp);
-        out_lines.push_back(std::move(pp));
-        return;
-    }
-
-    // Second macro expansion (only meaningful if token-paste occurred or full processing requested)
-    std::vector<TokensLine> further_expanded;
-    expand_macros(*base, true, further_expanded);
-
-    if (further_expanded.empty()) {
-        // Treat (possibly pasted) base line as single candidate
-        further_expanded.push_back(*base);
-    }
-
-    for (const TokensLine& candidate : further_expanded) {
-        if (full_processing) {
-            // Always split in full processing mode (matches previous add_virtual_file behavior)
-            std::vector<TokensLine> segments;
-            if (split_line(candidate, segments)) {
-                for (auto& seg : segments) {
-                    TokensLine pp_seg;
-                    pp_seg.reserve(seg.size());
-                    post_process_line(seg, pp_seg);
-                    out_lines.push_back(std::move(pp_seg));
-                }
-                continue;
-            }
-        }
-        // In fast mode (next_line, no full_processing), only split if we arrived
-        // here due to token-paste AND expansion produced new lines (i.e., further.size()>1).
-        if (!full_processing && further_expanded.size() == 1) {
-            TokensLine pp_single;
-            pp_single.reserve(candidate.size());
-            post_process_line(candidate, pp_single);
-            out_lines.push_back(std::move(pp_single));
-            continue;
-        }
-
-        // Split when there are multiple lines (macro generated extra lines) even in fast mode.
-        std::vector<TokensLine> segments;
-        if (split_line(candidate, segments)) {
-            for (auto& seg : segments) {
-                TokensLine pp_seg;
-                pp_seg.reserve(seg.size());
-                post_process_line(seg, pp_seg);
-                out_lines.push_back(std::move(pp_seg));
-            }
-        }
-        else {
-            TokensLine pp_line;
-            pp_line.reserve(candidate.size());
-            post_process_line(candidate, pp_line);
-            out_lines.push_back(std::move(pp_line));
-        }
-    }
 }
 
 void preprocess_only() {
