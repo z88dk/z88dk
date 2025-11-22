@@ -1493,10 +1493,27 @@ bool Preprocessor::split_line(const TokensLine& line,
     }
     bool did_split = false;
     int ternary_depth = 0;
+
+    // do not split lines with DEFINE
     unsigned i = 0;
+    Keyword kw;
+    if (is_directive(line, i, kw) && kw == Keyword::DEFINE) {
+        return false;
+    }
+
+    i = 0;
+    std::string name;
+    if (is_name_directive(line, i, kw, name) && kw == Keyword::DEFINE) {
+        return false;
+    }
+
+    // do not split labels
+    i = 0;
     while (split_label(line.location(), line, i, out_segments)) {
         did_split = true;
     }
+
+    // split into segments
     TokensLine segment(line.location());
     line.skip_spaces(i);
     if (i < line.size()) {

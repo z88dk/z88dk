@@ -8532,3 +8532,203 @@ TEST_CASE("Preprocessor: REPTC inside MACRO expands characters to integers in bo
     REQUIRE(values[1] == 66); // 'B'
     REQUIRE_FALSE(g_errors.has_errors());
 }
+
+// ADDITIONS: Multi-line #define (object-like, function-like, name-directive) split by ':' and '\'.
+// Each invocation must expand to multiple logical lines (one per segment).
+
+TEST_CASE("Preprocessor: object-like #define body split by ':' expands to multiple lines",
+          "[preprocessor][define][multiline][colon]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define TWOC db 1 : db 2\n"
+        "LINE 500, \"define_colon_obj.asm\"\n"
+        "TWOC\n"
+        "TAIL\n";
+    pp.push_virtual_file(content, "define_colon_obj_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    std::vector<int> locs;
+
+    while (pp.next_line(line)) {
+        if (line.empty()) {
+            continue;
+        }
+        outs.push_back(line.to_string());
+        locs.push_back(line.location().line_num());
+    }
+
+    // Expect: db 1, db 2, TAIL
+    REQUIRE(outs.size() == 3);
+    REQUIRE(outs[0] == "db 1");
+    REQUIRE(outs[1] == "db 2");
+    REQUIRE(outs[2] == "TAIL");
+
+    // First two lines must share call-site logical line number
+    REQUIRE(locs[0] == locs[1]);
+    // Third line may advance (>=) after macro expansion
+    REQUIRE(locs[2] >= locs[1]);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: object-like #define body split by '\\' expands to multiple lines",
+          "[preprocessor][define][multiline][backslash]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define TWOB db 3 \\ db 4\n"
+        "LINE 600, \"define_backslash_obj.asm\"\n"
+        "TWOB\n"
+        "ENDX\n";
+    pp.push_virtual_file(content, "define_backslash_obj_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    std::vector<int> locs;
+    while (pp.next_line(line)) {
+        if (line.empty()) {
+            continue;
+        }
+        outs.push_back(line.to_string());
+        locs.push_back(line.location().line_num());
+    }
+
+    REQUIRE(outs.size() == 3);
+    REQUIRE(outs[0] == "db 3");
+    REQUIRE(outs[1] == "db 4");
+    REQUIRE(outs[2] == "ENDX");
+    REQUIRE(locs[0] == locs[1]);
+    REQUIRE(locs[2] >= locs[1]);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: function-like #define body split by ':' expands to multiple lines",
+          "[preprocessor][define][function][multiline][colon]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define F2(a,b) db a : db b\n"
+        "LINE 700, \"define_colon_func.asm\"\n"
+        "F2(9,10)\n"
+        "AFTER\n";
+    pp.push_virtual_file(content, "define_colon_func_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    std::vector<int> locs;
+    while (pp.next_line(line)) {
+        if (line.empty()) {
+            continue;
+        }
+        outs.push_back(line.to_string());
+        locs.push_back(line.location().line_num());
+    }
+
+    REQUIRE(outs.size() == 3);
+    REQUIRE(outs[0] == "db 9");
+    REQUIRE(outs[1] == "db 10");
+    REQUIRE(outs[2] == "AFTER");
+    REQUIRE(locs[0] == locs[1]);
+    REQUIRE(locs[2] >= locs[1]);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: function-like #define body split by '\\' expands to multiple lines",
+          "[preprocessor][define][function][multiline][backslash]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define F2B(a,b) db a \\ db b\n"
+        "LINE 710, \"define_backslash_func.asm\"\n"
+        "F2B(11,12)\n"
+        "NEXT\n";
+    pp.push_virtual_file(content, "define_backslash_func_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    std::vector<int> locs;
+    while (pp.next_line(line)) {
+        if (line.empty()) {
+            continue;
+        }
+        outs.push_back(line.to_string());
+        locs.push_back(line.location().line_num());
+    }
+
+    REQUIRE(outs.size() == 3);
+    REQUIRE(outs[0] == "db 11");
+    REQUIRE(outs[1] == "db 12");
+    REQUIRE(outs[2] == "NEXT");
+    REQUIRE(locs[0] == locs[1]);
+    REQUIRE(locs[2] >= locs[1]);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: name-directive DEFINE body split by ':' expands to multiple lines",
+          "[preprocessor][define][name][multiline][colon]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "M DEFINE db 13 : db 14\n"
+        "LINE 800, \"define_colon_name.asm\"\n"
+        "M\n"
+        "TAIL\n";
+    pp.push_virtual_file(content, "define_colon_name_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    std::vector<int> locs;
+    while (pp.next_line(line)) {
+        if (line.empty()) {
+            continue;
+        }
+        outs.push_back(line.to_string());
+        locs.push_back(line.location().line_num());
+    }
+
+    REQUIRE(outs.size() == 3);
+    REQUIRE(outs[0] == "db 13");
+    REQUIRE(outs[1] == "db 14");
+    REQUIRE(outs[2] == "TAIL");
+    REQUIRE(locs[0] == locs[1]);
+    REQUIRE(locs[2] >= locs[1]);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to multiple lines",
+          "[preprocessor][define][name][multiline][backslash]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "N DEFINE db 15 \\ db 16\n"
+        "LINE 810, \"define_backslash_name.asm\"\n"
+        "N\n"
+        "DONE\n";
+    pp.push_virtual_file(content, "define_backslash_name_src", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    std::vector<int> locs;
+    while (pp.next_line(line)) {
+        if (line.empty()) {
+            continue;
+        }
+        outs.push_back(line.to_string());
+        locs.push_back(line.location().line_num());
+    }
+
+    REQUIRE(outs.size() == 3);
+    REQUIRE(outs[0] == "db 15");
+    REQUIRE(outs[1] == "db 16");
+    REQUIRE(outs[2] == "DONE");
+    REQUIRE(locs[0] == locs[1]);
+    REQUIRE(locs[2] >= locs[1]);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
