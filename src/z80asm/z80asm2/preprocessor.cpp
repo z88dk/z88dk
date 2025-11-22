@@ -32,6 +32,8 @@ void Preprocessor::clear() {
     included_once_.clear();
     current_line_chain_.reset();
     macro_fixpoint_iterations_ = 0;
+    current_params_ptr_ = nullptr;
+    current_iteration_var_.clear();
 }
 
 void Preprocessor::clear_file_cache() {
@@ -1798,9 +1800,13 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     expect_end(line, j);
 
     // Collect body lines verbatim until ENDM
+    current_params_ptr_ = &params;
     if (!collect_macro_body(body, locals, Keyword::MACRO, Keyword::ENDM)) {
+        current_params_ptr_ =
+            nullptr;    // safety reset if body collection failed early
         return;
     }
+    current_params_ptr_ = nullptr;        // reset after collection
 
     // Register the macro definition
     Macro macro;
@@ -1981,10 +1987,14 @@ void Preprocessor::do_reptc(const std::string& var_name,
     // 3) Collect body lines until ENDR, supporting nesting and LOCAL
     std::vector<TokensLine> body;
     std::vector<std::string> locals; // collect LOCALs
+    // Set iteration variable context for LOCAL collision detection
+    current_iteration_var_ = var_name;
     if (!collect_macro_body(body, locals,
                             Keyword::REPTC, Keyword::ENDR)) {
+        current_iteration_var_.clear();
         return;
     }
+    current_iteration_var_.clear();
 
     // 4) Build substituted lines for each character of iter_text
     if (iter_text.empty()) {
@@ -2101,10 +2111,13 @@ void Preprocessor::do_repti(const std::string& var_name,
     // 2) Collect body lines until matching ENDR, with nesting support (REPT/REPTC/REPTI)
     std::vector<TokensLine> body;
     std::vector<std::string> locals; // collect LOCALs
+    current_iteration_var_ = var_name;
     if (!collect_macro_body(body, locals,
                             Keyword::REPTI, Keyword::ENDR)) {
+        current_iteration_var_.clear();
         return;
     }
+    current_iteration_var_.clear();
 
     // 3) If no arguments, nothing to emit (but body consumed)
     if (flat_args.empty()) {
@@ -2285,6 +2298,28 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
         // Append parsed names, reporting duplicates across the whole body
         // (duplicates inside the same LOCAL line are already caught by parse_params_list)
         for (const auto& ln : local_names) {
+            bool duplicate = false;
+            // Check collision with previously declared LOCALs in this body
+            if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
+                duplicate = true;
+            }
+            // Check collision with MACRO parameter names
+            if (!duplicate && current_params_ptr_ &&
+                    std::find(current_params_ptr_->begin(), current_params_ptr_->end(),
+                              ln) != current_params_ptr_->end()) {
+                duplicate = true;
+            }
+            // Check collision with current iteration variable (REPTC / REPTI)
+            if (!duplicate && !current_iteration_var_.empty()
+                    && ln == current_iteration_var_) {
+                duplicate = true;
+            }
+            if (duplicate) {
+                g_errors.set_location(line.location());
+                g_errors.set_expanded_line(line.to_string());
+                g_errors.error(ErrorCode::DuplicateDefinition, ln);
+                continue; // skip adding duplicate
+            }
             if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
                 // Report and skip adding the duplicate name
                 g_errors.set_location(line.location());
