@@ -2282,9 +2282,18 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
     unsigned before = i;
     std::vector<std::string> local_names;
     if (parse_params_list(line, i, local_names)) {
-        // Append parsed names
-        out_locals.insert(out_locals.end(), local_names.begin(),
-                          local_names.end());
+        // Append parsed names, reporting duplicates across the whole body
+        // (duplicates inside the same LOCAL line are already caught by parse_params_list)
+        for (const auto& ln : local_names) {
+            if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
+                // Report and skip adding the duplicate name
+                g_errors.set_location(line.location());
+                g_errors.set_expanded_line(line.to_string());
+                g_errors.error(ErrorCode::DuplicateDefinition, ln);
+                continue;
+            }
+            out_locals.push_back(ln);
+        }
     }
     else {
         // Restore to allow "LOCAL" with no params
