@@ -169,3 +169,41 @@ TEST_CASE("Errors::error_count returns correct count", "[Errors]") {
     er.error(ErrorCode::InvalidSyntax);
     REQUIRE(er.error_count() == 2);
 }
+
+TEST_CASE("Errors shows both source and expanded lines when they differ",
+          "[Errors][lines][different]") {
+    Errors er;
+    CerrRedirect redirect;
+    er.set_location(Location("diff.asm", 5));
+    er.set_source_line("LD A, 42");
+    er.set_expanded_line("LD A,42");
+    er.error(ErrorCode::InvalidSyntax, "bad token");
+    std::string out = redirect.str();
+    // Error header
+    REQUIRE(out.find("diff.asm:5: error: Invalid syntax: bad token") !=
+            std::string::npos);
+    // Source line present
+    REQUIRE(out.find("   |LD A, 42") != std::string::npos);
+    // Expanded line present (different spacing)
+    REQUIRE(out.find("   |LD A,42") != std::string::npos);
+}
+
+TEST_CASE("Errors shows only source line when expanded line equals source",
+          "[Errors][lines][equal]") {
+    Errors er;
+    CerrRedirect redirect;
+    er.set_location(Location("same.asm", 7));
+    er.set_source_line("NOP");
+    er.set_expanded_line("NOP"); // identical
+    er.error(ErrorCode::InvalidSyntax, "unexpected");
+    std::string out = redirect.str();
+    // Header
+    REQUIRE(out.find("same.asm:7: error: Invalid syntax: unexpected") !=
+            std::string::npos);
+    // Source line appears
+    REQUIRE(out.find("   |NOP") != std::string::npos);
+    // Count occurrences of the marker line; should be exactly one
+    size_t pos = out.find("   |NOP");
+    REQUIRE(pos != std::string::npos);
+    REQUIRE(out.find("   |NOP", pos + 1) == std::string::npos);
+}

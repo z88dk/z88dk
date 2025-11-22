@@ -280,8 +280,7 @@ TokensFile::TokensFile(const std::string& filename,
     }
     catch (...) {
         // file read error
-        g_errors.error(ErrorCode::FileNotFound,
-                       "Could not read file: " + filename_);
+        g_errors.error(ErrorCode::FileNotFound, filename_);
         content.clear();
     }
 

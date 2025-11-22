@@ -196,8 +196,7 @@ TEST_CASE("Preprocessor: include with angle brackets treated as string; missing 
     const std::string msg = g_errors.last_error_message();
 
     // ensure the error is file-not-found for the included filename
-    REQUIRE(msg.find("File not found") != std::string::npos);
-    REQUIRE(msg.find("Could not read file: " + missing) != std::string::npos);
+    REQUIRE(msg.find("File not found: " + missing) != std::string::npos);
 
     // ensure we did NOT record the "Expected filename string in include directive" invalid-syntax
     REQUIRE(msg.find("Expected filename string in include directive") ==
@@ -8277,5 +8276,273 @@ TEST_CASE("Preprocessor: EXITM inside REPT inside MACRO aborts macro after first
         REQUIRE_FALSE(has888);
     }
 
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: C_LINE then REPT block keeps constant logical line number for all emitted REPT lines",
+          "[preprocessor][cline][rept][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // C_LINE fixes logical line and filename; REPT 3 should emit three X lines all at the same logical line.
+    const std::string content =
+        "C_LINE 6100, \"cline_rept.asm\"\n"
+        "REPT 3\n"
+        "X\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "cline_rept_src", 1, true);
+
+    TokensLine line;
+    int emitted = 0;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        REQUIRE(line[0].text() == "X");
+        REQUIRE(line.location().line_num() == 6100);
+        REQUIRE(line.location().filename() == "cline_rept.asm");
+        ++emitted;
+    }
+
+    REQUIRE(emitted == 3);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// Added tests: C_LINE then REPTC / REPTI blocks keep constant logical line number for all emitted lines
+
+TEST_CASE("Preprocessor: C_LINE then REPTC block keeps constant logical line number for all emitted REPTC lines",
+          "[preprocessor][cline][reptc][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "C_LINE 6201, \"cline_reptc.asm\"\n"
+        "REPTC ch, \"AZ\"\n"
+        "defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "cline_reptc_src", 1, true);
+
+    TokensLine line;
+    int emitted = 0;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        REQUIRE(line[0].text() == "defb");
+        // Expect integer token 65 for 'A' or 90 for 'Z'
+        bool has_char = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && (t.int_value() == 'A'
+                                             || t.int_value() == 'Z')) {
+                has_char = true;
+                break;
+            }
+        }
+        REQUIRE(has_char);
+        REQUIRE(line.location().line_num() == 6201);
+        REQUIRE(line.location().filename() == "cline_reptc.asm");
+        ++emitted;
+    }
+
+    REQUIRE(emitted == 2);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: C_LINE then REPTI block keeps constant logical line number for all emitted REPTI lines",
+          "[preprocessor][cline][repti][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "C_LINE 6301, \"cline_repti.asm\"\n"
+        "REPTI v, 7,8\n"
+        "db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "cline_repti_src", 1, true);
+
+    TokensLine line;
+    int emitted = 0;
+    std::vector<int> values;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        REQUIRE(line[0].text() == "db");
+        int found = -1;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                found = t.int_value();
+                break;
+            }
+        }
+        REQUIRE((found == 7 || found == 8));
+        values.push_back(found);
+        REQUIRE(line.location().line_num() == 6301);
+        REQUIRE(line.location().filename() == "cline_repti.asm");
+        ++emitted;
+    }
+
+    REQUIRE(emitted == 2);
+    REQUIRE(values == std::vector<int>({ 7, 8 }));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// Added tests: LINE then REPT / REPTC / REPTI blocks keep invocation logical line number, and following line advances appropriately.
+
+TEST_CASE("Preprocessor: LINE then REPT block emits all repeated lines at REPT invocation line number",
+          "[preprocessor][line][rept][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Physical layout:
+    // 1: LINE 100, "line_rept.asm"
+    // 2: REPT 3
+    // 3: X
+    // 4: ENDR
+    // 5: AFTER
+    //
+    // Expected logical line numbers:
+    // REPT expansion lines: 100 (constant invocation line)
+    // AFTER: 103 (100 + (physical_line(5) - physical_line(LINE) - 1) = 100 + 3)
+    const std::string content =
+        "LINE 100, \"line_rept.asm\"\n"
+        "REPT 3\n"
+        "X\n"
+        "ENDR\n"
+        "AFTER\n";
+    pp.push_virtual_file(content, "line_rept_src", 1, true);
+
+    TokensLine line;
+    int rept_emitted = 0;
+    bool saw_after = false;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        const std::string first = line[0].text();
+        if (first == "X") {
+            REQUIRE(line.location().line_num() == 100);
+            REQUIRE(line.location().filename() == "line_rept.asm");
+            ++rept_emitted;
+        }
+        else if (first == "AFTER") {
+            saw_after = true;
+            REQUIRE(line.location().line_num() == 103);
+            REQUIRE(line.location().filename() == "line_rept.asm");
+        }
+    }
+
+    REQUIRE(rept_emitted == 3);
+    REQUIRE(saw_after);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: LINE then REPTC block emits all character iterations at invocation line number",
+          "[preprocessor][line][reptc][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Physical layout:
+    // 1: LINE 200, "line_reptc.asm"
+    // 2: REPTC ch, \"AZ\"
+    // 3: defb ch
+    // 4: ENDR
+    //
+    // Expected logical line numbers for two emitted defb lines: 200 and 200.
+    const std::string content =
+        "LINE 200, \"line_reptc.asm\"\n"
+        "REPTC ch, \"AZ\"\n"
+        "defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "line_reptc_src", 1, true);
+
+    TokensLine line;
+    int emitted = 0;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        REQUIRE(line[0].text() == "defb");
+        bool hasAorZ = false;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer) && (t.int_value() == 'A'
+                                             || t.int_value() == 'Z')) {
+                hasAorZ = true;
+                break;
+            }
+        }
+        REQUIRE(hasAorZ);
+        REQUIRE(line.location().line_num() == 200);
+        REQUIRE(line.location().filename() == "line_reptc.asm");
+        ++emitted;
+    }
+    REQUIRE(emitted == 2);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: LINE then REPTI block emits all argument iterations at invocation line number",
+          "[preprocessor][line][repti][location]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Physical layout:
+    // 1: LINE 300, "line_repti.asm"
+    // 2: REPTI v, 7,8
+    // 3: db v
+    // 4: ENDR
+    //
+    // Expected logical line numbers for two emitted db lines: 300 and 300.
+    const std::string content =
+        "LINE 300, \"line_repti.asm\"\n"
+        "REPTI v, 7,8\n"
+        "db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "line_repti_src", 1, true);
+
+    TokensLine line;
+    std::vector<int> values;
+    int emitted = 0;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        REQUIRE(line[0].text() == "db");
+        int val = -1;
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                val = t.int_value();
+                break;
+            }
+        }
+        REQUIRE((val == 7 || val == 8));
+        REQUIRE(line.location().line_num() == 300);
+        REQUIRE(line.location().filename() == "line_repti.asm");
+        values.push_back(val);
+        ++emitted;
+    }
+    REQUIRE(emitted == 2);
+    REQUIRE(values == std::vector<int>({ 7, 8 }));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC inside MACRO expands characters to integers in body",
+          "[preprocessor][macro][reptc]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "MACRO EMIT()\n"
+        "REPTC ch, \"AB\"\n"
+        "db ch\n"
+        "ENDR\n"
+        "ENDM\n"
+        "EMIT()\n";
+    pp.push_virtual_file(content, "macro_reptc", 1, true);
+
+    TokensLine line;
+    std::vector<int> values;
+    while (pp.next_line(line)) {
+        REQUIRE(!line.empty());
+        REQUIRE(line[0].text() == "db");
+        // collect first integer per line
+        for (const auto& t : line.tokens()) {
+            if (t.is(TokenType::Integer)) {
+                values.push_back(t.int_value());
+                break;
+            }
+        }
+    }
+
+    REQUIRE(values.size() == 2);
+    REQUIRE(values[0] == 65); // 'A'
+    REQUIRE(values[1] == 66); // 'B'
     REQUIRE_FALSE(g_errors.has_errors());
 }
