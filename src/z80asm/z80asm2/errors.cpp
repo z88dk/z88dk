@@ -94,7 +94,7 @@ void Errors::format_error_message(ErrorCode code,
     if (!source_line_.empty()) {
         oss << "   |" << source_line_ << std::endl;
     }
-    if (!expanded_line_.empty()) {
+    if (!expanded_line_.empty() && expanded_line_ != source_line_) {
         oss << "   |" << expanded_line_ << std::endl;
     }
 
