@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cctype>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,14 @@ std::string to_lower(const std::string& s);
 std::string ltrim(const std::string& s);
 std::string rtrim(const std::string& s);
 std::string trim(const std::string& s);
+
+inline bool is_space(char c) {
+    return std::isspace(static_cast<unsigned char>(c));
+}
+
+inline bool is_ident_char(char c) {
+    return c == '_' || c == '@' || std::isalnum(static_cast<unsigned char>(c));
+}
 
 // check string ending
 bool str_ends_with(const std::string& str, const std::string& ending);

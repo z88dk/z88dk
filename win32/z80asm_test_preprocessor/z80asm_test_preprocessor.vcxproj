@@ -149,6 +149,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_codegen.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />

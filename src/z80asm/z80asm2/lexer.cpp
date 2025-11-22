@@ -9,8 +9,8 @@
 #include "utils.h"
 #include <algorithm>
 
-Token::Token(TokenType type, const std::string& text)
-    : type_(type), text_(text) {
+Token::Token(TokenType type, const std::string& text, bool has_space_after)
+    : type_(type), text_(text), has_space_after_(has_space_after) {
     switch (type) {
     case TokenType::Identifier:
         keyword_ = keyword_lookup(text);
@@ -39,20 +39,28 @@ Token::Token(TokenType type, const std::string& text)
     }
 }
 
-Token::Token(TokenType type, const std::string& text, int value)
-    : type_(type), text_(text), int_value_(value) {
+Token::Token(TokenType type, const std::string& text,
+             int value, bool has_space_after)
+    : type_(type), text_(text)
+    , int_value_(value), has_space_after_(has_space_after) {
 }
 
-Token::Token(TokenType type, const std::string& text, double value)
-    : type_(type), text_(text), float_value_(value) {
+Token::Token(TokenType type, const std::string& text,
+             double value, bool has_space_after)
+    : type_(type), text_(text)
+    , float_value_(value), has_space_after_(has_space_after) {
 }
 
-Token::Token(TokenType type, const std::string& text, std::string value)
-    : type_(type), text_(text), string_value_(value) {
+Token::Token(TokenType type, const std::string& text,
+             std::string value, bool has_space_after)
+    : type_(type), text_(text)
+    , string_value_(value), has_space_after_(has_space_after) {
 }
 
-Token::Token(TokenType type, const std::string& text, Keyword keyword)
-    : type_(type), text_(text), keyword_(keyword) {
+Token::Token(TokenType type, const std::string& text,
+             Keyword keyword, bool has_space_after)
+    : type_(type), text_(text)
+    , keyword_(keyword), has_space_after_(has_space_after) {
 }
 
 bool Token::is(TokenType t) const {
@@ -94,6 +102,10 @@ const std::string& Token::string_value() const {
 
 Keyword Token::keyword() const {
     return keyword_;
+}
+
+bool Token::has_space_after() const {
+    return has_space_after_;
 }
 
 //-----------------------------------------------------------------------------
@@ -146,7 +158,7 @@ const Token& TokensLine::back() const {
 
 const Token& TokensLine::operator[](unsigned index) const {
     if (index >= tokens_.size()) {
-        static Token empty_token(TokenType::EndOfFile, "");
+        static Token empty_token(TokenType::EndOfLine, "", false);
         return empty_token;
     }
     else {
@@ -177,32 +189,34 @@ std::string TokensLine::to_string() const {
     };
 
     auto is_idnum = [](TokenType t) {
-        return t == TokenType::Identifier || t == TokenType::Integer
-               || t == TokenType::Float;
+        return t == TokenType::Identifier || t == TokenType::Integer ||
+               t == TokenType::Float;
+    };
+
+    auto is_prefix = [](TokenType t) {
+        return t == TokenType::Dollar || t == TokenType::Modulus ||
+               t == TokenType::At;
     };
 
     for (unsigned i = 0; i < tokens_.size(); ++i) {
         const auto& tok = tokens_[i];
+        char last_char = out.empty() ? ' ' : out.back();
 
-        // If this is not the first token, consider inserting a separator space.
-        if (!out.empty()) {
+        if (i > 0 && last_char != ' ') {
             const auto& prev = tokens_[i - 1];
 
             bool need_space = false;
-
-            // If either token is explicit whitespace, just concatenate token.text() (whitespace preserved).
-            if (!prev.is(TokenType::Whitespace) && !tok.is(TokenType::Whitespace)) {
-                // Insert space between identifier/number-like tokens to avoid e.g. "foo123" -> "foo 123"
-                if (is_idnum(prev.type()) && is_idnum(tok.type())) {
+            if (is_idnum(prev.type()) && is_idnum(tok.type())) {
+                need_space = true;
+            }
+            else if (is_prefix(prev.type()) && is_idnum(tok.type())) {
+                need_space = true;
+            }
+            else {
+                std::string concat = prev.text() + tok.text();
+                if (std::find(problematic.begin(), problematic.end(),
+                              concat) != problematic.end()) {
                     need_space = true;
-                }
-                else {
-                    // If concatenation of texts would form a problematic multi-char operator, insert space.
-                    std::string concat = prev.text() + tok.text();
-                    if (std::find(problematic.begin(), problematic.end(),
-                                  concat) != problematic.end()) {
-                        need_space = true;
-                    }
                 }
             }
 
@@ -212,9 +226,6 @@ std::string TokensLine::to_string() const {
         }
 
         switch (tok.type()) {
-        case TokenType::Whitespace:
-            out += " ";
-            break;
         case TokenType::Integer:
             out += std::to_string(tok.int_value());
             break;
@@ -222,36 +233,18 @@ std::string TokensLine::to_string() const {
             out += tok.text();
             break;
         }
+
+        last_char = out.empty() ? ' ' : out.back();
+        if (last_char != ' ' && tok.has_space_after()) {
+            out += ' ';
+        }
     }
 
-    return out;
+    return trim(out);
 }
 
-void TokensLine::skip_spaces(unsigned& i) const {
-    while (i < size() && tokens_[i].is(TokenType::Whitespace)) {
-        ++i;
-    }
-}
-
-bool TokensLine::at_end(unsigned& i) const {
-    skip_spaces(i);
+bool TokensLine::at_end(unsigned i) const {
     return i >= size();
-}
-
-bool TokensLine::trim() {
-    bool changed = false;
-    // Remove leading whitespace
-    while (!tokens_.empty() && tokens_.front().is(TokenType::Whitespace)) {
-        tokens_.erase(tokens_.begin());
-        changed = true;
-    }
-
-    // Remove trailing whitespace
-    while (!tokens_.empty() && tokens_.back().is(TokenType::Whitespace)) {
-        tokens_.pop_back();
-        changed = true;
-    }
-    return changed;
 }
 
 void TokensLine::reserve(size_t capacity) {
@@ -303,8 +296,6 @@ TokensFile::TokensFile(const std::vector<TokensLine>& tok_lines,
       first_line_num_(first_line_num),
       inc_line_nums_(inc_line_nums),
       tok_lines_(tok_lines) {
-    // Do not alter token/locations; caller (Preprocessor) may override via forced location.
-    // text_lines_ intentionally left empty.
 }
 
 void TokensFile::clear() {
@@ -428,10 +419,8 @@ void TokensFile::tokenize(const std::string& content) {
         // and multi-line comments
         TokensLine tok_line(location);
         tokenize_line(i, tok_line);
-        tok_line.trim();
         if (!tok_line.empty()) {
             tok_lines_.push_back(std::move(tok_line));
         }
     }
 }
-

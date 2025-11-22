@@ -19,20 +19,22 @@
 #define PUSH_TOKEN1(type) \
     do { \
         str = std::string(tok, p); \
-        Token t(type, str); \
+        bool has_space_after = (p < pe) && is_space(*p); \
+        Token t(type, str, has_space_after); \
         output.push_back(t); \
     } while (0)
 
 #define PUSH_TOKEN2(type, arg) \
     do { \
         str = std::string(tok, p); \
-        Token t(type, str, arg); \
+        bool has_space_after = (p < pe) && is_space(*p); \
+        Token t(type, str, arg, has_space_after); \
         output.push_back(t); \
     } while (0)
 
 #define CHECK_TRAILING_CHAR() \
     do { \
-        if (p < pe && is_ident(*p)) { \
+        if (p < pe && is_ident_char(*p)) { \
             g_errors.error(ErrorCode::InvalidSyntax, \
                     "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p + 1) + "'"); \
             output.clear(); \
@@ -41,11 +43,6 @@
     } while (0)
 
 #define YYFILL() 1
-
-static bool is_ident(char c) {
-    return (std::isalnum(static_cast<unsigned char>(c)) ||
-            c == '_' || c == '@');
-}
 
 static void swap_x_y(std::string& str) {
     // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
@@ -293,7 +290,6 @@ yyFillLabel1:
                 goto yy3;
             }
 yy3: {
-                PUSH_TOKEN1(TokenType::Whitespace);
                 continue;
             }
 yy4:
@@ -552,7 +548,6 @@ yyFillLabel10:
             }
 yy28: {
                 CHECK_TRAILING_CHAR();
-                // decimal: allow underscores, optional 'd' suffix
                 std::string digits = std::string(tok, p);
                 if (!digits.empty() && (digits.back() == 'd' || digits.back() == 'D')) {
                     digits.pop_back();
@@ -672,7 +667,7 @@ yy32:
 yy33:
             ++p;
             {
-                goto eof;
+                goto eol;
             }
 yy34:
             ++p;
@@ -937,6 +932,14 @@ yy44: {
                     output.pop_back();       // remove '.'
                 }
 
+                // check for ASMPC
+                if (keyword == Keyword::ASMPC) {
+                    bool has_space_after = (p < pe) && is_space(*p);
+                    Token t(TokenType::ASMPC, str, keyword, has_space_after);
+                    output.push_back(t);
+                    continue;
+                }
+
                 // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
                 switch (keyword) {
                 case Keyword::INCLUDE:
@@ -950,7 +953,8 @@ yy44: {
                     ;
                 }
 
-                Token t(TokenType::Identifier, str, keyword);
+                bool has_space_after = (p < pe) && is_space(*p);
+                Token t(TokenType::Identifier, str, keyword, has_space_after);
                 output.push_back(t);
                 continue;
             }
@@ -964,14 +968,11 @@ yy46:
             ++p;
             {
                 const char* q = p;
-                while (*q && isspace(static_cast<unsigned char>(*q))) {
+                while (q < pe && is_space(*q)) {
                     ++q;
                 }
-                if (*q == '\0') {
+                if (q >= pe) {
                     // line continuation
-                    Token t(TokenType::Whitespace, " ");
-                    output.push_back(t);
-
                     ++line_index;
                     if (line_index >= line_count()) {
                         return;
@@ -1101,7 +1102,6 @@ yyFillLabel20:
             }
 yy58: {
                 CHECK_TRAILING_CHAR();
-                // hex with '$' prefix
                 std::string digits = std::string(tok + 1, p);
                 int value = 0;
                 if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -1177,7 +1177,6 @@ yyFillLabel22:
             }
 yy62: {
                 CHECK_TRAILING_CHAR();
-                // binary with '%' or '@' prefix
                 std::string digits = std::string(tok + 1, p);
                 int value = 0;
                 if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -1235,7 +1234,6 @@ yy66:
             }
 yy67: {
                 CHECK_TRAILING_CHAR();
-                // floats: allow underscores in integer, fractional and exponent parts
                 std::string digits = std::string(tok, p);
                 double value = 0.0;
                 if (!parse_float_from_chars(digits, value)) {
@@ -1255,7 +1253,7 @@ yy68:
 yy69:
             ++p;
             {
-                goto eof;
+                goto eol;
             }
 yy70:
             yyaccept = 6;
@@ -1358,7 +1356,6 @@ yyFillLabel26:
             }
 yy73: {
                 CHECK_TRAILING_CHAR();
-                // binary with trailing 'b'
                 std::string digits = std::string(tok, p - 1);
                 int value = 0;
                 if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -1417,7 +1414,6 @@ yy75:
             ++p;
             {
                 CHECK_TRAILING_CHAR();
-                // hex with trailing 'h' (first char must be dec digit, then hex; underscores allowed)
                 std::string digits = std::string(tok, p - 1);
                 int value = 0;
                 if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -1982,7 +1978,6 @@ yy97:
             }
 yy98: {
                 CHECK_TRAILING_CHAR();
-                // binary with '0b' prefix
                 std::string digits = std::string(tok + 2, p);
                 int value = 0;
                 if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -2036,7 +2031,6 @@ yyFillLabel40:
             }
 yy100: {
                 CHECK_TRAILING_CHAR();
-                // hex with '0x' prefix
                 std::string digits = std::string(tok + 2, p);
                 int value = 0;
                 if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -2204,14 +2198,14 @@ yyFillLabel45:
                 goto yy60;
             }
 yy106: {
-                goto eof;
+                goto eol;
             }
         }
 
     }
 
     // end of input line
-eof:
+eol:
     return;
 
     // find end of c-comment, possibly reading more lines
@@ -2220,8 +2214,6 @@ c_comment:
         while (p < pe) {
             if (*p == '*' && (p + 1) < pe && *(p + 1) == '/') {
                 p += 2;
-                Token t(TokenType::Whitespace, " ");
-                output.push_back(t);
                 goto main_loop;
             }
             ++p;
@@ -2290,7 +2282,8 @@ yy111:
             {
                 if (end_quote == '"') {
                     str = std::string(string_start, p);
-                    Token t(TokenType::String, str, str_content);
+                    bool has_space_after = (p < pe) && is_space(*p);
+                    Token t(TokenType::String, str, str_content, has_space_after);
                     output.push_back(t);
                     goto main_loop;
                 }
@@ -2311,7 +2304,9 @@ yy112:
                     }
                     else {
                         str = std::string(string_start, p);
-                        Token t(TokenType::Integer, str, str_content[0]);
+                        bool has_space_after = (p < pe) && is_space(*p);
+                        Token t(TokenType::Integer, str, str_content[0],
+                                has_space_after);
                         output.push_back(t);
                         goto main_loop;
                     }
@@ -2326,7 +2321,8 @@ yy113:
             {
                 if (end_quote == '>') {
                     str = std::string(string_start, p);
-                    Token t(TokenType::String, str, str_content);
+                    bool has_space_after = (p < pe) && is_space(*p);
+                    Token t(TokenType::String, str, str_content, has_space_after);
                     output.push_back(t);
                     goto main_loop;
                 }

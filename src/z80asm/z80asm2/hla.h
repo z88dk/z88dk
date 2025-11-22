@@ -7,27 +7,25 @@
 #pragma once
 
 #include "hla_codegen.h"
-#include "preprocessor.h"
 #include <deque>
 #include <string>
 #include <vector>
 
+class Preprocessor;
+
 class HLA {
 public:
+    HLA(Preprocessor* pp);
     void clear();
-    void push_file(const std::string& filename);
-    void push_virtual_file(const std::string& content,
-                           const std::string& filename,
-                           int first_line_num, bool inc_line_nums);
     bool next_line(TokensLine& out_line);
 
 private:
-    Preprocessor preprocessor_;
+    Preprocessor* pp_ = nullptr;
     std::deque<TokensLine> out_queue_;
     std::vector<hla::Block> block_stack_;
     unsigned label_counter_ = 0;
 
-    bool next_cleaned_line(TokensLine& out_line);
+    bool next_pp_line(TokensLine& out_line);
     void process_if(const TokensLine& line, unsigned& i);
     void process_elif(const TokensLine& line, unsigned& i);
     void process_else(const TokensLine& line, unsigned& i);

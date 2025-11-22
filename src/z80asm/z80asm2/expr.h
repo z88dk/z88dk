@@ -46,13 +46,13 @@ private:
     struct RPNItem {
         enum Kind { Value, Op, Symbol } kind = Kind::Value;
         int value = 0;                      // valid if kind == Value
-        TokenType op = TokenType::EndOfFile;// valid if kind == Op
+        TokenType op = TokenType::EndOfLine;// valid if kind == Op
         bool unary = false;                 // valid if kind == Op
         std::string name;                   // valid if kind == Symbol
     };
 
     struct RPNOp {
-        TokenType op = TokenType::EndOfFile;
+        TokenType op = TokenType::EndOfLine;
         bool unary = false;
     };
 

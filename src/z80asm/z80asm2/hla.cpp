@@ -9,27 +9,20 @@
 #include "hla_codegen.h"
 #include "hla_parser.h"
 #include "keywords.h"
+#include "preprocessor.h"
 
 static Token kw_tok(Keyword k) {
-    return Token(TokenType::Identifier, keyword_to_string(k), k);
+    return Token(TokenType::Identifier, keyword_to_string(k), k, false);
+}
+
+HLA::HLA(Preprocessor* pp)
+    : pp_(pp) {
 }
 
 void HLA::clear() {
-    preprocessor_.clear();
     out_queue_.clear();
     block_stack_.clear();
     label_counter_ = 0;
-}
-
-void HLA::push_file(const std::string& filename) {
-    preprocessor_.push_file(filename);
-}
-
-void HLA::push_virtual_file(const std::string& content,
-                            const std::string& filename,
-                            int first_line_num, bool inc_line_nums) {
-    preprocessor_.push_virtual_file(content, filename, first_line_num,
-                                    inc_line_nums);
 }
 
 bool HLA::next_line(TokensLine& out_line) {
@@ -43,7 +36,7 @@ bool HLA::next_line(TokensLine& out_line) {
 
         // 2) Otherwise, read next cleaned line from the preprocessor.
         TokensLine line;
-        if (!next_cleaned_line(line)) {
+        if (!next_pp_line(line)) {
             // No more input. check for unclosed blocks.
             if (!block_stack_.empty()) {
                 const hla::Block& top_blk = block_stack_.back();
@@ -113,20 +106,8 @@ bool HLA::next_line(TokensLine& out_line) {
     }
 }
 
-bool HLA::next_cleaned_line(TokensLine& out_line) {
-    if (preprocessor_.next_line(out_line)) {
-        // remove whitespace tokens
-        TokensLine cleaned_line(out_line.location());
-        cleaned_line.reserve(out_line.size());
-        for (const auto& t : out_line.tokens()) {
-            if (!t.is(TokenType::Whitespace)) {
-                cleaned_line.push_back(t);
-            }
-        }
-        out_line = std::move(cleaned_line);
-        return true;
-    }
-    return false;
+bool HLA::next_pp_line(TokensLine& out_line) {
+    return pp_ && pp_->next_line_pp(out_line);
 }
 
 void HLA::process_if(const TokensLine& line, unsigned& i) {
@@ -193,7 +174,7 @@ void HLA::process_elif(const TokensLine& line, unsigned& i) {
             // Emit: JP end_label
             TokensLine jp(line.location());
             jp.push_back(kw_tok(Keyword::JP));
-            jp.push_back(Token(TokenType::Identifier, blk.end_label));
+            jp.push_back(Token(TokenType::Identifier, blk.end_label, false));
             out_queue_.push_back(std::move(jp));
 
             // Place: .else_label
@@ -248,7 +229,7 @@ void HLA::process_else(const TokensLine& line, unsigned& i) {
     {
         TokensLine jp(line.location());
         jp.push_back(kw_tok(Keyword::JP));
-        jp.push_back(Token(TokenType::Identifier, blk.end_label));
+        jp.push_back(Token(TokenType::Identifier, blk.end_label, false));
         out_queue_.push_back(std::move(jp));
 
         // Place: .else_label
@@ -347,7 +328,7 @@ void HLA::process_wend(const TokensLine& line, unsigned& i) {
     {
         TokensLine jp(line.location());
         jp.push_back(kw_tok(Keyword::JP));
-        jp.push_back(Token(TokenType::Identifier, blk.top_label));
+        jp.push_back(Token(TokenType::Identifier, blk.top_label, false));
         out_queue_.push_back(std::move(jp));
     }
 
@@ -443,8 +424,8 @@ void HLA::process_untilb(const TokensLine& line, unsigned& i) {
         TokensLine jp(line.location());
         jp.push_back(kw_tok(Keyword::JP));
         jp.push_back(kw_tok(Keyword::NZ));
-        jp.push_back(Token(TokenType::Comma, ","));
-        jp.push_back(Token(TokenType::Identifier, blk.top_label));
+        jp.push_back(Token(TokenType::Comma, ",", false));
+        jp.push_back(Token(TokenType::Identifier, blk.top_label, false));
         out_queue_.push_back(std::move(jp));
     }
 
@@ -482,7 +463,7 @@ void HLA::process_untilbc(const TokensLine& line, unsigned& i) {
         TokensLine t(line.location());
         t.push_back(kw_tok(Keyword::LD));
         t.push_back(kw_tok(Keyword::A));
-        t.push_back(Token(TokenType::Comma, ","));
+        t.push_back(Token(TokenType::Comma, ",", false));
         t.push_back(kw_tok(Keyword::B));
         out_queue_.push_back(std::move(t));
     }
@@ -498,8 +479,8 @@ void HLA::process_untilbc(const TokensLine& line, unsigned& i) {
         TokensLine t(line.location());
         t.push_back(kw_tok(Keyword::JP));
         t.push_back(kw_tok(Keyword::NZ));
-        t.push_back(Token(TokenType::Comma, ","));
-        t.push_back(Token(TokenType::Identifier, blk.top_label));
+        t.push_back(Token(TokenType::Comma, ",", false));
+        t.push_back(Token(TokenType::Identifier, blk.top_label, false));
         out_queue_.push_back(std::move(t));
     }
 
@@ -523,7 +504,7 @@ void HLA::process_break(const TokensLine& line, unsigned& i) {
     if (i >= line.size()) {
         TokensLine jp(line.location());
         jp.push_back(kw_tok(Keyword::JP));
-        jp.push_back(Token(TokenType::Identifier, blk.end_label));
+        jp.push_back(Token(TokenType::Identifier, blk.end_label, false));
         out_queue_.push_back(std::move(jp));
         return;
     }
@@ -575,7 +556,7 @@ void HLA::process_continue(const TokensLine& line, unsigned& i) {
     if (i >= line.size()) {
         TokensLine jp(line.location());
         jp.push_back(kw_tok(Keyword::JP));
-        jp.push_back(Token(TokenType::Identifier, blk.top_label));
+        jp.push_back(Token(TokenType::Identifier, blk.top_label, false));
         out_queue_.push_back(std::move(jp));
         return;
     }

@@ -39,7 +39,6 @@ bool Expr::parse(const TokensLine& line, unsigned& i) {
     line_.set_location(line.location());
 
     unsigned start = i;
-    line.skip_spaces(i);
     std::vector<RPNItem> items;
     bool ok = try_parse(line, i, items);
     if (!ok) {
@@ -259,7 +258,7 @@ std::string Expr::to_string() const {
     for (auto& t : line_.tokens()) {
         out += t.text();
     }
-    return trim(out);
+    return out;
 }
 
 // return precedence for given token type and unary flag
@@ -361,7 +360,6 @@ bool Expr::is_operator_token(TokenType tt) {
 // Sequence lookahead: allow chains of unary ops before a real operand
 bool Expr::can_start_operand_sequence(const TokensLine& line, unsigned j) {
     const unsigned size = line.size();
-    line.skip_spaces(j);
     if (j >= size) {
         return false;
     }
@@ -372,7 +370,6 @@ bool Expr::can_start_operand_sequence(const TokensLine& line, unsigned j) {
         if (t == TokenType::Plus || t == TokenType::Minus ||
                 t == TokenType::BitwiseNot || t == TokenType::LogicalNot) {
             ++j;
-            line.skip_spaces(j);
             continue;
         }
         break;
@@ -411,7 +408,6 @@ bool Expr::try_parse(const TokensLine& line, unsigned& i,
     bool any_token_consumed = false;
 
     while (i < size) {
-        line.skip_spaces(i);
         if (i >= size) {
             break;
         }
@@ -497,7 +493,6 @@ bool Expr::try_parse(const TokensLine& line, unsigned& i,
                 return false;
             }
 
-            line.skip_spaces(i);
             if (i >= size || line[i].type() != TokenType::Colon) {
                 if (!silent_) {
                     g_errors.error(ErrorCode::InvalidSyntax, "Expected ':'");
