@@ -11,7 +11,7 @@
     EXTERN  cpygraph
     EXTERN  pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     PUBLIC  bkrestore
     PUBLIC  _bkrestore

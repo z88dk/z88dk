@@ -45,6 +45,9 @@ ENDIF
 
     INCLUDE	"target/sam/def/sam.def"
 
+    PUBLIC IO_SAA1099_DATA_PORT
+    PUBLIC IO_SAA1099_ADDRESS_PORT
+
 IF (!DEFINED_startup || (startup=1))
     INCLUDE "target/sam/classic/basic.asm"
 ELIF (startup=2)

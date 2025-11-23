@@ -6,7 +6,7 @@ target/cpm/stdio/obj/${TYPE}/stdpun_dev
 target/cpm/stdio/obj/${TYPE}/stdrdr_dev
 target/cpm/stdio/obj/${TYPE}/stdlst_dev
 target/cpm/cpm/obj/${TYPE}/__bdos
-@stdio/stdio_binary.lst
+@classic/stdio/stdio_binary.lst
 
 target/cpm/time/obj/${TYPE}/clock
 target/cpm/time/obj/${TYPE}/time

@@ -16,7 +16,7 @@
     EXTERN  __gfx_vram_page_in
 			;EXTERN	base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 cleargraphics:

@@ -13,7 +13,7 @@
     PUBLIC  fill
     PUBLIC  _fill
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  msxextrom
 

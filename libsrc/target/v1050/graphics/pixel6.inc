@@ -12,7 +12,7 @@
 ;
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  div3
     EXTERN  __gfx_coords

@@ -1,7 +1,7 @@
 # ZX SPECTRUM BIFROST*2 DEMO
 [Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)  
-[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/bifrost2)  
-[Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/bifrost2.h)
+[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/target/zx/bifrost2)  
+[Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/clang/arch/zx/bifrost2.h)
 
 Before using Bifrost*2, it should be configured.
 

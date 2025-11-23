@@ -8,7 +8,7 @@
     EXTERN  __mbc_line
 ;    EXTERN  __mbc_pixel
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 undraw_callee:
 _undraw_callee:

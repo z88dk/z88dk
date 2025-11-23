@@ -3,5 +3,5 @@ target/rc700/time/clock
 target/rc700/graphics/textpixl6
 target/rc700/graphics/clsgraph
 target/rc700/graphics/swapgfxbk
-@gfx/text6/gfx_text6.lst
-@games/games.lst
+@classic/gfx/text6/gfx_text6.lst
+@classic/games/games.lst

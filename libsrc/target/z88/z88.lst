@@ -1,5 +1,5 @@
 target/z88/stdio/fgets_cons
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/z88/stdio/ansi/f_ansi_attr
 target/z88/stdio/ansi/f_ansi_bel
 target/z88/stdio/ansi/f_ansi_char
@@ -10,8 +10,8 @@ target/z88/stdio/fgetc_cons
 target/z88/stdio/fputc_cons
 target/z88/stdio/getcmd
 target/z88/stdio/getk
-@stdio/stdio.lst
-@stdio/stdio_net.lst
+@classic/stdio/stdio.lst
+@classic/stdio/stdio_net.lst
 target/z88/fcntl/fdgetpos
 target/z88/fcntl/fdtell
 target/z88/fcntl/rename
@@ -46,7 +46,7 @@ target/z88/games/bit_open_di
 target/z88/games/bit_close
 target/z88/games/bit_close_ei
 target/z88/games/beeper
-@games/games.lst
+@classic/games/games.lst
 target/z88/rs232/rs232_close
 target/z88/rs232/rs232_get
 target/z88/rs232/rs232_init
@@ -81,8 +81,8 @@ target/z88/graphics/clrarea
 target/z88/graphics/pixladdr
 target/z88/graphics/swapgfxbk
 target/z88/graphics/window
-@gfx/narrow/gfx_narrow.lst
-@input/input_keyboard.lst
+@classic/gfx/narrow/gfx_narrow.lst
+@classic/input/input_keyboard.lst
 target/z88/input/in_Pause
 target/z88/input/in_WaitForKey
 target/z88/input/in_WaitForNoKey

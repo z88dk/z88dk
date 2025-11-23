@@ -60,4 +60,4 @@ j_done:
     ret
 
 j_qaop:
-    INCLUDE "games/joystick_qaop.as1"
+    INCLUDE "classic/games/joystick_qaop.as1"

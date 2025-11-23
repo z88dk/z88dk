@@ -4,15 +4,15 @@ target/pmd85/stdio/conio_map_colour
 target/pmd85/stdio/generic_console
 target/pmd85/stdio/generic_console_vpeek
 target/pmd85/stdio/generic_console_ioctl
-@stdio/stdio.lst
-stdio/obj/${TYPE}/inkey/getk
-stdio/obj/${TYPE}/inkey/fgetc_cons
+@classic/stdio/stdio.lst
+classic/stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 
 target/pmd85/games/joystick
 target/pmd85/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 target/pmd85/graphics/clg
 target/pmd85/graphics/w_pixladdr
 target/pmd85/graphics/w_plotpixl
@@ -20,6 +20,6 @@ target/pmd85/graphics/w_respixl
 target/pmd85/graphics/w_xorpixl
 target/pmd85/graphics/w_pointxy
 target/pmd85/graphics/__set_graphics_colour
-@gfx/portable/gfx_portable_w.lst
-@gfx/wide/gfx_wide.lst
+@classic/gfx/portable/gfx_portable_w.lst
+@classic/gfx/wide/gfx_wide.lst
 

@@ -1,4 +1,4 @@
 target/nanos/stdio/generic_console
-@games/games.lst
+@classic/games/games.lst
 target/nanos/graphics/textpixl2
-@gfx/gencon/gfx_gencon2.lst
+@classic/gfx/gencon/gfx_gencon2.lst

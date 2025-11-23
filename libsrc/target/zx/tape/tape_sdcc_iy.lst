@@ -1,0 +1,7 @@
+@target/zx/tape/tape_asm.lst
+target/zx/tape/c/sdcc_iy/zx_tape_load_block
+target/zx/tape/c/sdcc_iy/zx_tape_load_block_callee
+target/zx/tape/c/sdcc_iy/zx_tape_save_block
+target/zx/tape/c/sdcc_iy/zx_tape_save_block_callee
+target/zx/tape/c/sdcc_iy/zx_tape_verify_block
+target/zx/tape/c/sdcc_iy/zx_tape_verify_block_callee

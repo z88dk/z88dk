@@ -7,9 +7,9 @@ target/c128/graphics/w_xorpixl
 target/c128/graphics/w_putsprite
 target/c128/graphics/w_pointxy
 target/c128/graphics/w_stencil_render
-gfx/wide/obj/${TARGET}/w_dcircle_square
-gfx/common/obj/${TARGET}/draw_profile_nostencil
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+classic/gfx/common/obj/${TARGET}/draw_profile_nostencil
 target/c128/graphics/w_clga_callee
 target/c128/graphics/w_xorclga_callee
 target/c128/graphics/w_fillb_callee
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst

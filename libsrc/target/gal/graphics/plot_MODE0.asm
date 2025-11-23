@@ -12,4 +12,4 @@ plot_MODE0:
     ret     nc
 
     defc    NEEDplot=1
-    INCLUDE "gfx/gencon/pixel6.inc"
+    INCLUDE "classic/gfx/gencon/pixel6.inc"

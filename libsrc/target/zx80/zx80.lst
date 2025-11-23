@@ -5,14 +5,14 @@ target/zx80/stdio/zx80_decode_keys
 target/zx81/stdio/fputc_cons
 target/zx81/stdio/generic_console
 target/zx80/stdlib/obj/zx80/sleep
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/zx81/stdio/ansi_text/f_ansi_bel
 target/zx81/stdio/ansi_text/f_ansi_attr
 target/zx81/stdio/ansi_text/f_ansi_char
 target/zx81/stdio/ansi_text/f_ansi_cls
 target/zx81/stdio/ansi_text/f_ansi_dline
 target/zx81/stdio/ansi_text/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/zx81/time/clock
 target/zx81/graphics/clsgraph
 target/zx81/graphics/scrollup_4px
@@ -22,11 +22,11 @@ target/zx80/graphics/plotpixl
 target/zx80/graphics/respixl
 target/zx80/graphics/xorpixl
 target/zx80/graphics/pointxy
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @target/zx81/arch_zx81.lst
 target/zx81/psg/set_psg
 target/zx81/psg/set_psg_callee
 target/zx81/psg/get_psg
 target/zx81/psg/psg_init
-@psg/ay/psg.lst
+sound/ay/obj/${TYPE}/**/*.o
 

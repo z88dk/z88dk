@@ -1,0 +1,3 @@
+classic/video/tms9918/obj/${TARGET}/*
+classic/video/tms9918/stdio/**/obj/${TARGET}/*
+classic/video/tms9918/graphics/obj/${TARGET}/*

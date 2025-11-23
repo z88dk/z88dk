@@ -20,7 +20,7 @@
     EXTERN  __gfx_coords
     EXTERN  pix_return
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 respixel:

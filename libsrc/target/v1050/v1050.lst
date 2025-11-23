@@ -10,7 +10,7 @@ target/v1050/stdio/ansi/f_ansi_char
 target/v1050/stdio/ansi/f_ansi_cls
 target/v1050/stdio/ansi/f_ansi_dline
 target/v1050/stdio/ansi/f_ansi_scrollup
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/v1050/graphics/v1050_sendchar
 target/v1050/graphics/__v1050_coord
 target/v1050/graphics/__v1050_pixel
@@ -28,5 +28,5 @@ target/v1050/graphics/w_drawto_callee
 target/v1050/graphics/w_undrawto_callee
 target/v1050/graphics/w_xordrawto_callee
 target/v1050/graphics/clg
-@gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst

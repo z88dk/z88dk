@@ -50,6 +50,10 @@ ENDIF
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
 
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $06
+    PUBLIC  __IO_SN76489_LATCH_PORT
+    defc    __IO_SN76489_LATCH_PORT = $03
 
 IF !DEFINED_CLIB_RS232_PORT_B
     IF !DEFINED_CLIB_RS232_PORT_A

@@ -51,9 +51,9 @@ jobs:
         copy /y win32-latest\z88dk\lib\clibs\*.lib lib\clibs\
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sccz80\*.lib libsrc\_DEVELOPMENT\lib\sccz80\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_ix\*.lib libsrc\_DEVELOPMENT\lib\sdcc_ix\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_iy\*.lib libsrc\_DEVELOPMENT\lib\sdcc_iy\
+        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
+        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_iy\*.lib libsrc\newlib\lib\sdcc_iy\
     - name: Run z80asm tests
       run: |
         cd src\z80asm

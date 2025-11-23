@@ -8,7 +8,7 @@
     EXTERN  __v1050_line
 ;    EXTERN  __v1050_pixel
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 xordraw_callee:
 _xordraw_callee:

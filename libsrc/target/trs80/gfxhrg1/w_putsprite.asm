@@ -17,7 +17,7 @@
     PUBLIC  putsprite
     PUBLIC  _putsprite
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  div3_192
 

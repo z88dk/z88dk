@@ -2,7 +2,7 @@
     EXTERN  w_pixeladdress_640
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __smc777_paper16
     EXTERN  __smc777_ink16

@@ -13,7 +13,7 @@ EXTERN  asm_toupper
 
 INCLUDE "target/hector/def/hector1.def"
 
-INCLUDE "graphics/grafix.inc"
+INCLUDE "classic/gfx/grafix.inc"
 
 fputc_cons_native:
 _fputc_cons_native:

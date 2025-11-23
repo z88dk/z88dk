@@ -36,7 +36,7 @@
   ENDIF
 
   IF    FORsvi
-    INCLUDE "video/tms9918/vdp.inc"
+    INCLUDE "classic/video/tms9918/vdp.inc"
     INCLUDE "target/svi/def/svibios.def"
     INCLUDE "target/svi/def/svibasic.def"
   ENDIF

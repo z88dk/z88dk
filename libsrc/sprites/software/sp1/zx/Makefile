@@ -2,20 +2,20 @@ include ../../../../Make.config
 
 TARGET ?= zx
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/temp/sp1/zx/c/sccz80/*.asm" \
-	"$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/asm*.asm"  \
-	"$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/_sp*.asm"  \
-	"$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/__sp1_*_spr_char.asm" \
-	"$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/draw/*.asm" \
-	"$(NEWLIB_DIRECTORY)/temp/sp1/zx/tiles/*.asm" \
-	"$(NEWLIB_DIRECTORY)/temp/sp1/zx/updater/*.asm"
-NEWLIBGLOBS_ex := $(NEWLIB_DIRECTORY)/temp/sp1/zx/c/sccz80/*.asm \
-	$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/asm*.asm \
-	$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/_sp*.asm \
-	$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/__sp1_*_spr_char.asm \
-	$(NEWLIB_DIRECTORY)/temp/sp1/zx/sprites/draw/*.asm \
-	$(NEWLIB_DIRECTORY)/temp/sp1/zx/tiles/*.asm \
-	$(NEWLIB_DIRECTORY)/temp/sp1/zx/updater/*.asm
+NEWLIBGLOBS := "$(Z88DK_LIBSRC)/temp/sp1/zx/c/sccz80/*.asm" \
+	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/asm*.asm"  \
+	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/_sp*.asm"  \
+	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/__sp1_*_spr_char.asm" \
+	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/draw/*.asm" \
+	"$(Z88DK_LIBSRC)/temp/sp1/zx/tiles/*.asm" \
+	"$(Z88DK_LIBSRC)/temp/sp1/zx/updater/*.asm"
+NEWLIBGLOBS_ex := $(Z88DK_LIBSRC)/temp/sp1/zx/c/sccz80/*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/asm*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/_sp*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/__sp1_*_spr_char.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/draw/*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/tiles/*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/updater/*.asm
 
 NEWLIB_TARGETS := newlib-z80
 
@@ -32,7 +32,7 @@ sp1-zx.lib: obj/newlib-z80
 	$(Q)$(ASSEMBLER) -xsp1-zx "obj/z80/**/*.o"
 
 obj/newlib-z80: $(NEWLIBGLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/z80/x -I. -I$(NEWLIB_DIRECTORY) -mz80 -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/z80/x -I. -I$(Z88DK_LIBSRC) -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 	@touch $@
 
 

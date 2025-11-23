@@ -1,25 +1,24 @@
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 target/pc6001/stdio/fgetc_cons
 target/pc6001/stdio/getk
 target/pc6001/stdio/fputc_cons
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/pc6001/stdio/ansi/f_ansi_attr
 target/pc6001/stdio/ansi/f_ansi_bel
 target/pc6001/stdio/ansi/f_ansi_char
 target/pc6001/stdio/ansi/f_ansi_cls
 target/pc6001/stdio/ansi/f_ansi_dline
 target/pc6001/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
 target/pc6001/games/joystick
-games/obj/pc6001/joystick_type
+classic/games/obj/pc6001/joystick_type
 target/pc6001/graphics/textpixl6
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/pc6001/psg/set_psg
 target/pc6001/psg/set_psg_callee
 target/pc6001/psg/get_psg
 target/pc6001/psg/psg_init
 target/pc6001/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+sound/ay/obj/${TYPE}/**/*.o
 

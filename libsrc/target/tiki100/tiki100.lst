@@ -3,7 +3,7 @@ target/tiki100/psg/set_psg_callee
 target/tiki100/psg/get_psg
 target/tiki100/psg/psg_init
 target/tiki100/psg/playzb4
-@psg/ay/psg.lst
+sound/ay/obj/${TYPE}/**/*.o
 target/tiki100/graphics/clg
 target/tiki100/graphics/w_pixladdr
 target/tiki100/graphics/swapgfxbk
@@ -16,7 +16,7 @@ target/tiki100/graphics/getmaxy
 target/tiki100/graphics/fill
 target/tiki100/graphics/w_putsprite
 target/tiki100/graphics/w_stencil_render
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/tiki100/gr_setpalette
 target/tiki100/gr_defmod
 target/tiki100/gr_scroll
@@ -30,4 +30,4 @@ target/tiki100/stdio/generic_console_set_ink
 target/tiki100/stdio/generic_console_set_paper
 target/tiki100/stdio/generic_console_get_mode
 target/tiki100/stdio/conio_vars
-@games/games.lst
+@classic/games/games.lst

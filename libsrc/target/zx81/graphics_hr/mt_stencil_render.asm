@@ -11,7 +11,7 @@
 ;    stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION smc_clib

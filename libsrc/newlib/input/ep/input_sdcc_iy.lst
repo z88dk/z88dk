@@ -1,0 +1,16 @@
+newlib/input/ep/c/sdcc_iy/in_inkey
+newlib/input/ep/c/sdcc_iy/in_key_pressed
+newlib/input/ep/c/sdcc_iy/in_key_pressed_fastcall
+newlib/input/ep/c/sdcc_iy/in_key_scancode
+newlib/input/ep/c/sdcc_iy/in_key_scancode_fastcall
+newlib/input/ep/c/sdcc_iy/in_pause
+newlib/input/ep/c/sdcc_iy/in_pause_fastcall
+newlib/input/ep/c/sdcc_iy/in_stick_ext1
+newlib/input/ep/c/sdcc_iy/in_stick_ext2
+newlib/input/ep/c/sdcc_iy/in_stick_int
+newlib/input/ep/c/sdcc_iy/in_stick_keyboard
+newlib/input/ep/c/sdcc_iy/in_stick_keyboard_fastcall
+newlib/input/ep/c/sdcc_iy/in_test_key
+newlib/input/ep/c/sdcc_iy/in_wait_key
+newlib/input/ep/c/sdcc_iy/in_wait_nokey
+@newlib/input/ep/input_asm.lst

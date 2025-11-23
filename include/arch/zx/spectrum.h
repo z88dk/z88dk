@@ -555,12 +555,6 @@ extern void __LIB__ zx_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char r
 // zx_saddr2cy(saddr) will return the character y coordinate corresponding to the given screen address
 // zx_saddr2aaddr(saddr) will return the attribute address corresponding to the given screen address
 // zx_pxy2aaddr(px,py) will return the attribute address corresponding to the given (x,y) pixel coordinate
-//
-// Some functions will return with carry flag set if coordinates or addresses move out of
-// bounds.  In these cases the special z88dk keywords iferror() and ifnerror() can be used
-// to test the carry flag and determine if invalid results are returned.  Check with the
-// wiki documentation or the asm source files to see which functions support this.  If
-// comments in the asm source file do not mention this it is not supported.
 
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 

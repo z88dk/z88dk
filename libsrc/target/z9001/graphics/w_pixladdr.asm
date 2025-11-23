@@ -8,7 +8,7 @@
     SECTION code_clib
     PUBLIC  w_pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ;       $Id: w_pixladdr.asm,v 1.1 2016-09-30 12:20:04 stefano Exp $

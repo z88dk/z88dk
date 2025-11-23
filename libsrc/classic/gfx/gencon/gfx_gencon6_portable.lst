@@ -1,0 +1,9 @@
+classic/gfx/gencon/obj/${TARGET}/getmaxy6
+classic/gfx/gencon/obj/${TARGET}/getmaxx
+classic/gfx/gencon/obj/${TARGET}/plotpixl6
+classic/gfx/gencon/obj/${TARGET}/xorpixl6
+classic/gfx/gencon/obj/${TARGET}/pointxy6
+classic/gfx/gencon/obj/${TARGET}/clsgraph
+classic/gfx/gencon/obj/${TARGET}/respixl6
+@classic/gfx/common/gfx_common.lst
+@classic/gfx/portable/gfx_portable.lst

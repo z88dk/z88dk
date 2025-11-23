@@ -6,7 +6,7 @@
 
     EXTERN  NC_VRAM
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 ;
 ;       $Id: w_pixladdr.asm $
 ;

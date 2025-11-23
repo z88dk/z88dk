@@ -9,7 +9,7 @@ ENDIF
     public  sety
     public  getpat
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 sety:
 ; set y position

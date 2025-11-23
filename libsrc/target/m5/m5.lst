@@ -1,16 +1,16 @@
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
 target/m5/stdio/fgetc_cons_rom
 target/m5/stdio/getk_rom
 target/m5/stdio/fputc_cons_rom
-@video/tms9918/video_tms9918.lst
-@stdio/ansicore.lst
-@stdio/stdio.lst
+@classic/video/tms9918/video_tms9918.lst
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 
-@input/input_keyboard.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/input/input_keyboard.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick
 target/m5/games/keys_joystick
-@psg/sn76489/sn76489.lst
-@games/games.lst
+sound/sn76489/obj/${TYPE}/**/*.o
+@classic/games/games.lst
 

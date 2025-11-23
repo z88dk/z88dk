@@ -1,15 +1,15 @@
 target/osca/stdio/fputc_cons
 target/osca/stdio/fgetc_cons
 target/osca/stdio/getk
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/osca/stdio/ansi/f_ansi_attr
 target/osca/stdio/ansi/f_ansi_bel
 target/osca/stdio/ansi/f_ansi_char
 target/osca/stdio/ansi//f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/osca/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
-gfx/wide/obj/osca/w_dcircle_square.asm
+@classic/stdio/stdio.lst
+classic/gfx/wide/obj/osca/w_dcircle_square.asm
 target/osca/graphics/drawb
 target/osca/graphics/undrawb
 target/osca/graphics//xorborder
@@ -24,9 +24,9 @@ target/osca/graphics/cclg
 target/osca/graphics/cplot
 target/osca/graphics/cplot_callee
 target/osca/graphics/cplotpixel
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/osca/games/joystick
-@games/games.lst
+@classic/games/games.lst
 target/osca/time/clock
 target/osca/osca/flos_paper
 target/osca/osca/get_pen
@@ -90,5 +90,5 @@ target/osca/sdcard/sd_power_on
 target/osca/sdcard/sd_select_card
 target/osca/sdcard/sd_send_byte
 target/osca/sdcard/sd_spi_port_fast
-@sdcard/sdcard.lst
+@classic/sdcard/sdcard.lst
 

@@ -1,8 +1,8 @@
-        INCLUDE "graphics/grafix.inc"
-        SECTION code_clib
-        PUBLIC  xorborder
-        PUBLIC  _xorborder
-        EXTERN  w_pixeladdress
+	INCLUDE "classic/gfx/grafix.inc"
+	SECTION	code_clib
+	PUBLIC	xorborder
+	PUBLIC	_xorborder
+	EXTERN	w_pixeladdress
 ;	EXTERN	l_cmp
 
 ;

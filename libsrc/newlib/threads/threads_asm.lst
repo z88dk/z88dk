@@ -1,0 +1,2 @@
+@newlib/threads/mutex/mutex_asm.lst
+@newlib/threads/context/context_asm.lst

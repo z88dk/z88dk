@@ -1,0 +1,8 @@
+@target/sms/compress/compress_sdcc.lst
+@target/sms/globals/globals_asm.lst
+@target/sms/misc/misc_sdcc_iy.lst
+@target/sms/psg/psg_sdcc.lst
+@target/sms/registers/registers_asm.lst
+@target/sms/SMSlib/SMSlib_sdcc.lst
+@target/sms/vdp/vdp_sdcc.lst
+@target/sms/vram/vram_sdcc.lst

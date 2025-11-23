@@ -2,11 +2,11 @@ target/bee/graphics/w_clg
 target/bee/graphics/w_clsgraph
 target/bee/graphics/w_pixladdr
 target/bee/graphics/w_stencil_render
-gfx/wide/obj/${TARGET}/w_putsprite
-gfx/wide/obj/${TARGET}/w_clga_callee_smc
-gfx/wide/obj/${TARGET}/w_xorclga_callee_smc
-gfx/wide/obj/${TARGET}/w_fillb_callee_smc
+classic/gfx/wide/obj/${TARGET}/w_putsprite
+classic/gfx/wide/obj/${TARGET}/w_clga_callee_smc
+classic/gfx/wide/obj/${TARGET}/w_xorclga_callee_smc
+classic/gfx/wide/obj/${TARGET}/w_fillb_callee_smc
 target/bee/graphics/swapgfxbk
 target/bee/graphics/div5
 target/bee/graphics/div11
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst

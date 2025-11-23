@@ -26,10 +26,10 @@ just the ones which will be useful to know as we move forward.
 By default a Z88DK Spectrum program will be compiled such that its code
 originates at address 32768. This is one of the numerous configuration
 parameters defined in the C Runtime Configuration file
-[here](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/crt_config.inc#L19):
+[here](https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zx/crt_config.inc#L19):
 
 ```
-libsrc/_DEVELOPMENT/target/zx/crt_config.inc
+libsrc/newlib/target/zx/crt_config.inc
 ```
 
 Skim read this file and you'll find the CRT_ORG_CODE value set to 32768. You'll

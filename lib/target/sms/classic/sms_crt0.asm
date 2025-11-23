@@ -5,13 +5,9 @@
 ;    $Id: sms_crt0.asm,v 1.20 2016-07-13 22:12:25 dom Exp $
 ;
 
-    DEFC    ROM_Start  = $0000
-    DEFC    INT_Start  = $0038
-    DEFC    NMI_Start  = $0066
     DEFC    CODE_Start = $0100
     DEFC    RAM_Start  = $C000
     DEFC    RAM_Length = $2000
-    DEFC    Stack_Top  = $dff0
 
 
     MODULE  sms_crt0
@@ -22,6 +18,8 @@
 
     defc    crt0 = 1
     INCLUDE "zcc_opt.def"
+
+    INCLUDE     "target/sms/def/sms.def"
 
 ;-------
 ; Some general scope declarations
@@ -44,70 +42,150 @@
     PUBLIC __IO_VDP_DATA
     PUBLIC __IO_VDP_COMMAND
     PUBLIC __IO_VDP_STATUS
-    defc __IO_VDP_DATA              = 0xbe
-    defc __IO_VDP_COMMAND           = 0xbf
-    defc __IO_VDP_STATUS            = 0xbf
+    PUBLIC  __IO_SN76489_PORT
 
-    if __GAMEGEAR__
-        defc CONSOLE_XOFFSET = 6
-        defc CONSOLE_YOFFSET = 3
-        defc CONSOLE_COLUMNS = 20
-        defc CONSOLE_ROWS = 18
-        defc __GAMEGEAR_ENABLED = 1
-    else
-        defc __GAMEGEAR_ENABLED = 0
-        defc CONSOLE_COLUMNS = 32
-IF !DEFINED_CONSOLE_ROWS
-        defc CONSOLE_ROWS = 24
+    EXTERN  clear_vram
+
+IF __GAMEGEAR__
+    defc CONSOLE_XOFFSET = 6
+    defc CONSOLE_YOFFSET = 3
+    defc CONSOLE_COLUMNS = 20
+    defc CONSOLE_ROWS = 18
+    defc __GAMEGEAR_ENABLED = 1
+ELSE
+    defc __GAMEGEAR_ENABLED = 0
+    defc CONSOLE_COLUMNS = 32
+  IF !DEFINED_CONSOLE_ROWS
+    defc CONSOLE_ROWS = 24
+  ENDIF
 ENDIF
-    endif
 
     EXTERN  __tms9918_status_register
+    PUBLIC  __SMSlib_VDPFlags
+    defc    __SMSlib_VDPFlags = __tms9918_status_register
+    
 
-
-    defc    TAR__register_sp = Stack_Top
+    defc    CRT_ORG_CODE        = 0
+    defc    TAR__register_sp    = $dff0
     defc    TAR__clib_exit_stack_size = 32
     defc    __CPU_CLOCK = 3580000
+    defc    TAR__crt_enable_nmi = 1
 
     INCLUDE "crt/classic/crt_rules.inc"
 
 
-    org    ROM_Start
+    org     CRT_ORG_CODE
 
-    jp    start
-    
-    defm    "Sega Master System - Small C+"
+    jp      start
+
+    defs 0x0008 - ASMPC
+if (ASMPC<>$0008)
+    defs    CODE_ALIGNMENT_ERROR
+endif
+
+   PUBLIC _SMS_crt0_RST08
+   PUBLIC __RST08_SMS_crt0_RST08
+
+_SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
+__RST08_SMS_crt0_RST08:
+    ld      c,__IO_VDP_COMMAND
+    di                          ; make it interrupt SAFE
+    out     (c),l
+    out     (c),h
+    ei
+    ret
+
+    defm "Z88DK"
+   
+    defs 0x0018 - ASMPC
+if (ASMPC<>$0018)
+    defs    CODE_ALIGNMENT_ERROR
+endif
+    PUBLIC _SMS_crt0_RST18
+    PUBLIC __RST18_SMS_crt0_RST18
+
+_SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
+__RST18_SMS_crt0_RST18:
+    ld      a,l                      ; (respecting VRAM time constraints)
+    out     (__IO_VDP_DATA),a        ; 11
+    ld      a,h                      ; 4
+    sub     0                        ; 7
+    nop                              ; 4 = 26 (VRAM SAFE)
+    out     (__IO_VDP_DATA),a
+    ret
+
+IF ((__crt_enable_rst & $20) = $20)
+    IF ((__crt_enable_rst & $2020) = $0020)
+        EXTERN  _z80_rst_28h
+    ENDIF
+        jp      _z80_rst_28h
+ELSE
+        ret
+ENDIF
+
+    defs    $0030-ASMPC
+if (ASMPC<>$0030)
+    defs    CODE_ALIGNMENT_ERROR
+endif
+
+IF ((__crt_enable_rst & $40) = $40)
+    IF ((__crt_enable_rst & $4040) = $0040)
+        EXTERN  _z80_rst_30h
+    ENDIF
+        jp      _z80_rst_30h
+ELSE
+        ret
+ENDIF
+
+    defs    $0038-ASMPC
+if (ASMPC<>$0038)
+    defs    CODE_ALIGNMENT_ERROR
+endif
+
     
 ;-------        
 ; Interrupt handlers
 ;-------
-filler1:
-    defs    (INT_Start - filler1)
 
 int_RASTER: 
     push    af 
-
+    push    hl
     in      a, ($BF)
     ld      (__tms9918_status_register),a
     or      a 
     jp      p, int_not_VBL  ; Bit 7 not set 
 
+IFDEF CLIB_SMSLIB
+    call    int_SMSLIB
+ENDIF
+
+    ; __SMSLIB_ENABLE_MDPAD and other readings
 ;int_VBL: 
-    push    hl 
     ld      hl, (_timer)
     inc     hl
     ld      (_timer), hl
     ld      hl, raster_procs 
     call    int_handler 
-    pop     hl 
+interrupt_exit:
+    pop     hl
+    pop     af
+    ei
+    ret
 
 int_not_VBL: 
-    pop     af 
-    ei 
-    ret 
+   ld       hl,(__SMSlib_theLineInterruptHandler)
+   call     call_int_handler
+   jr       interrupt_exit
 
-filler2: 
-    defs    (NMI_Start - filler2) 
+
+
+    defs    $0066-ASMPC
+IF (ASMPC<>$0066)
+    defs    CODE_ALIGNMENT_ERROR
+ENDIF
+
+IF (__crt_enable_nmi = 1)
+    EXTERN _z80_nmi
 int_PAUSE: 
     push    af 
     push    hl 
@@ -120,6 +198,15 @@ int_PAUSE:
     pop     hl 
     pop     af 
     retn 
+ELSE 
+  IF (__crt_enable_nmi > 1)
+    jp     __z80_nmi
+  ELSE
+    retn
+  ENDIF
+ENDIF
+
+
 
 int_handler: 
     push    bc 
@@ -144,18 +231,19 @@ int_done:
     ret 
 
 call_int_handler: 
+l_dcal:
     jp      (hl) 
 
 ;-------        
 ; Beginning of the actual code
 ;-------
-filler3:
-    defs    (CODE_Start - filler3)
+    defs    (CODE_Start - ASMPC)
+IF (ASMPC<>CODE_Start)
+    defs    CODE_ALIGNMENT_ERROR
+ENDIF
 
 start:
-;    Make room for the atexit() stack
     INCLUDE "crt/classic/crt_init_sp.inc"
-; Clear static memory
     ld      hl,RAM_Start
     ld      de,RAM_Start+1
     ld      bc,RAM_Length-1
@@ -164,8 +252,8 @@ start:
     call    crt0_init
     INCLUDE "crt/classic/crt_init_atexit.inc"
 
-    
     call    DefaultInitialiseVDP
+    call    clear_vram
     
     im      1
     ei
@@ -176,9 +264,8 @@ __Exit:
     call    crt0_exit
 endloop:
     jr      endloop
-l_dcal:
-    jp      (hl)
-    
+
+
 ;---------------------------------
 ; VDP Initialization
 ;---------------------------------
@@ -195,6 +282,8 @@ IF __GAMEGEAR__
     ld      c,0
     call    asm_load_palette_gamegear
 ENDIF
+    PUBLIC  l_ret
+l_ret:
     ret
 
 IF __GAMEGEAR__
@@ -217,10 +306,6 @@ gg_palette:
     defw 0x0fff             ;ff ff ff
 ENDIF
 
-    DEFC SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
-    DEFC NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
-    DEFC SpriteTableAddress = $3f00   ; must be a multiple of $100; usually $3f00; fills $100 bytes
-
 _Data: 
     defb @00000110,$80
     ;     |||||||`- Disable synch 
@@ -238,11 +323,15 @@ _Data:
     ;      ||`----- 28 row/224 line mode 
     ;      |`------ Enable VBlank interrupts 
     ;      `------- Enable display 
-    defb (NameTableAddress/1024) |@11110001,$82 
+    defb (__SMS_VRAM_SCREEN_MAP_ADDRESS/1024) |@11110001,$82 
     defb $FF,$83 
     defb $FF,$84 
-    defb (SpriteTableAddress/128)|@10000001,$85 
-    defb (SpriteSet/2^2)         |@11111011,$86
+    defb (__SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS/128)|@10000001,$85 
+IF CLIB_SMSLIB
+    defb ((__SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS & 0x2000) >> 11) + 0xfb, 0x86
+ELSE
+    defb ((__SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS_CLASSIC & 0x2000) >> 11) + 0xfb, 0x86
+ENDIF
     defb $f|$f0,$87 
     ;     `-------- Border palette colour (sprite palette) 
     defb $00,$88 
@@ -290,6 +379,108 @@ banked_call:
     ret
 ENDIF
 
+
+IFDEF CLIB_SMSLIB
+
+    EXTERN  __SMSlib_VDPBlank
+    EXTERN  __SMSlib_KeysStatus
+    EXTERN  __SMSlib_PreviousKeysStatus
+
+int_SMSLIB:
+IFNDEF CLIB_SMSLIB_MDPAD
+   ld hl,__SMSlib_VDPBlank
+   ld (hl),1
+   
+   ld hl,(__SMSlib_KeysStatus)
+   ld (__SMSlib_PreviousKeysStatus),hl
+   
+   in a,(__IO_JOYSTICK_READ_L)
+   cpl
+   ld (__SMSlib_KeysStatus),a
+   
+   in a,(__IO_JOYSTICK_READ_H)
+   cpl
+   ld (__SMSlib_KeysStatus + 1),a
+ELSE
+    defc TH_HI = 0xf5
+    defc TH_LO = 0xd5
+
+   ld hl,__SMSlib_VDPBlank
+   ld (hl),1
+   
+   ld hl,(__SMSlib_KeysStatus)
+   ld (__SMSlib_PreviousKeysStatus),hl
+   
+   ld hl,(__SMSlib_MDKeysStatus)
+   ld (__SMSlib_PreviousMDKeysStatus),hl
+   
+   ld a,TH_HI
+   out (__IO_JOYSTICK_PORT_CONTROL),a
+
+   in a,(__IO_JOYSTICK_READ_L)
+   cpl
+   ld l,a
+   
+   in a,(__IO_JOYSTICK_READ_H)
+   cpl
+   ld h,a
+   
+   ld (__SMSlib_KeysStatus),hl
+   
+   ld a,TH_LO
+   out (__IO_JOYSTICK_PORT_CONTROL),a
+   
+   in a,(__IO_JOYSTICK_READ_L)
+   
+   ld h,0
+   ld l,a
+
+   ; hl = MDKeysStatus
+   
+   and 0x0c
+   jr z, read
+
+   ld l,h
+   jr set_MDKeysStatus
+
+read:
+   
+   ld a,l
+   cpl
+   and 0x30
+   ld l,a
+   
+   ld a,TH_HI
+   out (__IO_JOYSTICK_PORT_CONTROL),a
+   
+   ld a,TH_LO
+   out (__IO_JOYSTICK_PORT_CONTROL),a
+   
+   in a,(__IO_JOYSTICK_READ_L)
+   and 0x0f
+   jr nz, set_MDKeysStatus
+   
+   ld a,TH_HI
+   out (__IO_JOYSTICK_PORT_CONTROL),a
+   
+   in a,(__IO_JOYSTICK_READ_L)
+   cpl
+   and 0x0f
+   or l
+   ld l,a
+   
+   ld a,TH_LO
+   out (__IO_JOYSTICK_PORT_CONTROL),a
+
+set_MDKeysStatus:
+
+   ld (__SMSlib_MDKeysStatus),h
+ENDIF
+   ret
+ENDIF
+
+
+
     INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     ; And include handling disabling screenmodes
@@ -313,7 +504,7 @@ ENDIF
 
 IF CRT_ENABLE_BANKED_CALLS = 1
         SECTION bss_driver
-mainsp: defw    0
+mainsp:         defw    0
 tempstack:      defs    CLIB_BANKING_STACK_SIZE
 __current_bank: defb    2
 
@@ -322,11 +513,19 @@ tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
 ENDIF
 
         SECTION bss_crt
+
+        PUBLIC  __SMSlib_PauseRequested
+        PUBLIC  __SMSlib_theLineInterruptHandler
+
 raster_procs:       defs    16    ;Raster interrupt handlers
 pause_procs:        defs    16    ;Pause interrupt handlers
 _timer:             defw    0    ;This is incremented every time a VBL interrupt happens
+__SMSlib_PauseRequested:
 _pause_flag:        defb    0    ;This alternates between 0 and 1 every time pause is pressed
 __gamegear_flag:    defb    0    ;Non zero if running on a gamegear
+
+__SMSlib_theLineInterruptHandler:
+                    defw    l_ret
 
 
     ; DEFINE SECTIONS FOR BANKSWITCHING
@@ -572,3 +771,6 @@ __gamegear_flag:    defb    0    ;Non zero if running on a gamegear
     org $1f0000 + CRT_ORG_BANK_1F
     SECTION CODE_31
     SECTION RODATA_31
+
+    SECTION UNASSIGNED
+    org 0

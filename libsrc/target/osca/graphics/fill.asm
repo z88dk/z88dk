@@ -1,9 +1,9 @@
-        INCLUDE "graphics/grafix.inc"
-        SECTION code_clib
-        PUBLIC  fill
-        PUBLIC  _fill
-        EXTERN  w_pixeladdress
-        EXTERN  l_cmp
+	INCLUDE "classic/gfx/grafix.inc"
+        SECTION   code_clib
+	PUBLIC	fill
+	PUBLIC	_fill
+	EXTERN	w_pixeladdress
+	EXTERN	l_cmp
 
 
 fill:

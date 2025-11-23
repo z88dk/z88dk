@@ -2,24 +2,24 @@
 # We have special clg behaviour for mode 0
 target/phc25/graphics/clg
 
-@video/mc6847/mc6847.lst
+@classic/video/mc6847/mc6847.lst
 target/phc25/stdio/fgetc_cons
 target/phc25/stdio/getk
 target/phc25/stdio/fgetc_cons_rom
 target/phc25/stdio/getk_rom
 target/phc25/stdio/fputc_cons
-@stdio/stdio.lst
-@input/input_keyboard.lst
+@classic/stdio/stdio.lst
+@classic/input/input_keyboard.lst
 
-gfx/narrow/obj/${TARGET}/clrarea2
-gfx/narrow/obj/${TARGET}/fillarea2
-gfx/narrow/obj/${TARGET}/xorclrarea2
+classic/gfx/narrow/obj/${TARGET}/clrarea2
+classic/gfx/narrow/obj/${TARGET}/fillarea2
+classic/gfx/narrow/obj/${TARGET}/xorclrarea2
 target/phc25/graphics/textpixl6
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 
 target/phc25/games/joystick
 target/phc25/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst
 
 target/phc25/interrupt/add_raster_int
 
@@ -29,8 +29,4 @@ target/phc25/psg/set_psg
 target/phc25/psg/set_psg_callee
 target/phc25/psg/get_psg
 target/phc25/psg/psg_init
-@psg/ay/vt2/psg_vt2.lst
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/psg.lst
-#@psg/ay/wyz/psg_wyz.lst
-#@psg/ay/vt2/psg_vt2.lst
+sound/ay/obj/${TYPE}/**/*.o

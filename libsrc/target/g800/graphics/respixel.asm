@@ -7,7 +7,7 @@
     EXTERN  setx
     EXTERN  getpat
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __gfx_coords
 

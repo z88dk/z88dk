@@ -1,2 +1,0 @@
-video/mc6845/obj/${TARGET}/asm_set_cursor_state
-video/mc6845/obj/${TARGET}/asm_set_cursor_location

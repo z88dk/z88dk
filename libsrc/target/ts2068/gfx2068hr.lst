@@ -1,6 +1,6 @@
-target/ts2068/graphics_hr/xorborder
-target/ts2068/graphics_hr/fill
-target/ts2068/graphics_hr/w_putsprite
-target/ts2068/graphics_hr/w_stencil_render
-target/ts2068/graphics_hr/w_bksave
-target/ts2068/graphics_hr/w_bkrestore
+target/ts2068-libs/graphics_hr/xorborder
+target/ts2068-libs/graphics_hr/fill
+target/ts2068-libs/graphics_hr/w_putsprite
+target/ts2068-libs/graphics_hr/w_stencil_render
+target/ts2068-libs/graphics_hr/w_bksave
+target/ts2068-libs/graphics_hr/w_bkrestore

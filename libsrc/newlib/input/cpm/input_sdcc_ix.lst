@@ -1,0 +1,7 @@
+@newlib/input/cpm/input_asm.lst
+newlib/input/cpm/c/sdcc_ix/in_inkey
+newlib/input/cpm/c/sdcc_ix/in_pause
+newlib/input/cpm/c/sdcc_ix/in_pause_fastcall
+newlib/input/cpm/c/sdcc_ix/in_test_key
+newlib/input/cpm/c/sdcc_ix/in_wait_key
+newlib/input/cpm/c/sdcc_ix/in_wait_nokey

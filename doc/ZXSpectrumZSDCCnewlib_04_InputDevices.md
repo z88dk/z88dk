@@ -41,10 +41,10 @@ include/_DEVELOPMENT/sdcc/input/input_zx.h
 There isn't a great deal in the way of documentation in the file, so a bit of
 deduction and detective work is going to be required. However, it's worth
 mentioning that the assembly language routines which implement these functions
-_do_ carry descriptions of what they do. See the ASM files [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/input/zx/z80):
+_do_ carry descriptions of what they do. See the ASM files [here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/input/zx/z80):
 
 ```
-libsrc/_DEVELOPMENT/input/zx/z80
+libsrc/newlib/input/zx/z80
 ```
 
 ## Simple key presses - Interactive Border Example
@@ -354,10 +354,10 @@ the top byte of the uint16_t is not used.
 All joysticks return the same format 16-bit value but may differ in the number
 of fire buttons that can be detected.  The assembler files for these other
 joysticks are well commented, and are
-[here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/input/zx/z80):
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/input/zx/z80):
 
 ```
-libsrc/_DEVELOPMENT/input/zx/z80/
+libsrc/newlib/input/zx/z80/
 ```
 
 Because the format of the return value from joystick functions are the same,

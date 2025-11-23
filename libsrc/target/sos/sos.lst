@@ -1,7 +1,7 @@
 target/sos/stdio/fputc_cons
 target/sos/stdio/fgetc_cons
 target/sos/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/sos/sos/obj/sos/break_key
 target/sos/sos/obj/sos/lptoff
 target/sos/sos/obj/sos/lpton
@@ -28,4 +28,4 @@ target/sos/tape/tape_save
 target/sos/tape/tape_save_block
 target/sos/tape/tape_load
 target/sos/tape/tape_load_block
-@games/games.lst
+@classic/games/games.lst

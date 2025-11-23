@@ -71,4 +71,4 @@ target/zx81/games/bit_close_ei
 target/zx81/games/bit_synth
 target/zx81/games/bit_save_msx_callee
 target/zx81/games/playzb4
-@games/games.lst
+@classic/games/games.lst

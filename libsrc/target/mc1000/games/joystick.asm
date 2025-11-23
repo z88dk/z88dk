@@ -86,7 +86,7 @@ j_done:
 
 
 j_qaop:
-    INCLUDE "games/joystick_qaop.as1"
+    INCLUDE "classic/games/joystick_qaop.as1"
 
 j_8246:
-    INCLUDE "games/joystick_8246.as1"
+    INCLUDE "classic/games/joystick_8246.as1"

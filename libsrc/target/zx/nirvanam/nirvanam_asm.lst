@@ -1,0 +1,7 @@
+target/zx/nirvanam/z80/asm_NIRVANAM_drawT_di
+target/zx/nirvanam/z80/asm_NIRVANAM_drawTW_di
+target/zx/nirvanam/z80/asm_NIRVANAM_drawW_di
+target/zx/nirvanam/z80/asm_NIRVANAM_fillT_di
+target/zx/nirvanam/z80/asm_NIRVANAM_spriteT
+target/zx/nirvanam/z80/asm_NIRVANAM_stop
+target/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4
