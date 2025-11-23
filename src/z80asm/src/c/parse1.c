@@ -66,7 +66,7 @@ void ParseCtx_delete(ParseCtx *ctx)
 *----------------------------------------------------------------------------*/
 
 /* save the current scanner context and parse the given expression */
-struct Expr1 *parse_expr(const char *expr_text)
+struct Expr1 *parse_expr(const char *expr_text, bool silent)
 {
 	Expr1 *expr;
 	int num_errors;
@@ -80,10 +80,11 @@ struct Expr1 *parse_expr(const char *expr_text)
 			found_EOL = false;
 			scan_expect_operands();
 			GetSym();
-			expr = expr_parse();		/* may output error */
+			expr = expr_parse(silent);		/* may output error */
 			if (sym.tok != TK_END && sym.tok != TK_NEWLINE &&
 				num_errors == get_error_count()) {
-                error(ErrSyntax, NULL);
+                if (!silent)
+                    error(ErrSyntax, NULL);
 				OBJ_DELETE(expr);
 				expr = NULL;
 			}
@@ -133,7 +134,7 @@ void push_expr(ParseCtx *ctx)
 	}
 	
 	/* parse expression */
-	expr = parse_expr(Str_data(expr_text));
+	expr = parse_expr(Str_data(expr_text), false);
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(ctx->exprs, &expr);
@@ -331,26 +332,33 @@ static void free_tokens(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   IF, IFDEF, IFNDEF, ELSE, ELIF, ELIFDEF, ELIFNDEF, ENDIF
 *----------------------------------------------------------------------------*/
-void parse_const_expr_eval(const char* expr_text, int* result, bool* got_error) {
+void parse_const_expr_eval(const char* expr_text,
+    int* result, bool* got_error, bool silent) {
 	*result = 0;
 	*got_error = false;
-	struct Expr1* expr = parse_expr(expr_text);
+	struct Expr1* expr = parse_expr(expr_text, silent);
 	if (!expr)
 		*got_error = true;
 	else {
 		// eval and discard expression
-		*result = Expr_eval(expr, true);
+		*result = Expr_eval(expr, !silent);
 		if (expr->result.not_evaluable) {
-			error(ErrConstExprExpected, NULL);
+            if (!silent)
+                error(ErrConstExprExpected, NULL);
 			*got_error = true;
 		}
+        else if (expr->type != TYPE_CONSTANT) {
+            if (!silent)
+                error(ErrConstExprExpected, NULL);
+            *got_error = true;
+        }
 		OBJ_DELETE(expr);
 	}
 }
 
 void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* got_error) {
 	*condition = *got_error = false;
-	struct Expr1 *expr = parse_expr(expr_text);
+	struct Expr1 *expr = parse_expr(expr_text, false);
 	if (expr)
 		*condition = check_if_condition(expr);
 	else

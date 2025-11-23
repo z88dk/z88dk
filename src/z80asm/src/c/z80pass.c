@@ -264,7 +264,7 @@ bool Pass2info(range_t range)
 
 	}
 
-	expr = expr_parse();
+	expr = expr_parse(false);
 
 	if (range == RANGE_BYTE_SIGNED && sym.tok != TK_RPAREN)
 	{

@@ -374,7 +374,7 @@ static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 		// call parser to interpret expression
 		set_asmpc_env(CURRENTMODULE, section_name, expr_text, source_filename, line_num,
 			asmpc, false);
-		Expr1* expr = parse_expr(expr_text);
+		Expr1* expr = parse_expr(expr_text, false);
         if (expr) {
             expr->range = range;
             if (expr->range == RANGE_ASSIGNMENT) {

@@ -889,6 +889,35 @@ void Preproc::do_define() {
         bool has_space = m_line.peek().blank_before();
 		bool has_args = (!has_space && m_line.peek().is(TType::LParen));
 
+        // #2816 check if the expression can be evaluated to a constant
+        if (!has_args) {
+            // check if the expression can be evaluated to a constant
+            vector<Token> expr_tokens = m_line.peek_tokens();
+            ScannedLine expr_line{ Token::to_string(expr_tokens), expr_tokens };
+            ExpandedLine expanded_expr = expand(expr_line, defines());
+            string expr_text = expanded_expr.to_string();
+
+            // eval expression
+            bool error = false;
+            int value = 0;
+            parse_const_expr_eval(expr_text.c_str(), &value, &error, true);
+            if (!error) {
+                // push a DEFC line instead of a macro
+
+                // create new level for expansion
+                m_levels.emplace_back(&defines());
+                ScannedLine block;
+                block.append({ Token{TType::Ident, false, "defc"},
+                               Token{TType::Ident, false, name},
+                               Token{TType::Eq, false},
+                               Token{TType::Integer, false, value} });
+
+                // create lines from body
+                m_levels.back().split_lines(block);
+                return;
+            }
+        }
+
 		// create macro
 		auto macro = make_shared<Macro>(name);
 		defines_base().add(macro);				// create macro
@@ -1058,7 +1087,7 @@ void Preproc::do_rept() {
         ScannedLine count_line{ Token::to_string(count_tokens), count_tokens };
         ExpandedLine expanded_count = expand(count_line, defines());
         string count_text = expanded_count.to_string();
-		parse_const_expr_eval(count_text.c_str(), &count, &error);
+		parse_const_expr_eval(count_text.c_str(), &count, &error, false);
 		if (!error) {
 			ScannedLine body = collect_macro_body(Keyword::REPT, Keyword::ENDR);
 
@@ -1092,15 +1121,10 @@ void Preproc::do_reptc() {
 			m_levels.emplace_back(&defines());
             ScannedLine block;
 			for (auto& c : str) {
-                block.append({ Token{TType::Hash, false },
-                               Token{TType::Ident, false, "undef"},
+                block.append({ Token{TType::Ident, false, "defl"},
                                Token{TType::Ident, false, var},
-                               Token{TType::Newline, false } });
-
-                block.append({ Token{TType::Hash, false },
-                               Token{TType::Ident, false, "define"},
-                               Token{TType::Ident, false, var},
-                               Token{TType::Ident, false, std::to_string(c)},
+                               Token{TType::Eq, false},
+                               Token{TType::Integer, false, c},
                                Token{TType::Newline, false } });
 
                 block.append(body);
@@ -1143,14 +1167,9 @@ void Preproc::do_repti() {
 					m_levels.emplace_back(&defines());
                     ScannedLine block;
                     for (auto& param : params) {
-                        block.append({ Token{TType::Hash, false },
-                                       Token{TType::Ident, false, "undef"},
+                        block.append({ Token{TType::Ident, false, "defl"},
                                        Token{TType::Ident, false, var},
-                                       Token{TType::Newline, false } });
-
-                        block.append({ Token{TType::Hash, false },
-                                       Token{TType::Ident, false, "define"},
-                                       Token{TType::Ident, false, var} });
+                                       Token{TType::Eq, false} });
                         block.append(param);
                         block.append({ Token{TType::Newline, false } });
 
