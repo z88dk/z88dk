@@ -7,6 +7,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../errors.h"
 #include "../hla.h"
+#include "../preprocessor.h"
 #include "../symbol_table.h"
 #include "catch_amalgamated.hpp"
 #include <filesystem>
@@ -32,9 +33,10 @@ static StderrSilencer g_stderr_silencer;
 
 static std::vector<TokensLine> run_hla_on_text(const std::string& src,
         const std::string& fname) {
-    HLA hla;
+    Preprocessor pp;
+    HLA hla(&pp);
     hla.clear();
-    hla.push_virtual_file(src, fname, 1, true);
+    pp.push_virtual_file(src, fname, 1, true);
 
     TokensLine line;
     std::vector<TokensLine> out;

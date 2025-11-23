@@ -18,20 +18,22 @@
 #define PUSH_TOKEN1(type) \
     do { \
         str = std::string(tok, p); \
-        Token t(type, str); \
+        bool has_space_after = (p < pe) && is_space(*p); \
+        Token t(type, str, has_space_after); \
         output.push_back(t); \
     } while (0)
 
 #define PUSH_TOKEN2(type, arg) \
     do { \
         str = std::string(tok, p); \
-        Token t(type, str, arg); \
+        bool has_space_after = (p < pe) && is_space(*p); \
+        Token t(type, str, arg, has_space_after); \
         output.push_back(t); \
     } while (0)
 
 #define CHECK_TRAILING_CHAR() \
     do { \
-        if (p < pe && is_ident(*p)) { \
+        if (p < pe && is_ident_char(*p)) { \
             g_errors.error(ErrorCode::InvalidSyntax, \
                     "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p + 1) + "'"); \
             output.clear(); \
@@ -41,12 +43,7 @@
 
 #define YYFILL() 1
 
-static bool is_ident(char c) {
-    return (std::isalnum(static_cast<unsigned char>(c)) ||
-        c == '_' || c == '@');
-}
-
-static void swap_x_y(std::string & str) {
+static void swap_x_y(std::string& str) {
     // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
     for (auto& c : str) {
         switch (c) {
@@ -59,7 +56,7 @@ static void swap_x_y(std::string & str) {
     }
 }
 
-static void swap_ix_iy(std::string& str, Keyword & keyword) {
+static void swap_ix_iy(std::string& str, Keyword& keyword) {
     switch (keyword) {
     case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
     case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
@@ -124,14 +121,11 @@ main_loop:
 
         '\\' {
             const char* q = p;
-            while (*q && isspace(static_cast<unsigned char>(*q))) {
+            while (q < pe && is_space(*q)) {
                 ++q;
             }
-            if (*q == '\0') {
+            if (q >= pe) {
                 // line continuation
-                Token t(TokenType::Whitespace, " ");
-                output.push_back(t);
-
                 ++line_index;
                 if (line_index >= line_count()) {
                     return;
@@ -147,9 +141,9 @@ main_loop:
             }
         }
 
-        $       { goto eof; }
-        ';'     { goto eof; }
-        '//'    { goto eof; }
+        $       { goto eol; }
+        ';'     { goto eol; }
+        '//'    { goto eol; }
         '/*'    { goto c_comment; }
 
         '"'     {
@@ -176,7 +170,7 @@ main_loop:
             }
         }
 
-        ws+     { PUSH_TOKEN1(TokenType::Whitespace); continue; }
+        ws+     { continue; }
         '('		{ PUSH_TOKEN1(TokenType::LeftParen); continue; }
         ')'		{ PUSH_TOKEN1(TokenType::RightParen); continue; }
         ','		{ PUSH_TOKEN1(TokenType::Comma); continue; }
@@ -216,7 +210,6 @@ main_loop:
 
         mantissau expu? 	{
             CHECK_TRAILING_CHAR();
-            // floats: allow underscores in integer, fractional and exponent parts
             std::string digits = std::string(tok, p);
             double value = 0.0;
             if (!parse_float_from_chars(digits, value)) {
@@ -231,7 +224,6 @@ main_loop:
 
         decu 'd'?		{
             CHECK_TRAILING_CHAR();
-            // decimal: allow underscores, optional 'd' suffix
             std::string digits = std::string(tok, p);
             if (!digits.empty() && (digits.back() == 'd' || digits.back() == 'D')) {
                 digits.pop_back();
@@ -250,7 +242,6 @@ main_loop:
 
         decu ('_'* hex)* 'h'    	{
             CHECK_TRAILING_CHAR();
-            // hex with trailing 'h' (first char must be dec digit, then hex; underscores allowed)
             std::string digits = std::string(tok, p - 1);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -266,7 +257,6 @@ main_loop:
 
         "$" hexu		    {
             CHECK_TRAILING_CHAR();
-            // hex with '$' prefix
             std::string digits = std::string(tok + 1, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -282,7 +272,6 @@ main_loop:
 
         '0x' hexu		{
             CHECK_TRAILING_CHAR();
-            // hex with '0x' prefix
             std::string digits = std::string(tok + 2, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
@@ -298,7 +287,6 @@ main_loop:
 
         binu 'b'		    {
             CHECK_TRAILING_CHAR();
-            // binary with trailing 'b'
             std::string digits = std::string(tok, p - 1);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -314,7 +302,6 @@ main_loop:
 
         [%@] binu		{
             CHECK_TRAILING_CHAR();
-            // binary with '%' or '@' prefix
             std::string digits = std::string(tok + 1, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -330,7 +317,6 @@ main_loop:
 
         '0b' binu		{
             CHECK_TRAILING_CHAR();
-            // binary with '0b' prefix
             std::string digits = std::string(tok + 2, p);
             int value = 0;
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
@@ -383,6 +369,14 @@ main_loop:
                 output.pop_back();       // remove '.'
             }
 
+            // check for ASMPC
+            if (keyword == Keyword::ASMPC) {
+                bool has_space_after = (p < pe) && is_space(*p);
+                Token t(TokenType::ASMPC, str, keyword, has_space_after);
+                output.push_back(t);
+                continue;
+            }
+
             // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
             switch (keyword) {
             case Keyword::INCLUDE:
@@ -395,7 +389,8 @@ main_loop:
             default:;
             }
 
-            Token t(TokenType::Identifier, str, keyword);
+            bool has_space_after = (p < pe) && is_space(*p);
+            Token t(TokenType::Identifier, str, keyword, has_space_after);
             output.push_back(t);
             continue;
         }
@@ -404,7 +399,7 @@ main_loop:
     }
 
     // end of input line
-eof:
+eol:
     return;
 
     // find end of c-comment, possibly reading more lines
@@ -413,8 +408,6 @@ c_comment:
         while (p < pe) {
             if (*p == '*' && (p + 1) < pe && *(p + 1) == '/') {
                 p += 2;
-                Token t(TokenType::Whitespace, " ");
-                output.push_back(t);
                 goto main_loop;
             }
             ++p;
@@ -448,7 +441,8 @@ string_loop:
         '>' {
             if (end_quote == '>') {
                 str = std::string(string_start, p);
-                Token t(TokenType::String, str, str_content);
+                bool has_space_after = (p < pe) && is_space(*p);
+                Token t(TokenType::String, str, str_content, has_space_after);
                 output.push_back(t);
                 goto main_loop;
             }
@@ -460,7 +454,8 @@ string_loop:
         '"' {
             if (end_quote == '"') {
                 str = std::string(string_start, p);
-                Token t(TokenType::String, str, str_content);
+                bool has_space_after = (p < pe) && is_space(*p);
+                Token t(TokenType::String, str, str_content, has_space_after);
                 output.push_back(t);
                 goto main_loop;
             }
@@ -479,7 +474,9 @@ string_loop:
                 }
                 else {
                     str = std::string(string_start, p);
-                    Token t(TokenType::Integer, str, str_content[0]);
+                    bool has_space_after = (p < pe) && is_space(*p);
+                    Token t(TokenType::Integer, str, str_content[0],
+                            has_space_after);
                     output.push_back(t);
                     goto main_loop;
                 }

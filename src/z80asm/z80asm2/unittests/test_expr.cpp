@@ -80,12 +80,12 @@ TEST_CASE("Basic arithmetic and precedence", "[expr][precedence]") {
     // multiplication binds tighter than addition
     REQUIRE(parse_and_eval("2 + 3 * 4", v, undef, cnst, &i, &lsize));
     REQUIRE(v == 14);
-    REQUIRE(lsize == 9);
+    REQUIRE(lsize == 5);
 
     // parentheses override precedence
     REQUIRE(parse_and_eval("(2 + 3) * 4", v, undef, cnst, &i, &lsize));
     REQUIRE(v == 20);
-    REQUIRE(lsize == 11);
+    REQUIRE(lsize == 7);
 }
 
 TEST_CASE("Power operator (**) is right-associative and handles negative exponent as zero",
@@ -99,18 +99,18 @@ TEST_CASE("Power operator (**) is right-associative and handles negative exponen
     // right-assoc: 2 ** (3 ** 2) == 2 ** 9 == 512
     REQUIRE(parse_and_eval("2 ** 3 ** 2", v, undef, cnst, &i, &lsize));
     REQUIRE(v == 512);
-    REQUIRE(lsize == 9);
+    REQUIRE(lsize == 5);
 
     // negative exponent -> defined as 0 by implementation
     REQUIRE(parse_and_eval("2 ** -1", v, undef, cnst, &i, &lsize));
     REQUIRE(v == 0);
-    REQUIRE(lsize == 6);
+    REQUIRE(lsize == 4);
 
     // unary minus interacts with power precedence: unary has lower precedence than binary power
     // so "-2 ** 3" -> -(2 ** 3) == -8 (not (-2) ** 3)
     REQUIRE(parse_and_eval("-2 ** 3", v, undef, cnst, &i, &lsize));
     REQUIRE(v == -8);
-    REQUIRE(lsize == 6);
+    REQUIRE(lsize == 4);
 }
 
 TEST_CASE("Left associativity for subtraction, division, shifts",
