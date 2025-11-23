@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "hla.h"
 #include "keywords.h"
 #include "lexer.h"
 #include <ctime>
@@ -18,7 +19,7 @@
 
 class Preprocessor {
 public:
-    Preprocessor() = default;
+    Preprocessor();
 
     // Clear all state (stack, macros)
     void clear();
@@ -44,6 +45,9 @@ public:
                           const Location& location);
 
     // Pop and return the next processed TokensLine.
+    bool next_line_pp(TokensLine& out_line);
+
+    // Pop and return the next High-Level-Assembly line (after preprocessing).
     bool next_line(TokensLine& out_line);
 
     // Register a simple macro replacement (no parameters). Replacement may be
@@ -78,14 +82,10 @@ private:
     static constexpr int MAX_FIXPOINT_ITERATIONS = 256;
 
     struct Macro {
-        std::vector<TokensLine> replacement; // replacement token lines
-        std::vector<std::string> params;     // parameter names
-        std::vector<std::string> locals;     // LOCAL names declared in macro body
-        // true if definition had params or used empty ()
-        bool is_function_like = false;
-        // recursion depth counter per macro (avoid global map lookups)
-        int recursion_depth = 0;
-        bool emitted_recursion_error = false;   // prevent multiple errors
+        std::vector<TokensLine> replacement;// replacement token lines
+        std::vector<std::string> params;    // parameter names
+        std::vector<std::string> locals;    // LOCAL names declared in macro body
+        bool is_function_like = false;      // definition had params or used empty ()
     };
 
     // Cache entry for a file
@@ -180,6 +180,11 @@ private:
     //   a REPTC / REPTI body (empty otherwise).
     std::vector<std::string>* current_params_ptr_ = nullptr;
     std::string current_iteration_var_;
+
+    // current High-Level-Assembly context (for HLA directives)
+    HLA hla_context_;
+
+    //--- Internal methods ---
 
     // Fetch a line from the input file, or file_input_queue_ if not empty.
     bool fetch_line(TokensLine& out);

@@ -46,13 +46,13 @@ check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 LD BEFORE,1
 #line 3, "$test.inc"
-LD A, 42
+LD A,42
 
 
 
 LD B,2
 LD C,3
-LD D, 4
+LD D,4
 
 LD H,5
 #line 11
@@ -62,13 +62,13 @@ LD HL,7
 #line 3, "$test.asm"
 LD BEFORE,2
 #line 3, "$test.inc"
-LD A, 42
+LD A,42
 
 
 
 LD B,2
 LD C,3
-LD D, 4
+LD D,4
 
 LD H,5
 #line 11
@@ -78,13 +78,13 @@ LD HL,7
 #line 5, "$test.asm"
 LD BEFORE,3
 #line 3, "$test.inc"
-LD A, 42
+LD A,42
 
 
 
 LD B,2
 LD C,3
-LD D, 4
+LD D,4
 
 LD H,5
 #line 11
@@ -311,7 +311,7 @@ check_text_file("$test.i", <<END);
 10
 
 
-1 + 2
+1+ 2
 
 
 
@@ -381,7 +381,7 @@ check_text_file("$test.i", <<END);
 
 
 
-1 + 2
+1+ 2
 END
 
 #------------------------------------------------------------------------------
@@ -415,7 +415,7 @@ DEFC X = 5
 DEFC Y = 7
 DEFC W = 3
 
-DEFC SUM = 10 + 2
+DEFC SUM = 10+ 2
 DEFC a = 11
 DEFC b = 12
 DEFC U = 13
@@ -477,9 +477,9 @@ END
 
 check_text_file("$test.i", <<END);
 #line 4, "$test.asm"
-DEFC VAL = 1 + 2 + 3 + 4
-DEFC SUM = 1 + 2 + 3 + 5
-DEFC OUT = 1 + 2 + 3 + 6
+DEFC VAL = 1+ 2+ 3+ 4
+DEFC SUM = 1+ 2+ 3+ 5
+DEFC OUT = 1+ 2+ 3+ 6
 END
 
 #------------------------------------------------------------------------------
@@ -1549,7 +1549,7 @@ END
 # "Hello" -> 72,101,108,108,111
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 72,101,108,108,111
+db 72, 101, 108, 108, 111
 END
 
 # Stringize uses original (unexpanded) argument text
@@ -1582,7 +1582,7 @@ END
 # Expect db 34,"h","i",34 -> 34,104,105,34
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 34,104,105,34
+db 34, 104, 105, 34
 END
 
 # Stringize preserves spaces between tokens inside argument
@@ -1598,7 +1598,7 @@ END
 # Expect "A B" -> 65,32,66
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 65,32,66
+db 65, 32, 66
 END
 
 #------------------------------------------------------------------------------
@@ -1661,7 +1661,7 @@ check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
 7
 
-3 + 4
+3+ 4
 
 
 9
@@ -1691,9 +1691,9 @@ END
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 db 65
-db 65,66,67
+db 65, 66, 67
 LD A,90
-DEFB 72,105
+DEFB 72, 105
 END
 
 #------------------------------------------------------------------------------
@@ -2615,9 +2615,9 @@ END
 #  "QUOTE: \" BACKSLASH: \\ UNKNOWN: \q" -> numeric bytes of each character
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-db 7,8,27,12,10,13,9,11
-db 65,10,65,74,10
-db 81,85,79,84,69,58,32,34,32,66,65,67,75,83,76,65,83,72,58,32,92,32,85,78,75,78,79,87,78,58,32,113
+db 7, 8, 27, 12, 10, 13, 9, 11
+db 65, 10, 65, 74, 10
+db 81, 85, 79, 84, 69, 58, 32, 34, 32, 66, 65, 67, 75, 83, 76, 65, 83, 72, 58, 32, 92, 32, 85, 78, 75, 78, 79, 87, 78, 58, 32, 113
 END
 
 #------------------------------------------------------------------------------
@@ -2811,8 +2811,8 @@ END
 # Expect both calls to expand correctly at the call-site line
 check_text_file("$test.i", <<END);
 #line 4, "$test.asm"
-db 3 + 4
-db 5 + 6
+db 3+ 4
+db 5+ 6
 END
 
 #------------------------------------------------------------------------------
@@ -2926,6 +2926,176 @@ db 14
 db 15
 #line 12
 db 16
+END
+
+#------------------------------------------------------------------------------
+# EXITM outside any macro expansion (top-level/file context) should be ignored
+#------------------------------------------------------------------------------
+
+spew("$test.asm", <<END);
+A
+EXITM
+B
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect A and B; EXITM consumed and ignored. A at line 1, B at physical line 3 produces a blank line.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+A
+
+B
+END
+
+#------------------------------------------------------------------------------
+# EXITM inside a top-level REPT (not in any macro expansion) should be ignored
+#------------------------------------------------------------------------------
+
+spew("$test.asm", <<END);
+REPT 2
+db 1
+EXITM
+db 2
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# REPT expansion uses constant logical line (directive's line); EXITM does not abort anything here.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 1
+#line 1
+db 2
+#line 1
+db 1
+#line 1
+db 2
+END
+
+#------------------------------------------------------------------------------
+# EXITM multi-level nested macro expansion (A->B->C):
+# Correct behavior: EXITM in deepest macro (C) only terminates C's body.
+# Outer macros (B and A) continue emitting their remaining lines.
+#------------------------------------------------------------------------------
+
+spew("$test.asm", <<END);
+MACRO C(p)
+db p
+EXITM
+db 999          ; skipped (in C only)
+ENDM
+MACRO B(q)
+db q
+C(q+1)
+db q+2          ; should appear (B continues)
+ENDM
+MACRO A(r)
+db r
+B(r+10)
+db r+20         ; should appear (A continues)
+ENDM
+A(1)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Call site physical line is 16; all expansion lines use logical line 16.
+# Expected emitted sequence:
+#   db 1          (A start)
+#   db 1+10       (B start)
+#   db 1+10+1     (C before EXITM)
+#   db 1+10+2     (B after C)
+#   db 1+20       (A after B)
+check_text_file("$test.i", <<END);
+#line 16, "$test.asm"
+db 1
+#line 16
+db 1+10
+#line 16
+db 1+10+1
+#line 16
+db 1+10+2
+#line 16
+db 1+20
+END
+
+#------------------------------------------------------------------------------
+# Token pasting (##) failure paths:
+#  - Trailing '##' at end of line (foo##) -> no merge
+#  - Invalid continuation after ## (foo##,) -> no merge
+#  - Invalid continuation with string (foo##"ab") -> no merge; string still expanded to ints
+#  - Integer-start sequence (1##A) -> no merge (must start from identifier)
+#  - Mixed valid + invalid (foo##1##"ab") -> no merge anywhere
+#------------------------------------------------------------------------------
+
+spew("$test.asm", <<END);
+foo##
+foo##,
+foo##"ab"
+1##A
+foo##1##"ab"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Notes:
+#  - "ab" string expands to 97,98 by general string post-processing.
+#  - The absence of merged tokens (e.g. fooab, foo1, foo1ab) confirms failure paths.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+foo##
+foo##,
+foo##97, 98
+1##A
+foo1##97, 98
+END
+
+#------------------------------------------------------------------------------
+# Combined stringize (#param) and token pasting (param##suffix)
+#------------------------------------------------------------------------------
+# Validate interactions:
+#  - Stringize uses original (unexpanded) argument text.
+#  - Token pasting uses expanded argument tokens before merging.
+#  - Both can appear in one macro invocation.
+#------------------------------------------------------------------------------
+
+spew("$test.asm", <<END);
+#define X foo
+#define COMBO(p) db #p, p##_end
+COMBO(X)
+#define PAIR(a,b) db #a, #b, a##b, a##1, b##2
+PAIR(Hi,Go)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+#  COMBO(X):
+#    #p -> "X" -> 88
+#    p##_end -> foo_end (since X expands to foo before token pasting)
+#  PAIR(Hi,Go):
+#    #a -> "Hi" -> 72,105
+#    #b -> "Go" -> 71,111
+#    a##b  -> HiGo
+#    a##1  -> Hi1
+#    b##2  -> Go2
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+db 88, foo_end
+
+db 72, 105, 71, 111, HiGo, Hi1, Go2
 END
 
 #------------------------------------------------------------------------------

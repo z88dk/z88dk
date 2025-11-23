@@ -23,6 +23,10 @@
 std::unordered_map<std::string, Preprocessor::CachedFile>
 Preprocessor::file_cache_;
 
+Preprocessor::Preprocessor()
+    : hla_context_(this) {
+}
+
 void Preprocessor::clear() {
     input_queue_.clear();
     file_stack_.clear();
@@ -34,6 +38,7 @@ void Preprocessor::clear() {
     macro_fixpoint_iterations_ = 0;
     current_params_ptr_ = nullptr;
     current_iteration_var_.clear();
+    hla_context_.clear();
 }
 
 void Preprocessor::clear_file_cache() {
@@ -178,17 +183,17 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
         // Reserve: 2 initial tokens (DEFB + space) + byte_count integers + (byte_count-1) commas
         line.reserve(2 + byte_count * 2 - 1);
         // DEFB <space>
-        line.push_back(Token(TokenType::Identifier, "DEFB"));
-        line.push_back(Token(TokenType::Whitespace, " "));
+        line.push_back(Token(TokenType::Identifier, "DEFB", true));
 
         bool first = true;
         for (size_t j = i; j < end; ++j) {
             if (!first) {
-                line.push_back(Token(TokenType::Comma, ","));
+                line.push_back(Token(TokenType::Comma, ",", false));
             }
             first = false;
             int v = static_cast<int>(bytes[j]);
-            line.push_back(Token(TokenType::Integer, std::to_string(v), v));
+            line.push_back(Token(TokenType::Integer, std::to_string(v), v,
+                                 false));
         }
 
         tok_lines.push_back(std::move(line));
@@ -199,7 +204,7 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
                       location.line_num(), false);
 }
 
-bool Preprocessor::next_line(TokensLine& line) {
+bool Preprocessor::next_line_pp(TokensLine& line) {
     line.clear();
     while (true) {
         if (!input_queue_.empty()) {
@@ -211,7 +216,7 @@ bool Preprocessor::next_line(TokensLine& line) {
             else {
                 TokensLine final_line;
                 post_process_line(line, final_line);
-                line = final_line;
+                line = std::move(final_line);
                 current_line_chain_.reset();
                 macro_fixpoint_iterations_ = 0;
                 return true;
@@ -288,6 +293,10 @@ bool Preprocessor::next_line(TokensLine& line) {
     }
 }
 
+bool Preprocessor::next_line(TokensLine& out_line) {
+    return hla_context_.next_line(out_line);
+}
+
 void Preprocessor::define_macro(const std::string& name,
                                 const std::string replacement) {
     TokensFile tf(replacement, "<macro>", 1, false);
@@ -305,7 +314,6 @@ void Preprocessor::define_macro(const std::string& name,
     m.params.clear();
     m.locals.clear();
     m.is_function_like = false;
-    m.recursion_depth = 0;
     macros_[name] = std::move(m);
 }
 
@@ -357,7 +365,8 @@ void Preprocessor::preprocess_file(const std::string& input_filename,
             }
             location.set_line_num(g_errors.line_num());
         }
-        ofs << line.to_string() << std::endl;
+        std::string text = line.to_string();
+        ofs << text << std::endl;
         location.inc_line_num();
     }
 
@@ -430,7 +439,6 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
     // use unordered_set for faster duplicate checks
     std::unordered_set<std::string> seen_params;
     unsigned j = i;
-    line.skip_spaces(j);
 
     // Optional surrounding parentheses
     bool has_paren = false;
@@ -440,7 +448,6 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
     }
 
     // If we have immediate ')' it's an empty list
-    line.skip_spaces(j);
     if (has_paren && j < line.size() && line[j].is(TokenType::RightParen)) {
         ++j; // consume ')'
         i = j;
@@ -450,7 +457,6 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
     // Parse zero or more identifiers separated by commas
     bool expect_ident = true;
     while (j < line.size()) {
-        line.skip_spaces(j);
         if (expect_ident) {
             if (j < line.size() && line[j].is(TokenType::Identifier)) {
                 const std::string& param_name = line[j].text();
@@ -479,7 +485,6 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
                 continue;
             }
             if (has_paren) {
-                line.skip_spaces(j);
                 if (j < line.size() && line[j].is(TokenType::RightParen)) {
                     ++j; // consume ')'
                     i = j;
@@ -511,12 +516,11 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
 //  - An empty args list is accepted: either "()" or end-of-input (no tokens).
 //  - Trailing comma (e.g. "a,b,") is considered a syntax error and returns false.
 // On success returns true, sets i to the token index after the consumed argument list (after ')' if any, or end index),
-// and fills out_args with one TokensLine per argument (arguments preserve tokens, including whitespace).
+// and fills out_args with one TokensLine per argument (arguments preserve tokens).
 bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
                                     std::vector<TokensLine>& out_args) {
     out_args.clear();
     unsigned j = i;
-    line.skip_spaces(j);
 
     bool has_paren = false;
     if (j < line.size() && line[j].is(TokenType::LeftParen)) {
@@ -525,7 +529,6 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
     }
 
     // If parenthesized and immediate ')' -> empty list
-    line.skip_spaces(j);
     if (has_paren && j < line.size() && line[j].is(TokenType::RightParen)) {
         ++j; // consume ')'
         i = j;
@@ -538,16 +541,9 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
     bool last_was_comma = false;
     bool saw_any = false;
 
-    auto commit_arg_trimmed = [&](bool push_empty_if_none) {
-        // Trim TokenType::Whitespace from start and end of cur_arg and push as TokensLine
+    auto commit_arg = [&](bool push_empty_if_none) {
         unsigned s = 0;
         unsigned e = static_cast<unsigned>(cur_arg.size());
-        while (s < e && cur_arg[s].is(TokenType::Whitespace)) {
-            ++s;
-        }
-        while (e > s && cur_arg[e - 1].is(TokenType::Whitespace)) {
-            --e;
-        }
         TokensLine arg(line.location());
         for (unsigned k = s; k < e; ++k) {
             arg.push_back(cur_arg[k]);
@@ -563,7 +559,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
         // Handle top-level closing paren for parenthesized lists
         if (has_paren && t.is(TokenType::RightParen) && depth == 0) {
             // commit current argument (trimmed)
-            commit_arg_trimmed(true);
+            commit_arg(true);
             cur_arg.clear();
             ++j; // consume ')'
             i = j;
@@ -573,7 +569,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
         // Handle comma separators at top-level
         if (t.is(TokenType::Comma) && depth == 0) {
             // commit current argument (may be empty, keep it)
-            commit_arg_trimmed(true);
+            commit_arg(true);
             cur_arg.clear();
             last_was_comma = true;
             saw_any = true;
@@ -618,7 +614,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
     }
 
     // commit final argument (trimmed)
-    commit_arg_trimmed(true);
+    commit_arg(true);
     cur_arg.clear();
     i = j;
     return true;
@@ -630,13 +626,11 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    Keyword keyword) const {
     // accept negative line numbers
     int sign = 1;
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::Minus)) {
         ++i;
         sign = -1;
     }
 
-    line.skip_spaces(i);
     if (!(i < line.size() && line[i].is(TokenType::Integer))) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        std::string("Expected line number in ") +
@@ -647,12 +641,9 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
     out_linenum = sign * line[i].int_value();
     ++i;
 
-    line.skip_spaces(i);
-
     out_filename.clear();
     if (i < line.size() && line[i].is(TokenType::Comma)) {
         ++i;
-        line.skip_spaces(i);
         // Accept quoted or plain filename after comma.
         bool is_angle = false;
         if (!parse_filename(line, i, out_filename, is_angle)) {
@@ -669,8 +660,8 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
 }
 
 bool Preprocessor::parse_filename(const TokensLine& line, unsigned& i,
-                                  std::string& out_filename, bool& out_is_angle) const {
-    line.skip_spaces(i);
+                                  std::string& out_filename,
+                                  bool& out_is_angle) const {
     out_filename.clear();
     out_is_angle = false;
 
@@ -686,8 +677,11 @@ bool Preprocessor::parse_filename(const TokensLine& line, unsigned& i,
 
     // Plain filename: consume tokens up to whitespace
     std::string filename;
-    while (i < line.size() && line[i].is_not(TokenType::Whitespace)) {
+    while (i < line.size()) {
         filename += line[i].text();
+        if (line[i].has_space_after()) {
+            break;
+        }
         ++i;
     }
     if (filename.empty()) {
@@ -701,7 +695,6 @@ bool Preprocessor::parse_filename(const TokensLine& line, unsigned& i,
 bool Preprocessor::parse_identifier(const TokensLine& line, unsigned& i,
                                     std::string& out_name) const {
     out_name.clear();
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::Identifier)) {
         out_name = line[i].text();
         ++i;
@@ -715,7 +708,6 @@ bool Preprocessor::parse_identifier(const TokensLine& line, unsigned& i,
 bool Preprocessor::parse_keyword(const TokensLine& line, unsigned& i,
                                  Keyword& out_keyword) const {
     out_keyword = Keyword::None;
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::Identifier)) {
         out_keyword = line[i].keyword();
         if (out_keyword != Keyword::None) {
@@ -726,11 +718,10 @@ bool Preprocessor::parse_keyword(const TokensLine& line, unsigned& i,
     return false;
 }
 
-// Helper to collect the rest of the line into tokens, trimming trailing whitespace.
+// Helper to collect the rest of the line into tokens.
 // Advances `i` to the end of the line.
 TokensLine Preprocessor::collect_tokens(const TokensLine& line,
                                         unsigned& i) {
-    line.skip_spaces(i);
     TokensLine result(line.location());
     // Reserve remaining tokens as baseline capacity
     if (i < line.size()) {
@@ -740,7 +731,6 @@ TokensLine Preprocessor::collect_tokens(const TokensLine& line,
         result.push_back(line[i]);
         ++i;
     }
-    result.trim();
     return result;
 }
 
@@ -815,12 +805,9 @@ bool Preprocessor::eval_ifdef_name(const TokensLine& line, unsigned& i,
 
 bool Preprocessor::is_directive(const TokensLine& line,
                                 unsigned& i, Keyword& keyword) const {
-    line.skip_spaces(i);
-
     // skip optional #
     if (i < line.size() && line[i].is(TokenType::Hash)) {
         ++i;
-        line.skip_spaces(i);
     }
 
     // check for directive keywords
@@ -839,19 +826,15 @@ bool Preprocessor::is_name_directive(const TokensLine& line, unsigned& i,
                                      Keyword& keyword,
                                      std::string& name) const {
     unsigned start = i;
-    line.skip_spaces(i);
     name.clear();
     if (parse_identifier(line, i, name)) {
-        line.skip_spaces(i);
         keyword = Keyword::None;
         if (line[i].is(TokenType::EQ)) {    // synonym for EQU
             keyword = Keyword::EQU;
             ++i;
-            line.skip_spaces(i);
             return true;
         }
         else if (parse_keyword(line, i, keyword)) {
-            line.skip_spaces(i);
             if (keyword_is_name_directive(keyword)) {
                 return true;
             }
@@ -1133,9 +1116,11 @@ void Preprocessor::process_define(const TokensLine& line, unsigned& i) {
     }
 
     // Determine if function-like: must have '(' immediately after name (no space)
+    const Token& name_tok = line[i - 1];
     std::vector<std::string> params;
     bool had_func_parens = false;
-    if (i < line.size() && line[i].is(TokenType::LeftParen)) {
+    if (i < line.size() && !name_tok.has_space_after()
+            && line[i].is(TokenType::LeftParen)) {
         had_func_parens = true;
         if (!parse_params_list(line, i, params)) {
             g_errors.error(ErrorCode::InvalidSyntax,
@@ -1160,13 +1145,9 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
                              const std::string& name,
                              const std::vector<std::string>& params,
                              bool had_func_parens) {
-    line.skip_spaces(i);
-
     // scan optional '=' for compatibility
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::EQ)) {
         ++i; // skip '='
-        line.skip_spaces(i);
     }
 
     TokensLine replacement = collect_tokens(line, i);
@@ -1179,7 +1160,6 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
     macro.is_function_like = (!macro.params.empty()) || had_func_parens;
     macro.replacement.clear();
     macro.replacement.push_back(replacement);
-    macro.recursion_depth = 0;
 
     // Report redefinition for DEFINE (not for DEFL)
     if (macros_.find(name) != macros_.end()) {
@@ -1196,22 +1176,17 @@ void Preprocessor::process_equ(const TokensLine& line, unsigned& i) {
                        "Expected identifier after EQU");
         return;
     }
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::EQ)) {
         ++i;
-        line.skip_spaces(i);
     }
     TokensLine value = collect_tokens(line, i);
     TokensLine expanded = expand_macros_in_line(value);
 
     TokensLine defc(line.location());
-    defc.reserve(6 + expanded.size());
-    defc.push_back(Token(TokenType::Identifier, "DEFC"));
-    defc.push_back(Token(TokenType::Whitespace, " "));
-    defc.push_back(Token(TokenType::Identifier, name));
-    defc.push_back(Token(TokenType::Whitespace, " "));
-    defc.push_back(Token(TokenType::EQ, "="));
-    defc.push_back(Token(TokenType::Whitespace, " "));
+    defc.reserve(3 + expanded.size());
+    defc.push_back(Token(TokenType::Identifier, "DEFC", true));
+    defc.push_back(Token(TokenType::Identifier, name, true));
+    defc.push_back(Token(TokenType::EQ, "=", true));
     for (const auto& t : expanded.tokens()) {
         defc.push_back(t);
     }
@@ -1223,21 +1198,16 @@ void Preprocessor::process_equ(const TokensLine& line, unsigned& i) {
 
 void Preprocessor::process_name_equ(const TokensLine& line, unsigned& i,
                                     const std::string& name) {
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::EQ)) {
         ++i;
-        line.skip_spaces(i);
     }
     TokensLine value = collect_tokens(line, i);
     TokensLine expanded = expand_macros_in_line(value);
     TokensLine defc(line.location());
-    defc.reserve(6 + expanded.size());
-    defc.push_back(Token(TokenType::Identifier, "DEFC"));
-    defc.push_back(Token(TokenType::Whitespace, " "));
-    defc.push_back(Token(TokenType::Identifier, name));
-    defc.push_back(Token(TokenType::Whitespace, " "));
-    defc.push_back(Token(TokenType::EQ, "="));
-    defc.push_back(Token(TokenType::Whitespace, " "));
+    defc.reserve(3 + expanded.size());
+    defc.push_back(Token(TokenType::Identifier, "DEFC", true));
+    defc.push_back(Token(TokenType::Identifier, name, true));
+    defc.push_back(Token(TokenType::EQ, "=", true));
     for (const auto& t : expanded.tokens()) {
         defc.push_back(t);
     }
@@ -1279,10 +1249,8 @@ void Preprocessor::process_defl(const TokensLine& line, unsigned& i) {
                        "Expected identifier after DEFL");
     }
     else {
-        line.skip_spaces(i);
         if (i < line.size() && line[i].is(TokenType::EQ)) {
             ++i; // consume '='
-            line.skip_spaces(i);
         }
 
         do_defl(line, i, name);
@@ -1334,7 +1302,6 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     macro.params.clear();
     macro.replacement.clear();
     macro.replacement.push_back(final_body);
-    macro.recursion_depth = 0;
     macros_[name] = std::move(macro);
 }
 
@@ -1386,7 +1353,6 @@ bool Preprocessor::fetch_line(TokensLine& out) {
 
         // Fetch next physical line (raw location still physical here)
         out = file.tokens_file->get_tok_line(file.line_index);
-        out.trim();
         ++file.line_index;
 
         // skip empty lines
@@ -1476,7 +1442,6 @@ void Preprocessor::collect_guard_segments(File& file, TokensLine& line,
         unsigned& line_index, std::vector<TokensLine>& segments) {
     while (segments.empty() && line_index < file.tokens_file->tok_lines_count()) {
         line = file.tokens_file->get_tok_line(line_index++);
-        line.trim();
         if (line.empty()) {
             continue;
         }
@@ -1517,7 +1482,6 @@ bool Preprocessor::split_line(const TokensLine& line,
 
     // split into segments
     TokensLine segment(line.location());
-    line.skip_spaces(i);
     if (i < line.size()) {
         segment.reserve(line.size() - i);
     }
@@ -1527,15 +1491,14 @@ bool Preprocessor::split_line(const TokensLine& line,
         if ((t.is(TokenType::Colon) && ternary_depth == 0)
                 || t.is(TokenType::Backslash)) {
             did_split = true;
-            segment.trim();
             if (!segment.empty()) {
                 out_segments.push_back(std::move(segment));
             }
             segment = TokensLine(line.location());
-            line.skip_spaces(++i);
             if (i < line.size()) {
                 segment.reserve(line.size() - i);
             }
+            ++i;
             continue;
         }
         else if (t.is(TokenType::Quest)) {
@@ -1549,7 +1512,6 @@ bool Preprocessor::split_line(const TokensLine& line,
         segment.push_back(t);
         ++i;
     }
-    segment.trim();
     if (!segment.empty()) {
         out_segments.push_back(std::move(segment));
     }
@@ -1562,43 +1524,37 @@ bool Preprocessor::split_label(const TokensLine& line, unsigned& i,
     TokensLine label_line(line.location());
     label_line.reserve(2);
     i = start;
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::Identifier)) {
         std::string label_name = line[i].text();
         Keyword label_kw = line[i].keyword();
         if (keyword_is_instruction(label_kw)) {
             i = start;
-            line.skip_spaces(i);
             return false;
         }
         ++i;
-        line.skip_spaces(i);
         if (i < line.size() && line[i].is(TokenType::Colon)) {
             ++i;
-            label_line.push_back(Token(TokenType::Dot, "."));
-            label_line.push_back(Token(TokenType::Identifier, label_name));
+            label_line.push_back(Token(TokenType::Dot, ".", false));
+            label_line.push_back(Token(TokenType::Identifier, label_name,
+                                       false));
             out_segments.push_back(std::move(label_line));
-            line.skip_spaces(i);
             return true;
         }
     }
     i = start;
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(TokenType::Dot)) {
         ++i;
-        line.skip_spaces(i);
         if (i < line.size() && line[i].is(TokenType::Identifier)) {
             std::string label_name = line[i].text();
             ++i;
-            label_line.push_back(Token(TokenType::Dot, "."));
-            label_line.push_back(Token(TokenType::Identifier, label_name));
+            label_line.push_back(Token(TokenType::Dot, ".", false));
+            label_line.push_back(Token(TokenType::Identifier, label_name,
+                                       false));
             out_segments.push_back(std::move(label_line));
-            line.skip_spaces(i);
             return true;
         }
     }
     i = start;
-    line.skip_spaces(i);
     return false;
 }
 
@@ -1788,7 +1744,6 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     std::vector<std::string> locals;
     std::vector<TokensLine> body;
     unsigned j = i;
-    line.skip_spaces(j);
 
     const bool had_paren = (j < line.size() && line[j].is(TokenType::LeftParen));
     if (j < line.size()) {
@@ -1815,7 +1770,6 @@ void Preprocessor::do_macro(const TokensLine& line, unsigned& i,
     macro.is_function_like = (!macro.params.empty())
                              || had_paren; // true if params or empty ()
     macro.replacement = std::move(body);
-    macro.recursion_depth = 0;
 
     // Report redefinition for MACRO (not for DEFL)
     if (macros_.find(name) != macros_.end()) {
@@ -1870,7 +1824,8 @@ void Preprocessor::process_rept(const TokensLine& line, unsigned& i) {
                 if (tk.is(TokenType::Identifier) && !rmap.empty()) {
                     auto it = rmap.find(tk.text());
                     if (it != rmap.end()) {
-                        out.push_back(Token(TokenType::Identifier, it->second));
+                        out.push_back(Token(TokenType::Identifier,
+                                            it->second, tk.has_space_after()));
                         continue;
                     }
                 }
@@ -1895,7 +1850,6 @@ void Preprocessor::process_reptc(const TokensLine& line, unsigned& i) {
         return;
     }
 
-    line.skip_spaces(i);
     if (!(i < line.size() && line[i].is(TokenType::Comma))) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Expected comma after variable name in REPTC");
@@ -1937,16 +1891,13 @@ void Preprocessor::do_reptc(const std::string& var_name,
     // 2) Derive the source string to iterate:
     // - If exactly one String token (ignoring spaces): use string_value().
     // - Else if exactly one Integer token: use decimal text of its value.
-    // - Else: concatenate texts of all non-whitespace tokens.
+    // - Else: concatenate texts of all tokens.
     std::string iter_text;
 
     auto is_only_token_type = [&](TokenType tt) -> bool {
         unsigned count = 0;
         for (unsigned k = 0; k < flat.size(); k++) {
             const Token& tk = flat[k];
-            if (tk.is(TokenType::Whitespace)) {
-                continue;
-            }
             if (!tk.is(tt)) {
                 return false;
             }
@@ -1977,9 +1928,6 @@ void Preprocessor::do_reptc(const std::string& var_name,
         // Concatenate non-whitespace token texts
         for (unsigned k = 0; k < flat.size(); k++) {
             const Token& tk = flat[k];
-            if (tk.is(TokenType::Whitespace)) {
-                continue;
-            }
             iter_text += tk.text();
         }
     }
@@ -2034,7 +1982,8 @@ void Preprocessor::do_reptc(const std::string& var_name,
                 if (tok.is(TokenType::Identifier) && !rmap.empty()) {
                     auto it = rmap.find(tok.text());
                     if (it != rmap.end()) {
-                        sub.push_back(Token(TokenType::Identifier, it->second));
+                        sub.push_back(Token(TokenType::Identifier,
+                                            it->second, tok.has_space_after()));
                         continue;
                     }
                 }
@@ -2059,7 +2008,6 @@ void Preprocessor::process_repti(const TokensLine& line, unsigned& i) {
         return;
     }
 
-    line.skip_spaces(i);
     if (!(i < line.size() && line[i].is(TokenType::Comma))) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Expected ',' after REPTI variable name");
@@ -2155,7 +2103,8 @@ void Preprocessor::do_repti(const std::string& var_name,
                 if (tok.is(TokenType::Identifier) && !rmap.empty()) {
                     auto it = rmap.find(tok.text());
                     if (it != rmap.end()) {
-                        sub.push_back(Token(TokenType::Identifier, it->second));
+                        sub.push_back(Token(TokenType::Identifier,
+                                            it->second, tok.has_space_after()));
                         continue;
                     }
                 }
@@ -2339,7 +2288,6 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
 }
 
 void Preprocessor::process_pragma(const TokensLine& line, unsigned& i) {
-    line.skip_spaces(i);
     if (i < line.size() && line[i].is(Keyword::ONCE)) {
         ++i;
         expect_end(line, i);
@@ -2360,9 +2308,7 @@ bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
     // Fast path: if no string tokens present, only trimming may be needed.
     if (!line.has_token_type(TokenType::String)) { // replaced has_token_type
         out = line;
-        // Trim whitespace; if trim changes, return true, else false
-        bool trimmed = out.trim();
-        return trimmed;
+        return false;
     }
 
     // Precompute capacity after expanding strings into comma-separated integers
@@ -2395,10 +2341,11 @@ bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
             bool is_first = true;
             for (char c : str_val) {
                 if (!is_first) {
-                    out.push_back(Token(TokenType::Comma, ","));
+                    out.push_back(Token(TokenType::Comma, ",", true));
                 }
                 int char_int = static_cast<int>(static_cast<unsigned char>(c));
-                out.push_back(Token(TokenType::Integer, std::to_string(char_int), char_int));
+                out.push_back(Token(TokenType::Integer,
+                                    std::to_string(char_int), char_int, false));
                 is_first = false;
             }
         }
@@ -2406,9 +2353,6 @@ bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
             out.push_back(t);
             ++i;
         }
-    }
-    if (out.trim()) {
-        changed = true;
     }
     if (!changed) {
         out = line;
@@ -2424,88 +2368,41 @@ bool Preprocessor::merge_double_hash(const TokensLine& line, TokensLine& out) {
 
     out = TokensLine(line.location());
     out.reserve(line.size());
+
     bool merged_any = false;
     unsigned idx = 0;
+    const auto is_pastable = [](const Token & t) {
+        return t.is(TokenType::Identifier) || t.is(TokenType::Integer);
+    };
 
     while (idx < line.size()) {
         const Token& first = line[idx];
 
-        // Attempt to build a chained paste sequence starting from an identifier
         if (first.is(TokenType::Identifier)) {
             std::string glued = first.text();
-            unsigned j = idx + 1;
-            unsigned paste_start_ws_begin = 0;
-            unsigned paste_start_ws_end = 0;
-            bool found_any_paste = false;
+            unsigned cur = idx;
+            bool found_paste = false;
 
-            // Try to consume zero or more "## <ident|integer>" pairs.
-            while (true) {
-                // Record whitespace between previous glued token and next ##
-                unsigned ws_begin = j;
-                while (j < line.size() && line[j].is(TokenType::Whitespace)) {
-                    ++j;
-                }
-                unsigned ws_end = j;
-
-                if (j >= line.size() || !line[j].is(TokenType::DoubleHash)) {
-                    // No more paste operator
-                    break;
-                }
-
-                // Save first inter-token whitespace span so we can preserve it
-                if (!found_any_paste) {
-                    paste_start_ws_begin = ws_begin;
-                    paste_start_ws_end = ws_end;
-                }
-
-                // Skip '##'
-                ++j;
-
-                // Skip whitespace after ##
-                while (j < line.size() && line[j].is(TokenType::Whitespace)) {
-                    ++j;
-                }
-                if (j >= line.size() ||
-                        !(line[j].is(TokenType::Identifier) || line[j].is(TokenType::Integer))) {
-                    // Invalid continuation: abort paste here (leave tokens untouched)
-                    // Emit original identifier and any whitespace we skipped so far
-                    out.push_back(first);
-                    // Rewind to original next token (we consumed spaces and maybe ## incorrectly)
-                    // We cannot easily rewind; safest is to restart from idx+1 original position
-                    // so treat everything as normal tokens.
-                    // Reconstruct: emit whitespace sequence and the '##' token we consumed partially.
-                    // Simpler: fall back to copying tokens from idx+1 to current j treating them verbatim.
-                    for (unsigned k = paste_start_ws_begin; k < j; ++k) {
-                        out.push_back(line[k]);
-                    }
-                    idx = j;
-                    goto next_iteration;
-                }
-
-                // Valid continuation
-                glued += line[j].text();
-                ++j;
-                found_any_paste = true;
+            // Consume chained sequences: <tok> ## <tok> ## <tok> ...
+            while (cur + 2 < line.size() &&
+                    line[cur + 1].is(TokenType::DoubleHash) &&
+                    is_pastable(line[cur + 2])) {
+                glued += line[cur + 2].text();
+                cur += 2;
+                found_paste = true;
             }
 
-            if (found_any_paste) {
-                // Preserve the whitespace between the first identifier and the first ##
-                for (unsigned k = paste_start_ws_begin; k < paste_start_ws_end; ++k) {
-                    out.push_back(line[k]); // original inter-token whitespace retained
-                }
-                out.push_back(Token(TokenType::Identifier, glued));
+            if (found_paste) {
+                out.push_back(Token(TokenType::Identifier, glued, false));
                 merged_any = true;
-                idx = j;
+                idx = cur + 1; // advance past last merged token
                 continue;
             }
         }
 
-        // Not part of (or failed) paste sequence
+        // No paste starting here
         out.push_back(first);
         ++idx;
-
-next_iteration:
-        continue;
     }
 
     return merged_any;
@@ -2663,19 +2560,16 @@ bool Preprocessor::expand_macros_single_pass(const TokensLine& in_line,
                             std::string joined;
                             bool space_pending = false;
                             for (const auto& at : orig.tokens()) {
-                                if (at.is(TokenType::Whitespace)) {
-                                    space_pending = true;
-                                    continue;
-                                }
                                 if (!joined.empty() && space_pending) {
                                     joined += ' ';
                                 }
                                 joined += at.text();
-                                space_pending = false;
+                                space_pending = at.has_space_after();
                             }
                             std::string escaped = escape_c_string(joined);
                             std::string quoted = "\"" + escaped + "\"";
-                            out.push_back(Token(TokenType::String, quoted, joined));
+                            out.push_back(Token(TokenType::String,
+                                                quoted, joined, false));
                             ++p;
                             continue;
                         }
@@ -2724,7 +2618,8 @@ bool Preprocessor::expand_macros_single_pass(const TokensLine& in_line,
                         // LOCAL rename
                         auto lit = local_rename.find(rt.text());
                         if (lit != local_rename.end()) {
-                            out.push_back(Token(TokenType::Identifier, lit->second));
+                            out.push_back(Token(TokenType::Identifier,
+                                                lit->second, false));
                             continue;
                         }
                     }
@@ -2769,7 +2664,8 @@ bool Preprocessor::expand_macros_single_pass(const TokensLine& in_line,
                     if (rt.is(TokenType::Identifier)) {
                         auto lr = local_rename.find(rt.text());
                         if (lr != local_rename.end()) {
-                            substituted.push_back(Token(TokenType::Identifier, lr->second));
+                            substituted.push_back(Token(TokenType::Identifier,
+                                                        lr->second, false));
                             continue;
                         }
                     }
@@ -2866,22 +2762,15 @@ TokensLine Preprocessor::expand_macros_in_line(const TokensLine& line) {
     }
     if (current_set.size() == 1) {
         TokensLine single = current_set.front();
-        single.trim();
         return single;
     }
 
     TokensLine flattened(line.location());
-    bool first = true;
     for (const auto& ln : current_set) {
-        if (!first) {
-            flattened.push_back(Token(TokenType::Whitespace, " "));
-        }
         for (unsigned i = 0; i < ln.size(); ++i) {
             flattened.push_back(ln[i]);
         }
-        first = false;
     }
-    flattened.trim();
     return flattened;
 }
 
@@ -3024,8 +2913,8 @@ void preprocess_only() {
                           << " -> " << i_filename << std::endl;
             }
 
-            Preprocessor pp;
-            pp.preprocess_file(asm_filename, i_filename, g_options.gen_dependencies);
+            Preprocessor::preprocess_file(asm_filename, i_filename,
+                                          g_options.gen_dependencies);
         }
     }
 }
