@@ -680,6 +680,7 @@ bool Preprocessor::parse_filename(const TokensLine& line, unsigned& i,
     while (i < line.size()) {
         filename += line[i].text();
         if (line[i].has_space_after()) {
+            ++i;
             break;
         }
         ++i;
@@ -1567,6 +1568,9 @@ bool Preprocessor::fetch_line_for_macro_body(TokensLine& out) {
             return false;
         }
         out = std::move(input_queue_.front());
+
+        g_errors.set_expanded_line(out.to_string());
+
         input_queue_.pop_front();
         return true;
     }
@@ -1583,6 +1587,8 @@ bool Preprocessor::fetch_line_for_macro_body(TokensLine& out) {
     // Return the raw stored line; next_line() will handle user-visible mapping.
     out = file.tokens_file->get_tok_line(file.line_index);
     ++file.line_index;
+
+    g_errors.set_expanded_line(out.to_string());
 
     return true;
 }
@@ -2198,6 +2204,11 @@ void Preprocessor::process_ifdef(const TokensLine& line, unsigned& i,
 
 void Preprocessor::process_elifdef(const TokensLine& line, unsigned& i,
                                    bool negated) {
+    if (if_stack_.empty()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+            "Unexpected ELIFDEF directive without matching IF");
+        return;
+    }
     IfFrame& fr = if_stack_.back();
     if (fr.seen_else) {
         g_errors.error(ErrorCode::InvalidSyntax, "ELIFDEF/ELIFNDEF after ELSE");
