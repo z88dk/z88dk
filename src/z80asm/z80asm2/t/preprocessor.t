@@ -2500,6 +2500,7 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in MACRO (expected ENDM)
    |MACRO M()
+   |db 1
 END
 ok ! -f "$test.i", "no .i file produced on unclosed MACRO";
 
@@ -2512,6 +2513,7 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in REPT (expected ENDR)
    |REPT 3
+   |X
 END
 ok ! -f "$test.i", "no .i file produced on unclosed REPT";
 
@@ -2524,6 +2526,7 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in REPTC (expected ENDR)
    |REPTC ch, "AB"
+   |defb ch
 END
 ok ! -f "$test.i", "no .i file produced on unclosed REPTC";
 
@@ -2536,6 +2539,7 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in REPTI (expected ENDR)
    |REPTI v, 1,2
+   |db v
 END
 ok ! -f "$test.i", "no .i file produced on unclosed REPTI";
 
@@ -2553,8 +2557,10 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected ENDM directive without matching MACRO
    |MACRO OUT()
+   |ENDM
 $test.asm:1: error: Invalid syntax: Unexpected end of input in MACRO (expected ENDM)
    |MACRO OUT()
+   |ENDM
 END
 # Note: current implementation reports only the unclosed IF; OUT() / REPT error
 # messages are not emitted after EOF, so .i is not produced.
@@ -3097,6 +3103,774 @@ db 88, foo_end
 
 db 72, 105, 71, 111, HiGo, Hi1, Go2
 END
+
+#------------------------------------------------------------------------------
+# Stringize operator (#param) edge cases
+#------------------------------------------------------------------------------
+
+# Stringize empty argument: STR() with zero args when macro expects one param
+# Should raise argument count mismatch error
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define STR(x) db #x
+STR()
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Macro argument count mismatch for: STR
+   |STR()
+END
+ok ! -f "$test.i", "no .i file produced on empty argument to required-param macro";
+
+# Stringize truly empty token sequence: macro with empty param explicitly allows empty
+# Define a zero-parameter macro with stringize (edge case - no parameter to stringize)
+spew("$test.asm", <<END);
+#define EMPTY() db "empty"
+EMPTY()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 101, 109, 112, 116, 121
+END
+
+#------------------------------------------------------------------------------
+# Stringize operator (#) with non-parameter identifiers (should emit literal #)
+#------------------------------------------------------------------------------
+
+# Stringize before non-parameter identifier: should output literal # and identifier
+spew("$test.asm", <<END);
+#define HASH_IDENT(x) db #notparam
+HASH_IDENT(arg)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect literal '#' followed by 'notparam' -> #=35, space, then identifier 'notparam'
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db #notparam
+END
+
+# Stringize operator with parameter vs non-parameter in same macro
+spew("$test.asm", <<END);
+#define MIX(x) db #x, #other
+MIX(test)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: #x stringized to "test" (116,101,115,116), comma, then literal #other
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 116, 101, 115, 116, #other
+END
+
+# Macro with only # before undefined identifier (no parameters)
+spew("$test.asm", <<END);
+#define BARE_HASH db #foo
+BARE_HASH
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect literal '#foo' as-is
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db #foo
+END
+
+# Multiple # before non-parameter identifiers
+spew("$test.asm", <<END);
+#define MULTI_HASH(a) #first #second #a
+MULTI_HASH(value)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#first #second' then stringized 'value' -> 118,97,108,117,101
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+#first #second 118, 97, 108, 117, 101
+END
+
+# Stringize with parameter at start, non-parameter later
+spew("$test.asm", <<END);
+#define START_PARAM(p) #p #notparam
+START_PARAM(begin)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: "begin" stringized (98,101,103,105,110) then literal '#notparam'
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+98, 101, 103, 105, 110#notparam
+END
+
+# Stringize with non-parameter at start, parameter later
+spew("$test.asm", <<END);
+#define END_PARAM(p) #notparam #p
+END_PARAM(final)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#notparam' then "final" stringized (102,105,110,97,108)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+#notparam 102, 105, 110, 97, 108
+END
+
+# Macro with # followed by space and non-parameter
+spew("$test.asm", <<END);
+#define HASH_SPACE(x) # foo
+HASH_SPACE(arg)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '# foo' (hash with space, then 'foo')
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+# foo
+END
+
+# Zero-parameter macro with # before identifier (no parameters to stringify)
+spew("$test.asm", <<END);
+#define NO_PARAMS() #value
+NO_PARAMS()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#value'
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+#value
+END
+
+# Macro with # at end of line (no following identifier)
+spew("$test.asm", <<END);
+#define TRAILING_HASH(x) db x #
+TRAILING_HASH(10)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: 'db 10 #' (literal trailing hash)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+db 10#
+END
+
+# Macro with multiple parameters but # before non-parameter
+spew("$test.asm", <<END);
+#define TWO_PARAM(a,b) #a #middle #b
+TWO_PARAM(first,last)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: "first" stringized (102,105,114,115,116), literal '#middle', "last" stringized (108,97,115,116)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+102, 105, 114, 115, 116#middle 108, 97, 115, 116
+END
+
+# Macro with # before number (not an identifier)
+spew("$test.asm", <<END);
+#define HASH_NUM(x) #42
+HASH_NUM(arg)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#42' (hash followed by number token)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+#42
+END
+
+# Macro with # before string (not an identifier)
+spew("$test.asm", <<END);
+#define HASH_STR(x) #"text"
+HASH_STR(arg)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#' followed by string expanded to bytes -> #=35 then "text"=116,101,120,116
+# But actually the # should remain separate from the string token
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+#116, 101, 120, 116
+END
+
+# Macro with ## and # before non-parameter (token paste vs stringize)
+spew("$test.asm", <<END);
+#define PASTE_HASH(x) x##y #z
+PASTE_HASH(foo)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: 'foo' pasted with 'y' -> 'fooy', then literal '#z'
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+fooy#z
+END
+
+# Nested macros: outer has # before non-parameter, inner has parameter
+spew("$test.asm", <<END);
+#define INNER(p) #p
+#define OUTER(q) #notparam INNER(q)
+OUTER(test)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#notparam' then INNER(test) expanded to "test" -> 116,101,115,116
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+#notparam 116, 101, 115, 116
+END
+
+# Object-like macro with # before identifier
+spew("$test.asm", <<END);
+#define OBJ #identifier
+OBJ
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: literal '#identifier' (object-like macros have no parameters)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+#identifier
+END
+
+# Case sensitivity: parameter vs non-parameter with different case
+spew("$test.asm", <<END);
+#define CASE(Param) #Param #param
+CASE(Value)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: "Value" stringized (86,97,108,117,101), then literal '#param' (case mismatch)
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+86, 97, 108, 117, 101#param
+END
+
+#------------------------------------------------------------------------------
+# LINE / C_LINE error cases: trailing tokens after directive arguments
+#------------------------------------------------------------------------------
+
+# LINE with trailing tokens after line number (no filename)
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE 10 extra
+A
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
+   |LINE 10 extra
+END
+ok ! -f "$test.i", "no .i file produced on LINE with trailing tokens";
+
+# LINE with trailing tokens after line number and filename
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE 10, "file.asm" extra tokens
+B
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
+   |LINE 10, "file.asm" extra tokens
+END
+ok ! -f "$test.i", "no .i file produced on LINE with trailing tokens after filename";
+
+# LINE with multiple trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE 20, <file.inc> extra1 extra2
+C
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'extra1'
+   |LINE 20, <file.inc> extra1 extra2
+END
+ok ! -f "$test.i", "no .i file produced on LINE with multiple trailing tokens";
+
+# LINE with trailing comma (no filename provided)
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE 30,
+D
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Expected filename after comma in LINE directive
+   |LINE 30,
+END
+ok ! -f "$test.i", "no .i file produced on LINE with trailing comma only";
+
+# C_LINE with trailing tokens after line number (no filename)
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE 40 unexpected
+E
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'unexpected'
+   |C_LINE 40 unexpected
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with trailing tokens";
+
+# C_LINE with trailing tokens after filename
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE 50, "const.asm" trailing
+F
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'trailing'
+   |C_LINE 50, "const.asm" trailing
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with trailing tokens after filename";
+
+# C_LINE with multiple trailing tokens after angle-bracket filename
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE 60, <angle.inc> token1 token2 token3
+G
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'token1'
+   |C_LINE 60, <angle.inc> token1 token2 token3
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with multiple trailing tokens";
+
+# C_LINE with trailing comma only
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE 70,
+H
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Expected filename after comma in C_LINE directive
+   |C_LINE 70,
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with trailing comma only";
+
+# LINE with negative line number and trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE -10 extra
+I
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
+   |LINE -10 extra
+END
+ok ! -f "$test.i", "no .i file produced on LINE with negative line number and trailing tokens";
+
+# C_LINE with negative line number and trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE -20, "neg.asm" surplus
+J
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'surplus'
+   |C_LINE -20, "neg.asm" surplus
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with negative line number and trailing tokens";
+
+# LINE with plain filename form and trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE 80, plain.asm garbage
+K
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'garbage'
+   |LINE 80, plain.asm garbage
+END
+ok ! -f "$test.i", "no .i file produced on LINE with plain filename and trailing tokens";
+
+# C_LINE with plain filename form and trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE 90, plain2.asm unwanted
+L
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'unwanted'
+   |C_LINE 90, plain2.asm unwanted
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with plain filename and trailing tokens";
+
+# LINE with identifier as trailing token
+unlink("$test.i");
+spew("$test.asm", <<END);
+LINE 120, "test.asm" identifier
+O
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'identifier'
+   |LINE 120, "test.asm" identifier
+END
+ok ! -f "$test.i", "no .i file produced on LINE with identifier as trailing token";
+
+# C_LINE with number as trailing token
+unlink("$test.i");
+spew("$test.asm", <<END);
+C_LINE 130, <test.inc> 999
+P
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: '999'
+   |C_LINE 130, <test.inc> 999
+END
+ok ! -f "$test.i", "no .i file produced on C_LINE with number as trailing token";
+
+#------------------------------------------------------------------------------
+# Directive error cases: trailing tokens after single-keyword directives
+#------------------------------------------------------------------------------
+
+# EXITM with trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO M()
+EXITM extra
+ENDM
+M()
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:4: error: Invalid syntax: Unexpected token: 'extra'
+   |EXITM extra
+END
+ok ! -f "$test.i", "no .i file produced on EXITM with trailing tokens";
+
+# ELSE with trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF 1
+A
+ELSE unexpected
+B
+ENDIF
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Invalid syntax: Unexpected token: 'unexpected'
+   |ELSE unexpected
+END
+ok ! -f "$test.i", "no .i file produced on ELSE with trailing tokens";
+
+# ENDIF with trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF 1
+A
+ENDIF extra tokens
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Invalid syntax: Unexpected token: 'extra'
+   |ENDIF extra tokens
+END
+ok ! -f "$test.i", "no .i file produced on ENDIF with trailing tokens";
+
+# ENDM with trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+MACRO M()
+db 1
+ENDM surplus
+M()
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'surplus'
+   |MACRO M()
+   |ENDM surplus
+END
+ok ! -f "$test.i", "no .i file produced on ENDM with trailing tokens";
+
+# ENDR with trailing tokens
+unlink("$test.i");
+spew("$test.asm", <<END);
+REPT 1
+X
+ENDR garbage
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'garbage'
+   |REPT 1
+   |ENDR garbage
+END
+ok ! -f "$test.i", "no .i file produced on ENDR with trailing tokens";
+
+#------------------------------------------------------------------------------
+# Stray conditional directives without preceding IF family
+#------------------------------------------------------------------------------
+
+# Stray ELSE without IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+A
+ELSE
+B
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELSE directive without matching IF
+   |ELSE
+END
+ok ! -f "$test.i", "no .i file produced on stray ELSE";
+
+# Stray ELIF without IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+A
+ELIF 1
+B
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIF directive without matching IF
+   |ELIF 1
+END
+ok ! -f "$test.i", "no .i file produced on stray ELIF";
+
+# Stray ELSEIF without IF (synonym for ELIF)
+unlink("$test.i");
+spew("$test.asm", <<END);
+X
+ELSEIF 1
+Y
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIF directive without matching IF
+   |ELSEIF 1
+END
+ok ! -f "$test.i", "no .i file produced on stray ELSEIF";
+
+# Stray ELIFDEF without IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define FLAG 1
+ELIFDEF FLAG
+C
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIFDEF directive without matching IF
+   |ELIFDEF FLAG
+END
+ok ! -f "$test.i", "no .i file produced on stray ELIFDEF";
+
+# Stray ELSEIFDEF without IF (synonym for ELIFDEF)
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define SYM 1
+ELSEIFDEF SYM
+D
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIFDEF directive without matching IF
+   |ELSEIFDEF SYM
+END
+ok ! -f "$test.i", "no .i file produced on stray ELSEIFDEF";
+
+# Stray ELIFNDEF without IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+E
+ELIFNDEF MISSING
+F
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIFDEF directive without matching IF
+   |ELIFNDEF MISSING
+END
+ok ! -f "$test.i", "no .i file produced on stray ELIFNDEF";
+
+# Stray ELSEIFNDEF without IF (synonym for ELIFNDEF)
+unlink("$test.i");
+spew("$test.asm", <<END);
+G
+ELSEIFNDEF UNDEF
+H
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIFDEF directive without matching IF
+   |ELSEIFNDEF UNDEF
+END
+ok ! -f "$test.i", "no .i file produced on stray ELSEIFNDEF";
+
+# Stray ENDIF without IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+I
+ENDIF
+J
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ENDIF directive without matching IF
+   |ENDIF
+END
+ok ! -f "$test.i", "no .i file produced on stray ENDIF";
+
+# Stray ELSE after ENDIF (closed IF block)
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF 1
+A
+ENDIF
+ELSE
+B
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:4: error: Invalid syntax: Unexpected ELSE directive without matching IF
+   |ELSE
+END
+ok ! -f "$test.i", "no .i file produced on ELSE after closed IF";
+
+# Stray ELIF after ENDIF (closed IF block)
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF 0
+X
+ENDIF
+ELIF 1
+Y
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:4: error: Invalid syntax: Unexpected ELIF directive without matching IF
+   |ELIF 1
+END
+ok ! -f "$test.i", "no .i file produced on ELIF after closed IF";
+
+# Multiple stray ELSE directives
+unlink("$test.i");
+spew("$test.asm", <<END);
+K
+ELSE
+L
+ELSE
+M
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELSE directive without matching IF
+   |ELSE
+$test.asm:4: error: Invalid syntax: Unexpected ELSE directive without matching IF
+   |ELSE
+END
+ok ! -f "$test.i", "no .i file produced on multiple stray ELSE";
+
+# Stray ELIF in nested context (outer IF closed, inner missing)
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF 1
+ENDIF
+ELIF 1
+N
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Invalid syntax: Unexpected ELIF directive without matching IF
+   |ELIF 1
+END
+ok ! -f "$test.i", "no .i file produced on stray ELIF after closed outer IF";
+
+# Stray conditional directive at start of file
+unlink("$test.i");
+spew("$test.asm", <<END);
+ELSE
+FIRST
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected ELSE directive without matching IF
+   |ELSE
+END
+ok ! -f "$test.i", "no .i file produced on ELSE at start of file";
+
+# Stray ENDIF at start of file
+unlink("$test.i");
+spew("$test.asm", <<END);
+ENDIF
+CODE
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected ENDIF directive without matching IF
+   |ENDIF
+END
+ok ! -f "$test.i", "no .i file produced on ENDIF at start of file";
+
+# Stray ELIFDEF with valid identifier but no IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+#define TEST 1
+START
+ELIFDEF TEST
+WRONG
+ENDIF
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:3: error: Invalid syntax: Unexpected ELIFDEF directive without matching IF
+   |ELIFDEF TEST
+$test.asm:5: error: Invalid syntax: Unexpected ENDIF directive without matching IF
+   |ENDIF
+END
+ok ! -f "$test.i", "no .i file produced on stray ELIFDEF with valid symbol";
+
+# Stray ELIFNDEF with missing identifier but no IF
+unlink("$test.i");
+spew("$test.asm", <<END);
+DATA
+ELIFNDEF NOTDEF
+BRANCH
+ENDIF
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:2: error: Invalid syntax: Unexpected ELIFDEF directive without matching IF
+   |ELIFNDEF NOTDEF
+$test.asm:4: error: Invalid syntax: Unexpected ENDIF directive without matching IF
+   |ENDIF
+END
+ok ! -f "$test.i", "no .i file produced on stray ELIFNDEF checking undefined symbol";
 
 #------------------------------------------------------------------------------
 # Clean up
