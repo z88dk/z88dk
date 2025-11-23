@@ -1,16 +1,11 @@
-- preprocess_only must call HLA
 - add tests of processing of .asm.m4 file
 - add tests of processing of .asm.pl file
 - g_errors.set_source_line must ust the actual source line, not the to_string() conversion
+- DEFC expressions may influence IFDEF and IF behavior; do a preprocessing time symbol table 
+  to cope for this
+
 
 Edge cases in preprocessor.cpp not covered by preprocessor.t
-Macros / definitions:
-•	Stringize of an empty argument (macro invoked with empty token list: STR()).
-•	Stringize of argument containing escaped newline/backslash sequences (testing escape_c_string beyond quotes/backslash).
-•	Macro body containing only '#' before an identifier that is not a parameter (should emit literal '#').
-Directive parsing / syntax errors:
-•	Trailing tokens after LINE / C_LINE directives (e.g. LINE 10 extra).
-•	Trailing tokens after EXITM, ELSE, ENDIF, ENDM/ENDR mismatches already partly tested, but not stray ELSE / ELIF / ELIFDEF / ELIFNDEF / ENDIF without any preceding IF family.
 •	REPT / REPTC / REPTI with negative count/value (-3) (REPT <=0 skip path tests only zero).
 •	REPTC argument as a single integer token (iterating over digits stringified from number).
 •	REPTC argument that is a multi-token non-string/non-integer expression (e.g. "A" + "B") invoking concatenation branch.
