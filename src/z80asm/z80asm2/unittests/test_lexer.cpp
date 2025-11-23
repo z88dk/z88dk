@@ -40,8 +40,8 @@ TEST_CASE("TokensLine basic operations", "[lexer]") {
     TokensLine line;
     REQUIRE(line.empty());
 
-    line.push_back(Token(TokenType::Identifier, "foo"));
-    line.push_back(Token(TokenType::Integer, "123"));
+    line.push_back(Token(TokenType::Identifier, "foo", false));
+    line.push_back(Token(TokenType::Integer, "123", false));
 
     REQUIRE_FALSE(line.empty());
     REQUIRE(line.size() == 2);
@@ -64,23 +64,23 @@ TEST_CASE("Token constructor sets keyword for identifiers",
     g_options = Options();
 
     // Known keyword should map to corresponding Keyword enum (DEFINE)
-    Token t_define(TokenType::Identifier, "DEFINE");
+    Token t_define(TokenType::Identifier, "DEFINE", false);
     REQUIRE(t_define.is(Keyword::DEFINE));
     REQUIRE(t_define.keyword() == Keyword::DEFINE);
 
-    Token t_define2(TokenType::Identifier, "define");
+    Token t_define2(TokenType::Identifier, "define", false);
     REQUIRE(t_define2.is(Keyword::DEFINE));
     REQUIRE(t_define2.keyword() == Keyword::DEFINE);
 
     // Non-keyword identifier should map to Keyword::None
-    Token t_custom(TokenType::Identifier, "myIdentifier");
+    Token t_custom(TokenType::Identifier, "myIdentifier", false);
     REQUIRE(t_custom.is(Keyword::None));
     REQUIRE(t_custom.keyword() == Keyword::None);
 
     // Case-insensitive mapping: when options cause uppercasing, keyword mapping still works.
     g_options = Options();
     g_options.ucase_labels = true;
-    Token t_ucase(TokenType::Identifier, "define"); // lowercase input
+    Token t_ucase(TokenType::Identifier, "define", false); // lowercase input
     REQUIRE(t_ucase.keyword() == Keyword::DEFINE);
     // restore options
     g_options = Options();
@@ -145,7 +145,7 @@ TEST_CASE("empty content produces no token lines", "[lexer]") {
 TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
     g_options = Options();
 
-    // Build a single line that contains examples of each token type (except EndOfFile).
+    // Build a single line that contains examples of each token type (except EndOfLine).
     // Note: backslash is included as a standalone token; whitespace is produced between tokens.
     const std::string content = "id 123 1.23 \"str\" + \\ , . ( ) [ ] { }\n";
     TokensFile tf(content, "types_test", 1, true);
@@ -160,7 +160,7 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
         seen.insert(t.type());
     }
 
-    // Expected token types (exclude EndOfFile)
+    // Expected token types (exclude EndOfLine)
     std::vector<TokenType> expected = {
         TokenType::Identifier,
         TokenType::Integer,
@@ -175,7 +175,6 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
         TokenType::RightBracket,
         TokenType::LeftBrace,
         TokenType::RightBrace,
-        TokenType::Whitespace
     };
 
     for (auto et : expected) {
@@ -220,9 +219,7 @@ TEST_CASE("TokensFile tokenizes all TokenType values",
     // Collect operator token TokenType values in the order they appear.
     std::vector<TokenType> seen;
     for (const auto& t : toks) {
-        if (t.is_not(TokenType::Whitespace)) {
-            seen.push_back(t.type());
-        }
+        seen.push_back(t.type());
     }
 
     std::vector<TokenType> expected = {
@@ -704,45 +701,20 @@ TEST_CASE("g_options.swap_ix_iy swaps IX/IY keywords and token text",
 }
 
 // -----------------------------------------------------------------------------
-// Added tests: bounds, skip_spaces/at_end, to_string preserving whitespace,
+// Added tests: bounds, at_end, to_string preserving whitespace,
 // get_tok_line out-of-range behavior, spacing rules for to_string, and
 // operator-pair spacing tests.
 // -----------------------------------------------------------------------------
 
-TEST_CASE("TokensLine operator[] out-of-range returns EndOfFile token",
+TEST_CASE("TokensLine operator[] out-of-range returns EndOfLine token",
           "[lexer][tokensline][bounds]") {
     g_options = Options();
 
     TokensLine tl(Location("file", 1));
     REQUIRE(tl.empty());
     const Token& t = tl[0]; // out-of-range
-    REQUIRE(t.is(TokenType::EndOfFile));
+    REQUIRE(t.is(TokenType::EndOfLine));
     REQUIRE(t.text().empty());
-}
-
-TEST_CASE("TokensLine skip_spaces and at_end behave correctly",
-          "[lexer][tokensline][spaces]") {
-    g_options = Options();
-
-    TokensLine only_spaces(Location("loc", 1));
-    only_spaces.push_back(Token(TokenType::Whitespace, " "));
-    only_spaces.push_back(Token(TokenType::Whitespace, "\t"));
-    unsigned idx = 0;
-    // at_end should skip spaces and report end
-    REQUIRE(only_spaces.at_end(idx));
-    // idx should have been advanced by skip_spaces (>= size)
-    REQUIRE(idx >= only_spaces.size());
-
-    TokensLine mixed(Location("loc", 2));
-    mixed.push_back(Token(TokenType::Whitespace, " "));
-    mixed.push_back(Token(TokenType::Identifier, "a"));
-    unsigned j = 0;
-    // skip_spaces should advance j to first non-space token index (1)
-    mixed.skip_spaces(j);
-    REQUIRE(j == 1u);
-    // at_end should return false because a non-space token exists after skipping
-    unsigned k = 0;
-    REQUIRE_FALSE(mixed.at_end(k));
 }
 
 TEST_CASE("TokensLine to_string preserves original token text including whitespace",
@@ -750,12 +722,10 @@ TEST_CASE("TokensLine to_string preserves original token text including whitespa
     g_options = Options();
 
     TokensLine tl(Location("l", 1));
-    tl.push_back(Token(TokenType::Identifier, "mov"));
-    tl.push_back(Token(TokenType::Whitespace, " "));
-    tl.push_back(Token(TokenType::Identifier, "a"));
-    tl.push_back(Token(TokenType::Comma, ","));
-    tl.push_back(Token(TokenType::Whitespace, " "));
-    tl.push_back(Token(TokenType::Identifier, "b"));
+    tl.push_back(Token(TokenType::Identifier, "mov", true));
+    tl.push_back(Token(TokenType::Identifier, "a", false));
+    tl.push_back(Token(TokenType::Comma, ",", true));
+    tl.push_back(Token(TokenType::Identifier, "b", false));
 
     REQUIRE(tl.to_string() == "mov a, b");
 }
@@ -767,40 +737,40 @@ TEST_CASE("TokensLine to_string inserts spaces between Identifier, Integer and F
 
     // Identifier followed by Integer
     TokensLine tl_id_int(Location("l", 1));
-    tl_id_int.push_back(Token(TokenType::Identifier, "foo"));
-    tl_id_int.push_back(Token(TokenType::Integer, "123"));
+    tl_id_int.push_back(Token(TokenType::Identifier, "foo", false));
+    tl_id_int.push_back(Token(TokenType::Integer, "123", false));
     REQUIRE(tl_id_int.to_string() == "foo 123");
 
     // Identifier followed by Float
     TokensLine tl_id_float(Location("l", 2));
-    tl_id_float.push_back(Token(TokenType::Identifier, "foo"));
-    tl_id_float.push_back(Token(TokenType::Float, "1.23"));
+    tl_id_float.push_back(Token(TokenType::Identifier, "foo", false));
+    tl_id_float.push_back(Token(TokenType::Float, "1.23", false));
     REQUIRE(tl_id_float.to_string() == "foo 1.23");
 
     // Integer followed by Identifier
     TokensLine tl_int_id(Location("l", 3));
-    tl_int_id.push_back(Token(TokenType::Integer, "123"));
-    tl_int_id.push_back(Token(TokenType::Identifier, "bar"));
+    tl_int_id.push_back(Token(TokenType::Integer, "123", false));
+    tl_int_id.push_back(Token(TokenType::Identifier, "bar", false));
     REQUIRE(tl_int_id.to_string() == "123 bar");
 
     // Integer followed by Float
     TokensLine tl_int_float(Location("l", 4));
-    tl_int_float.push_back(Token(TokenType::Integer, "123"));
-    tl_int_float.push_back(Token(TokenType::Float, "1.23"));
+    tl_int_float.push_back(Token(TokenType::Integer, "123", false));
+    tl_int_float.push_back(Token(TokenType::Float, "1.23", false));
     REQUIRE(tl_int_float.to_string() == "123 1.23");
 
     // Float followed by Identifier
     TokensLine tl_float_id(Location("l", 5));
-    tl_float_id.push_back(Token(TokenType::Float, "1.23"));
-    tl_float_id.push_back(Token(TokenType::Identifier, "x"));
+    tl_float_id.push_back(Token(TokenType::Float, "1.23", false));
+    tl_float_id.push_back(Token(TokenType::Identifier, "x", false));
     REQUIRE(tl_float_id.to_string() == "1.23 x");
 
     // Mixed with non-identifier/number tokens should not insert extra spaces beyond token text
     TokensLine tl_mixed(Location("l", 6));
-    tl_mixed.push_back(Token(TokenType::Identifier, "mov"));
-    tl_mixed.push_back(Token(TokenType::LeftParen, "("));
-    tl_mixed.push_back(Token(TokenType::Integer, "1"));
-    tl_mixed.push_back(Token(TokenType::RightParen, ")"));
+    tl_mixed.push_back(Token(TokenType::Identifier, "mov", false));
+    tl_mixed.push_back(Token(TokenType::LeftParen, "(", false));
+    tl_mixed.push_back(Token(TokenType::Integer, "1", false));
+    tl_mixed.push_back(Token(TokenType::RightParen, ")", false));
     // Expect "mov(1)" if no whitespace tokens were present in original tokens
     REQUIRE(tl_mixed.to_string() == "mov(1)");
 }
@@ -834,8 +804,8 @@ TEST_CASE("TokensLine to_string inserts spaces between tokens that form multi-ch
 
     for (const auto& p : pairs) {
         TokensLine tl(Location("op", 1));
-        tl.push_back(Token(p.a, p.ta));
-        tl.push_back(Token(p.b, p.tb));
+        tl.push_back(Token(p.a, p.ta, false));
+        tl.push_back(Token(p.b, p.tb, false));
         std::string want = std::string(p.ta) + " " + std::string(p.tb);
         INFO("Checking pair: '" << p.ta << "' + '" << p.tb << "' -> to_string()");
         REQUIRE(tl.to_string() == want);
@@ -912,7 +882,7 @@ TEST_CASE("Lexer identifier forms allow underscores and digits after the first c
 }
 
 // New tests: verify all runs of any whitespace chars collapse to a single Whitespace token
-TEST_CASE("Lexer collapses mixed whitespace run into one Whitespace token",
+TEST_CASE("Lexer collapses mixed whitespace run",
           "[lexer][whitespace]") {
     g_options = Options();
 
@@ -923,17 +893,14 @@ TEST_CASE("Lexer collapses mixed whitespace run into one Whitespace token",
     REQUIRE(tf.tok_lines_count() == 1);
     const auto& toks = tf.get_tok_line(0).tokens();
 
-    REQUIRE(toks.size() == 3);
+    REQUIRE(toks.size() == 2);
     REQUIRE(toks[0].is(TokenType::Identifier));
     REQUIRE(toks[0].text() == "A");
-
-    REQUIRE(toks[1].is(TokenType::Whitespace)); // single token for the whole run
-
-    REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "B");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "B");
 }
 
-TEST_CASE("Lexer collapses multiple whitespace runs each to one Whitespace token",
+TEST_CASE("Lexer collapses multiple whitespace runs",
           "[lexer][whitespace]") {
     g_options = Options();
 
@@ -946,21 +913,15 @@ TEST_CASE("Lexer collapses multiple whitespace runs each to one Whitespace token
     const auto& toks = tf.get_tok_line(0).tokens();
 
     // Expect: A, WS, B, WS, C, WS, D
-    REQUIRE(toks.size() == 7);
+    REQUIRE(toks.size() == 4);
     REQUIRE(toks[0].is(TokenType::Identifier));
     REQUIRE(toks[0].text() == "A");
-    REQUIRE(toks[1].is(TokenType::Whitespace));
-
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "B");
     REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "B");
-    REQUIRE(toks[3].is(TokenType::Whitespace));
-
-    REQUIRE(toks[4].is(TokenType::Identifier));
-    REQUIRE(toks[4].text() == "C");
-    REQUIRE(toks[5].is(TokenType::Whitespace));
-
-    REQUIRE(toks[6].is(TokenType::Identifier));
-    REQUIRE(toks[6].text() == "D");
+    REQUIRE(toks[2].text() == "C");
+    REQUIRE(toks[3].is(TokenType::Identifier));
+    REQUIRE(toks[3].text() == "D");
 }
 
 TEST_CASE("Lexer trims leading and trailing whitespace runs",
@@ -1583,79 +1544,46 @@ TEST_CASE("Empty string literal is accepted and resolves to empty contents",
     REQUIRE(toks[0].string_value().empty());
 }
 
-TEST_CASE("TokensLine trim removes whitespace and returns change status",
-          "[lexer][trim]") {
-    g_options = Options();
-
-    TokensLine line;
-
-    // Add leading whitespace
-    line.push_back(Token(TokenType::Whitespace, " "));
-    line.push_back(Token(TokenType::Whitespace, "\t"));
-
-    // Add meaningful tokens
-    line.push_back(Token(TokenType::Identifier, "foo"));
-    line.push_back(Token(TokenType::Integer, "123"));
-
-    // Add trailing whitespace
-    line.push_back(Token(TokenType::Whitespace, " "));
-    line.push_back(Token(TokenType::Whitespace, "\n"));
-
-    REQUIRE(line.size() == 6);
-
-    bool changed = line.trim();
-
-    // After trimming, only the meaningful tokens should remain
-    REQUIRE(changed == true);
-    REQUIRE(line.size() == 2);
-    REQUIRE(line[0].text() == "foo");
-    REQUIRE(line[1].text() == "123");
-
-    // Now trimming again should return false (no change)
-    changed = line.trim();
-    REQUIRE(changed == false);
-}
-
 // New tests: direct Token::Token(TokenType, const std::string&) constructor behavior
 TEST_CASE("Token ctor infers keyword for Identifier and leaves others as None",
           "[token][ctor][identifier]") {
     // Known keyword (case-insensitive mapping performed in keyword_lookup)
-    Token t1(TokenType::Identifier, "define");
+    Token t1(TokenType::Identifier, "define", false);
     REQUIRE(t1.is(TokenType::Identifier));
     REQUIRE(t1.is(Keyword::DEFINE));
 
     // Non-keyword identifier
-    Token t2(TokenType::Identifier, "NotAKeyword123");
+    Token t2(TokenType::Identifier, "NotAKeyword123", false);
     REQUIRE(t2.is(TokenType::Identifier));
     REQUIRE(t2.is(Keyword::None));
 }
 
 TEST_CASE("Token ctor parses Integer text into int_value_",
           "[token][ctor][integer]") {
-    Token t_dec(TokenType::Integer, "123");
+    Token t_dec(TokenType::Integer, "123", false);
     REQUIRE(t_dec.is(TokenType::Integer));
     REQUIRE(t_dec.int_value() == 123);
     REQUIRE(t_dec.text() == "123");
 
-    Token t_neg(TokenType::Integer, "-45");
+    Token t_neg(TokenType::Integer, "-45", false);
     REQUIRE(t_neg.int_value() == -45);
 
     // Leading/trailing spaces are not trimmed here; stoi will throw if invalid.
     // Provide only well-formed numeric text.
-    Token t_zero(TokenType::Integer, "0");
+    Token t_zero(TokenType::Integer, "0", false);
     REQUIRE(t_zero.int_value() == 0);
 }
 
 TEST_CASE("Token ctor parses Float text into float_value_",
           "[token][ctor][float]") {
-    Token t_f1(TokenType::Float, "1.25");
+    Token t_f1(TokenType::Float, "1.25", false);
     REQUIRE(t_f1.is(TokenType::Float));
     REQUIRE(t_f1.float_value() == Catch::Approx(1.25).epsilon(1e-12));
 
-    Token t_f2(TokenType::Float, "-0.5");
+    Token t_f2(TokenType::Float, "-0.5", false);
     REQUIRE(t_f2.float_value() == Catch::Approx(-0.5).epsilon(1e-12));
 
-    Token t_f3(TokenType::Float, "123."); // trailing dot form
+    Token t_f3(TokenType::Float, "123.", false); // trailing dot form
     REQUIRE(t_f3.float_value() == Catch::Approx(123.0).epsilon(1e-12));
 }
 
@@ -1664,7 +1592,7 @@ TEST_CASE("Token ctor unescapes String text into string_value_",
     // Raw source literal content (no surrounding quotes passed to constructor).
     // lexer passes original text including escapes but without enclosing quotes for TokenType::String.
     // Here we simulate that by giving an escaped interior; unescape_c_string should resolve it.
-    Token t_str(TokenType::String, "\\n\\tA\\x41\\101\\\"");
+    Token t_str(TokenType::String, "\\n\\tA\\x41\\101\\\"", false);
     std::string expected;
     expected.push_back('\n');
     expected.push_back('\t');
@@ -1676,21 +1604,13 @@ TEST_CASE("Token ctor unescapes String text into string_value_",
     REQUIRE(t_str.string_value() == expected);
 
     // Empty string
-    Token t_empty(TokenType::String, "");
+    Token t_empty(TokenType::String, "", false);
     REQUIRE(t_empty.string_value().empty());
 }
 
 TEST_CASE("Token ctor leaves unrelated fields at defaults for non-matching types",
           "[token][ctor][defaults]") {
-    Token t_ws(TokenType::Whitespace, " ");
-    REQUIRE(t_ws.is(TokenType::Whitespace));
-    // Should not parse as integer/float/string/keyword
-    REQUIRE(t_ws.int_value() == 0);
-    REQUIRE(t_ws.float_value() == 0.0);
-    REQUIRE(t_ws.keyword() == Keyword::None);
-    REQUIRE(t_ws.string_value().empty());
-
-    Token t_plus(TokenType::Plus, "+");
+    Token t_plus(TokenType::Plus, "+", false);
     REQUIRE(t_plus.is(TokenType::Plus));
     REQUIRE(t_plus.int_value() == 0);
     REQUIRE(t_plus.float_value() == 0.0);
@@ -1706,10 +1626,9 @@ TEST_CASE("Token ctor preserves original text() for all types",
         { TokenType::Float, "3.14" },
         { TokenType::String, "XYZ" },
         { TokenType::Plus, "+" },
-        { TokenType::Whitespace, " \t" }
     };
     for (const auto& s : samples) {
-        Token t(s.first, s.second);
+        Token t(s.first, s.second, false);
         REQUIRE(t.text() == s.second);
     }
 }
@@ -1717,19 +1636,18 @@ TEST_CASE("Token ctor preserves original text() for all types",
 TEST_CASE("Token ctor integer/float throws on invalid numeric text (no catch here)",
           "[token][ctor][error][numeric]") {
     // Provide invalid integer; constructor should throw std::invalid_argument from stoi.
-    REQUIRE_THROWS(Token(TokenType::Integer, "12x"));
+    REQUIRE_THROWS(Token(TokenType::Integer, "12x", false));
     // Provide invalid float
-    REQUIRE_THROWS(Token(TokenType::Float, "1.2.3"));
+    REQUIRE_THROWS(Token(TokenType::Float, "1.2.3", false));
 }
 
 TEST_CASE("Token ctor string unescape handles hex and octal edge cases",
           "[token][ctor][string][escapes]") {
     // \x7 and \x4F plus octal \377
-    Token t(TokenType::String, "\\x7\\x4F\\377");
+    Token t(TokenType::String, "\\x7\\x4F\\377", false);
     std::string expected;
     expected.push_back(static_cast<char>(0x07));
     expected.push_back(static_cast<char>(0x4F));
     expected.push_back(static_cast<char>(0xFF));
     REQUIRE(t.string_value() == expected);
 }
-
