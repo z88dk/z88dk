@@ -216,6 +216,11 @@ private:
                            std::vector<std::string>& out_params) const;
     bool parse_macro_args(const TokensLine& line, unsigned& i,
                           std::vector<TokensLine>& out_args);
+    bool parse_argument_list(const TokensLine& line, unsigned& i,
+                             std::vector<TokensLine>& out_args);
+    bool parse_args_impl(const TokensLine& line, unsigned& i,
+                         std::vector<TokensLine>& out_args,
+                         bool check_outer_parens);
     bool parse_line_args(const TokensLine& line, unsigned& i,
                          int& out_linenum, std::string& out_filename,
                          Keyword keyword) const;

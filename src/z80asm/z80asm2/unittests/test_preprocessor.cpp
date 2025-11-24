@@ -8846,3 +8846,263 @@ TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label rep
     REQUIRE(msg.find("v") != std::string::npos);
 }
 
+TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list preserves expression structure",
+          "[preprocessor][repti][parentheses][expressions]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Test REPTI where first argument is a parenthesized expression (a+b) and second is (a-b)
+    // Each argument should be treated as a separate token sequence
+    const std::string content =
+        "#define a 10\n"
+        "#define b 20\n"
+        "REPTI var, (a+b), (a-b)\n"
+        "dw var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_paren_expr", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    // Should produce two iterations:
+    // dw (10+20)
+    // dw (10-20)
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "dw (10+20)");
+    REQUIRE(outputs[1] == "dw (10-20)");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI name-directive form with parenthesized expressions preserves expression structure",
+          "[preprocessor][repti][name-directive][parentheses][expressions]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Test name-directive form: var REPTI (a+b), (a-b)
+    // Each argument should be treated as a separate token sequence
+    const std::string content =
+        "#define a 10\n"
+        "#define b 20\n"
+        "var REPTI (a+b), (a-b)\n"
+        "dw var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_paren_expr", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    // Should produce two iterations:
+    // dw (10+20)
+    // dw (10-20)
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "dw (10+20)");
+    REQUIRE(outputs[1] == "dw (10-20)");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// NEW TESTS: REPTI with unmatched parentheses in arguments (error cases)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPTI with unmatched opening parenthesis in first argument reports error",
+          "[preprocessor][repti][error][unmatched][paren][open]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI var, (a+b\n"
+        "db var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_unmatched_open", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI with unmatched closing parenthesis reports error",
+          "[preprocessor][repti][error][unmatched][paren][close]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI var, a+b)\n"
+        "db var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_unmatched_close", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI with unmatched parentheses in second argument reports error",
+          "[preprocessor][repti][error][unmatched][paren][second]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI var, (a+b), (c-d\n"
+        "dw var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_unmatched_second", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI with multiple unmatched opening parentheses reports error",
+          "[preprocessor][repti][error][unmatched][paren][multiple]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI var, ((a+b), (c-d\n"
+        "db var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_unmatched_multiple", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI with nested unmatched parentheses reports error",
+          "[preprocessor][repti][error][unmatched][paren][nested]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTI var, (a+(b-c), (d+e)\n"
+        "db var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_unmatched_nested", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: name-directive REPTI with unmatched opening parenthesis reports error",
+          "[preprocessor][repti][name][error][unmatched][paren]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "var REPTI (a+b\n"
+        "db var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_unmatched", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list after REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list reports error",
+          "[preprocessor][repti][name][error][unmatched][list]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "var REPTI (1+2), (3+4\n"
+        "db var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_unmatched_list", 1, true);
+
+    TokensLine line;
+    while (pp.next_line(line)) { /* drain */ }
+
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid argument list after REPTI") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: REPTI with correctly matched parentheses succeeds (positive control)",
+          "[preprocessor][repti][parentheses][matched][control]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define a 10\n"
+        "#define b 20\n"
+        "REPTI var, (a+b), (a-b)\n"
+        "dw var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_matched_control", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    // Should produce two iterations with parenthesized expressions
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "dw (10+20)");
+    REQUIRE(outputs[1] == "dw (10-20)");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: name-directive REPTI with correctly matched parentheses succeeds (positive control)",
+          "[preprocessor][repti][name][parentheses][matched][control]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define a 10\n"
+        "#define b 20\n"
+        "var REPTI (a+b), (a-b)\n"
+        "dw var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_matched_control", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    // Should produce two iterations with parenthesized expressions
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "dw (10+20)");
+    REQUIRE(outputs[1] == "dw (10-20)");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
