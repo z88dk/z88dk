@@ -2640,8 +2640,6 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
    |REPTI v, 1,2,
-$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
-   |ENDR
 END
 ok ! -f "$test.i", "no .i file produced on REPTI trailing comma";
 
@@ -2655,8 +2653,6 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
    |REPTI v, (1,2
-$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
-   |ENDR
 END
 ok ! -f "$test.i", "no .i file produced on REPTI bad nesting";
 
@@ -2670,8 +2666,6 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Invalid argument list after REPTI
    |val REPTI 3,4,
-$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
-   |ENDR
 END
 ok ! -f "$test.i", "no .i file produced on name-directive REPTI trailing comma";
 
@@ -2685,8 +2679,6 @@ END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Invalid argument list after REPTI
    |val REPTI (7,8
-$test.asm:3: error: Invalid syntax: Unexpected ENDR directive without matching REPT
-   |ENDR
 END
 ok ! -f "$test.i", "no .i file produced on name-directive REPTI bad nesting";
 
@@ -3871,6 +3863,306 @@ $test.asm:4: error: Invalid syntax: Unexpected ENDIF directive without matching 
    |ENDIF
 END
 ok ! -f "$test.i", "no .i file produced on stray ELIFNDEF checking undefined symbol";
+
+#------------------------------------------------------------------------------
+# REPT / REPTC / REPTI with negative counts and values
+#------------------------------------------------------------------------------
+
+# REPT with negative count: should skip body (like zero count)
+spew("$test.asm", <<END);
+REPT -3
+SHOULD_NOT_APPEAR
+ENDR
+AFTER_NEG_REPT
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Negative count treated as zero: body skipped, next line emitted
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER_NEG_REPT
+END
+
+# REPT with -1 count: should skip body
+spew("$test.asm", <<END);
+REPT -1
+SKIP_ME
+ENDR
+AFTER_MINUS_ONE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER_MINUS_ONE
+END
+
+# REPT with large negative count: should skip body
+spew("$test.asm", <<END);
+REPT -1000
+NOT_EMITTED
+ENDR
+AFTER_LARGE_NEG
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER_LARGE_NEG
+END
+
+# REPT with negative count and LOCAL label: no labels generated
+spew("$test.asm", <<END);
+REPT -2
+LOCAL L
+L: db 1
+ENDR
+AFTER_NEG_LOCAL
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# No .L_n labels should appear
+check_text_file("$test.i", <<END);
+#line 5, "$test.asm"
+AFTER_NEG_LOCAL
+END
+
+# REPT with negative count via macro expansion
+spew("$test.asm", <<END);
+#define NEG_COUNT -5
+REPT NEG_COUNT
+HIDDEN
+ENDR
+VISIBLE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 5, "$test.asm"
+VISIBLE
+END
+
+# REPT with expression evaluating to negative: should skip body
+spew("$test.asm", <<END);
+REPT (2 - 5)
+SKIPPED
+ENDR
+NEXT_LINE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+NEXT_LINE
+END
+
+# REPTC with empty string (already tested) and negative count behavior test
+# Note: REPTC iterates over string characters, negative count doesn't apply directly
+# but we can test edge cases with special characters
+
+# REPTI with empty list (already tested) - verify negative values in list are valid
+spew("$test.asm", <<END);
+REPTI val, -3,-2,-1
+db val
+ENDR
+AFTER_NEG_VALUES
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Negative values in REPTI list should be emitted as-is
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db -3
+#line 1
+db -2
+#line 1
+db -1
+
+
+AFTER_NEG_VALUES
+END
+
+# REPTI with single negative value
+spew("$test.asm", <<END);
+REPTI v, -100
+defb v
+ENDR
+AFTER_SINGLE_NEG
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+defb -100
+
+
+AFTER_SINGLE_NEG
+END
+
+# REPTI with mix of positive and negative values
+spew("$test.asm", <<END);
+REPTI num, 5,-10,15,-20
+db num
+ENDR
+MIXED_DONE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 5
+#line 1
+db -10
+#line 1
+db 15
+#line 1
+db -20
+
+
+MIXED_DONE
+END
+
+# REPTI with negative values and LOCAL label
+spew("$test.asm", <<END);
+REPTI v, -1,-2
+LOCAL L
+L: db v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect two iterations with unique labels and negative values
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+.L_1
+#line 1
+db -1
+#line 1
+.L_2
+#line 1
+db -2
+END
+
+# REPT with negative count inside macro: body skipped during macro expansion
+spew("$test.asm", <<END);
+MACRO TEST_NEG()
+REPT -3
+INNER_SKIP
+ENDR
+OUTER_LINE
+ENDM
+TEST_NEG()
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Only OUTER_LINE should appear
+check_text_file("$test.i", <<END);
+#line 7, "$test.asm"
+OUTER_LINE
+END
+
+# REPT with count expression evaluating to negative inside conditional
+spew("$test.asm", <<END);
+#define COUNT -4
+IF COUNT < 0
+REPT COUNT
+NEVER
+ENDR
+GUARDED
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6, "$test.asm"
+GUARDED
+END
+
+# REPTI with negative expression values
+spew("$test.asm", <<END);
+#define A 10
+#define B 20
+REPTI val, (A-B), (B-A)
+dw val
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# (10-20)=-10, (20-10)=10
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+dw (10-20)
+#line 3
+dw (20-10)
+END
+
+# REPT negative count in nested context
+spew("$test.asm", <<END);
+REPT 2
+OUTER
+REPT -1
+INNER_SKIP
+ENDR
+ENDR
+AFTER_NESTED
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Two outer iterations, inner REPT skipped both times
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+OUTER
+#line 1
+OUTER
+
+
+
+
+
+AFTER_NESTED
+END
 
 #------------------------------------------------------------------------------
 # Clean up
