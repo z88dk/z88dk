@@ -509,21 +509,18 @@ bool Preprocessor::parse_params_list(const TokensLine& line, unsigned& i,
     return true;
 }
 
-// Parse macro argument list (optionally enclosed in parentheses).
-// Behavior:
-//  - Accept either parenthesized args "(a,b,...)" or unparenthesized args until end-of-line.
-//  - Arguments are separated by commas at top-level (commas inside nested parentheses are part of an argument).
-//  - An empty args list is accepted: either "()" or end-of-input (no tokens).
-//  - Trailing comma (e.g. "a,b,") is considered a syntax error and returns false.
-// On success returns true, sets i to the token index after the consumed argument list (after ')' if any, or end index),
-// and fills out_args with one TokensLine per argument (arguments preserve tokens).
-bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
-                                    std::vector<TokensLine>& out_args) {
+// Common helper to parse comma-separated arguments with parentheses depth tracking.
+// If check_outer_parens is true, checks for optional surrounding parentheses.
+// If check_outer_parens is false, always treats input as unparenthesized list.
+// Returns true on success and fills out_args with TokensLine per argument.
+bool Preprocessor::parse_args_impl(const TokensLine& line, unsigned& i,
+                                   std::vector<TokensLine>& out_args,
+                                   bool check_outer_parens) {
     out_args.clear();
     unsigned j = i;
 
     bool has_paren = false;
-    if (j < line.size() && line[j].is(TokenType::LeftParen)) {
+    if (check_outer_parens && j < line.size() && line[j].is(TokenType::LeftParen)) {
         has_paren = true;
         ++j; // consume '('
     }
@@ -542,11 +539,9 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
     bool saw_any = false;
 
     auto commit_arg = [&](bool push_empty_if_none) {
-        unsigned s = 0;
-        unsigned e = static_cast<unsigned>(cur_arg.size());
         TokensLine arg(line.location());
-        for (unsigned k = s; k < e; ++k) {
-            arg.push_back(cur_arg[k]);
+        for (const auto& t : cur_arg) {
+            arg.push_back(t);
         }
         if (push_empty_if_none || !arg.empty()) {
             out_args.push_back(arg);
@@ -558,7 +553,7 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
 
         // Handle top-level closing paren for parenthesized lists
         if (has_paren && t.is(TokenType::RightParen) && depth == 0) {
-            // commit current argument (trimmed)
+            // commit current argument
             commit_arg(true);
             cur_arg.clear();
             ++j; // consume ')'
@@ -566,9 +561,9 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
             return true;
         }
 
-        // Handle comma separators at top-level
+        // Handle comma separators at top-level (depth 0)
         if (t.is(TokenType::Comma) && depth == 0) {
-            // commit current argument (may be empty, keep it)
+            // commit current argument
             commit_arg(true);
             cur_arg.clear();
             last_was_comma = true;
@@ -577,16 +572,12 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
             continue;
         }
 
-        // Normal token processing:
-        // adjust depth when seeing parentheses
+        // Normal token processing: track parentheses depth
         if (t.is(TokenType::LeftParen)) {
             depth++;
         }
         else if (t.is(TokenType::RightParen)) {
-            if (depth > 0) {
-                depth--;
-            }
-            // otherwise this right-paren will be handled above if it's a top-level closer
+            depth--;
         }
 
         // append token to current arg
@@ -602,25 +593,53 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
         return false;
     }
 
-    // If the last processed top-level token was a comma, it's a trailing comma -> error
+    // Check for unmatched parentheses in unparenthesized argument lists
+    if (depth != 0) {
+        // Unmatched parentheses detected
+        return false;
+    }
+
+    // If the last processed token was a comma at top-level, it's a trailing comma -> error
     if (last_was_comma) {
         return false;
     }
 
-    // If we saw no tokens at all (unparenthesized end-of-input), accept empty args list
+    // If we saw no tokens at all, accept empty args list
     if (!saw_any) {
         i = j;
         return true;
     }
 
-    // commit final argument (trimmed)
+    // commit final argument
     commit_arg(true);
     cur_arg.clear();
     i = j;
     return true;
 }
 
-// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
+// Parse macro argument list (optionally enclosed in parentheses).
+// Behavior:
+//  - Accept either parenthesized args "(a,b,...)" or unparenthesized args until end-of-line.
+//  - Arguments are separated by commas at top-level (commas inside nested parentheses are part of an argument).
+//  - An empty args list is accepted: either "()" or end-of-input (no tokens).
+//  - Trailing comma (e.g. "a,b,") is considered a syntax error and returns false.
+// On success returns true, sets i to the token index after the consumed argument list (after ')' if any, or end index),
+// and fills out_args with one TokensLine per argument (arguments preserve tokens).
+bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
+                                    std::vector<TokensLine>& out_args) {
+    return parse_args_impl(line, i, out_args, true);
+}
+
+// Parse comma-separated argument list WITHOUT checking for surrounding parentheses.
+// This is used for REPTI directive form where arguments may contain parentheses.
+// Arguments are separated by commas at top-level (commas inside nested parentheses are part of an argument).
+// An empty args list is accepted (no tokens).
+// Trailing comma (e.g. "a,b,") is considered a syntax error and returns false.
+// On success returns true, sets i to end index, and fills out_args with one TokensLine per argument.
+bool Preprocessor::parse_argument_list(const TokensLine& line, unsigned& i,
+                                       std::vector<TokensLine>& out_args) {
+    return parse_args_impl(line, i, out_args, false);
+}// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
 bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    int& out_linenum, std::string& out_filename,
                                    Keyword keyword) const {
@@ -2011,24 +2030,19 @@ void Preprocessor::process_repti(const TokensLine& line, unsigned& i) {
     if (!parse_identifier(line, i, var_name)) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Expected identifier after REPTI");
-        return;
     }
 
     if (!(i < line.size() && line[i].is(TokenType::Comma))) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Expected ',' after REPTI variable name");
-        return;
     }
     ++i;
 
     // Parse the comma-separated argument list (unparenthesized)
-    TokensLine args_line = collect_tokens(line, i);
     std::vector<TokensLine> arg_list;
-    unsigned ai = 0;
-    if (!parse_macro_args(args_line, ai, arg_list)) {
+    if (!parse_argument_list(line, i, arg_list)) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Invalid argument list in REPTI");
-        return;
     }
 
     do_repti(var_name, arg_list, line);
@@ -2038,13 +2052,10 @@ void Preprocessor::process_repti(const TokensLine& line, unsigned& i) {
 void Preprocessor::process_name_repti(const TokensLine& line, unsigned& i,
                                       const std::string& var_name) {
     // The rest of the line is the list
-    TokensLine args_line = collect_tokens(line, i);
     std::vector<TokensLine> arg_list;
-    unsigned ai = 0;
-    if (!parse_macro_args(args_line, ai, arg_list)) {
+    if (!parse_argument_list(line, i, arg_list)) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Invalid argument list after REPTI");
-        return;
     }
 
     do_repti(var_name, arg_list, line);
@@ -2206,7 +2217,7 @@ void Preprocessor::process_elifdef(const TokensLine& line, unsigned& i,
                                    bool negated) {
     if (if_stack_.empty()) {
         g_errors.error(ErrorCode::InvalidSyntax,
-            "Unexpected ELIFDEF directive without matching IF");
+                       "Unexpected ELIFDEF directive without matching IF");
         return;
     }
     IfFrame& fr = if_stack_.back();
