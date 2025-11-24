@@ -232,15 +232,12 @@ static int             assembleonly = 0;
 static int             lstcwd = 0;
 static int             compileonly = 0;
 static int             m4only = 0;
-static int             clangonly = 0;
-static int             llvmonly = 0;
 static int             makelib = 0;
 static int             explicit_file_type_c = 0;
 static struct explicit_extension* explicit_extensions = NULL;
 static int             build_bin = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
-static int             zopt = 0;
 static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             sdccpeepopt = 0;
@@ -272,9 +269,6 @@ static char           *cpp_incpath_first;
 static char           *cpp_incpath_last;
 static char           *comparg;
 static char           *clangarg;
-static char           *clangcpparg = "-D\"__attribute__(x)= \" -D\"__builtin_unreachable(x)= \" ";
-static char           *llvmopt;
-static char           *llvmarg;
 static char           *linkargs;
 static char           *linker_libpath_first;
 static char           *linker_libpath_last;
@@ -343,8 +337,6 @@ static char  *c_options = NULL;
 static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_ez80clang_exe = "ez80-clang";
-static char  *c_clang_exe = "zclang";
-static char  *c_llvm_exe = "zllvm-cbe";
 static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_cpp_exe = "z88dk-ucpp";
@@ -359,7 +351,6 @@ static char  *c_copycmd = "type";
 #endif
 static char  *c_extension_config = "o";
 static char  *c_incpath = NULL;
-static char  *c_clangincpath = NULL;
 static char  *c_m4opts = NULL;
 static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
@@ -428,8 +419,7 @@ static arg_t  config[] = {
     { "COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)" },
     { "SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, NULL, "Name of sccz80 binary" },
     { "ZSDCCEXE", 0, SetStringConfig, &c_sdcc_exe, NULL, "Name of the sdcc binary" },
-    { "ZCLANGEXE", 0, SetStringConfig, &c_clang_exe, NULL, "Name of the clang binary" },
-    { "ZLLVMEXE", 0, SetStringConfig, &c_llvm_exe, NULL, "Name of the llvm-cbe binary" },
+    { "EZ80CLANGEXE", 0, SetStringConfig, &c_ez80clang_exe, NULL, "Name of the ez80-clang binary" },
 
     { "APPMAKEEXE", 0, SetStringConfig, &c_appmake_exe, NULL, "" },
     { "APPMAKER", AF_DEPRECATED, SetStringConfig, &c_appmake_exe, NULL, "Name of the applink binary (use APPMAKEEXE)" },
@@ -438,7 +428,6 @@ static arg_t  config[] = {
     { "COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, "" },
 
     { "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-isystem\"DESTDIR/include\" " },
-    { "CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "-isystem \"DESTDIR/include/_DEVELOPMENT/clang\" " },
     { "M4OPTS", 0, SetStringConfig, &c_m4opts, NULL, "", " -I \"DESTDIR/src/m4\" " },
     { "COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "\"DESTDIR/lib/z80rules.1\"" },
     { "COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "\"DESTDIR/lib/z80rules.2\"" },
@@ -570,13 +559,8 @@ static option options[] = {
     { 0, "SO", OPT_INT,  "Set the peephole optimiser setting for sdcc-peephole" , &sdccpeepopt, NULL, 0},
     { 0, "fsigned-char", OPT_BOOL|OPT_DOUBLE_DASH,  "Use signed chars by default" , &sdcc_signed_char, NULL, 0},
 
-    { 0, "", OPT_HEADER, "Compiler (clang/llvm) options:", NULL, NULL, 0 },
-    { 0, "Cg", OPT_FUNCTION,  "Add an option to clang" , &clangarg, AddToArgs, 0},
-    { 0, "clang", OPT_BOOL,  "Stop after translating .c files to llvm ir" , &clangonly, NULL, 0},
-    { 0, "llvm", OPT_BOOL,  "Stop after llvm-cbe generates new .cbe.c files" , &llvmonly, NULL, 0},
-    { 0, "Co", OPT_FUNCTION,  "Add an option to llvm-opt" , &llvmopt, AddToArgs, 0},
-    { 0, "Cv", OPT_FUNCTION,  "Add an option to llvm-cbe" , &llvmarg, AddToArgs, 0},
-    { 0, "zopt", OPT_BOOL,  "Enable llvm-optimizer (clang only)" , &zopt, NULL, 0},
+    { 0, "", OPT_HEADER, "Compiler (ez80-clang) options:", NULL, NULL, 0 },
+    { 0, "Cg", OPT_FUNCTION,  "Add an option to ez80-clang" , &clangarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
     { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
@@ -959,7 +943,7 @@ int main(int argc, char **argv)
 
     processing_user_command_line_arg = 0;
 
-    asmargs = linkargs = cpparg = clangarg = llvmopt = llvmarg = NULL;
+    asmargs = linkargs = cpparg = clangarg =  NULL;
     linklibs = muststrdup("");
 
     cpp_incpath_first = cpp_incpath_last = NULL;
@@ -1195,14 +1179,13 @@ int main(int argc, char **argv)
     }
 
     /* Mangle math lib name but only for classic compiles */
-    if ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
+    if ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")))
         if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   /* -lm appears here */
 
     /* Options that must be sequenced in specific order */
     if (compiler_type == CC_SDCC)
         BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
-    BuildOptions(&clangarg, c_clangincpath);
     if (cpp_incpath_last) {
         BuildOptions(&cpparg, cpp_incpath_last);
         BuildOptions(&clangarg, cpp_incpath_last);
@@ -1225,12 +1208,6 @@ int main(int argc, char **argv)
         BuildOptions(&linker_linklib_first, linker_linklib_last);
     if (linker_linklib_first)
         BuildOptions_start(&linklibs, linker_linklib_first);
-
-    /* CLANG & LLVM options */
-    BuildOptions_start(&clangarg, "--target=sdcc-z80 -S -emit-llvm ");
-    if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
-    BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
-    BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
 
     if (printmacros)
     {
@@ -1277,7 +1254,7 @@ int main(int argc, char **argv)
     /* m4 include path finds z88dk macro definition file "z88dk.m4" */
     BuildOptions(&m4arg, c_m4opts);
 
-    build_bin = !m4only && !clangonly && !llvmonly && !dependencyonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
+    build_bin = !m4only && !dependencyonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
 
     /* Create M4 defines out of some pragmas for the CRT */
     /* Some pragma values need to be known at m4 time in the new c lib CRTs */
@@ -1384,37 +1361,9 @@ int main(int argc, char **argv)
             /* Continue processing macro expanded source file */
             goto SWITCH_REPEAT;
             break;
-        CASE_LLFILE:
-        case LLFILE:
-            if (m4only || clangonly) continue;
-            /* llvm-cbe translates llvm-ir to c */
-            if (zopt && process(".ll", ".opt.ll", "zopt", llvmopt, outspecified_flag, i, YES, NO))
-                exit(1);
-            if (process(".ll", ".cbe.c", c_llvm_exe, llvmarg, outspecified_flag, i, YES, NO))
-                exit(1);
-            /* Write .cbe.c to original directory immediately */
-            ptr = changesuffix(original_filenames[i], ".cbe.c");
-            if (copy_file(filelist[i], "", ptr, "")) {
-                fprintf(stderr, "Couldn't write output file %s\n", ptr);
-                exit(1);
-            }
-            /* Copied file becomes the new original file */
-            free(original_filenames[i]);
-            free(filelist[i]);
-            original_filenames[i] = ptr;
-            filelist[i] = muststrdup(ptr);
         case CFILE:
         case CXXFILE:
             if (m4only) continue;
-            /* special treatment for clang+llvm */
-            if ((strcmp(c_compiler_type, "clang") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
-                if (process(".c", ".ll", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
-                    exit(1);
-                goto CASE_LLFILE;
-            }
-            if (clangonly || llvmonly) continue;
-            if (hassuffix(filelist[i], ".cbe.c"))
-                BuildOptions(&cpparg, clangcpparg);
             /* past clang+llvm related pre-processing */
             if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
@@ -1436,7 +1385,7 @@ int main(int argc, char **argv)
             {
                 char *compiler_arg = NULL;
 
-                if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly) continue;
+                if (m4only || preprocessonly || dependencyonly) continue;
 
                 if ( get_filetype_by_suffix(original_filenames[i]) == CXXFILE ) {
                     if ( compiler_type != CC_EZ80CLANG) {
@@ -1455,7 +1404,7 @@ int main(int argc, char **argv)
                 free(compiler_arg);
             }
         case OPTFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly) continue;
+            if (m4only || preprocessonly || dependencyonly) continue;
             if (compiler_type == CC_SDCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
@@ -1567,7 +1516,7 @@ int main(int argc, char **argv)
             /* user wants to stop at the .s file if stopping at assembly translation */
             if (assembleonly) continue;
         case SFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly) continue;
+            if (m4only || preprocessonly || dependencyonly) continue;
             /* filter comments out of asz80 asm file see issue #801 on github */
             /* substitute section names for section redirect */
 
@@ -1578,7 +1527,7 @@ int main(int argc, char **argv)
 
         CASE_ASMFILE:
         case ASMFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly || dependencyonly || assembleonly)
+            if (m4only || preprocessonly || dependencyonly || assembleonly)
                 continue;
 
             /* See #16 on github.                                                                    */
@@ -1711,14 +1660,6 @@ int main(int argc, char **argv)
 
     if (m4only) exit(0);
 
-    if (clangonly) {
-        if (nfiles > 1) outputfile = NULL;
-        copy_output_files_to_destdir(".ll", 1);
-        exit(0);
-    }
-
-    if (llvmonly) exit(0);
-
     if (preprocessonly) {
         if (nfiles > 1) outputfile = NULL;
         copy_output_files_to_destdir(".i", 1);
@@ -1752,7 +1693,7 @@ int main(int argc, char **argv)
 
     {
         // Sort out linklibs for CPU markers (only for classic)
-        int cpu_libs = ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")));
+        int cpu_libs = ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")));
         char *tmp = replace_str(linklibs, "@{ZCC_LIBCPU}", cpu_libs ? select_cpu(CPU_MAP_TOOL_LIBNAME) : "");
 
         free(linklibs);
@@ -2322,8 +2263,6 @@ int get_filetype_by_suffix(char *name)
         return HDRFILE;
     if (strcmp(ext, ".inc") == 0)
         return INCFILE;
-    if (strcmp(ext, ".ll") == 0)
-        return LLFILE;
     return 0;
 }
 
@@ -2517,14 +2456,12 @@ void AddPreProcIncPath(option *argument, char *arg)
 void AddPreProc(option *argument, char *arg)
 {
     BuildOptions(&cpparg, arg);
-    BuildOptions(&clangarg, arg);
 }
 
 void AddPreProcGen(option *argument, char *arg)
 {
     dependencyonly = 1;
     BuildOptions(&cpparg, arg);
-    BuildOptions(&clangarg, arg);
 }
 
 
@@ -3088,7 +3025,7 @@ static void configure_compiler(void)
     BuildOptions(&cpparg, "-D__Z88DK");
 
     /* compiler= */
-    if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
+    if (strcmp(c_compiler_type, "sdcc") == 0) {
         char *cpuarg = select_cpu(CPU_MAP_TOOL_ZSDCC);
 
         if ( cpuarg == NULL ) {
@@ -3179,6 +3116,11 @@ static void configure_compiler(void)
         BuildOptions(&cpparg, preprocarg);
         snprintf(buf, sizeof(buf), "-cc1 %s -S -O3", cpuarg);
         add_option_to_compiler(buf);
+
+        if (clangarg) {
+            add_option_to_compiler(clangarg);
+        }
+
         compiler_type = CC_EZ80CLANG;
         c_compiler = c_ez80clang_exe;
         c_cpp_exe = c_ez80clang_exe;
