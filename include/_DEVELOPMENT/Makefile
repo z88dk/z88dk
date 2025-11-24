@@ -9,9 +9,8 @@ HEADERS  := $(call rwildcard,proto,*)
 
 SCCZ80_HEADERS := $(subst proto,sccz80,$(HEADERS))
 SDCC_HEADERS   := $(subst proto,sdcc,$(HEADERS))
-CLANG_HEADERS  := $(subst proto,clang,$(HEADERS))
 
-default: dirs $(SCCZ80_HEADERS) $(SDCC_HEADERS) $(CLANG_HEADERS) classic
+default: dirs $(SCCZ80_HEADERS) $(SDCC_HEADERS) classic
 
 sccz80/%.h: proto/%.h
 	m4 -Dm4_SCCZ80 $^ > $@
@@ -19,16 +18,10 @@ sccz80/%.h: proto/%.h
 sdcc/%.h: proto/%.h
 	m4 -Dm4_SDCC $^ > $@
 
-clang/%.h: proto/%.h
-	m4 -Dm4_CLANG $^ > $@
-
 sccz80/%README: proto/%README
 	cp $^ $@
 
 sdcc/%README: proto/%README
-	cp $^ $@
-
-clang/%README: proto/%README
 	cp $^ $@
 
 # Copy files for classic up
@@ -42,6 +35,5 @@ classic:
 dirs:
 	@mkdir -p $(dir $(SCCZ80_HEADERS))
 	@mkdir -p $(dir $(SDCC_HEADERS))
-	@mkdir -p $(dir $(CLANG_HEADERS))
 
 .PHONY: dirs classic
