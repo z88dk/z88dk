@@ -1188,16 +1188,11 @@ int main(int argc, char **argv)
 
     if (cpp_incpath_last) {
         BuildOptions(&cpparg, cpp_incpath_last);
-        BuildOptions(&clangarg, cpp_incpath_last);
     }
     if (cpp_incpath_first) {
         BuildOptions_start(&cpparg, cpp_incpath_first);
-        BuildOptions_start(&clangarg, cpp_incpath_first);
     }
-    clangarg = replace_str(ptr = clangarg, "-I", "-idirafter ");
-    free(ptr);
-    clangarg = replace_str(ptr = clangarg, "-D__SDCC", "-D__CLANG");
-    free(ptr);
+
 
     BuildOptions(&linker_libpath_first, "-L. ");
     if (linker_libpath_last)
