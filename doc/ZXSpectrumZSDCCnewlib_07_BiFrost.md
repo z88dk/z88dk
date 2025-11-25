@@ -266,7 +266,7 @@ direction. This is the restriction of working with the low resolution BiFrost
 library: it works in full tile coordinates, which are 16 pixels wide.
 
 You may want to check out the available BIFROSTL functions in the
-[header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/bifrost_l.h).
+[header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/bifrost_l.h).
 
 This example program has 2 pragma instructions at the top. These are important,
 as we'll see in a few moments. First, we need to see how to build this program.

@@ -3,6 +3,9 @@ include(__link__.m4)
 #ifndef __ARCH_H__
 #define __ARCH_H__
 
+#include <sys/compiler.h>
+
+
 // target configuration goes here
 
 #ifdef __CPM

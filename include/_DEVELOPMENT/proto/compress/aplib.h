@@ -20,6 +20,9 @@ include(__link__.m4)
 //                                                              //
 //////////////////////////////////////////////////////////////////
 
+#include <sys/compiler.h>
+
+
 __DPROTO(`iyl,iyh',`iyl,iyh',void,,aplib_depack,void *dst,void *src)
 
 #ifdef __SMS

@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __LIBGEN_H__
 #define __LIBGEN_H__
 
+#include <sys/compiler.h>
+
 __D2PROTO(,,char,*,basename,char *path)
 __D2PROTO(,,char,*,basename_ext,char *path)
 __D2PROTO(,,char,*,dirname,char *path)

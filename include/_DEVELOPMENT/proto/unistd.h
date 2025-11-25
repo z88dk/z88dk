@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __UNISTD_H__
 #define __UNISTD_H__
 
+#include <sys/compiler.h>
+
 #ifndef NULL
 #define NULL                   ((void*)(0))
 #endif

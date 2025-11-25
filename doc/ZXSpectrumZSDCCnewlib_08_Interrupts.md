@@ -349,7 +349,7 @@ happening. We arrange this by wrapping our interrupt service routine definition
 with the *IM2_DEFINE_ISR_WITH_BASIC()* macro. This adds the same housekeeping
 wrapping code around the C ISR, and additionally makes a call into the Spectrum's
 ROM to run the BASIC ISR as well. If you're interested, you can see how this is
-set up by looking at the macro in the [im2 header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/im2.h#L87).
+set up by looking at the macro in the [im2 header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/im2.h#L87).
 
 With this in place we can set up a C code interrupt service routine, then return
 to BASIC with it still running, like this example:

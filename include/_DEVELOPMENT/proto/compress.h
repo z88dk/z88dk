@@ -4,7 +4,7 @@ include(__link__.m4)
 #define __COMPRESS_H__
 
 // data compression / decompression
-
+#include <sys/compiler.h>
 #include <compress/aplib.h>
 #include <compress/zx7.h>
 #include <compress/zx0.h>

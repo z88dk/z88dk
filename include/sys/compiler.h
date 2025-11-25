@@ -8,6 +8,7 @@
 #if defined(__CLION_IDE__) | defined(__INTELLISENSE__)
 
 #define __LIB__
+#define __SMALLC
 #define __SAVEFRAME__
 #define __z88dk_fastcall
 #define __FASTCALL__
@@ -30,6 +31,7 @@
 #if __SDCC | __clang__
 #define __LIB__
 #define __SAVEFRAME__
+#define __SMALLC
 #define far
 #define __vasmallc
 #define __Z88DK_R2L_CALLING_CONVENTION 1
@@ -46,6 +48,8 @@
 #endif
 
 #else
+// sccz80 case
+#define __SMALLC __smallc
 #define __vasmallc __smallc
 #define __z88dk_deprecated
 #endif

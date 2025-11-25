@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __CTYPE_H__
 #define __CTYPE_H__
 
+#include <sys/compiler.h>
+
 __D2PROTO(`b,c,d,e',`b,c,d,e',int,,isalnum,int)
 __D2PROTO(`b,c,d,e',`b,c,d,e',int,,isalpha,int)
 __D2PROTO(`b,c,d,e',`b,c,d,e',int,,isascii,int)
