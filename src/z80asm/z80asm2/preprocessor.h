@@ -115,6 +115,7 @@ private:
         // True when this file represents an expanded macro "virtual file".
         bool is_macro_expansion = false;
         bool exitm_found = false;
+        bool is_virtual_file = false;
     };
 
     struct IfFrame {
