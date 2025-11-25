@@ -19,7 +19,7 @@
     defc    crt0 = 1
     INCLUDE "zcc_opt.def"
 
-    INCLUDE     "target/sms/def/sms.def"
+    INCLUDE     "target/sms/def/sms.h"
 
 ;-------
 ; Some general scope declarations

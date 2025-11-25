@@ -7,6 +7,9 @@
 // must be a multiple of $100; usually $3f00; fills $100 bytes
 #define __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS 0x3f00
 
+#define __SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS_CLASSIC  0x0000
+
+
 
 
 // VDP ports
