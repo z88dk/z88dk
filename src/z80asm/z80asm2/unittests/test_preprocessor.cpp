@@ -3072,7 +3072,7 @@ TEST_CASE("Preprocessor: REPT with undefined expression is rejected and body con
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Undefined symbol: A") != std::string::npos);
-    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:3:") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body consumed",
@@ -3104,7 +3104,7 @@ TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Not constant symbol: A") != std::string::npos);
-    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:3:") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consumed",
@@ -3135,7 +3135,7 @@ TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consum
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Extern symbol: A") != std::string::npos);
-    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:3:") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: nested REPT repeats inner body correctly",

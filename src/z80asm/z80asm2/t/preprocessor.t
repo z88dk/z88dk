@@ -1629,6 +1629,7 @@ END
 unlink("$test.i");
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:3: error: Macro recursion limit exceeded: B
+   |A
    |B
 END
 ok ! -f "$test.i", "output file not produced on error";
@@ -2827,6 +2828,7 @@ A
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:4: error: Macro recursion limit exceeded: C
+   |A
    |C
 END
 ok ! -f "$test.i", "output file not produced on longer macro cycle";
@@ -3577,6 +3579,7 @@ M()
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:4: error: Invalid syntax: Unexpected token: 'extra'
+   |M()
    |EXITM extra
 END
 ok ! -f "$test.i", "no .i file produced on EXITM with trailing tokens";

@@ -1,7 +1,6 @@
 - add tests of the HLA features
 - add tests of processing of .asm.m4 file
 - add tests of processing of .asm.pl file
-- g_errors.set_source_line must must use the actual source line, not the to_string() conversion
 - DEFC expressions may influence IFDEF and IF behavior; do a preprocessing time symbol table 
   to cope for this
 - ifndef guard needs to check also DEFC
