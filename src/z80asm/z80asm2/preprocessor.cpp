@@ -109,6 +109,7 @@ void Preprocessor::push_file(const std::string& filename) {
     f.forced_constant_line_numbers = false;
     f.is_macro_expansion = false;
     f.exitm_found = false;
+    f.is_virtual_file = false;
 
     // detect #ifndef/#define guard
     std::string symbol;
@@ -133,6 +134,7 @@ void Preprocessor::push_virtual_file(const std::string& content,
     vf.forced_constant_line_numbers = false;
     vf.is_macro_expansion = false;
     vf.exitm_found = false;
+    vf.is_virtual_file = true;
     file_stack_.push_back(std::move(vf));
 }
 
@@ -148,6 +150,7 @@ void Preprocessor::push_virtual_file(const std::vector<TokensLine>& tok_lines,
     vf.forced_constant_line_numbers = false;
     vf.is_macro_expansion = false;
     vf.exitm_found = false;
+    vf.is_virtual_file = true;
     file_stack_.push_back(std::move(vf));
 }
 
@@ -1387,8 +1390,17 @@ bool Preprocessor::fetch_line(TokensLine& out) {
         Location loc = compute_location(file, out);
         out.set_location(loc);
 
-        g_errors.set_location(out.location());
-        g_errors.set_source_line(out.to_string());
+        // report position
+        if (file.is_virtual_file) {
+            g_errors.set_expanded_line(out.to_string());
+        }
+        else {
+            assert(file.last_physical_line_num >= 1);
+            const std::string source_line =
+                file.tokens_file->get_line(file.last_physical_line_num - 1);
+            g_errors.set_location(loc);
+            g_errors.set_source_line(source_line);
+        }
 
         // Potentially split line into segments
         std::vector<TokensLine> segments;
