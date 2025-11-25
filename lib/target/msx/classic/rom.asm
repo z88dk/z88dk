@@ -13,9 +13,17 @@
 
 
     defc    TAR__clib_exit_stack_size = 0
+IFNDEF REGISTER_SP
     defc    TAR__register_sp = -0xfc4a
+ELSE
+    defc    TAR__register_sp = REGISTER_SP
+ENDIF
     defc    TAR__crt_enable_eidi = $02 ; ei on entry
+IFNDEF CRT_ON_EXIT
     defc    TAR__crt_on_exit = 0x10001  ;loop forever
+ELSE
+    defc    TAR__crt_on_exit = CRT_ON_EXIT
+ENDIF
     INCLUDE "crt/classic/crt_rules.inc"
 
 ;
