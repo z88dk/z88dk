@@ -968,34 +968,129 @@ TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filena
 TEST_CASE("Preprocessor: object-like #define and name define expand to replacement",
           "[preprocessor][define][object]") {
     g_errors.reset();
-    g_symbol_table.clear();
-    Preprocessor pp;
 
-    // #define form
+    // #define form, not constant
     {
+        Preprocessor pp;
+        g_symbol_table.clear();
+
+        const std::string content = "#define X FOO\nX\n";
+        pp.push_virtual_file(content, "def_obj_hash", 1, true);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "FOO");
+
+        REQUIRE_FALSE(pp.next_line(line));
+    }
+
+    // #define form, constant
+    {
+        Preprocessor pp;
+        g_symbol_table.clear();
+
         const std::string content = "#define X 5\nX\n";
         pp.push_virtual_file(content, "def_obj_hash", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        // Expect integer token 5 as replacement
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 5);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].keyword() == Keyword::DEFC);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "X");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 5);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "X");
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
-    // name define form
+    // #define form, constant plus trailing text
     {
+        Preprocessor pp;
+        g_symbol_table.clear();
+
+        const std::string content = "#define X 5 more\nX\n";
+        pp.push_virtual_file(content, "def_obj_hash", 1, true);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 2);
+        REQUIRE(line[0].is(TokenType::Integer));
+        REQUIRE(line[0].int_value() == 5);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "more");
+
+        REQUIRE_FALSE(pp.next_line(line));
+    }
+
+    // name define form, not constant
+    {
+        Preprocessor pp;
+        g_symbol_table.clear();
+
+        const std::string content = "Y define FOO\nY\n";
+        pp.push_virtual_file(content, "def_obj_name", 1, true);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "FOO");
+
+        REQUIRE_FALSE(pp.next_line(line));
+    }
+
+    // name define form, constant
+    {
+        Preprocessor pp;
+        g_symbol_table.clear();
+
         const std::string content = "Y define 6\nY\n";
         pp.push_virtual_file(content, "def_obj_name", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 6);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].keyword() == Keyword::DEFC);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "Y");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 6);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "Y");
+
+        REQUIRE_FALSE(pp.next_line(line));
+    }
+
+    // name define form, constant plus trailing text
+    {
+        Preprocessor pp;
+        g_symbol_table.clear();
+
+        const std::string content = "Y define 6 more\nY\n";
+        pp.push_virtual_file(content, "def_obj_name", 1, true);
+
+        TokensLine line;
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 2);
+        REQUIRE(line[0].is(TokenType::Integer));
+        REQUIRE(line[0].int_value() == 6);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "more");
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -1016,17 +1111,20 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        // Expect the expanded token to be integer 10
-        bool found10 = false;
-        for (const auto& t : toks) {
-            if (t.is(TokenType::Integer) && t.int_value() == 10) {
-                found10 = true;
-                break;
-            }
-        }
-        REQUIRE(found10);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].keyword() == Keyword::DEFC);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "A");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 10);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "A");
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     // Multi-argument example: ADD1(1,TWO) -> should contain both 1 and 2 after expansion
@@ -1039,18 +1137,23 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        int found1 = 0, found2 = 0;
-        for (const auto& t : toks) {
-            if (t.is(TokenType::Integer) && t.int_value() == 1) {
-                ++found1;
-            }
-            if (t.is(TokenType::Integer) && t.int_value() == 2) {
-                ++found2;
-            }
-        }
-        REQUIRE(found1 >= 1);
-        REQUIRE(found2 >= 1);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].keyword() == Keyword::DEFC);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "TWO");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 2);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 3);
+        REQUIRE(line[0].is(TokenType::Integer));
+        REQUIRE(line[0].int_value() == 1);
+        REQUIRE(line[1].is(TokenType::Plus));
+        REQUIRE(line[2].is(TokenType::Identifier));
+        REQUIRE(line[2].text() == "TWO");
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -1067,11 +1170,22 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         pp.push_virtual_file(content, "def_empty_hash", 1, true);
 
         TokensLine line;
+
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 1);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].keyword() == Keyword::DEFC);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "EMPTY");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 1);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "EMPTY");
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     // name define with empty body
@@ -1080,11 +1194,22 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         pp.push_virtual_file(content, "def_empty_name", 1, true);
 
         TokensLine line;
+
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 1);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].keyword() == Keyword::DEFC);
+        REQUIRE(line[1].is(TokenType::Identifier));
+        REQUIRE(line[1].text() == "E");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 1);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "E");
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
 
     // function-like macro with empty body should also expand to 1
@@ -1094,10 +1219,11 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 1);
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Integer));
+        REQUIRE(line[0].int_value() == 1);
+
+        REQUIRE_FALSE(pp.next_line(line));
     }
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -1130,7 +1256,7 @@ TEST_CASE("Preprocessor: name undef removes macro (name UNDEF syntax)",
     g_symbol_table.clear();
     Preprocessor pp;
 
-    const std::string content = "M define 42\nM undef\nM\n";
+    const std::string content = "M define FOO\nM undef\nM\n";
     pp.push_virtual_file(content, "def_name_undef", 1, true);
 
     TokensLine line;
@@ -1148,15 +1274,15 @@ TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
     g_symbol_table.clear();
     Preprocessor pp;
 
-    const std::string content = "#define N 99\n#undef N\nN\n";
+    const std::string content = "#define N FOO\n#undef N\nN\n";
     pp.push_virtual_file(content, "def_hash_undef", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    const auto& toks = line.tokens();
-    REQUIRE(!toks.empty());
-    // After #undef the token should be the identifier 'N', not the expansion 99
-    REQUIRE(toks[0].text() == "N");
+    REQUIRE(line.size() == 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "N");
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -1499,9 +1625,9 @@ TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma lis
     // LIST expands to "10, 20" (a non-constant expression for eval_const_expr).
     // DEFL P=LIST should store the expanded body so that "db P" becomes "db 10,20".
     const std::string content =
-        "#define A 10\n"
-        "#define B 20\n"
-        "#define LIST A, B\n"
+        "DEFL A = 10\n"
+        "DEFL B = 20\n"
+        "DEFL LIST = A, B\n"
         "DEFL P=LIST\n"
         "db P\n";
     pp.push_virtual_file(content, "defl_nonconst", 1, true);
@@ -1551,10 +1677,19 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 5);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].text() == "DEFC");
+        REQUIRE(line[1].text() == "A");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 5);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "A");
+
+        REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
     }
 
@@ -1568,10 +1703,19 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
 
         TokensLine line;
         REQUIRE(pp.next_line(line));
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 6);
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].text() == "DEFC");
+        REQUIRE(line[1].text() == "B");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 6);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "B");
+
+        REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
     }
 }
@@ -1587,11 +1731,20 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
         pp.push_virtual_file(content, "def_eq_empty_obj", 1, true);
 
         TokensLine line;
-        REQUIRE(pp.next_line(line)); // expanded "E"
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 1);
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 4);
+        REQUIRE(line[0].text() == "DEFC");
+        REQUIRE(line[1].text() == "E");
+        REQUIRE(line[2].is(TokenType::EQ));
+        REQUIRE(line[3].is(TokenType::Integer));
+        REQUIRE(line[3].int_value() == 1);
+
+        REQUIRE(pp.next_line(line));
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "E");
+
+        REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
     }
 
@@ -1605,10 +1758,9 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "F(2)"
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 1);
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Integer));
+        REQUIRE(line[0].int_value() == 1);
         REQUIRE_FALSE(g_errors.has_errors());
     }
 }
@@ -1617,37 +1769,35 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
 
 TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like body",
           "[preprocessor][define][equals][prefix][object]") {
-    // Spaced form: "DEFINE A = 5"
+    // Spaced form: "DEFINE A = FOO"
     {
         g_errors.reset();
         g_symbol_table.clear();
         Preprocessor pp;
-        const std::string content = "DEFINE A = 5\nA\n";
+        const std::string content = "DEFINE A = FOO\nA\n";
         pp.push_virtual_file(content, "def_prefix_eq_obj_spaced", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "A"
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 5);
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "FOO");
         REQUIRE_FALSE(g_errors.has_errors());
     }
 
-    // Tight form: "DEFINE B=6"
+    // Tight form: "DEFINE B=FOO"
     {
         g_errors.reset();
         g_symbol_table.clear();
         Preprocessor pp;
-        const std::string content = "DEFINE B=6\nB\n";
+        const std::string content = "DEFINE B=FOO\nB\n";
         pp.push_virtual_file(content, "def_prefix_eq_obj_nospaces", 1, true);
 
         TokensLine line;
         REQUIRE(pp.next_line(line)); // expanded "B"
-        const auto& toks = line.tokens();
-        REQUIRE(!toks.empty());
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == 6);
+        REQUIRE(line.size() == 1);
+        REQUIRE(line[0].is(TokenType::Identifier));
+        REQUIRE(line[0].text() == "FOO");
         REQUIRE_FALSE(g_errors.has_errors());
     }
 }
@@ -1663,11 +1813,19 @@ TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
     pp.push_virtual_file(content, "def_prefix_eq_empty_obj", 1, true);
 
     TokensLine line;
-    REQUIRE(pp.next_line(line)); // expanded "E"
-    const auto& toks = line.tokens();
-    REQUIRE(!toks.empty());
-    REQUIRE(toks[0].is(TokenType::Integer));
-    REQUIRE(toks[0].int_value() == 1);
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "E");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 1);
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 1);
+    REQUIRE(line[0].text() == "E");
+
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -1706,7 +1864,7 @@ TEST_CASE("Preprocessor: name UNDEFINE removes macro (synonym to UNDEF)",
     g_symbol_table.clear();
     Preprocessor pp;
 
-    const std::string content = "M define 42\nM UNDEFINE\nM\n";
+    const std::string content = "M define FOO\nM UNDEFINE\nM\n";
     pp.push_virtual_file(content, "def_name_undefine", 1, true);
 
     TokensLine line;
@@ -1724,15 +1882,15 @@ TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
     g_symbol_table.clear();
     Preprocessor pp;
 
-    const std::string content = "#define N 99\n#UNDEFINE N\nN\n";
+    const std::string content = "#define N FOO\n#UNDEFINE N\nN\n";
     pp.push_virtual_file(content, "def_hash_undefine", 1, true);
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    const auto& toks = line.tokens();
-    REQUIRE(!toks.empty());
-    // After #UNDEFINE the token should be the identifier 'N', not the expansion 99
-    REQUIRE(toks[0].text() == "N");
+    REQUIRE(line.size() == 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "N");
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2706,8 +2864,8 @@ TEST_CASE("Preprocessor: #define redefines existing #define -> MacroRedefined er
     Preprocessor pp;
 
     const std::string content =
-        "#define A 1\n"
-        "#define A 2\n"
+        "#define A A1\n"
+        "#define A A2\n"
         "A\n";
     pp.push_virtual_file(content, "redef_define_hash", 1, true);
 
@@ -2717,8 +2875,7 @@ TEST_CASE("Preprocessor: #define redefines existing #define -> MacroRedefined er
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Macro redefined") != std::string::npos);
-    REQUIRE(msg.find("A") != std::string::npos);
+    REQUIRE(msg.find("Macro redefined: A") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined error",
@@ -2728,8 +2885,8 @@ TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined
     Preprocessor pp;
 
     const std::string content =
-        "B define 10\n"
-        "B define 20\n"
+        "B define FOO\n"
+        "B define BAR\n"
         "B\n";
     pp.push_virtual_file(content, "redef_define_name", 1, true);
 
@@ -2738,8 +2895,7 @@ TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Macro redefined") != std::string::npos);
-    REQUIRE(msg.find("B") != std::string::npos);
+    REQUIRE(msg.find("Macro redefined: B") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: MACRO (directive form) redefines existing MACRO -> MacroRedefined error",
@@ -2797,7 +2953,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
         Preprocessor pp;
 
         const std::string content =
-            "#define X 1\n"
+            "#define X FOO\n"
             "MACRO X()\n"
             "ENDM\n"
             "X\n";
@@ -2821,7 +2977,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
         const std::string content =
             "MACRO Y()\n"
             "ENDM\n"
-            "#define Y 2\n"
+            "#define Y FOO\n"
             "Y\n";
         pp.push_virtual_file(content, "redef_mixed_macro_then_def", 1, true);
 
@@ -3634,14 +3790,20 @@ TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    const auto& toks = line.tokens();
-    REQUIRE(toks.size() >= 4);
-    REQUIRE(toks[0].text() == "X");
-    REQUIRE(toks[1].is(TokenType::Integer));
-    REQUIRE(toks[1].int_value() == 1);
-    REQUIRE(toks[2].text() == "+");
-    REQUIRE(toks[3].is(TokenType::Integer));
-    REQUIRE(toks[3].int_value() == 2);
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "EXPR");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 3);
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 2);
+    REQUIRE(line[0].text() == "X");
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "EXPR");
+
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -4092,19 +4254,32 @@ TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tok
     pp.push_virtual_file(content, "equ_name_expand", 1, true);
 
     TokensLine line;
-    REQUIRE(pp.next_line(line)); // expect the DEFC line
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "A");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 10);
 
-    const auto& t = line.tokens();
-    REQUIRE(t.size() >= 6);
-    REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].text() == "SUM");
-    REQUIRE(t[2].is(TokenType::EQ));
-    // RHS must be: 10 + 20 (macro-expanded)
-    REQUIRE(t[3].is(TokenType::Integer));
-    REQUIRE(t[3].int_value() == 10);
-    REQUIRE(t[4].text() == "+");
-    REQUIRE(t[5].is(TokenType::Integer));
-    REQUIRE(t[5].int_value() == 20);
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "B");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 20);
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 6);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "SUM");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Identifier));
+    REQUIRE(line[3].text() == "A");
+    REQUIRE(line[4].is(TokenType::Plus));
+    REQUIRE(line[5].is(TokenType::Identifier));
+    REQUIRE(line[5].text() == "B");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4148,14 +4323,20 @@ TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    const auto& t = line.tokens();
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "A");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 42);
 
-    REQUIRE(t.size() >= 4);
-    REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].text() == "Z");
-    REQUIRE(t[2].is(TokenType::EQ));
-    REQUIRE(t[3].is(TokenType::Integer));
-    REQUIRE(t[3].int_value() == 42);
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "Z");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Identifier));
+    REQUIRE(line[3].text() == "A");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4174,14 +4355,20 @@ TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    const auto& t = line.tokens();
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "A");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 3);
 
-    REQUIRE(t.size() >= 4);
-    REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].text() == "W");
-    REQUIRE(t[2].is(TokenType::EQ));
-    REQUIRE(t[3].is(TokenType::Integer));
-    REQUIRE(t[3].int_value() == 3);
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "W");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Identifier));
+    REQUIRE(line[3].text() == "A");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4282,15 +4469,21 @@ TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
     pp.push_virtual_file(content, "eqsyn_expand", 1, true);
 
     TokensLine line;
-    REQUIRE(pp.next_line(line)); // DEFC line
-    const auto& t = line.tokens();
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "A");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 5);
 
-    REQUIRE(t.size() >= 4);
-    REQUIRE(t[0].text() == "DEFC");
-    REQUIRE(t[1].text() == "x");
-    REQUIRE(t[2].is(TokenType::EQ));
-    REQUIRE(t[3].is(TokenType::Integer));
-    REQUIRE(t[3].int_value() == 5);
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "x");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Identifier));
+    REQUIRE(line[3].text() == "A");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4407,24 +4600,28 @@ TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
 
     TokensLine line;
 
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line.to_string() == "DEFC A = 1");
+
     // Outer IF true -> "X" emitted
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "X");
+    REQUIRE(line.to_string() == "X");
     REQUIRE(line.location().line_num() == 102);
     REQUIRE(line.location().filename() == "ifnest.asm");
 
     // Inner IF false, ELIF true -> "Z" emitted
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "Z");
+    REQUIRE(line.to_string() == "Z");
     REQUIRE(line.location().line_num() == 106);
     REQUIRE(line.location().filename() == "ifnest.asm");
 
     // After the whole IF block
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after");
+    REQUIRE(line.to_string() == "after");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -4457,20 +4654,26 @@ TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELI
 
     TokensLine line;
 
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.to_string() == "DEFC A = 0");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.to_string() == "DEFC B = 1");
+
     // Should select ELIF branch
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "ELIF_BRANCH");
+    REQUIRE(line.to_string() == "ELIF_BRANCH");
 
     // Inside ELIF branch the inner IF 0 -> ELSE path selected
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "INNER_ELSE");
+    REQUIRE(line.to_string() == "INNER_ELSE");
 
     // After full conditional group
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "done");
+    REQUIRE(line.to_string() == "done");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4499,8 +4702,16 @@ TEST_CASE("Preprocessor: IF with multiple ELIF selects first true and ignores th
 
     // Only the first matching ELIF branch ("TWO") should be emitted
     REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "v");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 2);
+
+    REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "TWO");
+    REQUIRE(line.to_string() == "TWO");
 
     // No more lines from this block
     REQUIRE_FALSE(pp.next_line(line));
@@ -4538,7 +4749,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
     // Expect IF branch selected
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "OK1");
+    REQUIRE(line.to_string() == "OK1");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -4572,7 +4783,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects EL
     // Expect ELSE branch selected
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "OK0");
+    REQUIRE(line.to_string() == "OK0");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -4598,7 +4809,7 @@ TEST_CASE("Preprocessor: IF with undefined symbol does not report error and sele
     // Expect ELSE branch selected due to undefined symbol evaluating as false
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "ELSE_OK");
+    REQUIRE(line.to_string() == "ELSE_OK");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -4628,8 +4839,17 @@ TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "M");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 1);
+
+    REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "T");
+    REQUIRE(line.to_string() == "T");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -4651,7 +4871,7 @@ TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
     TokensLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "MISSING_TRUE");
+    REQUIRE(line.to_string() == "MISSING_TRUE");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -4675,8 +4895,17 @@ TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
 
     TokensLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].text() == "DEFC");
+    REQUIRE(line[1].text() == "A");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 1);
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 1);
     REQUIRE(line[0].text() == "ELIFDEF_TRUE");
+
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -4728,12 +4957,13 @@ TEST_CASE("Preprocessor: IFDEF/ELIFDEF nested with ELSE/ENDIF behave correctly",
     TokensLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "O");
+    REQUIRE(line.to_string() == "DEFC OUT = 1");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "INNER_TRUE");
+    REQUIRE(line.to_string() == "O");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.to_string() == "INNER_TRUE");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -7132,17 +7362,18 @@ TEST_CASE("Preprocessor: object-like macros cascade (A -> B -> C -> 123)",
     pp.push_virtual_file(content, "macro_cascade_object", 1, true);
 
     TokensLine line;
-    REQUIRE(pp.next_line(line)); // expanded "A"
-    const auto& toks = line.tokens();
+    REQUIRE(pp.next_line(line)); // DEFC C=123
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].keyword() == Keyword::C);
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 123);
 
-    bool found123 = false;
-    for (const auto& t : toks) {
-        if (t.is(TokenType::Integer) && t.int_value() == 123) {
-            found123 = true;
-            break;
-        }
-    }
-    REQUIRE(found123);
+    REQUIRE(pp.next_line(line)); // expanded "A"->"B"->"C"
+    REQUIRE(line.size() == 1);
+    REQUIRE(line[0].keyword() == Keyword::C);
+
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -7645,14 +7876,15 @@ TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second in
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
-            out.push_back(line[0].text());
+            out.push_back(line.to_string());
         }
     }
 
     // Body emitted only once
-    REQUIRE(out.size() == 2);
-    REQUIRE(out[0] == "SIMPLE_LINE");
-    REQUIRE(out[1] == "AFTER");
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "DEFC IG_GUARD_SIMPLE = 1");
+    REQUIRE(out[1] == "SIMPLE_LINE");
+    REQUIRE(out[2] == "AFTER");
 
     // Dependencies list should contain main + both include attempts (duplicate recorded)
     const auto& deps = pp.dependency_filenames();
@@ -7700,14 +7932,15 @@ TEST_CASE("Preprocessor: include guard #ifndef/name define at top prevents secon
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
-            out.push_back(line[0].text());
+            out.push_back(line.to_string());
         }
     }
 
     // Body emitted only once
-    REQUIRE(out.size() == 2);
-    REQUIRE(out[0] == "SIMPLE_LINE");
-    REQUIRE(out[1] == "AFTER");
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "DEFC IG_GUARD_SIMPLE = 1");
+    REQUIRE(out[1] == "SIMPLE_LINE");
+    REQUIRE(out[2] == "AFTER");
 
     // Dependencies list should contain main + both include attempts (duplicate recorded)
     const auto& deps = pp.dependency_filenames();
@@ -7871,13 +8104,14 @@ TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
-            out.push_back(line[0].text());
+            out.push_back(line.to_string());
         }
     }
 
-    REQUIRE(out.size() == 2);
-    REQUIRE(out[0] == "WS_LINE");
-    REQUIRE(out[1] == "TAIL");
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "DEFC IG_GUARD_WS = 1");
+    REQUIRE(out[1] == "WS_LINE");
+    REQUIRE(out[2] == "TAIL");
 
     const auto& deps = pp.dependency_filenames();
     REQUIRE(deps.size() == 3);
@@ -7922,15 +8156,21 @@ TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined 
 
     TokensLine line;
     std::vector<std::string> out;
-    while (pp.next_line(line)) {
-        if (!line.empty()) {
-            out.push_back(line[0].text());
-        }
-    }
+    REQUIRE(pp.next_line(line));    // DEFC IG_GUARD_PRE=1
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "IG_GUARD_PRE");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 1);
 
-    // Guard body must be completely skipped
-    REQUIRE(out.size() == 1);
-    REQUIRE(out[0] == "ENDLINE");
+    REQUIRE(pp.next_line(line));    // ENDLINE
+    REQUIRE(line.size() == 1);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "ENDLINE");
+
+    REQUIRE_FALSE(pp.next_line(line));
 
     const auto& deps = pp.dependency_filenames();
     REQUIRE(deps.size() == 2);
@@ -8244,18 +8484,25 @@ TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
 
     TokensLine line;
 
-    // First non-empty expanded output should be "5,6"
-    // Skip any lines produced by #define (none) then expansion of Y
-    REQUIRE(pp.next_line(line)); // expansion of Y
-    REQUIRE(line.to_string() == "5,6");
+    // First non-empty expanded output should be "DEFC A = 5"
+    REQUIRE(pp.next_line(line)); // expansion of #define A
+    REQUIRE(line.size() >= 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].keyword() == Keyword::A);
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 5);
 
-    const auto& toks = line.tokens();
-    REQUIRE(toks.size() == 3);
-    REQUIRE(toks[0].is(TokenType::Integer));
-    REQUIRE(toks[0].int_value() == 5);
-    REQUIRE(toks[1].is(TokenType::Comma));
-    REQUIRE(toks[2].is(TokenType::Integer));
-    REQUIRE(toks[2].int_value() == 6);
+    // next line is the Y expansion
+    REQUIRE(pp.next_line(line)); // expansion of Y
+    REQUIRE(line.to_string() == "A,6");
+
+    REQUIRE(line.size() >= 3);
+    REQUIRE(line[0].is(TokenType::Identifier));
+    REQUIRE(line[0].text() == "A");
+    REQUIRE(line[1].is(TokenType::Comma));
+    REQUIRE(line[2].is(TokenType::Integer));
+    REQUIRE(line[2].int_value() == 6);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -9285,20 +9532,48 @@ TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list p
     pp.push_virtual_file(content, "repti_paren_expr", 1, true);
 
     TokensLine line;
-    std::vector<std::string> outputs;
 
-    while (pp.next_line(line)) {
-        if (!line.empty()) {
-            outputs.push_back(line.to_string());
-        }
-    }
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "a");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 10);
 
-    // Should produce two iterations:
-    // dw (10+20)
-    // dw (10-20)
-    REQUIRE(outputs.size() == 2);
-    REQUIRE(outputs[0] == "dw (10+20)");
-    REQUIRE(outputs[1] == "dw (10-20)");
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "b");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 20);
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 6);
+    REQUIRE(line[0].keyword() == Keyword::DW);
+    REQUIRE(line[1].is(TokenType::LeftParen));
+    REQUIRE(line[2].is(TokenType::Identifier));
+    REQUIRE(line[2].text() == "a");
+    REQUIRE(line[3].is(TokenType::Plus));
+    REQUIRE(line[4].is(TokenType::Identifier));
+    REQUIRE(line[4].text() == "b");
+    REQUIRE(line[5].is(TokenType::RightParen));
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 6);
+    REQUIRE(line[0].keyword() == Keyword::DW);
+    REQUIRE(line[1].is(TokenType::LeftParen));
+    REQUIRE(line[2].is(TokenType::Identifier));
+    REQUIRE(line[2].text() == "a");
+    REQUIRE(line[3].is(TokenType::Minus));
+    REQUIRE(line[4].is(TokenType::Identifier));
+    REQUIRE(line[4].text() == "b");
+    REQUIRE(line[5].is(TokenType::RightParen));
+
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -9319,20 +9594,48 @@ TEST_CASE("Preprocessor: REPTI name-directive form with parenthesized expression
     pp.push_virtual_file(content, "repti_name_paren_expr", 1, true);
 
     TokensLine line;
-    std::vector<std::string> outputs;
 
-    while (pp.next_line(line)) {
-        if (!line.empty()) {
-            outputs.push_back(line.to_string());
-        }
-    }
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "a");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 10);
 
-    // Should produce two iterations:
-    // dw (10+20)
-    // dw (10-20)
-    REQUIRE(outputs.size() == 2);
-    REQUIRE(outputs[0] == "dw (10+20)");
-    REQUIRE(outputs[1] == "dw (10-20)");
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "b");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 20);
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 6);
+    REQUIRE(line[0].keyword() == Keyword::DW);
+    REQUIRE(line[1].is(TokenType::LeftParen));
+    REQUIRE(line[2].is(TokenType::Identifier));
+    REQUIRE(line[2].text() == "a");
+    REQUIRE(line[3].is(TokenType::Plus));
+    REQUIRE(line[4].is(TokenType::Identifier));
+    REQUIRE(line[4].text() == "b");
+    REQUIRE(line[5].is(TokenType::RightParen));
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.size() == 6);
+    REQUIRE(line[0].keyword() == Keyword::DW);
+    REQUIRE(line[1].is(TokenType::LeftParen));
+    REQUIRE(line[2].is(TokenType::Identifier));
+    REQUIRE(line[2].text() == "a");
+    REQUIRE(line[3].is(TokenType::Minus));
+    REQUIRE(line[4].is(TokenType::Identifier));
+    REQUIRE(line[4].text() == "b");
+    REQUIRE(line[5].is(TokenType::RightParen));
+
+    REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -9478,64 +9781,4 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Invalid argument list after REPTI") != std::string::npos);
-}
-
-TEST_CASE("Preprocessor: REPTI with correctly matched parentheses succeeds (positive control)",
-          "[preprocessor][repti][parentheses][matched][control]") {
-    g_errors.reset();
-    g_symbol_table.clear();
-    Preprocessor pp;
-
-    const std::string content =
-        "#define a 10\n"
-        "#define b 20\n"
-        "REPTI var, (a+b), (a-b)\n"
-        "dw var\n"
-        "ENDR\n";
-    pp.push_virtual_file(content, "repti_matched_control", 1, true);
-
-    TokensLine line;
-    std::vector<std::string> outputs;
-
-    while (pp.next_line(line)) {
-        if (!line.empty()) {
-            outputs.push_back(line.to_string());
-        }
-    }
-
-    // Should produce two iterations with parenthesized expressions
-    REQUIRE(outputs.size() == 2);
-    REQUIRE(outputs[0] == "dw (10+20)");
-    REQUIRE(outputs[1] == "dw (10-20)");
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
-TEST_CASE("Preprocessor: name-directive REPTI with correctly matched parentheses succeeds (positive control)",
-          "[preprocessor][repti][name][parentheses][matched][control]") {
-    g_errors.reset();
-    g_symbol_table.clear();
-    Preprocessor pp;
-
-    const std::string content =
-        "#define a 10\n"
-        "#define b 20\n"
-        "var REPTI (a+b), (a-b)\n"
-        "dw var\n"
-        "ENDR\n";
-    pp.push_virtual_file(content, "repti_name_matched_control", 1, true);
-
-    TokensLine line;
-    std::vector<std::string> outputs;
-
-    while (pp.next_line(line)) {
-        if (!line.empty()) {
-            outputs.push_back(line.to_string());
-        }
-    }
-
-    // Should produce two iterations with parenthesized expressions
-    REQUIRE(outputs.size() == 2);
-    REQUIRE(outputs[0] == "dw (10+20)");
-    REQUIRE(outputs[1] == "dw (10-20)");
-    REQUIRE_FALSE(g_errors.has_errors());
 }
