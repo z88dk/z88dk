@@ -31,9 +31,8 @@ private:
 static StderrSilencer g_stderr_silencer;
 }
 
-static std::vector<TokensLine> run_hla_on_text(const std::string& src,
-        const std::string& fname) {
-    Preprocessor pp;
+static std::vector<TokensLine> run_hla_on_text(Preprocessor& pp,
+        const std::string& src, const std::string& fname) {
     HLA hla(&pp);
     hla.clear();
     pp.push_virtual_file(src, fname, 1, true);
@@ -145,13 +144,14 @@ static void expect_dec_b(const TokensLine& l) {
 TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
           "[hla]") {
     namespace fs = std::filesystem;
+    Preprocessor pp;
 
     // Prepare a temporary source file with plain Z80 assembly lines
     const std::string src =
         "LD A, B\n"
         "ADD A, 1\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_plain.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_plain.asm");
     REQUIRE(lines.size() >= 2);
 
     // Line 1: LD A,B
@@ -177,6 +177,7 @@ TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
 }
 
 TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
+    Preprocessor pp;
     struct Case {
         const char* op;
         Keyword jp1;
@@ -205,7 +206,7 @@ TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
             "NOP\n"
             "%ENDIF\n";
 
-        const auto lines = run_hla_on_text(src,
+        const auto lines = run_hla_on_text(pp, src,
                                            std::string("z80asm_hla_if_rel_") + c.op + ".asm");
 
         // Expected common prefix: CP 7, then 1 or 2 conditionals to HLA_IF_0_ELSE
@@ -231,13 +232,14 @@ TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
 }
 
 TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
+    Preprocessor pp;
     // Single IF with no ELSE
     const std::string src =
         "%IF A == 1\n"
         "NOP\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_if_endif.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_endif.asm");
     // Expected:
     // 0: CP 1
     // 1: JP NZ, HLA_IF_0_ELSE
@@ -254,6 +256,7 @@ TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
 }
 
 TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
+    Preprocessor pp;
     const std::string src =
         "%IF A == 2\n"
         "NOP ; IF branch\n"
@@ -261,7 +264,7 @@ TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
         "NOP ; ELSE branch\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_if_else_endif.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_else_endif.asm");
     // Expected:
     // 0: CP 2
     // 1: JP NZ, HLA_IF_0_ELSE
@@ -281,6 +284,7 @@ TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
 }
 
 TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
+    Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
         "NOP ; IF\n"
@@ -290,7 +294,8 @@ TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
         "NOP ; ELSE\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_if_elif_else_endif.asm");
+    const auto lines = run_hla_on_text(pp, src,
+                                       "z80asm_hla_if_elif_else_endif.asm");
     // Expected:
     // 0: CP 1
     // 1: JP NZ, HLA_IF_0_ELSE
@@ -320,6 +325,7 @@ TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
 }
 
 TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
+    Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
         "NOP ; IF\n"
@@ -329,7 +335,8 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
         "NOP ; ELIF2\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_if_elif_elif_endif.asm");
+    const auto lines = run_hla_on_text(pp, src,
+                                       "z80asm_hla_if_elif_elif_endif.asm");
     // Expected:
     // 0:  CP 1
     // 1:  JP NZ, HLA_IF_0_ELSE
@@ -365,6 +372,7 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
 }
 
 TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
+    Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
         "NOP ; IF\n"
@@ -376,7 +384,7 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
         "NOP ; ELSE\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src,
+    const auto lines = run_hla_on_text(pp, src,
                                        "z80asm_hla_if_elif_elif_else_endif.asm");
     // Expected (like previous, but ELSE instead of terminal ELSE label at ENDIF):
     // 0:  CP 1
@@ -418,11 +426,12 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
 
 TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     SECTION("A == imm8") {
+        Preprocessor pp;
         const std::string src =
             "%IF A == 42\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_a_eq_imm.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_a_eq_imm.asm");
         REQUIRE(lines.size() >= 5);
         expect_cp_imm(lines[0], 42);
         expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
@@ -432,11 +441,12 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == B (reg8)") {
+        Preprocessor pp;
         const std::string src =
             "%IF A == B\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_a_eq_b.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_a_eq_b.asm");
         REQUIRE(lines.size() >= 5);
         expect_cp_reg(lines[0], Keyword::B);
         expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
@@ -446,11 +456,12 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == A (self compare)") {
+        Preprocessor pp;
         const std::string src =
             "%IF A == A\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_a_eq_a.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_a_eq_a.asm");
         REQUIRE(lines.size() >= 5);
         expect_cp_reg(lines[0], Keyword::A); // CP A
         expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
@@ -460,11 +471,12 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == (HL)") {
+        Preprocessor pp;
         const std::string src =
             "%IF A == (HL)\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_a_eq_memhl.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_a_eq_memhl.asm");
         REQUIRE(lines.size() >= 5);
         expect_cp_mem_hl(lines[0]); // CP (HL)
         expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
@@ -474,11 +486,12 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == (abs)") {
+        Preprocessor pp;
         const std::string src =
             "%IF A == (123)\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_a_eq_memabs.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_a_eq_memabs.asm");
         REQUIRE(lines.size() >= 5);
         expect_cp_mem_abs(lines[0], 123); // CP (123)
         expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
@@ -490,11 +503,12 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
 
 TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     SECTION("imm8 == A") {
+        Preprocessor pp;
         const std::string src =
             "%IF 42 == A\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_imm_eq_a.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_imm_eq_a.asm");
         REQUIRE(lines.size() >= 5);
         // Normalized to A == 42 -> CP 42
         expect_cp_imm(lines[0], 42);
@@ -505,11 +519,12 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("B == A (reg8)") {
+        Preprocessor pp;
         const std::string src =
             "%IF B == A\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_b_eq_a.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_b_eq_a.asm");
         REQUIRE(lines.size() >= 5);
         // Normalized to A == B -> CP B
         expect_cp_reg(lines[0], Keyword::B);
@@ -520,11 +535,12 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("(HL) == A") {
+        Preprocessor pp;
         const std::string src =
             "%IF (HL) == A\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_memhl_eq_a.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_memhl_eq_a.asm");
         REQUIRE(lines.size() >= 5);
         // Normalized to A == (HL) -> CP (HL)
         expect_cp_mem_hl(lines[0]);
@@ -535,11 +551,12 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("(abs) == A") {
+        Preprocessor pp;
         const std::string src =
             "%IF (123) == A\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_memabs_eq_a.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_memabs_eq_a.asm");
         REQUIRE(lines.size() >= 5);
         // Normalized to A == (123) -> CP (123)
         expect_cp_mem_abs(lines[0], 123);
@@ -550,11 +567,12 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("relational: 7 < A (normalizes to A > 7)") {
+        Preprocessor pp;
         const std::string src =
             "%IF 7 < A\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_imm_lt_a.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_imm_lt_a.asm");
         REQUIRE(lines.size() >= 6);
         // Normalized to A > 7 -> CP 7; false when Z or C
         expect_cp_imm(lines[0], 7);
@@ -567,6 +585,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
 }
 
 TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
+    Preprocessor pp;
     struct Case {
         const char* expr;
         int imm;
@@ -595,7 +614,7 @@ TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
             "%WEND\n";
 
         std::string fname = std::string("z80asm_hla_while_") + c.expr + ".asm";
-        auto lines = run_hla_on_text(src, fname);
+        auto lines = run_hla_on_text(pp, src, fname);
 
         // Expected sequence:
         // 0: .HLA_WHILE_0_TOP
@@ -632,13 +651,14 @@ TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
 }
 
 TEST_CASE("%WHILE with A on RHS normalization", "[hla][while][rhsA]") {
+    Preprocessor pp;
     // Example: 3 < A normalizes to A > 3 (false conditions Z, C)
     const std::string src =
         "%WHILE 3 < A\n"
         "NOP\n"
         "%WEND\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_while_rhs_a.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_while_rhs_a.asm");
     // Expect:
     // .HLA_WHILE_0_TOP
     // CP 3
@@ -662,12 +682,12 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
           "[hla][expr][immediate][address]") {
     SECTION("Immediate constant expression: A == 1+2*3 -> CP 7") {
         g_errors.reset();
-        g_symbol_table.clear();
+        Preprocessor pp;
         const std::string src =
             "%IF A == 1 + 2 * 3\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_constexpr_imm.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_constexpr_imm.asm");
 
         REQUIRE(lines.size() >= 5);
         expect_cp_imm(lines[0], 7);
@@ -680,12 +700,12 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 
     SECTION("Immediate address expression: A == (0x100+0x23) -> CP (0x123)") {
         g_errors.reset();
-        g_symbol_table.clear();
+        Preprocessor pp;
         const std::string src =
             "%IF A == (0x100 + 0x23)\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_constexpr_addr.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_constexpr_addr.asm");
 
         REQUIRE(lines.size() >= 5);
         expect_cp_mem_abs(lines[0], 0x123);
@@ -698,12 +718,13 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 
     SECTION("Nested parens in address expression are handled: A == ((10+5)*(2+3)) -> CP 75") {
         g_errors.reset();
-        g_symbol_table.clear();
+        Preprocessor pp;
         const std::string src =
             "%IF A == ((10 + 5) * (2 + 3))\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_constexpr_nested.asm");
+        const auto lines = run_hla_on_text(pp, src,
+                                           "z80asm_hla_if_constexpr_nested.asm");
 
         REQUIRE(lines.size() >= 5);
         expect_cp_mem_abs(lines[0], 75);
@@ -718,26 +739,27 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbols",
           "[hla][expr][symbols]") {
     // Helper to define a symbol in the test symbol table
-    auto define_sym = [](const std::string & name, int value, bool is_const,
+    auto define_sym = [](Preprocessor & pp, const std::string & name, int value,
+                         bool is_const,
     bool is_def = true) {
         Symbol s;
         s.name = name;
         s.value = value;
         s.is_defined = is_def;
         s.is_constant = is_const;
-        g_symbol_table.add_symbol(name, s);
+        pp.pp_symtab().add_symbol(name, s);
     };
 
     SECTION("Constant symbol in immediate expression") {
         g_errors.reset();
-        g_symbol_table.clear();
-        define_sym("CONST7", 7, true);
+        Preprocessor pp;
+        define_sym(pp, "CONST7", 7, true);
 
         const std::string src =
             "%IF A == CONST7\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_const_sym.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_const_sym.asm");
 
         REQUIRE(lines.size() >= 5);
         expect_cp_imm(lines[0], 7);
@@ -750,14 +772,14 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Constant symbol inside immediate address expression") {
         g_errors.reset();
-        g_symbol_table.clear();
-        define_sym("BASE", 0x100, true);
+        Preprocessor pp;
+        define_sym(pp, "BASE", 0x100, true);
 
         const std::string src =
             "%IF A == (BASE + 2)\n"
             "NOP\n"
             "%ENDIF\n";
-        const auto lines = run_hla_on_text(src, "z80asm_hla_if_const_sym_addr.asm");
+        const auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_const_sym_addr.asm");
 
         REQUIRE(lines.size() >= 5);
         expect_cp_mem_abs(lines[0], 0x102);
@@ -770,12 +792,12 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Undefined symbol is rejected") {
         g_errors.reset();
-        g_symbol_table.clear();
+        Preprocessor pp;
         const std::string src =
             "%IF A == UNDEF_SYM\n"
             "NOP\n"
             "%ENDIF\n";
-        (void)run_hla_on_text(src, "z80asm_hla_if_undef_sym.asm");
+        (void)run_hla_on_text(pp, src, "z80asm_hla_if_undef_sym.asm");
 
         REQUIRE(g_errors.has_errors());
         std::string msg = g_errors.last_error_message();
@@ -784,14 +806,14 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Defined but non-constant symbol is rejected") {
         g_errors.reset();
-        g_symbol_table.clear();
-        define_sym("VARX", 3, false); // defined but not constant
+        Preprocessor pp;
+        define_sym(pp, "VARX", 3, false); // defined but not constant
 
         const std::string src =
             "%IF A == (VARX + 1)\n"
             "NOP\n"
             "%ENDIF\n";
-        (void)run_hla_on_text(src, "z80asm_hla_if_nonconst_sym.asm");
+        (void)run_hla_on_text(pp, src, "z80asm_hla_if_nonconst_sym.asm");
 
         REQUIRE(g_errors.has_errors());
         std::string msg = g_errors.last_error_message();
@@ -801,12 +823,13 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
 TEST_CASE("Boolean AND short-circuit: %IF (A==1)&&(A<5) %ENDIF",
           "[hla][bool][and]") {
+    Preprocessor pp;
     const std::string src =
         "%IF (A == 1) && (A < 5)\n"
         "NOP\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_bool_and.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_bool_and.asm");
     // Expected:
     // CP 1
     // JP NZ, HLA_IF_0_ELSE
@@ -828,12 +851,13 @@ TEST_CASE("Boolean AND short-circuit: %IF (A==1)&&(A<5) %ENDIF",
 
 TEST_CASE("Boolean OR short-circuit: %IF (A==1)||(A<5) %ENDIF",
           "[hla][bool][or]") {
+    Preprocessor pp;
     const std::string src =
         "%IF (A == 1) || (A < 5)\n"
         "NOP\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_bool_or.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_bool_or.asm");
     // Expected:
     // CP 1
     // JP Z, <skip_bool_label>
@@ -857,12 +881,13 @@ TEST_CASE("Boolean OR short-circuit: %IF (A==1)||(A<5) %ENDIF",
 }
 
 TEST_CASE("Boolean NOT: %IF !(A==3) %ENDIF", "[hla][bool][not]") {
+    Preprocessor pp;
     const std::string src =
         "%IF !(A == 3)\n"
         "NOP\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_bool_not.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_bool_not.asm");
     // FALSE of !E == TRUE of E -> branch on Z for A==3
     // Expected:
     // CP 3
@@ -881,12 +906,13 @@ TEST_CASE("Boolean NOT: %IF !(A==3) %ENDIF", "[hla][bool][not]") {
 
 TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
           "[hla][bool][nested]") {
+    Preprocessor pp;
     const std::string src =
         "%IF (A == 1) && ((A < 5) || (A > 10))\n"
         "NOP\n"
         "%ENDIF\n";
 
-    const auto lines = run_hla_on_text(src, "z80asm_hla_bool_nested.asm");
+    const auto lines = run_hla_on_text(pp, src, "z80asm_hla_bool_nested.asm");
     // Expected:
     // CP 1
     // JP NZ, HLA_IF_0_ELSE
@@ -924,6 +950,7 @@ TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
 
 TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
           "[hla][while][synonyms]") {
+    Preprocessor pp;
     const std::vector<std::string> ends = { "WEND", "ENDW", "ENDWHILE" };
 
     for (const auto& endkw : ends) {
@@ -932,7 +959,7 @@ TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
             "NOP\n"
             "%" + endkw + "\n";
 
-        auto lines = run_hla_on_text(src, "z80asm_hla_while_end_synonyms.asm");
+        auto lines = run_hla_on_text(pp, src, "z80asm_hla_while_end_synonyms.asm");
 
         // Expect:
         // .HLA_WHILE_0_TOP
@@ -955,12 +982,13 @@ TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
 // Add after existing while tests (just before %IF accepts constant expressions section or at end)
 
 TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTIL A == 3\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_until_basic.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_repeat_until_basic.asm");
     // Expected:
     // .HLA_REPEAT_0_TOP
     // NOP
@@ -978,12 +1006,13 @@ TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
 
 TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm)",
           "[hla][repeat][until][rel]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTIL A <= 7\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_until_le.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_repeat_until_le.asm");
     // Expected false jumps: NZ and NC back to top
     // .HLA_REPEAT_0_TOP
     // NOP
@@ -1003,12 +1032,13 @@ TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm
 
 TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
           "[hla][repeat][until][rhsA]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTIL 2 < A\n"; // normalized to A > 2 -> false if Z or C
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_until_rhs_a.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_repeat_until_rhs_a.asm");
     // .HLA_REPEAT_0_TOP
     // NOP
     // CP 2
@@ -1027,8 +1057,9 @@ TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
 
 TEST_CASE("%UNTIL without %REPEAT reports error",
           "[hla][repeat][until][error]") {
+    Preprocessor pp;
     const std::string src = "%UNTIL A==1\n";
-    (void)run_hla_on_text(src, "z80asm_hla_until_no_repeat.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_until_no_repeat.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("%UNTIL without matching %REPEAT") !=
             std::string::npos);
@@ -1037,8 +1068,9 @@ TEST_CASE("%UNTIL without %REPEAT reports error",
 TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
           "[hla][repeat][until][error][eof]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src = "%REPEAT\nNOP\n";
-    (void)run_hla_on_text(src, "z80asm_hla_repeat_no_until.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_repeat_no_until.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unclosed HLA block") !=
             std::string::npos);
@@ -1050,12 +1082,13 @@ TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
 
 TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label",
           "[hla][repeat][untilb]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTILB\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_untilb_basic.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_repeat_untilb_basic.asm");
     // Expect:
     // .HLA_REPEAT_0_TOP
     // NOP
@@ -1074,8 +1107,9 @@ TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label
 TEST_CASE("%UNTILB without %REPEAT reports error",
           "[hla][repeat][untilb][error]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src = "%UNTILB\n";
-    (void)run_hla_on_text(src, "z80asm_hla_untilb_no_repeat.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_untilb_no_repeat.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("%UNTILB without matching %REPEAT")
             != std::string::npos);
@@ -1084,11 +1118,12 @@ TEST_CASE("%UNTILB without %REPEAT reports error",
 TEST_CASE("%UNTILB with trailing tokens reports error",
           "[hla][repeat][untilb][error][trailing]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTILB extra\n";
-    (void)run_hla_on_text(src, "z80asm_hla_untilb_trailing.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_untilb_trailing.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %UNTILB") !=
             std::string::npos);
@@ -1096,12 +1131,13 @@ TEST_CASE("%UNTILB with trailing tokens reports error",
 
 TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to top then end label",
           "[hla][repeat][untilbc]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTILBC\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_untilbc_basic.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_repeat_untilbc_basic.asm");
     // Expect:
     // 0 .HLA_REPEAT_0_TOP
     // 1 NOP
@@ -1124,8 +1160,9 @@ TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to
 TEST_CASE("%UNTILBC without %REPEAT reports error",
           "[hla][repeat][untilbc][error]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src = "%UNTILBC\n";
-    (void)run_hla_on_text(src, "z80asm_hla_untilbc_no_repeat.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_untilbc_no_repeat.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("%UNTILBC without matching %REPEAT")
             != std::string::npos);
@@ -1134,11 +1171,12 @@ TEST_CASE("%UNTILBC without %REPEAT reports error",
 TEST_CASE("%UNTILBC with trailing tokens reports error",
           "[hla][repeat][untilbc][error][trailing]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "NOP\n"
         "%UNTILBC extra\n";
-    (void)run_hla_on_text(src, "z80asm_hla_untilbc_trailing.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_untilbc_trailing.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %UNTILBC")
             != std::string::npos);
@@ -1147,6 +1185,7 @@ TEST_CASE("%UNTILBC with trailing tokens reports error",
 TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
           "[hla][repeat][untilbc][nested]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"              // outer
         "NOP\n"
@@ -1156,7 +1195,7 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
         "NOP\n"
         "%UNTILBC\n";            // end outer
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_repeat_untilbc_nested.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_repeat_untilbc_nested.asm");
     // We only check ordering of the two sequences and distinct labels
     // Collect top labels
     std::string outer_top = "HLA_REPEAT_0_TOP";
@@ -1213,6 +1252,7 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
 
 TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
           "[hla][flags]") {
+    Preprocessor pp;
     struct Case {
         const char* flag_src;
         Keyword inverted;
@@ -1234,7 +1274,7 @@ TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
             "NOP\n"
             "%ENDIF\n";
 
-        auto lines = run_hla_on_text(src,
+        auto lines = run_hla_on_text(pp, src,
                                      std::string("z80asm_hla_if_flag_") + c.flag_src + ".asm");
         // Expect:
         // 0: JP <inverted>, HLA_IF_0_ELSE
@@ -1251,12 +1291,13 @@ TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
 
 TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
           "[hla][flags][and]") {
+    Preprocessor pp;
     const std::string src =
         "%IF Z && (A == 5)\n"
         "NOP\n"
         "%ENDIF\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_if_flag_and_cmp.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_flag_and_cmp.asm");
     // Expected:
     // 0: JP NZ, HLA_IF_0_ELSE      ; Z false -> else
     // 1: CP 5
@@ -1276,12 +1317,13 @@ TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
 
 TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
           "[hla][flags][or]") {
+    Preprocessor pp;
     const std::string src =
         "%IF C || (A < 5)\n"
         "NOP\n"
         "%ENDIF\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_if_flag_or_cmp.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_if_flag_or_cmp.asm");
     // Expected:
     // 0: JP C, <skip_label>        ; if C true -> skip RHS
     // 1: CP 5
@@ -1302,6 +1344,7 @@ TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
 }
 
 TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
+    Preprocessor pp;
     const std::string src =
         "%WHILE A == 5\n"
         "NOP\n"
@@ -1309,7 +1352,7 @@ TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
         "NOP\n"
         "%WEND\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_break_basic.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_break_basic.asm");
     // .HLA_WHILE_0_TOP
     // CP 5
     // JP NZ, HLA_WHILE_0_END
@@ -1332,13 +1375,14 @@ TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
 
 TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
           "[hla][break][if]") {
+    Preprocessor pp;
     const std::string src =
         "%WHILE A != 9\n"
         "%BREAK IF A == 3\n"
         "NOP\n"
         "%WEND\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_break_if.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_break_if.asm");
     // .HLA_WHILE_0_TOP
     // CP 9
     // JP Z, HLA_WHILE_0_END        (A != 9 false)
@@ -1361,12 +1405,13 @@ TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
 
 TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
           "[hla][break][flags]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "%BREAK IF Z\n"
         "%UNTILB\n"; // loop end marker
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_break_if_flag.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_break_if_flag.asm");
     // .HLA_REPEAT_0_TOP
     // JP NZ, HLA_REPEAT_0_END   (break if Z -> jump when Z true -> JP Z end via inversion logic)
     // DEC B
@@ -1384,8 +1429,9 @@ TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
 
 TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src = "%BREAK\n";
-    (void)run_hla_on_text(src, "z80asm_hla_break_outside.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_break_outside.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("%BREAK outside loop") !=
             std::string::npos);
@@ -1394,11 +1440,12 @@ TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
 TEST_CASE("%BREAK with unexpected trailing tokens reports error",
           "[hla][break][error][trailing]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
         "%BREAK extra\n"
         "%WEND\n";
-    (void)run_hla_on_text(src, "z80asm_hla_break_trailing.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_break_trailing.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %BREAK") !=
             std::string::npos);
@@ -1407,11 +1454,12 @@ TEST_CASE("%BREAK with unexpected trailing tokens reports error",
 TEST_CASE("%BREAK IF missing expression reports error",
           "[hla][break][error][missingexpr]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
         "%BREAK IF\n"
         "%WEND\n";
-    (void)run_hla_on_text(src, "z80asm_hla_break_if_missing.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_break_if_missing.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Expected expression after %BREAK IF")
             != std::string::npos);
@@ -1420,6 +1468,7 @@ TEST_CASE("%BREAK IF missing expression reports error",
 // Add after %BREAK tests
 
 TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
+    Preprocessor pp;
     const std::string src =
         "%WHILE A == 5\n"
         "NOP\n"
@@ -1427,7 +1476,7 @@ TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
         "NOP\n"
         "%WEND\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_continue_basic.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_continue_basic.asm");
     // .HLA_WHILE_0_TOP
     // CP 5
     // JP NZ, HLA_WHILE_0_END
@@ -1450,13 +1499,14 @@ TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
 
 TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
           "[hla][continue][if]") {
+    Preprocessor pp;
     const std::string src =
         "%WHILE A != 9\n"
         "%CONTINUE IF A == 3\n"
         "NOP\n"
         "%WEND\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_continue_if.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_continue_if.asm");
     // .HLA_WHILE_0_TOP
     // CP 9
     // JP Z, HLA_WHILE_0_END         (A != 9 false)
@@ -1479,13 +1529,14 @@ TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
 
 TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
           "[hla][continue][flags]") {
+    Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
         "%CONTINUE IF Z\n"
         "NOP\n"
         "%UNTILB\n";
 
-    auto lines = run_hla_on_text(src, "z80asm_hla_continue_if_flag.asm");
+    auto lines = run_hla_on_text(pp, src, "z80asm_hla_continue_if_flag.asm");
     // .HLA_REPEAT_0_TOP
     // JP Z, HLA_REPEAT_0_TOP     (continue if Z)
     // NOP
@@ -1504,8 +1555,9 @@ TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
 
 TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src = "%CONTINUE\n";
-    (void)run_hla_on_text(src, "z80asm_hla_continue_outside.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_continue_outside.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("%CONTINUE outside loop") !=
             std::string::npos);
@@ -1514,11 +1566,12 @@ TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
 TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
           "[hla][continue][error][trailing]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
         "%CONTINUE extra\n"
         "%WEND\n";
-    (void)run_hla_on_text(src, "z80asm_hla_continue_trailing.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_continue_trailing.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unexpected tokens after %CONTINUE")
             != std::string::npos);
@@ -1527,11 +1580,12 @@ TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
 TEST_CASE("%CONTINUE IF missing expression reports error",
           "[hla][continue][error][missingexpr]") {
     g_errors.reset();
+    Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
         "%CONTINUE IF\n"
         "%WEND\n";
-    (void)run_hla_on_text(src, "z80asm_hla_continue_if_missing.asm");
+    (void)run_hla_on_text(pp, src, "z80asm_hla_continue_if_missing.asm");
     REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Expected expression after %CONTINUE IF")
             != std::string::npos);

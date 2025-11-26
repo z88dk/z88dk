@@ -44,6 +44,7 @@ static TokensLine make_line(const std::string& text,
 
 // Helper: parse and evaluate an expression using Expr API
 static bool parse_and_eval(const std::string& text,
+                           SymbolTable& symtab,
                            int& out_value,
                            bool& out_undefined,
                            bool& out_constant,
@@ -63,7 +64,7 @@ static bool parse_and_eval(const std::string& text,
         *lsize = tl.size();
     }
     int v = 0;
-    bool ok = e.evaluate(v);
+    bool ok = e.evaluate(symtab, v);
     out_value = v;
     out_undefined = e.is_undefined();
     out_constant = e.is_constant();
@@ -71,6 +72,7 @@ static bool parse_and_eval(const std::string& text,
 }
 
 TEST_CASE("Basic arithmetic and precedence", "[expr][precedence]") {
+    SymbolTable symtab;
     int v = 0;
     bool undef = false;
     bool cnst = false;
@@ -78,18 +80,19 @@ TEST_CASE("Basic arithmetic and precedence", "[expr][precedence]") {
     unsigned lsize = 0;
 
     // multiplication binds tighter than addition
-    REQUIRE(parse_and_eval("2 + 3 * 4", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 + 3 * 4", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 14);
     REQUIRE(lsize == 5);
 
     // parentheses override precedence
-    REQUIRE(parse_and_eval("(2 + 3) * 4", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("(2 + 3) * 4", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 20);
     REQUIRE(lsize == 7);
 }
 
 TEST_CASE("Power operator (**) is right-associative and handles negative exponent as zero",
           "[expr][power][associativity]") {
+    SymbolTable symtab;
     int v = 0;
     bool undef = false;
     bool cnst = false;
@@ -97,42 +100,44 @@ TEST_CASE("Power operator (**) is right-associative and handles negative exponen
     unsigned lsize = 0;
 
     // right-assoc: 2 ** (3 ** 2) == 2 ** 9 == 512
-    REQUIRE(parse_and_eval("2 ** 3 ** 2", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 ** 3 ** 2", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 512);
     REQUIRE(lsize == 5);
 
     // negative exponent -> defined as 0 by implementation
-    REQUIRE(parse_and_eval("2 ** -1", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 ** -1", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 0);
     REQUIRE(lsize == 4);
 
     // unary minus interacts with power precedence: unary has lower precedence than binary power
     // so "-2 ** 3" -> -(2 ** 3) == -8 (not (-2) ** 3)
-    REQUIRE(parse_and_eval("-2 ** 3", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("-2 ** 3", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == -8);
     REQUIRE(lsize == 4);
 }
 
 TEST_CASE("Left associativity for subtraction, division, shifts",
           "[expr][associativity]") {
+    SymbolTable symtab;
     int v = 0;
     bool undef = false;
     bool cnst = false;
     unsigned i = 0;
     unsigned lsize = 0;
 
-    REQUIRE(parse_and_eval("10 - 3 - 2", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("10 - 3 - 2", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 5); // (10 - 3) - 2
 
-    REQUIRE(parse_and_eval("20 / 2 / 2", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("20 / 2 / 2", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 5); // (20 / 2) / 2
 
-    REQUIRE(parse_and_eval("1 << 2 << 1", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 << 2 << 1", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 8); // (1<<2)<<1 == 4<<1 == 8
 }
 
 TEST_CASE("Bitwise and logical operators precedence and results (^ vs ^^, & vs &&, | vs ||)",
           "[expr][bitwise][logical][precedence]") {
+    SymbolTable symtab;
     int v = 0;
     bool undef = false;
     bool cnst = false;
@@ -140,65 +145,68 @@ TEST_CASE("Bitwise and logical operators precedence and results (^ vs ^^, & vs &
     unsigned lsize = 0;
 
     // bitwise AND binds tighter than bitwise OR: (1 & 2) | 4 == 0 | 4 == 4
-    REQUIRE(parse_and_eval("1 & 2 | 4", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 & 2 | 4", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 4);
 
     // bitwise xor '^' is a bitwise op, precedence higher than logical xor '^^'
     // (1 ^ 2) ^^ 2 -> (3) ^^ 2 -> logical xor: (3 != 2) -> 1
-    REQUIRE(parse_and_eval("1 ^ 2 ^^ 2", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 ^ 2 ^^ 2", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 1);
 
     // bitwise xor result correctness
-    REQUIRE(parse_and_eval("6 ^ 3", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("6 ^ 3", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == (6 ^ 3));
 
     // logical xor '^^' yields 1 if operands are different (non-zero), else 0
-    REQUIRE(parse_and_eval("2 ^^ 1", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 ^^ 1", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("2 ^^ 2", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 ^^ 2", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 0);
 
     // logical AND/OR precedence: && binds tighter than ||
-    REQUIRE(parse_and_eval("1 && 0 || 0", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 && 0 || 0", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 0); // (1&&0) || 0 == 0
-    REQUIRE(parse_and_eval("1 || 0 && 0", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 || 0 && 0", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 1); // 1 || (0 && 0) == 1
 }
 
 TEST_CASE("Comparisons and equality produce boolean 1/0",
           "[expr][comparison]") {
+    SymbolTable symtab;
     int v = 0;
     bool undef = false;
     bool cnst = false;
     unsigned i = 0;
     unsigned lsize = 0;
 
-    REQUIRE(parse_and_eval("3 < 4", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("3 < 4", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("3 >= 4", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("3 >= 4", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 0);
-    REQUIRE(parse_and_eval("2 = 2", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 = 2", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("2 != 3", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("2 != 3", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 1);
 }
 
 TEST_CASE("Ternary operator ? : selects correct branch and parsing stops at colon when appropriate",
           "[expr][ternary]") {
+    SymbolTable symtab;
     int v = 0;
     bool undef = false;
     bool cnst = false;
     unsigned i = 0;
     unsigned lsize = 0;
 
-    REQUIRE(parse_and_eval("1 ? 2 : 3", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 ? 2 : 3", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 2);
 
-    REQUIRE(parse_and_eval("0 ? 2 : 3", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("0 ? 2 : 3", symtab, v, undef, cnst, &i, &lsize));
     REQUIRE(v == 3);
 
     // nested ternary: 1 ? 0 ? 5 : 6 : 7  -> inner 0 ? 5 : 6 -> 6 ; outer -> 1 ? 6 : 7 -> 6
-    REQUIRE(parse_and_eval("1 ? 0 ? 5 : 6 : 7", v, undef, cnst, &i, &lsize));
+    REQUIRE(parse_and_eval("1 ? 0 ? 5 : 6 : 7", symtab, v, undef, cnst, &i,
+                           &lsize));
     REQUIRE(v == 6);
 }
 
@@ -214,7 +222,7 @@ static TokensLine make_line_2(const std::string& text,
 TEST_CASE("Expr: division by zero reports error message",
           "[expr][error][divzero][divide]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     TokensLine tl = make_line_2("10/0");
     unsigned i = 0;
@@ -222,7 +230,7 @@ TEST_CASE("Expr: division by zero reports error message",
     REQUIRE(e.parse(tl, i));
 
     int out = 0;
-    bool ok = e.evaluate(out);
+    bool ok = e.evaluate(symtab, out);
     REQUIRE_FALSE(ok);
 
     REQUIRE(g_errors.has_errors());
@@ -234,7 +242,7 @@ TEST_CASE("Expr: division by zero reports error message",
 TEST_CASE("Expr: modulus by zero reports error message",
           "[expr][error][divzero][modulus]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     TokensLine tl = make_line_2("10 % 0");
     unsigned i = 0;
@@ -242,7 +250,7 @@ TEST_CASE("Expr: modulus by zero reports error message",
     REQUIRE(e.parse(tl, i));
 
     int out = 0;
-    bool ok = e.evaluate(out);
+    bool ok = e.evaluate(symtab, out);
     REQUIRE_FALSE(ok);
 
     REQUIRE(g_errors.has_errors());
@@ -311,6 +319,7 @@ TEST_CASE("Expression syntax errors return false and leave index unchanged",
 TEST_CASE("Expr::parse stops before trailing binary operator and succeeds",
           "[expr][Expr][stop-index][trailing-op]") {
     g_errors.reset();
+    SymbolTable symtab;
 
     // Case 1: no whitespace "1+"
     {
@@ -326,7 +335,7 @@ TEST_CASE("Expr::parse stops before trailing binary operator and succeeds",
         REQUIRE(ex.to_string() == "1");
 
         int v = 0;
-        REQUIRE(ex.evaluate(v));
+        REQUIRE(ex.evaluate(symtab, v));
         REQUIRE(v == 1);
     }
 
@@ -343,7 +352,7 @@ TEST_CASE("Expr::parse stops before trailing binary operator and succeeds",
         REQUIRE(ex.to_string() == "1");
 
         int v = 0;
-        REQUIRE(ex.evaluate(v));
+        REQUIRE(ex.evaluate(symtab, v));
         REQUIRE(v == 1);
     }
 }
@@ -477,38 +486,38 @@ TEST_CASE("Expr::set_silent suppresses error reporting but still returns false",
 //-----------------------------------------------------------------------------
 // Expr operators parsing/evaluation tests
 // - covers all operators supported by Expr
-// - verifies symbol lookup via g_symbol_table (defined/undefined, constant flag)
+// - verifies symbol lookup via pp.pp_symtab() (defined/undefined, constant flag)
 // - checks division/modulus by zero error reporting
-// - ensures g_symbol_table is cleared at the start of every test
+// - ensures pp.pp_symtab() is cleared at the start of every test
 //-----------------------------------------------------------------------------
 
 // Unary operators: + - ~ !
 TEST_CASE("Expr: unary operators parse and evaluate", "[expr][ops][unary]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     int v = 0;
     bool undef = false;
     bool cst = false;
 
-    REQUIRE(parse_and_eval("+5", v, undef, cst));
+    REQUIRE(parse_and_eval("+5", symtab, v, undef, cst));
     REQUIRE(v == +5);
     REQUIRE_FALSE(undef);
     REQUIRE(cst);
 
-    REQUIRE(parse_and_eval("-5", v, undef, cst));
+    REQUIRE(parse_and_eval("-5", symtab, v, undef, cst));
     REQUIRE(v == -5);
     REQUIRE_FALSE(undef);
     REQUIRE(cst);
 
-    REQUIRE(parse_and_eval("~0", v, undef, cst));
+    REQUIRE(parse_and_eval("~0", symtab, v, undef, cst));
     REQUIRE(v == ~0);
     REQUIRE_FALSE(undef);
     REQUIRE(cst);
 
-    REQUIRE(parse_and_eval("!0", v, undef, cst));
+    REQUIRE(parse_and_eval("!0", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("!7", v, undef, cst));
+    REQUIRE(parse_and_eval("!7", symtab, v, undef, cst));
     REQUIRE(v == 0);
 }
 
@@ -516,29 +525,29 @@ TEST_CASE("Expr: unary operators parse and evaluate", "[expr][ops][unary]") {
 TEST_CASE("Expr: arithmetic operators parse and evaluate",
           "[expr][ops][arith]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     int v = 0;
     bool undef = false;
     bool cst = false;
 
-    REQUIRE(parse_and_eval("2+3", v, undef, cst));
+    REQUIRE(parse_and_eval("2+3", symtab, v, undef, cst));
     REQUIRE(v == 5);
-    REQUIRE(parse_and_eval("7-10", v, undef, cst));
+    REQUIRE(parse_and_eval("7-10", symtab, v, undef, cst));
     REQUIRE(v == -3);
-    REQUIRE(parse_and_eval("6*7", v, undef, cst));
+    REQUIRE(parse_and_eval("6*7", symtab, v, undef, cst));
     REQUIRE(v == 42);
-    REQUIRE(parse_and_eval("20/4", v, undef, cst));
+    REQUIRE(parse_and_eval("20/4", symtab, v, undef, cst));
     REQUIRE(v == 5);
-    REQUIRE(parse_and_eval("20%6", v, undef, cst));
+    REQUIRE(parse_and_eval("20%6", symtab, v, undef, cst));
     REQUIRE(v == 2);
 
     // power: right-assoc and negative exponent -> 0 per implementation
-    REQUIRE(parse_and_eval("2**3", v, undef, cst));
+    REQUIRE(parse_and_eval("2**3", symtab, v, undef, cst));
     REQUIRE(v == 8);
-    REQUIRE(parse_and_eval("2 ** 3 ** 2", v, undef, cst));
+    REQUIRE(parse_and_eval("2 ** 3 ** 2", symtab, v, undef, cst));
     REQUIRE(v == 512);
-    REQUIRE(parse_and_eval("2**-1", v, undef, cst));
+    REQUIRE(parse_and_eval("2**-1", symtab, v, undef, cst));
     REQUIRE(v == 0);
 }
 
@@ -546,76 +555,76 @@ TEST_CASE("Expr: arithmetic operators parse and evaluate",
 TEST_CASE("Expr: shift, bitwise, and logical operators",
           "[expr][ops][bitwise][logical]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     int v = 0;
     bool undef = false;
     bool cst = false;
 
-    REQUIRE(parse_and_eval("1<<3", v, undef, cst));
+    REQUIRE(parse_and_eval("1<<3", symtab, v, undef, cst));
     REQUIRE(v == (1 << 3));
-    REQUIRE(parse_and_eval("16>>2", v, undef, cst));
+    REQUIRE(parse_and_eval("16>>2", symtab, v, undef, cst));
     REQUIRE(v == (16 >> 2));
 
-    REQUIRE(parse_and_eval("6&3", v, undef, cst));
+    REQUIRE(parse_and_eval("6&3", symtab, v, undef, cst));
     REQUIRE(v == (6 & 3));
-    REQUIRE(parse_and_eval("6^3", v, undef, cst));
+    REQUIRE(parse_and_eval("6^3", symtab, v, undef, cst));
     REQUIRE(v == (6 ^ 3));
-    REQUIRE(parse_and_eval("6|1", v, undef, cst));
+    REQUIRE(parse_and_eval("6|1", symtab, v, undef, cst));
     REQUIRE(v == (6 | 1));
 
-    REQUIRE(parse_and_eval("1&&0", v, undef, cst));
+    REQUIRE(parse_and_eval("1&&0", symtab, v, undef, cst));
     REQUIRE(v == 0);
-    REQUIRE(parse_and_eval("1||0", v, undef, cst));
+    REQUIRE(parse_and_eval("1||0", symtab, v, undef, cst));
     REQUIRE(v == 1);
     // logical xor implemented as (a != b) ? 1 : 0
-    REQUIRE(parse_and_eval("0^^0", v, undef, cst));
+    REQUIRE(parse_and_eval("0^^0", symtab, v, undef, cst));
     REQUIRE(v == 0);
-    REQUIRE(parse_and_eval("0^^1", v, undef, cst));
+    REQUIRE(parse_and_eval("0^^1", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("2^^2", v, undef, cst));
+    REQUIRE(parse_and_eval("2^^2", symtab, v, undef, cst));
     REQUIRE(v == 0);
 }
 
 // Comparisons
 TEST_CASE("Expr: comparison operators", "[expr][ops][compare]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     int v = 0;
     bool undef = false;
     bool cst = false;
 
-    REQUIRE(parse_and_eval("3<4", v, undef, cst));
+    REQUIRE(parse_and_eval("3<4", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("3<=4", v, undef, cst));
+    REQUIRE(parse_and_eval("3<=4", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("4>3", v, undef, cst));
+    REQUIRE(parse_and_eval("4>3", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("4>=4", v, undef, cst));
+    REQUIRE(parse_and_eval("4>=4", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("5=5", v, undef, cst));
+    REQUIRE(parse_and_eval("5=5", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("5!=4", v, undef, cst));
+    REQUIRE(parse_and_eval("5!=4", symtab, v, undef, cst));
     REQUIRE(v == 1);
-    REQUIRE(parse_and_eval("5!=5", v, undef, cst));
+    REQUIRE(parse_and_eval("5!=5", symtab, v, undef, cst));
     REQUIRE(v == 0);
 }
 
 // Ternary
 TEST_CASE("Expr: ternary operator", "[expr][ops][ternary]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     int v = 0;
     bool undef = false;
     bool cst = false;
 
-    REQUIRE(parse_and_eval("1?2:3", v, undef, cst));
+    REQUIRE(parse_and_eval("1?2:3", symtab, v, undef, cst));
     REQUIRE(v == 2);
-    REQUIRE(parse_and_eval("0?2:3", v, undef, cst));
+    REQUIRE(parse_and_eval("0?2:3", symtab, v, undef, cst));
     REQUIRE(v == 3);
-    REQUIRE(parse_and_eval("1?0?5:6:7", v, undef, cst));
+    REQUIRE(parse_and_eval("1?0?5:6:7", symtab, v, undef, cst));
     REQUIRE(v == 6);
 }
 
@@ -623,7 +632,7 @@ TEST_CASE("Expr: ternary operator", "[expr][ops][ternary]") {
 TEST_CASE("Expr: symbol lookup defined/undefined and constant flag",
           "[expr][ops][symbol]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     // Populate one constant symbol and one non-constant symbol
     Symbol s_const;
@@ -636,21 +645,21 @@ TEST_CASE("Expr: symbol lookup defined/undefined and constant flag",
     s_var.value = 3;
     s_var.is_defined = true;
     s_var.is_constant = false;
-    REQUIRE(g_symbol_table.add_symbol("A", s_const));
-    REQUIRE(g_symbol_table.add_symbol("B", s_var));
+    REQUIRE(symtab.add_symbol("A", s_const));
+    REQUIRE(symtab.add_symbol("B", s_var));
 
     int v = 0;
     bool undef = false;
     bool cst = false;
 
     // Defined constant only -> constant result
-    REQUIRE(parse_and_eval("A+2", v, undef, cst));
+    REQUIRE(parse_and_eval("A+2", symtab, v, undef, cst));
     REQUIRE(v == 12);
     REQUIRE_FALSE(undef);
     REQUIRE(cst); // still constant
 
     // Mix const and non-const -> not constant
-    REQUIRE_FALSE(parse_and_eval("A+B*2", v, undef, cst));
+    REQUIRE_FALSE(parse_and_eval("A+B*2", symtab, v, undef, cst));
     REQUIRE(v == 0);
     REQUIRE_FALSE(undef);
     REQUIRE_FALSE(cst);
@@ -662,7 +671,7 @@ TEST_CASE("Expr: symbol lookup defined/undefined and constant flag",
         Expr e;
         REQUIRE(e.parse(tl, i));
         int out = 0;
-        bool ok = e.evaluate(out);
+        bool ok = e.evaluate(symtab, out);
         REQUIRE_FALSE(ok);
         REQUIRE(e.is_undefined());
     }
@@ -671,7 +680,7 @@ TEST_CASE("Expr: symbol lookup defined/undefined and constant flag",
 // Division/modulus by zero: report error and fail evaluation
 TEST_CASE("Expr: division and modulus by zero error", "[expr][ops][divzero]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     // "10/0"
     {
@@ -680,7 +689,7 @@ TEST_CASE("Expr: division and modulus by zero error", "[expr][ops][divzero]") {
         Expr e;
         REQUIRE(e.parse(tl, i));
         int out = 0;
-        bool ok = e.evaluate(out);
+        bool ok = e.evaluate(symtab, out);
         REQUIRE_FALSE(ok);
         REQUIRE(g_errors.has_errors());
         REQUIRE(g_errors.last_error_message().find("Division by zero") !=
@@ -695,7 +704,7 @@ TEST_CASE("Expr: division and modulus by zero error", "[expr][ops][divzero]") {
         Expr e;
         REQUIRE(e.parse(tl, i));
         int out = 0;
-        bool ok = e.evaluate(out);
+        bool ok = e.evaluate(symtab, out);
         REQUIRE_FALSE(ok);
         REQUIRE(g_errors.has_errors());
         REQUIRE(g_errors.last_error_message().find("Division by zero") !=
@@ -707,7 +716,7 @@ TEST_CASE("Expr: division and modulus by zero error", "[expr][ops][divzero]") {
 TEST_CASE("Expr: parsing consumes up to comma/colon and leaves index at first non-consumed token",
           "[expr][ops][stop-index]") {
     g_errors.reset();
-    g_symbol_table.clear();
+    SymbolTable symtab;
 
     {
         TokensLine tl = make_line("1+2,rest");
@@ -716,7 +725,7 @@ TEST_CASE("Expr: parsing consumes up to comma/colon and leaves index at first no
         REQUIRE(e.parse(tl, i));
         REQUIRE(tl[i].type() == TokenType::Comma);
         int v = 0;
-        REQUIRE(e.evaluate(v));
+        REQUIRE(e.evaluate(symtab, v));
         REQUIRE(v == 3);
     }
     {
@@ -727,7 +736,7 @@ TEST_CASE("Expr: parsing consumes up to comma/colon and leaves index at first no
         // After parsing "1?2:3", the next token should be ':'
         REQUIRE(tl[i].type() == TokenType::Colon);
         int v = 0;
-        REQUIRE(e.evaluate(v));
+        REQUIRE(e.evaluate(symtab, v));
         REQUIRE(v == 2);
     }
 }
