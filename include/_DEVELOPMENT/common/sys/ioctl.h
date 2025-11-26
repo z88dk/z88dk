@@ -10,7 +10,7 @@
 #include <arch.h>
 #include <stdint.h>
 
-extern int __LIB__ ioctl(int fd,uint16_t request,...) __SMALLC;
+extern int __LIB__ ioctl(int fd,uint16_t request,...) __vasmallc;
 
 extern int __LIB__ vioctl(int fd,uint16_t request,void *arg) __SMALLC;
 extern int __LIB__ vioctl_callee(int fd,uint16_t request,void *arg) __SMALLC __z88dk_callee;

@@ -42,7 +42,7 @@ extern int __LIB__ creat_callee(char *path,mode_t mode) __SMALLC __z88dk_callee;
 #define creat(a,b) creat_callee(a,b)
 
 
-extern int __LIB__ open(char *path,int oflag,...) __SMALLC;
+extern int __LIB__ open(char *path,int oflag,...) __vasmallc;
 
 extern int __LIB__ vopen(char *path,int oflag,void *arg) __SMALLC;
 extern int __LIB__ vopen_callee(char *path,int oflag,void *arg) __SMALLC __z88dk_callee;

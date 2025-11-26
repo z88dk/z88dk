@@ -101,9 +101,9 @@ extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`shift(shift(shift(sh
 
 # VARARG PROTOTYPES
 define(`__VPROTO', `ifelse(`$2',,dnl
-extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __SMALLC;
+extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __vasmallc;
 ,dnl
-extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __SMALLC __preserves_regs(`$2');
+extern `$3' ifdef(`m4_SCCZ80_NOLIB',,__LIB__) `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __vasmallc __preserves_regs(`$2');
 )')
 
 

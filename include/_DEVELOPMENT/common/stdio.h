@@ -92,7 +92,7 @@ extern FILE __LIB__ *_fmemopen__callee(void **bufp,size_t *sizep,char *mode) __S
 #define _fmemopen_(a,b,c) _fmemopen__callee(a,b,c)
 
 
-extern int __LIB__ asprintf(char **ptr,char *format,...) __SMALLC;
+extern int __LIB__ asprintf(char **ptr,char *format,...) __vasmallc;
 
 #ifdef __SCCZ80
 extern void __LIB__ clearerr(FILE *stream) __SMALLC __z88dk_fastcall;
@@ -191,7 +191,7 @@ extern FILE __LIB__ *fopen_callee(const char *filename,const char *mode) __SMALL
 #define fopen(a,b) fopen_callee(a,b)
 
 
-extern int __LIB__ fprintf(FILE *stream,char *format,...) __SMALLC;
+extern int __LIB__ fprintf(FILE *stream,char *format,...) __vasmallc;
 
 extern int __LIB__ fputc(int c,FILE *stream) __SMALLC;
 extern int __LIB__ fputc_callee(int c,FILE *stream) __SMALLC __z88dk_callee;
@@ -213,7 +213,7 @@ extern FILE __LIB__ *freopen_callee(char *filename,char *mode,FILE *stream) __SM
 #define freopen(a,b,c) freopen_callee(a,b,c)
 
 
-extern int __LIB__ fscanf(FILE *stream,char *format,...) __SMALLC;
+extern int __LIB__ fscanf(FILE *stream,char *format,...) __vasmallc;
 
 extern int __LIB__ fseek(FILE *stream,long offset,int whence) __SMALLC;
 extern int __LIB__ fseek_callee(FILE *stream,long offset,int whence) __SMALLC __z88dk_callee;
@@ -287,7 +287,7 @@ extern char *gets_fastcall(char *s) __z88dk_fastcall;
 #endif
 
 
-extern int __LIB__ obstack_printf(struct obstack *ob,char *format,...) __SMALLC;
+extern int __LIB__ obstack_printf(struct obstack *ob,char *format,...) __vasmallc;
 
 extern int __LIB__ obstack_vprintf(struct obstack *ob,char *format,void *arg) __SMALLC;
 extern int __LIB__ obstack_vprintf_callee(struct obstack *ob,char *format,void *arg) __SMALLC __z88dk_callee;
@@ -308,7 +308,7 @@ extern void perror_fastcall(char *s) __z88dk_fastcall;
 #endif
 
 
-extern int __LIB__ printf(char *format,...) __SMALLC;
+extern int __LIB__ printf(char *format,...) __vasmallc;
 
 extern int __LIB__ putc(int c,FILE *stream) __SMALLC;
 extern int __LIB__ putc_callee(int c,FILE *stream) __SMALLC __z88dk_callee;
@@ -342,13 +342,13 @@ extern void rewind_fastcall(FILE *stream) __z88dk_fastcall;
 #endif
 
 
-extern int __LIB__ scanf(char *format,...) __SMALLC;
+extern int __LIB__ scanf(char *format,...) __vasmallc;
 
-extern int __LIB__ snprintf(char *s,size_t n,char *format,...) __SMALLC;
+extern int __LIB__ snprintf(char *s,size_t n,char *format,...) __vasmallc;
 
-extern int __LIB__ sprintf(char *s,char *format,...) __SMALLC;
+extern int __LIB__ sprintf(char *s,char *format,...) __vasmallc;
 
-extern int __LIB__ sscanf(char *s,char *format,...) __SMALLC;
+extern int __LIB__ sscanf(char *s,char *format,...) __vasmallc;
 
 extern int __LIB__ ungetc(int c,FILE *stream) __SMALLC;
 extern int __LIB__ ungetc_callee(int c,FILE *stream) __SMALLC __z88dk_callee;
@@ -469,7 +469,7 @@ extern int fileno_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
 #endif
 
 
-extern int __LIB__ fprintf_unlocked(FILE *stream,char *format,...) __SMALLC;
+extern int __LIB__ fprintf_unlocked(FILE *stream,char *format,...) __vasmallc;
 
 extern int __LIB__ fputc_unlocked(int c,FILE *stream) __SMALLC;
 extern int __LIB__ fputc_unlocked_callee(int c,FILE *stream) __SMALLC __z88dk_callee;
@@ -491,7 +491,7 @@ extern FILE __LIB__ *freopen_unlocked_callee(char *filename,char *mode,FILE *str
 #define freopen_unlocked(a,b,c) freopen_unlocked_callee(a,b,c)
 
 
-extern int __LIB__ fscanf_unlocked(FILE *stream,char *format,...) __SMALLC;
+extern int __LIB__ fscanf_unlocked(FILE *stream,char *format,...) __vasmallc;
 
 extern int __LIB__ fseek_unlocked(FILE *stream,long offset,int whence) __SMALLC;
 extern int __LIB__ fseek_unlocked_callee(FILE *stream,long offset,int whence) __SMALLC __z88dk_callee;
@@ -547,7 +547,7 @@ extern char *gets_unlocked_fastcall(char *s) __z88dk_fastcall;
 #endif
 
 
-extern int __LIB__ printf_unlocked(char *format,...) __SMALLC;
+extern int __LIB__ printf_unlocked(char *format,...) __vasmallc;
 
 extern int __LIB__ putc_unlocked(int c,FILE *stream) __SMALLC;
 extern int __LIB__ putc_unlocked_callee(int c,FILE *stream) __SMALLC __z88dk_callee;
@@ -581,7 +581,7 @@ extern void rewind_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
 #endif
 
 
-extern int __LIB__ scanf_unlocked(char *format,...) __SMALLC;
+extern int __LIB__ scanf_unlocked(char *format,...) __vasmallc;
 
 extern int __LIB__ ungetc_unlocked(int c,FILE *stream) __SMALLC;
 extern int __LIB__ ungetc_unlocked_callee(int c,FILE *stream) __SMALLC __z88dk_callee;
