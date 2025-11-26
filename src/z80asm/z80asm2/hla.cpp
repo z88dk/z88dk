@@ -124,7 +124,7 @@ void HLA::process_if(const TokensLine& line, unsigned& i) {
 
     try {
         // Parse boolean expression after %IF
-        hla::Parser parser(line, i);
+        hla::Parser parser(line, i, pp_->pp_symtab());
         auto expr = parser.parse_bool_expr();
 
         // Emit branch-if-false to else_label
@@ -183,7 +183,7 @@ void HLA::process_elif(const TokensLine& line, unsigned& i) {
         }
 
         // Parse boolean expression of this %ELIF
-        hla::Parser parser(line, i);
+        hla::Parser parser(line, i, pp_->pp_symtab());
         auto expr = parser.parse_bool_expr();
 
         // Create a new else label for the remainder of the chain
@@ -276,7 +276,7 @@ void HLA::process_while(const TokensLine& line, unsigned& i) {
 
     try {
         // Parse boolean expression after %WHILE
-        hla::Parser parser(line, i);
+        hla::Parser parser(line, i, pp_->pp_symtab());
         auto expr = parser.parse_bool_expr();
 
         // Labels for WHILE
@@ -377,7 +377,7 @@ void HLA::process_until(const TokensLine& line, unsigned& i) {
     block_stack_.pop_back();
 
     try {
-        hla::Parser parser(line, i);
+        hla::Parser parser(line, i, pp_->pp_symtab());
         auto expr = parser.parse_bool_expr();
 
         // Branch back to top if expression is false
@@ -524,7 +524,7 @@ void HLA::process_break(const TokensLine& line, unsigned& i) {
     }
 
     try {
-        hla::Parser parser(line, i);
+        hla::Parser parser(line, i, pp_->pp_symtab());
         auto expr = parser.parse_bool_expr(); // expression E
 
         // Wrap in NOT so emit_bif branches on TRUE of E to end_label
@@ -577,7 +577,7 @@ void HLA::process_continue(const TokensLine& line, unsigned& i) {
     }
 
     try {
-        hla::Parser parser(line, i);
+        hla::Parser parser(line, i, pp_->pp_symtab());
         auto expr = parser.parse_bool_expr(); // expression E
 
         // We want to jump when E is TRUE. emit_bif branches on FALSE.
