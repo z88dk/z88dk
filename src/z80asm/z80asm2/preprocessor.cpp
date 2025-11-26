@@ -216,7 +216,7 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
                       location.line_num(), false);
 }
 
-bool Preprocessor::next_line_pp(TokensLine& line) {
+bool Preprocessor::pp_next_line(TokensLine& line) {
     line.clear();
     while (true) {
         if (!input_queue_.empty()) {
@@ -229,6 +229,7 @@ bool Preprocessor::next_line_pp(TokensLine& line) {
                 TokensLine final_line;
                 post_process_line(line, final_line);
                 line = std::move(final_line);
+                update_symtab(line);
                 current_line_chain_.reset();
                 macro_fixpoint_iterations_ = 0;
                 return true;
@@ -305,101 +306,12 @@ bool Preprocessor::next_line_pp(TokensLine& line) {
     }
 }
 
-bool Preprocessor::next_line_hla(TokensLine& out_line) {
-    return hla_context_.next_line(out_line);
-}
-
 SymbolTable& Preprocessor::pp_symtab() {
     return symtab_;
 }
 
 bool Preprocessor::next_line(TokensLine& out_line) {
-    if (!next_line_hla(out_line)) {
-        return false;    // end of input
-    }
-
-    // parse labels
-    std::string name;
-    if (out_line.size() >= 2 && out_line[0].is(TokenType::Dot)
-            && out_line[1].is(TokenType::Identifier)) {
-        name = out_line[1].text();
-        // label definition
-        Symbol label;
-        label.name = name;
-        label.is_defined = true;
-        label.location = out_line.location();
-        symtab_.add_symbol(label.name, label);
-        return true;
-    }
-
-    // parse DEFC name = statements
-    Keyword kw;
-    unsigned i = 0;
-    if (out_line.size() >= 3 && out_line[0].is(Keyword::DEFC) &&
-            out_line[1].is(TokenType::Identifier) &&
-            out_line[2].is(TokenType::EQ)) {
-        i = 3;
-        name = out_line[1].text();
-        TokensLine expr = collect_tokens(out_line, i);
-        if (expr.empty()) {
-            // Empty body defaults to integer 1
-            expr.clear_tokens();
-            expr.push_back(Token(TokenType::Integer, "1", 1));
-        }
-
-        int value = 0;
-        if (eval_const_expr(expr, value, true)) {
-            Symbol label;
-            label.name = name;
-            label.value = value;
-            label.is_defined = true;
-            label.is_constant = true;
-            label.location = out_line.location();
-            symtab_.add_symbol(label.name, label);
-            return true;
-        }
-        else {
-            Symbol label;
-            label.name = name;
-            label.is_defined = true;
-            label.location = out_line.location();
-            symtab_.add_symbol(label.name, label);
-            return true;
-        }
-    }
-
-    // parse name DEFC expr statements
-    i = 0;
-    if (is_name_directive(out_line, i, kw, name) && kw == Keyword::DEFC) {
-        TokensLine expr = collect_tokens(out_line, i);
-        if (expr.empty()) {
-            // Empty body defaults to integer 1
-            expr.clear_tokens();
-            expr.push_back(Token(TokenType::Integer, "1", 1));
-        }
-
-        int value = 0;
-        if (eval_const_expr(expr, value, true)) {
-            Symbol label;
-            label.name = name;
-            label.value = value;
-            label.is_defined = true;
-            label.is_constant = true;
-            label.location = out_line.location();
-            symtab_.add_symbol(label.name, label);
-            return true;
-        }
-        else {
-            Symbol label;
-            label.name = name;
-            label.is_defined = true;
-            label.location = out_line.location();
-            symtab_.add_symbol(label.name, label);
-            return true;
-        }
-    }
-
-    return true;
+    return hla_context_.next_line(out_line);
 }
 
 void Preprocessor::define_macro(const std::string& name,
@@ -3079,6 +2991,89 @@ bool Preprocessor::handle_directives_for_line(TokensLine& line,
 
     // ask caller to process normal line
     return false;
+}
+
+void Preprocessor::update_symtab(const TokensLine& line) {
+    // parse labels
+    std::string name;
+    if (line.size() >= 2 && line[0].is(TokenType::Dot)
+            && line[1].is(TokenType::Identifier)) {
+        name = line[1].text();
+        // label definition
+        Symbol label;
+        label.name = name;
+        label.is_defined = true;
+        label.location = line.location();
+        symtab_.add_symbol(label.name, label);
+        return;
+    }
+
+    // parse DEFC name = statements
+    Keyword kw;
+    unsigned i = 0;
+    if (line.size() >= 3 && line[0].is(Keyword::DEFC) &&
+            line[1].is(TokenType::Identifier) &&
+            line[2].is(TokenType::EQ)) {
+        i = 3;
+        name = line[1].text();
+        TokensLine expr = collect_tokens(line, i);
+        if (expr.empty()) {
+            // Empty body defaults to integer 1
+            expr.clear_tokens();
+            expr.push_back(Token(TokenType::Integer, "1", 1));
+        }
+
+        int value = 0;
+        if (eval_const_expr(expr, value, true)) {
+            Symbol label;
+            label.name = name;
+            label.value = value;
+            label.is_defined = true;
+            label.is_constant = true;
+            label.location = line.location();
+            symtab_.add_symbol(label.name, label);
+            return;
+        }
+        else {
+            Symbol label;
+            label.name = name;
+            label.is_defined = true;
+            label.location = line.location();
+            symtab_.add_symbol(label.name, label);
+            return;
+        }
+    }
+
+    // parse name DEFC expr statements
+    i = 0;
+    if (is_name_directive(line, i, kw, name) && kw == Keyword::DEFC) {
+        TokensLine expr = collect_tokens(line, i);
+        if (expr.empty()) {
+            // Empty body defaults to integer 1
+            expr.clear_tokens();
+            expr.push_back(Token(TokenType::Integer, "1", 1));
+        }
+
+        int value = 0;
+        if (eval_const_expr(expr, value, true)) {
+            Symbol label;
+            label.name = name;
+            label.value = value;
+            label.is_defined = true;
+            label.is_constant = true;
+            label.location = line.location();
+            symtab_.add_symbol(label.name, label);
+            return;
+        }
+        else {
+            Symbol label;
+            label.name = name;
+            label.is_defined = true;
+            label.location = line.location();
+            symtab_.add_symbol(label.name, label);
+            return;
+        }
+    }
 }
 
 void preprocess_only() {
