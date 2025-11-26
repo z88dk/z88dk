@@ -107,7 +107,7 @@ bool HLA::next_line(TokensLine& out_line) {
 }
 
 bool HLA::next_pp_line(TokensLine& out_line) {
-    return pp_ && pp_->next_line_pp(out_line);
+    return pp_ && pp_->pp_next_line(out_line);
 }
 
 void HLA::process_if(const TokensLine& line, unsigned& i) {
