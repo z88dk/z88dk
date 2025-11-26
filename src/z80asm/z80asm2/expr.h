@@ -9,6 +9,8 @@
 #include "lexer.h"
 #include <vector>
 
+class SymbolTable;
+
 class Expr {
 public:
     Expr() = default;
@@ -28,7 +30,7 @@ public:
     // returns false if evaluation failed
     // (e.g. division by zero, undefined symbol)
     // sets flags to tell if expression is defined and/or constant
-    bool evaluate(int& out_value);
+    bool evaluate(SymbolTable& symtab, int& out_value);
     bool is_extern() const {
         return is_extern_;
     }
