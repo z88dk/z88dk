@@ -65,10 +65,18 @@ void Preprocessor::push_file(const std::string& filename) {
         }
         // check for #ifndef/#define
         if (cit->second.tokens_file->has_ifndef_guard()) {
-            const std::string& guard_symbol =
+            const std::string& guard_name =
                 cit->second.tokens_file->ifndef_guard_symbol();
-            auto mit = macros_.find(guard_symbol);
+            // check ifdef macro
+            auto mit = macros_.find(guard_name);
             if (mit != macros_.end()) {
+                // Record dependency even when skipped
+                dep_files_.push_back(normalized_filename);
+                return; // skip include entirely
+            }
+            // check defc symbol
+            const Symbol& symbol = g_symbol_table.get_symbol(guard_name);
+            if (symbol.is_defined) {
                 // Record dependency even when skipped
                 dep_files_.push_back(normalized_filename);
                 return; // skip include entirely
@@ -296,8 +304,97 @@ bool Preprocessor::next_line_pp(TokensLine& line) {
     }
 }
 
-bool Preprocessor::next_line(TokensLine& out_line) {
+bool Preprocessor::next_line_hla(TokensLine& out_line) {
     return hla_context_.next_line(out_line);
+}
+
+bool Preprocessor::next_line(TokensLine& out_line) {
+    if (!next_line_hla(out_line)) {
+        return false;    // end of input
+    }
+
+    // parse labels
+    std::string name;
+    if (out_line.size() >= 2 && out_line[0].is(TokenType::Dot)
+            && out_line[1].is(TokenType::Identifier)) {
+        name = out_line[1].text();
+        // label definition
+        Symbol label;
+        label.name = name;
+        label.is_defined = true;
+        label.location = out_line.location();
+        g_symbol_table.add_symbol(label.name, label);
+        return true;
+    }
+
+    // parse DEFC name = statements
+    Keyword kw;
+    unsigned i = 0;
+    if (out_line.size() >= 3 && out_line[0].is(Keyword::DEFC) &&
+            out_line[1].is(TokenType::Identifier) &&
+            out_line[2].is(TokenType::EQ)) {
+        i = 3;
+        name = out_line[1].text();
+        TokensLine expr = collect_tokens(out_line, i);
+        if (expr.empty()) {
+            // Empty body defaults to integer 1
+            expr.clear_tokens();
+            expr.push_back(Token(TokenType::Integer, "1", 1));
+        }
+
+        int value = 0;
+        if (eval_const_expr(expr, value, true)) {
+            Symbol label;
+            label.name = name;
+            label.value = value;
+            label.is_defined = true;
+            label.is_constant = true;
+            label.location = out_line.location();
+            g_symbol_table.add_symbol(label.name, label);
+            return true;
+        }
+        else {
+            Symbol label;
+            label.name = name;
+            label.is_defined = true;
+            label.location = out_line.location();
+            g_symbol_table.add_symbol(label.name, label);
+            return true;
+        }
+    }
+
+    // parse name DEFC expr statements
+    i = 0;
+    if (is_name_directive(out_line, i, kw, name) && kw == Keyword::DEFC) {
+        TokensLine expr = collect_tokens(out_line, i);
+        if (expr.empty()) {
+            // Empty body defaults to integer 1
+            expr.clear_tokens();
+            expr.push_back(Token(TokenType::Integer, "1", 1));
+        }
+
+        int value = 0;
+        if (eval_const_expr(expr, value, true)) {
+            Symbol label;
+            label.name = name;
+            label.value = value;
+            label.is_defined = true;
+            label.is_constant = true;
+            label.location = out_line.location();
+            g_symbol_table.add_symbol(label.name, label);
+            return true;
+        }
+        else {
+            Symbol label;
+            label.name = name;
+            label.is_defined = true;
+            label.location = out_line.location();
+            g_symbol_table.add_symbol(label.name, label);
+            return true;
+        }
+    }
+
+    return true;
 }
 
 void Preprocessor::define_macro(const std::string& name,
@@ -1470,8 +1567,9 @@ Location Preprocessor::compute_location(const File& file,
     return loc;
 }
 
-void Preprocessor::collect_guard_segments(File& file, TokensLine& line,
-        unsigned& line_index, std::vector<TokensLine>& segments) {
+void Preprocessor::collect_guard_segments(File& file, unsigned& line_index,
+        std::vector<TokensLine>& segments) {
+    TokensLine line;
     while (segments.empty() && line_index < file.tokens_file->tok_lines_count()) {
         line = file.tokens_file->get_tok_line(line_index++);
         if (line.empty()) {
@@ -1497,12 +1595,14 @@ bool Preprocessor::split_line(const TokensLine& line,
     unsigned i = 0;
     Keyword kw;
     if (is_directive(line, i, kw) && kw == Keyword::DEFINE) {
+        out_segments.push_back(line);
         return false;
     }
 
     i = 0;
     std::string name;
     if (is_name_directive(line, i, kw, name) && kw == Keyword::DEFINE) {
+        out_segments.push_back(line);
         return false;
     }
 
@@ -2808,13 +2908,44 @@ TokensLine Preprocessor::expand_macros_in_line(const TokensLine& line) {
     return flattened;
 }
 
+// check for #define <same_name> or DEFC <same_name> = x or <same_name> DEFC x
+bool Preprocessor::is_guard_define_name(const TokensLine& line,
+                                        std::string& out_name) {
+    // #define name
+    Keyword kw = Keyword::None;
+    unsigned pos = 0;
+    if (pos < line.size() && is_directive(line, pos, kw) &&
+            (kw == Keyword::DEFINE || kw == Keyword::DEFC)) {
+        if (parse_identifier(line, pos, out_name)) {
+            return true;
+        }
+    }
+
+    // DEFC name
+    kw = Keyword::None;
+    pos = 0;
+    if (line.size() >= 2 && line[0].is(Keyword::DEFC) &&
+            line[1].is(TokenType::Identifier)) {
+        out_name = line[1].text();
+        return true;
+    }
+
+    // name DEFC || name DEFINE
+    kw = Keyword::None;
+    pos = 0;
+    if (pos < line.size() && is_name_directive(line, pos, kw, out_name) &&
+            (kw == Keyword::DEFINE || kw == Keyword::DEFC)) {
+        return true;
+    }
+
+    return false;
+}
+
 bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     out_symbol.clear();
 
-    TokensLine line;
-    unsigned line_index = 0;
-
     // no more lines
+    unsigned line_index = 0;
     if (line_index >= file.tokens_file->tok_lines_count()) {
         return false;
     }
@@ -2823,7 +2954,7 @@ bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     std::vector<TokensLine> segments;
 
     // Read first line and split into segments
-    collect_guard_segments(file, line, line_index, segments);
+    collect_guard_segments(file, line_index, segments);
     if (segments.empty()) {
         return false;
     }
@@ -2831,31 +2962,23 @@ bool Preprocessor::detect_ifndef_guard(File& file, std::string& out_symbol) {
     // First line must be #ifndef <name>
     Keyword kw = Keyword::None;
     unsigned pos = 0;
-    if (!(pos < segments[0].size() && is_directive(line, pos, kw) &&
+    if (!(pos < segments[0].size() && is_directive(segments[0], pos, kw) &&
             kw == Keyword::IFNDEF)) {
         return false;
     }
-    ++pos;
-    if (!parse_identifier(line, pos, ifndef_name)) {
+    if (!parse_identifier(segments[0], pos, ifndef_name)) {
         return false;
     }
     segments.erase(segments.begin());
 
     // Read second line or second segment of first line
-    collect_guard_segments(file, line, line_index, segments);
+    collect_guard_segments(file, line_index, segments);
     if (segments.empty()) {
         return false;
     }
 
-    // Second must be #define <same_name>
-    kw = Keyword::None;
-    pos = 0;
-    if (!(pos < segments[0].size() && is_directive(line, pos, kw) &&
-            kw == Keyword::DEFINE)) {
-        return false;
-    }
-    ++pos;
-    if (!parse_identifier(line, pos, define_name)) {
+    // Second must be #define <same_name> or DEFC <same_name> = x or <same_name> DEFC x or <same_name> DEFINE x
+    if (!is_guard_define_name(segments[0], define_name)) {
         return false;
     }
 
