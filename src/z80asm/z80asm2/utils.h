@@ -23,6 +23,18 @@ inline bool is_space(char c) {
     return std::isspace(static_cast<unsigned char>(c));
 }
 
+inline bool is_hex_char(char c) {
+    return std::isxdigit(static_cast<unsigned char>(c));
+}
+
+inline bool is_dec_char(char c) {
+    return std::isdigit(static_cast<unsigned char>(c));
+}
+
+inline bool is_bin_char(char c) {
+    return c == '0' || c == '1';
+}
+
 inline bool is_ident_char(char c) {
     return c == '_' || c == '@' || std::isalnum(static_cast<unsigned char>(c));
 }

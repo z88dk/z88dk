@@ -45,15 +45,10 @@ public:
     void push_binary_file(const std::string& bin_filename,
                           const Location& location);
 
-    // Pop and return the next processed TokensLine.
-    bool next_line_pp(TokensLine& out_line);
-
-    // Pop and return the next High-Level-Assembly line (after preprocessing).
-    bool next_line_hla(TokensLine& out_line);
+    // Get the symbol table maintained in the preprocessor
     SymbolTable& pp_symtab();
 
-    // Pop and return the next line - routine to be called from outside
-    // also handles the creation of DEFC symbols used in IF and IFDEF
+    // Return the next preprocessed line
     bool next_line(TokensLine& out_line);
 
     // Register a simple macro replacement (no parameters). Replacement may be
@@ -192,6 +187,10 @@ private:
     SymbolTable symtab_;
 
     //--- Internal methods ---
+
+    // Pop and return the next processed TokensLine, to be used by HLA
+    friend class HLA;
+    bool pp_next_line(TokensLine& out_line);
 
     // Fetch a line from the input file, or file_input_queue_ if not empty.
     bool fetch_line(TokensLine& out);
@@ -372,6 +371,9 @@ private:
     // Returns false if no directive/name-directive consumed the line, so the caller
     // should: for queued lines -> emit the line; for fetched lines -> expand macros and emit.
     bool handle_directives_for_line(TokensLine& line, bool reading_from_queue);
+
+    // update symtab from an assembly instruction
+    void update_symtab(const TokensLine& line);
 };
 
 // called when command line -E is given

@@ -17,6 +17,7 @@ struct Options {
     bool gen_dependencies = false;
     std::string m4_options;
     std::string perl_options;
+    std::string cpp_options;
     std::string output_dir;
     std::vector<std::string> include_paths;
 };
