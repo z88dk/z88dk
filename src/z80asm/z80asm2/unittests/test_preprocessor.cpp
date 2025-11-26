@@ -77,6 +77,7 @@ static int find_defb_value(const std::vector<TokensLine>& lines) {
 TEST_CASE("Preprocessor: split label produces label line then instruction line",
           "[preprocessor]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "start: nop\n";
@@ -99,6 +100,7 @@ TEST_CASE("Preprocessor: split label produces label line then instruction line",
 TEST_CASE("Preprocessor: transform string to list of integer tokens",
           "[preprocessor]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "db \"AB\"\n";
@@ -122,6 +124,7 @@ TEST_CASE("Preprocessor: transform string to list of integer tokens",
 TEST_CASE("Preprocessor: include directive pushes included file contents",
           "[preprocessor]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // create a temporary file to be included
@@ -157,6 +160,7 @@ TEST_CASE("Preprocessor: include directive pushes included file contents",
 TEST_CASE("Preprocessor: include without filename reports invalid-syntax",
           "[preprocessor][include][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "#include\n";
@@ -179,6 +183,7 @@ TEST_CASE("Preprocessor: include without filename reports invalid-syntax",
 TEST_CASE("Preprocessor: include with angle brackets treated as string; missing file reports FileNotFound",
           "[preprocessor][include][angle]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // angle-bracket include - lexer reports the name as a string token
@@ -205,6 +210,7 @@ TEST_CASE("Preprocessor: include with angle brackets treated as string; missing 
 TEST_CASE("Preprocessor: string escape sequences are converted to integer list",
           "[preprocessor][strings][escapes]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // The assembly string contains many escape sequences. Use a C++ literal
@@ -252,6 +258,7 @@ TEST_CASE("Preprocessor: string escape sequences are converted to integer list",
 TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms",
           "[preprocessor][include][forms]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fq = "inc_quoted.tmp";
@@ -312,6 +319,7 @@ TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms"
 TEST_CASE("Preprocessor: include with trailing extra token after filename is flagged as error",
           "[preprocessor][include][error][trailing]") {
     g_errors.reset();
+    g_symbol_table.clear();
     const std::string fq = "inc_trail_quoted.tmp";
     const std::string fa = "inc_trail_angle.tmp";
     const std::string fp = "inc_trail_plain.tmp";
@@ -334,6 +342,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
     // Quoted form with trailing token
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         std::string content = "#include \"" + fq + "\" trailing\n";
         pp.push_virtual_file(content, "inc_trail_q", 1, true);
@@ -347,6 +356,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
     // Angle-bracket form with trailing token
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         std::string content = "#include <" + fa + "> trailing\n";
         pp.push_virtual_file(content, "inc_trail_a", 1, true);
@@ -360,6 +370,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
     // Plain filename form with trailing token
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         std::string content = "#include " + fp + " trailing\n";
         pp.push_virtual_file(content, "inc_trail_p", 1, true);
@@ -381,6 +392,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
 TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines",
           "[preprocessor][line]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // LINE 100 then two ordinary lines
@@ -407,6 +419,7 @@ TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines"
 TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line numbers",
           "[preprocessor][line]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // LINE 200, "other.asm" then a line
@@ -425,6 +438,7 @@ TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line n
 TEST_CASE("Preprocessor: LINE with missing argument reports error",
           "[preprocessor][line][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "LINE\n";
@@ -446,6 +460,7 @@ TEST_CASE("Preprocessor: LINE with missing argument reports error",
 TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for following lines",
           "[preprocessor][cline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // C_LINE 400 then two ordinary lines
@@ -472,6 +487,7 @@ TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for follow
 TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and line number",
           "[preprocessor][cline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // C_LINE 300, "cfile.c" then a line
@@ -490,6 +506,7 @@ TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and lin
 TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
           "[preprocessor][cline][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "C_LINE\n";
@@ -511,6 +528,7 @@ TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
 TEST_CASE("Preprocessor: push_binary_file reads 0..255 bytes and emits DEFB lines",
           "[preprocessor][binary]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fname = "pp_0_255.bin";
@@ -556,6 +574,7 @@ TEST_CASE("Preprocessor: push_binary_file reads 0..255 bytes and emits DEFB line
 TEST_CASE("Preprocessor: BINARY directive is parsed and replaced by 16 DEFB lines at directive logical location",
           "[preprocessor][binary][directive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fname = "pp_bin_directive.bin";
@@ -622,6 +641,7 @@ TEST_CASE("Preprocessor: BINARY directive is parsed and replaced by 16 DEFB line
 TEST_CASE("Preprocessor: INCBIN directive is parsed and replaced by 16 DEFB lines at directive logical location",
           "[preprocessor][binary][directive][incbin]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fname = "pp_incbin_directive.bin";
@@ -686,6 +706,7 @@ TEST_CASE("Preprocessor: INCBIN directive is parsed and replaced by 16 DEFB line
 TEST_CASE("Preprocessor: LINE accepts quoted, angle-bracketed and plain filename forms",
           "[preprocessor][line][forms]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     std::string content;
@@ -720,6 +741,7 @@ TEST_CASE("Preprocessor: LINE accepts quoted, angle-bracketed and plain filename
 TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filename forms",
           "[preprocessor][cline][forms]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     std::string content;
@@ -755,6 +777,7 @@ TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filena
 TEST_CASE("Preprocessor: sequence C_LINE then lines then LINE then lines applies constant then incrementing logical line numbers",
           "[preprocessor][cline][line][sequence]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -804,6 +827,7 @@ TEST_CASE("Preprocessor: sequence C_LINE then lines then LINE then lines applies
 TEST_CASE("Preprocessor: BINARY accepts quoted, angle-bracketed and plain filename forms",
           "[preprocessor][binary][forms]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fq = "bin_q.dat";
@@ -873,6 +897,7 @@ TEST_CASE("Preprocessor: BINARY accepts quoted, angle-bracketed and plain filena
 TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filename forms",
           "[preprocessor][binary][forms][incbin]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fq = "inc_q.dat";
@@ -943,6 +968,7 @@ TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filena
 TEST_CASE("Preprocessor: object-like #define and name define expand to replacement",
           "[preprocessor][define][object]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // #define form
@@ -977,6 +1003,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are macro-expanded)",
           "[preprocessor][define][function][args]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Argument A is an object-like macro; ensure it's expanded when passed to F
@@ -1031,6 +1058,7 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
 TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntaxes, object and function)",
           "[preprocessor][define][empty]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // #define with empty body
@@ -1077,6 +1105,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
 TEST_CASE("Preprocessor: macro recursion limit is enforced for self-recursive macro",
           "[preprocessor][define][recursion]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Self-recursive macro R -> R should eventually trigger recursion limit
@@ -1098,6 +1127,7 @@ TEST_CASE("Preprocessor: macro recursion limit is enforced for self-recursive ma
 TEST_CASE("Preprocessor: name undef removes macro (name UNDEF syntax)",
           "[preprocessor][define][undef]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "M define 42\nM undef\nM\n";
@@ -1115,6 +1145,7 @@ TEST_CASE("Preprocessor: name undef removes macro (name UNDEF syntax)",
 TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
           "[preprocessor][define][undef][hash]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "#define N 99\n#undef N\nN\n";
@@ -1136,6 +1167,7 @@ TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
 TEST_CASE("Preprocessor: stringize operator '#' produces a string token for a simple identifier",
           "[preprocessor][define][stringize]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1173,6 +1205,7 @@ TEST_CASE("Preprocessor: stringize operator '#' produces a string token for a si
 TEST_CASE("Preprocessor: stringize '#' uses the original (unexpanded) argument",
           "[preprocessor][define][stringize][unexpanded]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1194,6 +1227,7 @@ TEST_CASE("Preprocessor: stringize '#' uses the original (unexpanded) argument",
 TEST_CASE("Preprocessor: stringize '#' escapes double-quotes and backslashes in emitted token.text and preserves original token text in string_value",
           "[preprocessor][define][stringize][escape]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Argument is a string literal token "\"hi\"" in source; after stringize:
@@ -1231,6 +1265,7 @@ TEST_CASE("Preprocessor: stringize '#' escapes double-quotes and backslashes in 
 TEST_CASE("Preprocessor: stringize '#' preserves spaces between tokens producing 65,32,66 for S(A B)",
           "[preprocessor][define][stringize][space]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1261,6 +1296,7 @@ TEST_CASE("Preprocessor: stringize '#' preserves spaces between tokens producing
 TEST_CASE("Preprocessor: single-line /* */ comment removed",
           "[preprocessor][comment]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "A/*single*/B\n";
@@ -1283,6 +1319,7 @@ TEST_CASE("Preprocessor: single-line /* */ comment removed",
 TEST_CASE("Preprocessor: multi-line /* */ comment removed",
           "[preprocessor][comment][multiline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "A/*multi\nline\ncomment*/B\n";
@@ -1308,6 +1345,7 @@ TEST_CASE("Preprocessor: multi-line /* */ comment removed",
 TEST_CASE("Preprocessor: DoubleHash '##' concatenates two identifiers into one identifier token",
           "[preprocessor][tokenpaste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "A ## B\n";
@@ -1332,6 +1370,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' concatenates two identifiers into one i
 TEST_CASE("Preprocessor: DoubleHash '##' concatenates identifier and integer into single identifier token",
           "[preprocessor][tokenpaste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "P##1\n";
@@ -1355,6 +1394,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' concatenates identifier and integer int
 TEST_CASE("Preprocessor: DoubleHash '##' supports multiple pastes in the same line",
           "[preprocessor][tokenpaste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "A##B C##D\n";
@@ -1387,6 +1427,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' supports multiple pastes in the same li
 TEST_CASE("Preprocessor: DEFL infix 'name DEFL expr' defines and replaces symbol",
           "[preprocessor][defl][infix]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1406,6 +1447,7 @@ TEST_CASE("Preprocessor: DEFL infix 'name DEFL expr' defines and replaces symbol
 TEST_CASE("Preprocessor: DEFL prefix 'DEFL name=expr' defines and replaces symbol",
           "[preprocessor][defl][prefix]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1425,6 +1467,7 @@ TEST_CASE("Preprocessor: DEFL prefix 'DEFL name=expr' defines and replaces symbo
 TEST_CASE("Preprocessor: DEFL can use previous value (DEFL index=index+1)",
           "[preprocessor][defl][previous]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1450,6 +1493,7 @@ TEST_CASE("Preprocessor: DEFL can use previous value (DEFL index=index+1)",
 TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma list) and expands at use sites",
           "[preprocessor][defl][nonconst]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // LIST expands to "10, 20" (a non-constant expression for eval_const_expr).
@@ -1500,6 +1544,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
     // Form with space before '='
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         const std::string content = "A DEFINE = 5\nA\n";
         pp.push_virtual_file(content, "def_eq_obj_spaced", 1, true);
@@ -1516,6 +1561,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
     // Form without spaces around '='
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         const std::string content = "B define=6\nB\n";
         pp.push_virtual_file(content, "def_eq_obj_nospaces", 1, true);
@@ -1535,6 +1581,7 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
     // Object-like empty body with '='
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         const std::string content = "E DEFINE =\nE\n";
         pp.push_virtual_file(content, "def_eq_empty_obj", 1, true);
@@ -1551,6 +1598,7 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
     // Function-like empty body with '='
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         const std::string content = "#define F(x)\nF(2)\n";
         pp.push_virtual_file(content, "def_eq_empty_func", 1, true);
@@ -1572,6 +1620,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
     // Spaced form: "DEFINE A = 5"
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         const std::string content = "DEFINE A = 5\nA\n";
         pp.push_virtual_file(content, "def_prefix_eq_obj_spaced", 1, true);
@@ -1588,6 +1637,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
     // Tight form: "DEFINE B=6"
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
         const std::string content = "DEFINE B=6\nB\n";
         pp.push_virtual_file(content, "def_prefix_eq_obj_nospaces", 1, true);
@@ -1605,6 +1655,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
 TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
           "[preprocessor][define][equals][prefix][empty]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Object-like empty body: "DEFINE E ="
@@ -1623,6 +1674,7 @@ TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
 TEST_CASE("Preprocessor: prefix DEFINE function-like accepts optional '=' before body",
           "[preprocessor][define][equals][prefix][function]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Function-like: "DEFINE ID(x) = x"
@@ -1651,6 +1703,7 @@ TEST_CASE("Preprocessor: prefix DEFINE function-like accepts optional '=' before
 TEST_CASE("Preprocessor: name UNDEFINE removes macro (synonym to UNDEF)",
           "[preprocessor][define][undef][undefine][synonym]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "M define 42\nM UNDEFINE\nM\n";
@@ -1668,6 +1721,7 @@ TEST_CASE("Preprocessor: name UNDEFINE removes macro (synonym to UNDEF)",
 TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
           "[preprocessor][define][undef][undefine][synonym][hash]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "#define N 99\n#UNDEFINE N\nN\n";
@@ -1689,6 +1743,7 @@ TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
 TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at call-site location",
           "[preprocessor][macro][multiline][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define a multi-line macro with one parameter, then set a logical location
@@ -1749,6 +1804,7 @@ TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at cal
 TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines at call-site location",
           "[preprocessor][macro][multiline][location][name-directive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define using the "<name> MACRO(...)" form, then set a logical location and invoke it.
@@ -1812,6 +1868,7 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines a
 TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parses params and expands correctly",
           "[preprocessor][macro][params][optional-parens][directive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1870,6 +1927,7 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parse
 TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) parses params and expands correctly",
           "[preprocessor][macro][params][optional-parens][name-directive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1932,6 +1990,7 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) 
 TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is accepted and expands",
           "[preprocessor][macro][params][no-parens-header]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -1990,6 +2049,7 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is acc
 TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parentheses are accepted",
           "[preprocessor][macro][params][no-parens-header][no-parens-call]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2052,6 +2112,7 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parent
 TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer expansion",
           "[preprocessor][macro][nested][directive-inner]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // OUT defines an inner macro IN(a) in its body. Calling OUT() must define IN,
@@ -2114,6 +2175,7 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
 TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during outer expansion",
           "[preprocessor][macro][nested][name-inner]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // OUTN defines inner macro INN(t) using the name-directive form. After OUTN(),
@@ -2181,6 +2243,7 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
 TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lines (parenthesized call)",
           "[preprocessor][macro][args][multiline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // INNER() expands to two lines: "A" and "B".
@@ -2217,6 +2280,7 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
 TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lines (unparenthesized call)",
           "[preprocessor][macro][args][multiline][no-parens-call]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Same as previous test but call OUT without parentheses:
@@ -2256,6 +2320,7 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
 TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expands to an object-like macro",
           "[preprocessor][tokenpaste][macro][object]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define object-like macro AB -> 777, then use token paste A ## B
@@ -2282,6 +2347,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expand
 TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expands to a function-like macro when followed by parentheses",
           "[preprocessor][tokenpaste][macro][function]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define function-like macro P1(x) -> x, then paste P ## 1 and call it with (99)
@@ -2308,6 +2374,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expand
 TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces macro name and expands correctly",
           "[preprocessor][tokenpaste][macro][idint]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define macro Q2 -> 202, then use token paste Q ## 2
@@ -2338,6 +2405,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces m
 TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expansion (labels)",
           "[preprocessor][macro][local][labels]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Macro defines local label 'L' and uses it. Each expansion should rename L -> L_1, L_2, ...
@@ -2399,6 +2467,7 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
 TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per expansion",
           "[preprocessor][macro][local][idents]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2461,6 +2530,7 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per
 TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
           "[preprocessor][local][outside]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // LOCAL appears outside any MACRO; it should be treated as a directive-like
@@ -2492,6 +2562,7 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
 TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner LOCAL handled when sub-macro is parsed",
           "[preprocessor][macro][local][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // OUT has its own LOCAL L and defines a sub-macro IN with its own LOCAL J.
@@ -2573,6 +2644,7 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
 TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
           "[preprocessor][macro][exitm]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2605,6 +2677,7 @@ TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
 TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
           "[preprocessor][exitm][outside]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2629,6 +2702,7 @@ TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
 TEST_CASE("Preprocessor: #define redefines existing #define -> MacroRedefined error",
           "[preprocessor][define][redefine][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2650,6 +2724,7 @@ TEST_CASE("Preprocessor: #define redefines existing #define -> MacroRedefined er
 TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined error",
           "[preprocessor][define][name][redefine][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2670,6 +2745,7 @@ TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined
 TEST_CASE("Preprocessor: MACRO (directive form) redefines existing MACRO -> MacroRedefined error",
           "[preprocessor][macro][directive][redefine][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2692,6 +2768,7 @@ TEST_CASE("Preprocessor: MACRO (directive form) redefines existing MACRO -> Macr
 TEST_CASE("Preprocessor: MACRO (name-directive form) redefines existing MACRO -> MacroRedefined error",
           "[preprocessor][macro][name][redefine][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2716,6 +2793,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
     // #define first, then MACRO
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         const std::string content =
@@ -2737,6 +2815,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
     // MACRO first, then #define
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         const std::string content =
@@ -2759,6 +2838,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
 TEST_CASE("Preprocessor: DEFL redefinition does NOT raise MacroRedefined",
           "[preprocessor][defl][redefine][noerror]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -2781,6 +2861,7 @@ TEST_CASE("Preprocessor: DEFL redefinition does NOT raise MacroRedefined",
 TEST_CASE("Preprocessor: define_macro from string content with multiple lines expands at call-site location",
           "[preprocessor][define_macro][string][multiline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Build a multi-line macro body from a string (two lines).
@@ -2846,6 +2927,7 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
 TEST_CASE("Preprocessor: define_macro from string content with label splits label and keeps call-site location",
           "[preprocessor][define_macro][string][label][multiline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Macro content includes a label and two instructions.
@@ -2918,6 +3000,7 @@ TEST_CASE("Preprocessor: define_macro from string content with label splits labe
 TEST_CASE("Preprocessor: define_macro(name, string) expands multi-line body at call-site location",
           "[preprocessor][define_macro][string][multiline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define an object-like macro from a raw multi-line string
@@ -2955,6 +3038,7 @@ TEST_CASE("Preprocessor: define_macro(name, string) expands multi-line body at c
 TEST_CASE("Preprocessor: define_macro(name, string) reports MacroRedefined on redefinition",
           "[preprocessor][define_macro][redefine][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     pp.define_macro("A", "1\n");
@@ -2969,6 +3053,7 @@ TEST_CASE("Preprocessor: define_macro(name, string) reports MacroRedefined on re
 TEST_CASE("Preprocessor: define_macro(name, tok_lines) reports MacroRedefined on redefinition",
           "[preprocessor][define_macro][vector][redefine][error]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // first definition via tok_lines
@@ -3000,6 +3085,7 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
     // Zero count
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         const std::string content =
@@ -3025,6 +3111,7 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
     // Negative count
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         const std::string content =
@@ -3141,6 +3228,7 @@ TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consum
 TEST_CASE("Preprocessor: nested REPT repeats inner body correctly",
           "[preprocessor][rept][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Outer repeats 2x; inner repeats 3x -> total 6 lines "N"
@@ -3174,6 +3262,7 @@ TEST_CASE("Preprocessor: nested REPT repeats inner body correctly",
 TEST_CASE("Preprocessor: REPTC (directive) with string argument produces character codes",
           "[preprocessor][reptc][directive][string]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3199,6 +3288,7 @@ TEST_CASE("Preprocessor: REPTC (directive) with string argument produces charact
 TEST_CASE("Preprocessor: REPTC (name-directive) with string argument produces character codes",
           "[preprocessor][reptc][name][string]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3224,6 +3314,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) with string argument produces ch
 TEST_CASE("Preprocessor: REPTC (directive) with numeric argument iterates over decimal digits",
           "[preprocessor][reptc][directive][number]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3249,6 +3340,7 @@ TEST_CASE("Preprocessor: REPTC (directive) with numeric argument iterates over d
 TEST_CASE("Preprocessor: REPTC (name-directive) with numeric argument iterates over decimal digits",
           "[preprocessor][reptc][name][number]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3274,6 +3366,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) with numeric argument iterates o
 TEST_CASE("Preprocessor: REPTC (directive) with identifier token sequence produces character codes",
           "[preprocessor][reptc][directive][tokens]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Bare identifier "hello" becomes the sequence 'h','e','l','l','o'
@@ -3300,6 +3393,7 @@ TEST_CASE("Preprocessor: REPTC (directive) with identifier token sequence produc
 TEST_CASE("Preprocessor: REPTC (name-directive) with identifier token sequence produces character codes",
           "[preprocessor][reptc][name][tokens]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3325,6 +3419,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) with identifier token sequence p
 TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string source (directive form)",
           "[preprocessor][reptc][directive][tokens][paste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3351,6 +3446,7 @@ TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string so
 TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string source (name-directive form)",
           "[preprocessor][reptc][name][tokens][paste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3377,6 +3473,7 @@ TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string so
 TEST_CASE("Preprocessor: REPTC with DEFL numeric symbol iterates over digits",
           "[preprocessor][reptc][defl][number]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3407,6 +3504,7 @@ TEST_CASE("Preprocessor: REPTC with DEFL numeric symbol iterates over digits",
 TEST_CASE("Preprocessor: REPTI (directive) enumerates identifier list into body",
           "[preprocessor][repti][directive][idents]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3431,6 +3529,7 @@ TEST_CASE("Preprocessor: REPTI (directive) enumerates identifier list into body"
 TEST_CASE("Preprocessor: REPTI (name-directive) enumerates identifier list into body",
           "[preprocessor][repti][name][idents]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3455,6 +3554,7 @@ TEST_CASE("Preprocessor: REPTI (name-directive) enumerates identifier list into 
 TEST_CASE("Preprocessor: REPTI duplicates body for integer expression arguments (no evaluation, textual)",
           "[preprocessor][repti][directive][numbers]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3495,6 +3595,7 @@ TEST_CASE("Preprocessor: REPTI duplicates body for integer expression arguments 
 TEST_CASE("Preprocessor: REPTI expands macros in arguments before substitution",
           "[preprocessor][repti][macro-arg]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3521,6 +3622,7 @@ TEST_CASE("Preprocessor: REPTI expands macros in arguments before substitution",
 TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens",
           "[preprocessor][repti][macro-arg][multitokens]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3547,6 +3649,7 @@ TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens
 TEST_CASE("Preprocessor: REPTI accepts token-paste result in argument via macro",
           "[preprocessor][repti][tokens][paste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3570,6 +3673,7 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste result in argument via macro"
 TEST_CASE("Preprocessor: REPTI accepts token-paste in name-directive form via macro",
           "[preprocessor][repti][name][tokens][paste]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3593,6 +3697,7 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste in name-directive form via ma
 TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product of arguments",
           "[preprocessor][repti][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Outer over 1,2; inner over A,B -> pairs in order:
@@ -3637,6 +3742,7 @@ TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product 
 TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
           "[preprocessor][rept][local][labels]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3697,6 +3803,7 @@ TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
 TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
           "[preprocessor][rept][local][idents]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3748,6 +3855,7 @@ TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
 TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substitutes variable",
           "[preprocessor][reptc][local]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // For each character, we get a unique label and 'defb <charcode>'
@@ -3815,6 +3923,7 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
 TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitutes variable",
           "[preprocessor][repti][local]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3881,6 +3990,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
 TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument tokens",
           "[preprocessor][repti][local][arg-preserve]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Local name equals an argument value; ensure inserted argument token is not renamed.
@@ -3941,6 +4051,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument
 TEST_CASE("Preprocessor: name-directive EQU 'X EQU 5' emits 'DEFC X = 5' tokens",
           "[preprocessor][equ][name]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -3971,6 +4082,7 @@ TEST_CASE("Preprocessor: name-directive EQU 'X EQU 5' emits 'DEFC X = 5' tokens"
 TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tokens",
           "[preprocessor][equ][name][expand]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4001,6 +4113,7 @@ TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tok
 TEST_CASE("Preprocessor: directive EQU 'EQU Y = 7' emits 'DEFC Y = 7' tokens",
           "[preprocessor][equ][directive][eq]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4025,6 +4138,7 @@ TEST_CASE("Preprocessor: directive EQU 'EQU Y = 7' emits 'DEFC Y = 7' tokens",
 TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits 'DEFC Z = 42'",
           "[preprocessor][equ][directive][no-eq]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4050,6 +4164,7 @@ TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits
 TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
           "[preprocessor][equ][name][optional-eq]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4075,6 +4190,7 @@ TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
 TEST_CASE("Preprocessor: EQU emitted DEFC line carries directive logical location",
           "[preprocessor][equ][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4107,6 +4223,7 @@ TEST_CASE("Preprocessor: EQU emitted DEFC line carries directive logical locatio
 TEST_CASE("Preprocessor: '=' synonym converts 'x = 10' to 'DEFC x = 10' tokens",
           "[preprocessor][equ][eq-synonym]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "x = 10\n";
@@ -4131,6 +4248,7 @@ TEST_CASE("Preprocessor: '=' synonym converts 'x = 10' to 'DEFC x = 10' tokens",
 TEST_CASE("Preprocessor: '=' synonym accepts tight form 'y=7'",
           "[preprocessor][equ][eq-synonym][tight]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "y=7\n";
@@ -4155,6 +4273,7 @@ TEST_CASE("Preprocessor: '=' synonym accepts tight form 'y=7'",
 TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
           "[preprocessor][equ][eq-synonym][expand]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4180,6 +4299,7 @@ TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
 TEST_CASE("Preprocessor: '=' synonym DEFC line carries directive logical location",
           "[preprocessor][equ][eq-synonym][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4212,6 +4332,7 @@ TEST_CASE("Preprocessor: '=' synonym DEFC line carries directive logical locatio
 TEST_CASE("Preprocessor: directive DEFC 'DEFC Y = 7' emits 'DEFC Y = 7' tokens",
           "[preprocessor][defc][directive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4237,6 +4358,7 @@ TEST_CASE("Preprocessor: directive DEFC 'DEFC Y = 7' emits 'DEFC Y = 7' tokens",
 TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' tokens",
           "[preprocessor][defc][name]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4266,6 +4388,7 @@ TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' token
 TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
           "[preprocessor][if][elif][else][endif][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4311,6 +4434,7 @@ TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
 TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELIF branch and inner ELSE",
           "[preprocessor][if][elif][else][endif][nested][mix]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4355,6 +4479,7 @@ TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELI
 TEST_CASE("Preprocessor: IF with multiple ELIF selects first true and ignores the rest",
           "[preprocessor][if][elif][else][endif]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4489,6 +4614,7 @@ TEST_CASE("Preprocessor: IF with undefined symbol does not report error and sele
 TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
           "[preprocessor][ifdef]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4511,6 +4637,7 @@ TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
 TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
           "[preprocessor][ifndef]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4532,6 +4659,7 @@ TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
 TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
           "[preprocessor][elifdef]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4556,6 +4684,7 @@ TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
 TEST_CASE("Preprocessor: ELIFNDEF after false IF selects when macro is not defined",
           "[preprocessor][elifndef]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4579,6 +4708,7 @@ TEST_CASE("Preprocessor: ELIFNDEF after false IF selects when macro is not defin
 TEST_CASE("Preprocessor: IFDEF/ELIFDEF nested with ELSE/ENDIF behave correctly",
           "[preprocessor][ifdef][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -4775,6 +4905,7 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
 TEST_CASE("Preprocessor: direct recursive include is detected and triggers RecursiveInclude error",
           "[preprocessor][include][recursive][direct]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Create a file that includes itself
@@ -4810,6 +4941,7 @@ TEST_CASE("Preprocessor: direct recursive include is detected and triggers Recur
 TEST_CASE("Preprocessor: indirect recursive include (A->B->A) is detected and triggers RecursiveInclude error",
           "[preprocessor][include][recursive][indirect]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fileA = "rec_a.asm";
@@ -4859,6 +4991,7 @@ TEST_CASE("Preprocessor: indirect recursive include (A->B->A) is detected and tr
 TEST_CASE("Preprocessor: longer cycle (A->B->C->A) is detected and triggers RecursiveInclude error",
           "[preprocessor][include][recursive][indirect][long]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fileA = "cycle_a.asm";
@@ -4913,6 +5046,7 @@ TEST_CASE("Preprocessor: longer cycle (A->B->C->A) is detected and triggers Recu
 TEST_CASE("Preprocessor: same file can be included multiple times if not recursive (A->B, A->B again after B closes)",
           "[preprocessor][include][multiple][nonrecursive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fileA = "multi_a.asm";
@@ -4962,6 +5096,7 @@ TEST_CASE("Preprocessor: same file can be included multiple times if not recursi
 TEST_CASE("Preprocessor: path normalization prevents redundant path forms from avoiding cycle detection",
           "[preprocessor][include][recursive][normalize]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fileA = "norm_a.asm";
@@ -5011,6 +5146,7 @@ TEST_CASE("Preprocessor: path normalization prevents redundant path forms from a
 TEST_CASE("Preprocessor: file cache reuses unchanged files",
           "[preprocessor][cache][hit]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string fname = "cache_test1.asm";
@@ -5047,6 +5183,7 @@ TEST_CASE("Preprocessor: file cache reuses unchanged files",
 TEST_CASE("Preprocessor: file cache works with multiple includes",
           "[preprocessor][cache][multiple]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string inc1 = "cache_inc1.asm";
@@ -5101,6 +5238,7 @@ TEST_CASE("Preprocessor: file cache works with multiple includes",
 TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
           "[preprocessor][cache][shared]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string fname = "cache_shared.asm";
@@ -5142,6 +5280,7 @@ TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
 TEST_CASE("Preprocessor: clear_file_cache empties the cache",
           "[preprocessor][cache][clear]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string fname = "cache_clear.asm";
@@ -5192,6 +5331,7 @@ TEST_CASE("Preprocessor: clear_file_cache empties the cache",
 TEST_CASE("Preprocessor: file cache handles path normalization",
           "[preprocessor][cache][normalize]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string fname = "cache_norm.asm";
@@ -5232,6 +5372,7 @@ TEST_CASE("Preprocessor: file cache handles path normalization",
 TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
           "[preprocessor][cache][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string common = "cache_common.asm";
@@ -5299,6 +5440,7 @@ TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
 TEST_CASE("Preprocessor: file cache invalidates on file modification",
           "[preprocessor][cache][invalidate]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string fname = "cache_test2.asm";
@@ -5353,6 +5495,7 @@ TEST_CASE("Preprocessor: file cache invalidates on file modification",
 TEST_CASE("Preprocessor: REPT with positive count repeats body correctly",
           "[preprocessor][rept][positive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5388,6 +5531,7 @@ TEST_CASE("Preprocessor: REPT with positive count repeats body correctly",
 TEST_CASE("Preprocessor: BINARY with missing file reports FileNotFound error",
           "[preprocessor][binary][error][missing]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string missing = "missing_binary.bin";
@@ -5406,6 +5550,7 @@ TEST_CASE("Preprocessor: BINARY with missing file reports FileNotFound error",
 TEST_CASE("Preprocessor: INCBIN with missing file reports FileNotFound error",
           "[preprocessor][binary][error][missing][incbin]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string missing = "missing_incbin.bin";
@@ -5424,6 +5569,7 @@ TEST_CASE("Preprocessor: INCBIN with missing file reports FileNotFound error",
 TEST_CASE("Preprocessor: BINARY with empty file produces no DEFB lines",
           "[preprocessor][binary][empty]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fname = "empty_binary.bin";
@@ -5462,6 +5608,7 @@ TEST_CASE("Preprocessor: BINARY with empty file produces no DEFB lines",
 TEST_CASE("Preprocessor: BINARY with non-multiple-of-16 size handles last partial line",
           "[preprocessor][binary][partial]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string fname = "partial_binary.bin";
@@ -5511,6 +5658,7 @@ TEST_CASE("Preprocessor: BINARY with non-multiple-of-16 size handles last partia
 TEST_CASE("Preprocessor: LINE with non-numeric line number reports error",
           "[preprocessor][line][error][nonnumeric]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "LINE abc\n";
@@ -5528,6 +5676,7 @@ TEST_CASE("Preprocessor: LINE with non-numeric line number reports error",
 TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementation-defined)",
           "[preprocessor][line][negative]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "LINE -5\ntest\nthis\n";
@@ -5552,6 +5701,7 @@ TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementat
 TEST_CASE("Preprocessor: LINE with trailing tokens after filename reports error",
           "[preprocessor][line][error][trailing]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "LINE 100, \"file.asm\" extra\n";
@@ -5572,6 +5722,7 @@ TEST_CASE("Preprocessor: LINE with trailing tokens after filename reports error"
 TEST_CASE("Preprocessor: function-like macro with too few arguments reports error",
           "[preprocessor][macro][args][error][few]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5590,6 +5741,7 @@ TEST_CASE("Preprocessor: function-like macro with too few arguments reports erro
 TEST_CASE("Preprocessor: function-like macro with too many arguments reports error",
           "[preprocessor][macro][args][error][many]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5608,6 +5760,7 @@ TEST_CASE("Preprocessor: function-like macro with too many arguments reports err
 TEST_CASE("Preprocessor: function-like macro with empty parentheses when expecting args reports error",
           "[preprocessor][macro][args][error][empty]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5630,6 +5783,7 @@ TEST_CASE("Preprocessor: function-like macro with empty parentheses when expecti
 TEST_CASE("Preprocessor: EXITM in nested macro only exits innermost macro",
           "[preprocessor][macro][exitm][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5670,6 +5824,7 @@ TEST_CASE("Preprocessor: EXITM in nested macro only exits innermost macro",
 TEST_CASE("Preprocessor: multiple EXITM in same macro - first one takes effect",
           "[preprocessor][macro][exitm][multiple]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5707,6 +5862,7 @@ TEST_CASE("Preprocessor: multiple EXITM in same macro - first one takes effect",
 TEST_CASE("Preprocessor: token paste at beginning of replacement list",
           "[preprocessor][tokenpaste][edge][beginning]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5729,6 +5885,7 @@ TEST_CASE("Preprocessor: token paste at beginning of replacement list",
 TEST_CASE("Preprocessor: token paste at end of replacement list",
           "[preprocessor][tokenpaste][edge][end]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5751,6 +5908,7 @@ TEST_CASE("Preprocessor: token paste at end of replacement list",
 TEST_CASE("Preprocessor: multiple consecutive ## operators",
           "[preprocessor][tokenpaste][edge][consecutive]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5780,6 +5938,7 @@ TEST_CASE("Preprocessor: multiple consecutive ## operators",
 TEST_CASE("Preprocessor: stringize with whitespace-only argument",
           "[preprocessor][stringize][edge][whitespace]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5807,6 +5966,7 @@ TEST_CASE("Preprocessor: stringize with whitespace-only argument",
 TEST_CASE("Preprocessor: stringize with special characters",
           "[preprocessor][stringize][edge][special]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5836,6 +5996,7 @@ TEST_CASE("Preprocessor: stringize with special characters",
 TEST_CASE("Preprocessor: unmatched ENDIF reports error",
           "[preprocessor][if][error][unmatched]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5856,6 +6017,7 @@ TEST_CASE("Preprocessor: unmatched ENDIF reports error",
 TEST_CASE("Preprocessor: ELIF without preceding IF reports error",
           "[preprocessor][if][error][elif]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5877,6 +6039,7 @@ TEST_CASE("Preprocessor: ELIF without preceding IF reports error",
 TEST_CASE("Preprocessor: ELSE without preceding IF reports error",
           "[preprocessor][if][error][else]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5898,6 +6061,7 @@ TEST_CASE("Preprocessor: ELSE without preceding IF reports error",
 TEST_CASE("Preprocessor: multiple ELSE in same IF block reports error",
           "[preprocessor][if][error][multiple-else]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5923,6 +6087,7 @@ TEST_CASE("Preprocessor: multiple ELSE in same IF block reports error",
 TEST_CASE("Preprocessor: ENDIF without IF reports error",
           "[preprocessor][if][error][endif-solo]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5945,6 +6110,7 @@ TEST_CASE("Preprocessor: ENDIF without IF reports error",
 TEST_CASE("Preprocessor: MACRO without ENDM reports error at end of file",
           "[preprocessor][macro][error][noendm]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5964,6 +6130,7 @@ TEST_CASE("Preprocessor: MACRO without ENDM reports error at end of file",
 TEST_CASE("Preprocessor: ENDM without MACRO reports error",
           "[preprocessor][macro][error][endm-solo]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -5983,6 +6150,7 @@ TEST_CASE("Preprocessor: ENDM without MACRO reports error",
 TEST_CASE("Preprocessor: MACRO with empty name reports error",
           "[preprocessor][macro][error][noname]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6003,6 +6171,7 @@ TEST_CASE("Preprocessor: MACRO with empty name reports error",
 TEST_CASE("Preprocessor: MACRO with duplicate parameter names reports error",
           "[preprocessor][macro][error][dup-params]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6026,6 +6195,7 @@ TEST_CASE("Preprocessor: MACRO with duplicate parameter names reports error",
 TEST_CASE("Preprocessor: empty virtual file produces no lines",
           "[preprocessor][virtual][empty]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "";
@@ -6039,6 +6209,7 @@ TEST_CASE("Preprocessor: empty virtual file produces no lines",
 TEST_CASE("Preprocessor: virtual file with only whitespace produces no lines",
           "[preprocessor][virtual][whitespace]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "   \n\t\n  \n";
@@ -6057,6 +6228,7 @@ TEST_CASE("Preprocessor: virtual file with only whitespace produces no lines",
 TEST_CASE("Preprocessor: virtual file with only comments produces no output lines",
           "[preprocessor][virtual][comments]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6084,6 +6256,7 @@ TEST_CASE("Preprocessor: virtual file with only comments produces no output line
 TEST_CASE("Preprocessor: empty string produces no characters",
           "[preprocessor][string][empty]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "db \"\"\n";
@@ -6108,6 +6281,7 @@ TEST_CASE("Preprocessor: empty string produces no characters",
 TEST_CASE("Preprocessor: string with only escape sequences",
           "[preprocessor][string][escapes-only]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "db \"\\n\\r\\t\"\n";
@@ -6138,6 +6312,7 @@ TEST_CASE("Preprocessor: string with only escape sequences",
 TEST_CASE("Preprocessor: multiple labels on same line - each gets split",
           "[preprocessor][label][multiple]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "lab1: lab2: nop\n";
@@ -6163,6 +6338,7 @@ TEST_CASE("Preprocessor: multiple labels on same line - each gets split",
 TEST_CASE("Preprocessor: label with no following instruction",
           "[preprocessor][label][alone]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "label:\n";
@@ -6191,6 +6367,7 @@ TEST_CASE("Preprocessor: label with no following instruction",
 TEST_CASE("Preprocessor: EXITM inside IF with true condition exits macro",
           "[preprocessor][macro][exitm][if][true]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6226,6 +6403,7 @@ TEST_CASE("Preprocessor: EXITM inside IF with true condition exits macro",
 TEST_CASE("Preprocessor: EXITM inside IF with false condition does not exit macro",
           "[preprocessor][macro][exitm][if][false]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6261,6 +6439,7 @@ TEST_CASE("Preprocessor: EXITM inside IF with false condition does not exit macr
 TEST_CASE("Preprocessor: EXITM in ELSE branch exits when IF condition is false",
           "[preprocessor][macro][exitm][if][else]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6301,6 +6480,7 @@ TEST_CASE("Preprocessor: EXITM in ELSE branch exits when IF condition is false",
 TEST_CASE("Preprocessor: nested IF with EXITM - inner condition controls exit",
           "[preprocessor][macro][exitm][if][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6342,6 +6522,7 @@ TEST_CASE("Preprocessor: nested IF with EXITM - inner condition controls exit",
 TEST_CASE("Preprocessor: nested IF with EXITM - inner true condition exits macro",
           "[preprocessor][macro][exitm][if][nested][exit]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6384,6 +6565,7 @@ TEST_CASE("Preprocessor: nested IF with EXITM - inner true condition exits macro
 TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
           "[preprocessor][macro][exitm][ifdef]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Test with IFDEF (symbol defined - should exit)
@@ -6418,6 +6600,7 @@ TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
     // Test with IFNDEF (symbol not defined - should exit)
     {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp2;
 
         const std::string content =
@@ -6451,6 +6634,7 @@ TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
 TEST_CASE("Preprocessor: EXITM with ELIF branch",
           "[preprocessor][macro][exitm][elif]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6495,6 +6679,7 @@ TEST_CASE("Preprocessor: EXITM with ELIF branch",
 TEST_CASE("Preprocessor: multiple EXITMs in different IF branches - only executed one is effective",
           "[preprocessor][macro][exitm][if][multiple]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6539,6 +6724,7 @@ TEST_CASE("Preprocessor: multiple EXITMs in different IF branches - only execute
 TEST_CASE("Preprocessor: IF without ENDIF reports error at end of input",
           "[preprocessor][if][error][noendif]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Unclosed IF; EOF reached without ENDIF
@@ -6562,6 +6748,7 @@ TEST_CASE("Preprocessor: IF without ENDIF reports error at end of input",
 TEST_CASE("Preprocessor: outer IF missing ENDIF is reported even when inner blocks close",
           "[preprocessor][if][error][noendif][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Outer IF is missing ENDIF; inner IF/ELSE/ENDIF is correctly closed
@@ -6590,6 +6777,7 @@ TEST_CASE("Preprocessor: outer IF missing ENDIF is reported even when inner bloc
 TEST_CASE("Preprocessor: dependency_filenames captures push_file and #include in order with duplicates",
           "[preprocessor][deps][include][order][dups]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
     Preprocessor pp;
 
@@ -6643,6 +6831,7 @@ TEST_CASE("Preprocessor: dependency_filenames captures push_file and #include in
 TEST_CASE("Preprocessor: dependency_filenames captures BINARY/INCBIN in order (including missing files)",
           "[preprocessor][deps][binary][incbin][order]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string ok1 = "dep_ok1.bin";
@@ -6692,6 +6881,7 @@ TEST_CASE("Preprocessor: dependency_filenames captures BINARY/INCBIN in order (i
 TEST_CASE("Preprocessor: clear() resets dependency_filenames",
           "[preprocessor][deps][clear]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Record a dependency via push_binary_file (file may not exist)
@@ -6714,6 +6904,7 @@ TEST_CASE("Preprocessor: clear() resets dependency_filenames",
 TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-statements line (parenthesized call)",
           "[preprocessor][macro][multiline][split][colon]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Define a 2-line macro and call it between two colon-separated statements
@@ -6757,6 +6948,7 @@ TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-state
 TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-statements line (unparenthesized call)",
           "[preprocessor][macro][multiline][split][colon][noparen]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Same macro, unparenthesized call form
@@ -6813,6 +7005,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
 
     SECTION("Non-keyword: parsed as label, then following statement") {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         // 'LBL' is not a keyword; should be parsed as a label, then 'NOP' as a separate line
@@ -6835,6 +7028,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
 
     SECTION("Opcode keyword: NOT a label; ':' is a separator") {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         // 'LD' is an opcode; must not be treated as a label
@@ -6857,6 +7051,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
 
     SECTION("Directive keyword: NOT a label; ':' is a separator") {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         // 'EQU' is a (name) directive; must not be treated as a label.
@@ -6874,6 +7069,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
         std::string msg = g_errors.last_error_message();
         REQUIRE(msg.find("Expected identifier after EQU") != std::string::npos);
         g_errors.reset();
+        g_symbol_table.clear();
 
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(Keyword::NOP));
@@ -6889,6 +7085,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
 
     SECTION("Conditional directive keyword: NOT a label; ':' is a separator") {
         g_errors.reset();
+        g_symbol_table.clear();
         Preprocessor pp;
 
         // 'IF' is a conditional directive; must not be treated as a label.
@@ -6924,6 +7121,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
 TEST_CASE("Preprocessor: object-like macros cascade (A -> B -> C -> 123)",
           "[preprocessor][macro][cascade][object]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6951,6 +7149,7 @@ TEST_CASE("Preprocessor: object-like macros cascade (A -> B -> C -> 123)",
 TEST_CASE("Preprocessor: function-like macro expands to object-like macro and recurses (M() -> N -> 42)",
           "[preprocessor][macro][cascade][function->object]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -6977,6 +7176,7 @@ TEST_CASE("Preprocessor: function-like macro expands to object-like macro and re
 TEST_CASE("Preprocessor: function-like macro expands to another function-like call and recurses (F() -> ID(7) -> 7)",
           "[preprocessor][macro][cascade][function->function]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7003,6 +7203,7 @@ TEST_CASE("Preprocessor: function-like macro expands to another function-like ca
 TEST_CASE("Preprocessor: 'NOP:' is not treated as a label (labels cannot be instructions)",
           "[preprocessor][label][instruction][colon]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7036,6 +7237,7 @@ TEST_CASE("Preprocessor: 'NOP:' is not treated as a label (labels cannot be inst
 TEST_CASE("Preprocessor: '.NOP' is not treated as a label (instruction after dot)",
           "[preprocessor][label][instruction][dot]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7066,6 +7268,7 @@ TEST_CASE("Preprocessor: '.NOP' is not treated as a label (instruction after dot
 TEST_CASE("Preprocessor: normal label 'LBL:' still recognized (control case)",
           "[preprocessor][label][control]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7096,6 +7299,7 @@ TEST_CASE("Preprocessor: normal label 'LBL:' still recognized (control case)",
 TEST_CASE("Preprocessor: opcode before ':' is not a label but following statement is split",
           "[preprocessor][label][opcode-first][chain]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
     const std::string content = "NOP: L2: X\n";
     pp.push_virtual_file(content, "label_chain_opcode_first.asm", 1, true);
@@ -7137,6 +7341,7 @@ TEST_CASE("Preprocessor: opcode before ':' is not a label but following statemen
 TEST_CASE("Preprocessor: single-line colon-separated IF true yields branch body",
           "[preprocessor][if][colon][singleline][true]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "IF 1 : NOP : ENDIF\n";
@@ -7154,6 +7359,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF true yields branch body"
 TEST_CASE("Preprocessor: single-line colon-separated IF false with ELSE selects ELSE branch",
           "[preprocessor][if][else][colon][singleline][false]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "IF 0 : SHOULD_NOT : ELSE : OK : ENDIF\n";
@@ -7170,6 +7376,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF false with ELSE selects 
 TEST_CASE("Preprocessor: single-line colon-separated IF with multiple ELIF picks first true only",
           "[preprocessor][if][elif][colon][singleline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7188,6 +7395,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF with multiple ELIF picks
 TEST_CASE("Preprocessor: single-line colon-separated IF/ELIF/ELSE chain picks ELSE when no prior true",
           "[preprocessor][if][elif][else][colon][singleline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7205,6 +7413,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF/ELIF/ELSE chain picks EL
 TEST_CASE("Preprocessor: single-line colon-separated nested IF works",
           "[preprocessor][if][nested][colon][singleline]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Inner IF is false so ELIF emits Z; outer IF true so both inner result and outer ENDIF processed.
@@ -7223,6 +7432,7 @@ TEST_CASE("Preprocessor: single-line colon-separated nested IF works",
 TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing tokens after ENDIF",
           "[preprocessor][if][colon][trailing]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7249,6 +7459,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing t
 TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance",
           "[preprocessor][pragma_once][single]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
     const std::string inc = "po_once.inc";
     const std::string mainf = "po_main_once.asm";
@@ -7285,6 +7496,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance"
 TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
           "[preprocessor][pragma_once][instances]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
     const std::string inc = "po_once_instance.inc";
     {
@@ -7321,6 +7533,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
 TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
           "[preprocessor][pragma_once][absent]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
     const std::string inc = "po_no_once.inc";
     const std::string mainf = "po_no_once_main.asm";
@@ -7352,6 +7565,7 @@ TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
 TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
           "[preprocessor][pragma_once][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
     const std::string inner = "po_inner_once.inc";
     const std::string outer = "po_outer_once.asm";
@@ -7384,6 +7598,7 @@ TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
 TEST_CASE("Preprocessor: PRAGMA ONCE trailing tokens error",
           "[preprocessor][pragma_once][error][trailing]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
     pp.push_virtual_file("PRAGMA ONCE extra\n", "po_trailing", 1, true);
     TokensLine l;
@@ -7399,6 +7614,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE trailing tokens error",
 TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second inclusion",
           "[preprocessor][include][guard]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string inc = "ig_guard_simple.inc";
@@ -7450,9 +7666,177 @@ TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second in
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
+TEST_CASE("Preprocessor: include guard #ifndef/name define at top prevents second inclusion",
+          "[preprocessor][include][guard]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "ig_guard_simple.inc";
+    const std::string mainf = "ig_guard_simple_main.asm";
+
+    {
+        std::ofstream o(inc);
+        REQUIRE(o.is_open());
+        o <<
+          "#ifndef IG_GUARD_SIMPLE\n"
+          "IG_GUARD_SIMPLE define 1\n"
+          "SIMPLE_LINE\n"
+          "#endif\n";
+    }
+    {
+        std::ofstream o(mainf);
+        REQUIRE(o.is_open());
+        o <<
+          "#include \"" << inc << "\"\n"
+          "#include \"" << inc << "\"\n"
+          "AFTER\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line[0].text());
+        }
+    }
+
+    // Body emitted only once
+    REQUIRE(out.size() == 2);
+    REQUIRE(out[0] == "SIMPLE_LINE");
+    REQUIRE(out[1] == "AFTER");
+
+    // Dependencies list should contain main + both include attempts (duplicate recorded)
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[0] == mainf);
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second inclusion",
+          "[preprocessor][include][guard]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "ig_guard_simple.inc";
+    const std::string mainf = "ig_guard_simple_main.asm";
+
+    {
+        std::ofstream o(inc);
+        REQUIRE(o.is_open());
+        o <<
+          "#ifndef IG_GUARD_SIMPLE\n"
+          "defc IG_GUARD_SIMPLE = 1\n"
+          "SIMPLE_LINE\n"
+          "#endif\n";
+    }
+    {
+        std::ofstream o(mainf);
+        REQUIRE(o.is_open());
+        o <<
+          "#include \"" << inc << "\"\n"
+          "#include \"" << inc << "\"\n"
+          "AFTER\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line.to_string());
+        }
+    }
+
+    // Body emitted only once
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "defc IG_GUARD_SIMPLE = 1");
+    REQUIRE(out[1] == "SIMPLE_LINE");
+    REQUIRE(out[2] == "AFTER");
+
+    // Dependencies list should contain main + both include attempts (duplicate recorded)
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[0] == mainf);
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: include guard #ifndef/name defc at top prevents second inclusion",
+          "[preprocessor][include][guard]") {
+    g_errors.reset();
+    g_symbol_table.clear();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "ig_guard_simple.inc";
+    const std::string mainf = "ig_guard_simple_main.asm";
+
+    {
+        std::ofstream o(inc);
+        REQUIRE(o.is_open());
+        o <<
+          "#ifndef IG_GUARD_SIMPLE\n"
+          "IG_GUARD_SIMPLE defc 1\n"
+          "SIMPLE_LINE\n"
+          "#endif\n";
+    }
+    {
+        std::ofstream o(mainf);
+        REQUIRE(o.is_open());
+        o <<
+          "#include \"" << inc << "\"\n"
+          "#include \"" << inc << "\"\n"
+          "AFTER\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line.to_string());
+        }
+    }
+
+    // Body emitted only once
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "DEFC IG_GUARD_SIMPLE = 1");
+    REQUIRE(out[1] == "SIMPLE_LINE");
+    REQUIRE(out[2] == "AFTER");
+
+    // Dependencies list should contain main + both include attempts (duplicate recorded)
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[0] == mainf);
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
 TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still detected",
           "[preprocessor][include][guard][whitespace]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string inc = "ig_guard_ws.inc";
@@ -7509,6 +7893,7 @@ TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still
 TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined before first include",
           "[preprocessor][include][guard][predefined]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor::clear_file_cache();
 
     const std::string inc = "ig_guard_predef.inc";
@@ -7564,6 +7949,7 @@ TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined 
 TEST_CASE("Preprocessor: single trailing backslash joins next line with",
           "[preprocessor][linecontinuation][backslash]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7586,6 +7972,7 @@ TEST_CASE("Preprocessor: single trailing backslash joins next line with",
 TEST_CASE("Preprocessor: multiple trailing backslashes cascade into one logical line",
           "[preprocessor][linecontinuation][backslash][multi]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7612,6 +7999,7 @@ TEST_CASE("Preprocessor: multiple trailing backslashes cascade into one logical 
 TEST_CASE("Preprocessor: backslash line continuation preserves commas and numeric tokens",
           "[preprocessor][linecontinuation][binary]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7646,6 +8034,7 @@ TEST_CASE("Preprocessor: backslash line continuation preserves commas and numeri
 TEST_CASE("Preprocessor: backslash continuation inside macro argument preserves spacing",
           "[preprocessor][linecontinuation][macro][args]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7671,6 +8060,7 @@ TEST_CASE("Preprocessor: backslash continuation inside macro argument preserves 
 TEST_CASE("Preprocessor: backslash before comment stops at comment newline",
           "[preprocessor][linecontinuation][comment]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7699,6 +8089,7 @@ TEST_CASE("Preprocessor: backslash before comment stops at comment newline",
 TEST_CASE("Preprocessor: trailing backslash followed by blank line joins empty line",
           "[preprocessor][linecontinuation][blank]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7727,6 +8118,7 @@ TEST_CASE("Preprocessor: trailing backslash followed by blank line joins empty l
 TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins line",
           "[preprocessor][linecontinuation][blank]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7750,6 +8142,7 @@ TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins l
 TEST_CASE("Preprocessor: backslash at end of last line (no following line) yields original line (no join)",
           "[preprocessor][linecontinuation][eof]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7779,6 +8172,7 @@ TEST_CASE("Preprocessor: backslash at end of last line (no following line) yield
 TEST_CASE("Preprocessor: DEFL preserves non-constant comma-separated list",
           "[preprocessor][defl][list]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // First line defines X as list 1,2 (directive produces no output line)
@@ -7809,6 +8203,7 @@ TEST_CASE("Preprocessor: DEFL preserves non-constant comma-separated list",
 TEST_CASE("Preprocessor: DEFL list expands inside another line (db macro usage)",
           "[preprocessor][defl][list][db]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7838,6 +8233,7 @@ TEST_CASE("Preprocessor: DEFL list expands inside another line (db macro usage)"
 TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
           "[preprocessor][defl][list][macro]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -7870,6 +8266,7 @@ TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
 TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list elements",
           "[preprocessor][defl][list][prev]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Avoid self-reference recursion: build new symbol from previous symbol
@@ -7901,6 +8298,7 @@ TEST_CASE("Preprocessor: ELSEIF is a synonym of ELIF in IF/ELSEIF.../ELSE/ENDIF 
     const std::vector<std::string>& defines) -> int {
         Preprocessor pp;
         g_errors.reset();
+        g_symbol_table.clear();
 
         std::string content;
         // Optional defines (empty body expands to 1)
@@ -7969,6 +8367,7 @@ TEST_CASE("Preprocessor: ELSEIFDEF is a synonym of ELIFDEF",
     auto run_chain = [](const std::string & syn,
     const std::vector<std::string>& defines) -> int {
         g_errors.reset();
+        g_symbol_table.clear();
 
         std::string content;
         for (const auto& d : defines) {
@@ -8011,6 +8410,7 @@ TEST_CASE("Preprocessor: ELSEIFNDEF is a synonym of ELIFNDEF",
     auto run_chain = [](const std::string & syn,
     const std::vector<std::string>& defines) -> int {
         g_errors.reset();
+        g_symbol_table.clear();
 
         std::string content;
         for (const auto& d : defines) {
@@ -8061,6 +8461,7 @@ TEST_CASE("Preprocessor: ELSEIFNDEF is a synonym of ELIFNDEF",
 TEST_CASE("Preprocessor: chained token pasting A##B##C produces single identifier ABC",
           "[preprocessor][tokenpaste][chained][outside-macro]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content = "A##B##C\n";
@@ -8089,6 +8490,7 @@ TEST_CASE("Preprocessor: chained token pasting A##B##C produces single identifie
 TEST_CASE("Preprocessor: outer macro continues after inner macro EXITM (multiple inner calls)",
           "[preprocessor][macro][exitm][nested][continue]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // INNER(n): emits inner_start then EXITM (inner_end suppressed)
@@ -8141,6 +8543,7 @@ TEST_CASE("Preprocessor: outer macro continues after inner macro EXITM (multiple
 TEST_CASE("Preprocessor: EXITM inside REPT inside MACRO aborts macro after first REPT iteration",
           "[preprocessor][macro][exitm][rept][iteration-cut]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Macro M(val):
@@ -8214,6 +8617,7 @@ TEST_CASE("Preprocessor: EXITM inside REPT inside MACRO aborts macro after first
 TEST_CASE("Preprocessor: C_LINE then REPT block keeps constant logical line number for all emitted REPT lines",
           "[preprocessor][cline][rept][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // C_LINE fixes logical line and filename; REPT 3 should emit three X lines all at the same logical line.
@@ -8243,6 +8647,7 @@ TEST_CASE("Preprocessor: C_LINE then REPT block keeps constant logical line numb
 TEST_CASE("Preprocessor: C_LINE then REPTC block keeps constant logical line number for all emitted REPTC lines",
           "[preprocessor][cline][reptc][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8279,6 +8684,7 @@ TEST_CASE("Preprocessor: C_LINE then REPTC block keeps constant logical line num
 TEST_CASE("Preprocessor: C_LINE then REPTI block keeps constant logical line number for all emitted REPTI lines",
           "[preprocessor][cline][repti][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8318,6 +8724,7 @@ TEST_CASE("Preprocessor: C_LINE then REPTI block keeps constant logical line num
 TEST_CASE("Preprocessor: LINE then REPT block emits all repeated lines at REPT invocation line number",
           "[preprocessor][line][rept][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Physical layout:
@@ -8364,6 +8771,7 @@ TEST_CASE("Preprocessor: LINE then REPT block emits all repeated lines at REPT i
 TEST_CASE("Preprocessor: LINE then REPTC block emits all character iterations at invocation line number",
           "[preprocessor][line][reptc][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Physical layout:
@@ -8405,6 +8813,7 @@ TEST_CASE("Preprocessor: LINE then REPTC block emits all character iterations at
 TEST_CASE("Preprocessor: LINE then REPTI block emits all argument iterations at invocation line number",
           "[preprocessor][line][repti][location]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Physical layout:
@@ -8448,6 +8857,7 @@ TEST_CASE("Preprocessor: LINE then REPTI block emits all argument iterations at 
 TEST_CASE("Preprocessor: REPTC inside MACRO expands characters to integers in body",
           "[preprocessor][macro][reptc]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8485,6 +8895,7 @@ TEST_CASE("Preprocessor: REPTC inside MACRO expands characters to integers in bo
 TEST_CASE("Preprocessor: object-like #define body split by ':' expands to multiple lines",
           "[preprocessor][define][multiline][colon]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8522,6 +8933,7 @@ TEST_CASE("Preprocessor: object-like #define body split by ':' expands to multip
 TEST_CASE("Preprocessor: object-like #define body split by '\\' expands to multiple lines",
           "[preprocessor][define][multiline][backslash]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8554,6 +8966,7 @@ TEST_CASE("Preprocessor: object-like #define body split by '\\' expands to multi
 TEST_CASE("Preprocessor: function-like #define body split by ':' expands to multiple lines",
           "[preprocessor][define][function][multiline][colon]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8586,6 +8999,7 @@ TEST_CASE("Preprocessor: function-like #define body split by ':' expands to mult
 TEST_CASE("Preprocessor: function-like #define body split by '\\' expands to multiple lines",
           "[preprocessor][define][function][multiline][backslash]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8618,6 +9032,7 @@ TEST_CASE("Preprocessor: function-like #define body split by '\\' expands to mul
 TEST_CASE("Preprocessor: name-directive DEFINE body split by ':' expands to multiple lines",
           "[preprocessor][define][name][multiline][colon]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8650,6 +9065,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by ':' expands to mult
 TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to multiple lines",
           "[preprocessor][define][name][multiline][backslash]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8687,6 +9103,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
 TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefinition error",
           "[preprocessor][local][duplicate][macro]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8711,6 +9128,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefin
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefinition error",
           "[preprocessor][local][duplicate][rept]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8734,6 +9152,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefini
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefinition error",
           "[preprocessor][local][duplicate][reptc]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8757,6 +9176,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefin
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefinition error",
           "[preprocessor][local][duplicate][repti]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8773,8 +9193,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefin
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("L") != std::string::npos);
+    REQUIRE(msg.find("Duplicate definition: L") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
@@ -8785,6 +9204,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefin
 TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports Duplicate definition",
           "[preprocessor][macro][local][collision][param]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8807,6 +9227,7 @@ TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports
 TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label reports Duplicate definition",
           "[preprocessor][reptc][local][collision][iter]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8828,6 +9249,7 @@ TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label rep
 TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label reports Duplicate definition",
           "[preprocessor][repti][local][collision][iter]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8849,6 +9271,7 @@ TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label rep
 TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list preserves expression structure",
           "[preprocessor][repti][parentheses][expressions]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Test REPTI where first argument is a parenthesized expression (a+b) and second is (a-b)
@@ -8882,6 +9305,7 @@ TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list p
 TEST_CASE("Preprocessor: REPTI name-directive form with parenthesized expressions preserves expression structure",
           "[preprocessor][repti][name-directive][parentheses][expressions]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     // Test name-directive form: var REPTI (a+b), (a-b)
@@ -8919,6 +9343,7 @@ TEST_CASE("Preprocessor: REPTI name-directive form with parenthesized expression
 TEST_CASE("Preprocessor: REPTI with unmatched opening parenthesis in first argument reports error",
           "[preprocessor][repti][error][unmatched][paren][open]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8938,6 +9363,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched opening parenthesis in first argum
 TEST_CASE("Preprocessor: REPTI with unmatched closing parenthesis reports error",
           "[preprocessor][repti][error][unmatched][paren][close]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8957,6 +9383,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched closing parenthesis reports error"
 TEST_CASE("Preprocessor: REPTI with unmatched parentheses in second argument reports error",
           "[preprocessor][repti][error][unmatched][paren][second]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8976,6 +9403,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched parentheses in second argument rep
 TEST_CASE("Preprocessor: REPTI with multiple unmatched opening parentheses reports error",
           "[preprocessor][repti][error][unmatched][paren][multiple]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -8995,6 +9423,7 @@ TEST_CASE("Preprocessor: REPTI with multiple unmatched opening parentheses repor
 TEST_CASE("Preprocessor: REPTI with nested unmatched parentheses reports error",
           "[preprocessor][repti][error][unmatched][paren][nested]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -9014,6 +9443,7 @@ TEST_CASE("Preprocessor: REPTI with nested unmatched parentheses reports error",
 TEST_CASE("Preprocessor: name-directive REPTI with unmatched opening parenthesis reports error",
           "[preprocessor][repti][name][error][unmatched][paren]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -9033,6 +9463,7 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched opening parenthesis
 TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list reports error",
           "[preprocessor][repti][name][error][unmatched][list]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -9052,6 +9483,7 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list
 TEST_CASE("Preprocessor: REPTI with correctly matched parentheses succeeds (positive control)",
           "[preprocessor][repti][parentheses][matched][control]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
@@ -9081,6 +9513,7 @@ TEST_CASE("Preprocessor: REPTI with correctly matched parentheses succeeds (posi
 TEST_CASE("Preprocessor: name-directive REPTI with correctly matched parentheses succeeds (positive control)",
           "[preprocessor][repti][name][parentheses][matched][control]") {
     g_errors.reset();
+    g_symbol_table.clear();
     Preprocessor pp;
 
     const std::string content =
