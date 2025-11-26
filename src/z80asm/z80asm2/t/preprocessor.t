@@ -15,8 +15,7 @@ unlink("$test.i");
 unlink("$test.o");
 
 spew("$test.inc", <<END);
-#undef FOO
-#define FOO 42 /*comment*/
+DEFL FOO = 42 /*comment*/
 LD A,/*
 
 
@@ -45,7 +44,7 @@ END
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 LD BEFORE,1
-#line 3, "$test.inc"
+#line 2, "$test.inc"
 LD A,42
 
 
@@ -55,13 +54,13 @@ LD C,3
 LD D,4
 
 LD H,5
-#line 11
+#line 10
 LD L,6
-#line 11
+#line 10
 LD HL,7
 #line 3, "$test.asm"
 LD BEFORE,2
-#line 3, "$test.inc"
+#line 2, "$test.inc"
 LD A,42
 
 
@@ -71,13 +70,13 @@ LD C,3
 LD D,4
 
 LD H,5
-#line 11
+#line 10
 LD L,6
-#line 11
+#line 10
 LD HL,7
 #line 5, "$test.asm"
 LD BEFORE,3
-#line 3, "$test.inc"
+#line 2, "$test.inc"
 LD A,42
 
 
@@ -87,9 +86,9 @@ LD C,3
 LD D,4
 
 LD H,5
-#line 11
+#line 10
 LD L,6
-#line 11
+#line 10
 LD HL,7
 #line 7, "$test.asm"
 LD BEFORE,4
@@ -261,31 +260,31 @@ END
 
 # Object-like, name-directive, empty bodies, function-like argument expansion, cascade chains.
 spew("$test.asm", <<END);
-#define X 5
+#define X A5
 X
-Y DEFINE 6
+Y DEFINE A6
 Y
 #define EMPTY
 EMPTY
 E DEFINE
 E
-#define A 10
+#define A A10
 #define F(x) x
 F(A)
-#define TWO 2
+#define TWO A2
 #define ADD(a,b) a + b
 ADD(1,TWO)
 UNDEF A
 A DEFINE B
 B DEFINE C
-C DEFINE 123
+C DEFINE A123
 A
-#define G 7
+#define G A7
 #define H() G
 H()
 #define I() J
 #define J() K
-#define K 99
+#define K A99
 I()
 #define Z()
 Z()
@@ -299,31 +298,31 @@ END
 # Cascade A->B->C->123, H()->7, I()->99, Z() empty -> 1.
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-5
+A5
 
-6
-
-1
-
-1
-
-
-10
+A6
+DEFC EMPTY = 1
+EMPTY
+DEFC E = 1
+E
 
 
-1+ 2
+A10
 
 
-
-
-123
-
-
-7
+1+ A2
 
 
 
-99
+
+A123
+
+
+A7
+
+
+
+A99
 
 1
 END
@@ -347,14 +346,15 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 2, "$test.asm"
-5
-
-6
-
-1
-
-1
+#line 1, "$test.asm"
+DEFC A = 5
+A
+DEFC B = 6
+B
+DEFC C = 1
+C
+DEFC D = 1
+D
 
 1
 END
@@ -376,12 +376,13 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 4, "$test.asm"
-42
+#line 3, "$test.asm"
+DEFC VAL = 42
+VAL
 
-
-
-1+ 2
+DEFC ONE = 1
+DEFC TWO = 2
+ONE+ TWO
 END
 
 #------------------------------------------------------------------------------
@@ -414,8 +415,8 @@ check_text_file("$test.i", <<END);
 DEFC X = 5
 DEFC Y = 7
 DEFC W = 3
-
-DEFC SUM = 10+ 2
+DEFC A = 10
+DEFC SUM = A + 2
 DEFC a = 11
 DEFC b = 12
 DEFC U = 13
@@ -447,14 +448,15 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 2, "$test.asm"
-5
-
-6
-
-1
-
-1
+#line 1, "$test.asm"
+DEFC A = 5
+A
+DEFC B = 6
+B
+DEFC C = 1
+C
+DEFC D = 1
+D
 DEFC E = 9
 DEFC F = 10
 DEFC G = 11
@@ -476,10 +478,13 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 4, "$test.asm"
-DEFC VAL = 1+ 2+ 3+ 4
-DEFC SUM = 1+ 2+ 3+ 5
-DEFC OUT = 1+ 2+ 3+ 6
+#line 1, "$test.asm"
+DEFC A = 1
+DEFC B = 3
+DEFC C = 6
+DEFC VAL = C + 4
+DEFC SUM = C + 5
+DEFC OUT = C + 6
 END
 
 #------------------------------------------------------------------------------
@@ -488,7 +493,7 @@ END
 
 # name UNDEF removes object-like macro; subsequent use is literal
 spew("$test.asm", <<END);
-M DEFINE 42
+M DEFINE A42
 M UNDEF
 M
 END
@@ -504,7 +509,7 @@ END
 
 # #undef removes object-like macro; subsequent use is literal
 spew("$test.asm", <<END);
-#define P 88
+#define P A88
 #undef P
 P
 END
@@ -520,7 +525,7 @@ END
 
 # UNDEFINE synonym behaves like UNDEF (name-directive)
 spew("$test.asm", <<END);
-Q DEFINE 7
+Q DEFINE A7
 Q UNDEFINE
 Q
 END
@@ -536,7 +541,7 @@ END
 
 # #UNDEFINE synonym behaves like #undef
 spew("$test.asm", <<END);
-#define N 99
+#define N A99
 #UNDEFINE N
 N
 END
@@ -571,9 +576,9 @@ END
 
 # Redefinition after UNDEF works (new value in effect)
 spew("$test.asm", <<END);
-R DEFINE 1
+R DEFINE A1
 R UNDEF
-R DEFINE 3
+R DEFINE A3
 R
 END
 
@@ -583,7 +588,7 @@ END
 
 check_text_file("$test.i", <<END);
 #line 4, "$test.asm"
-3
+A3
 END
 
 #------------------------------------------------------------------------------
@@ -656,8 +661,12 @@ END
 
 # Expect "db 10, 20"
 check_text_file("$test.i", <<END);
-#line 5, "$test.asm"
-db 10, 20
+#line 1, "$test.asm"
+DEFC A = 10
+DEFC B = 20
+
+
+db A, B
 END
 
 # Redefinition allowed (no MacroRedefined error) - last value wins
@@ -1029,7 +1038,9 @@ END
 
 # 'T' is on physical line 3
 check_text_file("$test.i", <<END);
-#line 3, "$test.asm"
+#line 1, "$test.asm"
+DEFC A = 1
+
 T
 END
 
@@ -1087,7 +1098,11 @@ END
 
 # 'NO_OK' is on physical line 6
 check_text_file("$test.i", <<END);
-#line 5, "$test.asm"
+#line 1, "$test.asm"
+DEFC B = 1
+
+
+
 NO_OK
 END
 
@@ -1109,7 +1124,11 @@ END
 
 # 'Y' is on physical line 5
 check_text_file("$test.i", <<END);
-#line 5, "$test.asm"
+#line 1, "$test.asm"
+DEFC A = 1
+
+
+
 Y
 END
 
@@ -1173,7 +1192,13 @@ END
 
 # 'ELSE_OK' is on physical line 8
 check_text_file("$test.i", <<END);
-#line 7, "$test.asm"
+#line 1, "$test.asm"
+DEFC FLAG = 1
+
+
+
+
+
 ELSE_OK
 END
 
@@ -1188,7 +1213,8 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 2, "$test.asm"
+#line 1, "$test.asm"
+DEFC C = 1
 OK
 END
 
@@ -1300,7 +1326,8 @@ END
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 PRE_G
-#line 3, "$test.guard"
+#line 2, "$test.guard"
+DEFC TEST_GUARD_INC = 1
 GUARD_CONTENT
 #line 3, "$test.asm"
 MID_G
@@ -1311,7 +1338,7 @@ END
 # Bad guard (names differ) should NOT skip: included twice
 spew("$test.badguard", <<END);
 #ifndef BAD_GUARD_A
-#define BAD_GUARD_B
+#define BAD_GUARD_B X
 BAD_GUARD_CONTENT
 #endif
 #undef BAD_GUARD_B
@@ -1343,7 +1370,7 @@ END
 # Re-include after explicit UNDEF of guard macro should re-emit content
 spew("$test.reincl", <<END);
 #ifndef REINCL_G
-#define REINCL_G
+#define REINCL_G X
 REINCL_CONTENT
 #endif
 END
@@ -1663,9 +1690,9 @@ check_text_file("$test.i", <<END);
 7
 
 3+ 4
+DEFC VAL = 9
 
-
-9
+VAL
 
 F 1
 END
@@ -3956,7 +3983,11 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 5, "$test.asm"
+#line 1, "$test.asm"
+DEFC NEG_COUNT = -5
+
+
+
 VISIBLE
 END
 
@@ -4113,7 +4144,12 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
-#line 6, "$test.asm"
+#line 1, "$test.asm"
+DEFC COUNT = -4
+
+
+
+
 GUARDED
 END
 
@@ -4132,10 +4168,12 @@ END
 
 # (10-20)=-10, (20-10)=10
 check_text_file("$test.i", <<END);
-#line 3, "$test.asm"
-dw (10-20)
+#line 1, "$test.asm"
+DEFC A = 10
+DEFC B = 20
+dw (A-B)
 #line 3
-dw (20-10)
+dw (B-A)
 END
 
 # REPT negative count in nested context
