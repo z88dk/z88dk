@@ -75,6 +75,7 @@ static RelOp invert_relop_on_swap(RelOp op) {
 // On success, sets out_value and out_after to the index after the consumed expression.
 static bool eval_const_expr_range(const std::vector<Token>& tokens,
                                   unsigned i, unsigned boundary,
+                                  SymbolTable& symtab,
                                   int& out_value, unsigned& out_after) {
     if (i >= boundary) {
         return false;
@@ -98,7 +99,7 @@ static bool eval_const_expr_range(const std::vector<Token>& tokens,
     }
 
     int value = 0;
-    if (!expr.evaluate(value)) {
+    if (!expr.evaluate(symtab, value)) {
         return false;
     }
     if (!expr.is_constant()) {  // accept only constant expressions
@@ -189,8 +190,8 @@ static bool is_paren_boolean_expr(const std::vector<Token>& tokens,
 
 //---------------------- Parser impl ------------------
 
-Parser::Parser(const TokensLine& line, unsigned i)
-    : tokens_(line.tokens()), i_(i) {}
+Parser::Parser(const TokensLine& line, unsigned i, SymbolTable& symtab)
+    : tokens_(line.tokens()), i_(i), symtab_(&symtab) {}
 
 std::unique_ptr<Expr> Parser::parse_bool_expr() {
     auto e = parse_or();
@@ -348,7 +349,7 @@ Operand Parser::parse_operand() {
 
         int addr = 0;
         unsigned after = start;
-        if (!eval_const_expr_range(tokens_, start, k, addr, after)) {
+        if (!eval_const_expr_range(tokens_, start, k, *symtab_, addr, after)) {
             throw std::runtime_error("Invalid constant address expression inside ()");
         }
         if (after != k) {
@@ -384,7 +385,7 @@ Operand Parser::parse_operand() {
         unsigned boundary = find_expr_boundary(tokens_, i_);
         int value = 0;
         unsigned after = i_;
-        if (!eval_const_expr_range(tokens_, i_, boundary, value, after)) {
+        if (!eval_const_expr_range(tokens_, i_, boundary, *symtab_, value, after)) {
             throw std::runtime_error("Invalid constant expression for operand");
         }
         i_ = after;
