@@ -35,39 +35,13 @@
     do { \
         if (p < pe && is_ident_char(*p)) { \
             g_errors.error(ErrorCode::InvalidSyntax, \
-                    "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p + 1) + "'"); \
+                    "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p) + "'"); \
             output.clear(); \
             return; \
         } \
     } while (0)
 
 #define YYFILL() 1
-
-static void swap_x_y(std::string& str) {
-    // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
-    for (auto& c : str) {
-        switch (c) {
-        case 'x': c = 'y'; break;
-        case 'X': c = 'Y'; break;
-        case 'y': c = 'x'; break;
-        case 'Y': c = 'X'; break;
-        default:;
-        }
-    }
-}
-
-static void swap_ix_iy(std::string& str, Keyword& keyword) {
-    switch (keyword) {
-    case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
-    case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
-    case Keyword::AIX: case Keyword::PIX: case Keyword::XIX: case Keyword::YIX: case Keyword::ZIX:
-    case Keyword::AIY: case Keyword::PIY: case Keyword::XIY: case Keyword::YIY: case Keyword::ZIY:
-        swap_x_y(str);
-        keyword = keyword_lookup(str);
-        break;
-    default:;
-    }
-}
 
 void TokensFile::tokenize_line(unsigned& line_index, TokensLine& output) {
     if (line_index >= line_count()) {
@@ -344,11 +318,6 @@ main_loop:
         ident "'"?      {
             str = std::string(tok, p);
 
-            // to upper
-            if (g_options.ucase_labels) {
-                str = to_upper(str);
-            }
-
             // handle af' et all
             Keyword keyword = keyword_lookup(str);
             if (str.back() == '\'' && keyword == Keyword::None) {
@@ -356,11 +325,6 @@ main_loop:
                 str.pop_back();
                 --p;
                 keyword = keyword_lookup(str);
-            }
-
-            // check for -IXIY
-            if (g_options.swap_ix_iy) {
-                swap_ix_iy(str, keyword);
             }
 
             // check for .ASSUME

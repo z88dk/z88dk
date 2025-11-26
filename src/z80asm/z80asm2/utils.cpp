@@ -8,12 +8,13 @@
 #include <algorithm>
 #include <cctype>
 #include <charconv>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sstream>
-#include <iomanip>
 
 std::string to_upper(const std::string& s) {
     std::string result = s;
@@ -484,4 +485,27 @@ std::string absolute_path(const std::string& path) {
         throw std::runtime_error("Error resolving absolute path: " +
                                  std::string(e.what()));
     }
+}
+
+std::vector<std::string> split_lines(const std::string& text) {
+    std::vector<std::string> lines;
+    const char* p = text.c_str();
+    while (*p) {
+        const char* line_start = p;
+        while (*p && *p != '\r' && *p != '\n') {
+            ++p;
+        }
+        lines.emplace_back(line_start, p - line_start);
+        // Handle line endings
+        if (*p == '\r') {
+            ++p;
+            if (*p == '\n') {
+                ++p;
+            }
+        }
+        else if (*p == '\n') {
+            ++p;
+        }
+    }
+    return lines;
 }

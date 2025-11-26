@@ -193,14 +193,10 @@ std::string TokensLine::to_string() const {
                t == TokenType::Float;
     };
 
-    auto is_prefix = [](TokenType t) {
-        return t == TokenType::Dollar || t == TokenType::Modulus ||
-               t == TokenType::At;
-    };
-
     for (unsigned i = 0; i < tokens_.size(); ++i) {
         const auto& tok = tokens_[i];
         char last_char = out.empty() ? ' ' : out.back();
+        char first_char = tok.text().empty() ? ' ' : tok.text().front();
 
         if (i > 0 && last_char != ' ') {
             const auto& prev = tokens_[i - 1];
@@ -209,7 +205,13 @@ std::string TokensLine::to_string() const {
             if (is_idnum(prev.type()) && is_idnum(tok.type())) {
                 need_space = true;
             }
-            else if (is_prefix(prev.type()) && is_idnum(tok.type())) {
+            else if (prev.type() == TokenType::Dollar && is_hex_char(first_char)) {
+                // $ followed by hex digit could be part of a hex number
+                need_space = true;
+            }
+            else if ((prev.type() == TokenType::Modulus || prev.type() == TokenType::At) &&
+                     is_bin_char(first_char)) {
+                // % followed by number could be part of a binary number
                 need_space = true;
             }
             else {
@@ -380,31 +382,9 @@ void TokensFile::set_ifndef_guard_symbol(const std::string& symbol) {
     ifndef_guard_symbol_ = symbol;
 }
 
-void TokensFile::split_lines(const char*& p) {
-    text_lines_.clear();
-    while (*p) {
-        const char* line_start = p;
-        while (*p && *p != '\r' && *p != '\n') {
-            ++p;
-        }
-        text_lines_.emplace_back(line_start, p - line_start);
-        // Handle line endings
-        if (*p == '\r') {
-            ++p;
-            if (*p == '\n') {
-                ++p;
-            }
-        }
-        else if (*p == '\n') {
-            ++p;
-        }
-    }
-}
-
 void TokensFile::tokenize(const std::string& content) {
     // Split content into lines
-    const char* p = content.c_str();
-    split_lines(p);
+    text_lines_ = split_lines(content);
 
     // Tokenize each line
     Location location(filename_, first_line_num_);

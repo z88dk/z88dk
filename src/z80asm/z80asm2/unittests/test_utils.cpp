@@ -763,4 +763,3 @@ TEST_CASE("absolute_path throws on filesystem errors",
     REQUIRE_NOTHROW(absolute_path(".."));
     REQUIRE_NOTHROW(absolute_path("test"));
 }
-

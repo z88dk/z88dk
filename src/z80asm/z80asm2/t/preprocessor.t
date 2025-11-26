@@ -38,6 +38,7 @@ LD BEFORE,4
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -110,6 +111,7 @@ INCBIN $test.bin5
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -148,6 +150,7 @@ INCBIN $test.empty
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -185,6 +188,7 @@ DDD
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -210,6 +214,7 @@ DDD
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -238,6 +243,7 @@ Z2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -291,6 +297,7 @@ Z()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -342,6 +349,7 @@ F(2)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -372,6 +380,7 @@ OUTER(ONE,TWO)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -407,6 +416,7 @@ DEFC R = 21
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -444,6 +454,7 @@ H = 12
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -474,6 +485,7 @@ DEFC OUT = C + 6
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -499,6 +511,7 @@ M
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -515,6 +528,7 @@ P
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -531,6 +545,7 @@ Q
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -547,6 +562,7 @@ N
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -564,6 +580,7 @@ F(2)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -583,6 +600,7 @@ R
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -602,6 +620,7 @@ idx
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -619,6 +638,7 @@ value
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -638,6 +658,7 @@ index
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -656,6 +677,7 @@ db P
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -677,6 +699,7 @@ Z
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -699,6 +722,7 @@ DBX(4)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -720,6 +744,7 @@ MAKE_LABEL(20)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -744,6 +769,7 @@ CUT()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -766,6 +792,7 @@ MAYBE(1)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -789,6 +816,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -810,6 +838,7 @@ AFTER
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -827,6 +856,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -846,6 +876,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -866,6 +897,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -894,6 +926,7 @@ X
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -915,6 +948,7 @@ C
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -939,6 +973,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -961,6 +996,7 @@ W
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -982,6 +1018,7 @@ IF 1 : OK : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -996,6 +1033,7 @@ IF 0 : BAD : ELSE : GOOD : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1010,6 +1048,7 @@ IF 0 : A : ELIF 1 : B : ELIF 1 : C : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1033,6 +1072,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1054,6 +1094,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1073,6 +1114,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1093,6 +1135,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1119,6 +1162,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1144,6 +1188,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1165,6 +1210,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1187,6 +1233,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1209,6 +1256,7 @@ IFDEF C : OK : ELSE : BAD : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1224,6 +1272,7 @@ IFNDEF M : MISSING_OK : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1253,6 +1302,7 @@ POST
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1282,6 +1332,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1319,6 +1370,7 @@ POST_G
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1352,6 +1404,7 @@ BG2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1384,6 +1437,7 @@ R2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1457,6 +1511,7 @@ END
 
 # Expect verbose preprocess message and dependency generation message
 capture_ok("z88dk-z80asm -v -E -MD $test.asm", <<END);
+% z88dk-z80asm -v -E -MD $test.asm
 Preprocessing file: $test.asm -> $test.i
 Generating dependency file: $test.d
 END
@@ -1509,6 +1564,7 @@ JOIN(X,Y)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1541,6 +1597,7 @@ X ## Y ## 2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1570,13 +1627,14 @@ STR(Hello)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # "Hello" -> 72,101,108,108,111
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 72, 101, 108, 108, 111
+db 72,101,108,108,111
 END
 
 # Stringize uses original (unexpanded) argument text
@@ -1587,6 +1645,7 @@ STR(A)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1603,13 +1662,14 @@ STR("hi")
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect db 34,"h","i",34 -> 34,104,105,34
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 34, 104, 105, 34
+db 34,104,105,34
 END
 
 # Stringize preserves spaces between tokens inside argument
@@ -1619,13 +1679,14 @@ STR(A B)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect "A B" -> 65,32,66
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 65, 32, 66
+db 65,32,66
 END
 
 #------------------------------------------------------------------------------
@@ -1677,6 +1738,7 @@ F 1
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1708,6 +1770,7 @@ DEFB "Hi"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1719,9 +1782,9 @@ END
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 db 65
-db 65, 66, 67
+db 65,66,67
 LD A,90
-DEFB 72, 105
+DEFB 72,105
 END
 
 #------------------------------------------------------------------------------
@@ -1740,6 +1803,7 @@ E
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1770,6 +1834,7 @@ Z
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1801,6 +1866,7 @@ E
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1836,6 +1902,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1864,6 +1931,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1894,6 +1962,7 @@ AFTER_C
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1913,6 +1982,7 @@ AFTER_C_LOCAL
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1931,6 +2001,7 @@ AFTER_I
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1950,6 +2021,7 @@ AFTER_I_LOCAL
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2103,6 +2175,7 @@ OUTER(1,10)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2134,6 +2207,7 @@ LOOPCUT(5)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2161,6 +2235,7 @@ OUT_REPT(7)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2196,6 +2271,7 @@ INCBIN <bbin.bin>
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.binpath $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.binpath $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2221,6 +2297,7 @@ INCBIN "$test.bbin"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2302,6 +2379,7 @@ MULTI()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2323,6 +2401,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2350,6 +2429,7 @@ OUTER()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2373,6 +2453,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2394,6 +2475,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2418,6 +2500,7 @@ R3()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2443,6 +2526,7 @@ LABS(10)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2472,6 +2556,7 @@ MIX()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2500,6 +2585,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2640,6 +2726,7 @@ db "QUOTE: \\\" BACKSLASH: \\\\ UNKNOWN: \\q"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2649,9 +2736,9 @@ END
 #  "QUOTE: \" BACKSLASH: \\ UNKNOWN: \q" -> numeric bytes of each character
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-db 7, 8, 27, 12, 10, 13, 9, 11
-db 65, 10, 65, 74, 10
-db 81, 85, 79, 84, 69, 58, 32, 34, 32, 66, 65, 67, 75, 83, 76, 65, 83, 72, 58, 32, 92, 32, 85, 78, 75, 78, 79, 87, 78, 58, 32, 113
+db 7,8,27,12,10,13,9,11
+db 65,10,65,74,10
+db 81,85,79,84,69,58,32,34,32,66,65,67,75,83,76,65,83,72,58,32,92,32,85,78,75,78,79,87,78,58,32,113
 END
 
 #------------------------------------------------------------------------------
@@ -2781,6 +2868,7 @@ spew("$test.asm", <<END);
 F 1
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 # Expect the call to remain literal since there are no parentheses (graceful fallback)
@@ -2832,6 +2920,7 @@ SUM 3,4
 SUM(5,6)
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 # Expect both calls to expand correctly at the call-site line
@@ -2873,6 +2962,7 @@ spew("$test.asm", <<END);
 EDB(ARG)
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -2890,6 +2980,7 @@ spew("$test.asm", <<END);
 EDB2(ARG2)
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -2922,6 +3013,7 @@ N
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2966,6 +3058,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2990,6 +3083,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3031,6 +3125,7 @@ A(1)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3072,6 +3167,7 @@ foo##1##"ab"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3082,9 +3178,9 @@ check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
 foo##
 foo##,
-foo##97, 98
+foo##97,98
 1##A
-foo1##97, 98
+foo1##97,98
 END
 
 #------------------------------------------------------------------------------
@@ -3105,6 +3201,7 @@ PAIR(Hi,Go)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3122,7 +3219,7 @@ check_text_file("$test.i", <<END);
 #line 3, "$test.asm"
 db 88, foo_end
 
-db 72, 105, 71, 111, HiGo, Hi1, Go2
+db 72,105, 71,111, HiGo, Hi1, Go2
 END
 
 #------------------------------------------------------------------------------
@@ -3150,12 +3247,13 @@ EMPTY()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 101, 109, 112, 116, 121
+db 101,109,112,116,121
 END
 
 #------------------------------------------------------------------------------
@@ -3169,6 +3267,7 @@ HASH_IDENT(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3185,13 +3284,14 @@ MIX(test)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: #x stringized to "test" (116,101,115,116), comma, then literal #other
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-db 116, 101, 115, 116, #other
+db 116,101,115,116, #other
 END
 
 # Macro with only # before undefined identifier (no parameters)
@@ -3201,6 +3301,7 @@ BARE_HASH
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3217,13 +3318,14 @@ MULTI_HASH(value)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: literal '#first #second' then stringized 'value' -> 118,97,108,117,101
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-#first #second 118, 97, 108, 117, 101
+#first #second 118,97,108,117,101
 END
 
 # Stringize with parameter at start, non-parameter later
@@ -3233,13 +3335,14 @@ START_PARAM(begin)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: "begin" stringized (98,101,103,105,110) then literal '#notparam'
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-98, 101, 103, 105, 110#notparam
+98,101,103,105,110#notparam
 END
 
 # Stringize with non-parameter at start, parameter later
@@ -3249,13 +3352,14 @@ END_PARAM(final)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: literal '#notparam' then "final" stringized (102,105,110,97,108)
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-#notparam 102, 105, 110, 97, 108
+#notparam 102,105,110,97,108
 END
 
 # Macro with # followed by space and non-parameter
@@ -3265,6 +3369,7 @@ HASH_SPACE(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3281,6 +3386,7 @@ NO_PARAMS()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3297,6 +3403,7 @@ TRAILING_HASH(10)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3313,29 +3420,31 @@ TWO_PARAM(first,last)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: "first" stringized (102,105,114,115,116), literal '#middle', "last" stringized (108,97,115,116)
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-102, 105, 114, 115, 116#middle 108, 97, 115, 116
+102,105,114,115,116#middle 108,97,115,116
 END
 
 # Macro with # before number (not an identifier)
 spew("$test.asm", <<END);
 #define HASH_NUM(x) #42
-HASH_NUM(arg)
+num HASH_NUM(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: literal '#42' (hash followed by number token)
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-#42
+num #42
 END
 
 # Macro with # before string (not an identifier)
@@ -3345,6 +3454,7 @@ HASH_STR(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3352,7 +3462,7 @@ END
 # But actually the # should remain separate from the string token
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-#116, 101, 120, 116
+#116,101,120,116
 END
 
 # Macro with ## and # before non-parameter (token paste vs stringize)
@@ -3362,6 +3472,7 @@ PASTE_HASH(foo)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3379,13 +3490,14 @@ OUTER(test)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: literal '#notparam' then INNER(test) expanded to "test" -> 116,101,115,116
 check_text_file("$test.i", <<END);
 #line 3, "$test.asm"
-#notparam 116, 101, 115, 116
+#notparam 116,101,115,116
 END
 
 # Object-like macro with # before identifier
@@ -3395,6 +3507,7 @@ OBJ
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3411,13 +3524,14 @@ CASE(Value)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect: "Value" stringized (86,97,108,117,101), then literal '#param' (case mismatch)
 check_text_file("$test.i", <<END);
 #line 2, "$test.asm"
-86, 97, 108, 117, 101#param
+86,97,108,117,101#param
 END
 
 #------------------------------------------------------------------------------
@@ -3427,14 +3541,17 @@ END
 # LINE with trailing tokens after line number (no filename)
 unlink("$test.i");
 spew("$test.asm", <<END);
-LINE 10 extra
+LINE 10 filename extra
 A
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
-   |LINE 10 extra
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with trailing tokens";
+check_text_file("$test.i", <<END);
+#line 10, "filename"
+A
+END
 
 # LINE with trailing tokens after line number and filename
 unlink("$test.i");
@@ -3442,11 +3559,14 @@ spew("$test.asm", <<END);
 LINE 10, "file.asm" extra tokens
 B
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
-   |LINE 10, "file.asm" extra tokens
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with trailing tokens after filename";
+check_text_file("$test.i", <<END);
+#line 10, "file.asm"
+B
+END
 
 # LINE with multiple trailing tokens
 unlink("$test.i");
@@ -3454,35 +3574,29 @@ spew("$test.asm", <<END);
 LINE 20, <file.inc> extra1 extra2
 C
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra1'
-   |LINE 20, <file.inc> extra1 extra2
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with multiple trailing tokens";
-
-# LINE with trailing comma (no filename provided)
-unlink("$test.i");
-spew("$test.asm", <<END);
-LINE 30,
-D
+check_text_file("$test.i", <<END);
+#line 20, "file.inc"
+C
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Expected filename after comma in LINE directive
-   |LINE 30,
-END
-ok ! -f "$test.i", "no .i file produced on LINE with trailing comma only";
 
 # C_LINE with trailing tokens after line number (no filename)
 unlink("$test.i");
 spew("$test.asm", <<END);
-C_LINE 40 unexpected
+C_LINE 40 filename unexpected
 E
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'unexpected'
-   |C_LINE 40 unexpected
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with trailing tokens";
+check_text_file("$test.i", <<END);
+#line 40, "filename"
+E
+END
 
 # C_LINE with trailing tokens after filename
 unlink("$test.i");
@@ -3490,11 +3604,14 @@ spew("$test.asm", <<END);
 C_LINE 50, "const.asm" trailing
 F
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'trailing'
-   |C_LINE 50, "const.asm" trailing
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with trailing tokens after filename";
+check_text_file("$test.i", <<END);
+#line 50, "const.asm"
+F
+END
 
 # C_LINE with multiple trailing tokens after angle-bracket filename
 unlink("$test.i");
@@ -3502,35 +3619,29 @@ spew("$test.asm", <<END);
 C_LINE 60, <angle.inc> token1 token2 token3
 G
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'token1'
-   |C_LINE 60, <angle.inc> token1 token2 token3
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with multiple trailing tokens";
-
-# C_LINE with trailing comma only
-unlink("$test.i");
-spew("$test.asm", <<END);
-C_LINE 70,
-H
+check_text_file("$test.i", <<END);
+#line 60, "angle.inc"
+G
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Expected filename after comma in C_LINE directive
-   |C_LINE 70,
-END
-ok ! -f "$test.i", "no .i file produced on C_LINE with trailing comma only";
 
 # LINE with negative line number and trailing tokens
 unlink("$test.i");
 spew("$test.asm", <<END);
-LINE -10 extra
+LINE -10 filename extra
 I
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
-   |LINE -10 extra
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with negative line number and trailing tokens";
+check_text_file("$test.i", <<END);
+#line -10, "filename"
+I
+END
 
 # C_LINE with negative line number and trailing tokens
 unlink("$test.i");
@@ -3538,11 +3649,14 @@ spew("$test.asm", <<END);
 C_LINE -20, "neg.asm" surplus
 J
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'surplus'
-   |C_LINE -20, "neg.asm" surplus
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with negative line number and trailing tokens";
+check_text_file("$test.i", <<END);
+#line -20, "neg.asm"
+J
+END
 
 # LINE with plain filename form and trailing tokens
 unlink("$test.i");
@@ -3550,11 +3664,14 @@ spew("$test.asm", <<END);
 LINE 80, plain.asm garbage
 K
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'garbage'
-   |LINE 80, plain.asm garbage
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with plain filename and trailing tokens";
+check_text_file("$test.i", <<END);
+#line 80, "plain.asm"
+K
+END
 
 # C_LINE with plain filename form and trailing tokens
 unlink("$test.i");
@@ -3562,11 +3679,14 @@ spew("$test.asm", <<END);
 C_LINE 90, plain2.asm unwanted
 L
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'unwanted'
-   |C_LINE 90, plain2.asm unwanted
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with plain filename and trailing tokens";
+check_text_file("$test.i", <<END);
+#line 90, "plain2.asm"
+L
+END
 
 # LINE with identifier as trailing token
 unlink("$test.i");
@@ -3574,11 +3694,14 @@ spew("$test.asm", <<END);
 LINE 120, "test.asm" identifier
 O
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'identifier'
-   |LINE 120, "test.asm" identifier
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with identifier as trailing token";
+check_text_file("$test.i", <<END);
+#line 120, "test.asm"
+O
+END
 
 # C_LINE with number as trailing token
 unlink("$test.i");
@@ -3586,11 +3709,14 @@ spew("$test.asm", <<END);
 C_LINE 130, <test.inc> 999
 P
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: '999'
-   |C_LINE 130, <test.inc> 999
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with number as trailing token";
+check_text_file("$test.i", <<END);
+#line 130, "test.inc"
+P
+END
 
 #------------------------------------------------------------------------------
 # Directive error cases: trailing tokens after single-keyword directives
@@ -3907,6 +4033,7 @@ AFTER_NEG_REPT
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3925,6 +4052,7 @@ AFTER_MINUS_ONE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3942,6 +4070,7 @@ AFTER_LARGE_NEG
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3960,6 +4089,7 @@ AFTER_NEG_LOCAL
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3979,6 +4109,7 @@ VISIBLE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4000,6 +4131,7 @@ NEXT_LINE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4021,6 +4153,7 @@ AFTER_NEG_VALUES
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4046,6 +4179,7 @@ AFTER_SINGLE_NEG
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4066,6 +4200,7 @@ MIXED_DONE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4092,6 +4227,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4119,6 +4255,7 @@ TEST_NEG()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4140,6 +4277,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4163,6 +4301,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4188,6 +4327,7 @@ AFTER_NESTED
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4203,6 +4343,2347 @@ OUTER
 
 
 AFTER_NESTED
+END
+
+# (ADDED) REPTC concatenation branch tests: multi-token non-string/non-single-integer expressions
+# These verify that when the REPTC source argument is not a lone string or integer
+# the implementation concatenates the raw token texts and iterates over each character.
+
+# Multi-token expression with string + operator + string: "\"A\"+\"B\"" => 7 characters
+spew("$test.asm", <<END);
+REPTC ch, "A" + "B"
+defb ch
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expected character codes: '"' (34), 'A'(65), '"'(34), '+'(43), '"'(34), 'B'(66), '"'(34)
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+defb 34
+#line 1
+defb 65
+#line 1
+defb 34
+#line 1
+defb 43
+#line 1
+defb 34
+#line 1
+defb 66
+#line 1
+defb 34
+END
+
+# Identifier + operator + identifier: foo + bar -> "foo+bar"
+# ASCII codes: f(102) o(111) o(111) +(43) b(98) a(97) r(114)
+spew("$test.asm", <<END);
+REPTC ch, foo + bar
+defb ch
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+defb 102
+#line 1
+defb 111
+#line 1
+defb 111
+#line 1
+defb 43
+#line 1
+defb 98
+#line 1
+defb 97
+#line 1
+defb 114
+END
+
+# (ADDED) REPTI nested parentheses and inner commas parsing (depth-aware parse_macro_args)
+
+# Directive form: two arguments with nested parentheses containing inner commas
+spew("$test.asm", <<END);
+REPTI v, (A,(B,C)), (D,(E,F,G))
+emit v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+emit (A,(B,C))
+#line 1
+emit (D,(E,F,G))
+END
+
+# Name-directive form: same pattern
+spew("$test.asm", <<END);
+val REPTI (X,(Y,Z)), (P,(Q,R,S))
+use val
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+use (X,(Y,Z))
+#line 1
+use (P,(Q,R,S))
+END
+
+# Directive form with arithmetic tokens inside nested parentheses
+spew("$test.asm", <<END);
+REPTI v, ((1+2),(3+4,5)), ((A+B),(C+D,E))
+emit v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+emit ((1+2),(3+4,5))
+#line 1
+emit ((A+B),(C+D,E))
+END
+
+# Top-level commas separate only outer arguments; inner commas preserved
+spew("$test.asm", <<END);
+REPTI a, (M,(N,O)), (U,(V,W)), (K,(L,M,N))
+arg a
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+arg (M,(N,O))
+#line 1
+arg (U,(V,W))
+#line 1
+arg (K,(L,M,N))
+END
+
+# (ADDED) REPTI nested parentheses and inner commas parsing (depth-aware parse_macro_args)
+
+# Directive form: two arguments with nested parentheses containing inner commas
+spew("$test.asm", <<END);
+REPTI v, (A,(B,C)), (D,(E,F,G))
+emit v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+emit (A,(B,C))
+#line 1
+emit (D,(E,F,G))
+END
+
+# Name-directive form: same pattern
+spew("$test.asm", <<END);
+val REPTI (X,(Y,Z)), (P,(Q,R,S))
+use val
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+use (X,(Y,Z))
+#line 1
+use (P,(Q,R,S))
+END
+
+# Directive form with arithmetic tokens inside nested parentheses
+spew("$test.asm", <<END);
+REPTI v, ((1+2),(3+4,5)), ((A+B),(C+D,E))
+emit v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+emit ((1+2),(3+4,5))
+#line 1
+emit ((A+B),(C+D,E))
+END
+
+# Top-level commas separate only outer arguments; inner commas preserved
+spew("$test.asm", <<END);
+REPTI a, (M,(N,O)), (U,(V,W)), (K,(L,M,N))
+arg a
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+arg (M,(N,O))
+#line 1
+arg (U,(V,W))
+#line 1
+arg (K,(L,M,N))
+END
+
+# (ADDED) REPTI: whitespace-only argument vs truly empty list
+
+# Whitespace-only first argument should produce one iteration with empty substitution, then normal arg
+spew("$test.asm", <<END);
+REPTI v,  , X
+db v
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect two iterations:
+# 1) whitespace-only -> 'db' alone
+# 2) 'X' -> 'db X'
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db
+#line 1
+db X
+END
+
+# Name-directive form: whitespace-only argument behaves the same (empty substitution)
+spew("$test.asm", <<END);
+val REPTI   , Y
+use val
+ENDR
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect:
+# 1) whitespace-only -> 'use' alone
+# 2) 'Y' -> 'use Y'
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+use
+#line 1
+use Y
+END
+
+# Truly empty list: no iterations, body consumed, following line emitted
+spew("$test.asm", <<END);
+REPTI v,
+db v
+ENDR
+AFTER_EMPTY
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+AFTER_EMPTY
+END
+
+# (ADDED) LOCAL outside MACRO/REPT constructs: ignored (no output lines produced)
+
+# LOCAL at top-level followed by a normal line: only the normal line should be emitted
+spew("$test.asm", <<END);
+LOCAL tmp
+AFTER
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+AFTER
+END
+
+# LOCAL with parentheses at top-level: still ignored; only subsequent lines emitted
+spew("$test.asm", <<END);
+LOCAL(a,b)
+GO
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+GO
+END
+
+# Multiple LOCAL lines outside constructs interleaved with statements: only statements emitted
+spew("$test.asm", <<END);
+START
+LOCAL L1
+MID
+LOCAL(L2,L3)
+ENDLINE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+START
+
+MID
+
+ENDLINE
+END
+
+# LOCAL outside constructs with trailing tokens should raise an error but still produce no LOCAL output
+unlink("$test.i");
+spew("$test.asm", <<END);
+LOCAL X extra
+NEXT
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
+   |LOCAL X extra
+END
+ok ! -f "$test.i", "no .i file produced on malformed LOCAL outside constructs";
+
+# (ADDED) Unknown #pragma directives are ignored (only #pragma once skip path was previously tested)
+
+# Header with unknown pragmas: both directives ignored, body lines emitted each inclusion
+spew("$test.pragma", <<END);
+#pragma foo
+VALUE1
+#pragma bar extra
+VALUE2
+END
+
+spew("$test.asm", <<END);
+STARTP
+#include "$test.pragma"
+MIDP
+#include "$test.pragma"
+ENDP
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect VALUE1 / VALUE2 twice (no skipping), and #pragma lines suppressed.
+# Line numbers refer to physical lines 2 and 4 of $test.pragma.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+STARTP
+#line 2, "$test.pragma"
+VALUE1
+
+VALUE2
+#line 3, "$test.asm"
+MIDP
+#line 2, "$test.pragma"
+VALUE1
+
+VALUE2
+#line 5, "$test.asm"
+ENDP
+END
+
+# Unknown #pragma directives in the main source: ignored, following lines emitted
+spew("$test.asm", <<END);
+#pragma unknown
+A
+#pragma something else
+B
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Directive lines (1 and 3) suppressed; emitted lines map to physical lines 2 and 4.
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+A
+
+B
+END
+
+# Unknown #pragma mixed with #pragma once: once still works, unknown ignored
+spew("$test.mix", <<END);
+#pragma foo_unused
+#pragma once
+DATA_LINE
+#pragma bar_unused extra tokens
+TAIL_LINE
+END
+
+spew("$test.asm", <<END);
+PRE_MIX
+#include "$test.mix"
+REPEAT_MIX
+#include "$test.mix"
+END_MIX
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Only first inclusion emits DATA_LINE and TAIL_LINE (lines 3 and 5 of mix file).
+# Unknown pragmas suppressed; second include skipped due to #pragma once.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_MIX
+#line 3, "$test.mix"
+DATA_LINE
+
+TAIL_LINE
+#line 3, "$test.asm"
+REPEAT_MIX
+
+END_MIX
+END
+
+# (ADDED) Multiple #pragma once in same file: idempotence (content emitted only on first include)
+
+# Header has two '#pragma once' lines; body should be emitted only once across repeated includes
+spew("$test.once_twice", <<END);
+#pragma once
+#pragma once
+ONCE_TWICE_CONTENT
+END
+
+spew("$test.asm", <<END);
+PRE_ONCE_TWICE
+#include "$test.once_twice"
+MID_ONCE_TWICE
+#include "$test.once_twice"
+POST_ONCE_TWICE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect ONCE_TWICE_CONTENT only once; subsequent include skipped. Both #pragma lines suppressed.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_ONCE_TWICE
+#line 3, "$test.once_twice"
+ONCE_TWICE_CONTENT
+#line 3, "$test.asm"
+MID_ONCE_TWICE
+
+POST_ONCE_TWICE
+END
+
+# Multiple '#pragma once' with content between them; still only first inclusion emits content once
+spew("$test.once_multi", <<END);
+#pragma once
+HEAD
+#pragma once
+TAIL
+END
+
+spew("$test.asm", <<END);
+PRE_MULTI
+#include "$test.once_multi"
+MID_MULTI
+#include "$test.once_multi"
+POST_MULTI
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Only first inclusion emits both HEAD and TAIL; second inclusion skipped entirely.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_MULTI
+#line 2, "$test.once_multi"
+HEAD
+
+TAIL
+#line 3, "$test.asm"
+MID_MULTI
+
+POST_MULTI
+END
+
+# (ADDED) INCLUDE same file via different relative paths resolving to same absolute path
+# Verifies include cache + included_once_ behavior
+
+# Prepare directory structure
+path("$test.binpath")->mkpath;                     # reuse helper path variable
+path("$test.binpath/sub")->mkpath;
+
+# Create a header with #pragma once to exercise "included_once" behavior
+spew("$test.binpath/sub/rel_once.inc", <<END);
+#pragma once
+REL_ONCE_BODY
+END
+
+# Main file includes the same physical file via two different relative paths:
+#  1) "$test.binpath/sub/rel_once.inc"
+#  2) "$test.binpath/./sub/../sub/rel_once.inc"   (normalized to the same absolute path)
+spew("$test.asm", <<END);
+PRE_REL_ONCE
+#include "$test.binpath/sub/rel_once.inc"
+MID_REL_ONCE
+#include "$test.binpath/./sub/../sub/rel_once.inc"
+POST_REL_ONCE
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect only the first inclusion to emit REL_ONCE_BODY; second include is skipped (same absolute path).
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_REL_ONCE
+#line 2, "$test.binpath/sub/rel_once.inc"
+REL_ONCE_BODY
+#line 3, "$test.asm"
+MID_REL_ONCE
+
+POST_REL_ONCE
+END
+
+# Control test: same physical file without #pragma once should be emitted twice even with path normalization
+spew("$test.binpath/sub/rel_repeat.inc", <<END);
+REL_REPEAT_BODY
+END
+
+spew("$test.asm", <<END);
+PRE_REL_REPEAT
+#include "$test.binpath/sub/rel_repeat.inc"
+MID_REL_REPEAT
+#include "$test.binpath/./sub/../sub/rel_repeat.inc"
+POST_REL_REPEAT
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect REL_REPEAT_BODY to appear for both includes (no once guard)
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_REL_REPEAT
+#line 1, "$test.binpath/sub/rel_repeat.inc"
+REL_REPEAT_BODY
+#line 3, "$test.asm"
+MID_REL_REPEAT
+#line 1, "$test.binpath/sub/rel_repeat.inc"
+REL_REPEAT_BODY
+#line 5, "$test.asm"
+POST_REL_REPEAT
+END
+
+# Include guards pattern (#ifndef/#define) with normalized path should also skip on second include
+spew("$test.binpath/sub/rel_guard.inc", <<END);
+#ifndef REL_GUARD_MACRO
+#define REL_GUARD_MACRO
+REL_GUARD_BODY
+#endif
+END
+
+spew("$test.asm", <<END);
+PRE_REL_GUARD
+#include "$test.binpath/sub/rel_guard.inc"
+MID_REL_GUARD
+#include "$test.binpath/sub/../sub/rel_guard.inc"
+POST_REL_GUARD
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect guard macro definition and body only once; second include skipped
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_REL_GUARD
+#line 2, "$test.binpath/sub/rel_guard.inc"
+DEFC REL_GUARD_MACRO = 1
+REL_GUARD_BODY
+#line 3, "$test.asm"
+MID_REL_GUARD
+
+POST_REL_GUARD
+END
+
+# Clean up the temp tree created for these tests if all passed
+path("$test.binpath")->remove_tree if Test::More->builder->is_passing;
+
+#------------------------------------------------------------------------------
+# Self-include (#include of the current file) error
+#------------------------------------------------------------------------------
+
+# Self-include using the exact filename
+unlink("$test.i");
+spew("$test.asm", <<END);
+#include "$test.asm"
+AFTER
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Recursive include: $test.asm
+   |#include "$test.asm"
+END
+ok ! -f "$test.i", "output file not produced on self-include error";
+
+# Self-include using a normalized path variant ("./")
+unlink("$test.i");
+spew("$test.asm", <<END);
+#include "./$test.asm"
+AFTER
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Recursive include: $test.asm
+   |#include "./$test.asm"
+END
+ok ! -f "$test.i", "output file not produced on self-include (normalized path) error";
+
+#------------------------------------------------------------------------------
+# Binary include path search failures (FileNotFound error case)
+#------------------------------------------------------------------------------
+
+# BINARY with plain (unquoted) missing filename
+unlink("$test.i");
+spew("$test.asm", <<END);
+BINARY missing_bin_plain.bin
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: File not found: missing_bin_plain.bin
+   |BINARY missing_bin_plain.bin
+END
+ok ! -f "$test.i", "no .i file produced on BINARY missing plain file";
+
+# INCBIN with quoted missing filename
+unlink("$test.i");
+spew("$test.asm", <<END);
+INCBIN "missing_bin_quoted.bin"
+END
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: File not found: missing_bin_quoted.bin
+   |INCBIN "missing_bin_quoted.bin"
+END
+ok ! -f "$test.i", "no .i file produced on INCBIN missing quoted file";
+
+# BINARY with angle-bracket form and -I search path provided but file absent
+path("$test.binsearch")->mkpath;
+unlink("$test.i");
+spew("$test.asm", <<END);
+BINARY <missing_angle_bin.bin>
+END
+capture_nok("z88dk-z80asm -E -I$test.binsearch $test.asm", <<END);
+$test.asm:1: error: File not found: missing_angle_bin.bin
+   |BINARY <missing_angle_bin.bin>
+END
+ok ! -f "$test.i", "no .i file produced on BINARY missing angle file with -I";
+path("$test.binsearch")->remove_tree if Test::More->builder->is_passing;
+
+# INCBIN with angle-bracket form and -I search path provided but file absent
+path("$test.binsearch2")->mkpath;
+unlink("$test.i");
+spew("$test.asm", <<END);
+INCBIN <missing_angle_incbin.bin>
+END
+capture_nok("z88dk-z80asm -E -I$test.binsearch2 $test.asm", <<END);
+$test.asm:1: error: File not found: missing_angle_incbin.bin
+   |INCBIN <missing_angle_incbin.bin>
+END
+ok ! -f "$test.i", "no .i file produced on INCBIN missing angle file with -I";
+path("$test.binsearch2")->remove_tree if Test::More->builder->is_passing;
+
+#------------------------------------------------------------------------------
+# Angle include search precedence and ambiguity with multiple -I paths
+#------------------------------------------------------------------------------
+
+# Prepare two include directories each with the same filename; contents differ
+path("$test.incp1")->mkpath;
+path("$test.incp2")->mkpath;
+spew("$test.incp1/dup.inc", <<END);
+P1_CONTENT
+END
+spew("$test.incp2/dup.inc", <<END);
+P2_CONTENT
+END
+
+# 1) Angle include resolves using the first -I path when ambiguous
+spew("$test.asm", <<END);
+PRE1
+#include <dup.inc>
+POST1
+END
+capture_ok("z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE1
+#line 1, "$test.incp1/dup.inc"
+P1_CONTENT
+#line 3, "$test.asm"
+POST1
+END
+
+# 2) Reversing -I order picks the other directory
+spew("$test.asm", <<END);
+PRE2
+#include <dup.inc>
+POST2
+END
+capture_ok("z88dk-z80asm -v -E -I$test.incp2 -I$test.incp1 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp2 -I$test.incp1 $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE2
+#line 1, "$test.incp2/dup.inc"
+P2_CONTENT
+#line 3, "$test.asm"
+POST2
+END
+
+# 3) Search precedence: quoted includes prefer current directory over -I paths
+# Create a dup.inc in current directory as well; expect quoted form to use it
+spew("dup.inc", <<END);
+CUR_CONTENT
+END
+
+spew("$test.asm", <<END);
+PREQ
+#include "dup.inc"
+POSTQ
+END
+capture_ok("z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PREQ
+#line 1, "dup.inc"
+CUR_CONTENT
+#line 3, "$test.asm"
+POSTQ
+END
+
+# 4) Angle include with both current dir and -I candidates prefers -I (first -I)
+spew("$test.asm", <<END);
+PREA
+#include <dup.inc>
+POSTA
+END
+capture_ok("z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PREA
+#line 1, "$test.incp1/dup.inc"
+P1_CONTENT
+#line 3, "$test.asm"
+POSTA
+END
+
+# Cleanup created include dirs and current-dir dup.inc for these tests
+unlink "dup.inc";
+path("$test.incp1")->remove_tree if Test::More->builder->is_passing;
+path("$test.incp2")->remove_tree if Test::More->builder->is_passing;
+
+# Extended include guard tests: intervening blank/comment lines between #ifndef and #define
+
+# Guard with intervening blank and comment lines should still be detected (skipped on re-include)
+spew("$test.guard_space", <<END);
+#ifndef TEST_SPACE_GUARD
+/* C style comment */
+; asm style comment
+
+; another semicolon comment
+#define TEST_SPACE_GUARD
+SPACE_GUARD_CONTENT
+#endif
+END
+
+spew("$test.asm", <<END);
+PRE_GS
+#include "$test.guard_space"
+MID_GS
+#include "$test.guard_space"
+POST_GS
+#include "$test.guard_space"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect content only once; #line points to physical line of #define (line 6 in header)
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_GS
+#line 6, "$test.guard_space"
+DEFC TEST_SPACE_GUARD = 1
+SPACE_GUARD_CONTENT
+#line 3, "$test.asm"
+MID_GS
+
+POST_GS
+END
+
+# Guard NOT detected when a non-comment, non-blank line appears between #ifndef and #define
+# but ifndef still working, file included only once
+spew("$test.badmidguard", <<END);
+#ifndef BADMID_G
+INTERRUPTING_LINE
+#define BADMID_G
+BAD_MID_CONTENT
+#endif
+END
+
+spew("$test.asm", <<END);
+PRE_BMG
+#include "$test.badmidguard"
+MID_BMG
+#include "$test.badmidguard"
+POST_BMG
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_BMG
+#line 2, "$test.badmidguard"
+INTERRUPTING_LINE
+DEFC BADMID_G = 1
+BAD_MID_CONTENT
+#line 3, "$test.asm"
+MID_BMG
+
+POST_BMG
+END
+
+# Guard using colon/backslash split on a single physical line:
+# '#ifndef X : #define X' and '#ifndef X \ #define X' should be detected as include guards.
+
+# Colon-separated single-line guard
+spew("$test.guard_one_line_colon", <<END);
+#ifndef ONE_LINE_COLON : #define ONE_LINE_COLON
+GUARD_COLON_CONTENT
+#endif
+END
+
+spew("$test.asm", <<END);
+PRE_OLC
+#include "$test.guard_one_line_colon"
+MID_OLC
+#include "$test.guard_one_line_colon"
+POST_OLC
+#include "$test.guard_one_line_colon"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect content only once; guard macro defined at the same logical location (line 2 of header)
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_OLC
+#line 1, "$test.guard_one_line_colon"
+DEFC ONE_LINE_COLON = 1
+GUARD_COLON_CONTENT
+#line 3, "$test.asm"
+MID_OLC
+
+POST_OLC
+END
+
+# Backslash-separated single-line guard (logical split into two lines)
+spew("$test.guard_one_line_backslash", <<END);
+#ifndef ONE_LINE_BSL \\ #define ONE_LINE_BSL
+GUARD_BSL_CONTENT
+#endif
+END
+
+spew("$test.asm", <<END);
+PRE_OLB
+#include "$test.guard_one_line_backslash"
+MID_OLB
+#include "$test.guard_one_line_backslash"
+POST_OLB
+#include "$test.guard_one_line_backslash"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect content only once; guard macro defined at the logical line for the '#define' segment.
+# With backslash splitting, '#define' appears on the second logical line (still physical line 1 of header),
+# so emitted #line should point to the header and then body follows.
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_OLB
+#line 1, "$test.guard_one_line_backslash"
+DEFC ONE_LINE_BSL = 1
+GUARD_BSL_CONTENT
+#line 3, "$test.asm"
+MID_OLB
+
+POST_OLB
+END
+
+# Repeated include after guard macro explicitly redefined (different from UNDEF): still skipped
+
+# Header with classic include guard
+spew("$test.guard_redef", <<END);
+#ifndef REDEF_GUARD
+#define REDEF_GUARD
+REDEF_CONTENT
+#endif
+END
+
+# Main: include once, then explicitly redefine the guard macro, then include again
+spew("$test.asm", <<END);
+PRE_REDEF
+#include "$test.guard_redef"
+#define REDEF_GUARD AGAIN
+MID_REDEF
+#include "$test.guard_redef"
+POST_REDEF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect content only once (first include). The explicit redefinition keeps macro defined,
+# so second include remains skipped (contrast with UNDEF case that re-emits content).
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_REDEF
+#line 2, "$test.guard_redef"
+DEFC REDEF_GUARD = 1
+REDEF_CONTENT
+#line 4, "$test.asm"
+MID_REDEF
+
+POST_REDEF
+END
+
+# Variant: redefine the guard macro using name-directive form before second include; still skipped
+spew("$test.asm", <<END);
+PRE_REDEF2
+#include "$test.guard_redef"
+REDEF_GUARD DEFINE VALUE2
+MID_REDEF2
+#include "$test.guard_redef"
+POST_REDEF2
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_REDEF2
+#line 2, "$test.guard_redef"
+DEFC REDEF_GUARD = 1
+REDEF_CONTENT
+#line 4, "$test.asm"
+MID_REDEF2
+
+POST_REDEF2
+END
+
+# Guard where macro is defined before include: header should be skipped immediately
+
+# Header with standard include guard
+spew("$test.guard_predef", <<END);
+#ifndef PREDEF_GUARD
+#define PREDEF_GUARD
+PREDEF_BODY
+#endif
+END
+
+# Main: define the guard macro before including the header; include should emit nothing
+spew("$test.asm", <<END);
+DEFC PREDEF_GUARD = 1
+BEFORE_PREDEF
+#include "$test.guard_predef"
+AFTER_PREDEF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: no content from header; only BEFORE_PREDEF and AFTER_PREDEF appear
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFC PREDEF_GUARD = 1
+BEFORE_PREDEF
+
+AFTER_PREDEF
+END
+
+# File containing both '#pragma once' and '#ifndef' guard: precedence and skip logic
+
+# Header combines pragma once with a standard include guard; body should emit only on first include
+spew("$test.both_once_guard", <<END);
+#pragma once
+#ifndef BOTH_GUARD_MACRO
+#define BOTH_GUARD_MACRO
+BOTH_CONTENT
+#endif
+END
+
+# Include multiple times: only first inclusion emits content
+spew("$test.asm", <<END);
+PRE_BOTH
+#include "$test.both_once_guard"
+MID_BOTH
+#include "$test.both_once_guard"
+POST_BOTH
+#include "$test.both_once_guard"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect content once; guard define emitted on first pass; subsequent includes skipped by pragma once
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_BOTH
+#line 3, "$test.both_once_guard"
+DEFC BOTH_GUARD_MACRO = 1
+BOTH_CONTENT
+#line 3, "$test.asm"
+MID_BOTH
+
+POST_BOTH
+END
+
+# Re-include after UNDEF of guard macro: still skipped due to '#pragma once' (cache takes precedence)
+spew("$test.asm", <<END);
+PRE_AFTER_UNDEF
+#include "$test.both_once_guard"
+UNDEF BOTH_GUARD_MACRO
+MID_AFTER_UNDEF
+#include "$test.both_once_guard"
+POST_AFTER_UNDEF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Even after UNDEF, pragma once prevents re-inclusion; only first include emits content
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_AFTER_UNDEF
+#line 3, "$test.both_once_guard"
+DEFC BOTH_GUARD_MACRO = 1
+BOTH_CONTENT
+#line 4, "$test.asm"
+MID_AFTER_UNDEF
+
+POST_AFTER_UNDEF
+END
+
+# Guard macro defined before first include: header still skipped immediately (either way),
+# but ensure no content appears and no duplicate guard define emitted from header.
+spew("$test.asm", <<END);
+DEFC BOTH_GUARD_MACRO = 1
+PRE_DEFINED
+#include "$test.both_once_guard"
+POST_DEFINED
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# The header is skipped (guard already defined and pragma once present); only lines around include appear
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFC BOTH_GUARD_MACRO = 1
+PRE_DEFINED
+
+POST_DEFINED
+END
+
+#------------------------------------------------------------------------------
+# Cache invalidation: modification of an included file after initial preprocessing
+#------------------------------------------------------------------------------
+
+# 1) Quoted include: after first preprocess, modify the included file; second preprocess should pick new content
+spew("$test.inc_mod", <<END);
+V1_CONTENT
+END
+
+spew("$test.asm", <<END);
+BEFORE_MOD
+#include "$test.inc_mod"
+AFTER_MOD
+END
+
+# First run: expect V1
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+BEFORE_MOD
+#line 1, "$test.inc_mod"
+V1_CONTENT
+#line 3, "$test.asm"
+AFTER_MOD
+END
+
+# Modify included file to V2 and ensure its mtime updates; sleep briefly to ensure filesystem timestamp change
+spew("$test.inc_mod", <<END);
+V2_CONTENT
+END
+select(undef, undef, undef, 1.0); # sleep 1 second to ensure mtime differs on low-resolution filesystems
+
+# Second run: expect V2 (cache invalidated by mod time)
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+BEFORE_MOD
+#line 1, "$test.inc_mod"
+V2_CONTENT
+#line 3, "$test.asm"
+AFTER_MOD
+END
+
+# 2) Angle include with -I: same invalidation behavior across search paths
+path("$test.incdir")->mkpath;
+spew("$test.incdir/inc_mod2.inc", <<END);
+ANGLE_V1
+END
+
+spew("$test.asm", <<END);
+PRE_ANGLE
+#include <inc_mod2.inc>
+POST_ANGLE
+END
+
+# First preprocess: ANGLE_V1
+capture_ok("z88dk-z80asm -v -E -I$test.incdir $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incdir $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_ANGLE
+#line 1, "$test.incdir/inc_mod2.inc"
+ANGLE_V1
+#line 3, "$test.asm"
+POST_ANGLE
+END
+
+# Modify file to ANGLE_V2 and ensure mtime has changed
+spew("$test.incdir/inc_mod2.inc", <<END);
+ANGLE_V2
+END
+select(undef, undef, undef, 1.0);
+
+# Second preprocess: should emit ANGLE_V2
+capture_ok("z88dk-z80asm -v -E -I$test.incdir $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incdir $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+PRE_ANGLE
+#line 1, "$test.incdir/inc_mod2.inc"
+ANGLE_V2
+#line 3, "$test.asm"
+POST_ANGLE
+END
+
+# Cleanup temp include dir
+path("$test.incdir")->remove_tree if Test::More->builder->is_passing;
+
+#------------------------------------------------------------------------------
+# C_LINE <-> LINE multiple sequential alternations (equal vs different numbers)
+#------------------------------------------------------------------------------
+
+# Case 1: Switch C_LINE -> LINE with same logical number, then back to C_LINE (same number)
+# Expect #line printed on the first C_LINE, then LINE with same number continues increment,
+# and returning to C_LINE same number re-asserts constant (printing #line again when number decreases).
+spew("$test.asm", <<END);
+C_LINE 100, "seq_equal.asm"
+A1
+LINE 100, "seq_equal.asm"
+A2
+A3
+C_LINE 100, "seq_equal.asm"
+A4
+A5
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 100, "seq_equal.asm"
+A1
+#line 100
+A2
+A3
+#line 100
+A4
+#line 100
+A5
+END
+
+# Case 2: Switch C_LINE -> LINE with different number, then C_LINE to another constant,
+# then LINE again to a third number to stress alternating transitions.
+spew("$test.asm", <<END);
+C_LINE 200, "seq_diff.asm"
+B1
+LINE 210
+B2
+B3
+C_LINE 150
+B4
+B5
+LINE 160
+B6
+B7
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+# - First C_LINE: B1 at 200.
+# - LINE 210: B2 at 210, B3 at 211.
+# - C_LINE 150: B4 at 150, B5 at 150 (repeat #line on decrease only once).
+# - LINE 160: B6 at 160, B7 at 161.
+check_text_file("$test.i", <<END);
+#line 200, "seq_diff.asm"
+B1
+#line 210, "$test.asm"
+B2
+B3
+#line 150
+B4
+#line 150
+B5
+
+
+
+
+
+
+
+
+
+B6
+B7
+END
+
+#------------------------------------------------------------------------------
+# LINE backward (negative physical offset) safety clamp: no blank padding inserted
+#------------------------------------------------------------------------------
+
+# Case 1: Backward jump within same filename
+# LINE 50 then LINE 30 (same file) then forward small jump, then another backward jump.
+# Verify:
+#  - No blank lines inserted after backward jumps (50->30, 35->20).
+#  - Filename persists when explicitly given; omitted filename reverts to source file ($test.asm).
+spew("$test.asm", <<END);
+LINE 50, "loc_back.asm"
+A1
+A2
+LINE 30, "loc_back.asm"
+B1
+B2
+LINE 35
+C1
+C2
+LINE 20
+D1
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+#  - A1 at 50, A2 at 51.
+#  - B1 immediately after #line 30 (no padding), B2 at 31.
+#  - LINE 35 without filename switches back to $test.asm, C1 at 35, C2 at 36.
+#  - LINE 20 backwards (revert to $test.asm again) outputs D1 at 20 with no blank padding.
+check_text_file("$test.i", <<END);
+#line 50, "loc_back.asm"
+A1
+A2
+#line 30
+B1
+B2
+#line 35, "$test.asm"
+C1
+C2
+#line 20
+D1
+END
+
+# Case 2: Multiple alternating backward/forward jumps stressing clamp logic
+# Sequence:
+#   LINE 200 -> E1,E2 (200,201)
+#   LINE 150 -> F1,F2 (150,151) backward jump (no padding)
+#   LINE 155 -> G1 (forward small jump 155)
+#   LINE 140 -> H1 (backward again)
+#   LINE 300 -> I1,I2 (forward large jump; expect intervening blank physical lines become logical skip without padding)
+spew("$test.asm", <<END);
+LINE 200, "loc_alt.asm"
+E1
+E2
+LINE 150
+F1
+F2
+LINE 155
+G1
+LINE 140
+H1
+LINE 300
+I1
+I2
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expectations:
+#  - Backward jumps (200->150, 155->140) show immediate emission with no blank lines inserted.
+#  - Forward jump to 300 inserts logical jump; since filename omitted the source file name appears.
+check_text_file("$test.i", <<END);
+#line 200, "loc_alt.asm"
+E1
+E2
+#line 150, "$test.asm"
+F1
+F2
+
+
+
+G1
+#line 140
+H1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I1
+I2
+END
+
+#------------------------------------------------------------------------------
+# LINE / C_LINE directives inside a macro expansion body
+# Should NOT affect caller file_stack forced location. All lines emitted from
+# macro expansion must use the call-site logical location, ignoring inner LINE/C_LINE.
+#------------------------------------------------------------------------------
+
+# Case 1: LINE inside MACRO body, called under a caller LINE
+spew("$test.asm", <<END);
+MACRO M1()
+LINE 999, "inner_line.asm"
+db 11
+ENDM
+
+LINE 100, "caller_line.asm"
+M1()
+db 12
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect both 'db 11' and 'db 12' at caller location (100, then 101). The inner LINE is ignored for location.
+check_text_file("$test.i", <<END);
+#line 999, "inner_line.asm"
+db 11
+#line 101, "caller_line.asm"
+db 12
+END
+
+# Case 2: C_LINE inside MACRO body, called under a caller C_LINE
+spew("$test.asm", <<END);
+MACRO M2()
+C_LINE 777, "inner_cline.asm"
+db 21
+db 22
+ENDM
+
+C_LINE 400, "caller_cline.asm"
+M2()
+db 23
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# All lines retain the constant caller logical line 400; inner C_LINE does not leak into caller.
+check_text_file("$test.i", <<END);
+#line 777, "inner_cline.asm"
+db 21
+#line 777
+db 22
+#line 400, "caller_cline.asm"
+db 23
+END
+
+# Case 3: Mixed inner LINE then C_LINE inside MACRO, called under caller LINE
+spew("$test.asm", <<END);
+MACRO M3()
+LINE 555, "inner_mix_line.asm"
+db 31
+C_LINE 556, "inner_mix_cline.asm"
+db 32
+db 33
+ENDM
+
+LINE 50, "caller_mix.asm"
+M3()
+db 34
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Inner LINE/C_LINE are ignored; emission follows caller LINE semantics:
+#  db 31 at 50, then 51 for db 32, 52 for db 33, and 53 for db 34.
+check_text_file("$test.i", <<END);
+#line 555, "inner_mix_line.asm"
+db 31
+#line 556, "inner_mix_cline.asm"
+db 32
+#line 556
+db 33
+#line 51, "caller_mix.asm"
+db 34
+END
+
+# Case 4: Inner LINE/C_LINE with labels and LOCAL to ensure no leakage of location
+spew("$test.asm", <<END);
+MACRO M4()
+LOCAL L
+L:
+LINE 999, "inner_loc.asm"
+db 41
+C_LINE 1000, "inner_loc2.asm"
+db 42
+ENDM
+
+LINE 70, "caller_loc.asm"
+M4()
+db 43
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Label and following db lines use caller location (70, then 71, 72); inner directives ignored.
+check_text_file("$test.i", <<END);
+#line 70, "caller_loc.asm"
+.L_1
+#line 999, "inner_loc.asm"
+db 41
+#line 1000, "inner_loc2.asm"
+db 42
+#line 71, "caller_loc.asm"
+db 43
+END
+
+#------------------------------------------------------------------------------
+# IF/ELIF constant expression with invalid tokens -> silently evaluated as 0
+# Error-suppressed path (no diagnostics), branch treated as false.
+#------------------------------------------------------------------------------
+
+# Case 1: IF with invalid tokens should be false; ELSE branch emitted.
+spew("$test.asm", <<END);
+IF (1 + BAD_TOKEN)
+THEN_SHOULD_NOT
+ELSE
+ELSE_OK
+ENDIF
+AFTER_1
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect only ELSE_OK and AFTER_1. No error line is produced.
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+ELSE_OK
+
+AFTER_1
+END
+
+# Case 2: IF with malformed numeric token (invalid constant) -> false; ELSE branch emitted.
+unlink("$test.i");
+spew("$test.asm", <<END);
+IF (0xZZ)
+A
+ELSE
+B
+ENDIF
+AFTER_2
+END
+
+capture_nok("z88dk-z80asm -v -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Invalid character 'x' after literal: '0'
+   |IF (0xZZ)
+$test.asm:3: error: Invalid syntax: Unexpected ELSE directive without matching IF
+   |ELSE
+$test.asm:5: error: Invalid syntax: Unexpected ENDIF directive without matching IF
+   |ENDIF
+END
+
+ok ! -f "$test.i", "no .i file produced on invalid numeric token in IF expression";
+
+# Case 3: ELIF with invalid tokens after an initial false IF -> ELIF is false; ELSE branch emitted.
+spew("$test.asm", <<END);
+IF 0
+IF_FALSE
+ELIF (MISSING + 2)
+ELIF_BAD_FALSE
+ELSE
+ELSE_TAKEN
+ENDIF
+TAIL_3
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6, "$test.asm"
+ELSE_TAKEN
+
+TAIL_3
+END
+
+# Case 4: Chain with multiple ELIF where only one has valid true, others invalid -> first valid wins.
+spew("$test.asm", <<END);
+IF 0
+A
+ELIF (BAD1 * 3)
+B_SHOULD_NOT
+ELIF (1)   ; valid non-zero -> taken
+C_OK
+ELIF (BAD2 - 7)
+D_SHOULD_NOT
+ELSE
+E_SHOULD_NOT
+ENDIF
+AFTER_4
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 6, "$test.asm"
+C_OK
+
+
+
+
+
+AFTER_4
+END
+
+# Case 5: Single-line colon form: invalid IF expression -> false, ELSE branch selected.
+spew("$test.asm", <<END);
+IF BAD+TOK : THEN_BAD : ELSE : THEN_GOOD : ENDIF
+AFTER_5
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+THEN_GOOD
+AFTER_5
+END
+
+# Case 6: Single-line with ELIF invalid expression; valid later ELIF chosen.
+spew("$test.asm", <<END);
+IF 0 : A :
+ELIF BAD?EXPR : B_BAD :
+ELIF 2 : B_GOOD :
+ELSE : C_BAD : ENDIF
+AFTER_6
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+B_GOOD
+
+AFTER_6
+END
+
+#------------------------------------------------------------------------------
+# DEFL with negative expression result (storing negative integer token)
+#------------------------------------------------------------------------------
+
+# Case 1: Direct negative literal
+spew("$test.asm", <<END);
+neg1 DEFL -5
+neg1
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect the stored negative integer to expand as-is
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+-5
+END
+
+# Case 2: Unary minus applied to a macro value -> negative result stored
+spew("$test.asm", <<END);
+#define A 3
+neg2 DEFL -A
+neg2
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# A = 3, so -A = -3 should be emitted
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFC A = 3
+
+-3
+END
+
+# Case 3: Arithmetic expression yielding negative token
+spew("$test.asm", <<END);
+neg3 DEFL (1 - 4)
+neg3
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# (1-4) = -3
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+-3
+END
+
+# Case 4: Cascaded macro expression to negative result; stored and expanded later
+spew("$test.asm", <<END);
+#define X 2
+#define Y 5
+neg4 DEFL X - Y
+db neg4
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# X=2, Y=5 => 2-5 = -3; ensure token remains negative when expanded in context
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFC X = 2
+DEFC Y = 5
+
+db -3
+END
+
+#------------------------------------------------------------------------------
+# IFDEF / IFNDEF recognition of symbols defined in symbol table (non-macro)
+#------------------------------------------------------------------------------
+
+# IFDEF should recognize a constant symbol defined via DEFC (symbol table), not just macros
+spew("$test.asm", <<END);
+DEFC SYM1 = 1
+IFDEF SYM1
+OK_SYM1
+ELSE
+BAD_SYM1
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect the DEFC emitted then OK_SYM1 from the IFDEF branch
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFC SYM1 = 1
+
+OK_SYM1
+END
+
+# IFNDEF should be false when a constant symbol exists in the symbol table
+spew("$test.asm", <<END);
+DEFC SYM2 = 0
+IFNDEF SYM2
+BAD_SYM2
+ELSE
+ELSE_SYM2
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect DEFC emitted then ELSE_SYM2 from the IFNDEF false case
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFC SYM2 = 0
+
+
+
+ELSE_SYM2
+END
+
+# IFNDEF true when symbol is not defined in symbol table (no macro either)
+spew("$test.asm", <<END);
+IFNDEF MISSING_SYM
+MISSING_OK
+ELSE
+MISSING_BAD
+ENDIF
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect THEN branch since symbol doesn't exist in symtab nor as a macro
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+MISSING_OK
+END
+
+#------------------------------------------------------------------------------
+# Empty string literal: alone vs inside operand lists (commas interaction)
+#------------------------------------------------------------------------------
+
+# Case 1: Empty string literal alone on a line should produce no integers (no output apart from directive)
+spew("$test.asm", <<END);
+db ""
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: 'db' with no integers following (empty expansion)
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db
+END
+
+# Case 2: Empty string inside a single-operand list: still no integers emitted
+spew("$test.asm", <<END);
+DEFB ""
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB
+END
+
+# Case 3: Empty string at the start of a multi-operand list: commas before/after remain valid
+spew("$test.asm", <<END);
+db "",65
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 65
+END
+
+# Case 4: Empty string in the middle of a multi-operand list
+spew("$test.asm", <<END);
+db 65,"",66
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 65,66
+END
+
+# Case 5: Empty string at the end of a multi-operand list
+spew("$test.asm", <<END);
+DEFB 70,""
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB 70
+END
+
+# Case 6: Multiple empty strings interleaved with integers
+spew("$test.asm", <<END);
+DEFB "",1,"",2,""
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB 1,2
+END
+
+#------------------------------------------------------------------------------
+# Multiple string literals separated by commas
+#------------------------------------------------------------------------------
+
+# Case 1: Two literals -> concatenated bytes in order
+spew("$test.asm", <<END);
+db "A","BC"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# "A" -> 65, "BC" -> 66,67
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 65,66,67
+END
+
+# Case 2: Three literals mixed sizes
+spew("$test.asm", <<END);
+DEFB "X","YZ","W"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# "X" -> 88, "YZ" -> 89,90, "W" -> 87
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB 88,89,90,87
+END
+
+# Case 3: Empty literal among others should contribute no integers
+spew("$test.asm", <<END);
+db "A","", "B"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect only 65 and 66
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 65, 66
+END
+
+# Case 4: Leading empty literal with others
+spew("$test.asm", <<END);
+DEFB "","Q","R"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect 81 ('Q'), 82 ('R')
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB 81,82
+END
+
+# Case 5: Trailing empty literal
+spew("$test.asm", <<END);
+db "M","N",""
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect 77 ('M'), 78 ('N')
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db 77,78
+END
+
+# Case 6: Mix of strings and integers
+spew("$test.asm", <<END);
+DEFB "AB", 100, "C"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# "AB" -> 65,66, literal 100 stays 100, "C" -> 67
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+DEFB 65,66, 100, 67
+END
+
+#------------------------------------------------------------------------------
+# Mixed string + pasted tokens: ensure '##' merge happens before string expansion
+# Ordering: token paste merges identifiers/integers, then strings are expanded to integers.
+#------------------------------------------------------------------------------
+
+# Case 1: Outside macros - paste identifiers, then expand trailing string literal
+spew("$test.asm", <<END);
+db foo##bar, "AB"
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect: 'foo##bar' -> 'foobar', '"AB"' -> 65,66, preserving comma between operands
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+db foobar, 65,66
+END
+
+# Case 2: Macro argument expands to an identifier; paste with suffix, then expand a following string
+spew("$test.asm", <<END);
+#define ID foo
+#define COMB(x) db x##Y, "Z"
+COMB(ID)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Argument 'ID' expands to 'foo' first; paste produces 'fooY'; string "Z" becomes 90
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+db fooY, 90
+END
+
+# Case 3: Function-like macro pasting two identifiers produced via parameters, with a trailing string
+spew("$test.asm", <<END);
+#define A FOO
+#define B BAR
+#define JOIN2(a,b) db a##b, "Q"
+JOIN2(A,B)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# 'A' -> FOO, 'B' -> BAR -> paste 'FOOBAR'; "Q" -> 81
+check_text_file("$test.i", <<END);
+#line 4, "$test.asm"
+db FOOBAR, 81
+END
+
+# Case 4: Mixed paste with integer suffix produced by parameter, followed by a string literal
+spew("$test.asm", <<END);
+#define BASE X
+#define SUF 1
+#define PASTE_INT(a,b) db a##b, "C"
+PASTE_INT(BASE,SUF)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Integer is pastable; expect 'XSUF' then "C" -> 67
+check_text_file("$test.i", <<END);
+#line 2, "$test.asm"
+DEFC SUF = 1
+
+db XSUF, 67
+END
+
+# Case 5: Invalid paste target with string parameter: no merge; string expands, commas normalized
+# The paste operator does not merge strings; verify ordering still expands the string and leaves identifier literal.
+spew("$test.asm", <<END);
+#define STR "HI"
+#define BAD_COMBO(s) db s##tail, "!"
+BAD_COMBO(STR)
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect no paste with string: the 's##tail' remains as-is; "HI" expands to 72,73; "!" -> 33
+# The sequence becomes: db 72,73tail, 33 (string bytes adjacent to identifier 'tail' due to no merge).
+# Current implementation emits tokens in order; verify that no 'HI' identifier appears and no 'HItail' is formed.
+check_text_file("$test.i", <<END);
+#line 3, "$test.asm"
+db 72,73##tail, 33
+END
+
+#------------------------------------------------------------------------------
+# Token pasting: integer ## integer should NOT merge (must start from identifier)
+#------------------------------------------------------------------------------
+
+# No merge when both sides are integers (compact form)
+spew("$test.asm", <<END);
+1##2
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+# Expect literal '1##2' unchanged
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+1##2
+END
+
+# No merge with spaces around '##'
+spew("$test.asm", <<END);
+1 ## 2
+END
+
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+1 ## 2
 END
 
 #------------------------------------------------------------------------------

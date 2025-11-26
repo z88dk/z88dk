@@ -23,6 +23,18 @@ inline bool is_space(char c) {
     return std::isspace(static_cast<unsigned char>(c));
 }
 
+inline bool is_hex_char(char c) {
+    return std::isxdigit(static_cast<unsigned char>(c));
+}
+
+inline bool is_dec_char(char c) {
+    return std::isdigit(static_cast<unsigned char>(c));
+}
+
+inline bool is_bin_char(char c) {
+    return c == '0' || c == '1';
+}
+
 inline bool is_ident_char(char c) {
     return c == '_' || c == '@' || std::isalnum(static_cast<unsigned char>(c));
 }
@@ -63,3 +75,6 @@ std::string parent_dir(const std::string& path);
 // returns platform-independent string with forward slashes
 std::string absolute_path(const std::string& path);
 
+// split lines of a text into a vector of strings
+// accept LF, CR and CR-LF as line endings
+std::vector<std::string> split_lines(const std::string& text);

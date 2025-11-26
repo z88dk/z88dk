@@ -176,7 +176,6 @@ private:
     bool has_ifndef_guard_ = false;
     std::string ifndef_guard_symbol_;
 
-    void split_lines(const char*& p);
     void tokenize(const std::string& content);
     void tokenize_line(unsigned& line_index, TokensLine& output);
 };

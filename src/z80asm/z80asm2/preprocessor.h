@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "hla.h"
 #include "keywords.h"
 #include "lexer.h"
+#include "symbol_table.h"
 #include <ctime>
 #include <deque>
 #include <memory>
@@ -44,14 +44,7 @@ public:
     void push_binary_file(const std::string& bin_filename,
                           const Location& location);
 
-    // Pop and return the next processed TokensLine.
-    bool next_line_pp(TokensLine& out_line);
-
-    // Pop and return the next High-Level-Assembly line (after preprocessing).
-    bool next_line_hla(TokensLine& out_line);
-
-    // Pop and return the next line - routine to be called from outside
-    // also handles the creation of DEFC symbols used in IF and IFDEF
+    // Return the next preprocessed line
     bool next_line(TokensLine& out_line);
 
     // Register a simple macro replacement (no parameters). Replacement may be
@@ -69,12 +62,6 @@ public:
 
     // Clears the collected dependency filenames.
     void clear_dependencies();
-
-    // preprocess one file and generate dependency information
-    static void preprocess_file(
-        const std::string& input_filename,
-        const std::string& output_filename,
-        bool gen_dependency);
 
     void generate_dependency_file();
 
@@ -183,9 +170,6 @@ private:
     std::vector<std::string>* current_params_ptr_ = nullptr;
     std::string current_iteration_var_;
 
-    // current High-Level-Assembly context (for HLA directives)
-    HLA hla_context_;
-
     //--- Internal methods ---
 
     // Fetch a line from the input file, or file_input_queue_ if not empty.
@@ -257,14 +241,12 @@ private:
 
     // INCLUDE
     void process_include(const TokensLine& line, unsigned& i);
-    void do_include(const std::string& filename, bool is_angle);
-    std::string search_include_path(const std::string& filename,
-                                    bool is_angle) const;
+    void do_include(const std::string& filename);
+    std::string search_include_path(const std::string& filename) const;
 
     // BINARY / INCBIN
     void process_binary(const TokensLine& line, unsigned& i);
-    void do_binary(const std::string& filename, bool is_angle,
-                   const Location& location);
+    void do_binary(const std::string& filename, const Location& location);
 
     // LINE / C_LINE
     void process_line(const TokensLine& line, unsigned& i);
@@ -368,6 +350,3 @@ private:
     // should: for queued lines -> emit the line; for fetched lines -> expand macros and emit.
     bool handle_directives_for_line(TokensLine& line, bool reading_from_queue);
 };
-
-// called when command line -E is given
-void preprocess_only();

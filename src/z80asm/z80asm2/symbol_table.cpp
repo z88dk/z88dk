@@ -7,8 +7,6 @@
 #include "errors.h"
 #include "symbol_table.h"
 
-SymbolTable g_symbol_table;
-
 void SymbolTable::clear() {
     symbols_.clear();
 }

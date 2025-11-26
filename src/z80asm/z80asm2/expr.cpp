@@ -56,7 +56,7 @@ bool Expr::parse(const TokensLine& line, unsigned& i) {
     }
 }
 
-bool Expr::evaluate(int& out_value) {
+bool Expr::evaluate(SymbolTable& symtab, int& out_value) {
     out_value = 0;
     is_extern_ = false;
     is_undefined_ = false;
@@ -73,7 +73,7 @@ bool Expr::evaluate(int& out_value) {
 
         // lookup symbol table
         if (it.kind == RPNItem::Symbol) {
-            const Symbol& symbol = g_symbol_table.get_symbol(it.name);
+            const Symbol& symbol = symtab.get_symbol(it.name);
             if (symbol.is_extern) {
                 is_extern_ = true;
                 if (!silent_) {

@@ -24,7 +24,7 @@ std::unordered_map<std::string, Preprocessor::CachedFile>
 Preprocessor::file_cache_;
 
 Preprocessor::Preprocessor()
-    : hla_context_(this) {
+{
 }
 
 void Preprocessor::clear() {
@@ -38,7 +38,6 @@ void Preprocessor::clear() {
     macro_fixpoint_iterations_ = 0;
     current_params_ptr_ = nullptr;
     current_iteration_var_.clear();
-    hla_context_.clear();
 }
 
 void Preprocessor::clear_file_cache() {
@@ -70,13 +69,6 @@ void Preprocessor::push_file(const std::string& filename) {
             // check ifdef macro
             auto mit = macros_.find(guard_name);
             if (mit != macros_.end()) {
-                // Record dependency even when skipped
-                dep_files_.push_back(normalized_filename);
-                return; // skip include entirely
-            }
-            // check defc symbol
-            const Symbol& symbol = g_symbol_table.get_symbol(guard_name);
-            if (symbol.is_defined) {
                 // Record dependency even when skipped
                 dep_files_.push_back(normalized_filename);
                 return; // skip include entirely
@@ -215,7 +207,7 @@ void Preprocessor::push_binary_file(const std::string& bin_filename,
                       location.line_num(), false);
 }
 
-bool Preprocessor::next_line_pp(TokensLine& line) {
+bool Preprocessor::next_line(TokensLine& line) {
     line.clear();
     while (true) {
         if (!input_queue_.empty()) {
@@ -304,99 +296,6 @@ bool Preprocessor::next_line_pp(TokensLine& line) {
     }
 }
 
-bool Preprocessor::next_line_hla(TokensLine& out_line) {
-    return hla_context_.next_line(out_line);
-}
-
-bool Preprocessor::next_line(TokensLine& out_line) {
-    if (!next_line_hla(out_line)) {
-        return false;    // end of input
-    }
-
-    // parse labels
-    std::string name;
-    if (out_line.size() >= 2 && out_line[0].is(TokenType::Dot)
-            && out_line[1].is(TokenType::Identifier)) {
-        name = out_line[1].text();
-        // label definition
-        Symbol label;
-        label.name = name;
-        label.is_defined = true;
-        label.location = out_line.location();
-        g_symbol_table.add_symbol(label.name, label);
-        return true;
-    }
-
-    // parse DEFC name = statements
-    Keyword kw;
-    unsigned i = 0;
-    if (out_line.size() >= 3 && out_line[0].is(Keyword::DEFC) &&
-            out_line[1].is(TokenType::Identifier) &&
-            out_line[2].is(TokenType::EQ)) {
-        i = 3;
-        name = out_line[1].text();
-        TokensLine expr = collect_tokens(out_line, i);
-        if (expr.empty()) {
-            // Empty body defaults to integer 1
-            expr.clear_tokens();
-            expr.push_back(Token(TokenType::Integer, "1", 1));
-        }
-
-        int value = 0;
-        if (eval_const_expr(expr, value, true)) {
-            Symbol label;
-            label.name = name;
-            label.value = value;
-            label.is_defined = true;
-            label.is_constant = true;
-            label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
-            return true;
-        }
-        else {
-            Symbol label;
-            label.name = name;
-            label.is_defined = true;
-            label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
-            return true;
-        }
-    }
-
-    // parse name DEFC expr statements
-    i = 0;
-    if (is_name_directive(out_line, i, kw, name) && kw == Keyword::DEFC) {
-        TokensLine expr = collect_tokens(out_line, i);
-        if (expr.empty()) {
-            // Empty body defaults to integer 1
-            expr.clear_tokens();
-            expr.push_back(Token(TokenType::Integer, "1", 1));
-        }
-
-        int value = 0;
-        if (eval_const_expr(expr, value, true)) {
-            Symbol label;
-            label.name = name;
-            label.value = value;
-            label.is_defined = true;
-            label.is_constant = true;
-            label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
-            return true;
-        }
-        else {
-            Symbol label;
-            label.name = name;
-            label.is_defined = true;
-            label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
-            return true;
-        }
-    }
-
-    return true;
-}
-
 void Preprocessor::define_macro(const std::string& name,
                                 const std::string replacement) {
     TokensFile tf(replacement, "<macro>", 1, false);
@@ -429,59 +328,6 @@ void Preprocessor::clear_dependencies() {
     dep_files_.clear();
 }
 
-void Preprocessor::preprocess_file(const std::string& input_filename,
-                                   const std::string& output_filename, bool gen_dependency) {
-    Preprocessor pp;
-    int start_errors = g_errors.error_count();
-
-    pp.push_file(input_filename);
-
-    std::ofstream ofs(output_filename, std::ios::out | std::ios::binary);
-    if (!ofs) {
-        g_errors.error(ErrorCode::FileOpenError, output_filename);
-        return;
-    }
-
-    Location location;
-    TokensLine line;
-    while (pp.next_line(line)) {
-        if (g_errors.filename() != location.filename()) {
-            // filename changed (e.g. due to #include)
-            location.set_filename(g_errors.filename());
-            location.set_line_num(g_errors.line_num());
-            ofs << "#line " << location.line_num() << ", \"" << location.filename() << "\""
-                << std::endl;
-        }
-        else if (g_errors.line_num() < location.line_num()) {
-            // Line number decreased (e.g. due to #line directive)
-            location.set_line_num(g_errors.line_num());
-            ofs << "#line " << location.line_num() << std::endl;
-        }
-        else {
-            // Normal line increment
-            while (g_errors.line_num() > location.line_num()) {
-                ofs << std::endl;
-                location.inc_line_num();
-            }
-            location.set_line_num(g_errors.line_num());
-        }
-        std::string text = line.to_string();
-        ofs << text << std::endl;
-        location.inc_line_num();
-    }
-
-    // remove output file if errors occurred
-    if (g_errors.error_count() > start_errors) {
-        ofs.close();
-        std::remove(output_filename.c_str());
-    }
-
-    // only generate dependency file if no errors occurred
-    if (gen_dependency && g_errors.error_count() == start_errors) {
-        pp.generate_dependency_file();
-    }
-}
-
 void Preprocessor::generate_dependency_file() {
     const unsigned LINE_WIDTH = 80;
 
@@ -494,18 +340,14 @@ void Preprocessor::generate_dependency_file() {
     std::string target = deps.front();
 
     // get dependency file name and target file name
-    std::string d_filename = get_d_filename(target);
-    std::string o_filename = get_o_filename(target);
+    std::string d_filename = g_options.get_d_filename(target);
+    std::string o_filename = g_options.get_o_filename(target);
 
     // generate dependency file
     std::ofstream ofs(d_filename, std::ios::out | std::ios::binary);
     if (!ofs) {
         g_errors.error(ErrorCode::FileOpenError, d_filename);
         return;
-    }
-
-    if (g_options.verbose) {
-        std::cout << "Generating dependency file: " << d_filename << std::endl;
     }
 
     // output file names
@@ -739,7 +581,9 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
 bool Preprocessor::parse_argument_list(const TokensLine& line, unsigned& i,
                                        std::vector<TokensLine>& out_args) {
     return parse_args_impl(line, i, out_args, false);
-}// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
+}
+
+// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
 bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    int& out_linenum, std::string& out_filename,
                                    Keyword keyword) const {
@@ -761,19 +605,34 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
     ++i;
 
     out_filename.clear();
+
+    // Optional comma before filename
     if (i < line.size() && line[i].is(TokenType::Comma)) {
         ++i;
-        // Accept quoted or plain filename after comma.
+    }
+
+    // Optional filename (with or without comma)
+    if (i < line.size()) {
+        std::string fname;
         bool is_angle = false;
-        if (!parse_filename(line, i, out_filename, is_angle)) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           std::string("Expected filename after comma in ") + keyword_to_string(keyword) +
-                           " directive");
-            return false;
+        const unsigned before_fname = i;
+        if (parse_filename(line, i, fname, is_angle)) {
+            out_filename = fname;
+        }
+        else {
+            // If there are leftover tokens but not a valid filename, error out.
+            // This catches cases like: LINE 100 , <invalid>
+            // or LINE 100 extra (when 'extra' is not a valid filename token sequence)
+            if (before_fname < line.size()) {
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               std::string("Unexpected token: '") + line[before_fname].text() + "'");
+                return false;
+            }
         }
     }
 
-    expect_end(line, i);
+    // cpp outputs other parameters after the filename, but we ignore them.
+    //expect_end(line, i);
 
     return true;
 }
@@ -876,10 +735,6 @@ bool Preprocessor::eval_const_expr(const TokensLine& expr_tokens,
     }
 
     out_value = 0;
-    if (!expr.evaluate(out_value)) {
-        return false;
-    }
-
     return true;
 }
 
@@ -913,12 +768,6 @@ bool Preprocessor::eval_ifdef_name(const TokensLine& line, unsigned& i,
 
     // check the macros
     bool is_def = macros_.find(name) != macros_.end();
-    if (!is_def) {
-        // also check symbol table
-        const Symbol& sym = g_symbol_table.get_symbol(name);
-        is_def = sym.is_defined;
-    }
-
     bool cond = negated ? !is_def : is_def;
     return cond;
 }
@@ -994,8 +843,13 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::MACRO:
         process_macro(line, i);
         break;
-    case Keyword::LOCAL:
+    case Keyword::LOCAL: {
+        // Validate LOCAL syntax outside of MACRO/REPT by parsing args and enforcing end-of-line.
+        // Any malformed LOCAL line will raise an error via expect_end or parse_params_list failure.
+        std::vector<std::string> _discard;
+        process_local(line, i, _discard);
         break;
+    }
     case Keyword::EXITM:
         process_exitm(line, i);
         break;
@@ -1107,20 +961,18 @@ void Preprocessor::process_include(const TokensLine& line, unsigned& i) {
     }
 
     expect_end(line, i);
-    do_include(filename, is_angle);
+    do_include(filename);
 }
 
-void Preprocessor::do_include(const std::string& filename,
-                              bool is_angle) {
+void Preprocessor::do_include(const std::string& filename) {
     // Use centralized search helper so callers (include/binary/etc.) all use
     // the same include-path resolution logic. search_include_path now
     // returns a non-empty filename (resolved path or the original candidate).
-    std::string resolved = search_include_path(filename, is_angle);
+    std::string resolved = search_include_path(filename);
     push_file(resolved);
 }
 
-std::string Preprocessor::search_include_path(const std::string& filename,
-        bool is_angle) const {
+std::string Preprocessor::search_include_path(const std::string& filename) const {
     // Wrapper for include resolution. Centralizes search logic so callers
     // (process_include/do_include/process_binary) all use the same routine.
     // Return the resolved path if found; otherwise return the original filename
@@ -1130,8 +982,7 @@ std::string Preprocessor::search_include_path(const std::string& filename,
         const File& top_file = file_stack_.back();
         including_filename = top_file.tokens_file->filename();
     }
-    std::string resolved = resolve_include_candidate(filename, including_filename,
-                           is_angle);
+    std::string resolved = filename;
     if (resolved.empty()) {
         return filename;
     }
@@ -1154,14 +1005,13 @@ void Preprocessor::process_binary(const TokensLine& line, unsigned& i) {
 
     // Use the directive's own logical location (already accounts for LINE/C_LINE)
     const Location location = line.location();
-    do_binary(filename, is_angle, location);
+    do_binary(filename, location);
 }
 
-void Preprocessor::do_binary(const std::string& filename, bool is_angle,
-                             const Location& location) {
+void Preprocessor::do_binary(const std::string& filename, const Location& location) {
     // Resolve include-path candidates first so BINARY/INCBIN honor include
     // search directories the same way #include does.
-    std::string resolved = search_include_path(filename, is_angle);
+    std::string resolved = search_include_path(filename);
 
     // Push a virtual file containing DEFB directives with the binary bytes,
     // starting exactly at the directive's logical location.
@@ -1433,7 +1283,12 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     TokensLine final_body(expanded_body.location());
     if (eval_const_expr(expanded_body, value, true)) {
         final_body.clear_tokens();
-        final_body.push_back(Token(TokenType::Integer, std::to_string(value), value));
+        if (value < 0) {
+            final_body.push_back(Token(TokenType::Minus, "-", false));
+            value = -value;
+        }
+        final_body.push_back(Token(TokenType::Integer, std::to_string(value), value,
+                                   false));
     }
     else {
         final_body = expanded_body; // preserve list / complex tokens
@@ -2397,48 +2252,50 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
                                  std::vector<std::string>& out_locals) {
     // `i` is positioned right after the LOCAL keyword (spaces skipped by is_directive).
     // Accept identifiers list with or without parentheses. If parsing fails, accept bare "LOCAL".
-    unsigned before = i;
     std::vector<std::string> local_names;
-    if (parse_params_list(line, i, local_names)) {
-        // Append parsed names, reporting duplicates across the whole body
-        // (duplicates inside the same LOCAL line are already caught by parse_params_list)
-        for (const auto& ln : local_names) {
-            bool duplicate = false;
-            // Check collision with previously declared LOCALs in this body
-            if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
-                duplicate = true;
-            }
-            // Check collision with MACRO parameter names
-            if (!duplicate && current_params_ptr_ &&
-                    std::find(current_params_ptr_->begin(), current_params_ptr_->end(),
-                              ln) != current_params_ptr_->end()) {
-                duplicate = true;
-            }
-            // Check collision with current iteration variable (REPTC / REPTI)
-            if (!duplicate && !current_iteration_var_.empty()
-                    && ln == current_iteration_var_) {
-                duplicate = true;
-            }
-            if (duplicate) {
-                g_errors.set_location(line.location());
-                g_errors.set_expanded_line(line.to_string());
-                g_errors.error(ErrorCode::DuplicateDefinition, ln);
-                continue; // skip adding duplicate
-            }
-            if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
-                // Report and skip adding the duplicate name
-                g_errors.set_location(line.location());
-                g_errors.set_expanded_line(line.to_string());
-                g_errors.error(ErrorCode::DuplicateDefinition, ln);
-                continue;
-            }
-            out_locals.push_back(ln);
+    if (!parse_params_list(line, i, local_names)) {
+        g_errors.set_location(line.location());
+        g_errors.set_expanded_line(line.to_string());
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Invalid LOCAL parameter list");
+        return;
+    }
+
+    // Append parsed names, reporting duplicates across the whole body
+    // (duplicates inside the same LOCAL line are already caught by parse_params_list)
+    for (const auto& ln : local_names) {
+        bool duplicate = false;
+        // Check collision with previously declared LOCALs in this body
+        if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
+            duplicate = true;
         }
+        // Check collision with MACRO parameter names
+        if (!duplicate && current_params_ptr_ &&
+                std::find(current_params_ptr_->begin(), current_params_ptr_->end(),
+                          ln) != current_params_ptr_->end()) {
+            duplicate = true;
+        }
+        // Check collision with current iteration variable (REPTC / REPTI)
+        if (!duplicate && !current_iteration_var_.empty()
+                && ln == current_iteration_var_) {
+            duplicate = true;
+        }
+        if (duplicate) {
+            g_errors.set_location(line.location());
+            g_errors.set_expanded_line(line.to_string());
+            g_errors.error(ErrorCode::DuplicateDefinition, ln);
+            continue; // skip adding duplicate
+        }
+        if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
+            // Report and skip adding the duplicate name
+            g_errors.set_location(line.location());
+            g_errors.set_expanded_line(line.to_string());
+            g_errors.error(ErrorCode::DuplicateDefinition, ln);
+            continue;
+        }
+        out_locals.push_back(ln);
     }
-    else {
-        // Restore to allow "LOCAL" with no params
-        i = before;
-    }
+
     // Validate no trailing tokens
     expect_end(line, i);
 }
@@ -2462,42 +2319,38 @@ void Preprocessor::process_pragma(const TokensLine& line, unsigned& i) {
 // Replace strings by comma-separated integers
 bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
     // Fast path: if no string tokens present, only trimming may be needed.
-    if (!line.has_token_type(TokenType::String)) { // replaced has_token_type
+    if (!line.has_token_type(TokenType::String)) {
         out = line;
         return false;
     }
 
-    // Precompute capacity after expanding strings into comma-separated integers
-    size_t capacity = 0;
-    for (unsigned k = 0; k < line.size(); ++k) {
-        const Token& t = line[k];
-        if (t.is(TokenType::String)) {
-            size_t L = t.string_value().size();
-            if (L == 0) {
-                capacity += 0;
-            }
-            else {
-                capacity += (2 * L - 1);
-            }
-        }
-        else {
-            capacity += 1;
-        }
-    }
     out = TokensLine(line.location());
-    out.reserve(capacity);
-    bool changed = false;
     unsigned i = 0;
     while (i < line.size()) {
         const Token& t = line[i];
         if (t.is(TokenType::String)) {
-            changed = true;
             std::string str_val = t.string_value();
-            ++i;
+            if (str_val.empty()) {
+                // Remove a comma already emitted before the empty string
+                bool comma_removed = false;
+                if (!out.empty() && out.back().is(TokenType::Comma)) {
+                    out.pop_back();
+                    comma_removed = true;
+                }
+                // Skip the empty string token
+                ++i;
+                // Skip a following comma token in the source (do not emit it)
+                if (!comma_removed && i < line.size() && line[i].is(TokenType::Comma)) {
+                    ++i;
+                }
+                continue; // Nothing to emit for an empty string
+            }
+
+            ++i; // consume the string token
             bool is_first = true;
             for (char c : str_val) {
                 if (!is_first) {
-                    out.push_back(Token(TokenType::Comma, ",", true));
+                    out.push_back(Token(TokenType::Comma, ",", false));
                 }
                 int char_int = static_cast<int>(static_cast<unsigned char>(c));
                 out.push_back(Token(TokenType::Integer,
@@ -2510,10 +2363,8 @@ bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
             ++i;
         }
     }
-    if (!changed) {
-        out = line;
-    }
-    return changed;
+
+    return true;
 }
 
 bool Preprocessor::merge_double_hash(const TokensLine& line, TokensLine& out) {
@@ -3057,6 +2908,15 @@ bool Preprocessor::handle_directives_for_line(TokensLine& line,
         return true; // consume and continue
     }
 
+    // Support cpp style line markers: "# <nr>" or "# <nr> , <filename>" or "# <nr> <filename>"
+    // Treat them as synonyms of "#line <nr> [ , filename ]"
+    if (line.size() >= 2 && line[0].is(TokenType::Hash)
+            && line[1].is(TokenType::Integer)) {
+        i = 1; // point to integer token
+        process_line(line, i);
+        return true; // consume directive
+    }
+
     // Process name-directive
     std::string name;
     keyword = Keyword::None;
@@ -3074,26 +2934,4 @@ bool Preprocessor::handle_directives_for_line(TokensLine& line,
 
     // ask caller to process normal line
     return false;
-}
-
-void preprocess_only() {
-    for (auto& asm_filename : g_input_files) {
-        if (is_o_filename(asm_filename)) {
-            if (g_options.verbose) {
-                std::cout << "Skipping preprocessing for object file: "
-                          << asm_filename << std::endl;
-            }
-        }
-        else {
-            std::string i_filename = get_i_filename(asm_filename);
-
-            if (g_options.verbose) {
-                std::cout << "Preprocessing file: " << asm_filename
-                          << " -> " << i_filename << std::endl;
-            }
-
-            Preprocessor::preprocess_file(asm_filename, i_filename,
-                                          g_options.gen_dependencies);
-        }
-    }
 }

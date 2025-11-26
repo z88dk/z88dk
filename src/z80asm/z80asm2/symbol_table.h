@@ -29,5 +29,3 @@ public:
 private:
     std::unordered_map<std::string, Symbol> symbols_;
 };
-
-extern SymbolTable g_symbol_table;
