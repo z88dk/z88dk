@@ -1,9 +1,7 @@
 - add tests of the HLA features
 - add tests of processing of .asm.m4 file
 - add tests of processing of .asm.pl file
-- DEFC expressions may influence IFDEF and IF behavior; do a preprocessing time symbol table 
-  to cope for this
-- ifndef guard needs to check also DEFC
+- ifndef guard needs to check also DEFC; needs DEFC expressions to be evaluated IFDEF and IF behavior
 
 Edge cases in preprocessor.cpp not covered by preprocessor.t
 •	REPTC argument that is a multi-token non-string/non-integer expression (e.g. "A" + "B") invoking concatenation branch.

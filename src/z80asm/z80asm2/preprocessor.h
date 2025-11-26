@@ -48,6 +48,10 @@ public:
     bool next_line_pp(TokensLine& out_line);
 
     // Pop and return the next High-Level-Assembly line (after preprocessing).
+    bool next_line_hla(TokensLine& out_line);
+
+    // Pop and return the next line - routine to be called from outside
+    // also handles the creation of DEFC symbols used in IF and IFDEF
     bool next_line(TokensLine& out_line);
 
     // Register a simple macro replacement (no parameters). Replacement may be
@@ -75,9 +79,6 @@ public:
     void generate_dependency_file();
 
 private:
-    // limit macro recursion depth
-    static constexpr int MAX_MACRO_RECURSION = 32;
-
     // limit total single-pass iterations for one physical line
     static constexpr int MAX_FIXPOINT_ITERATIONS = 256;
 
@@ -192,8 +193,8 @@ private:
     Location compute_location(const File& file, const TokensLine& out);
 
     // collect segments from the input file
-    void collect_guard_segments(File& file, TokensLine& line,
-                                unsigned& line_index, std::vector<TokensLine>& segments);
+    void collect_guard_segments(File& file, unsigned& line_index,
+                                std::vector<TokensLine>& segments);
 
     // Pre-split a raw physical line into colon or backslahs-separated segments
     // Returns true if the line was split and segments were produced.
@@ -358,6 +359,7 @@ private:
     TokensLine expand_macros_in_line(const TokensLine& line);
 
     // #ifndef/#define detector
+    bool is_guard_define_name(const TokensLine& line, std::string& out_name);
     bool detect_ifndef_guard(File& file, std::string& out_symbol);
 
     // NEW: handle directives for a line (both queued and fetched paths)
