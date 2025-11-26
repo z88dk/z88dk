@@ -39,6 +39,7 @@ void Preprocessor::clear() {
     current_params_ptr_ = nullptr;
     current_iteration_var_.clear();
     hla_context_.clear();
+    symtab_.clear();
 }
 
 void Preprocessor::clear_file_cache() {
@@ -75,7 +76,7 @@ void Preprocessor::push_file(const std::string& filename) {
                 return; // skip include entirely
             }
             // check defc symbol
-            const Symbol& symbol = g_symbol_table.get_symbol(guard_name);
+            const Symbol& symbol = symtab_.get_symbol(guard_name);
             if (symbol.is_defined) {
                 // Record dependency even when skipped
                 dep_files_.push_back(normalized_filename);
@@ -308,6 +309,10 @@ bool Preprocessor::next_line_hla(TokensLine& out_line) {
     return hla_context_.next_line(out_line);
 }
 
+SymbolTable& Preprocessor::pp_symtab() {
+    return symtab_;
+}
+
 bool Preprocessor::next_line(TokensLine& out_line) {
     if (!next_line_hla(out_line)) {
         return false;    // end of input
@@ -323,7 +328,7 @@ bool Preprocessor::next_line(TokensLine& out_line) {
         label.name = name;
         label.is_defined = true;
         label.location = out_line.location();
-        g_symbol_table.add_symbol(label.name, label);
+        symtab_.add_symbol(label.name, label);
         return true;
     }
 
@@ -350,7 +355,7 @@ bool Preprocessor::next_line(TokensLine& out_line) {
             label.is_defined = true;
             label.is_constant = true;
             label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
+            symtab_.add_symbol(label.name, label);
             return true;
         }
         else {
@@ -358,7 +363,7 @@ bool Preprocessor::next_line(TokensLine& out_line) {
             label.name = name;
             label.is_defined = true;
             label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
+            symtab_.add_symbol(label.name, label);
             return true;
         }
     }
@@ -381,7 +386,7 @@ bool Preprocessor::next_line(TokensLine& out_line) {
             label.is_defined = true;
             label.is_constant = true;
             label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
+            symtab_.add_symbol(label.name, label);
             return true;
         }
         else {
@@ -389,7 +394,7 @@ bool Preprocessor::next_line(TokensLine& out_line) {
             label.name = name;
             label.is_defined = true;
             label.location = out_line.location();
-            g_symbol_table.add_symbol(label.name, label);
+            symtab_.add_symbol(label.name, label);
             return true;
         }
     }
@@ -876,7 +881,7 @@ bool Preprocessor::eval_const_expr(const TokensLine& expr_tokens,
     }
 
     out_value = 0;
-    if (!expr.evaluate(out_value)) {
+    if (!expr.evaluate(symtab_, out_value)) {
         return false;
     }
 
@@ -915,7 +920,7 @@ bool Preprocessor::eval_ifdef_name(const TokensLine& line, unsigned& i,
     bool is_def = macros_.find(name) != macros_.end();
     if (!is_def) {
         // also check symbol table
-        const Symbol& sym = g_symbol_table.get_symbol(name);
+        const Symbol& sym = symtab_.get_symbol(name);
         is_def = sym.is_defined;
     }
 
