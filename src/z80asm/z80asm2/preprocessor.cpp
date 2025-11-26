@@ -1275,6 +1275,28 @@ void Preprocessor::do_define(const TokensLine& line, unsigned& i,
         replacement.push_back(Token(TokenType::Integer, "1", 1));
     }
 
+    // if replacement is a constant expression, define a DEFC instead so that
+    // the symbol in known at link time
+    if (!had_func_parens) {
+        TokensLine expr_tokens = expand_macros_in_line(replacement);
+        int value = 0;
+        if (eval_const_expr(expr_tokens, value, true)) {
+            TokensLine defc(line.location());
+            defc.reserve(4);
+            defc.push_back(Token(TokenType::Identifier, "DEFC", true));
+            defc.push_back(Token(TokenType::Identifier, name, true));
+            defc.push_back(Token(TokenType::EQ, "=", true));
+            defc.push_back(Token(TokenType::Integer, std::to_string(value), value, true));
+
+            std::vector<TokensLine> one_line;
+            one_line.push_back(std::move(defc));
+            push_virtual_file(one_line, line.location().filename(),
+                              line.location().line_num(), false);
+
+            return;
+        }
+    }
+
     Macro macro;
     macro.params = params;
     macro.is_function_like = (!macro.params.empty()) || had_func_parens;
