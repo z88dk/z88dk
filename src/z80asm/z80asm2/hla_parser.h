@@ -8,6 +8,7 @@
 
 #include "lexer.h"
 #include "location.h"
+#include "symbol_table.h"
 #include <memory>
 #include <vector>
 
@@ -51,12 +52,13 @@ struct FlagTest : Expr {
 
 class Parser {
 public:
-    Parser(const TokensLine& line, unsigned i = 0);
+    Parser(const TokensLine& line, unsigned i, SymbolTable& symtab);
     std::unique_ptr<Expr> parse_bool_expr();
 
 private:
     const std::vector<Token>& tokens_;
     unsigned i_ = 0;
+    SymbolTable* symtab_ = nullptr;
 
     const Token* peek(unsigned look = 0) const;
     bool match(TokenType type);

@@ -9,6 +9,7 @@
 #include "hla.h"
 #include "keywords.h"
 #include "lexer.h"
+#include "symbol_table.h"
 #include <ctime>
 #include <deque>
 #include <memory>
@@ -49,6 +50,7 @@ public:
 
     // Pop and return the next High-Level-Assembly line (after preprocessing).
     bool next_line_hla(TokensLine& out_line);
+    SymbolTable& pp_symtab();
 
     // Pop and return the next line - routine to be called from outside
     // also handles the creation of DEFC symbols used in IF and IFDEF
@@ -185,6 +187,9 @@ private:
 
     // current High-Level-Assembly context (for HLA directives)
     HLA hla_context_;
+
+    // symbol table to hold DEFC identifiers parsed in preprocessor
+    SymbolTable symtab_;
 
     //--- Internal methods ---
 
