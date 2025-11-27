@@ -212,16 +212,16 @@ the compilation is beyond the scope of a getting started guide, but suffice to
 say it shows that when using the zsdcc compiler the header files come from this
 directory:
 ```
- include/_DEVELOPMENT/sdcc
+ include/_DEVELOPMENT/common
 ```
 so the header file being included in this example is:
 ```
- include/_DEVELOPMENT/sdcc/arch/zx.h
+ include/_DEVELOPMENT/common/arch/zx.h
 ```
 It's sometimes quicker to browse the header files in a web browser. The base
-link is [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/sdcc).
+link is [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/common).
 
-That [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h) file contains the value for the INK_BLACK macro and a prototype
+That [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h) file contains the value for the INK_BLACK macro and a prototype
 for the zx_border() function.
 
 It's important not to be distracted by all the other header files in the

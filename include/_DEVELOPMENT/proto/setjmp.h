@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __SETJMP_H__
 #define __SETJMP_H__
 
+#include <sys/compiler.h>
+
 #define setjmp(env)         l_setjmp(&(env))
 #define longjmp(env, val)   l_longjmp(&(env), val)
 

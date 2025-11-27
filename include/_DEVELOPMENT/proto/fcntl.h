@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __FCNTL_H__
 #define __FCNTL_H__
 
+#include <sys/compiler.h>
+
 typedef unsigned int  mode_t;
 
 #ifndef _OFF_T

@@ -406,7 +406,7 @@ look? What about 3 pixels at a time?
 
 * Can you mix different sprite types on screen?  Try creating some sprites as MASK, 
 some as LOAD and some as OR.  Use the 2-byte draw functions for the LOAD and 
-[OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/sp1.h#L177) 
+[OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/sp1.h#L177) 
 so that all the sprites can share the MASK sprite graphics.
 
 

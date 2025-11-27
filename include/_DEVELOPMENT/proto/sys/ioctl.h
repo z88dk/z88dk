@@ -4,7 +4,7 @@ include(__link__.m4)
 #define __SYS_IOCTL_H__
 
 // ioctls are defined in arch.h
-
+#include <sys/compiler.h>
 #include <arch.h>
 #include <stdint.h>
 

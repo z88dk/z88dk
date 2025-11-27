@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 // DATA STRUCTURES

@@ -175,14 +175,14 @@ in installment 1 of the Z88DK getting started guide, the header files
 for the sdcc compiler and the new libraries are found here:
 
 ```
-include/_DEVELOPMENT/sdcc
+include/_DEVELOPMENT/common
 ```
 
 so the *sp1.h* header file, which is included in this example code,
 and which declares the SP1 library interface, is here:
 
 ```
-include/_DEVELOPMENT/sdcc/arch/zx/sp1.h
+include/_DEVELOPMENT/common/arch/zx/sp1.h
 ```
 
 You should keep this file open. It is currently sparsely documented,

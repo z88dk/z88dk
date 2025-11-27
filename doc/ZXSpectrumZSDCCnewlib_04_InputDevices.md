@@ -25,17 +25,17 @@ _input_ library.
 
 ## The Input Library
 
-The input library header file is [here](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/input.h):
+The input library header file is [here](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input.h):
 
 ```
-include/_DEVELOPMENT/sdcc/input.h
+include/_DEVELOPMENT/common/input.h
 ```
 
 and a quick skim read of that file will show that when you're writing for the
-ZX Spectrum it #include's the [Spectrum specific file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/input/input_zx.h):
+ZX Spectrum it #include's the [Spectrum specific file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input/input_zx.h):
 
 ```
-include/_DEVELOPMENT/sdcc/input/input_zx.h
+include/_DEVELOPMENT/common/input/input_zx.h
 ```
 
 There isn't a great deal in the way of documentation in the file, so a bit of
@@ -326,10 +326,10 @@ zcc +zx -vn -startup=1 -clib=sdcc_iy joy_input.c -o joy_input -create-app
 
 This prints 0x0001 when the stick is moved up, 0x0002 when it's moved down,
 0x0004 when it's moved left and 0x0008 when it's moved right. Those values are
-defined as constants in the [input header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/input.h).
+defined as constants in the [input header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input.h).
 
 ```
-include/_DEVELOPMENT/sdcc/input.h
+include/_DEVELOPMENT/common/input.h
 ```
 
 ```

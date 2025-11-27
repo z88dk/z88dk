@@ -27,16 +27,16 @@ There's a header file full of graphics routines here:
 we're after: draw, plot, circle, all sorts of stuff. But there's a problem. The
 header file is in the Z88DK include/ directory, whereas the header files for the
 new library is, as we've seen in the previous installments of this
-series, [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/sdcc):
+series, [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/common):
 
 ```
- include/_DEVELOPMENT/sdcc/
+ include/_DEVELOPMENT/common/
 ```
 
 The explanation is that the header files in the include/ directory relate to
 functions in the _classic_ library. We're using the newer compiler with the _new_
 library, and you'll notice that there's no graphics.h file in the
-include/_DEVELOPMENT/sdcc directory. As of this writing, October 2024, the graphics
+include/_DEVELOPMENT/common directory. As of this writing, October 2024, the graphics
 routines haven't yet been ported to the new library.
 
 Thus, for now at least, we meet a dead end. If your application requires the
@@ -86,10 +86,10 @@ pixel you want to set. Z88DK provides some manipulator functions that do this
 for you.
 
 The display address manipulator functions are defined in
-[arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h).
+[arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h).
 
 ```
-include/_DEVELOPMENT/sdcc/arch/zx.h
+include/_DEVELOPMENT/common/arch/zx.h
 ```
 
 Note that this file is in the new library's include path, so it's ready to be
@@ -256,7 +256,7 @@ Another simple modification may be to have the line routine draw a patterned lin
 instead of a solid black one.
 
 Besides the screen address manipulators, there is one high level graphics function
-in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L280)
+in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h#L280)
 and that is `zx_pattern_fill()`.  This can be used to fill an area on screen with a pattern.
 
 [... continue to Part 4: Input Devices](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md)

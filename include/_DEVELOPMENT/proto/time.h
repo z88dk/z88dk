@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __TIME_H__
 #define __TIME_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 #ifndef NULL

@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __INTRINSIC_H__
 #define __INTRINSIC_H__
 
+#include <sys/compiler.h>
+
 #ifdef __SDCC
 
 // disable warnings connected to intrinsics

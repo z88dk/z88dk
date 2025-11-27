@@ -72,10 +72,10 @@ compile line is therefore:
 Run that compilation and drag and drop the resultant TAP file onto the Fuse
 window. It does what you'd expect, Spectrum style.
 
-The [zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h) header file is found here:
+The [zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h) header file is found here:
 
 ```
- include/_DEVELOPMENT/sdcc/arch/zx.h
+ include/_DEVELOPMENT/common/arch/zx.h
 ```
 
 and you'll notice it contains the declaration of the zx_cls() function. There's
@@ -86,10 +86,10 @@ PAPER_WHITE constant to PAPER_YELLOW to confirm this. The scarcity of
 documentation makes this sort of investigation necessary for Z88DK development
 as things stand.
 
-The [stdio.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/stdio.h) header is found here:
+The [stdio.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/stdio.h) header is found here:
 
 ```
- include/_DEVELOPMENT/sdcc/stdio.h
+ include/_DEVELOPMENT/common/stdio.h
 ```
 
 Note that that file is under the sdcc/ subdirectory, so it's picked up by our

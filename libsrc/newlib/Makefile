@@ -79,13 +79,13 @@ endef
 
 define build_libs
 lib/sccz80/$(1).lib: target/$(1)/obj/config_private.inc
-	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sccz80 -Itarget/$(1)/obj -I.. -xlib/sccz80/$(1) -I$(Z88DK_LIB) @target/$(1)/library/$(1)_sccz80.lst
+	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sccz80/x -Itarget/$(1)/obj -I.. -xlib/sccz80/$(1) -I$(Z88DK_LIB) @target/$(1)/library/$(1)_sccz80.lst
 
 lib/sdcc_ix/$(1).lib: target/$(1)/obj/config_private.inc
-	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sdcc_ix -Itarget/$(1)/obj -I.. -xlib/sdcc_ix/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(1)/library/$(1)_sdcc_ix.lst
+	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sdcc_ix/x -Itarget/$(1)/obj -I.. -xlib/sdcc_ix/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(1)/library/$(1)_sdcc_ix.lst
 
 lib/sdcc_iy/$(1).lib: target/$(1)/obj/config_private.inc
-	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sdcc_iy -Itarget/$(1)/obj -I.. -IXIY-soft -xlib/sdcc_iy/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(1)/library/$(1)_sdcc_iy.lst
+	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-Itarget/$(1)/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -Otarget/$(1)/obj/sdcc_iy/x -Itarget/$(1)/obj -I.. -IXIY-soft -xlib/sdcc_iy/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(1)/library/$(1)_sdcc_iy.lst
 endef
 
 define make_clean

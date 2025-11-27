@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __IM2_H__
 #define __IM2_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 __DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,im2_init,void *im2_table_address)
