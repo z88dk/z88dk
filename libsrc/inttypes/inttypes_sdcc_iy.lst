@@ -1,9 +1,0 @@
-inttypes/c/sdcc_iy/_imaxdiv_
-inttypes/c/sdcc_iy/_imaxdiv__callee
-inttypes/c/sdcc_iy/imaxabs
-inttypes/c/sdcc_iy/imaxabs_callee
-inttypes/c/sdcc_iy/strtoimax
-inttypes/c/sdcc_iy/strtoimax_callee
-inttypes/c/sdcc_iy/strtoumax
-inttypes/c/sdcc_iy/strtoumax_callee
-@inttypes/inttypes_asm.lst

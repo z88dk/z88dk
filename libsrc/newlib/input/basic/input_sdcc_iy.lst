@@ -1,7 +1,0 @@
-@newlib/input/basic/input_asm.lst
-newlib/input/basic/c/sdcc_iy/in_inkey
-newlib/input/basic/c/sdcc_iy/in_pause
-newlib/input/basic/c/sdcc_iy/in_pause_fastcall
-newlib/input/basic/c/sdcc_iy/in_test_key
-newlib/input/basic/c/sdcc_iy/in_wait_key
-newlib/input/basic/c/sdcc_iy/in_wait_nokey
