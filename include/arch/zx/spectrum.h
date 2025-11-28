@@ -163,8 +163,7 @@ extern int  __LIB__ zx_model(void);
 extern int  __LIB__ zx_basic_length(void);
 extern int  __LIB__ zx_var_length(void);
 extern int  __LIB__ zx_printer(void);
-extern int  __LIB__ zx_soundchip(void);
-extern int  __LIB__ zx_timexsound(void);
+extern int  __LIB__ zx_soundchip(void);  // 0: NONE - 1: ZX128 AY - 2: BRAZIL AY (Microdigital, etc)
 extern int  __LIB__ zx_fullerstick(void);
 extern int  __LIB__ zx_kempstonmouse(void);
 extern int  __LIB__ zx_kempston(void);
