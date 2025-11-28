@@ -7,7 +7,7 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg_callee.asm,v 1.5 2017-01-02 23:57:08 aralbrec Exp $
+;	$Id: set_psg_callee.asm $
 ;
 
     SECTION code_clib
@@ -43,5 +43,10 @@ asm_set_psg:
     out     ($9f), a
     ld      a, e
     out     ($df), a
+	; "Timex Sound" (Portugal)
+    ld      a, l
+    out     ($f6), a
+    ld      a, e
+    out     ($f5), a
     ret
 
