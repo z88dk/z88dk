@@ -20,15 +20,22 @@ psg_init:
 _psg_init:
     call    zx_soundchip
     ld      a, l
-    and     a
-    ld      hl, $ff3f                   ; select + read
-    ld      bc, $ff5f                   ; write
-    jr      z, fullermode
+    and     a                ; Fuller if nothing detected
+    ld      hl, $ff3f        ; select + read  (foo MSB)
+    ld      bc, $ff5f        ; write  (foo MSB)
+    jr      z, altmode
+	
+	dec     hl
+    jr      z, zx128mode
+    ld      hl, $00ff        ; select register, read is on ($BF)
+    ld      bc, $00df        ; write  (foo MSB in addresses)
+    jr      altmode
 
-    ld      hl, $fffd                   ; select + read
-    ld      bc, $bffd                   ; write
-fullermode:
+zx128mode:
+    ld      hl, $fffd        ; select + read
+    ld      bc, $bffd        ; write
 
+altmode:
     ld      (__psg_select_and_read_port), hl
     ld      (__psg_write_port), bc
 
@@ -73,7 +80,11 @@ outpsg:
     out     ($9f), a
     ld      a, e
     out     ($df), a
-
+	; "Timex Sound" (Portugal)
+    ld      a, l
+    out     ($f6), a
+    ld      a, e
+    out     ($f5), a
     ret
 
 
