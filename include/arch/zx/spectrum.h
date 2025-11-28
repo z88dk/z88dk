@@ -350,6 +350,37 @@ extern void __LIB__  zx_print_buf(char *buf) __z88dk_fastcall;
 extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 
 
+/////////////////////////////////
+// CENTRONICS PRINTER INTERFACES
+/////////////////////////////////
+
+#define LPT_MOREX      0
+#define LPT_DKTRONICS  1
+#define LPT_KEMPSTONE  2
+#define LPT_KEMPSTONS  3
+#define LPT_HILDERBAY  4
+#define LPT_HWG        5
+#define LPT_MICROFACE  6
+#define LPT_PLUS3      7
+#define LPT_DISCIPLE   8
+#define LPT_PLUSD      9
+#define LPT_LPRINTIII  10
+#define LPT_AERCO      11
+#define LPT_PPI        12
+#define LPT_TASMAN     13
+#define LPT_WAFADRIVE  14
+#define LPT_ZXPOWER    15
+#define LPT_LINK       16
+#define LPT_GAMA       17
+#define LPT_PROXIMA    18
+#define LPT_DIDAKTIKMP 19
+#define LPT_DIDAKTIKB  20
+#define LPT_ROMANTIC   21
+
+extern int  __LIB__  centronics_init(int driver) __z88dk_fastcall;
+extern int  __LIB__  centronics_send(int driver);
+
+
 ////////////
 // TAPE I/O
 ////////////
