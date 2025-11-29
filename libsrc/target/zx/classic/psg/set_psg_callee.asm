@@ -44,9 +44,9 @@ asm_set_psg:
     ld      a, e
     out     ($df), a
 	; "Timex Sound" (Portugal)
-    ld      a, l
-    out     ($f6), a
-    ld      a, e
-    out     ($f5), a
+;    ld      a, l
+;    out     ($f6), a
+;    ld      a, e
+;    out     ($f5), a
     ret
 
