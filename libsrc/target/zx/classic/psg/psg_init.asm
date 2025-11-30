@@ -14,22 +14,32 @@
     PUBLIC  psg_init
     PUBLIC  _psg_init
     EXTERN  zx_soundchip
+    EXTERN  asm_set_psg
 
 
 psg_init:
 _psg_init:
+
     call    zx_soundchip
     ld      a, l
-    and     a                ; Fuller if nothing detected
-    ld      hl, $ff3f        ; select + read  (foo MSB)
-    ld      bc, $ff5f        ; write  (foo MSB)
+    cp      3                ; TS2068 or TC2068 ?
+    jr      nz,no_ts2068     ; no
+    ld      hl,$fff5
+    ld      bc,$fff6
+    jr      altmode          ; we have an internal AY in a TS2068
+no_ts2068:
+
+    and     a                ; Fuller if nothing detected, set MSB to zero to tell we also poke around
+    ld      hl, $003f        ; select + read  (zero in MSB)
+    ld      bc, $005f        ; write  (foo MSB)
     jr      z, altmode
-	
-	dec     a
+
+    dec     a
     jr      z, zx128mode
-    ld      hl, $00ff        ; select register, read is on ($BF)
-    ld      bc, $00df        ; write  (foo MSB in addresses)
-    jr      altmode
+    ld      hl, $ffff        ; select register, read is on ($BF)
+    ld      bc, $ffdf        ; write  (foo MSB in addresses)
+    jr      altmode          ; we're in Microdigital mode or external Timex AY
+
 
 zx128mode:
     ld      hl, $fffd        ; select + read
@@ -66,26 +76,8 @@ skip:
     ld      a, 11
 
 outpsg:
-    ld      bc, (__psg_select_and_read_port)
-    OUT     (C), a
-    ld      bc, (__psg_write_port)
-    OUT     (C), e
-	; ZON-X
     ld      l, a
-    out     ($ff), a
-    ld      a, e
-    out     ($7f), a
-	; ZXM and "William Stuart"
-    ld      a, l
-    out     ($9f), a
-    ld      a, e
-    out     ($df), a
-	; "Timex Sound" (Portugal)
-;    ld      a, l
-;    out     ($f6), a
-;    ld      a, e
-;    out     ($f5), a
-    ret
+	jp asm_set_psg
 
 
     SECTION bss_clib
