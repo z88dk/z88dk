@@ -163,7 +163,7 @@ extern int  __LIB__ zx_model(void);
 extern int  __LIB__ zx_basic_length(void);
 extern int  __LIB__ zx_var_length(void);
 extern int  __LIB__ zx_printer(void);
-extern int  __LIB__ zx_soundchip(void);  // 0: NONE - 1: ZX128 AY - 2: BRAZIL AY (Microdigital, etc)
+extern int  __LIB__ zx_soundchip(void);  // 0: NONE - 1: ZX128 AY - 2: BRAZIL AY (Microdigital..) - 3: TS-2068 
 extern int  __LIB__ zx_fullerstick(void);
 extern int  __LIB__ zx_kempstonmouse(void);
 extern int  __LIB__ zx_kempston(void);
@@ -375,10 +375,16 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LPT_DIDAKTIKMP 19
 #define LPT_DIDAKTIKB  20
 #define LPT_ROMANTIC   21
+#define LPT_HOBBIT     22
 
+// Choose the current output driver and initialize it
 extern int  __LIB__  centronics_init(int driver) __z88dk_fastcall;
-extern int  __LIB__  centronics_send(int driver);
 
+// Set to 20 by default.  It should be enough also for an overclocked Z80
+extern int  centronics_strobe_delay;
+
+// Send a character to the currently initialized driver
+extern int  __LIB__  centronics_send(int chr);
 
 ////////////
 // TAPE I/O
