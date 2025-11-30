@@ -30,9 +30,12 @@ _set_psg_callee:
 asm_set_psg:
 
     ld      bc, (__psg_select_and_read_port)
+	ld      a,b
     out     (c), l
     ld      bc, (__psg_write_port)
     out     (c), e
+	and     a
+	ret     nz
 	; ZON-X
     ld      a, l
     out     ($ff), a
@@ -43,10 +46,5 @@ asm_set_psg:
     out     ($9f), a
     ld      a, e
     out     ($df), a
-	; "Timex Sound" (Portugal)
-;    ld      a, l
-;    out     ($f6), a
-;    ld      a, e
-;    out     ($f5), a
     ret
 
