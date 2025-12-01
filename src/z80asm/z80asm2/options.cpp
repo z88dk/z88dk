@@ -22,6 +22,7 @@ static const std::string d_extension = ".d";
 static const std::string o_extension = ".o";
 static const std::string m4_extension = ".m4";
 static const std::string perl_extension = ".pl";
+static const std::string cpp_extension = ".cpp";
 static const std::string i_extension = ".i";
 
 void exit_show_copyright(int exit_code) {
@@ -35,14 +36,15 @@ void exit_show_usage(int exit_code) {
             << "Assembles Z80 assembly source files into binary output.\n\n"
             << "Options:\n"
             // #-------#-------#-------#-------#-------#-------#-------#-------#
+            << "  -cpp=OPTS    Options when calling cpp\n"
             << "  -d           Do not assemble if .o is newer\n"
             << "  -E           Only run the preprocessor, generate file.i\n"
             << "  -h           Show this screen\n"
             << "  -Ipath       Add path to search for source/include files\n"
             << "  -IXIY        Swap IX and IY registers\n"
-            << "  -m4OPTS      Options when calling m4\n"
+            << "  -m4=OPTS     Options when calling m4\n"
             << "  -MD          Generate Makefile dependency file.d\n"
-            << "  -perlOPTS    Options when calling perl\n"
+            << "  -perl=OPTS   Options when calling perl\n"
             << "  -ucase       Convert labels to uppercase\n"
             << "  -v           Enable verbose output\n"
             ;
@@ -313,6 +315,35 @@ static std::string run_perl(const std::string& filename) {
     }
 }
 
+// run cpp preprocessor
+static std::string run_cpp(const std::string& filename) {
+    std::string cpp_full_path = resolve_include_candidate(filename, "", false);
+    if (cpp_full_path.empty()) {
+        g_errors.error(ErrorCode::FileNotFound, filename);
+        return std::string();
+    }
+
+    // file.asm
+    std::string asm_filename =
+        cpp_full_path.substr(0, cpp_full_path.size() - cpp_extension.size());
+
+    // build cpp command
+    std::string cpp_cmd = "cpp " + g_options.cpp_options +
+                          " \"" + cpp_full_path + "\" > \"" + asm_filename + "\"";
+    if (g_options.verbose) {
+        std::cout << "% " << cpp_cmd << std::endl;
+    }
+
+    if (0 != system(cpp_cmd.c_str())) {
+        g_errors.error(ErrorCode::CommandFailed, cpp_cmd);
+        perror("cpp");
+        return std::string();
+    }
+    else {
+        return search_source_file(asm_filename);
+    }
+}
+
 // search source file in path, return empty string if not found
 std::string search_source_file(const std::string& filename) {
     std::string out_filename;
@@ -322,6 +353,9 @@ std::string search_source_file(const std::string& filename) {
     }
     else if (str_ends_with(filename, perl_extension)) {
         return run_perl(filename);
+    }
+    else if (str_ends_with(filename, cpp_extension)) {
+        return run_cpp(filename);
     }
     else {
         // check plain filename
