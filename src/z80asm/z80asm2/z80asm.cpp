@@ -154,10 +154,7 @@ int main(int argc, char* argv[]) {
         }
         else {
             // input file
-            std::string source_file = search_source_file(arg);
-            if (!source_file.empty()) {
-                g_input_files.push_back(source_file);
-            }
+            search_source_file(arg, g_input_files);
         }
     }
 

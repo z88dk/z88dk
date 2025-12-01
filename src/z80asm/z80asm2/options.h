@@ -40,7 +40,8 @@ bool is_o_filename(const std::string& filename);
 
 std::string resolve_include_candidate(const std::string& filename,
                                       const std::string& including_filename, bool is_angle = false);
-std::string search_source_file(const std::string& filename);
+void search_source_file(const std::string& filename,
+                        std::vector<std::string>& out_filenames);
 
 
 

@@ -258,11 +258,12 @@ static std::string check_source(const std::string& filename) {
 }
 
 // run m4 preprocessor
-static std::string run_m4(const std::string& filename) {
+static void run_m4(const std::string& filename,
+                   std::vector<std::string>& out_filenames) {
     std::string m4_full_path = resolve_include_candidate(filename, "", false);
     if (m4_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
-        return std::string();
+        return;
     }
 
     // file.asm
@@ -279,19 +280,20 @@ static std::string run_m4(const std::string& filename) {
     if (0 != system(m4_cmd.c_str())) {
         g_errors.error(ErrorCode::CommandFailed, m4_cmd);
         perror("m4");
-        return std::string();
+        return;
     }
-    else {
-        return search_source_file(asm_filename);
-    }
+
+    // process generated asm file
+    search_source_file(asm_filename, out_filenames);
 }
 
 // run perl preprocessor
-static std::string run_perl(const std::string& filename) {
+static void run_perl(const std::string& filename,
+                     std::vector<std::string>& out_filenames) {
     std::string perl_full_path = resolve_include_candidate(filename, "", false);
     if (perl_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
-        return std::string();
+        return;
     }
 
     // file.asm
@@ -308,19 +310,20 @@ static std::string run_perl(const std::string& filename) {
     if (0 != system(perl_cmd.c_str())) {
         g_errors.error(ErrorCode::CommandFailed, perl_cmd);
         perror("perl");
-        return std::string();
+        return;
     }
-    else {
-        return search_source_file(asm_filename);
-    }
+
+    // process generated asm file
+    search_source_file(asm_filename, out_filenames);
 }
 
 // run cpp preprocessor
-static std::string run_cpp(const std::string& filename) {
+static void run_cpp(const std::string& filename,
+                    std::vector<std::string>& out_filenames) {
     std::string cpp_full_path = resolve_include_candidate(filename, "", false);
     if (cpp_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
-        return std::string();
+        return;
     }
 
     // file.asm
@@ -337,111 +340,181 @@ static std::string run_cpp(const std::string& filename) {
     if (0 != system(cpp_cmd.c_str())) {
         g_errors.error(ErrorCode::CommandFailed, cpp_cmd);
         perror("cpp");
-        return std::string();
+        return;
     }
-    else {
-        return search_source_file(asm_filename);
+
+    // process generated asm file
+    search_source_file(asm_filename, out_filenames);
+}
+
+// search list files
+static void search_list_file(const std::string& list_filename,
+                             std::vector<std::string>& out_filenames) {
+    std::string list_full_path = resolve_include_candidate(list_filename, "",
+                                 false);
+    if (list_full_path.empty()) {
+        g_errors.error(ErrorCode::FileNotFound, list_filename);
+        return;
     }
+
+    // read list file
+    std::string content;
+    try {
+        content = read_file_to_string(list_full_path);
+    }
+    catch (std::exception& e) {
+        g_errors.error(ErrorCode::FileOpenError, e.what());
+        return;
+    }
+
+    // process each line
+    std::vector<std::string> lines = split_lines(content);
+    for (size_t i = 0; i < lines.size(); ++i) {
+        g_errors.set_location(Location(list_full_path, static_cast<int>(i + 1)));
+        std::string inc_filename = lines[i];
+
+        // remove comments and trim
+        size_t comment_pos = inc_filename.find_first_of(";#");
+        if (comment_pos != std::string::npos) {
+            inc_filename = inc_filename.substr(0, comment_pos);
+        }
+        inc_filename = trim(inc_filename);
+
+        if (inc_filename.empty()) {
+            continue;
+        }
+
+        if (inc_filename[0] == ';' || inc_filename[0] == '#') { // comment line
+            continue;
+        }
+
+        search_source_file(inc_filename, out_filenames);
+    }
+
+    g_errors.set_location(Location());
 }
 
 // search source file in path, return empty string if not found
-std::string search_source_file(const std::string& filename) {
+void search_source_file(const std::string& filename_,
+                        std::vector<std::string>& out_filenames) {
+    std::string filename = trim(filename_);
     std::string out_filename;
 
+    // check list files
+    if (!filename.empty() && filename[0] == '@') {
+        search_list_file(filename.substr(1), out_filenames);
+        return;
+    }
+
+    // check m4 preprocessing
     if (str_ends_with(filename, m4_extension)) {
-        return run_m4(filename);
+        run_m4(filename, out_filenames);
+        return;
     }
-    else if (str_ends_with(filename, perl_extension)) {
-        return run_perl(filename);
+
+    // check perl preprocessing
+    if (str_ends_with(filename, perl_extension)) {
+        run_perl(filename, out_filenames);
+        return;
     }
-    else if (str_ends_with(filename, cpp_extension)) {
-        return run_cpp(filename);
+
+    // check cpp preprocessing
+    if (str_ends_with(filename, cpp_extension)) {
+        run_cpp(filename, out_filenames);
+        return;
     }
-    else {
-        // check plain filename
-        out_filename = check_source(filename);
+
+    // check plain filename
+    out_filename = check_source(filename);
+    if (!out_filename.empty()) {
+        out_filenames.push_back(out_filename);
+        return;
+    }
+
+    // check plain file in include path (and CWD)
+    out_filename = resolve_include_candidate(filename, "", false);
+    if (!out_filename.empty()) {
+        out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            return out_filename;
+            out_filenames.push_back(out_filename);
+            return;
         }
+    }
 
-        // check plain file in include path (and CWD)
-        out_filename = resolve_include_candidate(filename, "", false);
+    // check filename with .asm extension
+    std::string asm_filename = filename + asm_extension;
+    out_filename = check_source(asm_filename);
+    if (!out_filename.empty()) {
+        out_filenames.push_back(out_filename);
+        return;
+    }
+
+    // check filename with .asm extension in include path
+    out_filename = resolve_include_candidate(asm_filename, "", false);
+    if (!out_filename.empty()) {
+        out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filename = check_source(out_filename);
-            if (!out_filename.empty()) {
-                return out_filename;
-            }
+            out_filenames.push_back(out_filename);
+            return;
         }
+    }
 
-        // check filename with .asm extension
-        std::string asm_filename = filename + asm_extension;
-        out_filename = check_source(asm_filename);
+    // check filename with .o extension
+    std::string o_filename = filename + o_extension;
+    out_filename = check_source(o_filename);
+    if (!out_filename.empty()) {
+        out_filenames.push_back(out_filename);
+        return;
+    }
+
+    // check filename with .o extension in include path
+    out_filename = resolve_include_candidate(o_filename, "", false);
+    if (!out_filename.empty()) {
+        out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            return out_filename;
+            out_filenames.push_back(out_filename);
+            return;
         }
+    }
 
-        // check filename with .asm extension in include path
-        out_filename = resolve_include_candidate(asm_filename, "", false);
+    // check source file
+    asm_filename = get_asm_filename(filename);
+    out_filename = check_source(asm_filename);
+    if (!out_filename.empty()) {
+        out_filenames.push_back(out_filename);
+        return;
+    }
+
+    // check filename with .asm extension in include path
+    out_filename = resolve_include_candidate(asm_filename, "", false);
+    if (!out_filename.empty()) {
+        out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filename = check_source(out_filename);
-            if (!out_filename.empty()) {
-                return out_filename;
-            }
+            out_filenames.push_back(out_filename);
+            return;
         }
+    }
 
-        // check filename with .o extension
-        std::string o_filename = filename + o_extension;
-        out_filename = check_source(o_filename);
+    // check object file in output_dir
+    o_filename = get_o_filename(filename);
+    out_filename = check_source(o_filename);
+    if (!out_filename.empty()) {
+        out_filenames.push_back(out_filename);
+        return;
+    }
+
+    // check obejct file in output_dir in include path
+    out_filename = resolve_include_candidate(o_filename, "", false);
+    if (!out_filename.empty()) {
+        out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            return out_filename;
+            out_filenames.push_back(out_filename);
+            return;
         }
+    }
 
-        // check filename with .o extension in include path
-        out_filename = resolve_include_candidate(o_filename, "", false);
-        if (!out_filename.empty()) {
-            out_filename = check_source(out_filename);
-            if (!out_filename.empty()) {
-                return out_filename;
-            }
-        }
-
-        // check source file
-        asm_filename = get_asm_filename(filename);
-        out_filename = check_source(asm_filename);
-        if (!out_filename.empty()) {
-            return out_filename;
-        }
-
-        // check filename with .asm extension in include path
-        out_filename = resolve_include_candidate(asm_filename, "", false);
-        if (!out_filename.empty()) {
-            out_filename = check_source(out_filename);
-            if (!out_filename.empty()) {
-                return out_filename;
-            }
-        }
-
-        // check object file in output_dir
-        o_filename = get_o_filename(filename);
-        out_filename = check_source(o_filename);
-        if (!out_filename.empty()) {
-            return out_filename;
-        }
-
-        // check obejct file in output_dir in include path
-        out_filename = resolve_include_candidate(o_filename, "", false);
-        if (!out_filename.empty()) {
-            out_filename = check_source(out_filename);
-            if (!out_filename.empty()) {
-                return out_filename;
-            }
-        }
-
-        // not found, avoid cascade of errors
-        if (!g_errors.has_errors()) {
-            g_errors.error(ErrorCode::FileNotFound, filename);
-        }
-
-        return std::string();
+    // not found, avoid cascade of errors
+    if (!g_errors.has_errors()) {
+        g_errors.error(ErrorCode::FileNotFound, filename);
     }
 }
