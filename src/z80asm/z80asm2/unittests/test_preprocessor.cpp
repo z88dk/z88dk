@@ -5967,20 +5967,23 @@ TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementat
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Preprocessor: LINE with trailing tokens after filename reports error",
+TEST_CASE("Preprocessor: LINE with trailing tokens after filename ignores them",
           "[preprocessor][line][error][trailing]") {
     g_errors.reset();
     Preprocessor pp;
 
-    const std::string content = "LINE 100, \"file.asm\" extra\n";
+    const std::string content = "LINE 100, \"file.asm\" extra\nthis\n";
     pp.push_virtual_file(content, "line_trailing", 1, true);
 
     TokensLine line;
-    while (pp.next_line(line)) {}
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.location().line_num() == 100);
+    REQUIRE(line.size() >= 1);
+    REQUIRE(line[0].text() == "this");
 
-    REQUIRE(g_errors.has_errors());
-    const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Unexpected token") != std::string::npos);
+    REQUIRE_FALSE(pp.next_line(line));
+
+    REQUIRE_FALSE(g_errors.has_errors());
 }
 
 // -----------------------------------------------------------------------------
