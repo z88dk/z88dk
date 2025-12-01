@@ -587,7 +587,7 @@ $test.a1.asm
 $test.a2       ; no extension, resolve to .asm
 END
 
-capture_ok("z88dk-z80asm -v -E \@$test.lst", <<END);
+capture_ok("z88dk-z80asm -v -E \"\@$test.lst\"", <<END);
 Preprocessing file: $test.a1.asm -> $test.a1.i
 Preprocessing file: $test.a2.asm -> $test.a2.i
 END
@@ -618,7 +618,7 @@ spew("$test.list2", <<END);
 \@$test.list3
 END
 
-capture_ok("z88dk-z80asm -v -E \@$test.list2", <<END);
+capture_ok("z88dk-z80asm -v -E \"\@$test.list2\"", <<END);
 Preprocessing file: $test.a3.asm -> $test.a3.i
 END
 
@@ -639,7 +639,7 @@ spew("$test.dir/$test.linc.lst", <<END);
 $test.dir/$test.linc.asm
 END
 
-capture_ok("z88dk-z80asm -v -E -I. \@$test.dir/$test.linc.lst", <<END);
+capture_ok("z88dk-z80asm -v -E -I. \"\@$test.dir/$test.linc.lst\"", <<END);
 Preprocessing file: $test.dir/$test.linc.asm -> $test.dir/$test.linc.i
 END
 
@@ -649,8 +649,105 @@ nop
 END
 
 #------------------------------------------------------------------------------
+# Wildcard matching: *, ?, and ** (recursive directories)
+#------------------------------------------------------------------------------
+
+# Setup a directory tree with files
+path("$test.dir")->remove_tree if -d "$test.dir";
+mkdir "$test.dir";
+mkdir "$test.dir/sub1";
+mkdir "$test.dir/sub1/deeper";
+mkdir "$test.dir/sub2";
+
+# Create asm sources in various places
+unlink("$test.i");
+unlink("$test.o");
+spew("$test.dir/a1.asm", "nop");
+spew("$test.dir/a2.asm", "nop");
+spew("$test.dir/bX.asm", "nop");
+spew("$test.dir/sub1/c1.asm", "nop");
+spew("$test.dir/sub1/deeper/d1.asm", "nop");
+spew("$test.dir/sub2/e2.asm", "nop");
+
+# 1) '*' matches any number of chars in a single path component
+capture_ok("z88dk-z80asm -v -E \"$test.dir/*.asm\"", <<END);
+Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i
+Preprocessing file: $test.dir/a2.asm -> $test.dir/a2.i
+Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
+END
+
+check_text_file("$test.dir/a1.i", <<END);
+#line 1, "$test.dir/a1.asm"
+nop
+END
+check_text_file("$test.dir/a2.i", <<END);
+#line 1, "$test.dir/a2.asm"
+nop
+END
+check_text_file("$test.dir/bX.i", <<END);
+#line 1, "$test.dir/bX.asm"
+nop
+END
+
+# 2) '?' matches a single character
+capture_ok("z88dk-z80asm -v -E \"$test.dir/b?.asm\"", <<END);
+Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
+END
+
+# 3) '**' matches subdirectories recursively
+capture_ok("z88dk-z80asm -v -E \"$test.dir/**/c1.asm\"", <<END);
+Preprocessing file: $test.dir/sub1/c1.asm -> $test.dir/sub1/c1.i
+END
+check_text_file("$test.dir/sub1/c1.i", <<END);
+#line 1, "$test.dir/sub1/c1.asm"
+nop
+END
+
+# 4) '**' combined with '*.asm' to collect many files across subdirs
+capture_ok("z88dk-z80asm -v -E \"$test.dir/**/*.asm\"", <<END);
+Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i
+Preprocessing file: $test.dir/a2.asm -> $test.dir/a2.i
+Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
+Preprocessing file: $test.dir/sub1/c1.asm -> $test.dir/sub1/c1.i
+Preprocessing file: $test.dir/sub1/deeper/d1.asm -> $test.dir/sub1/deeper/d1.i
+Preprocessing file: $test.dir/sub2/e2.asm -> $test.dir/sub2/e2.i
+END
+
+# Sanity checks for a couple of recursive outputs
+check_text_file("$test.dir/sub1/deeper/d1.i", <<END);
+#line 1, "$test.dir/sub1/deeper/d1.asm"
+nop
+END
+check_text_file("$test.dir/sub2/e2.i", <<END);
+#line 1, "$test.dir/sub2/e2.asm"
+nop
+END
+
+# 5) Wildcards together with -I include path: pattern resolved from include dir
+unlink(<$test.*>);
+path("$test.dir2")->remove_tree if -d "$test.dir2";
+mkdir "$test.dir2";
+spew("$test.dir2/x1.asm", "nop");
+spew("$test.dir2/y2.asm", "nop");
+
+capture_ok("z88dk-z80asm -v -E -I$test.dir2 \"*.asm\"", <<END);
+Preprocessing file: $test.dir2/x1.asm -> $test.dir2/x1.i
+Preprocessing file: $test.dir2/y2.asm -> $test.dir2/y2.i
+END
+
+check_text_file("$test.dir2/x1.i", <<END);
+#line 1, "$test.dir2/x1.asm"
+nop
+END
+check_text_file("$test.dir2/y2.i", <<END);
+#line 1, "$test.dir2/y2.asm"
+nop
+END
+
+#------------------------------------------------------------------------------
 # cleanup
 #------------------------------------------------------------------------------
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
+path("$test.dir2")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles if Test::More->builder->is_passing;
 done_testing;

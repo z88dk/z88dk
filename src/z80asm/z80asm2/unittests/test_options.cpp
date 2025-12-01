@@ -7,14 +7,17 @@
 #define CATCH_CONFIG_MAIN
 #include "../errors.h"
 #include "../options.h"
+#include "../utils.h"
 #include "catch_amalgamated.hpp"
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <cstdio>
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
+
+namespace fs = std::filesystem;
 
 // Small helper to write a file with given contents.
 static std::string write_text_file(const std::filesystem::path& path,
@@ -23,6 +26,13 @@ static std::string write_text_file(const std::filesystem::path& path,
     ofs << contents;
     ofs.close();
     return path.generic_string();
+}
+
+static void write_file(const fs::path& p, const char* txt) {
+    fs::create_directories(p.parent_path());
+    std::ofstream ofs(p, std::ios::binary);
+    REQUIRE(ofs.is_open());
+    ofs << txt;
 }
 
 // Helper to capture std::cerr output
@@ -244,4 +254,161 @@ TEST_CASE("get_i_filename returns filename with .i extension",
           std::filesystem::path("foo.asm").replace_extension(".i").generic_string());
     CHECK(get_i_filename("bar") ==
           std::filesystem::path("bar").replace_extension(".i").generic_string());
+}
+
+//-----------------------------------------------------------------------------
+// options wildcard unit tests (simple '*' and '?' patterns)
+//-----------------------------------------------------------------------------
+
+TEST_CASE("search_source_file: '*' matches multiple files in one directory",
+          "[options][wildcards][star]") {
+    g_errors.reset();
+    std::vector<std::string> out;
+
+    // Create a temp dir with three asm files.
+    fs::path base = fs::path("wild_star_test");
+    fs::remove_all(base);
+    fs::create_directories(base);
+
+    write_file(base / "a1.asm", "nop\n");
+    write_file(base / "a2.asm", "nop\n");
+    write_file(base / "bX.asm", "nop\n");
+
+    // Pattern: *.asm
+    search_source_file((base.string() + "/*.asm"), out);
+
+    // Expect i files for each asm, same directory
+    REQUIRE(out.size() == 3);
+    // Normalize to paths for stable checks
+    std::sort(out.begin(), out.end());
+    REQUIRE(out[0] == normalize_path((base / "a1.asm").generic_string()));
+    REQUIRE(out[1] == normalize_path((base / "a2.asm").generic_string()));
+    REQUIRE(out[2] == normalize_path((base / "bX.asm").generic_string()));
+
+    fs::remove_all(base);
+}
+
+TEST_CASE("search_source_file: '?' matches a single character",
+          "[options][wildcards][question]") {
+    g_errors.reset();
+    std::vector<std::string> out;
+
+    fs::path base = fs::path("wild_qmark_test");
+    fs::remove_all(base);
+    fs::create_directories(base);
+
+    write_file(base / "bX.asm", "nop\n");
+    write_file(base / "bY.asm", "nop\n");
+    write_file(base / "bb.asm", "nop\n"); // should not match 'b?.asm'
+
+    // Pattern: b?.asm
+    search_source_file((base.string() + "/b?.asm"), out);
+
+    // Expect two i files for bX.asm and bY.asm
+    std::sort(out.begin(), out.end());
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == normalize_path((base / "bX.asm").generic_string()));
+    REQUIRE(out[1] == normalize_path((base / "bY.asm").generic_string()));
+    REQUIRE(out[2] == normalize_path((base / "bb.asm").generic_string()));
+
+    fs::remove_all(base);
+}
+
+TEST_CASE("search_source_file: '**' matches specific subdirectory file",
+          "[options][wildcards][recursive][double_star]") {
+    g_errors.reset();
+    std::vector<std::string> out;
+
+    fs::path base = fs::path("wild_recursive_test");
+    fs::remove_all(base);
+    fs::create_directories(base / "sub1" / "deeper");
+    fs::create_directories(base / "sub2");
+
+    write_file(base / "a.asm", "nop\n");
+    write_file(base / "sub1" / "b.asm", "nop\n");
+    write_file(base / "sub1" / "deeper" / "c.asm", "nop\n");
+    write_file(base / "sub2" / "d.asm", "nop\n");
+
+    // Pattern: base/**/b.asm (should match only sub1/b.asm)
+    search_source_file((base.string() + "/**/b.asm"), out);
+    REQUIRE(out.size() == 1);
+    REQUIRE(out[0] == normalize_path((base / "sub1" / "b.asm").generic_string()));
+    out.clear();
+
+    // Pattern: base/**/deeper/c.asm (should match only deeper/c.asm)
+    search_source_file((base.string() + "/**/deeper/c.asm"), out);
+    REQUIRE(out.size() == 1);
+    REQUIRE(out[0] == normalize_path((base / "sub1" / "deeper" /
+                                      "c.asm").generic_string()));
+    out.clear();
+
+    // Pattern: base/**/*.asm (should match all four .asm files)
+    search_source_file((base.string() + "/**/*.asm"), out);
+    std::sort(out.begin(), out.end());
+    REQUIRE(out.size() == 4);
+    REQUIRE(out[0] == normalize_path((base / "a.asm").generic_string()));
+    REQUIRE(out[1] == normalize_path((base / "sub1" / "b.asm").generic_string()));
+    REQUIRE(out[2] == normalize_path((base / "sub1" / "deeper" /
+                                      "c.asm").generic_string()));
+    REQUIRE(out[3] == normalize_path((base / "sub2" / "d.asm").generic_string()));
+    out.clear();
+
+    // Pattern: base/**/nonexistent.asm (no matches -> error)
+    g_errors.reset();
+    search_source_file((base.string() + "/**/nonexistent.asm"), out);
+    REQUIRE(out.empty());
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("File not found") !=
+            std::string::npos);
+
+    fs::remove_all(base);
+}
+
+TEST_CASE("search_source_file: '**/*.asm' collects all .asm files in nested subdirectories",
+          "[options][wildcards][recursive][double_star_collect]") {
+    g_errors.reset();
+    std::vector<std::string> out;
+
+    fs::path base = fs::path("wild_collect_test");
+    fs::remove_all(base);
+    fs::create_directories(base / "lvl1");
+    fs::create_directories(base / "lvl1" / "lvl2");
+    fs::create_directories(base / "lvl1b");
+    fs::create_directories(base / "lvlX" / "lvlY" / "lvlZ");
+
+    // Create .asm files at various depths
+    write_file(base / "root.asm", "nop\n");
+    write_file(base / "lvl1" / "one.asm", "nop\n");
+    write_file(base / "lvl1" / "lvl2" / "two.asm", "nop\n");
+    write_file(base / "lvl1b" / "other.asm", "nop\n");
+    write_file(base / "lvlX" / "lvlY" / "lvlZ" / "deep.asm", "nop\n");
+
+    // Non-matching file (different extension) to ensure it is skipped
+    write_file(base / "skip.txt", "nop\n");
+
+    // Pattern: base/**/*.asm
+    search_source_file((base.string() + "/**/*.asm"), out);
+
+    // Expect all five .asm files
+    std::sort(out.begin(), out.end());
+    REQUIRE(out.size() == 5);
+    REQUIRE((out[0] == normalize_path((base / "lvl1" / "lvl2" /
+                                       "two.asm").generic_string()) ||
+             out[0] == normalize_path((base / "lvl1" / "one.asm").generic_string()) ||
+             out[0] == normalize_path((base / "lvl1b" / "other.asm").generic_string()) ||
+             out[0] == normalize_path((base / "lvlX" / "lvlY" / "lvlZ" /
+                                       "deep.asm").generic_string()) ||
+             out[0] == normalize_path((base / "root.asm").generic_string())));
+    // Use set comparison for clarity
+    std::set<std::string> expected = {
+        normalize_path((base / "root.asm").generic_string()),
+        normalize_path((base / "lvl1" / "one.asm").generic_string()),
+        normalize_path((base / "lvl1" / "lvl2" / "two.asm").generic_string()),
+        normalize_path((base / "lvl1b" / "other.asm").generic_string()),
+        normalize_path((base / "lvlX" / "lvlY" / "lvlZ" / "deep.asm").generic_string())
+    };
+    std::set<std::string> actual(out.begin(), out.end());
+    REQUIRE(actual == expected);
+
+    fs::remove_all(base);
 }
