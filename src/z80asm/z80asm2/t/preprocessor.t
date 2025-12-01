@@ -3430,11 +3430,13 @@ spew("$test.asm", <<END);
 LINE 10 filename extra
 A
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
-   |LINE 10 filename extra
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with trailing tokens";
+check_text_file("$test.i", <<END);
+#line 10, "filename"
+A
+END
 
 # LINE with trailing tokens after line number and filename
 unlink("$test.i");
@@ -3442,11 +3444,13 @@ spew("$test.asm", <<END);
 LINE 10, "file.asm" extra tokens
 B
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
-   |LINE 10, "file.asm" extra tokens
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with trailing tokens after filename";
+check_text_file("$test.i", <<END);
+#line 10, "file.asm"
+B
+END
 
 # LINE with multiple trailing tokens
 unlink("$test.i");
@@ -3454,11 +3458,13 @@ spew("$test.asm", <<END);
 LINE 20, <file.inc> extra1 extra2
 C
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra1'
-   |LINE 20, <file.inc> extra1 extra2
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with multiple trailing tokens";
+check_text_file("$test.i", <<END);
+#line 20, "file.inc"
+C
+END
 
 # C_LINE with trailing tokens after line number (no filename)
 unlink("$test.i");
@@ -3466,11 +3472,13 @@ spew("$test.asm", <<END);
 C_LINE 40 filename unexpected
 E
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'unexpected'
-   |C_LINE 40 filename unexpected
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with trailing tokens";
+check_text_file("$test.i", <<END);
+#line 40, "filename"
+E
+END
 
 # C_LINE with trailing tokens after filename
 unlink("$test.i");
@@ -3478,11 +3486,13 @@ spew("$test.asm", <<END);
 C_LINE 50, "const.asm" trailing
 F
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'trailing'
-   |C_LINE 50, "const.asm" trailing
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with trailing tokens after filename";
+check_text_file("$test.i", <<END);
+#line 50, "const.asm"
+F
+END
 
 # C_LINE with multiple trailing tokens after angle-bracket filename
 unlink("$test.i");
@@ -3490,11 +3500,13 @@ spew("$test.asm", <<END);
 C_LINE 60, <angle.inc> token1 token2 token3
 G
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'token1'
-   |C_LINE 60, <angle.inc> token1 token2 token3
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with multiple trailing tokens";
+check_text_file("$test.i", <<END);
+#line 60, "angle.inc"
+G
+END
 
 # LINE with negative line number and trailing tokens
 unlink("$test.i");
@@ -3502,11 +3514,13 @@ spew("$test.asm", <<END);
 LINE -10 filename extra
 I
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
-   |LINE -10 filename extra
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with negative line number and trailing tokens";
+check_text_file("$test.i", <<END);
+#line -10, "filename"
+I
+END
 
 # C_LINE with negative line number and trailing tokens
 unlink("$test.i");
@@ -3514,11 +3528,13 @@ spew("$test.asm", <<END);
 C_LINE -20, "neg.asm" surplus
 J
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'surplus'
-   |C_LINE -20, "neg.asm" surplus
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with negative line number and trailing tokens";
+check_text_file("$test.i", <<END);
+#line -20, "neg.asm"
+J
+END
 
 # LINE with plain filename form and trailing tokens
 unlink("$test.i");
@@ -3526,11 +3542,13 @@ spew("$test.asm", <<END);
 LINE 80, plain.asm garbage
 K
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'garbage'
-   |LINE 80, plain.asm garbage
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with plain filename and trailing tokens";
+check_text_file("$test.i", <<END);
+#line 80, "plain.asm"
+K
+END
 
 # C_LINE with plain filename form and trailing tokens
 unlink("$test.i");
@@ -3538,11 +3556,13 @@ spew("$test.asm", <<END);
 C_LINE 90, plain2.asm unwanted
 L
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'unwanted'
-   |C_LINE 90, plain2.asm unwanted
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with plain filename and trailing tokens";
+check_text_file("$test.i", <<END);
+#line 90, "plain2.asm"
+L
+END
 
 # LINE with identifier as trailing token
 unlink("$test.i");
@@ -3550,11 +3570,13 @@ spew("$test.asm", <<END);
 LINE 120, "test.asm" identifier
 O
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'identifier'
-   |LINE 120, "test.asm" identifier
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on LINE with identifier as trailing token";
+check_text_file("$test.i", <<END);
+#line 120, "test.asm"
+O
+END
 
 # C_LINE with number as trailing token
 unlink("$test.i");
@@ -3562,11 +3584,13 @@ spew("$test.asm", <<END);
 C_LINE 130, <test.inc> 999
 P
 END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: '999'
-   |C_LINE 130, <test.inc> 999
+capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+Preprocessing file: $test.asm -> $test.i
 END
-ok ! -f "$test.i", "no .i file produced on C_LINE with number as trailing token";
+check_text_file("$test.i", <<END);
+#line 130, "test.inc"
+P
+END
 
 #------------------------------------------------------------------------------
 # Directive error cases: trailing tokens after single-keyword directives
