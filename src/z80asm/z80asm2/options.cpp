@@ -9,6 +9,7 @@
 #include "utils.h"
 #include <filesystem>
 #include <iostream>
+#include <set>
 
 Options g_options;
 std::vector<std::string> g_input_files;
@@ -394,11 +395,245 @@ static void search_list_file(const std::string& list_filename,
     g_errors.set_location(Location());
 }
 
+// Helper: does the pattern contain any wildcard characters?
+static bool has_wildcards(const std::string& pat) {
+    return pat.find('*') != std::string::npos || pat.find('?') != std::string::npos;
+}
+
+// Helper: split a path string into components, preserving "**" segments
+static std::vector<std::string> split_path_components(const std::string& path) {
+    std::vector<std::string> comps;
+    std::string cur;
+    for (char c : path) {
+        if (c == '/' || c == '\\') {
+            if (!cur.empty()) {
+                comps.push_back(cur);
+                cur.clear();
+            }
+        }
+        else {
+            cur.push_back(c);
+        }
+    }
+    if (!cur.empty()) {
+        comps.push_back(cur);
+    }
+    return comps;
+}
+
+// Helper: match a single name with '*' and '?' wildcards (non-recursive, no directory separators)
+static bool match_name_glob(const std::string& name, const std::string& pat) {
+    size_t n = name.size(), p = pat.size();
+    size_t i = 0, j = 0;
+    size_t star_i = std::string::npos, star_j = std::string::npos;
+
+    while (i < n) {
+        if (j < p && (pat[j] == '?' || pat[j] == name[i])) {
+            ++i;
+            ++j;
+        }
+        else if (j < p && pat[j] == '*') {
+            star_j = j++;
+            star_i = i;
+        }
+        else if (star_j != std::string::npos) {
+            j = star_j + 1;
+            i = ++star_i;
+        }
+        else {
+            return false;
+        }
+    }
+    while (j < p && pat[j] == '*') {
+        ++j;
+    }
+    return j == p;
+}
+
+// Helper: recursive matcher over path components supporting "**" for subdirectory sequences.
+// anchor keeps the textual base path as given by the pattern prefix, so results remain relative
+static void glob_walk(const std::filesystem::path& base_fs,
+                      const std::filesystem::path& anchor,
+                      const std::vector<std::string>& comps,
+                      size_t idx,
+                      std::vector<std::filesystem::path>& out) {
+    namespace fs = std::filesystem;
+
+    if (idx == comps.size()) {
+        // terminal: record files only (regular_file) using the anchor to preserve relativeness
+        if (fs::exists(base_fs) && fs::is_regular_file(base_fs)) {
+            out.push_back(anchor.lexically_normal().generic_string());
+        }
+        return;
+    }
+
+    const std::string& pat = comps[idx];
+
+    if (pat == "**") {
+        // "**" consumes zero or more directory levels
+        // 1) zero levels: continue matching next component at current base
+        glob_walk(base_fs, anchor, comps, idx + 1, out);
+
+        // 2) recurse into all subdirectories
+        if (fs::exists(base_fs) && fs::is_directory(base_fs)) {
+            std::error_code ec;
+            for (fs::recursive_directory_iterator it(base_fs, ec), end; it != end; ++it) {
+                if (ec) {
+                    break;
+                }
+                if (it->is_directory()) {
+                    // compute relative subdir path to append to anchor
+                    std::error_code ec2;
+                    fs::path rel = fs::relative(it->path(), base_fs, ec2);
+                    if (ec2) {
+                        rel = it->path().filename();
+                    }
+                    glob_walk(it->path(), anchor / rel, comps, idx + 1, out);
+                }
+            }
+        }
+        return;
+    }
+
+    // normal component (with '*'/'?' wildcards) matched against entries in current directory
+    if (!fs::exists(base_fs) || !fs::is_directory(base_fs)) {
+        // Not a directory: nothing to do here (wildcard cannot match)
+        return;
+    }
+
+    std::error_code ec;
+    for (fs::directory_iterator it(base_fs, ec), end; it != end; ++it) {
+        if (ec) {
+            break;
+        }
+        const std::string name = it->path().filename().string();
+        if (!match_name_glob(name, pat)) {
+            continue;
+        }
+
+        if (idx == comps.size() - 1) {
+            // last component: collect files only, keep relative anchor + filename
+            if (it->is_regular_file()) {
+                out.push_back((anchor /
+                               it->path().filename()).lexically_normal().generic_string());
+            }
+        }
+        else {
+            // continue with next component; advance both filesystem and textual anchors
+            glob_walk(it->path(), anchor / it->path().filename(), comps, idx + 1, out);
+        }
+    }
+}
+
+// Expand wildcards using std::filesystem only: supports '*', '?', and '**'
+static std::vector<std::string> expand_wildcards(const std::string& pattern) {
+    namespace fs = std::filesystem;
+
+    std::vector<std::string> results;
+
+    // If no wildcards, return as-is (normalized)
+    if (!has_wildcards(pattern)) {
+        results.push_back(normalize_path(pattern));
+        return results;
+    }
+
+    // Split pattern into components preserving "**"
+    std::vector<std::string> comps = split_path_components(pattern);
+
+    // Build non-wildcard prefix as base (textual) until first wildcard segment
+    fs::path base_prefix;
+    size_t wildcard_idx = 0;
+    for (; wildcard_idx < comps.size(); ++wildcard_idx) {
+        const std::string& seg = comps[wildcard_idx];
+        const bool seg_has_wildcard = (seg == "**") ||
+                                      seg.find('*') != std::string::npos ||
+                                      seg.find('?') != std::string::npos;
+        if (seg_has_wildcard) {
+            break;
+        }
+
+        if (base_prefix.empty()) {
+            base_prefix = fs::path(seg);
+        }
+        else {
+            base_prefix /= seg;
+        }
+    }
+
+    // Filesystem base for walking; if no prefix, use "." (current directory) but keep anchor empty
+    fs::path base_fs = base_prefix.empty() ? fs::path(".") : base_prefix;
+    fs::path anchor  =
+        base_prefix; // textual anchor as given by the pattern prefix (may be relative)
+
+    // Remaining components to match from the first wildcard segment
+    std::vector<std::string> rest(comps.begin() + wildcard_idx, comps.end());
+
+    // Walk and collect; ensure we keep relative paths based on the pattern prefix (anchor)
+    std::vector<fs::path> paths;
+    glob_walk(base_fs, anchor, rest, 0, paths);
+
+    for (const auto& ph : paths) {
+        try {
+            results.push_back(ph.lexically_normal().generic_string());
+        }
+        catch (...) {
+            results.push_back(ph.generic_string());
+        }
+    }
+
+    return results;
+}
+
 // search source file in path, return empty string if not found
 void search_source_file(const std::string& filename_,
                         std::vector<std::string>& out_filenames) {
     std::string filename = trim(filename_);
     std::string out_filename;
+
+    // Expand wildcards first: process each matched file independently
+    if (has_wildcards(filename)) {
+        std::vector<std::string> matches;
+
+        // 1) Expand relative/absolute pattern as provided (CWD or explicit base)
+        {
+            std::vector<std::string> m = expand_wildcards(filename);
+            matches.insert(matches.end(), m.begin(), m.end());
+        }
+
+        // 2) Also expand from each include path when the pattern is not absolute.
+        // This enables: z88dk-z80asm -Ipath "*.asm"
+        std::filesystem::path pat_path(filename);
+        if (!pat_path.is_absolute()) {
+            for (const auto& inc : g_options.include_paths) {
+                std::string combined = (std::filesystem::path(inc) / filename).generic_string();
+                std::vector<std::string> m = expand_wildcards(combined);
+                matches.insert(matches.end(), m.begin(), m.end());
+            }
+        }
+
+        // Deduplicate while preserving order
+        std::set<std::string> seen;
+        std::vector<std::string> unique_matches;
+        unique_matches.reserve(matches.size());
+        for (const auto& m : matches) {
+            if (seen.insert(m).second) {
+                unique_matches.push_back(m);
+            }
+        }
+
+        if (unique_matches.empty()) {
+            // no matches -> report not found unless an error already exists
+            if (!g_errors.has_errors()) {
+                g_errors.error(ErrorCode::FileNotFound, filename);
+            }
+            return;
+        }
+
+        for (const auto& m : unique_matches) {
+            search_source_file(m, out_filenames);
+        }
+        return;
+    }
 
     // check list files
     if (!filename.empty() && filename[0] == '@') {
