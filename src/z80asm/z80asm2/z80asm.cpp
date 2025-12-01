@@ -16,7 +16,7 @@ static bool is_option_arg(const std::string& arg,
     if (arg.size() > option.size() &&
             arg.substr(0, option.size()) == option) {
         option_arg = arg.substr(option.size());
-        if (!option_arg.empty() && option.front() == '=') {
+        if (!option_arg.empty() && option_arg.front() == '=') {
             option_arg = option_arg.substr(1);
         }
     }
@@ -83,6 +83,17 @@ int main(int argc, char* argv[]) {
                     exit_invalid_option(arg);
                 }
                 break;
+            case 'c':
+                if (is_option_arg(arg, "-cpp", option_arg)) {
+                    if (!g_options.cpp_options.empty()) {
+                        g_options.cpp_options.push_back(' ');
+                    }
+                    g_options.cpp_options += option_arg;
+                }
+                else {
+                    exit_invalid_option(arg);
+                }
+                break;
             case 'd':
                 if (arg == "-d") {
                     g_options.date_stamp = true;
@@ -101,7 +112,10 @@ int main(int argc, char* argv[]) {
                 break;
             case 'm':
                 if (is_option_arg(arg, "-m4", option_arg)) {
-                    g_options.m4_options = option_arg;
+                    if (!g_options.m4_options.empty()) {
+                        g_options.m4_options.push_back(' ');
+                    }
+                    g_options.m4_options += option_arg;
                 }
                 else {
                     exit_invalid_option(arg);
@@ -109,7 +123,10 @@ int main(int argc, char* argv[]) {
                 break;
             case 'p':
                 if (is_option_arg(arg, "-perl", option_arg)) {
-                    g_options.perl_options = option_arg;
+                    if (!g_options.perl_options.empty()) {
+                        g_options.perl_options.push_back(' ');
+                    }
+                    g_options.perl_options += option_arg;
                 }
                 else {
                     exit_invalid_option(arg);

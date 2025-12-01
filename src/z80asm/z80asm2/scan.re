@@ -35,7 +35,7 @@
     do { \
         if (p < pe && is_ident_char(*p)) { \
             g_errors.error(ErrorCode::InvalidSyntax, \
-                    "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p + 1) + "'"); \
+                    "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p) + "'"); \
             output.clear(); \
             return; \
         } \
