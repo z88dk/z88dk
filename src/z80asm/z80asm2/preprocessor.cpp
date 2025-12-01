@@ -706,7 +706,8 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
         }
     }
 
-    expect_end(line, i);
+    // cpp outputs other parameters after the filename, but we ignore them.
+    //expect_end(line, i);
 
     return true;
 }
