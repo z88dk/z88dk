@@ -248,6 +248,210 @@ TEST_CASE("Preprocessor: string escape sequences are converted to integer list",
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
+/* --------------------------------------------------------------------------
+ * NEW TESTS: empty string elements inside operand lists remove themselves
+ * and the following comma (no stray commas emitted)
+ * -------------------------------------------------------------------------- */
+
+TEST_CASE("Preprocessor: leading empty string in db list removed with following comma",
+          "[preprocessor][string][empty][list][leading]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // db "",65  -> db 65
+    const std::string content = "db \"\",65\n";
+    pp.push_virtual_file(content, "empty_string_leading", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].text() == "db");
+
+    int int_count = 0;
+    int comma_count = 0;
+    for (size_t i = 1; i < toks.size(); ++i) {
+        if (toks[i].is(TokenType::Integer)) {
+            ++int_count;
+        }
+        else if (toks[i].is(TokenType::Comma)) {
+            ++comma_count;
+        }
+    }
+    REQUIRE(int_count == 1);
+    REQUIRE(comma_count == 0);
+    REQUIRE(toks.size() == 2); // strictly 'db' + one integer
+    REQUIRE(toks[1].int_value() == 65);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: middle empty string in db list removed along with surrounding comma",
+          "[preprocessor][string][empty][list][middle]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // db 65,"",66 -> db 65,66
+    const std::string content = "db 65,\"\",66\n";
+    pp.push_virtual_file(content, "empty_string_middle", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].text() == "db");
+
+    // Collect sequence after 'db'
+    std::vector<Token> seq;
+    for (size_t i = 1; i < toks.size(); ++i) {
+        seq.push_back(toks[i]);
+    }
+
+    // Expect pattern: Integer 65 , Comma , Integer 66
+    REQUIRE(seq.size() == 3);
+    REQUIRE(seq[0].is(TokenType::Integer));
+    REQUIRE(seq[0].int_value() == 65);
+    REQUIRE(seq[1].is(TokenType::Comma));
+    REQUIRE(seq[2].is(TokenType::Integer));
+    REQUIRE(seq[2].int_value() == 66);
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: trailing empty string in db list removed with preceding comma",
+          "[preprocessor][string][empty][list][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // db 77,78,"" -> db 77,78
+    const std::string content = "db 77,78,\"\"\n";
+    pp.push_virtual_file(content, "empty_string_trailing", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].text() == "db");
+
+    int ints = 0;
+    int commas = 0;
+    std::vector<int> values;
+
+    for (size_t i = 1; i < toks.size(); ++i) {
+        if (toks[i].is(TokenType::Integer)) {
+            values.push_back(toks[i].int_value());
+            ++ints;
+        }
+        else if (toks[i].is(TokenType::Comma)) {
+            ++commas;
+        }
+    }
+
+    REQUIRE(values == std::vector<int>({ 77, 78 }));
+    REQUIRE(ints == 2);
+    REQUIRE(commas == 1); // only the comma between 77 and 78
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: multiple empty strings interleaved are all removed with their commas",
+          "[preprocessor][string][empty][list][multiple]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // db "",1,"",2,"" -> db 1,2
+    const std::string content = "db \"\",1,\"\",2,\"\"\n";
+    pp.push_virtual_file(content, "empty_string_multiple", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].text() == "db");
+
+    std::vector<int> values;
+    int commas = 0;
+    for (size_t i = 1; i < toks.size(); ++i) {
+        if (toks[i].is(TokenType::Integer)) {
+            values.push_back(toks[i].int_value());
+        }
+        else if (toks[i].is(TokenType::Comma)) {
+            ++commas;
+        }
+    }
+
+    REQUIRE(values == std::vector<int>({ 1, 2 }));
+    REQUIRE(commas == 1);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: DEFB list removes empty string element and adjacent comma",
+          "[preprocessor][string][empty][list][defb]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // DEFB "",81,82 -> DEFB 81,82
+    const std::string content = "DEFB \"\",81,82\n";
+    pp.push_virtual_file(content, "empty_string_defb_leading", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].text() == "DEFB");
+
+    std::vector<int> values;
+    int commas = 0;
+    for (size_t i = 1; i < toks.size(); ++i) {
+        if (toks[i].is(TokenType::Integer)) {
+            values.push_back(toks[i].int_value());
+        }
+        else if (toks[i].is(TokenType::Comma)) {
+            ++commas;
+        }
+    }
+
+    REQUIRE(values == std::vector<int>({ 81, 82 }));
+    REQUIRE(commas == 1);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: DEFB list removes trailing empty string and preceding comma",
+          "[preprocessor][string][empty][list][defb][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // DEFB 70,"" -> DEFB 70
+    const std::string content = "DEFB 70,\"\"\n";
+    pp.push_virtual_file(content, "empty_string_defb_trailing", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    const auto& toks = line.tokens();
+    REQUIRE(!toks.empty());
+    REQUIRE(toks[0].text() == "DEFB");
+
+    int ints = 0;
+    int commas = 0;
+    int val = -1;
+    for (size_t i = 1; i < toks.size(); ++i) {
+        if (toks[i].is(TokenType::Integer)) {
+            val = toks[i].int_value();
+            ++ints;
+        }
+        else if (toks[i].is(TokenType::Comma)) {
+            ++commas;
+        }
+    }
+
+    REQUIRE(ints == 1);
+    REQUIRE(commas == 0);
+    REQUIRE(val == 70);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
 // New test: include accepts quoted, angle and plain filename forms
 TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms",
           "[preprocessor][include][forms]") {
@@ -8276,7 +8480,7 @@ TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list eleme
 
     TokensLine line;
     REQUIRE(pp.next_line(line)); // expansion of Z1
-    REQUIRE(line.to_string() == "1 ,2");
+    REQUIRE(line.to_string() == "1,2");
 
     const auto& toks = line.tokens();
     REQUIRE(toks.size() == 3);
@@ -9497,4 +9701,1203 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Invalid argument list after REPTI") != std::string::npos);
+}
+
+// --- Added tests: REPTC multi-token non-string/non-single-integer expression concatenation branch ---
+TEST_CASE("Preprocessor: REPTC (directive) multi-token expression \"A\"+\"B\" iterates over concatenated token texts",
+          "[preprocessor][reptc][concat][string-plus-string]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Argument is three tokens: "A" , '+' , "B"
+    // Concatenation branch should build: "\"A\"+\"B\"" then iterate its characters.
+    const std::string content =
+        "REPTC ch, \"A\" + \"B\"\n"
+        "defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_concat_str_plus_str", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "defb") {
+            for (const auto& t : line.tokens()) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+    }
+
+    // Expected characters: " A " + " B "  -> 34,65,34,43,34,66,34
+    std::vector<int> expected = { 34, 65, 34, 43, 34, 66, 34 };
+    REQUIRE(ints == expected);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (directive) multi-token identifier+operator+identifier AB+CD concatenation",
+          "[preprocessor][reptc][concat][ident-plus-ident]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC ch, AB + CD\n"
+        "defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_concat_ident_plus_ident", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "defb") {
+            for (const auto& t : line.tokens()) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+    }
+
+    // Concatenated token texts: "AB+CD"
+    std::vector<int> expected = {
+        'A', 'B', '+', 'C', 'D'
+    };
+    REQUIRE(ints == expected);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC (name-directive) multi-token expression \"X\"+\"Y\" concatenation",
+          "[preprocessor][reptc][name][concat][string-plus-string]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "v REPTC \"X\" + \"Y\"\n"
+        "defb v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_name_concat_str_plus_str", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "defb") {
+            for (const auto& t : line.tokens()) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+    }
+
+    // "\"X\"+\"Y\"" -> 34,88,34,43,34,89,34
+    std::vector<int> expected = { 34, 88, 34, 43, 34, 89, 34 };
+    REQUIRE(ints == expected);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC macro-expanded multi-token expression triggers concatenation branch",
+          "[preprocessor][reptc][macro][concat]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "#define JOIN \"P\" + \"Q\"\n"
+        "REPTC ch, JOIN\n"
+        "defb ch\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_macro_concat", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "defb") {
+            for (const auto& t : line.tokens()) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+    }
+
+    // "\"P\"+\"Q\"" -> 34,80,34,43,34,81,34
+    std::vector<int> expected = { 34, 80, 34, 43, 34, 81, 34 };
+    REQUIRE(ints == expected);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTC multi-token numeric expression 123+45 concatenation",
+          "[preprocessor][reptc][concat][numeric-plus-numeric]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "REPTC d, 123 + 45\n"
+        "defb d\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "reptc_concat_numeric_plus_numeric", 1, true);
+
+    TokensLine line;
+    std::vector<int> ints;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "defb") {
+            for (const auto& t : line.tokens()) {
+                if (t.is(TokenType::Integer)) {
+                    ints.push_back(t.int_value());
+                }
+            }
+        }
+    }
+
+    // "123+45" -> '1','2','3','+','4','5'
+    std::vector<int> expected = { '1', '2', '3', '+', '4', '5' };
+    REQUIRE(ints == expected);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// REPTI: nested parentheses and commas inside arguments (depth-aware parsing)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPTI parses arguments with nested parentheses and inner commas (directive form)",
+          "[preprocessor][repti][args][nested-parens][commas]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Two arguments:
+    //  1) (A,(B,C))    -> a single argument containing inner comma between B and C
+    //  2) (D,(E,F,G))  -> a single argument containing inner commas
+    const std::string content =
+        "REPTI v, (A,(B,C)), (D,(E,F,G))\n"
+        "emit v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_nested_parens_commas_dir", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "emit") {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    // Expect exactly two emitted lines, one per argument, preserving the argument token sequences.
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "emit (A,(B,C))");
+    REQUIRE(outputs[1] == "emit (D,(E,F,G))");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI name-directive parses nested parentheses and inner commas",
+          "[preprocessor][repti][name][args][nested-parens][commas]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Name-directive form. Same two complex arguments as above.
+    const std::string content =
+        "val REPTI (X,(Y,Z)), (P,(Q,R,S))\n"
+        "use val\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_nested_parens_commas_name", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "use") {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "use (X,(Y,Z))");
+    REQUIRE(outputs[1] == "use (P,(Q,R,S))");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI treats top-level commas as separators only; inner commas remain inside argument",
+          "[preprocessor][repti][args][top-level][separator]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Three arguments separated by top-level commas. Each contains nested commas that must NOT split args.
+    const std::string content =
+        "REPTI a, (M,(N,O)), (U,(V,W)), (K,(L,M,N))\n"
+        "arg a\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_top_level_commas", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "arg") {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    REQUIRE(outputs.size() == 3);
+    REQUIRE(outputs[0] == "arg (M,(N,O))");
+    REQUIRE(outputs[1] == "arg (U,(V,W))");
+    REQUIRE(outputs[2] == "arg (K,(L,M,N))");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI nested parentheses with arithmetic tokens are preserved in single argument",
+          "[preprocessor][repti][args][nested-parens][arith]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Two arguments contain nested parentheses with operators and commas inside:
+    const std::string content =
+        "REPTI v, ((1+2),(3+4,5)), ((A+B),(C+D,E))\n"
+        "emit v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_nested_parens_arith", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outputs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "emit") {
+            outputs.push_back(line.to_string());
+        }
+    }
+
+    REQUIRE(outputs.size() == 2);
+    REQUIRE(outputs[0] == "emit ((1+2),(3+4,5))");
+    REQUIRE(outputs[1] == "emit ((A+B),(C+D,E))");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// REPTI: arguments that expand to multiple lines are flattened before substitution
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPTI (directive) flattens multi-line macro argument before substitution",
+          "[preprocessor][repti][args][multiline][flatten]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define a macro ARG() that expands to two lines: "A" and "B".
+    // REPTI var, ARG() should treat the expansion as a single flattened argument when substituting into the body.
+    const std::string content =
+        "MACRO ARG()\n"
+        "A\n"
+        "B\n"
+        "ENDM\n"
+        "REPTI var, ARG()\n"
+        "emit var\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_flatten_arg", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "emit") {
+            outs.push_back(line.to_string());
+        }
+    }
+
+    // The single argument from ARG() is flattened to "A B" tokens in one line.
+    REQUIRE(outs.size() == 1);
+    REQUIRE(outs[0] == "emit A B");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI (name-directive) flattens multi-line macro argument before substitution",
+          "[preprocessor][repti][name][args][multiline][flatten]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Name-directive variant: val REPTI ARG().
+    const std::string content =
+        "MACRO ARG2()\n"
+        "X\n"
+        "Y\n"
+        "ENDM\n"
+        "val REPTI ARG2()\n"
+        "use val\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_name_flatten_arg", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "use") {
+            outs.push_back(line.to_string());
+        }
+    }
+
+    REQUIRE(outs.size() == 1);
+    REQUIRE(outs[0] == "use X Y");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI flattens each multi-line argument independently (two args both expand to two lines)",
+          "[preprocessor][repti][args][multiline][flatten][two-args]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Two macros each expand to two lines; REPTI over both should produce two output lines,
+    // each with the flattened tokens of the corresponding macro expansion.
+    const std::string content =
+        "MACRO M1()\n"
+        "P\n"
+        "Q\n"
+        "ENDM\n"
+        "MACRO M2()\n"
+        "R\n"
+        "S\n"
+        "ENDM\n"
+        "REPTI v, M1(), M2()\n"
+        "show v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_flatten_two_args", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> outs;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "show") {
+            outs.push_back(line.to_string());
+        }
+    }
+
+    REQUIRE(outs.size() == 2);
+    REQUIRE(outs[0] == "show P Q");
+    REQUIRE(outs[1] == "show R S");
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI does not rename LOCALs inside flattened argument tokens",
+          "[preprocessor][repti][args][multiline][flatten][local-preserve]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // ARG() produces identifier 'tmp' across two lines. The REPTI body declares LOCAL tmp.
+    // Flattened argument 'tmp' must NOT be renamed (local renaming applies only to body tokens, not substituted args).
+    const std::string content =
+        "MACRO ARG()\n"
+        "tmp\n"
+        "tmp\n"
+        "ENDM\n"
+        "REPTI v, ARG()\n"
+        "LOCAL tmp\n"
+        "emit v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_flatten_local_preserve", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    // First emitted line from REPTI: 'emit tmp tmp'
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "emit");
+    // Ensure argument tokens are not renamed (no 'tmp_1' inside v)
+    bool has_tmp = false, has_tmp_renamed = false;
+    for (const auto& t : line.tokens()) {
+        if (t.is(TokenType::Identifier) && t.text() == "tmp") {
+            has_tmp = true;
+        }
+        if (t.is(TokenType::Identifier) && t.text().find("tmp_") == 0) {
+            has_tmp_renamed = true;
+        }
+    }
+    REQUIRE(has_tmp);
+    REQUIRE_FALSE(has_tmp_renamed);
+
+    // No additional 'emit' lines expected (single argument)
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// REPTI: whitespace-only argument vs truly empty list
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: REPTI with a whitespace-only argument emits body once with empty substitution",
+          "[preprocessor][repti][args][whitespace-only]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // First argument is whitespace-only between commas; second is a normal identifier.
+    // The whitespace-only argument should be parsed as an empty TokensLine, causing the
+    // substitution of 'v' to insert nothing (i.e., 'db' alone on that iteration).
+    const std::string content =
+        "REPTI v,  , X\n"
+        "db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_whitespace_only_arg", 1, true);
+
+    TokensLine line;
+    std::vector<std::vector<std::string>> outputs;
+
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "db") {
+            std::vector<std::string> toks;
+            for (const auto& t : line.tokens()) {
+                toks.push_back(t.text());
+            }
+            outputs.push_back(std::move(toks));
+        }
+    }
+
+    // Expect two iterations:
+    // 1) whitespace-only arg -> 'db' only (no substituted value)
+    // 2) 'X' -> 'db X'
+    REQUIRE(outputs.size() == 2);
+
+    // First: only 'db'
+    REQUIRE(outputs[0].size() == 1);
+    REQUIRE(outputs[0][0] == "db");
+
+    // Second: 'db X'
+    REQUIRE(outputs[1].size() >= 2);
+    REQUIRE(outputs[1][0] == "db");
+    REQUIRE(outputs[1][1] == "X");
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: REPTI with truly empty list emits no lines",
+          "[preprocessor][repti][args][empty-list]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // No arguments after REPTI -> parse_argument_list returns empty list.
+    // The body must be consumed but no output lines emitted.
+    const std::string content =
+        "REPTI v,\n"
+        "db v\n"
+        "ENDR\n";
+    pp.push_virtual_file(content, "repti_empty_list", 1, true);
+
+    TokensLine line;
+    int emitted = 0;
+    while (pp.next_line(line)) {
+        if (!line.empty() && line[0].text() == "db") {
+            ++emitted;
+        }
+    }
+
+    REQUIRE(emitted == 0);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// LOCAL outside MACRO/REPT constructs: should be ignored (no output produced)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: LOCAL outside any construct produces no output and no errors",
+          "[preprocessor][local][outside][basic]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LOCAL tmp\n"
+        "AFTER\n";
+    pp.push_virtual_file(content, "local_outside_basic", 1, true);
+
+    TokensLine line;
+
+    // First logical line must be the 'AFTER' line (LOCAL is ignored)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "AFTER");
+
+    // No more lines
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: LOCAL with parentheses outside any construct is ignored",
+          "[preprocessor][local][outside][paren]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LOCAL(tmp1,tmp2)\n"
+        "GO\n";
+    pp.push_virtual_file(content, "local_outside_paren", 1, true);
+
+    TokensLine line;
+
+    // Only the following normal line should appear
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "GO");
+
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: multiple LOCAL lines outside constructs are all ignored",
+          "[preprocessor][local][outside][multiple]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "LOCAL A\n"
+        "LOCAL(B,C)\n"
+        "LOCAL D\n"
+        "ENDLINE\n";
+    pp.push_virtual_file(content, "local_outside_multiple", 1, true);
+
+    TokensLine line;
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "ENDLINE");
+
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: LOCAL outside constructs with trailing tokens still produces no output (error reported)",
+          "[preprocessor][local][outside][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Trailing token after LOCAL should trigger an error ("Unexpected token")
+    // but must not emit any LOCAL-related output line.
+    const std::string content =
+        "LOCAL X extra\n"
+        "NEXT\n";
+    pp.push_virtual_file(content, "local_outside_trailing", 1, true);
+
+    TokensLine line;
+
+    // Drain all lines (should only get 'NEXT')
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "NEXT");
+    REQUIRE_FALSE(pp.next_line(line));
+
+    // Ensure an error was recorded due to trailing token after LOCAL
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected token") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: LOCAL outside constructs with syntax error still produces no output (error reported)",
+          "[preprocessor][local][outside][trailing]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Trailing token after LOCAL should trigger an error ("Unexpected token")
+    // but must not emit any LOCAL-related output line.
+    const std::string content =
+        "LOCAL ?\n"
+        "NEXT\n";
+    pp.push_virtual_file(content, "local_outside_trailing", 1, true);
+
+    TokensLine line;
+
+    // Drain all lines (should only get 'NEXT')
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "NEXT");
+    REQUIRE_FALSE(pp.next_line(line));
+
+    // Ensure an error was recorded due to trailing token after LOCAL
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Invalid LOCAL parameter list") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: LOCAL outside constructs interleaved with statements yields only statements",
+          "[preprocessor][local][outside][interleave]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "START\n"
+        "LOCAL T\n"
+        "MID\n"
+        "LOCAL(U,V)\n"
+        "END\n";
+    pp.push_virtual_file(content, "local_outside_interleave", 1, true);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line[0].text());
+        }
+    }
+
+    REQUIRE(out == std::vector<std::string>({ "START", "MID", "END" }));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// PRAGMA: unknown pragmata are ignored (no output, no errors)
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: unknown PRAGMA is ignored and produces no output",
+          "[preprocessor][pragma][unknown][ignore]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Unknown pragma should be ignored
+    const std::string content =
+        "PRAGMA FOO\n"
+        "NEXT\n";
+    pp.push_virtual_file(content, "pragma_unknown_basic", 1, true);
+
+    TokensLine line;
+
+    // Only the subsequent normal line should appear
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "NEXT");
+
+    // No more lines
+    REQUIRE_FALSE(pp.next_line(line));
+    // Unknown pragma must not raise errors
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: unknown PRAGMA with trailing tokens is still ignored (no errors)",
+          "[preprocessor][pragma][unknown][trailing][ignore]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Unknown pragma with extra tokens; still ignored by implementation
+    const std::string content =
+        "PRAGMA UNKNOWN extra tokens here\n"
+        "AFTER\n";
+    pp.push_virtual_file(content, "pragma_unknown_trailing", 1, true);
+
+    TokensLine line;
+
+    // Only the following normal line should appear
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.empty());
+    REQUIRE(line[0].text() == "AFTER");
+
+    // No more lines
+    REQUIRE_FALSE(pp.next_line(line));
+    // Unknown pragma must not raise errors
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// INCLUDE of same file via different relative paths resolving to same absolute path
+// Verifies cache + included_once_ behavior (with PRAGMA ONCE, include guards, and without guards).
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion across path variants (inc and ./inc)",
+          "[preprocessor][include][pragma_once][path-variants]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "po_variants.inc";
+    const std::string mainf = "po_variants_main.asm";
+
+    // Create include with PRAGMA ONCE
+    {
+        std::ofstream o(inc, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "PRAGMA ONCE\n";
+        o << "UNIQUELINE\n";
+    }
+
+    // Main includes same file via two path variants
+    {
+        std::ofstream o(mainf, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inc << "\"\n";
+        o << "#include \"./" << inc << "\"\n";
+        o << "AFTER\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line[0].text());
+        }
+    }
+
+    // Only one body line emitted due to PRAGMA ONCE, then AFTER
+    REQUIRE(out.size() == 2);
+    REQUIRE(out[0] == "UNIQUELINE");
+    REQUIRE(out[1] == "AFTER");
+
+    // Dependencies record both include attempts (duplicates allowed)
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    // Both includes normalize to the same path string
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: include guard prevents second inclusion across path variants (inc and ./inc)",
+          "[preprocessor][include][guard][path-variants]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "ig_variants.inc";
+    const std::string mainf = "ig_variants_main.asm";
+
+    // Include guard file
+    {
+        std::ofstream o(inc, std::ios::binary);
+        REQUIRE(o.is_open());
+        o <<
+          "#ifndef IG_VARIANTS\n"
+          "#define IG_VARIANTS\n"
+          "GUARDED_LINE\n"
+          "#endif\n";
+    }
+
+    // Main includes same file via two path variants
+    {
+        std::ofstream o(mainf, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "#include \"./" << inc << "\"\n";
+        o << "#include \"" << inc << "\"\n";
+        o << "AFTER\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line.to_string());
+        }
+    }
+
+    // Expect guard define then the guarded line, then AFTER
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "DEFC IG_VARIANTS = 1");
+    REQUIRE(out[1] == "GUARDED_LINE");
+    REQUIRE(out[2] == "AFTER");
+
+    // Both include attempts are recorded in dependencies
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: without PRAGMA ONCE or guards, including same file via path variants emits twice",
+          "[preprocessor][include][path-variants][no-guard]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "noguard_variants.inc";
+    const std::string mainf = "noguard_variants_main.asm";
+
+    {
+        std::ofstream o(inc, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "LINE_BODY\n";
+    }
+    {
+        std::ofstream o(mainf, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inc << "\"\n";
+        o << "#include \"./" << inc << "\"\n";
+        o << "TAIL\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    std::vector<std::string> out;
+    while (pp.next_line(line)) {
+        if (!line.empty()) {
+            out.push_back(line[0].text());
+        }
+    }
+
+    // Body appears twice (no once/guard), then TAIL
+    REQUIRE(out.size() == 3);
+    REQUIRE(out[0] == "LINE_BODY");
+    REQUIRE(out[1] == "LINE_BODY");
+    REQUIRE(out[2] == "TAIL");
+
+    // Both include attempts are recorded
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() == 3);
+    REQUIRE(deps[1] == inc);
+    REQUIRE(deps[2] == inc);
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// -----------------------------------------------------------------------------
+// Recursive include: Self-include vs mutual include
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: self-include of current file triggers RecursiveInclude error (plain path)",
+          "[preprocessor][include][recursive][self]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fname = "self_plain.asm";
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"" << fname << "\"\n";
+        ofs << "AFTER\n";
+    }
+
+    pp.push_file(fname);
+
+    TokensLine line;
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    REQUIRE(produced == 0);
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Recursive include") != std::string::npos);
+    REQUIRE(msg.find(fname) != std::string::npos);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("Preprocessor: self-include of current file triggers RecursiveInclude error (normalized './' path)",
+          "[preprocessor][include][recursive][self][normalize]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string fname = "self_norm.asm";
+    {
+        std::ofstream ofs(fname, std::ios::binary);
+        REQUIRE(ofs.is_open());
+        ofs << "#include \"./" << fname << "\"\n";
+        ofs << "AFTER\n";
+    }
+
+    pp.push_file(fname);
+
+    TokensLine line;
+    int produced = 0;
+    while (pp.next_line(line)) {
+        ++produced;
+    }
+
+    REQUIRE(produced == 0);
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Recursive include") != std::string::npos);
+    REQUIRE(msg.find(fname) != std::string::npos);
+
+    std::remove(fname.c_str());
+}
+
+// -----------------------------------------------------------------------------
+// BINARY/INCBIN missing file errors when invoked from included source files
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: BINARY missing file invoked from included source reports FileNotFound",
+          "[preprocessor][binary][error][missing][via-include]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "bin_missing_inc.asm";
+    const std::string mainf = "bin_missing_main.asm";
+    const std::string missing = "does_not_exist_binary.bin";
+
+    // Included file that tries to BINARY a missing file
+    {
+        std::ofstream o(inc, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "BINARY \"" << missing << "\"\n";
+    }
+    // Main file includes the above
+    {
+        std::ofstream o(mainf, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inc << "\"\n";
+        o << "AFTER\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    // Drain all lines
+    while (pp.next_line(line)) {}
+
+    // Error reported as FileNotFound for the missing binary
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("File not found") != std::string::npos);
+    REQUIRE(msg.find(missing) != std::string::npos);
+
+    // Dependencies should record the include and the missing binary filename
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() >= 2);
+    REQUIRE(std::find(deps.begin(), deps.end(), inc) != deps.end());
+    REQUIRE(std::find(deps.begin(), deps.end(), missing) != deps.end());
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+}
+
+TEST_CASE("Preprocessor: INCBIN missing file invoked from included source reports FileNotFound",
+          "[preprocessor][binary][error][missing][incbin][via-include]") {
+    g_errors.reset();
+    Preprocessor::clear_file_cache();
+
+    const std::string inc = "incbin_missing_inc.asm";
+    const std::string mainf = "incbin_missing_main.asm";
+    const std::string missing = "does_not_exist_incbin.bin";
+
+    // Included file that tries to INCBIN a missing file
+    {
+        std::ofstream o(inc, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "INCBIN \"" << missing << "\"\n";
+    }
+    // Main file includes the above
+    {
+        std::ofstream o(mainf, std::ios::binary);
+        REQUIRE(o.is_open());
+        o << "#include \"" << inc << "\"\n";
+        o << "TAIL\n";
+    }
+
+    Preprocessor pp;
+    pp.push_file(mainf);
+
+    TokensLine line;
+    // Drain all lines
+    while (pp.next_line(line)) {}
+
+    // Error reported as FileNotFound for the missing binary
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("File not found") != std::string::npos);
+    REQUIRE(msg.find(missing) != std::string::npos);
+
+    // Dependencies should record the include and the missing binary filename
+    const auto& deps = pp.dependency_filenames();
+    REQUIRE(deps.size() >= 2);
+    REQUIRE(std::find(deps.begin(), deps.end(), inc) != deps.end());
+    REQUIRE(std::find(deps.begin(), deps.end(), missing) != deps.end());
+
+    std::remove(inc.c_str());
+    std::remove(mainf.c_str());
+}
+
+// -----------------------------------------------------------------------------
+// DEFL negative result tokenization: stored as Minus + positive Integer
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: DEFL negative literal stores Minus + positive Integer tokens",
+          "[preprocessor][defl][negative][tokens]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // Define a symbol with a negative literal, then use it standalone and inside another line.
+    const std::string content =
+        "NEG DEFL -5\n"
+        "NEG\n"
+        "db NEG\n";
+    pp.push_virtual_file(content, "defl_negative_tokens", 1, true);
+
+    TokensLine line;
+
+    // Expansion of 'NEG' should yield two tokens: Minus and Integer(5)
+    REQUIRE(pp.next_line(line));
+    const auto& toks1 = line.tokens();
+    REQUIRE(toks1.size() == 2);
+    REQUIRE(toks1[0].is(TokenType::Minus));
+    REQUIRE(toks1[1].is(TokenType::Integer));
+    REQUIRE(toks1[1].int_value() == 5);
+
+    // Next line: 'db NEG' should expand to 'db - 5' (Minus + Integer)
+    REQUIRE(pp.next_line(line));
+    const auto& toks2 = line.tokens();
+    REQUIRE(toks2.size() == 3);
+    REQUIRE(toks2[0].is(TokenType::Identifier));
+    REQUIRE(toks2[0].text() == "db");
+    REQUIRE(toks2[1].is(TokenType::Minus));
+    REQUIRE(toks2[2].is(TokenType::Integer));
+    REQUIRE(toks2[2].int_value() == 5);
+
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: DEFL negative via unary minus on macro stores Minus + positive Integer tokens",
+          "[preprocessor][defl][negative][macro][tokens]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // A = 3, NEG2 = -A. Verify tokenization of the stored body when used.
+    const std::string content =
+        "#define A 3\n"
+        "NEG2 DEFL -A\n"
+        "NEG2\n"
+        "db NEG2\n";
+    pp.push_virtual_file(content, "defl_negative_macro_tokens", 1, true);
+
+    TokensLine line;
+
+    // First non-directive line after macro define should be the expansion of NEG2 (Minus + Integer(3))
+    REQUIRE(pp.next_line(line)); // DEFC A = 3
+    REQUIRE(line.size() == 4);
+    REQUIRE(line[0].keyword() == Keyword::DEFC);
+    REQUIRE(line[1].is(TokenType::Identifier));
+    REQUIRE(line[1].text() == "A");
+    REQUIRE(line[2].is(TokenType::EQ));
+    REQUIRE(line[3].is(TokenType::Integer));
+    REQUIRE(line[3].int_value() == 3);
+
+    // Expansion of 'NEG2' -> Minus + Integer(3)
+    REQUIRE(pp.next_line(line));
+    const auto& toks1 = line.tokens();
+    REQUIRE(toks1.size() == 2);
+    REQUIRE(toks1[0].is(TokenType::Minus));
+    REQUIRE(toks1[1].is(TokenType::Integer));
+    REQUIRE(toks1[1].int_value() == 3);
+
+    // 'db NEG2' -> 'db - 3'
+    REQUIRE(pp.next_line(line));
+    const auto& toks2 = line.tokens();
+    REQUIRE(toks2.size() == 3);
+    REQUIRE(toks2[0].is(TokenType::Identifier));
+    REQUIRE(toks2[0].text() == "db");
+    REQUIRE(toks2[1].is(TokenType::Minus));
+    REQUIRE(toks2[2].is(TokenType::Integer));
+    REQUIRE(toks2[2].int_value() == 3);
+
+    REQUIRE_FALSE(pp.next_line(line));
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+// New tests: #line accepts optional comma before filename (m4 output compatibility)
+TEST_CASE("Preprocessor: #line accepts optional comma before filename",
+          "[preprocessor][hashline]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    // First #line uses a comma (as commonly emitted by m4), second one without comma
+    const std::string content =
+        "#line 10, \"m4_out.asm\"\n"
+        "first\n"
+        "#line 20 \"m4_nocomma.asm\"\n"
+        "second\n";
+
+    pp.push_virtual_file(content, "hashline_m4", 1, true);
+
+    TokensLine line;
+
+    // After '#line 10, "m4_out.asm"' the next logical line is 'first' at (m4_out.asm:10)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line[0].text() == "first");
+    REQUIRE(line.location().line_num() == 10);
+    REQUIRE(line.location().filename() == "m4_out.asm");
+
+    // After '#line 20 "m4_nocomma.asm"' the next logical line is 'second' at (m4_nocomma.asm:20)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line[0].text() == "second");
+    REQUIRE(line.location().line_num() == 20);
+    REQUIRE(line.location().filename() == "m4_nocomma.asm");
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: cpp style '# nr \"file\"' sets logical location (quoted filename)",
+          "[preprocessor][hashline][cpp]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "# 10 \"cpp1.asm\"\n"
+        "A\n"
+        "# 20, \"cpp2.asm\"\n"
+        "B\n"
+        "# 30 \"cpp3.asm\"  \n"
+        "C\n";
+
+    pp.push_virtual_file(content, "cpp_hashline_test", 1, true);
+
+    TokensLine line;
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].text() == "A");
+    REQUIRE(line.location().line_num() == 10);
+    REQUIRE(line.location().filename() == "cpp1.asm");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].text() == "B");
+    REQUIRE(line.location().line_num() == 20);
+    REQUIRE(line.location().filename() == "cpp2.asm");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].text() == "C");
+    REQUIRE(line.location().line_num() == 30);
+    REQUIRE(line.location().filename() == "cpp3.asm");
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: cpp style '# nr' without filename sets logical line number only",
+          "[preprocessor][hashline][cpp][nofile]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "# 100\n"
+        "L1\n"
+        "L2\n";
+
+    pp.push_virtual_file(content, "cpp_hashline_nofile", 1, true);
+
+    TokensLine line;
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].text() == "L1");
+    REQUIRE(line.location().line_num() == 100);
+    REQUIRE(line.location().filename() == "cpp_hashline_nofile");
+
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].text() == "L2");
+    REQUIRE(line.location().line_num() == 101);
+    REQUIRE(line.location().filename() == "cpp_hashline_nofile");
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: cpp style '# nr , \"file\"' with comma accepted",
+          "[preprocessor][hashline][cpp][comma]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    const std::string content =
+        "# 42, \"withcomma.asm\"\n"
+        "X\n";
+
+    pp.push_virtual_file(content, "cpp_hashline_comma", 1, true);
+
+    TokensLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line[0].text() == "X");
+    REQUIRE(line.location().line_num() == 42);
+    REQUIRE(line.location().filename() == "withcomma.asm");
+    REQUIRE_FALSE(g_errors.has_errors());
 }

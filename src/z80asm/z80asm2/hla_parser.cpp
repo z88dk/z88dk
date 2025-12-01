@@ -285,17 +285,19 @@ std::unique_ptr<Expr> Parser::parse_not() {
     const Token* t = peek();
     if (t && t->type() == TokenType::LeftParen &&
             is_paren_boolean_expr(tokens_, i_)) {
-        // consume '('
-        ++i_;
+        ++i_; // consume '('
         auto inner = parse_or();
         expect(TokenType::RightParen, "')' after parenthesized boolean expression");
         return inner;
     }
 
-    // Standalone flag condition: Z, NZ, C, NC, PO, PE, P, M
-    const Token* tf = peek();
-    if (tf && tf->type() == TokenType::Identifier) {
-        switch (tf->keyword()) {
+    // Standalone flag condition:
+    // Ambiguity: 'C' may be register C (comparison like C == 3) OR carry flag test.
+    // Resolve by treating it as a flag test ONLY if the next token is NOT a relational operator.
+    if (const Token* tf = peek(); tf && tf->type() == TokenType::Identifier) {
+        Keyword kw = tf->keyword();
+        bool is_flag_kw = false;
+        switch (kw) {
         case Keyword::Z:
         case Keyword::NZ:
         case Keyword::C:
@@ -303,14 +305,29 @@ std::unique_ptr<Expr> Parser::parse_not() {
         case Keyword::PO:
         case Keyword::PE:
         case Keyword::P:
-        case Keyword::M: {
-            auto f = std::make_unique<FlagTest>();
-            f->cond = tf->keyword();
-            ++i_;
-            return f;
-        }
+        case Keyword::M:
+            is_flag_kw = true;
+            break;
         default:
             break;
+        }
+
+        if (is_flag_kw) {
+            const Token* next = peek(1);
+            bool next_is_rel =
+                next &&
+                (next->is(TokenType::EQ) || next->is(TokenType::NE) ||
+                 next->is(TokenType::LT) || next->is(TokenType::LE) ||
+                 next->is(TokenType::GT) || next->is(TokenType::GE));
+
+            // If a relational operator follows, we defer to parse_rel() so that
+            // the identifier is interpreted as a register operand (e.g. C == 3).
+            if (!next_is_rel) {
+                auto f = std::make_unique<FlagTest>();
+                f->cond = kw;
+                ++i_;
+                return f;
+            }
         }
     }
 

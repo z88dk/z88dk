@@ -193,14 +193,10 @@ std::string TokensLine::to_string() const {
                t == TokenType::Float;
     };
 
-    auto is_prefix = [](TokenType t) {
-        return t == TokenType::Dollar || t == TokenType::Modulus ||
-               t == TokenType::At;
-    };
-
     for (unsigned i = 0; i < tokens_.size(); ++i) {
         const auto& tok = tokens_[i];
         char last_char = out.empty() ? ' ' : out.back();
+        char first_char = tok.text().empty() ? ' ' : tok.text().front();
 
         if (i > 0 && last_char != ' ') {
             const auto& prev = tokens_[i - 1];
@@ -209,7 +205,13 @@ std::string TokensLine::to_string() const {
             if (is_idnum(prev.type()) && is_idnum(tok.type())) {
                 need_space = true;
             }
-            else if (is_prefix(prev.type()) && is_idnum(tok.type())) {
+            else if (prev.type() == TokenType::Dollar && is_hex_char(first_char)) {
+                // $ followed by hex digit could be part of a hex number
+                need_space = true;
+            }
+            else if ((prev.type() == TokenType::Modulus || prev.type() == TokenType::At) &&
+                     is_bin_char(first_char)) {
+                // % followed by number could be part of a binary number
                 need_space = true;
             }
             else {

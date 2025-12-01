@@ -656,7 +656,9 @@ bool Preprocessor::parse_macro_args(const TokensLine& line, unsigned& i,
 bool Preprocessor::parse_argument_list(const TokensLine& line, unsigned& i,
                                        std::vector<TokensLine>& out_args) {
     return parse_args_impl(line, i, out_args, false);
-}// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
+}
+
+// Parse common LINE/C_LINE argument forms: <linenum> [ , "filename" ]
 bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
                                    int& out_linenum, std::string& out_filename,
                                    Keyword keyword) const {
@@ -678,15 +680,29 @@ bool Preprocessor::parse_line_args(const TokensLine& line, unsigned& i,
     ++i;
 
     out_filename.clear();
+
+    // Optional comma before filename
     if (i < line.size() && line[i].is(TokenType::Comma)) {
         ++i;
-        // Accept quoted or plain filename after comma.
+    }
+
+    // Optional filename (with or without comma)
+    if (i < line.size()) {
+        std::string fname;
         bool is_angle = false;
-        if (!parse_filename(line, i, out_filename, is_angle)) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           std::string("Expected filename after comma in ") + keyword_to_string(keyword) +
-                           " directive");
-            return false;
+        const unsigned before_fname = i;
+        if (parse_filename(line, i, fname, is_angle)) {
+            out_filename = fname;
+        }
+        else {
+            // If there are leftover tokens but not a valid filename, error out.
+            // This catches cases like: LINE 100 , <invalid>
+            // or LINE 100 extra (when 'extra' is not a valid filename token sequence)
+            if (before_fname < line.size()) {
+                g_errors.error(ErrorCode::InvalidSyntax,
+                               std::string("Unexpected token: '") + line[before_fname].text() + "'");
+                return false;
+            }
         }
     }
 
@@ -911,8 +927,13 @@ void Preprocessor::process_directive(const TokensLine& line, unsigned& i,
     case Keyword::MACRO:
         process_macro(line, i);
         break;
-    case Keyword::LOCAL:
+    case Keyword::LOCAL: {
+        // Validate LOCAL syntax outside of MACRO/REPT by parsing args and enforcing end-of-line.
+        // Any malformed LOCAL line will raise an error via expect_end or parse_params_list failure.
+        std::vector<std::string> _discard;
+        process_local(line, i, _discard);
         break;
+    }
     case Keyword::EXITM:
         process_exitm(line, i);
         break;
@@ -1350,7 +1371,12 @@ void Preprocessor::do_defl(const TokensLine& line, unsigned& i,
     TokensLine final_body(expanded_body.location());
     if (eval_const_expr(expanded_body, value, true)) {
         final_body.clear_tokens();
-        final_body.push_back(Token(TokenType::Integer, std::to_string(value), value));
+        if (value < 0) {
+            final_body.push_back(Token(TokenType::Minus, "-", false));
+            value = -value;
+        }
+        final_body.push_back(Token(TokenType::Integer, std::to_string(value), value,
+                                   false));
     }
     else {
         final_body = expanded_body; // preserve list / complex tokens
@@ -2314,48 +2340,50 @@ void Preprocessor::process_local(const TokensLine& line, unsigned& i,
                                  std::vector<std::string>& out_locals) {
     // `i` is positioned right after the LOCAL keyword (spaces skipped by is_directive).
     // Accept identifiers list with or without parentheses. If parsing fails, accept bare "LOCAL".
-    unsigned before = i;
     std::vector<std::string> local_names;
-    if (parse_params_list(line, i, local_names)) {
-        // Append parsed names, reporting duplicates across the whole body
-        // (duplicates inside the same LOCAL line are already caught by parse_params_list)
-        for (const auto& ln : local_names) {
-            bool duplicate = false;
-            // Check collision with previously declared LOCALs in this body
-            if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
-                duplicate = true;
-            }
-            // Check collision with MACRO parameter names
-            if (!duplicate && current_params_ptr_ &&
-                    std::find(current_params_ptr_->begin(), current_params_ptr_->end(),
-                              ln) != current_params_ptr_->end()) {
-                duplicate = true;
-            }
-            // Check collision with current iteration variable (REPTC / REPTI)
-            if (!duplicate && !current_iteration_var_.empty()
-                    && ln == current_iteration_var_) {
-                duplicate = true;
-            }
-            if (duplicate) {
-                g_errors.set_location(line.location());
-                g_errors.set_expanded_line(line.to_string());
-                g_errors.error(ErrorCode::DuplicateDefinition, ln);
-                continue; // skip adding duplicate
-            }
-            if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
-                // Report and skip adding the duplicate name
-                g_errors.set_location(line.location());
-                g_errors.set_expanded_line(line.to_string());
-                g_errors.error(ErrorCode::DuplicateDefinition, ln);
-                continue;
-            }
-            out_locals.push_back(ln);
+    if (!parse_params_list(line, i, local_names)) {
+        g_errors.set_location(line.location());
+        g_errors.set_expanded_line(line.to_string());
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Invalid LOCAL parameter list");
+        return;
+    }
+
+    // Append parsed names, reporting duplicates across the whole body
+    // (duplicates inside the same LOCAL line are already caught by parse_params_list)
+    for (const auto& ln : local_names) {
+        bool duplicate = false;
+        // Check collision with previously declared LOCALs in this body
+        if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
+            duplicate = true;
         }
+        // Check collision with MACRO parameter names
+        if (!duplicate && current_params_ptr_ &&
+                std::find(current_params_ptr_->begin(), current_params_ptr_->end(),
+                          ln) != current_params_ptr_->end()) {
+            duplicate = true;
+        }
+        // Check collision with current iteration variable (REPTC / REPTI)
+        if (!duplicate && !current_iteration_var_.empty()
+                && ln == current_iteration_var_) {
+            duplicate = true;
+        }
+        if (duplicate) {
+            g_errors.set_location(line.location());
+            g_errors.set_expanded_line(line.to_string());
+            g_errors.error(ErrorCode::DuplicateDefinition, ln);
+            continue; // skip adding duplicate
+        }
+        if (std::find(out_locals.begin(), out_locals.end(), ln) != out_locals.end()) {
+            // Report and skip adding the duplicate name
+            g_errors.set_location(line.location());
+            g_errors.set_expanded_line(line.to_string());
+            g_errors.error(ErrorCode::DuplicateDefinition, ln);
+            continue;
+        }
+        out_locals.push_back(ln);
     }
-    else {
-        // Restore to allow "LOCAL" with no params
-        i = before;
-    }
+
     // Validate no trailing tokens
     expect_end(line, i);
 }
@@ -2379,42 +2407,38 @@ void Preprocessor::process_pragma(const TokensLine& line, unsigned& i) {
 // Replace strings by comma-separated integers
 bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
     // Fast path: if no string tokens present, only trimming may be needed.
-    if (!line.has_token_type(TokenType::String)) { // replaced has_token_type
+    if (!line.has_token_type(TokenType::String)) {
         out = line;
         return false;
     }
 
-    // Precompute capacity after expanding strings into comma-separated integers
-    size_t capacity = 0;
-    for (unsigned k = 0; k < line.size(); ++k) {
-        const Token& t = line[k];
-        if (t.is(TokenType::String)) {
-            size_t L = t.string_value().size();
-            if (L == 0) {
-                capacity += 0;
-            }
-            else {
-                capacity += (2 * L - 1);
-            }
-        }
-        else {
-            capacity += 1;
-        }
-    }
     out = TokensLine(line.location());
-    out.reserve(capacity);
-    bool changed = false;
     unsigned i = 0;
     while (i < line.size()) {
         const Token& t = line[i];
         if (t.is(TokenType::String)) {
-            changed = true;
             std::string str_val = t.string_value();
-            ++i;
+            if (str_val.empty()) {
+                // Remove a comma already emitted before the empty string
+                bool comma_removed = false;
+                if (!out.empty() && out.back().is(TokenType::Comma)) {
+                    out.pop_back();
+                    comma_removed = true;
+                }
+                // Skip the empty string token
+                ++i;
+                // Skip a following comma token in the source (do not emit it)
+                if (!comma_removed && i < line.size() && line[i].is(TokenType::Comma)) {
+                    ++i;
+                }
+                continue; // Nothing to emit for an empty string
+            }
+
+            ++i; // consume the string token
             bool is_first = true;
             for (char c : str_val) {
                 if (!is_first) {
-                    out.push_back(Token(TokenType::Comma, ",", true));
+                    out.push_back(Token(TokenType::Comma, ",", false));
                 }
                 int char_int = static_cast<int>(static_cast<unsigned char>(c));
                 out.push_back(Token(TokenType::Integer,
@@ -2427,10 +2451,8 @@ bool Preprocessor::post_process_line(const TokensLine& line, TokensLine& out) {
             ++i;
         }
     }
-    if (!changed) {
-        out = line;
-    }
-    return changed;
+
+    return true;
 }
 
 bool Preprocessor::merge_double_hash(const TokensLine& line, TokensLine& out) {
@@ -2972,6 +2994,15 @@ bool Preprocessor::handle_directives_for_line(TokensLine& line,
             reading_queue_for_directive_ = false;
         }
         return true; // consume and continue
+    }
+
+    // Support cpp style line markers: "# <nr>" or "# <nr> , <filename>" or "# <nr> <filename>"
+    // Treat them as synonyms of "#line <nr> [ , filename ]"
+    if (line.size() >= 2 && line[0].is(TokenType::Hash)
+            && line[1].is(TokenType::Integer)) {
+        i = 1; // point to integer token
+        process_line(line, i);
+        return true; // consume directive
     }
 
     // Process name-directive
