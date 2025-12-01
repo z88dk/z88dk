@@ -382,31 +382,9 @@ void TokensFile::set_ifndef_guard_symbol(const std::string& symbol) {
     ifndef_guard_symbol_ = symbol;
 }
 
-void TokensFile::split_lines(const char*& p) {
-    text_lines_.clear();
-    while (*p) {
-        const char* line_start = p;
-        while (*p && *p != '\r' && *p != '\n') {
-            ++p;
-        }
-        text_lines_.emplace_back(line_start, p - line_start);
-        // Handle line endings
-        if (*p == '\r') {
-            ++p;
-            if (*p == '\n') {
-                ++p;
-            }
-        }
-        else if (*p == '\n') {
-            ++p;
-        }
-    }
-}
-
 void TokensFile::tokenize(const std::string& content) {
     // Split content into lines
-    const char* p = content.c_str();
-    split_lines(p);
+    text_lines_ = split_lines(content);
 
     // Tokenize each line
     Location location(filename_, first_line_num_);
