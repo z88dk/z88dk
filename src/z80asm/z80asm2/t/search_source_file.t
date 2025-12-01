@@ -569,6 +569,86 @@ nop
 END
 
 #------------------------------------------------------------------------------
+# '@' list files: expand recursively, ignore blank and comment lines
+#------------------------------------------------------------------------------
+
+# Simple list: includes two .asm files; list contains blanks and comments
+unlink("$test.i"); unlink("$test.o");
+unlink("$test.a1.asm"); unlink("$test.a2.asm");
+unlink("$test.lst");
+
+spew("$test.a1.asm", "nop");
+spew("$test.a2.asm", "nop");
+spew("$test.lst", <<END);
+; top comment
+# another comment
+
+$test.a1.asm
+$test.a2       ; no extension, resolve to .asm
+END
+
+capture_ok("z88dk-z80asm -v -E \@$test.lst", <<END);
+Preprocessing file: $test.a1.asm -> $test.a1.i
+Preprocessing file: $test.a2.asm -> $test.a2.i
+END
+
+check_text_file("$test.a1.i", <<END);
+#line 1, "$test.a1.asm"
+nop
+END
+
+check_text_file("$test.a2.i", <<END);
+#line 1, "$test.a2.asm"
+nop
+END
+
+# Nested lists: list2 includes list3 via '@' and a direct asm
+unlink("$test.i"); unlink("$test.o");
+unlink("$test.a3.asm");
+unlink("$test.list2"); unlink("$test.list3");
+
+spew("$test.a3.asm", "nop");
+spew("$test.list3", <<END);
+; nested comment
+$test.a3.asm
+END
+
+spew("$test.list2", <<END);
+# outer comment
+\@$test.list3
+END
+
+capture_ok("z88dk-z80asm -v -E \@$test.list2", <<END);
+Preprocessing file: $test.a3.asm -> $test.a3.i
+END
+
+check_text_file("$test.a3.i", <<END);
+#line 1, "$test.a3.asm"
+nop
+END
+
+# List file found via -I include path; referenced asm in same directory
+path("$test.dir")->remove_tree if -d "$test.dir";
+mkdir "$test.dir";
+unlink("$test.dir/$test.linc.asm");
+unlink("$test.dir/$test.linc.lst");
+unlink("$test.dir/$test.linc.i");
+
+spew("$test.dir/$test.linc.asm", "nop");
+spew("$test.dir/$test.linc.lst", <<END);
+$test.dir/$test.linc.asm
+END
+
+capture_ok("z88dk-z80asm -v -E -I. \@$test.dir/$test.linc.lst", <<END);
+Preprocessing file: $test.dir/$test.linc.asm -> $test.dir/$test.linc.i
+END
+
+check_text_file("$test.dir/$test.linc.i", <<END);
+#line 1, "$test.dir/$test.linc.asm"
+nop
+END
+
+#------------------------------------------------------------------------------
 # cleanup
 #------------------------------------------------------------------------------
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;

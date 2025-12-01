@@ -485,3 +485,26 @@ std::string absolute_path(const std::string& path) {
                                  std::string(e.what()));
     }
 }
+
+std::vector<std::string> split_lines(const std::string& text) {
+    std::vector<std::string> lines;
+    const char* p = text.c_str();
+    while (*p) {
+        const char* line_start = p;
+        while (*p && *p != '\r' && *p != '\n') {
+            ++p;
+        }
+        lines.emplace_back(line_start, p - line_start);
+        // Handle line endings
+        if (*p == '\r') {
+            ++p;
+            if (*p == '\n') {
+                ++p;
+            }
+        }
+        else if (*p == '\n') {
+            ++p;
+        }
+    }
+    return lines;
+}
