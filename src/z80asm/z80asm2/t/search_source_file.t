@@ -745,6 +745,35 @@ nop
 END
 
 #------------------------------------------------------------------------------
+# List file with environment variable reference ${TEST} expands and preprocesses
+#------------------------------------------------------------------------------
+
+# Prepare: set TEST environment to $test, create list and target asm
+$ENV{TEST} = $test;
+
+unlink("$test.i");
+unlink("$test.o");
+unlink("$test.asm");
+unlink("$test.lst");
+
+# The list file references ${TEST}.asm which should expand to $test.asm
+spew("$test.lst", <<END);
+\${TEST}.asm
+END
+
+# Create the referenced asm file
+spew("$test.asm", "nop\n");
+
+capture_ok("z88dk-z80asm -v -E \"\@$test.lst\"", <<END);
+Preprocessing file: $test.asm -> $test.i
+END
+
+check_text_file("$test.i", <<END);
+#line 1, "$test.asm"
+nop
+END
+
+#------------------------------------------------------------------------------
 # cleanup
 #------------------------------------------------------------------------------
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
