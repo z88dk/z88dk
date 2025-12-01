@@ -103,12 +103,13 @@ TEST_CASE("search_source_file finds files in include_paths and returns normalize
     g_options.include_paths.clear();
     g_options.include_paths.push_back(inc_dir.generic_string());
 
-    std::string result = search_source_file(inc_name);
-    REQUIRE_FALSE(result.empty());
+    std::vector<std::string> found_files;
+    search_source_file(inc_name, found_files);
+    REQUIRE(found_files.size() == 1);
 
     // result should be the absolute lexically-normal path to the file we created
     std::string expected = inc_file.lexically_normal().generic_string();
-    CHECK(result == expected);
+    CHECK(found_files.front() == expected);
 
     // cleanup
     std::filesystem::remove_all(inc_dir);
@@ -126,8 +127,11 @@ TEST_CASE("search_source_file reports FileNotFound when file missing",
     // ensure file absent
     std::filesystem::remove(missing);
 
-    std::string result = search_source_file(missing);
-    CHECK(result.empty());
+    std::vector<std::string> found_files;
+    search_source_file(missing, found_files);
+    CHECK(found_files.empty());
+    std::string msg = g_errors.last_error_message();
+    CHECK(msg.find("File not found: " + missing) != std::string::npos);
     CHECK(g_errors.has_errors());
 }
 
@@ -216,16 +220,18 @@ TEST_CASE("search_source_file respects -d (date_stamp) behavior for .asm/.o pair
 
     // Case 1: date_stamp == false -> prefer .asm when calling search_source_file("modtest")
     g_options.date_stamp = false;
-    std::string result1 = search_source_file(base);
-    REQUIRE_FALSE(result1.empty());
-    CHECK(result1 == std::filesystem::absolute(
+    std::vector<std::string> found_files1;
+    search_source_file(base, found_files1);
+    REQUIRE(found_files1.size() == 1);
+    CHECK(found_files1.front() == std::filesystem::absolute(
               asm_path).lexically_normal().generic_string());
 
     // Case 2: date_stamp == true and .o is newer -> should return .o
     g_options.date_stamp = true;
-    std::string result2 = search_source_file(base);
-    REQUIRE_FALSE(result2.empty());
-    CHECK(result2 == std::filesystem::absolute(
+    std::vector<std::string> found_files2;
+    search_source_file(base, found_files2);
+    REQUIRE(found_files2.size() == 1);
+    CHECK(found_files2.front() == std::filesystem::absolute(
               o_path).lexically_normal().generic_string());
 
     // cleanup
