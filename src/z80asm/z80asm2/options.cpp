@@ -588,6 +588,7 @@ static std::vector<std::string> expand_wildcards(const std::string& pattern) {
 void search_source_file(const std::string& filename_,
                         std::vector<std::string>& out_filenames) {
     std::string filename = trim(filename_);
+    filename = expand_env_vars(filename);
     std::string out_filename;
 
     // Expand wildcards first: process each matched file independently

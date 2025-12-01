@@ -764,3 +764,69 @@ TEST_CASE("absolute_path throws on filesystem errors",
     REQUIRE_NOTHROW(absolute_path("test"));
 }
 
+// -----------------------------------------------------------------------------
+// Tests for expand_env_vars
+// -----------------------------------------------------------------------------
+#include <cstdlib>
+
+static void set_env_var(const char* name, const char* value) {
+#ifdef _WIN32
+    _putenv_s(name, value ? value : "");
+#else
+    if (value) {
+        setenv(name, value, 1);
+    }
+    else {
+        unsetenv(name);
+    }
+#endif
+}
+
+static void unset_env_var(const char* name) {
+#ifdef _WIN32
+    _putenv_s(name, "");
+#else
+    unsetenv(name);
+#endif
+}
+
+TEST_CASE("expand_env_vars with non-existent variables expands to empty",
+          "[expand_env_vars][missing]") {
+    const char* VAR = "Z80ASM2_TEST_MISSING_ENV";
+    unset_env_var(VAR);
+
+    // Entire string is a missing var
+    REQUIRE(expand_env_vars(std::string("${") + VAR + "}").empty());
+
+    // Missing var embedded in text
+    REQUIRE(expand_env_vars(std::string("pre${") + VAR + "}post") == "prepost");
+}
+
+TEST_CASE("expand_env_vars simple ${VAR} expansion",
+          "[expand_env_vars][simple]") {
+    const char* VAR = "Z80ASM2_TEST_SIMPLE_ENV";
+    set_env_var(VAR, "abc123");
+
+    REQUIRE(expand_env_vars(std::string("${") + VAR + "}") == "abc123");
+    REQUIRE(expand_env_vars(std::string("X${") + VAR + "}Y") == "Xabc123Y");
+
+    // Clean up
+    unset_env_var(VAR);
+}
+
+TEST_CASE("expand_env_vars supports nested names: ${VAR${PARAM}}",
+          "[expand_env_vars][nested]") {
+    // Construct nested name: PARAM -> SUFFIX, then VARSUFFIX -> VALUE
+    set_env_var("PARAM", "SUFFIX");
+    set_env_var("VARSUFFIX", "VALUE");
+
+    // "${VAR${PARAM}}" -> "${VARSUFFIX}" -> VALUE
+    REQUIRE(expand_env_vars("${VAR${PARAM}}") == "VALUE");
+
+    // Also embedded within other text
+    REQUIRE(expand_env_vars("start-${VAR${PARAM}}-end") == "start-VALUE-end");
+
+    // Clean up
+    unset_env_var("PARAM");
+    unset_env_var("VARSUFFIX");
+}
