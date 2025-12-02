@@ -411,8 +411,8 @@ void Preprocessor::generate_dependency_file() {
     std::string target = deps.front();
 
     // get dependency file name and target file name
-    std::string d_filename = get_d_filename(target);
-    std::string o_filename = get_o_filename(target);
+    std::string d_filename = g_options.get_d_filename(target);
+    std::string o_filename = g_options.get_o_filename(target);
 
     // generate dependency file
     std::ofstream ofs(d_filename, std::ios::out | std::ios::binary);
@@ -1069,8 +1069,8 @@ std::string Preprocessor::search_include_path(const std::string& filename,
         const File& top_file = file_stack_.back();
         including_filename = top_file.tokens_file->filename();
     }
-    std::string resolved = resolve_include_candidate(filename, including_filename,
-                           is_angle);
+    std::string resolved = g_options.resolve_include_candidate(filename,
+                           including_filename, is_angle);
     if (resolved.empty()) {
         return filename;
     }
@@ -3109,15 +3109,15 @@ void Preprocessor::update_symtab(const TokensLine& line) {
 }
 
 void preprocess_only() {
-    for (auto& asm_filename : g_input_files) {
-        if (is_o_filename(asm_filename)) {
+    for (auto& asm_filename : g_options.input_files) {
+        if (g_options.is_o_filename(asm_filename)) {
             if (g_options.verbose) {
                 std::cout << "Skipping preprocessing for object file: "
                           << asm_filename << std::endl;
             }
         }
         else {
-            std::string i_filename = get_i_filename(asm_filename);
+            std::string i_filename = g_options.get_i_filename(asm_filename);
 
             if (g_options.verbose) {
                 std::cout << "Preprocessing file: " << asm_filename
