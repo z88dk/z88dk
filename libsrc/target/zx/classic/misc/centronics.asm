@@ -1,4 +1,4 @@
-  ; Universal Centronics driver for the ZX Spectrum
+	; Universal Centronics driver for the ZX Spectrum
 	; Stefano - November, 2025
 	;
 	; This module must be configured with centronics_init(n), where n is the driver number
@@ -11,13 +11,13 @@
     PUBLIC  centronics_send
     PUBLIC  _centronics_send
 
-    ; Basing on a doc referring to russian clones some printer, like the ROBOTRON 6329
+	; Basing on a doc referring to russian clones some printer, like the ROBOTRON 6329
 	; require the driver to send a VERY long STROBE signal
 	; I chose a much shorter value, yet almost all of the drivers had no delay at all !
 	; Probably it is relevant on systems with 14Mhz like the ATM Turbo.
 	; If you need to speed-up the printer output just set it to zero.
 	; If your printer doesn't work, properly try 0 or 255.
-	
+
     PUBLIC  centronics_strobe_delay
     PUBLIC  _centronics_strobe_delay
 
@@ -52,8 +52,9 @@ _centronics_init:
   ld a,l
   and a
   jp z,init_morex      ;  0: Morex, Abbeydale, Indescomp, Ventamatic,
-                       ;     PIN SOFT I/F, Elettronica 2000 magazine n.53, Microhobby,
-					   ;     Proceeding Electronic System, B&V Interface
+                       ;     PIN SOFT I/F, Microhobby, B&V Interface
+                       ;     Proceeding Electronic System,
+                       ;     Elettronica 2000 magazine n.53
   dec a
   jp z,init_dktronics  ;  1: DK'Tronics (Z80 PIO)
   dec a
@@ -77,30 +78,34 @@ _centronics_init:
   jp z,init_lprint3    ; 10: Euroelectronics LPRINT III (called MK III in Russian clones)
                        ;     e.g. ATM Turbo
   dec a
-  jp z,init_aerco      ; 11: AERCO CP-ZX (A.K.A. CP-2068)
+  jp z,init_aerco      ; 11: AERCO CP-ZX (A.K.A. CP-2068), OLIGER
   dec a
   jp z,init_ppi        ; 12: 8255 PPI based 3-port parallel interface by Marko Solajic
                        ;     also mentioned in a russian website as "AT IMS KR580VV66A PIA"
   dec a
-  jp z,init_tasman     ; 13: TASMAM Parallel Printer Interface
+  jp z,init_tasman     ; 13: TASMAN P.Printer Interface (Type A / USA B)
   dec a
-  jp z,init_wafa       ; 14: Rotronics WAFADRIVE Centronics interface
+  jp z,init_tasman_b   ; 14: TASMAN Type B (USA Type C)
   dec a
-  jp z,init_zxpower    ; 15: ZX-POWER PROD "ZX LPRINT" - Denmark
+  jp z,init_wafa       ; 15: Rotronics WAFADRIVE Centronics interface
   dec a
-  jp z,init_link       ; 16: "CENTRONICS LINK" interface by RS/MM
+  jp z,init_zxpower    ; 16: ZX-POWER PROD "ZX LPRINT" - Denmark
   dec a
-  jp z,init_gama_a     ; 17: Didaktik Gama (strobed on port A)
+  jp z,init_link       ; 17: "CENTRONICS LINK" interface by RS/MM
   dec a
-  jp z,init_gama_b     ; 18: Didaktik Gama "Proxima" (strobed on port B)
+  jp z,init_gama_a     ; 18: Didaktik Gama (strobed on port A)
   dec a
-  jp z,init_special_a  ; 19: SPECIAL DIDAKTIK (M/P interface), suggested option
+  jp z,init_gama_b     ; 19: Didaktik Gama "Proxima" (strobed on port B)
   dec a
-  jp z,init_special_b  ; 20: SPECIAL DIDAKTIK B
+  jp z,init_special_a  ; 20: SPECIAL DIDAKTIK (M/P interface), suggested option
   dec a
-  jp z,init_multiprint ; 21: Romantic Robot MULTIPRINT
+  jp z,init_special_b  ; 21: SPECIAL DIDAKTIK B
   dec a
-  jp z,init_hobbit     ; 22: Hobbit (Хоббит), strobed Z80 PIO
+  jp z,init_multiprint ; 22: Romantic Robot MULTIPRINT
+  dec a
+  jp z,init_hobbit     ; 23: Hobbit (Хоббит), strobed Z80 PIO
+  dec a
+  jp z,init_aj         ; 24: A & J Centronics or "Micro-Drive"+Centronics
 
   ; default
   jp init_morex
@@ -110,17 +115,38 @@ _centronics_init:
 
 
 ; TODO:
+;
 ; Fuller and Fuller Dual interface (also RS232)
 ; Microdigital TK90X/ TK95
-; Opus Discovery
 ; Sam Coupè
+; CS-Disk
+; -------(shadow ROM tricks)------- 
+; FDD-3000
+; Opus Discovery
+;
+
+
+;=========================================================
+; A & J Centronics and "Micro-Drive"+Centronics
+
+init_aj:
+  ld   hl,cfg_aj
+  jp   init_general_sub
+
+cfg_aj:
+	defw $0041   ; busy port
+	defb $04     ; busy mask
+	defw $0042   ; data port
+	defw $0041   ; strobe port
+	defb $04     ; strobe low (enabled)    ..inverted, the real strobe is active low
+	defb $00     ; strobe high
 
 
 ;=========================================================
 ; Centronics-Schnittstelle, HWG 1986
 
 init_hwg:
-  LD  A,$0F
+  LD  A,$0F      ; some unknown magic found in the original driver
   OUT ($5F),A
   LD  A,$CF
   OUT ($7F),A
@@ -128,29 +154,18 @@ init_hwg:
   OUT ($7F),A
   LD  A,$67
   OUT ($7F),A
-  LD  A,$80
-  OUT ($3F),A
-  ld  hl,send_hwg
-  ld  (driver_selected),hl
-  RET
-  
-send_hwg:
-send_hwg_busy:
-  call  centronics_break
-  IN    A,($3F)
-  RRA
-  JR    C,send_hwg_busy
-  POP   AF
-  OUT   ($1F),A
-  ld    a,(centronics_strobe_delay)
-  ld    b,a
-  XOR   A
-  OUT   ($3F),A      ; enable strobe (active low)
-send_hwg_strobe:
-  djnz  send_hwg_strobe
-  LD    A,$80
-  OUT   ($3F),A
-  jp    centronics_ei
+;  LD  A,$80
+;  OUT ($3F),A    --> already in the "general" code section
+  ld   hl,cfg_hwg
+  jp   init_general_sub
+
+cfg_hwg:
+	defw $003F   ; busy port
+	defb $01     ; busy mask
+	defw $001F   ; data port
+	defw $003F   ; strobe port
+	defb $00     ; strobe low (enabled)
+	defb $80     ; strobe high
 
 
 ;=========================================================
@@ -166,33 +181,20 @@ init_dktronics:
   OUT ($FB),A          ; Centronix data lines. 
   LD  A,$80            ; Program port B to "inputs" 
   OUT ($FB),A          ; Except bit 8 on port B 
-  LD  A,$02            ; Bit 2 of port B will be the 
-  OUT ($BB),A          ; "Stobe", initialize to "1" 
+;  LD  A,$02            ; Bit 2 of port B will be the
+;  OUT ($BB),A          ; "Stobe", initialize to "1"    --> already in the "general" code section
 ;  LD  A,$0A
 ;  LD  ($0002),A
-  ld  hl,send_dktronics
-  ld  (driver_selected),hl
-  RET
+  ld   hl,cfg_dktronics
+  jp   init_general_sub
 
-send_dktronics:
-send_dktronics_busy:
-  call centronics_break
-  XOR  A                         ; Look if the printer is BUSY 
-  IN   A,($BB)                   ; Look at dataline 8 of Z80-PIO 
-  RLCA                           ; port B. 
-  JR   C,send_dktronics_busy     ; Repeat if printer is busy 
-  POP  AF                        ; Restore register A 
-  OUT  ($9B),A    ; send data    ; Put A on Z80-PIO port A 
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  XOR  A                         ; Make A clean 
-  OUT  ($BB),A                   ; Lower the STROBE signal, data 
-send_dktronics_strobe:           ; line 2 of port B.
-  djnz send_dktronics_strobe     ; The data is clocked in into the printer
-                                 ;  with the STROBE signal.
-  LD   A,$02
-  OUT  ($BB),A                   ; Raise it again  
-  jp   centronics_ei
+cfg_dktronics:
+	defw $00BB   ; busy port
+	defb $80     ; busy mask
+	defw $009B   ; data port
+	defw $00BB   ; strobe port
+	defb $00     ; strobe low (enabled)
+	defb $02     ; strobe high
 
 
 ;=========================================================
@@ -256,64 +258,32 @@ send_multiprint_strobe:
 ; DISCiPLE parallel port
 
 init_disciple:
-  xor  a             ; clear STROBE (and stop/disable disk drives)
-  OUT  ($1F),A       ; stop strobe signal
-  ld   hl,send_disciple
-  ld   (driver_selected),hl
-  RET
+  ld   hl,cfg_disciple
+  jp   init_general_sub
 
-send_disciple:
-send_disciple_busy:
-  call centronics_break
-  IN   A,($1F)
-  BIT  6,A
-  JR   Z,send_disciple_busy
-  POP  AF
-  OUT  ($FB),A       ; send data
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  ld   a,$40
-  OUT  ($1F),A       ; send strobe
-send_disciple_strobe:
-  djnz send_disciple_strobe
-  xor  a
-  OUT  ($1F),A       ; stop strobe signal
-  jp   centronics_ei
+cfg_disciple:
+	defw $001F   ; busy port
+	defb $40     ; busy mask
+	defw $00FB   ; data port
+	defw $001F   ; strobe port
+	defb $40     ; strobe low (enabled)   ..inverted, on bit 6
+	defb $00     ; strobe high
 
 
 ;=========================================================
 ; +D printer port
 
-  xor  a             ; clear STROBE (and stop/disable disk drives)
 init_plusd:
-  OUT  ($EF),A       ; stop strobe signal
-  ld   hl,send_plusd
-  ld   (driver_selected),hl
-  RET
+  ld   hl,cfg_plusd
+  jp   init_general_sub
 
-send_plusd:
-send_plusd_busy:
-  call centronics_break
-  IN   A,($f7)
-  BIT  7,A
-  JR   NZ,send_plusd_busy
-  IN   A,($f7)
-  BIT  7,A
-  JR   NZ,send_plusd_busy
-  IN   A,($f7)
-  BIT  7,A
-  JR   NZ,send_plusd_busy
-  POP  AF
-  OUT  ($f7),A       ; send data
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  ld   a,$40
-  OUT  ($EF),A       ; send strobe
-send_plusd_strobe:
-  djnz send_plusd_strobe
-  xor  a
-  OUT  ($EF),A       ; stop strobe signal
-  jp   centronics_ei
+cfg_plusd:
+	defw $00F7   ; busy port
+	defb $80     ; busy mask
+	defw $00F7   ; data port
+	defw $00EF   ; strobe port
+	defb $40     ; strobe low (enabled)   ..inverted, on bit 6
+	defb $00     ; strobe high
 
 
 ;=========================================================
@@ -325,8 +295,8 @@ send_plusd_strobe:
 ;  ZXPRINT (unknown interface)
 
 init_ne:
-  XOR  A  
-  OUT  ($FB),A               ; INIT code found in "ZXPRINT", it sends a NUL (hopefully harmless)
+;  XOR  A  
+;  OUT  ($FB),A              ; INIT code found in "ZXPRINT", it sends a NUL (hopefully harmless)
   ld  hl,send_ne
   ld  (driver_selected),hl
   ret
@@ -354,6 +324,21 @@ send_ne_wait:
   jp   centronics_ei        ; the I/F Centronics by PIN SOFT had a short delay here,
                             ; the code around centronics_ei will suffice
 
+;=========================================================
+;  "General case"
+;  Found in a driver for the Timex computers
+
+init_gen:
+  ld   hl,cfg_gen
+  jp   init_general_sub
+
+cfg_gen:
+	defw $0080   ; busy port
+	defb $10     ; busy mask
+	defw $0082   ; data port
+	defw $0081   ; strobe port
+	defb $FE     ; strobe low (enabled)
+	defb $FF     ; strobe high
 
 ;=========================================================
 ;  Morex Peripherals Ltd (a.k.a. Abbeydale Designers Ltd)
@@ -366,31 +351,16 @@ send_ne_wait:
 ;  PIN SOFT I/F Centronics
 
 init_morex:
-  ld  a,$FF                 ; no strobe
-  OUT ($7F),A
-  ld  hl,send_morex
-  ld  (driver_selected),hl
-  ret
+  ld   hl,cfg_morex
+  jp   init_general_sub
 
-send_morex:
-send_morex_busy:
-  call  centronics_break
-  IN    A,($FB)
-  and   1                    ; test the right bit for BUSY
-  JR    NZ,send_morex_busy
-  POP   AF
-  OUT   ($FB),A              ; send byte
-  ld    a,(centronics_strobe_delay)
-  ld    b,a
-  LD    A,$FE                ; strobe on bit 0
-  AND   $FE
-  OUT   ($7F),A              ; send strobe
-send_morex_strobe:
-  djnz  send_morex_strobe
-  INC A                      ; stop strobe signal
-  OUT   ($7F),A
-  jp    centronics_ei        ; the I/F Centronics by PIN SOFT had a short delay here,
-                             ; the code around centronics_ei will suffice
+cfg_morex:
+	defw $00FB   ; busy port
+	defb $01     ; busy mask
+	defw $00FB   ; data port
+	defw $007F   ; strobe port
+	defb $FE     ; strobe low (enabled)
+	defb $FF     ; strobe high
 
 
 ;=========================================================
@@ -433,33 +403,16 @@ init_kempston:
   LD   BC,$E3BF
   LD   A,$81
   OUT  (C),A
-  LD   A,$0F
-  OUT  (C),A
-  ld   hl,send_kempston
-  ld   (driver_selected),hl
-  ret
+  ld   hl,cfg_kempston
+  jp   init_general_sub
 
-send_kempston:
-send_kempston_busy:
-  call centronics_break
-  LD   BC,$E2BF        ; busy port
-  in   a,(c)
-  rra
-  jr   c,send_kempston_busy
-  POP  AF
-  ld   b,$E0
-  out  (c),a      ; send character
-  ld   a,(centronics_strobe_delay)
-  ld   d,a
-  ld   a,$0E       ; strobe data
-  ld   b,$E3       ; change port to E3BFh, strobe port
-  out  (c),a       ; enable STROBE
-send_kempston_strobe:
-  dec  d
-  jr   nz,send_kempston_strobe
-  inc  a           ; stop STROBE signal
-  out  (c),a
-  jp   centronics_ei
+cfg_kempston:
+	defw $E2BF   ; busy port
+	defb $01     ; busy mask
+	defw $E0BF   ; data port
+	defw $E3BF   ; strobe port
+	defb $0E     ; strobe low (enabled)
+	defb $0F     ; strobe high
 
 
 ;=========================================================
@@ -537,20 +490,21 @@ init_aerco:
   ld   (driver_selected),hl
   ret
 
+
 send_aerco:
 send_aerco_busy:
   call centronics_break
-  IN   A,($7F)              ; look at input status
-  LD   C,A
-  LD   B,$50
-aerco_busy2:
+;  IN   A,($7F)              ; look at input status
+;  LD   C,A
+;  LD   B,$50
+;aerco_busy2:
   IN   A,($7F)
-  CP   C
-  JR   NZ,send_aerco_busy   ; no stable data
-  DJNZ aerco_busy2        ; keep checking for a while
-  BIT  1,A                 ; Enough, let's move on, let's test paper sensor..
-  JR   NZ,send_aerco_busy 
-  BIT  4,A                 ; ..and the BUSY signal
+;  CP   C
+;  JR   NZ,send_aerco_busy    ; no stable data
+;  DJNZ aerco_busy2         ; keep checking for a while
+;  BIT  1,A                 ; Enough, let's move on, let's test paper sensor..
+;  JR   NZ,send_aerco_busy 
+  BIT  4,A                 ; ..and the BUSY signal  (standard simplified drivers existed)
   JR   NZ,send_aerco_busy 
   POP  AF
   OUT  ($7F),A             ; data
@@ -573,27 +527,16 @@ send_aerco_strobe:
 init_ppi:
   ld   a,152
   out  (127),a
-  ld   hl,send_ppi
-  ld   (driver_selected),hl
-  ret
+  ld   hl,cfg_ppi
+  jp   init_general_sub
 
-send_ppi:
-send_ppi_busy:
-  call centronics_break
-  IN   A,($5F)              ; look at input status
-  BIT  7, A
-  JR   NZ,send_ppi_busy
-  POP  AF
-  OUT  ($3F), A              ; Data
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  LD   A, $FF                 ; STROBE 0
-  OUT  ($5F), A
-send_ppi_strobe:
-  djnz send_ppi_strobe
-  LD   A, $00                 ; STROBE 1 ($FE) in the russian version
-  OUT  ($5F), A
-  jp   centronics_ei
+cfg_ppi:
+	defw $005F   ; busy port
+	defb $80     ; busy mask
+	defw $003F   ; data port
+	defw $005F   ; strobe port
+	defb $FF     ; strobe low (enabled)    ..apparently it is inverted
+	defb $00     ; strobe high   ($FE) in the russian version
 
 
 ;=========================================================
@@ -627,51 +570,31 @@ send_hobbit_strobe:
 ; TASMAN Centronics interface
 
 init_tasman:
-  LD  BC,$00FB
-  XOR A
-  OUT (C),A
-  LD  BC,$007B
-  CPL               ; strobe off
-  OUT (C),A
-  OUT ($FB),A       ; enforce "strobe off"
-  ld   hl,send_tasman
-  ld   (driver_selected),hl
+  call init_tasman_b
+  LD   A,$00BF   ; busy_port
+  ld   (busy_port),A
   ret
 
-  LD BC,$00FB
-  LD A,$00
-  OUT (C),A
-  LD BC,$007B
-  LD A,$FF
-  OUT (C),A
-  OUT ($FB),A
-  
-send_tasman:
-send_tasman_busy:
-  call centronics_break
-  LD   BC,$00BF
-  IN   D,(C)
-  BIT  0,D
-  JR   NZ,send_tasman_busy
-;tasman_delay:            ; lots of time was taken in the original driver..
-;  DJNZ tasman_delay
-  POP  AF
-  OUT  ($7B),A             ; data
-;tasman_wait:
-;  DJNZ _tasman_wait
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  LD   A,$F7                ; strobe
-  OUT  ($FB),A
-send_tasman_wait:
-  DJNZ send_tasman_wait   ; .. we keep only an adjustable delay for the strobe signal
-;tasman_wait2:
-;  DJNZ tasman_wait2
-  LD   A,$FF                ; strobe off
-  OUT  ($FB),A
-;tasman_wait3:
-;  DJNZ tasman_wait3
-  jp   centronics_ei
+
+;=========================================================
+; TASMAN Centronics interface Type B (USA Type C)
+
+init_tasman_b:
+;  SUB A         ; odd "init" code in the original driver
+;  OUT ($FB),A
+;  DEC A
+;  OUT ($7B),A
+;  OUT ($FB),A
+  ld   hl,cfg_tasman_b
+  jp   init_general_sub
+
+cfg_tasman_b:
+	defw $00FB   ; busy port
+	defb $01     ; busy mask
+	defw $007B   ; data port
+	defw $00FB   ; strobe port
+	defb $F7     ; strobe low (enabled)
+	defb $FF     ; strobe high
 
 
 ;=========================================================
@@ -713,66 +636,37 @@ send_wafa_wait:
 
 init_link:
   ld   bc,$000A
-  in   a,(c)       ; enforce "strobe off"
-  ld   hl,send_link
-  ld   (driver_selected),hl
-  ret
+  in   a,(c)
+  ld   hl,cfg_link
+  jp   init_general_sub
 
-send_link:
-send_link_busy:
-  call centronics_break
-  ld b,$FF
-  ld c,$3F
-  in l,(c)
-  bit 5,l
-  jr nz,send_link_busy
-  POP  AF
-  ld b,$FF
-  ld c,$5F
-  OUT  (C),A         ; DATA
-  ld b,$FF
-  ld c,$1F
-  xor a
-  OUT  (C),A
-  ld a,$ff           ; "strobe off"
-  OUT  (C),A
-  jp   centronics_ei
-
+cfg_link:
+	defw $FF3F   ; busy port
+	defb $20     ; busy mask
+	defw $FF5F   ; data port
+	defw $FF1F   ; strobe port
+	defb $00     ; strobe low (enabled)
+	defb $FF     ; strobe high
 
 ;=========================================================
 ; Hilderbay Printer Interface, 1983
 
 init_hilderbay:
-  LD   BC,$FFBF
+  LD   BC,$FFBF  ; odd init code from the original driver
   LD   A,$83
   OUT  (C),A
-  LD   A,$0F
-  OUT  (C),A        ; "strobe off"
-  ld   hl,send_hilderbay
-  ld   (driver_selected),hl
-  ret
-  
-send_hilderbay:
-send_hilderbay_busy:
-  call centronics_break
-  LD   BC,$DFBF
-  IN   a,(C)
-  BIT  3,a
-  JR   NZ,send_hilderbay_busy
-  LD   B,$DB         ; DBBFh
-  POP  AF
-  OUT  (C),A         ; DATA
-  ld   a,(centronics_strobe_delay)
-  ld   d,a
-  LD   E,$0E         ; "strobe on"
-  LD   B,$FF         ; FFBFh
-  OUT  (C),E
-send_hilderbay_strobe:
-  dec  d
-  jr   nz,send_hilderbay_strobe
-  INC  E             ; "strobe off"
-  OUT  (C),E
-  jp   centronics_ei
+  ld   bc,$000A
+  in   a,(c)
+  ld   hl,cfg_hilderbay
+  jp   init_general_sub
+
+cfg_hilderbay:
+	defw $DFBF   ; busy port
+	defb $08     ; busy mask
+	defw $DBBF   ; data port
+	defw $FFBF   ; strobe port
+	defb $0E     ; strobe low (enabled)
+	defb $0F     ; strobe high
 
 
 ;=========================================================
@@ -845,32 +739,13 @@ send_gama_b_wait:
 ; Port C:  STROBE(out) - bit 3, BUSY (in) - bit 7
 
 init_special_a:
-  LD A,$8A       ; [10001010] init 8255, A=OUT, B=IN, C[0..3]=OUT, C[4..7]=IN
-  OUT ($7F),A
-  nop
-  ld   a,7       ;set bit 3 on port C
-  OUT ($7F),A
-  ld   hl,send_special_a
-  ld   (driver_selected),hl
+  LD    A,$8A       ; [10001010] init 8255, A=OUT, B=IN, C[0..3]=OUT, C[4..7]=IN
+  OUT   ($7F),A
+  ld    hl,cfg_special_b
+  call  init_general_sub
+  ld    a,$1F
+  ld    (data_port),a
   ret
-  
-send_special_a:
-send_special_a_busy:
-  call centronics_break
-  IN   A,($5F)
-  BIT  7,a
-  JR   nz,send_special_a_busy
-  POP  AF
-  OUT ($1F),A    ; data
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  ld   a,6       ;reset bit 3 on port C
-  OUT ($7F),A
-send_special_a_strobe:
-  djnz send_special_a_strobe
-  ld   a,7       ;set bit 3 on port C
-  OUT ($7F),A
-  jp   centronics_ei
 
 
 ;=========================================================
@@ -878,40 +753,69 @@ send_special_a_strobe:
 ; 8255 is configured in "mode 0", port B is used for data
 ; Port C:  STROBE(out) - bit 3, BUSY (in) - bit 7
 ;
-; this driver is very close to the PPI one, but for the strobe signal
+; this interface is very close to the PPI one, but for the strobe signal
 
 init_special_b:
   LD A,$98       ; [10011000] init 8255, A=IN, B=OUT, C[0..3]=OUT, C[4..7]=IN
   OUT ($7F),A
-  nop
-  ld   a,7       ;set bit 3 on port C
-  OUT ($7F),A
-  ld   hl,send_special_b
-  ld   (driver_selected),hl
-  ret
-  
-send_special_b:
-send_special_b_busy:
-  call centronics_break
-  IN   A,($5F)
-  BIT  7,a
-  JR   nz,send_special_b_busy
-  POP  AF
-  OUT ($3F),A
-  ld   a,(centronics_strobe_delay)
-  ld   b,a
-  ld   a,6       ;reset bit 3 on port C
-  OUT ($7F),A
-send_special_b_strobe:
-  djnz send_special_b_strobe
-  ld   a,7       ;set bit 3 on port C
-  OUT ($7F),A
-  jp   centronics_ei
+  ld   hl,cfg_special_b
+  jp   init_general_sub
+
+cfg_special_b:
+	defw $005F   ; busy port
+	defb $80     ; busy mask
+	defw $003F   ; data port
+	defw $007F   ; strobe port
+	defb $06     ; strobe low (enabled)
+	defb $07     ; strobe high
 
 
 
 ;=========================================================
 ; shared subroutines
+;=========================================================
+
+init_general_sub:
+  ld    de,busy_port
+  ld    bc,9
+  ldir
+  ld    bc,(strobe_port)
+  LD    a,(strobe_high)
+  out   (c),A              ; send strobe
+  ld    hl,send_general
+  ld    (driver_selected),hl
+  ret
+
+send_general:
+  call  centronics_break
+  ld    bc,(busy_port)
+  ld    hl,busy_mask
+  in    a,(c)
+  and   (hl)
+  ld    d,a
+  in    a,(c)
+  and   (hl)
+  cp    d                     ; we want a stable signal
+  jr    nz,send_general
+  or    a                     ; BUSY (active low) must be off
+  jr    nz,send_general
+  ;-----------
+  pop   af
+  ld    bc,(data_port)
+  out   (c),a                ; send byte
+  ;-----------
+  ld    a,(centronics_strobe_delay)
+  ld    d,a
+  ld    a,(strobe_low)       ; strobe is active low
+  ld    bc,(strobe_port)
+  out   (c),a              ; send strobe
+send_general_strobe:
+  dec   d
+  jr    nz,send_general_strobe
+  LD    A,(strobe_high)
+  out   (c),a              ; send strobe
+  jp    centronics_ei
+
 ;=========================================================
 
 ; Most of the original routines had DI/EI, some didn't
@@ -929,7 +833,9 @@ centronics_break:
 
     pop     bc     ; skip RET to the caller
     ld      hl,-1
-	jr      centronics_ei+3
+    jr      centronics_ei+3
+
+;=========================================================
 
 centronics_ei:
     ld      hl,0
@@ -952,5 +858,21 @@ _centronics_strobe_delay:
 	defw 20        ; make the strobe signal more persistent (what if we are on a 14mhz ATM Turbo ?)
 
 driver_selected:
-	defw send_ne
+	defw send_ne   ; The default value is set to a "strobed" interface which
+                   ; doesn't require real initialization
+
+; DO NOT SHUFFLE the data order
+;-------------------------------
+busy_port:
+	defw $0000
+busy_mask:
+	defb $00
+data_port:
+	defw $0000
+strobe_port:
+	defw $0000
+strobe_low:
+	defb $00
+strobe_high:
+	defb $ff
 
