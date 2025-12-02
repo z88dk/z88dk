@@ -9,7 +9,6 @@ ZX_GLOBS := "target/zx/ulaplus/c/sccz80/*.asm" "target/zx/ulaplus/z80/*.asm" \
 	"target/zx/classic/diagnostic/*.asm" \
 	"target/zx/classic/basic/*.asm" \
 	"target/zx/classic/opus/*.asm" \
-	"target/zx/classic/specdrum/*.asm" \
 	"target/zx/classic/uspeech/*.asm" \
 	"target/zx/classic/psg/*.asm" \
 	"target/zx/classic/games/*.asm" \
@@ -32,7 +31,6 @@ ZX_GLOBS_ex := target/zx/ulaplus/c/sccz80/*.asm target/zx/ulaplus/z80/*.asm \
 	target/zx/classic/diagnostic/*.asm \
 	target/zx/classic/basic/*.asm \
 	target/zx/classic/opus/*.asm \
-	target/zx/classic/specdrum/*.asm \
 	target/zx/classic/uspeech/*.asm \
 	target/zx/classic/games/*.asm \
 	target/zx/classic/psg/*.asm \
