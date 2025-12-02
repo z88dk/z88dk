@@ -106,6 +106,8 @@ _centronics_init:
   jp z,init_hobbit     ; 23: Hobbit (Хоббит), strobed Z80 PIO
   dec a
   jp z,init_aj         ; 24: A & J Centronics or "Micro-Drive"+Centronics
+  dec a
+  jp z,init_interface3 ; 25: Interface III Printer interface
 
   ; default
   jp init_morex
@@ -118,11 +120,10 @@ _centronics_init:
 ;
 ; Fuller and Fuller Dual interface (also RS232)
 ; Microdigital TK90X/ TK95
-; Sam Coupè
+; Sam Coupè  (CALL 0181H - send A to parallel printer)
 ; CS-Disk
 ; -------(shadow ROM tricks)------- 
 ; FDD-3000
-; Opus Discovery
 ;
 
 
@@ -140,6 +141,22 @@ cfg_aj:
 	defw $0041   ; strobe port
 	defb $04     ; strobe low (enabled)    ..inverted, the real strobe is active low
 	defb $00     ; strobe high
+
+
+;=========================================================
+; Interface III Printer interface
+
+init_interface3:
+  ld   hl,cfg_interface3
+  jp   init_general_sub
+
+cfg_interface3:
+	defw $FC9F   ; busy port
+	defb $01     ; busy mask
+	defw $FD9F   ; data port
+	defw $FC9F   ; strobe port
+	defb $00     ; strobe low (enabled)
+	defb $02     ; strobe high
 
 
 ;=========================================================
