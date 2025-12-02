@@ -513,7 +513,7 @@ std::vector<std::string> split_lines(const std::string& text) {
 // Helper: get environment variable value in a secure, cross-platform way.
 // Returns empty string if the variable is not set.
 std::string get_env_value(const std::string& name) {
-#ifdef _WIN32
+#ifdef _MSC_VER
     char* buf = nullptr;
     size_t sz = 0;
     if (_dupenv_s(&buf, &sz, name.c_str()) != 0 || buf == nullptr) {
