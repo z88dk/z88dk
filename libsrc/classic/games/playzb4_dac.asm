@@ -23,6 +23,11 @@
 
 playzb4_dac:
 _playzb4_dac:
+  IF    __CPU_GBZ80__||__CPU_INTEL__||__CPU_RABBIT__
+
+     ret
+
+  ELSE
 
 ;call    csv
 ;ld      l,(ix+6)        ;sample start addr
@@ -75,3 +80,4 @@ rep2:                                   ;repeat
     jr      nz, rep1                    ;until de = 0
 
     ret
+  ENDIF
