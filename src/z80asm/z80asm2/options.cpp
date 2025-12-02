@@ -12,7 +12,6 @@
 #include <set>
 
 Options g_options;
-std::vector<std::string> g_input_files;
 
 static const std::string copyright =
     "Usage: z88dk-z80asm [options] files...\n"
@@ -57,8 +56,151 @@ void exit_invalid_option(const std::string& option) {
     exit(EXIT_FAILURE);
 }
 
-static std::string replace_extension(const std::string& filename,
-                                     const std::string& extension) {
+bool Options::parse_arg(const std::string& arg, bool& found_dash_dash) {
+    if (arg.empty()) {
+        return true;
+    }
+
+    std::string option_arg;
+    if (!found_dash_dash && (arg[0] == '-' || arg[0] == '+')) {
+        switch (arg[1]) {
+        case '-':
+            if (arg == "--") {
+                found_dash_dash = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'E':
+            if (arg == "-E") {
+                preprocess_only = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'I':
+            if (arg == "-IXIY") {
+                swap_ix_iy = true;
+            }
+            else if (is_option_arg(arg, "-I", option_arg)) {
+                include_paths.push_back(option_arg);
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'M':
+            if (arg == "-MD") {
+                gen_dependencies = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'O':
+            if (is_option_arg(arg, "-O", option_arg)) {
+                output_dir = option_arg;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'c':
+            if (is_option_arg(arg, "-cpp", option_arg)) {
+                if (!cpp_options.empty()) {
+                    cpp_options.push_back(' ');
+                }
+                cpp_options += option_arg;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'd':
+            if (arg == "-d") {
+                date_stamp = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'h':
+            if (arg == "-h") {
+                exit_show_usage(EXIT_SUCCESS);
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'm':
+            if (is_option_arg(arg, "-m4", option_arg)) {
+                if (!m4_options.empty()) {
+                    m4_options.push_back(' ');
+                }
+                m4_options += option_arg;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'p':
+            if (is_option_arg(arg, "-perl", option_arg)) {
+                if (!perl_options.empty()) {
+                    perl_options.push_back(' ');
+                }
+                perl_options += option_arg;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'u':
+            if (arg == "-ucase") {
+                ucase_labels = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'v':
+            if (arg == "-v") {
+                verbose = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        default:
+            return false;
+        }
+    }
+    else {
+        // input file
+        search_source_file(arg);
+    }
+
+    return true;
+}
+
+bool Options::is_option_arg(const std::string& arg, const std::string& option,
+                            std::string& option_arg) {
+    option_arg.clear();
+
+    if (arg.size() > option.size() &&
+            arg.substr(0, option.size()) == option) {
+        option_arg = arg.substr(option.size());
+        if (!option_arg.empty() && option_arg.front() == '=') {
+            option_arg = option_arg.substr(1);
+        }
+    }
+
+    return !option_arg.empty();
+}
+
+std::string Options::replace_extension(const std::string& filename,
+                                       const std::string& extension) {
     try {
         std::filesystem::path p(filename);
         p.replace_extension(extension);
@@ -69,14 +211,13 @@ static std::string replace_extension(const std::string& filename,
     }
 }
 
-static std::string prepend_output_dir(const std::string& filename) {
+std::string Options::prepend_output_dir(const std::string& filename) {
     namespace fs = std::filesystem;
 
-    if (g_options.output_dir.empty()) {
+    if (output_dir.empty()) {
         return filename;
     }
-    else if (filename.substr(0, g_options.output_dir.size() + 1)
-             == g_options.output_dir + "/") {
+    else if (filename.substr(0, output_dir.size() + 1) == output_dir + "/") {
         // #2260: may be called with an object file already with
         // the path prepended; do not add it twice
         return filename;
@@ -88,12 +229,12 @@ static std::string prepend_output_dir(const std::string& filename) {
         // is it a win32 absolute path?
         std::string file;
         if (isalpha(filename[0]) && filename[1] == ':') {	// C:
-            file += g_options.output_dir + "/";
+            file += output_dir + "/";
             file += std::string(1, filename[0]) + "/";
             file += std::string(filename.substr(2));
         }
         else {
-            file += g_options.output_dir + "/";
+            file += output_dir + "/";
             file += filename;
         }
         fs::path path{ file };
@@ -101,35 +242,35 @@ static std::string prepend_output_dir(const std::string& filename) {
     }
 }
 
-std::string get_asm_filename(const std::string& filename) {
+std::string Options::get_asm_filename(const std::string& filename) {
     return replace_extension(filename, asm_extension);
 }
 
-std::string get_d_filename(const std::string& filename) {
+std::string Options::get_d_filename(const std::string& filename) {
     return replace_extension(filename, d_extension);
 }
 
-std::string get_o_filename(const std::string& filename) {
+std::string Options::get_o_filename(const std::string& filename) {
     return prepend_output_dir(replace_extension(filename, o_extension));
 }
 
-std::string get_i_filename(const std::string& filename) {
+std::string Options::get_i_filename(const std::string& filename) {
     return replace_extension(filename, i_extension);
 }
 
-bool is_asm_filename(const std::string& filename) {
+bool Options::is_asm_filename(const std::string& filename) {
     return str_ends_with(filename, asm_extension);
 }
 
-bool is_o_filename(const std::string& filename) {
+bool Options::is_o_filename(const std::string& filename) {
     return str_ends_with(filename, o_extension);
 }
 
 // Try candidates according to include semantics and include_paths,
 // return resolved path if found or empty string if not found.
 // including_filename: the file which contains the include directive (can be empty if unknown)
-std::string resolve_include_candidate(const std::string& filename,
-                                      const std::string& including_filename, bool is_angle) {
+std::string Options::resolve_include_candidate(const std::string& filename,
+        const std::string& including_filename, bool is_angle) {
     namespace fs = std::filesystem;
 
     std::vector<fs::path> candidates;
@@ -153,7 +294,7 @@ std::string resolve_include_candidate(const std::string& filename,
                 candidates.push_back(fs::path(including_dir) / fname);
             }
             // Then user-provided include paths
-            for (const auto& p : g_options.include_paths) {
+            for (const auto& p : include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
             // Finally as-given (relative to current working dir of the process)
@@ -161,7 +302,7 @@ std::string resolve_include_candidate(const std::string& filename,
         }
         else {
             // Angle includes: search include paths, then as-given
-            for (const auto& p : g_options.include_paths) {
+            for (const auto& p : include_paths) {
                 candidates.push_back(fs::path(p) / fname);
             }
             candidates.push_back(fname);
@@ -191,7 +332,7 @@ std::string resolve_include_candidate(const std::string& filename,
     return std::string();
 }
 
-static std::string check_source(const std::string& filename) {
+std::string Options::check_source(const std::string& filename) {
     namespace fs = std::filesystem;
 
     // avoid cascade of errors
@@ -228,7 +369,7 @@ static std::string check_source(const std::string& filename) {
     // if both .o and .asm exist, return .asm or .o if -d and .o is newer
     // NOTE: -d must come before the file to have effect
     if (src_ok && obj_ok) {
-        if (!g_options.date_stamp) {
+        if (!date_stamp) {
             // no -d
             if (got_obj) {
                 return normalize_path(obj_file.generic_string());
@@ -259,8 +400,7 @@ static std::string check_source(const std::string& filename) {
 }
 
 // run m4 preprocessor
-static void run_m4(const std::string& filename,
-                   std::vector<std::string>& out_filenames) {
+void Options::run_m4(const std::string& filename) {
     std::string m4_full_path = resolve_include_candidate(filename, "", false);
     if (m4_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
@@ -272,9 +412,9 @@ static void run_m4(const std::string& filename,
         m4_full_path.substr(0, m4_full_path.size() - m4_extension.size());
 
     // build m4 command
-    std::string m4_cmd = "m4 " + g_options.m4_options +
+    std::string m4_cmd = "m4 " + m4_options +
                          " \"" + m4_full_path + "\" > \"" + asm_filename + "\"";
-    if (g_options.verbose) {
+    if (verbose) {
         std::cout << "% " << m4_cmd << std::endl;
     }
 
@@ -285,12 +425,11 @@ static void run_m4(const std::string& filename,
     }
 
     // process generated asm file
-    search_source_file(asm_filename, out_filenames);
+    search_source_file(asm_filename);
 }
 
 // run perl preprocessor
-static void run_perl(const std::string& filename,
-                     std::vector<std::string>& out_filenames) {
+void Options::run_perl(const std::string& filename) {
     std::string perl_full_path = resolve_include_candidate(filename, "", false);
     if (perl_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
@@ -302,9 +441,9 @@ static void run_perl(const std::string& filename,
         perl_full_path.substr(0, perl_full_path.size() - perl_extension.size());
 
     // build perl command
-    std::string perl_cmd = "perl " + g_options.perl_options +
+    std::string perl_cmd = "perl " + perl_options +
                            " \"" + perl_full_path + "\" > \"" + asm_filename + "\"";
-    if (g_options.verbose) {
+    if (verbose) {
         std::cout << "% " << perl_cmd << std::endl;
     }
 
@@ -315,12 +454,11 @@ static void run_perl(const std::string& filename,
     }
 
     // process generated asm file
-    search_source_file(asm_filename, out_filenames);
+    search_source_file(asm_filename);
 }
 
 // run cpp preprocessor
-static void run_cpp(const std::string& filename,
-                    std::vector<std::string>& out_filenames) {
+void Options::run_cpp(const std::string& filename) {
     std::string cpp_full_path = resolve_include_candidate(filename, "", false);
     if (cpp_full_path.empty()) {
         g_errors.error(ErrorCode::FileNotFound, filename);
@@ -332,9 +470,9 @@ static void run_cpp(const std::string& filename,
         cpp_full_path.substr(0, cpp_full_path.size() - cpp_extension.size());
 
     // build cpp command
-    std::string cpp_cmd = "cpp " + g_options.cpp_options +
+    std::string cpp_cmd = "cpp " + cpp_options +
                           " \"" + cpp_full_path + "\" > \"" + asm_filename + "\"";
-    if (g_options.verbose) {
+    if (verbose) {
         std::cout << "% " << cpp_cmd << std::endl;
     }
 
@@ -345,12 +483,11 @@ static void run_cpp(const std::string& filename,
     }
 
     // process generated asm file
-    search_source_file(asm_filename, out_filenames);
+    search_source_file(asm_filename);
 }
 
 // search list files
-static void search_list_file(const std::string& list_filename,
-                             std::vector<std::string>& out_filenames) {
+void Options::search_list_file(const std::string& list_filename) {
     std::string list_full_path = resolve_include_candidate(list_filename, "",
                                  false);
     if (list_full_path.empty()) {
@@ -389,7 +526,7 @@ static void search_list_file(const std::string& list_filename,
             continue;
         }
 
-        search_source_file(inc_filename, out_filenames);
+        search_source_file(inc_filename);
     }
 
     g_errors.set_location(Location());
@@ -585,8 +722,7 @@ static std::vector<std::string> expand_wildcards(const std::string& pattern) {
 }
 
 // search source file in path, return empty string if not found
-void search_source_file(const std::string& filename_,
-                        std::vector<std::string>& out_filenames) {
+void Options::search_source_file(const std::string& filename_) {
     std::string filename = trim(filename_);
     filename = expand_env_vars(filename);
     std::string out_filename;
@@ -605,7 +741,7 @@ void search_source_file(const std::string& filename_,
         // This enables: z88dk-z80asm -Ipath "*.asm"
         std::filesystem::path pat_path(filename);
         if (!pat_path.is_absolute()) {
-            for (const auto& inc : g_options.include_paths) {
+            for (const auto& inc : include_paths) {
                 std::string combined = (std::filesystem::path(inc) / filename).generic_string();
                 std::vector<std::string> m = expand_wildcards(combined);
                 matches.insert(matches.end(), m.begin(), m.end());
@@ -631,39 +767,39 @@ void search_source_file(const std::string& filename_,
         }
 
         for (const auto& m : unique_matches) {
-            search_source_file(m, out_filenames);
+            search_source_file(m);
         }
         return;
     }
 
     // check list files
     if (!filename.empty() && filename[0] == '@') {
-        search_list_file(filename.substr(1), out_filenames);
+        search_list_file(filename.substr(1));
         return;
     }
 
     // check m4 preprocessing
     if (str_ends_with(filename, m4_extension)) {
-        run_m4(filename, out_filenames);
+        run_m4(filename);
         return;
     }
 
     // check perl preprocessing
     if (str_ends_with(filename, perl_extension)) {
-        run_perl(filename, out_filenames);
+        run_perl(filename);
         return;
     }
 
     // check cpp preprocessing
     if (str_ends_with(filename, cpp_extension)) {
-        run_cpp(filename, out_filenames);
+        run_cpp(filename);
         return;
     }
 
     // check plain filename
     out_filename = check_source(filename);
     if (!out_filename.empty()) {
-        out_filenames.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -672,7 +808,7 @@ void search_source_file(const std::string& filename_,
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filenames.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -681,7 +817,7 @@ void search_source_file(const std::string& filename_,
     std::string asm_filename = filename + asm_extension;
     out_filename = check_source(asm_filename);
     if (!out_filename.empty()) {
-        out_filenames.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -690,7 +826,7 @@ void search_source_file(const std::string& filename_,
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filenames.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -699,7 +835,7 @@ void search_source_file(const std::string& filename_,
     std::string o_filename = filename + o_extension;
     out_filename = check_source(o_filename);
     if (!out_filename.empty()) {
-        out_filenames.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -708,7 +844,7 @@ void search_source_file(const std::string& filename_,
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filenames.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -717,7 +853,7 @@ void search_source_file(const std::string& filename_,
     asm_filename = get_asm_filename(filename);
     out_filename = check_source(asm_filename);
     if (!out_filename.empty()) {
-        out_filenames.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -726,7 +862,7 @@ void search_source_file(const std::string& filename_,
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filenames.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -735,7 +871,7 @@ void search_source_file(const std::string& filename_,
     o_filename = get_o_filename(filename);
     out_filename = check_source(o_filename);
     if (!out_filename.empty()) {
-        out_filenames.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -744,7 +880,7 @@ void search_source_file(const std::string& filename_,
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            out_filenames.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
