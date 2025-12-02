@@ -385,6 +385,7 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LPT_ROMANTIC   22   // Romantic Robot MULTIPRINT
 #define LPT_HOBBIT     23   // Хоббит, strobed Z80 PIO
 #define LPT_AJ         24   // A & J "Micro Drive" or just Centronics
+#define LPT_INTERFACE3 25   // Interface III Printer interface
 
 // Choose the current output driver and initialize it
 extern int  __LIB__  centronics_init(int driver) __z88dk_fastcall;
