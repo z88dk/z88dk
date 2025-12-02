@@ -7,154 +7,66 @@
 #include "errors.h"
 #include "options.h"
 #include "preprocessor.h"
+#include "utils.h"
+#include <filesystem>
 #include <iostream>
+#include <sstream>
 
-static bool is_option_arg(const std::string& arg,
-                          const std::string& option, std::string& option_arg) {
-    option_arg.clear();
+const std::string z80asm_env = "Z80ASM";
 
-    if (arg.size() > option.size() &&
-            arg.substr(0, option.size()) == option) {
-        option_arg = arg.substr(option.size());
-        if (!option_arg.empty() && option_arg.front() == '=') {
-            option_arg = option_arg.substr(1);
+static bool has_verbose(int argc, char* argv[]) {
+    std::string env_options = get_env_value(z80asm_env);
+    if (env_options.find("-v") != std::string::npos) {
+        return true;
+    }
+    for (int i = 1; i < argc; ++i) {
+        std::string arg(argv[i]);
+        if (arg.find("-v") != std::string::npos) {
+            return true;
         }
     }
+    return false;
+}
 
-    return !option_arg.empty();
+static void show_command_line(int argc, char* argv[]) {
+    std::string env_options = get_env_value(z80asm_env);
+    if (!env_options.empty()) {
+        std::cout << z80asm_env << "=" << env_options << std::endl;
+    }
+
+    std::string cmd = std::filesystem::path(argv[0]).stem().generic_string();
+    std::cout << "% " << cmd;
+    for (int i = 1; i < argc; ++i) {
+        std::cout << " " << argv[i];
+    }
+    std::cout << std::endl;
 }
 
 int main(int argc, char* argv[]) {
-    // process command-line arguments
-    bool found_dash_dash = false;
     if (argc == 1) {
         exit_show_copyright(EXIT_FAILURE);
     }
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        std::string option_arg;
 
-        if (arg.empty()) {
-            // skip empty args
+    // show command line if verbose
+    if (has_verbose(argc, argv)) {
+        show_command_line(argc, argv);
+    }
+
+    // process options from environment variable Z80ASM
+    std::istringstream ss(get_env_value(z80asm_env));
+    std::string arg;
+    while (ss >> arg) {
+        bool found_dash_dash = false;
+        if (!g_options.parse_arg(arg, found_dash_dash)) {
+            exit_invalid_option(arg);
         }
-        else if (!found_dash_dash && arg[0] == '-') {
-            // options
-            switch (arg[1]) {
-            case '-':
-                if (arg == "--") {
-                    found_dash_dash = true;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'E':
-                if (arg == "-E") {
-                    g_options.preprocess_only = true;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'I':
-                if (arg == "-IXIY") {
-                    g_options.swap_ix_iy = true;
-                }
-                else if (is_option_arg(arg, "-I", option_arg)) {
-                    g_options.include_paths.push_back(option_arg);
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'M':
-                if (arg == "-MD") {
-                    g_options.gen_dependencies = true;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'O':
-                if (is_option_arg(arg, "-O", option_arg)) {
-                    g_options.output_dir = option_arg;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'c':
-                if (is_option_arg(arg, "-cpp", option_arg)) {
-                    if (!g_options.cpp_options.empty()) {
-                        g_options.cpp_options.push_back(' ');
-                    }
-                    g_options.cpp_options += option_arg;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'd':
-                if (arg == "-d") {
-                    g_options.date_stamp = true;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'h':
-                if (arg == "-h") {
-                    exit_show_usage(EXIT_SUCCESS);
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'm':
-                if (is_option_arg(arg, "-m4", option_arg)) {
-                    if (!g_options.m4_options.empty()) {
-                        g_options.m4_options.push_back(' ');
-                    }
-                    g_options.m4_options += option_arg;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'p':
-                if (is_option_arg(arg, "-perl", option_arg)) {
-                    if (!g_options.perl_options.empty()) {
-                        g_options.perl_options.push_back(' ');
-                    }
-                    g_options.perl_options += option_arg;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'u':
-                if (arg == "-ucase") {
-                    g_options.ucase_labels = true;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            case 'v':
-                if (arg == "-v") {
-                    g_options.verbose = true;
-                }
-                else {
-                    exit_invalid_option(arg);
-                }
-                break;
-            default:
-                exit_invalid_option(arg);
-            }
-        }
-        else {
-            // input file
-            search_source_file(arg, g_input_files);
+    }
+
+    // process command line arguments
+    bool found_dash_dash = false;
+    for (int i = 1; i < argc; ++i) {
+        if (!g_options.parse_arg(argv[i], found_dash_dash)) {
+            exit_invalid_option(argv[i]);
         }
     }
 
@@ -163,7 +75,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    if (g_input_files.empty()) {
+    if (g_options.input_files.empty()) {
         g_errors.error(ErrorCode::NoInputFiles);
         exit(EXIT_FAILURE);
     }

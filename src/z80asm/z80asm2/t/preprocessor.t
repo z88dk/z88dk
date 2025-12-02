@@ -38,6 +38,7 @@ LD BEFORE,4
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -110,6 +111,7 @@ INCBIN $test.bin5
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -148,6 +150,7 @@ INCBIN $test.empty
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -185,6 +188,7 @@ DDD
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -210,6 +214,7 @@ DDD
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -238,6 +243,7 @@ Z2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -291,6 +297,7 @@ Z()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -342,6 +349,7 @@ F(2)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -372,6 +380,7 @@ OUTER(ONE,TWO)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -407,6 +416,7 @@ DEFC R = 21
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -444,6 +454,7 @@ H = 12
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -474,6 +485,7 @@ DEFC OUT = C + 6
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -499,6 +511,7 @@ M
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -515,6 +528,7 @@ P
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -531,6 +545,7 @@ Q
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -547,6 +562,7 @@ N
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -564,6 +580,7 @@ F(2)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -583,6 +600,7 @@ R
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -602,6 +620,7 @@ idx
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -619,6 +638,7 @@ value
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -638,6 +658,7 @@ index
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -656,6 +677,7 @@ db P
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -677,6 +699,7 @@ Z
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -699,6 +722,7 @@ DBX(4)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -720,6 +744,7 @@ MAKE_LABEL(20)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -744,6 +769,7 @@ CUT()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -766,6 +792,7 @@ MAYBE(1)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -789,6 +816,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -810,6 +838,7 @@ AFTER
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -827,6 +856,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -846,6 +876,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -866,6 +897,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -894,6 +926,7 @@ X
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -915,6 +948,7 @@ C
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -939,6 +973,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -961,6 +996,7 @@ W
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -982,6 +1018,7 @@ IF 1 : OK : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -996,6 +1033,7 @@ IF 0 : BAD : ELSE : GOOD : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1010,6 +1048,7 @@ IF 0 : A : ELIF 1 : B : ELIF 1 : C : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1033,6 +1072,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1054,6 +1094,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1073,6 +1114,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1093,6 +1135,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1119,6 +1162,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1144,6 +1188,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1165,6 +1210,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1187,6 +1233,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1209,6 +1256,7 @@ IFDEF C : OK : ELSE : BAD : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1224,6 +1272,7 @@ IFNDEF M : MISSING_OK : ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1253,6 +1302,7 @@ POST
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1282,6 +1332,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1319,6 +1370,7 @@ POST_G
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1352,6 +1404,7 @@ BG2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1384,6 +1437,7 @@ R2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1457,6 +1511,7 @@ END
 
 # Expect verbose preprocess message and dependency generation message
 capture_ok("z88dk-z80asm -v -E -MD $test.asm", <<END);
+% z88dk-z80asm -v -E -MD $test.asm
 Preprocessing file: $test.asm -> $test.i
 Generating dependency file: $test.d
 END
@@ -1509,6 +1564,7 @@ JOIN(X,Y)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1541,6 +1597,7 @@ X ## Y ## 2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1570,6 +1627,7 @@ STR(Hello)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1587,6 +1645,7 @@ STR(A)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1603,6 +1662,7 @@ STR("hi")
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1619,6 +1679,7 @@ STR(A B)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1677,6 +1738,7 @@ F 1
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1708,6 +1770,7 @@ DEFB "Hi"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1740,6 +1803,7 @@ E
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1770,6 +1834,7 @@ Z
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1801,6 +1866,7 @@ E
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1836,6 +1902,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1864,6 +1931,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1894,6 +1962,7 @@ AFTER_C
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1913,6 +1982,7 @@ AFTER_C_LOCAL
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1931,6 +2001,7 @@ AFTER_I
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -1950,6 +2021,7 @@ AFTER_I_LOCAL
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2103,6 +2175,7 @@ OUTER(1,10)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2134,6 +2207,7 @@ LOOPCUT(5)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2161,6 +2235,7 @@ OUT_REPT(7)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2196,6 +2271,7 @@ INCBIN <bbin.bin>
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.binpath $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.binpath $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2221,6 +2297,7 @@ INCBIN "$test.bbin"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2302,6 +2379,7 @@ MULTI()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2323,6 +2401,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2350,6 +2429,7 @@ OUTER()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2373,6 +2453,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2394,6 +2475,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2418,6 +2500,7 @@ R3()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2443,6 +2526,7 @@ LABS(10)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2472,6 +2556,7 @@ MIX()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2500,6 +2585,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2640,6 +2726,7 @@ db "QUOTE: \\\" BACKSLASH: \\\\ UNKNOWN: \\q"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2781,6 +2868,7 @@ spew("$test.asm", <<END);
 F 1
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 # Expect the call to remain literal since there are no parentheses (graceful fallback)
@@ -2832,6 +2920,7 @@ SUM 3,4
 SUM(5,6)
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 # Expect both calls to expand correctly at the call-site line
@@ -2873,6 +2962,7 @@ spew("$test.asm", <<END);
 EDB(ARG)
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -2890,6 +2980,7 @@ spew("$test.asm", <<END);
 EDB2(ARG2)
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -2922,6 +3013,7 @@ N
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2966,6 +3058,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -2990,6 +3083,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3031,6 +3125,7 @@ A(1)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3072,6 +3167,7 @@ foo##1##"ab"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3105,6 +3201,7 @@ PAIR(Hi,Go)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3150,6 +3247,7 @@ EMPTY()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3169,6 +3267,7 @@ HASH_IDENT(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3185,6 +3284,7 @@ MIX(test)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3201,6 +3301,7 @@ BARE_HASH
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3217,6 +3318,7 @@ MULTI_HASH(value)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3233,6 +3335,7 @@ START_PARAM(begin)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3249,6 +3352,7 @@ END_PARAM(final)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3265,6 +3369,7 @@ HASH_SPACE(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3281,6 +3386,7 @@ NO_PARAMS()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3297,6 +3403,7 @@ TRAILING_HASH(10)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3313,6 +3420,7 @@ TWO_PARAM(first,last)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3329,6 +3437,7 @@ num HASH_NUM(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3345,6 +3454,7 @@ HASH_STR(arg)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3362,6 +3472,7 @@ PASTE_HASH(foo)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3379,6 +3490,7 @@ OUTER(test)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3395,6 +3507,7 @@ OBJ
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3411,6 +3524,7 @@ CASE(Value)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3431,6 +3545,7 @@ LINE 10 filename extra
 A
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3445,6 +3560,7 @@ LINE 10, "file.asm" extra tokens
 B
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3459,6 +3575,7 @@ LINE 20, <file.inc> extra1 extra2
 C
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3473,6 +3590,7 @@ C_LINE 40 filename unexpected
 E
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3487,6 +3605,7 @@ C_LINE 50, "const.asm" trailing
 F
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3501,6 +3620,7 @@ C_LINE 60, <angle.inc> token1 token2 token3
 G
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3515,6 +3635,7 @@ LINE -10 filename extra
 I
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3529,6 +3650,7 @@ C_LINE -20, "neg.asm" surplus
 J
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3543,6 +3665,7 @@ LINE 80, plain.asm garbage
 K
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3557,6 +3680,7 @@ C_LINE 90, plain2.asm unwanted
 L
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3571,6 +3695,7 @@ LINE 120, "test.asm" identifier
 O
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3585,6 +3710,7 @@ C_LINE 130, <test.inc> 999
 P
 END
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -3907,6 +4033,7 @@ AFTER_NEG_REPT
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3925,6 +4052,7 @@ AFTER_MINUS_ONE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3942,6 +4070,7 @@ AFTER_LARGE_NEG
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3960,6 +4089,7 @@ AFTER_NEG_LOCAL
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -3979,6 +4109,7 @@ VISIBLE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4000,6 +4131,7 @@ NEXT_LINE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4021,6 +4153,7 @@ AFTER_NEG_VALUES
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4046,6 +4179,7 @@ AFTER_SINGLE_NEG
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4066,6 +4200,7 @@ MIXED_DONE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4092,6 +4227,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4119,6 +4255,7 @@ TEST_NEG()
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4140,6 +4277,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4163,6 +4301,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4188,6 +4327,7 @@ AFTER_NESTED
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4217,6 +4357,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4247,6 +4388,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4277,6 +4419,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4295,6 +4438,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4313,6 +4457,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4331,6 +4476,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4353,6 +4499,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4371,6 +4518,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4389,6 +4537,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4407,6 +4556,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4429,6 +4579,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4450,6 +4601,7 @@ ENDR
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4472,6 +4624,7 @@ AFTER_EMPTY
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4489,6 +4642,7 @@ AFTER
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4504,6 +4658,7 @@ GO
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4522,6 +4677,7 @@ ENDLINE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4565,6 +4721,7 @@ ENDP
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4596,6 +4753,7 @@ B
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4625,6 +4783,7 @@ END_MIX
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4661,6 +4820,7 @@ POST_ONCE_TWICE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4693,6 +4853,7 @@ POST_MULTI
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4735,6 +4896,7 @@ POST_REL_ONCE
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4764,6 +4926,7 @@ POST_REL_REPEAT
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4798,6 +4961,7 @@ POST_REL_GUARD
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -4918,6 +5082,7 @@ PRE1
 POST1
 END
 capture_ok("z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -4936,6 +5101,7 @@ PRE2
 POST2
 END
 capture_ok("z88dk-z80asm -v -E -I$test.incp2 -I$test.incp1 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp2 -I$test.incp1 $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -4959,6 +5125,7 @@ PREQ
 POSTQ
 END
 capture_ok("z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -4977,6 +5144,7 @@ PREA
 POSTA
 END
 capture_ok("z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incp1 -I$test.incp2 $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -5017,6 +5185,7 @@ POST_GS
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5052,6 +5221,7 @@ POST_BMG
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5088,6 +5258,7 @@ POST_OLC
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5121,6 +5292,7 @@ POST_OLB
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5160,6 +5332,7 @@ POST_REDEF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5188,6 +5361,7 @@ POST_REDEF2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5222,6 +5396,7 @@ AFTER_PREDEF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5256,6 +5431,7 @@ POST_BOTH
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5283,6 +5459,7 @@ POST_AFTER_UNDEF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5309,6 +5486,7 @@ POST_DEFINED
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5338,6 +5516,7 @@ END
 
 # First run: expect V1
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -5357,6 +5536,7 @@ select(undef, undef, undef, 1.0); # sleep 1 second to ensure mtime differs on lo
 
 # Second run: expect V2 (cache invalidated by mod time)
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -5382,6 +5562,7 @@ END
 
 # First preprocess: ANGLE_V1
 capture_ok("z88dk-z80asm -v -E -I$test.incdir $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incdir $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -5401,6 +5582,7 @@ select(undef, undef, undef, 1.0);
 
 # Second preprocess: should emit ANGLE_V2
 capture_ok("z88dk-z80asm -v -E -I$test.incdir $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.incdir $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
@@ -5434,6 +5616,7 @@ A5
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5466,6 +5649,7 @@ B7
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5521,6 +5705,7 @@ D1
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5567,6 +5752,7 @@ I2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5768,6 +5954,7 @@ db 12
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5793,6 +5980,7 @@ db 23
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5822,6 +6010,7 @@ db 34
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5855,6 +6044,7 @@ db 43
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5886,6 +6076,7 @@ AFTER_1
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5932,6 +6123,7 @@ TAIL_3
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5959,6 +6151,7 @@ AFTER_4
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5980,6 +6173,7 @@ AFTER_5
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -5999,6 +6193,7 @@ AFTER_6
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6020,6 +6215,7 @@ neg1
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6037,6 +6233,7 @@ neg2
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6055,6 +6252,7 @@ neg3
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6073,6 +6271,7 @@ db neg4
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6100,6 +6299,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6122,6 +6322,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6145,6 +6346,7 @@ ENDIF
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6164,6 +6366,7 @@ db ""
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6179,6 +6382,7 @@ DEFB ""
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6193,6 +6397,7 @@ db "",65
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6207,6 +6412,7 @@ db 65,"",66
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6221,6 +6427,7 @@ DEFB 70,""
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6235,6 +6442,7 @@ DEFB "",1,"",2,""
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6253,6 +6461,7 @@ db "A","BC"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6268,6 +6477,7 @@ DEFB "X","YZ","W"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6283,6 +6493,7 @@ db "A","", "B"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6298,6 +6509,7 @@ DEFB "","Q","R"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6313,6 +6525,7 @@ db "M","N",""
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6328,6 +6541,7 @@ DEFB "AB", 100, "C"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6348,6 +6562,7 @@ db foo##bar, "AB"
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6365,6 +6580,7 @@ COMB(ID)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6383,6 +6599,7 @@ JOIN2(A,B)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6401,6 +6618,7 @@ PASTE_INT(BASE,SUF)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6421,6 +6639,7 @@ BAD_COMBO(STR)
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6442,6 +6661,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -6457,6 +6677,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
