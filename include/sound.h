@@ -109,6 +109,11 @@ extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smal
 #endif
 
 
+/* Generic version, DAC output port must be specified */
+
+extern void __LIB__ playzb4_dac(unsigned char *SamStart, unsigned int SamLen, unsigned int dacport) __smallc;
+
+
 /* DATA Load/Save - ZX Spectrum style */
 
 extern int  __LIB__            bit_save_zx(char *name, size_t loadstart,void *start, size_t len) __smallc;
