@@ -117,12 +117,14 @@ _centronics_init:
 
 
 ; TODO:
-;
-; Fuller and Fuller Dual interface (also RS232)
+; Watford Centronics + RS232
+; Fuller and Fuller Dual interface (also RS232) -> Nordic Systems ?
 ; Microdigital TK90X/ TK95
-; Sam Coupè  (CALL 0181H - send A to parallel printer)
 ; CS-Disk
-; -------(shadow ROM tricks)------- 
+; Pericon-C
+;
+; -------(shadow/ROM tricks)------- 
+; Sam Coupè  (CALL 0181H - send A to parallel printer)
 ; FDD-3000
 ;
 
