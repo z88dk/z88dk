@@ -353,29 +353,38 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 // CENTRONICS PRINTER INTERFACES
 /////////////////////////////////
 
+// For the Opus Discovery use opus_lptwrite() in <arch/zx/zxopus.h>
+
+// "MOREX" had plenty of derived, equivalent interfaces
+                            //   Morex,   Abbeydale,  Indescomp,   Ventamatic,
+                            //   PIN SOFT I/F,   Microhobby,  B&V Interface
+                            //   Proceeding Electronic System,
+                            //   Elettronica 2000 magazine n.53,
 #define LPT_MOREX      0
-#define LPT_DKTRONICS  1
-#define LPT_KEMPSTONE  2
-#define LPT_KEMPSTONS  3
-#define LPT_HILDERBAY  4
-#define LPT_HWG        5
-#define LPT_MICROFACE  6
-#define LPT_PLUS3      7
-#define LPT_DISCIPLE   8
-#define LPT_PLUSD      9
-#define LPT_LPRINTIII  10
-#define LPT_AERCO      11
-#define LPT_PPI        12
-#define LPT_TASMAN     13
-#define LPT_WAFADRIVE  14
-#define LPT_ZXPOWER    15
-#define LPT_LINK       16
-#define LPT_GAMA       17
-#define LPT_PROXIMA    18
-#define LPT_DIDAKTIKMP 19
-#define LPT_DIDAKTIKB  20
-#define LPT_ROMANTIC   21
-#define LPT_HOBBIT     22
+#define LPT_DKTRONICS  1    // DK'Tronics (Z80 PIO)
+#define LPT_KEMPSTONE  2    // Kempston Interface E
+#define LPT_KEMPSTONS  3    // Kempston Interface S
+#define LPT_HILDERBAY  4    // Hilderbay Printer Interface
+#define LPT_HWG        5    // Centronics-Schnittstelle by HWG 
+#define LPT_MICROFACE  6    // MICROFACE by CSH / N.E. n.98, kit LX674
+#define LPT_PLUS3      7    // ZX Spectrum +2A/+3
+#define LPT_DISCIPLE   8    // DISCiPLE
+#define LPT_PLUSD      9    // +D interface
+#define LPT_LPRINTIII  10   // Euroelectronics LPRINT III, a.k.a. MK III
+#define LPT_AERCO      11   // AERCO CP-ZX (A.K.A. CP-2068), OLIGER
+#define LPT_PPI        12   // AT IMS KR580VV66A PIA / also "Marko Solajic"
+#define LPT_TASMAN     13   // TASMAN (Type A / USA B)
+#define LPT_TASMAN_B   14   // TASMAN (Type B / USA C)
+#define LPT_WAFADRIVE  15   // Rotronics WAFADRIVE
+#define LPT_ZXPOWER    16   // ZX-POWER PROD "ZX LPRINT" - Denmark
+#define LPT_LINK       17   // "CENTRONICS LINK" interface by RS/MM
+#define LPT_GAMA       18   // Didaktik Gama (strobed on port A)
+#define LPT_PROXIMA    19   // Didaktik "Proxima" (strobed on port B)
+#define LPT_DIDAKTIKMP 20   // SPECIAL D. on port A (M/P interface)
+#define LPT_DIDAKTIKB  21   // SPECIAL D. on port B
+#define LPT_ROMANTIC   22   // Romantic Robot MULTIPRINT
+#define LPT_HOBBIT     23   // Хоббит, strobed Z80 PIO
+#define LPT_AJ         24   // A & J "Micro Drive" or just Centronics
 
 // Choose the current output driver and initialize it
 extern int  __LIB__  centronics_init(int driver) __z88dk_fastcall;
