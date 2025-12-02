@@ -7261,3 +7261,40 @@ $notcpu 8085
 	call	l_long_inc_mhl
 .%2
 	ld	hl,%3
+
+%title Copying small struct/union
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+	pop	de
+	ldi
+	ldi
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,%eval(%2 2 -)	;const
+	add	hl,sp
+	ld	a,(hl)
+	ld	(de),a
+	inc	de
+	inc	hl
+	ld	a,(hl)
+	ld	(de),a
+
+%title Close in stack references
+%eval 2 = %2 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,%2	;const
+	add	hl,sp
+=
+	ld	hl,0	;const
+	add	hl,sp
+	ld	d,h
+	ld	e,l
+	inc	hl
+	inc	hl

@@ -609,7 +609,7 @@ void putstk(LVALUE *lval)
         return;
     }
 
-    if ( ctype->bit_size ) {
+    if ( ctype && ctype->bit_size ) {
         int bit_offset = lval->ltype->bit_offset;
         int doinc = 0;
 
@@ -690,8 +690,16 @@ void putstk(LVALUE *lval)
         break;
     case KIND_STRUCT:
         pop("de");
-        outfmt("\tld\tbc,%d\n",lval->ltype->size);
-        ol("ldir");
+        switch ( lval->ltype->size ) {
+        case 2:
+            ol("ldi");
+        case 1:
+            ol("ldi");
+            break;
+        default:
+            outfmt("\tld\tbc,%d\n",lval->ltype->size);
+            ol("ldir");
+        }
         break;
     default:
         pop("de");

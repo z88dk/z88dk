@@ -682,7 +682,7 @@ void store(LVALUE* lval)
 void smartpush(LVALUE* lval, char* before)
 {
    // outfmt(";%s Indirect kind %d kind %d flags %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind,lval->flags);
-    if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
+    if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC || lval->ltype->kind == KIND_STRUCT )  {
         addstk(lval);
         gen_save_pointer(lval);
     } else {
@@ -705,7 +705,7 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC ) {
+    if (lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC || lval->ltype->kind == KIND_STRUCT ) {
         store(lval);
     } else {
         switch ((lval->symbol->offset.i) - Zsp) {
