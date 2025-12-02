@@ -24,6 +24,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test_dir/include $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test_dir/include $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -44,6 +45,7 @@ spew("$test_dir/$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test_dir/include $test_dir/$test.asm", <<END);
+% z88dk-z80asm -v -E -I$test_dir/include $test_dir/$test.asm
 Preprocessing file: $test_dir/$test.asm -> $test_dir/$test.i
 END
 

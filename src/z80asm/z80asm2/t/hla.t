@@ -34,6 +34,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -58,6 +59,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -84,6 +86,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -120,6 +123,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -147,6 +151,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -192,6 +197,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -223,6 +229,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -244,6 +251,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -269,6 +277,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -294,6 +303,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -328,6 +338,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -358,6 +369,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -390,6 +402,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -424,6 +437,7 @@ spew("$test.asm", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 

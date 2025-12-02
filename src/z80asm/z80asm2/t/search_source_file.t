@@ -14,6 +14,7 @@ unlink("$test.i");
 unlink("$test.o");
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E $test", <<END);
+% z88dk-z80asm -v -E $test
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -22,6 +23,7 @@ unlink("$test.i");
 unlink("$test.asm");
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E $test", <<END);
+% z88dk-z80asm -v -E $test
 Skipping preprocessing for object file: $test.o
 END
 
@@ -30,6 +32,7 @@ unlink("$test.i");
 unlink("$test.o");
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -38,6 +41,7 @@ unlink("$test.i");
 unlink("$test.asm");
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E $test.o", <<END);
+% z88dk-z80asm -v -E $test.o
 Skipping preprocessing for object file: $test.o
 END
 
@@ -46,6 +50,7 @@ unlink("$test.i");
 unlink("$test.o");
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E $test.o", <<END);
+% z88dk-z80asm -v -E $test.o
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -54,6 +59,7 @@ unlink("$test.i");
 unlink("$test.asm");
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
+% z88dk-z80asm -v -E $test.asm
 Skipping preprocessing for object file: $test.o
 END
 
@@ -70,6 +76,7 @@ unlink("$test.i");
 unlink("$test.dir/$test.o");
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test", <<END);
+% z88dk-z80asm -v -E -O$test.dir $test
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -78,6 +85,7 @@ unlink("$test.i");
 unlink("$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test", <<END);
+% z88dk-z80asm -v -E -O$test.dir $test
 Skipping preprocessing for object file: $test.dir/$test.o
 END
 
@@ -86,6 +94,7 @@ unlink("$test.i");
 unlink("$test.dir/$test.o");
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test.asm", <<END);
+% z88dk-z80asm -v -E -O$test.dir $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -94,6 +103,7 @@ unlink("$test.i");
 unlink("$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test.o", <<END);
+% z88dk-z80asm -v -E -O$test.dir $test.o
 Skipping preprocessing for object file: $test.dir/$test.o
 END
 
@@ -102,6 +112,7 @@ unlink("$test.i");
 unlink("$test.dir/$test.o");
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test.o", <<END);
+% z88dk-z80asm -v -E -O$test.dir $test.o
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -110,6 +121,7 @@ unlink("$test.i");
 unlink("$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test.asm", <<END);
+% z88dk-z80asm -v -E -O$test.dir $test.asm
 Skipping preprocessing for object file: $test.dir/$test.o
 END
 
@@ -127,6 +139,7 @@ unlink("$test.dir/$test.i");
 unlink("$test.dir/$test.o");
 spew("$test.dir/$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
 
@@ -135,6 +148,7 @@ unlink("$test.dir/$test.i");
 unlink("$test.dir/$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test
 Skipping preprocessing for object file: $test.dir/$test.o
 END
 
@@ -143,6 +157,7 @@ unlink("$test.dir/$test.i");
 unlink("$test.dir/$test.o");
 spew("$test.dir/$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.asm
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
 
@@ -151,6 +166,7 @@ unlink("$test.dir/$test.i");
 unlink("$test.dir/$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.o", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.o
 Skipping preprocessing for object file: $test.dir/$test.o
 END
 
@@ -159,6 +175,7 @@ unlink("$test.dir/$test.i");
 unlink("$test.dir/$test.o");
 spew("$test.dir/$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.o", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.o
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
 
@@ -167,6 +184,7 @@ unlink("$test.dir/$test.i");
 unlink("$test.dir/$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.asm", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.asm
 Skipping preprocessing for object file: $test.dir/$test.o
 END
 
@@ -179,6 +197,7 @@ spew("$test.asm", "nop");
 sleep(1);
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E -d $test", <<END);
+% z88dk-z80asm -v -E -d $test
 Skipping preprocessing for object file: $test.o
 END
 
@@ -188,6 +207,7 @@ spew("$test.asm", "nop");
 sleep(1);
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E -d $test.asm", <<END);
+% z88dk-z80asm -v -E -d $test.asm
 Skipping preprocessing for object file: $test.o
 END
 
@@ -197,6 +217,7 @@ spew("$test.asm", "nop");
 sleep(1);
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E -d $test.o", <<END);
+% z88dk-z80asm -v -E -d $test.o
 Skipping preprocessing for object file: $test.o
 END
 
@@ -209,6 +230,7 @@ spew("$test.o", "");
 sleep(1);
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -d $test", <<END);
+% z88dk-z80asm -v -E -d $test
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -218,6 +240,7 @@ spew("$test.o", "");
 sleep(1);
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -d $test.asm", <<END);
+% z88dk-z80asm -v -E -d $test.asm
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -227,6 +250,7 @@ spew("$test.o", "");
 sleep(1);
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -v -E -d $test.o", <<END);
+% z88dk-z80asm -v -E -d $test.o
 Preprocessing file: $test.asm -> $test.i
 END
 
@@ -244,6 +268,7 @@ print "nop\n";
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm.pl", <<END);
+% z88dk-z80asm -v -E $test.asm.pl
 % perl  "$test.asm.pl" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -269,6 +294,7 @@ print "nop\n";
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.asm.pl", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.asm.pl
 % perl  "$test.dir/$test.asm.pl" > "$test.dir/$test.asm"
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
@@ -293,6 +319,7 @@ END
 
 # Use a sample perl option string (e.g., -w -Mstrict)
 capture_ok("z88dk-z80asm -v -E -perl=-w -perl=-Mstrict $test.asm.pl", <<END);
+% z88dk-z80asm -v -E -perl=-w -perl=-Mstrict $test.asm.pl
 % perl -w -Mstrict "$test.asm.pl" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -319,6 +346,7 @@ print "nop\\n";
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir -perl=-w -perl=-Mstrict $test.asm.pl", <<END);
+% z88dk-z80asm -v -E -I$test.dir -perl=-w -perl=-Mstrict $test.asm.pl
 % perl -w -Mstrict "$test.dir/$test.asm.pl" > "$test.dir/$test.asm"
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
@@ -343,6 +371,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm.m4", <<END);
+% z88dk-z80asm -v -E $test.asm.m4
 % m4  "$test.asm.m4" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -370,6 +399,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.asm.m4", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.asm.m4
 % m4  "$test.dir/$test.asm.m4" > "$test.dir/$test.asm"
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
@@ -393,6 +423,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -m4=-DOP=nop $test.asm.m4", <<END);
+% z88dk-z80asm -v -E -m4=-DOP=nop $test.asm.m4
 % m4 -DOP=nop "$test.asm.m4" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -412,6 +443,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -m4=-DOP=nop -m4=-s $test.asm.m4", <<END);
+% z88dk-z80asm -v -E -m4=-DOP=nop -m4=-s $test.asm.m4
 % m4 -DOP=nop -s "$test.asm.m4" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -438,6 +470,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir -m4=-DOP=nop $test.asm.m4", <<END);
+% z88dk-z80asm -v -E -I$test.dir -m4=-DOP=nop $test.asm.m4
 % m4 -DOP=nop "$test.dir/$test.asm.m4" > "$test.dir/$test.asm"
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
@@ -461,6 +494,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E $test.asm.cpp", <<END);
+% z88dk-z80asm -v -E $test.asm.cpp
 % cpp  "$test.asm.cpp" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -491,6 +525,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.asm.cpp", <<END);
+% z88dk-z80asm -v -E -I$test.dir $test.asm.cpp
 % cpp  "$test.dir/$test.asm.cpp" > "$test.dir/$test.asm"
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
@@ -514,6 +549,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -cpp=-DOP=nop $test.asm.cpp", <<END);
+% z88dk-z80asm -v -E -cpp=-DOP=nop $test.asm.cpp
 % cpp -DOP=nop "$test.asm.cpp" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -533,6 +569,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -cpp=-DOP=nop -cpp=-DOTHER=1 $test.asm.cpp", <<END);
+% z88dk-z80asm -v -E -cpp=-DOP=nop -cpp=-DOTHER=1 $test.asm.cpp
 % cpp -DOP=nop -DOTHER=1 "$test.asm.cpp" > "$test.asm"
 Preprocessing file: $test.asm -> $test.i
 END
@@ -559,6 +596,7 @@ OP
 END
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir -cpp=-DOP=nop $test.asm.cpp", <<END);
+% z88dk-z80asm -v -E -I$test.dir -cpp=-DOP=nop $test.asm.cpp
 % cpp -DOP=nop "$test.dir/$test.asm.cpp" > "$test.dir/$test.asm"
 Preprocessing file: $test.dir/$test.asm -> $test.dir/$test.i
 END
@@ -588,6 +626,7 @@ $test.a2       ; no extension, resolve to .asm
 END
 
 capture_ok("z88dk-z80asm -v -E \"\@$test.lst\"", <<END);
+% z88dk-z80asm -v -E \@$test.lst
 Preprocessing file: $test.a1.asm -> $test.a1.i
 Preprocessing file: $test.a2.asm -> $test.a2.i
 END
@@ -619,6 +658,7 @@ spew("$test.list2", <<END);
 END
 
 capture_ok("z88dk-z80asm -v -E \"\@$test.list2\"", <<END);
+% z88dk-z80asm -v -E \@$test.list2
 Preprocessing file: $test.a3.asm -> $test.a3.i
 END
 
@@ -640,6 +680,7 @@ $test.dir/$test.linc.asm
 END
 
 capture_ok("z88dk-z80asm -v -E -I. \"\@$test.dir/$test.linc.lst\"", <<END);
+% z88dk-z80asm -v -E -I. \@$test.dir/$test.linc.lst
 Preprocessing file: $test.dir/$test.linc.asm -> $test.dir/$test.linc.i
 END
 
@@ -670,7 +711,8 @@ spew("$test.dir/sub1/deeper/d1.asm", "nop");
 spew("$test.dir/sub2/e2.asm", "nop");
 
 # 1) '*' matches any number of chars in a single path component
-capture_ok("z88dk-z80asm -v -E \"$test.dir/*.asm\"", <<END);
+capture_ok("z88dk-z80asm -v -E \"$test.dir/*.asm\" | sort", <<END);
+% z88dk-z80asm -v -E $test.dir/*.asm
 Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i
 Preprocessing file: $test.dir/a2.asm -> $test.dir/a2.i
 Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
@@ -691,11 +733,13 @@ END
 
 # 2) '?' matches a single character
 capture_ok("z88dk-z80asm -v -E \"$test.dir/b?.asm\"", <<END);
+% z88dk-z80asm -v -E $test.dir/b?.asm
 Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
 END
 
 # 3) '**' matches subdirectories recursively
 capture_ok("z88dk-z80asm -v -E \"$test.dir/**/c1.asm\"", <<END);
+% z88dk-z80asm -v -E $test.dir/**/c1.asm
 Preprocessing file: $test.dir/sub1/c1.asm -> $test.dir/sub1/c1.i
 END
 check_text_file("$test.dir/sub1/c1.i", <<END);
@@ -704,7 +748,8 @@ nop
 END
 
 # 4) '**' combined with '*.asm' to collect many files across subdirs
-capture_ok("z88dk-z80asm -v -E \"$test.dir/**/*.asm\"", <<END);
+capture_ok("z88dk-z80asm -v -E \"$test.dir/**/*.asm\" | sort", <<END);
+% z88dk-z80asm -v -E $test.dir/**/*.asm
 Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i
 Preprocessing file: $test.dir/a2.asm -> $test.dir/a2.i
 Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
@@ -731,6 +776,7 @@ spew("$test.dir2/x1.asm", "nop");
 spew("$test.dir2/y2.asm", "nop");
 
 capture_ok("z88dk-z80asm -v -E -I$test.dir2 \"*.asm\"", <<END);
+% z88dk-z80asm -v -E -I$test.dir2 *.asm
 Preprocessing file: $test.dir2/x1.asm -> $test.dir2/x1.i
 Preprocessing file: $test.dir2/y2.asm -> $test.dir2/y2.i
 END
@@ -765,6 +811,7 @@ END
 spew("$test.asm", "nop\n");
 
 capture_ok("z88dk-z80asm -v -E \"\@$test.lst\"", <<END);
+% z88dk-z80asm -v -E \@$test.lst
 Preprocessing file: $test.asm -> $test.i
 END
 

@@ -20,28 +20,38 @@ struct Options {
     std::string cpp_options;
     std::string output_dir;
     std::vector<std::string> include_paths;
+    std::vector<std::string> input_files;
+
+    bool parse_arg(const std::string& arg, bool& found_dash_dash);
+    void search_source_file(const std::string& filename);
+    void search_list_file(const std::string& list_filename);
+
+    // manipulate filenames and paths
+    std::string replace_extension(const std::string& filename,
+                                  const std::string& extension);
+    std::string prepend_output_dir(const std::string& filename);
+    std::string resolve_include_candidate(const std::string& filename,
+                                          const std::string& including_filename, bool is_angle = false);
+
+    std::string get_asm_filename(const std::string& filename);
+    std::string get_d_filename(const std::string& filename);
+    std::string get_o_filename(const std::string& filename);
+    std::string get_i_filename(const std::string& filename);
+
+    bool is_asm_filename(const std::string& filename);
+    bool is_o_filename(const std::string& filename);
+
+private:
+    bool is_option_arg(const std::string& arg,
+                       const std::string& opt, std::string& opt_arg);
+    void run_m4(const std::string& filename);
+    void run_perl(const std::string& filename);
+    void run_cpp(const std::string& filename);
+    std::string check_source(const std::string& filename);
 };
 
 extern Options g_options;
-extern std::vector<std::string> g_input_files;
 
 void exit_show_copyright(int exit_code);
 void exit_show_usage(int exit_code);
 void exit_invalid_option(const std::string& option);
-
-// manipulate filenames and paths
-std::string get_asm_filename(const std::string& filename);
-std::string get_d_filename(const std::string& filename);
-std::string get_o_filename(const std::string& filename);
-std::string get_i_filename(const std::string& filename);
-
-bool is_asm_filename(const std::string& filename);
-bool is_o_filename(const std::string& filename);
-
-std::string resolve_include_candidate(const std::string& filename,
-                                      const std::string& including_filename, bool is_angle = false);
-void search_source_file(const std::string& filename,
-                        std::vector<std::string>& out_filenames);
-
-
-
