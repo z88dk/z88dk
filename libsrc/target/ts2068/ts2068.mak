@@ -3,7 +3,6 @@ TS2068_GLOBS := "target/zx/display/c/sccz80/*.asm" "target/zx/display/z80/*.asm"
 	"target/zx/classic/diagnostic/*.asm" \
 	"target/zx/classic/basic/*.asm" \
 	"target/zx/classic/opus/*.asm" \
-	"target/zx/classic/specdrum/*.asm" \
 	"target/zx/classic/uspeech/*.asm" \
 	"target/zx/classic/games/*.asm" \
 	"target/zx/classic/input/*.asm" \
@@ -24,7 +23,6 @@ TS2068_GLOBS_ex := target/zx/display/c/sccz80/*.asm target/zx/display/z80/*.asm 
 	target/zx/classic/diagnostic/*.asm \
 	target/zx/classic/basic/*.asm \
 	target/zx/classic/opus/*.asm \
-	target/zx/classic/specdrum/*.asm \
 	target/zx/classic/uspeech/*.asm \
 	target/zx/classic/games/*.asm \
 	target/zx/classic/input/*.asm \
