@@ -20,6 +20,7 @@ Errors::Errors() = default;
 
 void Errors::reset() {
     error_count_ = 0;
+    warning_count_ = 0;
     clear();
 }
 
@@ -37,16 +38,25 @@ void Errors::error(ErrorCode code, const std::string& arg) {
 }
 
 void Errors::warning(ErrorCode code, const std::string& arg) {
+    ++warning_count_;
     format_error_message(code, "warning", arg);
     std::cerr << last_error_message_;
 }
 
-const std::string& Errors::filename() const {
-    return location_.filename();
+void Errors::error(const Location& loc, ErrorCode code, const std::string& arg) {
+    ++error_count_;
+    format_error_message(loc, code, "error", arg);
+    std::cerr << last_error_message_;
 }
 
-int Errors::line_num() const {
-    return location_.line_num();
+void Errors::warning(const Location& loc, ErrorCode code, const std::string& arg) {
+    ++warning_count_;
+    format_error_message(loc, code, "warning", arg);
+    std::cerr << last_error_message_;
+}
+
+const Location& Errors::location() const {
+    return location_;
 }
 
 void Errors::set_location(const Location& loc) {
@@ -68,6 +78,10 @@ int Errors::error_count() const {
 
 bool Errors::has_errors() const {
     return error_count_ > 0;
+}
+
+bool Errors::has_warnings() const {
+    return warning_count_ > 0;
 }
 
 const std::string& Errors::last_error_message() const {
@@ -97,6 +111,31 @@ void Errors::format_error_message(ErrorCode code,
     if (!expanded_line_.empty() && expanded_line_ != source_line_) {
         oss << "   |" << expanded_line_ << std::endl;
     }
+
+    last_error_message_ = oss.str();
+}
+
+void Errors::format_error_message(const Location& loc,
+                                  ErrorCode code,
+                                  const std::string& prefix,
+                                  const std::string& arg) {
+    std::ostringstream oss;
+
+    if (!loc.empty()) {
+        oss << loc.filename() << ":" << loc.line_num() << ": ";
+    }
+
+    std::string msg = error_messages[static_cast<int>(code)];
+    oss << prefix << ": " << msg;
+
+    if (!arg.empty()) {
+        oss << ": " << arg;
+    }
+
+    oss << std::endl;
+
+    // Note: No source_line_ or expanded_line_ output for explicit location errors
+    // since the context may not be available for expressions evaluated later
 
     last_error_message_ = oss.str();
 }

@@ -26,18 +26,23 @@ public:
     void error(ErrorCode code, const std::string& arg = "");
     void warning(ErrorCode code, const std::string& arg = "");
 
-    const std::string& filename() const;
-    int line_num() const;
+    // Overloads that accept explicit location (for expression errors)
+    void error(const Location& loc, ErrorCode code, const std::string& arg = "");
+    void warning(const Location& loc, ErrorCode code, const std::string& arg = "");
+
+    const Location& location() const;
     void set_location(const Location& loc);
     void set_source_line(const std::string& line);
     void set_expanded_line(const std::string& line);
 
     int error_count() const;
     bool has_errors() const;
+    bool has_warnings() const;
     const std::string& last_error_message() const;
 
 private:
     int error_count_ = 0;
+    int warning_count_ = 0;
     Location location_;
     std::string source_line_;
     std::string expanded_line_;
@@ -45,6 +50,12 @@ private:
 
     // set last_error_message_
     void format_error_message(ErrorCode code,
+                              const std::string& prefix,
+                              const std::string& arg);
+    
+    // Format error message with explicit location
+    void format_error_message(const Location& loc,
+                              ErrorCode code,
                               const std::string& prefix,
                               const std::string& arg);
 };

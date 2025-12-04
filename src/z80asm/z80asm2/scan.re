@@ -183,9 +183,9 @@ main_loop:
         '#'     { PUSH_TOKEN1(TokenType::Hash); continue; }
         '##'    { PUSH_TOKEN1(TokenType::DoubleHash); continue; }
         ':'     { PUSH_TOKEN1(TokenType::Colon); continue; }
-        '?'     { PUSH_TOKEN1(TokenType::Quest); continue; }
+        '?'     { PUSH_TOKEN1(TokenType::Question); continue; }
         '!'		{ PUSH_TOKEN1(TokenType::LogicalNot); continue; }
-        '%'		{ PUSH_TOKEN1(TokenType::Modulus); continue; }
+        '%'		{ PUSH_TOKEN1(TokenType::Modulo); continue; }
         '&'		{ PUSH_TOKEN1(TokenType::BitwiseAnd); continue; }
         '&&'		{ PUSH_TOKEN1(TokenType::LogicalAnd); continue; }
         '*'		{ PUSH_TOKEN1(TokenType::Multiply); continue; }
@@ -194,12 +194,12 @@ main_loop:
         '-'		{ PUSH_TOKEN1(TokenType::Minus); continue; }
         '/'		{ PUSH_TOKEN1(TokenType::Divide); continue; }
         '<='		{ PUSH_TOKEN1(TokenType::LE); continue; }
-        '<<'		{ PUSH_TOKEN1(TokenType::ShiftLeft); continue; }
+        '<<'		{ PUSH_TOKEN1(TokenType::LeftShift); continue; }
         '='  | '=='		{ PUSH_TOKEN1(TokenType::EQ); continue; }
         '!=' | '<>'		{ PUSH_TOKEN1(TokenType::NE); continue; }
         '>'		{ PUSH_TOKEN1(TokenType::GT); continue; }
         '>='		{ PUSH_TOKEN1(TokenType::GE); continue; }
-        '>>'		{ PUSH_TOKEN1(TokenType::ShiftRight); continue; }
+        '>>'		{ PUSH_TOKEN1(TokenType::RightShift); continue; }
         '^'		{ PUSH_TOKEN1(TokenType::BitwiseXor); continue; }
         '^^'		{ PUSH_TOKEN1(TokenType::LogicalXor); continue; }
         '|'		{ PUSH_TOKEN1(TokenType::BitwiseOr); continue; }

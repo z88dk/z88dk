@@ -87,4 +87,5 @@ std::string get_env_value(const std::string& name);
 // Supports nesting like ${var${param}} by recursively expanding inside names and values.
 std::string expand_env_vars(const std::string& text);
 
-
+// Helper function to format integer as hex string
+std::string int_to_hex(int value);

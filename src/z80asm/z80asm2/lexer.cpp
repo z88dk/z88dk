@@ -209,7 +209,7 @@ std::string TokensLine::to_string() const {
                 // $ followed by hex digit could be part of a hex number
                 need_space = true;
             }
-            else if ((prev.type() == TokenType::Modulus || prev.type() == TokenType::At) &&
+            else if ((prev.type() == TokenType::Modulo || prev.type() == TokenType::At) &&
                      is_bin_char(first_char)) {
                 // % followed by number could be part of a binary number
                 need_space = true;
