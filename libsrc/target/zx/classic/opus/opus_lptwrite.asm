@@ -5,7 +5,7 @@
 ;
 ;	void opus_lptwrite (unsigned char databyte);
 ;
-;	$Id: opus_lptwrite.asm,v 1.5 2016-06-27 19:16:34 dom Exp $
+;	$Id: opus_lptwrite.asm $
 ;
 
     SECTION code_clib
@@ -19,17 +19,17 @@
 
 opus_lptwrite:
 _opus_lptwrite:
-    push    ix                          ; save callers
+    push    ix
     ld      ix, 4
     add     ix, sp
 
     call    opus_rommap
-		;call	$1708		; Page in the Discovery ROM
-    ld      h, (ix+0)                   ; drive
-    ld      b, 2
+		;call	$1708     ; Page in the Discovery ROM
+    ld      h, (ix+0)      ; drive
+    ld      b, 0           ; write
     ld      a, $81
     call    P_DEVICE
-    call    $1748                       ; Page out the Discovery ROM
-					; HL = number of blocks
-    pop     ix                          ;restore callers
+    call    $1748          ; Page out the Discovery ROM
+    pop     ix
     ret
+
