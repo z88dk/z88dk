@@ -23,6 +23,9 @@
 
     EXTERN  __bit_irqstatus
 
+    EXTERN  call_rom3
+    ;EXTERN  zx_opus
+
 
 centronics_send:
 _centronics_send:
@@ -55,8 +58,11 @@ _centronics_init:
                        ;     PIN SOFT I/F, Microhobby, B&V Interface
                        ;     Proceeding Electronic System,
                        ;     Elettronica 2000 magazine n.53
+  cp 100
+  jp z,init_if1        ; 100: ZX Interface 1 (lame implementation, 9600bps by default)
+
   dec a
-  jp z,init_dktronics  ;  1: DK'Tronics (Z80 PIO)
+  jp z,init_dktronic   ;  1: DK'Tronic (Z80 PIO)
   dec a
   jp z,init_kempe      ;  2: Kempston Interface E
   dec a
@@ -108,6 +114,9 @@ _centronics_init:
   jp z,init_aj         ; 24: A & J Centronics or "Micro-Drive"+Centronics
   dec a
   jp z,init_interface3 ; 25: Interface III Printer interface
+  dec a
+  jp z,init_opus       ; 26: Opus Discovery (crashes if Interface 1 is connected)
+  dec a
 
   ; default
   jp init_morex
@@ -188,10 +197,10 @@ cfg_hwg:
 
 
 ;=========================================================
-; DK'Tronics 1988 (see also "Henk de Groot" ROM)
+; DK'Tronic 1988 (see also "Henk de Groot" ROM)
 ; https://www.pcbway.com/project/shareproject/ZX_Spectrum_LPT_Centronics_Interface_40443afb.html
 
-init_dktronics:
+init_dktronic:
 ;  LD  A,$1F
 ;  LD  ($0001),A
   LD  A,$3F            ; Program Z80-PIO port A to 
@@ -204,10 +213,10 @@ init_dktronics:
 ;  OUT ($BB),A          ; "Stobe", initialize to "1"    --> already in the "general" code section
 ;  LD  A,$0A
 ;  LD  ($0002),A
-  ld   hl,cfg_dktronics
+  ld   hl,cfg_dktronic
   jp   init_general_sub
 
-cfg_dktronics:
+cfg_dktronic:
 	defw $00BB   ; busy port
 	defb $80     ; busy mask
 	defw $009B   ; data port
@@ -787,6 +796,118 @@ cfg_special_b:
 	defw $007F   ; strobe port
 	defb $06     ; strobe low (enabled)
 	defb $07     ; strobe high
+
+
+;=========================================================
+; ZX Interface 1 - default is 9600bps
+; this is a light implementation prone to crashes
+; the version in the rs232 library is preferrable
+;
+; this interface is very close to the PPI one, but for the strobe signal
+
+init_if1:
+  ld   hl,send_interface1      ; Now, the IF1 is not related to Centronics but
+  ld   (driver_selected),hl    ; it is easy to add, the default speed is 9600bps
+  rst  8
+  defb $31                     ; Create Interface 1 system vars if not present already
+  ret
+
+send_interface1:
+  pop  af           ; get the character in A
+  rst  8
+  defb $1E			;  Calls the Hook Code
+  jp   centronics_ei
+  
+
+;=========================================================
+; OPUS Discovery
+;
+; The commented out code was intended to avoid crashes in case the Opus Discovery was absent.
+; This would still happen with the Interface 1 connected and possibly
+; other expansions, so we keep the code small and leave the eventual
+; protections to the caller program by using zx_interface1(), zx_opus(), etc..
+
+init_opus:
+  ;call zx_opus
+  ;ld   a,l
+  ;and  a
+  ;jp   z,init_morex            ; No OPUS, no known interfaces availabe, fall back to default
+  ld   hl,send_opus
+  ld   (driver_selected),hl
+  ret
+
+send_opus:
+  call call_rom3
+  defw $1708        ; Page in the Discovery ROM
+
+  pop  af              ; A := character.
+  LD   HL,$3003
+  LD   (HL),$38        ; Clock on for bits program
+  DEC  HL
+  LD   (HL),$FF        ; Signal: all databits = out
+  DEC  HL
+  RES  2,(HL)          ; Clock on for BUSY program
+  DEC  HL
+  RES  6,(HL)          ; Signal: BUSY = input.
+  INC  HL
+  SET  2,(HL)          ; Clock off for BUSY program
+  INC  HL
+  INC  HL
+  LD   (HL),$3C        ; Clock off for bits program
+  DEC  HL
+  LD   (HL),A          ; data
+send_opus_busy:
+  call opus_break      ; Test the 'BREAK' key.
+  LD   A,($3000)
+  BIT  6,A             ; Printer BUSY?
+  JR   NZ,send_opus_busy
+  INC  HL
+  LD   (HL),$34        ; STROBE on.
+  ld   a,(centronics_strobe_delay)
+  ld   b,a
+send_opus_wait:
+  djnz send_opus_wait
+  LD   (HL),$3C        ; STROBE off.
+
+; The ACK signal is not much relevant, if we're in trouble we can compensate 
+; with a delay before sending the next character or by extending
+; the STROBE duration a little
+
+;  DEC  HL
+;  DEC  HL
+;send_opus_wait_ack:
+;  call opus_break      ; Test the 'BREAK' key.
+;  BIT  6,(HL)          ; Wait for ACK to go high.
+;  JR   Z,send_opus_wait_ack      ;  (Don't wait for it to go low again)
+
+opus_ei:
+    ld      hl,0
+    push    hl
+    ld      hl, (__bit_irqstatus)
+    ex      (sp), hl
+    pop     af
+	push    hl
+    call    call_rom3
+    defw    $1748      ; Page out the Discovery ROM
+
+    pop     hl
+    ret     po
+    ei
+    ret
+
+opus_break:
+    LD      A,$7F      ; SPACE key ?
+    IN      A,($FE)
+    RRA
+    RET     C
+    LD      A,$FE      ; CAPS SHIFT key ?
+    IN      A,($FE)
+    RRA
+    RET     C
+
+    pop     bc     ; skip RET to the caller
+    ld      hl,-1
+    jr      opus_ei+3
 
 
 
