@@ -8,7 +8,7 @@
 #include "../errors.h"
 #include "../hla.h"
 #include "../preprocessor.h"
-#include "../symbol_table.h"
+#include "../symbols.h"
 #include "catch_amalgamated.hpp"
 #include <filesystem>
 #include <fstream>
@@ -31,16 +31,16 @@ private:
 static StderrSilencer g_stderr_silencer;
 }
 
-static std::vector<TokensLine> run_hla_on_text(Preprocessor& pp,
+static std::vector<TokenLine> run_hla_on_text(Preprocessor& pp,
         const std::string& src, const std::string& fname) {
     HLA hla(&pp);
     hla.clear();
-    pp.push_virtual_file(src, fname, 1, true);
+    pp.push_virtual_file(src, fname, 1, false);
 
-    TokensLine line;
-    std::vector<TokensLine> out;
+    TokenLine line;
+    std::vector<TokenLine> out;
     while (hla.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line);
         }
     }
@@ -48,102 +48,103 @@ static std::vector<TokensLine> run_hla_on_text(Preprocessor& pp,
     return out;
 }
 
-static void expect_cp_imm(const TokensLine& l, int imm) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(TokenType::Integer));
-    REQUIRE(l[1].int_value() == imm);
+static void expect_cp_imm(const TokenLine& l, int imm) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(TokenType::Integer));
+    REQUIRE(l.tokens()[1].int_value() == imm);
 }
 
-static void expect_jp_cond_label(const TokensLine& l, Keyword cond,
+static void expect_jp_cond_label(const TokenLine& l, Keyword cond,
                                  const std::string& label) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::JP));
-    REQUIRE(l[1].is(cond));
-    REQUIRE(l[2].is(TokenType::Comma));
-    REQUIRE(l[3].is(TokenType::Identifier));
-    REQUIRE(l[3].text() == label);
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::JP));
+    REQUIRE(l.tokens()[1].is(cond));
+    REQUIRE(l.tokens()[2].is(TokenType::Comma));
+    REQUIRE(l.tokens()[3].is(TokenType::Identifier));
+    REQUIRE(l.tokens()[3].text() == label);
 }
 
-static void expect_jp_label(const TokensLine& l, const std::string& label) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::JP));
-    REQUIRE(l[1].is(TokenType::Identifier));
-    REQUIRE(l[1].text() == label);
+static void expect_jp_label(const TokenLine& l, const std::string& label) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::JP));
+    REQUIRE(l.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(l.tokens()[1].text() == label);
 }
 
-static void expect_dot_label_def(const TokensLine& l,
+static void expect_dot_label_def(const TokenLine& l,
                                  const std::string& label) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(TokenType::Dot));
-    REQUIRE(l[1].is(TokenType::Identifier));
-    REQUIRE(l[1].text() == label);
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(TokenType::Dot));
+    REQUIRE(l.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(l.tokens()[1].text() == label);
 }
 
-static void expect_nop(const TokensLine& l) {
-    REQUIRE(l.size() >= 1);
-    REQUIRE(l[0].is(Keyword::NOP));
+static void expect_nop(const TokenLine& l) {
+    REQUIRE(l.tokens().size() >= 1);
+    REQUIRE(l.tokens()[0].is(Keyword::NOP));
 }
 
-static void expect_cp_reg(const TokensLine& l, Keyword reg) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(reg));
+static void expect_cp_reg(const TokenLine& l, Keyword reg) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(reg));
 }
 
-static void expect_cp_mem_hl(const TokensLine& l) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(TokenType::LeftParen));
-    REQUIRE(l[2].is(Keyword::HL));
-    REQUIRE(l[3].is(TokenType::RightParen));
+static void expect_cp_mem_hl(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(l.tokens()[2].is(Keyword::HL));
+    REQUIRE(l.tokens()[3].is(TokenType::RightParen));
 }
 
-static void expect_cp_mem_abs(const TokensLine& l, int addr) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(TokenType::LeftParen));
-    REQUIRE(l[2].is(TokenType::Integer));
-    REQUIRE(l[2].int_value() == addr);
-    REQUIRE(l[3].is(TokenType::RightParen));
+static void expect_cp_mem_abs(const TokenLine& l, int addr) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(l.tokens()[2].is(TokenType::Integer));
+    REQUIRE(l.tokens()[2].int_value() == addr);
+    REQUIRE(l.tokens()[3].is(TokenType::RightParen));
 }
 
-static std::string expect_jp_cond_any_label(const TokensLine& l, Keyword cond) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::JP));
-    REQUIRE(l[1].is(cond));
-    REQUIRE(l[2].is(TokenType::Comma));
-    REQUIRE(l[3].is(TokenType::Identifier));
-    return l[3].text();
+static std::string expect_jp_cond_any_label(const TokenLine& l, Keyword cond) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::JP));
+    REQUIRE(l.tokens()[1].is(cond));
+    REQUIRE(l.tokens()[2].is(TokenType::Comma));
+    REQUIRE(l.tokens()[3].is(TokenType::Identifier));
+    return l.tokens()[3].text();
 }
 
-static void expect_dec_bc(const TokensLine& l) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::DEC));
-    REQUIRE(l[1].is(Keyword::BC));
+static void expect_dec_bc(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::DEC));
+    REQUIRE(l.tokens()[1].is(Keyword::BC));
 }
-static void expect_ld_a_b(const TokensLine& l) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::LD));
-    REQUIRE(l[1].is(Keyword::A));
-    REQUIRE(l[2].is(TokenType::Comma));
-    REQUIRE(l[3].is(Keyword::B));
+static void expect_ld_a_b(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::LD));
+    REQUIRE(l.tokens()[1].is(Keyword::A));
+    REQUIRE(l.tokens()[2].is(TokenType::Comma));
+    REQUIRE(l.tokens()[3].is(Keyword::B));
 }
-static void expect_or_c(const TokensLine& l) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::OR));
-    REQUIRE(l[1].is(Keyword::C));
+static void expect_or_c(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::OR));
+    REQUIRE(l.tokens()[1].is(Keyword::C));
 }
 
-static void expect_dec_b(const TokensLine& l) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::DEC));
-    REQUIRE(l[1].is(Keyword::B));
+static void expect_dec_b(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::DEC));
+    REQUIRE(l.tokens()[1].is(Keyword::B));
 }
 
 TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
           "[hla]") {
     namespace fs = std::filesystem;
+    g_unique_id_counter = 0;
     Preprocessor pp;
 
     // Prepare a temporary source file with plain Z80 assembly lines
@@ -157,26 +158,27 @@ TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
     // Line 1: LD A,B
     {
         const auto& l = lines[0];
-        REQUIRE(l.size() == 4);
-        REQUIRE(l[0].is(Keyword::LD));
-        REQUIRE(l[1].is(Keyword::A));
-        REQUIRE(l[2].is(TokenType::Comma));
-        REQUIRE(l[3].is(Keyword::B));
+        REQUIRE(l.tokens().size() == 4);
+        REQUIRE(l.tokens()[0].is(Keyword::LD));
+        REQUIRE(l.tokens()[1].is(Keyword::A));
+        REQUIRE(l.tokens()[2].is(TokenType::Comma));
+        REQUIRE(l.tokens()[3].is(Keyword::B));
     }
 
     // Line 2: ADD A,1
     {
         const auto& l = lines[1];
-        REQUIRE(l.size() == 4);
-        REQUIRE(l[0].is(Keyword::ADD));
-        REQUIRE(l[1].is(Keyword::A));
-        REQUIRE(l[2].is(TokenType::Comma));
-        REQUIRE(l[3].is(TokenType::Integer));
-        REQUIRE(l[3].int_value() == 1);
+        REQUIRE(l.tokens().size() == 4);
+        REQUIRE(l.tokens()[0].is(Keyword::ADD));
+        REQUIRE(l.tokens()[1].is(Keyword::A));
+        REQUIRE(l.tokens()[2].is(TokenType::Comma));
+        REQUIRE(l.tokens()[3].is(TokenType::Integer));
+        REQUIRE(l.tokens()[3].int_value() == 1);
     }
 }
 
 TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     struct Case {
         const char* op;
@@ -201,6 +203,7 @@ TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
     };
 
     for (const auto& c : cases) {
+        g_unique_id_counter = 0;
         const std::string src =
             std::string("%IF A ") + c.op + " 7\n"
             "NOP\n"
@@ -232,6 +235,7 @@ TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
 }
 
 TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     // Single IF with no ELSE
     const std::string src =
@@ -249,13 +253,14 @@ TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
     REQUIRE(lines.size() >= 5);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2].size() == 1);
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens().size() == 1);
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[3], "HLA_IF_0_ELSE");
     expect_dot_label_def(lines[4], "HLA_IF_0_END");
 }
 
 TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 2\n"
@@ -276,14 +281,15 @@ TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
     REQUIRE(lines.size() >= 7);
     expect_cp_imm(lines[0], 2);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
-    REQUIRE(lines[5][0].is(Keyword::NOP));
+    REQUIRE(lines[5].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[6], "HLA_IF_0_END");
 }
 
 TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
@@ -312,19 +318,20 @@ TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
     REQUIRE(lines.size() >= 12);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
     expect_cp_imm(lines[5], 2);
     expect_jp_cond_label(lines[6], Keyword::NZ, "HLA_IF_1_ELSE");
-    REQUIRE(lines[7][0].is(Keyword::NOP));
+    REQUIRE(lines[7].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[8], "HLA_IF_0_END");
     expect_dot_label_def(lines[9], "HLA_IF_1_ELSE");
-    REQUIRE(lines[10][0].is(Keyword::NOP));
+    REQUIRE(lines[10].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[11], "HLA_IF_0_END");
 }
 
 TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
@@ -356,22 +363,23 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
     REQUIRE(lines.size() >= 15);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
     expect_cp_imm(lines[5], 2);
     expect_jp_cond_label(lines[6], Keyword::NZ, "HLA_IF_1_ELSE");
-    REQUIRE(lines[7][0].is(Keyword::NOP));
+    REQUIRE(lines[7].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[8], "HLA_IF_0_END");
     expect_dot_label_def(lines[9], "HLA_IF_1_ELSE");
     expect_cp_imm(lines[10], 3);
     expect_jp_cond_label(lines[11], Keyword::NZ, "HLA_IF_2_ELSE");
-    REQUIRE(lines[12][0].is(Keyword::NOP));
+    REQUIRE(lines[12].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[13], "HLA_IF_2_ELSE");
     expect_dot_label_def(lines[14], "HLA_IF_0_END");
 }
 
 TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
@@ -407,25 +415,26 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
     REQUIRE(lines.size() >= 17);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
     expect_cp_imm(lines[5], 2);
     expect_jp_cond_label(lines[6], Keyword::NZ, "HLA_IF_1_ELSE");
-    REQUIRE(lines[7][0].is(Keyword::NOP));
+    REQUIRE(lines[7].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[8], "HLA_IF_0_END");
     expect_dot_label_def(lines[9], "HLA_IF_1_ELSE");
     expect_cp_imm(lines[10], 3);
     expect_jp_cond_label(lines[11], Keyword::NZ, "HLA_IF_2_ELSE");
-    REQUIRE(lines[12][0].is(Keyword::NOP));
+    REQUIRE(lines[12].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[13], "HLA_IF_0_END");
     expect_dot_label_def(lines[14], "HLA_IF_2_ELSE");
-    REQUIRE(lines[15][0].is(Keyword::NOP));
+    REQUIRE(lines[15].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[16], "HLA_IF_0_END");
 }
 
 TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     SECTION("A == imm8") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == 42\n"
@@ -441,6 +450,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == B (reg8)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == B\n"
@@ -456,6 +466,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == A (self compare)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == A\n"
@@ -471,6 +482,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == (HL)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == (HL)\n"
@@ -486,6 +498,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == (abs)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == (123)\n"
@@ -503,6 +516,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
 
 TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     SECTION("imm8 == A") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF 42 == A\n"
@@ -519,6 +533,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("B == A (reg8)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF B == A\n"
@@ -535,6 +550,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("(HL) == A") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF (HL) == A\n"
@@ -551,6 +567,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("(abs) == A") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF (123) == A\n"
@@ -567,6 +584,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("relational: 7 < A (normalizes to A > 7)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF 7 < A\n"
@@ -585,6 +603,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
 }
 
 TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     struct Case {
         const char* expr;
@@ -608,6 +627,7 @@ TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
     };
 
     for (const auto& c : cases) {
+        g_unique_id_counter = 0;
         std::string src =
             std::string("%WHILE ") + c.expr + "\n"
             "NOP\n"
@@ -651,6 +671,7 @@ TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
 }
 
 TEST_CASE("%WHILE with A on RHS normalization", "[hla][while][rhsA]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     // Example: 3 < A normalizes to A > 3 (false conditions Z, C)
     const std::string src =
@@ -682,6 +703,7 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
           "[hla][expr][immediate][address]") {
     SECTION("Immediate constant expression: A == 1+2*3 -> CP 7") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == 1 + 2 * 3\n"
@@ -700,6 +722,7 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 
     SECTION("Immediate address expression: A == (0x100+0x23) -> CP (0x123)") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == (0x100 + 0x23)\n"
@@ -718,6 +741,7 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 
     SECTION("Nested parens in address expression are handled: A == ((10+5)*(2+3)) -> CP 75") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == ((10 + 5) * (2 + 3))\n"
@@ -739,19 +763,27 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbols",
           "[hla][expr][symbols]") {
     // Helper to define a symbol in the test symbol table
-    auto define_sym = [](Preprocessor & pp, const std::string & name, int value,
-                         bool is_const,
-    bool is_def = true) {
-        Symbol s;
-        s.name = name;
-        s.value = value;
-        s.is_defined = is_def;
-        s.is_constant = is_const;
-        pp.pp_symtab().add_symbol(name, s);
+    auto define_sym = [](Preprocessor & pp, const std::string & name,
+    int value, bool is_const, bool is_def = true) {
+        if (!is_def) {
+            Location ext_loc("ext.asm", 100);
+            pp.pp_module()->declare_symbol(name, ext_loc, SymbolScope::Extern);
+        }
+        else if (!is_const) {
+            Location var_loc("var.asm", 200);
+            pp.pp_module()->add_symbol(name, var_loc,
+                                       pp.pp_module()->current_section()->last_opcode(), 0,
+                                       SymbolType::AddressRelative);
+        }
+        else {
+            Location const_loc("const.asm", 300);
+            pp.pp_module()->add_symbol(name, const_loc, value, SymbolType::Constant);
+        }
     };
 
     SECTION("Constant symbol in immediate expression") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         define_sym(pp, "CONST7", 7, true);
 
@@ -772,6 +804,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Constant symbol inside immediate address expression") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         define_sym(pp, "BASE", 0x100, true);
 
@@ -792,6 +825,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Undefined symbol is rejected") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == UNDEF_SYM\n"
@@ -806,6 +840,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Defined but non-constant symbol is rejected") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         define_sym(pp, "VARX", 3, false); // defined but not constant
 
@@ -823,6 +858,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
 TEST_CASE("Boolean AND short-circuit: %IF (A==1)&&(A<5) %ENDIF",
           "[hla][bool][and]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF (A == 1) && (A < 5)\n"
@@ -851,6 +887,7 @@ TEST_CASE("Boolean AND short-circuit: %IF (A==1)&&(A<5) %ENDIF",
 
 TEST_CASE("Boolean OR short-circuit: %IF (A==1)||(A<5) %ENDIF",
           "[hla][bool][or]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF (A == 1) || (A < 5)\n"
@@ -881,6 +918,7 @@ TEST_CASE("Boolean OR short-circuit: %IF (A==1)||(A<5) %ENDIF",
 }
 
 TEST_CASE("Boolean NOT: %IF !(A==3) %ENDIF", "[hla][bool][not]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF !(A == 3)\n"
@@ -906,6 +944,7 @@ TEST_CASE("Boolean NOT: %IF !(A==3) %ENDIF", "[hla][bool][not]") {
 
 TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
           "[hla][bool][nested]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF (A == 1) && ((A < 5) || (A > 10))\n"
@@ -950,10 +989,12 @@ TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
 
 TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
           "[hla][while][synonyms]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::vector<std::string> ends = { "WEND", "ENDW", "ENDWHILE" };
 
     for (const auto& endkw : ends) {
+        g_unique_id_counter = 0;
         const std::string src =
             "%WHILE A == 5\n"
             "NOP\n"
@@ -982,6 +1023,7 @@ TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
 // Add after existing while tests (just before %IF accepts constant expressions section or at end)
 
 TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1006,6 +1048,7 @@ TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
 
 TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm)",
           "[hla][repeat][until][rel]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1032,6 +1075,7 @@ TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm
 
 TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
           "[hla][repeat][until][rhsA]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1057,6 +1101,7 @@ TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
 
 TEST_CASE("%UNTIL without %REPEAT reports error",
           "[hla][repeat][until][error]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%UNTIL A==1\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_until_no_repeat.asm");
@@ -1068,6 +1113,7 @@ TEST_CASE("%UNTIL without %REPEAT reports error",
 TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
           "[hla][repeat][until][error][eof]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%REPEAT\nNOP\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_repeat_no_until.asm");
@@ -1082,6 +1128,7 @@ TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
 
 TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label",
           "[hla][repeat][untilb]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1107,6 +1154,7 @@ TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label
 TEST_CASE("%UNTILB without %REPEAT reports error",
           "[hla][repeat][untilb][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%UNTILB\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_untilb_no_repeat.asm");
@@ -1118,6 +1166,7 @@ TEST_CASE("%UNTILB without %REPEAT reports error",
 TEST_CASE("%UNTILB with trailing tokens reports error",
           "[hla][repeat][untilb][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1131,6 +1180,7 @@ TEST_CASE("%UNTILB with trailing tokens reports error",
 
 TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to top then end label",
           "[hla][repeat][untilbc]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1160,6 +1210,7 @@ TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to
 TEST_CASE("%UNTILBC without %REPEAT reports error",
           "[hla][repeat][untilbc][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%UNTILBC\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_untilbc_no_repeat.asm");
@@ -1171,6 +1222,7 @@ TEST_CASE("%UNTILBC without %REPEAT reports error",
 TEST_CASE("%UNTILBC with trailing tokens reports error",
           "[hla][repeat][untilbc][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1185,6 +1237,7 @@ TEST_CASE("%UNTILBC with trailing tokens reports error",
 TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
           "[hla][repeat][untilbc][nested]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"              // outer
@@ -1233,8 +1286,8 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
     expect_or_c(lines[6]);
     expect_jp_cond_label(lines[7], Keyword::NZ, inner_top);
     // inner end label
-    REQUIRE(lines[8].size() == 2);
-    REQUIRE(lines[8][1].text().find("HLA_REPEAT_1_END") != std::string::npos);
+    REQUIRE(lines[8].tokens().size() == 2);
+    REQUIRE(lines[8].tokens()[1].text().find("HLA_REPEAT_1_END") != std::string::npos);
     // middle NOP
     expect_nop(lines[9]);
     // outer untilbc sequence
@@ -1243,8 +1296,8 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
     expect_or_c(lines[12]);
     expect_jp_cond_label(lines[13], Keyword::NZ, outer_top);
     // outer end (last line)
-    REQUIRE(lines.back().size() == 2);
-    REQUIRE(lines.back()[1].text().find("HLA_REPEAT_0_END") != std::string::npos);
+    REQUIRE(lines.back().tokens().size() == 2);
+    REQUIRE(lines.back().tokens()[1].text().find("HLA_REPEAT_0_END") != std::string::npos);
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -1252,6 +1305,7 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
 
 TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
           "[hla][flags]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     struct Case {
         const char* flag_src;
@@ -1269,6 +1323,7 @@ TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
     };
 
     for (const auto& c : cases) {
+        g_unique_id_counter = 0;
         const std::string src =
             std::string("%IF ") + c.flag_src + "\n"
             "NOP\n"
@@ -1291,6 +1346,7 @@ TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
 
 TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
           "[hla][flags][and]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF Z && (A == 5)\n"
@@ -1317,6 +1373,7 @@ TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
 
 TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
           "[hla][flags][or]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF C || (A < 5)\n"
@@ -1344,6 +1401,7 @@ TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
 }
 
 TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 5\n"
@@ -1375,6 +1433,7 @@ TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
 
 TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
           "[hla][break][if]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A != 9\n"
@@ -1405,6 +1464,7 @@ TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
 
 TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
           "[hla][break][flags]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1429,6 +1489,7 @@ TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
 
 TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%BREAK\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_break_outside.asm");
@@ -1440,6 +1501,7 @@ TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
 TEST_CASE("%BREAK with unexpected trailing tokens reports error",
           "[hla][break][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
@@ -1454,6 +1516,7 @@ TEST_CASE("%BREAK with unexpected trailing tokens reports error",
 TEST_CASE("%BREAK IF missing expression reports error",
           "[hla][break][error][missingexpr]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
@@ -1468,6 +1531,7 @@ TEST_CASE("%BREAK IF missing expression reports error",
 // Add after %BREAK tests
 
 TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 5\n"
@@ -1499,6 +1563,7 @@ TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
 
 TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
           "[hla][continue][if]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A != 9\n"
@@ -1529,6 +1594,7 @@ TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
 
 TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
           "[hla][continue][flags]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1555,6 +1621,7 @@ TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
 
 TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%CONTINUE\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_continue_outside.asm");
@@ -1566,6 +1633,7 @@ TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
 TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
           "[hla][continue][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
@@ -1580,6 +1648,7 @@ TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
 TEST_CASE("%CONTINUE IF missing expression reports error",
           "[hla][continue][error][missingexpr]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"

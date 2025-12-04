@@ -22,22 +22,29 @@ public:
     Errors();
     void reset();
     void clear(); // does not reset error count
+    void set_quiet(bool f);
 
     void error(ErrorCode code, const std::string& arg = "");
     void warning(ErrorCode code, const std::string& arg = "");
 
-    const std::string& filename() const;
-    int line_num() const;
+    // Overloads that accept explicit location (for expression errors)
+    void error(const Location& loc, ErrorCode code, const std::string& arg = "");
+    void warning(const Location& loc, ErrorCode code, const std::string& arg = "");
+
+    const Location& location() const;
     void set_location(const Location& loc);
     void set_source_line(const std::string& line);
     void set_expanded_line(const std::string& line);
 
     int error_count() const;
     bool has_errors() const;
+    bool has_warnings() const;
     const std::string& last_error_message() const;
 
 private:
     int error_count_ = 0;
+    int warning_count_ = 0;
+    bool quiet_ = false;
     Location location_;
     std::string source_line_;
     std::string expanded_line_;
@@ -47,7 +54,26 @@ private:
     void format_error_message(ErrorCode code,
                               const std::string& prefix,
                               const std::string& arg);
+
+    // Format error message with explicit location
+    void format_error_message(const Location& loc,
+                              ErrorCode code,
+                              const std::string& prefix,
+                              const std::string& arg);
 };
 
 // global error reporter instance
 extern Errors g_errors;
+
+// Helper class to suppress error output during tests
+class SuppressErrors {
+public:
+    SuppressErrors() {
+        g_errors.reset();
+        g_errors.set_quiet(true);
+    }
+
+    ~SuppressErrors() {
+        g_errors.set_quiet(false);
+    }
+};

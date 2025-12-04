@@ -20,37 +20,15 @@
 namespace fs = std::filesystem;
 
 // Small helper to write a file with given contents.
-static std::string write_text_file(const std::filesystem::path& path,
-                                   const std::string& contents = "") {
+static std::string write_file(const fs::path& path,
+                              const std::string& contents = "") {
+    fs::create_directories(path.parent_path());
     std::ofstream ofs(path.generic_string(), std::ios::binary);
+    REQUIRE(ofs.is_open());
     ofs << contents;
     ofs.close();
     return path.generic_string();
 }
-
-static void write_file(const fs::path& p, const char* txt) {
-    fs::create_directories(p.parent_path());
-    std::ofstream ofs(p, std::ios::binary);
-    REQUIRE(ofs.is_open());
-    ofs << txt;
-}
-
-// Helper to capture std::cerr output
-class CerrRedirect {
-    std::ostringstream ss;
-    std::streambuf* old;
-public:
-    CerrRedirect() : old(std::cerr.rdbuf(ss.rdbuf())) {}
-    ~CerrRedirect() {
-        std::cerr.rdbuf(old);
-    }
-    std::string str() const {
-        return ss.str();
-    }
-};
-
-// Global capture for this translation unit to prevent tests from printing to the console.
-static CerrRedirect g_cerr_silencer;
 
 TEST_CASE("get_asm_filename and get_i_filename replace extensions",
           "[options][replace_extension]") {
@@ -58,15 +36,15 @@ TEST_CASE("get_asm_filename and get_i_filename replace extensions",
 
     // simple cases
     CHECK(g_options.get_asm_filename("foo.o") ==
-          std::filesystem::path("foo.o").replace_extension(".asm").generic_string());
+          fs::path("foo.o").replace_extension(".asm").generic_string());
     CHECK(g_options.get_i_filename("bar.asm") ==
-          std::filesystem::path("bar.asm").replace_extension(".i").generic_string());
+          fs::path("bar.asm").replace_extension(".i").generic_string());
 
     // filenames without extension -> .asm/.i appended
     CHECK(g_options.get_asm_filename("baz") ==
-          std::filesystem::path("baz").replace_extension(".asm").generic_string());
+          fs::path("baz").replace_extension(".asm").generic_string());
     CHECK(g_options.get_i_filename("qux") ==
-          std::filesystem::path("qux").replace_extension(".i").generic_string());
+          fs::path("qux").replace_extension(".i").generic_string());
 }
 
 TEST_CASE("get_o_filename prepends output_dir and avoids double-prepend",
@@ -79,8 +57,8 @@ TEST_CASE("get_o_filename prepends output_dir and avoids double-prepend",
 
     // relative asm filename
     std::string input = "src/hello.asm";
-    std::filesystem::path expected = std::filesystem::path("outdir") /
-                                     std::filesystem::path("src/hello.o");
+    fs::path expected = fs::path("outdir") /
+                        fs::path("src/hello.o");
     CHECK(g_options.get_o_filename(input) ==
           expected.lexically_normal().generic_string());
 
@@ -101,16 +79,16 @@ TEST_CASE("search_source_file finds files in include_paths and returns normalize
           "[options][search_source_file][include_paths]") {
     // reset global state
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
     // create include directory and file
-    std::filesystem::path inc_dir = std::filesystem::temp_directory_path() /
-                                    "z80asm_test_inc";
-    std::filesystem::remove_all(inc_dir);
-    std::filesystem::create_directories(inc_dir);
+    fs::path inc_dir = fs::temp_directory_path() /
+                       "z80asm_test_inc";
+    fs::remove_all(inc_dir);
+    fs::create_directories(inc_dir);
     std::string inc_name = "common.inc";
-    std::filesystem::path inc_file = inc_dir / inc_name;
-    write_text_file(inc_file, "LD A,1");
+    fs::path inc_file = inc_dir / inc_name;
+    write_file(inc_file, "LD A,1");
 
     // add include path and search
     g_options.include_paths.clear();
@@ -124,20 +102,20 @@ TEST_CASE("search_source_file finds files in include_paths and returns normalize
     CHECK(g_options.input_files.front() == expected);
 
     // cleanup
-    std::filesystem::remove_all(inc_dir);
+    fs::remove_all(inc_dir);
 }
 
 TEST_CASE("search_source_file reports FileNotFound when file missing",
           "[options][search_source_file][error]") {
     // reset global state
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
     // choose a filename that (very likely) doesn't exist
     std::string missing = "this_file_should_not_exist_12345.inc";
 
     // ensure file absent
-    std::filesystem::remove(missing);
+    fs::remove(missing);
 
     g_options.search_source_file(missing);
     CHECK(g_options.input_files.empty());
@@ -164,34 +142,34 @@ TEST_CASE("resolve_include_candidate picks absolute path directly",
     g_options = Options();
 
     // create a temporary file with an absolute path
-    auto tmp = std::filesystem::temp_directory_path() / ("z80asm_opts_abs_" +
-               std::to_string(std::rand()) + ".inc");
-    std::string abs_path = write_text_file(tmp, "LD A,1");
+    auto tmp = fs::temp_directory_path() / ("z80asm_opts_abs_" +
+                                            std::to_string(std::rand()) + ".inc");
+    std::string abs_path = write_file(tmp, "LD A,1");
     // resolve should return the normalized absolute path when given an absolute path
     std::string resolved = g_options.resolve_include_candidate(abs_path, "", false);
     REQUIRE_FALSE(resolved.empty());
-    CHECK(std::filesystem::absolute(tmp).lexically_normal().generic_string() ==
+    CHECK(fs::absolute(tmp).lexically_normal().generic_string() ==
           resolved);
 
     // cleanup
-    std::filesystem::remove(tmp);
+    fs::remove(tmp);
 }
 
 TEST_CASE("resolve_include_candidate honors include_paths order for angle includes",
           "[options][resolve_include_candidate][include_paths][angle]") {
     // reset global state
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
-    auto base = std::filesystem::temp_directory_path();
+    auto base = fs::temp_directory_path();
     auto inc1 = base / ("z80asm_inc1_" + std::to_string(std::rand()));
     auto inc2 = base / ("z80asm_inc2_" + std::to_string(std::rand()));
-    std::filesystem::create_directories(inc1);
-    std::filesystem::create_directories(inc2);
+    fs::create_directories(inc1);
+    fs::create_directories(inc2);
 
     std::string name = "shared.inc";
-    write_text_file(inc1 / name, "LD C,DIR1");
-    write_text_file(inc2 / name, "LD C,DIR2");
+    write_file(inc1 / name, "LD C,DIR1");
+    write_file(inc2 / name, "LD C,DIR2");
 
     // Add include paths in order: inc2 first, then inc1.
     g_options.include_paths.clear();
@@ -201,43 +179,43 @@ TEST_CASE("resolve_include_candidate honors include_paths order for angle includ
     // Angle include: should search include_paths in order and pick inc2
     std::string resolved = g_options.resolve_include_candidate(name, "", true);
     REQUIRE_FALSE(resolved.empty());
-    CHECK(resolved == std::filesystem::absolute(inc2 /
-            name).lexically_normal().generic_string());
+    CHECK(resolved == fs::absolute(inc2 /
+                                   name).lexically_normal().generic_string());
 
     // cleanup
-    std::filesystem::remove_all(inc1);
-    std::filesystem::remove_all(inc2);
+    fs::remove_all(inc1);
+    fs::remove_all(inc2);
 }
 
 TEST_CASE("search_source_file respects -d (date_stamp) behavior for .asm/.o pair",
           "[options][search_source_file][date_stamp]") {
     // reset global state
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
-    auto tmpdir = std::filesystem::temp_directory_path() / ("z80asm_opts_date_" +
+    auto tmpdir = fs::temp_directory_path() / ("z80asm_opts_date_" +
                   std::to_string(std::rand()));
-    std::filesystem::remove_all(tmpdir);
-    std::filesystem::create_directories(tmpdir);
+    fs::remove_all(tmpdir);
+    fs::create_directories(tmpdir);
 
     std::string base = (tmpdir / "modtest").generic_string();
-    std::filesystem::path asm_path = tmpdir / "modtest.asm";
-    std::filesystem::path o_path = tmpdir / "modtest.o";
+    fs::path asm_path = tmpdir / "modtest.asm";
+    fs::path o_path = tmpdir / "modtest.o";
 
     // create both files
-    write_text_file(asm_path, "asm");
-    write_text_file(o_path, "obj");
+    write_file(asm_path, "asm");
+    write_file(o_path, "obj");
 
     // Ensure two distinct timestamps: make .o newer than .asm
-    auto now = std::filesystem::file_time_type::clock::now();
-    std::filesystem::last_write_time(asm_path, now - std::chrono::seconds(10));
-    std::filesystem::last_write_time(o_path, now);
+    auto now = fs::file_time_type::clock::now();
+    fs::last_write_time(asm_path, now - std::chrono::seconds(10));
+    fs::last_write_time(o_path, now);
 
     // Case 1: date_stamp == false -> prefer .asm when calling search_source_file("modtest")
     g_options.date_stamp = false;
     g_options.search_source_file(base);
     REQUIRE(g_options.input_files.size() == 1);
-    CHECK(g_options.input_files.front() == std::filesystem::absolute(
+    CHECK(g_options.input_files.front() == fs::absolute(
               asm_path).lexically_normal().generic_string());
 
     // Case 2: date_stamp == true and .o is newer -> should return .o
@@ -245,11 +223,11 @@ TEST_CASE("search_source_file respects -d (date_stamp) behavior for .asm/.o pair
     g_options.input_files.clear();
     g_options.search_source_file(base);
     REQUIRE(g_options.input_files.size() == 1);
-    CHECK(g_options.input_files.front() == std::filesystem::absolute(
+    CHECK(g_options.input_files.front() == fs::absolute(
               o_path).lexically_normal().generic_string());
 
     // cleanup
-    std::filesystem::remove_all(tmpdir);
+    fs::remove_all(tmpdir);
 }
 
 TEST_CASE("get_i_filename returns filename with .i extension",
@@ -257,9 +235,9 @@ TEST_CASE("get_i_filename returns filename with .i extension",
     g_options = Options();
 
     CHECK(g_options.get_i_filename("foo.asm") ==
-          std::filesystem::path("foo.asm").replace_extension(".i").generic_string());
+          fs::path("foo.asm").replace_extension(".i").generic_string());
     CHECK(g_options.get_i_filename("bar") ==
-          std::filesystem::path("bar").replace_extension(".i").generic_string());
+          fs::path("bar").replace_extension(".i").generic_string());
 }
 
 //-----------------------------------------------------------------------------
@@ -269,7 +247,7 @@ TEST_CASE("get_i_filename returns filename with .i extension",
 TEST_CASE("search_source_file: '*' matches multiple files in one directory",
           "[options][wildcards][star]") {
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
     // Create a temp dir with three asm files.
     fs::path base = fs::path("wild_star_test");
@@ -300,7 +278,7 @@ TEST_CASE("search_source_file: '*' matches multiple files in one directory",
 TEST_CASE("search_source_file: '?' matches a single character",
           "[options][wildcards][question]") {
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
     fs::path base = fs::path("wild_qmark_test");
     fs::remove_all(base);
@@ -329,7 +307,7 @@ TEST_CASE("search_source_file: '?' matches a single character",
 TEST_CASE("search_source_file: '**' matches specific subdirectory file",
           "[options][wildcards][recursive][double_star]") {
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
     fs::path base = fs::path("wild_recursive_test");
     fs::remove_all(base);
@@ -369,7 +347,7 @@ TEST_CASE("search_source_file: '**' matches specific subdirectory file",
             "d.asm").generic_string()));
 
     // Pattern: base/**/nonexistent.asm (no matches -> error)
-    g_errors.reset();
+    SuppressErrors suppress2;
     g_options.input_files.clear();
     g_options.search_source_file((base.string() + "/**/nonexistent.asm"));
     REQUIRE(g_options.input_files.empty());
@@ -383,7 +361,7 @@ TEST_CASE("search_source_file: '**' matches specific subdirectory file",
 TEST_CASE("search_source_file: '**/*.asm' collects all .asm files in nested subdirectories",
           "[options][wildcards][recursive][double_star_collect]") {
     g_options = Options();
-    g_errors.reset();
+    SuppressErrors suppress;
 
     fs::path base = fs::path("wild_collect_test");
     fs::remove_all(base);

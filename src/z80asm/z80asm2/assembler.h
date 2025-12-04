@@ -8,29 +8,22 @@
 
 #include "errors.h"
 #include "preprocessor.h"
-#include "symbol_table.h"
+#include "symbols.h"
+#include "unit.h"
 #include <cstdint>
 #include <string>
 #include <vector>
-
-class Lexer;
-class Parser;
-class CodeGenerator;
+#include <memory>
 
 class Assembler {
 public:
-    Assembler();
-    void assemble(const std::string& input);
-    std::vector<uint8_t> get_output() const;
-
-    // Expose the preprocessor for other users of Assembler if needed.
-    Preprocessor& preprocessor() {
-        return preprocessor_;
-    }
+    Assembler() = default;
+    bool assemble(const std::string& input);
+    Preprocessor& preprocessor();
+    CompilationUnit& compilation_unit();
 
 private:
-    // Components used by the assembler. Minimal placeholders here so the
-    // assembler can register the evaluation callback for the preprocessor.
-    Preprocessor preprocessor_;
-    SymbolTable symbols_;
+    // Components used by the assembler.
+    std::unique_ptr<Preprocessor> preprocessor_ = nullptr;
+    std::unique_ptr<CompilationUnit> compilation_unit_ = nullptr;
 };

@@ -1,2 +1,129 @@
-- check for -v, show command line if found
-- add options from Z80ASM environment variable
+
+
+This header defines the core data model for a Z80 assembler (z80asm v2), providing a comprehensive object-oriented representation of assembly concepts. Here's what it contains:
+Current Components
+1. Expression System
+•	Exception hierarchy for evaluation errors (UndefinedSymbol, DivisionByZero, InvalidDollar, RecursiveEvaluation)
+•	Expression tree with abstract ExprNode base class
+•	Support for all C operators plus extensions (** power, ^^ logical XOR)
+•	Factory functions for building expression trees
+•	Expression container with parsing, evaluation, and constant-checking (is_constant())
+•	Handles integer literals, symbols, $ (current location), unary/binary/ternary operators
+2. Symbol Management
+•	Symbol types: Undefined, Constant, AddressRelative (labels), Computed
+•	Symbol scopes: Local, Public, Extern, Global
+•	Features:
+•	Recursive evaluation detection (via evaluating_ flag)
+•	Expression-based computed symbols
+•	Address-relative symbols with opcode references
+•	Scope management (exported/imported symbols)
+3. Code Generation
+•	Opcode: Represents assembled instructions/data with:
+•	Byte buffer
+•	Address (computed at link time)
+•	Patches (for forward references)
+•	Source location
+•	Patch: Links expressions to opcode byte positions with:
+•	Offset into opcode
+•	PatchRange (byte/word/dword, signed/unsigned, relative offsets, etc.)
+•	Expression to evaluate
+4. Memory Organization
+•	Section: Contiguous code/data blocks with:
+•	Alignment constraints
+•	Base address
+•	Opcode collection (heap-allocated for pointer stability)
+•	Size calculation and program counter
+5. Module System
+•	Module: Object file representation with:
+•	Multiple sections
+•	Symbol table (name ? Symbol map)
+•	Symbol declaration/definition with scope validation
+•	CompilationUnit: Represents one source file with multiple modules
+What Might Be Missing for a Complete Assembler/Linker Backend
+1. Linker-Specific Components ??
+•	Library management: No representation of library files (.lib)
+•	External symbol resolution: No cross-module symbol resolution table
+•	Section merging: Logic for combining sections from multiple modules
+•	Common symbols: No support for COMMON blocks
+•	Weak symbols: No weak/strong symbol binding
+•	Symbol visibility: No protected/hidden visibility levels
+2. Relocation System ??
+•	Relocation entries: No explicit relocation table
+•	Relocation types: Limited to patches, no ELF-style relocation types
+•	Position-independent code: No PIC/PIE support
+•	Base address relocation: No relocatable address calculations
+3. Object File Format ??
+•	File I/O: No serialization/deserialization
+•	Object file header: No version, architecture, format metadata
+•	Debug information: No DWARF/debug symbol support
+•	Line number tables: No mapping to source lines
+•	String tables: No deduplicated string storage
+4. Optimization Support ??
+•	Dead code elimination: No unreferenced symbol tracking
+•	Section garbage collection: No unused section removal
+•	Constant propagation: Expression system supports it, but no infrastructure
+•	Peephole optimization: No opcode pattern matching
+5. Advanced Assembly Features ??
+•	Macros: No macro definition/expansion representation
+•	Include file tracking: No include dependency graph
+•	Conditional assembly: No IF/ELSE/ENDIF blocks
+•	Repeat blocks: No REPT/IRP/IRPC
+•	Structures/Unions: No data structure definitions
+•	Local labels: Basic support, but no .local scoping
+6. Multi-Pass Assembly ??
+•	Pass management: No infrastructure for 2+ pass assembly
+•	Forward reference tracking: Patches handle it, but no explicit tracking
+•	Phase error detection: No mechanism to detect address instability
+7. Error Recovery ???
+•	Error context: Locations exist, but no error recovery strategy
+•	Partial compilation: No continue-on-error for IDE integration
+•	Warning system: No distinction between errors/warnings/notes
+8. Memory Model ??
+•	Banking/paging: No support for banked memory (ROM banks, memory mappers)
+•	Overlays: No overlay management
+•	Segment registers: No segment-based addressing
+•	Memory constraints: No section size limits or memory maps
+9. Code Analysis ??
+•	Cross-reference: No XREF generation
+•	Call graph: No function call tracking
+•	Data flow: No register/memory usage analysis
+•	Coverage: No assembler coverage metrics
+10. Output Formats ??
+•	Binary output: Implicit, but no format specification
+•	Hex formats: No Intel HEX, Motorola S-record
+•	Executable formats: No ELF, PE, COFF, a.out
+•	Map files: No memory map generation
+•	Listing files: No annotated source listing
+11. Configuration ??
+•	Target architecture: Assumes Z80, no multi-architecture support
+•	Linker scripts: No memory layout scripts
+•	Section attributes: No read/write/execute flags
+•	Alignment policies: Basic alignment, no padding control
+12. Performance ?
+•	Symbol table indexing: Hash map is good, but no bloom filters
+•	Incremental linking: No support for incremental builds
+•	Parallel assembly: No multi-threading support
+•	Memory pooling: Unique_ptr allocation is clean but not pooled
+Strengths of Current Design ?
+1.	Clean separation between parsing and code generation
+2.	Strong type safety with enums and exception hierarchy
+3.	Pointer stability via heap allocation for cross-references
+4.	Recursive evaluation detection prevents infinite loops
+5.	Comprehensive expression system with operator precedence
+6.	Flexible patching for forward references
+7.	Section-based organization for linker integration
+8.	Const correctness (e.g., evaluate() is const)
+9.	Move semantics for performance
+10.	Self-documenting with extensive comments
+Recommendations for Extension
+1.	Add Linker class to manage module merging and symbol resolution
+2.	Create ObjectFile class for serialization
+3.	Implement RelocationTable for dynamic linking
+4.	Add DebugInfo class for source-level debugging
+5.	Create Macro and ConditionalBlock classes for preprocessor
+6.	Add MemoryMap class for layout specification
+7.	Implement ListFile generator for documentation
+8.	Add SymbolIndex for cross-referencing
+9.	Create ErrorRecovery strategy for IDE integration
+10.	Implement PassManager for multi-pass assembly
+The current model is solid for a single-pass assembler but needs extension for a full linker and advanced assembly features. The design is extensible and well-structured for adding these components incrementally.

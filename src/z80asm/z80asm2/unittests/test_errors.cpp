@@ -24,10 +24,6 @@ public:
     }
 };
 
-// Global capture for this translation unit to prevent tests from printing to the console.
-// Individual tests can still create their own local CerrRedirect if they need to inspect output.
-static CerrRedirect g_cerr_silencer;
-
 TEST_CASE("Errors counts errors", "[Errors]") {
     Errors er;
     CerrRedirect redirect;
@@ -35,6 +31,7 @@ TEST_CASE("Errors counts errors", "[Errors]") {
     er.error(ErrorCode::InvalidSyntax, "foo");
     REQUIRE(er.error_count() == 2);
     REQUIRE(er.has_errors());
+    REQUIRE_FALSE(er.has_warnings());
 }
 
 TEST_CASE("Errors does not count warnings", "[Errors]") {
@@ -44,6 +41,7 @@ TEST_CASE("Errors does not count warnings", "[Errors]") {
     er.warning(ErrorCode::InvalidSyntax, "foo");
     REQUIRE(er.error_count() == 0);
     REQUIRE_FALSE(er.has_errors());
+    REQUIRE(er.has_warnings());
 }
 
 TEST_CASE("Errors prints error", "[Errors]") {
@@ -118,15 +116,15 @@ TEST_CASE("Errors::clear clears location and lines but not error count",
     // error_count should remain
     REQUIRE(er.error_count() == 1);
     // location and lines should be cleared
-    REQUIRE(er.filename().empty());
-    REQUIRE(er.line_num() == 0);
+    REQUIRE(er.location().filename().empty());
+    REQUIRE(er.location().line_num() == 0);
 }
 
 TEST_CASE("Errors::filename and line_num reflect location", "[Errors]") {
     Errors er;
     er.set_location(Location("baz.asm", 123));
-    REQUIRE(er.filename() == "baz.asm");
-    REQUIRE(er.line_num() == 123);
+    REQUIRE(er.location().filename() == "baz.asm");
+    REQUIRE(er.location().line_num() == 123);
 }
 
 TEST_CASE("Errors::set_source_line and set_expanded_line store lines",
@@ -155,6 +153,7 @@ TEST_CASE("Errors::last_error_message returns last error", "[Errors]") {
 
 TEST_CASE("Errors::has_errors returns false when no errors", "[Errors]") {
     Errors er;
+    CerrRedirect redirect;
     REQUIRE_FALSE(er.has_errors());
     er.warning(ErrorCode::FileNotFound, "file.asm");
     REQUIRE_FALSE(er.has_errors());
@@ -206,4 +205,103 @@ TEST_CASE("Errors shows only source line when expanded line equals source",
     size_t pos = out.find("   |NOP");
     REQUIRE(pos != std::string::npos);
     REQUIRE(out.find("   |NOP", pos + 1) == std::string::npos);
+}
+
+TEST_CASE("Errors: error with explicit location", "[errors][location]") {
+    SuppressErrors suppress;
+
+    Location loc("test.asm", 42);
+    g_errors.error(loc, ErrorCode::InvalidSyntax, "test error");
+
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.error_count() == 1);
+
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("test.asm:42:") != std::string::npos);
+    REQUIRE(msg.find("error") != std::string::npos);
+    REQUIRE(msg.find("test error") != std::string::npos);
+}
+
+TEST_CASE("Errors: warning with explicit location", "[errors][location]") {
+    SuppressErrors suppress;
+
+    Location loc("source.asm", 100);
+    g_errors.warning(loc, ErrorCode::InvalidSyntax, "test warning");
+
+    REQUIRE_FALSE(g_errors.has_errors()); // warnings don't increment error count
+    REQUIRE(g_errors.error_count() == 0);
+
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("source.asm:100:") != std::string::npos);
+    REQUIRE(msg.find("warning") != std::string::npos);
+    REQUIRE(msg.find("test warning") != std::string::npos);
+}
+
+TEST_CASE("Errors: explicit location doesn't change internal location",
+          "[errors][location]") {
+    SuppressErrors suppress;
+
+    // Set internal location
+    Location internal_loc("internal.asm", 10);
+    g_errors.set_location(internal_loc);
+
+    // Report error with different location
+    Location error_loc("error.asm", 20);
+    g_errors.error(error_loc, ErrorCode::InvalidSyntax, "external error");
+
+    // Internal location should remain unchanged
+    REQUIRE(g_errors.location().filename() == "internal.asm");
+    REQUIRE(g_errors.location().line_num() == 10);
+
+    // Error message should use the explicit location
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("error.asm:20:") != std::string::npos);
+}
+
+TEST_CASE("Errors: explicit location with empty location",
+          "[errors][location]") {
+    SuppressErrors suppress;
+
+    Location empty_loc;
+    g_errors.error(empty_loc, ErrorCode::InvalidSyntax, "no location");
+
+    std::string msg = g_errors.last_error_message();
+    // Should not have filename:line prefix
+    REQUIRE(msg.find("error:") == 0);
+}
+
+TEST_CASE("Errors: multiple errors with explicit locations",
+          "[errors][location]") {
+    SuppressErrors suppress;
+
+    Location loc1("file1.asm", 10);
+    Location loc2("file2.asm", 20);
+    Location loc3("file3.asm", 30);
+
+    g_errors.error(loc1, ErrorCode::InvalidSyntax, "error 1");
+    g_errors.error(loc2, ErrorCode::InvalidSyntax, "error 2");
+    g_errors.warning(loc3, ErrorCode::InvalidSyntax, "warning 3");
+
+    REQUIRE(g_errors.error_count() == 2); // Only errors count
+
+    // Last message should be the warning
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("file3.asm:30:") != std::string::npos);
+    REQUIRE(msg.find("warning 3") != std::string::npos);
+}
+
+TEST_CASE("Errors: expression error example",
+          "[errors][location][expression]") {
+    SuppressErrors suppress;
+
+    // Simulate an expression defined at a specific location
+    Location expr_loc("math.asm", 55);
+
+    // Later during evaluation, report error using the expression's location
+    g_errors.error(expr_loc, ErrorCode::DivisionByZero);
+
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("math.asm:55:") != std::string::npos);
+    REQUIRE(msg.find("Division by zero") != std::string::npos);
 }

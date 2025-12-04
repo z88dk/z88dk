@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_errors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

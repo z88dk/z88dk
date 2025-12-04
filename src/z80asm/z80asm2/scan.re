@@ -20,7 +20,7 @@
         str = std::string(tok, p); \
         bool has_space_after = (p < pe) && is_space(*p); \
         Token t(type, str, has_space_after); \
-        output.push_back(t); \
+        out_line.tokens().push_back(t); \
     } while (0)
 
 #define PUSH_TOKEN2(type, arg) \
@@ -28,7 +28,7 @@
         str = std::string(tok, p); \
         bool has_space_after = (p < pe) && is_space(*p); \
         Token t(type, str, arg, has_space_after); \
-        output.push_back(t); \
+        out_line.tokens().push_back(t); \
     } while (0)
 
 #define CHECK_TRAILING_CHAR() \
@@ -36,8 +36,8 @@
         if (p < pe && is_ident_char(*p)) { \
             g_errors.error(ErrorCode::InvalidSyntax, \
                     "Invalid character '" + std::string(1, *p) + "' after literal: '" + std::string(tok, p) + "'"); \
-            output.clear(); \
-            return; \
+            out_line.clear(); \
+            return false; \
         } \
     } while (0)
 
@@ -69,13 +69,9 @@ static void swap_ix_iy(std::string& str, Keyword& keyword) {
     }
 }
 
-void TokensFile::tokenize_line(unsigned& line_index, TokensLine& output) {
-    if (line_index >= line_count()) {
-        return;
-    }
-
-    const char* p = text_lines_[line_index].c_str();
-    const char* pe = p + text_lines_[line_index].size();
+bool TokenFileReader::tokenize_line(TokenLine& out_line) {
+    const char* p = source_line_.c_str();
+    const char* pe = p + source_line_.size();
     const char* tok = p;
     const char* marker = p;
     char end_quote = 0;
@@ -115,8 +111,8 @@ main_loop:
         * {
             g_errors.error(ErrorCode::InvalidSyntax,
                     "Unexpected character: '" + std::string(tok, p) + "'");
-            output.clear();
-            return;
+            out_line.clear();
+            return false;
         }
 
         '\\' {
@@ -126,12 +122,11 @@ main_loop:
             }
             if (q >= pe) {
                 // line continuation
-                ++line_index;
-                if (line_index >= line_count()) {
-                    return;
+				if (!next_line_from_provider()) { 
+                    return true;	// no more input
                 }
-                p = text_lines_[line_index].c_str();
-                pe = p + text_lines_[line_index].size();
+                p = source_line_.c_str();
+                pe = p + source_line_.size();
                 continue;
             }
             else {
@@ -183,9 +178,9 @@ main_loop:
         '#'     { PUSH_TOKEN1(TokenType::Hash); continue; }
         '##'    { PUSH_TOKEN1(TokenType::DoubleHash); continue; }
         ':'     { PUSH_TOKEN1(TokenType::Colon); continue; }
-        '?'     { PUSH_TOKEN1(TokenType::Quest); continue; }
+        '?'     { PUSH_TOKEN1(TokenType::Question); continue; }
         '!'		{ PUSH_TOKEN1(TokenType::LogicalNot); continue; }
-        '%'		{ PUSH_TOKEN1(TokenType::Modulus); continue; }
+        '%'		{ PUSH_TOKEN1(TokenType::Modulo); continue; }
         '&'		{ PUSH_TOKEN1(TokenType::BitwiseAnd); continue; }
         '&&'		{ PUSH_TOKEN1(TokenType::LogicalAnd); continue; }
         '*'		{ PUSH_TOKEN1(TokenType::Multiply); continue; }
@@ -194,12 +189,12 @@ main_loop:
         '-'		{ PUSH_TOKEN1(TokenType::Minus); continue; }
         '/'		{ PUSH_TOKEN1(TokenType::Divide); continue; }
         '<='		{ PUSH_TOKEN1(TokenType::LE); continue; }
-        '<<'		{ PUSH_TOKEN1(TokenType::ShiftLeft); continue; }
+        '<<'		{ PUSH_TOKEN1(TokenType::LeftShift); continue; }
         '='  | '=='		{ PUSH_TOKEN1(TokenType::EQ); continue; }
         '!=' | '<>'		{ PUSH_TOKEN1(TokenType::NE); continue; }
         '>'		{ PUSH_TOKEN1(TokenType::GT); continue; }
         '>='		{ PUSH_TOKEN1(TokenType::GE); continue; }
-        '>>'		{ PUSH_TOKEN1(TokenType::ShiftRight); continue; }
+        '>>'		{ PUSH_TOKEN1(TokenType::RightShift); continue; }
         '^'		{ PUSH_TOKEN1(TokenType::BitwiseXor); continue; }
         '^^'		{ PUSH_TOKEN1(TokenType::LogicalXor); continue; }
         '|'		{ PUSH_TOKEN1(TokenType::BitwiseOr); continue; }
@@ -214,8 +209,8 @@ main_loop:
             double value = 0.0;
             if (!parse_float_from_chars(digits, value)) {
                 g_errors.error(ErrorCode::InvalidFloat, digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Float, value);
@@ -232,8 +227,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 10, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid decimal integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -247,8 +242,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid hexdecimal integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -262,8 +257,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid hexdecimal integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -277,8 +272,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 16, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid hexdecimal integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -292,8 +287,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid binary integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -307,8 +302,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid binary integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -322,8 +317,8 @@ main_loop:
             if (!parse_int_from_chars(digits.c_str(), 2, value)) {
                 g_errors.error(ErrorCode::InvalidInteger,
                         "Invalid binary integer: " + digits);
-                output.clear();
-                return;
+                out_line.clear();
+                return false;
             }
 
             PUSH_TOKEN2(TokenType::Integer, value);
@@ -364,16 +359,16 @@ main_loop:
             }
 
             // check for .ASSUME
-            if (keyword == Keyword::ASSUME && !output.empty() &&
-                output.back().is(TokenType::Dot)) {
-                output.pop_back();       // remove '.'
+            if (keyword == Keyword::ASSUME && !out_line.tokens().empty() &&
+                out_line.tokens().back().is(TokenType::Dot)) {
+                out_line.tokens().pop_back();       // remove '.'
             }
 
             // check for ASMPC
             if (keyword == Keyword::ASMPC) {
                 bool has_space_after = (p < pe) && is_space(*p);
                 Token t(TokenType::ASMPC, str, keyword, has_space_after);
-                output.push_back(t);
+                out_line.tokens().push_back(t);
                 continue;
             }
 
@@ -391,7 +386,7 @@ main_loop:
 
             bool has_space_after = (p < pe) && is_space(*p);
             Token t(TokenType::Identifier, str, keyword, has_space_after);
-            output.push_back(t);
+            out_line.tokens().push_back(t);
             continue;
         }
 
@@ -400,7 +395,7 @@ main_loop:
 
     // end of input line
 eol:
-    return;
+    return true;
 
     // find end of c-comment, possibly reading more lines
 c_comment:
@@ -414,18 +409,17 @@ c_comment:
         }
 
         // continue to next line
-        if (line_index + 1 >= line_count()) {
-            break;
+		if (!next_line_from_provider()) {
+            break;	// unterminated comment
         }
 
-        ++line_index;
-        p = text_lines_[line_index].c_str();
-        pe = p + text_lines_[line_index].size();
+        p = source_line_.c_str();
+        pe = p + source_line_.size();
     }
 
     g_errors.error(ErrorCode::UnterminatedComment);
-    output.clear();
-    return;
+    out_line.clear();
+    return false;
 
     // parse string literal
 string_loop:
@@ -443,7 +437,7 @@ string_loop:
                 str = std::string(string_start, p);
                 bool has_space_after = (p < pe) && is_space(*p);
                 Token t(TokenType::String, str, str_content, has_space_after);
-                output.push_back(t);
+                out_line.tokens().push_back(t);
                 goto main_loop;
             }
             else {
@@ -456,7 +450,7 @@ string_loop:
                 str = std::string(string_start, p);
                 bool has_space_after = (p < pe) && is_space(*p);
                 Token t(TokenType::String, str, str_content, has_space_after);
-                output.push_back(t);
+                out_line.tokens().push_back(t);
                 goto main_loop;
             }
             else {
@@ -468,16 +462,16 @@ string_loop:
             if (end_quote == '\'') {
                 if (str_content.size() != 1) {
                     g_errors.error(ErrorCode::InvalidSyntax,
-                        "Invalid quoted character");
-                    output.clear();
-                    return;
+                        "Invalid quoted character: '" + str_content + "'");
+                    out_line.clear();
+                    return false;
                 }
                 else {
                     str = std::string(string_start, p);
                     bool has_space_after = (p < pe) && is_space(*p);
                     Token t(TokenType::Integer, str, str_content[0],
                             has_space_after);
-                    output.push_back(t);
+                    out_line.tokens().push_back(t);
                     goto main_loop;
                 }
             }
@@ -577,8 +571,8 @@ string_loop:
                 if (!parse_int_from_chars(digits.c_str(), 8, value)) {
                     g_errors.error(ErrorCode::InvalidInteger,
                             "Invalid octal integer: " + digits);
-                    output.clear();
-                    return;
+                    out_line.clear();
+                    return false;
                 }
 
                 str_content.push_back(static_cast<char>(value));
@@ -596,8 +590,8 @@ string_loop:
                 if (!parse_int_from_chars(digits.c_str(), 16, value)) {
                     g_errors.error(ErrorCode::InvalidInteger,
                             "Invalid hexadecimal integer: " + digits);
-                    output.clear();
-                    return;
+                    out_line.clear();
+                    return false;
                 }
 
                 str_content.push_back(static_cast<char>(value));
@@ -618,8 +612,8 @@ string_loop:
     }
 
     g_errors.error(ErrorCode::UnterminatedString);
-    output.clear();
-    return;
+    out_line.clear();
+    return false;
 }
 
 #ifdef _MSC_VER
