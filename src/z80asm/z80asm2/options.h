@@ -22,6 +22,7 @@ struct Options {
     std::vector<std::string> include_paths;
     std::vector<std::string> input_files;
 
+    // parse arguments and options
     bool parse_arg(const std::string& arg, bool& found_dash_dash);
     void search_source_file(const std::string& filename);
     void search_list_file(const std::string& list_filename);

@@ -39,5 +39,3 @@ bool keyword_is_register_8bit(Keyword kw);
 bool keyword_is_flag(Keyword kw);
 bool keyword_is_opcode(Keyword kw);
 bool keyword_is_instruction(Keyword kw);
-
-
