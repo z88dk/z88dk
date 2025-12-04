@@ -20,6 +20,7 @@
     SECTION code_clib
     PUBLIC  zx_opus
     PUBLIC  _zx_opus
+    EXTERN  call_rom3
 ;    EXTERN  zx_syntax
 
 
@@ -36,14 +37,20 @@ _zx_opus:
     ld   hl,no_opus
     push hl               ; used to jump over if page-in fails
 
-	ld hl,k_ptr-1         ; ; ('K','S','P') can be used, they all will point to routine POP/RET
-    call $1708            ; If OPUS is present: page-in e return here.
-                          ; If no OPUS: CLOSE-2 -> INDEXER -> dummy "close" routine in ROM does POP HL/RET
+	ld hl,k_ptr-1         ; ('K','S','P') can be used, they all will point to routine POP/RET
+    call   call_rom3
+    defw   $1708            ; If OPUS is present: page-in e return here.
+                            ; If no OPUS: CLOSE-2 -> INDEXER -> dummy "close" routine in ROM does POP HL/RET
+
+;    ld   a,($1709)
+;    cp   43               ; This should be the same in all the OPUS versions
+;    jr   z,is_opus  ; Not corresponding? The shadow ROM hasn't really been paged-in
 
     ; ---------- OPUS has been enabled ----------
     ; the CALL ended normally, no POP/RET on exit
     pop  hl               ; [no_opus]
-    call $1748            ; PAGE_OUT
+    call   call_rom3
+    defw   $1748          ; PAGE_OUT
     ld   hl,1             ; Signal OPUS presence
     ret
 
