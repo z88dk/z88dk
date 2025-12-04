@@ -1,2 +1,0 @@
-- check for -v, show command line if found
-- add options from Z80ASM environment variable

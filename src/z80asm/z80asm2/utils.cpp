@@ -586,3 +586,14 @@ std::string expand_env_vars(const std::string& text) {
 
     return s;
 }
+
+std::string int_to_hex(int value) {
+    std::ostringstream oss;
+    if (value < 0) {
+        oss << "-0x" << std::hex << std::uppercase << (-value);
+    }
+    else {
+        oss << "0x" << std::hex << std::uppercase << value;
+    }
+    return oss.str();
+}
