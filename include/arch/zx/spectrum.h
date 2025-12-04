@@ -386,6 +386,9 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LPT_HOBBIT     23   // Хоббит, strobed Z80 PIO
 #define LPT_AJ         24   // A & J "Micro Drive" or just Centronics
 #define LPT_INTERFACE3 25   // Interface III Printer interface
+#define LPT_OPUS       26   // Opus Discovery (or lame Interface 1 calls)
+
+#define LPT_IF1       100   // ZX Interface 1 style "hook codes" (crap)
 
 // Choose the current output driver and initialize it
 extern int  __LIB__  centronics_init(int driver) __z88dk_fastcall;
