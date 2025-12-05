@@ -830,3 +830,198 @@ TEST_CASE("expand_env_vars supports nested names: ${VAR${PARAM}}",
     unset_env_var("PARAM");
     unset_env_var("VARSUFFIX");
 }
+
+//-----------------------------------------------------------------------------
+// Tests for file_exists and get_file_size (added for file_cache support)
+//-----------------------------------------------------------------------------
+
+TEST_CASE("file_exists detects existing files", "[utils][file_exists]") {
+    const std::string fname = "test_file_exists.txt";
+
+    // File doesn't exist yet
+    std::remove(fname.c_str());
+    REQUIRE_FALSE(file_exists(fname));
+
+    // Create file
+    write_string_to_file(fname, "test content");
+    REQUIRE(file_exists(fname));
+
+    // Remove file
+    std::remove(fname.c_str());
+    REQUIRE_FALSE(file_exists(fname));
+}
+
+TEST_CASE("file_exists returns false for directories", "[utils][file_exists]") {
+    const std::string dirname = "test_dir_not_file";
+
+    // Clean up first
+    std::filesystem::remove_all(dirname);
+
+    // Directory doesn't exist
+    REQUIRE_FALSE(file_exists(dirname));
+
+    // Create directory
+    std::filesystem::create_directory(dirname);
+
+    // file_exists should return false for directories
+    REQUIRE_FALSE(file_exists(dirname));
+
+    // Clean up
+    std::filesystem::remove_all(dirname);
+}
+
+TEST_CASE("file_exists handles empty filename", "[utils][file_exists]") {
+    REQUIRE_FALSE(file_exists(""));
+}
+
+TEST_CASE("file_exists handles non-existent paths", "[utils][file_exists]") {
+    REQUIRE_FALSE(file_exists("/nonexistent/path/to/file.txt"));
+    REQUIRE_FALSE(file_exists("C:\\nonexistent\\path\\to\\file.txt"));
+}
+
+TEST_CASE("get_file_size returns correct size for existing files", "[utils][get_file_size]") {
+    const std::string fname = "test_get_file_size.txt";
+
+    // Empty file
+    write_string_to_file(fname, "");
+    REQUIRE(get_file_size(fname) == 0);
+
+    // Small file
+    write_string_to_file(fname, "hello");
+    REQUIRE(get_file_size(fname) == 5);
+
+    // File with newlines
+    write_string_to_file(fname, "line1\nline2\nline3\n");
+    REQUIRE(get_file_size(fname) == 18);
+
+    // Binary file with null bytes
+    std::vector<unsigned char> binary_data = { 0x00, 0x01, 0x02, 0x03, 0xFF };
+    write_bytes_to_file(fname, binary_data);
+    REQUIRE(get_file_size(fname) == 5);
+
+    // Larger file
+    std::string large_content(10000, 'x');
+    write_string_to_file(fname, large_content);
+    REQUIRE(get_file_size(fname) == 10000);
+
+    // Clean up
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("get_file_size returns -1 for non-existent files", "[utils][get_file_size]") {
+    const std::string fname = "test_nonexistent_file.txt";
+
+    // Ensure file doesn't exist
+    std::remove(fname.c_str());
+
+    REQUIRE(get_file_size(fname) == static_cast<size_t>(-1));
+}
+
+TEST_CASE("get_file_size returns -1 for directories", "[utils][get_file_size]") {
+    const std::string dirname = "test_dir_for_size";
+
+    // Clean up first
+    std::filesystem::remove_all(dirname);
+
+    // Create directory
+    std::filesystem::create_directory(dirname);
+
+    // get_file_size should return -1 for directories
+    REQUIRE(get_file_size(dirname) == static_cast<size_t>(-1));
+
+    // Clean up
+    std::filesystem::remove_all(dirname);
+}
+
+TEST_CASE("get_file_size handles empty filename", "[utils][get_file_size]") {
+    REQUIRE(get_file_size("") == static_cast<size_t>(-1));
+}
+
+TEST_CASE("get_file_size with file_exists consistency", "[utils][file_exists][get_file_size]") {
+    const std::string fname = "test_consistency.txt";
+
+    // Non-existent file
+    std::remove(fname.c_str());
+    REQUIRE_FALSE(file_exists(fname));
+    REQUIRE(get_file_size(fname) == static_cast<size_t>(-1));
+
+    // Empty file
+    write_string_to_file(fname, "");
+    REQUIRE(file_exists(fname));
+    REQUIRE(get_file_size(fname) == 0);
+
+    // File with content
+    write_string_to_file(fname, "test");
+    REQUIRE(file_exists(fname));
+    REQUIRE(get_file_size(fname) == 4);
+
+    // Clean up
+    std::remove(fname.c_str());
+    REQUIRE_FALSE(file_exists(fname));
+    REQUIRE(get_file_size(fname) == static_cast<size_t>(-1));
+}
+
+TEST_CASE("get_file_size handles special characters in filename", "[utils][get_file_size]") {
+    // Note: Some special characters might not be valid on all filesystems
+    const std::string fname = "test-file_with.special+chars.txt";
+
+    write_string_to_file(fname, "content");
+    REQUIRE(file_exists(fname));
+    REQUIRE(get_file_size(fname) == 7);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("get_file_size tracks file growth", "[utils][get_file_size]") {
+    const std::string fname = "test_growth.txt";
+
+    // Start with empty file
+    write_string_to_file(fname, "");
+    REQUIRE(get_file_size(fname) == 0);
+
+    // Append data
+    write_string_to_file(fname, "a");
+    REQUIRE(get_file_size(fname) == 1);
+
+    write_string_to_file(fname, "ab");
+    REQUIRE(get_file_size(fname) == 2);
+
+    write_string_to_file(fname, "abc");
+    REQUIRE(get_file_size(fname) == 3);
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("file_exists works with relative and absolute paths", "[utils][file_exists]") {
+    const std::string fname = "test_paths.txt";
+
+    write_string_to_file(fname, "test");
+
+    // Relative path
+    REQUIRE(file_exists(fname));
+    REQUIRE(file_exists("./" + fname));
+
+    // Absolute path
+    std::string abs_path = absolute_path(fname);
+    REQUIRE(file_exists(abs_path));
+
+    std::remove(fname.c_str());
+}
+
+TEST_CASE("get_file_size works with relative and absolute paths", "[utils][get_file_size]") {
+    const std::string fname = "test_paths_size.txt";
+    const std::string content = "test content";
+
+    write_string_to_file(fname, content);
+    size_t expected_size = content.size();
+
+    // Relative path
+    REQUIRE(get_file_size(fname) == expected_size);
+    REQUIRE(get_file_size("./" + fname) == expected_size);
+
+    // Absolute path
+    std::string abs_path = absolute_path(fname);
+    REQUIRE(get_file_size(abs_path) == expected_size);
+
+    std::remove(fname.c_str());
+}

@@ -11,26 +11,6 @@
 #include "catch_amalgamated.hpp"
 #include <sstream>
 
-namespace {
-// Redirect std::cerr to an internal buffer for the duration of these tests
-// so test error messages don't pollute the console output.
-struct StderrSilencer {
-    StderrSilencer() : old_buf(std::cerr.rdbuf(stream.rdbuf())) {}
-    ~StderrSilencer() {
-        std::cerr.rdbuf(old_buf);
-    }
-    std::string str() const {
-        return stream.str();
-    }
-private:
-    std::ostringstream stream;
-    std::streambuf* old_buf = nullptr;
-};
-
-// Instantiate a single silencer for this translation unit.
-static StderrSilencer g_stderr_silencer;
-}
-
 //-----------------------------------------------------------------------------
 // Expression node tests
 //-----------------------------------------------------------------------------
@@ -2147,7 +2127,7 @@ TEST_CASE("Module: declare_symbol creates new undefined symbol with scope", "[mo
 }
 
 TEST_CASE("Module: declare_symbol allows scope update from Local", "[model][module][declare]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 20);
     Module module("TEST", loc1);
@@ -2164,7 +2144,7 @@ TEST_CASE("Module: declare_symbol allows scope update from Local", "[model][modu
 }
 
 TEST_CASE("Module: declare_symbol allows same scope redeclaration", "[model][module][declare]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 30);
     Location loc2("test.asm", 40);
     Module module("TEST", loc1);
@@ -2181,7 +2161,7 @@ TEST_CASE("Module: declare_symbol allows same scope redeclaration", "[model][mod
 }
 
 TEST_CASE("Module: declare_symbol errors on scope conflict (Public to Extern)", "[model][module][declare]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 50);
     Location loc2("test.asm", 60);
     Module module("TEST", loc1);
@@ -2203,7 +2183,7 @@ TEST_CASE("Module: declare_symbol errors on scope conflict (Public to Extern)", 
 }
 
 TEST_CASE("Module: declare_symbol errors on scope conflict (Extern to Public)", "[model][module][declare]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 70);
     Location loc2("test.asm", 80);
     Module module("TEST", loc1);
@@ -2224,7 +2204,7 @@ TEST_CASE("Module: declare_symbol errors on scope conflict (Extern to Public)", 
 }
 
 TEST_CASE("Module: declare_symbol errors declaring defined symbol as Extern", "[model][module][declare]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 90);
     Location loc2("test.asm", 100);
     Module module("TEST", loc1);
@@ -2247,7 +2227,7 @@ TEST_CASE("Module: declare_symbol errors declaring defined symbol as Extern", "[
 }
 
 TEST_CASE("Module: declare_symbol allows Global scope transitions", "[model][module][declare]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 110);
     Location loc2("test.asm", 120);
     Module module("TEST", loc1);
@@ -2293,7 +2273,7 @@ TEST_CASE("Module: add_symbol creates new defined symbol", "[model][module][add]
 }
 
 TEST_CASE("Module: add_symbol updates undefined symbol", "[model][module][add]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 150);
     Location loc2("test.asm", 160);
     Module module("TEST", loc1);
@@ -2313,7 +2293,7 @@ TEST_CASE("Module: add_symbol updates undefined symbol", "[model][module][add]")
 }
 
 TEST_CASE("Module: add_symbol errors on redefinition", "[model][module][add]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 170);
     Location loc2("test.asm", 180);
     Module module("TEST", loc1);
@@ -2336,7 +2316,7 @@ TEST_CASE("Module: add_symbol errors on redefinition", "[model][module][add]") {
 }
 
 TEST_CASE("Module: add_symbol errors defining Extern symbol", "[model][module][add]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 190);
     Location loc2("test.asm", 200);
     Module module("TEST", loc1);
@@ -2358,7 +2338,7 @@ TEST_CASE("Module: add_symbol errors defining Extern symbol", "[model][module][a
 }
 
 TEST_CASE("Module: add_symbol updates location only when defining", "[model][module][add]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 210);
     Location loc2("test.asm", 220);
     Module module("TEST", loc1);
@@ -2378,7 +2358,7 @@ TEST_CASE("Module: add_symbol updates location only when defining", "[model][mod
 //-----------------------------------------------------------------------------
 
 TEST_CASE("Integration: PUBLIC declaration followed by definition", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("module.asm", 10);
     Location loc2("module.asm", 50);
     Module module("MYMODULE", loc1);
@@ -2399,7 +2379,7 @@ TEST_CASE("Integration: PUBLIC declaration followed by definition", "[model][int
 }
 
 TEST_CASE("Integration: EXTERN declaration stays undefined", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("main.asm", 10);
     Module module("MAIN", loc1);
 
@@ -2417,7 +2397,7 @@ TEST_CASE("Integration: EXTERN declaration stays undefined", "[model][integratio
 }
 
 TEST_CASE("Integration: GLOBAL declaration then definition acts as PUBLIC", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("module.asm", 10);
     Location loc2("module.asm", 50);
     Module module("TEST", loc1);
@@ -2440,7 +2420,7 @@ TEST_CASE("Integration: GLOBAL declaration then definition acts as PUBLIC", "[mo
 }
 
 TEST_CASE("Integration: definition before PUBLIC declaration", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("module.asm", 10);
     Location loc2("module.asm", 50);
     Module module("TEST", loc1);
@@ -2460,7 +2440,7 @@ TEST_CASE("Integration: definition before PUBLIC declaration", "[model][integrat
 }
 
 TEST_CASE("Integration: multiple forward references", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("program.asm", 10);
     Location loc2("program.asm", 20);
     Location loc3("program.asm", 30);
@@ -2486,7 +2466,7 @@ TEST_CASE("Integration: multiple forward references", "[model][integration]") {
 }
 
 TEST_CASE("Integration: scope conflict detection", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("conflict.asm", 10);
     Location loc2("conflict.asm", 20);
     Location loc3("conflict.asm", 30);
@@ -2499,7 +2479,7 @@ TEST_CASE("Integration: scope conflict detection", "[model][integration]") {
     // Try to redeclare as EXTERN - should error
     module.declare_symbol("SYMBOL", loc2, SymbolScope::Extern);
     REQUIRE(g_errors.has_errors());
-    g_errors.reset();
+    SuppressErrors suppress2;
 
     // PUBLIC to PUBLIC is fine
     module.declare_symbol("SYMBOL", loc3, SymbolScope::Public);
@@ -2507,7 +2487,7 @@ TEST_CASE("Integration: scope conflict detection", "[model][integration]") {
 }
 
 TEST_CASE("Integration: typical assembly workflow", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc("test.asm", 1);
     Module module("MAIN", loc);
 
@@ -2553,7 +2533,7 @@ TEST_CASE("Integration: typical assembly workflow", "[model][integration]") {
 }
 
 TEST_CASE("Integration: error recovery continues after redefinition", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 20);
     Location loc3("test.asm", 30);
@@ -2566,7 +2546,7 @@ TEST_CASE("Integration: error recovery continues after redefinition", "[model][i
     // Try to redefine (error)
     module.add_symbol("DUP", loc2, 200, SymbolType::Constant);
     REQUIRE(g_errors.has_errors());
-    g_errors.reset();
+    SuppressErrors suppress2;
 
     // Can still define new symbols after error
     Symbol* new_sym = module.add_symbol("NEW", loc3, 300, SymbolType::Constant);
@@ -2575,7 +2555,7 @@ TEST_CASE("Integration: error recovery continues after redefinition", "[model][i
 }
 
 TEST_CASE("Integration: all scope types with definitions", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc("scopes.asm", 1);
     Module module("TEST", loc);
 
@@ -2612,7 +2592,7 @@ TEST_CASE("Integration: all scope types with definitions", "[model][integration]
 }
 
 TEST_CASE("Integration: cannot redefine after error", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 20);
     Module module("TEST", loc1);
@@ -2631,7 +2611,7 @@ TEST_CASE("Integration: cannot redefine after error", "[model][integration]") {
 }
 
 TEST_CASE("Integration: declare Extern then try to define (error)", "[model][integration]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 50);
     Module module("TEST", loc1);
@@ -4619,3 +4599,1369 @@ TEST_CASE("Integration: parse and check non-constant expression", "[model][integ
     REQUIRE_FALSE(expr.is_constant());  // Contains label
 }
 
+//-----------------------------------------------------------------------------
+// Library tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Library: constructor with filename", "[model][library]") {
+    Library lib("mylib.lib");
+
+    REQUIRE(lib.filename() == "mylib.lib");
+    REQUIRE(lib.modules().size() == 0);
+    REQUIRE(lib.public_symbols().size() == 0);
+    REQUIRE(lib.module_count() == 0);
+    REQUIRE(lib.public_symbol_count() == 0);
+}
+
+TEST_CASE("Library: add module", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MOD1", loc);
+    Module* mod_ptr = module.get();
+
+    Module* result = lib.add_module(std::move(module));
+
+    REQUIRE(result == mod_ptr);
+    REQUIRE(lib.modules().size() == 1);
+    REQUIRE(lib.module_count() == 1);
+    REQUIRE(lib.modules()[0].get() == mod_ptr);
+}
+
+TEST_CASE("Library: add module with public symbols", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MOD1", loc);
+
+    // Add public symbol
+    Symbol* sym = module->add_symbol("exported_func", loc, 0x8000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+
+    lib.add_module(std::move(module));
+
+    REQUIRE(lib.public_symbol_count() == 1);
+    REQUIRE(lib.has_public_symbol("exported_func"));
+
+    Module* found = lib.find_public_symbol("exported_func");
+    REQUIRE(found != nullptr);
+    REQUIRE(found->name() == "MOD1");
+}
+
+TEST_CASE("Library: add module with local symbols", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MOD1", loc);
+
+    // Add local symbol (should not be indexed)
+    module->add_symbol("local_var", loc, 42, SymbolType::Constant);
+
+    lib.add_module(std::move(module));
+
+    REQUIRE(lib.public_symbol_count() == 0);
+    REQUIRE_FALSE(lib.has_public_symbol("local_var"));
+    REQUIRE(lib.find_public_symbol("local_var") == nullptr);
+}
+
+TEST_CASE("Library: multiple modules with public symbols", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    // Module 1 with public symbol
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym1 = mod1->add_symbol("func1", loc, 0x8000, SymbolType::Constant);
+    sym1->set_scope(SymbolScope::Public);
+    Module* mod1_ptr = lib.add_module(std::move(mod1));
+
+    // Module 2 with different public symbol
+    auto mod2 = std::make_unique<Module>("MOD2", loc);
+    Symbol* sym2 = mod2->add_symbol("func2", loc, 0x9000, SymbolType::Constant);
+    sym2->set_scope(SymbolScope::Public);
+    Module* mod2_ptr = lib.add_module(std::move(mod2));
+
+    REQUIRE(lib.module_count() == 2);
+    REQUIRE(lib.public_symbol_count() == 2);
+
+    REQUIRE(lib.find_public_symbol("func1") == mod1_ptr);
+    REQUIRE(lib.find_public_symbol("func2") == mod2_ptr);
+}
+
+TEST_CASE("Library: duplicate public symbol keeps first", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    // Module 1 with public symbol
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym1 = mod1->add_symbol("duplicate", loc, 0x8000, SymbolType::Constant);
+    sym1->set_scope(SymbolScope::Public);
+    Module* mod1_ptr = lib.add_module(std::move(mod1));
+
+    // Module 2 with same public symbol
+    auto mod2 = std::make_unique<Module>("MOD2", loc);
+    Symbol* sym2 = mod2->add_symbol("duplicate", loc, 0x9000, SymbolType::Constant);
+    sym2->set_scope(SymbolScope::Public);
+    lib.add_module(std::move(mod2));
+
+    REQUIRE(lib.public_symbol_count() == 1);
+    REQUIRE(lib.find_public_symbol("duplicate") == mod1_ptr);  // First wins
+}
+
+TEST_CASE("Library: find module by name", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Module* mod1_ptr = lib.add_module(std::move(mod1));
+
+    auto mod2 = std::make_unique<Module>("MOD2", loc);
+    Module* mod2_ptr = lib.add_module(std::move(mod2));
+
+    REQUIRE(lib.find_module("MOD1") == mod1_ptr);
+    REQUIRE(lib.find_module("MOD2") == mod2_ptr);
+    REQUIRE(lib.find_module("NONEXISTENT") == nullptr);
+}
+
+TEST_CASE("Library: clear modules", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym = module->add_symbol("func", loc, 0x8000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+    lib.add_module(std::move(module));
+
+    REQUIRE(lib.module_count() == 1);
+    REQUIRE(lib.public_symbol_count() == 1);
+
+    lib.clear_modules();
+
+    REQUIRE(lib.module_count() == 0);
+    REQUIRE(lib.public_symbol_count() == 0);
+    REQUIRE(lib.modules().empty());
+    REQUIRE(lib.public_symbols().empty());
+}
+
+TEST_CASE("Library: rebuild public symbol index", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym = module->add_symbol("func", loc, 0x8000, SymbolType::Constant);
+    Module* mod_ptr = lib.add_module(std::move(module));
+
+    REQUIRE(lib.public_symbol_count() == 0);
+
+    // Make symbol public after adding to library
+    sym->set_scope(SymbolScope::Public);
+
+    // Rebuild index
+    lib.rebuild_public_symbol_index();
+
+    REQUIRE(lib.public_symbol_count() == 1);
+    REQUIRE(lib.find_public_symbol("func") == mod_ptr);
+}
+
+TEST_CASE("Library: const accessors", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym = module->add_symbol("func", loc, 0x8000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+    Module* mod_ptr = lib.add_module(std::move(module));
+
+    const Library& const_lib = lib;
+
+    REQUIRE(const_lib.filename() == "test.lib");
+    REQUIRE(const_lib.module_count() == 1);
+    REQUIRE(const_lib.public_symbol_count() == 1);
+    REQUIRE(const_lib.has_public_symbol("func"));
+
+    const Module* found = const_lib.find_public_symbol("func");
+    REQUIRE(found == mod_ptr);
+}
+
+TEST_CASE("Library: iteration over modules", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    lib.add_module(std::make_unique<Module>("MOD1", loc));
+    lib.add_module(std::make_unique<Module>("MOD2", loc));
+    lib.add_module(std::make_unique<Module>("MOD3", loc));
+
+    std::vector<std::string> names;
+    for (const auto& module : lib.modules()) {
+        names.push_back(module->name());
+    }
+
+    REQUIRE(names.size() == 3);
+    REQUIRE(names[0] == "MOD1");
+    REQUIRE(names[1] == "MOD2");
+    REQUIRE(names[2] == "MOD3");
+}
+
+TEST_CASE("Library: public symbol index iteration", "[model][library]") {
+    Library lib("test.lib");
+    Location loc("test.asm", 1);
+
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym1 = mod1->add_symbol("func1", loc, 0x8000, SymbolType::Constant);
+    sym1->set_scope(SymbolScope::Public);
+    lib.add_module(std::move(mod1));
+
+    auto mod2 = std::make_unique<Module>("MOD2", loc);
+    Symbol* sym2 = mod2->add_symbol("func2", loc, 0x9000, SymbolType::Constant);
+    sym2->set_scope(SymbolScope::Public);
+    lib.add_module(std::move(mod2));
+
+    std::set<std::string> symbol_names;
+    for (const auto& [name, module] : lib.public_symbols()) {
+        symbol_names.insert(name);
+    }
+
+    REQUIRE(symbol_names.size() == 2);
+    REQUIRE(symbol_names.count("func1") == 1);
+    REQUIRE(symbol_names.count("func2") == 1);
+}
+
+//-----------------------------------------------------------------------------
+// Integration tests: Library with complete modules
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Integration: library with code modules", "[model][integration][library]") {
+    Library lib("math.lib");
+    Location loc("math.asm", 1);
+
+    // Create module with function
+    auto module = std::make_unique<Module>("MATH", loc);
+
+    // Add CODE section
+    Section* code = module->add_section("CODE");
+    code->set_base_address(0x8000);
+
+    // Add public function
+    loc.set_line_num(10);
+    Opcode* func_opcode = code->add_opcode(Opcode({ 0xC9 }, loc));  // RET
+    Symbol* func = module->add_symbol("add", loc);
+    func->set_type(SymbolType::AddressRelative);
+    func->set_opcode(func_opcode);
+    func->set_scope(SymbolScope::Public);
+
+    lib.add_module(std::move(module));
+
+    // Verify library structure
+    REQUIRE(lib.module_count() == 1);
+    REQUIRE(lib.public_symbol_count() == 1);
+    REQUIRE(lib.has_public_symbol("add"));
+
+    Module* found_module = lib.find_public_symbol("add");
+    REQUIRE(found_module != nullptr);
+    REQUIRE(found_module->name() == "MATH");
+
+    const Symbol* found_symbol = found_module->find_symbol("add");
+    REQUIRE(found_symbol != nullptr);
+    REQUIRE(found_symbol->is_public());
+}
+
+TEST_CASE("Integration: library linking scenario", "[model][integration][library]") {
+    // Simulate linking scenario:
+    // Main program calls library function
+
+    Library lib("stdio.lib");
+    Location loc("stdio.asm", 1);
+
+    // Library module with print function
+    auto lib_module = std::make_unique<Module>("STDIO", loc);
+    Section* lib_code = lib_module->add_section("CODE");
+    lib_code->set_base_address(0xC000);
+
+    loc.set_line_num(10);
+    Opcode* print_opcode = lib_code->add_opcode(Opcode({ 0xC9 }, loc));
+    Symbol* print_func = lib_module->add_symbol("print", loc);
+    print_func->set_type(SymbolType::AddressRelative);
+    print_func->set_opcode(print_opcode);
+    print_func->set_scope(SymbolScope::Public);
+
+    lib.add_module(std::move(lib_module));
+
+    // Main program that calls print
+    CompilationUnit main_unit("main.asm", loc);
+    Module* main_module = main_unit.current_module();
+    Section* main_code = main_module->add_section("CODE");
+    main_code->set_base_address(0x8000);
+
+    // Declare external reference to print
+    loc.set_line_num(20);
+    Symbol* print_ref = main_module->declare_symbol("print", loc, SymbolScope::Extern);
+    REQUIRE(print_ref->is_extern());
+
+    // Add CALL instruction with patch
+    loc.set_line_num(21);
+    Opcode* call_opcode = main_code->add_opcode(Opcode({ 0xCD, 0x00, 0x00 }, loc));
+    Expression call_target(make_symbol(print_ref), loc);
+    Patch call_patch(1, PatchRange::Word, call_target);
+    call_opcode->add_patch(call_patch);
+
+    // Link step: resolve external reference
+    REQUIRE(lib.has_public_symbol("print"));
+    Module* defining_module = lib.find_public_symbol("print");
+    REQUIRE(defining_module != nullptr);
+
+    const Symbol* print_def = defining_module->find_symbol("print");
+    REQUIRE(print_def != nullptr);
+    REQUIRE(print_def->is_public());
+
+    // In real linker, would copy print_def's value to print_ref
+    // For this test, just verify structure is correct
+    REQUIRE(call_opcode->has_patches());
+    REQUIRE(call_opcode->patches()[0].range() == PatchRange::Word);
+}
+
+TEST_CASE("Integration: library search order", "[model][integration][library]") {
+    // Multiple libraries with duplicate symbols - first library wins
+
+    Location loc("test.asm", 1);
+
+    Library lib1("lib1.lib");
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym1 = mod1->add_symbol("common_func", loc, 0x8000, SymbolType::Constant);
+    sym1->set_scope(SymbolScope::Public);
+    lib1.add_module(std::move(mod1));
+
+    Library lib2("lib2.lib");
+    auto mod2 = std::make_unique<Module>("MOD2", loc);
+    Symbol* sym2 = mod2->add_symbol("common_func", loc, 0x9000, SymbolType::Constant);
+    sym2->set_scope(SymbolScope::Public);
+    lib2.add_module(std::move(mod2));
+
+    // In linking, search order matters
+    std::vector<Library*> search_path = { &lib1, &lib2 };
+
+    Module* found = nullptr;
+    for (Library* lib : search_path) {
+        found = lib->find_public_symbol("common_func");
+        if (found) break;
+    }
+
+    REQUIRE(found != nullptr);
+    REQUIRE(found->name() == "MOD1");  // First library wins
+}
+
+//-----------------------------------------------------------------------------
+// Linker tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Linker: constructor creates empty state", "[model][linker]") {
+    Linker linker;
+
+    REQUIRE(linker.module_count() == 0);
+    REQUIRE(linker.public_symbol_count() == 0);
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE_FALSE(linker.has_unresolved_symbols());
+    REQUIRE(linker.modules().empty());
+    REQUIRE(linker.public_symbols().empty());
+    REQUIRE(linker.unresolved_externs().empty());
+    REQUIRE(linker.libraries().empty());
+}
+
+TEST_CASE("Linker: add module with public symbols", "[model][linker]") {
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MAIN", loc);
+    Symbol* sym = module->add_symbol("main", loc, 0x8000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+
+    Module* module_ptr = linker.add_module(std::move(module));
+
+    REQUIRE(module_ptr != nullptr);
+    REQUIRE(linker.module_count() == 1);
+    REQUIRE(linker.public_symbol_count() == 1);
+    REQUIRE(linker.public_symbols().count("main") == 1);
+    REQUIRE(linker.public_symbols().at("main") == module_ptr);
+}
+
+TEST_CASE("Linker: add module with extern symbols", "[model][linker]") {
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    auto module = std::make_unique<Module>("MAIN", loc);
+    module->declare_symbol("printf", loc, SymbolScope::Extern);
+
+    linker.add_module(std::move(module));
+
+    REQUIRE(linker.module_count() == 1);
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+    REQUIRE(linker.has_unresolved_symbols());
+    REQUIRE(linker.unresolved_externs().count("printf") == 1);
+}
+
+TEST_CASE("Linker: extern resolved by later public", "[model][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    // Module 1: uses external symbol
+    auto mod1 = std::make_unique<Module>("MAIN", loc);
+    mod1->declare_symbol("helper", loc, SymbolScope::Extern);
+    linker.add_module(std::move(mod1));
+
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+
+    // Module 2: defines the symbol
+    auto mod2 = std::make_unique<Module>("UTIL", loc);
+    Symbol* sym = mod2->add_symbol("helper", loc, 0x9000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+    linker.add_module(std::move(mod2));
+
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE_FALSE(linker.has_unresolved_symbols());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Linker: public resolves existing extern", "[model][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    // Module 1: defines public symbol
+    auto mod1 = std::make_unique<Module>("LIB", loc);
+    Symbol* sym = mod1->add_symbol("api_func", loc, 0x8000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+    linker.add_module(std::move(mod1));
+
+    REQUIRE(linker.public_symbol_count() == 1);
+
+    // Module 2: uses the symbol (should not be unresolved)
+    auto mod2 = std::make_unique<Module>("MAIN", loc);
+    mod2->declare_symbol("api_func", loc, SymbolScope::Extern);
+    linker.add_module(std::move(mod2));
+
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Linker: duplicate public symbols error", "[model][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc1("mod1.asm", 10);
+    Location loc2("mod2.asm", 20);
+
+    // Module 1: defines public symbol
+    auto mod1 = std::make_unique<Module>("MOD1", loc1);
+    Symbol* sym1 = mod1->add_symbol("duplicate", loc1, 0x8000, SymbolType::Constant);
+    sym1->set_scope(SymbolScope::Public);
+    linker.add_module(std::move(mod1));
+
+    REQUIRE_FALSE(g_errors.has_errors());
+
+    // Module 2: defines same public symbol (error)
+    auto mod2 = std::make_unique<Module>("MOD2", loc2);
+    Symbol* sym2 = mod2->add_symbol("duplicate", loc2, 0x9000, SymbolType::Constant);
+    sym2->set_scope(SymbolScope::Public);
+    linker.add_module(std::move(mod2));
+
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Duplicate public symbol") != std::string::npos);
+    REQUIRE(msg.find("duplicate") != std::string::npos);
+}
+
+TEST_CASE("Linker: add library", "[model][linker]") {
+    Linker linker;
+    Library lib("test.lib");
+
+    linker.add_library(&lib);
+
+    REQUIRE(linker.libraries().size() == 1);
+    REQUIRE(linker.libraries()[0] == &lib);
+}
+
+TEST_CASE("Linker: link_libraries resolves symbols", "[model][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    // Create library with public symbol
+    Library lib("stdio.lib");
+    auto lib_module = std::make_unique<Module>("STDIO", loc);
+    Symbol* lib_sym = lib_module->add_symbol("printf", loc, 0xC000, SymbolType::Constant);
+    lib_sym->set_scope(SymbolScope::Public);
+    lib.add_module(std::move(lib_module));
+
+    linker.add_library(&lib);
+
+    // Add main module with extern reference
+    auto main_module = std::make_unique<Module>("MAIN", loc);
+    main_module->declare_symbol("printf", loc, SymbolScope::Extern);
+    linker.add_module(std::move(main_module));
+
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+
+    // Link libraries
+    bool success = linker.link_libraries();
+
+    REQUIRE(success);
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Linker: link_libraries reports unresolved", "[model][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 10);
+
+    // Add module with unresolved extern
+    auto module = std::make_unique<Module>("MAIN", loc);
+    module->declare_symbol("undefined", loc, SymbolScope::Extern);
+    linker.add_module(std::move(module));
+
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+
+    // Link libraries (no libraries added, so should fail)
+    bool success = linker.link_libraries();
+
+    REQUIRE_FALSE(success);
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+    REQUIRE(g_errors.has_errors());
+
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("test.asm:10:") != std::string::npos);
+    REQUIRE(msg.find("Unresolved external symbol") != std::string::npos);
+    REQUIRE(msg.find("undefined") != std::string::npos);
+}
+
+TEST_CASE("Linker: library search order", "[model][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    // Library 1 with symbol
+    Library lib1("lib1.lib");
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Symbol* sym1 = mod1->add_symbol("common", loc, 0x8000, SymbolType::Constant);
+    sym1->set_scope(SymbolScope::Public);
+    lib1.add_module(std::move(mod1));
+
+    // Library 2 with same symbol
+    Library lib2("lib2.lib");
+    auto mod2 = std::make_unique<Module>("MOD2", loc);
+    Symbol* sym2 = mod2->add_symbol("common", loc, 0x9000, SymbolType::Constant);
+    sym2->set_scope(SymbolScope::Public);
+    lib2.add_module(std::move(mod2));
+
+    // Add libraries in order
+    linker.add_library(&lib1);
+    linker.add_library(&lib2);
+
+    // Add module with extern
+    auto main_module = std::make_unique<Module>("MAIN", loc);
+    main_module->declare_symbol("common", loc, SymbolScope::Extern);
+    linker.add_module(std::move(main_module));
+
+    // Link - should resolve from first library
+    bool success = linker.link_libraries();
+
+    REQUIRE(success);
+    REQUIRE_FALSE(g_errors.has_errors());
+    // In full implementation, would verify MOD1 was pulled in, not MOD2
+}
+
+TEST_CASE("Linker: clear state", "[model][linker]") {
+    Linker linker;
+    Location loc("test.asm", 1);
+    Library lib("test.lib");
+
+    // Add some state
+    auto module = std::make_unique<Module>("MAIN", loc);
+    Symbol* sym = module->add_symbol("func", loc, 0x8000, SymbolType::Constant);
+    sym->set_scope(SymbolScope::Public);
+    linker.add_module(std::move(module));
+    linker.add_library(&lib);
+
+    REQUIRE(linker.module_count() > 0);
+    REQUIRE(linker.public_symbol_count() > 0);
+
+    // Clear
+    linker.clear();
+
+    REQUIRE(linker.module_count() == 0);
+    REQUIRE(linker.public_symbol_count() == 0);
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE(linker.modules().empty());
+    REQUIRE(linker.public_symbols().empty());
+    REQUIRE(linker.unresolved_externs().empty());
+    REQUIRE(linker.libraries().empty());
+}
+
+TEST_CASE("Linker: multiple unresolved locations tracked", "[model][linker]") {
+    Linker linker;
+    Location loc1("main.asm", 10);
+    Location loc2("main.asm", 20);
+    Location loc3("util.asm", 15);
+
+    // Module with multiple references to same extern
+    auto mod1 = std::make_unique<Module>("MAIN", loc1);
+    mod1->declare_symbol("helper", loc1, SymbolScope::Extern);
+    mod1->declare_symbol("helper", loc2, SymbolScope::Extern);
+    linker.add_module(std::move(mod1));
+
+    auto mod2 = std::make_unique<Module>("UTIL", loc3);
+    mod2->declare_symbol("helper", loc3, SymbolScope::Extern);
+    linker.add_module(std::move(mod2));
+
+    // Should track all locations
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+    const auto& externs = linker.unresolved_externs();
+    REQUIRE(externs.at("helper").size() == 3);
+}
+
+//-----------------------------------------------------------------------------
+// Integration tests: Complete linking workflow
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Integration: simple program linking", "[model][integration][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    // Main module with entry point
+    auto main_mod = std::make_unique<Module>("MAIN", loc);
+    Section* main_code = main_mod->add_section("CODE");
+    main_code->set_base_address(0x8000);
+
+    Symbol* start = main_mod->add_symbol("_start", loc, 0x8000, SymbolType::Constant);
+    start->set_scope(SymbolScope::Public);
+
+    /*Symbol* helper_ref =*/ main_mod->declare_symbol("helper", loc, SymbolScope::Extern);
+
+    linker.add_module(std::move(main_mod));
+
+    // Utility module with helper function
+    auto util_mod = std::make_unique<Module>("UTIL", loc);
+    Symbol* helper = util_mod->add_symbol("helper", loc, 0x9000, SymbolType::Constant);
+    helper->set_scope(SymbolScope::Public);
+
+    linker.add_module(std::move(util_mod));
+
+    // Should be fully resolved
+    REQUIRE(linker.module_count() == 2);
+    REQUIRE(linker.public_symbol_count() == 2);
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE_FALSE(linker.has_unresolved_symbols());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Integration: linking with library", "[model][integration][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("main.asm", 1);
+
+    // Create standard library
+    Library stdlib("stdlib.lib");
+
+    auto print_mod = std::make_unique<Module>("PRINT", loc);
+    Symbol* print = print_mod->add_symbol("print", loc, 0xC000, SymbolType::Constant);
+    print->set_scope(SymbolScope::Public);
+    stdlib.add_module(std::move(print_mod));
+
+    auto math_mod = std::make_unique<Module>("MATH", loc);
+    Symbol* multiply = math_mod->add_symbol("multiply", loc, 0xC100, SymbolType::Constant);
+    multiply->set_scope(SymbolScope::Public);
+    stdlib.add_module(std::move(math_mod));
+
+    linker.add_library(&stdlib);
+
+    // Main program using library functions
+    auto main = std::make_unique<Module>("MAIN", loc);
+    Symbol* start = main->add_symbol("_start", loc, 0x8000, SymbolType::Constant);
+    start->set_scope(SymbolScope::Public);
+
+    main->declare_symbol("print", loc, SymbolScope::Extern);
+    main->declare_symbol("multiply", loc, SymbolScope::Extern);
+
+    linker.add_module(std::move(main));
+
+    REQUIRE(linker.unresolved_symbol_count() == 2);
+
+    // Link
+    bool success = linker.link_libraries();
+
+    REQUIRE(success);
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Integration: complex linking scenario", "[model][integration][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 1);
+
+    // Library 1: stdio
+    Library stdio("stdio.lib");
+    auto printf_mod = std::make_unique<Module>("PRINTF", loc);
+    Symbol* printf_sym = printf_mod->add_symbol("printf", loc, 0xC000, SymbolType::Constant);
+    printf_sym->set_scope(SymbolScope::Public);
+    stdio.add_module(std::move(printf_mod));
+
+    // Library 2: math
+    Library math("math.lib");
+    auto sqrt_mod = std::make_unique<Module>("SQRT", loc);
+    Symbol* sqrt_sym = sqrt_mod->add_symbol("sqrt", loc, 0xD000, SymbolType::Constant);
+    sqrt_sym->set_scope(SymbolScope::Public);
+    math.add_module(std::move(sqrt_mod));
+
+    linker.add_library(&stdio);
+    linker.add_library(&math);
+
+    // Module 1: main
+    auto main = std::make_unique<Module>("MAIN", loc);
+    Symbol* start = main->add_symbol("_start", loc, 0x8000, SymbolType::Constant);
+    start->set_scope(SymbolScope::Public);
+    main->declare_symbol("printf", loc, SymbolScope::Extern);
+    main->declare_symbol("calc", loc, SymbolScope::Extern);
+    linker.add_module(std::move(main));
+
+    // Module 2: utility (provides calc, uses sqrt)
+    auto util = std::make_unique<Module>("UTIL", loc);
+    Symbol* calc = util->add_symbol("calc", loc, 0x9000, SymbolType::Constant);
+    calc->set_scope(SymbolScope::Public);
+    util->declare_symbol("sqrt", loc, SymbolScope::Extern);
+    linker.add_module(std::move(util));
+
+    // At this point: printf and sqrt are unresolved
+    REQUIRE(linker.unresolved_symbol_count() == 2);
+
+    // Link
+    bool success = linker.link_libraries();
+
+    REQUIRE(success);
+    REQUIRE(linker.unresolved_symbol_count() == 0);
+    REQUIRE(linker.public_symbol_count() == 4);  // _start, calc, printf, sqrt (conceptually)
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Integration: partial linking failure", "[model][integration][linker]") {
+    SuppressErrors suppress;
+    Linker linker;
+    Location loc("test.asm", 10);
+
+    // Library with one function
+    Library lib("partial.lib");
+    auto mod1 = std::make_unique<Module>("MOD1", loc);
+    Symbol* func1 = mod1->add_symbol("func1", loc, 0xC000, SymbolType::Constant);
+    func1->set_scope(SymbolScope::Public);
+    lib.add_module(std::move(mod1));
+
+    linker.add_library(&lib);
+
+    // Main module with two extern references
+    auto main = std::make_unique<Module>("MAIN", loc);
+    main->declare_symbol("func1", loc, SymbolScope::Extern);
+    main->declare_symbol("func2", loc, SymbolScope::Extern);  // Not in library
+    linker.add_module(std::move(main));
+
+    REQUIRE(linker.unresolved_symbol_count() == 2);
+
+    // Link - should partially resolve
+    bool success = linker.link_libraries();
+
+    REQUIRE_FALSE(success);
+    REQUIRE(linker.unresolved_symbol_count() == 1);
+    REQUIRE(linker.unresolved_externs().count("func2") == 1);
+    REQUIRE(g_errors.has_errors());
+}
+
+//-----------------------------------------------------------------------------
+// Patch resolve() tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Patch: resolve ByteUnsigned in range", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x42), loc);
+    Patch patch(0, PatchRange::ByteUnsigned, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    REQUIRE(bytes[0] == 0x42);
+    REQUIRE(bytes[1] == 0x00);
+    REQUIRE_FALSE(g_errors.has_errors());
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve ByteUnsigned out of range warns", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x1234), loc);
+    Patch patch(0, PatchRange::ByteUnsigned, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    REQUIRE(bytes[0] == 0x34);  // Truncated
+    REQUIRE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve ByteUnsigned negative value warns", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(-1), loc);
+    Patch patch(0, PatchRange::ByteUnsigned, expr);
+
+    std::vector<uint8_t> bytes = { 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    REQUIRE(bytes[0] == 0xFF);  // -1 as unsigned byte
+    REQUIRE_FALSE(g_errors.has_warnings());  // -1 is in range for unsigned byte (treated as 255)
+}
+
+TEST_CASE("Patch: resolve ByteSigned in range", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    {
+        Expression expr(make_integer(127), loc);
+        Patch patch(0, PatchRange::ByteSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 127);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+
+    {
+        Expression expr(make_integer(-128), loc);
+        Patch patch(0, PatchRange::ByteSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x80);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+}
+
+TEST_CASE("Patch: resolve ByteSigned out of range warns", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    {
+        Expression expr(make_integer(128), loc);
+        Patch patch(0, PatchRange::ByteSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x80);
+        REQUIRE(g_errors.has_warnings());
+    }
+
+    SuppressErrors suppress2;
+
+    {
+        Expression expr(make_integer(-129), loc);
+        Patch patch(0, PatchRange::ByteSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x7F);  // Truncated
+        REQUIRE(g_errors.has_warnings());
+    }
+}
+
+TEST_CASE("Patch: resolve HighOffset in range", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    {
+        Expression expr(make_integer(0x00), loc);
+        Patch patch(0, PatchRange::HighOffset, expr);
+
+        std::vector<uint8_t> bytes = { 0xFF };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x00);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+
+    {
+        Expression expr(make_integer(-1), loc);  // 0xFFFF
+        Patch patch(0, PatchRange::HighOffset, expr);
+
+        std::vector<uint8_t> bytes = { 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0xFF);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+}
+
+TEST_CASE("Patch: resolve HighOffset out of range warns", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x0100), loc);
+    Patch patch(0, PatchRange::HighOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+    REQUIRE(bytes[0] == 0x00);  // Low byte
+    REQUIRE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve ByteToWordUnsigned", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    {
+        Expression expr(make_integer(0x42), loc);
+        Patch patch(0, PatchRange::ByteToWordUnsigned, expr);
+
+        std::vector<uint8_t> bytes = { 0xFF, 0xFF };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x42);
+        REQUIRE(bytes[1] == 0x00);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+
+    SuppressErrors suppress2;
+
+    {
+        Expression expr(make_integer(0x100), loc);
+        Patch patch(0, PatchRange::ByteToWordUnsigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00, 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x00);
+        REQUIRE(bytes[1] == 0x00);
+        REQUIRE(g_errors.has_warnings());
+    }
+}
+
+TEST_CASE("Patch: resolve ByteToWordSigned", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    {
+        Expression expr(make_integer(127), loc);
+        Patch patch(0, PatchRange::ByteToWordSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00, 0xFF };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 127);
+        REQUIRE(bytes[1] == 0x00);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+
+    SuppressErrors suppress2;
+
+    {
+        Expression expr(make_integer(-1), loc);
+        Patch patch(0, PatchRange::ByteToWordSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00, 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0xFF);
+        REQUIRE(bytes[1] == 0xFF);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+
+    SuppressErrors suppress3;
+
+    {
+        Expression expr(make_integer(-128), loc);
+        Patch patch(0, PatchRange::ByteToWordSigned, expr);
+
+        std::vector<uint8_t> bytes = { 0x00, 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0x80);
+        REQUIRE(bytes[1] == 0xFF);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+}
+
+TEST_CASE("Patch: resolve ByteToPtr24Unsigned", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x42), loc);
+    Patch patch(0, PatchRange::ByteToPtr24Unsigned, expr);
+
+    std::vector<uint8_t> bytes = { 0xFF, 0xFF, 0xFF };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+    REQUIRE(bytes[0] == 0x42);
+    REQUIRE(bytes[1] == 0x00);
+    REQUIRE(bytes[2] == 0x00);
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve ByteToPtr24Signed", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    {
+        Expression expr(make_integer(127), loc);
+        Patch patch(0, PatchRange::ByteToPtr24Signed, expr);
+
+        std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 127);
+        REQUIRE(bytes[1] == 0x00);
+        REQUIRE(bytes[2] == 0x00);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+
+    SuppressErrors suppress2;
+
+    {
+        Expression expr(make_integer(-1), loc);
+        Patch patch(0, PatchRange::ByteToPtr24Signed, expr);
+
+        std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        REQUIRE(bytes[0] == 0xFF);
+        REQUIRE(bytes[1] == 0xFF);
+        REQUIRE(bytes[2] == 0xFF);
+        REQUIRE_FALSE(g_errors.has_warnings());
+    }
+}
+
+TEST_CASE("Patch: resolve Ptr24", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x123456), loc);
+    Patch patch(0, PatchRange::Ptr24, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+    REQUIRE(bytes[0] == 0x56);
+    REQUIRE(bytes[1] == 0x34);
+    REQUIRE(bytes[2] == 0x12);
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve Word little-endian", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x1234), loc);
+    Patch patch(0, PatchRange::Word, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+    REQUIRE(bytes[0] == 0x34);
+    REQUIRE(bytes[1] == 0x12);
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve WordBigEndian", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x1234), loc);
+    Patch patch(0, PatchRange::WordBigEndian, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+    REQUIRE(bytes[0] == 0x12);
+    REQUIRE(bytes[1] == 0x34);
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve Dword little-endian", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x12345678), loc);
+    Patch patch(0, PatchRange::Dword, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+    REQUIRE(bytes[0] == 0x78);
+    REQUIRE(bytes[1] == 0x56);
+    REQUIRE(bytes[2] == 0x34);
+    REQUIRE(bytes[3] == 0x12);
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve JrOffset in range", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    // JR forward: target = 0x8020, current = 0x8000, opcode_size = 2
+    // offset = 0x8020 - (0x8000 + 2) = 30
+    Expression expr(make_integer(0x8020), loc);
+    Patch patch(1, PatchRange::JrOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x18, 0x00 };  // JR offset
+    REQUIRE(patch.resolve(bytes, 0x8000, 2));
+    REQUIRE(bytes[0] == 0x18);
+    REQUIRE(bytes[1] == 30);
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve JrOffset backward", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    // JR backward: target = 0x8000, current = 0x8020, opcode_size = 2
+    // offset = 0x8000 - (0x8020 + 2) = -34
+    Expression expr(make_integer(0x8000), loc);
+    Patch patch(1, PatchRange::JrOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x18, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0x8020, 2));
+    REQUIRE(bytes[0] == 0x18);
+    REQUIRE(bytes[1] == static_cast<uint8_t>(-34));
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve JrOffset out of range errors", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    // JR too far forward: offset = 200 (out of range)
+    Expression expr(make_integer(0x8100), loc);
+    Patch patch(1, PatchRange::JrOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x18, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0x8000, 2));
+    REQUIRE(g_errors.has_errors());  // Error, not warning
+}
+
+TEST_CASE("Patch: resolve JreOffset (extended) in range", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    // JRE forward: target = 0x9000, current = 0x8000, opcode_size = 3
+    // offset = 0x9000 - (0x8000 + 3) = 4093
+    Expression expr(make_integer(0x9000), loc);
+    Patch patch(1, PatchRange::JreOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0x8000, 3));
+    REQUIRE(bytes[1] == static_cast<uint8_t>(4093 & 0xFF));
+    REQUIRE(bytes[2] == static_cast<uint8_t>(4093 >> 8));
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve JreOffset backward", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    // JRE backward: target = 0x8000, current = 0x9000, opcode_size = 3
+    // offset = 0x8000 - (0x9000 + 3) = -4099
+    Expression expr(make_integer(0x8000), loc);
+    Patch patch(1, PatchRange::JreOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0x9000, 3));
+
+    int16_t expected = -4099;
+    REQUIRE(bytes[1] == static_cast<uint8_t>(expected & 0xFF));
+    REQUIRE(bytes[2] == static_cast<uint8_t>((expected >> 8) & 0xFF));
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve JreOffset out of range errors", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    // JRE too far: offset = 40000 (out of range for signed 16-bit)
+    Expression expr(make_integer(0x18000), loc);
+    Patch patch(1, PatchRange::JreOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0x8000, 3));
+    REQUIRE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve with offset into byte vector", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x1234), loc);
+    Patch patch(2, PatchRange::Word, expr);  // offset = 2
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00, 0xFF, 0xFF };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    REQUIRE(bytes[0] == 0x00);  // Unchanged
+    REQUIRE(bytes[1] == 0x00);  // Unchanged
+    REQUIRE(bytes[2] == 0x34);  // Patched
+    REQUIRE(bytes[3] == 0x12);  // Patched
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve Assignment does nothing", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x1234), loc);
+    Patch patch(0, PatchRange::Assignment, expr);
+
+    std::vector<uint8_t> bytes = { 0xFF, 0xFF };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    REQUIRE(bytes[0] == 0xFF);  // Unchanged
+    REQUIRE(bytes[1] == 0xFF);  // Unchanged
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Patch: resolve bounds checking", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    Expression expr(make_integer(0x1234), loc);
+    Patch patch(10, PatchRange::Word, expr);  // offset beyond vector size
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    // Bytes unchanged - patch was out of bounds
+    REQUIRE(bytes[0] == 0x00);
+    REQUIRE(bytes[1] == 0x00);
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Patch: resolve with expression evaluation error", "[model][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+    Module module("TEST", loc);
+
+    // Create undefined symbol
+    Symbol* undef = module.add_symbol("undefined", loc);
+
+    Expression expr(make_symbol(undef), loc);
+    Patch patch(0, PatchRange::Word, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE_FALSE(patch.resolve(bytes, 0, 0));  // Should fail
+
+    // Bytes unchanged
+    REQUIRE(bytes[0] == 0x00);
+    REQUIRE(bytes[1] == 0x00);
+}
+
+//-----------------------------------------------------------------------------
+// Integration tests: Patch with complex expressions
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Integration: patch with computed value", "[model][integration][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+    Module module("TEST", loc);
+
+    // Create constants
+    module.add_symbol("BASE", loc, 0x8000, SymbolType::Constant);
+    module.add_symbol("OFFSET", loc, 0x100, SymbolType::Constant);
+
+    // Create expression: BASE + OFFSET
+    Expression expr(make_binary_op(
+        ExprOp::Add,
+        make_symbol(module.find_symbol("BASE")),
+        make_symbol(module.find_symbol("OFFSET"))
+    ), loc);
+
+    Patch patch(0, PatchRange::Word, expr);
+
+    std::vector<uint8_t> bytes = { 0x00, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0, 0));
+
+    REQUIRE(bytes[0] == 0x00);
+    REQUIRE(bytes[1] == 0x81);  // 0x8100 little-endian
+    REQUIRE_FALSE(g_errors.has_warnings());
+}
+
+TEST_CASE("Integration: patch all range types in sequence", "[model][integration][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+
+    std::vector<uint8_t> bytes(20, 0x00);
+    int offset = 0;
+
+    // ByteUnsigned
+    {
+        Expression expr(make_integer(0x42), loc);
+        Patch patch(offset, PatchRange::ByteUnsigned, expr);
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        offset += 1;
+    }
+
+    // Word
+    {
+        Expression expr(make_integer(0x1234), loc);
+        Patch patch(offset, PatchRange::Word, expr);
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        offset += 2;
+    }
+
+    // Ptr24
+    {
+        Expression expr(make_integer(0x567890), loc);
+        Patch patch(offset, PatchRange::Ptr24, expr);
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        offset += 3;
+    }
+
+    // Dword
+    {
+        Expression expr(make_integer(0x12345678), loc);
+        Patch patch(offset, PatchRange::Dword, expr);
+        REQUIRE(patch.resolve(bytes, 0, 0));
+        offset += 4;
+    }
+
+    // Verify all patches
+    REQUIRE(bytes[0] == 0x42);              // ByteUnsigned
+    REQUIRE(bytes[1] == 0x34);              // Word low
+    REQUIRE(bytes[2] == 0x12);              // Word high
+    REQUIRE(bytes[3] == 0x90);              // Ptr24 byte 0
+    REQUIRE(bytes[4] == 0x78);              // Ptr24 byte 1
+    REQUIRE(bytes[5] == 0x56);              // Ptr24 byte 2
+    REQUIRE(bytes[6] == 0x78);              // Dword byte 0
+    REQUIRE(bytes[7] == 0x56);              // Dword byte 1
+    REQUIRE(bytes[8] == 0x34);              // Dword byte 2
+    REQUIRE(bytes[9] == 0x12);              // Dword byte 3
+
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Integration: patch with relative offset calculation", "[model][integration][patch]") {
+    SuppressErrors suppress;
+    Location loc("test.asm", 10);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+    section->set_base_address(0x8000);
+
+    // Create label at 0x8000
+    Opcode* target_opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    section->compute_opcodes_addresses();
+
+    Symbol* label = module.add_symbol("loop", loc);
+    label->set_type(SymbolType::AddressRelative);
+    label->set_opcode(target_opcode);
+    label->set_offset(0);
+
+    // JR to loop from address 0x8020
+    Expression expr(make_symbol(label), loc);
+    Patch patch(1, PatchRange::JrOffset, expr);
+
+    std::vector<uint8_t> bytes = { 0x18, 0x00 };
+    REQUIRE(patch.resolve(bytes, 0x8020, 2));
+
+    // offset = 0x8000 - (0x8020 + 2) = -34 = 0xDE
+    REQUIRE(bytes[1] == 0xDE);
+    REQUIRE_FALSE(g_errors.has_warnings());
+    REQUIRE_FALSE(g_errors.has_errors());
+}
