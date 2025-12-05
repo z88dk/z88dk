@@ -885,12 +885,11 @@ opus_ei:
     push    hl
     ld      hl, (__bit_irqstatus)
     ex      (sp), hl
-    pop     af
 	push    hl
     call    call_rom3
     defw    $1748      ; Page out the Discovery ROM
-
     pop     hl
+    pop     af
     ret     po
     ei
     ret
