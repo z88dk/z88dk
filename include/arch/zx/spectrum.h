@@ -372,7 +372,7 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LPT_PLUSD      9    // +D interface
 #define LPT_LPRINTIII  10   // Euroelectronics LPRINT III, a.k.a. MK III
 #define LPT_AERCO      11   // AERCO CP-ZX (A.K.A. CP-2068), OLIGER
-#define LPT_PPI        12   // AT IMS KR580VV66A PIA / also "Marko Solajic"
+#define LPT_PPI        12   // Modern PPI interface by Marko Solajic
 #define LPT_TASMAN     13   // TASMAN (Type A / USA B)
 #define LPT_TASMAN_B   14   // TASMAN (Type B / USA C)
 #define LPT_WAFADRIVE  15   // Rotronics WAFADRIVE
@@ -381,12 +381,13 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LPT_GAMA       18   // Didaktik Gama (strobed on port A)
 #define LPT_PROXIMA    19   // Didaktik "Proxima" (strobed on port B)
 #define LPT_DIDAKTIKMP 20   // SPECIAL D. on port A (M/P interface)
-#define LPT_DIDAKTIKB  21   // SPECIAL D. on port B
+#define LPT_DIDAKTIKB  21   // SPECIAL D. on port B, "Baltik" or "Ural"
 #define LPT_ROMANTIC   22   // Romantic Robot MULTIPRINT
 #define LPT_HOBBIT     23   // Хоббит, strobed Z80 PIO
 #define LPT_AJ         24   // A & J "Micro Drive" or just Centronics
 #define LPT_INTERFACE3 25   // Interface III Printer interface
 #define LPT_OPUS       26   // Opus Discovery (or lame Interface 1 calls)
+#define LPT_PIA        27   // "AT IMS KR580VV66A PIA", very close to PPI
 
 #define LPT_IF1       100   // ZX Interface 1 style "hook codes" (crap)
 
