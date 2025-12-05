@@ -24,10 +24,6 @@ public:
     }
 };
 
-// Global capture for this translation unit to prevent tests from printing to the console.
-// Individual tests can still create their own local CerrRedirect if they need to inspect output.
-static CerrRedirect g_cerr_silencer;
-
 TEST_CASE("Errors counts errors", "[Errors]") {
     Errors er;
     CerrRedirect redirect;
@@ -35,6 +31,7 @@ TEST_CASE("Errors counts errors", "[Errors]") {
     er.error(ErrorCode::InvalidSyntax, "foo");
     REQUIRE(er.error_count() == 2);
     REQUIRE(er.has_errors());
+    REQUIRE_FALSE(er.has_warnings());
 }
 
 TEST_CASE("Errors does not count warnings", "[Errors]") {
@@ -44,6 +41,7 @@ TEST_CASE("Errors does not count warnings", "[Errors]") {
     er.warning(ErrorCode::InvalidSyntax, "foo");
     REQUIRE(er.error_count() == 0);
     REQUIRE_FALSE(er.has_errors());
+    REQUIRE(er.has_warnings());
 }
 
 TEST_CASE("Errors prints error", "[Errors]") {
@@ -155,6 +153,7 @@ TEST_CASE("Errors::last_error_message returns last error", "[Errors]") {
 
 TEST_CASE("Errors::has_errors returns false when no errors", "[Errors]") {
     Errors er;
+    CerrRedirect redirect;
     REQUIRE_FALSE(er.has_errors());
     er.warning(ErrorCode::FileNotFound, "file.asm");
     REQUIRE_FALSE(er.has_errors());
@@ -209,8 +208,7 @@ TEST_CASE("Errors shows only source line when expanded line equals source",
 }
 
 TEST_CASE("Errors: error with explicit location", "[errors][location]") {
-    g_errors.reset();
-    CerrRedirect redirect;
+    SuppressErrors suppress;
 
     Location loc("test.asm", 42);
     g_errors.error(loc, ErrorCode::InvalidSyntax, "test error");
@@ -225,8 +223,7 @@ TEST_CASE("Errors: error with explicit location", "[errors][location]") {
 }
 
 TEST_CASE("Errors: warning with explicit location", "[errors][location]") {
-    g_errors.reset();
-    CerrRedirect redirect;
+    SuppressErrors suppress;
 
     Location loc("source.asm", 100);
     g_errors.warning(loc, ErrorCode::InvalidSyntax, "test warning");
@@ -241,8 +238,7 @@ TEST_CASE("Errors: warning with explicit location", "[errors][location]") {
 }
 
 TEST_CASE("Errors: explicit location doesn't change internal location", "[errors][location]") {
-    g_errors.reset();
-    CerrRedirect redirect;
+    SuppressErrors suppress;
 
     // Set internal location
     Location internal_loc("internal.asm", 10);
@@ -262,8 +258,7 @@ TEST_CASE("Errors: explicit location doesn't change internal location", "[errors
 }
 
 TEST_CASE("Errors: explicit location with empty location", "[errors][location]") {
-    g_errors.reset();
-    CerrRedirect redirect;
+    SuppressErrors suppress;
 
     Location empty_loc;
     g_errors.error(empty_loc, ErrorCode::InvalidSyntax, "no location");
@@ -274,8 +269,7 @@ TEST_CASE("Errors: explicit location with empty location", "[errors][location]")
 }
 
 TEST_CASE("Errors: multiple errors with explicit locations", "[errors][location]") {
-    g_errors.reset();
-    CerrRedirect redirect;
+    SuppressErrors suppress;
 
     Location loc1("file1.asm", 10);
     Location loc2("file2.asm", 20);
@@ -294,8 +288,7 @@ TEST_CASE("Errors: multiple errors with explicit locations", "[errors][location]
 }
 
 TEST_CASE("Errors: expression error example", "[errors][location][expression]") {
-    g_errors.reset();
-    CerrRedirect redirect;
+    SuppressErrors suppress;
 
     // Simulate an expression defined at a specific location
     Location expr_loc("math.asm", 55);

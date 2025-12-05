@@ -25,34 +25,43 @@ void Errors::reset() {
 }
 
 void Errors::clear() {
+    quiet_ = false;
     location_.clear();
     source_line_.clear();
     expanded_line_.clear();
     last_error_message_.clear();
 }
 
+void Errors::set_quiet(bool f) {
+    quiet_ = f;
+}
+
 void Errors::error(ErrorCode code, const std::string& arg) {
     ++error_count_;
     format_error_message(code, "error", arg);
-    std::cerr << last_error_message_;
+    if (!quiet_)
+        std::cerr << last_error_message_;
 }
 
 void Errors::warning(ErrorCode code, const std::string& arg) {
     ++warning_count_;
     format_error_message(code, "warning", arg);
-    std::cerr << last_error_message_;
+    if (!quiet_)
+        std::cerr << last_error_message_;
 }
 
 void Errors::error(const Location& loc, ErrorCode code, const std::string& arg) {
     ++error_count_;
     format_error_message(loc, code, "error", arg);
-    std::cerr << last_error_message_;
+    if (!quiet_)
+        std::cerr << last_error_message_;
 }
 
 void Errors::warning(const Location& loc, ErrorCode code, const std::string& arg) {
     ++warning_count_;
     format_error_message(loc, code, "warning", arg);
-    std::cerr << last_error_message_;
+    if (!quiet_)
+        std::cerr << last_error_message_;
 }
 
 const Location& Errors::location() const {
