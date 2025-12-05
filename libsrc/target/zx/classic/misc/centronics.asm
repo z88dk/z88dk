@@ -87,7 +87,6 @@ _centronics_init:
   jp z,init_aerco      ; 11: AERCO CP-ZX (A.K.A. CP-2068), OLIGER
   dec a
   jp z,init_ppi        ; 12: 8255 PPI based 3-port parallel interface by Marko Solajic
-                       ;     also mentioned in a russian website as "AT IMS KR580VV66A PIA"
   dec a
   jp z,init_tasman     ; 13: TASMAN P.Printer Interface (Type A / USA B)
   dec a
@@ -105,7 +104,7 @@ _centronics_init:
   dec a
   jp z,init_special_a  ; 20: SPECIAL DIDAKTIK (M/P interface), suggested option
   dec a
-  jp z,init_special_b  ; 21: SPECIAL DIDAKTIK B
+  jp z,init_special_b  ; 21: SPECIAL DIDAKTIK B, and expansions on "Baltik" or "Ural"
   dec a
   jp z,init_multiprint ; 22: Romantic Robot MULTIPRINT
   dec a
@@ -117,20 +116,21 @@ _centronics_init:
   dec a
   jp z,init_opus       ; 26: Opus Discovery (crashes if Interface 1 is connected)
   dec a
+  jp z,init_8255       ; 27: Russian "AT IMS KR580VV66A PIA", very close to PPI
 
   ; default
   jp init_morex
 
 
 ;=========================================================
-
-
+;
 ; TODO:
 ; Watford Centronics + RS232
 ; Fuller and Fuller Dual interface (also RS232) -> Nordic Systems ?
 ; Microdigital TK90X/ TK95
 ; CS-Disk
 ; Pericon-C
+; Parallel over AY-3-8910
 ;
 ; -------(shadow/ROM tricks)------- 
 ; Sam Coupè  (CALL 0181H - send A to parallel printer)
@@ -368,6 +368,7 @@ cfg_gen:
 	defb $FE     ; strobe low (enabled)
 	defb $FF     ; strobe high
 
+
 ;=========================================================
 ;  Morex Peripherals Ltd (a.k.a. Abbeydale Designers Ltd)
 ;  B&V Interface, Forlì - Italy, by Simone Majocchi
@@ -550,21 +551,32 @@ send_aerco_strobe:
 ;=========================================================
 ; 8255 PPI based 3-port parallel interface by Marko Solajic
 ; https://github.com/msolajic/zx_spectrum_parallel_interface
-; Also found in a russian website as "AT IMS KR580VV66A PIA"
+;
+; The russian version named "AT IMS KR580VV66A PIA" was very close
 
-init_ppi:
+init_8255:
   ld   a,152
   out  (127),a
   ld   hl,cfg_ppi
   jp   init_general_sub
+
+init_ppi:
+  call init_8255
+  ld   hl,strobe_high
+  xor  a         ; STROBE is inverted in the modern versopm
+  ld   (hl),a    ; strobe_high
+  cpl
+  dec  hl
+  ld   (hl),a    ; strobe_low
+  ret
 
 cfg_ppi:
 	defw $005F   ; busy port
 	defb $80     ; busy mask
 	defw $003F   ; data port
 	defw $005F   ; strobe port
-	defb $FF     ; strobe low (enabled)    ..apparently it is inverted
-	defb $00     ; strobe high   ($FE) in the russian version
+	defb $FE     ; strobe low=$FF ($FE in the russian version)
+	defb $5F     ; strobe high=$00 ($5F in the russian version)
 
 
 ;=========================================================
@@ -815,7 +827,7 @@ init_if1:
 send_interface1:
   pop  af           ; get the character in A
   rst  8
-  defb $1E			;  Calls the Hook Code
+  defb $1E          ;  Calls the Hook Code
   jp   centronics_ei
   
 
@@ -885,7 +897,7 @@ opus_ei:
     push    hl
     ld      hl, (__bit_irqstatus)
     ex      (sp), hl
-	push    hl
+    push    hl
     call    call_rom3
     defw    $1748      ; Page out the Discovery ROM
     pop     hl
@@ -907,7 +919,6 @@ opus_break:
     pop     bc     ; skip RET to the caller
     ld      hl,-1
     jr      opus_ei+3
-
 
 
 ;=========================================================
@@ -990,7 +1001,9 @@ centronics_ei:
 ;=========================================================
 ;=========================================================
 
-	SECTION	bss_clib
+
+  SECTION  bss_clib
+
 
 centronics_strobe_delay:
 _centronics_strobe_delay:
