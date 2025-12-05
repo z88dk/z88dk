@@ -64,6 +64,12 @@ std::vector<unsigned char> read_file_to_bytes(const std::string& filename);
 void write_bytes_to_file(const std::string& filename,
                          const std::vector<unsigned char>& bytes);
 
+// check if a file exists
+bool file_exists(const std::string& filename);
+
+// get file size, returns -1 if file does not exist or on error
+size_t get_file_size(const std::string& filename);
+
 // normalize path lexicographically (resolves . and .., removes redundant separators)
 // returns platform-independent string with forward slashes
 std::string normalize_path(const std::string& path);
