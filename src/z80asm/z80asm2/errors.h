@@ -22,6 +22,7 @@ public:
     Errors();
     void reset();
     void clear(); // does not reset error count
+    void set_quiet(bool f);
 
     void error(ErrorCode code, const std::string& arg = "");
     void warning(ErrorCode code, const std::string& arg = "");
@@ -43,6 +44,7 @@ public:
 private:
     int error_count_ = 0;
     int warning_count_ = 0;
+    bool quiet_ = false;
     Location location_;
     std::string source_line_;
     std::string expanded_line_;
@@ -62,3 +64,16 @@ private:
 
 // global error reporter instance
 extern Errors g_errors;
+
+// Helper class to suppress error output during tests
+class SuppressErrors {
+public:
+    SuppressErrors() {
+        g_errors.reset();
+        g_errors.set_quiet(true);
+    }
+
+    ~SuppressErrors() {
+        g_errors.set_quiet(false);
+    }
+};

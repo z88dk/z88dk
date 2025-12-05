@@ -17,23 +17,6 @@
 #include <iostream>
 #include <sstream>
 
-// Helper to capture std::cerr output
-class CerrRedirect {
-    std::ostringstream ss;
-    std::streambuf* old;
-public:
-    CerrRedirect() : old(std::cerr.rdbuf(ss.rdbuf())) {}
-    ~CerrRedirect() {
-        std::cerr.rdbuf(old);
-    }
-    std::string str() const {
-        return ss.str();
-    }
-};
-
-// Global capture for this translation unit to prevent tests from printing to the console.
-static CerrRedirect g_cerr_silencer;
-
 TEST_CASE("TokensLine basic operations", "[lexer]") {
     g_options = Options();
 
@@ -436,7 +419,7 @@ TEST_CASE("Single-quoted empty and multi-character literals produce Invalid quot
           "[lexer][char][error]") {
     g_options = Options();
 
-    g_errors.reset();
+    SuppressErrors suppress;
 
     // Empty quoted character: ''  -> should trigger Invalid quoted character
     const std::string content_empty = "''\n";
@@ -453,7 +436,7 @@ TEST_CASE("Single-quoted empty and multi-character literals produce Invalid quot
     }
 
     // Reset errors before next case
-    g_errors.reset();
+    SuppressErrors suppress2;
 
     // Multi-character quoted literal: 'AB' -> should trigger Invalid quoted character
     const std::string content_multi = "'AB'\n";
@@ -494,7 +477,7 @@ TEST_CASE("Trailing quote after a keyword starts a character constant (DEFINE'a'
           "[lexer][keywords][quote_char]") {
     g_options = Options();
 
-    g_errors.reset();
+    SuppressErrors suppress;
     const std::string content = "DEFINE'a'\n";
     TokensFile tf(content, "kw_then_char", 1, false);
 
@@ -524,7 +507,7 @@ TEST_CASE("Unterminated C-style comment reports error",
           "[lexer][error][comment]") {
     g_options = Options();
 
-    g_errors.reset();
+    SuppressErrors suppress;
     const std::string content = "code /* unclosed comment\n";
     TokensFile tf(content, "unclosed_comment", 1, false);
 
@@ -540,7 +523,7 @@ TEST_CASE("Unterminated double-quoted string reports error",
           "[lexer][error][string]") {
     g_options = Options();
 
-    g_errors.reset();
+    SuppressErrors suppress;
     const std::string content = "db \"unterminated\n";
     TokensFile tf(content, "unclosed_dquote", 1, false);
 
@@ -555,7 +538,7 @@ TEST_CASE("Unterminated single-quoted string reports error",
           "[lexer][error][string]") {
     g_options = Options();
 
-    g_errors.reset();
+    SuppressErrors suppress;
     const std::string content = "db 'u\n";
     TokensFile tf(content, "unclosed_squote", 1, false);
 
@@ -1133,7 +1116,7 @@ TEST_CASE("Lexer rejects invalid underscore placements in integer/hex/binary lit
     };
 
     for (const auto& content : cases) {
-        g_errors.reset();
+        SuppressErrors suppress;
         TokensFile tf(content, "invalid_num_underscores", 1, false);
         REQUIRE(tf.tok_lines_count() == 0);
         REQUIRE(g_errors.has_errors());
@@ -1155,7 +1138,7 @@ TEST_CASE("Lexer rejects invalid underscore placements in floats",
     };
 
     for (const auto& content : cases) {
-        g_errors.reset();
+        SuppressErrors suppress;
         TokensFile tf(content, "invalid_float_underscores", 1, false);
         REQUIRE(tf.tok_lines_count() == 0);
         REQUIRE(g_errors.has_errors());
@@ -1221,7 +1204,7 @@ TEST_CASE("Lexer rejects numbers immediately followed by letters",
     };
 
     for (const auto& content : cases) {
-        g_errors.reset();
+        SuppressErrors suppress;
         TokensFile tf(content, "num_trailing_letters", 1, false);
         REQUIRE(tf.tok_lines_count() == 0);
         REQUIRE(g_errors.has_errors());
@@ -1244,7 +1227,7 @@ TEST_CASE("Lexer rejects 0x prefix without digits",
     };
 
     for (const auto& c : cases) {
-        g_errors.reset();
+        SuppressErrors suppress;
         TokensFile tf(c.text, c.fname, 1, false);
 
         // Tokenization should fail and produce no token lines
@@ -1297,7 +1280,7 @@ TEST_CASE("Lexer rejects malformed floats (missing exponent digits, multiple sig
     };
 
     for (const auto& c : cases) {
-        g_errors.reset();
+        SuppressErrors suppress;
         TokensFile tf(c.text, c.fname, 1, false);
 
         // Tokenization should fail and produce no token lines
