@@ -94,6 +94,13 @@ $(OBJ_DIR):
 $(TEST_OBJ_DIR):
 	$(MKDIR) -p $(TEST_OBJ_DIR)
 
+# Rule to produce .cpp from .re using re2c
+$(PROJ)$(EXE): $(OBJ_DIR)/scan.o
+
+scan.cpp: scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
+	$(DOS2UNIX) scan.cpp
+
 # $(1) = list of test binaries
 define run-tests
   $(foreach t,$(1), \
@@ -107,19 +114,6 @@ test:: $(TEST_BINS) $(TEST_OBJS)
 
 test:: $(PROJ)$(EXE)
 	$(PERL) -S prove --state=slow,save t/*.t
-
-$(TEST_DIR)/test_%$(EXE): $(TEST_DIR)/test_%.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
-$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-# Rule to produce .cpp from .re using re2c
-$(PROJ)$(EXE): scan.o
-
-scan.cpp: scan.re Makefile
-	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
-	dos2unix scan.cpp 2> /dev/null
 
 astyle:
 	$(ASTYLE)

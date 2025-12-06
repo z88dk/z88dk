@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "utils.h"
 #include <chrono>
 #include <cstddef>
 #include <filesystem>
@@ -42,6 +43,22 @@ public:
     // Clear all cached files
     void clear();
 
+#ifdef UNIT_TESTS
+    // Test-only methods
+    size_t cache_size() const {
+        return cache_.size();
+    }
+
+    bool is_cached_and_fresh(const std::string& filename) const {
+        std::string normalized = normalize_path(filename);
+        auto it = cache_.find(normalized);
+        if (it == cache_.end()) {
+            return false;
+        }
+        return !is_stale(filename, *it->second);
+    }
+#endif
+
 private:
     // Cached file entry
     struct CacheEntry {
@@ -71,7 +88,7 @@ public:
     explicit FileReader(const std::string& filename);
 
     // Open file for delayed initialization
-    bool open(const std::string& filename);
+    virtual bool open(const std::string& filename);
 
     // Inject content directly (creates virtual file)
     void inject(const std::string& filename, const std::string& content);
@@ -112,6 +129,8 @@ protected:
     size_t pos_ = 0;                    // Current position in content
     size_t line_number_ = 0;            // Current line number (1-based)
     bool fixed_line_number_ = false;    // true if line_number_ should not increment
+    bool just_updated_ =
+        false;         // true if line_number_ was just set manually
 
     static std::vector<char> empty_content_;
 };
