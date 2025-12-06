@@ -5,11 +5,11 @@
     EXTERN  getk
 
 
-    INCLUDE "target/radio86/def/monitor.def"
+    INCLUDE "target/radio86/def/radio86.h"
 
 fgetc_cons:
 _fgetc_cons:
-    call    WAITKEY
+    call    M_WAITKEY
     ld      l, a
     ld      h, 0
     ret
