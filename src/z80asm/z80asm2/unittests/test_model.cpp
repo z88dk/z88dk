@@ -19,7 +19,7 @@ TEST_CASE("Expression: integer literal", "[model][expr]") {
     auto node = make_integer(42);
     REQUIRE(node->op() == ExprOp::Integer);
     REQUIRE(node->to_string() == "42");
-    
+
     REQUIRE(node->evaluate() == 42);
 }
 
@@ -27,17 +27,18 @@ TEST_CASE("Expression: symbol reference throws exception", "[model][expr]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Symbol* sym = module.add_symbol("label", loc);
-    
+
     auto node = make_symbol(sym);
     REQUIRE(node->op() == ExprOp::Symbol);
     REQUIRE(node->to_string() == "label");
-    
+
     REQUIRE_THROWS_AS(node->evaluate(), UndefinedSymbol);
-    
+
     try {
         node->evaluate();
         FAIL("Should have thrown UndefinedSymbol");
-    } catch (const UndefinedSymbol& e) {
+    }
+    catch (const UndefinedSymbol& e) {
         REQUIRE(e.symbol_name() == "label");
     }
 }
@@ -48,7 +49,7 @@ TEST_CASE("Expression: dollar throws exception", "[model][expr]") {
     auto node = make_dollar(nullptr, nullptr);
     REQUIRE(node->op() == ExprOp::Dollar);
     REQUIRE(node->to_string() == "$");
-    
+
     REQUIRE_THROWS_AS(node->evaluate(), InvalidDollar);
 }
 
@@ -60,7 +61,7 @@ TEST_CASE("Expression: unary plus", "[model][expr][unary]") {
     auto node = make_unary_op(ExprOp::UnaryPlus, make_integer(5));
     REQUIRE(node->op() == ExprOp::UnaryPlus);
     REQUIRE(node->to_string() == "+(5)");
-    
+
     REQUIRE(node->evaluate() == 5);
 }
 
@@ -68,7 +69,7 @@ TEST_CASE("Expression: unary minus", "[model][expr][unary]") {
     auto node = make_unary_op(ExprOp::UnaryMinus, make_integer(5));
     REQUIRE(node->op() == ExprOp::UnaryMinus);
     REQUIRE(node->to_string() == "-(5)");
-    
+
     REQUIRE(node->evaluate() == -5);
 }
 
@@ -95,7 +96,7 @@ TEST_CASE("Expression: bitwise not", "[model][expr][unary]") {
 TEST_CASE("Expression: addition", "[model][expr][binary]") {
     auto node = make_binary_op(ExprOp::Add, make_integer(3), make_integer(4));
     REQUIRE(node->to_string() == "(3 + 4)");
-    
+
     REQUIRE(node->evaluate() == 7);
 }
 
@@ -114,7 +115,8 @@ TEST_CASE("Expression: division", "[model][expr][binary]") {
     REQUIRE(node->evaluate() == 5);
 }
 
-TEST_CASE("Expression: division by zero throws exception", "[model][expr][binary]") {
+TEST_CASE("Expression: division by zero throws exception",
+          "[model][expr][binary]") {
     auto node = make_binary_op(ExprOp::Divide, make_integer(20), make_integer(0));
     REQUIRE_THROWS_AS(node->evaluate(), DivisionByZero);
 }
@@ -124,7 +126,8 @@ TEST_CASE("Expression: modulo", "[model][expr][binary]") {
     REQUIRE(node->evaluate() == 2);
 }
 
-TEST_CASE("Expression: modulo by zero throws exception", "[model][expr][binary]") {
+TEST_CASE("Expression: modulo by zero throws exception",
+          "[model][expr][binary]") {
     auto node = make_binary_op(ExprOp::Modulo, make_integer(17), make_integer(0));
     REQUIRE_THROWS_AS(node->evaluate(), DivisionByZero);
 }
@@ -132,7 +135,7 @@ TEST_CASE("Expression: modulo by zero throws exception", "[model][expr][binary]"
 TEST_CASE("Expression: power", "[model][expr][binary]") {
     auto node = make_binary_op(ExprOp::Power, make_integer(2), make_integer(10));
     REQUIRE(node->to_string() == "(2 ** 10)");
-    
+
     REQUIRE(node->evaluate() == 1024);
 }
 
@@ -141,17 +144,20 @@ TEST_CASE("Expression: power", "[model][expr][binary]") {
 //-----------------------------------------------------------------------------
 
 TEST_CASE("Expression: bitwise AND", "[model][expr][binary][bitwise]") {
-    auto node = make_binary_op(ExprOp::BitwiseAnd, make_integer(0xF0), make_integer(0x3C));
+    auto node = make_binary_op(ExprOp::BitwiseAnd, make_integer(0xF0),
+                               make_integer(0x3C));
     REQUIRE(node->evaluate() == 0x30);
 }
 
 TEST_CASE("Expression: bitwise OR", "[model][expr][binary][bitwise]") {
-    auto node = make_binary_op(ExprOp::BitwiseOr, make_integer(0xF0), make_integer(0x0F));
+    auto node = make_binary_op(ExprOp::BitwiseOr, make_integer(0xF0),
+                               make_integer(0x0F));
     REQUIRE(node->evaluate() == 0xFF);
 }
 
 TEST_CASE("Expression: bitwise XOR", "[model][expr][binary][bitwise]") {
-    auto node = make_binary_op(ExprOp::BitwiseXor, make_integer(0xFF), make_integer(0xAA));
+    auto node = make_binary_op(ExprOp::BitwiseXor, make_integer(0xFF),
+                               make_integer(0xAA));
     REQUIRE(node->evaluate() == 0x55);
 }
 
@@ -161,7 +167,8 @@ TEST_CASE("Expression: left shift", "[model][expr][binary][shift]") {
 }
 
 TEST_CASE("Expression: right shift", "[model][expr][binary][shift]") {
-    auto node = make_binary_op(ExprOp::RightShift, make_integer(256), make_integer(4));
+    auto node = make_binary_op(ExprOp::RightShift, make_integer(256),
+                               make_integer(4));
     REQUIRE(node->evaluate() == 16);
 }
 
@@ -182,22 +189,26 @@ TEST_CASE("Expression: less than", "[model][expr][binary][relational]") {
 
 TEST_CASE("Expression: less or equal", "[model][expr][binary][relational]") {
     {
-        auto node = make_binary_op(ExprOp::LessOrEqual, make_integer(3), make_integer(3));
+        auto node = make_binary_op(ExprOp::LessOrEqual, make_integer(3),
+                                   make_integer(3));
         REQUIRE(node->evaluate() == 1);
     }
     {
-        auto node = make_binary_op(ExprOp::LessOrEqual, make_integer(5), make_integer(3));
+        auto node = make_binary_op(ExprOp::LessOrEqual, make_integer(5),
+                                   make_integer(3));
         REQUIRE(node->evaluate() == 0);
     }
 }
 
 TEST_CASE("Expression: greater than", "[model][expr][binary][relational]") {
-    auto node = make_binary_op(ExprOp::GreaterThan, make_integer(5), make_integer(3));
+    auto node = make_binary_op(ExprOp::GreaterThan, make_integer(5),
+                               make_integer(3));
     REQUIRE(node->evaluate() == 1);
 }
 
 TEST_CASE("Expression: greater or equal", "[model][expr][binary][relational]") {
-    auto node = make_binary_op(ExprOp::GreaterOrEqual, make_integer(3), make_integer(3));
+    auto node = make_binary_op(ExprOp::GreaterOrEqual, make_integer(3),
+                               make_integer(3));
     REQUIRE(node->evaluate() == 1);
 }
 
@@ -223,11 +234,13 @@ TEST_CASE("Expression: not equal", "[model][expr][binary][equality]") {
 
 TEST_CASE("Expression: logical AND", "[model][expr][binary][logical]") {
     {
-        auto node = make_binary_op(ExprOp::LogicalAnd, make_integer(1), make_integer(1));
+        auto node = make_binary_op(ExprOp::LogicalAnd, make_integer(1),
+                                   make_integer(1));
         REQUIRE(node->evaluate() == 1);
     }
     {
-        auto node = make_binary_op(ExprOp::LogicalAnd, make_integer(1), make_integer(0));
+        auto node = make_binary_op(ExprOp::LogicalAnd, make_integer(1),
+                                   make_integer(0));
         REQUIRE(node->evaluate() == 0);
     }
 }
@@ -243,17 +256,21 @@ TEST_CASE("Expression: logical OR", "[model][expr][binary][logical]") {
     }
 }
 
-TEST_CASE("Expression: logical XOR (extension)", "[model][expr][binary][logical]") {
+TEST_CASE("Expression: logical XOR (extension)",
+          "[model][expr][binary][logical]") {
     {
-        auto node = make_binary_op(ExprOp::LogicalXor, make_integer(0), make_integer(0));
+        auto node = make_binary_op(ExprOp::LogicalXor, make_integer(0),
+                                   make_integer(0));
         REQUIRE(node->evaluate() == 0);
     }
     {
-        auto node = make_binary_op(ExprOp::LogicalXor, make_integer(1), make_integer(0));
+        auto node = make_binary_op(ExprOp::LogicalXor, make_integer(1),
+                                   make_integer(0));
         REQUIRE(node->evaluate() == 1);
     }
     {
-        auto node = make_binary_op(ExprOp::LogicalXor, make_integer(1), make_integer(1));
+        auto node = make_binary_op(ExprOp::LogicalXor, make_integer(1),
+                                   make_integer(1));
         REQUIRE(node->evaluate() == 0);
     }
 }
@@ -264,22 +281,22 @@ TEST_CASE("Expression: logical XOR (extension)", "[model][expr][binary][logical]
 
 TEST_CASE("Expression: conditional true branch", "[model][expr][ternary]") {
     auto node = make_conditional(
-        make_integer(1),
-        make_integer(42),
-        make_integer(99)
-    );
+                    make_integer(1),
+                    make_integer(42),
+                    make_integer(99)
+                );
     REQUIRE(node->to_string() == "(1 ? 42 : 99)");
-    
+
     REQUIRE(node->evaluate() == 42);
 }
 
 TEST_CASE("Expression: conditional false branch", "[model][expr][ternary]") {
     auto node = make_conditional(
-        make_integer(0),
-        make_integer(42),
-        make_integer(99)
-    );
-    
+                    make_integer(0),
+                    make_integer(42),
+                    make_integer(99)
+                );
+
     REQUIRE(node->evaluate() == 99);
 }
 
@@ -287,61 +304,66 @@ TEST_CASE("Expression: conditional false branch", "[model][expr][ternary]") {
 // Complex expressions
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Expression: complex arithmetic (2 + 3) * 4", "[model][expr][complex]") {
+TEST_CASE("Expression: complex arithmetic (2 + 3) * 4",
+          "[model][expr][complex]") {
     auto node = make_binary_op(
-        ExprOp::Multiply,
-        make_binary_op(ExprOp::Add, make_integer(2), make_integer(3)),
-        make_integer(4)
-    );
-    
+                    ExprOp::Multiply,
+                    make_binary_op(ExprOp::Add, make_integer(2), make_integer(3)),
+                    make_integer(4)
+                );
+
     REQUIRE(node->evaluate() == 20);
 }
 
-TEST_CASE("Expression: power and multiply 2 ** 3 * 5", "[model][expr][complex]") {
+TEST_CASE("Expression: power and multiply 2 ** 3 * 5",
+          "[model][expr][complex]") {
     auto node = make_binary_op(
-        ExprOp::Multiply,
-        make_binary_op(ExprOp::Power, make_integer(2), make_integer(3)),
-        make_integer(5)
-    );
-    
+                    ExprOp::Multiply,
+                    make_binary_op(ExprOp::Power, make_integer(2), make_integer(3)),
+                    make_integer(5)
+                );
+
     REQUIRE(node->evaluate() == 40);
 }
 
-TEST_CASE("Expression: nested conditional 1 ? 2 : 3 ? 4 : 5", "[model][expr][complex]") {
+TEST_CASE("Expression: nested conditional 1 ? 2 : 3 ? 4 : 5",
+          "[model][expr][complex]") {
     auto node = make_conditional(
-        make_integer(1),
-        make_integer(2),
-        make_conditional(
-            make_integer(3),
-            make_integer(4),
-            make_integer(5)
-        )
-    );
-    
+                    make_integer(1),
+                    make_integer(2),
+                    make_conditional(
+                        make_integer(3),
+                        make_integer(4),
+                        make_integer(5)
+                    )
+                );
+
     REQUIRE(node->evaluate() == 2);
 }
 
-TEST_CASE("Expression: undefined symbol propagates through operators", "[model][expr][complex]") {
+TEST_CASE("Expression: undefined symbol propagates through operators",
+          "[model][expr][complex]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Symbol* sym = module.add_symbol("undefined", loc);
-    
+
     auto node = make_binary_op(
-        ExprOp::Add,
-        make_integer(10),
-        make_symbol(sym)
-    );
-    
+                    ExprOp::Add,
+                    make_integer(10),
+                    make_symbol(sym)
+                );
+
     REQUIRE_THROWS_AS(node->evaluate(), UndefinedSymbol);
 }
 
-TEST_CASE("Expression: division by zero in complex expression", "[model][expr][complex]") {
+TEST_CASE("Expression: division by zero in complex expression",
+          "[model][expr][complex]") {
     auto node = make_binary_op(
-        ExprOp::Multiply,
-        make_integer(5),
-        make_binary_op(ExprOp::Divide, make_integer(10), make_integer(0))
-    );
-    
+                    ExprOp::Multiply,
+                    make_integer(5),
+                    make_binary_op(ExprOp::Divide, make_integer(10), make_integer(0))
+                );
+
     REQUIRE_THROWS_AS(node->evaluate(), DivisionByZero);
 }
 
@@ -354,7 +376,7 @@ TEST_CASE("Expression: empty expression throws", "[model][expr]") {
     REQUIRE(expr.empty());
     REQUIRE(expr.root() == nullptr);
     REQUIRE(expr.to_string() == "");
-    
+
     REQUIRE_THROWS_AS(expr.evaluate(), ExpressionError);
 }
 
@@ -365,7 +387,7 @@ TEST_CASE("Expression: set and evaluate", "[model][expr]") {
     REQUIRE(expr.root() != nullptr);
     REQUIRE(expr.location().filename() == "test.asm");
     REQUIRE(expr.location().line_num() == 10);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == 42);
 }
@@ -374,7 +396,7 @@ TEST_CASE("Expression: copy constructor", "[model][expr]") {
     Location loc("test.asm", 20);
     Expression expr1(make_integer(42), loc);
     Expression expr2(expr1);
-    
+
     int result1 = expr1.evaluate();
     int result2 = expr2.evaluate();
     REQUIRE(result1 == result2);
@@ -387,9 +409,9 @@ TEST_CASE("Expression: assignment operator", "[model][expr]") {
     Location loc("source.asm", 30);
     Expression expr1(make_integer(42), loc);
     Expression expr2;
-    
+
     expr2 = expr1;
-    
+
     int result = expr2.evaluate();
     REQUIRE(result == 42);
     REQUIRE(expr2.location().filename() == "source.asm");
@@ -400,7 +422,7 @@ TEST_CASE("Expression: clear", "[model][expr]") {
     Location loc("file.asm", 40);
     Expression expr(make_integer(42), loc);
     REQUIRE_FALSE(expr.empty());
-    
+
     expr.clear();
     REQUIRE(expr.empty());
 }
@@ -412,55 +434,59 @@ TEST_CASE("Expression: clear", "[model][expr]") {
 TEST_CASE("Symbol: evaluate constant symbol", "[model][symbol][evaluate]") {
     Location loc("test.asm", 30);
     Symbol sym("MAX", loc, 255, SymbolType::Constant);
-    
+
     int result = sym.evaluate();
     REQUIRE(result == 255);
 }
 
-TEST_CASE("Symbol: evaluate undefined symbol throws", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: evaluate undefined symbol throws",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 10);
     Symbol sym("undefined", loc);
-    
+
     REQUIRE_THROWS_AS(sym.evaluate(), UndefinedSymbol);
-    
+
     try {
         sym.evaluate();
         FAIL("Should have thrown UndefinedSymbol");
-    } catch (const UndefinedSymbol& e) {
+    }
+    catch (const UndefinedSymbol& e) {
         REQUIRE(e.symbol_name() == "undefined");
     }
 }
 
-TEST_CASE("Symbol: evaluate address-relative symbol", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: evaluate address-relative symbol",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 40);
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     Opcode* opcode = sec.add_opcode(Opcode({ 0x00 }, loc));
     sec.compute_opcodes_addresses();
-    
+
     Symbol sym("start", loc);
     sym.set_type(SymbolType::AddressRelative);
     sym.set_opcode(opcode);
     sym.set_offset(0);
-    
+
     int result = sym.evaluate();
     REQUIRE(result == 0x8000);
 }
 
-TEST_CASE("Symbol: evaluate address-relative symbol with offset", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: evaluate address-relative symbol with offset",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 50);
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     Opcode* opcode = sec.add_opcode(Opcode({ 0x00, 0x00, 0x00 }, loc));
     sec.compute_opcodes_addresses();
-    
+
     Symbol sym("label", loc);
     sym.set_type(SymbolType::AddressRelative);
     sym.set_opcode(opcode);
     sym.set_offset(2);  // +2 offset
-    
+
     int result = sym.evaluate();
     REQUIRE(result == 0x8002);
 }
@@ -468,88 +494,95 @@ TEST_CASE("Symbol: evaluate address-relative symbol with offset", "[model][symbo
 TEST_CASE("Symbol: evaluate computed symbol", "[model][symbol][evaluate]") {
     Location loc("test.asm", 50);
     Expression expr(make_binary_op(
-        ExprOp::Add,
-        make_integer(10),
-        make_integer(32)
-    ), loc);
-    
+                        ExprOp::Add,
+                        make_integer(10),
+                        make_integer(32)
+                    ), loc);
+
     Symbol sym("computed", loc);
     sym.set_type(SymbolType::Computed);
     sym.set_expression(expr);
-    
+
     int result = sym.evaluate();
     REQUIRE(result == 42);
 }
 
-TEST_CASE("Symbol: recursive evaluation detection", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: recursive evaluation detection",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 60);
     Module module("TEST", loc);
-    
+
     // Create symbol A that references symbol B
     Symbol* sym_b = module.add_symbol("B", loc);
     Expression expr_a(make_symbol(sym_b), loc);
-    
+
     Symbol* sym_a = module.add_symbol("A", loc);
     sym_a->set_type(SymbolType::Computed);
     sym_a->set_expression(expr_a);
-    
+
     // Create symbol B that references symbol A (circular)
     Expression expr_b(make_symbol(sym_a), loc);
     sym_b->set_type(SymbolType::Computed);
     sym_b->set_expression(expr_b);
-    
+
     // Evaluating A should detect recursion
     REQUIRE_THROWS_AS(sym_a->evaluate(), RecursiveEvaluation);
-    
+
     try {
         sym_a->evaluate();
         FAIL("Should have thrown RecursiveEvaluation");
-    } catch (const RecursiveEvaluation& e) {
+    }
+    catch (const RecursiveEvaluation& e) {
         REQUIRE((e.symbol_name() == "A" || e.symbol_name() == "B"));
     }
 }
 
-TEST_CASE("Symbol: self-referential evaluation detection", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: self-referential evaluation detection",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 70);
     Module module("TEST", loc);
-    
+
     // Create symbol that references itself
     Symbol* sym = module.add_symbol("SELF", loc);
     Expression expr(make_symbol(sym), loc);
     sym->set_type(SymbolType::Computed);
     sym->set_expression(expr);
-    
+
     REQUIRE_THROWS_AS(sym->evaluate(), RecursiveEvaluation);
 }
 
-TEST_CASE("Symbol: evaluation error for address-relative without opcode", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: evaluation error for address-relative without opcode",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 80);
     Symbol sym("bad", loc);
     sym.set_type(SymbolType::AddressRelative);
     // No opcode set
-    
+
     REQUIRE_THROWS_AS(sym.evaluate(), ExpressionError);
 }
 
-TEST_CASE("Symbol: evaluation error for computed without expression", "[model][symbol][evaluate]") {
+TEST_CASE("Symbol: evaluation error for computed without expression",
+          "[model][symbol][evaluate]") {
     Location loc("test.asm", 90);
     Symbol sym("bad", loc);
     sym.set_type(SymbolType::Computed);
     // No expression set
-    
+
     REQUIRE_THROWS_AS(sym.evaluate(), ExpressionError);
 }
 
-TEST_CASE("Expression: error reporting with location for undefined symbol", "[model][expr][errors]") {
+TEST_CASE("Expression: error reporting with location for undefined symbol",
+          "[model][expr][errors]") {
     Location loc("expr_test.asm", 123);
     Module module("TEST", loc);
     Symbol* sym = module.add_symbol("undefined", loc);
     Expression expr(make_symbol(sym), loc);
-    
+
     REQUIRE_THROWS_AS(expr.evaluate(), UndefinedSymbol);
 }
 
-TEST_CASE("Expression: division by zero with location reporting", "[model][expr][errors]") {
+TEST_CASE("Expression: division by zero with location reporting",
+          "[model][expr][errors]") {
     Location loc("calc.asm", 50);
     auto node = make_binary_op(ExprOp::Divide, make_integer(10), make_integer(0));
     Expression expr(std::move(node), loc);
@@ -564,13 +597,14 @@ TEST_CASE("Expression: dollar without context", "[model][expr][errors]") {
     REQUIRE_THROWS_AS(expr.evaluate(), InvalidDollar);
 }
 
-TEST_CASE("Expression: exception in nested expression reports correct location", "[model][expr][errors]") {
+TEST_CASE("Expression: exception in nested expression reports correct location",
+          "[model][expr][errors]") {
     Location loc("nested.asm", 100);
     auto node = make_binary_op(
-        ExprOp::Add,
-        make_integer(5),
-        make_binary_op(ExprOp::Divide, make_integer(10), make_integer(0))
-    );
+                    ExprOp::Add,
+                    make_integer(5),
+                    make_binary_op(ExprOp::Divide, make_integer(10), make_integer(0))
+                );
     Expression expr(std::move(node), loc);
 
     REQUIRE_THROWS_AS(expr.evaluate(), DivisionByZero);
@@ -585,16 +619,16 @@ TEST_CASE("Parse: simple integer", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "42", 42, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "42", 42, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 1);
     REQUIRE_FALSE(expr.empty());
-    REQUIRE(expr.tokens().size() == 1);
-    
+    REQUIRE(expr.token_line().tokens().size() == 1);
+
     int result = expr.evaluate();
     REQUIRE(result == 42);
 }
@@ -604,17 +638,17 @@ TEST_CASE("Parse: simple addition", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "3", 3, false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Integer, "4", 4, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "4", 4, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 3);
-    REQUIRE(expr.tokens().size() == 3);
-    
+    REQUIRE(expr.token_line().tokens().size() == 3);
+
     int result = expr.evaluate();
     REQUIRE(result == 7);
 }
@@ -624,20 +658,20 @@ TEST_CASE("Parse: complex expression (2 + 3) * 4", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::LeftParen, "(", false));
-    line.push_back(Token(TokenType::Integer, "2", 2, false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Integer, "3", 3, false));
-    line.push_back(Token(TokenType::RightParen, ")", false));
-    line.push_back(Token(TokenType::Multiply, "*", false));
-    line.push_back(Token(TokenType::Integer, "4", 4, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", false));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::RightParen, ")", false));
+    line.tokens().push_back(Token(TokenType::Multiply, "*", false));
+    line.tokens().push_back(Token(TokenType::Integer, "4", 4, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 7);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == 20);
 }
@@ -646,15 +680,15 @@ TEST_CASE("Parse: symbol reference", "[model][parse]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
     Section* section = module.current_section();
-    
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "label", false));
-    
-    unsigned i = 0;
+
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "label", false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 1);
-    
+
     // Undefined symbol should throw
     REQUIRE_THROWS_AS(expr.evaluate(), UndefinedSymbol);
 }
@@ -663,14 +697,14 @@ TEST_CASE("Parse: dollar", "[model][parse]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
     Section* section = module.current_section();
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Dollar, "$", false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 1);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == 0); // Section address is 0 at this point
 }
@@ -680,15 +714,15 @@ TEST_CASE("Parse: unary minus", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Minus, "-", false));
-    line.push_back(Token(TokenType::Integer, "5", 5, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Minus, "-", false));
+    line.tokens().push_back(Token(TokenType::Integer, "5", 5, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 2);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == -5);
 }
@@ -698,16 +732,16 @@ TEST_CASE("Parse: power operator", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "2", 2, false));
-    line.push_back(Token(TokenType::Power, "**", false));
-    line.push_back(Token(TokenType::Integer, "10", 10, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, false));
+    line.tokens().push_back(Token(TokenType::Power, "**", false));
+    line.tokens().push_back(Token(TokenType::Integer, "10", 10, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 3);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == 1024);
 }
@@ -717,18 +751,18 @@ TEST_CASE("Parse: ternary conditional", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "1", 1, false));
-    line.push_back(Token(TokenType::Question, "?", false));
-    line.push_back(Token(TokenType::Integer, "42", 42, false));
-    line.push_back(Token(TokenType::Colon, ":", false));
-    line.push_back(Token(TokenType::Integer, "99", 99, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "1", 1, false));
+    line.tokens().push_back(Token(TokenType::Question, "?", false));
+    line.tokens().push_back(Token(TokenType::Integer, "42", 42, false));
+    line.tokens().push_back(Token(TokenType::Colon, ":", false));
+    line.tokens().push_back(Token(TokenType::Integer, "99", 99, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 5);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == 42);
 }
@@ -738,19 +772,19 @@ TEST_CASE("Parse: partial consumption", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "5", 5, false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Integer, "3", 3, false));
-    line.push_back(Token(TokenType::Comma, ",", false));
-    line.push_back(Token(TokenType::Integer, "7", 7, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "5", 5, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::Comma, ",", false));
+    line.tokens().push_back(Token(TokenType::Integer, "7", 7, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 3); // Stops at comma
-    REQUIRE(expr.tokens().size() == 3);
-    
+    REQUIRE(expr.token_line().tokens().size() == 3);
+
     int result = expr.evaluate();
     REQUIRE(result == 8);
 }
@@ -760,11 +794,11 @@ TEST_CASE("Parse: invalid syntax returns false", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE_FALSE(expr.parse(line, i, &module, section));
     REQUIRE(i == 0); // i unchanged on failure
@@ -775,11 +809,11 @@ TEST_CASE("Parse: unclosed parenthesis", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::LeftParen, "(", false));
-    line.push_back(Token(TokenType::Integer, "5", 5, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", false));
+    line.tokens().push_back(Token(TokenType::Integer, "5", 5, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE_FALSE(expr.parse(line, i, &module, section));
     REQUIRE(i == 0); // i unchanged on failure
@@ -790,20 +824,20 @@ TEST_CASE("Parse: tokens preserved for object file", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Identifier, "label", false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Integer, "10", 10, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Identifier, "label", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "10", 10, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
-    
-    const TokensLine& tokens = expr.tokens();
-    REQUIRE(tokens.size() == 3);
-    REQUIRE(tokens[0].text() == "label");
-    REQUIRE(tokens[1].text() == "+");
-    REQUIRE(tokens[2].text() == "10");
+
+    const TokenLine& token_line = expr.token_line();
+    REQUIRE(token_line.tokens().size() == 3);
+    REQUIRE(token_line.tokens()[0].text() == "label");
+    REQUIRE(token_line.tokens()[1].text() == "+");
+    REQUIRE(token_line.tokens()[2].text() == "10");
 }
 
 TEST_CASE("Parse: logical XOR operator", "[model][parse]") {
@@ -811,16 +845,16 @@ TEST_CASE("Parse: logical XOR operator", "[model][parse]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "1", 1, false));
-    line.push_back(Token(TokenType::LogicalXor, "^^", false));
-    line.push_back(Token(TokenType::Integer, "0", 0, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "1", 1, false));
+    line.tokens().push_back(Token(TokenType::LogicalXor, "^^", false));
+    line.tokens().push_back(Token(TokenType::Integer, "0", 0, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 3);
-    
+
     int result = expr.evaluate();
     REQUIRE(result == 1);
 }
@@ -834,7 +868,7 @@ TEST_CASE("Parse: all operators", "[model][parse]") {
         int right;
         int expected;
     };
-    
+
     std::vector<OpTest> tests = {
         {TokenType::Plus, "+", 3, 4, 7},
         {TokenType::Minus, "-", 10, 3, 7},
@@ -855,69 +889,74 @@ TEST_CASE("Parse: all operators", "[model][parse]") {
         {TokenType::LogicalAnd, "&&", 1, 1, 1},
         {TokenType::LogicalOr, "||", 0, 1, 1},
     };
-    
+
     for (const auto& test : tests) {
         Location loc("test.asm", 1);
         Module module("TEST", loc);
         Section* section = module.current_section();
 
-        TokensLine line(Location("test.asm", 1));
-        line.push_back(Token(TokenType::Integer, std::to_string(test.left), test.left, false));
-        line.push_back(Token(test.type, test.text, false));
-        line.push_back(Token(TokenType::Integer, std::to_string(test.right), test.right, false));
-        
-        unsigned i = 0;
+        TokenLine line(Location("test.asm", 1));
+        line.tokens().push_back(Token(TokenType::Integer, std::to_string(test.left),
+                                      test.left,
+                                      false));
+        line.tokens().push_back(Token(test.type, test.text, false));
+        line.tokens().push_back(Token(TokenType::Integer, std::to_string(test.right),
+                                      test.right,
+                                      false));
+
+        size_t i = 0;
         Expression expr;
         REQUIRE(expr.parse(line, i, &module, section));
-        
+
         int result = expr.evaluate();
         REQUIRE(result == test.expected);
     }
 }
 
-TEST_CASE("Parse: location is set from TokensLine", "[model][parse]") {
+TEST_CASE("Parse: location is set from TokenLine", "[model][parse]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("calc.asm", 42));
-    line.push_back(Token(TokenType::Integer, "100", 100, false));
-    
-    unsigned i = 0;
+    TokenLine line(Location("calc.asm", 42));
+    line.tokens().push_back(Token(TokenType::Integer, "100", 100, false));
+
+    size_t i = 0;
     Expression expr;
     REQUIRE(expr.parse(line, i, &module, section));
-    
+
     REQUIRE(expr.location().filename() == "calc.asm");
     REQUIRE(expr.location().line_num() == 42);
 }
 
-TEST_CASE("Parse: can parse multiple expressions from same line", "[model][parse]") {
+TEST_CASE("Parse: can parse multiple expressions from same line",
+          "[model][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    TokensLine line(Location("test.asm", 1));
-    line.push_back(Token(TokenType::Integer, "10", 10, false));
-    line.push_back(Token(TokenType::Comma, ",", false));
-    line.push_back(Token(TokenType::Integer, "20", 20, false));
-    
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "10", 10, false));
+    line.tokens().push_back(Token(TokenType::Comma, ",", false));
+    line.tokens().push_back(Token(TokenType::Integer, "20", 20, false));
+
     // Parse first expression
-    unsigned i = 0;
+    size_t i = 0;
     Expression expr1;
     REQUIRE(expr1.parse(line, i, &module, section));
     REQUIRE(i == 1); // Stops before comma
-    
+
     int result1 = expr1.evaluate();
     REQUIRE(result1 == 10);
-    
+
     // Skip comma
     ++i;
-    
+
     // Parse second expression
     Expression expr2;
     REQUIRE(expr2.parse(line, i, &module, section));
     REQUIRE(i == 3);
-    
+
     int result2 = expr2.evaluate();
     REQUIRE(result2 == 20);
 }
@@ -929,7 +968,7 @@ TEST_CASE("Parse: can parse multiple expressions from same line", "[model][parse
 TEST_CASE("Symbol: basic constructor with name", "[model][symbol]") {
     Location loc("test.asm", 10);
     Symbol sym("label", loc);
-    
+
     REQUIRE(sym.name() == "label");
     REQUIRE(sym.value() == 0);
     REQUIRE(sym.is_undefined());
@@ -942,7 +981,7 @@ TEST_CASE("Symbol: basic constructor with name", "[model][symbol]") {
 TEST_CASE("Symbol: constant symbol", "[model][symbol]") {
     Location loc("test.asm", 30);
     Symbol sym("MAX", loc, 255, SymbolType::Constant);
-    
+
     REQUIRE(sym.name() == "MAX");
     REQUIRE(sym.value() == 255);
     REQUIRE(sym.is_constant());
@@ -959,7 +998,7 @@ TEST_CASE("Symbol: address-relative symbol", "[model][symbol]") {
     sym.set_type(SymbolType::AddressRelative);
     sym.set_opcode(sec.last_opcode());
     sym.set_offset(100);
-    
+
     REQUIRE(sym.name() == "start");
     REQUIRE(sym.is_address_relative());
     REQUIRE(sym.is_defined());
@@ -972,23 +1011,23 @@ TEST_CASE("Symbol: address-relative symbol", "[model][symbol]") {
 TEST_CASE("Symbol: computed symbol with expression", "[model][symbol]") {
     Location loc("test.asm", 50);
     Expression expr(make_integer(42), loc);
-    
+
     Symbol sym("computed", loc);
     sym.set_type(SymbolType::Computed);
     sym.set_expression(expr);
-    
+
     REQUIRE(sym.name() == "computed");
     REQUIRE(sym.is_computed());
     REQUIRE(sym.is_defined());
     REQUIRE(sym.has_expression());
-    
+
     REQUIRE(sym.expression().evaluate() == 42);
 }
 
 TEST_CASE("Symbol: local scope (default)", "[model][symbol]") {
     Location loc("test.asm", 60);
     Symbol sym("local_var", loc);
-    
+
     REQUIRE(sym.name() == "local_var");
     REQUIRE(sym.is_local());
     REQUIRE_FALSE(sym.is_public());
@@ -1001,7 +1040,7 @@ TEST_CASE("Symbol: public scope", "[model][symbol]") {
     Location loc("test.asm", 70);
     Symbol sym("exported", loc, 100, SymbolType::Constant);
     sym.set_scope(SymbolScope::Public);
-    
+
     REQUIRE(sym.name() == "exported");
     REQUIRE(sym.is_public());
     REQUIRE(sym.is_exported());
@@ -1014,7 +1053,7 @@ TEST_CASE("Symbol: extern scope", "[model][symbol]") {
     Location loc("test.asm", 80);
     Symbol sym("imported", loc);
     sym.set_scope(SymbolScope::Extern);
-    
+
     REQUIRE(sym.name() == "imported");
     REQUIRE(sym.is_extern());
     REQUIRE(sym.is_imported());
@@ -1023,11 +1062,12 @@ TEST_CASE("Symbol: extern scope", "[model][symbol]") {
     REQUIRE_FALSE(sym.is_exported());
 }
 
-TEST_CASE("Symbol: global scope with defined symbol acts as public", "[model][symbol]") {
+TEST_CASE("Symbol: global scope with defined symbol acts as public",
+          "[model][symbol]") {
     Location loc("test.asm", 90);
     Symbol sym("global_defined", loc, 200, SymbolType::Constant);
     sym.set_scope(SymbolScope::Global);
-    
+
     REQUIRE(sym.name() == "global_defined");
     REQUIRE(sym.is_global());
     REQUIRE(sym.is_defined());
@@ -1037,11 +1077,12 @@ TEST_CASE("Symbol: global scope with defined symbol acts as public", "[model][sy
     REQUIRE_FALSE(sym.is_imported());
 }
 
-TEST_CASE("Symbol: global scope with undefined symbol acts as extern", "[model][symbol]") {
+TEST_CASE("Symbol: global scope with undefined symbol acts as extern",
+          "[model][symbol]") {
     Location loc("test.asm", 100);
     Symbol sym("global_undefined", loc);
     sym.set_scope(SymbolScope::Global);
-    
+
     REQUIRE(sym.name() == "global_undefined");
     REQUIRE(sym.is_global());
     REQUIRE_FALSE(sym.is_defined());
@@ -1054,15 +1095,15 @@ TEST_CASE("Symbol: global scope with undefined symbol acts as extern", "[model][
 TEST_CASE("Symbol: location is always available", "[model][symbol]") {
     Location loc("main.asm", 42);
     Symbol sym("test", loc);
-    
+
     REQUIRE(sym.name() == "test");
     REQUIRE(sym.location().filename() == "main.asm");
     REQUIRE(sym.location().line_num() == 42);
-    
+
     // Symbol location can still be updated (different from Expression)
     Location new_loc("other.asm", 99);
     sym.set_location(new_loc);
-    
+
     REQUIRE(sym.location().filename() == "other.asm");
     REQUIRE(sym.location().line_num() == 99);
 }
@@ -1070,16 +1111,16 @@ TEST_CASE("Symbol: location is always available", "[model][symbol]") {
 TEST_CASE("Symbol: type transitions", "[model][symbol]") {
     Location loc("test.asm", 110);
     Symbol sym("var", loc);
-    
+
     REQUIRE(sym.name() == "var");
     REQUIRE(sym.is_undefined());
-    
+
     sym.set_type(SymbolType::Constant);
     sym.set_value(100);
     REQUIRE(sym.is_constant());
     REQUIRE(sym.is_defined());
     REQUIRE(sym.value() == 100);
-    
+
     sym.set_type(SymbolType::AddressRelative);
     REQUIRE(sym.is_address_relative());
     REQUIRE(sym.is_defined());
@@ -1088,17 +1129,17 @@ TEST_CASE("Symbol: type transitions", "[model][symbol]") {
 TEST_CASE("Symbol: scope transitions", "[model][symbol]") {
     Location loc("test.asm", 120);
     Symbol sym("test", loc, 50, SymbolType::Constant);
-    
+
     REQUIRE(sym.name() == "test");
-    
+
     // Start as local
     REQUIRE(sym.is_local());
-    
+
     // Change to public
     sym.set_scope(SymbolScope::Public);
     REQUIRE(sym.is_public());
     REQUIRE(sym.is_exported());
-    
+
     // Change to global (acts as public since defined)
     sym.set_scope(SymbolScope::Global);
     REQUIRE(sym.is_global());
@@ -1110,12 +1151,12 @@ TEST_CASE("Symbol: address-relative with section", "[model][symbol]") {
     Location loc("test.asm", 130);
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     Symbol sym("loop", loc);
     sym.set_type(SymbolType::AddressRelative);
     sym.set_opcode(sec.last_opcode());
     sym.set_offset(0x50);
-    
+
     REQUIRE(sym.name() == "loop");
     REQUIRE(sym.is_address_relative());
     REQUIRE(sym.opcode() == sec.last_opcode());
@@ -1127,16 +1168,16 @@ TEST_CASE("Symbol: address-relative with section", "[model][symbol]") {
 TEST_CASE("Symbol: computed with complex expression", "[model][symbol]") {
     Location loc("calc.asm", 100);
     auto node = make_binary_op(
-        ExprOp::Add,
-        make_integer(10),
-        make_binary_op(ExprOp::Multiply, make_integer(3), make_integer(4))
-    );
+                    ExprOp::Add,
+                    make_integer(10),
+                    make_binary_op(ExprOp::Multiply, make_integer(3), make_integer(4))
+                );
     Expression expr(std::move(node), loc);
-    
+
     Symbol sym("result", loc);
     sym.set_type(SymbolType::Computed);
     sym.set_expression(expr);
-    
+
     REQUIRE(sym.name() == "result");
     REQUIRE(sym.is_computed());
     REQUIRE(sym.has_expression());
@@ -1146,23 +1187,23 @@ TEST_CASE("Symbol: computed with complex expression", "[model][symbol]") {
 
 TEST_CASE("Symbol: all symbol types", "[model][symbol]") {
     Location loc("test.asm", 140);
-    
+
     Symbol undef("undef", loc);
     REQUIRE(undef.name() == "undef");
     REQUIRE(undef.is_undefined());
     REQUIRE_FALSE(undef.is_defined());
-    
+
     Symbol constant("PI", loc, 314, SymbolType::Constant);
     REQUIRE(constant.name() == "PI");
     REQUIRE(constant.is_constant());
     REQUIRE(constant.is_defined());
-    
+
     Symbol label("start", loc);
     label.set_type(SymbolType::AddressRelative);
     REQUIRE(label.name() == "start");
     REQUIRE(label.is_address_relative());
     REQUIRE(label.is_defined());
-    
+
     Symbol computed("expr", loc);
     computed.set_type(SymbolType::Computed);
     REQUIRE(computed.name() == "expr");
@@ -1173,7 +1214,7 @@ TEST_CASE("Symbol: all symbol types", "[model][symbol]") {
 TEST_CASE("Symbol: empty name is allowed but discouraged", "[model][symbol]") {
     Location loc("test.asm", 150);
     Symbol sym("", loc);
-    
+
     REQUIRE(sym.name() == "");
     REQUIRE(sym.location().filename() == "test.asm");
     REQUIRE(sym.location().line_num() == 150);
@@ -1182,9 +1223,9 @@ TEST_CASE("Symbol: empty name is allowed but discouraged", "[model][symbol]") {
 TEST_CASE("Symbol: name is immutable", "[model][symbol]") {
     Location loc("test.asm", 160);
     Symbol sym("symbol_name", loc);
-    
+
     REQUIRE(sym.name() == "symbol_name");
-    
+
     // Name cannot be changed - it's the key in the symbol table
     // The following would not compile:
     // sym.set_name("new_name");  // ERROR: no member function 'set_name'
@@ -1194,23 +1235,24 @@ TEST_CASE("Symbol: name is immutable", "[model][symbol]") {
 // Integration tests: Symbols with expressions
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: symbol referencing other symbols", "[model][integration]") {
+TEST_CASE("Integration: symbol referencing other symbols",
+          "[model][integration]") {
     Location loc("test.asm", 100);
     Module module("TEST", loc);
     Symbol* undefined_sym = module.add_symbol("undefined", loc);
 
     // Create a symbol node that will reference "undefined_sym"
     auto node = make_symbol(undefined_sym);
-    
+
     Expression expr(std::move(node), loc);
-    
+
     Symbol sym("computed", loc);
     sym.set_type(SymbolType::Computed);
     sym.set_expression(expr);
-    
+
     REQUIRE(sym.is_computed());
     REQUIRE(sym.has_expression());
-    
+
     // Evaluation should fail because symbol is undefined
     REQUIRE_THROWS_AS(sym.expression().evaluate(), UndefinedSymbol);
 }
@@ -1219,7 +1261,7 @@ TEST_CASE("Integration: public constant symbol", "[model][integration]") {
     Location loc("constants.asm", 10);
     Symbol sym("VERSION", loc, 0x0100, SymbolType::Constant);
     sym.set_scope(SymbolScope::Public);
-    
+
     REQUIRE(sym.name() == "VERSION");
     REQUIRE(sym.value() == 0x0100);
     REQUIRE(sym.is_constant());
@@ -1233,7 +1275,7 @@ TEST_CASE("Integration: extern undefined symbol", "[model][integration]") {
     Location loc("main.asm", 20);
     Symbol sym("printf", loc);
     sym.set_scope(SymbolScope::Extern);
-    
+
     REQUIRE(sym.name() == "printf");
     REQUIRE(sym.is_undefined());
     REQUIRE(sym.is_extern());
@@ -1242,17 +1284,18 @@ TEST_CASE("Integration: extern undefined symbol", "[model][integration]") {
     REQUIRE_FALSE(sym.is_exported());
 }
 
-TEST_CASE("Integration: address-relative label in section", "[model][integration]") {
+TEST_CASE("Integration: address-relative label in section",
+          "[model][integration]") {
     Location loc("main.asm", 100);
     Section code("CODE");
     code.set_base_address(0x8000);
-    
+
     Symbol sym("main", loc);
     sym.set_type(SymbolType::AddressRelative);
     sym.set_opcode(code.last_opcode());
     sym.set_offset(0);
     sym.set_scope(SymbolScope::Public);
-    
+
     REQUIRE(sym.name() == "main");
     REQUIRE(sym.is_address_relative());
     REQUIRE(sym.is_public());
@@ -1276,11 +1319,12 @@ TEST_CASE("Patch: default constructor", "[model][patch]") {
 TEST_CASE("Patch: constructor with parameters", "[model][patch]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
-    Symbol* target_sym = module.add_symbol("target", loc, 0x1234, SymbolType::Constant);
-    
+    Symbol* target_sym = module.add_symbol("target", loc, 0x1234,
+                                           SymbolType::Constant);
+
     Expression expr(make_symbol(target_sym), loc);
     Patch patch(2, PatchRange::Word, expr);
-    
+
     REQUIRE(patch.offset() == 2);
     REQUIRE(patch.range() == PatchRange::Word);
     REQUIRE(patch.location().filename() == "test.asm");
@@ -1291,9 +1335,9 @@ TEST_CASE("Patch: JR offset range", "[model][patch]") {
     Location loc("test.asm", 20);
     Expression expr(make_integer(10), loc);
     Patch patch(1, PatchRange::JrOffset, expr);
-    
+
     REQUIRE(patch.range() == PatchRange::JrOffset);
-    
+
     REQUIRE(patch.expression().evaluate() == 10);
 }
 
@@ -1301,7 +1345,7 @@ TEST_CASE("Patch: byte unsigned range", "[model][patch]") {
     Location loc("test.asm", 30);
     Expression expr(make_integer(0xFF), loc);
     Patch patch(0, PatchRange::ByteUnsigned, expr);
-    
+
     REQUIRE(patch.range() == PatchRange::ByteUnsigned);
 
     REQUIRE(patch.expression().evaluate() == 0xFF);
@@ -1311,7 +1355,7 @@ TEST_CASE("Patch: word little-endian range", "[model][patch]") {
     Location loc("test.asm", 40);
     Expression expr(make_integer(0x1234), loc);
     Patch patch(1, PatchRange::Word, expr);
-    
+
     REQUIRE(patch.range() == PatchRange::Word);
 
     REQUIRE(patch.expression().evaluate() == 0x1234);
@@ -1320,7 +1364,7 @@ TEST_CASE("Patch: word little-endian range", "[model][patch]") {
 TEST_CASE("Patch: all range types", "[model][patch]") {
     Location loc("test.asm", 50);
     Expression expr(make_integer(0), loc);
-    
+
     std::vector<PatchRange> ranges = {
         PatchRange::Undefined,
         PatchRange::JrOffset,
@@ -1338,7 +1382,7 @@ TEST_CASE("Patch: all range types", "[model][patch]") {
         PatchRange::ByteToPtr24Unsigned,
         PatchRange::ByteToPtr24Signed
     };
-    
+
     for (auto range : ranges) {
         Patch patch(0, range, expr);
         REQUIRE(patch.range() == range);
@@ -1352,7 +1396,7 @@ TEST_CASE("Patch: all range types", "[model][patch]") {
 TEST_CASE("Opcode: location-only constructor", "[model][opcode]") {
     Location loc("test.asm", 10);
     Opcode opcode(loc);
-    
+
     REQUIRE(opcode.address() == 0);
     REQUIRE(opcode.size() == 0);
     REQUIRE_FALSE(opcode.has_patches());
@@ -1376,7 +1420,7 @@ TEST_CASE("Opcode: constructor with address and bytes", "[model][opcode]") {
     Location loc("test.asm", 30);
     std::vector<uint8_t> bytes = {0xC3, 0x00, 0x80};  // JP 0x8000
     Opcode opcode(0x1000, bytes, loc);
-    
+
     REQUIRE(opcode.address() == 0x1000);
     REQUIRE(opcode.size() == 3);
     REQUIRE(opcode.location().filename() == "test.asm");
@@ -1390,12 +1434,12 @@ TEST_CASE("Opcode: add patch", "[model][opcode]") {
 
     std::vector<uint8_t> bytes = {0xC3, 0x00, 0x00};  // JP address (needs patch)
     Opcode opcode(bytes, loc);
-    
+
     Expression expr(make_symbol(target_sym), loc);
     Patch patch(1, PatchRange::Word, expr);
-    
+
     opcode.add_patch(patch);
-    
+
     REQUIRE(opcode.has_patches());
     REQUIRE(opcode.patches().size() == 1);
     REQUIRE(opcode.patches()[0].offset() == 1);
@@ -1406,16 +1450,16 @@ TEST_CASE("Opcode: multiple patches", "[model][opcode]") {
     Location loc("test.asm", 110);
     std::vector<uint8_t> bytes = {0x00, 0x00, 0x00, 0x00};
     Opcode opcode(bytes, loc);
-    
+
     // Add two patches
     Expression expr1(make_integer(0x12), loc);
     Patch patch1(0, PatchRange::ByteUnsigned, expr1);
     opcode.add_patch(patch1);
-    
+
     Expression expr2(make_integer(0x3456), loc);
     Patch patch2(2, PatchRange::Word, expr2);
     opcode.add_patch(patch2);
-    
+
     REQUIRE(opcode.patches().size() == 2);
     REQUIRE(opcode.patches()[0].offset() == 0);
     REQUIRE(opcode.patches()[1].offset() == 2);
@@ -1425,13 +1469,13 @@ TEST_CASE("Opcode: clear patches", "[model][opcode]") {
     Location loc("test.asm", 120);
     std::vector<uint8_t> bytes = {0x00, 0x00};
     Opcode opcode(bytes, loc);
-    
+
     Expression expr(make_integer(42), loc);
     Patch patch(0, PatchRange::ByteUnsigned, expr);
-    
+
     opcode.add_patch(patch);
     REQUIRE(opcode.has_patches());
-    
+
     opcode.clear_patches();
     REQUIRE_FALSE(opcode.has_patches());
     REQUIRE(opcode.patches().size() == 0);
@@ -1440,10 +1484,10 @@ TEST_CASE("Opcode: clear patches", "[model][opcode]") {
 TEST_CASE("Opcode: location is immutable", "[model][opcode]") {
     Location loc("main.asm", 200);
     Opcode opcode(loc);
-    
+
     REQUIRE(opcode.location().filename() == "main.asm");
     REQUIRE(opcode.location().line_num() == 200);
-    
+
     // Location cannot be changed - it's immutable
     // The following would not compile:
     // opcode.set_location(Location("other.asm", 300));  // ERROR: no member function 'set_location'
@@ -1539,7 +1583,7 @@ TEST_CASE("Opcode: add_bytes with leading zeros", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with various values", "[model][opcode]") {
     Location loc("test.asm", 210);
-    
+
     struct TestCase {
         unsigned value;
         std::vector<uint8_t> expected;
@@ -1631,11 +1675,12 @@ TEST_CASE("Opcode: clear and rebuild", "[model][opcode]") {
     REQUIRE(opcode.bytes()[2] == 0x00);
 }
 
-TEST_CASE("Integration: build complete instruction with patches", "[model][opcode][integration]") {
+TEST_CASE("Integration: build complete instruction with patches",
+          "[model][opcode][integration]") {
     Location loc("test.asm", 100);
     Module module("TEST", loc);
     Symbol* label_sym = module.add_symbol("label", loc);
-    
+
     Opcode opcode(loc);
 
     // Build: JP label (0xC3 followed by address - needs patch)
@@ -1656,7 +1701,8 @@ TEST_CASE("Integration: build complete instruction with patches", "[model][opcod
     REQUIRE(opcode.patches()[0].offset() == 1);
 }
 
-TEST_CASE("Integration: build data with add_bytes", "[model][opcode][integration]") {
+TEST_CASE("Integration: build data with add_bytes",
+          "[model][opcode][integration]") {
     Location loc("test.asm", 260);
     Opcode opcode(loc);
 
@@ -1680,10 +1726,10 @@ TEST_CASE("Integration: section with patched opcodes", "[model][integration]") {
     Module module("TEST", loc);
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     // Add NOP
     sec.add_opcode(Opcode({0x00}, loc));
-    
+
     // Add LD A, value (needs patch)
     Symbol* value_sym = module.add_symbol("value", loc, 42, SymbolType::Constant);
     Opcode ld_opcode({0x3E, 0x00}, loc);
@@ -1691,7 +1737,7 @@ TEST_CASE("Integration: section with patched opcodes", "[model][integration]") {
     Patch patch1(1, PatchRange::ByteUnsigned, expr1);
     ld_opcode.add_patch(patch1);
     sec.add_opcode(ld_opcode);
-    
+
     // Add JP label (needs patch)
     Symbol* start_sym = module.add_symbol("start", loc);
     Opcode jp_opcode({0xC3, 0x00, 0x00}, loc);
@@ -1699,7 +1745,7 @@ TEST_CASE("Integration: section with patched opcodes", "[model][integration]") {
     Patch patch2(1, PatchRange::Word, expr2);
     jp_opcode.add_patch(patch2);
     sec.add_opcode(jp_opcode);
-    
+
     REQUIRE(sec.opcodes().size() == 4);
     REQUIRE(sec.size() == 6);  // 1 + 2 + 3
     REQUIRE(sec.pc() == 0x8006);
@@ -1707,16 +1753,17 @@ TEST_CASE("Integration: section with patched opcodes", "[model][integration]") {
     REQUIRE(sec.opcodes()[3]->has_patches());
 }
 
-TEST_CASE("Integration: compute opcode addresses in section", "[model][integration]") {
+TEST_CASE("Integration: compute opcode addresses in section",
+          "[model][integration]") {
     Location loc("test.asm", 50);
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     // Add opcodes
     sec.add_opcode(Opcode({0x00}, loc));                    // 0x8000
     sec.add_opcode(Opcode({0x3E, 0x42}, loc));              // 0x8001
     sec.add_opcode(Opcode({0xC3, 0x00, 0x80}, loc));        // 0x8003
-    
+
     // Compute and set addresses
     int addr = sec.base_address();
     for (auto& opcode : sec.opcodes()) {
@@ -1736,18 +1783,18 @@ TEST_CASE("Integration: relative jump with patch", "[model][integration]") {
     Section sec("CODE");
     sec.set_base_address(0x1000);
     Symbol* loop_sym = module.add_symbol("loop", loc);
-    
+
     // JR offset (needs patch to compute relative offset)
     Opcode jr_opcode({0x18, 0x00}, loc);
-    
+
     // Create expression: target - ($ + 2)
     // Where $ is current address and 2 is instruction size
     Expression target_expr(make_symbol(loop_sym), loc);
     Patch patch(1, PatchRange::JrOffset, target_expr);
     jr_opcode.add_patch(patch);
-    
+
     sec.add_opcode(jr_opcode);
-    
+
     REQUIRE(sec.opcodes()[1]->has_patches());
     REQUIRE(sec.opcodes()[1]->patches()[0].range() == PatchRange::JrOffset);
 }
@@ -1755,28 +1802,29 @@ TEST_CASE("Integration: relative jump with patch", "[model][integration]") {
 TEST_CASE("Integration: mixed code and data section", "[model][integration]") {
     Location loc1("test.asm", 100);
     Module module("TEST", loc1);
-    Symbol* constant_sym = module.add_symbol("constant", loc1, 42, SymbolType::Constant);
+    Symbol* constant_sym = module.add_symbol("constant", loc1, 42,
+                           SymbolType::Constant);
     Symbol* label_sym = module.add_symbol("label", loc1);
 
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     Location loc2("mixed.asm", 100);
-    
+
     // Code: LD A, value
     Opcode ld_opcode({0x3E, 0x00}, loc2);
     Expression expr1(make_symbol(constant_sym), loc2);
     Patch patch1(1, PatchRange::ByteUnsigned, expr1);
     ld_opcode.add_patch(patch1);
     sec.add_opcode(ld_opcode);
-    
+
     // Data: DEFW address
     Opcode data_opcode({0x00, 0x00}, loc2);
     Expression expr2(make_symbol(label_sym), loc2);
     Patch patch2(0, PatchRange::Word, expr2);
     data_opcode.add_patch(patch2);
     sec.add_opcode(data_opcode);
-    
+
     REQUIRE(sec.opcodes().size() == 3);
     REQUIRE(sec.size() == 4);
     REQUIRE(sec.opcodes()[1]->has_patches());
@@ -1806,7 +1854,7 @@ TEST_CASE("Section: constructor with name", "[model][section]") {
 TEST_CASE("Section: alignment default", "[model][section]") {
     Section sec("CODE");
     REQUIRE(sec.alignment() == 1);
-    
+
     // With default alignment, base address is not adjusted
     sec.set_base_address(0x8001);
     REQUIRE(sec.base_address() == 0x8001);
@@ -1815,22 +1863,22 @@ TEST_CASE("Section: alignment default", "[model][section]") {
 TEST_CASE("Section: alignment of 4", "[model][section]") {
     Section sec("CODE");
     sec.set_alignment(4);
-    
+
     REQUIRE(sec.alignment() == 4);
-    
+
     // Test various addresses get aligned to multiple of 4
     sec.set_base_address(0x8000);
     REQUIRE(sec.base_address() == 0x8000);  // Already aligned
-    
+
     sec.set_base_address(0x8001);
     REQUIRE(sec.base_address() == 0x8004);  // Rounded up to 0x8004
-    
+
     sec.set_base_address(0x8002);
     REQUIRE(sec.base_address() == 0x8004);  // Rounded up to 0x8004
-    
+
     sec.set_base_address(0x8003);
     REQUIRE(sec.base_address() == 0x8004);  // Rounded up to 0x8004
-    
+
     sec.set_base_address(0x8004);
     REQUIRE(sec.base_address() == 0x8004);  // Already aligned
 }
@@ -1838,19 +1886,19 @@ TEST_CASE("Section: alignment of 4", "[model][section]") {
 TEST_CASE("Section: alignment of 16", "[model][section]") {
     Section sec("DATA");
     sec.set_alignment(16);
-    
+
     REQUIRE(sec.alignment() == 16);
-    
+
     // Test alignment to multiple of 16
     sec.set_base_address(0x1000);
     REQUIRE(sec.base_address() == 0x1000);  // Already aligned
-    
+
     sec.set_base_address(0x1001);
     REQUIRE(sec.base_address() == 0x1010);  // Rounded up
-    
+
     sec.set_base_address(0x100F);
     REQUIRE(sec.base_address() == 0x1010);  // Rounded up
-    
+
     sec.set_base_address(0x1010);
     REQUIRE(sec.base_address() == 0x1010);  // Already aligned
 }
@@ -1858,30 +1906,31 @@ TEST_CASE("Section: alignment of 16", "[model][section]") {
 TEST_CASE("Section: alignment of 256", "[model][section]") {
     Section sec("PAGE");
     sec.set_alignment(256);
-    
+
     REQUIRE(sec.alignment() == 256);
-    
+
     // Test page alignment
     sec.set_base_address(0x0000);
     REQUIRE(sec.base_address() == 0x0000);  // Already aligned
-    
+
     sec.set_base_address(0x0001);
     REQUIRE(sec.base_address() == 0x0100);  // Rounded up to next page
-    
+
     sec.set_base_address(0x00FF);
     REQUIRE(sec.base_address() == 0x0100);  // Rounded up to next page
-    
+
     sec.set_base_address(0x0100);
     REQUIRE(sec.base_address() == 0x0100);  // Already aligned
 }
 
-TEST_CASE("Section: change alignment after setting base address", "[model][section]") {
+TEST_CASE("Section: change alignment after setting base address",
+          "[model][section]") {
     Section sec("CODE");
-    
+
     // Set base address with default alignment
     sec.set_base_address(0x8001);
     REQUIRE(sec.base_address() == 0x8001);
-    
+
     // Change alignment to 4 - base address should be re-aligned
     sec.set_alignment(4);
     REQUIRE(sec.alignment() == 4);
@@ -1891,9 +1940,9 @@ TEST_CASE("Section: change alignment after setting base address", "[model][secti
 TEST_CASE("Section: zero alignment defaults to 1", "[model][section]") {
     Section sec("CODE");
     sec.set_alignment(0);
-    
+
     REQUIRE(sec.alignment() == 1);
-    
+
     sec.set_base_address(0x8001);
     REQUIRE(sec.base_address() == 0x8001);  // No adjustment
 }
@@ -1901,9 +1950,9 @@ TEST_CASE("Section: zero alignment defaults to 1", "[model][section]") {
 TEST_CASE("Section: negative alignment defaults to 1", "[model][section]") {
     Section sec("CODE");
     sec.set_alignment(-4);
-    
+
     REQUIRE(sec.alignment() == 1);
-    
+
     sec.set_base_address(0x8001);
     REQUIRE(sec.base_address() == 0x8001);  // No adjustment
 }
@@ -1911,24 +1960,25 @@ TEST_CASE("Section: negative alignment defaults to 1", "[model][section]") {
 TEST_CASE("Section: alignment with zero base address", "[model][section]") {
     Section sec("CODE");
     sec.set_alignment(4);
-    
+
     sec.set_base_address(0);
     REQUIRE(sec.base_address() == 0);  // Zero is aligned to any value
 }
 
-TEST_CASE("Section: alignment doesn't affect opcodes or pc", "[model][section]") {
+TEST_CASE("Section: alignment doesn't affect opcodes or pc",
+          "[model][section]") {
     Location loc("test.asm", 10);
     Section sec("CODE");
     sec.set_alignment(4);
     sec.set_base_address(0x8001);  // Will be aligned to 0x8004
-    
+
     REQUIRE(sec.base_address() == 0x8004);
     REQUIRE(sec.pc() == 0x8004);  // Empty section
-    
+
     // Add opcodes
     sec.add_opcode(Opcode({0x00}, loc));
     REQUIRE(sec.pc() == 0x8005);  // base + 1
-    
+
     sec.add_opcode(Opcode({0x3E, 0x42}, loc));
     REQUIRE(sec.pc() == 0x8007);  // base + 3
 }
@@ -1936,11 +1986,11 @@ TEST_CASE("Section: alignment doesn't affect opcodes or pc", "[model][section]")
 TEST_CASE("Section: add opcode", "[model][section]") {
     Location loc("test.asm", 10);
     Section sec("CODE");
-    
+
     std::vector<uint8_t> bytes = {0x00};  // NOP
     Opcode opcode(bytes, loc);
     sec.add_opcode(opcode);
-    
+
     REQUIRE(sec.opcodes().size() == 2);
     REQUIRE(sec.size() == 1);
 }
@@ -1948,12 +1998,12 @@ TEST_CASE("Section: add opcode", "[model][section]") {
 TEST_CASE("Section: multiple opcodes", "[model][section]") {
     Location loc("test.asm", 20);
     Section sec("CODE");
-    
+
     // Add several opcodes
     sec.add_opcode(Opcode({0x00}, loc));                    // NOP - 1 byte
     sec.add_opcode(Opcode({0x3E, 0x42}, loc));              // LD A, 42 - 2 bytes
     sec.add_opcode(Opcode({0xC3, 0x00, 0x80}, loc));        // JP 0x8000 - 3 bytes
-    
+
     REQUIRE(sec.opcodes().size() == 4);
     REQUIRE(sec.size() == 6);  // 1 + 2 + 3
 }
@@ -1962,12 +2012,12 @@ TEST_CASE("Section: program counter calculation", "[model][section]") {
     Location loc("test.asm", 30);
     Section sec("CODE");
     sec.set_base_address(0x8000);
-    
+
     REQUIRE(sec.pc() == 0x8000);  // Empty section
-    
+
     sec.add_opcode(Opcode({0x00}, loc));
     REQUIRE(sec.pc() == 0x8001);  // Base + 1
-    
+
     sec.add_opcode(Opcode({0x3E, 0x42}, loc));
     REQUIRE(sec.pc() == 0x8003);  // Base + 3
 }
@@ -1977,13 +2027,13 @@ TEST_CASE("Section: program counter with alignment", "[model][section]") {
     Section sec("CODE");
     sec.set_alignment(16);
     sec.set_base_address(0x8001);  // Will be aligned to 0x8010
-    
+
     REQUIRE(sec.base_address() == 0x8010);
     REQUIRE(sec.pc() == 0x8010);  // Empty section
-    
+
     sec.add_opcode(Opcode({0x00}, loc));
     REQUIRE(sec.pc() == 0x8011);  // Aligned base + 1
-    
+
     sec.add_opcode(Opcode({0x3E, 0x42}, loc));
     REQUIRE(sec.pc() == 0x8013);  // Aligned base + 3
 }
@@ -1994,9 +2044,9 @@ TEST_CASE("Section: clear opcodes", "[model][section]") {
     REQUIRE(sec.size() == 0);
 
     sec.add_opcode(Opcode({0x00}, loc));
-    sec.add_opcode(Opcode({0x00}, loc));    
+    sec.add_opcode(Opcode({0x00}, loc));
     REQUIRE(sec.size() == 2);
-    
+
     sec.clear_opcodes();
     REQUIRE(sec.opcodes().size() == 1); // start with an empty opcode
     REQUIRE(sec.size() == 0);
@@ -2004,19 +2054,19 @@ TEST_CASE("Section: clear opcodes", "[model][section]") {
 
 TEST_CASE("Section: alignment boundary cases", "[model][section]") {
     Section sec("CODE");
-    
+
     // Alignment of 1 (no constraint)
     sec.set_alignment(1);
     sec.set_base_address(0x1234);
     REQUIRE(sec.base_address() == 0x1234);
-    
+
     // Alignment of 2
     sec.set_alignment(2);
     sec.set_base_address(0x1234);
     REQUIRE(sec.base_address() == 0x1234);  // Already even
     sec.set_base_address(0x1235);
     REQUIRE(sec.base_address() == 0x1236);  // Rounded up
-    
+
     // Alignment of 8
     sec.set_alignment(8);
     sec.set_base_address(0x1230);
@@ -2030,13 +2080,13 @@ TEST_CASE("Section: alignment boundary cases", "[model][section]") {
 TEST_CASE("Section: alignment with large addresses", "[model][section]") {
     Section sec("CODE");
     sec.set_alignment(0x1000);  // 4K alignment
-    
+
     sec.set_base_address(0x10000);
     REQUIRE(sec.base_address() == 0x10000);  // Already aligned
-    
+
     sec.set_base_address(0x10001);
     REQUIRE(sec.base_address() == 0x11000);  // Rounded up to next 4K boundary
-    
+
     sec.set_base_address(0x10FFF);
     REQUIRE(sec.base_address() == 0x11000);  // Rounded up to next 4K boundary
 }
@@ -2045,60 +2095,63 @@ TEST_CASE("Section: alignment with large addresses", "[model][section]") {
 // Integration tests: Section with alignment and opcodes
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: aligned section with opcodes", "[model][section][integration]") {
+TEST_CASE("Integration: aligned section with opcodes",
+          "[model][section][integration]") {
     Location loc("aligned.asm", 100);
     Section sec("CODE");
-    
+
     // Set 16-byte alignment
     sec.set_alignment(16);
     sec.set_base_address(0x8005);  // Will be aligned to 0x8010
-    
+
     REQUIRE(sec.base_address() == 0x8010);
-    
+
     // Add some opcodes
     sec.add_opcode(Opcode({0x00}, loc));                    // 0x8010
     sec.add_opcode(Opcode({0x3E, 0x42}, loc));              // 0x8011-0x8012
     sec.add_opcode(Opcode({0xC3, 0x00, 0x80}, loc));        // 0x8013-0x8015
-    
+
     REQUIRE(sec.opcodes().size() == 4);
     REQUIRE(sec.size() == 6);
     REQUIRE(sec.pc() == 0x8016);  // 0x8010 + 6
 }
 
-TEST_CASE("Integration: section alignment for page-aligned data", "[model][section][integration]") {
+TEST_CASE("Integration: section alignment for page-aligned data",
+          "[model][section][integration]") {
     Location loc("page.asm", 50);
     Section sec("LOOKUP_TABLE");
-    
+
     // Align to 256-byte page boundary
     sec.set_alignment(256);
     sec.set_base_address(0x7F80);  // Will be aligned to 0x8000
-    
+
     REQUIRE(sec.base_address() == 0x8000);
-    
+
     // Fill with data
     for (int i = 0; i < 256; ++i) {
         sec.add_opcode(Opcode({static_cast<uint8_t>(i)}, loc));
     }
-    
+
     REQUIRE(sec.size() == 256);
     REQUIRE(sec.pc() == 0x8100);  // Next page boundary
 }
 
-TEST_CASE("Integration: multiple sections with different alignments", "[model][section][integration]") {
+TEST_CASE("Integration: multiple sections with different alignments",
+          "[model][section][integration]") {
     Location loc("multi.asm", 200);
-    
+
     // Code section with 4-byte alignment
     Section code("CODE");
     code.set_alignment(4);
     code.set_base_address(0x8001);
     REQUIRE(code.base_address() == 0x8004);
-    
+
     // Data section with 16-byte alignment
     Section data("DATA");
     data.set_alignment(16);
     data.set_base_address(0x9005);
     REQUIRE(data.base_address() == 0x9010);
-    
+
     // Stack section with page alignment
     Section stack("STACK");
     stack.set_alignment(256);
@@ -2110,7 +2163,8 @@ TEST_CASE("Integration: multiple sections with different alignments", "[model][s
 // Module and Symbol declaration/definition tests
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Module: declare_symbol creates new undefined symbol with scope", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol creates new undefined symbol with scope",
+          "[model][module][declare]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
@@ -2126,7 +2180,8 @@ TEST_CASE("Module: declare_symbol creates new undefined symbol with scope", "[mo
     REQUIRE(module.has_symbol("FOO"));
 }
 
-TEST_CASE("Module: declare_symbol allows scope update from Local", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol allows scope update from Local",
+          "[model][module][declare]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 20);
@@ -2143,7 +2198,8 @@ TEST_CASE("Module: declare_symbol allows scope update from Local", "[model][modu
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Module: declare_symbol allows same scope redeclaration", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol allows same scope redeclaration",
+          "[model][module][declare]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 30);
     Location loc2("test.asm", 40);
@@ -2160,7 +2216,8 @@ TEST_CASE("Module: declare_symbol allows same scope redeclaration", "[model][mod
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Module: declare_symbol errors on scope conflict (Public to Extern)", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol errors on scope conflict (Public to Extern)",
+          "[model][module][declare]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 50);
     Location loc2("test.asm", 60);
@@ -2182,7 +2239,8 @@ TEST_CASE("Module: declare_symbol errors on scope conflict (Public to Extern)", 
     REQUIRE(msg.find("CONFLICT") != std::string::npos);
 }
 
-TEST_CASE("Module: declare_symbol errors on scope conflict (Extern to Public)", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol errors on scope conflict (Extern to Public)",
+          "[model][module][declare]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 70);
     Location loc2("test.asm", 80);
@@ -2203,7 +2261,8 @@ TEST_CASE("Module: declare_symbol errors on scope conflict (Extern to Public)", 
     REQUIRE(msg.find("Symbol redefined") != std::string::npos);
 }
 
-TEST_CASE("Module: declare_symbol errors declaring defined symbol as Extern", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol errors declaring defined symbol as Extern",
+          "[model][module][declare]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 90);
     Location loc2("test.asm", 100);
@@ -2223,10 +2282,12 @@ TEST_CASE("Module: declare_symbol errors declaring defined symbol as Extern", "[
     std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("test.asm:100:") != std::string::npos);
     REQUIRE(msg.find("Symbol redefined") != std::string::npos);
-    REQUIRE(msg.find("cannot declare defined symbol as EXTERN") != std::string::npos);
+    REQUIRE(msg.find("cannot declare defined symbol as EXTERN") !=
+            std::string::npos);
 }
 
-TEST_CASE("Module: declare_symbol allows Global scope transitions", "[model][module][declare]") {
+TEST_CASE("Module: declare_symbol allows Global scope transitions",
+          "[model][module][declare]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 110);
     Location loc2("test.asm", 120);
@@ -2243,7 +2304,8 @@ TEST_CASE("Module: declare_symbol allows Global scope transitions", "[model][mod
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Module: add_symbol creates new undefined symbol", "[model][module][add]") {
+TEST_CASE("Module: add_symbol creates new undefined symbol",
+          "[model][module][add]") {
     Location loc("test.asm", 130);
     Module module("TEST", loc);
 
@@ -2257,7 +2319,8 @@ TEST_CASE("Module: add_symbol creates new undefined symbol", "[model][module][ad
     REQUIRE(sym->location().line_num() == 130);
 }
 
-TEST_CASE("Module: add_symbol creates new defined symbol", "[model][module][add]") {
+TEST_CASE("Module: add_symbol creates new defined symbol",
+          "[model][module][add]") {
     Location loc("test.asm", 140);
     Module module("TEST", loc);
 
@@ -2272,7 +2335,8 @@ TEST_CASE("Module: add_symbol creates new defined symbol", "[model][module][add]
     REQUIRE(sym->location().line_num() == 140);
 }
 
-TEST_CASE("Module: add_symbol updates undefined symbol", "[model][module][add]") {
+TEST_CASE("Module: add_symbol updates undefined symbol",
+          "[model][module][add]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 150);
     Location loc2("test.asm", 160);
@@ -2299,12 +2363,14 @@ TEST_CASE("Module: add_symbol errors on redefinition", "[model][module][add]") {
     Module module("TEST", loc1);
 
     // Define symbol
-    Symbol* sym1 = module.add_symbol("LABEL", loc1, 0x8000, SymbolType::AddressRelative);
+    Symbol* sym1 = module.add_symbol("LABEL", loc1, 0x8000,
+                                     SymbolType::AddressRelative);
     REQUIRE(sym1->is_defined());
     REQUIRE(sym1->value() == 0x8000);
 
     // Try to redefine - should error
-    Symbol* sym2 = module.add_symbol("LABEL", loc2, 0x9000, SymbolType::AddressRelative);
+    Symbol* sym2 = module.add_symbol("LABEL", loc2, 0x9000,
+                                     SymbolType::AddressRelative);
     REQUIRE(sym2 == sym1);  // Returns same symbol despite error
     REQUIRE(sym1->value() == 0x8000);  // Value unchanged
 
@@ -2315,7 +2381,8 @@ TEST_CASE("Module: add_symbol errors on redefinition", "[model][module][add]") {
     REQUIRE(msg.find("LABEL") != std::string::npos);
 }
 
-TEST_CASE("Module: add_symbol errors defining Extern symbol", "[model][module][add]") {
+TEST_CASE("Module: add_symbol errors defining Extern symbol",
+          "[model][module][add]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 190);
     Location loc2("test.asm", 200);
@@ -2337,7 +2404,8 @@ TEST_CASE("Module: add_symbol errors defining Extern symbol", "[model][module][a
     REQUIRE(msg.find("cannot define EXTERN symbol") != std::string::npos);
 }
 
-TEST_CASE("Module: add_symbol updates location only when defining", "[model][module][add]") {
+TEST_CASE("Module: add_symbol updates location only when defining",
+          "[model][module][add]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 210);
     Location loc2("test.asm", 220);
@@ -2357,7 +2425,8 @@ TEST_CASE("Module: add_symbol updates location only when defining", "[model][mod
 // Integration tests: declare and define workflow
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: PUBLIC declaration followed by definition", "[model][integration]") {
+TEST_CASE("Integration: PUBLIC declaration followed by definition",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc1("module.asm", 10);
     Location loc2("module.asm", 50);
@@ -2369,7 +2438,8 @@ TEST_CASE("Integration: PUBLIC declaration followed by definition", "[model][int
     REQUIRE(sym1->is_undefined());
 
     // Define it later
-    Symbol* sym2 = module.add_symbol("API_FUNC", loc2, 0x8000, SymbolType::AddressRelative);
+    Symbol* sym2 = module.add_symbol("API_FUNC", loc2, 0x8000,
+                                     SymbolType::AddressRelative);
     REQUIRE(sym2 == sym1);
     REQUIRE(sym2->is_defined());
     REQUIRE(sym2->is_public());
@@ -2378,7 +2448,8 @@ TEST_CASE("Integration: PUBLIC declaration followed by definition", "[model][int
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: EXTERN declaration stays undefined", "[model][integration]") {
+TEST_CASE("Integration: EXTERN declaration stays undefined",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc1("main.asm", 10);
     Module module("MAIN", loc1);
@@ -2396,7 +2467,8 @@ TEST_CASE("Integration: EXTERN declaration stays undefined", "[model][integratio
     REQUIRE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: GLOBAL declaration then definition acts as PUBLIC", "[model][integration]") {
+TEST_CASE("Integration: GLOBAL declaration then definition acts as PUBLIC",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc1("module.asm", 10);
     Location loc2("module.asm", 50);
@@ -2419,14 +2491,16 @@ TEST_CASE("Integration: GLOBAL declaration then definition acts as PUBLIC", "[mo
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: definition before PUBLIC declaration", "[model][integration]") {
+TEST_CASE("Integration: definition before PUBLIC declaration",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc1("module.asm", 10);
     Location loc2("module.asm", 50);
     Module module("TEST", loc1);
 
     // Define first (as Local)
-    Symbol* sym1 = module.add_symbol("FUNC", loc1, 0x8000, SymbolType::AddressRelative);
+    Symbol* sym1 = module.add_symbol("FUNC", loc1, 0x8000,
+                                     SymbolType::AddressRelative);
     REQUIRE(sym1->is_defined());
     REQUIRE(sym1->is_local());
 
@@ -2457,7 +2531,8 @@ TEST_CASE("Integration: multiple forward references", "[model][integration]") {
     REQUIRE(sym1->is_undefined());
 
     // Finally define it
-    Symbol* sym4 = module.add_symbol("LOOP", loc4, 0x8050, SymbolType::AddressRelative);
+    Symbol* sym4 = module.add_symbol("LOOP", loc4, 0x8050,
+                                     SymbolType::AddressRelative);
     REQUIRE(sym4 == sym1);
     REQUIRE(sym4->is_defined());
     REQUIRE(sym4->value() == 0x8050);
@@ -2501,15 +2576,18 @@ TEST_CASE("Integration: typical assembly workflow", "[model][integration]") {
 
     // Line 30: start: (label definition)
     loc.set_line_num(30);
-    Symbol* start = module.add_symbol("start", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* start = module.add_symbol("start", loc, 0x8000,
+                                      SymbolType::AddressRelative);
 
     // Line 40: MAX_SIZE EQU 100
     loc.set_line_num(40);
-    Symbol* max_size = module.add_symbol("MAX_SIZE", loc, 100, SymbolType::Constant);
+    Symbol* max_size = module.add_symbol("MAX_SIZE", loc, 100,
+                                         SymbolType::Constant);
 
     // Line 50: loop: (local label)
     loc.set_line_num(50);
-    Symbol* loop = module.add_symbol("loop", loc, 0x8010, SymbolType::AddressRelative);
+    Symbol* loop = module.add_symbol("loop", loc, 0x8010,
+                                     SymbolType::AddressRelative);
 
     REQUIRE_FALSE(g_errors.has_errors());
 
@@ -2532,7 +2610,8 @@ TEST_CASE("Integration: typical assembly workflow", "[model][integration]") {
     REQUIRE(loop->value() == 0x8010);
 }
 
-TEST_CASE("Integration: error recovery continues after redefinition", "[model][integration]") {
+TEST_CASE("Integration: error recovery continues after redefinition",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 20);
@@ -2554,14 +2633,16 @@ TEST_CASE("Integration: error recovery continues after redefinition", "[model][i
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: all scope types with definitions", "[model][integration]") {
+TEST_CASE("Integration: all scope types with definitions",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc("scopes.asm", 1);
     Module module("TEST", loc);
 
     // Local symbol (default)
     loc.set_line_num(10);
-    Symbol* local_sym = module.add_symbol("local_var", loc, 10, SymbolType::Constant);
+    Symbol* local_sym = module.add_symbol("local_var", loc, 10,
+                                          SymbolType::Constant);
     REQUIRE(local_sym->is_local());
     REQUIRE_FALSE(local_sym->is_exported());
     REQUIRE_FALSE(local_sym->is_imported());
@@ -2569,13 +2650,15 @@ TEST_CASE("Integration: all scope types with definitions", "[model][integration]
     // Public symbol (exported)
     loc.set_line_num(20);
     module.declare_symbol("public_func", loc, SymbolScope::Public);
-    Symbol* public_sym = module.add_symbol("public_func", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* public_sym = module.add_symbol("public_func", loc, 0x8000,
+                                           SymbolType::AddressRelative);
     REQUIRE(public_sym->is_public());
     REQUIRE(public_sym->is_exported());
 
     // Extern symbol (imported, stays undefined)
     loc.set_line_num(30);
-    Symbol* extern_sym = module.declare_symbol("extern_func", loc, SymbolScope::Extern);
+    Symbol* extern_sym = module.declare_symbol("extern_func", loc,
+                         SymbolScope::Extern);
     REQUIRE(extern_sym->is_extern());
     REQUIRE(extern_sym->is_imported());
     REQUIRE(extern_sym->is_undefined());
@@ -2583,7 +2666,8 @@ TEST_CASE("Integration: all scope types with definitions", "[model][integration]
     // Global symbol (acts as PUBLIC when defined)
     loc.set_line_num(40);
     module.declare_symbol("global_var", loc, SymbolScope::Global);
-    Symbol* global_sym = module.add_symbol("global_var", loc, 42, SymbolType::Constant);
+    Symbol* global_sym = module.add_symbol("global_var", loc, 42,
+                                           SymbolType::Constant);
     REQUIRE(global_sym->is_global());
     REQUIRE(global_sym->is_public());  // Acts as PUBLIC when defined
     REQUIRE(global_sym->is_exported());
@@ -2610,7 +2694,8 @@ TEST_CASE("Integration: cannot redefine after error", "[model][integration]") {
     REQUIRE(sym1->value() == 100);  // Original value preserved
 }
 
-TEST_CASE("Integration: declare Extern then try to define (error)", "[model][integration]") {
+TEST_CASE("Integration: declare Extern then try to define (error)",
+          "[model][integration]") {
     SuppressErrors suppress;
     Location loc1("test.asm", 10);
     Location loc2("test.asm", 50);
@@ -2622,7 +2707,8 @@ TEST_CASE("Integration: declare Extern then try to define (error)", "[model][int
     REQUIRE(sym1->is_undefined());
 
     // Try to define (should error)
-    Symbol* sym2 = module.add_symbol("LIB_FUNC", loc2, 0x9000, SymbolType::AddressRelative);
+    Symbol* sym2 = module.add_symbol("LIB_FUNC", loc2, 0x9000,
+                                     SymbolType::AddressRelative);
     REQUIRE(sym2 == sym1);
     REQUIRE(g_errors.has_errors());
 
@@ -2635,7 +2721,8 @@ TEST_CASE("Integration: declare Extern then try to define (error)", "[model][int
 // Module section management tests
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Module: constructor creates default empty section", "[model][module][section]") {
+TEST_CASE("Module: constructor creates default empty section",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2645,7 +2732,8 @@ TEST_CASE("Module: constructor creates default empty section", "[model][module][
     REQUIRE(module.current_section()->name() == "");
 }
 
-TEST_CASE("Module: default section is current after construction", "[model][module][section]") {
+TEST_CASE("Module: default section is current after construction",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2653,7 +2741,8 @@ TEST_CASE("Module: default section is current after construction", "[model][modu
     REQUIRE(module.current_section() == default_section);
 }
 
-TEST_CASE("Module: add_section creates new section and makes it current", "[model][module][section]") {
+TEST_CASE("Module: add_section creates new section and makes it current",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2665,7 +2754,8 @@ TEST_CASE("Module: add_section creates new section and makes it current", "[mode
     REQUIRE(module.current_section() == code_section);
 }
 
-TEST_CASE("Module: add_section with existing name returns existing and makes it current", "[model][module][section]") {
+TEST_CASE("Module: add_section with existing name returns existing and makes it current",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2680,7 +2770,8 @@ TEST_CASE("Module: add_section with existing name returns existing and makes it 
     REQUIRE(module.current_section() == code1);  // CODE is now current again
 }
 
-TEST_CASE("Module: section pointer stability across additions", "[model][module][section]") {
+TEST_CASE("Module: section pointer stability across additions",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2704,7 +2795,8 @@ TEST_CASE("Module: section pointer stability across additions", "[model][module]
     REQUIRE(module.sections().size() == 5);
 }
 
-TEST_CASE("Module: section pointers remain stable when switching sections", "[model][module][section]") {
+TEST_CASE("Module: section pointers remain stable when switching sections",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2722,7 +2814,8 @@ TEST_CASE("Module: section pointers remain stable when switching sections", "[mo
     REQUIRE(module.current_section() == data);
 }
 
-TEST_CASE("Module: can add opcodes to current section", "[model][module][section]") {
+TEST_CASE("Module: can add opcodes to current section",
+          "[model][module][section]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
@@ -2736,7 +2829,8 @@ TEST_CASE("Module: can add opcodes to current section", "[model][module][section
     REQUIRE(code->size() == 3);
 }
 
-TEST_CASE("Module: opcodes remain accessible after section switch", "[model][module][section]") {
+TEST_CASE("Module: opcodes remain accessible after section switch",
+          "[model][module][section]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
@@ -2763,7 +2857,8 @@ TEST_CASE("Module: opcodes remain accessible after section switch", "[model][mod
     REQUIRE(data->opcodes().size() == 3);
 }
 
-TEST_CASE("Module: find_section returns correct section", "[model][module][section]") {
+TEST_CASE("Module: find_section returns correct section",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2776,7 +2871,8 @@ TEST_CASE("Module: find_section returns correct section", "[model][module][secti
     REQUIRE(module.find_section("NONEXISTENT") == nullptr);
 }
 
-TEST_CASE("Module: clear_sections recreates default section", "[model][module][section]") {
+TEST_CASE("Module: clear_sections recreates default section",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2796,7 +2892,8 @@ TEST_CASE("Module: clear_sections recreates default section", "[model][module][s
     REQUIRE(module.current_section()->name() == "");
 }
 
-TEST_CASE("Module: section pointer stability with symbols", "[model][module][section]") {
+TEST_CASE("Module: section pointer stability with symbols",
+          "[model][module][section]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
@@ -2804,7 +2901,8 @@ TEST_CASE("Module: section pointer stability with symbols", "[model][module][sec
     code->set_base_address(0x8000);
 
     // Add symbol referencing section
-    Symbol* label = module.add_symbol("start", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* label = module.add_symbol("start", loc, 0x8000,
+                                      SymbolType::AddressRelative);
     label->set_opcode(code->last_opcode());
     label->set_offset(0);
 
@@ -2817,7 +2915,8 @@ TEST_CASE("Module: section pointer stability with symbols", "[model][module][sec
     REQUIRE(label->opcode() == code->last_opcode());
 }
 
-TEST_CASE("Module: multiple symbols referencing different sections", "[model][module][section]") {
+TEST_CASE("Module: multiple symbols referencing different sections",
+          "[model][module][section]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
@@ -2828,11 +2927,13 @@ TEST_CASE("Module: multiple symbols referencing different sections", "[model][mo
     data->set_base_address(0x9000);
 
     // Add symbols to different sections
-    Symbol* code_label = module.add_symbol("start", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* code_label = module.add_symbol("start", loc, 0x8000,
+                                           SymbolType::AddressRelative);
     code_label->set_opcode(code->last_opcode());
     code_label->set_offset(0);
 
-    Symbol* data_label = module.add_symbol("buffer", loc, 0x9000, SymbolType::AddressRelative);
+    Symbol* data_label = module.add_symbol("buffer", loc, 0x9000,
+                                           SymbolType::AddressRelative);
     data_label->set_opcode(data->last_opcode());
     data_label->set_offset(0);
 
@@ -2841,7 +2942,8 @@ TEST_CASE("Module: multiple symbols referencing different sections", "[model][mo
     REQUIRE(data_label->opcode() == data->last_opcode());
 }
 
-TEST_CASE("Module: current_section const accessor", "[model][module][section]") {
+TEST_CASE("Module: current_section const accessor",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2850,7 +2952,8 @@ TEST_CASE("Module: current_section const accessor", "[model][module][section]") 
     REQUIRE(sec->name() == "");
 }
 
-TEST_CASE("Module: sections accessor provides access to unique_ptr elements", "[model][module][section]") {
+TEST_CASE("Module: sections accessor provides access to unique_ptr elements",
+          "[model][module][section]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
 
@@ -2889,7 +2992,8 @@ TEST_CASE("Module: section iteration", "[model][module][section]") {
 // Integration tests: Module with sections, symbols, and opcodes
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: complete module with sections and symbols", "[model][integration]") {
+TEST_CASE("Integration: complete module with sections and symbols",
+          "[model][integration]") {
     Location loc("program.asm", 1);
     Module module("MAIN", loc);
 
@@ -2898,7 +3002,8 @@ TEST_CASE("Integration: complete module with sections and symbols", "[model][int
     code->set_base_address(0x8000);
 
     loc.set_line_num(10);
-    Symbol* start = module.add_symbol("start", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* start = module.add_symbol("start", loc, 0x8000,
+                                      SymbolType::AddressRelative);
     Opcode* start_opcode = code->last_opcode();
     start->set_opcode(start_opcode);
     start->set_offset(0);
@@ -2908,7 +3013,8 @@ TEST_CASE("Integration: complete module with sections and symbols", "[model][int
     code->add_opcode(Opcode({ 0x3E, 0x42 }, loc));  // LD A, 42
 
     loc.set_line_num(20);
-    Symbol* loop = module.add_symbol("loop", loc, 0x8002, SymbolType::AddressRelative);
+    Symbol* loop = module.add_symbol("loop", loc, 0x8002,
+                                     SymbolType::AddressRelative);
     Opcode* loop_opcode = code->last_opcode();
     loop->set_opcode(loop_opcode);
     loop->set_offset(2);
@@ -2921,7 +3027,8 @@ TEST_CASE("Integration: complete module with sections and symbols", "[model][int
     data->set_base_address(0x9000);
 
     loc.set_line_num(30);
-    Symbol* buffer = module.add_symbol("buffer", loc, 0x9000, SymbolType::AddressRelative);
+    Symbol* buffer = module.add_symbol("buffer", loc, 0x9000,
+                                       SymbolType::AddressRelative);
     Opcode* buffer_opcode = data->last_opcode();
     buffer->set_opcode(buffer_opcode);
     buffer->set_offset(0);
@@ -2998,7 +3105,8 @@ TEST_CASE("Integration: default section behavior", "[model][integration]") {
     REQUIRE(code->opcodes().size() == 2);
 }
 
-TEST_CASE("Integration: section with alignment and symbols", "[model][integration]") {
+TEST_CASE("Integration: section with alignment and symbols",
+          "[model][integration]") {
     Location loc("aligned.asm", 10);
     Module module("TEST", loc);
 
@@ -3010,7 +3118,8 @@ TEST_CASE("Integration: section with alignment and symbols", "[model][integratio
     REQUIRE(page->base_address() == 0x8000);
 
     // Add symbol at start of page
-    Symbol* page_start = module.add_symbol("page_start", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* page_start = module.add_symbol("page_start", loc, 0x8000,
+                                           SymbolType::AddressRelative);
     Opcode* page_start_opcode = page->last_opcode();
     page_start->set_opcode(page_start_opcode);
     page_start->set_offset(0);
@@ -3029,7 +3138,8 @@ TEST_CASE("Integration: section with alignment and symbols", "[model][integratio
 // Section opcode pointer stability tests
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Section: add_opcode returns pointer to added opcode", "[model][section][opcode]") {
+TEST_CASE("Section: add_opcode returns pointer to added opcode",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
 
@@ -3048,7 +3158,8 @@ TEST_CASE("Section: add_opcode returns pointer to added opcode", "[model][sectio
     REQUIRE(opcode1 != opcode2);
 }
 
-TEST_CASE("Section: opcode pointers remain stable across additions", "[model][section][opcode]") {
+TEST_CASE("Section: opcode pointers remain stable across additions",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
 
@@ -3077,7 +3188,8 @@ TEST_CASE("Section: opcode pointers remain stable across additions", "[model][se
     REQUIRE(section.opcodes().size() == 102); // section starts with empty opcode
 }
 
-TEST_CASE("Section: opcode pointers can be modified through returned pointer", "[model][section][opcode]") {
+TEST_CASE("Section: opcode pointers can be modified through returned pointer",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
 
@@ -3099,7 +3211,8 @@ TEST_CASE("Section: opcode pointers can be modified through returned pointer", "
     REQUIRE(opcodes[1]->bytes()[1] == 0x42);
 }
 
-TEST_CASE("Section: opcode pointers with patches remain stable", "[model][section][opcode]") {
+TEST_CASE("Section: opcode pointers with patches remain stable",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section section("CODE");
@@ -3129,13 +3242,15 @@ TEST_CASE("Section: opcode pointers with patches remain stable", "[model][sectio
 // Section last_opcode() tests
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Section: last_opcode never returns nullptr", "[model][section][opcode]") {
+TEST_CASE("Section: last_opcode never returns nullptr",
+          "[model][section][opcode]") {
     Section section("CODE");
 
     REQUIRE(section.last_opcode() != nullptr);
 }
 
-TEST_CASE("Section: last_opcode returns pointer to last added opcode", "[model][section][opcode]") {
+TEST_CASE("Section: last_opcode returns pointer to last added opcode",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
 
@@ -3166,7 +3281,8 @@ TEST_CASE("Section: last_opcode const version", "[model][section][opcode]") {
     REQUIRE(last->bytes()[1] == 0x42);
 }
 
-TEST_CASE("Section: last_opcode can be used to modify last opcode", "[model][section][opcode]") {
+TEST_CASE("Section: last_opcode can be used to modify last opcode",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
 
@@ -3185,7 +3301,8 @@ TEST_CASE("Section: last_opcode can be used to modify last opcode", "[model][sec
     REQUIRE(section.last_opcode()->bytes()[1] == 0x42);
 }
 
-TEST_CASE("Section: last_opcode after clear_opcodes", "[model][section][opcode]") {
+TEST_CASE("Section: last_opcode after clear_opcodes",
+          "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
     REQUIRE(section.last_opcode() != nullptr);
@@ -3224,7 +3341,8 @@ TEST_CASE("Section: last_opcode with patches", "[model][section][opcode]") {
 // Integration tests: Opcode pointer stability with symbols
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: label symbol with opcode pointer", "[model][integration]") {
+TEST_CASE("Integration: label symbol with opcode pointer",
+          "[model][integration]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3248,7 +3366,8 @@ TEST_CASE("Integration: label symbol with opcode pointer", "[model][integration]
     REQUIRE(label->opcode() == label_opcode);
 }
 
-TEST_CASE("Integration: multiple labels with stable opcode pointers", "[model][integration]") {
+TEST_CASE("Integration: multiple labels with stable opcode pointers",
+          "[model][integration]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3262,7 +3381,8 @@ TEST_CASE("Integration: multiple labels with stable opcode pointers", "[model][i
         label_opcodes.push_back(opcode);
 
         std::string label_name = "label" + std::to_string(i);
-        Symbol* label = module.add_symbol(label_name, loc, i, SymbolType::AddressRelative);
+        Symbol* label = module.add_symbol(label_name, loc, i,
+                                          SymbolType::AddressRelative);
         label->set_opcode(section->last_opcode());
         labels.push_back(label);
     }
@@ -3279,7 +3399,8 @@ TEST_CASE("Integration: multiple labels with stable opcode pointers", "[model][i
     }
 }
 
-TEST_CASE("Integration: last_opcode for associating labels", "[model][integration]") {
+TEST_CASE("Integration: last_opcode for associating labels",
+          "[model][integration]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3292,7 +3413,8 @@ TEST_CASE("Integration: last_opcode for associating labels", "[model][integratio
     section->add_opcode(Opcode({ 0x00 }, loc));         // NOP (at loop:)
     Opcode* loop_opcode = section->last_opcode();
 
-    Symbol* loop_label = module.add_symbol("loop", loc, 0, SymbolType::AddressRelative);
+    Symbol* loop_label = module.add_symbol("loop", loc, 0,
+                                           SymbolType::AddressRelative);
     loop_label->set_opcode(loop_opcode);
 
     loc.set_line_num(30);
@@ -3310,20 +3432,23 @@ TEST_CASE("Integration: last_opcode for associating labels", "[model][integratio
     REQUIRE(section->opcodes().size() == 5); // section starts with empty opcode
 }
 
-TEST_CASE("Integration: opcode pointer stability across section switches", "[model][integration]") {
+TEST_CASE("Integration: opcode pointer stability across section switches",
+          "[model][integration]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
     // CODE section
     Section* code = module.add_section("CODE");
     Opcode* code_opcode = code->add_opcode(Opcode({ 0x00 }, loc));
-    Symbol* code_label = module.add_symbol("start", loc, 0, SymbolType::AddressRelative);
+    Symbol* code_label = module.add_symbol("start", loc, 0,
+                                           SymbolType::AddressRelative);
     code_label->set_opcode(code->last_opcode());
 
     // DATA section
     Section* data = module.add_section("DATA");
     Opcode* data_opcode = data->add_opcode(Opcode({ 0x42 }, loc));
-    Symbol* data_label = module.add_symbol("value", loc, 0, SymbolType::AddressRelative);
+    Symbol* data_label = module.add_symbol("value", loc, 0,
+                                           SymbolType::AddressRelative);
     data_label->set_opcode(data->last_opcode());
 
     // Back to CODE
@@ -3341,7 +3466,8 @@ TEST_CASE("Integration: opcode pointer stability across section switches", "[mod
     REQUIRE(data_label->opcode() == data_opcode);
 }
 
-TEST_CASE("Integration: opcode modification through stable pointers", "[model][integration]") {
+TEST_CASE("Integration: opcode modification through stable pointers",
+          "[model][integration]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3366,7 +3492,8 @@ TEST_CASE("Integration: opcode modification through stable pointers", "[model][i
     REQUIRE(placeholder->has_patches());
 }
 
-TEST_CASE("Integration: last_opcode workflow for label association", "[model][integration]") {
+TEST_CASE("Integration: last_opcode workflow for label association",
+          "[model][integration]") {
     Location loc("program.asm", 1);
     Module module("MAIN", loc);
     Section* section = module.current_section();
@@ -3408,7 +3535,8 @@ TEST_CASE("Integration: last_opcode workflow for label association", "[model][in
     REQUIRE(loop->opcode() == loop_opcode);
 }
 
-TEST_CASE("Integration: opcode pointers survive section operations", "[model][integration]") {
+TEST_CASE("Integration: opcode pointers survive section operations",
+          "[model][integration]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
@@ -3419,7 +3547,8 @@ TEST_CASE("Integration: opcode pointers survive section operations", "[model][in
     // Add opcodes and save pointers
     std::vector<Opcode*> opcodes;
     for (int i = 0; i < 10; ++i) {
-        opcodes.push_back(section->add_opcode(Opcode({ static_cast<uint8_t>(i) }, loc)));
+        opcodes.push_back(section->add_opcode(Opcode({ static_cast<uint8_t>(i) },
+                                              loc)));
     }
 
     // Perform section operations
@@ -3489,7 +3618,8 @@ TEST_CASE("Symbol: label constructor default type", "[model][symbol]") {
     REQUIRE(label.is_defined());
 }
 
-TEST_CASE("Symbol: label constructor opcode pointer stability", "[model][symbol]") {
+TEST_CASE("Symbol: label constructor opcode pointer stability",
+          "[model][symbol]") {
     Location loc("test.asm", 20);
     Section section("CODE");
 
@@ -3515,7 +3645,8 @@ TEST_CASE("Symbol: label constructor opcode pointer stability", "[model][symbol]
 // Integration test: Complete label workflow with new constructor
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: label creation workflow with new constructor", "[model][integration]") {
+TEST_CASE("Integration: label creation workflow with new constructor",
+          "[model][integration]") {
     Location loc("program.asm", 1);
     Module module("MAIN", loc);
 
@@ -3528,7 +3659,8 @@ TEST_CASE("Integration: label creation workflow with new constructor", "[model][
 
     // Label at current position
     loc.set_line_num(11);
-    Opcode* start_opcode = section->add_opcode(Opcode({ 0x3E, 0x00 }, loc));  // LD A, 0
+    Opcode* start_opcode = section->add_opcode(Opcode({ 0x3E, 0x00 },
+                           loc));  // LD A, 0
 
     // Create label using new constructor
     Symbol start_label("start", loc, start_opcode, 1);
@@ -3547,7 +3679,8 @@ TEST_CASE("Integration: label creation workflow with new constructor", "[model][
     section->add_opcode(Opcode({ 0x3C }, loc));  // INC A
 
     loc.set_line_num(13);
-    Opcode* loop_opcode = section->add_opcode(Opcode({ 0x00 }, loc));  // NOP (placeholder)
+    Opcode* loop_opcode = section->add_opcode(Opcode({ 0x00 },
+                          loc));  // NOP (placeholder)
     Symbol loop_label("loop", loc, loop_opcode, 3);
 
     loc.set_line_num(14);
@@ -3559,7 +3692,8 @@ TEST_CASE("Integration: label creation workflow with new constructor", "[model][
     REQUIRE(section->opcodes().size() == 6); // section starts with empty opcode
 }
 
-TEST_CASE("Integration: public label with new constructor", "[model][integration]") {
+TEST_CASE("Integration: public label with new constructor",
+          "[model][integration]") {
     Location loc("module.asm", 10);
     Module module("MYLIB", loc);
 
@@ -3596,11 +3730,11 @@ TEST_CASE("Expression: parse simple symbol reference", "[model][expr][parse]") {
     module.add_symbol("value", loc, 42, SymbolType::Constant);
 
     // Parse expression referencing the symbol
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "value", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "value", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 1);
 
@@ -3608,17 +3742,18 @@ TEST_CASE("Expression: parse simple symbol reference", "[model][expr][parse]") {
     REQUIRE(expr.evaluate() == 42);
 }
 
-TEST_CASE("Expression: parse undefined symbol creates symbol", "[model][expr][parse]") {
+TEST_CASE("Expression: parse undefined symbol creates symbol",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
 
     // Parse expression with undefined symbol
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "unknown", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "unknown", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 1);
 
@@ -3631,7 +3766,8 @@ TEST_CASE("Expression: parse undefined symbol creates symbol", "[model][expr][pa
     REQUIRE_THROWS_AS(expr.evaluate(), UndefinedSymbol);
 }
 
-TEST_CASE("Expression: parse $ (dollar) resolves to current opcode", "[model][expr][parse]") {
+TEST_CASE("Expression: parse $ (dollar) resolves to current opcode",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3643,11 +3779,11 @@ TEST_CASE("Expression: parse $ (dollar) resolves to current opcode", "[model][ex
     section->add_opcode(Opcode({ 0x00 }, loc));          // 0x8003
 
     // Parse expression with $
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Dollar, "$", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 1);
 
@@ -3655,7 +3791,8 @@ TEST_CASE("Expression: parse $ (dollar) resolves to current opcode", "[model][ex
     REQUIRE(expr.evaluate() == 0x8003);
 }
 
-TEST_CASE("Expression: parse ASMPC resolves to current opcode", "[model][expr][parse]") {
+TEST_CASE("Expression: parse ASMPC resolves to current opcode",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3664,11 +3801,11 @@ TEST_CASE("Expression: parse ASMPC resolves to current opcode", "[model][expr][p
     section->add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));  // 0x9000
 
     // Parse expression with ASMPC
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::ASMPC, "ASMPC", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::ASMPC, "ASMPC", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     REQUIRE(expr.evaluate() == 0x9000);
@@ -3684,13 +3821,13 @@ TEST_CASE("Expression: parse arithmetic with symbols", "[model][expr][parse]") {
     module.add_symbol("offset", loc, 0x100, SymbolType::Constant);
 
     // Parse: base + offset
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "base", true));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::Identifier, "offset", true));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "base", true));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::Identifier, "offset", true));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 3);
 
@@ -3708,13 +3845,13 @@ TEST_CASE("Expression: parse $ with offset", "[model][expr][parse]") {
     section->add_opcode(Opcode({ 0x18, 0x00 }, loc));  // JR at 0x8002
 
     // Parse: $ + 2 (for JR offset calculation)
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Dollar, "$", true));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::Integer, "2", 2, true));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Dollar, "$", true));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, true));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     REQUIRE(expr.evaluate() == 0x8004);  // $ (0x8002) + 2
@@ -3737,18 +3874,19 @@ TEST_CASE("Expression: parse address-relative symbol", "[model][expr][parse]") {
     label->set_offset(0);  // Offset from opcode start
 
     // Parse expression referencing label
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "start", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "start", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     section->compute_opcodes_addresses();
     REQUIRE(expr.evaluate() == 0x8001);
 }
 
-TEST_CASE("Expression: parse complex expression with symbols and $", "[model][expr][parse]") {
+TEST_CASE("Expression: parse complex expression with symbols and $",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3759,24 +3897,25 @@ TEST_CASE("Expression: parse complex expression with symbols and $", "[model][ex
     section->add_opcode(Opcode({ 0x18, 0x00 }, loc));  // JR at 0x8000
 
     // Parse: target - ($ + 2)  (JR offset calculation)
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "target", true));
-    line.push_back(Token(TokenType::Minus, "-", true));
-    line.push_back(Token(TokenType::LeftParen, "(", true));
-    line.push_back(Token(TokenType::Dollar, "$", false));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::Integer, "2", 2, true));
-    line.push_back(Token(TokenType::RightParen, ")", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "target", true));
+    line.tokens().push_back(Token(TokenType::Minus, "-", true));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", true));
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, true));
+    line.tokens().push_back(Token(TokenType::RightParen, ")", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(i == 7);
 
     REQUIRE(expr.evaluate() == 0xFE);  // 0x8100 - 0x8002 = 254
 }
 
-TEST_CASE("Expression: multiple symbols in expression", "[model][expr][parse]") {
+TEST_CASE("Expression: multiple symbols in expression",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3786,21 +3925,22 @@ TEST_CASE("Expression: multiple symbols in expression", "[model][expr][parse]") 
     module.add_symbol("c", loc, 5, SymbolType::Constant);
 
     // Parse: a * b + c
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "a", true));
-    line.push_back(Token(TokenType::Multiply, "*", true));
-    line.push_back(Token(TokenType::Identifier, "b", true));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::Identifier, "c", true));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "a", true));
+    line.tokens().push_back(Token(TokenType::Multiply, "*", true));
+    line.tokens().push_back(Token(TokenType::Identifier, "b", true));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::Identifier, "c", true));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     REQUIRE(expr.evaluate() == 205);  // 10 * 20 + 5
 }
 
-TEST_CASE("Expression: symbol with bitwise operations", "[model][expr][parse]") {
+TEST_CASE("Expression: symbol with bitwise operations",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -3808,51 +3948,54 @@ TEST_CASE("Expression: symbol with bitwise operations", "[model][expr][parse]") 
     module.add_symbol("flags", loc, 0xFF, SymbolType::Constant);
 
     // Parse: flags & 0x0F
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "flags", true));
-    line.push_back(Token(TokenType::BitwiseAnd, "&", true));
-    line.push_back(Token(TokenType::Integer, "0x0F", 0x0F, true));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "flags", true));
+    line.tokens().push_back(Token(TokenType::BitwiseAnd, "&", true));
+    line.tokens().push_back(Token(TokenType::Integer, "0x0F", 0x0F, true));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     REQUIRE(expr.evaluate() == 0x0F);
 }
 
-TEST_CASE("Expression: parse without module context throws", "[model][expr][parse]") {
+TEST_CASE("Expression: parse without module context throws",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "symbol", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "symbol", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
 
     // Parsing without module should throw
     REQUIRE_THROWS_AS(expr.parse(line, i, nullptr, nullptr), UndefinedSymbol);
 }
 
-TEST_CASE("Expression: parse $ without section context throws", "[model][expr][parse]") {
+TEST_CASE("Expression: parse $ without section context throws",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Dollar, "$", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
 
     // Parsing $ without section should throw
     REQUIRE_THROWS_AS(expr.parse(line, i, nullptr, nullptr), InvalidDollar);
 }
 
-TEST_CASE("Expression: parse $ without opcodes throws", "[model][expr][parse]") {
+TEST_CASE("Expression: parse $ without opcodes throws",
+          "[model][expr][parse]") {
     Location loc("test.asm", 10);
     // No opcodes added
 
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Dollar, "$", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
 
     // Parsing $ with empty section should throw
     REQUIRE_THROWS_AS(expr.parse(line, i, nullptr, nullptr), InvalidDollar);
@@ -3862,7 +4005,8 @@ TEST_CASE("Expression: parse $ without opcodes throws", "[model][expr][parse]") 
 // Integration tests: Expression with label symbols
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: label reference in expression", "[model][integration][expr]") {
+TEST_CASE("Integration: label reference in expression",
+          "[model][integration][expr]") {
     Location loc("program.asm", 1);
     Module module("MAIN", loc);
     Section* section = module.current_section();
@@ -3873,7 +4017,8 @@ TEST_CASE("Integration: label reference in expression", "[model][integration][ex
     section->add_opcode(Opcode({ 0x00 }, loc));  // 0x8000: NOP
 
     loc.set_line_num(11);
-    Opcode* loop_opcode = section->add_opcode(Opcode({ 0x3E, 0x00 }, loc));  // 0x8001: LD A, 0
+    Opcode* loop_opcode = section->add_opcode(Opcode({ 0x3E, 0x00 },
+                          loc));  // 0x8001: LD A, 0
     Symbol* loop = module.add_symbol("loop", loc);
     loop->set_type(SymbolType::AddressRelative);
     loop->set_opcode(loop_opcode);
@@ -3883,38 +4028,40 @@ TEST_CASE("Integration: label reference in expression", "[model][integration][ex
     section->add_opcode(Opcode({ 0x3C }, loc));  // 0x8003: INC A
 
     loc.set_line_num(13);
-    section->add_opcode(Opcode({ 0x18, 0x00 }, loc));  // 0x8004: JR loop (offset to be calculated)
+    section->add_opcode(Opcode({ 0x18, 0x00 },
+                               loc));  // 0x8004: JR loop (offset to be calculated)
 
     // Calculate JR offset: loop - ($ + 2)
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "loop", true));
-    line.push_back(Token(TokenType::Minus, "-", true));
-    line.push_back(Token(TokenType::LeftParen, "(", true));
-    line.push_back(Token(TokenType::Dollar, "$", false));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::Integer, "2", 2, true));
-    line.push_back(Token(TokenType::RightParen, ")", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "loop", true));
+    line.tokens().push_back(Token(TokenType::Minus, "-", true));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", true));
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, true));
+    line.tokens().push_back(Token(TokenType::RightParen, ")", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     section->compute_opcodes_addresses();
     REQUIRE(expr.evaluate() == -5);  // 0x8001 - 0x8006 = -5 (correct JR offset)
 }
 
-TEST_CASE("Integration: forward reference in expression", "[model][integration][expr]") {
+TEST_CASE("Integration: forward reference in expression",
+          "[model][integration][expr]") {
     Location loc("program.asm", 10);
     Module module("MAIN", loc);
     Section* section = module.current_section();
     section->set_base_address(0x8000);
 
     // Parse expression with forward reference (symbol defined later)
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "end_label", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "end_label", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     // Symbol should be created but undefined
@@ -3950,11 +4097,11 @@ TEST_CASE("Integration: expression in patch", "[model][integration][expr]") {
     Opcode* jp_opcode = section->add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));
 
     // Create expression for patch: target
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "target", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "target", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     // Add patch to opcode
@@ -3970,7 +4117,8 @@ TEST_CASE("Integration: expression in patch", "[model][integration][expr]") {
     REQUIRE(jp_opcode->patches()[0].expression().evaluate() == 0x8000);
 }
 
-TEST_CASE("Integration: $ in different sections", "[model][integration][expr]") {
+TEST_CASE("Integration: $ in different sections",
+          "[model][integration][expr]") {
     Location loc("multi.asm", 10);
     Module module("TEST", loc);
 
@@ -3981,11 +4129,11 @@ TEST_CASE("Integration: $ in different sections", "[model][integration][expr]") 
     code->add_opcode(Opcode({ 0x00 }, loc));
 
     // Parse $ in CODE section
-    TokensLine line1(loc);
-    line1.push_back(Token(TokenType::Dollar, "$", false));
+    TokenLine line1(loc);
+    line1.tokens().push_back(Token(TokenType::Dollar, "$", false));
 
     Expression expr1;
-    unsigned i1 = 0;
+    size_t i1 = 0;
     REQUIRE(expr1.parse(line1, i1, &module, code));
 
     REQUIRE(expr1.evaluate() == 0x8001);  // Last opcode in CODE
@@ -3996,17 +4144,18 @@ TEST_CASE("Integration: $ in different sections", "[model][integration][expr]") 
     data->add_opcode(Opcode({ 0x42 }, loc));
 
     // Parse $ in DATA section
-    TokensLine line2(loc);
-    line2.push_back(Token(TokenType::Dollar, "$", false));
+    TokenLine line2(loc);
+    line2.tokens().push_back(Token(TokenType::Dollar, "$", false));
 
     Expression expr2;
-    unsigned i2 = 0;
+    size_t i2 = 0;
     REQUIRE(expr2.parse(line2, i2, &module, data));
 
     REQUIRE(expr2.evaluate() == 0x9000);  // Last opcode in DATA
 }
 
-TEST_CASE("Integration: expression with PUBLIC symbol", "[model][integration][expr]") {
+TEST_CASE("Integration: expression with PUBLIC symbol",
+          "[model][integration][expr]") {
     Location loc("lib.asm", 10);
     Module module("LIB", loc);
     Section* section = module.current_section();
@@ -4021,11 +4170,11 @@ TEST_CASE("Integration: expression with PUBLIC symbol", "[model][integration][ex
     module.declare_symbol("api_init", loc, SymbolScope::Public);
 
     // Use in expression
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "api_init", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "api_init", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     section->compute_opcodes_addresses();
@@ -4033,7 +4182,8 @@ TEST_CASE("Integration: expression with PUBLIC symbol", "[model][integration][ex
     REQUIRE(api_func->is_public());
 }
 
-TEST_CASE("Integration: complex offset calculation", "[model][integration][expr]") {
+TEST_CASE("Integration: complex offset calculation",
+          "[model][integration][expr]") {
     Location loc("calc.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4047,19 +4197,19 @@ TEST_CASE("Integration: complex offset calculation", "[model][integration][expr]
     section->add_opcode(Opcode({ 0x00 }, loc));
 
     // Calculate: base_addr + (index * struct_size) + 4
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "base_addr", true));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::LeftParen, "(", true));
-    line.push_back(Token(TokenType::Identifier, "index", false));
-    line.push_back(Token(TokenType::Multiply, "*", true));
-    line.push_back(Token(TokenType::Identifier, "struct_size", true));
-    line.push_back(Token(TokenType::RightParen, ")", false));
-    line.push_back(Token(TokenType::Plus, "+", true));
-    line.push_back(Token(TokenType::Integer, "4", 4, true));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "base_addr", true));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", true));
+    line.tokens().push_back(Token(TokenType::Identifier, "index", false));
+    line.tokens().push_back(Token(TokenType::Multiply, "*", true));
+    line.tokens().push_back(Token(TokenType::Identifier, "struct_size", true));
+    line.tokens().push_back(Token(TokenType::RightParen, ")", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", true));
+    line.tokens().push_back(Token(TokenType::Integer, "4", 4, true));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
 
     REQUIRE(expr.evaluate() == 0x9034);  // 0x9000 + (3 * 16) + 4
@@ -4069,7 +4219,8 @@ TEST_CASE("Integration: complex offset calculation", "[model][integration][expr]
 // CompilationUnit tests
 //-----------------------------------------------------------------------------
 
-TEST_CASE("CompilationUnit: constructor creates default empty module", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: constructor creates default empty module",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4082,7 +4233,8 @@ TEST_CASE("CompilationUnit: constructor creates default empty module", "[model][
     REQUIRE(unit.current_module()->name() == "");
 }
 
-TEST_CASE("CompilationUnit: default module is current after construction", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: default module is current after construction",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4090,7 +4242,8 @@ TEST_CASE("CompilationUnit: default module is current after construction", "[mod
     REQUIRE(unit.current_module() == default_module);
 }
 
-TEST_CASE("CompilationUnit: add_module creates new module and makes it current", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: add_module creates new module and makes it current",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4102,7 +4255,8 @@ TEST_CASE("CompilationUnit: add_module creates new module and makes it current",
     REQUIRE(unit.current_module() == main_module);
 }
 
-TEST_CASE("CompilationUnit: add_module with existing name returns existing", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: add_module with existing name returns existing",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4117,7 +4271,8 @@ TEST_CASE("CompilationUnit: add_module with existing name returns existing", "[m
     REQUIRE(unit.current_module() == main1);  // MAIN is now current again
 }
 
-TEST_CASE("CompilationUnit: module pointer stability across additions", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: module pointer stability across additions",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4141,7 +4296,8 @@ TEST_CASE("CompilationUnit: module pointer stability across additions", "[model]
     REQUIRE(unit.modules().size() == 5);
 }
 
-TEST_CASE("CompilationUnit: module pointers remain stable when switching modules", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: module pointers remain stable when switching modules",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4159,7 +4315,8 @@ TEST_CASE("CompilationUnit: module pointers remain stable when switching modules
     REQUIRE(unit.current_module() == lib);
 }
 
-TEST_CASE("CompilationUnit: find_module returns correct module", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: find_module returns correct module",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4172,7 +4329,8 @@ TEST_CASE("CompilationUnit: find_module returns correct module", "[model][compil
     REQUIRE(unit.find_module("NONEXISTENT") == nullptr);
 }
 
-TEST_CASE("CompilationUnit: clear_modules recreates default module", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: clear_modules recreates default module",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4192,7 +4350,8 @@ TEST_CASE("CompilationUnit: clear_modules recreates default module", "[model][co
     REQUIRE(unit.current_module()->name() == "");
 }
 
-TEST_CASE("CompilationUnit: current_module const accessor", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: current_module const accessor",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
@@ -4225,7 +4384,8 @@ TEST_CASE("CompilationUnit: module iteration", "[model][compilation_unit]") {
 // Integration tests: CompilationUnit with modules and symbols
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: compilation unit with multiple modules", "[model][integration]") {
+TEST_CASE("Integration: compilation unit with multiple modules",
+          "[model][integration]") {
     Location loc("program.asm", 1);
     CompilationUnit unit("program", loc);
 
@@ -4307,7 +4467,8 @@ TEST_CASE("Integration: default module behavior", "[model][integration]") {
     REQUIRE(main->symbols().size() == 1);
 }
 
-TEST_CASE("Integration: compilation unit with sections and modules", "[model][integration]") {
+TEST_CASE("Integration: compilation unit with sections and modules",
+          "[model][integration]") {
     Location loc("complete.asm", 1);
     CompilationUnit unit("complete", loc);
 
@@ -4317,7 +4478,8 @@ TEST_CASE("Integration: compilation unit with sections and modules", "[model][in
     code->set_base_address(0x8000);
 
     loc.set_line_num(10);
-    Symbol* start = main->add_symbol("start", loc, 0x8000, SymbolType::AddressRelative);
+    Symbol* start = main->add_symbol("start", loc, 0x8000,
+                                     SymbolType::AddressRelative);
     Opcode* start_opcode = code->last_opcode();
     start->set_opcode(start_opcode);
     start->set_scope(SymbolScope::Public);
@@ -4330,7 +4492,8 @@ TEST_CASE("Integration: compilation unit with sections and modules", "[model][in
     data->set_base_address(0x9000);
 
     loc.set_line_num(20);
-    Symbol* buffer = lib->add_symbol("buffer", loc, 0x9000, SymbolType::AddressRelative);
+    Symbol* buffer = lib->add_symbol("buffer", loc, 0x9000,
+                                     SymbolType::AddressRelative);
     Opcode* buffer_opcode = data->last_opcode();
     buffer->set_opcode(buffer_opcode);
     buffer->set_scope(SymbolScope::Public);
@@ -4346,12 +4509,13 @@ TEST_CASE("Integration: compilation unit with sections and modules", "[model][in
     REQUIRE(buffer->opcode() == buffer_opcode);
 }
 
-TEST_CASE("CompilationUnit: modules accessor provides const reference", "[model][compilation_unit]") {
+TEST_CASE("CompilationUnit: modules accessor provides const reference",
+          "[model][compilation_unit]") {
     Location loc("test.asm", 1);
     CompilationUnit unit("test", loc);
 
     unit.add_module("MAIN");
-    
+
     // Access via const reference - accessor returns const
     const auto& modules = unit.modules();
     REQUIRE(modules.size() == 2);
@@ -4368,21 +4532,24 @@ TEST_CASE("Expression: integer is constant", "[model][expr][constant]") {
     REQUIRE(node->is_constant());
 }
 
-TEST_CASE("Expression: simple arithmetic is constant", "[model][expr][constant]") {
+TEST_CASE("Expression: simple arithmetic is constant",
+          "[model][expr][constant]") {
     auto node = make_binary_op(ExprOp::Add, make_integer(3), make_integer(4));
     REQUIRE(node->is_constant());
 }
 
-TEST_CASE("Expression: complex arithmetic is constant", "[model][expr][constant]") {
+TEST_CASE("Expression: complex arithmetic is constant",
+          "[model][expr][constant]") {
     auto node = make_binary_op(
-        ExprOp::Multiply,
-        make_binary_op(ExprOp::Add, make_integer(2), make_integer(3)),
-        make_integer(4)
-    );
+                    ExprOp::Multiply,
+                    make_binary_op(ExprOp::Add, make_integer(2), make_integer(3)),
+                    make_integer(4)
+                );
     REQUIRE(node->is_constant());
 }
 
-TEST_CASE("Expression: unary operators preserve constant", "[model][expr][constant]") {
+TEST_CASE("Expression: unary operators preserve constant",
+          "[model][expr][constant]") {
     {
         auto node = make_unary_op(ExprOp::UnaryMinus, make_integer(5));
         REQUIRE(node->is_constant());
@@ -4393,16 +4560,18 @@ TEST_CASE("Expression: unary operators preserve constant", "[model][expr][consta
     }
 }
 
-TEST_CASE("Expression: ternary with all constants is constant", "[model][expr][constant]") {
+TEST_CASE("Expression: ternary with all constants is constant",
+          "[model][expr][constant]") {
     auto node = make_conditional(
-        make_integer(1),
-        make_integer(42),
-        make_integer(99)
-    );
+                    make_integer(1),
+                    make_integer(42),
+                    make_integer(99)
+                );
     REQUIRE(node->is_constant());
 }
 
-TEST_CASE("Expression: constant symbol is constant", "[model][expr][constant]") {
+TEST_CASE("Expression: constant symbol is constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Symbol* sym = module.add_symbol("MAX", loc, 100, SymbolType::Constant);
@@ -4411,7 +4580,8 @@ TEST_CASE("Expression: constant symbol is constant", "[model][expr][constant]") 
     REQUIRE(node->is_constant());
 }
 
-TEST_CASE("Expression: undefined symbol is not constant", "[model][expr][constant]") {
+TEST_CASE("Expression: undefined symbol is not constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Symbol* sym = module.add_symbol("undefined", loc);
@@ -4420,7 +4590,8 @@ TEST_CASE("Expression: undefined symbol is not constant", "[model][expr][constan
     REQUIRE_FALSE(node->is_constant());
 }
 
-TEST_CASE("Expression: address-relative symbol is not constant", "[model][expr][constant]") {
+TEST_CASE("Expression: address-relative symbol is not constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4434,15 +4605,16 @@ TEST_CASE("Expression: address-relative symbol is not constant", "[model][expr][
     REQUIRE_FALSE(node->is_constant());
 }
 
-TEST_CASE("Expression: computed symbol with constant expr is constant", "[model][expr][constant]") {
+TEST_CASE("Expression: computed symbol with constant expr is constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
 
     Expression expr(make_binary_op(
-        ExprOp::Add,
-        make_integer(10),
-        make_integer(32)
-    ), loc);
+                        ExprOp::Add,
+                        make_integer(10),
+                        make_integer(32)
+                    ), loc);
 
     Symbol* sym = module.add_symbol("computed", loc);
     sym->set_type(SymbolType::Computed);
@@ -4452,7 +4624,8 @@ TEST_CASE("Expression: computed symbol with constant expr is constant", "[model]
     REQUIRE(node->is_constant());
 }
 
-TEST_CASE("Expression: computed symbol with non-constant expr is not constant", "[model][expr][constant]") {
+TEST_CASE("Expression: computed symbol with non-constant expr is not constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4465,10 +4638,10 @@ TEST_CASE("Expression: computed symbol with non-constant expr is not constant", 
 
     // Create computed symbol that references the label
     Expression expr(make_binary_op(
-        ExprOp::Add,
-        make_symbol(label),
-        make_integer(10)
-    ), loc);
+                        ExprOp::Add,
+                        make_symbol(label),
+                        make_integer(10)
+                    ), loc);
 
     Symbol* computed = module.add_symbol("computed", loc);
     computed->set_type(SymbolType::Computed);
@@ -4489,7 +4662,8 @@ TEST_CASE("Expression: $ (dollar) is not constant", "[model][expr][constant]") {
     REQUIRE_FALSE(node->is_constant());
 }
 
-TEST_CASE("Expression: expression with $ is not constant", "[model][expr][constant]") {
+TEST_CASE("Expression: expression with $ is not constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4497,14 +4671,15 @@ TEST_CASE("Expression: expression with $ is not constant", "[model][expr][consta
     section->add_opcode(Opcode({ 0x00 }, loc));
 
     auto node = make_binary_op(
-        ExprOp::Add,
-        make_dollar(section->last_opcode(), section),
-        make_integer(10)
-    );
+                    ExprOp::Add,
+                    make_dollar(section->last_opcode(), section),
+                    make_integer(10)
+                );
     REQUIRE_FALSE(node->is_constant());
 }
 
-TEST_CASE("Expression: mixed constant and non-constant is not constant", "[model][expr][constant]") {
+TEST_CASE("Expression: mixed constant and non-constant is not constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4517,14 +4692,15 @@ TEST_CASE("Expression: mixed constant and non-constant is not constant", "[model
     label->set_opcode(opcode);
 
     auto node = make_binary_op(
-        ExprOp::Add,
-        make_symbol(constant),
-        make_symbol(label)
-    );
+                    ExprOp::Add,
+                    make_symbol(constant),
+                    make_symbol(label)
+                );
     REQUIRE_FALSE(node->is_constant());
 }
 
-TEST_CASE("Expression: Expression container is_constant", "[model][expr][constant]") {
+TEST_CASE("Expression: Expression container is_constant",
+          "[model][expr][constant]") {
     Location loc("test.asm", 10);
 
     {
@@ -4534,10 +4710,10 @@ TEST_CASE("Expression: Expression container is_constant", "[model][expr][constan
 
     {
         Expression expr(make_binary_op(
-            ExprOp::Add,
-            make_integer(10),
-            make_integer(32)
-        ), loc);
+                            ExprOp::Add,
+                            make_integer(10),
+                            make_integer(32)
+                        ), loc);
         REQUIRE(expr.is_constant());
     }
 
@@ -4547,7 +4723,8 @@ TEST_CASE("Expression: Expression container is_constant", "[model][expr][constan
     }
 }
 
-TEST_CASE("Integration: parse and check constant expression", "[model][integration][constant]") {
+TEST_CASE("Integration: parse and check constant expression",
+          "[model][integration][constant]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4557,15 +4734,15 @@ TEST_CASE("Integration: parse and check constant expression", "[model][integrati
     module.add_symbol("MIN", loc, 0, SymbolType::Constant);
 
     // Parse: MAX + MIN * 2
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "MAX", false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Identifier, "MIN", false));
-    line.push_back(Token(TokenType::Multiply, "*", false));
-    line.push_back(Token(TokenType::Integer, "2", 2, false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "MAX", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Identifier, "MIN", false));
+    line.tokens().push_back(Token(TokenType::Multiply, "*", false));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE(expr.is_constant());
 
@@ -4573,7 +4750,8 @@ TEST_CASE("Integration: parse and check constant expression", "[model][integrati
     REQUIRE(result == 255);
 }
 
-TEST_CASE("Integration: parse and check non-constant expression", "[model][integration][constant]") {
+TEST_CASE("Integration: parse and check non-constant expression",
+          "[model][integration][constant]") {
     Location loc("test.asm", 1);
     Module module("TEST", loc);
     Section* section = module.current_section();
@@ -4588,13 +4766,13 @@ TEST_CASE("Integration: parse and check non-constant expression", "[model][integ
     label->set_opcode(opcode);
 
     // Parse: start + OFFSET (not constant because of label)
-    TokensLine line(loc);
-    line.push_back(Token(TokenType::Identifier, "start", false));
-    line.push_back(Token(TokenType::Plus, "+", false));
-    line.push_back(Token(TokenType::Identifier, "OFFSET", false));
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "start", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Identifier, "OFFSET", false));
 
     Expression expr;
-    unsigned i = 0;
+    size_t i = 0;
     REQUIRE(expr.parse(line, i, &module, section));
     REQUIRE_FALSE(expr.is_constant());  // Contains label
 }
@@ -4635,7 +4813,8 @@ TEST_CASE("Library: add module with public symbols", "[model][library]") {
     auto module = std::make_unique<Module>("MOD1", loc);
 
     // Add public symbol
-    Symbol* sym = module->add_symbol("exported_func", loc, 0x8000, SymbolType::Constant);
+    Symbol* sym = module->add_symbol("exported_func", loc, 0x8000,
+                                     SymbolType::Constant);
     sym->set_scope(SymbolScope::Public);
 
     lib.add_module(std::move(module));
@@ -4829,7 +5008,8 @@ TEST_CASE("Library: public symbol index iteration", "[model][library]") {
 // Integration tests: Library with complete modules
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: library with code modules", "[model][integration][library]") {
+TEST_CASE("Integration: library with code modules",
+          "[model][integration][library]") {
     Library lib("math.lib");
     Location loc("math.asm", 1);
 
@@ -4864,7 +5044,8 @@ TEST_CASE("Integration: library with code modules", "[model][integration][librar
     REQUIRE(found_symbol->is_public());
 }
 
-TEST_CASE("Integration: library linking scenario", "[model][integration][library]") {
+TEST_CASE("Integration: library linking scenario",
+          "[model][integration][library]") {
     // Simulate linking scenario:
     // Main program calls library function
 
@@ -4893,7 +5074,8 @@ TEST_CASE("Integration: library linking scenario", "[model][integration][library
 
     // Declare external reference to print
     loc.set_line_num(20);
-    Symbol* print_ref = main_module->declare_symbol("print", loc, SymbolScope::Extern);
+    Symbol* print_ref = main_module->declare_symbol("print", loc,
+                        SymbolScope::Extern);
     REQUIRE(print_ref->is_extern());
 
     // Add CALL instruction with patch
@@ -4918,20 +5100,23 @@ TEST_CASE("Integration: library linking scenario", "[model][integration][library
     REQUIRE(call_opcode->patches()[0].range() == PatchRange::Word);
 }
 
-TEST_CASE("Integration: library search order", "[model][integration][library]") {
+TEST_CASE("Integration: library search order",
+          "[model][integration][library]") {
     // Multiple libraries with duplicate symbols - first library wins
 
     Location loc("test.asm", 1);
 
     Library lib1("lib1.lib");
     auto mod1 = std::make_unique<Module>("MOD1", loc);
-    Symbol* sym1 = mod1->add_symbol("common_func", loc, 0x8000, SymbolType::Constant);
+    Symbol* sym1 = mod1->add_symbol("common_func", loc, 0x8000,
+                                    SymbolType::Constant);
     sym1->set_scope(SymbolScope::Public);
     lib1.add_module(std::move(mod1));
 
     Library lib2("lib2.lib");
     auto mod2 = std::make_unique<Module>("MOD2", loc);
-    Symbol* sym2 = mod2->add_symbol("common_func", loc, 0x9000, SymbolType::Constant);
+    Symbol* sym2 = mod2->add_symbol("common_func", loc, 0x9000,
+                                    SymbolType::Constant);
     sym2->set_scope(SymbolScope::Public);
     lib2.add_module(std::move(mod2));
 
@@ -4941,7 +5126,9 @@ TEST_CASE("Integration: library search order", "[model][integration][library]") 
     Module* found = nullptr;
     for (Library* lib : search_path) {
         found = lib->find_public_symbol("common_func");
-        if (found) break;
+        if (found) {
+            break;
+        }
     }
 
     REQUIRE(found != nullptr);
@@ -5050,7 +5237,8 @@ TEST_CASE("Linker: duplicate public symbols error", "[model][linker]") {
 
     // Module 1: defines public symbol
     auto mod1 = std::make_unique<Module>("MOD1", loc1);
-    Symbol* sym1 = mod1->add_symbol("duplicate", loc1, 0x8000, SymbolType::Constant);
+    Symbol* sym1 = mod1->add_symbol("duplicate", loc1, 0x8000,
+                                    SymbolType::Constant);
     sym1->set_scope(SymbolScope::Public);
     linker.add_module(std::move(mod1));
 
@@ -5058,7 +5246,8 @@ TEST_CASE("Linker: duplicate public symbols error", "[model][linker]") {
 
     // Module 2: defines same public symbol (error)
     auto mod2 = std::make_unique<Module>("MOD2", loc2);
-    Symbol* sym2 = mod2->add_symbol("duplicate", loc2, 0x9000, SymbolType::Constant);
+    Symbol* sym2 = mod2->add_symbol("duplicate", loc2, 0x9000,
+                                    SymbolType::Constant);
     sym2->set_scope(SymbolScope::Public);
     linker.add_module(std::move(mod2));
 
@@ -5086,7 +5275,8 @@ TEST_CASE("Linker: link_libraries resolves symbols", "[model][linker]") {
     // Create library with public symbol
     Library lib("stdio.lib");
     auto lib_module = std::make_unique<Module>("STDIO", loc);
-    Symbol* lib_sym = lib_module->add_symbol("printf", loc, 0xC000, SymbolType::Constant);
+    Symbol* lib_sym = lib_module->add_symbol("printf", loc, 0xC000,
+                      SymbolType::Constant);
     lib_sym->set_scope(SymbolScope::Public);
     lib.add_module(std::move(lib_module));
 
@@ -5221,7 +5411,8 @@ TEST_CASE("Linker: multiple unresolved locations tracked", "[model][linker]") {
 // Integration tests: Complete linking workflow
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: simple program linking", "[model][integration][linker]") {
+TEST_CASE("Integration: simple program linking",
+          "[model][integration][linker]") {
     SuppressErrors suppress;
     Linker linker;
     Location loc("test.asm", 1);
@@ -5231,16 +5422,19 @@ TEST_CASE("Integration: simple program linking", "[model][integration][linker]")
     Section* main_code = main_mod->add_section("CODE");
     main_code->set_base_address(0x8000);
 
-    Symbol* start = main_mod->add_symbol("_start", loc, 0x8000, SymbolType::Constant);
+    Symbol* start = main_mod->add_symbol("_start", loc, 0x8000,
+                                         SymbolType::Constant);
     start->set_scope(SymbolScope::Public);
 
-    /*Symbol* helper_ref =*/ main_mod->declare_symbol("helper", loc, SymbolScope::Extern);
+    /*Symbol* helper_ref =*/ main_mod->declare_symbol("helper", loc,
+            SymbolScope::Extern);
 
     linker.add_module(std::move(main_mod));
 
     // Utility module with helper function
     auto util_mod = std::make_unique<Module>("UTIL", loc);
-    Symbol* helper = util_mod->add_symbol("helper", loc, 0x9000, SymbolType::Constant);
+    Symbol* helper = util_mod->add_symbol("helper", loc, 0x9000,
+                                          SymbolType::Constant);
     helper->set_scope(SymbolScope::Public);
 
     linker.add_module(std::move(util_mod));
@@ -5262,12 +5456,14 @@ TEST_CASE("Integration: linking with library", "[model][integration][linker]") {
     Library stdlib("stdlib.lib");
 
     auto print_mod = std::make_unique<Module>("PRINT", loc);
-    Symbol* print = print_mod->add_symbol("print", loc, 0xC000, SymbolType::Constant);
+    Symbol* print = print_mod->add_symbol("print", loc, 0xC000,
+                                          SymbolType::Constant);
     print->set_scope(SymbolScope::Public);
     stdlib.add_module(std::move(print_mod));
 
     auto math_mod = std::make_unique<Module>("MATH", loc);
-    Symbol* multiply = math_mod->add_symbol("multiply", loc, 0xC100, SymbolType::Constant);
+    Symbol* multiply = math_mod->add_symbol("multiply", loc, 0xC100,
+                                            SymbolType::Constant);
     multiply->set_scope(SymbolScope::Public);
     stdlib.add_module(std::move(math_mod));
 
@@ -5293,7 +5489,8 @@ TEST_CASE("Integration: linking with library", "[model][integration][linker]") {
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: complex linking scenario", "[model][integration][linker]") {
+TEST_CASE("Integration: complex linking scenario",
+          "[model][integration][linker]") {
     SuppressErrors suppress;
     Linker linker;
     Location loc("test.asm", 1);
@@ -5301,14 +5498,16 @@ TEST_CASE("Integration: complex linking scenario", "[model][integration][linker]
     // Library 1: stdio
     Library stdio("stdio.lib");
     auto printf_mod = std::make_unique<Module>("PRINTF", loc);
-    Symbol* printf_sym = printf_mod->add_symbol("printf", loc, 0xC000, SymbolType::Constant);
+    Symbol* printf_sym = printf_mod->add_symbol("printf", loc, 0xC000,
+                         SymbolType::Constant);
     printf_sym->set_scope(SymbolScope::Public);
     stdio.add_module(std::move(printf_mod));
 
     // Library 2: math
     Library math("math.lib");
     auto sqrt_mod = std::make_unique<Module>("SQRT", loc);
-    Symbol* sqrt_sym = sqrt_mod->add_symbol("sqrt", loc, 0xD000, SymbolType::Constant);
+    Symbol* sqrt_sym = sqrt_mod->add_symbol("sqrt", loc, 0xD000,
+                                            SymbolType::Constant);
     sqrt_sym->set_scope(SymbolScope::Public);
     math.add_module(std::move(sqrt_mod));
 
@@ -5338,11 +5537,13 @@ TEST_CASE("Integration: complex linking scenario", "[model][integration][linker]
 
     REQUIRE(success);
     REQUIRE(linker.unresolved_symbol_count() == 0);
-    REQUIRE(linker.public_symbol_count() == 4);  // _start, calc, printf, sqrt (conceptually)
+    REQUIRE(linker.public_symbol_count() ==
+            4);  // _start, calc, printf, sqrt (conceptually)
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: partial linking failure", "[model][integration][linker]") {
+TEST_CASE("Integration: partial linking failure",
+          "[model][integration][linker]") {
     SuppressErrors suppress;
     Linker linker;
     Location loc("test.asm", 10);
@@ -5408,7 +5609,8 @@ TEST_CASE("Patch: resolve ByteUnsigned out of range warns", "[model][patch]") {
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Patch: resolve ByteUnsigned negative value warns", "[model][patch]") {
+TEST_CASE("Patch: resolve ByteUnsigned negative value warns",
+          "[model][patch]") {
     SuppressErrors suppress;
     Location loc("test.asm", 10);
 
@@ -5419,7 +5621,8 @@ TEST_CASE("Patch: resolve ByteUnsigned negative value warns", "[model][patch]") 
     REQUIRE(patch.resolve(bytes, 0, 0));
 
     REQUIRE(bytes[0] == 0xFF);  // -1 as unsigned byte
-    REQUIRE_FALSE(g_errors.has_warnings());  // -1 is in range for unsigned byte (treated as 255)
+    REQUIRE_FALSE(
+        g_errors.has_warnings());  // -1 is in range for unsigned byte (treated as 255)
 }
 
 TEST_CASE("Patch: resolve ByteSigned in range", "[model][patch]") {
@@ -5856,7 +6059,8 @@ TEST_CASE("Patch: resolve with expression evaluation error", "[model][patch]") {
 // Integration tests: Patch with complex expressions
 //-----------------------------------------------------------------------------
 
-TEST_CASE("Integration: patch with computed value", "[model][integration][patch]") {
+TEST_CASE("Integration: patch with computed value",
+          "[model][integration][patch]") {
     SuppressErrors suppress;
     Location loc("test.asm", 10);
     Module module("TEST", loc);
@@ -5867,10 +6071,10 @@ TEST_CASE("Integration: patch with computed value", "[model][integration][patch]
 
     // Create expression: BASE + OFFSET
     Expression expr(make_binary_op(
-        ExprOp::Add,
-        make_symbol(module.find_symbol("BASE")),
-        make_symbol(module.find_symbol("OFFSET"))
-    ), loc);
+                        ExprOp::Add,
+                        make_symbol(module.find_symbol("BASE")),
+                        make_symbol(module.find_symbol("OFFSET"))
+                    ), loc);
 
     Patch patch(0, PatchRange::Word, expr);
 
@@ -5882,7 +6086,8 @@ TEST_CASE("Integration: patch with computed value", "[model][integration][patch]
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
-TEST_CASE("Integration: patch all range types in sequence", "[model][integration][patch]") {
+TEST_CASE("Integration: patch all range types in sequence",
+          "[model][integration][patch]") {
     SuppressErrors suppress;
     Location loc("test.asm", 10);
 
@@ -5937,7 +6142,8 @@ TEST_CASE("Integration: patch all range types in sequence", "[model][integration
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-TEST_CASE("Integration: patch with relative offset calculation", "[model][integration][patch]") {
+TEST_CASE("Integration: patch with relative offset calculation",
+          "[model][integration][patch]") {
     SuppressErrors suppress;
     Location loc("test.asm", 10);
     Module module("TEST", loc);

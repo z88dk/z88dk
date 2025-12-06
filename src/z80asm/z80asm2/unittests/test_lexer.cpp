@@ -17,17 +17,17 @@
 #include <iostream>
 #include <sstream>
 
-TEST_CASE("TokensLine basic operations", "[lexer]") {
+TEST_CASE("TokenLine basic operations", "[lexer]") {
     g_options = Options();
 
-    TokensLine line;
-    REQUIRE(line.empty());
+    TokenLine line;
+    REQUIRE(line.tokens().empty());
 
-    line.push_back(Token(TokenType::Identifier, "foo", false));
-    line.push_back(Token(TokenType::Integer, "123", false));
+    line.tokens().push_back(Token(TokenType::Identifier, "foo", false));
+    line.tokens().push_back(Token(TokenType::Integer, "123", false));
 
-    REQUIRE_FALSE(line.empty());
-    REQUIRE(line.size() == 2);
+    REQUIRE_FALSE(line.tokens().empty());
+    REQUIRE(line.tokens().size() == 2);
 
     const auto& toks = line.tokens();
     REQUIRE(toks.size() == 2);
@@ -37,7 +37,7 @@ TEST_CASE("TokensLine basic operations", "[lexer]") {
     // to_string concatenates original token texts, inseritng spaces where needed
     REQUIRE(line.to_string() == "foo 123");
 
-    const Token& last = line.back();
+    const Token& last = line.tokens().back();
     REQUIRE(last.text() == "123");
 }
 
@@ -72,57 +72,60 @@ TEST_CASE("Token constructor sets keyword for identifiers",
 TEST_CASE("TokensFile from string, counts and bounds", "[lexer]") {
     g_options = Options();
 
-    const std::string content = "one\ntwo\n\nthree";
-    TokensFile tf(content, "virtual", 10, false);
+    TokenFileReader tfr;
+    tfr.inject("virtual", "one\ntwo\n\nthree");
+    tfr.set_fixed_line_number(10);
 
-    // text line splitting
-    REQUIRE(tf.line_count() == 4);
-    REQUIRE(tf.get_line(0) == "one");
-    REQUIRE(tf.get_line(1) == "two");
-    REQUIRE(tf.get_line(2) == "");
-    REQUIRE(tf.get_line(3) == "three");
-    REQUIRE(tf.get_line(99) == ""); // out-of-range returns empty string
-
-    // virtual file constructor should disable line number increments
-    REQUIRE(tf.filename() == "virtual");
-    REQUIRE(tf.first_line_num() == 10);
-    REQUIRE(tf.inc_line_nums() == false);
-
-    // tok_lines_count should count only non-empty tokenized lines
-    REQUIRE(tf.tok_lines_count() == 3);
-
-    // get_tok_line bounds
-    REQUIRE(tf.get_tok_line(static_cast<unsigned>(-1)).empty());
-    REQUIRE(tf.get_tok_line(999).empty());
+    REQUIRE(tfr.filename() == "virtual");
+    REQUIRE(tfr.line_number() == 10);
 
     // each non-empty tokenized line should have a location set to first_line_num (virtual file)
-    for (unsigned i = 0; i < tf.tok_lines_count(); ++i) {
-        const TokensLine& tl = tf.get_tok_line(i);
+    TokenLine tl;
+    int count_lines = 0;
+    while (tfr.next_token_line(tl)) {
         REQUIRE(tl.location().line_num() == 10);
-        REQUIRE(!tl.empty());
+        REQUIRE(!tl.tokens().empty());
         const auto& tks = tl.tokens();
         REQUIRE(tks.size() >= 1);
+        ++count_lines;
     }
+    REQUIRE(count_lines == 3); // 3 non-empty lines
 }
 
 TEST_CASE("split_lines handles CRLF and LF mixed endings", "[lexer]") {
     g_options = Options();
 
-    const std::string content = "a\r\nb\nc\r\n";
-    TokensFile tf(content, "virtual2", 1, true);
-    REQUIRE(tf.line_count() == 3);
-    REQUIRE(tf.get_line(0) == "a");
-    REQUIRE(tf.get_line(1) == "b");
-    REQUIRE(tf.get_line(2) == "c");
+    TokenFileReader tfr;
+    tfr.inject("virtual2", "a\r\nb\nc\r\n");
+    tfr.set_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].text() == "a");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].text() == "b");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].text() == "c");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("empty content produces no token lines", "[lexer]") {
     g_options = Options();
 
-    const std::string content = "\n\r\n\n"; // only empty lines
-    TokensFile tf(content, "empty", 1, true);
-    REQUIRE(tf.line_count() == 3);
-    REQUIRE(tf.tok_lines_count() == 0);
+    TokenFileReader tfr;
+    tfr.inject("empty", "\n\r\n\n");
+    tfr.set_line_number(1);
+
+    TokenLine tl;
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
@@ -130,11 +133,13 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
 
     // Build a single line that contains examples of each token type (except EndOfLine).
     // Note: backslash is included as a standalone token; whitespace is produced between tokens.
-    const std::string content = "id 123 1.23 \"str\" + \\ , . ( ) [ ] { }\n";
-    TokensFile tf(content, "types_test", 1, true);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const TokensLine& tl = tf.get_tok_line(0);
+    TokenFileReader tfr;
+    tfr.inject("types_test", "id 123 1.23 \"str\" + \\ , . ( ) [ ] { }\n");
+    tfr.set_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
     const auto& toks = tl.tokens();
 
     // Collect seen token types
@@ -182,6 +187,9 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
     REQUIRE(foundStr);
     REQUIRE(foundInt);
     REQUIRE(foundFloat);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("TokensFile tokenizes all TokenType values",
@@ -190,13 +198,13 @@ TEST_CASE("TokensFile tokenizes all TokenType values",
 
     // Construct one line that includes representative symbols for operator tokens.
     // Some operator tokens are multi-character and must be contiguous (e.g. '!=', '<<', '^^', '**', '##').
-    const std::string content =
-        "! != ~ ^ ^^ & && * ** / % + - << >> < <= > >= = ? : # ## | ||\n";
+    TokenFileReader tfr;
+    tfr.inject("op_test",
+               "! != ~ ^ ^^ & && * ** / % + - << >> < <= > >= = ? : # ## | ||\n");
+    tfr.set_fixed_line_number(1);
 
-    TokensFile tf(content, "op_test", 1, false);
-    REQUIRE(tf.tok_lines_count() == 1);
-
-    const TokensLine& tl = tf.get_tok_line(0);
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
     const auto& toks = tl.tokens();
 
     // Collect operator token TokenType values in the order they appear.
@@ -238,94 +246,75 @@ TEST_CASE("TokensFile tokenizes all TokenType values",
     for (size_t i = 0; i < expected.size(); ++i) {
         REQUIRE(seen[i] == expected[i]);
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 //
 // New tests: verify comment removal for ';', '//' and '/* */'
 //
 
-static std::vector<std::string> token_texts(const TokensLine& tl) {
-    std::vector<std::string> out;
-    for (const auto& t : tl.tokens()) {
-        out.push_back(t.text());
-    }
-    return out;
-}
-
 TEST_CASE("Lexer removes semicolon comments (';') from input",
           "[lexer][comments]") {
     g_options = Options();
 
-    const std::string content = "mov a, b ; this is a comment\nnext\n";
-    TokensFile tf(content, "comment_semicolon", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("comment_semicolon", "mov a, b ; this is a comment\nnext\n");
+    tfr.set_fixed_line_number(1);
 
     // Two non-empty tokenized lines: first with "mov a, b", second with "next"
-    REQUIRE(tf.tok_lines_count() == 2);
-
-    const TokensLine& first = tf.get_tok_line(0);
-    auto texts = token_texts(first);
-
-    // Ensure the code tokens are present
-    REQUIRE(std::find(texts.begin(), texts.end(), "mov") != texts.end());
-    REQUIRE(std::find(texts.begin(), texts.end(), "a") != texts.end());
-    REQUIRE(std::find(texts.begin(), texts.end(), "b") != texts.end());
-
-    // Ensure comment text does not appear
-    REQUIRE(std::none_of(texts.begin(), texts.end(), [](const std::string & s) {
-        return s.find(";") != std::string::npos || s.find("this") != std::string::npos;
-    }));
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "mov a, b");
 
     // Second line should contain 'next'
-    const TokensLine& second = tf.get_tok_line(1);
-    auto texts2 = token_texts(second);
-    REQUIRE(std::find(texts2.begin(), texts2.end(), "next") != texts2.end());
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "next");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Lexer removes double-slash comments ('//') from input",
           "[lexer][comments]") {
     g_options = Options();
 
-    const std::string content = "ld bc, 0 // set bc to zero\n";
-    TokensFile tf(content, "comment_double_slash", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("comment_double_slash", "ld bc, 0 // set bc to zero\nnext\n");
+    tfr.set_fixed_line_number(1);
 
-    // One tokenized line (comment removed)
-    REQUIRE(tf.tok_lines_count() == 1);
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "ld bc, 0");
 
-    const TokensLine& tl = tf.get_tok_line(0);
-    auto texts = token_texts(tl);
+    // Second line should contain 'next'
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "next");
 
-    // Ensure code tokens exist and comment tokens do not
-    REQUIRE(std::find(texts.begin(), texts.end(), "ld") != texts.end());
-    REQUIRE(std::find(texts.begin(), texts.end(), "bc") != texts.end());
-    REQUIRE(std::find(texts.begin(), texts.end(), "0") != texts.end());
-    REQUIRE(std::none_of(texts.begin(), texts.end(), [](const std::string & s) {
-        return s.find("//") != std::string::npos || s.find("set") != std::string::npos;
-    }));
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Lexer removes C-style multi-line comments ('/* */') across lines",
           "[lexer][comments]") {
     g_options = Options();
 
-    const std::string content = "a /* multi\ncomment */ b\n";
-    TokensFile tf(content, "comment_c_style", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("comment_c_style", "ld a, /* multi\nline\ncomment */ b\nnext\n");
+    tfr.set_fixed_line_number(1);
 
     // The tokenizer removes the comment; resulting token line should contain 'a' and 'b'
-    REQUIRE(tf.tok_lines_count() == 1);
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "ld a, b");
 
-    const TokensLine& tl = tf.get_tok_line(0);
-    auto texts = token_texts(tl);
+    // Second line should contain 'next'
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "next");
 
-    REQUIRE(std::find(texts.begin(), texts.end(), "a") != texts.end());
-    REQUIRE(std::find(texts.begin(), texts.end(), "b") != texts.end());
-
-    // Ensure no fragments of the comment remain
-    REQUIRE(std::none_of(texts.begin(), texts.end(), [](const std::string & s) {
-        return s.find("/*") != std::string::npos
-               || s.find("*/") != std::string::npos
-               || s.find("multi") != std::string::npos
-               || s.find("comment") != std::string::npos;
-    }));
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 //
@@ -346,19 +335,19 @@ TEST_CASE("TokensFile parses all integer literal formats",
     // - binary with '%' prefix: %1011
     // - binary with '@' prefix: @1011
     // - binary with '0b' prefix: 0b1011
-    const std::string content =
-        "123 123d 1Ah 1aH $FF 0xAB 1011b %1011 @1011 0b1011\n";
-    TokensFile tf(content, "int_formats", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("int_formats",
+               "123 123d 1Ah 1aH $FF 0xAB 1011b %1011 @1011 0b1011\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const TokensLine& tl = tf.get_tok_line(0);
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
     const auto& toks = tl.tokens();
 
     std::vector<int> found;
     for (const auto& t : toks) {
-        if (t.type() == TokenType::Integer) {
-            found.push_back(t.int_value());
-        }
+        REQUIRE(t.type() == TokenType::Integer);
+        found.push_back(t.int_value());
     }
 
     std::vector<int> expected = {
@@ -378,6 +367,9 @@ TEST_CASE("TokensFile parses all integer literal formats",
     for (size_t i = 0; i < expected.size(); ++i) {
         REQUIRE(found[i] == expected[i]);
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Single-quoted characters returned as Integer", "[lexer][char]") {
@@ -387,28 +379,32 @@ TEST_CASE("Single-quoted characters returned as Integer", "[lexer][char]") {
     // 'A'    -> ASCII 65
     // '\n'   -> newline (10)
     // '\t'   -> tab (9)
-    const std::string content = "'A'\n'\\n'\n'\\t'\n";
-    TokensFile tf(content, "char_test", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 3);
+    TokenFileReader tfr;
+    tfr.inject("char_test", "'A'\n'\\n'\n'\\t'\n");
+    tfr.set_fixed_line_number(1);
 
-    const auto& toks0 = tf.get_tok_line(0).tokens();
-    REQUIRE(toks0.size() == 1);
-    REQUIRE(toks0[0].is(TokenType::Integer));
-    REQUIRE(toks0[0].int_value() == static_cast<int>('A'));
-    REQUIRE(toks0[0].text() == "'A'");
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].is(TokenType::Integer));
+    REQUIRE(tl.tokens()[0].int_value() == static_cast<int>('A'));
+    REQUIRE(tl.tokens()[0].text() == "'A'");
 
-    const auto& toks1 = tf.get_tok_line(1).tokens();
-    REQUIRE(toks1.size() == 1);
-    REQUIRE(toks1[0].is(TokenType::Integer));
-    REQUIRE(toks1[0].int_value() == static_cast<int>('\n'));
-    REQUIRE(toks1[0].text() == "'\\n'");
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].is(TokenType::Integer));
+    REQUIRE(tl.tokens()[0].int_value() == static_cast<int>('\n'));
+    REQUIRE(tl.tokens()[0].text() == "'\\n'");
 
-    const auto& toks2 = tf.get_tok_line(2).tokens();
-    REQUIRE(toks2.size() == 1);
-    REQUIRE(toks2[0].is(TokenType::Integer));
-    REQUIRE(toks2[0].int_value() == static_cast<int>('\t'));
-    REQUIRE(toks2[0].text() == "'\\t'");
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].is(TokenType::Integer));
+    REQUIRE(tl.tokens()[0].int_value() == static_cast<int>('\t'));
+    REQUIRE(tl.tokens()[0].text() == "'\\t'");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 //
@@ -422,11 +418,14 @@ TEST_CASE("Single-quoted empty and multi-character literals produce Invalid quot
     SuppressErrors suppress;
 
     // Empty quoted character: ''  -> should trigger Invalid quoted character
-    const std::string content_empty = "''\n";
-    TokensFile tf_empty(content_empty, "char_err_empty", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("char_err_empty", "''\n");
+    tfr.set_fixed_line_number(1);
 
     // Tokenization should fail and produce no token lines
-    REQUIRE(tf_empty.tok_lines_count() == 0);
+    TokenLine tl;
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
     REQUIRE(g_errors.has_errors());
     {
         const std::string msg = g_errors.last_error_message();
@@ -439,10 +438,11 @@ TEST_CASE("Single-quoted empty and multi-character literals produce Invalid quot
     SuppressErrors suppress2;
 
     // Multi-character quoted literal: 'AB' -> should trigger Invalid quoted character
-    const std::string content_multi = "'AB'\n";
-    TokensFile tf_multi(content_multi, "char_err_multi", 1, false);
+    tfr.inject("char_err_multi", "'AB'\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf_multi.tok_lines_count() == 0);
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
     REQUIRE(g_errors.has_errors());
     {
         const std::string msg = g_errors.last_error_message();
@@ -460,43 +460,52 @@ TEST_CASE("Keyword token that includes a trailing quote is recognized as keyword
           "[lexer][keywords][quote]") {
     g_options = Options();
 
-    const std::string content = "AF'\n";
-    TokensFile tf(content, "kw_quote_test", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("kw_quote_test", "AF'\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 1);
 
     // Should produce a single identifier token which maps to Keyword::AF_
-    REQUIRE(toks.size() == 1);
-    REQUIRE(toks[0].is(TokenType::Identifier));
-    REQUIRE(toks[0].is(Keyword::AF_));
-    REQUIRE(toks[0].text() == "AF'");
+    REQUIRE(tl.tokens().size() == 1);
+    REQUIRE(tl.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(tl.tokens()[0].is(Keyword::AF_));
+    REQUIRE(tl.tokens()[0].text() == "AF'");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Trailing quote after a keyword starts a character constant (DEFINE'a')",
           "[lexer][keywords][quote_char]") {
     g_options = Options();
 
-    SuppressErrors suppress;
-    const std::string content = "DEFINE'a'\n";
-    TokensFile tf(content, "kw_then_char", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("kw_then_char", "DEFINE'a'\n");
+
+    tfr.set_fixed_line_number(1);
 
     // One tokenized line
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     // Expect two tokens: the keyword DEFINE (no trailing quote) and the character constant as Integer
-    REQUIRE(toks.size() == 2);
+    REQUIRE(tl.tokens().size() == 2);
 
     // First token: keyword DEFINE
-    REQUIRE(toks[0].is(TokenType::Identifier));
-    REQUIRE(toks[0].is(Keyword::DEFINE));
-    REQUIRE(toks[0].text() == "DEFINE");
+    REQUIRE(tl.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(tl.tokens()[0].is(Keyword::DEFINE));
+    REQUIRE(tl.tokens()[0].text() == "DEFINE");
 
     // Second token: character constant -> Integer token with value 'a'
-    REQUIRE(toks[1].is(TokenType::Integer));
-    REQUIRE(toks[1].int_value() == static_cast<int>('a'));
-    REQUIRE(toks[1].text() == "'a'");
+    REQUIRE(tl.tokens()[1].is(TokenType::Integer));
+    REQUIRE(tl.tokens()[1].int_value() == static_cast<int>('a'));
+    REQUIRE(tl.tokens()[1].text() == "'a'");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 //
@@ -508,11 +517,15 @@ TEST_CASE("Unterminated C-style comment reports error",
     g_options = Options();
 
     SuppressErrors suppress;
-    const std::string content = "code /* unclosed comment\n";
-    TokensFile tf(content, "unclosed_comment", 1, false);
+
+    TokenFileReader tfr;
+    tfr.inject("unclosed_comment", "code /* unclosed\nmulti\nline\ncomment\n");
+    tfr.set_fixed_line_number(1);
 
     // Tokenization should fail and produce no token lines
-    REQUIRE(tf.tok_lines_count() == 0);
+    TokenLine tl;
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Unterminated comment") != std::string::npos);
@@ -524,10 +537,14 @@ TEST_CASE("Unterminated double-quoted string reports error",
     g_options = Options();
 
     SuppressErrors suppress;
-    const std::string content = "db \"unterminated\n";
-    TokensFile tf(content, "unclosed_dquote", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 0);
+    TokenFileReader tfr;
+    tfr.inject("unclosed_dquote", "db \"unterminated\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Unterminated string") != std::string::npos);
@@ -539,17 +556,19 @@ TEST_CASE("Unterminated single-quoted string reports error",
     g_options = Options();
 
     SuppressErrors suppress;
-    const std::string content = "db 'u\n";
-    TokensFile tf(content, "unclosed_squote", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 0);
+    TokenFileReader tfr;
+    tfr.inject("unclosed_squote", "db 'u\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("Unterminated string") != std::string::npos);
     REQUIRE(msg.find("unclosed_squote:1:") != std::string::npos);
 }
-
-// New tests: include trailing extra token errors were added earlier (omitted here for brevity)
 
 // New test: verify identifiers are upper-cased when g_options.ucase_labels == true
 TEST_CASE("g_options.ucase_labels causes identifiers to be upper-cased",
@@ -557,17 +576,17 @@ TEST_CASE("g_options.ucase_labels causes identifiers to be upper-cased",
     g_options = Options();
     g_options.ucase_labels = true;
 
-    const std::string content = "foo bar Baz qux123\n";
-    TokensFile tf(content, "ucase_test", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("ucase_test", "foo bar Baz qux123\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     std::vector<std::string> ids;
-    for (const auto& t : toks) {
-        if (t.is(TokenType::Identifier)) {
-            ids.push_back(t.text());
-        }
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Identifier));
+        ids.push_back(t.text());
     }
 
     std::vector<std::string> expected = { "FOO", "BAR", "BAZ", "QUX123" };
@@ -576,19 +595,24 @@ TEST_CASE("g_options.ucase_labels causes identifiers to be upper-cased",
     // Also verify that keywords are upper-cased and mapped to Keyword enum
     g_options = Options();
     g_options.ucase_labels = true;
-    const std::string content2 = "ld a, 0\n";
-    TokensFile tf2(content2, "ucase_kw", 1, false);
-    REQUIRE(tf2.tok_lines_count() == 1);
-    const auto& toks2 = tf2.get_tok_line(0).tokens();
 
-    // find first identifier token
-    size_t idx = 0;
-    while (idx < toks2.size() && !toks2[idx].is(TokenType::Identifier)) {
-        ++idx;
-    }
-    REQUIRE(idx < toks2.size());
-    REQUIRE(toks2[idx].text() == "LD");
-    REQUIRE(toks2[idx].keyword() == Keyword::LD);
+    tfr.inject("ucase_kw", "ld a, 0\n");
+    tfr.set_fixed_line_number(1);
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().size() == 4);
+    REQUIRE(tl.tokens()[0].text() == "LD");
+    REQUIRE(tl.tokens()[0].keyword() == Keyword::LD);
+    REQUIRE(tl.tokens()[1].text() == "A");
+    REQUIRE(tl.tokens()[1].keyword() == Keyword::A);
+    REQUIRE(tl.tokens()[2].text() == ",");
+    REQUIRE(tl.tokens()[2].type() == TokenType::Comma);
+    REQUIRE(tl.tokens()[3].text() == "0");
+    REQUIRE(tl.tokens()[3].type() == TokenType::Integer);
+    REQUIRE(tl.tokens()[3].int_value() == 0);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 
     // restore options
     g_options = Options();
@@ -606,16 +630,20 @@ TEST_CASE("g_options.swap_ix_iy swaps IX/IY keywords and token text",
 
     // --- Case 1: swap disabled (default) ---
     g_options = Options(); // reset global options
-    TokensFile tf_off(content, "swap_off", 1, false);
-    REQUIRE(tf_off.tok_lines_count() == 1);
+
+    TokenFileReader tfr;
+    tfr.inject("swap_test", content);
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     std::vector<std::string> ids_off;
     std::vector<Keyword> kws_off;
-    for (const auto& t : tf_off.get_tok_line(0).tokens()) {
-        if (t.is(TokenType::Identifier)) {
-            ids_off.push_back(t.text());
-            kws_off.push_back(t.keyword());
-        }
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Identifier));
+        ids_off.push_back(t.text());
+        kws_off.push_back(t.keyword());
     }
 
     std::vector<std::string> expected_ids_off = {
@@ -640,20 +668,24 @@ TEST_CASE("g_options.swap_ix_iy swaps IX/IY keywords and token text",
         REQUIRE(kws_off[i] == expected_kws_off[i]);
     }
 
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
+
     // --- Case 2: swap enabled ---
     g_options = Options();
     g_options.swap_ix_iy = true;
 
-    TokensFile tf_on(content, "swap_on", 1, false);
-    REQUIRE(tf_on.tok_lines_count() == 1);
+    tfr.inject("swap_test", content);
+    tfr.set_fixed_line_number(1);
+
+    REQUIRE(tfr.next_token_line(tl));
 
     std::vector<std::string> ids_on;
     std::vector<Keyword> kws_on;
-    for (const auto& t : tf_on.get_tok_line(0).tokens()) {
-        if (t.is(TokenType::Identifier)) {
-            ids_on.push_back(t.text());
-            kws_on.push_back(t.keyword());
-        }
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Identifier));
+        ids_on.push_back(t.text());
+        kws_on.push_back(t.keyword());
     }
 
     // Expected names after swapping x<->y
@@ -679,88 +711,80 @@ TEST_CASE("g_options.swap_ix_iy swaps IX/IY keywords and token text",
         REQUIRE(kws_on[i] == expected_kws_on[i]);
     }
 
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
+
     // restore options
     g_options = Options();
 }
 
 // -----------------------------------------------------------------------------
-// Added tests: bounds, at_end, to_string preserving whitespace,
+// Added tests: to_string preserving whitespace,
 // get_tok_line out-of-range behavior, spacing rules for to_string, and
 // operator-pair spacing tests.
 // -----------------------------------------------------------------------------
 
-TEST_CASE("TokensLine operator[] out-of-range returns EndOfLine token",
-          "[lexer][tokensline][bounds]") {
-    g_options = Options();
-
-    TokensLine tl(Location("file", 1));
-    REQUIRE(tl.empty());
-    const Token& t = tl[0]; // out-of-range
-    REQUIRE(t.is(TokenType::EndOfLine));
-    REQUIRE(t.text().empty());
-}
-
-TEST_CASE("TokensLine to_string preserves original token text including whitespace",
+TEST_CASE("TokenLine to_string preserves original token text including whitespace",
           "[lexer][tokensline][to_string]") {
     g_options = Options();
 
-    TokensLine tl(Location("l", 1));
-    tl.push_back(Token(TokenType::Identifier, "mov", true));
-    tl.push_back(Token(TokenType::Identifier, "a", false));
-    tl.push_back(Token(TokenType::Comma, ",", true));
-    tl.push_back(Token(TokenType::Identifier, "b", false));
+    TokenLine tl(Location("l", 1));
+    tl.tokens().push_back(Token(TokenType::Identifier, "mov", true));
+    tl.tokens().push_back(Token(TokenType::Identifier, "a", false));
+    tl.tokens().push_back(Token(TokenType::Comma, ",", true));
+    tl.tokens().push_back(Token(TokenType::Identifier, "b", false));
 
     REQUIRE(tl.to_string() == "mov a, b");
 }
 
 // New tests: verify that to_string inserts spaces between Identifier/Integer/Float
-TEST_CASE("TokensLine to_string inserts spaces between Identifier, Integer and Float tokens",
+TEST_CASE("TokenLine to_string inserts spaces between Identifier, Integer and Float tokens",
           "[lexer][tokensline][to_string_spacing]") {
     g_options = Options();
 
     // Identifier followed by Integer
-    TokensLine tl_id_int(Location("l", 1));
-    tl_id_int.push_back(Token(TokenType::Identifier, "foo", false));
-    tl_id_int.push_back(Token(TokenType::Integer, "123", false));
+    TokenLine tl_id_int(Location("l", 1));
+    tl_id_int.tokens().push_back(Token(TokenType::Identifier, "foo", false));
+    tl_id_int.tokens().push_back(Token(TokenType::Integer, "123", false));
     REQUIRE(tl_id_int.to_string() == "foo 123");
 
     // Identifier followed by Float
-    TokensLine tl_id_float(Location("l", 2));
-    tl_id_float.push_back(Token(TokenType::Identifier, "foo", false));
-    tl_id_float.push_back(Token(TokenType::Float, "1.23", false));
+    TokenLine tl_id_float(Location("l", 2));
+    tl_id_float.tokens().push_back(Token(TokenType::Identifier, "foo", false));
+    tl_id_float.tokens().push_back(Token(TokenType::Float, "1.23", false));
     REQUIRE(tl_id_float.to_string() == "foo 1.23");
 
     // Integer followed by Identifier
-    TokensLine tl_int_id(Location("l", 3));
-    tl_int_id.push_back(Token(TokenType::Integer, "123", false));
-    tl_int_id.push_back(Token(TokenType::Identifier, "bar", false));
+    TokenLine tl_int_id(Location("l", 3));
+    tl_int_id.tokens().push_back(Token(TokenType::Integer, "123", false));
+    tl_int_id.tokens().push_back(Token(TokenType::Identifier, "bar", false));
     REQUIRE(tl_int_id.to_string() == "123 bar");
 
     // Integer followed by Float
-    TokensLine tl_int_float(Location("l", 4));
-    tl_int_float.push_back(Token(TokenType::Integer, "123", false));
-    tl_int_float.push_back(Token(TokenType::Float, "1.23", false));
+    TokenLine tl_int_float(Location("l", 4));
+    tl_int_float.tokens().push_back(Token(TokenType::Integer, "123", false));
+    tl_int_float.tokens().push_back(Token(TokenType::Float, "1.23", false));
     REQUIRE(tl_int_float.to_string() == "123 1.23");
 
     // Float followed by Identifier
-    TokensLine tl_float_id(Location("l", 5));
-    tl_float_id.push_back(Token(TokenType::Float, "1.23", false));
-    tl_float_id.push_back(Token(TokenType::Identifier, "x", false));
+    TokenLine tl_float_id(Location("l", 5));
+    tl_float_id.tokens().push_back(Token(TokenType::Float, "1.23", false));
+    tl_float_id.tokens().push_back(Token(TokenType::Identifier, "x", false));
     REQUIRE(tl_float_id.to_string() == "1.23 x");
 
     // Mixed with non-identifier/number tokens should not insert extra spaces beyond token text
-    TokensLine tl_mixed(Location("l", 6));
-    tl_mixed.push_back(Token(TokenType::Identifier, "mov", false));
-    tl_mixed.push_back(Token(TokenType::LeftParen, "(", false));
-    tl_mixed.push_back(Token(TokenType::Integer, "1", false));
-    tl_mixed.push_back(Token(TokenType::RightParen, ")", false));
+    TokenLine tl_mixed(Location("l", 6));
+    tl_mixed.tokens().push_back(Token(TokenType::Identifier, "mov", false));
+    tl_mixed.tokens().push_back(Token(TokenType::LeftParen, "(", false));
+    tl_mixed.tokens().push_back(Token(TokenType::Integer, "1", false));
+    tl_mixed.tokens().push_back(Token(TokenType::RightParen, ")", false));
     // Expect "mov(1)" if no whitespace tokens were present in original tokens
     REQUIRE(tl_mixed.to_string() == "mov(1)");
 }
 
 // New tests: verify that to_string inserts spaces between tokens that would combine
 // into multi-character operator tokens when concatenated.
-TEST_CASE("TokensLine to_string inserts spaces between tokens that form multi-char operators",
+TEST_CASE("TokenLine to_string inserts spaces between tokens that form multi-char operators",
           "[lexer][tokensline][to_string_op_spacing]") {
     g_options = Options();
 
@@ -786,26 +810,13 @@ TEST_CASE("TokensLine to_string inserts spaces between tokens that form multi-ch
     };
 
     for (const auto& p : pairs) {
-        TokensLine tl(Location("op", 1));
-        tl.push_back(Token(p.a, p.ta, false));
-        tl.push_back(Token(p.b, p.tb, false));
+        TokenLine tl(Location("op", 1));
+        tl.tokens().push_back(Token(p.a, p.ta, false));
+        tl.tokens().push_back(Token(p.b, p.tb, false));
         std::string want = std::string(p.ta) + " " + std::string(p.tb);
         INFO("Checking pair: '" << p.ta << "' + '" << p.tb << "' -> to_string()");
         REQUIRE(tl.to_string() == want);
     }
-}
-
-TEST_CASE("TokensFile get_tok_line out-of-range returns empty TokensLine",
-          "[lexer][tokensfile][bounds]") {
-    g_options = Options();
-
-    const std::string content = "one\n";
-    TokensFile tf(content, "v", 1, false);
-    REQUIRE(tf.tok_lines_count() == 1);
-    const TokensLine& out = tf.get_tok_line(99);
-    REQUIRE(out.empty());
-    // out.tokens() should be empty
-    REQUIRE(out.empty());
 }
 
 // New tests: verify identifier forms '@ident', 'ident@ident' and 'ident' (C identifier rules)
@@ -815,17 +826,18 @@ TEST_CASE("Lexer detects identifiers '@ident', 'ident@ident' and 'ident'",
 
     // ident1 = [_a-zA-Z][_a-zA-Z0-9]*
     // ident  = '@' ident1 | ident1 '@' ident1 | ident1
-    const std::string content = "@foo  _ok1@bar2  normal\n";
-    TokensFile tf(content, "ident_forms", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("ident_forms", "@foo  _ok1@bar2  normal\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     std::vector<std::string> ids;
-    for (const auto& t : toks) {
-        if (t.is(TokenType::Identifier)) {
-            ids.push_back(t.text());
-        }
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Identifier));
+        ids.push_back(t.text());
     }
 
     std::vector<std::string> expected = {
@@ -835,6 +847,9 @@ TEST_CASE("Lexer detects identifiers '@ident', 'ident@ident' and 'ident'",
     };
 
     REQUIRE(ids == expected);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Lexer identifier forms allow underscores and digits after the first character",
@@ -842,17 +857,18 @@ TEST_CASE("Lexer identifier forms allow underscores and digits after the first c
     g_options = Options(); // default options
 
     // More thorough coverage of allowed characters within ident1
-    const std::string content = "@_AbC123  A_B@C9_d  Z9\n";
-    TokensFile tf(content, "ident_forms_chars", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("ident_forms_chars", "@_AbC123  A_B@C9_d  Z9\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     std::vector<std::string> ids;
-    for (const auto& t : toks) {
-        if (t.is(TokenType::Identifier)) {
-            ids.push_back(t.text());
-        }
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Identifier));
+        ids.push_back(t.text());
     }
 
     std::vector<std::string> expected = {
@@ -862,66 +878,33 @@ TEST_CASE("Lexer identifier forms allow underscores and digits after the first c
     };
 
     REQUIRE(ids == expected);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
-// New tests: verify all runs of any whitespace chars collapse to a single Whitespace token
+// New tests: verify all runs of any whitespace chars collapse
 TEST_CASE("Lexer collapses mixed whitespace run",
           "[lexer][whitespace]") {
     g_options = Options();
 
     // Between A and B we place a contiguous run of space, tab, vertical-tab, form-feed, space
-    const std::string content = "A \t\v\f B\n";
-    TokensFile tf(content, "ws_mixed", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("ws_mixed", "\t\v\f A \t\v\f B \t\v\f \n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(toks.size() == 2);
-    REQUIRE(toks[0].is(TokenType::Identifier));
-    REQUIRE(toks[0].text() == "A");
-    REQUIRE(toks[1].is(TokenType::Identifier));
-    REQUIRE(toks[1].text() == "B");
-}
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
-TEST_CASE("Lexer collapses multiple whitespace runs",
-          "[lexer][whitespace]") {
-    g_options = Options();
+    REQUIRE(tl.tokens().size() == 2);
+    REQUIRE(tl.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(tl.tokens()[0].text() == "A");
+    REQUIRE(tl.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(tl.tokens()[1].text() == "B");
 
-    // Three runs of whitespace separating A, B, C, D
-    // 1) spaces, 2) tabs, 3) vertical-tab + form-feed
-    const std::string content = "A   B\t\tC\v\fD\n";
-    TokensFile tf(content, "ws_runs", 1, false);
-
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
-
-    // Expect: A, WS, B, WS, C, WS, D
-    REQUIRE(toks.size() == 4);
-    REQUIRE(toks[0].is(TokenType::Identifier));
-    REQUIRE(toks[0].text() == "A");
-    REQUIRE(toks[1].is(TokenType::Identifier));
-    REQUIRE(toks[1].text() == "B");
-    REQUIRE(toks[2].is(TokenType::Identifier));
-    REQUIRE(toks[2].text() == "C");
-    REQUIRE(toks[3].is(TokenType::Identifier));
-    REQUIRE(toks[3].text() == "D");
-}
-
-TEST_CASE("Lexer trims leading and trailing whitespace runs",
-          "[lexer][whitespace][edges]") {
-    g_options = Options();
-
-    // Leading run: space+tab, trailing run: tab+space
-    const std::string content = " \tA\t \n";
-    TokensFile tf(content, "ws_edges", 1, false);
-
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
-
-    // Expect: WS, A, WS
-    REQUIRE(toks.size() == 1);
-    REQUIRE(toks[0].is(TokenType::Identifier));
-    REQUIRE(toks[0].text() == "A");
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 // New tests: verify bitmask forms %"... and @ "..." are scanned into Integer with correct value
@@ -929,28 +912,31 @@ TEST_CASE("Lexer scans bitmask %\"-#-#\" and @\"-#-#\" into Integer tokens",
           "[lexer][bitmask]") {
     g_options = Options();
 
-    const std::string content = "%\"-#-#\" @\"-#-#\"\n";
-    TokensFile tf(content, "bitmask_basic", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("bitmask_basic", "%\"-#-#\" @\"-#-#\"\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     // Collect integer tokens
-    std::vector<const Token*> ints;
-    for (const auto& t : toks) {
-        if (t.is(TokenType::Integer)) {
-            ints.push_back(&t);
-        }
+    std::vector<Token> ints;
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Integer));
+        ints.push_back(t);
     }
 
     // Expect two Integer tokens, both representing binary -#-# => 0101b => 5
     REQUIRE(ints.size() == 2);
-    REQUIRE(ints[0]->int_value() == 5);
-    REQUIRE(ints[1]->int_value() == 5);
+    REQUIRE(ints[0].int_value() == 5);
+    REQUIRE(ints[1].int_value() == 5);
 
     // Text should be preserved exactly (including leading %/@ and quotes)
-    REQUIRE(ints[0]->text() == "%\"-#-#\"");
-    REQUIRE(ints[1]->text() == "@\"-#-#\"");
+    REQUIRE(ints[0].text() == "%\"-#-#\"");
+    REQUIRE(ints[1].text() == "@\"-#-#\"");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Lexer bitmask handles empty and single-bit sequences",
@@ -958,19 +944,20 @@ TEST_CASE("Lexer bitmask handles empty and single-bit sequences",
     g_options = Options();
 
     // Empty -> 0, "#" -> 1, "-#" -> 1, "#-" -> 2
-    const std::string content = "%\"\" %\"#\" %\"-#\" %\"#-\"\n";
-    TokensFile tf(content, "bitmask_edges", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("bitmask_edges", "%\"\" %\"#\" %\"-#\" %\"#-\"\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
 
     std::vector<int> values;
     std::vector<std::string> texts;
-    for (const auto& t : toks) {
-        if (t.is(TokenType::Integer)) {
-            values.push_back(t.int_value());
-            texts.push_back(t.text());
-        }
+    for (const auto& t : tl.tokens()) {
+        REQUIRE(t.is(TokenType::Integer));
+        values.push_back(t.int_value());
+        texts.push_back(t.text());
     }
 
     REQUIRE(values.size() == 4);
@@ -983,6 +970,9 @@ TEST_CASE("Lexer bitmask handles empty and single-bit sequences",
     REQUIRE(texts[1] == "%\"#\"");
     REQUIRE(texts[2] == "%\"-#\"");
     REQUIRE(texts[3] == "%\"#-\"");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 // New tests: verify underscores digit separators are ignored inside numeric literals
@@ -997,17 +987,18 @@ TEST_CASE("TokensFile parses integer literals with underscores as digit separato
     // - binary with trailing 'b', and '%' / '@' / '0b' prefixes
     const std::string content =
         "1_234 1_234d 1_234D 1A_2h 1a_2H $FF_FF 0xAB_CD 1010_1100b %1010_1100 @1010_1100 0b1010_1100\n";
-    TokensFile tf(content, "int_underscores", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("int_underscores", content);
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const TokensLine& tl = tf.get_tok_line(0);
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
     const auto& toks = tl.tokens();
 
     std::vector<int> found;
     for (const auto& t : toks) {
-        if (t.type() == TokenType::Integer) {
-            found.push_back(t.int_value());
-        }
+        REQUIRE(t.type() == TokenType::Integer);
+        found.push_back(t.int_value());
     }
 
     std::vector<int> expected = {
@@ -1028,6 +1019,9 @@ TEST_CASE("TokensFile parses integer literals with underscores as digit separato
     for (size_t i = 0; i < expected.size(); ++i) {
         REQUIRE(found[i] == expected[i]);
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 // New tests: verify floats accept underscores as digit separators in integer, fractional and exponent parts
@@ -1039,17 +1033,19 @@ TEST_CASE("Lexer parses floats with underscores in integer and fractional parts"
     // 1) underscore in integer part: 1_234.5 -> 1234.5
     // 2) underscore in fractional part: 12.3_45 -> 12.345
     // 3) multiple underscores within fractional digits: 0.0_5 -> 0.05
-    const std::string content = "1_234.5 12.3_45 0.0_5\n";
-    TokensFile tf(content, "float_underscores_if", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("float_underscores_if", "1_234.5 12.3_45 0.0_5\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    const auto& toks = tl.tokens();
 
     std::vector<double> found;
     for (const auto& t : toks) {
-        if (t.is(TokenType::Float)) {
-            found.push_back(t.float_value());
-        }
+        REQUIRE(t.is(TokenType::Float));
+        found.push_back(t.float_value());
     }
 
     std::vector<double> expected = {
@@ -1062,6 +1058,9 @@ TEST_CASE("Lexer parses floats with underscores in integer and fractional parts"
     for (size_t i = 0; i < expected.size(); ++i) {
         REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("Lexer parses floats with underscores in exponent part (and combined)",
@@ -1072,17 +1071,19 @@ TEST_CASE("Lexer parses floats with underscores in exponent part (and combined)"
     // 1) underscore in exponent: 1.25e1_2 -> 1.25e12
     // 2) underscore with negative exponent: 3.0e-0_3 -> 3.0e-3
     // 3) underscores in integer part and exponent: 4_2.0e0_0 -> 42.0
-    const std::string content = "1.25e1_2 3.0e-0_3 4_2.0e0_0\n";
-    TokensFile tf(content, "float_underscores_exp", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("float_underscores_exp", "1.25e1_2 3.0e-0_3 4_2.0e0_0\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    const auto& toks = tl.tokens();
 
     std::vector<double> found;
     for (const auto& t : toks) {
-        if (t.is(TokenType::Float)) {
-            found.push_back(t.float_value());
-        }
+        REQUIRE(t.is(TokenType::Float));
+        found.push_back(t.float_value());
     }
 
     std::vector<double> expected = {
@@ -1095,6 +1096,9 @@ TEST_CASE("Lexer parses floats with underscores in exponent part (and combined)"
     for (size_t i = 0; i < expected.size(); ++i) {
         REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 // New tests: verify invalid digit sequences are rejected
@@ -1117,9 +1121,17 @@ TEST_CASE("Lexer rejects invalid underscore placements in integer/hex/binary lit
 
     for (const auto& content : cases) {
         SuppressErrors suppress;
-        TokensFile tf(content, "invalid_num_underscores", 1, false);
-        REQUIRE(tf.tok_lines_count() == 0);
+        TokenFileReader tfr;
+        tfr.inject("invalid_num_underscores", content);
+        tfr.set_fixed_line_number(1);
+
+        TokenLine tl;
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
         REQUIRE(g_errors.has_errors());
+        std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Invalid character") != std::string::npos);
+        REQUIRE(msg.find("invalid_num_underscores:1:") != std::string::npos);
     }
 }
 
@@ -1139,9 +1151,17 @@ TEST_CASE("Lexer rejects invalid underscore placements in floats",
 
     for (const auto& content : cases) {
         SuppressErrors suppress;
-        TokensFile tf(content, "invalid_float_underscores", 1, false);
-        REQUIRE(tf.tok_lines_count() == 0);
+        TokenFileReader tfr;
+        tfr.inject("invalid_float_underscores", content);
+        tfr.set_fixed_line_number(1);
+
+        TokenLine tl;
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
         REQUIRE(g_errors.has_errors());
+        std::string msg = g_errors.last_error_message();
+        REQUIRE(msg.find("Invalid character") != std::string::npos);
+        REQUIRE(msg.find("invalid_float_underscores:1:") != std::string::npos);
     }
 }
 
@@ -1154,17 +1174,19 @@ TEST_CASE("Lexer parses canonical floating-point formats (mantissa with optional
     //  - dec+ '.' dec*        -> "123."      (fractional part optional)
     //  - dec* '.' dec+        -> ".789"      (integer part optional)
     //  - mantissa [eE][+-]?dec -> "1.e2", ".5E-2", "42.e+0"
-    const std::string content = "123.456 123. .789 1.e2 .5E-2 42.e+0\n";
-    TokensFile tf(content, "float_canonical", 1, false);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenFileReader tfr;
+    tfr.inject("float_canonical", "123.456 123. .789 1.e2 .5E-2 42.e+0\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    const auto& toks = tl.tokens();
 
     std::vector<double> found;
     for (const auto& t : toks) {
-        if (t.is(TokenType::Float)) {
-            found.push_back(t.float_value());
-        }
+        REQUIRE(t.is(TokenType::Float));
+        found.push_back(t.float_value());
     }
 
     std::vector<double> expected = {
@@ -1180,6 +1202,9 @@ TEST_CASE("Lexer parses canonical floating-point formats (mantissa with optional
     for (size_t i = 0; i < expected.size(); ++i) {
         REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 // New test: verify that a number immediately followed by letters is rejected (e.g., 123abc)
@@ -1205,9 +1230,13 @@ TEST_CASE("Lexer rejects numbers immediately followed by letters",
 
     for (const auto& content : cases) {
         SuppressErrors suppress;
-        TokensFile tf(content, "num_trailing_letters", 1, false);
-        REQUIRE(tf.tok_lines_count() == 0);
-        REQUIRE(g_errors.has_errors());
+        TokenFileReader tfr;
+        tfr.inject("num_trailing_letters", content);
+        tfr.set_fixed_line_number(1);
+
+        TokenLine tl;
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
         const std::string msg = g_errors.last_error_message();
         REQUIRE(msg.find("Invalid character") != std::string::npos);
         REQUIRE(msg.find("num_trailing_letters:1:") != std::string::npos);
@@ -1228,12 +1257,16 @@ TEST_CASE("Lexer rejects 0x prefix without digits",
 
     for (const auto& c : cases) {
         SuppressErrors suppress;
-        TokensFile tf(c.text, c.fname, 1, false);
+        TokenFileReader tfr;
+        tfr.inject(c.fname, c.text);
+        tfr.set_fixed_line_number(1);
 
         // Tokenization should fail and produce no token lines
-        REQUIRE(tf.tok_lines_count() == 0);
-        REQUIRE(g_errors.has_errors());
+        TokenLine tl;
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
 
+        REQUIRE(g_errors.has_errors());
         const std::string msg = g_errors.last_error_message();
         REQUIRE(msg.find("Invalid character") != std::string::npos);
         REQUIRE(msg.find(std::string(c.fname) + ":1:") != std::string::npos);
@@ -1245,11 +1278,13 @@ TEST_CASE("Lexer accepts '0b' as binary zero",
           "[lexer][binary][zero]") {
     g_options = Options();
 
-    const std::string content = "0b\n";
-    TokensFile tf(content, "zero_0b", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("zero_0b", "0b\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    const auto& toks = tl.tokens();
 
     REQUIRE(toks.size() == 1);
     REQUIRE(toks[0].is(TokenType::Integer));
@@ -1281,11 +1316,14 @@ TEST_CASE("Lexer rejects malformed floats (missing exponent digits, multiple sig
 
     for (const auto& c : cases) {
         SuppressErrors suppress;
-        TokensFile tf(c.text, c.fname, 1, false);
+        TokenFileReader tfr;
+        tfr.inject(c.fname, c.text);
+        tfr.set_fixed_line_number(1);
 
         // Tokenization should fail and produce no token lines
-        REQUIRE(tf.tok_lines_count() == 0);
-        REQUIRE(g_errors.has_errors());
+        TokenLine tl;
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
 
         const std::string msg = g_errors.last_error_message();
         REQUIRE(msg.find("Invalid character") != std::string::npos);
@@ -1323,16 +1361,28 @@ TEST_CASE("Single-quoted C escape sequences are converted to Integer (including 
         content += c.line;
     }
 
-    TokensFile tf(content, "char_escapes", 1, false);
-    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+    TokenFileReader tfr;
+    tfr.inject("char_escapes", content);
+    tfr.set_fixed_line_number(1);
 
+    TokenLine tl;
+    size_t count = 0;
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
-        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(tfr.next_token_line(tl));
+        const auto& toks = tl.tokens();
+
         REQUIRE(toks.size() == 1);
         REQUIRE(toks[0].is(TokenType::Integer));
         REQUIRE(toks[0].int_value() == cases[i].expected);
         REQUIRE(toks[0].text() == cases[i].text);
+
+        ++count;
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
+
+    REQUIRE(count == (sizeof(cases) / sizeof(cases[0])));
 }
 
 TEST_CASE("Single-quoted octal and hex escape sequences are converted to Integer",
@@ -1357,16 +1407,28 @@ TEST_CASE("Single-quoted octal and hex escape sequences are converted to Integer
         content += c.line;
     }
 
-    TokensFile tf(content, "char_escapes_octhex", 1, false);
-    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+    TokenFileReader tfr;
+    tfr.inject("char_escapes_octhex", content);
+    tfr.set_fixed_line_number(1);
 
+    TokenLine tl;
+    size_t count = 0;
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
-        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(tfr.next_token_line(tl));
+        const auto& toks = tl.tokens();
+
         REQUIRE(toks.size() == 1);
         REQUIRE(toks[0].is(TokenType::Integer));
         REQUIRE(toks[0].int_value() == cases[i].expected);
         REQUIRE(toks[0].text() == cases[i].text);
+
+        ++count;
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
+
+    REQUIRE(count == (sizeof(cases) / sizeof(cases[0])));
 }
 
 // New tests: verify that string literals accept all C-escapes plus \e, preserve original text(), and resolve into string_value()
@@ -1403,8 +1465,9 @@ TEST_CASE("String literals accept C escapes plus \\e and resolve to binary conte
         content += "\n";
     }
 
-    TokensFile tf(content, "string_escapes", 1, false);
-    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+    TokenFileReader tfr;
+    tfr.inject("string_escapes", content);
+    tfr.set_fixed_line_number(1);
 
     // Expected resolved contents built programmatically to avoid C++ escape confusion
     std::vector<std::string> expected;
@@ -1462,8 +1525,11 @@ TEST_CASE("String literals accept C escapes plus \\e and resolve to binary conte
         expected.push_back(s); // "\x7\7"
     }
 
+    TokenLine tl;
     for (size_t i = 0; i < expected.size(); ++i) {
-        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(tfr.next_token_line(tl));
+        const auto& toks = tl.tokens();
+
         REQUIRE(toks.size() == 1);
         const auto& t = toks[0];
         REQUIRE(t.is(TokenType::String));
@@ -1474,6 +1540,9 @@ TEST_CASE("String literals accept C escapes plus \\e and resolve to binary conte
         // string_value() must contain the resolved bytes (no quotes, escapes resolved)
         REQUIRE(t.string_value() == expected[i]);
     }
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+    REQUIRE(tl.tokens().empty());
 }
 
 TEST_CASE("String literals resolve octal (1-3 digits) and hex (1-2 digits) escapes",
@@ -1497,17 +1566,27 @@ TEST_CASE("String literals resolve octal (1-3 digits) and hex (1-2 digits) escap
         content += "\n";
     }
 
-    TokensFile tf(content, "string_octhex", 1, false);
-    REQUIRE(tf.tok_lines_count() == (sizeof(cases) / sizeof(cases[0])));
+    TokenFileReader tfr;
+    tfr.inject("string_octhex", content);
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    size_t count = 0;
 
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
-        const auto& toks = tf.get_tok_line(static_cast<unsigned>(i)).tokens();
+        REQUIRE(tfr.next_token_line(tl));
+        const auto& toks = tl.tokens();
+
         REQUIRE(toks.size() == 1);
         const auto& t = toks[0];
         REQUIRE(t.is(TokenType::String));
         REQUIRE(t.text() == cases[i].literal);
         REQUIRE(t.string_value() == cases[i].expected);
+
+        ++count;
     }
+
+    REQUIRE(count == (sizeof(cases) / sizeof(cases[0])));
 }
 
 // New test: verify that an empty double-quoted string is accepted
@@ -1515,11 +1594,13 @@ TEST_CASE("Empty string literal is accepted and resolves to empty contents",
           "[lexer][string][empty]") {
     g_options = Options();
 
-    const std::string content = "\"\"\n";
-    TokensFile tf(content, "str_empty", 1, false);
+    TokenFileReader tfr;
+    tfr.inject("str_empty", "\"\"\n");
+    tfr.set_fixed_line_number(1);
 
-    REQUIRE(tf.tok_lines_count() == 1);
-    const auto& toks = tf.get_tok_line(0).tokens();
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    const auto& toks = tl.tokens();
 
     REQUIRE(toks.size() == 1);
     REQUIRE(toks[0].is(TokenType::String));

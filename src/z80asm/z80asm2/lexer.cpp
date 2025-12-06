@@ -9,6 +9,10 @@
 #include "utils.h"
 #include <algorithm>
 
+//-----------------------------------------------------------------------------
+// Token implementation
+//-----------------------------------------------------------------------------
+
 Token::Token(TokenType type, const std::string& text, bool has_space_after)
     : type_(type), text_(text), has_space_after_(has_space_after) {
     switch (type) {
@@ -67,16 +71,8 @@ bool Token::is(TokenType t) const {
     return type_ == t;
 }
 
-bool Token::is_not(TokenType t) const {
-    return type_ != t;
-}
-
 bool Token::is(Keyword kw) const {
     return keyword_ == kw;
-}
-
-bool Token::is_not(Keyword kw) const {
-    return keyword_ != kw;
 }
 
 // Read-only accessors
@@ -109,76 +105,53 @@ bool Token::has_space_after() const {
 }
 
 //-----------------------------------------------------------------------------
+// TokenLine implementation
+//-----------------------------------------------------------------------------
 
-TokensLine::TokensLine(const Location& location)
+TokenLine::TokenLine(const Location& location)
     : location_(location) {
 }
 
-TokensLine::TokensLine(const Location& location,
-                       const std::vector<Token>& tokens)
+TokenLine::TokenLine(const Location& location,
+                     const std::vector<Token>& tokens)
     : location_(location), tokens_(tokens) {
 }
 
-void TokensLine::clear() {
+void TokenLine::clear() {
     location_.clear();
     tokens_.clear();
 }
 
-void TokensLine::clear_tokens() {
-    tokens_.clear();
-}
-
-bool TokensLine::empty() const {
-    return tokens_.empty();
-}
-
-const Location& TokensLine::location() const {
+const Location& TokenLine::location() const {
     return location_;
 }
 
-void TokensLine::set_location(const Location& location) {
+void TokenLine::set_location(const Location& location) {
     location_ = location;
 }
 
-void TokensLine::push_back(const Token& token) {
-    tokens_.push_back(token);
-}
-
-void TokensLine::push_back(Token&& token) {
-    tokens_.push_back(std::move(token));
-}
-
-void TokensLine::pop_back() {
-    tokens_.pop_back();
-}
-
-const Token& TokensLine::back() const {
-    return tokens_.back();
-}
-
-const Token& TokensLine::operator[](unsigned index) const {
-    if (index >= tokens_.size()) {
-        static Token empty_token(TokenType::EndOfLine, "", false);
-        return empty_token;
-    }
-    else {
-        return tokens_[index];
-    }
-}
-
-const std::vector<Token>& TokensLine::tokens() const {
+std::vector<Token>& TokenLine::tokens() {
     return tokens_;
 }
 
-unsigned TokensLine::size() const {
-    return static_cast<unsigned>(tokens_.size());
+const std::vector<Token>& TokenLine::tokens() const {
+    return tokens_;
+}
+
+bool TokenLine::has_token_type(TokenType tt) const {
+    for (const auto& t : tokens_) {
+        if (t.is(tt)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Reconstruct the line by concatenating the original token texts in order.
 // Insert spaces where necessary to avoid accidental re-scanning into different tokens:
 //  - always insert a space between Identifier, Integer and Float tokens when adjacent
 //  - insert a space between tokens whose concatenation would form a multi-character operator
-std::string TokensLine::to_string() const {
+std::string TokenLine::to_string() const {
     std::string out;
     out.reserve(tokens_.size() * 4);
 
@@ -245,162 +218,30 @@ std::string TokensLine::to_string() const {
     return trim(out);
 }
 
-bool TokensLine::at_end(unsigned i) const {
-    return i >= size();
-}
-
-void TokensLine::reserve(size_t capacity) {
-    tokens_.reserve(capacity);
-}
-
-bool TokensLine::has_token_type(TokenType tt) const {
-    for (const auto& t : tokens_) {
-        if (t.is(tt)) {
-            return true;
-        }
-    }
-    return false;
-}
-
+//-----------------------------------------------------------------------------
+// TokenFileReader implementation
 //-----------------------------------------------------------------------------
 
-TokensFile::TokensFile(const std::string& filename,
-                       int first_line_num) :
-    filename_(filename),
-    first_line_num_(first_line_num),
-    inc_line_nums_(true) {
-    std::string content;
-    try {
-        content = read_file_to_string(filename);
-    }
-    catch (...) {
-        // file read error
-        g_errors.error(ErrorCode::FileNotFound, filename_);
-        content.clear();
-    }
-
-    tokenize(content);
+TokenFileReader::TokenFileReader(const std::string& filename)
+    : FileReader(filename) {
 }
 
-TokensFile::TokensFile(const std::string& content,
-                       const std::string& filename,
-                       int first_line_num, bool inc_line_nums) :
-    filename_(filename),
-    first_line_num_(first_line_num),
-    inc_line_nums_(inc_line_nums) {
-    tokenize(content);
-}
+bool TokenFileReader::next_token_line(TokenLine& token_line) {
+    token_line.clear();
 
-TokensFile::TokensFile(const std::vector<TokensLine>& tok_lines,
-                       const std::string& filename,
-                       int first_line_num, bool inc_line_nums)
-    : filename_(filename),
-      first_line_num_(first_line_num),
-      inc_line_nums_(inc_line_nums),
-      tok_lines_(tok_lines) {
-}
+    while (token_line.tokens().empty()) {
+        // read next source line
+        if (!next_line(source_line_)) {
+            return false;
+        }
 
-void TokensFile::clear() {
-    filename_.clear();
-    first_line_num_ = 1;
-    inc_line_nums_ = true;
-    text_lines_.clear();
-    tok_lines_.clear();
-    has_pragma_once_ = false;
-}
-
-const std::string& TokensFile::filename() const {
-    return filename_;
-}
-
-int TokensFile::first_line_num() const {
-    return first_line_num_;
-}
-
-bool TokensFile::inc_line_nums() const {
-    return inc_line_nums_;
-}
-
-unsigned TokensFile::line_count() const {
-    return static_cast<unsigned>(text_lines_.size());
-}
-
-const std::string& TokensFile::get_line(unsigned index) const {
-    if (index >= text_lines_.size()) {
-        static std::string empty;
-        return empty;
-    }
-    else {
-        return text_lines_[index];
-    }
-}
-
-unsigned TokensFile::tok_lines_count() const {
-    return static_cast<unsigned>(tok_lines_.size());
-}
-
-const TokensLine& TokensFile::get_tok_line(unsigned index) const {
-    if (index >= tok_lines_.size()) {
-        static TokensLine empty_line;
-        return empty_line;
-    }
-    else {
-        return tok_lines_[index];
-    }
-}
-
-const std::vector<std::string> TokensFile::text_lines() const {
-    return text_lines_;
-}
-
-const std::vector<TokensLine> TokensFile::tok_lines() const {
-    return tok_lines_;
-}
-
-// PRAGMA ONCE support
-bool TokensFile::has_pragma_once() const {
-    return has_pragma_once_;
-}
-
-void TokensFile::set_has_pragma_once(bool v) {
-    has_pragma_once_ = v;
-}
-
-bool TokensFile::has_ifndef_guard() const {
-    return has_ifndef_guard_;
-}
-
-void TokensFile::set_has_ifndef_guard(bool v) {
-    has_ifndef_guard_ = v;
-}
-
-const std::string& TokensFile::ifndef_guard_symbol() const {
-    return ifndef_guard_symbol_;
-}
-
-void TokensFile::set_ifndef_guard_symbol(const std::string& symbol) {
-    ifndef_guard_symbol_ = symbol;
-}
-
-void TokensFile::tokenize(const std::string& content) {
-    // Split content into lines
-    text_lines_ = split_lines(content);
-
-    // Tokenize each line
-    Location location(filename_, first_line_num_);
-    for (unsigned i = 0; i < text_lines_.size(); ++i) {
-        // notify error reporter of current line
-        int line_num = first_line_num_ + (inc_line_nums_ ? i : 0);
-        location.set_line_num(line_num);
-        g_errors.set_location(location);
-        g_errors.set_source_line(text_lines_[i]);
-
-        // split in tokens, possibly advancing i for line continuations
-        // and multi-line comments
-        TokensLine tok_line(location);
-        tokenize_line(i, tok_line);
-        if (!tok_line.empty()) {
-            tok_lines_.push_back(std::move(tok_line));
+        // tokenize the line; may retrieve more lines if there are continuations
+        if (tokenize_line(token_line) && !token_line.tokens().empty()) {
+            break;
         }
     }
+
+    token_line.set_location(Location(filename_, line_number_));
+    g_errors.set_expanded_line(token_line.to_string());
+    return true;
 }

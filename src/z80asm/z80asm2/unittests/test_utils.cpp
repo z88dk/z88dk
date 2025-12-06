@@ -879,7 +879,8 @@ TEST_CASE("file_exists handles non-existent paths", "[utils][file_exists]") {
     REQUIRE_FALSE(file_exists("C:\\nonexistent\\path\\to\\file.txt"));
 }
 
-TEST_CASE("get_file_size returns correct size for existing files", "[utils][get_file_size]") {
+TEST_CASE("get_file_size returns correct size for existing files",
+          "[utils][get_file_size]") {
     const std::string fname = "test_get_file_size.txt";
 
     // Empty file
@@ -908,7 +909,8 @@ TEST_CASE("get_file_size returns correct size for existing files", "[utils][get_
     std::remove(fname.c_str());
 }
 
-TEST_CASE("get_file_size returns -1 for non-existent files", "[utils][get_file_size]") {
+TEST_CASE("get_file_size returns -1 for non-existent files",
+          "[utils][get_file_size]") {
     const std::string fname = "test_nonexistent_file.txt";
 
     // Ensure file doesn't exist
@@ -917,7 +919,8 @@ TEST_CASE("get_file_size returns -1 for non-existent files", "[utils][get_file_s
     REQUIRE(get_file_size(fname) == static_cast<size_t>(-1));
 }
 
-TEST_CASE("get_file_size returns -1 for directories", "[utils][get_file_size]") {
+TEST_CASE("get_file_size returns -1 for directories",
+          "[utils][get_file_size]") {
     const std::string dirname = "test_dir_for_size";
 
     // Clean up first
@@ -937,7 +940,8 @@ TEST_CASE("get_file_size handles empty filename", "[utils][get_file_size]") {
     REQUIRE(get_file_size("") == static_cast<size_t>(-1));
 }
 
-TEST_CASE("get_file_size with file_exists consistency", "[utils][file_exists][get_file_size]") {
+TEST_CASE("get_file_size with file_exists consistency",
+          "[utils][file_exists][get_file_size]") {
     const std::string fname = "test_consistency.txt";
 
     // Non-existent file
@@ -961,7 +965,8 @@ TEST_CASE("get_file_size with file_exists consistency", "[utils][file_exists][ge
     REQUIRE(get_file_size(fname) == static_cast<size_t>(-1));
 }
 
-TEST_CASE("get_file_size handles special characters in filename", "[utils][get_file_size]") {
+TEST_CASE("get_file_size handles special characters in filename",
+          "[utils][get_file_size]") {
     // Note: Some special characters might not be valid on all filesystems
     const std::string fname = "test-file_with.special+chars.txt";
 
@@ -992,7 +997,8 @@ TEST_CASE("get_file_size tracks file growth", "[utils][get_file_size]") {
     std::remove(fname.c_str());
 }
 
-TEST_CASE("file_exists works with relative and absolute paths", "[utils][file_exists]") {
+TEST_CASE("file_exists works with relative and absolute paths",
+          "[utils][file_exists]") {
     const std::string fname = "test_paths.txt";
 
     write_string_to_file(fname, "test");
@@ -1008,7 +1014,8 @@ TEST_CASE("file_exists works with relative and absolute paths", "[utils][file_ex
     std::remove(fname.c_str());
 }
 
-TEST_CASE("get_file_size works with relative and absolute paths", "[utils][get_file_size]") {
+TEST_CASE("get_file_size works with relative and absolute paths",
+          "[utils][get_file_size]") {
     const std::string fname = "test_paths_size.txt";
     const std::string content = "test content";
 

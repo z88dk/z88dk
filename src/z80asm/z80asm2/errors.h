@@ -54,7 +54,7 @@ private:
     void format_error_message(ErrorCode code,
                               const std::string& prefix,
                               const std::string& arg);
-    
+
     // Format error message with explicit location
     void format_error_message(const Location& loc,
                               ErrorCode code,

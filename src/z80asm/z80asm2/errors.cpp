@@ -39,29 +39,35 @@ void Errors::set_quiet(bool f) {
 void Errors::error(ErrorCode code, const std::string& arg) {
     ++error_count_;
     format_error_message(code, "error", arg);
-    if (!quiet_)
+    if (!quiet_) {
         std::cerr << last_error_message_;
+    }
 }
 
 void Errors::warning(ErrorCode code, const std::string& arg) {
     ++warning_count_;
     format_error_message(code, "warning", arg);
-    if (!quiet_)
+    if (!quiet_) {
         std::cerr << last_error_message_;
+    }
 }
 
-void Errors::error(const Location& loc, ErrorCode code, const std::string& arg) {
+void Errors::error(const Location& loc, ErrorCode code,
+                   const std::string& arg) {
     ++error_count_;
     format_error_message(loc, code, "error", arg);
-    if (!quiet_)
+    if (!quiet_) {
         std::cerr << last_error_message_;
+    }
 }
 
-void Errors::warning(const Location& loc, ErrorCode code, const std::string& arg) {
+void Errors::warning(const Location& loc, ErrorCode code,
+                     const std::string& arg) {
     ++warning_count_;
     format_error_message(loc, code, "warning", arg);
-    if (!quiet_)
+    if (!quiet_) {
         std::cerr << last_error_message_;
+    }
 }
 
 const Location& Errors::location() const {
