@@ -237,7 +237,8 @@ TEST_CASE("Errors: warning with explicit location", "[errors][location]") {
     REQUIRE(msg.find("test warning") != std::string::npos);
 }
 
-TEST_CASE("Errors: explicit location doesn't change internal location", "[errors][location]") {
+TEST_CASE("Errors: explicit location doesn't change internal location",
+          "[errors][location]") {
     SuppressErrors suppress;
 
     // Set internal location
@@ -257,7 +258,8 @@ TEST_CASE("Errors: explicit location doesn't change internal location", "[errors
     REQUIRE(msg.find("error.asm:20:") != std::string::npos);
 }
 
-TEST_CASE("Errors: explicit location with empty location", "[errors][location]") {
+TEST_CASE("Errors: explicit location with empty location",
+          "[errors][location]") {
     SuppressErrors suppress;
 
     Location empty_loc;
@@ -268,7 +270,8 @@ TEST_CASE("Errors: explicit location with empty location", "[errors][location]")
     REQUIRE(msg.find("error:") == 0);
 }
 
-TEST_CASE("Errors: multiple errors with explicit locations", "[errors][location]") {
+TEST_CASE("Errors: multiple errors with explicit locations",
+          "[errors][location]") {
     SuppressErrors suppress;
 
     Location loc1("file1.asm", 10);
@@ -287,7 +290,8 @@ TEST_CASE("Errors: multiple errors with explicit locations", "[errors][location]
     REQUIRE(msg.find("warning 3") != std::string::npos);
 }
 
-TEST_CASE("Errors: expression error example", "[errors][location][expression]") {
+TEST_CASE("Errors: expression error example",
+          "[errors][location][expression]") {
     SuppressErrors suppress;
 
     // Simulate an expression defined at a specific location

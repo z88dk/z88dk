@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 
 // Small helper to write a file with given contents.
 static std::string write_file(const fs::path& path,
-                                   const std::string& contents = "") {
+                              const std::string& contents = "") {
     fs::create_directories(path.parent_path());
     std::ofstream ofs(path.generic_string(), std::ios::binary);
     REQUIRE(ofs.is_open());
@@ -58,7 +58,7 @@ TEST_CASE("get_o_filename prepends output_dir and avoids double-prepend",
     // relative asm filename
     std::string input = "src/hello.asm";
     fs::path expected = fs::path("outdir") /
-                                     fs::path("src/hello.o");
+                        fs::path("src/hello.o");
     CHECK(g_options.get_o_filename(input) ==
           expected.lexically_normal().generic_string());
 
@@ -83,7 +83,7 @@ TEST_CASE("search_source_file finds files in include_paths and returns normalize
 
     // create include directory and file
     fs::path inc_dir = fs::temp_directory_path() /
-                                    "z80asm_test_inc";
+                       "z80asm_test_inc";
     fs::remove_all(inc_dir);
     fs::create_directories(inc_dir);
     std::string inc_name = "common.inc";
@@ -143,7 +143,7 @@ TEST_CASE("resolve_include_candidate picks absolute path directly",
 
     // create a temporary file with an absolute path
     auto tmp = fs::temp_directory_path() / ("z80asm_opts_abs_" +
-               std::to_string(std::rand()) + ".inc");
+                                            std::to_string(std::rand()) + ".inc");
     std::string abs_path = write_file(tmp, "LD A,1");
     // resolve should return the normalized absolute path when given an absolute path
     std::string resolved = g_options.resolve_include_candidate(abs_path, "", false);
@@ -180,7 +180,7 @@ TEST_CASE("resolve_include_candidate honors include_paths order for angle includ
     std::string resolved = g_options.resolve_include_candidate(name, "", true);
     REQUIRE_FALSE(resolved.empty());
     CHECK(resolved == fs::absolute(inc2 /
-            name).lexically_normal().generic_string());
+                                   name).lexically_normal().generic_string());
 
     // cleanup
     fs::remove_all(inc1);

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "file_cache.h"
 #include "keywords.h"
 #include "location.h"
 #include <iostream>
@@ -71,9 +72,7 @@ public:
                    Keyword keyword, bool has_space_after);
 
     bool is(TokenType t) const;
-    bool is_not(TokenType t) const;
     bool is(Keyword kw) const;
-    bool is_not(Keyword kw) const;
 
     // Read-only accessors
     TokenType type() const;
@@ -95,86 +94,38 @@ private:
         false; // true if original source had space after this token
 };
 
-class TokensLine {
+class TokenLine {
 public:
-    TokensLine() = default;
-    TokensLine(const Location& location);
-    TokensLine(const Location& location, const std::vector<Token>& tokens);
+    TokenLine() = default;
+    TokenLine(const Location& location);
+    TokenLine(const Location& location, const std::vector<Token>& tokens);
 
     void clear();
-    void clear_tokens();
-    bool empty() const;
+
     const Location& location() const;
     void set_location(const Location& location);
-    void push_back(const Token& token);
-    void push_back(Token&& token);
-    void pop_back();
-    const Token& back() const;
-    const Token& operator[](unsigned index) const;
+
+    std::vector<Token>& tokens();
     const std::vector<Token>& tokens() const;
-    unsigned size() const;
-    std::string to_string() const;
-    bool at_end(unsigned i) const;
-    void reserve(size_t capacity); // reserve storage in tokens_ vector
     bool has_token_type(TokenType tt) const; // check if any token matches type
+
+    std::string to_string() const;
 
 private:
     Location location_;             // Location of this line
     std::vector<Token> tokens_;     // Tokens found in this line
 };
 
-class TokensFile {
+class TokenFileReader : public FileReader {
 public:
-    TokensFile() = default;
+    TokenFileReader() = default;
+    TokenFileReader(const std::string& filename);
 
-    // read a text file
-    TokensFile(const std::string& filename,
-               int first_line_num = 1);
-
-    // virtual file from a string content
-    TokensFile(const std::string& content,
-               const std::string& filename,
-               int first_line_num, bool inc_line_nums);
-
-    // virtual file directly from pre-tokenized lines (no tokenize())
-    TokensFile(const std::vector<TokensLine>& tok_lines,
-               const std::string& filename,
-               int first_line_num, bool inc_line_nums);
-
-    void clear();
-    const std::string& filename() const;
-    int first_line_num() const;
-    bool inc_line_nums() const;
-    unsigned line_count() const;
-    const std::string& get_line(unsigned index) const;
-    unsigned tok_lines_count() const;
-    const TokensLine& get_tok_line(unsigned index) const;
-    const std::vector<std::string> text_lines() const;
-    const std::vector<TokensLine> tok_lines() const;
-
-    // PRAGMA ONCE support
-    bool has_pragma_once() const;
-    void set_has_pragma_once(bool v = true);
-
-    // IFNDEF/DEFINE guard support
-    bool has_ifndef_guard() const;
-    void set_has_ifndef_guard(bool v = true);
-    const std::string& ifndef_guard_symbol() const;
-    void set_ifndef_guard_symbol(const std::string& symbol);
+    // Read next line from file and tokenize it
+    // Returns true if a line was read, false on EOF
+    bool next_token_line(TokenLine& out_line);
 
 private:
-    std::string filename_;
-    int first_line_num_ = 1;
-    bool inc_line_nums_ = true;
-    std::vector<std::string> text_lines_;
-    std::vector<TokensLine> tok_lines_;
-    // set true when PRAGMA ONCE seen in this file
-    bool has_pragma_once_ = false;
-    // set true when IFNDEF/DEFINE guard seen in this file
-    bool has_ifndef_guard_ = false;
-    std::string ifndef_guard_symbol_;
-
-    void tokenize(const std::string& content);
-    void tokenize_line(unsigned& line_index, TokensLine& output);
+    std::string source_line_; // current source line being tokenized
+    bool tokenize_line(TokenLine& out_line);
 };
-
