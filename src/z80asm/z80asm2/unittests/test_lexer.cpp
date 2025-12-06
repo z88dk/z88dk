@@ -135,7 +135,7 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
     // Note: backslash is included as a standalone token; whitespace is produced between tokens.
 
     TokenFileReader tfr;
-    tfr.inject("types_test", "id 123 1.23 \"str\" + \\ , . ( ) [ ] { }\n");
+    tfr.inject("types_test", "id 123 1.23 \"str\" + , . ( ) [ ] { }\n");
     tfr.set_line_number(1);
 
     TokenLine tl;
@@ -154,7 +154,6 @@ TEST_CASE("TokensFile tokenizes all TokenType values", "[lexer][token_types]") {
         TokenType::Integer,
         TokenType::Float,
         TokenType::String,
-        TokenType::Backslash,
         TokenType::Comma,
         TokenType::Dot,
         TokenType::LeftParen,
@@ -200,7 +199,7 @@ TEST_CASE("TokensFile tokenizes all TokenType values",
     // Some operator tokens are multi-character and must be contiguous (e.g. '!=', '<<', '^^', '**', '##').
     TokenFileReader tfr;
     tfr.inject("op_test",
-               "! != ~ ^ ^^ & && * ** / % + - << >> < <= > >= = ? : # ## | ||\n");
+               "! != ~ ^ ^^ & && * ** / % + - << >> < <= > >= = ? # ## | ||\n");
     tfr.set_fixed_line_number(1);
 
     TokenLine tl;
@@ -235,7 +234,6 @@ TEST_CASE("TokensFile tokenizes all TokenType values",
         TokenType::GE,           // ">="
         TokenType::EQ,           // "="
         TokenType::Question,     // "?"
-        TokenType::Colon,        // ":"
         TokenType::Hash,         // "#"
         TokenType::DoubleHash,   // "##"
         TokenType::BitwiseOr,    // "|"
@@ -892,7 +890,7 @@ TEST_CASE("Lexer collapses mixed whitespace run",
 
     TokenFileReader tfr;
     tfr.inject("ws_mixed", "\t\v\f A \t\v\f B \t\v\f \n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -914,7 +912,7 @@ TEST_CASE("Lexer scans bitmask %\"-#-#\" and @\"-#-#\" into Integer tokens",
 
     TokenFileReader tfr;
     tfr.inject("bitmask_basic", "%\"-#-#\" @\"-#-#\"\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -947,7 +945,7 @@ TEST_CASE("Lexer bitmask handles empty and single-bit sequences",
 
     TokenFileReader tfr;
     tfr.inject("bitmask_edges", "%\"\" %\"#\" %\"-#\" %\"#-\"\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1024,18 +1022,21 @@ TEST_CASE("TokensFile parses integer literals with underscores as digit separato
     REQUIRE(tl.tokens().empty());
 }
 
-// New tests: verify floats accept underscores as digit separators in integer, fractional and exponent parts
-TEST_CASE("Lexer parses floats with underscores in integer and fractional parts",
+TEST_CASE("Lexer parses floats with underscores in integer, fractional and exponent parts",
           "[lexer][float][underscores]") {
     g_options = Options();
 
-    // Three floats:
+    // Five floats:
     // 1) underscore in integer part: 1_234.5 -> 1234.5
     // 2) underscore in fractional part: 12.3_45 -> 12.345
     // 3) multiple underscores within fractional digits: 0.0_5 -> 0.05
+    // 4) underscore in exponent: 1.25e1_2 -> 1.25e12
+    // 5) underscore with negative exponent: 3.0e-0_3 -> 3.0e-3
+    // 6) underscores in integer part and exponent: 4_2.0e0_0 -> 42.0
 
     TokenFileReader tfr;
-    tfr.inject("float_underscores_if", "1_234.5 12.3_45 0.0_5\n");
+    tfr.inject("float_underscores_if",
+               "1_234.5 12.3_45 0.0_5 1.25e1_2 3.0e-0_3 4_2.0e0_0\n");
     tfr.set_fixed_line_number(1);
 
     TokenLine tl;
@@ -1051,42 +1052,7 @@ TEST_CASE("Lexer parses floats with underscores in integer and fractional parts"
     std::vector<double> expected = {
         1234.5,   // "1_234.5"
         12.345,   // "12.3_45"
-        0.05      // "0.0_5"
-    };
-
-    REQUIRE(found.size() == expected.size());
-    for (size_t i = 0; i < expected.size(); ++i) {
-        REQUIRE(found[i] == Catch::Approx(expected[i]).epsilon(1e-12));
-    }
-
-    REQUIRE_FALSE(tfr.next_token_line(tl));
-    REQUIRE(tl.tokens().empty());
-}
-
-TEST_CASE("Lexer parses floats with underscores in exponent part (and combined)",
-          "[lexer][float][underscores][exponent]") {
-    g_options = Options();
-
-    // Three floats:
-    // 1) underscore in exponent: 1.25e1_2 -> 1.25e12
-    // 2) underscore with negative exponent: 3.0e-0_3 -> 3.0e-3
-    // 3) underscores in integer part and exponent: 4_2.0e0_0 -> 42.0
-
-    TokenFileReader tfr;
-    tfr.inject("float_underscores_exp", "1.25e1_2 3.0e-0_3 4_2.0e0_0\n");
-    tfr.set_fixed_line_number(1);
-
-    TokenLine tl;
-    REQUIRE(tfr.next_token_line(tl));
-    const auto& toks = tl.tokens();
-
-    std::vector<double> found;
-    for (const auto& t : toks) {
-        REQUIRE(t.is(TokenType::Float));
-        found.push_back(t.float_value());
-    }
-
-    std::vector<double> expected = {
+        0.05,     // "0.0_5"
         1.25e12,  // "1.25e1_2"
         3.0e-3,   // "3.0e-0_3"
         42.0      // "4_2.0e0_0"
@@ -1714,4 +1680,472 @@ TEST_CASE("Token ctor string unescape handles hex and octal edge cases",
     expected.push_back(static_cast<char>(0x4F));
     expected.push_back(static_cast<char>(0xFF));
     REQUIRE(t.string_value() == expected);
+}
+
+TEST_CASE("split_lines handles label colon", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "label: LD A, B\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Should be single line with label colon preserved
+    REQUIRE(tl.to_string() == ".label");
+
+    REQUIRE(tfr.next_token_line(tl));
+    // Rest of line on next output
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles local label with dot", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", ".local: LD A, B\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Local label should be output alone
+    REQUIRE(tl.to_string() == ".local");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles multiple consecutive labels", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "label1: label2: LD A, B\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".label1");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".label2");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles label only line", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "label:\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".label");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles local label only line", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", ".local:\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".local");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines splits on separator colon", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "LD A, B : ADD A, C\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "ADD A, C");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines splits on multiple separator colons", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "LD A, 1 : LD B, 2 : LD C, 3\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, 1");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD B, 2");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD C, 3");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines splits on backslash", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "LD A, B \\ ADD A, C\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "ADD A, C");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines preserves colon after instruction", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "LD A, (HL):\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, (HL)");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles simple ternary expression", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 1 ? 2 : 3\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Should be single line - colon is part of ternary, not a separator
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles nested ternary expressions", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB a ? b ? c : d : e\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Nested ternary - both colons should stay (levels: 0?1?2?1?0)
+    REQUIRE(tl.to_string() == "DEFB a ? b ? c : d : e");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles deeply nested ternary", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 0 ? 0 ? 2 : 3 : 1 ? 4 : 5\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 0 ? 0 ? 2 : 3 : 1 ? 4 : 5");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles ternary followed by separator",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 1 ? 2 : 3 : DEFB 4\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 4");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles label with ternary on separate lines",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "label: DEFB 1 ? 2 : 3\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Label output alone
+    REQUIRE(tl.to_string() == ".label");
+
+    REQUIRE(tfr.next_token_line(tl));
+    // Rest of line with ternary
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles ternary with separator after",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 1 ? 2 : 3, 4 : LD A, 5\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3, 4");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, 5");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles complex mixed line with labels",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "label1: DEFB 1 ? 2 : 3 : label2: LD A, 4 ? 5 : 6\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".label1");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".label2");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, 4 ? 5 : 6");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles multiple ternaries on same line",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 1 ? 2 : 3, 4 ? 5 : 6\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3, 4 ? 5 : 6");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines resets ternary level on backslash", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 1 ? 2 \\ : 3\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Backslash splits even inside ternary
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2");
+
+    REQUIRE(tfr.next_token_line(tl));
+    // Colon after backslash becomes a separator (ternary level reset)
+    REQUIRE(tl.to_string() == "3");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles instruction followed by ternary",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "LD A, 1 ? 2 : 3\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // LD is instruction, but colon is part of ternary
+    REQUIRE(tl.to_string() == "LD A, 1 ? 2 : 3");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles empty ternary branches", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 0 ? : 1\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 0 ? : 1");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles ternary in expression context",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "DEFB 2 * (1 ? 2 : 3) + 4\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFB 2 * (1 ? 2 : 3) + 4");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles label followed by instruction with colon",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "loop: LD A, (HL): INC HL\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // Label output alone
+    REQUIRE(tl.to_string() == ".loop");
+
+    REQUIRE(tfr.next_token_line(tl));
+    // Instruction colon stays
+    REQUIRE(tl.to_string() == "LD A, (HL)");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "INC HL");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles all colon types in one line", "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "start: LD A, 1 ? 2 : 3 : LD B, (HL): : END\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    // start: = label colon (output alone)
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".start");
+
+    // ? 2 : 3 = ternary colon (keep together)
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, 1 ? 2 : 3");
+
+    // (HL): = instruction colon (keep)
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD B, (HL)");
+
+    // Second standalone : splits to empty line
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "END");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles local label followed by instruction",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", ".loop: LD A, B\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".loop");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines handles mixed global and local labels",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "main: .local: LD A, B\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".main");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".local");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("split_lines non-first colon is separator not label",
+          "[lexer][split]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    tfr.inject("split_test", "LD A, B: label: LD C, D\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    // First colon after LD is instruction colon
+    REQUIRE(tl.to_string() == "LD A, B");
+
+    REQUIRE(tfr.next_token_line(tl));
+    // Second identifier+colon is now at start of new logical line, so it's a label
+    REQUIRE(tl.to_string() == ".label");
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD C, D");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
 }
