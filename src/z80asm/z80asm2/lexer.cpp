@@ -8,6 +8,7 @@
 #include "lexer.h"
 #include "utils.h"
 #include <algorithm>
+#include <filesystem>
 
 //-----------------------------------------------------------------------------
 // Token implementation
@@ -219,24 +220,148 @@ std::string TokenLine::to_string() const {
 }
 
 //-----------------------------------------------------------------------------
+// TokenCache implementation
+//-----------------------------------------------------------------------------
+
+std::optional<TokenCache::CacheKey> TokenCache::make_cache_key(
+    const std::string& filename) const {  // Add const here
+    try {
+        auto path = std::filesystem::path(filename);
+        if (!std::filesystem::exists(path)) {
+            return std::nullopt;
+        }
+
+        return CacheKey{
+            std::filesystem::canonical(path).string(),
+            std::filesystem::last_write_time(path),
+            std::filesystem::file_size(path)
+        };
+    }
+    catch (const std::filesystem::filesystem_error&) {
+        return std::nullopt;
+    }
+}
+
+bool TokenCache::options_match(const Options& cached,
+                               const Options& current) const {
+    // Only check options that affect tokenization
+    return cached.ucase_labels == current.ucase_labels &&
+           cached.swap_ix_iy == current.swap_ix_iy;
+}
+
+std::optional<std::vector<TokenLine>> TokenCache::get(const std::string&
+filename) {
+    auto key_opt = make_cache_key(filename);
+    if (!key_opt) {
+        return std::nullopt;
+    }
+
+    auto it = cache_.find(*key_opt);
+    if (it != cache_.end()) {
+        // Verify options haven't changed
+        if (options_match(it->second.options_snapshot, g_options)) {
+            return it->second.token_lines;
+        }
+        else {
+            // Options changed - invalidate this entry
+            cache_.erase(it);
+        }
+    }
+
+    return std::nullopt;
+}
+
+void TokenCache::put(const std::string& filename,
+                     std::vector<TokenLine> token_lines) {
+    auto key_opt = make_cache_key(filename);
+    if (!key_opt) {
+        return;
+    }
+
+    cache_[*key_opt] = CachedEntry{
+        std::move(token_lines),
+        g_options
+    };
+}
+
+void TokenCache::clear() {
+    cache_.clear();
+}
+
+//-----------------------------------------------------------------------------
 // TokenFileReader implementation
 //-----------------------------------------------------------------------------
 
-TokenFileReader::TokenFileReader(const std::string& filename)
-    : FileReader(filename) {
+TokenCache& TokenFileReader::get_cache() {
+    static TokenCache cache;
+    return cache;
+}
+
+TokenFileReader::TokenFileReader(const std::string& filename) {
+    open(filename);
+}
+
+bool TokenFileReader::open(const std::string& filename) {
+    // Call parent open first
+    if (!FileReader::open(filename)) {
+        return false;
+    }
+
+    // Check cache after successful open
+    check_cache();
+    return true;
+}
+
+void TokenFileReader::check_cache() {
+    // Reset cache-related state
+    use_cached_mode_ = false;
+    cached_lines_.clear();
+    current_line_index_ = 0;
+    pending_cache_lines_.clear();
+
+    // Only use cache for actual files, not injected content
+    if (filename_.empty() || !injected_content_.empty()) {
+        return;
+    }
+
+    // Try cache lookup
+    if (auto cached = get_cache().get(filename_)) {
+        cached_lines_ = *cached;  // Copy, don't move!
+        use_cached_mode_ = true;
+    }
 }
 
 bool TokenFileReader::next_token_line(TokenLine& token_line) {
+    // If using cached mode, just return next cached line
+    if (use_cached_mode_) {
+        if (current_line_index_ < cached_lines_.size()) {
+            token_line = cached_lines_[current_line_index_++];
+
+            // Update error context
+            g_errors.set_location(token_line.location());
+            g_errors.set_expanded_line(token_line.to_string());
+
+            return true;
+        }
+        return false;
+    }
+
+    // Check if content was injected
+    bool is_injected = !injected_content_.empty();
+
+    // Original tokenization logic
     while (true) {
         if (!output_queue_.empty()) {
             token_line = std::move(output_queue_.front());
             output_queue_.pop_front();
-            if (token_line.tokens().empty()) {
-                continue;
-            }
 
             g_errors.set_location(token_line.location());
             g_errors.set_expanded_line(token_line.to_string());
+
+            // Accumulate for caching (only for non-injected files)
+            if (!filename_.empty() && !is_injected) {
+                pending_cache_lines_.push_back(token_line);
+            }
 
             return true;
         }
@@ -245,6 +370,11 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
         while (token_line.tokens().empty()) {
             // read next source line
             if (!next_line(source_line_)) {
+                // EOF reached - save to cache if we have a real file
+                if (!filename_.empty() && !is_injected &&
+                        !pending_cache_lines_.empty()) {
+                    get_cache().put(filename_, std::move(pending_cache_lines_));
+                }
                 return false;
             }
 
@@ -349,12 +479,17 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
 
             // Normal colon handling (only when ternary_level == 0)
             if (prev_was_first_ident) {
-                // Label colon - add it to current line and output the label alone
-                Token name_token = current_line.tokens().back();
-                current_line.tokens().clear();
-                current_line.tokens().push_back(
-                    Token(TokenType::Dot, ".", false));
-                current_line.tokens().push_back(name_token);
+                // Label colon - convert to dot-label and output alone
+                // Replace "identifier:" with ".identifier"
+                if (!current_line.tokens().empty()) {
+                    // Change last token (identifier) and don't add colon
+                    Token label_token = current_line.tokens().back();
+                    // Insert a dot token before the identifier
+                    current_line.tokens().pop_back();
+                    current_line.tokens().push_back(Token(TokenType::Dot, ".", false));
+                    current_line.tokens().push_back(label_token);
+                }
+
                 output_queue_.push_back(current_line);
 
                 // Start fresh for next part of line
@@ -366,8 +501,7 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
                 prev_was_instruction = false;
             }
             else if (prev_was_instruction) {
-                // Colon after instruction - keep it, don't split
-                current_line.tokens().push_back(token);
+                // Colon after instruction - don't add it, just reset flag
                 prev_was_instruction = false;
             }
             else {

@@ -22,10 +22,12 @@ class test_file {
 public:
     test_file(const std::string& filename, const std::string& content)
         : filename_(filename) {
+        g_file_cache.invalidate(filename_);  // Clear any stale cache first
         write_string_to_file(filename_, content);
     }
 
     ~test_file() {
+        g_file_cache.invalidate(filename_);  // Clear cache before deleting
         std::remove(filename_.c_str());
     }
 
@@ -93,14 +95,23 @@ TEST_CASE("FileCache: invalidate removes file from cache", "[file_cache]") {
     REQUIRE(content1 != nullptr);
     REQUIRE(g_file_cache.is_cached(fname));
 
+    // Store the actual content to verify later
+    std::string content1_copy(content1->begin(), content1->end());
+
     // Invalidate
     g_file_cache.invalidate(fname);
-    REQUIRE_FALSE(g_file_cache.is_cached(fname));
+    REQUIRE_FALSE(g_file_cache.is_cached(fname));  // ? Key check: not in cache
 
-    // Read again - should be different pointer
+    // Read again - cache should reload the file
     const auto* content2 = g_file_cache.read_file(fname);
     REQUIRE(content2 != nullptr);
-    REQUIRE(content2 != content1);  // Different pointer because it was re-read
+
+    // Verify file was re-read by checking cache status
+    REQUIRE(g_file_cache.is_cached(fname));  // ? Now cached again
+
+    // Content should be the same
+    std::string content2_copy(content2->begin(), content2->end());
+    REQUIRE(content1_copy == content2_copy);
 
     std::remove(fname.c_str());
 }
@@ -1228,8 +1239,6 @@ TEST_CASE("BinFileReader: _at methods with out-of-bounds position generate error
     std::string str = reader.read_string_at(2, 5);
     REQUIRE(str.empty());
     REQUIRE(g_errors.has_errors());
-
-    std::remove(fname.c_str());
 }
 
 TEST_CASE("BinFileReader: handles empty file", "[bin_file_reader]") {
@@ -1724,14 +1733,15 @@ TEST_CASE("FileReader: set_line_number changes current line number",
     reader.set_line_number(10);
     REQUIRE(reader.line_number() == 10);
 
-    // Next line should increment from 10
+    // Next line should reflect new line number
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "Line 2");
-    REQUIRE(reader.line_number() == 11);
+    REQUIRE(reader.line_number() == 10);
 
+    // Next line should increment from 10
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "Line 3");
-    REQUIRE(reader.line_number() == 12);
+    REQUIRE(reader.line_number() == 11);
 }
 
 TEST_CASE("FileReader: set_fixed_line_number prevents increment",
@@ -1926,7 +1936,7 @@ TEST_CASE("FileReader: macro expansion simulation",
 
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "line after macro");
-    REQUIRE(reader.line_number() == 4);  // Increments from 3
+    REQUIRE(reader.line_number() == 3);
 }
 
 TEST_CASE("FileReader: include file simulation", "[file_reader][line_number]") {
@@ -1945,7 +1955,7 @@ TEST_CASE("FileReader: include file simulation", "[file_reader][line_number]") {
 
     // Simulate reading include file (starts at line 1)
     reader.inject("include.inc", "included A\nincluded B\n");
-    reader.set_line_number(0);  // Reset to 0 so first read becomes 1
+    reader.set_line_number(1);
 
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "included A");
@@ -1957,7 +1967,7 @@ TEST_CASE("FileReader: include file simulation", "[file_reader][line_number]") {
 
     // Return to main file
     reader.inject("main.asm", "line 2\nline 3\n");
-    reader.set_line_number(saved_line);  // Resume where we left off
+    reader.set_line_number(saved_line + 1);  // Resume where we left off
 
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "line 2");
@@ -1980,11 +1990,11 @@ TEST_CASE("FileReader: set_line_number at start",
     std::string line;
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "Line A");
-    REQUIRE(reader.line_number() == 101);
+    REQUIRE(reader.line_number() == 100);
 
     REQUIRE(reader.next_line(line));
     REQUIRE(line == "Line B");
-    REQUIRE(reader.line_number() == 102);
+    REQUIRE(reader.line_number() == 101);
 }
 
 TEST_CASE("FileReader: has_fixed_line_number default state",
@@ -2000,4 +2010,303 @@ TEST_CASE("FileReader: has_fixed_line_number default state",
     std::string line;
     REQUIRE(reader.next_line(line));
     REQUIRE_FALSE(reader.has_fixed_line_number());
+}
+
+//-----------------------------------------------------------------------------
+// Test FileCache advanced functionality
+//-----------------------------------------------------------------------------
+
+// Helper functions for cache testing
+namespace {
+std::string create_temp_test_file(const std::string& name,
+                                  const std::string& content) {
+    auto temp_dir = std::filesystem::temp_directory_path();
+    auto file_path = temp_dir / name;
+
+    std::ofstream out(file_path, std::ios::binary);
+    out << content;
+    out.close();
+
+    return file_path.string();
+}
+
+void modify_test_file(const std::string& path, const std::string& new_content) {
+    // Ensure timestamp changes
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    std::ofstream out(path, std::ios::binary);
+    out << new_content;
+    out.close();
+
+    // Force mtime update to ensure it's different
+    auto now = std::filesystem::file_time_type::clock::now();
+    std::filesystem::last_write_time(path, now);
+}
+}
+
+TEST_CASE("FileCache: basic caching functionality", "[file_cache][cache]") {
+    FileCache cache;
+    cache.clear();
+
+    auto temp_file = create_temp_test_file("cache_test.txt", "Hello World\n");
+
+    SECTION("First read populates cache") {
+        REQUIRE(cache.cache_size() == 0);
+        REQUIRE_FALSE(cache.is_cached(temp_file));
+
+        const auto* content = cache.read_file(temp_file);
+        REQUIRE(content != nullptr);
+        REQUIRE(content->size() > 0);
+
+        REQUIRE(cache.is_cached(temp_file));
+        REQUIRE(cache.cache_size() == 1);
+        REQUIRE(cache.is_cached_and_fresh(temp_file));
+    }
+
+    SECTION("Second read uses cache") {
+        // First read
+        const auto* content1 = cache.read_file(temp_file);
+        REQUIRE(content1 != nullptr);
+
+        // Second read should return same pointer (cached)
+        const auto* content2 = cache.read_file(temp_file);
+        REQUIRE(content2 == content1);  // Same pointer means cached
+
+        REQUIRE(cache.cache_size() == 1);
+    }
+
+    SECTION("Multiple files are cached independently") {
+        auto temp_file2 = create_temp_test_file("cache_test2.txt", "File 2\n");
+        auto temp_file3 = create_temp_test_file("cache_test3.txt", "File 3\n");
+
+        cache.read_file(temp_file);
+        cache.read_file(temp_file2);
+        cache.read_file(temp_file3);
+
+        REQUIRE(cache.cache_size() == 3);
+        REQUIRE(cache.is_cached(temp_file));
+        REQUIRE(cache.is_cached(temp_file2));
+        REQUIRE(cache.is_cached(temp_file3));
+    }
+}
+
+TEST_CASE("FileCache: invalidation and staleness", "[file_cache][cache]") {
+    FileCache cache;
+    cache.clear();
+
+    auto temp_file = create_temp_test_file("stale_test.txt", "Original content\n");
+
+    SECTION("Invalidate removes file from cache") {
+        cache.read_file(temp_file);
+        REQUIRE(cache.is_cached(temp_file));
+        REQUIRE(cache.cache_size() == 1);
+
+        cache.invalidate(temp_file);
+        REQUIRE_FALSE(cache.is_cached(temp_file));
+        REQUIRE(cache.cache_size() == 0);
+    }
+
+    SECTION("Invalidate non-existent file is safe") {
+        REQUIRE(cache.cache_size() == 0);
+        cache.invalidate("nonexistent.txt");
+        REQUIRE(cache.cache_size() == 0);
+    }
+
+    SECTION("Modified file is detected as stale") {
+        // Read original file
+        const auto* content1 = cache.read_file(temp_file);
+        REQUIRE(content1 != nullptr);
+        std::string original_content(content1->begin(), content1->end());
+        REQUIRE(cache.is_cached_and_fresh(temp_file));
+
+        // Modify file
+        modify_test_file(temp_file, "Modified content\n");
+
+        // Cache detects staleness and reloads
+        const auto* content2 = cache.read_file(temp_file);
+        REQUIRE(content2 != nullptr);
+        std::string new_content(content2->begin(), content2->end());
+
+        REQUIRE(new_content != original_content);
+        REQUIRE(new_content == "Modified content\n");
+        REQUIRE(cache.is_cached_and_fresh(temp_file));
+    }
+}
+
+TEST_CASE("FileCache: clear removes all entries", "[file_cache][cache]") {
+    FileCache cache;
+    cache.clear();
+
+    auto file1 = create_temp_test_file("clear1.txt", "File 1\n");
+    auto file2 = create_temp_test_file("clear2.txt", "File 2\n");
+    auto file3 = create_temp_test_file("clear3.txt", "File 3\n");
+
+    cache.read_file(file1);
+    cache.read_file(file2);
+    cache.read_file(file3);
+
+    REQUIRE(cache.cache_size() == 3);
+
+    cache.clear();
+
+    REQUIRE(cache.cache_size() == 0);
+    REQUIRE_FALSE(cache.is_cached(file1));
+    REQUIRE_FALSE(cache.is_cached(file2));
+    REQUIRE_FALSE(cache.is_cached(file3));
+}
+
+TEST_CASE("FileCache: nonexistent file returns nullptr",
+          "[file_cache][cache]") {
+    SuppressErrors suppress;
+    FileCache cache;
+    cache.clear();
+
+    const auto* content = cache.read_file("this_file_does_not_exist.txt");
+    REQUIRE(content == nullptr);
+    REQUIRE(cache.cache_size() == 0);
+    REQUIRE(g_errors.has_errors());
+    std::string err_msg = g_errors.last_error_message();
+    REQUIRE(err_msg.find("File not found") != std::string::npos);
+    REQUIRE(err_msg.find("this_file_does_not_exist.txt") != std::string::npos);
+}
+
+TEST_CASE("FileCache: global instance g_file_cache", "[file_cache][cache]") {
+    g_file_cache.clear();
+
+    auto temp_file = create_temp_test_file("global_test.txt",
+                                           "Global cache test\n");
+
+    SECTION("Global cache works") {
+        REQUIRE(g_file_cache.cache_size() == 0);
+
+        const auto* content = g_file_cache.read_file(temp_file);
+        REQUIRE(content != nullptr);
+        REQUIRE(g_file_cache.cache_size() == 1);
+
+        g_file_cache.clear();
+        REQUIRE(g_file_cache.cache_size() == 0);
+    }
+}
+
+TEST_CASE("FileCache: FileReader uses cache", "[file_cache][filereader]") {
+    g_file_cache.clear();
+
+    auto temp_file = create_temp_test_file("reader_cache.txt",
+                                           "Line 1\nLine 2\nLine 3\n");
+
+    SECTION("FileReader populates cache") {
+        REQUIRE(g_file_cache.cache_size() == 0);
+
+        FileReader reader(temp_file);
+        REQUIRE(reader.is_open());
+
+        // Cache should now have this file
+        REQUIRE(g_file_cache.cache_size() == 1);
+        REQUIRE(g_file_cache.is_cached(temp_file));
+    }
+
+    SECTION("Multiple FileReaders share cached content") {
+        FileReader reader1(temp_file);
+        REQUIRE(g_file_cache.cache_size() == 1);
+
+        FileReader reader2(temp_file);
+        // Should still be 1 (shared cache)
+        REQUIRE(g_file_cache.cache_size() == 1);
+
+        // Both readers should work independently
+        std::string line1, line2;
+        REQUIRE(reader1.next_line(line1));
+        REQUIRE(reader2.next_line(line2));
+        REQUIRE(line1 == line2);
+    }
+}
+
+TEST_CASE("FileCache: cache survives across FileReader lifetime",
+          "[file_cache][filereader]") {
+    g_file_cache.clear();
+
+    auto temp_file = create_temp_test_file("survive_test.txt", "Cached content\n");
+
+    // Open and close reader
+    {
+        FileReader reader(temp_file);
+        REQUIRE(reader.is_open());
+        REQUIRE(g_file_cache.cache_size() == 1);
+    }
+
+    // Cache should persist after reader is destroyed
+    REQUIRE(g_file_cache.cache_size() == 1);
+    REQUIRE(g_file_cache.is_cached(temp_file));
+
+    // New reader should use cached content
+    FileReader reader2(temp_file);
+    REQUIRE(reader2.is_open());
+    REQUIRE(g_file_cache.cache_size() == 1);
+}
+
+TEST_CASE("FileCache: injected content bypasses cache",
+          "[file_cache][inject]") {
+    g_file_cache.clear();
+
+    FileReader reader;
+    reader.inject("virtual_file.txt", "Injected content\n");
+
+    REQUIRE(reader.is_open());
+    // Injected content should not affect cache
+    REQUIRE(g_file_cache.cache_size() == 0);
+    REQUIRE_FALSE(g_file_cache.is_cached("virtual_file.txt"));
+}
+
+TEST_CASE("FileCache: large file handling", "[file_cache][cache]") {
+    FileCache cache;
+    cache.clear();
+
+    // Create a moderately large file (~40KB)
+    std::string large_content;
+    large_content.reserve(50 * 1024);  // Reserve 50KB
+    for (int i = 0; i < 1024; ++i) {
+        large_content += "This is line " + std::to_string(i) +
+                         " of a large test file xxxxxxxxxxxxxxxxxxxx.\n";
+    }
+
+    auto temp_file = create_temp_test_file("large_file.txt", large_content);
+
+    const auto* content = cache.read_file(temp_file);
+    REQUIRE(content != nullptr);
+    REQUIRE(content->size() >= 40000);  // ~40KB instead of 1MB
+    REQUIRE(cache.is_cached(temp_file));
+
+    // Second read should use cache (same pointer)
+    const auto* content2 = cache.read_file(temp_file);
+    REQUIRE(content2 == content);
+}
+
+TEST_CASE("FileCache: invalidate causes file to be re-read", "[file_cache]") {
+    SuppressErrors suppress;
+    g_file_cache.clear();
+
+    const std::string fname = "test_cache_invalidate.txt";
+    write_string_to_file(fname, "version 1");
+
+    // Cache the file
+    const auto* content1 = g_file_cache.read_file(fname);
+    REQUIRE(content1 != nullptr);
+    REQUIRE(std::string(content1->begin(), content1->end()) == "version 1");
+    REQUIRE(g_file_cache.is_cached(fname));
+
+    // Invalidate
+    g_file_cache.invalidate(fname);
+    REQUIRE_FALSE(g_file_cache.is_cached(fname));
+
+    // Modify file
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    write_string_to_file(fname, "version 2");
+
+    // Read again - should get new content
+    const auto* content2 = g_file_cache.read_file(fname);
+    REQUIRE(content2 != nullptr);
+    REQUIRE(std::string(content2->begin(), content2->end()) == "version 2");
+    REQUIRE(g_file_cache.is_cached(fname));
+
+    std::remove(fname.c_str());
 }

@@ -176,9 +176,10 @@ bool FileReader::next_line(std::string& out_line) {
     }
 
     // Increment line number only if not fixed
-    if (!fixed_line_number_) {
+    if (!fixed_line_number_ && !just_updated_) {
         ++line_number_;
     }
+    just_updated_ = false;
 
     // Read until newline or end of file
     while (pos_ < content_->size()) {
@@ -218,6 +219,7 @@ size_t FileReader::line_number() const {
 
 void FileReader::set_line_number(size_t line_num) {
     line_number_ = line_num;
+    just_updated_ = true;
 }
 
 void FileReader::set_fixed_line_number(size_t line_num) {

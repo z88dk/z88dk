@@ -19,18 +19,27 @@ RE2C ?= re2c
 RE2CFLAGS ?= -W --no-debug-info --no-generation-date 
 
 TEST_DIR = unittests
+OBJ_DIR = obj
+TEST_OBJ_DIR = $(TEST_DIR)/obj
 
 SRCS := $(wildcard *.cpp)
-OBJS := $(SRCS:.cpp=.o)
+OBJS := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 DEFS := $(wildcard *.def)
-COMMON_SRCS := $(filter-out z80asm.cpp, $(SRCS)) $(TEST_DIR)/catch_amalgamated.cpp
-COMMON_OBJS := $(COMMON_SRCS:.cpp=.o)
 
+# Common sources (excluding main) for unit tests
+COMMON_SRCS := $(filter-out z80asm.cpp, $(SRCS))
+COMMON_TEST_OBJS := $(patsubst %.cpp,$(TEST_OBJ_DIR)/%.o,$(COMMON_SRCS))
+
+# Catch framework
+CATCH_OBJ := $(TEST_OBJ_DIR)/catch_amalgamated.o
+
+# Test sources and binaries
 TEST_SRCS := $(wildcard $(TEST_DIR)/test_*.cpp)
 TEST_BINS := $(patsubst $(TEST_DIR)/%.cpp, $(TEST_DIR)/%$(EXE), $(TEST_SRCS))
-TEST_OBJS = $(TEST_SRCS:.cpp=.o)
+TEST_OBJS := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_OBJ_DIR)/%.o,$(TEST_SRCS))
 
-DEPENDS := $(SRCS:.cpp=.d) $(COMMON_SRCS:.cpp=.d) $(TEST_SRCS:.cpp=.d)
+# Dependency files
+DEPENDS := $(OBJS:.o=.d) $(COMMON_TEST_OBJS:.o=.d) $(TEST_OBJS:.o=.d) $(CATCH_OBJ:.o=.d)
 
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
@@ -40,11 +49,39 @@ ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 
 all: $(PROJ)$(EXE) $(TEST_BINS)
 
+# Main executable (no -DUNIT_TESTS)
 $(PROJ)$(EXE): $(OBJS) $(DEFS)
 	$(CXX) $(CXXFLAGS) -o $(PROJ)$(EXE) $(OBJS)
 
-test:: $(PROJ)$(EXE)
-	perl -S prove --state=slow,save t/*.t
+# Object files for main executable (no -DUNIT_TESTS)
+$(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+# Object files for unit tests (with -DUNIT_TESTS)
+$(TEST_OBJ_DIR)/%.o: %.cpp | $(TEST_OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -DUNIT_TESTS -c -o $@ $<
+
+# Test driver object files (with -DUNIT_TESTS)
+$(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -DUNIT_TESTS -c -o $@ $<
+
+# Link test executables
+$(TEST_DIR)/test_%$(EXE): $(TEST_OBJ_DIR)/test_%.o $(COMMON_TEST_OBJS) $(CATCH_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+# Create output directories
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(TEST_OBJ_DIR):
+	mkdir -p $(TEST_OBJ_DIR)
+
+# Rule to produce .cpp from .re using re2c
+$(PROJ)$(EXE): $(OBJ_DIR)/scan.o
+
+scan.cpp: scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
+	dos2unix scan.cpp 2> /dev/null
 
 test:: $(TEST_BINS)
 	@for test in $(TEST_BINS); do \
@@ -52,18 +89,8 @@ test:: $(TEST_BINS)
 		./$$test || exit 1; \
 	done
 
-$(TEST_DIR)/test_%$(EXE): $(TEST_DIR)/test_%.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
-$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-# Rule to produce .cpp from .re using re2c
-$(PROJ)$(EXE): scan.o
-
-scan.cpp: scan.re Makefile
-	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
-	dos2unix scan.cpp 2> /dev/null
+test:: $(PROJ)$(EXE)
+	perl -S prove --state=slow,save t/*.t
 
 astyle:
 	$(ASTYLE)
@@ -72,9 +99,10 @@ cloc:
 	perl -S cloc --fullpath --not-match-f="./unittests/catch_amalgamated.*" .
 
 clean:
-	$(RM) $(PROJ) $(PROJ)$(EXE) $(TEST_BINS) $(OBJS) $(DEPENDS) \
+	$(RM) $(PROJ) $(PROJ)$(EXE) $(TEST_BINS) \
 		  $(wildcard *.o *.d *.i *.exe *.orig *.core *.bak *~) \
 		  $(wildcard $(TEST_DIR)/*.o $(TEST_DIR)/*.d $(TEST_DIR)/*.i $(TEST_DIR)/*.exe $(TEST_DIR)/*.orig $(TEST_DIR)/*.core $(TEST_DIR)/*.bak $(TEST_DIR)/*~) \
 		  $(wildcard t/*.o t/*.d t/*.i t/*.exe t/*.orig t/*.core t/*.bak t/*~)
+	$(RM) -r $(OBJ_DIR) $(TEST_OBJ_DIR)
 
 -include $(DEPENDS)
