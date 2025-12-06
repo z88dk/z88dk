@@ -211,14 +211,14 @@ bool file_exists(const std::string& filename) {
     if (filename.empty()) {
         return false;
     }
-    
+
     std::error_code ec;
     auto status = std::filesystem::status(filename, ec);
-    
+
     if (ec) {
         return false;
     }
-    
+
     // Return true only for regular files, false for directories or other types
     return std::filesystem::is_regular_file(status);
 }
@@ -227,22 +227,22 @@ size_t get_file_size(const std::string& filename) {
     if (filename.empty()) {
         return static_cast<size_t>(-1);
     }
-    
+
     std::error_code ec;
-    
+
     // First check if it's a regular file (not a directory)
     auto status = std::filesystem::status(filename, ec);
     if (ec || !std::filesystem::is_regular_file(status)) {
         return static_cast<size_t>(-1);
     }
-    
+
     // Now get the file size (we know it's a regular file)
     auto size = std::filesystem::file_size(filename, ec);
-    
+
     if (ec) {
         return static_cast<size_t>(-1);
     }
-    
+
     return static_cast<size_t>(size);
 }
 

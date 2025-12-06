@@ -17,7 +17,7 @@ std::unordered_map<std::string, size_t>& Location::get_filename_map() {
     return filename_map;
 }
 
-Location::Location(const std::string& filename, int line_num)
+Location::Location(const std::string& filename, size_t line_num)
     : filename_index_(get_filename_index(filename)), line_num_(line_num) {}
 
 void Location::clear() {
@@ -33,7 +33,7 @@ const std::string& Location::filename() const {
     return get_filename_by_index(filename_index_);
 }
 
-int Location::line_num() const {
+size_t Location::line_num() const {
     return line_num_;
 }
 
@@ -41,7 +41,7 @@ void Location::set_filename(const std::string& filename) {
     filename_index_ = get_filename_index(filename);
 }
 
-void Location::set_line_num(int line_num) {
+void Location::set_line_num(size_t line_num) {
     line_num_ = line_num;
 }
 
@@ -52,13 +52,13 @@ void Location::inc_line_num() {
 size_t Location::get_filename_index(const std::string& filename) {
     auto& filename_map = get_filename_map();
     auto& filenames = get_filenames();
-    
+
     // Try to find existing filename
     auto it = filename_map.find(filename);
     if (it != filename_map.end()) {
         return it->second;
     }
-    
+
     // Add new filename
     size_t index = filenames.size();
     filenames.push_back(filename);
@@ -68,11 +68,11 @@ size_t Location::get_filename_index(const std::string& filename) {
 
 const std::string& Location::get_filename_by_index(size_t index) {
     auto& filenames = get_filenames();
-    
+
     if (index < filenames.size()) {
         return filenames[index];
     }
-    
+
     // Return empty string if index is out of bounds
     static const std::string empty_string;
     return empty_string;

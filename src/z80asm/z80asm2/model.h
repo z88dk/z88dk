@@ -20,7 +20,7 @@
 //-----------------------------------------------------------------------------
 class ExprNode;
 class Expression;
-class TokensLine;
+class TokenLine;
 class Symbol;
 class Section;
 class Opcode;
@@ -44,8 +44,10 @@ public:
     explicit UndefinedSymbol(const std::string& symbol_name)
         : ExpressionError("Undefined symbol: " + symbol_name),
           symbol_name_(symbol_name) {}
-    
-    const std::string& symbol_name() const { return symbol_name_; }
+
+    const std::string& symbol_name() const {
+        return symbol_name_;
+    }
 
 private:
     std::string symbol_name_;
@@ -60,7 +62,8 @@ public:
 // Current location ($) used without context
 class InvalidDollar : public ExpressionError {
 public:
-    InvalidDollar() : ExpressionError("Current location ($) not available in this context") {}
+    InvalidDollar() :
+        ExpressionError("Current location ($) not available in this context") {}
 };
 
 // Recursive evaluation error
@@ -69,8 +72,10 @@ public:
     explicit RecursiveEvaluation(const std::string& symbol_name)
         : ExpressionError("Recursive evaluation: " + symbol_name),
           symbol_name_(symbol_name) {}
-    
-    const std::string& symbol_name() const { return symbol_name_; }
+
+    const std::string& symbol_name() const {
+        return symbol_name_;
+    }
 
 private:
     std::string symbol_name_;
@@ -85,13 +90,13 @@ enum class ExprOp {
     Integer,            // Integer literal
     Symbol,             // Symbol reference
     Dollar,             // Current location counter ($)
-    
+
     // Unary operators
     UnaryPlus,          // +x
     UnaryMinus,         // -x
     LogicalNot,         // !x
     BitwiseNot,         // ~x
-    
+
     // Arithmetic binary operators (precedence: high to low)
     Power,              // x ** y (right-associative, extension)
     Multiply,           // x * y
@@ -99,31 +104,31 @@ enum class ExprOp {
     Modulo,             // x % y
     Add,                // x + y
     Subtract,           // x - y
-    
+
     // Shift operators
     LeftShift,          // x << y
     RightShift,         // x >> y
-    
+
     // Relational operators
     LessThan,           // x < y
     LessOrEqual,        // x <= y
     GreaterThan,        // x > y
     GreaterOrEqual,     // x >= y
-    
+
     // Equality operators
     Equal,              // x == y
     NotEqual,           // x != y
-    
+
     // Bitwise operators
     BitwiseAnd,         // x & y
     BitwiseXor,         // x ^ y
     BitwiseOr,          // x | y
-    
+
     // Logical operators
     LogicalAnd,         // x && y
     LogicalOr,          // x || y
     LogicalXor,         // x ^^ y (extension)
-    
+
     // Ternary operator
     Conditional         // x ? y : z
 };
@@ -134,21 +139,21 @@ enum class ExprOp {
 class ExprNode {
 public:
     virtual ~ExprNode() = default;
-    
+
     // Get the operator type
     virtual ExprOp op() const = 0;
-    
+
     // Evaluate the expression
     // Throws ExpressionError-derived exceptions on failure
     virtual int evaluate() const = 0;
-    
+
     // Check if expression is constant (can be evaluated at assembly time)
     // Returns true if all leaf nodes are integers or constant/computed symbols
     virtual bool is_constant() const = 0;
-    
+
     // Clone the node
     virtual std::unique_ptr<ExprNode> clone() const = 0;
-    
+
     // Convert to string for debugging
     virtual std::string to_string() const = 0;
 };
@@ -160,13 +165,13 @@ class Expression {
 public:
     Expression() = default;
     Expression(std::unique_ptr<ExprNode> root, const Location& location);
-    
+
     // Copy/move operations
     Expression(const Expression& other);
     Expression& operator=(const Expression& other);
     Expression(Expression&&) = default;
     Expression& operator=(Expression&&) = default;
-    
+
     // Parse an expression from a token line
     // Module and Section must be provided for symbol and $ resolution
     // If successful:
@@ -176,8 +181,9 @@ public:
     // If failed (syntax error):
     //   - Leaves i unchanged
     //   - Returns false (caller is responsible for error reporting)
-    bool parse(const TokensLine& line, unsigned& i, Module* module, Section* section);
-    
+    bool parse(const TokenLine& line, size_t& i, Module* module,
+               Section* section);
+
     // Evaluate the expression
     // Returns true and sets result if successful
     // Returns false if expression cannot be evaluated (reports error internally)
@@ -189,32 +195,34 @@ public:
 
     // Get the root node
     const ExprNode* root() const;
-    
+
     // Set the root node
     void set_root(std::unique_ptr<ExprNode> root);
-    
+
     // Get the source location (immutable - set only at construction or parsing)
     const Location& location() const;
-    
+
     // Get the original tokens (for object file output)
-    const TokensLine& tokens() const;
-    
+    const TokenLine& token_line() const;
+
     // Set the original tokens
-    void set_tokens(const TokensLine& tokens);
-    
+    void set_tokens(const TokenLine& token_line);
+
     // Check if expression is empty
     bool empty() const;
-    
+
     // Clear the expression
     void clear();
-    
+
     // Convert to string for debugging
     std::string to_string() const;
 
 private:
     std::unique_ptr<ExprNode> root_;
-    Location location_;                         // Immutable after construction/parsing
-    std::unique_ptr<TokensLine> tokens_;        // Original tokens for object file output
+    // Immutable after construction/parsing
+    Location location_;
+    // Original tokens for object file output
+    std::unique_ptr<TokenLine> token_line_;
 };
 
 //-----------------------------------------------------------------------------
@@ -231,17 +239,18 @@ std::unique_ptr<ExprNode> make_symbol(Symbol* symbol);
 std::unique_ptr<ExprNode> make_dollar(Opcode* opcode, Section* section);
 
 // Create a unary operator node
-std::unique_ptr<ExprNode> make_unary_op(ExprOp op, std::unique_ptr<ExprNode> operand);
+std::unique_ptr<ExprNode> make_unary_op(ExprOp op,
+                                        std::unique_ptr<ExprNode> operand);
 
 // Create a binary operator node
-std::unique_ptr<ExprNode> make_binary_op(ExprOp op, 
-                                        std::unique_ptr<ExprNode> left,
-                                        std::unique_ptr<ExprNode> right);
+std::unique_ptr<ExprNode> make_binary_op(ExprOp op,
+        std::unique_ptr<ExprNode> left,
+        std::unique_ptr<ExprNode> right);
 
 // Create a ternary conditional node
 std::unique_ptr<ExprNode> make_conditional(std::unique_ptr<ExprNode> condition,
-                                          std::unique_ptr<ExprNode> true_expr,
-                                          std::unique_ptr<ExprNode> false_expr);
+        std::unique_ptr<ExprNode> true_expr,
+        std::unique_ptr<ExprNode> false_expr);
 
 //-----------------------------------------------------------------------------
 // Symbol types
@@ -270,65 +279,65 @@ class Symbol {
 public:
     // All constructors require name and location (name first as primary identifier)
     Symbol(const std::string& name, const Location& location);
-    Symbol(const std::string& name, const Location& location, int value, 
+    Symbol(const std::string& name, const Location& location, int value,
            SymbolType type = SymbolType::Constant);
-    
+
     // Constructor for labels (address-relative symbols)
     Symbol(const std::string& name, const Location& location,
            Opcode* opcode, int offset,
            SymbolType type = SymbolType::AddressRelative);
-    
+
     // Symbol identification (name is immutable - it's the key in symbol table)
     const std::string& name() const;
-    
+
     // Symbol value
     int value() const;
     void set_value(int value);
-    
+
     // Symbol type
     SymbolType type() const;
     void set_type(SymbolType type);
-    
+
     // Symbol scope
     SymbolScope scope() const;
     void set_scope(SymbolScope scope);
-    
+
     // Source location
     const Location& location() const;
     void set_location(const Location& location);
-    
+
     // Opcode (for address-relative symbols - used to compute final address)
     Opcode* opcode() const;
     void set_opcode(Opcode* opcode);
-    
+
     // Offset (for address-relative symbols)
     int offset() const;
     void set_offset(int offset);
-    
+
     // Expression (for computed symbols)
     const Expression& expression() const;
     void set_expression(const Expression& expr);
     bool has_expression() const;
-    
+
     // Type checks
     bool is_undefined() const;
     bool is_constant() const;
     bool is_address_relative() const;
     bool is_computed() const;
-    
+
     // Scope checks
     bool is_local() const;
     bool is_public() const;
     bool is_extern() const;
     bool is_global() const;
-    
+
     // Effective scope (accounts for Global + defined/undefined)
     bool is_exported() const;  // PUBLIC or (GLOBAL && defined)
     bool is_imported() const;  // EXTERN or (GLOBAL && undefined)
-    
+
     // Definition check
     bool is_defined() const;
-    
+
     // Evaluate symbol value
     // Throws UndefinedSymbol if symbol is undefined
     // Throws RecursiveEvaluation if evaluation is recursive
@@ -341,10 +350,12 @@ private:
     SymbolType type_ = SymbolType::Undefined;
     SymbolScope scope_ = SymbolScope::Local;
     Location location_;
-    Opcode* opcode_ = nullptr;          // Opcode for address-relative symbols (to compute address)
+    Opcode* opcode_ =
+        nullptr;          // Opcode for address-relative symbols (to compute address)
     int offset_ = 0;                    // Offset for address-relative symbols
     Expression expression_;             // Expression for computed symbols
-    mutable bool evaluating_ = false;   // Flag to detect recursive evaluation (mutable for const evaluate)
+    mutable bool evaluating_ =
+        false;   // Flag to detect recursive evaluation (mutable for const evaluate)
 };
 
 //-----------------------------------------------------------------------------
@@ -410,38 +421,41 @@ public:
     // All constructors require a location (as last parameter)
     explicit Opcode(const Location& location);
     Opcode(const std::vector<uint8_t>& bytes, const Location& location);
-    Opcode(int address, const std::vector<uint8_t>& bytes, const Location& location);
-    
+    Opcode(int address, const std::vector<uint8_t>& bytes,
+           const Location& location);
+
     // Address (initialized to 0, computed at link time)
     int address() const;
     void set_address(int address);
-    
+
     // Opcode bytes
     const std::vector<uint8_t>& bytes() const;
     std::vector<uint8_t>& bytes();
     void set_bytes(const std::vector<uint8_t>& bytes);
-    
+
     // Opcode size
     size_t size() const;
-    
+
     // Byte manipulation
     void clear_bytes();
     void add_byte(uint8_t byte);
-    void add_bytes(unsigned value);  // Add 1-4 bytes from value (first non-zero byte and all lower)
-    
+    // Add 1-4 bytes from value (first non-zero byte and all lower)
+    void add_bytes(unsigned int value);
+
     // Patches to apply
     const std::vector<Patch>& patches() const;
     void add_patch(const Patch& patch);
     void clear_patches();
-    
+
     // Check if opcode has patches
     bool has_patches() const;
-    
+
     // Source location (immutable - required for error messages and list file)
     const Location& location() const;
 
 private:
-    int address_ = 0;                   // Address in section (computed at link time)
+    int address_ =
+        0;                   // Address in section (computed at link time)
     std::vector<uint8_t> bytes_;        // Opcode bytes
     std::vector<Patch> patches_;        // Patches to apply
     Location location_;                 // Source location (immutable)
@@ -454,30 +468,30 @@ class Section {
 public:
     Section() = default;
     explicit Section(const std::string& name);
-    
+
     // Section identification
     const std::string& name() const;
     void set_name(const std::string& name);
-    
+
     // Alignment (default 1 = no alignment constraint)
     // Base address will be adjusted to be a multiple of alignment
     int alignment() const;
     void set_alignment(int align);
-    
+
     // Base address (computed at link time, adjusted for alignment)
     int base_address() const;
     void set_base_address(int addr);
-    
+
     // Opcodes in this section (heap-allocated for pointer stability)
     const std::vector<std::unique_ptr<Opcode>>& opcodes() const;
     Opcode* add_opcode(const Opcode& opcode);  // Returns pointer to added opcode
     Opcode* last_opcode();                     // Returns pointer to last opcode (nullptr if empty)
     const Opcode* last_opcode() const;         // Const version
     void clear_opcodes();
-    
+
     // Current size (sum of all opcode sizes)
     size_t size() const;
-    
+
     // Get current program counter (base_address + size)
     int pc() const;
 
@@ -487,11 +501,14 @@ public:
 private:
     // Adjust address to meet alignment requirement
     static int align_address(int addr, int alignment);
-    
+
     std::string name_;
-    int alignment_ = 1;                                 // Alignment requirement (1 = no constraint)
-    int base_address_ = 0;                              // Base address of section (aligned)
-    std::vector<std::unique_ptr<Opcode>> opcodes_;     // Opcodes in this section (heap-allocated for pointer stability)
+    int alignment_ =
+        1;                                 // Alignment requirement (1 = no constraint)
+    int base_address_ =
+        0;                              // Base address of section (aligned)
+    std::vector<std::unique_ptr<Opcode>>
+                                      opcodes_;     // Opcodes in this section (heap-allocated for pointer stability)
 };
 
 
@@ -502,23 +519,23 @@ class Module {
 public:
     // Constructor requires name and location of MODULE directive
     Module(const std::string& name, const Location& location);
-    
+
     // Module identification (name is immutable - it's the key in module collection)
     const std::string& name() const;
-    
+
     // Location of MODULE directive
     const Location& location() const;
-    
+
     // Current section (last added, or default empty section if none added)
     Section* current_section();
     const Section* current_section() const;
-    
+
     // Sections in this module
     const std::vector<std::unique_ptr<Section>>& sections() const;
     Section* add_section(const std::string& name);
     Section* find_section(const std::string& name);
     void clear_sections();
-    
+
     // Symbol table for all symbols defined in this module
     const std::unordered_map<std::string, Symbol>& symbols() const;
 
@@ -528,9 +545,9 @@ public:
     // Errors:
     //   - Changing scope from non-Local to different scope
     //   - Declaring a defined symbol as Extern
-    Symbol* declare_symbol(const std::string& name, const Location& location, 
-                          SymbolScope scope);
-    
+    Symbol* declare_symbol(const std::string& name, const Location& location,
+                           SymbolScope scope);
+
     // Define a symbol (for source code definitions like labels, EQU, etc.)
     // Creates symbol if it doesn't exist
     // Updates undefined symbol if it exists
@@ -538,22 +555,27 @@ public:
     //   - Symbol is already defined
     //   - Symbol is declared as Extern
     Symbol* add_symbol(const std::string& name, const Location& location);
-    Symbol* add_symbol(const std::string& name, const Location& location, 
-                      int value, SymbolType type = SymbolType::Constant);
+    Symbol* add_symbol(const std::string& name, const Location& location,
+                       int value, SymbolType type = SymbolType::Constant);
 
     Symbol* find_symbol(const std::string& name);
     const Symbol* find_symbol(const std::string& name) const;
     bool has_symbol(const std::string& name) const;
     void clear_symbols();
 
-    const std::vector<Location>& get_extern_declarations(const std::string& name) const;
+    const std::vector<Location>& get_extern_declarations(const std::string& name)
+    const;
 
 private:
-    std::string name_;                                          // Module name (immutable)
+    std::string
+    name_;                                          // Module name (immutable)
     Location location_;                                         // Location of MODULE directive
-    std::vector<std::unique_ptr<Section>> sections_;           // All sections in this module (heap-allocated for pointer stability)
-    Section* current_section_ = nullptr;                        // Pointer to last added section (or default empty section)
-    std::unordered_map<std::string, Symbol> symbols_;          // Symbol table (name -> Symbol)
+    std::vector<std::unique_ptr<Section>>
+                                       sections_;           // All sections in this module (heap-allocated for pointer stability)
+    Section* current_section_ =
+        nullptr;                        // Pointer to last added section (or default empty section)
+    std::unordered_map<std::string, Symbol>
+    symbols_;          // Symbol table (name -> Symbol)
 
     // Track all declaration locations for error reporting
     std::unordered_map<std::string, std::vector<Location>> extern_declarations_;
@@ -567,28 +589,28 @@ class CompilationUnit {
 public:
     // Constructor requires name and location
     CompilationUnit(const std::string& name, const Location& location);
-    
+
     // Name and location
     const std::string& name() const;
     const Location& location() const;
-    
+
     // Module management
     const std::vector<std::unique_ptr<Module>>& modules() const;
-    
+
     // Add module by name - returns existing module or creates new one
     Module* add_module(const std::string& name);
-    
+
     // Find module by name - returns nullptr if not found
     Module* find_module(const std::string& name);
     const Module* find_module(const std::string& name) const;
-    
+
     // Current module (last added)
     Module* current_module();
     const Module* current_module() const;
-    
+
     // Clear all modules and recreate default empty-named module
     void clear_modules();
-    
+
 private:
     std::string name_;
     Location location_;
@@ -603,53 +625,55 @@ class Library {
 public:
     // Constructor requires library filename
     explicit Library(const std::string& filename);
-    
+
     // Library identification
     const std::string& filename() const;
-    
+
     // Public symbol index - maps symbol names to modules that define them
     // This allows quick lookup during symbol resolution without scanning all modules
     const std::unordered_map<std::string, Module*>& public_symbols() const;
-    
+
     // Find which module defines a public symbol
     // Returns nullptr if symbol not found or not public
     Module* find_public_symbol(const std::string& name);
     const Module* find_public_symbol(const std::string& name) const;
-    
+
     // Check if library exports a symbol
     bool has_public_symbol(const std::string& name) const;
-    
+
     // Module management
     const std::vector<std::unique_ptr<Module>>& modules() const;
-    
+
     // Add module to library
     // Automatically indexes public symbols from the module
     Module* add_module(std::unique_ptr<Module> module);
-    
+
     // Find module by name
     Module* find_module(const std::string& name);
     const Module* find_module(const std::string& name) const;
-    
+
     // Clear all modules (also clears public symbol index)
     void clear_modules();
-    
+
     // Rebuild public symbol index from all modules
     // Called automatically by add_module(), but can be called manually
     // if symbol scopes change after modules are added
     void rebuild_public_symbol_index();
-    
+
     // Statistics
     size_t module_count() const;
     size_t public_symbol_count() const;
-    
+
 private:
     // Index public symbols from a single module
     // Used by add_module() and rebuild_public_symbol_index()
     void index_module_public_symbols(Module* module);
 
     std::string filename_;                                      // Library filename
-    std::vector<std::unique_ptr<Module>> modules_;             // All modules in this library
-    std::unordered_map<std::string, Module*> public_symbols_;  // Public symbol name -> defining module
+    std::vector<std::unique_ptr<Module>>
+                                      modules_;             // All modules in this library
+    std::unordered_map<std::string, Module*>
+    public_symbols_;  // Public symbol name -> defining module
 };
 
 //-----------------------------------------------------------------------------
@@ -679,7 +703,8 @@ public:
     const std::unordered_map<std::string, Module*>& public_symbols() const;
 
     // Get list of unresolved extern symbols
-    const std::unordered_map<std::string, std::vector<Location>>& unresolved_externs() const;
+    const std::unordered_map<std::string, std::vector<Location>>&
+            unresolved_externs() const;
 
     // Check if there are unresolved symbols
     bool has_unresolved_symbols() const;
@@ -706,15 +731,21 @@ private:
     // Returns the module that defines the symbol, or nullptr if not found
     Module* resolve_from_libraries(const std::string& symbol_name);
 
-    std::vector<std::unique_ptr<Module>> modules_;                          // Modules in link order
-    std::vector<Library*> libraries_;                                       // Library search path (non-owning)
-    std::unordered_map<std::string, Module*> public_symbols_;              // Public symbol -> defining module
-    std::unordered_map<std::string, std::vector<Location>> unresolved_externs_;  // Unresolved symbol -> locations where referenced
+    std::vector<std::unique_ptr<Module>>
+                                      modules_;                          // Modules in link order
+    std::vector<Library*>
+    libraries_;                                       // Library search path (non-owning)
+    std::unordered_map<std::string, Module*>
+    public_symbols_;              // Public symbol -> defining module
+    std::unordered_map<std::string, std::vector<Location>>
+            unresolved_externs_;  // Unresolved symbol -> locations where referenced
     std::set<Module*> library_modules_pulled_;
-    std::set<std::string> currently_resolving_; // Track symbols being resolved to detect cycles
-    
+    std::set<std::string>
+    currently_resolving_; // Track symbols being resolved to detect cycles
+
     // Helper to resolve with cycle detection
-    Module* resolve_with_cycle_detection(const std::string& symbol_name, int depth = 0);
+    Module* resolve_with_cycle_detection(const std::string& symbol_name,
+                                         int depth = 0);
     static constexpr int MAX_RESOLUTION_DEPTH = 100; // Prevent infinite recursion
 };
 
