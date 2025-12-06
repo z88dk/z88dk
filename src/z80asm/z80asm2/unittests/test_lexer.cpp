@@ -6,16 +6,38 @@
 
 #define CATCH_CONFIG_MAIN
 #include "../errors.h"
-#include "../options.h"
 #include "../keywords.h"
 #include "../lexer.h"
+#include "../options.h"
 #include "catch_amalgamated.hpp"
 #include <algorithm>
-#include <set>
-#include <string>
-#include <vector>
+#include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <set>
 #include <sstream>
+#include <string>
+#include <thread>
+#include <vector>
+
+// test_lexer.cpp helpers
+std::string create_temp_file(const std::string& name,
+                             const std::string& content) {
+    auto temp_dir = std::filesystem::temp_directory_path();
+    auto file_path = temp_dir / name;
+
+    std::ofstream out(file_path);
+    out << content;
+    out.close();
+
+    return file_path.string();
+}
+
+void write_file(const std::string& path, const std::string& content) {
+    std::ofstream out(path);
+    out << content;
+}
 
 TEST_CASE("TokenLine basic operations", "[lexer]") {
     g_options = Options();
@@ -336,7 +358,7 @@ TEST_CASE("TokensFile parses all integer literal formats",
     TokenFileReader tfr;
     tfr.inject("int_formats",
                "123 123d 1Ah 1aH $FF 0xAB 1011b %1011 @1011 0b1011\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -380,7 +402,7 @@ TEST_CASE("Single-quoted characters returned as Integer", "[lexer][char]") {
 
     TokenFileReader tfr;
     tfr.inject("char_test", "'A'\n'\\n'\n'\\t'\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -418,7 +440,7 @@ TEST_CASE("Single-quoted empty and multi-character literals produce Invalid quot
     // Empty quoted character: ''  -> should trigger Invalid quoted character
     TokenFileReader tfr;
     tfr.inject("char_err_empty", "''\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     // Tokenization should fail and produce no token lines
     TokenLine tl;
@@ -437,7 +459,7 @@ TEST_CASE("Single-quoted empty and multi-character literals produce Invalid quot
 
     // Multi-character quoted literal: 'AB' -> should trigger Invalid quoted character
     tfr.inject("char_err_multi", "'AB'\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     REQUIRE_FALSE(tfr.next_token_line(tl));
     REQUIRE(tl.tokens().empty());
@@ -1379,14 +1401,16 @@ TEST_CASE("Single-quoted octal and hex escape sequences are converted to Integer
 
     TokenLine tl;
     size_t count = 0;
+
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
         REQUIRE(tfr.next_token_line(tl));
         const auto& toks = tl.tokens();
 
         REQUIRE(toks.size() == 1);
-        REQUIRE(toks[0].is(TokenType::Integer));
-        REQUIRE(toks[0].int_value() == cases[i].expected);
-        REQUIRE(toks[0].text() == cases[i].text);
+        const auto& t = toks[0];
+        REQUIRE(t.is(TokenType::Integer));
+        REQUIRE(t.int_value() == cases[i].expected);
+        REQUIRE(t.text() == cases[i].text);
 
         ++count;
     }
@@ -1744,7 +1768,7 @@ TEST_CASE("split_lines handles label only line", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "label:\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1758,7 +1782,7 @@ TEST_CASE("split_lines handles local label only line", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", ".local:\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1772,7 +1796,7 @@ TEST_CASE("split_lines splits on separator colon", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "LD A, B : ADD A, C\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1789,7 +1813,7 @@ TEST_CASE("split_lines splits on multiple separator colons", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "LD A, 1 : LD B, 2 : LD C, 3\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1809,7 +1833,7 @@ TEST_CASE("split_lines splits on backslash", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "LD A, B \\ ADD A, C\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1826,7 +1850,7 @@ TEST_CASE("split_lines preserves colon after instruction", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "LD A, (HL):\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1840,7 +1864,7 @@ TEST_CASE("split_lines handles simple ternary expression", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "DEFB 1 ? 2 : 3\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1855,7 +1879,7 @@ TEST_CASE("split_lines handles nested ternary expressions", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "DEFB a ? b ? c : d : e\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1870,7 +1894,7 @@ TEST_CASE("split_lines handles deeply nested ternary", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "DEFB 0 ? 0 ? 2 : 3 : 1 ? 4 : 5\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -2014,7 +2038,7 @@ TEST_CASE("split_lines handles empty ternary branches", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "DEFB 0 ? : 1\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -2029,7 +2053,7 @@ TEST_CASE("split_lines handles ternary in expression context",
 
     TokenFileReader tfr;
     tfr.inject("split_test", "DEFB 2 * (1 ? 2 : 3) + 4\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -2148,4 +2172,125 @@ TEST_CASE("split_lines non-first colon is separator not label",
     REQUIRE(tl.to_string() == "LD C, D");
 
     REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+// test_lexer.cpp
+TEST_CASE("TokenCache: basic caching") {
+    auto& cache = TokenFileReader::get_cache_for_testing();
+    cache.clear();
+
+    auto temp_file = create_temp_file("test.asm", "ld a, 1\n");
+
+    SECTION("First read populates cache") {
+        REQUIRE(cache.cache_size() == 0);
+        REQUIRE_FALSE(cache.has_cached(temp_file));
+
+        TokenFileReader reader;
+        REQUIRE(reader.open(temp_file));
+        REQUIRE_FALSE(reader.is_using_cache());  // First read tokenizes
+
+        TokenLine line;
+        while (reader.next_token_line(line)) {}
+
+        REQUIRE(cache.has_cached(temp_file));
+        REQUIRE(cache.cache_size() == 1);
+    }
+
+    SECTION("Second read uses cache") {
+        // Populate cache first
+        {
+            TokenFileReader reader;
+            REQUIRE(reader.open(temp_file));
+            TokenLine line;
+            while (reader.next_token_line(line)) {}
+        }
+
+        // Second read should hit cache
+        TokenFileReader reader;
+        REQUIRE(reader.open(temp_file));
+        REQUIRE(reader.is_using_cache());  // Using cached data!
+    }
+}
+
+TEST_CASE("TokenCache: invalidation on file modification") {
+    auto& cache = TokenFileReader::get_cache_for_testing();
+    cache.clear();
+
+    auto temp_file = create_temp_file("test.asm", "ld a, 1\n");
+
+    // First read
+    {
+        TokenFileReader reader;
+        REQUIRE(reader.open(temp_file));
+        TokenLine line;
+        while (reader.next_token_line(line)) {}
+    }
+    REQUIRE(cache.has_cached(temp_file));
+
+    // Modify file
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    write_file(temp_file, "ld b, 2\n");  // Different content
+
+    // Cache should miss (different mtime)
+    TokenFileReader reader;
+    REQUIRE(reader.open(temp_file));
+    REQUIRE_FALSE(reader.is_using_cache());  // Cache invalidated!
+}
+
+TEST_CASE("TokenCache: options change invalidates cache") {
+    auto& cache = TokenFileReader::get_cache_for_testing();
+    cache.clear();
+
+    auto temp_file = create_temp_file("test.asm", "label: ld a, 1\n");
+
+    // Read with default options
+    g_options.ucase_labels = false;
+    {
+        TokenFileReader reader;
+        REQUIRE(reader.open(temp_file));
+        TokenLine line;
+        while (reader.next_token_line(line)) {}
+    }
+    REQUIRE(cache.has_cached(temp_file));
+
+    // Change option that affects tokenization
+    g_options.ucase_labels = true;
+
+    // Should not use cache
+    TokenFileReader reader;
+    REQUIRE(reader.open(temp_file));
+    REQUIRE_FALSE(reader.is_using_cache());
+}
+
+TEST_CASE("TokenCache: direct API tests") {
+    TokenCache cache;
+    cache.clear();
+
+    auto temp_file = create_temp_file("test.asm", "ld a, 1\n");
+
+    SECTION("get returns nullopt for uncached file") {
+        REQUIRE_FALSE(cache.get(temp_file).has_value());
+    }
+
+    SECTION("put and get round-trip") {
+        std::vector<TokenLine> lines;
+        lines.emplace_back(Location(temp_file, 1));
+        lines.back().tokens().emplace_back(
+            TokenType::Identifier, "ld", Keyword::LD, false);
+
+        cache.put(temp_file, lines);
+
+        auto retrieved = cache.get(temp_file);
+        REQUIRE(retrieved.has_value());
+        REQUIRE(retrieved->size() == 1);
+    }
+
+    SECTION("clear removes all entries") {
+        std::vector<TokenLine> lines;
+        cache.put(temp_file, lines);
+        REQUIRE(cache.get(temp_file).has_value());
+
+        cache.clear();
+        REQUIRE_FALSE(cache.get(temp_file).has_value());
+    }
 }
