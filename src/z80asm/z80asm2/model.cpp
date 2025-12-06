@@ -2093,8 +2093,7 @@ const std::unordered_map<std::string, Module*>& Linker::public_symbols() const {
     return public_symbols_;
 }
 
-const std::unordered_map<std::string, std::vector<Location>>&
-        Linker::unresolved_externs()
+const std::unordered_map<std::string, std::vector<Location>>& Linker::unresolved_externs()
 const {
     return unresolved_externs_;
 }

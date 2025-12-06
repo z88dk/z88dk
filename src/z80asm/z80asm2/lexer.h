@@ -9,6 +9,7 @@
 #include "file_cache.h"
 #include "keywords.h"
 #include "location.h"
+#include <deque>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -126,6 +127,9 @@ public:
     bool next_token_line(TokenLine& out_line);
 
 private:
+    std::deque<TokenLine> output_queue_;
     std::string source_line_; // current source line being tokenized
     bool tokenize_line(TokenLine& out_line);
+
+    void split_lines(const TokenLine& input_line);
 };
