@@ -19,15 +19,16 @@ FileCache g_file_cache;
 // FileCache implementation
 //-----------------------------------------------------------------------------
 
-bool FileCache::is_stale(const std::string& filename, const CacheEntry& entry) const {
+bool FileCache::is_stale(const std::string& filename,
+                         const CacheEntry& entry) const {
     std::error_code ec;
     auto current_time = std::filesystem::last_write_time(filename, ec);
-    
+
     if (ec) {
         // File no longer exists or cannot be accessed
         return true;
     }
-    
+
     // Check if file has been modified since it was cached
     return current_time != entry.last_write_time;
 }
@@ -35,7 +36,7 @@ bool FileCache::is_stale(const std::string& filename, const CacheEntry& entry) c
 const std::vector<char>* FileCache::read_file(const std::string& filename) {
     // Normalize path for consistent cache keys
     std::string normalized = normalize_path(filename);
-    
+
     // Check cache
     auto it = cache_.find(normalized);
     if (it != cache_.end()) {
@@ -44,14 +45,15 @@ const std::vector<char>* FileCache::read_file(const std::string& filename) {
             // File has been modified - invalidate cache entry
             cache_.erase(it);
             // Fall through to re-read the file
-        } else {
+        }
+        else {
             // Cache hit with fresh data
             return &it->second->content;
         }
     }
-    
+
     // Cache miss or stale entry - read file
-    
+
     // Get file modification time before reading
     std::error_code ec;
     auto write_time = std::filesystem::last_write_time(filename, ec);
@@ -60,20 +62,20 @@ const std::vector<char>* FileCache::read_file(const std::string& filename) {
         g_errors.error(ErrorCode::FileNotFound, filename);
         return nullptr;
     }
-    
+
     // Use utils.h read_file_to_string function
     try {
         std::string file_content = read_file_to_string(filename);
-        
+
         // Create cache entry
         auto entry = std::make_unique<CacheEntry>();
         entry->content.assign(file_content.begin(), file_content.end());
         entry->last_write_time = write_time;
-        
+
         // Store in cache
         auto* content_ptr = &entry->content;
         cache_[normalized] = std::move(entry);
-        
+
         return content_ptr;
     }
     catch (const std::runtime_error&) {
@@ -86,11 +88,11 @@ const std::vector<char>* FileCache::read_file(const std::string& filename) {
 bool FileCache::is_cached(const std::string& filename) const {
     std::string normalized = normalize_path(filename);
     auto it = cache_.find(normalized);
-    
+
     if (it == cache_.end()) {
         return false;
     }
-    
+
     // Check if entry is stale
     return !is_stale(filename, *it->second);
 }
@@ -117,9 +119,26 @@ FileReader::FileReader(const std::string& filename) {
 bool FileReader::open(const std::string& filename) {
     filename_ = filename;
     content_ = g_file_cache.read_file(filename);
+    injected_content_.clear();  // Clear any injected content
     pos_ = 0;
     line_number_ = 0;
+    fixed_line_number_ = false;  // Reset to normal behavior
     return content_ != nullptr;
+}
+
+void FileReader::inject(const std::string& filename,
+                        const std::string& content) {
+    inject(filename, std::vector<char>(content.begin(), content.end()));
+}
+
+void FileReader::inject(const std::string& filename,
+                        const std::vector<char>& content) {
+    filename_ = filename;
+    injected_content_ = content;
+    content_ = &injected_content_;
+    pos_ = 0;
+    line_number_ = 0;
+    fixed_line_number_ = false;  // Reset to normal behavior
 }
 
 bool FileReader::is_open() const {
@@ -147,25 +166,28 @@ bool FileReader::has_next_line() const {
 
 bool FileReader::next_line(std::string& out_line) {
     out_line.clear();
-    
+
     if (!content_) {
         return false;
     }
-    
+
     if (pos_ >= content_->size()) {
         return false;
     }
-    
-    ++line_number_;
-    
+
+    // Increment line number only if not fixed
+    if (!fixed_line_number_) {
+        ++line_number_;
+    }
+
     // Read until newline or end of file
     while (pos_ < content_->size()) {
         char c = (*content_)[pos_++];
-        
+
         if (c == '\n') {
             break;
         }
-        
+
         if (c == '\r') {
             // Handle CR-LF or standalone CR
             if (pos_ < content_->size() && (*content_)[pos_] == '\n') {
@@ -173,20 +195,42 @@ bool FileReader::next_line(std::string& out_line) {
             }
             break;
         }
-        
+
         out_line += c;
     }
-    
+
+    Location location(filename_, line_number_);
+    g_errors.set_location(location);
+    g_errors.set_source_line(out_line);
+
     return true;
 }
 
 void FileReader::reset() {
     pos_ = 0;
     line_number_ = 0;
+    fixed_line_number_ = false;
 }
 
 size_t FileReader::line_number() const {
     return line_number_;
+}
+
+void FileReader::set_line_number(size_t line_num) {
+    line_number_ = line_num;
+}
+
+void FileReader::set_fixed_line_number(size_t line_num) {
+    line_number_ = line_num;
+    fixed_line_number_ = true;
+}
+
+void FileReader::clear_fixed_line_number() {
+    fixed_line_number_ = false;
+}
+
+bool FileReader::has_fixed_line_number() const {
+    return fixed_line_number_;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,8 +246,27 @@ BinFileReader::BinFileReader(const std::string& filename) {
 bool BinFileReader::open(const std::string& filename) {
     filename_ = filename;
     content_ = g_file_cache.read_file(filename);
+    injected_content_.clear();  // Clear any injected content
     pos_ = 0;
     return content_ != nullptr;
+}
+
+void BinFileReader::inject(const std::string& filename,
+                           const std::vector<char>& content) {
+    filename_ = filename;
+    injected_content_ = content;
+    content_ = &injected_content_;
+    pos_ = 0;
+}
+
+void BinFileReader::inject(const std::string& filename,
+                           const std::vector<unsigned char>& content) {
+    inject(filename, std::vector<char>(content.begin(), content.end()));
+}
+
+void BinFileReader::inject(const std::string& filename,
+                           const std::string& content) {
+    inject(filename, std::vector<char>(content.begin(), content.end()));
 }
 
 bool BinFileReader::is_open() const {
@@ -246,9 +309,10 @@ bool BinFileReader::check_bounds(size_t position, size_t num_bytes) const {
         g_errors.error(ErrorCode::FileOpenError, filename_);
         return false;
     }
-    
+
     if ((position + num_bytes) > content_->size()) {
-        g_errors.error(ErrorCode::InvalidObjectFile, filename_ + " at position " + std::to_string(position));
+        g_errors.error(ErrorCode::InvalidObjectFile,
+                       filename_ + " at position " + std::to_string(position));
         return false;
     }
     return true;
@@ -258,7 +322,7 @@ int BinFileReader::read_uint8() {
     if (!check_bounds(pos_, 1)) {
         return 0;
     }
-    
+
     uint8_t value = static_cast<uint8_t>((*content_)[pos_]);
     pos_++;
     return value;
@@ -268,16 +332,16 @@ int BinFileReader::read_int16() {
     if (!check_bounds(pos_, 2)) {
         return 0;
     }
-    
+
     // Little-endian
     int value = static_cast<uint8_t>((*content_)[pos_]) |
                 (static_cast<uint8_t>((*content_)[pos_ + 1]) << 8);
-    
+
     // Sign extend from 16-bit to int
     if (value & 0x8000) {
         value |= ~0xFFFF;
     }
-    
+
     pos_ += 2;
     return value;
 }
@@ -286,13 +350,13 @@ int BinFileReader::read_int32() {
     if (!check_bounds(pos_, 4)) {
         return 0;
     }
-    
+
     // Little-endian
     int value = static_cast<uint8_t>((*content_)[pos_]) |
                 (static_cast<uint8_t>((*content_)[pos_ + 1]) << 8) |
                 (static_cast<uint8_t>((*content_)[pos_ + 2]) << 16) |
                 (static_cast<uint8_t>((*content_)[pos_ + 3]) << 24);
-    
+
     pos_ += 4;
     return value;
 }
@@ -301,11 +365,11 @@ std::string BinFileReader::read_string(size_t length) {
     if (length == 0) {
         return "";
     }
-    
+
     if (!check_bounds(pos_, length)) {
         return "";
     }
-    
+
     std::string result(content_->begin() + pos_, content_->begin() + pos_ + length);
     pos_ += length;
     return result;
@@ -315,7 +379,7 @@ int BinFileReader::read_uint8_at(size_t pos) {
     if (!check_bounds(pos, 1)) {
         return 0;
     }
-    
+
     return static_cast<uint8_t>((*content_)[pos]);
 }
 
@@ -323,16 +387,16 @@ int BinFileReader::read_int16_at(size_t pos) {
     if (!check_bounds(pos, 2)) {
         return 0;
     }
-    
+
     // Little-endian
     int value = static_cast<uint8_t>((*content_)[pos]) |
                 (static_cast<uint8_t>((*content_)[pos + 1]) << 8);
-    
+
     // Sign extend from 16-bit to int
     if (value & 0x8000) {
         value |= ~0xFFFF;
     }
-    
+
     return value;
 }
 
@@ -340,13 +404,13 @@ int BinFileReader::read_int32_at(size_t pos) {
     if (!check_bounds(pos, 4)) {
         return 0;
     }
-    
+
     // Little-endian
     int value = static_cast<uint8_t>((*content_)[pos]) |
                 (static_cast<uint8_t>((*content_)[pos + 1]) << 8) |
                 (static_cast<uint8_t>((*content_)[pos + 2]) << 16) |
                 (static_cast<uint8_t>((*content_)[pos + 3]) << 24);
-    
+
     return value;
 }
 
@@ -354,10 +418,10 @@ std::string BinFileReader::read_string_at(size_t pos, size_t length) {
     if (length == 0) {
         return "";
     }
-    
+
     if (!check_bounds(pos, length)) {
         return "";
     }
-    
+
     return std::string(content_->begin() + pos, content_->begin() + pos + length);
 }
