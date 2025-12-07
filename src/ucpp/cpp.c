@@ -545,7 +545,7 @@ void free_lexer_state(struct lexer_state *ls)
 /*
  * Print line information.
  */
-static void print_line_info(struct lexer_state *ls, unsigned long flags)
+void print_line_info(struct lexer_state *ls, unsigned long flags)
 {
 	char *fn = current_long_filename ?
 		current_long_filename : current_filename;

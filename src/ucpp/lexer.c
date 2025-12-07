@@ -810,8 +810,6 @@ static inline int read_token(struct lexer_state *ls)
 		utf8 = ls->utf8;
 		shift_state = 0;
 	}
-	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
-		for (; ls->line > ls->oline;) put_char(ls,'\n');
 	do {
 		c = next_char(ls);
 		if (c < 0) {
@@ -938,15 +936,20 @@ static inline int read_token(struct lexer_state *ls)
 					outc = -2;
 				} else {
 					if (outc < 0) {
+				        yield_newlines(ls);
 						put_char(ls, '%');
 						put_char(ls, ':');
 						if (outc == -2)
 							put_char(ls, '%');
 						outc = 0;
 					} else if (outc) {
+				        yield_newlines(ls);
 						put_char(ls, outc);
 						outc = 0;
 					}
+				    if (c != '\n') {
+				        yield_newlines(ls);
+				    }
 					put_char(ls, c);
 				}
 			}
@@ -998,6 +1001,7 @@ int next_token(struct lexer_state *ls)
 	if (ls->flags & READ_AGAIN) {
 		ls->flags &= ~READ_AGAIN;
 		if (!(ls->flags & LEXER)) {
+			yield_newlines(ls);
 			char *c = S_TOKEN(ls->ctok->type) ?
 				ls->ctok->name : token_name(ls->ctok);
 			if (ls->ctok->type == OPT_NONE) {
