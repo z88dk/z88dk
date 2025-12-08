@@ -579,7 +579,7 @@ TEST_CASE("Unterminated single-quoted string reports error",
 
     TokenFileReader tfr;
     tfr.inject("unclosed_squote", "db 'u\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE_FALSE(tfr.next_token_line(tl));
@@ -880,7 +880,7 @@ TEST_CASE("Lexer identifier forms allow underscores and digits after the first c
 
     TokenFileReader tfr;
     tfr.inject("ident_forms_chars", "@_AbC123  A_B@C9_d  Z9\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1730,7 +1730,7 @@ TEST_CASE("split_lines handles local label with dot", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", ".local: LD A, B\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -1748,7 +1748,7 @@ TEST_CASE("split_lines handles multiple consecutive labels", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "label1: label2: LD A, B\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -2003,7 +2003,7 @@ TEST_CASE("split_lines resets ternary level on backslash", "[lexer][split]") {
 
     TokenFileReader tfr;
     tfr.inject("split_test", "DEFB 1 ? 2 \\ : 3\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -2023,7 +2023,7 @@ TEST_CASE("split_lines handles instruction followed by ternary",
 
     TokenFileReader tfr;
     tfr.inject("split_test", "LD A, 1 ? 2 : 3\n");
-    tfr.set_fixed_line_number(1);
+    tfr.set_line_number(1);
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
@@ -2293,4 +2293,167 @@ TEST_CASE("TokenCache: direct API tests") {
         cache.clear();
         REQUIRE_FALSE(cache.get(temp_file).has_value());
     }
+}
+
+TEST_CASE("Lexer handles continuation lines ended by backslash (merge with next line)", "[lexer][continuation]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    // Physical line ends with backslash -> next physical line is merged into the same logical line.
+    // Expect a single logical line with the backslash removed and contents concatenated.
+    tfr.inject("cont_lines", "LD A, B \\\nADD A, C\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+
+    // The continuation backslash should be consumed and the two physical lines merged.
+    REQUIRE(tl.to_string() == "LD A, B ADD A, C");
+
+    // No additional logical lines should be produced
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("Lexer: continuation backslash at end-of-file is consumed and yields no trailing line", "[lexer][continuation][eof]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    // Backslash is the final character in the file; it should act as a continuation and not produce an extra empty line.
+    tfr.inject("cont_eof", "LD A, B \\\nADD A, C\\");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B ADD A, C");
+
+    // No more logical lines; the trailing backslash at EOF is not returned
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("Lexer: continuation backslash followed by mixed whitespace still joins lines", "[lexer][continuation][whitespace]") {
+    g_options = Options();
+
+    TokenFileReader tfr;
+    // Backslash followed by spaces, tabs, vertical-tab, form-feed before newline should still join with the next line.
+    tfr.inject("cont_ws", "LD A, B \\ \t\v\f \nADD A, C\n");
+    tfr.set_fixed_line_number(1);
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A, B ADD A, C");
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("TokenFileReader::inject_tokens returns injected logical lines first and preserves location", "[lexer][inject_tokens]") {
+    g_options = Options();
+
+    // Build two TokenLine inputs:
+    // 1) a label with colon that should split into ".LABEL" and instruction
+    // 2) a macro-like line starting with DEFINE that should NOT split
+    TokenLine injected1(Location("macrofile.asm", 42));
+    injected1.tokens().push_back(Token(TokenType::Identifier, "LABEL", false));
+    injected1.tokens().push_back(Token(TokenType::Colon, ":", false));
+    injected1.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
+    injected1.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A, false));
+    injected1.tokens().push_back(Token(TokenType::Comma, ",", false));
+    injected1.tokens().push_back(Token(TokenType::Integer, "1", false));
+
+    TokenLine injected2(Location("macrofile.asm", 43));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "DEFINE", Keyword::DEFINE, false));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "X", false));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "B", Keyword::B, false));
+
+    // Reader with some normal content to ensure injected tokens take precedence
+    TokenFileReader tfr;
+    tfr.inject("normal.asm", "ld c, 2\n");
+    tfr.set_fixed_line_number(10);
+
+    // Inject tokens (they will be split via split_lines and queued before normal content)
+    tfr.inject_tokens({ injected1, injected2 });
+
+    TokenLine tl;
+
+    // First injected1 should split into two logical lines:
+    //  - ".LABEL" with location ("macrofile.asm", 42)
+    //  - "LD A, 1" with same location
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == ".LABEL");
+    REQUIRE(tl.location().filename() == "macrofile.asm");
+    REQUIRE(tl.location().line_num() == 42);
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A,1");
+    REQUIRE(tl.location().filename() == "macrofile.asm");
+    REQUIRE(tl.location().line_num() == 42);
+
+    // Next injected2 starts with DEFINE -> should not split
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "DEFINE X LD B");
+    REQUIRE(tl.location().filename() == "macrofile.asm");
+    REQUIRE(tl.location().line_num() == 43);
+
+    // Finally, the normal file content should come after injected ones
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "ld c, 2");
+    REQUIRE(tl.location().filename() == "normal.asm");
+    REQUIRE(tl.location().line_num() == 10);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("TokenFileReader::inject_tokens handles backslash splitting in injected lines and preserves location", "[lexer][inject_tokens][backslash]") {
+    g_options = Options();
+
+    // Injected line with backslash split should produce two logical lines
+    TokenLine injected(Location("macros.inc", 99));
+    injected.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A, false));
+    injected.tokens().push_back(Token(TokenType::Comma, ",", false));
+    injected.tokens().push_back(Token(TokenType::Integer, "0", false));
+    injected.tokens().push_back(Token(TokenType::Backslash, "\\", false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "INC", Keyword::INC, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "HL", Keyword::HL, false));
+
+    TokenFileReader tfr;
+    tfr.inject_tokens({ injected });
+
+    TokenLine tl;
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "LD A,0");
+    REQUIRE(tl.location().filename() == "macros.inc");
+    REQUIRE(tl.location().line_num() == 99);
+
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "INC HL");
+    REQUIRE(tl.location().filename() == "macros.inc");
+    REQUIRE(tl.location().line_num() == 99);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
+}
+
+TEST_CASE("TokenFileReader::inject_tokens respects no-split for #define and preserves location", "[lexer][inject_tokens][define]") {
+    g_options = Options();
+
+    // Build a "#define" start using Hash + Identifier(DEFINE)
+    TokenLine injected(Location("defs.asm", 7));
+    injected.tokens().push_back(Token(TokenType::Hash, "#", false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "DEFINE", Keyword::DEFINE, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "FOO", false));
+    injected.tokens().push_back(Token(TokenType::Colon, ":", false)); // should NOT cause split
+    injected.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A, false));
+
+    TokenFileReader tfr;
+    tfr.inject_tokens({ injected });
+
+    TokenLine tl;
+    REQUIRE(tfr.next_token_line(tl));
+    REQUIRE(tl.to_string() == "#DEFINE FOO:LD A");
+    REQUIRE(tl.location().filename() == "defs.asm");
+    REQUIRE(tl.location().line_num() == 7);
+
+    REQUIRE_FALSE(tfr.next_token_line(tl));
 }
