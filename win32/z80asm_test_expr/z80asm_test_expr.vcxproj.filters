@@ -45,7 +45,10 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\symbol_table.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\file_cache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
