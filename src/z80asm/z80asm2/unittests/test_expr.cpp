@@ -749,6 +749,357 @@ TEST_CASE("Expression: parse $ without opcodes throws",
 }
 
 //-----------------------------------------------------------------------------
+// Parse tests - UPDATED
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Parse: simple integer", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "42", 42, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 1);
+    REQUIRE_FALSE(expr.empty());
+    REQUIRE(expr.token_line().tokens().size() == 1);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 42);
+}
+
+TEST_CASE("Parse: simple addition", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "4", 4, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 3);
+    REQUIRE(expr.token_line().tokens().size() == 3);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 7);
+}
+
+TEST_CASE("Parse: complex expression (2 + 3) * 4", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", false));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::RightParen, ")", false));
+    line.tokens().push_back(Token(TokenType::Multiply, "*", false));
+    line.tokens().push_back(Token(TokenType::Integer, "4", 4, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 7);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 20);
+}
+
+TEST_CASE("Parse: symbol reference", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Identifier, "label", false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 1);
+
+    // Undefined symbol should throw
+    REQUIRE_THROWS_AS(expr.evaluate(), UndefinedSymbol);
+}
+
+TEST_CASE("Parse: dollar", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Dollar, "$", false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 1);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 0); // Section address is 0 at this point
+}
+
+TEST_CASE("Parse: unary minus", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Minus, "-", false));
+    line.tokens().push_back(Token(TokenType::Integer, "5", 5, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 2);
+
+    int result = expr.evaluate();
+    REQUIRE(result == -5);
+}
+
+TEST_CASE("Parse: power operator", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "2", 2, false));
+    line.tokens().push_back(Token(TokenType::Power, "**", false));
+    line.tokens().push_back(Token(TokenType::Integer, "10", 10, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 3);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 1024);
+}
+
+TEST_CASE("Parse: ternary conditional", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "1", 1, false));
+    line.tokens().push_back(Token(TokenType::Question, "?", false));
+    line.tokens().push_back(Token(TokenType::Integer, "42", 42, false));
+    line.tokens().push_back(Token(TokenType::Colon, ":", false));
+    line.tokens().push_back(Token(TokenType::Integer, "99", 99, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 5);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 42);
+}
+
+TEST_CASE("Parse: partial consumption", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "5", 5, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::Comma, ",", false));
+    line.tokens().push_back(Token(TokenType::Integer, "7", 7, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 3); // Stops at comma
+    REQUIRE(expr.token_line().tokens().size() == 3);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 8);
+}
+
+TEST_CASE("Parse: invalid syntax returns false", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE_FALSE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 0); // i unchanged on failure
+}
+
+TEST_CASE("Parse: unclosed parenthesis", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::LeftParen, "(", false));
+    line.tokens().push_back(Token(TokenType::Integer, "5", 5, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE_FALSE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 0); // i unchanged on failure
+}
+
+TEST_CASE("Parse: tokens preserved for object file", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Identifier, "label", false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "10", 10, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+
+    const TokenLine& token_line = expr.token_line();
+    REQUIRE(token_line.tokens().size() == 3);
+    REQUIRE(token_line.tokens()[0].text() == "label");
+    REQUIRE(token_line.tokens()[1].text() == "+");
+    REQUIRE(token_line.tokens()[2].text() == "10");
+}
+
+TEST_CASE("Parse: logical XOR operator", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "1", 1, false));
+    line.tokens().push_back(Token(TokenType::LogicalXor, "^^", false));
+    line.tokens().push_back(Token(TokenType::Integer, "0", 0, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 3);
+
+    int result = expr.evaluate();
+    REQUIRE(result == 1);
+}
+
+TEST_CASE("Parse: all operators", "[model][parse]") {
+    // Test that all operator types can be parsed
+    struct OpTest {
+        TokenType type;
+        std::string text;
+        int left;
+        int right;
+        int expected;
+    };
+
+    std::vector<OpTest> tests = {
+        {TokenType::Plus, "+", 3, 4, 7},
+        {TokenType::Minus, "-", 10, 3, 7},
+        {TokenType::Multiply, "*", 6, 7, 42},
+        {TokenType::Divide, "/", 20, 4, 5},
+        {TokenType::Modulo, "%", 17, 5, 2},
+        {TokenType::LeftShift, "<<", 1, 3, 8},
+        {TokenType::RightShift, ">>", 16, 2, 4},
+        {TokenType::BitwiseAnd, "&", 0xF0, 0x3C, 0x30},
+        {TokenType::BitwiseOr, "|", 0xF0, 0x0F, 0xFF},
+        {TokenType::BitwiseXor, "^", 0xFF, 0xAA, 0x55},
+        {TokenType::LT, "<", 3, 5, 1},
+        {TokenType::LE, "<=", 3, 3, 1},
+        {TokenType::GT, ">", 5, 3, 1},
+        {TokenType::GE, ">=", 3, 3, 1},
+        {TokenType::EQ, "==", 5, 5, 1},
+        {TokenType::NE, "!=", 5, 3, 1},
+        {TokenType::LogicalAnd, "&&", 1, 1, 1},
+        {TokenType::LogicalOr, "||", 0, 1, 1},
+    };
+
+    for (const auto& test : tests) {
+        Location loc("test.asm", 1);
+        Module module("TEST", loc);
+        Section* section = module.current_section();
+
+        TokenLine line(Location("test.asm", 1));
+        line.tokens().push_back(Token(TokenType::Integer, std::to_string(test.left),
+                                      test.left,
+                                      false));
+        line.tokens().push_back(Token(test.type, test.text, false));
+        line.tokens().push_back(Token(TokenType::Integer, std::to_string(test.right),
+                                      test.right,
+                                      false));
+
+        size_t i = 0;
+        Expression expr;
+        REQUIRE(expr.parse(line, i, &module, section));
+
+        int result = expr.evaluate();
+        REQUIRE(result == test.expected);
+    }
+}
+
+TEST_CASE("Parse: location is set from TokenLine", "[model][parse]") {
+    Location loc("test.asm", 1);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("calc.asm", 42));
+    line.tokens().push_back(Token(TokenType::Integer, "100", 100, false));
+
+    size_t i = 0;
+    Expression expr;
+    REQUIRE(expr.parse(line, i, &module, section));
+
+    REQUIRE(expr.location().filename() == "calc.asm");
+    REQUIRE(expr.location().line_num() == 42);
+}
+
+TEST_CASE("Parse: can parse multiple expressions from same line",
+          "[model][parse]") {
+    Location loc("test.asm", 10);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    TokenLine line(Location("test.asm", 1));
+    line.tokens().push_back(Token(TokenType::Integer, "10", 10, false));
+    line.tokens().push_back(Token(TokenType::Comma, ",", false));
+    line.tokens().push_back(Token(TokenType::Integer, "20", 20, false));
+
+    // Parse first expression
+    size_t i = 0;
+    Expression expr1;
+    REQUIRE(expr1.parse(line, i, &module, section));
+    REQUIRE(i == 1); // Stops before comma
+
+    int result1 = expr1.evaluate();
+    REQUIRE(result1 == 10);
+
+    // Skip comma
+    ++i;
+
+    // Parse second expression
+    Expression expr2;
+    REQUIRE(expr2.parse(line, i, &module, section));
+    REQUIRE(i == 3);
+
+    int result2 = expr2.evaluate();
+    REQUIRE(result2 == 20);
+}
+
+//-----------------------------------------------------------------------------
 // Expression is_constant() tests
 //-----------------------------------------------------------------------------
 
@@ -1912,4 +2263,79 @@ TEST_CASE("Expression::parse reports error on missing ':' in ternary and leaves 
     REQUIRE_FALSE(expr.parse(line, i, &module, section));
     REQUIRE(i == 0);                 // index unchanged on failure
     REQUIRE(expr.to_string() == ""); // nothing captured
+}
+
+//-----------------------------------------------------------------------------
+// Integration tests: Symbols with expressions
+//-----------------------------------------------------------------------------
+
+TEST_CASE("Integration: symbol referencing other symbols",
+          "[model][integration]") {
+    Location loc("test.asm", 100);
+    Module module("TEST", loc);
+    Symbol* undefined_sym = module.add_symbol("undefined", loc);
+
+    // Create a symbol node that will reference "undefined_sym"
+    auto node = make_symbol(undefined_sym);
+
+    Expression expr(std::move(node), loc);
+
+    Symbol sym("computed", loc);
+    sym.set_type(SymbolType::Computed);
+    sym.set_expression(expr);
+
+    REQUIRE(sym.is_computed());
+    REQUIRE(sym.has_expression());
+
+    // Evaluation should fail because symbol is undefined
+    REQUIRE_THROWS_AS(sym.expression().evaluate(), UndefinedSymbol);
+}
+
+TEST_CASE("Integration: public constant symbol", "[model][integration]") {
+    Location loc("constants.asm", 10);
+    Symbol sym("VERSION", loc, 0x0100, SymbolType::Constant);
+    sym.set_scope(SymbolScope::Public);
+
+    REQUIRE(sym.name() == "VERSION");
+    REQUIRE(sym.value() == 0x0100);
+    REQUIRE(sym.is_constant());
+    REQUIRE(sym.is_public());
+    REQUIRE(sym.is_exported());
+    REQUIRE(sym.location().filename() == "constants.asm");
+    REQUIRE(sym.location().line_num() == 10);
+}
+
+TEST_CASE("Integration: extern undefined symbol", "[model][integration]") {
+    Location loc("main.asm", 20);
+    Symbol sym("printf", loc);
+    sym.set_scope(SymbolScope::Extern);
+
+    REQUIRE(sym.name() == "printf");
+    REQUIRE(sym.is_undefined());
+    REQUIRE(sym.is_extern());
+    REQUIRE(sym.is_imported());
+    REQUIRE_FALSE(sym.is_defined());
+    REQUIRE_FALSE(sym.is_exported());
+}
+
+TEST_CASE("Integration: address-relative label in section",
+          "[model][integration]") {
+    Location loc("main.asm", 100);
+    Section code("CODE");
+    code.set_base_address(0x8000);
+
+    Symbol sym("main", loc);
+    sym.set_type(SymbolType::AddressRelative);
+    sym.set_opcode(code.last_opcode());
+    sym.set_offset(0);
+    sym.set_scope(SymbolScope::Public);
+
+    REQUIRE(sym.name() == "main");
+    REQUIRE(sym.is_address_relative());
+    REQUIRE(sym.is_public());
+    REQUIRE(sym.is_exported());
+    REQUIRE(sym.opcode() == code.last_opcode());
+    REQUIRE(sym.offset() == 0);
+    REQUIRE(sym.location().filename() == "main.asm");
+    REQUIRE(sym.location().line_num() == 100);
 }
