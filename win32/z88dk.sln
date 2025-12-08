@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11205.157 d18.0
+VisualStudioVersion = 18.0.11205.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-z80nm", "z80nm\z80nm.vcxproj", "{E3CAFDD4-FBE2-4E7E-AB20-816C8B257F6B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -117,6 +117,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_options", "z80asm_test_options\z80asm_test_options.vcxproj", "{576D9828-EB70-486E-911A-0E8100C80CEA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_hla", "z80asm_test_hla\z80asm_test_hla.vcxproj", "{DA470020-5885-439A-9F42-803CE6839B88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm_test_symbols", "z80asm_test_symbols\z80asm_test_symbols.vcxproj", "{83C87AF4-97DB-4063-AC34-6854A6D2A410}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -406,6 +408,14 @@ Global
 		{DA470020-5885-439A-9F42-803CE6839B88}.Release|Win32.Build.0 = Release|Win32
 		{DA470020-5885-439A-9F42-803CE6839B88}.Release|x64.ActiveCfg = Release|x64
 		{DA470020-5885-439A-9F42-803CE6839B88}.Release|x64.Build.0 = Release|x64
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Debug|Win32.ActiveCfg = Debug|Win32
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Debug|Win32.Build.0 = Debug|Win32
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Debug|x64.ActiveCfg = Debug|x64
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Debug|x64.Build.0 = Debug|x64
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Release|Win32.ActiveCfg = Release|Win32
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Release|Win32.Build.0 = Release|Win32
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Release|x64.ActiveCfg = Release|x64
+		{83C87AF4-97DB-4063-AC34-6854A6D2A410}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
