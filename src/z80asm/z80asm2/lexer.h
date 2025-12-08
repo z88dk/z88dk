@@ -258,7 +258,8 @@ private:
 
     bool tokenize_line(TokenLine& token_line);
     // Updated: split into the provided target queue (output or injected)
-    void split_lines(const TokenLine& input_line, std::deque<TokenLine>& target_queue);
+    void split_lines(const TokenLine& input_line,
+                     std::deque<TokenLine>& target_queue);
 
     // Helper to check cache after opening
     void check_cache();
