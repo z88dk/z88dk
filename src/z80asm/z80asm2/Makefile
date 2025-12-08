@@ -103,6 +103,6 @@ clean:
 		  $(wildcard *.o *.d *.i *.exe *.orig *.core *.bak *~) \
 		  $(wildcard $(TEST_DIR)/*.o $(TEST_DIR)/*.d $(TEST_DIR)/*.i $(TEST_DIR)/*.exe $(TEST_DIR)/*.orig $(TEST_DIR)/*.core $(TEST_DIR)/*.bak $(TEST_DIR)/*~) \
 		  $(wildcard t/*.o t/*.d t/*.i t/*.exe t/*.orig t/*.core t/*.bak t/*~)
-	$(RM) -r $(OBJ_DIR) $(TEST_OBJ_DIR)
+	$(RM) -r $(OBJ_DIR) $(TEST_OBJ_DIR) $(wildcard test_t_*)
 
 -include $(DEPENDS)
