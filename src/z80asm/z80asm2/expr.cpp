@@ -4,15 +4,12 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
 #include "expr.h"
-#include "symbol_table.h"
-#include "utils.h"
-#include <cmath>
-#include <cstdint>
-#include <vector>
+#include "model.h"
 
+//-----------------------------------------------------------------------------
 // integer power helper (fast exponentiation). negative exponent -> 0
+//-----------------------------------------------------------------------------
 static int ipow(int base, int exp) {
     if (exp < 0) {
         return 0;
@@ -29,610 +26,1030 @@ static int ipow(int base, int exp) {
     return static_cast<int>(acc);
 }
 
-void Expr::clear() {
-    line_.clear();
-    rpn_items_.clear();
-}
+//-----------------------------------------------------------------------------
+// Concrete expression node classes (private implementation)
+//-----------------------------------------------------------------------------
 
-bool Expr::parse(const TokensLine& line, unsigned& i) {
-    clear();
-    line_.set_location(line.location());
+namespace {
 
-    unsigned start = i;
-    std::vector<RPNItem> items;
-    bool ok = try_parse(line, i, items);
-    if (!ok) {
-        i = start;
-        return false;
+// Integer literal - always constant
+class IntegerNode : public ExprNode {
+public:
+    explicit IntegerNode(int value) : value_(value) {}
+
+    ExprOp op() const override {
+        return ExprOp::Integer;
     }
-    else {
-        // copy operators and tokens to expression
-        rpn_items_.insert(rpn_items_.end(), items.begin(), items.end());
-        unsigned end = i;
-        for (unsigned j = start; j < end; ++j) {
-            line_.push_back(line[j]);
-        }
-        return true;
+
+    int evaluate() const override {
+        return value_;
     }
-}
 
-bool Expr::evaluate(SymbolTable& symtab, int& out_value) {
-    out_value = 0;
-    is_extern_ = false;
-    is_undefined_ = false;
-    is_constant_ = true;
+    bool is_constant() const override {
+        return true;  // Integer literals are always constant
+    }
 
-    std::vector<int> stack;
-    stack.reserve(rpn_items_.size());
+    std::unique_ptr<ExprNode> clone() const override {
+        return std::make_unique<IntegerNode>(value_);
+    }
 
-    for (const auto& it : rpn_items_) {
-        if (it.kind == RPNItem::Value) {
-            stack.push_back(it.value);
-            continue;
+    std::string to_string() const override {
+        return std::to_string(value_);
+    }
+
+private:
+    int value_;
+};
+
+// Symbol reference (by pointer - always resolved during parsing)
+class SymbolNode : public ExprNode {
+public:
+    explicit SymbolNode(Symbol* symbol) : symbol_(symbol) {}
+
+    ExprOp op() const override {
+        return ExprOp::Symbol;
+    }
+
+    int evaluate() const override {
+        if (!symbol_) {
+            throw UndefinedSymbol("<null>");
         }
 
-        // lookup symbol table
-        if (it.kind == RPNItem::Symbol) {
-            const Symbol& symbol = symtab.get_symbol(it.name);
-            if (symbol.is_extern) {
-                is_extern_ = true;
-                if (!silent_) {
-                    g_errors.error(ErrorCode::ExternSymbol, it.name);
-                }
-                return false;
-            }
-            if (!symbol.is_defined) {
-                is_undefined_ = true;
-                if (!silent_) {
-                    g_errors.error(ErrorCode::UndefinedSymbol, it.name);
-                }
-                return false;
-            }
-            if (!symbol.is_constant) {
-                is_constant_ = false;
-                if (!silent_) {
-                    g_errors.error(ErrorCode::NotConstantSymbol, it.name);
-                }
-                return false;
-            }
-            stack.push_back(symbol.value);
-            continue;
+        // Call Symbol::evaluate() which is now const
+        return symbol_->evaluate();
+    }
+
+    bool is_constant() const override {
+        if (!symbol_) {
+            return false;
         }
 
-        // Operator
-        if (it.unary) {
-            if (stack.empty()) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InsufficientOperands);
-                }
-                return false;
+        // Check if symbol is defined
+        if (symbol_->is_undefined()) {
+            return false;
+        }
+
+        // Check symbol type
+        switch (symbol_->type()) {
+        case SymbolType::Constant:
+            return true;  // Constants are always constant
+
+        case SymbolType::AddressRelative:
+            return false;  // Labels are not constant (address depends on link time)
+
+        case SymbolType::Computed:
+            // Computed symbols are constant if their expression is constant
+            return symbol_->has_expression() && symbol_->expression().is_constant();
+
+        case SymbolType::Undefined:
+        default:
+            return false;
+        }
+    }
+
+    std::unique_ptr<ExprNode> clone() const override {
+        return std::make_unique<SymbolNode>(symbol_);
+    }
+
+    std::string to_string() const override {
+        return symbol_ ? symbol_->name() : "<null>";
+    }
+
+    Symbol* symbol() const {
+        return symbol_;
+    }
+
+private:
+    Symbol* symbol_;
+};
+
+// Dollar (current location) - always resolved during parsing
+class DollarNode : public ExprNode {
+public:
+    explicit DollarNode(Opcode* opcode, Section* section)
+        : opcode_(opcode), section_(section) {
+    }
+
+    ExprOp op() const override {
+        return ExprOp::Dollar;
+    }
+
+    int evaluate() const override {
+        if (!section_ || !opcode_) {
+            throw InvalidDollar();
+        }
+
+        // Calculate address: section base + opcode's offset in section
+        int offset = 0;
+        for (const auto& op : section_->opcodes()) {
+            if (op.get() == opcode_) {
+                return section_->base_address() + offset;
             }
-            int a = stack.back();
-            stack.pop_back();
-            int r = 0;
-            switch (it.op) {
-            case TokenType::Plus:
-                r = +a;
-                break;
-            case TokenType::Minus:
-                r = -a;
-                break;
-            case TokenType::BitwiseNot:
-                r = ~a;
-                break;
-            case TokenType::LogicalNot:
-                r = (!a) ? 1 : 0;
-                break;
-            default:
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax);
-                }
-                return false;
+            offset += static_cast<int>(op->size());
+        }
+
+        throw InvalidDollar();  // Opcode not found in section
+    }
+
+    bool is_constant() const override {
+        return false;  // $ depends on assembly location, not constant
+    }
+
+    std::unique_ptr<ExprNode> clone() const override {
+        return std::make_unique<DollarNode>(opcode_, section_);
+    }
+
+    std::string to_string() const override {
+        return "$";
+    }
+
+private:
+    Opcode* opcode_;
+    Section* section_;
+};
+
+// Unary operator
+class UnaryOpNode : public ExprNode {
+public:
+    UnaryOpNode(ExprOp op, std::unique_ptr<ExprNode> operand)
+        : op_(op), operand_(std::move(operand)) {
+    }
+
+    ExprOp op() const override {
+        return op_;
+    }
+
+    int evaluate() const override {
+        int val = operand_->evaluate();
+
+        switch (op_) {
+        case ExprOp::UnaryPlus:
+            return val;
+        case ExprOp::UnaryMinus:
+            return -val;
+        case ExprOp::LogicalNot:
+            return !val;
+        case ExprOp::BitwiseNot:
+            return ~val;
+        default:
+            throw ExpressionError("Invalid unary operator");
+        }
+    }
+
+    bool is_constant() const override {
+        return operand_->is_constant();  // Unary op is constant if operand is constant
+    }
+
+    std::unique_ptr<ExprNode> clone() const override {
+        return std::make_unique<UnaryOpNode>(op_, operand_->clone());
+    }
+
+    std::string to_string() const override {
+        const char* op_str = "?";
+        switch (op_) {
+        case ExprOp::UnaryPlus:
+            op_str = "+";
+            break;
+        case ExprOp::UnaryMinus:
+            op_str = "-";
+            break;
+        case ExprOp::LogicalNot:
+            op_str = "!";
+            break;
+        case ExprOp::BitwiseNot:
+            op_str = "~";
+            break;
+        default:
+            break;
+        }
+        return std::string(op_str) + "(" + operand_->to_string() + ")";
+    }
+
+private:
+    ExprOp op_;
+    std::unique_ptr<ExprNode> operand_;
+};
+
+// Binary operator
+class BinaryOpNode : public ExprNode {
+public:
+    BinaryOpNode(ExprOp op, std::unique_ptr<ExprNode> left,
+                 std::unique_ptr<ExprNode> right)
+        : op_(op), left_(std::move(left)), right_(std::move(right)) {
+    }
+
+    ExprOp op() const override {
+        return op_;
+    }
+
+    int evaluate() const override {
+        int left_val = left_->evaluate();
+        int right_val = right_->evaluate();
+
+        switch (op_) {
+        case ExprOp::Power:
+            return ipow(left_val, right_val);
+        case ExprOp::Multiply:
+            return left_val * right_val;
+        case ExprOp::Divide:
+            if (right_val == 0) {
+                throw DivisionByZero();
             }
-            stack.push_back(r);
+            return left_val / right_val;
+        case ExprOp::Modulo:
+            if (right_val == 0) {
+                throw DivisionByZero();
+            }
+            return left_val % right_val;
+        case ExprOp::Add:
+            return left_val + right_val;
+        case ExprOp::Subtract:
+            return left_val - right_val;
+        case ExprOp::LeftShift:
+            return left_val << right_val;
+        case ExprOp::RightShift:
+            return left_val >> right_val;
+        case ExprOp::LessThan:
+            return left_val < right_val;
+        case ExprOp::LessOrEqual:
+            return left_val <= right_val;
+        case ExprOp::GreaterThan:
+            return left_val > right_val;
+        case ExprOp::GreaterOrEqual:
+            return left_val >= right_val;
+        case ExprOp::Equal:
+            return left_val == right_val;
+        case ExprOp::NotEqual:
+            return left_val != right_val;
+        case ExprOp::BitwiseAnd:
+            return left_val & right_val;
+        case ExprOp::BitwiseXor:
+            return left_val ^ right_val;
+        case ExprOp::BitwiseOr:
+            return left_val | right_val;
+        case ExprOp::LogicalAnd:
+            return left_val && right_val;
+        case ExprOp::LogicalOr:
+            return left_val || right_val;
+        case ExprOp::LogicalXor:
+            return (left_val ? 1 : 0) ^ (right_val ? 1 : 0);
+        default:
+            throw ExpressionError("Invalid binary operator");
+        }
+    }
+
+    bool is_constant() const override {
+        // Binary op is constant if both operands are constant
+        return left_->is_constant() && right_->is_constant();
+    }
+
+    std::unique_ptr<ExprNode> clone() const override {
+        return std::make_unique<BinaryOpNode>(op_, left_->clone(), right_->clone());
+    }
+
+    std::string to_string() const override {
+        const char* op_str = "?";
+        switch (op_) {
+        case ExprOp::Power:
+            op_str = "**";
+            break;
+        case ExprOp::Multiply:
+            op_str = "*";
+            break;
+        case ExprOp::Divide:
+            op_str = "/";
+            break;
+        case ExprOp::Modulo:
+            op_str = "%";
+            break;
+        case ExprOp::Add:
+            op_str = "+";
+            break;
+        case ExprOp::Subtract:
+            op_str = "-";
+            break;
+        case ExprOp::LeftShift:
+            op_str = "<<";
+            break;
+        case ExprOp::RightShift:
+            op_str = ">>";
+            break;
+        case ExprOp::LessThan:
+            op_str = "<";
+            break;
+        case ExprOp::LessOrEqual:
+            op_str = "<=";
+            break;
+        case ExprOp::GreaterThan:
+            op_str = ">";
+            break;
+        case ExprOp::GreaterOrEqual:
+            op_str = ">=";
+            break;
+        case ExprOp::Equal:
+            op_str = "==";
+            break;
+        case ExprOp::NotEqual:
+            op_str = "!=";
+            break;
+        case ExprOp::BitwiseAnd:
+            op_str = "&";
+            break;
+        case ExprOp::BitwiseXor:
+            op_str = "^";
+            break;
+        case ExprOp::BitwiseOr:
+            op_str = "|";
+            break;
+        case ExprOp::LogicalAnd:
+            op_str = "&&";
+            break;
+        case ExprOp::LogicalOr:
+            op_str = "||";
+            break;
+        case ExprOp::LogicalXor:
+            op_str = "^^";
+            break;
+        default:
+            break;
+        }
+        return "(" + left_->to_string() + " " + op_str + " " + right_->to_string() +
+               ")";
+    }
+
+private:
+    ExprOp op_;
+    std::unique_ptr<ExprNode> left_;
+    std::unique_ptr<ExprNode> right_;
+};
+
+// Ternary conditional operator
+class ConditionalNode : public ExprNode {
+public:
+    ConditionalNode(std::unique_ptr<ExprNode> condition,
+                    std::unique_ptr<ExprNode> true_expr,
+                    std::unique_ptr<ExprNode> false_expr)
+        : condition_(std::move(condition)),
+          true_expr_(std::move(true_expr)),
+          false_expr_(std::move(false_expr)) {
+    }
+
+    ExprOp op() const override {
+        return ExprOp::Conditional;
+    }
+
+    int evaluate() const override {
+        int cond_val = condition_->evaluate();
+
+        if (cond_val) {
+            return true_expr_->evaluate();
         }
         else {
-            if (it.op == TokenType::Quest) {
-                // ternary: expects 3 operands: cond true false (in that order in RPN)
-                if (stack.size() < 3) {
-                    if (!silent_) {
-                        g_errors.error(ErrorCode::InsufficientOperands);
-                    }
-                    return false;
-                }
-                int false_val = stack.back();
-                stack.pop_back();
-                int true_val = stack.back();
-                stack.pop_back();
-                int cond = stack.back();
-                stack.pop_back();
-                int res = (cond != 0) ? true_val : false_val;
-                stack.push_back(res);
-                continue;
-            }
-
-            if (stack.size() < 2) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InsufficientOperands);
-                }
-                return false;
-            }
-            int b = stack.back();
-            stack.pop_back();
-            int a = stack.back();
-            stack.pop_back();
-
-            // guard division/mod by zero
-            if ((it.op == TokenType::Divide ||
-                    it.op == TokenType::Modulus) && b == 0) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::DivisionByZero);
-                }
-                return false;
-            }
-
-            int r = 0;
-            switch (it.op) {
-            case TokenType::Multiply:
-                r = a * b;
-                break;
-            case TokenType::Divide:
-                r = a / b;
-                break;
-            case TokenType::Modulus:
-                r = a % b;
-                break;
-            case TokenType::Plus:
-                r = a + b;
-                break;
-            case TokenType::Minus:
-                r = a - b;
-                break;
-            case TokenType::ShiftLeft:
-                r = static_cast<int>(static_cast<unsigned int>(a) << (b & 31));
-                break;
-            case TokenType::ShiftRight:
-                r = a >> (b & 31);
-                break;
-            case TokenType::LT:
-                r = (a < b) ? 1 : 0;
-                break;
-            case TokenType::LE:
-                r = (a <= b) ? 1 : 0;
-                break;
-            case TokenType::GT:
-                r = (a > b) ? 1 : 0;
-                break;
-            case TokenType::GE:
-                r = (a >= b) ? 1 : 0;
-                break;
-            case TokenType::EQ:
-                r = (a == b) ? 1 : 0;
-                break;
-            case TokenType::NE:
-                r = (a != b) ? 1 : 0;
-                break;
-            case TokenType::BitwiseAnd:
-                r = a & b;
-                break;
-            case TokenType::BitwiseXor:
-                r = a ^ b;
-                break;
-            case TokenType::BitwiseOr:
-                r = a | b;
-                break;
-            case TokenType::LogicalAnd:
-                r = (a && b) ? 1 : 0;
-                break;
-            case TokenType::LogicalOr:
-                r = (a || b) ? 1 : 0;
-                break;
-            case TokenType::LogicalXor:
-                r = (a != b) ? 1 : 0;
-                break;
-            case TokenType::Power:
-                r = ipow(a, b);
-                break;
-            default:
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax);
-                }
-                return false;
-            }
-            stack.push_back(r);
+            return false_expr_->evaluate();
         }
     }
 
-    if (stack.empty()) {
-        if (!silent_) {
-            g_errors.error(ErrorCode::InsufficientOperands);
+    bool is_constant() const override {
+        // Ternary is constant if all three parts are constant
+        return condition_->is_constant() &&
+               true_expr_->is_constant() &&
+               false_expr_->is_constant();
+    }
+
+    std::unique_ptr<ExprNode> clone() const override {
+        return std::make_unique<ConditionalNode>(
+                   condition_->clone(),
+                   true_expr_->clone(),
+                   false_expr_->clone()
+               );
+    }
+
+    std::string to_string() const override {
+        return "(" + condition_->to_string() + " ? " +
+               true_expr_->to_string() + " : " +
+               false_expr_->to_string() + ")";
+    }
+
+private:
+    std::unique_ptr<ExprNode> condition_;
+    std::unique_ptr<ExprNode> true_expr_;
+    std::unique_ptr<ExprNode> false_expr_;
+};
+
+} // anonymous namespace
+
+//-----------------------------------------------------------------------------
+// Factory functions
+//-----------------------------------------------------------------------------
+
+std::unique_ptr<ExprNode> make_integer(int value) {
+    return std::make_unique<IntegerNode>(value);
+}
+
+std::unique_ptr<ExprNode> make_symbol(Symbol* symbol) {
+    return std::make_unique<SymbolNode>(symbol);
+}
+
+std::unique_ptr<ExprNode> make_dollar(Opcode* opcode, Section* section) {
+    return std::make_unique<DollarNode>(opcode, section);
+}
+
+std::unique_ptr<ExprNode> make_unary_op(ExprOp op,
+                                        std::unique_ptr<ExprNode> operand) {
+    return std::make_unique<UnaryOpNode>(op, std::move(operand));
+}
+
+std::unique_ptr<ExprNode> make_binary_op(ExprOp op,
+        std::unique_ptr<ExprNode> left,
+        std::unique_ptr<ExprNode> right) {
+    return std::make_unique<BinaryOpNode>(op, std::move(left), std::move(right));
+}
+
+std::unique_ptr<ExprNode> make_conditional(std::unique_ptr<ExprNode> condition,
+        std::unique_ptr<ExprNode> true_expr,
+        std::unique_ptr<ExprNode> false_expr) {
+    return std::make_unique<ConditionalNode>(
+               std::move(condition),
+               std::move(true_expr),
+               std::move(false_expr)
+           );
+}
+
+//-----------------------------------------------------------------------------
+// Expression Parser (Recursive Descent)
+//-----------------------------------------------------------------------------
+
+namespace {
+
+class ExprParser {
+public:
+    ExprParser(const TokenLine& line, size_t& i, Module* module, Section* section)
+        : line_(line), i_(i), start_i_(i), module_(module), section_(section) {
+    }
+
+    std::unique_ptr<ExprNode> parse() {
+        auto result = parse_ternary();
+        if (!result) {
+            i_ = start_i_; // Reset on failure
+        }
+        return result;
+    }
+
+private:
+    const TokenLine& line_;
+    size_t& i_;
+    size_t start_i_;
+    Module* module_;
+    Section* section_;
+
+    bool at_end() const {
+        return i_ >= line_.tokens().size();
+    }
+    const Token& current() const {
+        return line_.tokens()[i_];
+    }
+
+    bool match(TokenType type) {
+        if (at_end()) {
+            return false;
+        }
+        if (current().is(type)) {
+            ++i_;
+            return true;
         }
         return false;
     }
-    out_value = stack.back();
-    return true;
-}
 
-std::string Expr::to_string() const {
-    std::string out;
-    for (auto& t : line_.tokens()) {
-        out += t.text();
+    // Precedence levels (lowest to highest)
+    std::unique_ptr<ExprNode> parse_ternary();        // ? :
+    std::unique_ptr<ExprNode> parse_logical_or();     // ||
+    std::unique_ptr<ExprNode> parse_logical_xor();    // ^^
+    std::unique_ptr<ExprNode> parse_logical_and();    // &&
+    std::unique_ptr<ExprNode> parse_bitwise_or();     // |
+    std::unique_ptr<ExprNode> parse_bitwise_xor();    // ^
+    std::unique_ptr<ExprNode> parse_bitwise_and();    // &
+    std::unique_ptr<ExprNode> parse_equality();       // == !=
+    std::unique_ptr<ExprNode> parse_relational();     // < <= > >=
+    std::unique_ptr<ExprNode> parse_shift();          // << >>
+    std::unique_ptr<ExprNode> parse_additive();       // + -
+    std::unique_ptr<ExprNode> parse_multiplicative(); // * / %
+    std::unique_ptr<ExprNode> parse_power();          // **
+    std::unique_ptr<ExprNode> parse_unary();          // + - ! ~
+    std::unique_ptr<ExprNode> parse_primary();
+};
+
+std::unique_ptr<ExprNode> ExprParser::parse_ternary() {
+    auto condition = parse_logical_or();
+    if (!condition) {
+        return nullptr;
     }
-    return out;
-}
 
-// return precedence for given token type and unary flag
-int Expr::prec(TokenType type, bool unary) {
-    switch (type) {
-    case TokenType::Power:
-        return unary ? 18 : 17; // unary power (shouldn't really happen) vs binary power
+    if (match(TokenType::Question)) {
+        auto true_expr = parse_ternary();
+        if (!true_expr) {
+            return nullptr;
+        }
 
-    case TokenType::Plus:
-    case TokenType::Minus:
-        return unary ? 16 : 13;
+        if (!match(TokenType::Colon)) {
+            return nullptr;
+        }
 
-    case TokenType::Multiply:
-    case TokenType::Divide:
-    case TokenType::Modulus:
-        return 14;
+        auto false_expr = parse_ternary();
+        if (!false_expr) {
+            return nullptr;
+        }
 
-    case TokenType::ShiftLeft:
-    case TokenType::ShiftRight:
-        return 12;
-
-    case TokenType::LT:
-    case TokenType::LE:
-    case TokenType::GT:
-    case TokenType::GE:
-        return 11;
-
-    case TokenType::EQ:
-    case TokenType::NE:
-        return 10;
-
-    case TokenType::BitwiseAnd:
-        return 9;
-
-    case TokenType::BitwiseXor:
-        return 8;
-
-    case TokenType::BitwiseOr:
-        return 7;
-
-    case TokenType::LogicalAnd:
-        return 6;
-
-    case TokenType::LogicalXor:
-        return 5;
-
-    case TokenType::LogicalOr:
-        return 4;
-
-    default:
-        return 0;
+        return make_conditional(
+                   std::move(condition),
+                   std::move(true_expr),
+                   std::move(false_expr)
+               );
     }
+
+    return condition;
 }
 
-// determine if an operator (given by type and unary flag) is right-associative
-bool Expr::is_right_assoc(TokenType type, bool unary) {
-    // unary operators and power are right-assoc
-    if (unary) {
+std::unique_ptr<ExprNode> ExprParser::parse_logical_or() {
+    auto left = parse_logical_xor();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (match(TokenType::LogicalOr)) {
+        auto right = parse_logical_xor();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(ExprOp::LogicalOr, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_logical_xor() {
+    auto left = parse_logical_and();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (match(TokenType::LogicalXor)) {
+        auto right = parse_logical_and();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(ExprOp::LogicalXor, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_logical_and() {
+    auto left = parse_bitwise_or();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (match(TokenType::LogicalAnd)) {
+        auto right = parse_bitwise_or();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(ExprOp::LogicalAnd, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_bitwise_or() {
+    auto left = parse_bitwise_xor();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (match(TokenType::BitwiseOr)) {
+        auto right = parse_bitwise_xor();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(ExprOp::BitwiseOr, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_bitwise_xor() {
+    auto left = parse_bitwise_and();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (match(TokenType::BitwiseXor)) {
+        auto right = parse_bitwise_and();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(ExprOp::BitwiseXor, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_bitwise_and() {
+    auto left = parse_equality();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (match(TokenType::BitwiseAnd)) {
+        auto right = parse_equality();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(ExprOp::BitwiseAnd, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_equality() {
+    auto left = parse_relational();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (!at_end()) {
+        ExprOp op;
+        if (match(TokenType::EQ)) {
+            op = ExprOp::Equal;
+        }
+        else if (match(TokenType::NE)) {
+            op = ExprOp::NotEqual;
+        }
+        else {
+            break;
+        }
+
+        auto right = parse_relational();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(op, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_relational() {
+    auto left = parse_shift();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (!at_end()) {
+        ExprOp op;
+        if (match(TokenType::LT)) {
+            op = ExprOp::LessThan;
+        }
+        else if (match(TokenType::LE)) {
+            op = ExprOp::LessOrEqual;
+        }
+        else if (match(TokenType::GT)) {
+            op = ExprOp::GreaterThan;
+        }
+        else if (match(TokenType::GE)) {
+            op = ExprOp::GreaterOrEqual;
+        }
+        else {
+            break;
+        }
+
+        auto right = parse_shift();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(op, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_shift() {
+    auto left = parse_additive();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (!at_end()) {
+        ExprOp op;
+        if (match(TokenType::LeftShift)) {
+            op = ExprOp::LeftShift;
+        }
+        else if (match(TokenType::RightShift)) {
+            op = ExprOp::RightShift;
+        }
+        else {
+            break;
+        }
+
+        auto right = parse_additive();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(op, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_additive() {
+    auto left = parse_multiplicative();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (!at_end()) {
+        ExprOp op;
+        if (match(TokenType::Plus)) {
+            op = ExprOp::Add;
+        }
+        else if (match(TokenType::Minus)) {
+            op = ExprOp::Subtract;
+        }
+        else {
+            break;
+        }
+
+        auto right = parse_multiplicative();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(op, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_multiplicative() {
+    auto left = parse_power();
+    if (!left) {
+        return nullptr;
+    }
+
+    while (!at_end()) {
+        ExprOp op;
+        if (match(TokenType::Multiply)) {
+            op = ExprOp::Multiply;
+        }
+        else if (match(TokenType::Divide)) {
+            op = ExprOp::Divide;
+        }
+        else if (match(TokenType::Modulo)) {
+            op = ExprOp::Modulo;
+        }
+        else {
+            break;
+        }
+
+        auto right = parse_power();
+        if (!right) {
+            return nullptr;
+        }
+        left = make_binary_op(op, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_power() {
+    auto left = parse_unary();
+    if (!left) {
+        return nullptr;
+    }
+
+    // Right-associative
+    if (match(TokenType::Power)) {
+        auto right = parse_power();
+        if (!right) {
+            return nullptr;
+        }
+        return make_binary_op(ExprOp::Power, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_unary() {
+    if (match(TokenType::Plus)) {
+        auto operand = parse_unary();
+        if (!operand) {
+            return nullptr;
+        }
+        return make_unary_op(ExprOp::UnaryPlus, std::move(operand));
+    }
+
+    if (match(TokenType::Minus)) {
+        auto operand = parse_unary();
+        if (!operand) {
+            return nullptr;
+        }
+        return make_unary_op(ExprOp::UnaryMinus, std::move(operand));
+    }
+
+    if (match(TokenType::LogicalNot)) {
+        auto operand = parse_unary();
+        if (!operand) {
+            return nullptr;
+        }
+        return make_unary_op(ExprOp::LogicalNot, std::move(operand));
+    }
+
+    if (match(TokenType::BitwiseNot)) {
+        auto operand = parse_unary();
+        if (!operand) {
+            return nullptr;
+        }
+        return make_unary_op(ExprOp::BitwiseNot, std::move(operand));
+    }
+
+    return parse_primary();
+}
+
+std::unique_ptr<ExprNode> ExprParser::parse_primary() {
+    if (at_end()) {
+        return nullptr;
+    }
+
+    const Token& tok = current();
+
+    // Integer literal
+    if (tok.is(TokenType::Integer)) {
+        ++i_;
+        return make_integer(tok.int_value());
+    }
+
+    // Current address ($) - always resolved immediately
+    if (tok.is(TokenType::Dollar) || tok.is(TokenType::ASMPC)) {
+        ++i_;
+
+        if (!section_) {
+            throw InvalidDollar();  // Error: $ used without section context
+        }
+
+        Opcode* last = section_->last_opcode();
+        if (!last) {
+            throw InvalidDollar();  // Error: $ used with no opcodes
+        }
+
+        return make_dollar(last, section_);
+    }
+
+    // Identifier (symbol reference) - always resolved immediately
+    if (tok.is(TokenType::Identifier)) {
+        ++i_;
+        std::string name = tok.text();
+
+        if (!module_) {
+            throw UndefinedSymbol(name);  // Error: no module context
+        }
+
+        Symbol* symbol = module_->find_symbol(name);
+        if (!symbol) {
+            // Symbol doesn't exist yet - create it as undefined
+            Location loc = line_.location();
+            symbol = module_->add_symbol(name, loc);
+        }
+
+        return make_symbol(symbol);
+    }
+
+    // Parenthesized expression
+    if (match(TokenType::LeftParen)) {
+        auto expr = parse_ternary();
+        if (!expr) {
+            return nullptr;
+        }
+
+        if (!match(TokenType::RightParen)) {
+            return nullptr;
+        }
+
+        return expr;
+    }
+
+    return nullptr;
+}
+
+} // anonymous namespace
+
+//-----------------------------------------------------------------------------
+// Expression implementation
+//-----------------------------------------------------------------------------
+
+Expression::Expression(std::unique_ptr<ExprNode> root, const Location& location)
+    : root_(std::move(root)), location_(location) {
+}
+
+Expression::Expression(const Expression& other)
+    : root_(other.root_ ? other.root_->clone() : nullptr),
+      location_(other.location_),
+      token_line_(other.token_line_ ? std::make_unique<TokenLine>
+                  (*other.token_line_) : nullptr) {
+}
+
+Expression& Expression::operator=(const Expression& other) {
+    if (this != &other) {
+        root_ = other.root_ ? other.root_->clone() : nullptr;
+        location_ = other.location_;
+        token_line_ = other.token_line_ ? std::make_unique<TokenLine>
+                      (*other.token_line_) : nullptr;
+    }
+    return *this;
+}
+
+bool Expression::parse(const TokenLine& line, size_t& i, Module* module,
+                       Section* section) {
+    size_t start_i = i;
+
+    ExprParser parser(line, i, module, section);
+    auto root = parser.parse();
+
+    if (root) {
+        // Create a TokenLine with only the consumed tokens
+        TokenLine expr_tokens(line.location());
+        for (size_t j = start_i; j < i; ++j) {
+            expr_tokens.tokens().push_back(line.tokens()[j]);
+        }
+
+        // Update this expression
+        root_ = std::move(root);
+        location_ = line.location();
+        token_line_ = std::make_unique<TokenLine>(expr_tokens);
+
         return true;
     }
-    if (type == TokenType::Power) {
-        return true;
-    }
+
+    // Parse failed - i is already reset by parser
     return false;
 }
 
-// Return true if token type represents an operator (binary or unary).
-// Implemented as a switch to let the compiler optimize the dispatch.
-bool Expr::is_operator_token(TokenType tt) {
-    switch (tt) {
-    case TokenType::Plus:
-    case TokenType::Minus:
-    case TokenType::Multiply:
-    case TokenType::Divide:
-    case TokenType::Modulus:
-    case TokenType::Power:
-    case TokenType::ShiftLeft:
-    case TokenType::ShiftRight:
-    case TokenType::LT:
-    case TokenType::LE:
-    case TokenType::GT:
-    case TokenType::GE:
-    case TokenType::EQ:
-    case TokenType::NE:
-    case TokenType::BitwiseAnd:
-    case TokenType::BitwiseXor:
-    case TokenType::BitwiseOr:
-    case TokenType::LogicalAnd:
-    case TokenType::LogicalOr:
-    case TokenType::LogicalXor:
-    case TokenType::BitwiseNot:
-    case TokenType::LogicalNot:
-        return true;
-    default:
-        return false;
+int Expression::evaluate() const {
+    if (!root_) {
+        throw ExpressionError("Empty expression");
     }
+
+    // Simply delegate to root node - let exceptions propagate
+    return root_->evaluate();
 }
 
-// Sequence lookahead: allow chains of unary ops before a real operand
-bool Expr::can_start_operand_sequence(const TokensLine& line, unsigned j) {
-    const unsigned size = line.size();
-    if (j >= size) {
-        return false;
+bool Expression::is_constant() const {
+    if (!root_) {
+        return false;  // Empty expression is not constant
     }
 
-    // allow a chain of unary operators
-    while (j < size) {
-        TokenType t = line[j].type();
-        if (t == TokenType::Plus || t == TokenType::Minus ||
-                t == TokenType::BitwiseNot || t == TokenType::LogicalNot) {
-            ++j;
-            continue;
-        }
-        break;
-    }
-
-    if (j >= size) {
-        return false;
-    }
-
-    switch (line[j].type()) {
-    case TokenType::Integer:
-    case TokenType::Identifier:
-    case TokenType::LeftParen:
-        return true;
-    default:
-        return false;
-    }
+    return root_->is_constant();
 }
 
-// Convert infix TokensLine starting at 'i' to RPN vector 'rpn_items_'.
-// Stops when it reaches end-of-line, or a token that is not part of
-// the expression.
-// Advances 'i' to the token following the last consumed token
-bool Expr::try_parse(const TokensLine& line, unsigned& i,
-                     std::vector<RPNItem>& out) {
-    auto size = line.size();
-    if (i >= size) {
-        if (!silent_) {
-            g_errors.error(ErrorCode::InvalidSyntax, "Expression expected");
-        }
-        return false;
-    }
-
-    std::vector<RPNOp> ops;
-    bool expect_operand = true;
-    bool any_token_consumed = false;
-
-    while (i < size) {
-        if (i >= size) {
-            break;
-        }
-
-        const Token& tk = line[i];
-        TokenType tt = tk.type();
-
-        // Accept integer operand
-        if (tt == TokenType::Integer) {
-            RPNItem it;
-            it.kind = RPNItem::Value;
-            it.value = tk.int_value();
-            out.push_back(it);
-            ++i;
-            expect_operand = false;
-            any_token_consumed = true;
-            continue;
-        }
-
-        // Accept identifier operand
-        if (tt == TokenType::Identifier) {
-            RPNItem it;
-            it.kind = RPNItem::Symbol;
-            it.name = tk.text();
-            out.push_back(it);
-            ++i;
-            expect_operand = false;
-            any_token_consumed = true;
-            continue;
-        }
-
-        // Parenthesis
-        if (tt == TokenType::LeftParen) {
-            ops.push_back({ TokenType::LeftParen, false });
-            ++i;
-            expect_operand = true;
-            any_token_consumed = true;
-            continue;
-        }
-
-        if (tt == TokenType::RightParen) {
-            // collapse until LParen
-            bool found = false;
-            while (!ops.empty()) {
-                RPNOp top = ops.back();
-                ops.pop_back();
-                if (top.op == TokenType::LeftParen) {
-                    found = true;
-                    break;
-                }
-                RPNItem item;
-                item.kind = RPNItem::Op;
-                item.op = top.op;
-                item.unary = top.unary;
-                out.push_back(item);
-            }
-            if (!found) {
-                return true; // extra ')' after a valid expr: leave it unconsumed
-            }
-            ++i;
-            expect_operand = false;
-            any_token_consumed = true;
-            continue;
-        }
-
-        // Ternary operator '?'
-        if (tt == TokenType::Quest) {
-            // condition must already be present in output (like values stack)
-            if (out.empty()) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax, "Unexpected '?'");
-                }
-                return false;
-            }
-            ++i; // consume '?'
-
-            // parse true branch RPN until colon (do not consume colon)
-            std::vector<RPNItem> true_rpn;
-            if (!try_parse(line, i, true_rpn)) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax, "Ternary expression");
-                }
-                return false;
-            }
-
-            if (i >= size || line[i].type() != TokenType::Colon) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax, "Expected ':'");
-                }
-                return false;
-            }
-            ++i; // consume ':'
-
-            // parse false branch RPN (stops at colon/comma/end)
-            std::vector<RPNItem> false_rpn;
-            if (!try_parse(line, i, false_rpn)) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax, "Ternary expression");
-                }
-                return false;
-            }
-
-            // append true then false RPN, then ternary op
-            out.insert(out.end(), true_rpn.begin(), true_rpn.end());
-            out.insert(out.end(), false_rpn.begin(), false_rpn.end());
-            RPNItem tern;
-            tern.kind = RPNItem::Op;
-            tern.op = TokenType::Quest; // treat as a 3-operand operator in evaluation
-            tern.unary = false;
-            out.push_back(tern);
-            expect_operand = false;
-            any_token_consumed = true;
-            continue;
-        }
-
-        // Operators (binary or unary)
-        bool is_unary = false;
-        if (tt == TokenType::Plus || tt == TokenType::Minus) {
-            is_unary = expect_operand;
-        }
-        else if (tt == TokenType::BitwiseNot || tt == TokenType::LogicalNot) {
-            is_unary = true;
-        }
-        else {
-            is_unary = false;
-        }
-
-        // Use the factored-out helper to detect operator tokens
-        if (!is_operator_token(tt)) {
-            // Not part of expression -> stop parsing
-            break;
-        }
-
-        // REJECT binary operator when an operand is expected (e.g., "*1" at start)
-        if (!is_unary && expect_operand) {
-            if (!any_token_consumed) {
-                if (!silent_) {
-                    g_errors.error(ErrorCode::InvalidSyntax, "Expression expected");
-                }
-                return false;
-            }
-            break; // leave it unconsumed for outer parser
-        }
-
-        RPNOp cur{ tt, is_unary };
-        if (is_unary) {
-            // Lookahead: only consume unary op if a valid operand sequence follows.
-            unsigned j = i + 1;
-            if (!can_start_operand_sequence(line, j)) {
-                // dangling unary operator: if nothing parsed yet, fail; else stop here
-                break;
-            }
-            ops.push_back(cur);
-            ++i;
-            expect_operand = true;
-            any_token_consumed = true;
-            continue;
-        }
-        else {
-            // Binary operator: only consume if a valid RHS can start (allowing unary chain)
-            unsigned j = i + 1;
-            if (!can_start_operand_sequence(line, j)) {
-                // dangling binary operator - stop before it
-                break;
-            }
-
-            // Binary operator: collapse according to precedence
-            // and associativity
-            collapse_ops_while(ops, cur, out);
-            ops.push_back(cur);
-            ++i;
-            expect_operand = true;
-            any_token_consumed = true;
-            continue;
-        }
-    } // main parsing loop
-
-    if (!any_token_consumed) {
-        if (!silent_) {
-            g_errors.error(ErrorCode::InvalidSyntax, "Expression expected");
-        }
-        return false;
-    }
-
-    // Collapse remaining operators to output
-    while (!ops.empty()) {
-        RPNOp top = ops.back();
-        ops.pop_back();
-        if (top.op == TokenType::LeftParen) {
-            if (!silent_) {
-                g_errors.error(ErrorCode::InvalidSyntax, "Mismatched parenthesis");
-            }
-            return false;
-        }
-        RPNItem item;
-        item.kind = RPNItem::Op;
-        item.op = top.op;
-        item.unary = top.unary;
-        out.push_back(item);
-    }
-
-    return true;
+const ExprNode* Expression::root() const {
+    return root_.get();
 }
 
-// Collapse operators from the ops stack into the RPN output according to precedence/associativity.
-void Expr::collapse_ops_while(std::vector<RPNOp>& ops,
-                              const RPNOp& incoming, std::vector<RPNItem>& out) {
-    while (!ops.empty()) {
-        RPNOp top = ops.back();
-        if (top.op == TokenType::LeftParen) {
-            break;
-        }
-        int ptop = prec(top.op, top.unary);
-        int pin = prec(incoming.op, incoming.unary);
-        if ((ptop > pin) ||
-                (ptop == pin && !is_right_assoc(incoming.op, incoming.unary))) {
-            ops.pop_back();
-            RPNItem item;
-            item.kind = RPNItem::Op;
-            item.op = top.op;
-            item.unary = top.unary;
-            out.push_back(item);
-        }
-        else {
-            break;
-        }
-    }
+void Expression::set_root(std::unique_ptr<ExprNode> root) {
+    root_ = std::move(root);
 }
+
+const Location& Expression::location() const {
+    return location_;
+}
+
+const TokenLine& Expression::token_line() const {
+    static const TokenLine empty_tokens;
+    return token_line_ ? *token_line_ : empty_tokens;
+}
+
+void Expression::set_tokens(const TokenLine& token_line) {
+    token_line_ = std::make_unique<TokenLine>(token_line);
+}
+
+bool Expression::empty() const {
+    return root_ == nullptr;
+}
+
+void Expression::clear() {
+    root_.reset();
+    location_ = Location();
+    token_line_.reset();
+}
+
+std::string Expression::to_string() const {
+    // If tokens were collected during parsing, return the exact tokenized text
+    if (token_line_ && !token_line_->tokens().empty()) {
+        return token_line_->to_string();
+    }
+
+    // Fallback to reconstructing from the AST when no parsed tokens are available
+    if (root_) {
+        return root_->to_string();
+    }
+    return "";
+}
+
