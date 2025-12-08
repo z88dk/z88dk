@@ -332,7 +332,17 @@ void TokenFileReader::check_cache() {
 }
 
 bool TokenFileReader::next_token_line(TokenLine& token_line) {
-    // If using cached mode, just return next cached line
+    // 1) If there are injected tokens, return them first.
+    if (!injected_tokens_.empty()) {
+        token_line = injected_tokens_.front();
+        injected_tokens_.pop_front();
+
+        g_errors.set_location(token_line.location());
+        g_errors.set_expanded_line(token_line.to_string());
+        return true;
+    }
+
+    // 2) If using cached mode, return next cached line
     if (use_cached_mode_) {
         if (current_line_index_ < cached_lines_.size()) {
             token_line = cached_lines_[current_line_index_++];
@@ -346,10 +356,9 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
         return false;
     }
 
-    // Check if content was injected
-    bool is_injected = !injected_content_.empty();
+    // 3) Normal path: process output_queue_ or read/tokenize next source lines
+    bool is_injected_text = !injected_content_.empty();
 
-    // Original tokenization logic
     while (true) {
         if (!output_queue_.empty()) {
             token_line = std::move(output_queue_.front());
@@ -358,45 +367,77 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
             g_errors.set_location(token_line.location());
             g_errors.set_expanded_line(token_line.to_string());
 
-            // Accumulate for caching (only for non-injected files)
-            if (!filename_.empty() && !is_injected) {
+            // Accumulate for caching (only for non-injected text files)
+            if (!filename_.empty() && !is_injected_text) {
                 pending_cache_lines_.push_back(token_line);
             }
-
             return true;
         }
 
         token_line.clear();
         while (token_line.tokens().empty()) {
-            // read next source line
             if (!next_line(source_line_)) {
-                // EOF reached - save to cache if we have a real file
-                if (!filename_.empty() && !is_injected &&
-                        !pending_cache_lines_.empty()) {
+                // EOF: persist cache (real files only)
+                if (!filename_.empty() && !is_injected_text && !pending_cache_lines_.empty()) {
                     get_cache().put(filename_, std::move(pending_cache_lines_));
                 }
                 return false;
             }
 
-            // tokenize the line; may retrieve more lines if there are continuations
             if (!tokenize_line(token_line)) {
-                continue;   // no tokens produced due to error
+                continue;
             }
 
             if (token_line.tokens().empty()) {
-                continue;   // skip empty lines
+                continue;
             }
 
-            // split lines at backslashes and colons
             token_line.set_location(Location(filename_, line_number_));
-            split_lines(token_line);
+            split_lines(token_line, output_queue_);
             break;
         }
     }
     return true;
 }
 
-void TokenFileReader::split_lines(const TokenLine& input_line) {
+void TokenFileReader::inject_tokens(const std::vector<TokenLine>& lines) {
+    // Split injected lines into logical lines using the same splitting rules.
+    for (const auto& tl : lines) {
+        split_lines(tl, injected_tokens_);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// split_lines implementation (updated to use target_queue)
+//-----------------------------------------------------------------------------
+
+void TokenFileReader::split_lines(const TokenLine& input_line, std::deque<TokenLine>& target_queue) {
+    // Do not split lines that start with:
+    // - TokenType::Hash followed by Identifier whose keyword() == Keyword::DEFINE, or
+    // - Identifier whose keyword() == Keyword::DEFINE.
+    if (!input_line.tokens().empty()) {
+        const Token& first = input_line.tokens().front();
+        bool no_split = false;
+
+        // Case 1: "#define ..."
+        if (first.is(TokenType::Hash) && input_line.tokens().size() >= 2) {
+            const Token& second = input_line.tokens()[1];
+            if (second.is(TokenType::Identifier) && second.is(Keyword::DEFINE)) {
+                no_split = true;
+            }
+        }
+
+        // Case 2: "define ..."
+        if (!no_split && first.is(TokenType::Identifier) && first.is(Keyword::DEFINE)) {
+            no_split = true;
+        }
+
+        if (no_split) {
+            target_queue.push_back(input_line);
+            return;
+        }
+    }
+
     TokenLine current_line(input_line.location());
     bool seen_first_token = false;
     bool prev_was_first_ident = false;
@@ -436,7 +477,7 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
                 // Identifier after first dot - this completes a dot-label
                 // Output the label (dot + identifier) alone
                 current_line.tokens().push_back(token);
-                output_queue_.push_back(current_line);
+                target_queue.push_back(current_line);
 
                 // Start fresh for next part of line
                 current_line.tokens().clear();
@@ -490,7 +531,7 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
                     current_line.tokens().push_back(label_token);
                 }
 
-                output_queue_.push_back(current_line);
+                target_queue.push_back(current_line);
 
                 // Start fresh for next part of line
                 current_line.tokens().clear();
@@ -507,7 +548,7 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
             else {
                 // Separator colon - emit current line without the colon
                 if (!current_line.tokens().empty()) {
-                    output_queue_.push_back(current_line);
+                    target_queue.push_back(current_line);
                     current_line.tokens().clear();
                     current_line.set_location(input_line.location());
                 }
@@ -522,7 +563,7 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
         case TokenType::Backslash:
             // Always a split point - emit current line without backslash
             if (!current_line.tokens().empty()) {
-                output_queue_.push_back(current_line);
+                target_queue.push_back(current_line);
                 current_line.tokens().clear();
                 current_line.set_location(input_line.location());
             }
@@ -546,7 +587,7 @@ void TokenFileReader::split_lines(const TokenLine& input_line) {
 
     // Don't forget the last line
     if (!current_line.tokens().empty()) {
-        output_queue_.push_back(current_line);
+        target_queue.push_back(current_line);
     }
 }
 

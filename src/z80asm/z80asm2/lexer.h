@@ -238,6 +238,9 @@ public:
     }
 #endif
 
+    // Inject pre-tokenized lines into the reader; they take precedence over file/cached content.
+    void inject_tokens(const std::vector<TokenLine>& lines);
+
 private:
     // Cache-related members
     static TokenCache& get_cache();
@@ -250,8 +253,12 @@ private:
     std::string source_line_;
     std::deque<TokenLine> output_queue_;
 
+    // Queue of injected token lines that are returned first (split into logical lines).
+    std::deque<TokenLine> injected_tokens_;
+
     bool tokenize_line(TokenLine& token_line);
-    void split_lines(const TokenLine& input_line);
+    // Updated: split into the provided target queue (output or injected)
+    void split_lines(const TokenLine& input_line, std::deque<TokenLine>& target_queue);
 
     // Helper to check cache after opening
     void check_cache();
