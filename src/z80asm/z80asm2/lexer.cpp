@@ -411,7 +411,8 @@ void TokenFileReader::inject_tokens(const std::vector<TokenLine>& lines) {
 // split_lines implementation (updated to use target_queue)
 //-----------------------------------------------------------------------------
 
-void TokenFileReader::split_lines(const TokenLine& input_line, std::deque<TokenLine>& target_queue) {
+void TokenFileReader::split_lines(const TokenLine& input_line,
+                                  std::deque<TokenLine>& target_queue) {
     // Do not split lines that start with:
     // - TokenType::Hash followed by Identifier whose keyword() == Keyword::DEFINE, or
     // - Identifier whose keyword() == Keyword::DEFINE.

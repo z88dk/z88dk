@@ -2295,7 +2295,8 @@ TEST_CASE("TokenCache: direct API tests") {
     }
 }
 
-TEST_CASE("Lexer handles continuation lines ended by backslash (merge with next line)", "[lexer][continuation]") {
+TEST_CASE("Lexer handles continuation lines ended by backslash (merge with next line)",
+          "[lexer][continuation]") {
     g_options = Options();
 
     TokenFileReader tfr;
@@ -2314,7 +2315,8 @@ TEST_CASE("Lexer handles continuation lines ended by backslash (merge with next 
     REQUIRE_FALSE(tfr.next_token_line(tl));
 }
 
-TEST_CASE("Lexer: continuation backslash at end-of-file is consumed and yields no trailing line", "[lexer][continuation][eof]") {
+TEST_CASE("Lexer: continuation backslash at end-of-file is consumed and yields no trailing line",
+          "[lexer][continuation][eof]") {
     g_options = Options();
 
     TokenFileReader tfr;
@@ -2330,7 +2332,8 @@ TEST_CASE("Lexer: continuation backslash at end-of-file is consumed and yields n
     REQUIRE_FALSE(tfr.next_token_line(tl));
 }
 
-TEST_CASE("Lexer: continuation backslash followed by mixed whitespace still joins lines", "[lexer][continuation][whitespace]") {
+TEST_CASE("Lexer: continuation backslash followed by mixed whitespace still joins lines",
+          "[lexer][continuation][whitespace]") {
     g_options = Options();
 
     TokenFileReader tfr;
@@ -2345,7 +2348,8 @@ TEST_CASE("Lexer: continuation backslash followed by mixed whitespace still join
     REQUIRE_FALSE(tfr.next_token_line(tl));
 }
 
-TEST_CASE("TokenFileReader::inject_tokens returns injected logical lines first and preserves location", "[lexer][inject_tokens]") {
+TEST_CASE("TokenFileReader::inject_tokens returns injected logical lines first and preserves location",
+          "[lexer][inject_tokens]") {
     g_options = Options();
 
     // Build two TokenLine inputs:
@@ -2354,16 +2358,21 @@ TEST_CASE("TokenFileReader::inject_tokens returns injected logical lines first a
     TokenLine injected1(Location("macrofile.asm", 42));
     injected1.tokens().push_back(Token(TokenType::Identifier, "LABEL", false));
     injected1.tokens().push_back(Token(TokenType::Colon, ":", false));
-    injected1.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
-    injected1.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A, false));
+    injected1.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD,
+                                       false));
+    injected1.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A,
+                                       false));
     injected1.tokens().push_back(Token(TokenType::Comma, ",", false));
     injected1.tokens().push_back(Token(TokenType::Integer, "1", false));
 
     TokenLine injected2(Location("macrofile.asm", 43));
-    injected2.tokens().push_back(Token(TokenType::Identifier, "DEFINE", Keyword::DEFINE, false));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "DEFINE",
+                                       Keyword::DEFINE, false));
     injected2.tokens().push_back(Token(TokenType::Identifier, "X", false));
-    injected2.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
-    injected2.tokens().push_back(Token(TokenType::Identifier, "B", Keyword::B, false));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD,
+                                       false));
+    injected2.tokens().push_back(Token(TokenType::Identifier, "B", Keyword::B,
+                                       false));
 
     // Reader with some normal content to ensure injected tokens take precedence
     TokenFileReader tfr;
@@ -2403,18 +2412,23 @@ TEST_CASE("TokenFileReader::inject_tokens returns injected logical lines first a
     REQUIRE_FALSE(tfr.next_token_line(tl));
 }
 
-TEST_CASE("TokenFileReader::inject_tokens handles backslash splitting in injected lines and preserves location", "[lexer][inject_tokens][backslash]") {
+TEST_CASE("TokenFileReader::inject_tokens handles backslash splitting in injected lines and preserves location",
+          "[lexer][inject_tokens][backslash]") {
     g_options = Options();
 
     // Injected line with backslash split should produce two logical lines
     TokenLine injected(Location("macros.inc", 99));
-    injected.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
-    injected.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD,
+                                      false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A,
+                                      false));
     injected.tokens().push_back(Token(TokenType::Comma, ",", false));
     injected.tokens().push_back(Token(TokenType::Integer, "0", false));
     injected.tokens().push_back(Token(TokenType::Backslash, "\\", false));
-    injected.tokens().push_back(Token(TokenType::Identifier, "INC", Keyword::INC, false));
-    injected.tokens().push_back(Token(TokenType::Identifier, "HL", Keyword::HL, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "INC", Keyword::INC,
+                                      false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "HL", Keyword::HL,
+                                      false));
 
     TokenFileReader tfr;
     tfr.inject_tokens({ injected });
@@ -2434,17 +2448,22 @@ TEST_CASE("TokenFileReader::inject_tokens handles backslash splitting in injecte
     REQUIRE_FALSE(tfr.next_token_line(tl));
 }
 
-TEST_CASE("TokenFileReader::inject_tokens respects no-split for #define and preserves location", "[lexer][inject_tokens][define]") {
+TEST_CASE("TokenFileReader::inject_tokens respects no-split for #define and preserves location",
+          "[lexer][inject_tokens][define]") {
     g_options = Options();
 
     // Build a "#define" start using Hash + Identifier(DEFINE)
     TokenLine injected(Location("defs.asm", 7));
     injected.tokens().push_back(Token(TokenType::Hash, "#", false));
-    injected.tokens().push_back(Token(TokenType::Identifier, "DEFINE", Keyword::DEFINE, false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "DEFINE",
+                                      Keyword::DEFINE, false));
     injected.tokens().push_back(Token(TokenType::Identifier, "FOO", false));
-    injected.tokens().push_back(Token(TokenType::Colon, ":", false)); // should NOT cause split
-    injected.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD, false));
-    injected.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A, false));
+    injected.tokens().push_back(Token(TokenType::Colon, ":",
+                                      false)); // should NOT cause split
+    injected.tokens().push_back(Token(TokenType::Identifier, "LD", Keyword::LD,
+                                      false));
+    injected.tokens().push_back(Token(TokenType::Identifier, "A", Keyword::A,
+                                      false));
 
     TokenFileReader tfr;
     tfr.inject_tokens({ injected });
