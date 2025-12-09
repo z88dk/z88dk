@@ -16,6 +16,7 @@
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
+#include "ticks.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -26,8 +27,8 @@
 #define SEC_TO_US(sec) ((sec)*1000000)
 #define NS_TO_US(ns)    ((ns)/1000)
 
-static uint8_t verbose = 0;
-static char* script_file = NULL;
+uint8_t verbose = 0;
+char* script_file = NULL;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
 static uint8_t has_clock_register = 0;
@@ -67,32 +68,7 @@ static uint16_t mem_requested_amount = 0;
 static int connection_socket = 0;
 static struct network_op* last_network_op = NULL;
 
-enum register_mapping_t {
-    REGISTER_MAPPING_AF = 0,
-    REGISTER_MAPPING_BC,
-    REGISTER_MAPPING_DE,
-    REGISTER_MAPPING_HL,
-    REGISTER_MAPPING_AF_,
-    REGISTER_MAPPING_BC_,
-    REGISTER_MAPPING_DE_,
-    REGISTER_MAPPING_HL_,
-    REGISTER_MAPPING_IX,
-    REGISTER_MAPPING_IY,
-    REGISTER_MAPPING_SP,
-    REGISTER_MAPPING_PC,
-
-    /*
-     * Some emulators would report this 16bit register pair, which could be used
-     * to track ticks for profiling purposes
-     */
-    REGISTER_MAPPING_CLOCKL,
-    REGISTER_MAPPING_CLOCKH,
-
-    REGISTER_MAPPING_MAX,
-    REGISTER_MAPPING_UNKNOWN
-};
-
-static const char* register_mapping_names[] = {
+const char* register_mapping_names[] = {
     "af",
     "bc",
     "de",
@@ -787,7 +763,7 @@ void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
     pthread_mutex_unlock(&main_thread_mutex);
 }
 
-static void gdb_execution_stopped()
+static void gdb_execution_stopped(int code)
 {
     if (debugger_active == 1)
     {
@@ -804,7 +780,9 @@ static void gdb_execution_stopped()
 
 void remote_execution_stopped(const void* data, void* response)
 {
-    bk.execution_stopped();
+    const int* code = data;
+    bk.execution_stopped(*code);
+    free(response);
 }
 
 static uint8_t process_packet()
@@ -874,7 +852,10 @@ static uint8_t process_packet()
     {
         case 'T':
         {
-            execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
+            payload[2] = '\0';
+            int* code = malloc(sizeof(int));
+            *code = strtol(payload, NULL, 10);
+            execute_on_main_thread_no_response(&remote_execution_stopped, code);
 
             break;
         }
@@ -897,6 +878,8 @@ static void* network_read_thread(void* arg)
 
         while (process_packet()) {};
     }
+
+    bk.remote_closed();
 
     return NULL;
 }
@@ -1149,6 +1132,11 @@ static void ctrl_c() {
     ctrl_c_requested = 1;
 }
 
+static void gdb_remote_closed() {
+    bk.console("Connection to remote closed.\n");
+    exit(1);
+}
+
 uint32_t gdb_profiler_time() {
     if (has_clock_register) {
         /*
@@ -1209,7 +1197,8 @@ static backend_t gdb_backend = {
     .execution_stopped = gdb_execution_stopped,
     .ctrl_c = ctrl_c,
     .time = gdb_profiler_time,
-	.script_filename = script_filename
+	.script_filename = script_filename,
+    .remote_closed = gdb_remote_closed,
 };
 
 static void process_scheduled_actions()

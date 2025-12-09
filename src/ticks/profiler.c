@@ -190,8 +190,8 @@ void profiler_start(const char* function, int iterations_limit) {
         return;
     }
 
-    breakpoint_push_frame = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, push_frame, strdup("profiler push"));
-    breakpoint_pop_frame = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, pop_frame, strdup("profiler pop"));
+    breakpoint_push_frame = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, push_frame, strdup("profiler push"), 0);
+    breakpoint_pop_frame = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, pop_frame, strdup("profiler pop"), 0);
 
     bk.console("Profiler enabled.\n");
     if (within_function_only) {

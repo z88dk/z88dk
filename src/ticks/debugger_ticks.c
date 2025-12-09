@@ -206,6 +206,11 @@ static uint32_t ticks_time()
     return (uint32_t)st;
 }
 
+static void ticks_remote_closed()
+{
+    // do nothing
+}
+
 backend_t ticks_debugger_backend = {
     .st = &get_st,
     .ff = &get_ff,
@@ -242,5 +247,6 @@ backend_t ticks_debugger_backend = {
     .debug = stdout_log,
     .execution_stopped = NULL,
     .ctrl_c = ctrl_c,
-    .time = ticks_time
+    .time = ticks_time,
+    .remote_closed = ticks_remote_closed,
 };

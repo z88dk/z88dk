@@ -70,6 +70,8 @@ static void cmd_var_evaluate_expression(const char* flow, int argc, char **argv)
 static void cmd_var_list_children(const char* flow, int argc, char **argv);
 static void cmd_list_features(const char* flow, int argc, char **argv);
 static void cmd_environment_directory(const char* flow, int argc, char **argv);
+static void cmd_list_register_names(const char* flow, int argc, char **argv);
+static void cmd_list_register_values(const char* flow, int argc, char **argv);
 
 static command mi2_commands[] = {
     {"-gdb-exit",                   cmd_exit},
@@ -104,6 +106,8 @@ static command mi2_commands[] = {
     {"-var-list-children",          cmd_var_list_children},
     {"-list-features",              cmd_list_features},
     {"-environment-directory",      cmd_environment_directory},
+    {"-data-list-register-names",   cmd_list_register_names},
+    {"-data-list-register-values",  cmd_list_register_values},
     { NULL, NULL }
 };
 
@@ -136,6 +140,107 @@ static void cmd_list_features(const char* flow, int argc, char **argv) {
 static void cmd_environment_directory(const char* flow, int argc, char **argv) {
     // we do that by default
     mi2_printf_response(flow, "done");
+}
+
+static void cmd_list_register_names(const char* flow, int argc, char **argv) {
+    // we do that by default
+
+    UT_string* registers;
+    utstring_new(registers);
+
+    for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+        if (i == REGISTER_MAPPING_MAX - 1) {
+            utstring_printf(registers, "\"%s\"", register_mapping_names[i]);
+        } else {
+            utstring_printf(registers, "\"%s\",", register_mapping_names[i]);
+        }
+    }
+
+    mi2_printf_response(flow, "done,register-names=[%s]", utstring_body(registers));
+    utstring_free(registers);
+}
+
+static void cmd_list_register_values(const char* flow, int argc, char **argv) {
+    // --thread 1 --frame 0 --skip-unavailable r 1 2 3
+
+    const char* kind = NULL;
+
+    uint8_t register_filtering = 0;
+    uint8_t required_registers[REGISTER_MAPPING_MAX] = {};
+
+    for (int i = 1; i < argc; i++) {
+        const char* arg = argv[i];
+        if (strcmp(arg, "--thread") == 0) {
+            i++;
+        } else if (strcmp(arg, "--frame") == 0) {
+            i++;
+        } else if (strcmp(arg, "--skip-unavailable") == 0) {
+            //
+        } else {
+            if (kind == NULL) {
+                kind = arg;
+            } else {
+                // a specific list of registers is requested
+                int idx = atoi(arg);
+                if (idx >= 0) {
+                    register_filtering = 1;
+                    required_registers[idx] = 1;
+                }
+            }
+        }
+    }
+
+    uint8_t natural = strcmp(kind, "N") == 0;
+
+    struct debugger_regs_t regs;
+
+    bk.get_regs(&regs);
+
+    uint16_t reg_values[REGISTER_MAPPING_MAX] = {
+        regs.f | regs.a << 8,
+        regs.c | regs.b << 8,
+        regs.e | regs.d << 8,
+        regs.l | regs.h << 8,
+        regs.f_ | regs.a_ << 8,
+        regs.c_ | regs.b_ << 8,
+        regs.e_ | regs.d_ << 8,
+        regs.l_ | regs.h_ << 8,
+        regs.xl | regs.xh << 8,
+        regs.yl | regs.yh << 8,
+        regs.sp,
+        regs.pc,
+        regs.clockl,
+        regs.clockh,
+    };
+
+    UT_string* registers;
+    utstring_new(registers);
+
+    uint8_t first = 1;
+
+    for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+        if (register_filtering) {
+            if (required_registers[i] == 0) {
+                // skipping that one
+                continue;
+            }
+        }
+
+        if (first) {
+            first = 0;
+        } else {
+            utstring_printf(registers, ",");
+        }
+
+        if (natural) {
+            utstring_printf(registers, "{number=\"%d\",value=\"%d\"}", i, reg_values[i]);
+        } else {
+            utstring_printf(registers, "{number=\"%d\",value=\"0x%04X\"}", i, reg_values[i]);
+        }
+    }
+
+    mi2_printf_response(flow, "done,register-values=[%s]", utstring_body(registers));
+    utstring_free(registers);
 }
 
 static void cmd_file_exec_and_symbols(const char* flow, int argc, char **argv) {
@@ -179,6 +284,19 @@ static void cmd_maintenance(const char* flow, int argc, char **argv) {
         bk.console("Exec file:");
         bk.console("    `program', file type z80.");
         bk.console(" [0]      0x000000000->0x00000FFFF at 0x00000000: .text ALLOC LOAD CODE HAS_CONTENTS");
+    } else if (strcmp(section, "print") == 0) {
+        const char* target = argv[3];
+        if (strcmp(target, "register-groups") == 0) {
+            UT_string* registers;
+            utstring_new(registers);
+
+            for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+                utstring_printf(registers, " %s", register_mapping_names[i]);
+            }
+
+            bk.console("Group all:%s", utstring_body(registers));
+            utstring_free(registers);
+        }
     } else {
         bk.debug("unknown info section: %s\n", section);
     }
@@ -216,7 +334,7 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
     uint16_t offset = 0;
     symbol* s = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
 
-    const char* filename;
+    const char* filename = "unknown.c";
     int lineno;
     if (s == NULL || debug_find_source_location(regs.pc, &filename, &lineno)) {
         mi2_printf_response(flow, 
@@ -261,7 +379,18 @@ static void cmd_stack_list_variables(const char* flow, int argc, char **argv) {
     uint16_t at = bk.pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
+    if (first_frame_pointer == NULL)
+    {
+        mi2_printf_response(flow, "done,variables=[]");
+        return;
+    }
+
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+    if (fp == NULL)
+    {
+        mi2_printf_response(flow, "done,variables=[]");
+        return;
+    }
 
     UT_string* response;
     utstring_new(response);
@@ -343,14 +472,26 @@ static void cmd_interpreter_exec(const char* flow, int argc_, char **argv_) {
         char **argv = parse_words(exec, &argc);
 
         if ( argc > 0 ) {
+            char evaluation_flow[32] = "";
+
             const char* command_name = argv[0];
+
+            char* flow_ptr = evaluation_flow;
+            memset(evaluation_flow, 0, sizeof(evaluation_flow));
+
+            while (isdigit(*command_name)) {
+                *flow_ptr = *command_name;
+                command_name++;
+                flow_ptr++;
+            }
+
             command *cmd = &mi2_commands[0];
             uint8_t command_found = 0;
 
             while ( cmd->cmd ) {
                 if ( strcmp(command_name, cmd->cmd) == 0 ) {
                     command_found = 1;
-                    cmd->func("", argc, argv);
+                    cmd->func(evaluation_flow, argc, argv);
                     break;
                 }
                 cmd++;
@@ -672,8 +813,8 @@ static void sprintf_frame0(UT_string* ptr) {
         uint16_t offset;
         symbol* sym = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
         if (sym != NULL) {
-            const char *filename;
-            int lineno;
+            const char *filename = "unknown.c";
+            int lineno = 0;
             if (debug_find_source_location(regs.pc, &filename, &lineno)) {
                 utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                                      "file=\"%s\","
@@ -716,7 +857,7 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
         symbol* sym = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
         if (sym != NULL) {
 
-            const char *filename;
+            const char *filename = "unknown.c";
             int lineno;
             if (debug_find_source_location(regs.pc, &filename, &lineno)) {
                 utstring_printf(dump_buffer,
@@ -948,7 +1089,7 @@ static void cmd_plain_disassemble(const char* flow, int argc, char **argv) {
     bk.console("Dump of assembler code from 0x%08x to 0x%08x:\n", from_d, to_d);
 
     while (pc <= to_d) {
-        static char db[2048];
+        static char db[4096];
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         const char* ppp = (pc == regs.pc) ? "=> " : "   ";
@@ -1112,7 +1253,6 @@ static void cmd_target_select(const char* flow, int argc, char **argv) {
         return;
     }
 
-    bk.debug("Connected\n");
     report_connected = 1;
     report_execution_stopped = 1;
 }
@@ -1126,12 +1266,22 @@ static void cmd_target_detach(const char* flow, int argc, char **argv)
 
 static void cmd_break_insert(const char* flow, int argc, char **argv) {
     char* insert_path = NULL;
+    uint8_t temporary = 0;
+    uint8_t force = 0;
+    uint8_t function = 0;
 
     for (int i = 1; i < argc; i++) {
-        const char* arg = argv[i];
+        char* arg = argv[i];
 
         if (strcmp(arg, "-f") == 0) {
-            insert_path = argv[++i];
+            force = 1;
+        } else if (strcmp(arg, "--function") == 0) {
+            function = 1;
+        } else if (strcmp(arg, "-t") == 0) {
+            temporary = 1;
+        } else {
+            insert_path = arg;
+            break;
         }
     }
 
@@ -1141,7 +1291,7 @@ static void cmd_break_insert(const char* flow, int argc, char **argv) {
         int value = parse_address(insert_path, &corrected_source);
 
         if ( value != -1 ) {
-            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL);
+            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL, temporary);
 
             uint16_t offset = 0;
             symbol* s = symbol_find_lower(value, SYM_ADDRESS, &offset);
@@ -1196,7 +1346,7 @@ typedef struct mi2_command_execution {
     int argc;
 } mi2_command_execution;
 
-static void mi2_execution_stopped() {
+static void mi2_execution_stopped(int code) {
     debugger_active = 1;
 
     struct debugger_regs_t regs;
@@ -1280,7 +1430,13 @@ static void mi2_execution_stopped() {
         } else {
             if (report_execution_stopped) {
                 report_execution_stopped = 0;
-                mi2_printf_async("stopped,frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
+
+                // T02 means we have reated to an interrupt
+                if (code == 02) {
+                    mi2_printf_async("stopped,reason=\"signal-received\",signal-name=\"SIGINT\"");
+                } else {
+                    mi2_printf_async("stopped,frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
+                }
             }
         }
     }
@@ -1327,15 +1483,16 @@ static void* debugger_mi2_console_loop(void* arg) {
         if ( argc > 0 ) {
             char* command_name = argv[0];
             char flow[32] = "";
+            char* flow_ptr = flow;
+            memset(flow, 0, sizeof(flow));
 
-            uint32_t flow_id;
-            int end;
-            if (sscanf(command_name, "%d-%n", &flow_id, &end) == 1) {
-                // we have 'xxx-command' syntext, split it into 'xxx' and '-command'
-                memset(flow, 0, sizeof(flow));
-                memcpy(flow, command_name, end - 1);
-                command_name += end - 1;
+            while (isdigit(*command_name)) {
+                *flow_ptr = *command_name;
+                command_name++;
+                flow_ptr++;
             }
+
+            *flow_ptr = '\0';
 
             command *cmd = &mi2_commands[0];
             uint8_t command_found = 0;
@@ -1514,6 +1671,12 @@ static void mi2_break(uint8_t temporary)
     debugger_gdb_break(temporary);
 }
 
+static void mi2_remote_closed()
+{
+    mi2_printf_error("N", "Remote communication error. Target disconnected.");
+    mi2_printf_thread("=thread-group-exited,id=\"i1\"");
+}
+
 void debugger_mi2_init()
 {
     // we need to disable buffering or the client won't be happy
@@ -1523,6 +1686,7 @@ void debugger_mi2_init()
     bk.debug = mi2_internal_printf;
     bk.execution_stopped = mi2_execution_stopped;
     bk.break_ = mi2_break;
+    bk.remote_closed = mi2_remote_closed;
 
     {
         pthread_t id;
