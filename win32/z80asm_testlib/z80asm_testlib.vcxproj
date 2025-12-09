@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\library.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\macros.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\module.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
@@ -34,7 +35,6 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unit.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
