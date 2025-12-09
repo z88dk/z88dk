@@ -277,7 +277,7 @@ TEST_CASE("Integration: compilation unit with sections and modules",
     start->set_opcode(start_opcode);
     start->set_scope(SymbolScope::Public);
 
-    code->add_opcode(Opcode({ 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
 
     // LIB module with DATA section
     Module* lib = unit.add_module("LIB");
@@ -291,7 +291,7 @@ TEST_CASE("Integration: compilation unit with sections and modules",
     buffer->set_opcode(buffer_opcode);
     buffer->set_scope(SymbolScope::Public);
 
-    data->add_opcode(Opcode({ 0x42 }, loc));
+    data->add_opcode(Opcode(data, { 0x42 }, loc));
 
     // Verify structure
     REQUIRE(unit.modules().size() == 3);  // Empty + MAIN + LIB
@@ -353,7 +353,7 @@ TEST_CASE("Integration: parse and check non-constant expression",
     // Define constant and label
     module.add_symbol("OFFSET", loc, 10, SymbolType::Constant);
 
-    Opcode* opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = section->add_opcode(Opcode(section, { 0x00 }, loc));
     Symbol* label = module.add_symbol("start", loc);
     label->set_type(SymbolType::AddressRelative);
     label->set_opcode(opcode);

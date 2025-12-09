@@ -8,13 +8,27 @@
 #include "section.h"
 #include "utils.h"
 #include <cassert>
+#include <cassert>
+#include <memory>
 
 //-----------------------------------------------------------------------------
 // Patch implementation
 //-----------------------------------------------------------------------------
 
-Patch::Patch(int offset, PatchRange range, const Expression& expr)
-    : offset_(offset), range_(range), expression_(expr) {
+Patch::Patch(Opcode* parent)
+    : parent_(parent) {
+}
+
+Patch::Patch(Opcode* parent, int offset, PatchRange range, const Expression& expr)
+    : parent_(parent), offset_(offset), range_(range), expression_(expr) {
+}
+
+Opcode* Patch::parent() const {
+    return parent_;
+}
+
+void Patch::set_parent(Opcode* parent) {
+    parent_ = parent;
 }
 
 int Patch::offset() const {
@@ -45,10 +59,12 @@ const Location& Patch::location() const {
     return expression_.location();
 }
 
-bool Patch::resolve(std::vector<uint8_t>& bytes, int asmpc, int opcode_size) {
+bool Patch::resolve() {
+    assert(parent_);
+
     try {
-        int value = evaluate_expression(asmpc, opcode_size);
-        patch_bytes(bytes, value);
+        int value = evaluate_expression();
+        patch_bytes(parent_->bytes(), value);
         return true;
     }
     catch (const ExpressionError&) {
@@ -57,11 +73,14 @@ bool Patch::resolve(std::vector<uint8_t>& bytes, int asmpc, int opcode_size) {
     }
 }
 
-int Patch::evaluate_expression(int asmpc, int opcode_size) {
+int Patch::evaluate_expression() {
     // For JR_OFFSET and JRE_OFFSET, need to compute relative offset
     int value = expression_.evaluate();
 
     if (range_ == PatchRange::JrOffset || range_ == PatchRange::JreOffset) {
+        int asmpc = parent_ ? parent_->address() : 0;
+        int opcode_size = parent_ ? static_cast<int>(parent_->size()) : 0;
+
         // Compute relative offset: target - (asmpc + opcode_size)
         value = value - (asmpc + opcode_size);
     }
@@ -70,7 +89,6 @@ int Patch::evaluate_expression(int asmpc, int opcode_size) {
 }
 
 void Patch::patch_bytes(std::vector<uint8_t>& bytes, int value) {
-    // Helper lambda to patch a byte at offset
     auto patch_byte = [&](int pos, uint8_t byte_value) {
         if (pos >= 0 && static_cast<size_t>(offset_ + pos) < bytes.size()) {
             bytes[offset_ + pos] = byte_value;
@@ -209,15 +227,27 @@ void Patch::patch_bytes(std::vector<uint8_t>& bytes, int value) {
 // Opcode implementation
 //-----------------------------------------------------------------------------
 
-Opcode::Opcode(const Location& location) : location_(location) {}
+Opcode::Opcode(Section* parent, const Location& location)
+    : parent_(parent), location_(location) {}
 
-Opcode::Opcode(const std::vector<uint8_t>& bytes, const Location& location)
-    : bytes_(bytes), location_(location) {
+Opcode::Opcode(Section* parent, const std::vector<uint8_t>& bytes, const Location& location)
+    : parent_(parent), bytes_(bytes), location_(location) {
 }
 
-Opcode::Opcode(int address, const std::vector<uint8_t>& bytes,
-               const Location& location)
-    : address_(address), bytes_(bytes), location_(location) {
+Opcode::Opcode(Section* parent, int address, const std::vector<uint8_t>& bytes, const Location& location)
+    : parent_(parent), address_(address), bytes_(bytes), location_(location) {
+}
+
+Section* Opcode::parent() const {
+    return parent_;
+}
+
+void Opcode::set_parent(Section* parent) {
+    parent_ = parent;
+    // Rebind patches to this opcode
+    for (auto& p : patches_) {
+        p.set_parent(this);
+    }
 }
 
 int Opcode::address() const {
@@ -253,17 +283,11 @@ void Opcode::add_byte(uint8_t byte) {
 }
 
 void Opcode::add_bytes(unsigned int value) {
-    // Extract bytes from value (up to 4 bytes)
-    // Find the first non-zero byte from high to low order
-    // Then add that byte and all lower order bytes
-
-    // Break into bytes
     uint8_t byte3 = static_cast<uint8_t>((value >> 24) & 0xFF);
     uint8_t byte2 = static_cast<uint8_t>((value >> 16) & 0xFF);
     uint8_t byte1 = static_cast<uint8_t>((value >> 8) & 0xFF);
     uint8_t byte0 = static_cast<uint8_t>(value & 0xFF);
 
-    // Find first non-zero byte (or start at byte 0 if all are zero)
     if (byte3 != 0) {
         bytes_.push_back(byte3);
         bytes_.push_back(byte2);
@@ -296,6 +320,17 @@ void Opcode::clear_patches() {
     patches_.clear();
 }
 
+bool Opcode::resolve() {
+    bool ok = true;
+    for (auto& p : patches_) {
+        if (p.parent() != this) {
+            p.set_parent(this);
+        }
+        ok = p.resolve() && ok;
+    }
+    return ok;
+}
+
 bool Opcode::has_patches() const {
     return !patches_.empty();
 }
@@ -304,13 +339,49 @@ const Location& Opcode::location() const {
     return location_;
 }
 
+// NEW: deep clone bound to new_parent
+std::unique_ptr<Opcode> Opcode::clone(Section* new_parent) const {
+    auto cloned = std::make_unique<Opcode>(new_parent, address_, bytes_, location_);
+    // copy patches and rebind to cloned opcode
+    for (const auto& p : patches_) {
+        Patch copy(cloned.get(), p.offset(), p.range(), p.expression());
+        cloned->add_patch(copy);
+    }
+    return cloned;
+}
+
 //-----------------------------------------------------------------------------
 // Section implementation
 //-----------------------------------------------------------------------------
 
 Section::Section(const std::string& name) : name_(name) {
     // Always start with an empty opcode so last_opcode() never returns nullptr
-    opcodes_.push_back(std::make_unique<Opcode>(Location()));
+    opcodes_.push_back(std::make_unique<Opcode>(this, Location()));
+    // Initialize the sentinel opcode address to the current base
+    opcodes_.back()->set_address(base_address_);
+}
+
+Opcode* Section::add_opcode(const Opcode& opcode) {
+    // Clone opcode (deep copy, patches rebound) and bind to this Section
+    auto created = opcode.clone(this);
+
+    // Set address based on previous opcode to provide immediate stability
+    if (opcodes_.empty()) {
+        created->set_address(base_address_);
+    }
+    else {
+        const Opcode* prev = opcodes_.back().get();
+        int prev_addr = prev->address();
+        int next_addr = prev_addr + static_cast<int>(prev->size());
+        if (opcodes_.size() == 1) {
+            opcodes_.back()->set_address(base_address_);
+            next_addr = base_address_ + static_cast<int>(prev->size());
+        }
+        created->set_address(next_addr);
+    }
+
+    opcodes_.push_back(std::move(created));
+    return opcodes_.back().get();
 }
 
 const std::string& Section::name() const {
@@ -332,7 +403,7 @@ void Section::set_alignment(int align) {
     alignment_ = align;
 
     // Re-adjust base address to meet new alignment requirement
-    base_address_ = align_address(base_address_, alignment_);
+    set_base_address(align_address(base_address_, alignment_));
 }
 
 int Section::base_address() const {
@@ -340,32 +411,32 @@ int Section::base_address() const {
 }
 
 void Section::set_base_address(int addr) {
+    // Align and set base address
     base_address_ = align_address(addr, alignment_);
+    // Recompute all opcode addresses after base change
+    compute_opcodes_addresses();
 }
 
 const std::vector<std::unique_ptr<Opcode>>& Section::opcodes() const {
     return opcodes_;
 }
 
-Opcode* Section::add_opcode(const Opcode& opcode) {
-    opcodes_.push_back(std::make_unique<Opcode>(opcode));
-    return opcodes_.back().get();
-}
-
 Opcode* Section::last_opcode() {
-    // Never returns nullptr - there's always at least one empty opcode
+    assert(!opcodes_.empty());
     return opcodes_.back().get();
 }
 
 const Opcode* Section::last_opcode() const {
-    // Never returns nullptr - there's always at least one empty opcode
+    assert(!opcodes_.empty());
     return opcodes_.back().get();
 }
 
 void Section::clear_opcodes() {
     opcodes_.clear();
     // Always maintain at least one empty opcode so last_opcode() never returns nullptr
-    opcodes_.push_back(std::make_unique<Opcode>(Location()));
+    opcodes_.push_back(std::make_unique<Opcode>(this, Location()));
+    // Reset sentinel address to current base
+    opcodes_.back()->set_address(base_address_);
 }
 
 size_t Section::size() const {
@@ -377,7 +448,9 @@ size_t Section::size() const {
 }
 
 int Section::pc() const {
-    return base_address_ + static_cast<int>(size());
+    const Opcode* last = last_opcode();
+    assert(last);
+    return last->address() + static_cast<int>(last->size());
 }
 
 void Section::compute_opcodes_addresses() {
@@ -394,7 +467,6 @@ int Section::align_address(int addr, int alignment) {
     }
 
     // Calculate aligned address
-    // Formula: ((addr + alignment - 1) / alignment) * alignment
     int remainder = addr % alignment;
     if (remainder == 0) {
         return addr;    // Already aligned

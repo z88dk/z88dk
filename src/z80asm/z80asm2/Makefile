@@ -43,7 +43,7 @@ DEPENDS := $(OBJS:.o=.d) $(COMMON_TEST_OBJS:.o=.d) $(TEST_OBJS:.o=.d) $(CATCH_OB
 
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
-		  --max-code-length=80 --lineend=linux --formatted \
+		  --max-code-length=120 --lineend=linux --formatted \
 		  --recursive "*.cpp" "*.h"
 
 
