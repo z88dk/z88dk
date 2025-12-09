@@ -5,7 +5,9 @@
 //-----------------------------------------------------------------------------
 
 #include "expr.h"
-#include "model.h"
+#include "module.h"
+#include "section.h"
+#include "symbols.h"
 
 //-----------------------------------------------------------------------------
 // integer power helper (fast exponentiation). negative exponent -> 0

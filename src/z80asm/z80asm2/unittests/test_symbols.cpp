@@ -6,7 +6,8 @@
 
 #define CATCH_CONFIG_MAIN
 #include "../expr.h"
-#include "../model.h"
+#include "../module.h"
+#include "../section.h"
 #include "../symbols.h"
 #include "catch_amalgamated.hpp"
 
