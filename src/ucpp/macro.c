@@ -275,6 +275,25 @@ static void print_macro(void *vm)
 }
 
 /*
+ * Called before any character is actually being put into output.
+ * Is the line number differs between input and output too much (due to #ifdef checks)
+ * instead generating \n, it inserts #line markers
+ */
+void yield_newlines(struct lexer_state *ls)
+{
+	if (!(ls->flags & KEEP_OUTPUT)) {
+		return;
+	}
+
+	if (ls->line > ls->oline + 10) {
+	    print_line_info(ls, ls->flags);
+	    ls->oline = ls->line;
+	} else {
+	    for (; ls->line > ls->oline;) put_char(ls,'\n');
+	}
+}
+
+/*
  * Send a token to the output (a token_fifo in lexer mode, the output
  * buffer in stand alone mode).
  */
@@ -295,9 +314,7 @@ void print_token(struct lexer_state *ls, struct token *t, long uz_line)
 			TOKEN_LIST_MEMG);
 		return;
 	}
-	if (ls->flags & KEEP_OUTPUT) {
-		for (; ls->oline < ls->line;) put_char(ls, '\n');
-	}
+    yield_newlines(ls);
 	if (!S_TOKEN(t->type)) x = operators_name[t->type];
 	for (; *x; x ++) put_char(ls, *x);
 }

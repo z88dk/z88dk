@@ -31,3 +31,10 @@ jobs:
         export PATH=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/bin:$PATH
         export ZCCCFG=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/lib/config
         perl -S prove t/*.t
+    - name: Run ucpp tests
+      run: |
+        set -x
+        cd osx-latest/z88dk/src/ucpp
+        export PATH=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/bin:$PATH
+        export ZCCCFG=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/lib/config
+        perl -S prove t/*.t

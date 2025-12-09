@@ -59,3 +59,9 @@ jobs:
         set PATH=%RUNNER_WORKSPACE%\z88dk\bin;%PATH%
         set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\lib\config
         perl -S prove t\*.t
+    - name: Run ucpp tests
+      run: |
+        cd src\ucpp
+        set PATH=%RUNNER_WORKSPACE%\z88dk\bin;%PATH%
+        set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\lib\config
+        perl -S prove t\*.t
