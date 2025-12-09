@@ -1239,6 +1239,8 @@ TEST_CASE("BinFileReader: _at methods with out-of-bounds position generate error
     std::string str = reader.read_string_at(2, 5);
     REQUIRE(str.empty());
     REQUIRE(g_errors.has_errors());
+
+    std::remove(fname.c_str());
 }
 
 TEST_CASE("BinFileReader: handles empty file", "[bin_file_reader]") {

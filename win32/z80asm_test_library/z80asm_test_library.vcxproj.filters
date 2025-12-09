@@ -18,7 +18,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_location.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_library.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

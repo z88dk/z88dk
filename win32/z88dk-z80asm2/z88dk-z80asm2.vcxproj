@@ -159,13 +159,17 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\hla_parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\library.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\model.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\module.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\section.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unit.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
@@ -182,12 +186,17 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\hla_parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\library.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\model.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\module.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preprocessor.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\section.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\symbols.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\unit.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <ItemGroup>

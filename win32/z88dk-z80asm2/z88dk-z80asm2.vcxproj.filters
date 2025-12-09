@@ -75,10 +75,22 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\file_cache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\model.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\section.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\module.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\unit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\library.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -138,6 +150,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\symbols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\section.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\unit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\library.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
