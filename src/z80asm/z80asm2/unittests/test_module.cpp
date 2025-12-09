@@ -673,8 +673,8 @@ TEST_CASE("Module: can add opcodes to current section",
     module.add_section("CODE");
     Section* code = module.current_section();
 
-    code->add_opcode(Opcode({ 0x00 }, loc));  // NOP
-    code->add_opcode(Opcode({ 0x3E, 0x42 }, loc));  // LD A, 42
+    code->add_opcode(Opcode(code, { 0x00 }, loc));  // NOP
+    code->add_opcode(Opcode(code, { 0x3E, 0x42 }, loc));  // LD A, 42
 
     REQUIRE(code->opcodes().size() == 3); // section starts with empty opcode
     REQUIRE(code->size() == 3);
@@ -687,21 +687,21 @@ TEST_CASE("Module: opcodes remain accessible after section switch",
 
     // Add opcodes to CODE section
     Section* code = module.add_section("CODE");
-    code->add_opcode(Opcode({ 0x00 }, loc));
-    code->add_opcode(Opcode({ 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
 
     // Switch to DATA section
     Section* data = module.add_section("DATA");
-    data->add_opcode(Opcode({ 0x42 }, loc));
+    data->add_opcode(Opcode(data, { 0x42 }, loc));
 
     // Switch back to CODE
     module.add_section("CODE");
     REQUIRE(module.current_section() == code);
-    code->add_opcode(Opcode({ 0x3E, 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x3E, 0x00 }, loc));
 
     // Back to DATA
     module.add_section("DATA");
-    data->add_opcode(Opcode({ 0xFF }, loc));
+    data->add_opcode(Opcode(data, { 0xFF }, loc));
 
     // All pointers should still be valid
     REQUIRE(code->opcodes().size() == 4);
@@ -861,7 +861,7 @@ TEST_CASE("Integration: complete module with sections and symbols",
     start->set_scope(SymbolScope::Public);
 
     loc.set_line_num(15);
-    code->add_opcode(Opcode({ 0x3E, 0x42 }, loc));  // LD A, 42
+    code->add_opcode(Opcode(code, { 0x3E, 0x42 }, loc));  // LD A, 42
 
     loc.set_line_num(20);
     Symbol* loop = module.add_symbol("loop", loc, 0x8002,
@@ -871,7 +871,7 @@ TEST_CASE("Integration: complete module with sections and symbols",
     loop->set_offset(2);
 
     loc.set_line_num(25);
-    code->add_opcode(Opcode({ 0x18, 0xFE }, loc));  // JR loop
+    code->add_opcode(Opcode(code, { 0x18, 0xFE }, loc));  // JR loop
 
     // DATA section
     Section* data = module.add_section("DATA");
@@ -885,7 +885,7 @@ TEST_CASE("Integration: complete module with sections and symbols",
     buffer->set_offset(0);
 
     loc.set_line_num(35);
-    data->add_opcode(Opcode({ 0x00, 0x00, 0x00, 0x00 }, loc));  // DEFS 4
+    data->add_opcode(Opcode(data, { 0x00, 0x00, 0x00, 0x00 }, loc));  // DEFS 4
 
     // Verify structure
     REQUIRE(module.sections().size() == 3);  // Empty + CODE + DATA
@@ -908,24 +908,24 @@ TEST_CASE("Integration: section switching workflow", "[model][integration]") {
     // Start in CODE section
     loc.set_line_num(10);
     Section* code = module.add_section("CODE");
-    code->add_opcode(Opcode({ 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
 
     // Switch to DATA section
     loc.set_line_num(20);
     Section* data = module.add_section("DATA");
-    data->add_opcode(Opcode({ 0x42 }, loc));
+    data->add_opcode(Opcode(data, { 0x42 }, loc));
 
     // Back to CODE
     loc.set_line_num(30);
     module.add_section("CODE");
     REQUIRE(module.current_section() == code);
-    code->add_opcode(Opcode({ 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
 
     // Back to DATA
     loc.set_line_num(40);
     module.add_section("DATA");
     REQUIRE(module.current_section() == data);
-    data->add_opcode(Opcode({ 0xFF }, loc));
+    data->add_opcode(Opcode(data, { 0xFF }, loc));
 
     // Verify final state
     REQUIRE(code->opcodes().size() == 3); // section starts with empty opcode
@@ -941,14 +941,14 @@ TEST_CASE("Integration: default section behavior", "[model][integration]") {
     REQUIRE(default_sec->name() == "");
 
     loc.set_line_num(10);
-    default_sec->add_opcode(Opcode({ 0x00 }, loc));
+    default_sec->add_opcode(Opcode(default_sec, { 0x00 }, loc));
     loc.set_line_num(20);
-    default_sec->add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    default_sec->add_opcode(Opcode(default_sec, { 0x3E, 0x42 }, loc));
 
     // Add named section
     Section* code = module.add_section("CODE");
     loc.set_line_num(30);
-    code->add_opcode(Opcode({ 0xC3, 0x00, 0x80 }, loc));
+    code->add_opcode(Opcode(code, { 0xC3, 0x00, 0x80 }, loc));
 
     // Verify both sections exist and have correct opcodes
     REQUIRE(module.sections().size() == 2);
@@ -977,7 +977,7 @@ TEST_CASE("Integration: section with alignment and symbols",
 
     // Add data
     for (int i = 0; i < 256; ++i) {
-        page->add_opcode(Opcode({ static_cast<uint8_t>(i) }, loc));
+        page->add_opcode(Opcode(page, { static_cast<uint8_t>(i) }, loc));
     }
 
     REQUIRE(page->size() == 256);
@@ -999,11 +999,11 @@ TEST_CASE("Integration: label creation workflow with new constructor",
 
     // Simulate assembly workflow
     loc.set_line_num(10);
-    section->add_opcode(Opcode({ 0x00 }, loc));  // NOP
+    section->add_opcode(Opcode(section, { 0x00 }, loc));  // NOP
 
     // Label at current position
     loc.set_line_num(11);
-    Opcode* start_opcode = section->add_opcode(Opcode({ 0x3E, 0x00 },
+    Opcode* start_opcode = section->add_opcode(Opcode(section, { 0x3E, 0x00 },
                            loc));  // LD A, 0
 
     // Create label using new constructor
@@ -1020,15 +1020,15 @@ TEST_CASE("Integration: label creation workflow with new constructor",
 
     // Add more code
     loc.set_line_num(12);
-    section->add_opcode(Opcode({ 0x3C }, loc));  // INC A
+    section->add_opcode(Opcode(section, { 0x3C }, loc));  // INC A
 
     loc.set_line_num(13);
-    Opcode* loop_opcode = section->add_opcode(Opcode({ 0x00 },
+    Opcode* loop_opcode = section->add_opcode(Opcode(section, { 0x00 },
                           loc));  // NOP (placeholder)
     Symbol loop_label("loop", loc, loop_opcode, 3);
 
     loc.set_line_num(14);
-    section->add_opcode(Opcode({ 0x18, 0xFE }, loc));  // JR loop
+    section->add_opcode(Opcode(section, { 0x18, 0xFE }, loc));  // JR loop
 
     // Verify both labels
     REQUIRE(start_label.opcode() == start_opcode);
@@ -1045,7 +1045,7 @@ TEST_CASE("Integration: public label with new constructor",
     section->set_base_address(0x8000);
 
     // Add entry point
-    Opcode* entry_opcode = section->add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));
+    Opcode* entry_opcode = section->add_opcode(Opcode(section, { 0xC3, 0x00, 0x00 }, loc));
 
     // Create public label
     Symbol api_func("api_func", loc, entry_opcode, 0);
@@ -1074,10 +1074,10 @@ TEST_CASE("Integration: label reference in expression",
 
     // Add code
     loc.set_line_num(10);
-    section->add_opcode(Opcode({ 0x00 }, loc));  // 0x8000: NOP
+    section->add_opcode(Opcode(section, { 0x00 }, loc));  // 0x8000: NOP
 
     loc.set_line_num(11);
-    Opcode* loop_opcode = section->add_opcode(Opcode({ 0x3E, 0x00 },
+    Opcode* loop_opcode = section->add_opcode(Opcode(section, { 0x3E, 0x00 },
                           loc));  // 0x8001: LD A, 0
     Symbol* loop = module.add_symbol("loop", loc);
     loop->set_type(SymbolType::AddressRelative);
@@ -1085,10 +1085,10 @@ TEST_CASE("Integration: label reference in expression",
     loop->set_offset(0);
 
     loc.set_line_num(12);
-    section->add_opcode(Opcode({ 0x3C }, loc));  // 0x8003: INC A
+    section->add_opcode(Opcode(section, { 0x3C }, loc));  // 0x8003: INC A
 
     loc.set_line_num(13);
-    section->add_opcode(Opcode({ 0x18, 0x00 },
+    section->add_opcode(Opcode(section, { 0x18, 0x00 },
                                loc));  // 0x8004: JR loop (offset to be calculated)
 
     // Calculate JR offset: loop - ($ + 2)
@@ -1147,14 +1147,14 @@ TEST_CASE("Integration: expression in patch", "[model][integration][expr]") {
     section->set_base_address(0x8000);
 
     // Create target label
-    Opcode* target_opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* target_opcode = section->add_opcode(Opcode(section, { 0x00 }, loc));
     Symbol* target = module.add_symbol("target", loc);
     target->set_type(SymbolType::AddressRelative);
     target->set_opcode(target_opcode);
     target->set_offset(0);
 
     // Add JP instruction with patch
-    Opcode* jp_opcode = section->add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));
+    Opcode* jp_opcode = section->add_opcode(Opcode(section, { 0xC3, 0x00, 0x00 }, loc));
 
     // Create expression for patch: target
     TokenLine line(loc);
@@ -1165,7 +1165,7 @@ TEST_CASE("Integration: expression in patch", "[model][integration][expr]") {
     REQUIRE(expr.parse(line, i, &module, section));
 
     // Add patch to opcode
-    Patch patch(1, PatchRange::Word, expr);
+    Patch patch(jp_opcode, 1, PatchRange::Word, expr);
     jp_opcode->add_patch(patch);
 
     // Verify patch
@@ -1185,8 +1185,8 @@ TEST_CASE("Integration: $ in different sections",
     // CODE section
     Section* code = module.add_section("CODE");
     code->set_base_address(0x8000);
-    code->add_opcode(Opcode({ 0x00 }, loc));
-    code->add_opcode(Opcode({ 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
+    code->add_opcode(Opcode(code, { 0x00 }, loc));
 
     // Parse $ in CODE section
     TokenLine line1(loc);
@@ -1201,7 +1201,7 @@ TEST_CASE("Integration: $ in different sections",
     // DATA section
     Section* data = module.add_section("DATA");
     data->set_base_address(0x9000);
-    data->add_opcode(Opcode({ 0x42 }, loc));
+    data->add_opcode(Opcode(data, { 0x42 }, loc));
 
     // Parse $ in DATA section
     TokenLine line2(loc);
@@ -1222,7 +1222,7 @@ TEST_CASE("Integration: expression with PUBLIC symbol",
     section->set_base_address(0x8000);
 
     // Create and export symbol
-    Opcode* api_opcode = section->add_opcode(Opcode({ 0xC9 }, loc));  // RET
+    Opcode* api_opcode = section->add_opcode(Opcode(section, { 0xC9 }, loc));  // RET
     Symbol* api_func = module.add_symbol("api_init", loc);
     api_func->set_type(SymbolType::AddressRelative);
     api_func->set_opcode(api_opcode);
@@ -1254,7 +1254,7 @@ TEST_CASE("Integration: complex offset calculation",
     module.add_symbol("index", loc, 3, SymbolType::Constant);
     module.add_symbol("base_addr", loc, 0x9000, SymbolType::Constant);
 
-    section->add_opcode(Opcode({ 0x00 }, loc));
+    section->add_opcode(Opcode(section, { 0x00 }, loc));
 
     // Calculate: base_addr + (index * struct_size) + 4
     TokenLine line(loc);
