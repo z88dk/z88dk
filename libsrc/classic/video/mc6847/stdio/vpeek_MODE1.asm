@@ -7,7 +7,7 @@ IFNDEF MC6847_IOSPACE
 
     PUBLIC  vpeek_MODE1
     EXTERN  vpeek_screendollar
-    EXTERN  __mc6847_mode
+    EXTERN  __mc6847_modeval
     EXTERN  __console_font_h 
     EXTERN  generic_console_gfx_xypos_MODE1
 
@@ -29,7 +29,7 @@ vpeek_MODE1:
     ld      b, a
 vpeek_1:
 IF FORmc1000
-    ld      a, (__mc6847_mode)
+    ld      a, (__mc6847_modeval)
     res     0, a
     out     ($80), a
     ld      c, (hl)

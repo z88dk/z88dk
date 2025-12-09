@@ -39,13 +39,15 @@ pix_return:
     ld      a, (__mc6847_modeval)
     res     0,a
     out     ($80), a
-
     ex      af, af                      ; dcircle uses the flags in af'.. watch out !
+    
     ld      (de), a                     ; pixel address
 
+    ex      af,af
     ld      a, (__mc6847_modeval)
     set     0, a
     out     ($80),a
+    ex      af,af
     ret
 
     PUBLIC  pixelbyte

@@ -1,6 +1,7 @@
 
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
+    EXTERN  pix_return
 
     INCLUDE "classic/gfx/grafix.inc"
 
@@ -18,6 +19,9 @@
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value
     call    pixeladdress                ;hl = address, a = pixel number
+IF FORmc1000
+    push    de
+ENDIF
     ld      b, a
     ld      a, (__mc6847_MODE2_attr)
     rlca
@@ -43,18 +47,35 @@ rotated:
 IF  NEEDplot
     and     c
     or      e
+  IF FORmc1000
+    pop     de
+    call    pix_return
+  ELSE
     ld      (hl), a
-    ;; TODO mc1000
+  ENDIF
 ENDIF
 IF  NEEDunplot
     and     c
+  IF FORmc1000
+    pop     de
+    call    pix_return
+  ELSE
     ld      (hl), a
+  ENDIF
 ENDIF
 IF  NEEDxor
     xor     e
+  IF FORmc1000
+    pop     de
+    call    pix_return
+  ELSE
     ld      (hl), a
+  ENDIF
 ENDIF
 IF  NEEDpoint
+  IF FORmc1000
+    pop     de
+  ENDIF
     and     b
 ENDIF
     pop     bc                          ;Restore callers

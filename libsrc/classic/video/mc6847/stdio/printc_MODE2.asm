@@ -12,7 +12,7 @@ IFNDEF MC6847_IOSPACE
     EXTERN  generic_console_flags
     EXTERN  __mc6847_MODE2_attr
     EXTERN  generic_console_flags
-    EXTERN  __mc6847_mode
+    EXTERN  __mc6847_modeval
     EXTERN  __console_font_h
     EXTERN  generic_console_text_xypos
     EXTERN  generic_console_gfx_xypos_MODE2
@@ -23,7 +23,7 @@ IFNDEF MC6847_IOSPACE
 ; e = raw
 printc_MODE2:
 IF FORmc1000
-    ld      a, (__mc6847_mode)
+    ld      a, (__mc6847_modeval)
     ex      af, af
 ENDIF
     push    bc

@@ -16,8 +16,8 @@ target/mc1000/graphics/stencil_render
 classic/gfx/narrow/obj/${TARGET}/clrarea2
 classic/gfx/narrow/obj/${TARGET}/fillarea2
 classic/gfx/narrow/obj/${TARGET}/xorclrarea2
-@classic/gfx/narrow/gfx_narrow.lst
 @classic/video/mc6847/mc6847.lst
+@classic/gfx/narrow/gfx_narrow.lst
 
 
 target/mc1000/time/clock

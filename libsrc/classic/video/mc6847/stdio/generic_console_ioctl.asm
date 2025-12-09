@@ -163,13 +163,13 @@ ENDIF
 set_mode:
     bit     5, c
     jr      z, not_css
-IF FORphc25
-    set     6,h
-ELSE
     ld      a,h
+IF FORphc25
+    xor     64
+ELSE
     xor     2
-    ld      h,a
 ENDIF
+    ld      h,a
 not_css:
     ld      (__console_w), de       ;Stored w, then h
     ld      a, l
