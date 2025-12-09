@@ -1,5 +1,6 @@
 
 
+    MODULE  m2_generic_console
     SECTION code_clib
 
     PUBLIC  generic_console_cls
@@ -9,6 +10,7 @@
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute
+    PUBLIC  generic_console_ioctl
 
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
@@ -18,12 +20,14 @@
 
     EXTERN  base_graphics
 
+    PUBLIC      CLIB_GENCON_CAPS
+	defc        CLIB_GENCON_CAPS = 0
+
     defc    CHAR_TABLE=0xF800
 
-
+generic_console_ioctl:
+    scf
 generic_console_set_ink:
-    ret
-
 generic_console_set_paper:
 generic_console_set_attribute:
     ret
