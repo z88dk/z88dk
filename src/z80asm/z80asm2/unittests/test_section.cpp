@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 
 TEST_CASE("Patch: default constructor", "[model][patch]") {
-    Patch patch;
+    Patch patch(nullptr);
     REQUIRE(patch.offset() == 0);
     REQUIRE(patch.range() == PatchRange::Undefined);
 }
@@ -30,7 +30,9 @@ TEST_CASE("Patch: constructor with parameters", "[model][patch]") {
                                            SymbolType::Constant);
 
     Expression expr(make_symbol(target_sym), loc);
-    Patch patch(2, PatchRange::Word, expr);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
+    Patch patch(&opcode, 2, PatchRange::Word, expr);
 
     REQUIRE(patch.offset() == 2);
     REQUIRE(patch.range() == PatchRange::Word);
@@ -41,7 +43,9 @@ TEST_CASE("Patch: constructor with parameters", "[model][patch]") {
 TEST_CASE("Patch: JR offset range", "[model][patch]") {
     Location loc("test.asm", 20);
     Expression expr(make_integer(10), loc);
-    Patch patch(1, PatchRange::JrOffset, expr);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
+    Patch patch(&opcode, 1, PatchRange::JrOffset, expr);
 
     REQUIRE(patch.range() == PatchRange::JrOffset);
 
@@ -51,7 +55,9 @@ TEST_CASE("Patch: JR offset range", "[model][patch]") {
 TEST_CASE("Patch: byte unsigned range", "[model][patch]") {
     Location loc("test.asm", 30);
     Expression expr(make_integer(0xFF), loc);
-    Patch patch(0, PatchRange::ByteUnsigned, expr);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
+    Patch patch(&opcode, 0, PatchRange::ByteUnsigned, expr);
 
     REQUIRE(patch.range() == PatchRange::ByteUnsigned);
 
@@ -61,7 +67,9 @@ TEST_CASE("Patch: byte unsigned range", "[model][patch]") {
 TEST_CASE("Patch: word little-endian range", "[model][patch]") {
     Location loc("test.asm", 40);
     Expression expr(make_integer(0x1234), loc);
-    Patch patch(1, PatchRange::Word, expr);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
+    Patch patch(&opcode, 1, PatchRange::Word, expr);
 
     REQUIRE(patch.range() == PatchRange::Word);
 
@@ -71,6 +79,8 @@ TEST_CASE("Patch: word little-endian range", "[model][patch]") {
 TEST_CASE("Patch: all range types", "[model][patch]") {
     Location loc("test.asm", 50);
     Expression expr(make_integer(0), loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     std::vector<PatchRange> ranges = {
         PatchRange::Undefined,
@@ -91,7 +101,7 @@ TEST_CASE("Patch: all range types", "[model][patch]") {
     };
 
     for (auto range : ranges) {
-        Patch patch(0, range, expr);
+        Patch patch(&opcode, 0, range, expr);
         REQUIRE(patch.range() == range);
     }
 }
@@ -102,7 +112,8 @@ TEST_CASE("Patch: all range types", "[model][patch]") {
 
 TEST_CASE("Opcode: location-only constructor", "[model][opcode]") {
     Location loc("test.asm", 10);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     REQUIRE(opcode.address() == 0);
     REQUIRE(opcode.size() == 0);
@@ -114,7 +125,8 @@ TEST_CASE("Opcode: location-only constructor", "[model][opcode]") {
 TEST_CASE("Opcode: constructor with bytes", "[model][opcode]") {
     Location loc("test.asm", 20);
     std::vector<uint8_t> bytes = { 0x3E, 0x42 };  // LD A, 42
-    Opcode opcode(bytes, loc);
+    Section section("CODE");
+    Opcode opcode(&section, bytes, loc);
 
     REQUIRE(opcode.size() == 2);
     REQUIRE(opcode.bytes()[0] == 0x3E);
@@ -126,7 +138,8 @@ TEST_CASE("Opcode: constructor with bytes", "[model][opcode]") {
 TEST_CASE("Opcode: constructor with address and bytes", "[model][opcode]") {
     Location loc("test.asm", 30);
     std::vector<uint8_t> bytes = { 0xC3, 0x00, 0x80 };  // JP 0x8000
-    Opcode opcode(0x1000, bytes, loc);
+    Section section("CODE");
+    Opcode opcode(&section, 0x1000, bytes, loc);
 
     REQUIRE(opcode.address() == 0x1000);
     REQUIRE(opcode.size() == 3);
@@ -140,10 +153,11 @@ TEST_CASE("Opcode: add patch", "[model][opcode]") {
     Symbol* target_sym = module.add_symbol("target", loc);
 
     std::vector<uint8_t> bytes = { 0xC3, 0x00, 0x00 };  // JP address (needs patch)
-    Opcode opcode(bytes, loc);
+    Section section("CODE");
+    Opcode opcode(&section, bytes, loc);
 
     Expression expr(make_symbol(target_sym), loc);
-    Patch patch(1, PatchRange::Word, expr);
+    Patch patch(&opcode, 1, PatchRange::Word, expr);
 
     opcode.add_patch(patch);
 
@@ -156,15 +170,16 @@ TEST_CASE("Opcode: add patch", "[model][opcode]") {
 TEST_CASE("Opcode: multiple patches", "[model][opcode]") {
     Location loc("test.asm", 110);
     std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00, 0x00 };
-    Opcode opcode(bytes, loc);
+    Section section("CODE");
+    Opcode opcode(&section, bytes, loc);
 
     // Add two patches
     Expression expr1(make_integer(0x12), loc);
-    Patch patch1(0, PatchRange::ByteUnsigned, expr1);
+    Patch patch1(&opcode, 0, PatchRange::ByteUnsigned, expr1);
     opcode.add_patch(patch1);
 
     Expression expr2(make_integer(0x3456), loc);
-    Patch patch2(2, PatchRange::Word, expr2);
+    Patch patch2(&opcode, 2, PatchRange::Word, expr2);
     opcode.add_patch(patch2);
 
     REQUIRE(opcode.patches().size() == 2);
@@ -175,10 +190,11 @@ TEST_CASE("Opcode: multiple patches", "[model][opcode]") {
 TEST_CASE("Opcode: clear patches", "[model][opcode]") {
     Location loc("test.asm", 120);
     std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    Opcode opcode(bytes, loc);
+    Section section("CODE");
+    Opcode opcode(&section, bytes, loc);
 
     Expression expr(make_integer(42), loc);
-    Patch patch(0, PatchRange::ByteUnsigned, expr);
+    Patch patch(&opcode, 0, PatchRange::ByteUnsigned, expr);
 
     opcode.add_patch(patch);
     REQUIRE(opcode.has_patches());
@@ -190,20 +206,18 @@ TEST_CASE("Opcode: clear patches", "[model][opcode]") {
 
 TEST_CASE("Opcode: location is immutable", "[model][opcode]") {
     Location loc("main.asm", 200);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     REQUIRE(opcode.location().filename() == "main.asm");
     REQUIRE(opcode.location().line_num() == 200);
-
-    // Location cannot be changed - it's immutable
-    // The following would not compile:
-    // opcode.set_location(Location("other.asm", 300));  // ERROR: no member function 'set_location'
 }
 
 TEST_CASE("Opcode: clear bytes", "[model][opcode]") {
     Location loc("test.asm", 130);
     std::vector<uint8_t> bytes = { 0x3E, 0x42, 0x00 };
-    Opcode opcode(bytes, loc);
+    Section section("CODE");
+    Opcode opcode(&section, bytes, loc);
 
     REQUIRE(opcode.size() == 3);
 
@@ -214,7 +228,8 @@ TEST_CASE("Opcode: clear bytes", "[model][opcode]") {
 
 TEST_CASE("Opcode: add single byte", "[model][opcode]") {
     Location loc("test.asm", 140);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     opcode.add_byte(0x3E);
     REQUIRE(opcode.size() == 1);
@@ -228,7 +243,8 @@ TEST_CASE("Opcode: add single byte", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with single byte value", "[model][opcode]") {
     Location loc("test.asm", 150);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
     opcode.add_bytes(0x3E);
 
     REQUIRE(opcode.size() == 1);
@@ -237,7 +253,8 @@ TEST_CASE("Opcode: add_bytes with single byte value", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with two byte value", "[model][opcode]") {
     Location loc("test.asm", 160);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
     opcode.add_bytes(0x1234);
 
     REQUIRE(opcode.size() == 2);
@@ -247,7 +264,8 @@ TEST_CASE("Opcode: add_bytes with two byte value", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with three byte value", "[model][opcode]") {
     Location loc("test.asm", 170);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
     opcode.add_bytes(0xC30000);
 
     REQUIRE(opcode.size() == 3);
@@ -258,7 +276,8 @@ TEST_CASE("Opcode: add_bytes with three byte value", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with four byte value", "[model][opcode]") {
     Location loc("test.asm", 180);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
     opcode.add_bytes(0x12345678);
 
     REQUIRE(opcode.size() == 4);
@@ -270,7 +289,8 @@ TEST_CASE("Opcode: add_bytes with four byte value", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with zero", "[model][opcode]") {
     Location loc("test.asm", 190);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
     opcode.add_bytes(0);
 
     REQUIRE(opcode.size() == 1);
@@ -279,7 +299,8 @@ TEST_CASE("Opcode: add_bytes with zero", "[model][opcode]") {
 
 TEST_CASE("Opcode: add_bytes with leading zeros", "[model][opcode]") {
     Location loc("test.asm", 200);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
     opcode.add_bytes(0x00001234);
 
     // Should skip leading zero bytes and add from first non-zero
@@ -310,7 +331,8 @@ TEST_CASE("Opcode: add_bytes with various values", "[model][opcode]") {
     };
 
     for (const auto& test : tests) {
-        Opcode opcode(loc);
+        Section section("CODE");
+        Opcode opcode(&section, loc);
         opcode.add_bytes(test.value);
 
         REQUIRE(opcode.size() == test.expected.size());
@@ -322,7 +344,8 @@ TEST_CASE("Opcode: add_bytes with various values", "[model][opcode]") {
 
 TEST_CASE("Opcode: build instruction with add_byte", "[model][opcode]") {
     Location loc("test.asm", 220);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     // Build: LD A, 42 (0x3E 0x2A)
     opcode.add_byte(0x3E);
@@ -335,7 +358,8 @@ TEST_CASE("Opcode: build instruction with add_byte", "[model][opcode]") {
 
 TEST_CASE("Opcode: build instruction with add_bytes", "[model][opcode]") {
     Location loc("test.asm", 230);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     // Build: JP 0x8000 (0xC3 0x00 0x80)
     opcode.add_bytes(0xC38000);
@@ -348,7 +372,8 @@ TEST_CASE("Opcode: build instruction with add_bytes", "[model][opcode]") {
 
 TEST_CASE("Opcode: mix add_byte and add_bytes", "[model][opcode]") {
     Location loc("test.asm", 240);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     // Build complex instruction
     opcode.add_byte(0xDD);      // IX prefix
@@ -364,7 +389,8 @@ TEST_CASE("Opcode: mix add_byte and add_bytes", "[model][opcode]") {
 
 TEST_CASE("Opcode: clear and rebuild", "[model][opcode]") {
     Location loc("test.asm", 250);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     // Build first instruction
     opcode.add_byte(0x3E);
@@ -388,7 +414,8 @@ TEST_CASE("Integration: build complete instruction with patches",
     Module module("TEST", loc);
     Symbol* label_sym = module.add_symbol("label", loc);
 
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     // Build: JP label (0xC3 followed by address - needs patch)
     opcode.add_byte(0xC3);
@@ -397,7 +424,7 @@ TEST_CASE("Integration: build complete instruction with patches",
 
     // Add patch for the address
     Expression expr(make_symbol(label_sym), loc);
-    Patch patch(1, PatchRange::Word, expr);
+    Patch patch(&opcode, 1, PatchRange::Word, expr);
     opcode.add_patch(patch);
 
     REQUIRE(opcode.size() == 3);
@@ -411,7 +438,8 @@ TEST_CASE("Integration: build complete instruction with patches",
 TEST_CASE("Integration: build data with add_bytes",
           "[model][opcode][integration]") {
     Location loc("test.asm", 260);
-    Opcode opcode(loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
 
     // DEFW 0x1234, 0x5678
     opcode.add_bytes(0x1234);
@@ -435,21 +463,21 @@ TEST_CASE("Integration: section with patched opcodes", "[model][integration]") {
     sec.set_base_address(0x8000);
 
     // Add NOP
-    sec.add_opcode(Opcode({ 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
 
     // Add LD A, value (needs patch)
     Symbol* value_sym = module.add_symbol("value", loc, 42, SymbolType::Constant);
-    Opcode ld_opcode({ 0x3E, 0x00 }, loc);
+    Opcode ld_opcode(&sec, std::vector<uint8_t> { 0x3E, 0x00 }, loc);
     Expression expr1(make_symbol(value_sym), loc);
-    Patch patch1(1, PatchRange::ByteUnsigned, expr1);
+    Patch patch1(&ld_opcode, 1, PatchRange::ByteUnsigned, expr1);
     ld_opcode.add_patch(patch1);
     sec.add_opcode(ld_opcode);
 
     // Add JP label (needs patch)
     Symbol* start_sym = module.add_symbol("start", loc);
-    Opcode jp_opcode({ 0xC3, 0x00, 0x00 }, loc);
+    Opcode jp_opcode(&sec, std::vector<uint8_t> { 0xC3, 0x00, 0x00 }, loc);
     Expression expr2(make_symbol(start_sym), loc);
-    Patch patch2(1, PatchRange::Word, expr2);
+    Patch patch2(&jp_opcode, 1, PatchRange::Word, expr2);
     jp_opcode.add_patch(patch2);
     sec.add_opcode(jp_opcode);
 
@@ -467,9 +495,9 @@ TEST_CASE("Integration: compute opcode addresses in section",
     sec.set_base_address(0x8000);
 
     // Add opcodes
-    sec.add_opcode(Opcode({ 0x00 }, loc));                    // 0x8000
-    sec.add_opcode(Opcode({ 0x3E, 0x42 }, loc));              // 0x8001
-    sec.add_opcode(Opcode({ 0xC3, 0x00, 0x80 }, loc));        // 0x8003
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));                   // 0x8000
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));             // 0x8001
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0xC3, 0x00, 0x80 }, loc));       // 0x8003
 
     // Compute and set addresses
     int addr = sec.base_address();
@@ -492,12 +520,11 @@ TEST_CASE("Integration: relative jump with patch", "[model][integration]") {
     Symbol* loop_sym = module.add_symbol("loop", loc);
 
     // JR offset (needs patch to compute relative offset)
-    Opcode jr_opcode({ 0x18, 0x00 }, loc);
+    Opcode jr_opcode(&sec, std::vector<uint8_t> { 0x18, 0x00 }, loc);
 
     // Create expression: target - ($ + 2)
-    // Where $ is current address and 2 is instruction size
     Expression target_expr(make_symbol(loop_sym), loc);
-    Patch patch(1, PatchRange::JrOffset, target_expr);
+    Patch patch(&jr_opcode, 1, PatchRange::JrOffset, target_expr);
     jr_opcode.add_patch(patch);
 
     sec.add_opcode(jr_opcode);
@@ -519,16 +546,16 @@ TEST_CASE("Integration: mixed code and data section", "[model][integration]") {
     Location loc2("mixed.asm", 100);
 
     // Code: LD A, value
-    Opcode ld_opcode({ 0x3E, 0x00 }, loc2);
+    Opcode ld_opcode(&sec, std::vector<uint8_t> { 0x3E, 0x00 }, loc2);
     Expression expr1(make_symbol(constant_sym), loc2);
-    Patch patch1(1, PatchRange::ByteUnsigned, expr1);
+    Patch patch1(&ld_opcode, 1, PatchRange::ByteUnsigned, expr1);
     ld_opcode.add_patch(patch1);
     sec.add_opcode(ld_opcode);
 
     // Data: DEFW address
-    Opcode data_opcode({ 0x00, 0x00 }, loc2);
+    Opcode data_opcode(&sec, std::vector<uint8_t> { 0x00, 0x00 }, loc2);
     Expression expr2(make_symbol(label_sym), loc2);
-    Patch patch2(0, PatchRange::Word, expr2);
+    Patch patch2(&data_opcode, 0, PatchRange::Word, expr2);
     data_opcode.add_patch(patch2);
     sec.add_opcode(data_opcode);
 
@@ -683,10 +710,10 @@ TEST_CASE("Section: alignment doesn't affect opcodes or pc",
     REQUIRE(sec.pc() == 0x8004);  // Empty section
 
     // Add opcodes
-    sec.add_opcode(Opcode({ 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(sec.pc() == 0x8005);  // base + 1
 
-    sec.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
     REQUIRE(sec.pc() == 0x8007);  // base + 3
 }
 
@@ -695,7 +722,7 @@ TEST_CASE("Section: add opcode", "[model][section]") {
     Section sec("CODE");
 
     std::vector<uint8_t> bytes = { 0x00 };  // NOP
-    Opcode opcode(bytes, loc);
+    Opcode opcode(&sec, bytes, loc);
     sec.add_opcode(opcode);
 
     REQUIRE(sec.opcodes().size() == 2);
@@ -707,9 +734,9 @@ TEST_CASE("Section: multiple opcodes", "[model][section]") {
     Section sec("CODE");
 
     // Add several opcodes
-    sec.add_opcode(Opcode({ 0x00 }, loc));                    // NOP - 1 byte
-    sec.add_opcode(Opcode({ 0x3E, 0x42 }, loc));              // LD A, 42 - 2 bytes
-    sec.add_opcode(Opcode({ 0xC3, 0x00, 0x80 }, loc));        // JP 0x8000 - 3 bytes
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));                   // NOP - 1 byte
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));             // LD A, 42 - 2 bytes
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0xC3, 0x00, 0x80 }, loc));       // JP 0x8000 - 3 bytes
 
     REQUIRE(sec.opcodes().size() == 4);
     REQUIRE(sec.size() == 6);  // 1 + 2 + 3
@@ -722,10 +749,10 @@ TEST_CASE("Section: program counter calculation", "[model][section]") {
 
     REQUIRE(sec.pc() == 0x8000);  // Empty section
 
-    sec.add_opcode(Opcode({ 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(sec.pc() == 0x8001);  // Base + 1
 
-    sec.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
     REQUIRE(sec.pc() == 0x8003);  // Base + 3
 }
 
@@ -738,10 +765,10 @@ TEST_CASE("Section: program counter with alignment", "[model][section]") {
     REQUIRE(sec.base_address() == 0x8010);
     REQUIRE(sec.pc() == 0x8010);  // Empty section
 
-    sec.add_opcode(Opcode({ 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(sec.pc() == 0x8011);  // Aligned base + 1
 
-    sec.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
     REQUIRE(sec.pc() == 0x8013);  // Aligned base + 3
 }
 
@@ -750,13 +777,30 @@ TEST_CASE("Section: clear opcodes", "[model][section]") {
     Section sec("CODE");
     REQUIRE(sec.size() == 0);
 
-    sec.add_opcode(Opcode({ 0x00 }, loc));
-    sec.add_opcode(Opcode({ 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(sec.size() == 2);
 
     sec.clear_opcodes();
     REQUIRE(sec.opcodes().size() == 1); // start with an empty opcode
     REQUIRE(sec.size() == 0);
+}
+
+TEST_CASE("Section: program counter calculation with clear and add",
+          "[model][section]") {
+    Location loc("test.asm", 30);
+    Section sec("CODE");
+    sec.set_base_address(0x8000);
+
+    // Add opcodes
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
+    REQUIRE(sec.pc() == 0x8003);  // 3 bytes
+
+    // Clear and add new opcodes
+    sec.clear_opcodes();
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0xC3, 0x00, 0x80 }, loc));
+    REQUIRE(sec.pc() == 0x8003);  // 3 bytes
 }
 
 TEST_CASE("Section: alignment boundary cases", "[model][section]") {
@@ -814,9 +858,9 @@ TEST_CASE("Integration: aligned section with opcodes",
     REQUIRE(sec.base_address() == 0x8010);
 
     // Add some opcodes
-    sec.add_opcode(Opcode({ 0x00 }, loc));                    // 0x8010
-    sec.add_opcode(Opcode({ 0x3E, 0x42 }, loc));              // 0x8011-0x8012
-    sec.add_opcode(Opcode({ 0xC3, 0x00, 0x80 }, loc));        // 0x8013-0x8015
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x00 }, loc));                   // 0x8010
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0x3E, 0x42 }, loc));             // 0x8011-0x8012
+    sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { 0xC3, 0x00, 0x80 }, loc));       // 0x8013-0x8015
 
     REQUIRE(sec.opcodes().size() == 4);
     REQUIRE(sec.size() == 6);
@@ -836,7 +880,7 @@ TEST_CASE("Integration: section alignment for page-aligned data",
 
     // Fill with data
     for (int i = 0; i < 256; ++i) {
-        sec.add_opcode(Opcode({ static_cast<uint8_t>(i) }, loc));
+        sec.add_opcode(Opcode(&sec, std::vector<uint8_t> { static_cast<uint8_t>(i) }, loc));
     }
 
     REQUIRE(sec.size() == 256);
@@ -875,12 +919,12 @@ TEST_CASE("Section: add_opcode returns pointer to added opcode",
     Location loc("test.asm", 10);
     Section section("CODE");
 
-    Opcode* opcode1 = section.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode1 = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(opcode1 != nullptr);
     REQUIRE(opcode1->size() == 1);
     REQUIRE(opcode1->bytes()[0] == 0x00);
 
-    Opcode* opcode2 = section.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    Opcode* opcode2 = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
     REQUIRE(opcode2 != nullptr);
     REQUIRE(opcode2->size() == 2);
     REQUIRE(opcode2->bytes()[0] == 0x3E);
@@ -896,7 +940,7 @@ TEST_CASE("Section: opcode pointers remain stable across additions",
     Section section("CODE");
 
     // Add first opcode and save pointer
-    Opcode* first = section.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* first = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(first->size() == 1);
     REQUIRE(section.opcodes().size() == 2); // section starts with empty opcode
 
@@ -904,7 +948,7 @@ TEST_CASE("Section: opcode pointers remain stable across additions",
     std::vector<Opcode*> opcodes;
     opcodes.push_back(first);
     for (int i = 0; i < 100; ++i) {
-        opcodes.push_back(section.add_opcode(Opcode({ 0x00 }, loc)));
+        opcodes.push_back(section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc)));
     }
 
     // First pointer should still be valid and point to correct data
@@ -925,7 +969,7 @@ TEST_CASE("Section: opcode pointers can be modified through returned pointer",
     Location loc("test.asm", 10);
     Section section("CODE");
 
-    Opcode* opcode = section.add_opcode(Opcode({ 0x00, 0x00 }, loc));
+    Opcode* opcode = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc));
     REQUIRE(opcode->size() == 2);
 
     // Modify through pointer
@@ -951,9 +995,9 @@ TEST_CASE("Section: opcode pointers with patches remain stable",
     Symbol* target_sym = module.add_symbol("target", loc);
 
     // Add opcode with patch
-    Opcode* opcode = section.add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));
+    Opcode* opcode = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0xC3, 0x00, 0x00 }, loc));
     Expression expr(make_symbol(target_sym), loc);
-    Patch patch(1, PatchRange::Word, expr);
+    Patch patch(opcode, 1, PatchRange::Word, expr);
     opcode->add_patch(patch);
 
     REQUIRE(opcode->has_patches());
@@ -961,7 +1005,7 @@ TEST_CASE("Section: opcode pointers with patches remain stable",
 
     // Add more opcodes
     for (int i = 0; i < 50; ++i) {
-        section.add_opcode(Opcode({ 0x00 }, loc));
+        section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     }
 
     // Original opcode pointer should still be valid
@@ -986,14 +1030,14 @@ TEST_CASE("Section: last_opcode returns pointer to last added opcode",
     Location loc("test.asm", 10);
     Section section("CODE");
 
-    Opcode* first = section.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* first = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(section.last_opcode() == first);
 
-    Opcode* second = section.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    Opcode* second = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
     REQUIRE(section.last_opcode() == second);
     REQUIRE(section.last_opcode() != first);
 
-    Opcode* third = section.add_opcode(Opcode({ 0xC3, 0x00, 0x80 }, loc));
+    Opcode* third = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0xC3, 0x00, 0x80 }, loc));
     REQUIRE(section.last_opcode() == third);
 }
 
@@ -1001,8 +1045,8 @@ TEST_CASE("Section: last_opcode const version", "[model][section][opcode]") {
     Location loc("test.asm", 10);
     Section section("CODE");
 
-    section.add_opcode(Opcode({ 0x00 }, loc));
-    section.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
 
     const Section& const_section = section;
     const Opcode* last = const_section.last_opcode();
@@ -1018,8 +1062,8 @@ TEST_CASE("Section: last_opcode can be used to modify last opcode",
     Location loc("test.asm", 10);
     Section section("CODE");
 
-    section.add_opcode(Opcode({ 0x00 }, loc));
-    section.add_opcode(Opcode({ 0x00, 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc));
 
     Opcode* last = section.last_opcode();
     REQUIRE(last != nullptr);
@@ -1039,8 +1083,8 @@ TEST_CASE("Section: last_opcode after clear_opcodes",
     Section section("CODE");
     REQUIRE(section.last_opcode() != nullptr);
 
-    section.add_opcode(Opcode({ 0x00 }, loc));
-    section.add_opcode(Opcode({ 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     REQUIRE(section.last_opcode() != nullptr);
 
     section.clear_opcodes();
@@ -1053,15 +1097,15 @@ TEST_CASE("Section: last_opcode with patches", "[model][section][opcode]") {
     Section section("CODE");
     Symbol* target_sym = module.add_symbol("target", loc);
 
-    section.add_opcode(Opcode({ 0x00 }, loc));
-    section.add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0xC3, 0x00, 0x00 }, loc));
 
     Opcode* last = section.last_opcode();
     REQUIRE(last != nullptr);
 
     // Add patch to last opcode
     Expression expr(make_symbol(target_sym), loc);
-    Patch patch(1, PatchRange::Word, expr);
+    Patch patch(last, 1, PatchRange::Word, expr);
     last->add_patch(patch);
 
     // Verify patch is accessible
@@ -1080,17 +1124,17 @@ TEST_CASE("Integration: label symbol with opcode pointer",
     Section* section = module.current_section();
 
     // Add some code
-    section->add_opcode(Opcode({ 0x00 }, loc));
-    section->add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
 
     // Add label at current position
-    Opcode* label_opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* label_opcode = section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
     Symbol* label = module.add_symbol("loop", loc, 0, SymbolType::AddressRelative);
     label->set_opcode(section->last_opcode());
 
     // Add more code
     for (int i = 0; i < 50; ++i) {
-        section->add_opcode(Opcode({ 0x00 }, loc));
+        section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
     }
 
     // Opcode pointer should still be valid
@@ -1109,7 +1153,7 @@ TEST_CASE("Integration: multiple labels with stable opcode pointers",
     std::vector<Symbol*> labels;
 
     for (int i = 0; i < 10; ++i) {
-        Opcode* opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+        Opcode* opcode = section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
         label_opcodes.push_back(opcode);
 
         std::string label_name = "label" + std::to_string(i);
@@ -1121,7 +1165,7 @@ TEST_CASE("Integration: multiple labels with stable opcode pointers",
 
     // Add more code
     for (int i = 0; i < 100; ++i) {
-        section->add_opcode(Opcode({ 0x00 }, loc));
+        section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
     }
 
     // All opcode pointers should still be valid
@@ -1139,10 +1183,10 @@ TEST_CASE("Integration: last_opcode for associating labels",
 
     // Simulate assembly: add instruction then label
     loc.set_line_num(10);
-    section->add_opcode(Opcode({ 0x3E, 0x00 }, loc));  // LD A, 0
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x3E, 0x00 }, loc)); // LD A, 0
 
     loc.set_line_num(20);
-    section->add_opcode(Opcode({ 0x00 }, loc));         // NOP (at loop:)
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));        // NOP (at loop:)
     Opcode* loop_opcode = section->last_opcode();
 
     Symbol* loop_label = module.add_symbol("loop", loc, 0,
@@ -1150,10 +1194,10 @@ TEST_CASE("Integration: last_opcode for associating labels",
     loop_label->set_opcode(loop_opcode);
 
     loc.set_line_num(30);
-    section->add_opcode(Opcode({ 0x3C }, loc));         // INC A
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x3C }, loc));        // INC A
 
     loc.set_line_num(40);
-    section->add_opcode(Opcode({ 0x18, 0xFC }, loc));   // JR loop
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x18, 0xFC }, loc));  // JR loop
 
     // Verify loop opcode pointer is still valid
     REQUIRE(loop_opcode != nullptr);
@@ -1171,25 +1215,25 @@ TEST_CASE("Integration: opcode pointer stability across section switches",
 
     // CODE section
     Section* code = module.add_section("CODE");
-    Opcode* code_opcode = code->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* code_opcode = code->add_opcode(Opcode(code, std::vector<uint8_t> { 0x00 }, loc));
     Symbol* code_label = module.add_symbol("start", loc, 0,
                                            SymbolType::AddressRelative);
     code_label->set_opcode(code->last_opcode());
 
     // DATA section
     Section* data = module.add_section("DATA");
-    Opcode* data_opcode = data->add_opcode(Opcode({ 0x42 }, loc));
+    Opcode* data_opcode = data->add_opcode(Opcode(data, std::vector<uint8_t> { 0x42 }, loc));
     Symbol* data_label = module.add_symbol("value", loc, 0,
                                            SymbolType::AddressRelative);
     data_label->set_opcode(data->last_opcode());
 
     // Back to CODE
     module.add_section("CODE");
-    code->add_opcode(Opcode({ 0x3E, 0x00 }, loc));
+    code->add_opcode(Opcode(code, std::vector<uint8_t> { 0x3E, 0x00 }, loc));
 
     // Back to DATA
     module.add_section("DATA");
-    data->add_opcode(Opcode({ 0xFF }, loc));
+    data->add_opcode(Opcode(data, std::vector<uint8_t> { 0xFF }, loc));
 
     // All pointers should still be valid
     REQUIRE(code_opcode->bytes()[0] == 0x00);
@@ -1205,23 +1249,24 @@ TEST_CASE("Integration: opcode modification through stable pointers",
     Section* section = module.current_section();
 
     // Add placeholder opcode
-    Opcode* placeholder = section->add_opcode(Opcode({ 0x00, 0x00, 0x00 }, loc));
+    Opcode* placeholder = section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00, 0x00, 0x00 }, loc));
 
     // Add more opcodes
     for (int i = 0; i < 20; ++i) {
-        section->add_opcode(Opcode({ 0x00 }, loc));
+        section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
     }
 
     // Later, patch the placeholder (simulating two-pass assembly)
     placeholder->set_bytes({ 0xC3, 0x00, 0x80 });  // JP 0x8000
     Expression expr(make_integer(0x8000), loc);
-    Patch patch(1, PatchRange::Word, expr);
+    Patch patch(placeholder, 1, PatchRange::Word, expr);
     placeholder->add_patch(patch);
 
     // Verify modification
     REQUIRE(placeholder->size() == 3);
     REQUIRE(placeholder->bytes()[0] == 0xC3);
-    REQUIRE(placeholder->has_patches());
+    REQUIRE(placeholder->bytes()[1] == 0x00);
+    REQUIRE(placeholder->bytes()[2] == 0x80);
 }
 
 TEST_CASE("Integration: last_opcode workflow for label association",
@@ -1233,11 +1278,11 @@ TEST_CASE("Integration: last_opcode workflow for label association",
 
     // Simulate typical assembly workflow
     loc.set_line_num(10);
-    section->add_opcode(Opcode({ 0x00 }, loc));  // NOP
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc)); // NOP
 
     // Label at next position
     loc.set_line_num(11);
-    section->add_opcode(Opcode({ 0x00 }, loc));  // NOP (placeholder for start:)
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc)); // NOP (placeholder for start:)
     Opcode* start_opcode = section->last_opcode();
     Symbol* start = module.add_symbol("start", loc, 0, SymbolType::AddressRelative);
     start->set_opcode(section->last_opcode());
@@ -1245,18 +1290,18 @@ TEST_CASE("Integration: last_opcode workflow for label association",
     module.declare_symbol("start", loc, SymbolScope::Public);
 
     loc.set_line_num(12);
-    section->add_opcode(Opcode({ 0x3E, 0x42 }, loc));  // LD A, 42
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x3E, 0x42 }, loc)); // LD A, 42
 
     // Another label
     loc.set_line_num(13);
-    section->add_opcode(Opcode({ 0x00 }, loc));  // NOP (placeholder for loop:)
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc)); // NOP (placeholder for loop:)
     Opcode* loop_opcode = section->last_opcode();
     Symbol* loop = module.add_symbol("loop", loc, 0, SymbolType::AddressRelative);
     loop->set_opcode(section->last_opcode());
     loop->set_offset(3);  // Offset 3 from section base
 
     loc.set_line_num(14);
-    section->add_opcode(Opcode({ 0x18, 0xFE }, loc));  // JR loop
+    section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x18, 0xFC }, loc));  // JR loop
 
     // Verify structure
     REQUIRE(section->opcodes().size() == 6); // section starts with empty opcode
@@ -1279,8 +1324,7 @@ TEST_CASE("Integration: opcode pointers survive section operations",
     // Add opcodes and save pointers
     std::vector<Opcode*> opcodes;
     for (int i = 0; i < 10; ++i) {
-        opcodes.push_back(section->add_opcode(Opcode({ static_cast<uint8_t>(i) },
-                                              loc)));
+        opcodes.push_back(section->add_opcode(Opcode(section, std::vector<uint8_t> { static_cast<uint8_t>(i) }, loc)));
     }
 
     // Perform section operations
@@ -1304,7 +1348,7 @@ TEST_CASE("Symbol: label constructor", "[model][symbol]") {
     Section section("CODE");
     section.set_base_address(0x8000);
 
-    Opcode* opcode = section.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
 
     Symbol label("start", loc, opcode, 0, SymbolType::AddressRelative);
 
@@ -1325,9 +1369,9 @@ TEST_CASE("Symbol: label constructor with offset", "[model][symbol]") {
     section.set_base_address(0x8000);
 
     // Add some opcodes
-    section.add_opcode(Opcode({ 0x00 }, loc));
-    section.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
-    Opcode* label_opcode = section.add_opcode(Opcode({ 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
+    section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
+    Opcode* label_opcode = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
 
     Symbol label("loop", loc, label_opcode, 3, SymbolType::AddressRelative);
 
@@ -1340,7 +1384,7 @@ TEST_CASE("Symbol: label constructor with offset", "[model][symbol]") {
 TEST_CASE("Symbol: label constructor default type", "[model][symbol]") {
     Location loc("test.asm", 10);
     Section section("CODE");
-    Opcode* opcode = section.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
 
     // Using default type parameter (AddressRelative)
     Symbol label("entry", loc, opcode, 0);
@@ -1355,15 +1399,15 @@ TEST_CASE("Symbol: label constructor opcode pointer stability",
     Location loc("test.asm", 20);
     Section section("CODE");
 
-    Opcode* opcode1 = section.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode1 = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     Symbol label1("label1", loc, opcode1, 0);
 
     // Add more opcodes
     for (int i = 0; i < 50; ++i) {
-        section.add_opcode(Opcode({ 0x00 }, loc));
+        section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x00 }, loc));
     }
 
-    Opcode* opcode2 = section.add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    Opcode* opcode2 = section.add_opcode(Opcode(&section, std::vector<uint8_t> { 0x3E, 0x42 }, loc));
     Symbol label2("label2", loc, opcode2, 51);
 
     // Verify pointers are still valid
@@ -1382,13 +1426,14 @@ TEST_CASE("Patch: resolve ByteUnsigned in range", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x42), loc);
-    Patch patch(0, PatchRange::ByteUnsigned, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
+    Patch patch(&opcode, 0, PatchRange::ByteUnsigned, expr);
+    REQUIRE(patch.resolve());
 
-    REQUIRE(bytes[0] == 0x42);
-    REQUIRE(bytes[1] == 0x00);
+    REQUIRE(opcode.bytes()[0] == 0x42);
+    REQUIRE(opcode.bytes()[1] == 0x00);
     REQUIRE_FALSE(g_errors.has_errors());
     REQUIRE_FALSE(g_errors.has_warnings());
 }
@@ -1398,12 +1443,13 @@ TEST_CASE("Patch: resolve ByteUnsigned out of range warns", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x1234), loc);
-    Patch patch(0, PatchRange::ByteUnsigned, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
+    Patch patch(&opcode, 0, PatchRange::ByteUnsigned, expr);
+    REQUIRE(patch.resolve());
 
-    REQUIRE(bytes[0] == 0x34);  // Truncated
+    REQUIRE(opcode.bytes()[0] == 0x34);  // Truncated
     REQUIRE(g_errors.has_warnings());
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -1414,14 +1460,14 @@ TEST_CASE("Patch: resolve ByteUnsigned negative value warns",
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(-1), loc);
-    Patch patch(0, PatchRange::ByteUnsigned, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
+    Patch patch(&opcode, 0, PatchRange::ByteUnsigned, expr);
+    REQUIRE(patch.resolve());
 
-    REQUIRE(bytes[0] == 0xFF);  // -1 as unsigned byte
-    REQUIRE_FALSE(
-        g_errors.has_warnings());  // -1 is in range for unsigned byte (treated as 255)
+    REQUIRE(opcode.bytes()[0] == 0xFF);  // -1 as unsigned byte
+    REQUIRE_FALSE(g_errors.has_warnings());  // -1 is in range for unsigned byte (treated as 255)
 }
 
 TEST_CASE("Patch: resolve ByteSigned in range", "[model][patch]") {
@@ -1430,21 +1476,23 @@ TEST_CASE("Patch: resolve ByteSigned in range", "[model][patch]") {
 
     {
         Expression expr(make_integer(127), loc);
-        Patch patch(0, PatchRange::ByteSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 127);
+        Patch patch(&opcode, 0, PatchRange::ByteSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 127);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 
     {
         Expression expr(make_integer(-128), loc);
-        Patch patch(0, PatchRange::ByteSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x80);
+        Patch patch(&opcode, 0, PatchRange::ByteSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x80);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 }
@@ -1455,11 +1503,12 @@ TEST_CASE("Patch: resolve ByteSigned out of range warns", "[model][patch]") {
 
     {
         Expression expr(make_integer(128), loc);
-        Patch patch(0, PatchRange::ByteSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x80);
+        Patch patch(&opcode, 0, PatchRange::ByteSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x80);
         REQUIRE(g_errors.has_warnings());
     }
 
@@ -1467,11 +1516,12 @@ TEST_CASE("Patch: resolve ByteSigned out of range warns", "[model][patch]") {
 
     {
         Expression expr(make_integer(-129), loc);
-        Patch patch(0, PatchRange::ByteSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x7F);  // Truncated
+        Patch patch(&opcode, 0, PatchRange::ByteSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x7F);  // Truncated
         REQUIRE(g_errors.has_warnings());
     }
 }
@@ -1482,21 +1532,23 @@ TEST_CASE("Patch: resolve HighOffset in range", "[model][patch]") {
 
     {
         Expression expr(make_integer(0x00), loc);
-        Patch patch(0, PatchRange::HighOffset, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0xFF }, loc);
 
-        std::vector<uint8_t> bytes = { 0xFF };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x00);
+        Patch patch(&opcode, 0, PatchRange::HighOffset, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x00);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 
     {
         Expression expr(make_integer(-1), loc);  // 0xFFFF
-        Patch patch(0, PatchRange::HighOffset, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0xFF);
+        Patch patch(&opcode, 0, PatchRange::HighOffset, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0xFF);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 }
@@ -1506,11 +1558,12 @@ TEST_CASE("Patch: resolve HighOffset out of range warns", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x0100), loc);
-    Patch patch(0, PatchRange::HighOffset, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-    REQUIRE(bytes[0] == 0x00);  // Low byte
+    Patch patch(&opcode, 0, PatchRange::HighOffset, expr);
+    REQUIRE(patch.resolve());
+    REQUIRE(opcode.bytes()[0] == 0x00);  // Low byte
     REQUIRE(g_errors.has_warnings());
 }
 
@@ -1520,12 +1573,13 @@ TEST_CASE("Patch: resolve ByteToWordUnsigned", "[model][patch]") {
 
     {
         Expression expr(make_integer(0x42), loc);
-        Patch patch(0, PatchRange::ByteToWordUnsigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0xFF, 0xFF }, loc);
 
-        std::vector<uint8_t> bytes = { 0xFF, 0xFF };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x42);
-        REQUIRE(bytes[1] == 0x00);
+        Patch patch(&opcode, 0, PatchRange::ByteToWordUnsigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x42);
+        REQUIRE(opcode.bytes()[1] == 0x00);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 
@@ -1533,12 +1587,13 @@ TEST_CASE("Patch: resolve ByteToWordUnsigned", "[model][patch]") {
 
     {
         Expression expr(make_integer(0x100), loc);
-        Patch patch(0, PatchRange::ByteToWordUnsigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00, 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x00);
-        REQUIRE(bytes[1] == 0x00);
+        Patch patch(&opcode, 0, PatchRange::ByteToWordUnsigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x00);
+        REQUIRE(opcode.bytes()[1] == 0x00);
         REQUIRE(g_errors.has_warnings());
     }
 }
@@ -1549,12 +1604,13 @@ TEST_CASE("Patch: resolve ByteToWordSigned", "[model][patch]") {
 
     {
         Expression expr(make_integer(127), loc);
-        Patch patch(0, PatchRange::ByteToWordSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0xFF }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00, 0xFF };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 127);
-        REQUIRE(bytes[1] == 0x00);
+        Patch patch(&opcode, 0, PatchRange::ByteToWordSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 127);
+        REQUIRE(opcode.bytes()[1] == 0x00);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 
@@ -1562,12 +1618,13 @@ TEST_CASE("Patch: resolve ByteToWordSigned", "[model][patch]") {
 
     {
         Expression expr(make_integer(-1), loc);
-        Patch patch(0, PatchRange::ByteToWordSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00, 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0xFF);
-        REQUIRE(bytes[1] == 0xFF);
+        Patch patch(&opcode, 0, PatchRange::ByteToWordSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0xFF);
+        REQUIRE(opcode.bytes()[1] == 0xFF);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 
@@ -1575,12 +1632,13 @@ TEST_CASE("Patch: resolve ByteToWordSigned", "[model][patch]") {
 
     {
         Expression expr(make_integer(-128), loc);
-        Patch patch(0, PatchRange::ByteToWordSigned, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00, 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0x80);
-        REQUIRE(bytes[1] == 0xFF);
+        Patch patch(&opcode, 0, PatchRange::ByteToWordSigned, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0x80);
+        REQUIRE(opcode.bytes()[1] == 0xFF);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 }
@@ -1590,13 +1648,14 @@ TEST_CASE("Patch: resolve ByteToPtr24Unsigned", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x42), loc);
-    Patch patch(0, PatchRange::ByteToPtr24Unsigned, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0xFF, 0xFF, 0xFF }, loc);
 
-    std::vector<uint8_t> bytes = { 0xFF, 0xFF, 0xFF };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-    REQUIRE(bytes[0] == 0x42);
-    REQUIRE(bytes[1] == 0x00);
-    REQUIRE(bytes[2] == 0x00);
+    Patch patch(&opcode, 0, PatchRange::ByteToPtr24Unsigned, expr);
+    REQUIRE(patch.resolve());
+    REQUIRE(opcode.bytes()[0] == 0x42);
+    REQUIRE(opcode.bytes()[1] == 0x00);
+    REQUIRE(opcode.bytes()[2] == 0x00);
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
@@ -1606,13 +1665,14 @@ TEST_CASE("Patch: resolve ByteToPtr24Signed", "[model][patch]") {
 
     {
         Expression expr(make_integer(127), loc);
-        Patch patch(0, PatchRange::ByteToPtr24Signed, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00, 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 127);
-        REQUIRE(bytes[1] == 0x00);
-        REQUIRE(bytes[2] == 0x00);
+        Patch patch(&opcode, 0, PatchRange::ByteToPtr24Signed, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 127);
+        REQUIRE(opcode.bytes()[1] == 0x00);
+        REQUIRE(opcode.bytes()[2] == 0x00);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 
@@ -1620,13 +1680,14 @@ TEST_CASE("Patch: resolve ByteToPtr24Signed", "[model][patch]") {
 
     {
         Expression expr(make_integer(-1), loc);
-        Patch patch(0, PatchRange::ByteToPtr24Signed, expr);
+        Section section("CODE");
+        Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00, 0x00 }, loc);
 
-        std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
-        REQUIRE(patch.resolve(bytes, 0, 0));
-        REQUIRE(bytes[0] == 0xFF);
-        REQUIRE(bytes[1] == 0xFF);
-        REQUIRE(bytes[2] == 0xFF);
+        Patch patch(&opcode, 0, PatchRange::ByteToPtr24Signed, expr);
+        REQUIRE(patch.resolve());
+        REQUIRE(opcode.bytes()[0] == 0xFF);
+        REQUIRE(opcode.bytes()[1] == 0xFF);
+        REQUIRE(opcode.bytes()[2] == 0xFF);
         REQUIRE_FALSE(g_errors.has_warnings());
     }
 }
@@ -1636,13 +1697,14 @@ TEST_CASE("Patch: resolve Ptr24", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x123456), loc);
-    Patch patch(0, PatchRange::Ptr24, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-    REQUIRE(bytes[0] == 0x56);
-    REQUIRE(bytes[1] == 0x34);
-    REQUIRE(bytes[2] == 0x12);
+    Patch patch(&opcode, 0, PatchRange::Ptr24, expr);
+    REQUIRE(patch.resolve());
+    REQUIRE(opcode.bytes()[0] == 0x56);
+    REQUIRE(opcode.bytes()[1] == 0x34);
+    REQUIRE(opcode.bytes()[2] == 0x12);
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
@@ -1651,12 +1713,13 @@ TEST_CASE("Patch: resolve Word little-endian", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x1234), loc);
-    Patch patch(0, PatchRange::Word, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-    REQUIRE(bytes[0] == 0x34);
-    REQUIRE(bytes[1] == 0x12);
+    Patch patch(&opcode, 0, PatchRange::Word, expr);
+    REQUIRE(patch.resolve());
+    REQUIRE(opcode.bytes()[0] == 0x34);
+    REQUIRE(opcode.bytes()[1] == 0x12);
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
@@ -1665,12 +1728,13 @@ TEST_CASE("Patch: resolve WordBigEndian", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x1234), loc);
-    Patch patch(0, PatchRange::WordBigEndian, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-    REQUIRE(bytes[0] == 0x12);
-    REQUIRE(bytes[1] == 0x34);
+    Patch patch(&opcode, 0, PatchRange::WordBigEndian, expr);
+    REQUIRE(patch.resolve());
+    REQUIRE(opcode.bytes()[0] == 0x12);
+    REQUIRE(opcode.bytes()[1] == 0x34);
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
@@ -1679,179 +1743,28 @@ TEST_CASE("Patch: resolve Dword little-endian", "[model][patch]") {
     Location loc("test.asm", 10);
 
     Expression expr(make_integer(0x12345678), loc);
-    Patch patch(0, PatchRange::Dword, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00, 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-    REQUIRE(bytes[0] == 0x78);
-    REQUIRE(bytes[1] == 0x56);
-    REQUIRE(bytes[2] == 0x34);
-    REQUIRE(bytes[3] == 0x12);
+    Patch patch(&opcode, 0, PatchRange::Dword, expr);
+    REQUIRE(patch.resolve());
+    REQUIRE(opcode.bytes()[0] == 0x78);
+    REQUIRE(opcode.bytes()[1] == 0x56);
+    REQUIRE(opcode.bytes()[2] == 0x34);
+    REQUIRE(opcode.bytes()[3] == 0x12);
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
-TEST_CASE("Patch: resolve JrOffset in range", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
+TEST_CASE("Patch: resolve JR offset range", "[model][patch]") {
+    Location loc("test.asm", 20);
+    Expression expr(make_integer(10), loc);
+    Section section("CODE");
+    Opcode opcode(&section, loc);
+    Patch patch(&opcode, 1, PatchRange::JrOffset, expr);
 
-    // JR forward: target = 0x8020, current = 0x8000, opcode_size = 2
-    // offset = 0x8020 - (0x8000 + 2) = 30
-    Expression expr(make_integer(0x8020), loc);
-    Patch patch(1, PatchRange::JrOffset, expr);
+    REQUIRE(patch.range() == PatchRange::JrOffset);
 
-    std::vector<uint8_t> bytes = { 0x18, 0x00 };  // JR offset
-    REQUIRE(patch.resolve(bytes, 0x8000, 2));
-    REQUIRE(bytes[0] == 0x18);
-    REQUIRE(bytes[1] == 30);
-    REQUIRE_FALSE(g_errors.has_warnings());
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
-TEST_CASE("Patch: resolve JrOffset backward", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    // JR backward: target = 0x8000, current = 0x8020, opcode_size = 2
-    // offset = 0x8000 - (0x8020 + 2) = -34
-    Expression expr(make_integer(0x8000), loc);
-    Patch patch(1, PatchRange::JrOffset, expr);
-
-    std::vector<uint8_t> bytes = { 0x18, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0x8020, 2));
-    REQUIRE(bytes[0] == 0x18);
-    REQUIRE(bytes[1] == static_cast<uint8_t>(-34));
-    REQUIRE_FALSE(g_errors.has_warnings());
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
-TEST_CASE("Patch: resolve JrOffset out of range errors", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    // JR too far forward: offset = 200 (out of range)
-    Expression expr(make_integer(0x8100), loc);
-    Patch patch(1, PatchRange::JrOffset, expr);
-
-    std::vector<uint8_t> bytes = { 0x18, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0x8000, 2));
-    REQUIRE(g_errors.has_errors());  // Error, not warning
-}
-
-TEST_CASE("Patch: resolve JreOffset (extended) in range", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    // JRE forward: target = 0x9000, current = 0x8000, opcode_size = 3
-    // offset = 0x9000 - (0x8000 + 3) = 4093
-    Expression expr(make_integer(0x9000), loc);
-    Patch patch(1, PatchRange::JreOffset, expr);
-
-    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0x8000, 3));
-    REQUIRE(bytes[1] == static_cast<uint8_t>(4093 & 0xFF));
-    REQUIRE(bytes[2] == static_cast<uint8_t>(4093 >> 8));
-    REQUIRE_FALSE(g_errors.has_warnings());
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
-TEST_CASE("Patch: resolve JreOffset backward", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    // JRE backward: target = 0x8000, current = 0x9000, opcode_size = 3
-    // offset = 0x8000 - (0x9000 + 3) = -4099
-    Expression expr(make_integer(0x8000), loc);
-    Patch patch(1, PatchRange::JreOffset, expr);
-
-    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0x9000, 3));
-
-    int16_t expected = -4099;
-    REQUIRE(bytes[1] == static_cast<uint8_t>(expected & 0xFF));
-    REQUIRE(bytes[2] == static_cast<uint8_t>((expected >> 8) & 0xFF));
-    REQUIRE_FALSE(g_errors.has_warnings());
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
-TEST_CASE("Patch: resolve JreOffset out of range errors", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    // JRE too far: offset = 40000 (out of range for signed 16-bit)
-    Expression expr(make_integer(0x18000), loc);
-    Patch patch(1, PatchRange::JreOffset, expr);
-
-    std::vector<uint8_t> bytes = { 0x00, 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0x8000, 3));
-    REQUIRE(g_errors.has_errors());
-}
-
-TEST_CASE("Patch: resolve with offset into byte vector", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    Expression expr(make_integer(0x1234), loc);
-    Patch patch(2, PatchRange::Word, expr);  // offset = 2
-
-    std::vector<uint8_t> bytes = { 0x00, 0x00, 0xFF, 0xFF };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-
-    REQUIRE(bytes[0] == 0x00);  // Unchanged
-    REQUIRE(bytes[1] == 0x00);  // Unchanged
-    REQUIRE(bytes[2] == 0x34);  // Patched
-    REQUIRE(bytes[3] == 0x12);  // Patched
-    REQUIRE_FALSE(g_errors.has_warnings());
-}
-
-TEST_CASE("Patch: resolve Assignment does nothing", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    Expression expr(make_integer(0x1234), loc);
-    Patch patch(0, PatchRange::Assignment, expr);
-
-    std::vector<uint8_t> bytes = { 0xFF, 0xFF };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-
-    REQUIRE(bytes[0] == 0xFF);  // Unchanged
-    REQUIRE(bytes[1] == 0xFF);  // Unchanged
-    REQUIRE_FALSE(g_errors.has_warnings());
-    REQUIRE_FALSE(g_errors.has_errors());
-}
-
-TEST_CASE("Patch: resolve bounds checking", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-
-    Expression expr(make_integer(0x1234), loc);
-    Patch patch(10, PatchRange::Word, expr);  // offset beyond vector size
-
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
-
-    // Bytes unchanged - patch was out of bounds
-    REQUIRE(bytes[0] == 0x00);
-    REQUIRE(bytes[1] == 0x00);
-    REQUIRE_FALSE(g_errors.has_warnings());
-}
-
-TEST_CASE("Patch: resolve with expression evaluation error", "[model][patch]") {
-    SuppressErrors suppress;
-    Location loc("test.asm", 10);
-    Module module("TEST", loc);
-
-    // Create undefined symbol
-    Symbol* undef = module.add_symbol("undefined", loc);
-
-    Expression expr(make_symbol(undef), loc);
-    Patch patch(0, PatchRange::Word, expr);
-
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE_FALSE(patch.resolve(bytes, 0, 0));  // Should fail
-
-    // Bytes unchanged
-    REQUIRE(bytes[0] == 0x00);
-    REQUIRE(bytes[1] == 0x00);
+    REQUIRE(patch.expression().evaluate() == 10);
 }
 
 //-----------------------------------------------------------------------------
@@ -1875,13 +1788,14 @@ TEST_CASE("Integration: patch with computed value",
                         make_symbol(module.find_symbol("OFFSET"))
                     ), loc);
 
-    Patch patch(0, PatchRange::Word, expr);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t> { 0x00, 0x00 }, loc);
 
-    std::vector<uint8_t> bytes = { 0x00, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0, 0));
+    Patch patch(&opcode, 0, PatchRange::Word, expr);
+    REQUIRE(patch.resolve());
 
-    REQUIRE(bytes[0] == 0x00);
-    REQUIRE(bytes[1] == 0x81);  // 0x8100 little-endian
+    REQUIRE(opcode.bytes()[0] == 0x00);
+    REQUIRE(opcode.bytes()[1] == 0x81);  // 0x8100 little-endian
     REQUIRE_FALSE(g_errors.has_warnings());
 }
 
@@ -1890,52 +1804,53 @@ TEST_CASE("Integration: patch all range types in sequence",
     SuppressErrors suppress;
     Location loc("test.asm", 10);
 
-    std::vector<uint8_t> bytes(20, 0x00);
+    Section section("CODE");
+    Opcode opcode(&section, std::vector<uint8_t>(20, 0x00), loc);
     int offset = 0;
 
     // ByteUnsigned
     {
         Expression expr(make_integer(0x42), loc);
-        Patch patch(offset, PatchRange::ByteUnsigned, expr);
-        REQUIRE(patch.resolve(bytes, 0, 0));
+        Patch patch(&opcode, offset, PatchRange::ByteUnsigned, expr);
+        REQUIRE(patch.resolve());
         offset += 1;
     }
 
     // Word
     {
         Expression expr(make_integer(0x1234), loc);
-        Patch patch(offset, PatchRange::Word, expr);
-        REQUIRE(patch.resolve(bytes, 0, 0));
+        Patch patch(&opcode, offset, PatchRange::Word, expr);
+        REQUIRE(patch.resolve());
         offset += 2;
     }
 
     // Ptr24
     {
         Expression expr(make_integer(0x567890), loc);
-        Patch patch(offset, PatchRange::Ptr24, expr);
-        REQUIRE(patch.resolve(bytes, 0, 0));
+        Patch patch(&opcode, offset, PatchRange::Ptr24, expr);
+        REQUIRE(patch.resolve());
         offset += 3;
     }
 
     // Dword
     {
         Expression expr(make_integer(0x12345678), loc);
-        Patch patch(offset, PatchRange::Dword, expr);
-        REQUIRE(patch.resolve(bytes, 0, 0));
+        Patch patch(&opcode, offset, PatchRange::Dword, expr);
+        REQUIRE(patch.resolve());
         offset += 4;
     }
 
     // Verify all patches
-    REQUIRE(bytes[0] == 0x42);              // ByteUnsigned
-    REQUIRE(bytes[1] == 0x34);              // Word low
-    REQUIRE(bytes[2] == 0x12);              // Word high
-    REQUIRE(bytes[3] == 0x90);              // Ptr24 byte 0
-    REQUIRE(bytes[4] == 0x78);              // Ptr24 byte 1
-    REQUIRE(bytes[5] == 0x56);              // Ptr24 byte 2
-    REQUIRE(bytes[6] == 0x78);              // Dword byte 0
-    REQUIRE(bytes[7] == 0x56);              // Dword byte 1
-    REQUIRE(bytes[8] == 0x34);              // Dword byte 2
-    REQUIRE(bytes[9] == 0x12);              // Dword byte 3
+    REQUIRE(opcode.bytes()[0] == 0x42);              // ByteUnsigned
+    REQUIRE(opcode.bytes()[1] == 0x34);              // Word low
+    REQUIRE(opcode.bytes()[2] == 0x12);              // Word high
+    REQUIRE(opcode.bytes()[3] == 0x90);              // Ptr24 byte 0
+    REQUIRE(opcode.bytes()[4] == 0x78);              // Ptr24 byte 1
+    REQUIRE(opcode.bytes()[5] == 0x56);              // Ptr24 byte 2
+    REQUIRE(opcode.bytes()[6] == 0x78);              // Dword byte 0
+    REQUIRE(opcode.bytes()[7] == 0x56);              // Dword byte 1
+    REQUIRE(opcode.bytes()[8] == 0x34);              // Dword byte 2
+    REQUIRE(opcode.bytes()[9] == 0x12);              // Dword byte 3
 
     REQUIRE_FALSE(g_errors.has_warnings());
     REQUIRE_FALSE(g_errors.has_errors());
@@ -1950,7 +1865,7 @@ TEST_CASE("Integration: patch with relative offset calculation",
     section->set_base_address(0x8000);
 
     // Create label at 0x8000
-    Opcode* target_opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* target_opcode = section->add_opcode(Opcode(section, std::vector<uint8_t> { 0x00 }, loc));
     section->compute_opcodes_addresses();
 
     Symbol* label = module.add_symbol("loop", loc);
@@ -1960,13 +1875,15 @@ TEST_CASE("Integration: patch with relative offset calculation",
 
     // JR to loop from address 0x8020
     Expression expr(make_symbol(label), loc);
-    Patch patch(1, PatchRange::JrOffset, expr);
+    Section dummy("CODE");
+    Opcode opcode(&dummy, std::vector<uint8_t> { 0x18, 0x00 }, loc);
+    opcode.set_address(0x8020);
 
-    std::vector<uint8_t> bytes = { 0x18, 0x00 };
-    REQUIRE(patch.resolve(bytes, 0x8020, 2));
+    Patch patch(&opcode, 1, PatchRange::JrOffset, expr);
+    REQUIRE(patch.resolve());
 
     // offset = 0x8000 - (0x8020 + 2) = -34 = 0xDE
-    REQUIRE(bytes[1] == 0xDE);
+    REQUIRE(opcode.bytes()[1] == 0xDE);
     REQUIRE_FALSE(g_errors.has_warnings());
     REQUIRE_FALSE(g_errors.has_errors());
 }

@@ -33,13 +33,18 @@ enum class PatchRange {
     ByteToPtr24Signed       // 8-bit signed sign-extended to 24 bits
 };
 
+class Opcode; // forward
+
 //-----------------------------------------------------------------------------
 // Patch - represents a value to be patched into an opcode at link time
 //-----------------------------------------------------------------------------
 class Patch {
 public:
-    Patch() = default;
-    Patch(int offset, PatchRange range, const Expression& expr);
+    Patch(Opcode* parent = nullptr);
+    Patch(Opcode* parent, int offset, PatchRange range, const Expression& expr);
+
+    Opcode* parent() const;
+    void set_parent(Opcode* parent);
 
     int offset() const;
     void set_offset(int offset);
@@ -52,54 +57,50 @@ public:
 
     const Location& location() const;
 
-    // Resolve patch: evaluate expression and patch bytes
-    bool resolve(std::vector<uint8_t>& bytes, int asmpc, int opcode_size);
+    bool resolve();
 
 private:
-    // Helper: evaluate expression and return value
-    int evaluate_expression(int asmpc, int opcode_size);
-
-    // Helper: patch bytes with value according to range
+    int evaluate_expression();
     void patch_bytes(std::vector<uint8_t>& bytes, int value);
 
+    Opcode* parent_ = nullptr;
     int offset_ = 0;
     PatchRange range_ = PatchRange::Undefined;
     Expression expression_;
 };
 
-//-----------------------------------------------------------------------------
-// Opcode - represents a single assembled instruction or data
-//-----------------------------------------------------------------------------
+class Section; // forward
+
 class Opcode {
 public:
-    // All constructors require a location (as last parameter)
-    explicit Opcode(const Location& location);
-    Opcode(const std::vector<uint8_t>& bytes, const Location& location);
-    Opcode(int address, const std::vector<uint8_t>& bytes,
-           const Location& location);
+    explicit Opcode(Section* parent, const Location& location);
+    Opcode(Section* parent, const std::vector<uint8_t>& bytes, const Location& location);
+    Opcode(Section* parent, int address, const std::vector<uint8_t>& bytes, const Location& location);
+    std::unique_ptr<Opcode> clone(Section* new_parent) const;
 
-    // Address (initialized to 0, computed at link time)
+    Section* parent() const;
+    void set_parent(Section* parent);                 // NEW
+
     int address() const;
     void set_address(int address);
 
-    // Opcode bytes
     const std::vector<uint8_t>& bytes() const;
     std::vector<uint8_t>& bytes();
     void set_bytes(const std::vector<uint8_t>& bytes);
 
-    // Opcode size
     size_t size() const;
 
-    // Byte manipulation
     void clear_bytes();
     void add_byte(uint8_t byte);
-    // Add 1-4 bytes from value (first non-zero byte and all lower)
     void add_bytes(unsigned int value);
 
-    // Patches to apply
     const std::vector<Patch>& patches() const;
     void add_patch(const Patch& patch);
     void clear_patches();
+
+    // Resolve all patches for this opcode
+    // Patches will modify this opcode's bytes in place
+    bool resolve();
 
     // Check if opcode has patches
     bool has_patches() const;
@@ -108,11 +109,11 @@ public:
     const Location& location() const;
 
 private:
-    // Address in section (computed at link time)
-    int address_ = 0;
-    std::vector<uint8_t> bytes_;        // Opcode bytes
-    std::vector<Patch> patches_;        // Patches to apply
-    Location location_;                 // Source location (immutable)
+    Section* parent_ = nullptr;          // Non-owning reference to parent section
+    int address_ = 0;                    // Address in section (computed at link time)
+    std::vector<uint8_t> bytes_;         // Opcode bytes
+    std::vector<Patch> patches_;         // Patches to apply
+    Location location_;                  // Source location (immutable)
 };
 
 //-----------------------------------------------------------------------------
@@ -120,8 +121,7 @@ private:
 //-----------------------------------------------------------------------------
 class Section {
 public:
-    Section() = default;
-    explicit Section(const std::string& name);
+    explicit Section(const std::string& name = "");
 
     // Section identification
     const std::string& name() const;
@@ -157,12 +157,9 @@ private:
     static int align_address(int addr, int alignment);
 
     std::string name_;
-    int alignment_ =
-        1;                                 // Alignment requirement (1 = no constraint)
-    int base_address_ =
-        0;                              // Base address of section (aligned)
-    std::vector<std::unique_ptr<Opcode>>
-                                      opcodes_;     // Opcodes in this section (heap-allocated for pointer stability)
+    int alignment_ = 1;                   // Alignment requirement (1 = no constraint)
+    int base_address_ = 0;                // Base address of section (aligned)
+    std::vector<std::unique_ptr<Opcode>> opcodes_; // Opcodes in this section
 };
 
 

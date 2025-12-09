@@ -254,7 +254,7 @@ TEST_CASE("Integration: library with code modules",
 
     // Add public function
     loc.set_line_num(10);
-    Opcode* func_opcode = code->add_opcode(Opcode({ 0xC9 }, loc));  // RET
+    Opcode* func_opcode = code->add_opcode(Opcode(module->current_section(), { 0xC9 }, loc));  // RET
     Symbol* func = module->add_symbol("add", loc);
     func->set_type(SymbolType::AddressRelative);
     func->set_opcode(func_opcode);
@@ -290,7 +290,7 @@ TEST_CASE("Integration: library linking scenario",
     lib_code->set_base_address(0xC000);
 
     loc.set_line_num(10);
-    Opcode* print_opcode = lib_code->add_opcode(Opcode({ 0xC9 }, loc));
+    Opcode* print_opcode = lib_code->add_opcode(Opcode(lib_code, { 0xC9 }, loc));
     Symbol* print_func = lib_module->add_symbol("print", loc);
     print_func->set_type(SymbolType::AddressRelative);
     print_func->set_opcode(print_opcode);
@@ -312,9 +312,9 @@ TEST_CASE("Integration: library linking scenario",
 
     // Add CALL instruction with patch
     loc.set_line_num(21);
-    Opcode* call_opcode = main_code->add_opcode(Opcode({ 0xCD, 0x00, 0x00 }, loc));
+    Opcode* call_opcode = main_code->add_opcode(Opcode(main_code, { 0xCD, 0x00, 0x00 }, loc));
     Expression call_target(make_symbol(print_ref), loc);
-    Patch call_patch(1, PatchRange::Word, call_target);
+    Patch call_patch(call_opcode, 1, PatchRange::Word, call_target);
     call_opcode->add_patch(call_patch);
 
     // Link step: resolve external reference
