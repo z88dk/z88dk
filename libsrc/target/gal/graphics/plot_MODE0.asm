@@ -14,6 +14,14 @@ plot_MODE0:
 
     LD      D, H       ; X (C passes it in L)
     LD      E, L       ; Y (C passes it in H)
-    LD      A, 0x80
-    JP      fastdot_MODE0
+    call    fastdot_MODE0
+    bit     7,(hl)
+    jr      nz,noset
+    ld      (hl),0x80
+noset:
+    OR      (HL)
+    or      0x80        ;force graphics
+    LD      (HL),A
+    EXX
+    RET
 

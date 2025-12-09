@@ -13,5 +13,15 @@ res_MODE0:
     ret     nc
     LD      D, H
     LD      E, L
-    LD      A, 1
-    JP      fastdot_MODE0
+    call    fastdot_MODE0
+    cpl
+    bit     7,(hl)
+    jr      nz,noset
+    ld      (hl),0x80
+noset:
+    and     (HL)
+    LD      (HL),A
+    EXX
+    RET
+
+

@@ -12,8 +12,6 @@ fastdot_MODE0:
     PUSH DE
     EXX
     POP DE
-    OR A
-    PUSH AF
     LD C,D
     PUSH BC
     LD BC,0x20
@@ -44,33 +42,4 @@ parni:
     LD H,0
     POP BC
     ADD HL,BC
-    LD B,A
-    POP AF
-    LD A,B
-    JR NZ,sres
-    BIT 7,(HL)
-    JR Z,exret
-    AND (HL)
-exret:
-    EXX
-    RET
-
-sres:
-    PUSH AF
-    BIT 7,(HL)
-    JR NZ,sr
-    LD (HL),0x80
-sr:
-    POP AF
-    JP M,setxy
-    CPL
-    AND (HL)
-    LD (HL),A
-    EXX
-    RET
-
-setxy:
-    OR (HL)
-    LD (HL),A
-    EXX
-    RET
+    ret

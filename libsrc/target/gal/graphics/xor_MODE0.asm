@@ -13,11 +13,13 @@ xor_MODE0:
     ret     nc
     LD      D, H       ; X (in L)
     LD      E, L       ; Y (in H)
-    push    de
-    XOR     A         ; mode 0 for ifdot
     CALL    fastdot_MODE0
-    pop     de
-    ld      a,0x80        ;plot
-    jp      z,fastdot_MODE0
-    ld      a,1           ;unplot
-    jp      fastdot_MODE0
+    bit     7,(hl)
+    jr      nz,noset
+    ld      (hl),0x80
+noset:
+    xor      (HL)
+    or      0x80        ;force graphics
+    LD      (HL),A
+    EXX
+    RET
