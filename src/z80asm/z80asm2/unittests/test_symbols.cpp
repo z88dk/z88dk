@@ -45,7 +45,7 @@ TEST_CASE("Symbol: evaluate address-relative symbol",
     Section sec("CODE");
     sec.set_base_address(0x8000);
 
-    Opcode* opcode = sec.add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = sec.add_opcode(Opcode(&sec, { 0x00 }, loc));
     sec.compute_opcodes_addresses();
 
     Symbol sym("start", loc);
@@ -63,7 +63,7 @@ TEST_CASE("Symbol: evaluate address-relative symbol with offset",
     Section sec("CODE");
     sec.set_base_address(0x8000);
 
-    Opcode* opcode = sec.add_opcode(Opcode({ 0x00, 0x00, 0x00 }, loc));
+    Opcode* opcode = sec.add_opcode(Opcode(&sec, { 0x00, 0x00, 0x00 }, loc));
     sec.compute_opcodes_addresses();
 
     Symbol sym("label", loc);

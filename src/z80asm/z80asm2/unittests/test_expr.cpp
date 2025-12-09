@@ -521,9 +521,9 @@ TEST_CASE("Expression: parse $ (dollar) resolves to current opcode",
     section->set_base_address(0x8000);
 
     // Add some opcodes
-    section->add_opcode(Opcode({ 0x00 }, loc));          // 0x8000
-    section->add_opcode(Opcode({ 0x3E, 0x42 }, loc));    // 0x8001
-    section->add_opcode(Opcode({ 0x00 }, loc));          // 0x8003
+    section->add_opcode(Opcode(section, { 0x00 }, loc));          // 0x8000
+    section->add_opcode(Opcode(section, { 0x3E, 0x42 }, loc));    // 0x8001
+    section->add_opcode(Opcode(section, { 0x00 }, loc));          // 0x8003
 
     // Parse expression with $
     TokenLine line(loc);
@@ -545,7 +545,7 @@ TEST_CASE("Expression: parse ASMPC resolves to current opcode",
     Section* section = module.current_section();
     section->set_base_address(0x9000);
 
-    section->add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc));  // 0x9000
+    section->add_opcode(Opcode(section, { 0xC3, 0x00, 0x00 }, loc));  // 0x9000
 
     // Parse expression with ASMPC
     TokenLine line(loc);
@@ -587,9 +587,9 @@ TEST_CASE("Expression: parse $ with offset", "[model][expr][parse]") {
     Section* section = module.current_section();
     section->set_base_address(0x8000);
 
-    section->add_opcode(Opcode({ 0x00 }, loc));
-    section->add_opcode(Opcode({ 0x00 }, loc));
-    section->add_opcode(Opcode({ 0x18, 0x00 }, loc));  // JR at 0x8002
+    section->add_opcode(Opcode(section, { 0x00 }, loc));
+    section->add_opcode(Opcode(section, { 0x00 }, loc));
+    section->add_opcode(Opcode(section, { 0x18, 0x00 }, loc));  // JR at 0x8002
 
     // Parse: $ + 2 (for JR offset calculation)
     TokenLine line(loc);
@@ -611,8 +611,8 @@ TEST_CASE("Expression: parse address-relative symbol", "[model][expr][parse]") {
     section->set_base_address(0x8000);
 
     // Add opcodes and create label
-    section->add_opcode(Opcode({ 0x00 }, loc));
-    Opcode* label_opcode = section->add_opcode(Opcode({ 0x3E, 0x42 }, loc));
+    section->add_opcode(Opcode(section, { 0x00 }, loc));
+    Opcode* label_opcode = section->add_opcode(Opcode(section, { 0x3E, 0x42 }, loc));
 
     // Create label symbol
     Symbol* label = module.add_symbol("start", loc);
@@ -641,7 +641,7 @@ TEST_CASE("Expression: parse complex expression with symbols and $",
 
     // Setup
     module.add_symbol("target", loc, 0x8100, SymbolType::Constant);
-    section->add_opcode(Opcode({ 0x18, 0x00 }, loc));  // JR at 0x8000
+    section->add_opcode(Opcode(section, { 0x18, 0x00 }, loc));  // JR at 0x8000
 
     // Parse: target - ($ + 2)  (JR offset calculation)
     TokenLine line(loc);
@@ -1172,7 +1172,7 @@ TEST_CASE("Expression: address-relative symbol is not constant",
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    Opcode* opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = section->add_opcode(Opcode(section, { 0x00 }, loc));
     Symbol* sym = module.add_symbol("label", loc);
     sym->set_type(SymbolType::AddressRelative);
     sym->set_opcode(opcode);
@@ -1207,7 +1207,7 @@ TEST_CASE("Expression: computed symbol with non-constant expr is not constant",
     Section* section = module.current_section();
 
     // Create address-relative symbol
-    Opcode* opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = section->add_opcode(Opcode(section, { 0x00 }, loc));
     Symbol* label = module.add_symbol("label", loc);
     label->set_type(SymbolType::AddressRelative);
     label->set_opcode(opcode);
@@ -1232,7 +1232,7 @@ TEST_CASE("Expression: $ (dollar) is not constant", "[model][expr][constant]") {
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    section->add_opcode(Opcode({ 0x00 }, loc));
+    section->add_opcode(Opcode(section, { 0x00 }, loc));
 
     auto node = make_dollar(section->last_opcode(), section);
     REQUIRE_FALSE(node->is_constant());
@@ -1244,7 +1244,7 @@ TEST_CASE("Expression: expression with $ is not constant",
     Module module("TEST", loc);
     Section* section = module.current_section();
 
-    section->add_opcode(Opcode({ 0x00 }, loc));
+    section->add_opcode(Opcode(section, { 0x00 }, loc));
 
     auto node = make_binary_op(
                     ExprOp::Add,
@@ -1262,7 +1262,7 @@ TEST_CASE("Expression: mixed constant and non-constant is not constant",
 
     Symbol* constant = module.add_symbol("MAX", loc, 100, SymbolType::Constant);
 
-    Opcode* opcode = section->add_opcode(Opcode({ 0x00 }, loc));
+    Opcode* opcode = section->add_opcode(Opcode(section, { 0x00 }, loc));
     Symbol* label = module.add_symbol("label", loc);
     label->set_type(SymbolType::AddressRelative);
     label->set_opcode(opcode);
@@ -1309,7 +1309,7 @@ TEST_CASE("Expression: ASMPC participates in arithmetic",
     section->set_base_address(0xA000);
 
     // Add a single opcode so ASMPC resolves to base address
-    section->add_opcode(Opcode({ 0x00 }, loc));  // address 0xA000
+    section->add_opcode(Opcode(section, { 0x00 }, loc));  // address 0xA000
 
     TokenLine line(loc);
     line.tokens().push_back(Token(TokenType::ASMPC, "ASMPC", false));
@@ -1344,8 +1344,8 @@ TEST_CASE("Expression: $ mixed with arithmetic and parentheses",
     section->set_base_address(0x8000);
 
     // opcodes at 0x8000 and 0x8001; last opcode address is 0x8001
-    section->add_opcode(Opcode({ 0x00 }, loc));      // 0x8000
-    section->add_opcode(Opcode({ 0x3E, 0x00 }, loc)); // 0x8001
+    section->add_opcode(Opcode(section, { 0x00 }, loc));      // 0x8000
+    section->add_opcode(Opcode(section, { 0x3E, 0x00 }, loc)); // 0x8001
 
     TokenLine line(loc);
     line.tokens().push_back(Token(TokenType::LeftParen, "(", false));
@@ -1387,8 +1387,8 @@ TEST_CASE("Expression: ASMPC with parentheses and addition then subtraction",
     section->set_base_address(0x9000);
 
     // Add two opcodes; ASMPC resolves to 0x9001 (last opcode)
-    section->add_opcode(Opcode({ 0x00 }, loc));       // 0x9000
-    section->add_opcode(Opcode({ 0xC3, 0x00, 0x00 }, loc)); // 0x9001
+    section->add_opcode(Opcode(section, { 0x00 }, loc));       // 0x9000
+    section->add_opcode(Opcode(section, { 0xC3, 0x00, 0x00 }, loc)); // 0x9001
 
     TokenLine line(loc);
     line.tokens().push_back(Token(TokenType::LeftParen, "(", false));
