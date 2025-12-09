@@ -199,3 +199,18 @@ private:
 
     static std::vector<char> empty_content_;
 };
+
+//-----------------------------------------------------------------------------
+// Dependency file creator
+//-----------------------------------------------------------------------------
+
+class DependencyFile {
+public:
+    DependencyFile() = default;
+    void add_dependency(const std::string& filename);
+    const std::vector<std::string>& dependencies() const;
+    bool write();
+
+private:
+    std::vector<std::string> dependencies_;
+};
