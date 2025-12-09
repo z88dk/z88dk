@@ -33,6 +33,7 @@ target/gal/graphics/xorpixl
 target/gal/graphics/pointxy
 target/gal/graphics/pixladdr
 target/gal/graphics/pixladdr_MODE1
+target/gal/graphics/fastdot_MODE0
 target/gal/graphics/plot_MODE0
 target/gal/graphics/res_MODE0
 target/gal/graphics/xor_MODE0

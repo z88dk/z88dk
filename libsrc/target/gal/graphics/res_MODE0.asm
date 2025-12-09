@@ -2,6 +2,7 @@
     SECTION code_clib
 
     PUBLIC  res_MODE0
+    EXTERN  fastdot_MODE0
 
 res_MODE0:
     ld      a, l
@@ -10,6 +11,7 @@ res_MODE0:
     ld      a, h
     cp      64
     ret     nc
-
-    defc    NEEDunplot=1
-    INCLUDE "classic/gfx/gencon/pixel6.inc"
+    LD      D, H
+    LD      E, L
+    LD      A, 1
+    JP      fastdot_MODE0
