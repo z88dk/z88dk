@@ -6,7 +6,10 @@
 
 #include "errors.h"
 #include "file_cache.h"
+#include "options.h"
 #include "utils.h"
+#include <fstream>
+#include <iostream>
 #include <stdexcept>
 
 //-----------------------------------------------------------------------------
@@ -426,4 +429,60 @@ std::string BinFileReader::read_string_at(size_t pos, size_t length) {
     }
 
     return std::string(content_->begin() + pos, content_->begin() + pos + length);
+}
+
+//-----------------------------------------------------------------------------
+// Dependency file creator
+//-----------------------------------------------------------------------------
+
+void DependencyFile::add_dependency(const std::string& filename) {
+    dependencies_.push_back(filename);
+}
+
+const std::vector<std::string>& DependencyFile::dependencies() const {
+    return dependencies_;
+}
+
+bool DependencyFile::write() {
+    const unsigned LINE_WIDTH = 80;
+
+    if (dependencies_.empty()) {
+        return false;
+    }
+
+    // get main source file
+    std::string target = dependencies_.front();
+
+    // get dependency file name and target file name
+    std::string d_filename = g_options.get_d_filename(target);
+    std::string o_filename = g_options.get_o_filename(target);
+
+    // generate dependency file
+    std::ofstream ofs(d_filename, std::ios::out | std::ios::binary);
+    if (!ofs) {
+        g_errors.error(ErrorCode::FileOpenError, d_filename);
+        return false;
+    }
+
+    if (g_options.verbose) {
+        std::cout << "Generating dependency file: " << d_filename << std::endl;
+    }
+
+    // output file names
+    size_t pos = 0;
+    ofs << o_filename << ":";
+    pos += o_filename.size() + 1;
+
+    for (auto& f : dependencies_) {
+        if (pos + f.size() + 1 + 2 >= LINE_WIDTH) { // +2: account for space-backslash
+            pos = 7;
+            ofs << " \\" << std::endl << std::string(pos, ' ');
+        }
+
+        ofs << " " << f;
+        pos += f.size() + 1;
+    }
+    ofs << std::endl;
+
+    return true;
 }

@@ -2312,3 +2312,84 @@ TEST_CASE("FileCache: invalidate causes file to be re-read", "[file_cache]") {
 
     std::remove(fname.c_str());
 }
+
+//-----------------------------------------------------------------------------
+// FileCache / DependencyFile tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("DependencyFile: write does nothing when empty", "[filecache][dependency]") {
+    SuppressErrors suppress;
+
+    DependencyFile dep;
+    // No dependencies added; call write
+    REQUIRE_FALSE(dep.write());
+}
+
+TEST_CASE("DependencyFile: writes single-line dependency file", "[filecache][dependency]") {
+    SuppressErrors suppress;
+
+    // Prepare dependency file
+    DependencyFile dep;
+    dep.add_dependency("main.asm"); // first is the 'main source file'
+    dep.add_dependency("include1.asm");
+    dep.add_dependency("include2.asm");
+
+    // Generate dependency file
+    REQUIRE(dep.write());
+
+    // Validate output
+    REQUIRE(file_exists("main.d"));
+    std::string text = read_file_to_string("main.d");
+
+    // Expected structure: "<o_filename>: <dep0> <dep1> <dep2>\n"
+    // where dep0 == target (first dependency added)
+    REQUIRE(text.find("main.o: main.asm include1.asm include2.asm") == 0);
+
+    // Single line should end with newline
+    REQUIRE(text.size() > 0);
+    REQUIRE(text.back() == '\n');
+
+    std::remove("main.d");
+}
+
+TEST_CASE("DependencyFile: wraps long lines with backslash and indentation", "[filecache][dependency]") {
+    SuppressErrors suppress;
+
+    DependencyFile dep;
+    dep.add_dependency("wrap.asm");
+
+    // Construct many dependencies to exceed LINE_WIDTH (80)
+    // Each dependency like "depXXXXXXXX.asm" ~ length 15, plus spaces
+    for (int i = 0; i < 20; ++i) {
+        dep.add_dependency("dep" + std::to_string(i) + ".asm");
+    }
+
+    REQUIRE(dep.write());
+
+    // Validate output
+    REQUIRE(file_exists("wrap.d"));
+    std::string text = read_file_to_string("wrap.d");
+
+    // Must contain the header
+    REQUIRE(text.find("wrap.o: wrap.asm dep0.asm dep1.asm dep2.asm") == 0);
+
+    // Check presence of backslash continuation and 8-space indentation after newline
+    // Pattern: " \\\n        " (space, backslash, newline, 8 spaces)
+    REQUIRE(text.find(" \\\n        ") != std::string::npos);
+
+    // Ensure some dependencies appear after wrapping point
+    REQUIRE(text.find(" dep10.asm") != std::string::npos);
+    REQUIRE(text.find(" dep19.asm") != std::string::npos);
+
+    // Ensure all dependencies are present
+    for (int i = 0; i < 20; ++i) {
+        std::string file = "dep" + std::to_string(i) + ".asm";
+        REQUIRE(text.find(" " + file) != std::string::npos);
+    }
+
+    // Ensure the last line ends with newline
+    REQUIRE(text.size() > 0);
+    REQUIRE(text.back() == '\n');
+
+    std::remove("wrap.d");
+}
