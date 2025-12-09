@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -131,19 +131,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\file_cache.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\model.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\catch_amalgamated.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unittests\test_symbols.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\z80asm_testlib\z80asm_testlib.vcxproj">
+      <Project>{eff429d0-6ff3-4e9f-8859-7a25ed20cf5d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
