@@ -15,17 +15,30 @@
 Module::Module(const std::string& name, const Location& location)
     : name_(name), location_(location) {
     // Create the default empty-named section
-    // (Section constructor already adds an empty opcode)
-    sections_.push_back(std::make_unique<Section>(""));
-    current_section_ = sections_.back().get();
+    clear_sections();
+}
+
+void Module::clear() {
+    name_.clear();
+    location_.clear();
+    clear_sections();
+    clear_symbols();
 }
 
 const std::string& Module::name() const {
     return name_;
 }
 
+void Module::set_name(const std::string& name) {
+    name_ = name;
+}
+
 const Location& Module::location() const {
     return location_;
+}
+
+void Module::set_location(const Location& location) {
+    location_ = location;
 }
 
 Section* Module::current_section() {
@@ -97,6 +110,7 @@ bool Module::has_symbol(const std::string& name) const {
 
 void Module::clear_symbols() {
     symbols_.clear();
+    extern_declarations_.clear();
 }
 
 const std::vector<Location>& Module::get_extern_declarations(
@@ -192,35 +206,45 @@ Symbol* Module::add_symbol(const std::string& name, const Location& location) {
 
 Symbol* Module::add_symbol(const std::string& name, const Location& location,
                            int value, SymbolType type) {
-    auto it = symbols_.find(name);
-
-    if (it != symbols_.end()) {
-        // Symbol already exists
-        Symbol& existing = it->second;
-
-        // Error if symbol is already defined
-        if (existing.is_defined()) {
-            g_errors.error(location, ErrorCode::SymbolRedefined, name);
-            return &existing;
-        }
-
-        // Error if trying to define an explicitly EXTERN symbol (not Global)
-        if (existing.scope() == SymbolScope::Extern) {
-            g_errors.error(location, ErrorCode::SymbolRedefined,
-                           name + " (cannot define EXTERN symbol)");
-            return &existing;
-        }
-
-        // Update the symbol with definition
-        existing.set_value(value);
-        existing.set_type(type);
-        existing.set_location(location);
-
-        return &existing;
+    // Delegate common logic to the basic overload
+    Symbol* sym = add_symbol(name, location);
+    if (!sym) {
+        return nullptr;
     }
 
-    // Symbol doesn't exist - create it with definition
-    auto result = symbols_.emplace(name, Symbol(name, location, value, type));
-    return &result.first->second;
+    // If the symbol was already defined or marked EXTERN, the basic overload
+    // has already reported the appropriate error. Do not mutate further.
+    if (sym->is_defined() || sym->scope() == SymbolScope::Extern) {
+        return sym;
+    }
+
+    // Apply definition
+    sym->set_value(value);
+    sym->set_type(type);
+    sym->set_location(location);
+
+    return sym;
 }
 
+Symbol* Module::add_symbol(const std::string& name, const Location& location,
+                           Opcode* opcode, int offset, SymbolType type) {
+    // Delegate common logic to the basic overload
+    Symbol* sym = add_symbol(name, location);
+    if (!sym) {
+        return nullptr;
+    }
+
+    // If the symbol was already defined or marked EXTERN, the basic overload
+    // has already reported the appropriate error. Do not mutate further.
+    if (sym->is_defined() || sym->scope() == SymbolScope::Extern) {
+        return sym;
+    }
+
+    // Apply definition
+    sym->set_opcode(opcode);
+    sym->set_offset(offset);
+    sym->set_type(type);
+    sym->set_location(location);
+
+    return sym;
+}

@@ -865,7 +865,7 @@ TEST_CASE("Macro: expand substitutes parameters with argument tokens", "[model][
 
 TEST_CASE("Macro: expand renames locals to unique <var>_<id> and increments id", "[model][macro][expand]") {
     SuppressErrors suppress;
-    int start_id = g_unique_id_counter;
+    size_t start_id = g_unique_id_counter;
 
     Location macLoc("def.asm", 30);
     Macro macro("M", macLoc);
@@ -1141,7 +1141,7 @@ TEST_CASE("Macro: expand_flat reports error and returns empty when argument mism
 
 TEST_CASE("Macro: expand_flat reflects local renaming with unique suffix", "[model][macro][expand_flat]") {
     SuppressErrors suppress;
-    int start = g_unique_id_counter;
+    size_t start = g_unique_id_counter;
 
     Location macLoc("def.asm", 530);
     Macro macro("M", macLoc);
@@ -1735,7 +1735,7 @@ TEST_CASE("RepeatCountBlock: expand with count>1 repeats entire body", "[model][
 TEST_CASE("RepeatCountBlock: LOCAL variables are uniquified per iteration using global unique_id",
           "[model][repeat][count][locals]") {
     // Capture starting unique id
-    int start_id = g_unique_id_counter;
+    size_t start_id = g_unique_id_counter;
 
     Location defLoc("defs.asm", 1030);
     RepeatCountBlock block(defLoc, 3);
@@ -1878,7 +1878,7 @@ TEST_CASE("RepeatIterateBlock: repeats once per parsed item and substitutes vari
 
 TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration using global unique_id",
           "[model][repeat][iterate][locals]") {
-    int start_id = g_unique_id_counter;
+    size_t start_id = g_unique_id_counter;
 
     Location defLoc("defs.asm", 1210);
     RepeatIterateBlock block(defLoc, "V");

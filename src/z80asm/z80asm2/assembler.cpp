@@ -9,18 +9,23 @@
 #include "errors.h"
 #include "lexer.h"
 #include "parser.h"
-#include "symbol_table.h"
+#include "symbols.h"
 #include <string>
+#include <cassert>
 
-Assembler::Assembler() {
-    // Other component initialization...
+bool Assembler::assemble(const std::string& input_file) {
+    (void)input_file;
+    preprocessor_ = std::make_unique<Preprocessor>();
+    compilation_unit_ = std::make_unique<CompilationUnit>();
+    return false;
 }
 
-void Assembler::assemble(const std::string& /*input*/) {
-    // Stub: to be implemented
+Preprocessor& Assembler::preprocessor() {
+    assert(preprocessor_);
+    return *preprocessor_;
 }
 
-std::vector<uint8_t> Assembler::get_output() const {
-    // Stub: to be implemented
-    return {};
+CompilationUnit& Assembler::compilation_unit() {
+    assert(compilation_unit_);
+    return *compilation_unit_;
 }

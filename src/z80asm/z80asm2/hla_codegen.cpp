@@ -36,12 +36,12 @@ static Token comma_tok() {
 }
 
 // Make a new instruction line
-static TokensLine make_line(const Location& loc,
-                            const std::vector<Token>& toks) {
-    TokensLine line(loc);
-    line.reserve(toks.size());
+static TokenLine make_line(const Location& loc,
+                           const std::vector<Token>& toks) {
+    TokenLine line(loc);
+    line.tokens().reserve(toks.size());
     for (const auto& t : toks) {
-        line.push_back(t);
+        line.tokens().push_back(t);
     }
     return line;
 }
@@ -72,7 +72,7 @@ static void emit_operand_tokens(const Operand& op, std::vector<Token>& out) {
 
 // Ensure A has lhs value (if not already)
 static void emit_load_a(const Operand& lhs, const Location& loc,
-                        std::deque<TokensLine>& out) {
+                        std::deque<TokenLine>& out) {
     if (lhs.kind == Operand::Kind::Reg8 && lhs.reg == Keyword::A) {
         return; // already A
     }
@@ -86,7 +86,7 @@ static void emit_load_a(const Operand& lhs, const Location& loc,
 
 // Emit CP rhs
 static void emit_cp(const Operand& rhs, const Location& loc,
-                    std::deque<TokensLine>& out) {
+                    std::deque<TokenLine>& out) {
     std::vector<Token> toks;
     toks.push_back(kw(Keyword::CP));
     emit_operand_tokens(rhs, toks);
@@ -95,12 +95,12 @@ static void emit_cp(const Operand& rhs, const Location& loc,
 
 // Emit JP <cond>, label
 static void emit_jp_cond(const Location& loc, Keyword cond,
-                         const std::string& label, std::deque<TokensLine>& out) {
-    TokensLine line(loc);
-    line.push_back(kw(Keyword::JP));
-    line.push_back(kw(cond));
-    line.push_back(comma_tok());
-    line.push_back(Token(TokenType::Identifier, label, false)); // label
+                         const std::string& label, std::deque<TokenLine>& out) {
+    TokenLine line(loc);
+    line.tokens().push_back(kw(Keyword::JP));
+    line.tokens().push_back(kw(cond));
+    line.tokens().push_back(comma_tok());
+    line.tokens().push_back(Token(TokenType::Identifier, label, false)); // label
     out.push_back(std::move(line));
 }
 
@@ -157,7 +157,7 @@ static std::vector<Keyword> relop_conditions(RelOp op, bool want_true) {
 static void emit_compare_branch(const Compare& cmp, bool branch_on_true,
                                 const std::string& target_label,
                                 const Location& loc,
-                                std::deque<TokensLine>& out) {
+                                std::deque<TokenLine>& out) {
     emit_load_a(cmp.lhs, loc, out);
     emit_cp(cmp.rhs, loc, out);
     for (Keyword cond : relop_conditions(cmp.op, branch_on_true)) {
@@ -167,16 +167,16 @@ static void emit_compare_branch(const Compare& cmp, bool branch_on_true,
 
 // Public helper to emit a dot label definition.
 void CodeGen::emit_label(const std::string& label, const Location& loc,
-                         std::deque<TokensLine>& out) {
-    TokensLine lbl(loc);
-    lbl.push_back(Token(TokenType::Dot, ".", false));
-    lbl.push_back(Token(TokenType::Identifier, label, false));
+                         std::deque<TokenLine>& out) {
+    TokenLine lbl(loc);
+    lbl.tokens().push_back(Token(TokenType::Dot, ".", false));
+    lbl.tokens().push_back(Token(TokenType::Identifier, label, false));
     out.push_back(std::move(lbl));
 }
 
 void CodeGen::emit_bif(const Expr& e, const std::string& false_label,
                        const Location& loc,
-                       std::deque<TokensLine>& out) {
+                       std::deque<TokenLine>& out) {
     // Recursive lambdas for branch-if-false (gen_false) and branch-if-true (gen_true)
     std::function<void(const Expr&, const std::string&)> gen_false;
     std::function<void(const Expr&, const std::string&)> gen_true;

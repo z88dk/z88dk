@@ -25,18 +25,18 @@ struct Block {
 
 class CodeGen {
 public:
-    explicit CodeGen(unsigned& label_counter) : counter_(label_counter) {}
+    explicit CodeGen(size_t& label_counter) : counter_(label_counter) {}
     // Emit branch-if-false for expr to label
     void emit_bif(const Expr& e, const std::string& false_label,
                   const Location& loc,
-                  std::deque<TokensLine>& out);
+                  std::deque<TokenLine>& out);
 
     // Emit a dot label definition (".<label>") into output
     void emit_label(const std::string& label, const Location& loc,
-                    std::deque<TokensLine>& out);
+                    std::deque<TokenLine>& out);
 
 private:
-    unsigned& counter_;
+    size_t& counter_;
 };
 
 } // namespace hla

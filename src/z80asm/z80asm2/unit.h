@@ -14,12 +14,16 @@
 
 class CompilationUnit {
 public:
-    // Constructor requires name and location
+    CompilationUnit() = default;
     CompilationUnit(const std::string& name, const Location& location);
+    void clear();
 
     // Name and location
     const std::string& name() const;
+    void set_name(const std::string& name);
+
     const Location& location() const;
+    void set_location(const Location& location);
 
     // Module management
     const std::vector<std::unique_ptr<Module>>& modules() const;
