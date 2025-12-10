@@ -41,7 +41,7 @@ _multipoint_callee:
     push    af                          ; ret addr
 asm_multipoint:
     push    ix
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     ld      de, 0
@@ -79,7 +79,7 @@ jh:
     inc     h
     djnz    horizontal
 exit:
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_out
   ENDIF
     pop     ix

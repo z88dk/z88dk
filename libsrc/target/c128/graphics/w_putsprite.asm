@@ -55,7 +55,7 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
         ; @@@@@@@@@@@@

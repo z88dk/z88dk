@@ -23,7 +23,7 @@ _xordrawr_callee:
 
 asm_xordrawr:
     push    ix
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     ld      ix, w_xorpixel

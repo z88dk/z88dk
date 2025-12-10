@@ -53,7 +53,7 @@ __ansichar_4x4:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
 ENDIF
-IFDEF _gfx_vram_page
+IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
 ENDIF
 

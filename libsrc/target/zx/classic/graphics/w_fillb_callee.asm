@@ -56,7 +56,7 @@ IF FORzxn
 ENDIF
 
     push    ix
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     ld      ix, w_plotpixel
@@ -90,7 +90,7 @@ ENDIF
 
 ;;   TS2068 High Resolution and standard mode
     push    ix
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
 

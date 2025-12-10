@@ -24,11 +24,11 @@ _cplot_callee:
 asm_cplot:
     ld      a, c
     ld      (__gfx_color), a
-IFDEF _gfx_vram_page
+IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
 ENDIF
     call    w_cplotpixel
-IFDEF _gfx_vram_page
+IFDEF _GFX_PAGE_VRAM
     jp      __gfx_vram_page_out
 ELSE
     ret

@@ -35,7 +35,7 @@ __generic_stencil_render:
     ld      ix, 4
     add     ix, sp
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     ;ld    bc,__graphics_end

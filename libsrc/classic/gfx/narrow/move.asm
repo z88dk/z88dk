@@ -31,7 +31,7 @@ ___move:
     ld      l, (ix+4)                   ;px
     ld      h, (ix+5)
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
 

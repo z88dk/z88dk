@@ -44,7 +44,7 @@ _xorborder_callee:
 asm_xorborder:
 
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     push    bc
@@ -98,7 +98,7 @@ vrowloop:
     inc     h
     pop     bc
     djnz    vrowloop
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     jp      __gfx_vram_page_out
   ELSE
     ret

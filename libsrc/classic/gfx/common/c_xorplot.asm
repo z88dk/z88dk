@@ -34,7 +34,7 @@ ELSE
     ld      l, (ix+2)
     ld      h, (ix+4)
 ENDIF
-IFDEF _gfx_vram_page
+IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
 ENDIF
     call    c_xorpixel

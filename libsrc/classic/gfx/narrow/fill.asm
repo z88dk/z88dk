@@ -30,7 +30,7 @@ ___fill:
     add     ix, sp
     ld      d, (ix+2)                   ;y
     ld      e, (ix+4)                   ;x
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    do_fill

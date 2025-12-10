@@ -38,7 +38,7 @@ _uncircle_callee:
 asm_uncircle:
     push    ix
     ld      ix, w_respixel
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    w_draw_circle

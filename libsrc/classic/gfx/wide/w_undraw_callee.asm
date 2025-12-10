@@ -32,7 +32,7 @@ asm_undraw:
     push    hl                          ;x1
     push    de                          ;y1
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    w_respixel

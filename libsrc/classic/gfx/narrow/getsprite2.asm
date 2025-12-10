@@ -59,7 +59,7 @@ getsprite_sub:
     dec     h
     ld      c, h                        ; keep copy of X position
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
 

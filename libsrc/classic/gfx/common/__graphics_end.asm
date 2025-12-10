@@ -8,7 +8,7 @@
 
 
 __graphics_end:
-IFDEF _gfx_vram_page
+IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_out
 ENDIF
 IF  !__CPU_INTEL__&!__CPU_GBZ80__

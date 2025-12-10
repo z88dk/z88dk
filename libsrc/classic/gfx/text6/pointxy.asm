@@ -12,6 +12,7 @@
 ;
 
 
+    MODULE  text6_pointxy
     INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
@@ -21,6 +22,8 @@
     EXTERN  div3_0
     EXTERN  __gfx_coords
     EXTERN  base_graphics
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 pointxy:
     ld      a, h
@@ -87,7 +90,13 @@ r_zero:                                 ; hl = char address
     ld      e, c
     add     hl, de
 
+IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
+ENDIF
     ld      a, (hl)                     ; get current symbol from screen
+IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_out
+ENDIF
     ld      e, a                        ; ..and its copy
 
     push    hl                          ; char address

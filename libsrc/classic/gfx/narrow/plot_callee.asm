@@ -23,7 +23,7 @@ _plot_callee:
     push    bc                          ; ret addr
 asm_plot:
     push    ix
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    plotpixel

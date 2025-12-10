@@ -44,7 +44,7 @@ _stencil_add_side:
     ld      e, (ix+8)
     ld      d, (ix+9)
 
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    stencil_add_pixel

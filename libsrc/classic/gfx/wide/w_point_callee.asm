@@ -24,11 +24,11 @@ _point_callee:
 
 asm_point:
     push    ix
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    w_pointxy
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     push    af
     call    __gfx_vram_page_out
     pop     af

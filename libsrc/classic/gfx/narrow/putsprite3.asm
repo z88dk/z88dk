@@ -35,7 +35,7 @@
 putsprite:
 _putsprite:
 ___putsprite:
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     ld      hl, 2

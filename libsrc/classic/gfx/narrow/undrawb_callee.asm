@@ -29,7 +29,7 @@ _undrawb_callee:
 asm_undrawb:
     push    ix
     ld      ix, respixel
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     call    drawbox
