@@ -1032,3 +1032,55 @@ TEST_CASE("get_file_size works with relative and absolute paths",
 
     std::remove(fname.c_str());
 }
+
+TEST_CASE("split_lines handles lines without continuations", "[split_lines][no-continuation]") {
+    const std::string in = "first line\nsecond line\nthird line";
+    auto lines = split_lines(in);
+    REQUIRE(lines.size() == 3);
+    REQUIRE(lines[0] == "first line");
+    REQUIRE(lines[1] == "second line");
+    REQUIRE(lines[2] == "third line");
+}
+
+TEST_CASE("split_lines handles empty input and blank lines", "[split_lines][empty][blank]") {
+    {
+        const std::string in = "";
+        auto lines = split_lines(in);
+        REQUIRE(lines.empty());
+    }
+    {
+        const std::string in = "\n\n";
+        auto lines = split_lines(in);
+        REQUIRE(lines.size() == 2);
+        REQUIRE(lines[0].empty());
+        REQUIRE(lines[1].empty());
+    }
+}
+
+TEST_CASE("split_lines handles mixed line endings", "[split_lines][mixed-endings]") {
+    const std::string in = "line1\r\nline2\nline3\r\nline4";
+    auto lines = split_lines(in);
+    REQUIRE(lines.size() == 4);
+    REQUIRE(lines[0] == "line1");
+    REQUIRE(lines[1] == "line2");
+    REQUIRE(lines[2] == "line3");
+    REQUIRE(lines[3] == "line4");
+}
+
+TEST_CASE("split_lines handles lines ending with carriage return only", "[split_lines][carriage-return]") {
+    const std::string in = "lineA\rlineB\rlineC";
+    auto lines = split_lines(in);
+    REQUIRE(lines.size() == 3);
+    REQUIRE(lines[0] == "lineA");
+    REQUIRE(lines[1] == "lineB");
+    REQUIRE(lines[2] == "lineC");
+}
+
+TEST_CASE("split_lines handles lines with only whitespace", "[split_lines][whitespace-only]") {
+    const std::string in = "   \n\t\n  \t  \n";
+    auto lines = split_lines(in);
+    REQUIRE(lines.size() == 3);
+    REQUIRE(lines[0] == "   ");
+    REQUIRE(lines[1] == "\t");
+    REQUIRE(lines[2] == "  \t  ");
+}

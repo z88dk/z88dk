@@ -297,19 +297,44 @@ TokenCache& TokenFileReader::get_cache() {
     return cache;
 }
 
-TokenFileReader::TokenFileReader(const std::string& filename) {
+TokenFileReader::TokenFileReader(const std::string& filename)
+    : FileReader(filename) {
     open(filename);
 }
 
 bool TokenFileReader::open(const std::string& filename) {
-    // Call parent open first
-    if (!FileReader::open(filename)) {
-        return false;
+    // Preserve existing open behavior
+    bool ok = FileReader::open(filename);
+    if (ok) {
+        // Check cache after successful open
+        check_cache();
     }
 
-    // Check cache after successful open
-    check_cache();
-    return true;
+    // Reset default provider upon open, unless caller sets a custom one later.
+    line_provider_ = [this](std::string & out) {
+        return FileReader::next_line(out);
+    };
+
+    return ok;
+}
+
+void TokenFileReader::set_line_provider(std::function<bool(std::string&)> provider) {
+    line_provider_ = std::move(provider);
+}
+
+inline std::function<bool(std::string&)> TokenFileReader::get_line_provider() const {
+    return line_provider_;
+}
+
+bool TokenFileReader::next_line_from_provider() {
+    // Fetch next physical line into source_line_; return whether available.
+    if (!line_provider_) {
+        // Fallback to default reader if not yet initialized.
+        line_provider_ = [this](std::string & out) {
+            return FileReader::next_line(out);
+        };
+    }
+    return line_provider_(source_line_);
 }
 
 void TokenFileReader::check_cache() {
@@ -334,7 +359,7 @@ void TokenFileReader::check_cache() {
 bool TokenFileReader::next_token_line(TokenLine& token_line) {
     // 1) If there are injected tokens, return them first.
     if (!injected_tokens_.empty()) {
-        token_line = injected_tokens_.front();
+        token_line = std::move(injected_tokens_.front());
         injected_tokens_.pop_front();
 
         g_errors.set_location(token_line.location());
@@ -376,7 +401,7 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
 
         token_line.clear();
         while (token_line.tokens().empty()) {
-            if (!next_line(source_line_)) {
+            if (!next_line_from_provider()) {
                 // EOF: persist cache (real files only)
                 if (!filename_.empty() && !is_injected_text && !pending_cache_lines_.empty()) {
                     get_cache().put(filename_, std::move(pending_cache_lines_));
@@ -398,6 +423,48 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
         }
     }
     return true;
+}
+
+void TokenFileReader::inject(const std::string& filename, const std::string& content) {
+    (void)filename; // uset the current filename_ instead
+    inject(filename, 1, false, content);
+}
+
+void TokenFileReader::inject(const std::string& filename, size_t line_number,
+                             bool fixed_line_number, const std::string& content) {
+    std::vector<std::string> lines = ::split_lines(content);
+    filename_ = filename;
+    line_number_ = line_number - (fixed_line_number ? 0 : 1);
+    fixed_line_number_ = fixed_line_number;
+
+    // set line provider to read from array of lines
+    size_t idx = 0;
+    auto save_provider = get_line_provider();
+    set_line_provider([&](std::string & out) {
+        if (idx >= lines.size()) {
+            return false;
+        }
+        out = lines[idx++];
+        return true;
+    });
+
+    while (idx < lines.size()) {
+        if (!fixed_line_number_) {
+            ++line_number_;
+        }
+
+        source_line_ = lines[idx++];
+        Location location(filename_, line_number_);
+        g_errors.set_location(location);
+
+        TokenLine tl(location);
+        if (tokenize_line(tl)) {
+            split_lines(tl, injected_tokens_);
+        }
+    }
+
+    // restore provider
+    set_line_provider(save_provider);
 }
 
 void TokenFileReader::inject_tokens(const std::vector<TokenLine>& lines) {

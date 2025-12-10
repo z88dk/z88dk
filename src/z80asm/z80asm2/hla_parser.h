@@ -8,9 +8,12 @@
 
 #include "lexer.h"
 #include "location.h"
-#include "symbol_table.h"
+#include "symbols.h"
 #include <memory>
 #include <vector>
+
+class Module;
+class Section;
 
 namespace hla {
 
@@ -52,15 +55,16 @@ struct FlagTest : Expr {
 
 class Parser {
 public:
-    Parser(const TokensLine& line, unsigned i, SymbolTable& symtab);
+    Parser(const TokenLine& line, size_t i, Module* module, Section* section);
     std::unique_ptr<Expr> parse_bool_expr();
 
 private:
     const std::vector<Token>& tokens_;
-    unsigned i_ = 0;
-    SymbolTable* symtab_ = nullptr;
+    size_t i_ = 0;
+    Module* module_ = nullptr;
+    Section* section_ = nullptr;
 
-    const Token* peek(unsigned look = 0) const;
+    const Token* peek(size_t look = 0) const;
     bool match(TokenType type);
     bool match_keyword(Keyword kw);
     void expect(TokenType type, const char* msg);

@@ -20,14 +20,17 @@
 //-----------------------------------------------------------------------------
 class Module {
 public:
-    // Constructor requires name and location of MODULE directive
+    Module() = default;
     Module(const std::string& name, const Location& location);
+    void clear();
 
     // Module identification (name is immutable - it's the key in module collection)
     const std::string& name() const;
+    void set_name(const std::string& name);
 
     // Location of MODULE directive
     const Location& location() const;
+    void set_location(const Location& location);
 
     // Current section (last added, or default empty section if none added)
     Section* current_section();
@@ -60,6 +63,9 @@ public:
     Symbol* add_symbol(const std::string& name, const Location& location);
     Symbol* add_symbol(const std::string& name, const Location& location,
                        int value, SymbolType type = SymbolType::Constant);
+    Symbol* add_symbol(const std::string& name, const Location& location,
+                       Opcode* opcode, int offset,
+                       SymbolType type = SymbolType::AddressRelative);
 
     Symbol* find_symbol(const std::string& name);
     const Symbol* find_symbol(const std::string& name) const;
@@ -70,15 +76,11 @@ public:
     const;
 
 private:
-    std::string
-    name_;                                          // Module name (immutable)
-    Location location_;                                         // Location of MODULE directive
-    std::vector<std::unique_ptr<Section>>
-                                       sections_;           // All sections in this module (heap-allocated for pointer stability)
-    Section* current_section_ =
-        nullptr;                        // Pointer to last added section (or default empty section)
-    std::unordered_map<std::string, Symbol>
-    symbols_;          // Symbol table (name -> Symbol)
+    std::string name_;      // Module name
+    Location location_;     // Location of MODULE directive
+    std::vector<std::unique_ptr<Section>> sections_;    // All sections in this module
+    Section* current_section_ = nullptr;    // Pointer to last added section (or default empty section)
+    std::unordered_map<std::string, Symbol> symbols_;   // Symbol table (name -> Symbol)
 
     // Track all declaration locations for error reporting
     std::unordered_map<std::string, std::vector<Location>> extern_declarations_;

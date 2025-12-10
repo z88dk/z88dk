@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "expr.h"
 #include "location.h"
 #include <string>
 

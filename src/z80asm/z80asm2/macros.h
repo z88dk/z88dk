@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-extern int g_unique_id_counter; // to create unique local names
+extern size_t g_unique_id_counter; // to create unique local names
 
 //-----------------------------------------------------------------------------
 // Macro

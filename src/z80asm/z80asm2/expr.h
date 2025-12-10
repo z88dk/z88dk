@@ -177,12 +177,11 @@ public:
     // If failed (syntax error):
     //   - Leaves i unchanged
     //   - Returns false (caller is responsible for error reporting)
-    bool parse(const TokenLine& line, size_t& i, Module* module,
-               Section* section);
+    bool parse(const TokenLine& line, size_t& i,
+               Module* module, Section* section);
 
-    // Evaluate the expression
-    // Returns true and sets result if successful
-    // Returns false if expression cannot be evaluated (reports error internally)
+    // Evaluate the expression, returns the result
+    // throws ExpressionError-derived exceptions on failure
     int evaluate() const;
 
     // Check if expression is constant (can be evaluated at assembly time)

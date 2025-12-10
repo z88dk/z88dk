@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <unordered_map>
 
-int g_unique_id_counter = 0;
+size_t g_unique_id_counter = 0;
 
 //-----------------------------------------------------------------------------
 // Macro
@@ -378,7 +378,7 @@ void Macro::expand(const Location& location, const std::vector<TokenLine>& argum
 
     // Generate unique name for locals for this expansion
     if (!locals_.empty()) {
-        int unique_id = g_unique_id_counter++;
+        size_t unique_id = g_unique_id_counter++;
         const std::string unique_suffix = "_" + std::to_string(unique_id);
 
         for (const auto& local : locals_) {

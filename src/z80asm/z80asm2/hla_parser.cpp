@@ -8,8 +8,9 @@
 // HLA boolean expression parser
 //-----------------------------------------------------------------------------
 
+#include "expr.h"
 #include "hla_parser.h"
-#include "expr.h"   // use expression evaluator for constant operands
+#include <cassert>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -74,39 +75,44 @@ static RelOp invert_relop_on_swap(RelOp op) {
 // boundary is where relational/logical tokens begin (or end-of-line).
 // On success, sets out_value and out_after to the index after the consumed expression.
 static bool eval_const_expr_range(const std::vector<Token>& tokens,
-                                  unsigned i, unsigned boundary,
-                                  SymbolTable& symtab,
-                                  int& out_value, unsigned& out_after) {
+                                  size_t i, size_t boundary,
+                                  Module* module, Section* section,
+                                  int& out_value, size_t& out_after) {
     if (i >= boundary) {
         return false;
     }
 
-    TokensLine expr_line; // location not needed for evaluation
-    expr_line.reserve(boundary - i);
-    for (unsigned k = i; k < boundary; ++k) {
-        expr_line.push_back(tokens[k]);
+    TokenLine expr_line; // location not needed for evaluation
+    expr_line.tokens().reserve(boundary - i);
+    for (size_t k = i; k < boundary; ++k) {
+        expr_line.tokens().push_back(tokens[k]);
     }
 
-    ::Expr expr;
-    expr.set_silent(true);
-    unsigned j = 0;
-    if (!expr.parse(expr_line, j)) {
+    Expression expr;
+    size_t j = 0;
+    if (!expr.parse(expr_line, j, module, section)) {
         return false;
     }
+
     // Accept only if we consumed the whole candidate range
-    if (!expr_line.at_end(j)) {
+    if (j < expr_line.tokens().size()) {
         return false;
     }
 
-    int value = 0;
-    if (!expr.evaluate(symtab, value)) {
-        return false;
-    }
-    if (!expr.is_constant()) {  // accept only constant expressions
+    // Evaluate expression only if constant
+    if (!expr.is_constant()) {
         return false;
     }
 
-    out_value = value;
+    // should not throw here since is_constant() is true
+    try {
+        out_value = expr.evaluate();
+    }
+    catch (...) {
+        assert(0);
+    }
+    out_value = expr.evaluate();
+
     out_after = boundary;
     return true;
 }
@@ -115,9 +121,9 @@ static bool eval_const_expr_range(const std::vector<Token>& tokens,
 // Counts parentheses depth and stops at:
 //  - a relational/logical operator when depth == 0
 //  - a ')' when depth == 0 (caller handles consumption of ')' if needed)
-static unsigned find_expr_boundary(const std::vector<Token>& tokens,
-                                   unsigned start) {
-    unsigned k = start;
+static size_t find_expr_boundary(const std::vector<Token>& tokens,
+                                 size_t start) {
+    size_t k = start;
     int depth = 0;
     while (k < tokens.size()) {
         const Token& t = tokens[k];
@@ -156,14 +162,14 @@ static unsigned find_expr_boundary(const std::vector<Token>& tokens,
 // Detect if a '(' at index 'open_idx' starts a parenthesized boolean expression
 // (contains a relational or logical operator at top-level before matching ')')
 static bool is_paren_boolean_expr(const std::vector<Token>& tokens,
-                                  unsigned open_idx) {
+                                  size_t open_idx) {
     if (open_idx >= tokens.size() || !tokens[open_idx].is(TokenType::LeftParen)) {
         return false;
     }
 
     int depth = 0;
     bool saw_bool_op = false;
-    for (unsigned k = open_idx + 1; k < tokens.size(); ++k) {
+    for (size_t k = open_idx + 1; k < tokens.size(); ++k) {
         const Token& t = tokens[k];
         if (t.is(TokenType::LeftParen)) {
             ++depth;
@@ -190,8 +196,8 @@ static bool is_paren_boolean_expr(const std::vector<Token>& tokens,
 
 //---------------------- Parser impl ------------------
 
-Parser::Parser(const TokensLine& line, unsigned i, SymbolTable& symtab)
-    : tokens_(line.tokens()), i_(i), symtab_(&symtab) {}
+Parser::Parser(const TokenLine& line, size_t i, Module* module, Section* section)
+    : tokens_(line.tokens()), i_(i), module_(module), section_(section) {}
 
 std::unique_ptr<Expr> Parser::parse_bool_expr() {
     auto e = parse_or();
@@ -200,13 +206,12 @@ std::unique_ptr<Expr> Parser::parse_bool_expr() {
     }
     if (i_ < tokens_.size())
         throw std::runtime_error("HLA boolean expression: extra token after expression '"
-                                 +
-                                 tokens_[i_].text() + "'");
+                                 + tokens_[i_].text() + "'");
     return e;
 }
 
-const Token* Parser::peek(unsigned look) const {
-    unsigned idx = i_ + look;
+const Token* Parser::peek(size_t look) const {
+    size_t idx = i_ + look;
     if (idx >= tokens_.size()) {
         return nullptr;
     }
@@ -358,15 +363,15 @@ Operand Parser::parse_operand() {
         }
 
         // constant address expression
-        unsigned start = i_;
-        unsigned k = find_expr_boundary(tokens_, start);
+        size_t start = i_;
+        size_t k = find_expr_boundary(tokens_, start);
         if (k >= tokens_.size() || !tokens_[k].is(TokenType::RightParen)) {
             throw std::runtime_error("Missing ')' after memory operand");
         }
 
         int addr = 0;
-        unsigned after = start;
-        if (!eval_const_expr_range(tokens_, start, k, *symtab_, addr, after)) {
+        size_t after = start;
+        if (!eval_const_expr_range(tokens_, start, k, module_, section_, addr, after)) {
             throw std::runtime_error("Invalid constant address expression inside ()");
         }
         if (after != k) {
@@ -392,17 +397,17 @@ Operand Parser::parse_operand() {
 
     // Immediate constant expression
     if (t->type() == TokenType::Integer ||
-            t->type() == TokenType::UnaryPlus ||
-            t->type() == TokenType::UnaryMinus ||
+            t->type() == TokenType::Plus ||
+            t->type() == TokenType::Minus ||
             t->type() == TokenType::LeftParen
             || // allow leading '(' for arithmetic sub-expr
             (t->type() == TokenType::Identifier
              && !keyword_is_register_8bit(t->keyword()))) {
 
-        unsigned boundary = find_expr_boundary(tokens_, i_);
+        size_t boundary = find_expr_boundary(tokens_, i_);
         int value = 0;
-        unsigned after = i_;
-        if (!eval_const_expr_range(tokens_, i_, boundary, *symtab_, value, after)) {
+        size_t after = i_;
+        if (!eval_const_expr_range(tokens_, i_, boundary, module_, section_, value, after)) {
             throw std::runtime_error("Invalid constant expression for operand");
         }
         i_ = after;

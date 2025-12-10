@@ -191,7 +191,6 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\macros.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\model.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\module.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />

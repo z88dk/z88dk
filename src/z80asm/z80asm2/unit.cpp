@@ -17,12 +17,27 @@ CompilationUnit::CompilationUnit(const std::string& name,
     add_module("");
 }
 
+void CompilationUnit::clear() {
+    name_.clear();
+    location_.clear();
+    modules_.clear();
+    current_module_ = nullptr;
+}
+
 const std::string& CompilationUnit::name() const {
     return name_;
 }
 
+void CompilationUnit::set_name(const std::string& name) {
+    name_ = name;
+}
+
 const Location& CompilationUnit::location() const {
     return location_;
+}
+
+void CompilationUnit::set_location(const Location& location) {
+    location_ = location;
 }
 
 const std::vector<std::unique_ptr<Module>>& CompilationUnit::modules() const {

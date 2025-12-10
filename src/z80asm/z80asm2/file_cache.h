@@ -91,7 +91,7 @@ public:
     virtual bool open(const std::string& filename);
 
     // Inject content directly (creates virtual file)
-    void inject(const std::string& filename, const std::string& content);
+    virtual void inject(const std::string& filename, const std::string& content);
     void inject(const std::string& filename, const std::vector<char>& content);
 
     // Check if file was successfully opened
@@ -129,8 +129,7 @@ protected:
     size_t pos_ = 0;                    // Current position in content
     size_t line_number_ = 0;            // Current line number (1-based)
     bool fixed_line_number_ = false;    // true if line_number_ should not increment
-    bool just_updated_ =
-        false;         // true if line_number_ was just set manually
+    bool just_updated_ = false;         // true if line_number_ was just set manually
 
     static std::vector<char> empty_content_;
 };
