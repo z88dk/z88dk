@@ -12,6 +12,7 @@
 #include "options.h"
 #include <deque>
 #include <filesystem>
+#include <functional>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -238,8 +239,16 @@ public:
     }
 #endif
 
-    // Inject pre-tokenized lines into the reader; they take precedence over file/cached content.
+    // Inject lines into the reader; they take precedence over file/cached content.
+    void inject(const std::string& filename, size_t line_number, bool fixed_line_number,
+                const std::string& content);
     void inject_tokens(const std::vector<TokenLine>& lines);
+
+    // Line provider abstraction: set a custom provider for subsequent physical line reads.
+    // The provider should return true and write the next physical line into 'out',
+    // or return false when no more lines are available.
+    void set_line_provider(std::function<bool(std::string& out)> provider);
+    std::function<bool(std::string&)> get_line_provider() const;
 
 private:
     // Cache-related members
@@ -256,11 +265,20 @@ private:
     // Queue of injected token lines that are returned first (split into logical lines).
     std::deque<TokenLine> injected_tokens_;
 
+    // Line provider used by tokenize_line to fetch the next physical line.
+    // Defaults to the underlying FileReader::next_line.
+    std::function<bool(std::string&)> line_provider_;
+
     bool tokenize_line(TokenLine& token_line);
+    void inject(const std::string& filename, const std::string& content) override;
+
     // Updated: split into the provided target queue (output or injected)
     void split_lines(const TokenLine& input_line,
                      std::deque<TokenLine>& target_queue);
 
     // Helper to check cache after opening
     void check_cache();
+
+    // Helper used by the lexer/re2c-generated code to advance to the next physical line.
+    bool next_line_from_provider();
 };
