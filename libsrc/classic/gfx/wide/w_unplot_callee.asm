@@ -28,7 +28,7 @@ asm_unplot:
     call    __gfx_vram_page_in
   ENDIF
     call    w_respixel
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

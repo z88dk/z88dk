@@ -82,7 +82,7 @@ fast_putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
       ; @@@@@@@@@@@@
@@ -177,7 +177,7 @@ _saddr:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix
@@ -242,7 +242,7 @@ _saddr1:
 
     pop     bc                          ;Restore data
     djnz    woloop
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

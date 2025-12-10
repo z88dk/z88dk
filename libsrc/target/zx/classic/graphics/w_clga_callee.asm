@@ -62,7 +62,7 @@ ENDIF
     ld      ix, w_respixel
     call    w_area
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

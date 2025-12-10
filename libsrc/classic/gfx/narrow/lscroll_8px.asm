@@ -28,7 +28,7 @@ _lscroll_8px:
 ___lscroll_8px:
 
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
 
@@ -78,7 +78,7 @@ loop:
 end_loop:
     ld (de),a
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_out
   ENDIF
     ret

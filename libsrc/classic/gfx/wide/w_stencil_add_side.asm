@@ -56,7 +56,7 @@ _stencil_add_side:
 
     ld      ix, stencil_add_pixel
     call    w_line
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

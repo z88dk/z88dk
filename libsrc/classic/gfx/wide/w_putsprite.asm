@@ -141,7 +141,7 @@ _notedge:
     pop     bc                          ;Restore data
     djnz    _oloop
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix
@@ -205,7 +205,7 @@ nextline:
 
     pop     bc                          ;Restore data
     djnz    woloop
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

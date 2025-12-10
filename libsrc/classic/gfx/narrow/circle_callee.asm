@@ -37,7 +37,7 @@ asm_circle:
   ENDIF
     ld      hl, plotpixel
     call    draw_circle
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__

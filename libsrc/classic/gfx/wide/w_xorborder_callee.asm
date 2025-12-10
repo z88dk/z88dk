@@ -115,7 +115,7 @@ yloop1:
     jr      nz, yloop1
 endyloop:
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

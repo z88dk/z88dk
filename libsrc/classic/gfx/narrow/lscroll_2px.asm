@@ -28,7 +28,7 @@ _lscroll_2px:
 ___lscroll_2px:
 
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
 
@@ -145,7 +145,7 @@ loop:
     or c
     jr nz,loop
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_out
   ENDIF
     ret

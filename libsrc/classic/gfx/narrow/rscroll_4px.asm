@@ -28,7 +28,7 @@ _rscroll_4px:
 ___rscroll_4px:
 
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
 
@@ -87,7 +87,7 @@ loop:
     pop    af
 
 
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     call    __gfx_vram_page_out
   ENDIF
     ret

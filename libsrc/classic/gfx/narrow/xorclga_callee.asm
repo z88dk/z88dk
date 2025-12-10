@@ -34,7 +34,7 @@ asm_xorclga:
     call    __gfx_vram_page_in
   ENDIF
     call    xorclrarea
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
