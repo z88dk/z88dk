@@ -117,6 +117,8 @@ _centronics_init:
   jp z,init_opus       ; 26: Opus Discovery (crashes if Interface 1 is connected)
   dec a
   jp z,init_8255       ; 27: Russian "AT IMS KR580VV66A PIA", very close to PPI
+  dec a
+  jp z,init_ads        ; 28: ADS Interface, a.k.a. "Printer Interface 1"
 
   ; default
   jp init_morex
@@ -341,16 +343,40 @@ send_ne_busy:
   jr   nz,send_ne_busy
   or   a                    ; BUSY (active low) must be off
   jr   nz,send_ne_busy
+  POP  AF
+  OUT  ($FB),A               ; Prepare data to be sent
   ld   a,(centronics_strobe_delay)
   ld   b,a                   ; originally it was 80 decimal, 70 is close enough
 send_ne_delay:
   djnz send_ne_delay
-  POP  AF
-  OUT  ($FB),A               ; Prepare data to be sent
-send_ne_wait:
-  djnz send_ne_wait         ; loop 256 times, leaving time to the automatic strobe
   jp   centronics_ei        ; the I/F Centronics by PIN SOFT had a short delay here,
                             ; the code around centronics_ei will suffice
+
+
+;=========================================================
+;  ADS Interface
+;  "Printer Interface 1" by Advanced Digital Systems Ltd. 
+
+init_ads:
+  ld  hl,send_ads
+  ld  (driver_selected),hl
+  ret
+
+send_ads:
+send_ads_busy:
+  call centronics_break
+  IN   A,($9d)
+  bit  4,a
+  jr   nz,send_ads_busy
+  POP  AF
+  OUT  ($9d),A               ; Prepare data to be sent
+
+  ld   a,(centronics_strobe_delay)
+  ld   b,a                   ; originally it was 80 decimal, 70 is close enough
+send_ads_delay:
+  djnz send_ads_delay
+  jp   centronics_ei
+
 
 ;=========================================================
 ;  "General case"

@@ -388,6 +388,7 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LPT_INTERFACE3 25   // Interface III Printer interface
 #define LPT_OPUS       26   // Opus Discovery (or lame Interface 1 calls)
 #define LPT_PIA        27   // "AT IMS KR580VV66A PIA", very close to PPI
+#define LPT_ADS        28   // ADS Interface
 
 #define LPT_IF1       100   // ZX Interface 1 style "hook codes" (crap)
 
