@@ -574,3 +574,182 @@ TokenLine Macros::expand_flat(const TokenLine& line) {
     return TokenLine(line.location(), flat_tokens);
 }
 
+//-----------------------------------------------------------------------------
+// REPT* block
+//-----------------------------------------------------------------------------
+
+RepeatBlock::RepeatBlock(Type type, const Location& location)
+    : type_(type), macro_("", location) {
+}
+
+const Location& RepeatBlock::location() const {
+    return macro_.location();
+}
+
+void RepeatBlock::add_body_line(const TokenLine& line) {
+    macro_.add_body_line(line);
+}
+
+bool RepeatBlock::parse_body_line(const TokenLine& line) {
+    const auto& toks = line.tokens();
+
+    // Empty line: store and continue
+    if (toks.empty()) {
+        add_body_line(line);
+        return false;
+    }
+
+    const Token& t0 = toks[0];
+
+    // 1) Start of nested REPT|RETPI|REPTC:
+    //    - first token is 'REPT|RETPI|REPTC', or
+    //    - first is identifier and second is 'RETPI|REPTC'
+    if (t0.is(Keyword::REPT) ||
+            t0.is(Keyword::REPTI) ||
+            t0.is(Keyword::REPTC) ||
+            (t0.is(TokenType::Identifier) && toks.size() >= 2 &&
+             (toks[1].is(Keyword::REPTI) ||
+              toks[1].is(Keyword::REPTC)))) {
+        ++nesting_level_;
+        add_body_line(line);
+        return true;
+    }
+
+    // 2) ENDR encountered:
+    if (t0.is(Keyword::ENDR)) {
+        // If there are more tokens beyond ENDR, report unexpected token
+        if (toks.size() > 1) {
+            g_errors.error(line.location(), ErrorCode::InvalidSyntax,
+                           std::string("Unexpected token '") + toks[1].text() + "'");
+        }
+
+        // Decrement nesting
+        if (nesting_level_ > 0) {
+            --nesting_level_;
+        }
+
+        // If nesting reached zero, this ENDR closes the outermost repeat block:
+        // - do not store the line, return false
+        if (nesting_level_ == 0) {
+            return false;   // return false to signal end of repeat body
+        }
+
+        // Still inside nested REPT*: store the line, return true
+        add_body_line(line);
+        return true;
+    }
+
+    // 3) LOCAL: parse locals, do not store the line
+    if (t0.is(Keyword::LOCAL)) {
+        size_t idx = 1; // parse after 'LOCAL'
+        if (!macro_.parse_locals(line, idx)) {
+            // error already reported
+            return true;
+        }
+        if (idx < toks.size()) {
+            g_errors.error(line.location(), ErrorCode::InvalidSyntax,
+                           std::string("Unexpected token '") + toks[idx].text() + "'");
+            return true;
+        }
+        return true;
+    }
+
+    // 3) Any other input: store the line and return true
+    add_body_line(line);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// REPT block
+//-----------------------------------------------------------------------------
+
+RepeatCountBlock::RepeatCountBlock(const Location& location, size_t count)
+    : RepeatBlock(Type::Count, location), count_(count) {
+}
+
+size_t RepeatCountBlock::count() const {
+    return count_;
+}
+
+bool RepeatCountBlock::expand(const Location& location, std::vector<TokenLine>& out_lines) {
+    out_lines.clear();
+    if (count_ < 1) {
+        return false;
+    }
+
+    out_lines.reserve(macro_.body_lines().size() * count_);
+    for (size_t i = 0; i < count_; ++i) {
+        std::vector<TokenLine> expansion;
+        macro_.expand(location, std::vector<TokenLine> {}, expansion);
+        out_lines.insert(out_lines.end(), expansion.begin(), expansion.end());
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// REPTI block
+//-----------------------------------------------------------------------------
+
+RepeatIterateBlock::RepeatIterateBlock(const Location& location, const std::string& variable)
+    : RepeatBlock(Type::Iterate, location) {
+    macro_.add_parameter(variable);
+}
+
+const std::string& RepeatIterateBlock::variable() const {
+    return macro_.parameters().front();
+}
+
+const std::vector<TokenLine>& RepeatIterateBlock::items() const {
+    return items_;
+}
+
+bool RepeatIterateBlock::parse_items(const TokenLine& line, size_t& index) {
+    return macro_.parse_arguments(line, index, items_);
+}
+
+bool RepeatIterateBlock::expand(const Location& location, std::vector<TokenLine>& out_lines) {
+    out_lines.clear();
+    if (items_.empty()) {
+        return false;
+    }
+
+    out_lines.reserve(macro_.body_lines().size() * items_.size());
+    for (const auto& item : items_) {
+        std::vector<TokenLine> args = { item };
+        std::vector<TokenLine> expansion;
+        macro_.expand(location, args, expansion);
+        out_lines.insert(out_lines.end(), expansion.begin(), expansion.end());
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// REPTC block
+//-----------------------------------------------------------------------------
+
+RepeatCharsBlock::RepeatCharsBlock(const Location& location, const std::string& variable)
+    : RepeatIterateBlock(location, variable) {
+}
+
+bool RepeatCharsBlock::parse_items(const TokenLine& line, size_t& index) {
+    return parse_chars(line, index);
+}
+
+bool RepeatCharsBlock::parse_chars(const TokenLine& line, size_t& index) {
+    const auto& toks = line.tokens();
+    while (index < toks.size()) {
+        const Token& tok = toks[index];
+        const std::string& text = tok.is(TokenType::String) ? tok.string_value() : tok.text();
+        for (auto c : text) {
+            int value = static_cast<int>(static_cast<unsigned char>(c));
+            Token token(TokenType::Integer, std::to_string(value), value, false);
+            TokenLine char_line(line.location(), { token });
+            items_.push_back(char_line);
+        }
+        ++index;
+    }
+
+    return true;
+}

@@ -70,3 +70,57 @@ public:
 private:
     std::unordered_map<std::string, Macro> macros_;
 };
+
+//-----------------------------------------------------------------------------
+// REPT* block
+//-----------------------------------------------------------------------------
+
+class RepeatBlock {
+public:
+    enum class Type { Count, Iterate, Chars };
+    RepeatBlock(Type type, const Location& location);
+    const Location& location() const;
+
+    void add_body_line(const TokenLine& line);
+    bool parse_body_line(const TokenLine& line);
+
+    virtual bool expand(const Location& location, std::vector<TokenLine>& out_lines) = 0;
+
+protected:
+    Type type_;
+    Macro macro_; // to reuse parameter/local handling
+    int nesting_level_ = 1; // start at 1 because REPT was already parsed
+};
+
+class RepeatCountBlock : public RepeatBlock {
+public:
+    RepeatCountBlock(const Location& location, size_t count);
+    size_t count() const;
+
+    bool expand(const Location& location, std::vector<TokenLine>& out_lines) override;
+
+protected:
+    size_t count_;
+};
+
+class RepeatIterateBlock : public RepeatBlock {
+public:
+    RepeatIterateBlock(const Location& location, const std::string& variable);
+    const std::string& variable() const;
+    const std::vector<TokenLine>& items() const;
+
+    virtual bool parse_items(const TokenLine& line, size_t& index);
+    bool expand(const Location& location, std::vector<TokenLine>& out_lines) override;
+
+protected:
+    std::vector<TokenLine> items_;
+};
+
+class RepeatCharsBlock : public RepeatIterateBlock {
+public:
+    RepeatCharsBlock(const Location& location, const std::string& variable);
+    bool parse_chars(const TokenLine& line, size_t& index);
+
+private:
+    bool parse_items(const TokenLine& line, size_t& index) override;
+};

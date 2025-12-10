@@ -109,7 +109,6 @@ TEST_CASE("Macro: local cannot duplicate parameter name", "[model][macro]") {
 }
 
 TEST_CASE("Macro: add body line copies and overwrites location", "[model][macro]") {
-    SuppressErrors suppress;
     Location mac_loc("macro.asm", 60);
     Macro macro("M", mac_loc);
 
@@ -502,7 +501,6 @@ TEST_CASE("Macro: parse_arguments with no input yields no arguments", "[model][m
 }
 
 TEST_CASE("Macro: parse_arguments simple comma-separated", "[model][macro][args]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 301);
     Macro macro("M", loc);
 
@@ -528,7 +526,6 @@ TEST_CASE("Macro: parse_arguments simple comma-separated", "[model][macro][args]
 }
 
 TEST_CASE("Macro: parse_arguments handles nested parentheses", "[model][macro][args]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 302);
     Macro macro("M", loc);
 
@@ -567,7 +564,6 @@ TEST_CASE("Macro: parse_arguments handles nested parentheses", "[model][macro][a
 }
 
 TEST_CASE("Macro: parse_arguments consecutive commas produce empty arguments", "[model][macro][args]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 303);
     Macro macro("M", loc);
 
@@ -593,7 +589,6 @@ TEST_CASE("Macro: parse_arguments consecutive commas produce empty arguments", "
 }
 
 TEST_CASE("Macro: parse_arguments stops at top-level ')' without consuming it", "[model][macro][args]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 304);
     Macro macro("M", loc);
 
@@ -623,7 +618,6 @@ TEST_CASE("Macro: parse_arguments stops at top-level ')' without consuming it", 
 //-----------------------------------------------------------------------------
 
 TEST_CASE("Macro: parse_body_line stores regular lines and returns true", "[model][macro][body]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 400);
     Macro macro("M", loc);
 
@@ -643,7 +637,6 @@ TEST_CASE("Macro: parse_body_line stores regular lines and returns true", "[mode
 }
 
 TEST_CASE("Macro: parse_body_line increments nesting on MACRO and stores line", "[model][macro][body]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 401);
     Macro macro("M", loc);
 
@@ -668,7 +661,6 @@ TEST_CASE("Macro: parse_body_line increments nesting on MACRO and stores line", 
 }
 
 TEST_CASE("Macro: parse_body_line ENDM at nesting>0 stores line and returns true", "[model][macro][body]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 402);
     Macro macro("M", loc);
 
@@ -695,7 +687,6 @@ TEST_CASE("Macro: parse_body_line ENDM at nesting>0 stores line and returns true
 }
 
 TEST_CASE("Macro: parse_body_line ENDM at nesting==0 returns false and does not store", "[model][macro][body]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 403);
     Macro macro("M", loc);
 
@@ -735,7 +726,6 @@ TEST_CASE("Macro: parse_body_line ENDM with trailing tokens reports error", "[mo
 }
 
 TEST_CASE("Macro: parse_body_line LOCAL parses locals, does not store line, returns true", "[model][macro][body]") {
-    SuppressErrors suppress;
     Location loc("macro.asm", 405);
     Macro macro("M", loc);
 
@@ -812,7 +802,6 @@ TEST_CASE("Macro: expand reports error on argument count mismatch", "[model][mac
 
 TEST_CASE("Macro: expand substitutes parameters with argument tokens", "[model][macro][expand]") {
     SuppressErrors suppress;
-
     Location macLoc("def.asm", 20);
     Macro macro("M", macLoc);
     macro.add_parameter("A");
@@ -876,7 +865,6 @@ TEST_CASE("Macro: expand substitutes parameters with argument tokens", "[model][
 
 TEST_CASE("Macro: expand renames locals to unique <var>_<id> and increments id", "[model][macro][expand]") {
     SuppressErrors suppress;
-
     int start_id = g_unique_id_counter;
 
     Location macLoc("def.asm", 30);
@@ -985,7 +973,6 @@ TEST_CASE("Macro: expand renames locals to unique <var>_<id> and increments id",
 //-----------------------------------------------------------------------------
 
 TEST_CASE("Macros: add and retrieve macro", "[model][macros_container]") {
-    SuppressErrors suppress;
     Macros container;
 
     Location loc("defs.asm", 1);
@@ -1053,7 +1040,6 @@ TEST_CASE("Macros: macro redefinition reports error and keeps original", "[model
 
 TEST_CASE("Macro: expand_flat substitutes parameters and flattens into single line", "[model][macro][expand_flat]") {
     SuppressErrors suppress;
-
     Location macLoc("def.asm", 500);
     Macro macro("M", macLoc);
     macro.add_parameter("P1");
@@ -1106,7 +1092,6 @@ TEST_CASE("Macro: expand_flat substitutes parameters and flattens into single li
 
 TEST_CASE("Macro: expand_flat copies as-is when no params and no locals", "[model][macro][expand_flat]") {
     SuppressErrors suppress;
-
     Location macLoc("def.asm", 510);
     Macro macro("M", macLoc);
 
@@ -1156,7 +1141,6 @@ TEST_CASE("Macro: expand_flat reports error and returns empty when argument mism
 
 TEST_CASE("Macro: expand_flat reflects local renaming with unique suffix", "[model][macro][expand_flat]") {
     SuppressErrors suppress;
-
     int start = g_unique_id_counter;
 
     Location macLoc("def.asm", 530);
@@ -1195,8 +1179,6 @@ TEST_CASE("Macro: expand_flat reflects local renaming with unique suffix", "[mod
 }
 
 TEST_CASE("Macros: inline splicing for function-like macro with parentheses", "[model][macros_container][expand]") {
-    SuppressErrors suppress;
-
     // Define SUM(A,B) -> A + B
     Location defLoc("defs.asm", 700);
     Macro sum("SUM", defLoc);
@@ -1240,8 +1222,6 @@ TEST_CASE("Macros: inline splicing for function-like macro with parentheses", "[
 }
 
 TEST_CASE("Macros: inline splicing for function-like macro without parentheses", "[model][macros_container][expand]") {
-    SuppressErrors suppress;
-
     // Define SUM(A,B) -> A + B
     Location defLoc("defs.asm", 710);
     Macro sum("SUM", defLoc);
@@ -1284,8 +1264,6 @@ TEST_CASE("Macros: inline splicing for function-like macro without parentheses",
 
 TEST_CASE("Macros: multi-line function-like macro splices first line inline and emits subsequent lines",
           "[model][macros_container][expand]") {
-    SuppressErrors suppress;
-
     // Define:
     // MACRO PP(A,B)
     //   PUSH A
@@ -1350,8 +1328,6 @@ TEST_CASE("Macros: multi-line function-like macro splices first line inline and 
 
 TEST_CASE("Macros: object-like macro without arguments expands two lines; first spliced inline, second verbatim",
           "[model][macros_container][expand]") {
-    SuppressErrors suppress;
-
     // Define:
     // MACRO NOARG
     //   PUSH HL
@@ -1414,8 +1390,6 @@ TEST_CASE("Macros: object-like macro without arguments expands two lines; first 
 
 TEST_CASE("Macros: argument macro expands first and is flattened before top-level expansion",
           "[model][macros_container][expand][nested]") {
-    SuppressErrors suppress;
-
     // Define ADDR -> IX , HL  (object-like, expands to two tokens separated by comma)
     Location defLoc1("defs.asm", 900);
     Macro addr("ADDR", defLoc1);
@@ -1472,8 +1446,6 @@ TEST_CASE("Macros: argument macro expands first and is flattened before top-leve
 
 TEST_CASE("Macros: argument is a two-line macro; argument expands then flattens before top-level expansion",
           "[model][macros_container][expand][nested]") {
-    SuppressErrors suppress;
-
     // Two-line argument macro: ADDR2 -> (IX)  \n  , (HL)
     // When flattened as an argument, we expect "(IX) , (HL)" tokens sequence.
     Location defLoc1("defs.asm", 910);
@@ -1537,4 +1509,658 @@ TEST_CASE("Macros: argument is a two-line macro; argument expands then flattens 
     REQUIRE(toks[7].is(TokenType::Colon));
     REQUIRE(toks[8].is(TokenType::Identifier));
     REQUIRE(toks[8].text() == "DE");
+}
+
+//-----------------------------------------------------------------------------
+// RepeatBlock parse_body_line tests (using RepeatCountBlock)
+//-----------------------------------------------------------------------------
+
+TEST_CASE("RepeatBlock: parse_body_line stores regular lines and returns true", "[model][repeat][body]") {
+    Location loc("rept.asm", 1100);
+    RepeatCountBlock block(loc, 1);
+
+    // A regular instruction line
+    std::vector<Token> toks = {
+        Token(TokenType::Identifier, "LD", false),
+        Token(TokenType::Identifier, "A", false)
+    };
+    TokenLine line(loc, toks);
+
+    REQUIRE(block.parse_body_line(line)); // returns true (continue parsing)
+}
+
+TEST_CASE("RepeatBlock: parse_body_line increments nesting on REPT/REPTI/REPTC and stores line",
+          "[model][repeat][body]") {
+    Location loc("rept.asm", 1101);
+    RepeatCountBlock block(loc, 1);
+
+    // REPT
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "REPT", Keyword::REPT, false),
+            Token(TokenType::Integer, "3", 3, false)
+        };
+        TokenLine line(loc, toks);
+        REQUIRE(block.parse_body_line(line)); // true
+    }
+
+    // REPTI
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "REPTI", Keyword::REPTI, false),
+            Token(TokenType::Identifier, "list", false)
+        };
+        TokenLine line(loc, toks);
+        REQUIRE(block.parse_body_line(line)); // true
+    }
+
+    // REPTC
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "REPTC", Keyword::REPTC, false),
+            Token(TokenType::String, "\"abc\"", false)
+        };
+        TokenLine line(loc, toks);
+        REQUIRE(block.parse_body_line(line)); // true
+    }
+}
+
+TEST_CASE("RepeatBlock: parse_body_line ENDR at nesting>0 stores line and returns true", "[model][repeat][body]") {
+    Location loc("rept.asm", 1102);
+    RepeatCountBlock block(loc, 1);
+
+    // Enter nested REPT
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "REPT", Keyword::REPT, false),
+            Token(TokenType::Integer, "2", 2, false)
+        };
+        TokenLine line(loc, toks);
+        REQUIRE(block.parse_body_line(line)); // true
+    }
+
+    // ENDR for inner REPT (nesting>0): store and return true
+    {
+        std::vector<Token> toks = { Token(TokenType::Identifier, "ENDR", Keyword::ENDR, false) };
+        TokenLine line(loc, toks);
+        REQUIRE(block.parse_body_line(line)); // true
+    }
+}
+
+TEST_CASE("RepeatBlock: parse_body_line ENDR at nesting==0 returns false and does not store", "[model][repeat][body]") {
+    Location loc("rept.asm", 1103);
+    RepeatCountBlock block(loc, 1);
+
+    // A body line first
+    {
+        std::vector<Token> toks = { Token(TokenType::Identifier, "NOP", false) };
+        TokenLine line(loc, toks);
+        REQUIRE(block.parse_body_line(line)); // true
+    }
+
+    // Outermost ENDR ends repeat block: return false, don't store
+    {
+        std::vector<Token> toks = { Token(TokenType::Identifier, "ENDR", Keyword::ENDR, false) };
+        TokenLine line(loc, toks);
+        REQUIRE_FALSE(block.parse_body_line(line));
+    }
+}
+
+TEST_CASE("RepeatBlock: parse_body_line ENDR with trailing tokens reports error", "[model][repeat][body]") {
+    SuppressErrors suppress;
+    Location loc("rept.asm", 1104);
+    RepeatCountBlock block(loc, 1);
+
+    std::vector<Token> toks = {
+        Token(TokenType::Identifier, "ENDR", Keyword::ENDR, false),
+        Token(TokenType::Identifier, "EXTRA", false)
+    };
+    TokenLine line(loc, toks);
+
+    REQUIRE_FALSE(block.parse_body_line(line)); // outermost end; false
+    REQUIRE(g_errors.has_errors()); // Unexpected token 'EXTRA'
+}
+
+//-----------------------------------------------------------------------------
+// RepeatCountBlock tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("RepeatCountBlock: expand with count=0 yields no lines", "[model][repeat][count]") {
+    Location defLoc("defs.asm", 1000);
+    RepeatCountBlock block(defLoc, 0);
+
+    // Body: NOP
+    block.add_body_line(TokenLine(defLoc, { Token(TokenType::Identifier, "NOP", false) }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1001);
+    REQUIRE_FALSE(block.expand(useLoc, out));
+    REQUIRE(out.empty());
+}
+
+TEST_CASE("RepeatCountBlock: expand with count=1 returns body once", "[model][repeat][count]") {
+    Location defLoc("defs.asm", 1010);
+    RepeatCountBlock block(defLoc, 1);
+
+    // Body:
+    //   LD A, B
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "LD", false),
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1011);
+    REQUIRE(block.expand(useLoc, out));
+
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(out[0].location().filename() == "use.asm");
+    REQUIRE(out[0].location().line_num() == 1011);
+    REQUIRE(toks.size() == 4);
+    REQUIRE(toks[0].text() == "LD");
+    REQUIRE(toks[1].text() == "A");
+    REQUIRE(toks[2].is(TokenType::Comma));
+    REQUIRE(toks[3].text() == "B");
+}
+
+TEST_CASE("RepeatCountBlock: expand with count>1 repeats entire body", "[model][repeat][count]") {
+    Location defLoc("defs.asm", 1020);
+    RepeatCountBlock block(defLoc, 3);
+
+    // Body has two lines:
+    //   PUSH HL
+    //   POP  HL
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "PUSH", false),
+        Token(TokenType::Identifier, "HL", false)
+    }));
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "POP", false),
+        Token(TokenType::Identifier, "HL", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1021);
+    REQUIRE(block.expand(useLoc, out));
+
+    // Expect body repeated 3 times --> 2 * 3 = 6 lines
+    REQUIRE(out.size() == 6);
+
+    // Verify the first repetition (lines 0 and 1)
+    {
+        const auto& t0 = out[0].tokens();
+        const auto& t1 = out[1].tokens();
+        REQUIRE(t0.size() == 2);
+        REQUIRE(t1.size() == 2);
+        REQUIRE(t0[0].text() == "PUSH");
+        REQUIRE(t0[1].text() == "HL");
+        REQUIRE(t1[0].text() == "POP");
+        REQUIRE(t1[1].text() == "HL");
+    }
+
+    // Verify the second repetition (lines 2 and 3)
+    {
+        const auto& t2 = out[2].tokens();
+        const auto& t3 = out[3].tokens();
+        REQUIRE(t2.size() == 2);
+        REQUIRE(t3.size() == 2);
+        REQUIRE(t2[0].text() == "PUSH");
+        REQUIRE(t2[1].text() == "HL");
+        REQUIRE(t3[0].text() == "POP");
+        REQUIRE(t3[1].text() == "HL");
+    }
+
+    // Verify the third repetition (lines 4 and 5)
+    {
+        const auto& t4 = out[4].tokens();
+        const auto& t5 = out[5].tokens();
+        REQUIRE(t4.size() == 2);
+        REQUIRE(t5.size() == 2);
+        REQUIRE(t4[0].text() == "PUSH");
+        REQUIRE(t4[1].text() == "HL");
+        REQUIRE(t5[0].text() == "POP");
+        REQUIRE(t5[1].text() == "HL");
+    }
+
+    // All expanded lines should carry the expansion location
+    for (const auto& tl : out) {
+        REQUIRE(tl.location().filename() == "use.asm");
+        REQUIRE(tl.location().line_num() == 1021);
+    }
+}
+
+TEST_CASE("RepeatCountBlock: LOCAL variables are uniquified per iteration using global unique_id",
+          "[model][repeat][count][locals]") {
+    // Capture starting unique id
+    int start_id = g_unique_id_counter;
+
+    Location defLoc("defs.asm", 1030);
+    RepeatCountBlock block(defLoc, 3);
+
+    // Declare locals via LOCAL line
+    // LOCAL X, Y
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "LOCAL", Keyword::LOCAL, false),
+            Token(TokenType::Identifier, "X", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Identifier, "Y", false),
+        };
+        TokenLine localLine(defLoc, toks);
+        REQUIRE(block.parse_body_line(localLine)); // LOCAL line is parsed, not stored
+    }
+
+    // Body references X and Y
+    //   LD X, Y
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "LD", false),
+        Token(TokenType::Identifier, "X", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Identifier, "Y", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1031);
+    REQUIRE(block.expand(useLoc, out));
+
+    // Expect 3 iterations -> 3 lines
+    REQUIRE(out.size() == 3);
+
+    // Each iteration should replace X and Y with X_<id> and Y_<id>, where id increments
+    for (size_t i = 0; i < out.size(); ++i) {
+        const auto& toks = out[i].tokens();
+        REQUIRE(toks.size() == 4);
+        REQUIRE(toks[0].text() == "LD");
+
+        std::string suffix = std::string("_") + std::to_string(start_id + static_cast<int>(i));
+        REQUIRE(toks[1].text() == std::string("X") + suffix);
+        REQUIRE(toks[2].is(TokenType::Comma));
+        REQUIRE(toks[3].text() == std::string("Y") + suffix);
+
+        // Location of expanded lines is the caller's
+        REQUIRE(out[i].location().filename() == "use.asm");
+        REQUIRE(out[i].location().line_num() == 1031);
+    }
+
+    // g_unique_id_counter must be incremented once per iteration
+    REQUIRE(g_unique_id_counter == start_id + 3);
+}
+
+//-----------------------------------------------------------------------------
+// RepeatIterateBlock tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("RepeatIterateBlock: repeats once per parsed item and substitutes variable", "[model][repeat][iterate]") {
+    Location defLoc("defs.asm", 1200);
+    // Variable name 'V'
+    RepeatIterateBlock block(defLoc, "V");
+
+    // Parse items: (1), 2, (IX), HL
+    // Mixed tokens to ensure substitution works for multi-token items
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::LeftParen, "(", false),
+            Token(TokenType::Integer, "1", 1, false),
+            Token(TokenType::RightParen, ")", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Integer, "2", 2, false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::LeftParen, "(", false),
+            Token(TokenType::Identifier, "IX", false),
+            Token(TokenType::RightParen, ")", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Identifier, "HL", false)
+        };
+        TokenLine items(defLoc, toks);
+        size_t idx = 0;
+        REQUIRE(block.parse_items(items, idx));
+        // Should consume entire line
+        REQUIRE(idx == toks.size());
+    }
+
+    // Body references the iteration variable V
+    //   LD V
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "LD", false),
+        Token(TokenType::Identifier, "V", false)
+    }));
+
+    // Expand: expect one output line per item (4 lines)
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1201);
+    REQUIRE(block.expand(useLoc, out));
+    REQUIRE(out.size() == 4);
+
+    // Line 0: LD (1)
+    {
+        const auto& toks = out[0].tokens();
+        REQUIRE(out[0].location().filename() == "use.asm");
+        REQUIRE(out[0].location().line_num() == 1201);
+        REQUIRE(toks.size() == 4);
+        REQUIRE(toks[0].text() == "LD");
+        REQUIRE(toks[1].is(TokenType::LeftParen));
+        REQUIRE(toks[2].is(TokenType::Integer));
+        REQUIRE(toks[3].is(TokenType::RightParen));
+    }
+
+    // Line 1: LD 2
+    {
+        const auto& toks = out[1].tokens();
+        REQUIRE(toks.size() == 2);
+        REQUIRE(toks[0].text() == "LD");
+        REQUIRE(toks[1].is(TokenType::Integer));
+        REQUIRE(toks[1].int_value() == 2);
+    }
+
+    // Line 2: LD (IX)
+    {
+        const auto& toks = out[2].tokens();
+        REQUIRE(toks.size() == 4);
+        REQUIRE(toks[0].text() == "LD");
+        REQUIRE(toks[1].is(TokenType::LeftParen));
+        REQUIRE(toks[2].is(TokenType::Identifier));
+        REQUIRE(toks[2].text() == "IX");
+        REQUIRE(toks[3].is(TokenType::RightParen));
+    }
+
+    // Line 3: LD HL
+    {
+        const auto& toks = out[3].tokens();
+        REQUIRE(toks.size() == 2);
+        REQUIRE(toks[0].text() == "LD");
+        REQUIRE(toks[1].is(TokenType::Identifier));
+        REQUIRE(toks[1].text() == "HL");
+    }
+}
+
+TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration using global unique_id",
+          "[model][repeat][iterate][locals]") {
+    int start_id = g_unique_id_counter;
+
+    Location defLoc("defs.asm", 1210);
+    RepeatIterateBlock block(defLoc, "V");
+
+    // Items: A, B, C
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "A", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Identifier, "B", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Identifier, "C", false)
+        };
+        TokenLine items(defLoc, toks);
+        size_t idx = 0;
+        REQUIRE(block.parse_items(items, idx));
+        REQUIRE(idx == toks.size());
+    }
+
+    // Declare locals via LOCAL line: LOCAL X, Y
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "LOCAL", Keyword::LOCAL, false),
+            Token(TokenType::Identifier, "X", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Identifier, "Y", false),
+        };
+        TokenLine localLine(defLoc, toks);
+        REQUIRE(block.parse_body_line(localLine)); // LOCAL parsed, not stored
+    }
+
+    // Body references V and the locals: "LD X, V" and "INC Y"
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "LD", false),
+        Token(TokenType::Identifier, "X", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Identifier, "V", false)
+    }));
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "INC", false),
+        Token(TokenType::Identifier, "Y", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1211);
+    REQUIRE(block.expand(useLoc, out));
+
+    // Expect 3 items -> 2 lines per item -> 6 lines total
+    REQUIRE(out.size() == 6);
+
+    // Validate each iteration has unique local suffix and correct substitution of V
+    auto assertIteration = [&](size_t baseIndex, const char* vName, int expectedId) {
+        const auto& l0 = out[baseIndex + 0].tokens();
+        const auto& l1 = out[baseIndex + 1].tokens();
+
+        // Line 0: LD X_<id>, V
+        REQUIRE(l0.size() == 4);
+        REQUIRE(l0[0].text() == "LD");
+        REQUIRE(l0[1].is(TokenType::Identifier));
+        REQUIRE(l0[1].text() == std::string("X_") + std::to_string(expectedId));
+        REQUIRE(l0[2].is(TokenType::Comma));
+        REQUIRE(l0[3].is(TokenType::Identifier));
+        REQUIRE(l0[3].text() == vName);
+
+        // Line 1: INC Y_<id>
+        REQUIRE(l1.size() == 2);
+        REQUIRE(l1[0].text() == "INC");
+        REQUIRE(l1[1].is(TokenType::Identifier));
+        REQUIRE(l1[1].text() == std::string("Y_") + std::to_string(expectedId));
+
+        // Location of expanded lines is the caller's
+        REQUIRE(out[baseIndex + 0].location().filename() == "use.asm");
+        REQUIRE(out[baseIndex + 1].location().filename() == "use.asm");
+        REQUIRE(out[baseIndex + 0].location().line_num() == 1211);
+        REQUIRE(out[baseIndex + 1].location().line_num() == 1211);
+    };
+
+    // Iteration 0: V = A, id = start_id
+    assertIteration(0, "A", start_id);
+
+    // Iteration 1: V = B, id = start_id + 1
+    assertIteration(2, "B", start_id + 1);
+
+    // Iteration 2: V = C, id = start_id + 2
+    assertIteration(4, "C", start_id + 2);
+
+    // unique_id increments once per iteration
+    REQUIRE(g_unique_id_counter == start_id + 3);
+}
+
+TEST_CASE("RepeatIterateBlock: error when iteration variable conflicts with LOCAL name",
+          "[model][repeat][iterate][locals][error]") {
+    SuppressErrors suppress;
+
+    Location defLoc("defs.asm", 1220);
+    // Iteration variable is "X"
+    RepeatIterateBlock block(defLoc, "X");
+
+    // Items: A, B
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "A", false),
+            Token(TokenType::Comma, ",", false),
+            Token(TokenType::Identifier, "B", false)
+        };
+        TokenLine items(defLoc, toks);
+        size_t idx = 0;
+        REQUIRE(block.parse_items(items, idx));
+        REQUIRE(idx == toks.size());
+    }
+
+    // Declare a local with the same name as the iteration variable: LOCAL X
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "LOCAL", Keyword::LOCAL, false),
+            Token(TokenType::Identifier, "X", false)
+        };
+        TokenLine localLine(defLoc, toks);
+        // Parsing succeeds but should set up a name conflict for expand
+        REQUIRE(block.parse_body_line(localLine));
+        REQUIRE(g_errors.has_errors());
+    }
+
+    // Body references X (iteration variable)
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "LD", false),
+        Token(TokenType::Identifier, "X", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1221);
+
+    REQUIRE(block.expand(useLoc, out));
+    REQUIRE(!out.empty());
+}
+
+//-----------------------------------------------------------------------------
+// RepeatCharsBlock tests
+//-----------------------------------------------------------------------------
+
+TEST_CASE("RepeatCharsBlock: repeats once per character in string; variable is integer char code",
+          "[model][repeat][chars]") {
+    Location defLoc("defs.asm", 1300);
+    // Iteration variable name 'C'
+    RepeatCharsBlock block(defLoc, "C");
+
+    // Parse items from a string: "Az"
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::String, "\"Az\"", "Az", false)
+        };
+        TokenLine items(defLoc, toks);
+        size_t idx = 0;
+        REQUIRE(block.parse_chars(items, idx));
+        REQUIRE(idx == toks.size());
+    }
+
+    // Body: DB C
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "DB", false),
+        Token(TokenType::Identifier, "C", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1301);
+    REQUIRE(block.expand(useLoc, out));
+
+    // Two characters -> two lines
+    REQUIRE(out.size() == 2);
+
+    // First char 'A' (ASCII 65)
+    {
+        const auto& toks = out[0].tokens();
+        REQUIRE(toks.size() == 2);
+        REQUIRE(toks[0].text() == "DB");
+        REQUIRE(toks[1].is(TokenType::Integer));
+        REQUIRE(toks[1].text() == "65");
+        REQUIRE(out[0].location().filename() == "use.asm");
+        REQUIRE(out[0].location().line_num() == 1301);
+    }
+
+    // Second char 'z' (ASCII 122)
+    {
+        const auto& toks = out[1].tokens();
+        REQUIRE(toks.size() == 2);
+        REQUIRE(toks[0].text() == "DB");
+        REQUIRE(toks[1].is(TokenType::Integer));
+        REQUIRE(toks[1].text() == "122");
+        REQUIRE(out[1].location().filename() == "use.asm");
+        REQUIRE(out[1].location().line_num() == 1301);
+    }
+}
+
+TEST_CASE("RepeatCharsBlock: repeats once per character in non-string token text", "[model][repeat][chars]") {
+    Location defLoc("defs.asm", 1310);
+    RepeatCharsBlock block(defLoc, "C");
+
+    // Parse items from a non-string token: IDENT 'Ab'
+    {
+        std::vector<Token> toks = {
+            Token(TokenType::Identifier, "Ab", false)
+        };
+        TokenLine items(defLoc, toks);
+        size_t idx = 0;
+        REQUIRE(block.parse_chars(items, idx));
+        REQUIRE(idx == toks.size());
+    }
+
+    // Body: DB C
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "DB", false),
+        Token(TokenType::Identifier, "C", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1311);
+    REQUIRE(block.expand(useLoc, out));
+
+    // Two characters -> two lines
+    REQUIRE(out.size() == 2);
+
+    // First char 'A' (ASCII 65)
+    {
+        const auto& toks = out[0].tokens();
+        REQUIRE(toks.size() == 2);
+        REQUIRE(toks[0].text() == "DB");
+        REQUIRE(toks[1].is(TokenType::Integer));
+        REQUIRE(toks[1].text() == "65");
+    }
+
+    // Second char 'b' (ASCII 98)
+    {
+        const auto& toks = out[1].tokens();
+        REQUIRE(toks.size() == 2);
+        REQUIRE(toks[0].text() == "DB");
+        REQUIRE(toks[1].is(TokenType::Integer));
+        REQUIRE(toks[1].text() == "98");
+    }
+}
+
+TEST_CASE("RepeatCharsBlock: empty input yields no output and expand returns false (no tokens)",
+          "[model][repeat][chars]") {
+    Location defLoc("defs.asm", 1320);
+    RepeatCharsBlock block(defLoc, "C");
+
+    // Parse items from an empty token list
+    TokenLine items(defLoc, {});
+    size_t idx = 0;
+    REQUIRE(block.parse_chars(items, idx));
+    REQUIRE(idx == 0);
+
+    // Body: DB C (won't be used)
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "DB", false),
+        Token(TokenType::Identifier, "C", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1321);
+    REQUIRE_FALSE(block.expand(useLoc, out));
+    REQUIRE(out.empty());
+}
+
+TEST_CASE("RepeatCharsBlock: empty string input yields no output and expand returns false", "[model][repeat][chars]") {
+    Location defLoc("defs.asm", 1330);
+    RepeatCharsBlock block(defLoc, "C");
+
+    // Parse items from an empty string: ""
+    TokenLine items(defLoc, { Token(TokenType::String, "\"\"", "", false)});
+    size_t idx = 0;
+    REQUIRE(block.parse_chars(items, idx));
+    REQUIRE(idx == 1); // consumed the string token
+    // No characters should have been added to items
+
+    // Body: DB C (won't be used)
+    block.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "DB", false),
+        Token(TokenType::Identifier, "C", false)
+    }));
+
+    std::vector<TokenLine> out;
+    Location useLoc("use.asm", 1331);
+    REQUIRE_FALSE(block.expand(useLoc, out));
+    REQUIRE(out.empty());
 }
