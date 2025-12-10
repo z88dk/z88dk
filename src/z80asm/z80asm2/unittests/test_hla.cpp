@@ -8,7 +8,7 @@
 #include "../errors.h"
 #include "../hla.h"
 #include "../preprocessor.h"
-#include "../symbol_table.h"
+#include "../symbols.h"
 #include "catch_amalgamated.hpp"
 #include <filesystem>
 #include <fstream>
@@ -31,16 +31,16 @@ private:
 static StderrSilencer g_stderr_silencer;
 }
 
-static std::vector<TokensLine> run_hla_on_text(Preprocessor& pp,
+static std::vector<TokenLine> run_hla_on_text(Preprocessor& pp,
         const std::string& src, const std::string& fname) {
     HLA hla(&pp);
     hla.clear();
     pp.push_virtual_file(src, fname, 1, true);
 
-    TokensLine line;
-    std::vector<TokensLine> out;
+    TokenLine line;
+    std::vector<TokenLine> out;
     while (hla.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line);
         }
     }
@@ -48,97 +48,97 @@ static std::vector<TokensLine> run_hla_on_text(Preprocessor& pp,
     return out;
 }
 
-static void expect_cp_imm(const TokensLine& l, int imm) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(TokenType::Integer));
-    REQUIRE(l[1].int_value() == imm);
+static void expect_cp_imm(const TokenLine& l, int imm) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(TokenType::Integer));
+    REQUIRE(l.tokens()[1].int_value() == imm);
 }
 
-static void expect_jp_cond_label(const TokensLine& l, Keyword cond,
+static void expect_jp_cond_label(const TokenLine& l, Keyword cond,
                                  const std::string& label) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::JP));
-    REQUIRE(l[1].is(cond));
-    REQUIRE(l[2].is(TokenType::Comma));
-    REQUIRE(l[3].is(TokenType::Identifier));
-    REQUIRE(l[3].text() == label);
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::JP));
+    REQUIRE(l.tokens()[1].is(cond));
+    REQUIRE(l.tokens()[2].is(TokenType::Comma));
+    REQUIRE(l.tokens()[3].is(TokenType::Identifier));
+    REQUIRE(l.tokens()[3].text() == label);
 }
 
-static void expect_jp_label(const TokensLine& l, const std::string& label) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::JP));
-    REQUIRE(l[1].is(TokenType::Identifier));
-    REQUIRE(l[1].text() == label);
+static void expect_jp_label(const TokenLine& l, const std::string& label) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::JP));
+    REQUIRE(l.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(l.tokens()[1].text() == label);
 }
 
-static void expect_dot_label_def(const TokensLine& l,
+static void expect_dot_label_def(const TokenLine& l,
                                  const std::string& label) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(TokenType::Dot));
-    REQUIRE(l[1].is(TokenType::Identifier));
-    REQUIRE(l[1].text() == label);
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(TokenType::Dot));
+    REQUIRE(l.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(l.tokens()[1].text() == label);
 }
 
-static void expect_nop(const TokensLine& l) {
-    REQUIRE(l.size() >= 1);
-    REQUIRE(l[0].is(Keyword::NOP));
+static void expect_nop(const TokenLine& l) {
+    REQUIRE(l.tokens().size() >= 1);
+    REQUIRE(l.tokens()[0].is(Keyword::NOP));
 }
 
-static void expect_cp_reg(const TokensLine& l, Keyword reg) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(reg));
+static void expect_cp_reg(const TokenLine& l, Keyword reg) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(reg));
 }
 
-static void expect_cp_mem_hl(const TokensLine& l) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(TokenType::LeftParen));
-    REQUIRE(l[2].is(Keyword::HL));
-    REQUIRE(l[3].is(TokenType::RightParen));
+static void expect_cp_mem_hl(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(l.tokens()[2].is(Keyword::HL));
+    REQUIRE(l.tokens()[3].is(TokenType::RightParen));
 }
 
-static void expect_cp_mem_abs(const TokensLine& l, int addr) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::CP));
-    REQUIRE(l[1].is(TokenType::LeftParen));
-    REQUIRE(l[2].is(TokenType::Integer));
-    REQUIRE(l[2].int_value() == addr);
-    REQUIRE(l[3].is(TokenType::RightParen));
+static void expect_cp_mem_abs(const TokenLine& l, int addr) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::CP));
+    REQUIRE(l.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(l.tokens()[2].is(TokenType::Integer));
+    REQUIRE(l.tokens()[2].int_value() == addr);
+    REQUIRE(l.tokens()[3].is(TokenType::RightParen));
 }
 
-static std::string expect_jp_cond_any_label(const TokensLine& l, Keyword cond) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::JP));
-    REQUIRE(l[1].is(cond));
-    REQUIRE(l[2].is(TokenType::Comma));
-    REQUIRE(l[3].is(TokenType::Identifier));
-    return l[3].text();
+static std::string expect_jp_cond_any_label(const TokenLine& l, Keyword cond) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::JP));
+    REQUIRE(l.tokens()[1].is(cond));
+    REQUIRE(l.tokens()[2].is(TokenType::Comma));
+    REQUIRE(l.tokens()[3].is(TokenType::Identifier));
+    return l.tokens()[3].text();
 }
 
-static void expect_dec_bc(const TokensLine& l) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::DEC));
-    REQUIRE(l[1].is(Keyword::BC));
+static void expect_dec_bc(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::DEC));
+    REQUIRE(l.tokens()[1].is(Keyword::BC));
 }
-static void expect_ld_a_b(const TokensLine& l) {
-    REQUIRE(l.size() == 4);
-    REQUIRE(l[0].is(Keyword::LD));
-    REQUIRE(l[1].is(Keyword::A));
-    REQUIRE(l[2].is(TokenType::Comma));
-    REQUIRE(l[3].is(Keyword::B));
+static void expect_ld_a_b(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 4);
+    REQUIRE(l.tokens()[0].is(Keyword::LD));
+    REQUIRE(l.tokens()[1].is(Keyword::A));
+    REQUIRE(l.tokens()[2].is(TokenType::Comma));
+    REQUIRE(l.tokens()[3].is(Keyword::B));
 }
-static void expect_or_c(const TokensLine& l) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::OR));
-    REQUIRE(l[1].is(Keyword::C));
+static void expect_or_c(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::OR));
+    REQUIRE(l.tokens()[1].is(Keyword::C));
 }
 
-static void expect_dec_b(const TokensLine& l) {
-    REQUIRE(l.size() == 2);
-    REQUIRE(l[0].is(Keyword::DEC));
-    REQUIRE(l[1].is(Keyword::B));
+static void expect_dec_b(const TokenLine& l) {
+    REQUIRE(l.tokens().size() == 2);
+    REQUIRE(l.tokens()[0].is(Keyword::DEC));
+    REQUIRE(l.tokens()[1].is(Keyword::B));
 }
 
 TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
@@ -157,22 +157,22 @@ TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
     // Line 1: LD A,B
     {
         const auto& l = lines[0];
-        REQUIRE(l.size() == 4);
-        REQUIRE(l[0].is(Keyword::LD));
-        REQUIRE(l[1].is(Keyword::A));
-        REQUIRE(l[2].is(TokenType::Comma));
-        REQUIRE(l[3].is(Keyword::B));
+        REQUIRE(l.tokens().size() == 4);
+        REQUIRE(l.tokens()[0].is(Keyword::LD));
+        REQUIRE(l.tokens()[1].is(Keyword::A));
+        REQUIRE(l.tokens()[2].is(TokenType::Comma));
+        REQUIRE(l.tokens()[3].is(Keyword::B));
     }
 
     // Line 2: ADD A,1
     {
         const auto& l = lines[1];
-        REQUIRE(l.size() == 4);
-        REQUIRE(l[0].is(Keyword::ADD));
-        REQUIRE(l[1].is(Keyword::A));
-        REQUIRE(l[2].is(TokenType::Comma));
-        REQUIRE(l[3].is(TokenType::Integer));
-        REQUIRE(l[3].int_value() == 1);
+        REQUIRE(l.tokens().size() == 4);
+        REQUIRE(l.tokens()[0].is(Keyword::ADD));
+        REQUIRE(l.tokens()[1].is(Keyword::A));
+        REQUIRE(l.tokens()[2].is(TokenType::Comma));
+        REQUIRE(l.tokens()[3].is(TokenType::Integer));
+        REQUIRE(l.tokens()[3].int_value() == 1);
     }
 }
 
@@ -249,8 +249,8 @@ TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
     REQUIRE(lines.size() >= 5);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2].size() == 1);
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens().size() == 1);
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[3], "HLA_IF_0_ELSE");
     expect_dot_label_def(lines[4], "HLA_IF_0_END");
 }
@@ -276,10 +276,10 @@ TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
     REQUIRE(lines.size() >= 7);
     expect_cp_imm(lines[0], 2);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
-    REQUIRE(lines[5][0].is(Keyword::NOP));
+    REQUIRE(lines[5].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[6], "HLA_IF_0_END");
 }
 
@@ -312,15 +312,15 @@ TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
     REQUIRE(lines.size() >= 12);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
     expect_cp_imm(lines[5], 2);
     expect_jp_cond_label(lines[6], Keyword::NZ, "HLA_IF_1_ELSE");
-    REQUIRE(lines[7][0].is(Keyword::NOP));
+    REQUIRE(lines[7].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[8], "HLA_IF_0_END");
     expect_dot_label_def(lines[9], "HLA_IF_1_ELSE");
-    REQUIRE(lines[10][0].is(Keyword::NOP));
+    REQUIRE(lines[10].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[11], "HLA_IF_0_END");
 }
 
@@ -356,17 +356,17 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
     REQUIRE(lines.size() >= 15);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
     expect_cp_imm(lines[5], 2);
     expect_jp_cond_label(lines[6], Keyword::NZ, "HLA_IF_1_ELSE");
-    REQUIRE(lines[7][0].is(Keyword::NOP));
+    REQUIRE(lines[7].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[8], "HLA_IF_0_END");
     expect_dot_label_def(lines[9], "HLA_IF_1_ELSE");
     expect_cp_imm(lines[10], 3);
     expect_jp_cond_label(lines[11], Keyword::NZ, "HLA_IF_2_ELSE");
-    REQUIRE(lines[12][0].is(Keyword::NOP));
+    REQUIRE(lines[12].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[13], "HLA_IF_2_ELSE");
     expect_dot_label_def(lines[14], "HLA_IF_0_END");
 }
@@ -407,20 +407,20 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
     REQUIRE(lines.size() >= 17);
     expect_cp_imm(lines[0], 1);
     expect_jp_cond_label(lines[1], Keyword::NZ, "HLA_IF_0_ELSE");
-    REQUIRE(lines[2][0].is(Keyword::NOP));
+    REQUIRE(lines[2].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[3], "HLA_IF_0_END");
     expect_dot_label_def(lines[4], "HLA_IF_0_ELSE");
     expect_cp_imm(lines[5], 2);
     expect_jp_cond_label(lines[6], Keyword::NZ, "HLA_IF_1_ELSE");
-    REQUIRE(lines[7][0].is(Keyword::NOP));
+    REQUIRE(lines[7].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[8], "HLA_IF_0_END");
     expect_dot_label_def(lines[9], "HLA_IF_1_ELSE");
     expect_cp_imm(lines[10], 3);
     expect_jp_cond_label(lines[11], Keyword::NZ, "HLA_IF_2_ELSE");
-    REQUIRE(lines[12][0].is(Keyword::NOP));
+    REQUIRE(lines[12].tokens()[0].is(Keyword::NOP));
     expect_jp_label(lines[13], "HLA_IF_0_END");
     expect_dot_label_def(lines[14], "HLA_IF_2_ELSE");
-    REQUIRE(lines[15][0].is(Keyword::NOP));
+    REQUIRE(lines[15].tokens()[0].is(Keyword::NOP));
     expect_dot_label_def(lines[16], "HLA_IF_0_END");
 }
 
@@ -739,15 +739,22 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbols",
           "[hla][expr][symbols]") {
     // Helper to define a symbol in the test symbol table
-    auto define_sym = [](Preprocessor & pp, const std::string & name, int value,
-                         bool is_const,
-    bool is_def = true) {
-        Symbol s;
-        s.name = name;
-        s.value = value;
-        s.is_defined = is_def;
-        s.is_constant = is_const;
-        pp.pp_symtab().add_symbol(name, s);
+    auto define_sym = [](Preprocessor & pp, const std::string & name,
+    int value, bool is_const, bool is_def = true) {
+        if (!is_def) {
+            Location ext_loc("ext.asm", 100);
+            pp.pp_module()->declare_symbol(name, ext_loc, SymbolScope::Extern);
+        }
+        else if (!is_const) {
+            Location var_loc("var.asm", 200);
+            pp.pp_module()->add_symbol(name, var_loc,
+                                       pp.pp_module()->current_section()->last_opcode(), 0,
+                                       SymbolType::AddressRelative);
+        }
+        else {
+            Location const_loc("const.asm", 300);
+            pp.pp_module()->add_symbol(name, const_loc, value, SymbolType::Constant);
+        }
     };
 
     SECTION("Constant symbol in immediate expression") {
@@ -1234,7 +1241,7 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
     expect_jp_cond_label(lines[7], Keyword::NZ, inner_top);
     // inner end label
     REQUIRE(lines[8].size() == 2);
-    REQUIRE(lines[8][1].text().find("HLA_REPEAT_1_END") != std::string::npos);
+    REQUIRE(lines[8].tokens()[1].text().find("HLA_REPEAT_1_END") != std::string::npos);
     // middle NOP
     expect_nop(lines[9]);
     // outer untilbc sequence

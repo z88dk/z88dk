@@ -969,7 +969,7 @@ yy46:
                 }
                 if (q >= pe) {
                     // line continuation
-                    if (!next_line(source_line_)) {
+                    if (!next_line_from_provider()) {
                         return true;	// no more input
                     }
                     p = source_line_.c_str();
@@ -2215,7 +2215,7 @@ c_comment:
         }
 
         // continue to next line
-        if (!next_line(source_line_)) {
+        if (!next_line_from_provider()) {
             break;	// unterminated comment
         }
 

@@ -149,9 +149,6 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\file_cache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\symbols.h">
       <Filter>Header Files</Filter>
     </ClInclude>
