@@ -36,7 +36,7 @@ typedef enum
 } breakpoint_ret_t;
 
 typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
-typedef uint8_t (*connect_cb)(const char* hostname, int port);
+typedef uint8_t (*connect_cb)(const char* address);
 
 typedef struct {
     get_longlong_cb st;

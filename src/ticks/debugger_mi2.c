@@ -1231,25 +1231,20 @@ static void cmd_target_select(const char* flow, int argc, char **argv) {
         return;
     }
 
-    char hostname[128];
-    int port;
-
-    {
-        int scanf_res = sscanf(argv[2], "tcp:%[^:]:%d", hostname, &port);
-        if (scanf_res != 2) {
-            scanf_res = sscanf(argv[2], "%[^:]:%d", hostname, &port);
-            if (scanf_res != 2) {
-                mi2_printf_error(flow, "target-select: cannot process target address: %s", argv[2]);
-                return;
-            }
-        }
+    const char* address = argv[2];
+    const char* connect_address = address;
+    
+    // Remove "serial:" prefix if present
+    if (strncmp(address, "serial:", 7) == 0) {
+        connect_address = address + 7;
     }
+    
+    // connect_remote() will detect connection type (TCP vs serial) based on address format
 
-    bk.debug("Connecting to %s port %d...\n", hostname, port);
     strcpy(connect_flow, flow);
 
-    if (bk.remote_connect(hostname, port) ) {
-        mi2_printf_error(flow, "target-select: cannot connect hostname %s port %d", hostname, port);
+    if (bk.remote_connect(connect_address)) {
+        mi2_printf_error(flow, "target-select: cannot connect to %s", connect_address);
         return;
     }
 

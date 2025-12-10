@@ -33,5 +33,7 @@ void write_packet_bytes(const uint8_t *data, size_t num_bytes);
 void write_data_raw(const uint8_t *data, ssize_t len);
 void write_binary_packet(const char *pfx, const uint8_t *data, ssize_t num_bytes);
 int read_packet(sock_t sockfd);
+void set_connection_type(uint8_t is_serial);
+uint8_t is_connection_serial(void);
 
 #endif /* PACKETS_H */
