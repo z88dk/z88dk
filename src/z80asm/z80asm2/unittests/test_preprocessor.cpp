@@ -7,7 +7,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../errors.h"
 #include "../preprocessor.h"
-#include "../symbol_table.h"
+#include "../symbols.h"
 #include "catch_amalgamated.hpp"
 #include <cstdio>
 #include <fstream>
@@ -43,14 +43,14 @@ static StderrSilencer g_stderr_silencer;
 }
 
 // Local helper: run the preprocessor on an in-memory string and collect tokenized lines
-static std::vector<TokensLine> run_pp_on_text(const std::string& src,
+static std::vector<TokenLine> run_pp_on_text(const std::string& src,
         const std::string& fname) {
     Preprocessor pp;
     pp.clear();
     pp.push_virtual_file(src, fname, 1, true);
 
-    TokensLine line;
-    std::vector<TokensLine> out;
+    TokenLine line;
+    std::vector<TokenLine> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
             out.push_back(line);
@@ -60,7 +60,7 @@ static std::vector<TokensLine> run_pp_on_text(const std::string& src,
 }
 
 // Extract first integer found from a 'DEFB <int>' line
-static int find_defb_value(const std::vector<TokensLine>& lines) {
+static int find_defb_value(const std::vector<TokenLine>& lines) {
     for (const auto& l : lines) {
         if (!l.empty() && l[0].is(Keyword::DEFB)) {
             for (const auto& t : l.tokens()) {
@@ -82,7 +82,7 @@ TEST_CASE("Preprocessor: split label produces label line then instruction line",
     const std::string content = "start: nop\n";
     pp.push_virtual_file(content, "virtual_label", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // label line
     const auto& toks1 = line.tokens();
     REQUIRE(toks1.size() == 2);
@@ -104,7 +104,7 @@ TEST_CASE("Preprocessor: transform string to list of integer tokens",
     const std::string content = "db \"AB\"\n";
     pp.push_virtual_file(content, "virtual_db", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -136,7 +136,7 @@ TEST_CASE("Preprocessor: include directive pushes included file contents",
     const std::string content = "#include \"" + fname + "\"\nafter\n";
     pp.push_virtual_file(content, "virtual_include", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // first non-directive line should come from the included file
     REQUIRE(pp.next_line(line));
     const auto& toks1 = line.tokens();
@@ -162,7 +162,7 @@ TEST_CASE("Preprocessor: include without filename reports invalid-syntax",
     const std::string content = "#include\n";
     pp.push_virtual_file(content, "virtual_noarg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // consume all produced lines (there should be none)
     while (pp.next_line(line)) { }
 
@@ -186,7 +186,7 @@ TEST_CASE("Preprocessor: include with angle brackets treated as string; missing 
     const std::string content = "#include <" + missing + ">\n";
     pp.push_virtual_file(content, "virtual_angle", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // consume produced lines (none expected because include is processed as directive)
     while (pp.next_line(line)) { }
 
@@ -213,7 +213,7 @@ TEST_CASE("Preprocessor: string escape sequences are converted to integer list",
         "db \"A\\a\\b\\e\\f\\n\\r\\t\\v\\x41\\101\\\\\\\"\\'\"\n";
     pp.push_virtual_file(content, "escape_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
 
     const auto& toks = line.tokens();
@@ -262,7 +262,7 @@ TEST_CASE("Preprocessor: leading empty string in db list removed with following 
     const std::string content = "db \"\",65\n";
     pp.push_virtual_file(content, "empty_string_leading", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -295,7 +295,7 @@ TEST_CASE("Preprocessor: middle empty string in db list removed along with surro
     const std::string content = "db 65,\"\",66\n";
     pp.push_virtual_file(content, "empty_string_middle", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -328,7 +328,7 @@ TEST_CASE("Preprocessor: trailing empty string in db list removed with preceding
     const std::string content = "db 77,78,\"\"\n";
     pp.push_virtual_file(content, "empty_string_trailing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -364,7 +364,7 @@ TEST_CASE("Preprocessor: multiple empty strings interleaved are all removed with
     const std::string content = "db \"\",1,\"\",2,\"\"\n";
     pp.push_virtual_file(content, "empty_string_multiple", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -396,7 +396,7 @@ TEST_CASE("Preprocessor: DEFB list removes empty string element and adjacent com
     const std::string content = "DEFB \"\",81,82\n";
     pp.push_virtual_file(content, "empty_string_defb_leading", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -427,7 +427,7 @@ TEST_CASE("Preprocessor: DEFB list removes trailing empty string and preceding c
     const std::string content = "DEFB 70,\"\"\n";
     pp.push_virtual_file(content, "empty_string_defb_trailing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -485,7 +485,7 @@ TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms"
 
     pp.push_virtual_file(content, "include_forms", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Expect included contents to appear in the same order
     REQUIRE(pp.next_line(line));
@@ -533,7 +533,7 @@ TEST_CASE("Preprocessor: include with trailing extra token after filename is fla
         ofs3 << "P\n";
     }
 
-    TokensLine line;
+    TokenLine line;
 
     // Quoted form with trailing token
     {
@@ -591,7 +591,7 @@ TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines"
     const std::string content = "LINE 100\nfirst_line\nsecond_line\n";
     pp.push_virtual_file(content, "line_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // first returned line should be "first_line" with logical line 100
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
@@ -617,7 +617,7 @@ TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line n
     const std::string content = "LINE 200, \"other.asm\"\nonly_line\n";
     pp.push_virtual_file(content, "orig_file", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
     REQUIRE(line[0].text() == "only_line");
@@ -634,7 +634,7 @@ TEST_CASE("Preprocessor: LINE with missing argument reports error",
     const std::string content = "LINE\n";
     pp.push_virtual_file(content, "line_missing_arg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // consume produced lines (none expected)
     while (pp.next_line(line)) { }
 
@@ -656,7 +656,7 @@ TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for follow
     const std::string content = "C_LINE 400\none_line\ntwo_line\n";
     pp.push_virtual_file(content, "cline_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // first returned line should be "one_line" with logical line 400
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
@@ -682,7 +682,7 @@ TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and lin
     const std::string content = "C_LINE 300, \"cfile.c\"\nonly_c_line\n";
     pp.push_virtual_file(content, "orig_c_line", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
     REQUIRE(line[0].text() == "only_c_line");
@@ -699,7 +699,7 @@ TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
     const std::string content = "C_LINE\n";
     pp.push_virtual_file(content, "cline_missing_arg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // consume produced lines (none expected)
     while (pp.next_line(line)) { }
 
@@ -731,7 +731,7 @@ TEST_CASE("Preprocessor: push_binary_file reads 0..255 bytes and emits DEFB line
     // Push the binary file as a virtual file (DEFB lines)
     pp.push_binary_file(fname, Location(fname, 1));
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     int returned_lines = 0;
 
@@ -784,7 +784,7 @@ TEST_CASE("Preprocessor: BINARY directive is parsed and replaced by 16 DEFB line
 
     pp.push_virtual_file(content, "virtual_binary_dir", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     int defb_lines = 0;
     bool saw_after = false;
@@ -849,7 +849,7 @@ TEST_CASE("Preprocessor: INCBIN directive is parsed and replaced by 16 DEFB line
 
     pp.push_virtual_file(content, "virtual_incbin_dir", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     int defb_lines = 0;
     bool saw_after = false;
@@ -899,7 +899,7 @@ TEST_CASE("Preprocessor: LINE accepts quoted, angle-bracketed and plain filename
 
     pp.push_virtual_file(content, "virtual_line_forms", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
@@ -933,7 +933,7 @@ TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filena
 
     pp.push_virtual_file(content, "virtual_cline_forms", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
@@ -970,7 +970,7 @@ TEST_CASE("Preprocessor: sequence C_LINE then lines then LINE then lines applies
         "D\n";
     pp.push_virtual_file(content, "cline_line_sequence", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First logical output: A at 500 (fixed)
     REQUIRE(pp.next_line(line));
@@ -1037,7 +1037,7 @@ TEST_CASE("Preprocessor: BINARY accepts quoted, angle-bracketed and plain filena
 
     pp.push_virtual_file(content, "virtual_binary_forms", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::vector<int>> groups;
     bool saw_after = false;
 
@@ -1106,7 +1106,7 @@ TEST_CASE("Preprocessor: INCBIN accepts quoted, angle-bracketed and plain filena
 
     pp.push_virtual_file(content, "virtual_incbin_forms", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::vector<int>> groups;
     bool saw_after = false;
 
@@ -1155,7 +1155,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
         const std::string content = "#define X FOO\nX\n";
         pp.push_virtual_file(content, "def_obj_hash", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(TokenType::Identifier));
@@ -1171,7 +1171,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
         const std::string content = "#define X 5\nX\n";
         pp.push_virtual_file(content, "def_obj_hash", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -1196,7 +1196,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
         const std::string content = "#define X 5 more\nX\n";
         pp.push_virtual_file(content, "def_obj_hash", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 2);
         REQUIRE(line[0].is(TokenType::Integer));
@@ -1214,7 +1214,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
         const std::string content = "Y define FOO\nY\n";
         pp.push_virtual_file(content, "def_obj_name", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(TokenType::Identifier));
@@ -1230,7 +1230,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
         const std::string content = "Y define 6\nY\n";
         pp.push_virtual_file(content, "def_obj_name", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -1255,7 +1255,7 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
         const std::string content = "Y define 6 more\nY\n";
         pp.push_virtual_file(content, "def_obj_name", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 2);
         REQUIRE(line[0].is(TokenType::Integer));
@@ -1281,7 +1281,7 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
             "F(A)\n";
         pp.push_virtual_file(content, "def_func_arg_expand", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -1307,7 +1307,7 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
             "ADD1(1,TWO)\n";
         pp.push_virtual_file(content, "def_func_multiarg", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -1340,7 +1340,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         const std::string content = "#define EMPTY\nEMPTY\n";
         pp.push_virtual_file(content, "def_empty_hash", 1, true);
 
-        TokensLine line;
+        TokenLine line;
 
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
@@ -1364,7 +1364,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         const std::string content = "E define\nE\n";
         pp.push_virtual_file(content, "def_empty_name", 1, true);
 
-        TokensLine line;
+        TokenLine line;
 
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
@@ -1388,7 +1388,7 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         const std::string content = "#define F(x)\nF(2)\n";
         pp.push_virtual_file(content, "def_empty_func", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(TokenType::Integer));
@@ -1410,7 +1410,7 @@ TEST_CASE("Preprocessor: macro recursion limit is enforced for self-recursive ma
         "R\n";
     pp.push_virtual_file(content, "def_recursion", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // consume produced lines (there will be at least one)
     while (pp.next_line(line)) { }
 
@@ -1428,7 +1428,7 @@ TEST_CASE("Preprocessor: name undef removes macro (name UNDEF syntax)",
     const std::string content = "M define FOO\nM undef\nM\n";
     pp.push_virtual_file(content, "def_name_undef", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -1445,7 +1445,7 @@ TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
     const std::string content = "#define N FOO\n#undef N\nN\n";
     pp.push_virtual_file(content, "def_hash_undef", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 1);
     REQUIRE(line[0].is(TokenType::Identifier));
@@ -1468,7 +1468,7 @@ TEST_CASE("Preprocessor: stringize operator '#' produces a string token for a si
         "S(Hello)\n";
     pp.push_virtual_file(content, "str_simple", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1506,7 +1506,7 @@ TEST_CASE("Preprocessor: stringize '#' uses the original (unexpanded) argument",
         "S(A)\n";
     pp.push_virtual_file(content, "str_unexpanded", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(toks.size() >= 1);
@@ -1530,7 +1530,7 @@ TEST_CASE("Preprocessor: stringize '#' escapes double-quotes and backslashes in 
         "S(\"hi\")\n";
     pp.push_virtual_file(content, "str_escape", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(toks.size() >= 7);
@@ -1563,7 +1563,7 @@ TEST_CASE("Preprocessor: stringize '#' preserves spaces between tokens producing
         "S(A B)\n";
     pp.push_virtual_file(content, "str_space", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1591,7 +1591,7 @@ TEST_CASE("Preprocessor: single-line /* */ comment removed",
     const std::string content = "A/*single*/B\n";
     pp.push_virtual_file(content, "comment_single", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1613,7 +1613,7 @@ TEST_CASE("Preprocessor: multi-line /* */ comment removed",
     const std::string content = "A/*multi\nline\ncomment*/B\n";
     pp.push_virtual_file(content, "comment_multi", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1638,7 +1638,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' concatenates two identifiers into one i
     const std::string content = "A ## B\n";
     pp.push_virtual_file(content, "paste_ids", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1662,7 +1662,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' concatenates identifier and integer int
     const std::string content = "P##1\n";
     pp.push_virtual_file(content, "paste_id_int", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1685,7 +1685,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' supports multiple pastes in the same li
     const std::string content = "A##B C##D\n";
     pp.push_virtual_file(content, "paste_multi", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -1719,7 +1719,7 @@ TEST_CASE("Preprocessor: DEFL infix 'name DEFL expr' defines and replaces symbol
         "idx\n";
     pp.push_virtual_file(content, "defl_infix", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -1738,7 +1738,7 @@ TEST_CASE("Preprocessor: DEFL prefix 'DEFL name=expr' defines and replaces symbo
         "count\n";
     pp.push_virtual_file(content, "defl_prefix", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -1759,7 +1759,7 @@ TEST_CASE("Preprocessor: DEFL can use previous value (DEFL index=index+1)",
         "index\n";
     pp.push_virtual_file(content, "defl_prev", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -1787,7 +1787,7 @@ TEST_CASE("Preprocessor: DEFL stores non-constant expanded body (e.g., comma lis
         "db P\n";
     pp.push_virtual_file(content, "defl_nonconst", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(
                 line)); // expect the "db P" line after directives are consumed
 
@@ -1829,7 +1829,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
         const std::string content = "A DEFINE = 5\nA\n";
         pp.push_virtual_file(content, "def_eq_obj_spaced", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].text() == "DEFC");
@@ -1854,7 +1854,7 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
         const std::string content = "B define=6\nB\n";
         pp.push_virtual_file(content, "def_eq_obj_nospaces", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].text() == "DEFC");
@@ -1882,7 +1882,7 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
         const std::string content = "E DEFINE =\nE\n";
         pp.push_virtual_file(content, "def_eq_empty_obj", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(line.size() == 4);
         REQUIRE(line[0].text() == "DEFC");
@@ -1907,7 +1907,7 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
         const std::string content = "#define F(x)\nF(2)\n";
         pp.push_virtual_file(content, "def_eq_empty_func", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line)); // expanded "F(2)"
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(TokenType::Integer));
@@ -1927,7 +1927,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
         const std::string content = "DEFINE A = FOO\nA\n";
         pp.push_virtual_file(content, "def_prefix_eq_obj_spaced", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line)); // expanded "A"
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(TokenType::Identifier));
@@ -1942,7 +1942,7 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
         const std::string content = "DEFINE B=FOO\nB\n";
         pp.push_virtual_file(content, "def_prefix_eq_obj_nospaces", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line)); // expanded "B"
         REQUIRE(line.size() == 1);
         REQUIRE(line[0].is(TokenType::Identifier));
@@ -1960,7 +1960,7 @@ TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
     const std::string content = "DEFINE E =\nE\n";
     pp.push_virtual_file(content, "def_prefix_eq_empty_obj", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].text() == "DEFC");
@@ -1988,7 +1988,7 @@ TEST_CASE("Preprocessor: prefix DEFINE function-like accepts optional '=' before
         "ID(7)\n";
     pp.push_virtual_file(content, "def_prefix_eq_func", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // expanded "ID(7)"
     const auto& toks = line.tokens();
 
@@ -2013,7 +2013,7 @@ TEST_CASE("Preprocessor: name UNDEFINE removes macro (synonym to UNDEF)",
     const std::string content = "M define FOO\nM UNDEFINE\nM\n";
     pp.push_virtual_file(content, "def_name_undefine", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(!toks.empty());
@@ -2030,7 +2030,7 @@ TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
     const std::string content = "#define N FOO\n#UNDEFINE N\nN\n";
     pp.push_virtual_file(content, "def_hash_undefine", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 1);
     REQUIRE(line[0].is(TokenType::Identifier));
@@ -2060,7 +2060,7 @@ TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at cal
         "after\n";
     pp.push_virtual_file(content, "macro_multiline_dir", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // 1st expanded line
     REQUIRE(pp.next_line(line));
@@ -2119,7 +2119,7 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines a
         "after2\n";
     pp.push_virtual_file(content, "macro_multiline_name", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // 1st expanded line
     REQUIRE(pp.next_line(line));
@@ -2181,7 +2181,7 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parse
         "after_np\n";
     pp.push_virtual_file(content, "macro_params_no_paren_dir", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expanded line: L1 11
     REQUIRE(pp.next_line(line));
@@ -2239,7 +2239,7 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) 
         "after_pair\n";
     pp.push_virtual_file(content, "macro_params_no_paren_name", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expanded line: A 7
     REQUIRE(pp.next_line(line));
@@ -2301,7 +2301,7 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is acc
         "done\n";
     pp.push_virtual_file(content, "macro_header_no_parens", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expanded line
     REQUIRE(pp.next_line(line));
@@ -2359,7 +2359,7 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parent
         "end2\n";
     pp.push_virtual_file(content, "macro_header_call_no_parens", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expanded line
     REQUIRE(pp.next_line(line));
@@ -2426,7 +2426,7 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
         "after_nested\n";
     pp.push_virtual_file(content, "macro_nested_dir_inner", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Expect expansion of IN(12) produced by the nested macro definition
     REQUIRE(pp.next_line(line));
@@ -2488,7 +2488,7 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
         "tail\n";
     pp.push_virtual_file(content, "macro_nested_name_inner", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expanded line from INN(3)
     REQUIRE(pp.next_line(line));
@@ -2556,7 +2556,7 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
         "after_ml\n";
     pp.push_virtual_file(content, "macro_arg_multiline_paren", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() >= 2);
@@ -2591,7 +2591,7 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
         "after_ml2\n";
     pp.push_virtual_file(content, "macro_arg_multiline_noparen", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() >= 2);
@@ -2621,7 +2621,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expand
         "A ## B\n";
     pp.push_virtual_file(content, "paste_then_expand_obj", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -2647,7 +2647,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue produces an identifier that expand
         "P##1(99)\n";
     pp.push_virtual_file(content, "paste_then_expand_func", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -2673,7 +2673,7 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces m
         "Q ## 2\n";
     pp.push_virtual_file(content, "paste_id_int_expand", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -2709,7 +2709,7 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
         "after_local\n";
     pp.push_virtual_file(content, "macro_local_labels", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expansion: label line ('. L_1') then 'nop' line
     REQUIRE(pp.next_line(line));
@@ -2769,7 +2769,7 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per
         "done_local\n";
     pp.push_virtual_file(content, "macro_local_idents", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expansion: mov tmp_1,5  (tmp renamed)
     REQUIRE(pp.next_line(line));
@@ -2828,7 +2828,7 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
         "after\n";
     pp.push_virtual_file(content, "local_outside_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First returned logical line must be the 'after' line.
     REQUIRE(pp.next_line(line));
@@ -2869,7 +2869,7 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
         "after_nested_locals\n";
     pp.push_virtual_file(content, "macro_local_nested", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // OUT() expansion at call-site line 1000
     REQUIRE(pp.next_line(line));
@@ -2943,7 +2943,7 @@ TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
         "after\n";
     pp.push_virtual_file(content, "exitm_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Only the lines before EXITM ("A") should be emitted from the macro
     REQUIRE(pp.next_line(line));
@@ -2969,7 +2969,7 @@ TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
         "X\n";
     pp.push_virtual_file(content, "exitm_outside", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "X");
@@ -2994,7 +2994,7 @@ TEST_CASE("Preprocessor: #define redefines existing #define -> MacroRedefined er
         "A\n";
     pp.push_virtual_file(content, "redef_define_hash", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume all lines so diagnostics are emitted
     while (pp.next_line(line)) {}
 
@@ -3014,7 +3014,7 @@ TEST_CASE("Preprocessor: name define redefines existing define -> MacroRedefined
         "B\n";
     pp.push_virtual_file(content, "redef_define_name", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -3035,7 +3035,7 @@ TEST_CASE("Preprocessor: MACRO (directive form) redefines existing MACRO -> Macr
         "M()\n";
     pp.push_virtual_file(content, "redef_macro_dir", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -3057,7 +3057,7 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) redefines existing MACRO ->
         "N()\n";
     pp.push_virtual_file(content, "redef_macro_name", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -3080,7 +3080,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
             "X\n";
         pp.push_virtual_file(content, "redef_mixed_def_then_macro", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         while (pp.next_line(line)) {}
 
         REQUIRE(g_errors.has_errors());
@@ -3101,7 +3101,7 @@ TEST_CASE("Preprocessor: mixed redefinitions (#define then MACRO, and MACRO then
             "Y\n";
         pp.push_virtual_file(content, "redef_mixed_macro_then_def", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         while (pp.next_line(line)) {}
 
         REQUIRE(g_errors.has_errors());
@@ -3122,7 +3122,7 @@ TEST_CASE("Preprocessor: DEFL redefinition does NOT raise MacroRedefined",
         "Z\n";
     pp.push_virtual_file(content, "redef_defl", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     // DEFL redefinitions should not be flagged as MacroRedefined
@@ -3145,7 +3145,7 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
 
     // Tokenize the string and define an object-like macro that expands to multiple lines.
     // This emulates Preprocessor::define_macro(name, std::string).
-    TokensFile tf(macro_text, "<macro_define_string>", 1, false);
+    TokenFileReader tf(macro_text, "<macro_define_string>", 1, false);
     pp.define_macro("ML", tf.tok_lines());
 
     // Use a LINE directive to fix the call-site logical location and then invoke the macro.
@@ -3155,7 +3155,7 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
         "tail\n";
     pp.push_virtual_file(content, "ml_call_site", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First expanded line: "LHS 10"
     REQUIRE(pp.next_line(line));
@@ -3209,7 +3209,7 @@ TEST_CASE("Preprocessor: define_macro from string content with label splits labe
         "ret\n";
 
     // Tokenize string and define macro.
-    TokensFile tf(macro_text, "<macro_define_label>", 1, false);
+    TokenFileReader tf(macro_text, "<macro_define_label>", 1, false);
     pp.define_macro("BLK", tf.tok_lines());
 
     // Fix call-site location and invoke the macro.
@@ -3219,7 +3219,7 @@ TEST_CASE("Preprocessor: define_macro from string content with label splits labe
         "after\n";
     pp.push_virtual_file(content, "blk_call_site", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Label line emitted first: ". LBL"
     REQUIRE(pp.next_line(line));
@@ -3285,7 +3285,7 @@ TEST_CASE("Preprocessor: define_macro(name, string) expands multi-line body at c
         "after\n";
     pp.push_virtual_file(content, "define_string_call", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     const std::vector<std::string> expected = { "text", "with", "several", "lines" };
     for (const auto& word : expected) {
@@ -3328,13 +3328,13 @@ TEST_CASE("Preprocessor: define_macro(name, tok_lines) reports MacroRedefined on
 
     // first definition via tok_lines
     {
-        TokensFile tf("X 10\n", "<macro_vec_1>", 1, false);
+        TokenFileReader tf("X 10\n", "<macro_vec_1>", 1, false);
         pp.define_macro("B", tf.tok_lines());
     }
 
     // second definition via tok_lines (same name) triggers error
     {
-        TokensFile tf2("X 20\n", "<macro_vec_2>", 1, false);
+        TokenFileReader tf2("X 20\n", "<macro_vec_2>", 1, false);
         pp.define_macro("B", tf2.tok_lines());
     }
 
@@ -3364,7 +3364,7 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
             "after0\n";
         pp.push_virtual_file(content, "rept_zero", 1, true);
 
-        TokensLine line;
+        TokenLine line;
 
         // First returned line should be the one after the REPT block (no Z0 lines)
         REQUIRE(pp.next_line(line));
@@ -3389,7 +3389,7 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
             "after_neg\n";
         pp.push_virtual_file(content, "rept_negative", 1, true);
 
-        TokensLine line;
+        TokenLine line;
 
         // First returned line should be the one after the REPT block (no NEG lines)
         REQUIRE(pp.next_line(line));
@@ -3415,7 +3415,7 @@ TEST_CASE("Preprocessor: REPT with undefined expression is rejected and body con
         "ENDR\n";
     pp.push_virtual_file(content, "rept_nonconst", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume any produced lines (none expected)
     int produced = 0;
     while (pp.next_line(line)) {
@@ -3433,10 +3433,9 @@ TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body 
           "[preprocessor][rept][error][nonconst]") {
     g_errors.reset();
     Preprocessor pp;
-    Symbol a;
-    a.name = "A";
-    a.is_defined = true;
-    a.is_constant = false;
+    auto a = std::make_shared<Symbol>("A");
+    a->set_defined(true);
+    a->set_constant(false);
     pp.pp_symtab().add_symbol("A", a);
 
     // 'A' is undefined -> non-constant expression for REPT count
@@ -3446,7 +3445,7 @@ TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body 
         "ENDR\n";
     pp.push_virtual_file(content, "rept_nonconst", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume any produced lines (none expected)
     int produced = 0;
     while (pp.next_line(line)) {
@@ -3464,9 +3463,8 @@ TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consum
           "[preprocessor][rept][error][nonconst]") {
     g_errors.reset();
     Preprocessor pp;
-    Symbol a;
-    a.name = "A";
-    a.is_extern = true;
+    auto a = std::make_shared<Symbol>("A");
+    a->set_extern(true);
     pp.pp_symtab().add_symbol("A", a);
 
     // 'A' is undefined -> non-constant expression for REPT count
@@ -3476,7 +3474,7 @@ TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consum
         "ENDR\n";
     pp.push_virtual_file(content, "rept_nonconst", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume any produced lines (none expected)
     int produced = 0;
     while (pp.next_line(line)) {
@@ -3504,7 +3502,7 @@ TEST_CASE("Preprocessor: nested REPT repeats inner body correctly",
         "ENDR\n";
     pp.push_virtual_file(content, "rept_nested", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int countN = 0;
 
     while (pp.next_line(line)) {
@@ -3534,7 +3532,7 @@ TEST_CASE("Preprocessor: REPTC (directive) with string argument produces charact
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_dir_string", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3559,7 +3557,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) with string argument produces ch
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_name_string", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3584,7 +3582,7 @@ TEST_CASE("Preprocessor: REPTC (directive) with numeric argument iterates over d
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_dir_number", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3609,7 +3607,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) with numeric argument iterates o
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_name_number", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3635,7 +3633,7 @@ TEST_CASE("Preprocessor: REPTC (directive) with identifier token sequence produc
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_dir_ident", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3660,7 +3658,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) with identifier token sequence p
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_name_ident", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3686,7 +3684,7 @@ TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string so
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_dir_cat", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3712,7 +3710,7 @@ TEST_CASE("Preprocessor: REPTC accepts token-paste macro result as the string so
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_name_cat", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3738,7 +3736,7 @@ TEST_CASE("Preprocessor: REPTC with DEFL numeric symbol iterates over digits",
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_defl_number", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         for (const auto& t : line.tokens()) {
@@ -3767,7 +3765,7 @@ TEST_CASE("Preprocessor: REPTI (directive) enumerates identifier list into body"
         "ENDR\n";
     pp.push_virtual_file(content, "repti_dir_idents", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> seen;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
@@ -3791,7 +3789,7 @@ TEST_CASE("Preprocessor: REPTI (name-directive) enumerates identifier list into 
         "ENDR\n";
     pp.push_virtual_file(content, "repti_name_idents", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> seen;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
@@ -3815,7 +3813,7 @@ TEST_CASE("Preprocessor: REPTI duplicates body for integer expression arguments 
         "ENDR\n";
     pp.push_virtual_file(content, "repti_dir_numbers", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int line_no = 0;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
@@ -3857,7 +3855,7 @@ TEST_CASE("Preprocessor: REPTI expands macros in arguments before substitution",
         "ENDR\n";
     pp.push_virtual_file(content, "repti_dir_macro_args", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> seen;
     while (pp.next_line(line)) {
         const auto& toks = line.tokens();
@@ -3882,7 +3880,7 @@ TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens
         "ENDR\n";
     pp.push_virtual_file(content, "repti_dir_macro_expr", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -3914,7 +3912,7 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste result in argument via macro"
         "ENDR\n";
     pp.push_virtual_file(content, "repti_dir_cat", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(toks.size() >= 2);
@@ -3937,7 +3935,7 @@ TEST_CASE("Preprocessor: REPTI accepts token-paste in name-directive form via ma
         "ENDR\n";
     pp.push_virtual_file(content, "repti_name_cat", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
     REQUIRE(toks.size() >= 2);
@@ -3963,7 +3961,7 @@ TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product 
         "ENDR\n";
     pp.push_virtual_file(content, "repti_nested", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::pair<int, std::string>> pairs;
 
     while (pp.next_line(line)) {
@@ -4005,7 +4003,7 @@ TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
         "after_rept_local\n";
     pp.push_virtual_file(content, "rept_local_labels", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // 1st iteration label
     REQUIRE(pp.next_line(line));
@@ -4065,7 +4063,7 @@ TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
         "after_rept_local_id\n";
     pp.push_virtual_file(content, "rept_local_idents", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // 1st iteration: 'use t_1'
     REQUIRE(pp.next_line(line));
@@ -4117,7 +4115,7 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
         "after_reptc_local\n";
     pp.push_virtual_file(content, "reptc_local", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // 1st iter label '. lab_1'
     REQUIRE(pp.next_line(line));
@@ -4183,7 +4181,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
         "after_repti_local\n";
     pp.push_virtual_file(content, "repti_local", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // 1st iter label '. p_1'
     REQUIRE(pp.next_line(line));
@@ -4249,7 +4247,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument
         "ENDR\n";
     pp.push_virtual_file(content, "repti_local_arg_preserve", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First output line: 'emit tmp' (not 'tmp_1')
     REQUIRE(pp.next_line(line));
@@ -4305,7 +4303,7 @@ TEST_CASE("Preprocessor: name-directive EQU 'X EQU 5' emits 'DEFC X = 5' tokens"
         "X EQU 5\n";
     pp.push_virtual_file(content, "equ_name_basic", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
@@ -4337,7 +4335,7 @@ TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tok
         "SUM EQU A + B\n";
     pp.push_virtual_file(content, "equ_name_expand", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].text() == "DEFC");
@@ -4378,7 +4376,7 @@ TEST_CASE("Preprocessor: directive EQU 'EQU Y = 7' emits 'DEFC Y = 7' tokens",
         "EQU Y = 7\n";
     pp.push_virtual_file(content, "equ_dir_eq", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
@@ -4403,7 +4401,7 @@ TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits
         "EQU Z A\n";
     pp.push_virtual_file(content, "equ_dir_noeq", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].text() == "DEFC");
@@ -4434,7 +4432,7 @@ TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
         "W EQU = A\n";
     pp.push_virtual_file(content, "equ_name_opt_eq", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].text() == "DEFC");
@@ -4465,7 +4463,7 @@ TEST_CASE("Preprocessor: EQU emitted DEFC line carries directive logical locatio
         "V EQU 9\n";
     pp.push_virtual_file(content, "equ_loc", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
 
     REQUIRE(line.location().line_num() == 123);
@@ -4495,7 +4493,7 @@ TEST_CASE("Preprocessor: '=' synonym converts 'x = 10' to 'DEFC x = 10' tokens",
     const std::string content = "x = 10\n";
     pp.push_virtual_file(content, "eqsyn_basic", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
@@ -4519,7 +4517,7 @@ TEST_CASE("Preprocessor: '=' synonym accepts tight form 'y=7'",
     const std::string content = "y=7\n";
     pp.push_virtual_file(content, "eqsyn_tight", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
@@ -4545,7 +4543,7 @@ TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
         "x = A\n";
     pp.push_virtual_file(content, "eqsyn_expand", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].text() == "DEFC");
@@ -4576,7 +4574,7 @@ TEST_CASE("Preprocessor: '=' synonym DEFC line carries directive logical locatio
         "v = 9\n";
     pp.push_virtual_file(content, "eqsyn_loc_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
 
     REQUIRE(line.location().line_num() == 250);
@@ -4607,7 +4605,7 @@ TEST_CASE("Preprocessor: directive DEFC 'DEFC Y = 7' emits 'DEFC Y = 7' tokens",
         "DEFC Y = 7\n";
     pp.push_virtual_file(content, "defc_dir_eq", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
@@ -4632,7 +4630,7 @@ TEST_CASE("Preprocessor: name-directive DEFC 'W DEFC 3' emits 'DEFC W = 3' token
         "W DEFC 3\n";
     pp.push_virtual_file(content, "defc_name_basic", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& t = line.tokens();
 
@@ -4671,7 +4669,7 @@ TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
         "after\n";
     pp.push_virtual_file(content, "if_nested_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
@@ -4724,7 +4722,7 @@ TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELI
         "done\n";
     pp.push_virtual_file(content, "if_elif_nested", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.to_string() == "DEFC A = 0");
@@ -4769,7 +4767,7 @@ TEST_CASE("Preprocessor: IF with multiple ELIF selects first true and ignores th
         "ENDIF\n";
     pp.push_virtual_file(content, "if_chain", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Only the first matching ELIF branch ("TWO") should be emitted
     REQUIRE(pp.next_line(line));
@@ -4799,11 +4797,10 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
     Preprocessor pp;
 
     // Define A as a constant with value 1
-    Symbol A;
-    A.name = "A";
-    A.value = 1;
-    A.is_defined = true;
-    A.is_constant = true;
+    auto A = std::make_shared<Symbol>("A");
+    A->set_value(1);
+    A->set_defined(true);
+    A->set_constant(true);
     pp.pp_symtab().add_symbol("A", A);
 
     const std::string content =
@@ -4814,7 +4811,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
         "ENDIF\n";
     pp.push_virtual_file(content, "if_sym_true", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Expect IF branch selected
     REQUIRE(pp.next_line(line));
@@ -4832,11 +4829,10 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects EL
     Preprocessor pp;
 
     // Define Z as a constant with value 0
-    Symbol Z;
-    Z.name = "Z";
-    Z.value = 0;
-    Z.is_defined = true;
-    Z.is_constant = true;
+    auto Z = std::make_shared<Symbol>("Z");
+    Z->set_value(0);
+    Z->set_defined(true);
+    Z->set_constant(true);
     pp.pp_symtab().add_symbol("Z", Z);
 
     const std::string content =
@@ -4847,7 +4843,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects EL
         "ENDIF\n";
     pp.push_virtual_file(content, "if_sym_false", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Expect ELSE branch selected
     REQUIRE(pp.next_line(line));
@@ -4872,7 +4868,7 @@ TEST_CASE("Preprocessor: IF with undefined symbol does not report error and sele
         "ENDIF\n";
     pp.push_virtual_file(content, "if_sym_undef", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Expect ELSE branch selected due to undefined symbol evaluating as false
     REQUIRE(pp.next_line(line));
@@ -4904,7 +4900,7 @@ TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
         "ENDIF\n";
     pp.push_virtual_file(content, "ifdef_true", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -4934,7 +4930,7 @@ TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
         "ENDIF\n";
     pp.push_virtual_file(content, "ifndef_true", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line.to_string() == "MISSING_TRUE");
@@ -4958,7 +4954,7 @@ TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
         "ENDIF\n";
     pp.push_virtual_file(content, "elifdef_case", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].text() == "DEFC");
@@ -4990,7 +4986,7 @@ TEST_CASE("Preprocessor: ELIFNDEF after false IF selects when macro is not defin
         "ENDIF\n";
     pp.push_virtual_file(content, "elifndef_case", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "ELIFNDEF_TRUE");
@@ -5017,7 +5013,7 @@ TEST_CASE("Preprocessor: IFDEF/ELIFDEF nested with ELSE/ENDIF behave correctly",
         "ENDIF\n";
     pp.push_virtual_file(content, "ifdef_nested", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.to_string() == "DEFC OUT = 1");
@@ -5042,11 +5038,10 @@ TEST_CASE("Preprocessor: IFDEF uses symbol table definition when macro is absent
     Preprocessor pp;
 
     // Define symbol S in the global symbol table (no macro named S)
-    Symbol s;
-    s.name = "S";
-    s.is_defined = true;
-    s.is_constant = true;
-    s.value = 1;
+    auto s = std::make_shared<Symbol>("S");
+    s->set_defined(true);
+    s->set_constant(true);
+    s->set_value(1);
     pp.pp_symtab().add_symbol("S", s);
 
     const std::string content =
@@ -5057,7 +5052,7 @@ TEST_CASE("Preprocessor: IFDEF uses symbol table definition when macro is absent
         "ENDIF\n";
     pp.push_virtual_file(content, "ifdef_symtab", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "OK_S_DEFINED");
@@ -5072,11 +5067,10 @@ TEST_CASE("Preprocessor: IFNDEF is false when symbol is defined in symbol table"
     Preprocessor pp;
 
     // Define symbol Z as present in the symbol table
-    Symbol z;
-    z.name = "Z";
-    z.is_defined = true;
-    z.is_constant = true;
-    z.value = 0;
+    auto z = std::make_shared<Symbol>("Z");
+    z->set_defined(true);
+    z->set_constant(true);
+    z->set_value(0);
     pp.pp_symtab().add_symbol("Z", z);
 
     const std::string content =
@@ -5087,7 +5081,7 @@ TEST_CASE("Preprocessor: IFNDEF is false when symbol is defined in symbol table"
         "ENDIF\n";
     pp.push_virtual_file(content, "ifndef_symtab", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "OK_Z_DEFINED");
@@ -5102,11 +5096,10 @@ TEST_CASE("Preprocessor: ELIFDEF selects when symbol is defined in symbol table"
     Preprocessor pp;
 
     // Define A in the symbol table
-    Symbol a;
-    a.name = "A";
-    a.is_defined = true;
-    a.is_constant = true;
-    a.value = 123;
+    auto a = std::make_shared<Symbol>("A");
+    a->set_defined(true);
+    a->set_constant(true);
+    a->set_value(123);
     pp.pp_symtab().add_symbol("A", a);
 
     const std::string content =
@@ -5119,7 +5112,7 @@ TEST_CASE("Preprocessor: ELIFDEF selects when symbol is defined in symbol table"
         "ENDIF\n";
     pp.push_virtual_file(content, "elifdef_symtab", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "ELIFDEF_OK");
@@ -5145,7 +5138,7 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
             "ENDIF\n";
         pp.push_virtual_file(content, "elifndef_symtab_undef", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "ELIFNDEF_OK");
@@ -5159,11 +5152,10 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
         g_errors.reset();
         Preprocessor pp;
 
-        Symbol b;
-        b.name = "B";
-        b.is_defined = true;
-        b.is_constant = true;
-        b.value = 7;
+        auto b = std::make_shared<Symbol>("B");
+        b->set_defined(true);
+        b->set_constant(true);
+        b->set_value(7);
         pp.pp_symtab().add_symbol("B", b);
 
         const std::string content =
@@ -5176,7 +5168,7 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
             "ENDIF\n";
         pp.push_virtual_file(content, "elifndef_symtab_def", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "ELSE_OK");
@@ -5206,7 +5198,7 @@ TEST_CASE("Preprocessor: direct recursive include is detected and triggers Recur
 
     pp.push_file(fname);
 
-    TokensLine line;
+    TokenLine line;
     // Consume all produced lines (none expected due to error)
     int produced = 0;
     while (pp.next_line(line)) {
@@ -5251,7 +5243,7 @@ TEST_CASE("Preprocessor: indirect recursive include (A->B->A) is detected and tr
 
     pp.push_file(fileA);
 
-    TokensLine line;
+    TokenLine line;
     // Consume all produced lines
     int produced = 0;
     while (pp.next_line(line)) {
@@ -5309,7 +5301,7 @@ TEST_CASE("Preprocessor: longer cycle (A->B->C->A) is detected and triggers Recu
 
     pp.push_file(fileA);
 
-    TokensLine line;
+    TokenLine line;
     int produced = 0;
     while (pp.next_line(line)) {
         ++produced;
@@ -5355,7 +5347,7 @@ TEST_CASE("Preprocessor: same file can be included multiple times if not recursi
 
     pp.push_file(fileA);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -5404,7 +5396,7 @@ TEST_CASE("Preprocessor: path normalization prevents redundant path forms from a
 
     pp.push_file(fileA);
 
-    TokensLine line;
+    TokenLine line;
     int produced = 0;
     while (pp.next_line(line)) {
         ++produced;
@@ -5444,7 +5436,7 @@ TEST_CASE("Preprocessor: file cache reuses unchanged files",
     Preprocessor pp1;
     pp1.push_file(fname);
 
-    TokensLine line1;
+    TokenLine line1;
     REQUIRE(pp1.next_line(line1));
     REQUIRE(!line1.empty());
     REQUIRE(line1[0].text() == "test_line");
@@ -5453,7 +5445,7 @@ TEST_CASE("Preprocessor: file cache reuses unchanged files",
     Preprocessor pp2;
     pp2.push_file(fname);
 
-    TokensLine line2;
+    TokenLine line2;
     REQUIRE(pp2.next_line(line2));
     REQUIRE(!line2.empty());
     REQUIRE(line2[0].text() == "test_line");
@@ -5494,7 +5486,7 @@ TEST_CASE("Preprocessor: file cache works with multiple includes",
     Preprocessor pp;
     pp.push_file(main_file);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -5535,7 +5527,7 @@ TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
         Preprocessor pp1;
         pp1.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp1.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "shared_content");
@@ -5547,7 +5539,7 @@ TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
         Preprocessor pp2;
         pp2.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp2.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "shared_content");
@@ -5576,7 +5568,7 @@ TEST_CASE("Preprocessor: clear_file_cache empties the cache",
         Preprocessor pp;
         pp.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "before_clear");
@@ -5597,7 +5589,7 @@ TEST_CASE("Preprocessor: clear_file_cache empties the cache",
         Preprocessor pp;
         pp.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "after_clear");
@@ -5626,7 +5618,7 @@ TEST_CASE("Preprocessor: file cache handles path normalization",
         Preprocessor pp;
         pp.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "normalized");
@@ -5637,7 +5629,7 @@ TEST_CASE("Preprocessor: file cache handles path normalization",
         Preprocessor pp;
         pp.push_file("./" + fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "normalized");
@@ -5690,7 +5682,7 @@ TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
     Preprocessor pp;
     pp.push_file(main_file);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -5733,7 +5725,7 @@ TEST_CASE("Preprocessor: file cache invalidates on file modification",
         Preprocessor pp;
         pp.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "original_line");
@@ -5754,7 +5746,7 @@ TEST_CASE("Preprocessor: file cache invalidates on file modification",
         Preprocessor pp;
         pp.push_file(fname);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         REQUIRE(!line.empty());
         REQUIRE(line[0].text() == "modified_line");
@@ -5780,7 +5772,7 @@ TEST_CASE("Preprocessor: REPT with positive count repeats body correctly",
         "after\n";
     pp.push_virtual_file(content, "rept_positive", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int count = 0;
 
     while (pp.next_line(line)) {
@@ -5812,7 +5804,7 @@ TEST_CASE("Preprocessor: BINARY with missing file reports FileNotFound error",
     const std::string content = "BINARY \"" + missing + "\"\n";
     pp.push_virtual_file(content, "binary_missing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -5830,7 +5822,7 @@ TEST_CASE("Preprocessor: INCBIN with missing file reports FileNotFound error",
     const std::string content = "INCBIN \"" + missing + "\"\n";
     pp.push_virtual_file(content, "incbin_missing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -5855,7 +5847,7 @@ TEST_CASE("Preprocessor: BINARY with empty file produces no DEFB lines",
     const std::string content = "BINARY \"" + fname + "\"\nafter\n";
     pp.push_virtual_file(content, "binary_empty", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int defb_count = 0;
     bool saw_after = false;
 
@@ -5896,7 +5888,7 @@ TEST_CASE("Preprocessor: BINARY with non-multiple-of-16 size handles last partia
     const std::string content = "BINARY \"" + fname + "\"\n";
     pp.push_virtual_file(content, "binary_partial", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     int line_count = 0;
 
@@ -5934,7 +5926,7 @@ TEST_CASE("Preprocessor: LINE with non-numeric line number reports error",
     const std::string content = "LINE abc\n";
     pp.push_virtual_file(content, "line_nonnumeric", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -5951,7 +5943,7 @@ TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementat
     const std::string content = "LINE -5\ntest\nthis\n";
     pp.push_virtual_file(content, "line_negative", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == -5);
     REQUIRE(line.size() >= 1);
@@ -5975,7 +5967,7 @@ TEST_CASE("Preprocessor: LINE with trailing tokens after filename ignores them",
     const std::string content = "LINE 100, \"file.asm\" extra\nthis\n";
     pp.push_virtual_file(content, "line_trailing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 100);
     REQUIRE(line.size() >= 1);
@@ -6000,7 +5992,7 @@ TEST_CASE("Preprocessor: function-like macro with too few arguments reports erro
         "ADD1(5)\n";
     pp.push_virtual_file(content, "macro_few_args", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6018,7 +6010,7 @@ TEST_CASE("Preprocessor: function-like macro with too many arguments reports err
         "ADD1(5,10,15)\n";
     pp.push_virtual_file(content, "macro_many_args", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6036,7 +6028,7 @@ TEST_CASE("Preprocessor: function-like macro with empty parentheses when expecti
         "MUL()\n";
     pp.push_virtual_file(content, "macro_empty_args", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6068,7 +6060,7 @@ TEST_CASE("Preprocessor: EXITM in nested macro only exits innermost macro",
         "done\n";
     pp.push_virtual_file(content, "exitm_nested_macro", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6105,7 +6097,7 @@ TEST_CASE("Preprocessor: multiple EXITM in same macro - first one takes effect",
         "after\n";
     pp.push_virtual_file(content, "exitm_multiple", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6135,7 +6127,7 @@ TEST_CASE("Preprocessor: token paste at beginning of replacement list",
         "PASTE(test)\n";
     pp.push_virtual_file(content, "paste_beginning", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() >= 2);
     REQUIRE(line[0].is(TokenType::DoubleHash));
@@ -6157,7 +6149,7 @@ TEST_CASE("Preprocessor: token paste at end of replacement list",
         "PASTE(test)\n";
     pp.push_virtual_file(content, "paste_end", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() >= 2);
     REQUIRE(line[0].is(TokenType::Identifier));
@@ -6179,7 +6171,7 @@ TEST_CASE("Preprocessor: multiple consecutive ## operators",
         "MULTI(X,Y,Z)\n";
     pp.push_virtual_file(content, "paste_consecutive", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -6208,7 +6200,7 @@ TEST_CASE("Preprocessor: stringize with whitespace-only argument",
         "STR(\" \")\n";
     pp.push_virtual_file(content, "stringize_whitespace", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() >= 5);
     REQUIRE(line[0].is(TokenType::Integer));
@@ -6235,7 +6227,7 @@ TEST_CASE("Preprocessor: stringize with special characters",
         "STR(@#$%)\n";
     pp.push_virtual_file(content, "stringize_special", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -6265,7 +6257,7 @@ TEST_CASE("Preprocessor: unmatched ENDIF reports error",
         "line2\n";
     pp.push_virtual_file(content, "unmatched_endif", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6286,7 +6278,7 @@ TEST_CASE("Preprocessor: ELIF without preceding IF reports error",
         "ENDIF\n";
     pp.push_virtual_file(content, "elif_without_if", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6307,7 +6299,7 @@ TEST_CASE("Preprocessor: ELSE without preceding IF reports error",
         "ENDIF\n";
     pp.push_virtual_file(content, "else_without_if", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6331,7 +6323,7 @@ TEST_CASE("Preprocessor: multiple ELSE in same IF block reports error",
         "ENDIF\n";
     pp.push_virtual_file(content, "multiple_else", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6351,7 +6343,7 @@ TEST_CASE("Preprocessor: ENDIF without IF reports error",
         "ENDIF\n";
     pp.push_virtual_file(content, "endif_solo", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6373,7 +6365,7 @@ TEST_CASE("Preprocessor: MACRO without ENDM reports error at end of file",
         "body\n";
     pp.push_virtual_file(content, "macro_no_endm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6392,7 +6384,7 @@ TEST_CASE("Preprocessor: ENDM without MACRO reports error",
         "ENDM\n";
     pp.push_virtual_file(content, "endm_solo", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6412,7 +6404,7 @@ TEST_CASE("Preprocessor: MACRO with empty name reports error",
         "ENDM\n";
     pp.push_virtual_file(content, "macro_no_name", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6432,7 +6424,7 @@ TEST_CASE("Preprocessor: MACRO with duplicate parameter names reports error",
         "ENDM\n";
     pp.push_virtual_file(content, "macro_dup_params", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {}
 
     REQUIRE(g_errors.has_errors());
@@ -6452,7 +6444,7 @@ TEST_CASE("Preprocessor: empty virtual file produces no lines",
     const std::string content = "";
     pp.push_virtual_file(content, "empty_virtual", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -6465,7 +6457,7 @@ TEST_CASE("Preprocessor: virtual file with only whitespace produces no lines",
     const std::string content = "   \n\t\n  \n";
     pp.push_virtual_file(content, "whitespace_virtual", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int line_count = 0;
     while (pp.next_line(line)) {
         ++line_count;
@@ -6486,7 +6478,7 @@ TEST_CASE("Preprocessor: virtual file with only comments produces no output line
         "/* block comment */\n";
     pp.push_virtual_file(content, "comment_virtual", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int line_count = 0;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -6510,7 +6502,7 @@ TEST_CASE("Preprocessor: empty string produces no characters",
     const std::string content = "db \"\"\n";
     pp.push_virtual_file(content, "empty_string", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -6534,7 +6526,7 @@ TEST_CASE("Preprocessor: string with only escape sequences",
     const std::string content = "db \"\\n\\r\\t\"\n";
     pp.push_virtual_file(content, "escapes_only", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -6564,7 +6556,7 @@ TEST_CASE("Preprocessor: multiple labels on same line - each gets split",
     const std::string content = "lab1: lab2: nop\n";
     pp.push_virtual_file(content, "multiple_labels", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> labels;
 
     while (pp.next_line(line)) {
@@ -6589,7 +6581,7 @@ TEST_CASE("Preprocessor: label with no following instruction",
     const std::string content = "label:\n";
     pp.push_virtual_file(content, "label_alone", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -6627,7 +6619,7 @@ TEST_CASE("Preprocessor: EXITM inside IF with true condition exits macro",
         "done\n";
     pp.push_virtual_file(content, "exitm_if_true", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6662,7 +6654,7 @@ TEST_CASE("Preprocessor: EXITM inside IF with false condition does not exit macr
         "done\n";
     pp.push_virtual_file(content, "exitm_if_false", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6700,7 +6692,7 @@ TEST_CASE("Preprocessor: EXITM in ELSE branch exits when IF condition is false",
         "done\n";
     pp.push_virtual_file(content, "exitm_else", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6741,7 +6733,7 @@ TEST_CASE("Preprocessor: nested IF with EXITM - inner condition controls exit",
         "done\n";
     pp.push_virtual_file(content, "exitm_nested_if", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6782,7 +6774,7 @@ TEST_CASE("Preprocessor: nested IF with EXITM - inner true condition exits macro
         "done\n";
     pp.push_virtual_file(content, "exitm_nested_if_exit", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6822,7 +6814,7 @@ TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
             "done\n";
         pp.push_virtual_file(content, "exitm_ifdef_defined", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         std::vector<std::string> lines;
 
         while (pp.next_line(line)) {
@@ -6853,7 +6845,7 @@ TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
             "done\n";
         pp2.push_virtual_file(content, "exitm_ifndef_undef", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         std::vector<std::string> lines;
 
         while (pp2.next_line(line)) {
@@ -6892,7 +6884,7 @@ TEST_CASE("Preprocessor: EXITM with ELIF branch",
         "done\n";
     pp.push_virtual_file(content, "exitm_elif", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6936,7 +6928,7 @@ TEST_CASE("Preprocessor: multiple EXITMs in different IF branches - only execute
         "done\n";
     pp.push_virtual_file(content, "exitm_multi_if", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -6968,7 +6960,7 @@ TEST_CASE("Preprocessor: IF without ENDIF reports error at end of input",
         "OK\n";
     pp.push_virtual_file(content, "if_no_endif", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume all output to trigger end-of-input checks
     while (pp.next_line(line)) {}
 
@@ -6996,7 +6988,7 @@ TEST_CASE("Preprocessor: outer IF missing ENDIF is reported even when inner bloc
         "ENDIF\n";
     pp.push_virtual_file(content, "if_outer_no_endif", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume all output to trigger end-of-input checks
     while (pp.next_line(line)) {}
 
@@ -7042,7 +7034,7 @@ TEST_CASE("Preprocessor: dependency_filenames captures push_file and #include in
     // Push main file (records main), then process includes (records incs)
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {
         // drain
     }
@@ -7091,7 +7083,7 @@ TEST_CASE("Preprocessor: dependency_filenames captures BINARY/INCBIN in order (i
     content += "BINARY \"" + ok2 + "\"\n";
     pp.push_virtual_file(content, "deps_binary_script", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {
         // drain
     }
@@ -7147,7 +7139,7 @@ TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-state
     pp.push_virtual_file(content, "macro_midline_parenthesized.asm", 1, true);
 
     std::vector<std::string> outs;
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {
         outs.push_back(line.to_string());
     }
@@ -7190,7 +7182,7 @@ TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-state
     pp.push_virtual_file(content, "macro_midline_noparen.asm", 1, true);
 
     std::vector<std::string> outs;
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {
         outs.push_back(line.to_string());
     }
@@ -7242,7 +7234,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
         pp.push_virtual_file(content, "label_ok.asm", 1, true);
 
         std::vector<std::string> outs;
-        TokensLine line;
+        TokenLine line;
         while (pp.next_line(line)) {
             outs.push_back(line.to_string());
         }
@@ -7264,7 +7256,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
         pp.push_virtual_file(content, "label_opcode.asm", 1, true);
 
         std::vector<std::string> outs;
-        TokensLine line;
+        TokenLine line;
         while (pp.next_line(line)) {
             outs.push_back(line.to_string());
         }
@@ -7287,7 +7279,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
             "EQU : NOP : HALT\n";
         pp.push_virtual_file(content, "label_directive.asm", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         REQUIRE(pp.next_line(line));
         // EQU is not output because of the missing identifier; error expected
         // It is not treated as a label.
@@ -7320,7 +7312,7 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
         pp.push_virtual_file(content, "label_conditional.asm", 1, true);
 
         std::vector<std::string> outs;
-        TokensLine line;
+        TokenLine line;
         while (pp.next_line(line)) {
             outs.push_back(line.to_string());
         }
@@ -7354,7 +7346,7 @@ TEST_CASE("Preprocessor: object-like macros cascade (A -> B -> C -> 123)",
         "A\n";
     pp.push_virtual_file(content, "macro_cascade_object", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // DEFC C=123
     REQUIRE(line.size() == 4);
     REQUIRE(line[0].keyword() == Keyword::DEFC);
@@ -7381,7 +7373,7 @@ TEST_CASE("Preprocessor: function-like macro expands to object-like macro and re
         "M()\n";
     pp.push_virtual_file(content, "macro_cascade_func_to_obj", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // expanded "M()"
     const auto& toks = line.tokens();
 
@@ -7407,7 +7399,7 @@ TEST_CASE("Preprocessor: function-like macro expands to another function-like ca
         "F()\n";
     pp.push_virtual_file(content, "macro_cascade_func_to_func", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // expanded "F()"
     const auto& toks = line.tokens();
 
@@ -7431,8 +7423,8 @@ TEST_CASE("Preprocessor: 'NOP:' is not treated as a label (labels cannot be inst
         "NOP: HALT\n";
     pp.push_virtual_file(content, "nop_colon.asm", 1, true);
 
-    std::vector<TokensLine> lines;
-    TokensLine line;
+    std::vector<TokenLine> lines;
+    TokenLine line;
     while (pp.next_line(line)) {
         lines.push_back(line);
     }
@@ -7464,8 +7456,8 @@ TEST_CASE("Preprocessor: '.NOP' is not treated as a label (instruction after dot
         ".NOP\n";
     pp.push_virtual_file(content, "dot_nop.asm", 1, true);
 
-    std::vector<TokensLine> lines;
-    TokensLine line;
+    std::vector<TokenLine> lines;
+    TokenLine line;
     while (pp.next_line(line)) {
         lines.push_back(line);
     }
@@ -7494,8 +7486,8 @@ TEST_CASE("Preprocessor: normal label 'LBL:' still recognized (control case)",
         "LBL: NOP\n";
     pp.push_virtual_file(content, "label_control.asm", 1, true);
 
-    std::vector<TokensLine> lines;
-    TokensLine line;
+    std::vector<TokenLine> lines;
+    TokenLine line;
     while (pp.next_line(line)) {
         lines.push_back(line);
     }
@@ -7523,7 +7515,7 @@ TEST_CASE("Preprocessor: opcode before ':' is not a label but following statemen
     pp.push_virtual_file(content, "label_chain_opcode_first.asm", 1, true);
 
     std::vector<std::string> outs;
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) {
         outs.push_back(line.to_string());
     }
@@ -7564,7 +7556,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF true yields branch body"
     const std::string content = "IF 1 : NOP : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_true.asm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "NOP");
@@ -7581,7 +7573,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF false with ELSE selects 
     const std::string content = "IF 0 : SHOULD_NOT : ELSE : OK : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_else.asm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "OK");
@@ -7598,7 +7590,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF with multiple ELIF picks
         "IF 0 : A : ELIF 1 : B : ELIF 1 : C : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_elif_chain.asm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "B");
@@ -7616,7 +7608,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF/ELIF/ELSE chain picks EL
         "IF 0 : A : ELIF 0 : B : ELSE : FALLBACK : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_full_chain.asm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "FALLBACK");
@@ -7634,7 +7626,7 @@ TEST_CASE("Preprocessor: single-line colon-separated nested IF works",
         "IF 1 : IF 0 : Y : ELIF 1 : Z : ENDIF : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_nested.asm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
     REQUIRE(line[0].text() == "Z");
@@ -7651,7 +7643,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing t
         "IF 1 : OK : ENDIF : EXTRA_SHOULD_BE_STATEMENT\n";
     pp.push_virtual_file(content, "if_colon_trailing.asm", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // First: OK (from IF)
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
@@ -7686,7 +7678,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance"
     }
     Preprocessor pp;
     pp.push_file(mainf);
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) if (!line.empty()) {
             out.push_back(line[0].text());
@@ -7717,7 +7709,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
     {
         Preprocessor p1;
         p1.push_file(inc);
-        TokensLine l;
+        TokenLine l;
         std::vector<std::string> v;
         while (p1.next_line(l)) if (!l.empty()) {
                 v.push_back(l[0].text());
@@ -7728,7 +7720,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
     {
         Preprocessor p2;
         p2.push_file(inc);
-        TokensLine l;
+        TokenLine l;
         std::vector<std::string> v;
         while (p2.next_line(l)) if (!l.empty()) {
                 v.push_back(l[0].text());
@@ -7758,7 +7750,7 @@ TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
     }
     Preprocessor pp;
     pp.push_file(mainf);
-    TokensLine l;
+    TokenLine l;
     std::vector<std::string> v;
     while (pp.next_line(l)) if (!l.empty()) {
             v.push_back(l[0].text());
@@ -7790,7 +7782,7 @@ TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
     }
     Preprocessor pp;
     pp.push_file(outer);
-    TokensLine l;
+    TokenLine l;
     std::vector<std::string> v;
     while (pp.next_line(l)) if (!l.empty()) {
             v.push_back(l[0].text());
@@ -7808,7 +7800,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE trailing tokens error",
     g_errors.reset();
     Preprocessor pp;
     pp.push_virtual_file("PRAGMA ONCE extra\n", "po_trailing", 1, true);
-    TokensLine l;
+    TokenLine l;
     while (pp.next_line(l)) {} REQUIRE(g_errors.has_errors());
     REQUIRE(g_errors.last_error_message().find("Unexpected token") !=
             std::string::npos);
@@ -7847,7 +7839,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second in
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -7902,7 +7894,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name define at top prevents secon
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -7957,7 +7949,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second 
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -8012,7 +8004,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name defc at top prevents second 
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -8071,7 +8063,7 @@ TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -8124,7 +8116,7 @@ TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined 
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     REQUIRE(pp.next_line(line));    // DEFC IG_GUARD_PRE=1
     REQUIRE(line.size() == 4);
@@ -8166,7 +8158,7 @@ TEST_CASE("Preprocessor: single trailing backslash joins next line with",
         "B\n";
     pp.push_virtual_file(content, "lc_simple", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -8190,7 +8182,7 @@ TEST_CASE("Preprocessor: multiple trailing backslashes cascade into one logical 
         "D\n";
     pp.push_virtual_file(content, "lc_multi", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -8215,7 +8207,7 @@ TEST_CASE("Preprocessor: backslash line continuation preserves commas and numeri
         ",4\n";
     pp.push_virtual_file(content, "lc_commas", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -8249,7 +8241,7 @@ TEST_CASE("Preprocessor: backslash continuation inside macro argument preserves 
         "B)\n";
     pp.push_virtual_file(content, "lc_macro_arg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // expansion of SHOW(...)
     const auto& toks = line.tokens();
 
@@ -8274,7 +8266,7 @@ TEST_CASE("Preprocessor: backslash before comment stops at comment newline",
         "Y\n";
     pp.push_virtual_file(content, "lc_comment", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
     REQUIRE(line.size() >= 1);
@@ -8302,7 +8294,7 @@ TEST_CASE("Preprocessor: trailing backslash followed by blank line joins empty l
         "SECOND\n";
     pp.push_virtual_file(content, "lc_blank", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
     REQUIRE(line.size() >= 1);
@@ -8329,7 +8321,7 @@ TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins l
         "SECOND\n";
     pp.push_virtual_file(content, "lc_blank", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
     REQUIRE(line.size() >= 2);
@@ -8351,7 +8343,7 @@ TEST_CASE("Preprocessor: backslash at end of last line (no following line) yield
         "ONLY\\\n";
     pp.push_virtual_file(content, "lc_eof", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Depending on implementation this may produce either empty output or 'ONLY'
     bool got_line = pp.next_line(line);
     if (got_line) {
@@ -8383,7 +8375,7 @@ TEST_CASE("Preprocessor: DEFL preserves non-constant comma-separated list",
         "X\n";
     pp.push_virtual_file(content, "defl_list", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     // Consume expanded output (skip directive)
     REQUIRE(pp.next_line(line));          // expansion of X
     REQUIRE(line.to_string() == "1,2");
@@ -8411,7 +8403,7 @@ TEST_CASE("Preprocessor: DEFL list expands inside another line (db macro usage)"
         "db VAL\n";
     pp.push_virtual_file(content, "defl_list_db", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // expansion of db VAL
     REQUIRE(line.to_string() == "db 1,2");
 
@@ -8441,7 +8433,7 @@ TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
         "Y\n";
     pp.push_virtual_file(content, "defl_list_macro", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First non-empty expanded output should be "DEFC A = 5"
     REQUIRE(pp.next_line(line)); // expansion of #define A
@@ -8481,7 +8473,7 @@ TEST_CASE("Preprocessor: DEFL referencing previous symbol accumulates list eleme
         "Z1\n";
     pp.push_virtual_file(content, "defl_list_prev", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line)); // expansion of Z1
     REQUIRE(line.to_string() == "1,2");
 
@@ -8524,7 +8516,7 @@ TEST_CASE("Preprocessor: ELSEIF is a synonym of ELIF in IF/ELSEIF.../ELSE/ENDIF 
 
         pp.push_virtual_file(content, "elseif_chain", 1, true);
 
-        TokensLine line;
+        TokenLine line;
         while (pp.next_line(line)) {
             const auto& toks = line.tokens();
             if (toks.empty()) {
@@ -8668,7 +8660,7 @@ TEST_CASE("Preprocessor: chained token pasting A##B##C produces single identifie
     const std::string content = "A##B##C\n";
     pp.push_virtual_file(content, "paste_chained", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     const auto& toks = line.tokens();
 
@@ -8714,7 +8706,7 @@ TEST_CASE("Preprocessor: outer macro continues after inner macro EXITM (multiple
 
     pp.push_virtual_file(content, "outer_inner_exitm_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
@@ -8768,7 +8760,7 @@ TEST_CASE("Preprocessor: EXITM inside REPT inside MACRO aborts macro after first
 
     pp.push_virtual_file(content, "exitm_rept_macro_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> first_tokens;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -8826,7 +8818,7 @@ TEST_CASE("Preprocessor: C_LINE then REPT block keeps constant logical line numb
         "ENDR\n";
     pp.push_virtual_file(content, "cline_rept_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
         REQUIRE(!line.empty());
@@ -8854,7 +8846,7 @@ TEST_CASE("Preprocessor: C_LINE then REPTC block keeps constant logical line num
         "ENDR\n";
     pp.push_virtual_file(content, "cline_reptc_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
         REQUIRE(!line.empty());
@@ -8890,7 +8882,7 @@ TEST_CASE("Preprocessor: C_LINE then REPTI block keeps constant logical line num
         "ENDR\n";
     pp.push_virtual_file(content, "cline_repti_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int emitted = 0;
     std::vector<int> values;
     while (pp.next_line(line)) {
@@ -8940,7 +8932,7 @@ TEST_CASE("Preprocessor: LINE then REPT block emits all repeated lines at REPT i
         "AFTER\n";
     pp.push_virtual_file(content, "line_rept_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int rept_emitted = 0;
     bool saw_after = false;
     while (pp.next_line(line)) {
@@ -8982,7 +8974,7 @@ TEST_CASE("Preprocessor: LINE then REPTC block emits all character iterations at
         "ENDR\n";
     pp.push_virtual_file(content, "line_reptc_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
         REQUIRE(!line.empty());
@@ -9023,7 +9015,7 @@ TEST_CASE("Preprocessor: LINE then REPTI block emits all argument iterations at 
         "ENDR\n";
     pp.push_virtual_file(content, "line_repti_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> values;
     int emitted = 0;
     while (pp.next_line(line)) {
@@ -9061,7 +9053,7 @@ TEST_CASE("Preprocessor: REPTC inside MACRO expands characters to integers in bo
         "EMIT()\n";
     pp.push_virtual_file(content, "macro_reptc", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> values;
     while (pp.next_line(line)) {
         REQUIRE(!line.empty());
@@ -9096,7 +9088,7 @@ TEST_CASE("Preprocessor: object-like #define body split by ':' expands to multip
         "TAIL\n";
     pp.push_virtual_file(content, "define_colon_obj_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     std::vector<int> locs;
 
@@ -9133,7 +9125,7 @@ TEST_CASE("Preprocessor: object-like #define body split by '\\' expands to multi
         "ENDX\n";
     pp.push_virtual_file(content, "define_backslash_obj_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     std::vector<int> locs;
     while (pp.next_line(line)) {
@@ -9165,7 +9157,7 @@ TEST_CASE("Preprocessor: function-like #define body split by ':' expands to mult
         "AFTER\n";
     pp.push_virtual_file(content, "define_colon_func_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     std::vector<int> locs;
     while (pp.next_line(line)) {
@@ -9197,7 +9189,7 @@ TEST_CASE("Preprocessor: function-like #define body split by '\\' expands to mul
         "NEXT\n";
     pp.push_virtual_file(content, "define_backslash_func_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     std::vector<int> locs;
     while (pp.next_line(line)) {
@@ -9229,7 +9221,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by ':' expands to mult
         "TAIL\n";
     pp.push_virtual_file(content, "define_colon_name_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     std::vector<int> locs;
     while (pp.next_line(line)) {
@@ -9261,7 +9253,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
         "DONE\n";
     pp.push_virtual_file(content, "define_backslash_name_src", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     std::vector<int> locs;
     while (pp.next_line(line)) {
@@ -9301,7 +9293,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefin
 
     pp.push_virtual_file(content, "dup_local_macro", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* consume */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9324,7 +9316,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefini
 
     pp.push_virtual_file(content, "dup_local_rept", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* consume */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9347,7 +9339,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefin
 
     pp.push_virtual_file(content, "dup_local_reptc", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* consume */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9370,7 +9362,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefin
 
     pp.push_virtual_file(content, "dup_local_repti", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* consume */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9396,7 +9388,7 @@ TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports
         "M(1)\n";
     pp.push_virtual_file(content, "macro_local_param_collision", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9417,7 +9409,7 @@ TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label rep
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_local_iter_collision", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9438,7 +9430,7 @@ TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label rep
         "ENDR\n";
     pp.push_virtual_file(content, "repti_local_iter_collision", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9462,7 +9454,7 @@ TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list p
         "ENDR\n";
     pp.push_virtual_file(content, "repti_paren_expr", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
@@ -9523,7 +9515,7 @@ TEST_CASE("Preprocessor: REPTI name-directive form with parenthesized expression
         "ENDR\n";
     pp.push_virtual_file(content, "repti_name_paren_expr", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.size() == 4);
@@ -9584,7 +9576,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched opening parenthesis in first argum
         "ENDR\n";
     pp.push_virtual_file(content, "repti_unmatched_open", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9603,7 +9595,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched closing parenthesis reports error"
         "ENDR\n";
     pp.push_virtual_file(content, "repti_unmatched_close", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9622,7 +9614,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched parentheses in second argument rep
         "ENDR\n";
     pp.push_virtual_file(content, "repti_unmatched_second", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9641,7 +9633,7 @@ TEST_CASE("Preprocessor: REPTI with multiple unmatched opening parentheses repor
         "ENDR\n";
     pp.push_virtual_file(content, "repti_unmatched_multiple", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9660,7 +9652,7 @@ TEST_CASE("Preprocessor: REPTI with nested unmatched parentheses reports error",
         "ENDR\n";
     pp.push_virtual_file(content, "repti_unmatched_nested", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9679,7 +9671,7 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched opening parenthesis
         "ENDR\n";
     pp.push_virtual_file(content, "repti_name_unmatched", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9698,7 +9690,7 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list
         "ENDR\n";
     pp.push_virtual_file(content, "repti_name_unmatched_list", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     while (pp.next_line(line)) { /* drain */ }
 
     REQUIRE(g_errors.has_errors());
@@ -9720,7 +9712,7 @@ TEST_CASE("Preprocessor: REPTC (directive) multi-token expression \"A\"+\"B\" it
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_concat_str_plus_str", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "defb") {
@@ -9749,7 +9741,7 @@ TEST_CASE("Preprocessor: REPTC (directive) multi-token identifier+operator+ident
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_concat_ident_plus_ident", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "defb") {
@@ -9780,7 +9772,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) multi-token expression \"X\"+\"Y
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_name_concat_str_plus_str", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "defb") {
@@ -9810,7 +9802,7 @@ TEST_CASE("Preprocessor: REPTC macro-expanded multi-token expression triggers co
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_macro_concat", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "defb") {
@@ -9839,7 +9831,7 @@ TEST_CASE("Preprocessor: REPTC multi-token numeric expression 123+45 concatenati
         "ENDR\n";
     pp.push_virtual_file(content, "reptc_concat_numeric_plus_numeric", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "defb") {
@@ -9875,7 +9867,7 @@ TEST_CASE("Preprocessor: REPTI parses arguments with nested parentheses and inne
         "ENDR\n";
     pp.push_virtual_file(content, "repti_nested_parens_commas_dir", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "emit") {
@@ -9902,7 +9894,7 @@ TEST_CASE("Preprocessor: REPTI name-directive parses nested parentheses and inne
         "ENDR\n";
     pp.push_virtual_file(content, "repti_nested_parens_commas_name", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "use") {
@@ -9928,7 +9920,7 @@ TEST_CASE("Preprocessor: REPTI treats top-level commas as separators only; inner
         "ENDR\n";
     pp.push_virtual_file(content, "repti_top_level_commas", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "arg") {
@@ -9955,7 +9947,7 @@ TEST_CASE("Preprocessor: REPTI nested parentheses with arithmetic tokens are pre
         "ENDR\n";
     pp.push_virtual_file(content, "repti_nested_parens_arith", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "emit") {
@@ -9990,7 +9982,7 @@ TEST_CASE("Preprocessor: REPTI (directive) flattens multi-line macro argument be
         "ENDR\n";
     pp.push_virtual_file(content, "repti_flatten_arg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "emit") {
@@ -10020,7 +10012,7 @@ TEST_CASE("Preprocessor: REPTI (name-directive) flattens multi-line macro argume
         "ENDR\n";
     pp.push_virtual_file(content, "repti_name_flatten_arg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "use") {
@@ -10054,7 +10046,7 @@ TEST_CASE("Preprocessor: REPTI flattens each multi-line argument independently (
         "ENDR\n";
     pp.push_virtual_file(content, "repti_flatten_two_args", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> outs;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "show") {
@@ -10086,7 +10078,7 @@ TEST_CASE("Preprocessor: REPTI does not rename LOCALs inside flattened argument 
         "ENDR\n";
     pp.push_virtual_file(content, "repti_flatten_local_preserve", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     // First emitted line from REPTI: 'emit tmp tmp'
     REQUIRE(!line.empty());
@@ -10119,7 +10111,7 @@ TEST_CASE("Preprocessor: REPTI with a whitespace-only argument emits body once w
     Preprocessor pp;
 
     // First argument is whitespace-only between commas; second is a normal identifier.
-    // The whitespace-only argument should be parsed as an empty TokensLine, causing the
+    // The whitespace-only argument should be parsed as an empty TokenLine, causing the
     // substitution of 'v' to insert nothing (i.e., 'db' alone on that iteration).
     const std::string content =
         "REPTI v,  , X\n"
@@ -10127,7 +10119,7 @@ TEST_CASE("Preprocessor: REPTI with a whitespace-only argument emits body once w
         "ENDR\n";
     pp.push_virtual_file(content, "repti_whitespace_only_arg", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::vector<std::string>> outputs;
 
     while (pp.next_line(line)) {
@@ -10170,7 +10162,7 @@ TEST_CASE("Preprocessor: REPTI with truly empty list emits no lines",
         "ENDR\n";
     pp.push_virtual_file(content, "repti_empty_list", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
         if (!line.empty() && line[0].text() == "db") {
@@ -10196,7 +10188,7 @@ TEST_CASE("Preprocessor: LOCAL outside any construct produces no output and no e
         "AFTER\n";
     pp.push_virtual_file(content, "local_outside_basic", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First logical line must be the 'AFTER' line (LOCAL is ignored)
     REQUIRE(pp.next_line(line));
@@ -10218,7 +10210,7 @@ TEST_CASE("Preprocessor: LOCAL with parentheses outside any construct is ignored
         "GO\n";
     pp.push_virtual_file(content, "local_outside_paren", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Only the following normal line should appear
     REQUIRE(pp.next_line(line));
@@ -10241,7 +10233,7 @@ TEST_CASE("Preprocessor: multiple LOCAL lines outside constructs are all ignored
         "ENDLINE\n";
     pp.push_virtual_file(content, "local_outside_multiple", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(!line.empty());
@@ -10263,7 +10255,7 @@ TEST_CASE("Preprocessor: LOCAL outside constructs with trailing tokens still pro
         "NEXT\n";
     pp.push_virtual_file(content, "local_outside_trailing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Drain all lines (should only get 'NEXT')
     REQUIRE(pp.next_line(line));
@@ -10289,7 +10281,7 @@ TEST_CASE("Preprocessor: LOCAL outside constructs with syntax error still produc
         "NEXT\n";
     pp.push_virtual_file(content, "local_outside_trailing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Drain all lines (should only get 'NEXT')
     REQUIRE(pp.next_line(line));
@@ -10316,7 +10308,7 @@ TEST_CASE("Preprocessor: LOCAL outside constructs interleaved with statements yi
         "END\n";
     pp.push_virtual_file(content, "local_outside_interleave", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -10343,7 +10335,7 @@ TEST_CASE("Preprocessor: unknown PRAGMA is ignored and produces no output",
         "NEXT\n";
     pp.push_virtual_file(content, "pragma_unknown_basic", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Only the subsequent normal line should appear
     REQUIRE(pp.next_line(line));
@@ -10367,7 +10359,7 @@ TEST_CASE("Preprocessor: unknown PRAGMA with trailing tokens is still ignored (n
         "AFTER\n";
     pp.push_virtual_file(content, "pragma_unknown_trailing", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Only the following normal line should appear
     REQUIRE(pp.next_line(line));
@@ -10413,7 +10405,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion across path varia
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -10469,7 +10461,7 @@ TEST_CASE("Preprocessor: include guard prevents second inclusion across path var
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -10518,7 +10510,7 @@ TEST_CASE("Preprocessor: without PRAGMA ONCE or guards, including same file via 
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
         if (!line.empty()) {
@@ -10562,7 +10554,7 @@ TEST_CASE("Preprocessor: self-include of current file triggers RecursiveInclude 
 
     pp.push_file(fname);
 
-    TokensLine line;
+    TokenLine line;
     int produced = 0;
     while (pp.next_line(line)) {
         ++produced;
@@ -10592,7 +10584,7 @@ TEST_CASE("Preprocessor: self-include of current file triggers RecursiveInclude 
 
     pp.push_file(fname);
 
-    TokensLine line;
+    TokenLine line;
     int produced = 0;
     while (pp.next_line(line)) {
         ++produced;
@@ -10637,7 +10629,7 @@ TEST_CASE("Preprocessor: BINARY missing file invoked from included source report
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     // Drain all lines
     while (pp.next_line(line)) {}
 
@@ -10683,7 +10675,7 @@ TEST_CASE("Preprocessor: INCBIN missing file invoked from included source report
     Preprocessor pp;
     pp.push_file(mainf);
 
-    TokensLine line;
+    TokenLine line;
     // Drain all lines
     while (pp.next_line(line)) {}
 
@@ -10719,7 +10711,7 @@ TEST_CASE("Preprocessor: DEFL negative literal stores Minus + positive Integer t
         "db NEG\n";
     pp.push_virtual_file(content, "defl_negative_tokens", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // Expansion of 'NEG' should yield two tokens: Minus and Integer(5)
     REQUIRE(pp.next_line(line));
@@ -10756,7 +10748,7 @@ TEST_CASE("Preprocessor: DEFL negative via unary minus on macro stores Minus + p
         "db NEG2\n";
     pp.push_virtual_file(content, "defl_negative_macro_tokens", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // First non-directive line after macro define should be the expansion of NEG2 (Minus + Integer(3))
     REQUIRE(pp.next_line(line)); // DEFC A = 3
@@ -10805,7 +10797,7 @@ TEST_CASE("Preprocessor: #line accepts optional comma before filename",
 
     pp.push_virtual_file(content, "hashline_m4", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     // After '#line 10, "m4_out.asm"' the next logical line is 'first' at (m4_out.asm:10)
     REQUIRE(pp.next_line(line));
@@ -10839,7 +10831,7 @@ TEST_CASE("Preprocessor: cpp style '# nr \"file\"' sets logical location (quoted
 
     pp.push_virtual_file(content, "cpp_hashline_test", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line[0].text() == "A");
@@ -10871,7 +10863,7 @@ TEST_CASE("Preprocessor: cpp style '# nr' without filename sets logical line num
 
     pp.push_virtual_file(content, "cpp_hashline_nofile", 1, true);
 
-    TokensLine line;
+    TokenLine line;
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line[0].text() == "L1");
@@ -10897,7 +10889,7 @@ TEST_CASE("Preprocessor: cpp style '# nr , \"file\"' with comma accepted",
 
     pp.push_virtual_file(content, "cpp_hashline_comma", 1, true);
 
-    TokensLine line;
+    TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line[0].text() == "X");
     REQUIRE(line.location().line_num() == 42);
