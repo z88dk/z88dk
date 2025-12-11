@@ -1,3 +1,5 @@
+build/
+
 **/*.bak
 **/*.bin
 **/*.c.asm
