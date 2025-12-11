@@ -141,6 +141,7 @@ public:
     void clear();
 
     const Location& location() const;
+    Location& location();
     void set_location(const Location& location);
 
     std::vector<Token>& tokens();
@@ -235,10 +236,7 @@ class TokenFileReader : public FileReader {
 public:
     TokenFileReader() = default;
     explicit TokenFileReader(const std::string& filename);
-
-    // Override open to handle cache lookup
     bool open(const std::string& filename) override;
-
     bool next_token_line(TokenLine& token_line);
 
 #ifdef UNIT_TESTS
@@ -266,6 +264,10 @@ public:
     void set_line_provider(std::function<bool(std::string& out)> provider);
     std::function<bool(std::string&)> get_line_provider() const;
 
+    // line number setters must update lines in output_queue_ as well
+    void set_line_number(size_t line_num) override;
+    void set_fixed_line_number(size_t line_num) override;
+
 private:
     // Cache-related members
     static TokenCache& get_cache();
@@ -281,6 +283,7 @@ private:
     // Existing members
     std::string source_line_;
     std::deque<TokenLine> output_queue_;
+    bool is_injected_ = false;
 
     // Queue of injected token lines that are returned first (split into logical lines).
     std::deque<TokenLine> injected_tokens_;
@@ -293,10 +296,14 @@ private:
     bool has_pragma_once_ = false;
     bool has_ifndef_guard_ = false;
     std::string ifndef_guard_symbol_;
-    enum class DetectIncludeGuardState {
+    enum class DetectIfndefState {
         Initial, FoundIfndef, Final
     };
-    DetectIncludeGuardState detect_include_guard_state_ = DetectIncludeGuardState::Initial;
+    DetectIfndefState detect_ifndef_state_ = DetectIfndefState::Initial;
+    enum class DetectPragmaState {
+        Initial, Final
+    };
+    DetectPragmaState detect_pragma_state_ = DetectPragmaState::Initial;
 
     bool tokenize_line(TokenLine& token_line);
     void inject(const std::string& filename, const std::string& content) override;
@@ -307,9 +314,12 @@ private:
 
     // Helper to check cache after opening
     void check_cache();
+    void accumulate_for_cache(const TokenLine& token_line);
+    void persist_cache();
 
     // Helper used by the lexer/re2c-generated code to advance to the next physical line.
     bool next_line_from_provider();
+    bool read_and_tokenize_line(TokenLine& token_line);
 
     // Detect include guards while reading the file from the provider
     void detect_include_guard(const TokenLine& line);
