@@ -13,6 +13,7 @@
 #include <deque>
 #include <filesystem>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -161,13 +162,21 @@ private:
 
 class TokenCache {
 public:
-    // Get cached tokens for a file, returns nullopt if not cached or invalid
-    std::optional<std::vector<TokenLine>> get(const std::string& filename);
+    // Get cached tokens for a file. Returns nullptr if not cached or invalid.
+    // Also outputs cached preprocessor flags if available.
+    std::shared_ptr<const std::vector<TokenLine>> get(
+                const std::string& filename,
+                bool& has_pragma_once,
+                bool& has_ifndef_guard,
+                std::string& ifndef_guard_symbol);
 
-    // Store tokenized result in cache
-    void put(const std::string& filename, std::vector<TokenLine> token_lines);
+    // Store tokenized result in cache without copying the vector
+    void put(const std::string& filename,
+             std::shared_ptr<const std::vector<TokenLine>> token_lines,
+             bool has_pragma_once,
+             bool has_ifndef_guard,
+             std::string ifndef_guard_symbol);
 
-    // Clear all cache entries
     void clear();
 
 #ifdef UNIT_TESTS
@@ -205,11 +214,13 @@ private:
     };
 
     struct CachedEntry {
-        std::vector<TokenLine> token_lines;
+        std::shared_ptr<const std::vector<TokenLine>> token_lines;
         Options options_snapshot;  // Cache is invalidated if options change
+        bool has_pragma_once_ = false;
+        bool has_ifndef_guard_ = false;
+        std::string ifndef_guard_symbol_;
     };
 
-    // Make this const so it can be called from const test methods
     std::optional<CacheKey> make_cache_key(const std::string& filename) const;
     bool options_match(const Options& cached, const Options& current) const;
 
@@ -239,6 +250,11 @@ public:
     }
 #endif
 
+    // include guard detection accessors
+    bool has_pragma_once() const;
+    bool has_ifndef_guard() const;
+    const std::string& ifndef_guard_symbol() const;
+
     // Inject lines into the reader; they take precedence over file/cached content.
     void inject(const std::string& filename, size_t line_number, bool fixed_line_number,
                 const std::string& content);
@@ -254,8 +270,12 @@ private:
     // Cache-related members
     static TokenCache& get_cache();
     bool use_cached_mode_ = false;
-    std::vector<TokenLine> cached_lines_;
+
+    // Shared cached lines (no copy)
+    std::shared_ptr<const std::vector<TokenLine>> cached_lines_ptr_;
     size_t current_line_index_ = 0;
+
+    // Accumulated lines for eventual cache population during reading
     std::vector<TokenLine> pending_cache_lines_;
 
     // Existing members
@@ -269,6 +289,15 @@ private:
     // Defaults to the underlying FileReader::next_line.
     std::function<bool(std::string&)> line_provider_;
 
+    // Include guards
+    bool has_pragma_once_ = false;
+    bool has_ifndef_guard_ = false;
+    std::string ifndef_guard_symbol_;
+    enum class DetectIncludeGuardState {
+        Initial, FoundIfndef, Final
+    };
+    DetectIncludeGuardState detect_include_guard_state_ = DetectIncludeGuardState::Initial;
+
     bool tokenize_line(TokenLine& token_line);
     void inject(const std::string& filename, const std::string& content) override;
 
@@ -281,4 +310,7 @@ private:
 
     // Helper used by the lexer/re2c-generated code to advance to the next physical line.
     bool next_line_from_provider();
+
+    // Detect include guards while reading the file from the provider
+    void detect_include_guard(const TokenLine& line);
 };
