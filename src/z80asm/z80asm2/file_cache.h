@@ -115,12 +115,10 @@ public:
     size_t line_number() const;
 
     // Line number control (for virtual files / macro expansion)
-    void set_line_number(size_t line_num);           // Set current line number
-    void set_fixed_line_number(size_t
-                               line_num);     // Set fixed line number (doesn't increment)
-    void clear_fixed_line_number();                  // Clear fixed line number (resume normal increment)
-    bool has_fixed_line_number()
-    const;              // Check if line number is fixed
+    virtual void set_line_number(size_t line_num);
+    virtual void set_fixed_line_number(size_t line_num);
+    void clear_fixed_line_number();
+    bool has_fixed_line_number() const;
 
 protected:
     std::string filename_;

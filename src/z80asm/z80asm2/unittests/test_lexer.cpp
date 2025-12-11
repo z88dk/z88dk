@@ -2534,40 +2534,47 @@ TEST_CASE("TokenFileReader detects 'pragma once' in files and sets has_pragma_on
     g_options = Options();
 
     // Create a temp file with 'pragma once' followed by some content
-    const std::string file_path = create_temp_file("pragma_once1.asm",
-                                  "pragma once\nLD A, 1\n");
+    struct Case {
+        std::string filename;
+        std::vector<std::string> lines;
+    };
+    Case cases[] = {
+        { "pragma_once1.asm", { "pragma once", "LD A, 1" } },
+        { "pragma_once2.asm", { "PrAgMa OnCe", "LD B, 2" } },
+        { "pragma_once3.asm", { "#pragma once", "LD C, 3" } },
+        { "pragma_once4.asm", { "#PrAgMa OnCe", "LD D, 4" } },
+    };
 
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-    TokenLine line;
-    while (reader.next_token_line(line)) {
-        // drain
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        const auto& test_case = cases[i];
+        std::string content;
+        for (size_t k = 0; k < test_case.lines.size(); ++k) {
+            content += test_case.lines[k] + "\n";
+        }
+        const std::string file_path = create_temp_file(test_case.filename,
+                                      content);
+
+        TokenLine line;
+        // Read twice to test caching
+        for (int j = 0; j < 2; ++j) {
+            TokenFileReader reader;
+            REQUIRE(reader.open(file_path));
+            // Verify the flag is set during open()
+            REQUIRE(reader.has_pragma_once());
+
+            for (size_t k = 0; k < test_case.lines.size(); ++k) {
+                REQUIRE(reader.next_token_line(line));
+                REQUIRE(line.to_string() == test_case.lines[k]);
+            }
+
+            REQUIRE_FALSE(reader.next_token_line(line));
+
+            // verify again after reading all lines
+            REQUIRE(reader.has_pragma_once());
+        }
+
+        std::remove(test_case.filename.c_str());
     }
-
-    // Verify the flag is set for file-based detection
-    REQUIRE(reader.has_pragma_once());
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader detects '#pragma once' in files and sets has_pragma_once()",
-          "[lexer][pragma_once][hash][file]") {
-    g_options = Options();
-
-    // Create a temp file with '#pragma once' followed by some content
-    const std::string file_path = create_temp_file("pragma_once2.asm",
-                                  "#pragma once\nLD B, 2\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-    TokenLine line;
-    while (reader.next_token_line(line)) {
-        // Drain
-    }
-
-    REQUIRE(reader.has_pragma_once());
-
-    std::remove(file_path.c_str());
 }
 
 TEST_CASE("TokenFileReader does not set has_pragma_once() for files without pragma once",
@@ -2579,6 +2586,8 @@ TEST_CASE("TokenFileReader does not set has_pragma_once() for files without prag
 
     TokenFileReader reader;
     REQUIRE(reader.open(file_path));
+    REQUIRE_FALSE(reader.has_pragma_once());
+
     TokenLine line;
     while (reader.next_token_line(line)) {
         // drain
@@ -2594,6 +2603,9 @@ TEST_CASE("TokenFileReader does not set has_pragma_once() when reading injected 
     TokenFileReader reader;
     reader.inject("virtual.asm", 1, true, "pragma once\nLD A, 1\n");
 
+    // Injected content should not affect file-based pragma once detection flag
+    REQUIRE_FALSE(reader.has_pragma_once());
+
     TokenLine line;
     while (reader.next_token_line(line)) {
         // drain
@@ -2603,167 +2615,59 @@ TEST_CASE("TokenFileReader does not set has_pragma_once() when reading injected 
     REQUIRE_FALSE(reader.has_pragma_once());
 }
 
-TEST_CASE("TokenFileReader detects mixed-case 'PrAgMa OnCe' in files and sets has_pragma_once()",
-          "[lexer][pragma_once][case][file]") {
-    g_options = Options();
-    // Create a temp file with mixed-case 'PrAgMa OnCe'
-    const std::string file_path = create_temp_file("pragma_once_case.asm",
-                                  "PrAgMa OnCe\nLD D, 4\n");
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-    TokenLine line;
-    while (reader.next_token_line(line)) {
-        // drain
-    }
-    REQUIRE(reader.has_pragma_once());
-
-    std::remove(file_path.c_str());
-}
-
 TEST_CASE("TokenFileReader detects #ifndef VAR followed by #define VAR (same VAR) and stores guard symbol",
           "[lexer][ifndef_guard][hash][define]") {
     g_options = Options();
 
-    const std::string file_path = create_temp_file("guard_hash_define.asm",
-                                  "#ifndef GUARD_SYM\n#define GUARD_SYM\nLD A, 1\n");
+    // Create a temp file with 'ifndef guard' followed by some content
+    struct Case {
+        std::string filename;
+        std::vector<std::string> lines;
+    };
+    Case cases[] = {
+        { "guard_hash_define1.asm", { "#ifndef GUARD_SYM", "#define GUARD_SYM", "LD A, 1" } },
+        { "guard_hash_define2.asm", { "ifndef GUARD_SYM", "define GUARD_SYM", "LD B, 2" } },
+        { "guard_hash_define3.asm", { "ifndef GUARD_SYM", "defc GUARD_SYM", "LD C, 3" } },
+        { "guard_hash_define4.asm", { "ifndef GUARD_SYM", "equ GUARD_SYM", "LD D, 4" } },
+        { "guard_hash_define5.asm", { "ifndef GUARD_SYM", "GUARD_SYM define", "LD E, 5" } },
+        { "guard_hash_define6.asm", { "ifndef GUARD_SYM", "GUARD_SYM defc", "LD H, 6" } },
+        { "guard_hash_define7.asm", { "ifndef GUARD_SYM", "GUARD_SYM equ", "LD L, 7" } },
+        { "guard_hash_define8.asm", { "ifndef GUARD_SYM", "#define GUARD_SYM", "LD M, 1" } },
+        { "guard_hash_define9.asm", { "#ifndef GUARD_SYM", "define GUARD_SYM", "LD N, 1" } },
+    };
 
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        const auto& test_case = cases[i];
+        std::string content;
+        for (size_t k = 0; k < test_case.lines.size(); ++k) {
+            content += test_case.lines[k] + "\n";
+        }
+        const std::string file_path = create_temp_file(test_case.filename,
+                                      content);
 
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
+        TokenLine line;
+        // Read twice to test caching
+        for (int j = 0; j < 2; ++j) {
+            TokenFileReader reader;
+            REQUIRE(reader.open(file_path));
+            // Verify the flag is set during open()
+            REQUIRE(reader.has_ifndef_guard());
+            REQUIRE(reader.ifndef_guard_symbol() == "GUARD_SYM");
 
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "GUARD_SYM");
+            for (size_t k = 0; k < test_case.lines.size(); ++k) {
+                REQUIRE(reader.next_token_line(line));
+                REQUIRE(line.to_string() == test_case.lines[k]);
+            }
 
-    std::remove(file_path.c_str());
-}
+            REQUIRE_FALSE(reader.next_token_line(line));
 
-TEST_CASE("TokenFileReader detects ifndef VAR followed by define VAR (same VAR) and stores guard symbol",
-          "[lexer][ifndef_guard][plain][define]") {
-    g_options = Options();
+            // verify again after reading all lines
+            REQUIRE(reader.has_ifndef_guard());
+            REQUIRE(reader.ifndef_guard_symbol() == "GUARD_SYM");
+        }
 
-    const std::string file_path = create_temp_file("guard_plain_define.asm",
-                                  "ifndef MY_GUARD\ndefine MY_GUARD\nLD B, 2\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "MY_GUARD");
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader detects ifndef VAR followed by defc VAR", "[lexer][ifndef_guard][defc]") {
-    g_options = Options();
-
-    const std::string file_path = create_temp_file("guard_defc.asm",
-                                  "ifndef SYM\ndefc SYM\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "SYM");
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader detects ifndef VAR followed by equ VAR", "[lexer][ifndef_guard][equ]") {
-    g_options = Options();
-
-    const std::string file_path = create_temp_file("guard_equ.asm",
-                                  "ifndef SYM2\nequ SYM2\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "SYM2");
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader detects ifndef VAR followed by VAR defc", "[lexer][ifndef_guard][postfix_defc]") {
-    g_options = Options();
-
-    const std::string file_path = create_temp_file("guard_postfix_defc.asm",
-                                  "ifndef ABC\nABC defc\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "ABC");
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader detects ifndef VAR followed by VAR define", "[lexer][ifndef_guard][postfix_define]") {
-    g_options = Options();
-
-    const std::string file_path = create_temp_file("guard_postfix_define.asm",
-                                  "ifndef XYZ\nXYZ define\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "XYZ");
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader detects ifndef VAR followed by VAR equ", "[lexer][ifndef_guard][postfix_equ]") {
-    g_options = Options();
-
-    const std::string file_path = create_temp_file("guard_postfix_equ.asm",
-                                  "ifndef KLM\nKLM equ\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "KLM");
-
-    std::remove(file_path.c_str());
-}
-
-TEST_CASE("TokenFileReader accepts mixed hash/plain forms: #ifndef then define", "[lexer][ifndef_guard][mixed]") {
-    g_options = Options();
-
-    const std::string file_path = create_temp_file("guard_mixed.asm",
-                                  "#ifndef MIXED\ndefine MIXED\n");
-
-    TokenFileReader reader;
-    REQUIRE(reader.open(file_path));
-
-    TokenLine line;
-    while (reader.next_token_line(line)) { /* drain */ }
-
-    REQUIRE(reader.has_ifndef_guard());
-    REQUIRE(reader.ifndef_guard_symbol() == "MIXED");
-
-    std::remove(file_path.c_str());
+        std::remove(test_case.filename.c_str());
+    }
 }
 
 TEST_CASE("TokenFileReader does not set guard when VAR mismatches between lines",
@@ -2775,6 +2679,7 @@ TEST_CASE("TokenFileReader does not set guard when VAR mismatches between lines"
 
     TokenFileReader reader;
     REQUIRE(reader.open(file_path));
+    REQUIRE_FALSE(reader.has_ifndef_guard());
 
     TokenLine line;
     while (reader.next_token_line(line)) { /* drain */ }
@@ -2793,6 +2698,7 @@ TEST_CASE("TokenFileReader does not set guard when second non-empty line is not 
 
     TokenFileReader reader;
     REQUIRE(reader.open(file_path));
+    REQUIRE_FALSE(reader.has_ifndef_guard());
 
     TokenLine line;
     while (reader.next_token_line(line)) { /* drain */ }
@@ -2808,6 +2714,7 @@ TEST_CASE("TokenFileReader ignores injected content for include guard detection"
 
     TokenFileReader reader;
     reader.inject("virtual.asm", 1, true, "ifndef INJ\ndefine INJ\n");
+    REQUIRE_FALSE(reader.has_ifndef_guard());
 
     TokenLine line;
     while (reader.next_token_line(line)) { /* drain */ }
@@ -2825,6 +2732,8 @@ TEST_CASE("TokenFileReader ignores blank lines when detecting ifndef guard (hash
 
     TokenFileReader reader;
     REQUIRE(reader.open(file_path));
+    REQUIRE(reader.has_ifndef_guard());
+    REQUIRE(reader.ifndef_guard_symbol() == "BLANK_GUARD");
 
     TokenLine line;
     while (reader.next_token_line(line)) { /* drain */ }
@@ -2845,6 +2754,8 @@ TEST_CASE("TokenFileReader ignores blank lines when detecting ifndef guard (plai
 
     TokenFileReader reader;
     REQUIRE(reader.open(file_path));
+    REQUIRE(reader.has_ifndef_guard());
+    REQUIRE(reader.ifndef_guard_symbol() == "PLAIN_GUARD");
 
     TokenLine line;
     while (reader.next_token_line(line)) { /* drain */ }
@@ -2875,6 +2786,8 @@ TEST_CASE("TokenFileReader ignores blank lines for postfix second-line forms (VA
 
         TokenFileReader reader;
         REQUIRE(reader.open(file_path));
+        REQUIRE(reader.has_ifndef_guard());
+        REQUIRE(reader.ifndef_guard_symbol() == c.sym);
 
         TokenLine line;
         while (reader.next_token_line(line)) { /* drain */ }
@@ -2895,12 +2808,141 @@ TEST_CASE("TokenFileReader ignores multiple blank lines before and between guard
 
     TokenFileReader reader;
     REQUIRE(reader.open(file_path));
+    REQUIRE(reader.has_ifndef_guard());
+    REQUIRE(reader.ifndef_guard_symbol() == "MULTI");
 
     TokenLine line;
     while (reader.next_token_line(line)) { /* drain */ }
 
     REQUIRE(reader.has_ifndef_guard());
     REQUIRE(reader.ifndef_guard_symbol() == "MULTI");
+
+    std::remove(file_path.c_str());
+}
+
+TEST_CASE("TokenFileReader detects ifndef guard when first and second non-empty parts are on same line split by colon",
+          "[lexer][ifndef_guard][same_line][colon]") {
+    g_options = Options();
+
+    // Single physical line with colon separator. Second logical line should be detected as define/defc/equ forms.
+    struct Case {
+        std::string filename;
+        std::string line;
+        std::string sym;
+        std::vector<std::string> expectedLogicalLines; // after split_lines
+    } cases[] = {
+        {
+            "guard_same_colon_define.asm", "ifndef GCOL: define GCOL\n", "GCOL",
+            { "ifndef GCOL", "define GCOL" }
+        },
+        {
+            "guard_same_colon_defc.asm",   "ifndef GCOL2: defc GCOL2\n", "GCOL2",
+            { "ifndef GCOL2", "defc GCOL2" }
+        },
+        {
+            "guard_same_colon_equ.asm",    "ifndef GCOL3: equ GCOL3\n",  "GCOL3",
+            { "ifndef GCOL3", "equ GCOL3" }
+        },
+        {
+            "guard_same_colon_postfix_define.asm", "ifndef GCOL4: GCOL4 define\n", "GCOL4",
+            { "ifndef GCOL4", "GCOL4 define" }
+        },
+        {
+            "guard_same_colon_postfix_defc.asm",   "ifndef GCOL5: GCOL5 defc\n",   "GCOL5",
+            { "ifndef GCOL5", "GCOL5 defc" }
+        },
+        {
+            "guard_same_colon_postfix_equ.asm",    "ifndef GCOL6: GCOL6 equ\n",    "GCOL6",
+            { "ifndef GCOL6", "GCOL6 equ" }
+        },
+        { "guard_same_colon_hash_define.asm",    "#ifndef GCOL7: #define GCOL7\n", "GCOL7", { "#ifndef GCOL7", "#define GCOL7" } },
+    };
+
+    for (const auto& c : cases) {
+        const std::string file_path = create_temp_file(c.filename, c.line);
+
+        TokenFileReader reader;
+        REQUIRE(reader.open(file_path));
+
+        // Guard must be detected during open()
+        REQUIRE(reader.has_ifndef_guard());
+        REQUIRE(reader.ifndef_guard_symbol() == c.sym);
+
+        // Read and validate logical line split
+        TokenLine tl;
+        for (const auto& expected : c.expectedLogicalLines) {
+            REQUIRE(reader.next_token_line(tl));
+            REQUIRE(tl.to_string() == expected);
+        }
+        REQUIRE_FALSE(reader.next_token_line(tl));
+
+        std::remove(file_path.c_str());
+    }
+}
+
+TEST_CASE("TokenFileReader detects ifndef guard when first and second non-empty parts are on same line split by backslash",
+          "[lexer][ifndef_guard][same_line][backslash]") {
+    g_options = Options();
+
+    // Single physical line with backslash separator. Second logical line should be detected as define/defc/equ forms.
+    struct Case {
+        std::string filename;
+        std::string line;
+        std::string sym;
+        std::vector<std::string> expectedLogicalLines; // after split_lines
+    } cases[] = {
+        { "guard_same_backslash_define.asm", "ifndef GBS \\ define GBS\n", "GBS", { "ifndef GBS", "define GBS" } },
+        { "guard_same_backslash_defc.asm",   "ifndef GBS2 \\ defc GBS2\n", "GBS2", { "ifndef GBS2", "defc GBS2" } },
+        { "guard_same_backslash_equ.asm",    "ifndef GBS3 \\ equ GBS3\n",  "GBS3", { "ifndef GBS3", "equ GBS3" } },
+        { "guard_same_backslash_postfix_define.asm", "ifndef GBS4 \\ GBS4 define\n", "GBS4", { "ifndef GBS4", "GBS4 define" } },
+        { "guard_same_backslash_postfix_defc.asm",   "ifndef GBS5 \\ GBS5 defc\n",   "GBS5", { "ifndef GBS5", "GBS5 defc" } },
+        { "guard_same_backslash_postfix_equ.asm",    "ifndef GBS6 \\ GBS6 equ\n",    "GBS6", { "ifndef GBS6", "GBS6 equ" } },
+        { "guard_same_backslash_hash_define.asm",    "#ifndef GBS7 \\ #define GBS7\n", "GBS7", { "#ifndef GBS7", "#define GBS7" } },
+    };
+
+    for (const auto& c : cases) {
+        const std::string file_path = create_temp_file(c.filename, c.line);
+
+        TokenFileReader reader;
+        REQUIRE(reader.open(file_path));
+
+        // Guard must be detected during open()
+        REQUIRE(reader.has_ifndef_guard());
+        REQUIRE(reader.ifndef_guard_symbol() == c.sym);
+
+        // Read and validate logical line split
+        TokenLine tl;
+        for (const auto& expected : c.expectedLogicalLines) {
+            REQUIRE(reader.next_token_line(tl));
+            REQUIRE(tl.to_string() == expected);
+        }
+        REQUIRE_FALSE(reader.next_token_line(tl));
+
+        std::remove(file_path.c_str());
+    }
+}
+
+TEST_CASE("split_lines: 'ifndef GCOL: define GCOL' splits into two logical lines without converting to '.ifndef'",
+          "[lexer][split][ifndef][bug]") {
+    g_options = Options();
+
+    const std::string file_path = create_temp_file("split_ifndef_define.asm",
+                                  "ifndef GCOL: define GCOL\n");
+
+    TokenFileReader reader;
+    REQUIRE(reader.open(file_path));
+
+    TokenLine tl;
+
+    // First logical line should be the original 'ifndef GCOL' (no dot-label conversion)
+    REQUIRE(reader.next_token_line(tl));
+    REQUIRE(tl.to_string() == "ifndef GCOL");
+
+    // Second logical line should be 'define GCOL'
+    REQUIRE(reader.next_token_line(tl));
+    REQUIRE(tl.to_string() == "define GCOL");
+
+    REQUIRE_FALSE(reader.next_token_line(tl));
 
     std::remove(file_path.c_str());
 }
