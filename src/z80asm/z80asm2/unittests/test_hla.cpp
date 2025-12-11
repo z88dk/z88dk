@@ -1240,7 +1240,7 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
     expect_or_c(lines[6]);
     expect_jp_cond_label(lines[7], Keyword::NZ, inner_top);
     // inner end label
-    REQUIRE(lines[8].size() == 2);
+    REQUIRE(lines[8].tokens().size() == 2);
     REQUIRE(lines[8].tokens()[1].text().find("HLA_REPEAT_1_END") != std::string::npos);
     // middle NOP
     expect_nop(lines[9]);
