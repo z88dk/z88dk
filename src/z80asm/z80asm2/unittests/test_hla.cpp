@@ -35,7 +35,7 @@ static std::vector<TokenLine> run_hla_on_text(Preprocessor& pp,
         const std::string& src, const std::string& fname) {
     HLA hla(&pp);
     hla.clear();
-    pp.push_virtual_file(src, fname, 1, true);
+    pp.push_virtual_file(src, fname, 1, false);
 
     TokenLine line;
     std::vector<TokenLine> out;

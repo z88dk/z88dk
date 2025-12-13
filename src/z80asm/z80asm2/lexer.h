@@ -108,6 +108,9 @@ public:
     bool is(TokenType t) const;
     bool is(Keyword kw) const;
 
+    bool is_not(TokenType t) const;
+    bool is_not(Keyword kw) const;
+
     // Read-only accessors
     TokenType type() const;
     const std::string& text() const;

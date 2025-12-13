@@ -1930,7 +1930,7 @@ TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration usin
     REQUIRE(out.size() == 6);
 
     // Validate each iteration has unique local suffix and correct substitution of V
-    auto assertIteration = [&](size_t baseIndex, const char* vName, int expectedId) {
+    auto assert_iteration = [&](size_t baseIndex, const char* vName, size_t expectedId) {
         const auto& l0 = out[baseIndex + 0].tokens();
         const auto& l1 = out[baseIndex + 1].tokens();
 
@@ -1957,13 +1957,13 @@ TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration usin
     };
 
     // Iteration 0: V = A, id = start_id
-    assertIteration(0, "A", start_id);
+    assert_iteration(0, "A", start_id);
 
     // Iteration 1: V = B, id = start_id + 1
-    assertIteration(2, "B", start_id + 1);
+    assert_iteration(2, "B", start_id + 1);
 
     // Iteration 2: V = C, id = start_id + 2
-    assertIteration(4, "C", start_id + 2);
+    assert_iteration(4, "C", start_id + 2);
 
     // unique_id increments once per iteration
     REQUIRE(g_unique_id_counter == start_id + 3);
@@ -2163,4 +2163,514 @@ TEST_CASE("RepeatCharsBlock: empty string input yields no output and expand retu
     Location useLoc("use.asm", 1331);
     REQUIRE_FALSE(block.expand(useLoc, out));
     REQUIRE(out.empty());
+}
+
+TEST_CASE("Macros: recursive macro triggers recursion guard error", "[model][macros_container][expand][recursion]") {
+    SuppressErrors suppress;
+
+    // Define:
+    // MACRO FOO
+    //   FOO       ; self-recursive call
+    // ENDM
+    Location defLoc("defs.asm", 1400);
+    Macro foo("FOO", defLoc);
+    // Object-like: do not set function_like
+    foo.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "FOO", false)
+    }));
+
+    Macros container;
+    container.add_macro(foo);
+
+    // Input:
+    // FOO
+    Location useLoc("use.asm", 1401);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "FOO", false)
+    });
+
+    std::vector<TokenLine> out;
+    // Expansion should hit the recursion limit and report an error
+    REQUIRE(container.expand(line, out));
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("use.asm:1401:") != std::string::npos);
+    REQUIRE(msg.find("recursion limit") != std::string::npos);
+
+    // After hitting the limit, the identifier is treated as a normal token to stop runaway expansion.
+    REQUIRE(out.size() >= 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE_FALSE(toks.empty());
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "FOO");
+}
+
+TEST_CASE("Macros: stringize operator produces string from raw argument tokens",
+          "[model][macros_container][stringize]") {
+    // Define STR(A) -> #A
+    Location defLoc("defs.asm", 1500);
+    Macro str("STR", defLoc);
+    str.set_function_like(true);
+    str.add_parameter("A");
+    str.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Hash, "#", false),
+        Token(TokenType::Identifier, "A", false)
+    }));
+
+    Macros container;
+    container.add_macro(str);
+
+    // Input: STR(X)
+    Location useLoc("use.asm", 1501);
+    TokenLine line1(useLoc, {
+        Token(TokenType::Identifier, "STR", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "X", false),
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    std::vector<TokenLine> out1;
+    REQUIRE(container.expand(line1, out1));
+    REQUIRE(out1.size() == 1);
+    {
+        const auto& toks = out1[0].tokens();
+        REQUIRE(toks.size() == 1);
+        REQUIRE(toks[0].is(TokenType::String));
+        REQUIRE(toks[0].text() == "\"X\"");
+        REQUIRE(toks[0].string_value() == "X");
+    }
+
+    // Input: STR((HL))
+    TokenLine line2(useLoc, {
+        Token(TokenType::Identifier, "STR", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "HL", false),
+        Token(TokenType::RightParen, ")", false),
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    std::vector<TokenLine> out2;
+    REQUIRE(container.expand(line2, out2));
+    REQUIRE(out2.size() == 1);
+    {
+        const auto& toks = out2[0].tokens();
+        REQUIRE(toks.size() == 1);
+        REQUIRE(toks[0].is(TokenType::String));
+        // Concatenation of raw tokens: "(" "HL" ")"
+        REQUIRE(toks[0].text() == "\"(HL)\"");
+        REQUIRE(toks[0].string_value() == "(HL)");
+    }
+}
+
+TEST_CASE("Macros: stringize with multiple parameters on one line", "[model][macros_container][stringize]") {
+    // Define STR2(A,B) -> #A , #B
+    Location defLoc("defs.asm", 1510);
+    Macro str2("STR2", defLoc);
+    str2.set_function_like(true);
+    str2.add_parameter("A");
+    str2.add_parameter("B");
+    str2.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Hash, "#", false),
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Hash, "#", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+
+    Macros container;
+    container.add_macro(str2);
+
+    // Input: STR2(IX, (DE))
+    Location useLoc("use.asm", 1511);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "STR2", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "IX", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "DE", false),
+        Token(TokenType::RightParen, ")", false),
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].is(TokenType::String));
+    REQUIRE(toks[0].text() == "\"IX\"");
+    REQUIRE(toks[0].string_value() == "IX");
+
+    REQUIRE(toks[1].is(TokenType::Comma));
+
+    REQUIRE(toks[2].is(TokenType::String));
+    REQUIRE(toks[2].text() == "\"(DE)\"");
+    REQUIRE(toks[2].string_value() == "(DE)");
+}
+
+TEST_CASE("Macros: stringize uses raw (unexpanded) argument, not expanded result",
+          "[model][macros_container][stringize][raw]") {
+    // Define ADDR -> (IX) , (HL)    (object-like)
+    Location defLoc1("defs.asm", 1520);
+    Macro addr("ADDR", defLoc1);
+    addr.add_body_line(TokenLine(defLoc1, {
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "IX", false),
+        Token(TokenType::RightParen, ")", false)
+    }));
+    addr.add_body_line(TokenLine(defLoc1, {
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "HL", false),
+        Token(TokenType::RightParen, ")", false)
+    }));
+
+    // Define SHOW(A) -> #A
+    Location defLoc2("defs.asm", 1521);
+    Macro show("SHOW", defLoc2);
+    show.set_function_like(true);
+    show.add_parameter("A");
+    show.add_body_line(TokenLine(defLoc2, {
+        Token(TokenType::Hash, "#", false),
+        Token(TokenType::Identifier, "A", false)
+    }));
+
+    Macros container;
+    container.add_macro(addr);
+    container.add_macro(show);
+
+    // Input: SHOW(ADDR)
+    Location useLoc("use.asm", 1522);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "SHOW", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "ADDR", false), // raw argument is "ADDR"
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::String));
+    // Must be the raw argument "ADDR" and not its expanded tokens like "(IX) , (HL)"
+    REQUIRE(toks[0].text() == "\"ADDR\"");
+    REQUIRE(toks[0].string_value() == "ADDR");
+}
+
+TEST_CASE("Macros: stringize escapes quotes in raw argument using escape_c_string",
+          "[model][macros_container][stringize][escape]") {
+    // Define QUOTE(A) -> #A
+    Location defLoc("defs.asm", 1530);
+    Macro quote("QUOTE", defLoc);
+    quote.set_function_like(true);
+    quote.add_parameter("A");
+    quote.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Hash, "#", false),
+        Token(TokenType::Identifier, "A", false)
+    }));
+
+    Macros container;
+    container.add_macro(quote);
+
+    // Input: QUOTE("A")  -> raw tokens include a String token with value A
+    Location useLoc("use.asm", 1531);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "QUOTE", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::String, "\"A\"", "A", false),
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::String));
+    // The produced string token text should quote and escape via escape_c_string; here no extra escapes needed.
+    REQUIRE(toks[0].text() == "\"\\\"A\\\"\""); // depending on lexer text composition
+    REQUIRE(toks[0].string_value() == "\"A\"");
+}
+
+TEST_CASE("Macros: token pasting with ## concatenates two tokens to an identifier (no macro)",
+          "[model][macros_container][paste]") {
+    Macros container;
+
+    // Input: FOO ## BAR -> "FOOBAR" (not a macro)
+    Location useLoc("use.asm", 1600);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "FOO", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Identifier, "BAR", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "FOOBAR");
+}
+
+TEST_CASE("Macros: token pasting with ## concatenates identifier and integer (no macro)",
+          "[model][macros_container][paste]") {
+    Macros container;
+
+    // Input: TMP ## 123 -> "TMP123" (not a macro)
+    Location useLoc("use.asm", 1601);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "TMP", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Integer, "123", 123, false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "TMP123");
+}
+
+TEST_CASE("Macros: token pasting with ## concatenates three tokens (identifier+identifier+integer)",
+          "[model][macros_container][paste]") {
+    Macros container;
+
+    // Input: AA ## BB ## 9 -> "AABB9" (not a macro)
+    Location useLoc("use.asm", 1602);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "AA", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Identifier, "BB", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Integer, "9", 9, false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "AABB9");
+}
+
+TEST_CASE("Macros: token pasted identifier expands an object-like macro", "[model][macros_container][paste]") {
+    // Define an object-like macro named OBJMAC -> emits two tokens: INC A
+    Location defLoc("defs.asm", 1610);
+    Macro obj("OBJMAC", defLoc);
+    obj.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "INC", false),
+        Token(TokenType::Identifier, "A", false)
+    }));
+
+    Macros container;
+    container.add_macro(obj);
+
+    // Create OBJ ## MAC -> "OBJMAC" and expand
+    Location useLoc("use.asm", 1611);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "OBJ", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Identifier, "MAC", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 2);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "INC");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "A");
+}
+
+TEST_CASE("Macros: token pasted identifier expands a function-like macro with parentheses",
+          "[model][macros_container][paste]") {
+    // Define SUM(A,B) -> A + B
+    Location defLoc("defs.asm", 1620);
+    Macro sum("SUM", defLoc);
+    sum.set_function_like(true);
+    sum.add_parameter("A");
+    sum.add_parameter("B");
+    sum.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Plus, "+", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+
+    Macros container;
+    container.add_macro(sum);
+
+    // Create S ## U ## M -> "SUM" then call with parentheses: (2,4)
+    Location useLoc("use.asm", 1621);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "S", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Identifier, "U", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Identifier, "M", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Integer, "2", 2, false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Integer, "4", 4, false),
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 3);
+    REQUIRE(toks[0].text() == "2");
+    REQUIRE(toks[1].is(TokenType::Plus));
+    REQUIRE(toks[2].text() == "4");
+}
+
+TEST_CASE("Macros: token pasted identifier expands a function-like macro without parentheses",
+          "[model][macros_container][paste]") {
+    // Define CAT2(A,B) -> A B
+    Location defLoc("defs.asm", 1630);
+    Macro cat("CAT2", defLoc);
+    cat.set_function_like(true);
+    cat.add_parameter("A");
+    cat.add_parameter("B");
+    cat.add_body_line(TokenLine(defLoc, {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+
+    Macros container;
+    container.add_macro(cat);
+
+    // Create CAT ## 2 -> "CAT2" then call without parens: X, Y
+    Location useLoc("use.asm", 1631);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "CAT", false),
+        Token(TokenType::DoubleHash, "##", false),
+        Token(TokenType::Integer, "2", 2, false),
+        Token(TokenType::Identifier, "X", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Identifier, "Y", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+    REQUIRE(toks.size() == 2);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "X");
+    REQUIRE(toks[1].is(TokenType::Identifier));
+    REQUIRE(toks[1].text() == "Y");
+}
+
+TEST_CASE("Macros: chained object-like expansion A -> B -> C", "[model][macros_container][expand][chain]") {
+    // Define A -> B
+    Location defLocA("defs.asm", 1700);
+    Macro A("A", defLocA);
+    A.add_body_line(TokenLine(defLocA, { Token(TokenType::Identifier, "B", false) }));
+
+    // Define B -> C
+    Location defLocB("defs.asm", 1701);
+    Macro B("B", defLocB);
+    B.add_body_line(TokenLine(defLocB, { Token(TokenType::Identifier, "C", false) }));
+
+    // Define C -> NOP
+    Location defLocC("defs.asm", 1702);
+    Macro C("C", defLocC);
+    C.add_body_line(TokenLine(defLocC, { Token(TokenType::Identifier, "NOP", false) }));
+
+    Macros container;
+    container.add_macro(A);
+    container.add_macro(B);
+    container.add_macro(C);
+
+    // Input: A
+    Location useLoc("use.asm", 1703);
+    TokenLine line(useLoc, { Token(TokenType::Identifier, "A", false) });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));         // changes should be detected
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+
+    // Expect final expansion to NOP (after A->B->C)
+    REQUIRE(toks.size() == 1);
+    REQUIRE(toks[0].is(TokenType::Identifier));
+    REQUIRE(toks[0].text() == "NOP");
+}
+
+TEST_CASE("Macros: chained function-like expansion F(X) -> G(X) -> H(X)", "[model][macros_container][expand][chain]") {
+    // Define H(T) -> PUSH T
+    Location defLocH("defs.asm", 1710);
+    Macro H("H", defLocH);
+    H.set_function_like(true);
+    H.add_parameter("T");
+    H.add_body_line(TokenLine(defLocH, {
+        Token(TokenType::Identifier, "PUSH", false),
+        Token(TokenType::Identifier, "T", false)
+    }));
+
+    // Define G(Y) -> H(Y)
+    Location defLocG("defs.asm", 1711);
+    Macro G("G", defLocG);
+    G.set_function_like(true);
+    G.add_parameter("Y");
+    G.add_body_line(TokenLine(defLocG, {
+        Token(TokenType::Identifier, "H", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "Y", false),
+        Token(TokenType::RightParen, ")", false)
+    }));
+
+    // Define F(X) -> G(X)
+    Location defLocF("defs.asm", 1712);
+    Macro F("F", defLocF);
+    F.set_function_like(true);
+    F.add_parameter("X");
+    F.add_body_line(TokenLine(defLocF, {
+        Token(TokenType::Identifier, "G", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "X", false),
+        Token(TokenType::RightParen, ")", false)
+    }));
+
+    Macros container;
+    container.add_macro(H);
+    container.add_macro(G);
+    container.add_macro(F);
+
+    // Input: label: F(BC) EXTRA
+    Location useLoc("use.asm", 1713);
+    TokenLine line(useLoc, {
+        Token(TokenType::Identifier, "label", false),
+        Token(TokenType::Colon, ":", false),
+        Token(TokenType::Identifier, "F", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Identifier, "BC", false),
+        Token(TokenType::RightParen, ")", false),
+        Token(TokenType::Identifier, "EXTRA", false)
+    });
+
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));         // chained changes should be detected
+    REQUIRE(out.size() == 1);
+    const auto& toks = out[0].tokens();
+
+    // Expect inline splicing: label: PUSH BC EXTRA
+    REQUIRE(toks.size() == 5);
+    REQUIRE(toks[0].text() == "label");
+    REQUIRE(toks[1].is(TokenType::Colon));
+    REQUIRE(toks[2].text() == "PUSH");
+    REQUIRE(toks[3].text() == "BC");
+    REQUIRE(toks[4].text() == "EXTRA");
 }

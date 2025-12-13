@@ -435,6 +435,10 @@ std::string BinFileReader::read_string_at(size_t pos, size_t length) {
 // Dependency file creator
 //-----------------------------------------------------------------------------
 
+void DependencyFile::clear() {
+    dependencies_.clear();
+}
+
 void DependencyFile::add_dependency(const std::string& filename) {
     dependencies_.push_back(filename);
 }

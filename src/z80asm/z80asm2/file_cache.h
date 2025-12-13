@@ -204,6 +204,7 @@ private:
 class DependencyFile {
 public:
     DependencyFile() = default;
+    void clear();
     void add_dependency(const std::string& filename);
     const std::vector<std::string>& dependencies() const;
     bool write();
