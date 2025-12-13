@@ -56,43 +56,43 @@ bool HLA::next_line(TokenLine& out_line) {
             size_t i = 2;
             switch (toks[1].keyword()) {
             case Keyword::IF:
-                process_if(line, i);
+                process_IF(line, i);
                 continue;
             case Keyword::ELIF:
             case Keyword::ELSEIF:
-                process_elif(line, i);
+                process_ELIF(line, i);
                 continue;
             case Keyword::ELSE:
-                process_else(line, i);
+                process_ELSE(line, i);
                 continue;
             case Keyword::ENDIF:
-                process_endif(line, i);
+                process_ENDIF(line, i);
                 continue;
             case Keyword::WHILE:
-                process_while(line, i);
+                process_WHILE(line, i);
                 continue;
             case Keyword::WEND:
             case Keyword::ENDW:
             case Keyword::ENDWHILE:
-                process_wend(line, i);
+                process_WEND(line, i);
                 continue;
             case Keyword::REPEAT:
-                process_repeat(line, i);
+                process_REPEAT(line, i);
                 continue;
             case Keyword::UNTIL:
-                process_until(line, i);
+                process_UNTIL(line, i);
                 continue;
             case Keyword::UNTILB:
-                process_untilb(line, i);
+                process_UNTILB(line, i);
                 continue;
             case Keyword::UNTILBC:
-                process_untilbc(line, i);
+                process_UNTILBC(line, i);
                 continue;
             case Keyword::BREAK:
-                process_break(line, i);
+                process_BREAK(line, i);
                 continue;
             case Keyword::CONTINUE:
-                process_continue(line, i);
+                process_CONTINUE(line, i);
                 continue;
             default:
                 out_line = std::move(line);
@@ -110,7 +110,7 @@ bool HLA::next_pp_line(TokenLine& out_line) {
     return pp_ && pp_->pp_next_line(out_line);
 }
 
-void HLA::process_if(const TokenLine& line, size_t& i) {
+void HLA::process_IF(const TokenLine& line, size_t& i) {
     if (i >= line.tokens().size()) {
         g_errors.set_location(line.location());
         g_errors.error(ErrorCode::InvalidSyntax, "Expected expression after %IF");
@@ -147,7 +147,7 @@ void HLA::process_if(const TokenLine& line, size_t& i) {
     block_stack_.push_back(std::move(blk));
 }
 
-void HLA::process_elif(const TokenLine& line, size_t& i) {
+void HLA::process_ELIF(const TokenLine& line, size_t& i) {
     // Validate context
     if (block_stack_.empty() || block_stack_.back().kind != hla::Block::Kind::If) {
         g_errors.set_location(line.location());
@@ -204,7 +204,7 @@ void HLA::process_elif(const TokenLine& line, size_t& i) {
     }
 }
 
-void HLA::process_else(const TokenLine& line, size_t& i) {
+void HLA::process_ELSE(const TokenLine& line, size_t& i) {
     // Validate context
     if (block_stack_.empty() || block_stack_.back().kind != hla::Block::Kind::If) {
         g_errors.set_location(line.location());
@@ -240,7 +240,7 @@ void HLA::process_else(const TokenLine& line, size_t& i) {
     blk.saw_else = true;
 }
 
-void HLA::process_endif(const TokenLine& line, size_t& i) {
+void HLA::process_ENDIF(const TokenLine& line, size_t& i) {
     // Validate context
     if (block_stack_.empty() || block_stack_.back().kind != hla::Block::Kind::If) {
         g_errors.set_location(line.location());
@@ -267,7 +267,7 @@ void HLA::process_endif(const TokenLine& line, size_t& i) {
     cg.emit_label(blk.end_label, line.location(), out_queue_);
 }
 
-void HLA::process_while(const TokenLine& line, size_t& i) {
+void HLA::process_WHILE(const TokenLine& line, size_t& i) {
     if (i >= line.tokens().size()) {
         g_errors.set_location(line.location());
         g_errors.error(ErrorCode::InvalidSyntax, "Expected expression after %WHILE");
@@ -306,7 +306,7 @@ void HLA::process_while(const TokenLine& line, size_t& i) {
     }
 }
 
-void HLA::process_wend(const TokenLine& line, size_t& i) {
+void HLA::process_WEND(const TokenLine& line, size_t& i) {
     // Validate context
     if (block_stack_.empty() ||
             block_stack_.back().kind != hla::Block::Kind::While) {
@@ -337,7 +337,7 @@ void HLA::process_wend(const TokenLine& line, size_t& i) {
     cg.emit_label(blk.end_label, line.location(), out_queue_);
 }
 
-void HLA::process_repeat(const TokenLine& line, size_t& i) {
+void HLA::process_REPEAT(const TokenLine& line, size_t& i) {
     // %REPEAT must not have trailing tokens
     if (i < line.tokens().size()) {
         g_errors.set_location(line.location());
@@ -360,7 +360,7 @@ void HLA::process_repeat(const TokenLine& line, size_t& i) {
     block_stack_.push_back(std::move(blk));
 }
 
-void HLA::process_until(const TokenLine& line, size_t& i) {
+void HLA::process_UNTIL(const TokenLine& line, size_t& i) {
     if (block_stack_.empty() ||
             block_stack_.back().kind != hla::Block::Kind::Repeat) {
         g_errors.set_location(line.location());
@@ -393,7 +393,7 @@ void HLA::process_until(const TokenLine& line, size_t& i) {
     }
 }
 
-void HLA::process_untilb(const TokenLine& line, size_t& i) {
+void HLA::process_UNTILB(const TokenLine& line, size_t& i) {
     // %UNTILB ends a %REPEAT loop using a B counter:
     //   dec b
     //   jp nz, <top_label>
@@ -434,7 +434,7 @@ void HLA::process_untilb(const TokenLine& line, size_t& i) {
     cg.emit_label(blk.end_label, line.location(), out_queue_);
 }
 
-void HLA::process_untilbc(const TokenLine& line, size_t& i) {
+void HLA::process_UNTILBC(const TokenLine& line, size_t& i) {
     // %UNTILBC ends a %REPEAT loop by: dec bc; ld a, b; or c; jp nz, <top>
     if (block_stack_.empty()
             || block_stack_.back().kind != hla::Block::Kind::Repeat) {
@@ -489,7 +489,7 @@ void HLA::process_untilbc(const TokenLine& line, size_t& i) {
     cg.emit_label(blk.end_label, line.location(), out_queue_);
 }
 
-void HLA::process_break(const TokenLine& line, size_t& i) {
+void HLA::process_BREAK(const TokenLine& line, size_t& i) {
     // Must be inside a WHILE or REPEAT block
     if (block_stack_.empty() ||
             !(block_stack_.back().kind == hla::Block::Kind::While ||
@@ -541,7 +541,7 @@ void HLA::process_break(const TokenLine& line, size_t& i) {
     }
 }
 
-void HLA::process_continue(const TokenLine& line, size_t& i) {
+void HLA::process_CONTINUE(const TokenLine& line, size_t& i) {
     // Must be inside a WHILE or REPEAT block
     if (block_stack_.empty() ||
             !(block_stack_.back().kind == hla::Block::Kind::While ||

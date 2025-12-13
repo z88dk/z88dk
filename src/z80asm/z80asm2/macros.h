@@ -10,6 +10,7 @@
 #include "location.h"
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 extern size_t g_unique_id_counter; // to create unique local names
 
@@ -20,35 +21,63 @@ extern size_t g_unique_id_counter; // to create unique local names
 class Macro {
 public:
     Macro(const std::string& name, const Location& location);
+
     const std::string& name() const;
     const Location& location() const;
+
     bool is_function_like() const;
     void set_function_like(bool f);
+
     const std::vector<std::string>& parameters() const;
     void add_parameter(const std::string& param);
+
     const std::vector<std::string>& locals() const;
     void add_local(const std::string& local);
+
     const std::vector<TokenLine>& body_lines() const;
     void add_body_line(const TokenLine& line);
+    void add_body_line(const TokenLine& line, size_t i);
 
     bool parse_parameters(const TokenLine& line, size_t& index);
     bool parse_locals(const TokenLine& line, size_t& index);
-    bool parse_arguments(const TokenLine& line, size_t& index,
-                         std::vector<TokenLine>& out_arguments);
+    bool parse_arguments(const TokenLine& line, size_t& index, std::vector<TokenLine>& out_arguments);
     bool parse_body_line(const TokenLine& line);
 
-    void expand(const Location& location, const std::vector<TokenLine>& arguments,
-                std::vector<TokenLine>& out_lines);
+    void expand(const Location& location, const std::vector<TokenLine>& arguments, std::vector<TokenLine>& out_lines);
     TokenLine expand_flat(const Location& location, const std::vector<TokenLine>& arguments);
+
+    // Recursion counter API
+    size_t recursion_count() const {
+        return recursion_count_;
+    }
+    void increment_recursion() {
+        ++recursion_count_;
+    }
+    void decrement_recursion() {
+        if (recursion_count_ > 0) {
+            --recursion_count_;
+        }
+    }
+
+    // New: expand with both expanded and raw (unexpanded) arguments to support stringize `#`
+    void expand_with_raw(const Location& location,
+                         const std::vector<TokenLine>& expanded_args,
+                         const std::vector<TokenLine>& raw_args,
+                         std::vector<TokenLine>& out_lines);
 
 private:
     std::string name_;
     Location location_;
     bool is_function_like_ = false;
+
     std::vector<std::string> parameters_;
     std::vector<std::string> locals_;
     std::vector<TokenLine> body_lines_;
+
     int nesting_level_ = 1; // start at 1 because MACRO was already parsed
+
+    // Per-macro recursion counter (non-thread-safe; assembler is single-threaded)
+    size_t recursion_count_ = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -57,18 +86,28 @@ private:
 
 class Macros {
 public:
-    Macros() = default;
     bool has_macro(const std::string& name) const;
     Macro* get_macro(const std::string& name);
     const Macro* get_macro(const std::string& name) const;
+
     void add_macro(const Macro& macro);
+    void remove_macro(const std::string& name);
     void clear();
 
     bool expand(const TokenLine& line, std::vector<TokenLine>& out_lines);
+    bool expand(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines);
+
     TokenLine expand_flat(const TokenLine& line);
+    TokenLine expand_flat(const TokenLine& line, size_t i);
+
+    const std::string& last_expanded_macro() const;
 
 private:
     std::unordered_map<std::string, Macro> macros_;
+    std::string last_expanded_macro_;
+
+    bool expand_once_suffix(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines);
+    TokenLine flatten(const Location& location, const std::vector<TokenLine>& lines);
 };
 
 //-----------------------------------------------------------------------------

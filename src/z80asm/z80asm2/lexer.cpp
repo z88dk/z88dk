@@ -78,6 +78,14 @@ bool Token::is(Keyword kw) const {
     return keyword_ == kw;
 }
 
+bool Token::is_not(TokenType t) const {
+    return type_ != t;
+}
+
+bool Token::is_not(Keyword kw) const {
+    return keyword_ != kw;
+}
+
 // Read-only accessors
 TokenType Token::type() const {
     return type_;
