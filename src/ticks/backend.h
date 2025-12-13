@@ -20,6 +20,7 @@ typedef void (*debugger_read_memory_cb)(int addr);
 typedef void (*get_regs_cb)(struct debugger_regs_t* regs);
 typedef void (*break_cb)(uint8_t temporary);
 typedef void (*void_cb)();
+typedef void (*execution_stopped_cb)(int code);
 typedef void (*step_cb)(uint8_t add_bp);
 typedef uint8_t (*uint8_t_cb)();
 typedef uint32_t (*uint32_t_cb)();
@@ -35,7 +36,7 @@ typedef enum
 } breakpoint_ret_t;
 
 typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
-typedef uint8_t (*connect_cb)(const char* hostname, int port);
+typedef uint8_t (*connect_cb)(const char* address);
 
 typedef struct {
     get_longlong_cb st;
@@ -70,10 +71,11 @@ typedef struct {
     log_cb debug;
     connect_cb remote_connect;
     uint8_t_cb is_remote_connected;
-    void_cb execution_stopped;
+    execution_stopped_cb execution_stopped;
     void_cb ctrl_c;
     uint32_t_cb time;
 	get_charp_cb script_filename;
+    void_cb remote_closed;
 } backend_t;
 
 extern backend_t bk;

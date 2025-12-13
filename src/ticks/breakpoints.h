@@ -34,6 +34,7 @@ typedef struct breakpoint {
 
     int                     number;
     char                    enabled;
+    uint8_t                 auto_remove;
     char                    *text;
     struct breakpoint       *next;
 } breakpoint;
@@ -64,7 +65,8 @@ extern breakpoint *watchpoints;
 extern temporary_breakpoint_t* temporary_breakpoints;
 extern int next_breakpoint_number;
 
-extern breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, int bk_size, int value, const char* text);
+extern breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, int bk_size, int value,
+    const char* text, uint8_t temporary);
 extern breakpoint* add_watchpoint(breakpoint_type operation, int value);
 extern void delete_breakpoint(breakpoint* b);
 extern void delete_watchpoint(breakpoint* w);

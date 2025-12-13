@@ -20,6 +20,8 @@ struct packet_buf
     int end;
 } in = {0}, out = {0};
 
+static uint8_t is_serial_connection = 0;
+
 uint8_t *inbuf_get()
 {
     return in.buf;
@@ -70,7 +72,13 @@ int read_data_once(sock_t sockfd)
     ssize_t nread;
     uint8_t buf[4096];
 
+#ifndef WIN32
+    // On Unix, use read() for both sockets and serial devices (sockets are file descriptors)
+    nread = read(sockfd, buf, sizeof(buf));
+#else
+    // On Windows, use recv() for sockets
     nread = recv(sockfd, buf, sizeof(buf), 0);
+#endif
     if (nread <= 0)
     {
         return -1;
@@ -86,7 +94,13 @@ void write_flush(sock_t sockfd)
     while (write_index < out.end)
     {
         ssize_t nwritten;
+#ifndef WIN32
+        // On Unix, use write() for both sockets and serial devices (sockets are file descriptors)
+        nwritten = write(sockfd, out.buf + write_index, (int)(out.end - write_index));
+#else
+        // On Windows, use send() for sockets
         nwritten = send(sockfd, out.buf + write_index, (int)(out.end - write_index), 0);
+#endif
         if (nwritten < 0)
         {
             printf("Write error\n");
@@ -95,6 +109,16 @@ void write_flush(sock_t sockfd)
         write_index += nwritten;
     }
     pktbuf_clear(&out);
+}
+
+void set_connection_type(uint8_t is_serial)
+{
+    is_serial_connection = is_serial;
+}
+
+uint8_t is_connection_serial(void)
+{
+    return is_serial_connection;
 }
 
 void write_data_raw(const uint8_t *data, ssize_t len)
@@ -191,6 +215,13 @@ bool skip_to_packet_start()
     pktbuf_erase_head(&in, end);
     assert(1 <= in.end);
     assert('$' == in.buf[0] || INTERRUPT_CHAR == in.buf[0]);
+
+    if (memchr(in.buf, '#', in.end) == NULL)
+    {
+        // packet is incomplete
+        return false;
+    }
+
     return true;
 }
 
