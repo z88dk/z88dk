@@ -25,16 +25,16 @@ private:
     std::vector<hla::Block> block_stack_;
 
     bool next_pp_line(TokenLine& out_line);
-    void process_if(const TokenLine& line, size_t& i);
-    void process_elif(const TokenLine& line, size_t& i);
-    void process_else(const TokenLine& line, size_t& i);
-    void process_endif(const TokenLine& line, size_t& i);
-    void process_while(const TokenLine& line, size_t& i);
-    void process_wend(const TokenLine& line, size_t& i);
-    void process_repeat(const TokenLine& line, size_t& i);
-    void process_until(const TokenLine& line, size_t& i);
-    void process_untilb(const TokenLine& line, size_t& i);
-    void process_untilbc(const TokenLine& line, size_t& i);
-    void process_break(const TokenLine& line, size_t& i);
-    void process_continue(const TokenLine& line, size_t& i);
+    void process_IF(const TokenLine& line, size_t& i);
+    void process_ELIF(const TokenLine& line, size_t& i);
+    void process_ELSE(const TokenLine& line, size_t& i);
+    void process_ENDIF(const TokenLine& line, size_t& i);
+    void process_WHILE(const TokenLine& line, size_t& i);
+    void process_WEND(const TokenLine& line, size_t& i);
+    void process_REPEAT(const TokenLine& line, size_t& i);
+    void process_UNTIL(const TokenLine& line, size_t& i);
+    void process_UNTILB(const TokenLine& line, size_t& i);
+    void process_UNTILBC(const TokenLine& line, size_t& i);
+    void process_BREAK(const TokenLine& line, size_t& i);
+    void process_CONTINUE(const TokenLine& line, size_t& i);
 };
