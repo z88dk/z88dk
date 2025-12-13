@@ -93,26 +93,39 @@
 ;         DATABASE
 ;----------------------------
 
-; Inserts a fact under 'data for its key, which avoids duplicates
-;    e.g.  (insert '(father john))
+; Inserts a fact under 'fact for its key, which avoids duplicates
+;    e.g.  (insfact '(hammer tool))
 
-(defun insert (fact)
-  (putprop (car fact) (cdr fact) 'data)
+(defun insfact (fact)
+  (putprop (car fact) (cdr fact) 'fact)
 )
 
 
-; Removes a fact looking for the 'data key only
-;    e.g.  (remove 'father)
+; Removes a fact looking for the 'fact key only
+;    e.g.  (remove 'hammer)
 
-(defun remove (fact)
-  (if (getprop fact 'data)
+(defun rmfact (fact)
+  (if (getprop fact 'fact)
       (progn
-        (remprop fact 'data)
+        (remprop fact 'fact)
         fact)
       nil))
 
 
-; Picks the declared 'data property
-;    e.g.  (get 'father)
-(defun get (key)
-  (getprop key 'data))
+; Picks the 'fact property
+;    e.g.  (get 'hammer)
+(defun getfact (key)
+  (getprop key 'fact))
+
+
+; Get all the properties
+;    e.g.  (insfact '(hammer tool))
+;          (putprop 'hammer 'handle 'has)
+;          (fetch 'hammer)
+(defun fetch (key)
+    (if (assv key *props*)
+        (cdr (assv key *props*))
+        nil))
+
+
+
