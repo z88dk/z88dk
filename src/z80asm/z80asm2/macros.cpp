@@ -58,7 +58,7 @@ const std::vector<std::string>& Macro::parameters() const {
 
 void Macro::add_parameter(const std::string& param) {
     if (std::find(parameters_.begin(), parameters_.end(), param) != parameters_.end()) {
-        g_errors.error(location_, ErrorCode::ParameterRedefined, param);
+        g_errors.error(ErrorCode::ParameterRedefined, param);
     }
     else {
         parameters_.push_back(param);
@@ -73,7 +73,7 @@ void Macro::add_local(const std::string& local) {
     // error if local duplicates an existing local or parameter name
     if (std::find(locals_.begin(), locals_.end(), local) != locals_.end() ||
             std::find(parameters_.begin(), parameters_.end(), local) != parameters_.end()) {
-        g_errors.error(location_, ErrorCode::SymbolRedefined, local);
+        g_errors.error(ErrorCode::SymbolRedefined, local);
     }
     else {
         locals_.push_back(local);
@@ -81,6 +81,10 @@ void Macro::add_local(const std::string& local) {
 }
 
 const std::vector<TokenLine>& Macro::body_lines() const {
+    return body_lines_;
+}
+
+std::vector<TokenLine>& Macro::body_lines() {
     return body_lines_;
 }
 
@@ -107,7 +111,7 @@ bool Macro::parse_parameters(const TokenLine& line, size_t& index) {
     std::vector<std::string> temp_params;
 
     auto fail = [&](ErrorCode ec, const std::string & message) {
-        g_errors.error(line.location(), ec, message);
+        g_errors.error(ec, message);
         parameters_.clear();
         return false;
     };
@@ -124,6 +128,7 @@ bool Macro::parse_parameters(const TokenLine& line, size_t& index) {
     // Optional opening parenthesis
     if (i < toks.size() && toks[i].is(TokenType::LeftParen)) {
         in_parens = true;
+        is_function_like_ = true;
         i++;
 
         // Empty list "()"
@@ -148,6 +153,7 @@ bool Macro::parse_parameters(const TokenLine& line, size_t& index) {
 
     // Parse first identifier
     if (i < toks.size() && toks[i].is(TokenType::Identifier)) {
+        is_function_like_ = true;
         if (!add_param_name(toks[i].text())) {
             return false;
         }
@@ -196,7 +202,7 @@ bool Macro::parse_locals(const TokenLine& line, size_t& index) {
     std::vector<std::string> temp_locals;
 
     auto fail = [&](ErrorCode ec, const std::string & message) {
-        g_errors.error(line.location(), ec, message);
+        g_errors.error(ec, message);
         return false;
     };
 
@@ -260,6 +266,7 @@ bool Macro::parse_arguments(const TokenLine& line, size_t& index,
     int paren_level = 0;
 
     std::vector<Token> current;
+    bool last_was_top_level_comma = false; // track trailing separator
 
     while (i < toks.size()) {
         const Token& tok = toks[i];
@@ -274,6 +281,7 @@ bool Macro::parse_arguments(const TokenLine& line, size_t& index,
             // Argument separator at top level: finalize current argument
             out_arguments.emplace_back(line.location(), current);
             current.clear();
+            last_was_top_level_comma = true; // potential trailing empty arg
             ++i; // consume comma and continue
             continue;
         }
@@ -291,18 +299,28 @@ bool Macro::parse_arguments(const TokenLine& line, size_t& index,
 
         // Add token to current argument
         current.push_back(tok);
+        last_was_top_level_comma = false; // we consumed a non-separator token
         ++i;
     }
 
-    // Push the final argument only if it contains tokens.
-    // Do NOT emit a single empty argument when there is no input.
-    // In general, after parsing stops, we should commit the last collected `current`.
+    // Commit the last collected argument:
+    // - If it has tokens, push it.
+    // - Otherwise, if we ended right after a top-level comma, push an empty argument
+    //   to account for trailing separators (e.g., "A,B," or "A,B,)" before ')').
     if (!current.empty()) {
         out_arguments.emplace_back(line.location(), current);
     }
+    else if (last_was_top_level_comma) {
+        out_arguments.emplace_back(line.location(), std::vector<Token> {});
+    }
 
-    // Success: return at first non-parsed token
+    // Return first non-parsed token index (points at ')' if present)
     index = i;
+
+    // check if parens balanced
+    if (paren_level != 0) {
+        return false;
+    }
     return true;
 }
 
@@ -312,7 +330,7 @@ bool Macro::parse_body_line(const TokenLine& line) {
     // Empty line: store and continue
     if (toks.empty()) {
         add_body_line(line);
-        return false;
+        return true;
     }
 
     const Token& t0 = toks[0];
@@ -331,8 +349,8 @@ bool Macro::parse_body_line(const TokenLine& line) {
     if (t0.is(Keyword::ENDM)) {
         // If there are more tokens beyond ENDM, report unexpected token
         if (toks.size() > 1) {
-            g_errors.error(line.location(), ErrorCode::InvalidSyntax,
-                           std::string("Unexpected token '") + toks[1].text() + "'");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           std::string("Unexpected token: '") + toks[1].text() + "'");
         }
 
         // Decrement nesting
@@ -356,12 +374,10 @@ bool Macro::parse_body_line(const TokenLine& line) {
         size_t idx = 1; // parse after 'LOCAL'
         if (!parse_locals(line, idx)) {
             // error already reported
-            return true;
         }
-        if (idx < toks.size()) {
-            g_errors.error(line.location(), ErrorCode::InvalidSyntax,
-                           std::string("Unexpected token '") + toks[idx].text() + "'");
-            return true;
+        else if (idx < toks.size()) {
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           std::string("Unexpected token: '") + toks[idx].text() + "'");
         }
         return true;
     }
@@ -385,19 +401,18 @@ void Macro::expand_with_raw(const Location& location,
     out_lines.clear();
     out_lines.reserve(body_lines_.size());
 
-    // 1) short-cut : no parameters and no locals --> copy body as-is
-    if (parameters_.empty() && locals_.empty()) {
-        for (const auto& body : body_lines_) {
-            TokenLine out_line(location, body.tokens());
-            out_lines.push_back(out_line);
-        }
+    // 1) Parameter count validation (must run before any short-cut)
+    if (expanded_args.size() != parameters_.size()) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Macro argument count mismatch for: " + name_);
         return;
     }
 
-    // 2) Parameter count validation
-    if (expanded_args.size() != parameters_.size()) {
-        g_errors.error(location, ErrorCode::InvalidSyntax,
-                       "Macro argument count does not match parameters");
+    // 2) Short-cut: no parameters and no locals --> copy body as-is
+    if (parameters_.empty() && locals_.empty()) {
+        for (const auto& body : body_lines_) {
+            out_lines.emplace_back(location, body.tokens());
+        }
         return;
     }
 
@@ -444,6 +459,9 @@ void Macro::expand_with_raw(const Location& location,
                     strval.reserve(32);
                     for (const auto& rt : raw_toks) {
                         strval += rt.text();
+                        if (rt.has_space_after()) {
+                            strval += " ";
+                        }
                     }
                     // Create a string token with quoted text as token text and raw string value
                     Token string_tok(TokenType::String, std::string("\"") + escape_c_string(strval) + "\"", strval, false);
@@ -521,7 +539,11 @@ void Macros::add_macro(const Macro& macro) {
         g_errors.error(macro.location(), ErrorCode::MacroRedefined, macro.name());
         return;
     }
-    macros_.emplace(macro.name(), macro);
+    macros_.insert_or_assign(macro.name(), macro);
+}
+
+void Macros::replace_macro(const Macro& macro) {
+    macros_.insert_or_assign(macro.name(), macro);
 }
 
 void Macros::remove_macro(const std::string& name) {
@@ -554,10 +576,15 @@ static bool has_macro_or_paste_in_suffix(const Macros* self, const std::vector<T
     return false;
 }
 
+bool Macros::expand_once(const TokenLine& line, std::vector<TokenLine>& out_lines) {
+    size_t i = 0;
+    return expand_once(line, i, out_lines);
+}
+
 // Single-pass helper that processes only the suffix [i .. end) of one line,
 // producing a list of TokenLine(s) without flattening.
 // Returns whether it changed anything (macros expanded or token pasted).
-bool Macros::expand_once_suffix(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines) {
+bool Macros::expand_once(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines) {
     out_lines.clear();
 
     const auto& toks = line.tokens();
@@ -586,7 +613,7 @@ bool Macros::expand_once_suffix(const TokenLine& line, size_t i, std::vector<Tok
     while (k < toks.size()) {
         const Token& tok = toks[k];
 
-        // Token pasting
+        // Token pasting first
         if (tok.is(TokenType::Identifier)) {
             size_t paste_idx = k;
             std::string pasted_name = tok.text();
@@ -614,7 +641,7 @@ bool Macros::expand_once_suffix(const TokenLine& line, size_t i, std::vector<Tok
                 last_expanded_macro_ = macro->name();
 
                 if (macro->recursion_count() >= MACRO_RECURSION_LIMIT) {
-                    g_errors.error(line.location(), ErrorCode::MacroRecursionLimit, macro->name());
+                    g_errors.error(ErrorCode::MacroRecursionLimit, macro->name());
                     // Emit verbatim; do not mark change to allow convergence
                     suffix_out.push_back(tok);
                     ++k;
@@ -628,10 +655,13 @@ bool Macros::expand_once_suffix(const TokenLine& line, size_t i, std::vector<Tok
 
                 if (macro->is_function_like()) {
                     size_t arg_idx = k + 1;
+
+                    // Parenthesized form
                     if (arg_idx < toks.size() && toks[arg_idx].is(TokenType::LeftParen)) {
                         size_t parse_idx = arg_idx + 1;
 
-                        TokenLine temp(line.location(), std::vector<Token>(toks.begin() + static_cast<std::ptrdiff_t>(parse_idx), toks.end()));
+                        TokenLine temp(line.location(),
+                                       std::vector<Token>(toks.begin() + static_cast<std::ptrdiff_t>(parse_idx), toks.end()));
                         size_t rel = 0;
                         std::vector<TokenLine> raw_args;
                         macro->parse_arguments(temp, rel, raw_args);
@@ -641,7 +671,7 @@ bool Macros::expand_once_suffix(const TokenLine& line, size_t i, std::vector<Tok
                             ++consumed;
                         }
                         else {
-                            g_errors.error(line.location(), ErrorCode::InvalidSyntax, "Right parenthesis expected");
+                            g_errors.error(ErrorCode::InvalidSyntax, "Right parenthesis expected");
                         }
 
                         std::vector<TokenLine> expanded_args;
@@ -653,11 +683,21 @@ bool Macros::expand_once_suffix(const TokenLine& line, size_t i, std::vector<Tok
                         macro->expand_with_raw(line.location(), expanded_args, raw_args, macro_out);
                         k = consumed;
                     }
+                    // Unparenthesized form: strict arity check required
                     else {
-                        TokenLine temp(line.location(), std::vector<Token>(toks.begin() + static_cast<std::ptrdiff_t>(arg_idx), toks.end()));
+                        TokenLine temp(line.location(),
+                                       std::vector<Token>(toks.begin() + static_cast<std::ptrdiff_t>(arg_idx), toks.end()));
                         size_t rel = 0;
                         std::vector<TokenLine> raw_args;
                         macro->parse_arguments(temp, rel, raw_args);
+
+                        // Only expand if arity matches exactly; otherwise treat as literal (no expansion)
+                        if (raw_args.size() != macro->parameters().size()) {
+                            // Leave identifier as-is; do not consume arguments here
+                            suffix_out.push_back(tok);
+                            ++k;
+                            continue;
+                        }
 
                         std::vector<TokenLine> expanded_args;
                         expanded_args.reserve(raw_args.size());
@@ -709,7 +749,7 @@ bool Macros::expand(const TokenLine& line, size_t i, std::vector<TokenLine>& out
     out_lines.clear();
 
     // First pass: expand only the suffix of the input line
-    bool changed = expand_once_suffix(line, i, out_lines);
+    bool changed = expand_once(line, i, out_lines);
     if (!changed) {
         // Nothing to do -> already returned suffix as single line
         return false;
@@ -727,7 +767,7 @@ bool Macros::expand(const TokenLine& line, size_t i, std::vector<TokenLine>& out
         // Process each line independently from index 0
         for (const auto& tl : out_lines) {
             std::vector<TokenLine> expanded_line_out;
-            bool line_changed = expand_once_suffix(tl, 0, expanded_line_out);
+            bool line_changed = expand_once(tl, 0, expanded_line_out);
 
             // Append expanded lines to next result
             next.insert(next.end(), expanded_line_out.begin(), expanded_line_out.end());
@@ -746,7 +786,7 @@ bool Macros::expand(const TokenLine& line, size_t i, std::vector<TokenLine>& out
         ++iteration;
         if (iteration >= MAX_ITERATIONS) {
             std::string macro_name = last_expanded_macro_.empty() ? std::string("<unknown>") : last_expanded_macro_;
-            g_errors.error(line.location(), ErrorCode::MacroRecursionLimit,
+            g_errors.error(ErrorCode::MacroRecursionLimit,
                            std::string("Macro expansion iteration limit reached; last expanded: ") + macro_name);
             out_lines = std::move(next);
             return true;
@@ -827,8 +867,8 @@ bool RepeatBlock::parse_body_line(const TokenLine& line) {
     if (t0.is(Keyword::ENDR)) {
         // If there are more tokens beyond ENDR, report unexpected token
         if (toks.size() > 1) {
-            g_errors.error(line.location(), ErrorCode::InvalidSyntax,
-                           std::string("Unexpected token '") + toks[1].text() + "'");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           std::string("Unexpected token: '") + toks[1].text() + "'");
         }
 
         // Decrement nesting
@@ -855,8 +895,8 @@ bool RepeatBlock::parse_body_line(const TokenLine& line) {
             return true;
         }
         if (idx < toks.size()) {
-            g_errors.error(line.location(), ErrorCode::InvalidSyntax,
-                           std::string("Unexpected token '") + toks[idx].text() + "'");
+            g_errors.error(ErrorCode::InvalidSyntax,
+                           std::string("Unexpected token: '") + toks[idx].text() + "'");
             return true;
         }
         return true;
@@ -909,6 +949,10 @@ const std::string& RepeatIterateBlock::variable() const {
 }
 
 const std::vector<TokenLine>& RepeatIterateBlock::items() const {
+    return items_;
+}
+
+std::vector<TokenLine>& RepeatIterateBlock::items() {
     return items_;
 }
 

@@ -316,6 +316,8 @@ void TokenCache::clear() {
 // TokenFileReader implementation
 //-----------------------------------------------------------------------------
 
+int TokenFileReader::g_provider_calls_in_session = 0;
+
 TokenCache& TokenFileReader::get_cache() {
     static TokenCache cache;
     return cache;
@@ -331,9 +333,8 @@ bool TokenFileReader::open(const std::string& filename) {
     detect_pragma_state_ = DetectPragmaState::Initial;
     is_injected_ = false;
 
-    line_provider_ = [this](std::string & out) {
-        return FileReader::next_line(out);
-    };
+    // Do not install a default provider that captures `this`.
+    line_provider_ = nullptr;
 
     bool ok = FileReader::open(filename);
     if (ok) {
@@ -341,6 +342,21 @@ bool TokenFileReader::open(const std::string& filename) {
     }
 
     return ok;
+}
+
+bool TokenFileReader::next_line_from_provider() {
+    // If a provider is installed (e.g., for injected content), use it.
+    if (line_provider_) {
+        // Count only provider-driven fetches; FileReader::next_line does not affect injected text.
+        bool ok = line_provider_(source_line_);
+        if (ok) {
+            ++g_provider_calls_in_session;
+        }
+        return ok;
+    }
+
+    // Normal path: call FileReader directly; no lambda, no captured pointers.
+    return FileReader::next_line(source_line_);
 }
 
 void TokenFileReader::set_line_provider(std::function<bool(std::string&)> provider) {
@@ -367,15 +383,6 @@ void TokenFileReader::set_fixed_line_number(size_t line_num) {
     }
 }
 
-bool TokenFileReader::next_line_from_provider() {
-    if (!line_provider_) {
-        line_provider_ = [this](std::string & out) {
-            return FileReader::next_line(out);
-        };
-    }
-    return line_provider_(source_line_);
-}
-
 bool TokenFileReader::read_and_tokenize_line(TokenLine& token_line) {
     if (!next_line_from_provider()) {
         // EOF: persist cache (real files only)
@@ -384,8 +391,9 @@ bool TokenFileReader::read_and_tokenize_line(TokenLine& token_line) {
     }
 
     token_line.clear();
+    size_t start_line_number = line_number_;
     if (tokenize_line(token_line)) {
-        token_line.set_location(Location(filename_, line_number_));
+        token_line.set_location(Location(filename_, start_line_number));
         split_lines(token_line, output_queue_);
     }
     return true;
@@ -414,6 +422,16 @@ void TokenFileReader::detect_include_guard(const TokenLine& line) {
                     toks[1].is(Keyword::ONCE)) {
                 has_pragma_once_ = true;
                 detect_pragma_state_ = DetectPragmaState::Final;
+                break;
+            }
+            // any other pragma is ignored
+            if (toks.size() >= 2 &&
+                    toks[0].is(TokenType::Hash) &&
+                    toks[1].is(Keyword::PRAGMA)) {
+                break;
+            }
+            if (toks.size() >= 1 &&
+                    toks[0].is(Keyword::PRAGMA)) {
                 break;
             }
             // any other line aborts the detection
@@ -661,33 +679,51 @@ void TokenFileReader::inject(const std::string& filename, size_t line_number,
     line_number_ = line_number - (fixed_line_number ? 0 : 1);
     fixed_line_number_ = fixed_line_number;
 
-    // set line provider to read from array of lines
-    size_t idx = 0;
+    // Save current provider (may be null)
     auto save_provider = get_line_provider();
-    set_line_provider([&](std::string & out) {
-        if (idx >= lines.size()) {
-            return false;
+
+    // Self-contained provider owning its data; used only during injection
+    struct LinesProvider {
+        std::vector<std::string> lines;
+        size_t idx = 0;
+        bool operator()(std::string& out) {
+            if (idx >= lines.size()) {
+                return false;
+            }
+            out = lines[idx++];
+            return true;
         }
-        out = lines[idx++];
-        return true;
+    };
+    auto lp = std::make_shared<LinesProvider>(LinesProvider{ std::move(lines), 0 });
+    set_line_provider([lp](std::string & out) {
+        return (*lp)(out);
     });
 
-    while (idx < lines.size()) {
+    // Consume lines and tokenize into injected queue
+    while (lp->idx < lp->lines.size()) {
         if (!fixed_line_number_) {
             ++line_number_;
         }
 
-        source_line_ = lines[idx++];
+        source_line_ = lp->lines[lp->idx++];
         Location location(filename_, line_number_);
         g_errors.set_location(location);
 
+        // Begin a new tokenize session; reset provider call counter
+        g_provider_calls_in_session = 0;
+
         TokenLine tl(location);
         if (tokenize_line(tl)) {
+            // If tokenize_line consumed N additional physical lines via the provider
+            // (e.g., due to line continuation), advance the current line number accordingly.
+            if (!fixed_line_number_ && g_provider_calls_in_session > 0) {
+                line_number_ += g_provider_calls_in_session;
+            }
             split_lines(tl, injected_tokens_);
         }
     }
 
-    // restore provider
+    // Restore previous provider (or none)
     set_line_provider(save_provider);
 }
 
@@ -703,193 +739,119 @@ void TokenFileReader::inject_tokens(const std::vector<TokenLine>& lines) {
 // split_lines implementation (updated to use target_queue)
 //-----------------------------------------------------------------------------
 
-void TokenFileReader::split_lines(const TokenLine& input_line,
+void TokenFileReader::split_lines(const TokenLine& line,
                                   std::deque<TokenLine>& target_queue) {
-    // Do not split lines that start with:
-    // - TokenType::Hash followed by Identifier whose keyword() == Keyword::DEFINE, or
-    // - Identifier whose keyword() == Keyword::DEFINE.
-    if (!input_line.tokens().empty()) {
-        const Token& first = input_line.tokens().front();
-        bool no_split = false;
+    const auto& tokens = line.tokens();
 
-        // Case 1: "#define ..."
-        if (first.is(TokenType::Hash) && input_line.tokens().size() >= 2) {
-            const Token& second = input_line.tokens()[1];
-            if (second.is(Keyword::DEFINE)) {
-                no_split = true;
-            }
-        }
-
-        // Case 2: "define ..."
-        if (!no_split && first.is(Keyword::DEFINE)) {
-            no_split = true;
-        }
-
-        // Case 3: "NAME define ..."
-        if (!no_split && first.is(TokenType::Identifier) &&
-                input_line.tokens().size() >= 2) {
-            const Token& second = input_line.tokens()[1];
-            if (second.is(Keyword::DEFINE)) {
-                no_split = true;
-            }
-        }
-
-        if (no_split) {
-            target_queue.push_back(input_line);
-            return;
-        }
+    // empty lines produce no result
+    if (tokens.empty()) {
+        return;
     }
 
-    TokenLine current_line(input_line.location());
-    bool seen_first_token = false;
-    bool prev_was_first_ident = false;
-    bool prev_was_first_dot = false;
-    bool prev_was_instruction = false;
+    // Do not split lines that start with DEFINE
+    if (is_define(line)) {
+        target_queue.push_back(line);
+        return;
+    }
+
+    // split labels at start of line
+    size_t i = 0;
+    split_labels(line, i, target_queue);
+
+    // split the rest of the line
+    TokenLine current_line(line.location());
     int ternary_level = 0;  // Track nesting level of ternary operators
 
-    for (size_t i = 0; i < input_line.tokens().size(); ++i) {
-        const Token& token = input_line.tokens()[i];
+    auto split_line = [&]() {
+        if (!current_line.tokens().empty()) {
+            target_queue.push_back(current_line);
+            current_line.tokens().clear();
+        }
+        ternary_level = 0;
+    };
 
-        switch (token.type()) {
-        case TokenType::Dot:
-            if (!seen_first_token) {
-                // First token is dot - this is a label marker (alternative to colon)
-                // Expecting identifier next
-                seen_first_token = true;
-                prev_was_first_dot = true;
-                current_line.tokens().push_back(token);
-            }
-            else {
-                // Dot in middle of line - regular token
-                seen_first_token = true;
-                prev_was_first_ident = false;
-                prev_was_first_dot = false;
-                prev_was_instruction = false;
-                current_line.tokens().push_back(token);
-            }
-            break;
+    for (; i < line.tokens().size(); ++i) {
+        const Token& token = line.tokens()[i];
 
-        case TokenType::Identifier:
-            if (!seen_first_token) {
-                // First token is identifier - could be followed by colon to make a label
-                seen_first_token = true;
-                prev_was_first_ident = true;
-            }
-            else if (prev_was_first_dot) {
-                // Identifier after first dot - this completes a dot-label
-                // Output the label (dot + identifier) alone
-                current_line.tokens().push_back(token);
-                target_queue.push_back(current_line);
-
-                // Start fresh for next part of line
-                current_line.tokens().clear();
-                current_line.set_location(input_line.location());
-                seen_first_token = false;
-                prev_was_first_ident = false;
-                prev_was_first_dot = false;
-                prev_was_instruction = false;
-                break;  // Important: skip adding token again and instruction check
-            }
-            else {
-                prev_was_first_ident = false;
-            }
-
-            // Check if this identifier is an instruction keyword
-            prev_was_instruction = (token.keyword() != Keyword::None) &&
-                                   keyword_is_instruction(token.keyword());
-
-            current_line.tokens().push_back(token);
-            break;
-
-        case TokenType::Question:
-            // Question mark increases ternary level
+        if (token.is(TokenType::Question)) {
             ternary_level++;
-            current_line.tokens().push_back(token);
-            seen_first_token = true;
-            prev_was_first_ident = false;
-            prev_was_first_dot = false;
-            prev_was_instruction = false;
-            break;
-
-        case TokenType::Colon:
-            // Colon decreases ternary level if we're in a ternary expression
+        }
+        else if (token.is(TokenType::Colon)) {
             if (ternary_level > 0) {
                 ternary_level--;
-                current_line.tokens().push_back(token);
-                prev_was_instruction = false;
-                break;
-            }
-
-            // Normal colon handling (only when ternary_level == 0)
-            if (prev_was_first_ident) {
-                // Label colon - convert to dot-label and output alone
-                // Replace "identifier:" with ".identifier"
-                if (!current_line.tokens().empty()) {
-                    // Change last token (identifier) and don't add colon
-                    Token label_token = current_line.tokens().back();
-                    // Insert a dot token before the identifier
-                    current_line.tokens().pop_back();
-                    current_line.tokens().push_back(Token(TokenType::Dot, ".", false));
-                    current_line.tokens().push_back(label_token);
-                }
-
-                target_queue.push_back(current_line);
-
-                // Start fresh for next part of line
-                current_line.tokens().clear();
-                current_line.set_location(input_line.location());
-                seen_first_token = false;
-                prev_was_first_ident = false;
-                prev_was_first_dot = false;
-                prev_was_instruction = false;
-            }
-            else if (prev_was_instruction) {
-                // Colon after instruction - don't add it, just reset flag
-                prev_was_instruction = false;
             }
             else {
-                // Separator colon - emit current line without the colon
-                if (!current_line.tokens().empty()) {
-                    target_queue.push_back(current_line);
-                    current_line.tokens().clear();
-                    current_line.set_location(input_line.location());
-                }
-                seen_first_token = false;
-                prev_was_first_ident = false;
-                prev_was_first_dot = false;
-                prev_was_instruction = false;
-                ternary_level = 0;  // Reset ternary level on line split
+                split_line();
+                continue;
             }
-            break;
-
-        case TokenType::Backslash:
-            // Always a split point - emit current line without backslash
-            if (!current_line.tokens().empty()) {
-                target_queue.push_back(current_line);
-                current_line.tokens().clear();
-                current_line.set_location(input_line.location());
-            }
-            seen_first_token = false;
-            prev_was_first_ident = false;
-            prev_was_first_dot = false;
-            prev_was_instruction = false;
-            ternary_level = 0;  // Reset ternary level on line split
-            break;
-
-        default:
-            // Any other token
-            seen_first_token = true;
-            prev_was_first_ident = false;
-            prev_was_first_dot = false;
-            prev_was_instruction = false;
-            current_line.tokens().push_back(token);
-            break;
         }
+        else if (token.is(TokenType::Backslash)) {
+            split_line();
+            continue;
+        }
+
+        current_line.tokens().push_back(token);
     }
 
-    // Don't forget the last line
-    if (!current_line.tokens().empty()) {
-        target_queue.push_back(current_line);
+    split_line();   // move the last line if any
+}
+
+void TokenFileReader::split_labels(const TokenLine& line, size_t& i, std::deque<TokenLine>& target_queue) {
+    const auto& tokens = line.tokens();
+
+    while (true) {
+        // .label
+        if (i + 1 < tokens.size() &&
+                tokens[i].is(TokenType::Dot) &&
+                tokens[i + 1].is(TokenType::Identifier)) {
+
+            TokenLine label_line(line.location());
+            label_line.tokens().push_back(tokens[i]);     // Dot
+            label_line.tokens().push_back(tokens[i + 1]); // Identifier
+            target_queue.push_back(label_line);
+            i += 2;
+            continue;
+        }
+
+        // label:
+        if (i + 1 < tokens.size() &&
+                tokens[i].is(TokenType::Identifier) &&
+                tokens[i + 1].is(TokenType::Colon) &&
+                !keyword_is_instruction(tokens[i].keyword())) {
+
+            TokenLine label_line(line.location());
+            label_line.tokens().push_back(Token(TokenType::Dot, ".", false)); // Dot
+            label_line.tokens().push_back(tokens[i]);     // Identifier
+            target_queue.push_back(label_line);
+            i += 2;
+            continue;
+        }
+
+        break;
     }
 }
 
+bool TokenFileReader::is_define(const TokenLine& line) {
+    const auto& tokens = line.tokens();
+    // Case 1: "#define ..."
+    if (tokens.size() >= 2 &&
+            tokens[0].is(TokenType::Hash) &&
+            tokens[1].is(Keyword::DEFINE)) {
+        return true;
+    }
+
+    // Case 2: "define ..."
+    if (tokens.size() >= 1 &&
+            tokens[0].is(Keyword::DEFINE)) {
+        return true;
+    }
+
+    // Case 3: "NAME define ..."
+    if (tokens.size() >= 2 &&
+            tokens[0].is(TokenType::Identifier) &&
+            tokens[1].is(Keyword::DEFINE)) {
+        return true;
+    }
+
+    return false;
+}

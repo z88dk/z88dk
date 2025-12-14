@@ -520,7 +520,6 @@ spew("$test.asm", <<END);
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unclosed HLA block
-   |%IF A==1
 END
 ok ! -f "$test.i", "no .i on unclosed HLA block";
 

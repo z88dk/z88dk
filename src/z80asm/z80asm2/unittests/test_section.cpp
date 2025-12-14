@@ -1784,8 +1784,8 @@ TEST_CASE("Integration: patch with computed value",
     // Create expression: BASE + OFFSET
     Expression expr(make_binary_op(
                         ExprOp::Add,
-                        make_symbol(module.find_symbol("BASE")),
-                        make_symbol(module.find_symbol("OFFSET"))
+                        make_symbol(module.get_symbol("BASE")),
+                        make_symbol(module.get_symbol("OFFSET"))
                     ), loc);
 
     Section section("CODE");

@@ -505,7 +505,7 @@ TEST_CASE("Expression: parse undefined symbol creates symbol",
     REQUIRE(i == 1);
 
     // Symbol should have been created as undefined
-    Symbol* sym = module.find_symbol("unknown");
+    Symbol* sym = module.get_symbol("unknown");
     REQUIRE(sym != nullptr);
     REQUIRE(sym->is_undefined());
 

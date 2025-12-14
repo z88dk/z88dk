@@ -144,6 +144,7 @@ static void expect_dec_b(const TokenLine& l) {
 TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
           "[hla]") {
     namespace fs = std::filesystem;
+    g_unique_id_counter = 0;
     Preprocessor pp;
 
     // Prepare a temporary source file with plain Z80 assembly lines
@@ -177,6 +178,7 @@ TEST_CASE("HLA passes through plain assembly without HLA directives unchanged",
 }
 
 TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     struct Case {
         const char* op;
@@ -201,6 +203,7 @@ TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
     };
 
     for (const auto& c : cases) {
+        g_unique_id_counter = 0;
         const std::string src =
             std::string("%IF A ") + c.op + " 7\n"
             "NOP\n"
@@ -232,6 +235,7 @@ TEST_CASE("Relational operators: %IF A op imm8 %ENDIF", "[hla][relops]") {
 }
 
 TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     // Single IF with no ELSE
     const std::string src =
@@ -256,6 +260,7 @@ TEST_CASE("%IF A==imm ... %ENDIF", "[hla][if]") {
 }
 
 TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 2\n"
@@ -284,6 +289,7 @@ TEST_CASE("%IF/%ELSE/%ENDIF with A==imm", "[hla][if][else]") {
 }
 
 TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
@@ -325,6 +331,7 @@ TEST_CASE("%IF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
 }
 
 TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
@@ -372,6 +379,7 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ENDIF with A==imm", "[hla][if][elif]") {
 }
 
 TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF A == 1\n"
@@ -426,6 +434,7 @@ TEST_CASE("%IF/%ELIF/%ELIF/%ELSE/%ENDIF with A==imm", "[hla][if][elif][else]") {
 
 TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     SECTION("A == imm8") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == 42\n"
@@ -441,6 +450,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == B (reg8)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == B\n"
@@ -456,6 +466,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == A (self compare)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == A\n"
@@ -471,6 +482,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == (HL)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == (HL)\n"
@@ -486,6 +498,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
     }
 
     SECTION("A == (abs)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == (123)\n"
@@ -503,6 +516,7 @@ TEST_CASE("%IF A == operand %ENDIF - all operand kinds", "[hla][operands]") {
 
 TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     SECTION("imm8 == A") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF 42 == A\n"
@@ -519,6 +533,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("B == A (reg8)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF B == A\n"
@@ -535,6 +550,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("(HL) == A") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF (HL) == A\n"
@@ -551,6 +567,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("(abs) == A") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF (123) == A\n"
@@ -567,6 +584,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
     }
 
     SECTION("relational: 7 < A (normalizes to A > 7)") {
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF 7 < A\n"
@@ -585,6 +603,7 @@ TEST_CASE("%IF operand == A %ENDIF - A on RHS is accepted", "[hla][rhsA]") {
 }
 
 TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     struct Case {
         const char* expr;
@@ -608,6 +627,7 @@ TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
     };
 
     for (const auto& c : cases) {
+        g_unique_id_counter = 0;
         std::string src =
             std::string("%WHILE ") + c.expr + "\n"
             "NOP\n"
@@ -651,6 +671,7 @@ TEST_CASE("%WHILE / %WEND basic forms", "[hla][while]") {
 }
 
 TEST_CASE("%WHILE with A on RHS normalization", "[hla][while][rhsA]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     // Example: 3 < A normalizes to A > 3 (false conditions Z, C)
     const std::string src =
@@ -682,6 +703,7 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
           "[hla][expr][immediate][address]") {
     SECTION("Immediate constant expression: A == 1+2*3 -> CP 7") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == 1 + 2 * 3\n"
@@ -700,6 +722,7 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 
     SECTION("Immediate address expression: A == (0x100+0x23) -> CP (0x123)") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == (0x100 + 0x23)\n"
@@ -718,6 +741,7 @@ TEST_CASE("%IF accepts constant expressions as immediate value or immediate addr
 
     SECTION("Nested parens in address expression are handled: A == ((10+5)*(2+3)) -> CP 75") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == ((10 + 5) * (2 + 3))\n"
@@ -759,6 +783,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Constant symbol in immediate expression") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         define_sym(pp, "CONST7", 7, true);
 
@@ -779,6 +804,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Constant symbol inside immediate address expression") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         define_sym(pp, "BASE", 0x100, true);
 
@@ -799,6 +825,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Undefined symbol is rejected") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         const std::string src =
             "%IF A == UNDEF_SYM\n"
@@ -813,6 +840,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
     SECTION("Defined but non-constant symbol is rejected") {
         g_errors.reset();
+        g_unique_id_counter = 0;
         Preprocessor pp;
         define_sym(pp, "VARX", 3, false); // defined but not constant
 
@@ -830,6 +858,7 @@ TEST_CASE("%IF accepts constant symbols; rejects undefined or non-constant symbo
 
 TEST_CASE("Boolean AND short-circuit: %IF (A==1)&&(A<5) %ENDIF",
           "[hla][bool][and]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF (A == 1) && (A < 5)\n"
@@ -858,6 +887,7 @@ TEST_CASE("Boolean AND short-circuit: %IF (A==1)&&(A<5) %ENDIF",
 
 TEST_CASE("Boolean OR short-circuit: %IF (A==1)||(A<5) %ENDIF",
           "[hla][bool][or]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF (A == 1) || (A < 5)\n"
@@ -888,6 +918,7 @@ TEST_CASE("Boolean OR short-circuit: %IF (A==1)||(A<5) %ENDIF",
 }
 
 TEST_CASE("Boolean NOT: %IF !(A==3) %ENDIF", "[hla][bool][not]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF !(A == 3)\n"
@@ -913,6 +944,7 @@ TEST_CASE("Boolean NOT: %IF !(A==3) %ENDIF", "[hla][bool][not]") {
 
 TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
           "[hla][bool][nested]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF (A == 1) && ((A < 5) || (A > 10))\n"
@@ -957,10 +989,12 @@ TEST_CASE("Nested boolean: (A==1) && ((A<5) || (A>10))",
 
 TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
           "[hla][while][synonyms]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::vector<std::string> ends = { "WEND", "ENDW", "ENDWHILE" };
 
     for (const auto& endkw : ends) {
+        g_unique_id_counter = 0;
         const std::string src =
             "%WHILE A == 5\n"
             "NOP\n"
@@ -989,6 +1023,7 @@ TEST_CASE("%WHILE end markers: %WEND, %ENDW and %ENDWHILE are synonyms",
 // Add after existing while tests (just before %IF accepts constant expressions section or at end)
 
 TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1013,6 +1048,7 @@ TEST_CASE("%REPEAT / %UNTIL basic A==imm", "[hla][repeat][until]") {
 
 TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm)",
           "[hla][repeat][until][rel]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1039,6 +1075,7 @@ TEST_CASE("%REPEAT / %UNTIL with relational generating two false jumps (A <= imm
 
 TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
           "[hla][repeat][until][rhsA]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1064,6 +1101,7 @@ TEST_CASE("%REPEAT / %UNTIL A on RHS normalization (imm < A => A > imm)",
 
 TEST_CASE("%UNTIL without %REPEAT reports error",
           "[hla][repeat][until][error]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%UNTIL A==1\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_until_no_repeat.asm");
@@ -1075,6 +1113,7 @@ TEST_CASE("%UNTIL without %REPEAT reports error",
 TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
           "[hla][repeat][until][error][eof]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%REPEAT\nNOP\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_repeat_no_until.asm");
@@ -1089,6 +1128,7 @@ TEST_CASE("%REPEAT missing %UNTIL reports error at EOF",
 
 TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label",
           "[hla][repeat][untilb]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1114,6 +1154,7 @@ TEST_CASE("%REPEAT / %UNTILB basic emits DEC B / JP NZ back to top and end label
 TEST_CASE("%UNTILB without %REPEAT reports error",
           "[hla][repeat][untilb][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%UNTILB\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_untilb_no_repeat.asm");
@@ -1125,6 +1166,7 @@ TEST_CASE("%UNTILB without %REPEAT reports error",
 TEST_CASE("%UNTILB with trailing tokens reports error",
           "[hla][repeat][untilb][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1138,6 +1180,7 @@ TEST_CASE("%UNTILB with trailing tokens reports error",
 
 TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to top then end label",
           "[hla][repeat][untilbc]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1167,6 +1210,7 @@ TEST_CASE("%REPEAT / %UNTILBC basic emits dec bc / ld a,b / or c / jp nz back to
 TEST_CASE("%UNTILBC without %REPEAT reports error",
           "[hla][repeat][untilbc][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%UNTILBC\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_untilbc_no_repeat.asm");
@@ -1178,6 +1222,7 @@ TEST_CASE("%UNTILBC without %REPEAT reports error",
 TEST_CASE("%UNTILBC with trailing tokens reports error",
           "[hla][repeat][untilbc][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1192,6 +1237,7 @@ TEST_CASE("%UNTILBC with trailing tokens reports error",
 TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
           "[hla][repeat][untilbc][nested]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"              // outer
@@ -1250,8 +1296,8 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
     expect_or_c(lines[12]);
     expect_jp_cond_label(lines[13], Keyword::NZ, outer_top);
     // outer end (last line)
-    REQUIRE(lines.back().size() == 2);
-    REQUIRE(lines.back()[1].text().find("HLA_REPEAT_0_END") != std::string::npos);
+    REQUIRE(lines.back().tokens().size() == 2);
+    REQUIRE(lines.back().tokens()[1].text().find("HLA_REPEAT_0_END") != std::string::npos);
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -1259,6 +1305,7 @@ TEST_CASE("Nested %REPEAT with inner %UNTILBC works independently",
 
 TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
           "[hla][flags]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     struct Case {
         const char* flag_src;
@@ -1276,6 +1323,7 @@ TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
     };
 
     for (const auto& c : cases) {
+        g_unique_id_counter = 0;
         const std::string src =
             std::string("%IF ") + c.flag_src + "\n"
             "NOP\n"
@@ -1298,6 +1346,7 @@ TEST_CASE("%IF with flag-only conditions emits inverted conditional JP to ELSE",
 
 TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
           "[hla][flags][and]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF Z && (A == 5)\n"
@@ -1324,6 +1373,7 @@ TEST_CASE("Flag && comparison: %IF Z && (A == 5) %ENDIF",
 
 TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
           "[hla][flags][or]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%IF C || (A < 5)\n"
@@ -1351,6 +1401,7 @@ TEST_CASE("Flag || comparison: %IF C || (A < 5) %ENDIF",
 }
 
 TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 5\n"
@@ -1382,6 +1433,7 @@ TEST_CASE("%BREAK inside %WHILE emits JP to loop end", "[hla][break]") {
 
 TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
           "[hla][break][if]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A != 9\n"
@@ -1412,6 +1464,7 @@ TEST_CASE("%BREAK IF <expr> inside %WHILE emits conditional jump to end",
 
 TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
           "[hla][break][flags]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1436,6 +1489,7 @@ TEST_CASE("%BREAK IF flag condition inside %REPEAT works",
 
 TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%BREAK\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_break_outside.asm");
@@ -1447,6 +1501,7 @@ TEST_CASE("%BREAK outside loop reports error", "[hla][break][error]") {
 TEST_CASE("%BREAK with unexpected trailing tokens reports error",
           "[hla][break][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
@@ -1461,6 +1516,7 @@ TEST_CASE("%BREAK with unexpected trailing tokens reports error",
 TEST_CASE("%BREAK IF missing expression reports error",
           "[hla][break][error][missingexpr]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
@@ -1475,6 +1531,7 @@ TEST_CASE("%BREAK IF missing expression reports error",
 // Add after %BREAK tests
 
 TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 5\n"
@@ -1506,6 +1563,7 @@ TEST_CASE("%CONTINUE inside %WHILE emits JP to loop top", "[hla][continue]") {
 
 TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
           "[hla][continue][if]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A != 9\n"
@@ -1536,6 +1594,7 @@ TEST_CASE("%CONTINUE IF <expr> inside %WHILE emits conditional jump to top",
 
 TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
           "[hla][continue][flags]") {
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%REPEAT\n"
@@ -1562,6 +1621,7 @@ TEST_CASE("%CONTINUE IF flag condition inside %REPEAT works",
 
 TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src = "%CONTINUE\n";
     (void)run_hla_on_text(pp, src, "z80asm_hla_continue_outside.asm");
@@ -1573,6 +1633,7 @@ TEST_CASE("%CONTINUE outside loop reports error", "[hla][continue][error]") {
 TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
           "[hla][continue][error][trailing]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"
@@ -1587,6 +1648,7 @@ TEST_CASE("%CONTINUE with unexpected trailing tokens reports error",
 TEST_CASE("%CONTINUE IF missing expression reports error",
           "[hla][continue][error][missingexpr]") {
     g_errors.reset();
+    g_unique_id_counter = 0;
     Preprocessor pp;
     const std::string src =
         "%WHILE A == 1\n"

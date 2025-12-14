@@ -88,7 +88,7 @@ const std::unordered_map<std::string, Symbol>& Module::symbols() const {
     return symbols_;
 }
 
-Symbol* Module::find_symbol(const std::string& name) {
+Symbol* Module::get_symbol(const std::string& name) {
     auto it = symbols_.find(name);
     if (it != symbols_.end()) {
         return &it->second;
@@ -96,7 +96,7 @@ Symbol* Module::find_symbol(const std::string& name) {
     return nullptr;
 }
 
-const Symbol* Module::find_symbol(const std::string& name) const {
+const Symbol* Module::get_symbol(const std::string& name) const {
     auto it = symbols_.find(name);
     if (it != symbols_.end()) {
         return &it->second;
