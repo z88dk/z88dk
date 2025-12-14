@@ -35,6 +35,7 @@ public:
     void add_local(const std::string& local);
 
     const std::vector<TokenLine>& body_lines() const;
+    std::vector<TokenLine>& body_lines();
     void add_body_line(const TokenLine& line);
     void add_body_line(const TokenLine& line, size_t i);
 
@@ -91,11 +92,15 @@ public:
     const Macro* get_macro(const std::string& name) const;
 
     void add_macro(const Macro& macro);
+    void replace_macro(const Macro& macro);
     void remove_macro(const std::string& name);
     void clear();
 
     bool expand(const TokenLine& line, std::vector<TokenLine>& out_lines);
     bool expand(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines);
+
+    bool expand_once(const TokenLine& line, std::vector<TokenLine>& out_lines);
+    bool expand_once(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines);
 
     TokenLine expand_flat(const TokenLine& line);
     TokenLine expand_flat(const TokenLine& line, size_t i);
@@ -106,7 +111,6 @@ private:
     std::unordered_map<std::string, Macro> macros_;
     std::string last_expanded_macro_;
 
-    bool expand_once_suffix(const TokenLine& line, size_t i, std::vector<TokenLine>& out_lines);
     TokenLine flatten(const Location& location, const std::vector<TokenLine>& lines);
 };
 
@@ -147,6 +151,7 @@ public:
     RepeatIterateBlock(const Location& location, const std::string& variable);
     const std::string& variable() const;
     const std::vector<TokenLine>& items() const;
+    std::vector<TokenLine>& items();
 
     virtual bool parse_items(const TokenLine& line, size_t& index);
     bool expand(const Location& location, std::vector<TokenLine>& out_lines) override;

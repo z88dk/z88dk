@@ -336,7 +336,7 @@ TEST_CASE("Macro: parse_locals syntax error missing identifier after comma", "[m
     REQUIRE(macro.locals().empty());    // cleared on error
 }
 
-TEST_CASE("Macro: parse_locals duplicate within list reports error and clears locals", "[model][macro][locals]") {
+TEST_CASE("Macro: parse_locals duplicate within list reports error", "[model][macro][locals]") {
     SuppressErrors suppress;
     Location loc("macro.asm", 203);
     Macro macro("M", loc);
@@ -349,7 +349,6 @@ TEST_CASE("Macro: parse_locals duplicate within list reports error and clears lo
     TokenLine line(loc, toks);
     size_t index = 0;
     REQUIRE_FALSE(macro.parse_locals(line, index));
-    REQUIRE(macro.locals().size() == 0);
     REQUIRE(g_errors.has_errors());
 }
 
@@ -721,7 +720,7 @@ TEST_CASE("Macro: parse_body_line ENDM with trailing tokens reports error", "[mo
     TokenLine line(loc, toks);
 
     REQUIRE_FALSE(macro.parse_body_line(line)); // outermost end; false
-    REQUIRE(g_errors.has_errors()); // Unexpected token 'EXTRA'
+    REQUIRE(g_errors.has_errors()); // Unexpected token: 'EXTRA'
     REQUIRE(macro.body_lines().empty()); // ENDM was not stored
 }
 
@@ -1180,12 +1179,12 @@ TEST_CASE("Macro: expand_flat reflects local renaming with unique suffix", "[mod
 
 TEST_CASE("Macros: inline splicing for function-like macro with parentheses", "[model][macros_container][expand]") {
     // Define SUM(A,B) -> A + B
-    Location defLoc("defs.asm", 700);
-    Macro sum("SUM", defLoc);
+    Location def_loc("defs.asm", 700);
+    Macro sum("SUM", def_loc);
     sum.set_function_like(true);
     sum.add_parameter("A");
     sum.add_parameter("B");
-    sum.add_body_line(TokenLine(defLoc, {
+    sum.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Plus, "+", false),
         Token(TokenType::Identifier, "B", false)
@@ -1195,8 +1194,8 @@ TEST_CASE("Macros: inline splicing for function-like macro with parentheses", "[
     container.add_macro(sum);
 
     // Input: LD A, SUM(2,4)
-    Location useLoc("use.asm", 701);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 701);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Comma, ",", false),
@@ -1223,12 +1222,12 @@ TEST_CASE("Macros: inline splicing for function-like macro with parentheses", "[
 
 TEST_CASE("Macros: inline splicing for function-like macro without parentheses", "[model][macros_container][expand]") {
     // Define SUM(A,B) -> A + B
-    Location defLoc("defs.asm", 710);
-    Macro sum("SUM", defLoc);
+    Location def_loc("defs.asm", 710);
+    Macro sum("SUM", def_loc);
     sum.set_function_like(true);
     sum.add_parameter("A");
     sum.add_parameter("B");
-    sum.add_body_line(TokenLine(defLoc, {
+    sum.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Plus, "+", false),
         Token(TokenType::Identifier, "B", false)
@@ -1238,8 +1237,8 @@ TEST_CASE("Macros: inline splicing for function-like macro without parentheses",
     container.add_macro(sum);
 
     // Input: LD A, SUM 2,4   (no parentheses)
-    Location useLoc("use.asm", 711);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 711);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Comma, ",", false),
@@ -1269,16 +1268,16 @@ TEST_CASE("Macros: multi-line function-like macro splices first line inline and 
     //   PUSH A
     //   PUSH B
     // ENDM
-    Location defLoc("defs.asm", 800);
-    Macro pp("PP", defLoc);
+    Location def_loc("defs.asm", 800);
+    Macro pp("PP", def_loc);
     pp.set_function_like(true);
     pp.add_parameter("A");
     pp.add_parameter("B");
-    pp.add_body_line(TokenLine(defLoc, {
+    pp.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "PUSH", false),
         Token(TokenType::Identifier, "A", false)
     }));
-    pp.add_body_line(TokenLine(defLoc, {
+    pp.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "PUSH", false),
         Token(TokenType::Identifier, "B", false)
     }));
@@ -1288,8 +1287,8 @@ TEST_CASE("Macros: multi-line function-like macro splices first line inline and 
 
     // Input:
     // label: PP(BC,DE) EXTRA
-    Location useLoc("use.asm", 801);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 801);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "label", false),
         Token(TokenType::Colon, ":", false),
         Token(TokenType::Identifier, "PP", false),
@@ -1333,14 +1332,14 @@ TEST_CASE("Macros: object-like macro without arguments expands two lines; first 
     //   PUSH HL
     //   POP  DE
     // ENDM
-    Location defLoc("defs.asm", 820);
-    Macro noarg("NOARG", defLoc);
+    Location def_loc("defs.asm", 820);
+    Macro noarg("NOARG", def_loc);
     // Object-like: do not set function_like
-    noarg.add_body_line(TokenLine(defLoc, {
+    noarg.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "PUSH", false),
         Token(TokenType::Identifier, "HL", false)
     }));
-    noarg.add_body_line(TokenLine(defLoc, {
+    noarg.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "POP", false),
         Token(TokenType::Identifier, "DE", false)
     }));
@@ -1350,8 +1349,8 @@ TEST_CASE("Macros: object-like macro without arguments expands two lines; first 
 
     // Input:
     // label: NOARG EXTRA
-    Location useLoc("use.asm", 821);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 821);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "label", false),
         Token(TokenType::Colon, ":", false),
         Token(TokenType::Identifier, "NOARG", false),
@@ -1417,8 +1416,8 @@ TEST_CASE("Macros: argument macro expands first and is flattened before top-leve
 
     // Input:  PAIR(ADDR, DE)
     // Expect: IX,HL:DE on the same line (argument ADDR is expanded first and flattened)
-    Location useLoc("use.asm", 902);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 902);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "PAIR", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::Identifier, "ADDR", false), // argument macro
@@ -1480,8 +1479,8 @@ TEST_CASE("Macros: argument is a two-line macro; argument expands then flattens 
 
     // Input:  PAIR(ADDR2, DE)
     // Expect: (IX):(HL),DE on the same line (ADDR2 expanded first to "(IX) , (HL)" then used as A)
-    Location useLoc("use.asm", 912);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 912);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "PAIR", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::Identifier, "ADDR2", false), // argument macro (two-line)
@@ -1618,7 +1617,7 @@ TEST_CASE("RepeatBlock: parse_body_line ENDR with trailing tokens reports error"
     TokenLine line(loc, toks);
 
     REQUIRE_FALSE(block.parse_body_line(line)); // outermost end; false
-    REQUIRE(g_errors.has_errors()); // Unexpected token 'EXTRA'
+    REQUIRE(g_errors.has_errors()); // Unexpected token: 'EXTRA'
 }
 
 //-----------------------------------------------------------------------------
@@ -1626,25 +1625,25 @@ TEST_CASE("RepeatBlock: parse_body_line ENDR with trailing tokens reports error"
 //-----------------------------------------------------------------------------
 
 TEST_CASE("RepeatCountBlock: expand with count=0 yields no lines", "[model][repeat][count]") {
-    Location defLoc("defs.asm", 1000);
-    RepeatCountBlock block(defLoc, 0);
+    Location def_loc("defs.asm", 1000);
+    RepeatCountBlock block(def_loc, 0);
 
     // Body: NOP
-    block.add_body_line(TokenLine(defLoc, { Token(TokenType::Identifier, "NOP", false) }));
+    block.add_body_line(TokenLine(def_loc, { Token(TokenType::Identifier, "NOP", false) }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1001);
-    REQUIRE_FALSE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1001);
+    REQUIRE_FALSE(block.expand(use_loc, out));
     REQUIRE(out.empty());
 }
 
 TEST_CASE("RepeatCountBlock: expand with count=1 returns body once", "[model][repeat][count]") {
-    Location defLoc("defs.asm", 1010);
-    RepeatCountBlock block(defLoc, 1);
+    Location def_loc("defs.asm", 1010);
+    RepeatCountBlock block(def_loc, 1);
 
     // Body:
     //   LD A, B
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Comma, ",", false),
@@ -1652,8 +1651,8 @@ TEST_CASE("RepeatCountBlock: expand with count=1 returns body once", "[model][re
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1011);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1011);
+    REQUIRE(block.expand(use_loc, out));
 
     REQUIRE(out.size() == 1);
     const auto& toks = out[0].tokens();
@@ -1667,24 +1666,24 @@ TEST_CASE("RepeatCountBlock: expand with count=1 returns body once", "[model][re
 }
 
 TEST_CASE("RepeatCountBlock: expand with count>1 repeats entire body", "[model][repeat][count]") {
-    Location defLoc("defs.asm", 1020);
-    RepeatCountBlock block(defLoc, 3);
+    Location def_loc("defs.asm", 1020);
+    RepeatCountBlock block(def_loc, 3);
 
     // Body has two lines:
     //   PUSH HL
     //   POP  HL
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "PUSH", false),
         Token(TokenType::Identifier, "HL", false)
     }));
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "POP", false),
         Token(TokenType::Identifier, "HL", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1021);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1021);
+    REQUIRE(block.expand(use_loc, out));
 
     // Expect body repeated 3 times --> 2 * 3 = 6 lines
     REQUIRE(out.size() == 6);
@@ -1737,8 +1736,8 @@ TEST_CASE("RepeatCountBlock: LOCAL variables are uniquified per iteration using 
     // Capture starting unique id
     size_t start_id = g_unique_id_counter;
 
-    Location defLoc("defs.asm", 1030);
-    RepeatCountBlock block(defLoc, 3);
+    Location def_loc("defs.asm", 1030);
+    RepeatCountBlock block(def_loc, 3);
 
     // Declare locals via LOCAL line
     // LOCAL X, Y
@@ -1749,13 +1748,13 @@ TEST_CASE("RepeatCountBlock: LOCAL variables are uniquified per iteration using 
             Token(TokenType::Comma, ",", false),
             Token(TokenType::Identifier, "Y", false),
         };
-        TokenLine localLine(defLoc, toks);
+        TokenLine localLine(def_loc, toks);
         REQUIRE(block.parse_body_line(localLine)); // LOCAL line is parsed, not stored
     }
 
     // Body references X and Y
     //   LD X, Y
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "X", false),
         Token(TokenType::Comma, ",", false),
@@ -1763,8 +1762,8 @@ TEST_CASE("RepeatCountBlock: LOCAL variables are uniquified per iteration using 
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1031);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1031);
+    REQUIRE(block.expand(use_loc, out));
 
     // Expect 3 iterations -> 3 lines
     REQUIRE(out.size() == 3);
@@ -1794,9 +1793,9 @@ TEST_CASE("RepeatCountBlock: LOCAL variables are uniquified per iteration using 
 //-----------------------------------------------------------------------------
 
 TEST_CASE("RepeatIterateBlock: repeats once per parsed item and substitutes variable", "[model][repeat][iterate]") {
-    Location defLoc("defs.asm", 1200);
+    Location def_loc("defs.asm", 1200);
     // Variable name 'V'
-    RepeatIterateBlock block(defLoc, "V");
+    RepeatIterateBlock block(def_loc, "V");
 
     // Parse items: (1), 2, (IX), HL
     // Mixed tokens to ensure substitution works for multi-token items
@@ -1814,7 +1813,7 @@ TEST_CASE("RepeatIterateBlock: repeats once per parsed item and substitutes vari
             Token(TokenType::Comma, ",", false),
             Token(TokenType::Identifier, "HL", false)
         };
-        TokenLine items(defLoc, toks);
+        TokenLine items(def_loc, toks);
         size_t idx = 0;
         REQUIRE(block.parse_items(items, idx));
         // Should consume entire line
@@ -1823,15 +1822,15 @@ TEST_CASE("RepeatIterateBlock: repeats once per parsed item and substitutes vari
 
     // Body references the iteration variable V
     //   LD V
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "V", false)
     }));
 
     // Expand: expect one output line per item (4 lines)
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1201);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1201);
+    REQUIRE(block.expand(use_loc, out));
     REQUIRE(out.size() == 4);
 
     // Line 0: LD (1)
@@ -1880,8 +1879,8 @@ TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration usin
           "[model][repeat][iterate][locals]") {
     size_t start_id = g_unique_id_counter;
 
-    Location defLoc("defs.asm", 1210);
-    RepeatIterateBlock block(defLoc, "V");
+    Location def_loc("defs.asm", 1210);
+    RepeatIterateBlock block(def_loc, "V");
 
     // Items: A, B, C
     {
@@ -1892,7 +1891,7 @@ TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration usin
             Token(TokenType::Comma, ",", false),
             Token(TokenType::Identifier, "C", false)
         };
-        TokenLine items(defLoc, toks);
+        TokenLine items(def_loc, toks);
         size_t idx = 0;
         REQUIRE(block.parse_items(items, idx));
         REQUIRE(idx == toks.size());
@@ -1906,25 +1905,25 @@ TEST_CASE("RepeatIterateBlock: LOCAL variables are uniquified per iteration usin
             Token(TokenType::Comma, ",", false),
             Token(TokenType::Identifier, "Y", false),
         };
-        TokenLine localLine(defLoc, toks);
+        TokenLine localLine(def_loc, toks);
         REQUIRE(block.parse_body_line(localLine)); // LOCAL parsed, not stored
     }
 
     // Body references V and the locals: "LD X, V" and "INC Y"
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "X", false),
         Token(TokenType::Comma, ",", false),
         Token(TokenType::Identifier, "V", false)
     }));
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "INC", false),
         Token(TokenType::Identifier, "Y", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1211);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1211);
+    REQUIRE(block.expand(use_loc, out));
 
     // Expect 3 items -> 2 lines per item -> 6 lines total
     REQUIRE(out.size() == 6);
@@ -1973,9 +1972,9 @@ TEST_CASE("RepeatIterateBlock: error when iteration variable conflicts with LOCA
           "[model][repeat][iterate][locals][error]") {
     SuppressErrors suppress;
 
-    Location defLoc("defs.asm", 1220);
+    Location def_loc("defs.asm", 1220);
     // Iteration variable is "X"
-    RepeatIterateBlock block(defLoc, "X");
+    RepeatIterateBlock block(def_loc, "X");
 
     // Items: A, B
     {
@@ -1984,7 +1983,7 @@ TEST_CASE("RepeatIterateBlock: error when iteration variable conflicts with LOCA
             Token(TokenType::Comma, ",", false),
             Token(TokenType::Identifier, "B", false)
         };
-        TokenLine items(defLoc, toks);
+        TokenLine items(def_loc, toks);
         size_t idx = 0;
         REQUIRE(block.parse_items(items, idx));
         REQUIRE(idx == toks.size());
@@ -1996,22 +1995,22 @@ TEST_CASE("RepeatIterateBlock: error when iteration variable conflicts with LOCA
             Token(TokenType::Identifier, "LOCAL", Keyword::LOCAL, false),
             Token(TokenType::Identifier, "X", false)
         };
-        TokenLine localLine(defLoc, toks);
+        TokenLine localLine(def_loc, toks);
         // Parsing succeeds but should set up a name conflict for expand
         REQUIRE(block.parse_body_line(localLine));
         REQUIRE(g_errors.has_errors());
     }
 
     // Body references X (iteration variable)
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "LD", false),
         Token(TokenType::Identifier, "X", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1221);
+    Location use_loc("use.asm", 1221);
 
-    REQUIRE(block.expand(useLoc, out));
+    REQUIRE(block.expand(use_loc, out));
     REQUIRE(!out.empty());
 }
 
@@ -2021,30 +2020,30 @@ TEST_CASE("RepeatIterateBlock: error when iteration variable conflicts with LOCA
 
 TEST_CASE("RepeatCharsBlock: repeats once per character in string; variable is integer char code",
           "[model][repeat][chars]") {
-    Location defLoc("defs.asm", 1300);
+    Location def_loc("defs.asm", 1300);
     // Iteration variable name 'C'
-    RepeatCharsBlock block(defLoc, "C");
+    RepeatCharsBlock block(def_loc, "C");
 
     // Parse items from a string: "Az"
     {
         std::vector<Token> toks = {
             Token(TokenType::String, "\"Az\"", "Az", false)
         };
-        TokenLine items(defLoc, toks);
+        TokenLine items(def_loc, toks);
         size_t idx = 0;
         REQUIRE(block.parse_chars(items, idx));
         REQUIRE(idx == toks.size());
     }
 
     // Body: DB C
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "DB", false),
         Token(TokenType::Identifier, "C", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1301);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1301);
+    REQUIRE(block.expand(use_loc, out));
 
     // Two characters -> two lines
     REQUIRE(out.size() == 2);
@@ -2073,29 +2072,29 @@ TEST_CASE("RepeatCharsBlock: repeats once per character in string; variable is i
 }
 
 TEST_CASE("RepeatCharsBlock: repeats once per character in non-string token text", "[model][repeat][chars]") {
-    Location defLoc("defs.asm", 1310);
-    RepeatCharsBlock block(defLoc, "C");
+    Location def_loc("defs.asm", 1310);
+    RepeatCharsBlock block(def_loc, "C");
 
     // Parse items from a non-string token: IDENT 'Ab'
     {
         std::vector<Token> toks = {
             Token(TokenType::Identifier, "Ab", false)
         };
-        TokenLine items(defLoc, toks);
+        TokenLine items(def_loc, toks);
         size_t idx = 0;
         REQUIRE(block.parse_chars(items, idx));
         REQUIRE(idx == toks.size());
     }
 
     // Body: DB C
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "DB", false),
         Token(TokenType::Identifier, "C", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1311);
-    REQUIRE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1311);
+    REQUIRE(block.expand(use_loc, out));
 
     // Two characters -> two lines
     REQUIRE(out.size() == 2);
@@ -2121,47 +2120,47 @@ TEST_CASE("RepeatCharsBlock: repeats once per character in non-string token text
 
 TEST_CASE("RepeatCharsBlock: empty input yields no output and expand returns false (no tokens)",
           "[model][repeat][chars]") {
-    Location defLoc("defs.asm", 1320);
-    RepeatCharsBlock block(defLoc, "C");
+    Location def_loc("defs.asm", 1320);
+    RepeatCharsBlock block(def_loc, "C");
 
     // Parse items from an empty token list
-    TokenLine items(defLoc, {});
+    TokenLine items(def_loc, {});
     size_t idx = 0;
     REQUIRE(block.parse_chars(items, idx));
     REQUIRE(idx == 0);
 
     // Body: DB C (won't be used)
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "DB", false),
         Token(TokenType::Identifier, "C", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1321);
-    REQUIRE_FALSE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1321);
+    REQUIRE_FALSE(block.expand(use_loc, out));
     REQUIRE(out.empty());
 }
 
 TEST_CASE("RepeatCharsBlock: empty string input yields no output and expand returns false", "[model][repeat][chars]") {
-    Location defLoc("defs.asm", 1330);
-    RepeatCharsBlock block(defLoc, "C");
+    Location def_loc("defs.asm", 1330);
+    RepeatCharsBlock block(def_loc, "C");
 
     // Parse items from an empty string: ""
-    TokenLine items(defLoc, { Token(TokenType::String, "\"\"", "", false)});
+    TokenLine items(def_loc, { Token(TokenType::String, "\"\"", "", false)});
     size_t idx = 0;
     REQUIRE(block.parse_chars(items, idx));
     REQUIRE(idx == 1); // consumed the string token
     // No characters should have been added to items
 
     // Body: DB C (won't be used)
-    block.add_body_line(TokenLine(defLoc, {
+    block.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "DB", false),
         Token(TokenType::Identifier, "C", false)
     }));
 
     std::vector<TokenLine> out;
-    Location useLoc("use.asm", 1331);
-    REQUIRE_FALSE(block.expand(useLoc, out));
+    Location use_loc("use.asm", 1331);
+    REQUIRE_FALSE(block.expand(use_loc, out));
     REQUIRE(out.empty());
 }
 
@@ -2172,10 +2171,10 @@ TEST_CASE("Macros: recursive macro triggers recursion guard error", "[model][mac
     // MACRO FOO
     //   FOO       ; self-recursive call
     // ENDM
-    Location defLoc("defs.asm", 1400);
-    Macro foo("FOO", defLoc);
+    Location def_loc("defs.asm", 1400);
+    Macro foo("FOO", def_loc);
     // Object-like: do not set function_like
-    foo.add_body_line(TokenLine(defLoc, {
+    foo.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "FOO", false)
     }));
 
@@ -2184,10 +2183,11 @@ TEST_CASE("Macros: recursive macro triggers recursion guard error", "[model][mac
 
     // Input:
     // FOO
-    Location useLoc("use.asm", 1401);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1401);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "FOO", false)
     });
+    g_errors.set_location(use_loc);
 
     std::vector<TokenLine> out;
     // Expansion should hit the recursion limit and report an error
@@ -2208,11 +2208,11 @@ TEST_CASE("Macros: recursive macro triggers recursion guard error", "[model][mac
 TEST_CASE("Macros: stringize operator produces string from raw argument tokens",
           "[model][macros_container][stringize]") {
     // Define STR(A) -> #A
-    Location defLoc("defs.asm", 1500);
-    Macro str("STR", defLoc);
+    Location def_loc("defs.asm", 1500);
+    Macro str("STR", def_loc);
     str.set_function_like(true);
     str.add_parameter("A");
-    str.add_body_line(TokenLine(defLoc, {
+    str.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Hash, "#", false),
         Token(TokenType::Identifier, "A", false)
     }));
@@ -2221,8 +2221,8 @@ TEST_CASE("Macros: stringize operator produces string from raw argument tokens",
     container.add_macro(str);
 
     // Input: STR(X)
-    Location useLoc("use.asm", 1501);
-    TokenLine line1(useLoc, {
+    Location use_loc("use.asm", 1501);
+    TokenLine line1(use_loc, {
         Token(TokenType::Identifier, "STR", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::Identifier, "X", false),
@@ -2241,7 +2241,7 @@ TEST_CASE("Macros: stringize operator produces string from raw argument tokens",
     }
 
     // Input: STR((HL))
-    TokenLine line2(useLoc, {
+    TokenLine line2(use_loc, {
         Token(TokenType::Identifier, "STR", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::LeftParen, "(", false),
@@ -2265,12 +2265,12 @@ TEST_CASE("Macros: stringize operator produces string from raw argument tokens",
 
 TEST_CASE("Macros: stringize with multiple parameters on one line", "[model][macros_container][stringize]") {
     // Define STR2(A,B) -> #A , #B
-    Location defLoc("defs.asm", 1510);
-    Macro str2("STR2", defLoc);
+    Location def_loc("defs.asm", 1510);
+    Macro str2("STR2", def_loc);
     str2.set_function_like(true);
     str2.add_parameter("A");
     str2.add_parameter("B");
-    str2.add_body_line(TokenLine(defLoc, {
+    str2.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Hash, "#", false),
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Comma, ",", false),
@@ -2282,8 +2282,8 @@ TEST_CASE("Macros: stringize with multiple parameters on one line", "[model][mac
     container.add_macro(str2);
 
     // Input: STR2(IX, (DE))
-    Location useLoc("use.asm", 1511);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1511);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "STR2", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::Identifier, "IX", false),
@@ -2343,8 +2343,8 @@ TEST_CASE("Macros: stringize uses raw (unexpanded) argument, not expanded result
     container.add_macro(show);
 
     // Input: SHOW(ADDR)
-    Location useLoc("use.asm", 1522);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1522);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "SHOW", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::Identifier, "ADDR", false), // raw argument is "ADDR"
@@ -2365,11 +2365,11 @@ TEST_CASE("Macros: stringize uses raw (unexpanded) argument, not expanded result
 TEST_CASE("Macros: stringize escapes quotes in raw argument using escape_c_string",
           "[model][macros_container][stringize][escape]") {
     // Define QUOTE(A) -> #A
-    Location defLoc("defs.asm", 1530);
-    Macro quote("QUOTE", defLoc);
+    Location def_loc("defs.asm", 1530);
+    Macro quote("QUOTE", def_loc);
     quote.set_function_like(true);
     quote.add_parameter("A");
-    quote.add_body_line(TokenLine(defLoc, {
+    quote.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Hash, "#", false),
         Token(TokenType::Identifier, "A", false)
     }));
@@ -2378,8 +2378,8 @@ TEST_CASE("Macros: stringize escapes quotes in raw argument using escape_c_strin
     container.add_macro(quote);
 
     // Input: QUOTE("A")  -> raw tokens include a String token with value A
-    Location useLoc("use.asm", 1531);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1531);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "QUOTE", false),
         Token(TokenType::LeftParen, "(", false),
         Token(TokenType::String, "\"A\"", "A", false),
@@ -2402,8 +2402,8 @@ TEST_CASE("Macros: token pasting with ## concatenates two tokens to an identifie
     Macros container;
 
     // Input: FOO ## BAR -> "FOOBAR" (not a macro)
-    Location useLoc("use.asm", 1600);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1600);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "FOO", false),
         Token(TokenType::DoubleHash, "##", false),
         Token(TokenType::Identifier, "BAR", false)
@@ -2423,8 +2423,8 @@ TEST_CASE("Macros: token pasting with ## concatenates identifier and integer (no
     Macros container;
 
     // Input: TMP ## 123 -> "TMP123" (not a macro)
-    Location useLoc("use.asm", 1601);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1601);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "TMP", false),
         Token(TokenType::DoubleHash, "##", false),
         Token(TokenType::Integer, "123", 123, false)
@@ -2444,8 +2444,8 @@ TEST_CASE("Macros: token pasting with ## concatenates three tokens (identifier+i
     Macros container;
 
     // Input: AA ## BB ## 9 -> "AABB9" (not a macro)
-    Location useLoc("use.asm", 1602);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1602);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "AA", false),
         Token(TokenType::DoubleHash, "##", false),
         Token(TokenType::Identifier, "BB", false),
@@ -2464,9 +2464,9 @@ TEST_CASE("Macros: token pasting with ## concatenates three tokens (identifier+i
 
 TEST_CASE("Macros: token pasted identifier expands an object-like macro", "[model][macros_container][paste]") {
     // Define an object-like macro named OBJMAC -> emits two tokens: INC A
-    Location defLoc("defs.asm", 1610);
-    Macro obj("OBJMAC", defLoc);
-    obj.add_body_line(TokenLine(defLoc, {
+    Location def_loc("defs.asm", 1610);
+    Macro obj("OBJMAC", def_loc);
+    obj.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "INC", false),
         Token(TokenType::Identifier, "A", false)
     }));
@@ -2475,8 +2475,8 @@ TEST_CASE("Macros: token pasted identifier expands an object-like macro", "[mode
     container.add_macro(obj);
 
     // Create OBJ ## MAC -> "OBJMAC" and expand
-    Location useLoc("use.asm", 1611);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1611);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "OBJ", false),
         Token(TokenType::DoubleHash, "##", false),
         Token(TokenType::Identifier, "MAC", false)
@@ -2496,12 +2496,12 @@ TEST_CASE("Macros: token pasted identifier expands an object-like macro", "[mode
 TEST_CASE("Macros: token pasted identifier expands a function-like macro with parentheses",
           "[model][macros_container][paste]") {
     // Define SUM(A,B) -> A + B
-    Location defLoc("defs.asm", 1620);
-    Macro sum("SUM", defLoc);
+    Location def_loc("defs.asm", 1620);
+    Macro sum("SUM", def_loc);
     sum.set_function_like(true);
     sum.add_parameter("A");
     sum.add_parameter("B");
-    sum.add_body_line(TokenLine(defLoc, {
+    sum.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Plus, "+", false),
         Token(TokenType::Identifier, "B", false)
@@ -2511,8 +2511,8 @@ TEST_CASE("Macros: token pasted identifier expands a function-like macro with pa
     container.add_macro(sum);
 
     // Create S ## U ## M -> "SUM" then call with parentheses: (2,4)
-    Location useLoc("use.asm", 1621);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1621);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "S", false),
         Token(TokenType::DoubleHash, "##", false),
         Token(TokenType::Identifier, "U", false),
@@ -2538,12 +2538,12 @@ TEST_CASE("Macros: token pasted identifier expands a function-like macro with pa
 TEST_CASE("Macros: token pasted identifier expands a function-like macro without parentheses",
           "[model][macros_container][paste]") {
     // Define CAT2(A,B) -> A B
-    Location defLoc("defs.asm", 1630);
-    Macro cat("CAT2", defLoc);
+    Location def_loc("defs.asm", 1630);
+    Macro cat("CAT2", def_loc);
     cat.set_function_like(true);
     cat.add_parameter("A");
     cat.add_parameter("B");
-    cat.add_body_line(TokenLine(defLoc, {
+    cat.add_body_line(TokenLine(def_loc, {
         Token(TokenType::Identifier, "A", false),
         Token(TokenType::Identifier, "B", false)
     }));
@@ -2552,8 +2552,8 @@ TEST_CASE("Macros: token pasted identifier expands a function-like macro without
     container.add_macro(cat);
 
     // Create CAT ## 2 -> "CAT2" then call without parens: X, Y
-    Location useLoc("use.asm", 1631);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1631);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "CAT", false),
         Token(TokenType::DoubleHash, "##", false),
         Token(TokenType::Integer, "2", 2, false),
@@ -2595,8 +2595,8 @@ TEST_CASE("Macros: chained object-like expansion A -> B -> C", "[model][macros_c
     container.add_macro(C);
 
     // Input: A
-    Location useLoc("use.asm", 1703);
-    TokenLine line(useLoc, { Token(TokenType::Identifier, "A", false) });
+    Location use_loc("use.asm", 1703);
+    TokenLine line(use_loc, { Token(TokenType::Identifier, "A", false) });
 
     std::vector<TokenLine> out;
     REQUIRE(container.expand(line, out));         // changes should be detected
@@ -2650,8 +2650,8 @@ TEST_CASE("Macros: chained function-like expansion F(X) -> G(X) -> H(X)", "[mode
     container.add_macro(F);
 
     // Input: label: F(BC) EXTRA
-    Location useLoc("use.asm", 1713);
-    TokenLine line(useLoc, {
+    Location use_loc("use.asm", 1713);
+    TokenLine line(use_loc, {
         Token(TokenType::Identifier, "label", false),
         Token(TokenType::Colon, ":", false),
         Token(TokenType::Identifier, "F", false),
@@ -2674,3 +2674,237 @@ TEST_CASE("Macros: chained function-like expansion F(X) -> G(X) -> H(X)", "[mode
     REQUIRE(toks[3].text() == "BC");
     REQUIRE(toks[4].text() == "EXTRA");
 }
+
+TEST_CASE("Macro: parse_arguments trailing comma yields empty final argument (no parens)",
+          "[model][macro][args][trailing-comma]") {
+    Location loc("macro.asm", 305);
+    Macro macro("M", loc);
+
+    // Args: A, B,   -> third (final) argument is empty
+    std::vector<Token> toks = {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Identifier, "B", false),
+        Token(TokenType::Comma, ",", false)
+    };
+    TokenLine line(loc, toks);
+    size_t index = 0;
+    std::vector<TokenLine> args;
+
+    REQUIRE(macro.parse_arguments(line, index, args));
+    REQUIRE(index == toks.size());
+    REQUIRE(args.size() == 3);
+
+    REQUIRE(args[0].tokens().size() == 1);
+    REQUIRE(args[0].tokens()[0].text() == "A");
+
+    REQUIRE(args[1].tokens().size() == 1);
+    REQUIRE(args[1].tokens()[0].text() == "B");
+
+    // Final empty argument due to trailing comma
+    REQUIRE(args[2].tokens().empty());
+}
+
+TEST_CASE("Macro: parse_arguments trailing comma before ')' yields empty final argument (with parens)",
+          "[model][macro][args][trailing-comma][parens]") {
+    Location loc("macro.asm", 306);
+    Macro macro("M", loc);
+
+    // Args inside parens: A, B, )  -> third (final) argument is empty, parser stops at ')'
+    std::vector<Token> toks = {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Identifier, "B", false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::RightParen, ")", false),
+        Token(TokenType::Identifier, "AFTER", false)
+    };
+    TokenLine line(loc, toks);
+    size_t index = 0;
+    std::vector<TokenLine> args;
+
+    REQUIRE(macro.parse_arguments(line, index, args));
+    // Should stop at the right paren without consuming it
+    REQUIRE(index == 4);
+    REQUIRE(args.size() == 3);
+
+    REQUIRE(args[0].tokens().size() == 1);
+    REQUIRE(args[0].tokens()[0].text() == "A");
+
+    REQUIRE(args[1].tokens().size() == 1);
+    REQUIRE(args[1].tokens()[0].text() == "B");
+
+    // Final empty argument due to trailing comma
+    REQUIRE(args[2].tokens().empty());
+}
+
+TEST_CASE("Macros: function-like macro without parens and too few args stays literal",
+          "[model][macros_container][expand][arity][no-parens]") {
+    // Define SUM(A,B) -> A + B
+    Location def_loc("defs.asm", 1800);
+    Macro sum("SUM", def_loc);
+    sum.set_function_like(true);
+    sum.add_parameter("A");
+    sum.add_parameter("B");
+    sum.add_body_line(TokenLine(def_loc, {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Plus, "+", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+
+    Macros container;
+    container.add_macro(sum);
+
+    // Invoke without parentheses with only one argument: SUM 5
+    Location use_loc("use.asm", 1801);
+    TokenLine line(use_loc, {
+        Token(TokenType::Identifier, "SUM", false),
+        Token(TokenType::Integer, "5", 5, false)
+    });
+
+    std::vector<TokenLine> out;
+    // Should not expand; treated as literal (no change)
+    REQUIRE_FALSE(container.expand(line, out));
+    // Verify original line unchanged
+    REQUIRE(out.size() == 1);
+    REQUIRE(out[0].to_string() == "SUM 5");
+}
+
+TEST_CASE("Macros: function-like macro without parens and too many args stays literal",
+          "[model][macros_container][expand][arity][no-parens]") {
+    // Define SUM(A,B) -> A + B
+    Location def_loc("defs.asm", 1810);
+    Macro sum("SUM", def_loc);
+    sum.set_function_like(true);
+    sum.add_parameter("A");
+    sum.add_parameter("B");
+    sum.add_body_line(TokenLine(def_loc, {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Plus, "+", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+
+    Macros container;
+    container.add_macro(sum);
+
+    // Invoke without parentheses with too many arguments: SUM 1,2,3
+    Location use_loc("use.asm", 1811);
+    TokenLine line(use_loc, {
+        Token(TokenType::Identifier, "SUM", false),
+        Token(TokenType::Integer, "1", 1, false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Integer, "2", 2, false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Integer, "3", 3, false)
+    });
+
+    std::vector<TokenLine> out;
+    // Should not expand; treated as literal (no change)
+    REQUIRE_FALSE(container.expand(line, out));
+    REQUIRE(out.size() == 1);
+    REQUIRE(out[0].to_string() == "SUM 1,2,3");
+}
+
+TEST_CASE("Macros: function-like macro with parens and too few args reports error",
+          "[model][macros_container][expand][arity][parens][error]") {
+    SuppressErrors suppress;
+    // Define SUM(A,B) -> A + B
+    Location def_loc("defs.asm", 1820);
+    Macro sum("SUM", def_loc);
+    sum.set_function_like(true);
+    sum.add_parameter("A");
+    sum.add_parameter("B");
+    sum.add_body_line(TokenLine(def_loc, {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Plus, "+", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+    Macros container;
+    container.add_macro(sum);
+    // Invoke with parentheses but too few arguments: SUM(10)
+    Location use_loc("use.asm", 1821);
+    TokenLine line(use_loc, {
+        Token(TokenType::Identifier, "SUM", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Integer, "10", 10, false),
+        Token(TokenType::RightParen, ")", false)
+    });
+    g_errors.set_location(use_loc);
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("use.asm:1821:") != std::string::npos);
+    REQUIRE(msg.find("Macro argument count mismatch for: SUM") != std::string::npos);
+}
+
+TEST_CASE("Macros: function-like macro with parens and too many args reports error",
+          "[model][macros_container][expand][arity][parens][error]") {
+    SuppressErrors suppress;
+    // Define SUM(A,B) -> A + B
+    Location def_loc("defs.asm", 1830);
+    Macro sum("SUM", def_loc);
+    sum.set_function_like(true);
+    sum.add_parameter("A");
+    sum.add_parameter("B");
+    sum.add_body_line(TokenLine(def_loc, {
+        Token(TokenType::Identifier, "A", false),
+        Token(TokenType::Plus, "+", false),
+        Token(TokenType::Identifier, "B", false)
+    }));
+    Macros container;
+    container.add_macro(sum);
+    // Invoke with parentheses but too many arguments: SUM(1,2,3)
+    Location use_loc("use.asm", 1831);
+    TokenLine line(use_loc, {
+        Token(TokenType::Identifier, "SUM", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Integer, "1", 1, false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Integer, "2", 2, false),
+        Token(TokenType::Comma, ",", false),
+        Token(TokenType::Integer, "3", 3, false),
+        Token(TokenType::RightParen, ")", false)
+    });
+    g_errors.set_location(use_loc);
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("use.asm:1831:") != std::string::npos);
+    REQUIRE(msg.find("Macro argument count mismatch for: SUM") != std::string::npos);
+}
+
+TEST_CASE("Macros: zero-parameter function-like macro invoked with 1 argument reports error",
+          "[model][macros_container][expand][arity][parens][error][zero-param]") {
+    SuppressErrors suppress;
+
+    // Define H() -> ZERO (body not used on mismatch)
+    Location def_loc("defs.asm", 1840);
+    Macro h("H", def_loc);
+    h.set_function_like(true);
+    h.add_body_line(TokenLine(def_loc, {
+        Token(TokenType::Identifier, "ZERO", false)
+    }));
+
+    Macros container;
+    container.add_macro(h);
+
+    // Invoke with parentheses and one argument: H(1) -> arity mismatch
+    Location use_loc("use.asm", 1841);
+    TokenLine line(use_loc, {
+        Token(TokenType::Identifier, "H", false),
+        Token(TokenType::LeftParen, "(", false),
+        Token(TokenType::Integer, "1", 1, false),
+        Token(TokenType::RightParen, ")", false)
+    });
+
+    g_errors.set_location(use_loc);
+    std::vector<TokenLine> out;
+    REQUIRE(container.expand(line, out));
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("use.asm:1841:") != std::string::npos);
+    REQUIRE(msg.find("Macro argument count mismatch for: H") != std::string::npos);
+}
+

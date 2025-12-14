@@ -448,9 +448,9 @@ TEST_CASE("Integration: typical assembly workflow", "[model][integration]") {
     REQUIRE(start->is_exported());
     REQUIRE(start->value() == 0x8000);
 
-    REQUIRE(module.find_symbol("printf")->is_extern());
-    REQUIRE(module.find_symbol("printf")->is_undefined());
-    REQUIRE(module.find_symbol("printf")->is_imported());
+    REQUIRE(module.get_symbol("printf")->is_extern());
+    REQUIRE(module.get_symbol("printf")->is_undefined());
+    REQUIRE(module.get_symbol("printf")->is_imported());
 
     REQUIRE(max_size->is_constant());
     REQUIRE(max_size->is_local());
@@ -1125,7 +1125,7 @@ TEST_CASE("Integration: forward reference in expression",
     REQUIRE(expr.parse(line, i, &module, section));
 
     // Symbol should be created but undefined
-    Symbol* sym = module.find_symbol("end_label");
+    Symbol* sym = module.get_symbol("end_label");
     REQUIRE(sym != nullptr);
     REQUIRE(sym->is_undefined());
 

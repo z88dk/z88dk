@@ -914,7 +914,7 @@ std::unique_ptr<ExprNode> ExprParser::parse_primary() {
             throw UndefinedSymbol(name);  // Error: no module context
         }
 
-        Symbol* symbol = module_->find_symbol(name);
+        Symbol* symbol = module_->get_symbol(name);
         if (!symbol) {
             // Symbol doesn't exist yet - create it as undefined
             Location loc = line_.location();
@@ -966,6 +966,11 @@ Expression& Expression::operator=(const Expression& other) {
                       (*other.token_line_) : nullptr;
     }
     return *this;
+}
+
+bool Expression::parse(const TokenLine& line, Module* module, Section* section) {
+    size_t i = 0;
+    return parse(line, i, module, section);
 }
 
 bool Expression::parse(const TokenLine& line, size_t& i, Module* module,

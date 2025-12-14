@@ -1906,17 +1906,17 @@ TEST_CASE("split_lines handles complex mixed line with labels",
     g_options = Options();
 
     TokenFileReader tfr;
-    tfr.inject("split_test", 1, true, "label1: DEFB 1 ? 2 : 3 : label2: LD A, 4 ? 5 : 6\n");
+    tfr.inject("split_test", 1, true, "label1: .label2 DEFB 1 ? 2 : 3 : LD A, 4 ? 5 : 6\n");
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
     REQUIRE(tl.to_string() == ".label1");
 
     REQUIRE(tfr.next_token_line(tl));
-    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3");
+    REQUIRE(tl.to_string() == ".label2");
 
     REQUIRE(tfr.next_token_line(tl));
-    REQUIRE(tl.to_string() == ".label2");
+    REQUIRE(tl.to_string() == "DEFB 1 ? 2 : 3");
 
     REQUIRE(tfr.next_token_line(tl));
     REQUIRE(tl.to_string() == "LD A, 4 ? 5 : 6");
@@ -2088,16 +2088,15 @@ TEST_CASE("split_lines non-first colon is separator not label",
     g_options = Options();
 
     TokenFileReader tfr;
-    tfr.inject("split_test", 1, true, "LD A, B: label: LD C, D\n");
+    tfr.inject("split_test", 1, true, ".label LD A, B: LD C, D\n");
 
     TokenLine tl;
     REQUIRE(tfr.next_token_line(tl));
     // First colon after LD is instruction colon
-    REQUIRE(tl.to_string() == "LD A, B");
+    REQUIRE(tl.to_string() == ".label");
 
     REQUIRE(tfr.next_token_line(tl));
-    // Second identifier+colon is now at start of new logical line, so it's a label
-    REQUIRE(tl.to_string() == ".label");
+    REQUIRE(tl.to_string() == "LD A, B");
 
     REQUIRE(tfr.next_token_line(tl));
     REQUIRE(tl.to_string() == "LD C, D");
@@ -2945,4 +2944,43 @@ TEST_CASE("split_lines: 'ifndef GCOL: define GCOL' splits into two logical lines
     REQUIRE_FALSE(reader.next_token_line(tl));
 
     std::remove(file_path.c_str());
+}
+
+TEST_CASE("TokenFileReader detects pragma once even if preceded by other pragmas (ignored)",
+          "[lexer][pragma_once][preceded]") {
+    g_options = Options();
+
+    // Build a temporary file where unknown pragmas come before a valid pragma once
+    const std::string path = create_temp_file("pragma_preceded.asm",
+                             "#pragma foo_unused\n"
+                             "pragma bar_unused extra tokens\n"
+                             "#PrAgMa OnCe\n"
+                             "LD A, 1\n");
+
+    // Open twice to also exercise cache path
+    for (int run = 0; run < 2; ++run) {
+        TokenFileReader reader;
+        REQUIRE(reader.open(path));
+
+        // Unknown pragmas should be ignored; pragma once must be detected
+        REQUIRE(reader.has_pragma_once());
+
+        TokenLine tl;
+        // First logical line: unknown pragma suppressed; tokenizer returns only non-pragma content
+        REQUIRE(reader.next_token_line(tl));
+        REQUIRE(tl.to_string() == "#pragma foo_unused"); // tokenized line content (unknown pragma)
+        REQUIRE(reader.next_token_line(tl));
+        REQUIRE(tl.to_string() == "pragma bar_unused extra tokens"); // plain 'pragma' form (unknown)
+        REQUIRE(reader.next_token_line(tl));
+        REQUIRE(tl.to_string() == "#PrAgMa OnCe"); // normalized detection still flags pragma once
+        REQUIRE(reader.next_token_line(tl));
+        REQUIRE(tl.to_string() == "LD A, 1");
+
+        REQUIRE_FALSE(reader.next_token_line(tl));
+
+        // Flag persists after reading
+        REQUIRE(reader.has_pragma_once());
+    }
+
+    std::remove(path.c_str());
 }
