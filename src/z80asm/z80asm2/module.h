@@ -20,8 +20,7 @@
 //-----------------------------------------------------------------------------
 class Module {
 public:
-    Module() = default;
-    Module(const std::string& name, const Location& location);
+    Module(const std::string& name = "", const Location& location = Location());
     void clear();
 
     // Module identification (name is immutable - it's the key in module collection)
@@ -67,8 +66,8 @@ public:
                        Opcode* opcode, int offset,
                        SymbolType type = SymbolType::AddressRelative);
 
-    Symbol* find_symbol(const std::string& name);
-    const Symbol* find_symbol(const std::string& name) const;
+    Symbol* get_symbol(const std::string& name);
+    const Symbol* get_symbol(const std::string& name) const;
     bool has_symbol(const std::string& name) const;
     void clear_symbols();
 

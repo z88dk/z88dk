@@ -271,6 +271,8 @@ public:
     void set_line_number(size_t line_num) override;
     void set_fixed_line_number(size_t line_num) override;
 
+    static int g_provider_calls_in_session; // count of line provider calls in current session
+
 private:
     // Cache-related members
     static TokenCache& get_cache();
@@ -312,8 +314,11 @@ private:
     void inject(const std::string& filename, const std::string& content) override;
 
     // Updated: split into the provided target queue (output or injected)
-    void split_lines(const TokenLine& input_line,
+    void split_lines(const TokenLine& line,
                      std::deque<TokenLine>& target_queue);
+    void split_labels(const TokenLine& line, size_t& i,
+                      std::deque<TokenLine>& target_queue);
+    bool is_define(const TokenLine& line);
 
     // Helper to check cache after opening
     void check_cache();

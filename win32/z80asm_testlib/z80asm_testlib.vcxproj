@@ -19,9 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\assembler.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\ast_node.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\file_cache.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_codegen.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\library.cpp" />
@@ -30,6 +37,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\macros.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\module.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\section.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp" />

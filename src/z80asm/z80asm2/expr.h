@@ -177,6 +177,8 @@ public:
     // If failed (syntax error):
     //   - Leaves i unchanged
     //   - Returns false (caller is responsible for error reporting)
+    bool parse(const TokenLine& line,
+               Module* module, Section* section);
     bool parse(const TokenLine& line, size_t& i,
                Module* module, Section* section);
 

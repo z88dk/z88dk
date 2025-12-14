@@ -52,7 +52,7 @@ static std::vector<TokenLine> run_pp_on_text(const std::string& src,
     TokenLine line;
     std::vector<TokenLine> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line);
         }
     }
@@ -62,7 +62,7 @@ static std::vector<TokenLine> run_pp_on_text(const std::string& src,
 // Extract first integer found from a 'DEFB <int>' line
 static int find_defb_value(const std::vector<TokenLine>& lines) {
     for (const auto& l : lines) {
-        if (!l.empty() && l[0].is(Keyword::DEFB)) {
+        if (!l.tokens().empty() && l.tokens()[0].is(Keyword::DEFB)) {
             for (const auto& t : l.tokens()) {
                 if (t.is(TokenType::Integer)) {
                     return t.int_value();
@@ -490,20 +490,20 @@ TEST_CASE("Preprocessor: include accepts quoted, angle and plain filename forms"
     // Expect included contents to appear in the same order
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "from_quoted");
+    REQUIRE(line.tokens()[0].text() == "from_quoted");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "from_angle");
+    REQUIRE(line.tokens()[0].text() == "from_angle");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "from_plain");
+    REQUIRE(line.tokens()[0].text() == "from_plain");
 
     // finally the sentinel from the original virtual file
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "sentinel");
+    REQUIRE(line.tokens()[0].text() == "sentinel");
     REQUIRE_FALSE(g_errors.has_errors());
 
     // cleanup
@@ -595,14 +595,14 @@ TEST_CASE("Preprocessor: LINE <n> sets logical line numbers for following lines"
     // first returned line should be "first_line" with logical line 100
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "first_line");
+    REQUIRE(line.tokens()[0].text() == "first_line");
     REQUIRE(line.location().line_num() == 100);
     REQUIRE(line.location().filename() == "line_test");
 
     // next returned line should be "second_line" with logical line 101
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "second_line");
+    REQUIRE(line.tokens()[0].text() == "second_line");
     REQUIRE(line.location().line_num() == 101);
     REQUIRE(line.location().filename() == "line_test");
     REQUIRE_FALSE(g_errors.has_errors());
@@ -620,7 +620,7 @@ TEST_CASE("Preprocessor: LINE <n>, \"filename\" sets logical filename and line n
     TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "only_line");
+    REQUIRE(line.tokens()[0].text() == "only_line");
     REQUIRE(line.location().line_num() == 200);
     REQUIRE(line.location().filename() == "other.asm");
     REQUIRE_FALSE(g_errors.has_errors());
@@ -660,14 +660,14 @@ TEST_CASE("Preprocessor: C_LINE <n> sets constant logical line number for follow
     // first returned line should be "one_line" with logical line 400
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "one_line");
+    REQUIRE(line.tokens()[0].text() == "one_line");
     REQUIRE(line.location().line_num() == 400);
     REQUIRE(line.location().filename() == "cline_test");
 
     // next returned line should be "two_line" with the same logical line 400
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "two_line");
+    REQUIRE(line.tokens()[0].text() == "two_line");
     REQUIRE(line.location().line_num() == 400);
     REQUIRE(line.location().filename() == "cline_test");
     REQUIRE_FALSE(g_errors.has_errors());
@@ -685,7 +685,7 @@ TEST_CASE("Preprocessor: C_LINE <n>, \"filename\" sets constant filename and lin
     TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "only_c_line");
+    REQUIRE(line.tokens()[0].text() == "only_c_line");
     REQUIRE(line.location().line_num() == 300);
     REQUIRE(line.location().filename() == "cfile.c");
     REQUIRE_FALSE(g_errors.has_errors());
@@ -903,19 +903,19 @@ TEST_CASE("Preprocessor: LINE accepts quoted, angle-bracketed and plain filename
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "line_q");
+    REQUIRE(line.tokens()[0].text() == "line_q");
     REQUIRE(line.location().line_num() == 10);
     REQUIRE(line.location().filename() == "line_q.asm");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "line_a");
+    REQUIRE(line.tokens()[0].text() == "line_a");
     REQUIRE(line.location().line_num() == 20);
     REQUIRE(line.location().filename() == "line_a.asm");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "line_p");
+    REQUIRE(line.tokens()[0].text() == "line_p");
     REQUIRE(line.location().line_num() == 30);
     REQUIRE(line.location().filename() == "line_p.asm");
     REQUIRE_FALSE(g_errors.has_errors());
@@ -937,19 +937,19 @@ TEST_CASE("Preprocessor: C_LINE accepts quoted, angle-bracketed and plain filena
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "cline_q");
+    REQUIRE(line.tokens()[0].text() == "cline_q");
     REQUIRE(line.location().line_num() == 101);
     REQUIRE(line.location().filename() == "cline_q.c");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "cline_a");
+    REQUIRE(line.tokens()[0].text() == "cline_a");
     REQUIRE(line.location().line_num() == 202);
     REQUIRE(line.location().filename() == "cline_a.c");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "cline_p");
+    REQUIRE(line.tokens()[0].text() == "cline_p");
     REQUIRE(line.location().line_num() == 303);
     REQUIRE(line.location().filename() == "cline_p.c");
     REQUIRE_FALSE(g_errors.has_errors());
@@ -974,29 +974,29 @@ TEST_CASE("Preprocessor: sequence C_LINE then lines then LINE then lines applies
 
     // First logical output: A at 500 (fixed)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "A");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
     REQUIRE(line.location().line_num() == 500);
     REQUIRE(line.location().filename() == "c_fixed.asm");
 
     // Second logical output: B still at 500 (C_LINE does not increment)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "B");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
     REQUIRE(line.location().line_num() == 500);
     REQUIRE(line.location().filename() == "c_fixed.asm");
 
     // Third logical output: C at 700 (LINE sets start)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "C");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "C");
     REQUIRE(line.location().line_num() == 700);
     REQUIRE(line.location().filename() == "l_start.asm");
 
     // Fourth logical output: D at 701 (LINE increments)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "D");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "D");
     REQUIRE(line.location().line_num() == 701);
     REQUIRE(line.location().filename() == "l_start.asm");
 
@@ -1157,9 +1157,9 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "FOO");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "FOO");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1173,18 +1173,18 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].keyword() == Keyword::DEFC);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "X");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 5);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "X");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 5);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "X");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "X");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1198,11 +1198,11 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 2);
-        REQUIRE(line[0].is(TokenType::Integer));
-        REQUIRE(line[0].int_value() == 5);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "more");
+        REQUIRE(line.tokens().size() == 2);
+        REQUIRE(line.tokens()[0].is(TokenType::Integer));
+        REQUIRE(line.tokens()[0].int_value() == 5);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "more");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1216,9 +1216,9 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "FOO");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "FOO");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1232,18 +1232,18 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].keyword() == Keyword::DEFC);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "Y");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 6);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "Y");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 6);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "Y");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "Y");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1257,11 +1257,11 @@ TEST_CASE("Preprocessor: object-like #define and name define expand to replaceme
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 2);
-        REQUIRE(line[0].is(TokenType::Integer));
-        REQUIRE(line[0].int_value() == 6);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "more");
+        REQUIRE(line.tokens().size() == 2);
+        REQUIRE(line.tokens()[0].is(TokenType::Integer));
+        REQUIRE(line.tokens()[0].int_value() == 6);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "more");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1283,18 +1283,18 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].keyword() == Keyword::DEFC);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "A");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 10);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "A");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 10);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "A");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "A");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1309,21 +1309,21 @@ TEST_CASE("Preprocessor: function-like macros expand arguments (arguments are ma
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].keyword() == Keyword::DEFC);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "TWO");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 2);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "TWO");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 2);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 3);
-        REQUIRE(line[0].is(TokenType::Integer));
-        REQUIRE(line[0].int_value() == 1);
-        REQUIRE(line[1].is(TokenType::Plus));
-        REQUIRE(line[2].is(TokenType::Identifier));
-        REQUIRE(line[2].text() == "TWO");
+        REQUIRE(line.tokens().size() == 3);
+        REQUIRE(line.tokens()[0].is(TokenType::Integer));
+        REQUIRE(line.tokens()[0].int_value() == 1);
+        REQUIRE(line.tokens()[1].is(TokenType::Plus));
+        REQUIRE(line.tokens()[2].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[2].text() == "TWO");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1343,18 +1343,18 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         TokenLine line;
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].keyword() == Keyword::DEFC);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "EMPTY");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 1);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "EMPTY");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 1);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "EMPTY");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "EMPTY");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1367,18 +1367,18 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
         TokenLine line;
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].keyword() == Keyword::DEFC);
-        REQUIRE(line[1].is(TokenType::Identifier));
-        REQUIRE(line[1].text() == "E");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 1);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+        REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[1].text() == "E");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 1);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "E");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "E");
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1390,9 +1390,9 @@ TEST_CASE("Preprocessor: empty define body is replaced by integer 1 (both syntax
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Integer));
-        REQUIRE(line[0].int_value() == 1);
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Integer));
+        REQUIRE(line.tokens()[0].int_value() == 1);
 
         REQUIRE_FALSE(pp.next_line(line));
     }
@@ -1447,9 +1447,9 @@ TEST_CASE("Preprocessor: #undef removes macro (#undef name syntax)",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "N");
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "N");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -1831,17 +1831,17 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].text() == "DEFC");
-        REQUIRE(line[1].text() == "A");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 5);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].text() == "DEFC");
+        REQUIRE(line.tokens()[1].text() == "A");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 5);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "A");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "A");
 
         REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
@@ -1856,17 +1856,17 @@ TEST_CASE("Preprocessor: name DEFINE accepts optional '=' before object-like bod
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].text() == "DEFC");
-        REQUIRE(line[1].text() == "B");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 6);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].text() == "DEFC");
+        REQUIRE(line.tokens()[1].text() == "B");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 6);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "B");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "B");
 
         REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
@@ -1884,17 +1884,17 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 4);
-        REQUIRE(line[0].text() == "DEFC");
-        REQUIRE(line[1].text() == "E");
-        REQUIRE(line[2].is(TokenType::EQ));
-        REQUIRE(line[3].is(TokenType::Integer));
-        REQUIRE(line[3].int_value() == 1);
+        REQUIRE(line.tokens().size() == 4);
+        REQUIRE(line.tokens()[0].text() == "DEFC");
+        REQUIRE(line.tokens()[1].text() == "E");
+        REQUIRE(line.tokens()[2].is(TokenType::EQ));
+        REQUIRE(line.tokens()[3].is(TokenType::Integer));
+        REQUIRE(line.tokens()[3].int_value() == 1);
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "E");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "E");
 
         REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
@@ -1909,9 +1909,9 @@ TEST_CASE("Preprocessor: DEFINE '=' with empty body expands to 1 (object and fun
 
         TokenLine line;
         REQUIRE(pp.next_line(line)); // expanded "F(2)"
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Integer));
-        REQUIRE(line[0].int_value() == 1);
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Integer));
+        REQUIRE(line.tokens()[0].int_value() == 1);
         REQUIRE_FALSE(g_errors.has_errors());
     }
 }
@@ -1929,9 +1929,9 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
 
         TokenLine line;
         REQUIRE(pp.next_line(line)); // expanded "A"
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "FOO");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "FOO");
         REQUIRE_FALSE(g_errors.has_errors());
     }
 
@@ -1944,9 +1944,9 @@ TEST_CASE("Preprocessor: prefix DEFINE accepts optional '=' before object-like b
 
         TokenLine line;
         REQUIRE(pp.next_line(line)); // expanded "B"
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(TokenType::Identifier));
-        REQUIRE(line[0].text() == "FOO");
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+        REQUIRE(line.tokens()[0].text() == "FOO");
         REQUIRE_FALSE(g_errors.has_errors());
     }
 }
@@ -1962,16 +1962,16 @@ TEST_CASE("Preprocessor: prefix DEFINE with '=' and empty body expands to 1",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "E");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 1);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "E");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 1);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 1);
-    REQUIRE(line[0].text() == "E");
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].text() == "E");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -2032,9 +2032,9 @@ TEST_CASE("Preprocessor: #UNDEFINE removes macro (synonym to #undef)",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "N");
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "N");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -2064,8 +2064,8 @@ TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at cal
 
     // 1st expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "one");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "one");
     {
         bool has5 = false;
         for (const auto& t : line.tokens()) {
@@ -2081,8 +2081,8 @@ TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at cal
 
     // 2nd expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "two");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "two");
     {
         bool has5 = false;
         for (const auto& t : line.tokens()) {
@@ -2098,8 +2098,8 @@ TEST_CASE("Preprocessor: MACRO (directive form) expands to multiple lines at cal
 
     // Next line after macro expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2123,8 +2123,8 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines a
 
     // 1st expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "A");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
     {
         bool has9 = false;
         for (const auto& t : line.tokens()) {
@@ -2140,8 +2140,8 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines a
 
     // 2nd expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "B");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
     {
         bool has9 = false;
         for (const auto& t : line.tokens()) {
@@ -2157,8 +2157,8 @@ TEST_CASE("Preprocessor: MACRO (name-directive form) expands to multiple lines a
 
     // Next line after macro expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after2");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after2");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2185,8 +2185,8 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parse
 
     // First expanded line: L1 11
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "L1");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "L1");
     {
         bool has11 = false;
         for (const auto& t : line.tokens()) {
@@ -2202,8 +2202,8 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parse
 
     // Second expanded line: L2 22
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "L2");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "L2");
     {
         bool has22 = false;
         for (const auto& t : line.tokens()) {
@@ -2219,8 +2219,8 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (directive form) parse
 
     // Next line after macro expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_np");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_np");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2243,8 +2243,8 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) 
 
     // First expanded line: A 7
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "A");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
     {
         bool has7 = false;
         for (const auto& t : line.tokens()) {
@@ -2260,8 +2260,8 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) 
 
     // Second expanded line: B 8
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "B");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
     {
         bool has8 = false;
         for (const auto& t : line.tokens()) {
@@ -2277,8 +2277,8 @@ TEST_CASE("Preprocessor: MACRO header without parentheses (name-directive form) 
 
     // Next line after macro expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_pair");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_pair");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2305,8 +2305,8 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is acc
 
     // First expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "LHS");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "LHS");
     {
         bool has3 = false;
         for (const auto& t : line.tokens()) {
@@ -2322,8 +2322,8 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is acc
 
     // Second expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "RHS");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "RHS");
     {
         bool has4 = false;
         for (const auto& t : line.tokens()) {
@@ -2339,8 +2339,8 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 (no parentheses) header is acc
 
     // After expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "done");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "done");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2363,8 +2363,8 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parent
 
     // First expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "A");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
     {
         bool has10 = false;
         for (const auto& t : line.tokens()) {
@@ -2380,8 +2380,8 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parent
 
     // Second expanded line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "B");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "B");
     {
         bool has20 = false;
         for (const auto& t : line.tokens()) {
@@ -2397,8 +2397,8 @@ TEST_CASE("Preprocessor: MACRO name param1,param2 header and call without parent
 
     // After expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "end2");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "end2");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2430,8 +2430,8 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
 
     // Expect expansion of IN(12) produced by the nested macro definition
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "L");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "L");
     {
         bool has12 = false;
         for (const auto& t : line.tokens()) {
@@ -2446,8 +2446,8 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
     REQUIRE(line.location().filename() == "nested_dir_inner.asm");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "M");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "M");
     {
         bool has12 = false;
         for (const auto& t : line.tokens()) {
@@ -2463,8 +2463,8 @@ TEST_CASE("Preprocessor: nested MACRO (directive form) is defined during outer e
 
     // Next ordinary line after the nested macro expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_nested");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_nested");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2492,8 +2492,8 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
 
     // First expanded line from INN(3)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "X");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "X");
     {
         bool has3 = false;
         for (const auto& t : line.tokens()) {
@@ -2509,8 +2509,8 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
 
     // Second expanded line from INN(3)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "Y");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "Y");
     {
         bool has3 = false;
         for (const auto& t : line.tokens()) {
@@ -2526,8 +2526,8 @@ TEST_CASE("Preprocessor: nested MACRO (name-directive form) is defined during ou
 
     // Next ordinary line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "tail");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "tail");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2559,15 +2559,15 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 2);
-    REQUIRE(line[0].text() == "A");
-    REQUIRE(line[1].text() == "B");
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == "A");
+    REQUIRE(line.tokens()[1].text() == "B");
     REQUIRE(line.location().line_num() == 700);
     REQUIRE(line.location().filename() == "arg_multiline_1.asm");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_ml");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_ml");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2594,15 +2594,15 @@ TEST_CASE("Preprocessor: function-like macro argument can expand to multiple lin
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 2);
-    REQUIRE(line[0].text() == "X");
-    REQUIRE(line[1].text() == "Y");
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].text() == "X");
+    REQUIRE(line.tokens()[1].text() == "Y");
     REQUIRE(line.location().line_num() == 710);
     REQUIRE(line.location().filename() == "arg_multiline_2.asm");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_ml2");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_ml2");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2695,9 +2695,10 @@ TEST_CASE("Preprocessor: DoubleHash '##' glue with identifier+integer produces m
 TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expansion (labels)",
           "[preprocessor][macro][local][labels]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable renaming
     Preprocessor pp;
 
-    // Macro defines local label 'L' and uses it. Each expansion should rename L -> L_1, L_2, ...
+    // Macro defines local label 'L' and uses it. Each expansion should rename L -> L_0, L_1, ...
     const std::string content =
         "MACRO M()\n"
         "LOCAL L\n"
@@ -2711,14 +2712,14 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
 
     TokenLine line;
 
-    // First expansion: label line ('. L_1') then 'nop' line
+    // First expansion: label line ('. L_0') then 'nop' line
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "L_1");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_0");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     // instruction 'nop' should follow (label removed from instruction line)
     bool saw_nop = false;
     for (const auto& t : line.tokens()) {
@@ -2729,14 +2730,14 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
     }
     REQUIRE(saw_nop);
 
-    // Second expansion: label 'L_2'
+    // Second expansion: label 'L_1'
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "L_2");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_1");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     saw_nop = false;
     for (const auto& t : line.tokens()) {
         if (t.text() == "nop") {
@@ -2748,14 +2749,15 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames local symbols on each expans
 
     // After expansions: next original line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_local");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_local");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per expansion",
           "[preprocessor][macro][local][idents]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable renaming
     Preprocessor pp;
 
     const std::string content =
@@ -2771,53 +2773,52 @@ TEST_CASE("Preprocessor: LOCAL inside macro renames identifiers (non-labels) per
 
     TokenLine line;
 
-    // First expansion: mov tmp_1,5  (tmp renamed)
+    // First expansion: mov tmp_0,5  (tmp renamed)
     REQUIRE(pp.next_line(line));
-    bool found_mov = false, found_tmp1 = false, found_5 = false;
+    bool found_mov = false, found_tmp = false, found_5 = false;
     for (const auto& t : line.tokens()) {
         if (t.text() == "mov") {
             found_mov = true;
         }
-        if (t.text() == "tmp_1") {
-            found_tmp1 = true;
+        if (t.text() == "tmp_0") {
+            found_tmp = true;
         }
         if (t.is(TokenType::Integer) && t.int_value() == 5) {
             found_5 = true;
         }
     }
     REQUIRE(found_mov);
-    REQUIRE(found_tmp1);
+    REQUIRE(found_tmp);
     REQUIRE(found_5);
 
-    // Second expansion: mov tmp_2,6
+    // Second expansion: mov tmp_1,6
     REQUIRE(pp.next_line(line));
-    found_mov = found_tmp1 = found_5 = false;
+    found_mov = found_tmp = found_5 = false;
     for (const auto& t : line.tokens()) {
         if (t.text() == "mov") {
             found_mov = true;
         }
-        if (t.text() == "tmp_2") {
-            found_tmp1 = true;
+        if (t.text() == "tmp_1") {
+            found_tmp = true;
         }
         if (t.is(TokenType::Integer) && t.int_value() == 6) {
             found_5 = true;
         }
     }
     REQUIRE(found_mov);
-    REQUIRE(found_tmp1);
+    REQUIRE(found_tmp);
     REQUIRE(found_5);
 
     // After expansions
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "done_local");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "done_local");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-// New test: LOCAL outside a macro definition is ignored (not emitted)
-TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
+TEST_CASE("Preprocessor: LOCAL outside macro definition raises error",
           "[preprocessor][local][outside]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Preprocessor pp;
 
     // LOCAL appears outside any MACRO; it should be treated as a directive-like
@@ -2832,14 +2833,16 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
 
     // First returned logical line must be the 'after' line.
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
 
     // No further output expected.
     REQUIRE_FALSE(pp.next_line(line));
 
-    // No errors should have been reported.
-    REQUIRE_FALSE(g_errors.has_errors());
+    // Ensure an error was recorded due to LOCAL outside construct
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
@@ -2849,6 +2852,7 @@ TEST_CASE("Preprocessor: LOCAL outside macro definition is ignored",
 TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner LOCAL handled when sub-macro is parsed",
           "[preprocessor][macro][local][nested]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable renaming
     Preprocessor pp;
 
     // OUT has its own LOCAL L and defines a sub-macro IN with its own LOCAL J.
@@ -2874,8 +2878,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     // OUT() expansion at call-site line 1000
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "L_1");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_0");
     REQUIRE(line.location().line_num() == 1000);
     REQUIRE(line.location().filename() == "local_nested.asm");
 
@@ -2896,9 +2900,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
     // IN() is invoked on the next physical line -> call-site line 1001
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() ==
-            "J_2"); // inner local renamed on its own expansion
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "J_0"); // inner local renamed on its own expansion
     REQUIRE(line.location().line_num() == 1001);
     REQUIRE(line.location().filename() == "local_nested.asm");
 
@@ -2918,8 +2921,8 @@ TEST_CASE("Preprocessor: nested LOCAL - only top-level LOCAL is handled; inner L
 
     // Next ordinary line
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_nested_locals");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_nested_locals");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2947,15 +2950,15 @@ TEST_CASE("Preprocessor: EXITM inside MACRO aborts the current macro expansion",
 
     // Only the lines before EXITM ("A") should be emitted from the macro
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "A");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "A");
     REQUIRE(line.location().line_num() == 111);
     REQUIRE(line.location().filename() == "exitm_call.asm");
 
     // Next should be the line after the macro call in the original file
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -2971,8 +2974,8 @@ TEST_CASE("Preprocessor: EXITM outside of macro is ignored",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "X");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "X");
 
     // No other lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -3145,8 +3148,8 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
 
     // Tokenize the string and define an object-like macro that expands to multiple lines.
     // This emulates Preprocessor::define_macro(name, std::string).
-    TokenFileReader tf(macro_text, "<macro_define_string>", 1, false);
-    pp.define_macro("ML", tf.tok_lines());
+    Location loc("<macro_define_string>", 1);
+    pp.define_macro("ML", loc, macro_text);
 
     // Use a LINE directive to fix the call-site logical location and then invoke the macro.
     const std::string content =
@@ -3159,8 +3162,8 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
 
     // First expanded line: "LHS 10"
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "LHS");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "LHS");
     {
         bool has10 = false;
         for (const auto& t : line.tokens()) {
@@ -3176,8 +3179,8 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
 
     // Second expanded line: "RHS 20"
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "RHS");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "RHS");
     {
         bool has20 = false;
         for (const auto& t : line.tokens()) {
@@ -3193,8 +3196,8 @@ TEST_CASE("Preprocessor: define_macro from string content with multiple lines ex
 
     // Next original line after the macro expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "tail");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "tail");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3209,8 +3212,8 @@ TEST_CASE("Preprocessor: define_macro from string content with label splits labe
         "ret\n";
 
     // Tokenize string and define macro.
-    TokenFileReader tf(macro_text, "<macro_define_label>", 1, false);
-    pp.define_macro("BLK", tf.tok_lines());
+    Location loc("<macro_define_label>", 1);
+    pp.define_macro("BLK", loc, macro_text);
 
     // Fix call-site location and invoke the macro.
     const std::string content =
@@ -3224,8 +3227,8 @@ TEST_CASE("Preprocessor: define_macro from string content with label splits labe
     // Label line emitted first: ". LBL"
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "LBL");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "LBL");
     REQUIRE(line.location().line_num() == 1234);
     REQUIRE(line.location().filename() == "call_define_label.asm");
 
@@ -3261,8 +3264,8 @@ TEST_CASE("Preprocessor: define_macro from string content with label splits labe
 
     // Next original line after expansion
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3276,7 +3279,8 @@ TEST_CASE("Preprocessor: define_macro(name, string) expands multi-line body at c
     Preprocessor pp;
 
     // Define an object-like macro from a raw multi-line string
-    pp.define_macro("S", "text\nwith\nseveral\nlines");
+    Location loc("<macro_define_string_simple>", 1);
+    pp.define_macro("S", loc, "text\nwith\nseveral\nlines");
 
     // Fix the call-site location; invoking S should emit four lines at line 42
     const std::string content =
@@ -3290,16 +3294,16 @@ TEST_CASE("Preprocessor: define_macro(name, string) expands multi-line body at c
     const std::vector<std::string> expected = { "text", "with", "several", "lines" };
     for (const auto& word : expected) {
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == word);
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == word);
         REQUIRE(line.location().line_num() == 42);
         REQUIRE(line.location().filename() == "call_define_string.asm");
     }
 
     // Next ordinary line from the original file
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
@@ -3312,8 +3316,9 @@ TEST_CASE("Preprocessor: define_macro(name, string) reports MacroRedefined on re
     g_errors.reset();
     Preprocessor pp;
 
-    pp.define_macro("A", "1\n");
-    pp.define_macro("A", "2\n"); // redefinition should be reported
+    Location loc("<macro_define_redef>", 1);
+    pp.define_macro("A", loc, "1\n");
+    pp.define_macro("A", loc, "2\n"); // redefinition should be reported
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
@@ -3328,14 +3333,14 @@ TEST_CASE("Preprocessor: define_macro(name, tok_lines) reports MacroRedefined on
 
     // first definition via tok_lines
     {
-        TokenFileReader tf("X 10\n", "<macro_vec_1>", 1, false);
-        pp.define_macro("B", tf.tok_lines());
+        Location loc("<macro_vec_1>", 1);
+        pp.define_macro("B", loc, "X 10\n");
     }
 
     // second definition via tok_lines (same name) triggers error
     {
-        TokenFileReader tf2("X 20\n", "<macro_vec_2>", 1, false);
-        pp.define_macro("B", tf2.tok_lines());
+        Location loc("<macro_vec_2>", 1);
+        pp.define_macro("B", loc, "X 20\n");
     }
 
     REQUIRE(g_errors.has_errors());
@@ -3368,8 +3373,8 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
 
         // First returned line should be the one after the REPT block (no Z0 lines)
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "after0");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "after0");
 
         // No further lines
         REQUIRE_FALSE(pp.next_line(line));
@@ -3393,8 +3398,8 @@ TEST_CASE("Preprocessor: REPT with zero and negative counts emits no lines",
 
         // First returned line should be the one after the REPT block (no NEG lines)
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "after_neg");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "after_neg");
 
         // No further lines
         REQUIRE_FALSE(pp.next_line(line));
@@ -3425,18 +3430,16 @@ TEST_CASE("Preprocessor: REPT with undefined expression is rejected and body con
     REQUIRE(produced == 0);
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Undefined symbol: A") != std::string::npos);
-    REQUIRE(msg.find("rept_nonconst:3:") != std::string::npos);
+    REQUIRE(msg.find("Expected constant expression") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body consumed",
           "[preprocessor][rept][error][nonconst]") {
     g_errors.reset();
     Preprocessor pp;
-    auto a = std::make_shared<Symbol>("A");
-    a->set_defined(true);
-    a->set_constant(false);
-    pp.pp_symtab().add_symbol("A", a);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("A", loc, pp.pp_current_section()->last_opcode(), 0, SymbolType::AddressRelative);
 
     // 'A' is undefined -> non-constant expression for REPT count
     const std::string content =
@@ -3455,17 +3458,16 @@ TEST_CASE("Preprocessor: REPT with non-constant expression is rejected and body 
     REQUIRE(produced == 0);
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Not constant symbol: A") != std::string::npos);
-    REQUIRE(msg.find("rept_nonconst:3:") != std::string::npos);
+    REQUIRE(msg.find("Expected constant expression") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consumed",
           "[preprocessor][rept][error][nonconst]") {
     g_errors.reset();
     Preprocessor pp;
-    auto a = std::make_shared<Symbol>("A");
-    a->set_extern(true);
-    pp.pp_symtab().add_symbol("A", a);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("A", loc);
 
     // 'A' is undefined -> non-constant expression for REPT count
     const std::string content =
@@ -3484,8 +3486,8 @@ TEST_CASE("Preprocessor: REPT with extern expression is rejected and body consum
     REQUIRE(produced == 0);
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Extern symbol: A") != std::string::npos);
-    REQUIRE(msg.find("rept_nonconst:3:") != std::string::npos);
+    REQUIRE(msg.find("Expected constant expression") != std::string::npos);
+    REQUIRE(msg.find("rept_nonconst:1:") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: nested REPT repeats inner body correctly",
@@ -3882,19 +3884,19 @@ TEST_CASE("Preprocessor: REPTI argument can be a macro producing multiple tokens
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "EXPR");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 3);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "EXPR");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 3);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 2);
-    REQUIRE(line[0].text() == "X");
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "EXPR");
+    REQUIRE(line.tokens().size() == 2);
+    REQUIRE(line.tokens()[0].text() == "X");
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "EXPR");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -3993,6 +3995,7 @@ TEST_CASE("Preprocessor: nested REPTI duplicates body for the cartesian product 
 TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
           "[preprocessor][rept][local][labels]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable results
     Preprocessor pp;
 
     const std::string content =
@@ -4008,8 +4011,8 @@ TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
     // 1st iteration label
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "L_1");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_0");
 
     // 1st iteration body line
     REQUIRE(pp.next_line(line));
@@ -4027,8 +4030,8 @@ TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
     // 2nd iteration label
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "L_2");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "L_1");
 
     // 2nd iteration body line
     REQUIRE(pp.next_line(line));
@@ -4045,14 +4048,15 @@ TEST_CASE("Preprocessor: REPT LOCAL renames local labels per iteration",
 
     // After block
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_rept_local");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_rept_local");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
           "[preprocessor][rept][local][idents]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable results
     Preprocessor pp;
 
     const std::string content =
@@ -4065,9 +4069,24 @@ TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
 
     TokenLine line;
 
-    // 1st iteration: 'use t_1'
+    // 1st iteration: 'use t_0'
     REQUIRE(pp.next_line(line));
-    bool saw_use = false, saw_t1 = false;
+    bool saw_use = false, saw_t0 = false;
+    for (const auto& t : line.tokens()) {
+        if (t.text() == "use") {
+            saw_use = true;
+        }
+        if (t.text() == "t_0") {
+            saw_t0 = true;
+        }
+    }
+    REQUIRE(saw_use);
+    REQUIRE(saw_t0);
+
+    // 2nd iteration: 'use t_1'
+    REQUIRE(pp.next_line(line));
+    saw_use = false;
+    bool saw_t1 = false;
     for (const auto& t : line.tokens()) {
         if (t.text() == "use") {
             saw_use = true;
@@ -4079,31 +4098,17 @@ TEST_CASE("Preprocessor: REPT LOCAL renames identifiers per iteration",
     REQUIRE(saw_use);
     REQUIRE(saw_t1);
 
-    // 2nd iteration: 'use t_2'
-    REQUIRE(pp.next_line(line));
-    saw_use = false;
-    bool saw_t2 = false;
-    for (const auto& t : line.tokens()) {
-        if (t.text() == "use") {
-            saw_use = true;
-        }
-        if (t.text() == "t_2") {
-            saw_t2 = true;
-        }
-    }
-    REQUIRE(saw_use);
-    REQUIRE(saw_t2);
-
     // After block
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_rept_local_id");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_rept_local_id");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substitutes variable",
           "[preprocessor][reptc][local]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable results
     Preprocessor pp;
 
     // For each character, we get a unique label and 'defb <charcode>'
@@ -4117,11 +4122,11 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
 
     TokenLine line;
 
-    // 1st iter label '. lab_1'
+    // 1st iter label '. lab_0'
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "lab_1");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "lab_0");
 
     // 1st iter body: 'defb 65'
     REQUIRE(pp.next_line(line));
@@ -4139,11 +4144,11 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
         REQUIRE(hasA);
     }
 
-    // 2nd iter label '. lab_2'
+    // 2nd iter label '. lab_1'
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "lab_2");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "lab_1");
 
     // 2nd iter body: 'defb 90'
     REQUIRE(pp.next_line(line));
@@ -4163,14 +4168,15 @@ TEST_CASE("Preprocessor: REPTC LOCAL renames per character iteration and substit
 
     // After block
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_reptc_local");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_reptc_local");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitutes variable",
           "[preprocessor][repti][local]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable results
     Preprocessor pp;
 
     const std::string content =
@@ -4183,11 +4189,11 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
 
     TokenLine line;
 
-    // 1st iter label '. p_1'
+    // 1st iter label '. p_0'
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "p_1");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "p_0");
 
     // 1st iter body: 'db 7'
     REQUIRE(pp.next_line(line));
@@ -4205,11 +4211,11 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
         REQUIRE(has7);
     }
 
-    // 2nd iter label '. p_2'
+    // 2nd iter label '. p_1'
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 2);
-    REQUIRE(line[0].text() == ".");
-    REQUIRE(line[1].text() == "p_2");
+    REQUIRE(line.tokens()[0].text() == ".");
+    REQUIRE(line.tokens()[1].text() == "p_1");
 
     // 2nd iter body: 'db 8'
     REQUIRE(pp.next_line(line));
@@ -4229,14 +4235,15 @@ TEST_CASE("Preprocessor: REPTI LOCAL renames per argument iteration and substitu
 
     // After block
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "after_repti_local");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "after_repti_local");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
 TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument tokens",
           "[preprocessor][repti][local][arg-preserve]") {
     g_errors.reset();
+    g_unique_id_counter = 0; // reset unique ID counter for predictable results
     Preprocessor pp;
 
     // Local name equals an argument value; ensure inserted argument token is not renamed.
@@ -4249,7 +4256,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument
 
     TokenLine line;
 
-    // First output line: 'emit tmp' (not 'tmp_1')
+    // First output line: 'emit tmp' (not 'tmp_0')
     REQUIRE(pp.next_line(line));
     {
         bool saw_emit = false, saw_tmp_literal = false, saw_tmp_renamed = false;
@@ -4260,7 +4267,7 @@ TEST_CASE("Preprocessor: REPTI LOCAL does not rename inside substituted argument
             if (t.text() == "tmp") {
                 saw_tmp_literal = true;
             }
-            if (t.text() == "tmp_1") {
+            if (t.text() == "tmp_0") {
                 saw_tmp_renamed = true;
             }
         }
@@ -4337,31 +4344,31 @@ TEST_CASE("Preprocessor: name-directive EQU expands RHS macros and preserves tok
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "A");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 10);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "A");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 10);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "B");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 20);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "B");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 20);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 6);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "SUM");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Identifier));
-    REQUIRE(line[3].text() == "A");
-    REQUIRE(line[4].is(TokenType::Plus));
-    REQUIRE(line[5].is(TokenType::Identifier));
-    REQUIRE(line[5].text() == "B");
+    REQUIRE(line.tokens().size() == 6);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "SUM");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[3].text() == "A");
+    REQUIRE(line.tokens()[4].is(TokenType::Plus));
+    REQUIRE(line.tokens()[5].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[5].text() == "B");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4403,20 +4410,20 @@ TEST_CASE("Preprocessor: directive EQU without '=' 'EQU Z A' expands A and emits
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "A");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 42);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "A");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 42);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "Z");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Identifier));
-    REQUIRE(line[3].text() == "A");
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "Z");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[3].text() == "A");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4434,20 +4441,20 @@ TEST_CASE("Preprocessor: name-directive EQU accepts optional '=' after EQU",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "A");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 3);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "A");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 3);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "W");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Identifier));
-    REQUIRE(line[3].text() == "A");
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "W");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[3].text() == "A");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4545,20 +4552,20 @@ TEST_CASE("Preprocessor: '=' synonym macro-expands RHS (x = A -> DEFC x = 5)",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "A");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 5);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "A");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 5);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "x");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Identifier));
-    REQUIRE(line[3].text() == "A");
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "x");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[3].text() == "A");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4672,26 +4679,26 @@ TEST_CASE("Preprocessor: nested IF with inner ELIF selects correct branches",
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "DEFC A = 1");
 
     // Outer IF true -> "X" emitted
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "X");
     REQUIRE(line.location().line_num() == 102);
     REQUIRE(line.location().filename() == "ifnest.asm");
 
     // Inner IF false, ELIF true -> "Z" emitted
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "Z");
     REQUIRE(line.location().line_num() == 106);
     REQUIRE(line.location().filename() == "ifnest.asm");
 
     // After the whole IF block
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "after");
 
     // No more lines
@@ -4732,17 +4739,17 @@ TEST_CASE("Preprocessor: outer IF false, ELIF true with nested IF-ELSE picks ELI
 
     // Should select ELIF branch
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "ELIF_BRANCH");
 
     // Inside ELIF branch the inner IF 0 -> ELSE path selected
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "INNER_ELSE");
 
     // After full conditional group
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "done");
 
     REQUIRE_FALSE(pp.next_line(line));
@@ -4771,15 +4778,15 @@ TEST_CASE("Preprocessor: IF with multiple ELIF selects first true and ignores th
 
     // Only the first matching ELIF branch ("TWO") should be emitted
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "v");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 2);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "v");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 2);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "TWO");
 
     // No more lines from this block
@@ -4797,11 +4804,8 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
     Preprocessor pp;
 
     // Define A as a constant with value 1
-    auto A = std::make_shared<Symbol>("A");
-    A->set_value(1);
-    A->set_defined(true);
-    A->set_constant(true);
-    pp.pp_symtab().add_symbol("A", A);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("A", loc, 1, SymbolType::Constant);
 
     const std::string content =
         "IF A\n"
@@ -4815,7 +4819,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 1 as true",
 
     // Expect IF branch selected
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "OK1");
 
     // No more lines
@@ -4829,11 +4833,8 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects EL
     Preprocessor pp;
 
     // Define Z as a constant with value 0
-    auto Z = std::make_shared<Symbol>("Z");
-    Z->set_value(0);
-    Z->set_defined(true);
-    Z->set_constant(true);
-    pp.pp_symtab().add_symbol("Z", Z);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("Z", loc, 0, SymbolType::Constant);
 
     const std::string content =
         "IF Z\n"
@@ -4847,7 +4848,7 @@ TEST_CASE("Preprocessor: IF uses constant symbol value 0 as false and selects EL
 
     // Expect ELSE branch selected
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "OK0");
 
     // No more lines
@@ -4872,7 +4873,7 @@ TEST_CASE("Preprocessor: IF with undefined symbol does not report error and sele
 
     // Expect ELSE branch selected due to undefined symbol evaluating as false
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "ELSE_OK");
 
     // No more lines
@@ -4902,16 +4903,16 @@ TEST_CASE("Preprocessor: IFDEF selects true branch when macro is defined",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "M");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 1);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "M");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 1);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "T");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4932,7 +4933,7 @@ TEST_CASE("Preprocessor: IFNDEF selects true branch when macro is not defined",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
+    REQUIRE(!line.tokens().empty());
     REQUIRE(line.to_string() == "MISSING_TRUE");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4956,16 +4957,16 @@ TEST_CASE("Preprocessor: ELIFDEF after false IF selects when macro is defined",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].text() == "DEFC");
-    REQUIRE(line[1].text() == "A");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 1);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].text() == "DEFC");
+    REQUIRE(line.tokens()[1].text() == "A");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 1);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 1);
-    REQUIRE(line[0].text() == "ELIFDEF_TRUE");
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].text() == "ELIFDEF_TRUE");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -4988,8 +4989,8 @@ TEST_CASE("Preprocessor: ELIFNDEF after false IF selects when macro is not defin
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "ELIFNDEF_TRUE");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELIFNDEF_TRUE");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -5038,11 +5039,8 @@ TEST_CASE("Preprocessor: IFDEF uses symbol table definition when macro is absent
     Preprocessor pp;
 
     // Define symbol S in the global symbol table (no macro named S)
-    auto s = std::make_shared<Symbol>("S");
-    s->set_defined(true);
-    s->set_constant(true);
-    s->set_value(1);
-    pp.pp_symtab().add_symbol("S", s);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("S", loc, 1, SymbolType::Constant);
 
     const std::string content =
         "IFDEF S\n"
@@ -5054,8 +5052,8 @@ TEST_CASE("Preprocessor: IFDEF uses symbol table definition when macro is absent
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "OK_S_DEFINED");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK_S_DEFINED");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -5067,11 +5065,8 @@ TEST_CASE("Preprocessor: IFNDEF is false when symbol is defined in symbol table"
     Preprocessor pp;
 
     // Define symbol Z as present in the symbol table
-    auto z = std::make_shared<Symbol>("Z");
-    z->set_defined(true);
-    z->set_constant(true);
-    z->set_value(0);
-    pp.pp_symtab().add_symbol("Z", z);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("Z", loc, 0, SymbolType::Constant);
 
     const std::string content =
         "IFNDEF Z\n"
@@ -5083,8 +5078,8 @@ TEST_CASE("Preprocessor: IFNDEF is false when symbol is defined in symbol table"
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "OK_Z_DEFINED");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "OK_Z_DEFINED");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -5096,11 +5091,8 @@ TEST_CASE("Preprocessor: ELIFDEF selects when symbol is defined in symbol table"
     Preprocessor pp;
 
     // Define A in the symbol table
-    auto a = std::make_shared<Symbol>("A");
-    a->set_defined(true);
-    a->set_constant(true);
-    a->set_value(123);
-    pp.pp_symtab().add_symbol("A", a);
+    Location loc("<test>", 1);
+    pp.pp_module()->add_symbol("A", loc, 123, SymbolType::Constant);
 
     const std::string content =
         "IF 0\n"
@@ -5114,8 +5106,8 @@ TEST_CASE("Preprocessor: ELIFDEF selects when symbol is defined in symbol table"
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "ELIFDEF_OK");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ELIFDEF_OK");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -5140,8 +5132,8 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "ELIFNDEF_OK");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "ELIFNDEF_OK");
 
         REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
@@ -5152,11 +5144,8 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
         g_errors.reset();
         Preprocessor pp;
 
-        auto b = std::make_shared<Symbol>("B");
-        b->set_defined(true);
-        b->set_constant(true);
-        b->set_value(7);
-        pp.pp_symtab().add_symbol("B", b);
+        Location loc("<test>", 1);
+        pp.pp_module()->add_symbol("B", loc, 7, SymbolType::Constant);
 
         const std::string content =
             "IF 0\n"
@@ -5170,8 +5159,8 @@ TEST_CASE("Preprocessor: ELIFNDEF selects when symbol is NOT defined in symbol t
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "ELSE_OK");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "ELSE_OK");
 
         REQUIRE_FALSE(pp.next_line(line));
         REQUIRE_FALSE(g_errors.has_errors());
@@ -5350,8 +5339,8 @@ TEST_CASE("Preprocessor: same file can be included multiple times if not recursi
     TokenLine line;
     std::vector<std::string> lines;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -5421,7 +5410,7 @@ TEST_CASE("Preprocessor: path normalization prevents redundant path forms from a
 TEST_CASE("Preprocessor: file cache reuses unchanged files",
           "[preprocessor][cache][hit]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string fname = "cache_test1.asm";
 
@@ -5438,8 +5427,8 @@ TEST_CASE("Preprocessor: file cache reuses unchanged files",
 
     TokenLine line1;
     REQUIRE(pp1.next_line(line1));
-    REQUIRE(!line1.empty());
-    REQUIRE(line1[0].text() == "test_line");
+    REQUIRE(!line1.tokens().empty());
+    REQUIRE(line1.tokens()[0].text() == "test_line");
 
     // Second preprocessor instance - should hit cache
     Preprocessor pp2;
@@ -5447,8 +5436,8 @@ TEST_CASE("Preprocessor: file cache reuses unchanged files",
 
     TokenLine line2;
     REQUIRE(pp2.next_line(line2));
-    REQUIRE(!line2.empty());
-    REQUIRE(line2[0].text() == "test_line");
+    REQUIRE(!line2.tokens().empty());
+    REQUIRE(line2.tokens()[0].text() == "test_line");
     REQUIRE_FALSE(g_errors.has_errors());
 
     std::remove(fname.c_str());
@@ -5457,7 +5446,7 @@ TEST_CASE("Preprocessor: file cache reuses unchanged files",
 TEST_CASE("Preprocessor: file cache works with multiple includes",
           "[preprocessor][cache][multiple]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc1 = "cache_inc1.asm";
     const std::string inc2 = "cache_inc2.asm";
@@ -5490,8 +5479,8 @@ TEST_CASE("Preprocessor: file cache works with multiple includes",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -5511,7 +5500,7 @@ TEST_CASE("Preprocessor: file cache works with multiple includes",
 TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
           "[preprocessor][cache][shared]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string fname = "cache_shared.asm";
 
@@ -5529,8 +5518,8 @@ TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
 
         TokenLine line;
         REQUIRE(pp1.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "shared_content");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "shared_content");
     }
 
     // Second instance should use cached version
@@ -5541,58 +5530,8 @@ TEST_CASE("Preprocessor: file cache shared across preprocessor instances",
 
         TokenLine line;
         REQUIRE(pp2.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "shared_content");
-    }
-    REQUIRE_FALSE(g_errors.has_errors());
-
-    std::remove(fname.c_str());
-}
-
-TEST_CASE("Preprocessor: clear_file_cache empties the cache",
-          "[preprocessor][cache][clear]") {
-    g_errors.reset();
-    Preprocessor::clear_file_cache();
-
-    const std::string fname = "cache_clear.asm";
-
-    // Create test file
-    {
-        std::ofstream ofs(fname, std::ios::binary);
-        REQUIRE(ofs.is_open());
-        ofs << "before_clear\n";
-    }
-
-    // Read file to populate cache
-    {
-        Preprocessor pp;
-        pp.push_file(fname);
-
-        TokenLine line;
-        REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "before_clear");
-    }
-
-    // Clear cache
-    Preprocessor::clear_file_cache();
-
-    // Modify file without waiting (since cache is cleared, modification time doesn't matter)
-    {
-        std::ofstream ofs(fname, std::ios::binary);
-        REQUIRE(ofs.is_open());
-        ofs << "after_clear\n";
-    }
-
-    // Read again - should get new content (cache was cleared)
-    {
-        Preprocessor pp;
-        pp.push_file(fname);
-
-        TokenLine line;
-        REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "after_clear");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "shared_content");
     }
     REQUIRE_FALSE(g_errors.has_errors());
 
@@ -5602,7 +5541,7 @@ TEST_CASE("Preprocessor: clear_file_cache empties the cache",
 TEST_CASE("Preprocessor: file cache handles path normalization",
           "[preprocessor][cache][normalize]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string fname = "cache_norm.asm";
 
@@ -5620,8 +5559,8 @@ TEST_CASE("Preprocessor: file cache handles path normalization",
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "normalized");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "normalized");
     }
 
     // Read with relative path (./ prefix) - should use same cache entry
@@ -5631,8 +5570,8 @@ TEST_CASE("Preprocessor: file cache handles path normalization",
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "normalized");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "normalized");
     }
     REQUIRE_FALSE(g_errors.has_errors());
 
@@ -5642,7 +5581,7 @@ TEST_CASE("Preprocessor: file cache handles path normalization",
 TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
           "[preprocessor][cache][nested]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string common = "cache_common.asm";
     const std::string level1a = "cache_level1a.asm";
@@ -5686,8 +5625,8 @@ TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -5709,7 +5648,7 @@ TEST_CASE("Preprocessor: file cache handles nested includes efficiently",
 TEST_CASE("Preprocessor: file cache invalidates on file modification",
           "[preprocessor][cache][invalidate]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string fname = "cache_test2.asm";
 
@@ -5727,8 +5666,8 @@ TEST_CASE("Preprocessor: file cache invalidates on file modification",
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "original_line");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "original_line");
     }
 
     // Wait to ensure different modification time
@@ -5748,8 +5687,8 @@ TEST_CASE("Preprocessor: file cache invalidates on file modification",
 
         TokenLine line;
         REQUIRE(pp.next_line(line));
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "modified_line");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "modified_line");
     }
     REQUIRE_FALSE(g_errors.has_errors());
 
@@ -5945,14 +5884,14 @@ TEST_CASE("Preprocessor: LINE with negative line number is accepted (implementat
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.location().line_num() == -5);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].text() == "test");
+    REQUIRE(line.location().line_num() == static_cast<size_t>(-5));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "test");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.location().line_num() == -4);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].text() == "this");
+    REQUIRE(line.location().line_num() == static_cast<size_t>(-4));
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "this");
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -5970,8 +5909,8 @@ TEST_CASE("Preprocessor: LINE with trailing tokens after filename ignores them",
     TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 100);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].text() == "this");
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].text() == "this");
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -5997,7 +5936,7 @@ TEST_CASE("Preprocessor: function-like macro with too few arguments reports erro
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("argument count mismatch") != std::string::npos);
+    REQUIRE(msg.find("Macro argument count mismatch for: ADD1") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: function-like macro with too many arguments reports error",
@@ -6015,7 +5954,7 @@ TEST_CASE("Preprocessor: function-like macro with too many arguments reports err
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("argument count mismatch") != std::string::npos);
+    REQUIRE(msg.find("Macro argument count mismatch for: ADD1") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: function-like macro with empty parentheses when expecting args reports error",
@@ -6033,7 +5972,7 @@ TEST_CASE("Preprocessor: function-like macro with empty parentheses when expecti
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("argument count mismatch") != std::string::npos);
+    REQUIRE(msg.find("Macro argument count mismatch for: MUL") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
@@ -6064,8 +6003,8 @@ TEST_CASE("Preprocessor: EXITM in nested macro only exits innermost macro",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6101,8 +6040,8 @@ TEST_CASE("Preprocessor: multiple EXITM in same macro - first one takes effect",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6129,10 +6068,10 @@ TEST_CASE("Preprocessor: token paste at beginning of replacement list",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 2);
-    REQUIRE(line[0].is(TokenType::DoubleHash));
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "test");
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].is(TokenType::DoubleHash));
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "test");
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -6151,10 +6090,10 @@ TEST_CASE("Preprocessor: token paste at end of replacement list",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 2);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "test");
-    REQUIRE(line[1].is(TokenType::DoubleHash));
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "test");
+    REQUIRE(line.tokens()[1].is(TokenType::DoubleHash));
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -6202,15 +6141,15 @@ TEST_CASE("Preprocessor: stringize with whitespace-only argument",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() >= 5);
-    REQUIRE(line[0].is(TokenType::Integer));
-    REQUIRE(line[0].int_value() == 34);     // quotes
-    REQUIRE(line[1].is(TokenType::Comma));
-    REQUIRE(line[2].is(TokenType::Integer));
-    REQUIRE(line[2].int_value() == 32);     // space
-    REQUIRE(line[3].is(TokenType::Comma));
-    REQUIRE(line[4].is(TokenType::Integer));
-    REQUIRE(line[4].int_value() == 34);     // quotes
+    REQUIRE(line.tokens().size() >= 5);
+    REQUIRE(line.tokens()[0].is(TokenType::Integer));
+    REQUIRE(line.tokens()[0].int_value() == 34);     // quotes
+    REQUIRE(line.tokens()[1].is(TokenType::Comma));
+    REQUIRE(line.tokens()[2].is(TokenType::Integer));
+    REQUIRE(line.tokens()[2].int_value() == 32);     // space
+    REQUIRE(line.tokens()[3].is(TokenType::Comma));
+    REQUIRE(line.tokens()[4].is(TokenType::Integer));
+    REQUIRE(line.tokens()[4].int_value() == 34);     // quotes
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -6429,7 +6368,7 @@ TEST_CASE("Preprocessor: MACRO with duplicate parameter names reports error",
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
+    REQUIRE(msg.find("Parameter redefined: a") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
@@ -6481,7 +6420,7 @@ TEST_CASE("Preprocessor: virtual file with only comments produces no output line
     TokenLine line;
     int line_count = 0;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             ++line_count;
         }
     }
@@ -6623,8 +6562,8 @@ TEST_CASE("Preprocessor: EXITM inside IF with true condition exits macro",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6658,8 +6597,8 @@ TEST_CASE("Preprocessor: EXITM inside IF with false condition does not exit macr
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6696,8 +6635,8 @@ TEST_CASE("Preprocessor: EXITM in ELSE branch exits when IF condition is false",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6737,8 +6676,8 @@ TEST_CASE("Preprocessor: nested IF with EXITM - inner condition controls exit",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6778,8 +6717,8 @@ TEST_CASE("Preprocessor: nested IF with EXITM - inner true condition exits macro
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6818,8 +6757,8 @@ TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
         std::vector<std::string> lines;
 
         while (pp.next_line(line)) {
-            if (!line.empty()) {
-                lines.push_back(line[0].text());
+            if (!line.tokens().empty()) {
+                lines.push_back(line.tokens()[0].text());
             }
         }
 
@@ -6849,8 +6788,8 @@ TEST_CASE("Preprocessor: EXITM with IFDEF/IFNDEF conditionals",
         std::vector<std::string> lines;
 
         while (pp2.next_line(line)) {
-            if (!line.empty()) {
-                lines.push_back(line[0].text());
+            if (!line.tokens().empty()) {
+                lines.push_back(line.tokens()[0].text());
             }
         }
 
@@ -6888,8 +6827,8 @@ TEST_CASE("Preprocessor: EXITM with ELIF branch",
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -6932,8 +6871,8 @@ TEST_CASE("Preprocessor: multiple EXITMs in different IF branches - only execute
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            lines.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -7003,7 +6942,7 @@ TEST_CASE("Preprocessor: outer IF missing ENDIF is reported even when inner bloc
 TEST_CASE("Preprocessor: dependency_filenames captures push_file and #include in order with duplicates",
           "[preprocessor][deps][include][order][dups]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
     Preprocessor pp;
 
     const std::string inc1 = "dep_inc1.asm";
@@ -7288,12 +7227,12 @@ TEST_CASE("Preprocessor: identifier before ':' is a label only when not a direct
         REQUIRE(msg.find("Expected identifier after EQU") != std::string::npos);
         g_errors.reset();
 
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(Keyword::NOP));
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(Keyword::NOP));
 
         REQUIRE(pp.next_line(line));
-        REQUIRE(line.size() == 1);
-        REQUIRE(line[0].is(Keyword::HALT));
+        REQUIRE(line.tokens().size() == 1);
+        REQUIRE(line.tokens()[0].is(Keyword::HALT));
 
         REQUIRE_FALSE(pp.next_line(line));
 
@@ -7348,16 +7287,16 @@ TEST_CASE("Preprocessor: object-like macros cascade (A -> B -> C -> 123)",
 
     TokenLine line;
     REQUIRE(pp.next_line(line)); // DEFC C=123
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].keyword() == Keyword::C);
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 123);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].keyword() == Keyword::C);
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 123);
 
     REQUIRE(pp.next_line(line)); // expanded "A"->"B"->"C"
-    REQUIRE(line.size() == 1);
-    REQUIRE(line[0].keyword() == Keyword::C);
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::C);
 
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7433,16 +7372,16 @@ TEST_CASE("Preprocessor: 'NOP:' is not treated as a label (labels cannot be inst
     REQUIRE(lines.size() == 2);
 
     // First line must start with identifier "NOP" (not a label line ".NOP")
-    REQUIRE(lines[0].size() >= 1);
-    REQUIRE(lines[0][0].is(TokenType::Identifier));
-    REQUIRE(lines[0][0].text() == "NOP");
+    REQUIRE(lines[0].tokens().size() >= 1);
+    REQUIRE(lines[0].tokens()[0].is(TokenType::Identifier));
+    REQUIRE(lines[0].tokens()[0].text() == "NOP");
 
     // Ensure no emitted label line ".NOP"
     for (const auto& l : lines) {
-        REQUIRE(!(l.size() >= 2 &&
-                  l[0].is(TokenType::Dot) &&
-                  l[1].is(TokenType::Identifier) &&
-                  l[1].text() == "NOP"));
+        REQUIRE(!(l.tokens().size() >= 2 &&
+                  l.tokens()[0].is(TokenType::Dot) &&
+                  l.tokens()[1].is(TokenType::Identifier) &&
+                  l.tokens()[1].text() == "NOP"));
     }
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7466,10 +7405,10 @@ TEST_CASE("Preprocessor: '.NOP' is not treated as a label (instruction after dot
     REQUIRE(lines.size() == 1);
 
     // Line tokens should be '.' followed by 'NOP'
-    REQUIRE(lines[0].size() >= 2);
-    REQUIRE(lines[0][0].is(TokenType::Dot));
-    REQUIRE(lines[0][1].is(TokenType::Identifier));
-    REQUIRE(lines[0][1].text() == "NOP");
+    REQUIRE(lines[0].tokens().size() >= 2);
+    REQUIRE(lines[0].tokens()[0].is(TokenType::Dot));
+    REQUIRE(lines[0].tokens()[1].is(TokenType::Identifier));
+    REQUIRE(lines[0].tokens()[1].text() == "NOP");
 
     // Because 'NOP' is an instruction, this must NOT have been converted into a label definition
     // (label definitions would be indistinguishable by content here, so we assert that no second
@@ -7495,18 +7434,17 @@ TEST_CASE("Preprocessor: normal label 'LBL:' still recognized (control case)",
     // Expect two lines: label definition ".LBL" and instruction "NOP"
     REQUIRE(lines.size() == 2);
 
-    REQUIRE(lines[0].size() >= 2);
-    REQUIRE(lines[0][0].is(TokenType::Dot));
-    REQUIRE(lines[0][1].is(TokenType::Identifier));
-    REQUIRE(lines[0][1].text() == "LBL");
+    REQUIRE(lines[0].tokens().size() >= 2);
+    REQUIRE(lines[0].tokens()[0].is(TokenType::Dot));
+    REQUIRE(lines[0].tokens()[1].is(TokenType::Identifier));
+    REQUIRE(lines[0].tokens()[1].text() == "LBL");
 
-    REQUIRE(lines[1].size() >= 1);
-    REQUIRE(lines[1][0].is(TokenType::Identifier));
-    REQUIRE(lines[1][0].text() == "NOP");
+    REQUIRE(lines[1].tokens().size() >= 1);
+    REQUIRE(lines[1].tokens()[0].is(TokenType::Identifier));
+    REQUIRE(lines[1].tokens()[0].text() == "NOP");
     REQUIRE_FALSE(g_errors.has_errors());
 }
 
-// Labels and colon-separators with leading opcode followed by a one-identifier statement
 TEST_CASE("Preprocessor: opcode before ':' is not a label but following statement is split",
           "[preprocessor][label][opcode-first][chain]") {
     g_errors.reset();
@@ -7558,8 +7496,8 @@ TEST_CASE("Preprocessor: single-line colon-separated IF true yields branch body"
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "NOP");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "NOP");
     // No more output
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -7570,13 +7508,13 @@ TEST_CASE("Preprocessor: single-line colon-separated IF false with ELSE selects 
     g_errors.reset();
     Preprocessor pp;
 
-    const std::string content = "IF 0 : SHOULD_NOT : ELSE : OK : ENDIF\n";
+    const std::string content = "IF 0 : RET SHOULD_NOT : ELSE : RET OK : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_else.asm", 1, false);
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "OK");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.to_string() == "RET OK");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7587,13 +7525,13 @@ TEST_CASE("Preprocessor: single-line colon-separated IF with multiple ELIF picks
     Preprocessor pp;
 
     const std::string content =
-        "IF 0 : A : ELIF 1 : B : ELIF 1 : C : ENDIF\n";
+        "IF 0 : RET A : ELIF 1 : RET B : ELIF 1 : RET C : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_elif_chain.asm", 1, false);
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "B");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.to_string() == "RET B");
     // Ensure subsequent true ELIF branch 'C' was ignored
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -7605,13 +7543,13 @@ TEST_CASE("Preprocessor: single-line colon-separated IF/ELIF/ELSE chain picks EL
     Preprocessor pp;
 
     const std::string content =
-        "IF 0 : A : ELIF 0 : B : ELSE : FALLBACK : ENDIF\n";
+        "IF 0 : NOP : ELIF 0 : HALT : ELSE : RET FALLBACK : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_full_chain.asm", 1, false);
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "FALLBACK");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.to_string() == "RET FALLBACK");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7623,13 +7561,13 @@ TEST_CASE("Preprocessor: single-line colon-separated nested IF works",
 
     // Inner IF is false so ELIF emits Z; outer IF true so both inner result and outer ENDIF processed.
     const std::string content =
-        "IF 1 : IF 0 : Y : ELIF 1 : Z : ENDIF : ENDIF\n";
+        "IF 1 : IF 0 : RET Y : ELIF 1 : RET Z : ENDIF : ENDIF\n";
     pp.push_virtual_file(content, "if_colon_nested.asm", 1, false);
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "Z");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.to_string() == "RET Z");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7640,18 +7578,18 @@ TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing t
     Preprocessor pp;
 
     const std::string content =
-        "IF 1 : OK : ENDIF : EXTRA_SHOULD_BE_STATEMENT\n";
+        "IF 1 : RET OK : ENDIF : EXTRA_SHOULD_BE_STATEMENT\n";
     pp.push_virtual_file(content, "if_colon_trailing.asm", 1, false);
 
     TokenLine line;
     // First: OK (from IF)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "OK");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.to_string() == "RET OK");
     // Second: EXTRA_SHOULD_BE_STATEMENT (standalone after ENDIF)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "EXTRA_SHOULD_BE_STATEMENT");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "EXTRA_SHOULD_BE_STATEMENT");
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -7663,7 +7601,7 @@ TEST_CASE("Preprocessor: single-line colon-separated IF chain ignores trailing t
 TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance",
           "[preprocessor][pragma_once][single]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
     const std::string inc = "po_once.inc";
     const std::string mainf = "po_main_once.asm";
     {
@@ -7680,8 +7618,8 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance"
     pp.push_file(mainf);
     TokenLine line;
     std::vector<std::string> out;
-    while (pp.next_line(line)) if (!line.empty()) {
-            out.push_back(line[0].text());
+    while (pp.next_line(line)) if (!line.tokens().empty()) {
+            out.push_back(line.tokens()[0].text());
         }
     REQUIRE(out.size() == 2);
     REQUIRE(out[0] == "VAL1");
@@ -7699,7 +7637,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion in same instance"
 TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
           "[preprocessor][pragma_once][instances]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
     const std::string inc = "po_once_instance.inc";
     {
         std::ofstream o(inc);
@@ -7711,8 +7649,8 @@ TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
         p1.push_file(inc);
         TokenLine l;
         std::vector<std::string> v;
-        while (p1.next_line(l)) if (!l.empty()) {
-                v.push_back(l[0].text());
+        while (p1.next_line(l)) if (!l.tokens().empty()) {
+                v.push_back(l.tokens()[0].text());
             }
         REQUIRE(v.size() == 1);
         REQUIRE(v[0] == "DATA");
@@ -7722,8 +7660,8 @@ TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
         p2.push_file(inc);
         TokenLine l;
         std::vector<std::string> v;
-        while (p2.next_line(l)) if (!l.empty()) {
-                v.push_back(l[0].text());
+        while (p2.next_line(l)) if (!l.tokens().empty()) {
+                v.push_back(l.tokens()[0].text());
             }
         REQUIRE(v.size() == 1);
         REQUIRE(v[0] == "DATA");
@@ -7735,7 +7673,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE inclusion per instance",
 TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
           "[preprocessor][pragma_once][absent]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
     const std::string inc = "po_no_once.inc";
     const std::string mainf = "po_no_once_main.asm";
     {
@@ -7752,8 +7690,8 @@ TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
     pp.push_file(mainf);
     TokenLine l;
     std::vector<std::string> v;
-    while (pp.next_line(l)) if (!l.empty()) {
-            v.push_back(l[0].text());
+    while (pp.next_line(l)) if (!l.tokens().empty()) {
+            v.push_back(l.tokens()[0].text());
         }
     REQUIRE(v.size() == 2);
     REQUIRE(v[0] == "VALX");
@@ -7766,7 +7704,7 @@ TEST_CASE("Preprocessor: absence of PRAGMA ONCE allows multiple inclusion",
 TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
           "[preprocessor][pragma_once][nested]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
     const std::string inner = "po_inner_once.inc";
     const std::string outer = "po_outer_once.asm";
     {
@@ -7784,8 +7722,8 @@ TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
     pp.push_file(outer);
     TokenLine l;
     std::vector<std::string> v;
-    while (pp.next_line(l)) if (!l.empty()) {
-            v.push_back(l[0].text());
+    while (pp.next_line(l)) if (!l.tokens().empty()) {
+            v.push_back(l.tokens()[0].text());
         }
     REQUIRE(v.size() == 2);
     REQUIRE(v[0] == "INNER_LINE");
@@ -7797,13 +7735,13 @@ TEST_CASE("Preprocessor: nested includes with PRAGMA ONCE only emit inner once",
 
 TEST_CASE("Preprocessor: PRAGMA ONCE trailing tokens error",
           "[preprocessor][pragma_once][error][trailing]") {
-    g_errors.reset();
+    SuppressErrors supppress;
     Preprocessor pp;
     pp.push_virtual_file("PRAGMA ONCE extra\n", "po_trailing", 1, false);
     TokenLine l;
-    while (pp.next_line(l)) {} REQUIRE(g_errors.has_errors());
-    REQUIRE(g_errors.last_error_message().find("Unexpected token") !=
-            std::string::npos);
+    while (pp.next_line(l)) {}
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Unexpected token") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
@@ -7813,7 +7751,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE trailing tokens error",
 TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second inclusion",
           "[preprocessor][include][guard]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_guard_simple.inc";
     const std::string mainf = "ig_guard_simple_main.asm";
@@ -7842,7 +7780,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second in
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line.to_string());
         }
     }
@@ -7868,7 +7806,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/#define at top prevents second in
 TEST_CASE("Preprocessor: include guard #ifndef/name define at top prevents second inclusion",
           "[preprocessor][include][guard]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_guard_simple.inc";
     const std::string mainf = "ig_guard_simple_main.asm";
@@ -7897,7 +7835,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name define at top prevents secon
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line.to_string());
         }
     }
@@ -7923,7 +7861,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name define at top prevents secon
 TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second inclusion",
           "[preprocessor][include][guard]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_guard_simple.inc";
     const std::string mainf = "ig_guard_simple_main.asm";
@@ -7952,7 +7890,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second 
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line.to_string());
         }
     }
@@ -7978,7 +7916,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second 
 TEST_CASE("Preprocessor: include guard #ifndef/name defc at top prevents second inclusion",
           "[preprocessor][include][guard]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_guard_simple.inc";
     const std::string mainf = "ig_guard_simple_main.asm";
@@ -7988,7 +7926,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name defc at top prevents second 
         REQUIRE(o.is_open());
         o <<
           "#ifndef IG_GUARD_SIMPLE\n"
-          "IG_GUARD_SIMPLE defc 1\n"
+          "IG_GUARD_SIMPLE DEFC 1\n"
           "SIMPLE_LINE\n"
           "#endif\n";
     }
@@ -8007,7 +7945,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name defc at top prevents second 
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line.to_string());
         }
     }
@@ -8033,7 +7971,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/name defc at top prevents second 
 TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still detected",
           "[preprocessor][include][guard][whitespace]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_guard_ws.inc";
     const std::string mainf = "ig_guard_ws_main.asm";
@@ -8066,7 +8004,7 @@ TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line.to_string());
         }
     }
@@ -8090,7 +8028,7 @@ TEST_CASE("Preprocessor: include guard with leading blank/whitespace lines still
 TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined before first include",
           "[preprocessor][include][guard][predefined]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_guard_predef.inc";
     const std::string mainf = "ig_guard_predef_main.asm";
@@ -8119,18 +8057,18 @@ TEST_CASE("Preprocessor: include guard skipped entirely when symbol pre-defined 
     TokenLine line;
     std::vector<std::string> out;
     REQUIRE(pp.next_line(line));    // DEFC IG_GUARD_PRE=1
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "IG_GUARD_PRE");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 1);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "IG_GUARD_PRE");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 1);
 
     REQUIRE(pp.next_line(line));    // ENDLINE
-    REQUIRE(line.size() == 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "ENDLINE");
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "ENDLINE");
 
     REQUIRE_FALSE(pp.next_line(line));
 
@@ -8269,15 +8207,15 @@ TEST_CASE("Preprocessor: backslash before comment stops at comment newline",
     TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "X");
+    REQUIRE(line.tokens().size() == 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "X");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 3);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "Y");
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "Y");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -8297,15 +8235,15 @@ TEST_CASE("Preprocessor: trailing backslash followed by blank line joins empty l
     TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "FIRST");
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "FIRST");
 
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 3);
-    REQUIRE(line.size() >= 1);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "SECOND");
+    REQUIRE(line.tokens().size() >= 1);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "SECOND");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -8324,11 +8262,11 @@ TEST_CASE("Preprocessor: trailing backslash followed by whitespace still joins l
     TokenLine line;
     REQUIRE(pp.next_line(line));
     REQUIRE(line.location().line_num() == 1);
-    REQUIRE(line.size() >= 2);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "FIRST");
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "SECOND");
+    REQUIRE(line.tokens().size() >= 2);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "FIRST");
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "SECOND");
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -8437,23 +8375,23 @@ TEST_CASE("Preprocessor: DEFL list with macro in body expands before storing",
 
     // First non-empty expanded output should be "DEFC A = 5"
     REQUIRE(pp.next_line(line)); // expansion of #define A
-    REQUIRE(line.size() >= 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].keyword() == Keyword::A);
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 5);
+    REQUIRE(line.tokens().size() >= 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].keyword() == Keyword::A);
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 5);
 
     // next line is the Y expansion
     REQUIRE(pp.next_line(line)); // expansion of Y
     REQUIRE(line.to_string() == "A,6");
 
-    REQUIRE(line.size() >= 3);
-    REQUIRE(line[0].is(TokenType::Identifier));
-    REQUIRE(line[0].text() == "A");
-    REQUIRE(line[1].is(TokenType::Comma));
-    REQUIRE(line[2].is(TokenType::Integer));
-    REQUIRE(line[2].int_value() == 6);
+    REQUIRE(line.tokens().size() >= 3);
+    REQUIRE(line.tokens()[0].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[0].text() == "A");
+    REQUIRE(line.tokens()[1].is(TokenType::Comma));
+    REQUIRE(line.tokens()[2].is(TokenType::Integer));
+    REQUIRE(line.tokens()[2].int_value() == 6);
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -8710,9 +8648,9 @@ TEST_CASE("Preprocessor: outer macro continues after inner macro EXITM (multiple
     std::vector<std::string> lines;
 
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             // Capture first token text from each logical output line
-            lines.push_back(line[0].text());
+            lines.push_back(line.tokens()[0].text());
         }
     }
 
@@ -8763,8 +8701,8 @@ TEST_CASE("Preprocessor: EXITM inside REPT inside MACRO aborts macro after first
     TokenLine line;
     std::vector<std::string> first_tokens;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            first_tokens.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            first_tokens.push_back(line.tokens()[0].text());
         }
     }
 
@@ -8821,8 +8759,8 @@ TEST_CASE("Preprocessor: C_LINE then REPT block keeps constant logical line numb
     TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "X");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "X");
         REQUIRE(line.location().line_num() == 6100);
         REQUIRE(line.location().filename() == "cline_rept.asm");
         ++emitted;
@@ -8849,8 +8787,8 @@ TEST_CASE("Preprocessor: C_LINE then REPTC block keeps constant logical line num
     TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "defb");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "defb");
         // Expect integer token 65 for 'A' or 90 for 'Z'
         bool has_char = false;
         for (const auto& t : line.tokens()) {
@@ -8886,8 +8824,8 @@ TEST_CASE("Preprocessor: C_LINE then REPTI block keeps constant logical line num
     int emitted = 0;
     std::vector<int> values;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "db");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "db");
         int found = -1;
         for (const auto& t : line.tokens()) {
             if (t.is(TokenType::Integer)) {
@@ -8936,8 +8874,8 @@ TEST_CASE("Preprocessor: LINE then REPT block emits all repeated lines at REPT i
     int rept_emitted = 0;
     bool saw_after = false;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        const std::string first = line[0].text();
+        REQUIRE(!line.tokens().empty());
+        const std::string first = line.tokens()[0].text();
         if (first == "X") {
             REQUIRE(line.location().line_num() == 100);
             REQUIRE(line.location().filename() == "line_rept.asm");
@@ -8977,8 +8915,8 @@ TEST_CASE("Preprocessor: LINE then REPTC block emits all character iterations at
     TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "defb");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "defb");
         bool hasAorZ = false;
         for (const auto& t : line.tokens()) {
             if (t.is(TokenType::Integer) && (t.int_value() == 'A'
@@ -9019,8 +8957,8 @@ TEST_CASE("Preprocessor: LINE then REPTI block emits all argument iterations at 
     std::vector<int> values;
     int emitted = 0;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "db");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "db");
         int val = -1;
         for (const auto& t : line.tokens()) {
             if (t.is(TokenType::Integer)) {
@@ -9056,8 +8994,8 @@ TEST_CASE("Preprocessor: REPTC inside MACRO expands characters to integers in bo
     TokenLine line;
     std::vector<int> values;
     while (pp.next_line(line)) {
-        REQUIRE(!line.empty());
-        REQUIRE(line[0].text() == "db");
+        REQUIRE(!line.tokens().empty());
+        REQUIRE(line.tokens()[0].text() == "db");
         // collect first integer per line
         for (const auto& t : line.tokens()) {
             if (t.is(TokenType::Integer)) {
@@ -9090,10 +9028,10 @@ TEST_CASE("Preprocessor: object-like #define body split by ':' expands to multip
 
     TokenLine line;
     std::vector<std::string> outs;
-    std::vector<int> locs;
+    std::vector<size_t> locs;
 
     while (pp.next_line(line)) {
-        if (line.empty()) {
+        if (line.tokens().empty()) {
             continue;
         }
         outs.push_back(line.to_string());
@@ -9127,9 +9065,9 @@ TEST_CASE("Preprocessor: object-like #define body split by '\\' expands to multi
 
     TokenLine line;
     std::vector<std::string> outs;
-    std::vector<int> locs;
+    std::vector<size_t> locs;
     while (pp.next_line(line)) {
-        if (line.empty()) {
+        if (line.tokens().empty()) {
             continue;
         }
         outs.push_back(line.to_string());
@@ -9159,9 +9097,9 @@ TEST_CASE("Preprocessor: function-like #define body split by ':' expands to mult
 
     TokenLine line;
     std::vector<std::string> outs;
-    std::vector<int> locs;
+    std::vector<size_t> locs;
     while (pp.next_line(line)) {
-        if (line.empty()) {
+        if (line.tokens().empty()) {
             continue;
         }
         outs.push_back(line.to_string());
@@ -9191,9 +9129,9 @@ TEST_CASE("Preprocessor: function-like #define body split by '\\' expands to mul
 
     TokenLine line;
     std::vector<std::string> outs;
-    std::vector<int> locs;
+    std::vector<size_t> locs;
     while (pp.next_line(line)) {
-        if (line.empty()) {
+        if (line.tokens().empty()) {
             continue;
         }
         outs.push_back(line.to_string());
@@ -9223,9 +9161,9 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by ':' expands to mult
 
     TokenLine line;
     std::vector<std::string> outs;
-    std::vector<int> locs;
+    std::vector<size_t> locs;
     while (pp.next_line(line)) {
-        if (line.empty()) {
+        if (line.tokens().empty()) {
             continue;
         }
         outs.push_back(line.to_string());
@@ -9255,9 +9193,9 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
 
     TokenLine line;
     std::vector<std::string> outs;
-    std::vector<int> locs;
+    std::vector<size_t> locs;
     while (pp.next_line(line)) {
-        if (line.empty()) {
+        if (line.tokens().empty()) {
             continue;
         }
         outs.push_back(line.to_string());
@@ -9275,7 +9213,7 @@ TEST_CASE("Preprocessor: name-directive DEFINE body split by '\\' expands to mul
 
 /* --------------------------------------------------------------------------
  * NEW TESTS: Duplicate LOCAL names inside MACRO / REPT / REPTC / REPTI bodies
- * Should issue a "Duplicate definition" (redefinition) error and stop expansion.
+ * Should issue a "Symbol redefined" (redefinition) error and stop expansion.
  * -------------------------------------------------------------------------- */
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefinition error",
@@ -9298,8 +9236,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside MACRO body reports redefin
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("L") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: L") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefinition error",
@@ -9321,8 +9258,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPT body reports redefini
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("L") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: L") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefinition error",
@@ -9344,8 +9280,7 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTC body reports redefin
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("L") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: L") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefinition error",
@@ -9367,17 +9302,17 @@ TEST_CASE("Preprocessor: duplicate LOCAL names inside REPTI body reports redefin
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition: L") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: L") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
 // NEW TESTS: LOCAL name collision with parameter / iteration variable
-// Should raise Duplicate definition error and produce no expansion.
+// Should raise Symbol redefined error and produce no expansion.
 // -----------------------------------------------------------------------------
 
-TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports Duplicate definition",
+TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports Symbol redefined",
           "[preprocessor][macro][local][collision][param]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Preprocessor pp;
 
     const std::string content =
@@ -9393,11 +9328,10 @@ TEST_CASE("Preprocessor: MACRO parameter name colliding with LOCAL label reports
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("p") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: p") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label reports Duplicate definition",
+TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label reports Symbol redefined",
           "[preprocessor][reptc][local][collision][iter]") {
     g_errors.reset();
     Preprocessor pp;
@@ -9414,11 +9348,10 @@ TEST_CASE("Preprocessor: REPTC iteration variable colliding with LOCAL label rep
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("ch") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: ch") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label reports Duplicate definition",
+TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label reports Symbol redefined",
           "[preprocessor][repti][local][collision][iter]") {
     g_errors.reset();
     Preprocessor pp;
@@ -9435,8 +9368,7 @@ TEST_CASE("Preprocessor: REPTI iteration variable colliding with LOCAL label rep
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Duplicate definition") != std::string::npos);
-    REQUIRE(msg.find("v") != std::string::npos);
+    REQUIRE(msg.find("Symbol redefined: v") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list preserves expression structure",
@@ -9457,44 +9389,44 @@ TEST_CASE("Preprocessor: REPTI with parenthesized expressions in argument list p
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "a");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 10);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "a");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 10);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "b");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 20);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "b");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 20);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 6);
-    REQUIRE(line[0].keyword() == Keyword::DW);
-    REQUIRE(line[1].is(TokenType::LeftParen));
-    REQUIRE(line[2].is(TokenType::Identifier));
-    REQUIRE(line[2].text() == "a");
-    REQUIRE(line[3].is(TokenType::Plus));
-    REQUIRE(line[4].is(TokenType::Identifier));
-    REQUIRE(line[4].text() == "b");
-    REQUIRE(line[5].is(TokenType::RightParen));
+    REQUIRE(line.tokens().size() == 6);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DW);
+    REQUIRE(line.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(line.tokens()[2].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[2].text() == "a");
+    REQUIRE(line.tokens()[3].is(TokenType::Plus));
+    REQUIRE(line.tokens()[4].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[4].text() == "b");
+    REQUIRE(line.tokens()[5].is(TokenType::RightParen));
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 6);
-    REQUIRE(line[0].keyword() == Keyword::DW);
-    REQUIRE(line[1].is(TokenType::LeftParen));
-    REQUIRE(line[2].is(TokenType::Identifier));
-    REQUIRE(line[2].text() == "a");
-    REQUIRE(line[3].is(TokenType::Minus));
-    REQUIRE(line[4].is(TokenType::Identifier));
-    REQUIRE(line[4].text() == "b");
-    REQUIRE(line[5].is(TokenType::RightParen));
+    REQUIRE(line.tokens().size() == 6);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DW);
+    REQUIRE(line.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(line.tokens()[2].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[2].text() == "a");
+    REQUIRE(line.tokens()[3].is(TokenType::Minus));
+    REQUIRE(line.tokens()[4].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[4].text() == "b");
+    REQUIRE(line.tokens()[5].is(TokenType::RightParen));
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -9518,44 +9450,44 @@ TEST_CASE("Preprocessor: REPTI name-directive form with parenthesized expression
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "a");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 10);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "a");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 10);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "b");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 20);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "b");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 20);
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 6);
-    REQUIRE(line[0].keyword() == Keyword::DW);
-    REQUIRE(line[1].is(TokenType::LeftParen));
-    REQUIRE(line[2].is(TokenType::Identifier));
-    REQUIRE(line[2].text() == "a");
-    REQUIRE(line[3].is(TokenType::Plus));
-    REQUIRE(line[4].is(TokenType::Identifier));
-    REQUIRE(line[4].text() == "b");
-    REQUIRE(line[5].is(TokenType::RightParen));
+    REQUIRE(line.tokens().size() == 6);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DW);
+    REQUIRE(line.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(line.tokens()[2].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[2].text() == "a");
+    REQUIRE(line.tokens()[3].is(TokenType::Plus));
+    REQUIRE(line.tokens()[4].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[4].text() == "b");
+    REQUIRE(line.tokens()[5].is(TokenType::RightParen));
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line.size() == 6);
-    REQUIRE(line[0].keyword() == Keyword::DW);
-    REQUIRE(line[1].is(TokenType::LeftParen));
-    REQUIRE(line[2].is(TokenType::Identifier));
-    REQUIRE(line[2].text() == "a");
-    REQUIRE(line[3].is(TokenType::Minus));
-    REQUIRE(line[4].is(TokenType::Identifier));
-    REQUIRE(line[4].text() == "b");
-    REQUIRE(line[5].is(TokenType::RightParen));
+    REQUIRE(line.tokens().size() == 6);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DW);
+    REQUIRE(line.tokens()[1].is(TokenType::LeftParen));
+    REQUIRE(line.tokens()[2].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[2].text() == "a");
+    REQUIRE(line.tokens()[3].is(TokenType::Minus));
+    REQUIRE(line.tokens()[4].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[4].text() == "b");
+    REQUIRE(line.tokens()[5].is(TokenType::RightParen));
 
     REQUIRE_FALSE(pp.next_line(line));
     REQUIRE_FALSE(g_errors.has_errors());
@@ -9600,7 +9532,7 @@ TEST_CASE("Preprocessor: REPTI with unmatched closing parenthesis reports error"
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
+    REQUIRE(msg.find("Unexpected token: ')'") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: REPTI with unmatched parentheses in second argument reports error",
@@ -9676,7 +9608,7 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched opening parenthesis
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Invalid argument list after REPTI") != std::string::npos);
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list reports error",
@@ -9695,7 +9627,7 @@ TEST_CASE("Preprocessor: name-directive REPTI with unmatched parentheses in list
 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Invalid argument list after REPTI") != std::string::npos);
+    REQUIRE(msg.find("Invalid argument list in REPTI") != std::string::npos);
 }
 
 // --- Added tests: REPTC multi-token non-string/non-single-integer expression concatenation branch ---
@@ -9715,7 +9647,7 @@ TEST_CASE("Preprocessor: REPTC (directive) multi-token expression \"A\"+\"B\" it
     TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "defb") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "defb") {
             for (const auto& t : line.tokens()) {
                 if (t.is(TokenType::Integer)) {
                     ints.push_back(t.int_value());
@@ -9724,8 +9656,8 @@ TEST_CASE("Preprocessor: REPTC (directive) multi-token expression \"A\"+\"B\" it
         }
     }
 
-    // Expected characters: " A " + " B "  -> 34,65,34,43,34,66,34
-    std::vector<int> expected = { 34, 65, 34, 43, 34, 66, 34 };
+    // Expected characters: A + B -> 65,43,66
+    std::vector<int> expected = { 65, 43, 66 };
     REQUIRE(ints == expected);
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -9744,7 +9676,7 @@ TEST_CASE("Preprocessor: REPTC (directive) multi-token identifier+operator+ident
     TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "defb") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "defb") {
             for (const auto& t : line.tokens()) {
                 if (t.is(TokenType::Integer)) {
                     ints.push_back(t.int_value());
@@ -9775,7 +9707,7 @@ TEST_CASE("Preprocessor: REPTC (name-directive) multi-token expression \"X\"+\"Y
     TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "defb") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "defb") {
             for (const auto& t : line.tokens()) {
                 if (t.is(TokenType::Integer)) {
                     ints.push_back(t.int_value());
@@ -9784,8 +9716,8 @@ TEST_CASE("Preprocessor: REPTC (name-directive) multi-token expression \"X\"+\"Y
         }
     }
 
-    // "\"X\"+\"Y\"" -> 34,88,34,43,34,89,34
-    std::vector<int> expected = { 34, 88, 34, 43, 34, 89, 34 };
+    // X+Y -> 88,43,89
+    std::vector<int> expected = { 88, 43, 89 };
     REQUIRE(ints == expected);
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -9805,7 +9737,7 @@ TEST_CASE("Preprocessor: REPTC macro-expanded multi-token expression triggers co
     TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "defb") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "defb") {
             for (const auto& t : line.tokens()) {
                 if (t.is(TokenType::Integer)) {
                     ints.push_back(t.int_value());
@@ -9814,8 +9746,8 @@ TEST_CASE("Preprocessor: REPTC macro-expanded multi-token expression triggers co
         }
     }
 
-    // "\"P\"+\"Q\"" -> 34,80,34,43,34,81,34
-    std::vector<int> expected = { 34, 80, 34, 43, 34, 81, 34 };
+    // P+Q -> 80,43,81
+    std::vector<int> expected = { 80, 43, 81 };
     REQUIRE(ints == expected);
     REQUIRE_FALSE(g_errors.has_errors());
 }
@@ -9834,7 +9766,7 @@ TEST_CASE("Preprocessor: REPTC multi-token numeric expression 123+45 concatenati
     TokenLine line;
     std::vector<int> ints;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "defb") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "defb") {
             for (const auto& t : line.tokens()) {
                 if (t.is(TokenType::Integer)) {
                     ints.push_back(t.int_value());
@@ -9870,7 +9802,7 @@ TEST_CASE("Preprocessor: REPTI parses arguments with nested parentheses and inne
     TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "emit") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "emit") {
             outputs.push_back(line.to_string());
         }
     }
@@ -9897,7 +9829,7 @@ TEST_CASE("Preprocessor: REPTI name-directive parses nested parentheses and inne
     TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "use") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "use") {
             outputs.push_back(line.to_string());
         }
     }
@@ -9923,7 +9855,7 @@ TEST_CASE("Preprocessor: REPTI treats top-level commas as separators only; inner
     TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "arg") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "arg") {
             outputs.push_back(line.to_string());
         }
     }
@@ -9950,7 +9882,7 @@ TEST_CASE("Preprocessor: REPTI nested parentheses with arithmetic tokens are pre
     TokenLine line;
     std::vector<std::string> outputs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "emit") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "emit") {
             outputs.push_back(line.to_string());
         }
     }
@@ -9985,7 +9917,7 @@ TEST_CASE("Preprocessor: REPTI (directive) flattens multi-line macro argument be
     TokenLine line;
     std::vector<std::string> outs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "emit") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "emit") {
             outs.push_back(line.to_string());
         }
     }
@@ -10015,7 +9947,7 @@ TEST_CASE("Preprocessor: REPTI (name-directive) flattens multi-line macro argume
     TokenLine line;
     std::vector<std::string> outs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "use") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "use") {
             outs.push_back(line.to_string());
         }
     }
@@ -10049,7 +9981,7 @@ TEST_CASE("Preprocessor: REPTI flattens each multi-line argument independently (
     TokenLine line;
     std::vector<std::string> outs;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "show") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "show") {
             outs.push_back(line.to_string());
         }
     }
@@ -10081,8 +10013,8 @@ TEST_CASE("Preprocessor: REPTI does not rename LOCALs inside flattened argument 
     TokenLine line;
     REQUIRE(pp.next_line(line));
     // First emitted line from REPTI: 'emit tmp tmp'
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "emit");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "emit");
     // Ensure argument tokens are not renamed (no 'tmp_1' inside v)
     bool has_tmp = false, has_tmp_renamed = false;
     for (const auto& t : line.tokens()) {
@@ -10123,7 +10055,7 @@ TEST_CASE("Preprocessor: REPTI with a whitespace-only argument emits body once w
     std::vector<std::vector<std::string>> outputs;
 
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "db") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "db") {
             std::vector<std::string> toks;
             for (const auto& t : line.tokens()) {
                 toks.push_back(t.text());
@@ -10165,7 +10097,7 @@ TEST_CASE("Preprocessor: REPTI with truly empty list emits no lines",
     TokenLine line;
     int emitted = 0;
     while (pp.next_line(line)) {
-        if (!line.empty() && line[0].text() == "db") {
+        if (!line.tokens().empty() && line.tokens()[0].text() == "db") {
             ++emitted;
         }
     }
@@ -10192,15 +10124,19 @@ TEST_CASE("Preprocessor: LOCAL outside any construct produces no output and no e
 
     // First logical line must be the 'AFTER' line (LOCAL is ignored)
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "AFTER");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "AFTER");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
-    REQUIRE_FALSE(g_errors.has_errors());
+
+    // Ensure an error was recorded due to LOCAL outside construct
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: LOCAL with parentheses outside any construct is ignored",
+TEST_CASE("Preprocessor: LOCAL with parentheses outside any construct raises error",
           "[preprocessor][local][outside][paren]") {
     g_errors.reset();
     Preprocessor pp;
@@ -10214,16 +10150,20 @@ TEST_CASE("Preprocessor: LOCAL with parentheses outside any construct is ignored
 
     // Only the following normal line should appear
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "GO");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "GO");
 
     REQUIRE_FALSE(pp.next_line(line));
-    REQUIRE_FALSE(g_errors.has_errors());
+
+    // Ensure an error was recorded due to LOCAL outside construct
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
-TEST_CASE("Preprocessor: multiple LOCAL lines outside constructs are all ignored",
+TEST_CASE("Preprocessor: multiple LOCAL lines outside constructs raise an error",
           "[preprocessor][local][outside][multiple]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Preprocessor pp;
 
     const std::string content =
@@ -10236,16 +10176,18 @@ TEST_CASE("Preprocessor: multiple LOCAL lines outside constructs are all ignored
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "ENDLINE");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "ENDLINE");
 
     REQUIRE_FALSE(pp.next_line(line));
-    REQUIRE_FALSE(g_errors.has_errors());
+    REQUIRE(g_errors.has_errors());
+    std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: LOCAL outside constructs with trailing tokens still produces no output (error reported)",
           "[preprocessor][local][outside][trailing]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Preprocessor pp;
 
     // Trailing token after LOCAL should trigger an error ("Unexpected token")
@@ -10259,19 +10201,19 @@ TEST_CASE("Preprocessor: LOCAL outside constructs with trailing tokens still pro
 
     // Drain all lines (should only get 'NEXT')
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "NEXT");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "NEXT");
     REQUIRE_FALSE(pp.next_line(line));
 
-    // Ensure an error was recorded due to trailing token after LOCAL
+    // Ensure an error was recorded due to LOCAL outside construct
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Unexpected token") != std::string::npos);
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: LOCAL outside constructs with syntax error still produces no output (error reported)",
           "[preprocessor][local][outside][trailing]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Preprocessor pp;
 
     // Trailing token after LOCAL should trigger an error ("Unexpected token")
@@ -10285,19 +10227,19 @@ TEST_CASE("Preprocessor: LOCAL outside constructs with syntax error still produc
 
     // Drain all lines (should only get 'NEXT')
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "NEXT");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "NEXT");
     REQUIRE_FALSE(pp.next_line(line));
 
-    // Ensure an error was recorded due to trailing token after LOCAL
+    // Ensure an error was recorded due to LOCAL outside construct
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Invalid LOCAL parameter list") != std::string::npos);
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: LOCAL outside constructs interleaved with statements yields only statements",
           "[preprocessor][local][outside][interleave]") {
-    g_errors.reset();
+    SuppressErrors suppress;
     Preprocessor pp;
 
     const std::string content =
@@ -10311,13 +10253,17 @@ TEST_CASE("Preprocessor: LOCAL outside constructs interleaved with statements yi
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            out.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            out.push_back(line.tokens()[0].text());
         }
     }
 
     REQUIRE(out == std::vector<std::string>({ "START", "MID", "END" }));
-    REQUIRE_FALSE(g_errors.has_errors());
+
+    // Ensure an error was recorded due to LOCAL outside construct
+    REQUIRE(g_errors.has_errors());
+    const std::string msg = g_errors.last_error_message();
+    REQUIRE(msg.find("Unexpected LOCAL directive outside of MACRO/REPT body") != std::string::npos);
 }
 
 // -----------------------------------------------------------------------------
@@ -10339,8 +10285,8 @@ TEST_CASE("Preprocessor: unknown PRAGMA is ignored and produces no output",
 
     // Only the subsequent normal line should appear
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "NEXT");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "NEXT");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -10363,8 +10309,8 @@ TEST_CASE("Preprocessor: unknown PRAGMA with trailing tokens is still ignored (n
 
     // Only the following normal line should appear
     REQUIRE(pp.next_line(line));
-    REQUIRE(!line.empty());
-    REQUIRE(line[0].text() == "AFTER");
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "AFTER");
 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
@@ -10380,7 +10326,7 @@ TEST_CASE("Preprocessor: unknown PRAGMA with trailing tokens is still ignored (n
 TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion across path variants (inc and ./inc)",
           "[preprocessor][include][pragma_once][path-variants]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "po_variants.inc";
     const std::string mainf = "po_variants_main.asm";
@@ -10408,8 +10354,8 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion across path varia
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            out.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            out.push_back(line.tokens()[0].text());
         }
     }
 
@@ -10433,7 +10379,7 @@ TEST_CASE("Preprocessor: PRAGMA ONCE prevents second inclusion across path varia
 TEST_CASE("Preprocessor: include guard prevents second inclusion across path variants (inc and ./inc)",
           "[preprocessor][include][guard][path-variants]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "ig_variants.inc";
     const std::string mainf = "ig_variants_main.asm";
@@ -10464,7 +10410,7 @@ TEST_CASE("Preprocessor: include guard prevents second inclusion across path var
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
+        if (!line.tokens().empty()) {
             out.push_back(line.to_string());
         }
     }
@@ -10489,7 +10435,7 @@ TEST_CASE("Preprocessor: include guard prevents second inclusion across path var
 TEST_CASE("Preprocessor: without PRAGMA ONCE or guards, including same file via path variants emits twice",
           "[preprocessor][include][path-variants][no-guard]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "noguard_variants.inc";
     const std::string mainf = "noguard_variants_main.asm";
@@ -10513,8 +10459,8 @@ TEST_CASE("Preprocessor: without PRAGMA ONCE or guards, including same file via 
     TokenLine line;
     std::vector<std::string> out;
     while (pp.next_line(line)) {
-        if (!line.empty()) {
-            out.push_back(line[0].text());
+        if (!line.tokens().empty()) {
+            out.push_back(line.tokens()[0].text());
         }
     }
 
@@ -10606,7 +10552,7 @@ TEST_CASE("Preprocessor: self-include of current file triggers RecursiveInclude 
 TEST_CASE("Preprocessor: BINARY missing file invoked from included source reports FileNotFound",
           "[preprocessor][binary][error][missing][via-include]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "bin_missing_inc.asm";
     const std::string mainf = "bin_missing_main.asm";
@@ -10652,7 +10598,7 @@ TEST_CASE("Preprocessor: BINARY missing file invoked from included source report
 TEST_CASE("Preprocessor: INCBIN missing file invoked from included source reports FileNotFound",
           "[preprocessor][binary][error][missing][incbin][via-include]") {
     g_errors.reset();
-    Preprocessor::clear_file_cache();
+
 
     const std::string inc = "incbin_missing_inc.asm";
     const std::string mainf = "incbin_missing_main.asm";
@@ -10752,13 +10698,13 @@ TEST_CASE("Preprocessor: DEFL negative via unary minus on macro stores Minus + p
 
     // First non-directive line after macro define should be the expansion of NEG2 (Minus + Integer(3))
     REQUIRE(pp.next_line(line)); // DEFC A = 3
-    REQUIRE(line.size() == 4);
-    REQUIRE(line[0].keyword() == Keyword::DEFC);
-    REQUIRE(line[1].is(TokenType::Identifier));
-    REQUIRE(line[1].text() == "A");
-    REQUIRE(line[2].is(TokenType::EQ));
-    REQUIRE(line[3].is(TokenType::Integer));
-    REQUIRE(line[3].int_value() == 3);
+    REQUIRE(line.tokens().size() == 4);
+    REQUIRE(line.tokens()[0].keyword() == Keyword::DEFC);
+    REQUIRE(line.tokens()[1].is(TokenType::Identifier));
+    REQUIRE(line.tokens()[1].text() == "A");
+    REQUIRE(line.tokens()[2].is(TokenType::EQ));
+    REQUIRE(line.tokens()[3].is(TokenType::Integer));
+    REQUIRE(line.tokens()[3].int_value() == 3);
 
     // Expansion of 'NEG2' -> Minus + Integer(3)
     REQUIRE(pp.next_line(line));
@@ -10802,14 +10748,14 @@ TEST_CASE("Preprocessor: #line accepts optional comma before filename",
     // After '#line 10, "m4_out.asm"' the next logical line is 'first' at (m4_out.asm:10)
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "first");
+    REQUIRE(line.tokens()[0].text() == "first");
     REQUIRE(line.location().line_num() == 10);
     REQUIRE(line.location().filename() == "m4_out.asm");
 
     // After '#line 20 "m4_nocomma.asm"' the next logical line is 'second' at (m4_nocomma.asm:20)
     REQUIRE(pp.next_line(line));
     REQUIRE(line.tokens().size() >= 1);
-    REQUIRE(line[0].text() == "second");
+    REQUIRE(line.tokens()[0].text() == "second");
     REQUIRE(line.location().line_num() == 20);
     REQUIRE(line.location().filename() == "m4_nocomma.asm");
 
@@ -10834,17 +10780,17 @@ TEST_CASE("Preprocessor: cpp style '# nr \"file\"' sets logical location (quoted
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].text() == "A");
+    REQUIRE(line.tokens()[0].text() == "A");
     REQUIRE(line.location().line_num() == 10);
     REQUIRE(line.location().filename() == "cpp1.asm");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].text() == "B");
+    REQUIRE(line.tokens()[0].text() == "B");
     REQUIRE(line.location().line_num() == 20);
     REQUIRE(line.location().filename() == "cpp2.asm");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].text() == "C");
+    REQUIRE(line.tokens()[0].text() == "C");
     REQUIRE(line.location().line_num() == 30);
     REQUIRE(line.location().filename() == "cpp3.asm");
 
@@ -10866,12 +10812,12 @@ TEST_CASE("Preprocessor: cpp style '# nr' without filename sets logical line num
     TokenLine line;
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].text() == "L1");
+    REQUIRE(line.tokens()[0].text() == "L1");
     REQUIRE(line.location().line_num() == 100);
     REQUIRE(line.location().filename() == "cpp_hashline_nofile");
 
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].text() == "L2");
+    REQUIRE(line.tokens()[0].text() == "L2");
     REQUIRE(line.location().line_num() == 101);
     REQUIRE(line.location().filename() == "cpp_hashline_nofile");
 
@@ -10891,8 +10837,36 @@ TEST_CASE("Preprocessor: cpp style '# nr , \"file\"' with comma accepted",
 
     TokenLine line;
     REQUIRE(pp.next_line(line));
-    REQUIRE(line[0].text() == "X");
+    REQUIRE(line.tokens()[0].text() == "X");
     REQUIRE(line.location().line_num() == 42);
     REQUIRE(line.location().filename() == "withcomma.asm");
     REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor splits 'NOP:HALT:RET' into three lines without labels", "[preprocessor][split][virtual_file]") {
+    g_options = Options();
+
+    Preprocessor pp;
+    // Push a virtual file: single physical line with separator colons
+    pp.push_virtual_file("NOP:HALT:RET\n", "virt.asm", 1, true);
+
+    TokenLine line;
+
+    // First logical line: "NOP" (not a label)
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.to_string() == "NOP");
+    REQUIRE_FALSE((!line.tokens().empty() && line.tokens()[0].is(TokenType::Dot)));
+
+    // Second logical line: "HALT"
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.to_string() == "HALT");
+    REQUIRE_FALSE((!line.tokens().empty() && line.tokens()[0].is(TokenType::Dot)));
+
+    // Third logical line: "RET"
+    REQUIRE(pp.next_line(line));
+    REQUIRE(line.to_string() == "RET");
+    REQUIRE_FALSE((!line.tokens().empty() && line.tokens()[0].is(TokenType::Dot)));
+
+    // No more lines
+    REQUIRE_FALSE(pp.next_line(line));
 }

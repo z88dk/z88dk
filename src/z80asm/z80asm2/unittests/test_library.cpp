@@ -271,7 +271,7 @@ TEST_CASE("Integration: library with code modules",
     REQUIRE(found_module != nullptr);
     REQUIRE(found_module->name() == "MATH");
 
-    const Symbol* found_symbol = found_module->find_symbol("add");
+    const Symbol* found_symbol = found_module->get_symbol("add");
     REQUIRE(found_symbol != nullptr);
     REQUIRE(found_symbol->is_public());
 }
@@ -322,7 +322,7 @@ TEST_CASE("Integration: library linking scenario",
     Module* defining_module = lib.find_public_symbol("print");
     REQUIRE(defining_module != nullptr);
 
-    const Symbol* print_def = defining_module->find_symbol("print");
+    const Symbol* print_def = defining_module->get_symbol("print");
     REQUIRE(print_def != nullptr);
     REQUIRE(print_def->is_public());
 

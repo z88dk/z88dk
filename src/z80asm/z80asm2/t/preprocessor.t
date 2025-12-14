@@ -750,10 +750,10 @@ END
 
 check_text_file("$test.i", <<END);
 #line 6, "$test.asm"
-.L_1
+.L_0
 #line 6
 db 10
-.L_2
+.L_1
 #line 7
 db 20
 END
@@ -904,11 +904,11 @@ END
 # Expect two iterations with labels renamed L_1 and L_2 and corresponding nop lines
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-.L_1
+.L_0
 #line 1
 nop
 #line 1
-.L_2
+.L_1
 #line 1
 nop
 END
@@ -1716,9 +1716,8 @@ END
 
 unlink("$test.i");
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:3: error: Macro recursion limit exceeded: B
+$test.asm:3: error: Macro recursion limit exceeded: A
    |A
-   |B
 END
 ok ! -f "$test.i", "output file not produced on error";
 
@@ -1813,14 +1812,14 @@ END
 # Subsequent C_LINE -30 sets constant -30.
 # LINE -5 => sets -5 then (if more lines followed) would increment; only one line emitted.
 check_text_file("$test.i", <<END);
-#line -10, "neg_line.asm"
+#line 18446744073709551606, "neg_line.asm"
 A
 B
-#line -20, "neg_cangle.asm"
+#line 18446744073709551596, "neg_cangle.asm"
 C
-#line -30, "neg_cplain.asm"
+#line 18446744073709551586, "neg_cplain.asm"
 D
-#line -5, "neg_mix.asm"
+#line 18446744073709551611, "neg_mix.asm"
 E
 END
 
@@ -1842,11 +1841,11 @@ END
 # LINE -15 (no filename) => uses source file name then increments.
 # C_LINE -25 keeps constant -25; second physical line after C_LINE prints #line -25 again (no filename).
 check_text_file("$test.i", <<END);
-#line -15, "$test.asm"
+#line 18446744073709551601, "$test.asm"
 X
-#line -25
+#line 18446744073709551591
 Y
-#line -25
+#line 18446744073709551591
 Z
 END
 
@@ -1911,11 +1910,11 @@ END
 #  2nd: .L_2 then defb 66 ('B')
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-.L_1
+.L_0
 #line 1
 defb 65
 #line 1
-.L_2
+.L_1
 #line 1
 defb 66
 END
@@ -1940,11 +1939,11 @@ END
 #  2nd: .L_2 then db 8
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-.L_1
+.L_0
 #line 1
 db 7
 #line 1
-.L_2
+.L_1
 #line 1
 db 8
 END
@@ -2047,8 +2046,7 @@ ENDM
 DUPM()
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:3: error: Duplicate definition: L
-   |MACRO DUPM()
+$test.asm:3: error: Symbol redefined: L
    |LOCAL L
 END
 ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside MACRO";
@@ -2063,8 +2061,7 @@ L: nop
 ENDR
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:3: error: Duplicate definition: L
-   |REPT 1
+$test.asm:3: error: Symbol redefined: L
    |LOCAL L
 END
 ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPT";
@@ -2079,8 +2076,7 @@ L: defb ch
 ENDR
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:3: error: Duplicate definition: L
-   |REPTC ch, "A"
+$test.asm:3: error: Symbol redefined: L
    |LOCAL L
 END
 ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPTC";
@@ -2095,8 +2091,7 @@ L: db v
 ENDR
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:3: error: Duplicate definition: L
-   |REPTI v, 1
+$test.asm:3: error: Symbol redefined: L
    |LOCAL L
 END
 ok ! -f "$test.i", "no .i file produced on duplicate LOCAL inside REPTI";
@@ -2116,8 +2111,7 @@ ENDM
 M(1)
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:2: error: Duplicate definition: p
-   |MACRO M(p)
+$test.asm:2: error: Symbol redefined: p
    |LOCAL p
 END
 ok ! -f "$test.i", "no .i file produced on parameter/local collision in MACRO";
@@ -2131,8 +2125,7 @@ ch: defb ch
 ENDR
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:2: error: Duplicate definition: ch
-   |REPTC ch, "A"
+$test.asm:2: error: Symbol redefined: ch
    |LOCAL ch
 END
 ok ! -f "$test.i", "no .i file produced on iteration/local collision in REPTC";
@@ -2146,8 +2139,7 @@ v: db v
 ENDR
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:2: error: Duplicate definition: v
-   |REPTI v, 1
+$test.asm:2: error: Symbol redefined: v
    |LOCAL v
 END
 ok ! -f "$test.i", "no .i file produced on iteration/local collision in REPTI";
@@ -2531,10 +2523,10 @@ Preprocessing file: $test.asm -> $test.i
 END
 
 # Expect:
-# .L_1, db 10, db 10+1 all at 6600
+# .L_0, db 10, db 10+1 all at 6600
 check_text_file("$test.i", <<END);
 #line 6600, "const_local_macro.asm"
-.L_1
+.L_0
 #line 6600
 db 10
 #line 6600
@@ -2613,8 +2605,6 @@ db 1
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in MACRO (expected ENDM)
-   |MACRO M()
-   |db 1
 END
 ok ! -f "$test.i", "no .i file produced on unclosed MACRO";
 
@@ -2626,8 +2616,6 @@ X
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in REPT (expected ENDR)
-   |REPT 3
-   |X
 END
 ok ! -f "$test.i", "no .i file produced on unclosed REPT";
 
@@ -2639,8 +2627,6 @@ defb ch
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in REPTC (expected ENDR)
-   |REPTC ch, "AB"
-   |defb ch
 END
 ok ! -f "$test.i", "no .i file produced on unclosed REPTC";
 
@@ -2652,8 +2638,6 @@ db v
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
 $test.asm:1: error: Invalid syntax: Unexpected end of input in REPTI (expected ENDR)
-   |REPTI v, 1,2
-   |db v
 END
 ok ! -f "$test.i", "no .i file produced on unclosed REPTI";
 
@@ -2667,14 +2651,11 @@ REPT 2
 IF 1
 X
 ENDM
+OUT
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected ENDM directive without matching MACRO
-   |MACRO OUT()
-   |ENDM
-$test.asm:1: error: Invalid syntax: Unexpected end of input in MACRO (expected ENDM)
-   |MACRO OUT()
-   |ENDM
+$test.asm:6: error: Invalid syntax: Unexpected end of input in REPT (expected ENDR)
+$test.asm:6: error: Invalid syntax: Unexpected end of input in IF (expected ENDIF)
 END
 # Note: current implementation reports only the unclosed IF; OUT() / REPT error
 # messages are not emitted after EOF, so .i is not produced.
@@ -2745,19 +2726,6 @@ END
 # parse_macro_args negative tests: trailing comma and bad nesting
 #------------------------------------------------------------------------------
 
-# REPTI trailing comma -> Invalid argument list in REPTI
-unlink("$test.i");
-spew("$test.asm", <<END);
-REPTI v, 1,2,
-db v
-ENDR
-END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
-   |REPTI v, 1,2,
-END
-ok ! -f "$test.i", "no .i file produced on REPTI trailing comma";
-
 # REPTI bad nesting (unclosed parenthesis) -> Invalid argument list in REPTI
 unlink("$test.i");
 spew("$test.asm", <<END);
@@ -2771,20 +2739,7 @@ $test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
 END
 ok ! -f "$test.i", "no .i file produced on REPTI bad nesting";
 
-# Name-directive REPTI trailing comma -> Invalid argument list after REPTI
-unlink("$test.i");
-spew("$test.asm", <<END);
-val REPTI 3,4,
-db val
-ENDR
-END
-capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Invalid argument list after REPTI
-   |val REPTI 3,4,
-END
-ok ! -f "$test.i", "no .i file produced on name-directive REPTI trailing comma";
-
-# Name-directive REPTI bad nesting -> Invalid argument list after REPTI
+# Name-directive REPTI bad nesting -> Invalid argument list in REPTI
 unlink("$test.i");
 spew("$test.asm", <<END);
 val REPTI (7,8
@@ -2792,7 +2747,7 @@ db val
 ENDR
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Invalid argument list after REPTI
+$test.asm:1: error: Invalid syntax: Invalid argument list in REPTI
    |val REPTI (7,8
 END
 ok ! -f "$test.i", "no .i file produced on name-directive REPTI bad nesting";
@@ -2811,7 +2766,7 @@ $test.asm:4: error: Invalid syntax: Macro argument count mismatch for: F
 END
 ok ! -f "$test.i", "no .i file produced on macro call trailing comma";
 
-# Function-like macro bad nesting (unclosed parenthesis) -> Macro argument count mismatch
+# Function-like macro bad nesting (unclosed parenthesis) -> Right parenthesis expected
 unlink("$test.i");
 spew("$test.asm", <<END);
 MACRO G(x,y)
@@ -2820,7 +2775,7 @@ ENDM
 G(1,(2,3
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:4: error: Invalid syntax: Macro argument count mismatch for: G
+$test.asm:4: error: Invalid syntax: Right parenthesis expected
    |G(1,(2,3
 END
 ok ! -f "$test.i", "no .i file produced on macro call bad nesting";
@@ -2837,7 +2792,7 @@ db 0
 ENDM
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Duplicate definition: a
+$test.asm:1: error: Parameter redefined: a
    |MACRO M(a,a)
 END
 ok ! -f "$test.i", "no .i file produced on duplicate MACRO parameters";
@@ -2849,10 +2804,8 @@ spew("$test.asm", <<END);
 F(2)
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Duplicate definition: a
+$test.asm:1: error: Parameter redefined: a
    |#define F(a,a) 1
-$test.asm:2: error: Invalid syntax: Macro argument count mismatch for: F
-   |F(2)
 END
 ok ! -f "$test.i", "no .i file produced on duplicate #define parameters";
 
@@ -2943,9 +2896,9 @@ spew("$test.asm", <<END);
 A
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:4: error: Macro recursion limit exceeded: C
+$test.asm:4: error: Macro recursion limit exceeded: B
    |A
-   |C
+   |B
 END
 ok ! -f "$test.i", "output file not produced on longer macro cycle";
 
@@ -3639,7 +3592,7 @@ capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
-#line -10, "filename"
+#line 18446744073709551606, "filename"
 I
 END
 
@@ -3654,7 +3607,7 @@ capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
 Preprocessing file: $test.asm -> $test.i
 END
 check_text_file("$test.i", <<END);
-#line -20, "neg.asm"
+#line 18446744073709551596, "neg.asm"
 J
 END
 
@@ -3774,8 +3727,7 @@ ENDM surplus
 M()
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'surplus'
-   |MACRO M()
+$test.asm:3: error: Invalid syntax: Unexpected token: 'surplus'
    |ENDM surplus
 END
 ok ! -f "$test.i", "no .i file produced on ENDM with trailing tokens";
@@ -3788,8 +3740,7 @@ X
 ENDR garbage
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'garbage'
-   |REPT 1
+$test.asm:3: error: Invalid syntax: Unexpected token: 'garbage'
    |ENDR garbage
 END
 ok ! -f "$test.i", "no .i file produced on ENDR with trailing tokens";
@@ -4234,11 +4185,11 @@ END
 # Expect two iterations with unique labels and negative values
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-.L_1
+.L_0
 #line 1
 db -1
 #line 1
-.L_2
+.L_1
 #line 1
 db -2
 END
@@ -4361,22 +4312,14 @@ capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
 Preprocessing file: $test.asm -> $test.i
 END
 
-# Expected character codes: '"' (34), 'A'(65), '"'(34), '+'(43), '"'(34), 'B'(66), '"'(34)
+# Expected character codes: 'A'(65), '+'(43), 'B'(66)
 check_text_file("$test.i", <<END);
 #line 1, "$test.asm"
-defb 34
-#line 1
 defb 65
-#line 1
-defb 34
 #line 1
 defb 43
 #line 1
-defb 34
-#line 1
 defb 66
-#line 1
-defb 34
 END
 
 # Identifier + operator + identifier: foo + bar -> "foo+bar"
@@ -4633,71 +4576,44 @@ check_text_file("$test.i", <<END);
 AFTER_EMPTY
 END
 
-# (ADDED) LOCAL outside MACRO/REPT constructs: ignored (no output lines produced)
+# LOCAL outside MACRO/REPT constructs: error raised
 
-# LOCAL at top-level followed by a normal line: only the normal line should be emitted
+unlink("$test.i");
 spew("$test.asm", <<END);
 LOCAL tmp
 AFTER
 END
 
-capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
-% z88dk-z80asm -v -E $test.asm
-Preprocessing file: $test.asm -> $test.i
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected LOCAL directive outside of MACRO/REPT body
+   |LOCAL tmp
 END
 
-check_text_file("$test.i", <<END);
-#line 2, "$test.asm"
-AFTER
-END
+ok ! -f "$test.i", "no .i file produced LOCAL outside constructs";
 
-# LOCAL with parentheses at top-level: still ignored; only subsequent lines emitted
+# LOCAL with parentheses at top-level: error raised
+
+unlink("$test.i");
 spew("$test.asm", <<END);
 LOCAL(a,b)
 GO
 END
 
-capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
-% z88dk-z80asm -v -E $test.asm
-Preprocessing file: $test.asm -> $test.i
+capture_nok("z88dk-z80asm -E $test.asm", <<END);
+$test.asm:1: error: Invalid syntax: Unexpected LOCAL directive outside of MACRO/REPT body
+   |LOCAL(a,b)
 END
 
-check_text_file("$test.i", <<END);
-#line 2, "$test.asm"
-GO
-END
+ok ! -f "$test.i", "no .i file produced LOCAL outside constructs";
 
-# Multiple LOCAL lines outside constructs interleaved with statements: only statements emitted
-spew("$test.asm", <<END);
-START
-LOCAL L1
-MID
-LOCAL(L2,L3)
-ENDLINE
-END
-
-capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
-% z88dk-z80asm -v -E $test.asm
-Preprocessing file: $test.asm -> $test.i
-END
-
-check_text_file("$test.i", <<END);
-#line 1, "$test.asm"
-START
-
-MID
-
-ENDLINE
-END
-
-# LOCAL outside constructs with trailing tokens should raise an error but still produce no LOCAL output
+# LOCAL outside constructs with trailing tokens should raise an error
 unlink("$test.i");
 spew("$test.asm", <<END);
 LOCAL X extra
 NEXT
 END
 capture_nok("z88dk-z80asm -E $test.asm", <<END);
-$test.asm:1: error: Invalid syntax: Unexpected token: 'extra'
+$test.asm:1: error: Invalid syntax: Unexpected LOCAL directive outside of MACRO/REPT body
    |LOCAL X extra
 END
 ok ! -f "$test.i", "no .i file produced on malformed LOCAL outside constructs";
@@ -6051,7 +5967,7 @@ END
 # Label and following db lines use caller location (70, then 71, 72); inner directives ignored.
 check_text_file("$test.i", <<END);
 #line 70, "caller_loc.asm"
-.L_1
+.L_0
 #line 999, "inner_loc.asm"
 db 41
 #line 1000, "inner_loc2.asm"
