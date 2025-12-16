@@ -181,7 +181,7 @@ std::string TokenLine::to_string() const {
                t == TokenType::Float;
     };
 
-    for (unsigned i = 0; i < tokens_.size(); ++i) {
+    for (size_t i = 0; i < tokens_.size(); ++i) {
         const auto& tok = tokens_[i];
         char last_char = out.empty() ? ' ' : out.back();
         char first_char = tok.text().empty() ? ' ' : tok.text().front();
@@ -777,10 +777,19 @@ void TokenFileReader::split_lines(const TokenLine& line,
             ternary_level++;
         }
         else if (token.is(TokenType::Colon)) {
-            if (ternary_level > 0) {
+            // is this colon after a segment override? (e.g., "A:")
+            if (i > 0 &&
+                    !tokens[i - 1].has_space_after() &&
+                    keyword_is_segment_register(line.tokens()[i - 1].keyword())) {
+                // fall through, do not split
+            }
+            // is this colon part of a ternary operator?
+            else if (ternary_level > 0) {
                 ternary_level--;
+                // fall through, do not split
             }
             else {
+                // this colon splits the line
                 split_line();
                 continue;
             }
