@@ -448,7 +448,7 @@ const std::vector<std::string>& DependencyFile::dependencies() const {
 }
 
 bool DependencyFile::write() {
-    const unsigned LINE_WIDTH = 80;
+    const size_t LINE_WIDTH = 80;
 
     if (dependencies_.empty()) {
         return false;

@@ -61,6 +61,11 @@ bool keyword_is_register(Keyword kw) {
     return (flags & IS_REGISTER) != 0;
 }
 
+bool keyword_is_segment_register(Keyword kw) {
+    int flags = keyword_flags[static_cast<int>(kw)];
+    return (flags & IS_SEGMENT_REGISTER) != 0;
+}
+
 bool keyword_is_register_8bit(Keyword kw) {
     int flags = keyword_flags[static_cast<int>(kw)];
     return (flags & IS_REGISTER_8BIT) != 0;
