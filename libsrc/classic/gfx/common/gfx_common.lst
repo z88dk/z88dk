@@ -33,5 +33,6 @@ classic/gfx/common/obj/${TARGET}/c_point
 classic/gfx/common/obj/${TARGET}/__gfx_fatpix
 classic/gfx/common/obj/${TARGET}/gfx_set_fatpix
 classic/gfx/common/obj/${TARGET}/gfx_refresh
+classic/gfx/common/obj/${TARGET}/_font_4x5
 @classic/gfx/x11/x11.lst
 

@@ -700,6 +700,10 @@ IF FORvz
     defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
+IF FORx07
+    defc    _GFX_MAXX    = 120
+    defc    _GFX_MAXY    = 32
+ENDIF
 
 IF FORx1
     defc    _GFX_MAXX    = 640
