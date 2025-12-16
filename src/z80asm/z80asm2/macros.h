@@ -168,3 +168,9 @@ public:
 private:
     bool parse_items(const TokenLine& line, size_t& index) override;
 };
+
+//-----------------------------------------------------------------------------
+// temporary labels
+//-----------------------------------------------------------------------------
+
+std::string make_temp_label_name(const std::string& base_name);

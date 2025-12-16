@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\t">
       <UniqueIdentifier>{50693bb0-9f80-4454-9e80-141dfb8eee1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\cpu">
+      <UniqueIdentifier>{acfd9655-b02c-429b-ae3c-4ae10c89c729}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp">
@@ -96,6 +99,15 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\macros.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\assembler.h">
@@ -170,6 +182,12 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\errors.def">
@@ -195,6 +213,81 @@
     </None>
     <None Include="..\..\src\z80asm\z80asm2\t\include.t">
       <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\dump_opcodes.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\make_dfa.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\make_opcodes.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Opcodes.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_8080.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_8085.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_ez80.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_gbz80.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_kc160.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_r800.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_rabbit.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_synth.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_z80.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_z80n.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_z180.pl">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\opcodes_tables.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\CsrBuilder.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Keywords.pm">
+      <Filter>Resource Files\t</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\CPUs.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\TokenTypes.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\DFA_Tokens.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\DFA.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\DFA_Leafs.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Trie.pm">
+      <Filter>Resource Files\cpu</Filter>
     </None>
   </ItemGroup>
 </Project>

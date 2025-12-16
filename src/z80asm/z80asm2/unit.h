@@ -14,8 +14,8 @@
 
 class CompilationUnit {
 public:
-    CompilationUnit() = default;
-    CompilationUnit(const std::string& name, const Location& location);
+    CompilationUnit(const std::string& name = "",
+                    const Location& location = Location());
     void clear();
 
     // Name and location

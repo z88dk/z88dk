@@ -65,6 +65,8 @@ public:
     Symbol* add_symbol(const std::string& name, const Location& location,
                        Opcode* opcode, int offset,
                        SymbolType type = SymbolType::AddressRelative);
+    Symbol* add_label_symbol(const std::string& name,
+                             const Location& location, int offset);
 
     Symbol* get_symbol(const std::string& name);
     const Symbol* get_symbol(const std::string& name) const;

@@ -1727,7 +1727,8 @@ void Preprocessor::generate_dependency_file() {
     dependency_file_.write();
 }
 
-void Preprocessor::preprocess_file(const std::string& input_filename, const std::string& output_filename,
+void Preprocessor::preprocess_file(const std::string& input_filename,
+                                   const std::string& output_filename,
                                    bool gen_dependency) {
     Preprocessor pp;
     int start_errors = g_errors.error_count();
@@ -1783,14 +1784,16 @@ void preprocess_only() {
     for (auto& asm_filename : g_options.input_files) {
         if (g_options.is_o_filename(asm_filename)) {
             if (g_options.verbose) {
-                std::cout << "Skipping preprocessing for object file: " << asm_filename << std::endl;
+                std::cout << "Skipping preprocessing of object file: "
+                          << asm_filename << std::endl;
             }
         }
         else {
             std::string i_filename = g_options.get_i_filename(asm_filename);
 
             if (g_options.verbose) {
-                std::cout << "Preprocessing file: " << asm_filename << " -> " << i_filename << std::endl;
+                std::cout << "Preprocessing file: "
+                          << asm_filename << " -> " << i_filename << std::endl;
             }
 
             Preprocessor::preprocess_file(asm_filename, i_filename, g_options.gen_dependencies);

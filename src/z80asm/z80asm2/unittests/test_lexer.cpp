@@ -2984,3 +2984,57 @@ TEST_CASE("TokenFileReader detects pragma once even if preceded by other pragmas
 
     std::remove(path.c_str());
 }
+
+TEST_CASE("Lexer: segment keywords followed immediately by ':' do not split the line",
+          "[lexer][colon][segment][no-split]") {
+    g_options = Options();
+
+    // Segment keywords that can be followed by ':' without splitting the line
+    const std::vector<std::string> segments = { "A", "PP", "XP", "YP", "ZP" };
+
+    for (const auto& seg : segments) {
+        TokenFileReader tfr;
+        // No space before colon; ensure not split at ':'
+        const std::string fname = "seg_colon_" + seg;
+        const std::string ld = "LD ";
+        tfr.inject(fname, 1, false, ld + seg + ":REG\n");
+
+        TokenLine tl;
+        // Exactly one logical line should be produced
+        REQUIRE(tfr.next_token_line(tl));
+        REQUIRE(tl.to_string() == ld + seg + ":REG");
+
+        // No second line
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
+    }
+}
+
+TEST_CASE("Lexer: segment keywords followed by space then ':' split the line",
+          "[lexer][colon][segment][split]") {
+    g_options = Options();
+
+    // Segment keywords that, when followed by a space and a colon, should split at ':'
+    const std::vector<std::string> segments = { "A", "PP", "XP", "YP", "ZP" };
+
+    for (const auto& seg : segments) {
+        TokenFileReader tfr;
+        // Space before colon; expect split at ':'
+        const std::string fname = "seg_space_colon_" + seg;
+        const std::string ld = "LD ";
+        tfr.inject(fname, 1, false, ld + seg + " :REG\n");
+
+        TokenLine tl;
+        // First logical line: segment keyword before separator colon
+        REQUIRE(tfr.next_token_line(tl));
+        REQUIRE(tl.to_string() == ld + seg);
+
+        // Second logical line: token after separator colon
+        REQUIRE(tfr.next_token_line(tl));
+        REQUIRE(tl.to_string() == "REG");
+
+        // No third line
+        REQUIRE_FALSE(tfr.next_token_line(tl));
+        REQUIRE(tl.tokens().empty());
+    }
+}
