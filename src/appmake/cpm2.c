@@ -2297,7 +2297,7 @@ static struct formats {
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
     { "beehive",   "Beehive Topper",        &beehive_spec, 0, NULL, 1 },
-    { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
+    { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, "z88dk CPCPMDISC\xa4", 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
