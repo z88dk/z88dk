@@ -2,7 +2,6 @@
     SECTION code_clib
 
     PUBLIC  generic_console_cls
-    PUBLIC  generic_console_pointxy
     PUBLIC  generic_console_vpeek
     PUBLIC  generic_console_scrollup
     PUBLIC  generic_console_printc
