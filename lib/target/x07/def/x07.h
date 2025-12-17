@@ -188,6 +188,9 @@
 
 
 
+// Mirrored character display - same as the ROMs variant
+#define X07_MIRROR      0x0214
+
 // Determine XY POS (hl=yx)
 #define FW_CALC_XYPOS	0x0075
 #define ROM_CALC_XYPOS	0xc250
