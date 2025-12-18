@@ -5,6 +5,8 @@
 //-----------------------------------------------------------------------------
 
 #pragma once
+
+#include "cpu.h"
 #include <string>
 #include <vector>
 
@@ -15,6 +17,7 @@ struct Options {
     bool swap_ix_iy = false;
     bool date_stamp = false;
     bool gen_dependencies = false;
+    CPU cpu_id = CPU::z80;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;
