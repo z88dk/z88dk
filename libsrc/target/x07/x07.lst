@@ -1,5 +1,15 @@
 target/x07/stdio/fgetc_cons
 target/x07/stdio/fputc_cons
+target/x07/stdio/generic_console
+target/x07/stdio/generic_console_ioctl
 target/x07/stdio/getk
+target/x07/vars
+target/x07/graphics/clg
+target/x07/graphics/plotpixl
+target/x07/graphics/respixl
+target/x07/graphics/xorpixl
+target/x07/graphics/pointxy
+@classic/gfx/portable/gfx_portable.lst
+@classic/gfx/narrow/gfx_narrow.lst
 @classic/stdio/stdio.lst
 @classic/games/games.lst
