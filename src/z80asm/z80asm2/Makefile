@@ -44,8 +44,9 @@ DEPENDS := $(OBJS:.o=.d) $(COMMON_TEST_OBJS:.o=.d) $(TEST_OBJS:.o=.d) $(CATCH_OB
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
 		  --max-code-length=120 --lineend=linux --formatted \
+		  --exclude="opcodes_tables.h" --exclude="opcodes_tables.cpp" \
+		  --exclude="unittests/catch_amalgamated.hpp" --exclude="unittests/catch_amalgamated.cpp" \
 		  --recursive "*.cpp" "*.h"
-
 
 all: $(PROJ)$(EXE) $(TEST_BINS)
 
@@ -82,6 +83,12 @@ $(PROJ)$(EXE): $(OBJ_DIR)/scan.o
 scan.cpp: scan.re Makefile
 	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
 	dos2unix scan.cpp 2> /dev/null
+
+# Rule to procude opcodes_tables.cpp
+$(PROJ)$(EXE): $(OBJ_DIR)/opcodes_tables.o
+
+opcodes_tables.cpp: $(wildcard *.def cpu/*.pl cpu/*.pm) Makefile cpu/Makefile 
+	$(MAKE) -C cpu
 
 test:: $(TEST_BINS)
 	@for test in $(TEST_BINS); do \

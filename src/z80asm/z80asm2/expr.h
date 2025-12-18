@@ -249,3 +249,5 @@ std::unique_ptr<ExprNode> make_conditional(std::unique_ptr<ExprNode> condition,
         std::unique_ptr<ExprNode> true_expr,
         std::unique_ptr<ExprNode> false_expr);
 
+// Return a new Expression whose value is +(orig + 1) and whose token line is "+(<orig_tokens>)+1"
+Expression expression_plus_one(const Expression& orig);

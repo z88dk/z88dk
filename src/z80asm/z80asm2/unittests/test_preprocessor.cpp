@@ -7862,7 +7862,6 @@ TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second 
           "[preprocessor][include][guard]") {
     g_errors.reset();
 
-
     const std::string inc = "ig_guard_simple.inc";
     const std::string mainf = "ig_guard_simple_main.asm";
 
@@ -7871,7 +7870,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second 
         REQUIRE(o.is_open());
         o <<
           "#ifndef IG_GUARD_SIMPLE\n"
-          "defc IG_GUARD_SIMPLE = 1\n"
+          "DEFC IG_GUARD_SIMPLE = 1\n"
           "SIMPLE_LINE\n"
           "#endif\n";
     }
@@ -7897,7 +7896,7 @@ TEST_CASE("Preprocessor: include guard #ifndef/defc name at top prevents second 
 
     // Body emitted only once
     REQUIRE(out.size() == 3);
-    REQUIRE(out[0] == "defc IG_GUARD_SIMPLE = 1");
+    REQUIRE(out[0] == "DEFC IG_GUARD_SIMPLE = 1");
     REQUIRE(out[1] == "SIMPLE_LINE");
     REQUIRE(out[2] == "AFTER");
 

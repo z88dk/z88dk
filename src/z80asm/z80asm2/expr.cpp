@@ -477,6 +477,47 @@ std::unique_ptr<ExprNode> make_conditional(std::unique_ptr<ExprNode> condition,
            );
 }
 
+Expression expression_plus_one(const Expression& orig) {
+    // Produce AST: UnaryPlus(orig) + 1
+    if (orig.empty()) {
+        Expression out(make_integer(1), orig.location());
+        TokenLine toks(orig.location());
+        toks.tokens().push_back(Token(TokenType::Integer, "1", 1, false));
+        out.set_tokens(toks);
+        return out;
+    }
+
+    // Clone original root and build unary plus then add 1
+    std::unique_ptr<ExprNode> cloned = orig.root()->clone();
+    std::unique_ptr<ExprNode> unary = make_unary_op(ExprOp::UnaryPlus, std::move(cloned));
+    std::unique_ptr<ExprNode> add = make_binary_op(ExprOp::Add, std::move(unary), make_integer(1));
+    Expression out(std::move(add), orig.location());
+
+    // Build token line "+(old_tokens)+1" with no space after '('
+    TokenLine toks(orig.location());
+
+    // leading '+'
+    toks.tokens().push_back(Token(TokenType::Plus, "+", false));
+    // '('
+    toks.tokens().push_back(Token(TokenType::LeftParen, "(", false));
+
+    // copy original tokens
+    const TokenLine& old = orig.token_line();
+    const auto& old_tokens = old.tokens();
+    for (size_t i = 0; i < old_tokens.size(); ++i) {
+        const Token& t = old_tokens[i];
+        toks.tokens().push_back(t);
+    }
+
+    // ')', '+', '1'
+    toks.tokens().push_back(Token(TokenType::RightParen, ")", false));
+    toks.tokens().push_back(Token(TokenType::Plus, "+", false));
+    toks.tokens().push_back(Token(TokenType::Integer, "1", 1, false));
+
+    out.set_tokens(toks);
+    return out;
+}
+
 //-----------------------------------------------------------------------------
 // Expression Parser (Recursive Descent)
 //-----------------------------------------------------------------------------

@@ -2908,3 +2908,63 @@ TEST_CASE("Macros: zero-parameter function-like macro invoked with 1 argument re
     REQUIRE(msg.find("Macro argument count mismatch for: H") != std::string::npos);
 }
 
+TEST_CASE("Macro: make_temp_label_name produces predictable unique names when counter reset",
+          "[model][macro][temp_label]") {
+    // Preserve and restore global counter to avoid affecting other tests
+    size_t saved_counter = g_unique_id_counter;
+    g_unique_id_counter = 0;
+
+    // Generate two temporary names
+    std::string name1 = make_temp_label_name("base");
+    std::string name2 = make_temp_label_name("base");
+
+    // They must be different
+    REQUIRE(name1 != name2);
+
+    // Both must contain a trailing "_<id>" suffix matching the counter values
+    auto suffix1_pos = name1.find_last_of('_');
+    auto suffix2_pos = name2.find_last_of('_');
+    REQUIRE(suffix1_pos != std::string::npos);
+    REQUIRE(suffix2_pos != std::string::npos);
+
+    REQUIRE(name1.substr(suffix1_pos + 1) == "0");
+    REQUIRE(name2.substr(suffix2_pos + 1) == "1");
+
+    // Global counter should have advanced accordingly (2 calls -> value 2)
+    REQUIRE(g_unique_id_counter == 2);
+
+    // Restore original counter
+    g_unique_id_counter = saved_counter;
+}
+
+TEST_CASE("Macro: make_temp_label_name increments g_unique_id_counter and embeds id",
+          "[model][macro][temp_label]") {
+    size_t saved_counter = g_unique_id_counter;
+    g_unique_id_counter = 5;
+
+    std::string name = make_temp_label_name("base");
+
+    // Expect suffix "_5"
+    auto pos = name.find_last_of('_');
+    REQUIRE(pos != std::string::npos);
+    REQUIRE(name.substr(pos + 1) == "5");
+
+    // Counter should have incremented
+    REQUIRE(g_unique_id_counter == 6);
+
+    g_unique_id_counter = saved_counter;
+}
+
+TEST_CASE("Macro: make_temp_label_name handles large counter values",
+          "[model][macro][temp_label][large-counter]") {
+    size_t saved_counter = g_unique_id_counter;
+    g_unique_id_counter = 123456;
+    std::string name = make_temp_label_name("base");
+    // Expect suffix "_123456"
+    auto pos = name.find_last_of('_');
+    REQUIRE(pos != std::string::npos);
+    REQUIRE(name.substr(pos + 1) == "123456");
+    // Counter should have incremented
+    REQUIRE(g_unique_id_counter == 123457);
+    g_unique_id_counter = saved_counter;
+}

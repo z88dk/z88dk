@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\ast_node.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\file_cache.cpp" />
@@ -36,6 +37,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\macros.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\module.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
@@ -44,6 +47,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\unit.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

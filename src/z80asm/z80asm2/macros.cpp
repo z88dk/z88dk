@@ -1005,3 +1005,9 @@ bool RepeatCharsBlock::parse_chars(const TokenLine& line, size_t& index) {
 
     return true;
 }
+
+std::string make_temp_label_name(const std::string& base_name) {
+    std::string name = base_name + "_TEMP_" +
+                       std::to_string(g_unique_id_counter++);
+    return name;
+}

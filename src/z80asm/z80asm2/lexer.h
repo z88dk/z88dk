@@ -79,6 +79,8 @@ enum class TokenType {
 
     // Assembly instruction pointer
     ASMPC,
+
+    Count           // Total number of token types
 };
 
 //-----------------------------------------------------------------------------
