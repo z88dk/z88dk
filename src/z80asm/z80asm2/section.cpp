@@ -282,29 +282,35 @@ void Opcode::add_byte(uint8_t byte) {
     bytes_.push_back(byte);
 }
 
-void Opcode::add_bytes(unsigned int value) {
-    uint8_t byte3 = static_cast<uint8_t>((value >> 24) & 0xFF);
-    uint8_t byte2 = static_cast<uint8_t>((value >> 16) & 0xFF);
-    uint8_t byte1 = static_cast<uint8_t>((value >> 8) & 0xFF);
-    uint8_t byte0 = static_cast<uint8_t>(value & 0xFF);
+void Opcode::add_bytes(uint64_t value) {
+    // Emit a minimal big-endian byte sequence for `value`.
+    // Behaviour kept compatible with the previous implementation:
+    // - emit the smallest number of bytes that represent `value` (except zero -> emit one zero byte)
+    // - bytes are emitted MSB first (big-endian order)
+    uint8_t parts[8];
+    // parts[0] = most significant byte, parts[7] = least significant byte
+    for (int i = 0; i < 8; ++i) {
+        parts[i] = static_cast<uint8_t>((value >> ((7 - i) * 8)) & 0xFF);
+    }
 
-    if (byte3 != 0) {
-        bytes_.push_back(byte3);
-        bytes_.push_back(byte2);
-        bytes_.push_back(byte1);
-        bytes_.push_back(byte0);
+    // find first non-zero byte (from MSB to LSB)
+    int first_nonzero = -1;
+    for (int i = 0; i < 8; ++i) {
+        if (parts[i] != 0) {
+            first_nonzero = i;
+            break;
+        }
     }
-    else if (byte2 != 0) {
-        bytes_.push_back(byte2);
-        bytes_.push_back(byte1);
-        bytes_.push_back(byte0);
-    }
-    else if (byte1 != 0) {
-        bytes_.push_back(byte1);
-        bytes_.push_back(byte0);
+
+    if (first_nonzero == -1) {
+        // value == 0 -> emit a single zero byte (preserve old behavior)
+        bytes_.push_back(parts[7]);
     }
     else {
-        bytes_.push_back(byte0);
+        // emit from first_nonzero .. 7 (MSB..LSB)
+        for (int i = first_nonzero; i < 8; ++i) {
+            bytes_.push_back(parts[i]);
+        }
     }
 }
 

@@ -55,6 +55,8 @@ DEPENDS := $(OBJS:.o=.d) $(COMMON_TEST_OBJS:.o=.d) $(TEST_OBJS:.o=.d) $(CATCH_OB
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
 		  --max-code-length=120 --lineend=linux --formatted \
+		  --exclude="opcodes_tables.h" \
+		  --exclude="opcodes_tables.cpp" \
 		  --exclude="unittests/catch_amalgamated.hpp" \
 		  --exclude="unittests/catch_amalgamated.cpp" \
 		  --recursive "*.cpp" "*.h"
@@ -108,32 +110,32 @@ define run-tests
 endef
 
 # Rule to procude opcodes_tables.cpp
-#$(PROJ)$(EXE): $(OBJ_DIR)/opcodes_tables.o
-#$(OBJ_DIR)/opcodes.o: opcodes_tables.h
-#
-#opcodes_tables.cpp opcodes_tables.h opcodes_tables.inc: \
-#		lexer.h $(wildcard *.def) \
-#		$(wildcard cpu/*.dat cpu/*.pl cpu/*.pm) \
-#		Makefile cpu/Makefile 
-#	$(MAKE) -C cpu
+$(PROJ)$(EXE): $(OBJ_DIR)/opcodes_tables.o
+$(OBJ_DIR)/opcodes.o: opcodes_tables.h
+
+opcodes_tables.cpp opcodes_tables.h opcodes_tables.inc: \
+		lexer.h $(wildcard *.def) \
+		$(wildcard cpu/*.dat cpu/*.pl cpu/*.pm) \
+		Makefile cpu/Makefile 
+	$(MAKE) -C cpu
 
 # Rule to produce keywords.def filters
-#$(OBJ_DIR)/preprocessor.o: keywords_preproc_directive.inc
-#
-#keywords_8bit_register.inc \
-#keywords_asm_directive.inc \
-#keywords_conditional_directive.inc \
-#keywords_flag.inc \
-#keywords_hla_directive.inc \
-#keywords_opcode.inc \
-#keywords_preproc_directive.inc \
-#keywords_preproc_name_directive.inc \
-#keywords_register.inc \
-#keywords_segment_register.inc \
-#keywords_x_register: \
-#		make_keywords_filters.pl keywords.def Makefile
-#	$(PERL) make_keywords_filters.pl keywords.def
-#	$(DOS2UNIX) keywords*.inc
+$(OBJ_DIR)/preprocessor.o: keywords_preproc_directive.inc
+
+keywords_8bit_register.inc \
+keywords_asm_directive.inc \
+keywords_conditional_directive.inc \
+keywords_flag.inc \
+keywords_hla_directive.inc \
+keywords_opcode.inc \
+keywords_preproc_directive.inc \
+keywords_preproc_name_directive.inc \
+keywords_register.inc \
+keywords_segment_register.inc \
+keywords_x_register: \
+		make_keywords_filters.pl keywords.def Makefile
+	$(PERL) make_keywords_filters.pl keywords.def
+	$(DOS2UNIX) keywords*.inc
 
 test:: $(TEST_BINS) $(TEST_OBJS)
 	$(call run-tests,$(TEST_BINS))

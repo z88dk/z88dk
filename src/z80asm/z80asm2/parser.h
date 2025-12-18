@@ -6,10 +6,22 @@
 
 #pragma once
 
-class AST;
+#include "expr.h"
+#include <deque>
+#include <string>
+
+class CompilationUnit;
+class TokenLine;
 
 class Parser {
 public:
-    Parser();
-    AST parse();
+    Parser(CompilationUnit* unit);
+    void clear();
+    bool parse(const TokenLine& line);
+
+private:
+    CompilationUnit* unit_ = nullptr;
+    const TokenLine* line_ = nullptr;
+    size_t i_ = 0; // point int line tokens
+    std::deque<Expression> exprs_;
 };

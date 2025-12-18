@@ -92,7 +92,7 @@ public:
 
     void clear_bytes();
     void add_byte(uint8_t byte);
-    void add_bytes(unsigned int value);
+    void add_bytes(uint64_t value);
 
     const std::vector<Patch>& patches() const;
     void add_patch(const Patch& patch);

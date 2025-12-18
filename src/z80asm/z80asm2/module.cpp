@@ -248,3 +248,11 @@ Symbol* Module::add_symbol(const std::string& name, const Location& location,
 
     return sym;
 }
+
+Symbol* Module::add_label_symbol(const std::string& name,
+                                 const Location& location, int offset) {
+    Opcode opcode(current_section(), location);
+    Opcode* opcode_ptr = current_section()->add_opcode(std::move(opcode));
+    return add_symbol(name, location,
+                      opcode_ptr, offset, SymbolType::AddressRelative);
+}

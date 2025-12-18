@@ -1,0 +1,41 @@
+//-----------------------------------------------------------------------------
+// Z80 assembler
+// Copyright (C) Paulo Custodio, 2011-2026
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+X(0,  not_defined,    	"")
+X(1,  z80,         	    "z80")
+X(2,  z80_strict,  	    "z80_strict")
+X(3,  z180,        	    "z180")
+X(4,  ez80_z80,    	    "ez80_z80")
+X(5,  ez80,        	    "ez80")
+X(6,  z80n,        	    "z80n")
+X(7,  r2ka,        	    "r2ka")
+X(8,  r3k,         	    "r3k")
+X(9,  gbz80,       	    "gbz80")
+X(10, i8080,            	"8080")
+X(11, i8085,        	    "8085")
+X(12, r800,        	    "r800")
+X(13, r4k,         	    "r4k")
+X(14, r5k,         	    "r5k")
+X(15, kc160,       	    "kc160")
+X(16, kc160_z80,   	    "kc160_z80")
+X(17, i8080_strict,		"8080_strict")
+X(18, i8085_strict,		"8085_strict")
+X(19, gbz80_strict,	    "gbz80_strict")
+X(20, z180_strict,		"z180_strict")
+X(21, z80n_strict,		"z80n_strict")
+X(22, ez80_z80_strict,  "ez80_z80_strict")
+X(23, ez80_strict,      "ez80_strict")
+X(24, r800_strict,   	"r800_strict")
+X(25, kc160_strict,     "kc160_strict")
+X(26, kc160_z80_strict, "kc160_z80_strict")
+X(27, r2ka_strict,      "r2ka_strict")
+X(28, r3k_strict,       "r3k_strict")
+X(29, r4k_strict,       "r4k_strict")
+X(30, r5k_strict,		"r5k_strict")
+X(31, r6k,				"r6k")
+X(32, r6k_strict,		"r6k_strict")
+
+#undef X
