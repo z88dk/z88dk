@@ -151,6 +151,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\ast_node.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\code_generator.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\file_cache.cpp" />
@@ -164,6 +165,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\location.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\macros.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\module.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preprocessor.cpp" />
@@ -179,6 +182,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\ast_node.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\code_generator.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\file_cache.h" />
@@ -192,6 +196,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\location.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\macros.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\module.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preprocessor.h" />
@@ -201,8 +206,33 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm\z80asm2\cpu.def" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\CPUs.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\CsrBuilder.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\DFA.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\DFA_Leafs.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\DFA_Tokens.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\dump_opcodes.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Keywords.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\make_dfa.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\make_opcodes.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Opcodes.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_8080.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_8085.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_ez80.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_gbz80.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_kc160.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_r800.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_rabbit.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_synth.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_z180.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_z80.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\opcodes_z80n.pl" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\TokenTypes.pm" />
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Trie.pm" />
     <None Include="..\..\src\z80asm\z80asm2\errors.def" />
     <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
+    <None Include="..\..\src\z80asm\z80asm2\opcodes_tables.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.re" />
     <None Include="..\..\src\z80asm\z80asm2\t\include.t" />
     <None Include="..\..\src\z80asm\z80asm2\t\preprocessor.t" />

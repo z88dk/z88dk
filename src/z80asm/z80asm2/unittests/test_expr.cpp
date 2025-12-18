@@ -2339,3 +2339,40 @@ TEST_CASE("Integration: address-relative label in section",
     REQUIRE(sym.location().filename() == "main.asm");
     REQUIRE(sym.location().line_num() == 100);
 }
+
+TEST_CASE("Expression: expression_plus_one on constant multi-operand preserves location and tokens",
+          "[model][expr][util]") {
+    Location loc("plusone.asm", 5);
+    Module module("TEST", loc);
+    Section* section = module.current_section();
+
+    // Create a constant expression with more than one operand by parsing tokens
+    // so that token text is preserved (to_string() -> "3+4")
+    TokenLine line(loc);
+    line.tokens().push_back(Token(TokenType::Integer, "3", 3, false));
+    line.tokens().push_back(Token(TokenType::Plus, "+", false));
+    line.tokens().push_back(Token(TokenType::Integer, "4", 4, false));
+
+    Expression expr;
+    size_t i = 0;
+    REQUIRE(expr.parse(line, i, &module, section));
+    REQUIRE(i == 3);
+
+    REQUIRE(expr.is_constant());
+    int orig_value = expr.evaluate();
+    REQUIRE(orig_value == 7);
+
+    // Build the +1 expression
+    Expression new_expr = expression_plus_one(expr);
+
+    // It must evaluate to original + 1
+    REQUIRE(new_expr.evaluate() == orig_value + 1);
+
+    // It must preserve the original location
+    REQUIRE(new_expr.location().filename() == expr.location().filename());
+    REQUIRE(new_expr.location().line_num() == expr.location().line_num());
+
+    // and have the expected token-style string: "+(original)+1"
+    REQUIRE(new_expr.to_string() == "+(" + expr.to_string() + ")+1");
+}
+

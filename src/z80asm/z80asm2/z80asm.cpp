@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "assembler.h"
 #include "errors.h"
 #include "options.h"
 #include "preprocessor.h"
@@ -85,8 +86,7 @@ int main(int argc, char* argv[]) {
         preprocess_only();
     }
     else {
-        g_errors.error(ErrorCode::UnknownInstruction,
-                       "Full assemble not implemented yet");
+        assemble_files();
     }
 
     return g_errors.has_errors() ? EXIT_FAILURE : EXIT_SUCCESS;

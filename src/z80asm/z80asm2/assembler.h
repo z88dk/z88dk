@@ -17,13 +17,12 @@
 
 class Assembler {
 public:
-    Assembler() = default;
-    bool assemble(const std::string& input);
-    Preprocessor& preprocessor();
-    CompilationUnit& compilation_unit();
+    void assemble(const std::string& input_filename);
 
 private:
-    // Components used by the assembler.
-    std::unique_ptr<Preprocessor> preprocessor_ = nullptr;
-    std::unique_ptr<CompilationUnit> compilation_unit_ = nullptr;
+    std::string input_filename_;
+    Preprocessor preprocessor_;
+    CompilationUnit compilation_unit_;
 };
+
+void assemble_files();
