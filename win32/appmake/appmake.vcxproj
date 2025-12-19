@@ -33,6 +33,7 @@
     <ClCompile Include="..\..\src\appmake\alphatp2.c" />
     <ClCompile Include="..\..\src\appmake\appmake.c" />
     <ClCompile Include="..\..\src\appmake\aquarius.c" />
+    <ClCompile Include="..\..\src\appmake\bbc.c" />
     <ClCompile Include="..\..\src\appmake\c128.c" />
     <ClCompile Include="..\..\src\appmake\c7420.c" />
     <ClCompile Include="..\..\src\appmake\cpc.c" />
