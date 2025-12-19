@@ -41,6 +41,9 @@
     <ClCompile Include="..\..\src\appmake\aquarius.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\bbc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\appmake\c128.c">
       <Filter>Source Files</Filter>
     </ClCompile>
