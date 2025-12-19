@@ -79,6 +79,9 @@ extern option_t  alphatp2_options[];
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options[];
 
+extern int       bbc_exec(char *target);
+extern option_t  bbc_options[];
+
 extern int       c128_exec(char *target);
 extern option_t  c128_options[];
 
@@ -348,6 +351,10 @@ struct {
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,
       aquarius_exec, aquarius_options },
+    { "bin2bbc",   "bbc",    "(C) 2025 z88dk",
+      "Generates disk image files for BBC Micro",
+      NULL,
+      bbc_exec,    bbc_options },
     { "bin3000",  "c128",      "(C) 2001 Stefano Bodrato",
       "Adds a c128 style disk file header",
       NULL,
