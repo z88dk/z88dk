@@ -360,7 +360,6 @@ static int write_file_Lx(FILE *img,
 
 int bbc_exec(char *target)
 {
-    char     sector[512] = {0};
     char    filename[FILENAME_MAX+1];
     int     pos, length;
 
@@ -508,4 +507,3 @@ int bbc_exec(char *target)
 
     return 0;
 }
-
