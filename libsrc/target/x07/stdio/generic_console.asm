@@ -15,10 +15,10 @@
     EXTERN  generic_console_udg32
     EXTERN  clg
     EXTERN  __x07_buffer
+    EXTERN  __x07_natural_chars
+    EXTERN  __ansichar_4x4
 
     defc generic_console_cls = clg
-
-
 
     INCLUDE "target/x07/def/x07.h"
 
@@ -32,6 +32,9 @@ generic_console_scrollup:
     push    de
     push    bc
     // TODO: Issue subcpu command
+    ld      a,(__x07_natural_chars)
+    and     a
+    jr      z,scroll_return
 
 
     // Clear our memory buffer
@@ -46,7 +49,7 @@ generic_console_scrollup_3:
     inc     hl
     djnz    generic_console_scrollup_3
 
-
+scroll_return:
     pop     bc
     pop     de
     ret
@@ -57,6 +60,10 @@ generic_console_scrollup_3:
 ; a = d = character to print
 ; e = raw
 generic_console_printc:
+    ld      a,(__x07_natural_chars)
+    and     a
+    ld      a,d
+    jp      z,__ansichar_4x4
     push    bc
     call    generic_console_xypos
     ld      (hl), a
@@ -83,6 +90,10 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+    ld      a,(__x07_natural_chars)
+    and     a
+    scf
+    ret     z
     call    generic_console_xypos
     ld      a, (hl)
     and     a
@@ -97,3 +108,4 @@ generic_console_xypos_1:
     djnz    generic_console_xypos_1
     add     hl, bc                      ;hl now points to address in display
     ret
+
