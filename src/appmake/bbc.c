@@ -54,6 +54,14 @@ option_t bbc_options[] = {
 #define MAX_LOGICAL_SECTOR 2559  // 16*80*2 - 1
 
 
+typedef struct {
+    uint16_t block_word;
+    uint16_t highest_rec;
+    uint8_t  user;
+    char     nameext[11];
+} DirEntry;
+
+
 static void wr16le(uint8_t *p, uint16_t i)
 {
     p[0] = (uint8_t)(i%256);
@@ -109,37 +117,34 @@ static int next_free_sector(uint16_t start)
     return -1; // no sectors left
 }
 
-// Write a single directory sector image (first entry + end-of-dir) 
-// and replicate across all dir sectors (quick and dirty)
-static int write_directory(FILE *img, uint16_t block_word, uint16_t highest_rec, uint8_t user)
-{
-    // Set up a directory sector with 16 entries (the used one + directory end + nulls)
-    uint8_t sector[SECTOR_SIZE];
-    memset(sector, 0x00, sizeof(sector));
 
-    // Entry 0
-    wr16le(&sector[0],  block_word);
-    wr16le(&sector[2],  highest_rec);
-    sector[4] = user;
-
-    // 8 char name + 3 char ext, bit7 = attributes (left to 0)
-    for (int i = 0; i < 11; i++) sector[5 + i]  = (uint8_t)(bbc_filename[i] & 0x7F);
-    // Bit7 in extension chars could be used for R/O, SYS, Execute-only flags; we leave them clear.
-
-    // Entry 1: end of directory (&0000)
-    wr16le(&sector[16 + 0], 0x0000);
-    wr16le(&sector[16 + 2], 0x0000);
-    sector[16 + 4] = 0x00;
-
-    // Write all accessible directory sectors (&0000..&0009, &0010..&0015)
-    for (uint16_t s = LOG_DIR_S1_START; s <= LOG_DIR_S1_END; ++s) {
-        if (write_logical_sector(img, s, sector) == 0) mark_alloc(s);
+static int write_directory(FILE *img, const DirEntry *ents, size_t n) {
+  const uint16_t ranges[][2] = { {LOG_DIR_S1_START, LOG_DIR_S1_END},
+                                 {LOG_DIR_S2_START, LOG_DIR_S2_END} };
+  uint8_t sector[SECTOR_SIZE];
+  size_t ent_idx = 0;
+  for (size_t r = 0; r < 2; ++r) {
+    for (uint16_t s = ranges[r][0]; s <= ranges[r][1]; ++s) {
+      memset(sector, 0x00, sizeof(sector));
+      for (int slot = 0; slot < SECTOR_SIZE/16; ++slot) {
+        uint8_t *p = &sector[slot*16];
+        if (ent_idx < n) {
+          wr16le(&p[0],  ents[ent_idx].block_word);
+          wr16le(&p[2],  ents[ent_idx].highest_rec);
+          p[4] = ents[ent_idx].user;
+          for (int i = 0; i < 11; ++i)  p[5 + i]  = (uint8_t)(ents[ent_idx].nameext[i] & 0x7F);
+          ++ent_idx;
+        } else {
+          wr16le(&p[0], 0x0000); wr16le(&p[2], 0x0000); p[4] = 0x00;
+        }
+      }
+      if (write_logical_sector(img, s, sector) != 0) return -1;
+      mark_alloc(s);
     }
-    for (uint16_t s = LOG_DIR_S2_START; s <= LOG_DIR_S2_END; ++s) {
-        if (write_logical_sector(img, s, sector) == 0) mark_alloc(s);
-    }
-    return 0;
+  }
+  return 0;
 }
+
 
 // Write Test Pattern (@0x0018) and Other Info (@0x0019)
 static void write_misc(FILE *img)
@@ -203,10 +208,8 @@ static int write_allocation_map(FILE *img)
 // - number of data sectors used (for reporting)
 static int write_file_Lx(FILE *img,
                          uint16_t total_records,
-                         uint16_t *out_block_word,
-                         uint16_t *out_data_sectors)
+                         uint16_t *out_block_word)
 {
-    *out_data_sectors = 0;
 
     // Direct L3 if <= 256 records
     if (total_records <= 256) {
@@ -250,7 +253,6 @@ static int write_file_Lx(FILE *img,
                 // Write data sector
                 if (write_logical_sector(img, data_sec, databuf) != 0) return -1;
                 mark_alloc(data_sec);
-                (*out_data_sectors)++;
 
                 // Set up L3: b0-13 = sector, b14/b15 = flag record as written
                 uint16_t w = (uint16_t)(data_sec & 0x3FFF);
@@ -332,7 +334,6 @@ static int write_file_Lx(FILE *img,
 
                 if (write_logical_sector(img, data_sec, databuf) != 0) return -1;
                 mark_alloc(data_sec);
-                (*out_data_sectors)++;
 
                 uint16_t w = (uint16_t)(data_sec & 0x3FFF);
                 if (have_even) w |= 0x4000;
@@ -353,6 +354,50 @@ static int write_file_Lx(FILE *img,
 
     return 0;
 }
+
+
+// TODO: edit mode to add files to an existing disk image
+
+// static int torch_add_file(FILE *img,
+//                           const char *path,
+//                           const char *crt,
+//                           DirEntry *out_dir_ent)
+// {
+//     FILE *fp = fopen_bin(path, crt);
+//     if (!fp) {
+//         exit_log(1, "Cannot open CRT file <%s>\n", path);
+//     }
+//     // Size
+//     if (fseek(fp, 0, SEEK_END)) {
+//         fclose(fp);
+//         exit_log(1, "Couldn't determine size of file\n");
+//     }
+//     int length = ftell(fp);
+//     fseek(fp, 0L, SEEK_SET);
+//     if (length <= 0) {
+//         fclose(fp);
+//         exit_log(1, "Input file is empty.\n");
+//     }
+//     // Records
+//     uint16_t total_records = (uint16_t)((length + 127) / 128);
+//     // Prepara name/ext CPM (11 byte upper & padded)
+//     char nameext[11] = {0};
+//     cpm_create_filename(path, nameext, 1, 0);
+// 
+//     bbc_fpin = fp;
+//     uint16_t block_word = 0;
+//     if (write_file_Lx(img, total_records, &block_word) != 0) {
+//         fclose(fp);
+//         exit_log(1, "Error writing file contents.\n");
+//     }
+//     // Directory entry
+//     out_dir_ent->block_word  = block_word;            // L3 direct (0+n) or L2 (0x8000+n)
+//     out_dir_ent->highest_rec = (uint16_t)(total_records - 1);
+//     out_dir_ent->user        = 0;
+//     memcpy(out_dir_ent->nameext, nameext, 11);
+//     fclose(fp);
+//     return 0;
+// }
 
 // **************************************************************************************
 
@@ -436,8 +481,7 @@ int bbc_exec(char *target)
 
     // Write file (data + L2/L3)
     uint16_t  block_word = 0;
-    uint16_t  data_sectors = 0;
-    if (write_file_Lx(img, total_records, &block_word, &data_sectors) != 0) {
+    if (write_file_Lx(img, total_records, &block_word) != 0) {
         fclose(img);
         fclose(bbc_fpin);
         exit_log(1,"Error writing file contents.\n");
@@ -446,8 +490,12 @@ int bbc_exec(char *target)
     // highest_record = total_records - 1
     uint16_t highest_rec = (uint16_t)(total_records - 1);
 
-    // Write directory sectors
-    if (write_directory(img, block_word, highest_rec, 0) != 0) {
+    // Write directory sectors (first file in disk)
+    DirEntry e = {block_word, highest_rec, 0, {0}};
+	memcpy(e.nameext, bbc_filename, 11);
+    write_directory(img, &e, 1);
+
+    if (write_directory(img, &e, 1) != 0) {
         fclose(img);
         fclose(bbc_fpin);
         exit_log(1,"Error writing directory.\n");
@@ -507,3 +555,4 @@ int bbc_exec(char *target)
 
     return 0;
 }
+
