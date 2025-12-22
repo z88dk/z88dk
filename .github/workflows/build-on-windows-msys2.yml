@@ -15,61 +15,70 @@ jobs:
     defaults:
       run:
         shell: msys2 {0}
+
     steps:
     - name: Checkout from git
       uses: actions/checkout@v4
-      with: 
+      with:
         submodules: 'true'
+
     - name: Cache multiple paths
       uses: actions/cache@v4
       with:
         path: |
           ~/perl5
         key: ${{ runner.os }}-cache3
+
     - name: Setup msys2
       uses: msys2/setup-msys2@v2
       with:
         update: true
         install: |
-          base-devel
-          perl-modules
-          perl-doc
-          perl-YAML-Tiny
-          mingw64/mingw-w64-x86_64-gcc
-          mingw64/mingw-w64-x86_64-pkg-config
-          mingw64/mingw-w64-x86_64-libxml2
-          mingw64/mingw-w64-x86_64-ragel
           mingw64/mingw-w64-x86_64-boost
+          mingw64/mingw-w64-x86_64-gcc
           mingw64/mingw-w64-x86_64-gmp
+          mingw64/mingw-w64-x86_64-libxml2
+          mingw64/mingw-w64-x86_64-make
+          mingw64/mingw-w64-x86_64-perl
+          mingw64/mingw-w64-x86_64-pkg-config
+          mingw64/mingw-w64-x86_64-ragel
           git
           re2c
           vim
+
     - name: Install perl prerequisites
       run: |
         set -e -x
+        export PATH=/mingw64/bin:$PATH
         cpan local::lib
         eval $(perl -Mlocal::lib)
-        # install modules that fail tests in msys2 with -f
-        cpan -f Test::Harness
-        cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Test::HexDifferences Text::Diff Text::Table
+        cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table
+
     - name: Build binaries
       run: |
         set -e -x
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -Mlocal::lib)
         ./build.sh -v -l
+
     - name: Build libraries
       run: |
         set -e -x
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -Mlocal::lib)
         cp `which m4` bin/
         ./build.sh -v -b
+
     - name: Build examples
       run: |
         set -e -x
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -Mlocal::lib)
         ./build.sh -v -b -l -e
+
     - name: Run tests
       run: |
         set -e -x
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -Mlocal::lib)
         ./build.sh -v -b -l -t
