@@ -1709,6 +1709,26 @@ static disc_spec bigboard_spec = {
 };
 
 
+static disc_spec rm380z_spec = {
+    .name = "RM380Z",
+    .disk_mode = FM300,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 128,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
+};
+
+
 static disc_spec excali_spec = {
     .name = "Excalibur64",
     .disk_mode = MFM300,
@@ -2360,6 +2380,7 @@ static struct formats {
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "ZX Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
+    { "rm380z",    "Research Machines 380Z", &rm380z_spec, 0, NULL, 1 },
     { "scorpion",  "ZX Scorpion, Profi",    &scoprpion_spec, 0, NULL, 1 },
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
     { "diskface",  "ZX Dataputer DISKFACE", &diskface_spec, 0, NULL, 1 },
