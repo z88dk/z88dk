@@ -23,7 +23,7 @@ jobs:
       run: |
         export PATH=/usr/local/bin:$PATH
         cpan -T Capture::Tiny
-        cpan App::Prove Array::Compare Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::HexDifferences Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+        cpan App::Prove Array::Compare Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
       run: |
         eval "$(/opt/homebrew/bin/brew shellenv)"
