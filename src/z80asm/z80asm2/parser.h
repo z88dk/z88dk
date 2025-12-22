@@ -22,7 +22,7 @@ public:
 private:
     CompilationUnit* unit_ = nullptr;
     const TokenLine* line_ = nullptr;
-    size_t i_ = 0; // point int line tokens
+    size_t i_ = 0; // point into line tokens
     std::deque<Expression> exprs_;
 
     void expect_end();
