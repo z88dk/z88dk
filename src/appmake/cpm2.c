@@ -2047,6 +2047,8 @@ static disc_spec hz17_spec = {
     .extent_size = 1024,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 4, 8, 2, 6, 1, 5, 9, 3, 7 }
 };
 
 // Heath H89/Zenith Z89 SSDD (Magnolia disk unit)
