@@ -21,4 +21,12 @@ target/p2000/games/bit_open_di
 target/p2000/games/bit_close
 target/p2000/games/bit_close_ei
 @classic/games/games.lst
-
+target/p2000/input/in_Inkey
+target/p2000/input/in_JoyKeyboard
+target/p2000/input/in_KeyPressed
+target/p2000/input/in_LookupKey
+target/p2000/input/in_Pause
+target/p2000/input/in_Wait
+target/p2000/input/in_WaitForKey
+target/p2000/input/in_WaitForNoKey
+target/p2000/input/in_keytranstbl
