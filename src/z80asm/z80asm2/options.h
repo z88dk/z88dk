@@ -23,7 +23,8 @@ struct Options {
     std::string cpp_options;
     std::string output_dir;
     std::vector<std::string> include_paths;
-    std::vector<std::string> input_files;
+    std::vector<std::string> input_files;   // command line input files
+    std::vector<std::string> object_files;  // output from the assembler
 
     // parse arguments and options
     bool parse_arg(const std::string& arg, bool& found_dash_dash);

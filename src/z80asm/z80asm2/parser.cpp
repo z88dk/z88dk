@@ -7,11 +7,24 @@
 #include "parser.h"
 #include "ast.h"
 
-Parser::Parser() {
-    // Stub: to be implemented
+Parser::Parser(CompilationUnit* unit)
+    : unit_(unit) {
 }
 
-AST Parser::parse() {
-    // Stub: to be implemented
-    return AST();
+void Parser::clear() {
+    line_ = nullptr;
+    i_ = 0;
+    exprs_.clear();
+}
+
+bool Parser::parse(const TokenLine& line) {
+    line_ = &line;
+    i_ = 0;
+
+    // check for empty line
+    if (i_ >= line_->tokens().size()) {
+        return true;
+    }
+
+    return false;
 }

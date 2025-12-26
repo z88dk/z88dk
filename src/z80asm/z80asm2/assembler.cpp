@@ -13,19 +13,29 @@
 #include <string>
 #include <cassert>
 
-bool Assembler::assemble(const std::string& input_file) {
-    (void)input_file;
-    preprocessor_ = std::make_unique<Preprocessor>();
-    compilation_unit_ = std::make_unique<CompilationUnit>();
-    return false;
+void Assembler::assemble(const std::string& input_filename) {
+    input_filename_ = input_filename;
+    preprocessor_.push_file(input_filename_);
+
 }
 
-Preprocessor& Assembler::preprocessor() {
-    assert(preprocessor_);
-    return *preprocessor_;
-}
+void assemble_files() {
+    for (auto& asm_filename : g_options.input_files) {
+        if (g_options.is_o_filename(asm_filename)) {
+            if (g_options.verbose) {
+                std::cout << "Skipping assembly of object file: "
+                          << asm_filename << std::endl;
+            }
+            g_options.object_files.push_back(asm_filename);
+        }
+        else {
+            if (g_options.verbose) {
+                std::cout << "Assembling file: "
+                          << asm_filename << std::endl;
+            }
 
-CompilationUnit& Assembler::compilation_unit() {
-    assert(compilation_unit_);
-    return *compilation_unit_;
+            Assembler as;
+            as.assemble(asm_filename);
+        }
+    }
 }

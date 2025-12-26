@@ -24,7 +24,7 @@ unlink("$test.asm");
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E $test", <<END);
 % z88dk-z80asm -v -E $test
-Skipping preprocessing for object file: $test.o
+Skipping preprocessing of object file: $test.o
 END
 
 # file.asm exists, give .asm
@@ -42,7 +42,7 @@ unlink("$test.asm");
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E $test.o", <<END);
 % z88dk-z80asm -v -E $test.o
-Skipping preprocessing for object file: $test.o
+Skipping preprocessing of object file: $test.o
 END
 
 # file.asm exists, give .o
@@ -60,7 +60,7 @@ unlink("$test.asm");
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E $test.asm", <<END);
 % z88dk-z80asm -v -E $test.asm
-Skipping preprocessing for object file: $test.o
+Skipping preprocessing of object file: $test.o
 END
 
 
@@ -86,7 +86,7 @@ unlink("$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test", <<END);
 % z88dk-z80asm -v -E -O$test.dir $test
-Skipping preprocessing for object file: $test.dir/$test.o
+Skipping preprocessing of object file: $test.dir/$test.o
 END
 
 # file.asm exists, give .asm
@@ -104,7 +104,7 @@ unlink("$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test.o", <<END);
 % z88dk-z80asm -v -E -O$test.dir $test.o
-Skipping preprocessing for object file: $test.dir/$test.o
+Skipping preprocessing of object file: $test.dir/$test.o
 END
 
 # file.asm exists, give .o
@@ -122,7 +122,7 @@ unlink("$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -O$test.dir $test.asm", <<END);
 % z88dk-z80asm -v -E -O$test.dir $test.asm
-Skipping preprocessing for object file: $test.dir/$test.o
+Skipping preprocessing of object file: $test.dir/$test.o
 END
 
 
@@ -149,7 +149,7 @@ unlink("$test.dir/$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test", <<END);
 % z88dk-z80asm -v -E -I$test.dir $test
-Skipping preprocessing for object file: $test.dir/$test.o
+Skipping preprocessing of object file: $test.dir/$test.o
 END
 
 # file.asm exists, give .asm
@@ -167,7 +167,7 @@ unlink("$test.dir/$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.o", <<END);
 % z88dk-z80asm -v -E -I$test.dir $test.o
-Skipping preprocessing for object file: $test.dir/$test.o
+Skipping preprocessing of object file: $test.dir/$test.o
 END
 
 # file.asm exists, give .o
@@ -185,7 +185,7 @@ unlink("$test.dir/$test.asm");
 spew("$test.dir/$test.o", "");
 capture_ok("z88dk-z80asm -v -E -I$test.dir $test.asm", <<END);
 % z88dk-z80asm -v -E -I$test.dir $test.asm
-Skipping preprocessing for object file: $test.dir/$test.o
+Skipping preprocessing of object file: $test.dir/$test.o
 END
 
 
@@ -198,7 +198,7 @@ sleep(1);
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E -d $test", <<END);
 % z88dk-z80asm -v -E -d $test
-Skipping preprocessing for object file: $test.o
+Skipping preprocessing of object file: $test.o
 END
 
 # file.asm exists, give .asm
@@ -208,7 +208,7 @@ sleep(1);
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E -d $test.asm", <<END);
 % z88dk-z80asm -v -E -d $test.asm
-Skipping preprocessing for object file: $test.o
+Skipping preprocessing of object file: $test.o
 END
 
 # both exists, give .o
@@ -218,7 +218,7 @@ sleep(1);
 spew("$test.o", "");
 capture_ok("z88dk-z80asm -v -E -d $test.o", <<END);
 % z88dk-z80asm -v -E -d $test.o
-Skipping preprocessing for object file: $test.o
+Skipping preprocessing of object file: $test.o
 END
 
 
