@@ -473,6 +473,7 @@ static rsthelper *get_rsthelper(dcontext *state, uint8_t b)
     else if ( strcmp(c_target, "z88") == 0 ) h = z88_helpers;
     else if ( strcmp(c_target, "zx") == 0 ) h = zx_helpers;
     else if ( strcmp(c_target, "sam") == 0 ) h = sam_helpers;
+    else if ( strcmp(c_target, "zx81") == 0 ) h = zx81_helpers;
     else return NULL;
 
     while ( h->length >= 0 ) {
