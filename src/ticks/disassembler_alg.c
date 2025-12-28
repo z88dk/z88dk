@@ -472,6 +472,7 @@ static rsthelper *get_rsthelper(dcontext *state, uint8_t b)
     if ( c_target == NULL ) return NULL;
     else if ( strcmp(c_target, "z88") == 0 ) h = z88_helpers;
     else if ( strcmp(c_target, "zx") == 0 ) h = zx_helpers;
+    else if ( strcmp(c_target, "sam") == 0 ) h = sam_helpers;
     else return NULL;
 
     while ( h->length >= 0 ) {
@@ -1402,8 +1403,14 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
 
                                             // Exponent byte handling
                                             if ( (val2 & 0x3f) == 0 ) plain_count++;
-                                        } else if ( h && h->flags & F_REL ) {
+                                        } else if ( h && h->flags & F_BYTE ) {
                                             plain_count = 1;
+                                        } else if ( h && h->flags & F_WORD ) {
+                                            plain_count = 2;
+                                        } else if ( h && h->flags & F_5BYTES ) {
+                                            plain_count = 2;
+                                        } else if ( h && h->flags & F_nBYTES ) {
+                                            PEEK_BYTE_OFFS(state, 1, plain_count);
                                         }
 
 

@@ -6,8 +6,11 @@
 #define F_SEQUENCE 1
 #define F_END      2
 #define F_LEN67    4
-// F_REL, relative jump
-#define F_REL      8        
+// One byte following (relative jumps + sam constants)
+#define F_BYTE      8
+#define F_WORD     16
+#define F_5BYTES   32
+#define F_nBYTES   64
 
 typedef struct {
     uint8_t     rst;
@@ -332,7 +335,7 @@ static rsthelper zx_helpers[] = {
 
 
     // Floating point calculator
-    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_REL, .bytes = { 0x00 }, .api = "ZXFP_JUMP_TRUE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = { 0x00 }, .api = "ZXFP_JUMP_TRUE" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x01 }, .api = "ZXFP_EXCHANGE" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x02 }, .api = "ZXFP_DELETE" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x03 }, .api = "ZXFP_SUBTRACT" },
@@ -383,7 +386,7 @@ static rsthelper zx_helpers[] = {
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x30 }, .api = "ZXFP_NOT" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x31 }, .api = "ZXFP_DUPLICATE" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x32 }, .api = "ZXFP_N_MOD_M" },
-    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_REL, .bytes = { 0x33 }, .api = "ZXFP_JUMP" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = { 0x33 }, .api = "ZXFP_JUMP" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_LEN67, .bytes = { 0x34 }, .api = "ZXFP_STK_DATA" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x35 }, .api = "ZXFP_DEC_JR_NZ" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x36 }, .api = "ZXFP_LESS_0" },
@@ -420,5 +423,132 @@ static rsthelper zx_helpers[] = {
 
     { .length = -1 }
 };
+
+static rsthelper sam_helpers[] = {
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x00 }, .api = "SAMFP_MULT" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x01 }, .api = "SAMFP_ADDN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x02 }, .api = "SAMFP_CONCAT" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x03 }, .api = "SAMFP_SUBN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x04 }, .api = "SAMFP_POWER" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x05 }, .api = "SAMFP_DIVN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x06 }, .api = "SAMFP_SWOP" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x07 }, .api = "SAMFP_DROP" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x08 }, .api = "SAMFP_MOD" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x09 }, .api = "SAMFP_IDIV" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x0a }, .api = "SAMFP_BOR" },
+    // 0x0b = reserved
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x0c }, .api = "SAMFP_BAND" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x0d }, .api = "SAMFP_NUOR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x0e }, .api = "SAMFP_NUAND" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0xf4 }, .api = "SAMFP_NOTE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x10 }, .api = "SAMFP_NLESE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x11 }, .api = "SAMFP_NGRTE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x12 }, .api = "SAMFP_NLESS" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x13 }, .api = "SAMFP_NEQUAL" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x14 }, .api = "SAMFP_NGRTR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x15 }, .api = "SAMFP_SAND" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x16 }, .api = "SAMFP_SNOTE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x17 }, .api = "SAMFP_SLESE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x18 }, .api = "SAMFP_SGRTE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x19 }, .api = "SAMFP_SLESS" },
+
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x1a }, .api = "SAMFP_SEQUAL" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x1b }, .api = "SAMFP_SGRTR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x1c }, .api = "SAMFP_SWOp13" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x1d }, .api = "SAMFP_SWOp23" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = { 0x1e }, .api = "SAMFP_JPTRUE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = { 0x1f }, .api = "SAMFP_JFFALSE" },
+
+
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = { 0x20 }, .api = "SAMFP_JUMP" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = 0x21, .api = "SAMFP_LDBREG" },   // Just loads next byte
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = 0x22, .api = "SAMFP_DECB" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x23, .api = "SAMFP_STKBREG" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x24, .api = "SAMFP_USEB" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x25, .api = "SAMFP_DUP" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_BYTE, .bytes = 0x26, .api = "SAMFP_ONELIT" },     // 1 following
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_5BYTES, .bytes = 0x27, .api = "SAMFP_FIVELIT" },    // 5 following 
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_nBYTES, .bytes = 0x28, .api = "SAMFP_SOMELIT" },    // next bytes speciies how many
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_WORD, .bytes = 0x29, .api = "SAMFP_LKADDRB" },    // Reads next 2 bytes
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_WORD, .bytes = 0x2A, .api = "SAMFP_LKADDRW" },    // Reads next 2 bytes
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x2B, .api = "SAMFP_REDARG" }, 
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x2C, .api = "SAMFP_LESS0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x2D, .api = "SAMFP_LESE0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x2E, .api = "SAMFP_GRTR0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x2F, .api = "SAMFP_GRTE0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x30, .api = "SAMFP_TRUNC" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x31, .api = "SAMFP_RESTACK" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x32, .api = "SAMFP_POWR2" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_END, .bytes = 0x33, .api = "SAMFP_EXIT" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE|F_END, .bytes = 0x34, .api = "SAMFP_EXIT2" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x39, .api = "SAMFP_SIN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x3A, .api = "SAMFP_COS" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x3B, .api = "SAMFP_TAN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x3C, .api = "SAMFP_ASN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x3D, .api = "SAMFP_ACS" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x3E, .api = "SAMFP_ATN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x3F, .api = "SAMFP_LOGN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x40, .api = "SAMFP_EXP" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x41, .api = "SAMFP_ABS" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x42, .api = "SAMFP_SQN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x43, .api = "SAMFP_SOR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x44, .api = "SAMFP_INT" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x45, .api = "SAMFP_USR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x46, .api = "SAMFP_IN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x47, .api = "SAMFP_PEEK" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x48, .api = "SAMFP_DPEEK" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x49, .api = "SAMFP_DVAR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x4A, .api = "SAMFP_SVAR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x4B, .api = "SAMFP_BUTTON" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x4C, .api = "SAMFP_EOF" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x4D, .api = "SAMFP_PTR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x4F, .api = "SAMFP_UDG" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x50, .api = "SAMFP_NUMBER" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x51, .api = "SAMFP_LEN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x52, .api = "SAMFP_CODE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x53, .api = "SAMFP_VALDOLLAR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x54, .api = "SAMFP_VAL" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x55, .api = "SAMFP_TRUNCDOLLAR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x56, .api = "SAMFP_CHR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x57, .api = "SAMFP_STR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x58, .api = "SAMFP_BIN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x59, .api = "SAMFP_HEX" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x5A, .api = "SAMFP_USRDOLLAR" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x5B, .api = "SAMFP_INKEY" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x5C, .api = "SAMFP_NOT" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0x5D, .api = "SAMFP_NEGATE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xC8, .api = "SAMFP_STOD0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xC9, .api = "SAMFP_STOD1" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xCA, .api = "SAMFP_STOD2" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xCB, .api = "SAMFP_STOD3" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xCC, .api = "SAMFP_STOD4" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xCD, .api = "SAMFP_STOD5" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD0, .api = "SAMFP_STO0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD1, .api = "SAMFP_STOl" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD2, .api = "SAMFP_STO2" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD3, .api = "SAMFP_STO3" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD4, .api = "SAMFP_STO4" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD5, .api = "SAMFP_STO5" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD8, .api = "SAMFP_RCL0" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xD9, .api = "SAMFP_RCLl" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xDA, .api = "SAMFP_RCL2" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xDB, .api = "SAMFP_RCL3" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xDC, .api = "SAMFP_RCL4" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xDD, .api = "SAMFP_RCL5" },
+
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xe0, .api = "SAMFP_STKHALF" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xe1, .api = "SAMFP_STKZERO" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xe2, .api = "SAMFP_STX1SK" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xe8, .api = "SAMFP_STKFONE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xe9, .api = "SAMFP_STKONE" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xec, .api = "SAMFP_STKTEN" },
+    { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = 0xed, .api = "SAMFP_STKRALFPI" },
+
+    { .length = -1 }
+
+
+};
+
+
 
 #endif

@@ -118,9 +118,17 @@ JGETINT Unstack number from calculator stack into HL. BC holds (0121H) acopyofHL
 	defc	SAMFP_STO3 = $D3
 	defc	SAMFP_STO4 = $D4
 	defc	SAMFP_STO5 = $D5
-	defc	SAMFP_RCL0 = $DB
+	defc	SAMFP_RCL0 = $D8
 	defc	SAMFP_RCLl = $D9
 	defc	SAMFP_RCL2 = $DA
 	defc	SAMFP_RCL3 = $DB
 	defc	SAMFP_RCL4 = $DC
 	defc	SAMFP_RCL5 = $DD
+
+    defc SAMFP_STKHALF = 0xe0
+    defc SAMFP_STKZERO = 0xe1
+    defc SAMFP_STX1SK = 0xe2
+    defc SAMFP_STKFONE = 0xe8
+    defc SAMFP_STKONE = 0xe9
+    defc SAMFP_STKTEN = 0xec
+    defc SAMFP_STKRALFPI = 0xed
