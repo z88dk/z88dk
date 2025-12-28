@@ -465,6 +465,27 @@ static rsthelper zx_helpers[] = {
 };
 
 static rsthelper sam_helpers[] = {
+    // Hook codes
+    { .rst = 0xcf, .length = 0x01, .bytes = { 128 }, .api = "INIT" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 129 }, .api = "HGTHD" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 130 }, .api = "HLOAD" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 131 }, .api = "HVERY" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 132 }, .api = "HSAVE" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 139 }, .api = "HVAR" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 147 }, .api = "HOFLE" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 148 }, .api = "SBYT" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 149 }, .api = "HWSAD" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 150 }, .api = "HSVNK" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 152 }, .api = "CFSM" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 158 }, .api = "HGFLE" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 159 }, .api = "LBYT" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 160 }, .api = "HRSAD" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 161 }, .api = "HLDBK" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 164 }, .api = "REST" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 165 }, .api = "PCAT" },
+    { .rst = 0xcf, .length = 0x01, .bytes = { 166 }, .api = "HERAZ" },
+
+
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x00 }, .api = "SAMFP_MULT" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x01 }, .api = "SAMFP_ADDN" },
     { .rst = 0xef, .length = 0x01, .flags = F_SEQUENCE, .bytes = { 0x02 }, .api = "SAMFP_CONCAT" },
