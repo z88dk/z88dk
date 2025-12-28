@@ -76,6 +76,7 @@ ___gfx_vram_page_out:
 vram_unmap:
     ld      a, $01                      ; disable video memory access
     out     ($FF), a
+    pop     af
     pop     bc
     pop     de
     pop     hl
