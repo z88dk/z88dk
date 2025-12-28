@@ -599,7 +599,7 @@ uint8_t breakpoints_check()
 
 void debugger_next(uint8_t add_bp)
 {
-    static char buf[2048];
+    static char buf[16384];
     int len;
     const unsigned short pc = bk.pc();
 

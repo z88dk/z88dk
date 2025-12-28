@@ -3,6 +3,7 @@
 
 extern int c_cpu;
 extern int c_adl_mode;
+extern char *c_target;
 
 #define CPU_Z80         1
 #define CPU_Z180        2

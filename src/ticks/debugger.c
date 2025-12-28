@@ -578,7 +578,7 @@ void debugger()
 {
 	static FILE *script_file = NULL;
     static char *last_line = NULL;
-    static char buf[2048];
+    static char buf[16384];
     char prompt[300];
     char *line;
 
@@ -2143,7 +2143,7 @@ static int cmd_list(int argc, char **argv)
 
 static void print_hotspots(void)
 {
-    static char buf[2048];
+    static char buf[16384];
     int i;
     FILE  *fp;
 
