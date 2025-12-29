@@ -63,33 +63,26 @@ private:    // class data
     static const std::uint16_t TokenCount;
     static const std::uint16_t ActionCount;
 
-    // start states per first opcode token
-    static const int32_t start_states[static_cast<size_t>(DFA_Token::Count)];
-
-    // map Keyword and TokenType to DFA_Token
-    static const DFA_Token keyword_dfa_tokens[static_cast<size_t>(Keyword::Count)];
-    static const DFA_Token token_type_dfa_tokens[static_cast<size_t>(TokenType::Count)];
+    // map Tokens to DFA_Token
+    static const DFA_Token map_cpu_to_dfa_tokens[];
+    static const DFA_Token map_keyword_to_dfa_tokens[];
+    static const DFA_Token map_token_type_to_dfa_tokens[];
 
     // declare alias for member function pointer
     using Action = void (OpcodesParser::*)();
 
     // CSR transition table
-    static const std::uint32_t state_offsets[]; // [StateCount+1]
-    static const std::uint16_t trans_tokens[];  // token ids
-    static const std::int32_t  trans_targets[]; // target state ids
+    static const std::uint32_t state_offsets[];     // sparse rows offsets [StateCount+1]
+    static const std::uint16_t trans_tokens[];      // sparse rows token ids
+    static const std::int32_t  trans_targets[];     // sparse rows target state ids
+    static const std::int32_t  dense_row_offsets[]; // dense rows offsets
+    static const std::int32_t  dense_rows[];        // dense rows
 
     // Acceptance table
     static const std::int32_t  accept_index[];   // [-1 == no accept]
     static const Action        accept_actions[];
 
-    // CPU set masks for actions
-    // maps action_idx -> cpu_set_index
-    static const std::uint8_t action_set[];
-    // cpu_set_mask[i] has bit j set if CPU j supported
-    static const std::uint64_t cpu_set_mask[];
-    // helper to check quickly:
-    static bool cpu_ok_for_action(int action_idx);
-
+    static DFA_Token get_dfa_token(CPU cpu_id);
     static DFA_Token get_dfa_token(const TokenLine& line, size_t i);
     static int32_t find_transition(int32_t state, uint16_t token);
     static int32_t accept_action(int32_t state);

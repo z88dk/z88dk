@@ -23,7 +23,6 @@ static const int IS_OPCODE = 1 << 8;
 enum class Keyword {
     None = 0,
 #include "keywords.def"
-    Count
 };
 #undef X
 
