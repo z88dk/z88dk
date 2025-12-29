@@ -16,7 +16,7 @@ CXXFLAGS = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror -O3
 
 # re2c: generate C/C++ sources from .re files
 RE2C ?= re2c
-RE2CFLAGS ?= -W --no-debug-info --no-generation-date 
+RE2CFLAGS ?= -W --tags --no-debug-info --no-generation-date 
 
 TEST_DIR = unittests
 OBJ_DIR = obj

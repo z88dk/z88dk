@@ -74,6 +74,8 @@ bool TokenFileReader::tokenize_line(TokenLine& out_line) {
     const char* pe = p + source_line_.size();
     const char* tok = p;
     const char* marker = p;
+    const char* p1 = p;
+    const char* yyt1 = p;
     char end_quote = 0;
     bool raw_strings = false;   // set to true after INCLUDE/LINE/...
     const char* string_start = p;
@@ -165,6 +167,22 @@ main_loop:
             }
         }
 
+        '+' ws* @p1 ident1 {
+                // disambiguate +register from +expression
+                std::string reg_str(p1, p);
+                Keyword reg_kw = keyword_lookup(reg_str);
+                switch (reg_kw) {
+                case Keyword::A:  PUSH_TOKEN1(TokenType::PlusA); continue;
+                case Keyword::BC: PUSH_TOKEN1(TokenType::PlusBC); continue;
+                case Keyword::DE: PUSH_TOKEN1(TokenType::PlusDE); continue;
+                case Keyword::HL: PUSH_TOKEN1(TokenType::PlusHL); continue;
+                case Keyword::IX: PUSH_TOKEN1(TokenType::PlusIX); continue;
+                case Keyword::IY: PUSH_TOKEN1(TokenType::PlusIY); continue;
+                default: p = tok + 1; PUSH_TOKEN1(TokenType::Plus); continue;
+                }
+        }
+        '+'		{ PUSH_TOKEN1(TokenType::Plus); continue; }
+
         ws+     { continue; }
         '('		{ PUSH_TOKEN1(TokenType::LeftParen); continue; }
         ')'		{ PUSH_TOKEN1(TokenType::RightParen); continue; }
@@ -185,7 +203,6 @@ main_loop:
         '&&'		{ PUSH_TOKEN1(TokenType::LogicalAnd); continue; }
         '*'		{ PUSH_TOKEN1(TokenType::Multiply); continue; }
         '**'		{ PUSH_TOKEN1(TokenType::Power); continue; }
-        '+'		{ PUSH_TOKEN1(TokenType::Plus); continue; }
         '-'		{ PUSH_TOKEN1(TokenType::Minus); continue; }
         '/'		{ PUSH_TOKEN1(TokenType::Divide); continue; }
         '<='		{ PUSH_TOKEN1(TokenType::LE); continue; }

@@ -80,6 +80,14 @@ enum class TokenType {
     // Assembly instruction pointer
     ASMPC,
 
+    // disambiguate +register from +expression
+    PlusA,          // +A
+    PlusBC,         // +BC
+    PlusDE,         // +DE
+    PlusHL,         // +HL
+    PlusIX,         // +IX
+    PlusIY,         // +IY
+
     Count           // Total number of token types
 };
 
