@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "cpu.h"
 #include "errors.h"
 #include "keywords.h"
 #include "opcodes.h"
@@ -12,6 +13,15 @@
 
 // Return target state, or NO_ACTION if no transition.
 int32_t OpcodesParser::find_transition(int32_t state, uint16_t token) {
+    // If dense_row_offsets[state] != -1, use O(1) dense lookup
+    int32_t dense_offset = dense_row_offsets[state];
+    if (dense_offset != -1) {
+        // O(1) lookup in dense_rows
+        int32_t target = dense_rows[dense_offset + token];
+        return target;
+    }
+
+    // Otherwise, use sparse CSR row (binary search)
     uint32_t start = state_offsets[state];
     uint32_t end = state_offsets[state + 1];
     const uint16_t* first = &trans_tokens[start];
@@ -53,12 +63,7 @@ bool OpcodesParser::parse(const TokenLine& line) {
         return false;
     }
 
-    if (!cpu_ok_for_action(action_idx)) {
-        return false;
-    }
-
     do_action(action_idx);
-
     return true;
 }
 
@@ -70,22 +75,20 @@ int OpcodesParser::follow_dfa() {
         return NO_ACTION;
     }
 
-    // first token, initial state
-    DFA_Token dt = get_dfa_token(*line_, i_);
-    int state = start_states[static_cast<size_t>(dt)];
+    // find transition for CPU token
+    int state = 0;
+    DFA_Token dt = get_dfa_token(g_options.cpu_id);
+    state = find_transition(state, static_cast<uint16_t>(dt));
     if (state < 0) {
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       "Illegal opcode '" + tokens[i_].text() + "'");
+        g_errors.error(ErrorCode::InvalidCpu, cpu_name(g_options.cpu_id));
         return NO_ACTION;
     }
 
-    ++i_;
-
-    // collect tokens and match each state
+    // follow DFA transtions for rest of tokens
     while (true) {
         dt = get_dfa_token(*line_, i_);
         int action_idx = accept_action(state);
-        if (dt == DFA_Token::T_EndOfLine && action_idx >= 0) {
+        if (dt == DFA_Token::TK_EndOfLine && action_idx >= 0) {
             return action_idx;
         }
 
@@ -116,7 +119,7 @@ int OpcodesParser::follow_dfa() {
         }
 
         // check for PlusExpr token as fallback
-        if (dt == DFA_Token::T_Plus || dt == DFA_Token::T_Minus) {
+        if (dt == DFA_Token::TK_Plus || dt == DFA_Token::TK_Minus) {
             target_state = find_transition(state,
                                            static_cast<uint16_t>(DFA_Token::PlusExpr));
             if (target_state >= 0) {
@@ -138,42 +141,31 @@ int OpcodesParser::follow_dfa() {
 
         // invalid token
         g_errors.error(ErrorCode::InvalidSyntax,
-                       "Unexpected token '" + tokens[i_].text() + "'");
+                       "Unexpected token '" + tokens[i_].text() +
+                       "' for cpu " + cpu_name(g_options.cpu_id));
         return NO_ACTION;
     }
 }
 
-bool OpcodesParser::cpu_ok_for_action(int action_idx) {
-    assert(action_idx >= 0 && action_idx < ActionCount);
-
-    uint8_t set = action_set[action_idx];
-    uint64_t mask = cpu_set_mask[set];
-    uint64_t my_mask = 1LLU << static_cast<unsigned>(g_options.cpu_id);
-    if ((mask & my_mask) != 0) {
-        return true;
-    }
-    else {
-        g_errors.error(ErrorCode::InvalidOpcode,
-                       "for cpu " + cpu_name(g_options.cpu_id));
-        return false;
-    }
+DFA_Token OpcodesParser::get_dfa_token(CPU cpu_id) {
+    return map_cpu_to_dfa_tokens[static_cast<size_t>(cpu_id)];
 }
 
 // get DFA_Token from current token
 DFA_Token OpcodesParser::get_dfa_token(const TokenLine& line, size_t i) {
     if (i >= line.tokens().size()) {
-        return DFA_Token::T_EndOfLine;
+        return DFA_Token::TK_EndOfLine;
     }
 
     const Token& token = line.tokens()[i];
     Keyword kw = token.keyword();
-    DFA_Token dt = keyword_dfa_tokens[static_cast<size_t>(kw)];
+    DFA_Token dt = map_keyword_to_dfa_tokens[static_cast<size_t>(kw)];
     if (dt != DFA_Token::None) {
         return dt;
     }
 
     TokenType tt = token.type();
-    dt = token_type_dfa_tokens[static_cast<size_t>(tt)];
+    dt = map_token_type_to_dfa_tokens[static_cast<size_t>(tt)];
     return dt;
 }
 

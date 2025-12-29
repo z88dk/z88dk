@@ -56,12 +56,16 @@ sub _make_states_recurse {
                 $state->{end} = $v;
             }
             elsif ($k =~ /^Keyword::/) {
-                my $k_key = $k =~ s/^Keyword::/K_/r;
+                my $k_key = $k =~ s/^Keyword::/KW_/r;
                 $state->{transitions}{$k_key} = { state => $v->{state} };
             }
             elsif ($k =~ /^TokenType::/) {
-                my $t_key = $k =~ s/^TokenType::/T_/r;
+                my $t_key = $k =~ s/^TokenType::/TK_/r;
                 $state->{transitions}{$t_key} = { state => $v->{state} };
+            }
+            elsif ($k =~ /^CPU::/) {
+                my $cpu_key = $k =~ s/^CPU::/CPU_/r;
+                $state->{transitions}{$cpu_key} = { state => $v->{state} };
             }
             elsif ($k =~ /^(Plus)?Expr$/) {
                 $state->{transitions}{$k} = { state => $v->{state} };

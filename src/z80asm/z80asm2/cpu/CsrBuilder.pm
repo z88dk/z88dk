@@ -7,24 +7,31 @@
 package CsrBuilder;
 use Modern::Perl;
 use Object::Tiny qw( state_count trans built
-                     state_offsets trans_tokens trans_targets );
+                     state_offsets trans_tokens trans_targets dense_rows );
 
 # Simple CSR builder "class"
 # Usage:
-#   my $b = CsrBuilder->new($state_count);
+#   my $b = CsrBuilder->new($state_count, $token_count);
 #   $b->add_transition($state, $token, $target);
 #   $b->build;
 #   $b->emit_cpp($fh, $cpp_namespace, $var_prefix);
+
+# Threshold for using dense row (index lookup) instead of binary search
+use constant DENSE_ROW_THRESHOLD => 8;
+
 sub new {
-    my ($class, $state_count) = @_;
+    my ($class, $state_count, $token_count) = @_;
     die "state_count required" unless defined $state_count;
+    die "token_count required" unless defined $token_count;
     my $self = {
         state_count => int($state_count),
+        token_count => int($token_count),
         trans       => [ map { [] } (0 .. $state_count - 1) ], # arrayref of arrayrefs
         built       => 0,
         state_offsets => [],
         trans_tokens  => [],
         trans_targets => [],
+        dense_rows    => [], # array of arrayrefs, one per dense row, undef for sparse
     };
     return bless $self, $class;
 }
@@ -42,12 +49,31 @@ sub build {
     my @state_offsets;
     my @tokens;
     my @targets;
+    my @dense_rows;
 
     my $idx = 0;
     for my $s (0 .. $self->{state_count} - 1) {
+        my $list = $self->{trans}->[$s];
+        my $n = scalar(@$list);
+        my $is_dense = ($n >= DENSE_ROW_THRESHOLD) ? 1 : 0;
+
+        if ($is_dense) {
+            # Build dense row: array of size token_count, -1 for missing
+            my @dense = ( ( -1 ) x $self->{token_count} );
+            for my $pair (@$list) {
+                my ($tok, $tgt) = @$pair;
+                $dense[$tok] = $tgt;
+            }
+            $dense_rows[$s] = \@dense;
+            # For dense rows, do not add to sparse CSR arrays
+            $state_offsets[$s] = $idx;
+            next;
+        } else {
+            $dense_rows[$s] = undef;
+        }
+
         $state_offsets[$s] = $idx;
 
-        my $list = $self->{trans}->[$s];
         next unless @$list;
 
         # sort by token, stable
@@ -73,6 +99,7 @@ sub build {
     $self->{state_offsets} = \@state_offsets;
     $self->{trans_tokens}  = \@tokens;
     $self->{trans_targets} = \@targets;
+    $self->{dense_rows}    = \@dense_rows;
     $self->{built} = 1;
 }
 
@@ -86,8 +113,9 @@ sub emit_cpp {
     # helpers
     my $emit_array = sub {
         my ($name, $type, $aref) = @_;
-        print $fh "const $type ${cpp_class}::${var_prefix}${name}[] = {\n";
-        my $count = 0;
+        my $count = scalar @$aref;
+        print $fh "const $type ${cpp_class}::${var_prefix}${name}[$count] = {\n";
+        $count = 0;
         for my $v (@$aref) {
             printf $fh "%6s, ", $v;
             $count++;
@@ -103,6 +131,25 @@ sub emit_cpp {
     $emit_array->('state_offsets', 'std::uint32_t', $self->{state_offsets});
     $emit_array->('trans_tokens',  'std::uint16_t', $self->{trans_tokens});
     $emit_array->('trans_targets', 'std::int32_t',  $self->{trans_targets});
+    
+    # Emit dense rows as a flat array and an index array
+    my @dense_flat;
+    my @dense_row_offsets;
+    my $dense_idx = 0;
+    for my $s (0 .. $self->{state_count} - 1) {
+        if (defined $self->{dense_rows}[$s]) {
+            $dense_row_offsets[$s] = $dense_idx;
+            my $row = $self->{dense_rows}[$s];
+            push @dense_flat, @$row;
+            $dense_idx += $self->{token_count};
+        } else {
+            $dense_row_offsets[$s] = -1;
+        }
+    }
+    $dense_row_offsets[$self->{state_count}] = $dense_idx;
+
+    $emit_array->('dense_row_offsets', 'std::int32_t', \@dense_row_offsets);
+    $emit_array->('dense_rows', 'int32_t', \@dense_flat);
 }
 
 1;
