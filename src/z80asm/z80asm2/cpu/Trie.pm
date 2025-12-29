@@ -79,6 +79,9 @@ sub tokenize {
         if ($text =~ s/^\+%\w//) {
             push @tokens, "PlusExpr";
         }
+        elsif ($text =~ s/^\+(A|BC|DE|HL|IX|IY)//i) {
+            push @tokens, "TokenType::Plus".uc($1);
+        }
         elsif ($text =~ s/^%\w//) {
             push @tokens, "Expr";
         }

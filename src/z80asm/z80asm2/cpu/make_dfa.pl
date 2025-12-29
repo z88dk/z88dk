@@ -383,6 +383,7 @@ sub make_action {
     # check if we need temp labels
     my $temp_end_label;
     if ($leaf->{ops} =~ /%t/g) {
+        warn "test temp_end_label\n";
         $temp_end_label = 1;
         $code .= "    std::string temp_end_label = ".
         "make_temp_label_name(\"END\");\n";
@@ -433,6 +434,7 @@ sub make_action {
         }
         # hh %n %s %s
         elsif ($op =~ /^([0-9A-F]{2} )+%n %s %s$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[ns]/00/g;
             my $offset = length($op)/2 - 3;
@@ -449,6 +451,7 @@ sub make_action {
         }
         # hh %d %s
         elsif ($op =~ /^([0-9A-F]{2} )+%d %s$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[ds]/00/g;
             my $offset = length($op)/2 - 2;
@@ -457,6 +460,7 @@ sub make_action {
         }
         # hh %d %s %s
         elsif ($op =~ /^([0-9A-F]{2} )+%d %s %s$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[ds]/00/g;
             my $offset = length($op)/2 - 3;
@@ -473,11 +477,13 @@ sub make_action {
         }
         # %d
         elsif ($op =~ /^%d$/) {
+            warn "test emit_bytes in op: $op\n";
             $code .= "    emit_bytes_expr(0x00,\n".
                     "        0, PatchRange::ByteSigned);\n";
         }
         # hh hh %m %m
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%m/00/g;
             my $offset = length($op)/2 - 2;
@@ -486,6 +492,7 @@ sub make_action {
         }
         # hh hh %m %m %m
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %m$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%m/00/g;
             my $offset = length($op)/2 - 3;
@@ -494,6 +501,7 @@ sub make_action {
         }
         # hh hh %m %m %m %m
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %m %m$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%m/00/g;
             my $offset = length($op)/2 - 4;
@@ -502,6 +510,7 @@ sub make_action {
         }
         # hh hh %m %m %x
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %x$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[mx]/00/g;
             my $offset_m = length($op)/2 - 3;
@@ -512,6 +521,7 @@ sub make_action {
         }
         # hh hh %m %m %x %x
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %x %x$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[mx]/00/g;
             my $offset_m = length($op)/2 - 4;
@@ -522,6 +532,7 @@ sub make_action {
         }
         # hh hh %m1 %m1
         elsif ($op =~ /^([0-9A-F]{2} )+%m1 %m1$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%m1/00/g;
             my $offset = length($op)/2 - 2;
@@ -530,6 +541,7 @@ sub make_action {
         }
         # hh hh @func
         elsif ($op =~ /^(([0-9A-F]{2} )+)\@(\w+)\s*$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $func) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
@@ -538,6 +550,7 @@ sub make_action {
         }
         # hh hh %tN
         elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $label_offset) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
@@ -548,6 +561,7 @@ sub make_action {
         }
         # hh hh %tN %tN
         elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*) %t\3$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $label_offset) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
@@ -558,6 +572,7 @@ sub make_action {
         }
         # hh hh %tN %tN %tN
         elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*) %t\3 %t\3$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $label_offset) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
@@ -568,6 +583,7 @@ sub make_action {
         }
         # hh hh %M %M
         elsif ($op =~ /^([0-9A-F]{2} )+%M %M$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%M/00/g;
             my $offset = length($op)/2 - 2;
@@ -576,6 +592,7 @@ sub make_action {
         }
         # hh hh hh %h
         elsif ($op =~ /^([0-9A-F]{2} )+%h$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%h/00/g;
             my $offset = length($op)/2 - 1;
@@ -584,6 +601,7 @@ sub make_action {
         }
         # hh hh hh %d1
         elsif ($op =~ /^([0-9A-F]{2} )+%d1$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%d1/00/g;
             my $offset = length($op)/2 - 1;
@@ -592,6 +610,7 @@ sub make_action {
         }
         # hh hh hh %j
         elsif ($op =~ /^([0-9A-F]{2} )+%j$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%j/00/g;
             my $offset = length($op)/2 - 1;
@@ -600,6 +619,7 @@ sub make_action {
         }
         # hh hh hh %J %J
         elsif ($op =~ /^([0-9A-F]{2} )+%J %J$/) {
+            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%J/00/g;
             my $offset = length($op)/2 - 2;
@@ -608,6 +628,7 @@ sub make_action {
         }
         # hh hh %d dd+8*%c
         elsif ($op =~ /^([0-9A-F]{2} [0-9A-F]{2}) %d (\d+\+8\*%c)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $2);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -620,6 +641,7 @@ sub make_action {
         }
         # hh hh dd+%c-1
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+%c-1)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -630,6 +652,7 @@ sub make_action {
         }
         # hh hh dd+8*%c
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+8\*%c)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -640,6 +663,7 @@ sub make_action {
         }
         # hh hh %c==8?dd:dd+c-1
         elsif ($op =~ /^(([0-9A-F]{2} )+)(%c==8\?\d+:\d+\+%c-1)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -650,6 +674,7 @@ sub make_action {
         }
         # hh hh %c==0?0x46:%c==1?0x56:0x5E
         elsif ($op =~ /^(([0-9A-F]{2} )+)(%c==0\?0x[0-9A-F]+:%c==1\?0x[0-9A-F]+:0x[0-9A-F]+)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -660,6 +685,7 @@ sub make_action {
         }
         # hh hh %c==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E
         elsif ($op =~ /^(([0-9A-F]{2} )+)(%c==0\?0x[0-9A-F]+:%c==1\?0x[0-9A-F]+:%c==2\?0x[0-9A-F]+:0x[0-9A-F]+)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -670,6 +696,7 @@ sub make_action {
         }
         # hh hh dd+%c %n
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+%c) %n$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -682,6 +709,7 @@ sub make_action {
         }
         # hh hh dd+%c
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+%c)$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -692,6 +720,7 @@ sub make_action {
         }
         # hh dd+(%c<8?%c*8:%c)
         elsif ($op =~ /^(([0-9A-F]{2} )*)(\d+\+\(%c<8\?%c\*8:%c\))$/) {
+            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -707,7 +736,7 @@ sub make_action {
     # make temp label
     if ($temp_end_label) {
         $code .= "    add_label_symbol(temp_end_label, 0);\n";
-
+        warn "test emit_bytes in temp_end_label\n";
     }
 
     return $code;
