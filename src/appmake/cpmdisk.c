@@ -196,7 +196,6 @@ void disc_free(disc_handle* h)
 }
 
 // Image writing routines
-
 struct container {
     const char        *name;
     const char        *extension;
@@ -210,6 +209,7 @@ struct container {
     { "h17raw",     ".h17raw", "H89js RAW format",         disc_write_h17raw },
     { "imd",        ".imd", "IMD (Imagedisk) format",      disc_write_imd },
     { "dmk",        ".dmk", "dmk (TRS-80/MSX) format",     disc_write_dmk },
+    { "td0",        ".TD0", "TeleDisk (TD0) format",       disc_write_td0 },
     { "raw",        ".img", "Raw image",                   disc_write_raw },
     { NULL, NULL, NULL }
 };
@@ -286,7 +286,7 @@ int disc_write_h17(disc_handle* h, const char* filename)
 {
     size_t offs;
     FILE* fp;
-    int i, j, j2, s;
+    int i, j, s;
 
     if ((fp = fopen(filename, "wb")) == NULL) {
         return -1;
@@ -976,6 +976,182 @@ int disc_write_dmk(disc_handle* h, const char* filename)
     fclose(fp);
     return 0;
 }
+
+
+
+/* TD0 CRC-16 (poly 0xA097), initial value 0x0000; MSB-first bit processing.
+ * See: Dave Dunfield's "Teledisk .TD0 notes" (CRC section). */
+static uint16_t td0_crc16(const uint8_t *p, size_t n)
+{
+    uint16_t crc = 0;
+    while (n--) {
+        uint8_t b = *p++;
+        for (int i = 0; i < 8; i++) {
+            uint16_t mix = (crc ^ (b << 8)) & 0x8000;
+            crc <<= 1;
+            if (mix) crc ^= 0xA097;
+            b <<= 1;
+        }
+    }
+    return crc;
+}
+
+
+int disc_write_td0(disc_handle *h, const char *filename)
+{
+    uint8_t ssize_code;
+    int i, j, s;
+    
+    FILE *fp = fopen(filename, "wb");
+    if (!fp) return -1;
+
+    /* ---------- TD0 Image Header (12 bytes) ---------- */
+    uint8_t hdr[12] = {0};
+    hdr[0] = 'T'; hdr[1] = 'D';          /* normal compression signature */
+    hdr[2] = 0;                          /* sequence (single volume) */
+    hdr[3] = 0;                          /* checksequence */
+    hdr[4] = 0x21;                       /* TeleDisk version (2.1) */
+
+    /* Data rate (lower 2 bits: 0=250,1=300,2=500; bit7 may indicate FM on very old images) */
+    if (h->spec.disk_mode == DEFAULT)
+        hdr[5] = 1;                        /* Default rpm: 300 */
+    else if (h->spec.disk_mode >= MFM500)
+        hdr[5] = MFM250 - h->spec.disk_mode;
+    else
+        hdr[5] = FM250 - h->spec.disk_mode;
+
+/*  Drive type
+   
+    0 = 5,25″ 96 tpi (double stepping)
+    1 = 5,25″ (generic - good default case)
+    2 = 5,25″ 48 tpi
+    3 = 3,5″
+    4 = 3,5″ (variant)
+    5 = 8″
+    6 = 3,5″ (another variant)
+*/
+	if (h->spec.tracks == 77)
+	  hdr[6] = 5;   // 8"
+    else if ((h->spec.sector_size == 512) && (h->spec.tracks == 80))
+	  hdr[6] = 3;   // 3"
+    else
+	  hdr[6] = 1;   // generic 5,25″ (default)
+  
+    hdr[7] = 0x00;                       /* stepping (00=single); no comment => high bit clear */
+    hdr[8] = 0x00;                       /* DOS allocation flag (0 = none) */
+    hdr[9] = (h->spec.sides == 1) ? 0x01 : 0x02; /* sides: 1 or 2 */
+    uint16_t hcrc = td0_crc16(hdr, 10); /* CRC over first 10 bytes */
+    hdr[10] = (uint8_t)(hcrc & 0xFF);
+    hdr[11] = (uint8_t)(hcrc >> 8);
+    fwrite(hdr, 1, sizeof(hdr), fp);
+
+    /* ---------- Tracks ---------- */
+
+    switch (h->spec.sector_size) {
+    case 128:  ssize_code = 0;
+               break;
+    case 256:  ssize_code = 1;
+               break;
+    case 512:  ssize_code = 2;
+               break;
+    case 1024: ssize_code = 3;
+               break;
+    case 2048: ssize_code = 4;
+               break;
+    case 4096: ssize_code = 5;
+               break;
+    case 8192: ssize_code = 6;
+               break;
+    default:   ssize_code = 2; /* default to 512 */
+               break;
+    }
+
+    for (i = 0; i < h->spec.tracks; ++i) {
+        for (s = 0; s < h->spec.sides; ++s) {
+            /* Track Header: [numsects, cyl, side, CRC(low)] */
+            uint8_t th[4];
+            th[0] = h->spec.sectors_per_track;
+            th[1] = i;
+            /* TD0 sets bit7 of "side" for single-density on mixed-density images.
+               We don't change density per track here, so keep side as 0/1. */
+            th[2] = s;
+            if ((h->spec.disk_mode >= FM500)&&(h->spec.disk_mode <= FM250))  th[2] |= 0x80; /* mark FM per-track */
+            uint16_t tcrc = td0_crc16(th, 3);
+            th[3] = (uint8_t)(tcrc & 0xFF);
+            fwrite(th, 1, sizeof(th), fp);
+
+            /* Sector loop */
+            size_t offs = track_offset(h, i, s);
+            for (j = 0; j < h->spec.sectors_per_track; ++j) {
+                
+                /* Logical sector number */
+                uint8_t sec_id;
+
+				if (!h->spec.side2_sector_numbering || !(h->spec.inverted_sides ^ s)) {
+					/* side 0 or numbering not used: 1..N */
+					sec_id = j + h->spec.first_sector_offset;
+				} else {
+					/* side 1 with side2 numbering: N+1..2N */
+					sec_id = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track;
+				}
+
+                /* Sector Header: [C, H, R, N, Flags, CRC(low)] */
+                uint8_t sh[6] = {0};
+                sh[0] = i;                 /* logical C */
+                sh[1] = s;                 /* logical H */
+                sh[2] = sec_id;            /* logical R */
+                sh[3] = ssize_code;        /* N (size code) */
+                sh[4] = 0x00;              /* Flags: none (no deleted data/dup/errors) */
+
+                /* Data header + payload (encoding = 0 -> raw) */
+                const uint8_t *sp = h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size);
+
+                /* Copy to a temp buffer so that optional XOR can be applied before CRC */
+                uint8_t *tmp = malloc(h->spec.sector_size);
+                if (!tmp) { fclose(fp); return -1; }
+                memcpy(tmp, sp, h->spec.sector_size);
+                xorblock(tmp, h->spec.sector_size, h->spec.xor_data);
+
+                /* Sector Data Header: [len_lo, len_hi, encoding] ; len includes 'encoding' byte */
+                uint8_t dh[3];
+                uint16_t data_len = (uint16_t)(h->spec.sector_size + 1); /* encoding + data bytes */
+                dh[0] = (uint8_t)(data_len & 0xFF);
+                dh[1] = (uint8_t)(data_len >> 8);
+                dh[2] = 0x00; /* encoding method 0 = raw sector data */
+
+                /* Compute sector CRC over: first 5 bytes of SH + full DH + data */
+                uint16_t scrc = 0;
+                scrc = td0_crc16(sh, 5);
+                scrc = td0_crc16(dh, 3) ^ scrc; /* accumulate by XOR of sequential td0_crc16 results? */
+                /* NOTE: td0_crc16 returns CRC for a block; to concatenate blocks, we must feed bytes sequentially. */
+                {
+                    /* Build a transient buffer covering [SH(5) | DH(3) | DATA(ssize)] for CRC */
+                    uint8_t *crcbuf = malloc(5 + 3 + h->spec.sector_size);
+                    if (!crcbuf) { free(tmp); fclose(fp); return -1; }
+                    memcpy(crcbuf + 0, sh, 5);
+                    memcpy(crcbuf + 5, dh, 3);
+                    memcpy(crcbuf + 8, tmp, h->spec.sector_size);
+                    scrc = td0_crc16(crcbuf, 5 + 3 + h->spec.sector_size);
+                    free(crcbuf);
+                }
+                sh[5] = (uint8_t)(scrc & 0xFF); /* only the low byte is stored */
+
+                /* Write sector header + data header + payload */
+                fwrite(sh, 1, sizeof(sh), fp);
+                fwrite(dh, 1, sizeof(dh), fp);
+                fwrite(tmp, 1, h->spec.sector_size, fp);
+                free(tmp);
+            }
+        }
+    }
+
+    /* End-of-image marker: one byte 0xFF (track header with sector count=255) */
+    fputc(0xFF, fp);
+
+    fclose(fp);
+    return 0;
+}
+
 
 
 // CP/M routines
