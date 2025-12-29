@@ -580,7 +580,13 @@ enum class DFA_Token : int16_t {
     T_LeftParen = 567,
     T_Minus = 568,
     T_Plus = 569,
-    T_RightParen = 570,
-    Count = 571
+    T_PlusA = 570,
+    T_PlusBC = 571,
+    T_PlusDE = 572,
+    T_PlusHL = 573,
+    T_PlusIX = 574,
+    T_PlusIY = 575,
+    T_RightParen = 576,
+    Count = 577
 };
 

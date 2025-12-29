@@ -89,12 +89,6 @@ int OpcodesParser::follow_dfa() {
             return action_idx;
         }
 
-        if (dt == DFA_Token::None) {
-            g_errors.error(ErrorCode::InvalidSyntax,
-                           "Unexpected token '" + tokens[i_].text() + "'");
-            return NO_ACTION;
-        }
-
         int target_state = find_transition(state, static_cast<uint16_t>(dt));
         if (target_state >= 0) {
             state = target_state;
@@ -141,6 +135,7 @@ int OpcodesParser::follow_dfa() {
                 continue;
             }
         }
+
         // invalid token
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected token '" + tokens[i_].text() + "'");
