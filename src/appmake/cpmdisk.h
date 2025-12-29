@@ -76,6 +76,7 @@ extern int disc_write_h17(disc_handle* h, const char* filename);
 extern int disc_write_h17raw(disc_handle* h, const char* filename);
 extern int disc_write_imd(disc_handle* h, const char* filename);
 extern int disc_write_dmk(disc_handle* h, const char* filename);
+extern int disc_write_td0(disc_handle* h, const char* filename);
 extern void disc_print_writers(FILE *fp);
 
 
