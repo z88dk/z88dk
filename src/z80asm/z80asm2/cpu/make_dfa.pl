@@ -40,7 +40,6 @@ $trie->read_opcodes($opcodes_dat_file, $keywords);
 
 my $dfa = DFA->new($dfa_tokens, $dfa_leafs);
 $dfa->read_from_trie($trie);
-$dfa->write_to_file("opcodes.dfa");
 
 # build CSR tables
 my $csr_builder = CsrBuilder->new( scalar(@{ $dfa->states }));
