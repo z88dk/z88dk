@@ -87,8 +87,6 @@ enum class TokenType {
     PlusHL,         // +HL
     PlusIX,         // +IX
     PlusIY,         // +IY
-
-    Count           // Total number of token types
 };
 
 //-----------------------------------------------------------------------------

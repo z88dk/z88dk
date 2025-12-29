@@ -38,7 +38,7 @@ TEST_CASE("OpcodesParser: parse fails when first token is non-opcode keyword and
     // Expect an error to have been recorded (current parse emits InvalidSyntax)
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("Illegal opcode") != std::string::npos);
+    REQUIRE(msg.find("Unexpected token") != std::string::npos);
     REQUIRE(msg.find("DEFB") != std::string::npos);
     /*
     REQUIRE(!msg.empty());
@@ -277,7 +277,7 @@ TEST_CASE("OpcodesParser: 'nextreg 2,3' fails on default CPU (z80) with correct 
     REQUIRE(g_errors.has_errors());
     const std::string msg = g_errors.last_error_message();
     REQUIRE(msg.find("nextreg") != std::string::npos);
-    REQUIRE(msg.find("Invalid opcode") != std::string::npos);
+    REQUIRE(msg.find("Unexpected token") != std::string::npos);
     REQUIRE(msg.find("z80") != std::string::npos);
 
     g_options = Options();

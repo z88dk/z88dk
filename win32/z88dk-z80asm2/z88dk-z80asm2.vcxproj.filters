@@ -265,9 +265,6 @@
     <None Include="..\..\src\z80asm\z80asm2\opcodes_tables.def">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\src\z80asm\z80asm2\cpu\CsrBuilder.pm">
-      <Filter>Resource Files\cpu</Filter>
-    </None>
     <None Include="..\..\src\z80asm\z80asm2\cpu\Keywords.pm">
       <Filter>Resource Files\t</Filter>
     </None>
@@ -288,6 +285,9 @@
     </None>
     <None Include="..\..\src\z80asm\z80asm2\cpu\Trie.pm">
       <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\CsrBuilder.pm">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>
