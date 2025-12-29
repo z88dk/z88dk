@@ -69,7 +69,6 @@ extern void disc_free(disc_handle *h);
 typedef int (*disc_writer_func)(disc_handle *h, const char *flename);
 extern disc_writer_func disc_get_writer(const char *container_name, const char **extension);
 extern int disc_write_raw(disc_handle *h, const char *filename);
-extern int disc_write_raw_linear(disc_handle *h, const char *filename);
 extern int disc_write_edsk(disc_handle *h, const char *filename);
 extern int disc_write_d88(disc_handle *h, const char *filename);
 extern int disc_write_anadisk(disc_handle* h, const char* filename);

@@ -17,8 +17,10 @@ static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
 static char            **c_additional_files  = NULL;
 static int               c_additional_files_num = 0;
-
 static char              c_force_com_extension   = 0;
+
+char                     c_linear   = 0;
+
 static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
@@ -36,6 +38,7 @@ option_t cpm2_options[] = {
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
+    {  0,  "linear",   "No interleave (disable skew)", OPT_BOOL, &c_linear},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
                               /* ISO C does not require that a void pointer can be cast to a function pointer
                                  (and vice versa), but conforming compilers are required to warn you about it.
@@ -1013,7 +1016,7 @@ static disc_spec qc10m1_spec = {
     .tracks = 40,
     .sides = 2,
     .sector_size = 256,
-	.gap3_length = 0x17,
+    .gap3_length = 0x17,
     .filler_byte = 0xe5,
     .boottracks = 8,
     .directory_entries = 64,
@@ -1274,7 +1277,7 @@ static disc_spec g2s_kkcpm_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .has_skew = 1,
-    .skew_tab = { 0,2,4,1,3 }	
+    .skew_tab = { 0,2,4,1,3 }
 };
 
 // Genie IIs (TRS80 clone) Klaus Kaempf CP/M Data disk (B:)
@@ -1294,7 +1297,7 @@ static disc_spec g2s_kkcpmb_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .has_skew = 1,
-    .skew_tab = { 0,2,4,1,3 }	
+    .skew_tab = { 0,2,4,1,3 }
 };
 
 // Genie IIs (TRS80 clone) GS CP/M
@@ -1314,7 +1317,7 @@ static disc_spec g2s_gscpm_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .has_skew = 1,
-    .skew_tab = { 0,2,4,1,3 }	
+    .skew_tab = { 0,2,4,1,3 }
 };
 
 // Genie III (TRS80 clone) Holte CP/M 3.0
@@ -1709,6 +1712,7 @@ static disc_spec bigboard_spec = {
 };
 
 
+// Research Machines RM380Z
 static disc_spec rm380z_spec = {
     .name = "RM380Z",
     .disk_mode = FM300,
@@ -2050,6 +2054,7 @@ static disc_spec hz17_spec = {
     .has_skew = 1,
     .skew_tab = { 0, 4, 8, 2, 6, 1, 5, 9, 3, 7 }
 };
+
 
 // Heath H89/Zenith Z89 SSDD (Magnolia disk unit)
 static disc_spec magnolia_spec = {

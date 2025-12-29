@@ -34,6 +34,7 @@
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
+extern char c_linear;             // if TRUE disable interleave (skew) in cpmdisk
 
 /* Conversion routines */
 
