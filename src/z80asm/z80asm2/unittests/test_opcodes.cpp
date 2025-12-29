@@ -69,6 +69,47 @@ TEST_CASE("OpcodesParser: simple 'nop' instruction parses successfully",
     REQUIRE(section->opcodes()[1]->patches().size() == 0); // no patches
 }
 
+TEST_CASE("OpcodesParser: 'ld bc, (hl)' assembles into multiple opcodes without patches",
+          "[opcodes][success][multi-opcodes][ld]") {
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    // Single instruction that expands into multiple opcodes
+    pp.push_virtual_file("ld bc, (hl)\n", "ld_bc_hl.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // Expect: placeholder + 4 opcode entries (indexes 1..4)
+    REQUIRE(section->opcodes().size() == 5);
+    REQUIRE(section->opcodes()[0]->size() == 0); // empty placeholder
+
+    // opcode[1] == { 0x4E }
+    REQUIRE(section->opcodes()[1]->size() == 1);
+    REQUIRE(section->opcodes()[1]->bytes() == std::vector<uint8_t>({ 0x4E }));
+    REQUIRE(section->opcodes()[1]->patches().size() == 0);
+
+    // opcode[2] == { 0x23 }
+    REQUIRE(section->opcodes()[2]->size() == 1);
+    REQUIRE(section->opcodes()[2]->bytes() == std::vector<uint8_t>({ 0x23 }));
+    REQUIRE(section->opcodes()[2]->patches().size() == 0);
+
+    // opcode[3] == { 0x46 }
+    REQUIRE(section->opcodes()[3]->size() == 1);
+    REQUIRE(section->opcodes()[3]->bytes() == std::vector<uint8_t>({ 0x46 }));
+    REQUIRE(section->opcodes()[3]->patches().size() == 0);
+
+    // opcode[4] == { 0x2B }
+    REQUIRE(section->opcodes()[4]->size() == 1);
+    REQUIRE(section->opcodes()[4]->bytes() == std::vector<uint8_t>({ 0x2B }));
+    REQUIRE(section->opcodes()[4]->patches().size() == 0);
+}
+
 TEST_CASE("OpcodesParser: 'ld a, 22*2' parses to correct opcode, patch, and expression",
           "[opcodes][patch][expression]") {
     Preprocessor pp;
@@ -803,6 +844,84 @@ TEST_CASE("OpcodesParser: 'ld de, sp' on ez80 parses to correct opcode sequence 
     // 5th opcode: EX DE,HL (0xEB)
     REQUIRE(section->opcodes()[4]->size() == 1);
     REQUIRE(section->opcodes()[4]->bytes()[0] == 0xEB);
+
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'ld hl,0x1234' parses to correct opcode, patch, and expression",
+    "[opcodes][ld][hl][imm16][patch]") {
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    // Assemble the instruction
+    pp.push_virtual_file("ld hl,0x1234\n", "ld_hl_imm16.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // There should be two opcodes: placeholder and the instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+    REQUIRE(op->size() == 3);
+    REQUIRE(op->bytes()[0] == 0x21); // LD HL,nn
+    REQUIRE(op->bytes()[1] == 0x00); // Patched value placeholder (low byte)
+    REQUIRE(op->bytes()[2] == 0x00); // Patched value placeholder (high byte)
+
+    // There should be one patch
+    const auto& patches = op->patches();
+    REQUIRE(patches.size() == 1);
+    const auto& patch = patches[0];
+    REQUIRE(patch.range() == PatchRange::Word);
+    REQUIRE(patch.offset() == 1);
+
+    // The patch expression should evaluate to 0x1234
+    int value = patch.expression().evaluate();
+    REQUIRE(value == 0x1234);
+}
+
+TEST_CASE("OpcodesParser: 'ld hl,0x123456' on ez80 parses to correct opcode, patch, and expression (24-bit)",
+    "[opcodes][ld][hl][imm24][ez80][patch]") {
+    g_options = Options();
+    g_options.cpu_id = CPU::ez80;
+
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    // Assemble the instruction
+    pp.push_virtual_file("ld hl,0x123456\n", "ld_hl_imm24_ez80.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // There should be two opcodes: placeholder and the instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+    REQUIRE(op->size() == 4);
+    REQUIRE(op->bytes()[0] == 0x21); // LD HL,nnn
+    REQUIRE(op->bytes()[1] == 0x00); // Patched value placeholder (low byte)
+    REQUIRE(op->bytes()[2] == 0x00); // Patched value placeholder (mid byte)
+    REQUIRE(op->bytes()[3] == 0x00); // Patched value placeholder (high byte)
+
+    // There should be one patch
+    const auto& patches = op->patches();
+    REQUIRE(patches.size() == 1);
+    const auto& patch = patches[0];
+    REQUIRE(patch.range() == PatchRange::Ptr24);
+    REQUIRE(patch.offset() == 1);
+
+    // The patch expression should evaluate to 0x123456
+    int value = patch.expression().evaluate();
+    REQUIRE(value == 0x123456);
 
     g_options = Options();
 }
