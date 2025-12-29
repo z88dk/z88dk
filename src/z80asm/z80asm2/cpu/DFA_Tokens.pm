@@ -29,8 +29,9 @@ sub add_token {
 
     my $token_key = $token;
     for ($token_key) {
-        s/^Keyword::/K_/;
-        s/^TokenType::/T_/;
+        s/^Keyword::/KW_/;
+        s/^TokenType::/TK_/;
+        s/^CPU::/CPU_/;
     }
 
     $self->{by_key}{$token_key} = { dfa_token => $token_key, token => $token, idx => 0 };

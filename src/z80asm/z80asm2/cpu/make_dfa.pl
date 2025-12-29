@@ -42,7 +42,9 @@ my $dfa = DFA->new($dfa_tokens, $dfa_leafs);
 $dfa->read_from_trie($trie);
 
 # build CSR tables
-my $csr_builder = CsrBuilder->new( scalar(@{ $dfa->states }));
+my $state_count = scalar(@{ $dfa->states });
+my $token_count = scalar(@{ $dfa_tokens->list });
+my $csr_builder = CsrBuilder->new($state_count, $token_count);
 for my $state_idx (0 .. $#{ $dfa->states }) {
     my $state = $dfa->states->[$state_idx];
     if (exists $state->{transitions}) {
@@ -113,9 +115,7 @@ END
         my $token = $dfa->dfa_tokens->by_key->{$token_key};
         print $fh "    $token_key = $token->{idx},\n";
     }
-    my $count = scalar(@{ $dfa->dfa_tokens->list });
 	print $fh <<END;
-    Count = $count
 };
 
 END
@@ -168,25 +168,30 @@ const std::uint16_t OpcodesParser::ActionCount = $action_count;
 END
 
     # ----------------------------
-    # existing start_states emitter
+    # CPU -> DFA_Token map
     # ----------------------------
-    print $fh <<'END';
-// map DFA_Token to start state
-const int32_t OpcodesParser::start_states[
-    static_cast<size_t>(DFA_Token::Count)] = {
+    my $count = scalar(@{ $cpus->list });
+    print $fh <<END;
+// map CPU to DFA_Token
+const DFA_Token OpcodesParser::map_cpu_to_dfa_tokens[$count] = {
 END
-    my @start_states;
-    my $state0 = $dfa->states->[0];
-    for my $dfa_token (sort keys %{ $state0->{transitions} }) {
-        my $next_state = $state0->{transitions}{$dfa_token}{state};
-        my $token_idx = $dfa->dfa_tokens->by_key->{$dfa_token}{idx};
-        $start_states[$token_idx] = $next_state;
-    }
-    for my $i (0 .. $#{ $dfa->dfa_tokens->list }) {
-        my $start_state = defined $start_states[$i] ? $start_states[$i] : -1;
-        printf $fh "%6d, ", $start_state;
-        print $fh "\n" if $i % 8 == 7;
-    }
+    my @cpu_dfa_tokens;
+    for my $cpu (@{ $cpus->list }) {
+        my $cpu_id = $cpu->{id};
+        my $cpu_idx = $cpu->{idx};
+        my $dfa_token = $cpu_id =~ s/^CPU::/CPU_/r;
+        if (exists $dfa->dfa_tokens->by_key->{$dfa_token}) {
+            $cpu_dfa_tokens[$cpu_idx] = ["DFA_Token::$dfa_token", $cpu_id];
+        }
+        else {
+            $cpu_dfa_tokens[$cpu_idx] = ["DFA_Token::None", $cpu_id];
+        }
+    };
+
+    for (@cpu_dfa_tokens) {
+        my($dfa_token, $cpu_id) = @$_;
+        printf $fh "    %-32s, // %s\n", $dfa_token, $cpu_id;
+    } 
     print $fh <<'END';
 };
 
@@ -195,28 +200,28 @@ END
     # ----------------------------
     # keyword -> DFA_Token map
     # ----------------------------
-    print $fh <<'END';
+    $count = scalar(@{ $keywords->list });
+    print $fh <<END;
 // map Keyword to DFA_Token
-const DFA_Token OpcodesParser::keyword_dfa_tokens[
-    static_cast<size_t>(Keyword::Count)] = {
+const DFA_Token OpcodesParser::map_keyword_to_dfa_tokens[$count] = {
 END
     my @keyword_dfa_tokens;
     for my $keyword (@{ $keywords->list }) {
         my $keyword_id = $keyword->{id};
         my $keyword_idx = $keyword->{idx};
 
-        my $dfa_token = $keyword_id =~ s/^Keyword::/K_/r;
+        my $dfa_token = $keyword_id =~ s/^Keyword::/KW_/r;
         if (exists $dfa->dfa_tokens->by_key->{$dfa_token}) {
-            $keyword_dfa_tokens[$keyword_idx] = "DFA_Token::$dfa_token";
+            $keyword_dfa_tokens[$keyword_idx] = ["DFA_Token::$dfa_token", $keyword_id];
         }
         else {
-            $keyword_dfa_tokens[$keyword_idx] = "DFA_Token::None";
+            $keyword_dfa_tokens[$keyword_idx] = ["DFA_Token::None", $keyword_id];
         }
     };
-    for my $i (0 .. $#keyword_dfa_tokens) {
-        my $dfa_token = $keyword_dfa_tokens[$i];
-        printf $fh "%-24s, ", $dfa_token;
-        print $fh "\n" if $i % 3 == 2;
+
+    for (@keyword_dfa_tokens) {
+        my($dfa_token, $keyword_id) = @$_;
+        printf $fh "    %-32s, // %s\n", $dfa_token, $keyword_id;
     } 
     print $fh <<'END';
 };
@@ -226,28 +231,28 @@ END
     # ----------------------------
     # token type -> DFA_Token map
     # ----------------------------
-    print $fh <<'END';
+    $count = scalar(@{ $token_types->list });
+    print $fh <<END;
 // map TokenType to DFA_Token
-const DFA_Token OpcodesParser::token_type_dfa_tokens[
-    static_cast<size_t>(TokenType::Count)] = {
+const DFA_Token OpcodesParser::map_token_type_to_dfa_tokens[$count] = {
 END
     my @token_type_dfa_tokens;
     for my $token_type (@{ $token_types->list }) {
         my $token_type_id = $token_type->{id};
         my $token_type_idx = $token_type->{idx};
 
-        my $dfa_token = $token_type_id =~ s/^TokenType::/T_/r;
+        my $dfa_token = $token_type_id =~ s/^TokenType::/TK_/r;
         if (exists $dfa->dfa_tokens->by_key->{$dfa_token}) {
-            $token_type_dfa_tokens[$token_type_idx] = "DFA_Token::$dfa_token";
+            $token_type_dfa_tokens[$token_type_idx] = ["DFA_Token::$dfa_token", $token_type_id];
         }
         else {
-            $token_type_dfa_tokens[$token_type_idx] = "DFA_Token::None";
+            $token_type_dfa_tokens[$token_type_idx] = ["DFA_Token::None", $token_type_id];
         }
     }
-    for my $i (0 .. $#token_type_dfa_tokens) {
-        my $dfa_token = $token_type_dfa_tokens[$i];
-        printf $fh "%-24s, ", $dfa_token;
-        print $fh "\n" if $i % 3 == 2;
+
+    for (@token_type_dfa_tokens) {
+        my($dfa_token, $token_type_id) = @$_;
+        printf $fh "    %-24s, // %s\n", $dfa_token, $token_type_id;
     }
     print $fh <<'END';
 };
@@ -268,10 +273,9 @@ END
 
 
     # accept index per state
-
-    print $fh <<'END';
+    print $fh <<END;
 // per-state accept leaf idx (-1 if none)
-const std::int32_t OpcodesParser::accept_index[] = {
+const std::int32_t OpcodesParser::accept_index[$state_count] = {
 END
     for my $i (0 .. scalar(@{ $dfa->states }) - 1) {
         my $state = $dfa->states->[$i];
@@ -295,9 +299,9 @@ END
     # ----------------------------
     # Emit action dispatcher table
     # ----------------------------
-    print $fh <<'END';
+    print $fh <<END;
 // Action dispatcher
-const OpcodesParser::Action OpcodesParser::accept_actions[] = {
+const OpcodesParser::Action OpcodesParser::accept_actions[$state_count] = {
 END
     for my $i (0 .. $#{ $dfa->dfa_leafs->list }) {
         # Add pointer for each action
@@ -308,65 +312,14 @@ END
 
 END
 
-    # emit CPU selectors for actions
-    my %set_idx;
-    my @cpu_set_masks;
-    my @action_set;
-
-    for my $action_idx (0 .. $#{ $dfa->dfa_leafs->list }) {
-        my $leaf = $dfa->dfa_leafs->list->[$action_idx];
-
-        my @cpu_keys = sort keys %{ $leaf->{cpus} };
-        my @cpu_ids = map { $cpus->by_id->{$_}{idx} } @cpu_keys;
-        my $key = join(',', @cpu_ids);
-        my $idx;
-        if (exists $set_idx{$key}) {
-            $idx = $set_idx{$key};
-        } else {
-            $idx = scalar @cpu_set_masks;
-            $set_idx{$key} = $idx;
-            my $mask = 0;
-            $mask |= (1 << $_) for @cpu_ids;   # assumes <64 CPUs
-            push @cpu_set_masks, $mask;
-        }
-        $action_set[$action_idx] = $idx;
-    }
-
-    print $fh <<'END';
-// maps action_idx -> cpu_set_index
-const std::uint8_t OpcodesParser::action_set[] = {
-END
-    for my $i (0 .. $#action_set) {
-        my $idx = $action_set[$i];
-        printf $fh "%6d, ", $idx;
-        print $fh "\n" if $i % 8 == 7;
-    }
-    print $fh <<'END';
-};
-
-END
-
-    print $fh <<'END';
-// cpu_set_mask[i] has bit j set if CPU j supported
-const std::uint64_t OpcodesParser::cpu_set_mask[] = {
-END
-    for my $mask (@cpu_set_masks) {
-        printf $fh "    0x%016X,\n", $mask;
-    }
-    print $fh <<'END';
-};
-
-END
-
     # emit action functions
     for my $i (0 .. $#{ $dfa->dfa_leafs->list }) {
         my $leaf = $dfa->dfa_leafs->list->[$i];
         my $path = $leaf->{path};
-        my $cpus = join(", ", sort keys %{ $leaf->{cpus} });
+        $path =~ s/ \| /\n\/\/ /g;
         my $const = $leaf->{const};
         my $action = make_action($leaf);
         say $fh "// $path";
-        say $fh "// $cpus";
         say $fh "// $const" if $const;
         say $fh "void OpcodesParser::do_action_$i() {";
         print $fh "$action";
@@ -386,7 +339,7 @@ sub make_action {
         warn "test temp_end_label\n";
         $temp_end_label = 1;
         $code .= "    std::string temp_end_label = ".
-        "make_temp_label_name(\"END\");\n";
+                 "make_temp_label_name(\"END\");\n";
     }
 
     my @ops = split(';', $leaf->{ops});

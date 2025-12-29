@@ -41,19 +41,16 @@ sub read_opcodes {
 
         # special case for Intel
         my $cpu_key = $cpu =~ /^80/ ? "CPU::i$cpu" : "CPU::$cpu";
+        unshift @tokens, $cpu_key;      # start with the CPU token
 
         # build the trie with the tokens
         my $p = $self->{trie};
-
-        # Only create states in the DFA for the opcode and operands
-        # $self->{dfa_tokens}->add_token($cpu_key);
-
         for my $i (0 .. $#tokens) {
             my $token = $tokens[$i];
+
             $p->{$token} ||= {};
             $p = $p->{$token};
 
-            # Only create states in the DFA for the opcode and operands
             $self->{dfa_tokens}->add_token($token);
         }
 

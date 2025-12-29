@@ -28,6 +28,7 @@ sub add_leaf {
     my $key = "$const|$ops";
 
     for ($path) {
+        s/CPU:://g;
         s/Keyword:://g;
         s/TokenType:://g;
     }
