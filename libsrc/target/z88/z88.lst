@@ -78,10 +78,13 @@ target/z88/z88/opwin
 target/z88/z88/fnexpand
 target/z88/graphics/closegfx
 target/z88/graphics/clrarea
-target/z88/graphics/pixladdr
+target/z88/graphics/cleargraphics
+target/z88/graphics/w_pixladdr
 target/z88/graphics/swapgfxbk
+target/z88/graphics/vars
 target/z88/graphics/window
-@classic/gfx/narrow/gfx_narrow.lst
+target/z88/graphics/getmaxx
+@classic/gfx/wide/gfx_wide.lst
 @classic/input/input_keyboard.lst
 target/z88/input/in_Pause
 target/z88/input/in_WaitForKey

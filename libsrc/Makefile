@@ -331,7 +331,7 @@ z88_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
-	$(call buildgeneric,z88)
+	$(call buildgeneric,z88,wide)
 	$(MAKE) -C classic/games TARGET=z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
