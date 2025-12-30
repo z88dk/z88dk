@@ -17,6 +17,11 @@ jobs:
         shell: msys2 {0}
 
     steps:
+    - name: Configure git
+      run: |
+        git config --global core.autocrlf input
+      shell: cmd
+      
     - name: Checkout from git
       uses: actions/checkout@v4
       with:
@@ -48,37 +53,32 @@ jobs:
 
     - name: Install perl prerequisites
       run: |
-        set -e -x
+        PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
         export PATH=/mingw64/bin:$PATH
-        cpan local::lib
-        eval $(perl -Mlocal::lib)
-        cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table
-
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+        
     - name: Build binaries
       run: |
-        set -e -x
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -Mlocal::lib)
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -l
 
     - name: Build libraries
       run: |
-        set -e -x
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -Mlocal::lib)
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         cp `which m4` bin/
         ./build.sh -v -b
 
     - name: Build examples
       run: |
-        set -e -x
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -Mlocal::lib)
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -b -l -e
 
     - name: Run tests
       run: |
-        set -e -x
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -Mlocal::lib)
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -b -l -t
