@@ -40,21 +40,15 @@ sub add_leaf {
             idx       => $idx,
             const     => $const,
             ops       => $ops,
-            paths     => { $path => 1 },
-            cpus      => { $cpu_key => 1 },
+            path      => { $path => 1 },
         };
         $self->{by_key}{$key} = $leaf;
         $self->{list}[$idx] = $leaf;
     }
     else {
         $leaf = $self->{by_key}{$key};
-        $leaf->{paths}{$path} = 1;
-        $leaf->{cpus}{$cpu_key} = 1;
+        $leaf->{path}{$path} = 1;
     }
-
-    # make path list
-    my @paths = sort keys %{ $leaf->{paths} };
-    $leaf->{path} = join(" | ", @paths);
 
     return $leaf;
 }
@@ -65,4 +59,3 @@ sub idx_exists {
 }
 
 1;
-

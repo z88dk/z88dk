@@ -44,8 +44,15 @@ DEPENDS := $(OBJS:.o=.d) $(COMMON_TEST_OBJS:.o=.d) $(TEST_OBJS:.o=.d) $(CATCH_OB
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
 		  --max-code-length=120 --lineend=linux --formatted \
-		  --exclude="opcodes_tables.h" --exclude="opcodes_tables.cpp" \
-		  --exclude="unittests/catch_amalgamated.hpp" --exclude="unittests/catch_amalgamated.cpp" \
+		  --exclude="opcodes_tables.h" \
+		  --exclude="opcodes_tables.cpp" \
+		  --exclude="opcodes_tables_1.cpp" \
+		  --exclude="opcodes_tables_2.cpp" \
+		  --exclude="opcodes_tables_3.cpp" \
+		  --exclude="opcodes_tables_4.cpp" \
+		  --exclude="opcodes_tables_5.cpp" \
+		  --exclude="unittests/catch_amalgamated.hpp" \
+		  --exclude="unittests/catch_amalgamated.cpp" \
 		  --recursive "*.cpp" "*.h"
 
 all: $(PROJ)$(EXE) $(TEST_BINS)
