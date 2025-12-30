@@ -849,7 +849,7 @@ TEST_CASE("OpcodesParser: 'ld de, sp' on ez80 parses to correct opcode sequence 
 }
 
 TEST_CASE("OpcodesParser: 'ld hl,0x1234' parses to correct opcode, patch, and expression",
-    "[opcodes][ld][hl][imm16][patch]") {
+          "[opcodes][ld][hl][imm16][patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -885,7 +885,7 @@ TEST_CASE("OpcodesParser: 'ld hl,0x1234' parses to correct opcode, patch, and ex
 }
 
 TEST_CASE("OpcodesParser: 'ld hl,0x123456' on ez80 parses to correct opcode, patch, and expression (24-bit)",
-    "[opcodes][ld][hl][imm24][ez80][patch]") {
+          "[opcodes][ld][hl][imm24][ez80][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -926,3 +926,92 @@ TEST_CASE("OpcodesParser: 'ld hl,0x123456' on ez80 parses to correct opcode, pat
     g_options = Options();
 }
 
+TEST_CASE("OpcodesParser: 'sub hl, de' assembles to CALL helper with Word patch and extern symbol",
+          "[opcodes][sub][hl][patch][symbol]") {
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    // Assemble the instruction
+    pp.push_virtual_file("sub hl, de\n", "sub_hl_de.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // Expect placeholder + one instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+
+    // Expected bytes: { 0xCD, 0x00, 0x00 }
+    REQUIRE(op->size() == 3);
+    REQUIRE(op->bytes()[0] == 0xCD);
+    REQUIRE(op->bytes()[1] == 0x00);
+    REQUIRE(op->bytes()[2] == 0x00);
+
+    // One Word patch at offset 1
+    const auto& patches = op->patches();
+    REQUIRE(patches.size() == 1);
+    const auto& patch = patches[0];
+    REQUIRE(patch.range() == PatchRange::Word);
+    REQUIRE(patch.offset() == 1);
+
+    // Patch expression text must be the helper symbol name
+    REQUIRE(patch.expression().to_string() == "__z80asm__sub_hl_de");
+
+    // The helper symbol should be declared in the current module as extern
+    Symbol* helper = module->get_symbol("__z80asm__sub_hl_de");
+    REQUIRE(helper != nullptr);
+    REQUIRE(helper->is_extern());
+}
+
+TEST_CASE("OpcodesParser: 'sub hl, de' on ez80 assembles to CALL helper with Ptr24 patch and extern symbol",
+          "[opcodes][sub][hl][ez80][patch][symbol]") {
+    g_options = Options();
+    g_options.cpu_id = CPU::ez80;
+
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    // Assemble the instruction
+    pp.push_virtual_file("sub hl, de\n", "sub_hl_de_ez80.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // Expect placeholder + one instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+
+    // Expected bytes: { 0xCD, 0x00, 0x00, 0x00 } (24-bit pointer placeholder)
+    REQUIRE(op->size() == 4);
+    REQUIRE(op->bytes()[0] == 0xCD);
+    REQUIRE(op->bytes()[1] == 0x00);
+    REQUIRE(op->bytes()[2] == 0x00);
+    REQUIRE(op->bytes()[3] == 0x00);
+
+    // One Ptr24 patch at offset 1
+    const auto& patches = op->patches();
+    REQUIRE(patches.size() == 1);
+    const auto& patch = patches[0];
+    REQUIRE(patch.range() == PatchRange::Ptr24);
+    REQUIRE(patch.offset() == 1);
+
+    // Patch expression text must be the helper symbol name
+    REQUIRE(patch.expression().to_string() == "__z80asm__sub_hl_de");
+
+    // The helper symbol should be declared in the current module as extern
+    Symbol* helper = module->get_symbol("__z80asm__sub_hl_de");
+    REQUIRE(helper != nullptr);
+    REQUIRE(helper->is_extern());
+
+    g_options = Options();
+}
