@@ -32,7 +32,7 @@ jobs:
       uses: cygwin/cygwin-install-action@master
       with:
         platform: x64
-        packages: make gcc-g++ bison flex libxml2-devel libiconv-devel zlib-devel liblzma-devel wget unzip dos2unix autoconf automake libtool ragel perl perl-Regexp-Common perl-Test-Harness perl-Text-Diff perl-YAML-Tiny perl-Module-Build perl-List-MoreUtils perl-Params-Util Perl-B-COW Perl-Clone libgmp-devel
+        packages: make gcc-g++ bison flex libxml2-devel libiconv-devel zlib-devel liblzma-devel libcrypt-devel libxcrypt-devel wget unzip dos2unix autoconf automake libtool ragel perl perl-Regexp-Common perl-Test-Harness perl-Text-Diff perl-YAML-Tiny perl-Module-Build perl-List-MoreUtils perl-Params-Util Perl-B-COW Perl-Clone libgmp-devel
     - name: Install choco packages
       run: |
         choco install re2c
