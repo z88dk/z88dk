@@ -66,20 +66,16 @@ jobs:
     - name: Build binaries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -l
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b
     - name: Build examples
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -e
     - name: Run tests
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -t
