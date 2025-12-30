@@ -33,13 +33,12 @@ jobs:
       with:
         platform: x64
         packages: >
-          Perl-B-COW 
-          Perl-Clone 
           autoconf 
           automake 
           bison 
           dos2unix 
           flex 
+          gcc-core
           gcc-g++ 
           libcrypt-devel 
           libexpat-devel 
@@ -51,21 +50,12 @@ jobs:
           libxml2-devel 
           make 
           perl 
-          perl-List-MoreUtils 
-          perl-Module-Build 
-          perl-Params-Util 
-          perl-Regexp-Common 
-          perl-Test-Harness 
-          perl-Text-Diff 
-          perl-YAML-Tiny 
+          pkg-config
           ragel 
+          re2c
           unzip 
           wget 
           zlib-devel 
-    - name: Install choco packages
-      run: |
-        choco install re2c
-      shell: cmd
     - name: Install perl prerequisites
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
