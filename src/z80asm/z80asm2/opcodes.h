@@ -39,7 +39,7 @@ private:    // object data
                          int offset2, PatchRange range2);
     void emit_bytes_expr_plus_one(uint64_t value,
                                   int offset, PatchRange range);
-    void emit_bytes_func(uint64_t value, int offset,
+    void emit_bytes_func(uint64_t value, int offset, PatchRange range,
                          const std::string& func);
     Expression get_temp_expr(const std::string& temp_label,
                              int temp_label_offset);

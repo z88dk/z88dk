@@ -239,7 +239,8 @@ void OpcodesParser::emit_bytes_expr_plus_one(uint64_t value,
     opcode->add_patch(std::move(patch));
 }
 
-void OpcodesParser::emit_bytes_func(uint64_t value, int offset,
+void OpcodesParser::emit_bytes_func(uint64_t value,
+                                    int offset, PatchRange range,
                                     const std::string& func) {
 
     // declare the function as external symbol
@@ -262,8 +263,7 @@ void OpcodesParser::emit_bytes_func(uint64_t value, int offset,
     Opcode* opcode = emit_bytes(value);
 
     // emit patch
-    Patch patch(opcode, offset,
-                PatchRange::Word, std::move(func_expr));
+    Patch patch(opcode, offset, range, std::move(func_expr));
     opcode->add_patch(std::move(patch));
 }
 

@@ -106,14 +106,17 @@ sub make_h_file {
 
 #pragma once
 
-#include <limits>
 #include <cstdint>
 
 enum class DFA_Token : int16_t {
 END
-    for my $token_key (sort keys %{ $dfa->dfa_tokens->by_key }) {
-        my $token = $dfa->dfa_tokens->by_key->{$token_key};
-        print $fh "    $token_key = $token->{idx},\n";
+    # Order token keys by their numeric idx instead of by name
+    my $dfa_tokens = $dfa->dfa_tokens;
+    for my $token_key (sort {
+        $dfa_tokens->by_key->{$a}{idx} <=> $dfa_tokens->by_key->{$b}{idx}
+        } keys %{ $dfa_tokens->by_key }) {
+        my $token = $dfa_tokens->by_key->{$token_key};
+        printf $fh "    %-24s = %d,\n", $token_key, $token->{idx}; 
     }
 	print $fh <<END;
 };
@@ -133,25 +136,23 @@ END
 #------------------------------------------------------------------------------
 sub make_cpp_file {
 	my($cpp_file, $dfa, $keywords, $token_types) = @_;
-    
-    	open(my $fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh <<'END';
+
+    my $header = <<'END';
 //-----------------------------------------------------------------------------
 // Z80 assembler
 // Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "keywords.h"
-#include "lexer.h"
 #include "macros.h"
 #include "opcodes.h"
 #include "opcodes_tables.h"
-#include <cassert>
 #include <cstdint>
-#include <limits>
 
 END
+
+    	open(my $fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh $header;
 
     # ----------------------------
     # DFA size constants emitter
@@ -166,6 +167,10 @@ const std::uint16_t OpcodesParser::TokenCount = $token_count;
 const std::uint16_t OpcodesParser::ActionCount = $action_count;
 
 END
+
+    $cpp_file =~ s/\.cpp/_1.cpp/;
+    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh $header;
 
     # ----------------------------
     # CPU -> DFA_Token map
@@ -259,6 +264,10 @@ END
 
 END
 
+    $cpp_file =~ s/_1\.cpp/_2.cpp/;
+    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh $header;
+
     # ----------------------------
     # CSR emitter: build flattened transition arrays and accept index
     # ----------------------------
@@ -272,7 +281,13 @@ END
     $csr_builder->emit_cpp($fh, 'OpcodesParser', '');
 
 
+    $cpp_file =~ s/_2\.cpp/_3.cpp/;
+    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh $header;
+
+    # ----------------------------
     # accept index per state
+    # ----------------------------
     print $fh <<END;
 // per-state accept leaf idx (-1 if none)
 const std::int32_t OpcodesParser::accept_index[$state_count] = {
@@ -296,6 +311,10 @@ END
 
 END
 
+    $cpp_file =~ s/_3\.cpp/_4.cpp/;
+    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh $header;
+
     # ----------------------------
     # Emit action dispatcher table
     # ----------------------------
@@ -312,11 +331,17 @@ END
 
 END
 
+    $cpp_file =~ s/_4\.cpp/_5.cpp/;
+    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh $header;
+
+    # ----------------------------
     # emit action functions
+    # ----------------------------
     for my $i (0 .. $#{ $dfa->dfa_leafs->list }) {
         my $leaf = $dfa->dfa_leafs->list->[$i];
-        my $path = $leaf->{path};
-        $path =~ s/ \| /\n\/\/ /g;
+        my @path = sort keys %{ $leaf->{path} };
+        my $path = join("\n// ", @path);
         my $const = $leaf->{const};
         my $action = make_action($leaf);
         say $fh "// $path";
@@ -490,14 +515,21 @@ sub make_action {
             $code .= "    emit_bytes_expr_plus_one(0x$op,\n".
                     "        $offset, PatchRange::Word);\n";
         }
-        # hh hh @func
-        elsif ($op =~ /^(([0-9A-F]{2} )+)\@(\w+)\s*$/) {
-            warn "test emit_bytes in op: $op\n";
+        # hh hh @func x
+        elsif ($op =~ /^(([0-9A-F]{2} )+)\@(\w+) x\s*$/) {
             my($op1, $func) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
             $code .= "    emit_bytes_func(0x${op1}0000,\n".
-                    "        $offset, \"$func\");\n";
+                    "        $offset, PatchRange::Word, \"$func\");\n";
+        }
+        # hh hh @func x x
+        elsif ($op =~ /^(([0-9A-F]{2} )+)\@(\w+) x x\s*$/) {
+            my($op1, $func) = ($1, $3);
+            $op1 =~ s/\s+//g;
+            my $offset = length($op1)/2;
+            $code .= "    emit_bytes_func(0x${op1}000000,\n".
+                    "        $offset, PatchRange::Ptr24, \"$func\");\n";
         }
         # hh hh %tN
         elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*)$/) {
