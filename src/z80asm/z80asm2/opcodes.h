@@ -24,7 +24,7 @@ public:
 private:    // object data
     CompilationUnit* unit_ = nullptr;
     const TokenLine* line_ = nullptr;
-    size_t i_ = 0; // point int line tokens
+    size_t i_ = 0; // point into line tokens
     std::deque<Expression> exprs_;
 
     static inline const int NO_ACTION = -1;
