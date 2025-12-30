@@ -260,14 +260,20 @@ sub add_emul {
 	}
 
 	if (!$self->exists($cpu, $asm)) {
+        my @call_ops = @{ $self->opcodes->{"call %m"}{$cpu}{ops} };
+        my @call_op = @{ shift @call_ops }; # CD %m %m  or  CD %m %m %m
+        $call_op[0] == 0xCD or die;
+        $call_op[1] =~ s/%m/'@'.$func/e or die;
+        for (@call_op) { s/%m/x/; }         # CD @func x  or  CD @func x x
+
 		if (@args) {
 			$self->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
-								   ops=>[[0xCD, '@'.$func, ''], \@args],
+								   ops=>[ \@call_op, \@args ],
 								   synth=>1));
 		}
 		else {
 			$self->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
-								   ops=>[[0xCD, '@'.$func, '']],
+								   ops=>[ \@call_op ],
 								   synth=>1));
 		}
 	}

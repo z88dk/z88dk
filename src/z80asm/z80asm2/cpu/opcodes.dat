@@ -1052,13 +1052,13 @@ adc hl, (pz+%d)|r6k|_||49;1B %d
 adc hl, (pz+%d)|r6k_strict|_||49;1B %d
 adc hl, (sp+%n)|r6k|_||49;9A %n
 adc hl, (sp+%n)|r6k_strict|_||49;9A %n
-adc hl, bc|8080|X||CD @__z80asm__adc_hl_bc 
-adc hl, bc|8085|X||CD @__z80asm__adc_hl_bc 
+adc hl, bc|8080|X||CD @__z80asm__adc_hl_bc x
+adc hl, bc|8085|X||CD @__z80asm__adc_hl_bc x
 adc hl, bc|ez80|_||ED 4A
 adc hl, bc|ez80_strict|_||ED 4A
 adc hl, bc|ez80_z80|_||ED 4A
 adc hl, bc|ez80_z80_strict|_||ED 4A
-adc hl, bc|gbz80|X||CD @__z80asm__adc_hl_bc 
+adc hl, bc|gbz80|X||CD @__z80asm__adc_hl_bc x
 adc hl, bc|kc160|_||ED 4A
 adc hl, bc|kc160_strict|_||ED 4A
 adc hl, bc|kc160_z80|_||ED 4A
@@ -1081,13 +1081,13 @@ adc hl, bc|z80|_||ED 4A
 adc hl, bc|z80_strict|_||ED 4A
 adc hl, bc|z80n|_||ED 4A
 adc hl, bc|z80n_strict|_||ED 4A
-adc hl, de|8080|X||CD @__z80asm__adc_hl_de 
-adc hl, de|8085|X||CD @__z80asm__adc_hl_de 
+adc hl, de|8080|X||CD @__z80asm__adc_hl_de x
+adc hl, de|8085|X||CD @__z80asm__adc_hl_de x
 adc hl, de|ez80|_||ED 5A
 adc hl, de|ez80_strict|_||ED 5A
 adc hl, de|ez80_z80|_||ED 5A
 adc hl, de|ez80_z80_strict|_||ED 5A
-adc hl, de|gbz80|X||CD @__z80asm__adc_hl_de 
+adc hl, de|gbz80|X||CD @__z80asm__adc_hl_de x
 adc hl, de|kc160|_||ED 5A
 adc hl, de|kc160_strict|_||ED 5A
 adc hl, de|kc160_z80|_||ED 5A
@@ -1110,13 +1110,13 @@ adc hl, de|z80|_||ED 5A
 adc hl, de|z80_strict|_||ED 5A
 adc hl, de|z80n|_||ED 5A
 adc hl, de|z80n_strict|_||ED 5A
-adc hl, hl|8080|X||CD @__z80asm__adc_hl_hl 
-adc hl, hl|8085|X||CD @__z80asm__adc_hl_hl 
+adc hl, hl|8080|X||CD @__z80asm__adc_hl_hl x
+adc hl, hl|8085|X||CD @__z80asm__adc_hl_hl x
 adc hl, hl|ez80|_||ED 6A
 adc hl, hl|ez80_strict|_||ED 6A
 adc hl, hl|ez80_z80|_||ED 6A
 adc hl, hl|ez80_z80_strict|_||ED 6A
-adc hl, hl|gbz80|X||CD @__z80asm__adc_hl_hl 
+adc hl, hl|gbz80|X||CD @__z80asm__adc_hl_hl x
 adc hl, hl|kc160|_||ED 6A
 adc hl, hl|kc160_strict|_||ED 6A
 adc hl, hl|kc160_z80|_||ED 6A
@@ -1139,13 +1139,13 @@ adc hl, hl|z80|_||ED 6A
 adc hl, hl|z80_strict|_||ED 6A
 adc hl, hl|z80n|_||ED 6A
 adc hl, hl|z80n_strict|_||ED 6A
-adc hl, sp|8080|X||CD @__z80asm__adc_hl_sp 
-adc hl, sp|8085|X||CD @__z80asm__adc_hl_sp 
+adc hl, sp|8080|X||CD @__z80asm__adc_hl_sp x
+adc hl, sp|8085|X||CD @__z80asm__adc_hl_sp x
 adc hl, sp|ez80|_||ED 7A
 adc hl, sp|ez80_strict|_||ED 7A
 adc hl, sp|ez80_z80|_||ED 7A
 adc hl, sp|ez80_z80_strict|_||ED 7A
-adc hl, sp|gbz80|X||CD @__z80asm__adc_hl_sp 
+adc hl, sp|gbz80|X||CD @__z80asm__adc_hl_sp x
 adc hl, sp|kc160|_||ED 7A
 adc hl, sp|kc160_strict|_||ED 7A
 adc hl, sp|kc160_z80|_||ED 7A
@@ -2308,21 +2308,21 @@ add bc, %m|z180|X||E5;21 %m %m;09;44;4D;E1
 add bc, %m|z80|X||E5;21 %m %m;09;44;4D;E1
 add bc, %m|z80n|_||ED 36 %m %m
 add bc, %m|z80n_strict|_||ED 36 %m %m
-add bc, a|8080|X||CD @__z80asm__add_bc_a 
-add bc, a|8085|X||CD @__z80asm__add_bc_a 
-add bc, a|ez80|X||CD @__z80asm__add_bc_a 
-add bc, a|ez80_z80|X||CD @__z80asm__add_bc_a 
-add bc, a|gbz80|X||CD @__z80asm__add_bc_a 
-add bc, a|kc160|X||CD @__z80asm__add_bc_a 
-add bc, a|kc160_z80|X||CD @__z80asm__add_bc_a 
-add bc, a|r2ka|X||CD @__z80asm__add_bc_a 
-add bc, a|r3k|X||CD @__z80asm__add_bc_a 
-add bc, a|r4k|X||CD @__z80asm__add_bc_a 
-add bc, a|r5k|X||CD @__z80asm__add_bc_a 
-add bc, a|r6k|X||CD @__z80asm__add_bc_a 
-add bc, a|r800|X||CD @__z80asm__add_bc_a 
-add bc, a|z180|X||CD @__z80asm__add_bc_a 
-add bc, a|z80|X||CD @__z80asm__add_bc_a 
+add bc, a|8080|X||CD @__z80asm__add_bc_a x
+add bc, a|8085|X||CD @__z80asm__add_bc_a x
+add bc, a|ez80|X||CD @__z80asm__add_bc_a x x
+add bc, a|ez80_z80|X||CD @__z80asm__add_bc_a x
+add bc, a|gbz80|X||CD @__z80asm__add_bc_a x
+add bc, a|kc160|X||CD @__z80asm__add_bc_a x
+add bc, a|kc160_z80|X||CD @__z80asm__add_bc_a x
+add bc, a|r2ka|X||CD @__z80asm__add_bc_a x
+add bc, a|r3k|X||CD @__z80asm__add_bc_a x
+add bc, a|r4k|X||CD @__z80asm__add_bc_a x
+add bc, a|r5k|X||CD @__z80asm__add_bc_a x
+add bc, a|r6k|X||CD @__z80asm__add_bc_a x
+add bc, a|r800|X||CD @__z80asm__add_bc_a x
+add bc, a|z180|X||CD @__z80asm__add_bc_a x
+add bc, a|z80|X||CD @__z80asm__add_bc_a x
 add bc, a|z80n|_||ED 33
 add bc, a|z80n_strict|_||ED 33
 add c|8080|_||81
@@ -2390,21 +2390,21 @@ add de, %m|z180|X||E5;21 %m %m;19;54;5D;E1
 add de, %m|z80|X||E5;21 %m %m;19;54;5D;E1
 add de, %m|z80n|_||ED 35 %m %m
 add de, %m|z80n_strict|_||ED 35 %m %m
-add de, a|8080|X||CD @__z80asm__add_de_a 
-add de, a|8085|X||CD @__z80asm__add_de_a 
-add de, a|ez80|X||CD @__z80asm__add_de_a 
-add de, a|ez80_z80|X||CD @__z80asm__add_de_a 
-add de, a|gbz80|X||CD @__z80asm__add_de_a 
-add de, a|kc160|X||CD @__z80asm__add_de_a 
-add de, a|kc160_z80|X||CD @__z80asm__add_de_a 
-add de, a|r2ka|X||CD @__z80asm__add_de_a 
-add de, a|r3k|X||CD @__z80asm__add_de_a 
-add de, a|r4k|X||CD @__z80asm__add_de_a 
-add de, a|r5k|X||CD @__z80asm__add_de_a 
-add de, a|r6k|X||CD @__z80asm__add_de_a 
-add de, a|r800|X||CD @__z80asm__add_de_a 
-add de, a|z180|X||CD @__z80asm__add_de_a 
-add de, a|z80|X||CD @__z80asm__add_de_a 
+add de, a|8080|X||CD @__z80asm__add_de_a x
+add de, a|8085|X||CD @__z80asm__add_de_a x
+add de, a|ez80|X||CD @__z80asm__add_de_a x x
+add de, a|ez80_z80|X||CD @__z80asm__add_de_a x
+add de, a|gbz80|X||CD @__z80asm__add_de_a x
+add de, a|kc160|X||CD @__z80asm__add_de_a x
+add de, a|kc160_z80|X||CD @__z80asm__add_de_a x
+add de, a|r2ka|X||CD @__z80asm__add_de_a x
+add de, a|r3k|X||CD @__z80asm__add_de_a x
+add de, a|r4k|X||CD @__z80asm__add_de_a x
+add de, a|r5k|X||CD @__z80asm__add_de_a x
+add de, a|r6k|X||CD @__z80asm__add_de_a x
+add de, a|r800|X||CD @__z80asm__add_de_a x
+add de, a|z180|X||CD @__z80asm__add_de_a x
+add de, a|z80|X||CD @__z80asm__add_de_a x
 add de, a|z80n|_||ED 32
 add de, a|z80n_strict|_||ED 32
 add e|8080|_||83
@@ -2552,21 +2552,21 @@ add hl, (pz+%d)|r6k|_||49;0B %d
 add hl, (pz+%d)|r6k_strict|_||49;0B %d
 add hl, (sp+%n)|r6k|_||49;8A %n
 add hl, (sp+%n)|r6k_strict|_||49;8A %n
-add hl, a|8080|X||CD @__z80asm__add_hl_a 
-add hl, a|8085|X||CD @__z80asm__add_hl_a 
-add hl, a|ez80|X||CD @__z80asm__add_hl_a 
-add hl, a|ez80_z80|X||CD @__z80asm__add_hl_a 
-add hl, a|gbz80|X||CD @__z80asm__add_hl_a 
-add hl, a|kc160|X||CD @__z80asm__add_hl_a 
-add hl, a|kc160_z80|X||CD @__z80asm__add_hl_a 
-add hl, a|r2ka|X||CD @__z80asm__add_hl_a 
-add hl, a|r3k|X||CD @__z80asm__add_hl_a 
-add hl, a|r4k|X||CD @__z80asm__add_hl_a 
-add hl, a|r5k|X||CD @__z80asm__add_hl_a 
-add hl, a|r6k|X||CD @__z80asm__add_hl_a 
-add hl, a|r800|X||CD @__z80asm__add_hl_a 
-add hl, a|z180|X||CD @__z80asm__add_hl_a 
-add hl, a|z80|X||CD @__z80asm__add_hl_a 
+add hl, a|8080|X||CD @__z80asm__add_hl_a x
+add hl, a|8085|X||CD @__z80asm__add_hl_a x
+add hl, a|ez80|X||CD @__z80asm__add_hl_a x x
+add hl, a|ez80_z80|X||CD @__z80asm__add_hl_a x
+add hl, a|gbz80|X||CD @__z80asm__add_hl_a x
+add hl, a|kc160|X||CD @__z80asm__add_hl_a x
+add hl, a|kc160_z80|X||CD @__z80asm__add_hl_a x
+add hl, a|r2ka|X||CD @__z80asm__add_hl_a x
+add hl, a|r3k|X||CD @__z80asm__add_hl_a x
+add hl, a|r4k|X||CD @__z80asm__add_hl_a x
+add hl, a|r5k|X||CD @__z80asm__add_hl_a x
+add hl, a|r6k|X||CD @__z80asm__add_hl_a x
+add hl, a|r800|X||CD @__z80asm__add_hl_a x
+add hl, a|z180|X||CD @__z80asm__add_hl_a x
+add hl, a|z80|X||CD @__z80asm__add_hl_a x
 add hl, a|z80n|_||ED 31
 add hl, a|z80n_strict|_||ED 31
 add hl, bc|8080|_||09
@@ -3025,14 +3025,14 @@ add m|r800|_||86
 add m|z180|_||86
 add m|z80|_||86
 add m|z80n|_||86
-add sp, %d|8080|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|8085|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|ez80|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|ez80_z80|X||CD @__z80asm__add_sp_d ;%d
+add sp, %d|8080|X||CD @__z80asm__add_sp_d x;%d
+add sp, %d|8085|X||CD @__z80asm__add_sp_d x;%d
+add sp, %d|ez80|X||CD @__z80asm__add_sp_d x x;%d
+add sp, %d|ez80_z80|X||CD @__z80asm__add_sp_d x;%d
 add sp, %d|gbz80|_||E8 %d
 add sp, %d|gbz80_strict|_||E8 %d
-add sp, %d|kc160|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|kc160_z80|X||CD @__z80asm__add_sp_d ;%d
+add sp, %d|kc160|X||CD @__z80asm__add_sp_d x;%d
+add sp, %d|kc160_z80|X||CD @__z80asm__add_sp_d x;%d
 add sp, %d|r2ka|_||27 %d
 add sp, %d|r2ka_strict|_||27 %d
 add sp, %d|r3k|_||27 %d
@@ -3043,10 +3043,10 @@ add sp, %d|r5k|_||27 %d
 add sp, %d|r5k_strict|_||27 %d
 add sp, %d|r6k|_||27 %d
 add sp, %d|r6k_strict|_||27 %d
-add sp, %d|r800|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|z180|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|z80|X||CD @__z80asm__add_sp_d ;%d
-add sp, %d|z80n|X||CD @__z80asm__add_sp_d ;%d
+add sp, %d|r800|X||CD @__z80asm__add_sp_d x;%d
+add sp, %d|z180|X||CD @__z80asm__add_sp_d x;%d
+add sp, %d|z80|X||CD @__z80asm__add_sp_d x;%d
+add sp, %d|z80n|X||CD @__z80asm__add_sp_d x;%d
 add xhl, bc|kc160|_||40;09
 add xhl, bc|kc160_strict|_||40;09
 add xhl, de|kc160|_||40;19
@@ -19523,7 +19523,7 @@ ani %n|r800|_||E6 %n
 ani %n|z180|_||E6 %n
 ani %n|z80|_||E6 %n
 ani %n|z80n|_||E6 %n
-arhl|8080|X||CD @__z80asm__sra_hl 
+arhl|8080|X||CD @__z80asm__sra_hl x
 arhl|8085|_||10
 arhl|8085_strict|_||10
 arhl|ez80|X||CB 2C;CB 1D
@@ -20397,57 +20397,57 @@ call %m|z80|_||CD %m %m
 call %m|z80_strict|_||CD %m %m
 call %m|z80n|_||CD %m %m
 call %m|z80n_strict|_||CD %m %m
-call (hl)|8080|X||CD @__z80asm__call_hl 
-call (hl)|8085|X||CD @__z80asm__call_hl 
-call (hl)|ez80|X||CD @__z80asm__call_hl 
-call (hl)|ez80_z80|X||CD @__z80asm__call_hl 
-call (hl)|gbz80|X||CD @__z80asm__call_hl 
-call (hl)|kc160|X||CD @__z80asm__call_hl 
-call (hl)|kc160_z80|X||CD @__z80asm__call_hl 
-call (hl)|r2ka|X||CD @__z80asm__call_hl 
-call (hl)|r3k|X||CD @__z80asm__call_hl 
+call (hl)|8080|X||CD @__z80asm__call_hl x
+call (hl)|8085|X||CD @__z80asm__call_hl x
+call (hl)|ez80|X||CD @__z80asm__call_hl x x
+call (hl)|ez80_z80|X||CD @__z80asm__call_hl x
+call (hl)|gbz80|X||CD @__z80asm__call_hl x
+call (hl)|kc160|X||CD @__z80asm__call_hl x
+call (hl)|kc160_z80|X||CD @__z80asm__call_hl x
+call (hl)|r2ka|X||CD @__z80asm__call_hl x
+call (hl)|r3k|X||CD @__z80asm__call_hl x
 call (hl)|r4k|_||ED EA
 call (hl)|r4k_strict|_||ED EA
 call (hl)|r5k|_||ED EA
 call (hl)|r5k_strict|_||ED EA
 call (hl)|r6k|_||ED EA
 call (hl)|r6k_strict|_||ED EA
-call (hl)|r800|X||CD @__z80asm__call_hl 
-call (hl)|z180|X||CD @__z80asm__call_hl 
-call (hl)|z80|X||CD @__z80asm__call_hl 
-call (hl)|z80n|X||CD @__z80asm__call_hl 
-call (ix)|ez80|X||CD @__z80asm__call_ix 
-call (ix)|ez80_z80|X||CD @__z80asm__call_ix 
-call (ix)|kc160|X||CD @__z80asm__call_ix 
-call (ix)|kc160_z80|X||CD @__z80asm__call_ix 
-call (ix)|r2ka|X||CD @__z80asm__call_ix 
-call (ix)|r3k|X||CD @__z80asm__call_ix 
+call (hl)|r800|X||CD @__z80asm__call_hl x
+call (hl)|z180|X||CD @__z80asm__call_hl x
+call (hl)|z80|X||CD @__z80asm__call_hl x
+call (hl)|z80n|X||CD @__z80asm__call_hl x
+call (ix)|ez80|X||CD @__z80asm__call_ix x x
+call (ix)|ez80_z80|X||CD @__z80asm__call_ix x
+call (ix)|kc160|X||CD @__z80asm__call_ix x
+call (ix)|kc160_z80|X||CD @__z80asm__call_ix x
+call (ix)|r2ka|X||CD @__z80asm__call_ix x
+call (ix)|r3k|X||CD @__z80asm__call_ix x
 call (ix)|r4k|_||DD EA
 call (ix)|r4k_strict|_||DD EA
 call (ix)|r5k|_||DD EA
 call (ix)|r5k_strict|_||DD EA
 call (ix)|r6k|_||DD EA
 call (ix)|r6k_strict|_||DD EA
-call (ix)|r800|X||CD @__z80asm__call_ix 
-call (ix)|z180|X||CD @__z80asm__call_ix 
-call (ix)|z80|X||CD @__z80asm__call_ix 
-call (ix)|z80n|X||CD @__z80asm__call_ix 
-call (iy)|ez80|X||CD @__z80asm__call_iy 
-call (iy)|ez80_z80|X||CD @__z80asm__call_iy 
-call (iy)|kc160|X||CD @__z80asm__call_iy 
-call (iy)|kc160_z80|X||CD @__z80asm__call_iy 
-call (iy)|r2ka|X||CD @__z80asm__call_iy 
-call (iy)|r3k|X||CD @__z80asm__call_iy 
+call (ix)|r800|X||CD @__z80asm__call_ix x
+call (ix)|z180|X||CD @__z80asm__call_ix x
+call (ix)|z80|X||CD @__z80asm__call_ix x
+call (ix)|z80n|X||CD @__z80asm__call_ix x
+call (iy)|ez80|X||CD @__z80asm__call_iy x x
+call (iy)|ez80_z80|X||CD @__z80asm__call_iy x
+call (iy)|kc160|X||CD @__z80asm__call_iy x
+call (iy)|kc160_z80|X||CD @__z80asm__call_iy x
+call (iy)|r2ka|X||CD @__z80asm__call_iy x
+call (iy)|r3k|X||CD @__z80asm__call_iy x
 call (iy)|r4k|_||FD EA
 call (iy)|r4k_strict|_||FD EA
 call (iy)|r5k|_||FD EA
 call (iy)|r5k_strict|_||FD EA
 call (iy)|r6k|_||FD EA
 call (iy)|r6k_strict|_||FD EA
-call (iy)|r800|X||CD @__z80asm__call_iy 
-call (iy)|z180|X||CD @__z80asm__call_iy 
-call (iy)|z80|X||CD @__z80asm__call_iy 
-call (iy)|z80n|X||CD @__z80asm__call_iy 
+call (iy)|r800|X||CD @__z80asm__call_iy x
+call (iy)|z180|X||CD @__z80asm__call_iy x
+call (iy)|z80|X||CD @__z80asm__call_iy x
+call (iy)|z80n|X||CD @__z80asm__call_iy x
 call c, %m|8080|_||DC %m %m
 call c, %m|8085|_||DC %m %m
 call c, %m|ez80|_||DC %m %m %m
@@ -23531,22 +23531,22 @@ cp.sil a, (iy)|ez80|_||52;FD BE 00
 cp.sil a, (iy)|ez80_strict|_||52;FD BE 00
 cp.sil a, (iy+%d)|ez80|_||52;FD BE %d
 cp.sil a, (iy+%d)|ez80_strict|_||52;FD BE %d
-cpd|8080|X||CD @__z80asm__cpd 
-cpd|8085|X||CD @__z80asm__cpd 
+cpd|8080|X||CD @__z80asm__cpd x
+cpd|8085|X||CD @__z80asm__cpd x
 cpd|ez80|_||ED A9
 cpd|ez80_strict|_||ED A9
 cpd|ez80_z80|_||ED A9
 cpd|ez80_z80_strict|_||ED A9
-cpd|gbz80|X||CD @__z80asm__cpd 
+cpd|gbz80|X||CD @__z80asm__cpd x
 cpd|kc160|_||ED A9
 cpd|kc160_strict|_||ED A9
 cpd|kc160_z80|_||ED A9
 cpd|kc160_z80_strict|_||ED A9
-cpd|r2ka|X||CD @__z80asm__cpd 
-cpd|r3k|X||CD @__z80asm__cpd 
-cpd|r4k|X||CD @__z80asm__cpd 
-cpd|r5k|X||CD @__z80asm__cpd 
-cpd|r6k|X||CD @__z80asm__cpd 
+cpd|r2ka|X||CD @__z80asm__cpd x
+cpd|r3k|X||CD @__z80asm__cpd x
+cpd|r4k|X||CD @__z80asm__cpd x
+cpd|r5k|X||CD @__z80asm__cpd x
+cpd|r6k|X||CD @__z80asm__cpd x
 cpd|r800|_||ED A9
 cpd|r800_strict|_||ED A9
 cpd|z180|_||ED A9
@@ -23565,22 +23565,22 @@ cpd.s|ez80|_||52;ED A9
 cpd.s|ez80_strict|_||52;ED A9
 cpd.sil|ez80|_||52;ED A9
 cpd.sil|ez80_strict|_||52;ED A9
-cpdr|8080|X||CD @__z80asm__cpdr 
-cpdr|8085|X||CD @__z80asm__cpdr 
+cpdr|8080|X||CD @__z80asm__cpdr x
+cpdr|8085|X||CD @__z80asm__cpdr x
 cpdr|ez80|_||ED B9
 cpdr|ez80_strict|_||ED B9
 cpdr|ez80_z80|_||ED B9
 cpdr|ez80_z80_strict|_||ED B9
-cpdr|gbz80|X||CD @__z80asm__cpdr 
+cpdr|gbz80|X||CD @__z80asm__cpdr x
 cpdr|kc160|_||ED B9
 cpdr|kc160_strict|_||ED B9
 cpdr|kc160_z80|_||ED B9
 cpdr|kc160_z80_strict|_||ED B9
-cpdr|r2ka|X||CD @__z80asm__cpdr 
-cpdr|r3k|X||CD @__z80asm__cpdr 
-cpdr|r4k|X||CD @__z80asm__cpdr 
-cpdr|r5k|X||CD @__z80asm__cpdr 
-cpdr|r6k|X||CD @__z80asm__cpdr 
+cpdr|r2ka|X||CD @__z80asm__cpdr x
+cpdr|r3k|X||CD @__z80asm__cpdr x
+cpdr|r4k|X||CD @__z80asm__cpdr x
+cpdr|r5k|X||CD @__z80asm__cpdr x
+cpdr|r6k|X||CD @__z80asm__cpdr x
 cpdr|r800|_||ED B9
 cpdr|r800_strict|_||ED B9
 cpdr|z180|_||ED B9
@@ -23616,22 +23616,22 @@ cpe %m|r800|_||EC %m %m
 cpe %m|z180|_||EC %m %m
 cpe %m|z80|_||EC %m %m
 cpe %m|z80n|_||EC %m %m
-cpi|8080|X||CD @__z80asm__cpi 
-cpi|8085|X||CD @__z80asm__cpi 
+cpi|8080|X||CD @__z80asm__cpi x
+cpi|8085|X||CD @__z80asm__cpi x
 cpi|ez80|_||ED A1
 cpi|ez80_strict|_||ED A1
 cpi|ez80_z80|_||ED A1
 cpi|ez80_z80_strict|_||ED A1
-cpi|gbz80|X||CD @__z80asm__cpi 
+cpi|gbz80|X||CD @__z80asm__cpi x
 cpi|kc160|_||ED A1
 cpi|kc160_strict|_||ED A1
 cpi|kc160_z80|_||ED A1
 cpi|kc160_z80_strict|_||ED A1
-cpi|r2ka|X||CD @__z80asm__cpi 
-cpi|r3k|X||CD @__z80asm__cpi 
-cpi|r4k|X||CD @__z80asm__cpi 
-cpi|r5k|X||CD @__z80asm__cpi 
-cpi|r6k|X||CD @__z80asm__cpi 
+cpi|r2ka|X||CD @__z80asm__cpi x
+cpi|r3k|X||CD @__z80asm__cpi x
+cpi|r4k|X||CD @__z80asm__cpi x
+cpi|r5k|X||CD @__z80asm__cpi x
+cpi|r6k|X||CD @__z80asm__cpi x
 cpi|r800|_||ED A1
 cpi|r800_strict|_||ED A1
 cpi|z180|_||ED A1
@@ -23668,22 +23668,22 @@ cpi.s|ez80|_||52;ED A1
 cpi.s|ez80_strict|_||52;ED A1
 cpi.sil|ez80|_||52;ED A1
 cpi.sil|ez80_strict|_||52;ED A1
-cpir|8080|X||CD @__z80asm__cpir 
-cpir|8085|X||CD @__z80asm__cpir 
+cpir|8080|X||CD @__z80asm__cpir x
+cpir|8085|X||CD @__z80asm__cpir x
 cpir|ez80|_||ED B1
 cpir|ez80_strict|_||ED B1
 cpir|ez80_z80|_||ED B1
 cpir|ez80_z80_strict|_||ED B1
-cpir|gbz80|X||CD @__z80asm__cpir 
+cpir|gbz80|X||CD @__z80asm__cpir x
 cpir|kc160|_||ED B1
 cpir|kc160_strict|_||ED B1
 cpir|kc160_z80|_||ED B1
 cpir|kc160_z80_strict|_||ED B1
-cpir|r2ka|X||CD @__z80asm__cpir 
-cpir|r3k|X||CD @__z80asm__cpir 
-cpir|r4k|X||CD @__z80asm__cpir 
-cpir|r5k|X||CD @__z80asm__cpir 
-cpir|r6k|X||CD @__z80asm__cpir 
+cpir|r2ka|X||CD @__z80asm__cpir x
+cpir|r3k|X||CD @__z80asm__cpir x
+cpir|r4k|X||CD @__z80asm__cpir x
+cpir|r5k|X||CD @__z80asm__cpir x
+cpir|r6k|X||CD @__z80asm__cpir x
 cpir|r800|_||ED B1
 cpir|r800_strict|_||ED B1
 cpir|z180|_||ED B1
@@ -23827,11 +23827,11 @@ daa|kc160|_||27
 daa|kc160_strict|_||27
 daa|kc160_z80|_||27
 daa|kc160_z80_strict|_||27
-daa|r2ka|X||CD @__z80asm__daa 
-daa|r3k|X||CD @__z80asm__daa 
-daa|r4k|X||CD @__z80asm__daa 
-daa|r5k|X||CD @__z80asm__daa 
-daa|r6k|X||CD @__z80asm__daa 
+daa|r2ka|X||CD @__z80asm__daa x
+daa|r3k|X||CD @__z80asm__daa x
+daa|r4k|X||CD @__z80asm__daa x
+daa|r5k|X||CD @__z80asm__daa x
+daa|r6k|X||CD @__z80asm__daa x
 daa|r800|_||27
 daa|r800_strict|_||27
 daa|z180|_||27
@@ -25216,23 +25216,23 @@ djnz b, %j|r800|_||10 %j
 djnz b, %j|z180|_||10 %j
 djnz b, %j|z80|_||10 %j
 djnz b, %j|z80n|_||10 %j
-dsub|8080|X||CD @__z80asm__sub_hl_bc 
+dsub|8080|X||CD @__z80asm__sub_hl_bc x
 dsub|8085|_||08
 dsub|8085_strict|_||08
-dsub|ez80|X||CD @__z80asm__sub_hl_bc 
-dsub|ez80_z80|X||CD @__z80asm__sub_hl_bc 
-dsub|gbz80|X||CD @__z80asm__sub_hl_bc 
-dsub|kc160|X||CD @__z80asm__sub_hl_bc 
-dsub|kc160_z80|X||CD @__z80asm__sub_hl_bc 
-dsub|r2ka|X||CD @__z80asm__sub_hl_bc 
-dsub|r3k|X||CD @__z80asm__sub_hl_bc 
-dsub|r4k|X||CD @__z80asm__sub_hl_bc 
-dsub|r5k|X||CD @__z80asm__sub_hl_bc 
-dsub|r6k|X||CD @__z80asm__sub_hl_bc 
-dsub|r800|X||CD @__z80asm__sub_hl_bc 
-dsub|z180|X||CD @__z80asm__sub_hl_bc 
-dsub|z80|X||CD @__z80asm__sub_hl_bc 
-dsub|z80n|X||CD @__z80asm__sub_hl_bc 
+dsub|ez80|X||CD @__z80asm__sub_hl_bc x x
+dsub|ez80_z80|X||CD @__z80asm__sub_hl_bc x
+dsub|gbz80|X||CD @__z80asm__sub_hl_bc x
+dsub|kc160|X||CD @__z80asm__sub_hl_bc x
+dsub|kc160_z80|X||CD @__z80asm__sub_hl_bc x
+dsub|r2ka|X||CD @__z80asm__sub_hl_bc x
+dsub|r3k|X||CD @__z80asm__sub_hl_bc x
+dsub|r4k|X||CD @__z80asm__sub_hl_bc x
+dsub|r5k|X||CD @__z80asm__sub_hl_bc x
+dsub|r6k|X||CD @__z80asm__sub_hl_bc x
+dsub|r800|X||CD @__z80asm__sub_hl_bc x
+dsub|z180|X||CD @__z80asm__sub_hl_bc x
+dsub|z80|X||CD @__z80asm__sub_hl_bc x
+dsub|z80n|X||CD @__z80asm__sub_hl_bc x
 dwjnz %j|r4k|_||ED 10 %j
 dwjnz %j|r4k_strict|_||ED 10 %j
 dwjnz %j|r5k|_||ED 10 %j
@@ -25279,7 +25279,7 @@ ex (sp), hl|ez80|_||E3
 ex (sp), hl|ez80_strict|_||E3
 ex (sp), hl|ez80_z80|_||E3
 ex (sp), hl|ez80_z80_strict|_||E3
-ex (sp), hl|gbz80|X||CD @__z80asm__ex_sp_hl 
+ex (sp), hl|gbz80|X||CD @__z80asm__ex_sp_hl x
 ex (sp), hl|kc160|_||E3
 ex (sp), hl|kc160_strict|_||E3
 ex (sp), hl|kc160_z80|_||E3
@@ -63869,13 +63869,13 @@ ldax de|r800|_||1A
 ldax de|z180|_||1A
 ldax de|z80|_||1A
 ldax de|z80n|_||1A
-ldd|8080|X||CD @__z80asm__ldd 
-ldd|8085|X||CD @__z80asm__ldd 
+ldd|8080|X||CD @__z80asm__ldd x
+ldd|8085|X||CD @__z80asm__ldd x
 ldd|ez80|_||ED A8
 ldd|ez80_strict|_||ED A8
 ldd|ez80_z80|_||ED A8
 ldd|ez80_z80_strict|_||ED A8
-ldd|gbz80|X||CD @__z80asm__ldd 
+ldd|gbz80|X||CD @__z80asm__ldd x
 ldd|kc160|_||ED A8
 ldd|kc160_strict|_||ED A8
 ldd|kc160_z80|_||ED A8
@@ -64591,13 +64591,13 @@ ldd.sil h, (de)|ez80|X||EB;52;56;EB;52;1B
 ldd.sil h, (hl)|ez80|X||52;66;52;2B
 ldd.sil l, (de)|ez80|X||EB;52;5E;EB;52;1B
 ldd.sil l, (hl)|ez80|X||52;6E;52;2B
-lddr|8080|X||CD @__z80asm__lddr 
-lddr|8085|X||CD @__z80asm__lddr 
+lddr|8080|X||CD @__z80asm__lddr x
+lddr|8085|X||CD @__z80asm__lddr x
 lddr|ez80|_||ED B8
 lddr|ez80_strict|_||ED B8
 lddr|ez80_z80|_||ED B8
 lddr|ez80_z80_strict|_||ED B8
-lddr|gbz80|X||CD @__z80asm__lddr 
+lddr|gbz80|X||CD @__z80asm__lddr x
 lddr|kc160|_||ED B8
 lddr|kc160_strict|_||ED B8
 lddr|kc160_z80|_||ED B8
@@ -64933,13 +64933,13 @@ ldhi %n|z80|X||E5;11 %n %s;19;EB;E1
 ldhi %n|z80n|X||E5;11 %n %s;19;EB;E1
 ldhl sp, %d|gbz80|_||F8 %d
 ldhl sp, %d|gbz80_strict|_||F8 %d
-ldi|8080|X||CD @__z80asm__ldi 
-ldi|8085|X||CD @__z80asm__ldi 
+ldi|8080|X||CD @__z80asm__ldi x
+ldi|8085|X||CD @__z80asm__ldi x
 ldi|ez80|_||ED A0
 ldi|ez80_strict|_||ED A0
 ldi|ez80_z80|_||ED A0
 ldi|ez80_z80_strict|_||ED A0
-ldi|gbz80|X||CD @__z80asm__ldi 
+ldi|gbz80|X||CD @__z80asm__ldi x
 ldi|kc160|_||ED A0
 ldi|kc160_strict|_||ED A0
 ldi|kc160_z80|_||ED A0
@@ -65818,13 +65818,13 @@ ldi.sil ix, (hl)|ez80|X||52;ED 37;52;23;52;23
 ldi.sil iy, (hl)|ez80|X||52;ED 31;52;23;52;23
 ldi.sil l, (de)|ez80|X||EB;52;5E;EB;52;13
 ldi.sil l, (hl)|ez80|X||52;6E;52;23
-ldir|8080|X||CD @__z80asm__ldir 
-ldir|8085|X||CD @__z80asm__ldir 
+ldir|8080|X||CD @__z80asm__ldir x
+ldir|8085|X||CD @__z80asm__ldir x
 ldir|ez80|_||ED B0
 ldir|ez80_strict|_||ED B0
 ldir|ez80_z80|_||ED B0
 ldir|ez80_z80_strict|_||ED B0
-ldir|gbz80|X||CD @__z80asm__ldir 
+ldir|gbz80|X||CD @__z80asm__ldir x
 ldir|kc160|_||ED B0
 ldir|kc160_strict|_||ED B0
 ldir|kc160_z80|_||ED B0
@@ -71626,7 +71626,7 @@ rc|r800|_||D8
 rc|z180|_||D8
 rc|z80|_||D8
 rc|z80n|_||D8
-rdel|8080|X||CD @__z80asm__rl_de 
+rdel|8080|X||CD @__z80asm__rl_de x
 rdel|8085|_||18
 rdel|8085_strict|_||18
 rdel|ez80|X||CB 13;CB 12
@@ -73233,8 +73233,8 @@ rl b'|r5k|_||76;CB 10
 rl b'|r5k_strict|_||76;CB 10
 rl b'|r6k|_||76;CB 10
 rl b'|r6k_strict|_||76;CB 10
-rl bc|8080|X||CD @__z80asm__rl_bc 
-rl bc|8085|X||CD @__z80asm__rl_bc 
+rl bc|8080|X||CD @__z80asm__rl_bc x
+rl bc|8085|X||CD @__z80asm__rl_bc x
 rl bc|ez80|X||CB 11;CB 10
 rl bc|ez80_z80|X||CB 11;CB 10
 rl bc|gbz80|X||CB 11;CB 10
@@ -73334,7 +73334,7 @@ rl d'|r5k|_||76;CB 12
 rl d'|r5k_strict|_||76;CB 12
 rl d'|r6k|_||76;CB 12
 rl d'|r6k_strict|_||76;CB 12
-rl de|8080|X||CD @__z80asm__rl_de 
+rl de|8080|X||CD @__z80asm__rl_de x
 rl de|8085|_||18
 rl de|8085_strict|_||18
 rl de|ez80|X||CB 13;CB 12
@@ -73442,8 +73442,8 @@ rl h'|r5k|_||76;CB 14
 rl h'|r5k_strict|_||76;CB 14
 rl h'|r6k|_||76;CB 14
 rl h'|r6k_strict|_||76;CB 14
-rl hl|8080|X||CD @__z80asm__rl_hl 
-rl hl|8085|X||CD @__z80asm__rl_hl 
+rl hl|8080|X||CD @__z80asm__rl_hl x
+rl hl|8085|X||CD @__z80asm__rl_hl x
 rl hl|ez80|X||CB 15;CB 14
 rl hl|ez80_z80|X||CB 15;CB 14
 rl hl|gbz80|X||CB 15;CB 14
@@ -74295,22 +74295,22 @@ rlca'|r5k|_||76;07
 rlca'|r5k_strict|_||76;07
 rlca'|r6k|_||76;07
 rlca'|r6k_strict|_||76;07
-rld|8080|X||CD @__z80asm__rld 
-rld|8085|X||CD @__z80asm__rld 
+rld|8080|X||CD @__z80asm__rld x
+rld|8085|X||CD @__z80asm__rld x
 rld|ez80|_||ED 6F
 rld|ez80_strict|_||ED 6F
 rld|ez80_z80|_||ED 6F
 rld|ez80_z80_strict|_||ED 6F
-rld|gbz80|X||CD @__z80asm__rld 
+rld|gbz80|X||CD @__z80asm__rld x
 rld|kc160|_||ED 6F
 rld|kc160_strict|_||ED 6F
 rld|kc160_z80|_||ED 6F
 rld|kc160_z80_strict|_||ED 6F
-rld|r2ka|X||CD @__z80asm__rld 
-rld|r3k|X||CD @__z80asm__rld 
-rld|r4k|X||CD @__z80asm__rld 
-rld|r5k|X||CD @__z80asm__rld 
-rld|r6k|X||CD @__z80asm__rld 
+rld|r2ka|X||CD @__z80asm__rld x
+rld|r3k|X||CD @__z80asm__rld x
+rld|r4k|X||CD @__z80asm__rld x
+rld|r5k|X||CD @__z80asm__rld x
+rld|r6k|X||CD @__z80asm__rld x
 rld|r800|_||ED 6F
 rld|r800_strict|_||ED 6F
 rld|z180|_||ED 6F
@@ -74329,7 +74329,7 @@ rld (yhl)|kc160|_||49;ED 6F
 rld (yhl)|kc160_strict|_||49;ED 6F
 rld (zhl)|kc160|_||7F;ED 6F
 rld (zhl)|kc160_strict|_||7F;ED 6F
-rlde|8080|X||CD @__z80asm__rl_de 
+rlde|8080|X||CD @__z80asm__rl_de x
 rlde|8085|_||18
 rlde|8085_strict|_||18
 rlde|ez80|X||CB 13;CB 12
@@ -74889,8 +74889,8 @@ rr b'|r5k|_||76;CB 18
 rr b'|r5k_strict|_||76;CB 18
 rr b'|r6k|_||76;CB 18
 rr b'|r6k_strict|_||76;CB 18
-rr bc|8080|X||CD @__z80asm__rr_bc 
-rr bc|8085|X||CD @__z80asm__rr_bc 
+rr bc|8080|X||CD @__z80asm__rr_bc x
+rr bc|8085|X||CD @__z80asm__rr_bc x
 rr bc|ez80|X||CB 18;CB 19
 rr bc|ez80_z80|X||CB 18;CB 19
 rr bc|gbz80|X||CB 18;CB 19
@@ -74990,8 +74990,8 @@ rr d'|r5k|_||76;CB 1A
 rr d'|r5k_strict|_||76;CB 1A
 rr d'|r6k|_||76;CB 1A
 rr d'|r6k_strict|_||76;CB 1A
-rr de|8080|X||CD @__z80asm__rr_de 
-rr de|8085|X||CD @__z80asm__rr_de 
+rr de|8080|X||CD @__z80asm__rr_de x
+rr de|8085|X||CD @__z80asm__rr_de x
 rr de|ez80|X||CB 1A;CB 1B
 rr de|ez80_z80|X||CB 1A;CB 1B
 rr de|gbz80|X||CB 1A;CB 1B
@@ -75097,8 +75097,8 @@ rr h'|r5k|_||76;CB 1C
 rr h'|r5k_strict|_||76;CB 1C
 rr h'|r6k|_||76;CB 1C
 rr h'|r6k_strict|_||76;CB 1C
-rr hl|8080|X||CD @__z80asm__rr_hl 
-rr hl|8085|X||CD @__z80asm__rr_hl 
+rr hl|8080|X||CD @__z80asm__rr_hl x
+rr hl|8085|X||CD @__z80asm__rr_hl x
 rr hl|ez80|X||CB 1C;CB 1D
 rr hl|ez80_z80|X||CB 1C;CB 1D
 rr hl|gbz80|X||CB 1C;CB 1D
@@ -75976,22 +75976,22 @@ rrca'|r5k|_||76;0F
 rrca'|r5k_strict|_||76;0F
 rrca'|r6k|_||76;0F
 rrca'|r6k_strict|_||76;0F
-rrd|8080|X||CD @__z80asm__rrd 
-rrd|8085|X||CD @__z80asm__rrd 
+rrd|8080|X||CD @__z80asm__rrd x
+rrd|8085|X||CD @__z80asm__rrd x
 rrd|ez80|_||ED 67
 rrd|ez80_strict|_||ED 67
 rrd|ez80_z80|_||ED 67
 rrd|ez80_z80_strict|_||ED 67
-rrd|gbz80|X||CD @__z80asm__rrd 
+rrd|gbz80|X||CD @__z80asm__rrd x
 rrd|kc160|_||ED 67
 rrd|kc160_strict|_||ED 67
 rrd|kc160_z80|_||ED 67
 rrd|kc160_z80_strict|_||ED 67
-rrd|r2ka|X||CD @__z80asm__rrd 
-rrd|r3k|X||CD @__z80asm__rrd 
-rrd|r4k|X||CD @__z80asm__rrd 
-rrd|r5k|X||CD @__z80asm__rrd 
-rrd|r6k|X||CD @__z80asm__rrd 
+rrd|r2ka|X||CD @__z80asm__rrd x
+rrd|r3k|X||CD @__z80asm__rrd x
+rrd|r4k|X||CD @__z80asm__rrd x
+rrd|r5k|X||CD @__z80asm__rrd x
+rrd|r6k|X||CD @__z80asm__rrd x
 rrd|r800|_||ED 67
 rrd|r800_strict|_||ED 67
 rrd|z180|_||ED 67
@@ -76010,7 +76010,7 @@ rrd (yhl)|kc160|_||49;ED 67
 rrd (yhl)|kc160_strict|_||49;ED 67
 rrd (zhl)|kc160|_||7F;ED 67
 rrd (zhl)|kc160_strict|_||7F;ED 67
-rrhl|8080|X||CD @__z80asm__sra_hl 
+rrhl|8080|X||CD @__z80asm__sra_hl x
 rrhl|8085|_||10
 rrhl|8085_strict|_||10
 rrhl|ez80|X||CB 2C;CB 1D
@@ -77275,13 +77275,13 @@ sbc hl, (pz+%d)|r6k|_||49;3B %d
 sbc hl, (pz+%d)|r6k_strict|_||49;3B %d
 sbc hl, (sp+%n)|r6k|_||49;BA %n
 sbc hl, (sp+%n)|r6k_strict|_||49;BA %n
-sbc hl, bc|8080|X||CD @__z80asm__sbc_hl_bc 
-sbc hl, bc|8085|X||CD @__z80asm__sbc_hl_bc 
+sbc hl, bc|8080|X||CD @__z80asm__sbc_hl_bc x
+sbc hl, bc|8085|X||CD @__z80asm__sbc_hl_bc x
 sbc hl, bc|ez80|_||ED 42
 sbc hl, bc|ez80_strict|_||ED 42
 sbc hl, bc|ez80_z80|_||ED 42
 sbc hl, bc|ez80_z80_strict|_||ED 42
-sbc hl, bc|gbz80|X||CD @__z80asm__sbc_hl_bc 
+sbc hl, bc|gbz80|X||CD @__z80asm__sbc_hl_bc x
 sbc hl, bc|kc160|_||ED 42
 sbc hl, bc|kc160_strict|_||ED 42
 sbc hl, bc|kc160_z80|_||ED 42
@@ -77304,13 +77304,13 @@ sbc hl, bc|z80|_||ED 42
 sbc hl, bc|z80_strict|_||ED 42
 sbc hl, bc|z80n|_||ED 42
 sbc hl, bc|z80n_strict|_||ED 42
-sbc hl, de|8080|X||CD @__z80asm__sbc_hl_de 
-sbc hl, de|8085|X||CD @__z80asm__sbc_hl_de 
+sbc hl, de|8080|X||CD @__z80asm__sbc_hl_de x
+sbc hl, de|8085|X||CD @__z80asm__sbc_hl_de x
 sbc hl, de|ez80|_||ED 52
 sbc hl, de|ez80_strict|_||ED 52
 sbc hl, de|ez80_z80|_||ED 52
 sbc hl, de|ez80_z80_strict|_||ED 52
-sbc hl, de|gbz80|X||CD @__z80asm__sbc_hl_de 
+sbc hl, de|gbz80|X||CD @__z80asm__sbc_hl_de x
 sbc hl, de|kc160|_||ED 52
 sbc hl, de|kc160_strict|_||ED 52
 sbc hl, de|kc160_z80|_||ED 52
@@ -77333,13 +77333,13 @@ sbc hl, de|z80|_||ED 52
 sbc hl, de|z80_strict|_||ED 52
 sbc hl, de|z80n|_||ED 52
 sbc hl, de|z80n_strict|_||ED 52
-sbc hl, hl|8080|X||CD @__z80asm__sbc_hl_hl 
-sbc hl, hl|8085|X||CD @__z80asm__sbc_hl_hl 
+sbc hl, hl|8080|X||CD @__z80asm__sbc_hl_hl x
+sbc hl, hl|8085|X||CD @__z80asm__sbc_hl_hl x
 sbc hl, hl|ez80|_||ED 62
 sbc hl, hl|ez80_strict|_||ED 62
 sbc hl, hl|ez80_z80|_||ED 62
 sbc hl, hl|ez80_z80_strict|_||ED 62
-sbc hl, hl|gbz80|X||CD @__z80asm__sbc_hl_hl 
+sbc hl, hl|gbz80|X||CD @__z80asm__sbc_hl_hl x
 sbc hl, hl|kc160|_||ED 62
 sbc hl, hl|kc160_strict|_||ED 62
 sbc hl, hl|kc160_z80|_||ED 62
@@ -77362,13 +77362,13 @@ sbc hl, hl|z80|_||ED 62
 sbc hl, hl|z80_strict|_||ED 62
 sbc hl, hl|z80n|_||ED 62
 sbc hl, hl|z80n_strict|_||ED 62
-sbc hl, sp|8080|X||CD @__z80asm__sbc_hl_sp 
-sbc hl, sp|8085|X||CD @__z80asm__sbc_hl_sp 
+sbc hl, sp|8080|X||CD @__z80asm__sbc_hl_sp x
+sbc hl, sp|8085|X||CD @__z80asm__sbc_hl_sp x
 sbc hl, sp|ez80|_||ED 72
 sbc hl, sp|ez80_strict|_||ED 72
 sbc hl, sp|ez80_z80|_||ED 72
 sbc hl, sp|ez80_z80_strict|_||ED 72
-sbc hl, sp|gbz80|X||CD @__z80asm__sbc_hl_sp 
+sbc hl, sp|gbz80|X||CD @__z80asm__sbc_hl_sp x
 sbc hl, sp|kc160|_||ED 72
 sbc hl, sp|kc160_strict|_||ED 72
 sbc hl, sp|kc160_z80|_||ED 72
@@ -79711,8 +79711,8 @@ sra b'|r5k|_||76;CB 28
 sra b'|r5k_strict|_||76;CB 28
 sra b'|r6k|_||76;CB 28
 sra b'|r6k_strict|_||76;CB 28
-sra bc|8080|X||CD @__z80asm__sra_bc 
-sra bc|8085|X||CD @__z80asm__sra_bc 
+sra bc|8080|X||CD @__z80asm__sra_bc x
+sra bc|8085|X||CD @__z80asm__sra_bc x
 sra bc|ez80|X||CB 28;CB 19
 sra bc|ez80_z80|X||CB 28;CB 19
 sra bc|gbz80|X||CB 28;CB 19
@@ -79803,8 +79803,8 @@ sra d'|r5k|_||76;CB 2A
 sra d'|r5k_strict|_||76;CB 2A
 sra d'|r6k|_||76;CB 2A
 sra d'|r6k_strict|_||76;CB 2A
-sra de|8080|X||CD @__z80asm__sra_de 
-sra de|8085|X||CD @__z80asm__sra_de 
+sra de|8080|X||CD @__z80asm__sra_de x
+sra de|8085|X||CD @__z80asm__sra_de x
 sra de|ez80|X||CB 2A;CB 1B
 sra de|ez80_z80|X||CB 2A;CB 1B
 sra de|gbz80|X||CB 2A;CB 1B
@@ -79895,7 +79895,7 @@ sra h'|r5k|_||76;CB 2C
 sra h'|r5k_strict|_||76;CB 2C
 sra h'|r6k|_||76;CB 2C
 sra h'|r6k_strict|_||76;CB 2C
-sra hl|8080|X||CD @__z80asm__sra_hl 
+sra hl|8080|X||CD @__z80asm__sra_hl x
 sra hl|8085|_||10
 sra hl|8085_strict|_||10
 sra hl|ez80|X||CB 2C;CB 1D
@@ -81620,80 +81620,80 @@ sub hl, (pz+%d)|r6k|_||49;2B %d
 sub hl, (pz+%d)|r6k_strict|_||49;2B %d
 sub hl, (sp+%n)|r6k|_||49;AA %n
 sub hl, (sp+%n)|r6k_strict|_||49;AA %n
-sub hl, bc|8080|X||CD @__z80asm__sub_hl_bc 
+sub hl, bc|8080|X||CD @__z80asm__sub_hl_bc x
 sub hl, bc|8085|_||08
 sub hl, bc|8085_strict|_||08
-sub hl, bc|ez80|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|ez80_z80|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|gbz80|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|kc160|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|kc160_z80|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|r2ka|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|r3k|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|r4k|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|r5k|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|r6k|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|r800|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|z180|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|z80|X||CD @__z80asm__sub_hl_bc 
-sub hl, bc|z80n|X||CD @__z80asm__sub_hl_bc 
-sub hl, de|8080|X||CD @__z80asm__sub_hl_de 
-sub hl, de|8085|X||CD @__z80asm__sub_hl_de 
-sub hl, de|ez80|X||CD @__z80asm__sub_hl_de 
-sub hl, de|ez80_z80|X||CD @__z80asm__sub_hl_de 
-sub hl, de|gbz80|X||CD @__z80asm__sub_hl_de 
-sub hl, de|kc160|X||CD @__z80asm__sub_hl_de 
-sub hl, de|kc160_z80|X||CD @__z80asm__sub_hl_de 
-sub hl, de|r2ka|X||CD @__z80asm__sub_hl_de 
-sub hl, de|r3k|X||CD @__z80asm__sub_hl_de 
+sub hl, bc|ez80|X||CD @__z80asm__sub_hl_bc x x
+sub hl, bc|ez80_z80|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|gbz80|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|kc160|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|kc160_z80|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|r2ka|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|r3k|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|r4k|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|r5k|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|r6k|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|r800|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|z180|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|z80|X||CD @__z80asm__sub_hl_bc x
+sub hl, bc|z80n|X||CD @__z80asm__sub_hl_bc x
+sub hl, de|8080|X||CD @__z80asm__sub_hl_de x
+sub hl, de|8085|X||CD @__z80asm__sub_hl_de x
+sub hl, de|ez80|X||CD @__z80asm__sub_hl_de x x
+sub hl, de|ez80_z80|X||CD @__z80asm__sub_hl_de x
+sub hl, de|gbz80|X||CD @__z80asm__sub_hl_de x
+sub hl, de|kc160|X||CD @__z80asm__sub_hl_de x
+sub hl, de|kc160_z80|X||CD @__z80asm__sub_hl_de x
+sub hl, de|r2ka|X||CD @__z80asm__sub_hl_de x
+sub hl, de|r3k|X||CD @__z80asm__sub_hl_de x
 sub hl, de|r4k|_||55
 sub hl, de|r4k_strict|_||55
 sub hl, de|r5k|_||55
 sub hl, de|r5k_strict|_||55
 sub hl, de|r6k|_||55
 sub hl, de|r6k_strict|_||55
-sub hl, de|r800|X||CD @__z80asm__sub_hl_de 
-sub hl, de|z180|X||CD @__z80asm__sub_hl_de 
-sub hl, de|z80|X||CD @__z80asm__sub_hl_de 
-sub hl, de|z80n|X||CD @__z80asm__sub_hl_de 
-sub hl, hl|8080|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|8085|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|ez80|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|ez80_z80|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|gbz80|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|kc160|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|kc160_z80|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|r2ka|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|r3k|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|r4k|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|r5k|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|r6k|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|r800|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|z180|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|z80|X||CD @__z80asm__sub_hl_hl 
-sub hl, hl|z80n|X||CD @__z80asm__sub_hl_hl 
+sub hl, de|r800|X||CD @__z80asm__sub_hl_de x
+sub hl, de|z180|X||CD @__z80asm__sub_hl_de x
+sub hl, de|z80|X||CD @__z80asm__sub_hl_de x
+sub hl, de|z80n|X||CD @__z80asm__sub_hl_de x
+sub hl, hl|8080|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|8085|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|ez80|X||CD @__z80asm__sub_hl_hl x x
+sub hl, hl|ez80_z80|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|gbz80|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|kc160|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|kc160_z80|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|r2ka|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|r3k|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|r4k|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|r5k|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|r6k|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|r800|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|z180|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|z80|X||CD @__z80asm__sub_hl_hl x
+sub hl, hl|z80n|X||CD @__z80asm__sub_hl_hl x
 sub hl, jk|r4k|_||45
 sub hl, jk|r4k_strict|_||45
 sub hl, jk|r5k|_||45
 sub hl, jk|r5k_strict|_||45
 sub hl, jk|r6k|_||45
 sub hl, jk|r6k_strict|_||45
-sub hl, sp|8080|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|8085|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|ez80|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|ez80_z80|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|gbz80|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|kc160|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|kc160_z80|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|r2ka|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|r3k|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|r4k|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|r5k|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|r6k|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|r800|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|z180|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|z80|X||CD @__z80asm__sub_hl_sp 
-sub hl, sp|z80n|X||CD @__z80asm__sub_hl_sp 
+sub hl, sp|8080|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|8085|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|ez80|X||CD @__z80asm__sub_hl_sp x x
+sub hl, sp|ez80_z80|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|gbz80|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|kc160|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|kc160_z80|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|r2ka|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|r3k|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|r4k|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|r5k|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|r6k|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|r800|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|z180|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|z80|X||CD @__z80asm__sub_hl_sp x
+sub hl, sp|z80n|X||CD @__z80asm__sub_hl_sp x
 sub ixh|ez80|_||DD 94
 sub ixh|ez80_z80|_||DD 94
 sub ixh|r800|_||DD 94
@@ -83588,7 +83588,7 @@ xthl|8085|_||E3
 xthl|8085_strict|_||E3
 xthl|ez80|_||E3
 xthl|ez80_z80|_||E3
-xthl|gbz80|X||CD @__z80asm__ex_sp_hl 
+xthl|gbz80|X||CD @__z80asm__ex_sp_hl x
 xthl|kc160|_||E3
 xthl|kc160_z80|_||E3
 xthl|r2ka|_||E3
