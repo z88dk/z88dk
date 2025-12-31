@@ -46,6 +46,7 @@ jobs:
         install: |
           git
           mingw64/mingw-w64-x86_64-boost
+          mingw64/mingw-w64-x86_64-expat
           mingw64/mingw-w64-x86_64-gcc
           mingw64/mingw-w64-x86_64-gmp
           mingw64/mingw-w64-x86_64-libxml2
