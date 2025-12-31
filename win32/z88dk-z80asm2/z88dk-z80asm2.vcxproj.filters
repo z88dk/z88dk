@@ -108,21 +108,6 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables_1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables_2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables_3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables_4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_tables_5.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\assembler.h">
@@ -302,7 +287,7 @@
       <Filter>Resource Files\cpu</Filter>
     </None>
     <None Include="..\..\src\z80asm\z80asm2\cpu\CsrBuilder.pm">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\cpu</Filter>
     </None>
   </ItemGroup>
 </Project>
