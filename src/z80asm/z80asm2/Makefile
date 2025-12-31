@@ -46,11 +46,6 @@ ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --max-code-length=120 --lineend=linux --formatted \
 		  --exclude="opcodes_tables.h" \
 		  --exclude="opcodes_tables.cpp" \
-		  --exclude="opcodes_tables_1.cpp" \
-		  --exclude="opcodes_tables_2.cpp" \
-		  --exclude="opcodes_tables_3.cpp" \
-		  --exclude="opcodes_tables_4.cpp" \
-		  --exclude="opcodes_tables_5.cpp" \
 		  --exclude="unittests/catch_amalgamated.hpp" \
 		  --exclude="unittests/catch_amalgamated.cpp" \
 		  --recursive "*.cpp" "*.h"
@@ -93,8 +88,12 @@ scan.cpp: scan.re Makefile
 
 # Rule to procude opcodes_tables.cpp
 $(PROJ)$(EXE): $(OBJ_DIR)/opcodes_tables.o
+$(OBJ_DIR)/opcodes.o: opcodes_tables.h
 
-opcodes_tables.cpp: $(wildcard *.def cpu/*.pl cpu/*.pm) Makefile cpu/Makefile 
+opcodes_tables.cpp opcodes_tables.h opcodes_tables.def: \
+		lexer.h $(filter-out,opcodes_tables.def,$(wildcard *.def)) \
+		$(wildcard cpu/*.dat cpu/*.pl cpu/*.pm) \
+		Makefile cpu/Makefile 
 	$(MAKE) -C cpu
 
 test:: $(TEST_BINS)

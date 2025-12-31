@@ -64,7 +64,30 @@ make_def_file($opcodes_def_file, $dfa, $keywords, $token_types);
 my $opcodes_h_file = $opcodes_cpp_file =~ s/\.cpp$/.h/r;
 make_h_file($opcodes_h_file, $dfa, $keywords, $token_types);
 
-make_cpp_file($opcodes_cpp_file, $dfa, $keywords, $token_types);
+# Prepare optional human-readable helpers for the CSR emitter:
+# token names by index
+my @state_names = map { undef } (0 .. $state_count - 1);
+for my $i (0 .. scalar(@{ $dfa->states }) - 1) {
+    my $state = $dfa->states->[$i];
+    $state_names[$i] = $state->{path} =~ s/\b(CPU::|Keyword::|TokenType::)//gr;
+}
+my @token_names = map { undef } (0 .. $token_count - 1);
+for my $token_key (keys %{ $dfa->dfa_tokens->by_key }) {
+    my $token = $dfa->dfa_tokens->by_key->{$token_key};
+    $token_names[ $token->{idx} ] = $token_key;
+}
+# per-state accept index (leaf idx or -1)
+my @accept_index;
+for my $i (0 .. scalar(@{ $dfa->states }) - 1) {
+    my $state = $dfa->states->[$i];
+    my $accept_idx = exists $state->{end} ? $state->{end}{idx} : -1;
+    $accept_index[$i] = $accept_idx;
+}
+# action names
+my $action_count = scalar(@{ $dfa->dfa_leafs->list });
+my @action_names = map { "do_action_$_" } (0 .. $action_count - 1);
+
+make_cpp_file($opcodes_cpp_file, $dfa, $keywords, $token_types, \@state_names, \@token_names, \@accept_index, \@action_names);
 
 exit 0;
 
@@ -135,9 +158,10 @@ END
 #  - accept_index   : int32_t  [num_states] (leaf idx or -1)
 #------------------------------------------------------------------------------
 sub make_cpp_file {
-	my($cpp_file, $dfa, $keywords, $token_types) = @_;
+	my($cpp_file, $dfa, $keywords, $token_types, $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref) = @_;
 
-    my $header = <<'END';
+    	open(my $fh, ">", $cpp_file) or die "open $cpp_file: $!";
+    print $fh <<'END';
 //-----------------------------------------------------------------------------
 // Z80 assembler
 // Copyright (C) Paulo Custodio, 2011-2025
@@ -150,9 +174,6 @@ sub make_cpp_file {
 #include <cstdint>
 
 END
-
-    	open(my $fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh $header;
 
     # ----------------------------
     # DFA size constants emitter
@@ -167,10 +188,6 @@ const std::uint16_t OpcodesParser::TokenCount = $token_count;
 const std::uint16_t OpcodesParser::ActionCount = $action_count;
 
 END
-
-    $cpp_file =~ s/\.cpp/_1.cpp/;
-    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh $header;
 
     # ----------------------------
     # CPU -> DFA_Token map
@@ -264,10 +281,6 @@ END
 
 END
 
-    $cpp_file =~ s/_1\.cpp/_2.cpp/;
-    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh $header;
-
     # ----------------------------
     # CSR emitter: build flattened transition arrays and accept index
     # ----------------------------
@@ -278,12 +291,10 @@ END
 //   transitions for state s are in range
 //     [ state_offsets[s], state_offsets[s+1] )
 END
-    $csr_builder->emit_cpp($fh, 'OpcodesParser', '');
+    # pass the optional token names/accept/actions so the CSR emitter can
+    # also output a human-readable state dump
+    $csr_builder->emit_cpp($fh, 'OpcodesParser', '', $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref);
 
-
-    $cpp_file =~ s/_2\.cpp/_3.cpp/;
-    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh $header;
 
     # ----------------------------
     # accept index per state
@@ -311,10 +322,6 @@ END
 
 END
 
-    $cpp_file =~ s/_3\.cpp/_4.cpp/;
-    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh $header;
-
     # ----------------------------
     # Emit action dispatcher table
     # ----------------------------
@@ -330,10 +337,6 @@ END
 };
 
 END
-
-    $cpp_file =~ s/_4\.cpp/_5.cpp/;
-    	open($fh, ">", $cpp_file) or die "open $cpp_file: $!";
-    print $fh $header;
 
     # ----------------------------
     # emit action functions
