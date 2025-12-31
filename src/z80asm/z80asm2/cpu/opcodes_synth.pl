@@ -153,9 +153,13 @@ for my $cpu (Opcode->cpus) {
 	add_synth($cpu, "r_ltu", "rc");
 	
 	# JP|CALL|RET GTU, NN
+	add_synth($cpu, "jgtu %m", "jr z, %t", "jp nc, %m");
 	add_synth($cpu, "jgtu %m", "jz %t", "jnc %m");
+
+	add_synth($cpu, "j_gtu %m", "jr z, %t", "jp nc, %m");
 	add_synth($cpu, "j_gtu %m", "jz %t", "jnc %m");
-	add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
+
+    add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
 	add_synth($cpu, "jre gtu, %J", "jr z, %t", "jre nc, %J");
 	add_synth($cpu, "jp3 gtu, %m", "jr z, %t", "jp3 nc, %m");
 	add_synth($cpu, "cgtu %m", "jr z, %t", "call nc, %m");

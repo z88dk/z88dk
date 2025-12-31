@@ -1017,7 +1017,7 @@ TEST_CASE("OpcodesParser: 'sub hl, de' on ez80 assembles to CALL helper with Ptr
 }
 
 TEST_CASE("OpcodesParser: 'call z, 0x1234' on r2ka expands to jr/nz + call + label (patches and symbol)",
-    "[opcodes][call][r2ka][patch][symbol]") {
+          "[opcodes][call][r2ka][patch][symbol]") {
     g_options = Options();
     g_options.cpu_id = CPU::r2ka;
 
@@ -1087,7 +1087,7 @@ TEST_CASE("OpcodesParser: 'call z, 0x1234' on r2ka expands to jr/nz + call + lab
 // Added tests: verify 'ld hl, sp+4', 'ld hl, sp-4' and 'ld hl, sp' opcode expansion
 
 TEST_CASE("OpcodesParser: 'ld hl, sp+4' parses to LD HL,imm16 + ADD HL,SP with signed word patch",
-    "[opcodes][ld][hl][sp][positive-offset][patch]") {
+          "[opcodes][ld][hl][sp][positive-offset][patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1128,7 +1128,7 @@ TEST_CASE("OpcodesParser: 'ld hl, sp+4' parses to LD HL,imm16 + ADD HL,SP with s
 }
 
 TEST_CASE("OpcodesParser: 'ld hl, sp-4' parses to LD HL,imm16 + ADD HL,SP with signed word patch (negative)",
-    "[opcodes][ld][hl][sp][negative-offset][patch]") {
+          "[opcodes][ld][hl][sp][negative-offset][patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1169,7 +1169,7 @@ TEST_CASE("OpcodesParser: 'ld hl, sp-4' parses to LD HL,imm16 + ADD HL,SP with s
 }
 
 TEST_CASE("OpcodesParser: 'ld hl, sp' parses to LD HL,imm16 + ADD HL,SP with no patch",
-    "[opcodes][ld][hl][sp][no-patch]") {
+          "[opcodes][ld][hl][sp][no-patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1207,7 +1207,7 @@ TEST_CASE("OpcodesParser: 'ld hl, sp' parses to LD HL,imm16 + ADD HL,SP with no 
 // EZ80 variants of the 'ld hl, sp(+/-)N' tests: 24-bit LD HL and ByteToPtr24Signed patches
 
 TEST_CASE("OpcodesParser: 'ld hl, sp+4' on ez80 parses to LD HL,imm24 + ADD HL,SP with signed 24-bit patch",
-    "[opcodes][ld][hl][sp][ez80][positive-offset][patch]") {
+          "[opcodes][ld][hl][sp][ez80][positive-offset][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -1254,7 +1254,7 @@ TEST_CASE("OpcodesParser: 'ld hl, sp+4' on ez80 parses to LD HL,imm24 + ADD HL,S
 }
 
 TEST_CASE("OpcodesParser: 'ld hl, sp-4' on ez80 parses to LD HL,imm24 + ADD HL,SP with signed 24-bit patch (negative)",
-    "[opcodes][ld][hl][sp][ez80][negative-offset][patch]") {
+          "[opcodes][ld][hl][sp][ez80][negative-offset][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -1301,7 +1301,7 @@ TEST_CASE("OpcodesParser: 'ld hl, sp-4' on ez80 parses to LD HL,imm24 + ADD HL,S
 }
 
 TEST_CASE("OpcodesParser: 'ld hl, sp' on ez80 parses to LD HL,imm24 + ADD HL,SP with no patch (24-bit)",
-    "[opcodes][ld][hl][sp][ez80][no-patch]") {
+          "[opcodes][ld][hl][sp][ez80][no-patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -1345,7 +1345,7 @@ TEST_CASE("OpcodesParser: 'ld hl, sp' on ez80 parses to LD HL,imm24 + ADD HL,SP 
 // Tests for 'add sp, N' encoding: helper call + adjustment opcode
 
 TEST_CASE("OpcodesParser: 'add sp, 4' expands to CALL helper + adjustment opcode with signed byte patch",
-    "[opcodes][add][sp][patch][symbol]") {
+          "[opcodes][add][sp][patch][symbol]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1395,7 +1395,7 @@ TEST_CASE("OpcodesParser: 'add sp, 4' expands to CALL helper + adjustment opcode
 }
 
 TEST_CASE("OpcodesParser: 'add sp, -4' expands to CALL helper + adjustment opcode with signed byte patch (negative)",
-    "[opcodes][add][sp][patch][symbol][negative]") {
+          "[opcodes][add][sp][patch][symbol][negative]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1445,7 +1445,7 @@ TEST_CASE("OpcodesParser: 'add sp, -4' expands to CALL helper + adjustment opcod
 }
 
 TEST_CASE("OpcodesParser: 'add sp, 0' expands to CALL helper + adjustment opcode with adjustment patch (zero)",
-    "[opcodes][add][sp][no-patch][symbol]") {
+          "[opcodes][add][sp][no-patch][symbol]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1498,7 +1498,7 @@ TEST_CASE("OpcodesParser: 'add sp, 0' expands to CALL helper + adjustment opcode
 // EZ80 variants of the 'add sp, N' tests: 24-bit CALL and Ptr24 patch
 
 TEST_CASE("OpcodesParser: 'add sp, 4' on ez80 expands to CALL helper + adjustment opcode with signed byte patch",
-    "[opcodes][add][sp][ez80][patch][symbol]") {
+          "[opcodes][add][sp][ez80][patch][symbol]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -1554,7 +1554,7 @@ TEST_CASE("OpcodesParser: 'add sp, 4' on ez80 expands to CALL helper + adjustmen
 }
 
 TEST_CASE("OpcodesParser: 'add sp, -4' on ez80 expands to CALL helper + adjustment opcode with signed byte patch (negative)",
-    "[opcodes][add][sp][ez80][patch][symbol][negative]") {
+          "[opcodes][add][sp][ez80][patch][symbol][negative]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -1610,7 +1610,7 @@ TEST_CASE("OpcodesParser: 'add sp, -4' on ez80 expands to CALL helper + adjustme
 }
 
 TEST_CASE("OpcodesParser: 'add sp, 0' on ez80 expands to CALL helper + adjustment opcode with adjustment patch (zero)",
-    "[opcodes][add][sp][ez80][no-patch][symbol]") {
+          "[opcodes][add][sp][ez80][no-patch][symbol]") {
     g_options = Options();
     g_options.cpu_id = CPU::ez80;
 
@@ -1667,7 +1667,7 @@ TEST_CASE("OpcodesParser: 'add sp, 0' on ez80 expands to CALL helper + adjustmen
 }
 
 TEST_CASE("OpcodesParser: 'ld px,0x12345678' on r4k parses to 6-byte opcode with Dword patch",
-    "[opcodes][ld][px][r4k][imm32][patch]") {
+          "[opcodes][ld][px][r4k][imm32][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::r4k;
 
@@ -1707,7 +1707,7 @@ TEST_CASE("OpcodesParser: 'ld px,0x12345678' on r4k parses to 6-byte opcode with
 }
 
 TEST_CASE("OpcodesParser: 'lcall 0x12, 0x3456' on r2ka parses to single opcode with segment+address patches",
-    "[opcodes][lcall][r2ka][patch]") {
+          "[opcodes][lcall][r2ka][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::r2ka;
 
@@ -1751,7 +1751,7 @@ TEST_CASE("OpcodesParser: 'lcall 0x12, 0x3456' on r2ka parses to single opcode w
 }
 
 TEST_CASE("OpcodesParser: 'llcall 0x1234, 0x5678' on r4k parses to single opcode with segment+address word patches",
-    "[opcodes][llcall][r4k][patch]") {
+          "[opcodes][llcall][r4k][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::r4k;
 
@@ -1796,7 +1796,7 @@ TEST_CASE("OpcodesParser: 'llcall 0x1234, 0x5678' on r4k parses to single opcode
 }
 
 TEST_CASE("OpcodesParser: 'ld hl,(0x4000)' on gbz80 expands to expected 6-opcode sequence with word patches",
-    "[opcodes][ld][hl][gbz80][patch]") {
+          "[opcodes][ld][hl][gbz80][patch]") {
     g_options = Options();
     g_options.cpu_id = CPU::gbz80;
 
@@ -1869,7 +1869,7 @@ TEST_CASE("OpcodesParser: 'ld hl,(0x4000)' on gbz80 expands to expected 6-opcode
 // Added tests for 'ld hl, (ix+4)', 'ld hl, (ix-4)', and 'ld hl, (ix)'
 
 TEST_CASE("OpcodesParser: 'ld hl, (ix+4)' parses to two opcodes with correct patches",
-    "[opcodes][ld][hl][ix][positive-offset][patch]") {
+          "[opcodes][ld][hl][ix][positive-offset][patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1910,7 +1910,7 @@ TEST_CASE("OpcodesParser: 'ld hl, (ix+4)' parses to two opcodes with correct pat
 }
 
 TEST_CASE("OpcodesParser: 'ld hl, (ix-4)' parses to two opcodes with correct patches (negative offset)",
-    "[opcodes][ld][hl][ix][negative-offset][patch]") {
+          "[opcodes][ld][hl][ix][negative-offset][patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1951,7 +1951,7 @@ TEST_CASE("OpcodesParser: 'ld hl, (ix-4)' parses to two opcodes with correct pat
 }
 
 TEST_CASE("OpcodesParser: 'ld hl, (ix)' parses to two opcodes with no patches",
-    "[opcodes][ld][hl][ix][no-patch]") {
+          "[opcodes][ld][hl][ix][no-patch]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -1982,7 +1982,7 @@ TEST_CASE("OpcodesParser: 'ld hl, (ix)' parses to two opcodes with no patches",
 }
 
 TEST_CASE("OpcodesParser: 'bool hl' expands to expected 7-opcode sequence with jr temp label",
-    "[opcodes][bool][hl][patch][symbol]") {
+          "[opcodes][bool][hl][patch][symbol]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
@@ -2060,7 +2060,7 @@ TEST_CASE("OpcodesParser: 'bool hl' expands to expected 7-opcode sequence with j
 }
 
 TEST_CASE("OpcodesParser: 'bool hl' on 8080 expands to expected 7-opcode sequence (8080 variant)",
-    "[opcodes][bool][hl][8080][patch][symbol]") {
+          "[opcodes][bool][hl][8080][patch][symbol]") {
     // set CPU to 8080 for this test
     g_options = Options();
     g_options.cpu_id = CPU::i8080;
