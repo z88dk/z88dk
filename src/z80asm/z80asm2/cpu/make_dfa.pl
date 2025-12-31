@@ -565,7 +565,6 @@ sub make_action {
         }
         # hh hh %M %M
         elsif ($op =~ /^([0-9A-F]{2} )+%M %M$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%M/00/g;
             my $offset = length($op)/2 - 2;
