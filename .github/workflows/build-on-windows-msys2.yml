@@ -63,8 +63,8 @@ jobs:
         set PATH=C:\msys64\mingw64\bin;%PATH%
         set LANG=C
         set LC_ALL=C
-        cpan local::lib
-        cpan Module::Build
+        perl -S cpan local::lib
+        perl -S cpan Module::Build
         perl -Mlocal::lib
         
     - name: Install perl prerequisites
