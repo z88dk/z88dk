@@ -2143,3 +2143,40 @@ TEST_CASE("OpcodesParser: 'bool hl' on 8080 expands to expected 7-opcode sequenc
     REQUIRE(temp_sym4->opcode() == op7);
 }
 
+TEST_CASE("OpcodesParser: 'push 0x1234' on z80n assembles to CALL-like opcode with WordBigEndian patch",
+    "[opcodes][push][z80n][patch][wordbigendian]") {
+    g_options = Options();
+    g_options.cpu_id = CPU::z80n;
+
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    pp.push_virtual_file("push 0x1234\n", "push_0x1234_z80n.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // There should be two opcodes: placeholder and the instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+
+    // Expected bytes: { 0xED, 0x8A, 0x00, 0x00 }
+    REQUIRE(op->size() == 4);
+    REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xED, 0x8A, 0x00, 0x00 }));
+
+    // One WordBigEndian patch at offset 2 with value 0x1234
+    const auto& patches = op->patches();
+    REQUIRE(patches.size() == 1);
+    const auto& patch = patches[0];
+    REQUIRE(patch.range() == PatchRange::WordBigEndian);
+    REQUIRE(patch.offset() == 2);
+    REQUIRE(patch.expression().evaluate() == 0x1234);
+
+    g_options = Options();
+}
+
