@@ -17,7 +17,6 @@ jobs:
         shell: msys2 {0}
         
     env:
-      PATH: /mingw64/bin:${PATH}
       LANG: C
       LC_ALL: C
 
@@ -58,27 +57,32 @@ jobs:
 
     - name: Install perl prerequisites
       run: |
+        export PATH=/mingw64/bin:$PATH
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
         
     - name: Build binaries
       run: |
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -l
 
     - name: Build libraries
       run: |
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         cp `which m4` bin/
         ./build.sh -v -b
 
     - name: Build examples
       run: |
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -b -l -e
 
     - name: Run tests
       run: |
+        export PATH=/mingw64/bin:$PATH
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -b -l -t
