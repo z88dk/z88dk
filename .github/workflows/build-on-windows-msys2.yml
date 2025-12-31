@@ -60,6 +60,7 @@ jobs:
         export PATH=/mingw64/bin:$PATH
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        cpan Module::Build
         cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
         
     - name: Build binaries
