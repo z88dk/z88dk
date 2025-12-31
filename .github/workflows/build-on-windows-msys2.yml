@@ -44,23 +44,23 @@ jobs:
         update: true
         msystem: MINGW64
         install: |
+          git
           mingw64/mingw-w64-x86_64-boost
           mingw64/mingw-w64-x86_64-gcc
           mingw64/mingw-w64-x86_64-gmp
           mingw64/mingw-w64-x86_64-libxml2
           mingw64/mingw-w64-x86_64-make
           mingw64/mingw-w64-x86_64-perl
+          mingw64/mingw-w64-x86_64-perl-Module-Build
+          mingw64/mingw-w64-x86_64-perl-local-lib
           mingw64/mingw-w64-x86_64-pkg-config
           mingw64/mingw-w64-x86_64-ragel
-          git
           re2c
           vim
-
     - name: Install perl prerequisites
       run: |
         export PATH=/mingw64/bin:$PATH
-        cpan local::lib App::cpanminus
-        cpan inc::latest Software::License Module::Build
+        cpan App::cpanminus
         cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
         
     - name: Build binaries
