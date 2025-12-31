@@ -177,6 +177,13 @@ void OpcodesParser::do_action(int action_idx) {
     (this->*accept_actions[action_idx])();
 }
 
+void OpcodesParser::pop_expr(Expression& out) {
+    // get first expression and move it into caller-provided storage
+    assert(!exprs_.empty());
+    out = std::move(exprs_.front());
+    exprs_.pop_front();
+}
+
 Opcode* OpcodesParser::emit_bytes(uint64_t value) {
     const Location& location = line_->location();
     Section* section = unit_->current_module()->current_section();
@@ -188,15 +195,20 @@ Opcode* OpcodesParser::emit_bytes(uint64_t value) {
 void OpcodesParser::emit_bytes_expr(uint64_t value,
                                     int offset, PatchRange range) {
     // get first expresion
-    assert(exprs_.size() >= 1);
-    Expression expr = std::move(exprs_.front());
-    exprs_.pop_front();
+    Expression expr;
+    pop_expr(expr);
 
+    // emit opcode
+    emit_bytes_expr(value, offset, range, expr);
+}
+
+void OpcodesParser::emit_bytes_expr(uint64_t value,
+    int offset, PatchRange range, const Expression& expr) {
     // emit fixed part
     Opcode* opcode = emit_bytes(value);
 
     // emit patch
-    Patch patch(opcode, offset, range, std::move(expr));
+    Patch patch(opcode, offset, range, expr);
     opcode->add_patch(std::move(patch));
 }
 
@@ -204,11 +216,9 @@ void OpcodesParser::emit_bytes_expr(uint64_t value,
                                     int offset1, PatchRange range1,
                                     int offset2, PatchRange range2) {
     // get first expresions
-    assert(exprs_.size() >= 2);
-    Expression expr1 = std::move(exprs_.front());
-    exprs_.pop_front();
-    Expression expr2 = std::move(exprs_.front());
-    exprs_.pop_front();
+    Expression expr1, expr2;
+    pop_expr(expr1);
+    pop_expr(expr2);
 
     // emit fixed part
     Opcode* opcode = emit_bytes(value);
@@ -219,24 +229,6 @@ void OpcodesParser::emit_bytes_expr(uint64_t value,
 
     Patch patch2(opcode, offset2, range2, std::move(expr2));
     opcode->add_patch(std::move(patch2));
-}
-
-void OpcodesParser::emit_bytes_expr_plus_one(uint64_t value,
-        int offset, PatchRange range) {
-    // get first expresion
-    assert(exprs_.size() >= 1);
-    Expression expr = std::move(exprs_.front());
-    exprs_.pop_front();
-
-    // add 1 to expression
-    Expression expr_plus_one = expression_plus_one(expr);
-
-    // emit fixed part
-    Opcode* opcode = emit_bytes(value);
-
-    // emit patch
-    Patch patch(opcode, offset, range, std::move(expr_plus_one));
-    opcode->add_patch(std::move(patch));
 }
 
 void OpcodesParser::emit_bytes_func(uint64_t value,

@@ -360,8 +360,9 @@ END
         my $leaf = $dfa->dfa_leafs->list->[$i];
         my @path = sort keys %{ $leaf->{path} };
         my $path = join("\n// ", @path);
+        my $ops = $leaf->{ops};
         my $const = $leaf->{const};
-        my $action = make_action($leaf);
+        my $action = make_action($ops, $const);
         say $fh "// $path";
         say $fh "// $const" if $const;
         say $fh "void OpcodesParser::do_action_$i() {";
@@ -373,19 +374,43 @@ END
 }
 
 sub make_action {
-    my($leaf) = @_;
+    my($ops, $const) = @_;
     my $code = "";
+
+    # check if we need to use an expression more than once
+    if ($ops =~ /%[dm]1/) {
+        # hh hh %m1 %m1
+        # hh hh hh %d1
+        $code .= "    Expression expr, expr_plus_one;\n".
+                 "    pop_expr(expr);\n".
+                 "    expr_plus_one = expression_plus_one(expr);\n";
+        my @ops = split(';', $ops);
+        for my $op (@ops) {
+            my $is_plus_one = $op =~ /%[dm]1/;
+            $op =~ s/(%[dm])1/$1/g;
+            my $sub_code = make_action($op, $const);
+            if ($sub_code =~ /emit_bytes_expr/) {
+                if ($is_plus_one){
+                    $sub_code =~ s/\);/, expr_plus_one);/;
+                }
+                else {
+                    $sub_code =~ s/\);/, expr);/;
+                }
+            }
+            $code .= $sub_code;
+        }
+        return $code;
+    }
 
     # check if we need temp labels
     my $temp_end_label;
-    if ($leaf->{ops} =~ /%t/g) {
-        warn "test temp_end_label\n";
+    if ($ops =~ /%t/g) {
         $temp_end_label = 1;
         $code .= "    std::string temp_end_label = ".
                  "make_temp_label_name(\"END\");\n";
     }
 
-    my @ops = split(';', $leaf->{ops});
+    my @ops = split(';', $ops);
     for my $op (@ops) {
         # hh hh hh hh
         if ($op =~ /^[0-9A-F ]+$/i) {
@@ -430,7 +455,6 @@ sub make_action {
         }
         # hh %n %s %s
         elsif ($op =~ /^([0-9A-F]{2} )+%n %s %s$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[ns]/00/g;
             my $offset = length($op)/2 - 3;
@@ -447,7 +471,6 @@ sub make_action {
         }
         # hh %d %s
         elsif ($op =~ /^([0-9A-F]{2} )+%d %s$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[ds]/00/g;
             my $offset = length($op)/2 - 2;
@@ -456,7 +479,6 @@ sub make_action {
         }
         # hh %d %s %s
         elsif ($op =~ /^([0-9A-F]{2} )+%d %s %s$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[ds]/00/g;
             my $offset = length($op)/2 - 3;
@@ -473,7 +495,6 @@ sub make_action {
         }
         # %d
         elsif ($op =~ /^%d$/) {
-            warn "test emit_bytes in op: $op\n";
             $code .= "    emit_bytes_expr(0x00,\n".
                     "        0, PatchRange::ByteSigned);\n";
         }
@@ -495,7 +516,6 @@ sub make_action {
         }
         # hh hh %m %m %m %m
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %m %m$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%m/00/g;
             my $offset = length($op)/2 - 4;
@@ -504,7 +524,6 @@ sub make_action {
         }
         # hh hh %m %m %x
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %x$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[mx]/00/g;
             my $offset_m = length($op)/2 - 3;
@@ -515,7 +534,6 @@ sub make_action {
         }
         # hh hh %m %m %x %x
         elsif ($op =~ /^([0-9A-F]{2} )+%m %m %x %x$/) {
-            warn "test emit_bytes in op: $op\n";
             $op =~ s/\s+//g;
             $op =~ s/%[mx]/00/g;
             my $offset_m = length($op)/2 - 4;
@@ -523,15 +541,6 @@ sub make_action {
             $code .= "    emit_bytes_expr(0x$op,\n".
                     "        $offset_x, PatchRange::Word,\n".
                     "        $offset_m, PatchRange::Word);\n";
-        }
-        # hh hh %m1 %m1
-        elsif ($op =~ /^([0-9A-F]{2} )+%m1 %m1$/) {
-            warn "test emit_bytes in op: $op\n";
-            $op =~ s/\s+//g;
-            $op =~ s/%m1/00/g;
-            my $offset = length($op)/2 - 2;
-            $code .= "    emit_bytes_expr_plus_one(0x$op,\n".
-                    "        $offset, PatchRange::Word);\n";
         }
         # hh hh @func x
         elsif ($op =~ /^(([0-9A-F]{2} )+)\@(\w+) x\s*$/) {
@@ -551,7 +560,6 @@ sub make_action {
         }
         # hh hh %tN
         elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*)$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $label_offset) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
@@ -562,7 +570,6 @@ sub make_action {
         }
         # hh hh %tN %tN
         elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*) %t\3$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $label_offset) = ($1, $3);
             $op1 =~ s/\s+//g;
             my $offset = length($op1)/2;
@@ -600,15 +607,6 @@ sub make_action {
             $code .= "    emit_bytes_expr(0x$op,\n".
                     "        $offset, PatchRange::HighOffset);\n";
         }
-        # hh hh hh %d1
-        elsif ($op =~ /^([0-9A-F]{2} )+%d1$/) {
-            warn "test emit_bytes in op: $op\n";
-            $op =~ s/\s+//g;
-            $op =~ s/%d1/00/g;
-            my $offset = length($op)/2 - 1;
-            $code .= "    emit_bytes_expr_plus_one(0x$op,\n".
-                    "        $offset, PatchRange::ByteSigned);\n";
-        }
         # hh hh hh %j
         elsif ($op =~ /^([0-9A-F]{2} )+%j$/) {
             warn "test emit_bytes in op: $op\n";
@@ -634,8 +632,8 @@ sub make_action {
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
             my $offset = 2;
-            $leaf->{const} eq "0,1,2,3,4,5,6,7" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "0,1,2,3,4,5,6,7" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_8();\n";
             $code .= "    emit_bytes_expr(0x${op1}0000+${op2},\n".
                     "        $offset, PatchRange::ByteSigned);\n";
@@ -646,8 +644,8 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            $leaf->{const} eq "1,2,4" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "1,2,4" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_124();\n";
             $code .= "    emit_bytes(0x${op1}00+${op2});\n";
         }
@@ -657,8 +655,8 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            $leaf->{const} eq "0,1,2,3,4,5,6,7" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "0,1,2,3,4,5,6,7" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_8();\n";
             $code .= "    emit_bytes(0x${op1}00+${op2});\n";
         }
@@ -668,8 +666,8 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            $leaf->{const} eq "1,2,4,8" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "1,2,4,8" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_1248();\n";
             $code .= "    emit_bytes(0x${op1}00+(${op2}));\n";
         }
@@ -679,8 +677,8 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            $leaf->{const} eq "0,1,2" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "0,1,2" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_012();\n";
             $code .= "    emit_bytes(0x${op1}00+(${op2}));\n";
         }
@@ -690,8 +688,8 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            $leaf->{const} eq "0,1,2,3" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "0,1,2,3" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_0123();\n";
             $code .= "    emit_bytes(0x${op1}00+(${op2}));\n";
         }
@@ -702,8 +700,8 @@ sub make_action {
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
             my $offset = length($op1)/2 + 1;
-            $leaf->{const} eq "0,1,2,3,4,5,6,7" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "0,1,2,3,4,5,6,7" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_8();\n";
             $code .= "    emit_bytes_expr(0x${op1}0000+((${op2})<<8),\n".
                     "        $offset, PatchRange::ByteUnsigned);\n";
@@ -714,8 +712,8 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            $leaf->{const} eq "0,1,2,3,4,5,6,7" or
-                die "unexpected const in leaf: ".$leaf->{const}."\n";
+            $const eq "0,1,2,3,4,5,6,7" or
+                die "unexpected const in leaf: ".$const."\n";
             $code .= "    int c = get_const_8();\n";
             $code .= "    emit_bytes(0x${op1}00+(${op2}));\n";
         }
@@ -725,19 +723,18 @@ sub make_action {
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
-            (my $get_const = "get_const_".$leaf->{const}) =~ s/,/_/g;
+            (my $get_const = "get_const_".$const) =~ s/,/_/g;
             $code .= "    int c = $get_const();\n";
             $code .= "    emit_bytes(0x${op1}00+(${op2}));\n";
         }
         else {
-            die "unknown op in leaf: $op\n", dump($leaf);
+            die "unknown op: $op in ($ops, $const)\n";
         }
     }
 
     # make temp label
     if ($temp_end_label) {
         $code .= "    add_label_symbol(temp_end_label, 0);\n";
-        warn "test emit_bytes in temp_end_label\n";
     }
 
     return $code;

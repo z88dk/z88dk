@@ -31,14 +31,16 @@ private:    // object data
 
     int follow_dfa();
     void do_action(int action_idx);
+    void pop_expr(Expression& out);
     Opcode* emit_bytes(uint64_t value);
     void emit_bytes_expr(uint64_t value,
-                         int offset, PatchRange range);
+        int offset, PatchRange range);
+    void emit_bytes_expr(uint64_t value,
+        int offset, PatchRange range,
+        const Expression& expr);
     void emit_bytes_expr(uint64_t value,
                          int offset1, PatchRange range1,
                          int offset2, PatchRange range2);
-    void emit_bytes_expr_plus_one(uint64_t value,
-                                  int offset, PatchRange range);
     void emit_bytes_func(uint64_t value, int offset, PatchRange range,
                          const std::string& func);
     Expression get_temp_expr(const std::string& temp_label,
