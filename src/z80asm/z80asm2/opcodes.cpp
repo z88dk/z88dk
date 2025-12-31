@@ -203,7 +203,7 @@ void OpcodesParser::emit_bytes_expr(uint64_t value,
 }
 
 void OpcodesParser::emit_bytes_expr(uint64_t value,
-    int offset, PatchRange range, const Expression& expr) {
+                                    int offset, PatchRange range, const Expression& expr) {
     // emit fixed part
     Opcode* opcode = emit_bytes(value);
 

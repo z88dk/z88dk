@@ -42513,20 +42513,20 @@ j_gt %m|r5k|_||A2 %m %m
 j_gt %m|r6k|_||A2 %m %m
 j_gtu %m|8080|X||CA %t %t;D2 %m %m
 j_gtu %m|8085|X||CA %t %t;D2 %m %m
-j_gtu %m|ez80|X||CA %t %t %t;D2 %m %m %m
-j_gtu %m|ez80_z80|X||CA %t %t;D2 %m %m
-j_gtu %m|gbz80|X||CA %t %t;D2 %m %m
-j_gtu %m|kc160|X||CA %t %t;D2 %m %m
-j_gtu %m|kc160_z80|X||CA %t %t;D2 %m %m
-j_gtu %m|r2ka|X||CA %t %t;D2 %m %m
-j_gtu %m|r3k|X||CA %t %t;D2 %m %m
+j_gtu %m|ez80|X||28 %t;D2 %m %m %m
+j_gtu %m|ez80_z80|X||28 %t;D2 %m %m
+j_gtu %m|gbz80|X||28 %t;D2 %m %m
+j_gtu %m|kc160|X||28 %t;D2 %m %m
+j_gtu %m|kc160_z80|X||28 %t;D2 %m %m
+j_gtu %m|r2ka|X||28 %t;D2 %m %m
+j_gtu %m|r3k|X||28 %t;D2 %m %m
 j_gtu %m|r4k|_||AA %m %m
 j_gtu %m|r5k|_||AA %m %m
 j_gtu %m|r6k|_||AA %m %m
-j_gtu %m|r800|X||CA %t %t;D2 %m %m
-j_gtu %m|z180|X||CA %t %t;D2 %m %m
-j_gtu %m|z80|X||CA %t %t;D2 %m %m
-j_gtu %m|z80n|X||CA %t %t;D2 %m %m
+j_gtu %m|r800|X||28 %t;D2 %m %m
+j_gtu %m|z180|X||28 %t;D2 %m %m
+j_gtu %m|z80|X||28 %t;D2 %m %m
+j_gtu %m|z80n|X||28 %t;D2 %m %m
 j_le %m|r4k|X||A2 %t %t;C3 %m %m
 j_le %m|r5k|X||A2 %t %t;C3 %m %m
 j_le %m|r6k|X||A2 %t %t;C3 %m %m
@@ -42787,20 +42787,20 @@ jgt %m|r5k|_||A2 %m %m
 jgt %m|r6k|_||A2 %m %m
 jgtu %m|8080|X||CA %t %t;D2 %m %m
 jgtu %m|8085|X||CA %t %t;D2 %m %m
-jgtu %m|ez80|X||CA %t %t %t;D2 %m %m %m
-jgtu %m|ez80_z80|X||CA %t %t;D2 %m %m
-jgtu %m|gbz80|X||CA %t %t;D2 %m %m
-jgtu %m|kc160|X||CA %t %t;D2 %m %m
-jgtu %m|kc160_z80|X||CA %t %t;D2 %m %m
-jgtu %m|r2ka|X||CA %t %t;D2 %m %m
-jgtu %m|r3k|X||CA %t %t;D2 %m %m
+jgtu %m|ez80|X||28 %t;D2 %m %m %m
+jgtu %m|ez80_z80|X||28 %t;D2 %m %m
+jgtu %m|gbz80|X||28 %t;D2 %m %m
+jgtu %m|kc160|X||28 %t;D2 %m %m
+jgtu %m|kc160_z80|X||28 %t;D2 %m %m
+jgtu %m|r2ka|X||28 %t;D2 %m %m
+jgtu %m|r3k|X||28 %t;D2 %m %m
 jgtu %m|r4k|_||AA %m %m
 jgtu %m|r5k|_||AA %m %m
 jgtu %m|r6k|_||AA %m %m
-jgtu %m|r800|X||CA %t %t;D2 %m %m
-jgtu %m|z180|X||CA %t %t;D2 %m %m
-jgtu %m|z80|X||CA %t %t;D2 %m %m
-jgtu %m|z80n|X||CA %t %t;D2 %m %m
+jgtu %m|r800|X||28 %t;D2 %m %m
+jgtu %m|z180|X||28 %t;D2 %m %m
+jgtu %m|z80|X||28 %t;D2 %m %m
+jgtu %m|z80n|X||28 %t;D2 %m %m
 jk %m|8085|_||FD %m %m
 jk %m|8085_strict|_||FD %m %m
 jle %m|r4k|X||A2 %t %t;C3 %m %m
