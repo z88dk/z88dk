@@ -189,7 +189,7 @@ sub emit_cpp {
                 push @pairs, "$tname->$tgt";
             }
             if (@pairs) {
-                print $fh "   transitions: ", join(", ", @pairs), "\n";
+                print $fh "   transitions: ", join(", ", sort @pairs), "\n";
             } else {
                 print $fh "   transitions: (none)\n";
             }
@@ -201,7 +201,7 @@ sub emit_cpp {
                     my $tname = (defined $token_names_aref && defined $token_names_aref->[$tok]) ? $token_names_aref->[$tok] : $tok;
                     "$tname->$tgt"
                 } @$list;
-                print $fh "   transitions: ", join(", ", @pairs), "\n";
+                print $fh "   transitions: ", join(", ", sort @pairs), "\n";
             } else {
                 print $fh "   transitions: (none)\n";
             }
