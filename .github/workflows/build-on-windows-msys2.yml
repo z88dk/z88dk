@@ -42,6 +42,7 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         update: true
+        msystem: MINGW64
         install: |
           mingw64/mingw-w64-x86_64-boost
           mingw64/mingw-w64-x86_64-gcc
@@ -56,11 +57,8 @@ jobs:
           vim
 
     - name: Install perl prerequisites
-      shell: cmd
       run: |
-        set PATH=C:\msys64\mingw64\bin;%PATH%
-        set LANG=C
-        set LC_ALL=C
+        export PATH=/mingw64/bin:$PATH
         cpan local::lib App::cpanminus
         cpan Module::Build
         cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
