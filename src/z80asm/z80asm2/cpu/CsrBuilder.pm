@@ -15,7 +15,8 @@ use Object::Tiny qw( state_count trans built
 #   $b->add_transition($state, $token, $target);
 #   $b->build;
 #   $b->emit_cpp($fh, $cpp_namespace, $var_prefix);
-
+#   $b->emit_doc($fh, \@state_names, \@token_names, \@accept_index, \@action_names);
+#
 # Threshold for using dense row (index lookup) instead of binary search
 use constant DENSE_ROW_THRESHOLD => 8;
 
@@ -150,6 +151,60 @@ sub emit_cpp {
 
     $emit_array->('dense_row_offsets', 'std::int32_t', \@dense_row_offsets);
     $emit_array->('dense_rows', 'int32_t', \@dense_flat);
+}
+
+sub emit_doc {
+    my ($self, $fh, $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref) = @_;
+    die "not built" unless $self->{built};
+
+    printf $fh "DFA state dump: %d states, %d transitions\n",
+        $self->{state_count}, scalar @{ $self->{trans_tokens} };
+
+    for my $s (0 .. $self->{state_count} - 1) {
+        my $off = $self->{state_offsets}[$s];
+        my $off_next = $self->{state_offsets}[$s+1];
+        my $is_dense = defined $self->{dense_rows}[$s] ? 1 : 0;
+        my $state_name = (defined $state_names_aref && defined $state_names_aref->[$s]) ? $state_names_aref->[$s] : undef;
+        my $accept = defined $accept_index_aref ? $accept_index_aref->[$s] : undef;
+        my $action_name = (defined $accept && $accept >= 0 && defined $action_names_aref && defined $action_names_aref->[$accept])
+                          ? $action_names_aref->[$accept] : undef;
+
+        printf $fh " State %4d: offsets=[%d,%d) %s", $s, $off, $off_next, ($is_dense ? "DENSE" : "SPARSE");
+        if (defined $accept) {
+            printf $fh "  accept=%d", $accept;
+            printf $fh " (%s)", $action_name if defined $action_name;
+        }
+        print $fh "\n";
+        print $fh "  name: $state_name\n" if defined $state_name;
+
+        if ($is_dense) {
+            my $row = $self->{dense_rows}[$s];
+            my @pairs;
+            for my $tok (0 .. $self->{token_count}-1) {
+                my $tgt = $row->[$tok];
+                next if $tgt == -1;
+                my $tname = (defined $token_names_aref && defined $token_names_aref->[$tok]) ? $token_names_aref->[$tok] : $tok;
+                push @pairs, "$tname->$tgt";
+            }
+            if (@pairs) {
+                print $fh "   transitions: ", join(", ", sort @pairs), "\n";
+            } else {
+                print $fh "   transitions: (none)\n";
+            }
+        } else {
+            my $list = $self->{trans}->[$s];
+            if (@$list) {
+                my @pairs = map {
+                    my ($tok,$tgt) = @$_;
+                    my $tname = (defined $token_names_aref && defined $token_names_aref->[$tok]) ? $token_names_aref->[$tok] : $tok;
+                    "$tname->$tgt"
+                } @$list;
+                print $fh "   transitions: ", join(", ", sort @pairs), "\n";
+            } else {
+                print $fh "   transitions: (none)\n";
+            }
+        }
+    }
 }
 
 1;

@@ -29,7 +29,7 @@ opcodes.txt: dump_opcodes.pl opcodes.dat Makefile
 	$(PERL) dump_opcodes.pl opcodes.dat opcodes.txt
 	$(DOS2UNIX) opcodes.txt
 
-../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.def: \
+../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc: \
 		make_dfa.pl $(wildcard *.pm) opcodes.dat ../keywords.def ../lexer.h ../cpu.def Makefile
 	$(PERL) make_dfa.pl opcodes.dat ../keywords.def ../lexer.h ../cpu.def ../opcodes_tables.cpp
-	$(DOS2UNIX) ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.def
+	$(DOS2UNIX) ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc ../opcodes_tables.txt
