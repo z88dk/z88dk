@@ -54,13 +54,23 @@ jobs:
           mingw64/mingw-w64-x86_64-perl
           mingw64/mingw-w64-x86_64-pkg-config
           mingw64/mingw-w64-x86_64-ragel
-          mingw64/mingw-w64-x86_64-perl-Module-Build
-          mingw64/mingw-w64-x86_64-perl-local-lib
           re2c
           vim
+          
+    - name: Install Perl toolchain (Windows)
+      shell: cmd
+      run: |
+        set PATH=C:\msys64\mingw64\bin;%PATH%
+        set LANG=C
+        set LC_ALL=C
+        cpan local::lib
+        cpan Module::Build
+        perl -Mlocal::lib
+        
     - name: Install perl prerequisites
       run: |
         export PATH=/mingw64/bin:$PATH
+        eval $(perl -Mlocal::lib="C:/Users/runneradmin/perl5")
         cpan App::cpanminus
         cpan -T Path::Tiny
         cpan App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
@@ -68,24 +78,24 @@ jobs:
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -Mlocal::lib="C:/Users/runneradmin/perl5")
         ./build.sh -v -l
 
     - name: Build libraries
       run: |
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -Mlocal::lib="C:/Users/runneradmin/perl5")
         cp `which m4` bin/
         ./build.sh -v -b
 
     - name: Build examples
       run: |
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -Mlocal::lib="C:/Users/runneradmin/perl5")
         ./build.sh -v -b -l -e
 
     - name: Run tests
       run: |
         export PATH=/mingw64/bin:$PATH
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -Mlocal::lib="C:/Users/runneradmin/perl5")
         ./build.sh -v -b -l -t
