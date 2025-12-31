@@ -563,17 +563,6 @@ sub make_action {
                     "        $offset, PatchRange::Word,\n".
                     "        temp_end_label, $label_offset);\n";
         }
-        # hh hh %tN %tN %tN
-        elsif ($op =~ /^(([0-9A-F]{2} )+)%t(\d*) %t\3 %t\3$/) {
-            warn "test emit_bytes in op: $op\n";
-            my($op1, $label_offset) = ($1, $3);
-            $op1 =~ s/\s+//g;
-            my $offset = length($op1)/2;
-            $label_offset = $label_offset eq '' ? 0 : -$label_offset;
-            $code .= "    emit_bytes_temp_expr(0x${op1}000000,\n".
-                    "        $offset, PatchRange::Ptr24,\n".
-                    "        temp_end_label, $label_offset);\n";
-        }
         # hh hh %M %M
         elsif ($op =~ /^([0-9A-F]{2} )+%M %M$/) {
             warn "test emit_bytes in op: $op\n";
