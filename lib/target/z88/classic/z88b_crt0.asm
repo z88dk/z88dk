@@ -122,7 +122,7 @@ l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
     call_oz(Os_Esc)		;Acknowledge escape pressed
-    jr      crt0_exit		;Exit the program
+    jp      crt0_exit		;Exit the program
 
 
 

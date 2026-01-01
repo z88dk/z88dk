@@ -17,7 +17,7 @@
     PUBLIC  __gfx_vram_page_in
     PUBLIC  ___gfx_vram_page_in
 
-    EXTERN  gfx_bank
+    EXTERN  __z88_gfxbank
     EXTERN  z88_map_bank
 
     PUBLIC  __gfx_vram_page_out
@@ -34,11 +34,11 @@ ___gfx_vram_page_out:
     push    de
     ld      hl, z88_map_bank            ;$4Dx
     ld      e, (hl)
-    ld      a, (gfx_bank)               ;in crt0
+    ld      a, (__z88_gfxbank)               ;in crt0
     ld      (hl), a
     out     (z88_map_bank-$400), a
     ld      a, e
-    ld      (gfx_bank), a
+    ld      (__z88_gfxbank), a
     pop     de
     pop     hl
     ret
