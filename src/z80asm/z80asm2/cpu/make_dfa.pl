@@ -634,7 +634,6 @@ sub make_action {
         }
         # hh hh dd+8*%c
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+8\*%c)$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -645,7 +644,6 @@ sub make_action {
         }
         # hh hh %c==8?dd:dd+c-1
         elsif ($op =~ /^(([0-9A-F]{2} )+)(%c==8\?\d+:\d+\+%c-1)$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -656,7 +654,6 @@ sub make_action {
         }
         # hh hh %c==0?0x46:%c==1?0x56:0x5E
         elsif ($op =~ /^(([0-9A-F]{2} )+)(%c==0\?0x[0-9A-F]+:%c==1\?0x[0-9A-F]+:0x[0-9A-F]+)$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -667,7 +664,6 @@ sub make_action {
         }
         # hh hh %c==0?0x46:%c==1?0x56:%c==2?0x5E:0x4E
         elsif ($op =~ /^(([0-9A-F]{2} )+)(%c==0\?0x[0-9A-F]+:%c==1\?0x[0-9A-F]+:%c==2\?0x[0-9A-F]+:0x[0-9A-F]+)$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -678,7 +674,6 @@ sub make_action {
         }
         # hh hh dd+%c %n
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+%c) %n$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -691,7 +686,6 @@ sub make_action {
         }
         # hh hh dd+%c
         elsif ($op =~ /^(([0-9A-F]{2} )+)(\d+\+%c)$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
@@ -702,7 +696,6 @@ sub make_action {
         }
         # hh dd+(%c<8?%c*8:%c)
         elsif ($op =~ /^(([0-9A-F]{2} )*)(\d+\+\(%c<8\?%c\*8:%c\))$/) {
-            warn "test emit_bytes in op: $op\n";
             my($op1, $op2) = ($1, $3);
             $op1 =~ s/\s+//g;
             $op2 =~ s/%c/c/g;
