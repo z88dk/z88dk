@@ -395,10 +395,15 @@ int OpcodesParser::get_const_16_24_32_40_56() {
     int c = get_const();
     switch (c) {
     case 0x10:
+    case 0x10 / 8:
     case 0x18:
+    case 0x18 / 8:
     case 0x20:
+    case 0x20 / 8:
     case 0x28:
+    case 0x28 / 8:
     case 0x38:
+    case 0x38 / 8:
         return c;
     default:
         g_errors.error(ErrorCode::IntegerRange,
@@ -413,12 +418,19 @@ int OpcodesParser::get_const_0_8_16_24_32_40_48_56() {
     switch (c) {
     case 0x00:
     case 0x08:
+    case 0x08 / 8:
     case 0x10:
+    case 0x10 / 8:
     case 0x18:
+    case 0x18 / 8:
     case 0x20:
+    case 0x20 / 8:
     case 0x28:
+    case 0x28 / 8:
     case 0x30:
+    case 0x30 / 8:
     case 0x38:
+    case 0x38 / 8:
         return c;
     default:
         g_errors.error(ErrorCode::IntegerRange,
