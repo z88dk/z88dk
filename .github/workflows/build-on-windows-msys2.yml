@@ -63,7 +63,9 @@ jobs:
         set PATH=C:\msys64\mingw64\bin;%PATH%
         set LANG=C
         set LC_ALL=C
-        perl -S cpan local::lib App::cpanminus
+        perl -S cpan local::lib
+        for /f "delims=" %%i in ('perl -Mlocal::lib') do set "%%i"
+        perl -S cpan App::cpanminus
         perl -S cpanm inc::latest Software::License Module::Build
         
     - name: Install Perl toolchain (msys)
