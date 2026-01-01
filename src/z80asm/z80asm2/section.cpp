@@ -394,10 +394,6 @@ const std::string& Section::name() const {
     return name_;
 }
 
-void Section::set_name(const std::string& name) {
-    name_ = name;
-}
-
 int Section::alignment() const {
     return alignment_;
 }

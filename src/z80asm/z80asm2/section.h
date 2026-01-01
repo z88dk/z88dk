@@ -124,8 +124,8 @@ public:
     explicit Section(const std::string& name = "");
 
     // Section identification
+    // (name is immutable - it's the key in section collection)
     const std::string& name() const;
-    void set_name(const std::string& name);
 
     // Alignment (default 1 = no alignment constraint)
     // Base address will be adjusted to be a multiple of alignment
