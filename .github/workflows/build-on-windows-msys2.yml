@@ -65,15 +65,24 @@ jobs:
         set PATH=%MSYS2_ROOT%\mingw64\bin;C:\Windows\System32
         set LANG=C
         set LC_ALL=C
-        perl -v   :: should now work
+        
+        perl -v
         perl -V:archname
         where perl
-        perl -S cpan local::lib
-        for /f "delims=" %%i in ('perl -Mlocal::lib') do set "%%i"
-        perl -S cpan App::cpanminus
-        perl -S cpanm inc::latest Software::License
-        perl -S cpan -f Module::Build
         
+        :: Install cpanminus manually
+        curl -L https://cpanmin.us -o cpanm
+        perl cpanm --self-upgrade
+        
+        :: Install local::lib
+        perl cpanm local::lib
+        
+        :: Activate local::lib
+        for /f "delims=" %%i in ('perl -Mlocal::lib') do set "%%i"
+        
+        :: Install Module::Build into local::lib
+        perl cpanm Module::Build
+
     - name: Install Perl toolchain (msys)
       run: |
         export PATH=/mingw64/bin:$PATH
