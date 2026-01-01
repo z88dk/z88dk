@@ -55,17 +55,19 @@ jobs:
           libgmp-devel
           libiconv-devel 
           liblzma-devel 
-          libtool 
-          libxcrypt-devel 
+          libtool  
           libxml2-devel 
           make 
           perl 
           pkg-config
           ragel 
-          re2c
           unzip 
           wget 
           zlib-devel 
+    - name: Install choco packages
+      run: |
+        choco install re2c
+      shell: cmd
     - name: Install perl prerequisites
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
@@ -75,20 +77,24 @@ jobs:
     - name: Build binaries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -l
 
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        cp `which m4` bin/
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        #cp `which m4` bin/
         ./build.sh -v -b
 
     - name: Build examples
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -e
 
     - name: Run tests
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -t
