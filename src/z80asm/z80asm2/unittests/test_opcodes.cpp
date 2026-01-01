@@ -2447,3 +2447,255 @@ TEST_CASE("OpcodesParser: 'rl N, bcde' on r4k assembles to single opcode with no
     }
     g_options = Options();
 }
+
+TEST_CASE("OpcodesParser: 'bit N, a' encodes to CB-prefixed opcode without patches for N=0..7",
+          "[opcodes][bit][a][no-patch]") {
+    for (int n = 0; n <= 7; ++n) {
+        CAPTURE(n);
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "bit " << n << ", a\n";
+        pp.push_virtual_file(asm_src.str(), "bit_a.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xCB, static_cast<uint8_t>(0x47 + 8 * n) }));
+        REQUIRE(op->patches().empty());
+    }
+}
+
+TEST_CASE("OpcodesParser: 'rlc N, bcde' on r4k encodes single opcode without patches for N={1,2,4,8}",
+          "[opcodes][rlc][bcde][r4k][no-patch]") {
+    const int Ns[] = { 1, 2, 4, 8 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options();
+        g_options.cpu_id = CPU::r4k;
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "rlc " << n << ", bcde\n";
+        pp.push_virtual_file(asm_src.str(), "rlc_bcde_r4k.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        uint8_t byte1 = static_cast<uint8_t>(n == 8 ? 79 : 72 + n - 1);
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xDD, byte1 }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'im N' encodes to ED prefixed opcode without patches for N=0,1,2",
+          "[opcodes][im][mode][no-patch]") {
+    const int Ns[] = { 0, 1, 2 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options(); // default CPU (z80)
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "im " << n << "\n";
+        pp.push_virtual_file(asm_src.str(), "im_mode.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        uint8_t op2 = static_cast<uint8_t>(n == 0 ? 0x46 : (n == 1 ? 0x56 : 0x5E));
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xED, op2 }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'im N' on kc160 encodes to ED-prefixed opcode without patches for N=0..3",
+          "[opcodes][im][kc160][no-patch]") {
+    const int Ns[] = { 0, 1, 2, 3 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options();
+        g_options.cpu_id = CPU::kc160;
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "im " << n << "\n";
+        pp.push_virtual_file(asm_src.str(), "im_kc160.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        uint8_t op2 = static_cast<uint8_t>(
+                          n == 0 ? 0x46 :
+                          n == 1 ? 0x56 :
+                          n == 2 ? 0x5E : 0x4E);
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xED, op2 }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'ipset N' on r2ka encodes to ED-prefixed opcode without patches for N=0..3",
+          "[opcodes][ipset][r2ka][no-patch]") {
+    const int Ns[] = { 0, 1, 2, 3 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options();
+        g_options.cpu_id = CPU::r2ka;
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "ipset " << n << "\n";
+        pp.push_virtual_file(asm_src.str(), "ipset_r2ka.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        uint8_t op2 = static_cast<uint8_t>(
+                          n == 0 ? 0x46 :
+                          n == 1 ? 0x56 :
+                          n == 2 ? 0x4E : 0x5E);
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xED, op2 }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'mmu N, 4' on z80n encodes to ED 91 (0x50+N) with ByteUnsigned patch at offset 3 for N=0..7",
+          "[opcodes][mmu][z80n][patch]") {
+    const int Ns[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options();
+        g_options.cpu_id = CPU::z80n;
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "mmu " << n << ", 4\n";
+        pp.push_virtual_file(asm_src.str(), "mmu_z80n.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        // placeholder + instruction
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() ==
+                std::vector<uint8_t>({ 0xED, 0x91, static_cast<uint8_t>(0x50 + n), 0x00 }));
+        REQUIRE(op->patches().size() == 1);
+        const auto& patch = op->patches()[0];
+        REQUIRE(patch.range() == PatchRange::ByteUnsigned);
+        REQUIRE(patch.offset() == 3);
+        REQUIRE(patch.expression().evaluate() == 4);
+    }
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'mmu N, a' on z80n encodes to ED 92 (0x50+N) without patches for N=0..7",
+          "[opcodes][mmu][z80n][no-patch]") {
+    const int Ns[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options();
+        g_options.cpu_id = CPU::z80n;
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "mmu " << n << ", a\n";
+        pp.push_virtual_file(asm_src.str(), "mmu_a_z80n.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() ==
+                std::vector<uint8_t>({ 0xED, 0x92, static_cast<uint8_t>(0x50 + n) }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'rst N' encodes single byte opcode without patches for specified N values",
+          "[opcodes][rst][no-patch]") {
+    const int Ns[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 24, 32, 40, 48, 56 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options(); // default CPU (z80)
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "rst " << n << "\n";
+        pp.push_virtual_file(asm_src.str(), "rst.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        uint8_t opcode = static_cast<uint8_t>(199 + (n < 8 ? n * 8 : n));
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ opcode }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
+
