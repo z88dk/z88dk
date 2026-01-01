@@ -66,13 +66,14 @@ jobs:
         perl -S cpan local::lib
         for /f "delims=" %%i in ('perl -Mlocal::lib') do set "%%i"
         perl -S cpan App::cpanminus
-        perl -S cpanm inc::latest Software::License Module::Build
+        perl -S cpan inc::latest Software::License Module::Build
         
     - name: Install Perl toolchain (msys)
       run: |
         export PATH=/mingw64/bin:$PATH
         cpan local::lib App::cpanminus
         eval $(perl -Mlocal::lib="/c/Users/runneradmin/perl5")
+        perl -MModule::Build -e 1
         cpanm --notest Path::Tiny
         cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
         
