@@ -5974,7 +5974,7 @@ replace restart {
 	pop	ix
 	jp	%1
 	; peephole115 replaced call at end of function by jump moving call beyond pop ix (tail call optimization).
-} if symmParmStack(%1), notSame(%1 '____sdcc_cpu_pop_ei'), notSame(%1 '___sdcc_enter_ix')
+} if symmParmStack(%1), notSame(%1 '____sdcc_cpu_pop_ei'), notSame(%1 '___sdcc_enter_ix'), notSame(%1 '____sdcc_load_dehl_deix'), notSame(%1 '____sdcc_load_debc_deix')
 
 replace restart {
 	ld	%1,#%2
