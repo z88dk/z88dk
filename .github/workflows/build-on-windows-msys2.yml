@@ -83,7 +83,7 @@ jobs:
         :: Install Module::Build into local::lib
         perl cpanm Module::Build
         
-        perl -MModule::Build -e 'print $INC{"Module/Build.pm"}'
+        perl -MModule::Build -e "print $INC{'Module/Build.pm'}"
 
     - name: Install Perl toolchain (msys)
       run: |
