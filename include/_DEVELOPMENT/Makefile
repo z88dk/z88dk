@@ -9,7 +9,7 @@ HEADERS  := $(call rwildcard,proto,*)
 
 COMMON_HEADERS := $(subst proto,common,$(HEADERS))
 
-default: dirs $(COMMON_HEADERS) classic
+default: dirs $(COMMON_HEADERS) 
 
 common/%.h: proto/%.h
 	m4  $^ > $@
