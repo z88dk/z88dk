@@ -29,10 +29,6 @@ const std::string& Module::name() const {
     return name_;
 }
 
-void Module::set_name(const std::string& name) {
-    name_ = name;
-}
-
 const Location& Module::location() const {
     return location_;
 }
