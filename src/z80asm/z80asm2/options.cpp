@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Z80 assembler
-// Copyright (C) Paulo Custodio, 2011-2025
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ Options g_options;
 
 static const std::string copyright =
     "Usage: z88dk-z80asm [options] files...\n"
-    "Copyright (C) Paulo Custodio, 2011-2025\n";
+    "Copyright (C) Paulo Custodio, 2011-2026\n";
 
 static const std::string asm_extension = ".asm";
 static const std::string d_extension = ".d";
