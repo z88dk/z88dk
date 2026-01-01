@@ -23,9 +23,9 @@ public:
     Module(const std::string& name = "", const Location& location = Location());
     void clear();
 
-    // Module identification (name is immutable - it's the key in module collection)
+    // Module identification
+    // (name is immutable - it's the key in module collection)
     const std::string& name() const;
-    void set_name(const std::string& name);
 
     // Location of MODULE directive
     const Location& location() const;
