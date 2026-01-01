@@ -76,7 +76,23 @@ _scan_loop:
     ; --- Key Detected ---
     ; Note: this is the only instruction that impacts the C flag.
     ; this will not be executed if we have not found a row.
-    neg                     ; Convert $FE -> $01 (Active High Mask)
+
+    ; At this point, A = (Input + 1). We need to convert the original active-low 
+    ; input (e.g., $FE) into an active-high mask (e.g., $01).
+    ;
+    ; We use NEG. Mathematically, NEG(x) is (0 - x).
+    ; So we are calculating: 0 - (Input + 1).
+    ;
+    ; This equals CPL(Input):
+    ;   1.  0 - (Input + 1)  =  -Input - 1
+    ;   2.  In 8-bit math, -1 is 255 ($FF).
+    ;   3.  Therefore: -Input + 255  =  255 - Input
+    ;
+    ; Since CPL(x) is defined as (255 - x), we have successfully created 
+    ; the bitwise complement of the original input.;
+    ; This saves us 4 t-states.
+
+    neg
    
     ; 1. Check Multi-Row Collision, we have 2 cases:
     ; D is $FF (Empty) or $00-$08 (Found).
@@ -165,16 +181,16 @@ _found_bit:
     ld   d, 0
     ld   hl, in_keytranstbl 
     add  hl, de
-    ld   l, (hl)
-    ld   h, 0
 
     ; --- Clean Exit (Success) ---
-    or a                    ; Clear Carry
+    xor  a                 ; Clear Carry, 
+    ld   l, (hl)           ; and set the result.
+    ld   h, a                 
     ret
 
 _err_exit:
     scf                     ; Set Carry (Error)
-    
+
 _exit_none:
     ; Note: the carry flag is guaranteed to be 0.
     ; the jump to _exit_none implies that D = $FF, which in
