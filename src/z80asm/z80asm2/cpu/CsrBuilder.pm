@@ -15,12 +15,7 @@ use Object::Tiny qw( state_count trans built
 #   $b->add_transition($state, $token, $target);
 #   $b->build;
 #   $b->emit_cpp($fh, $cpp_namespace, $var_prefix);
-#
-# NOTE: emit_cpp accepts optional extra args to improve human readability:
-#   emit_cpp($fh, $cpp_class, $var_prefix, \@token_names, \@accept_index, \@action_names);
-#   - \@token_names: array indexed by token idx -> token name (string)
-#   - \@accept_index: array indexed by state -> accept leaf idx or -1
-#   - \@action_names: array indexed by action idx -> action name (string)
+#   $b->emit_doc($fh, \@state_names, \@token_names, \@accept_index, \@action_names);
 #
 # Threshold for using dense row (index lookup) instead of binary search
 use constant DENSE_ROW_THRESHOLD => 8;
@@ -110,7 +105,7 @@ sub build {
 }
 
 sub emit_cpp {
-    my ($self, $fh, $cpp_class, $var_prefix, $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref) = @_;
+    my ($self, $fh, $cpp_class, $var_prefix) = @_;
     $cpp_class  //= 'OpcodesParser';
     $var_prefix //= '';
 
@@ -156,10 +151,15 @@ sub emit_cpp {
 
     $emit_array->('dense_row_offsets', 'std::int32_t', \@dense_row_offsets);
     $emit_array->('dense_rows', 'int32_t', \@dense_flat);
+}
 
-    # Human-readable per-state dump (as C-style comment) to aid inspection.
-    # This is optional and driven by the optional extra arrays passed in.
-    print $fh "/* Human-readable DFA state dump (generated)\n";
+sub emit_doc {
+    my ($self, $fh, $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref) = @_;
+    die "not built" unless $self->{built};
+
+    printf $fh "DFA state dump: %d states, %d transitions\n",
+        $self->{state_count}, scalar @{ $self->{trans_tokens} };
+
     for my $s (0 .. $self->{state_count} - 1) {
         my $off = $self->{state_offsets}[$s];
         my $off_next = $self->{state_offsets}[$s+1];
@@ -175,12 +175,10 @@ sub emit_cpp {
             printf $fh " (%s)", $action_name if defined $action_name;
         }
         print $fh "\n";
-        if (defined $state_name) {
-            printf $fh "   (%s)\n", $state_name;
-        }
+        print $fh "  name: $state_name\n" if defined $state_name;
+
         if ($is_dense) {
             my $row = $self->{dense_rows}[$s];
-            # print only present transitions to avoid huge blocks
             my @pairs;
             for my $tok (0 .. $self->{token_count}-1) {
                 my $tgt = $row->[$tok];
@@ -207,8 +205,6 @@ sub emit_cpp {
             }
         }
     }
-    print $fh "*/\n\n";
 }
 
 1;
-

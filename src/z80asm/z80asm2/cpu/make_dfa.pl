@@ -87,7 +87,11 @@ for my $i (0 .. scalar(@{ $dfa->states }) - 1) {
 my $action_count = scalar(@{ $dfa->dfa_leafs->list });
 my @action_names = map { "do_action_$_" } (0 .. $action_count - 1);
 
-make_cpp_file($opcodes_cpp_file, $dfa, $keywords, $token_types, \@state_names, \@token_names, \@accept_index, \@action_names);
+# emit C++ + DFA doc
+make_cpp_file($opcodes_cpp_file, $dfa, $keywords, $token_types);
+
+my $opcodes_doc_file = $opcodes_cpp_file =~ s/\.cpp$/.txt/r;
+make_doc_file($opcodes_doc_file, $csr_builder, \@state_names, \@token_names, \@accept_index, \@action_names);
 
 exit 0;
 
@@ -146,6 +150,19 @@ END
 
 END
 
+    close($fh);
+}
+
+#------------------------------------------------------------------------------
+# make doc file (plain text DFA dump)
+#------------------------------------------------------------------------------
+sub make_doc_file {
+    my($doc_file, $csr_builder, $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref) = @_;
+    open(my $fh, ">", $doc_file) or die "open $doc_file: $!";
+    print $fh "//-----------------------------------------------------------------------------\n";
+    print $fh "// Z80 assembler DFA description (generated)\n";
+    print $fh "//-----------------------------------------------------------------------------\n";
+    $csr_builder->emit_doc($fh, $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref);
     close($fh);
 }
 
@@ -291,9 +308,7 @@ END
 //   transitions for state s are in range
 //     [ state_offsets[s], state_offsets[s+1] )
 END
-    # pass the optional token names/accept/actions so the CSR emitter can
-    # also output a human-readable state dump
-    $csr_builder->emit_cpp($fh, 'OpcodesParser', '', $state_names_aref, $token_names_aref, $accept_index_aref, $action_names_aref);
+    $csr_builder->emit_cpp($fh, 'OpcodesParser', '');
 
 
     # ----------------------------
