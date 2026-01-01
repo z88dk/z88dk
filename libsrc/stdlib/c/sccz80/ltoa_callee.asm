@@ -19,7 +19,9 @@ ltoa_callee:
    pop de
    push af
 
+   exx
    push bc
+   exx
    ex (sp),ix
    call asm_ltoa
    pop ix
