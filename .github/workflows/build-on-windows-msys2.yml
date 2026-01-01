@@ -60,7 +60,8 @@ jobs:
     - name: Install Perl toolchain (Windows)
       shell: cmd
       run: |
-        set PATH=C:\msys64\mingw64\bin;%PATH%
+        set PATH=
+        set PATH=C:\msys64\mingw64\bin;C:\Windows\System32
         set LANG=C
         set LC_ALL=C
         perl -S cpan local::lib
@@ -68,6 +69,8 @@ jobs:
         perl -S cpan App::cpanminus
         perl -S cpanm inc::latest Software::License
         perl -S cpan -f Module::Build
+        perl -V:archname
+        where perl
         
     - name: Install Perl toolchain (msys)
       run: |
