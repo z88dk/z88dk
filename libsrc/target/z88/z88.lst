@@ -9,6 +9,10 @@ target/z88/stdio/ansi/f_ansi_scrollup
 target/z88/stdio/fgetc_cons
 target/z88/stdio/fputc_cons
 target/z88/stdio/getcmd
+target/z88/stdio/CRT_FONT
+target/z88/stdio/generic_console
+target/z88/stdio/generic_console_ioctl
+target/z88/stdio/generic_console_vpeek
 target/z88/stdio/getk
 @classic/stdio/stdio.lst
 @classic/stdio/stdio_net.lst

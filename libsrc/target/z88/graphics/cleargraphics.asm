@@ -19,6 +19,7 @@ cleargraphics:
     jr      z,doit
     ld      bc,+(64*8*8)-1
 doit:
+    ld      (hl),0
     ldir
     ret
 

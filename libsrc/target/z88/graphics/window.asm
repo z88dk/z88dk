@@ -38,6 +38,9 @@
     PUBLIC  window
     PUBLIC  _window
 
+    PUBLIC  __z88_open_map256
+    PUBLIC  __z88_open_map512
+
     EXTERN  base_graphics
     EXTERN  __z88_gfxbank
     EXTERN  z88_map_segment
@@ -68,11 +71,14 @@ _window:
     ret
 
 
+__z88_open_map256:
+    ld      a,'4'
+    ld      hl,255
+    ld      bc, mp_gra
+    jr      opengfx1
 
 opengfx:
-    dec     a
-    ld      (__z88_gfxmode),a
-    jr      nz,open_512
+    jr      nz,__z88_open_map512
     ld      l, (ix+wind_w)
     ld      h, 0
     ld      a, l
@@ -81,11 +87,14 @@ opengfx:
     ld      bc, mp_def                  ;define map based on pipedream
     jr      z, opengfx1
     ld      bc, mp_gra                  ;user width
+    pop     ix
 opengfx1:
     call_oz (os_map)                    ;opened the window
     ld      hl, 1
     jr      c, opengfx_exit             ;error, return TRUE
+    xor     a
 setup_map_addresses:
+    ld      (__z88_gfxmode),a
     ;Now get the address of the map
     ld      b, 0                        ; query
     ld      a, sc_hr0
@@ -99,11 +108,9 @@ setup_map_addresses:
     ld      (base_graphics), hl
     ld      hl, 0                       ;NULL=good
 opengfx_exit:
-    pop     ix
     ret
 
-
-open_512:
+__z88_open_map512:
     ; Get the SBR 
     ld      b, 0                        ; get the details
     ld      a, sc_sbr
@@ -156,6 +163,7 @@ null_fill:
     pop     af
     ld      (z88_map_bank),a
     out     (z88_map_bank-$400), a
+    ld      a,1
     jr      setup_map_addresses
 
 
