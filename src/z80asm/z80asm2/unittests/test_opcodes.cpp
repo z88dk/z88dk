@@ -2243,14 +2243,14 @@ TEST_CASE("OpcodesParser: 'ldh a, (0x25)' on gbz80 emits HighOffset patch with 0
 }
 
 TEST_CASE("OpcodesParser: label + jr loop emits label placeholder and jr with JrOffset patch",
-    "[opcodes][label][jr][patch][symbol]") {
+          "[opcodes][label][jr][patch][symbol]") {
     Preprocessor pp;
     CompilationUnit unit;
     Module* module = unit.current_module();
     Section* section = module->current_section();
     OpcodesParser parser(&unit);
 
-    module->add_label_symbol("loop", Location("jr_loop.asm", 1), 0); 
+    module->add_label_symbol("loop", Location("jr_loop.asm", 1), 0);
     pp.push_virtual_file("jr loop\n", "jr_loop.asm", 1, true);
 
     TokenLine line;
@@ -2286,7 +2286,7 @@ TEST_CASE("OpcodesParser: label + jr loop emits label placeholder and jr with Jr
 }
 
 TEST_CASE("OpcodesParser: label + jre loop on r4k emits label placeholder and jre with JreOffset patch",
-    "[opcodes][label][jre][r4k][patch][symbol]") {
+          "[opcodes][label][jre][r4k][patch][symbol]") {
     g_options = Options();
     g_options.cpu_id = CPU::r4k;
 
@@ -2334,7 +2334,7 @@ TEST_CASE("OpcodesParser: label + jre loop on r4k emits label placeholder and jr
 }
 
 TEST_CASE("OpcodesParser: 'bit N, (ix+4)' parses to correct opcode and displacement patch for N=1..7",
-    "[opcodes][bit][ix][positive-offset][patch]") {
+          "[opcodes][bit][ix][positive-offset][patch]") {
     for (int n = 1; n <= 7; ++n) {
         CAPTURE(n);
         Preprocessor pp;
@@ -2363,7 +2363,7 @@ TEST_CASE("OpcodesParser: 'bit N, (ix+4)' parses to correct opcode and displacem
 }
 
 TEST_CASE("OpcodesParser: 'bit N, (ix-4)' parses to correct opcode and displacement patch for N=1..7",
-    "[opcodes][bit][ix][negative-offset][patch]") {
+          "[opcodes][bit][ix][negative-offset][patch]") {
     for (int n = 1; n <= 7; ++n) {
         CAPTURE(n);
         Preprocessor pp;
@@ -2392,7 +2392,7 @@ TEST_CASE("OpcodesParser: 'bit N, (ix-4)' parses to correct opcode and displacem
 }
 
 TEST_CASE("OpcodesParser: 'bit N, (ix)' parses to correct opcode with no displacement patch for N=1..7",
-    "[opcodes][bit][ix][no-patch]") {
+          "[opcodes][bit][ix][no-patch]") {
     for (int n = 1; n <= 7; ++n) {
         CAPTURE(n);
         Preprocessor pp;
@@ -2417,7 +2417,7 @@ TEST_CASE("OpcodesParser: 'bit N, (ix)' parses to correct opcode with no displac
 }
 
 TEST_CASE("OpcodesParser: 'rl N, bcde' on r4k assembles to single opcode with no patches for N={1,2,4}",
-    "[opcodes][rl][bcde][r4k][no-patch]") {
+          "[opcodes][rl][bcde][r4k][no-patch]") {
     const int Ns[] = { 1, 2, 4 };
     for (int n : Ns) {
         CAPTURE(n);
@@ -2442,7 +2442,7 @@ TEST_CASE("OpcodesParser: 'rl N, bcde' on r4k assembles to single opcode with no
         REQUIRE(section->opcodes().size() == 2);
         auto* op = section->opcodes()[1].get();
         REQUIRE(op->bytes() ==
-            std::vector<uint8_t>({ 0xDD, static_cast<uint8_t>(104 + n - 1) }));
+                std::vector<uint8_t>({ 0xDD, static_cast<uint8_t>(104 + n - 1) }));
         REQUIRE(op->patches().empty());
     }
     g_options = Options();
