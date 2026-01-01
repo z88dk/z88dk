@@ -2144,7 +2144,7 @@ TEST_CASE("OpcodesParser: 'bool hl' on 8080 expands to expected 7-opcode sequenc
 }
 
 TEST_CASE("OpcodesParser: 'push 0x1234' on z80n assembles to CALL-like opcode with WordBigEndian patch",
-    "[opcodes][push][z80n][patch][wordbigendian]") {
+          "[opcodes][push][z80n][patch][wordbigendian]") {
     g_options = Options();
     g_options.cpu_id = CPU::z80n;
 
@@ -2180,3 +2180,270 @@ TEST_CASE("OpcodesParser: 'push 0x1234' on z80n assembles to CALL-like opcode wi
     g_options = Options();
 }
 
+TEST_CASE("OpcodesParser: 'ldh a, (0xFF25)' on gbz80 emits HighOffset patch with 0xFF25",
+          "[opcodes][gbz80][ldh][highoffset]") {
+    g_options = Options();
+    g_options.cpu_id = CPU::gbz80;
+
+    Preprocessor pp;
+    CompilationUnit unit;
+    Section* section = unit.current_module()->current_section();
+    OpcodesParser parser(&unit);
+
+    pp.push_virtual_file("ldh a, (0xFF25)\n", "ldh_a_ff25_gbz80.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // placeholder + instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+    REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xF0, 0x00 }));
+    REQUIRE(op->patches().size() == 1);
+
+    const auto& patch = op->patches()[0];
+    REQUIRE(patch.range() == PatchRange::HighOffset);
+    REQUIRE(patch.offset() == 1);
+    REQUIRE(patch.expression().evaluate() == 0xFF25);
+
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'ldh a, (0x25)' on gbz80 emits HighOffset patch with 0x25",
+          "[opcodes][gbz80][ldh][highoffset][short]") {
+    g_options = Options();
+    g_options.cpu_id = CPU::gbz80;
+
+    Preprocessor pp;
+    CompilationUnit unit;
+    Section* section = unit.current_module()->current_section();
+    OpcodesParser parser(&unit);
+
+    pp.push_virtual_file("ldh a, (0x25)\n", "ldh_a_25_gbz80.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // placeholder + instruction
+    REQUIRE(section->opcodes().size() == 2);
+    auto* op = section->opcodes()[1].get();
+    REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xF0, 0x00 }));
+    REQUIRE(op->patches().size() == 1);
+
+    const auto& patch = op->patches()[0];
+    REQUIRE(patch.range() == PatchRange::HighOffset);
+    REQUIRE(patch.offset() == 1);
+    REQUIRE(patch.expression().evaluate() == 0x25);
+
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: label + jr loop emits label placeholder and jr with JrOffset patch",
+    "[opcodes][label][jr][patch][symbol]") {
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    module->add_label_symbol("loop", Location("jr_loop.asm", 1), 0); 
+    pp.push_virtual_file("jr loop\n", "jr_loop.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // Expect: global placeholder + label placeholder + jr opcode
+    REQUIRE(section->opcodes().size() == 3);
+
+    // [0] global placeholder
+    REQUIRE(section->opcodes()[0]->size() == 0);
+
+    // [1] label placeholder for 'loop'
+    auto* op_label = section->opcodes()[1].get();
+    REQUIRE(op_label->size() == 0);
+    REQUIRE(op_label->patches().size() == 0);
+
+    // [2] jr opcode
+    auto* op_jr = section->opcodes()[2].get();
+    REQUIRE(op_jr->bytes() == std::vector<uint8_t>({ 0x18, 0x00 }));
+    REQUIRE(op_jr->patches().size() == 1);
+    const auto& patch = op_jr->patches()[0];
+    REQUIRE(patch.range() == PatchRange::JrOffset);
+    REQUIRE(patch.offset() == 1);
+    REQUIRE(patch.expression().to_string() == "loop");
+
+    // Symbol 'loop' must point to the label opcode
+    Symbol* loop_sym = module->get_symbol("loop");
+    REQUIRE(loop_sym != nullptr);
+    REQUIRE(loop_sym->is_address_relative());
+    REQUIRE(loop_sym->opcode() == op_label);
+}
+
+TEST_CASE("OpcodesParser: label + jre loop on r4k emits label placeholder and jre with JreOffset patch",
+    "[opcodes][label][jre][r4k][patch][symbol]") {
+    g_options = Options();
+    g_options.cpu_id = CPU::r4k;
+
+    Preprocessor pp;
+    CompilationUnit unit;
+    Module* module = unit.current_module();
+    Section* section = module->current_section();
+    OpcodesParser parser(&unit);
+
+    module->add_label_symbol("loop", Location("jre_loop_r4k.asm", 1), 0);
+    pp.push_virtual_file("jre loop\n", "jre_loop_r4k.asm", 1, true);
+
+    TokenLine line;
+    while (pp.next_line(line)) {
+        REQUIRE(parser.parse(line));
+    }
+
+    // Expect: global placeholder + label placeholder + jre opcode
+    REQUIRE(section->opcodes().size() == 3);
+
+    // [0] global placeholder
+    REQUIRE(section->opcodes()[0]->size() == 0);
+
+    // [1] label placeholder for 'loop'
+    auto* op_label = section->opcodes()[1].get();
+    REQUIRE(op_label->size() == 0);
+    REQUIRE(op_label->patches().size() == 0);
+
+    // [2] jre opcode
+    auto* op_jre = section->opcodes()[2].get();
+    REQUIRE(op_jre->bytes() == std::vector<uint8_t>({ 0x98, 0x00, 0x00 }));
+    REQUIRE(op_jre->patches().size() == 1);
+    const auto& patch = op_jre->patches()[0];
+    REQUIRE(patch.range() == PatchRange::JreOffset);
+    REQUIRE(patch.offset() == 1);
+    REQUIRE(patch.expression().to_string() == "loop");
+
+    // Symbol 'loop' must point to the label opcode
+    Symbol* loop_sym = module->get_symbol("loop");
+    REQUIRE(loop_sym != nullptr);
+    REQUIRE(loop_sym->is_address_relative());
+    REQUIRE(loop_sym->opcode() == op_label);
+
+    g_options = Options();
+}
+
+TEST_CASE("OpcodesParser: 'bit N, (ix+4)' parses to correct opcode and displacement patch for N=1..7",
+    "[opcodes][bit][ix][positive-offset][patch]") {
+    for (int n = 1; n <= 7; ++n) {
+        CAPTURE(n);
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "bit " << n << ", (ix+4)\n";
+        pp.push_virtual_file(asm_src.str(), "bit_ix_plus4.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xDD, 0xCB, 0x00, static_cast<uint8_t>(0x46 + 8 * n) }));
+        REQUIRE(op->patches().size() == 1);
+        const auto& patch = op->patches()[0];
+        REQUIRE(patch.range() == PatchRange::ByteSigned);
+        REQUIRE(patch.offset() == 2);
+        REQUIRE(patch.expression().evaluate() == 4);
+    }
+}
+
+TEST_CASE("OpcodesParser: 'bit N, (ix-4)' parses to correct opcode and displacement patch for N=1..7",
+    "[opcodes][bit][ix][negative-offset][patch]") {
+    for (int n = 1; n <= 7; ++n) {
+        CAPTURE(n);
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "bit " << n << ", (ix-4)\n";
+        pp.push_virtual_file(asm_src.str(), "bit_ix_minus4.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xDD, 0xCB, 0x00, static_cast<uint8_t>(0x46 + 8 * n) }));
+        REQUIRE(op->patches().size() == 1);
+        const auto& patch = op->patches()[0];
+        REQUIRE(patch.range() == PatchRange::ByteSigned);
+        REQUIRE(patch.offset() == 2);
+        REQUIRE(patch.expression().evaluate() == -4);
+    }
+}
+
+TEST_CASE("OpcodesParser: 'bit N, (ix)' parses to correct opcode with no displacement patch for N=1..7",
+    "[opcodes][bit][ix][no-patch]") {
+    for (int n = 1; n <= 7; ++n) {
+        CAPTURE(n);
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "bit " << n << ", (ix)\n";
+        pp.push_virtual_file(asm_src.str(), "bit_ix_nopatch.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() == std::vector<uint8_t>({ 0xDD, 0xCB, 0x00, static_cast<uint8_t>(0x46 + 8 * n) }));
+        REQUIRE(op->patches().size() == 0);
+    }
+}
+
+TEST_CASE("OpcodesParser: 'rl N, bcde' on r4k assembles to single opcode with no patches for N={1,2,4}",
+    "[opcodes][rl][bcde][r4k][no-patch]") {
+    const int Ns[] = { 1, 2, 4 };
+    for (int n : Ns) {
+        CAPTURE(n);
+        g_options = Options();
+        g_options.cpu_id = CPU::r4k;
+
+        Preprocessor pp;
+        CompilationUnit unit;
+        Section* section = unit.current_module()->current_section();
+        OpcodesParser parser(&unit);
+
+        std::ostringstream asm_src;
+        asm_src << "rl " << n << ", bcde\n";
+        pp.push_virtual_file(asm_src.str(), "rl_bcde_r4k.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        // placeholder + instruction
+        REQUIRE(section->opcodes().size() == 2);
+        auto* op = section->opcodes()[1].get();
+        REQUIRE(op->bytes() ==
+            std::vector<uint8_t>({ 0xDD, static_cast<uint8_t>(104 + n - 1) }));
+        REQUIRE(op->patches().empty());
+    }
+    g_options = Options();
+}
