@@ -60,17 +60,19 @@ jobs:
     - name: Install Perl toolchain (Windows)
       shell: cmd
       run: |
-        set PATH=
-        set PATH=C:\msys64\mingw64\bin;C:\Windows\System32
+        :: Use the actual MSYS2 install path
+        set MSYS2_ROOT=D:\a\_temp\msys64
+        set PATH=%MSYS2_ROOT%\mingw64\bin;C:\Windows\System32
         set LANG=C
         set LC_ALL=C
+        perl -v   :: should now work
+        perl -V:archname
+        where perl
         perl -S cpan local::lib
         for /f "delims=" %%i in ('perl -Mlocal::lib') do set "%%i"
         perl -S cpan App::cpanminus
         perl -S cpanm inc::latest Software::License
         perl -S cpan -f Module::Build
-        perl -V:archname
-        where perl
         
     - name: Install Perl toolchain (msys)
       run: |
