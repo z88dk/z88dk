@@ -40,6 +40,12 @@ private:
     void process_DW();
     void process_WORD();
 
+    // 2-byte lists in big-endian order
+    void process_DEFW_BE();
+    void process_DW_BE();
+    void process_DEFDB();
+    void process_DDB();
+
     // 3-byte lists
     void process_DEFP();
     void process_DP();
