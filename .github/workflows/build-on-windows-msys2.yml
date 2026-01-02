@@ -72,8 +72,8 @@ jobs:
         where perl
         
         echo === Bootstrap cpanm ===
-        curl -L https://cpanmin.us -o cpanm
-        perl cpanm --self-upgrade
+        curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o cpanm
+        perl cpanm --version
         
         echo === Install pure library modules only ===
         :: (We will add modules later — for now this is empty)
