@@ -35,29 +35,28 @@ jobs:
           ~/perl5
         key: ${{ runner.os }}-cache3
       # ---------------------------------------------------------
-      # 1. Install MSYS2 + MinGW Perl
+      # Install MSYS2 + MinGW Perl
       # ---------------------------------------------------------
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
         update: true
         install: >
-          mingw-w64-x86_64-perl
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-make
-          mingw-w64-x86_64-pkg-config
-          git
-
-#          mingw64/mingw-w64-x86_64-boost
-#          mingw64/mingw-w64-x86_64-expat
-#          mingw64/mingw-w64-x86_64-gmp
-#          mingw64/mingw-w64-x86_64-libxml2
-#          mingw64/mingw-w64-x86_64-ragel
-#          re2c
-#          vim
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-perl
+            mingw-w64-x86_64-pkg-config
+            mingw64/mingw-w64-x86_64-boost
+            mingw64/mingw-w64-x86_64-expat
+            mingw64/mingw-w64-x86_64-gmp
+            mingw64/mingw-w64-x86_64-libxml2
+            mingw64/mingw-w64-x86_64-ragel
+            re2c
+            vim
           
       # ---------------------------------------------------------
-      # 2. Windows step — install ONLY pure library modules
+      # Windows step - install ONLY pure library modules
       # ---------------------------------------------------------
     - name: Install Perl toolchain (Windows / MinGW Perl)
       shell: cmd
@@ -95,59 +94,28 @@ jobs:
             Text::Table ^
             YAML::Tiny
 
-        
-#        :: modules that require pl2bat fail installation, use The Force
-#        perl cpanm --force    LWP::UserAgent
-#        
-#        :: all modules needed
-#        perl cpanm                 
-#            Archive::Zip
-#            LWP::UserAgent 
-#            Spreadsheet::ParseXLSX
-#            CPU::Z80::Assembler
-
       # ---------------------------------------------------------
-      # 3. MSYS2 step — ensure MinGW Perl is used
-      # ---------------------------------------------------------
-    - name: Verify MinGW Perl in MSYS2
-      shell: msys2 {0}
-      run: |
-        echo === MSYS2 environment ===
-        export PATH=/mingw64/bin:/usr/bin:/bin
-        hash -r
-        
-        echo Using perl:
-        which perl
-        perl -V:archname
-        perl -le 'print for @INC'
-        
-      # ---------------------------------------------------------
-      # 4. MSYS2 step — install script-based modules using MSYS Perl
+      # MSYS2 step - install script-based modules using MSYS Perl
       # ---------------------------------------------------------
     - name: Install script-based modules (MSYS2 Perl)
       shell: msys2 {0}
       run: |
         echo === Installing script-based modules under MSYS2 Perl ===
+        
+        # Use MSYS2 Perl for script installation
         export PATH=/usr/bin:/bin:/mingw64/bin
         hash -r
         
         echo Using perl:
         which perl
+        perl -V:archname
         
-        # (We will add modules later — for now this is empty)
-        echo No script modules installed in this intermediary step.
-        
-#    - name: Install Perl toolchain (msys)
-#      run: |
-#        export PATH=/mingw64/bin:$PATH
-#        hash -r
-#        which perl
-#        perl -V:archname
-#        perl -V:@INC
-#        
-#        :: check that we are using the same Perl installed in the Windows section
-#        perl -MModule::Build -MCPU::Z80::Assembler -e 1
-         
+        echo === Installing LWP and related modules ===
+        cpanm \
+          Archive::Zip \
+          CPU::Z80::Assembler \
+          Spreadsheet::ParseXLSX
+
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:$PATH
