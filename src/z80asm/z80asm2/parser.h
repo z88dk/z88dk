@@ -28,11 +28,15 @@ private:
 
     void process_directive(Keyword keyword);
 
-    void process_DB();
     void process_DEFB();
-    void process_DM();
+    void process_DB();
     void process_DEFM();
+    void process_DM();
     void process_BYTE();
+
+    void process_DEFW();
+    void process_DW();
+    void process_WORD();
 
     void process_define_list(int element_size, PatchRange range);
     void parse_expr_list();
