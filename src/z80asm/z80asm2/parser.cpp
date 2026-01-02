@@ -140,6 +140,18 @@ void Parser::process_PTR() {
     process_define_list(3, PatchRange::Ptr24);
 }
 
+void Parser::process_DEFQ() {
+    process_define_list(4, PatchRange::Dword);
+}
+
+void Parser::process_DQ() {
+    process_define_list(4, PatchRange::Dword);
+}
+
+void Parser::process_DWORD() {
+    process_define_list(4, PatchRange::Dword);
+}
+
 void Parser::process_define_list(int element_size, PatchRange range) {
     // Parse expressions following the directive
     parse_expr_list();
