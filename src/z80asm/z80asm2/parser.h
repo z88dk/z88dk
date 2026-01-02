@@ -7,6 +7,7 @@
 #pragma once
 
 #include "expr.h"
+#include "section.h"
 #include <deque>
 #include <string>
 
@@ -25,5 +26,19 @@ private:
     size_t i_ = 0; // point into line tokens
     std::deque<Expression> exprs_;
 
+    void process_directive(Keyword keyword);
+
+    void process_DB();
+    void process_DEFB();
+    void process_DM();
+    void process_DEFM();
+    void process_BYTE();
+
+    void process_define_list(int element_size, PatchRange range);
+    void parse_expr_list();
     void expect_end();
+
+    // tables of actions for directives
+    using Action = void (Parser::*)();
+    static const Action asm_directive_actions[];
 };
