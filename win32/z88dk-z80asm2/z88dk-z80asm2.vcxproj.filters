@@ -262,12 +262,6 @@
     <None Include="..\..\src\z80asm\z80asm2\cpu.def">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\src\z80asm\z80asm2\opcodes_tables.def">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\src\z80asm\z80asm2\cpu\Keywords.pm">
-      <Filter>Resource Files\t</Filter>
-    </None>
     <None Include="..\..\src\z80asm\z80asm2\cpu\CPUs.pm">
       <Filter>Resource Files\cpu</Filter>
     </None>
@@ -288,6 +282,48 @@
     </None>
     <None Include="..\..\src\z80asm\z80asm2\cpu\CsrBuilder.pm">
       <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu\Keywords.pm">
+      <Filter>Resource Files\cpu</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_asm_directive.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_conditional_directive.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_flag.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_hla_directive.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_opcode.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_preproc_directive.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_preproc_name_directive.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_register.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_segment_register.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\opcodes_tables.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_8bit_register.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_directive_has_file_arg.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\keywords_x_register.inc">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
 </Project>

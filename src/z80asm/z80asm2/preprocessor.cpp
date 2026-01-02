@@ -20,6 +20,43 @@
 #include <sys/stat.h>
 #include <unordered_set>
 
+//-----------------------------------------------------------------------------
+// action tables
+//-----------------------------------------------------------------------------
+
+// Dispatch on the literal 0/1 in the generated inc file.
+// 0 -> emit nullptr
+// 1 -> emit &Preprocessor::handle_<id>
+#define X(f, id)    X_##f(id)
+#define X_0(id)     nullptr,
+#define X_1(id)     &Preprocessor::process_##id,
+
+const Preprocessor::Action Preprocessor::preproc_directive_actions[] = {
+#include "keywords_preproc_directive.inc"
+};
+
+#undef X
+#undef X_0
+#undef X_1
+
+// Dispatch on the literal 0/1 in the generated inc file.
+// 0 -> emit nullptr
+// 1 -> emit &Preprocessor::handle_<id>
+#define X(f, id)    X_##f(id)
+#define X_0(id)     nullptr,
+#define X_1(id)     &Preprocessor::process_name_##id,
+
+const Preprocessor::ActionName Preprocessor::preproc_name_directive_actions[] = {
+#include "keywords_preproc_name_directive.inc"
+};
+
+#undef X
+#undef X_0
+#undef X_1
+
+//-----------------------------------------------------------------------------
+// class implementation
+//-----------------------------------------------------------------------------
 Preprocessor::Preprocessor()
     : hla_context_(this) {
 }
@@ -548,7 +585,7 @@ bool Preprocessor::handle_directives_for_line(TokenLine& line, bool reading_from
 
         // Conditional directives always execute
         if (keyword_is_conditional_directive(keyword)) {
-            process_contitional_directive(line, i, keyword);
+            process_directive(line, i, keyword);
             return true;
         }
     }
@@ -638,7 +675,7 @@ bool Preprocessor::is_directive(const TokenLine& line, size_t& i, Keyword& keywo
 
     // check for directive keywords
     if (parse_keyword(line, i, keyword)) {
-        if (keyword_is_directive(keyword)) {
+        if (keyword_is_preproc_directive(keyword)) {
             return true;
         }
     }
@@ -667,7 +704,7 @@ bool Preprocessor::is_name_directive(const TokenLine& line, size_t& i, Keyword& 
 
     // check for directive keywords
     if (parse_keyword(line, i, keyword) &&
-            keyword_is_name_directive(keyword)) {
+            keyword_is_preproc_name_directive(keyword)) {
         return true;
     }
 
@@ -675,130 +712,26 @@ bool Preprocessor::is_name_directive(const TokenLine& line, size_t& i, Keyword& 
     return false;
 }
 
-void Preprocessor::process_directive(const TokenLine& line, size_t& i, Keyword keyword) {
-    switch (keyword) {
-    case Keyword::INCLUDE:
-        process_INCLUDE(line, i);
-        break;
-    case Keyword::BINARY:
-    case Keyword::INCBIN:
-        process_BINARY(line, i);
-        break;
-    case Keyword::LINE:
-        process_LINE(line, i);
-        break;
-    case Keyword::C_LINE:
-        process_C_LINE(line, i);
-        break;
-    case Keyword::DEFINE:
-        process_DEFINE(line, i);
-        break;
-    case Keyword::UNDEF:
-    case Keyword::UNDEFINE:
-        process_UNDEF(line, i);
-        break;
-    case Keyword::DEFL:
-        process_DEFL(line, i);
-        break;
-    case Keyword::MACRO:
-        process_MACRO(line, i);
-        break;
-    case Keyword::LOCAL:
-        process_LOCAL(line, i);
-        break;
-    case Keyword::EXITM:
-        process_EXITM(line, i);
-        break;
-    case Keyword::REPT:
-        process_REPT(line, i);
-        break;
-    case Keyword::REPTC:
-        process_REPTC(line, i);
-        break;
-    case Keyword::REPTI:
-        process_REPTI(line, i);
-        break;
-    case Keyword::EQU:
-        process_EQU(line, i);
-        break;
-    case Keyword::PRAGMA:
-        process_PRAGMA(line, i);
-        break;
-    case Keyword::ENDM:
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       "Unexpected ENDM directive without matching MACRO");
-        break;
-    case Keyword::ENDR:
-        g_errors.error(ErrorCode::InvalidSyntax,
-                       "Unexpected ENDR directive without matching REPT");
-        break;
-    default:
+void Preprocessor::process_directive(const TokenLine& line, size_t& i,
+                                     Keyword keyword) {
+    size_t idx = static_cast<size_t>(keyword);
+    Action action = preproc_directive_actions[idx];
+    if (action) {
+        (this->*action)(line, i);
+    }
+    else {
         assert(0);
     }
 }
 
-void Preprocessor::process_name_directive(const TokenLine& line, size_t& i, Keyword keyword, const std::string& name) {
-    // Handle directives of the form: <name> <directive> ...
-    switch (keyword) {
-    case Keyword::DEFINE:
-        process_name_DEFINE(line, i, name);
-        break;
-    case Keyword::UNDEF:
-    case Keyword::UNDEFINE:
-        process_name_UNDEF(line, i, name);
-        break;
-    case Keyword::DEFL:
-        process_name_DEFL(line, i, name);
-        break;
-    case Keyword::MACRO:
-        process_name_MACRO(line, i, name);
-        break;
-    case Keyword::REPTC:
-        process_name_REPTC(line, i, name);
-        break;
-    case Keyword::REPTI:
-        process_name_REPTI(line, i, name);
-        break;
-    case Keyword::EQU:
-    case Keyword::DEFC:
-        process_name_EQU(line, i, name);
-        break;
-    default:
-        assert(0);
+void Preprocessor::process_name_directive(const TokenLine& line, size_t& i,
+        Keyword keyword, const std::string& name) {
+    size_t idx = static_cast<size_t>(keyword);
+    ActionName action = preproc_name_directive_actions[idx];
+    if (action) {
+        (this->*action)(line, i, name);
     }
-}
-
-void Preprocessor::process_contitional_directive(const TokenLine& line,
-        size_t& i, Keyword keyword) {
-    switch (keyword) {
-    case Keyword::IF:
-        process_IF(line, i);
-        break;
-    case Keyword::IFDEF:
-        process_IFDEF(line, i, false);
-        break;
-    case Keyword::IFNDEF:
-        process_IFDEF(line, i, true);
-        break;
-    case Keyword::ELIF:
-    case Keyword::ELSEIF:
-        process_ELIF(line, i);
-        break;
-    case Keyword::ELIFDEF:
-    case Keyword::ELSEIFDEF:
-        process_ELIFDEF(line, i, false);
-        break;
-    case Keyword::ELIFNDEF:
-    case Keyword::ELSEIFNDEF:
-        process_ELIFDEF(line, i, true);
-        break;
-    case Keyword::ELSE:
-        process_ELSE(line, i);
-        break;
-    case Keyword::ENDIF:
-        process_ENDIF(line, i);
-        break;
-    default:
+    else {
         assert(0);
     }
 }
@@ -930,6 +863,10 @@ void Preprocessor::process_BINARY(const TokenLine& line, size_t& i) {
     // Use the directive's own logical location (already accounts for LINE/C_LINE)
     const Location& location = line.location();
     do_BINARY(filename, is_angle, location);
+}
+
+void Preprocessor::process_INCBIN(const TokenLine& line, size_t& i) {
+    process_BINARY(line, i);
 }
 
 void Preprocessor::do_BINARY(const std::string& filename, bool is_angle,
@@ -1167,6 +1104,11 @@ void Preprocessor::process_name_EQU(const TokenLine& line, size_t& i,
     do_EQU(line, i, name);
 }
 
+void Preprocessor::process_name_DEFC(const TokenLine& line, size_t& i,
+                                     const std::string& name) {
+    process_name_EQU(line, i, name);
+}
+
 void Preprocessor::do_EQU(const TokenLine& line, size_t& i, const std::string& name) {
     // expand macros in value
     TokenLine expanded = macros_.expand_flat(line, i);
@@ -1196,11 +1138,20 @@ void Preprocessor::process_UNDEF(const TokenLine& line, size_t& i) {
     do_UNDEF(name, line, i);
 }
 
+void Preprocessor::process_UNDEFINE(const TokenLine& line, size_t& i) {
+    process_UNDEF(line, i);
+}
+
 void Preprocessor::process_name_UNDEF(const TokenLine& line, size_t& i,
                                       const std::string& name) {
     // In the "<name> UNDEF" form the identifier to remove is provided as `name`.
     // Delegate the remainder to the shared do_UNDEF helper.
     do_UNDEF(name, line, i);
+}
+
+void Preprocessor::process_name_UNDEFINE(const TokenLine& line, size_t& i,
+        const std::string& name) {
+    process_name_UNDEF(line, i, name);
 }
 
 void Preprocessor::do_UNDEF(const std::string& name, const TokenLine& line,
@@ -1301,6 +1252,11 @@ void Preprocessor::process_MACRO(const TokenLine& line, size_t& i) {
     }
 }
 
+void Preprocessor::process_ENDM(const TokenLine&, size_t&) {
+    g_errors.error(ErrorCode::InvalidSyntax,
+                   "Unexpected ENDM directive without matching MACRO");
+}
+
 void Preprocessor::process_name_MACRO(const TokenLine& line,
                                       size_t& i, const std::string& name) {
     // Form: <name> MACRO (param, ...) or <name> MACRO param, ...
@@ -1357,6 +1313,11 @@ void Preprocessor::process_REPT(const TokenLine& line, size_t& i) {
     if (ok && count > 0 && rbc.expand(line.location(), expanded)) {
         push_virtual_file(expanded);
     }
+}
+
+void Preprocessor::process_ENDR(const TokenLine&, size_t&) {
+    g_errors.error(ErrorCode::InvalidSyntax,
+                   "Unexpected ENDR directive without matching REPT");
 }
 
 // REPTC: directive form "REPTC var, string"
@@ -1565,6 +1526,10 @@ void Preprocessor::process_ELIF(const TokenLine& line, size_t& i) {
     }
 }
 
+void Preprocessor::process_ELSEIF(const TokenLine& line, size_t& i) {
+    process_ELIF(line, i);
+}
+
 void Preprocessor::process_ELSE(const TokenLine& line, size_t& i) {
     if (if_stack_.empty()) {
         g_errors.error(ErrorCode::InvalidSyntax,
@@ -1610,8 +1575,16 @@ bool Preprocessor::eval_if_expr(const TokenLine& line, size_t& i, Keyword keywor
     }
 }
 
-void Preprocessor::process_IFDEF(const TokenLine& line, size_t& i,
-                                 bool negated) {
+void Preprocessor::process_IFDEF(const TokenLine& line, size_t& i) {
+    process_ifdef_ifndef(line, i, false);
+}
+
+void Preprocessor::process_IFNDEF(const TokenLine& line, size_t& i) {
+    process_ifdef_ifndef(line, i, true);
+}
+
+void Preprocessor::process_ifdef_ifndef(const TokenLine& line, size_t& i,
+                                        bool negated) {
     bool cond = eval_ifdef_name(line, i, negated, Keyword::IFDEF);
 
     IfFrame fr;
@@ -1622,8 +1595,24 @@ void Preprocessor::process_IFDEF(const TokenLine& line, size_t& i,
     if_stack_.push_back(fr);
 }
 
-void Preprocessor::process_ELIFDEF(const TokenLine& line, size_t& i,
-                                   bool negated) {
+void Preprocessor::process_ELIFDEF(const TokenLine& line, size_t& i) {
+    process_elifdef_elifndef(line, i, false);
+}
+
+void Preprocessor::process_ELSEIFDEF(const TokenLine& line, size_t& i) {
+    process_elifdef_elifndef(line, i, false);
+}
+
+void Preprocessor::process_ELIFNDEF(const TokenLine& line, size_t& i) {
+    process_elifdef_elifndef(line, i, true);
+}
+
+void Preprocessor::process_ELSEIFNDEF(const TokenLine& line, size_t& i) {
+    process_elifdef_elifndef(line, i, true);
+}
+
+void Preprocessor::process_elifdef_elifndef(const TokenLine& line, size_t& i,
+        bool negated) {
     if (if_stack_.empty()) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        "Unexpected ELIFDEF directive without matching IF");

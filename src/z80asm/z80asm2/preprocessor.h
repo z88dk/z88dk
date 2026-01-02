@@ -177,7 +177,6 @@ private:
     bool is_name_directive(const TokenLine& line, size_t& i, Keyword& keyword, std::string& name) const;
     void process_directive(const TokenLine& line, size_t& i, Keyword keyword);
     void process_name_directive(const TokenLine& line, size_t& i, Keyword keyword, const std::string& name);
-    void process_contitional_directive(const TokenLine& line, size_t& i, Keyword keyword);
     void expect_end(const TokenLine& line, size_t i) const;
     bool parse_identifier(const TokenLine& line, size_t& i, std::string& out_name) const;
     bool parse_keyword(const TokenLine& line, size_t& i, Keyword& out_keyword) const;
@@ -192,6 +191,7 @@ private:
 
     // BINARY / INCBIN
     void process_BINARY(const TokenLine& line, size_t& i);
+    void process_INCBIN(const TokenLine& line, size_t& i);
     void do_BINARY(const std::string& filename, bool is_angle,
                    const Location& location);
 
@@ -210,12 +210,19 @@ private:
 
     // EQU / name EQU (includes DEFC synonym)
     void process_EQU(const TokenLine& line, size_t& i);
-    void process_name_EQU(const TokenLine& line, size_t& i, const std::string& name);
+    void process_name_EQU(const TokenLine& line, size_t& i,
+                          const std::string& name);
+    void process_name_DEFC(const TokenLine& line, size_t& i,
+                           const std::string& name);
     void do_EQU(const TokenLine& line, size_t& i, const std::string& name);
 
     // UNDEF / UNDEFINE
     void process_UNDEF(const TokenLine& line, size_t& i);
-    void process_name_UNDEF(const TokenLine& line, size_t& i, const std::string& name);
+    void process_UNDEFINE(const TokenLine& line, size_t& i);
+    void process_name_UNDEF(const TokenLine& line, size_t& i,
+                            const std::string& name);
+    void process_name_UNDEFINE(const TokenLine& line, size_t& i,
+                               const std::string& name);
     void do_UNDEF(const std::string& name, const TokenLine& line, size_t& i);
 
     // DEFL
@@ -225,11 +232,13 @@ private:
 
     // MACRO
     void process_MACRO(const TokenLine& line, size_t& i);
+    void process_ENDM(const TokenLine& line, size_t& i);
     void process_name_MACRO(const TokenLine& line, size_t& i, const std::string& name);
     void do_MACRO(const TokenLine& line, size_t& i, const std::string& name);
 
     // REPT / REPTC / REPTI
     void process_REPT(const TokenLine& line, size_t& i);
+    void process_ENDR(const TokenLine& line, size_t& i);
     void process_REPTC(const TokenLine& line, size_t& i);
     void process_name_REPTC(const TokenLine& line, size_t& i, const std::string& var_name);
     void do_REPTC(bool ok, const std::string& var_name, const TokenLine& line, size_t& i);
@@ -243,13 +252,20 @@ private:
     // IF / ELIF / ELSE / ENDIF
     void process_IF(const TokenLine& line, size_t& i);
     void process_ELIF(const TokenLine& line, size_t& i);
+    void process_ELSEIF(const TokenLine& line, size_t& i);
     void process_ELSE(const TokenLine& line, size_t& i);
     void process_ENDIF(const TokenLine& line, size_t& i);
     bool eval_if_expr(const TokenLine& line, size_t& i, Keyword keyword);
 
     // IFDEF / IFNDEF / ELIFDEF / ELIFNDEF
-    void process_IFDEF(const TokenLine& line, size_t& i, bool negated);
-    void process_ELIFDEF(const TokenLine& line, size_t& i, bool negated);
+    void process_IFDEF(const TokenLine& line, size_t& i);
+    void process_IFNDEF(const TokenLine& line, size_t& i);
+    void process_ifdef_ifndef(const TokenLine& line, size_t& i, bool negated);
+    void process_ELIFDEF(const TokenLine& line, size_t& i);
+    void process_ELSEIFDEF(const TokenLine& line, size_t& i);
+    void process_ELIFNDEF(const TokenLine& line, size_t& i);
+    void process_ELSEIFNDEF(const TokenLine& line, size_t& i);
+    void process_elifdef_elifndef(const TokenLine& line, size_t& i, bool negated);
     bool eval_ifdef_name(const TokenLine& line, size_t& i, bool negated, Keyword keyword);
 
     // EXITM
@@ -269,6 +285,14 @@ public:
     Module* pp_module();    // only public for unit tests
     Section* pp_current_section();
 private:
+
+    // tables of actions for directives
+    using Action = void (Preprocessor::*)(const TokenLine& line, size_t& i);
+    using ActionName = void (Preprocessor::*)(
+                           const TokenLine& line, size_t& i, const std::string& name);
+
+    static const Action preproc_directive_actions[];
+    static const ActionName preproc_name_directive_actions[];
 };
 
 // called when command line -E is given

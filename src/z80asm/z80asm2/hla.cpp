@@ -11,6 +11,30 @@
 #include "keywords.h"
 #include "macros.h"
 #include "preprocessor.h"
+#include <cassert>
+
+//-----------------------------------------------------------------------------
+// action tables
+//-----------------------------------------------------------------------------
+
+// Dispatch on the literal 0/1 in the generated inc file.
+// 0 -> emit nullptr
+// 1 -> emit &Preprocessor::handle_<id>
+#define X(f, id)    X_##f(id)
+#define X_0(id)     nullptr,
+#define X_1(id)     &HLA::process_##id,
+
+const HLA::Action HLA::hla_directive_actions[] = {
+#include "keywords_hla_directive.inc"
+};
+
+#undef X
+#undef X_0
+#undef X_1
+
+//-----------------------------------------------------------------------------
+// HLA class
+//-----------------------------------------------------------------------------
 
 static Token kw_tok(Keyword k) {
     return Token(TokenType::Identifier, keyword_to_string(k), k, false);
@@ -52,52 +76,9 @@ bool HLA::next_line(TokenLine& out_line) {
                 toks[0].is(TokenType::Modulo) &&
                 toks[1].is(TokenType::Identifier) &&
                 keyword_is_hla_directive(toks[1].keyword())) {
-
             size_t i = 2;
-            switch (toks[1].keyword()) {
-            case Keyword::IF:
-                process_IF(line, i);
-                continue;
-            case Keyword::ELIF:
-            case Keyword::ELSEIF:
-                process_ELIF(line, i);
-                continue;
-            case Keyword::ELSE:
-                process_ELSE(line, i);
-                continue;
-            case Keyword::ENDIF:
-                process_ENDIF(line, i);
-                continue;
-            case Keyword::WHILE:
-                process_WHILE(line, i);
-                continue;
-            case Keyword::WEND:
-            case Keyword::ENDW:
-            case Keyword::ENDWHILE:
-                process_WEND(line, i);
-                continue;
-            case Keyword::REPEAT:
-                process_REPEAT(line, i);
-                continue;
-            case Keyword::UNTIL:
-                process_UNTIL(line, i);
-                continue;
-            case Keyword::UNTILB:
-                process_UNTILB(line, i);
-                continue;
-            case Keyword::UNTILBC:
-                process_UNTILBC(line, i);
-                continue;
-            case Keyword::BREAK:
-                process_BREAK(line, i);
-                continue;
-            case Keyword::CONTINUE:
-                process_CONTINUE(line, i);
-                continue;
-            default:
-                out_line = std::move(line);
-                return true;
-            }
+            process_directive(toks[1].keyword(), line, i);
+            continue;
         }
 
         // 4) Not a directive; pass the cleaned line through.
@@ -108,6 +89,18 @@ bool HLA::next_line(TokenLine& out_line) {
 
 bool HLA::next_pp_line(TokenLine& out_line) {
     return pp_ && pp_->pp_next_line(out_line);
+}
+
+void HLA::process_directive(Keyword keyword,
+                            const TokenLine& line, size_t& i) {
+    size_t idx = static_cast<size_t>(keyword);
+    Action action = hla_directive_actions[idx];
+    if (action) {
+        (this->*action)(line, i);
+    }
+    else {
+        assert(0);
+    }
 }
 
 void HLA::process_IF(const TokenLine& line, size_t& i) {
@@ -202,6 +195,10 @@ void HLA::process_ELIF(const TokenLine& line, size_t& i) {
         g_errors.error(ErrorCode::InvalidSyntax,
                        std::string("Error parsing %ELIF expression: ") + ex.what());
     }
+}
+
+void HLA::process_ELSEIF(const TokenLine& line, size_t& i) {
+    process_ELIF(line, i);
 }
 
 void HLA::process_ELSE(const TokenLine& line, size_t& i) {
@@ -335,6 +332,14 @@ void HLA::process_WEND(const TokenLine& line, size_t& i) {
     // Place: .end_label
     hla::CodeGen cg(g_unique_id_counter);
     cg.emit_label(blk.end_label, line.location(), out_queue_);
+}
+
+void HLA::process_ENDW(const TokenLine& line, size_t& i) {
+    process_WEND(line, i);
+}
+
+void HLA::process_ENDWHILE(const TokenLine& line, size_t& i) {
+    process_WEND(line, i);
 }
 
 void HLA::process_REPEAT(const TokenLine& line, size_t& i) {
