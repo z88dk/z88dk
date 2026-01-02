@@ -76,14 +76,34 @@ jobs:
         perl cpanm --version
         
         echo === Install pure library modules only ===
-        :: (We will add modules later — for now this is empty)
-        echo No library modules installed in this intermediary step.
+        perl cpanm ^
+            Archive::Zip ^
+            Array::Compare ^
+            CPU::Z80::Assembler ^
+            Capture::Tiny ^
+            Clone ^
+            Data::Dump ^
+            Data::HexDump ^
+            File::Path ^
+            List::Uniq ^
+            Modern::Perl ^
+            Object::Tiny ^
+            Object::Tiny::RW ^
+            Path::Tiny ^
+            Regexp::Common ^
+            Spreadsheet::ParseXLSX ^
+            Test::HexDifferences ^
+            Text::Diff ^
+            Text::Table ^
+            YAML::Tiny
+
         
 #        :: modules that require pl2bat fail installation, use The Force
-#        perl cpanm --force Path::Tiny CPU::Z80::Assembler Archive::Zip LWP::UserAgent
+#        perl cpanm --force    LWP::UserAgent
 #        
 #        :: all modules needed
-#        perl cpanm Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+#        perl cpanm                 
+#            LWP::UserAgent 
 
       # ---------------------------------------------------------
       # 3. MSYS2 step — ensure MinGW Perl is used
@@ -98,7 +118,7 @@ jobs:
         echo Using perl:
         which perl
         perl -V:archname
-        perl -V:@INC
+        perl -le 'print for @INC'
         
       # ---------------------------------------------------------
       # 4. MSYS2 step — install script-based modules using MSYS Perl
