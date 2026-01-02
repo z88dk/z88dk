@@ -76,8 +76,9 @@ jobs:
         perl cpanm --version
         
         echo === Install pure library modules only ===
+        perl cpanm --notest ^
+            Path::Tiny            
         perl cpanm ^
-            Archive::Zip ^
             Array::Compare ^
             CPU::Z80::Assembler ^
             Capture::Tiny ^
@@ -89,9 +90,7 @@ jobs:
             Modern::Perl ^
             Object::Tiny ^
             Object::Tiny::RW ^
-            Path::Tiny ^
             Regexp::Common ^
-            Spreadsheet::ParseXLSX ^
             Test::HexDifferences ^
             Text::Diff ^
             Text::Table ^
@@ -103,7 +102,9 @@ jobs:
 #        
 #        :: all modules needed
 #        perl cpanm                 
+#            Archive::Zip
 #            LWP::UserAgent 
+#            Spreadsheet::ParseXLSX
 
       # ---------------------------------------------------------
       # 3. MSYS2 step — ensure MinGW Perl is used
