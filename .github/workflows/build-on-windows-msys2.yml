@@ -113,7 +113,7 @@ jobs:
         echo Using perl:
         which perl
         
-        :: (We will add modules later — for now this is empty)
+        # (We will add modules later — for now this is empty)
         echo No script modules installed in this intermediary step.
         
 #    - name: Install Perl toolchain (msys)
