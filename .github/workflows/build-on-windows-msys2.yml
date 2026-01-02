@@ -80,7 +80,6 @@ jobs:
             Path::Tiny            
         perl cpanm ^
             Array::Compare ^
-            CPU::Z80::Assembler ^
             Capture::Tiny ^
             Clone ^
             Data::Dump ^
@@ -105,6 +104,7 @@ jobs:
 #            Archive::Zip
 #            LWP::UserAgent 
 #            Spreadsheet::ParseXLSX
+#            CPU::Z80::Assembler
 
       # ---------------------------------------------------------
       # 3. MSYS2 step — ensure MinGW Perl is used
