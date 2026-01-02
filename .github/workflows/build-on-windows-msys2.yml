@@ -27,117 +27,130 @@ jobs:
       shell: cmd
       
     - name: Checkout from git
-      uses: actions/checkout@v4
-      with:
-        submodules: 'true'
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
 
     - name: Cache multiple paths
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/perl5
-        key: ${{ runner.os }}-cache3
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/perl5
+          key: ${{ runner.os }}-cache3
 
-    - name: Setup msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        update: true
-        msystem: MINGW64
-        install: |
-          git
-          mingw64/mingw-w64-x86_64-boost
-          mingw64/mingw-w64-x86_64-expat
-          mingw64/mingw-w64-x86_64-gcc
-          mingw64/mingw-w64-x86_64-gmp
-          mingw64/mingw-w64-x86_64-libxml2
-          mingw64/mingw-w64-x86_64-make
-          mingw64/mingw-w64-x86_64-perl
-          mingw64/mingw-w64-x86_64-pkg-config
-          mingw64/mingw-w64-x86_64-ragel
-          re2c
-          vim
+      # ---------------------------------------------------------
+      # 1. Install MSYS2 + MinGW Perl
+      # ---------------------------------------------------------
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >
+            mingw-w64-x86_64-perl
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-pkg-config
+            git
+
+#          mingw64/mingw-w64-x86_64-boost
+#          mingw64/mingw-w64-x86_64-expat
+#          mingw64/mingw-w64-x86_64-gmp
+#          mingw64/mingw-w64-x86_64-libxml2
+#          mingw64/mingw-w64-x86_64-ragel
+#          re2c
+#          vim
           
-    - name: Install Perl toolchain (Windows)
-      shell: cmd
-      run: |
-        :: Install Only Library Modules Using MinGW Perl
-        
-        :: Use the actual MSYS2 install path
-        set MSYS2_ROOT=D:\a\_temp\msys64
-        set PATH=%MSYS2_ROOT%\mingw64\bin;C:\Windows\System32
-        set LANG=C
-        set LC_ALL=C
-        
-        perl -v
-        where perl
-         
-        :: bootstrap cpanm
-        curl -L https://cpanmin.us -o cpanm
-        perl cpanm --self-upgrade
-        
-        :: install ONLY library modules (no scripts!)
-        perl cpanm --notest ^
-            Path::Tiny ^
-            Clone ^
-            Capture::Tiny ^
-            Data::Dump ^
-            Data::HexDump ^
-            File::Path ^
-            List::Uniq ^
-            Modern::Perl ^
-            Object::Tiny ^
-            Object::Tiny::RW ^
-            Regexp::Common ^
-            Test::HexDifferences ^
-            Text::Diff ^
-            Text::Table ^
-            YAML::Tiny
+      # ---------------------------------------------------------
+      # 2. Windows step — install ONLY pure library modules
+      # ---------------------------------------------------------
+      - name: Install Perl toolchain (Windows / MinGW Perl)
+        shell: cmd
+        run: |
+          echo === Windows MinGW Perl setup ===
+          set MSYS2_ROOT=D:\a\_temp\msys64
+          set PATH=%MSYS2_ROOT%\mingw64\bin;C:\Windows\System32
+          set LANG=C
+          set LC_ALL=C
 
-        
-        :: modules that require pl2bat fail installation, use The Force
-        perl cpanm --force Path::Tiny CPU::Z80::Assembler Archive::Zip LWP::UserAgent
-        
-        :: all modules needed
-        perl cpanm Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+          perl -v
+          where perl
 
-    - name: Ensure MinGW Perl Is Used (MinGW)
-      run: |
-        export PATH=/mingw64/bin:/usr/bin:/bin
-        hash -r
-        
-        echo "Perl in MSYS2:"
-        which perl
-        perl -V:archname
-        perl -V:@INC
+          echo === Bootstrap cpanm ===
+          curl -L https://cpanmin.us -o cpanm
+          perl cpanm --self-upgrade
 
-    - name: Install Perl toolchain (MSYS2 for script modules)
-      run: |
-        :: Install Script-Based Modules Under MSYS2 Perl (Not MinGW Perl)
-        export PATH=/usr/bin:/bin:/mingw64/bin
-        hash -r
-        
-        /usr/bin/cpanm --notest LWP::UserAgent
+          echo === Install pure library modules only ===
+          :: (We will add modules later — for now this is empty)
+          echo No library modules installed in this intermediary step.
+
+#        :: modules that require pl2bat fail installation, use The Force
+#        perl cpanm --force Path::Tiny CPU::Z80::Assembler Archive::Zip LWP::UserAgent
+#        
+#        :: all modules needed
+#        perl cpanm Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+
+      # ---------------------------------------------------------
+      # 3. MSYS2 step — ensure MinGW Perl is used
+      # ---------------------------------------------------------
+      - name: Verify MinGW Perl in MSYS2
+        shell: msys2 {0}
+        run: |
+          echo === MSYS2 environment ===
+          export PATH=/mingw64/bin:/usr/bin:/bin
+          hash -r
+
+          echo Using perl:
+          which perl
+          perl -V:archname
+          perl -V:@INC
+
+      # ---------------------------------------------------------
+      # 4. MSYS2 step — install script-based modules using MSYS Perl
+      # ---------------------------------------------------------
+      - name: Install script-based modules (MSYS2 Perl)
+        shell: msys2 {0}
+        run: |
+          echo === Installing script-based modules under MSYS2 Perl ===
+          export PATH=/usr/bin:/bin:/mingw64/bin
+          hash -r
+
+          echo Using perl:
+          which perl
+
+          :: (We will add modules later — for now this is empty)
+          echo No script modules installed in this intermediary step.
+
+#    - name: Install Perl toolchain (msys)
+#      run: |
+#        export PATH=/mingw64/bin:$PATH
+#        hash -r
+#        which perl
+#        perl -V:archname
+#        perl -V:@INC
+#        
+#        :: check that we are using the same Perl installed in the Windows section
+#        perl -MModule::Build -MCPU::Z80::Assembler -e 1
         
     - name: Build binaries
-      run: |
-        export PATH=/mingw64/bin:$PATH
-        hash -r
-        ./build.sh -v -l
+        run: |
+          export PATH=/mingw64/bin:$PATH
+          hash -r
+          ./build.sh -v -l
 
     - name: Build libraries
-      run: |
-        export PATH=/mingw64/bin:$PATH
-        hash -r
-        ./build.sh -v -b
+        run: |
+          export PATH=/mingw64/bin:$PATH
+          hash -r
+          ./build.sh -v -b
 
     - name: Build examples
-      run: |
-        export PATH=/mingw64/bin:$PATH
-        hash -r
-        ./build.sh -v -b -l -e
+        run: |
+          export PATH=/mingw64/bin:$PATH
+          hash -r
+          ./build.sh -v -b -l -e
 
     - name: Run tests
-      run: |
-        export PATH=/mingw64/bin:$PATH
-        hash -r
-        ./build.sh -v -b -l -t
+        run: |
+          export PATH=/mingw64/bin:$PATH
+          hash -r
+          ./build.sh -v -b -l -t
