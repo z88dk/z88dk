@@ -71,7 +71,11 @@ jobs:
         perl cpanm --self-upgrade
         
         :: install toolchain / deps into site_perl
-        perl cpanm --notest Path::Tiny CPU::Z80::Assembler Archive::Zip LWP::UserAgent
+        
+        :: modules that require pl2bat fail installation, use The Force
+        perl cpanm --force Path::Tiny CPU::Z80::Assembler Archive::Zip LWP::UserAgent
+        
+        :: all modules needed
         perl cpanm Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table YAML::Tiny
 
     - name: Install Perl toolchain (msys)
