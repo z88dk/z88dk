@@ -119,7 +119,7 @@ jobs:
         ./cpanm --version
         
         echo === Installing LWP and related modules ===
-        MAKE=mingw32-make ./cpanm \
+        MAKE=mingw32-make ./cpanm --notest \
           Archive::Zip \
           CPU::Z80::Assembler \
           Spreadsheet::ParseXLSX
