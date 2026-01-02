@@ -387,7 +387,7 @@ Operand Parser::parse_operand() {
 
     // 8-bit register
     if (t->type() == TokenType::Identifier
-            && keyword_is_register_8bit(t->keyword())) {
+            && keyword_is_8bit_register(t->keyword())) {
         Operand op;
         op.kind = Operand::Kind::Reg8;
         op.reg = t->keyword();
@@ -402,7 +402,7 @@ Operand Parser::parse_operand() {
             t->type() == TokenType::LeftParen
             || // allow leading '(' for arithmetic sub-expr
             (t->type() == TokenType::Identifier
-             && !keyword_is_register_8bit(t->keyword()))) {
+             && !keyword_is_8bit_register(t->keyword()))) {
 
         size_t boundary = find_expr_boundary(tokens_, i_);
         int value = 0;
