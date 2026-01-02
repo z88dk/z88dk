@@ -96,15 +96,11 @@ void Parser::process_directive(Keyword keyword) {
     }
 }
 
-void Parser::process_DB() {
-    process_define_list(1, PatchRange::ByteUnsigned);
-}
-
 void Parser::process_DEFB() {
     process_define_list(1, PatchRange::ByteUnsigned);
 }
 
-void Parser::process_DM() {
+void Parser::process_DB() {
     process_define_list(1, PatchRange::ByteUnsigned);
 }
 
@@ -112,8 +108,24 @@ void Parser::process_DEFM() {
     process_define_list(1, PatchRange::ByteUnsigned);
 }
 
+void Parser::process_DM() {
+    process_define_list(1, PatchRange::ByteUnsigned);
+}
+
 void Parser::process_BYTE() {
     process_define_list(1, PatchRange::ByteUnsigned);
+}
+
+void Parser::process_DEFW() {
+    process_define_list(2, PatchRange::Word);
+}
+
+void Parser::process_DW() {
+    process_define_list(2, PatchRange::Word);
+}
+
+void Parser::process_WORD() {
+    process_define_list(2, PatchRange::Word);
 }
 
 void Parser::process_define_list(int element_size, PatchRange range) {
