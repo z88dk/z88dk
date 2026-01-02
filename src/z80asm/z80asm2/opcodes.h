@@ -89,5 +89,5 @@ private:    // class data
     static int32_t find_transition(int32_t state, uint16_t token);
     static int32_t accept_action(int32_t state);
 
-#include "opcodes_tables.def"
+#include "opcodes_tables.inc"
 };

@@ -58,8 +58,8 @@ for my $state_idx (0 .. $#{ $dfa->states }) {
 $csr_builder->build();
 
 # genetate code files
-my $opcodes_def_file = $opcodes_cpp_file =~ s/\.cpp$/.def/r;
-make_def_file($opcodes_def_file, $dfa, $keywords, $token_types);
+my $opcodes_inc_file = $opcodes_cpp_file =~ s/\.cpp$/.inc/r;
+make_inc_file($opcodes_inc_file, $dfa, $keywords, $token_types);
 
 my $opcodes_h_file = $opcodes_cpp_file =~ s/\.cpp$/.h/r;
 make_h_file($opcodes_h_file, $dfa, $keywords, $token_types);
@@ -96,12 +96,12 @@ make_doc_file($opcodes_doc_file, $csr_builder, \@state_names, \@token_names, \@a
 exit 0;
 
 #------------------------------------------------------------------------------
-# make def file - to be included in the private section of OpcodesParser class
+# make inc file - to be included in the private section of OpcodesParser class
 #------------------------------------------------------------------------------
-sub make_def_file {
-	my($def_file, $dfa, $keywords, $token_types) = @_;
+sub make_inc_file {
+	my($inc_file, $dfa, $keywords, $token_types) = @_;
 
-    	open(my $fh, ">", $def_file) or die "open $def_file: $!";
+    	open(my $fh, ">", $inc_file) or die "open $inc_file: $!";
 	print $fh <<'END';
 //-----------------------------------------------------------------------------
 // Z80 assembler

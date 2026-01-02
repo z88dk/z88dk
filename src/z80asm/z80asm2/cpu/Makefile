@@ -14,7 +14,7 @@ opcodes.txt: dump_opcodes.pl opcodes.dat Makefile
 	perl dump_opcodes.pl opcodes.dat opcodes.txt
 	dos2unix opcodes.txt
 
-../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.def: \
+../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc: \
 		make_dfa.pl $(wildcard *.pm) opcodes.dat ../keywords.def ../lexer.h ../cpu.def Makefile
 	perl make_dfa.pl opcodes.dat ../keywords.def ../lexer.h ../cpu.def ../opcodes_tables.cpp
-	dos2unix ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.def ../opcodes_tables.txt
+	dos2unix ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc ../opcodes_tables.txt

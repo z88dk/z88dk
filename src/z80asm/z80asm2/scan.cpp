@@ -58,15 +58,9 @@ static void swap_x_y(std::string& str) {
 }
 
 static void swap_ix_iy(std::string& str, Keyword& keyword) {
-    switch (keyword) {
-    case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
-    case Keyword::IY: case Keyword::IYH: case Keyword::IYL:
-    case Keyword::AIX: case Keyword::PIX: case Keyword::XIX: case Keyword::YIX: case Keyword::ZIX:
-    case Keyword::AIY: case Keyword::PIY: case Keyword::XIY: case Keyword::YIY: case Keyword::ZIY:
+    if (keyword_is_x_register(keyword)) {
         swap_x_y(str);
         keyword = keyword_lookup(str);
-        break;
-    default:;
     }
 }
 
@@ -835,15 +829,8 @@ yy45:
             }
 
             // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
-            switch (keyword) {
-            case Keyword::INCLUDE:
-            case Keyword::BINARY:
-            case Keyword::INCBIN:
-            case Keyword::LINE:
-            case Keyword::C_LINE:
+            if (keyword_directive_has_file_arg(keyword)) {
                 raw_strings = true;
-                break;
-            default:;
             }
 
             bool has_space_after = (p < pe) && is_space(*p);

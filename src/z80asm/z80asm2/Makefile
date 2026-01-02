@@ -90,11 +90,29 @@ scan.cpp: scan.re Makefile
 $(PROJ)$(EXE): $(OBJ_DIR)/opcodes_tables.o
 $(OBJ_DIR)/opcodes.o: opcodes_tables.h
 
-opcodes_tables.cpp opcodes_tables.h opcodes_tables.def: \
-		lexer.h $(filter-out,opcodes_tables.def,$(wildcard *.def)) \
+opcodes_tables.cpp opcodes_tables.h opcodes_tables.inc: \
+		lexer.h $(wildcard *.def) \
 		$(wildcard cpu/*.dat cpu/*.pl cpu/*.pm) \
 		Makefile cpu/Makefile 
 	$(MAKE) -C cpu
+
+# Rule to produce keywords.def filters
+$(OBJ_DIR)/preprocessor.o: keywords_preproc_directive.inc
+
+keywords_8bit_register.inc \
+keywords_asm_directive.inc \
+keywords_conditional_directive.inc \
+keywords_flag.inc \
+keywords_hla_directive.inc \
+keywords_opcode.inc \
+keywords_preproc_directive.inc \
+keywords_preproc_name_directive.inc \
+keywords_register.inc \
+keywords_segment_register.inc \
+keywords_x_register: \
+		make_keywords_filters.pl keywords.def Makefile
+	perl make_keywords_filters.pl keywords.def
+	dos2unix keywords*.inc
 
 test:: $(TEST_BINS)
 	@for test in $(TEST_BINS); do \
