@@ -45,6 +45,11 @@ private:
     void process_DP();
     void process_PTR();
 
+    // 4-byte lists
+    void process_DEFQ();
+    void process_DQ();
+    void process_DWORD();
+
     void process_define_list(int element_size, PatchRange range);
     void parse_expr_list();
     void expect_end();
