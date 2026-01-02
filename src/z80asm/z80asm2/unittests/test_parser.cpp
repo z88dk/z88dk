@@ -355,7 +355,7 @@ TEST_CASE("Parser: DEFW/DW/WORD empty body produces zero-sized opcode", "[parser
 }
 
 TEST_CASE("Parser: DEFW/DW/WORD report expression syntax errors",
-    "[parser][defw][dw][word][errors]") {
+          "[parser][defw][dw][word][errors]") {
     const std::vector<std::string> kws = { "DEFW", "DW", "WORD" };
 
     for (const auto& kw : kws) {
@@ -376,13 +376,62 @@ TEST_CASE("Parser: DEFW/DW/WORD report expression syntax errors",
 
         REQUIRE(g_errors.error_count() == 1);
         REQUIRE_THAT(g_errors.last_error_message(),
-            Catch::Matchers::ContainsSubstring("Invalid expression"));
+                     Catch::Matchers::ContainsSubstring("Invalid expression"));
 
         const auto& ops = section->opcodes();
         REQUIRE(ops.size() == 2); // sentinel + directive
         const Opcode* op = ops[1].get();
         REQUIRE(op->size() == 0);
         REQUIRE(op->patches().size() == 0);
+    }
+}
+
+TEST_CASE("Parser: DEFP/DP/PTR emit placeholder ptr24 values and patches",
+    "[parser][defp][dp][ptr]") {
+    const std::vector<std::string> kws = { "DEFP", "DP", "PTR" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        // Use an expression to ensure evaluation works too
+        std::string src = kw + std::string(" 1, 2+1, 0x123456\n");
+        pp.push_virtual_file(src, "data_ptr24.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 9); // 3 entries * 3 bytes
+        REQUIRE(op->bytes()[0] == 0);
+        REQUIRE(op->bytes()[1] == 0);
+        REQUIRE(op->bytes()[2] == 0);
+        REQUIRE(op->bytes()[3] == 0);
+        REQUIRE(op->bytes()[4] == 0);
+        REQUIRE(op->bytes()[5] == 0);
+        REQUIRE(op->bytes()[6] == 0);
+        REQUIRE(op->bytes()[7] == 0);
+        REQUIRE(op->bytes()[8] == 0);
+
+        const auto& patches = op->patches();
+        REQUIRE(patches.size() == 3);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[1].offset() == 3);
+        REQUIRE(patches[2].offset() == 6);
+        REQUIRE(patches[0].range() == PatchRange::Ptr24);
+        REQUIRE(patches[1].range() == PatchRange::Ptr24);
+        REQUIRE(patches[2].range() == PatchRange::Ptr24);
+        REQUIRE(patches[0].expression().evaluate() == 1);
+        REQUIRE(patches[1].expression().evaluate() == 3);       // 2+1
+        REQUIRE(patches[2].expression().evaluate() == 0x123456);
     }
 }
 

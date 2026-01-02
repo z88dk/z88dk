@@ -128,6 +128,18 @@ void Parser::process_WORD() {
     process_define_list(2, PatchRange::Word);
 }
 
+void Parser::process_DEFP() {
+    process_define_list(3, PatchRange::Ptr24);
+}
+
+void Parser::process_DP() {
+    process_define_list(3, PatchRange::Ptr24);
+}
+
+void Parser::process_PTR() {
+    process_define_list(3, PatchRange::Ptr24);
+}
+
 void Parser::process_define_list(int element_size, PatchRange range) {
     // Parse expressions following the directive
     parse_expr_list();
