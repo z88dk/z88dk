@@ -110,8 +110,13 @@ jobs:
         which perl
         perl -V:archname
         
+        echo === Bootstrap cpanm for MSYS2 Perl ===
+        curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o cpanm
+        chmod +x cpanm
+        ./cpanm --version
+        
         echo === Installing LWP and related modules ===
-        cpanm \
+        ./cpanm \
           Archive::Zip \
           CPU::Z80::Assembler \
           Spreadsheet::ParseXLSX
