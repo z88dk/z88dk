@@ -103,12 +103,15 @@ jobs:
         echo === Installing script-based modules under MSYS2 Perl ===
         
         # Use MSYS2 Perl for script installation
-        export PATH=/usr/bin:/bin:/mingw64/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin
         hash -r
         
         echo Using perl:
         which perl
         perl -V:archname
+        
+        echo Using make:
+        which make
         
         echo === Bootstrap cpanm for MSYS2 Perl ===
         curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o cpanm
