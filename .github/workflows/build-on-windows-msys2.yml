@@ -27,16 +27,16 @@ jobs:
       shell: cmd
       
     - name: Checkout from git
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
+      uses: actions/checkout@v4
+      with:
+        submodules: 'true'
 
     - name: Cache multiple paths
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/perl5
-          key: ${{ runner.os }}-cache3
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/perl5
+        key: ${{ runner.os }}-cache3
 
       # ---------------------------------------------------------
       # 1. Install MSYS2 + MinGW Perl
@@ -132,25 +132,25 @@ jobs:
 #        perl -MModule::Build -MCPU::Z80::Assembler -e 1
         
     - name: Build binaries
-        run: |
-          export PATH=/mingw64/bin:$PATH
-          hash -r
-          ./build.sh -v -l
+      run: |
+        export PATH=/mingw64/bin:$PATH
+        hash -r
+        ./build.sh -v -l
 
     - name: Build libraries
-        run: |
-          export PATH=/mingw64/bin:$PATH
-          hash -r
-          ./build.sh -v -b
+      run: |
+        export PATH=/mingw64/bin:$PATH
+        hash -r
+        ./build.sh -v -b
 
     - name: Build examples
-        run: |
-          export PATH=/mingw64/bin:$PATH
-          hash -r
-          ./build.sh -v -b -l -e
+      run: |
+        export PATH=/mingw64/bin:$PATH
+        hash -r
+        ./build.sh -v -b -l -e
 
     - name: Run tests
-        run: |
-          export PATH=/mingw64/bin:$PATH
-          hash -r
-          ./build.sh -v -b -l -t
+      run: |
+        export PATH=/mingw64/bin:$PATH
+        hash -r
+        ./build.sh -v -b -l -t
