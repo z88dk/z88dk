@@ -257,7 +257,9 @@ TEST_CASE("Parser: DEFB/DB report unexpected tokens after expression",
 }
 
 TEST_CASE("Parser: DEFW/DW/WORD emit placeholder words and patches", "[parser][defw][dw][word]") {
-    const std::vector<std::string> kws = { "DEFW", "DW", "WORD" };
+    const std::vector<std::string> kws = {
+        "DEFW", "DW", "WORD"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -294,7 +296,9 @@ TEST_CASE("Parser: DEFW/DW/WORD emit placeholder words and patches", "[parser][d
 }
 
 TEST_CASE("Parser: DEFW/DW/WORD ignore extra commas", "[parser][defw][dw][word][commas]") {
-    const std::vector<std::string> kws = { "DEFW", "DW", "WORD" };
+    const std::vector<std::string> kws = {
+        "DEFW", "DW", "WORD"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -328,7 +332,9 @@ TEST_CASE("Parser: DEFW/DW/WORD ignore extra commas", "[parser][defw][dw][word][
 }
 
 TEST_CASE("Parser: DEFW/DW/WORD empty body produces zero-sized opcode", "[parser][defw][dw][word][empty]") {
-    const std::vector<std::string> kws = { "DEFW", "DW", "WORD" };
+    const std::vector<std::string> kws = {
+        "DEFW", "DW", "WORD"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -356,7 +362,9 @@ TEST_CASE("Parser: DEFW/DW/WORD empty body produces zero-sized opcode", "[parser
 
 TEST_CASE("Parser: DEFW/DW/WORD report expression syntax errors",
           "[parser][defw][dw][word][errors]") {
-    const std::vector<std::string> kws = { "DEFW", "DW", "WORD" };
+    const std::vector<std::string> kws = {
+        "DEFW", "DW", "WORD"
+    };
 
     for (const auto& kw : kws) {
         SuppressErrors silence;
@@ -388,7 +396,9 @@ TEST_CASE("Parser: DEFW/DW/WORD report expression syntax errors",
 
 TEST_CASE("Parser: DEFP/DP/PTR emit placeholder ptr24 values and patches",
           "[parser][defp][dp][ptr]") {
-    const std::vector<std::string> kws = { "DEFP", "DP", "PTR" };
+    const std::vector<std::string> kws = {
+        "DEFP", "DP", "PTR"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -436,7 +446,9 @@ TEST_CASE("Parser: DEFP/DP/PTR emit placeholder ptr24 values and patches",
 
 TEST_CASE("Parser: DEFQ/DQ/DWORD emit placeholder dwords and patches",
           "[parser][defq][dq][dword]") {
-    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+    const std::vector<std::string> kws = {
+        "DEFQ", "DQ", "DWORD"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -474,7 +486,9 @@ TEST_CASE("Parser: DEFQ/DQ/DWORD emit placeholder dwords and patches",
 
 TEST_CASE("Parser: DEFQ/DQ/DWORD ignore extra commas",
           "[parser][defq][dq][dword][commas]") {
-    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+    const std::vector<std::string> kws = {
+        "DEFQ", "DQ", "DWORD"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -509,7 +523,9 @@ TEST_CASE("Parser: DEFQ/DQ/DWORD ignore extra commas",
 
 TEST_CASE("Parser: DEFQ/DQ/DWORD empty body produces zero-sized opcode",
           "[parser][defq][dq][dword][empty]") {
-    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+    const std::vector<std::string> kws = {
+        "DEFQ", "DQ", "DWORD"
+    };
 
     for (const auto& kw : kws) {
         Preprocessor pp;
@@ -537,7 +553,9 @@ TEST_CASE("Parser: DEFQ/DQ/DWORD empty body produces zero-sized opcode",
 
 TEST_CASE("Parser: DEFQ/DQ/DWORD report expression syntax errors",
           "[parser][defq][dq][dword][errors]") {
-    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+    const std::vector<std::string> kws = {
+        "DEFQ", "DQ", "DWORD"
+    };
 
     for (const auto& kw : kws) {
         SuppressErrors silence;
@@ -569,7 +587,9 @@ TEST_CASE("Parser: DEFQ/DQ/DWORD report expression syntax errors",
 
 TEST_CASE("Parser: DEFQ/DQ/DWORD report unexpected tokens after expression",
           "[parser][defq][dq][dword][errors]") {
-    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+    const std::vector<std::string> kws = {
+        "DEFQ", "DQ", "DWORD"
+    };
 
     for (const auto& kw : kws) {
         SuppressErrors silence;
@@ -599,6 +619,186 @@ TEST_CASE("Parser: DEFQ/DQ/DWORD report unexpected tokens after expression",
         REQUIRE(op->size() == 4);
         REQUIRE(patches.size() == 1);
         REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[0].expression().evaluate() == 1);
+    }
+}
+
+TEST_CASE("Parser: DEFW_BE/DW_BE/DEFDB/DDB emit placeholder big-endian words and patches",
+          "[parser][defw_be][dw_be][defdb][ddb]") {
+    const std::vector<std::string> kws = {
+        "DEFW_BE", "DW_BE", "DEFDB", "DDB"
+    };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" 1, 2+1, 0x1234\n");
+        pp.push_virtual_file(src, "data_word_be.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 6); // 3 words * 2 bytes
+        const auto& patches = op->patches();
+        REQUIRE(patches.size() == 3);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[1].offset() == 2);
+        REQUIRE(patches[2].offset() == 4);
+        REQUIRE(patches[0].range() == PatchRange::WordBigEndian);
+        REQUIRE(patches[1].range() == PatchRange::WordBigEndian);
+        REQUIRE(patches[2].range() == PatchRange::WordBigEndian);
+        REQUIRE(patches[0].expression().evaluate() == 1);
+        REQUIRE(patches[1].expression().evaluate() == 3);
+        REQUIRE(patches[2].expression().evaluate() == 0x1234);
+    }
+}
+
+TEST_CASE("Parser: DEFW_BE/DW_BE/DEFDB/DDB ignore extra commas",
+          "[parser][defw_be][dw_be][defdb][ddb][commas]") {
+    const std::vector<std::string> kws = {
+        "DEFW_BE", "DW_BE", "DEFDB", "DDB"
+    };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" ,,,1,,,2,, ,3,,,\n");
+        pp.push_virtual_file(src, "data_commas_word_be.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 6);
+        const auto& patches = op->patches();
+        REQUIRE(patches.size() == 3);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[1].offset() == 2);
+        REQUIRE(patches[2].offset() == 4);
+        REQUIRE(patches[0].expression().evaluate() == 1);
+        REQUIRE(patches[1].expression().evaluate() == 2);
+        REQUIRE(patches[2].expression().evaluate() == 3);
+    }
+}
+
+TEST_CASE("Parser: DEFW_BE/DW_BE/DEFDB/DDB empty body produces zero-sized opcode",
+          "[parser][defw_be][dw_be][defdb][ddb][empty]") {
+    const std::vector<std::string> kws = {
+        "DEFW_BE", "DW_BE", "DEFDB", "DDB"
+    };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" \n");
+        pp.push_virtual_file(src, "data_empty_word_be.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 0);
+        REQUIRE(op->patches().size() == 0);
+    }
+}
+
+TEST_CASE("Parser: DEFW_BE/DW_BE/DEFDB/DDB report expression syntax errors",
+          "[parser][defw_be][dw_be][defdb][ddb][errors]") {
+    const std::vector<std::string> kws = {
+        "DEFW_BE", "DW_BE", "DEFDB", "DDB"
+    };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" 1+*2 \n");
+        pp.push_virtual_file(src, "data_err_word_be.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring("Invalid expression"));
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+        REQUIRE(op->size() == 0);
+        REQUIRE(op->patches().size() == 0);
+    }
+}
+
+TEST_CASE("Parser: DEFW_BE/DW_BE/DEFDB/DDB report unexpected tokens after expression",
+          "[parser][defw_be][dw_be][defdb][ddb][errors]") {
+    const std::vector<std::string> kws = {
+        "DEFW_BE", "DW_BE", "DEFDB", "DDB"
+    };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" 1 EXTRA\n");
+        pp.push_virtual_file(src, "data_err2_word_be.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring(
+                         "Expected ',' between expressions"));
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+        const auto& patches = op->patches();
+        REQUIRE(op->size() == 2);
+        REQUIRE(patches.size() == 1);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[0].range() == PatchRange::WordBigEndian);
         REQUIRE(patches[0].expression().evaluate() == 1);
     }
 }
