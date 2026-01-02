@@ -387,7 +387,7 @@ TEST_CASE("Parser: DEFW/DW/WORD report expression syntax errors",
 }
 
 TEST_CASE("Parser: DEFP/DP/PTR emit placeholder ptr24 values and patches",
-    "[parser][defp][dp][ptr]") {
+          "[parser][defp][dp][ptr]") {
     const std::vector<std::string> kws = { "DEFP", "DP", "PTR" };
 
     for (const auto& kw : kws) {
@@ -397,7 +397,6 @@ TEST_CASE("Parser: DEFP/DP/PTR emit placeholder ptr24 values and patches",
         Section* section = module->current_section();
         Parser parser(&unit);
 
-        // Use an expression to ensure evaluation works too
         std::string src = kw + std::string(" 1, 2+1, 0x123456\n");
         pp.push_virtual_file(src, "data_ptr24.asm", 1, true);
 
@@ -432,6 +431,175 @@ TEST_CASE("Parser: DEFP/DP/PTR emit placeholder ptr24 values and patches",
         REQUIRE(patches[0].expression().evaluate() == 1);
         REQUIRE(patches[1].expression().evaluate() == 3);       // 2+1
         REQUIRE(patches[2].expression().evaluate() == 0x123456);
+    }
+}
+
+TEST_CASE("Parser: DEFQ/DQ/DWORD emit placeholder dwords and patches",
+          "[parser][defq][dq][dword]") {
+    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" 1, 2+1, 0x12345678\n");
+        pp.push_virtual_file(src, "data_dword.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 12); // 3 dwords * 4 bytes
+        const auto& patches = op->patches();
+        REQUIRE(patches.size() == 3);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[1].offset() == 4);
+        REQUIRE(patches[2].offset() == 8);
+        REQUIRE(patches[0].range() == PatchRange::Dword);
+        REQUIRE(patches[1].range() == PatchRange::Dword);
+        REQUIRE(patches[2].range() == PatchRange::Dword);
+        REQUIRE(patches[0].expression().evaluate() == 1);
+        REQUIRE(patches[1].expression().evaluate() == 3);
+        REQUIRE(patches[2].expression().evaluate() == 0x12345678);
+    }
+}
+
+TEST_CASE("Parser: DEFQ/DQ/DWORD ignore extra commas",
+          "[parser][defq][dq][dword][commas]") {
+    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" ,,,1,,,2,, ,3,,,\n");
+        pp.push_virtual_file(src, "data_commas_dword.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 12);
+        const auto& patches = op->patches();
+        REQUIRE(patches.size() == 3);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[1].offset() == 4);
+        REQUIRE(patches[2].offset() == 8);
+        REQUIRE(patches[0].expression().evaluate() == 1);
+        REQUIRE(patches[1].expression().evaluate() == 2);
+        REQUIRE(patches[2].expression().evaluate() == 3);
+    }
+}
+
+TEST_CASE("Parser: DEFQ/DQ/DWORD empty body produces zero-sized opcode",
+          "[parser][defq][dq][dword][empty]") {
+    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" \n");
+        pp.push_virtual_file(src, "data_empty_dword.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 0);
+        REQUIRE(op->patches().size() == 0);
+    }
+}
+
+TEST_CASE("Parser: DEFQ/DQ/DWORD report expression syntax errors",
+          "[parser][defq][dq][dword][errors]") {
+    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" 1+*3 \n");
+        pp.push_virtual_file(src, "data_err_dword.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring("Invalid expression"));
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+        REQUIRE(op->size() == 0);
+        REQUIRE(op->patches().size() == 0);
+    }
+}
+
+TEST_CASE("Parser: DEFQ/DQ/DWORD report unexpected tokens after expression",
+          "[parser][defq][dq][dword][errors]") {
+    const std::vector<std::string> kws = { "DEFQ", "DQ", "DWORD" };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        std::string src = kw + std::string(" 1 EXTRA\n");
+        pp.push_virtual_file(src, "data_err2_dword.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring(
+                         "Expected ',' between expressions"));
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+        const auto& patches = op->patches();
+        REQUIRE(op->size() == 4);
+        REQUIRE(patches.size() == 1);
+        REQUIRE(patches[0].offset() == 0);
+        REQUIRE(patches[0].expression().evaluate() == 1);
     }
 }
 
