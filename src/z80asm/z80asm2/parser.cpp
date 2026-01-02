@@ -128,6 +128,22 @@ void Parser::process_WORD() {
     process_define_list(2, PatchRange::Word);
 }
 
+void Parser::process_DEFW_BE() {
+    process_define_list(2, PatchRange::WordBigEndian);
+}
+
+void Parser::process_DW_BE() {
+    process_define_list(2, PatchRange::WordBigEndian);
+}
+
+void Parser::process_DEFDB() {
+    process_define_list(2, PatchRange::WordBigEndian);
+}
+
+void Parser::process_DDB() {
+    process_define_list(2, PatchRange::WordBigEndian);
+}
+
 void Parser::process_DEFP() {
     process_define_list(3, PatchRange::Ptr24);
 }
