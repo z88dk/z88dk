@@ -1,60 +1,45 @@
 name: build-on-windows-msys2
-
 on:
   push:
   pull_request:
     branches: [ master ]
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
-
 jobs:
   build:
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
-
     env:
       LANG: C
       LC_ALL: C
-
     steps:
     - name: Configure git
       run: |
         git config --global core.autocrlf input
       shell: cmd
-
     - name: Checkout from git
       uses: actions/checkout@v4
       with:
         submodules: 'true'
-
     - name: Cache multiple paths
       uses: actions/cache@v4
       with:
         path: |
           ~/perl5
         key: ${{ runner.os }}-cache3
-
-      # ---------------------------------------------------------
-      # 1. Install Strawberry Perl
-      # ---------------------------------------------------------
     - name: Install Strawberry Perl
       shell: powershell
       run: |
         Invoke-WebRequest -Uri "https://strawberryperl.com/download/5.38.2.2/strawberry-perl-5.38.2.2-64bit.msi" -OutFile "strawberry.msi"
         Start-Process msiexec.exe -ArgumentList "/i strawberry.msi /quiet /qn /norestart" -Wait
-
-      # ---------------------------------------------------------
-      # 2. Install CPAN modules under Strawberry Perl
-      # ---------------------------------------------------------
-      - name: Install CPAN modules (Strawberry Perl)
-        shell: cmd
-        run: |
-          set PATH=C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%
-          cpanm --notest ^
+    - name: Install CPAN modules (Strawberry Perl)
+      shell: cmd
+      run: |
+        set PATH=C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%
+        cpanm --notest ^
             Archive::Zip ^
             CPU::Z80::Assembler ^
             Capture::Tiny ^
@@ -73,10 +58,6 @@ jobs:
             Text::Diff ^
             Text::Table ^
             YAML::Tiny
-
-      # ---------------------------------------------------------
-      # 3. Install MSYS2 + MinGW Perl (runtime)
-      # ---------------------------------------------------------
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
@@ -95,43 +76,31 @@ jobs:
             mingw64/mingw-w64-x86_64-ragel
             re2c
             vim
-          
-      # ---------------------------------------------------------
-      # 4. Unify environments: expose Strawberry Perl modules to MinGW Perl
-      # ---------------------------------------------------------
     - name: Configure PERL5LIB for MinGW Perl
       shell: msys2 {0}
       run: |
-          export PATH=/mingw64/bin:/usr/bin:/bin
-          export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
-          echo "PERL5LIB=$PERL5LIB"
-          perl -V
-
-      # ---------------------------------------------------------
-      # 5. Run tests using MinGW Perl
-      # ---------------------------------------------------------
-
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        echo "PERL5LIB=$PERL5LIB"
+        perl -V
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -l
-
     - name: Build libraries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b
-
     - name: Build examples
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b -l -e
-
     - name: Run tests
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin
