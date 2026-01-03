@@ -102,10 +102,10 @@ jobs:
       run: |
         echo === Installing script-based modules under MSYS2 Perl ===
         
-        # Use MSYS2 Perl for script installation
-        export PATH=/mingw64/bin:/usr/bin:/bin
+        # Use MSYS2 Perl and MSYS2 toolchain
+        export PATH=/usr/bin:/bin:/mingw64/bin
         hash -r
-        
+                
         echo Using perl:
         which perl
         perl -V:archname
@@ -119,8 +119,9 @@ jobs:
         ./cpanm --version
         
         echo === Installing LWP and related modules ===
-        MAKE=mingw32-make ./cpanm --notest \
+        ./cpanm --notest \
           Archive::Zip \
+          LWP::UserAgent \
           CPU::Z80::Assembler \
           Spreadsheet::ParseXLSX
 
