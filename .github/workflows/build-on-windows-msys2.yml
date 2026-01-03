@@ -91,6 +91,7 @@ jobs:
         export PATH=/mingw64/bin:/usr/bin:/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
+        cp `which m4` bin/
         ./build.sh -v -l
     - name: Build libraries
       run: |
