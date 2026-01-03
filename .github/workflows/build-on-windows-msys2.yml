@@ -41,6 +41,7 @@ jobs:
         set PATH=C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%
         cpanm --notest ^
             Archive::Zip ^
+            Array::Compare ^
             CPU::Z80::Assembler ^
             Capture::Tiny ^
             Clone ^
@@ -59,6 +60,7 @@ jobs:
             Test::HexDifferences ^
             Text::Diff ^
             Text::Table ^
+            Win32::Autoglob ^
             YAML::Tiny
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
