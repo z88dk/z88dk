@@ -64,16 +64,17 @@ jobs:
         msystem: MINGW64
         update: true
         install: >
+            base-devel
             git
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-expat
             mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gmp
+            mingw-w64-x86_64-libxml2
             mingw-w64-x86_64-make
             mingw-w64-x86_64-perl
             mingw-w64-x86_64-pkg-config
-            mingw64/mingw-w64-x86_64-boost
-            mingw64/mingw-w64-x86_64-expat
-            mingw64/mingw-w64-x86_64-gmp
-            mingw64/mingw-w64-x86_64-libxml2
-            mingw64/mingw-w64-x86_64-ragel
+            mingw-w64-x86_64-ragel
             re2c
             vim
     - name: Configure PERL5LIB for MinGW Perl
