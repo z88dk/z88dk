@@ -82,7 +82,7 @@ jobs:
     - name: Configure PERL5LIB for MinGW Perl
       shell: msys2 {0}
       run: |
-        export PATH=/c/Strawberry/perl/bin:/mingw64/bin:/usr/bin:/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         echo "PERL5LIB=$PERL5LIB"
         perl -V
@@ -90,7 +90,7 @@ jobs:
         which make
     - name: Build binaries
       run: |
-        export PATH=/c/Strawberry/perl/bin:/mingw64/bin:/usr/bin:/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         mkdir -p bin
@@ -98,19 +98,19 @@ jobs:
         ./build.sh -v -l
     - name: Build libraries
       run: |
-        export PATH=/c/Strawberry/perl/bin:/mingw64/bin:/usr/bin:/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b
     - name: Build examples
       run: |
-        export PATH=/c/Strawberry/perl/bin:/mingw64/bin:/usr/bin:/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b -l -e
     - name: Run tests
       run: |
-        export PATH=/c/Strawberry/perl/bin:/mingw64/bin:/usr/bin:/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b -l -t
