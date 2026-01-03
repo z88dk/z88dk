@@ -83,6 +83,8 @@ jobs:
         export PERL5LIB="/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         echo "PERL5LIB=$PERL5LIB"
         perl -V
+        ln -s /mingw64/bin/mingw32-make /mingw64/bin/make
+        which make
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin
