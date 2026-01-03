@@ -22,6 +22,12 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  w_respixel
     EXTERN  w_xorpixel
 
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
+
+    INCLUDE "classic/gfx/grafix.inc"
+    
+
 ; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
 
@@ -80,7 +86,13 @@ iloopx:
     push    hl
     push    bc
     push    de
+IF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
+ENDIF
     call    w_xorpixel
+IF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_out
+ENDIF
     pop     de
     pop     bc
     pop     hl
@@ -151,7 +163,13 @@ iloopa:
     push    hl
     push    bc
     push    de
+IF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
+ENDIF
     call    w_respixel
+IF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_out
+ENDIF
     pop     de
     pop     bc
     pop     hl
@@ -223,7 +241,13 @@ iloopo:
     push    hl
     push    bc
     push    de
+IF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
+ENDIF
     call    w_plotpixel
+IF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_out
+ENDIF
     pop     de
     pop     bc
     pop     hl
