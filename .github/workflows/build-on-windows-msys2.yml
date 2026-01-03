@@ -51,6 +51,7 @@ jobs:
             Modern::Perl ^
             Object::Tiny ^
             Object::Tiny::RW ^
+            Params::Util ^
             Path::Tiny ^
             Regexp::Common ^
             Spreadsheet::ParseXLSX ^
