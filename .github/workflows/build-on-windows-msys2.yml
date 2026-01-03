@@ -66,6 +66,7 @@ jobs:
         install: >
             base-devel
             git
+            m4
             mingw-w64-x86_64-boost
             mingw-w64-x86_64-expat
             mingw-w64-x86_64-gcc
