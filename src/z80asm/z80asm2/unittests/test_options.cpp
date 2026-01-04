@@ -410,3 +410,137 @@ TEST_CASE("search_source_file: '**/*.asm' collects all .asm files in nested subd
 
     fs::remove_all(base);
 }
+
+TEST_CASE("parse_arg accumulates cpp options from -cppXX and -cpp=YY",
+          "[options][parse_arg][cpp]") {
+    g_options = Options();
+    bool dashdash = false;
+
+    REQUIRE(g_options.parse_arg("-cpp-O1", dashdash));
+    REQUIRE(g_options.parse_arg("-cpp=-DFOO", dashdash));
+
+    CHECK(g_options.cpp_options == "-O1 -DFOO");
+
+    g_options = Options();
+}
+
+TEST_CASE("parse_arg accumulates perl options from -perlXX and -perl=YY",
+          "[options][parse_arg][perl]") {
+    g_options = Options();
+    bool dashdash = false;
+
+    REQUIRE(g_options.parse_arg("-perl-Ilib", dashdash));
+    REQUIRE(g_options.parse_arg("-perl=-w", dashdash));
+
+    CHECK(g_options.perl_options == "-Ilib -w");
+
+    g_options = Options();
+}
+
+TEST_CASE("parse_arg accumulates m4 options from -m4XX and -m4=YY",
+          "[options][parse_arg][m4]") {
+    g_options = Options();
+    bool dashdash = false;
+
+    REQUIRE(g_options.parse_arg("-m4-DM4A", dashdash));
+    REQUIRE(g_options.parse_arg("-m4=-DM4B", dashdash));
+
+    CHECK(g_options.m4_options == "-DM4A -DM4B");
+
+    g_options = Options();
+}
+
+TEST_CASE("parse_arg sets date_stamp when -d is provided",
+          "[options][parse_arg][date_stamp]") {
+    g_options = Options();
+    bool dashdash = false;
+
+    REQUIRE(g_options.parse_arg("-d", dashdash));
+    CHECK(g_options.date_stamp);
+
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg sets preprocess_only when -E is provided",
+          "[options][parse_arg][preprocess_only]") {
+    g_options = Options();
+    bool dashdash = false;
+    REQUIRE(g_options.parse_arg("-E", dashdash));
+    CHECK(g_options.preprocess_only);
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg sets swap_ix_iy when -IXIY is provided",
+          "[options][parse_arg][swap_ix_iy]") {
+    g_options = Options();
+    bool dashdash = false;
+    REQUIRE(g_options.parse_arg("-IXIY", dashdash));
+    CHECK(g_options.swap_ix_iy);
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg sets gen_dependencies when -MD is provided",
+          "[options][parse_arg][gen_dependencies]") {
+    g_options = Options();
+    bool dashdash = false;
+    REQUIRE(g_options.parse_arg("-MD", dashdash));
+    CHECK(g_options.gen_dependencies);
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg sets verbose when -v is provided",
+          "[options][parse_arg][verbose]") {
+    g_options = Options();
+    bool dashdash = false;
+    REQUIRE(g_options.parse_arg("-v", dashdash));
+    CHECK(g_options.verbose);
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg sets ucase_labels when -ucase is provided",
+          "[options][parse_arg][ucase_labels]") {
+    g_options = Options();
+    bool dashdash = false;
+    REQUIRE(g_options.parse_arg("-ucase", dashdash));
+    CHECK(g_options.ucase_labels);
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg returns false for invalid options",
+          "[options][parse_arg][invalid_option]") {
+    g_options = Options();
+    bool dashdash = false;
+    REQUIRE_FALSE(g_options.parse_arg("-invalid", dashdash));
+    REQUIRE_FALSE(g_options.parse_arg("-cpp", dashdash)); // missing argument
+    REQUIRE_FALSE(g_options.parse_arg("-m4", dashdash));  // missing argument
+    REQUIRE_FALSE(g_options.parse_arg("-perl", dashdash)); // missing argument
+    REQUIRE_FALSE(g_options.parse_arg("-I", dashdash));    // missing argument
+    g_options = Options(); // reset side effects
+}
+
+TEST_CASE("parse_arg collects include paths from -Ipath and -I=path",
+          "[options][parse_arg][include_paths]") {
+    g_options = Options();
+    bool dashdash = false;
+
+    REQUIRE(g_options.parse_arg("-Ifoo", dashdash));
+    REQUIRE(g_options.parse_arg("-I=bar/baz", dashdash));
+
+    REQUIRE(g_options.include_paths.size() == 2);
+    CHECK(g_options.include_paths[0] == "foo");
+    CHECK(g_options.include_paths[1] == "bar/baz");
+
+    g_options = Options();
+}
+
+TEST_CASE("parse_arg evaluates -f expression and assigns filler_byte when in range",
+          "[options][parse_arg][filler_byte][expr]") {
+    g_options = Options();
+    bool dashdash = false;
+
+    // Expression 0x10 + 5 = 0x15 (21)
+    REQUIRE(g_options.parse_arg("-f=0x10+5", dashdash));
+    CHECK(g_options.filler_byte == static_cast<uint8_t>(0x15));
+
+    g_options = Options(); // reset side effects
+}
