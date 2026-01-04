@@ -6,6 +6,7 @@
 
 #define CATCH_CONFIG_MAIN
 #include "../errors.h"
+#include "../options.h"
 #include "../parser.h"
 #include "../preprocessor.h"
 #include "../unit.h"
@@ -801,5 +802,255 @@ TEST_CASE("Parser: DEFW_BE/DW_BE/DEFDB/DDB report unexpected tokens after expres
         REQUIRE(patches[0].range() == PatchRange::WordBigEndian);
         REQUIRE(patches[0].expression().evaluate() == 1);
     }
+}
+
+TEST_CASE("Parser: DEFS/DS reserve count uses filler", "[parser][defs][ds][filler]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string(" 4\n"), "defs_fill.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 4);
+        REQUIRE(op->patches().empty());
+        const auto& bytes = op->bytes();
+        REQUIRE(bytes.size() == 4);
+        for (size_t i = 1; i < bytes.size(); ++i) {
+            REQUIRE(bytes[i] == bytes[0]); // all filled with the same filler byte
+        }
+    }
+}
+
+TEST_CASE("Parser: DEFS/DS supports explicit filler byte", "[parser][defs][ds][filler]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string(" 3, -1\n"), "defs_filler.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 3);
+        REQUIRE(op->patches().empty());
+        REQUIRE(op->bytes()[0] == 0xFF);
+        REQUIRE(op->bytes()[1] == 0xFF);
+        REQUIRE(op->bytes()[2] == 0xFF);
+    }
+}
+
+TEST_CASE("Parser: DEFS/DS copies inline byte data when count matches", "[parser][defs][ds][data]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string(" 3, 1, 2, 3\n"), "defs_data.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 3);
+        REQUIRE(op->patches().empty());
+        REQUIRE(op->bytes()[0] == 1);
+        REQUIRE(op->bytes()[1] == 2);
+        REQUIRE(op->bytes()[2] == 3);
+    }
+}
+
+TEST_CASE("Parser: DEFS/DS requires at least one expression", "[parser][defs][ds][errors]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string("\n"), "defs_empty.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring("requires at least one expression"));
+
+        // No opcode should be emitted when the directive is invalid
+        REQUIRE(section->opcodes().size() == 1);
+    }
+}
+
+TEST_CASE("Parser: DEFS/DS errors when data exceeds reserved size", "[parser][defs][ds][errors]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string(" 2, 1, 2, 3\n"), "defs_overflow.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring("String longer than reserved space"));
+        REQUIRE(section->opcodes().size() == 1);
+    }
+}
+
+TEST_CASE("Parser: DEFS/DS validates filler range", "[parser][defs][ds][errors]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    for (const auto& kw : kws) {
+        SuppressErrors silence;
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string(" 2, 300\n"), "defs_filler_range.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        REQUIRE(g_errors.error_count() == 1);
+        REQUIRE_THAT(g_errors.last_error_message(),
+                     Catch::Matchers::ContainsSubstring("Integer out of range"));
+        REQUIRE(section->opcodes().size() == 1);
+    }
+}
+
+TEST_CASE("Parser: DEFS/DS uses g_options filler when only count is provided",
+          "[parser][defs][ds][filler][g_options]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    const uint8_t saved_filler = g_options.filler_byte;
+    const uint8_t filler1 = 0xA5;
+    const uint8_t filler2 = 0x3C;
+
+    for (auto filler : {
+                filler1, filler2
+            }) {
+        g_options.filler_byte = filler;
+
+        for (const auto& kw : kws) {
+            Preprocessor pp;
+            CompilationUnit unit;
+            Module* module = unit.current_module();
+            Section* section = module->current_section();
+            Parser parser(&unit);
+
+            pp.push_virtual_file(kw + std::string(" 3\n"), "defs_default_filler.asm", 1, true);
+
+            TokenLine line;
+            while (pp.next_line(line)) {
+                REQUIRE(parser.parse(line));
+            }
+
+            const auto& ops = section->opcodes();
+            REQUIRE(ops.size() == 2); // sentinel + directive
+            const Opcode* op = ops[1].get();
+
+            REQUIRE(op->size() == 3);
+            REQUIRE(op->patches().empty());
+            const auto& bytes = op->bytes();
+            REQUIRE(bytes.size() == 3);
+            for (uint8_t b : bytes) {
+                REQUIRE(b == filler);
+            }
+        }
+    }
+
+    g_options.filler_byte = saved_filler;
+}
+
+TEST_CASE("Parser: DEFS/DS fills remainder with g_options filler when data is shorter",
+          "[parser][defs][ds][filler][string]") {
+    const std::vector<std::string> kws = { "DEFS", "DS" };
+
+    const uint8_t saved_filler = g_options.filler_byte;
+    const uint8_t filler = 0xEE;
+    g_options.filler_byte = filler;
+
+    for (const auto& kw : kws) {
+        Preprocessor pp;
+        CompilationUnit unit;
+        Module* module = unit.current_module();
+        Section* section = module->current_section();
+        Parser parser(&unit);
+
+        pp.push_virtual_file(kw + std::string(" 5, \"AB\"\n"), "defs_string_pad.asm", 1, true);
+
+        TokenLine line;
+        while (pp.next_line(line)) {
+            REQUIRE(parser.parse(line));
+        }
+
+        const auto& ops = section->opcodes();
+        REQUIRE(ops.size() == 2); // sentinel + directive
+        const Opcode* op = ops[1].get();
+
+        REQUIRE(op->size() == 5);
+        REQUIRE(op->patches().empty());
+        const auto& bytes = op->bytes();
+        REQUIRE(bytes.size() == 5);
+        REQUIRE(bytes[0] == 'A');
+        REQUIRE(bytes[1] == 'B');
+        REQUIRE(bytes[2] == filler);
+        REQUIRE(bytes[3] == filler);
+        REQUIRE(bytes[4] == filler);
+    }
+
+    g_options.filler_byte = saved_filler;
 }
 
