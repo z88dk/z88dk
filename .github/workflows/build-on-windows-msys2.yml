@@ -34,17 +34,6 @@ jobs:
         key: ${{ runner.os }}-perlmods-${{ hashFiles('cpanfile', 'Makefile.PL', 'Build.PL') }}
         restore-keys: |
           ${{ runner.os }}-perlmods-
-    - name: Cache build artifacts
-      uses: actions/cache@v4
-      with:
-        path: |
-          bin/
-          lib/
-          libsrc/
-          src/
-        key: ${{ runner.os }}-z88dk-${{ hashFiles('src/**', 'lib/**', 'libsrc/**', 'Makefile', 'build.sh') }}
-        restore-keys: |
-          ${{ runner.os }}-z88dk-
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
