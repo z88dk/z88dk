@@ -30,6 +30,26 @@ jobs:
         path: |
           ~/perl5
         key: ${{ runner.os }}-cache3
+    - name: Install MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >
+            base-devel
+            git
+            m4
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-expat
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gmp
+            mingw-w64-x86_64-libxml2
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-perl
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-ragel
+            re2c
+            vim
     - name: Install Strawberry Perl
       shell: powershell
       run: |
@@ -62,26 +82,11 @@ jobs:
             Text::Table ^
             Win32::Autoglob ^
             YAML::Tiny
-    - name: Install MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        update: true
-        install: >
-            base-devel
-            git
-            m4
-            mingw-w64-x86_64-boost
-            mingw-w64-x86_64-expat
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-gmp
-            mingw-w64-x86_64-libxml2
-            mingw-w64-x86_64-make
-            mingw-w64-x86_64-perl
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-ragel
-            re2c
-            vim
+    - name: Install XS modules under MinGW Perl
+      shell: msys2 {0}
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        cpanm Params::Util
     - name: Configure PERL5LIB for MinGW Perl
       shell: msys2 {0}
       run: |
