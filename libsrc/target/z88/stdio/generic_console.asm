@@ -237,7 +237,7 @@ start:
     defb    1, '3', '@', 0
 
 scroll:
-    defb    1,SD_DWN
+    defb    1,SD_DWN,0
 
 boldon:
     defb    1, '2', '+', 'B', 0
