@@ -12,6 +12,11 @@
     PUBLIC  vz_getrnd
     PUBLIC  _vz_getrnd
 
+    ; By default, the n is stored in HL by z88dk
+    ; and used in these calls, and the call $0a7f
+    ; returns the value in HL which is returned automatically
+    ; by z88dk from this function
+
 vz_getrnd:
 _vz_getrnd:
 

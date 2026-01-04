@@ -66,7 +66,8 @@ printit:
     ex de,hl
     inc hl
     jr printout
-    ;ret
+
+    SECTION bss_clib
 printat_x:
     defb $00
 printat_y:

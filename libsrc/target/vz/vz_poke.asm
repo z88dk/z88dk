@@ -13,12 +13,12 @@
     EXTERN  vz_poke_callee
     EXTERN  asm_vz_poke
 
-vz_poke:
-_vz_poke:
-
     pop     af
     pop     bc
     pop     hl
     push    af
+    
+vz_poke:
+_vz_poke:
 
     jp      asm_vz_poke

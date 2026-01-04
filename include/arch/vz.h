@@ -19,7 +19,7 @@
 // first CALLER and FASTCALL linkage
 
 extern void __LIB__              vz_char_draw(int x, int y, int c, int ch) __smallc;
-extern void __LIB__              vz_coursescroll(void *addr, int byte) __smallc;
+extern void __LIB__              vz_coarsescroll(void *addr, int byte) __smallc;
 extern void __LIB__              vz_disableirq(void);
 extern void __LIB__              vz_drawsprite(int x, int y, int n) __smallc;
 extern void __LIB__              vz_enableirq(void);
@@ -35,7 +35,7 @@ extern void __LIB__              vz_randomize(void);
 extern void __LIB__              vz_score(void *addr, int byte) __smallc;
 extern void __LIB__				 vz_setpaper(char x) __z88dk_fastcall;
 extern void __LIB__              vz_setspritesize(int w, int h) __smallc;
-extern void __LIB__              vz_setspritedata(void *addr) __smallc;
+extern void __LIB__              vz_setspritedata(void *addr) __z88dk_fastcall;
 extern void __LIB__              vz_shape(int x, int y, int w, int h, int c, char *data) __smallc;
 extern void __LIB__              vz_smoothscroll(void *addr, int byte) __smallc;
 extern void __LIB__              vz_sound(int freq, int cycles) __smallc;
@@ -44,7 +44,7 @@ extern void __LIB__              vz_waitvb(void);
 
 // CALLEE linkage for functions with at least two parameters
 
-extern void __LIB__    vz_coursescroll_callee(void *addr, int byte) __smallc __z88dk_callee;
+extern void __LIB__    vz_coarsescroll_callee(void *addr, int byte) __smallc __z88dk_callee;
 extern void __LIB__    vz_drawsprite_callee(int x, int y, int n) __smallc __z88dk_callee;
 extern char __LIB__   *vz_midstr_callee(char *str, int pos) __smallc __z88dk_callee;
 extern void __LIB__    vz_poke_callee(void *addr, int byte) __smallc __z88dk_callee;
@@ -57,7 +57,7 @@ extern void __LIB__    vz_soundcopy_callee(char *dst, char *src, int size, int s
 
 // make the CALLEE linkage default, function pointers will use CALLER linkage
 
-#define vz_coursescroll(a,b)	 vz_coursescroll_callee(a,b)
+#define vz_coarsescroll(a,b)	 vz_coarsescroll_callee(a,b)
 #define vz_drawsprite(a,b,c)  	 vz_drawsprite_callee(a,b,c)
 #define vz_midstr(a,b)           vz_midstr_callee(a,b)
 #define vz_poke(a,b)			 vz_poke_callee(a,b)
@@ -67,5 +67,10 @@ extern void __LIB__    vz_soundcopy_callee(char *dst, char *src, int size, int s
 #define vz_smoothscroll(a,b)	 vz_smoothscroll_callee(a,b)
 #define vz_sound(a,b)            vz_sound_callee(a,b)
 #define vz_soundcopy(a,b,c,d,e)  vz_soundcopy_callee(a,b,c,d,e)
+
+#define vz_plot(a,b,c,d)		 line(a,b,c,d)
+
+#define vz_disableirq			 intrinsic_di()
+#define vz_enableirq		 	 intrinsic_ei()
 
 #endif

@@ -97,6 +97,8 @@ subtract_width:
     ld (hcount),a
     jr nz,iterate_height
     ret
+
+    SECTION bss_clib
 hcount:
     defb  $00  
 save_no:

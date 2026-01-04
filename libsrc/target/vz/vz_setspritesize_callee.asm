@@ -50,6 +50,8 @@ Mult12R_NoAdd:
     ld (vz_sprite_datasize),hl
     ret    
 
+    SECTION bss_clib
+
 vz_sprite_width:
     defb    $00
 vz_sprite_height:

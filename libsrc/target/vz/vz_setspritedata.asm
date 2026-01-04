@@ -17,7 +17,8 @@ vz_setspritedata:
 _vz_setspritedata:
     ld (vz_spritedata),hl
     ret
-
+    
+    SECTION bss_clib
 vz_spritedata:
     defb    $00
     defb    $00

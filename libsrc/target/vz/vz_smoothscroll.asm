@@ -20,5 +20,7 @@ _vz_smoothscroll:
     pop     af
     pop     bc
     pop     hl
+    push    hl
+    push    bc
     push    af
 

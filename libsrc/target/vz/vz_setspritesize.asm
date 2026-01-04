@@ -19,6 +19,8 @@ _vz_setspritesize:
     pop     af
     pop     bc
     pop     hl
+    push    hl
+    push    bc
     push    af
 
     jp      asm_vz_setspritesize

@@ -20,5 +20,8 @@ _vz_smoothscroll_wrap_l:
     pop     af
     pop     bc
     pop     hl
+    push    hl
+    push    bc
     push    af
 
+    jp asm_vz_smoothscroll_wrap_l

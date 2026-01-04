@@ -16,8 +16,7 @@
 vz_printnum:
 _vz_printnum:
 
-    push hl
-    pop de
+    ex de,hl
     ld bc,$0000
     call $09b4      ; Loads ACC with BCDE
     call $0a9d      ; Set flag to Integer    
