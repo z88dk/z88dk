@@ -163,7 +163,7 @@ spew("${test_dir}/src/s1/s2/${test}.asm", $asm);
 
 my $source_dir = path("${test_dir}/src/s1/s2")->absolute;
 if ($^O =~ /msys|cygwin/) {
-	chomp(my $abs_path = `cygpath -u -a '${test_dir}/src/s1/s2'`);
+	chomp(my $abs_path = `cygpath -m -a '${test_dir}/src/s1/s2'`);
 	$abs_path =~ s/://g;
 	$output_dir = "${test_dir}/bin/${abs_path}";
 }
