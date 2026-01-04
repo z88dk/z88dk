@@ -19,12 +19,13 @@ else
   EXESUFFIX ?=
 endif
 
-PROJ		:= z88dk-z80asm$(EXESUFFIX)
-TICKS		:= z88dk-ticks$(EXESUFFIX)
+PROJ		:= z88dk-z80asm
+PROJ_EXE	:= $(PROJ)$(EXESUFFIX)
+TICKS_EXE	:= z88dk-ticks$(EXESUFFIX)
 TICKS_DIR	:= ../../../ticks
 
 INSTALL 	?= install
-Z80ASM_EXE	?= ../../$(PROJ)
+Z80ASM_EXE	?= ../../$(PROJ)$(EXESUFFIX)
 SRC			:= $(wildcard *.asm)
 
 TASKS ?= 9
@@ -38,19 +39,19 @@ $(PROJ)_lib.lst: $(SRC) Makefile
 	$(PERL) make_lib_list.pl $(SRC) > $(PROJ)_lib.lst
 
 clean::
-	$(RM) -f $(PROJ).lib $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ) *.bak
+	$(RM) -f $(PROJ).lib $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ_EXE) *.bak
 
 install::
 	$(INSTALL) $(PROJ).lib $(PREFIX)/lib/$(PROJ).lib
 
-test: all $(PROJ) $(TICKS)
+test: all $(PROJ_EXE) $(TICKS_EXE)
 	$(PERL) -S prove --state=slow,save -j$(TASKS) t/*.t
 
-$(PROJ): $(Z80ASM_EXE)
-	$(CP) $(Z80ASM_EXE) $(PROJ)
+$(PROJ)$(EXESUFFIX): $(Z80ASM_EXE)
+	$(CP) $(Z80ASM_EXE) $(PROJ_EXE)
 
-$(TICKS): $(TICKS_DIR)/$(TICKS)
-	$(CP) $(TICKS_DIR)/$(TICKS) $(TICKS)
+$(TICKS_EXE): $(TICKS_DIR)/$(TICKS_EXE)
+	$(CP) $(TICKS_DIR)/$(TICKS_EXE) $(TICKS_EXE)
 
-$(TICKS_DIR)/$(TICKS): $(wildcard $(TICKS_DIR)/*.c $(TICKS_DIR)/*.h)
+$(TICKS_DIR)/$(TICKS_EXE): $(wildcard $(TICKS_DIR)/*.c $(TICKS_DIR)/*.h)
 	$(MAKE) -C $(TICKS_DIR)
