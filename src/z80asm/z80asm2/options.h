@@ -51,6 +51,8 @@ struct Options {
 private:
     bool is_option_arg(const std::string& arg,
                        const std::string& opt, std::string& opt_arg);
+    bool is_const_expr_arg(const std::string& arg,
+                           const std::string& opt, int& value);
     void run_m4(const std::string& filename);
     void run_perl(const std::string& filename);
     void run_cpp(const std::string& filename);

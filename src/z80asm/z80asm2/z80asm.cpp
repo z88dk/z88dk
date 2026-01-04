@@ -45,7 +45,7 @@ static void show_command_line(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
     if (argc == 1) {
-        exit_show_copyright(EXIT_FAILURE);
+        exit_show_copyright(EXIT_SUCCESS);
     }
 
     // show command line if verbose
@@ -91,3 +91,4 @@ int main(int argc, char* argv[]) {
 
     return g_errors.has_errors() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
+

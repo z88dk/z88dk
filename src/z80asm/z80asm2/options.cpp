@@ -5,7 +5,10 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
+#include "expr.h"
+#include "lexer.h"
 #include "options.h"
+#include "preprocessor.h"
 #include "utils.h"
 #include <filesystem>
 #include <iostream>
@@ -39,8 +42,9 @@ void exit_show_usage(int exit_code) {
             << "  -cpp=OPTS    Options when calling cpp\n"
             << "  -d           Do not assemble if .o is newer\n"
             << "  -E           Only run the preprocessor, generate file.i\n"
+            << "  -f=expr      Set the filler byte value for DEFS\n"
             << "  -h           Show this screen\n"
-            << "  -Ipath       Add path to search for source/include files\n"
+            << "  -I=path      Add path to search for source/include files\n"
             << "  -IXIY        Swap IX and IY registers\n"
             << "  -m4=OPTS     Options when calling m4\n"
             << "  -MD          Generate Makefile dependency file.d\n"
@@ -62,11 +66,23 @@ bool Options::parse_arg(const std::string& arg, bool& found_dash_dash) {
     }
 
     std::string option_arg;
+    int option_value = 0;
     if (!found_dash_dash && (arg[0] == '-' || arg[0] == '+')) {
         switch (arg[1]) {
+        case '?':
+            if (arg == "-?") {
+                exit_show_usage(EXIT_SUCCESS);
+            }
+            else {
+                return false;
+            }
+            break;
         case '-':
             if (arg == "--") {
                 found_dash_dash = true;
+            }
+            else if (arg == "--help") {
+                exit_show_usage(EXIT_SUCCESS);
             }
             else {
                 return false;
@@ -121,6 +137,17 @@ bool Options::parse_arg(const std::string& arg, bool& found_dash_dash) {
         case 'd':
             if (arg == "-d") {
                 date_stamp = true;
+            }
+            else {
+                return false;
+            }
+            break;
+        case 'f':
+            if (is_const_expr_arg(arg, "-f", option_value)) {
+                if (option_value < 0 || option_value > 255) {
+                    return false;
+                }
+                filler_byte = static_cast<uint8_t>(option_value);
             }
             else {
                 return false;
@@ -197,6 +224,34 @@ bool Options::is_option_arg(const std::string& arg, const std::string& option,
     }
 
     return !option_arg.empty();
+}
+
+bool Options::is_const_expr_arg(const std::string& arg,
+                                const std::string& opt, int& value) {
+    value = 0;
+    std::string option_arg;
+    if (!is_option_arg(arg, opt, option_arg)) {
+        return false;
+    }
+
+    Preprocessor pp;
+    pp.push_virtual_file(option_arg, "<cmd-line>", 0, true);
+    TokenLine line;
+    if (!pp.next_line(line)) {
+        return false;
+    }
+
+    Expression expr;
+    size_t i = 0;
+    if (!expr.parse(line, i, nullptr, nullptr)) {
+        return false;
+    }
+    if (!expr.is_constant()) {
+        return false;
+    }
+
+    value = expr.evaluate();
+    return true;
 }
 
 std::string Options::replace_extension(const std::string& filename,
