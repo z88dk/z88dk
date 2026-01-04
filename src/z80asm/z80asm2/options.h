@@ -7,6 +7,7 @@
 #pragma once
 
 #include "cpu.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,7 @@ struct Options {
     bool swap_ix_iy = false;
     bool date_stamp = false;
     bool gen_dependencies = false;
+    uint8_t filler_byte = 0x00;
     CPU cpu_id = CPU::z80;
     std::string m4_options;
     std::string perl_options;

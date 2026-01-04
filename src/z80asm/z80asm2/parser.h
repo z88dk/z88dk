@@ -56,6 +56,10 @@ private:
     void process_DQ();
     void process_DWORD();
 
+    // reserve space
+    void process_DEFS();
+    void process_DS();
+
     void process_define_list(int element_size, PatchRange range);
     void parse_expr_list();
     void expect_end();
