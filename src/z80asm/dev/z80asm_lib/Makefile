@@ -6,12 +6,12 @@
 
 # windows portability layer
 PERL   = perl
-CP     = $(PERL) ../../tools/cp.pl
-RM     = $(PERL) ../../tools/rm.pl
-MV     = $(PERL) ../../tools/mv.pl
-MKDIR  = $(PERL) ../../tools/mkdir.pl
-TOUCH  = $(PERL) ../../tools/touch.pl
-INSTALL= $(PERL) ../../tools/install.pl
+CP     = $(PERL) ../../tools/posix.pl cp
+RM     = $(PERL) ../../tools/posix.pl rm
+MV     = $(PERL) ../../tools/posix.pl mv
+MKDIR  = $(PERL) ../../tools/posix.pl mkdir
+TOUCH  = $(PERL) ../../tools/posix.pl touch
+INSTALL= $(PERL) ../../tools/posix.pl install
 
 ifeq ($(OS),Windows_NT)
   EXESUFFIX := .exe
