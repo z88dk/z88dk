@@ -4,7 +4,8 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-use Modern::Perl;
+use strict;
+use warnings;
 use File::Find;
 
 my @patterns = (
