@@ -97,6 +97,14 @@ jobs:
             Text::Table ^
             Win32::Autoglob ^
             YAML::Tiny
+    - name: Bootstrap cpanm for MinGW Perl
+      shell: msys2 {0}
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o /mingw64/bin/cpanm
+        chmod +x /mingw64/bin/cpanm
+        which cpanm
+        cpanm --version
     - name: Install XS modules under MinGW Perl
       shell: msys2 {0}
       run: |
