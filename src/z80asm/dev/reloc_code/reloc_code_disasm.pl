@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 
 # Show the source code of the z80asm reloc routine
 
