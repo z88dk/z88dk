@@ -29,7 +29,7 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r4k 		r4k_strict 
 			r5k 		r5k_strict
 			r6k 		r6k_strict
-			8080 8085 
+			8080 		8085 
 			gbz80 		gbz80_strict 
 			kc160		kc160_strict
 			kc160_z80	kc160_z80_strict

@@ -7,10 +7,10 @@ use File::Copy;
 
 # Test loading of z88dk-z80asm-*.lib
 
-# locartion of default library
-my $default_lib_path = ($^O eq 'MSWin32') ?
-	"c:/z88dk/lib" :
-	"/usr/local/share/z88dk/lib";
+# location of default library
+my $config = path("../config.h")->slurp;
+my($prefix) = $config =~ /^\s*#\s*define\s+PREFIX\s*\"(.*?)\"/;
+my $default_lib_path = "$prefix/lib";
 
 # check our RLD code is compiling
 
