@@ -24,12 +24,27 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: 'true'
-    - name: Cache multiple paths
+    - name: Cache Perl modules
       uses: actions/cache@v4
       with:
         path: |
-          ~/perl5
-        key: ${{ runner.os }}-cache3
+          C:\Strawberry\perl\site\lib
+          C:\Strawberry\perl\vendor\lib
+          D:\a\_temp\msys64\mingw64\lib\perl5\site_perl
+        key: ${{ runner.os }}-perlmods-${{ hashFiles('cpanfile', 'Makefile.PL', 'Build.PL') }}
+        restore-keys: |
+          ${{ runner.os }}-perlmods-
+    - name: Cache build artifacts
+      uses: actions/cache@v4
+      with:
+        path: |
+          bin/
+          lib/
+          libsrc/
+          src/
+        key: ${{ runner.os }}-z88dk-${{ hashFiles('src/**', 'lib/**', 'libsrc/**', 'Makefile', 'build.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-z88dk-
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
@@ -86,7 +101,7 @@ jobs:
       shell: msys2 {0}
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin
-        cpanm Params::Util
+        cpanm --notest Params::Util
     - name: Configure PERL5LIB for MinGW Perl
       shell: msys2 {0}
       run: |
