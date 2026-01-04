@@ -1697,6 +1697,31 @@ void Preprocessor::process_PRAGMA(const TokenLine& line, size_t& i) {
     }
 }
 
+void Preprocessor::process_ASSERT(const TokenLine& line, size_t& i) {
+    int value = 0;
+    if (!eval_const_expr(line, i, value)) {
+        g_errors.error(ErrorCode::InvalidSyntax,
+                       "Invalid expression in ASSERT directive");
+        return;
+    }
+
+    std::string message = "Assertion failed";
+    const auto& tokens = line.tokens();
+    if (i < tokens.size() && tokens[i].is(TokenType::Comma)) {
+        ++i; // skip comma
+        // parse message string
+        if (i < tokens.size() && tokens[i].is(TokenType::String)) {
+            message = tokens[i].string_value();
+            ++i;
+        }
+    }
+    expect_end(line, i);
+
+    if (value == 0) {
+        g_errors.error(line.location(), ErrorCode::AssertionFailed, message);
+    }
+}
+
 Module* Preprocessor::pp_module() {
     return &module_;
 }

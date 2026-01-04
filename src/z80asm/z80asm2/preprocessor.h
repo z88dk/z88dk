@@ -278,6 +278,9 @@ private:
     // PRAGMA
     void process_PRAGMA(const TokenLine& line, size_t& i);
 
+    // ASSERT
+    void process_ASSERT(const TokenLine& line, size_t& i);
+
     // Get the module/section maintained in the preprocessor
 #ifdef UNIT_TESTS
 public:

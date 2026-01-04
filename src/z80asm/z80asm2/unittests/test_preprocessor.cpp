@@ -10869,3 +10869,51 @@ TEST_CASE("Preprocessor splits 'NOP:HALT:RET' into three lines without labels", 
     // No more lines
     REQUIRE_FALSE(pp.next_line(line));
 }
+
+// -----------------------------------------------------------------------------
+// ASSERT directive tests
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Preprocessor: ASSERT true passes without error", "[preprocessor][assert]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    pp.push_virtual_file("ASSERT 1\nNEXT\n", "assert_true.asm", 1, false);
+
+    TokenLine line;
+    REQUIRE(pp.next_line(line));
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "NEXT");
+
+    REQUIRE_FALSE(g_errors.has_errors());
+}
+
+TEST_CASE("Preprocessor: ASSERT false reports assertion failure", "[preprocessor][assert][error]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    pp.push_virtual_file("ASSERT 0\nAFTER\n", "assert_false.asm", 1, false);
+
+    TokenLine line;
+    REQUIRE(pp.next_line(line)); // AFTER
+    REQUIRE(!line.tokens().empty());
+    REQUIRE(line.tokens()[0].text() == "AFTER");
+
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.error_count() == 1);
+    REQUIRE(g_errors.last_error_message().find("Assertion failed") != std::string::npos);
+}
+
+TEST_CASE("Preprocessor: ASSERT false uses custom message", "[preprocessor][assert][error][message]") {
+    g_errors.reset();
+    Preprocessor pp;
+
+    pp.push_virtual_file("ASSERT 0, \"Custom message\"\nTAIL\n",
+                         "assert_msg.asm", 1, false);
+
+    TokenLine line;
+    while (pp.next_line(line)) {}
+
+    REQUIRE(g_errors.has_errors());
+    REQUIRE(g_errors.last_error_message().find("Custom message") != std::string::npos);
+}
