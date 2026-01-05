@@ -21,8 +21,8 @@ target/vz/games/joystick
 @classic/games/games.lst
 @classic/input/input_keyboard.lst
 target/vz/vz_char_draw
-target/vz/vz_coursescroll
-target/vz/vz_coursescroll_callee
+target/vz/vz_coarsescroll
+target/vz/vz_coarsescroll_callee
 target/vz/vz_disableirq
 target/vz/vz_drawsprite
 target/vz/vz_drawsprite_callee
