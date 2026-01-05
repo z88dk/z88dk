@@ -187,8 +187,13 @@ extern int __LIB__ parsefile(far char *seg, wildcard_t *wild);
 #endif
 
 
-/* Execute a CLI string (returns 0 on success)
+/* Execute a CLI string (returns 0 on success) */
 extern int __LIB__ exec_cli(char *str);
+
+
+/* Enable disable the cursor on teh current window */
+extern void __LIB__ z88_disable_cursor(void);
+extern void __LIB__ z88_enable_cursor(void);
 
 /*
  *	Some routines from GWL now

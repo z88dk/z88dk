@@ -82,6 +82,7 @@ target/z88/z88/stripdev
 target/z88/z88/strippath
 target/z88/z88/opwin
 target/z88/z88/fnexpand
+target/z88/z88/z88_cursor
 target/z88/graphics/closegfx
 target/z88/graphics/clrarea
 target/z88/graphics/cleargraphics
