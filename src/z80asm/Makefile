@@ -274,7 +274,6 @@ clean::
 	$(RM) -rf $(TARGET_EXE) test*.dir
 	$(RM) -f $(TARGET_EXE) test*
 	$(RM) -f t/*.tmp t/dev/*.tmp
-	$(RM) -f ../config.h
 
 #------------------------------------------------------------------------------
 # Dependencies
