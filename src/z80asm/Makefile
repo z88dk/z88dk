@@ -239,7 +239,7 @@ all:
 test: $(TARGET_EXE) $(TARGET_LIB) $(Z80NM)
 	$(MAKE) -C dev/z80asm_lib test
 	$(PERL) -S prove --state=slow,save -j$(TASKS) t/*.t
-	$(MAKE) -C z80ams2 test
+	$(MAKE) -C z80asm2 test
 
 $(Z80NM): $(Z80NM_DIR)/$(Z80NM)
 	$(CP) $(Z80NM_DIR)/$(Z80NM) $(Z80NM)
