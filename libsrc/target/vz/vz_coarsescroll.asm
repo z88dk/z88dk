@@ -20,5 +20,7 @@ _vz_coarsescroll:
     pop     af
     pop     bc
     pop     hl
+    push    hl
+    push    bc
     push    af
 

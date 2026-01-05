@@ -12,6 +12,9 @@ _vz_printat:
     pop     bc
     pop     hl
     pop     de
+    push    de
+    push    hl
+    push    bc
     push    af
 
     jp      asm_vz_printat
