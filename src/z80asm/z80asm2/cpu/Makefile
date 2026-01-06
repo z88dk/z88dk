@@ -4,17 +4,32 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
+# windows portability layer
+PERL     = perl
+CP       = $(PERL) ../../tools/posix.pl cp
+RM       = $(PERL) ../../tools/posix.pl rm
+MV       = $(PERL) ../../tools/posix.pl mv
+MKDIR    = $(PERL) ../../tools/posix.pl mkdir
+TOUCH    = $(PERL) ../../tools/posix.pl touch
+INSTALL  = $(PERL) ../../tools/posix.pl install
+DOS2UNIX = $(PERL) ../../tools/posix.pl dos2unix
+
+EXE =
+ifeq ($(OS),Windows_NT)
+  EXE = .exe
+endif
+
 all: opcodes.dat opcodes.txt ../opcodes_tables.cpp
 
 opcodes.dat: make_opcodes.pl Opcodes.pm $(wildcard opcodes*.pl) Makefile
-	perl make_opcodes.pl opcodes.dat
-	dos2unix opcodes.dat
+	$(PERL) make_opcodes.pl opcodes.dat
+	$(DOS2UNIX) opcodes.dat
 
 opcodes.txt: dump_opcodes.pl opcodes.dat Makefile
-	perl dump_opcodes.pl opcodes.dat opcodes.txt
-	dos2unix opcodes.txt
+	$(PERL) dump_opcodes.pl opcodes.dat opcodes.txt
+	$(DOS2UNIX) opcodes.txt
 
 ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc: \
 		make_dfa.pl $(wildcard *.pm) opcodes.dat ../keywords.def ../lexer.h ../cpu.def Makefile
-	perl make_dfa.pl opcodes.dat ../keywords.def ../lexer.h ../cpu.def ../opcodes_tables.cpp
-	dos2unix ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc ../opcodes_tables.txt
+	$(PERL) make_dfa.pl opcodes.dat ../keywords.def ../lexer.h ../cpu.def ../opcodes_tables.cpp
+	$(DOS2UNIX) ../opcodes_tables.cpp ../opcodes_tables.h ../opcodes_tables.inc ../opcodes_tables.txt

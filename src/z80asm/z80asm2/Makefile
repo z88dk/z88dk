@@ -4,12 +4,23 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-PROJ = z88dk-z80asm
+# windows portability layer
+PERL     = perl
+CP       = $(PERL) ../tools/posix.pl cp
+RM       = $(PERL) ../tools/posix.pl rm
+MV       = $(PERL) ../tools/posix.pl mv
+MKDIR    = $(PERL) ../tools/posix.pl mkdir
+TOUCH    = $(PERL) ../tools/posix.pl touch
+INSTALL  = $(PERL) ../tools/posix.pl install
+DOS2UNIX = $(PERL) ../tools/posix.pl dos2unix
 
 EXE =
 ifeq ($(OS),Windows_NT)
   EXE = .exe
 endif
+
+PROJ = z88dk-z80asm
+
 
 CXX = g++
 CXXFLAGS = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror -O3
@@ -74,17 +85,17 @@ $(TEST_DIR)/test_%$(EXE): $(TEST_OBJ_DIR)/test_%.o $(COMMON_TEST_OBJS) $(CATCH_O
 
 # Create output directories
 $(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+	$(MKDIR) -p $(OBJ_DIR)
 
 $(TEST_OBJ_DIR):
-	mkdir -p $(TEST_OBJ_DIR)
+	$(MKDIR) -p $(TEST_OBJ_DIR)
 
 # Rule to produce .cpp from .re using re2c
 $(PROJ)$(EXE): $(OBJ_DIR)/scan.o
 
 scan.cpp: scan.re Makefile
 	$(RE2C) $(RE2CFLAGS) -o scan.cpp scan.re
-	dos2unix scan.cpp 2> /dev/null
+	$(DOS2UNIX) scan.cpp 2> /dev/null
 
 # Rule to procude opcodes_tables.cpp
 $(PROJ)$(EXE): $(OBJ_DIR)/opcodes_tables.o
@@ -111,29 +122,39 @@ keywords_register.inc \
 keywords_segment_register.inc \
 keywords_x_register: \
 		make_keywords_filters.pl keywords.def Makefile
-	perl make_keywords_filters.pl keywords.def
-	dos2unix keywords*.inc
+	$(PERL) make_keywords_filters.pl keywords.def
+	$(DOS2UNIX) keywords*.inc
+
+define run-tests
+  $(foreach t,$(1), \
+    echo Running $(CURDIR)/$(t)... ; \
+    $(CURDIR)/$(t) || exit 1; \
+  )
+endef
 
 test:: $(TEST_BINS)
-	@for test in $(TEST_BINS); do \
-		echo "Running $$test..."; \
-		./$$test || exit 1; \
-	done
+	$(call run-tests,$(TEST_BINS))
 
 test:: $(PROJ)$(EXE)
-	perl -S prove --state=slow,save t/*.t
+	$(PERL) -S prove --state=slow,save t/*.t
 
 astyle:
 	$(ASTYLE)
 
 cloc:
-	perl -S cloc --fullpath --not-match-f="./unittests/catch_amalgamated.*" .
+	$(PERL) -S cloc --fullpath --not-match-f="./unittests/catch_amalgamated.*" .
+
+CLEAN_PATTERNS = *.o *.d *.i *.exe *.orig *.core *.bak *~
+CLEAN_DIRS = . $(TEST_DIR) t
+CLEAN_FILES = \
+  $(foreach d,$(CLEAN_DIRS), \
+    $(foreach p,$(CLEAN_PATTERNS), \
+      $(wildcard $(d)/$(p)) \
+    ) \
+  )
 
 clean:
-	$(RM) $(PROJ) $(PROJ)$(EXE) $(TEST_BINS) \
-		  $(wildcard *.o *.d *.i *.exe *.orig *.core *.bak *~) \
-		  $(wildcard $(TEST_DIR)/*.o $(TEST_DIR)/*.d $(TEST_DIR)/*.i $(TEST_DIR)/*.exe $(TEST_DIR)/*.orig $(TEST_DIR)/*.core $(TEST_DIR)/*.bak $(TEST_DIR)/*~) \
-		  $(wildcard t/*.o t/*.d t/*.i t/*.exe t/*.orig t/*.core t/*.bak t/*~)
-	$(RM) -r $(OBJ_DIR) $(TEST_OBJ_DIR) $(wildcard test_t_*)
+	$(RM) -f $(PROJ) $(PROJ)$(EXE) $(TEST_BINS) $(CLEAN_FILES)
+	$(RM) -rf $(OBJ_DIR) $(TEST_OBJ_DIR) $(wildcard test_t_*)
 
 -include $(DEPENDS)
