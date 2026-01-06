@@ -26,10 +26,8 @@ generic_console_vpeek:
     ;; Text mode - this doesn't work unfortunatley
 
     ; Move cursor
-    ld      a,1
-    call_oz (os_out)
-    ld      a,'@'
-    call_oz (os_out)
+    ld      hl,printat
+    call_oz (gn_sop)
     ld      a,c
     add     32
     call_oz (os_out)
@@ -37,8 +35,8 @@ generic_console_vpeek:
     add     32
     call_oz (os_out)
 
-    push    af
     ld      hl,0
+    push    hl
     add     hl,sp
     ex      de,hl
     ld      hl,1        ;read 1 character
@@ -47,10 +45,8 @@ generic_console_vpeek:
     call_oz (os_nq)
 
     ;; Move cursor back
-    ld      a,1
-    call_oz (os_out)
-    ld      a,'@'
-    call_oz (os_out)
+    ld      hl,printat
+    call_oz (gn_sop)
     ld      a,(__console_x)
     add     32
     call_oz (os_out)
@@ -60,6 +56,9 @@ generic_console_vpeek:
 
     pop     hl
     ld      a,l
+    and     a
+    ret     nz
+    scf
     ret
 
 
@@ -93,3 +92,9 @@ gotit:
     ld      sp, hl
     ex      af, af
     ret
+
+
+    SECTION rodata_clib
+
+printat:
+    defb    1,'3','@',0
