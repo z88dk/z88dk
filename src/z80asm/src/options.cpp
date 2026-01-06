@@ -162,7 +162,8 @@ string Options::prepend_output_dir(const string& filename) {
 		// with strings instead.
 		// is it a win32 absolute path?
 		string file;
-		if (isalpha(filename[0]) && filename[1] == ':') {	// C:
+		if (filename.size() >= 2 &&
+		    isalpha(filename[0]) && filename[1] == ':') {	// C:
 			file += output_dir + "/";
 			file += string(1, filename[0]) + "/";
 			file += string(filename.substr(2));
