@@ -8,12 +8,14 @@ use File::Copy;
 # Test loading of z88dk-z80asm-*.lib
 
 # location of default library
-my $config = path("../config.h")->slurp;
-my($prefix) = $config =~ /^\s*#\s*define\s+PREFIX\s*\"(.*?)\"/;
-my $default_lib_path = "$prefix/lib";
+my $default_lib_path = "/usr/local/share/z88dk/lib";	# reasonable default
+open(my $fh, "<", "../config.h"); 						# ignore file-not-found errors
+while (<$fh>) {
+	/^\s*#\s*define\s+PREFIX\s*\"(.*?)\"/ and $default_lib_path = "$1/lib";
+}
+close($fh);
 
 # check our RLD code is compiling
-
 my @RLD_AT_0004 = map {hex} qw( 
 	30 05 CD 0B 00 37 C9 07 07 07 07 CB 27
 	CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB
