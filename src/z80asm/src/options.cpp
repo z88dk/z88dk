@@ -173,7 +173,7 @@ string Options::prepend_output_dir(const string& filename) {
 			file += filename;
 		}
 		fs::path path{ file };
-		return path.generic_string();
+		return path.lexically_normal().generic_string();
 	}
 }
 
