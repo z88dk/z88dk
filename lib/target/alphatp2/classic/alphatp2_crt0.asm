@@ -17,7 +17,7 @@
     PUBLIC    l_dcal          ;jp(hl)
 
 IFNDEF      CRT_ORG_CODE
-    defc    CRT_ORG_CODE = 0x4010
+    defc    CRT_ORG_CODE = 0x8000
 ENDIF
 
     defc    CONSOLE_COLUMNS = 80
@@ -70,3 +70,23 @@ l_dcal:
     INCLUDE "crt/classic/crt_runtime_selection.inc"
 
     INCLUDE	"crt/classic/crt_section.inc"
+
+
+    SECTION bootstrap
+
+    org     $4010
+
+    EXTERN  __DATA_END_tail
+
+    ld      l,0         ;Drive 0, side 0
+    ld      de,0x3000   ;Sector 3, track 0
+    ld      a,$84       ;Position floppy
+    call    0x0814      ;Execute command
+;    jp      c,0
+    ld      bc,CRT_ORG_CODE
+    ld	    d, +((__DATA_END_tail - CRT_ORG_CODE ) / 256) + 1       ;Number of sectors
+    ld      e,0
+    ld      a,$82        ;Load sectors
+    call    0x814
+;    jp      c,0
+    jp      CRT_ORG_CODE
