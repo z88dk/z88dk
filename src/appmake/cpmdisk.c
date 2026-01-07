@@ -1213,7 +1213,8 @@ disc_handle *cpm_create(disc_spec* spec)
 
 static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
-    size_t num_extents = (len / h->spec.extent_size) + 1;
+    //size_t num_extents = (len / h->spec.extent_size) + 1;
+	size_t num_extents = (len + h->spec.extent_size - 1) / h->spec.extent_size;
     size_t directory_offset;
     size_t offset;
     uint8_t direntry[32];
