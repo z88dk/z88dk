@@ -32,6 +32,7 @@ ENDIF
 IF FORalphatp2
     defc    _GFX_MAXX    = 160
     defc    _GFX_MAXY    = 72
+    defc    _GFX_GENCON_USEPLOTC   = 1        ; We call generic_console_plotc, not _printc for text mode
     defc    _GFX_TEXT_BLANK_CHAR    = 32
 ENDIF
 

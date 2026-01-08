@@ -12,6 +12,8 @@
     PUBLIC  generic_console_set_attribute
     PUBLIC  generic_console_ioctl
     EXTERN  generic_console_flags
+    EXTERN  generic_console_plotc
+    EXTERN  generic_console_pointxy
 
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
@@ -63,6 +65,7 @@ generic_console_printc:
     ld      a,(generic_console_flags)
     and     128
     or      d
+generic_console_plotc:
     push    bc
     call    xypos
     ld      (hl),a
@@ -93,6 +96,11 @@ generic_console_vpeek:
     and     127
     ret
 
+generic_console_pointxy:
+    call    xypos
+    ld      a,(hl)
+    and     a
+    ret
 
 
 ; b = row
