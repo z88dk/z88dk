@@ -1638,7 +1638,7 @@ alphatp2_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building Alpha P2 Library ---'
 	@echo ''
-	$(call buildgeneric,alphatp2,gencon narrow)
+	$(call buildgeneric,alphatp2,"gencon narrow")
 	TARGET=alphatp2 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -DFORalphatp2 -x$(OUTPUT_DIRECTORY)/alphatp2_clib @$(TARGET_DIRECTORY)/alphatp2/alphatp2.lst
 
 
