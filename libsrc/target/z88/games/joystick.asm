@@ -9,7 +9,8 @@
 
 joystick:
 _joystick:
-	call	joystick_inkey
+    ld      a,l
+    call    joystick_inkey
     ; Let OZ in
     push    hl
     call    getk
