@@ -15,4 +15,8 @@
 getk:
 _getk:
     xor     a
-    jp      $C90A
+    call    $C90A
+    ld      hl,0
+    ret     z
+    ld      l,a
+    ret

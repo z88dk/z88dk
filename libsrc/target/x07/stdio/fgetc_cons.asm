@@ -18,4 +18,6 @@ _fgetc_cons:
     xor     a
     call    $C90A
     jr      z, fgetc_cons
+    ld      l,a
+    ld      h,0
     ret
