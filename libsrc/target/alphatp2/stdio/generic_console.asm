@@ -11,6 +11,7 @@
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute
     PUBLIC  generic_console_ioctl
+    EXTERN  generic_console_flags
 
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
@@ -18,9 +19,6 @@
     EXTERN  generic_console_flags
 
     defc    DISPLAY=0x3000
-
-    defc    CONSOLE_COLUMNS=80
-    defc    CONSOLE_ROWS=24
 
     INCLUDE "ioctl.def"
     PUBLIC  CLIB_GENCON_CAPS
@@ -51,26 +49,28 @@ generic_console_cls_2:
     dec     c
     jr      nz,generic_console_cls_1
 
-	ld	hl,screen_copy
-	ld	de,screen_copy+1
-	ld	bc,+((CONSOLE_ROWS+1) * CONSOLE_COLUMNS) - 1
-	ld	(hl),0
-	ldir
+    ld      hl,screen_copy
+    ld      de,screen_copy+1
+    ld      bc,+((CONSOLE_ROWS+1) * CONSOLE_COLUMNS) - 1
+    ld      (hl),32
+    ldir
 
     ret
 
 
 
 generic_console_printc:
-	push	bc
-	call	xypos
-	ld	(hl),a
-	pop	bc
+    ld      a,(generic_console_flags)
+    and     128
+    or      d
+    push    bc
+    call    xypos
+    ld      (hl),a
+    pop     bc
 
-    ld      hl, DISPLAY
+    ld      hl, DISPLAY - 128
     ld      de, 128
     inc     b
-    sbc     hl, de
 generic_console_printc_1:
     add     hl, de
     djnz    generic_console_printc_1
@@ -88,39 +88,43 @@ generic_console_printc_1:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-	call	xypos
-	ld	a,(hl)
-	and	a
-	ret
+    call    xypos
+    ld      a,(hl)
+    and     127
+    ret
 
 
 
 ; b = row
 ; c = column
 xypos:
-        ld      hl,screen_copy - CONSOLE_COLUMNS
-        ld      de,CONSOLE_COLUMNS
-        inc     b
+    ld      hl,screen_copy - CONSOLE_COLUMNS
+    ld      de,CONSOLE_COLUMNS
+    inc     b
 generic_console_xypos_1:
-        add     hl,de
-        djnz    generic_console_xypos_1
-        add     hl,bc                   ;hl now points to address in display
-		ret
+    add     hl,de
+    djnz    generic_console_xypos_1
+    add     hl,bc                   ;hl now points to address in display
+    ret
 
 
 
 ; We avoid LDIR to be 8085 compatible
 generic_console_scrollup:
-
-	ld	hl,screen_copy + CONSOLE_COLUMNS
-	ld	de,screen_copy
-	ld	bc,+((CONSOLE_ROWS) * CONSOLE_COLUMNS)   ; 1 more row to wipe the bottom row
-	ldir
-;	ex	de,hl
-
-
     push    de
     push    bc
+
+    ld      hl,screen_copy + CONSOLE_COLUMNS
+    ld      de,screen_copy
+    ld      bc,+((CONSOLE_ROWS) * CONSOLE_COLUMNS)   ; 1 more row to wipe the bottom row
+    ldir
+    ex      de,hl
+    ld      de,hl
+    inc     hl
+    ld      bc,CONSOLE_COLUMNS - 1
+    ld      (hl),32
+    ldir
+    
 
     ld      hl, DISPLAY
 	ld      de, screen_copy
@@ -156,42 +160,31 @@ generic_console_scrollup_3:
 
 
 
-	SECTION	bss_clib
+    SECTION	bss_clib
 
 screen_copy:	
-	defs	80 * 26		;Hopefully big enough?
+    defs	80 * 26		;Hopefully big enough?
 
 
 
     SECTION code_crt_init
-    ; Set the size of the console to this hardware
-    EXTERN  __console_w
-    EXTERN  __console_h
 
-    ld      a, CONSOLE_COLUMNS
-    ld      (__console_w), a
-    ld      a, CONSOLE_ROWS
-    ld      (__console_h), a
-
-
-	; Init CRTC (and reset scroll register)
-
-;    LD HL,(1BF3h)
-;    ;LD (3FFEh),A   ; Writing to this register makes the screen scroll up
-;
-;    LD BC,3FF0h
-;    LD E,7   ; the table contains 7 bytes, we will force the last ones
-;vtac_init:
-;    LD A,(HL)
-;    LD (BC),A
-;    INC HL
-;    INC BC
-;    DEC E
-;    JP NZ,vtac_init
+    ; Init CRTC (and reset scroll register)
+    ld      hl,(1BF3h)
+    ;LD (3FFEh),A   ; Writing to this register makes the screen scroll up
+    ld      bc,3FF0h
+    ld      e,7   ; the table contains 7 bytes, we will force the last ones
+vtac_init:
+    ld      a,(hl)
+    ld      (bc),a
+    inc     hl
+    inc     bc
+    dec     e
+    jp      nz,vtac_init
 
     ld      c,$0c	;Reset the video driver, reset scroll register
     call    $00b6
-	
-	; Hide cursor
-	ld a,80
-	ld (3FFCh),a
+
+    ; Hide cursor
+    ld      a,80
+    ld      (3FFCh),a

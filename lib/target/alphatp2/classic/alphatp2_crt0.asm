@@ -17,7 +17,7 @@
     PUBLIC    l_dcal          ;jp(hl)
 
 IFNDEF      CRT_ORG_CODE
-    defc    CRT_ORG_CODE = 0x8000
+    defc    CRT_ORG_CODE = 0x4100
 ENDIF
 
     defc    CONSOLE_COLUMNS = 80
