@@ -5,7 +5,7 @@ all: binaries
 include ../../support/multitarget_build/Makefile
 
 # Hello world 
-FEATURE_TARGETS = abc80 abc800 ace adam agon alphatro altair8800 aquarius aquarius_rom aqplus bee c128 c7420 coleco bit90 cpc cpm dai \
+FEATURE_TARGETS = abc80 abc800 ace adam agon alphatp2 alphatro altair8800 aquarius aquarius_rom aqplus bee c128 c7420 coleco bit90 cpc cpm dai \
 	eg2000 enterprise excali64 fp1100 g800 gal galplus gamegear gb gl gl4000 gl6000  \
 	hector hectorhr \
 	hemc hgmc homelab homelab2 kc kramermc krokha lambda laser500 lm80c lviv lynx m5 m100 m100_optrom m10 m10_optrom kc85 kc85_optrom pc8201 \

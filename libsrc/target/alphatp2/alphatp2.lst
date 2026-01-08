@@ -4,3 +4,4 @@ target/alphatp2/stdio/fputc_cons_native
 @classic/stdio/stdio.lst
 target/alphatp2/graphics/textpixl6
 @classic/gfx/gencon/gfx_gencon6_portable.lst
+@classic/games/games.lst

@@ -1742,6 +1742,43 @@
 // #define __HAVE_BANKED_CALL 0
 // #define __HAVE_BANKED_FAR_MAPPING 0
 
+#elif defined(__ALPHATP2)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_FGETC_CONS 1
+#define __HAVE_GETK 1
+// #define __HAVE_INKEY 0
+// #define __HAVE_ONEBITSOUND 0
+// #define __HAVE_PSG_AY 0
+// #define __HAVE_PSG_AY_WYZ 0
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_AY_ARKOS 0
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+// #define __HAVE_VIDEO_V9938 0
+#define __HAVE_JOYSTICK 1
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_CUSTOM_FONT 0
+#define __GENCON_MAX_UDGS 0
+#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 0
+#define __HAVE_GFX 1
+// #define __HAVE_GFX_COLOUR 0
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+// #define __HAVE_COLOUR 0
+// #define __HAVE_COLOUR_MAPPING 0
+// #define __HAVE_FARHEAP 0
+// #define __HAVE_BANKED_CALL 0
+// #define __HAVE_BANKED_FAR_MAPPING 0
+
 #elif defined(__ALPHATRO__)
 #define __HAVE_KEYBOARD 1
 #define __HAVE_FGETC_CONS 1
@@ -4299,7 +4336,7 @@
 #define __HAVE_KEYBOARD 1
 #define __HAVE_FGETC_CONS 1
 #define __HAVE_GETK 1
-#define __HAVE_INKEY 1
+// #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
 // #define __HAVE_PSG_AY_WYZ 0
@@ -6246,10 +6283,10 @@
 #define __GENCON_CUSTOM_FONT 0
 #define __GENCON_MAX_UDGS 0
 #define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 0
-// #define __HAVE_GFX 0
+#define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-// #define __HAVE_GFX_POINTXY 0
-// #define __HAVE_GFX_XORPLOT 0
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 // #define __HAVE_COLOUR 0
 // #define __HAVE_COLOUR_MAPPING 0
 // #define __HAVE_FARHEAP 0
@@ -6428,9 +6465,9 @@
 #define __HAVE_JOYSTICK 1
 #define __HARDWARE_JOY1_INDEX -1
 #define __HARDWARE_JOY2_INDEX -1
-#define __GENCON_CUSTOM_FONT 0
-#define __GENCON_MAX_UDGS 0
-#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 0
+#define __GENCON_CUSTOM_FONT 1
+#define __GENCON_MAX_UDGS 128
+#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
 #define __HAVE_GFX_POINTXY 1
@@ -6465,9 +6502,9 @@
 #define __HAVE_JOYSTICK 1
 #define __HARDWARE_JOY1_INDEX -1
 #define __HARDWARE_JOY2_INDEX -1
-#define __GENCON_CUSTOM_FONT 0
-#define __GENCON_MAX_UDGS 0
-#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 0
+#define __GENCON_CUSTOM_FONT 1
+#define __GENCON_MAX_UDGS 128
+#define __GENCON_MAX_UDGS_WITH_CUSTOM_FONT 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
 #define __HAVE_GFX_POINTXY 1

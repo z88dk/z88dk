@@ -5,7 +5,7 @@ all: binaries
 include ../../support/multitarget_build/Makefile
 
 # Hello world 
-WORLD_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius aqplus bee c128 c7420 coleco bit90 cpc cpm dai \
+WORLD_TARGETS = abc80 abc800 ace adam alphatp2 alphatro altair8800 aquarius aqplus bee c128 c7420 coleco bit90 cpc cpm dai \
 	eg2000 enterprise fp1100 g800 gal gamegear gl  gl4000 gl6000  \
 	hector hectorhr hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 micro8085 mikro80 \
 	map1010 msx msx2_rom mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
@@ -26,7 +26,7 @@ $(eval $(call build_app, $(WORLD_TARGETS), world.bin, world.c) )
 
 # Hello world using conio features
 
-CONIO_TARGETS = abc80 ace adam alphatro aquarius aqplus bee cpc coleco cpm fp1100 gb hector hectorhr  hemc hgmc homelab homelab2 \
+CONIO_TARGETS = abc80 ace adam alphatp2 alphatro aquarius aqplus bee cpc coleco cpm fp1100 gb hector hectorhr  hemc hgmc homelab homelab2 \
 	kramermc laser500 mc1000 mikro80 nabu \
 	nascom ondra pmd85 pv1000 pps rx78 sam spc1000 srr super80 super80_vduem trs80 vg5k vz z1013 zx80 zx81 \
 	map1010 msx msx2_rom phc25 pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx \
