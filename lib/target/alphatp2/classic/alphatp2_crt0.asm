@@ -72,7 +72,7 @@ l_dcal:
     INCLUDE	"crt/classic/crt_section.inc"
 
 
-    SECTION bootstrap
+    SECTION BOOTSTRAP
 
     org     $4010
 
