@@ -19,20 +19,51 @@ jobs:
       SHELLOPTS: igncr
       CHERE_INVOKING: 1
       CYGWIN_NOWINPATH: 1
+      
     steps:
     - name: Configure git
       run: |
         git config --global core.autocrlf input
       shell: cmd
+      
     - name: Checkout from git
       uses: actions/checkout@v4
       with: 
         submodules: 'true'
+
+    - name: Cache multiple paths
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/perl5
+        key: ${{ runner.os }}-cache3
+
     - name: Setup Cygwin
       uses: cygwin/cygwin-install-action@master
       with:
         platform: x64
-        packages: make gcc-g++ bison flex libxml2-devel libiconv-devel zlib-devel liblzma-devel wget unzip dos2unix autoconf automake libtool ragel perl perl-Regexp-Common perl-Test-Harness perl-Text-Diff perl-YAML-Tiny perl-Module-Build perl-List-MoreUtils perl-Params-Util Perl-B-COW Perl-Clone libgmp-devel
+        packages: >
+          autoconf 
+          automake 
+          bison 
+          dos2unix 
+          flex 
+          gcc-core
+          gcc-g++ 
+          libcrypt-devel 
+          libexpat-devel 
+          libgmp-devel
+          libiconv-devel 
+          liblzma-devel 
+          libtool  
+          libxml2-devel 
+          make 
+          perl 
+          pkg-config
+          ragel 
+          unzip 
+          wget 
+          zlib-devel 
     - name: Install choco packages
       run: |
         choco install re2c
@@ -41,23 +72,26 @@ jobs:
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        cpanm --force File::Path Capture::Tiny
-        cpanm App::Prove Array::Compare Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Path::Tiny Regexp::Common Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+        cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+        
     - name: Build binaries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -l
+
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b
+
     - name: Build examples
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -e
+
     - name: Run tests
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
