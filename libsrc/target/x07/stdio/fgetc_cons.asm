@@ -20,4 +20,8 @@ _fgetc_cons:
     jr      z, fgetc_cons
     ld      l,a
     ld      h,0
+    push    hl
+    ld      a,SUB_KBD_CLEAR
+    call    SUB_EXEC_CMD
+    pop     hl
     ret
