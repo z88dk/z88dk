@@ -60,3 +60,6 @@ string int_to_hex(T i, int width) {
         << std::hex << i << std::dec;
     return ss.str();
 }
+
+std::string pop_end_slash(std::string path);
+std::string join_dir(const std::string& a, const std::string& b);

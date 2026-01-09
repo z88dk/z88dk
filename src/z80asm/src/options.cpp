@@ -760,7 +760,7 @@ string Options::search_path(vector<string>& path, const string& file) {
 
 	// search in directory list
 	for (auto& dir : path) {
-		fs::path full_path{ fs::path(dir) / file_path };
+        fs::path full_path{ join_dir(dir, file_path.generic_string())};
 
 		if (fs::is_regular_file(full_path))
 			return full_path.lexically_normal().generic_string();
@@ -1082,13 +1082,13 @@ string Options::search_z80asm_lib() {
 	// try to read from ZCCCFG/..
 	const char* zcccfg = getenv("ZCCCFG");
 	if (zcccfg) {
-		fs::path lib_path = fs::path(zcccfg) / fs::path("..") / fs::path(lib_name);
+        fs::path lib_path = fs::path(join_dir(join_dir(zcccfg, ".."), lib_name));
 		if (check_library(lib_path))
 			return lib_path.lexically_normal().generic_string();
 	}
 
 	// try to read from PREFIX/lib
-	fs::path lib_path{ fs::path(PREFIX) / fs::path("lib") / fs::path(lib_name) };
+    fs::path lib_path = join_dir(join_dir(PREFIX, "lib"), lib_name);
 	if (check_library(lib_path))
 		return lib_path.lexically_normal().generic_string();
 

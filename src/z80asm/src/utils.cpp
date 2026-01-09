@@ -224,3 +224,29 @@ istream& safe_getline(istream& is, string& t) {
         }
     }
 }
+
+std::string pop_end_slash(std::string path) {
+    while (!path.empty() && (path.back() == '/' || path.back() == '\\'))
+        path.pop_back();
+    return path;
+}
+
+std::string join_dir(const std::string& a, const std::string& b) {
+    std::string left = a;
+    std::string right = b;
+
+    // Remove trailing slashes from left
+    while (!left.empty() && (left.back() == '/' || left.back() == '\\'))
+        left.pop_back();
+
+    // Remove leading slashes from right
+    while (!right.empty() && (right.front() == '/' || right.front() == '\\'))
+        right.erase(right.begin());
+
+    if (left.empty())
+        return right;
+    if (right.empty())
+        return left;
+
+    return left + "/" + right;
+}

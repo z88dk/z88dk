@@ -14,6 +14,8 @@ while (<$fh>) {
 	/^\s*#\s*define\s+PREFIX\s*\"(.*?)\"/ and $default_lib_path = "$1/lib";
 }
 close($fh);
+$default_lib_path =~ s{[\\/]+$}{};
+$default_lib_path =~ s{[\\/]+}{/}g;
 
 # check our RLD code is compiling
 my @RLD_AT_0004 = map {hex} qw( 
