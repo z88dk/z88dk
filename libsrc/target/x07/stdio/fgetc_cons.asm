@@ -13,6 +13,8 @@
     PUBLIC  fgetc_cons
     PUBLIC  _fgetc_cons
 
+    INCLUDE "target/x07/def/x07.h"
+
 fgetc_cons:
 _fgetc_cons:
     xor     a
