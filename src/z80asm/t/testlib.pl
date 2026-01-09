@@ -633,6 +633,42 @@ sub ixiy_compatible {
 }
 
 #------------------------------------------------------------------------------
+sub normalize_path_for_assembler {
+    my ($test_dir, $source_dir) = @_;
+
+    # Detect MSYS2 vs Cygwin
+    my $is_msys   = exists $ENV{MSYSTEM};          # MSYS2 always sets this
+    my $is_cygwin = (!$is_msys && $^O eq 'cygwin');# True Cygwin Perl
+
+    my $output_dir;
+
+    if ($^O eq 'MSWin32') {
+        # Native Windows Perl (Strawberry)
+        $output_dir = "${test_dir}/${source_dir}";
+        $output_dir =~ s/://g;                     # strip drive colon
+    }
+    elsif ($is_msys) {
+        # MSYS2 Perl -> convert to Windows path because argv[] will be rewritten
+        chomp(my $abs_path = `cygpath -m -a '$source_dir'`);
+        $abs_path =~ s/://g;
+        $output_dir = "${test_dir}/${abs_path}";
+    }
+    elsif ($is_cygwin) {
+        # True Cygwin -> POSIX paths preserved end-to-end
+        $output_dir = "${test_dir}/${source_dir}";
+    }
+    else {
+        # Linux, macOS, WSL -> POSIX
+        $output_dir = "${test_dir}/${source_dir}";
+    }
+
+    # Normalize double slashes
+    $output_dir =~ s{/+}{/}g;
+
+    return $output_dir;
+}
+
+#------------------------------------------------------------------------------
 # Ticks: prepare tests and run all in one go
 {
 	package Ticks;

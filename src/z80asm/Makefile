@@ -290,8 +290,8 @@ clean::
 rebuild: clean
 	$(RM) -f ../z80asm/dev/z80asm_lib/$(TARGET_LIB)
 	$(RM) -f ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
-	touch ../z80asm/Makefile ../z80asm/dev/z80asm_lib/Makefile ../z80asm/dev/cpu/Makefile
-	touch ../z80asm/src/c/*.rl
+	$(TOUCH) ../z80asm/Makefile ../z80asm/dev/z80asm_lib/Makefile ../z80asm/dev/cpu/Makefile
+	$(TOUCH) ../z80asm/src/c/*.rl
 	$(MAKE) -C ../common
 	$(MAKE) -C ../z80asm
 	$(CP) ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
@@ -312,3 +312,4 @@ retest: rebuild
 	$(MAKE) -C ../common test
 	$(MAKE) -C ../z80asm test
 	$(MAKE) -C ../zobjcopy test
+

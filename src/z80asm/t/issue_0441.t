@@ -162,18 +162,7 @@ path("${test_dir}/src/s1/s2")->mkpath;
 spew("${test_dir}/src/s1/s2/${test}.asm", $asm);
 
 my $source_dir = path("${test_dir}/src/s1/s2")->absolute;
-if ($^O =~ /msys|cygwin/) {
-	chomp(my $abs_path = `cygpath -u -a '${test_dir}/src/s1/s2'`);
-	$abs_path =~ s/://g;
-	$output_dir = "${test_dir}/bin/${abs_path}";
-}
-elsif ($^O eq 'MSWin32') {
-	$output_dir = "${test_dir}/bin/${source_dir}";
-	$output_dir =~ s/://g;
-}
-else {
-	$output_dir = "${test_dir}/bin/${source_dir}";
-}
+$output_dir = normalize_path_for_assembler("${test_dir}/bin", $source_dir);
 
 run_ok("z88dk-z80asm -b -s -l -m -g ".
 	   "-O${test_dir}/bin ${source_dir}/${test}.asm");
