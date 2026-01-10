@@ -57,7 +57,7 @@ pixeladdress_MODE0:
     cp      1
     jr      nz, not_screen1
     set     5, d
-  ELIF  FORsam
+  ELIF  FORsam|FORz88
     ld      a, d
     sub     +(64-(SCREEN_BASE/256))
     ld      d, a

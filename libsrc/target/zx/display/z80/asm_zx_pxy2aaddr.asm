@@ -33,6 +33,9 @@ asm_zx_pxy2aaddr:
 
 IF __USE_SPECTRUM_128_SECOND_DFILE
    ld h,$d8/4
+ELIF __USE_OFFSET_SCREEN
+   EXTERN SCREEN_BASE
+   or +((SCREEN_BASE/256) + $18) / 4
 ELSE
    ld h,$58/4
 ENDIF

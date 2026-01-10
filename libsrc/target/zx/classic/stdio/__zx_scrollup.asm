@@ -18,7 +18,7 @@
 
     EXTERN  generic_console_zxn_tile_scrollup
 
-  IF    FORsam
+  IF    FORsam|FORz88
     defc    NOROMCALLS=1
     EXTERN  SCREEN_BASE
     EXTERN  __sam_graphics_pagein
@@ -51,7 +51,7 @@ outer_loop:
 inner_loop:
     ex      af, af
     ld      l, (ix+16)
-    IF  FORsam
+    IF  FORsam|FORz88
     ld      a, (ix+17)
     sub     64-(SCREEN_BASE/256)
     ld      h, a
@@ -59,7 +59,7 @@ inner_loop:
     ld      h, (ix+17)
     ENDIF
     ld      e, (ix+0)
-    IF  FORsam
+    IF  FORsam|FORz88
     ld      a, (ix+1)
     sub     64-(SCREEN_BASE/256)
     ld      d, a
@@ -85,7 +85,7 @@ inner_loop:
 clear_loop:
     ex      af, af
     ld      e, (ix+0)
-    IF  FORsam
+    IF  FORsam|FORz88
     ld      a, (ix+1)
     sub     64-(SCREEN_BASE/256)
     ld      d, a
@@ -105,7 +105,7 @@ clear_loop:
     dec     a
     jr      nz, clear_loop
 
-    IF  FORsam
+    IF  FORsam|FORz88
     ld      hl, SCREEN_BASE+6144+32
     ld      de, SCREEN_BASE+6144
     ELSE

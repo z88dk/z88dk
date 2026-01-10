@@ -5,7 +5,7 @@
     PUBLIC  __zx_gencon_xy_to_dfaddr
 
     EXTERN  __zx_screenmode
-  IF    FORsam
+  IF    FORsam|FORz88
     EXTERN  SCREEN_BASE
   ENDIF
 
@@ -28,7 +28,7 @@ not_hrgmode:
     ld      l, a
     ld      a, b
     and     0x18
-  IF    FORsam
+  IF    FORsam|FORz88
     or      SCREEN_BASE/256
   ELSE
     or      0x40

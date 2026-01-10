@@ -21,7 +21,7 @@
     EXTERN  generic_console_zxn_tile_printc
     EXTERN  __sam_printc
 
-  IF    FORsam
+  IF    FORsam|FORz88
     EXTERN  SCREEN_BASE
   ENDIF
 

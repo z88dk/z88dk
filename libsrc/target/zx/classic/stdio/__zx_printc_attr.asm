@@ -6,7 +6,7 @@
 
     EXTERN  __zx_screenmode
     EXTERN  __zx_console_attr
-  IF    FORsam
+  IF    FORsam|FORz88
     EXTERN  SCREEN_BASE
     EXTERN  __sam_graphics_pageout
   ENDIF
@@ -40,7 +40,7 @@ not_hi_colour:
     rrca
     rrca
     and     3
-  IF    FORsam
+  IF    FORsam|FORz88
     or      +(SCREEN_BASE/256)+24
   ELSE
     or      88

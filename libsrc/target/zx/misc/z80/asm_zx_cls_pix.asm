@@ -28,6 +28,10 @@ asm_zx_cls_pix:
 IF __USE_SPECTRUM_128_SECOND_DFILE
    ld hl,$c000
    ld de,$c001
+ELIF __USE_OFFSET_SCREEN
+   EXTERN SCREEN_BASE
+   ld hl,SCREEN_BASE + $0000
+   ld de,SCREEN_BASE + $0001
 ELSE
    ld hl,$4000
    ld de,$4001

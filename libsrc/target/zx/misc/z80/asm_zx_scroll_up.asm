@@ -59,6 +59,9 @@ asm0_zx_scroll_up:
 
 IF __USE_SPECTRUM_128_SECOND_DFILE
    ld de,$c000
+ELIF __USE_OFFSET_SCREEN
+   EXTERN SCREEN_BASE
+   ld de,SCREEN_BASE + $0000
 ELSE
    ld de,$4000                 ; de = destination address of first scroll row
 ENDIF
@@ -72,6 +75,9 @@ ENDIF
 
 IF __USE_SPECTRUM_128_SECOND_DFILE
    ld de,$d800
+ELIF __USE_OFFSET_SCREEN
+   EXTERN SCREEN_BASE
+   ld de,SCREEN_BASE + $1800
 ELSE
    ld de,$5800                 ; de = destination address of first scroll row
 ENDIF

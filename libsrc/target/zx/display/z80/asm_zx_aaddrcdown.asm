@@ -34,6 +34,9 @@ asm_zx_aaddrcdown:
 
 IF __USE_SPECTRUM_128_SECOND_DFILE
    ld a,$da
+ELIF __USE_OFFSET_SCREEN
+   EXTERN SCREEN_BASE
+   ld a,+(SCREEN_BASE/256) + $1a
 ELSE
    ld a,$5a
 ENDIF

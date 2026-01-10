@@ -27,6 +27,10 @@ asm_zx_cls_attr:
 IF __USE_SPECTRUM_128_SECOND_DFILE
    ld hl,$d800
    ld de,$d801
+ELIF __USE_OFFSET_SCREEN
+   EXTERN SCREEN_BASE
+   ld hl,SCREEN_BASE + $1800
+   ld de,SCREEN_BASE + $1801
 ELSE
    ld hl,$5800
    ld de,$5801

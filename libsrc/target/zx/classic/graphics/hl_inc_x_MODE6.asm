@@ -9,7 +9,7 @@
     EXTERN  __zx_screenmode
     EXTERN  __zx_console_attr
 
-  IF    FORsam
+  IF    FORsam|FORz88
     ; This code won't work on the same due to the lack of correct paging
     ; but it is assembled as part of zx-common
     EXTERN  SCREEN_BASE
@@ -46,7 +46,7 @@ standard_modes:
     rrca
     rrca
     and     3
-  IF    FORsam
+  IF    FORsam|FORz88
     or      +(SCREEN_BASE/256)+24
   ELSE
     or      88
