@@ -26,6 +26,8 @@ target/vz/vz_coarsescroll_callee
 target/vz/vz_disableirq
 target/vz/vz_drawsprite
 target/vz/vz_drawsprite_callee
+target/vz/vz_drawtext
+target/vz/vz_drawtext_callee
 target/vz/vz_enableirq
 target/vz/vz_getch
 target/vz/vz_getrnd

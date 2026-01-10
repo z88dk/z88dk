@@ -22,6 +22,7 @@ extern void __LIB__              vz_char_draw(int x, int y, int c, int ch) __sma
 extern void __LIB__              vz_coarsescroll(void *addr, int byte) __smallc;
 extern void __LIB__              vz_disableirq(void);
 extern void __LIB__              vz_drawsprite(int x, int y, int n) __smallc;
+extern void __LIB__              vz_drawtext(int x, int y, void *addr) __smallc;
 extern void __LIB__              vz_enableirq(void);
 extern int  __LIB__              vz_getch(void);
 extern int  __LIB__              vz_getrnd(int x);
@@ -46,6 +47,7 @@ extern void __LIB__              vz_waitvb(void);
 
 extern void __LIB__    vz_coarsescroll_callee(void *addr, int byte) __smallc __z88dk_callee;
 extern void __LIB__    vz_drawsprite_callee(int x, int y, int n) __smallc __z88dk_callee;
+extern void __LIB__    vz_drawtext_callee(int x, int y, void *addr) __smallc __z88dk_callee;
 extern char __LIB__   *vz_midstr_callee(char *str, int pos) __smallc __z88dk_callee;
 extern void __LIB__    vz_poke_callee(void *addr, int byte) __smallc __z88dk_callee;
 extern void __LIB__    vz_printat_callee(int x, int y, void *addr) __smallc __z88dk_callee;
@@ -59,6 +61,7 @@ extern void __LIB__    vz_soundcopy_callee(char *dst, char *src, int size, int s
 
 #define vz_coarsescroll(a,b)	 vz_coarsescroll_callee(a,b)
 #define vz_drawsprite(a,b,c)  	 vz_drawsprite_callee(a,b,c)
+#define vz_drawtext(a,b,c)  	 vz_drawtext_callee(a,b,c)
 #define vz_midstr(a,b)           vz_midstr_callee(a,b)
 #define vz_poke(a,b)			 vz_poke_callee(a,b)
 #define vz_printat(a,b,c)        vz_printat_callee(a,b,c)
@@ -67,9 +70,7 @@ extern void __LIB__    vz_soundcopy_callee(char *dst, char *src, int size, int s
 #define vz_smoothscroll(a,b)	 vz_smoothscroll_callee(a,b)
 #define vz_sound(a,b)            vz_sound_callee(a,b)
 #define vz_soundcopy(a,b,c,d,e)  vz_soundcopy_callee(a,b,c,d,e)
-
 #define vz_plot(a,b,c,d)		 line(a,b,c,d)
-
 #define vz_disableirq			 intrinsic_di()
 #define vz_enableirq		 	 intrinsic_ei()
 
