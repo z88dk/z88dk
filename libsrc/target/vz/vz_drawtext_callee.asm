@@ -21,8 +21,8 @@ vz_drawtext_callee:
 _vz_drawtext_callee:
     pop     af
     pop     bc
-    pop     de
     pop     hl
+    pop     de
     push    af
 
    ;  bc = string pointer

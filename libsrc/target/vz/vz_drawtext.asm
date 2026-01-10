@@ -19,10 +19,10 @@ _vz_drawtext:
 
     pop     af
     pop     bc
-    pop     de
     pop     hl
-    push    hl
+    pop     de
     push    de
+    push    hl
     push    bc
     push    af
 
