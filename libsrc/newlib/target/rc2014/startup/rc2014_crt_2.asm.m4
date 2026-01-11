@@ -327,10 +327,10 @@ SECTION code_crt_return
 
 include "crt/classic/crt_runtime_selection.inc" 
 
-PUBLIC _8085_int65
+PUBLIC _i8085_int65
 EXTERN _acia_interrupt
 
-defc _8085_int65 = _acia_interrupt
+defc _i8085_int65 = _acia_interrupt
 
 include "crt/newlib/crt_jump_vectors_8085.inc"
 

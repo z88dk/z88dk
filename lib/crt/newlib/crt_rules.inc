@@ -590,9 +590,9 @@ IF __8085
    ENDIF
    
    
-   IFDEF CRT_ENABLE_INT65
+   IFDEF CRT_ENABLE_INT75
    
-      defc __crt_enable_int75 = CRT_ENABLE_INT65
+      defc __crt_enable_int75 = CRT_ENABLE_INT75
    
    ELSE
    

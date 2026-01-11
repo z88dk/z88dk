@@ -8,14 +8,14 @@
 
 IF ((__crt_enable_rst & $0202) = $02)
 
-   EXTERN _8085_rst_08h
-   jp     _8085_rst_08h
+   EXTERN _i8085_rst_08h
+   jp     _i8085_rst_08h
 
 ELSE
 
    IF ((__crt_enable_rst & $0202) = $0202)
 
-   jp     __8085_rst_08h
+   jp     __i8085_rst_08h
 
    ELSE
 
@@ -27,8 +27,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $0202) != $0202)
    
-   PUBLIC _8085_rst_08h_vector
-   defc   _8085_rst_08h_vector = $09
+   PUBLIC _i8085_rst_08h_vector
+   defc   _i8085_rst_08h_vector = $09
 
 ENDIF
 
@@ -40,14 +40,14 @@ ENDIF
 
 IF ((__crt_enable_rst & $0404) = $04)
 
-   EXTERN _8085_rst_10h
-   jp     _8085_rst_10h
+   EXTERN _i8085_rst_10h
+   jp     _i8085_rst_10h
 
 ELSE
 
    IF ((__crt_enable_rst & $0404) = $0404)
 
-   jp     __8085_rst_10h
+   jp     __i8085_rst_10h
 
    ELSE
 
@@ -59,8 +59,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $0404) != $0404)
 
-   PUBLIC _8085_rst_10h_vector
-   defc   _8085_rst_10h_vector = $11
+   PUBLIC _i8085_rst_10h_vector
+   defc   _i8085_rst_10h_vector = $11
 
 ENDIF
 
@@ -72,14 +72,14 @@ ENDIF
 
 IF ((__crt_enable_rst & $0808) = $08)
 
-   EXTERN _8085_rst_18h
-   jp     _8085_rst_18h
+   EXTERN _i8085_rst_18h
+   jp     _i8085_rst_18h
 
 ELSE
 
    IF ((__crt_enable_rst & $0808) = $0808)
 
-   jp     __8085_rst_18h
+   jp     __i8085_rst_18h
 
    ELSE
 
@@ -91,8 +91,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $0808) != $0808)
 
-   PUBLIC _8085_rst_18h_vector
-   defc   _8085_rst_18h_vector = $19
+   PUBLIC _i8085_rst_18h_vector
+   defc   _i8085_rst_18h_vector = $19
 
 ENDIF
 
@@ -102,14 +102,14 @@ ENDIF
 
 IF ((__crt_enable_rst & $1010) = $10)
 
-   EXTERN _8085_rst_20h
-   jp     _8085_rst_20h
+   EXTERN _i8085_rst_20h
+   jp     _i8085_rst_20h
 
 ELSE
 
    IF ((__crt_enable_rst & $1010) = $1010)
 
-   jp     __8085_rst_20h
+   jp     __i8085_rst_20h
 
    ELSE
 
@@ -121,8 +121,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $1010) != $1010)
    
-   PUBLIC _8085_rst_20h_vector
-   defc   _8085_rst_20h_vector = $21
+   PUBLIC _i8085_rst_20h_vector
+   defc   _i8085_rst_20h_vector = $21
 
 ENDIF
 
@@ -163,14 +163,14 @@ ENDIF
 
 IF ((__crt_enable_rst & $2020) = $20)
 
-   EXTERN _8085_rst_28h
-   jp     _8085_rst_28h
+   EXTERN _i8085_rst_28h
+   jp     _i8085_rst_28h
 
 ELSE
 
    IF ((__crt_enable_rst & $2020) = $2020)
 
-   jp     __8085_rst_28h
+   jp     __i8085_rst_28h
 
    ELSE
 
@@ -182,8 +182,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $2020) != $2020)
    
-   PUBLIC _8085_rst_28h_vector
-   defc   _8085_rst_28h_vector = $29
+   PUBLIC _i8085_rst_28h_vector
+   defc   _i8085_rst_28h_vector = $29
       
 ENDIF
 
@@ -193,14 +193,14 @@ ENDIF
 
 IF (__crt_enable_int55 = 1)
 
-   EXTERN _8085_int55
-   jp     _8085_int55
+   EXTERN _i8085_int55
+   jp     _i8085_int55
 
 ELSE
 
    IF (__crt_enable_int55 > 1)
 
-   jp     __8085_int55
+   jp     __i8085_int55
 
    ELSE
 
@@ -213,8 +213,8 @@ ENDIF
 
 IF (__crt_enable_int55 <= 1)
    
-   PUBLIC _8085_int55_vector
-   defc   _8085_int55_vector = $2D
+   PUBLIC _i8085_int55_vector
+   defc   _i8085_int55_vector = $2D
 
 ENDIF
 
@@ -224,14 +224,14 @@ ENDIF
 
 IF ((__crt_enable_rst & $4040) = $40)
 
-   EXTERN _8085_rst_30h
-   jp     _8085_rst_30h
+   EXTERN _i8085_rst_30h
+   jp     _i8085_rst_30h
 
 ELSE
 
    IF ((__crt_enable_rst & $4040) = $4040)
 
-   jp     __8085_rst_30h
+   jp     __i8085_rst_30h
 
    ELSE
 
@@ -243,8 +243,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $4040) != $4040)
    
-   PUBLIC _8085_rst_30h_vector
-   defc   _8085_rst_30h_vector = $31
+   PUBLIC _i8085_rst_30h_vector
+   defc   _i8085_rst_30h_vector = $31
       
 ENDIF
 
@@ -254,14 +254,14 @@ ENDIF
 
 IF (__crt_enable_int65 = 1)
 
-   EXTERN _8085_int65
-   jp     _8085_int65
+   EXTERN _i8085_int65
+   jp     _i8085_int65
 
 ELSE
 
    IF (__crt_enable_int65 > 1)
 
-   jp     __8085_int65
+   jp     __i8085_int65
 
    ELSE
 
@@ -274,8 +274,8 @@ ENDIF
 
 IF (__crt_enable_int65 <= 1)
    
-   PUBLIC _8085_int65_vector
-   defc   _8085_int65_vector = $35
+   PUBLIC _i8085_int65_vector
+   defc   _i8085_int65_vector = $35
 
 ENDIF
 
@@ -285,14 +285,14 @@ ENDIF
 
 IF ((__crt_enable_rst & $8080) = $80)
 
-   EXTERN _8085_rst_38h
-   jp     _8085_rst_38h
+   EXTERN _i8085_rst_38h
+   jp     _i8085_rst_38h
 
 ELSE
 
    IF ((__crt_enable_rst & $8080) = $8080)
 
-   jp     __8085_rst_38h
+   jp     __i8085_rst_38h
 
    ELSE
 
@@ -305,8 +305,8 @@ ENDIF
 
 IF ((__crt_enable_rst & $8080) != $8080)
    
-   PUBLIC _8085_rst_38h_vector
-   defc   _8085_rst_38h_vector = $39
+   PUBLIC _i8085_rst_38h_vector
+   defc   _i8085_rst_38h_vector = $39
       
 ENDIF
 
@@ -316,14 +316,14 @@ ENDIF
 
 IF (__crt_enable_int75 = 1)
 
-   EXTERN _8085_int75
-   jp     _8085_int75
+   EXTERN _i8085_int75
+   jp     _i8085_int75
 
 ELSE
 
    IF (__crt_enable_int75 > 1)
 
-   jp     __8085_int75
+   jp     __i8085_int75
 
    ELSE
 
@@ -336,8 +336,8 @@ ENDIF
 
 IF (__crt_enable_int75 <= 1)
    
-   PUBLIC _8085_int75_vector
-   defc   _8085_int75_vector = $3D
+   PUBLIC _i8085_int75_vector
+   defc   _i8085_int75_vector = $3D
 
 ENDIF
 
@@ -348,14 +348,14 @@ ENDIF
 
 IF (__crt_enable_rst40h = 1)
 
-   EXTERN _8085_rst40h
-   jp     _8085_rst40h
+   EXTERN _i8085_rst40h
+   jp     _i8085_rst40h
 
 ELSE
 
    IF (__crt_enable_rst40h > 1)
 
-   jp     __8085_rst40h
+   jp     __i8085_rst40h
 
    ELSE
 
@@ -368,8 +368,8 @@ ENDIF
 
 IF (__crt_enable_rst40h <= 1)
    
-   PUBLIC _8085_rst40h_vector
-   defc   _8085_rst40h_vector = $41
+   PUBLIC _i8085_rst40h_vector
+   defc   _i8085_rst40h_vector = $41
 
 ENDIF
 
