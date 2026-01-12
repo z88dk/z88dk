@@ -12,6 +12,7 @@
 #define __Z88_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 
