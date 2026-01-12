@@ -3,10 +3,6 @@
  * h17raw.c
  * Extract formats from H17Disk (.h17) images:
  *   - RAW/H8D-style user-data stream (default)
- *   - Intermediate "h17raw" for jsH89:
- *       h17raw=userdata  -> same as H8D user data (H8DB block)
- *       h17raw=hdrdata   -> per-sector header + 256-byte data + data checksum,
- *                           using SecM if present; else fallback to userdata.
  *
  * Usage:
  *   h17raw input.h17 output.h8d (TODO: --h17raw for the H89JS emulator)
