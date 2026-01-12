@@ -5,9 +5,9 @@
 
 getmaxx:
 _getmaxx:
-    ld      hl,255
-    ld      a,(__z88_gfxmode)
-    and     a
-    ret     z
     ld      hl,511
+    ld      a,(__z88_gfxmode)
+    cp      1
+    ret     z
+    ld      hl,255
     ret
