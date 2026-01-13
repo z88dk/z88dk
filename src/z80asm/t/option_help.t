@@ -10,7 +10,7 @@ ok $version, "version $version";
 
 capture_ok("z88dk-z80asm -h", <<END . slurp("t/help.txt"));
 Z80 Macro Assembler $version
-(c) InterLogic 1993-2009, Paulo Custodio 2011-2025
+(c) InterLogic 1993-2009, Paulo Custodio 2011-2026
 
 END
 

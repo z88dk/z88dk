@@ -37,7 +37,7 @@ Options g_options;
 #define Z88DK_VERSION "build " __DATE__
 #endif
 
-#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2025"
+#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2026"
 
 #define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT
 
