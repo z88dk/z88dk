@@ -5,6 +5,7 @@
  * Supports:  --dir
  *            --get <NAME.EXT> <hostfile>,
  *            --add <hostfile> <NAME.EXT>,
+ *            --add <hostfile> <NAME.ABS> address,
  *            --delete <NAME.EXT>
  * 
  * To list the file directory, use hdos_inspect.c
@@ -207,12 +208,13 @@ static int extract_file(FILE *fp, HDOS_Label lab, const uint8_t *grt, const char
 }
 
 // Insert file into disk image
-static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *inpath, const char *filename) {
+static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *inpath, const char *filename, int abs_addr) {
     FILE *in = fopen(inpath, "rb");
     if (!in) { perror("open in"); return 1; }
     fseek(in, 0, SEEK_END);
     long fsize = ftell(in);
     rewind(in);
+	if (abs_addr) fsize += 8;   // Add the header space if we want to create and ABS file
     int sectors_needed = (fsize + SECTOR_SIZE - 1)/SECTOR_SIZE;
     int groups_needed = (sectors_needed + lab.spg - 1)/lab.spg;
     // Collect free groups
@@ -231,9 +233,18 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *inpat
     // Write file data
     uint8_t buf[SECTOR_SIZE];
     int written=0;
+	size_t r;
     for (int g=0; g<groups_needed; g++) {
         for (int s=0; s<lab.spg; s++) {
-            size_t r=fread(buf,1,SECTOR_SIZE,in);
+			if (abs_addr && g == 0 && s==0) {
+				buf[0]=0xff; buf[1]=00;
+				w16le (buf+2,abs_addr);
+				w16le (buf+4,fsize-8);
+				w16le (buf+6,abs_addr);
+				r=fread(buf+8,1,SECTOR_SIZE-8,in);
+			} else {
+				r=fread(buf,1,SECTOR_SIZE,in);
+			}
             if (r==0) break;
             if (r<SECTOR_SIZE) memset(buf+r,0,SECTOR_SIZE-r);
             int sector_num = (cur * lab.spg) + s;             // HDOS: group g -> sectors [g*spg .. g*spg+(spg-1)]
@@ -380,16 +391,16 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 
 
 int main(int argc,char**argv){
-    if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir|--get name.ext out|--add hostfile name.ext|--delete name.ext]\n",argv[0]);return 1;}
+    if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir|--get name.ext out|--add hostfile name.ext <addr>|--delete name.ext]\n",argv[0]);return 1;}
     const char*path=argv[1];
-    FILE*fp=fopen(path,"rb"); if(!fp){perror("Missing disk image file");return 1;}
+    FILE*fp=fopen(path,"r+b"); if(!fp){perror("Missing disk image file");return 1;}
 
     uint8_t sector[SECTOR_SIZE];read_sector(fp,9,sector);
     HDOS_Label lab=parse_label(sector);
     uint8_t grt_sector[SECTOR_SIZE];read_sector(fp,lab.grt,grt_sector);
 	if(argc>=3) {
 		if(strcmp(argv[2],"--get")==0){extract_file(fp,lab,grt_sector,argv[3],argv[4]); goto program_end;}
-		if(strcmp(argv[2],"--add")==0){insert_file(fp,lab,grt_sector,argv[3],argv[4]); goto program_end;}
+		if(strcmp(argv[2],"--add")==0){insert_file(fp,lab,grt_sector,argv[3],argv[4],(argc < 5) ? 0 :atoi(argv[5])); goto program_end;}
 		if(strcmp(argv[2],"--delete")==0){delete_file(fp,lab,grt_sector,argv[3]); goto program_end;}
 		if(strcmp(argv[2],"--inspect")==0){inspect(fp,lab,grt_sector); goto program_end;}
 		if(strcmp(argv[2],"--dir")==0){parse_directory(fp, lab, grt_sector); goto program_end;}
