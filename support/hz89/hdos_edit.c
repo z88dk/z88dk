@@ -262,10 +262,10 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *inpat
                 }else{
                     strncpy(name8,filename,8);
                 }
-                for (i = 0; i < 11; ++i)
-                    name8[i] = toupper(name8[i]);
                 memcpy(blk+off,name8,8);
                 memcpy(blk+off+8,ext3,3);
+                for (i = 0; i < 11; ++i)
+                    blk[off+i] = toupper(blk[off+i]);
                 blk[off+16]=fgn;
                 blk[off+17]=lgn;
                 blk[off+18]=(sectors_needed-1)%lab.spg;
@@ -382,7 +382,8 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 int main(int argc,char**argv){
     if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir|--get name.ext out|--add hostfile name.ext|--delete name.ext]\n",argv[0]);return 1;}
     const char*path=argv[1];
-    FILE*fp=fopen(path,"r+b");if(!fp){perror("Missing disk image file");return 1;}
+    FILE*fp=fopen(path,"rb"); if(!fp){perror("Missing disk image file");return 1;}
+
     uint8_t sector[SECTOR_SIZE];read_sector(fp,9,sector);
     HDOS_Label lab=parse_label(sector);
     uint8_t grt_sector[SECTOR_SIZE];read_sector(fp,lab.grt,grt_sector);
@@ -392,7 +393,10 @@ int main(int argc,char**argv){
 		if(strcmp(argv[2],"--delete")==0){delete_file(fp,lab,grt_sector,argv[3]); goto program_end;}
 		if(strcmp(argv[2],"--inspect")==0){inspect(fp,lab,grt_sector); goto program_end;}
 		if(strcmp(argv[2],"--dir")==0){parse_directory(fp, lab, grt_sector); goto program_end;}
+		fprintf(stderr,"hdos_edit: wrong option");
+		return 1;
 	}
 program_end:
-    fclose(fp);return 0;
+    fclose(fp);
+	return 0;
 }
