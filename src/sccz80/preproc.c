@@ -85,13 +85,14 @@ void vinline(void)
             unit = input;
         clear();
         while ((k = getc(unit)) > 0) {
-            if (k == '\n' || k == '\r' || lptr >= LINEMAX)
+            if (k == '\r') continue;
+            if (k == '\n' ||lptr >= LINEMAX)
                 break;
             line[lptr++] = k;
         }
         line[lptr] = 0; /* append null */
-        if (k != '\r')
-            ++lineno; /* read one more line */
+        ++lineno; 
+
         if (k <= 0) {
             fclose(unit);
             if (inpt2 != NULL)
@@ -102,14 +103,14 @@ void vinline(void)
             }
         }
         if (lptr) {
-            if (c_intermix_ccode && cmode) {
+            if (c_intermix_ccode && cmode && pstack == NULL) {
                 gen_comment(line);
             }
             if (c_cline_directive || c_intermix_ccode) {
                 while ( lptr-- ) {
                     if ( !isspace(lptr)) break;
                 }
-                if ( lptr ) 
+                if ( lptr && pstack == NULL) 
                     gen_emit_line(lineno);
             }
             lptr = 0;
@@ -191,7 +192,7 @@ void ifline(void)
                 string[0] = 0;
                 sscanf(line + lptr, "%d %s", &num, string);
                 if (num)
-                    lineno = --num;
+                    lineno = num - 1;
 
                 if (strlen(string)) {
                     if ( strcmp(Filename, string)) {

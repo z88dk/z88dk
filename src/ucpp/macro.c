@@ -284,12 +284,13 @@ void yield_newlines(struct lexer_state *ls)
 	if (!(ls->flags & KEEP_OUTPUT)) {
 		return;
 	}
-
 	if (ls->line > ls->oline + 10) {
 	    print_line_info(ls, ls->flags);
 	    ls->oline = ls->line;
 	} else {
-	    for (; ls->line > ls->oline;) put_char(ls,'\n');
+        while ( ls->oline < ls->line ) {
+            put_char_direct(ls, '\n');
+        }
 	}
 }
 
@@ -314,7 +315,6 @@ void print_token(struct lexer_state *ls, struct token *t, long uz_line)
 			TOKEN_LIST_MEMG);
 		return;
 	}
-    yield_newlines(ls);
 	if (!S_TOKEN(t->type)) x = operators_name[t->type];
 	for (; *x; x ++) put_char(ls, *x);
 }
@@ -331,9 +331,6 @@ static void print_token_nailed(struct lexer_state *ls, struct token *t,
 	if (ls->flags & LEXER) {
 		print_token(ls, t, 0);
 		return;
-	}
-	if (ls->flags & KEEP_OUTPUT) {
-		for (; ls->oline < nail_line;) put_char(ls, '\n');
 	}
 	if (!S_TOKEN(t->type)) x = operators_name[t->type];
 	for (; *x; x ++) put_char(ls, *x);
