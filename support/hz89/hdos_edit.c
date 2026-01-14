@@ -3,6 +3,7 @@
  * z88dk tool to inspect or modify a raw HDOS disk image.
  *
  * Supports:  --dir
+ *            --inspect
  *            --get <NAME.EXT> <hostfile>,
  *            --add <hostfile> <NAME.EXT>,
  *            --add <hostfile> <NAME.ABS> address,
@@ -447,7 +448,7 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 
 
 int main(int argc,char**argv){
-    if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir|--get name.ext out|--add hostfile name.ext <addr>|--delete name.ext]\n",argv[0]);return 1;}
+    if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir|--inspect|--get name.ext out|--add hostfile name.ext <addr>|--delete name.ext]\n",argv[0]);return 1;}
     const char*path=argv[1];
     FILE*fp=fopen(path,"r+b"); if(!fp){perror("Missing disk image file");return 1;}
 
