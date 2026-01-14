@@ -160,7 +160,9 @@ static int delete_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *filen
     return 1;
 }
 
+
 // Extract file from disk image
+// If outpath is a null string, then we use extract_file to check whether a filename is already present (0 if file exists)
 static int extract_file(FILE *fp, HDOS_Label lab, const uint8_t *grt, const char *filename, const char *outpath) {
     int next_sector = lab.dis;
     while (next_sector != 0) {
@@ -176,121 +178,175 @@ static int extract_file(FILE *fp, HDOS_Label lab, const uint8_t *grt, const char
             memcpy(name, e, 8); name[8]='\0';
             char ext[4]; memcpy(ext, e+8, 3); ext[3]='\0';
             if (strlen(ext)) { strcat(name, "."); strcat(name, ext); }
-            if (strcasecmp(name, filename)==0) {
-                uint8_t fgn = e[16];
-                uint8_t lgn = e[17];
-                uint8_t lsi = e[18];
-                FILE *out = fopen(outpath, "wb");
-                if (!out) { perror("open out"); return 1; }
-                int cur = fgn;
-                int group_count = 0;
-                while (cur != 0) {
-                    for (int s = 0; s < lab.spg; s++) {
-                        int sector_num = (cur * lab.spg) + s;             // HDOS: group g -> sectors [g*spg .. g*spg+(spg-1)]
-                        uint8_t buf[SECTOR_SIZE];
-                        read_sector(fp, sector_num, buf);
-                        // Last group may have partial sectors
-                        if (cur == lgn && s > lsi) break;
-                        fwrite(buf, 1, SECTOR_SIZE, out);
-                    }
-                    cur = grt[cur];
-                    group_count++;
-                }
-                fclose(out);
-                printf("Extracted %s to %s (%d groups)\n", filename, outpath, group_count);
-                return 0;
-            }
+			if (*outpath == '\0') {
+				if (strcasecmp(name, filename)==0) return 0;
+			} else {
+				if (strcasecmp(name, filename)==0) {
+					uint8_t fgn = e[16];
+					uint8_t lgn = e[17];
+					uint8_t lsi = e[18];
+					FILE *out = fopen(outpath, "wb");
+					if (!out) { perror("open out"); return 1; }
+					int cur = fgn;
+					int group_count = 0;
+					while (cur != 0) {
+						for (int s = 0; s < lab.spg; s++) {
+							int sector_num = (cur * lab.spg) + s;             // HDOS: group g -> sectors [g*spg .. g*spg+(spg-1)]
+							uint8_t buf[SECTOR_SIZE];
+							read_sector(fp, sector_num, buf);
+							// Last group may have partial sectors
+							if (cur == lgn && s > lsi) break;
+							fwrite(buf, 1, SECTOR_SIZE, out);
+						}
+						cur = grt[cur];
+						group_count++;
+					}
+					fclose(out);
+					printf("Extracted %s to %s (%d groups)\n", filename, outpath, group_count);
+					return 0;
+				}
+			}
         }
         next_sector = u16le(blk+510);
     }
-    fprintf(stderr, "File %s not found.\n", filename);
     return 1;
 }
 
+
 // Insert file into disk image
-static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *inpath, const char *filename, int abs_addr) {
+static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
+                       const char *inpath, const char *filename, int abs_addr)
+{
     FILE *in = fopen(inpath, "rb");
     if (!in) { perror("open in"); return 1; }
+
+    // Determine sizes
     fseek(in, 0, SEEK_END);
-    long fsize = ftell(in);
+    long host_size = ftell(in);
     rewind(in);
-	if (abs_addr) fsize += 8;   // Add the header space if we want to create and ABS file
-    int sectors_needed = (fsize + SECTOR_SIZE - 1)/SECTOR_SIZE;
-    int groups_needed = (sectors_needed + lab.spg - 1)/lab.spg;
-    // Collect free groups
-    int free_groups[200], free_count=0;
-    int cur = grt[0];
-    while (cur!=0 && free_count<200) { free_groups[free_count++]=cur; cur=grt[cur]; }
-    if (free_count < groups_needed) { fprintf(stderr,"Not enough space\n"); fclose(in); return 1; }
-    // Allocate groups
+
+    const int make_abs = (abs_addr != 0);
+    long on_disk_size = host_size + (make_abs ? 8 : 0);   // include ABS header if requested
+    int sectors_needed = (int)((on_disk_size + SECTOR_SIZE - 1) / SECTOR_SIZE);
+    int groups_needed  = (sectors_needed + lab.spg - 1) / lab.spg;
+
+    // Collect free groups (from free chain head at grt[0])
+    int free_groups[200], free_count = 0;
+    int gcur = grt[0];
+    while (gcur != 0 && free_count < 200) {
+        free_groups[free_count++] = gcur;
+        gcur = grt[gcur];
+    }
+    if (free_count < groups_needed) {
+        fprintf(stderr, "Not enough space\n");
+        fclose(in);
+        return 1;
+    }
+
+    // Allocate: link the chosen groups together and terminate with 0
     int fgn = free_groups[0];
-    int lgn = free_groups[groups_needed-1];
-    for (int i=0;i<groups_needed-1;i++) grt[free_groups[i]]=free_groups[i+1];
-    grt[free_groups[groups_needed-1]]=0;
-    // Advance the free chain head past the allocated run.
-    // If we consumed all collected free groups, head becomes 0.
-    grt[0] = (free_count > groups_needed) ? free_groups[groups_needed] : 0;
-    // Write file data
+    int lgn = free_groups[groups_needed - 1];
+    for (int i = 0; i < groups_needed - 1; ++i)
+        grt[free_groups[i]] = (uint8_t)free_groups[i + 1];
+    grt[free_groups[groups_needed - 1]] = 0;
+
+    // Advance free chain head beyond the allocated run
+    grt[0] = (free_count > groups_needed) ? (uint8_t)free_groups[groups_needed] : 0;
+
+    // Write file data into allocated groups
     uint8_t buf[SECTOR_SIZE];
-    int written=0;
-	size_t r;
-    for (int g=0; g<groups_needed; g++) {
-        for (int s=0; s<lab.spg; s++) {
-			if (abs_addr && g == 0 && s==0) {
-				buf[0]=0xff; buf[1]=00;
-				w16le (buf+2,abs_addr);
-				w16le (buf+4,fsize-8);
-				w16le (buf+6,abs_addr);
-				r=fread(buf+8,1,SECTOR_SIZE-8,in);
-			} else {
-				r=fread(buf,1,SECTOR_SIZE,in);
-			}
-            if (r==0) break;
-            if (r<SECTOR_SIZE) memset(buf+r,0,SECTOR_SIZE-r);
-            int sector_num = (cur * lab.spg) + s;             // HDOS: group g -> sectors [g*spg .. g*spg+(spg-1)]
-            write_sector(fp,sector_num,buf);
+    int written = 0;
+
+    for (int g = 0; g < groups_needed; ++g) {
+        int gnum = free_groups[g];  // actual group number we allocated
+        for (int s = 0; s < lab.spg; ++s) {
+
+            size_t r = 0;
+
+            if (make_abs && g == 0 && s == 0) {
+                // First sector: build ABS header + payload prefix
+                // ABS header: 0xFF,0x00, then three big-endian words (load, length, entry)
+                memset(buf, 0, sizeof(buf));
+                buf[0] = 0xFF; buf[1] = 0x00;
+                w16le(buf + 2, (uint16_t)abs_addr);
+                w16le(buf + 4, (uint16_t)(on_disk_size - 8));  // payload byte count (no header)
+                w16le(buf + 6, (uint16_t)abs_addr);
+                r = fread(buf + 8, 1, SECTOR_SIZE - 8, in);     // may be 0..(SECTOR_SIZE-8)
+                // If r < SECTOR_SIZE-8, buffer tail is already zeroed by memset above
+            } else {
+                r = fread(buf, 1, SECTOR_SIZE, in);             // may be 0..SECTOR_SIZE
+                if (r < SECTOR_SIZE) memset(buf + r, 0, SECTOR_SIZE - r);
+            }
+
+            // Always write this sector if it's part of the logical size we computed
+            int sector_num = (gnum * lab.spg) + s; // group g -> sectors [g*spg .. g*spg+(spg-1)]
+            write_sector(fp, sector_num, buf);
             written++;
-            if (written>=sectors_needed) break;
+
+            // Stop once we've written all needed sectors (handles exact fit)
+            if (written >= sectors_needed)
+                break;
         }
+        if (written >= sectors_needed)
+            break;
     }
     fclose(in);
-    // Update directory: naive approach, first empty slot
-    int next_sector=lab.dis;
-    while(next_sector!=0){
+
+    // Update directory: first empty slot
+    int next_sector = lab.dis;
+    while (next_sector != 0) {
         uint8_t blk[512];
-        read_sector(fp,next_sector,blk);
-        read_sector(fp,next_sector+1,blk+256);
-        for(int i=0;i<22;i++){
-            int off=i*23;
-            if(off+23>506)break;
-            if(blk[off]==0){
-                memset(blk+off,0,23);
-                char name8[8]={0},ext3[3]={0};
-                char *dot=strchr(filename,'.');
-                if(dot){
-                    strncpy(name8,filename,dot-filename);
-                    strncpy(ext3,dot+1,3);
-                }else{
-                    strncpy(name8,filename,8);
+        read_sector(fp, next_sector, blk);
+        read_sector(fp, next_sector + 1, blk + 256);
+
+        for (int i = 0; i < 22; ++i) {
+            int off = i * 23;
+            if (off + 23 > 506) break;
+
+            if (blk[off] == 0) {
+                // Prepare NAME.EXT in 8.3 uppercase
+                memset(blk + off, 0, 23);
+                char name8[8] = {0}, ext3[3] = {0};
+                const char *dot = strchr(filename, '.');
+                if (dot) {
+                    size_t base_len = (size_t)(dot - filename);
+                    if (base_len > 8) base_len = 8;
+                    memcpy(name8, filename, base_len);
+                    strncpy(ext3, dot + 1, 3);
+                } else {
+                    strncpy(name8, filename, 8);
                 }
-                memcpy(blk+off,name8,8);
-                memcpy(blk+off+8,ext3,3);
-                for (i = 0; i < 11; ++i)
-                    blk[off+i] = toupper(blk[off+i]);
-                blk[off+16]=fgn;
-                blk[off+17]=lgn;
-                blk[off+18]=(sectors_needed-1)%lab.spg;
-                write_sector(fp,next_sector,blk);
-                write_sector(fp,next_sector+1,blk+256);
-                // Update GRT sector
-                write_sector(fp,lab.grt,grt);
-                printf("Inserted %s from %s (%ld bytes)\n",filename,inpath,fsize);
+                memcpy(blk + off,     name8, 8);
+                memcpy(blk + off + 8, ext3,  3);
+
+                // Uppercase name + ext (do not clobber outer loop index!)
+                for (int j = 0; j < 11; ++j) {
+                    blk[off + j] = (uint8_t)toupper((unsigned char)blk[off + j]);
+                }
+
+                // Fill in chain info
+                blk[off + 16] = (uint8_t)fgn;                           // first group
+                blk[off + 17] = (uint8_t)lgn;                           // last group
+                blk[off + 18] = (uint8_t)((sectors_needed - 1) % lab.spg); // last sector index in last group
+
+                // Optionally set flags/project/version/cluster_factor if you like:
+                // blk[off + 13] = lab.spg; // cluster factor (optional)
+
+                write_sector(fp, next_sector,     blk);
+                write_sector(fp, next_sector + 1, blk + 256);
+
+                // Persist GRT
+                write_sector(fp, lab.grt, grt);
+
+                printf("Inserted %s from %s (%ld bytes on host, %ld on-disk)\n",
+                       filename, inpath, host_size, on_disk_size);
                 return 0;
             }
         }
-        next_sector=u16le(blk+510);
+        next_sector = u16le(blk + 510);
     }
-    fprintf(stderr,"No free directory slot\n");
+
+    fprintf(stderr, "No free directory slot\n");
     return 1;
 }
 
@@ -398,15 +454,38 @@ int main(int argc,char**argv){
     uint8_t sector[SECTOR_SIZE];read_sector(fp,9,sector);
     HDOS_Label lab=parse_label(sector);
     uint8_t grt_sector[SECTOR_SIZE];read_sector(fp,lab.grt,grt_sector);
+
 	if(argc>=3) {
-		if(strcmp(argv[2],"--get")==0){extract_file(fp,lab,grt_sector,argv[3],argv[4]); goto program_end;}
-		if(strcmp(argv[2],"--add")==0){insert_file(fp,lab,grt_sector,argv[3],argv[4],(argc < 5) ? 0 :atoi(argv[5])); goto program_end;}
+		if(strcmp(argv[2],"--get")==0){
+			if(argc==4) {
+				fprintf(stderr, "Output filename missing.\n");
+			    fclose(fp);
+				return 1;
+			}
+			if (extract_file(fp,lab,grt_sector,argv[3],argv[4])) {
+				fprintf(stderr, "File %s not found.\n", argv[3]);
+			    fclose(fp);
+				return 1;
+			}
+			goto program_end;
+		}
+		if(strcmp(argv[2],"--add")==0){
+			if (extract_file(fp,lab,grt_sector,argv[4],"")==0) {
+				fprintf(stderr,"hdos_edit: file already present");
+			    fclose(fp);
+				return 1;
+			}
+			rewind(fp);
+			insert_file(fp,lab,grt_sector,argv[3],argv[4],(argc < 6) ? 0 :atoi(argv[5])); goto program_end;
+		}
 		if(strcmp(argv[2],"--delete")==0){delete_file(fp,lab,grt_sector,argv[3]); goto program_end;}
 		if(strcmp(argv[2],"--inspect")==0){inspect(fp,lab,grt_sector); goto program_end;}
 		if(strcmp(argv[2],"--dir")==0){parse_directory(fp, lab, grt_sector); goto program_end;}
 		fprintf(stderr,"hdos_edit: wrong option");
+	    fclose(fp);
 		return 1;
 	}
+
 program_end:
     fclose(fp);
 	return 0;
