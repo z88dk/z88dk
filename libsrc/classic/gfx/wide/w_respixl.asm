@@ -6,6 +6,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  l_graphics_cmp
     EXTERN  w_pixeladdress
+    EXTERN  getmaxx
+    EXTERN  getmaxy
 
     EXTERN  __gfx_coords
 
@@ -31,13 +33,15 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ;
 w_respixel:
     push    hl
-    ld      hl, _GFX_MAXY
+call getmaxy
     call    l_graphics_cmp
     pop     hl
     ret     nc                          ; Return if Y overflows
 
     push    de
-    ld      de, _GFX_MAXX
+    ex      de, hl
+    call    getmaxx
+    ex      de, hl
     call    l_graphics_cmp
     pop     de
     ret     c                           ; Return if X overflows

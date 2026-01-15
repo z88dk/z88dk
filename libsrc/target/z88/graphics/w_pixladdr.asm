@@ -4,6 +4,10 @@
     EXTERN  base_graphics
     EXTERN  __z88_gfxmode
 
+
+    EXTERN  w_pixeladdress_MODE0
+
+
 ;
 ;	$Id: pixladdr.asm,v 1.7 2016-04-23 21:05:46 dom Exp $
 ;
@@ -28,6 +32,10 @@ w_pixeladdress:
     ld      a,(__z88_gfxmode)
     and     a
     jr      z,pixeladdress
+    cp      2
+    jp      z,w_pixeladdress_MODE0
+
+    ;; This is for 512 
     ld      a,e
     rrca
     rrca

@@ -13,6 +13,7 @@
     EXTERN  __z88_open_map512
     EXTERN  __console_w
     EXTERN  CONSOLE_COLUMNS
+    EXTERN __z88_gfxmode
 
     EXTERN  generic_console_caps
     PUBLIC  CLIB_GENCON_CAPS
@@ -52,6 +53,8 @@ check_mode:
     jp      z,set_mode1
     cp      2
     jp      z,set_mode2
+    cp      3
+    jp      z,set_mode3
 failure:
     scf
     ret
@@ -70,10 +73,17 @@ set_mode0:
     ret
 
 
+; Text window + 256px map - ZX graphics in operation
+set_mode3:
+    ;; TODO: Set console height (also elsewhere as well)
+    call set_mode1
+    ld  a,2
+    ld  (__z88_gfxmode),a
+    ret
+
 ; Text window + 256px map
 set_mode1:
 
-    ; TOOD: Open text window
     ld      hl,small_txt_window
     call_oz (gn_sop)
     ld      hl,reset_window
@@ -109,7 +119,6 @@ set_mode2:
     ld      b,64
     ld      c,CAPS_MODE_GFX
     jr      set_params
-
 
 
     SECTION rodata_clib

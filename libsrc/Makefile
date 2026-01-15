@@ -224,6 +224,7 @@ include target/pps/pps.mak
 include target/sam/sam.mak
 include target/sms/sms.mak
 include target/ts2068/ts2068.mak
+include target/z88/z88.mak
 include target/zx/zx.mak
 include target/zxn/zxn.mak
 
@@ -327,13 +328,12 @@ micro8085_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=micro8085 TYPE=8085 $(LIBLINKER) -m8085 -DFORmicro8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/micro8085_clib @$(TARGET_DIRECTORY)/micro8085/micro8085.lst
 
 # z88 library - dom
-z88_clib.lib: $(TARGET_CLIB_DEPS)
+z88_clib.lib: $(TARGET_CLIB_DEPS) target-z88
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(call buildgeneric,z88,wide)
 	$(MAKE) -C classic/games TARGET=z88
-	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
 
 # 64/32 column library for ZX Spectrum - dom/stefano

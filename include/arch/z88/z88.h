@@ -12,7 +12,22 @@
 #define __Z88_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 #include <sys/types.h>
+
+
+
+// Copy the ZX scree onto the z88 map area
+//
+// Compile with: pragma-define:CLIB_NEED_ZXSCREEN=1 to make space for it
+//
+// Call this function every iteration to keep the z88 graphics map updated
+//
+// centre_y is the y (character) coordinate to centre the map on
+#define ZX_SCREEN_INVERSE   1
+#define ZX_SCREEN_SQUASHED  2
+extern void __LIB__ z88_copy_zxscreen(int centre_y, uint8_t flags) __smallc;
+
 
 /*
  * Read and send mail
@@ -52,12 +67,13 @@ extern void __LIB__ nameapp(const char *);
 
 /*
  * Some calls provided for by the packages system 
- *
+ *π
  * First of all types for the type in RegisterInt()
  *
  * All these return 0 on failure
  */
 
+ #if 0
 #define INT_TICK	1
 #define INT_SEC		2
 #define INT_MIN		4
@@ -65,6 +81,7 @@ extern void __LIB__ nameapp(const char *);
 
 extern int __LIB__ RegisterInt(void (*fn)(),int type, int tick) __smallc;
 extern int __LIB__ DeRegisterInt(void);
+#endif 
 
 /*
  *	Open a library/package, returns 0 on failure

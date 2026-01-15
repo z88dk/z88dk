@@ -727,7 +727,7 @@ ENDIF
 
 IF FORz88
     defc    _GFX_MAXX    = 512
-    defc    _GFX_MAXY     = 64
+    defc    _GFX_MAXY     = 192
     defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
