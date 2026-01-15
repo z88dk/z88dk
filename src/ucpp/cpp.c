@@ -557,9 +557,10 @@ void print_line_info(struct lexer_state *ls, unsigned long flags)
 	} else {
 		sprintf(b, "#line %ld \"%s\"\n", ls->line, fn);
 	}
-        put_char(ls, '\n');
-	for (d = b; *d; d ++) put_char(ls, (unsigned char)(*d));
+    put_char_direct(ls, '\n');
+	for (d = b; *d; d ++) put_char_direct(ls, (unsigned char)(*d));
 	freemem(b);
+    ls->oline -= 2;    /* emitted #line troubled oline */
 }
 
 /*
@@ -588,7 +589,6 @@ int enter_file(struct lexer_state *ls, unsigned long flags)
 		return 1;
 	}
 	print_line_info(ls, flags);
-	ls->oline -=2;	/* emitted #line troubled oline */
 	return 0;
 }
 
@@ -1408,8 +1408,9 @@ do_include:
 	   the #include is at the end of the file with no trailing newline */
 	if (ls->ctok->type != NEWLINE) ls->line ++;
 do_include_next:
-	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
+	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT)) {
 		put_char(ls, '\n');
+    }
 	push_file_context(ls);
 	reinit_lexer_state(ls, 1);
 #ifdef MSDOS
@@ -2062,7 +2063,9 @@ int cpp(struct lexer_state *ls)
 				"(depth %ld)", ls->ifnest);
 			r = CPPERR_NEST;
 		}
-		if (ls_depth == 0) return CPPERR_EOF;
+		if (ls_depth == 0) {
+            return CPPERR_EOF;
+        }
 		close_input(ls);
 		if (!(ls->flags & LEXER) && !ls->ltwnl) {
 			put_char(ls, '\n');
@@ -2117,10 +2120,15 @@ int cpp(struct lexer_state *ls)
 
 			ls->ltwnl = 1;
 			return r ? r : x;
-		}
+		} 
 	}
-	if (ls->ctok->type == NEWLINE) ls->ltwnl = 1;
+
+	if (ls->ctok->type == NEWLINE && ls->ltwnl) yield_newlines(ls); 
+
+	if (ls->ctok->type == NEWLINE) ls->ltwnl = 1; 
 	else if (!ttWHI(ls->ctok->type)) ls->ltwnl = 0;
+
+    //yield_newlines(ls); // Gets line numbers right, but doesn't collapse multiple newlines.
 	return r ? r : -1;
 }
 
@@ -2714,7 +2722,9 @@ int main(int argc, char *argv[])
     }
 	enter_file(&ls, ls.flags);
 	while ((r = cpp(&ls)) < CPPERR_EOF) fr = fr || (r > 0);
-	fr = fr || check_cpp_errors(&ls);
+    put_char(&ls, '\n');
+    yield_newlines(&ls);
+    fr = fr || check_cpp_errors(&ls);
 	free_lexer_state(&ls);
 	wipeout();
 #ifdef MEM_DEBUG

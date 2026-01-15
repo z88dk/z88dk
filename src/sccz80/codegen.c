@@ -150,7 +150,7 @@ static const char *map_library_routine(const char *wanted, Kind to)
 /* Output a comment line for the assembler */
 void gen_comment(const char *message)
 {
-    outfmt(";%s\n",message);
+    outfmt(";%s:%d: %s\n",Filename, lineno, message);
 }
 
 /* Put out assembler info before any code is generated */
