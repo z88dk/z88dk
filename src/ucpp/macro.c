@@ -327,13 +327,23 @@ static void print_token_nailed(struct lexer_state *ls, struct token *t,
 	long nail_line)
 {
 	char *x = t->name;
+    int line_offs = 0;
 
+    // If this macro is at the end of the line, then we've incremented linecount
+    // To avoid printing a newline before this macro, decrement line count and then
+    // increment after printing
+    if ( ls->tknl ) {
+        ls->line--;
+        line_offs = 1;
+    }
 	if (ls->flags & LEXER) {
 		print_token(ls, t, 0);
+        if ( line_offs) ls->line++;
 		return;
 	}
 	if (!S_TOKEN(t->type)) x = operators_name[t->type];
 	for (; *x; x ++) put_char(ls, *x);
+    if ( line_offs) ls->line++;
 }
 
 /*
