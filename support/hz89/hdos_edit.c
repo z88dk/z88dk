@@ -86,6 +86,8 @@ static int delete_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *filen
 
             uint8_t *e = blk + off;
             if (e[0] == 0) continue;             // empty slot
+            if (e[0] == 0xFE) continue;             // empty slot
+            if (e[0] == 0xFF) continue;             // unusable slot
 
             // Compose NAME.EXT for match (case-insensitive)
             char name[13]; memcpy(name, e, 8); name[8] = '\0';
@@ -141,7 +143,9 @@ static int delete_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *filen
                 grt[0]   = fgn;
 
                 // Clear the directory entry (mark as empty by zeroing first byte; we zero all 23 bytes for cleanliness).
-                memset(e, 0, 23);
+                //memset(e, 0, 23);
+				// This is the classic method, it should suffice
+				e[0] = 0xFF;   // NOTE: 0x00 would truncate the directory, 0xFE raise errors
 
                 // Write back directory block and GRT sector
                 write_sector(fp, next_sector,   blk);
@@ -304,7 +308,7 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
             int off = i * 23;
             if (off + 23 > 506) break;
 
-            if (blk[off] == 0) {
+            if ((blk[off] == 0xFE)||(blk[off] == 0xFF)||(blk[off] == 0x00)) {
                 // Prepare NAME.EXT in 8.3 uppercase
                 memset(blk + off, 0, 23);
                 char name8[8] = {0}, ext3[3] = {0};
@@ -324,14 +328,15 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
                 for (int j = 0; j < 11; ++j) {
                     blk[off + j] = (uint8_t)toupper((unsigned char)blk[off + j]);
                 }
-
+				
                 // Fill in chain info
                 blk[off + 16] = (uint8_t)fgn;                           // first group
                 blk[off + 17] = (uint8_t)lgn;                           // last group
                 blk[off + 18] = (uint8_t)((sectors_needed - 1) % lab.spg); // last sector index in last group
 
-                // Optionally set flags/project/version/cluster_factor if you like:
-                // blk[off + 13] = lab.spg; // cluster factor (optional)
+                // Optionally set flags/project/version/cluster_factor				
+                blk[off + 13] = lab.spg; // cluster factor
+				//blk[off + 13] = 1;
 
                 write_sector(fp, next_sector,     blk);
                 write_sector(fp, next_sector + 1, blk + 256);
@@ -401,7 +406,9 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
             int off = i * 23;
             if (off+23 > 506) break;
             const uint8_t *e = blk + off;
-            if (e[0] == 0) continue; // empty
+            if (e[0] == 0) continue; // empty, but never used on the early  HDOS versions (not sure abt the late versions)
+			if (e[0] == 0xFE) {entry_count++; continue;} // empty
+			if (e[0] == 0xFF) continue; // empty, not to be used
             HDOS_DirEntry d;
             memcpy(d.name, e, 8); d.name[8] = '\0';
             memcpy(d.ext, e+8, 3); d.ext[3] = '\0';
@@ -433,7 +440,7 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
             if (d.flags & 0x40) flags_s[1]='L';
             if (d.flags & 0x20) flags_s[2]='W';
             if (d.flags & 0x10) flags_s[3]='C';
-            printf("%-12s %-5s %-10d %-8d ", d.name, flags_s, size_b, sectors);
+            printf("%-12s %-5s %-10d %-8d ", d.name, flags_s, size_b, sectors-1);
             if (clen) {
                 printf("%d->%d->0\n", chain[0], chain[clen-1]);
 				entry_used++;
