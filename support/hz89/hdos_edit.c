@@ -64,13 +64,18 @@ static void w16le(uint8_t *p, uint16_t v) { p[0] = v & 0xFF; p[1] = v >> 8; }
  *   month range is 1..12 but the encoding does not validate
  *   calendar correctness (e.g., 31-SEP is possible).
  */
-DecodedDate decode_timestamp(uint8_t B1, uint8_t B2)
+DecodedDate decode_timestamp(unsigned int dt)
 {
+	uint8_t B1, B2;
     DecodedDate d;
+
+	B1 =  dt & 0xFF;
+	B2 =  dt >> 8;
 
     d.day   = B1 & 0x1F;                  // 5 lower bits
     d.month = (B1 >> 5) | ((B2 & 0x01) << 3);
-    d.year  = 1970 + (B2 >> 1);
+    //d.year  = 1970 + (B2 >> 1);
+	d.year  = 70 + (B2 >> 1);
 
     return d;
 }
@@ -472,7 +477,7 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 	char entry_fname[14];
 	
     printf("\n=== DIRECTORY ===\n");
-    printf("%-12s  %-5s %-10s %-8s %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "GROUPS");
+    printf("%-12s  %-5s %-10s %-8s %-8s  %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "DATE", "GROUPS");
     while (next_sector != 0) {
         uint8_t blk[512];
         read_sector(fp, next_sector, blk);
@@ -516,7 +521,14 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
             if (d.flags & 0x40) flags_s[1]='L';
             if (d.flags & 0x20) flags_s[2]='W';
             if (d.flags & 0x10) flags_s[3]='C';
-            printf("%-12s  %-5s %-10d %-8d ", entry_fname, flags_s, size_b, sectors-1);
+			
+			// Creation Date
+			DecodedDate ts = decode_timestamp(d.crd);
+			// Last Update
+			//DecodedDate ts = decode_timestamp(d.ald);
+
+            printf("%-12s  %-5s %-10d %-8d %02d-%02d-%02d  ", entry_fname, flags_s, size_b, sectors-1, ts.day, ts.month, ts.year);
+			//printf("%-12s  %-5s %-10d %-8d ", entry_fname, flags_s, size_b, sectors-1);
             if (clen) {
                 printf("%d->%d->0\n", chain[0], chain[clen-1]);
 				entry_used++;
