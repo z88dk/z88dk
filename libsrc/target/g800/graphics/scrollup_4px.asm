@@ -15,7 +15,7 @@
     EXTERN setx
     EXTERN sety
     
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 scrollup_4px:
@@ -27,7 +27,7 @@ hloop:
     ld      e,0
     push     hl
     
-    ld      l, maxy-8
+    ld      l, _GFX_MAXY-8
 vloop:
     push    hl
     call    sety
@@ -69,7 +69,7 @@ vloop:
     
     pop     hl
     inc     h
-    ld      a,maxx
+    ld      a,_GFX_MAXX
     cp      h
     jr      nz,hloop
     

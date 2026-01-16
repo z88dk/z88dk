@@ -12,6 +12,7 @@
 ;
 
 
+    MODULE  m2_textpixl
     PUBLIC  textpixl
 
 

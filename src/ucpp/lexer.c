@@ -450,7 +450,6 @@ void flush_output(struct lexer_state *ls)
 }
 #endif
 
-static char nl_flag = 0;
 
 /*
  * Output one character; flush the buffer if needed.
@@ -469,32 +468,29 @@ static inline void write_char(struct lexer_state *ls, unsigned char c)
 #endif
 	if (c == '\n') {
 		ls->oline ++;
-	} else {
-		nl_flag = 0;
 	}
 }
 
-/*
- * Output one character; flush the buffer if needed.
- * This function should not be called, except by put_char().
- */
-static inline void write_char_nl(struct lexer_state *ls)
-{
-	if (nl_flag) {
-		ls->oline ++;
-		return;
-	} else {
-		write_char(ls, '\n');
-		nl_flag = 1;
-	}
-}
 
 /*
  * schedule a character for output
  */
 void put_char(struct lexer_state *ls, unsigned char c)
 {
-	if (ls->flags & KEEP_OUTPUT) write_char(ls, c);
+	if (ls->flags & KEEP_OUTPUT) {
+        if ( c == '\n' ) {
+        } else if (c ) {
+            yield_newlines(ls);
+            write_char(ls, c);
+        }
+    }
+}
+
+void put_char_direct(struct lexer_state *ls, unsigned char c)
+{
+	if (ls->flags & KEEP_OUTPUT) {
+        write_char(ls, c);
+    }
 }
 
 /*
@@ -827,8 +823,8 @@ static inline int read_token(struct lexer_state *ls)
 		utf8 = ls->utf8;
 		shift_state = 0;
 	}
-	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
-		for (; ls->line > ls->oline;) write_char_nl(ls);
+    // if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
+    //     yield_newlines(ls);
 	do {
 		c = next_char(ls);
 		if (c < 0) {

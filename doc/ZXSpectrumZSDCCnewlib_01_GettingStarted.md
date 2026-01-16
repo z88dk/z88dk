@@ -212,16 +212,16 @@ the compilation is beyond the scope of a getting started guide, but suffice to
 say it shows that when using the zsdcc compiler the header files come from this
 directory:
 ```
- include/_DEVELOPMENT/sdcc
+ include/_DEVELOPMENT/common
 ```
 so the header file being included in this example is:
 ```
- include/_DEVELOPMENT/sdcc/arch/zx.h
+ include/_DEVELOPMENT/common/arch/zx.h
 ```
 It's sometimes quicker to browse the header files in a web browser. The base
-link is [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/sdcc).
+link is [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/common).
 
-That [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h) file contains the value for the INK_BLACK macro and a prototype
+That [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h) file contains the value for the INK_BLACK macro and a prototype
 for the zx_border() function.
 
 It's important not to be distracted by all the other header files in the
@@ -238,7 +238,7 @@ passed into an embedded z88dk-z80asm command. Again, details are beyond the scop
 this document, but the value for that argument tells us that the library code is
 coming from:
 ```
- libsrc/_DEVELOPMENT/lib/sdcc_iy
+ libsrc/newlib/lib/sdcc_iy
 ```
 The contents of this directory are built during the Z88DK build, so you can't
 browse it online.
@@ -254,7 +254,7 @@ can inspect the contents of the library with the z88dk-z80nm command:
 ```
 Do a search and you'll find the zx_border() function listed in there.
 
-The actual source code used to build the library is rooted in [z88dk/libsrc/_DEVELOPMENT](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT)
-and a search using the header path `arch/zx` as a clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/arch/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
+The actual source code used to build the library is rooted in [z88dk/libsrc/](https://github.com/z88dk/z88dk/tree/master/libsrc/)
+and a search using the header path `arch/zx` as a clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/target/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
 
 [... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)

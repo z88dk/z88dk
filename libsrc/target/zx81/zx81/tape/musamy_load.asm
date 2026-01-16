@@ -5,7 +5,7 @@
 ;      Load (L=0) and verify (L=0x40), speed auto-calibration
 ;
 ;
-;	$Id: musamy_load.asm,v 1.5 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: musamy_load.asm $
 ;
 
 
@@ -95,8 +95,8 @@ L012C:
 
 ; - ENTRY for LOAD
 musamy_load:
-;		LD H,0Ch ; TIMEOUT
-    LD      H, 02h                      ; TIMEOUT
+		LD H,0Ch ; TIMEOUT
+;    LD      H, 02h                      ; TIMEOUT
 
 L0132:
     RES     3, L                        ; 0000X000 ; init leader pulses mode
@@ -190,11 +190,11 @@ L0169:
 
     POP     HL
     NOP
-    LD      C, (HL)
+    LD      C, (HL)                     ; BC=(HL)
     INC     HL
     LD      B, (HL)
     INC     HL
-    LD      E, (HL)
+    LD      E, (HL)                     ; DE=(HL)
     INC     HL
     LD      D, (HL)
     EX      DE, HL

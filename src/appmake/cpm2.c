@@ -17,8 +17,10 @@ static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
 static char            **c_additional_files  = NULL;
 static int               c_additional_files_num = 0;
-
 static char              c_force_com_extension   = 0;
+
+char                     c_linear   = 0;
+
 static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
@@ -36,6 +38,7 @@ option_t cpm2_options[] = {
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
+    {  0,  "linear",   "No interleave (disable skew)", OPT_BOOL, &c_linear},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
                               /* ISO C does not require that a void pointer can be cast to a function pointer
                                  (and vice versa), but conforming compilers are required to warn you about it.
@@ -931,6 +934,7 @@ static disc_spec pasopia_spec = {
 
 
 // NEC PC-6001/6601
+// Triumph-Adler P2
 static disc_spec pc6001_spec = {
     .name = "NEC PC6001",
     .disk_mode = MFM250,
@@ -1012,7 +1016,7 @@ static disc_spec qc10m1_spec = {
     .tracks = 40,
     .sides = 2,
     .sector_size = 256,
-	.gap3_length = 0x17,
+    .gap3_length = 0x17,
     .filler_byte = 0xe5,
     .boottracks = 8,
     .directory_entries = 64,
@@ -1273,7 +1277,7 @@ static disc_spec g2s_kkcpm_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .has_skew = 1,
-    .skew_tab = { 0,2,4,1,3 }	
+    .skew_tab = { 0,2,4,1,3 }
 };
 
 // Genie IIs (TRS80 clone) Klaus Kaempf CP/M Data disk (B:)
@@ -1293,7 +1297,7 @@ static disc_spec g2s_kkcpmb_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .has_skew = 1,
-    .skew_tab = { 0,2,4,1,3 }	
+    .skew_tab = { 0,2,4,1,3 }
 };
 
 // Genie IIs (TRS80 clone) GS CP/M
@@ -1313,7 +1317,7 @@ static disc_spec g2s_gscpm_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
     .has_skew = 1,
-    .skew_tab = { 0,2,4,1,3 }	
+    .skew_tab = { 0,2,4,1,3 }
 };
 
 // Genie III (TRS80 clone) Holte CP/M 3.0
@@ -1708,6 +1712,27 @@ static disc_spec bigboard_spec = {
 };
 
 
+// Research Machines RM380Z
+static disc_spec rm380z_spec = {
+    .name = "RM380Z",
+    .disk_mode = FM300,
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
+};
+
+
 static disc_spec excali_spec = {
     .name = "Excalibur64",
     .disk_mode = MFM300,
@@ -2026,7 +2051,10 @@ static disc_spec hz17_spec = {
     .extent_size = 1024,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 4, 8, 2, 6, 1, 5, 9, 3, 7 }
 };
+
 
 // Heath H89/Zenith Z89 SSDD (Magnolia disk unit)
 static disc_spec magnolia_spec = {
@@ -2296,7 +2324,7 @@ static struct formats {
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "aussie",    "AussieByte Knight2000", &aussie_spec, 0, NULL, 1 },
     { "beehive",   "Beehive Topper",        &beehive_spec, 0, NULL, 1 },
-    { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, NULL, 1 },
+    { "bbc",       "BBC Micro Z80CPU SSSD", &bbc_spec, 0, "z88dk CPCPMDISC\xa4", 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bigboard",  "X820/Bigboard, 8in",    &bigboard_spec, 0, NULL, 1 },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
@@ -2353,12 +2381,13 @@ static struct formats {
     { "osborne1sd", "Osborne 1 SD",         &osborne_sd_spec, 0, NULL, 1 },
     { "pasopia",   "Toshiba Pasopia/T100",  &pasopia_spec, 0, NULL, 1 },
     { "philips",   "Philips P2012/P2000C",  &philips_spec, 0, NULL, 1 },
-    { "pc6001",    "NEC PC6001/6601",       &pc6001_spec, 0, NULL, 1 },
+    { "pc6001",    "NEC PC6001/6601,TA-P2", &pc6001_spec, 0, NULL, 1 },
     { "pc8001",    "NEC PC8001",            &pc8001_spec, 0, NULL, 1 },
     { "pc88",      "NEC PC8001/8801,FM7/8", &pc88_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "ZX Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
+    { "rm380z",    "Research Machines 380Z", &rm380z_spec, 0, NULL, 1 },
     { "scorpion",  "ZX Scorpion, Profi",    &scoprpion_spec, 0, NULL, 1 },
     { "atmturbo",  "ZX MicroART ATM Turbo", &atmturbo_spec, 0, NULL, 1 },
     { "diskface",  "ZX Dataputer DISKFACE", &diskface_spec, 0, NULL, 1 },
@@ -2644,15 +2673,14 @@ void cpm_create_filename(const char* binary, char* cpm_filename, char force_com_
 
     ptr = zbasename((char *)binary);
 
-    while (count < 8 && count < strlen(ptr) && ptr[count] != '.') {
-        if (ptr[count] > 127) {
-            cpm_filename[count] = '_';
-        } else {
-            cpm_filename[count] = toupper(ptr[count]);
-        }
-        count++;
+    while (dest < 8 && count < strlen(ptr) && ptr[count] != '.') {
+        if ( isalnum(ptr[count])) {
+            cpm_filename[dest++] = toupper(ptr[count++]);
+        } else count++;
     }
-    dest = count;
+    if ( dest == 0 ) {
+        cpm_filename[dest++] = 'A';
+    }
 
     if ( include_dot ) {
         cpm_filename[dest++] = '.';

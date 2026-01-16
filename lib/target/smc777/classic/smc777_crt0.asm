@@ -30,6 +30,9 @@
     defc    __CPU_CLOCK = 4000000
 
 
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $53
+
 
     INCLUDE "crt/classic/crt_rules.inc"
 

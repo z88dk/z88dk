@@ -2,7 +2,7 @@
     EXTERN  w_pixeladdress_320
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __smc777_ink16
     EXTERN  __smc777_paper16
@@ -16,7 +16,7 @@
 ; 4 bits per pixel in MODE4(not updated)
 
     push    hl                          ;save x
-    call    getmaxy                     ;hl = maxy
+    call    getmaxy                     ;hl = _GFX_MAXY
     inc     hl
     call    l_cmp
     pop     hl

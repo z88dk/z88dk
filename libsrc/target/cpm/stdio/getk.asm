@@ -14,6 +14,7 @@
 	SECTION	code_clib
 	PUBLIC	getk
 	PUBLIC	_getk
+	EXTERN	__cpm_base_address
 
 .getk
 ._getk
@@ -51,7 +52,7 @@ ENDIF
 .const
 	ld   de,3
 .console
-	ld   hl,(1)	; WBOOT (BIOS)
+	ld   hl,(__cpm_base_address+1)	; WBOOT (BIOS) - TODO: check if it is valid on all the CP/M 3 implementations
 	add  hl,de
 	jp   (hl)
 

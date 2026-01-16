@@ -40,7 +40,7 @@ check_text_file("${test}1.map", <<END);
 __ASM_LINE_2_${test_expanded}1_2easm = \$0000 ; addr, local, , ${test}1_asm, , ${test}1.asm:2
 __C_LINE_0_${test_expanded}_2ec = \$0000 ; addr, local, , ${test}_c, , ${test}.c:0
 __C_LINE_10_${test_expanded}_2ec_3a_3amain_3a_3a1_3a_3a3 = \$0194 ; addr, local, , ${test}_c, code_compiler, ${test}.c::main::1::3:10
-__C_LINE_11_${test_expanded}_2ec_3a_3amain_3a_3a1_3a_3a3 = \$0194 ; addr, local, , ${test}_c, code_compiler, ${test}.c::main::1::3:11
+__C_LINE_11_${test_expanded}_2ec_3a_3amain_3a_3a1_3a_3a3 = \$01A5 ; addr, local, , ${test}_c, code_compiler, ${test}.c::main::1::3:11
 __C_LINE_1_${test_expanded}_2ec = \$0000 ; addr, local, , ${test}_c, , ${test}.c:1
 __C_LINE_2_${test_expanded}_2ec_3a_3aadd_3a_3a0_3a_3a0 = \$0180 ; addr, local, , ${test}_c, code_compiler, ${test}.c::add::0::0:2
 __C_LINE_3_${test_expanded}_2ec_3a_3aadd_3a_3a1_3a_3a1 = \$0180 ; addr, local, , ${test}_c, code_compiler, ${test}.c::add::1::1:3

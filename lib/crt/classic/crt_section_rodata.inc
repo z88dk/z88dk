@@ -31,6 +31,25 @@ ENDIF
     SECTION rodata_splib2
     SECTION rodata_sound_bit
     SECTION rodata_video_vdp
+
+    ; Alignment sections
+    SECTION rodata_align_256
+    align 256
+    SECTION rodata_align_128
+    align 128
+    SECTION rodata_align_64
+    align 64
+    SECTION rodata_align_32
+    align 32
+    SECTION rodata_align_16
+    align 16
+    SECTION rodata_align_8
+    align 8
+    SECTION rodata_align_4
+    align 4
+    SECTION rodata_align_2
+    align 2
+
     ; Keep the following section last of all
     SECTION rodata_appdor
     SECTION RODATA_END

@@ -1,9 +1,25 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.4 - xx.xx.2024
+z88dk v2.5 - xx.xx.202x
 
-Future release changes:
+Headline features for this release:
+
+More detailed, but still incomplete changelist:
+
+
+
+z88dk v2.4 - 02.10.2025
+
+Headline features for this release:
+
+- Far heap support for many new targets providing access for up to
+  4MB of memory from C 
+- New classic targets: Hector1 and HectorHR
+- Support for the Rabbit 6000 processor
+- z80asm supports local labels 
+
+More detailed, but still incomplete changelist:
 
 - [appmake] +c128 Correct filename handling for use with c1541
 - [classic] Support more ways of configuring the heap size
@@ -12,22 +28,31 @@ Future release changes:
 - [classic] +cpm: Stack now setup correctly when running on CP/M Plus
 - [classic] +cpm: Support for many new disc formats
 - [classic] +cpm: Support for far heap (PCW)
+- [classic] +cpm: fcntl operations sped up
 - [classic] +hector: New target
+- [classic] +m100: Support for more hardware variants
 - [classic] +msx: Support for far heap (MSXDOS)
+- [classic] +nc: Generic console, graphics fixes
+- [classic] +nc: Bootable disc images for NC200: -subtype=ncboot 
+- [classic] +nc: Inkey keyboard driver
+- [classic] +pv1000: Fixes to support running on genuine hardware
 - [classic] +sam: Support for far heap 
 - [classic] +zx: Support for far heap 
 - [classic] +zx81 ARX hires graphics updates
-- [classic] -llib3d is now integratted into target library
+- [classic] -llib3d is now integrated into target library
 - [classic] More near-heap size choice pragmas
 - [classic] More modularised crt setup
+- [classic] Common 6847 library code & bug fixes across targets
 - [newlib] Resolve and correct library build issues with .asm.m4 files
 - [sccz80] 8080 codegen fixes
+- [ticks] Support for Rabbit 5k and 6k
 - [zsdcc] Upgraded to SDCC 4.5.0 r15248
 - [z80asm] GBZ80 opcode conversion fixes
 - [z80asm] process file.asm.m4 by m4 and assemble resulting file.asm
 - [z80asm] add string argument to ASSERT
 - [z80asm] fix expansion of nested macros with same parameter names
 - [z80asm] add local labels
+- [z80asm] Support for Rabbit 5k and 6k
 
 z88dk v2.3 - 20.12.2023
 

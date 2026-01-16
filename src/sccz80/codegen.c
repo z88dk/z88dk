@@ -150,7 +150,7 @@ static const char *map_library_routine(const char *wanted, Kind to)
 /* Output a comment line for the assembler */
 void gen_comment(const char *message)
 {
-    outfmt(";%s\n",message);
+    outfmt(";%s:%d: %s\n",Filename, lineno, message);
 }
 
 /* Put out assembler info before any code is generated */
@@ -609,7 +609,7 @@ void putstk(LVALUE *lval)
         return;
     }
 
-    if ( ctype->bit_size ) {
+    if ( ctype && ctype->bit_size ) {
         int bit_offset = lval->ltype->bit_offset;
         int doinc = 0;
 
@@ -690,8 +690,16 @@ void putstk(LVALUE *lval)
         break;
     case KIND_STRUCT:
         pop("de");
-        outfmt("\tld\tbc,%d\n",lval->ltype->size);
-        ol("ldir");
+        switch ( lval->ltype->size ) {
+        case 2:
+            ol("ldi");
+        case 1:
+            ol("ldi");
+            break;
+        default:
+            outfmt("\tld\tbc,%d\n",lval->ltype->size);
+            ol("ldir");
+        }
         break;
     default:
         pop("de");

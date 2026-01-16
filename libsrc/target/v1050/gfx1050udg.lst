@@ -1,0 +1,8 @@
+target/v1050/graphics/loadudg6.asm
+target/v1050/graphics/clg6.asm
+target/v1050/graphics/swapgfxbk6
+target/v1050/graphics/plotpixl
+target/v1050/graphics/pointxy
+target/v1050/graphics/respixl
+target/v1050/graphics/xorpixl
+@classic/gfx/gencon/gfx_gencon6.lst

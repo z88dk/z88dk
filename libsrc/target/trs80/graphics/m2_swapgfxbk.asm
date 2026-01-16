@@ -10,31 +10,34 @@
 ;       Stefano - 6/2023
 ;
 ;
-;	$Id: m2_swapgfxbk.asm $
+;	$Id: m2___gfx_vram_page_in.asm $
 ;
 
 
+    MODULE  m2_swapgfxbk
     SECTION code_clib
 
-    PUBLIC  swapgfxbk
-    PUBLIC  _swapgfxbk
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-    PUBLIC  swapgfxbk1
-    PUBLIC  _swapgfxbk1
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
-swapgfxbk:
-_swapgfxbk:
+__gfx_vram_page_in:
+___gfx_vram_page_in:
 
     di
     push    hl
     push    de
     push    bc
+    push    af
     ld      a, (64)                     ; If we have a 'JP' at position $40, it should be the P&T "special functions" entry
     ld      b, 21                       ; "enable access to screen "
     sub     $c3                         ; 'JP' ?
     jr      nz, vram_map
     call    64                          ; VRAM switching, the Pickles & Trout CP/M way
+    pop     af
     pop     bc
     pop     de
     pop     hl
@@ -42,7 +45,6 @@ _swapgfxbk:
 
 ; Unknown CP/M type, use the I/O port and cross fingers
 vram_map:
-    push    af
     ld      a, $81                      ; enable video memory access
     out     ($FF), a
     pop     af
@@ -52,17 +54,18 @@ vram_map:
     ret
 
 
-swapgfxbk1:
-_swapgfxbk1:
-
+__gfx_vram_page_out:
+___gfx_vram_page_out:
     push    hl
     push    de
     push    bc
+    push    af
     ld      a, (64)
     ld      b, 22                       ; "disable access to screen "
     sub     $c3
     jr      nz, vram_unmap
     call    64                          ; VRAM switching, the Pickles & Trout CP/M way
+    pop     af
     pop     bc
     pop     de
     pop     hl
@@ -71,7 +74,6 @@ _swapgfxbk1:
 
 ; Unknown CP/M type, use the I/O port and cross fingers
 vram_unmap:
-    push    af
     ld      a, $01                      ; disable video memory access
     out     ($FF), a
     pop     af

@@ -1,7 +1,4 @@
 CPM Disc access routines
 
-These routines are a port of the Hitech C routines.
-
-They've been modified to work within the z88dk stdio framework and
-seem to quite well within the tests that I've made. There is no distinction
-between binary and text files.
+These routines were originally a port of the Hitech C routines,
+they've been later reworked and include even part of the BDS C ones.

@@ -10,7 +10,7 @@ use CPU::Z80::Assembler;
 # Test https://github.com/z88dk/z88dk/issues/2045
 # z80asm: +zx creates invalid tap file if code has split sections
 
-my $reloc_code = z80asm_file("dev/reloc_code.asm");
+my $reloc_code = z80asm_file("dev/reloc_code/reloc_code.asm");
 
 #------------------------------------------------------------------------------
 # test verbose reloc

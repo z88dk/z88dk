@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ Options g_options;
 #define Z88DK_VERSION "build " __DATE__
 #endif
 
-#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2024"
+#define COPYRIGHT		"InterLogic 1993-2009, Paulo Custodio 2011-2026"
 
 #define COPYRIGHT_MSG	"Z80 Macro Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT
 
@@ -162,7 +162,8 @@ string Options::prepend_output_dir(const string& filename) {
 		// with strings instead.
 		// is it a win32 absolute path?
 		string file;
-		if (isalpha(filename[0]) && filename[1] == ':') {	// C:
+		if (filename.size() >= 2 &&
+		    isalpha(filename[0]) && filename[1] == ':') {	// C:
 			file += output_dir + "/";
 			file += string(1, filename[0]) + "/";
 			file += string(filename.substr(2));
@@ -172,14 +173,14 @@ string Options::prepend_output_dir(const string& filename) {
 			file += filename;
 		}
 		fs::path path{ file };
-		return path.generic_string();
+		return path.lexically_normal().generic_string();
 	}
 }
 
 static string replace_ext(const string& filename, const string& ext) {
 	fs::path file_path{ filename };
 	file_path.replace_extension(ext);
-	return file_path.generic_string();
+	return file_path.lexically_normal().generic_string();
 }
 
 string Options::get_consol_obj_file() const {
@@ -188,7 +189,7 @@ string Options::get_consol_obj_file() const {
     else {
         fs::path file_path{ output_dir };
         file_path /= fs::path{ m_consol_obj_file };
-        return file_path.generic_string();
+        return file_path.lexically_normal().generic_string();
     }
 }
 
@@ -226,8 +227,8 @@ string Options::bin_filename(const string& filename, const string& section) {
 		file_ext = file_path.extension();
 	}
 
-	string filename1 = prepend_output_dir(file_path.generic_string());
-	string filename2 = replace_ext(filename1, file_ext.generic_string());
+	string filename1 = prepend_output_dir(file_path.lexically_normal().generic_string());
+	string filename2 = replace_ext(filename1, file_ext.lexically_normal().generic_string());
 	file_path = filename2;
 
 	if (!section.empty()) {
@@ -241,7 +242,7 @@ string Options::bin_filename(const string& filename, const string& section) {
 		file_path = new_path;
 	}
 
-	return file_path.generic_string();
+	return file_path.lexically_normal().generic_string();
 }
 
 string Options::lib_filename(const string& filename) {
@@ -267,7 +268,7 @@ string Options::reloc_filename(const string& bin_filename) {
 
 // Issue #2476: on msys2 a path "/d/xxx" must be changed to "d:/xxx"
 string Options::norm_filename(const string& filename) {
-    string cur_path = fs::current_path().generic_string();
+    string cur_path = fs::current_path().lexically_normal().generic_string();
     if (cur_path.size() > 2 && isalpha(cur_path[0]) && cur_path[1] == ':' &&
         filename.size() > 3 && filename[0] == '/' && isalpha(filename[1]) && filename[2] == '/')
         return string(1, filename[1]) + ":" + filename.substr(2);
@@ -479,7 +480,7 @@ void Options::expand_source_glob(const string& pattern_) {
         bool found = false;
 		for (auto& file : files) {
             if (fs::is_regular_file(file)) {
-                if (search_source(file.generic_string(), result_filename))
+                if (search_source(file.lexically_normal().generic_string(), result_filename))
                     input_files.push_back(norm_filename(result_filename));
                 found = true;
             }
@@ -511,9 +512,9 @@ void Options::expand_list_glob(const string& pattern_) {
 	for (auto& file : files) {
 		if (fs::is_regular_file(file)) {
 			// append the directoy of the list file to the include path	and remove it at the end
-			g_options.include_path.push_back(file.parent_path().generic_string());
+			g_options.include_path.push_back(file.parent_path().lexically_normal().generic_string());
 			{
-				if (g_file_reader.open(file.generic_string())) {
+				if (g_file_reader.open(file.lexically_normal().generic_string())) {
 					string line;
 					while (g_file_reader.getline(line)) {
                         line = str_strip(unquote(expand_env_vars(line)));
@@ -545,8 +546,9 @@ void Options::expand_list_glob(const string& pattern_) {
 // run m4 if file is .asm.m4
 bool Options::search_source(const string& filename, string& out_filename) {
     if (str_ends_with(filename, EXT_M4)) {                                     		// file.asm.m4
-        string asm_filename = filename.substr(0, filename.size() - strlen(EXT_M4));	// file.asm
-        string m4_cmd = "m4 " + m4_options + " \"" + filename + "\" > \"" + asm_filename + "\"";
+        string m4_full_path = search_include_path(filename);
+        string asm_filename = m4_full_path.substr(0, m4_full_path.size() - strlen(EXT_M4));	// file.asm
+        string m4_cmd = "m4 " + m4_options + " \"" + m4_full_path + "\" > \"" + asm_filename + "\"";
         if (verbose)
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
@@ -610,7 +612,7 @@ bool Options::check_source(const string& filename, string& out_filename) {
 
     // avoid cascade of errors
     if (g_errors.count) {
-        out_filename = fs::path(filename).generic_string();
+        out_filename = fs::path(filename).lexically_normal().generic_string();
         return true;
     }
 
@@ -618,12 +620,12 @@ bool Options::check_source(const string& filename, string& out_filename) {
     fs::path src_file, obj_file;
     bool got_obj = false;
 
-    if (file_path.extension().generic_string() == EXT_O) {
+    if (file_path.extension().lexically_normal().generic_string() == EXT_O) {
         got_obj = true;
         obj_file = file_path;
         src_file = asm_filename(filename);
     }
-    else if (file_path.extension().generic_string() == EXT_ASM) {
+    else if (file_path.extension().lexically_normal().generic_string() == EXT_ASM) {
         got_obj = false;
         src_file = file_path;
         obj_file = o_filename(filename);
@@ -646,35 +648,35 @@ bool Options::check_source(const string& filename, string& out_filename) {
         if (!date_stamp) {
             // no -d
             if (got_obj) {
-                out_filename = obj_file.generic_string();
+                out_filename = obj_file.lexically_normal().generic_string();
                 if (!lib_for_all_cpus)
-                    check_object_file(obj_file.generic_string().c_str());
+                    check_object_file(obj_file.lexically_normal().generic_string().c_str());
             }
             else
-                out_filename = src_file.generic_string();
+                out_filename = src_file.lexically_normal().generic_string();
             return true;
         }
         else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
             // -d and .o is up-to-date
-            out_filename = obj_file.generic_string();
+            out_filename = obj_file.lexically_normal().generic_string();
             if (!lib_for_all_cpus)
-                check_object_file(obj_file.generic_string().c_str());
+                check_object_file(obj_file.lexically_normal().generic_string().c_str());
             return true;
         }
         else {
             // -d and .o is old
-            out_filename = src_file.generic_string();
+            out_filename = src_file.lexically_normal().generic_string();
             return true;
         }
     }
     else if (!got_obj && src_ok) {
-        out_filename = src_file.generic_string();
+        out_filename = src_file.lexically_normal().generic_string();
         return true;
     }
     else if (got_obj && obj_ok) {
-        out_filename = obj_file.generic_string();
+        out_filename = obj_file.lexically_normal().generic_string();
         if (!lib_for_all_cpus)
-            check_object_file(obj_file.generic_string().c_str());
+            check_object_file(obj_file.lexically_normal().generic_string().c_str());
         return true;
     }
     else {
@@ -750,22 +752,22 @@ string Options::search_path(vector<string>& path, const string& file) {
 
 	// if path is empty, return filename as-is
 	if (path.empty())
-		return file_path.generic_string();
+		return file_path.lexically_normal().generic_string();
 
 	// if file exists, return filename as-is
 	if (fs::is_regular_file(file_path))
-		return file_path.generic_string();
+		return file_path.lexically_normal().generic_string();
 
 	// search in directory list
 	for (auto& dir : path) {
-		fs::path full_path{ fs::path(dir) / file_path };
+        fs::path full_path{ join_dir(dir, file_path.generic_string())};
 
 		if (fs::is_regular_file(full_path))
-			return full_path.generic_string();
+			return full_path.lexically_normal().generic_string();
 	}
 
 	// not found, return original file name
-	return file_path.generic_string();
+	return file_path.lexically_normal().generic_string();
 }
 
 void Options::set_cpu(int cpu) {
@@ -1080,15 +1082,15 @@ string Options::search_z80asm_lib() {
 	// try to read from ZCCCFG/..
 	const char* zcccfg = getenv("ZCCCFG");
 	if (zcccfg) {
-		fs::path lib_path = fs::path(zcccfg) / fs::path("..") / fs::path(lib_name);
+        fs::path lib_path = fs::path(join_dir(join_dir(zcccfg, ".."), lib_name));
 		if (check_library(lib_path))
-			return lib_path.generic_string();
+			return lib_path.lexically_normal().generic_string();
 	}
 
 	// try to read from PREFIX/lib
-	fs::path lib_path{ fs::path(PREFIX) / fs::path("lib") / fs::path(lib_name) };
+    fs::path lib_path = join_dir(join_dir(PREFIX, "lib"), lib_name);
 	if (check_library(lib_path))
-		return lib_path.generic_string();
+		return lib_path.lexically_normal().generic_string();
 
 	// not found, retrun empty string
 	return "";
@@ -1107,7 +1109,7 @@ bool Options::check_library(const fs::path& file_path) {
 		return true;
 	else {
 		if (verbose)
-			cout << "Library '" << file_path.generic_string()
+			cout << "Library '" << file_path.lexically_normal().generic_string()
 			<< "' not found" << endl;
 		return false;
 	}
@@ -1283,7 +1285,7 @@ const char* path_parent_dir(const char* filename) {
 	if (!file_path.has_parent_path())
 		parent = ".";
 	else
-		parent = file_path.parent_path().generic_string();
+		parent = file_path.parent_path().lexically_normal().generic_string();
 
 	return spool_add(parent.c_str());
 }
@@ -1300,7 +1302,7 @@ bool path_file_exists(const char* filename) {
 const char* path_replace_ext(const char* filename, const char* ext) {
 	fs::path file_path{ filename };
 	file_path.replace_extension(ext);
-	string new_file = file_path.generic_string();
+	string new_file = file_path.lexically_normal().generic_string();
 	return spool_add(new_file.c_str());
 }
 

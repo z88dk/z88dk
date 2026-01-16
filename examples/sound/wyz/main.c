@@ -47,6 +47,10 @@ extern void __LIB__ add_raster_int(isr_t handler);
 #define NO_INTERRUPT_INIT 1
 #endif
 
+#ifdef __PHC25__
+#define NO_INTERRUPT_INIT 1
+#endif
+
 extern wyz_song mysong;
 extern wyz_effects myeffects;
 

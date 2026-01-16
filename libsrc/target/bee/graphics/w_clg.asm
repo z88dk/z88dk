@@ -13,7 +13,7 @@
     PUBLIC  clg
     PUBLIC  _clg
     EXTERN  cleargraphics
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
 
 
 vdutab:                                 ; 80x25 - Peter Broughton
@@ -24,7 +24,7 @@ vdutab:                                 ; 80x25 - Peter Broughton
 clg:
 _clg:
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
 	; Set 80x25 mode
     LD      HL, vdutab

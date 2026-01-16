@@ -1,6 +1,6 @@
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/bit90/games/joystick
 target/bit90/games/keys_joystick
-games/obj/bit90/joystick_type
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+classic/games/obj/bit90/joystick_type
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk

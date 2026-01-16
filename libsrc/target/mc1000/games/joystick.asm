@@ -8,6 +8,8 @@
     PUBLIC  joystick
     PUBLIC  _joystick
 
+    EXTERN  getk
+
 joystick:
 _joystick:
 
@@ -20,6 +22,10 @@ _joystick:
     jr      z, j_p1
     cp      2
     jr      z, j_p2
+    cp      3
+    jr      z, j_qaop
+    cp      4
+    jr      z, j_8246
     jr      j_nop
 
 j_p1:
@@ -76,3 +82,11 @@ j_done:
     ld      l, a
     ld      h, 0
     ret
+
+
+
+j_qaop:
+    INCLUDE "classic/games/joystick_qaop.as1"
+
+j_8246:
+    INCLUDE "classic/games/joystick_8246.as1"

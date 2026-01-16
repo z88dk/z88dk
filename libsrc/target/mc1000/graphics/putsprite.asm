@@ -16,18 +16,24 @@
     EXTERN  pixelbyte
     EXTERN  pix_return
     EXTERN  gfxbyte_get
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
+    EXTERN  __mc6847_mode
+    EXTERN  __generic_putsprite
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
+IFNDEF FORphc20
 
 putsprite:
 _putsprite:
+    ld      a,(__mc6847_mode)
+    cp      1
+    jp      nz,__generic_putsprite
     push    ix                          ;save cllers
     ld      hl, 4
     add     hl, sp
@@ -61,7 +67,7 @@ _putsprite:
 
     ld      (actcoord), hl              ; save current coordinates
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    pixeladdress
 
     ld      hl, offsets_table
@@ -113,7 +119,7 @@ _noplot:
     pop     bc                          ;Restore data
     djnz    _oloop
     pop     ix                          ;restore callers
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 putspritew:
@@ -154,7 +160,7 @@ wsmc2:
     pop     bc                          ;Restore data
     djnz    woloop
     pop     ix                          ;restore callers
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 wover_1:
@@ -169,7 +175,7 @@ wover_1:
 
     pop     bc
     djnz    woloop
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 ; Edge of byte reached, save its content,
@@ -229,3 +235,5 @@ offsets_table:
     SECTION bss_clib
 actcoord:
     defw    0
+
+ENDIF

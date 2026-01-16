@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __INTRINSIC_H__
 #define __INTRINSIC_H__
 
+#include <sys/compiler.h>
+
 #ifdef __SDCC
 
 // disable warnings connected to intrinsics
@@ -62,6 +64,20 @@ __OPROTO(`a,b,c,d,e',`a,b,c,d,e',void,*,intrinsic_return_de,void)
 __DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,intrinsic_swap_endian_16,unsigned int n)
 __DPROTO(`b,c',`b,c',unsigned long,,intrinsic_swap_endian_32,unsigned long n)
 __DPROTO(`a,b,c',`a,b,c',unsigned long,,intrinsic_swap_word_32,unsigned long n)
+
+#ifdef __SDCC
+
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
+#endif
+
+#ifdef __SCCZ80
+
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
+#endif
 
 #ifdef __Z180
 

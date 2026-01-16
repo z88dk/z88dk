@@ -1,0 +1,9 @@
+; Sanyo PHC-20
+
+
+; VARAM starts here
+;
+; bit 6 of the character indicates the cursor
+defc DISPLAY = 0x4000
+
+

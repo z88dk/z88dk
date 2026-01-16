@@ -34,6 +34,7 @@
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
+extern char c_linear;             // if TRUE disable interleave (skew) in cpmdisk
 
 /* Conversion routines */
 
@@ -78,6 +79,9 @@ extern option_t  alphatp2_options[];
 
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options[];
+
+extern int       bbc_exec(char *target);
+extern option_t  bbc_options[];
 
 extern int       c128_exec(char *target);
 extern option_t  c128_options[];
@@ -169,6 +173,9 @@ extern option_t  mz2500_options[];
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options[];
 
+extern int       ncboot_exec(char *target);
+extern option_t  ncboot_options[];
+
 extern int       nec_exec(char *target);
 extern option_t  nec_options[];
 
@@ -186,6 +193,9 @@ extern option_t  pc88_options[];
 
 extern int       pc88disc_exec(char *target);
 extern option_t  pc88disc_options[];
+
+extern int       phc25_exec(char *target);
+extern option_t  phc25_options[];
 
 extern int       p2000_exec(char *target);
 extern option_t  p2000_options[];
@@ -342,6 +352,10 @@ struct {
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,
       aquarius_exec, aquarius_options },
+    { "bin2bbc",   "bbc",    "(C) 2025 z88dk",
+      "Generates disk image files for BBC Micro",
+      NULL,
+      bbc_exec,    bbc_options },
     { "bin3000",  "c128",      "(C) 2001 Stefano Bodrato",
       "Adds a c128 style disk file header",
       NULL,
@@ -470,6 +484,10 @@ struct {
       "Generates a .NAS file suitable for use by emulators",
       NULL,
       nascom_exec,    nascom_options },
+    { "bin2ncboot",   "ncboot",       "(C) 2025 z88dk",
+      "Generates a boot NC200 disc image",
+      NULL,
+      ncboot_exec,    ncboot_options },
     { "hex2cas",   "nec",       "(C) 2003,2007 Takahide Matsutsuka",
       "PC-6001 (and others) CAS format conversion utility",
       NULL,
@@ -506,6 +524,10 @@ struct {
       "Create a PC88 bootable d88 disc",
       NULL,
       pc88disc_exec,    pc88disc_options },
+    { "bin2phc",   "phc25",       "(C) 2025 z88dk",
+      "Create a .phc file for Sanyo PHC-25",
+      NULL,
+      phc25_exec,    phc25_options },
     { "bin2ptp",   "pmd85",       "(C) 2020 z88dk",
       "Create a PMD85 ptp file",
       NULL,
@@ -680,6 +702,7 @@ extern FILE        *fopen_bin(const char *fname,const  char *crtfile);
 extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, const char *suffix);
 extern void         any_suffix_change(char *name, const char *suffix, char schar);
+extern void         get_temporary_filename(char *filen);
 
 #define must_malloc_block(sz,sector_sz) must_malloc( ((sz/sector_sz)+1) * sector_sz)
 extern void        *must_malloc(size_t sz);
@@ -731,6 +754,12 @@ extern uint32_t     num2bcd(uint32_t num);
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #endif
+
+
+/* scheduled file deletion */
+
+extern void schedule_for_deletion(char* fname);   // fname is strduped
+
 
 /* memory banks */
 

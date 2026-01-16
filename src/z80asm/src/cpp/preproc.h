@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // preprocessor
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 struct PreprocLevel {
-	Macros		defines;			// #defines, macro args
+	Macros	defines;			// #defines, macro args
 	bool		exitm_called{ false };
 
 	PreprocLevel(Macros* parent = nullptr);
@@ -73,7 +73,7 @@ public:
 	void set_c_source(bool f);
 
 private:
-	list<FileScanner>	m_files;		// input stack of files
+	list<FileScanner>	m_files;		    // input stack of files
 	list<PreprocLevel>	m_levels;		// levels of macro expansion
 	deque<ScannedLine>	m_output;       // parsed output
 	vector<IfNest>		m_if_stack;		// state of nested IFs

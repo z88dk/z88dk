@@ -8,7 +8,7 @@ target/zx81/graphics/xorpixl
 target/zx81/graphics/pointxy
 target/zx81/graphics/swapgfxbk
 target/zx81/graphics/scrollup_4px
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/zx81/stdio/ansi_text/f_ansi_attr
 target/zx81/stdio/ansi_text/f_ansi_bel
 target/zx81/stdio/ansi_text/f_ansi_char

@@ -1,0 +1,7 @@
+@classic/games/games.lst
+target/apple2/stdio/a2_ctl
+target/apple2/stdio/fputc_cons
+target/apple2/stdio/gotoxy_callee
+target/apple2/asm_z80_delay_ms
+target/apple2/r6502
+target/apple2/z80_slot

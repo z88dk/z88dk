@@ -5,6 +5,7 @@
     PUBLIC  _clg
 
     EXTERN  v1050_sendchar
+    EXTERN  set_cursor
 
 
 ;
@@ -27,4 +28,6 @@ _clg:
 ;		call v1050_sendchar
 
     ld      l, 12
-    jp      v1050_sendchar
+    call    v1050_sendchar
+    ld      hl, 0
+    jp      set_cursor

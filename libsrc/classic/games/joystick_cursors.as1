@@ -1,0 +1,29 @@
+; Snippet for Cursors-space joystick
+
+	call	getk
+	ld	a,l
+	ld	hl,0
+	cp	' '
+	jr	nz,no_fire1_curs
+    ld      l,16
+	ret
+.no_fire1_curs
+	cp	11
+	jr	nz,no_up_curs
+    ld      l,8
+	ret
+.no_up_curs
+	cp	10
+	jr	nz,no_down_curs
+    ld      l,4
+	ret
+.no_down_curs
+	cp	8
+	jr	nz,no_left_curs
+    ld      l,2
+	ret
+.no_left_curs
+	cp	9
+	ret	nz
+    ld      l,1
+	ret

@@ -1,0 +1,3 @@
+target/zxn/version/z80/check_version_core
+target/zxn/version/z80/check_version_esxdos
+target/zxn/version/z80/check_version_nextzxos

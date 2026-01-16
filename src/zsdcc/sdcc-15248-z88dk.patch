@@ -1,13 +1,16 @@
-Index: ChangeLog
+Index: sdas/linksrc/aslink.h
 ===================================================================
---- ChangeLog	(revision 15248)
-+++ ChangeLog	(working copy)
-@@ -56138,4 +56142,4 @@
- 	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
- 	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
+--- sdas/linksrc/aslink.h	(revision 15248)
++++ sdas/linksrc/aslink.h	(working copy)
+@@ -1312,7 +1312,7 @@
+ extern  VOID            sflush(void);
  
--$Revision: 15242 $
-+$Revision: 15248 $
+ /* EEP: lkelf.c */
+-extern  VOID            elf();
++extern  VOID            elf(int i);
+ 
+ /* JCF: lkmem.c */
+ extern int summary(struct area * xp);
 Index: src/SDCCasm.c
 ===================================================================
 --- src/SDCCasm.c	(revision 15248)
@@ -144,7 +147,28 @@ Index: src/z80/main.c
 ===================================================================
 --- src/z80/main.c	(revision 15248)
 +++ src/z80/main.c	(working copy)
-@@ -1163,7 +1163,7 @@
+@@ -826,6 +826,9 @@
+ static void
+ _finaliseOptions (void)
+ {
++  if ( z80_opts.legacyBanking ) {
++    port->stack.banked_overhead = 0;
++  }
+   port->mem.default_local_map = data;
+   port->mem.default_globl_map = data;
+   if (IS_SM83)
+@@ -1163,8 +1166,8 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
+-  { -1, 0, 0, 4, 0, 3, 0 },
++  0,                            /* ABI revision */
++  { -1, 0, 0, 4, 0, 3, 0 },     // Stack options
+   { 
+     -1,                         /* shifts never use support routines */
+     true,                       /* use support routine for int x int -> long multiplication */
+@@ -1297,7 +1300,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -153,16 +177,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 3, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -1297,7 +1297,7 @@
-     1                           /* No fancy alignments supported. */
-   },
-   { NULL, NULL },
--  1,                            /* ABI revision */
-+  0,                            /* ABI revision */
-   { -1, 0, 0, 4, 0, 3, 0 },
-   { 
-     -1,                         /* shifts never use support routines */
-@@ -1430,7 +1430,7 @@
+@@ -1430,7 +1433,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -171,7 +186,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 2, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -1564,7 +1564,7 @@
+@@ -1564,7 +1567,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -180,7 +195,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 2, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -1698,7 +1698,7 @@
+@@ -1698,7 +1701,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -189,7 +204,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 2, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -1834,7 +1834,7 @@
+@@ -1834,7 +1837,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -198,7 +213,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 2, 0, 4, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -1968,7 +1968,7 @@
+@@ -1968,7 +1971,7 @@
      1                           /* No fancy alignments supported. */
     },
    { NULL, NULL },
@@ -207,7 +222,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 2, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -2102,7 +2102,7 @@
+@@ -2102,7 +2105,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -216,7 +231,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 3, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -2236,7 +2236,7 @@
+@@ -2236,7 +2239,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },
@@ -225,7 +240,7 @@ Index: src/z80/main.c
    { -1, 0, 0, 4, 0, 3, 0 },
    { 
      -1,                         /* shifts never use support routines */
-@@ -2370,7 +2370,7 @@
+@@ -2370,7 +2373,7 @@
      1                           /* No fancy alignments supported. */
    },
    { NULL, NULL },

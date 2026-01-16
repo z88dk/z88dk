@@ -9,9 +9,11 @@
     EXTERN  generic_console_get_mode
     EXTERN  screendollar
     EXTERN  screendollar_with_count
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
+    EXTERN  __MODE2_attr
+    EXTERN  __MODE3_attr
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
 
@@ -23,7 +25,9 @@ generic_console_vpeek:
     ld      sp, hl
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
-    call    swapgfxbk
+    ld      a,255
+    ld      (__vpeek_colour),a
+    call    __gfx_vram_page_in
     call    generic_console_xypos
     call    generic_console_get_mode
     ex      af, af
@@ -57,7 +61,7 @@ vpeek_1:
     inc     de
     pop     bc
     djnz    vpeek_1
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     de                          ;the buffer on the stack
     ld      hl, (generic_console_font32)
 do_screendollar:
@@ -87,29 +91,40 @@ vpeek_MODE1:
 vpeek_MODE2:
     ex      af, af
     push    de
-    ld      d, @00000001
     ld      c, 0                        ;resulting byte
     ld      a, 2                        ;Loop twice
-MODE2_nibble:
+@nibble_loop:
     push    af
+    ld      a,(__vpeek_colour)          ;bits 0,1 occupied
+    ld      d,a
     ld      e, @00000011
     ld      b, 4                        ;4 pixels in a byte
-MODE2_1:
+@bit_loop:
+    ld      a,d
+    inc     a
+    jr      nz,@got_paper
     ld      a, (hl)
     and     e
-    jr      z, not_set
-    ld      a, c
-    or      d
-    ld      c, a
-not_set:
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (hl)
+    and     e
+    cp      d
+    scf
+    jr      nz,@rotate_bit              ;it's ink
+    ccf
+@rotate_bit:
+    rr      c
+    sla     d
     sla     d
     sla     e
     sla     e
-    djnz    MODE2_1
+    djnz    @bit_loop
     inc     hl
     pop     af
     dec     a
-    jr      nz, MODE2_nibble
+    jr      nz, @nibble_loop
     ld      a, c                        ;Byte to return
     ld      bc, 126
     add     hl, bc
@@ -121,30 +136,47 @@ vpeek_MODE3:
     ex      af, af
     push    de
     ld      c, 0                        ;resulting byte
-    ld      d, @00000001
+    ld      a,(__vpeek_colour)          ;bits 0-3
+    ld      d,a
     ld      b, 4
-vpeek_MODE3_0:
+@byte_loop:
+    ld      a,d
+    inc     a
+    jr      nz,@got_paper
     ld      a, (hl)
     and     15
-    jr      z, right_nibble
-    ld      a, c
-    or      d
-    ld      c, a
-right_nibble:
-    sla     d
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
     ld      a, (hl)
-    and     240
-    jr      z, vpeek_MODE3_loop
-    ld      a, c
-    or      d
-    ld      c, a
-vpeek_MODE3_loop:
-    sla     d
+    and     15
+    cp      d
+    scf
+    jr      nz, @bit_rotate_in1
+    ccf
+@bit_rotate_in1:
+    rr      c
+    ld      a, (hl)
+    rrca
+    rrca
+    rrca
+    rrca
+    and     15
+    cp      d
+    scf
+    jr      nz, @bit_rotate_in2
+    ccf
+@bit_rotate_in2:
+    rr      c
     inc     hl
-    djnz    vpeek_MODE3_0
+    djnz    @byte_loop
     ld      a, c
     ld      bc, 124
     add     hl, bc
     pop     de
     ex      af, af
     ret
+
+    SECTION bss_graphics
+
+__vpeek_colour: defb    0

@@ -17,6 +17,10 @@ for my $lib_ixiy ("", "-IXIY", "-IXIY-soft") {
 	my %IXIY_ERROR = (""=>"(no option)", "-IXIY"=>"-IXIY", "-IXIY-soft"=>"-IXIY-soft");
 		
 	for my $lib_cpu (@CPUS) {
+
+		# run only once for each kind or success/failure required
+		my %already_run;
+		
 		spew("$test.1.asm", <<'END');
 				public the_answer
 		the_answer = 42
@@ -58,7 +62,11 @@ END
 		for my $code_ixiy ("", "-IXIY", "-IXIY-soft") {
 			for my $code_cpu (@CPUS) {
 
+				note "Library: $lib_ixiy $lib_cpu Code: $code_ixiy $code_cpu";
+				
 				if (!cpu_compatible($code_cpu, $lib_cpu)) {
+					next if $already_run{cpu_not_compatible}++;
+					
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 						    "$test.asm $test.1.o", <<END);
 error: CPU incompatible: file $test.1.o compiled for $lib_cpu, incompatible with $code_cpu
@@ -71,6 +79,8 @@ $test.asm:2: error: undefined symbol: the_answer
 END
 				}
 				elsif (!ixiy_compatible($code_ixiy, $lib_ixiy)) {
+					next if $already_run{ixiy_not_compatible}++;
+					
 					capture_nok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 						    "$test.asm $test.1.o", <<END);
 error: -IXIY incompatible: file $test.1.o compiled with $IXIY_ERROR{$lib_ixiy}, incompatible with $IXIY_ERROR{$code_ixiy}
@@ -84,6 +94,8 @@ END
 
 				}
 				else {
+					next if $already_run{compatible}++;
+					
 					unlink("$test.bin");
 					capture_ok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 							"$test.asm $test.1.o", "");

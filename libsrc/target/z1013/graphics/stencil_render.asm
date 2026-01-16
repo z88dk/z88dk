@@ -11,7 +11,7 @@
 ;    stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     MODULE  __z1013_stencil_render
     SECTION smc_clib
@@ -19,7 +19,7 @@
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
     EXTERN  KRT_BANK_SELECTOR

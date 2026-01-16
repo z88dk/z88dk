@@ -43,8 +43,8 @@
 
     EXTERN  base_graphics
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  ansicharacter_pixelwidth
     EXTERN  ansifont_is_packed
@@ -75,7 +75,7 @@ Rloop:
     djnz    Rloop
 ZROW:
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
 
     ld      (RIGA+1), hl                ; RIGA+1=ROW Location
@@ -225,7 +225,7 @@ NEXT:
     dec     c
     jr      nz, PRE
 
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
   ;ret					;return
 
 

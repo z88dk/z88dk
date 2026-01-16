@@ -463,11 +463,13 @@ void doozcopyasm()
 {
 #asm
 
-    EXTERN	swapgfxbk
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
-    call    swapgfxbk
+
+    call    __gfx_vram_page_in
     call    ozscrcpy
-    jp      swapgfxbk
+    jp      __gfx_vram_page_out
 
     EXTERN	base_graphics
 

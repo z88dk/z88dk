@@ -16,18 +16,25 @@
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
+#include "ticks.h"
 
 #ifdef WIN32
 #include <windows.h>
+#include <io.h>
 #else
 #include <unistd.h>
+#include <sys/stat.h>
+#include <termios.h>
+#include <errno.h>
 #endif
+
+#include <fcntl.h>
 
 #define SEC_TO_US(sec) ((sec)*1000000)
 #define NS_TO_US(ns)    ((ns)/1000)
 
-static uint8_t verbose = 0;
-static char* script_file = NULL;
+uint8_t verbose = 0;
+char* script_file = NULL;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
 static uint8_t has_clock_register = 0;
@@ -67,32 +74,7 @@ static uint16_t mem_requested_amount = 0;
 static int connection_socket = 0;
 static struct network_op* last_network_op = NULL;
 
-enum register_mapping_t {
-    REGISTER_MAPPING_AF = 0,
-    REGISTER_MAPPING_BC,
-    REGISTER_MAPPING_DE,
-    REGISTER_MAPPING_HL,
-    REGISTER_MAPPING_AF_,
-    REGISTER_MAPPING_BC_,
-    REGISTER_MAPPING_DE_,
-    REGISTER_MAPPING_HL_,
-    REGISTER_MAPPING_IX,
-    REGISTER_MAPPING_IY,
-    REGISTER_MAPPING_SP,
-    REGISTER_MAPPING_PC,
-
-    /*
-     * Some emulators would report this 16bit register pair, which could be used
-     * to track ticks for profiling purposes
-     */
-    REGISTER_MAPPING_CLOCKL,
-    REGISTER_MAPPING_CLOCKH,
-
-    REGISTER_MAPPING_MAX,
-    REGISTER_MAPPING_UNKNOWN
-};
-
-static const char* register_mapping_names[] = {
+const char* register_mapping_names[] = {
     "af",
     "bc",
     "de",
@@ -617,7 +599,7 @@ uint8_t breakpoints_check()
 
 void debugger_next(uint8_t add_bp)
 {
-    static char buf[2048];
+    static char buf[16384];
     int len;
     const unsigned short pc = bk.pc();
 
@@ -787,7 +769,7 @@ void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
     pthread_mutex_unlock(&main_thread_mutex);
 }
 
-static void gdb_execution_stopped()
+static void gdb_execution_stopped(int code)
 {
     if (debugger_active == 1)
     {
@@ -804,7 +786,9 @@ static void gdb_execution_stopped()
 
 void remote_execution_stopped(const void* data, void* response)
 {
-    bk.execution_stopped();
+    const int* code = data;
+    bk.execution_stopped(*code);
+    free(response);
 }
 
 static uint8_t process_packet()
@@ -874,7 +858,10 @@ static uint8_t process_packet()
     {
         case 'T':
         {
-            execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
+            payload[2] = '\0';
+            int* code = malloc(sizeof(int));
+            *code = strtol(payload, NULL, 10);
+            execute_on_main_thread_no_response(&remote_execution_stopped, code);
 
             break;
         }
@@ -897,6 +884,8 @@ static void* network_read_thread(void* arg)
 
         while (process_packet()) {};
     }
+
+    bk.remote_closed();
 
     return NULL;
 }
@@ -942,30 +931,15 @@ static uint8_t is_gdbserver_connected()
     return connection_socket;
 }
 
-static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
+static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port);
+
+static uint8_t initialize_gdb_connection(void)
 {
-    connection_socket = (int)socket(AF_INET, SOCK_STREAM, 0);
-#ifdef _WIN32
-	if (connection_socket == SOCKET_ERROR) {
-		bk.debug("Socket error: %d\n", WSAGetLastError());
-		return 1;
-	}
-#endif
+    // Reset register mappings
+    register_mappings_count = 0;
+    has_clock_register = 0;
 
-    struct sockaddr_in servaddr;
-    memset(&servaddr, 0, sizeof(servaddr));
-
-    // assign IP, PORT
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr(connect_host);
-    servaddr.sin_port = htons(connect_port);
-
-    // connect the client socket to server socket
-    int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
-    if (ret) {
-        return 1;
-    }
-
+    // Create read/write threads
     {
         pthread_t id;
         pthread_create(&id, NULL, network_read_thread, &connection_socket);
@@ -983,7 +957,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         if (supported == NULL || strstr(supported, "qXfer:features:read+") == NULL)
         {
             bk.debug("Remote target does not support qXfer:features:read+\n");
-            goto shutdown;
+            return 1;
         }
 
         if (strstr(supported, "NonBreakable")) {
@@ -1011,7 +985,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         const char* target = send_request("qXfer:features:read:target.xml:0,3fff");
         if (target == NULL || *target++ != 'l') {
             bk.debug("Could not obtain target.xml\n");
-            goto shutdown;
+            return 1;
         }
 
         XMLDoc xml;
@@ -1020,7 +994,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         if (XMLDoc_parse_buffer_DOM(target, "features", &xml) == 0) {
             bk.debug("Cannot parse target.xml.\n");
             XMLDoc_free(&xml);
-            goto shutdown;
+            return 1;
         }
 
         {
@@ -1029,12 +1003,14 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             XMLNode* arch = xml.nodes[xml.i_root];
             if ((arch = XMLSearch_next(arch, &search)) == NULL) {
                 bk.debug("Unknown architecture.\n");
-                goto shutdown;
+                XMLDoc_free(&xml);
+                return 1;
             }
 
             if (strcmp(arch->text, "z80") != 0) {
                 bk.debug("Unsupported architecture: %s\n", arch->text);
-                goto shutdown;
+                XMLDoc_free(&xml);
+                return 1;
             }
             XMLSearch_free(&search, 1);
         }
@@ -1109,10 +1085,214 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
     send_request_no_response("?");
 
     return 0;
+}
+static uint8_t connect_to_serial_device(const char *device_path)
+{
+#ifdef _WIN32
+    // On Windows use e.g. "\\\\.\\COM3"
+    HANDLE h = CreateFileA(
+        device_path,
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        NULL,
+        OPEN_EXISTING,
+        0,
+        NULL
+    );
 
-shutdown:
-    shutdown(connection_socket, 0);
-    return 1;
+    if (h == INVALID_HANDLE_VALUE)
+    {
+        bk.debug("Cannot open serial device %s (CreateFile failed)\n", device_path);
+        return 1;
+    }
+
+    // Configure 115200 8N1, "raw"
+    DCB dcb;
+    SecureZeroMemory(&dcb, sizeof(dcb));
+    dcb.DCBlength = sizeof(dcb);
+
+    if (!GetCommState(h, &dcb))
+    {
+        bk.debug("Cannot get comm state\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    dcb.BaudRate = CBR_115200;
+    dcb.ByteSize = 8;
+    dcb.Parity   = NOPARITY;
+    dcb.StopBits = ONESTOPBIT;
+
+    // roughly "raw mode": disable XON/XOFF, HW flow control etc.
+    dcb.fParity          = FALSE;
+    dcb.fOutX            = FALSE;
+    dcb.fInX             = FALSE;
+    dcb.fOutxCtsFlow     = FALSE;
+    dcb.fOutxDsrFlow     = FALSE;
+    dcb.fDtrControl      = DTR_CONTROL_DISABLE;
+    dcb.fRtsControl      = RTS_CONTROL_DISABLE;
+    dcb.fTXContinueOnXoff = TRUE;
+
+    if (!SetCommState(h, &dcb))
+    {
+        bk.debug("Cannot set comm state\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    // Blocking read, return as soon as data appears (closest to VMIN=1, VTIME=0)
+    COMMTIMEOUTS timeouts;
+    timeouts.ReadIntervalTimeout         = 0;
+    timeouts.ReadTotalTimeoutMultiplier  = 0;
+    timeouts.ReadTotalTimeoutConstant    = 0;
+    timeouts.WriteTotalTimeoutMultiplier = 0;
+    timeouts.WriteTotalTimeoutConstant   = 0;
+
+    if (!SetCommTimeouts(h, &timeouts))
+    {
+        bk.debug("Cannot set timeouts\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    // Turn HANDLE into a POSIX-ish fd so existing read/write code works
+    int fd = _open_osfhandle((intptr_t)h, _O_RDWR | _O_BINARY);
+    if (fd < 0)
+    {
+        bk.debug("Cannot wrap HANDLE as fd\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    connection_socket = fd;
+    set_connection_type(1);
+
+    if (initialize_gdb_connection())
+    {
+        close(connection_socket);      // this will also close the HANDLE
+        connection_socket = 0;
+        return 1;
+    }
+
+    return 0;
+
+#else   // POSIX (Linux, macOS, etc.)
+
+    int fd;
+    struct termios tty;
+
+    fd = open(device_path, O_RDWR | O_NOCTTY);
+    if (fd < 0)
+    {
+        bk.debug("Cannot open serial device %s: %s\n", device_path, strerror(errno));
+        return 1;
+    }
+
+    if (tcgetattr(fd, &tty) != 0)
+    {
+        bk.debug("Cannot get terminal attributes: %s\n", strerror(errno));
+        close(fd);
+        return 1;
+    }
+
+    cfsetospeed(&tty, B115200);
+    cfsetispeed(&tty, B115200);
+
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY | INLCR | IGNCR | ICRNL);
+    tty.c_oflag &= ~OPOST;
+    tty.c_cflag &= ~(CSIZE | PARENB);
+    tty.c_cflag |= CS8 | CLOCAL | CREAD;
+
+    tty.c_cc[VMIN]  = 1;
+    tty.c_cc[VTIME] = 0;
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0)
+    {
+        bk.debug("Cannot set terminal attributes: %s\n", strerror(errno));
+        close(fd);
+        return 1;
+    }
+
+    connection_socket = fd;
+    set_connection_type(1);
+
+    if (initialize_gdb_connection())
+    {
+        close(connection_socket);
+        connection_socket = 0;
+        return 1;
+    }
+
+    return 0;
+#endif
+}
+
+static uint8_t connect_remote(const char* address)
+{
+#ifdef WIN32
+    // On Windows, check for COM ports
+    if (strncmp(address, "COM", 3) == 0) {
+        return connect_to_serial_device(address);
+    }
+#else
+    // On Unix, check if address is a file/device
+    struct stat st;
+    if (stat(address, &st) == 0) {
+        return connect_to_serial_device(address);
+    }
+#endif
+
+    // Otherwise, treat as TCP connection
+    // Parse address: could be "tcp:host:port" or "host:port"
+    char hostname[128];
+    int port;
+    const char* addr = address;
+    
+    if (strncmp(address, "tcp:", 4) == 0) {
+        addr = address + 4;
+    }
+    
+    int scanf_res = sscanf(addr, "%[^:]:%d", hostname, &port);
+    if (scanf_res != 2) {
+        bk.debug("Invalid TCP address format: %s (expected host:port or tcp:host:port)\n", address);
+        return 1;
+    }
+    
+    return connect_to_gdbserver(hostname, port);
+}
+
+static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
+{
+    set_connection_type(0); // TCP connection
+    connection_socket = (int)socket(AF_INET, SOCK_STREAM, 0);
+#ifdef _WIN32
+	if (connection_socket == SOCKET_ERROR) {
+		bk.debug("Socket error: %d\n", WSAGetLastError());
+		return 1;
+	}
+#endif
+
+    struct sockaddr_in servaddr;
+    memset(&servaddr, 0, sizeof(servaddr));
+
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(connect_host);
+    servaddr.sin_port = htons(connect_port);
+
+    // connect the client socket to server socket
+    int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    if (ret) {
+        return 1;
+    }
+
+    if (initialize_gdb_connection()) {
+        shutdown(connection_socket, 0);
+        return 1;
+    }
+
+    return 0;
 }
 
 static void ctrl_c_main_thread(const void* data, void* response) {
@@ -1147,6 +1327,11 @@ static void start_ctrl_c_signal_loop() {
 
 static void ctrl_c() {
     ctrl_c_requested = 1;
+}
+
+static void gdb_remote_closed() {
+    bk.console("Connection to remote closed.\n");
+    exit(1);
 }
 
 uint32_t gdb_profiler_time() {
@@ -1202,14 +1387,15 @@ static backend_t gdb_backend = {
     .enable_breakpoint = &gdb_enable_breakpoint,
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose,
-    .remote_connect = connect_to_gdbserver,
+    .remote_connect = connect_remote,
     .is_remote_connected = is_gdbserver_connected,
     .console = stdout_log,
     .debug = stdout_log,
     .execution_stopped = gdb_execution_stopped,
     .ctrl_c = ctrl_c,
     .time = gdb_profiler_time,
-	.script_filename = script_filename
+	.script_filename = script_filename,
+    .remote_closed = gdb_remote_closed,
 };
 
 static void process_scheduled_actions()
@@ -1262,6 +1448,7 @@ static void process_scheduled_actions()
 int main(int argc, char **argv) {
     char* connect_host = NULL;
     int connect_port = 0;
+    char* connect_device = NULL;
 
     set_backend(gdb_backend);
 
@@ -1273,6 +1460,8 @@ int main(int argc, char **argv) {
             connect_port = atoi(argv[++i]);
         } else if (strcmp(argv[i], "-h") == 0) {
             connect_host = argv[++i];
+        } else if (strcmp(argv[i], "-d") == 0) {
+            connect_device = argv[++i];
         } else if (strcmp(argv[i], "-x") == 0) {
             char* debug_symbols = argv[++i];
             if (bk.is_verbose()) {
@@ -1339,28 +1528,46 @@ int main(int argc, char **argv) {
                "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
                "\n");
 
-        if (connect_port == 0 || connect_host == NULL) {
+        // Validate that either TCP (host+port) or serial device is specified, not both
+        int has_tcp = (connect_host != NULL && connect_port != 0);
+        int has_serial = (connect_device != NULL);
+        
+        if (!has_tcp && !has_serial) {
             bk.debug("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
+            bk.debug("   or: z88dk-gdb -d <device> -x <debug symbols> [-x <debug symbols>] [-v]\n");
             return 1;
+        }
+        
+        if (has_tcp && has_serial) {
+            bk.debug("Error: Cannot specify both TCP connection (-h/-p) and serial device (-d)\n");
+            return 1;
+        }
+        
+        start_ctrl_c_signal_loop();
+
+        bk.console("Connecting...\n");
+
+        char connect_address[256];
+        if (has_serial) {
+            strncpy(connect_address, connect_device, sizeof(connect_address) - 1);
+            connect_address[sizeof(connect_address) - 1] = '\0';
         } else {
-            start_ctrl_c_signal_loop();
+            snprintf(connect_address, sizeof(connect_address), "%s:%d", connect_host, connect_port);
+        }
 
-            bk.console("Connecting...\n");
+        if (connect_remote(connect_address)) {
+            bk.debug("Could not connect\n");
+            return 1;
+        }
 
-            if (connect_to_gdbserver(connect_host, connect_port)) {
-                bk.debug("Could not connect to the server\n");
-                return 1;
-            }
+        bk.console("Connected to the server.\n");
 
-            bk.console("Connected to the server.\n");
-
-            while (1) {
-                registers_invalidated = 1;
-                if (debugger_active) {
-                    debugger();
-                } else {
-                    process_scheduled_actions();
-                }
+        while (1) {
+            registers_invalidated = 1;
+            if (debugger_active) {
+                debugger();
+            } else {
+                process_scheduled_actions();
             }
         }
     }

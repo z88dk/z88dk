@@ -4,15 +4,15 @@
     PUBLIC  _getk
 
 
-    INCLUDE "target/radio86/def/monitor.def"
+    INCLUDE "target/radio86/def/radio86.h"
 
 getk:
 _getk:
-    call    QUERYKEY
+    call    M_QUERYKEY
     ld      hl, 0
     and     a
     ret     z
-    call    WAITKEY
+    call    M_WAITKEY
     ld      l, a
     ret
 

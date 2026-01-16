@@ -5,6 +5,7 @@
 #include "syms.h"
 #include "backend.h"
 #include "disassembler.h"
+#include "rsthelper.h"
 #include "debugger.h"
 
 
@@ -39,6 +40,7 @@ typedef struct {
 } dcontext;
 
 
+
 #define READ_BYTE(state,val) do { \
     val = bk.get_memory(state->pc++, MEM_TYPE_INST); \
     if ( state->len < sizeof(state->instr_bytes)) \
@@ -50,12 +52,18 @@ typedef struct {
     val = bk.get_memory(state->pc, MEM_TYPE_INST); \
 } while (0)
 
+#define PEEK_BYTE_OFFS(state,offs,val) do { \
+    val = bk.get_memory(state->pc + offs, MEM_TYPE_INST); \
+} while (0)
+
 #define BUF_PRINTF(fmt, ...) do { \
-    offs += snprintf(buf + offs, buflen - offs, fmt, ## __VA_ARGS__); \
+    int o; \
+    o = snprintf(buf + offs, buflen - offs, fmt, ## __VA_ARGS__); \
+    offs += o; linepos += o; \
 } while(0)
 
 #define BUF_RESET() do { \
-   offs = 0; \
+   offs = 0; linepos = 0; \
    if (compact <= 1) { \
         offs = snprintf(buf, buflen, "%-20s", ""); \
    } \
@@ -85,6 +93,7 @@ static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
 {
     const char   *label;
     size_t  offs = 0;
+    size_t  linepos = 0;
     int8_t  displacement;
 
     READ_BYTE(state, displacement);
@@ -114,6 +123,7 @@ static char *handle_rel16(dcontext *state, char *buf, size_t buflen)
 {
     const char   *label;
     size_t  offs = 0;
+    size_t  linepos = 0;
     int16_t  displacement;
     uint8_t   d1,d2;
 
@@ -145,6 +155,7 @@ static char *handle_rel16(dcontext *state, char *buf, size_t buflen)
 static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
 {
     size_t   offs = 0;
+    size_t  linepos = 0;
     const char    *label;
     uint8_t  lsb;
     uint8_t  msb;
@@ -180,6 +191,7 @@ static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
 static char *handle_addr24(dcontext *state, char *buf, size_t buflen)
 {
     size_t   offs = 0;
+    size_t  linepos = 0;
     const char    *label;
     uint8_t  lsb;
     uint8_t  msb;
@@ -206,6 +218,7 @@ static char *handle_addr24(dcontext *state, char *buf, size_t buflen)
 static char *handle_immed8(dcontext *state, char *buf, size_t buflen)
 {
     size_t offs = 0;
+    size_t  linepos = 0;
     uint8_t lsb;
     
     READ_BYTE(state, lsb);
@@ -217,6 +230,7 @@ static char *handle_immed8(dcontext *state, char *buf, size_t buflen)
 static char *handle_immed16(dcontext *state, char *buf, size_t buflen)
 {
     size_t offs = 0;
+    size_t  linepos = 0;
     uint8_t lsb;
     uint8_t msb;
     uint8_t mmsb;
@@ -237,6 +251,7 @@ static char *handle_immed16(dcontext *state, char *buf, size_t buflen)
 static char *handle_immed16_be(dcontext *state, char *buf, size_t buflen)
 {
     size_t offs = 0;
+    size_t  linepos = 0;
     uint8_t lsb;
     uint8_t msb;
     
@@ -251,6 +266,7 @@ static char *handle_immed16_be(dcontext *state, char *buf, size_t buflen)
 static char *handle_immed24(dcontext *state, char *buf, size_t buflen)
 {
     size_t offs = 0;
+    size_t  linepos = 0;
     uint8_t lsb;
     uint8_t msb;
     uint8_t mlsb;
@@ -267,6 +283,7 @@ static char *handle_immed24(dcontext *state, char *buf, size_t buflen)
 static char *handle_immed32(dcontext *state, char *buf, size_t buflen)
 {
     size_t offs = 0;
+    size_t  linepos = 0;
     uint8_t lsb;
     uint8_t msb;
     uint8_t mlsb;
@@ -316,6 +333,7 @@ static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t bufl
         { "b", "c", "d", "e", "iyh", "iyl", "iy", "a" }
     };
     size_t offs = 0;
+    size_t  linepos = 0;
     int index = state->index;
 
     /* Turn off ixl/h handling for Rabbit and Z180 */
@@ -342,6 +360,7 @@ static char *handle_displacement(dcontext *state, char *buf, size_t buflen)
 {
     int8_t dis;
     size_t offs = 0;
+    size_t  linepos = 0;
 
     READ_BYTE(state, dis);
     BUF_PRINTF("%s$%02x",  dis < 0 ? "-" : "+", dis < 0 ? -dis : dis);
@@ -446,6 +465,39 @@ static char *handle_ez80_am(dcontext *state, char *opcode)
     return buf;
 }
 
+static rsthelper *get_rsthelper(dcontext *state, uint8_t b)
+{
+    rsthelper *h;
+
+    if ( c_target == NULL ) return NULL;
+    else if ( strcmp(c_target, "z88") == 0 ) h = z88_helpers;
+    else if ( strcmp(c_target, "zx") == 0 ) h = zx_helpers;
+    else if ( strcmp(c_target, "sam") == 0 ) h = sam_helpers;
+    else if ( strcmp(c_target, "zx81") == 0 ) h = zx81_helpers;
+    else return NULL;
+
+    while ( h->length >= 0 ) {
+        if ( h->rst == b ) {
+            int     i;
+            uint8_t val1;
+
+            for ( i = 0; i < h->length; i++ ) {
+                uint8_t val;
+                
+                PEEK_BYTE_OFFS(state, i, val);
+
+                if ( val != h->bytes[i]) {
+                    break;
+                }
+
+            }
+            if ( i == h->length) return h;
+        }
+        h++;
+    }
+    return NULL;
+}
+
 int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
 {
     dcontext    s_state = {0};
@@ -454,11 +506,43 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
     uint8_t     b;
     char        *buf;
     const char  *label;
+    char        *aftercomment;
     size_t       offs = 0;
+    size_t       linepos = 0;
     int          start_pc = pc;
     char         dolf = 0; 
     char         opbuf1[256];
     char         opbuf2[256];
+
+#define eol(ppc) do { \
+    if (compact <= 1) {             \
+        while ( linepos < 60 ) {       \
+            buf[offs++] = ' ';      \
+            buf[offs] = 0;          \
+            linepos++;              \
+        }                           \
+        offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", ppc & 0xffff); \
+    } else {                        \
+        offs += snprintf(buf + offs, buflen - offs, ";");                           \
+    }                                                                               \
+    for ( i = state->skip; i < state->len; i++ ) {                                  \
+        if ( i < sizeof(state->instr_bytes)) {                                      \
+            offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);  \
+        } else {                                                                    \
+            offs += snprintf(buf + offs, buflen - offs,"%s%s", i == sizeof(state->instr_bytes)  ? " " : "", ".");   \
+        }                                                                           \
+    }                                                                               \
+    if ( aftercomment != NULL ) {                                                   \
+        offs += snprintf(buf + offs, buflen - offs, ": %s", aftercomment);          \
+    }                                                                               \
+    if (compact <= 1) {                                                             \
+        if ( dolf ) {                                                               \
+            offs += snprintf(buf + offs, buflen - offs,"\n");                       \
+        }                                                                           \
+    }                                                                               \
+} while (0)
+
+
 
     state->pc = pc;
     state->adl = c_adl_mode;
@@ -474,6 +558,10 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
     if (compact <= 1) {
         offs = snprintf(buf, buflen, "%-20s", "");
     }
+
+    linepos = offs;
+
+    aftercomment = NULL;
 
     if ( address_is_code(state->pc) == 0 ) {
         READ_BYTE(state, b);
@@ -528,7 +616,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 else BUF_PRINTF("%-10s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));                  
                             } else if ( y == 3 ) {
                                 if ( is8085() ) BUF_PRINTF("%-10s%s","rl","de");
-                                else if ( !is8080() ) BUF_PRINTF("%-10s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1)));
+                                else if ( !is8080() ) { BUF_PRINTF("%-10s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1))); dolf=1; }
                                 else BUF_PRINTF("nop");
                             } else if ( is8085() ) {
                                 if ( y == 4 ) BUF_PRINTF("%-10s","rim");
@@ -860,7 +948,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( p == 1 && is8085() ) BUF_PRINTF("%-10s(de),hl","ld");
                             else if ( p == 1 && !isgbz80() ) BUF_PRINTF("exx");
                             else if ( p == 1 && isgbz80() ) { BUF_PRINTF("reti"); dolf=1; }
-                            else if ( p == 2 ) BUF_PRINTF("%-10s(%s%s)",handle_ez80_am(state,"jp"),handle_kc_prefix(state->kc_prefix),handle_register16(state, 2, state->index)); 
+                            else if ( p == 2 ) {BUF_PRINTF("%-10s(%s%s)",handle_ez80_am(state,"jp"),handle_kc_prefix(state->kc_prefix),handle_register16(state, 2, state->index)); dolf = 1; }
                             else if ( p == 3 ) BUF_PRINTF("%-10ssp,%s", handle_ez80_am(state,"ld"), handle_register16(state, 2, state->index)); 
                         }
                     } else if ( z == 2 ) { 
@@ -873,7 +961,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             else if ( y == 7 ) BUF_PRINTF("%-10sa,(%s)","ld",handle_addr16(state,opbuf1,sizeof(opbuf1)));                        
                         }
                     } else if  ( z == 3 ) {
-                        if ( y == 0 ) BUF_PRINTF("%-10s%s", handle_ez80_am(state,"jp"), handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                        if ( y == 0 ) { BUF_PRINTF("%-10s%s", handle_ez80_am(state,"jp"), handle_addr16(state, opbuf1, sizeof(opbuf1))); dolf=1; }
                         else if ( y == 1 && is8085() ) BUF_PRINTF("%-10sv,$0040","rst");
                         else if ( y == 1 && is8080() ) BUF_PRINTF("nop");
                         else if ( y == 1 ) {
@@ -1290,37 +1378,95 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         } else if ( israbbit() && y == 0 ) { handle_immed16(state, opbuf1, sizeof(opbuf1)); handle_immed8(state, opbuf2, sizeof(opbuf2)); BUF_PRINTF("%-10s%s,%s","ljp", opbuf2, opbuf1); }
                         else if ( israbbit() && y == 1 ) { handle_immed16(state, opbuf1, sizeof(opbuf1)); handle_immed8(state, opbuf2, sizeof(opbuf2)); BUF_PRINTF("%-10s%s,%s","lcall", opbuf2, opbuf1); }
                         else if ( israbbit() && y == 6 ) BUF_PRINTF("mul");
-                        else BUF_PRINTF("%-10s$%02x", handle_ez80_am(state,"rst"), y * 8);
-                    }
+                        else {
+                            rsthelper *h = get_rsthelper(state, b);
+                            int     i;
+
+                            if ( h != NULL ) {
+                                if ( h->flags & F_SEQUENCE ) {
+                                    int     count = 1;
+                                    int     plain_count = 0;
+
+                                    BUF_PRINTF("%-10s$%02x", handle_ez80_am(state,"rst"), y * 8); 
+                                    eol(state->pc+1);
+                                    state->len = 0;
+                                    while ( 1 ) {
+                                        uint8_t val;
+                                        int     soffs = offs;
+                                        int     printed;
+
+                                        // This handles ZXFP_STK_DATA where variable length encoding is used
+                                        if ( h && h->flags & F_LEN67 ) {
+                                            uint8_t val2;
+
+                                            PEEK_BYTE_OFFS(state, 1, val2);
+                                            plain_count = ((val2 >> 6) & 0x03) + 2;
+
+                                            // Exponent byte handling
+                                            if ( (val2 & 0x3f) == 0 ) plain_count++;
+                                        } else if ( h && h->flags & F_BYTE ) {
+                                            plain_count = 1;
+                                        } else if ( h && h->flags & F_WORD ) {
+                                            plain_count = 2;
+                                        } else if ( h && h->flags & F_5BYTES ) {
+                                            plain_count = 2;
+                                        } else if ( h && h->flags & F_nBYTES ) {
+                                            PEEK_BYTE_OFFS(state, 1, plain_count);
+                                        }
+
+
+                                        linepos = -1; BUF_PRINTF("\n%-20s", "");        // -1 since there's a newline on the previous line
+                                        READ_BYTE(state, val);
+                                        if ( h ) {
+                                            BUF_PRINTF("%-10s%s","defb",h->api);
+                                        } else {
+                                            BUF_PRINTF("%-10s$%02x","defb",val);
+                                        }
+                                        eol(state->pc+1);
+                                        state->len = 0;
+
+                                        count++;
+                                        if ( h && (h->flags & F_END)) {
+                                            break;
+                                        }
+
+                                        if ( plain_count == 0 ) {
+                                            h = get_rsthelper(state, b);
+                                        } else {
+                                            plain_count--;
+                                            h = NULL;
+                                        }
+
+                                    }
+                                    return count;       // Number of bytes in this instruction
+                                } else if ( h->opcode != NULL ) {
+                                    BUF_PRINTF("%-10s%s", h->opcode, h->api);
+                                    for ( i = 0; i < h->length; i++ ) {
+                                        uint8_t val;
+                                        READ_BYTE(state, val);
+                                    }
+                                } else {
+                                    // Print restarts followed by defbs
+                                    BUF_PRINTF("%-10s$%02x: defb ", handle_ez80_am(state,"rst"), y * 8);                    
+                                    for ( i = 0; i < h->length; i++ ) {
+                                        uint8_t val;
+                                        READ_BYTE(state, val);
+                                        BUF_PRINTF("%s$%02x ", i == 0 ? "" : ",", val);
+                                    }
+                                    aftercomment = h->api;
+                                }
+                            } else {
+                                BUF_PRINTF("%-10s$%02x", handle_ez80_am(state,"rst"), y * 8);                    
+                            }
+                        }
+                    } 
                     break;
             }
             break;
         } while (1);
     }
 
-    if (compact <= 1) {
-        while ( offs < 60 ) {
-            buf[offs++] = ' ';
-            buf[offs] = 0;
-        }
-
-        offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc & 0xffff);
-    } else {
-        offs += snprintf(buf + offs, buflen - offs, ";");
-    }
-
-    for ( i = state->skip; i < state->len; i++ ) {
-        if ( i < sizeof(state->instr_bytes)) {
-            offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
-        } else {
-            offs += snprintf(buf + offs, buflen - offs,"%s%s", i == sizeof(state->instr_bytes)  ? " " : "", ".");
-        }
-    }
-    if (compact <= 1) {
-        if ( dolf ) {
-            offs += snprintf(buf + offs, buflen - offs,"\n");
-        }
-    }
+    eol(start_pc);
 
     return state->len;
 }

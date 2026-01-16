@@ -1,4 +1,7 @@
 
+SUBDIRS = demo_bifrost2 demo_nirvanap
+CLEANDIRS = $(SUBDIRS:%=%-clean)
+
 all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
 	adv_a.tap ansitest.tap enigma.tap fib.tap mm.tap rpn.tap tic.tap \
 	sorter.tap snakes.tap dstar.tap dstar_native.tap microman.tap \
@@ -8,8 +11,14 @@ all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
 	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap marilyn.tap eagle.tap \
 	fern.tap thuemorse.tap wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
 	coswave_small.tap spritest.tap smile.tap xample.tap psgtest.tap \
-	carpet.tap ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
+	carpet.tap ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap \
+	subdirs-all
 
+subdirs-all: $(SUBDIRS)
+
+subdirs-clean: $(SUBDIRS_CLEAN)
+
+.PHONY: subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 
 fontexample.tap: fontexample.c
 	zcc +zx -vn -lndos fontexample.c -create-app -o fontexample.bin
@@ -197,6 +206,16 @@ sndtest.tap: ../sound/sndtest.c
 synthdemo.tap: ../sound/synthdemo.c
 	zcc +zx -vn ../sound/synthdemo.c -lndos -create-app -osynthdemo.bin
 
-clean:
+
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all 
+
+subdirs-clean: $(CLEANDIRS)
+
+clean:	subdirs-clean
 	$(RM) *.bin *.i *.asm *.scr *.tap *.op* *.o *~ zcc_opt.def *.reloc
 
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:%-clean=%) clean

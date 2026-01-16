@@ -1,0 +1,8 @@
+@target/cpm-libs/cpm_asm.lst
+target/cpm-libs/c/sccz80/cpm_bdos
+target/cpm-libs/c/sccz80/cpm_bdos_callee
+target/cpm-libs/c/sccz80/cpm_bdos_hl
+target/cpm-libs/c/sccz80/cpm_bdos_hl_callee
+target/cpm-libs/c/sccz80/cpm_get_offset
+target/cpm-libs/c/sccz80/cpm_set_offset
+target/cpm-libs/c/sccz80/cpm_set_offset_callee

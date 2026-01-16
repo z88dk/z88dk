@@ -30,8 +30,11 @@ int alphatp2_exec(char *target)
     char     sector[256] = {0};
     char    *buf = NULL;
     char    filename[FILENAME_MAX+1];
-    FILE    *fpin;
+    char    bootname[FILENAME_MAX+1];
+    char    bootbuf[256];
+    FILE    *fpin, *bootstrap_fp;
     disc_handle *h;
+    size_t  bootlen;
     int     pos, length;
     int     t,s,head = 0;
     int     offs;
@@ -42,6 +45,29 @@ int alphatp2_exec(char *target)
     if ( binname == NULL ) {
         return -1;
     }
+
+    strcpy(bootname, binname);
+    suffix_change(bootname, "_BOOTSTRAP.bin");
+    if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
+        exit_log(1,"Can't open input file %s\n",bootname);
+    }
+    if ( fseek(bootstrap_fp,0,SEEK_END) ) {
+        fclose(bootstrap_fp);
+        fprintf(stderr,"Couldn't determine size of file\n");
+    }
+    bootlen = ftell(bootstrap_fp);
+    fseek(bootstrap_fp,0L,SEEK_SET);
+
+    if ( bootlen > 240 ) {
+        exit_log(1, "Bootstrap has length %d > 240", bootlen);
+    }
+    memset(bootbuf, 0, sizeof(bootbuf));
+    bootbuf[0] = bootlen;
+    if ( fread(bootbuf+1, 1, bootlen, bootstrap_fp) != bootlen ) {
+        exit_log(1, "Cannot read whole bootstrap file");
+    }
+    fclose(bootstrap_fp);
+
 
     strcpy(filename, binname);
     if ( ( fpin = fopen_bin(binname, crtfile) ) == NULL ) {
@@ -72,22 +98,26 @@ int alphatp2_exec(char *target)
 
 
     // Prepare a boot sector with MOS commands
-    snprintf(sector,sizeof(sector),"%cI%04X %04X%cU%04X FC00%c",0x7f,pos,pos + length -2,0x0d,pos,0xd);
+    pos = 0x4010;
+    snprintf(sector,sizeof(sector),"%cI%04X %04X%cU%04X FC00%c",0x7f,pos,pos + bootlen -1,0x0d,pos,0xd);
 //    snprintf(sector,sizeof(sector),"%cI%04X FFFF%cU%04X FC00%c",0x7f,pos,0x0d,pos,0xd);
 //    snprintf(sector,sizeof(sector),"%cI%04X %04X%cU%04X%c",0x7f,pos,pos - 1 + ((length / 256) + 1)*256,0x0d,pos,0xd);
 
     
     disc_write_boot_track(h, sector, 256);
+
     
     offs = 0;
     head = t = 0;
     s = 1;
+    disc_write_sector(h,t,s++,head,bootbuf);
+
+
     while ( offs < length ) {
         int rem = length - offs;
-        sector[0] = rem >= 255 ? 0xff : rem;
-        memcpy(sector+1, &buf[offs], 255);
+        memcpy(sector, &buf[offs], 256);
         disc_write_sector(h,t,s,head,sector);
-        offs += 255;
+        offs += 256;
         s++;
         if ( s == 16 ) {
            t++;

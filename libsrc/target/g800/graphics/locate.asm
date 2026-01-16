@@ -9,7 +9,7 @@ ENDIF
     public  sety
     public  getpat
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 sety:
 ; set y position
@@ -51,7 +51,7 @@ ELSE
 ;    out     (0x58), a
 
     ld      a,h
-    sub     maxx/2                      ; check if x is in the left half of the display
+    sub     _GFX_MAXX/2                      ; check if x is in the left half of the display
 
     ld      a,0xb8
     ld      (setx_half+1),a
@@ -60,7 +60,7 @@ ELSE
     ; right half
     ld      a,0xbc
     ld      (setx_half+1),a
-    ld      a,maxx-1                    ; mirror the x coordinates
+    ld      a,_GFX_MAXX-1                    ; mirror the x coordinates
     sub     h                           ; adjust x
     ld      h,a
 left_half:

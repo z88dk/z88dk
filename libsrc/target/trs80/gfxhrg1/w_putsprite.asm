@@ -17,7 +17,7 @@
     PUBLIC  putsprite
     PUBLIC  _putsprite
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  div3_192
 
@@ -57,7 +57,7 @@ _putsprite:
     ld      a, (hl)
     ld      (ortype2), a                ; Self modifying code
 
-        ;call    swapgfxbk
+        ;call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c

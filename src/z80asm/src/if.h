@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -93,7 +93,8 @@ void undefine_local_def_sym(const char* name);
 struct Symbol1* find_local_symbol(const char* name);
 
 // expressions
-void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
+void parse_const_expr_eval(const char* expr_text,
+    int* result, bool* error, bool silent);
 void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
 bool check_ifdef_condition(const char* name);
 

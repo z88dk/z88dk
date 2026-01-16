@@ -54,6 +54,10 @@ IF CRT_ORG_CODE = 0x0000
     INCLUDE "crt/classic/crt_z80_rsts.inc"
 ENDIF
 
+IFDEF CRT_INCLUDE_PREAMBLE
+    INCLUDE "crt_preamble.asm"
+ENDIF
+
 start:
     INCLUDE "crt/classic/crt_init_sp.inc"
     ; Setup BSS memory and perform other initialisation
@@ -90,7 +94,8 @@ l_dcal:
     ; If we were given a model then use it
 IF DEFINED_CRT_MODEL
     defc __crt_model = CRT_MODEL
-ELSE
+ELIF DEFINED_CRT_ORG_BSS
+    ;; If BSS is defined, then assume we're ROM model
     defc __crt_model = 1
 ENDIF
     INCLUDE	"crt/classic/crt_section.inc"

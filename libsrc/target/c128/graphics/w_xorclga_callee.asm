@@ -19,9 +19,9 @@
     EXTERN  _vdcDispMem
 
     EXTERN  l_cmp
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 xorclga_callee:
@@ -30,7 +30,7 @@ _xorclga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -39,8 +39,8 @@ _xorclga_callee:
 asm_xorclga:
 
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
   ENDIF
 
 
@@ -51,13 +51,13 @@ asm_xorclga:
          ; de=y
 
     push    de
-    ld      de, maxx+1
+    ld      de, _GFX_MAXX+1
     call    l_cmp
     pop     de
     jp      c, __graphics_end          ; Return if X overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows
@@ -76,7 +76,7 @@ asm_xorclga:
 	dec     bc     ;;  Something is wrong, fix 1px horizontal gap
     add     hl,bc                       ; x2 pos
 
-    ld      de, maxx+1
+    ld      de, _GFX_MAXX+1
     call    l_cmp
     jp      c, __graphics_end          ; Return if X overflows
 	
@@ -161,7 +161,7 @@ clear_nextrow:
 ;;;   check for Y + Ysz overflow
 ;;	ex      de,hl
 ;;  ld      hl, (_vdcDispMem)
-;;	ld      bc, maxy*80
+;;	ld      bc, _GFX_MAXY*80
 ;;	add	    hl,bc
 ;;	sbc	    hl,de
 ;;	bit     7,h

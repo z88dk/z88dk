@@ -44,7 +44,6 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define M4FILE    9
 #define HDRFILE   10
 #define INCFILE   11
-#define LLFILE    12
 
 #define NO      0
 #define YES     1

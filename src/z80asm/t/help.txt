@@ -34,9 +34,14 @@ Preprocessor Options:
 
 Code Generation Options:
   -m[=]CPU              Assemble for the specified CPU, default z80, one of:
-                        *, z80, z80_strict, z180, ez80_z80, ez80, z80n, gbz80,
-                        r2ka, r3k, r4k, r5k, 8080, 8080_strict, 8085, 8085_strict, 
-                        r800, kc160, kc160_z80, ti83, ti83plus
+                        *, 8080, 8080_strict, 8085, 8085_strict, 
+                        ez80, ez80_strict, ez80_z80, ez80_z80_strict, 
+                        gbz80, gbz80_strict, 
+                        kc160, kc160_strict, kc160_z80, kc160_z80_strict, 
+                        r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, 
+                        r5k, r5k_strict, r6k, r6k_strict, 
+                        r800, r800_strict, 
+                        z180, z180_strict, z80, z80_strict, z80n, z80n_strict
   -no-synth             Do not assemble synthetic opcodes
   -float[=]FORMAT       Set default float format, one of:
                         genmath, math48, ieee16, ieee32, ieee64,

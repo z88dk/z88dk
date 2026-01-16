@@ -29,7 +29,7 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			r4k 		r4k_strict 
 			r5k 		r5k_strict
 			r6k 		r6k_strict
-			8080 8085 
+			8080 		8085 
 			gbz80 		gbz80_strict 
 			kc160		kc160_strict
 			kc160_z80	kc160_z80_strict
@@ -304,7 +304,7 @@ sub dwords { return pack("V*", @_); }
 sub unlink_testfiles {
 	my(@additional) = @_;
     unlink(<${test}*>, @additional) 
-        if !$ENV{DEBUG} && Test::More->builder->is_passing;
+        if Test::More->builder->is_passing;
 }
 
 # return object file binary representation
@@ -630,6 +630,42 @@ sub ixiy_compatible {
 	else {
 		return 0;
 	}
+}
+
+#------------------------------------------------------------------------------
+sub normalize_path_for_assembler {
+    my ($test_dir, $source_dir) = @_;
+
+    # Detect MSYS2 vs Cygwin
+    my $is_msys   = exists $ENV{MSYSTEM};          # MSYS2 always sets this
+    my $is_cygwin = (!$is_msys && $^O eq 'cygwin');# True Cygwin Perl
+
+    my $output_dir;
+
+    if ($^O eq 'MSWin32') {
+        # Native Windows Perl (Strawberry)
+        $output_dir = "${test_dir}/${source_dir}";
+        $output_dir =~ s/://g;                     # strip drive colon
+    }
+    elsif ($is_msys) {
+        # MSYS2 Perl -> convert to Windows path because argv[] will be rewritten
+        chomp(my $abs_path = `cygpath -m -a '$source_dir'`);
+        $abs_path =~ s/://g;
+        $output_dir = "${test_dir}/${abs_path}";
+    }
+    elsif ($is_cygwin) {
+        # True Cygwin -> POSIX paths preserved end-to-end
+        $output_dir = "${test_dir}/${source_dir}";
+    }
+    else {
+        # Linux, macOS, WSL -> POSIX
+        $output_dir = "${test_dir}/${source_dir}";
+    }
+
+    # Normalize double slashes
+    $output_dir =~ s{/+}{/}g;
+
+    return $output_dir;
 }
 
 #------------------------------------------------------------------------------

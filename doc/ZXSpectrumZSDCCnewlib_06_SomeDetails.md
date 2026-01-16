@@ -26,10 +26,10 @@ just the ones which will be useful to know as we move forward.
 By default a Z88DK Spectrum program will be compiled such that its code
 originates at address 32768. This is one of the numerous configuration
 parameters defined in the C Runtime Configuration file
-[here](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/crt_config.inc#L19):
+[here](https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zx/crt_config.inc#L19):
 
 ```
-libsrc/_DEVELOPMENT/target/zx/crt_config.inc
+libsrc/newlib/target/zx/crt_config.inc
 ```
 
 Skim read this file and you'll find the CRT_ORG_CODE value set to 32768. You'll
@@ -156,7 +156,7 @@ On the other hand, you can turn off the heap entirely with:
 ```
 
 The default heap size on Spectrum programs is set to -1, which is a special
-value which says "use all the memory above the program's BBS section and the
+value which says "use all the memory above the program's BSS section and the
 below the stack for heap." This is frequently the best option since it allows
 the program to malloc as much memory as it needs. The problem is
 that the heap memory is pre-formatted for allocation with malloc():

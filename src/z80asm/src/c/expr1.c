@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2024
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -378,14 +378,14 @@ void Expr1_fini(Expr1* self)
 /*-----------------------------------------------------------------------------
 *	Expression parser
 *----------------------------------------------------------------------------*/
-static bool Expr_parse_ternary_cond(Expr1* expr);
+static bool Expr_parse_ternary_cond(Expr1* expr, bool silent);
 
 #define DEFINE_PARSER( name, prev_name, condition )			\
-	static bool name( Expr1 *self )							\
+	static bool name( Expr1 *self, bool silent )				\
 	{														\
-		tokid_t op = TK_NIL;								\
+		tokid_t op = TK_NIL;								    \
 															\
-		if ( ! prev_name(self) )							\
+		if ( ! prev_name(self, silent) )					    \
 			return false;									\
 															\
 		while ( condition )									\
@@ -394,17 +394,17 @@ static bool Expr_parse_ternary_cond(Expr1* expr);
 			Str_append_n(self->text, sym.tstart, sym.tlen);	\
 			/* '%10' is binary constant 2, '% 10' is modulo 10 */	\
 			if (*sym.tstart == '%')							\
-				Str_append(self->text, " ");				\
+				Str_append(self->text, " ");				    \
 			GetSym();										\
-			if ( ! prev_name(self) )						\
+			if ( ! prev_name(self, silent) )					\
 				return false;								\
 															\
 			ExprOp_init_operator(							\
 				ExprOpArray_push( self->rpn_ops ),			\
-				op, BINARY_OP );							\
+				op, BINARY_OP );							    \
 		}													\
 															\
-		return true;										\
+		return true;										    \
 	}
 
 /* parse value */
@@ -454,7 +454,7 @@ static bool Expr_parse_factor(Expr1* self)
 }
 
 /* parse unary operators */
-static bool Expr_parse_unary(Expr1* self)
+static bool Expr_parse_unary(Expr1* self, bool silent)
 {
 	tokid_t open_paren;
 
@@ -463,7 +463,7 @@ static bool Expr_parse_unary(Expr1* self)
 	case TK_MINUS:
 		Str_append_n(self->text, sym.tstart, sym.tlen);
 		GetSym();
-		if (!Expr_parse_unary(self))		/* right-associative, recurse */
+		if (!Expr_parse_unary(self, silent))		/* right-associative, recurse */
 			return false;
 
 		ExprOp_init_operator(ExprOpArray_push(self->rpn_ops),
@@ -472,12 +472,12 @@ static bool Expr_parse_unary(Expr1* self)
 
 	case TK_PLUS:
 		GetSym();
-		return Expr_parse_unary(self);
+		return Expr_parse_unary(self, silent);
 
 	case TK_BIN_NOT:
 		Str_append_n(self->text, sym.tstart, sym.tlen);
 		GetSym();
-		if (!Expr_parse_unary(self))		/* right-associative, recurse */
+		if (!Expr_parse_unary(self, silent))		/* right-associative, recurse */
 			return false;
 
 		ExprOp_init_operator(ExprOpArray_push(self->rpn_ops),
@@ -488,7 +488,7 @@ static bool Expr_parse_unary(Expr1* self)
 		Str_append_n(self->text, sym.tstart, sym.tlen);
 		GetSym();
 
-		if (!Expr_parse_unary(self))		/* right-associative, recurse */
+		if (!Expr_parse_unary(self, silent))		/* right-associative, recurse */
 			return false;
 
 		ExprOp_init_operator(ExprOpArray_push(self->rpn_ops),
@@ -501,7 +501,7 @@ static bool Expr_parse_unary(Expr1* self)
 		open_paren = sym.tok;
 		GetSym();
 
-		if (!Expr_parse_ternary_cond(self))
+		if (!Expr_parse_ternary_cond(self, silent))
 			return false;
 
 		/* chack parentheses balance */
@@ -519,16 +519,16 @@ static bool Expr_parse_unary(Expr1* self)
 }
 
 /* parse A ** B */
-static bool Expr_parse_power(Expr1* self)
+static bool Expr_parse_power(Expr1* self, bool silent)
 {
-	if (!Expr_parse_unary(self))
+	if (!Expr_parse_unary(self, silent))
 		return false;
 
 	while (sym.tok == TK_POWER)
 	{
 		Str_append_n(self->text, sym.tstart, sym.tlen);
 		GetSym();
-		if (!Expr_parse_power(self))		/* right-associative, recurse */
+		if (!Expr_parse_power(self, silent))		/* right-associative, recurse */
 			return false;
 
 		ExprOp_init_operator(ExprOpArray_push(self->rpn_ops),
@@ -542,40 +542,40 @@ static bool Expr_parse_power(Expr1* self)
 DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 	sym.tok == TK_MULTIPLY || sym.tok == TK_DIVIDE || sym.tok == TK_MOD)
 
-	/* parse A + B, A - B */
-	DEFINE_PARSER(Expr_parse_addition, Expr_parse_multiplication,
-		sym.tok == TK_PLUS || sym.tok == TK_MINUS)
+/* parse A + B, A - B */
+DEFINE_PARSER(Expr_parse_addition, Expr_parse_multiplication,
+	sym.tok == TK_PLUS || sym.tok == TK_MINUS)
 
-	/* parse A << B, A >> B */
-	DEFINE_PARSER(Expr_parse_binary_shift, Expr_parse_addition,
-		sym.tok == TK_LEFT_SHIFT || sym.tok == TK_RIGHT_SHIFT)
+/* parse A << B, A >> B */
+DEFINE_PARSER(Expr_parse_binary_shift, Expr_parse_addition,
+	sym.tok == TK_LEFT_SHIFT || sym.tok == TK_RIGHT_SHIFT)
 
-	/* parse A == B, A < B, A <= B, A > B, A >= B, A != B */
-	DEFINE_PARSER(Expr_parse_condition, Expr_parse_binary_shift,
-		sym.tok == TK_LESS || sym.tok == TK_LESS_EQ ||
-		sym.tok == TK_EQUAL || sym.tok == TK_NOT_EQ ||
-		sym.tok == TK_GREATER || sym.tok == TK_GREATER_EQ)
+/* parse A == B, A < B, A <= B, A > B, A >= B, A != B */
+DEFINE_PARSER(Expr_parse_condition, Expr_parse_binary_shift,
+	sym.tok == TK_LESS || sym.tok == TK_LESS_EQ ||
+	sym.tok == TK_EQUAL || sym.tok == TK_NOT_EQ ||
+	sym.tok == TK_GREATER || sym.tok == TK_GREATER_EQ)
 
-	/* parse A & B */
-	DEFINE_PARSER(Expr_parse_binary_and, Expr_parse_condition,
-		sym.tok == TK_BIN_AND)
+/* parse A & B */
+DEFINE_PARSER(Expr_parse_binary_and, Expr_parse_condition,
+	sym.tok == TK_BIN_AND)
 
-	/* parse A | B, A ^ B */
-	DEFINE_PARSER(Expr_parse_binary_or, Expr_parse_binary_and,
-		sym.tok == TK_BIN_OR || sym.tok == TK_BIN_XOR)
+/* parse A | B, A ^ B */
+DEFINE_PARSER(Expr_parse_binary_or, Expr_parse_binary_and,
+	sym.tok == TK_BIN_OR || sym.tok == TK_BIN_XOR)
 
-	/* parse A && B */
-	DEFINE_PARSER(Expr_parse_logical_and, Expr_parse_binary_or,
-		sym.tok == TK_LOG_AND)
+/* parse A && B */
+DEFINE_PARSER(Expr_parse_logical_and, Expr_parse_binary_or,
+	sym.tok == TK_LOG_AND)
 
-	/* parse A || B */
-	DEFINE_PARSER(Expr_parse_logical_or, Expr_parse_logical_and,
-		sym.tok == TK_LOG_OR)
+/* parse A || B */
+DEFINE_PARSER(Expr_parse_logical_or, Expr_parse_logical_and,
+	sym.tok == TK_LOG_OR)
 
-	/* parse cond ? true : false */
-	static bool Expr_parse_ternary_cond(Expr1* self)
+/* parse cond ? true : false */
+static bool Expr_parse_ternary_cond(Expr1* self, bool silent)
 {
-	if (!Expr_parse_logical_or(self))		/* get cond or expression */
+	if (!Expr_parse_logical_or(self, silent))		/* get cond or expression */
 		return false;
 
 	if (sym.tok != TK_QUESTION)
@@ -585,7 +585,7 @@ DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 	Str_append_char(self->text, '?');
 	GetSym();						/* consume '?' */
 
-	if (!Expr_parse_ternary_cond(self))	/* get true */
+	if (!Expr_parse_ternary_cond(self, silent))	/* get true */
 		return false;
 
 	if (sym.tok != TK_COLON)
@@ -593,7 +593,7 @@ DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 	Str_append_char(self->text, ':');
 	GetSym();						/* consume ':' */
 
-	if (!Expr_parse_ternary_cond(self))	/* get false */
+	if (!Expr_parse_ternary_cond(self, silent))	/* get false */
 		return false;
 
 	ExprOp_init_operator(ExprOpArray_push(self->rpn_ops),
@@ -603,12 +603,13 @@ DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 
 /* parse expression at current input, return new Expr1 object;
    return NULL and issue syntax error on error */
-Expr1* expr_parse(void) {
+Expr1* expr_parse(bool silent) {
 	Expr1* self = OBJ_NEW(Expr1);
-	if (!Expr_parse_ternary_cond(self))
+	if (!Expr_parse_ternary_cond(self, silent))
 	{
 		/* syntax error in expression */
-        error(ErrSyntaxExpr, NULL);
+        if (!silent)
+            error(ErrSyntaxExpr, NULL);
 
 		OBJ_DELETE(self);
 		self = NULL;

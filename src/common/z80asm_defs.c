@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -352,7 +352,7 @@ const char* range_str_short(range_t type) {
 range_t range_ofile_code(int code) {
     for (int i = 0; i < NUM_ELEMS(range_lu); i++) {
         if (range_lu[i].code == code)
-            return (sym_type_t)i;
+            return (range_t)i;
     }
     return RANGE_UNDEFINED;
 }

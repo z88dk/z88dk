@@ -3,9 +3,12 @@
 
     EXTERN  screendollar
     EXTERN  screendollar_with_count
+    EXTERN  generic_console_xypos_hector1
     EXTERN  generic_console_font32
     EXTERN  generic_console_font64
     EXTERN  generic_console_udg32
+    EXTERN  __MODE1_attr
+    EXTERN  __console_font_h
 
     INCLUDE "target/hector/def/hector1.def"
 
@@ -24,12 +27,7 @@ generic_console_vpeek:
     push    hl                          ;Save buffer
     ex      de, hl                      ;get it into de
 IF FORhector1
-    ; 64 column font
-    ld      h, b                        ; 32 * 8
-    ld      l, c
-    ld      bc, HEC_SCREEN
-    ld      c, l
-    add     hl, bc                      ;hl = screen
+    call    generic_console_xypos_hector1
 ELSE
     ; 32 column font
     ld      h,b                         ;*256
@@ -41,42 +39,58 @@ ELSE
     add     hl,bc                       ;+x
 ENDIF
     ex      de, hl
-    ld      b, 8
-handle_per_line:
+    ld      a,255
+    ld      (__vpeek_colour),a
+    ld      a,(__console_font_h)
+    ld      b, a
+@line_loop:
     push    bc
     push    hl                          ;save buffer
-    ld      h, @0000000
     ld      c, 0                        ;resulting byte
     ld      a, 2                        ;we need to do this loop twice
-handle_nibble:
+@byte_loop:
     push    af
     ld      l, @00000011
+    ld      a,(__vpeek_colour)
+    ld      h,a
     ld      b, 4                        ;4 pixels in a byte
-handle_0:
+@bit_loop:
+    ld      a,h
+    inc     a
+    jr      nz,@got_paper
     ld      a, (de)
     and     l
-    jr      z, not_set
+    ld      h,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (de)
+    and     l
+    cp      h
     scf
-not_set:
+    jr      nz, @rotate_bit
+    ccf
+@rotate_bit:
     rl      c
     sla     l
     sla     l
-    djnz    handle_0
+    sla     h
+    sla     h
+    djnz    @bit_loop
     inc     de
     pop     af
     dec     a
-    jr      nz, handle_nibble
+    jr      nz, @byte_loop
     pop     hl                          ;buffer
     ld      (hl), c
     inc     hl
     ld      a, e
     add     HEC_STRIDE - 2 
     ld      e, a
-    jr      nc, no_overflow_MODE2
+    jr      nc, @next_row_no_overflow
     inc     d
-no_overflow_MODE2:
+@next_row_no_overflow:
     pop     bc
-    djnz    handle_per_line
+    djnz    @line_loop
 
 
     ld      hl,(generic_console_font32)
@@ -97,7 +111,7 @@ try_64col:
     ; Copy the top nibble to lower nibble
     ; 64 column fonts are stored doubled up
     ld      b,8
-copy64:
+@populate_64col:
     ld      a,(hl)
     and     @11110000
     ld      c,a
@@ -108,7 +122,7 @@ copy64:
     or      c
     ld      (hl),a
     inc     hl
-    djnz    copy64
+    djnz    @populate_64col
     ex      de,hl
     pop     de          ;buffer back
     call    screendollar
@@ -127,3 +141,6 @@ gotit:
     ex      af,af           ; Flags and parameter back
     ret
 
+    SECTION bss_clib
+
+__vpeek_colour: defb    0

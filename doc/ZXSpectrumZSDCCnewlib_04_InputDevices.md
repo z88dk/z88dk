@@ -25,26 +25,26 @@ _input_ library.
 
 ## The Input Library
 
-The input library header file is [here](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/input.h):
+The input library header file is [here](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input.h):
 
 ```
-include/_DEVELOPMENT/sdcc/input.h
+include/_DEVELOPMENT/common/input.h
 ```
 
 and a quick skim read of that file will show that when you're writing for the
-ZX Spectrum it #include's the [Spectrum specific file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/input/input_zx.h):
+ZX Spectrum it #include's the [Spectrum specific file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input/input_zx.h):
 
 ```
-include/_DEVELOPMENT/sdcc/input/input_zx.h
+include/_DEVELOPMENT/common/input/input_zx.h
 ```
 
 There isn't a great deal in the way of documentation in the file, so a bit of
 deduction and detective work is going to be required. However, it's worth
 mentioning that the assembly language routines which implement these functions
-_do_ carry descriptions of what they do. See the ASM files [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/input/zx/z80):
+_do_ carry descriptions of what they do. See the ASM files [here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/input/zx/z80):
 
 ```
-libsrc/_DEVELOPMENT/input/zx/z80
+libsrc/newlib/input/zx/z80
 ```
 
 ## Simple key presses - Interactive Border Example
@@ -326,10 +326,10 @@ zcc +zx -vn -startup=1 -clib=sdcc_iy joy_input.c -o joy_input -create-app
 
 This prints 0x0001 when the stick is moved up, 0x0002 when it's moved down,
 0x0004 when it's moved left and 0x0008 when it's moved right. Those values are
-defined as constants in the [input header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/input.h).
+defined as constants in the [input header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input.h).
 
 ```
-include/_DEVELOPMENT/sdcc/input.h
+include/_DEVELOPMENT/common/input.h
 ```
 
 ```
@@ -354,10 +354,10 @@ the top byte of the uint16_t is not used.
 All joysticks return the same format 16-bit value but may differ in the number
 of fire buttons that can be detected.  The assembler files for these other
 joysticks are well commented, and are
-[here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/input/zx/z80):
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/input/zx/z80):
 
 ```
-libsrc/_DEVELOPMENT/input/zx/z80/
+libsrc/newlib/input/zx/z80/
 ```
 
 Because the format of the return value from joystick functions are the same,

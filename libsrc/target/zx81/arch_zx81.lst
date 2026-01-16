@@ -63,3 +63,12 @@ target/zx81/zx81/tape/set_tape_speed
 target/zx81/zx81/tape/musamy_load
 target/zx81/zx81/tape/tape_load_block
 target/zx81/zx81/tape/tape_load_block_callee
+target/zx81/games/joystick
+target/zx81/games/bit_open
+target/zx81/games/bit_open_di
+target/zx81/games/bit_close
+target/zx81/games/bit_close_ei
+target/zx81/games/bit_synth
+target/zx81/games/bit_save_msx_callee
+target/zx81/games/playzb4
+@classic/games/games.lst

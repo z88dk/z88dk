@@ -13,7 +13,7 @@
     PUBLIC  fill
     PUBLIC  _fill
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  msxextrom
 
@@ -35,7 +35,7 @@ _fill:
     ld      ix, 2
     add     ix, sp
     ld      a, (ix+2)
-    cp      maxy                        ;check range for y
+    cp      _GFX_MAXY                        ;check range for y
     jr      nc, fill_exit
 
     ld      l, (ix+4)                   ;x
@@ -48,7 +48,7 @@ _fill:
     push    hl
     push    de
 
-    ld      a, fcolor
+    ld      a, _GFX_MSX_FILL_COLOUR
     ld      (ATRBYT), a                 ; set fill color
     ld      (BRDATR), a                 ; set border color
 

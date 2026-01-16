@@ -1,0 +1,8 @@
+
+    defc DISPLAY = $7000
+
+    ; Check these values
+
+    defc MODE_TEXT = 0         ;text
+    defc MODE_HIRES = 0xff      ;UNUSED
+    defc MODE_MULTICOLOUR = $0c       ;multicolour

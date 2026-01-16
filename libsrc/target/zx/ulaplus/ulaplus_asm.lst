@@ -1,0 +1,9 @@
+target/zx/ulaplus/z80/asm_ulap_attr_from_pentp_penti
+target/zx/ulaplus/z80/asm_ulap_disable
+target/zx/ulaplus/z80/asm_ulap_enable
+target/zx/ulaplus/z80/asm_ulap_pent_from_attr_ink
+target/zx/ulaplus/z80/asm_ulap_pent_from_attr_paper
+target/zx/ulaplus/z80/asm_ulap_read_color
+target/zx/ulaplus/z80/asm_ulap_read_palette
+target/zx/ulaplus/z80/asm_ulap_write_color
+target/zx/ulaplus/z80/asm_ulap_write_palette

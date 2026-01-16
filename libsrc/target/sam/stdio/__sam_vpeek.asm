@@ -16,13 +16,17 @@
     EXTERN  __sam_xypos_MODE4
     EXTERN  __sam_graphics_pagein
     EXTERN  __sam_graphics_pageout
-
+    EXTERN  __sam_MODE4_attr
+    EXTERN  __sam_MODE3_attr
+    
 
 
     EXTERN  SCREEN_BASE
 
 
 __sam_vpeek:
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      a, (__zx_screenmode)
     and     a
     jp      z, __zx_vpeek               ; Just use the regular +zx code
@@ -36,37 +40,51 @@ __sam_vpeek:
     dec     a
     jr      z, vpeek_MODE3
     ; Lets handle mode 4 here
+vpeek_MODE4:
     call    __sam_xypos_MODE4
     call    __sam_graphics_pagein
     ld      b, 8
-vpeek_MODE4_row_loop:
+@row_loop:
     push    bc
     push    de                          ;Save buffer
-    ld      d, @10000000
+    ld      a,(__vpeek_colour)
+    ld      d,a
     ld      c, 0                        ;Resultant byte
     ld      a, 4                        ;4 bytes to do
-vpeek_MODE4_loop:
+@nibble_loop:
     ex      af, af
+    ;; See if paper has been set
+    bit     0,d
+    jr      z,@got_paper
     ld      a, (hl)
     and     @11110000
-    jr      z, first_nibble_not_set
-    ld      a, c
-    or      d
-    ld      c, a
-first_nibble_not_set:
-    srl     d
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
     ld      a, (hl)
-    and     @00001111
-    jr      z, second_nibble_not_set
-    ld      a, c
-    or      d
-    ld      c, a
-second_nibble_not_set:
-    srl     d
+    and     @11110000
+    cp      d
+    scf
+    jr      nz,@rotate_bit_in1
+    ccf
+@rotate_bit_in1:
+    rl      c
+    ld      a, (hl)
+    rlca
+    rlca
+    rlca
+    rlca
+    and     @11110000
+    cp      d
+    scf
+    jr      nz,@rotate_bit_in2
+    ccf
+@rotate_bit_in2:
+    rl      c
     inc     hl
     ex      af, af
     dec     a
-    jr      nz, vpeek_MODE4_loop
+    jr      nz, @nibble_loop
     pop     de
     ld      a, c
     ld      (de), a
@@ -74,7 +92,7 @@ second_nibble_not_set:
     ld      bc, 128-4
     add     hl, bc
     pop     bc
-    djnz    vpeek_MODE4_row_loop
+    djnz    @row_loop
 
 do_screendollar:
     call    __sam_graphics_pageout
@@ -99,32 +117,44 @@ vpeek_MODE3:
     call    __sam_xypos_MODE3
     call    __sam_graphics_pagein
     ld      b, 8
-vpeek_MODE3_row_loop:
+@row_loop:
     push    bc
     push    de                          ;Save buffer
-    ld      d, @10000000
     ld      c, 0                        ;Resultant byte
     ld      a, 2                        ;We need to do this loop twice
-vpeek_MODE3_loop_2:
+@byte_loop:
     ex      af, af
+    ld      a,(__vpeek_colour)
+    ld      d,a
     ld      e, @11000000
     ld      b, 4                        ;4 interations
-vpeek_MODE3_loop_3:
+@bit_loop:
+    ;; See if paper has been set
+    ld      a,d
+    inc     a
+    jr      nz,@got_paper
     ld      a, (hl)
     and     e
-    jr      z, MODE3_not_set
-    ld      a, c
-    or      d
-    ld      c, a
-MODE3_not_set:
+    ld      d,a
+    ld      (__vpeek_colour),a
+@got_paper:
+    ld      a, (hl)
+    and     e
+    cp      d
+    scf
+    jr      nz,@rotate_bit_in
+    ccf
+@rotate_bit_in:
+    rl      c
+    srl     d
     srl     d
     srl     e
     srl     e
-    djnz    vpeek_MODE3_loop_3
+    djnz    @bit_loop
     inc     hl
     ex      af, af
     dec     a
-    jr      nz, vpeek_MODE3_loop_2
+    jr      nz, @byte_loop
     pop     de                          ;Buffer
     ld      a, c
     ld      (de), a
@@ -132,7 +162,7 @@ MODE3_not_set:
     ld      bc, 128-2
     add     hl, bc
     pop     bc
-    djnz    vpeek_MODE3_row_loop
+    djnz    @row_loop
     jr      do_screendollar
 
 vpeek_MODE2:
@@ -143,7 +173,7 @@ vpeek_MODE2:
     ld      l, c
     call    __sam_graphics_pagein
     ld      b, 8
-vpeek_MODE2_loop:
+@row_loop:
     ld      a, (hl)
     ld      (de), a
     inc     de
@@ -153,5 +183,9 @@ vpeek_MODE2_loop:
     ld      a, h
     adc     0
     ld      h, a
-    djnz    vpeek_MODE2_loop
+    djnz    @row_loop
     jr      do_screendollar
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0

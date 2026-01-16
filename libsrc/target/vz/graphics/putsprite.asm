@@ -13,7 +13,9 @@
     PUBLIC  putsprite
     PUBLIC  _putsprite
     EXTERN  pixeladdress
-    EXTERN  __MODE1_attr
+    EXTERN  __mc6847_MODE2_attr
+    EXTERN  __mc6847_mode
+    EXTERN  __generic_putsprite
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -21,6 +23,9 @@
 
 putsprite:
 _putsprite:
+    ld      a,(__mc6847_mode)
+    cp      1
+    jp      nz,__generic_putsprite
     push    ix                          ;save callers
     ld      hl, 4
     add     hl, sp
@@ -55,7 +60,7 @@ _putsprite:
     xor     3
     ld      b, a
     ld      c, a
-    ld      a, (__MODE1_attr)           ; pink up ink
+    ld      a, (__mc6847_MODE2_attr)           ; pink up ink
 attr_shift:
     rrca
     rrca

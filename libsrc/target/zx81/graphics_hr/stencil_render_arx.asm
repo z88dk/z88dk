@@ -11,16 +11,16 @@
 ;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     PUBLIC  stencil_render
     PUBLIC  _stencil_render
     EXTERN  dither_pattern
 
-	;EXTERN swapgfxbk
+	;EXTERN __gfx_vram_page_in
     EXTERN  pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN swapgfxbk1
+	;EXTERN __gfx_vram_page_out
 
 ;
 ;	$Id: stencil_render_arx.asm,v 1.4 2017-01-02 22:58:00 aralbrec Exp $
@@ -31,14 +31,14 @@ _stencil_render:
     ld      ix, 2
     add     ix, sp
 
-		;call	swapgfxbk
+		;call	__gfx_vram_page_in
 
-    ld      c, maxy
+    ld      c, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
     dec     c
-		;jp	z,swapgfxbk1
+		;jp	z,__gfx_vram_page_out
     ret     z
     push    bc
 
@@ -50,7 +50,7 @@ yloop:
     add     hl, de
     ld      a, (hl)                     ;X1
 
-    ld      e, maxy
+    ld      e, _GFX_MAXY
     add     hl, de
     cp      (hl)                        ; if x1>x2, return
     jr      nc, yloop

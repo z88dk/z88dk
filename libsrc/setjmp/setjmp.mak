@@ -1,40 +1,37 @@
+SETJMP_GLOBS := "setjmp/c/*.asm" 
+SETJMP_GLOBS_ex := setjmp/c/*.asm
 
-SETJMP_CFILES := $(notdir $(wildcard setjmp/*.c))
-SETJMP_AFILES := $(notdir $(wildcard setjmp/*.asm))
+SETJMP_TARGETS := setjmp/obj/newlib-z80-setjmp \
+		setjmp/obj/newlib-z80n-setjmp \
+		setjmp/obj/newlib-r2ka-setjmp \
+		setjmp/obj/newlib-ixiy-setjmp \
+		setjmp/obj/newlib-8080-setjmp \
+		setjmp/obj/newlib-8085-setjmp \
+		setjmp/obj/newlib-gbz80-setjmp \
+		setjmp/obj/newlib-z180-setjmp \
+		setjmp/obj/newlib-r4k-setjmp \
+		setjmp/obj/newlib-kc160-setjmp \
+		setjmp/obj/newlib-ez80_z80-setjmp 
+		
 
-SETJMP_OBJECTS := $(SETJMP_CFILES:.c=.o) $(SETJMP_AFILES:.asm=.o)
-
-SETJMP_OBJS := $(addprefix setjmp/obj/z80/, $(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/r2ka/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/r4k/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/ixiy/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/z80n/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/8080/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/8085/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/gbz80/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/z180/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/ez80_z80/,$(SETJMP_OBJECTS)) \
-	$(addprefix setjmp/obj/kc160/,$(SETJMP_OBJECTS))
-
-OBJS += $(SETJMP_OBJS)
+OBJS += $(SETJMP_TARGETS)
 CLEAN += setjmp-clean
 
-setjmp: $(SETJMP_OBJS)
+setjmp: $(SETJMP_TARGETS)
 
 .PHONY: setjmp setjmp-clean
 
-$(eval $(call buildbit,setjmp,z80,test))
-$(eval $(call buildbit,setjmp,ixiy,test,-Ca-IXIY,-IXIY))
-$(eval $(call buildbit,setjmp,8080,test,-clib=8080,-m8080))
-$(eval $(call buildbit,setjmp,8085,test,-clib=8085,-m8085))
-$(eval $(call buildbit,setjmp,gbz80,test,-clib=gbz80,-mgbz80))
-$(eval $(call buildbit,setjmp,r2ka,test,-clib=rabbit,-mr2ka))
-$(eval $(call buildbit,setjmp,r4k,test,-clib=rabbit4k,-mr4k))
-$(eval $(call buildbit,setjmp,z80n,test,-clib=z80n,-mz80n))
-$(eval $(call buildbit,setjmp,z180,test,-clib=z180,-mz180))
-$(eval $(call buildbit,setjmp,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
-$(eval $(call buildbit,setjmp,kc160,test,-clib=kc160,-mkc160))
-
+$(eval $(call buildnew,setjmp,z80,-mz80,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,r2ka,-mr2ka,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,r4k,-mr4k,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,z80n,-mz80n,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,ixiy,-mz80 -IXIY,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,8080,-m8080,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,8085,-m8085,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,gbz80,-mgbz80,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,z180,-mz180,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,ez80_z80,-mez80_z80,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,kc160,-mkc160,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 
 setjmp-clean:
-	$(RM) -fr setjmp/obj setjmp/*.o
+	$(RM) -fr setjmp/obj

@@ -1,3 +1,11 @@
 target/g800/stdio/fgetc_cons_850
 target/g800/stdio/getk_850
+target/g800/stdio/ansi/f_ansi_attr
+target/g800/stdio/ansi/f_ansi_bel
+target/g800/stdio/ansi/f_ansi_char
+target/g800/stdio/ansi/f_ansi_cls
+target/g800/stdio/ansi/f_ansi_dline
+target/g800/stdio/ansi/f_ansi_scrollup
+@classic/stdio/ansicore.lst
+@classic/stdio/stdio.lst
 @target/g800/g800_common.lst

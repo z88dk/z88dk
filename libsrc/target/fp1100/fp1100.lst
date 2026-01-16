@@ -6,7 +6,7 @@ target/fp1100/stdio/conio_map_colour
 target/fp1100/stdio/fputc_cons_native
 target/fp1100/stdio/fgetc_cons
 target/fp1100/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/fp1100/graphics/clg
 target/fp1100/graphics/textpixl
 target/fp1100/graphics/getmaxx
@@ -16,5 +16,5 @@ target/fp1100/graphics/w_plotpixl
 target/fp1100/graphics/w_respixl
 target/fp1100/graphics/w_xorpixl
 target/fp1100/graphics/w_pointxy
-@gfx/wide/gfx_wide.lst
-@games/games.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst

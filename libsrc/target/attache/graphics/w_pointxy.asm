@@ -12,7 +12,7 @@
 ;
 
 
-			INCLUDE	"graphics/grafix.inc"
+			INCLUDE	"classic/gfx/grafix.inc"
 
 			SECTION smc_clib
 			PUBLIC	w_pointxy
@@ -22,13 +22,13 @@
 
 .w_pointxy
                         push    hl
-                        ld      hl,maxy
+                        ld      hl,_GFX_MAXY
                         call    l_cmp
                         pop     hl
                         ret     nc               ; Return if Y overflows
 						
                         push    de
-                        ld      de,maxx
+                        ld      de,_GFX_MAXX
                         call    l_cmp
                         pop     de
                         ret     c               ; Return if X overflows

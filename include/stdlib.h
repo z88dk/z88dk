@@ -343,32 +343,19 @@ extern void  __LIB__  outp_callee(unsigned int port, unsigned int byte) __smallc
 
 extern void __LIB__  *swapendian(void *addr) __z88dk_fastcall;
 
-// The macros can be used to inline code if the parameters resolve to constants
 
-__ZPROTO2(void,,bpoke,void *,addr,unsigned char,byte)
-__ZPROTO2(void,,wpoke,void *,addr,unsigned int,byte)
+// These (and more) are also available in <arch/z80.h>
+#define bpoke(a,b)  (*(unsigned char *)(a) = b)
+#define wpoke(a,b)  (*(unsigned int *)(a) = b)
 
+#define bpeek(a)    (*(unsigned char *)(a))
+#define wpeek(a)    (*(unsigned int *)(a))
 
-extern unsigned char __LIB__    bpeek(const void *addr);
-extern unsigned int  __LIB__    wpeek(const void *addr);
-
-
-#ifndef __STDC_ABI_ONLY
-extern unsigned char __LIB__    bpeek_fastcall(const void *addr) __z88dk_fastcall;
-#define bpeek(x) bpeek_fastcall(x)
-extern unsigned int  __LIB__    wpeek_fastcall(const void *addr) __z88dk_fastcall;
-#define wpeek(x) wpeek_fastcall(x)
-
-extern void          __LIB__    bpoke_callee(void *addr, unsigned char byte) __smallc __z88dk_callee;
-extern void          __LIB__    wpoke_callee(void *addr, unsigned int word) __smallc __z88dk_callee;
-#define bpoke(a,b) bpoke_callee(a,b)
-#define wpoke(a,b) wpoke_callee(a,b)
-#endif
-
-#define M_BPOKE(addr,byte) asm("ld\thl,"#addr"\nld\t(hl),"#byte"\n");
-#define M_WPOKE(addr,word) asm("ld\thl,"#addr"\nld\t(hl),"#word"%256\ninc\thl\nld\t(hl),"#word"/256\n");
-#define M_BPEEK(addr) asm("ld\thl,("#addr")\nld\th,0\n");
-#define M_WPEEK(addr) asm("ld\thl,("#addr")\n");
+// Legacy macros
+#define M_BPOKE(addr,byte) (*(unsigned char *)(a) = b)
+#define M_WPOKE(addr,word) (*(unsigned int *)(a) = b)
+#define M_BPEEK(addr)      (*(unsigned char *)(a))
+#define M_WPEEK(addr)      (*(unsigned int *)(a))
 
 //////////////////////////////////////////////////
 // Timing (some are non-standard)

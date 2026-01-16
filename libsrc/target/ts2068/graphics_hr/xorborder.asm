@@ -1,4 +1,4 @@
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     SECTION code_clib
     PUBLIC  xorborder
     PUBLIC  _xorborder
@@ -24,7 +24,7 @@ _xorborder:
     cp      h
     jr      c, xorborder_exit
     ld      e, (ix+6)                   ; y
-    ld      a, maxy
+    ld      a, _GFX_MAXY
     cp      e
     jr      c, xorborder_exit
 ; left vertical

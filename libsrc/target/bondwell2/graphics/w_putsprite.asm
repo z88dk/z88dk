@@ -11,7 +11,7 @@
 ;
 ;
 ; The Bondwell2 requires  paging to access to the graphics memory
-; we need to move swapgfxbk/swapgfxbk1 in order to permit
+; we need to move __gfx_vram_page_in/__gfx_vram_page_out in order to permit
 ; the sprite data to be still accessible.
 ;
 ;
@@ -24,11 +24,11 @@
     PUBLIC  _putsprite
     EXTERN  w_pixeladdress
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
         ;EXTERN    __graphics_end
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -67,7 +67,7 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-        ;call    swapgfxbk
+        ;call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
@@ -106,13 +106,13 @@ _iloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, _noplot                 ;See if a plot is needed
     ld      e, a
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, e
 ortype:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
     ld      (hl), a
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     ld      a, e
 _noplot:
     rrca
@@ -159,13 +159,13 @@ wiloop:
     sla     c                           ;Test leftmost pixel
     jp      nc, wnoplot                 ;See if a plot is needed
     ld      e, a
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, e
 ortype2:
     nop                                 ; changed into nop / cpl
     nop                                 ; changed into and/or/xor (hl)
     ld      (hl), a
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     ld      a, e
 wnoplot:
     rrca

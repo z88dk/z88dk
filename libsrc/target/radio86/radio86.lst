@@ -4,7 +4,7 @@ target/radio86/stdio/fputc_cons_native
 target/radio86/stdio/generic_console
 target/radio86/graphics/textpixl
 target/radio86/graphics/getmaxy1
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 
-@gfx/gencon/gfx_gencon1_portable.lst
+@classic/gfx/gencon/gfx_gencon1_portable.lst
 

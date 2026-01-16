@@ -1,9 +1,9 @@
 target/pv1000/stdio/generic_console
 target/pv1000/stdio/fgetc_cons
 target/pv1000/stdio/getk
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/pv1000/games/joystick
-games/obj/pv1000/joystick_type
+classic/games/obj/pv1000/joystick_type
 target/pv1000/graphics/textpixl
-@gfx/gencon/gfx_gencon.lst
+@classic/gfx/gencon/gfx_gencon.lst
 

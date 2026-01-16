@@ -11,7 +11,7 @@
 ;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  stencil_render
@@ -19,10 +19,10 @@
     EXTERN  dither_pattern
 	;EXTERN	l_cmp
 
-	;EXTERN swapgfxbk
+	;EXTERN __gfx_vram_page_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN swapgfxbk1
+	;EXTERN __gfx_vram_page_out
 
 ;
 ;	$Id: w_stencil_render.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
@@ -37,9 +37,9 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-		;call	swapgfxbk
+		;call	__gfx_vram_page_in
 
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
@@ -69,7 +69,7 @@ yloop:
     cp      127
     jr      z, yloop                    ; ...loop if nothing to be drawn
 
-    ld      bc, maxy*2
+    ld      bc, _GFX_MAXY*2
     add     hl, bc
     ld      a, (hl)
     inc     hl

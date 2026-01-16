@@ -1,5 +1,6 @@
 
 
+    MODULE  m2_generic_console
     SECTION code_clib
 
     PUBLIC  generic_console_cls
@@ -9,27 +10,30 @@
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute
+    PUBLIC  generic_console_ioctl
 
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  base_graphics
 
+    PUBLIC      CLIB_GENCON_CAPS
+	defc        CLIB_GENCON_CAPS = 0
+
     defc    CHAR_TABLE=0xF800
 
-
+generic_console_ioctl:
+    scf
 generic_console_set_ink:
-    ret
-
 generic_console_set_paper:
 generic_console_set_attribute:
     ret
 
 generic_console_cls:
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, (base_graphics)
     ld      d, h
     ld      e, l
@@ -37,7 +41,7 @@ generic_console_cls:
     ld      bc, 1919
     ld      (hl), 32
     ldir
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 ; c = x
 ; b = y
@@ -48,9 +52,9 @@ generic_console_printc:
     call    xypos
     pop     de
     ld      d, a
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      (hl), d
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 ;Entry: c = x,
@@ -64,11 +68,11 @@ generic_console_vpeek:
     call    xypos
     ld      e, a
 	push    de
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 	pop     de
     ld      d, (hl)
 	push    de
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
 	pop     de
     rr      e
     call    nc, vpeek_unmap
@@ -99,7 +103,7 @@ generic_console_printc_3:
 generic_console_scrollup:
     push    de
     push    bc
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, CONSOLE_COLUMNS
     ld      de, (base_graphics)
     add     hl, de
@@ -111,7 +115,7 @@ generic_console_scrollup_3:
     ld      (hl), 32
     inc     hl
     djnz    generic_console_scrollup_3
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     bc
     pop     de
     ret

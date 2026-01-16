@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2024
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -113,7 +113,7 @@ void add_opcode_jr_jr(long long opcode0, int opcode1, struct Expr1* expr0)
 
     add_opcode_jr(opcode0, expr0);
 
-    struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+    struct Expr1* expr1 = parse_expr(utstring_body(expr1_text), false);
     if (expr1)
         add_opcode_jr(opcode1, expr1);
 
@@ -177,7 +177,7 @@ void add_opcode_nn(long long opcode, Expr1 *expr, int target_offset) {
 		utstring_new(expr1_text);
 		utstring_printf(expr1_text, "+(%s)+%d", expr->text->data, target_offset);
 
-		struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+		struct Expr1* expr1 = parse_expr(utstring_body(expr1_text), false);
 		xassert(expr1);
 		
 		add_opcode(opcode);
@@ -201,7 +201,7 @@ void add_opcode_nn_nn(long long opcode0, long long opcode1, struct Expr1* expr0)
 
     add_opcode_nn(opcode0, expr0, 0);
 
-    struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+    struct Expr1* expr1 = parse_expr(utstring_body(expr1_text), false);
     if (expr1)
         add_opcode_nn(opcode1, expr1, 0);
 
@@ -216,7 +216,7 @@ void add_opcode_nnn(long long opcode, struct Expr1 *expr, int target_offset) {
 		utstring_new(expr1_text);
 		utstring_printf(expr1_text, "+(%s)+%d", expr->text->data, target_offset);
 
-		struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+		struct Expr1* expr1 = parse_expr(utstring_body(expr1_text), false);
 		xassert(expr1);
 		
 		add_opcode(opcode);
@@ -267,7 +267,7 @@ void add_opcode_idx_idx1(long long opcode0, long long opcode1, struct Expr1* exp
 	utstring_printf(expr1_text, "1+(%s)", expr0->text->data);
 
 	add_opcode_idx(opcode0, expr0);
-	struct Expr1* expr1 = parse_expr(utstring_body(expr1_text));
+	struct Expr1* expr1 = parse_expr(utstring_body(expr1_text), false);
 	if (expr1) 
 		add_opcode_idx(opcode1, expr1);
 
@@ -316,7 +316,7 @@ void add_opcode_defb(struct Expr1* expr) {
 void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
-	Expr1 *emul_expr = parse_expr(emul_func);
+	Expr1 *emul_expr = parse_expr(emul_func, false);
     cpu_t cpu = option_cpu();
     if (cpu == CPU_EZ80 || cpu == CPU_EZ80_STRICT)
         add_opcode_nnn(0xCD, emul_expr, 0);
@@ -330,7 +330,7 @@ void add_opcode_jr_end(long long opcode, const char* end_label, int offset)
 	UT_string* target;
 	utstring_new(target);
 	utstring_printf(target, "%s-%d", end_label, offset);
-	Expr1 *target_expr = parse_expr(utstring_body(target));
+	Expr1 *target_expr = parse_expr(utstring_body(target), false);
 	add_opcode_jr(opcode, target_expr);			//jump over
 	utstring_free(target);
 }
@@ -340,7 +340,7 @@ void add_opcode_jp_nn_end(long long opcode, const char* end_label, int offset)
 	UT_string* target;
 	utstring_new(target);
 	utstring_printf(target, "%s-%d", end_label, offset);
-	Expr1 *target_expr = parse_expr(utstring_body(target));
+	Expr1 *target_expr = parse_expr(utstring_body(target), false);
 	add_opcode_nn(opcode, target_expr, 0);			//jump over
 	utstring_free(target);
 }
@@ -350,7 +350,7 @@ void add_opcode_jp_nnn_end(long long opcode, const char* end_label, int offset)
 	UT_string* target;
 	utstring_new(target);
 	utstring_printf(target, "%s-%d", end_label, offset);
-	Expr1 *target_expr = parse_expr(utstring_body(target));
+	Expr1 *target_expr = parse_expr(utstring_body(target), false);
 	add_opcode_nnn(opcode, target_expr, 0);			//jump over
 	utstring_free(target);
 }
@@ -431,7 +431,7 @@ void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
 			"0x8000 + (((%s) & 0x3F) << 9) + ((%s) & 0x1FF)", Str_data(hor->text), Str_data(ver->text));
-		Expr1 *expr = parse_expr(expr_text);
+		Expr1 *expr = parse_expr(expr_text, false);
 
 		Pass2infoExpr(RANGE_WORD_BE, expr);
 		OBJ_DELETE(ver);
@@ -450,7 +450,7 @@ void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
 			"(((%s) & 0x7F) << 8) + ((%s) & 0xFF)", Str_data(reg->text), Str_data(val->text));
-		Expr1 *expr = parse_expr(expr_text);
+		Expr1 *expr = parse_expr(expr_text, false);
 
 		Pass2infoExpr(RANGE_WORD_BE, expr);
 		OBJ_DELETE(reg);

@@ -43,7 +43,6 @@ static void         set_option_by_type(option_t *options, type_t type, char *val
 static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
 static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
-static void         get_temporary_filename(char *filen);
 static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
@@ -52,6 +51,9 @@ static char       **temp_files = NULL;
 static char         tmpnambuf[] = "apmXXXX";
 #endif
 
+static int          num_remove_files = 0;
+static char       **remove_files = NULL;     // files scheduled for deletion on exit similar to temp_files
+static void         delete_scheduled_files(void);
 
 int main(int argc, char *argv[])
 {
@@ -89,6 +91,7 @@ int main(int argc, char *argv[])
     }
 
     atexit(cleanup_temporary_files);
+/*  atexit(delete_scheduled_files);    // choose to delete files only on successful completion  */
 
     /* So, let's check for + style execution */
     av = calloc(argc,sizeof(char*));
@@ -113,6 +116,8 @@ int main(int argc, char *argv[])
         main_usage();
     }
     execute_command(target, ac, av, 2);
+
+    delete_scheduled_files();
     exit(0);
 }
 
@@ -243,6 +248,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 
     // Warn if aligned sections are not aligned
 
+#if 0
     for (c = 0x100; c >= 0x2; c >>= 1)
     {
         int start;
@@ -267,6 +273,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
                 fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", (int)strlen(cmdline) - 5, cmdline, start);
         }
     }
+#endif
 
     // Sort out the binary
 
@@ -366,13 +373,15 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         fclose(fdata);
     }
 
-    // If we have a HIMEM then append it as well
-    strcpy(name, fname);
-    suffix_change(name, "_HIMEM.bin");
-    if ( ( fhimem = fopen(name, "rb")) != NULL ) {
-        while ((c = fgetc(fhimem)) != EOF)
-            fputc(c, fin);
-        fclose(fhimem);
+    // If we have a HIMEM then append it as well - but only if defined by crt
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__HIMEM_head ")) > 0)) {
+        strcpy(name, fname);
+        suffix_change(name, "_HIMEM.bin");
+        if ( ( fhimem = fopen(name, "rb")) != NULL ) {
+            while ((c = fgetc(fhimem)) != EOF)
+                fputc(c, fin);
+            fclose(fhimem);
+        }
     }
 
 
@@ -1086,7 +1095,7 @@ int bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, i
 }
 
 
-static void get_temporary_filename(char *filen)
+void get_temporary_filename(char *filen)
 {
 #ifdef _WIN32
     char   *ptr;
@@ -1125,13 +1134,37 @@ static void get_temporary_filename(char *filen)
 }
 
 
-
 static void  cleanup_temporary_files(void)
 {
     int   i;
 
     for ( i = 0; i < num_temp_files; i++ ) {
          remove(temp_files[i]);
+    }
+}
+
+
+// Issue #2756 schedule files for deletion on appmake exit
+// Kept separate from temporary files list in case these files should not be deleted on error exit
+
+void schedule_for_deletion(char* fname)
+{
+    char** temp_remove_files;
+
+    if ((temp_remove_files = realloc(remove_files, (num_remove_files + 1) * sizeof(remove_files[0]))) == NULL)
+        exit_log(1, "Out of Memory");
+
+    remove_files = temp_remove_files;
+    remove_files[num_remove_files++] = must_strdup(fname);
+}
+
+
+static void delete_scheduled_files(void)
+{
+    int i;
+
+    for (i = 0; i < num_remove_files; ++i) {
+        remove(remove_files[i]);
     }
 }
 
@@ -1396,7 +1429,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 
             for (i = 0; i < mb->num; ++i)
             {
-                if (clean) remove(mb->secbin[i].filename);
+                if (clean) schedule_for_deletion(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }
@@ -1422,7 +1455,7 @@ void mb_remove_mainbank(struct memory_bank *mb, int clean)
         struct section_bin *sb = &mb->secbin[i];
 
         if (clean)
-            remove(sb->filename);
+            schedule_for_deletion(sb->filename);
 
         free(sb->filename);
         free(sb->section_name);
@@ -1498,7 +1531,7 @@ int mb_remove_section(struct banked_memory *memory, char *section_name, int clea
         // section has been found
         // free allocated memory, remove it from the section array
 
-        if (clean) remove(mb->secbin[secnum].filename);
+        if (clean) schedule_for_deletion(mb->secbin[secnum].filename);
 
         free(mb->secbin[secnum].filename);
         free(mb->secbin[secnum].section_name);
@@ -1898,7 +1931,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
     // remove main bank binaries
 
     for (i = 0; i < memory->mainbank.num; ++i)
-        remove(memory->mainbank.secbin[i].filename);
+        schedule_for_deletion(memory->mainbank.secbin[i].filename);
 
     // remove binaries from all bank spaces
 
@@ -1909,7 +1942,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
             struct memory_bank *mb = &memory->bankspace[i].membank[j];
 
             for (k = 0; k < mb->num; ++k)
-                remove(mb->secbin[k].filename);
+                schedule_for_deletion(mb->secbin[k].filename);
         }
     }
 }

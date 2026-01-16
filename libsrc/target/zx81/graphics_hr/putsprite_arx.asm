@@ -14,10 +14,10 @@
     PUBLIC  putsprite
     PUBLIC  _putsprite
     EXTERN  pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -57,7 +57,7 @@ _putsprite:
 
     ld      (actcoord), hl              ; save current coordinates
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    pixeladdress
 
     ld      hl, offsets_table
@@ -122,7 +122,7 @@ _notedge:
 
     pop     bc                          ;Restore data
     djnz    _oloop
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 putspritew:
@@ -176,7 +176,7 @@ wsmc2:
 
     pop     bc                          ;Restore data
     djnz    woloop
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 wover_1:
@@ -198,7 +198,7 @@ wover_1:
 
     pop     bc
     djnz    woloop
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out
 
 
 

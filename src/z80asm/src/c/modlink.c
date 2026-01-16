@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2024
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -374,7 +374,7 @@ static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 		// call parser to interpret expression
 		set_asmpc_env(CURRENTMODULE, section_name, expr_text, source_filename, line_num,
 			asmpc, false);
-		Expr1* expr = parse_expr(expr_text);
+		Expr1* expr = parse_expr(expr_text, false);
         if (expr) {
             expr->range = range;
             if (expr->range == RANGE_ASSIGNMENT) {

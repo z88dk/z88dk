@@ -8,6 +8,7 @@
 #if defined(__CLION_IDE__) | defined(__INTELLISENSE__)
 
 #define __LIB__
+#define __SMALLC
 #define __SAVEFRAME__
 #define __z88dk_fastcall
 #define __FASTCALL__
@@ -18,7 +19,8 @@
 #define __z88dk_callee
 #define __stdc
 #define __smallc
-#define __preserves_regs
+#define __smallconly
+#define __preserves_regs(x...)
 #define __no_z88dk_declspec
 #define __at(x)
 #define __sfr
@@ -30,12 +32,21 @@
 #if __SDCC | __clang__
 #define __LIB__
 #define __SAVEFRAME__
+#define __SMALLC
 #define far
 #define __vasmallc
 #define __Z88DK_R2L_CALLING_CONVENTION 1
 #define __stdc
 #define __z88dk_deprecated
 #define __z88dk_sdccdecl
+
+#if __SDCC
+// __smallconly is for functions that only come in a smallc variant
+#define __smallconly __smallc
+#else
+// Clang - we're out of luck
+#define __smallconly
+#endif
 
 // Make intellisense run easier..
 #if __clang__ | __CLANG
@@ -46,6 +57,9 @@
 #endif
 
 #else
+// sccz80 case
+#define __SMALLC __smallc
+#define __smallconly __smallc
 #define __vasmallc __smallc
 #define __z88dk_deprecated
 #endif

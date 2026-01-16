@@ -18,12 +18,11 @@ jobs:
         submodules: 'true'
     - name: Install homebrew dependencies
       run: |
-        brew install perl dos2unix boost ragel re2c make gmp
+        brew install cpanminus perl dos2unix boost ragel re2c make gmp
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
-        cpan -T Capture::Tiny
-        cpan App::Prove Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::HexDifferences Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+        cpanm App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
       run: |
         eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -34,7 +33,7 @@ jobs:
     - name: Build libraries
       run: |
         export PATH=/usr/local/bin:$PATH
-        MAKE_CONCURRENCY=-j3 ./build.sh -v -b
+        MAKE_CONCURRENCY=-j1 ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/usr/local/bin:$PATH

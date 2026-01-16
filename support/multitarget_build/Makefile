@@ -165,6 +165,14 @@ Z88DKTARGET_hectorhr = hector
 ZCFLAGS_hectorhr = -clib=hectorhr
 ZLDFLAGS_hectorhr = 
 
+Z88DKTARGET_nc200 = nc
+ZCFLAGS_nc200 = -clib=nc200
+ZLDFLAGS_nc200 = 
+
+Z88DKTARGET_map1010 = phc25
+ZCFLAGS_map1010 = -clib=map1010
+ZLDFLAGS_map1010 = 
+
 
 # Setup the CP/M mappings to +cpm
 CPMSUBTYPES = aussie px px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
@@ -199,7 +207,7 @@ ZLDFLAGS_zxn =
 # Function to setup defaults for a target
 define setup_target
 Z88DKTARGET_$(1) ?= $(1)
-ZLDFLAGS_$(1) += $(shell if [ -f $(1)/zpragma.inc ]; then  echo '-pragma-include:$(1)/zpragma.inc'; fi)
+ZLDFLAGS_$(1) += $(shell if [ -f $(1)/zpragma.inc ]; then  echo '-pragma-include:$(1)/zpragma.inc'; elif [ -f zpragma.inc ]; then echo '-pragma-include:zpragma.inc';fi)
 endef
 
 
@@ -210,15 +218,16 @@ endef
 # $(2) = source file
 # $(3) = $(basename binary name)
 define build_ofile_asm
-build/$(1)/$(patsubst %.asm,%.o,$(2)): $(2) 
+build/$(1)/$(patsubst %.asm,%.o,$(2)): $(2) $(DEPS_ASM_$(3))  $(DEPS_ASM_$(2))
 	@mkdir -p $(dir build/$(1)/$(2))
 	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -o $$@ -c $(2)
 endef
 
 define build_ofile
-build/$(1)/$(patsubst %.c,%.o,$(2)): $(2) 
+-include build/$(1)/$(patsubst %.c,%.d,$(2))
+build/$(1)/$(patsubst %.c,%.o,$(2)): $(2) $(DEPS_C_$(3)) $(DEPS_C_$(2))
 	@mkdir -p $(dir build/$(1)/$(2))
-	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
+	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) -MD -MT build/$(1)/$(patsubst %.c,%.o,$(2)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
 endef
 
 

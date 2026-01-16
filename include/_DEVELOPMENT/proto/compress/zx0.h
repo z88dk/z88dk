@@ -53,6 +53,8 @@ include(__link__.m4)
 
 */
 
+#include <sys/compiler.h>
+
 __DPROTO(,,unsigned char,*,dzx0_standard,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx0_standard_back,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx0_turbo,void *src,void *dst)

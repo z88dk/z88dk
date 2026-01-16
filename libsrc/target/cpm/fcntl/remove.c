@@ -15,13 +15,13 @@ int remove(char *name)
 {
     struct fcb fc;
 
-    int       retval;
+    int retval;
     unsigned char uid;
 
-    if ( setfcb(&fc,name) ) 
-	return 0;
+    if ( setfcb(&fc,name) )
+        return 0;
 
-	uid = swapuid(fc.uid);
+    uid = swapuid(fc.uid);
 
     retval = bdos(CPM_DEL,&fc);
 

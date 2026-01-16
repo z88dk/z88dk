@@ -6,7 +6,7 @@ target/x1/input/in_Pause
 target/x1/input/in_Wait
 target/x1/input/in_WaitForKey
 target/x1/input/in_WaitForNoKey
-input/obj/${TYPE}/fgetc_cons_inkey
+classic/input/obj/${TYPE}/fgetc_cons_inkey
 target/x1/stdio/generic_console_cls
 target/x1/stdio/generic_console_ioctl
 target/x1/stdio/generic_console_printc
@@ -17,7 +17,7 @@ target/x1/stdio/generic_console
 target/x1/stdio/conio_vars
 target/x1/stdio/conio_map_colour
 target/x1/stdio/CRT_FONT
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 
 target/x1/stdio/ansi/f_ansi_attr
 target/x1/stdio/ansi/f_ansi_bel
@@ -33,7 +33,7 @@ target/x1/graphics/w_plotpixl
 target/x1/graphics/w_respixl
 target/x1/graphics/w_xorpixl
 target/x1/graphics/w_pointxy
-@gfx/wide/gfx_wide.lst
+@classic/gfx/wide/gfx_wide.lst
 target/x1/x1/subcpu_command
 target/x1/x1/subcpu_get
 target/x1/x1/subcpu_set
@@ -57,5 +57,5 @@ target/x1/psg/set_psg_callee
 target/x1/psg/get_psg
 target/x1/psg/psg_init
 target/x1/psg/playzb4
-@psg/ay/psg.lst
-@games/games_joystick.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/games/games_joystick.lst

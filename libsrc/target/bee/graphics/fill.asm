@@ -2,12 +2,12 @@
     PUBLIC  fill
     PUBLIC  _fill
     EXTERN  w_pixeladdress
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     EXTERN  l_cmp
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;.sline 	defs 320 * 2 * 3
 ;.sline2	defs 320 * 2 * 3
@@ -27,7 +27,7 @@ _fill:
 
 
 ;		push    de
-;		ld      de,maxx
+;		ld      de,_GFX_MAXX
 ;		call    l_cmp
 ;		pop     de
 ;		ret c	; ret if x>320
@@ -45,12 +45,12 @@ cont:
 
 ;		ld hl,sline
 
-    ld      hl, -maxx*2*3               ; create buffer 2 on stack
+    ld      hl, -_GFX_MAXX*2*3               ; create buffer 2 on stack
     add     hl, sp                      ; The stack size depends on the display height.
     ld      (sl2ptr+1), hl              ; We don't undersize it because we have lots of RAM
     ld      sp, hl
 
-    ld      hl, -maxx*2*3               ; create buffer 1 on stack
+    ld      hl, -_GFX_MAXX*2*3               ; create buffer 1 on stack
     add     hl, sp
     ld      sp, hl
     ld      (w_sline+3), hl
@@ -65,7 +65,7 @@ petelka:
     bit     3, c                        ; indeks_ws1 == 0
     jr      nz, noret
 
-    ld      hl, maxx*2*3*2
+    ld      hl, _GFX_MAXX*2*3*2
     add     hl, sp
     ld      sp, hl
     ret
@@ -119,17 +119,17 @@ write:
     ret
 
 test_up_down:
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, (de)
     or      b
     ld      (de), a                     ; plot(x,y)
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     push    de
     call    decy
     jr      c, down
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     and     b                           ; point(x, y - 1)
     jr      z, test_write
     set     0, c
@@ -147,9 +147,9 @@ down:
     call    incy
     jr      c, wypad
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     and     b                           ; point(x, y + 1)
     jr      z, test_write2
     set     1, c
@@ -174,9 +174,9 @@ segm:
     ld      a, b
     push    af
 loop1:
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     and     b
     jr      nz, right
     call    test_up_down
@@ -190,9 +190,9 @@ right:
 loop2:
     call    incx
     ret     c
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      a, (de)
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     and     b
     ret     nz
     call    test_up_down

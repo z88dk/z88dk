@@ -13,13 +13,13 @@
 
     EXTERN  base_graphics
 
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
 
 ansi_SCROLLUP:
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     ld      hl, (base_graphics)
     ld      d, h
@@ -42,4 +42,4 @@ ansi_SCROLLUP:
     ld      bc, +(30*8)-1
     ldir
 
-    jp      swapgfxbk1
+    jp      __gfx_vram_page_out

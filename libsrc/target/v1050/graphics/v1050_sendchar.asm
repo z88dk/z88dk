@@ -1,10 +1,10 @@
 ;
-;	Visual 1050 specific code
+;   Visual 1050 specific code
 ;
-;	Stefano Bodrato - 2023
+;   Stefano Bodrato - 2023
 ;
 ;
-;	$Id: v1050_sendchar.asm $
+;   $Id: v1050_sendchar.asm $
 ;
 
     SECTION code_clib
@@ -15,36 +15,44 @@
 
 v1050_sendchar:
 _v1050_sendchar:
-
-; ..using the BIOS
-    push    bc
-    push    de
-    ld      c, l
-    ld      de, 9                       ; shift ptr to CONOUT
-    ld      hl, (1)                     ; WBOOT (BIOS)
-    add     hl, de
-    call    __chl
-    pop     de
-    pop     bc
-    ret
-
-__chl:
-    jp      (hl)
-
-
 v1050_sendchar_fast:
 _v1050_sendchar_fast:
-; ..direct I/O
-MDSPOT:
-    IN      A, (86h)                    ; [P_DISP_C]  GET STATUS
-    AND     1                           ; TEST BIT 0
-    JR      Z, MDSPOT                   ; WAIT IF IT IS
 
-    ld      a, l                        ; GET THE CHARACTER
-    OUT     (85h), A                    ; [P_DISP_OUT]  AND PUT IN THE REG
-    LD      A, 0EH                      ; STROBE
-    OUT     (87h), A                    ; P_DISP_CONTROL..
-    INC     A                           ; STROBE OFF
-    OUT     (87h), A                    ; P_DISP_CONTROL..
+;; ..using the BIOS
+;    push    bc
+;    push    de
+;    ld      c, l
+;    ld      de, 9                       ; shift ptr to CONOUT
+;    ld      hl, (1)                     ; WBOOT (BIOS)
+;    add     hl, de
+;    call    __chl
+;    pop     de
+;    pop     bc
+;    ret
+;
+;__chl:
+;    jp      (hl)
 
-    ret
+
+ ; ..direct I/O
+     PUSH    BC
+     LD  B,13                 ; workaround for a weakeness in the strobe signal, perhaps in the MAME emulator
+ MDSPOT:
+     ; Wait for display section to read previous byte
+     IN      A, (86h)         ; Read port C
+     AND     1                ; display ready?
+     JR      Z, MDSPOT        ; No, PC0=0, loop and wait
+     DJNZ    MDSPOT
+ 
+     ; Output byte display section
+     ld      a, l             ; A=the byte
+     OUT     (85h), A         ; Output to port B
+ 
+     ; Strobe PC7 from 1 to 0 andh back to 1
+     LD      A,0Eh            ; Mask to reset port C bit 7
+     OUT     (87h), A         ; reset it
+     INC     A                ; A=0Fh, mask to set port C bit 7
+     OUT     (87h), A         ; set it
+     POP     BC
+ 
+     ret

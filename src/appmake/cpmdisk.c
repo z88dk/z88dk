@@ -94,6 +94,7 @@ disc_handle *disc_create(disc_spec* spec)
     return h;
 }
 
+
 void disc_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
     h->write_file(h, filename, data, len);
@@ -195,7 +196,6 @@ void disc_free(disc_handle* h)
 }
 
 // Image writing routines
-
 struct container {
     const char        *name;
     const char        *extension;
@@ -205,8 +205,11 @@ struct container {
     { "dsk",        ".dsk", "CPC extended .dsk format",    disc_write_edsk },
     { "d88",        ".D88", "d88 format",                  disc_write_d88 },
     { "ana",        ".dump", "Anadisk format",             disc_write_anadisk },
+    { "h17",        ".h17", "Heathkit H17 Hard-sectored",  disc_write_h17 },
+    { "h17raw",     ".h17raw", "H89js RAW format",         disc_write_h17raw },
     { "imd",        ".imd", "IMD (Imagedisk) format",      disc_write_imd },
     { "dmk",        ".dmk", "dmk (TRS-80/MSX) format",     disc_write_dmk },
+    { "td0",        ".TD0", "TeleDisk (TD0) format",       disc_write_td0 },
     { "raw",        ".img", "Raw image",                   disc_write_raw },
     { NULL, NULL, NULL }
 };
@@ -239,6 +242,8 @@ void disc_print_writers(FILE *fp)
 int skew_sector(disc_handle* h, int j, int track)
 {
     int sect;
+    
+    if (c_linear) return (j);
 
     if ( h->spec.has_skew && track + (track * h->spec.sides) >= h->spec.skew_track_start ) {
         for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
@@ -256,6 +261,199 @@ void xorblock(uint8_t *pos, int count, int mask)
     int i;
     for ( i = 0; i < count; i++ )
         pos[i] ^= mask;
+}
+
+
+/*
+ *  Heath/Zenith specific containers
+ *  ================================
+ *  The volume "number" is zero for CP/M,
+ *  on HDOS (not supported by cpmdisk) it is the vol number of the disk label
+ */
+
+static uint8_t h17_checksum(const uint8_t *buf, size_t n, uint8_t d) {
+  for (size_t k=0; k<n; ++k) {
+    d ^= buf[k];             // XOR
+    d = (d << 1) | (d >> 7); // RLC
+  }
+  return d;
+}
+
+
+// Write hard sectored disk image (H17)
+int disc_write_h17(disc_handle* h, const char* filename)
+{
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+    /* Header "H17D" + "200" + 0xFF */
+    uint8_t header[8] = {'H','1','7','D','2','0','0',0xFF};
+    fwrite(header, sizeof(header), 1, fp);
+
+     /* DskF (sides, tracks, ro) */
+    uint8_t dskf[12] = {'D','s','k','F', 0,0,0,3, 1,40,0};
+    dskf[8] = (h->spec.sides == 2) ? 2 : 1;
+    dskf[9] = h->spec.tracks;            // 40 o 80
+    dskf[10]= 0;                         // not write-protected
+    fwrite(dskf, 12-1, 1, fp);           // 11 bytes total
+
+    /* Labl (optional) */
+    uint8_t labl[13] = {'L','a','b','l', 0,0,0,5, 'z','8','8','d','k'};
+    fwrite(labl, sizeof(labl), 1, fp);
+
+    /* Padding: zero-fill up to 248 */
+    long pos = ftell(fp);       //should be 32
+    while (pos < 248) { fputc(0, fp); ++pos; }
+
+    /* H8DB header with length (bytes) */
+    uint8_t h8db[8] = {'H','8','D','B', 0,0,0,0};
+    uint32_t h8d_len = h->spec.sector_size * h->spec.sectors_per_track * h->spec.tracks * h->spec.sides;
+    h8db[4] = (h8d_len >> 24) & 0xFF;
+    h8db[5] = (h8d_len >> 16) & 0xFF;
+    h8db[6] = (h8d_len >>  8) & 0xFF;
+    h8db[7] = (h8d_len      ) & 0xFF;
+    fwrite(h8db, 8, 1, fp);
+    
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            offs = track_offset(h, i, s);
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 fwrite(h->image + offs + j*h->spec.sector_size, h->spec.sector_size, 1, fp);       // NO SKEW here !!
+            }
+        }
+    }
+
+    // Sector metadata block header
+    uint8_t meta[16];   // Metadata data
+    uint32_t sectors = h->spec.tracks * h->spec.sectors_per_track * h->spec.sides;
+    uint32_t secm_len = sectors * 16;
+    uint8_t secm[8] = {'S','e','c','M', 0,0,0,0};
+    secm[4] = (secm_len >> 24) & 0xFF;
+    secm[5] = (secm_len >> 16) & 0xFF;
+    secm[6] = (secm_len >>  8) & 0xFF;
+    secm[7] = (secm_len      ) & 0xFF;
+    fwrite(secm, 8, 1, fp);
+
+    // Sector metadata (physical order), with offset and checksum
+    // 'skew' does not apply here, we're shuffling the sector contents only
+    uint32_t h8d_base = 256;
+    uint32_t track_len = h->spec.sector_size * h->spec.sectors_per_track;
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            size_t offs = track_offset(h,i,s);
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+               memset(meta, 0, sizeof(meta));
+
+               uint32_t h8d_offs = h8d_base + (((i * h->spec.sides) + s) * track_len) + (skew_sector(h, j, i) * h->spec.sector_size);
+
+               meta[0] = (h8d_offs >> 24) & 0xFF;
+               meta[1] = (h8d_offs >> 16) & 0xFF;
+               meta[2] = (h8d_offs >>  8) & 0xFF;
+               meta[3] = (h8d_offs      ) & 0xFF;
+               
+               meta[4]  = 0x00;        // status (no error)
+
+               meta[5]  = 0xFD;        // Sync
+
+               uint8_t vol = 0;                // CP/M: always 0
+               /* UNUSED HACK: if we have c_linear (no skew), we assume it is HDOS */
+               // if (c_linear && i) vol = 88;    // HDOS: 0 on track 0, otherwise "volume number"
+               
+               meta[6]  = vol;
+               meta[7]  = i;
+               meta[8]  = j;           // sector number in headers (0..9)
+
+               // header checksum (vol,trk,sec)
+               meta[9]  = h17_checksum((uint8_t[]){vol,i,j}, 3, 0xfD);
+               meta[10] = 0xFD;        // Sync
+               uint8_t *sp = h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size);
+               meta[11] = h17_checksum(sp, h->spec.sector_size, 0);
+  
+               // on H17 the sector size should always be 256
+               meta[12] = h->spec.sector_size & 0xFF;
+               meta[13] = (h->spec.sector_size >> 8) & 0xFF;
+               // remaining bytes (14–15) are reserved (=0)        
+
+               fwrite(meta, 16, 1, fp);
+            }
+        }
+    }
+    
+    fclose(fp);
+    return 0;
+}
+
+
+/* Write a sector "frame" (header + data + gap) */
+static void h17raw_write_sector_frame(FILE *fp, uint8_t vol, uint8_t track, uint8_t j, const uint8_t *payload256)
+{
+    uint8_t b;
+    int i;
+    
+    /* --- Header: 00..00, FD, VOL/TRK/SEC/HCK --- */
+    for (i = 0; i < 10; ++i) fputc(0x00, fp);      // zero padding before the 0xFD header sync
+    fputc(0xFD, fp);  /* sync header */
+
+    fputc(vol,   fp);
+    fputc(track, fp);
+    fputc(j,fp);
+
+    b = h17_checksum((const uint8_t[]){vol,track,j}, 3, 0xFD);  // header checksum on [VOL,TRK,SEC]
+    fputc(b, fp);
+
+    /* --- Data: 00..00, FD, 256 bytes, DCK --- */
+    for (i = 0; i < 10; ++i) fputc(0x00, fp);      // Zero padding before the 0xFD data sync
+    fputc(0xFD, fp);  /* sync data */
+
+    fwrite(payload256, 1, 256, fp);                // 256 data bytes payload
+
+    b = h17_checksum(payload256, 256, 0);          // data bytes checksum
+    fputc(b, fp);
+
+    /* Gap between sectors */
+    for (i = 0; i < 3; ++i) fputc(0x00, fp);       // Post data zeroes
+    for (i = 0; i < 34; ++i) fputc(0xFF, fp);      // 0xFF filler between sectors
+}
+
+
+/* ------------------------------------------------------------------------
+ * H17-RAW (per-sector) writer
+ * Writes: [00..] FD [VOL][TRK][SEC][HCK] [00..] FD [256 DATA][DCK] [FF..]
+ * ------------------------------------------------------------------------ */
+int disc_write_h17raw(disc_handle *h, const char *filename)
+{
+    int i, j;
+
+    FILE *fp = fopen(filename, "wb");
+    if (!fp) return -1;
+
+    for (i = 0; i < h->spec.tracks; ++i) {
+        for (int s = 0; s < h->spec.sides; ++s) {
+
+           size_t offs = track_offset(h, i, s);
+
+           /* Sectors are in "physical" order 0..(N-1) */
+           for (j = 0; j < h->spec.sectors_per_track; ++j) {
+
+               uint8_t vol = 0;                  // CP/M: always 0
+               /* UNUSED HACK: if we have c_linear (no skew), we assume it is HDOS */
+               // if (c_linear && i) vol = 88;    // HDOS: 0 on track 0, otherwise "volume number"
+
+               /* Write the full frame (header + data + gap) */
+               /* 'skew' the sector data only */
+               h17raw_write_sector_frame(fp, vol, i, j, h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size));
+           }
+        }
+    }
+
+    fclose(fp);
+    return 0;
 }
 
 
@@ -502,7 +700,7 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
                 // head
                 // secotr number
                 // size code
-                // length (little endian) word
+                // length word
                 header[0] = i;
                 header[1] = s;
                 header[2] = i;
@@ -782,6 +980,182 @@ int disc_write_dmk(disc_handle* h, const char* filename)
 }
 
 
+
+/* TD0 CRC-16 (poly 0xA097), initial value 0x0000; MSB-first bit processing.
+ * See: Dave Dunfield's "Teledisk .TD0 notes" (CRC section). */
+static uint16_t td0_crc16(const uint8_t *p, size_t n)
+{
+    uint16_t crc = 0;
+    while (n--) {
+        uint8_t b = *p++;
+        for (int i = 0; i < 8; i++) {
+            uint16_t mix = (crc ^ (b << 8)) & 0x8000;
+            crc <<= 1;
+            if (mix) crc ^= 0xA097;
+            b <<= 1;
+        }
+    }
+    return crc;
+}
+
+
+int disc_write_td0(disc_handle *h, const char *filename)
+{
+    uint8_t ssize_code;
+    int i, j, s;
+    
+    FILE *fp = fopen(filename, "wb");
+    if (!fp) return -1;
+
+    /* ---------- TD0 Image Header (12 bytes) ---------- */
+    uint8_t hdr[12] = {0};
+    hdr[0] = 'T'; hdr[1] = 'D';          /* normal compression signature */
+    hdr[2] = 0;                          /* sequence (single volume) */
+    hdr[3] = 0;                          /* checksequence */
+    hdr[4] = 0x21;                       /* TeleDisk version (2.1) */
+
+    /* Data rate (lower 2 bits: 0=250,1=300,2=500; bit7 may indicate FM on very old images) */
+    if (h->spec.disk_mode == DEFAULT)
+        hdr[5] = 1;                        /* Default rpm: 300 */
+    else if (h->spec.disk_mode >= MFM500)
+        hdr[5] = MFM250 - h->spec.disk_mode;
+    else
+        hdr[5] = FM250 - h->spec.disk_mode;
+
+/*  Drive type
+   
+    0 = 5,25″ 96 tpi (double stepping)
+    1 = 5,25″ (generic - good default case)
+    2 = 5,25″ 48 tpi
+    3 = 3,5″
+    4 = 3,5″ (variant)
+    5 = 8″
+    6 = 3,5″ (another variant)
+*/
+    if (h->spec.tracks == 77)
+      hdr[6] = 5;   // 8"
+    else if ((h->spec.sector_size == 512) && (h->spec.tracks == 80))
+      hdr[6] = 3;   // 3"
+    else
+      hdr[6] = 1;   // generic 5,25″ (default)
+  
+    hdr[7] = 0x00;                       /* stepping (00=single); no comment => high bit clear */
+    hdr[8] = 0x00;                       /* DOS allocation flag (0 = none) */
+    hdr[9] = (h->spec.sides == 1) ? 0x01 : 0x02; /* sides: 1 or 2 */
+    uint16_t hcrc = td0_crc16(hdr, 10); /* CRC over first 10 bytes */
+    hdr[10] = (uint8_t)(hcrc & 0xFF);
+    hdr[11] = (uint8_t)(hcrc >> 8);
+    fwrite(hdr, 1, sizeof(hdr), fp);
+
+    /* ---------- Tracks ---------- */
+
+    switch (h->spec.sector_size) {
+    case 128:  ssize_code = 0;
+               break;
+    case 256:  ssize_code = 1;
+               break;
+    case 512:  ssize_code = 2;
+               break;
+    case 1024: ssize_code = 3;
+               break;
+    case 2048: ssize_code = 4;
+               break;
+    case 4096: ssize_code = 5;
+               break;
+    case 8192: ssize_code = 6;
+               break;
+    default:   ssize_code = 2; /* default to 512 */
+               break;
+    }
+
+    for (i = 0; i < h->spec.tracks; ++i) {
+        for (s = 0; s < h->spec.sides; ++s) {
+            /* Track Header: [numsects, cyl, side, CRC(low)] */
+            uint8_t th[4];
+            th[0] = h->spec.sectors_per_track;
+            th[1] = i;
+            /* TD0 sets bit7 of "side" for single-density on mixed-density images.
+               We don't change density per track here, so keep side as 0/1. */
+            th[2] = s;
+            if ((h->spec.disk_mode >= FM500)&&(h->spec.disk_mode <= FM250))  th[2] |= 0x80; /* mark FM per-track */
+            uint16_t tcrc = td0_crc16(th, 3);
+            th[3] = (uint8_t)(tcrc & 0xFF);
+            fwrite(th, 1, sizeof(th), fp);
+
+            /* Sector loop */
+            size_t offs = track_offset(h, i, s);
+            for (j = 0; j < h->spec.sectors_per_track; ++j) {
+                
+                /* Logical sector number */
+                uint8_t sec_id;
+
+                if (!h->spec.side2_sector_numbering || !(h->spec.inverted_sides ^ s)) {
+                    /* side 0 or numbering not used: 1..N */
+                    sec_id = j + h->spec.first_sector_offset;
+                } else {
+                    /* side 1 with side2 numbering: N+1..2N */
+                    sec_id = skew_sector(h, j, i) + h->spec.first_sector_offset + h->spec.sectors_per_track;
+                }
+
+                /* Sector Header: [C, H, R, N, Flags, CRC(low)] */
+                uint8_t sh[6] = {0};
+                sh[0] = i;                 /* logical C */
+                sh[1] = s;                 /* logical H */
+                sh[2] = sec_id;            /* logical R */
+                sh[3] = ssize_code;        /* N (size code) */
+                sh[4] = 0x00;              /* Flags: none (no deleted data/dup/errors) */
+
+                /* Data header + payload (encoding = 0 -> raw) */
+                const uint8_t *sp = h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size);
+
+                /* Copy to a temp buffer so that optional XOR can be applied before CRC */
+                uint8_t *tmp = malloc(h->spec.sector_size);
+                if (!tmp) { fclose(fp); return -1; }
+                memcpy(tmp, sp, h->spec.sector_size);
+                xorblock(tmp, h->spec.sector_size, h->spec.xor_data);
+
+                /* Sector Data Header: [len_lo, len_hi, encoding] ; len includes 'encoding' byte */
+                uint8_t dh[3];
+                uint16_t data_len = (uint16_t)(h->spec.sector_size + 1); /* encoding + data bytes */
+                dh[0] = (uint8_t)(data_len & 0xFF);
+                dh[1] = (uint8_t)(data_len >> 8);
+                dh[2] = 0x00; /* encoding method 0 = raw sector data */
+
+                /* Compute sector CRC over: first 5 bytes of SH + full DH + data */
+                uint16_t scrc = 0;
+                scrc = td0_crc16(sh, 5);
+                scrc = td0_crc16(dh, 3) ^ scrc; /* accumulate by XOR of sequential td0_crc16 results? */
+                /* NOTE: td0_crc16 returns CRC for a block; to concatenate blocks, we must feed bytes sequentially. */
+                {
+                    /* Build a transient buffer covering [SH(5) | DH(3) | DATA(ssize)] for CRC */
+                    uint8_t *crcbuf = malloc(5 + 3 + h->spec.sector_size);
+                    if (!crcbuf) { free(tmp); fclose(fp); return -1; }
+                    memcpy(crcbuf + 0, sh, 5);
+                    memcpy(crcbuf + 5, dh, 3);
+                    memcpy(crcbuf + 8, tmp, h->spec.sector_size);
+                    scrc = td0_crc16(crcbuf, 5 + 3 + h->spec.sector_size);
+                    free(crcbuf);
+                }
+                sh[5] = (uint8_t)(scrc & 0xFF); /* only the low byte is stored */
+
+                /* Write sector header + data header + payload */
+                fwrite(sh, 1, sizeof(sh), fp);
+                fwrite(dh, 1, sizeof(dh), fp);
+                fwrite(tmp, 1, h->spec.sector_size, fp);
+                free(tmp);
+            }
+        }
+    }
+
+    /* End-of-image marker: one byte 0xFF (track header with sector count=255) */
+    fputc(0xFF, fp);
+
+    fclose(fp);
+    return 0;
+}
+
+
+
 // CP/M routines
 static int first_free_extent(disc_handle* h)
 {
@@ -841,7 +1215,8 @@ disc_handle *cpm_create(disc_spec* spec)
 
 static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
-    size_t num_extents = (len / h->spec.extent_size) + 1;
+    //size_t num_extents = (len / h->spec.extent_size) + 1;
+    size_t num_extents = (len + h->spec.extent_size - 1) / h->spec.extent_size;
     size_t directory_offset;
     size_t offset;
     uint8_t direntry[32];
@@ -920,6 +1295,20 @@ disc_handle *fat_create(disc_spec* spec)
 
     h->write_file = fat_write_file;
     return h;
+}
+
+void fat_mount(disc_handle *h)
+{
+    //char         buf[1024];
+    FRESULT      res;
+
+    current_fat_handle = h;
+    // And now we need to mount it
+    if ( (res = f_mount(&h->fatfs, "1", 1)) != FR_OK ) {
+        exit_log(1, "Cannot mount newly create FAT filesystem: %d\n",res);
+    }
+
+    h->write_file = fat_write_file;
 }
 
 static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len)

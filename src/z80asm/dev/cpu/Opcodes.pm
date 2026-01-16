@@ -190,7 +190,7 @@ sub add {
 	
 	$self->opcodes->{$asm}{$cpu} = $opcode;
 	
-	say STDERR "add ", $opcode->cpu, " ", $opcode->asm if $ENV{DEBUG};
+	#say STDERR "add ", $opcode->cpu, " ", $opcode->asm if $ENV{DEBUG};
 	#use Carp 'longmess';
 	#warn "$cpu\t$asm\n".longmess() if $asm eq "ld (ix), bc";
 }
@@ -221,7 +221,7 @@ sub add_synth {
 		return;
 	}
 
-	say STDERR "try add ", $cpu, " ", $asm if $ENV{DEBUG};
+	#say STDERR "try add ", $cpu, " ", $asm if $ENV{DEBUG};
 
 	my @subops;
 	my @subasm = split(/\n| : /, join("\n", @asm_statements));
@@ -231,7 +231,7 @@ sub add_synth {
 		# get opcode
 		my $subopcode = $self->search_opcode($cpu, $subasm);
 		if (!$subopcode) {
-			say STDERR "opcode not found: $cpu, $asm" if $ENV{DEBUG};
+			#say STDERR "opcode not found: $cpu, $asm" if $ENV{DEBUG};
 			return;
 		}
 		
@@ -343,7 +343,7 @@ sub search_opcode {
 	
 	my $opcode = $self->opcodes->{$asm}{$cpu};
 	if (!$opcode) {
-		warn "opcode not found: $cpu, $asm" if $ENV{DEBUG};
+		#warn "opcode not found: $cpu, $asm" if $ENV{DEBUG};
 	}
 	return $opcode;
 }

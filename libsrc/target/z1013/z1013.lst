@@ -6,19 +6,19 @@ target/z1013/stdio/conio_vars
 target/z1013/stdio/generic_console_ioctl
 target/z1013/stdio/generic_console_MODE1
 target/z1013/stdio/CRT_FONT
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst
 target/z1013/stdio/ansi/f_ansi_attr
 target/z1013/stdio/ansi/f_ansi_bel
 target/z1013/stdio/ansi/f_ansi_char
 target/z1013/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/z1013/stdio/ansi/f_ansi_scrollup
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/z1013/games/joystick.asm
-@games/games_joystick.lst
+@classic/games/games_joystick.lst
 
 
-@video/krt/video_krt.lst
+@classic/video/krt/video_krt.lst
 target/z1013/graphics/cleargraphics
 target/z1013/graphics/getmaxx
 target/z1013/graphics/getmaxy
@@ -38,4 +38,4 @@ target/z1013/graphics/textpixl
 target/z1013/graphics/xor_MODE0
 target/z1013/graphics/xor_MODE1
 target/z1013/graphics/xorpixl
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst

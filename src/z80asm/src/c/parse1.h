@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2024
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -57,8 +57,9 @@ extern void parse_file(const char *filename);
 extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
-extern struct Expr1 *parse_expr(const char *expr_text);
-extern void parse_const_expr_eval(const char* expr_text, int* result, bool* got_error);
+extern struct Expr1 *parse_expr(const char *expr_text, bool silent);
+extern void parse_const_expr_eval(const char* expr_text,
+    int* result, bool* got_error, bool silent);
 extern void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* got_error);
 
 /* push current expression */

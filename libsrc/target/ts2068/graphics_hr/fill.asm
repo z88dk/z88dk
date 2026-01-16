@@ -1,4 +1,4 @@
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  fill
@@ -15,7 +15,7 @@ _fill:
     push    hl
     push    de
     push    bc
-    ld      a, maxy
+    ld      a, _GFX_MAXY
     cp      e
     ret     c
     ld      a, 1

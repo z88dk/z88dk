@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: g007_hrg_on.asm,v 1.6 2016-06-27 20:26:33 dom Exp $
+;	$Id: g007_hrg_on.asm $
 ;
 
     SECTION code_clib
@@ -13,7 +13,6 @@
     PUBLIC  _hrg_on
     EXTERN  base_graphics
 
-    EXTERN  L0292
     EXTERN  G007_P1
     EXTERN  G007_P2
     EXTERN  G007_P3
@@ -22,28 +21,70 @@
 hrg_on:
 _hrg_on:
 
-    ld      hl, ($2306)                 ; Current HRG page (use CLS 2 / SLOW 4, in BASIC, first)
-    ld      (base_graphics), hl
 
-;; if hrgpage has not been specified, then set a default value
+; if hrgpage has not been specified, then set a default value
+; TODO: this check should be improved, when the BASIC program is modified, the D-FILE shifts.
+;       We also miss an option to provide a fixed position for the HRG page avoiding the
+;       ROM's MAKE-ROOM approach.
+;
 ;	ld      hl,(base_graphics)
 ;	ld      a,h
 ;	or      l
-;	jr		nz,gotpage
+;	jr      nz,gotpage
+
+  IF    FORzx81g64
+
+	LD HL,($400C)    ; D-FILE
+	LD A,$76
+	DEC HL
+	DEC HL
+	CP (HL)
+	jr z,__zx81g64_no_init
+
+; ;$2DF8  01;92;19    LD BC,$1992         ; 6546 -> (6528+18) -> (34*192+18)
+; ;$2DFB  2A;0C;40    LD HL,($400C)
+; ;$2DFE  2B          DEC HL
+; ;$2DFF  CD;9E;09    CALL $099E          ; [MAKE-ROOM]
+; ;$2E02  3E;76       LD A,$76
+; 
+ 	ld a,64
+ 	ld ($2318),a
+; 	; TODO: find a working way to allocate a lower amount of memory
+; 	;ld bc,34*64+18	;  an $2DF8 it uses to be $1992 (34*192+18)
+; 	ld bc,192*64+18
+; 	inc hl          ; points to D-FILE -1
+; 	call $2DFF
+
+	call $2DF8
+
+__zx81g64_no_init:
+  ELSE
+
+	; check if we already have reserved graphics memory
+	LD HL,($400C)    ; D-FILE
+	LD A,$76
+	DEC HL
+	DEC HL
+	CP (HL)
+	call nz,$2DF8
+    ;call 11807           ; Set up graphics page if not reserved yet
+
+  ENDIF
+
 ;IF FORzx81g64
 ;	ld		hl,29000		; on a 16K system we leave a space of abt 1.5K bytes for stack
 ;ELSE
 ;	ld		hl,25000		; on a 16K system we leave a space of a bit more than 1K for stack
 ;ENDIF
 ;	ld		(base_graphics),hl
+;	ld      ($2306),hl                  ; Current HRG page
+
 ;gotpage:
+    ld      hl, ($2306)                 ; Current HRG page
+    ld      (base_graphics), hl
 
-;	ld		hl,(base_graphics)
-
-;	ld		($2306),hl		; probably not necessary, bur emulators may like it
     ld      de, 9
     add     hl, de
-;	ld		($2308),hl		; probably not necessary, bur emulators may like it
 
   IF    FORzx81g64
     ld      a, 65                       ; new row counter
@@ -61,10 +102,12 @@ zloop:
     dec     a
     jr      nz, floop
 
+;	No linefeed characters in G007 mode
+;	the D-FILE is just a clean raster picture !
+;
 ;	ld (hl),$76
 ;	inc hl
 ;	ld (hl),$76
-
 
 
 	; wait for video sync to reduce flicker
@@ -85,14 +128,15 @@ zloop:
     ld      (G007_P3+1), hl
 
 
-;IF FORzx81g64
-;	ld	a,85
-;	ld	(MTCH_P3+1),a	; patch also our custom interrupt handler
-;ENDIF
-
-
-
-
+	; In the normal ZX81 ROM BASIC the I register contains 0x1E, pointing
+	; into the character pixel table in the ROM, Bit 0 of I is thus '0'.
+	; In high res mode, the I register has the value 0x1F, where D0 is '1',
+	; The G007 board uses the A8 bit to understand whether the ZX81 must run
+	; in graphics or in text mode. During a refresh cyclem A0..A7 presents the
+	; the contents of the refresh-row register (only D0-D6 count, D7 is just
+	; whatever was last written into R), A8-15 present the contents of the
+	; interrupt vector register.
+	
     ld      a, $1f                      ; ROM address $1F00 +  enable graphics mode and shadow memory blocks
     ld      i, a
 
@@ -104,6 +148,9 @@ display_3:
 ;  HRG replacement fot DISPLAY-3
     dec     hl
     ld      a, ($4028)
+IF FORzx81g64
+    add		58
+ENDIF
     ld      c, a
     pop     iy                          ;  z80asm will do an IX<>IY swap
     ld      a, ($403B)                  ; test CDFLAG
@@ -116,6 +163,7 @@ display_3:
     ld      b, 1
     ld      hl, $2d9a
     call    $2d95
+	
     add     hl, hl
     nop
     ld      e, a

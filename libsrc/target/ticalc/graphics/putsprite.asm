@@ -10,7 +10,7 @@
     EXTERN  cpygraph
     EXTERN  pixeladdress
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ;	$Id: putsprite.asm $

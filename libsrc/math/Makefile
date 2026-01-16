@@ -1,6 +1,7 @@
 include ../Make.config
 
-SUBDIRS = fastmath genmath math48 math32 math16 mbf32 daimath32 am9511 cpcmath mbf64 z88math zxmath 
+SUBDIRS = integer/fastmath float/genmath float/math48 float/math32 float/math16 \
+	float/mbf32 float/daimath32 float/am9511 float/cpcmath float/mbf64 float/z88math float/zxmath 
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 

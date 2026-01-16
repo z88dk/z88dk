@@ -17,14 +17,14 @@
 
     EXTERN  base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 invhrg:
 _invhrg:
     ld      hl, (base_graphics)
 
-    ld      a, maxy
+    ld      a, _GFX_MAXY
     ld      c, a
 	;push af
 

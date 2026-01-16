@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2024
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -125,7 +125,7 @@ extern void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error);
 
 /* parse expression at current input, return new Expr1 object;
    return NULL and issue syntax error on error */
-extern Expr1* expr_parse(void);
+extern Expr1* expr_parse(bool silent);
 
 /* evaluate expression if possible, set result.not_evaluable if failed
    e.g. symbol not defined; show error messages if not_defined_error */

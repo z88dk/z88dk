@@ -122,7 +122,8 @@ option_t zxn_options[] = {
     {  0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
-    {  0,  "nex",          "Make .nex instead of .tap", OPT_BOOL,   &nex },
+    {  0,  "nex",          "Make .nex instead of .tap", OPT_BOOL, &nex },
+    {  0,  "nex-2mb",      "Force setting of the 2MB flag", OPT_BOOL, &zxnex.mb },
     {  0,  "nex-norun",    "Return to basic after loading", OPT_BOOL, &zxnex.norun },
     {  0,  "nex-screen",   "File containing loading screen (layer 2)", OPT_STR, &zxnex.screen },
     {  0,  "nex-screen-no-palette", "No palette prepends loading screen", OPT_BOOL, &zxnex.nopalette },

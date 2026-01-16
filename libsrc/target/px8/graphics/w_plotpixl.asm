@@ -1,5 +1,5 @@
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
 
@@ -31,13 +31,13 @@ w_pixel:
     ld      (mode), a
 
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_graphics_cmp
     pop     hl
     ret     nc                          ; Return if Y overflows
 
     push    de
-    ld      de, maxx
+    ld      de, _GFX_MAXX
     call    l_graphics_cmp
     pop     de
     ret     c                           ; Return if X overflows

@@ -63,7 +63,12 @@ static size_t include_path_nb = 0;
 
 int no_special_macros = 0;
 int emit_dependencies = 0, emit_defines = 0, emit_assertions = 0;
+int auto_derive_dependency_file = 0;
 FILE *emit_output;
+
+char *output_file = NULL;
+char *dependency_target = NULL;
+char *dependency_file = NULL;
 
 #ifdef STAND_ALONE
 static char *system_macros_def[] = { STD_MACROS, 0 };
@@ -540,7 +545,7 @@ void free_lexer_state(struct lexer_state *ls)
 /*
  * Print line information.
  */
-static void print_line_info(struct lexer_state *ls, unsigned long flags)
+void print_line_info(struct lexer_state *ls, unsigned long flags)
 {
 	char *fn = current_long_filename ?
 		current_long_filename : current_filename;
@@ -552,9 +557,10 @@ static void print_line_info(struct lexer_state *ls, unsigned long flags)
 	} else {
 		sprintf(b, "#line %ld \"%s\"\n", ls->line, fn);
 	}
-        put_char(ls, '\n');
-	for (d = b; *d; d ++) put_char(ls, (unsigned char)(*d));
+    put_char_direct(ls, '\n');
+	for (d = b; *d; d ++) put_char_direct(ls, (unsigned char)(*d));
 	freemem(b);
+    ls->oline -= 2;    /* emitted #line troubled oline */
 }
 
 /*
@@ -583,7 +589,6 @@ int enter_file(struct lexer_state *ls, unsigned long flags)
 		return 1;
 	}
 	print_line_info(ls, flags);
-	ls->oline -=2;	/* emitted #line troubled oline */
 	return 0;
 }
 
@@ -852,7 +857,7 @@ found_file_cache:
 	 * protect_detect.ff
 	 */
 found_file:
-	if (f && ((emit_dependencies == 1 && lf && current_incdir == -1)
+	if (f && ((emit_dependencies == 1 && lf )
 		|| emit_dependencies == 2)) {
 		fprintf(emit_output, " %s", s ? s : name);
 	}
@@ -1403,8 +1408,9 @@ do_include:
 	   the #include is at the end of the file with no trailing newline */
 	if (ls->ctok->type != NEWLINE) ls->line ++;
 do_include_next:
-	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
+	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT)) {
 		put_char(ls, '\n');
+    }
 	push_file_context(ls);
 	reinit_lexer_state(ls, 1);
 #ifdef MSDOS
@@ -2057,7 +2063,9 @@ int cpp(struct lexer_state *ls)
 				"(depth %ld)", ls->ifnest);
 			r = CPPERR_NEST;
 		}
-		if (ls_depth == 0) return CPPERR_EOF;
+		if (ls_depth == 0) {
+            return CPPERR_EOF;
+        }
 		close_input(ls);
 		if (!(ls->flags & LEXER) && !ls->ltwnl) {
 			put_char(ls, '\n');
@@ -2112,10 +2120,15 @@ int cpp(struct lexer_state *ls)
 
 			ls->ltwnl = 1;
 			return r ? r : x;
-		}
+		} 
 	}
-	if (ls->ctok->type == NEWLINE) ls->ltwnl = 1;
+
+	if (ls->ctok->type == NEWLINE && ls->ltwnl) yield_newlines(ls); 
+
+	if (ls->ctok->type == NEWLINE) ls->ltwnl = 1; 
 	else if (!ttWHI(ls->ctok->type)) ls->ltwnl = 0;
+
+    //yield_newlines(ls); // Gets line numbers right, but doesn't collapse multiple newlines.
 	return r ? r : -1;
 }
 
@@ -2355,10 +2368,14 @@ static void usage(char *command_name)
 	"  -I directory    add 'directory' before the standard include path\n"
 	"  -J directory    add 'directory' after the standard include path\n"
 	"  -zI             do not use the standard include path\n"
-	"  -M              emit Makefile-like dependencies instead of normal "
-			"output\n"
-	"  -Ma             emit also dependancies for system files\n"
 	"  -o file         store output in file\n"
+	"dependency options:\n"
+	"  -M              emit Makefile-like dependencies instead of normal output\n"
+	"  -MM             emit also dependencies for system files (-Ma is an alias)\n"
+	"  -MF file        file to write dependencies to\n"
+    "  -MT target      change the target of the Makefile dependency\n"
+    "  -MD             equivalent of -MM -MF file, preprocesses and emits dependencies\n"
+    "  -MMD            equivalent of -M  -MF file, preprocesses and emits dependencies\n"
 	"macro and assertion options:\n"
 	"  -Dmacro         predefine 'macro'\n"
 	"  -Dmacro=def     predefine 'macro' with 'def' content\n"
@@ -2406,7 +2423,8 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 
 	init_lexer_state(ls);
 	ls->flags = DEFAULT_CPP_FLAGS;
-	emit_output = ls->output = stdout;
+	ls->output = stdout;
+    emit_output = NULL;
 	for (i = 1; i < argc; i ++) if (argv[i][0] == '-') {
 		if (!strcmp(argv[i], "-h")) {
 			return 2;
@@ -2454,15 +2472,40 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 		} else if (!strcmp(argv[i], "-M")) {
 			ls->flags &= ~KEEP_OUTPUT;
 			emit_dependencies = 1;
-		} else if (!strcmp(argv[i], "-Ma")) {
+		} else if (!strcmp(argv[i], "-Ma") || !strcmp(argv[i],"-MM")) {
 			ls->flags &= ~KEEP_OUTPUT;
 			emit_dependencies = 2;
-		} else if (!strcmp(argv[i], "-Y")) {
+		} else if (!strcmp(argv[i], "-MF")) {
+			if ((++ i) >= argc) {
+				error(-1, "missing filename after -MF");
+				return 2;
+			}
+            dependency_file = argv[i];
+		} else if (!strcmp(argv[i], "-MD")) {
+            // -MD is equivalent to -M -MF file, except that -E is not implied. The driver determines file based on whether an -o option is given. 
+            // If it is, the driver uses its argument but with a suffix of .d, otherwise it takes the name of the input file, removes any directory components 
+            // and suffix, and applies a .d suffix.
+            ls->flags |= KEEP_OUTPUT;
+            emit_dependencies = 2;
+            auto_derive_dependency_file = 1;
+		} else if (!strcmp(argv[i], "-MMD")) {
+            // As -MD but don't include system header files
+            ls->flags |= KEEP_OUTPUT;
+            emit_dependencies = 1;
+            auto_derive_dependency_file = 1;
+		} else if (!strcmp(argv[i], "-MT")) {
+			if ((++ i) >= argc) {
+				error(-1, "missing value after -MT");
+				return 2;
+			}
+            dependency_target = argv[i];
+        } else if (!strcmp(argv[i], "-Y")) {
 			system_macros = 1;
 		} else if (!strcmp(argv[i], "-Z")) {
 			no_special_macros = 1;
 		} else if (!strcmp(argv[i], "-d")) {
 			print_defs = 1;
+            emit_output = stdout;
 		} else if (!strcmp(argv[i], "-e")) {
 			ls->flags &= ~KEEP_OUTPUT;
 			print_asserts = 1;
@@ -2478,15 +2521,15 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 				return 2;
 			}
 			if (argv[i][0] == '-' && argv[i][1] == 0) {
-				emit_output = ls->output = stdout;
+                ls->output = stdout;
 			} else {
+                output_file = argv[i];
 				ls->output = fopen(argv[i], "w");
 				if (!ls->output) {
 					error(-1, "failed to open for "
 						"writing: %s", argv[i]);
 					return 2;
 				}
-				emit_output = ls->output;
 			}
 		} else if (!strcmp(argv[i], "-v")) {
 			print_version = 1;
@@ -2505,7 +2548,6 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 						"writing: %s", argv[i]);
 					return 2;
 				}
-				emit_output = ls->output;
 			} else {
 				error(-1, "spurious filename '%s'", argv[i]);
 				return 2;
@@ -2594,6 +2636,47 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 	return ret;
 }
 
+char *last_path_char(char *filename)
+{
+    char *p, *q;
+
+    /* return pointer to last slash character in filename   */
+    /* return NULL if no slash character found              */
+
+    p = strrchr(filename, '/');
+    q = strrchr(filename, '\\');
+    if ((p == NULL) || ((q != NULL) && ((q - filename) > (p - filename))))
+        p = q;
+
+    return p;
+}
+
+static char *find_file_ext(char *filename)
+{
+    char *p;
+
+    if ((p = last_path_char(filename)) == NULL)
+        p = filename;
+    return strrchr(p, '.');
+}
+
+static char *changesuffix(char *name, char *suffix)
+{
+    char *p, *r;
+
+    if ((p = find_file_ext(name)) == NULL) {
+        r = malloc(strlen(name) + strlen(suffix) + 1);
+        sprintf(r, "%s%s", name, suffix);
+    } else {
+        r = malloc(p - name + strlen(suffix) + 1);
+        r[0] = '\0';
+        strncat(r, name, p - name);
+        strcat(r, suffix);
+    }
+
+    return (r);
+}
+
 int main(int argc, char *argv[])
 {
 	struct lexer_state ls;
@@ -2604,9 +2687,44 @@ int main(int argc, char *argv[])
 		if (r == 2) usage(argv[0]);
 		return EXIT_FAILURE;
 	}
+    if ( emit_dependencies  ) {
+        char *fn = current_long_filename ? current_long_filename : current_filename;
+        char *basename = last_path_char(fn);
+        char *ofile;
+
+        if (basename) basename++;
+        else basename = fn;
+
+        if ( dependency_file ) {
+            emit_output = fopen(dependency_file, "w");
+            if ( emit_output == NULL ) {
+                fprintf(stderr, "Cannot open dependency file %s for writing\n", dependency_file);
+                return EXIT_FAILURE;
+            }
+
+        } else if ( auto_derive_dependency_file ) {
+            char *file;
+            if ( output_file != NULL ) {
+                file = changesuffix(output_file, ".d");
+            } else {
+                file = changesuffix(basename, ".d");
+            }
+            if ( ( emit_output = fopen(file, "w")) == NULL ) {
+                fprintf(stderr, "Cannot open dependency file %s for writing\n", file);
+                return EXIT_FAILURE;
+            }
+        } else {
+            emit_output = stdout;
+        }
+
+        ofile = changesuffix(basename, ".o");
+        fprintf(emit_output,"%s: %s", dependency_target ? dependency_target : ofile, fn);
+    }
 	enter_file(&ls, ls.flags);
 	while ((r = cpp(&ls)) < CPPERR_EOF) fr = fr || (r > 0);
-	fr = fr || check_cpp_errors(&ls);
+    put_char(&ls, '\n');
+    yield_newlines(&ls);
+    fr = fr || check_cpp_errors(&ls);
 	free_lexer_state(&ls);
 	wipeout();
 #ifdef MEM_DEBUG
@@ -2614,4 +2732,7 @@ int main(int argc, char *argv[])
 #endif
 	return fr ? EXIT_FAILURE : EXIT_SUCCESS;
 }
+
+
+
 #endif

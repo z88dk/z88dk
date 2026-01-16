@@ -4,7 +4,7 @@
     PUBLIC  _fputc_cons_native
 
 
-    INCLUDE "target/radio86/def/monitor.def"
+    INCLUDE "target/radio86/def/radio86.h"
 
 fputc_cons_native:
 _fputc_cons_native:
@@ -16,10 +16,10 @@ _fputc_cons_native:
     jp      nz, not_lf
     ld      c, 13
 print:
-    jp      PUTCHAR
+    jp      M_PUTCHAR
 not_lf:
     cp      12
-    jp      nz, PUTCHAR
+    jp      nz, M_PUTCHAR
     ld      c, $1f
-    jp      PUTCHAR
+    jp      M_PUTCHAR
 

@@ -56,5 +56,46 @@ ifelse($1,, __uniq_, $1_)`'eval(_Z88DK_UNIQ_ID_$1, 10, 4)')
 define(`Z88DK_CLBL', `define(`_Z88DK_UNIQ_ID_$2', ifdef(`_Z88DK_UNIQ_ID_$2', _Z88DK_UNIQ_ID_$2, 0))dnl
 ifelse($2,, __uniq_, $2_)`'ifelse($1,, eval(_Z88DK_UNIQ_ID_$2, 10, 4), `eval(_Z88DK_UNIQ_ID_$2 + $1, 10, 4)')')
 
+# Z88DK_C_COMMENTS_TO_ASM(MULTILINE_TEXT)
+# Convert C style comments (only //) to ASM style ones
+define(`Z88DK_C_COMMENTS_TO_ASM',`patsubst($1,`//',`;')')
+
+# Z88DK_REMOVE_C_COMMENTS(MULTILINE_TEXT)
+# Removes C style comments (only //)
+define(`Z88DK_REMOVE_C_COMMENTS',`patsubst($1,`//.*$',`')')
+
+# Z88DK_REMOVE_EMPTY_LINES(MULTILINE_TEXT)
+# Removes empty lines from a file
+define(`Z88DK_REMOVE_EMPTY_LINES',`patsubst($1,`^[ \t]*
+',`')')
+
+# Z88DK_C_DEF_TO_ASM(MULTILINE_TEXT)
+# Converts #define C style lines to ASM defc definitions. The symbols get added a "__" prefix
+define(`Z88DK_C_DEF_TO_ASM',`patsubst($1,`#define[ \t]+\([A-Za-z_][A-Za-z0-9_]*\)',`defc __\1 =')')
+
+# Z88DK_C_DEF_TO_PUBLIC(MULTILINE_TEXT)
+# Converts #define C style lines to ASM public entries. The symbols get added a "__" prefix
+define(`Z88DK_C_DEF_TO_PUBLIC',`patsubst($1,`#define[ \t]+\([A-Za-z_][A-Za-z0-9_]*\).*',`PUBLIC __\1')')
+
+# Z88DK_H2ASMPUB(MULTILINE_TEXT)
+# Converts a C header file (limited to definitions and // style comments) to ASM public entries
+# Symbols get a "__" prefix in the ASM file
+define(`Z88DK_H2ASMPUB',`Z88DK_REMOVE_EMPTY_LINES(Z88DK_REMOVE_C_COMMENTS(Z88DK_C_DEF_TO_PUBLIC(include($1))))')
+
+# Z88DK_H2ASMDEF(MULTILINE_TEXT)
+# Converts a C header file (limited to definitions and // style comments) to ASM definitions
+# Symbols get a "__" prefix in the ASM file
+define(`Z88DK_H2ASMDEF',`Z88DK_C_COMMENTS_TO_ASM(Z88DK_C_DEF_TO_ASM(include($1)))')
+
+# Z88DK_PROCESS_CONSTANTS_H(FILE_PATH)
+# Process a .h file (limited to constants definitions for architecture config files and // style comments)
+# to produce the config files of each architecture (used in zxn target)
+define(`Z88DK_PROCESS_CONSTANTS_H', `
+ifdef(`CFG_ASM_DEF', `Z88DK_H2ASMDEF($1)')
+ifdef(`CFG_C_DEF', `include($1)')
+ifdef(`CFG_ASM_PUB',`Z88DK_H2ASMPUB($1)')
+')
+
+
 divert(Z88DK_DIVNUM)
 dnl`'popdef(`Z88DK_DIVNUM')

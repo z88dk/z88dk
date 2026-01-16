@@ -20,7 +20,7 @@ w_pointxy:
     jr      nz, hires
     ld      h, l
     ld      l, e
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"
 
 hires:
     cp      @00000100

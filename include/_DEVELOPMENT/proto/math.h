@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS

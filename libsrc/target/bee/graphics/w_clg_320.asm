@@ -13,7 +13,7 @@
     PUBLIC  clg
     PUBLIC  _clg
     EXTERN  cleargraphics
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
 
 vdutab:                                 ; 40x24
     defb    $35, 40, $2D, $24, $1b, $05, $19, $1a, $48, $0a, $2a, $0a, $20, 0, 0, 0
@@ -22,7 +22,7 @@ vdutab:                                 ; 40x24
 clg:
 _clg:
 
-    call    swapgfxbk
+    call    __gfx_vram_page_in
 
     defb    $3E, 1, $DB, 9              ;{HALVES VIDEO CLOCK SPEED}
 

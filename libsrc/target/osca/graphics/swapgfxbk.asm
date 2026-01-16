@@ -13,47 +13,47 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ;    INCLUDE "target/osca/def/flos.def"
-    INCLUDE "target/osca/def/osca.def"
+        INCLUDE "target/osca/def/osca.def"
 
-		SECTION code_clib
-		PUBLIC    swapgfxbk
-      PUBLIC    _swapgfxbk
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+        SECTION code_clib
+        PUBLIC  __gfx_vram_page_in
+        PUBLIC  ___gfx_vram_page_in
+        PUBLIC  __gfx_vram_page_out
+        PUBLIC  ___gfx_vram_page_out
 
 
-.swapgfxbk
-._swapgfxbk
+__gfx_vram_page_in:
+___gfx_vram_page_in:
 		;call kjt_wait_vrt		; wait for last line of display
 		;call kjt_page_in_video	; page video RAM in at $2000-$3fff
-		
-		di
-		ld	 (asave),a
-		in a,(sys_mem_select)	
-		or $40
-		out (sys_mem_select),a	; page in video RAM
-		ld a,(asave)
-		ret
 
-.swapgfxbk1
-._swapgfxbk1
-		ld	 (asave),a
-		in a,(sys_mem_select)	; page in video RAM
-		and $bf
-		out (sys_mem_select),a
+        di
+        ld      (asave), a
+        in      a, (sys_mem_select)
+        or      $40
+        out     (sys_mem_select), a     ; page in video RAM
+        ld      a, (asave)
+        ret
+
+__gfx_vram_page_out:
+___gfx_vram_page_out:
+        ld      (asave), a
+        in      a, (sys_mem_select)     ; page in video RAM
+        and     $bf
+        out     (sys_mem_select), a
 		;call kjt_page_out_video	; page video RAM out of $2000-$3fff
 
-        ld		a,@10000011                     ; Enable keyboard and mouse interrupts only
-        out		(sys_irq_enable),a
-		ld a,(asave)
+        ld      a, @10000011            ; Enable keyboard and mouse interrupts only
+        out     (sys_irq_enable), a
+        ld      a, (asave)
         ei
 
-		ret
+        ret
 
-		SECTION bss_clib
-.asave
-		defb 0
+        SECTION bss_clib
+asave:
+        defb    0

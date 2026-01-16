@@ -12,7 +12,7 @@
 ;
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  plotpixel
@@ -23,10 +23,10 @@
 
 plotpixel:
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                          ; y0	out of range
 
     dec     a
@@ -63,7 +63,7 @@ plotpixel:
     and     a
     jr      z, r_zero
 
-    ld      de, maxx/2                  ; microbee is 64 columns
+    ld      de, _GFX_MAXX/2                  ; microbee is 64 columns
 r_loop:
     add     hl, de
     dec     a

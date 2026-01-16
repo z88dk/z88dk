@@ -4,11 +4,18 @@
  * $Id: spectrum.h$
  */
 
+
+/** \file Header file for +zx specific functions
+ * 
+ * These functions can also be used on +ts2068 and +zxn
+ */
+
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <rect.h>
 #include <arch/zx/zx_input.h>
 
 /////////////
@@ -156,8 +163,7 @@ extern int  __LIB__ zx_model(void);
 extern int  __LIB__ zx_basic_length(void);
 extern int  __LIB__ zx_var_length(void);
 extern int  __LIB__ zx_printer(void);
-extern int  __LIB__ zx_soundchip(void);
-extern int  __LIB__ zx_timexsound(void);
+extern int  __LIB__ zx_soundchip(void);  // 0: NONE - 1: ZX128 AY - 2: BRAZIL AY (Microdigital..) - 3: TS-2068 
 extern int  __LIB__ zx_fullerstick(void);
 extern int  __LIB__ zx_kempstonmouse(void);
 extern int  __LIB__ zx_kempston(void);
@@ -343,6 +349,58 @@ extern void __LIB__  zx_print_buf(char *buf) __z88dk_fastcall;
 extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 
 
+/////////////////////////////////
+// CENTRONICS PRINTER INTERFACES
+/////////////////////////////////
+
+// For the Opus Discovery use opus_lptwrite() in <arch/zx/zxopus.h>
+
+// "MOREX" had plenty of derived, equivalent interfaces
+                            //   Morex,   Abbeydale,  Indescomp,   Ventamatic,
+                            //   PIN SOFT I/F,   Microhobby,  B&V Interface
+                            //   Proceeding Electronic System,
+                            //   Elettronica 2000 magazine n.53,
+#define LPT_MOREX      0
+#define LPT_DKTRONICS  1    // DK'Tronics (Z80 PIO)
+#define LPT_KEMPSTONE  2    // Kempston Interface E
+#define LPT_KEMPSTONS  3    // Kempston Interface S
+#define LPT_HILDERBAY  4    // Hilderbay Printer Interface
+#define LPT_HWG        5    // Centronics-Schnittstelle by HWG 
+#define LPT_MICROFACE  6    // MICROFACE by CSH / N.E. n.98, kit LX674
+#define LPT_PLUS3      7    // ZX Spectrum +2A/+3
+#define LPT_DISCIPLE   8    // DISCiPLE
+#define LPT_PLUSD      9    // +D interface
+#define LPT_LPRINTIII  10   // Euroelectronics LPRINT III, a.k.a. MK III
+#define LPT_AERCO      11   // AERCO CP-ZX (A.K.A. CP-2068), OLIGER
+#define LPT_PPI        12   // Modern PPI interface by Marko Solajic
+#define LPT_TASMAN     13   // TASMAN (Type A / USA B)
+#define LPT_TASMAN_B   14   // TASMAN (Type B / USA C)
+#define LPT_WAFADRIVE  15   // Rotronics WAFADRIVE
+#define LPT_ZXPOWER    16   // ZX-POWER PROD "ZX LPRINT" - Denmark
+#define LPT_LINK       17   // "CENTRONICS LINK" interface by RS/MM
+#define LPT_GAMA       18   // Didaktik Gama (strobed on port A)
+#define LPT_PROXIMA    19   // Didaktik "Proxima" (strobed on port B)
+#define LPT_DIDAKTIKMP 20   // SPECIAL D. on port A (M/P interface)
+#define LPT_DIDAKTIKB  21   // SPECIAL D. on port B, "Baltik" or "Ural"
+#define LPT_ROMANTIC   22   // Romantic Robot MULTIPRINT
+#define LPT_HOBBIT     23   // Хоббит, strobed Z80 PIO
+#define LPT_AJ         24   // A & J "Micro Drive" or just Centronics
+#define LPT_INTERFACE3 25   // Interface III Printer interface
+#define LPT_OPUS       26   // Opus Discovery (or lame Interface 1 calls)
+#define LPT_PIA        27   // "AT IMS KR580VV66A PIA", very close to PPI
+#define LPT_ADS        28   // ADS Interface
+
+#define LPT_IF1       100   // ZX Interface 1 style "hook codes" (crap)
+
+// Choose the current output driver and initialize it
+extern int  __LIB__  centronics_init(int driver) __z88dk_fastcall;
+
+// Set to 20 by default.  It should be enough also for an overclocked Z80
+extern int  centronics_strobe_delay;
+
+// Send a character to the currently initialized driver
+extern int  __LIB__  centronics_send(int chr);
+
 ////////////
 // TAPE I/O
 ////////////
@@ -384,40 +442,78 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
-// NOTE: remember to compile with -pragma-define:CLIB_CONIO_NATIVE_COLOUR=1
-// in order to use INK_BLACK to INK_WHITE and PAPER_BLACK to PAPER_WHITE.
-// Clear the screen
-
+/** \brief  Clear the screen with the currently set attribute
+ */
 extern void __LIB__ zx_cls(void);
 
-// Clears the screen and sets the screen and current attribute to attr
+
+/** \brief  Clears the screen and sets the screen and current attribute to attr
+ * \param attr - The full attribute byte
+*/
 extern void __LIB__ zx_cls_attr(int attr);
 extern void __LIB__ zx_cls_attr_fastcall(int attr) __z88dk_fastcall;
 #define zx_cls_attr(a)                 zx_cls_attr_fastcall(a)
 
-// Set or unset the flash attribute for now on
-#define zx_setattrflash(b)        fputc_cons(18); fputc_cons((b)? 49: 48)
+/** \brief Set or unset the flash attribute for printing
+ * 
+ * \param f Values 0/1
+ * 
+ * This function sets the flash flag for the --generic-console screen driver
+ */
+extern void zx_setattrflash(uint f);
+extern void zx_setattrflash_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrflash(f) zx_setattrflash_fastcall(f)
 
-// Set or unset the bright attribute for now on
-#define zx_setattrbright(b)       fputc_cons(19); fputc_cons((b)? 49: 48)
+/** \brief Set or unset the bright attribute for printing
+ * 
+ * \param f Values 0/1
+ * 
+ * This function sets the bright flag for the --generic-console screen driver
+ */
+extern void zx_setattrbright(uint f);
+extern void zx_setattrbright_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrbright(f) zx_setattrbright_fastcall(f)
 
-// Set or unset the inverse attribute for now on
-#define zx_setattrinverse(b)      fputc_cons(20); fputc_cons((b)? 49: 48)
+/** \brief Set or unset the inverse attribute for printing
+ * 
+ * \param f Values 0/1
+ * 
+ * This function sets the inverse flag for the --generic-console screen driver
+ */
+extern void zx_setattrinverse(uint f);
+extern void zx_setattrinverse_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrinverse(f) zx_setattrinverse_fastcall(f)
 
-// Set the border color
-// Param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
-// Quickly set the whole screen color attributes
-// Param colour must be in the form i | p, where
+/** \brief Set the border color
+ *   \param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+ */
+extern void  __LIB__  zx_border(uint colour);
+extern void  __LIB__  zx_border_fastcall(uint colour) __z88dk_fastcall;
+#define zx_border(c) zx_border_fastcall(c)
+
+
+/** \brief Quickly set the whole screen color attributes (and set the attributes for now on)
+    \param colour Is the full attribute byte
+    \note This is the equivalent of the newlib function zx_cls_attr()
+*/
+extern void  __LIB__  zx_colour(uint colour);
+extern void  __LIB__  zx_colour_fastcall(uint colour) __z88dk_fastcall;
+#define zx_colour(a) zx_colour_fastcall(a)
+
+
+// Change the ink attr from now on
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
-extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
+extern void zx_setink(uint i);
+extern void __LIB__ zx_setink_fastcall(uint i) __z88dk_fastcall;
+#define zx_setink(i) zx_setink_fastcall(i)
+
 // Change the paper attr from now on
-// i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-#define zx_setink(i) fputc_cons(16); fputc_cons(48 + i)
-// Change the paper attr from now on
-// p can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-#define zx_setpaper(p) fputc_cons(17); fputc_cons(48 + p)
+// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPERWHITE
+extern void zx_setpaper(uint p);
+extern void __LIB__ zx_setpaper_fastcall(uint p) __z88dk_fastcall;
+#define zx_setpaper(p) zx_setpaper_fastcall(p)
+
+
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __smallc;
 extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __smallc;
@@ -440,6 +536,55 @@ extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88
 // Print a string on the screen
 extern int __LIB__ zx_printf(char *fmt, ...);
 
+
+extern void __LIB__ zx_scroll_up(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_up_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_up(a,b) zx_scroll_up_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_up_attr(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_up_attr_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_up_attr(a,b) zx_scroll_up_attr_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_up_pix(unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ zx_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define zx_scroll_up_pix(a,b) zx_scroll_up_pix_callee(a,b)
+
+
+// Rectangle bounded functions
+extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ zx_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __smallc __z88dk_callee;
+#define zx_cls_wc(a,b) zx_cls_wc_callee(a,b)
+
+
+extern void __LIB__ zx_cls_wc_attr(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ zx_cls_wc_attr_callee(struct r_Rect8 *r,unsigned char attr) __smallc __z88dk_callee;
+#define zx_cls_wc_attr(a,b) zx_cls_wc_attr_callee(a,b)
+
+
+extern void __LIB__ zx_cls_wc_pix(struct r_Rect8 *r,unsigned char pix) __smallc;
+extern void __LIB__ zx_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __smallc __z88dk_callee;
+#define zx_cls_wc_pix(a,b) zx_cls_wc_pix_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_wc_up(a,b,c) zx_scroll_wc_up_callee(a,b,c)
+
+
+extern void __LIB__ zx_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ zx_scroll_wc_up_attr_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define zx_scroll_wc_up_attr(a,b,c) zx_scroll_wc_up_attr_callee(a,b,c)
+
+
+extern void __LIB__ zx_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ zx_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define zx_scroll_wc_up_pix(a,b,c) zx_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+
 // In the following, screen address refers to a pixel address within the display file while
 // attribute address refers to the attributes area.
 //
@@ -461,17 +606,14 @@ extern int __LIB__ zx_printf(char *fmt, ...);
 // zx_saddr2cy(saddr) will return the character y coordinate corresponding to the given screen address
 // zx_saddr2aaddr(saddr) will return the attribute address corresponding to the given screen address
 // zx_pxy2aaddr(px,py) will return the attribute address corresponding to the given (x,y) pixel coordinate
-//
-// Some functions will return with carry flag set if coordinates or addresses move out of
-// bounds.  In these cases the special z88dk keywords iferror() and ifnerror() can be used
-// to test the carry flag and determine if invalid results are returned.  Check with the
-// wiki documentation or the asm source files to see which functions support this.  If
-// comments in the asm source file do not mention this it is not supported.
 
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 
 extern uchar __LIB__              *zx_cxy2saddr(uchar row, uchar col) __smallc;
 extern uchar __LIB__  *zx_cy2saddr(uchar row) __z88dk_fastcall;           // cx assumed 0
+
+
+extern unsigned char __LIB__ zx_px2bitmask(unsigned char x) __z88dk_fastcall;
 
 extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord) __smallc;
 extern uchar __LIB__  *zx_py2saddr(uchar ycoord) __z88dk_fastcall;        // px assumed 0
@@ -535,6 +677,12 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 #define zx_cyx2aaddr(a,b)          zx_cxy2aaddr_callee(b,a)
 #define zx_cxy2aaddr(a,b)          zx_cxy2aaddr_callee(a,b)
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
+
+// graphics
+
+extern int __LIB__ zx_pattern_fill(unsigned char x,unsigned char y,void *pattern,unsigned int depth) __smallc;
+extern int __LIB__ zx_pattern_fill_callee(unsigned char x,unsigned char y,void *pattern,unsigned int depth) __smallc __z88dk_callee;
+#define zx_pattern_fill(a,b,c,d) zx_pattern_fill_callee(a,b,c,d)
 
 
 /* Interrupt handling */

@@ -296,11 +296,20 @@ ENDIF
     ; Expose to appmake
     PUBLIC __crt_z88_safedata
     defc __crt_z88_safedata = 120 + CRT_Z88_SAFEDATA
-    defc __crt_org_bss = $1ffD - 100 ; __crt_z88_safedata
+    defc __crt_org_bss = $1ffD - __crt_z88_safedata
+    
 
+IF CLIB_NEED_ZXSCREEN
+  ;; The ZX screen has to go on an 8k boundary
+  ;; As a result it's incompatible with farheap (unless we do a bit more work)
+  IF DEFINED_farheapsz
+    defs    ZXSCREEN_INCOMATIBLE_WITH_FARHEAP
+  ELSE
+    defc __crt_org_bss_fardata_start = 8192 + 6912
+  ENDIF
+ELSE
     ; We have to get user variables to start at 0x2000, and far
     ; data at 8192 to match up with CamelForth
-IF CRT_Z88_SAFEDATA = 0
     defc __crt_org_bss_fardata_start = 8192
 ENDIF
     INCLUDE "crt/classic/crt_section.inc"

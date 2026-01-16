@@ -13,7 +13,7 @@
 ;
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  respixel
@@ -24,10 +24,10 @@
 
 respixel:
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                          ; y0	out of range
 
     dec     a
@@ -61,7 +61,7 @@ respixel:
     ld      b, a                        ; keep y/3
     and     a
 
-    ld      de, maxx/2
+    ld      de, _GFX_MAXX/2
 			;dec	a
     jr      z, r_zero
 r_loop:

@@ -108,6 +108,20 @@ extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __smallc __
 extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __smallc __z88dk_fastcall;
 extern unsigned long __LIB__ intrinsic_swap_word_32(unsigned long n) __smallc __z88dk_fastcall;
 
+#ifdef __SDCC
+
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
+#endif
+
+#ifdef __SCCZ80
+
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
+#endif
+
 #ifdef __Z180
 extern void __LIB__ intrinsic_slp(void) __smallc;
 #endif

@@ -16,12 +16,12 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___putsprite
     EXTERN  w_pixeladdress
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
     EXTERN  base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -61,8 +61,8 @@ ___putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
   ENDIF                                 ; @@@@@@@@@@@@
     ld      h, b
     ld      l, c
@@ -212,7 +212,7 @@ _evenrow2:
 
     pop     bc                          ;Restore data
     djnz    woloop
-  IF    NEED_swapgfxbk
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     pop     ix

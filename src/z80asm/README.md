@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2024
 
 Repository
 ----------
-Repository: <z88dk.cvs.sourceforge.net:/cvsroot/z88dk>
+Repository: <https://github.com/z88dk/z88dk.git>
 
 License
 -------
@@ -46,23 +46,3 @@ TODO List
 - add high level constructs (IF flag / ELSE / ENDIF, 
   DO WHILE flag, ...)
 - add a rule based optimizer based on RAGEL as a state machine generator
-
-Differences to z88dk-z80asm
----------------------------
-- Errors are only output on stderr, *.err files are not created.
-  *.err files are a leftover from operating systems that could not
-  redirect standard error.
-
-  Fatal errors example:  
-```
-  x.cc:1:18: fatal error: nofile: No such file or directory  
-    \#include "nofile"  
-    ------------------^  
-  compilation terminated.
-```
-
-  Non-fatal errors example:  
-```
-  x.cc:1:7: error: expected initializer before 'b'  
-    int a b  
-    -------^ 

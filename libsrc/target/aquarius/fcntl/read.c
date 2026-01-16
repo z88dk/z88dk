@@ -43,13 +43,15 @@ not_failed:
     ld      l,a
     ; And fill buffer for offered length
 loop:
+    ld      a, b
+    or      c
+    jr      z, read_done
     call    __esp_read_byte
     ld      (hl),a
     inc     hl
     dec     bc
-    ld      a,b
-    or      c
-    jr      nz,loop
+    jr      loop
+read_done:
     pop     hl      ;amount read
     ret
 #endasm

@@ -109,6 +109,11 @@ extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smal
 #endif
 
 
+/* Generic version, DAC output port must be specified */
+
+extern void __LIB__ playzb4_dac(unsigned char *SamStart, unsigned int SamLen, unsigned int dacport) __smallc;
+
+
 /* DATA Load/Save - ZX Spectrum style */
 
 extern int  __LIB__            bit_save_zx(char *name, size_t loadstart,void *start, size_t len) __smallc;
@@ -133,6 +138,15 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
 #define bit_save_msx(a,b,c,d,e) bit_save_msx_callee(a,b,c,d,e)
 
 
+
+/* DATA Save - NASCOM NAS-SYS FORMAT (CUTS encoding) */
+
+extern int  __LIB__            bit_save_nassys(size_t loadstart, size_t loadend) __smallc;
+extern int  __LIB__  bit_save_nassys_callee(size_t loadstart, size_t loadend) __smallc __z88dk_callee;
+
+#define bit_save_nassys(a,b) bit_save_nassys_callee(a,b)
+
+
 /* bit_load_*() work on a limited number of targets, (not on the Spectravideo SVI) */
 /* Known working targets:  MSX, Aquarius, ZX Spectrum (SAM, etc..) */
 
@@ -148,7 +162,11 @@ extern int  __LIB__  bit_load_vg5000(char *name, void *loadstart, size_t len) __
 /* It should be possible to get stream data created by:  MSX, SVI, Philips VG-5000, Sega SC-3000 and many others */
 /* Supported by few z88dk targets only  */
 
-/* Open tape device for input and sync with the carrier tone */
+/* Open tape device for input and start the tape motor */
+/* 0..256 = sync speed, -1=sync failed */
+extern int  __LIB__  bit_tapion_motor(void);
+
+/* Open tape device for input, start tape and sync with the carrier tone */
 /* 0..256 = sync speed, -1=sync failed */
 extern int  __LIB__  bit_tapion(void);
 

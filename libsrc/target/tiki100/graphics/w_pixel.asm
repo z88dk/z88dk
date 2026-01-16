@@ -5,8 +5,8 @@
     EXTERN  getmaxy
     EXTERN  getmaxx
     EXTERN  l_graphics_cmp
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
     EXTERN  generic_console_get_mode
     EXTERN  __gfx_coords
 
@@ -18,7 +18,7 @@
 ; Define NEEDxxx before including
 
     push    hl                          ;save x
-    call    getmaxy                     ;hl = maxy
+    call    getmaxy                     ;hl = _GFX_MAXY
     inc     hl
     call    l_graphics_cmp
     pop     hl
@@ -63,7 +63,7 @@ rotated:
 ; c = byte holding pixel mask
 ; d = ink to use
 ; hl = address
-    call    swapgfxbk
+    call    __gfx_vram_page_in
   IF    NEEDplot
     ld      a, (hl)
     and     c
@@ -93,6 +93,6 @@ do_xor_plot:
     cpl
     and     (hl)
   ENDIF
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     bc                          ;Restore callers
     ret

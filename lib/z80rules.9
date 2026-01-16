@@ -244,3 +244,7 @@
 	call	intrinsic_swap_word_32
 =
 	ex	de,hl
+
+	call	_intrinsic_emit_%1
+=
+	defb	%1

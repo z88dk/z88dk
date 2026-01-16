@@ -4,7 +4,7 @@
 ;	Ported by Stefano Bodrato
 ;
 ;	Feb 2000 - Platform dependent stack usage
-;		   Stack usage should be maxy*8 (512 bytes for the Z88)
+;		   Stack usage should be _GFX_MAXY*8 (512 bytes for the Z88)
 ;
 ;	Since some platform (expecially the TI83) has very little stack space,
 ;	we undersize it; this will cause a crash if a big area is filled.
@@ -12,7 +12,7 @@
 ;	$Id: dfill.asm,v 1.4 2016-06-21 20:16:35 dom Exp $
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_clib
     PUBLIC  do_fill
@@ -29,7 +29,7 @@
 
 
 do_fill:
-    ld      hl, -maxy*3                 ; create buffer 1 on stack
+    ld      hl, -_GFX_MAXY*3                 ; create buffer 1 on stack
     add     hl, sp                      ; The stack size depends on the display height.
     ld      sp, hl                      ; The worst case is when we paint a blank
     push    hl                          ; display starting from the center.
@@ -39,7 +39,7 @@ do_fill:
     ld      (hl), e
     inc     hl
     ld      (hl), 255
-    ld      hl, -maxy*3                 ; create buffer 2 on stack
+    ld      hl, -_GFX_MAXY*3                 ; create buffer 2 on stack
     add     hl, sp
     ld      sp, hl
 loop:
@@ -55,7 +55,7 @@ loop:
     pop     af
 
     jr      nz, loop
-    ld      hl, maxy*6                  ; restore the stack pointer (parm*2)
+    ld      hl, _GFX_MAXY*6                  ; restore the stack pointer (parm*2)
     add     hl, sp
     ld      sp, hl
     ret
@@ -84,7 +84,7 @@ next:
 l1:
     ld      a, b
 
-    cp      maxy-1
+    cp      _GFX_MAXY-1
     jr      z, l2
 
     inc     b
@@ -105,7 +105,7 @@ l3:
     pop     bc
 
     ld      a, c
-    cp      maxx-1
+    cp      _GFX_MAXX-1
     jr      z, l4
 
     inc     c

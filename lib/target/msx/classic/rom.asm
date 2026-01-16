@@ -26,6 +26,9 @@ IFNDEF CRT_ORG_CODE
 ENDIF
     org   CRT_ORG_CODE
 
+IF CRT_MSX_CUSTOM_HEADER
+    INCLUDE "msx_rom_header.asm"
+ELSE
 ; ROM header
     defm    "AB"
     defw    start
@@ -33,6 +36,8 @@ ENDIF
     defw    0		;Device handler
     defw    0		;basic
     defs    6
+ENDIF 
+
 
 start:
     di

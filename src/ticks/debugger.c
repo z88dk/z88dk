@@ -578,7 +578,7 @@ void debugger()
 {
 	static FILE *script_file = NULL;
     static char *last_line = NULL;
-    static char buf[2048];
+    static char buf[16384];
     char prompt[300];
     char *line;
 
@@ -642,7 +642,12 @@ void debugger()
                 }
 
                 if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
-                    bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                    if (elem->auto_remove) {
+                        bk.console("Hit breakpoint (temp): @%04x (%s)\n",bk.pc(),resolve_to_label(bk.pc()));
+                        delete_breakpoint(elem);
+                    } else {
+                        bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                    }
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue ) {
@@ -1689,7 +1694,7 @@ static int cmd_break(int argc, char **argv)
         int value = parse_address(argv[1], &corrected_source);
 
         if ( value != -1 ) {
-            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL);
+            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL, 0);
             bk.console("Adding breakpoint at '%s' $%04x (%s)\n", corrected_source, value,  resolve_to_label(value));
         } else {
             bk.console("Cannot break on '%s'\n", corrected_source);
@@ -1726,7 +1731,7 @@ static int cmd_break(int argc, char **argv)
         int value = parse_address(argv[2], NULL);
 
         if ( value != -1 ) {
-            breakpoint *elem = add_breakpoint(BREAK_CHECK8, BK_BREAKPOINT_WATCHPOINT, 1, value, strdup(argv[2]));
+            breakpoint *elem = add_breakpoint(BREAK_CHECK8, BK_BREAKPOINT_WATCHPOINT, 1, value, strdup(argv[2]), 0);
             elem->lvalue = parse_number(argv[4], &end);
             bk.console("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
         }
@@ -1736,7 +1741,7 @@ static int cmd_break(int argc, char **argv)
 
         if ( addr != -1 ) {
             int value = parse_number(argv[4],&end);
-            breakpoint *elem = add_breakpoint(BREAK_CHECK16, BK_BREAKPOINT_WATCHPOINT, 2, 0, strdup(argv[2]));
+            breakpoint *elem = add_breakpoint(BREAK_CHECK16, BK_BREAKPOINT_WATCHPOINT, 2, 0, strdup(argv[2]), 0);
             elem->lcheck_arg = addr;
             elem->lvalue = value % 256;
             elem->hcheck_arg = addr+1;
@@ -1757,7 +1762,7 @@ static int cmd_break(int argc, char **argv)
 
         if ( search->name != NULL ) {
             int value = atoi(argv[4]);
-            breakpoint *elem = add_breakpoint(BREAK_REGISTER, BK_BREAKPOINT_REGISTER, 1, search_idx, strdup(argv[2]));
+            breakpoint *elem = add_breakpoint(BREAK_REGISTER, BK_BREAKPOINT_REGISTER, 1, search_idx, strdup(argv[2]), 0);
             elem->lcheck_arg = search_idx;
             elem->lvalue = (value % 256);
             elem->hvalue = (value % 65536) / 256;
@@ -2076,7 +2081,7 @@ static int cmd_restore_pc(int argc, char **argv)
         return 0;
     }
 
-    if (bk.restore(argv[1], address, 0))
+    if (bk.restore(argv[1], address, 1))
     {
         return 0;
     }
@@ -2138,7 +2143,7 @@ static int cmd_list(int argc, char **argv)
 
 static void print_hotspots(void)
 {
-    static char buf[2048];
+    static char buf[16384];
     int i;
     FILE  *fp;
 

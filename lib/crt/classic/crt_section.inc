@@ -29,11 +29,11 @@ crt0_init:
 IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     ; Setup std* streams
     ld      hl,__sgoioblk+2
-    ld      (hl),19 ;stdin
+    ld      (hl),18 ;stdin
     ld      hl,__sgoioblk+12
-    ld      (hl),21 ;stdout
+    ld      (hl),20 ;stdout
     ld      hl,__sgoioblk+22
-    ld      (hl),21 ;stderr
+    ld      (hl),20 ;stderr
 ENDIF
     INCLUDE "crt/classic/crt_copy_data_section.inc"
 

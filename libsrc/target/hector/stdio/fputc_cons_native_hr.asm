@@ -13,7 +13,7 @@ EXTERN  asm_toupper
 
 INCLUDE "target/hector/def/hector1.def"
 
-INCLUDE "graphics/grafix.inc"
+INCLUDE "classic/gfx/grafix.inc"
 
 fputc_cons_native:
 _fputc_cons_native:
@@ -37,9 +37,9 @@ dolf:
     ld      a,l
     add     8
     ld      l,a
-    cp      maxy
+    cp      _GFX_MAXY
     jr      c,continue
-    ld      h,maxy - 8
+    ld      h,_GFX_MAXY - 8
 continue:
     ld      (putc_coords),hl
     ld      (IO_MODE_HR_VRAM),a

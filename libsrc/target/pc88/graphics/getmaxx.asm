@@ -1,4 +1,4 @@
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
     MODULE  pc88_getmaxx

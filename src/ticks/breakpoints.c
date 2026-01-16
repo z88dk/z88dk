@@ -30,13 +30,14 @@ breakpoint* add_watchpoint(breakpoint_type operation, int value) {
 }
 
 breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, 
-    int bk_size, int value, const char* text) {
+    int bk_size, int value, const char* text, uint8_t temporary) {
     breakpoint* elem = calloc(1, sizeof(breakpoint));
 
     elem->number = next_breakpoint_number++;
     elem->type = type;
     elem->value = value;
     elem->enabled = 1;
+    elem->auto_remove = temporary;
     elem->text = NULL;
     LL_APPEND(breakpoints, elem);
 

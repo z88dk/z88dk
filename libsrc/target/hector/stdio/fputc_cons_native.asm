@@ -14,7 +14,7 @@ EXTERN  asm_toupper
 
 INCLUDE "target/hector/def/hector1.def"
 
-INCLUDE "graphics/grafix.inc"
+INCLUDE "classic/gfx/grafix.inc"
 
 
 
@@ -45,9 +45,9 @@ dolf:
     ld      a,l
     add     6
     ld      l,a
-    cp      maxy
+    cp      _GFX_MAXY
     jr      c,continue
-    ld      l,maxy - 6
+    ld      l,_GFX_MAXY - 6
 continue:
     ld      (putc_coords),hl
     ret

@@ -53,5 +53,8 @@ msxbios:
     ei                  ; make sure interrupts are enabled
     ret
 
+    SECTION UNASSIGNED
+    org     0
+
 
 

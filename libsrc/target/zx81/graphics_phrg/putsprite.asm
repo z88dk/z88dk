@@ -20,7 +20,7 @@
 
     EXTERN  base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  pixeladdress
     EXTERN  __pixeladdress_hl
@@ -29,7 +29,7 @@
     EXTERN  pix_return_pixelbyte
 
 
-;	EXTERN  swapgfxbk
+;	EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
 
@@ -73,7 +73,7 @@ _putsprite:
 
     ld      (actcoord), hl              ; save current coordinates
 
-	;call    swapgfxbk
+	;call    __gfx_vram_page_in
     call    pixeladdress
 
     ld      hl, offsets_table

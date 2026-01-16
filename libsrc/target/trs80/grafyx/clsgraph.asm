@@ -10,7 +10,7 @@
     PUBLIC  clg
     PUBLIC  _clg
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 clsgraph:
@@ -20,7 +20,7 @@ _clg:
     ld      a, 255
     out     (131), a                    ; enable graphics page
 
-    ld      hl, maxx
+    ld      hl, _GFX_MAXX
     srl     h                           ;hl = x / 8
     rr      l
     srl     h
@@ -32,7 +32,7 @@ _clg:
     xor     a
 
 clsloop:
-    ld      e, maxy
+    ld      e, _GFX_MAXY
 clsloop2:
 
     inc     bc

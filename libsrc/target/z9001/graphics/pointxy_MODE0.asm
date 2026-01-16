@@ -18,4 +18,4 @@ pointxy_MODE0:
 
     defc    NEEDpoint=1
     defc    WIDE_GFX=1
-    INCLUDE "gfx/gencon/pixel.inc"
+    INCLUDE "classic/gfx/gencon/pixel.inc"

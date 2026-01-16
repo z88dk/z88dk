@@ -22,7 +22,7 @@ jobs:
     - name: Install perl prerequisites
       run: |
         perl -S cpan App::cpanminus
-        perl -S cpanm App::Prove Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+        perl -S cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
     - name: Checkout from git
       uses: actions/checkout@v4
       with: 
@@ -51,12 +51,17 @@ jobs:
         copy /y win32-latest\z88dk\lib\clibs\*.lib lib\clibs\
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sccz80\*.lib libsrc\_DEVELOPMENT\lib\sccz80\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_ix\*.lib libsrc\_DEVELOPMENT\lib\sdcc_ix\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_iy\*.lib libsrc\_DEVELOPMENT\lib\sdcc_iy\
+        copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
+        copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
     - name: Run z80asm tests
       run: |
         cd src\z80asm
+        set PATH=%RUNNER_WORKSPACE%\z88dk\bin;%PATH%
+        set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\lib\config
+        perl -S prove t\*.t
+    - name: Run ucpp tests
+      run: |
+        cd src\ucpp
         set PATH=%RUNNER_WORKSPACE%\z88dk\bin;%PATH%
         set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\lib\config
         perl -S prove t\*.t

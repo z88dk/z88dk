@@ -24,6 +24,7 @@
 
     EXTERN  sharpmz_from_ascii
     EXTERN  sharpmz_to_ascii
+    EXTERN  conio_map_colour
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
 
@@ -49,6 +50,7 @@ generic_console_set_attribute:
     ret
 
 generic_console_set_ink:
+    call    conio_map_colour
     and     7
     rla
     rla
@@ -63,6 +65,7 @@ generic_console_set_ink:
 
 
 generic_console_set_paper:
+    call    conio_map_colour
     and     7
     ld      e, a
     ld      a, (__sharpmz_attr)

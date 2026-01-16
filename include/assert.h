@@ -19,11 +19,13 @@
 #ifndef __ASSERT_H__
 #define __ASSERT_H__
 
-#include <sys/compiler.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef NDEBUG
-__ZPROTO3(void,,l_assert,int,line,const char *,file, const char *,msg)
-#define assert(exp)     if((exp==0)) {l_assert(__LINE__, __FILE__, #exp );}
+#define __assert_s(s)       #s
+#define __assert_i(s)       __assert_s(s)
+#define assert(exp)         if (!(exp))  { fputs(__FILE__ " line " __assert_i(__LINE__) ": assert(" __assert_s(exp) ") failed\n", stderr); abort(); }
 #else
 #define assert(exp)
 #endif /* NDEBUG */

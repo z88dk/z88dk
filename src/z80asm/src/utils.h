@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -60,3 +60,6 @@ string int_to_hex(T i, int width) {
         << std::hex << i << std::dec;
     return ss.str();
 }
+
+std::string pop_end_slash(std::string path);
+std::string join_dir(const std::string& a, const std::string& b);

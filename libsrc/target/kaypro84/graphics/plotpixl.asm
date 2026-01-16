@@ -12,51 +12,51 @@
 ;
 
 
-			INCLUDE	"graphics/grafix.inc"
+	INCLUDE	"classic/gfx/grafix.inc"
 
-			SECTION code_clib
-			PUBLIC	plotpixel
+        SECTION code_clib
+        PUBLIC  plotpixel
 
-			EXTERN	div3
-			EXTERN	__gfx_coords
-			EXTERN	base_graphics
+        EXTERN  div3
+        EXTERN  __gfx_coords
+        EXTERN  base_graphics
 
-.plotpixel
-			ld	a,h
-			cp	maxx
-			ret	nc
-			ld	a,l
-			cp	maxy
-			ret	nc		; y0	out of range
-			
-			push bc
+plotpixel:
+        ld      a, h
+        cp      _GFX_MAXX
+        ret     nc
+        ld      a, l
+        cp      _GFX_MAXY
+        ret     nc                      ; y0	out of range
 
-			ld	(__gfx_coords),hl
-			push hl
-			push hl
+        push    bc
 
-			ld	e,27
-			ld	c,2
-			call	5
-			
-			ld	e,'*'
-			ld	c,2
-			call	5
-			
-			pop hl
-			ld	a,l	; vertical
-			add 32
-			ld	e,a
-			ld	c,2
-			call	5
+        ld      (__gfx_coords), hl
+        push    hl
+        push    hl
 
-			pop hl
-			ld	a,h	; horizontal
-			add 32
-			ld	e,a
-			ld	c,2
-			call	5
-			
-			pop bc
+        ld      e, 27
+        ld      c, 2
+        call    5
 
-			ret
+        ld      e, '*'
+        ld      c, 2
+        call    5
+
+        pop     hl
+        ld      a, l                    ; vertical
+        add     32
+        ld      e, a
+        ld      c, 2
+        call    5
+
+        pop     hl
+        ld      a, h                    ; horizontal
+        add     32
+        ld      e, a
+        ld      c, 2
+        call    5
+
+        pop     bc
+
+        ret

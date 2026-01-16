@@ -1,4 +1,4 @@
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
     EXTERN  __rx78_ink
@@ -12,13 +12,13 @@
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including
 
-IF  maxx<>256
+IF  _GFX_MAXX<>256
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
 ENDIF
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc
 
     ld      (__gfx_coords), hl

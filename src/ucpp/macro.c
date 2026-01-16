@@ -275,6 +275,26 @@ static void print_macro(void *vm)
 }
 
 /*
+ * Called before any character is actually being put into output.
+ * Is the line number differs between input and output too much (due to #ifdef checks)
+ * instead generating \n, it inserts #line markers
+ */
+void yield_newlines(struct lexer_state *ls)
+{
+	if (!(ls->flags & KEEP_OUTPUT)) {
+		return;
+	}
+	if (ls->line > ls->oline + 10) {
+	    print_line_info(ls, ls->flags);
+	    ls->oline = ls->line;
+	} else {
+        while ( ls->oline < ls->line ) {
+            put_char_direct(ls, '\n');
+        }
+	}
+}
+
+/*
  * Send a token to the output (a token_fifo in lexer mode, the output
  * buffer in stand alone mode).
  */
@@ -295,9 +315,6 @@ void print_token(struct lexer_state *ls, struct token *t, long uz_line)
 			TOKEN_LIST_MEMG);
 		return;
 	}
-	if (ls->flags & KEEP_OUTPUT) {
-		for (; ls->oline < ls->line;) put_char(ls, '\n');
-	}
 	if (!S_TOKEN(t->type)) x = operators_name[t->type];
 	for (; *x; x ++) put_char(ls, *x);
 }
@@ -310,16 +327,23 @@ static void print_token_nailed(struct lexer_state *ls, struct token *t,
 	long nail_line)
 {
 	char *x = t->name;
+    int line_offs = 0;
 
+    // If this macro is at the end of the line, then we've incremented linecount
+    // To avoid printing a newline before this macro, decrement line count and then
+    // increment after printing
+    if ( ls->tknl ) {
+        ls->line--;
+        line_offs = 1;
+    }
 	if (ls->flags & LEXER) {
 		print_token(ls, t, 0);
+        if ( line_offs) ls->line++;
 		return;
-	}
-	if (ls->flags & KEEP_OUTPUT) {
-		for (; ls->oline < nail_line;) put_char(ls, '\n');
 	}
 	if (!S_TOKEN(t->type)) x = operators_name[t->type];
 	for (; *x; x ++) put_char(ls, *x);
+    if ( line_offs) ls->line++;
 }
 
 /*

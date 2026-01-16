@@ -14,10 +14,10 @@
     EXTERN  leftbitmask
     EXTERN  rightbitmask
     EXTERN  l_cmp
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
     EXTERN  w_pixeladdress
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 clga_callee:
@@ -26,7 +26,7 @@ _clga_callee:
     pop     af  ; ret addr
     pop     de  ; tly2
     pop     hl  ; tlx2
-    exx                                 ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    exx                                 ; w_plotpixel and __gfx_vram_page_in must not use the alternate registers, no problem with w_line_r
     pop     de  ; tly1
     pop     hl  ; tlx1
     push    af                          ; ret addr
@@ -35,8 +35,8 @@ _clga_callee:
 asm_clga:
 
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
   ENDIF
 
 ;    push    hl           ; width
@@ -46,12 +46,12 @@ asm_clga:
     exx  ; hl=x
          ; de=y
 
-    ld      a,h                         ; chech for maxx
+    ld      a,h                         ; chech for _GFX_MAXX
     and     a
     jp      nz, __graphics_end          ; Return if Y overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows
@@ -75,12 +75,12 @@ asm_clga:
     add     hl,bc
     ex      de,hl
     
-    ld      a,h                         ; chech for maxx
+    ld      a,h                         ; chech for _GFX_MAXX
     and     a
     jp      nz, __graphics_end          ; Return if Y overflows
     
     push    hl
-    ld      hl, maxy
+    ld      hl, _GFX_MAXY
     call    l_cmp
     pop     hl
     jp      nc, __graphics_end          ; Return if Y overflows

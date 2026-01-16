@@ -2,7 +2,7 @@
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __MODE1_attr
 
@@ -10,10 +10,10 @@
 ; Define NEEDxxx before including
 
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc
     ld      (__gfx_coords), hl
     push    bc                          ;Save callers value

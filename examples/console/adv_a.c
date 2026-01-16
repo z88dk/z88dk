@@ -58,6 +58,7 @@
 /* Only a limited set of targets is supported for data input and no border flashing happens during LOAD/SAVE operations */
 
 #include <sound.h>
+
 #ifdef ZXTAPE
 #undef tape_load_block
 #undef tape_save_block
@@ -65,6 +66,12 @@
 #define tape_save_block bit_save_block_zx
 #endif
 
+#ifdef MSXTAPE
+#undef tape_load_block
+#undef tape_save_block
+#define tape_save_block(a,b,c) strncpy(strTokenBuf, "GAME00", 6);strTokenBuf[5]='0'+c;bit_save_msx(strTokenBuf,a,a,a,b)
+#define tape_load_block(a,b,c) strncpy(strTokenBuf, "GAME00", 6);strTokenBuf[5]='0'+c;bit_load_msx(strTokenBuf,a,b)
+#endif
 
 
 #ifdef PICS

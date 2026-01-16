@@ -18,8 +18,8 @@
 
     EXTERN  gr_setpalette
     EXTERN  gr_vscroll
-    EXTERN  swapgfxbk
-    EXTERN  swapgfxbk1
+    EXTERN  __gfx_vram_page_in
+    EXTERN  __gfx_vram_page_out
 
     defc    SCREEN_LAST_ROW=$7c00
 
@@ -61,7 +61,7 @@ not_udg:
     rlca
     sbc     a
     ld      c, a
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     call    generic_console_get_mode
     ex      af, af
     ld      b, 8
@@ -96,7 +96,7 @@ printc_1:
     pop     bc
     djnz    printc_1
 printc_cleanup:
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
 	; And cleanup the buffer
     ld      hl, 8
     add     hl, sp
@@ -224,13 +224,13 @@ generic_console_scrollup:
     push    de
     ld      a, -8
     call    gr_vscroll
-    call    swapgfxbk
+    call    __gfx_vram_page_in
     ld      hl, SCREEN_LAST_ROW
     ld      de, SCREEN_LAST_ROW+1
     ld      (hl), 0
     ld      bc, 1023
     ldir
-    call    swapgfxbk1
+    call    __gfx_vram_page_out
     pop     de
     pop     bc
     ret

@@ -1,0 +1,8 @@
+# Seiko MAP-1010 is just a few overrides on PHC-25
+# essentially the keyboard is handled differently
+
+target/map1010/input/in_Inkey
+target/map1010/input/in_KeyPressed
+target/map1010/input/in_keytranstbl
+target/map1010/input/in_LookupKey
+target/map1010/games/keys_joystick

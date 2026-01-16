@@ -13,9 +13,17 @@
     PUBLIC  fgetc_cons
     PUBLIC  _fgetc_cons
 
+    INCLUDE "target/x07/def/x07.h"
+
 fgetc_cons:
 _fgetc_cons:
     xor     a
     call    $C90A
     jr      z, fgetc_cons
+    ld      l,a
+    ld      h,0
+    push    hl
+    ld      a,SUB_KBD_CLEAR
+    call    SUB_EXEC_CMD
+    pop     hl
     ret

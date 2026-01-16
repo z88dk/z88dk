@@ -1,12 +1,12 @@
 target/nascom/stdio/generic_console
-@stdio/stdio.lst
+@classic/stdio/stdio.lst
 target/nascom/stdio/ansi/f_ansi_attr
 target/nascom/stdio/ansi/f_ansi_bel_cpm
 target/nascom/stdio/ansi/f_ansi_char
 target/nascom/stdio/ansi/f_ansi_cls
-stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
+classic/stdio/obj/${TYPE}/ansi/generic/f_ansi_dline
 target/nascom/stdio/ansi/f_ansi_scrollup
 target/nascom/graphics/textpixl6
-@stdio/ansicore.lst
-@gfx/gencon/gfx_gencon6.lst
-@games/games.lst
+@classic/stdio/ansicore.lst
+@classic/gfx/gencon/gfx_gencon6.lst
+@classic/games/games.lst

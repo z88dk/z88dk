@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -30,9 +30,14 @@ OPT("-m4", "[=]OPTIONS", m4_options += opt_arg + " ", "Pass options to the m4 su
 
 OPT_HEADER("Code Generation Options:")
 OPT("-m", "[=]CPU", set_cpu(opt_arg), "Assemble for the specified CPU, default z80, one of:" \
-	HELP_CONTINUE "*, z80, z80_strict, z180, ez80_z80, ez80, z80n, gbz80," \
-	HELP_CONTINUE "r2ka, r3k, r4k, r5k, 8080, 8080_strict, 8085, 8085_strict, " \
-    HELP_CONTINUE "r800, kc160, kc160_z80, ti83, ti83plus")
+	HELP_CONTINUE "*, 8080, 8080_strict, 8085, 8085_strict, " \
+	HELP_CONTINUE "ez80, ez80_strict, ez80_z80, ez80_z80_strict, " \
+	HELP_CONTINUE "gbz80, gbz80_strict, " \
+	HELP_CONTINUE "kc160, kc160_strict, kc160_z80, kc160_z80_strict, " \
+	HELP_CONTINUE "r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, " \
+	HELP_CONTINUE "r5k, r5k_strict, r6k, r6k_strict, " \
+	HELP_CONTINUE "r800, r800_strict, " \
+	HELP_CONTINUE "z180, z180_strict, z80, z80_strict, z80n, z80n_strict")
 OPT("-no-synth", nullptr, m_no_synth = true, "Do not assemble synthetic opcodes")
 OPT("-float", "[=]FORMAT", set_float_option(opt_arg), "Set default float format, one of:" \
 	HELP_CONTINUE "genmath, math48, ieee16, ieee32, ieee64," \

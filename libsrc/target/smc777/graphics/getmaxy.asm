@@ -7,7 +7,7 @@
     EXTERN  __smc777_mode
 
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 getmaxy:
 _getmaxy:

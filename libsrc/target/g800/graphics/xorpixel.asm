@@ -7,7 +7,7 @@
     EXTERN  setx
     EXTERN  getpat
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     EXTERN  __gfx_coords
 
@@ -15,11 +15,11 @@
 xorpixel:
 
     ld      a, h
-    cp      maxx
+    cp      _GFX_MAXX
     ret     nc
 
     ld      a, l
-    cp      maxy
+    cp      _GFX_MAXY
     ret     nc                       ; y0 out of range
 
     ld      (__gfx_coords), hl

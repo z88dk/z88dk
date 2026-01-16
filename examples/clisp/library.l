@@ -1,7 +1,7 @@
 ;;;; 
 ;;;; Campus LIsP function lib
 ;;;; 
-;;;; $Id: library.l,v 1.6 2015-04-22 17:37:01 stefano Exp $
+;;;; $Id: library.l $
 
 
 ; factorial example, for comparison to 'minimalistic'
@@ -443,6 +443,16 @@
     (t 
         (assv obj (cdr alist))))) 
 
+; get - retrive the value associated with a given key
+;       in a property list
+;
+;  ] (setq my-plist '((name John) (age 30) (city York)))
+;  ] (get 'age my-plist)
+;  (30)
+;
+(defun get (object alist)
+  (cond ((null (assv object alist)) nil) (t
+  (cdr (assv object alist)) )))
 
 ; sort and splice make up a sorting utility.
 ; ex: (sort '(3 6 7 1 9) '<) => (1 3 6 7 9).

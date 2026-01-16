@@ -1,0 +1,13 @@
+classic/gfx/portable/obj/${TYPE}/commondraw
+classic/gfx/portable/obj/${TYPE}/w_commondrawr
+classic/gfx/portable/obj/${TYPE}/w_commondrawto
+classic/gfx/portable/obj/${TYPE}/draw
+classic/gfx/portable/obj/${TYPE}/drawr
+classic/gfx/portable/obj/${TYPE}/drawto
+classic/gfx/portable/obj/${TYPE}/linedraw
+classic/gfx/portable/obj/${TYPE}/undraw
+classic/gfx/portable/obj/${TYPE}/undrawr
+classic/gfx/portable/obj/${TYPE}/undrawto
+classic/gfx/portable/obj/${TYPE}/xordraw
+classic/gfx/portable/obj/${TYPE}/xordrawr
+classic/gfx/portable/obj/${TYPE}/xordrawto

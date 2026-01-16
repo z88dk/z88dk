@@ -54,45 +54,45 @@ struct fcb {
     uint8_t drive;          /* drive code */
     char    name[8];        /* file name */
     char    ext[3];         /* file type */
-    uint8_t extent;         /* file extent */
-    char    filler[2];      /* not used */
-    char    records;        /* number of records in present extent */
+    uint8_t extent;         /* file extent (EX) */
+    char    s1;             /* reserved (S1) */
+    char    s2;             /* module number, extent high byte (S2) */
+    char    records;        /* number of records in present extent (RC) */
     char    discmap[16];    /* CP/M disc map */
-    char    next_record;    /* next record to read or write */
-    uint8_t ranrec[3];      /* random record number (24 bit no. ) */
-    
+    char    current_record; /* next record to read or write (CR) */
+    uint8_t ranrec[3];      /* random record number (24 bit no. ) (R0, R1, R2) */
 
     /* Below here is used by the library */
     // 7 bytes used by the library
     unsigned long rwptr;    /* read/write pointer in bytes */
-    uint8_t    use;            /* use flag */
-    uint8_t    uid;            /* user id belonging to this file */
-    uint8_t    mode;           /* TEXT/BINARY discrimination */
-    uint8_t    rnr_dirty;    /* Set if the rwptr needs to be recalculatd */
-    uint32_t   record_nr;      /* Record number that that rwptr refers to */ 
+    uint8_t    use;         /* use flag */
+    uint8_t    uid;         /* user id belonging to this file */
+    uint8_t    mode;        /* TEXT/BINARY discrimination */
+    uint8_t    rnr_dirty;   /* Set if the rwptr needs to be recalculatd */
+    uint32_t   record_nr;   /* Record number that that rwptr refers to */ 
 
     // 133 bytes used for caching
-    unsigned long cached_record;   /* Record number that we have cached */
-    uint8_t    dirty;          /* Set if the buffer is dirty and needs writing to disc */
+    unsigned long cached_record;    /* Record number that we have cached */
+    uint8_t    dirty;       /* Set if the buffer is dirty and needs writing to disc */
     uint8_t    buffer[SECSIZE];
 };
 
 struct sfcb {
-    uint8_t    drive;       /* drive code */
+    uint8_t drive;          /* drive code */
     char    name[8];        /* file name */
     char    ext[3];         /* file type */
-    uint8_t    pwdmode;     /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
+    uint8_t pwdmode;        /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
     char    filler[11];     /* not used */
-    int 	c_date;			/* Create or Access date/time (depends on settings) */
-    uint8_t	c_hours;        /* Hours and minutes are encoded as BCD */
-    uint8_t	c_minutes;
-    int 	date;			/* Update date/time (days since January 1, 1978) */
-    uint8_t	hours;
-    uint8_t	minutes;
+    int     c_date;         /* Create or Access date/time (depends on settings) */
+    uint8_t c_hours;        /* Hours and minutes are encoded as BCD */
+    uint8_t c_minutes;
+    int     date;           /* Update date/time (days since January 1, 1978) */
+    uint8_t hours;
+    uint8_t minutes;
 };
 
 
-extern struct fcb  _fcb[0];	// Has MAXFILES entries
+extern struct fcb  _fcb[0]; /* Has MAXFILES entries */
 
 
 /* DPB and DPH related functions will probably work on CP/M v2 only.
@@ -105,7 +105,7 @@ extern struct fcb  _fcb[0];	// Has MAXFILES entries
 */
 
 struct dpb {
-    int 	SPT;			/* "Sectors Per Track", total number of 128 bytes sectors per track */
+    int     SPT;            /* "Sectors Per Track", total number of 128 bytes sectors per track */
     uint8_t BSH;            /* "Block Shift Factor", number of 128 bytes sectors per "Allocation Block" */
     uint8_t BLM;            /* "Block Mask", the values of BSH and BLM implicitly determine the data allocation size */
     uint8_t EXM;            /* "Extent Mask", number of extents per directory entry */
@@ -113,7 +113,7 @@ struct dpb {
     int     DRM;            /* "Total # of directory entries" (-1) */
     uint8_t AL0;            /* Allocation table (MSB) */
     uint8_t AL1;            /* Allocation table (LSB) */
-    int 	CKS;			/* "Check area Size", number of directory entries to check for disk change. */
+    int     CKS;            /* "Check area Size", number of directory entries to check for disk change. */
     uint8_t OFF;            /* "Offset", number of system reserved tracks at the beginning of the disk */
 };
 
@@ -121,7 +121,8 @@ struct dpb {
 extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 
 
-/* BDOS calls */
+/* CP/M 2.2 BDOS calls */
+
 #define CPM_RCON 1               /* read console */
 #define CPM_WCON 2               /* write console */
 #define CPM_RRDR 3               /* read reader */
@@ -147,11 +148,17 @@ extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 #define CPM_ILOG 24              /* get bit map of logged in disks */
 #define CPM_IDRV 25              /* interrogate drive number */
 #define CPM_SDMA 26              /* set DMA address for i/o */
+
+/* The following functions are available on CP/M v2 and later */
 #define CPM_SUID 32              /* set/get user id */
 #define CPM_RRAN 33              /* read random record */
 #define CPM_WRAN 34              /* write random record */
 #define CPM_CFS  35              /* compute file size */
-#define CPM_DSEG 51              /* set DMA segment */
+#define CPM_RREC 36              /* update random access pointer */
+#define CPM_SRDS 37              /* selectively reset disc drives */
+#define CPM_WRZF 40              /* write random record with zero fill */
+
+/* Available only if the graphics extension has been applied */
 #define CPM_GSX 115              /* enter GSX */
 
 
@@ -221,18 +228,19 @@ extern int __LIB__ cpm_cache_flush(struct fcb *fcb);
 /* Fill up the filename stuff */
 extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
 extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
+
 /* Write the file offset into the FCB */
 extern void __LIB__ putoffset(char *dest, long val) __smallc;
 
-/* Set/get userid */
-#define setuid(u)  bdos(CPM_SUID,u)
-#define getuid()   bdos(CPM_SUID,0xFF)
+/* Write an offset as 3 bytes */
+extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
 
 // Set the user number to requid, return the current one
 extern int __LIB__ swapuid(int reqid) __z88dk_fastcall;
 
-/* Write an offset as 3 bytes */
-extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
+/* Set/get userid */
+#define setuid(u)  bdos(CPM_SUID,u)
+#define getuid()   bdos(CPM_SUID,0xFF)
 
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
@@ -304,21 +312,21 @@ extern int __LIB__ a_serialport(void);
 
 /* GIOS parameter block structure */
 struct GSX_PB {
-	void *control;    /* Addr of control array */
-	void *intin;      /* Addr of integer input array */
-	void *ptsin;      /* Addr of pixel input array */
-	void *intout;     /* Addr of integer input array */
-	void *ptsout;     /* Addr of pixel input array */
+    void *control;    /* Addr of control array */
+    void *intin;      /* Addr of integer input array */
+    void *ptsin;      /* Addr of pixel input array */
+    void *intout;     /* Addr of integer input array */
+    void *ptsout;     /* Addr of pixel input array */
 };
 
 
 struct GSX_CTL {
-	int	fn;         /* GSX function, 1-33 */
-	int	n_ptsin;    /* number of pts in ptsin */
-	int	n_ptsout;   /* number of pts in ptsout */
-	int	n_intin;    /* number of values in intin */
-	int	n_intout;   /* number of values in intout */
-	int	special;    /* for special uses (e.g. in-ESC functions) */
+    int fn;         /* GSX function, 1-33 */
+    int n_ptsin;    /* number of pts in ptsin */
+    int n_ptsout;   /* number of pts in ptsout */
+    int n_intin;    /* number of values in intin */
+    int n_intout;   /* number of values in intout */
+    int special;    /* for special uses (e.g. in-ESC functions) */
 };
 
 

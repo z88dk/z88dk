@@ -12,7 +12,17 @@
     PUBLIC  getk
     PUBLIC  _getk
 
+    INCLUDE "target/x07/def/x07.h"
+
 getk:
 _getk:
     xor     a
-    jp      $C90A
+    call    $C90A
+    ld      hl,0
+    ret     z
+    ld      l,a
+    push    hl
+    ld      a,SUB_KBD_CLEAR
+    call    SUB_EXEC_CMD
+    pop     hl
+    ret

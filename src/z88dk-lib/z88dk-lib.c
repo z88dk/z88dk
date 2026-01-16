@@ -73,9 +73,7 @@ enum
     NEWLIB_LIB_SDCC_IX,
     NEWLIB_LIB_SDCC_IY,
     NEWLIB_LIB_END,
-    NEWLIB_HDR_SCCZ80,
-    NEWLIB_HDR_SDCC,
-    NEWLIB_HDR_CLANG,
+    NEWLIB_HDR_COMMON,
     NEWLIB_HDR_END,
     NEWLIB_HDR_PROTO,
     NEWLIB_HDR_MAKE,
@@ -83,13 +81,11 @@ enum
 };
 
 char *newlib_paths[NEWLIB_SIZE] = {
-    "/../../libsrc/_DEVELOPMENT/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
-    "/../../libsrc/_DEVELOPMENT/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
-    "/../../libsrc/_DEVELOPMENT/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
+    "/../../libsrc/newlib/lib/sccz80/lib/",     // NEWLIB_LIB_SCCZ80
+    "/../../libsrc/newlib/lib/sdcc_ix/lib/",    // NEWLIB_LIB_SDCC_IX
+    "/../../libsrc/newlib/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
     0,
-    "/../../include/_DEVELOPMENT/sccz80/lib/",        // NEWLIB_HDR_SCCZ80
-    "/../../include/_DEVELOPMENT/sdcc/lib/",          // NEWLIB_HDR_SDCC
-    "/../../include/_DEVELOPMENT/clang/lib/",         // NEWLIB_HDR_CLANG
+    "/../../include/_DEVELOPMENT/common/lib/",        // NEWLIB_HDR_COMMON
     0,
     "/../../include/_DEVELOPMENT/proto/lib/",         // NEWLIB_HDR_PROTO
     "/../../include/_DEVELOPMENT"                     // NEWLIB_HDR_MAKE
@@ -396,12 +392,7 @@ int main(int argc, char **argv)
             newlib_paths[i] = generate_path(4, ZCCCFG, newlib_paths[i], target, "/");
 
     // Shell command to make newlib headers
-
-#ifdef WIN32
-    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && Winmake 1> nul");
-#else
     newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && make > /dev/null");
-#endif
 
     //
 
@@ -423,14 +414,8 @@ int main(int argc, char **argv)
 
         // newlib header
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SCCZ80]);
-        listlibs("newlib hdr sccz80", src);
-
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SDCC]);
-        listlibs("newlib hdr sdcc", src);
-
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_CLANG]);
-        listlibs("newlib hdr clang", src);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_COMMON]);
+        listlibs("newlib hdr common", src);
 
         // newlib library
 
@@ -496,14 +481,8 @@ int main(int argc, char **argv)
 
                 if (delete || newlib)
                 {
-                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SCCZ80], basename, ".h");
-                    uninstall("newlib hdr sccz80", dst);
-
-                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SDCC], basename, ".h");
-                    uninstall("newlib hdr sdcc", dst);
-
-                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_CLANG], basename, ".h");
-                    uninstall("newlib hdr clang", dst);
+                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_COMMON], basename, ".h");
+                    uninstall("newlib hdr common", dst);
                 }
 
                 generate_newlib += newlib;

@@ -1,16 +1,16 @@
-@stdio/stdio.lst
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+@classic/stdio/stdio.lst
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
 target/gl6000/stdio/CRT_FONT
 target/gl6000/stdio/generic_console
 target/gl6000/stdio/generic_console_ioctl
 target/gl6000/stdio/generic_console_vpeek
 target/gl6000/video/asm_lcd_init
 target/gl6000/graphics/pixladdr.asm
-gfx/narrow/obj/gl6000/stencil_render
-gfx/narrow/obj/gl6000/putsprite
-@gfx/narrow/gfx_narrow.lst
+classic/gfx/narrow/obj/gl6000/stencil_render
+classic/gfx/narrow/obj/gl6000/putsprite
+@classic/gfx/narrow/gfx_narrow.lst
 
-@input/input_keyboard.lst
+@classic/input/input_keyboard.lst
 target/gl6000/games/keys_joystick
-@games/games.lst
+@classic/games/games.lst

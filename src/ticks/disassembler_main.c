@@ -17,6 +17,7 @@ static void disassemble_loop(int start, int end);
 unsigned char *mem;
 int  c_cpu = CPU_Z80;
 int  c_adl_mode = 0;
+char *c_target = NULL;
 int  inverted = 0;
 int  c_autolabel = 0;
 
@@ -24,7 +25,8 @@ int  c_autolabel = 0;
 static void usage(char *program)
 {
     printf("z88dk disassembler\n\n");
-    printf("%s [options] [file]\n\n",program);
+    printf("%s [+target] [options] [file]\n\n",program);
+    printf("  +target        Enable extended disassembly for target\n");
     printf("  -x <file>      Symbol file to read\n");
     printf("                 Use before -o,-s,-e to enable symbols\n");
     printf("  -o <addr>      Address to load code to\n");
@@ -75,7 +77,10 @@ int main(int argc, char **argv)
     set_backend(disassembler_backend);
 
     while ( argc > 1  ) {
-        if( argv[1][0] == '-' && argv[2] ) {
+        if (argv[1][0] == '+' ) {
+            c_target = &argv[1][1];
+            argc--; argv++;
+        } else if( argv[1][0] == '-' && argv[2] ) {
             switch (argc--, argv++[1][1]){
             case 'o':
                 symbol_addr = symbol_resolve(argv[1], NULL);
@@ -191,7 +196,7 @@ int main(int argc, char **argv)
 
 static void disassemble_loop(int start, int end)
 {
-    static char buf[2048];
+    static char buf[16384];
     int start2 = start;
 
     while ( start2 < end ) {

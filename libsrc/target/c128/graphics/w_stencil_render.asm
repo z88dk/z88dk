@@ -12,7 +12,7 @@
 ;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_graphics
 
@@ -22,10 +22,10 @@
     EXTERN  dither_pattern
 	;EXTERN	l_cmp
 
-	EXTERN swapgfxbk
+	EXTERN __gfx_vram_page_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-	;EXTERN swapgfxbk1
+	;EXTERN __gfx_vram_page_out
     EXTERN  __graphics_end
 
     EXTERN  __c128_vaddr
@@ -38,16 +38,16 @@ stencil_render:
 _stencil_render:
 
     push    ix
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
   ENDIF
 
     ld      ix, 4
     add     ix, sp
 
-		;call	swapgfxbk
+		;call	__gfx_vram_page_in
 
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
@@ -77,7 +77,7 @@ yloop:
     cp      127
     jr      z, yloop                    ; ...loop if nothing to be drawn
 
-    ld      bc, maxy*2
+    ld      bc, _GFX_MAXY*2
     add     hl, bc
     ld      a, (hl)
     inc     hl

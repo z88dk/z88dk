@@ -29,4 +29,24 @@ ENDIF
     SECTION data_video_vdp
     SECTION data_user
     SECTION data_alloc_balloc
+    SECTION data_SMSlib
+
+    ; Alignment sections
+    SECTION data_align_256
+    align 256
+    SECTION data_align_128
+    align 128
+    SECTION data_align_64
+    align 64
+    SECTION data_align_32
+    align 32
+    SECTION data_align_16
+    align 16
+    SECTION data_align_8
+    align 8
+    SECTION data_align_4
+    align 4
+    SECTION data_align_2
+    align 2
+
     SECTION DATA_END

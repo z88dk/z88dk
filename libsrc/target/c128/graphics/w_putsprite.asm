@@ -16,10 +16,10 @@
         ;EXTERN    vdcset
         ;EXTERN    vdcget
 
-    EXTERN  swapgfxbk
+    EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -55,8 +55,8 @@ _putsprite:
     ld      (ortype), a                 ; Self modifying code
     ld      (ortype2), a                ; Self modifying code
 
-  IF    NEED_swapgfxbk=1
-    call    swapgfxbk
+  IFDEF _GFX_PAGE_VRAM
+    call    __gfx_vram_page_in
   ENDIF
         ; @@@@@@@@@@@@
     ld      h, b

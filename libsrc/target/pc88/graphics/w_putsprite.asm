@@ -17,7 +17,7 @@
     EXTERN  l_push_di
     EXTERN  l_pop_ei
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
     INCLUDE "target/pc88/def/pc88.def"
 
 ; __gfx_coords: d,e (vert-horz)

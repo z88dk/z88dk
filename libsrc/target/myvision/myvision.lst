@@ -1,18 +1,17 @@
-@stdio/ansicore.lst
-stdio/obj/${TYPE}/inkey/fgetc_cons
-stdio/obj/${TYPE}/inkey/getk
+@classic/stdio/ansicore.lst
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
 
-@input/input_keyboard.lst
-@video/tms9918/video_tms9918.lst
-@stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
+@classic/input/input_keyboard.lst
+@classic/video/tms9918/video_tms9918.lst
+@classic/stdio/stdio.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/myvision/games/joystick.asm
-@games/games.lst
+@classic/games/games.lst
 target/myvision/psg/set_psg
 target/myvision/psg/set_psg_callee
 target/myvision/psg/get_psg
 target/myvision/psg/psg_init
 target/myvision/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+sound/ay/obj/${TYPE}/**/*.o
 

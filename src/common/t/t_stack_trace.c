@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // stack_trace - show a stack dump on SIGSEGV in Linux
-// Copyright (C) Paulo Custodio, 2011-2024
+// Copyright (C) Paulo Custodio, 2011-2026
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"

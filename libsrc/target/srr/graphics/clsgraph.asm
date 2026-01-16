@@ -16,7 +16,7 @@
     EXTERN  loadudg6
     EXTERN  base_graphics
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 cleargraphics:
@@ -30,9 +30,9 @@ _cleargraphics:
     call    loadudg6
 
     ld      hl, (base_graphics)
-    ld      bc, maxx*maxy/6
+    ld      bc, _GFX_MAXX*maxy/6
 clean:
-    ld      (hl), blankch
+    ld      (hl), _GFX_TEXT_BLANK_CHAR
     inc     hl
     dec     bc
     ld      a, b

@@ -2,7 +2,7 @@
     EXTERN  pixeladdress
     EXTERN  __gfx_coords
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including

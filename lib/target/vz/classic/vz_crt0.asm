@@ -139,4 +139,6 @@ l_dcal:
     ld      hl,$7000
     ld      (base_graphics),hl
 
+    INCLUDE "crt/classic/mc6847/mc6847_mode_disable.inc"
+
 

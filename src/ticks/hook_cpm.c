@@ -55,33 +55,35 @@ static int get_random(int fcb)
 }
 
 
-void get_filename(int fcb, char *filename)
-{
-    int i, filenoffs;
-
-    // Get the filename
-    for ( i = 1, filenoffs = 0; i < 9; i++ ) {
-        uint8_t c  = get_memory_data(fcb + i );
-        if ( !isspace(c)) {
-            filename[filenoffs++] = tolower(c);
-            filename[filenoffs] = 0;
-        } else break;
-    }
-    for ( i = 9; i < 12; i++ ) {
-        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
-        if ( !isspace(c)) {
-            if  ( i == 9 ) filename[filenoffs++] = '.';
-            filename[filenoffs++] = tolower(c);
-            filename[filenoffs] = 0;
-        } else break;
-    }
-}
-
 static void set_offset(int fcb, int offset)
 {
     *get_memory_addr(fcb+32, MEM_TYPE_DATA) = offset & 0x7f;
     *get_memory_addr(fcb + 12, MEM_TYPE_DATA) = (offset >> 7) & 0x001f;
     *get_memory_addr(fcb + 14, MEM_TYPE_DATA) = offset >> 12;
+}
+
+
+static void get_filename(int fcb, int offset, char filename[15])
+{
+    int i, filenoffs;
+    
+    for ( i = offset, filenoffs = 0; i < offset + 8; i++ ) {
+        uint8_t c  = get_memory_data(fcb + i ) & 0x7f;
+        if ( !isspace(c)) {
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        } else {
+            break;
+        }
+    }
+    for ( i = offset + 8; i < offset + 11; i++ ) {
+        uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
+        if ( !isspace(c)) {
+            if  ( i == offset+8 ) filename[filenoffs++] = '.';
+            filename[filenoffs++] = tolower(c);
+            filename[filenoffs] = 0;
+        }
+    }
 }
 
 
@@ -104,7 +106,7 @@ static void bdos_open_file(void)
     // S2 = 0
     put_memory(fcb + 14, 0x00);
 
-    get_filename(fcb, filename);
+    get_filename(fcb, 1, filename);
 
 
     if ( (fd = open(filename, O_RDWR)) == -1 ) {
@@ -146,7 +148,7 @@ static void bdos_create_file(void)
     put_memory(fcb + 14, 0x00);
 
     // Get the filename
-    get_filename(fcb, filename);
+    get_filename(fcb, 1, filename);
 
     if ( (fd = open(filename, O_RDWR|O_CREAT, 0666)) == -1 ) {
         goto fail;
@@ -172,21 +174,20 @@ static void bdos_delete_file(void)
 {
     char filename[15];
     int fcb = GET_FCB();
-    int extent;
     int filenoffs = 0;
-    int fd = -1, slot;
 
     a = 255;   // By default we fail
 
 
     // Get the filename
     for ( i = 1, filenoffs = 0; i < 9; i++ ) {
-        uint8_t c  = get_memory_data(fcb + i );
+        uint8_t c  = get_memory_data(fcb + i ) & 0x7f;
         if ( !isspace(c)) {
             filename[filenoffs++] = tolower(c);
             filename[filenoffs] = 0;
+        } else {
+            break;
         }
-        break;
     }
     for ( i = 9; i < 12; i++ ) {
         uint8_t c  = (get_memory_data(fcb + i ) & 0x7f);
@@ -196,17 +197,38 @@ static void bdos_delete_file(void)
             filename[filenoffs] = 0;
         }
     }
-
     unlink(filename);
 
     a = 0x00;
 
 fail:
-    if ( fd != -1 ) close(fd);
-
     l = a;
     h = b = 0;
 }
+
+
+static void bdos_rename_file(void)
+{
+    char filename1[15];
+    char filename2[15];
+    int fcb = GET_FCB();
+
+    a = 255;   // By default we fail
+
+    // Get the filenames
+    get_filename(fcb, 1, filename1);
+    get_filename(fcb, 17, filename2);
+    
+    if ( rename(filename1, filename2) == 0 ) {
+        a = 0x00;
+    }
+
+fail:
+    l = a;
+    h = b = 0;
+}
+
+
 static void bdos_close_file(void)
 {
     int fcb = GET_FCB();
@@ -315,7 +337,7 @@ static void bdos_file_size(void)
     
     a = 0; // Success always for CP/M 2
     
-    get_filename(fcb, filename);
+    get_filename(fcb, 1, filename);
 
     put_memory(fcb + 0x21, 0);
     put_memory(fcb + 0x22, 0);
@@ -427,6 +449,9 @@ void hook_cpm(void)
         /* Entered with C=16h, DE=address of FCB. Returns error codes in BA and HL. */
         bdos_create_file();
         break;
+    case 0x17: // F_RENAME - rename file
+        /* Entered with C=17h, DE=address of FCB. Returns error codes in BA and HL. */
+        bdos_rename_file();
     case 0x19:  // DRV_GET
         /* Entered with C=19h, E=drive number. Returns L=A=0 or 0FFh. */
         if ( e == 0 )

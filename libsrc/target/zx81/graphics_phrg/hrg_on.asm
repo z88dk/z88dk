@@ -22,7 +22,7 @@
     EXTERN  L0292
     EXTERN  MTCH_P3
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 ;hrgmode:	defb	2
@@ -47,10 +47,10 @@ HRG_Sync1:
     ld      iy, hresgen
 
 
-  IF    (maxy>191)
+  IF    (_GFX_MAXY>191)
 			; patch is not necessary for 192 rows
   ELSE
-    ld      a, 96-(maxy*6/12)
+    ld      a, 96-(_GFX_MAXY*6/12)
     ld      (MTCH_P3+1), a              ; patch also our custom interrupt handler for 64 rows
   ENDIF
 
@@ -84,7 +84,7 @@ hresgen:
 sync3:
     djnz    sync3
 
-    ld      b, maxy
+    ld      b, _GFX_MAXY
 genline:
     in      a, (c)                      ; trick the ULA and reset the..
     out     (0ffh), a                   ; ..character ROW counter

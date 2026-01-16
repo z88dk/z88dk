@@ -16,6 +16,7 @@ defc GETYPR = $0030 ; Return the type FAC.
 defc KEYINT = $0038 ; Performs hardware interrupt procedures.
 
 
+
 ; Console (i.e. the keyboard and the CRT)
 defc CHSNS  = $35CE ; Get key from keyboard buffer, don't wait for keypress (on MSX, only check the status of keyboard buffer)
 defc CHGET  = $5A41 ; Waits for character being input and returns the character codes.
@@ -38,6 +39,27 @@ defc BEEP   = $3E9B ; Sounds the buffer
 ;defc ERAFNK = $ ; Hide the function key diplay.
 ;defc DSPFNK = $ ; Show the function key display.
 ;defc TOTEXT = $ ; Forcidly places the screen in text mode.
+
+
+
+; Tape device routines
+
+defc TAPION = $7ED0 ; Reads the header block after turning the cassette motor on
+defc TAPIN  = $7F87 ; Read data from the tape
+defc TAPIOF = $7F15 ; Stops reading from the tape
+
+defc TAPOON = $7F4D ; Turns on the cassette motor and writes the header
+defc TAPOUT = $7FD0 ; Writes data on the tape
+defc TAPOOF = $7F1A ; Stops writing on the tape
+;defc STMOTR = $ ; Sets the cassette motor action
+
+
+; Queue routines
+
+defc LFTQ   = $4667 ; Gives number of bytes in queue
+defc PUTQ   = $45DD ; Put byte in queue
+
+
 
 ; Misc routines
 defc ISFLIO = $5372 ; Tests if I/O to device is taking place

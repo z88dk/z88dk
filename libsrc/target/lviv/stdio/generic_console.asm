@@ -21,6 +21,7 @@
 
 
 generic_console_set_paper:
+    call    conio_map_colour
     and     3
     call    convert_to_mode
     ld      (__lviv_paper), a
@@ -31,6 +32,7 @@ generic_console_set_attribute:
 
 
 generic_console_set_ink:
+    call    conio_map_colour
     and     3
     call    convert_to_mode
     ld      (__lviv_ink), a

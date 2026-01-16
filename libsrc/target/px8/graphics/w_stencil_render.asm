@@ -11,7 +11,7 @@
 ;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
-    INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_graphics
     PUBLIC  stencil_render
@@ -36,7 +36,7 @@ _stencil_render:
     ld      ix, 4
     add     ix, sp
 
-    ld      bc, maxy
+    ld      bc, _GFX_MAXY
     push    bc
 yloop:
     pop     bc
@@ -66,7 +66,7 @@ yloop:
     cp      127
     jr      z, yloop                    ; ...loop if nothing to be drawn
 
-    ld      bc, maxy*2
+    ld      bc, _GFX_MAXY*2
     add     hl, bc
     ld      a, (hl)
     inc     hl

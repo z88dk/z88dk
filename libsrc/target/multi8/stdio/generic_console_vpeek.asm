@@ -1,5 +1,5 @@
-		; In code_driver so we are low down in memory and hopefully
-		; never paged out
+    ; In code_driver so we are low down in memory and hopefully
+    ; never paged out
     SECTION code_driver
 
     PUBLIC  generic_console_vpeek
@@ -14,6 +14,7 @@
     EXTERN  __vram_out
     EXTERN  __port29_copy
     EXTERN  __multi8_mode
+    EXTERN  __multi8_paper
 
     EXTERN  generic_console_xypos_graphics
     EXTERN  generic_console_xypos
@@ -58,32 +59,77 @@ vpeek_graphics:
                                         ; hl = screen
     pop     de                          ; de = buffer
 
+    ld      a,255
+    ld      (__vpeek_colour),a
     ld      a, 8
-loop:
+@row_loop:
     push    af
+    push    de                          ;push buffer
     ld      a, (__vram_in)
     ld      b, a
-    or      @00000110
+    or      @00000110                   ;blue
     out     ($2a), a
-    ld      c, (hl)
+    ld      d,(hl)
     ld      a, b
-    or      @00000101
+    or      @00000101                   ;green
     out     ($2a), a
-    ld      a, (hl)
-    or      c
-    ld      c, a
-    ld      a, b
-    or      @00000011
+    ld      e,(hl)
+    ld      a,b
+
+    or      @00000011                   ;red
     out     ($2a), a
-    ld      a, (hl)
-    or      c
-    ld      (de), a
+    ld      a,(hl)
+
+    ld      bc,80
+    add     hl,bc                       ;Move to next row
+    ld      c,a                         ;red value
+    ex      (sp),hl                     ;(sp) = next row, hl = buffer
+    push    hl
+
+
+    ld      a,(__vpeek_colour)
+    ld      h,a
+    ld      l,0                         ;resulting row
+
+    ; Now create a colour byte for each pixel
+    ld      b,8
+@create_bytes:
+    xor     a
+    rl      c
+    rla
+    rl      e
+    rla
+    rl      d
+    rla
+    push    bc
+    ld      b,a
+    ld      a,h
+    inc     a
+    jr      nz,@paper_set
+    ld      a,b
+    ld      (__vpeek_colour),a
+    ld      h,a
+@paper_set:
+    ld      a,b
+    pop     bc
+    cp      h                           ;current background?
+    scf
+    jr      nz,@rotate_bit
+    ccf
+@rotate_bit:
+    rl      l
+    djnz    @create_bytes
+    pop     de                          ;de=buffer
+    ld      a,l
+    ld      (de),a
     inc     de
-    ld      bc, 80                      ;Move to next row
-    add     hl, bc
+    pop     hl                          ;screen
+
+
+
     pop     af
     dec     a
-    jr      nz, loop
+    jr      nz, @row_loop
     ld      a, (__vram_out)
     out     ($2a), a
     call    l_pop_ei
@@ -104,6 +150,10 @@ gotit:
     ld      sp, hl
     ex      af, af
     ret
+
+    SECTION bss_driver
+
+__vpeek_colour: defb    0
 
 
 

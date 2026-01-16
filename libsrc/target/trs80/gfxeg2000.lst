@@ -8,6 +8,6 @@ target/trs80/graphics_eg2000/pixladdr
 target/trs80/graphics_eg2000/putsprite
 target/trs80/graphics_eg2000/bksave
 target/trs80/graphics_eg2000/bkrestore
-@gfx/narrow/gfx_narrow.lst
+@classic/gfx/narrow/gfx_narrow.lst
 target/trs80/graphics_eg2000/f_ansi_lorez
-@stdio/ansicore.lst
+@classic/stdio/ansicore.lst

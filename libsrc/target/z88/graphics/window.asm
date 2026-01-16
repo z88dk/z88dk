@@ -24,12 +24,10 @@
 ;       char width;
 ;       char depth;
 ;       char type;
-;       char graphics;  0=text, 1=graphics
+;       char graphics;  0=text, 1=graphics, 2=graphics 512
 ;} ;
 
-
-
-    INCLUDE "graphics/grafix.inc"       ; Contains fn defs
+    INCLUDE "classic/gfx/grafix.inc"       ; Contains fn defs
 
     INCLUDE "stdio.def"
     INCLUDE "map.def"
@@ -40,9 +38,14 @@
     PUBLIC  window
     PUBLIC  _window
 
+    PUBLIC  __z88_open_map256
+    PUBLIC  __z88_open_map512
+
     EXTERN  base_graphics
-    PUBLIC  gfx_bank
+    EXTERN  __z88_gfxbank
     EXTERN  z88_map_segment
+    EXTERN  __z88_gfxmode
+    EXTERN  z88_map_bank
 
 window:
 _window:
@@ -68,8 +71,14 @@ _window:
     ret
 
 
+__z88_open_map256:
+    ld      a,'4'
+    ld      hl,255
+    ld      bc, mp_gra
+    jr      opengfx1
 
 opengfx:
+    jr      nz,__z88_open_map512
     ld      l, (ix+wind_w)
     ld      h, 0
     ld      a, l
@@ -78,23 +87,20 @@ opengfx:
     ld      bc, mp_def                  ;define map based on pipedream
     jr      z, opengfx1
     ld      bc, mp_gra                  ;user width
+    pop     ix
 opengfx1:
     call_oz (os_map)                    ;opened the window
     ld      hl, 1
     jr      c, opengfx_exit             ;error, return TRUE
-;Now get the address of the map
-    ld      b, 0
-    ld      hl, 0                       ; dummy address
+    xor     a
+setup_map_addresses:
+    ld      (__z88_gfxmode),a
+    ;Now get the address of the map
+    ld      b, 0                        ; query
     ld      a, sc_hr0
     call_oz (os_sci)                    ; get base address of map area (hires0)
-    push    bc
-    push    hl
-    call_oz (os_sci)                    ; (and re-write original address)
-    pop     hl
-    pop     bc
-;Page in the map page so it's always there..errkk!
     ld      a, b
-    ld      (gfx_bank), a
+    ld      (__z88_gfxbank), a
     ld      a, h
     and     63                          ;mask to bank
     or      z88_map_segment             ;mask to segment map_seg
@@ -102,14 +108,68 @@ opengfx1:
     ld      (base_graphics), hl
     ld      hl, 0                       ;NULL=good
 opengfx_exit:
-    pop     ix
     ret
+
+__z88_open_map512:
+    ; Get the SBR 
+    ld      b, 0                        ; get the details
+    ld      a, sc_sbr
+    call_oz (os_sci)                    ; get base address of map area (hires0)
+   
+    ; Page in the bamk for SBR
+    ld      a,h
+    and     63
+    or      z88_map_segment
+    ld      h,a
+
+    ld      a,(z88_map_bank)
+    push    af
+    ld      a,b
+    ld      (z88_map_bank),a
+    out     (z88_map_bank-$400), a
+
+
+    ; Now setup a graphics display that's 512 bytes wide
+    ld      l,36
+    ld      b,8
+    ld      d,0x20
+    ld      e,0
+row_loop:
+    push    bc
+    push    hl
+    ld      b,64
+row_fill:
+    ld      (hl),e
+    inc     hl
+    ld      (hl),d
+    inc     hl
+    inc     de
+    djnz    row_fill
+
+    ; There are 216 bytes to fill, we want to leave the last 3 (OZ panel) in place
+    ld      b,+(216-128-36 - 6) / 2
+null_fill:
+    ld      (hl),$0
+    inc     hl
+    ld      (hl),$34
+    inc     hl
+    djnz    null_fill
+    pop     hl
+    inc     h      ;step to next row
+    pop     bc
+    djnz    row_loop
+    
+    ; Restore banking
+    pop     af
+    ld      (z88_map_bank),a
+    out     (z88_map_bank-$400), a
+    ld      a,1
+    jr      setup_map_addresses
+
+
 
     SECTION rodata_clib
 initwind:
     defb    1, '7', '#', 0
 
-    SECTION bss_clib
 
-gfx_bank:
-    defb    0                           ;Bank that this is in

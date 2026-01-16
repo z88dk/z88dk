@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __RECT_H__
 #define __RECT_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 // STRUCTURES

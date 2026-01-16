@@ -7,7 +7,7 @@
  *
  */
 #include <sys/compiler.h>
-#include <sys/types.h>
+#include <stdint.h>
 
 /*
  * A library of routines that can check for and compute intersections amongst
@@ -20,45 +20,45 @@
 
 struct r_Ival8 {
 
-   uchar coord;              // +0
-   uchar width;              // +1
+   uint8_t coord;              // +0
+   uint8_t width;              // +1
 
 };
 
 struct r_Ival16 {
 
-   uint coord;               // +0
-   uint width;               // +2
+   uint16_t coord;               // +0
+   uint16_t width;               // +2
    
 };
 
 struct r_Rect8 {
 
-   uchar x;                  // +0  struct r_Ival8
-   uchar width;              // +1
-   uchar y;                  // +2  struct r_Ival8
-   uchar height;             // +3
+   uint8_t x;                  // +0  struct r_Ival8
+   uint8_t width;              // +1
+   uint8_t y;                  // +2  struct r_Ival8
+   uint8_t height;             // +3
    
 };
 
 struct r_Rect16 {
 
-   uint x;                   // +0  struct r_Ival16
-   uint width;               // +2
-   uint y;                   // +4  struct r_Ival16
-   uint height;              // +6
+   uint16_t x;                   // +0  struct r_Ival16
+   uint16_t width;               // +2
+   uint16_t y;                   // +4  struct r_Ival16
+   uint16_t height;              // +6
    
 };
 
 // Detect whether points, intervals and rectangles intersect
 
-extern int __LIB__ r_IsPtInIval8(uchar x, struct r_Ival8 *i) __smallc;
-extern int __LIB__ r_IsPtInRect8(uchar x, uchar y, struct r_Rect8 *r) __smallc;
+extern int __LIB__ r_IsPtInIval8(uint8_t x, struct r_Ival8 *i) __smallc;
+extern int __LIB__ r_IsPtInRect8(uint8_t x, uint8_t y, struct r_Rect8 *r) __smallc;
 extern int __LIB__ r_IsIvalInIval8(struct r_Ival8 *i1, struct r_Ival8 *i2) __smallc;
 extern int __LIB__ r_IsRectInRect8(struct r_Rect8 *r1, struct r_Rect8 *r2) __smallc;
 
-extern int __LIB__ r_IsPtInIval16(uint x, struct r_Ival16 *i) __smallc;
-extern int __LIB__ r_IsPtInRect16(uint x, uint y, struct r_Rect16 *r) __smallc;
+extern int __LIB__ r_IsPtInIval16(uint16_t x, struct r_Ival16 *i) __smallc;
+extern int __LIB__ r_IsPtInRect16(uint16_t x, uint16_t y, struct r_Rect16 *r) __smallc;
 extern int __LIB__ r_IsIvalInIval16(struct r_Ival16 *i1, struct r_Ival16 *i2) __smallc;
 extern int __LIB__ r_IsRectInRect16(struct r_Rect16 *r1, struct r_Rect16 *r2) __smallc;
 

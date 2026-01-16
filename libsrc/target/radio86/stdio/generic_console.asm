@@ -21,7 +21,7 @@
     PUBLIC  CLIB_GENCON_CAPS
     defc    CLIB_GENCON_CAPS=0
 
-    INCLUDE "target/radio86/def/monitor.def"
+    INCLUDE "target/radio86/def/radio86.h"
 
 generic_console_ioctl:
     scf
@@ -36,7 +36,7 @@ generic_console_set_paper:
 
 generic_console_cls:
     ld      c, $1f
-    jp      PUTCHAR
+    jp      M_PUTCHAR
 
 generic_console_scrollup:
     push    de
@@ -46,7 +46,7 @@ generic_console_scrollup:
     ld      a, 10
     ld      (printc_str+4), a
     ld      hl, printc_str
-    call    PRINTSTR
+    call    M_PRINTSTR
     pop     bc
     pop     hl
     ret
@@ -65,7 +65,7 @@ generic_console_printc:
     ld      (printc_str+2), hl
     ld      (printc_str+4), a
     ld      hl, printc_str
-    jp      PRINTSTR
+    jp      M_PRINTSTR
 
 ;Entry: c = x,
 ;       b = y
@@ -82,8 +82,8 @@ generic_console_vpeek:
     xor     a
     ld      (printc_str+4), a
     ld      hl, printc_str
-    call    PRINTSTR
-    call    VPEEK
+    call    M_PRINTSTR
+    call    M_VPEEK
     and     a
     ret
 

@@ -1,7 +1,7 @@
 /*
- *	long fdtell(int fd)
+ *  long fdtell(int fd)
  *
- *	$Id: fdtell.c $
+ *  $Id: fdtell.c $
 */
 
 #include <fcntl.h>
@@ -11,8 +11,8 @@
 
 long fdtell(int fd)
 {
-	struct	fcb *fc = (struct fcb *)fd;
-	
-	return (fc->rwptr);
+    struct fcb *fc = (struct fcb *)fd;
+
+    return (fc->rwptr);
 }
 

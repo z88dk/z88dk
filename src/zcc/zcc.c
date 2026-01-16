@@ -138,18 +138,22 @@ static void cmd_free_tokens(struct tokens_list_s* tokens);
 
 static void            SetNumber(arg_t *argument, char *arg);
 static void            SetStringConfig(arg_t *argument, char *arg);
+static void            EmitWarning(arg_t *argument, char *arg);
 static void            LoadConfigFile(arg_t *argument, char *arg);
 static void            parse_cmdline_arg(char *arg);
 static void            AddPreProc(option *arg, char *);
+static void            AddPreProcGen(option *arg, char *);
 static void            AddPreProcIncPath(option *arg, char *);
 static void            AddToArgs(option *arg, char *);
 static void            AddToArgsQuoted(option *arg, char *);
+static void            AddToArgsVerbatim(option *argument, char *arg);
 static void            AddLinkLibrary(option *arg, char *);
 static void            AddLinkSearchPath(option *arg, char *);
 static void            usage(const char *program);
 static void            print_help_text(const char *program);
 static void            GlobalDefc(option *argument, char *);
 static void            Alias(option *arg, char *);
+static void            OptAllSeg(option* arg, char*);
 static void            PragmaDefine(option *arg, char *);
 static void            PragmaExport(option *arg, char *);
 static void            PragmaRedirect(option *arg, char *);
@@ -176,7 +180,7 @@ static int             linkthem(char *);
 static int             get_filetype_by_suffix(char *);
 static void            BuildAsmLine(char *, size_t, char *);
 static void            parse_cmdline_arg(char *option);
-static void            BuildOptions(char **, char *);
+static void            BuildOptions(char **, const char *);
 static void            BuildOptions_start(char **, char *);
 static void            BuildOptionsQuoted(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
@@ -192,6 +196,7 @@ static void            configure_maths_library(char **libstring);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
+static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
@@ -227,15 +232,12 @@ static int             assembleonly = 0;
 static int             lstcwd = 0;
 static int             compileonly = 0;
 static int             m4only = 0;
-static int             clangonly = 0;
-static int             llvmonly = 0;
 static int             makelib = 0;
 static int             explicit_file_type_c = 0;
 static struct explicit_extension* explicit_extensions = NULL;
 static int             build_bin = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
-static int             zopt = 0;
 static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             sdccpeepopt = 0;
@@ -244,6 +246,7 @@ static int             lston = 0;
 static int             mapon = 0;
 static int             globaldefon = 0;
 static char           *globaldefrefile = NULL;
+static int             dependencyonly = 0;
 static int             preprocessonly = 0;
 static int             printmacros = 0;
 static int             relocate = 0;
@@ -266,9 +269,6 @@ static char           *cpp_incpath_first;
 static char           *cpp_incpath_last;
 static char           *comparg;
 static char           *clangarg;
-static char           *clangcpparg = "-D\"__attribute__(x)= \" -D\"__builtin_unreachable(x)= \" ";
-static char           *llvmopt;
-static char           *llvmarg;
 static char           *linkargs;
 static char           *linker_libpath_first;
 static char           *linker_libpath_last;
@@ -337,8 +337,6 @@ static char  *c_options = NULL;
 static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_ez80clang_exe = "ez80-clang";
-static char  *c_clang_exe = "zclang";
-static char  *c_llvm_exe = "zllvm-cbe";
 static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_cpp_exe = "z88dk-ucpp";
@@ -353,7 +351,6 @@ static char  *c_copycmd = "type";
 #endif
 static char  *c_extension_config = "o";
 static char  *c_incpath = NULL;
-static char  *c_clangincpath = NULL;
 static char  *c_m4opts = NULL;
 static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
@@ -383,7 +380,7 @@ static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL;        /* "-math-z88 -D__NATIVE_MATH__"; */
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "genmath@{ZCC_LIBCPU}";
-static int    c_stylecpp = outspecified;
+static int    c_stylecpp = outspecified_flag;
 static char  *c_swallow_mf = NULL;
 
 static char  *c_extension = NULL;
@@ -403,6 +400,11 @@ static int    aliases_num = 0;
 static char   c_generate_debug_info = 0;
 static char   c_help = 0;
 
+static char *opt_code_seg = NULL;
+static char *opt_const_seg = NULL;
+static char *opt_data_seg = NULL;
+static char *opt_bss_seg = NULL;
+
 static arg_t  config[] = {
     { "OPTIONS", 0, SetStringConfig, &c_options, NULL, "Extra options for port" },
     { "CPP", 0, SetStringConfig, &c_cpp_exe, NULL, "Name of the cpp binary" },
@@ -417,8 +419,7 @@ static arg_t  config[] = {
     { "COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)" },
     { "SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, NULL, "Name of sccz80 binary" },
     { "ZSDCCEXE", 0, SetStringConfig, &c_sdcc_exe, NULL, "Name of the sdcc binary" },
-    { "ZCLANGEXE", 0, SetStringConfig, &c_clang_exe, NULL, "Name of the clang binary" },
-    { "ZLLVMEXE", 0, SetStringConfig, &c_llvm_exe, NULL, "Name of the llvm-cbe binary" },
+    { "EZ80CLANGEXE", 0, SetStringConfig, &c_ez80clang_exe, NULL, "Name of the ez80-clang binary" },
 
     { "APPMAKEEXE", 0, SetStringConfig, &c_appmake_exe, NULL, "" },
     { "APPMAKER", AF_DEPRECATED, SetStringConfig, &c_appmake_exe, NULL, "Name of the applink binary (use APPMAKEEXE)" },
@@ -427,7 +428,6 @@ static arg_t  config[] = {
     { "COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, "" },
 
     { "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-isystem\"DESTDIR/include\" " },
-    { "CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "-isystem \"DESTDIR/include/_DEVELOPMENT/clang\" " },
     { "M4OPTS", 0, SetStringConfig, &c_m4opts, NULL, "", " -I \"DESTDIR/src/m4\" " },
     { "COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "\"DESTDIR/lib/z80rules.1\"" },
     { "COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "\"DESTDIR/lib/z80rules.2\"" },
@@ -436,18 +436,18 @@ static arg_t  config[] = {
     { "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
     { "EZ80CLANGRULES", 0, SetStringConfig, &c_ez80clang_opt, NULL, "Rules for ez80 clang", "DESTDIR/lib/clang_rules.1"},
-    { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
-    { "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
-    { "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
-    { "SDCCOPT9", 0, SetStringConfig, &c_sdccopt9, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.9\"" },
-    { "SDCCPEEP0", 0, SetStringConfig, &c_sdccpeeph0, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.0\"" },
-    { "SDCCPEEP1", 0, SetStringConfig, &c_sdccpeeph1, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.1\"" },
-    { "SDCCPEEP2", 0, SetStringConfig, &c_sdccpeeph2, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.2\"" },
-    { "SDCCPEEP3", 0, SetStringConfig, &c_sdccpeeph3, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.3\"" },
-    { "SDCCOPTSZ0", 0, SetStringConfig, &c_sdccpeeph0cs, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.0\"" },
-    { "SDCCOPTSZ1", 0, SetStringConfig, &c_sdccpeeph1cs, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.1\"" },
-    { "SDCCOPTSZ2", 0, SetStringConfig, &c_sdccpeeph2cs, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.2\"" },
-    { "SDCCOPTSZ3", 0, SetStringConfig, &c_sdccpeeph3cs, NULL, "", " --no-peep --peep-file \"DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.3\"" },
+    { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.1\"" },
+    { "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.2\"" },
+    { "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.3\"" },
+    { "SDCCOPT9", 0, SetStringConfig, &c_sdccopt9, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.9\"" },
+    { "SDCCPEEP0", 0, SetStringConfig, &c_sdccpeeph0, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph.0\"" },
+    { "SDCCPEEP1", 0, SetStringConfig, &c_sdccpeeph1, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph.1\"" },
+    { "SDCCPEEP2", 0, SetStringConfig, &c_sdccpeeph2, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph.2\"" },
+    { "SDCCPEEP3", 0, SetStringConfig, &c_sdccpeeph3, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph.3\"" },
+    { "SDCCOPTSZ0", 0, SetStringConfig, &c_sdccpeeph0cs, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph_cs.0\"" },
+    { "SDCCOPTSZ1", 0, SetStringConfig, &c_sdccpeeph1cs, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph_cs.1\"" },
+    { "SDCCOPTSZ2", 0, SetStringConfig, &c_sdccpeeph2cs, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph_cs.2\"" },
+    { "SDCCOPTSZ3", 0, SetStringConfig, &c_sdccpeeph3cs, NULL, "", " --no-peep --peep-file \"DESTDIR/lib/sdcc/sdcc_peeph_cs.3\"" },
     { "CRT0", 0, SetStringConfig, &c_crt0, NULL, "" },
 
     { "ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library" },
@@ -460,6 +460,7 @@ static arg_t  config[] = {
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
     { "INCLUDE", 0, LoadConfigFile, NULL, NULL, "Load a configuration file"},
+    { "WARNING", 0, EmitWarning, NULL, NULL, "" },
     { "", 0, NULL, NULL }
 };
 
@@ -516,12 +517,18 @@ static option options[] = {
     { 0, "xc", OPT_BOOL,  "Explicitly specify file type as C" , &explicit_file_type_c, NULL, 0},
     { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
 
-
     { 0, "", OPT_HEADER, "M4 options:", NULL, NULL, 0 },
     { 0, "Cm", OPT_FUNCTION,  "Add an option to m4" , &m4arg, AddToArgs, 0},
     { 0, "copy-back-after-m4", OPT_BOOL, "Copy files back after processing with m4",&c_copy_m4_processed_files, NULL, 0 },
 
     { 0, "", OPT_HEADER, "Preprocessor options:", NULL, NULL, 0 },
+
+    { 0, "M", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies (implies no further processing)", NULL, AddPreProcGen, 0 },
+    { 0, "MM", OPT_FUNCTION|OPT_BOOL|OPT_INCLUDE_OPT, "Emit Makefile dependencies, including system headers (implies no further processing)", NULL, AddPreProcGen, 0 },
+    { 0, "MF", OPT_FUNCTION, "Emit Makefile dependencies, including system headers (implies -E)", &cpparg, AddToArgsVerbatim },
+    { 0, "MD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies, including system headers" , NULL, AddPreProc, 0},
+    { 0, "MMD", OPT_FUNCTION|OPT_INCLUDE_OPT|OPT_BOOL,  "Generate a .d file with dependencies" , NULL, AddPreProc, 0},
+    { 0, "MT", OPT_FUNCTION,  "Specify the dependency target" , &cpparg, AddToArgsVerbatim, 0},
     { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
     { 0, "D", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Define a preprocessor option" , NULL, AddPreProc, 0},
     { 0, "U", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Undefine a preprocessor option" , NULL, AddPreProc, 0},
@@ -534,23 +541,27 @@ static option options[] = {
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
     { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
+    { 0, "allseg", OPT_FUNCTION|OPT_DOUBLE_DASH, "Redirect all compiler output to the same segment", NULL, OptAllSeg, 0 },  // accesses opt_*_seg vars below
+    { 0, "codeseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler code segment", &opt_code_seg, NULL, 0 },
+    { 0, "constseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler const segment", &opt_const_seg, NULL, 0 },
+    { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler data segment", &opt_data_seg, NULL, 0 },
+    { 0, "bssseg", OPT_STRING|OPT_DOUBLE_DASH, "Redirect compiler bss segment", &opt_bss_seg, NULL, 0 },
+
     { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
     { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
     { 0, "Ch", OPT_FUNCTION,  "Add an option to the sccz80 peepholer" , &coptarg, AddToArgs, 0},
+
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
     { 0, "SO", OPT_INT,  "Set the peephole optimiser setting for sdcc-peephole" , &sdccpeepopt, NULL, 0},
     { 0, "fsigned-char", OPT_BOOL|OPT_DOUBLE_DASH,  "Use signed chars by default" , &sdcc_signed_char, NULL, 0},
-    { 0, "", OPT_HEADER, "Compiler (clang/llvm) options:", NULL, NULL, 0 },
-    { 0, "Cg", OPT_FUNCTION,  "Add an option to clang" , &clangarg, AddToArgs, 0},
-    { 0, "clang", OPT_BOOL,  "Stop after translating .c files to llvm ir" , &clangonly, NULL, 0},
-    { 0, "llvm", OPT_BOOL,  "Stop after llvm-cbe generates new .cbe.c files" , &llvmonly, NULL, 0},
-    { 0, "Co", OPT_FUNCTION,  "Add an option to llvm-opt" , &llvmopt, AddToArgs, 0},
-    { 0, "Cv", OPT_FUNCTION,  "Add an option to llvm-cbe" , &llvmarg, AddToArgs, 0},
-    { 0, "zopt", OPT_BOOL,  "Enable llvm-optimizer (clang only)" , &zopt, NULL, 0},
+
+    { 0, "", OPT_HEADER, "Compiler (ez80-clang) options:", NULL, NULL, 0 },
+    { 0, "Cg", OPT_FUNCTION,  "Add an option to ez80-clang" , &clangarg, AddToArgs, 0},
+
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
     { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
     { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
@@ -703,8 +714,7 @@ static char *changesuffix(char *name, char *suffix)
     if ((p = find_file_ext(name)) == NULL) {
         r = mustmalloc(strlen(name) + strlen(suffix) + 1);
         sprintf(r, "%s%s", name, suffix);
-    }
-    else {
+    } else {
         r = mustmalloc(p - name + strlen(suffix) + 1);
         r[0] = '\0';
         strncat(r, name, p - name);
@@ -933,7 +943,7 @@ int main(int argc, char **argv)
 
     processing_user_command_line_arg = 0;
 
-    asmargs = linkargs = cpparg = clangarg = llvmopt = llvmarg = NULL;
+    asmargs = linkargs = cpparg = clangarg =  NULL;
     linklibs = muststrdup("");
 
     cpp_incpath_first = cpp_incpath_last = NULL;
@@ -1169,26 +1179,20 @@ int main(int argc, char **argv)
     }
 
     /* Mangle math lib name but only for classic compiles */
-    if ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
+    if ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")))
         if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   /* -lm appears here */
 
     /* Options that must be sequenced in specific order */
     if (compiler_type == CC_SDCC)
         BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
-    BuildOptions(&clangarg, c_clangincpath);
     if (cpp_incpath_last) {
         BuildOptions(&cpparg, cpp_incpath_last);
-        BuildOptions(&clangarg, cpp_incpath_last);
     }
     if (cpp_incpath_first) {
         BuildOptions_start(&cpparg, cpp_incpath_first);
-        BuildOptions_start(&clangarg, cpp_incpath_first);
     }
-    clangarg = replace_str(ptr = clangarg, "-I", "-idirafter ");
-    free(ptr);
-    clangarg = replace_str(ptr = clangarg, "-D__SDCC", "-D__CLANG");
-    free(ptr);
+
 
     BuildOptions(&linker_libpath_first, "-L. ");
     if (linker_libpath_last)
@@ -1199,12 +1203,6 @@ int main(int argc, char **argv)
         BuildOptions(&linker_linklib_first, linker_linklib_last);
     if (linker_linklib_first)
         BuildOptions_start(&linklibs, linker_linklib_first);
-
-    /* CLANG & LLVM options */
-    BuildOptions_start(&clangarg, "--target=sdcc-z80 -S -emit-llvm ");
-    if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
-    BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
-    BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
 
     if (printmacros)
     {
@@ -1251,7 +1249,7 @@ int main(int argc, char **argv)
     /* m4 include path finds z88dk macro definition file "z88dk.m4" */
     BuildOptions(&m4arg, c_m4opts);
 
-    build_bin = !m4only && !clangonly && !llvmonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
+    build_bin = !m4only && !dependencyonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
 
     /* Create M4 defines out of some pragmas for the CRT */
     /* Some pragma values need to be known at m4 time in the new c lib CRTs */
@@ -1358,37 +1356,9 @@ int main(int argc, char **argv)
             /* Continue processing macro expanded source file */
             goto SWITCH_REPEAT;
             break;
-        CASE_LLFILE:
-        case LLFILE:
-            if (m4only || clangonly) continue;
-            /* llvm-cbe translates llvm-ir to c */
-            if (zopt && process(".ll", ".opt.ll", "zopt", llvmopt, outspecified_flag, i, YES, NO))
-                exit(1);
-            if (process(".ll", ".cbe.c", c_llvm_exe, llvmarg, outspecified_flag, i, YES, NO))
-                exit(1);
-            /* Write .cbe.c to original directory immediately */
-            ptr = changesuffix(original_filenames[i], ".cbe.c");
-            if (copy_file(filelist[i], "", ptr, "")) {
-                fprintf(stderr, "Couldn't write output file %s\n", ptr);
-                exit(1);
-            }
-            /* Copied file becomes the new original file */
-            free(original_filenames[i]);
-            free(filelist[i]);
-            original_filenames[i] = ptr;
-            filelist[i] = muststrdup(ptr);
         case CFILE:
         case CXXFILE:
             if (m4only) continue;
-            /* special treatment for clang+llvm */
-            if ((strcmp(c_compiler_type, "clang") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
-                if (process(".c", ".ll", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
-                    exit(1);
-                goto CASE_LLFILE;
-            }
-            if (clangonly || llvmonly) continue;
-            if (hassuffix(filelist[i], ".cbe.c"))
-                BuildOptions(&cpparg, clangcpparg);
             /* past clang+llvm related pre-processing */
             if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
@@ -1410,7 +1380,7 @@ int main(int argc, char **argv)
             {
                 char *compiler_arg = NULL;
 
-                if (m4only || clangonly || llvmonly || preprocessonly) continue;
+                if (m4only || preprocessonly || dependencyonly) continue;
 
                 if ( get_filetype_by_suffix(original_filenames[i]) == CXXFILE ) {
                     if ( compiler_type != CC_EZ80CLANG) {
@@ -1429,13 +1399,22 @@ int main(int argc, char **argv)
                 free(compiler_arg);
             }
         case OPTFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly) continue;
+            if (m4only || preprocessonly || dependencyonly) continue;
             if (compiler_type == CC_SDCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
 
                 /* filter comments out of asz80 asm file see issue #801 on github */
                 if (peepholeopt) zsdcc_asm_filter_comments(i, ".op1");
+
+                /* sdcc section redirect is broken so do it via text substitution instead */
+                /* c_sdccopt1 rules must be applied first because they rename sdcc section names to the standard compiler output names */
+                if (peepholeopt)
+                {
+                    rules[0] = c_sdccopt1;
+                    apply_copt_rules(i, 1, rules, ".op1", ".opt", ".opt");
+                    zsdcc_asm_filter_sections(i, ".op1");
+                }
 
                 /* sdcc_opt.9 bugfixes critical sections and implements RST substitution */
                 /* rules[num_rules++] = c_sdccopt9;                                      */
@@ -1446,29 +1425,30 @@ int main(int argc, char **argv)
                     rules[num_rules++] = c_sdccopt9;
                     break;
                 case 1:
-                    rules[num_rules++] = c_sdccopt1;
+                    // rules[num_rules++] = c_sdccopt1;  /* already applied above */
                     rules[num_rules++] = c_sdccopt9;
                     break;
                 default:
-                    rules[num_rules++] = c_sdccopt1;
+                    // rules[num_rules++] = c_sdccopt1;  /* already applied above */
                     rules[num_rules++] = c_sdccopt9;
                     rules[num_rules++] = c_sdccopt2;
                     break;
                 }
 
-                if ( c_coptrules_target ) {
-                    rules[num_rules++] = c_coptrules_target;
+                if (peepholeopt)
+                {
+                    if (c_coptrules_target) {
+                        rules[num_rules++] = c_coptrules_target;
+                    }
+
+                    if (coptrules_cpu) {
+                        rules[num_rules++] = coptrules_cpu;
+                    }
+
+                    if (c_coptrules_user) {
+                        rules[num_rules++] = c_coptrules_user;
+                    }
                 }
-
-                if ( coptrules_cpu ) {
-                    rules[num_rules++] = coptrules_cpu;
-                }
-
-                if ( c_coptrules_user ) {
-                    rules[num_rules++] = c_coptrules_user;
-                }
-
-
 
                 if (peepholeopt == 0)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
@@ -1531,14 +1511,18 @@ int main(int argc, char **argv)
             /* user wants to stop at the .s file if stopping at assembly translation */
             if (assembleonly) continue;
         case SFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly) continue;
+            if (m4only || preprocessonly || dependencyonly) continue;
             /* filter comments out of asz80 asm file see issue #801 on github */
+            /* substitute section names for section redirect */
+
             zsdcc_asm_filter_comments(i, ".s2");
-            if (process(".s2", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+            if (process(".s2", ".s3", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                 exit(1);
+            zsdcc_asm_filter_sections(i, ".asm");
+
         CASE_ASMFILE:
         case ASMFILE:
-            if (m4only || clangonly || llvmonly || preprocessonly || assembleonly)
+            if (m4only || preprocessonly || dependencyonly || assembleonly)
                 continue;
 
             /* See #16 on github.                                                                    */
@@ -1671,17 +1655,16 @@ int main(int argc, char **argv)
 
     if (m4only) exit(0);
 
-    if (clangonly) {
-        if (nfiles > 1) outputfile = NULL;
-        copy_output_files_to_destdir(".ll", 1);
-        exit(0);
-    }
-
-    if (llvmonly) exit(0);
-
     if (preprocessonly) {
         if (nfiles > 1) outputfile = NULL;
         copy_output_files_to_destdir(".i", 1);
+        copy_output_files_to_destdir(".d", 1);
+        exit(0);
+    }
+
+    if (dependencyonly) {
+        if (nfiles > 1) outputfile = NULL;
+        copy_output_files_to_destdir(".d", 1);
         exit(0);
     }
 
@@ -1690,6 +1673,7 @@ int main(int argc, char **argv)
         copy_output_files_to_destdir(".asm", 1);
         copy_output_files_to_destdir(".s", 1);
         copy_output_files_to_destdir(".adb", 1);
+        copy_output_files_to_destdir(".d", 1);
         exit(0);
     }
     copy_output_files_to_destdir(".adb", 1);
@@ -1704,7 +1688,7 @@ int main(int argc, char **argv)
 
     {
         // Sort out linklibs for CPU markers (only for classic)
-        int cpu_libs = ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")));
+        int cpu_libs = ((c_clib == NULL) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")));
         char *tmp = replace_str(linklibs, "@{ZCC_LIBCPU}", cpu_libs ? select_cpu(CPU_MAP_TOOL_LIBNAME) : "");
 
         free(linklibs);
@@ -1722,6 +1706,7 @@ int main(int argc, char **argv)
         {
             /* independent object files */
             copy_output_files_to_destdir(c_extension, 1);
+            copy_output_files_to_destdir(".d", 1);
         }
         exit(0);
     }
@@ -1873,70 +1858,85 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
         unsigned int quote_type = 0;
         unsigned int quote_count = 0;
 
-        for (i = 0; i <= strlen(line); ++i)
+        unsigned int dst = 0;
+        unsigned int src = 0;
+
+        // issue #807 on github
+        // nop with comment can be used to inline asm
+
+        sscanf(line, " %n" "nop ; %n", &dst, &src);
+        if (src > dst)
         {
-            if (accept_line == 0)
+            strcpy(line + dst, line + src);
+        }
+        else
+        {
+            for (i = 0; i <= strlen(line); ++i)
             {
-                if (seen_semicolon && (line[i] != '@'))
-                    break;
-
-                seen_semicolon = 0;
-
-                switch (line[i])
+                if (accept_line == 0)
                 {
-                case '\'':
+                    if (seen_semicolon && (line[i] != '@'))
+                        break;
+
+                    seen_semicolon = 0;
+
+                    switch (line[i])
+                    {
+                    case '\'':
 #ifdef WIN32
-                    if ((i >= 2) && (strnicmp(&line[i - 2], "af'", 3) == 0))
+                        if ((i >= 2) && (strnicmp(&line[i - 2], "af'", 3) == 0))
 #else
-                    if ((i >= 2) && (strncasecmp(&line[i - 2], "af'", 3) == 0))
+                        if ((i >= 2) && (strncasecmp(&line[i - 2], "af'", 3) == 0))
 #endif
+                            break;
+                        if (quote_count && ((quote_type & 0x1) == 0))
+                        {
+                            quote_count--;
+                            quote_type >>= 1;
+                        }
+                        else
+                        {
+                            quote_count++;
+                            quote_type <<= 1;
+                        }
                         break;
-                    if (quote_count && ((quote_type & 0x1) == 0))
-                    {
-                        quote_count--;
-                        quote_type >>= 1;
-                    }
-                    else
-                    {
-                        quote_count++;
-                        quote_type <<= 1;
-                    }
-                    break;
 
-                case '"':
-                    if (quote_count && ((quote_type & 0x1) == 1))
-                    {
-                        quote_count--;
-                        quote_type >>= 1;
-                    }
-                    else
-                    {
-                        quote_count++;
-                        quote_type = (quote_type << 1) + 1;
-                    }
-                    break;
-
-                case ';':
-                    if (quote_count)
+                    case '"':
+                        if (quote_count && ((quote_type & 0x1) == 1))
+                        {
+                            quote_count--;
+                            quote_type >>= 1;
+                        }
+                        else
+                        {
+                            quote_count++;
+                            quote_type = (quote_type << 1) + 1;
+                        }
                         break;
-                    if (seen_nonws == 0)
-                    {
-                        accept_line = 1;
+
+                    case ';':
+                        if (quote_count)
+                            break;
+                        if (seen_nonws == 0)
+                        {
+                            accept_line = 1;
+                            break;
+                        }
+                        seen_semicolon = 1;
+                        break;
+
+                    default:
                         break;
                     }
-                    seen_semicolon = 1;
-                    break;
 
-                default:
-                    break;
+                    if (!isspace(line[i]))
+                        seen_nonws = 1;
                 }
-
-                if (!isspace(line[i]))
-                    seen_nonws = 1;
             }
+
+            if (seen_semicolon) line[i - 1] = '\0';                   /* terminate at semicolon */
         }
 
-        if (seen_semicolon) line[i-1] = '\0';                         /* terminate at semicolon */
         fprintf(fout, "%s\n", zcc_ascii_only(zcc_strrstrip(line)));   /* remove trailing whitespace (copt asz80 translator) and ascii-ify source (copt) */
     }
 
@@ -1949,6 +1949,84 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
     filelist[filenumber] = outname;
 }
 
+
+void zsdcc_asm_filter_sections(int filenumber, char* ext)
+{
+    FILE* fin;
+    FILE* fout;
+    char* outname;
+
+    char* line = NULL;
+    unsigned int len = 0;
+
+    char* outline = NULL;
+    char* procline = NULL;
+
+    outname = changesuffix(temporary_filenames[filenumber], ext);
+
+    if ((fin = fopen(filelist[filenumber], "r")) == NULL)
+    {
+        fprintf(stderr, "Error: Cannot read %s\n", filelist[filenumber]);
+        exit(1);
+    }
+
+    if ((fout = fopen(outname, "w")) == NULL)
+    {
+        fprintf(stderr, "Error: Cannot write %s\n", outname);
+        fclose(fin);
+        exit(1);
+    }
+
+    /* read lines from asm file */
+
+    while (zcc_getdelim(&line, &len, '\n', fin) > 0)
+    {
+        outline = muststrdup(line);
+
+        // section redirect
+
+        if (opt_code_seg != NULL)
+        {
+            procline = replace_str(outline, "code_compiler", opt_code_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        if (opt_const_seg != NULL)
+        {
+            procline = replace_str(outline, "rodata_compiler", opt_const_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        if (opt_data_seg != NULL)
+        {
+            procline = replace_str(outline, "data_compiler", opt_data_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        if (opt_bss_seg != NULL)
+        {
+            procline = replace_str(outline, "bss_compiler", opt_bss_seg);
+            free(outline);
+            outline = procline;
+        }
+
+        // write line to output
+
+        fprintf(fout, "%s\n", zcc_strrstrip(outline));
+        free(outline);
+    }
+
+    free(line);
+
+    fclose(fin);
+    fclose(fout);
+
+    free(filelist[filenumber]);
+    filelist[filenumber] = outname;
+}
 
 
 /* Filter global defc file as it is written to the destination directory.
@@ -2180,8 +2258,6 @@ int get_filetype_by_suffix(char *name)
         return HDRFILE;
     if (strcmp(ext, ".inc") == 0)
         return INCFILE;
-    if (strcmp(ext, ".ll") == 0)
-        return LLFILE;
     return 0;
 }
 
@@ -2288,6 +2364,12 @@ static char *expand_macros(char *arg)
     return nval;
 }
 
+void EmitWarning(arg_t *argument, char *arg)
+{
+    fprintf(stderr, "WARNING: %s\n", arg);
+}
+
+
 void SetStringConfig(arg_t *argument, char *arg)
 {
     *(char **)argument->data = expand_macros(arg);
@@ -2346,6 +2428,17 @@ void AddToArgsQuoted(option *argument, char *arg)
     BuildOptionsQuoted(argument->value, arg);
 }
 
+// Add both the argument and the value
+void AddToArgsVerbatim(option *argument, char *arg)
+{
+    char buf[128];
+
+    snprintf(buf,sizeof(buf),"-%s", argument->long_name);
+    BuildOptions(argument->value, buf);
+    BuildOptions(argument->value, arg);
+}
+
+
 void AddPreProcIncPath(option *argument, char *arg)
 {
     /* user-supplied inc path takes precedence over system-supplied inc path */
@@ -2358,7 +2451,12 @@ void AddPreProcIncPath(option *argument, char *arg)
 void AddPreProc(option *argument, char *arg)
 {
     BuildOptions(&cpparg, arg);
-    BuildOptions(&clangarg, arg);
+}
+
+void AddPreProcGen(option *argument, char *arg)
+{
+    dependencyonly = 1;
+    BuildOptions(&cpparg, arg);
 }
 
 
@@ -2383,7 +2481,7 @@ void AddLinkSearchPath(option *argument, char *arg)
 
 /** \brief Append arg to *list
 */
-void BuildOptions(char **list, char *arg)
+void BuildOptions(char **list, const char *arg)
 {
     char           *val;
     char           *orig = *list;
@@ -2922,7 +3020,7 @@ static void configure_compiler(void)
     BuildOptions(&cpparg, "-D__Z88DK");
 
     /* compiler= */
-    if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
+    if (strcmp(c_compiler_type, "sdcc") == 0) {
         char *cpuarg = select_cpu(CPU_MAP_TOOL_ZSDCC);
 
         if ( cpuarg == NULL ) {
@@ -2932,12 +3030,15 @@ static void configure_compiler(void)
 
 
         compiler_type = CC_SDCC;
-        snprintf(buf, sizeof(buf), "%s --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
+        snprintf(buf, sizeof(buf), "%s --legacy-banking --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
             cpuarg, \
             (sdcc_signed_char ? "--fsigned-char" : ""), \
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
             (opt_code_size ? "--opt-code-size" : ""));
         add_option_to_compiler(buf);
+
+        // section redirect is broken in sdcc so do it via text substitution during file processing instead
+
         if (sdccarg) {
             add_option_to_compiler(sdccarg);
         }
@@ -2959,6 +3060,28 @@ static void configure_compiler(void)
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
+
+        // section redirect is fine in sccz80 so add it as a compiler option
+        if (opt_code_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--codeseg=%s", opt_code_seg);
+            add_option_to_compiler(buf);
+        }
+        if (opt_const_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--constseg=%s", opt_const_seg);
+            add_option_to_compiler(buf);
+        }
+        if (opt_data_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--dataseg=%s", opt_data_seg);
+            add_option_to_compiler(buf);
+        }
+        if (opt_bss_seg != NULL)
+        {
+            snprintf(buf, sizeof(buf), "--bssseg=%s", opt_bss_seg);
+            add_option_to_compiler(buf);
+        }
 
         if (sccz80arg) {
             add_option_to_compiler(sccz80arg);
@@ -2988,6 +3111,11 @@ static void configure_compiler(void)
         BuildOptions(&cpparg, preprocarg);
         snprintf(buf, sizeof(buf), "-cc1 %s -S -O3", cpuarg);
         add_option_to_compiler(buf);
+
+        if (clangarg) {
+            add_option_to_compiler(clangarg);
+        }
+
         compiler_type = CC_EZ80CLANG;
         c_compiler = c_ez80clang_exe;
         c_cpp_exe = c_ez80clang_exe;
@@ -2999,6 +3127,23 @@ static void configure_compiler(void)
     }
 }
 
+void OptAllSeg(option* arg, char* val)
+{
+    char *ptr = val;
+
+    while ((*ptr == '=') || (*ptr == ':')) ++ptr;
+
+    if (*ptr != '\0') {
+        free(opt_code_seg);
+        free(opt_const_seg);
+        free(opt_data_seg);
+        free(opt_bss_seg);
+        opt_code_seg = muststrdup(ptr);
+        opt_const_seg = muststrdup(ptr);
+        opt_data_seg = muststrdup(ptr);
+        opt_bss_seg = muststrdup(ptr);
+    }
+}
 
 void PragmaInclude(option *arg, char *val)
 {
@@ -3161,13 +3306,20 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
             if (stat(ptr, &tmp) == 0) {
 
                 /* generate output filename */
-                if (outputfile != NULL)
-                    strcpy(fname, outputfile);                                  /* use supplied output filename */
-                else {
+                if (outputfile != NULL ) {
+                    // Kludge for dependency file
+                    if ( strcmp(suffix, ".d") == 0 ) {
+                        name = changesuffix(outputfile, ".d");
+                        strcpy(fname, name);
+                        free(name);
+                    } else {
+                        strcpy(fname, outputfile);                                  /* use supplied output filename */
+                    }
+                } else {
                     /* using original filename to create output filename */
                     name = stripsuffix(original_filenames[j], ".m4");
-                    if (strcmp(suffix, c_extension) == 0) {
-                        p = changesuffix(name, suffix);                         /* for .o, use original filename with extension changed to .o */
+                    if (strcmp(suffix, c_extension) == 0 || strcmp(suffix,".d") == 0) {
+                        p = changesuffix(name, suffix);                         /* for .o and .d, use original filename with extension changed to .o */
                         strcpy(fname, p);
                         free(p);
                     }
@@ -3213,6 +3365,7 @@ void remove_temporary_files(void)
     if (cleanup) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
             remove_file_with_extension(temporary_filenames[j], "");
+            remove_file_with_extension(temporary_filenames[j], ".d");
             remove_file_with_extension(temporary_filenames[j], ".ll");
             remove_file_with_extension(temporary_filenames[j], ".i");
             remove_file_with_extension(temporary_filenames[j], ".i2");
