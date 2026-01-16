@@ -2047,9 +2047,10 @@ static void declfunc(Type *functype, enum storage_type storage)
     {
         UT_string *output;
         utstring_new(output);
-        //print_ast(output, pair->node);
-        //printf("%s\n", utstring_body(output));
+        print_ast(output, pair->node);
+        printf("%s\n", utstring_body(output));
         utstring_free(output);
+        ast_generate_code(pair->node);
     }
     if (pair->i != STRETURN && (functype->flags & NAKED) == 0 ) {
         if ( functype->return_type->kind != KIND_VOID && lastst != STASM) {

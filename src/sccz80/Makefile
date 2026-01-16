@@ -34,7 +34,8 @@ OBJS =	callfunc.o     	\
 	while.o 	\
 	declparse.o	\
 	../common/option.o \
-	node.o
+	node.o		\
+	ast_codegen.o
 
 DEPENDS := $(OBJS:.o=.d)
 

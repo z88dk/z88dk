@@ -72,6 +72,7 @@ Node *ast_local_var(SYMBOL *sym, const char *name)
     Node *ret = calloc(1,sizeof(*ret));
     ret->ast_type = AST_LOCAL_VAR;
     ret->sym = sym;
+    ret->type = sym->ctype;
     ret->filename = Filename;
     ret->line = lineno;
     return ret;
@@ -83,6 +84,7 @@ Node *ast_global_var(SYMBOL *sym, const char *name)
     Node *ret = calloc(1,sizeof(*ret));
     ret->ast_type = AST_GLOBAL_VAR;
     ret->sym = sym;
+    ret->type = sym->ctype;
     ret->filename = Filename;
     ret->line = lineno;
     return ret;
@@ -118,9 +120,10 @@ Node *ast_uop(int ast_type, Node *op) {
     return ret; 
 }
 
-Node *ast_return(Node *retval) {
+Node *ast_return(Node *retval, Type *desired_return_type) {
     Node *ret = calloc(1,sizeof(*ret));
     ret->ast_type = AST_RETURN;
+    ret->type = desired_return_type;
     ret->retval = retval;
     ret->filename = Filename;
     ret->line = lineno;

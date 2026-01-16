@@ -274,6 +274,9 @@ extern int      c_old_diagnostic_fmt;
 
 #include "misc.h"
 
+/* ast_code.c */
+extern void     ast_generate_code(Node *node);
+
 /* node.c */
 extern Node    *ast_decl(SYMBOL *sym, Node *declvar);
 extern Node    *ast_undecl(SYMBOL *sym);
@@ -283,7 +286,7 @@ extern Node    *ast_global_var(SYMBOL *sym, const char *name);
 extern Node    *ast_conditional(Node *cond, Node *then, Node *nelse);
 extern Node    *ast_binop(int ast_type, Node *left, Node *right);
 extern Node    *ast_uop(int ast_type, Node *op);
-extern Node    *ast_return(Node *retval);
+extern Node    *ast_return(Node *retval, Type *desired_return_type);
 extern Node    *ast_compound(array *nodes);
 extern Node    *ast_label(int label, const char *slabel);
 extern Node    *ast_jump(int label, const char *slabel);

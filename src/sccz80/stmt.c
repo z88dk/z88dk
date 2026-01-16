@@ -693,7 +693,7 @@ Node *doreturn(char type)
                 load_constant(&lval);
                 gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
                 sym_undecl_frame(arr, STARTLOC, 0);
-                return ast_return(array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr));
+                return ast_return(array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr), currfn->ctype->return_type);
             }
             clearstage(before, start);
             if (ch() != ',')
@@ -706,7 +706,7 @@ Node *doreturn(char type)
         gen_leave_function(KIND_INT, type, incritical);
     }
     sym_undecl_frame(arr, STARTLOC, 0);
-    return ast_return(array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr));
+    return ast_return(array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr), currfn->ctype->return_type);
 }
 
 
