@@ -185,6 +185,9 @@ noblockx:
     djnz    oloopx
 
   IF    _GFX_PAGE_VRAM
+   IF __CPU_INTEL__ | __CPU_GBZ80__
+    pop     de
+   ENDIF
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -298,13 +301,16 @@ noblocka:
     djnz    oloopa
 
   IF    _GFX_PAGE_VRAM
+   IF __CPU_INTEL__ | __CPU_GBZ80__
+    pop     de
+   ENDIF
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+   IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ELSE
+   ELSE
     pop     de
-    ENDIF
+   ENDIF
     ret
   ENDIF
 
@@ -414,13 +420,16 @@ noblocko:
     djnz    oloopo
 
   IF    _GFX_PAGE_VRAM
+   IF __CPU_INTEL__ | __CPU_GBZ80__
+    pop     de
+   ENDIF
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+   IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ELSE
+   ELSE
     pop     de
-    ENDIF
+   ENDIF
     ret
   ENDIF
 
