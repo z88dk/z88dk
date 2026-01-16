@@ -36,8 +36,75 @@ typedef struct {
     uint16_t crd, ald;
 } HDOS_DirEntry;
 
+typedef struct {
+    int day;
+    int month;
+    int year;
+} DecodedDate;
+
+typedef struct {
+    uint8_t B1;
+    uint8_t B2;
+} EncodedTimestamp;
+
+
 static uint16_t u16le(const uint8_t *p) { return p[0] | (p[1] << 8); }
 static void w16le(uint8_t *p, uint16_t v) { p[0] = v & 0xFF; p[1] = v >> 8; }
+
+
+/*
+ * Decode the 2-byte timestamp format:
+ *
+ *   B1: bits 0..4 -> day
+ *       bits 5..7 -> month low bits (0..7)
+ *
+ *   B2: bit 0     -> month high bit (MSB of month)
+ *       bits 1..7 -> year offset from 1970
+ *
+ *   month range is 1..12 but the encoding does not validate
+ *   calendar correctness (e.g., 31-SEP is possible).
+ */
+DecodedDate decode_timestamp(uint8_t B1, uint8_t B2)
+{
+    DecodedDate d;
+
+    d.day   = B1 & 0x1F;                  // 5 lower bits
+    d.month = (B1 >> 5) | ((B2 & 0x01) << 3);
+    d.year  = 1970 + (B2 >> 1);
+
+    return d;
+}
+
+
+/*
+ * Encode date into 2-byte timestamp format:
+ *
+ *   Input constraints (not enforced):
+ *     day   = 1..31
+ *     month = 1..12
+ *     year  = >= 1970
+ *
+ *   Encoding:
+ *     B1 bits 0..4  -> day
+ *     B1 bits 5..7  -> month low 3 bits
+ *
+ *     B2 bit 0      -> month high bit (month bit 3)
+ *     B2 bits 1..7  -> (year - 1970)
+ */
+EncodedTimestamp encode_timestamp(int day, int month, int year)
+{
+    EncodedTimestamp e;
+
+    int year_offset = year - 1970;
+    int month_low3  = month & 0x07;   // lower 3 bits of month
+    int month_high1 = (month >> 3) & 0x01; // MSB of month (bit 3)
+
+    e.B1 = (day & 0x1F) | (month_low3 << 5);
+    e.B2 = (month_high1) | (year_offset << 1);
+
+    return e;
+}
+
 
 static void read_sector(FILE *fp, int sector, uint8_t *buf) {
     fseek(fp, sector * SECTOR_SIZE, SEEK_SET);
@@ -85,9 +152,9 @@ static int delete_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *filen
             if (off + 23 > 506) break;           // safety bound
 
             uint8_t *e = blk + off;
-            if (e[0] == 0) continue;             // empty slot
+            if (e[0] == 0) continue;                // empty slot
             if (e[0] == 0xFE) continue;             // empty slot
-            if (e[0] == 0xFF) continue;             // unusable slot
+            if (e[0] == 0xFF) continue;             // freed slot
 
             // Compose NAME.EXT for match (case-insensitive)
             char name[13]; memcpy(name, e, 8); name[8] = '\0';
@@ -309,6 +376,7 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
             if (off + 23 > 506) break;
 
             if ((blk[off] == 0xFE)||(blk[off] == 0xFF)||(blk[off] == 0x00)) {
+				printf("Identified Directory slot at offset %lu\n",off);
                 // Prepare NAME.EXT in 8.3 uppercase
                 memset(blk + off, 0, 23);
                 char name8[8] = {0}, ext3[3] = {0};
@@ -329,14 +397,19 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
                     blk[off + j] = (uint8_t)toupper((unsigned char)blk[off + j]);
                 }
 				
+                // Optionally set flags/project/version/cluster_factor				
+				blk[off + 13] = lab.spg+1;    // cluster factor (+1 as seen in the wild)
+				blk[off + 14] = 0x00;         // flags, e.g. 0x20 = WR protect
+
                 // Fill in chain info
                 blk[off + 16] = (uint8_t)fgn;                           // first group
                 blk[off + 17] = (uint8_t)lgn;                           // last group
                 blk[off + 18] = (uint8_t)((sectors_needed - 1) % lab.spg); // last sector index in last group
 
-                // Optionally set flags/project/version/cluster_factor				
-                blk[off + 13] = lab.spg; // cluster factor
-				//blk[off + 13] = 1;
+				// Put z88dk signature in the file timestamp
+				EncodedTimestamp ts = encode_timestamp(1, 1, 1988);
+				blk[off + 19] = blk[off + 21] = ts.B1;
+				blk[off + 20] = blk[off + 22] = ts.B2;
 
                 write_sector(fp, next_sector,     blk);
                 write_sector(fp, next_sector + 1, blk + 256);
@@ -396,8 +469,10 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
     int next_sector = lab.dis;
 	int entry_count = 0;
 	int entry_used = 0;
+	char entry_fname[14];
+	
     printf("\n=== DIRECTORY ===\n");
-    printf("%-12s %-5s %-10s %-8s %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "GROUPS");
+    printf("%-12s  %-5s %-10s %-8s %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "GROUPS");
     while (next_sector != 0) {
         uint8_t blk[512];
         read_sector(fp, next_sector, blk);
@@ -410,11 +485,12 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 			if (e[0] == 0xFE) {entry_count++; continue;} // empty
 			if (e[0] == 0xFF) continue; // empty, not to be used
             HDOS_DirEntry d;
-            memcpy(d.name, e, 8); d.name[8] = '\0';
+			
+            memcpy(entry_fname, e, 8); entry_fname[8] = '\0';
             memcpy(d.ext, e+8, 3); d.ext[3] = '\0';
 			if (strlen(d.ext)) {
-				strcat(d.name, ".");
-				strcat(d.name, d.ext);
+				strcat(entry_fname, ".");
+				strcat(entry_fname, d.ext);
 			}
             d.project = e[11];
             d.version = e[12];
@@ -440,7 +516,7 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
             if (d.flags & 0x40) flags_s[1]='L';
             if (d.flags & 0x20) flags_s[2]='W';
             if (d.flags & 0x10) flags_s[3]='C';
-            printf("%-12s %-5s %-10d %-8d ", d.name, flags_s, size_b, sectors-1);
+            printf("%-12s  %-5s %-10d %-8d ", entry_fname, flags_s, size_b, sectors-1);
             if (clen) {
                 printf("%d->%d->0\n", chain[0], chain[clen-1]);
 				entry_used++;
