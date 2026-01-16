@@ -61,8 +61,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ELSE
     ex      (sp),hl
     inc     hl
-    ld      a,(hl)                      ; Height
-    ld      b,a
+    ld      b,(hl)                      ; Height
     inc     hl
     ld      (__spr_bitmap),hl
     dec     hl
@@ -98,9 +97,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ELSE
     push    hl
     ld      hl,(__spr_bitmap)
-    ld      a,(hl)
+    ld      c,(hl)
     pop     hl
-    ld      c,a
 ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
@@ -148,9 +146,8 @@ ELSE
     ld      hl,(__spr_bitmap)
     inc     hl
     ld      (__spr_bitmap),hl
-    ld      a,(hl)
+    ld      c,(hl)
     pop     hl
-    ld      c,a
 ENDIF
 
     jr      noblockx
@@ -174,9 +171,8 @@ ELSE
     ld      hl,(__spr_bitmap)
     inc     hl
     ld      (__spr_bitmap),hl
-    ld      a,(hl)
+    ld      c,(hl)
     pop     hl
-    ld      c,a
 ENDIF
     jr      iloopx
 
@@ -193,6 +189,8 @@ noblockx:
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+    ELSE
+    pop     de
     ENDIF
     ret
   ENDIF
@@ -304,6 +302,8 @@ noblocka:
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+    ELSE
+    pop     de
     ENDIF
     ret
   ENDIF
@@ -418,6 +418,8 @@ noblocko:
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+    ELSE
+    pop     de
     ENDIF
     ret
   ENDIF
