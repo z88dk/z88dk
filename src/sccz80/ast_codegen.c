@@ -505,6 +505,8 @@ static void generate_decl(Node *node)
         // Assign to variable
         LVALUE lval = {0};
         lval.symbol = node->sym;
+        lval.ltype = node->sym->ctype;
+        lval.val_type = node->sym->type;
         smartstore(&lval);
     }
 }
