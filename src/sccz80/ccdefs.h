@@ -191,6 +191,8 @@ extern array     *array_init(void (*destructor)(void *));
 extern void       array_free(array *arr);
 extern size_t     array_len(array *arr);
 extern void       array_add(array *arr, void *elem);
+extern void array_del_byindex(array *arr, int index);
+extern void array_insert(array *arr, int index, void *elem);
 extern void      *array_get_byindex(array *arr, int index);
 extern Type      *find_tag(const char *name);
 extern Type      *find_tag_field(Type *tag, const char *fieldname);

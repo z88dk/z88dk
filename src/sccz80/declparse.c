@@ -128,6 +128,23 @@ void array_del_byindex(array *arr, int index)
     arr->size--;
 }
 
+void array_insert(array *arr, int index, void *elem)
+{
+    int i;
+
+    if ( index < 0 || index >= arr->size ) {
+        return;
+    }
+
+    arr->elems = REALLOC(arr->elems, (arr->size + 1) * sizeof(arr->elems[0]));
+
+    for ( i = arr->size; i > index; i-- ) {
+        arr->elems[i] = arr->elems[i-1];
+    }
+    arr->elems[index] = elem;
+    arr->size++;
+}
+
 
 
 
@@ -2050,6 +2067,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         print_ast(output, pair->node);
         printf("%s\n", utstring_body(output));
         utstring_free(output);
+        ol("AST Generated:");
         ast_generate_code(pair->node);
     }
     if (pair->i != STRETURN && (functype->flags & NAKED) == 0 ) {
