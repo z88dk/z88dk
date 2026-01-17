@@ -103,9 +103,10 @@ lstoff
 
 		DEFC	ZXFP_RE_STACK	= $3D
 
-		DEFC	ZXFP_SERIES_06	= $3E	; Polynomenentwicklung
+		DEFC	ZXFP_SERIES_06	= $80	; Polynomenentwicklung
+		DEFC	ZXFP_SERIES_08	= $90	; Polynomenentwicklung
 
-		DEFC	ZXFP_STK_ZERO	= $3F
+		DEFC	ZXFP_STK_ZERO	= $A0
 		DEFC	ZXFP_STK_ONE	= $A1
 		DEFC	ZXFP_STK_HALF	= $A2
 		DEFC	ZXFP_STK_PI_D_2	= $A3

@@ -22,6 +22,7 @@
 #ifndef __STDARG_H__
 #define __STDARG_H__
 
+#include <sys/compiler.h>
 
 #ifdef __Z88DK_R2L_CALLING_CONVENTION
 
