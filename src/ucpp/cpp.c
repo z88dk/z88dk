@@ -429,7 +429,7 @@ static void close_input(struct lexer_state *ls)
 #endif
 	if (ls->input) {
 		fclose(ls->input);
-		ls->input = 0;
+		ls->input = NULL;
 	}
 }
 
@@ -1432,6 +1432,7 @@ do_include_next:
 		}
 		/* file was found, but it is useless to include it again */
 		freemem(fname);
+		ls->oline++;
 		return 0;
 	}
 #ifdef UCPP_MMAP
@@ -2056,7 +2057,7 @@ int cpp(struct lexer_state *ls)
 				/* We found a guardian but an old one. */
 				freemem(protect_detect.macro);
 			}
-			protect_detect.macro = 0;
+			protect_detect.macro = NULL;
 		}
 		if (ls->ifnest) {
 			error(ls->line, "unterminated #if construction "
@@ -2128,7 +2129,6 @@ int cpp(struct lexer_state *ls)
 	if (ls->ctok->type == NEWLINE) ls->ltwnl = 1; 
 	else if (!ttWHI(ls->ctok->type)) ls->ltwnl = 0;
 
-    //yield_newlines(ls); // Gets line numbers right, but doesn't collapse multiple newlines.
 	return r ? r : -1;
 }
 
