@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct window mine; /* Window structure */
 unsigned char stencil[192 * 2];
 
 main()
