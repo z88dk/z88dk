@@ -15,11 +15,10 @@
 #ifndef __CONIO_H__
 #define __CONIO_H__
 
-// this is used by getch, putch and ungetch.
 #include <sys/compiler.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <graphics.h>
+#include <sys/ioctl.h>
 #include <dos.h>
 #include <X11/Xz88dk.h>
 
@@ -160,6 +159,28 @@ extern int __LIB__ bordercolour(int c) __z88dk_fastcall;
 // CC65 compatibility
 #define cgetc() getch()
 #define cputc(a) fputc_cons(a)
+
+
+// Convenience method for setting screen mode
+#define conio_set_screen_mode(n) do { \
+    int mode = (n); \
+    console_ioctl(IOCTL_GENCON_SET_MODE, &mode); \
+} while(0)
+
+#define conio_set_font64(f) do { \
+    void *fnt = (void *)(f); \
+    console_ioctl(IOCTL_GENCON_SET_FONT64, &fnt); \
+} while(0)
+
+#define conio_set_font32(f) do { \
+    void *fnt = (void *)(f); \
+    console_ioctl(IOCTL_GENCON_SET_FONT32, &fnt); \
+} while(0)
+
+#define conio_set_udg32(f) do { \
+    void *fnt = (void *)(f); \
+    console_ioctl(IOCTL_GENCON_SET_UDG32, &fnt); \
+} while(0)
 
 
 #endif /* _CONIO_H */

@@ -68,7 +68,7 @@ extern void  __LIB__ *shiftsprite_l(void *sprite) __z88dk_fastcall;
 extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
 
 
-/* Order fo rbelow is right, left, down, up, fire, fire2, fire3, fire4 */
+/* Order for below is right, left, down, up, fire, fire2, fire3, fire4 */
 /* Internal keyboard joysticks that use inkey driver */
 extern uint8_t __LIB__ joystick_sc(int *scan_codes) __z88dk_fastcall;
 /* Takes an array of ascii codes to check for joystick (0 terminated) */
@@ -87,234 +87,22 @@ extern uint8_t __LIB__ kjoystick(uint8_t *keycodes) __z88dk_fastcall;
 
 extern const unsigned char *joystick_type[];
 
-#ifdef __C128__
+
+#ifdef __ACE__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN"};
+	const unsigned char *joystick_type[] = {"Keys 1-5","Keys 6-0","Cursor"};
 #endif
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef __CPC__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursor", "hjkl-sd"};
-#endif
-	#define GAME_DEVICES 5
-#endif
-
-#ifdef __ENTERPRISE__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 3
-#endif
-
-#ifdef __TVC__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1/internal", "Joystick 2a, §"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __GAL__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Arrows and SPACE", "QAOP-MN"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __GAMEBOY__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joypad"};
-#endif
-	#define GAME_DEVICES 1
-#endif
-
-#ifdef __PC6001__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __PHC25__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursor",  "hjkl-sd"};
-#endif
-	#define GAME_DEVICES 5
-#endif
-
-#ifdef __M5__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1 + Space", "QAOP-MN", "8246-05", "hjkl-sd"};
-#endif
-	#define GAME_DEVICES 4
-#endif
-
-#ifdef __MSX__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 3
-#endif
-
-#ifdef __MTX__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __BEE__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Arrows and SPACE", "Arrows + SPACE (256TC)", "Joystick on parallel port"};
-#endif
-	#define GAME_DEVICES 3
-#endif
-
-#ifdef __PENCIL2__
+#ifdef __ALPHATRO__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
 	#define GAME_DEVICES 4
 #endif
 
-#ifdef __COLECO__
-#ifndef __BIT90__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
-#endif
-	#define GAME_DEVICES 4
-#endif
-#endif
-
-#ifdef __BIT90__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor", "Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
-#endif
-	#define GAME_DEVICES 8
-#endif
-
-#ifdef __HOMELAB__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 4
-#endif
-
-#ifdef __HOMELAB2__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd"};
-#endif
-	#define GAME_DEVICES 3
-#endif
-
-#ifdef __LASER500__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd"};
-#endif
-	#define GAME_DEVICES 4
-#endif
-
-#ifdef __MC1000__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick A", "Joystick B", "QAOP-MN", "8246-05",};
-#endif
-	#define GAME_DEVICES 4
-#endif
-
-#ifdef __MYVISION__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Cursor","1234-56"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __OSCA__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Cursor", "Joystick"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __PACMAN__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __PV1000__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __LYNX__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 4
-#endif
-
-#ifdef __RX78__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 6
-#endif
-
-#ifdef __SVI__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 6
-#endif
-
-#ifdef __SMS__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joypad 1", "Joypad 2" };
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-#ifdef __SPC1000__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 5
-#endif
-
-#ifdef __SC3000__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 6
-#endif
-
-#ifdef __SAM__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1","Joystick 2","QAOP-MN"};
-#endif
-	#define GAME_DEVICES 3
-#endif
-
-#ifdef __SPECTRUM__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller","QAOP-MN"};
-#endif
-	#define GAME_DEVICES 6
-#endif
-
-#ifdef __PASOPIA7__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
-#endif
-	#define GAME_DEVICES 2
-#endif
-
-
-#ifdef __SUPER80__
+#ifdef __ALPHATP2__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
@@ -335,11 +123,106 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 4
 #endif
 
+#ifdef __BEE__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Arrows and SPACE", "Arrows + SPACE (256TC)", "Joystick on parallel port"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef __BIT90__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor", "Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
+#endif
+	#define GAME_DEVICES 8
+#endif
+
+#ifdef __C128__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef __COLECO__
+#ifndef __BIT90__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+#endif
+
+#ifdef __CPC__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursor", "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 5
+#endif
+
+#ifdef __ENTERPRISE__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef __GAL__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Arrows and SPACE", "QAOP-MN"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __GAMEBOY__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joypad"};
+#endif
+	#define GAME_DEVICES 1
+#endif
+
+#ifdef __GL__
+#ifdef GL_TARGET_GL6000
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05",  "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+#endif
+
+#ifdef __HECTOR
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2","AQOP-BN", "8246-05", "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 5
+#endif
+
+#ifdef __HOMELAB__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __HOMELAB2__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
 #ifdef __KROKHA__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Joystick"};
 #endif
 	#define GAME_DEVICES 1
+#endif
+
+#ifdef __LASER500__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 4
 #endif
 
 #ifdef __LVIV__
@@ -349,6 +232,68 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
+#ifdef __LYNX__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __M5__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1 + Space", "QAOP-MN", "8246-05", "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __MC1000__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick A", "Joystick B", "QAOP-MN", "8246-05",};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __MIKRO80__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __MSX__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef __MTX__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __MYVISION__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Cursor","1234-56"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __NABUPC__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __NC
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05",  "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
 
 #ifdef __ONDRA__
 #ifdef DEFINE_JOYSTICK_TYPE
@@ -357,11 +302,46 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 4
 #endif
 
-#ifdef __SMC777__
+#ifdef __OSCA__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Cursor", "Joystick"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __PACMAN__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
 #endif
 	#define GAME_DEVICES 2
+#endif
+
+#ifdef __PASOPIA7__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __PC6001__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __PENCIL2__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __PHC25__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "Cursor",  "hjkl-sd"};
+#endif
+	#define GAME_DEVICES 5
 #endif
 
 #ifdef __PMD85__
@@ -378,13 +358,47 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 4
 #endif
 
-#ifdef __MIKRO80__
+#ifdef __PV1000__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
 #endif
-	#define GAME_DEVICES 4
+	#define GAME_DEVICES 2
 #endif
 
+#ifdef __RX78__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 6
+#endif
+
+#ifdef __SAM__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1","Joystick 2","QAOP-MN"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef __SC3000__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 6
+#endif
+
+#ifdef __SMC777__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __SMS__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joypad 1", "Joypad 2" };
+#endif
+	#define GAME_DEVICES 2
+#endif
 
 #ifdef __SORCERER__
 #ifdef DEFINE_JOYSTICK_TYPE
@@ -393,19 +407,26 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef __TRS80__
+#ifdef __SPC1000__
 #ifdef DEFINE_JOYSTICK_TYPE
-#ifdef __TRS80II__
-	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05"};
-#else
+	const unsigned char *joystick_type[] = { "Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 5
+#endif
+
+#ifdef __SPECTRUM__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller","QAOP-MN"};
+#endif
+	#define GAME_DEVICES 6
+#endif
+
+
+#ifdef __SUPER80__
+#ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
-#endif
-#ifdef __TRS80II__
-	#define GAME_DEVICES 2
-#else
 	#define GAME_DEVICES 4
-#endif
 #endif
 
 #ifdef __SV8000_
@@ -415,18 +436,11 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
-#ifdef __ACE__
+#ifdef __SVI__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Keys 1-5","Keys 6-0","Cursor"};
+	const unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
-	#define GAME_DEVICES 3
-#endif
-
-#ifdef __ZX81__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"kempston","zxpand","qaop-mn","cursor"};
-#endif
-	#define GAME_DEVICES 4
+	#define GAME_DEVICES 6
 #endif
 
 #ifdef __TI82__
@@ -457,13 +471,34 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 1
 #endif
 
+#ifdef __TRS80__
+#ifdef DEFINE_JOYSTICK_TYPE
+#ifdef __TRS80II__
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05"};
+#else
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+#endif
+#ifdef __TRS80II__
+	#define GAME_DEVICES 2
+#else
+	#define GAME_DEVICES 4
+#endif
+#endif
+
+#ifdef __TVC__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1/internal", "Joystick 2a, §"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
 #ifdef __VECTOR06C__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
 	#define GAME_DEVICES 4
 #endif
-
 
 #ifdef __VG5000__
 #ifdef DEFINE_JOYSTICK_TYPE
@@ -472,26 +507,11 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 6
 #endif
 
-#ifdef __HECTOR
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2","AQOP-BN", "8246-05", "hjkl-sd"};
-#endif
-	#define GAME_DEVICES 5
-#endif
-
-
 #ifdef __VZ200__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Keys 1-5","Keys 6-0","QAOP-MN"};
 #endif
 	#define GAME_DEVICES 3
-#endif
-
-#ifdef __ZXVGS__
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
-#endif
-	#define GAME_DEVICES 4
 #endif
 
 #ifdef __Z80TVGAME__
@@ -522,28 +542,26 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef __NABUPC__
+#ifdef __ZX81__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05"};
+	const unsigned char *joystick_type[] = {"kempston","zxpand","qaop-mn","cursor"};
 #endif
 	#define GAME_DEVICES 4
 #endif
 
-#ifdef __GL__
-#ifdef GL_TARGET_GL6000
+#ifdef __ZXVGS__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05",  "hjkl-sd", "Cursor"};
+	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
 #endif
 	#define GAME_DEVICES 4
-#endif
 #endif
 
-#ifdef __NC
-#ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05",  "hjkl-sd", "Cursor"};
-#endif
-	#define GAME_DEVICES 4
-#endif
+
+
+
+
+
+
 
 
 #ifndef GAME_DEVICES

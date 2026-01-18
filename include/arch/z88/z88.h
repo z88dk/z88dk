@@ -2,10 +2,6 @@
  *	This file contains pretty well all the z88 specific routines
  *	Most of these will probably have no equivalent on any other
  *	machine..
- *
- *      Link using -lz88
- *
- *	$Id: z88.h,v 1.9 2016-06-23 21:11:24 dom Exp $
  */
 
 #ifndef __Z88_H__
@@ -16,8 +12,34 @@
 #include <sys/types.h>
 
 
+/*
+ * Structure to use when opening a window - as per usual, if graph <> 0
+ * then open graphics window number with width (pixels) width 
+ */
 
-// Copy the ZX scree onto the z88 map area
+struct window {
+    uint8_t number;
+    uint8_t x;
+    uint8_t y;
+    uint8_t width;
+    uint8_t depth;
+    uint8_t type;
+    uint8_t graph;          // 1 = 256, 2 = 512
+};
+
+/* Open a z88 window..either graphics or text */
+extern int __LIB__ window(struct window *) __smallc;
+
+
+/* Scroll map left by one pixel */
+extern void __LIB__ lscroll(int x, int y, int width, int height, int pixels) __smallc;
+/* Scroll map right by one pixel (unwritten) */
+extern void __LIB__ rscroll(int x, int y, int width, int height, int pixels) __smallc;
+/* Close the map */
+extern void __LIB__ closegfx(struct window *) __smallc;
+
+
+// Copy the ZX screen onto the z88 map area
 //
 // Compile with: pragma-define:CLIB_NEED_ZXSCREEN=1 to make space for it
 //
@@ -73,15 +95,13 @@ extern void __LIB__ nameapp(const char *);
  * All these return 0 on failure
  */
 
- #if 0
 #define INT_TICK	1
 #define INT_SEC		2
-#define INT_MIN		4
+#define INT_MINUTE  4
 #define INT_UART	8
 
 extern int __LIB__ RegisterInt(void (*fn)(),int type, int tick) __smallc;
 extern int __LIB__ DeRegisterInt(void);
-#endif 
 
 /*
  *	Open a library/package, returns 0 on failure
@@ -113,7 +133,7 @@ extern pid_t __LIB__ getpid(void);
 #define LIB_PACKAGE	0x0f
 #define LIB_XFS		0x12
 #define LIB_TCP		0x15
-#define LIB_TFTPD       0x18
+#define LIB_TFTPD   0x18
 #define LIB_EXAMPLE	0x45
 
 extern int __LIB__ opendor(const char *filename);
@@ -135,9 +155,9 @@ extern int __LIB__ brotherdor(int dor, char *store) __smallc;
 
 typedef struct wildcard_st {
 	void	*endptr;
-	u8_t	segments;
-	u8_t	length;
-	u8_t	dortype;
+	uint8_t	segments;
+	uint8_t	length;
+	uint8_t	dortype;
 } wildcard_t;
 
 /* Open a wildcard handler, 
@@ -208,7 +228,7 @@ extern int __LIB__ parsefile(far char *seg, wildcard_t *wild);
 extern int __LIB__ exec_cli(char *str);
 
 
-/* Enable disable the cursor on teh current window */
+/* Enable disable the cursor on the current window */
 extern void __LIB__ z88_disable_cursor(void);
 extern void __LIB__ z88_enable_cursor(void);
 

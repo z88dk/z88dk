@@ -29,7 +29,7 @@ typedef int error_t;
 #define ANGE  13
 #define ESTAT  14
 #define EAGAIN  15
-#define EWOULDBLOCK  15
+#define EWOULDBLOCK  16
 
 
 #endif

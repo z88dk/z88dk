@@ -13,22 +13,12 @@
 #include <sys/types.h>
 #include <stdint.h>
 
-#pragma output graphics
+#ifdef __Z88__
+// Window has moved into z88.h
+#include <arch/z88/z88.h>
+#endif
 
 
-/* Structure to use when opening a window - as per usual, if graph <> 0
- * then open graphics window number with width (pixels) width 
- */
-
-struct window {
-        uint8_t number;
-        uint8_t x;
-        uint8_t y;
-        uint8_t width;
-        uint8_t depth;
-        uint8_t type;
-        uint8_t graph;
-} ;
 
 
 /* Fills an area */
@@ -119,37 +109,29 @@ extern void __LIB__ xordrawr_callee(int px, int py) __smallc __z88dk_callee;
 /* Remove a relative draw */
 __ZPROTO2(void,,undrawr,int,px,int,py)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
 extern void __LIB__ undrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define undrawr(a,b)           undrawr_callee(a,b)
-#endif
 #endif
 
 /* Draw up to a specified point */
 __ZPROTO2(void,,drawto,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
 extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define drawto(a,b)           drawto_callee(a,b)
-#endif
 #endif
 
 /* Draw up to a specified point in XOR mode*/
 __ZPROTO2(void,,xordrawto,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
 extern void __LIB__ xordrawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define xordrawto(a,b)           xordrawto_callee(a,b)
-#endif
 #endif
 
 /* Undraw up to a specified point */
 __ZPROTO2(void,,undrawto,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
 extern void __LIB__ undrawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define undrawto(a,b)           undrawto_callee(a,b)
-#endif
 #endif
 
 
@@ -337,17 +319,6 @@ extern void __LIB__ stencil_render(unsigned char *stencil, unsigned char intensi
 /* 'Graphic Profiles' are byte streams containing vector and surface descriptions
    they are detailed in <gfxprofile.h> */
 extern void __LIB__ draw_profile(int dx, int dy, int scale, unsigned char *metapic) __smallc;
-
-#ifdef Z88
-/* Open a z88 window..either graphics or text */
-extern int __LIB__ window(struct window *) __smallc;
-/* Scroll map left by one pixel */
-extern void __LIB__ lscroll(int x, int y, int width, int height, int pixels) __smallc;
-/* Scroll map right by one pixel (unwritten) */
-extern void __LIB__ rscroll(int x, int y, int width, int height, int pixels) __smallc;
-/* Close the map */
-extern void __LIB__ closegfx(struct window *) __smallc;
-#endif
 
 /* Chunk 4x4 pixel */
 __ZPROTO2(void,,c_plot,int,x,int,y)
