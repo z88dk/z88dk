@@ -7,6 +7,7 @@
 #ifndef __AQUARIUS_H__
 #define __AQUARIUS_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <sound.h>
 

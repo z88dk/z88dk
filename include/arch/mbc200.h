@@ -1,6 +1,8 @@
 #ifndef __ARCH_MBC200_H__
 #define __ARCH_MBC200_H__
 
+#include <sys/compiler.h>
+
 //////////////////////////
 //   Video interface
 //////////////////////////

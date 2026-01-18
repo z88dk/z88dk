@@ -1,6 +1,7 @@
 #ifndef __G800_H__
 #define __G800_H__
 
+#include <sys/compiler.h>
 
 // invlcd(1) -> invert LCD display
 // invlcd(0) -> undo inversion

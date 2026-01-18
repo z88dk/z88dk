@@ -1,6 +1,8 @@
 #ifndef __ARCH_APPLE2_H__
 #define __ARCH_APPLE2_H__
 
+#include <sys/compiler.h>
+
 
 //////////////////////////
 //   Video interface

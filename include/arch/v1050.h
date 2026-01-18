@@ -1,6 +1,8 @@
 #ifndef __ARCH_V1050_H__
 #define __ARCH_V1050_H__
 
+#include <sys/compiler.h>
+
 //////////////////////////
 //   Video interface
 //////////////////////////

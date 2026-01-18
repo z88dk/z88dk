@@ -1,6 +1,7 @@
 #ifndef __ARCH_ATTACHE_H__
 #define __ARCH_ATTACHE_H__
 
+#include <sys/compiler.h>
 #include <cpm.h>
 
 

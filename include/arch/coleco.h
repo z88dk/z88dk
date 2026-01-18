@@ -1,6 +1,7 @@
 #ifndef ARCH_COLECO_H
 #define ARCH_COLECO_H
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 // Access to the buffers that are used by OS7

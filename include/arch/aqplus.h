@@ -2,6 +2,7 @@
 #ifndef __AQPLUS_H
 #define __AQPLUS_H
 
+#include <sys/compiler.h>
 #include <stdint.h>
 #include <arch/aquarius.h>
 

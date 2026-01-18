@@ -3,6 +3,7 @@
 #ifndef __ARCH_ZXN_H__
 #define __ARCH_ZXN_H__
 
+#include <sys/compiler.h>
 #include <arch.h>
 
 #include <stddef.h>

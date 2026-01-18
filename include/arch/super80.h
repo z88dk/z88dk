@@ -1,6 +1,7 @@
 #ifndef ARCH_SUPER80_H
 #define ARCH_SUPER80_H
 
+#include <sys/compiler.h>
 
 // Set the palette mode
 #define SUPER80_PALETTE_RGB 0

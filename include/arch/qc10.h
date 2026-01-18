@@ -1,6 +1,7 @@
 #ifndef __ARCH_QX10_H__
 #define __ARCH_QX10_H__
 
+#include <sys/compiler.h>
 #include <stdlib.h>
 
 ///////////////////////////

@@ -2,6 +2,8 @@
 #ifndef ARCH_HECTOR_H
 #define ARCH_HECTOR_H
 
+#include <sys/compiler.h>
+
 typedef enum {
     HECTOR_BLACK = 0,
     HECTOR_RED,
