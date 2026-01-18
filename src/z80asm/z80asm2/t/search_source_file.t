@@ -711,12 +711,14 @@ spew("$test.dir/sub1/deeper/d1.asm", "nop");
 spew("$test.dir/sub2/e2.asm", "nop");
 
 # 1) '*' matches any number of chars in a single path component
-capture_ok("z88dk-z80asm -v -E \"$test.dir/*.asm\" | sort", <<END);
-% z88dk-z80asm -v -E $test.dir/*.asm
-Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i
-Preprocessing file: $test.dir/a2.asm -> $test.dir/a2.i
-Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i
-END
+run_ok("z88dk-z80asm -v -E \"$test.dir/*.asm\" > $test.out");
+my @out = path("$test.out")->lines;
+for (@out) { s/\s+$//; }  # chomp CR-LF
+@out = grep {$_ ne "% z88dk-z80asm -v -E $test.dir/*.asm"} @out;
+@out = grep {$_ ne "Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i"} @out;
+@out = grep {$_ ne "Preprocessing file: $test.dir/a2.asm -> $test.dir/a2.i"} @out;
+@out = grep {$_ ne "Preprocessing file: $test.dir/bX.asm -> $test.dir/bX.i"} @out;
+ok @out == 0, "All expected files processed @out";
 
 check_text_file("$test.dir/a1.i", <<END);
 #line 1, "$test.dir/a1.asm"
@@ -749,7 +751,7 @@ END
 
 # 4) '**' combined with '*.asm' to collect many files across subdirs
 run_ok("z88dk-z80asm -v -E \"$test.dir/**/*.asm\" > $test.out");
-my @out = path("$test.out")->lines;
+@out = path("$test.out")->lines;
 for (@out) { s/\s+$//; }  # chomp CR-LF
 @out = grep {$_ ne "% z88dk-z80asm -v -E $test.dir/**/*.asm"} @out;
 @out = grep {$_ ne "Preprocessing file: $test.dir/a1.asm -> $test.dir/a1.i"} @out;
@@ -758,7 +760,7 @@ for (@out) { s/\s+$//; }  # chomp CR-LF
 @out = grep {$_ ne "Preprocessing file: $test.dir/sub1/c1.asm -> $test.dir/sub1/c1.i"} @out;
 @out = grep {$_ ne "Preprocessing file: $test.dir/sub1/deeper/d1.asm -> $test.dir/sub1/deeper/d1.i"} @out;
 @out = grep {$_ ne "Preprocessing file: $test.dir/sub2/e2.asm -> $test.dir/sub2/e2.i"} @out;
-ok @out == 0, "All expected files processed";
+ok @out == 0, "All expected files processed @out";
 
 # Sanity checks for a couple of recursive outputs
 check_text_file("$test.dir/sub1/deeper/d1.i", <<END);
@@ -777,11 +779,13 @@ mkdir "$test.dir2";
 spew("$test.dir2/x1.asm", "nop");
 spew("$test.dir2/y2.asm", "nop");
 
-capture_ok("z88dk-z80asm -v -E -I$test.dir2 \"*.asm\"", <<END);
-% z88dk-z80asm -v -E -I$test.dir2 *.asm
-Preprocessing file: $test.dir2/x1.asm -> $test.dir2/x1.i
-Preprocessing file: $test.dir2/y2.asm -> $test.dir2/y2.i
-END
+run_ok("z88dk-z80asm -v -E -I$test.dir2 \"*.asm\" > $test.out");
+@out = path("$test.out")->lines;
+for (@out) { s/\s+$//; }  # chomp CR-LF
+@out = grep {$_ ne "% z88dk-z80asm -v -E -I$test.dir2 *.asm"} @out;
+@out = grep {$_ ne "Preprocessing file: $test.dir2/x1.asm -> $test.dir2/x1.i"} @out;
+@out = grep {$_ ne "Preprocessing file: $test.dir2/y2.asm -> $test.dir2/y2.i"} @out;
+ok @out == 0, "All expected files processed @out";
 
 check_text_file("$test.dir2/x1.i", <<END);
 #line 1, "$test.dir2/x1.asm"
