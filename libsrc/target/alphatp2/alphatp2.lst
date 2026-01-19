@@ -1,8 +1,5 @@
-target/alphatp2/stdio/generic_console
-target/alphatp2/stdio/getk
-target/alphatp2/stdio/fputc_cons_native
+target/alphatp2/obj/alphatp2/**/*.o
 @classic/stdio/stdio.lst
-target/alphatp2/graphics/textpixl6
 @classic/gfx/gencon/gfx_gencon6_portable.lst
 # Pick up remaining routines
 @classic/gfx/narrow/gfx_narrow.lst

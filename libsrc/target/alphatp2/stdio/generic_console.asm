@@ -65,12 +65,11 @@ generic_console_printc:
     ld      a,(generic_console_flags)
     and     128
     or      d
-generic_console_plotc:
+generic_console_printc_no_flags:
     push    bc
     call    xypos
     ld      (hl),a
     pop     bc
-
     ld      hl, DISPLAY - 128
     ld      de, 128
     inc     b
@@ -82,6 +81,13 @@ generic_console_printc_1:
 
     ret
 
+generic_console_plotc:
+    cp      0x20
+    jr      c, generic_console_printc_no_flags
+    ld      a,0x3f
+    sub     d
+    or      128
+    jr      generic_console_printc_no_flags
 
 
 ;Entry: c = x,
@@ -99,9 +105,21 @@ generic_console_vpeek:
 generic_console_pointxy:
     call    xypos
     ld      a,(hl)
-    and     a
+    cp      0x80
+    jr      nc, point_high_graphics
+    cp      0x20
+    ret     c
+fail_point:
+    xor     a
     ret
-
+point_high_graphics:
+    cp      $a0
+    jr      nc,fail_point 
+    ld      a,0x9f
+    sub     (hl)
+    and     0x1f
+    add     0x20
+    ret
 
 ; b = row
 ; c = column

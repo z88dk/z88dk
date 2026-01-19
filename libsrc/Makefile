@@ -219,6 +219,7 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+include target/alphatp2/alphatp2.mak
 include target/hector/hector.mak
 include target/pps/pps.mak
 include target/sam/sam.mak
@@ -1634,7 +1635,7 @@ hectorhr_clib.lib: $(TARGET_CLIB_DEPS) target-hector
 	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Alphatro P2 - dom
-alphatp2_clib.lib: $(TARGET_CLIB_DEPS) 
+alphatp2_clib.lib: $(TARGET_CLIB_DEPS) target-alphatp2
 	@echo ''
 	@echo '--- Building Alpha P2 Library ---'
 	@echo ''
