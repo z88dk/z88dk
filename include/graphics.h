@@ -64,7 +64,7 @@ extern int __LIB__ multipoint_callee(int hv, int length, int x, int y) __smallc 
 /* Draw a line */
 __ZPROTO4(void,,draw,int,x1,int,y1,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ draw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define draw(a,b,c,d)           draw_callee(a,b,c,d)
 #endif
@@ -73,7 +73,7 @@ extern void __LIB__ draw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk
 /* Draw a line in 'XOR' mode */
 __ZPROTO4(void,,xordraw,int,x1,int,y1,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ xordraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define xordraw(a,b,c,d)           xordraw_callee(a,b,c,d)
 #endif
@@ -82,7 +82,7 @@ extern void __LIB__ xordraw_callee(int x1, int y1, int x2, int y2) __smallc __z8
 /* Remove a line */
 __ZPROTO4(void,,undraw,int,x1,int,y1,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ undraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define undraw(a,b,c,d)           undraw_callee(a,b,c,d)
 #endif
@@ -91,7 +91,7 @@ extern void __LIB__ undraw_callee(int x1, int y1, int x2, int y2) __smallc __z88
 /* Relative draw */
 __ZPROTO2(void,,drawr,int,px,int,py)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ drawr_callee(int px, int py) __smallc __z88dk_callee;
 #define drawr(a,b)           drawr_callee(a,b)
 #endif
@@ -100,7 +100,7 @@ extern void __LIB__ drawr_callee(int px, int py) __smallc __z88dk_callee;
 /* Relative draw in XOR mode*/
 __ZPROTO2(void,,xordrawr,int,px,int,py)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ xordrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define xordrawr(a,b)           xordrawr_callee(a,b)
 #endif
@@ -158,36 +158,44 @@ extern int __LIB__ gety(void);
 /* Draw a box (minimum size: 3x3) */
 __ZPROTO4(void,,drawb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ drawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define drawb(a,b,c,d)           drawb_callee(a,b,c,d)
+#endif
 #endif
 
 /* Draw a box in XOR mode (minimum size: 3x3) */
 __ZPROTO4(void,,xordrawb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ xordrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define xordrawb(a,b,c,d)           xordrawb_callee(a,b,c,d)
+#endif
 #endif
 
 /* Undraw a box (minimum size: 3x3) */
 __ZPROTO4(void,,undrawtodrawb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ undrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define undrawb(a,b,c,d)           undrawb_callee(a,b,c,d)
+#endif
 #endif
 
 /* Draw a dotted border */
 __ZPROTO4(void,,xorborder,int,tlx,int,yly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ xorborder_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define xorborder(a,b,c,d)           xorborder_callee(a,b,c,d)
+#endif
 #endif
 
 
 /* Draw a circle */
 __ZPROTO4(void,,circle,int,x,int,y,int,radius,int,skip)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ circle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define circle(a,b,c,d)           circle_callee(a,b,c,d)
 #endif
@@ -196,7 +204,7 @@ extern void __LIB__ circle_callee(int x, int y, int radius, int skip) __smallc _
 /* Undraw a circle */
 __ZPROTO4(void,,uncircle,int,x,int,y,int,radius,int,skip)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ uncircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define uncircle(a,b,c,d)           uncircle_callee(a,b,c,d)
 #endif
@@ -205,7 +213,7 @@ extern void __LIB__ uncircle_callee(int x, int y, int radius, int skip) __smallc
 /* Draw a circle in XOR mode */
 __ZPROTO4(void,,xorcircle,int,x,int,y,int,radius,int,skip)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define xorcircle(a,b,c,d)           xorcircle_callee(a,b,c,d)
 #endif
@@ -249,22 +257,28 @@ extern void __LIB__  scrollup_4px();
 /* Clear area of graphics map */
 __ZPROTO4(void,,clga,int,tlx,int,tly,int,tlx2,int,tly2)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ clga_callee(int tlx, int tly, int tlx2, int tly2) __smallc __z88dk_callee;
 #define clga(a,b,c,d)           clga_callee(a,b,c,d)
+#endif
 #endif
 
 /* Invert an area in the graphics map */
 __ZPROTO4(void,,xorclga,int,tlx,int,tly,int,tlx2,int,tly2)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ xorclga_callee(int tlx, int tly, int tlx2, int tly2) __smallc __z88dk_callee;
 #define xorclga(a,b,c,d)           xorclga_callee(a,b,c,d)
+#endif
 #endif
 
 /* Draw a filled box in the graphics map */
 __ZPROTO4(void,,fillb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
+#if !__GBZ80 && !__8080 && !__8085
 extern void __LIB__ fillb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define fillb(a,b,c,d)           fillb_callee(a,b,c,d)
+#endif
 #endif
 
 
