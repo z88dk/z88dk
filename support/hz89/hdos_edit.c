@@ -385,7 +385,7 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
             if (off + 23 > 506) break;
 
             if ((blk[off] == 0xFE)||(blk[off] == 0xFF)||(blk[off] == 0x00)) {
-				printf("Identified Directory slot at offset %lu\n",off);
+				printf("Identified Directory slot at offset %u\n",off);
                 // Prepare NAME.EXT in 8.3 uppercase
                 memset(blk + off, 0, 23);
                 char name8[8] = {0}, ext3[3] = {0};
@@ -394,9 +394,9 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
                     size_t base_len = (size_t)(dot - filename);
                     if (base_len > 8) base_len = 8;
                     memcpy(name8, filename, base_len);
-                    strncpy(ext3, dot + 1, 3);
+                    memcpy(ext3, dot + 1, 3);
                 } else {
-                    strncpy(name8, filename, 8);
+                    memcpy(name8, filename, 8);
                 }
                 memcpy(blk + off,     name8, 8);
                 memcpy(blk + off + 8, ext3,  3);
@@ -562,7 +562,7 @@ static int file_sectors_from_chain(int clen, int lsi, int spg) {
 }
 
 
-static int inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
+static void inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     uint8_t sector[SECTOR_SIZE];
     read_sector(fp, 9, sector);
     int tracks, sides;
