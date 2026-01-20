@@ -9,9 +9,13 @@
  *            --add <hostfile> <NAME.ABS> address,
  *            --delete <NAME.EXT>
  * 
- * To list the file directory, use hdos_inspect.c
+ * By Stefano Bodrato, Jan 2026
  *
  * Build: gcc -O2 -Wall -o hdos_edit hdos_edit.c
+ *
+ * Links:  https://github.com/DarrellH89/DiskImageUtility/
+ *         https://github.com/sebhc/sebhc/
+ *         https://heathkit.garlanger.com/software/OSes/HDOS/
  */
 
 #include <stdio.h>
@@ -441,6 +445,123 @@ static void decode_geometry(uint8_t vfl, int *tracks, int *sides) {
 }
 
 
+static void dump_sector_hex(FILE *fp, int sector) {
+    uint8_t buf[SECTOR_SIZE];
+    read_sector(fp, sector, buf);
+    //printf("=== SECTOR %d (0x%X) HEX DUMP ===\n", sector, sector);
+    for (int i = 0; i < SECTOR_SIZE; i += 16) {
+        printf("%04X : ", i);
+        for (int j = 0; j < 16; j++)
+            printf("%02X ", buf[i + j]);
+        //printf(" | ");
+        //for (int j = 0; j < 16; j++) {
+        //    uint8_t c = buf[i + j];
+        //    printf("%c", (c >= 32 && c < 127) ? c : '.');
+        //}
+        printf("\n");
+    }
+    printf("\n");
+}
+
+// Print the directory chain and get the block and sector count.
+// A "directory block" is 512 bytes long (= 2 sectors); the next block link is at offset 510..511.
+
+static void report_directory_chain(FILE *fp, HDOS_Label lab)
+{
+    int next_sector = lab.dis;
+    int blocks = 0, sectors = 0;
+
+    printf("\n=== DIRECTORY CHAIN ===\n");
+    while (next_sector != 0) {
+        uint8_t blk[512];
+        // Get the directory block (2 sectors)
+        read_sector(fp, next_sector,     blk);
+        read_sector(fp, next_sector + 1, blk + 256);
+
+        // 508..509 = "block start" sector index, 510..511 = link to next block
+        uint16_t this_begin = u16le(blk + 508);
+        uint16_t next_begin = u16le(blk + 510);
+
+        printf("Block #%d @sec %u (verify begin=%u) -> next %u\n",
+               blocks, next_sector, this_begin, next_begin);
+
+        blocks++;
+        sectors += 2; // 512 B = 2 settori
+        next_sector = next_begin;
+		if (sectors >= 200)	{
+			printf("Error: circular directory chaining\n");
+			return;
+		}
+    }
+    printf("Total directory: %d blocks, %d sectors\n", blocks, sectors);
+}
+
+
+// === GRT helpers ===================================================
+// Each GRT byte is a "next group" index; grt[0] is the free-list head.
+// Valid group numbers for classic H-17 HDOS are typically 1..200.
+// The number of sectors per group is lab.spg.
+
+static int grt_next(const uint8_t *grt, int g) {
+    if (g < 0 || g > 255) return 0; // defensive
+    return grt[g];
+}
+
+// Count free groups by following the free-list from grt[0]
+static int grt_count_free(const uint8_t *grt, int max_steps) {
+    int head = grt[0];
+    int cnt = 0, steps = 0;
+    int seen[256] = {0};
+    while (head != 0 && steps < max_steps) {
+        if (head < 0 || head > 255) break;
+        if (seen[head]) {
+            fprintf(stderr, "Loop in free-list at group %d\n", head);
+            break;
+        }
+        seen[head] = 1;
+        cnt++;
+        head = grt_next(grt, head);
+        steps++;
+    }
+    return cnt;
+}
+
+// Verify a single file chain (fgn..lgn, lsi) and return group count.
+// Sets *ends_at_lgn = 1 if last visited group == lgn.
+// Returns -1 on loop/corruption detection.
+static int grt_verify_file_chain(const uint8_t *grt, int fgn, int lgn, int *ends_at_lgn) {
+    int seen[256] = {0};
+    int cur = fgn, clen = 0;
+    *ends_at_lgn = 0;
+
+    while (cur != 0) {
+        if (cur < 0 || cur > 255) {
+            fprintf(stderr, "Invalid group index %d in chain\n", cur);
+            return -1;
+        }
+        if (seen[cur]) {
+            fprintf(stderr, "Loop detected in file chain at group %d\n", cur);
+            return -1;
+        }
+        seen[cur] = 1;
+        clen++;
+        int nxt = grt_next(grt, cur);
+        if (nxt == 0) {
+            if (cur == lgn) *ends_at_lgn = 1;
+            else fprintf(stderr, "Chain does not end at lgn (%d != %d)\n", cur, lgn);
+        }
+        cur = nxt;
+    }
+    return clen;
+}
+
+// Compute file size in sectors given clen, lsi, and lab.spg
+static int file_sectors_from_chain(int clen, int lsi, int spg) {
+    if (clen <= 0) return 0;
+    return (clen - 1) * spg + (lsi + 1);
+}
+
+
 static int inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     uint8_t sector[SECTOR_SIZE];
     read_sector(fp, 9, sector);
@@ -450,23 +571,57 @@ static int inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     printf("=== HDOS LABEL ===\n");
     printf("Volume label    : %s\n", lab.lab);
     printf("Volume serial   : %d\n", lab.ser);
-    printf("Directory @sec  : %d\n", lab.dis);
-    printf("GRT       @sec  : %d\n", lab.grt);
+    printf("Volume Type     : ");
+	switch (lab.vlt) {
+		case 0:
+			printf("Data\n");
+			break;
+		case 1:
+			printf("System\n");
+			break;
+		default:
+			printf("Unknown: $%02X\n", lab.vlt);
+	}
+
+    printf("System Version  : %u.%u\n", lab.ver/16 , lab.ver&15);
+	// Initialization date
+	DecodedDate ts = decode_timestamp(lab.ind);
+    printf("Creation date   : %02d-%02d-%02d\n", ts.day, ts.month, ts.year);
+
+    //printf("Directory @sec  : %d\n", lab.dis);
     printf("Sectors/group   : %d\n", lab.spg);
     printf("Total sectors   : %d\n", lab.siz);
     printf("Geometry        : %d tracks, %d side(s)\n", tracks, sides);
+	if (lab.ver < 0x20)
+		printf("SPT flags       : %d\n", lab.spt);
+	else
+		printf("Sectors/track   : %d\n", lab.spt);
+
+    // RGT (Root Group Table) – 256 bytes
+    printf("\n=== RGT (Root Group Table, @sector %u) ===\n",lab.rgt);
+    //printf("RGT       @sec  : %d\n", lab.rgt);
+	if (lab.rgt) dump_sector_hex(fp, lab.rgt);
 
     // Read GRT
     uint8_t grt_sector[SECTOR_SIZE];
     read_sector(fp, lab.grt, grt_sector);
-    printf("\n=== GRT SUMMARY ===\n");
+    printf("=== GRT (Group Reference Table, @sector %u) ===\n", lab.grt);
+	//printf("GRT       @sec  : %d\n", lab.grt);
     int free_chain_len = 0;
     int cur = grt_sector[0];
     while (cur != 0 && free_chain_len < 200) {
         free_chain_len++;
         cur = grt_sector[cur];
     }
-    printf("Free chain length: %d groups (~%d sectors free)\n", free_chain_len, free_chain_len*lab.spg);
+    //printf("Free chain length: %d groups (~%d sectors free)\n", free_chain_len, free_chain_len*lab.spg);
+	printf("Free chain length: %d groups (%d sectors free)\n", free_chain_len, grt_count_free(grt_sector, lab.siz));
+
+    //printf("\n=== GRT (Group Reference Table) ===\n");
+    dump_sector_hex(fp, lab.grt);
+
+    //printf("=== 1st directory sector: %u ===\n", lab.dis);
+	report_directory_chain(fp,lab);
+
 }
 
 
@@ -477,7 +632,7 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 	char entry_fname[14];
 	
     printf("\n=== DIRECTORY ===\n");
-    printf("%-12s  %-5s %-10s %-8s %-8s  %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "DATE", "GROUPS");
+    printf("%-12s  %-5s %-10s  %-8s  %-8s  %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "DATE", "GROUPS");
     while (next_sector != 0) {
         uint8_t blk[512];
         read_sector(fp, next_sector, blk);
@@ -526,17 +681,31 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
 			DecodedDate ts = decode_timestamp(d.crd);
 			// Last Update
 			//DecodedDate ts = decode_timestamp(d.ald);
+			
+			// Compare the actual sector count to the file lsi
+			char sec_check=(sectors==file_sectors_from_chain(clen, d.lsi, lab.spg)) ? ' ' : '!';
 
-            printf("%-12s  %-5s %-10d %-8d %02d-%02d-%02d  ", entry_fname, flags_s, size_b, sectors-1, ts.day, ts.month, ts.year);
-			//printf("%-12s  %-5s %-10d %-8d ", entry_fname, flags_s, size_b, sectors-1);
+            printf("%-12s  %-5s %-10d  %c%-8d %02d-%02d-%02d  ", entry_fname, flags_s, size_b, sec_check, sectors-1, ts.day, ts.month, ts.year);
+
+			int ends_at_lgn;
+			if (clen != grt_verify_file_chain(grt, d.fgn, d.lgn, &ends_at_lgn)) printf ("[!] ");
+			else if (!ends_at_lgn) printf ("[!] ");
+
             if (clen) {
                 printf("%d->%d->0\n", chain[0], chain[clen-1]);
 				entry_used++;
             } else {
                 printf("-\n");
             }
+
+			
+
         }
         next_sector = u16le(blk+510);
+		if (entry_used >= 200)	{
+			printf("Error: circular directory chaining\n");
+			return;
+		}
     }
 	printf("%d Directory slots, %d allocated.\n", entry_count, entry_used);
 }
