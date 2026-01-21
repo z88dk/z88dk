@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.18 2015-02-11 19:27:05 stefano Exp $
+   $Id: z80svg.c$
  * ----------------------------------------------------------
 */
 
@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 #include <libxml/parser.h>
+#include <libxml/tree.h>
 
 #include "../../include/gfxprofile.h"
 //#include "gfxprofile.h"
@@ -246,6 +247,28 @@ unsigned char x,y;
 
 /* Current command */
 unsigned char cmd;
+
+/* structure definitions for "polygon" */
+typedef struct {
+    double x;
+    double y;
+} PointD;
+
+typedef enum {
+    FILL_RULE_NONZERO,
+    FILL_RULE_EVENODD
+} FillRule;
+
+typedef struct {
+    PointD* points;
+    size_t  count;
+    char*   fill;         // NULL if not present
+    char*   stroke;       // NULL if not present
+    double  stroke_width; // -1 if not present
+    double  opacity;      // -1 if not present
+    FillRule fill_rule;   // default NONZERO
+    // You can add transform matrix here if you plan to support it
+} SvgPolygon;
 
 int gethex(char hexval) {
     char c;
@@ -619,6 +642,150 @@ void close_area() {
 }
 
 
+// Trims leading/trailing whitespace (in-place)
+static void trim_inplace(char* s) {
+    if (!s) return;
+    char* p = s;
+    while (isspace((unsigned char)*p)) p++;
+    if (p != s) memmove(s, p, strlen(p) + 1);
+    size_t n = strlen(s);
+    while (n > 0 && isspace((unsigned char)s[n-1])) s[--n] = '\0';
+}
+
+// Converts xmlChar* to newly allocated char*
+static char* xstrdup_xml(const xmlChar* xs) {
+    if (!xs) return NULL;
+    size_t n = xmlStrlen(xs);
+    char* s = (char*)malloc(n + 1);
+    if (!s) return NULL;
+    memcpy(s, xs, n);
+    s[n] = '\0';
+    return s;
+}
+
+// Returns malloc'ed array of doubles and count of doubles via *out_count.
+// On failure returns NULL.
+static double* parse_number_stream(const char* s, size_t* out_count) {
+    *out_count = 0;
+    if (!s) return NULL;
+
+    // Make a working copy and normalize commas -> spaces
+    char* buf = strdup(s);
+    if (!buf) return NULL;
+    for (char* p = buf; *p; ++p) {
+        if (*p == ',') *p = ' ';
+    }
+
+    // First pass: count numbers
+    size_t cap = 16, count = 0;
+    double* vals = (double*)malloc(cap * sizeof(double));
+    if (!vals) { free(buf); return NULL; }
+
+    char* endptr = buf;
+    while (*endptr) {
+        // Skip leading spaces
+        while (isspace((unsigned char)*endptr)) endptr++;
+        if (*endptr == '\0') break;
+
+        errno = 0;
+        char* next = NULL;
+        double v = strtod(endptr, &next);
+
+        if (next == endptr) {
+            // Not a number: invalid token
+            free(vals);
+            free(buf);
+            return NULL;
+        }
+        if (errno == ERANGE) {
+            // Out of range; still accept but you may want to clamp/log
+        }
+
+        // Push value
+        if (count == cap) {
+            cap *= 2;
+            double* t = (double*)realloc(vals, cap * sizeof(double));
+            if (!t) { free(vals); free(buf); return NULL; }
+            vals = t;
+        }
+        vals[count++] = v;
+        endptr = next;
+    }
+
+    free(buf);
+    *out_count = count;
+    return vals;
+}
+
+static int parse_points_attribute(const xmlChar* pointsAttr, PointD** out_points, size_t* out_count) {
+    *out_points = NULL; *out_count = 0;
+    if (!pointsAttr) return -1;
+
+    char* s = xstrdup_xml(pointsAttr);
+    if (!s) return -1;
+    trim_inplace(s);
+
+    size_t nvals = 0;
+    double* vals = parse_number_stream(s, &nvals);
+    free(s);
+
+    if (!vals || nvals == 0 || (nvals % 2) != 0) {
+        free(vals);
+        return -1; // must be pairs
+    }
+
+    size_t npts = nvals / 2;
+    PointD* pts = (PointD*)malloc(npts * sizeof(PointD));
+    if (!pts) { free(vals); return -1; }
+
+    for (size_t i = 0; i < npts; ++i) {
+        pts[i].x = vals[2*i + 0];
+        pts[i].y = vals[2*i + 1];
+    }
+    free(vals);
+
+    *out_points = pts;
+    *out_count = npts;
+    return 0;
+}
+
+
+static char* get_attr_strdup(xmlNode* node, const char* name) {
+    xmlChar* v = xmlGetProp(node, (const xmlChar*)name);
+    if (!v) return NULL;
+    char* s = xstrdup_xml(v);
+    xmlFree(v);
+    if (s) trim_inplace(s);
+    return s;
+}
+
+static double get_attr_double(xmlNode* node, const char* name, double def_val, int* found) {
+    if (found) *found = 0;
+    xmlChar* v = xmlGetProp(node, (const xmlChar*)name);
+    if (!v) return def_val;
+    char* s = xstrdup_xml(v);
+    xmlFree(v);
+    if (!s) return def_val;
+    trim_inplace(s);
+    char* endptr = NULL;
+    errno = 0;
+    double d = strtod(s, &endptr);
+    if (endptr == s || errno == ERANGE) {
+        free(s);
+        return def_val;
+    }
+    free(s);
+    if (found) *found = 1;
+    return d;
+}
+
+static FillRule parse_fill_rule(const char* s) {
+    if (!s) return FILL_RULE_NONZERO;
+    if (strcasecmp(s, "evenodd") == 0) return FILL_RULE_EVENODD;
+    return FILL_RULE_NONZERO;
+}
+
+
 void scale_and_shift() {
 
 float ax;
@@ -662,6 +829,54 @@ char * tmpstr;
         if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
     
     free(tmpstr);
+}
+
+
+int handle_polygon_node(xmlNode* node, SvgPolygon* out) {
+    if (!node || !out) return -1;
+    memset(out, 0, sizeof(*out));
+    out->stroke_width = -1.0;
+    out->opacity = -1.0;
+    out->fill_rule = FILL_RULE_NONZERO;
+
+    // 1) Parse points
+    xmlChar* points = xmlGetProp(node, (const xmlChar*)"points");
+    if (!points) {
+        fprintf(stderr, "polygon missing 'points'\n");
+        return -1;
+    }
+    if (parse_points_attribute(points, &out->points, &out->count) != 0) {
+        fprintf(stderr, "invalid 'points' for polygon\n");
+        xmlFree(points);
+        return -1;
+    }
+    xmlFree(points);
+
+    // 2) Optional styles
+    out->fill         = get_attr_strdup(node, "fill");
+    out->stroke       = get_attr_strdup(node, "stroke");
+    int sw_found = 0;
+    out->stroke_width = get_attr_double(node, "stroke-width", -1.0, &sw_found);
+    out->opacity      = get_attr_double(node, "opacity", -1.0, NULL);
+
+    char* fill_rule_s = get_attr_strdup(node, "fill-rule");
+    out->fill_rule = parse_fill_rule(fill_rule_s);
+    free(fill_rule_s);
+
+    // TODO: parse 'transform' to apply matrices
+    // char* transform = get_attr_strdup(node, "transform");
+    // if (transform) { ... apply or store ...; free(transform); }
+
+    return 0;
+}
+
+void free_svg_polygon(SvgPolygon* p) {
+    if (!p) return;
+    free(p->points);
+    free(p->fill);
+    free(p->stroke);
+    // reset
+    memset(p, 0, sizeof(*p));
 }
 
 
@@ -1116,6 +1331,51 @@ autoloop:
                 if (abm < bm) abm = bm;
 
                 inipath = 0;
+            }
+
+
+            /*         */
+            /* Polygon */
+            /*         */
+            if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0) {
+                SvgPolygon poly;
+                if (handle_polygon_node(node, &poly) == 0) {
+                    inipath = 0;
+                    elementcnt = 0;
+
+                    if (poly.count >= 1) {
+                        // First point
+                        cx = poly.points[0].x - xx;
+                        cy = poly.points[0].y - yy;
+                        scale_and_shift();
+                        move_to(x, y);
+                        int x_first = x, y_first = y;
+                        int x_prev  = x, y_prev  = y;
+
+                        // Remaining vertices
+                        for (size_t i = 1; i < poly.count; ++i) {
+                            cx = poly.points[i].x - xx;
+                            cy = poly.points[i].y - yy;
+                            scale_and_shift();
+                            line_to(x, y, x_prev, y_prev);
+                            x_prev = x; y_prev = y;
+                        }
+
+                        // Close polygon (implicit in SVG)
+                        line_to(x_first, y_first, x_prev, y_prev);
+
+                        if (pathdetails > 0) printf("\n");
+                        close_area();
+
+                        // Update absolute margins / bbox like fai per path
+                        if (alm > lm) alm = lm;
+                        if (arm < rm) arm = rm;
+                        if (atm > tm) atm = tm;
+                        if (abm < bm) abm = bm;
+                    }
+
+                    free_svg_polygon(&poly);
+                }
             }
 
             /*      */
