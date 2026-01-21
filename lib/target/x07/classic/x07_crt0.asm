@@ -29,6 +29,8 @@ ENDIF
     defc    __CPU_CLOCK = 3840000
     INCLUDE "crt/classic/crt_rules.inc"
 
+    INCLUDE "target/x07/def/x07.h"
+
     org     CRT_ORG_CODE
 
 ;----------------------
@@ -83,6 +85,60 @@ __restore_sp_onexit:
 
 l_dcal:
     jp  (hl)    ;Used for call by function ptr
+
+
+; a = command
+; hl = buffer
+; b = bytes to send
+; c = bytes to read
+    PUBLIC  __x07_SUB_EXECUTE
+__x07_SUB_EXECUTE:
+    push    af
+    ld      a,c
+    jr      nz,call_firmware
+
+    ; No return parameters, we can just fast path
+    pop     af
+    ld      c,a
+    call    send_t6834
+    ld      a,b
+    and     a
+    ret     z
+@loop:
+    ld      c,(hl)
+    inc     hl
+    call   send_t6834
+    djnz   @loop
+    ret
+
+
+call_firmware:
+    pop     af
+    jp      SUB_EXECUTE
+
+; c = byte to send
+; Uses af
+send_t6834:
+    in a,($f2)	;
+    and $02		;
+    jr z,send_t6834	;
+                ; nop
+    ei	
+    ld a,($026c)	; INTIMAG
+    or $80
+                ; ld ($026c),a	???		
+    out ($f0),a
+    di
+                ; nop
+    
+    ld a,c
+
+    out ($f1),a	; send a to $F1
+                ; nop
+        
+    ld a,$02	; a<-2
+    out ($f5),a
+    ret
 
 
 end:

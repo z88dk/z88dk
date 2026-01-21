@@ -8,6 +8,7 @@
     EXTERN  __x07_buffer
 
     INCLUDE "target/x07/def/x07.h"
+    EXTERN  __x07_SUB_EXECUTE
 
 ; hl = xy
 pointxy:
@@ -21,7 +22,7 @@ pointxy:
     ld      b,2         ;arguments
     ld      c,1
     ld      de,hl
-    call    SUB_EXECUTE
+    call    __x07_SUB_EXECUTE
     ld      a,(__x07_buffer)
     and     a
     ret

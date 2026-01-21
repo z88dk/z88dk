@@ -21,6 +21,7 @@
     defc generic_console_cls = clg
 
     INCLUDE "target/x07/def/x07.h"
+    EXTERN  __x07_SUB_EXECUTE
 
 generic_console_set_attribute:
 generic_console_set_ink:
@@ -80,7 +81,7 @@ generic_console_printc:
     dec     hl
     ld      a, SUB_LOCATE
     ld      bc,0x0300           ;3 input, 0 output
-    call    SUB_EXECUTE
+    call    __x07_SUB_EXECUTE
     ret
 
 ;Entry: c = x,
