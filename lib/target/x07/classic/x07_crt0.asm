@@ -95,6 +95,7 @@ l_dcal:
 __x07_SUB_EXECUTE:
     push    af
     ld      a,c
+    and     a
     jr      nz,call_firmware
 
     ; No return parameters, we can just fast path
