@@ -55,7 +55,6 @@ typedef struct {
 static uint16_t u16le(const uint8_t *p) { return p[0] | (p[1] << 8); }
 static void w16le(uint8_t *p, uint16_t v) { p[0] = v & 0xFF; p[1] = v >> 8; }
 
-
 /*
  * Decode the 2-byte timestamp format:
  *
@@ -515,7 +514,7 @@ static int grt_count_free(const uint8_t *grt, int max_steps) {
     while (head != 0 && steps < max_steps) {
         if (head < 0 || head > 255) break;
         if (seen[head]) {
-            fprintf(stderr, "Loop in free-list at group %d\n", head);
+            printf("Error: loop in free-list at group %d\n", head);
             break;
         }
         seen[head] = 1;
@@ -536,11 +535,11 @@ static int grt_verify_file_chain(const uint8_t *grt, int fgn, int lgn, int *ends
 
     while (cur != 0) {
         if (cur < 0 || cur > 255) {
-            fprintf(stderr, "Invalid group index %d in chain\n", cur);
+            printf("Error: invalid group index %d in chain\n", cur);
             return -1;
         }
         if (seen[cur]) {
-            fprintf(stderr, "Loop detected in file chain at group %d\n", cur);
+            printf("Error: Loop detected in file chain at group %d\n", cur);
             return -1;
         }
         seen[cur] = 1;
@@ -548,7 +547,7 @@ static int grt_verify_file_chain(const uint8_t *grt, int fgn, int lgn, int *ends
         int nxt = grt_next(grt, cur);
         if (nxt == 0) {
             if (cur == lgn) *ends_at_lgn = 1;
-            else fprintf(stderr, "Chain does not end at lgn (%d != %d)\n", cur, lgn);
+            else printf("Error: chain does not end at lgn (%d != %d)\n", cur, lgn);
         }
         cur = nxt;
     }
@@ -757,7 +756,16 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt, int ad
 
 
 int main(int argc,char**argv){
-    if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir <+>|--inspect|--get name.ext out|--add hostfile name.ext <addr>|--delete name.ext]\n",argv[0]);return 1;}
+    if (argc<3){
+        fprintf(stderr,"z88dk HDOS Heath/Zenith disk image editor/analyzer\n");
+        fprintf(stderr,"Usage: %s disk.h8d {command}\n",argv[0]);
+        fprintf(stderr,"\t[--dir <+>]\n");
+        fprintf(stderr,"\t[--inspect]\n");
+        fprintf(stderr,"\t[--get name.ext out]\n");
+        fprintf(stderr,"\t[--add hostfile name.ext <addr>]\n");
+        fprintf(stderr,"\t[--delete name.ext]\n");
+        return 1;
+        }
     const char*path=argv[1];
     FILE*fp=fopen(path,"r+b"); if(!fp){perror("Missing disk image file");return 1;}
 
