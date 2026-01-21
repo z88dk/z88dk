@@ -13,10 +13,10 @@ INSTALL ?= install
 
 
 ifeq ($(CROSS),1)
-   LIBS += `pkg-config     --define-prefix --libs libxml-2.0`
+   LIBS += `pkg-config     --define-prefix --libs libxml-2.0` -lm
    CFLAGS += `pkg-config     --define-prefix --cflags libxml-2.0`
 else
-   LIBS += `pkg-config    --libs libxml-2.0`
+   LIBS += `pkg-config    --libs libxml-2.0` -lm
    CFLAGS += `pkg-config  --cflags libxml-2.0`
 endif
 
