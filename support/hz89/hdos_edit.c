@@ -9,9 +9,13 @@
  *            --add <hostfile> <NAME.ABS> address,
  *            --delete <NAME.EXT>
  * 
- * To list the file directory, use hdos_inspect.c
+ * By Stefano Bodrato, Jan 2026
  *
  * Build: gcc -O2 -Wall -o hdos_edit hdos_edit.c
+ *
+ * Links:  https://github.com/DarrellH89/DiskImageUtility/
+ *         https://github.com/sebhc/sebhc/
+ *         https://heathkit.garlanger.com/software/OSes/HDOS/
  */
 
 #include <stdio.h>
@@ -51,7 +55,6 @@ typedef struct {
 static uint16_t u16le(const uint8_t *p) { return p[0] | (p[1] << 8); }
 static void w16le(uint8_t *p, uint16_t v) { p[0] = v & 0xFF; p[1] = v >> 8; }
 
-
 /*
  * Decode the 2-byte timestamp format:
  *
@@ -66,16 +69,16 @@ static void w16le(uint8_t *p, uint16_t v) { p[0] = v & 0xFF; p[1] = v >> 8; }
  */
 DecodedDate decode_timestamp(unsigned int dt)
 {
-	uint8_t B1, B2;
+    uint8_t B1, B2;
     DecodedDate d;
 
-	B1 =  dt & 0xFF;
-	B2 =  dt >> 8;
+    B1 =  dt & 0xFF;
+    B2 =  dt >> 8;
 
     d.day   = B1 & 0x1F;                  // 5 lower bits
     d.month = (B1 >> 5) | ((B2 & 0x01) << 3);
     //d.year  = 1970 + (B2 >> 1);
-	d.year  = 70 + (B2 >> 1);
+    d.year  = 70 + (B2 >> 1);
 
     return d;
 }
@@ -216,8 +219,8 @@ static int delete_file(FILE *fp, HDOS_Label lab, uint8_t *grt, const char *filen
 
                 // Clear the directory entry (mark as empty by zeroing first byte; we zero all 23 bytes for cleanliness).
                 //memset(e, 0, 23);
-				// This is the classic method, it should suffice
-				e[0] = 0xFF;   // NOTE: 0x00 would truncate the directory, 0xFE raise errors
+                // This is the classic method, it should suffice
+                e[0] = 0xFF;   // NOTE: 0x00 would truncate the directory, 0xFE raise errors
 
                 // Write back directory block and GRT sector
                 write_sector(fp, next_sector,   blk);
@@ -255,34 +258,34 @@ static int extract_file(FILE *fp, HDOS_Label lab, const uint8_t *grt, const char
             memcpy(name, e, 8); name[8]='\0';
             char ext[4]; memcpy(ext, e+8, 3); ext[3]='\0';
             if (strlen(ext)) { strcat(name, "."); strcat(name, ext); }
-			if (*outpath == '\0') {
-				if (strcasecmp(name, filename)==0) return 0;
-			} else {
-				if (strcasecmp(name, filename)==0) {
-					uint8_t fgn = e[16];
-					uint8_t lgn = e[17];
-					uint8_t lsi = e[18];
-					FILE *out = fopen(outpath, "wb");
-					if (!out) { perror("open out"); return 1; }
-					int cur = fgn;
-					int group_count = 0;
-					while (cur != 0) {
-						for (int s = 0; s < lab.spg; s++) {
-							int sector_num = (cur * lab.spg) + s;             // HDOS: group g -> sectors [g*spg .. g*spg+(spg-1)]
-							uint8_t buf[SECTOR_SIZE];
-							read_sector(fp, sector_num, buf);
-							// Last group may have partial sectors
-							if (cur == lgn && s > lsi) break;
-							fwrite(buf, 1, SECTOR_SIZE, out);
-						}
-						cur = grt[cur];
-						group_count++;
-					}
-					fclose(out);
-					printf("Extracted %s to %s (%d groups)\n", filename, outpath, group_count);
-					return 0;
-				}
-			}
+            if (*outpath == '\0') {
+                if (strcasecmp(name, filename)==0) return 0;
+            } else {
+                if (strcasecmp(name, filename)==0) {
+                    uint8_t fgn = e[16];
+                    uint8_t lgn = e[17];
+                    uint8_t lsi = e[18];
+                    FILE *out = fopen(outpath, "wb");
+                    if (!out) { perror("open out"); return 1; }
+                    int cur = fgn;
+                    int group_count = 0;
+                    while (cur != 0) {
+                        for (int s = 0; s < lab.spg; s++) {
+                            int sector_num = (cur * lab.spg) + s;             // HDOS: group g -> sectors [g*spg .. g*spg+(spg-1)]
+                            uint8_t buf[SECTOR_SIZE];
+                            read_sector(fp, sector_num, buf);
+                            // Last group may have partial sectors
+                            if (cur == lgn && s > lsi) break;
+                            fwrite(buf, 1, SECTOR_SIZE, out);
+                        }
+                        cur = grt[cur];
+                        group_count++;
+                    }
+                    fclose(out);
+                    printf("Extracted %s to %s (%d groups)\n", filename, outpath, group_count);
+                    return 0;
+                }
+            }
         }
         next_sector = u16le(blk+510);
     }
@@ -381,7 +384,7 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
             if (off + 23 > 506) break;
 
             if ((blk[off] == 0xFE)||(blk[off] == 0xFF)||(blk[off] == 0x00)) {
-				printf("Identified Directory slot at offset %lu\n",off);
+                printf("Identified Directory slot at offset %u\n",off);
                 // Prepare NAME.EXT in 8.3 uppercase
                 memset(blk + off, 0, 23);
                 char name8[8] = {0}, ext3[3] = {0};
@@ -390,9 +393,9 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
                     size_t base_len = (size_t)(dot - filename);
                     if (base_len > 8) base_len = 8;
                     memcpy(name8, filename, base_len);
-                    strncpy(ext3, dot + 1, 3);
+                    memcpy(ext3, dot + 1, 3);
                 } else {
-                    strncpy(name8, filename, 8);
+                    memcpy(name8, filename, 8);
                 }
                 memcpy(blk + off,     name8, 8);
                 memcpy(blk + off + 8, ext3,  3);
@@ -401,20 +404,20 @@ static int insert_file(FILE *fp, HDOS_Label lab, uint8_t *grt,
                 for (int j = 0; j < 11; ++j) {
                     blk[off + j] = (uint8_t)toupper((unsigned char)blk[off + j]);
                 }
-				
-                // Optionally set flags/project/version/cluster_factor				
-				blk[off + 13] = lab.spg+1;    // cluster factor (+1 as seen in the wild)
-				blk[off + 14] = 0x00;         // flags, e.g. 0x20 = WR protect
+                
+                // Optionally set flags/project/version/cluster_factor              
+                blk[off + 13] = lab.spg+1;    // cluster factor (+1 as seen in the wild)
+                blk[off + 14] = 0x00;         // flags, e.g. 0x20 = WR protect
 
                 // Fill in chain info
                 blk[off + 16] = (uint8_t)fgn;                           // first group
                 blk[off + 17] = (uint8_t)lgn;                           // last group
                 blk[off + 18] = (uint8_t)((sectors_needed - 1) % lab.spg); // last sector index in last group
 
-				// Put z88dk signature in the file timestamp
-				EncodedTimestamp ts = encode_timestamp(1, 1, 1988);
-				blk[off + 19] = blk[off + 21] = ts.B1;
-				blk[off + 20] = blk[off + 22] = ts.B2;
+                // Put z88dk signature in the file timestamp
+                EncodedTimestamp ts = encode_timestamp(1, 1, 1988);
+                blk[off + 19] = blk[off + 21] = ts.B1;
+                blk[off + 20] = blk[off + 22] = ts.B2;
 
                 write_sector(fp, next_sector,     blk);
                 write_sector(fp, next_sector + 1, blk + 256);
@@ -441,7 +444,144 @@ static void decode_geometry(uint8_t vfl, int *tracks, int *sides) {
 }
 
 
-static int inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
+static void dump_sector_hex(FILE *fp, int sector) {
+    uint8_t buf[SECTOR_SIZE];
+    read_sector(fp, sector, buf);
+    //printf("=== SECTOR %d (0x%X) HEX DUMP ===\n", sector, sector);
+    for (int i = 0; i < SECTOR_SIZE; i += 16) {
+        printf("%04X : ", i);
+        for (int j = 0; j < 16; j++)
+            printf("%02X ", buf[i + j]);
+        //printf(" | ");
+        //for (int j = 0; j < 16; j++) {
+        //    uint8_t c = buf[i + j];
+        //    printf("%c", (c >= 32 && c < 127) ? c : '.');
+        //}
+        printf("\n");
+    }
+    printf("\n");
+}
+
+// Print the directory chain and get the block and sector count.
+// A "directory block" is 512 bytes long (= 2 sectors); the next block link is at offset 510..511.
+
+static void report_directory_chain(FILE *fp, HDOS_Label lab)
+{
+    int next_sector = lab.dis;
+    int blocks = 0, sectors = 0;
+
+    printf("\n=== DIRECTORY CHAIN ===\n");
+    while (next_sector != 0) {
+        uint8_t blk[512];
+        // Get the directory block (2 sectors)
+        read_sector(fp, next_sector,     blk);
+        read_sector(fp, next_sector + 1, blk + 256);
+
+        // 508..509 = "block start" sector index, 510..511 = link to next block
+        uint16_t this_begin = u16le(blk + 508);
+        uint16_t next_begin = u16le(blk + 510);
+
+        printf("Block #%d @sec %u (verify begin=%u) -> next %u\n",
+               blocks, next_sector, this_begin, next_begin);
+
+        blocks++;
+        sectors += 2; // 512 B = 2 settori
+        next_sector = next_begin;
+        if (sectors >= 200) {
+            printf("Error: circular directory chaining\n");
+            return;
+        }
+    }
+    printf("Total directory: %d blocks, %d sectors\n", blocks, sectors);
+}
+
+
+// === GRT helpers ===================================================
+// Each GRT byte is a "next group" index; grt[0] is the free-list head.
+// Valid group numbers for classic H-17 HDOS are typically 1..200.
+// The number of sectors per group is lab.spg.
+
+static int grt_next(const uint8_t *grt, int g) {
+    if (g < 0 || g > 255) return 0; // defensive
+    return grt[g];
+}
+
+// Count free groups by following the free-list from grt[0]
+static int grt_count_free(const uint8_t *grt, int max_steps) {
+    int head = grt[0];
+    int cnt = 0, steps = 0;
+    int seen[256] = {0};
+    while (head != 0 && steps < max_steps) {
+        if (head < 0 || head > 255) break;
+        if (seen[head]) {
+            printf("Error: loop in free-list at group %d\n", head);
+            break;
+        }
+        seen[head] = 1;
+        cnt++;
+        head = grt_next(grt, head);
+        steps++;
+    }
+    return cnt;
+}
+
+// Verify a single file chain (fgn..lgn, lsi) and return group count.
+// Sets *ends_at_lgn = 1 if last visited group == lgn.
+// Returns -1 on loop/corruption detection.
+static int grt_verify_file_chain(const uint8_t *grt, int fgn, int lgn, int *ends_at_lgn) {
+    int seen[256] = {0};
+    int cur = fgn, clen = 0;
+    *ends_at_lgn = 0;
+
+    while (cur != 0) {
+        if (cur < 0 || cur > 255) {
+            printf("Error: invalid group index %d in chain\n", cur);
+            return -1;
+        }
+        if (seen[cur]) {
+            printf("Error: Loop detected in file chain at group %d\n", cur);
+            return -1;
+        }
+        seen[cur] = 1;
+        clen++;
+        int nxt = grt_next(grt, cur);
+        if (nxt == 0) {
+            if (cur == lgn) *ends_at_lgn = 1;
+            else printf("Error: chain does not end at lgn (%d != %d)\n", cur, lgn);
+        }
+        cur = nxt;
+    }
+    return clen;
+}
+
+static void print_grt_chain(const uint8_t *grt, int start)
+{
+    if (start <= 0) {
+        printf(" - ");
+        return;
+    }
+
+    int cur = start;
+    int count = 0;
+
+    while (cur != 0 && count < 200) {
+        printf("%d", cur);
+        cur = grt[cur];
+        if (cur != 0) printf(" -> ");
+        count++;
+    }
+
+    printf(" -> 0 ");
+}
+
+// Compute file size in sectors given clen, lsi, and lab.spg
+static int file_sectors_from_chain(int clen, int lsi, int spg) {
+    if (clen <= 0) return 0;
+    return (clen - 1) * spg + (lsi + 1);
+}
+
+
+static void inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     uint8_t sector[SECTOR_SIZE];
     read_sector(fp, 9, sector);
     int tracks, sides;
@@ -450,34 +590,82 @@ static int inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     printf("=== HDOS LABEL ===\n");
     printf("Volume label    : %s\n", lab.lab);
     printf("Volume serial   : %d\n", lab.ser);
-    printf("Directory @sec  : %d\n", lab.dis);
-    printf("GRT       @sec  : %d\n", lab.grt);
+    printf("Volume Type     : ");
+    switch (lab.vlt) {
+        case 0:
+            printf("Data\n");
+            break;
+        case 1:
+            printf("System\n");
+            break;
+        default:
+            printf("Unknown: $%02X\n", lab.vlt);
+    }
+
+    printf("System Version  : %u.%u\n", lab.ver/16 , lab.ver&15);
+    // Initialization date
+    DecodedDate ts = decode_timestamp(lab.ind);
+    printf("Creation date   : %02d-%02d-%02d\n", ts.day, ts.month, ts.year);
+
+    //printf("Directory @sec  : %d\n", lab.dis);
     printf("Sectors/group   : %d\n", lab.spg);
     printf("Total sectors   : %d\n", lab.siz);
     printf("Geometry        : %d tracks, %d side(s)\n", tracks, sides);
+    if (lab.ver < 0x20)
+        printf("SPT flags       : %d\n", lab.spt);
+    else
+        printf("Sectors/track   : %d\n", lab.spt);
+
+    // RGT (Root Group Table) – 256 bytes
+    printf("\n=== RGT (Root Group Table, @sector %u) ===\n",lab.rgt);
+    //printf("RGT       @sec  : %d\n", lab.rgt);
+    if (lab.rgt) dump_sector_hex(fp, lab.rgt);
 
     // Read GRT
     uint8_t grt_sector[SECTOR_SIZE];
     read_sector(fp, lab.grt, grt_sector);
-    printf("\n=== GRT SUMMARY ===\n");
-    int free_chain_len = 0;
-    int cur = grt_sector[0];
-    while (cur != 0 && free_chain_len < 200) {
-        free_chain_len++;
-        cur = grt_sector[cur];
-    }
-    printf("Free chain length: %d groups (~%d sectors free)\n", free_chain_len, free_chain_len*lab.spg);
+    printf("=== GRT (Group Reference Table, @sector %u) ===\n", lab.grt);
+    //printf("GRT       @sec  : %d\n", lab.grt);
+    
+    int free_chain_len =grt_count_free(grt_sector, lab.siz);
+    
+    //int free_chain_len = 0;
+    //int cur = grt_sector[0];
+    //while (cur != 0 && free_chain_len < 200) {
+    //    free_chain_len++;
+    //    cur = grt_sector[cur];
+    //}
+    //printf("Free chain length: %d groups (~%d sectors free)\n", free_chain_len, free_chain_len*lab.spg);
+
+    printf("\nFree chain: ");
+    print_grt_chain(grt_sector, grt_sector[0]);
+    printf(",  %d groups (%d sectors) free.\n", free_chain_len, free_chain_len * lab.spg);
+
+    //printf("\nGRT Summary (first 64 groups):\n");
+    //printf("Grp | Next\n");
+    //printf("----+------\n");
+    //for (int i = 0; i < 64; i++) {
+    //  printf("%3d | %3d\n", i, grt_sector[i]);
+    //}
+
+    printf("\n=== GRT (Group Reference Table) ===\n");
+    dump_sector_hex(fp, lab.grt);
+
+
+    //printf("=== 1st directory sector: %u ===\n", lab.dis);
+    report_directory_chain(fp,lab);
+
 }
 
 
-static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
+static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt, int add_detail) {
     int next_sector = lab.dis;
-	int entry_count = 0;
-	int entry_used = 0;
-	char entry_fname[14];
-	
+    int entry_count = 0;
+    int entry_used = 0;
+    char entry_fname[14];
+    
     printf("\n=== DIRECTORY ===\n");
-    printf("%-12s  %-5s %-10s %-8s %-8s  %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "DATE", "GROUPS");
+    printf("%-12s  %-5s %-10s  %-8s  %-8s  %s\n", "NAME", "FLAGS", "SIZE(B)", "SECTORS", "DATE", "GROUPS");
     while (next_sector != 0) {
         uint8_t blk[512];
         read_sector(fp, next_sector, blk);
@@ -487,16 +675,16 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
             if (off+23 > 506) break;
             const uint8_t *e = blk + off;
             if (e[0] == 0) continue; // empty, but never used on the early  HDOS versions (not sure abt the late versions)
-			if (e[0] == 0xFE) {entry_count++; continue;} // empty
-			if (e[0] == 0xFF) continue; // empty, not to be used
+            if (e[0] == 0xFE) {entry_count++; continue;} // empty
+            if (e[0] == 0xFF) continue; // empty, not to be used
             HDOS_DirEntry d;
-			
+            
             memcpy(entry_fname, e, 8); entry_fname[8] = '\0';
             memcpy(d.ext, e+8, 3); d.ext[3] = '\0';
-			if (strlen(d.ext)) {
-				strcat(entry_fname, ".");
-				strcat(entry_fname, d.ext);
-			}
+            if (strlen(d.ext)) {
+                strcat(entry_fname, ".");
+                strcat(entry_fname, d.ext);
+            }
             d.project = e[11];
             d.version = e[12];
             d.cluster_factor = e[13];
@@ -513,7 +701,7 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
                 chain[clen++] = cur;
                 cur = grt[cur];
             }
-			entry_count++;
+            entry_count++;
             int sectors = clen ? ((clen-1)*lab.spg + (d.lsi+1)) : 0;
             int size_b = sectors * SECTOR_SIZE;
             char flags_s[5] = "-";
@@ -521,29 +709,63 @@ static void parse_directory(FILE *fp, HDOS_Label lab, const uint8_t *grt) {
             if (d.flags & 0x40) flags_s[1]='L';
             if (d.flags & 0x20) flags_s[2]='W';
             if (d.flags & 0x10) flags_s[3]='C';
-			
-			// Creation Date
-			DecodedDate ts = decode_timestamp(d.crd);
-			// Last Update
-			//DecodedDate ts = decode_timestamp(d.ald);
+            
+            // Creation Date
+            DecodedDate ts = decode_timestamp(d.crd);
+            // Last Update
+            //DecodedDate ts = decode_timestamp(d.ald);
+            
+            // Compare the actual sector count to the file lsi
+            char sec_check=(sectors==file_sectors_from_chain(clen, d.lsi, lab.spg)) ? ' ' : '!';
 
-            printf("%-12s  %-5s %-10d %-8d %02d-%02d-%02d  ", entry_fname, flags_s, size_b, sectors-1, ts.day, ts.month, ts.year);
-			//printf("%-12s  %-5s %-10d %-8d ", entry_fname, flags_s, size_b, sectors-1);
+            printf("%-12s  %-5s %-10d  %c%-8d %02d-%02d-%02d  ", entry_fname, flags_s, size_b, sec_check, sectors-1, ts.day, ts.month, ts.year);
+
+            int ends_at_lgn;
+            if (clen != grt_verify_file_chain(grt, d.fgn, d.lgn, &ends_at_lgn)) printf ("[!] ");
+            else if (!ends_at_lgn) printf ("[!] ");
+
             if (clen) {
                 printf("%d->%d->0\n", chain[0], chain[clen-1]);
-				entry_used++;
+                entry_used++;
             } else {
                 printf("-\n");
             }
+
+            
+            // Optionaly, print the whole chain
+            if (add_detail) {
+                printf("   [ ");
+                for (int k = 0; k < clen; k++) {
+                    printf("%d", chain[k]);
+                    if (k < clen - 1)
+                        printf(" -> ");
+                }
+            printf(" -> 0 ]\n\n");
+            }
+
+
         }
         next_sector = u16le(blk+510);
+        if (entry_used >= 200)  {
+            printf("Error: circular directory chaining\n");
+            return;
+        }
     }
-	printf("%d Directory slots, %d allocated.\n", entry_count, entry_used);
+    printf("%d Directory slots, %d allocated.\n", entry_count, entry_used);
 }
 
 
 int main(int argc,char**argv){
-    if(argc<3){fprintf(stderr,"Usage: %s disk.h8d [--dir|--inspect|--get name.ext out|--add hostfile name.ext <addr>|--delete name.ext]\n",argv[0]);return 1;}
+    if (argc<3){
+        fprintf(stderr,"z88dk HDOS Heath/Zenith disk image editor/analyzer\n");
+        fprintf(stderr,"Usage: %s disk.h8d {command}\n",argv[0]);
+        fprintf(stderr,"\t[--dir <+>]\n");
+        fprintf(stderr,"\t[--inspect]\n");
+        fprintf(stderr,"\t[--get name.ext out]\n");
+        fprintf(stderr,"\t[--add hostfile name.ext <addr>]\n");
+        fprintf(stderr,"\t[--delete name.ext]\n");
+        return 1;
+        }
     const char*path=argv[1];
     FILE*fp=fopen(path,"r+b"); if(!fp){perror("Missing disk image file");return 1;}
 
@@ -551,38 +773,38 @@ int main(int argc,char**argv){
     HDOS_Label lab=parse_label(sector);
     uint8_t grt_sector[SECTOR_SIZE];read_sector(fp,lab.grt,grt_sector);
 
-	if(argc>=3) {
-		if(strcmp(argv[2],"--get")==0){
-			if(argc==4) {
-				fprintf(stderr, "Output filename missing.\n");
-			    fclose(fp);
-				return 1;
-			}
-			if (extract_file(fp,lab,grt_sector,argv[3],argv[4])) {
-				fprintf(stderr, "File %s not found.\n", argv[3]);
-			    fclose(fp);
-				return 1;
-			}
-			goto program_end;
-		}
-		if(strcmp(argv[2],"--add")==0){
-			if (extract_file(fp,lab,grt_sector,argv[4],"")==0) {
-				fprintf(stderr,"hdos_edit: file already present");
-			    fclose(fp);
-				return 1;
-			}
-			rewind(fp);
-			insert_file(fp,lab,grt_sector,argv[3],argv[4],(argc < 6) ? 0 :atoi(argv[5])); goto program_end;
-		}
-		if(strcmp(argv[2],"--delete")==0){delete_file(fp,lab,grt_sector,argv[3]); goto program_end;}
-		if(strcmp(argv[2],"--inspect")==0){inspect(fp,lab,grt_sector); goto program_end;}
-		if(strcmp(argv[2],"--dir")==0){parse_directory(fp, lab, grt_sector); goto program_end;}
-		fprintf(stderr,"hdos_edit: wrong option");
-	    fclose(fp);
-		return 1;
-	}
+    if(argc>=3) {
+        if(strcmp(argv[2],"--get")==0){
+            if(argc==4) {
+                fprintf(stderr, "Output filename missing.\n");
+                fclose(fp);
+                return 1;
+            }
+            if (extract_file(fp,lab,grt_sector,argv[3],argv[4])) {
+                fprintf(stderr, "File %s not found.\n", argv[3]);
+                fclose(fp);
+                return 1;
+            }
+            goto program_end;
+        }
+        if(strcmp(argv[2],"--add")==0){
+            if (extract_file(fp,lab,grt_sector,argv[4],"")==0) {
+                fprintf(stderr,"hdos_edit: file already present");
+                fclose(fp);
+                return 1;
+            }
+            rewind(fp);
+            insert_file(fp,lab,grt_sector,argv[3],argv[4],(argc < 6) ? 0 :atoi(argv[5])); goto program_end;
+        }
+        if(strcmp(argv[2],"--delete")==0){delete_file(fp,lab,grt_sector,argv[3]); goto program_end;}
+        if(strcmp(argv[2],"--inspect")==0){inspect(fp,lab,grt_sector); goto program_end;}
+        if(strcmp(argv[2],"--dir")==0){parse_directory(fp, lab, grt_sector,(argc < 4) ? 0 : 1); goto program_end;}
+        fprintf(stderr,"hdos_edit: wrong option");
+        fclose(fp);
+        return 1;
+    }
 
 program_end:
     fclose(fp);
-	return 0;
+    return 0;
 }
