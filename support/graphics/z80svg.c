@@ -209,7 +209,7 @@ unsigned char fill;
 unsigned char color;
 int color_balance;
 /* fill flags */
-unsigned char area;
+unsigned char area, sv_area;
 unsigned char line;
 /* Counters */
 int elementcnt;
@@ -1338,11 +1338,24 @@ autoloop:
             /*         */
             /* Polygon */
             /*         */
-            if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0) {
+            if ((xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0) || xmlStrcmp(node->name, (const xmlChar*)"polyline") == 0){
                 SvgPolygon poly;
+                sv_area = area;
                 if (handle_polygon_node(node, &poly) == 0) {
                     inipath = 0;
                     elementcnt = 0;
+
+                    if (verbose==1) {
+                        if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0)
+                            fprintf(stderr,"\nObject: 'polygon'.");
+                        else
+                            fprintf(stderr,"\nObject: 'polyline'.");
+                    }
+
+                    chkstyle(node);
+                    
+                    // 'polyline' is simplified by forcing wireframe mode
+                    if (xmlStrcmp(node->name, (const xmlChar*)"polyline") == 0) area = 0;
 
                     if (poly.count >= 1) {
                         // First point
@@ -1363,7 +1376,8 @@ autoloop:
                         }
 
                         // Close polygon (implicit in SVG)
-                        line_to(x_first, y_first, x_prev, y_prev);
+                        if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0)
+                            line_to(x_first, y_first, x_prev, y_prev);
 
                         if (pathdetails > 0) printf("\n");
                         close_area();
@@ -1377,7 +1391,9 @@ autoloop:
 
                     free_svg_polygon(&poly);
                 }
+                area = sv_area;
             }
+
 
             /*      */
             /* Line */
@@ -1528,55 +1544,6 @@ autoloop:
                 if (atm>tm) atm=tm;
                 if (abm<bm) abm=bm;
 
-                inipath=0;
-            }
-
-
-            /*         */
-            /* Polygon */
-            /*         */
-            if(xmlStrcmp(node->name, (const xmlChar *) "polygon") == 0) {
-
-                inipath=0;
-                elementcnt=0;
-
-                if (verbose==1) fprintf(stderr,"\nObject: 'polygon'.");
-
-                chkstyle (node);
-                
-                x1=y1=x2=y2=0;
-                oldx=oldy=0;
-                svcx=svcy=0;
-                
-                cmd='[';
-
-                attr = xmlGetProp(node, (const xmlChar *) "points");
-                if(attr != NULL) {
-                    sprintf(Dummy,"%s",(const char *)attr);
-                    //xmlFree(attr);
-
-/*
-                    cx=x1; cy=y1;
-                    scale_and_shift();
-                    move_to (x,y);
-                    oldx=x; oldy=y;
-                    line_to (x,y,oldx,oldy);
-
-                    cx=x2; cy=y2;
-                    scale_and_shift();
-                    line_to (x,y,oldx,oldy);
-                    oldx=x; oldy=y;
-
-                    if (pathdetails>0) printf("\n");
-
-                    close_area();
-*/
-//                  /* keep track of absolute margins */
-//                  if (alm>lm) alm=lm;
-//                  if (arm<rm) arm=rm;
-//                  if (atm>tm) atm=tm;
-//                  if (abm<bm) abm=bm;
-                }
                 inipath=0;
             }
 
