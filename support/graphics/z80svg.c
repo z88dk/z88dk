@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
