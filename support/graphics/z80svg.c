@@ -787,49 +787,40 @@ static FillRule parse_fill_rule(const char* s) {
 }
 
 
+/* --- scale_and_shift(): compute floats first, measure on floats, round only for output --- */
 void scale_and_shift() {
+    float ax;
 
-float ax;
-char * tmpstr;
+    /* Scale (no extra -xx/-yy here; callers already subtract offsets) */
+    cx = (scale * xyproportion * cx / 100);
+    cy = (scale * cy / 100);
 
-    tmpstr=malloc(100);
-    /* Scale and shift the picture (part of the main loop) */
-    cx=(scale*xyproportion*(cx-xx)/100);
-    cy=(scale*(cy-yy)/100);
-    if (rotate==1) {
-        ax=cx;  cx=cy;  cy=ax;
+    if (rotate == 1) { ax = cx; cx = cy; cy = ax; }
+    if (pathdetails == 1) printf("\n%c %f %f", cmd, cx, cy);
+
+    /* Float mapping to 0..255 space (+shift) */
+    float xf = (255.0f * cx / width)  + xshift;
+    float yf = (255.0f * cy / height) + yshift;
+
+    /* Update relative bbox on floats (no rounding/clamping) */
+    if (lm > xf) lm = xf;
+	if (rm < xf) rm = xf;
+    if (tm > yf) tm = yf;
+	if (bm < yf) bm = yf;
+
+    /* Convert to integer coordinates for output */
+    float x_out_f = xf, y_out_f = yf;
+    if (autosize == 2) {
+        if (x_out_f < 0) x_out_f = 0;
+		if (x_out_f > 255) x_out_f = 255;
+        if (y_out_f < 0) y_out_f = 0;
+		if (y_out_f > 255) y_out_f = 255;
     }
-    
-    if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
-    
-    sprintf (tmpstr,"%0.f",(255*cx/width));
-    fx=atof(tmpstr)+xshift;
-    if (autosize==2) {
-        if (fx<=0) fx=0;
-        if (fx>=255) fx=255;
-        sprintf (tmpstr,"%0.f",fx-xshift);
-    }
-    x=atoi(tmpstr)+xshift;
-    sprintf (tmpstr,"%0.f",(255*cy/height));
-    fy=atof(tmpstr)+yshift; 
-    if (autosize==2) {
-        if (fy<=0) fy=0;
-        if (fy>=255) fy=255;
-        sprintf (tmpstr,"%0.f",fy-yshift);
-    }
-    y=atoi(tmpstr)+yshift;
+    x = (unsigned char)lroundf(x_out_f);
+    y = (unsigned char)lroundf(y_out_f);
 
-    /* keep track of margins */
-    if (lm>fx) lm=fx;
-    if (rm<fx) rm=fx;
-    if (tm>fy) tm=fy;
-    if (bm<fy) bm=fy;
-
-    //printf("|%c| 0x%02X 0x%02X",cmd, x, y);
-    if ((area==1)||(line==1))
-        if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
-    
-    free(tmpstr);
+    if ((area == 1) && (line == 1) && (pathdetails == 2))
+        printf("\n%c %03u %03u", cmd, x, y);
 }
 
 
@@ -1167,6 +1158,9 @@ autoloop:
             yy = atof((const char *)attr);
         //xmlFree(attr);
 
+        // Normalize max coordinates
+        if (width > height) height = width; else width = height;
+
         // Init abs margin limits (inverted)
         alm = width;
         arm = 0;
@@ -1284,6 +1278,12 @@ autoloop:
                     attr = xmlGetProp(node, (const xmlChar *) "ry");
                     if (attr) sry = atof((const char *)attr);
                 }
+
+                // Init rel margin limits (inverted)
+                lm = width;
+                rm = 0;
+                tm = height;
+                bm = 0;
 
                 // TODO: find an automated way to compute c_segments
                 int c_segments=15;
@@ -1423,12 +1423,12 @@ autoloop:
                 }
                 attr = xmlGetProp(node, (const xmlChar *) "x2");
                 if(attr != NULL) {
-                    x2=atof((const char *)attr);
+                    x2=atof((const char *)attr)-xx;
                     //xmlFree(attr);
                 }
                 attr = xmlGetProp(node, (const xmlChar *) "y2");
                 if(attr != NULL) {
-                    y2=atof((const char *)attr);
+                    y2=atof((const char *)attr)-yy;
                     //xmlFree(attr);
                 }
 
