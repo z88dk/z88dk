@@ -16,6 +16,19 @@ description: |
 grade: stable 
 confinement: strict
 
+issues:
+  - https://github.com/z88dk/z88dk/issues
+
+source-code:
+  - https://github.com/z88dk/z88dk
+
+website:
+  - https://www.z88dk.org
+
+title: z88dk - The z80 development kit
+
+license: ClArtistic
+
 
 parts:
   part-z88dk:
@@ -67,7 +80,6 @@ parts:
     stage-packages:
       - libregexp-common-perl
       - libcapture-tiny-perl
-      - libicu74
       - perl-modules-5.38
       - libperl5.38
       - libxml2
