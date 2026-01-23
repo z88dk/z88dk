@@ -209,7 +209,7 @@ unsigned char fill;
 unsigned char color;
 int color_balance;
 /* fill flags */
-unsigned char area;
+unsigned char area, sv_area;
 unsigned char line;
 /* Counters */
 int elementcnt;
@@ -787,49 +787,40 @@ static FillRule parse_fill_rule(const char* s) {
 }
 
 
+/* --- scale_and_shift(): compute floats first, measure on floats, round only for output --- */
 void scale_and_shift() {
+    float ax;
 
-float ax;
-char * tmpstr;
+    /* Scale (no extra -xx/-yy here; callers already subtract offsets) */
+    cx = (scale * xyproportion * cx / 100);
+    cy = (scale * cy / 100);
 
-    tmpstr=malloc(100);
-    /* Scale and shift the picture (part of the main loop) */
-    cx=(scale*xyproportion*(cx-xx)/100);
-    cy=(scale*(cy-yy)/100);
-    if (rotate==1) {
-        ax=cx;  cx=cy;  cy=ax;
+    if (rotate == 1) { ax = cx; cx = cy; cy = ax; }
+    if (pathdetails == 1) printf("\n%c %f %f", cmd, cx, cy);
+
+    /* Float mapping to 0..255 space (+shift) */
+    float xf = (255.0f * cx / width)  + xshift;
+    float yf = (255.0f * cy / height) + yshift;
+
+    /* Update relative bbox on floats (no rounding/clamping) */
+    if (lm > xf) lm = xf;
+	if (rm < xf) rm = xf;
+    if (tm > yf) tm = yf;
+	if (bm < yf) bm = yf;
+
+    /* Convert to integer coordinates for output */
+    float x_out_f = xf, y_out_f = yf;
+    if (autosize == 2) {
+        if (x_out_f < 0) x_out_f = 0;
+		if (x_out_f > 255) x_out_f = 255;
+        if (y_out_f < 0) y_out_f = 0;
+		if (y_out_f > 255) y_out_f = 255;
     }
-    
-    if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
-    
-    sprintf (tmpstr,"%0.f",(255*cx/width));
-    fx=atof(tmpstr)+xshift;
-    if (autosize==2) {
-        if (fx<=0) fx=0;
-        if (fx>=255) fx=255;
-        sprintf (tmpstr,"%0.f",fx-xshift);
-    }
-    x=atoi(tmpstr)+xshift;
-    sprintf (tmpstr,"%0.f",(255*cy/height));
-    fy=atof(tmpstr)+yshift; 
-    if (autosize==2) {
-        if (fy<=0) fy=0;
-        if (fy>=255) fy=255;
-        sprintf (tmpstr,"%0.f",fy-yshift);
-    }
-    y=atoi(tmpstr)+yshift;
+    x = (unsigned char)lroundf(x_out_f);
+    y = (unsigned char)lroundf(y_out_f);
 
-    /* keep track of margins */
-    if (lm>fx) lm=fx;
-    if (rm<fx) rm=fx;
-    if (tm>fy) tm=fy;
-    if (bm<fy) bm=fy;
-
-    //printf("|%c| 0x%02X 0x%02X",cmd, x, y);
-    if ((area==1)||(line==1))
-        if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
-    
-    free(tmpstr);
+    if ((area == 1) && (line == 1) && (pathdetails == 2))
+        printf("\n%c %03u %03u", cmd, x, y);
 }
 
 
@@ -1167,6 +1158,9 @@ autoloop:
             yy = atof((const char *)attr);
         //xmlFree(attr);
 
+        // Normalize max coordinates
+        if (width > height) height = width; else width = height;
+
         // Init abs margin limits (inverted)
         alm = width;
         arm = 0;
@@ -1285,6 +1279,12 @@ autoloop:
                     if (attr) sry = atof((const char *)attr);
                 }
 
+                // Init rel margin limits (inverted)
+                lm = width;
+                rm = 0;
+                tm = height;
+                bm = 0;
+
                 // TODO: find an automated way to compute c_segments
                 int c_segments=15;
 
@@ -1338,11 +1338,24 @@ autoloop:
             /*         */
             /* Polygon */
             /*         */
-            if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0) {
+            if ((xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0) || xmlStrcmp(node->name, (const xmlChar*)"polyline") == 0){
                 SvgPolygon poly;
+                sv_area = area;
                 if (handle_polygon_node(node, &poly) == 0) {
                     inipath = 0;
                     elementcnt = 0;
+
+                    if (verbose==1) {
+                        if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0)
+                            fprintf(stderr,"\nObject: 'polygon'.");
+                        else
+                            fprintf(stderr,"\nObject: 'polyline'.");
+                    }
+
+                    chkstyle(node);
+                    
+                    // 'polyline' is simplified by forcing wireframe mode
+                    if (xmlStrcmp(node->name, (const xmlChar*)"polyline") == 0) area = 0;
 
                     if (poly.count >= 1) {
                         // First point
@@ -1363,7 +1376,8 @@ autoloop:
                         }
 
                         // Close polygon (implicit in SVG)
-                        line_to(x_first, y_first, x_prev, y_prev);
+                        if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0)
+                            line_to(x_first, y_first, x_prev, y_prev);
 
                         if (pathdetails > 0) printf("\n");
                         close_area();
@@ -1377,7 +1391,9 @@ autoloop:
 
                     free_svg_polygon(&poly);
                 }
+                area = sv_area;
             }
+
 
             /*      */
             /* Line */
@@ -1407,12 +1423,12 @@ autoloop:
                 }
                 attr = xmlGetProp(node, (const xmlChar *) "x2");
                 if(attr != NULL) {
-                    x2=atof((const char *)attr);
+                    x2=atof((const char *)attr)-xx;
                     //xmlFree(attr);
                 }
                 attr = xmlGetProp(node, (const xmlChar *) "y2");
                 if(attr != NULL) {
-                    y2=atof((const char *)attr);
+                    y2=atof((const char *)attr)-yy;
                     //xmlFree(attr);
                 }
 
@@ -1528,55 +1544,6 @@ autoloop:
                 if (atm>tm) atm=tm;
                 if (abm<bm) abm=bm;
 
-                inipath=0;
-            }
-
-
-            /*         */
-            /* Polygon */
-            /*         */
-            if(xmlStrcmp(node->name, (const xmlChar *) "polygon") == 0) {
-
-                inipath=0;
-                elementcnt=0;
-
-                if (verbose==1) fprintf(stderr,"\nObject: 'polygon'.");
-
-                chkstyle (node);
-                
-                x1=y1=x2=y2=0;
-                oldx=oldy=0;
-                svcx=svcy=0;
-                
-                cmd='[';
-
-                attr = xmlGetProp(node, (const xmlChar *) "points");
-                if(attr != NULL) {
-                    sprintf(Dummy,"%s",(const char *)attr);
-                    //xmlFree(attr);
-
-/*
-                    cx=x1; cy=y1;
-                    scale_and_shift();
-                    move_to (x,y);
-                    oldx=x; oldy=y;
-                    line_to (x,y,oldx,oldy);
-
-                    cx=x2; cy=y2;
-                    scale_and_shift();
-                    line_to (x,y,oldx,oldy);
-                    oldx=x; oldy=y;
-
-                    if (pathdetails>0) printf("\n");
-
-                    close_area();
-*/
-//                  /* keep track of absolute margins */
-//                  if (alm>lm) alm=lm;
-//                  if (arm<rm) arm=rm;
-//                  if (atm>tm) atm=tm;
-//                  if (abm<bm) abm=bm;
-                }
                 inipath=0;
             }
 
