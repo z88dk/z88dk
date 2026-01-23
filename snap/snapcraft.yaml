@@ -135,12 +135,12 @@ apps:
     plugs: [home, removable-media]
   z88dk-asmpp:
     environment:
-      PERL5LIB: "$SNAP/perl5/lib/perl5:$SNAP/usr/share/perl5:$SNAP/usr/share/perl/5.30:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30"
+      PERL5LIB: "$SNAP/perl5/lib/perl5:$SNAP/usr/share/perl5:$SNAP/usr/share/perl/5.38:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.38"
     command: bin/z88dk-asmpp
     plugs: [home, removable-media]
   z88dk-asmstyle:
     environment:
-      PERL5LIB: "$SNAP/perl5/lib/perl5:$SNAP/usr/share/perl/5.30:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30"
+      PERL5LIB: "$SNAP/perl5/lib/perl5:$SNAP/usr/share/perl/5.38:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.38"
     command: bin/z88dk-asmstyle
     plugs: [home, removable-media]
 
