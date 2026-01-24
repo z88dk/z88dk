@@ -1184,7 +1184,7 @@ int main(int argc, char **argv)
 
     /* Options that must be sequenced in specific order */
     if (compiler_type == CC_SDCC)
-        BuildOptions_start(&comparg, "--constseg rodata_compiler ");
+        BuildOptions_start(&comparg, "--constseg CONST_compiler ");
 
     if (cpp_incpath_last) {
         BuildOptions(&cpparg, cpp_incpath_last);
@@ -1992,19 +1992,18 @@ void zsdcc_asm_filter_sections(int filenumber, char* ext)
             outline = procline;
         }
 
-        if (opt_const_seg != NULL)
-        {
-            procline = replace_str(outline, "rodata_compiler", opt_const_seg);
-            free(outline);
-            outline = procline;
-        }
-
         if (opt_data_seg != NULL)
         {
             procline = replace_str(outline, "data_compiler", opt_data_seg);
             free(outline);
             outline = procline;
         }
+
+        procline = replace_str(outline, "CONST_compiler", opt_const_seg ? opt_const_seg : "rodata_compiler");
+        free(outline);
+        outline = procline;
+
+
 
         if (opt_bss_seg != NULL)
         {
