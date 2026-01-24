@@ -225,6 +225,7 @@ include target/pps/pps.mak
 include target/sam/sam.mak
 include target/sms/sms.mak
 include target/ts2068/ts2068.mak
+include target/x07/x07.mak
 include target/z88/z88.mak
 include target/zx/zx.mak
 include target/zxn/zxn.mak
@@ -2029,14 +2030,16 @@ trsdos.lib: trs80_clib.lib
 	$(MAKE) -C target/trs80/fcntl
 
 # Canon X-07 lib - Stefano
-x07_clib.lib: $(TARGET_CLIB_DEPS)
+# Machine use alt registers for interrupts, so we have to use 8080 routines
+# But, we can use z80 instructinos
+x07_clib.lib: $(TARGET_CLIB_DEPS) target-x07
 	@echo ''
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
 	$(call buildgeneric,x07)
 	$(MAKE) -C classic/games TARGET=x07
 	$(MAKE) -C classic/gfx TARGET=x07 FLAVOUR="narrow"
-	TARGET=x07 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
+	TARGET=x07 TYPE=8080 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
 x1_clib.lib: $(TARGET_CLIB_DEPS)

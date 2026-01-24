@@ -69,7 +69,6 @@ generic_console_printc:
     call    generic_console_xypos
     ld      (hl), a
     pop     bc
-    push    af
     // Now we need to print it
     ld      hl,__x07_buffer
     ld      (hl),c
