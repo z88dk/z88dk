@@ -38,15 +38,15 @@ static __sfr __at 0xFE IO_PRINTER;
 static __sfr __at 0xFF IO_SCRAMBLE;
 
 
-static __sfr __at 0x00FF IO_KEYBOARD_ALL;
-static __sfr __at 0x7FFF IO_KEYBOARD_COL7;
-static __sfr __at 0xBFFF IO_KEYBOARD_COL6;
-static __sfr __at 0xDFFF IO_KEYBOARD_COL5;
-static __sfr __at 0xEFFF IO_KEYBOARD_COL4;
-static __sfr __at 0xF7FF IO_KEYBOARD_COL3;
-static __sfr __at 0xFBFF IO_KEYBOARD_COL2;
-static __sfr __at 0xFDFF IO_KEYBOARD_COL1;
-static __sfr __at 0xFEFF IO_KEYBOARD_COL0;
+static __sfr __banked __at 0x00FF IO_KEYBOARD_ALL;
+static __sfr __banked __at 0x7FFF IO_KEYBOARD_COL7;
+static __sfr __banked __at 0xBFFF IO_KEYBOARD_COL6;
+static __sfr __banked __at 0xDFFF IO_KEYBOARD_COL5;
+static __sfr __banked __at 0xEFFF IO_KEYBOARD_COL4;
+static __sfr __banked __at 0xF7FF IO_KEYBOARD_COL3;
+static __sfr __banked __at 0xFBFF IO_KEYBOARD_COL2;
+static __sfr __banked __at 0xFDFF IO_KEYBOARD_COL1;
+static __sfr __banked __at 0xFEFF IO_KEYBOARD_COL0;
 
 
 #endif
