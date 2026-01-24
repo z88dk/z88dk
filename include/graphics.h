@@ -248,10 +248,10 @@ extern void __LIB__ lscroll_8px(void);
 extern void __LIB__ rscroll_8px(void);
 
 /* Scroll the graphics map 1 pixel up */
-extern void __LIB__  scrollup_1px();
+extern void __LIB__  scrollup_1px(void);
 
 /* Scroll the graphics map 4 pixel up */
-extern void __LIB__  scrollup_4px();
+extern void __LIB__  scrollup_4px(void);
 
 
 /* Clear area of graphics map */
