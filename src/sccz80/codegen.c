@@ -46,7 +46,6 @@ extern void OutIndex(int);
 #endif
 
 
-static void swap(void);
 static void dpush_under(Kind val_type);
 static void push(const char *ret);
 static void pop(const char *ret);
@@ -354,11 +353,11 @@ void gen_load_static(SYMBOL* sym)
                 outname(sym->name, dopref(sym));
                 outstr("+2)\n");
             } else {
-                swap();
+                gen_swap();
                 ot("ld\thl,(");
                 outname(sym->name, dopref(sym));
                 outstr("+2)\n");
-                swap();
+                gen_swap();
             }
         }
         if (sym->ctype->kind == KIND_CPTR) {
@@ -440,11 +439,11 @@ void gen_store_static(SYMBOL* sym)
                 outname(sym->name, dopref(sym));
                 outstr("+2),de\n");
             } else {
-                swap();
+                gen_swap();
                 ot("ld\t(");
                 outname(sym->name, dopref(sym));
                 outstr("+2),hl\n");
-                swap();
+                gen_swap();
             }
         }
     } else if (sym->ctype->kind == KIND_CPTR) {
@@ -927,7 +926,7 @@ void gen_load_indirect(LVALUE* lval)
 }
 
 /* Swap the primary and secondary registers */
-static void swap(void)
+void gen_swap(void)
 {
     if ( IS_GBZ80() ) {
         // Crude emulation - we can probably do better on a case by case basis
@@ -1039,12 +1038,12 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
         Zsp--;
         return 1;
     } else if (expr == KIND_STRUCT) {
-        swap();             /* de = stack address */
+        gen_swap();             /* de = stack address */
         vconst(-type->size);
         ol("add\thl,sp");
         ol("ld\tsp,hl");
         Zsp -= type->size;
-        swap();
+        gen_swap();
         outfmt("\tld\tbc,%d\n",type->size);
         ol("ldir");
         return type->size;
@@ -1068,7 +1067,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push
 {
     if (expr == KIND_LONG || expr == KIND_CPTR || ( c_fp_size == 4 && expr == KIND_DOUBLE)) {
         if (is_last_argument == 0 || (functype->flags & FASTCALL) == 0 ) {
-            swap(); /* MSW -> hl */
+            gen_swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
             push("de"); /* LSW -> stack, addr = hl */
             return 4;
@@ -1087,14 +1086,14 @@ int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push
         }
     } else if (expr == KIND_STRUCT ) {
         // 13 bytes
-        swap();             // de = address of struct
+        gen_swap();             // de = address of struct
         ol("pop\tbc");      // return address
         vconst(-type->size);
         ol("add\thl,sp");
         ol("ld\tsp,hl");
         ol("push\tbc");
         Zsp -= type->size;
-        swap();
+        gen_swap();
         outfmt("\tld\tbc,%d\n",type->size);
         ol("ldir");
         pop("hl");
@@ -1122,7 +1121,7 @@ void dpush_under(Kind val_type)
     if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
         if ( c_fp_size == 4 ) {
             ol("pop\tbc");  // addr2 -> bc
-            swap(); /* MSW -> hl */
+            gen_swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr1 -> hl */
             push("de"); /* LSW -> stack, addr1 = hl */
             push("hl");     // addr -> stack
@@ -1133,7 +1132,7 @@ void dpush_under(Kind val_type)
         }
     } else {
         if ( c_fp_size == 4 ) {
-            swap(); /* MSW -> hl */
+            gen_swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
             push("de"); /* LSW -> stack, addr = hl */
             push("hl");
@@ -1675,7 +1674,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
                 ol("ld\tc,l");
             }
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
-            swap();
+            gen_swap();
         }
         vconst(k);
         ol("add\thl,sp");
@@ -1686,7 +1685,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
                 ol("ld\tl,c");
             }
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
-            swap();
+            gen_swap();
         }
         return newsp;
     }
@@ -2394,9 +2393,9 @@ void zadd_const(LVALUE *lval, int64_t value64)
         uint32_t highword = ((uint32_t)value) / 65536;
         if ( (value % 65536) == 0 ) {
             if ( add_to_high_word(value) == 0 ) {
-                swap();         // 1, 4
+                gen_swap();         // 1, 4
                 addbchl(((uint32_t)value) / 65536); // 4, 21
-                swap();         // 4
+                gen_swap();         // 4
             }
             return;
         }
@@ -2785,7 +2784,7 @@ void zdiv_const(LVALUE *lval, int64_t value64)
             asr_const(lval, 13);
             return;
         } else if ( value == 65536 ) {
-            swap();
+            gen_swap();
             const2(0);
             return;
         }
@@ -2844,7 +2843,7 @@ void zdiv_const(LVALUE *lval, int64_t value64)
                 vlongconst(value);
             } else {
                 const2(value & 0xffff);
-                swap();
+                gen_swap();
             }
             zdiv(lval);
     }
@@ -2893,7 +2892,7 @@ void zmod(LVALUE* lval)
             Zsp += 4;
         } else {
             zdiv(lval);
-            swap();
+            gen_swap();
         }
     }
 }
@@ -3014,7 +3013,7 @@ void zmod_const(LVALUE *lval, int64_t value64)
             break;
         default:
             const2(value & 0xffff);
-            swap();
+            gen_swap();
             zmod(&templval);
     }
 
@@ -3816,7 +3815,7 @@ void asl_16bit_const(LVALUE *lval, int value)
                 ol("ex\tde,hl");   // 1, 4T
             } else {
                 const2(value & 0xffff);
-                swap();
+                gen_swap();
                 callrts("l_asl");
             }
             break;
@@ -3841,7 +3840,7 @@ void asl_const(LVALUE *lval, int64_t value64)
             ol("add\thl,hl");  // 5 bytes, 11 + 4 + 10 = 25T
             // Fall through
         case 16: // 4 bytes
-            swap();
+            gen_swap();
             vconst(0);
             break;
         case 8: // 5 bytes, 4 + 4 + 4 +7 = 19T
@@ -3901,7 +3900,7 @@ void asl_const(LVALUE *lval, int64_t value64)
             value &= 31;
             if (  value >= 16 ) {
                 asl_16bit_const(lval, value - 16);
-                swap();
+                gen_swap();
                 ot("ld\thl,"); outdec(0); nl();
             } else {
                 loada( value );
@@ -4627,7 +4626,7 @@ void zlt_const(LVALUE *lval, int64_t value64)
         zlt(lval);
     } else {
         const2(value & 0xffff);  // 7 bytes
-        swap();
+        gen_swap();
         zlt(lval);
     }
 }
@@ -4694,7 +4693,7 @@ void zlt(LVALUE* lval)
             } else {
            // callrts("l_ult");
             // de = lhs, hl = rhs
-                swap();
+                gen_swap();
                 ol("and\ta");
                 ol("sbc\thl,de");
                 set_carry(lval);
@@ -4753,7 +4752,7 @@ void zle_const(LVALUE *lval, int64_t value64)
             set_carry(lval);
         } else {
             const2(value & 0xffff);  // 7 bytes
-            swap();
+            gen_swap();
             zle(lval);
         }
     }
@@ -4885,7 +4884,7 @@ void zgt_const(LVALUE *lval, int64_t value64)
         zgt(lval);
     } else {
         const2(value & 0xffff);  // 7 bytes
-        swap();
+        gen_swap();
         zgt(lval);
     }
 }
@@ -5020,7 +5019,7 @@ void zge_const(LVALUE *lval, int64_t value64)
                 set_carry(lval);
             } else {
                 const2(value & 0xffff);  // 7 bytes
-                swap();
+                gen_swap();
                 zge(lval);
             }
         }
@@ -5088,7 +5087,7 @@ void zge(LVALUE* lval)
         if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if (ulvalue(lval)) {
             if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
-                swap();
+                gen_swap();
                 ol("and\ta");
                 ol("sbc\thl,de");
                 ol("ccf");

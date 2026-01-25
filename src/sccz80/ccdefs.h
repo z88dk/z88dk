@@ -91,6 +91,7 @@ extern void gen_shortcall(Type *functype, int rst, int value);
 extern void gen_bankedcall(SYMBOL *sym, Type* functype);
 extern void gen_hl_call(Type *functype, int module, int address);
 extern void gen_emit_line(int);
+extern void gen_swap(void);
 
 extern void gen_load_indirect(LVALUE *lval);
 extern void gen_load_static(SYMBOL *sym);
