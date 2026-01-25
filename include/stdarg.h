@@ -1,22 +1,21 @@
 /*
- *	A nice old stdarg.h
+ * stdarg with __smallc conventions is tricky. 
  *
- *	djm 28/2/2000
- *
- *	Will this work? Who knows!
- *
- *	NB. va_start must be called immediately after calling
- *	the function - i.e. no auto variables can be initialised
- *	(except to constants)
- *
- *	NB2. The first call to va_next returns with the value
- *	of the first named argument, the 2nd call returns the
- *	value of the 2nd named argument etc etc
- *
- *	I've only tested this with 2 byte arguments but it 
- *	seems to work...
- *
- *	$Id: stdarg.h,v 1.4 2016-03-07 20:25:48 dom Exp $
+ * Here's a exammple code of how to do it:
+ * 
+char *error(char *fmt, ...)
+{
+   va_list v;
+   va_start(v, fmt);
+
+#ifdef __SCCZ80
+   vsnprintf(ebuf, sizeof(ebuf), va_ptr(v,char *), v);
+#else
+   vsnprintf(ebuf, sizeof(ebuf), fmt, v);
+#endif
+
+   return ebuf;
+}
  */
 
 #ifndef __STDARG_H__
@@ -44,13 +43,13 @@ typedef unsigned char * va_list;
 extern int __LIB__ getarg(void);
 #endif
 
-#define va_list                 unsigned char *
-#define va_start(ap,last)       ap=(getarg()*2)+&last-5
-#define va_arg(ap,type)         (*(type*)(ap-=sizeof(type),ap+1))
+typedef unsigned char * va_list;
+#define va_start(ap,last)       ap=(getarg()*2)+(unsigned char *)&last-4
+#define va_arg(ap,type)         (*(type*)(ap-=sizeof(type),ap))
 #define va_copy(dst, src)       dst = src
 #define va_end(ap)
 
-#define va_ptr(ap,type)         (*(type*)(ap+1))
+#define va_ptr(ap,type)         (*(type*)(ap+2))
 
 
 /*
