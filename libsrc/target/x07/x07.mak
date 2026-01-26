@@ -8,6 +8,7 @@ X07_GLOBS := \
 X07_GLOBS_ex := \
 	target/x07/stdio/*.asm \
 	target/x07/graphics/*.asm \
+	target/x07/graphics/*.inc \
 	target/x07/*.asm
 
 

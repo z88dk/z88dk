@@ -2039,7 +2039,7 @@ x07_clib.lib: $(TARGET_CLIB_DEPS) target-x07
 	$(call buildgeneric,x07)
 	$(MAKE) -C classic/games TARGET=x07
 	$(MAKE) -C classic/gfx TARGET=x07 FLAVOUR="narrow"
-	TARGET=x07 TYPE=8080 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
+	TARGET=x07 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
 x1_clib.lib: $(TARGET_CLIB_DEPS)

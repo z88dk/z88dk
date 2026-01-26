@@ -31,6 +31,13 @@ ENDIF
 
     INCLUDE "target/x07/def/x07.h"
 
+IFNDEF CLIB_X07_USE_FIRMWARE
+    defc    CLIB_X07_USE_FIRMWARE = 1
+ENDIF
+
+    PUBLIC  __CLIB_X07_USE_FIRMWARE
+    defc    __CLIB_X07_USE_FIRMWARE = CLIB_X07_USE_FIRMWARE
+
     org     CRT_ORG_CODE
 
 ;----------------------

@@ -11,6 +11,7 @@
     EXTERN  __x07_SUB_EXECUTE
 
 ; hl = xy
+; Always use the firmware 
 pointxy:
     ex      de,hl
     ld      hl,__x07_buffer

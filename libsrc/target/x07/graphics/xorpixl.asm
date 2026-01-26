@@ -9,9 +9,17 @@
 
     INCLUDE "target/x07/def/x07.h"
     EXTERN  __x07_SUB_EXECUTE
+    EXTERN  __CLIB_X07_USE_FIRMWARE
 
 ; hl = xy
 xorpixel:
+    ld      a,__CLIB_X07_USE_FIRMWARE
+    and     a
+    jr      nz,use_rom
+
+    defc    NEEDxorplot=1
+    INCLUDE "target/x07/graphics/pixel_MODE1.inc"
+use_rom:
     ex      de,hl
     ld      hl,__x07_buffer
     ld      (hl),d

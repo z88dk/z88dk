@@ -17,6 +17,7 @@
     EXTERN  __x07_buffer
     EXTERN  __x07_natural_chars
     EXTERN  __ansichar_4x4
+    EXTERN  __x07_mode1_copy
 
     defc generic_console_cls = clg
 
@@ -64,7 +65,10 @@ generic_console_printc:
     ld      a,(__x07_natural_chars)
     and     a
     ld      a,d
-    jp      z,__ansichar_4x4
+    jp      nz,printc_regular
+    call    __ansichar_4x4
+    jp      __x07_mode1_copy
+printc_regular:
     push    bc
     call    generic_console_xypos
     ld      (hl), a
