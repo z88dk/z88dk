@@ -287,7 +287,8 @@ char *skip_spc(char *p) {
 char *skip_num(char *p) {
     int dot_found=0;
     p=skip_spc(p);
-    p++;
+    //p++;
+	if (*p == '-') p++;
     while ((isdigit(*p) || ((*p == '.') && (dot_found == 0))) && (strlen(p) > 0)) {
         if (*p == '.') dot_found++;
         p++;
