@@ -29,7 +29,6 @@
 #include "../../include/gfxprofile.h"
 //#include "gfxprofile.h"
 
-//#ifdef LIBXML_READER_ENABLED
 
 #ifdef __MINGW32__
 #define fcloseall _fcloseall
@@ -214,6 +213,7 @@ unsigned char line;
 /* Counters */
 int elementcnt;
 unsigned int pathcnt,nodecnt,skipcnt;
+int c_segments;
 
 /* File and string buffer pointers */
 char destline[10000];
@@ -226,7 +226,7 @@ int maxelements=0;
 int verbose=0;
 int expanded=0;
 int rotate=0;
-int pathdetails=0;
+int pathaccuracy=3;
 int wireframe=0;
 int autosize=0;
 int forcedmode=0;
@@ -285,9 +285,13 @@ char *skip_spc(char *p) {
 }
 
 char *skip_num(char *p) {
+    int dot_found=0;
     p=skip_spc(p);
     p++;
-    while ( (isdigit(*p) || (*p == '.') ) && (strlen(p) > 0) ) p++;
+    while ((isdigit(*p) || ((*p == '.') && (dot_found == 0))) && (strlen(p) > 0)) {
+        if (*p == '.') dot_found++;
+        p++;
+    }
     p=skip_spc(p);
     return (p);
 }
@@ -796,7 +800,6 @@ void scale_and_shift() {
     cy = (scale * cy / 100);
 
     if (rotate == 1) { ax = cx; cx = cy; cy = ax; }
-    if (pathdetails == 1) printf("\n%c %f %f", cmd, cx, cy);
 
     /* Float mapping to 0..255 space (+shift) */
     float xf = (255.0f * cx / width)  + xshift;
@@ -804,23 +807,20 @@ void scale_and_shift() {
 
     /* Update relative bbox on floats (no rounding/clamping) */
     if (lm > xf) lm = xf;
-	if (rm < xf) rm = xf;
+    if (rm < xf) rm = xf;
     if (tm > yf) tm = yf;
-	if (bm < yf) bm = yf;
+    if (bm < yf) bm = yf;
 
     /* Convert to integer coordinates for output */
     float x_out_f = xf, y_out_f = yf;
     if (autosize == 2) {
         if (x_out_f < 0) x_out_f = 0;
-		if (x_out_f > 255) x_out_f = 255;
+        if (x_out_f > 255) x_out_f = 255;
         if (y_out_f < 0) y_out_f = 0;
-		if (y_out_f > 255) y_out_f = 255;
+        if (y_out_f > 255) y_out_f = 255;
     }
     x = (unsigned char)lroundf(x_out_f);
     y = (unsigned char)lroundf(y_out_f);
-
-    if ((area == 1) && (line == 1) && (pathdetails == 2))
-        printf("\n%c %03u %03u", cmd, x, y);
 }
 
 
@@ -886,7 +886,6 @@ int main( int argc, char *argv[] )
     char dname[300]="";
 
     int takedisabled=0;
-    int curves_cnt;
     int excluded_nodes=0;
 
     xmlDocPtr doc;
@@ -941,7 +940,7 @@ int main( int argc, char *argv[] )
             fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
             fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
             fprintf(stderr,"\n   -f1..7: Force line/area modes (1/0 0/1 1/1 1/X X/1 0/X X/0).");
-            fprintf(stderr,"\n   -p1/-p2: List path details to stdout (float or converted int values).");
+            fprintf(stderr,"\n   -p1..5: Path decoding & curve accuracy (default=3).");
             fprintf(stderr,"\n");
             exit(1);
             break;
@@ -1024,8 +1023,8 @@ int main( int argc, char *argv[] )
             grouping=1;
             break;
        case 'p' :
-            pathdetails=atoi(arg+2);
-            if ((pathdetails==0)||(pathdetails>2)) {
+            pathaccuracy=atoi(arg+2);
+            if ((pathaccuracy==0)||(pathaccuracy>5)) {
                 fprintf(stderr,"\nInvalid path detail listing option.\n");
                 exit(11);
             }
@@ -1284,9 +1283,11 @@ autoloop:
                 rm = 0;
                 tm = height;
                 bm = 0;
-
-                // TODO: find an automated way to compute c_segments
-                int c_segments=15;
+                
+                // c_segments depend on diameters and on pathaccuracy
+                if (srx > sry) c_segments = 5+(srx/4);
+                else c_segments = 3+(sry/4);
+                c_segments += pathaccuracy*2;
 
                 /* First coordinate */
                 cmd = '(';
@@ -1319,9 +1320,6 @@ autoloop:
 
                 /* Close */
                 line_to(x0, y0, oldx, oldy);
-
-                if(pathdetails > 0)
-                    printf("\n");
 
                 close_area();
 
@@ -1379,7 +1377,6 @@ autoloop:
                         if (xmlStrcmp(node->name, (const xmlChar*)"polygon") == 0)
                             line_to(x_first, y_first, x_prev, y_prev);
 
-                        if (pathdetails > 0) printf("\n");
                         close_area();
 
                         // Update absolute margins / bbox like fai per path
@@ -1445,8 +1442,6 @@ autoloop:
                 scale_and_shift();
                 line_to (x,y,oldx,oldy);
                 oldx=x; oldy=y;
-
-                if (pathdetails>0) printf("\n");
 
                 close_area();
 
@@ -1534,8 +1529,6 @@ autoloop:
                 line_to (x,y,oldx,oldy);
                 oldx=x; oldy=y;
 
-                if (pathdetails>0) printf("\n");
-
                 close_area();
 
                 /* keep track of absolute margins */
@@ -1582,7 +1575,6 @@ autoloop:
                     //spath=strdup((char *)attr);
                     sprintf (spath,"%s",(const char *)attr);
                     path=spath;
-                    curves_cnt=0;
                     oldx=oldy=0;
                     svcx=svcy=0;
 
@@ -1601,7 +1593,6 @@ autoloop:
                                     cmd=oldcmd;
                             }
                         else {
-                            curves_cnt=0;
                             oldcmd=cmd;
                             path++;
                             skip_spc(path);
@@ -1624,7 +1615,6 @@ autoloop:
                             if ((x != inix) || (y != iniy))
                                 line_to (inix,iniy,oldx,oldy);
 
-                            if (pathdetails>0) printf("\n%c", cmd);
                             if (strlen(path)>0) {
                                 //oldcmd=*path;
                                 path++;
@@ -1632,6 +1622,10 @@ autoloop:
                             }
                         } else {
                             nodecnt++;
+
+                            // _Debugging_
+                            //fprintf(stderr,"\n%s",path);
+
                             /* skip 5 parameters if cmd is 'arc'*/
                             if ((cmd == 'A')||(cmd == 'a')) {
                                 path=skip_num(path);
@@ -1640,7 +1634,23 @@ autoloop:
                                 path=skip_num(path);
                                 path=skip_num(path);
                             }
-                            /* Vertical and Horizontal lines take 1 parameter only */
+
+                            // Cubic
+                            if ((cmd == 'C')||(cmd == 'c')) {
+                                path=skip_num(path);
+                                path=skip_num(path);
+                                path=skip_num(path);
+                                path=skip_num(path);
+                            }
+
+                            // Quadratic / Smooth
+                            if ((cmd == 'S')||(cmd == 's')||(cmd == 'Q')||(cmd == 'q')) {
+                                path=skip_num(path);
+                                path=skip_num(path);
+                            }
+
+                            // Gather X and Y destination values for ALL the possible command sequences
+                            // (Vertical and Horizontal lines take 1 parameter only)
                             if (toupper(cmd) != 'V') {
                                 cx=atof(path)-xx;
                                 path=skip_num(path);
@@ -1649,16 +1659,7 @@ autoloop:
                                 cy=atof(path)-yy;
                                 path=skip_num(path);
                             }
-                            ////fprintf(stderr,"\n%s",path);
-                            /* don't consider the second parameter of a relative curve*/
-                            if ((cmd == 'c')||(cmd == 'q')||(cmd == 't')) {
-                                curves_cnt++;
-                                if ((curves_cnt % 3)==1) {
-                                    path=skip_num(path);
-                                    path=skip_num(path);
-                                    curves_cnt++;
-                                    }
-                            } else curves_cnt=0;
+
                             /* Lower case commands take relative coordinates */
                             if (toupper(cmd)!=cmd) {
                                 if (cmd != 'v') cx=cx+svcx;
@@ -1701,10 +1702,7 @@ autoloop:
                         path=skip_spc(path);
                     }
 
-                    close_area();
-                    
-                    if (pathdetails>0) printf("\n");
-                    
+                    close_area();                    
                     inipath=0;
                 }
                 //xmlFree(attr);
@@ -1790,6 +1788,4 @@ autoloop:
     //(void)fcloseall();
     return(0);
 }
-
-//#endif
 
