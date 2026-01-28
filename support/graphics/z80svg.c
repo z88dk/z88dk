@@ -288,7 +288,7 @@ char *skip_num(char *p) {
     int dot_found=0;
     p=skip_spc(p);
     //p++;
-	if (*p == '-') p++;
+    if (*p == '-') p++;
     while ((isdigit(*p) || ((*p == '.') && (dot_found == 0))) && (strlen(p) > 0)) {
         if (*p == '.') dot_found++;
         p++;
@@ -820,8 +820,45 @@ void scale_and_shift() {
         if (y_out_f < 0) y_out_f = 0;
         if (y_out_f > 255) y_out_f = 255;
     }
-    x = (unsigned char)lroundf(x_out_f);
-    y = (unsigned char)lroundf(y_out_f);
+    x = (unsigned char)round(x_out_f);
+    y = (unsigned char)round(y_out_f);
+}
+
+
+// Adjust curve parameters only
+static inline void scale_midpoints(float *x1, float *y1, float *x2, float *y2)
+{
+    float ax;
+
+    *x1 = (scale * xyproportion * *x1 / 100);
+    *y1 = (scale * *y1 / 100);
+
+    if (rotate == 1) { ax = *x1; *x1 = *y1; *y1 = ax; }
+
+    *x2 = (scale * xyproportion * *x2 / 100);
+    *y2 = (scale * *y2 / 100);
+
+    if (rotate == 1) { ax = *x2; *x2 = *y2; *y2 = ax; }
+
+    float x1f = (255.0f * *x1 / width) + xshift;
+    float y1f = (255.0f * *y1 / height) + yshift;
+    float x2f = (255.0f * *x2 / width) + xshift;
+    float y2f = (255.0f * *y2 / height) + yshift;
+
+    if (autosize == 2) {
+        if (x1f < 0) x1f = 0;
+        if (x1f > 255) x1f = 255;
+        if (y1f < 0) y1f = 0;
+        if (y1f > 255) y1f = 255;
+        if (x2f < 0) x2f = 0;
+        if (x2f > 255) x2f = 255;
+        if (y2f < 0) y2f = 0;
+        if (y2f > 255) y2f = 255;
+    }
+    *x1 = round(x1f);
+    *y1 = round(y1f);
+    *x2 = round(x2f);
+    *y2 = round(y2f);
 }
 
 
@@ -880,7 +917,7 @@ int main( int argc, char *argv[] )
     int i;
     char** p = argv+1;
     char *arg;
-    float x1,x2,y1,y2;
+    float x1,x2,y1,y2,rx,ry,sweepFlag;
 
     char stname[150]="svg_picture";
     char sname[300]="";
@@ -1582,7 +1619,7 @@ autoloop:
                     while (strlen(path)>0) {
                         path=skip_spc(path);
                         cmd=*path;
-                        if ((isdigit(cmd))||(cmd=='-'))
+                        if ((isdigit(cmd))||(cmd=='-')||(cmd=='.'))
                             switch (oldcmd) {
                                 case 'm':
                                     cmd = 'l';
@@ -1623,30 +1660,42 @@ autoloop:
                             }
                         } else {
                             nodecnt++;
+                            x1=y1=x2=y2=0;
 
                             // _Debugging_
                             //fprintf(stderr,"\n%s",path);
 
-                            /* skip 5 parameters if cmd is 'arc'*/
-                            if ((cmd == 'A')||(cmd == 'a')) {
-                                path=skip_num(path);
-                                path=skip_num(path);
-                                path=skip_num(path);
-                                path=skip_num(path);
-                                path=skip_num(path);
+                            // Arc
+                            if ((cmd == 'A') || (cmd == 'a')) {
+                                rx = atof(path);            // rx
+                                path = skip_num(path);
+                                ry = atof(path);            // ry
+                                path = skip_num(path);
+                                //xAxisRotation = atof(path);
+                                path = skip_num(path);
+                                //largeArcFlag = atoi(path);
+                                path = skip_num(path);
+                                sweepFlag = atoi(path);     // Sweep flag
+                                path = skip_num(path);
                             }
 
                             // Cubic
                             if ((cmd == 'C')||(cmd == 'c')) {
+                                x1=atof(path)-xx;
                                 path=skip_num(path);
+                                y1=atof(path)-yy;
                                 path=skip_num(path);
+                                x2=atof(path)-xx;
                                 path=skip_num(path);
+                                y2=atof(path)-yy;
                                 path=skip_num(path);
                             }
 
                             // Quadratic / Smooth
                             if ((cmd == 'S')||(cmd == 's')||(cmd == 'Q')||(cmd == 'q')) {
+                                x1=atof(path)-xx;
                                 path=skip_num(path);
+                                y1=atof(path)-yy;
                                 path=skip_num(path);
                             }
 
@@ -1663,20 +1712,111 @@ autoloop:
 
                             /* Lower case commands take relative coordinates */
                             if (toupper(cmd)!=cmd) {
+                                x1=x1+svcx;
+                                y1=y1+svcy;
+                                x2=x2+svcx;
+                                y2=y2+svcy;
                                 if (cmd != 'v') cx=cx+svcx;
                                 if (cmd != 'h') cy=cy+svcy;
+
                                 cmd=toupper(cmd);
                             }
+                            
                             svcx=cx; svcy=cy;
                             
                             /* Scale and shift the picture */
                             scale_and_shift();
+                            //if (pathaccuracy > 3)
+                            scale_midpoints(&x1,&y1,&x2,&y2);
                             
                             switch (cmd) {
                                 case 'M':
-                                case 'm':
+                                // case 'm':   // always uppercase
                                     move_to (x,y);
                                     break;
+
+                                    case 'C':
+                                    case 'Q':
+                                    case 'S':
+                                    case 'T':
+                                    case 'A':
+                                    
+                                    if ((cmd == 'C')||(cmd == 'Q')||(cmd == 'S')||(cmd == 'T')) {
+                                        if (pathaccuracy > 3) {
+                                        
+                                            if ((cmd == 'Q') || (cmd == 'T')) {
+                                            /* Q has one control point; convert to equivalent cubic:
+                                               C1 = P0 + (2/3)*(Qctrl - P0)
+                                               C2 = P3 + (2/3)*(Qctrl - P3),  then segment like a cubic. */
+                                              
+                                                x2 = x    + (2.0/3.0) * (x1 - x);
+                                                y2 = y    + (2.0/3.0) * (y1 - y);
+                                                x1 = oldx + (2.0/3.0) * (x1 - oldx);
+                                                y1 = oldy + (2.0/3.0) * (y1 - oldy);
+                                            }
+                                            
+                                            int nseg=pathaccuracy-2;
+                                            for (int i = 1; i < nseg; ++i) {
+                                                float t  = (float)i / (float)nseg;
+                                                float it = 1.0 - t;
+
+                                                float bx = it*it*it*oldx + 3.0f*it*it*t*x1 + 3.0f*it*t*t*x2 + t*t*t*x;
+                                                float by = it*it*it*oldy + 3.0f*it*it*t*y1 + 3.0f*it*t*t*y2 + t*t*t*y;
+                                                
+                                                line_to(round(bx), round(by), oldx, oldy);
+
+                                                oldx = (unsigned char)round(bx); 
+                                                oldy = (unsigned char)round(by);
+                                            }
+                                        }
+                                    }
+
+                                    /* fall through and draw the last segment (no break) */
+
+
+                                    /* TODO: Proper SVG arc handling: use xAxisRotation & largeArcFlag to compute the real ellipse center
+                                       and split to cubic Beziers. This block is just an approximation. */
+
+                                    if (cmd == 'A') {
+                                        if (pathaccuracy > 3) {
+                                            int nseg = (pathaccuracy - 2) * 2;
+                                            /* Map radii rx, ry to output space (0..255) coherently with scale/rotate/proportion */
+                                            float rx_f = rx, ry_f = ry;     /* source units (already absolute/relative-adjusted) */
+                                            /* Reuse the math from scale_midpoints (without clamping) */
+                                            {
+                                                float ax;
+                                                rx_f = (scale * xyproportion * rx_f / 100);
+                                                ry_f = (scale * ry_f / 100);
+                                                if (rotate == 1) { ax = rx_f; rx_f = ry_f; ry_f = ax; }
+                                                rx_f = (255.0f * rx_f / width);
+                                                ry_f = (255.0f * ry_f / height);
+                                            }
+                                            /* Midpoint center in output space (approximation) */
+                                            float cx0 = (oldx + x) / 2.0;
+                                            float cy0 = (oldy + y) / 2.0;
+                                            float a0 = atan2f(oldy - cy0, oldx - cx0);    // start angle
+                                            float a1   = atan2f(y    - cy0, x    - cx0);  // end angle
+                                            if (sweepFlag && a1 < a0) a1 += 2.0 * M_PI;
+                                            if (!sweepFlag && a1 > a0) a1 -= 2.0 * M_PI;
+                                            float delta = a1 - a0;
+                                            for (int i = 1; i < nseg; ++i) {
+                                                float t = (float)i / (float)nseg;
+                                                float a = a0 + delta * t;
+
+                                                float bx = cx0 + rx_f * cosf(a);
+                                                float by = cy0 + ry_f * sinf(a);
+
+                                                line_to(roundf(bx), roundf(by), oldx, oldy);
+
+                                                oldx = (unsigned char)round(bx); 
+                                                oldy = (unsigned char)round(by);
+                                            }
+                                        }
+                                    }
+
+                                    /* fall through and draw the last segment (no break) */
+
+
                                 default:
                                     if ((oldx!=0) && (oldy!=0))
                                     line_to (x,y,oldx,oldy);
