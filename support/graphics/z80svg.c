@@ -39,7 +39,7 @@
  * (overlapping corners are excluded)
  */
 
-#define scale_divisor 2.5
+#define scale_divisor 1.8
 
 struct svgcolor{
     char color_name[30];
@@ -226,7 +226,7 @@ int maxelements=0;
 int verbose=0;
 int expanded=0;
 int rotate=0;
-int pathaccuracy=3;
+int pathaccuracy=4;
 int wireframe=0;
 int autosize=0;
 int forcedmode=0;
@@ -238,16 +238,24 @@ unsigned char oldx, oldy;
 
 
 /* Positioning */
-float scale=100;
-float xyproportion=1;
-float width, height;
-float xx,yy,cx,cy,fx,fy;
-float lm,rm,tm,bm;
-float alm,arm,atm,abm;
+double scale=100;
+double xyproportion=1;
+double width, height;
+double xx,yy,cx,cy,fx,fy;
+double lm,rm,tm,bm;
+double alm,arm,atm,abm;
 unsigned char x,y;
 
 /* Current command */
 unsigned char cmd;
+
+/* Matrix struct for 'transform */
+typedef struct {
+    double a, b, c, d, e, f;
+} Affine2D;
+
+static Affine2D node_tf;
+static int has_tf = 0;
 
 /* structure definitions for "polygon" */
 typedef struct {
@@ -268,7 +276,6 @@ typedef struct {
     double  stroke_width; // -1 if not present
     double  opacity;      // -1 if not present
     FillRule fill_rule;   // default NONZERO
-    // You can add transform matrix here if you plan to support it
 } SvgPolygon;
 
 int gethex(char hexval) {
@@ -358,12 +365,465 @@ int look_parent_name(xmlNodePtr node,char * layer_name)
 }
 
 
+void move_to (unsigned char x,unsigned char y) {
+
+        if ((expanded==0)&&(elementcnt > 0))
+            if ((area==1)||(line==1))
+                fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
+        elementcnt=0;
+        //sprintf(destline,"");
+        destline[0]='\0';
+        if ((inipath==0) && (area==1) && (line==1))
+            fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
+        else if (grouping == 0) {
+            if ((inipath==1) && (area==1))
+                fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
+            if ((area==1) && (line==1))
+                fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
+        }
+        inix=x;
+        iniy=y;
+        if ((area==1)||(line==1)) {
+            if ((area==1) && (line==0)) {
+              fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
+            }
+            else
+              fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
+        }
+        inipath=1;
+}
+
+void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy) {
+    if (expanded == 0) {
+        if ((x != oldx) || (y != oldy)) {
+          if ((area==1) && (line==0))
+            if (elementcnt == 0)
+                sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_AREA_LINETO, x, y);
+            else
+                sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+          else {
+            if ((area==1)||(line==1)) {
+                if (elementcnt == 0)
+                    sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
+                else
+                    sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+            }
+          }
+        }
+        else {elementcnt--; skipcnt++;}
+    } else {
+        if (((expanded == 1) && ((x != oldx) && (y != oldy))) ||
+            ((expanded == 2) && ((x != oldx) || (y != oldy)))) {
+          if ((area==1) && (line==0))
+            fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
+          else if ((area==1)||(line==1))
+            fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
+        } 
+        else if ((x != oldx) && (y == oldy)) {
+          if ((area==1) && (line==0))
+            fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_HLINETO, x);
+          else if ((area==1)||(line==1))
+            fprintf(dest," 0x%2X,0x%02X,", CMD_HLINETO|pen, x);
+        } 
+        else if ((x == oldx) && (y != oldy)) {
+          if ((area==1) && (line==0))
+            fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_VLINETO, y);
+          else if  ((area==1)||(line==1))
+            fprintf(dest," 0x%2X,0x%02X,", CMD_VLINETO|pen, y);
+        } 
+        else {elementcnt--; skipcnt++;}
+    }
+    elementcnt++;
+}
+
+void close_area() {
+    if ((expanded == 0)&&(elementcnt>0))
+        if ((area==1)||(line==1))
+            fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
+
+    if ((area == 1) && (inipath==1)) {
+        fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
+    }
+}
+
+
+// ======= Node attributes parsing =======
+
+// Trims leading/trailing whitespace (in-place),
+// does not touch commas or inner whitespace
+static void trim_inplace(char* s) {
+    if (!s) return;
+    char* p = s;
+    while (isspace((unsigned char)*p)) p++;
+    if (p != s) memmove(s, p, strlen(p) + 1);
+    size_t n = strlen(s);
+    while (n > 0 && isspace((unsigned char)s[n-1])) s[--n] = '\0';
+}
+
+// Converts xmlChar* to newly allocated char*
+static char* xstrdup_xml(const xmlChar* xs) {
+    if (!xs) return NULL;
+    size_t n = xmlStrlen(xs);
+    char* s = (char*)malloc(n + 1);
+    if (!s) return NULL;
+    memcpy(s, xs, n);
+    s[n] = '\0';
+    return s;
+}
+
+// Returns malloc'ed array of doubles and count of doubles via *out_count.
+// On failure returns NULL.
+static double* parse_number_stream(const char* s, size_t* out_count) {
+    *out_count = 0;
+    if (!s) return NULL;
+
+    // Make a working copy and normalize commas -> spaces
+    char* buf = strdup(s);
+    if (!buf) return NULL;
+    for (char* p = buf; *p; ++p) {
+        if (*p == ',') *p = ' ';
+    }
+
+    // First pass: count numbers
+    size_t cap = 16, count = 0;
+    double* vals = (double*)malloc(cap * sizeof(double));
+    if (!vals) { free(buf); return NULL; }
+
+    char* endptr = buf;
+    while (*endptr) {
+        // Skip leading spaces
+        while (isspace((unsigned char)*endptr)) endptr++;
+        if (*endptr == '\0') break;
+
+        errno = 0;
+        char* next = NULL;
+        double v = strtod(endptr, &next);
+
+        if (next == endptr) {
+            // Not a number: invalid token
+            free(vals);
+            free(buf);
+            return NULL;
+        }
+        if (errno == ERANGE) {
+            // Out of range; still accept but you may want to clamp/log
+        }
+
+        // Push value
+        if (count == cap) {
+            cap *= 2;
+            double* t = (double*)realloc(vals, cap * sizeof(double));
+            if (!t) { free(vals); free(buf); return NULL; }
+            vals = t;
+        }
+        vals[count++] = v;
+        endptr = next;
+    }
+
+    free(buf);
+    *out_count = count;
+    return vals;
+}
+
+static int parse_points_attribute(const xmlChar* pointsAttr, PointD** out_points, size_t* out_count) {
+    *out_points = NULL; *out_count = 0;
+    if (!pointsAttr) return -1;
+
+    char* s = xstrdup_xml(pointsAttr);
+    if (!s) return -1;
+    trim_inplace(s);
+
+    size_t nvals = 0;
+    double* vals = parse_number_stream(s, &nvals);
+    free(s);
+
+    if (!vals || nvals == 0 || (nvals % 2) != 0) {
+        free(vals);
+        return -1; // must be pairs
+    }
+
+    size_t npts = nvals / 2;
+    PointD* pts = (PointD*)malloc(npts * sizeof(PointD));
+    if (!pts) { free(vals); return -1; }
+
+    for (size_t i = 0; i < npts; ++i) {
+        pts[i].x = vals[2*i + 0];
+        pts[i].y = vals[2*i + 1];
+    }
+    free(vals);
+
+    *out_points = pts;
+    *out_count = npts;
+    return 0;
+}
+
+
+static char* get_attr_strdup(xmlNode* node, const char* name) {
+    xmlChar* v = xmlGetProp(node, (const xmlChar*)name);
+    if (!v) return NULL;
+    char* s = xstrdup_xml(v);
+    xmlFree(v);
+    if (s) trim_inplace(s);
+    return s;
+}
+
+static double get_attr_double(xmlNode* node, const char* name, double def_val, int* found) {
+    if (found) *found = 0;
+    xmlChar* v = xmlGetProp(node, (const xmlChar*)name);
+    if (!v) return def_val;
+    char* s = xstrdup_xml(v);
+    xmlFree(v);
+    if (!s) return def_val;
+    trim_inplace(s);
+    char* endptr = NULL;
+    errno = 0;
+    double d = strtod(s, &endptr);
+    if (endptr == s || errno == ERANGE) {
+        free(s);
+        return def_val;
+    }
+    free(s);
+    if (found) *found = 1;
+    return d;
+}
+
+static FillRule parse_fill_rule(const char* s) {
+    if (!s) return FILL_RULE_NONZERO;
+    if (strcasecmp(s, "evenodd") == 0) return FILL_RULE_EVENODD;
+    return FILL_RULE_NONZERO;
+}
+
+
+
+// Matrix layout matches SVG's matrix(a b c d e f) which is:
+// [ a c e ]
+// [ b d f ]
+// [ 0 0 1 ]
+
+static inline Affine2D mat_identity(void) {
+    Affine2D m = {1,0,0,1,0,0};
+    return m;
+}
+
+// Compose: result = m1 * m2  (apply m2, then m1; i.e., left-multiply)
+static inline Affine2D mat_mul(Affine2D m1, Affine2D m2) {
+    Affine2D r;
+    r.a = m1.a*m2.a + m1.c*m2.b;
+    r.b = m1.b*m2.a + m1.d*m2.b;
+    r.c = m1.a*m2.c + m1.c*m2.d;
+    r.d = m1.b*m2.c + m1.d*m2.d;
+    r.e = m1.a*m2.e + m1.c*m2.f + m1.e;
+    r.f = m1.b*m2.e + m1.d*m2.f + m1.f;
+    return r;
+}
+
+static inline void mat_apply_point(const Affine2D* m, double* xp, double* yp) {
+    double xin=*xp;
+    double yin=*yp;
+
+    // Do nothing if no "transform" flag
+    if (!has_tf) return;
+    
+    *xp = m->a * xin + m->c * yin + m->e;
+    *yp = m->b * xin + m->d * yin + m->f;
+}
+
+// Elementary builders for the matrix layout
+static inline Affine2D mat_translate(double tx, double ty) {
+    Affine2D m = {1,0,0,1,tx,ty}; return m;
+}
+static inline Affine2D mat_scale(double sx, double sy) {
+    Affine2D m = {sx,0,0,sy,0,0}; return m;
+}
+static inline Affine2D mat_rotate_deg(double ang_deg) {
+    double r = ang_deg * M_PI / 180.0;
+    double c = cos(r), s = sin(r);
+    Affine2D m = {c,s,-s,c,0,0}; return m;
+}
+static inline Affine2D mat_skewX_deg(double ang_deg) {
+    double t = tan(ang_deg * M_PI / 180.0);
+    Affine2D m = {1,0,t,1,0,0}; return m;
+}
+static inline Affine2D mat_skewY_deg(double ang_deg) {
+    double t = tan(ang_deg * M_PI / 180.0);
+    Affine2D m = {1,t,0,1,0,0}; return m;
+}
+static inline Affine2D mat_from_svg_matrix(double a, double b, double c,
+                                           double d, double e, double f) {
+    Affine2D m = {a,b,c,d,e,f}; return m;
+}
+
+
+// Parse transform lists (matrix/translate/scale/rotate/skewX/skewY)
+// =================================================================
+
+// Reads one identifier at s, writes it into name[] (lowercase), returns ptr after it.
+static const char* read_ident(const char* s, char* name, size_t cap) {
+    while (isspace((unsigned char)*s)) ++s;
+    size_t n = 0;
+    while (isalpha((unsigned char)*s) && n + 1 < cap) {
+        name[n++] = (char)tolower((unsigned char)*s++);
+    }
+    name[n] = '\0';
+    return s;
+}
+
+// Reads "( ... )" content, returns pointer after ')', and sets [out] to newly-allocated string
+// containing the inner content (without the parentheses). Caller must free(*out).
+static const char* read_parens(const char* s, char** out) {
+    while (isspace((unsigned char)*s)) ++s;
+    if (*s != '(') return NULL;
+    ++s;
+    const char* start = s;
+    int depth = 1;
+    while (*s && depth > 0) {
+        if (*s == '(') depth++;
+        else if (*s == ')') depth--;
+        s++;
+    }
+    if (depth != 0) return NULL;
+    size_t len = (size_t)(s - 1 - start);
+    char* buf = (char*)malloc(len + 1);
+    if (!buf) return NULL;
+    memcpy(buf, start, len);
+    buf[len] = '\0';
+    *out = buf;
+    return s; // s now points just after ')'
+}
+
+// Parse the full 'transform' attribute into a single Affine2D.
+// Returns 0 on success (even if empty), -1 on parse error.
+static int parse_transform_attribute(const char* s, Affine2D* out) {
+    if (!out) return -1;
+    *out = mat_identity();
+    if (!s) return 0;
+
+    const char* p = s;
+    char name[32];
+
+    while (1) {
+        // Skip spaces/commas between functions
+        while (isspace((unsigned char)*p) || *p == ',') ++p;
+        if (*p == '\0') break;
+
+        // Read function name
+        const char* after_name = read_ident(p, name, sizeof(name));
+        if (name[0] == '\0') return -1;
+        p = after_name;
+
+        // Read parenthesized number list for this function
+        char* inner = NULL;
+        const char* after_par = read_parens(p, &inner);
+        if (!after_par || !inner) {
+            free(inner);
+            return -1;
+        }
+        p = after_par;
+
+        // Parse numbers inside the parentheses
+        size_t nvals = 0;
+        double* vals = parse_number_stream(inner, &nvals);
+        free(inner);
+        if (nvals == 0 && strcmp(name, "rotate") != 0 /* rotate() needs at least 1 */) {
+            free(vals);
+            return -1;
+        }
+
+        // Build the step matrix
+        Affine2D step = mat_identity();
+        if (strcmp(name, "matrix") == 0) {
+            if (nvals != 6) { free(vals); return -1; }
+            step = mat_from_svg_matrix(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
+        } else if (strcmp(name, "translate") == 0) {
+            double tx = (nvals >= 1) ? vals[0] : 0.0;
+            double ty = (nvals >= 2) ? vals[1] : 0.0;
+            step = mat_translate(tx, ty);
+        } else if (strcmp(name, "scale") == 0) {
+            double sx = (nvals >= 1) ? vals[0] : 1.0;
+            double sy = (nvals >= 2) ? vals[1] : sx;
+            step = mat_scale(sx, sy);
+        } else if (strcmp(name, "rotate") == 0) {
+            // rotate(a) or rotate(a, cx, cy)
+            if (nvals < 1) { free(vals); return -1; }
+            double ang = vals[0];
+            if (nvals >= 3) {
+                double cx = vals[1], cy = vals[2];
+                // T(cx,cy) * R(ang) * T(-cx,-cy)
+                step = mat_mul(mat_translate(cx, cy),
+                        mat_mul(mat_rotate_deg(ang), mat_translate(-cx, -cy)));
+            } else {
+                step = mat_rotate_deg(ang);
+            }
+        } else if (strcmp(name, "skewx") == 0) {
+            if (nvals < 1) { free(vals); return -1; }
+            step = mat_skewX_deg(vals[0]);
+        } else if (strcmp(name, "skewy") == 0) {
+            if (nvals < 1) { free(vals); return -1; }
+            step = mat_skewY_deg(vals[0]);
+        } else {
+            // Unknown transform function -> error
+            free(vals);
+            return -1;
+        }
+
+        free(vals);
+
+        // Compose (left-to-right semantics)
+        *out = mat_mul(*out, step);
+    }
+
+    return 0;
+}
+
+
+// Read transform directly from a node into global 'tf'.
+// Returns 0 on success (including "no attribute" -> identity), -1 on parse error.
+
+static int get_node_transform(xmlNode* node)
+{
+    // Compose cumulative transform from root -> ... -> node
+    Affine2D accum = mat_identity();
+    int any_tf = 0;
+
+    // Collect nodes from root to current into a small stack (array)
+    xmlNode* stack[128];
+    int top = 0;
+    xmlNode* cur = node;
+
+    // Walk up to root; store in reversed order (we'll apply from root to leaf)
+    while (cur && top < (int)(sizeof(stack)/sizeof(stack[0]))) {
+        stack[top++] = cur;
+        cur = cur->parent;
+    }
+
+    // Apply transforms in document order: ancestor first, then descendants
+    for (int i = top - 1; i >= 0; --i) {
+        char* s = get_attr_strdup(stack[i], "transform");
+        if (!s) continue;
+        trim_inplace(s);
+        Affine2D step = mat_identity();
+        if (parse_transform_attribute(s, &step) == 0) {
+            // accum = accum * step (left-to-right semantics)
+            accum = mat_mul(accum, step);
+            any_tf = 1;
+        }
+        free(s);
+    }
+
+    node_tf = accum;
+    has_tf  = any_tf;  // keep flag for fast path in mat_apply_point
+    return 0; // never considered fatal if a bad segment is found; we just skip it
+}
+
+
+// ========
+
 /* Pick pen and area style */
 void chkstyle_a (xmlNodePtr node)
 {
     xmlChar *attr;
     int retcode;
-    float opacity;
+    double opacity;
     char *style;
 
       opacity = 0.6;
@@ -536,266 +996,48 @@ void chkstyle_b(xmlNodePtr node)
 
 
 void chkstyle(xmlNodePtr node) {
-                if (wireframe != 1) {
-                    chkstyle_a (node);
-                    chkstyle_b (node);
-                    switch (forcedmode) {
-                        case 1:
-                            line=1; area=0;
-                            break;
-                        case 2:
-                            line=0; area=1;
-                            break;
-                        case 3:
-                            line=1; area=1;
-                            break;
-                        case 4:
-                            line=1;
-                            break;
-                        case 5:
-                            area=1;
-                            break;
-                        case 6:
-                            line=0;
-                            break;
-                        case 7:
-                            area=0;
-                            break;
-                    }
-                }
-}
 
+    if (get_node_transform(node) == -1) fprintf(stderr, "'transform' matrix read error\n");
 
-void move_to (unsigned char x,unsigned char y) {
-
-        if ((expanded==0)&&(elementcnt > 0))
-            if ((area==1)||(line==1))
-                fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
-        elementcnt=0;
-        //sprintf(destline,"");
-        destline[0]='\0';
-        if ((inipath==0) && (area==1) && (line==1))
-            fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
-        else if (grouping == 0) {
-            if ((inipath==1) && (area==1))
-                fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
-            if ((area==1) && (line==1))
-                fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
+    if (wireframe != 1) {
+        chkstyle_a (node);
+        chkstyle_b (node);
+        switch (forcedmode) {
+            case 1:
+                line=1; area=0;
+                break;
+            case 2:
+                line=0; area=1;
+                break;
+            case 3:
+                line=1; area=1;
+                break;
+            case 4:
+                line=1;
+                break;
+            case 5:
+                area=1;
+                break;
+            case 6:
+                line=0;
+                break;
+            case 7:
+                area=0;
+                break;
         }
-        inix=x;
-        iniy=y;
-        if ((area==1)||(line==1)) {
-            if ((area==1) && (line==0)) {
-              fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
-            }
-            else
-              fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
-        }
-        inipath=1;
-}
-
-void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy) {
-    if (expanded == 0) {
-        if ((x != oldx) || (y != oldy)) {
-          if ((area==1) && (line==0))
-            if (elementcnt == 0)
-                sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_AREA_LINETO, x, y);
-            else
-                sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
-          else {
-            if ((area==1)||(line==1)) {
-                if (elementcnt == 0)
-                    sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
-                else
-                    sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
-            }
-          }
-        }
-        else {elementcnt--; skipcnt++;}
-    } else {
-        if (((expanded == 1) && ((x != oldx) && (y != oldy))) ||
-            ((expanded == 2) && ((x != oldx) || (y != oldy)))) {
-          if ((area==1) && (line==0))
-            fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
-          else if ((area==1)||(line==1))
-            fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
-        } 
-        else if ((x != oldx) && (y == oldy)) {
-          if ((area==1) && (line==0))
-            fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_HLINETO, x);
-          else if ((area==1)||(line==1))
-            fprintf(dest," 0x%2X,0x%02X,", CMD_HLINETO|pen, x);
-        } 
-        else if ((x == oldx) && (y != oldy)) {
-          if ((area==1) && (line==0))
-            fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_VLINETO, y);
-          else if  ((area==1)||(line==1))
-            fprintf(dest," 0x%2X,0x%02X,", CMD_VLINETO|pen, y);
-        } 
-        else {elementcnt--; skipcnt++;}
-    }
-    elementcnt++;
-}
-
-void close_area() {
-    if ((expanded == 0)&&(elementcnt>0))
-        if ((area==1)||(line==1))
-            fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
-
-    if ((area == 1) && (inipath==1)) {
-        fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
     }
 }
 
 
-// Trims leading/trailing whitespace (in-place)
-static void trim_inplace(char* s) {
-    if (!s) return;
-    char* p = s;
-    while (isspace((unsigned char)*p)) p++;
-    if (p != s) memmove(s, p, strlen(p) + 1);
-    size_t n = strlen(s);
-    while (n > 0 && isspace((unsigned char)s[n-1])) s[--n] = '\0';
-}
 
-// Converts xmlChar* to newly allocated char*
-static char* xstrdup_xml(const xmlChar* xs) {
-    if (!xs) return NULL;
-    size_t n = xmlStrlen(xs);
-    char* s = (char*)malloc(n + 1);
-    if (!s) return NULL;
-    memcpy(s, xs, n);
-    s[n] = '\0';
-    return s;
-}
-
-// Returns malloc'ed array of doubles and count of doubles via *out_count.
-// On failure returns NULL.
-static double* parse_number_stream(const char* s, size_t* out_count) {
-    *out_count = 0;
-    if (!s) return NULL;
-
-    // Make a working copy and normalize commas -> spaces
-    char* buf = strdup(s);
-    if (!buf) return NULL;
-    for (char* p = buf; *p; ++p) {
-        if (*p == ',') *p = ' ';
-    }
-
-    // First pass: count numbers
-    size_t cap = 16, count = 0;
-    double* vals = (double*)malloc(cap * sizeof(double));
-    if (!vals) { free(buf); return NULL; }
-
-    char* endptr = buf;
-    while (*endptr) {
-        // Skip leading spaces
-        while (isspace((unsigned char)*endptr)) endptr++;
-        if (*endptr == '\0') break;
-
-        errno = 0;
-        char* next = NULL;
-        double v = strtod(endptr, &next);
-
-        if (next == endptr) {
-            // Not a number: invalid token
-            free(vals);
-            free(buf);
-            return NULL;
-        }
-        if (errno == ERANGE) {
-            // Out of range; still accept but you may want to clamp/log
-        }
-
-        // Push value
-        if (count == cap) {
-            cap *= 2;
-            double* t = (double*)realloc(vals, cap * sizeof(double));
-            if (!t) { free(vals); free(buf); return NULL; }
-            vals = t;
-        }
-        vals[count++] = v;
-        endptr = next;
-    }
-
-    free(buf);
-    *out_count = count;
-    return vals;
-}
-
-static int parse_points_attribute(const xmlChar* pointsAttr, PointD** out_points, size_t* out_count) {
-    *out_points = NULL; *out_count = 0;
-    if (!pointsAttr) return -1;
-
-    char* s = xstrdup_xml(pointsAttr);
-    if (!s) return -1;
-    trim_inplace(s);
-
-    size_t nvals = 0;
-    double* vals = parse_number_stream(s, &nvals);
-    free(s);
-
-    if (!vals || nvals == 0 || (nvals % 2) != 0) {
-        free(vals);
-        return -1; // must be pairs
-    }
-
-    size_t npts = nvals / 2;
-    PointD* pts = (PointD*)malloc(npts * sizeof(PointD));
-    if (!pts) { free(vals); return -1; }
-
-    for (size_t i = 0; i < npts; ++i) {
-        pts[i].x = vals[2*i + 0];
-        pts[i].y = vals[2*i + 1];
-    }
-    free(vals);
-
-    *out_points = pts;
-    *out_count = npts;
-    return 0;
-}
-
-
-static char* get_attr_strdup(xmlNode* node, const char* name) {
-    xmlChar* v = xmlGetProp(node, (const xmlChar*)name);
-    if (!v) return NULL;
-    char* s = xstrdup_xml(v);
-    xmlFree(v);
-    if (s) trim_inplace(s);
-    return s;
-}
-
-static double get_attr_double(xmlNode* node, const char* name, double def_val, int* found) {
-    if (found) *found = 0;
-    xmlChar* v = xmlGetProp(node, (const xmlChar*)name);
-    if (!v) return def_val;
-    char* s = xstrdup_xml(v);
-    xmlFree(v);
-    if (!s) return def_val;
-    trim_inplace(s);
-    char* endptr = NULL;
-    errno = 0;
-    double d = strtod(s, &endptr);
-    if (endptr == s || errno == ERANGE) {
-        free(s);
-        return def_val;
-    }
-    free(s);
-    if (found) *found = 1;
-    return d;
-}
-
-static FillRule parse_fill_rule(const char* s) {
-    if (!s) return FILL_RULE_NONZERO;
-    if (strcasecmp(s, "evenodd") == 0) return FILL_RULE_EVENODD;
-    return FILL_RULE_NONZERO;
-}
-
+// =======================
 
 /* --- scale_and_shift(): compute floats first, measure on floats, round only for output --- */
 void scale_and_shift() {
-    float ax;
+    double ax;
 
+    mat_apply_point(&node_tf, &cx, &cy);
+    
     /* Scale (no extra -xx/-yy here; callers already subtract offsets) */
     cx = (scale * xyproportion * cx / 100);
     cy = (scale * cy / 100);
@@ -803,8 +1045,8 @@ void scale_and_shift() {
     if (rotate == 1) { ax = cx; cx = cy; cy = ax; }
 
     /* Float mapping to 0..255 space (+shift) */
-    float xf = (255.0f * cx / width)  + xshift;
-    float yf = (255.0f * cy / height) + yshift;
+    double xf = (255.0 * cx / width)  + xshift;
+    double yf = (255.0 * cy / height) + yshift;
 
     /* Update relative bbox on floats (no rounding/clamping) */
     if (lm > xf) lm = xf;
@@ -813,7 +1055,7 @@ void scale_and_shift() {
     if (bm < yf) bm = yf;
 
     /* Convert to integer coordinates for output */
-    float x_out_f = xf, y_out_f = yf;
+    double x_out_f = xf, y_out_f = yf;
     if (autosize == 2) {
         if (x_out_f < 0) x_out_f = 0;
         if (x_out_f > 255) x_out_f = 255;
@@ -826,9 +1068,13 @@ void scale_and_shift() {
 
 
 // Adjust curve parameters only
-static inline void scale_midpoints(float *x1, float *y1, float *x2, float *y2)
+static inline void scale_midpoints(double *x1, double *y1, double *x2, double *y2)
 {
-    float ax;
+    double ax;
+
+
+    mat_apply_point(&node_tf, x1, y1);
+    mat_apply_point(&node_tf, x2, y2);
 
     *x1 = (scale * xyproportion * *x1 / 100);
     *y1 = (scale * *y1 / 100);
@@ -840,10 +1086,10 @@ static inline void scale_midpoints(float *x1, float *y1, float *x2, float *y2)
 
     if (rotate == 1) { ax = *x2; *x2 = *y2; *y2 = ax; }
 
-    float x1f = (255.0f * *x1 / width) + xshift;
-    float y1f = (255.0f * *y1 / height) + yshift;
-    float x2f = (255.0f * *x2 / width) + xshift;
-    float y2f = (255.0f * *y2 / height) + yshift;
+    double x1f = (255.0 * *x1 / width) + xshift;
+    double y1f = (255.0 * *y1 / height) + yshift;
+    double x2f = (255.0 * *x2 / width) + xshift;
+    double y2f = (255.0 * *y2 / height) + yshift;
 
     if (autosize == 2) {
         if (x1f < 0) x1f = 0;
@@ -861,7 +1107,8 @@ static inline void scale_midpoints(float *x1, float *y1, float *x2, float *y2)
     *y2 = round(y2f);
 }
 
-
+// Polygons
+// ========
 int handle_polygon_node(xmlNode* node, SvgPolygon* out) {
     if (!node || !out) return -1;
     memset(out, 0, sizeof(*out));
@@ -869,7 +1116,7 @@ int handle_polygon_node(xmlNode* node, SvgPolygon* out) {
     out->opacity = -1.0;
     out->fill_rule = FILL_RULE_NONZERO;
 
-    // 1) Parse points
+    // Parse points
     xmlChar* points = xmlGetProp(node, (const xmlChar*)"points");
     if (!points) {
         fprintf(stderr, "polygon missing 'points'\n");
@@ -882,7 +1129,7 @@ int handle_polygon_node(xmlNode* node, SvgPolygon* out) {
     }
     xmlFree(points);
 
-    // 2) Optional styles
+    // Optional styles
     out->fill         = get_attr_strdup(node, "fill");
     out->stroke       = get_attr_strdup(node, "stroke");
     int sw_found = 0;
@@ -893,12 +1140,9 @@ int handle_polygon_node(xmlNode* node, SvgPolygon* out) {
     out->fill_rule = parse_fill_rule(fill_rule_s);
     free(fill_rule_s);
 
-    // TODO: parse 'transform' to apply matrices
-    // char* transform = get_attr_strdup(node, "transform");
-    // if (transform) { ... apply or store ...; free(transform); }
-
     return 0;
 }
+
 
 void free_svg_polygon(SvgPolygon* p) {
     if (!p) return;
@@ -910,6 +1154,8 @@ void free_svg_polygon(SvgPolygon* p) {
 }
 
 
+// ===  ===  ===  ===  ===  ===  ===  ===
+
 int main( int argc, char *argv[] )
 {
     char Dummy[600];
@@ -917,7 +1163,7 @@ int main( int argc, char *argv[] )
     int i;
     char** p = argv+1;
     char *arg;
-    float x1,x2,y1,y2,rx,ry,sweepFlag;
+    double x1,x2,y1,y2,rx,ry,sweepFlag;
 
     char stname[150]="svg_picture";
     char sname[300]="";
@@ -940,7 +1186,7 @@ int main( int argc, char *argv[] )
     // Static line buffer, to make it compatible to MinGW32
     char spath[2000000];
     unsigned char oldcmd;
-    float svcx,svcy;
+    double svcx,svcy;
 
     if ( (argc < 2) ) {
       fprintf(stderr,"\nParameter error, use 'z80svg -h' for help.\n\n");
@@ -1295,8 +1541,8 @@ autoloop:
 
                 chkstyle(node);
 
-                float scx = 0, scy = 0, srx = 0, sry = 0;               
-                float a;
+                double scx = 0, scy = 0, srx = 0, sry = 0;               
+                double a;
                 unsigned char x0, y0;
                 int i;
 
@@ -1718,8 +1964,8 @@ autoloop:
                                 y2=y2+svcy;
                                 if (cmd != 'v') cx=cx+svcx;    // as above, skip horizontal or shift if 'v'
                                 if (cmd != 'h') cy=cy+svcy;    // as above, skip vertical or shift if 'h'
-								if (cmd == 'v') cx=svcx;
-								if (cmd == 'h') cy=svcy;
+                                if (cmd == 'v') cx=svcx;
+                                if (cmd == 'h') cy=svcy;
 
                                 cmd=toupper(cmd);
                             }
@@ -1759,11 +2005,11 @@ autoloop:
                                             
                                             int nseg=pathaccuracy-2;
                                             for (int i = 1; i < nseg; ++i) {
-                                                float t  = (float)i / (float)nseg;
-                                                float it = 1.0 - t;
+                                                double t  = (double)i / (double)nseg;
+                                                double it = 1.0 - t;
 
-                                                float bx = it*it*it*oldx + 3.0f*it*it*t*x1 + 3.0f*it*t*t*x2 + t*t*t*x;
-                                                float by = it*it*it*oldy + 3.0f*it*it*t*y1 + 3.0f*it*t*t*y2 + t*t*t*y;
+                                                double bx = it*it*it*oldx + 3.0*it*it*t*x1 + 3.0*it*t*t*x2 + t*t*t*x;
+                                                double by = it*it*it*oldy + 3.0*it*it*t*y1 + 3.0*it*t*t*y2 + t*t*t*y;
                                                 
                                                 line_to(round(bx), round(by), oldx, oldy);
 
@@ -1783,30 +2029,30 @@ autoloop:
                                         if (pathaccuracy > 3) {
                                             int nseg = (pathaccuracy - 2) * 2;
                                             /* Map radii rx, ry to output space (0..255) coherently with scale/rotate/proportion */
-                                            float rx_f = rx, ry_f = ry;     /* source units (already absolute/relative-adjusted) */
+                                            double rx_f = rx, ry_f = ry;     /* source units (already absolute/relative-adjusted) */
                                             /* Reuse the math from scale_midpoints (without clamping) */
                                             {
-                                                float ax;
+                                                double ax;
                                                 rx_f = (scale * xyproportion * rx_f / 100);
                                                 ry_f = (scale * ry_f / 100);
                                                 if (rotate == 1) { ax = rx_f; rx_f = ry_f; ry_f = ax; }
-                                                rx_f = (255.0f * rx_f / width);
-                                                ry_f = (255.0f * ry_f / height);
+                                                rx_f = (255.0 * rx_f / width);
+                                                ry_f = (255.0 * ry_f / height);
                                             }
                                             /* Midpoint center in output space (approximation) */
-                                            float cx0 = (oldx + x) / 2.0;
-                                            float cy0 = (oldy + y) / 2.0;
-                                            float a0 = atan2f(oldy - cy0, oldx - cx0);    // start angle
-                                            float a1   = atan2f(y    - cy0, x    - cx0);  // end angle
+                                            double cx0 = (oldx + x) / 2.0;
+                                            double cy0 = (oldy + y) / 2.0;
+                                            double a0 = atan2f(oldy - cy0, oldx - cx0);    // start angle
+                                            double a1   = atan2f(y    - cy0, x    - cx0);  // end angle
                                             if (sweepFlag && a1 < a0) a1 += 2.0 * M_PI;
                                             if (!sweepFlag && a1 > a0) a1 -= 2.0 * M_PI;
-                                            float delta = a1 - a0;
+                                            double delta = a1 - a0;
                                             for (int i = 1; i < nseg; ++i) {
-                                                float t = (float)i / (float)nseg;
-                                                float a = a0 + delta * t;
+                                                double t = (double)i / (double)nseg;
+                                                double a = a0 + delta * t;
 
-                                                float bx = cx0 + rx_f * cosf(a);
-                                                float by = cy0 + ry_f * sinf(a);
+                                                double bx = cx0 + rx_f * cosf(a);
+                                                double by = cy0 + ry_f * sinf(a);
 
                                                 line_to(roundf(bx), roundf(by), oldx, oldy);
 
