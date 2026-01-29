@@ -1701,11 +1701,11 @@ autoloop:
 
                             // Gather X and Y destination values for ALL the possible command sequences
                             // (Vertical and Horizontal lines take 1 parameter only)
-                            if (toupper(cmd) != 'V') {
+                            if (toupper(cmd) != 'V') {         // If 'v' it must ignore the horizontal pos parameter
                                 cx=atof(path)-xx;
                                 path=skip_num(path);
                             }
-                            if (toupper(cmd) != 'H') {
+                            if (toupper(cmd) != 'H') {         // If 'h' it must ignore the vertical pos parameter
                                 cy=atof(path)-yy;
                                 path=skip_num(path);
                             }
@@ -1716,8 +1716,10 @@ autoloop:
                                 y1=y1+svcy;
                                 x2=x2+svcx;
                                 y2=y2+svcy;
-                                if (cmd != 'v') cx=cx+svcx;
-                                if (cmd != 'h') cy=cy+svcy;
+                                if (cmd != 'v') cx=cx+svcx;    // as above, skip horizontal or shift if 'v'
+                                if (cmd != 'h') cy=cy+svcy;    // as above, skip vertical or shift if 'h'
+								if (cmd == 'v') cx=svcx;
+								if (cmd == 'h') cy=svcy;
 
                                 cmd=toupper(cmd);
                             }
@@ -1737,7 +1739,7 @@ autoloop:
 
                                     case 'C':
                                     case 'Q':
-                                    case 'S':
+                                    //case 'S':  // TODO: This needs to be calibrated
                                     case 'T':
                                     case 'A':
                                     
