@@ -236,6 +236,15 @@ int yshift=0;
 unsigned char inix,iniy;
 unsigned char oldx, oldy;
 
+// Used when forcemode >7 to track convex pictures
+typedef struct {
+    unsigned char hits;
+    unsigned char xmin;
+    unsigned char xmax;
+} yspan_t;
+
+yspan_t yscan[256];
+
 
 /* Positioning */
 double scale=100;
@@ -296,7 +305,7 @@ char *skip_num(char *p) {
     p=skip_spc(p);
     //p++;
     if (*p == '-') p++;
-    while ((isdigit(*p) || ((*p == '.') && (dot_found == 0))) && (strlen(p) > 0)) {
+    while ((isdigit(*p) || (*p == 'e') || (*p == 'E') || ((*p == '.') && (dot_found == 0))) && (strlen(p) > 0)) {
         if (*p == '.') dot_found++;
         p++;
     }
@@ -383,6 +392,9 @@ void move_to (unsigned char x,unsigned char y) {
         }
         inix=x;
         iniy=y;
+        
+        memset(yscan, 0, sizeof(yscan));   // used when forcemode >7
+        
         if ((area==1)||(line==1)) {
             if ((area==1) && (line==0)) {
               fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
@@ -394,6 +406,63 @@ void move_to (unsigned char x,unsigned char y) {
 }
 
 void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy) {
+
+    // Special case: forcedmode used to limit the filled areas
+    // flooding out of a large concave area
+    if (forcedmode > 7 && area == 1) {
+
+        int y1 = oldy, y2 = y;
+        if (y1 > y2) { int t=y1; y1=y2; y2=t; }
+        
+        int concave=0;
+
+        // detect x-intersections with scanline yy
+        for (int yy=y1; yy<=y2; yy++) {
+
+            float denom = (y == oldy) ? 1.0f : (float)(y - oldy);
+            float t = (float)(yy - oldy) / denom;
+
+            int xx = oldx + t * (x - oldx);
+
+            // try to determine whether we have a vertical convex shape
+            yspan_t *s = &yscan[yy];
+
+            // track the intersection
+            if (s->hits == 0) {
+                s->xmin = s->xmax = xx;
+            } else {
+                if (xx < s->xmin) s->xmin = xx;
+                else if (xx > s->xmax) s->xmax = xx;
+            }
+
+            s->hits++;
+
+            // a vertical convex shape must have max 2 intersection 
+            // we avoid to fill the area only when it is too wide (forcedmode)
+            if (s->hits > 2) {
+                int delta = s->xmax - s->xmin;
+                if (delta > forcedmode) {
+                    concave = 1;
+                }
+            }
+        }
+
+        // Break the path and split it into smaller chunks
+        if ((concave == 1) && (area == 1)) {
+            if (expanded == 0 && elementcnt > 0) {
+                fprintf(dest, "\t0x%2X,0x%02X, %s\n\t",
+                        REPEAT_COMMAND, elementcnt, destline);
+                elementcnt = 0;
+                destline[0] = '\0';
+            }
+            if (inipath == 1) {
+                fprintf(dest, "\t0x%2X,\n", CMD_AREA_CLOSE | fill);
+            }
+        area=0;  //disable area mode
+        }
+
+    }
+
     if (expanded == 0) {
         if ((x != oldx) || (y != oldy)) {
           if ((area==1) && (line==0))
@@ -1224,6 +1293,7 @@ int main( int argc, char *argv[] )
             fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
             fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
             fprintf(stderr,"\n   -f1..7: Force line/area modes (1/0 0/1 1/1 1/X X/1 0/X X/0).");
+            fprintf(stderr,"\n   -f8..255: dynamically disable area mode for a given x delta.");
             fprintf(stderr,"\n   -p1..5: Path decoding & curve accuracy (default=3).");
             fprintf(stderr,"\n");
             exit(1);
@@ -1315,10 +1385,12 @@ int main( int argc, char *argv[] )
             break;
        case 'f' :
             forcedmode=atoi(arg+2);
-            if ((forcedmode==0)||(forcedmode>7)) {
+            if ((forcedmode<=0)||(forcedmode>255)) {
                 fprintf(stderr,"\nInvalid 'force mode' option.\n");
                 exit(12);
             }
+            if (forcedmode>7)
+                fprintf(stderr,"\nDynamically disabling the area mode for x delta = %u.\n", forcedmode);
             break;
        case 'e' :
             expanded=atoi(arg+2);
