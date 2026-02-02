@@ -167,36 +167,44 @@ send_t6834:
 
 int3c:
     exx
+    ex      af,af
     push    af
     push    bc
     push    de
     push    hl
+    ex      af,af
     exx
 int3c_patch:
     call    0
     exx
+    ex      af,af
     pop     hl
     pop     de
     pop     bc
     pop     af
+    ex      af,af
     exx
     ret
 
 
 int34:
     exx
+    ex      af,af
     push    af
     push    bc
     push    de
     push    hl
+    ex      af,af
     exx
 int34_patch:
     call    0
     exx
+    ex      af,af
     pop     hl
     pop     de
     pop     bc
     pop     af
+    ex      af,af
     exx
     ret
 
