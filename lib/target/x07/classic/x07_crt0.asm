@@ -38,6 +38,7 @@ ENDIF
     PUBLIC  __CLIB_X07_USE_FIRMWARE
     defc    __CLIB_X07_USE_FIRMWARE = CLIB_X07_USE_FIRMWARE
 
+
     org     CRT_ORG_CODE
 
 ;----------------------
@@ -75,7 +76,18 @@ __x07_program_entry_point:
     INCLUDE "crt/classic/crt_init_atexit.inc"
 
     INCLUDE "crt/classic/crt_init_heap.inc"
-    INCLUDE "crt/classic/crt_init_eidi.inc"
+    di
+    ; Now, patch the interrupts
+    ld      hl,($003d)
+    ld      (int3c_patch+1),hl
+    ld      hl,int3c
+    ld      ($003d),hl
+
+    ld      hl,($0035)
+    ld      (int34_patch+1),hl
+    ld      hl,int34
+    ld      ($0035),hl
+    ei
 
     ;ld a,65	; (Debugging:  print 'A' char)
     ;call $009F
@@ -85,7 +97,12 @@ __x07_program_entry_point:
 
 __Exit:
     call    crt0_exit
-    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    di
+    ld      hl,(int3c_patch+1)
+    ld      ($003d),hl
+    ld      hl,(int34_patch+1)
+    ld      ($0035),hl 
+    ei
 __restore_sp_onexit:
     ld      sp,0    ;Pick up entry sp
     ret             ; End of program
@@ -147,6 +164,42 @@ send_t6834:
     ld a,$02	; a<-2
     out ($f5),a
     ret
+
+int3c:
+    exx
+    push    af
+    push    bc
+    push    de
+    push    hl
+    exx
+int3c_patch:
+    call    0
+    exx
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+    exx
+    ret
+
+
+int34:
+    exx
+    push    af
+    push    bc
+    push    de
+    push    hl
+    exx
+int34_patch:
+    call    0
+    exx
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+    exx
+    ret
+
 
 
 end:
