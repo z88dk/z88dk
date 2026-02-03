@@ -17,13 +17,22 @@
     EXTERN  conio_map_colour
     EXTERN  __c128_attr
     EXTERN  __c128_paper
+    EXTERN  __c128_invrs
 
     defc    DISPLAY=$2000
     defc    COLOUR_MAP=$1000
 
 
 generic_console_set_attribute:
+    ld      a, (__c128_invrs)
+    res     7, a
+    bit     7, (hl)
+    jr      z, no_inverse
+    set     7, a
+no_inverse:
+    ld      (__c128_invrs), a
     ret
+
 
 generic_console_set_ink:
     call    conio_map_colour
@@ -63,6 +72,9 @@ generic_console_cls:
 ; e = raw
 generic_console_printc:
     call    xypos
+    ld      c,a
+    ld      a,(__c128_invrs)
+    or      c
     ld      (hl), a
     ld      a, h
     sub     16
@@ -137,6 +149,19 @@ generic_console_scrollup_4:
     out     (c), a
     ld      de, $3100
     ld      bc, 768
-    ldir
+set_font:
+    ld      a,(hl)
+    ld      (de),a
+    cpl
+    set     2,d                         ;uppper half of the character set
+    ld      (de),a
+    res     2,d
+    inc     hl
+    inc     de
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,set_font
+
 no_set_font:
 
