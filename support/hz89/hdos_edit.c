@@ -581,6 +581,30 @@ static int file_sectors_from_chain(int clen, int lsi, int spg) {
 }
 
 
+
+static int check_sector10_fingerprint(FILE *fp)
+{
+    uint8_t buf[SECTOR_SIZE];
+    int i;
+
+    read_sector(fp, 10, buf); /* LSN 10 */
+
+    /* Check first 5 signature bytes */
+    if (!(buf[0] == 0x00 && buf[1] == 0x00 &&
+          buf[2] == 0xFF && buf[3] == 0xFF && buf[4] == 0xFF))
+        return 0;
+
+    /* Check tail: last 56 bytes should be 0xFF.
+     * Be tolerant: we check indices [SECTOR_SIZE-56 .. SECTOR_SIZE-1].
+     */
+    for (i = SECTOR_SIZE - 56; i < SECTOR_SIZE; ++i) {
+        if (buf[i] != 0xFF)
+            return 0;
+    }
+    return 1;
+}
+
+
 static void inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     uint8_t sector[SECTOR_SIZE];
     read_sector(fp, 9, sector);
@@ -651,9 +675,13 @@ static void inspect(FILE *fp, HDOS_Label lab, uint8_t *grt) {
     printf("\n=== GRT (Group Reference Table) ===\n");
     dump_sector_hex(fp, lab.grt);
 
-
     //printf("=== 1st directory sector: %u ===\n", lab.dis);
     report_directory_chain(fp,lab);
+
+	if (check_sector10_fingerprint(fp))
+		printf("\nHDOS fingerprint in sector #10 -> OK\n");
+	else
+		printf("\nWarning: invalid fingerprint in sector #10, possibly invalid HDOS disk.\n");
 
 }
 
