@@ -20,6 +20,7 @@ SAM_GLOBS := \
 	"target/zx/classic/games/bit*.asm" \
 	"target/zx/classic/input/in_JoySinclair*.asm" \
 	"target/zx/classic/stdio/*.asm" \
+        "target/zx/classic/misc/zx_*.asm" \
 	"target/shared/clock.asm" 
 
 SAM_GLOBS_ex := \
@@ -44,6 +45,7 @@ SAM_GLOBS_ex := \
 	target/zx/classic/games/bit*.asm  \
 	target/zx/classic/input/in_JoySinclair*.asm \
 	target/zx/classic/stdio/*.asm \
+        target/zx/classic/misc/zx_*.asm \
 	target/shared/clock.asm
 
 SAM_CPM_GLOBS := \
