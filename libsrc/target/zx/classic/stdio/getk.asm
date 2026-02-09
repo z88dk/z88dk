@@ -9,6 +9,7 @@
 ;	$Id: getk.asm,v 1.6 2016-03-09 22:25:54 dom Exp $
 ;
 
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  getk
     PUBLIC  _getk
@@ -27,3 +28,4 @@ not_return:
     xor     a
     ld      (23560), a
     ret
+ENDIF

@@ -12,7 +12,7 @@
 ;	$Id: fgetc_cons.asm,v 1.5 2016-03-09 22:25:54 dom Exp $
 ;
 
-
+IFNDEF FORsam
     SECTION code_clib
     PUBLIC  fgetc_cons
     PUBLIC  _fgetc_cons
@@ -34,3 +34,4 @@ not_return:
     ld      l, a
     ld      h, 0
     ret
+ENDIF
