@@ -4,6 +4,7 @@
  *
  * Supports:  --dir  [+]           (optionally, show group chain per file)
  *            --inspect
+ *            --map
  *            --get <NAME.EXT> <hostfile>
  *            --add <hostfile> <NAME.EXT>
  *            --add <hostfile> <NAME.ABS> address
@@ -629,6 +630,163 @@ static int sanitize(FILE *fp, HDOS_Label lab, const uint8_t *grt, char *label)
 }
 
 
+// === SECTOR MAP ===================================================
+// Print a synthetic sector-by-sector map and detect repeated 16-bit word patterns.
+static void map_sectors(FILE *fp, HDOS_Label lab, const uint8_t *grt)
+{
+    // Determine total number of sectors from the image size (robust fallback).
+    long cur = ftell(fp);
+    fseek(fp, 0, SEEK_END);
+    long img_bytes = ftell(fp);
+    fseek(fp, cur, SEEK_SET);
+    if (img_bytes <= 0) {
+        fprintf(stderr, "Blank or unreadable image.\n");
+        return;
+    }
+    const int total_sectors = (int)(img_bytes / SECTOR_SIZE);
+
+    // Marks
+    uint8_t *is_dir  = (uint8_t*)calloc((size_t)total_sectors, 1);
+    uint8_t *is_file = (uint8_t*)calloc((size_t)total_sectors, 1);
+    uint8_t *is_free = (uint8_t*)calloc((size_t)total_sectors, 1);
+    int     *sec_grp = (int*)calloc((size_t)total_sectors, sizeof(int)); // group number for sector, if applicable
+    int     *sec_gsi = (int*)calloc((size_t)total_sectors, sizeof(int)); // sector index within group
+
+    if (!is_dir || !is_file || !is_free || !sec_grp || !sec_gsi) {
+        fprintf(stderr, "Out of memory.\n");
+        goto cleanup;
+    }
+
+    // --- Mark directory chain (both sectors per directory block) ---
+    {
+        int next_sector = lab.dis;
+        int guard = 0;
+        while (next_sector != 0 && guard++ < 512) {
+            if (next_sector >= 0 && next_sector < total_sectors) is_dir[next_sector] = 1;
+            if (next_sector + 1 >= 0 && next_sector + 1 < total_sectors) is_dir[next_sector + 1] = 1;
+
+            uint8_t blk[512];
+            read_sector(fp, next_sector, blk);
+            read_sector(fp, next_sector + 1, blk + 256);
+            next_sector = u16le(blk + 510);
+        }
+    }
+
+    // --- Mark FREE groups from the GRT free list starting at grt[0] ---
+    {
+        int head = grt[0];
+        int steps = 0;
+        while (head != 0 && steps++ < 256) {
+            for (int s = 0; s < lab.spg; ++s) {
+                int sec = head * lab.spg + s;
+                if (sec >= 0 && sec < total_sectors) {
+                    is_free[sec] = 1;
+                    sec_grp[sec] = head;
+                    sec_gsi[sec] = s;
+                }
+            }
+            head = grt[head];
+        }
+    }
+
+    // --- Mark FILE DATA by walking each directory entry and following its group chain ---
+    {
+        int next_sector = lab.dis;
+        int guard_blocks = 0;
+        while (next_sector != 0 && guard_blocks++ < 512) {
+            uint8_t blk[512];
+            read_sector(fp, next_sector, blk);
+            read_sector(fp, next_sector + 1, blk + 256);
+
+            for (int i = 0; i < 22; ++i) {
+                int off = i * 23;
+                if (off + 23 > 506) break;
+                const uint8_t *e = blk + off;
+
+                // Skip empty/invalid slots (00, FE, FF as already handled elsewhere)
+                if (e[0] == 0x00 || e[0] == 0xFE || e[0] == 0xFF) continue;
+
+                int fgn = e[16];
+                int lgn = e[17];
+                (void)lgn; // not strictly needed for marking
+
+                int safety = 0, g = fgn;
+                while (g != 0 && safety++ < 256) {
+                    for (int s = 0; s < lab.spg; ++s) {
+                        int sec = g * lab.spg + s;
+                        if (sec >= 0 && sec < total_sectors) {
+                            is_file[sec] = 1;
+                            sec_grp[sec] = g;
+                            sec_gsi[sec] = s;
+                        }
+                    }
+                    g = grt[g];
+                }
+            }
+            next_sector = u16le(blk + 510);
+        }
+    }
+
+    // --- Print the map & detect repeated 16-bit word pattern ---
+    printf("\n=== SECTOR MAP (256-byte blocks) ===\n");
+    printf("%-6s %-18s %s\n", "SEC", "ROLE", "DETAILS");
+
+    for (int sec = 0; sec < total_sectors; ++sec) {
+        const char *role = "UNKNOWN/UNUSED";
+        char details[128]; details[0] = '\0';
+        
+        if ((sec & 1) == 0) printf ("\n");
+
+        if (sec < 9 )       role = "BOOT";
+        if (sec == 9)       role = "VOLUME LABEL";
+        else if (sec == 10) role = "FINGERPRINT";
+        else if (sec == lab.rgt) role = "RGT";
+        else if (sec == lab.grt) role = "GRT";
+        else if (is_dir[sec])    role = "DIRECTORY";
+        else if (is_file[sec])   role = "FILE DATA";
+        else if (is_free[sec])   role = "FREE (GRT chain)";
+
+        // If we know the group/sector within group, add it
+        if (sec_grp[sec] > 0 || sec_gsi[sec] > 0) {
+            snprintf(details, sizeof(details), "group %d, sector %d", sec_grp[sec], sec_gsi[sec]);
+        }
+
+        // Read sector and check for a repeated 16-bit word pattern
+        uint8_t buf[SECTOR_SIZE];
+        read_sector(fp, sec, buf);
+
+        int is_rep_word = 1;
+        uint16_t w0 = (uint16_t)(buf[0] | (buf[1] << 8));
+        for (int i = 2; i < SECTOR_SIZE; i += 2) {
+            uint16_t wi = (uint16_t)(buf[i] | (buf[i + 1] << 8));
+            if (wi != w0) { is_rep_word = 0; break; }
+        }
+        if (is_rep_word) {
+            char note[64];
+            snprintf(note, sizeof(note), "%s%s-> 0x%04X",
+                     details[0] ? ", " : "", details[0] ? "" : "", w0);
+            strncat(details, note, sizeof(details) - strlen(details) - 1);
+        }
+
+        // Highlight contradictions (should not normally happen)
+        if (is_file[sec] && is_free[sec]) {
+            const char *warn = details[0] ? ", OVERLAP with FREE" : "OVERLAP with FREE";
+            strncat(details, warn, sizeof(details) - strlen(details) - 1);
+        }
+
+        printf("%-6d %-18s %s\n", sec, role, details);
+    }
+
+cleanup:
+    free(is_dir);
+    free(is_file);
+    free(is_free);
+    free(sec_grp);
+    free(sec_gsi);
+}
+
+
+
 // === GRT helpers ===================================================
 // Each GRT byte is a "next group" index; grt[0] is the free-list head.
 // Valid group numbers for classic H-17 HDOS are typically 1..200.
@@ -714,6 +872,7 @@ static int file_sectors_from_chain(int clen, int lsi, int spg) {
 }
 
 
+// === INSPECT ===================================================
 
 static int check_sector10_fingerprint(FILE *fp)
 {
@@ -924,6 +1083,7 @@ int main(int argc,char**argv){
         fprintf(stderr,"Usage: %s disk.h8d {command}\n",argv[0]);
         fprintf(stderr,"\t[--dir <+>]\n");
         fprintf(stderr,"\t[--inspect]\n");
+        fprintf(stderr,"\t[--map]\n");
         fprintf(stderr,"\t[--get name.ext out]\n");
         fprintf(stderr,"\t[--add hostfile name.ext <addr>]\n");
         fprintf(stderr,"\t[--delete name.ext]\n");
@@ -963,7 +1123,8 @@ int main(int argc,char**argv){
         if(strcmp(argv[2],"--delete")==0){delete_file(fp,lab,grt_sector,argv[3]); goto program_end;}
         if(strcmp(argv[2],"--inspect")==0){inspect(fp,lab,grt_sector); goto program_end;}
         if(strcmp(argv[2],"--dir")==0){parse_directory(fp, lab, grt_sector,(argc < 4) ? 0 : 1); goto program_end;}
-        if (strcmp(argv[2], "--clean") == 0) {sanitize(fp, lab, grt_sector, (argc < 4) ? "" : argv[3]); goto program_end;}
+        if(strcmp(argv[2], "--clean") == 0) {sanitize(fp, lab, grt_sector, (argc < 4) ? "" : argv[3]); goto program_end;}
+        if(strcmp(argv[2],"--map")==0){map_sectors(fp, lab, grt_sector); goto program_end;}
 
         fprintf(stderr,"hdos_edit: wrong option");
         fclose(fp);
