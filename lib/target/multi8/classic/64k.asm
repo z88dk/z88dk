@@ -25,7 +25,7 @@
 
 
     org     CRT_ORG_CODE
-
+    jp      program
     INCLUDE    "crt/classic/crt_z80_rsts.inc"
 
 program:
