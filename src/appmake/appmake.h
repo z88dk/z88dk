@@ -131,6 +131,9 @@ extern int       extract_exec(char *target);
 extern option_t  extract_options[];
 extern char      extract_longhelp[];
 
+extern int       hdos_exec(char *target);
+extern option_t  hdos_options[];
+
 extern int       lviv_exec(char *target);
 extern option_t  lviv_options[];
 
@@ -428,6 +431,10 @@ struct {
       "Convert the Laser 350/500/700 .vz file to .cas, optionally to WAV",
       NULL,
       laser500_exec,    laser500_options },
+    { "bin2h8d",  "hdos",          "(C) 2025 z88dk",
+      "Generates an HDOS disk image file for Heath/Zenith",
+      NULL,
+      hdos_exec,     hdos_options },
     { "bin2lvt",  "lviv",          "(C) 2020 z88dk",
       "Generates an LVT file for the Livi PK-01",
       NULL,
