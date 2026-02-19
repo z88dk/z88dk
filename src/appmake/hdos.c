@@ -280,10 +280,11 @@ static int insert_file(disc_handle *h, FILE *in, HDOS_Label lab, uint8_t *grt, c
             if (off + 23 > 506) break;
 
             if ((blk[off] == 0xFE)||(blk[off] == 0xFF)||(blk[off] == 0x00)) {
-                printf("Identified Directory slot at offset %u\n",off);
+                // printf("Identified Directory slot at offset %u\n",off);
                 // Prepare NAME.EXT in 8.3 uppercase
                 memset(blk + off, 0, 23);
-
+				// cpm_create_filename() could probably replace the next lines
+				// --------------
                 char name8[8] = {0}, ext3[3] = {0};
                 const char *dot = strchr(filename, '.');
                 if (dot) {
@@ -294,6 +295,7 @@ static int insert_file(disc_handle *h, FILE *in, HDOS_Label lab, uint8_t *grt, c
                 } else {
                     memcpy(name8, filename, 8);
                 }
+				// --------------
                 memcpy(blk + off,     name8, 8);
                 memcpy(blk + off + 8, ext3,  3);
 
@@ -322,7 +324,7 @@ static int insert_file(disc_handle *h, FILE *in, HDOS_Label lab, uint8_t *grt, c
                 // Persist GRT
                 write_sector(h, lab.grt, grt);
 
-                printf("Inserted %s (%ld bytes)\n", filename, len);
+                // printf("Inserted %s (%d bytes)\n", filename, len);
                 return 0;
             }
         }
@@ -345,8 +347,6 @@ int hdos_exec(char *target)
     int     pos,len;
     FILE    *fp,*rfp;
 	long rsize;
-    char    nameext11[20];   // We add space because we're reusing cpm_create_filename
-    char    nameext12[12];
     int     i,j,k;
     disc_handle   *h;
     const char    *extension;
@@ -399,14 +399,6 @@ int hdos_exec(char *target)
     if (!dumb)
         suffix_change(prgname, ".ABS");
     
-    // /* Deal with file name2 */
-    // cpm_create_filename(prgname, nameext12, 0, 1);
-    // cpm_create_filename(prgname, nameext11, 1, 0);
-    // nameext11[8]='A';
-    // nameext11[9]='B';
-    // nameext11[10]='S';
-
-
     //uint8_t *img = (uint8_t*)must_malloc(IMAGE_SIZE);
     h = cpm_create_with_format("hz89");
 
