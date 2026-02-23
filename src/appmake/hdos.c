@@ -8,6 +8,7 @@
  *   - 40 tracks × 10 sectors × 256 B = 102400 B
  *   - HDOS expects sectors 0–8 = boot, and sector 9 = label (describing the logical disk deployment)
  *
+ * WARNING: the .h17 and .h17raw containers are NOT WORKING yet
  */
 
 #include "appmake.h"
