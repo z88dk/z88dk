@@ -83,6 +83,9 @@
     <ClCompile Include="..\..\src\appmake\glue.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\hdos.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\appmake\hex.c">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -772,7 +772,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
             // 'Unable to determine interleave' and rearrange the sector numbers into a simple sequential list."
             // In most of the situations the sequential map is the best choice, but on the MZ80A/MZ80B which are
             // currently the only case with the disk sides swapped.
-            // At the moment we use "spec.inverted_sides" to trigger an accurete skew map.
+            // At the moment we use "spec.inverted_sides" to apply the skew map properly.
 
             if (h->spec.inverted_sides) {
                 for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
