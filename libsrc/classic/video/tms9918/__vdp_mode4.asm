@@ -65,6 +65,7 @@ mode4_addresses:
     defw    SPRITE_ATTRIBUTE
     defw    SPRITE_GENERATOR
     defb    10, +((COLOUR_TABLE>>14)&0x07)
+    defb    8, @00000010                ;r8 disable sprites
     defb    $ff                         ;endmarker
 
 

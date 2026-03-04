@@ -67,6 +67,7 @@ mode5_addresses:
     defb    10, +((COLOUR_TABLE>>14)&0x07)
     defb    5, +((SPRITE_ATTRIBUTE>>7)&0xFF)|0x07
     defb    11, +(SPRITE_ATTRIBUTE>>15)&0x03
+    defb    8, @00000010                ;r8 disable sprites
     defb    $ff                         ;endmarker
 
 
