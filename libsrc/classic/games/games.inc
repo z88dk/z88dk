@@ -684,7 +684,7 @@ ENDIF
 
 
 IFDEF TAPE_SPEED_6MHZ
-        defc PLAY_DATA_LEAD    = 279   ;  Timing for the leading tone
+		defc PLAY_DATA_LEAD    = 255   ;  Leading tone.  Was 279, reduced by 8,6% to fit in the byte boundary 
         defc PLAY_DATA_SYNC1   = 77    ;  Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 7     ;  Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 93    ;
