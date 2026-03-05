@@ -108,4 +108,57 @@ __ZPROTO3(void,,vdp_cmd_execute,vdp_cmd_t *,cmd,vdp_cmd_operation,oper,vdp_cmd_l
 
 
 
+// Set a new palette from index 0 to 15
+//
+// Pass an array of 16 words, each with the format : [0:5|green:3|0|red:3|0|blue:3]
+extern void __LIB__ vdp_set_palette(const uint8_t* pal);
+extern void __LIB__ vdp_set_palette_fastcall(const uint8_t* pal) __z88dk_fastcall;
+#define vdp_set_palette(a) vdp_set_palette_fastcall(a)
+
+// Set the colour of specified pen
+__ZPROTO2(void,,vdp_set_palette_entry,uint8_t,index, uint16_t,colour)
+
+// Default palettes for MSX1
+extern void __LIB__ vdp_set_msx1_palette(void);
+
+// Default palettes for MSX1
+extern void __LIB__ vdp_set_msx2_palette(void);
+
+// Helper macro to define a word from the RGB compoments
+// [00000|G:3] [0|R:3|0|B:3]
+#define RGB16(r, g, b)  (uint16_t)(((uint16_t)((g) & 0x07) << 8) + (((r) & 0x07) << 4) + ((b) & 0x07))
+
+#define PAL_MSX1_BLACK          RGB16(0, 0, 0) 
+#define PAL_MSX1_MEDIUM_GREEN   RGB16(1, 5, 1) // Medium green
+#define PAL_MSX1_LIGHT_GREEN    RGB16(3, 6, 3) // Light green
+#define PAL_MSX1_DARK_BLUE      RGB16(2, 2, 6) // Dark blue
+#define PAL_MSX1_LIGHT_BLUE     RGB16(3, 3, 7) // Light blue
+#define PAL_MSX1_DARK_RED       RGB16(5, 2, 2) // Dark red
+#define PAL_MSX1_CYAN           RGB16(2, 6, 7) // Cyan
+#define PAL_MSX1_MEDIUM_RED     RGB16(6, 2, 2) // Medium red
+#define PAL_MSX1_LIGHT_RED      RGB16(6, 3, 3) // Light red
+#define PAL_MSX1_DARK_YELLOW    RGB16(5, 5, 2) // Dark yellow
+#define PAL_MSX1_LIGHT_YELLOW   RGB16(6, 6, 3) // Light yellow
+#define PAL_MSX1_DARK_GREEN     RGB16(1, 4, 1) // Dark green
+#define PAL_MSX1_MAGENTA        RGB16(5, 2, 5) // Magenta
+#define PAL_MSX1_GRAY           RGB16(5, 5, 5) // Gray
+#define PAL_MSX1_WHITE          RGB16(7, 7, 7) // White
+
+
+#define PAL_MSX2_BLACK          RGB16(0, 0, 0) // Black
+#define PAL_MSX2_MEDIUM_GREEN   RGB16(1, 6, 1) // Medium green
+#define PAL_MSX2_LIGHT_GREEN    RGB16(3, 7, 3) // Light green
+#define PAL_MSX2_DARK_BLUE      RGB16(1, 1, 7) // Dark blue
+#define PAL_MSX2_LIGHT_BLUE     RGB16(2, 3, 7) // Light blue
+#define PAL_MSX2_DARK_RED       RGB16(5, 1, 1) // Dark red
+#define PAL_MSX2_CYAN           RGB16(2, 6, 7) // Cyan
+#define PAL_MSX2_MEDIUM_RED     RGB16(7, 1, 1) // Medium red
+#define PAL_MSX2_LIGHT_RED      RGB16(7, 3, 3) // Light red
+#define PAL_MSX2_DARK_YELLOW    RGB16(6, 6, 1) // Dark yellow
+#define PAL_MSX2_LIGHT_YELLOW   RGB16(6, 6, 4) // Light yellow
+#define PAL_MSX2_DARK_GREEN     RGB16(1, 4, 1) // Dark green
+#define PAL_MSX2_MAGENTA        RGB16(6, 2, 5) // Magenta
+#define PAL_MSX2_GRAY           RGB16(5, 5, 5) // Gray
+#define PAL_MSX2_WHITE          RGB16(7, 7, 7)  // White
+
 #endif
