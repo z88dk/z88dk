@@ -77,7 +77,7 @@ ENDIF
     call    VDPreg_Write
     ld      a, (hl)                     ;register 1
     inc     hl
-IF  FORadam
+IF  FORadam | FOReinstein | FOReinstein256
     res     5, a                        ;No interrupts on an adam for CP/M breaks
 ENDIF
     call    VDPreg_Write
