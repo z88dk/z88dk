@@ -66,6 +66,7 @@ __tms9918_graphics_spec_end:
     EXTERN  __vdp_mode4_graphics
     EXTERN  __vdp_mode5_graphics
     EXTERN  __vdp_mode6_graphics
+    EXTERN  __vdp_mode7_graphics
     EXTERN  __vdp_mode8_graphics
     EXTERN  __vdp_mode1_2_graphics
 
@@ -85,6 +86,8 @@ IFDEF   V9938
     defw    __vdp_mode5_graphics
     defb    6
     defw    __vdp_mode6_graphics
+    defb    7
+    defw    __vdp_mode7_graphics
     defb    8
     defw    __vdp_mode8_graphics
 ENDIF

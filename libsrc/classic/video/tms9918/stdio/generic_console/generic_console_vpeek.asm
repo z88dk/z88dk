@@ -13,6 +13,7 @@
     EXTERN  __tms9918_text_xypos
     EXTERN  __v9938_mode5_vpeek
     EXTERN  __v9938_mode6_vpeek
+    EXTERN  __v9938_mode7_vpeek
     EXTERN  __v9938_mode8_vpeek
 
     EXTERN  LDIRMV
@@ -35,6 +36,8 @@ IF  V9938
     jp      z, __v9938_mode5_vpeek
     cp      6
     jp      z, __v9938_mode6_vpeek
+    cp      7
+    jp      z, __v9938_mode7_vpeek
     cp      8
     jp      z, __v9938_mode8_vpeek
 ENDIF

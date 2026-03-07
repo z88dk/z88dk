@@ -13,6 +13,7 @@
     EXTERN  __vdp_mode4
     EXTERN  __vdp_mode5
     EXTERN  __vdp_mode6
+    EXTERN  __vdp_mode7
     EXTERN  __vdp_mode8
     EXTERN  vdp_set_mangled_mode
 
@@ -28,6 +29,7 @@ loop:
     ld      a, (hl)
     inc     hl
     cp      255
+    scf
     ret     z
     cp      e
     jr      nz, loop
@@ -60,6 +62,8 @@ IFDEF   V9938
     defw    __vdp_mode5
     defb    6
     defw    __vdp_mode6
+    defb    7
+    defw    __vdp_mode7
     defb    8
     defw    __vdp_mode8
 ENDIF

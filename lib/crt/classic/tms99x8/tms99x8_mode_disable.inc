@@ -123,6 +123,20 @@ IF CLIB_DISABLE_MODE6
     defc    __CLIB_DISABLE_MODE6 = 1
 ENDIF
 
+IF CLIB_DISABLE_MODE7
+    ; MSX V9938 GRAPHICS V
+    PUBLIC __vdp_mode7
+    PUBLIC __vdp_mode7_term
+    PUBLIC __vdp_mode7_graphics
+
+    defc __vdp_mode7 = l_ret
+    defc __vdp_mode7_term = __vdp_mode_noop_term
+    defc __vdp_mode7_graphics = __vdp_mode_noop_graphics
+    defc __vdp_mode7_vpeek = l_ret
+
+    PUBLIC  __CLIB_DISABLE_MODE6
+    defc    __CLIB_DISABLE_MODE7 = 1
+ENDIF
 
 
 IF CLIB_DISABLE_MODE8
