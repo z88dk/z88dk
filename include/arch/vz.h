@@ -12,53 +12,66 @@
 
 	Video Technology library for small C compiler
 
-		Juergen Buchmueller
+		Juergen Buchmueller & Jason Oakley
 
 *****************************************************/
 
 // first CALLER and FASTCALL linkage
 
-extern void __LIB__  vz_bgrd(int n) __z88dk_fastcall;
-extern void __LIB__              vz_brick(void *addr, int byte) __smallc;
 extern void __LIB__              vz_char_draw(int x, int y, int c, int ch) __smallc;
-extern void __LIB__              vz_clrscr(void);
-extern void __LIB__  vz_color(int n) __z88dk_fastcall;
+extern void __LIB__              vz_coarsescroll(void *addr, int byte) __smallc;
+extern void __LIB__              vz_disableirq(void);
+extern void __LIB__              vz_drawsprite(int x, int y, int n) __smallc;
+extern void __LIB__              vz_drawtext(int x, int y, void *addr) __smallc;
+extern void __LIB__              vz_enableirq(void);
 extern int  __LIB__              vz_getch(void);
-extern void __LIB__              vz_gotoxy(int x, int y) __smallc;
+extern int  __LIB__              vz_getrnd(int x);
 extern void __LIB__              vz_inch(void);
-extern void __LIB__              vz_line(int x1, int y1, int x2, int y2, int c) __smallc;
 extern char __LIB__             *vz_midstr(char *str, int pos) __smallc;
-extern void __LIB__  vz_mode(int n) __z88dk_fastcall;
-extern void __LIB__              vz_plot(int x, int y, int c) __smallc;
-extern char __LIB__              vz_point(int x, int y) __smallc;
+extern char __LIB__              vz_peek(void *addr) __smallc;
+extern void __LIB__              vz_poke(void *addr, int byte) __smallc;
+extern void __LIB__              vz_printat(int x, int y, void *addr) __smallc;
+extern void __LIB__				 vz_printnum(int x);
+extern void __LIB__              vz_randomize(void);
 extern void __LIB__              vz_score(void *addr, int byte) __smallc;
-extern void __LIB__  vz_setbase(void *start) __z88dk_fastcall;
+extern void __LIB__				 vz_setpaper(char x) __z88dk_fastcall;
+extern void __LIB__              vz_setspritesize(int w, int h) __smallc;
+extern void __LIB__              vz_setspritedata(void *addr) __z88dk_fastcall;
 extern void __LIB__              vz_shape(int x, int y, int w, int h, int c, char *data) __smallc;
+extern void __LIB__              vz_smoothscroll(void *addr, int byte) __smallc;
 extern void __LIB__              vz_sound(int freq, int cycles) __smallc;
 extern void __LIB__              vz_soundcopy(char *dst, char *src, int size, int sound1, int sound2) __smallc;
+extern void __LIB__              vz_waitvb(void);
 
 // CALLEE linkage for functions with at least two parameters
 
-extern void __LIB__    vz_brick_callee(void *addr, int byte) __smallc __z88dk_callee;
-extern void __LIB__    vz_gotoxy_callee(int x, int y) __smallc __z88dk_callee;
-extern void __LIB__    vz_line_callee(int x1, int y1, int x2, int y2, int c) __smallc __z88dk_callee;
+extern void __LIB__    vz_coarsescroll_callee(void *addr, int byte) __smallc __z88dk_callee;
+extern void __LIB__    vz_drawsprite_callee(int x, int y, int n) __smallc __z88dk_callee;
+extern void __LIB__    vz_drawtext_callee(int x, int y, void *addr) __smallc __z88dk_callee;
 extern char __LIB__   *vz_midstr_callee(char *str, int pos) __smallc __z88dk_callee;
-extern void __LIB__    vz_plot_callee(int x, int y, int c) __smallc __z88dk_callee;
-extern char __LIB__    vz_point_callee(int x, int y) __smallc __z88dk_callee;
+extern void __LIB__    vz_poke_callee(void *addr, int byte) __smallc __z88dk_callee;
+extern void __LIB__    vz_printat_callee(int x, int y, void *addr) __smallc __z88dk_callee;
 extern void __LIB__    vz_score_callee(void *addr, int byte) __smallc __z88dk_callee;
+extern void __LIB__    vz_setspritesize_callee(int w, int h) __smallc __z88dk_callee;
+extern void __LIB__    vz_smoothscroll_callee(void *addr, int byte) __smallc __z88dk_callee;
 extern void __LIB__    vz_sound_callee(int freq, int cycles) __smallc __z88dk_callee;
 extern void __LIB__    vz_soundcopy_callee(char *dst, char *src, int size, int sound1, int sound2) __smallc __z88dk_callee;
 
 // make the CALLEE linkage default, function pointers will use CALLER linkage
 
-#define vz_brick(a,b)            vz_brick_callee(a,b)
-#define vz_gotoxy(a,b)           vz_gotoxy_callee(a,b)
-#define vz_line(a,b,c,d,e)       vz_line_callee(a,b,c,d,e)
+#define vz_coarsescroll(a,b)	 vz_coarsescroll_callee(a,b)
+#define vz_drawsprite(a,b,c)  	 vz_drawsprite_callee(a,b,c)
+#define vz_drawtext(a,b,c)  	 vz_drawtext_callee(a,b,c)
 #define vz_midstr(a,b)           vz_midstr_callee(a,b)
-#define vz_plot(a,b,c)           vz_plot_callee(a,b,c)
-#define vz_point(a,b)            vz_point_callee(a,b)
+#define vz_poke(a,b)			 vz_poke_callee(a,b)
+#define vz_printat(a,b,c)        vz_printat_callee(a,b,c)
 #define vz_score(a,b)            vz_score_callee(a,b)
+#define vz_setspritesize(a,b)    vz_setspritesize_callee(a,b)
+#define vz_smoothscroll(a,b)	 vz_smoothscroll_callee(a,b)
 #define vz_sound(a,b)            vz_sound_callee(a,b)
 #define vz_soundcopy(a,b,c,d,e)  vz_soundcopy_callee(a,b,c,d,e)
+#define vz_plot(a,b,c,d)		 line(a,b,c,d)
+#define vz_disableirq			 intrinsic_di()
+#define vz_enableirq		 	 intrinsic_ei()
 
 #endif
