@@ -59,15 +59,15 @@ mode7_addresses:
     defb    +(((PATTERN_NAME>>10)&0x7F)|0x1F)
                                         ;r2
     defw    COLOUR_TABLE
-    defb    $80                         ;r3
+    defb    $0                          ;r3
     defw    PATTERN_GENERATOR
-    defb    $01                         ;r4
+    defb    $0                          ;r4
     defw    SPRITE_ATTRIBUTE
     defw    SPRITE_GENERATOR
     defb    10, +((COLOUR_TABLE>>14)&0x07)
     defb    5, +((SPRITE_ATTRIBUTE>>7)&0xFF)|0x07
     defb    11, +(SPRITE_ATTRIBUTE>>15)&0x03
-    defb    8, @00000010                ;r8 disable sprites
+  ;  defb    8, @00000010                ;r8 disable sprites
     defb    $ff                         ;endmarker
 
 
