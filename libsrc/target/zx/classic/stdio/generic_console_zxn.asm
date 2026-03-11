@@ -69,7 +69,9 @@ generic_console_zxn_tile_cls:
     ld      bc, 0x243b
     out     (c), a
     inc     b
-    in      h, (c)
+    in      a, (c)
+    add     $40
+    ld      h,a
     ld      l, 0
     ld      a, 0x6b                     ;Tilemap control
     dec     b
@@ -101,7 +103,9 @@ generic_console_zxn_tile_scrollup:
     ld      bc, 0x243b
     out     (c), a
     inc     b
-    in      h, (c)
+    in      a, (c)
+    add     $40
+    ld      h,a
     ld      l, 0
     ld      a, 0x6b                     ;Tilemap control
     dec     b
@@ -164,10 +168,10 @@ xypos:
     pop     bc
     ld      hl, (__console_w)
     ld      h, 0
-    bit     5, a                        ;byte tiles if set
-    jr      nz, is_byte_tiles
+    bit     5, a                        ;have we got attrs?
+    jr      nz, no_attrs
     add     hl, hl
-is_byte_tiles:
+no_attrs:
     ld      de, 0
     ex      de, hl
     and     a
@@ -182,13 +186,17 @@ generic_console_printc_3:
     jr      nz, add_screen_address
     add     hl, bc                      ;For word screen mode
 add_screen_address:
-    ld      e, 0x6e                     ;Tilemap base address
+    ld      e, a
+    ld      a, 0x6e                     ;Tilemap base address
     ld      bc, 0x243b
-    out     (c), e
+    out     (c), a
     inc     b
-    in      b, (c)
+    in      a, (c)
+    add     $40
+    ld      b, a
     ld      c, 0
     add     hl, bc
+    ld      a, e
     ret
 
     SECTION code_crt_init

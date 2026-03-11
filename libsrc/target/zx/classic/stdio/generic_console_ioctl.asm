@@ -119,8 +119,8 @@ check_mode:
     or      @10000001
     nextreg $6b, a
     nextreg $6c, @10000000
-    nextreg $6e, $6c                    ;tile map
-    nextreg $6f, $4c                    ;tile definition
+    nextreg $6e, $6c - $40                   ;tile map
+    nextreg $6f, $4c - $40                    ;tile definition
     ld      hl, $2028
     bit     6, a
     jr      z, set_tilemap_size
