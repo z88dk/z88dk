@@ -256,6 +256,7 @@ static int             swallow_M = 0;
 static int             c_print_specs = 0;
 static int             c_zorg = -1;
 static int             c_sccz80_inline_ints = 0;
+static int             c_disable_nop_comment = 0;
 static int             gargc;
 /* filelist has to stay as ** because we change suffix all the time */
 static int             nfiles = 0;
@@ -539,6 +540,7 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc)" , &c_compiler_type, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
+    { 0, "no-nop-comment", OPT_BOOL|OPT_DOUBLE_DASH,  "Disable nop-comment inlined asm in sdcc output" , &c_disable_nop_comment, NULL, 0},
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
     { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
     { 0, "allseg", OPT_FUNCTION|OPT_DOUBLE_DASH, "Redirect all compiler output to the same segment", NULL, OptAllSeg, 0 },  // accesses opt_*_seg vars below
@@ -1862,10 +1864,9 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
         unsigned int src = 0;
 
         // issue #807 on github
-        // nop with comment can be used to inline asm
-
+        // nop with comment can be used to inline asm; allow opting out
         sscanf(line, " %n" "nop ; %n", &dst, &src);
-        if (src > dst)
+        if (src > dst && !c_disable_nop_comment)
         {
             strcpy(line + dst, line + src);
         }
