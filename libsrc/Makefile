@@ -56,6 +56,7 @@ TOCREATE += $(call check_target,gb,gb_clib.lib)
 TOCREATE += $(call check_target,gl,gl_clib.lib)
 TOCREATE += $(call check_target,gl6000,gl6000_clib.lib)
 TOCREATE += $(call check_target,hector,hector1_clib.lib hectorhr_clib.lib)
+TOCREATE += $(call check_target,hdos,hdos_clib.lib)
 TOCREATE += $(call check_target,hemc,hemc_clib.lib)
 TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 TOCREATE += $(call check_target,homelab,homelab_clib.lib)
@@ -1361,6 +1362,15 @@ kc_clib.lib: $(TARGET_CLIB_DEPS)
 	$(call buildgeneric,kc,"wide portable")
 	$(MAKE) -C classic/games TARGET=kc
 	TARGET=kc TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(TARGET_DIRECTORY)/kc/kc.lst
+
+# Heath/Zenith HDOS - Stefano
+hdos_clib.lib: $(TARGET_CLIB_DEPS)
+	@echo ''
+	@echo '--- Building Heath/Zenith HDOS ---'
+	@echo ''
+	$(call buildgeneric,hdos,"gencon narrow")
+	$(MAKE) -C target/hdos
+	TARGET=hdos TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhdos -x$(OUTPUT_DIRECTORY)/hdos_clib @$(TARGET_DIRECTORY)/hdos/hdos.lst
 
 # Hübler/Evert-MC - dom
 hemc_clib.lib: $(TARGET_CLIB_DEPS)

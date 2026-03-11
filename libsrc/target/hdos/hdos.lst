@@ -1,0 +1,4 @@
+target/hdos/stdio/obj/${TYPE}/fgetc_cons
+target/hdos/stdio/obj/${TYPE}/getk
+target/hdos/stdio/obj/${TYPE}/fputc_cons
+@classic/stdio/stdio_binary.lst
