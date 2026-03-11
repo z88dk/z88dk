@@ -6768,12 +6768,18 @@ $notcpu 8085
 .i_%2
 =
 %once
-.i_%2
+.i_%1
 %activate
 ; --- Start of Optimiser additions ---
 =
 %once
 ; --- Start of Optimiser additions ---
+	defc	i_%2 = i_%1
+
+%title Remove circular defc aliases
+	defc	i_%1 = i_%2
+	defc	i_%2 = i_%1
+=
 	defc	i_%1 = i_%2
 
 %title Jump to ret
