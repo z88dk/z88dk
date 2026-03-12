@@ -1,4 +1,12 @@
 target/hdos/stdio/obj/${TYPE}/fgetc_cons
 target/hdos/stdio/obj/${TYPE}/getk
 target/hdos/stdio/obj/${TYPE}/fputc_cons
+target/hdos/hdos/obj/${TYPE}/hdos_ver
+target/hdos/hdos/obj/${TYPE}/hdos_overlay
+target/hdos/hdos/obj/${TYPE}/hdos_default
+target/hdos/hdos/obj/${TYPE}/hdos_delete
+target/hdos/hdos/obj/${TYPE}/hdos_rename
+target/hdos/hdos/obj/${TYPE}/hdos_rename_callee
+target/hdos/hdos/obj/${TYPE}/hdos_chflg
+target/hdos/hdos/obj/${TYPE}/hdos_chflg_callee
 @classic/stdio/stdio_binary.lst
