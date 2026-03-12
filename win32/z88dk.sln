@@ -98,6 +98,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-font2pv1000", "z88dk-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-test", "common-test\common-test.vcxproj", "{4128F3D3-4ED7-4C8D-8305-F76A250520BC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-z80asm2", "z88dk-z80asm2\z88dk-z80asm2.vcxproj", "{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -306,6 +308,14 @@ Global
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|Win32.Build.0 = Release|Win32
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|x64.ActiveCfg = Release|x64
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|x64.Build.0 = Release|x64
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Debug|Win32.Build.0 = Debug|Win32
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Debug|x64.ActiveCfg = Debug|x64
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Debug|x64.Build.0 = Debug|x64
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Release|Win32.ActiveCfg = Release|Win32
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Release|Win32.Build.0 = Release|Win32
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Release|x64.ActiveCfg = Release|x64
+		{BDB52F53-CB6A-49FF-AC78-B5F46F4F49AC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
