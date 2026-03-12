@@ -24,7 +24,9 @@ asm_zxn_copytiles:
     ld      bc, 0x243b
     out     (c), a
     inc     b
-    in      b, (c)
+    in      a, (c)
+    add     $40
+    ld      b,a
     ld      c, 0
 	; Get the tile position (starting tile *32)
     ld      h, 0
