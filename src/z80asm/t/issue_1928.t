@@ -26,7 +26,7 @@ END
 run_ok("z88dk-z80asm -b -l $test.asm");
 check_bin_file("$test.bin", "45".bytes(0xff)."23".bytes(0xff));
 check_text_file("$test.lis", <<END);
-test_t_issue_1928.asm:
+test_t_issue_1928_t.asm:
      1                          REPTC var, 45
      2                          defb var
      3  0000  3435              ENDR
@@ -47,7 +47,7 @@ END
 run_ok("z88dk-z80asm -b -l -v $test.asm > $null");
 check_bin_file("$test.bin", "45".bytes(0xff)."23".bytes(0xff));
 check_text_file("$test.lis", <<END);
-test_t_issue_1928.asm:
+test_t_issue_1928_t.asm:
      1                          REPTC var, 45
      2                          defb var
      3                          ENDR

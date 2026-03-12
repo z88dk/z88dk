@@ -20,9 +20,9 @@ spew("${test}3.asm", "djnz");
 
 # try to assemble and link all three 
 capture_nok("z88dk-z80asm -b ${test}1.asm ${test}2.asm ${test}3.asm", <<END);
-test_t_issue_20701.asm:1: error: syntax error
+${test}1.asm:1: error: syntax error
   ^---- jr
-test_t_issue_20703.asm:1: error: syntax error
+${test}3.asm:1: error: syntax error
   ^---- djnz
 END
 

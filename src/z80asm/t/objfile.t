@@ -4480,7 +4480,7 @@ Object  file ${test}.lib at \$0014: Z80RMF18
   Symbols:
     G A \$0000: mult (section "") (file ${test}1.asm:2)
 
-Object  file ${test}.lib at \$00C4: Z80RMF18
+Object  file ${test}.lib at \$00C8: Z80RMF18
   Name: ${test}2
   CPU:  z80 
   Section "": 1 bytes

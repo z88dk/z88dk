@@ -15,7 +15,7 @@ END
 
 capture_ok("z88dk-z80asm -m8085 -l $test.asm", "");
 check_text_file("$test.lis", <<'END');
-test_t_issue_2632.asm:
+test_t_issue_2632_t.asm:
      1                          	SECTION	code
      2  0000  2801              	ld de,hl+1
      3  0002  3802              	ld de,sp+2

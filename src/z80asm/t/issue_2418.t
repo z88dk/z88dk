@@ -97,7 +97,7 @@ END
 	}
 
 	# assemble and link
-	run_ok(qq{z88dk-z80asm -b -d  -o"test_t_issue_2418.bin" -m -L.  -L"C:/msys64/home/T0071173/git/z88dk/lib/config/../../lib/clibs/z80"   -I"C:/msys64/tmp/$temp_dir" -L"C:/msys64/home/T0071173/git/z88dk/lib/config/../../lib/clibs" -I"C:/msys64/home/T0071173/git/z88dk/lib/config/../../lib" -ltest_clib -l"z80_crt0"     "\@$list_file" });
+	run_ok(qq{z88dk-z80asm -b -d  -o"test_t_issue_2418_t.bin" -m -L.  -L"C:/msys64/home/T0071173/git/z88dk/lib/config/../../lib/clibs/z80"   -I"C:/msys64/tmp/$temp_dir" -L"C:/msys64/home/T0071173/git/z88dk/lib/config/../../lib/clibs" -I"C:/msys64/home/T0071173/git/z88dk/lib/config/../../lib" -ltest_clib -l"z80_crt0"     "\@$list_file" });
 }
 # run z80asm to force the error
 else {
@@ -123,19 +123,19 @@ END
 	check_bin_file("$test.bin", bytes(0xC3, 6, 0, 0xC3, 6, 0, 0xC9));
 
 	capture_ok("z88dk-z80nm -a $test.o", <<'END');
-Object  file test_t_issue_2418.o at $0000: Z80RMF18
-  Name: test_t_issue_2418
+Object  file test_t_issue_2418_t.o at $0000: Z80RMF18
+  Name: test_t_issue_2418_t
   CPU:  z80 
   Section "": 0 bytes
   Section code_compiler: 7 bytes
     C $0000: C3 00 00 C3 00 00 C9
   Section code_crt_exit: 0 bytes
   Symbols:
-    L A $0006: i_11 (section code_compiler) (file test_t_issue_2418.asm:11)
-    L A $0006: i_9 (section code_compiler) (file test_t_issue_2418.asm:7)
+    L A $0006: i_11 (section code_compiler) (file test_t_issue_2418_t.asm:11)
+    L A $0006: i_9 (section code_compiler) (file test_t_issue_2418_t.asm:7)
   Expressions:
-    E W $0000 $0001 3: i_9 (section code_compiler) (file test_t_issue_2418.asm:5)
-    E W $0003 $0004 3: i_11 (section code_compiler) (file test_t_issue_2418.asm:6)
+    E W $0000 $0001 3: i_9 (section code_compiler) (file test_t_issue_2418_t.asm:5)
+    E W $0003 $0004 3: i_11 (section code_compiler) (file test_t_issue_2418_t.asm:6)
 END
 
 }

@@ -34,12 +34,12 @@ check_bin_file("${test}.bin", bytes(0xC9));
 unlink_testfiles;
 spew("${test}.asm", "ret");
 capture_nok("z88dk-z80asm -b ${test}.o", <<END);
-error: file not found: test_t_option_files.o
+error: file not found: test_t_option_files_t.o
 END
 
 unlink("${test}.bin", "${test}.asm");
 capture_nok("z88dk-z80asm -b ${test}.o", <<END);
-error: file not found: test_t_option_files.o
+error: file not found: test_t_option_files_t.o
 END
 
 # -- option separator

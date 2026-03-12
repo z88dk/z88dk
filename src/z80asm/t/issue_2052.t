@@ -14,7 +14,7 @@ for my $opts ('', '-d') {
 		spew("${test}.asm", "nop");
 		if ($ext eq '.o') {
 			capture_nok("z88dk-z80asm ${test}${ext}", <<END);
-error: file not found: test_t_issue_2052.o
+error: file not found: ${test}.o
 END
 		}
 		else {

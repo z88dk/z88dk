@@ -31,7 +31,7 @@ Object  file ${test}plat1.lib at \$0014: Z80RMF18
   CPU:  z80 
   Section "": 0 bytes
 
-Object  file ${test}plat1.lib at \$008C: Z80RMF18
+Object  file ${test}plat1.lib at \$0090: Z80RMF18
   Name: ${test}gen
   CPU:  z80 
   Section "": 3 bytes
@@ -61,7 +61,7 @@ Object  file ${test}plat1.lib at \$0014: Z80RMF18
   CPU:  z80 
   Section "": 0 bytes
 
-Object  file ${test}plat1.lib at \$008C: Z80RMF18
+Object  file ${test}plat1.lib at \$0090: Z80RMF18
   Name: ${test}gen
   CPU:  z80 
   Section "": 3 bytes

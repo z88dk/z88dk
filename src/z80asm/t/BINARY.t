@@ -57,7 +57,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		binary "$test.dat"
 END_ASM
 $test.asm:2: error: segment overflow
-  ^---- binary "test_t_BINARY.dat"
+  ^---- binary "test_t_BINARY_t.dat"
       ^---- defb 240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
 END_ERR
 
@@ -66,7 +66,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		binary "$test.dat"
 END_ASM
 $test.asm:1: error: segment overflow
-  ^---- binary "test_t_BINARY.dat"
+  ^---- binary "test_t_BINARY_t.dat"
       ^---- defb 120
 END_ERR
 

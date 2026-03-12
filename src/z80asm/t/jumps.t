@@ -135,20 +135,20 @@ check_bin_file("$test.bin",
 		bytes((0) x 32755));
 
 capture_ok("z88dk-z80nm -a $test.o $test.1.o", <<'END');
-Object  file test_t_jumps.o at $0000: Z80RMF18
-  Name: test_t_jumps
+Object  file test_t_jumps_t.o at $0000: Z80RMF18
+  Name: test_t_jumps_t
   CPU:  r4k 
   Section "": 16 bytes
     C $0000: ED C3 00 00 ED CB 00 00 ED D3 00 00 ED DB 00 00
   Externs:
     U         j1
   Expressions:
-    E j $0000 $0002 4: j1 (section "") (file test_t_jumps.asm:2)
-    E j $0004 $0006 4: j1 (section "") (file test_t_jumps.asm:3)
-    E j $0008 $000A 4: j1 (section "") (file test_t_jumps.asm:4)
-    E j $000C $000E 4: j1 (section "") (file test_t_jumps.asm:5)
-Object  file test_t_jumps.1.o at $0000: Z80RMF18
-  Name: test_t_jumps.1
+    E j $0000 $0002 4: j1 (section "") (file test_t_jumps_t.asm:2)
+    E j $0004 $0006 4: j1 (section "") (file test_t_jumps_t.asm:3)
+    E j $0008 $000A 4: j1 (section "") (file test_t_jumps_t.asm:4)
+    E j $000C $000E 4: j1 (section "") (file test_t_jumps_t.asm:5)
+Object  file test_t_jumps_t.1.o at $0000: Z80RMF18
+  Name: test_t_jumps_t.1
   CPU:  r4k 
   Section "": 32755 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -2200,7 +2200,7 @@ Object  file test_t_jumps.1.o at $0000: Z80RMF18
     C $7FE0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     C $7FF0: 00 00 00
   Symbols:
-    G A $7FF3: j1 (section "") (file test_t_jumps.1.asm:3)
+    G A $7FF3: j1 (section "") (file test_t_jumps_t.1.asm:3)
 END
 
 z80asm_nok("-b -mr4k", "", <<END, <<END);

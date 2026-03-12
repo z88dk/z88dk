@@ -33,7 +33,7 @@ check_text_file("$test.map", <<'END');
 __head                          = $0000 ; const, public, def, , ,
 __size                          = $0001 ; const, public, def, , ,
 __tail                          = $0001 ; const, public, def, , ,
-the_answer                      = $002A ; const, public, , test_t_issue_2320_n.1, , test_t_issue_2320_n.1.asm:2
+the_answer                      = $002A ; const, public, , test_t_issue_2320_n_t.1, , test_t_issue_2320_n_t.1.asm:2
 END
 
 unlink_testfiles;

@@ -17,17 +17,17 @@ sleep(1);
 spew("$test.o", objfile(CPU=>-1));
 
 capture_ok("z88dk-z80nm -a $test.o", <<'END');
-Object  file test_t_issue_2320_0.o at $0000: Z80RMF18
+Object  file test_t_issue_2320_0_t.o at $0000: Z80RMF18
   Name: test
   CPU:  (invalid -1) 
 END
 
 capture_nok("z88dk-z80asm -b $test.o", <<'END');
-error: CPU invalid: file test_t_issue_2320_0.o, cpu_id = -1
+error: CPU invalid: file test_t_issue_2320_0_t.o, cpu_id = -1
 END
 
 capture_nok("z88dk-z80asm -d -b $test.o", <<'END');
-error: CPU invalid: file test_t_issue_2320_0.o, cpu_id = -1
+error: CPU invalid: file test_t_issue_2320_0_t.o, cpu_id = -1
 END
 
 sleep(1);

@@ -63,7 +63,7 @@ z80asm_ok("-b ".quote_os("-D_value\${TEST_ENV}23"), "", "",
 spew("${test}.asm", "nop");
 capture_ok("z88dk-z80asm -v ".
 		   "-Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 ${test}.asm", <<'END');
-% z88dk-z80asm -v -Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 test_t_option_define.asm
+% z88dk-z80asm -v -Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Done -Dnine=+9 -Dten=10 test_t_option_define_t.asm
 Predefined constant: mten = -$000a
 Predefined constant: mnine = -9
 Predefined constant: zero = 0
@@ -74,8 +74,8 @@ Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling 'test_t_option_define.asm'
-Writing object file 'test_t_option_define.o'
+Assembling 'test_t_option_define_t.asm'
+Writing object file 'test_t_option_define_t.o'
 
 END
 

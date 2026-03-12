@@ -25,7 +25,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "$test.inc" extra
 END_ASM
 $test.asm:1: error: syntax error
-  ^---- include "test_t_INCLUDE.inc" extra
+  ^---- include "test_t_INCLUDE_t.inc" extra
 END_ERR
 
 spew("$test.inc", <<END);

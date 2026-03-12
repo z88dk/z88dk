@@ -17,22 +17,22 @@ capture_ok("z88dk-z80asm -mr3k $test.asm", "");
 sleep(1);
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -d -v -x$test.lib -mz80 $test.o", <<'END');
-% z88dk-z80asm -d -v -xtest_t_issue_2320_2.lib -mz80 test_t_issue_2320_2.o
+% z88dk-z80asm -d -v -xtest_t_issue_2320_2_t.lib -mz80 test_t_issue_2320_2_t.o
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling 'test_t_issue_2320_2.asm'
-Writing object file 'test_t_issue_2320_2.o'
+Assembling 'test_t_issue_2320_2_t.asm'
+Writing object file 'test_t_issue_2320_2_t.o'
 
-Creating library 'test_t_issue_2320_2.lib'
-Adding test_t_issue_2320_2.o to library
+Creating library 'test_t_issue_2320_2_t.lib'
+Adding test_t_issue_2320_2_t.o to library
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<'END');
-Library file test_t_issue_2320_2.lib at $0000: Z80LMF18
-Object  file test_t_issue_2320_2.lib at $0014: Z80RMF18
-  Name: test_t_issue_2320_2
+Library file test_t_issue_2320_2_t.lib at $0000: Z80LMF18
+Object  file test_t_issue_2320_2_t.lib at $0014: Z80RMF18
+  Name: test_t_issue_2320_2_t
   CPU:  z80 
   Section "": 1 bytes
     C $0000: 00
@@ -42,22 +42,22 @@ END
 sleep(1);
 spew("$test.asm", "nop");
 capture_ok("z88dk-z80asm -d -v -x$test.lib -mz80 $test.asm", <<'END');
-% z88dk-z80asm -d -v -xtest_t_issue_2320_2.lib -mz80 test_t_issue_2320_2.asm
+% z88dk-z80asm -d -v -xtest_t_issue_2320_2_t.lib -mz80 test_t_issue_2320_2_t.asm
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
 Reading library 'z88dk-z80asm.lib'
-Assembling 'test_t_issue_2320_2.asm'
-Writing object file 'test_t_issue_2320_2.o'
+Assembling 'test_t_issue_2320_2_t.asm'
+Writing object file 'test_t_issue_2320_2_t.o'
 
-Creating library 'test_t_issue_2320_2.lib'
-Adding test_t_issue_2320_2.o to library
+Creating library 'test_t_issue_2320_2_t.lib'
+Adding test_t_issue_2320_2_t.o to library
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<'END');
-Library file test_t_issue_2320_2.lib at $0000: Z80LMF18
-Object  file test_t_issue_2320_2.lib at $0014: Z80RMF18
-  Name: test_t_issue_2320_2
+Library file test_t_issue_2320_2_t.lib at $0000: Z80LMF18
+Object  file test_t_issue_2320_2_t.lib at $0014: Z80RMF18
+  Name: test_t_issue_2320_2_t
   CPU:  z80 
   Section "": 1 bytes
     C $0000: 00

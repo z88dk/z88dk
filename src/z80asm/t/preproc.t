@@ -10,7 +10,7 @@ ld a,\
 1
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1                          ld a,\
      2  0000  3e01              1
      3                          
@@ -30,7 +30,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 1, 0xc9));
 ld a,1\ret
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  3e01c9            ld a,1\ret
      2                          
      3                          
@@ -40,7 +40,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 1, 0xc9));
 ld a,1:ret
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  3e01c9            ld a,1:ret
      2                          
      3                          
@@ -50,7 +50,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 1, 0xc9));
 ld a,1\:\:ret
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  3e01c9            ld a,1\:\:ret
      2                          
      3                          
@@ -60,7 +60,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 2, 0xc9));
 ld a,1?2:3:ret
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  3e02c9            ld a,1?2:3:ret
      2                          
      3                          
@@ -70,7 +70,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 3, 0xc9));
 ld a,1?(2?3:4):5:ret
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  3e03c9            ld a,1?(2?3:4):5:ret
      2                          
      3                          
@@ -81,7 +81,7 @@ a1:nop:a2:nop:a3:nop
 defb a1,a2,a3
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  000000            a1:nop:a2:nop:a3:nop
      2  0003  000102            defb a1,a2,a3
      3                          
@@ -93,7 +93,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0,0,0, 0,1,2));
 defb a1,a2,a3
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  000000            .a1 nop:.a2 nop:.a3 nop
      2  0003  000102            defb a1,a2,a3
      3                          
@@ -105,7 +105,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 1));
 ld a,1;\:ret
 END
 check_text_file("$test.lis", <<'END');
-test_t_preproc.asm:
+test_t_preproc_t.asm:
      1  0000  3e01              ld a,1;\:ret
      2                          
      3                          

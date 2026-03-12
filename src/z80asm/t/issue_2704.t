@@ -14,7 +14,7 @@ END
 capture_ok("z88dk-z80asm -mr4k -l -b $test.asm", "");
 check_bin_file("$test.bin", bytes(0xDD, 0x6F, 0xFD, 0x6F, 0xDD, 0x7F, 0xFD, 0x7F));
 check_text_file("$test.lis", <<END);
-test_t_issue_2704.asm:
+test_t_issue_2704_t.asm:
      1  0000  dd6f              		rlb a, bcde
      2  0002  fd6f              		rlb a, jkhl
      3  0004  dd7f              		rrb a, bcde

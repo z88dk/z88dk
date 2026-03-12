@@ -198,19 +198,19 @@ Object  file ${test}.o at \$0000: Z80RMF18
 END
 
 check_text_file("${test}.sym", <<'END');
-code_end                        = $0025 ; addr, public, , , code, test_t_modlink_consolobj4.asm:4
-main1                           = $0000 ; comput, public, , , code, test_t_modlink_consolobj1.asm:14
-main                            = $0000 ; addr, public, , , code, test_t_modlink_consolobj1.asm:4
-print1                          = $001F ; addr, public, , , code, test_t_modlink_consolobj3.asm:4
-print                           = $0000 ; comput, public, , , , test_t_modlink_consolobj2.asm:3
-printa                          = $000D ; addr, public, , , code, test_t_modlink_consolobj2.asm:7
-test_t_modlink_consolobj1_mess  = $0000 ; addr, local, , , data, test_t_modlink_consolobj1.asm:12
-test_t_modlink_consolobj2__delay = $0018 ; addr, local, , , code, test_t_modlink_consolobj2.asm:16
-test_t_modlink_consolobj2__delay_1 = $001A ; addr, local, , , code, test_t_modlink_consolobj2.asm:18
-test_t_modlink_consolobj2_mess  = $0006 ; addr, local, , , data, test_t_modlink_consolobj2.asm:24
-test_t_modlink_consolobj2_printa1 = $0000 ; comput, local, , , , test_t_modlink_consolobj2.asm:4
-test_t_modlink_consolobj3_dollar = $000D ; addr, local, , , data, test_t_modlink_consolobj3.asm:12
-test_t_modlink_consolobj3_mess  = $000B ; addr, local, , , data, test_t_modlink_consolobj3.asm:11
+code_end                        = $0025 ; addr, public, , , code, test_t_modlink_consolobj_t4.asm:4
+main1                           = $0000 ; comput, public, , , code, test_t_modlink_consolobj_t1.asm:14
+main                            = $0000 ; addr, public, , , code, test_t_modlink_consolobj_t1.asm:4
+print1                          = $001F ; addr, public, , , code, test_t_modlink_consolobj_t3.asm:4
+print                           = $0000 ; comput, public, , , , test_t_modlink_consolobj_t2.asm:3
+printa                          = $000D ; addr, public, , , code, test_t_modlink_consolobj_t2.asm:7
+test_t_modlink_consolobj_t1_mess = $0000 ; addr, local, , , data, test_t_modlink_consolobj_t1.asm:12
+test_t_modlink_consolobj_t2__delay = $0018 ; addr, local, , , code, test_t_modlink_consolobj_t2.asm:16
+test_t_modlink_consolobj_t2__delay_1 = $001A ; addr, local, , , code, test_t_modlink_consolobj_t2.asm:18
+test_t_modlink_consolobj_t2_mess = $0006 ; addr, local, , , data, test_t_modlink_consolobj_t2.asm:24
+test_t_modlink_consolobj_t2_printa1 = $0000 ; comput, local, , , , test_t_modlink_consolobj_t2.asm:4
+test_t_modlink_consolobj_t3_dollar = $000D ; addr, local, , , data, test_t_modlink_consolobj_t3.asm:12
+test_t_modlink_consolobj_t3_mess = $000B ; addr, local, , , data, test_t_modlink_consolobj_t3.asm:11
 END
 
 
@@ -229,21 +229,21 @@ __data_tail                     = $0034 ; const, public, def, , ,
 __head                          = $0000 ; const, public, def, , ,
 __size                          = $0034 ; const, public, def, , ,
 __tail                          = $0034 ; const, public, def, , ,
-code_end                        = $0025 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj4.asm:4
-lib_end                         = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:4
-lib_start                       = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:3
-main1                           = $0000 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:14
-main                            = $0000 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:4
-print1                          = $001F ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj3.asm:4
-print                           = $001F ; addr, public, , test_t_modlink_consolobj, , test_t_modlink_consolobj2.asm:3
-printa                          = $000D ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:7
-test_t_modlink_consolobj1_mess  = $0025 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj1.asm:12
-test_t_modlink_consolobj2__delay = $0018 ; addr, local, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:16
-test_t_modlink_consolobj2__delay_1 = $001A ; addr, local, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:18
-test_t_modlink_consolobj2_mess  = $002B ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj2.asm:24
-test_t_modlink_consolobj2_printa1 = $000D ; addr, local, , test_t_modlink_consolobj, , test_t_modlink_consolobj2.asm:4
-test_t_modlink_consolobj3_dollar = $0032 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj3.asm:12
-test_t_modlink_consolobj3_mess  = $0030 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj3.asm:11
+code_end                        = $0025 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t4.asm:4
+lib_end                         = $0000 ; const, public, , test_t_modlink_consolobj_tlib, , test_t_modlink_consolobj_tlib.asm:4
+lib_start                       = $0000 ; const, public, , test_t_modlink_consolobj_tlib, , test_t_modlink_consolobj_tlib.asm:3
+main1                           = $0000 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t1.asm:14
+main                            = $0000 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t1.asm:4
+print1                          = $001F ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t3.asm:4
+print                           = $001F ; addr, public, , test_t_modlink_consolobj_t, , test_t_modlink_consolobj_t2.asm:3
+printa                          = $000D ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t2.asm:7
+test_t_modlink_consolobj_t1_mess = $0025 ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t1.asm:12
+test_t_modlink_consolobj_t2__delay = $0018 ; addr, local, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t2.asm:16
+test_t_modlink_consolobj_t2__delay_1 = $001A ; addr, local, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t2.asm:18
+test_t_modlink_consolobj_t2_mess = $002B ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t2.asm:24
+test_t_modlink_consolobj_t2_printa1 = $000D ; addr, local, , test_t_modlink_consolobj_t, , test_t_modlink_consolobj_t2.asm:4
+test_t_modlink_consolobj_t3_dollar = $0032 ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t3.asm:12
+test_t_modlink_consolobj_t3_mess = $0030 ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t3.asm:11
 END
 
 
@@ -262,21 +262,21 @@ __data_tail                     = $1268 ; const, public, def, , ,
 __head                          = $1234 ; const, public, def, , ,
 __size                          = $0034 ; const, public, def, , ,
 __tail                          = $1268 ; const, public, def, , ,
-code_end                        = $1259 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj4.asm:4
-lib_end                         = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:4
-lib_start                       = $0000 ; const, public, , test_t_modlink_consolobjlib, , test_t_modlink_consolobjlib.asm:3
-main1                           = $1234 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:14
-main                            = $1234 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj1.asm:4
-print1                          = $1253 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj3.asm:4
-print                           = $1253 ; addr, public, , test_t_modlink_consolobj, , test_t_modlink_consolobj2.asm:3
-printa                          = $1241 ; addr, public, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:7
-test_t_modlink_consolobj1_mess  = $1259 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj1.asm:12
-test_t_modlink_consolobj2__delay = $124C ; addr, local, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:16
-test_t_modlink_consolobj2__delay_1 = $124E ; addr, local, , test_t_modlink_consolobj, code, test_t_modlink_consolobj2.asm:18
-test_t_modlink_consolobj2_mess  = $125F ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj2.asm:24
-test_t_modlink_consolobj2_printa1 = $1241 ; addr, local, , test_t_modlink_consolobj, , test_t_modlink_consolobj2.asm:4
-test_t_modlink_consolobj3_dollar = $1266 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj3.asm:12
-test_t_modlink_consolobj3_mess  = $1264 ; addr, local, , test_t_modlink_consolobj, data, test_t_modlink_consolobj3.asm:11
+code_end                        = $1259 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t4.asm:4
+lib_end                         = $0000 ; const, public, , test_t_modlink_consolobj_tlib, , test_t_modlink_consolobj_tlib.asm:4
+lib_start                       = $0000 ; const, public, , test_t_modlink_consolobj_tlib, , test_t_modlink_consolobj_tlib.asm:3
+main1                           = $1234 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t1.asm:14
+main                            = $1234 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t1.asm:4
+print1                          = $1253 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t3.asm:4
+print                           = $1253 ; addr, public, , test_t_modlink_consolobj_t, , test_t_modlink_consolobj_t2.asm:3
+printa                          = $1241 ; addr, public, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t2.asm:7
+test_t_modlink_consolobj_t1_mess = $1259 ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t1.asm:12
+test_t_modlink_consolobj_t2__delay = $124C ; addr, local, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t2.asm:16
+test_t_modlink_consolobj_t2__delay_1 = $124E ; addr, local, , test_t_modlink_consolobj_t, code, test_t_modlink_consolobj_t2.asm:18
+test_t_modlink_consolobj_t2_mess = $125F ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t2.asm:24
+test_t_modlink_consolobj_t2_printa1 = $1241 ; addr, local, , test_t_modlink_consolobj_t, , test_t_modlink_consolobj_t2.asm:4
+test_t_modlink_consolobj_t3_dollar = $1266 ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t3.asm:12
+test_t_modlink_consolobj_t3_mess = $1264 ; addr, local, , test_t_modlink_consolobj_t, data, test_t_modlink_consolobj_t3.asm:11
 END
 
 

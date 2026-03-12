@@ -16,7 +16,7 @@ ok -f "$test.lis", "$test.lis exists";
 
 check_bin_file("$test.bin", bytes(1, 1, 0, 0x21, 1, 0));
 check_text_file("$test.lis", <<END);
-test_t_LSTON.asm:
+test_t_LSTON_t.asm:
      1                          lstoff
      4  0003  210100            ld hl,1
      5                          
