@@ -49,6 +49,35 @@ extern int __LIB__          hdos_chflg(char *name, int flags) __smallc;
 extern int __LIB__   hdos_chflg_callee(char *name, int flags) __smallc __z88dk_callee;
 #define hdos_chflg(a,b) hdos_chflg_callee(a,b)
 
+// Open HDOS file for reading
+//
+extern int __LIB__          hdos_open_rd(char *name, int ch) __smallc;
+extern int __LIB__   hdos_open_rd_callee(char *name, int ch) __smallc __z88dk_callee;
+#define hdos_open_rd(a,b) hdos_open_rd_callee(a,b)
+
+// Open HDOS file for writing
+//
+extern int __LIB__          hdos_open_wr(char *name, int ch) __smallc;
+extern int __LIB__   hdos_open_wr_callee(char *name, int ch) __smallc __z88dk_callee;
+#define hdos_open_wr(a,b) hdos_open_wr_callee(a,b)
+
+// Reopen HDOS file for update (refer to the HDOS documentation)
+//
+extern int __LIB__          hdos_open_upd(char *name, int ch) __smallc;
+extern int __LIB__   hdos_open_upd_callee(char *name, int ch) __smallc __z88dk_callee;
+#define hdos_open_upd(a,b) hdos_open_upd_callee(a,b)
+
+// Reposition the sector pointer (refer to the HDOS documentation)
+//
+extern int __LIB__          hdos_posit(int ch, int sec) __smallc;
+extern int __LIB__   hdos_posit_callee(int ch, int sec) __smallc __z88dk_callee;
+#define hdos_posit(a,b) hdos_posit_callee(a,b)
+
+// Close HDOS file on the specified channel
+//
+extern int __LIB__          hdos_close(char *name) __z88dk_fastcall;
+
+
 
 
 #endif
