@@ -5,18 +5,17 @@ EXTERN  __x07_buffer
 EXTERN  __x07_mode1_screen
 EXTERN  __x07_mode1_dirty
 EXTERN  __x07_SUB_EXECUTE
+EXTERN  __CLIB_X07_USE_FIRMWARE
 
 INCLUDE "target/x07/def/x07.h"
             
                         
-
-
-
-;
 ; Copy the virtual mode1 screen onto the UDCs that hold it
 ; 0x80 -> 0x9f and 0xe0 -> 0xff
 __x07_mode1_copy:
-    xor     a
+    ld      a,__CLIB_X07_USE_FIRMWARE
+    and     a
+    ret     nz
     ld      hl,__x07_mode1_dirty
     ld      de,__x07_mode1_screen
     call    @docopy

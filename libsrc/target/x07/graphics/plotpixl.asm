@@ -10,6 +10,7 @@
     INCLUDE "target/x07/def/x07.h"
     EXTERN  __x07_SUB_EXECUTE
     EXTERN  __CLIB_X07_USE_FIRMWARE
+    EXTERN  __gfx_coords
 
 ; hl = xy
 plotpixel:
@@ -20,6 +21,8 @@ plotpixel:
     INCLUDE "target/x07/graphics/pixel_MODE1.inc"
 
 use_rom:
+    ld      (__gfx_coords),hl
+    push    bc
     ex      de,hl
     ld      hl,__x07_buffer
     ld      (hl),d
@@ -29,5 +32,7 @@ use_rom:
     ld      a,SUB_LCD_PSET
     ld      b,2         ;arguments
     ld      c,0
-    jp      __x07_SUB_EXECUTE
+    call    __x07_SUB_EXECUTE
+    pop     bc
+    ret
 

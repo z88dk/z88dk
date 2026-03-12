@@ -14,6 +14,7 @@
 ; Always use the firmware 
 pointxy:
     ex      de,hl
+    push    bc
     ld      hl,__x07_buffer
     ld      (hl),d
     inc     hl
@@ -24,6 +25,7 @@ pointxy:
     ld      c,1
     ld      de,hl
     call    __x07_SUB_EXECUTE
+    pop     bc
     ld      a,(__x07_buffer)
     and     a
     ret
