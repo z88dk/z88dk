@@ -158,6 +158,7 @@ error_msg_nextos:
     ENDIF
 ENDIF
 
+    INCLUDE	"crt/classic/crt_runtime_selection.inc"
     INCLUDE "target/zxn/classic/memory_map.asm"
     SECTION rodata_clib
 end:            defb    0               ; null file name
