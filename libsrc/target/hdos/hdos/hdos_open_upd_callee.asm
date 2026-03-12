@@ -27,7 +27,7 @@ _hdos_open_upd_callee:
         push    af
 
 asm_hdos_open_upd:
-	ld     a,c
+    ld     a,c
     ld     de,hdos_default
     rst    38h
     defb   OPENU
