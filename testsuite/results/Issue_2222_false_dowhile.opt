@@ -22,7 +22,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	ld	(hl),15
-.i_3
+.i_5
 	pop	hl
 	push	hl
 	ld	h,0
@@ -32,8 +32,8 @@
 
 	SECTION	bss_compiler
 	SECTION	code_compiler
-	defc	i_5 = i_2
-	defc	i_2 = i_3
+	defc	i_2 = i_5
+	defc	i_3 = i_5
 
 
 
