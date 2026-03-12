@@ -524,6 +524,7 @@ __SMSlib_PauseRequested:
 _pause_flag:        defb    0    ;This alternates between 0 and 1 every time pause is pressed
 __gamegear_flag:    defb    0    ;Non zero if running on a gamegear
 
+	SECTION	data_crt
 __SMSlib_theLineInterruptHandler:
                     defw    l_ret
 
