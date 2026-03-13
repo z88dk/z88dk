@@ -25,6 +25,7 @@ extern int __LIB__ hdos_overlay(int ov) __z88dk_fastcall;
 //
 // The file fucntions will return non-zero if an error occurs
 // When no device or file extension is specified, the default values will be used
+// The channel 'ch' is in the range -1..5 (the program itself is open on channel -1).
 
 // Default device and extension, set to "SY1TXT"
 extern char *hdos_default;
@@ -77,6 +78,19 @@ extern int __LIB__   hdos_posit_callee(int ch, int sec) __smallc __z88dk_callee;
 //
 extern int __LIB__          hdos_close(char *name) __z88dk_fastcall;
 
+// Load bytes from the current sector of an open file channel
+// Byte blocks must be multiple of 256 (LDB is ignored).
+//
+extern int __LIB__          hdos_read(int ch, int bytes) __smallc;
+extern int __LIB__   hdos_read_callee(int ch, int bytes) __smallc __z88dk_callee;
+#define hdos_read(a,b,c) hdos_read_callee(a,b,c)
+
+// Save bytes on the current sector of an open file channel
+// Byte blocks must be multiple of 256 (LDB is ignored).
+//
+extern int __LIB__          hdos_write(int ch, int bytes) __smallc;
+extern int __LIB__   hdos_write_callee(int ch, int bytes) __smallc __z88dk_callee;
+#define hdos_write(a,b,c) hdos_write_callee(a,b,c)
 
 
 
