@@ -38,6 +38,8 @@ zx81_cnvtab:
     defb    '"'
     defb    9
     defb    '_'
+    defb    3
+    defb    '~'
     defb    12
     defb    0xA3
     defb    13
