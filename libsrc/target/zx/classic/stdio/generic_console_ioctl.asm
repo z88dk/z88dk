@@ -129,6 +129,13 @@ set_tilemap_size:
     ld      (__console_w), hl
     ld      a, CLIB_GENCON_CAPS_TILEMAP
     ld      (generic_console_caps), a
+    ; Copy the current font/udgs over into the tileset
+    ld      hl,(__zx_32col_font)
+    ld      bc, $6020
+    call    asm_zxn_copytiles
+    ld      hl,(__zx_32col_udgs)
+    ld      bc, $8080
+    call    asm_zxn_copytiles
     call    generic_console_cls
     jr      success
     ENDIF
