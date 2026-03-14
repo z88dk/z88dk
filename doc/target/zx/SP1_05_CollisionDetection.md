@@ -8,7 +8,6 @@ This document, the 5th in the SP1 part of the [ZX Spectrum Z88DK/C developer's g
 
 ---
 
-
 ## Sprite Collision Detections are Hard!
 
 We've waited this long to discuss sprite collision detection for a good reason: it's hard! Some of the Spectrum's contemporary 1980s home computers were focused as games machines and had hardware support for detecting sprite collisions. The Commodore 64 has a chip called VIC-II which can directly report whether the visible parts of 2 sprites are overlapping. The Spectrum has no such hardware, which means the task is much harder, both for the programmer and the Z80.
@@ -49,7 +48,7 @@ The Y-position of the boat sprite is incremented and the boat sails across the b
 
 The relevant loop is this one:
 
-```
+```c
 do {
   sp1_MoveSprPix(boat_sprite, &full_screen, boat_col1, boat_x_pos, boat_y_pos);
   sp1_UpdateNow();
@@ -73,7 +72,7 @@ Note how this particular piece of code is structured with a do/while loop and we
 
 Of course, we've hardcoded the hotspot coordinates into this piece of code for clarity. In practise the hotspot location is more likely to be part of the sprite data. You might use a graphics data structure with the hotspot coded in, like:
 
-```
+```c
 extern unsigned char boat_col1[];
 extern unsigned char boat_col2[];
 struct
@@ -89,7 +88,7 @@ boat_gfx_data = { boat_col1, boat_col2, 15, 10 };
 
 Your collision detection line might then be a more generic:
 
-```
+```c
 hotspot_attribute = *(zx_pxy2aaddr(boat_x_pos+boat_gfx_data.hotspot_x,
                                    boat_y_pos+boat_gfx_data.hotspot_y));
 ```
@@ -98,7 +97,7 @@ This example is listed in full [here](https://github.com/derekfountain/z88dk-zxs
 
 This may feel like a somewhat contrived example, but there are quite a few real world scenarios where this approach will work. Your author's game, [Wonky One Key](https://spectrumcomputing.co.uk/entry/34686/ZX-Spectrum/ZX_Wonky_One_Key), uses this exact approach for its [collision detection](https://github.com/derekfountain/zxwonkyonekey/blob/master/src/collision.c#L97).
 
-### Multiple Hotspots ###
+### Multiple Hotspots
 
 The simple example above uses a single frame sprite with a single pixel hotspot in it, but you can have more. If your sprite is moving in multiple directions you'll probably want hot spots on more than one side, and depending on its shape you might want more than one hotspot.
 
@@ -132,7 +131,7 @@ So now we can say that if the gem sprite's hotspot enters the chain's bounding b
 
 The code to implement this might be something like:
 
-```
+```c
   if( hotspot_xpos >= chain_box.x1 && hotspot_xpos <= chain_box.x2
       &&
       hotspot_ypos >= chain_box.y1 && hotspot_ypos <= chain_box.y2 )
@@ -145,7 +144,7 @@ That's 4 8-bit comparisons, which is still relatively quick to do.
 
 In this simple example, with the sprite always approaching from the bottom of the screen, and with its hotspot on its leading point, and with the chain going all the way across, we don't really need to ask the question of whether the hotspot has entered the chain's box. We only need to know if the hotspot's screen y-position is above (lower, in pixel coordinate terms) the y-position of the lowest boundary of the box:
 
-```
+```c
   if( hotspot_ypos <= chain_box.y2 )
   {
     /* Hot spot has entered the chain's box from the bottom, it has hit the chain */
@@ -198,7 +197,7 @@ It doesn't logically matter if the helicopter came down on the moneybag or the m
 
 Assuming the boxes are defined like this:
 
-```
+```txt
    x1,y1            x1,y1
      +---------       *---------
      |        |       |        |
@@ -212,7 +211,7 @@ Assuming the boxes are defined like this:
 
 you can see if the boxes intersect with this code:
 
-```
+```c
   if( ! (box2.x1 >= box1.x2 || box2.x2 <= box1.x1
           ||
          box2.y1 >= box1.y2 || box2.y2 <= box1.y1) )
@@ -282,7 +281,7 @@ The idea of using square or rectangular boxes for intersection checking is quite
 
 This approach requires knowing the centre coordinates of 2 sprites, so for SP1, which uses the top left corner of the sprite as its origin point, you'll need to calculate the sprite centre point. Once you've done so you can check whether 2 bounding diamond shapes, with centres _x,y_ and _q,p_, have collided by using this piece of code:
 
-```
+```c
   #define COLLISION_THRESHOLD 16
 
   if( ( abs(x - q) + abs(y - p) ) < COLLISION_THRESHOLD )

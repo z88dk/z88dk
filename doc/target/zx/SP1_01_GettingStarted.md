@@ -22,7 +22,7 @@ We're going to start with a program which sets up the SP1 library, creates a sma
 
 And we start not with C code, but assembly language. Save this listing to a file named 'circle_sprite.asm':
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _circle
@@ -72,7 +72,7 @@ We therefore have our sprite data, defined in assembly language. Let's now look 
 
 Save this listing to a file named 'circle.c':
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <arch/zx.h>
@@ -106,7 +106,7 @@ int main(void)
 
 Compile this, together with the graphical data in the assembly language file, using this line:
 
-```
+```sh
 zcc +zx -vn -startup=31 -clib=sdcc_iy circle.c circle_sprite.asm -o circle -create-app
 ```
 
@@ -116,13 +116,13 @@ When you run the resultant program you'll see the border turns black and the 8x8
 
 As [discussed](01_GettingStarted.md#header-files) in installment 1 of the Z88DK getting started guide, the header files for the sdcc compiler and the new libraries are found here:
 
-```
+```txt
 include/_DEVELOPMENT/common
 ```
 
 so the *sp1.h* header file, which is included in this example code, and which declares the SP1 library interface, is here:
 
-```
+```txt
 include/_DEVELOPMENT/common/arch/zx/sp1.h
 ```
 
@@ -130,12 +130,11 @@ You should keep this file open. It is currently sparsely documented, but it's st
 
 The SP1 library code we're using is in the 'iy' version of the standard C library, as described [here](01_GettingStarted.md#library-files). On Linux you can confirm this with a command such as:
 
-```
+```sh
 >z88dk-z80nm $ZCCCFG/../../libsrc/newlib/lib/sdcc_iy/zx.lib | less
 ```
 
 and search for 'sp1' in the output.
-
 
 #### The C code
 
@@ -153,7 +152,7 @@ Next, we place the sprite on screen via the call to *sp1_MoveSprAbs()*. The fina
 
 The sprite's location in pixels is therefore:
 
-```
+```c
  x = (col*8) + horizontal_rotation
  y = (row*8) + vertical_rotation
 ```
@@ -182,7 +181,7 @@ On the subject of pixel positioning, it's worth a look at how SP1 positions a sp
 
 "What," you might ask, "is at address 49,999?" because whatever is there is going to end up in the display and the user will see it! Recall our sprite data, in assembly language:
 
-```
+```z80
 	defb @00000000
 	defb @00000000
 	defb @00000000
@@ -220,7 +219,7 @@ You'll also note the 8 zeroes after the graphic data, the purpose of which might
 
 The 3 lines of code which create the sprite in memory stand closer inspection. Here's the first:
 
-```
+```c
   circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)circle, 0);
 ```
 
@@ -238,7 +237,7 @@ Finally we add the plane of the display to draw the sprite into. SP1 uses 256 "p
 
 Let's move on to the second line of sprite generation code:
 
-```
+```c
   sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
 ```
 
@@ -254,7 +253,7 @@ The final zero sets the plane to 0, closest to the viewer.
 
 We already looked at the line which moves the sprite to the required screen location:
 
-```
+```c
   sp1_MoveSprAbs(circle_sprite, &full_screen, 0, 0, 0, 0, 0);
 ```
 

@@ -18,7 +18,7 @@ For this article we're going stay with the same sort of 8x8 pixel, single column
 
 The sprite has 8 "frames" of animation. As in previous examples, we code this graphics data as an assembly listing:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _runner_f1
@@ -214,13 +214,13 @@ In previous example code in this series we've built and drawn sprites using the 
 
 Firstly, we create the sprite structure in memory, passing the graphic data (at address *runner_f1* in the example we're building) into the sprite creation library function:
 
-```
+```c
 sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)runner_f1, 0);
 ```
 
 Later in the program we place that sprite on screen using one of the sprite movement functions:
 
-```
+```c
 sp1_MoveSprPix(sprite, &full_screen, 0, x, y);
 ```
 
@@ -228,7 +228,7 @@ So far we've studiously ignored that 3rd argument to the movement function (the 
 
 Only, there's a complication. Due to what might be termed a quirk in the SP1 interface, it's easier to set the offset value in the sprite structure directly than it is to use that third argument of the sprite movement call (which we leave at zero). So our code will actually do this:
 
-```
+```c
 sprite->frame = (void*)animation_offset;
 sp1_MoveSprPix(sprite, &full_screen, 0, x, y);
 ```
@@ -237,7 +237,7 @@ which does exactly what the SP1 interface was supposed to do, only avoiding the 
 
 With this animation code in place, here's the program to walk our character across the screen. Save it to a file called 'runner.c':
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <arch/zx.h>
@@ -285,7 +285,7 @@ int main(void)
 
 The compile line is:
 
-```
+```sh
 zcc +zx -vn -startup=31 -clib=sdcc_iy runner.c runner_sprite.asm -o runner -create-app
 ```
 
@@ -299,7 +299,7 @@ The sequential graphical frame approach we've seen, where we calculate offsets t
 
 Let's look at a trivial example to see how the code changes. Save this code to a file called *arrow_sprite.asm*:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _arrow_left
@@ -356,8 +356,7 @@ This is a simple 2-state sprite representing an arrow. One state has it facing l
 
 Here's the C code, which you should save to a file called *arrow_sprite.c*:
 
-```
-
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <arch/zx.h>
@@ -419,7 +418,7 @@ int main(void)
 
 Compile this example with:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy arrow_sprite.c arrow_sprite.asm -o arrow_sprite -create-app
 ```
 
@@ -434,9 +433,7 @@ Of course, this is a trivial example. A real game, where the characters walk, ru
 ## Exercises for the reader
 
 * Add [mask data](SP1_02_SimpleMaskedSprite.md#the-sprite-data) to the runner sprite and have him run through a screen with a background.
-
 * Add more states and graphics to the arrow sprite example. Change it so you can guide the arrow using Q, A, O and P.
-
 * Add an explosion state, which the arrow takes if you let it hit the side of the screen.
 
 ## Conclusion

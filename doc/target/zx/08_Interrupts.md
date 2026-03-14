@@ -28,14 +28,17 @@ Unusually for this series, the example which follows isn't a particularly simple
 
 The steps required to set up a Spectrum IM 2 routine are these:
 
-* fill in the vector table with a complete set of vectors, all the same * at that vector, place an instruction to jump to the interrupt service routine * set the Z80's I register to point at the vector table * enable the interrupts
+* fill in the vector table with a complete set of vectors, all the same
+* at that vector, place an instruction to jump to the interrupt service routine
+* set the Z80's I register to point at the vector table
+* enable the interrupts
 
 The first issue we need to cover is, where can we put the vector table and jump instruction? The answer is, anywhere convenient, but that doesn't really answer the question properly. What follows is a description of one solution which would work for a program where such things can be placed out of the way in high memory. As befits a getting started guide, this configuration will suit many scenarios and will suffice until the reader is knowledgeable enough to work out a more suitable alternative for their situation.
 
 Our vector table needs to be 257 bytes. Referring back to [installment 6](https://github.com/derekfountain/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md) of this getting started guide where we looked at the memory map of the Spectrum, we see that with the default compiler settings our simple program's memory map looks like this:
 
 
-```
+```txt
 +-------------+
 |0xFFFF  65535|
 |             | User Defined Graphics
@@ -75,7 +78,7 @@ We need to find somewhere in there where 257 bytes won't cause a problem, and th
 
 By default the stack starts at address 0xFF58, as shown in the illustration above. We can move it if we want to, but that's a sensible place if we're to preserve the UDGs. So let's leave it there. The highest memory location we can place our 257 byte vector table below the stack is therefore 0xFE00-0xFF00 inclusive, but that would only give the stack 87 bytes (0x57 hex) bytes to grow down into. That would be too tight for all but the simplest program, so let's put the vector table 512 bytes lower, occupying memory locations 0xFC00-FD00 inclusive. That will give our stack 600 bytes to grow down into:
 
-```
+```txt
 |-------------|
 |0xFF58  65368| Z88DK program's stack
 |             | (600 bytes total)
@@ -98,7 +101,7 @@ By default the stack starts at address 0xFF58, as shown in the illustration abov
 
 This vector table needs to be filled with 257 bytes, all the same. They make up an address of a jump instruction. Because the high and low bytes must be the same we're restricted in the vector address we can use. Again, anywhere suitable will do the job, but we keep to our plan of putting things as high up in memory as possible. 0xFFFF is the top of memory, so that's no good. 0xFEFE and 0xFDFD are the next ones down, but those are in the stack area. Next would be 0xFCFC which is in our vector table so that's no use either. Next one down is 0xFBFB. Ah, this looks better. That's just below the vector table. We need 3 bytes for our JMP instruction, so we can use the bytes at 0xFBFB, 0xFBFC and 0xFBFD:
 
-```
+```txt
 |-------------|
 |0xFF58  65368| Z88DK program's stack
 |             | (600 bytes total)
@@ -134,7 +137,7 @@ Having worked all that out, we can now look at the program which arranges it.
 
 Here's a piece of code which sets up interrupt mode 2 routine as per the discussion above:
 
-```
+```c
 #pragma output REGISTER_SP = 0xFF58
 #pragma output CLIB_MALLOC_HEAP_SIZE = -0xFBFA
 
@@ -174,7 +177,7 @@ int main(void)
 
 Save this to a file called im2_simple.c and compile it with this command:
 
-```
+```sh
 zcc +zx -vn -clib=sdcc_iy -startup=31 im2_simple.c -o im2_simple -create-app
 ```
 
@@ -186,7 +189,7 @@ The first thing the code does in *main()* is set up the vector table. As describ
 
 Next we need to place our redirection JMP instruction at address 0xFBFB. This is simply :
 
-```
+```z80
   JMP isr
 ```
 
@@ -210,7 +213,7 @@ In the example above we end by going into an infinite loop, which is why the Spe
 
 We can control the interrupt mode the program exits with via the *CRT_INTERRUPT_MODE_EXIT* pragma, like this:
 
-```
+```c
 #pragma output CRT_INTERRUPT_MODE_EXIT = 2
 ```
 
@@ -220,8 +223,7 @@ To use this feature we need to ensure that as well as having our C interrupt ser
 
 With this in place we can set up a C code interrupt service routine, then return to BASIC with it still running, like this example:
 
-```
-
+```c
 #pragma output REGISTER_SP = 0xFF58
 #pragma output CLIB_MALLOC_HEAP_SIZE = -0xFBFA
 
@@ -232,7 +234,6 @@ With this in place we can set up a C code interrupt service routine, then return
 #include <string.h>
 #include <im2.h>
 #include <arch/zx.h>
-
 
 static unsigned char  ticker_string[] = "Hello, world! ";
 static unsigned char* current_char_ptr;
@@ -338,7 +339,7 @@ int main(void)
 
 Compile this with:
 
-```
+```sh
 zcc +zx -vn -clib=sdcc_iy -startup=31 atts_ticker.c -o atts_ticker -create-app
 ```
 

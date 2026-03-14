@@ -30,7 +30,7 @@ The SP1 display background is split up into a grid of 8x8 pixel *tiles*, each on
 
 In the first article in this SP1 getting started series we looked at a [small program](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite) which initialises the SP1 library with this line of code:
 
-```
+```c
 sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
                 INK_BLACK | PAPER_WHITE,
                 ' ' );
@@ -38,7 +38,7 @@ sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OV
 
 The last argument in that function call is the important one here. It specifies a character value to fill the SP1 display area's tiles with. In this example it uses the space character (the data comes from the character set in the Spectrum's ROM) which has the effect of clearing the screen. For the purposes of this guide, we're going to change this line to:
 
-```
+```c
 sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
                 INK_BLACK | PAPER_WHITE,
                 'X' );
@@ -50,7 +50,7 @@ which will fill the display area with Xs. It's not particularly useful, but it d
 
 Recall from the first article in this series that we used a simple 8x8 [circle graphic](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite) as our sprite, and that the data for it was defined in assembly language as opposed to 'C' in order to make the graphical data a little easier to look at. We're going to continue with that approach. For our masked sprite we'll use the same circle sprite and a mask for it, as seen here, circle to the left, mask to the right:
 
-```
+```txt
   1111     11    11
  1    1    1      1
 1      1
@@ -66,7 +66,7 @@ SP1 masks have a bit set where the background is to be allowed to be seen. This 
 
 As we've [seen](SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code), in SP1 sprites are built up in columns, and our simple 8x8 pixel sprite is one column of data. With masked sprites, the data is arranged in memory as one mask byte, followed by one data byte, incrementing upwards in memory. That gives this assembly listing:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _circle_masked
@@ -107,7 +107,7 @@ Save this listing to a file called *circle_sprite_masked.asm*.
 
 Here's the code to draw the sprite. Save it to a file called 'circle_masked.c':
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <arch/zx.h>
@@ -162,7 +162,7 @@ int main(void)
 
 The compile line is:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy circle_masked.c circle_sprite_masked.asm -o circle_masked -create-app
 ```
 
@@ -186,7 +186,7 @@ Since we've now introduced the concept of timings, let's have a look at how SP1 
 
 Save this code to a file called 'circle_masked_multi.c':
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <arch/zx.h>
@@ -203,7 +203,6 @@ IM2_DEFINE_ISR(isr) {}
 #define UI_256                 ((unsigned int)256)
 #define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
 #define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
-
 
 extern unsigned char circle_masked[];
 
@@ -260,7 +259,7 @@ int main(void)
 
 Since we're discussing timings and performance, we'll turn on the SDCC compiler's options for full optimisation for this compile:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 circle_masked_multi.c circle_sprite_masked.asm -o circle_masked_multi -create-app
 ```
 
@@ -271,20 +270,12 @@ This example uses multiple sprites. Instead of a single *sp1_ss* pointer, we def
 There's enough here to play with, so we leave some exercises for the reader:
 
 * Modify the sprite mask to open up the centre of the circle sprite.
-
 * How many 8x8 pixel, masked sprites can SP1 draw in 1/50th of a second (i.e. between the *HALT*s)?
-
 * What happens if too many sprites are used, such that SP1 can't redraw them all in 1/50th second?
-
 * Take out the *intrinsic_halt()* call from the second example and rerun the tests. Now what happens? Increase the number of sprites to see how many SP1 could realistically manipulate in a game.
-
 * Replace the masked sprite data and code with the simple LOADed sprite and code from the [first example](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many more sprites can it handle each frame? But what happens on screen? (Note: Perhaps a simpler way to change to LOAD sprites is to use the SP1_DRAW_LOAD2LB and SP1_DRAW_LOAD2RB draw functions in place of the MASK ones used.  These are still 2-byte draw functions that simply ignore the mask byte when the sprite is drawn; the extra mask byte is wasted on this draw function but it does allow sprite graphics defined with masks to be used).
-
 * Try changing the *circle_sprites[i].x_pos++* code which moves each sprite 1 pixel to *circle_sprites[i].x_pos+=2*, to move them 2 pixels. How does that look? What about 3 pixels at a time?
-
-
 * Can you mix different sprite types on screen?  Try creating some sprites as MASK, some as LOAD and some as OR.  Use the 2-byte draw functions for the LOAD and [OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/sp1.h#L177) so that all the sprites can share the MASK sprite graphics.
-
 
 ## Conclusion
 

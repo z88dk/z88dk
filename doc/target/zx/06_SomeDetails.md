@@ -16,7 +16,7 @@ In previous installments we've looked at how to get started writing C programs f
 
 By default a Z88DK Spectrum program will be compiled such that its code originates at address 32768. This is one of the numerous configuration parameters defined in the C Runtime Configuration file [here](https://github.com/z88dk/z88dk/blob/master/libsrc/newlib/target/zx/crt_config.inc#L19):
 
-```
+```txt
 libsrc/newlib/target/zx/crt_config.inc
 ```
 
@@ -24,7 +24,7 @@ Skim read this file and you'll find the CRT_ORG_CODE value set to 32768. You'll 
 
 So by default the Spectrum's memory map for a Z88DK program is:
 
-```
+```txt
 +-------------+
 |0xFFFF  65535|
 |             | User Defined Graphics
@@ -72,13 +72,13 @@ For a large project, these pragmas can be collected into a single file, for exam
 
 However for small projects with few source files, it can be more convenient just to include them within the C code itself like this:
 
-```
+```c
 #pragma output CRT_ORG_CODE = 36864
 ```
 
 You can put these anywhere in the source files you like. This one would push the compiled C 4KB up in memory from the usual org address of 32768. If you need to do something like this remember to change your BASIC loader to:
 
-```
+```zxbasic
 RANDOMIZE USR 36864
 ```
 
@@ -86,19 +86,19 @@ since that's where your code will now be loaded.  If you use `-create-app` on th
 
 Here's an interesting pragma to move the initial stack location:
 
-```
+```c
 #pragma output REGISTER_SP           = -1
 ```
 
 Setting the stack pointer to the special value of -1 means "don't move it." In this case the stack will remain where the BASIC loader left it, which is just below the location of the CLEAR command in the loader. If your loader starts with:
 
-```
+```zxbasic
 10 CLEAR 32767
 ```
 
 and your program loads into the default location of 32768, the stack will start just beneath your program and grow down towards the screen. That's slower, contended memory, but the stack would be out of the way of the heap, which might be useful if your program needs lots of heap space:
 
-```
+```txt
 |             |
 |             |
 |0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
@@ -110,13 +110,13 @@ and your program loads into the default location of 32768, the stack will start 
 
 On the other hand, you can turn off the heap entirely with:
 
-```
+```c
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0
 ```
 
 The default heap size on Spectrum programs is set to -1, which is a special value which says "use all the memory above the program's BSS section and the below the stack for heap." This is frequently the best option since it allows the program to malloc as much memory as it needs. The problem is that the heap memory is pre-formatted for allocation with malloc():
 
-```
+```txt
 |             |
 |-------------|
 |0xFF58  65368| Z88DK program's stack

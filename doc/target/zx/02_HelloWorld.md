@@ -20,9 +20,7 @@ The stdio library talks to a "driver." A driver is some Z88DK code that is attac
 
 We need to start at the beginning, and the beginning for standard IO is, of course, "hello world". Here's the Spectrum version which you should save to a file called hello_world.c:
 
-```
-  /* C source start */
-
+```c
   #include <arch/zx.h>
   #include <stdio.h>
 
@@ -34,31 +32,28 @@ We need to start at the beginning, and the beginning for standard IO is, of cour
 
     return 0;
   }
-
-  /* C source end */
-
 ```
 
 Recalling the command line we built for our zsdcc compiles using Z88DK's sdcc_iy library in the first installment of this series, we need to make a tweak to the C runtime we're using. We were using crt number 31 which turns off all the stdio channels to save some memory. Since we now want to use those channels we need to use a C runtime which enables them. crt 0 does so, and sets the screen up in the Spectrum's traditional 32x24 character display, so that's the one to use. Our compile line is therefore:
 
-```
- zcc +zx -vn -startup=0 -clib=sdcc_iy hello_world.c -o hello_world -create-app
+```sh
+zcc +zx -vn -startup=0 -clib=sdcc_iy hello_world.c -o hello_world -create-app
 ```
 
 Run that compilation and drag and drop the resultant TAP file onto the Fuse window. It does what you'd expect, Spectrum style.
 
 The [zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h) header file is found here:
 
-```
- include/_DEVELOPMENT/common/arch/zx.h
+```txt
+include/_DEVELOPMENT/common/arch/zx.h
 ```
 
 and you'll notice it contains the declaration of the zx_cls() function. There's no documentation for that function beyond the header file, but it's a reasonable assumption that it clears the screen. A little experimentation shows that its argument changes the colour attribute of the screen. Try changing the PAPER_WHITE constant to PAPER_YELLOW to confirm this. The scarcity of documentation makes this sort of investigation necessary for Z88DK development as things stand.
 
 The [stdio.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/stdio.h) header is found here:
 
-```
- include/_DEVELOPMENT/common/stdio.h
+```txt
+include/_DEVELOPMENT/common/stdio.h
 ```
 
 Note that that file is under the sdcc/ subdirectory, so it's picked up by our zsdcc compilation, but it isn't in the zx/ subdirectory. Instead it's in the sdcc root includes directory, along with all the other generic headers. We're only interested in Spectrum development in this guide, but in fact this file is the standard header file for any Z88DK target which uses the standard IO library.
@@ -67,10 +62,7 @@ Note that that file is under the sdcc/ subdirectory, so it's picked up by our zs
 
 stdio brings to the Spectrum a lot of things, including the printf() function found on much more powerful machines. Here's an example which hexdumps the first few bytes of the Spectrum's ROM:
 
-
-```
-  /* C source start */
-
+```c
   #include <arch/zx.h>
   #include <stdio.h>
 
@@ -102,14 +94,11 @@ stdio brings to the Spectrum a lot of things, including the printf() function fo
 
     return 0;
   }
-
-  /* C source end */
 ```
 
 Save it to a file called rom_in_hex.c and compile it with this compile command:
 
-
-```
+```sh
 zcc +zx -vn -startup=4 -clib=sdcc_iy rom_in_hex.c -o rom_in_hex -create-app
 ```
 
@@ -119,9 +108,7 @@ Did you spot the -startup=4 argument? This chooses crt4. Z88DK's C runtime 4 set
 
 We've covered the output part of standard IO, so let's have a look at the input. Hopefully anyone familiar with stdio on any other type of machine should already be able to see how this is going to work. Here's a small code file called question.c:
 
-```
-  /* C source start */
-
+```c
   #include <arch/zx.h>
   #include <stdio.h>
 
@@ -137,24 +124,21 @@ We've covered the output part of standard IO, so let's have a look at the input.
 
     return 0;
   }
-
-  /* C source end */
 ```
 
 We'll go back to 32 column mode for this one (crt0), so the compile command is:
 
-```
+```sh
 zcc +zx -vn -startup=0 -clib=sdcc_iy question.c -o question -create-app
 ```
 
 Note that with stdio comes the same responsibilities usually associated with the library on other platforms. This includes avoiding things like buffer overflows. The example above uses a buffer of 15 bytes for the entered name. Try entering a 20 character string and see how the Spectrum behaves. The use of gets() is discouraged for this reason. The better alternative is this one:
 
-```
+```c
   fgets(name, 15, stdin)
 ```
 
 The Z88DK stdio library includes all the other things you'd expect from stdio, so you get sprintf(), scanf(), etc. Read the header file and experiment.
-
 
 ## Embedded Control Codes
 
@@ -164,13 +148,13 @@ Control codes are ready to use in several of the crts. crt0, which we've used so
 
 Change the print line in your hello_world.c program to this:
 
-```
+```c
   puts("Hello, \x10\x33world!");
 ```
 
 and recompile with crt1 using:
 
-```
+```sh
 zcc +zx -vn -startup=1 -clib=sdcc_iy hello_world.c -o hello_world -create-app
 ```
 
@@ -180,7 +164,7 @@ Note that it's '\x33' not '\x03'. The value is offset by 30 hex. Why? Because ot
 
 Try this one:
 
-```
+```c
   puts("\x16\x0A\x0C\x12\x31Hello\x12\x30, world!");
 ```
 
@@ -190,25 +174,25 @@ Code '\x12' (hex, that's 18 decimal) is the 'FLASH' one, and the next byte, '\x3
 
 Control codes don't exactly make for easy reading in the code, but they're a very efficient way of getting control over text if that's what your program requires. Macros can make them more readable. For example:
 
-```
+```c
   #define FLASH_ON "\x12\x31"
 ```
 
 A subtle caveat to look out for. Consider this:
 
-```
+```c
   puts("\x16\x0A\x0BCool!");
 ```
 
 So that's move to location 10,11 and print "Cool!". Only it isn't, because hex strings are consumed by the compiler in a greedy manner. That string would print "ool!" at location 10,188 because '\x0BC' is 188 decimal. Use C's string concatenation to work around this:
 
-```
+```c
   puts("\x16\x0A\x0B" "Cool!");
 ```
 
 Documentation for control codes, as implemented by the new Z88DK libraries, hasn't been completed yet. Reading the source files is the only way to get definitive documentation. They're [here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk):
 
-```
+```txt
   libsrc/newlib/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk
 ```
 

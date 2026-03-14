@@ -38,13 +38,15 @@ The low resolution version of BiFrost can place a 16x16 pixel multicolour "tile"
 
 BiFrost based programs created with Z88DK LOAD in a slightly different way to most Spectrum programs. The compliation process generates _two_ blocks of machine code. The first is the programmer's code, the compiled C, as usual. The second is the BiFrost library itself, which needs to be loaded separately into a specifically allocated area of high memory. The details of why aren't really important at this getting started level. The important thing is to understand the loading process the Spectrum will have to go through:
 
-* load and run a BASIC loader * the BASIC loader loads the programmer's CODE into memory * the BASIC loader then loads the BiFrost library CODE into higher memory * the BASIC loader then runs the programmer's code
+* load and run a BASIC loader
+* the BASIC loader loads the programmer's CODE into memory
+* the BASIC loader then loads the BiFrost library CODE into higher memory * the BASIC loader then runs the programmer's code
 
 The programmer's code, created by Z88DK, expects to find the BiFrost library loaded and waiting to be run at the correct address. (BiFrost  has to be loaded at an exact memory location otherwise it won't work.) As long as the BASIC loader has loaded BiFrost into the correct area of memory this will work as expected.
 
 Step 1, therefore, is to create a BASIC loader program. Yes, you're going to type a bit of Spectrum BASIC. Here it is:
 
-```
+```zxbasic
 10 CLEAR 32767
 20 LOAD "" CODE
 30 LOAD "" CODE
@@ -53,7 +55,7 @@ Step 1, therefore, is to create a BASIC loader program. Yes, you're going to typ
 
 This needs to be saved to a .TAP file. The exact steps for doing this depend on the emulator you're using. On Fuse you would use Media->Tape->Clear to clear the emulator's "virtual tape", then save the program with:
 
-```
+```zxbasic
 SAVE "biloader" LINE 10
 ```
 
@@ -75,7 +77,7 @@ Details on how to use ZX Paintbrush to save ctiles are [here](https://www.worldo
 
 There are several ways to get the 64 bytes of ctile data into a Z88DK program. A C array containing the relevant bytes is probably easiest, but not the most flexible since you'd have to change the array each time you update your graphic. An alternative, which we use in this example, is to create an assembly language file like this:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _ctiles
@@ -93,7 +95,7 @@ The assembler's BINARY command loads the binary data from the named file, which 
 
 Step 3 is to create a small program which uses BiFrost. Save this to bifrost_01.c:
 
-```
+```c
 #pragma output REGISTER_SP  = -1
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0
 
@@ -137,13 +139,13 @@ We then place our single tile, the coloured ball (index 0 in our tiles image dat
 
 If you change the line:
 
-```
+```c
 BIFROSTL_setTile(0, 0, (unsigned char)(0+BIFROSTL_STATIC));
 ```
 
 to:
 
-```
+```c
 BIFROSTL_setTile(1, 1, (unsigned char)(0+BIFROSTL_STATIC));
 ```
 
@@ -157,7 +159,7 @@ This example program has 2 pragma instructions at the top. These are important, 
 
 We can compile our little program with this:
 
-```
+```sh
 zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_01.c ctile.asm -o bifrost_01
 ```
 
@@ -165,7 +167,7 @@ We use crt31 since we're not using Z88DK's standard IO. Also note there's no spe
 
 Once this has run you'll notice it's created _two_ binary files in the local directory:
 
-```
+```txt
 bifrost_01_CODE.bin
 bifrost_01_BIFROSTL.bin
 ```
@@ -176,56 +178,56 @@ The command to convert a binary machine code file to a .TAP file is _z88dk-appma
 
 Our target machine, as ever, will be a ZX Spectrum:
 
-```
+```sh
 z88dk-appmake +zx ...
 ```
 
 Our binary input file is bifrost_01_CODE.bin:
 
-```
+```sh
 z88dk-appmake +zx -b bifrost_01_CODE.bin ...
 ```
 
 and the output file will be bifrost_01_code.tap:
 
-```
+```sh
 z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap ...
 ```
 
 By default the z88dk-appmake utility produces a little BASIC loader program to load machine code. In this case we've already written our own, so we need to suppress that:
 
-```
+```sh
 z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader ...
 ```
 
 Next we need to specify where the piece of code will be LOADed. This value goes into the tape header so when you type _LOAD "" CODE_ (i.e. without a specific load address) the Spectrum can work out where in memory it's expected to load the code. By default Z88DK compiled code expects to load and run from address 32768, so:
 
-```
+```sh
 z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 ...
 ```
 
 Finally we need to provide a name for the block of CODE on the tape:
 
-```
+```sh
 z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
 ```
 
 We have to create two pieces of tape loadable code for our BiFrost project, the second containing the BiFrost code which expects to load and run from address 58625. So the two commands to create the .TAP files are:
 
-```
+```sh
 z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
 z88dk-appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
 ```
 
 Finally, we need to merge our 3 tape files into a single one. The .TAP format is a very simple one which allows direct concatenation of .TAP files in order to make a single big one, so on Linux the command is:
 
-```
+```sh
 cat bifrost_loader.tap bifrost_01_code.tap bifrostl.tap > bifrost_01.tap
 ```
 
 This is all a bit fussy to keep typing, so maybe it's time for a makeifle:
 
-```
+```makefile
 all: bifrost_01.tap
 
 bifrost_01_CODE.bin: bifrost_01.c ctile.asm coloured_ball.ctile
@@ -247,7 +249,7 @@ The example program has 2 pragma instructions to the compiler at the top. The us
 
 Without the pragmas the memory map of the program, together with the BiFrost library, would look like this:
 
-```
+```txt
 ...
 |               |
 |---------------|
@@ -280,7 +282,7 @@ The example program is loaded at address 32768 as is usual for Z88DK programs. T
 
 So the first thing we have to do is move the stack somewhere safer, where it's got a bit of room to grow. That's what the REGISTER_SP pragma does, and as we saw in [installment 6](06_SomeDetails.md), setting it to -1 leaves the stack pointer where the BASIC loader puts it, which in our case is address 32767, safely below our program:
 
-```
+```txt
 ...
 |             |
 |-------------|
@@ -318,7 +320,7 @@ Let's take a brief look at the two high resolution variants of the BiFrost libra
 
 Here's an updated version of our low resolution, bifrost_01.c program, reworked for the BiFrost high resolution library:
 
-```
+```c
 #pragma output REGISTER_SP  = -1
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0
 
@@ -363,7 +365,7 @@ int main(void)
 
 and its makefile:
 
-```
+```makefile
 all: bifrost_02.tap
 
 bifrost_02_CODE.bin: bifrost_02.c ctile.asm coloured_ball.ctile
@@ -381,7 +383,7 @@ Let's just look at the updates we've made for high resolution mode.
 
 The main difference is the screen location positioning. The set tile function works the same way as with the low resolution code:
 
-```
+```c
 BIFROSTH_setTile(4, 4, (unsigned char)(0+BIFROSTH_STATIC));
 ```
 
@@ -405,7 +407,7 @@ At 13KB the library is considerably larger than the high resolution variant of B
 
 Here's an example which animates our ball twice, once vertically and once horizontally:
 
-```
+```c
 #pragma output REGISTER_SP  = -1
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0
 
@@ -462,7 +464,7 @@ When you run this you'll also notice the artefacts the horizontally moving ball 
 
 As an extra bonus at the end of this article, let's skip the makefile and use a different approach for building. Use these commands to build the example:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy bifrost_03.c ctile.asm -o bifrost_03
 z88dk-appmake +glue -b bifrost_03 --filler 0 --clean
 z88dk-appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03.tap
@@ -472,13 +474,11 @@ The -m option to zcc causes it to output a _map_ file. The map is a text file co
 
 The +glue approach is much less fussy than building the two separate binary files and a special BASIC loader to get them into place. The drawback is the much larger LOADable file, which is mainly full of zeroes. With emulators this isn't a problem as loading from "tape" is instantaneous, so +glue is the best option for development work.
 
-
 ### Conclusion
 
 This has been a long and rather complicated story. BiFrost is clever software which opens up a whole host of possibilities for the Spectrum programmer, and its interface with Z88DK makes it available for C programmers.
 
 BiFrost is also rather involved and complex to deal with; we've used this complexity to introduce a host of new concepts, features and approaches which the Z88DK programmer will hopefully find useful as we move forward.
-
 
 ### Where To Go From Here
 

@@ -12,14 +12,14 @@ This guide examines the Z88DK capabilities for handling low level graphics primi
 
 There's a header file full of graphics routines here:
 
-```
- include/graphics.h
+```txt
+include/graphics.h
 ```
 
 [This](https://github.com/z88dk/z88dk/blob/master/include/graphics.h) is what we're after: draw, plot, circle, all sorts of stuff. But there's a problem. The header file is in the Z88DK include/ directory, whereas the header files for the new library is, as we've seen in the previous installments of this series, [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/common):
 
-```
- include/_DEVELOPMENT/common/
+```txt
+include/_DEVELOPMENT/common/
 ```
 
 The explanation is that the header files in the include/ directory relate to functions in the _classic_ library. We're using the newer compiler with the _new_ library, and you'll notice that there's no graphics.h file in the include/_DEVELOPMENT/common directory. As of this writing, October 2024, the graphics routines haven't yet been ported to the new library.
@@ -42,7 +42,7 @@ The problem of drawing or printing into the display directly is really a problem
 
 The display address manipulator functions are defined in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h).
 
-```
+```txt
 include/_DEVELOPMENT/common/arch/zx.h
 ```
 
@@ -52,7 +52,7 @@ If you scroll down you will find a block of functions under the "display" headin
 
 To make it clear what each function does, there is a naming convention applied to each function name. In general function names are composed of strings like these:
 
-```
+```c
 saddr = screen address
 aaddr = attribute address
 
@@ -73,9 +73,7 @@ It should be noted that both the character coordinates and the pixel coordinates
 
 To illustrate how these display manipulators can be used, let's write a program that plots points at random on the screen.  Save this to a file called plot.c:
 
-```
-  /* C source start */
-
+```c
   #include <arch/zx.h>
   #include <stdlib.h>
 
@@ -96,14 +94,12 @@ To illustrate how these display manipulators can be used, let's write a program 
      }
      return 0;
   }
-
-  /* C source end */
 ```
 
 Our compile line will use startup=31 because we have no use for stdio in this example:
 
-```
- zcc +zx -vn -startup=31 -clib=sdcc_iy plot.c -o plot -create-app
+```sh
+zcc +zx -vn -startup=31 -clib=sdcc_iy plot.c -o plot -create-app
 ```
 
 In the plot() function, zx_pxy2saddr(x,y) returns a char* that represents the screen address that contains the pixel to be plotted. To find out which bit in the byte should be set, a call to zx_px2bitmask(x) is made. The result of that call is a byte with a single bit set in it - that's the bit we want to set. Then
@@ -119,10 +115,7 @@ It really isn't important to understand the Bresenham algorithm. The important p
 
 Retaining our plot function and borrowing the internet line code, save the following in file line.c:
 
-
-```
-  /* C source start */
-
+```c
   #include <arch/zx.h>
   #include <input.h>
   #include <stdlib.h>
@@ -164,14 +157,12 @@ Retaining our plot function and borrowing the internet line code, save the follo
     }
     return 0;
   }
-
-  /* C source end */
 ```
 
 The compile line is the same as for the last example:
 
-```
- zcc +zx -vn -startup=31 -clib=sdcc_iy line.c -o line -create-app
+```sh
+zcc +zx -vn -startup=31 -clib=sdcc_iy line.c -o line -create-app
 ```
 
 ### Where To Go From Here

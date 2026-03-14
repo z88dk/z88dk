@@ -26,7 +26,7 @@ We're going to work through an example with a 16x16 pixel masked sprite kindly p
 
 We need to convert this graphical data and the mask into an SP1 sprite data structure. Here it is in assembly language, which you should save to a file called *bubble_masked_sprite.asm*:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _bubble_col1
@@ -101,7 +101,7 @@ As usual with SP1, in order to allow vertical pixel positioning we add 7 empty r
 
 To display this sprite we need to follow our now established pattern, using this code to initialise the sprite structure:
 
-```
+```c
 bubble_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, (int)bubble_col1, 0);
 sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, (int)bubble_col2, 0);
 sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2RB,  SP1_TYPE_2BYTE, 0, 0);
@@ -111,7 +111,7 @@ The first line creates the sprite as being 3 character cells high and establishe
 
 Here's a program which glides the bubble sprite over a background of 'X's in the manner we've seen previously:
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <z80.h>
@@ -152,13 +152,13 @@ int main(void)
 
 Save this to *bubble_masked.c* and compile it with:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy bubble_masked.c bubble_masked_sprite.asm -o bubble_masked -create-app
 ```
 
 If you prefer the alternative method of specifying sprite data, as we saw in the [previous article](SP1_03_AnimatedSprite.md#state-based-animation), you can specify the the sprite initialisation like this:
 
-```
+```c
 bubble_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 0, 0);
 sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, bubble_col2-bubble_col1, 0);
 sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2RB,  SP1_TYPE_2BYTE, 0, 0);
@@ -166,7 +166,7 @@ sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2RB,  SP1_TYPE_2BYTE, 0, 0);
 
 This creates the sprite with null data and uses an address calculation in the compiler to calculate the offset to the second column. You then place the sprite with:
 
-```
+```c
 sp1_MoveSprPix(bubble_sprite, &full_screen, bubble_col1, x, y);
 ```
 
@@ -180,7 +180,7 @@ Here's an example of a bigger *mothership* type of sprite, seen in [ZX Paintbrus
 
 Unfortunately ZX Paintbrush doesn't export to an ASM listing format which SP1 can use directly, but it can get close enough to make it practical to cut and paste its output into a suitable file. Here's a sample of its ASM output:
 
-```
+```z80
 ; ASM data file from a ZX-Paintbrush picture with 48 x 24 pixels (= 6 x 3 characters)
 
 ; line based output of pixel data:
@@ -215,7 +215,7 @@ The exported mask data looks similar.
 
 A few minutes with a text editor which can handle columns and this 48x24 pixel graphic with mask looks like this, which you can save to a file called *mothership_sprite.asm*:
 
-```
+```z80
 SECTION rodata_user
 
  defb @11111111, @00000000
@@ -453,7 +453,7 @@ This should appear familiar by now: we have 6 columns (i.e. 6*8=48 pixels) of 24
 
 Here's the *mothership_masked.c* listing which shows the sprite:
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <z80.h>
@@ -504,7 +504,7 @@ This 24 pixel high sprite needs to be created as 4 character cells high.
 
 Compile with:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy mothership_masked.c mothership_sprite.asm -o mothership_masked -create-app
 ```
 
@@ -522,7 +522,7 @@ Because a sprite can be of arbitrary size, and can therefore have an arbitrary n
 
 Here's a modified version of the bubble program which colours the sprite:
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <z80.h>
@@ -573,7 +573,7 @@ int main(void)
 
 Save this to a file called *bubble_col.c*. The compile line is:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy bubble_col.c bubble_masked_sprite.asm -o bubble_col -create-app
 ```
 
@@ -583,7 +583,7 @@ In this example we colour the sprite at the point it's created. The iterator cal
 
 We'll look at one more example before we finish: let's make the mothership land, with its antennae changing colour as it does so. Save this listing to *mothership_landing.c*:
 
-```
+```c
 #pragma output REGISTER_SP = 0xD000
 
 #include <z80.h>
@@ -671,7 +671,7 @@ int main(void)
 
 The compile line is:
 
-```
+```sh
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy mothership_landing.c mothership_sprite.asm -o mothership_landing -create-app
 ```
 
@@ -683,7 +683,7 @@ At the top of the main loop there's another call to *sp1_IterateSprChar()*, this
 
 There's another iterator in there too - this call:
 
-```
+```c
 sp1_IterateUpdateSpr(mothership_sprite,invalidateAntenna);
 ```
 
@@ -697,7 +697,7 @@ Attention to detail is essential with SP1, and Spectrum programming in general. 
 
 The [comment in the SP1 header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/sp1.h#L87) tells us that the char struct's pointer to the update structure is big endian (the Z80 is little endian so we need to swap the bytes) and only valid if the most significant byte of it isn't 0.  With all this in mind, the *changeAntennacolour()* function can be updated to this:
 
-```
+```c
 void changeAntennacolour(unsigned int count, struct sp1_cs *c)
 {
   if( count == 2 || count == 3 || count == 4 )

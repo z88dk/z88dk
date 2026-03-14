@@ -22,9 +22,7 @@ This is going to be a brief introduction. Using multiple files isn't complicated
 
 As always, we start simple. Here's a source file containing a *main()* function:
 
-```
-/* C source start */
-
+```c
 #include <stdio.h>
 
 extern unsigned char message[];
@@ -35,23 +33,17 @@ int main(void)
 
   return 0;
 }
-
-/* C source end */
 ```
 
 Save that into a file called *text_main.c*, then save this into a file called *text_data.c*:
 
-```
-/* C source start */
-
+```c
 unsigned char message[] = "Hello, world!";
-
-/* C source end */
 ```
 
 To compile both files and link them together into the final application just give both file names on the compile line:
 
-```
+```sh
 zcc +zx -vn -startup=0 -clib=sdcc_iy text_main.c text_data.c -o text -create-app
 ```
 
@@ -63,14 +55,14 @@ Two filenames on the command line isn't a problem, but as a project gets bigger 
 
 Create a file called *text.lst* containing these lines:
 
-```
+```txt
 text_main.c
 text_data.c
 ```
 
 and compile with the list file, indicated by the preceding '@' symbol:
 
-```
+```sh
 zcc +zx -vn -startup=0 -clib=sdcc_iy @text.lst -o text -create-app
 ```
 
@@ -78,14 +70,14 @@ It does what you'd expect. You can use filenames containing subdirectory names, 
 
 You can also add list files into list files by using the same '@' symbol, so your first list file might contain:
 
-```
+```txt
 game_code.c
 @data/data.lst
 ```
 
 That's one C file and a second list file in the *data/* subdirectory. The *data/data.lst* file might contain:
 
-```
+```txt
 graphics_data.c
 music_data.c
 text_data.c
@@ -99,7 +91,7 @@ This guide isn't the place to introduce Z80 assembly language or how it can be u
 
 Copy this assembly language into a file called *text_data.asm*:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _message
@@ -111,7 +103,7 @@ defb 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x41, 0x53, 0x4D, 0x00
 
 Build the application with:
 
-```
+```sh
 zcc +zx -vn -startup=0 -clib=sdcc_iy text_main.c text_data.asm -o text -create-app
 ```
 
@@ -123,7 +115,7 @@ Once a project gets to a reasonable size it makes sense to start using makefiles
 
 We need another assembly language file to play with, so save this text to a file called *text_via_makefile.asm*:
 
-```
+```z80
 SECTION rodata_user
 
 PUBLIC _message
@@ -135,7 +127,7 @@ defm "This version is built from a makefile", 0x00
 
 Here's a sample makefile which will build the program, resulting in a TAP file:
 
-```
+```makefile
 CC=zcc
 AS=zcc
 TARGET=+zx
@@ -179,7 +171,7 @@ This isn't the place to learn about makefiles, and since everyone does it a bit 
 
 What we're putting together here is called a *split build*, which is where the various parts of a software package are (at least potentially) built separately from each other. The key with split builds is to ensure all components of the software use the same tools, flags, options, and so on.
 
-```
+```makefile
 CC=zcc
 AS=zcc
 TARGET=+zx
@@ -189,19 +181,19 @@ CRT=4
 
 Firstly, we use the Z88DK front end utility *zcc* as both the C compiler (which it fronts for *sdcc*) and the assembler (which it fronts for *z80asm*). Using the underlying tools is perfectly possible, but *zcc* makes life a lot easier, at least at first. We also define our [target platform](01_GettingStarted.md#build-a-compile-command) and [CRT](02_HelloWorld.md#crts-for-reference) up front to make them easier to change should we want to.
 
-```
+```makefile
 PRAGMA_FILE=zpragma.inc
 ```
 
 We define a separate file for our *pragma* declarations. We haven't seen pragmas yet. They will be introduced in the [next article](06_SomeDetails.md#changing-the-memory-layout) where they are embedded into the C source. When using split builds it's easier to put them all into a separate file used by all the tools. This ensures they're used consistently. Don't worry about this detail until you need pragmas. For now just create an empty file to allow the build to progress:
 
-```
+```sh
 > touch zpragma.inc
 ```
 
 Next we set up the flags for the compile, link and assembler tools:
 
-```
+```makefile
 C_OPT_FLAGS=-SO3 --max-allocs-per-node200000
 
 CFLAGS=$(TARGET) $(VERBOSITY) -c $(C_OPT_FLAGS) -compiler sdcc -clib=sdcc_iy -pragma-include:$(PRAGMA_FILE)
@@ -211,21 +203,21 @@ ASFLAGS=$(TARGET) $(VERBOSITY) -c
 
 To keep all pieces of a split build consistent we specifically state the compiler we want to use (SDCC) together with the C library (sdcc_iy). The C library option needs to be given to both the compiler and linker. The optimisation flags are separate so they can be switched off easily.
 
-```
+```makefile
 %.o: %.c $(PRAGMA_FILE)
 	$(CC) $(CFLAGS) -o $@ $<
 ```
 
 This is the standard *C-file-to-Object-file* implicit compilation rule. We've added the pragma file to it so all C files will be recompiled if the pragma file changes.
 
-```
+```makefile
 %.o: %.asm
 	$(AS) $(ASFLAGS) -o $@ $<
 ```
 
 This is an additional rule which defines how to create an object file from an assembly language file. We just call the assembler with the correct flags. (Actually, GNU make's implicit rule works fine if you don't mind your assembly language files having .s extensions.)
 
-```
+```makefile
 $(EXEC) : $(OBJECTS)
 	 $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
 ```
@@ -234,7 +226,7 @@ Finally this is the build line which uses *zcc* to bring together the built obje
 
 The output from this makefile is:
 
-```
+```sh
 >make all
 zcc +zx -vn -c -SO3 --max-allocs-per-node200000 -compiler sdcc -clib=sdcc_iy -pragma-include:zpragma.inc -o text_main.o text_main.c
 zcc +zx -vn -c -o text_via_makefile.o text_via_makefile.asm

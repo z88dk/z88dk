@@ -16,19 +16,19 @@ This type of interaction with input devices is supported in Z88DK using the _inp
 
 The input library header file is [here](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input.h):
 
-```
+```txt
 include/_DEVELOPMENT/common/input.h
 ```
 
 and a quick skim read of that file will show that when you're writing for the ZX Spectrum it #include's the [Spectrum specific file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input/input_zx.h):
 
-```
+```txt
 include/_DEVELOPMENT/common/input/input_zx.h
 ```
 
 There isn't a great deal in the way of documentation in the file, so a bit of deduction and detective work is going to be required. However, it's worth mentioning that the assembly language routines which implement these functions _do_ carry descriptions of what they do. See the ASM files [here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/input/zx/z80):
 
-```
+```txt
 libsrc/newlib/input/zx/z80
 ```
 
@@ -36,9 +36,7 @@ libsrc/newlib/input/zx/z80
 
 As before, we start with something simple and get it compiling. Here's something simple:
 
-```
-/* C source start */
-
+```c
 #include <arch/zx.h>
 #include <input.h>
 
@@ -56,13 +54,11 @@ int main(void)
     in_wait_nokey();
   }
 }
-
-/* C source end */
 ```
 
 Compile this with what should now be becoming our familiar compile line:
 
-```
+```sh
 zcc +zx -vn -startup=31 -clib=sdcc_iy key_press.c -o key_press -create-app
 ```
 
@@ -72,9 +68,7 @@ This program uses the zx_border() library routine we've seen before to change th
 
 Let's see how to find which key is pressed. This time we'll use stdio to print the information we're seeing from the keyboard:
 
-```
-/* C source start */
-
+```c
 #include <stdio.h>
 #include <input.h>
 
@@ -91,13 +85,11 @@ int main(void)
     printf("Key pressed is %c (0x%02X)\n", c, c);
   }
 }
-
-/* C source end */
 ```
 
 This program needs stdio, so we have to compile with a C runtime which supports it. crt0 will do nicely:
 
-```
+```sh
 zcc +zx -vn -startup=0 -clib=sdcc_iy key_value.c -o key_value -create-app
 ```
 
@@ -111,7 +103,7 @@ These limitations mean in_inkey() is only useful in certain situations. For an a
 
 For faster and more accurate information on what's happening on the keyboard we need to switch to examining _scancodes_. A scancode is a single number which represents the physical state of the keyboard when a single character is entered. Each scancode is a 16 bit, predefined and hardcoded number, and some of the common ones are listed in input_zx.h, like this:
 
-```
+```c
 #define IN_KEY_SCANCODE_a      0x01fd
 #define IN_KEY_SCANCODE_b      0x107f
 #define IN_KEY_SCANCODE_c      0x08fe
@@ -121,9 +113,7 @@ For faster and more accurate information on what's happening on the keyboard we 
 
 You might reasonably ask what the point is. After all, 65 is a unique number and since that's the ASCII code for 'A', why not use that instead of 0x01FD? The answer is _speed_. The scancodes directly reflect the values returned by the hardware when the keyboard is scanned. Why the scancode numbers are what they are is tied into the layout of the keyboard matrix and is irrelevant to the programmer. The important point is that the keyboard hardware can be examined and checked to see if it matches a given scancode very quickly. That is what the in_key_pressed(uint16_t) function does: you give it a scancode and it returns a value indicating whether the corresponding key is currently up or down. Here's an example which reads 5 keys and shows the results:
 
-```
-/* C source start */
-
+```c
 #include <stdio.h>
 #include <input.h>
 #include <arch/zx.h>
@@ -142,13 +132,11 @@ int main(void)
     printf("Scan for <sp> returns 0x%04X\n\n", in_key_pressed( IN_KEY_SCANCODE_SPACE ));
   }
 }
-
-/* C source end */
 ```
 
 This uses a control code to position the text so we need to compile it with a control code supporting C runtime, such as crt1:
 
-```
+```sh
 zcc +zx -vn -startup=1 -clib=sdcc_iy scancodes.c -o scancodes -create-app
 ```
 
@@ -160,9 +148,7 @@ An interesting aside: with some PC keyboards and an emulator this program displa
 
 The list of scancodes in input_zx.h is handy for simple cases where you know in advance which key you're looking for, but it doesn't list all the possible permutations of keys, and doesn't handle cases where you're looking for shifted key presses. For these cases you can programmatically find the appropriate scancode. For example:
 
-```
-/* C source start */
-
+```c
 #include <stdio.h>
 #include <input.h>
 #include <arch/zx.h>
@@ -180,8 +166,6 @@ int main(void)
     printf("Scan for $ returns 0x%04X\n",   in_key_pressed( dollar_scancode ));
   }
 }
-
-/* C source end */
 ```
 
 The in_key_scancode() function returns the 16 bit scancode value for the given character, which in this case is the dollar symbol (symbol shifted '4'). The scancode value for dollar is, apparently, 0x48F7, but that's of no real interest, it's just a number. But once the program has that number it can be used in the call to in_key_pressed(). The program only indicates the $ key is pressed when both symbol shift and '4' are down.
@@ -190,9 +174,7 @@ The in_key_scancode() function returns the 16 bit scancode value for the given c
 
 There are some scancode combinations which use the shift keys which you need to build yourself. The top bit of a scancode value indicates the scancode should yield true if the CAPS key is down, and the second top bit indicates the scancode should yield true if the SYM key is down. So you can build your own scancode for BREAK, which is CAPS+Space like this:
 
-```
-/* C source start */
-
+```c
 #include <stdio.h>
 #include <input.h>
 #include <arch/zx.h>
@@ -210,8 +192,6 @@ int main(void)
     printf("Scan for <break> returns 0x%04X\n",  in_key_pressed( break_scancode ));
   }
 }
-
-/* C source end */
 ```
 
 ## Joysticks
@@ -220,9 +200,7 @@ The Z88DK input library supports a variety of joysticks, all in the same way. Yo
 
 Here's an example for my Kempston joystick (actually a PlayStation3 Gamepad which Fuse is quite happy with):
 
-```
-/* C source start */
-
+```c
 #include <stdio.h>
 #include <input.h>
 #include <arch/zx.h>
@@ -241,23 +219,21 @@ int main(void)
     printf("Joystick input value is 0x%04X\n", kempston_input);
   }
 }
-
-/* C source end */
 ```
 
 Compile with:
 
-```
+```sh
 zcc +zx -vn -startup=1 -clib=sdcc_iy joy_input.c -o joy_input -create-app
 ```
 
 This prints 0x0001 when the stick is moved up, 0x0002 when it's moved down, 0x0004 when it's moved left and 0x0008 when it's moved right. Those values are defined as constants in the [input header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/input.h).
 
-```
+```txt
 include/_DEVELOPMENT/common/input.h
 ```
 
-```
+```c
 #define IN_STICK_FIRE    0x80
 #define IN_STICK_FIRE_1  0x80
 #define IN_STICK_FIRE_2  0x40
@@ -275,7 +251,7 @@ Moving the stick to one of the diagonal positions adds those values together, so
 
 All joysticks return the same format 16-bit value but may differ in the number of fire buttons that can be detected.  The assembler files for these other joysticks are well commented, and are [here](https://github.com/z88dk/z88dk/tree/master/libsrc/newlib/input/zx/z80):
 
-```
+```txt
 libsrc/newlib/input/zx/z80/
 ```
 
@@ -285,9 +261,7 @@ Also worth noting is that automatic joystick detection is not supported in Z88DK
 
 Let's finish where we started, by playing with the border. Here's a program which changes the border colour based on the joystick movements. Moving to the diagonal positions and/or pressing fire makes the border swirl with colour.
 
-```
-/* C source start */
-
+```c
 #include <input.h>
 #include <arch/zx.h>
 
@@ -317,13 +291,11 @@ int main(void)
       zx_border(INK_GREEN);
   }
 }
-
-/* C source end */
 ```
 
 Compile with:
 
-```
+```sh
 zcc +zx -vn -startup=31 -clib=sdcc_iy joy_border.c -o joy_border -create-app
 ```
 
