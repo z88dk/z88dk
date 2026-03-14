@@ -128,6 +128,8 @@ defm "This version is built from a makefile", 0x00
 Here's a sample makefile which will build the program, resulting in a TAP file:
 
 ```makefile
+.RECIPEPREFIX = >
+
 CC=zcc
 AS=zcc
 TARGET=+zx
@@ -150,28 +152,28 @@ OBJECTS = text_main.o \
           text_via_makefile.o
 
 %.o: %.c $(PRAGMA_FILE)
-	$(CC) $(CFLAGS) -o $@ $<
+> $(CC) $(CFLAGS) -o $@ $<
 
 %.o: %.asm
-	$(AS) $(ASFLAGS) -o $@ $<
+> $(AS) $(ASFLAGS) -o $@ $<
 
 all : $(EXEC)
 
 $(EXEC) : $(OBJECTS)
-	 $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
+>  $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
 
 .PHONY: clean
 clean:
-	rm -f *.o *.bin *.tap *.map zcc_opt.def *~ /tmp/tmpXX*
+> rm -f *.o *.bin *.tap *.map zcc_opt.def *~ /tmp/tmpXX*
 ```
-
-**If you copy and paste the makefile example above, ensure you end up with tab characters in the rule lines, not spaces.**
 
 This isn't the place to learn about makefiles, and since everyone does it a bit differently we'll just review the salient points.
 
 What we're putting together here is called a *split build*, which is where the various parts of a software package are (at least potentially) built separately from each other. The key with split builds is to ensure all components of the software use the same tools, flags, options, and so on.
 
 ```makefile
+.RECIPEPREFIX = >
+
 CC=zcc
 AS=zcc
 TARGET=+zx
@@ -205,21 +207,21 @@ To keep all pieces of a split build consistent we specifically state the compile
 
 ```makefile
 %.o: %.c $(PRAGMA_FILE)
-	$(CC) $(CFLAGS) -o $@ $<
+> $(CC) $(CFLAGS) -o $@ $<
 ```
 
 This is the standard *C-file-to-Object-file* implicit compilation rule. We've added the pragma file to it so all C files will be recompiled if the pragma file changes.
 
 ```makefile
 %.o: %.asm
-	$(AS) $(ASFLAGS) -o $@ $<
+> $(AS) $(ASFLAGS) -o $@ $<
 ```
 
 This is an additional rule which defines how to create an object file from an assembly language file. We just call the assembler with the correct flags. (Actually, GNU make's implicit rule works fine if you don't mind your assembly language files having .s extensions.)
 
 ```makefile
 $(EXEC) : $(OBJECTS)
-	 $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
+> $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
 ```
 
 Finally this is the build line which uses *zcc* to bring together the built object files and create a Spectrum application from them.

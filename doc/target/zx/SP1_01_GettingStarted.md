@@ -27,32 +27,32 @@ SECTION rodata_user
 
 PUBLIC _circle
 
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
 
 ._circle
-	defb @00111100
-	defb @01000010
-	defb @10000001
-	defb @10000001
-	defb @10000001
-	defb @10000001
-	defb @01000010
-	defb @00111100
+    defb @00111100
+    defb @01000010
+    defb @10000001
+    defb @10000001
+    defb @10000001
+    defb @10000001
+    defb @01000010
+    defb @00111100
 
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
 
 ```
 
@@ -182,32 +182,32 @@ On the subject of pixel positioning, it's worth a look at how SP1 positions a sp
 "What," you might ask, "is at address 49,999?" because whatever is there is going to end up in the display and the user will see it! Recall our sprite data, in assembly language:
 
 ```z80
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
 
 ._circle
-	defb @00111100
-	defb @01000010
-	defb @10000001
-	defb @10000001
-	defb @10000001
-	defb @10000001
-	defb @01000010
-	defb @00111100
+    defb @00111100
+    defb @01000010
+    defb @10000001
+    defb @10000001
+    defb @10000001
+    defb @10000001
+    defb @01000010
+    defb @00111100
 
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
-	defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
+    defb @00000000
 
 ```
 

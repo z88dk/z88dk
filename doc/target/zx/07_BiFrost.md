@@ -228,17 +228,19 @@ cat bifrost_loader.tap bifrost_01_code.tap bifrostl.tap > bifrost_01.tap
 This is all a bit fussy to keep typing, so maybe it's time for a makeifle:
 
 ```makefile
+.RECIPEPREFIX = >
+
 all: bifrost_01.tap
 
 bifrost_01_CODE.bin: bifrost_01.c ctile.asm coloured_ball.ctile
-	zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_01.c ctile.asm -o bifrost_01
+> zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_01.c ctile.asm -o bifrost_01
 
 bifrost_01_code.tap: bifrost_01_CODE.bin
-	z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
-	z88dk-appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
+> z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
+> z88dk-appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
 
 bifrost_01.tap: bifrost_01_code.tap
-	cat bifrost_loader.tap bifrost_01_code.tap bifrostl.tap > bifrost_01.tap
+> cat bifrost_loader.tap bifrost_01_code.tap bifrostl.tap > bifrost_01.tap
 ```
 
 Clearly this makefile could be made more streamlined, or more generic, but it works for this example. Save this to a file called 'makefile' and run 'make' (assuming GNU make is installed). The resultant TAP file will place a ball towards the top left corner of the screen.
@@ -366,17 +368,19 @@ int main(void)
 and its makefile:
 
 ```makefile
+.RECIPEPREFIX = >
+
 all: bifrost_02.tap
 
 bifrost_02_CODE.bin: bifrost_02.c ctile.asm coloured_ball.ctile
-	zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_02.c ctile.asm -o bifrost_02
+> zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_02.c ctile.asm -o bifrost_02
 
 bifrost_02_code.tap: bifrost_02_CODE.bin
-	z88dk-appmake +zx -b bifrost_02_CODE.bin -o bifrost_02_code.tap --noloader --org 32768 --blockname bifrost_02_code
-	z88dk-appmake +zx -b bifrost_02_BIFROSTH.bin -o bifrosth.tap --noloader --org 57047 --blockname bifrosth
+> z88dk-appmake +zx -b bifrost_02_CODE.bin -o bifrost_02_code.tap --noloader --org 32768 --blockname bifrost_02_code
+> z88dk-appmake +zx -b bifrost_02_BIFROSTH.bin -o bifrosth.tap --noloader --org 57047 --blockname bifrosth
 
 bifrost_02.tap: bifrost_02_code.tap
-	cat bifrost_loader.tap bifrost_02_code.tap bifrosth.tap > bifrost_02.tap
+> cat bifrost_loader.tap bifrost_02_code.tap bifrosth.tap > bifrost_02.tap
 ```
 
 Let's just look at the updates we've made for high resolution mode.
