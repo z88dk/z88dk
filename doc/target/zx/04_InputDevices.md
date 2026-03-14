@@ -40,19 +40,18 @@ As before, we start with something simple and get it compiling. Here's something
 #include <arch/zx.h>
 #include <input.h>
 
-int main(void)
-{
+int main ( void ) {
 
-  while( 1 )
-  {
-    zx_border(INK_WHITE);
+  while (1) {
 
+    zx_border( INK_WHITE );
     in_wait_key();
 
-    zx_border(INK_BLUE);
-
+    zx_border( INK_BLUE );
     in_wait_nokey();
+
   }
+
 }
 ```
 
@@ -62,9 +61,9 @@ Compile this with what should now be becoming our familiar compile line:
 zcc +zx -vn -startup=31 -clib=sdcc_iy key_press.c -o key_press -create-app
 ```
 
-We use the new library (sdcc_iy) and crt number "31", which you'll recall is the one which doesn't set up a terminal driver. We don't need it for this example.
+We use the new library `sdcc_iy` and crt number `31`, which you'll recall is the one which doesn't set up a terminal driver. We don't need it for this example.
 
-This program uses the zx_border() library routine we've seen before to change the border colour, then calls the input library function which sits and waits for a key to be pressed. Any key will do including the shift keys; the key which is pressed isn't returned. When a key is pressed the border is turned blue, then, since we know at least one key is currently down, we call the input library function which waits for _no_ key to be pressed. When the user releases the key (strictly speaking, when they release _all_ keys they might be holding) the no-key function returns and we go round the loop. Result: the border is white when the keyboard is untouched, and turns blue when any key is being held down.
+This program uses the `zx_border()` library routine we've seen before to change the border colour, then calls the input library function which sits and waits for a key to be pressed. Any key will do including the shift keys; the key which is pressed isn't returned. When a key is pressed the border is turned blue, then, since we know at least one key is currently down, we call the input library function which waits for _no_ key to be pressed. When the user releases the key (strictly speaking, when they release _all_ keys they might be holding) the no-key function returns and we go round the loop. Result: the border is white when the keyboard is untouched, and turns blue when any key is being held down.
 
 Let's see how to find which key is pressed. This time we'll use stdio to print the information we're seeing from the keyboard:
 
@@ -72,18 +71,19 @@ Let's see how to find which key is pressed. This time we'll use stdio to print t
 #include <stdio.h>
 #include <input.h>
 
-int main(void)
-{
-  unsigned char c;
+int main ( void ) {
 
-  while( 1 )
-  {
-    in_wait_key();
-    c = in_inkey();
-    in_wait_nokey();
+    unsigned char c;
 
-    printf("Key pressed is %c (0x%02X)\n", c, c);
-  }
+    while (1) {
+
+        in_wait_key();
+        c = in_inkey();
+        in_wait_nokey();
+
+        printf( "Key pressed is %c (0x%02X)\n", c, c );
+
+    }
 }
 ```
 
@@ -93,15 +93,15 @@ This program needs stdio, so we have to compile with a C runtime which supports 
 zcc +zx -vn -startup=0 -clib=sdcc_iy key_value.c -o key_value -create-app
 ```
 
-The in_inkey() function examines the keyboard and immediately returns a code relating to the key being pressed. So in this case we wait for a key to be pressed using in_wait_key(), then read the key using in_inkey(), then wait for the key to be released using in_wait_nokey() before showing the result.
+The `in_inkey()` function examines the keyboard and immediately returns a code relating to the key being pressed. So in this case we wait for a key to be pressed using `in_wait_key()`, then read the key using `in_inkey()`, then wait for the key to be released using `in_wait_nokey()` before showing the result.
 
-For normal keys the in_inkey() function returns the ASCII code of the key being pressed.  If no keys are pressed, it returns 0.  If more than one key is pressed it also returns 0.  The shift keys, if pressed on their own, do not register and also cause in_inkey() to return 0.  However, if the shift keys are pressed in combination with regular keys, the shifted ascii value will be returned.
+For normal keys the `in_inkey()` function returns the ASCII code of the key being pressed.  If no keys are pressed, it returns 0. If more than one key is pressed it also returns 0. The shift keys, if pressed on their own, do not register and also cause in_inkey() to return 0. However, if the shift keys are pressed in combination with regular keys, the shifted ascii value will be returned.
 
-These limitations mean in_inkey() is only useful in certain situations. For an accurate picture of what's happening on the keyboard we need to turn to _scancodes_.
+These limitations mean `in_inkey()` is only useful in certain situations. For an accurate picture of what's happening on the keyboard we need to turn to _scancodes_.
 
 ## Scancodes
 
-For faster and more accurate information on what's happening on the keyboard we need to switch to examining _scancodes_. A scancode is a single number which represents the physical state of the keyboard when a single character is entered. Each scancode is a 16 bit, predefined and hardcoded number, and some of the common ones are listed in input_zx.h, like this:
+For faster and more accurate information on what's happening on the keyboard we need to switch to examining _scancodes_. A scancode is a single number which represents the physical state of the keyboard when a single character is entered. Each scancode is a 16 bit, predefined and hardcoded number, and some of the common ones are listed in `input_zx.h`, like this:
 
 ```c
 #define IN_KEY_SCANCODE_a      0x01fd
@@ -111,30 +111,32 @@ For faster and more accurate information on what's happening on the keyboard we 
 ...
 ```
 
-You might reasonably ask what the point is. After all, 65 is a unique number and since that's the ASCII code for 'A', why not use that instead of 0x01FD? The answer is _speed_. The scancodes directly reflect the values returned by the hardware when the keyboard is scanned. Why the scancode numbers are what they are is tied into the layout of the keyboard matrix and is irrelevant to the programmer. The important point is that the keyboard hardware can be examined and checked to see if it matches a given scancode very quickly. That is what the in_key_pressed(uint16_t) function does: you give it a scancode and it returns a value indicating whether the corresponding key is currently up or down. Here's an example which reads 5 keys and shows the results:
+You might reasonably ask what the point is. After all, 65 is a unique number and since that's the ASCII code for 'A', why not use that instead of 0x01FD? The answer is _speed_. The scancodes directly reflect the values returned by the hardware when the keyboard is scanned. Why the scancode numbers are what they are is tied into the layout of the keyboard matrix and is irrelevant to the programmer. The important point is that the keyboard hardware can be examined and checked to see if it matches a given scancode very quickly. That is what the `in_key_pressed(uint16_t)` function does: you give it a scancode and it returns a value indicating whether the corresponding key is currently up or down. Here's an example which reads 5 keys and shows the results:
 
 ```c
 #include <stdio.h>
 #include <input.h>
 #include <arch/zx.h>
 
-int main(void)
-{
-  zx_cls(PAPER_WHITE);
-  while( 1 ) {
+int main ( void ) {
 
-    printf("\x16\x01\x01");
+    zx_cls( PAPER_WHITE) ;
+    while (1) {
 
-    printf("Scan for q returns 0x%04X\n",   in_key_pressed( IN_KEY_SCANCODE_q ));
-    printf("Scan for a returns 0x%04X\n",   in_key_pressed( IN_KEY_SCANCODE_a ));
-    printf("Scan for o returns 0x%04X\n",   in_key_pressed( IN_KEY_SCANCODE_o ));
-    printf("Scan for p returns 0x%04X\n",   in_key_pressed( IN_KEY_SCANCODE_p ));
-    printf("Scan for <sp> returns 0x%04X\n\n", in_key_pressed( IN_KEY_SCANCODE_SPACE ));
+        printf( "\x16\x01\x01" );
+
+        printf( "Scan for q returns 0x%04X\n"     , in_key_pressed( IN_KEY_SCANCODE_q ) );
+        printf( "Scan for a returns 0x%04X\n"     , in_key_pressed( IN_KEY_SCANCODE_a ) );
+        printf( "Scan for o returns 0x%04X\n"     , in_key_pressed( IN_KEY_SCANCODE_o ) );
+        printf( "Scan for p returns 0x%04X\n"     , in_key_pressed( IN_KEY_SCANCODE_p ) );
+        printf( "Scan for <sp> returns 0x%04X\n\n", in_key_pressed( IN_KEY_SCANCODE_SPACE ) );
+
   }
+
 }
 ```
 
-This uses a control code to position the text so we need to compile it with a control code supporting C runtime, such as crt1:
+This uses a control code to position the text so we need to compile it with a control code supporting C runtime, such as `crt1`:
 
 ```sh
 zcc +zx -vn -startup=1 -clib=sdcc_iy scancodes.c -o scancodes -create-app
@@ -153,22 +155,24 @@ The list of scancodes in input_zx.h is handy for simple cases where you know in 
 #include <input.h>
 #include <arch/zx.h>
 
-int main(void)
-{
-  uint16_t dollar_scancode = in_key_scancode('$');
+int main ( void ) {
 
-  zx_cls(PAPER_WHITE);
-  while( 1 ) {
+    uint16_t dollar_scancode = in_key_scancode('$');
 
-    printf("\x16\x01\x01");
+    zx_cls( PAPER_WHITE );
+    while (1) {
 
-    printf("Scancode for '$' is 0x%04X\n\n", dollar_scancode);
-    printf("Scan for $ returns 0x%04X\n",   in_key_pressed( dollar_scancode ));
+        printf( "\x16\x01\x01" );
+
+        printf( "Scancode for '$' is 0x%04X\n\n", dollar_scancode );
+        printf( "Scan for $ returns 0x%04X\n"   , in_key_pressed( dollar_scancode ) );
+
   }
+
 }
 ```
 
-The in_key_scancode() function returns the 16 bit scancode value for the given character, which in this case is the dollar symbol (symbol shifted '4'). The scancode value for dollar is, apparently, 0x48F7, but that's of no real interest, it's just a number. But once the program has that number it can be used in the call to in_key_pressed(). The program only indicates the $ key is pressed when both symbol shift and '4' are down.
+The `in_key_scancode()` function returns the 16 bit scancode value for the given character, which in this case is the dollar symbol (symbol shifted '4'). The scancode value for dollar is, apparently, 0x48F7, but that's of no real interest, it's just a number. But once the program has that number it can be used in the call to `in_key_pressed()`. The program only indicates the $ key is pressed when both symbol shift and '4' are down.
 
 ## Building Scancodes
 
@@ -179,18 +183,18 @@ There are some scancode combinations which use the shift keys which you need to 
 #include <input.h>
 #include <arch/zx.h>
 
-int main(void)
-{
-  /* Space, plus top bit set means CAPS */
-  uint16_t break_scancode = IN_KEY_SCANCODE_SPACE | 0x8000;
+int main ( void ) {
 
-  zx_cls(PAPER_WHITE);
-  while( 1 ) {
+    // Space, plus top bit set means CAPS
+    uint16_t break_scancode = IN_KEY_SCANCODE_SPACE | 0x8000;
 
-    printf("\x16\x01\x01");
+    zx_cls( PAPER_WHITE );
+    while (1) {
 
-    printf("Scan for <break> returns 0x%04X\n",  in_key_pressed( break_scancode ));
-  }
+        printf( "\x16\x01\x01" );
+        printf( "Scan for <break> returns 0x%04X\n", in_key_pressed( break_scancode ) );
+
+    }
 }
 ```
 
@@ -205,19 +209,20 @@ Here's an example for my Kempston joystick (actually a PlayStation3 Gamepad whic
 #include <input.h>
 #include <arch/zx.h>
 
-int main(void)
-{
-  uint16_t kempston_input;
+int main ( void ) {
 
-  zx_cls(PAPER_WHITE);
-  while( 1 ) {
+    uint16_t kempston_input;
 
-    kempston_input = in_stick_kempston();
+    zx_cls( PAPER_WHITE );
+    while (1) {
 
-    printf("\x16\x01\x01");
+        kempston_input = in_stick_kempston();
 
-    printf("Joystick input value is 0x%04X\n", kempston_input);
+        printf( "\x16\x01\x01" );
+        printf( "Joystick input value is 0x%04X\n", kempston_input );
+
   }
+
 }
 ```
 
@@ -265,31 +270,33 @@ Let's finish where we started, by playing with the border. Here's a program whic
 #include <input.h>
 #include <arch/zx.h>
 
-int main(void)
-{
-  uint16_t kempston_input;
+int main ( void ) {
 
-  zx_cls(PAPER_WHITE);
-  zx_border(INK_WHITE);
-  while( 1 ) {
+    uint16_t kempston_input;
 
-    kempston_input = in_stick_kempston();
+    zx_cls( PAPER_WHITE );
+    zx_border( INK_WHITE );
+    while (1) {
 
-    if( kempston_input & IN_STICK_UP )
-      zx_border(INK_BLACK);
+        kempston_input = in_stick_kempston();
 
-    if( kempston_input & IN_STICK_DOWN )
-      zx_border(INK_BLUE);
+        if ( kempston_input & IN_STICK_UP )
+            zx_border( INK_BLACK );
 
-    if( kempston_input & IN_STICK_LEFT )
-      zx_border(INK_RED);
+        if ( kempston_input & IN_STICK_DOWN )
+            zx_border( INK_BLUE );
 
-    if( kempston_input & IN_STICK_RIGHT )
-      zx_border(INK_MAGENTA);
+        if ( kempston_input & IN_STICK_LEFT )
+            zx_border( INK_RED );
 
-    if( kempston_input & IN_STICK_FIRE )
-      zx_border(INK_GREEN);
+        if ( kempston_input & IN_STICK_RIGHT )
+            zx_border( INK_MAGENTA );
+
+        if ( kempston_input & IN_STICK_FIRE )
+            zx_border( INK_GREEN );
+
   }
+
 }
 ```
 

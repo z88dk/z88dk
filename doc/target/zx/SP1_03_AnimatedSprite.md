@@ -194,9 +194,9 @@ The individual frames are labelled in the listing, but only for information purp
 
 Notice how each frame is separated from the next with 8 zero bytes. As discussed in the [first article](SP1_01_GettingStarted.md#pixel-positioning) in this series, each sprite needs to have 7 zero bytes *before* it in memory, and also 8 zero bytes *after* it, in order to facilitate precise pixel positioning. This requirement persists for individual sprite animation frames, and when sprite frames are positioned sequentially in memory, as they are here, it's convenient to use the same 8 zero bytes as the *after* bytes for one frame and the *before* bytes for the following frame. This technique saves some memory.
 
-Finally, take note that given this layout each frame is located 16 bytes higher in memory than the previous one. For example, label *runner_f2* will assemble to be 16 greater than label *runner_f1*, those being the 8 bytes of data for frame 1, plus the 8 bytes of zeros which separate frame 1 from frame 2. This is important because this value of *16 bytes* becomes a sort of *magic number* when we get to the code in a moment.
+Finally, take note that given this layout each frame is located 16 bytes higher in memory than the previous one. For example, label `runner_f2` will assemble to be 16 greater than label `runner_f1`, those being the 8 bytes of data for frame 1, plus the 8 bytes of zeros which separate frame 1 from frame 2. This is important because this value of *16 bytes* becomes a sort of *magic number* when we get to the code in a moment.
 
-Save this listing to a file called *runner_sprite.asm*.
+Save this listing to a file called `runner_sprite.asm`.
 
 ## Animating the sprite
 
@@ -212,30 +212,30 @@ The SP1 library provides two ways to draw sprites on the screen using SP1, and n
 
 In previous example code in this series we've built and drawn sprites using the following combination of SP1 library calls:
 
-Firstly, we create the sprite structure in memory, passing the graphic data (at address *runner_f1* in the example we're building) into the sprite creation library function:
+Firstly, we create the sprite structure in memory, passing the graphic data (at address `runner_f1` in the example we're building) into the sprite creation library function:
 
 ```c
-sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)runner_f1, 0);
+sprite = sp1_CreateSpr( SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)runner_f1, 0 );
 ```
 
 Later in the program we place that sprite on screen using one of the sprite movement functions:
 
 ```c
-sp1_MoveSprPix(sprite, &full_screen, 0, x, y);
+sp1_MoveSprPix( sprite, &full_screen, 0, x, y );
 ```
 
-So far we've studiously ignored that 3rd argument to the movement function (the zero in the above line). That value is the key to one approach to animation in SP1; its purpose is to provide an offset value into the graphic data, that offset indicating which sprite frame we want drawn at the next screen refresh. So for our runner sprite we would start with an offset of 0, indicating we want the 1st frame (which is at address *runner_f1* as provided to the sp1_CreateSpr() call). For the next frame we'd want an offset of 16, which is the difference from address *runner_f1* to address *runner_f2*. Recall the *magic number* we discussed earlier? This is what it's for: it's the offset number of bytes from one frame in our animated sprite to the next. Each time we call the sprite movement routine we bump the offset by 16 bytes, until we've displayed the final frame, at which point we go back to an offset of 0 to make the animation loop round.
+So far we've studiously ignored that 3rd argument to the movement function (the zero in the above line). That value is the key to one approach to animation in SP1; its purpose is to provide an offset value into the graphic data, that offset indicating which sprite frame we want drawn at the next screen refresh. So for our runner sprite we would start with an offset of 0, indicating we want the 1st frame (which is at address `runner_f1` as provided to the sp1_CreateSpr() call). For the next frame we'd want an offset of 16, which is the difference from address `runner_f1` to address `runner_f2`. Recall the *magic number* we discussed earlier? This is what it's for: it's the offset number of bytes from one frame in our animated sprite to the next. Each time we call the sprite movement routine we bump the offset by 16 bytes, until we've displayed the final frame, at which point we go back to an offset of 0 to make the animation loop round.
 
 Only, there's a complication. Due to what might be termed a quirk in the SP1 interface, it's easier to set the offset value in the sprite structure directly than it is to use that third argument of the sprite movement call (which we leave at zero). So our code will actually do this:
 
 ```c
 sprite->frame = (void*)animation_offset;
-sp1_MoveSprPix(sprite, &full_screen, 0, x, y);
+sp1_MoveSprPix( sprite, &full_screen, 0, x, y );
 ```
 
 which does exactly what the SP1 interface was supposed to do, only avoiding the quirk. (This is one of those moments where it's better for an SP1 beginner to not worry about the detail too much and just do as advised. The underlying issue is discussed in [this forum thread](https://www.z88dk.org/forum/viewtopic.php?id=10277) if you're interested, and you can always come back to it when you understand more.)
 
-With this animation code in place, here's the program to walk our character across the screen. Save it to a file called 'runner.c':
+With this animation code in place, here's the program to walk our character across the screen. Save it to a file called `runner.c`:
 
 ```c
 #pragma output REGISTER_SP = 0xD000
@@ -248,38 +248,41 @@ extern unsigned char runner_f1[];
 
 struct sp1_Rect full_screen = {0, 0, 32, 24};
 
-int main(void)
-{
-  struct sp1_ss  *runner_sprite;
-  unsigned char   x;
-  unsigned char   animation_offset;
+int main ( void ) {
 
-  zx_border(INK_BLACK);
+    struct sp1_ss  *runner_sprite;
+    unsigned char   x;
+    unsigned char   animation_offset;
 
-  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
-                  INK_BLACK | PAPER_WHITE,
-                  ' ' );
-  sp1_Invalidate(&full_screen);
+    zx_border( INK_BLACK );
 
-  runner_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)runner_f1, 0);
+    sp1_Initialize(
+        SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+        INK_BLACK | PAPER_WHITE,
+        ' '
+    );
+    sp1_Invalidate( &full_screen );
 
-  sp1_AddColSpr(runner_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
+    runner_sprite = sp1_CreateSpr( SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)runner_f1, 0 );
 
-  x=0;
-  animation_offset=0;
-  while(1) {
-    runner_sprite->frame = (void*)animation_offset;
-    sp1_MoveSprPix(runner_sprite, &full_screen, 0, x++, 80);
+    sp1_AddColSpr( runner_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0 );
 
-    animation_offset+=16;
-    if( animation_offset == 128 )
-    {
-      animation_offset = 0;
+    x=0;
+    animation_offset=0;
+    while (1) {
+
+        runner_sprite->frame = (void*)animation_offset;
+        sp1_MoveSprPix( runner_sprite, &full_screen, 0, x++, 80 );
+
+        animation_offset+=16;
+        if ( animation_offset == 128 )
+            animation_offset = 0;
+
+        z80_delay_ms(50);
+        sp1_UpdateNow();
+
     }
 
-    z80_delay_ms(50);
-    sp1_UpdateNow();
-  }
 }
 ```
 
@@ -289,7 +292,7 @@ The compile line is:
 zcc +zx -vn -startup=31 -clib=sdcc_iy runner.c runner_sprite.asm -o runner -create-app
 ```
 
-The main loop starts with an animation offset of 0, so we start with the first frame. We increment the offset each time around the loop, resetting after the 8th frame of our animation so we go back to the beginning. Rather than using the interrupt to *HALT* the Z80 in order to slow the animation, this example (which doesn't enable interrupts) adds a pause to slow things down.
+The main loop starts with an animation offset of 0, so we start with the first frame. We increment the offset each time around the loop, resetting after the 8th frame of our animation so we go back to the beginning. Rather than using the interrupt to `HALT` the Z80 in order to slow the animation, this example (which doesn't enable interrupts) adds a pause to slow things down.
 
 ### State based animation
 
@@ -297,7 +300,7 @@ Sequential animation works well for sprites like the runner character where the 
 
 The sequential graphical frame approach we've seen, where we calculate offsets to the appropriate frame data, doesn't really work for this sort of animation. It's simpler to just store the absolute address of the graphical data for each state, and switch to using that data when the sprite moves to the state. This is the nature of the second approach the SP1 library uses for sprite animation.
 
-Let's look at a trivial example to see how the code changes. Save this code to a file called *arrow_sprite.asm*:
+Let's look at a trivial example to see how the code changes. Save this code to a file called `arrow_sprite.asm`:
 
 ```z80
 SECTION rodata_user
@@ -354,7 +357,7 @@ PUBLIC _arrow_right
 
 This is a simple 2-state sprite representing an arrow. One state has it facing left, the other has it facing right. The addresses of both frames are exported to the C.
 
-Here's the C code, which you should save to a file called *arrow_sprite.c*:
+Here's the C code, which you should save to a file called `arrow_sprite.c`:
 
 ```c
 #pragma output REGISTER_SP = 0xD000
@@ -367,52 +370,59 @@ Here's the C code, which you should save to a file called *arrow_sprite.c*:
 extern unsigned char arrow_left[];
 extern unsigned char arrow_right[];
 
-struct sp1_Rect full_screen = {0, 0, 32, 24};
+struct sp1_Rect full_screen = { 0, 0, 32, 24 };
 
-struct
-{
-  unsigned int   scan_code;
-  unsigned char *graphic;
-  signed   char  x_delta;
+struct {
+    unsigned int   scan_code;
+    unsigned char *graphic;
+    signed   char  x_delta;
 }
-arrow_state[] = { {IN_KEY_SCANCODE_o, arrow_left,  -1},
-                  {IN_KEY_SCANCODE_p, arrow_right, +1} };
+arrow_state[] = {
+                  { IN_KEY_SCANCODE_o, arrow_left,  -1 },
+                  { IN_KEY_SCANCODE_p, arrow_right, +1 }
+                };
 
-int main(void)
-{
-  struct sp1_ss  *arrow_sprite;
+int main ( void ) {
 
-  unsigned char   x     = 128;
-  unsigned char   state = 0;
+    struct sp1_ss  *arrow_sprite;
 
-  zx_border(INK_BLACK);
+    unsigned char   x     = 128;
+    unsigned char   state = 0;
 
-  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
-                  INK_BLACK | PAPER_WHITE,
-                  ' ' );
-  sp1_Invalidate(&full_screen);
+    zx_border( INK_BLACK );
 
-  arrow_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0);
-  sp1_AddColSpr(arrow_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
+    sp1_Initialize(
+        SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+        INK_BLACK | PAPER_WHITE,
+        ' '
+    );
+    sp1_Invalidate( &full_screen );
 
-  while( 1 ) {
-    unsigned char i;
+    arrow_sprite = sp1_CreateSpr( SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0 );
+    sp1_AddColSpr( arrow_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0 );
 
-    for( i=0; i<2; i++ )
-    {
-      if( in_key_pressed( arrow_state[i].scan_code ) == 0xFFFF ) {
-        state = i;
-        break;
-      }
+    while (1) {
+
+        unsigned char i;
+
+        for( i=0; i<2; i++ ) {
+
+            if( in_key_pressed( arrow_state[i].scan_code ) == 0xFFFF ) {
+                state = i;
+                break;
+            }
+
+        }
+
+        x += arrow_state[state].x_delta;
+
+        sp1_MoveSprPix( arrow_sprite, &full_screen, arrow_state[state].graphic, x, 80 );
+        z80_delay_ms(10);
+
+        sp1_UpdateNow();
+
     }
 
-    x += arrow_state[state].x_delta;
-
-    sp1_MoveSprPix(arrow_sprite, &full_screen, arrow_state[state].graphic, x, 80);
-    z80_delay_ms(10);
-
-    sp1_UpdateNow();
-  }
 }
 ```
 
@@ -422,7 +432,7 @@ Compile this example with:
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy arrow_sprite.c arrow_sprite.asm -o arrow_sprite -create-app
 ```
 
-The main difference to the sprite handling introduced here is that the sprite creation function, *sp1_CreateSpr()*, has a null value in its penultimate argument. We're not giving the graphical data address here. Instead we provide the graphic data address to the *sp1_MoveSprPix()* function in the third argument - it's not an offset here, we're effectively saying "move the sprite to this screen location, and show it using this graphical data."
+The main difference to the sprite handling introduced here is that the sprite creation function, `sp1_CreateSpr()`, has a null value in its penultimate argument. We're not giving the graphical data address here. Instead we provide the graphic data address to the `sp1_MoveSprPix()` function in the third argument - it's not an offset here, we're effectively saying "move the sprite to this screen location, and show it using this graphical data."
 
 The rest of the code should be simple to understand. We create a structure which holds a [key scancode](04_InputDevices.md#scancodes) which will allow us to detect user input and hence change state on cue, the graphical data to use when in the state, and a value to adjust the sprite's screen position by each time round the game loop while in the state. In this simple example we only have two such states for the sprite, moving left and moving right, so we have an array of 2 of these structures.
 

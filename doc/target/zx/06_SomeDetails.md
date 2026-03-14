@@ -66,9 +66,9 @@ So far in this series we've used the default values for the runtime configuratio
 
 ### Changing the Memory Layout
 
-There are several ways to change the default settings of a Z88DK compile but the simplest approach is to use special statements called _pragma_s to change these settings.  Pragmas are compiler specific extensions to the C language that can override the default CRT configuration at compile time.
+There are several ways to change the default settings of a Z88DK compile but the simplest approach is to use special statements called `pragma`s to change these settings.  Pragmas are compiler specific extensions to the C language that can override the default CRT configuration at compile time.
 
-For a large project, these pragmas can be collected into a single file, for example "zpragma.inc", and can be incorporated into the compile using `-pragma-include:zpragma.inc` on the compile line.
+For a large project, these pragmas can be collected into a single file, for example `zpragma.inc`, and can be incorporated into the compile using `-pragma-include:zpragma.inc` on the compile line.
 
 However for small projects with few source files, it can be more convenient just to include them within the C code itself like this:
 

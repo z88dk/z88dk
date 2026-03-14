@@ -4,7 +4,7 @@ This document, the 5th in the SP1 part of the [ZX Spectrum Z88DK/C developer's g
 
 ---
 
-**_This article is in the SP1 section of this getting started guide because it uses the SP1 sprite engine for its examples. The principles introduced here are generic, so this article should be accessible to anyone with an interest in sprite collision detection._**
+***This article is in the SP1 section of this getting started guide because it uses the SP1 sprite engine for its examples. The principles introduced here are generic, so this article should be accessible to anyone with an interest in sprite collision detection.***
 
 ---
 
@@ -22,9 +22,9 @@ The example code for this article is too big to fit inline in this document. It 
 
 ## Approach
 
-Collision detection on the Spectrum is normally based on _coordinate checking_. That is, the code looks at the screen locations of two objects, looks at their sizes, then calculates the areas of the screen the objects are occupying. If those screen areas overlap, then the two objects are colliding.
+Collision detection on the Spectrum is normally based on *coordinate checking*. That is, the code looks at the screen locations of two objects, looks at their sizes, then calculates the areas of the screen the objects are occupying. If those screen areas overlap, then the two objects are colliding.
 
-The tradeoff with collision detection code is precision versus speed of execution. If you want perfectly accurate collision detection, applied precisely every time, it's going to cost a lot of Z80 cycles. In most cases an approximation is quicker and plenty good enough. We'll examine some of these tradeoffs, and start by looking at _hotspots_.
+The tradeoff with collision detection code is precision versus speed of execution. If you want perfectly accurate collision detection, applied precisely every time, it's going to cost a lot of Z80 cycles. In most cases an approximation is quicker and plenty good enough. We'll examine some of these tradeoffs, and start by looking at *hotspots*.
 
 ## Hotspots and Attribute Cells
 
@@ -36,7 +36,7 @@ Consider this boat sprite, noting the tip of the bow pixel marked:
 
 Assuming the boat only animates left to right (boats only go forward, right?), and that we only want to check whether the boat has hit something (as opposed to something hitting the boat), then the only point on the sprite we need to check is the tip of the bow: the pixel coloured red in the image. That's a "hotspot."
 
-The idea here is to calculate the pixel _x,y_ screen location where that hotspot pixel is located, then check the colour attribute for that screen location. If the attribute is that of the "empty background" then there's no collision; if the attribute is that of something else then the boat has hit it.
+The idea here is to calculate the pixel *x,y* screen location where that hotspot pixel is located, then check the colour attribute for that screen location. If the attribute is that of the "empty background" then there's no collision; if the attribute is that of something else then the boat has hit it.
 
 ### Example Code
 
@@ -50,38 +50,37 @@ The relevant loop is this one:
 
 ```c
 do {
-  sp1_MoveSprPix(boat_sprite, &full_screen, boat_col1, boat_x_pos, boat_y_pos);
-  sp1_UpdateNow();
-  intrinsic_halt();
 
-  boat_x_pos++;
-  hotspot_attribute = *(zx_pxy2aaddr(boat_x_pos+HOTSPOT_X, boat_y_pos+HOTSPOT_Y));
-}
-while( hotspot_attribute != PAPER_GREEN );
+    sp1_MoveSprPix( boat_sprite, &full_screen, boat_col1, boat_x_pos, boat_y_pos );
+    sp1_UpdateNow();
+    intrinsic_halt();
+
+    boat_x_pos++;
+    hotspot_attribute = *( zx_pxy2aaddr( boat_x_pos+HOTSPOT_X, boat_y_pos+HOTSPOT_Y ) );
+
+} while( hotspot_attribute != PAPER_GREEN );
 boat_x_pos--;
-
 ```
 
-SP1 considers the sprite's "screen position" as being that of the sprite's top left pixel. The hotspot is 15 pixels right and 10 pixels down from that top left corner of the sprite, so we do the additions to find the screen pixel of the hotspot, find the attribute of the cell that pixel is located in using _zx_pxy2aaddr()_ (which is pronounced as "_pixel x,y to attribute address_"), and stop when the hotspot pixel gets to the first green block. The loop renders the sprite on screen and uses a halt to sync to 50 frames per second (just to slow the animation down a bit).
+SP1 considers the sprite's "screen position" as being that of the sprite's top left pixel. The hotspot is 15 pixels right and 10 pixels down from that top left corner of the sprite, so we do the additions to find the screen pixel of the hotspot, find the attribute of the cell that pixel is located in using `zx_pxy2aaddr()` (which is pronounced as "*pixel x,y to attribute address*"), and stop when the hotspot pixel gets to the first green block. The loop renders the sprite on screen and uses a halt to sync to 50 frames per second (just to slow the animation down a bit).
 
 The result is this:
 
 ![alt text](images/boat_docked.png "Boat docked")
 
-Note how this particular piece of code is structured with a do/while loop and we actually check the attribute cell the hotspot is _about_ to enter. This is because in this instance we want the boat to stop when when it gets _to_ the green block, not when it actually _enters_ it. In other scenarios it might be required to allow the actual overlap and render the sprite to the screen so the player can see, albeit momentarily, that their sprite did in fact hit something. If you want the sprite to bounce off the side of the screen you'll likely need this "look ahead" type of code structure because you probably don't want to render the sprite partially off screen.
+Note how this particular piece of code is structured with a do/while loop and we actually check the attribute cell the hotspot is *about* to enter. This is because in this instance we want the boat to stop when when it gets *to* the green block, not when it actually *enters* it. In other scenarios it might be required to allow the actual overlap and render the sprite to the screen so the player can see, albeit momentarily, that their sprite did in fact hit something. If you want the sprite to bounce off the side of the screen you'll likely need this "look ahead" type of code structure because you probably don't want to render the sprite partially off screen.
 
 Of course, we've hardcoded the hotspot coordinates into this piece of code for clarity. In practise the hotspot location is more likely to be part of the sprite data. You might use a graphics data structure with the hotspot coded in, like:
 
 ```c
 extern unsigned char boat_col1[];
 extern unsigned char boat_col2[];
-struct
-{
-  unsigned char *col1;
-  unsigned char *col2;
+struct {
+    unsigned char *col1;
+    unsigned char *col2;
 
-  unsigned char hotspot_x;
-  unsigned char hotspot_y;
+    unsigned char hotspot_x;
+    unsigned char hotspot_y;
 }
 boat_gfx_data = { boat_col1, boat_col2, 15, 10 };
 ```
@@ -89,8 +88,8 @@ boat_gfx_data = { boat_col1, boat_col2, 15, 10 };
 Your collision detection line might then be a more generic:
 
 ```c
-hotspot_attribute = *(zx_pxy2aaddr(boat_x_pos+boat_gfx_data.hotspot_x,
-                                   boat_y_pos+boat_gfx_data.hotspot_y));
+hotspot_attribute = *( zx_pxy2aaddr( boat_x_pos+boat_gfx_data.hotspot_x,
+                                     boat_y_pos+boat_gfx_data.hotspot_y ) );
 ```
 
 This example is listed in full [here](https://github.com/derekfountain/z88dk-zxspectrum-examples/tree/master/SP1/05_CollisionDetection/boat_struct.c).
@@ -105,7 +104,7 @@ Imagine you're using 3 frames to animate this pulsing cross:
 
 ![alt text](images/cross1_hotspot.png "16x16 cross 1") ![alt text](images/cross2_hotspot.png "16x16 cross 2") ![alt text](images/cross3_hotspot.png "16x16 cross 3")
 
-As it's moving around the screen you'll need to compute the screen coordinates of each of those hotspots each frame, then find the value of that attribute cell to check if it's hit something. The more hotspots you have the more resource intensive it is to check them each frame. The bulk of the work, however, is done in the _zx_pxy2aaddr()_ function, and as of this writing the Z88DK implementation of that code is around 87 Z80 clock cycles, so it's still relatively efficient.
+As it's moving around the screen you'll need to compute the screen coordinates of each of those hotspots each frame, then find the value of that attribute cell to check if it's hit something. The more hotspots you have the more resource intensive it is to check them each frame. The bulk of the work, however, is done in the `zx_pxy2aaddr()` function, and as of this writing the Z88DK implementation of that code is around 87 Z80 clock cycles, so it's still relatively efficient.
 
 ## Box and a Hotspot
 
@@ -132,11 +131,11 @@ So now we can say that if the gem sprite's hotspot enters the chain's bounding b
 The code to implement this might be something like:
 
 ```c
-  if( hotspot_xpos >= chain_box.x1 && hotspot_xpos <= chain_box.x2
-      &&
-      hotspot_ypos >= chain_box.y1 && hotspot_ypos <= chain_box.y2 )
-  {
-    /* Hot spot is inside the chain's box, it has hit the chain */
+if (   hotspot_xpos >= chain_box.x1 && hotspot_xpos <= chain_box.x2
+    && hotspot_ypos >= chain_box.y1 && hotspot_ypos <= chain_box.y2
+) {
+
+    // Hot spot is inside the chain's box, it has hit the chain
     ...
 ```
 
@@ -145,9 +144,9 @@ That's 4 8-bit comparisons, which is still relatively quick to do.
 In this simple example, with the sprite always approaching from the bottom of the screen, and with its hotspot on its leading point, and with the chain going all the way across, we don't really need to ask the question of whether the hotspot has entered the chain's box. We only need to know if the hotspot's screen y-position is above (lower, in pixel coordinate terms) the y-position of the lowest boundary of the box:
 
 ```c
-  if( hotspot_ypos <= chain_box.y2 )
-  {
-    /* Hot spot has entered the chain's box from the bottom, it has hit the chain */
+if ( hotspot_ypos <= chain_box.y2 ) {
+
+    // Hot spot has entered the chain's box from the bottom, it has hit the chain
     ...
 ```
 
@@ -157,7 +156,7 @@ That's a very useful optimisation. But maybe this isn't a typical example. What 
 
 So far we've kept this discussion simple by using hotspots on sprites. It's easy to picture a single point of a graphic entering an area of the screen as being a hit. But although such scenarios are not uncommon, and should be looked for in the first instance, there are plenty of other scenarios where they don't work. Not all sprites have a convenient leading edge or tip. Irregular shaped sprites which move in multiple directions would need so many hotspots so as to make the approach impractical.
 
-An alternative approach is to use _box intersections_. That is, wrap a box around each sprite and check, after moving everything around each game loop, whether any of the boxes intersect (i.e. overlap). The principle is much the same as for a hotspot - we're still dealing with coordinate checking - but now we're checking the coordinates of boxes as opposed to a single point on the screen.
+An alternative approach is to use *box intersections*. That is, wrap a box around each sprite and check, after moving everything around each game loop, whether any of the boxes intersect (i.e. overlap). The principle is much the same as for a hotspot - we're still dealing with coordinate checking - but now we're checking the coordinates of boxes as opposed to a single point on the screen.
 
 Let's look at a game where this helicopter:
 
@@ -212,11 +211,13 @@ Assuming the boxes are defined like this:
 you can see if the boxes intersect with this code:
 
 ```c
-  if( ! (box2.x1 >= box1.x2 || box2.x2 <= box1.x1
-          ||
-         box2.y1 >= box1.y2 || box2.y2 <= box1.y1) )
-  {
-    /* Boxes intersect */
+if ( ! (
+          box2.x1 >= box1.x2 || box2.x2 <= box1.x1
+      ||  box2.y1 >= box1.y2 || box2.y2 <= box1.y1
+    )
+) {
+
+    // Boxes intersect
 ```
 
 ### Box Intersection Limitations
@@ -279,18 +280,18 @@ The idea of using square or rectangular boxes for intersection checking is quite
 
 ![alt text](images/diamond_grid.png "diamond")
 
-This approach requires knowing the centre coordinates of 2 sprites, so for SP1, which uses the top left corner of the sprite as its origin point, you'll need to calculate the sprite centre point. Once you've done so you can check whether 2 bounding diamond shapes, with centres _x,y_ and _q,p_, have collided by using this piece of code:
+This approach requires knowing the centre coordinates of 2 sprites, so for SP1, which uses the top left corner of the sprite as its origin point, you'll need to calculate the sprite centre point. Once you've done so you can check whether 2 bounding diamond shapes, with centres *x,y* and *q,p*, have collided by using this piece of code:
 
 ```c
-  #define COLLISION_THRESHOLD 16
+#define COLLISION_THRESHOLD 16
 
-  if( ( abs(x - q) + abs(y - p) ) < COLLISION_THRESHOLD )
-  {
-    /* Sprites have collided */
+if ( ( abs( x - q ) + abs( y - p ) ) < COLLISION_THRESHOLD ) {
+
+    // Sprites have collided */
     ...
 ```
 
-If _y_ and _q_ are the same (i.e. the sprites are on the same vertical line of the screen) then you have a collision if the centres are within the sprite width of each other. For each vertical line they are separated by, the sprites have to be one pixel closer horizontally to conclude an overlap. The result looks like a diamond, and you can adjust the harshness of the test by tweaking the threshold value.
+If *y* and *q* are the same (i.e. the sprites are on the same vertical line of the screen) then you have a collision if the centres are within the sprite width of each other. For each vertical line they are separated by, the sprites have to be one pixel closer horizontally to conclude an overlap. The result looks like a diamond, and you can adjust the harshness of the test by tweaking the threshold value.
 
 The result looks like this:
 

@@ -20,22 +20,23 @@ So far in this series of articles we've only ever had examples consisting of a s
 
 This is going to be a brief introduction. Using multiple files isn't complicated with Z88DK, and the nuances and caveats that there are won't be discussed here. We simply introduce the concept so the reader can see how to keep their build clear and understandable as it gets bigger.
 
-As always, we start simple. Here's a source file containing a *main()* function:
+As always, we start simple. Here's a source file containing a `main()` function:
 
 ```c
 #include <stdio.h>
 
 extern unsigned char message[];
 
-int main(void)
-{
-  printf("Message is: \"%s\"\n", message);
+int main ( void ) {
 
-  return 0;
+    printf( "Message is: \"%s\"\n", message );
+
+    return 0;
+
 }
 ```
 
-Save that into a file called *text_main.c*, then save this into a file called *text_data.c*:
+Save that into a file called `text_main.c`, then save this into a file called `text_data.c`:
 
 ```c
 unsigned char message[] = "Hello, world!";
@@ -53,14 +54,14 @@ Both files will be compiled each time the application is built.
 
 Two filenames on the command line isn't a problem, but as a project gets bigger and the list of its files gets longer it becomes more convenient to put those filenames into a single list file and use that on the command line instead.
 
-Create a file called *text.lst* containing these lines:
+Create a file called `text.lst` containing these lines:
 
 ```txt
 text_main.c
 text_data.c
 ```
 
-and compile with the list file, indicated by the preceding '@' symbol:
+and compile with the list file, indicated by the preceding `@` symbol:
 
 ```sh
 zcc +zx -vn -startup=0 -clib=sdcc_iy @text.lst -o text -create-app
@@ -68,14 +69,14 @@ zcc +zx -vn -startup=0 -clib=sdcc_iy @text.lst -o text -create-app
 
 It does what you'd expect. You can use filenames containing subdirectory names, so you can break your build up into subdirectories as required.
 
-You can also add list files into list files by using the same '@' symbol, so your first list file might contain:
+You can also add list files into list files by using the same `@` symbol, so your first list file might contain:
 
 ```txt
 game_code.c
 @data/data.lst
 ```
 
-That's one C file and a second list file in the *data/* subdirectory. The *data/data.lst* file might contain:
+That's one C file and a second list file in the *data/* subdirectory. The `data/data.lst` file might contain:
 
 ```txt
 graphics_data.c
@@ -83,13 +84,13 @@ music_data.c
 text_data.c
 ```
 
-All the data files listed in *data/data.lst* would be compiled and linked with *game_code.c* as you'd expect.
+All the data files listed in `data/data.lst` would be compiled and linked with `game_code.c` as you'd expect.
 
 ## Adding Z80 Assembly Language
 
 This guide isn't the place to introduce Z80 assembly language or how it can be used with Z88DK, but we can demonstrate how to bring a Z80 assembly language file into our build. In fact, since the *zcc* front end tool knows how to deal with assembly language files it's quite trivial.
 
-Copy this assembly language into a file called *text_data.asm*:
+Copy this assembly language into a file called `text_data.asm`:
 
 ```z80
 SECTION rodata_user
@@ -111,9 +112,9 @@ The *zcc* tool recognises the ASM file and knows it has to be passed to the asse
 
 ## Makefiles
 
-Once a project gets to a reasonable size it makes sense to start using makefiles.  The SDCC compiler can be very slow when optimising so deploying a makefile can speed up builds quite considerably. For this worked example we use the GNU *make* utility on Linux, although any variant can be used with a little tweaking.
+Once a project gets to a reasonable size it makes sense to start using makefiles. The SDCC compiler can be very slow when optimising so deploying a makefile can speed up builds quite considerably. For this worked example we use the GNU *make* utility on Linux, although any variant can be used with a little tweaking.
 
-We need another assembly language file to play with, so save this text to a file called *text_via_makefile.asm*:
+We need another assembly language file to play with, so save this text to a file called `text_via_makefile.asm`:
 
 ```z80
 SECTION rodata_user
@@ -160,7 +161,7 @@ OBJECTS = text_main.o \
 all : $(EXEC)
 
 $(EXEC) : $(OBJECTS)
->  $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
+> $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
 
 .PHONY: clean
 clean:
@@ -235,7 +236,7 @@ zcc +zx -vn -c -o text_via_makefile.o text_via_makefile.asm
 zcc +zx -vn -clib=sdcc_iy -pragma-include:zpragma.inc -startup=4 text_main.o text_via_makefile.o -o text -create-app
 ```
 
-The first line compiles *text_main.c*, the second assembles *text_via_makefile.asm*, and the third links the objects and creates the Spectrum TAP file.
+The first line compiles `text_main.c`, the second assembles `text_via_makefile.asm`, and the third links the objects and creates the Spectrum TAP file.
 
 ## Where To Go From Here
 

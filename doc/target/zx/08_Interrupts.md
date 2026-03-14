@@ -37,7 +37,6 @@ The first issue we need to cover is, where can we put the vector table and jump 
 
 Our vector table needs to be 257 bytes. Referring back to [installment 6](https://github.com/derekfountain/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md) of this getting started guide where we looked at the memory map of the Spectrum, we see that with the default compiler settings our simple program's memory map looks like this:
 
-
 ```txt
 +-------------+
 |0xFFFF  65535|
@@ -147,9 +146,8 @@ Here's a piece of code which sets up interrupt mode 2 routine as per the discuss
 #include <im2.h>
 #include <arch/zx.h>
 
-IM2_DEFINE_ISR(isr)
-{
-  *(unsigned char*)0x4000 = 0x55;
+IM2_DEFINE_ISR(isr) {
+    *(unsigned char*)0x4000 = 0x55;
 }
 
 #define TABLE_HIGH_BYTE        ((unsigned int)0xfc)
@@ -160,22 +158,23 @@ IM2_DEFINE_ISR(isr)
 #define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
 #define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
 
-int main(void)
-{
-  memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
+int main ( void ) {
 
-  z80_bpoke( JUMP_POINT,   195 );
-  z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
+    memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
 
-  im2_init( TABLE_ADDR );
+    z80_bpoke( JUMP_POINT,   195 );
+    z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
 
-  intrinsic_ei();
+    im2_init( TABLE_ADDR );
 
-  while(1);
+    intrinsic_ei();
+
+    while (1);
+
 }
 ```
 
-Save this to a file called im2_simple.c and compile it with this command:
+Save this to a file called `im2_simple.c` and compile it with this command:
 
 ```sh
 zcc +zx -vn -clib=sdcc_iy -startup=31 im2_simple.c -o im2_simple -create-app
@@ -183,9 +182,9 @@ zcc +zx -vn -clib=sdcc_iy -startup=31 im2_simple.c -o im2_simple -create-app
 
 This is our typical, simplest compile command, using the stripped down CRT31. It deliberately uses C macros to define the salient values to make things a bit clearer. If you run it you'll notice that a) a small dashed line appears in the top left corner of the screen and b) the Spectrum locks up.  Let's look at the code to see what's happening.
 
-The first pragma, as we saw in [installment 6](06_SomeDetails.md#changing-the-memory-layout), sets the stack pointer to address 0xFF58. This happens to be the default stack location but there's no harm is stating it explicitly. The second pragma sets the top byte of the heap to address 0xFBFA. Note how this is done: you give it the negation of the absolute address you want the top byte of the heap to be, as described [here](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded&s[]=crt&s[]=enable&s[]=restart#crt_configuration). If the program attempts a *malloc()* which would cause the heap to overwrite the interrupt structures, the *malloc()* will fail.
+The first pragma, as we saw in [installment 6](06_SomeDetails.md#changing-the-memory-layout), sets the stack pointer to address 0xFF58. This happens to be the default stack location but there's no harm is stating it explicitly. The second pragma sets the top byte of the heap to address 0xFBFA. Note how this is done: you give it the negation of the absolute address you want the top byte of the heap to be, as described [here](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded&s[]=crt&s[]=enable&s[]=restart#crt_configuration). If the program attempts a `malloc()` which would cause the heap to overwrite the interrupt structures, the `malloc()` will fail.
 
-The first thing the code does in *main()* is set up the vector table. As described above, the table will occupy the 257 bytes from 0xFC00, so a simple *memset()* is all that's required. The jump vector is at 0xFBFB, so the table is filled with 0xFB in every byte.
+The first thing the code does in `main()` is set up the vector table. As described above, the table will occupy the 257 bytes from 0xFC00, so a simple `memset()` is all that's required. The jump vector is at 0xFBFB, so the table is filled with 0xFB in every byte.
 
 Next we need to place our redirection JMP instruction at address 0xFBFB. This is simply :
 
@@ -193,25 +192,25 @@ Next we need to place our redirection JMP instruction at address 0xFBFB. This is
   JMP isr
 ```
 
-where *'isr'* is the address of our C routine. This jump point is placed in memory with the Z88DK *z80*_*poke()* calls. The first puts in the value 195 (that's 0xC3 hex), which is the Z80 machine code value for the JMP instruction. The second puts in the address of the interrupt service routine named *isr()*, and which will be located somewhere in memory by the compiler. We can use its symbol in the C code.
+where `isr` is the address of our C routine. This jump point is placed in memory with the Z88DK `z80_poke()` calls. The first puts in the value 195 (that's 0xC3 hex), which is the Z80 machine code value for the JMP instruction. The second puts in the address of the interrupt service routine named `isr()`, and which will be located somewhere in memory by the compiler. We can use its symbol in the C code.
 
 We can see this arrangement in memory using an emulator's memory inspector:
 
 ![alt text](images/fuse_im2_memory.png "IM2 memory")
 
-This screenshot is from Fuse which displays memory upside down. You can see the JMP instruction in the "C3 E7 80" bytes at 0xFBFB (so for this compilation the *isr()* routine was placed at 0x80E7).  Then there are 2 empty bytes, then the vector table, full of 0xFB bytes.
+This screenshot is from Fuse which displays memory upside down. You can see the JMP instruction in the "C3 E7 80" bytes at 0xFBFB (so for this compilation the `isr()` routine was placed at 0x80E7).  Then there are 2 empty bytes, then the vector table, full of 0xFB bytes.
 
-The definition of the interrupt service routine *isr()* uses a wrapper macro *IM2_DEFINE_ISR()*. This is because a C function can't be used as an interrupt service routine by itself. It needs some Z80 instructions around it which save a few registers on the stack, restore them when the routine is finished, plus some other housekeeping bit and pieces. The details aren't really important here; all that's required is that the definition of the C function to be used as the interrupt service routine is wrapped in the *IM2_DEFINE_ISR()* macro. The C compiler looks after everything else.
+The definition of the interrupt service routine `isr()` uses a wrapper macro `IM2_DEFINE_ISR()`. This is because a C function can't be used as an interrupt service routine by itself. It needs some Z80 instructions around it which save a few registers on the stack, restore them when the routine is finished, plus some other housekeeping bit and pieces. The details aren't really important here; all that's required is that the definition of the C function to be used as the interrupt service routine is wrapped in the `IM2_DEFINE_ISR()` macro. The C compiler looks after everything else.
 
 In this example the interrupt service routine simply places the value 0x55 in the first byte of screen memory, hence the small dashed line in the Spectrum's display when this code is run.
 
-Back in the *main()* function, after the pokes to place the JMP instruction we have the call to *im2_init()*. This library function takes the address of the vector table which it programs into the Z80's I register, and then sets the interrupt mode to 2. We then enable interrupts and the interrupt service routine will start being called every 50th of a second.
+Back in the `main()` function, after the pokes to place the JMP instruction we have the call to `im2_init()`. This library function takes the address of the vector table which it programs into the Z80's I register, and then sets the interrupt mode to 2. We then enable interrupts and the interrupt service routine will start being called every 50th of a second.
 
 ### Returning to BASIC with IM 2 still set
 
 In the example above we end by going into an infinite loop, which is why the Spectrum locks up with this program. The reason for this is that by default a Z88DK Spectrum program resets the interrupt mode to 1 when it exits and returns to BASIC. For this example we don't want this to happen, otherwise we wouldn't see the dashed line in the display.
 
-We can control the interrupt mode the program exits with via the *CRT_INTERRUPT_MODE_EXIT* pragma, like this:
+We can control the interrupt mode the program exits with via the `CRT_INTERRUPT_MODE_EXIT` pragma, like this:
 
 ```c
 #pragma output CRT_INTERRUPT_MODE_EXIT = 2
@@ -219,7 +218,7 @@ We can control the interrupt mode the program exits with via the *CRT_INTERRUPT_
 
 Placing this line at the top of the program ensures the compiler generates code which leaves interrupt mode 2 active when the program exits. Thus the C code interrupt service routine will continue running when control is returned to BASIC.
 
-To use this feature we need to ensure that as well as having our C interrupt service routine run every interrupt, we must also have the Spectrum's BASIC interrupt service routine called as well. This is because that code, in the Spectrum's ROM, handles things like keyboard input which BASIC expects to keep happening. We arrange this by wrapping our interrupt service routine definition with the *IM2_DEFINE_ISR_WITH_BASIC()* macro. This adds the same housekeeping wrapping code around the C ISR, and additionally makes a call into the Spectrum's ROM to run the BASIC ISR as well. If you're interested, you can see how this is set up by looking at the macro in the [im2 header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/im2.h#L87).
+To use this feature we need to ensure that as well as having our C interrupt service routine run every interrupt, we must also have the Spectrum's BASIC interrupt service routine called as well. This is because that code, in the Spectrum's ROM, handles things like keyboard input which BASIC expects to keep happening. We arrange this by wrapping our interrupt service routine definition with the `IM2_DEFINE_ISR_WITH_BASIC()` macro. This adds the same housekeeping wrapping code around the C ISR, and additionally makes a call into the Spectrum's ROM to run the BASIC ISR as well. If you're interested, you can see how this is set up by looking at the macro in the [im2 header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/im2.h#L87).
 
 With this in place we can set up a C code interrupt service routine, then return to BASIC with it still running, like this example:
 
@@ -227,7 +226,7 @@ With this in place we can set up a C code interrupt service routine, then return
 #pragma output REGISTER_SP = 0xFF58
 #pragma output CLIB_MALLOC_HEAP_SIZE = -0xFBFA
 
-/* Ensure IM2 is left at exit */
+// Ensure IM2 is left at exit
 #pragma output CRT_INTERRUPT_MODE_EXIT = 2
 
 #include <z80.h>
@@ -238,73 +237,75 @@ With this in place we can set up a C code interrupt service routine, then return
 static unsigned char  ticker_string[] = "Hello, world! ";
 static unsigned char* current_char_ptr;
 
-/* Address in ROM of the character being scrolled into view */
+// Address in ROM of the character being scrolled into view
 static unsigned char* rom_address;
 
-/* Bit, left to right, of the character to scroll into view next. Goes 128, 64, 32...1 */
+// Bit, left to right, of the character to scroll into view next. Goes 128, 64, 32...1
 static unsigned char  bit;
 
-/*
- * Off-screen buffer to put the display into. This is blitted into the screen, replacing
- * whatever the user's program happens to have put there. A "merge" would be friendlier. :)
- */
+// Off-screen buffer to put the display into. This is blitted into the screen, replacing
+// whatever the user's program happens to have put there. A "merge" would be friendlier. :)
 static unsigned char  off_screen_buffer[32*8];
 
-IM2_DEFINE_ISR_WITH_BASIC(isr)
-{
-  unsigned char* buffer_address;
-  unsigned char  i;
+IM2_DEFINE_ISR_WITH_BASIC(isr) {
 
-  /*
-   * Scroll off-screen display buffer data leftwards one byte. This is just a memory move downwards by one.
-   */
-  memcpy((unsigned char*)off_screen_buffer, (unsigned char*)off_screen_buffer+1, sizeof(off_screen_buffer)-1);
+    unsigned char* buffer_address;
+    unsigned char  i;
 
-  /*
-   * For each of the 8 lines (top to bottom) of the character we're displaying, pick out
-   * the current bit (left to right). If it's a 1, set the rightmost attribute cell to
-   * colour, otherwise set the attribute cell white. This is done in the off-screen buffer.
-   */
-  buffer_address = (unsigned char*)&off_screen_buffer+0x1f;
-  for( i=0; i<8; i++ )
-  {
-    unsigned char attribute_value;
+    // Scroll off-screen display buffer data leftwards one byte. This is just a memory move downwards by one.
+    memcpy(
+        (unsigned char*)off_screen_buffer,
+        (unsigned char*)off_screen_buffer + 1,
+        sizeof( off_screen_buffer ) - 1
+    );
 
-    attribute_value = ( *rom_address & bit ) ? PAPER_MAGENTA : PAPER_WHITE;
+    // For each of the 8 lines (top to bottom) of the character we're displaying, pick out
+    // the current bit (left to right). If it's a 1, set the rightmost attribute cell to
+    // colour, otherwise set the attribute cell white. This is done in the off-screen buffer.
+    buffer_address = (unsigned char*)&off_screen_buffer + 0x1f;
+    for ( i = 0; i < 8; i++ ) {
 
-    *buffer_address = attribute_value;
-    buffer_address += 0x20;
+        unsigned char attribute_value;
 
-    rom_address++;
-  }
+        attribute_value = ( *rom_address & bit ) ? PAPER_MAGENTA : PAPER_WHITE;
 
-  /*
-   * If that was the rightmost bit of the character, that character's done with. Move to the
-   * next character in the display string and start again at its left side (bit 128).
-   * Otherwise keep with the same character and get ready for the next bit.
-   */
-  if( bit == 1 )
-  {
-    current_char_ptr++;
-    if( *current_char_ptr == '\0' )
-      current_char_ptr = ticker_string;
+        *buffer_address = attribute_value;
+        buffer_address += 0x20;
 
-    rom_address = ((*current_char_ptr-0x20)*8)+(unsigned char*)0x3D00;
+        rom_address++;
 
-    bit = 128;
-  }
-  else
-  {
-    bit = bit/2;
+    }
 
-    /* Still on the same character, so move back to the start of its data in ROM */
-    rom_address -= 8;
-  }
+    // If that was the rightmost bit of the character, that character's done with. Move to the
+    // next character in the display string and start again at its left side (bit 128).
+    // Otherwise keep with the same character and get ready for the next bit.
+    if ( bit == 1 ) {
 
-  /* Copy the off-screen buffer into the display */
-  memcpy( (unsigned char*)0x5800, off_screen_buffer, sizeof(off_screen_buffer) );
+        current_char_ptr++;
+        if ( *current_char_ptr == '\0' )
+            current_char_ptr = ticker_string;
+
+        rom_address = ( (*current_char_ptr-0x20) * 8 ) + (unsigned char*)0x3D00;
+
+        bit = 128;
+
+    } else {
+
+        bit = bit/2;
+
+        // Still on the same character, so move back to the start of its data in ROM
+        rom_address -= 8;
+
+    }
+
+    // Copy the off-screen buffer into the display
+    memcpy(
+        (unsigned char*)0x5800,
+        off_screen_buffer,
+        sizeof( off_screen_buffer )
+    );
+
 }
-
 
 #define TABLE_HIGH_BYTE        ((unsigned int)0xfc)
 #define JUMP_POINT_HIGH_BYTE   ((unsigned int)0xfb)
@@ -314,26 +315,29 @@ IM2_DEFINE_ISR_WITH_BASIC(isr)
 #define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
 #define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
 
-int main(void)
-{
-  /*
-   * Initialise the ticker and its buffer
-   */
-  memset( off_screen_buffer, PAPER_WHITE+INK_WHITE, sizeof(off_screen_buffer) );
+int main ( void ) {
 
-  current_char_ptr = ticker_string;
-  rom_address      = ((*current_char_ptr-0x20)*8)+(unsigned char*)0x3D00;
-  bit              = 128;
+    // Initialise the ticker and its buffer
+    memset(
+        off_screen_buffer,
+        PAPER_WHITE + INK_WHITE,
+        sizeof( off_screen_buffer )
+    );
 
-  /* Set up the interrupt vector table */
-  im2_init( TABLE_ADDR );
+    current_char_ptr = ticker_string;
+    rom_address      = ( (*current_char_ptr-0x20) * 8 ) + (unsigned char*)0x3D00;
+    bit              = 128;
 
-  memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
+    // Set up the interrupt vector table
+    im2_init( TABLE_ADDR );
 
-  z80_bpoke( JUMP_POINT,   195 );
-  z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
+    memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
 
-  return 0;
+    z80_bpoke( JUMP_POINT,   195 );
+    z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
+
+    return 0;
+
 }
 ```
 
@@ -343,7 +347,7 @@ Compile this with:
 zcc +zx -vn -clib=sdcc_iy -startup=31 atts_ticker.c -o atts_ticker -create-app
 ```
 
-Note how the call to *intrinsic_ei()* isn't required in the *main()* code in this example. This is because the Z88DK CRT code will always contain an instruction to re-enable interrupts when returning to BASIC.
+Note how the call to `intrinsic_ei()` isn't required in the `main()` code in this example. This is because the Z88DK CRT code will always contain an instruction to re-enable interrupts when returning to BASIC.
 
 ### Warnings
 

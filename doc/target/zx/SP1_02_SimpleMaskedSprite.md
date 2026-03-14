@@ -22,7 +22,7 @@ We're going to postpone discussion of how to get proper control over the backgro
 
 ---
 
-**_This section introduces the SP1 concept of 'tiles'. If you've already read the [BiFrost](07_BiFrost.md) part of this guide you'll know that BiFrost also has the concept of 'tiles'. It's somewhat unfortunate and confusing that the two graphics libraries use the same term for different things. As we're about to see, SP1 uses the term 'tile' for an 8x8 pixel character cell, a grid of which makes up the background SP1 draws onto. BiFrost uses the term 'tile' for a 16x16 pixel graphical object which it can place on the screen.  If you're already familiar with BiFrost, make sure you keep the concepts of 'tiles' separate in your head. They're different entities in these two libraries._**
+***This section introduces the SP1 concept of 'tiles'. If you've already read the [BiFrost](07_BiFrost.md) part of this guide you'll know that BiFrost also has the concept of 'tiles'. It's somewhat unfortunate and confusing that the two graphics libraries use the same term for different things. As we're about to see, SP1 uses the term 'tile' for an 8x8 pixel character cell, a grid of which makes up the background SP1 draws onto. BiFrost uses the term 'tile' for a 16x16 pixel graphical object which it can place on the screen.  If you're already familiar with BiFrost, make sure you keep the concepts of 'tiles' separate in your head. They're different entities in these two libraries.***
 
 ---
 
@@ -31,17 +31,21 @@ The SP1 display background is split up into a grid of 8x8 pixel *tiles*, each on
 In the first article in this SP1 getting started series we looked at a [small program](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite) which initialises the SP1 library with this line of code:
 
 ```c
-sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
-                INK_BLACK | PAPER_WHITE,
-                ' ' );
+sp1_Initialize(
+    SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+    INK_BLACK | PAPER_WHITE,
+    ' '
+);
 ```
 
 The last argument in that function call is the important one here. It specifies a character value to fill the SP1 display area's tiles with. In this example it uses the space character (the data comes from the character set in the Spectrum's ROM) which has the effect of clearing the screen. For the purposes of this guide, we're going to change this line to:
 
 ```c
-sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
-                INK_BLACK | PAPER_WHITE,
-                'X' );
+sp1_Initialize(
+    SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+    INK_BLACK | PAPER_WHITE,
+    'X'
+);
 ```
 
 which will fill the display area with Xs. It's not particularly useful, but it does fill the screen with a repeating pattern which is what we need here.
@@ -99,13 +103,13 @@ PUBLIC _circle_masked
     defb @11111111, @00000000
 ```
 
-Our mask and graphic data are at the *circle_masked* label, mask byte first, and as [discussed](SP1_01_GettingStarted.md#pixel-positioning) in the first article of this series, the padding bytes before and after the actual graphic are required to assist SP1 with its pixel positioning. The padding bytes require mask and graphic data pairs just like the actual sprite data.
+Our mask and graphic data are at the `circle_masked` label, mask byte first, and as [discussed](SP1_01_GettingStarted.md#pixel-positioning) in the first article of this series, the padding bytes before and after the actual graphic are required to assist SP1 with its pixel positioning. The padding bytes require mask and graphic data pairs just like the actual sprite data.
 
-Save this listing to a file called *circle_sprite_masked.asm*.
+Save this listing to a file called `circle_sprite_masked.asm`.
 
 ## Drawing the masked sprite
 
-Here's the code to draw the sprite. Save it to a file called 'circle_masked.c':
+Here's the code to draw the sprite. Save it to a file called `circle_masked.c`:
 
 ```c
 #pragma output REGISTER_SP = 0xD000
@@ -127,36 +131,41 @@ IM2_DEFINE_ISR(isr) {}
 
 extern unsigned char circle_masked[];
 
-struct sp1_Rect full_screen = {0, 0, 32, 24};
+struct sp1_Rect full_screen = { 0, 0, 32, 24 };
 
-int main(void)
-{
-  struct sp1_ss  *circle_sprite;
-  unsigned char x;
+int main ( void ) {
 
-  memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
-  z80_bpoke( JUMP_POINT,   195 );
-  z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
-  im2_init( TABLE_ADDR );
-  intrinsic_ei();
+    struct sp1_ss  *circle_sprite;
+    unsigned char x;
 
-  zx_border(INK_BLACK);
+    memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
+    z80_bpoke( JUMP_POINT,   195 );
+    z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
+    im2_init( TABLE_ADDR );
+    intrinsic_ei();
 
-  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
-                  INK_BLACK | PAPER_WHITE,
-                  'X' );
-  sp1_Invalidate(&full_screen);
+    zx_border( INK_BLACK );
 
-  circle_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0);
+    sp1_Initialize(
+        SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+        INK_BLACK | PAPER_WHITE,
+        'X'
+    );
+    sp1_Invalidate( &full_screen );
 
-  sp1_AddColSpr(circle_sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0);
+    circle_sprite = sp1_CreateSpr( SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0 );
 
-  x=0;
-  while(1) {
-    sp1_MoveSprPix(circle_sprite, &full_screen, 0, x++, 4);
-    intrinsic_halt();
-    sp1_UpdateNow();
-  }
+    sp1_AddColSpr( circle_sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0 );
+
+    x=0;
+    while (1) {
+
+        sp1_MoveSprPix( circle_sprite, &full_screen, 0, x++, 4 );
+        intrinsic_halt();
+        sp1_UpdateNow();
+
+    }
+
 }
 ```
 
@@ -170,21 +179,21 @@ Running the program sees the screen fill with 'X's and our little circle sprite 
 
 ### SP1 and the interrupt
 
-This code uses the Spectrum's hardware interrupt: it calls *intrinsic_ei()* to enable the interrupt (Z88DK programs start with interrupts disabled), and uses *intrinsic_halt()* to pause and wait for the interrupt between each screen update. As has been [discussed](SP1_01_GettingStarted.md#runtime), you don't need to *HALT* the Z80 in SP1 programs in order to avoid flickering, so you might wonder what's going on here. If you take out the *intrinsic_halt()* call you'll see: the sprite zips across the screen too quickly to observe. Waiting on the interrupt locks the update to moving the sprite one pixel every interrupt. Since the Spectrum generates 50 interrupts a second, the *intrinsic_halt()* makes the updates slow down and the sprite moves at 50 pixels a second. The Spectrum's screen is 256 pixels wide, so at 50 frames per second (fps) it takes the sprite about 5 seconds to cross the screen.
+This code uses the Spectrum's hardware interrupt: it calls `intrinsic_ei()` to enable the interrupt (Z88DK programs start with interrupts disabled), and uses `intrinsic_halt()` to pause and wait for the interrupt between each screen update. As has been [discussed](SP1_01_GettingStarted.md#runtime), you don't need to `HALT` the Z80 in SP1 programs in order to avoid flickering, so you might wonder what's going on here. If you take out the `intrinsic_halt()` call you'll see: the sprite zips across the screen too quickly to observe. Waiting on the interrupt locks the update to moving the sprite one pixel every interrupt. Since the Spectrum generates 50 interrupts a second, the `intrinsic_halt()` makes the updates slow down and the sprite moves at 50 pixels a second. The Spectrum's screen is 256 pixels wide, so at 50 frames per second (fps) it takes the sprite about 5 seconds to cross the screen.
 
-In order to use the 50Hz interrupt with SP1 we need to stop it calling the Spectrum ROM's default interrupt routine, which is incompatible with SP1. (The ROM routine assumes exclusive use of some registers which the SP1 library uses.) Disabling interrupts is one simple answer to the problem, but since it's fairly typical for SP1 programs to use the ISR to do other background tasks like maintain timers or play music, installing a custom ISR is a more common practice. In this simple example our interrupt service routine, *isr()*, is empty. It still gets called, and we can still *HALT* the Z80, the ISR just doesn't do anything.
+In order to use the 50Hz interrupt with SP1 we need to stop it calling the Spectrum ROM's default interrupt routine, which is incompatible with SP1. (The ROM routine assumes exclusive use of some registers which the SP1 library uses.) Disabling interrupts is one simple answer to the problem, but since it's fairly typical for SP1 programs to use the ISR to do other background tasks like maintain timers or play music, installing a custom ISR is a more common practice. In this simple example our interrupt service routine, `isr()`, is empty. It still gets called, and we can still `HALT` the Z80, the ISR just doesn't do anything.
 
 The default SP1 installation leaves room for the interrupt vector table at 0xD000, and the jump vector at 0xD1D1. All these details are covered in the [interrupts](08_Interrupts.md) document of this getting started guide.
 
 ### Masked sprite modifications
 
-Other than the interrupt and the tweak to *sp1_Initialize()* which populates the background tiles, there are only two other significant differences between this code and the version of it introduced in the first article in this series. Firstly, the *sp1_CreateSpr()* and *sp1_AddColSpr()* calls specify draw functions called *SP1_DRAW_MASK2LB* and *SP1_DRAW_MASK2RB* respectively, and have a sprite type of *SP1_TYPE_2BYTE*. This is because we're drawing a masked sprite, with 2 bytes per scan line (one mask, one data). Secondly, we're moving the sprite with a call to *sp1_MoveSprPix()* instead of *sp1_MoveSprAbs()*. The *Pix* version of the move function takes pixel coordinates, which are frequently easier to work with than the cell/rotation arguments the *Abs* sprite move function takes. Both sprite moving functions do the same thing in the end, so use whichever one works best with the positioning data your program has to hand.
+Other than the interrupt and the tweak to `sp1_Initialize()` which populates the background tiles, there are only two other significant differences between this code and the version of it introduced in the first article in this series. Firstly, the `sp1_CreateSpr()` and `sp1_AddColSpr()` calls specify draw functions called `SP1_DRAW_MASK2LB` and `SP1_DRAW_MASK2RB` respectively, and have a sprite type of `SP1_TYPE_2BYTE`. This is because we're drawing a masked sprite, with 2 bytes per scan line (one mask, one data). Secondly, we're moving the sprite with a call to `sp1_MoveSprPix()` instead of `sp1_MoveSprAbs()`. The `Pix` version of the move function takes pixel coordinates, which are frequently easier to work with than the cell/rotation arguments the `Abs` sprite move function takes. Both sprite moving functions do the same thing in the end, so use whichever one works best with the positioning data your program has to hand.
 
 ## Multiple sprites
 
 Since we've now introduced the concept of timings, let's have a look at how SP1 copes with multiple sprites.
 
-Save this code to a file called 'circle_masked_multi.c':
+Save this code to a file called `circle_masked_multi.c`:
 
 ```c
 #pragma output REGISTER_SP = 0xD000
@@ -208,52 +217,55 @@ extern unsigned char circle_masked[];
 
 struct sp1_Rect full_screen = {0, 0, 32, 24};
 
-typedef struct
-{
-  struct sp1_ss  *sprite;
-  unsigned char   x_pos;
-  unsigned char   y_pos;
+typedef struct {
+    struct sp1_ss  *sprite;
+    unsigned char   x_pos;
+    unsigned char   y_pos;
 } CIRCLE_SPRITE;
 
 #define NUM_SPRITES  3
 
 CIRCLE_SPRITE circle_sprites[NUM_SPRITES];
 
-int main(void)
-{
-  unsigned char i;
+int main ( void ) {
 
-  memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
-  z80_bpoke( JUMP_POINT,   195 );
-  z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
-  im2_init( TABLE_ADDR );
-  intrinsic_ei();
+    unsigned char i;
 
-  zx_border(INK_BLACK);
+    memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
+    z80_bpoke( JUMP_POINT,   195 );
+    z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
+    im2_init( TABLE_ADDR );
+    intrinsic_ei();
 
-  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
-                  INK_BLACK | PAPER_WHITE,
-                  'X' );
-  sp1_Invalidate(&full_screen);
+    zx_border( INK_BLACK );
 
-  for( i=0; i<NUM_SPRITES; i++ )
-  {
-    circle_sprites[i].sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0);
-    sp1_AddColSpr(circle_sprites[i].sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0);
+    sp1_Initialize(
+        SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+        INK_BLACK | PAPER_WHITE,
+        'X'
+    );
+    sp1_Invalidate( &full_screen );
 
-    circle_sprites[i].x_pos = i*10;
-    circle_sprites[i].y_pos = i*10;
-  }
+    for ( i=0; i<NUM_SPRITES; i++ ) {
 
-  while(1)
-  {
-    for( i=0; i<NUM_SPRITES; i++ )
-    {
-      sp1_MoveSprPix(circle_sprites[i].sprite, &full_screen, 0, circle_sprites[i].x_pos++, circle_sprites[i].y_pos);
+        circle_sprites[i].sprite = sp1_CreateSpr( SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0 );
+        sp1_AddColSpr( circle_sprites[i].sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0 );
+
+        circle_sprites[i].x_pos = i*10;
+        circle_sprites[i].y_pos = i*10;
+
     }
-    intrinsic_halt();
-    sp1_UpdateNow();
-  }
+
+    while (1) {
+
+        for( i=0; i<NUM_SPRITES; i++ )
+          sp1_MoveSprPix( circle_sprites[i].sprite, &full_screen, 0, circle_sprites[i].x_pos++, circle_sprites[i].y_pos );
+
+        intrinsic_halt();
+        sp1_UpdateNow();
+
+    }
+
 }
 ```
 
@@ -263,7 +275,7 @@ Since we're discussing timings and performance, we'll turn on the SDCC compiler'
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 circle_masked_multi.c circle_sprite_masked.asm -o circle_masked_multi -create-app
 ```
 
-This example uses multiple sprites. Instead of a single *sp1_ss* pointer, we define a structure to hold the necessary details of a sprite (*sp1_ss and screen location), then create an array of those structures. For now the created sprites all use the same sprite data (the masked circle sprite); they're intialised to different screen x,y locations. Each time round the game loop all the sprites are moved one pixel, left to right, as before.
+This example uses multiple sprites. Instead of a single `sp1_ss` pointer, we define a structure to hold the necessary details of a sprite (*sp1_ss and screen location), then create an array of those structures. For now the created sprites all use the same sprite data (the masked circle sprite); they're intialised to different screen x,y locations. Each time round the game loop all the sprites are moved one pixel, left to right, as before.
 
 ## Exercises for the reader
 
@@ -272,9 +284,9 @@ There's enough here to play with, so we leave some exercises for the reader:
 * Modify the sprite mask to open up the centre of the circle sprite.
 * How many 8x8 pixel, masked sprites can SP1 draw in 1/50th of a second (i.e. between the *HALT*s)?
 * What happens if too many sprites are used, such that SP1 can't redraw them all in 1/50th second?
-* Take out the *intrinsic_halt()* call from the second example and rerun the tests. Now what happens? Increase the number of sprites to see how many SP1 could realistically manipulate in a game.
+* Take out the `intrinsic_halt()` call from the second example and rerun the tests. Now what happens? Increase the number of sprites to see how many SP1 could realistically manipulate in a game.
 * Replace the masked sprite data and code with the simple LOADed sprite and code from the [first example](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many more sprites can it handle each frame? But what happens on screen? (Note: Perhaps a simpler way to change to LOAD sprites is to use the SP1_DRAW_LOAD2LB and SP1_DRAW_LOAD2RB draw functions in place of the MASK ones used.  These are still 2-byte draw functions that simply ignore the mask byte when the sprite is drawn; the extra mask byte is wasted on this draw function but it does allow sprite graphics defined with masks to be used).
-* Try changing the *circle_sprites[i].x_pos++* code which moves each sprite 1 pixel to *circle_sprites[i].x_pos+=2*, to move them 2 pixels. How does that look? What about 3 pixels at a time?
+* Try changing the `circle_sprites[i].x_pos++` code which moves each sprite 1 pixel to `circle_sprites[i].x_pos += 2`, to move them 2 pixels. How does that look? What about 3 pixels at a time?
 * Can you mix different sprite types on screen?  Try creating some sprites as MASK, some as LOAD and some as OR.  Use the 2-byte draw functions for the LOAD and [OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/sp1.h#L177) so that all the sprites can share the MASK sprite graphics.
 
 ## Conclusion

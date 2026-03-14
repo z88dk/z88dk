@@ -65,35 +65,34 @@ cy    = character y coordinate (0..23)
 cxy   = character (x,y) coordinate
 ```
 
-If you wanted to find a function that converts a pixel x,y coordinate to a screen address, you would look for something like `zx_pxy2saddr`. Because the Spectrum stores the state of eight pixels in each byte, the screen address returned by that function holds the state of eight pixels. To plot an individual point, you would write a byte there that sets exactly one bit corresponding to the individual pixel you want to plot. There is another function zx_px2bitmask() that will tell you what byte to write given an x coordinate and we will see how that is used in the example below.
+If you wanted to find a function that converts a pixel x,y coordinate to a screen address, you would look for something like `zx_pxy2saddr`. Because the Spectrum stores the state of eight pixels in each byte, the screen address returned by that function holds the state of eight pixels. To plot an individual point, you would write a byte there that sets exactly one bit corresponding to the individual pixel you want to plot. There is another function `zx_px2bitmask()` that will tell you what byte to write given an x coordinate and we will see how that is used in the example below.
 
 It should be noted that both the character coordinates and the pixel coordinates have (0,0) located at the top left of the screen.  BASIC does the same for character coordinates but it places the pixel coordinate origin two character lines above the lower left of the screen.  So the pixel coordinate system is a little bit different in C.
 
 ### Plotting Points on Screen
 
-To illustrate how these display manipulators can be used, let's write a program that plots points at random on the screen.  Save this to a file called plot.c:
+To illustrate how these display manipulators can be used, let's write a program that plots points at random on the screen.  Save this to a file called `plot.c`:
 
 ```c
-  #include <arch/zx.h>
-  #include <stdlib.h>
+#include <arch/zx.h>
+#include <stdlib.h>
 
-  void plot(unsigned char x, unsigned char y)
-  {
-     *zx_pxy2saddr(x,y) |= zx_px2bitmask(x);
-  }
+void plot( unsigned char x, unsigned char y ) {
+    *zx_pxy2saddr( x, y ) |= zx_px2bitmask( x );
+}
 
-  int main(void)
-  {
-     unsigned char i;
+int main ( void ) {
 
-     zx_cls(PAPER_WHITE);
+    unsigned char i;
 
-     for( i=0; i<15; i++ )
-     {
-        plot(rand()%256, rand()%192);
-     }
-     return 0;
-  }
+    zx_cls( PAPER_WHITE );
+
+    for( i = 0; i < 15; i++ )
+        plot( rand()%256, rand()%192 );
+
+    return 0;
+
+}
 ```
 
 Our compile line will use startup=31 because we have no use for stdio in this example:
@@ -102,8 +101,7 @@ Our compile line will use startup=31 because we have no use for stdio in this ex
 zcc +zx -vn -startup=31 -clib=sdcc_iy plot.c -o plot -create-app
 ```
 
-In the plot() function, zx_pxy2saddr(x,y) returns a char* that represents the screen address that contains the pixel to be plotted. To find out which bit in the byte should be set, a call to zx_px2bitmask(x) is made. The result of that call is a byte with a single bit set in it - that's the bit we want to set. Then
-this byte is mixed into the display by ORing it in using the C operator "|=".
+In the `plot()` function, `zx_pxy2saddr(x,y)` returns a `char*` that represents the screen address that contains the pixel to be plotted. To find out which bit in the byte should be set, a call to `zx_px2bitmask(x)` is made. The result of that call is a byte with a single bit set in it - that's the bit we want to set. Then this byte is mixed into the display by ORing it in using the C operator `|=`.
 
 Notice we haven't done anything with colour. We're simply plotting pixels here and the colour they will appear in depends on the current attribute value on screen which is being set by `zx_cls()`.
 
@@ -113,50 +111,55 @@ Let's go one step further and draw lines on screen. We'll do that the easy way b
 
 It really isn't important to understand the Bresenham algorithm. The important point here is that Z88DK provides the low level tools which enable such an algorithm to be implemented.
 
-Retaining our plot function and borrowing the internet line code, save the following in file line.c:
+Retaining our plot function and borrowing the internet line code, save the following in file `line.c`:
 
 ```c
-  #include <arch/zx.h>
-  #include <input.h>
-  #include <stdlib.h>
+#include <arch/zx.h>
+#include <input.h>
+#include <stdlib.h>
 
-  void plot(unsigned char x, unsigned char y)
-  {
-     *zx_pxy2saddr(x,y) |= zx_px2bitmask(x);
-  }
+void plot ( unsigned char x, unsigned char y ) {
+    *zx_pxy2saddr( x, y ) |= zx_px2bitmask( x );
+}
 
-  void line(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1)
-  {
-     unsigned char dx  = abs(x1-x0);
-     unsigned char dy  = abs(y1-y0);
-     signed   char sx  = x0<x1 ? 1 : -1;
-     signed   char sy  = y0<y1 ? 1 : -1;
-     int           err = (dx>dy ? dx : -dy)/2;
-     int           e2;
+void line( unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1 ) {
 
-     while (1)
-     {
-        plot(x0,y0);
-        if (x0==x1 && y0==y1) break;
+    unsigned char dx  = abs( x1 - x0 );
+    unsigned char dy  = abs( y1 - y0 );
+    signed   char sx  = x0 < x1 ? 1 : -1;
+    signed   char sy  = y0 < y1 ? 1 : -1;
+    int           err = ( dx>dy ? dx : -dy ) / 2;
+    int           e2;
+
+    while (1) {
+
+        plot( x0, y0 );
+        if ( x0 == x1 && y0 == y1 )
+            break;
 
         e2 = err;
-        if (e2 >-dx) { err -= dy; x0 += sx; }
-        if (e2 < dy) { err += dx; y0 += sy; }
-     }
-  }
+        if ( e2 > -dx )
+            { err -= dy; x0 += sx; }
 
-  int main(void)
-  {
+        if ( e2 < dy )
+            { err += dx; y0 += sy; }
+
+    }
+
+}
+
+int main ( void ) {
+
     unsigned char i;
 
-    zx_cls(PAPER_WHITE);
+    zx_cls( PAPER_WHITE );
 
-    for( i=0; i<15; i++ )
-    {
-      line(rand()%256, rand()%192, rand()%256, rand()%192);
-    }
+    for( i = 0; i < 15; i++ )
+      line( rand()%256, rand()%192, rand()%256, rand()%192 );
+
     return 0;
-  }
+
+}
 ```
 
 The compile line is the same as for the last example:
