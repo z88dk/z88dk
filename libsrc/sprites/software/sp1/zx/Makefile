@@ -2,13 +2,13 @@ include ../../../../Make.config
 
 TARGET ?= zx
 
-NEWLIBGLOBS := "$(Z88DK_LIBSRC)/temp/sp1/zx/c/sccz80/*.asm" \
-	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/asm*.asm"  \
-	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/_sp*.asm"  \
-	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/__sp1_*_spr_char.asm" \
-	"$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/draw/*.asm" \
-	"$(Z88DK_LIBSRC)/temp/sp1/zx/tiles/*.asm" \
-	"$(Z88DK_LIBSRC)/temp/sp1/zx/updater/*.asm"
+NEWLIBGLOBS := $(Z88DK_LIBSRC)/temp/sp1/zx/c/sccz80/*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/asm*.asm  \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/_sp*.asm  \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/__sp1_*_spr_char.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/draw/*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/tiles/*.asm \
+	$(Z88DK_LIBSRC)/temp/sp1/zx/updater/*.asm
 NEWLIBGLOBS_ex := $(Z88DK_LIBSRC)/temp/sp1/zx/c/sccz80/*.asm \
 	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/asm*.asm \
 	$(Z88DK_LIBSRC)/temp/sp1/zx/sprites/_sp*.asm \
