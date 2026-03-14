@@ -58,7 +58,25 @@ ELSE
         ret
 ENDIF
 
-    defs        $0028-ASMPC
+IF __CPU_8085__
+    ; address = 0x0024
+        defs        $0024-ASMPC
+  if (ASMPC<>$0024)
+        defs    CODE_ALIGNMENT_ERROR
+  endif
+
+  IF (CRT_ENABLE_TRAP = 1)
+        EXTERN _8085_trap
+        jp     _8085_trap
+  ELIF (CRT_ENABLE_TRAP > 1)
+        jp     __8085_trap
+  ELSE
+        ret
+  ENDIF
+ENDIF
+
+
+        defs        $0028-ASMPC
 if (ASMPC<>$0028)
         defs    CODE_ALIGNMENT_ERROR
 endif
@@ -71,6 +89,40 @@ IF ((__crt_enable_rst & $20) = $20)
 ELSE
         ret
 ENDIF
+
+
+IF __CPU_8085__
+        defs        $002c-ASMPC
+  if (ASMPC<>$002c)
+        defs        CODE_ALIGNMENT_ERROR
+  endif
+
+  IF (CRT_ENABLE_INT55 = 1)
+
+        EXTERN _i8085_int55
+        jp     _i8085_int55
+  ELIF (CRT_ENABLE_INT55 > 1)
+        jp    __i8085_int55
+  ELSE
+        ei
+        ret
+  ENDIF
+ELIFDEF CRT_NSC800_RSTC
+        defs        $002c-ASMPC
+  if (ASMPC<>$002c)
+        defs        CODE_ALIGNMENT_ERROR
+  endif
+  IF (CRT_NSC800_RSTC = 1)
+        EXTERN _nsc800_rstc
+        jp     _nsc800_rstc
+  ELIF (CRT_NSC800_RSTC > 1)
+        jp    _nsc800_rstc
+  ELSE
+        ei
+        ret
+  ENDIF
+ENDIF
+
 
         defs    $0030-ASMPC
 if (ASMPC<>$0030)
@@ -85,6 +137,39 @@ IF ((__crt_enable_rst & $40) = $40)
 ELSE
         ret
 ENDIF
+
+
+IF __CPU_8085__
+        defs        $0034-ASMPC
+  if (ASMPC<>$0034)
+        defs        CODE_ALIGNMENT_ERROR
+  endif
+
+  IF (CRT_ENABLE_INT65 = 1)
+        EXTERN _i8085_int65
+        jp     _i8085_int65
+  ELIF (CRT_ENABLE_INT65 > 1)
+        jp    __i8085_int65
+  ELSE
+        ei
+        ret
+  ENDIF
+ELIFDEF CRT_NSC800_RSTB
+        defs        $0034-ASMPC
+  if (ASMPC<>$0034)
+        defs        CODE_ALIGNMENT_ERROR
+  endif
+  IF (CRT_NSC800_RSTB = 1)
+        EXTERN _nsc800_rstb
+        jp     _nsc800_rstb
+  ELIF (CRT_NSC800_RSTB > 1)
+        jp    _nsc800_rstb
+  ELSE
+        ei
+        ret
+  ENDIF
+ENDIF
+
 
         defs    $0038-ASMPC
 if (ASMPC<>$0038)
@@ -106,6 +191,38 @@ ELSE
   	ret
   ELSE
         reti
+  ENDIF
+ENDIF
+
+IF __CPU_8085__
+        defs        $003c-ASMPC
+  if (ASMPC<>$003c)
+        defs        CODE_ALIGNMENT_ERROR
+  endif
+
+  IF (CRT_ENABLE_INT75 = 1)
+
+        EXTERN _i8085_int75
+        jp     _i8085_int75
+  ELIF (CRT_ENABLE_INT75 > 1)
+        jp    __i8085_int75
+  ELSE
+        ei
+        ret
+  ENDIF
+ELIFDEF CRT_NSC800_RSTA
+        defs        $003c-ASMPC
+  if (ASMPC<>$003c)
+        defs        CODE_ALIGNMENT_ERROR
+  endif
+  IF (CRT_NSC800_RSTA = 1)
+        EXTERN _nsc800_rsta
+        jp     _nsc800_rsta
+  ELIF (CRT_NSC800_RSTA > 1)
+        jp    _nsc800_rsta
+  ELSE
+        ei
+        ret
   ENDIF
 ENDIF
 
