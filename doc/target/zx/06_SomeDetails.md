@@ -11,9 +11,9 @@ complex memory management and are not covered here.
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from [installment 5](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md).
+series and is continuing on from [installment 5](05_MultipleFiles.md).
 
-If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+If you would like to jump to the beginning, click on [installment 1](01_GettingStarted.md).
 
 ## Z88DK's Memory Map, Stack, and Other Details
 
@@ -35,7 +35,7 @@ libsrc/newlib/target/zx/crt_config.inc
 Skim read this file and you'll find the CRT_ORG_CODE value set to 32768. You'll
 also find the stack register is initially set to 65368 (REGISTER_SP) which
 places it immediately below the user defined graphics area. This is so that if
-the program returns to BASIC the UDGs will still be intact. The stack size is set to 
+the program returns to BASIC the UDGs will still be intact. The stack size is set to
 512 bytes. There's quite a few other things in there too, and they're documented
 [here](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded#crt_configuration).
 
@@ -192,6 +192,6 @@ the BiFrost multicolour library uses for itself.
 
 ### Where To Go From Here
 
-Now that we've seen how programs are laid out in memory, we can have a better 
+Now that we've seen how programs are laid out in memory, we can have a better
 look at the BiFrost library.
-Part 7 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)
+Part 7 is [here](07_BiFrost.md)

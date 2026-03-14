@@ -2,7 +2,7 @@
 
 This document describes how to get started writing ZX Spectrum programs using
 C, Z88DK and the SP1 sprite library. It's part of the [ZX Spectrum
-Z88DK/C developer's getting started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md).
+Z88DK/C developer's getting started guide](_GettingStartedGuide.md).
 
 ## Assumptions
 
@@ -143,7 +143,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   ' ' );
   sp1_Invalidate(&full_screen);
- 
+
   circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)circle, 0);
 
   sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
@@ -170,7 +170,7 @@ screen. It's not much, but it's a start.
 #### The SP1 header file and library
 
 As
-[discussed](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#header-files)
+[discussed](01_GettingStarted.md#header-files)
 in installment 1 of the Z88DK getting started guide, the header files
 for the sdcc compiler and the new libraries are found here:
 
@@ -190,7 +190,7 @@ but it's still the definitive guide to the SP1 C interface.
 
 The SP1 library code we're using is in the 'iy' version of the
 standard C library, as described
-[here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#library-files).
+[here](01_GettingStarted.md#library-files).
 On Linux you can confirm this with a command such as:
 
 ```
@@ -518,4 +518,4 @@ and
 in particular is a complete game written with SP1, and is an excellent
 source of ideas and revelations.
 
-The second article in this SP1 series covers masked sprites, and is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md).
+The second article in this SP1 series covers masked sprites, and is [here](SP1_02_SimpleMaskedSprite.md).

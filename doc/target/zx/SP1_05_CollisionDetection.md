@@ -1,11 +1,11 @@
 # ZX Spectrum Development with Z88DK - Sprite Collision Detection
 
 This document, the 5th in the SP1 part of the [ZX Spectrum Z88DK/C developer's
-getting started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md),
+getting started guide](_GettingStartedGuide.md),
 builds on the previous 4 instalments, showing some of the simpler techniques
 which can be used to detect collisions between
 sprites. It follows on from the [fourth
-document](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_04_BiggerSprites.md)
+document](SP1_04_BiggerSprites.md)
 which looked at bigger sprites.
 
 ---
@@ -260,7 +260,7 @@ the lowest boundary of the box:
 ```
 
 That's a very useful optimisation. But maybe this isn't a typical example. What
-if the sprites were also approaching downwards, from the top?  Or the sides? 
+if the sprites were also approaching downwards, from the top?  Or the sides?
 More hotspots would be required, but you only need to check those on the leading
 edge of the sprite. So which hotspot to check depends on the direction of the
 sprite's travel. The chain and sprite code is in the [examples
@@ -330,14 +330,14 @@ they've collided.
 Assuming the boxes are defined like this:
 
 ```
-   x1,y1            x1,y1             
-     +---------       *---------    
-     |        |       |        |    
-     |  box1  |       |  box2  |    
-     |        |       |        |    
-     |        |       |        |    
-     ---------+       ---------*    
-            x2,y2            x2,y2   
+   x1,y1            x1,y1
+     +---------       *---------
+     |        |       |        |
+     |  box1  |       |  box2  |
+     |        |       |        |
+     |        |       |        |
+     ---------+       ---------*
+            x2,y2            x2,y2
 
 ```
 
@@ -372,7 +372,7 @@ pixels of the moneybag:
 ![alt text](images/helicopter_right_intersection3.png "helicopter hit")
 
 but the bounding boxes do. (Compile the example and edge the helicopter towards
-the corner of a moneybag, the effect is quite clear when you're looking for it.) 
+the corner of a moneybag, the effect is quite clear when you're looking for it.)
 Since it's to the player's advantage it's alright to call that a hit and allow
 the moneybag to get collected.
 
@@ -417,7 +417,7 @@ when those extra checks are required? Such decisions are part of game design on
 a computer with very limited hardware.
 
 As another example, have a look at the particularly tricky [mothership
-sprite](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_04_BiggerSprites.md#a-bigger-example)
+sprite](SP1_04_BiggerSprites.md#a-bigger-example)
 used in a previous article in this series:
 
 ![alt text](images/mothership.png "mothership")

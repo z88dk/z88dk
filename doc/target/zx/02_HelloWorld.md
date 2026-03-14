@@ -8,7 +8,7 @@ sccz80 compiler nor the classic library is discussed.
 ## Assumptions
 
 It is assumed the reader has worked through the [first installment of this
-series](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+series](01_GettingStarted.md).
 
 ## Purpose
 
@@ -137,7 +137,7 @@ few bytes of the Spectrum's ROM:
 
       printf("\n");
     }
-  
+
     return 0;
   }
 
@@ -334,4 +334,4 @@ fzx proportional fonts, control codes supported
 32x24 rom print routine, no scanf
 much smaller than other crts because the rom is used for output
 
-[... continue to Part 3: Simple Graphics](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md)
+[... continue to Part 3: Simple Graphics](03_SimpleGraphics.md)

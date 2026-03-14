@@ -2,18 +2,18 @@
 
 This document describes how a ZX Spectrum developer can use the SP1 sprite
 library to place a masked sprite on screen. It follows on from the [first
-document](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md)
+document](SP1_01_GettingStarted.md)
 in the series, which the reader is assumed to have read.
 
 This document is part of the [ZX Spectrum Z88DK/C developer's getting
-started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md).
+started guide](_GettingStartedGuide.md).
 
 ## Purpose
 
 The SP1 library supports a number of ways of merging sprite data into the
 Spectrum's display, the simplest of which, just loading the data straight into
 video memory regardless of what's already there, was discussed in the [first SP1
-article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md)
+article](SP1_01_GettingStarted.md)
 in this series. The other modes are simple enough for the reader to
 explore on their own, but how SP1 deals with masked sprites is worthy of
 investigation.
@@ -24,7 +24,7 @@ The reader is expected to be following on from the first SP1 document, and to
 have read the other documents in the Getting Started series. In particular, this
 document makes use of the Spectrum's interrupt, and the reader is assumed to
 understand how Z88DK can set up the interrupt for custom use. This is covered in
-depth in the [interrupts article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md).
+depth in the [interrupts article](08_Interrupts.md).
 
 ## The Display Background
 
@@ -51,7 +51,7 @@ see the effects of the masking. We can create such a pattern by using a default
 
 **_This section introduces the SP1 concept of 'tiles'. If you've already read
 the
-[BiFrost](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)
+[BiFrost](07_BiFrost.md)
 part of this guide you'll know that BiFrost also has the concept of
 'tiles'. It's somewhat unfortunate and confusing that the two graphics libraries
 use the same term for different things. As we're about to see, SP1 uses the term
@@ -72,7 +72,7 @@ need to populate the tiles with something so we can experiment with the
 sprite masking. Fortunately there's an easy way to do this.
 
 In the first article in this SP1 getting started series we looked at a [small
-program](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite)
+program](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite)
 which initialises the SP1 library with this line of code:
 
 ```
@@ -99,7 +99,7 @@ does fill the screen with a repeating pattern which is what we need here.
 ### The Sprite Data
 
 Recall from the first article in this series that we used a simple 8x8 [circle
-graphic](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite)
+graphic](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite)
 as our sprite, and that the data for it was defined in assembly language
 as opposed to 'C' in order to make the graphical data a little easier to look
 at. We're going to continue with that approach. For our masked sprite we'll use
@@ -109,10 +109,10 @@ to the right:
 ```
   1111     11    11
  1    1    1      1
-1      1           
-1      1           
-1      1           
-1      1           
+1      1
+1      1
+1      1
+1      1
  1    1    1      1
   1111     11    11
 
@@ -122,7 +122,7 @@ SP1 masks have a bit set where the background is to be allowed to be seen. This
 mask just opens up the corners of the sprite; we could allow the centre of the
 circle to show the background if we so chose.
 
-As we've [seen](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code), in SP1 sprites are built up in columns, and our simple 8x8 pixel
+As we've [seen](SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code), in SP1 sprites are built up in columns, and our simple 8x8 pixel
 sprite is one column of data. With masked sprites, the data is arranged in
 memory as one mask byte, followed by one data byte, incrementing upwards in
 memory. That gives this assembly listing:
@@ -161,7 +161,7 @@ PUBLIC _circle_masked
 ```
 
 Our mask and graphic data are at the *circle_masked* label, mask byte first, and
-as [discussed](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#pixel-positioning)
+as [discussed](SP1_01_GettingStarted.md#pixel-positioning)
 in the first article of this series, the padding bytes before and
 after the actual graphic are required to assist SP1 with its pixel
 positioning. The padding bytes require mask and graphic data pairs just like the
@@ -212,7 +212,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   'X' );
   sp1_Invalidate(&full_screen);
- 
+
   circle_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0);
 
   sp1_AddColSpr(circle_sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0);
@@ -242,7 +242,7 @@ This code uses the Spectrum's hardware interrupt: it calls *intrinsic_ei()* to
 enable the interrupt (Z88DK programs start with interrupts disabled), and uses
 *intrinsic_halt()* to pause and wait for the interrupt between each screen
 update. As has been
-[discussed](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#runtime),
+[discussed](SP1_01_GettingStarted.md#runtime),
 you don't need to *HALT* the Z80 in SP1 programs in order to avoid flickering,
 so you might wonder what's going on here. If you take out the *intrinsic_halt()*
 call you'll see: the sprite zips across the screen too quickly to
@@ -263,7 +263,7 @@ called, and we can still *HALT* the Z80, the ISR just doesn't do anything.
 
 The default SP1 installation leaves room for the interrupt vector table at
 0xD000, and the jump vector at 0xD1D1. All these details are covered in the
-[interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
+[interrupts](08_Interrupts.md)
 document of this getting started guide.
 
 ### Masked sprite modifications
@@ -338,7 +338,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   'X' );
   sp1_Invalidate(&full_screen);
- 
+
   for( i=0; i<NUM_SPRITES; i++ )
   {
     circle_sprites[i].sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0);
@@ -391,12 +391,12 @@ tests. Now what happens? Increase the number of sprites to see how many SP1
 could realistically manipulate in a game.
 
 * Replace the masked sprite data and code with the simple LOADed sprite and code
-from the [first example](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many
-more sprites can it handle each frame? But what happens on screen?  
-(Note: Perhaps a simpler way to change to LOAD sprites is to use the SP1_DRAW_LOAD2LB 
-and SP1_DRAW_LOAD2RB draw functions in place of the MASK ones used.  These are still 
-2-byte draw functions that simply ignore the mask byte when the sprite is drawn; the 
-extra mask byte is wasted on this draw function but it does allow sprite graphics 
+from the [first example](SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many
+more sprites can it handle each frame? But what happens on screen?
+(Note: Perhaps a simpler way to change to LOAD sprites is to use the SP1_DRAW_LOAD2LB
+and SP1_DRAW_LOAD2RB draw functions in place of the MASK ones used.  These are still
+2-byte draw functions that simply ignore the mask byte when the sprite is drawn; the
+extra mask byte is wasted on this draw function but it does allow sprite graphics
 defined with masks to be used).
 
 * Try changing the *circle_sprites[i].x_pos++* code which moves each sprite 1
@@ -404,9 +404,9 @@ pixel to *circle_sprites[i].x_pos+=2*, to move them 2 pixels. How does that
 look? What about 3 pixels at a time?
 
 
-* Can you mix different sprite types on screen?  Try creating some sprites as MASK, 
-some as LOAD and some as OR.  Use the 2-byte draw functions for the LOAD and 
-[OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/sp1.h#L177) 
+* Can you mix different sprite types on screen?  Try creating some sprites as MASK,
+some as LOAD and some as OR.  Use the 2-byte draw functions for the LOAD and
+[OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx/sp1.h#L177)
 so that all the sprites can share the MASK sprite graphics.
 
 
@@ -426,9 +426,9 @@ programmer.
 ### Where To Go From Here
 
 More of the [example
-links](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#where-to-go-from-here)
+links](SP1_01_GettingStarted.md#where-to-go-from-here)
 given in the first article in this series will now make sense, since most of them
 use masked sprites.
 
-The [next article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md)
+The [next article](SP1_03_AnimatedSprite.md)
 in this series explores sprite animation.

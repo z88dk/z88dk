@@ -9,7 +9,7 @@ sccz80 compiler nor the classic library is discussed.
 
 It is assumed the reader has worked through the earlier installments of this
 series and is continuing on from
-[installment 3](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md).  If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+[installment 3](03_SimpleGraphics.md).  If you would like to jump to the beginning, click on [installment 1](01_GettingStarted.md).
 
 ## Input Devices
 
@@ -420,4 +420,4 @@ The Sinclair sticks map themselves to the number keys on the keyboard.
 
 ### Where To Go From Here
 
-[... continue to Part 5: Using multiple files](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md)
+[... continue to Part 5: Using multiple files](05_MultipleFiles.md)

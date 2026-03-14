@@ -8,8 +8,8 @@ sccz80 compiler nor the classic library is covered.
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from [installment 2](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md).
-If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+series and is continuing on from [installment 2](02_HelloWorld.md).
+If you would like to jump to the beginning, click on [installment 1](01_GettingStarted.md).
 
 ## Simple Graphics
 
@@ -150,10 +150,10 @@ that plots points at random on the screen.  Save this to a file called plot.c:
      unsigned char i;
 
      zx_cls(PAPER_WHITE);
-   
+
      for( i=0; i<15; i++ )
      {
-        plot(rand()%256, rand()%192);      
+        plot(rand()%256, rand()%192);
      }
      return 0;
   }
@@ -217,7 +217,7 @@ file line.c:
      {
         plot(x0,y0);
         if (x0==x1 && y0==y1) break;
-      
+
         e2 = err;
         if (e2 >-dx) { err -= dy; x0 += sx; }
         if (e2 < dy) { err += dx; y0 += sy; }
@@ -229,7 +229,7 @@ file line.c:
     unsigned char i;
 
     zx_cls(PAPER_WHITE);
-   
+
     for( i=0; i<15; i++ )
     {
       line(rand()%256, rand()%192, rand()%256, rand()%192);
@@ -259,4 +259,4 @@ Besides the screen address manipulators, there is one high level graphics functi
 in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/common/arch/zx.h#L280)
 and that is `zx_pattern_fill()`.  This can be used to fill an area on screen with a pattern.
 
-[... continue to Part 4: Input Devices](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md)
+[... continue to Part 4: Input Devices](04_InputDevices.md)

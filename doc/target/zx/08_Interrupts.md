@@ -11,9 +11,9 @@ complex memory management and are not covered here.
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from [installment 7](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md).
+series and is continuing on from [installment 7](07_BiFrost.md).
 
-If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+If you would like to jump to the beginning, click on [installment 1](01_GettingStarted.md).
 
 Two documents are referenced in the introduction below: the generic interrupts
 document in the Z88DK wiki, and the Coders Bucket blog post which covers
@@ -265,7 +265,7 @@ clearer. If you run it you'll notice that a) a small dashed line appears in the
 top left corner of the screen and b) the Spectrum locks up.  Let's look at the
 code to see what's happening.
 
-The first pragma, as we saw in [installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md#changing-the-memory-layout),
+The first pragma, as we saw in [installment 6](06_SomeDetails.md#changing-the-memory-layout),
 sets the stack pointer to address 0xFF58. This happens to be the default stack
 location but there's no harm is stating it explicitly. The second pragma sets
 the top byte of the heap to address 0xFBFA. Note how this is done: you give it
@@ -389,7 +389,7 @@ IM2_DEFINE_ISR_WITH_BASIC(isr)
   unsigned char  i;
 
   /*
-   * Scroll off-screen display buffer data leftwards one byte. This is just a memory move downwards by one. 
+   * Scroll off-screen display buffer data leftwards one byte. This is just a memory move downwards by one.
    */
   memcpy((unsigned char*)off_screen_buffer, (unsigned char*)off_screen_buffer+1, sizeof(off_screen_buffer)-1);
 

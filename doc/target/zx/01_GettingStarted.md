@@ -79,9 +79,9 @@ these commands should produce something similar to the output given:
   Z80 Module Assembler 2.8.5, (c) InterLogic 1993-2009, Paulo Custodio 2011-2017
 ```
 ```
-  >z88dk-appmake 
+  >z88dk-appmake
   appmake [+target] [options]
-  
+
   The z88dk application generator
   <pages and pages of help and options snipped>
 ```
@@ -94,15 +94,15 @@ As a starting point, both for discussion and development processes, we're going
 to get this program to compile and run:
 ```
   /* C source start */
-  
+
   #include <arch/zx.h>
-  
+
   int main(void)
   {
     zx_border(INK_BLACK);
     return 0;
   }
-  
+
   /* C source end */
 ```
 Details will follow, but for now it should be pretty obvious what this program
@@ -257,4 +257,4 @@ Do a search and you'll find the zx_border() function listed in there.
 The actual source code used to build the library is rooted in [z88dk/libsrc/](https://github.com/z88dk/z88dk/tree/master/libsrc/)
 and a search using the header path `arch/zx` as a clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/target/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
 
-[... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)
+[... continue to Part 2: Hello World](02_HelloWorld.md)

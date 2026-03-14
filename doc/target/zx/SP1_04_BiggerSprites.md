@@ -1,10 +1,10 @@
 # ZX Spectrum Development with C, Z88DK and SP1 - Bigger, Colourful Sprites
 
 This document, the 4th in the SP1 part of the [ZX Spectrum Z88DK/C developer's
-getting started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md),
+getting started guide](_GettingStartedGuide.md),
 builds on the previous 3 instalments, showing how to create bigger and more
 colourful sprites. It follows on from the [third
-document](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md)
+document](SP1_03_AnimatedSprite.md)
 which looked at animation.
 
 ## Purpose
@@ -50,7 +50,7 @@ SECTION rodata_user
 
 PUBLIC _bubble_col1
 PUBLIC _bubble_col2
-	
+
 	defb @11111111, @00000000
 	defb @11111111, @00000000
 	defb @11111111, @00000000
@@ -103,7 +103,7 @@ PUBLIC _bubble_col2
 	defb @00000111, @00110000
 	defb @00001111, @11000000
 	defb @00111111, @00000000
-		
+
 	defb @11111111, @00000000
 	defb @11111111, @00000000
 	defb @11111111, @00000000
@@ -118,7 +118,7 @@ Consider this carefully in relation to the graphic above: we have 2 columns of
 8-pixel-wide data, labelled *bubble_col1* and *bubble_col2*. Each has 16 rows,
 and each row consists of a mask byte followed by a data byte. This data layout
 is the same as we saw in the earlier [masked sprite
-example](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md#the-sprite-data),
+example](SP1_02_SimpleMaskedSprite.md#the-sprite-data),
 only with twice the vertical data (16 rows instead of 8). The first column is
 the left side of the sprite (with mask), and the second column is the right side
 (with mask).
@@ -170,7 +170,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   'X' );
   sp1_Invalidate(&full_screen);
- 
+
   bubble_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, (int)bubble_col1, 0);
   sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, (int)bubble_col2, 0);
   sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2RB,  SP1_TYPE_2BYTE, 0, 0);
@@ -181,7 +181,7 @@ int main(void)
     sp1_MoveSprPix(bubble_sprite, &full_screen, 0, x++, 80);
 
     z80_delay_ms(25);
-    sp1_UpdateNow();    
+    sp1_UpdateNow();
   }
 }
 ```
@@ -194,7 +194,7 @@ zcc +zx -vn -m -startup=31 -clib=sdcc_iy bubble_masked.c bubble_masked_sprite.as
 
 If you prefer the alternative method of specifying sprite data, as we saw in the
 [previous
-article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md#state-based-animation),
+article](SP1_03_AnimatedSprite.md#state-based-animation),
 you can specify the the sprite initialisation like this:
 
 ```
@@ -279,29 +279,29 @@ PUBLIC _mothership_col1
 ._mothership_col1
 
  defb @11111111, @00000000
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111110, @00000001 
- defb @11111100, @00000010 
- defb @11100000, @00011100 
- defb @10000000, @01110010 
- defb @11110000, @00001101 
- defb @11111110, @00000001 
- defb @11111101, @00000010 
- defb @11100011, @00011100 
- defb @11001111, @00110000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111110, @00000001
+ defb @11111100, @00000010
+ defb @11100000, @00011100
+ defb @10000000, @01110010
+ defb @11110000, @00001101
+ defb @11111110, @00000001
+ defb @11111101, @00000010
+ defb @11100011, @00011100
+ defb @11001111, @00110000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
 
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -315,30 +315,30 @@ PUBLIC _mothership_col1
 PUBLIC _mothership_col2
 ._mothership_col2
 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111000, @00000111 
- defb @11000000, @00111000 
- defb @00000000, @11000000 
- defb @00000000, @00011100 
- defb @00000000, @01110001 
- defb @00000000, @00000000 
- defb @00000000, @01001110 
- defb @00000000, @10110001 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111110, @00000001 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111000, @00000111
+ defb @11000000, @00111000
+ defb @00000000, @11000000
+ defb @00000000, @00011100
+ defb @00000000, @01110001
+ defb @00000000, @00000000
+ defb @00000000, @01001110
+ defb @00000000, @10110001
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111110, @00000001
+ defb @11111111, @00000000
+ defb @11111111, @00000000
 
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -352,30 +352,30 @@ PUBLIC _mothership_col2
 PUBLIC _mothership_col3
 ._mothership_col3
 
- defb @11100111, @00011000 
- defb @11000011, @00100100 
- defb @11000011, @00100100 
- defb @11100111, @00011000 
- defb @11111001, @00000110 
- defb @11111110, @00000001 
- defb @11111110, @00000001 
- defb @11111000, @00000100 
- defb @11111100, @00000011 
- defb @11111000, @00000100 
- defb @01110000, @10001000 
- defb @00000000, @01110000 
- defb @00000000, @00000110 
- defb @00000000, @01110000 
- defb @00000000, @10000000 
- defb @00000000, @00001000 
- defb @00000000, @00110000 
- defb @00000000, @10000000 
- defb @10000000, @01010011 
- defb @11010011, @00101100 
- defb @10111111, @01000000 
- defb @01111111, @10000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
+ defb @11100111, @00011000
+ defb @11000011, @00100100
+ defb @11000011, @00100100
+ defb @11100111, @00011000
+ defb @11111001, @00000110
+ defb @11111110, @00000001
+ defb @11111110, @00000001
+ defb @11111000, @00000100
+ defb @11111100, @00000011
+ defb @11111000, @00000100
+ defb @01110000, @10001000
+ defb @00000000, @01110000
+ defb @00000000, @00000110
+ defb @00000000, @01110000
+ defb @00000000, @10000000
+ defb @00000000, @00001000
+ defb @00000000, @00110000
+ defb @00000000, @10000000
+ defb @10000000, @01010011
+ defb @11010011, @00101100
+ defb @10111111, @01000000
+ defb @01111111, @10000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
 
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -389,30 +389,30 @@ PUBLIC _mothership_col3
 PUBLIC _mothership_col4
 ._mothership_col4
 
- defb @11100111, @00011000 
- defb @11000011, @00100100 
- defb @11000011, @00100100 
- defb @11100111, @00011000 
- defb @10011111, @01100000 
- defb @01111111, @10000000 
- defb @01111111, @10000000 
- defb @00011111, @00100000 
- defb @00111111, @11000000 
- defb @00011111, @00100000 
- defb @00001110, @00010001 
- defb @00000000, @00001110 
- defb @00000000, @01100000 
- defb @00000000, @00001110 
- defb @00000000, @00000001 
- defb @00000000, @00010000 
- defb @00000000, @00001100 
- defb @00000000, @00000001 
- defb @00000001, @11001010 
- defb @11001011, @00110100 
- defb @11111101, @00000010 
- defb @11111110, @00000001 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
+ defb @11100111, @00011000
+ defb @11000011, @00100100
+ defb @11000011, @00100100
+ defb @11100111, @00011000
+ defb @10011111, @01100000
+ defb @01111111, @10000000
+ defb @01111111, @10000000
+ defb @00011111, @00100000
+ defb @00111111, @11000000
+ defb @00011111, @00100000
+ defb @00001110, @00010001
+ defb @00000000, @00001110
+ defb @00000000, @01100000
+ defb @00000000, @00001110
+ defb @00000000, @00000001
+ defb @00000000, @00010000
+ defb @00000000, @00001100
+ defb @00000000, @00000001
+ defb @00000001, @11001010
+ defb @11001011, @00110100
+ defb @11111101, @00000010
+ defb @11111110, @00000001
+ defb @11111111, @00000000
+ defb @11111111, @00000000
 
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -426,30 +426,30 @@ PUBLIC _mothership_col4
 PUBLIC _mothership_col5
 ._mothership_col5
 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @00011111, @11100000 
- defb @00000011, @00011100 
- defb @00000000, @00000011 
- defb @00000000, @00111000 
- defb @00000000, @10001110 
- defb @00000000, @00000000 
- defb @00000000, @01110010 
- defb @00000000, @10001101 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
- defb @01111111, @10000000 
- defb @11111111, @00000000 
- defb @11111111, @00000000 
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @00011111, @11100000
+ defb @00000011, @00011100
+ defb @00000000, @00000011
+ defb @00000000, @00111000
+ defb @00000000, @10001110
+ defb @00000000, @00000000
+ defb @00000000, @01110010
+ defb @00000000, @10001101
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
+ defb @01111111, @10000000
+ defb @11111111, @00000000
+ defb @11111111, @00000000
 
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -485,7 +485,7 @@ PUBLIC _mothership_col6
  defb @10111111, @01000000
  defb @11000111, @00111000
  defb @11110011, @00001100
- defb @11111111, @00000000 
+ defb @11111111, @00000000
  defb @11111111, @00000000
 
  defb @11111111, @00000000
@@ -531,7 +531,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   'X' );
   sp1_Invalidate(&full_screen);
- 
+
   mothership_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 4, (int)mothership_col1, 0);
   sp1_AddColSpr(mothership_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, (int)mothership_col2, 0);
   sp1_AddColSpr(mothership_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, (int)mothership_col3, 0);
@@ -546,7 +546,7 @@ int main(void)
     sp1_MoveSprPix(mothership_sprite, &full_screen, 0, x++, 0);
 
     z80_delay_ms(10);
-    sp1_UpdateNow();    
+    sp1_UpdateNow();
   }
 }
 ```
@@ -633,12 +633,12 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   ' ' );
   sp1_Invalidate(&full_screen);
- 
+
   bubble_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 0, 0);
   sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, bubble_col2-bubble_col1, 0);
   sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2RB,  SP1_TYPE_2BYTE, 0, 0);
 
-  sp1_IterateSprChar(bubble_sprite, initialiseColour);  
+  sp1_IterateSprChar(bubble_sprite, initialiseColour);
 
   x=0;
   while(1)
@@ -646,7 +646,7 @@ int main(void)
     sp1_MoveSprPix(bubble_sprite, &full_screen, bubble_col1, x++, 80);
 
     z80_delay_ms(25);
-    sp1_UpdateNow();    
+    sp1_UpdateNow();
   }
 }
 ```
@@ -725,7 +725,7 @@ int main(void)
   sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
                   INK_BLACK | PAPER_WHITE,
                   ' ' );
- 
+
   mothership_sprite = sp1_CreateSpr(SP1_DRAW_LOAD2LB, SP1_TYPE_2BYTE, 4, 0, 0);
   sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col2-mothership_col1, 0);
   sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col3-mothership_col1, 0);
@@ -752,7 +752,7 @@ int main(void)
     }
 
     z80_delay_ms(20);
-    sp1_UpdateNow();    
+    sp1_UpdateNow();
   }
 }
 ```
@@ -860,4 +860,4 @@ SP1. The reader should now be able to display, colour and animate any sprite of
 any size using any of the SP1 draw functions. There's a lot of ground still to
 cover and we've still not even considered important issues such as collision
 detection. Thats the topic of the
-[5th article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_05_CollisionDetection.md) in the series.
+[5th article](SP1_05_CollisionDetection.md) in the series.

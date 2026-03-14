@@ -2,11 +2,11 @@
 
 This document describes how a ZX Spectrum developer can use the SP1 sprite
 library to animate a sprite on screen. It follows on from the [second
-document](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md)
+document](SP1_02_SimpleMaskedSprite.md)
 in the series, which the reader is assumed to have read.
 
 This document is part of the [ZX Spectrum Z88DK/C developer's getting
-started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md).
+started guide](_GettingStartedGuide.md).
 
 ## Purpose
 
@@ -64,7 +64,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	
+
 ._runner_f2
 	defb @00011000
 	defb @00011110
@@ -83,7 +83,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	
+
 ._runner_f3
 	defb @00000000
 	defb @00011000
@@ -102,7 +102,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	
+
 ._runner_f4
 	defb @00011000
 	defb @00011110
@@ -121,7 +121,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	
+
 ._runner_f5
 	defb @00011000
 	defb @00011110
@@ -140,7 +140,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-		
+
 ._runner_f6
 	defb @00011000
 	defb @00011110
@@ -159,7 +159,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-		
+
 ._runner_f7
 	defb @00000000
 	defb @00011000
@@ -178,7 +178,7 @@ PUBLIC _runner_f1
 	defb @00000000
 	defb @00000000
 	defb @00000000
-		
+
 ._runner_f8
 	defb @00011000
 	defb @00011110
@@ -208,7 +208,7 @@ create SP1 sprite data assembly listings from an animated GIF.
 Secondly, there is no mask data in this listing, for no reason other than your
 author didn't want to have to type those data lines in as well. We're going to
 go back to using SP1's LOAD draw routines which we used in [article
-1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code).
+1](SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code).
 
 What we have here is the data for an 8 frame sprite. That is, 8
 separate 8x8 pixel graphics, which drawn in sequence create the
@@ -222,7 +222,7 @@ this example. We only export the first frame address.
 
 Notice how each frame is separated from the next with 8 zero bytes. As discussed
 in the [first
-article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#pixel-positioning)
+article](SP1_01_GettingStarted.md#pixel-positioning)
 in this series, each sprite needs to have 7 zero bytes *before* it in memory,
 and also 8 zero bytes *after* it, in order to facilitate precise pixel
 positioning. This requirement persists for individual sprite animation frames,
@@ -337,7 +337,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   ' ' );
   sp1_Invalidate(&full_screen);
- 
+
   runner_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)runner_f1, 0);
 
   sp1_AddColSpr(runner_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
@@ -426,7 +426,7 @@ PUBLIC _arrow_right
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	
+
 ._arrow_right
 	defb @00001000
 	defb @00000100
@@ -444,7 +444,7 @@ PUBLIC _arrow_right
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	defb @00000000	
+	defb @00000000
 ```
 
 This is a simple 2-state sprite representing an arrow. One state has
@@ -490,7 +490,7 @@ int main(void)
                   INK_BLACK | PAPER_WHITE,
                   ' ' );
   sp1_Invalidate(&full_screen);
- 
+
   arrow_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0);
   sp1_AddColSpr(arrow_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
 
@@ -510,7 +510,7 @@ int main(void)
     sp1_MoveSprPix(arrow_sprite, &full_screen, arrow_state[state].graphic, x, 80);
     z80_delay_ms(10);
 
-    sp1_UpdateNow();    
+    sp1_UpdateNow();
   }
 }
 ```
@@ -531,7 +531,7 @@ location, and show it using this graphical data."
 
 The rest of the code should be simple to understand. We create a
 structure which holds a [key
-scancode](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md#scancodes)
+scancode](04_InputDevices.md#scancodes)
 which will allow us to detect
 user input and hence change state on cue, the graphical data to use
 when in the state, and a value to adjust the sprite's screen position
@@ -552,7 +552,7 @@ from one state to the next.
 
 ## Exercises for the reader
 
-* Add [mask data](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md#the-sprite-data)
+* Add [mask data](SP1_02_SimpleMaskedSprite.md#the-sprite-data)
 to the runner sprite and have him run through a screen with a background.
 
 * Add more states and graphics to the arrow sprite example. Change it
@@ -571,5 +571,5 @@ moved. While both approaches have their merits and use cases, it's
 the second approach which is generally more popular. Certainly, most
 of the SP1 example code in Z88DK uses it.
 
-The [next article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_04_BiggerSprites.md)
+The [next article](SP1_04_BiggerSprites.md)
 in this series looks at creating bigger and more colourful sprites.

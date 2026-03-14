@@ -16,9 +16,9 @@ particular interest in BiFrost.
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from [installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md).
+series and is continuing on from [installment 6](06_SomeDetails.md).
 
-If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+If you would like to jump to the beginning, click on [installment 1](01_GettingStarted.md).
 
 ## Z88DK's BiFrost Library
 
@@ -42,7 +42,7 @@ you require.
 ---
 
 **_This section introduces the BiFrost concept of 'tiles'. If you've already
-read the [SP1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md)
+read the [SP1](SP1_02_SimpleMaskedSprite.md)
 part of this guide you'll know that SP1 also has the concept
 of 'tiles'. It's somewhat unfortunate and confusing that the two graphics
 libraries use the same term for different things. As we're about to see,
@@ -210,7 +210,7 @@ int main(void)
 
   BIFROSTL_start();
 
-  while(1); 
+  while(1);
 }
 ```
 
@@ -387,7 +387,7 @@ towards the top left corner of the screen.
 
 The example program has 2 pragma instructions to the compiler at the top. The
 use of pragmas was covered in
-[installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
+[installment 6](06_SomeDetails.md)
 of this series. Of more interest is _why_ they are needed here.
 
 Without the pragmas the memory map of the program, together with the BiFrost
@@ -402,7 +402,7 @@ library, would look like this:
 |0xFF51  65361  |
 |               | BiFrost 81 byte tile map
 |0xFF01  65281  |
-|---------------|                    
+|---------------|
 |0xFF00  65280  |
 |              X| BiFrost Library
 |0xE501  58625 X|
@@ -437,7 +437,7 @@ tile map data as it grows downwards.
 
 So the first thing we have to do is move the stack somewhere safer, where it's
 got a bit of room to grow. That's what the REGISTER_SP pragma does, and as we
-saw in [installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md),
+saw in [installment 6](06_SomeDetails.md),
 setting it to -1 leaves the stack pointer where the BASIC loader puts it, which
 in our case is address 32767, safely below our program:
 
@@ -663,7 +663,7 @@ int main(void)
       BIFROST2_drawTileH(80, col, 0);
       if( ++col == 21 )
         col = 0;
-    }  
+    }
   }
 }
 ```
@@ -738,4 +738,4 @@ picture.
 
 The next part of this getting started guide looks at using the Spectrum's
 interrupt with Z88DK.
-Part 8 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
+Part 8 is [here](08_Interrupts.md)

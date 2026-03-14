@@ -8,9 +8,9 @@ sccz80 compiler nor the classic library is discussed.
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from [installment 4](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md).
+series and is continuing on from [installment 4](04_InputDevices.md).
 
-If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+If you would like to jump to the beginning, click on [installment 1](01_GettingStarted.md).
 
 The reader is assumed to be familiar with the idea of linking object files
 together within the context of a C program.
@@ -226,7 +226,7 @@ CRT=4
 Firstly, we use the Z88DK front end utility *zcc* as both the C compiler (which
 it fronts for *sdcc*) and the assembler (which it fronts for *z80asm*). Using
 the underlying tools is perfectly possible, but *zcc* makes life a lot easier,
-at least at first. We also define our [target platform](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#build-a-compile-command) and [CRT](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md#crts-for-reference) up front
+at least at first. We also define our [target platform](01_GettingStarted.md#build-a-compile-command) and [CRT](02_HelloWorld.md#crts-for-reference) up front
 to make them easier to change should we want to.
 
 ```
@@ -235,7 +235,7 @@ PRAGMA_FILE=zpragma.inc
 
 We define a separate file for our *pragma* declarations. We haven't seen pragmas
 yet. They will be introduced in the [next
-article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md#changing-the-memory-layout)
+article](06_SomeDetails.md#changing-the-memory-layout)
 where they are embedded into the C source. When using split builds it's easier
 to put them all into a separate file used by all the tools. This ensures they're
 used consistently. Don't worry about this detail until you need pragmas. For now
@@ -309,4 +309,4 @@ tool which is worth exploring, and is documented
 
 The next installment in this series takes a step back and looks at some of the
 details of how Z88DK C programs are arranged in memory.
-Part 6 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
+Part 6 is [here](06_SomeDetails.md)

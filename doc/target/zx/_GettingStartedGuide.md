@@ -11,25 +11,25 @@ be read in sequence:
 
 | Article         | Covers        |
 | --------------- | ------------- |
-| [Getting Started](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md) | The Z88DK toolset, compiler command line |
-| [Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)     | Text, stdio, CRTs |
-| [Simple Graphics](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md) | Simple graphics, screen addressing, line drawing example |
-| [Input Devices](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md)   | Keyboard, scancodes, joysticks |
-| [Multiple Files](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md)  | Multiple file builds, list files |
-| [Some Details](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)    | Memory map, pragmas |
-| [BiFrost](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)         | The BiFrost multicolour library |
-| [Interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md) | Z80 Mode 2 interrupts |
+| [Getting Started](01_GettingStarted.md) | The Z88DK toolset, compiler command line |
+| [Hello World](02_HelloWorld.md)     | Text, stdio, CRTs |
+| [Simple Graphics](03_SimpleGraphics.md) | Simple graphics, screen addressing, line drawing example |
+| [Input Devices](04_InputDevices.md)   | Keyboard, scancodes, joysticks |
+| [Multiple Files](05_MultipleFiles.md)  | Multiple file builds, list files |
+| [Some Details](06_SomeDetails.md)    | Memory map, pragmas |
+| [BiFrost](07_BiFrost.md)         | The BiFrost multicolour library |
+| [Interrupts](08_Interrupts.md) | Z80 Mode 2 interrupts |
 
 A complementary series of documents covers the SP1 sprite library, which is
 an excellent basis for Spectrum games written with Z88DK:
 
 | Article         | Covers        |
 | --------------- | ------------- |
-| [SP1, Getting Started](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md) | Getting started with SP1 |
-| [SP1, Masked Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md) | Masked sprites |
-| [SP1, Animated Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md) | Animated sprites |
-| [SP1, Bigger Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_04_BiggerSprites.md) | Bigger sprites, colour |
-| [SP1, Collision Detection](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_05_CollisionDetection.md) | Detecting collisions between sprites |
+| [SP1, Getting Started](SP1_01_GettingStarted.md) | Getting started with SP1 |
+| [SP1, Masked Sprites](SP1_02_SimpleMaskedSprite.md) | Masked sprites |
+| [SP1, Animated Sprites](SP1_03_AnimatedSprite.md) | Animated sprites |
+| [SP1, Bigger Sprites](SP1_04_BiggerSprites.md) | Bigger sprites, colour |
+| [SP1, Collision Detection](SP1_05_CollisionDetection.md) | Detecting collisions between sprites |
 
 
 These documents are a work in progress. Comments and suggestions are welcome in
