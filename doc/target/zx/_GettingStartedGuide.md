@@ -1,12 +1,8 @@
 # The ZX Spectrum Programmer's Z88DK Getting Started Guide
 
-The *ZX Spectrum Programmer's Z88DK Getting Started Guide* consists of a series
-of documents written to assist Spectrum developers who want to write programs in
-'C' using the Z88DK development toolset. The reader is expected to know the 'C'
-programming language, but otherwise the series starts from the very beginning.
+The *ZX Spectrum Programmer's Z88DK Getting Started Guide* consists of a series of documents written to assist Spectrum developers who want to write programs in 'C' using the Z88DK development toolset. The reader is expected to know the 'C' programming language, but otherwise the series starts from the very beginning.
 
-The articles lean towards Spectrum games development, and they are designed to
-be read in sequence:
+The articles lean towards Spectrum games development, and they are designed to be read in sequence:
 
 
 | Article         | Covers        |
@@ -20,8 +16,7 @@ be read in sequence:
 | [BiFrost](07_BiFrost.md)         | The BiFrost multicolour library |
 | [Interrupts](08_Interrupts.md) | Z80 Mode 2 interrupts |
 
-A complementary series of documents covers the SP1 sprite library, which is
-an excellent basis for Spectrum games written with Z88DK:
+A complementary series of documents covers the SP1 sprite library, which is an excellent basis for Spectrum games written with Z88DK:
 
 | Article         | Covers        |
 | --------------- | ------------- |
@@ -32,8 +27,7 @@ an excellent basis for Spectrum games written with Z88DK:
 | [SP1, Collision Detection](SP1_05_CollisionDetection.md) | Detecting collisions between sprites |
 
 
-These documents are a work in progress. Comments and suggestions are welcome in
-the [Z88DK Sinclair ZX forum](https://www.z88dk.org/forum/viewforum.php?f=2).
+These documents are a work in progress. Comments and suggestions are welcome in the [Z88DK Sinclair ZX forum](https://www.z88dk.org/forum/viewforum.php?f=2).
 
 
 | Further Reading | Covers        |
