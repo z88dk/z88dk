@@ -7,7 +7,8 @@
 #include "utils.h"
 #include <algorithm>
 #include <filesystem>
-#include <fstream>
+#include <iomanip>
+#include <sstream>
 #include <unordered_set>
 
 static const std::string blanks = " \t\r\n\v\f";
@@ -256,3 +257,16 @@ std::string expand_env_vars(const std::string& text) {
     return s;
 }
 
+std::string int_to_hex(int value) {
+    std::ostringstream oss;
+    if (abs(value < 10)) {
+        oss << value;
+    }
+    else if (value < 0) {
+        oss << "-$" << std::hex << std::setw(2) << std::uppercase << (-value);
+    }
+    else {
+        oss << "$" << std::hex << std::setw(2) << std::uppercase << value;
+    }
+    return oss.str();
+}

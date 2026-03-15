@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\const_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
@@ -141,6 +142,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\const_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
