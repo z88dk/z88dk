@@ -8,6 +8,8 @@
 
 #include "keywords.h"
 #include "source_loc.h"
+#include <string>
+#include <vector>
 
 // all strings stored in strpool for memory efficiency and fast comparisons
 
@@ -102,3 +104,4 @@ struct Token {
 
 struct SourceFile;          // forward declaration (no #include "source.h")
 void tokenize(SourceFile& source);
+std::vector<Token> tokenize_text(const std::string& text, const SourceLoc& loc);

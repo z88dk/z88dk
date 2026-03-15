@@ -48,7 +48,7 @@ static void print_message(const SourceLoc& loc, const std::string& level, const 
     }
     std::cerr << level << ": " << msg << std::endl;
 
-    SourceFile* file = get_source_file(loc.file);
+    SourceFile* file = get_source_file(loc.file, SourceLoc());
     if (file != nullptr) {
         if (loc.line >= 1 && loc.line <= static_cast<int>(file->lines.size())) {
             const SourceLine& line = file->lines[loc.line - 1];
