@@ -343,7 +343,7 @@ static bool parse_int_literal(const std::string& text, int base, int& value) {
             return false;
         }
         if (parsed < std::numeric_limits<int>::min() ||
-            parsed > std::numeric_limits<int>::max()) {
+                parsed > std::numeric_limits<int>::max()) {
             return false;
         }
 
@@ -362,10 +362,10 @@ enum class ScanResult {
 };
 
 static ScanResult try_scan_integer_literal(SourceLine& line,
-                                           const char* text,
-                                           size_t length,
-                                           size_t& pos,
-                                           const SourceLoc& loc) {
+        const char* text,
+        size_t length,
+        size_t& pos,
+        const SourceLoc& loc) {
     struct Candidate {
         bool matched = false;
         size_t end = 0;
@@ -376,7 +376,7 @@ static ScanResult try_scan_integer_literal(SourceLine& line,
 
     Candidate best;
 
-    auto consider = [&](size_t end, int base, const std::string& digits, const std::string& kind) {
+    auto consider = [&](size_t end, int base, const std::string & digits, const std::string & kind) {
         if (!best.matched || end > best.end) {
             best.matched = true;
             best.end = end;
@@ -404,7 +404,7 @@ static ScanResult try_scan_integer_literal(SourceLine& line,
 
     // 0x hexu / 0X hexu
     if (text[pos] == '0' && pos + 1 < length &&
-        (text[pos + 1] == 'x' || text[pos + 1] == 'X')) {
+            (text[pos + 1] == 'x' || text[pos + 1] == 'X')) {
         size_t p = pos + 2;
         if (scan_hexu(text, length, p)) {
             consider(p, 16, std::string(text + pos + 2, p - pos - 2), "hexadecimal");
@@ -413,7 +413,7 @@ static ScanResult try_scan_integer_literal(SourceLine& line,
 
     // 0b binu / 0B binu
     if (text[pos] == '0' && pos + 1 < length &&
-        (text[pos + 1] == 'b' || text[pos + 1] == 'B')) {
+            (text[pos + 1] == 'b' || text[pos + 1] == 'B')) {
         size_t p = pos + 2;
         if (scan_binu(text, length, p)) {
             consider(p, 2, std::string(text + pos + 2, p - pos - 2), "binary");
@@ -434,7 +434,7 @@ static ScanResult try_scan_integer_literal(SourceLine& line,
         // binu 'b'
         size_t pb = pos;
         if (scan_binu(text, length, pb) &&
-            pb < length && (text[pb] == 'b' || text[pb] == 'B')) {
+                pb < length && (text[pb] == 'b' || text[pb] == 'B')) {
             consider(pb + 1, 2, std::string(text + pos, pb - pos), "binary");
         }
 
@@ -660,7 +660,7 @@ static void tokenize_line(SourceLine& line, TokenizeState& state) {
 
             // check for .ASSUME
             if (keyword == Keyword::ASSUME &&
-                !line.tokens.empty() && line.tokens.back().type == TokenType::Dot) {
+                    !line.tokens.empty() && line.tokens.back().type == TokenType::Dot) {
                 line.tokens.pop_back();       // remove '.'
             }
 
@@ -1024,6 +1024,65 @@ static bool strip_line_continuation(SourceLine& line) {
         return true;
     }
     return false;
+}
+
+std::string tokens_to_string(const std::vector<Token>& tokens) {
+    auto concat = [](const std::string & s1, const std::string & s2) {
+        if (s1.empty() || s2.empty()) {
+            return s1 + s2;
+        }
+        else if (str_ends_with(s1, "##")) {   // cpp-style concatenation
+            return s1.substr(0, s1.length() - 2) + s2;
+        }
+        else if (is_space(s1.back()) || is_space(s2.front())) {
+            return s1 + s2;
+        }
+        else if (is_ident_char(s1.back()) && is_ident_char(s2.front())) {
+            return s1 + " " + s2;
+        }
+        else if (is_ident_char(s1.back()) && s2.front() == '@') {
+            return s1 + " " + s2;
+        }
+        else if (s1.back() == '$' && is_hex_digit(s2.front())) {
+            return s1 + " " + s2;
+        }
+        else if ((s1.back() == '%' || s1.back() == '@') &&
+                 (is_digit(s2.front()) || s2.front() == '"' || is_ident_start(s2.front()))) {
+            return s1 + " " + s2;
+        }
+        else if ((s1.back() == '&' && s2.front() == '&') ||
+                 (s1.back() == '|' && s2.front() == '|') ||
+                 (s1.back() == '^' && s2.front() == '^') ||
+                 (s1.back() == '*' && s2.front() == '*') ||
+                 (s1.back() == '<' && (s2.front() == '=' || s2.front() == '<' || s2.front() == '>')) ||
+                 (s1.back() == '>' && (s2.front() == '=' || s2.front() == '>')) ||
+                 (s1.back() == '=' && s2.front() == '=') ||
+                 (s1.back() == '!' && s2.front() == '=') ||
+                 (s1.back() == '#' && s2.front() == '#')) {
+            return s1 + " " + s2;
+        }
+        else {
+            return s1 + s2;
+        }
+    };
+
+    std::string out;
+    for (const Token& token : tokens) {
+        switch (token.type) {
+        case TokenType::EndOfLine:
+            out += '\n';
+            break;
+
+        case TokenType::EndOfFile:
+            break;
+
+        default:
+            out = concat(out, token.text);
+            break;
+        }
+    }
+
+    return out;
 }
 
 void tokenize(SourceFile& source) {
