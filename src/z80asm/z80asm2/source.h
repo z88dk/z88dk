@@ -8,22 +8,15 @@
 
 #include "lexer.h"
 #include "source_loc.h"
-#include "utils.h"
-#include <cstdint>
-#include <string.h>
+#include <string>
 #include <vector>
 
 // all strings stored in strpool for memory efficiency and fast comparisons
 
 struct SourceLine {
-    const char* text = "";              // filled by file reader
-    const char* expanded_text = "";     // filled by preprocessor
-    int address = 0;                    // filled by code generator
-    std::vector<uint8_t> bytes;         // filled by code generator
-    std::vector<Token> tokens;          // filled by lexer
-    SourceLoc loc;                      // filled by file reader
-
-    SourceLine();
+    const char* text = "";
+    std::vector<Token> tokens;
+    SourceLoc loc;
 };
 
 struct SourceFile {
@@ -33,4 +26,13 @@ struct SourceFile {
 
 // read source file and return normalized path and lines
 // caches file contents for later retrieval
-SourceFile& get_source_file(const std::string& file);
+// returns nullptr if the file could not be opened
+SourceFile* get_source_file(const std::string& file, const SourceLoc& loc = SourceLoc());
+
+// read whole file from a string
+// return empty string and issues error message if file cannot be opened
+std::string read_file_to_string(const std::string& filename, const SourceLoc& loc = SourceLoc());
+
+// split lines of a text into a vector of strings
+// accept LF, CR and CR-LF as line endings
+std::vector<SourceLine> split_source_lines(const std::string& filename, const std::string& content);
