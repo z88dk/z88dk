@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "const_expr.h"
 #include "source_loc.h"
 #include <string>
 #include <vector>
@@ -21,6 +22,7 @@ struct Options {
     std::string cpp_options;
     std::string output_dir;
     std::vector<std::string> include_paths;
+    ConstSymbols global_defs;
 };
 
 extern Options g_options;
