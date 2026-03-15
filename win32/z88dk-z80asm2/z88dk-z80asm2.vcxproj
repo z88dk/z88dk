@@ -131,16 +131,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source_loc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
