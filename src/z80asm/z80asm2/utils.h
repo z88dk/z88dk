@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <string>
 #include <cctype>
-#include <vector>
+#include <string>
 
 // global string pool
 // reuse string literals to save memory and speed up comparisons
@@ -29,6 +28,10 @@ inline bool is_digit(char c) {
 
 inline bool is_hex_digit(char c) {
     return std::isxdigit(static_cast<unsigned char>(c)) != 0;
+}
+
+inline bool is_oct_digit(char c) {
+    return c >= '0' && c <= '7';
 }
 
 inline bool is_bin_digit(char c) {
