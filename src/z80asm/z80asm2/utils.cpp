@@ -7,7 +7,10 @@
 #include "utils.h"
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
 #include <unordered_set>
+
+static const std::string blanks = " \t\r\n\v\f";
 
 const char* strpool(const std::string& str) {
     static std::unordered_set<std::string> pool;
@@ -31,6 +34,20 @@ std::string to_lower(const std::string& s) {
         return static_cast<char>(std::tolower(c));
     });
     return result;
+}
+
+std::string ltrim(const std::string& s) {
+    size_t start = s.find_first_not_of(blanks);
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+
+std::string rtrim(const std::string& s) {
+    size_t end = s.find_last_not_of(blanks);
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+std::string trim(const std::string& s) {
+    return ltrim(rtrim(s));
 }
 
 bool str_ends_with(const std::string& str, const std::string& ending) {
@@ -117,5 +134,125 @@ std::string parent_dir(const std::string& path) {
     catch (...) {
         return std::string();
     }
+}
+
+std::string replace_extension(const std::string& filename, const std::string& extension) {
+    try {
+        std::filesystem::path p(filename);
+        p.replace_extension(extension);
+        return normalize_path(p.lexically_normal().generic_string());
+    }
+    catch (...) {
+        return normalize_path(filename + extension);
+    }
+}
+
+std::string prepend_output_dir(const std::string& filename, const std::string& output_dir) {
+    namespace fs = std::filesystem;
+
+    if (output_dir.empty()) {
+        return normalize_path(filename);
+    }
+    else if (filename.substr(0, output_dir.size() + 1) == output_dir + "/") {
+        // #2260: may be called with an object file already with
+        // the path prepended; do not add it twice
+        return normalize_path(filename);
+    }
+    else {
+        // NOTE: concatenation (/) of a relative fs::path and an
+        // absolute fs::path discards the first one! Do our magic
+        // with strings instead.
+
+        // is it a win32 absolute path?
+        std::string file;
+        if (filename.size() >= 2 && is_alpha(filename[0]) && filename[1] == ':') {	// C:
+            file += output_dir + "/";
+            file += std::string(1, filename[0]) + "/";
+            file += std::string(filename.substr(2));
+        }
+        else {
+            file += output_dir + "/";
+            file += filename;
+        }
+        fs::path path{ file };
+        return normalize_path(path.lexically_normal().generic_string());
+    }
+}
+
+// Helper: get environment variable value in a secure, cross-platform way.
+// Returns empty string if the variable is not set.
+std::string get_env_value(const std::string& name) {
+#ifdef _MSC_VER
+    char* buf = nullptr;
+    size_t sz = 0;
+    if (_dupenv_s(&buf, &sz, name.c_str()) != 0 || buf == nullptr) {
+        return std::string();
+    }
+    std::string value(buf);
+    free(buf);
+    return value;
+#else
+    const char* v = std::getenv(name.c_str());
+    return v ? std::string(v) : std::string();
+#endif
+}
+
+// Expand environment variables of the form ${VAR}. Supports nesting such as ${var${param}}.
+// Unset variables expand to the empty string. Recursively expands until no patterns remain.
+std::string expand_env_vars(const std::string& text) {
+    const size_t RUNAWAY_GUARD = 1000; // prevent infinite loops
+    std::string s = text;
+
+    // Limit iterations to avoid infinite loops if values reintroduce placeholders cyclically.
+    size_t guard = 0;
+    while (true) {
+        size_t start = s.find("${");
+        if (start == std::string::npos) {
+            break;
+        }
+
+        // Find matching closing brace for this ${ ... }, supporting nested ${...} inside.
+        size_t level = 1;
+        size_t i = start + 2;
+        size_t end = std::string::npos;
+
+        while (i < s.size()) {
+            if (s[i] == '$' && i + 1 < s.size() && s[i + 1] == '{') {
+                level++;
+                i += 2;
+                continue;
+            }
+            if (s[i] == '}') {
+                level--;
+                if (level == 0) {
+                    end = i;
+                    break;
+                }
+            }
+            i++;
+        }
+
+        if (end == std::string::npos) {
+            // Unbalanced pattern; stop processing to avoid infinite loop.
+            break;
+        }
+
+        // Extract inner name and recursively expand it to support nested names.
+        std::string inner = s.substr(start + 2, end - (start + 2));
+        std::string var_name = expand_env_vars(inner);
+
+        // Secure env fetch (avoids MSVC C4996 warning for getenv)
+        std::string value = get_env_value(var_name);
+
+        // Replace the pattern with the environment value.
+        s = s.substr(0, start) + value + s.substr(end + 1);
+
+        if (++guard > RUNAWAY_GUARD) {
+            // Safety guard to prevent runaway expansion.
+            break;
+        }
+    }
+
+    return s;
 }
 
