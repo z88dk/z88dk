@@ -1,14 +1,16 @@
 include ../../../Make.config
 
+LIBSRC := ../../..
+
 TARGET ?= test
 
-NEWLIBGLOBS := "$(Z88DK_LIBSRC)/math/integer/fast/*.asm" "$(Z88DK_LIBSRC)/math/integer/small/*.asm" "$(Z88DK_LIBSRC)/math/integer/*.asm"
+NEWLIBGLOBS := "$(LIBSRC)/math/integer/fast/*.asm" "$(LIBSRC)/math/integer/small/*.asm" "$(LIBSRC)/math/integer/*.asm"
 NEWLIBGLOBS_ex := $(Z88DK_LIBSRC)/math/integer/fast/*.asm $(Z88DK_LIBSRC)/math/integer/small/*.asm $(Z88DK_LIBSRC)/math/integer/*.asm
-NEWLIBZ180GLOBS := "$(Z88DK_LIBSRC)/math/integer/z180/*.asm"
+NEWLIBZ180GLOBS := "$(LIBSRC)/math/integer/z180/*.asm"
 NEWLIBZ180GLOBS_ex := $(Z88DK_LIBSRC)/math/integer/z180/*.asm
-NEWLIBZXNGLOBS := "$(Z88DK_LIBSRC)/math/integer/z80n/*.asm"
+NEWLIBZXNGLOBS := "$(LIBSRC)/math/integer/z80n/*.asm"
 NEWLIBZXNGLOBS_ex := $(Z88DK_LIBSRC)/math/integer/z80n/*.asm
-NEWLIBR2KAGLOBS := "$(Z88DK_LIBSRC)/math/integer/r2ka/*.asm"
+NEWLIBR2KAGLOBS := "$(LIBSRC)/math/integer/r2ka/*.asm"
 NEWLIBR2KAGLOBS_ex := $(Z88DK_LIBSRC)/math/integer/r2ka/*.asm
 
 NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2ka obj/newlib-ixiy obj/newlib-z180 obj/newlib-ez80_z80
@@ -25,27 +27,27 @@ all: $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib \
 	 $(OUTPUT_DIRECTORY)/fastmath_ez80_z80.lib
 
 obj/newlib-z80: $(NEWLIBGLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/z80/x/1/2/3 -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 	@touch $@
 
 obj/newlib-r2ka: $(NEWLIBGLOBS_ex) $(NEWLIBR2KAGLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/r2ka/x -I.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBR2KAGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/r2ka/x/1/2/3/ -I.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBR2KAGLOBS)
 	@touch $@
 
 obj/newlib-z80n: $(NEWLIBGLOBS_ex) $(NEWLIBZXNGLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBZXNGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/z80n/x/1/2/3/ -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBZXNGLOBS)
 	@touch $@
 
 obj/newlib-z180: $(NEWLIBGLOBS_ex) $(NEWLIBZ180GLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/z180/x -I.. -mz180 -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBZ180GLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/z180/x/1/2/3 -I.. -mz180 -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBZ180GLOBS)
 	@touch $@
 
 obj/newlib-ez80_z80: $(NEWLIBGLOBS_ex) $(NEWLIBZ180GLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/ez80_z80/x -I.. -mez80_z80 -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBZ180GLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/ez80_z80/x/1/2/3 -I.. -mez80_z80 -D__CLASSIC $(NEWLIBGLOBS) $(NEWLIBZ180GLOBS)
 	@touch $@
 
 obj/newlib-ixiy: $(NEWLIBGLOBS_ex)
-	$(Q)$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/ixiy/x/1/2/3 -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 	@touch $@
 
 $(OUTPUT_DIRECTORY)/fastmath.lib: fastmath.lst obj/newlib-z80
