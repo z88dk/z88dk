@@ -26,7 +26,7 @@ DEPENDS := $(OBJS:.o=.d)
 
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
-		  --max-code-length=120 --lineend=linux --formatted \
+		  --max-code-length=100 --lineend=linux --formatted \
 		  --recursive "*.cpp" "*.h"
 
 all: $(PROJ)$(EXE)
@@ -59,7 +59,7 @@ CLEAN_FILES = \
   )
 
 clean:
-	$(RM) -f $(PROJ) $(PROJ)$(EXE) $(CLEAN_FILES)
-	$(RM) -rf $(OBJ_DIR) $(wildcard test_t_*)
+	$(RM) $(PROJ) $(PROJ)$(EXE) $(CLEAN_FILES)
+	$(RM) -r $(OBJ_DIR)
 
 -include $(DEPENDS)

@@ -4,15 +4,93 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "source.h"
+#include "errors.h"
+#include "options.h"
 #include "utils.h"
+#include <filesystem>
 #include <iostream>
+#include <sstream>
+#include <string>
+
+static const std::string z80asm_env = "Z80ASM";
+
+static void preprocess_only() {}
+static void assemble_files() {}
+
+static bool has_verbose(int argc, char* argv[]) {
+    std::string env_options = get_env_value(z80asm_env);
+    if (env_options.find("-v") != std::string::npos) {
+        return true;
+    }
+    for (int i = 1; i < argc; ++i) {
+        std::string arg(argv[i]);
+        if (arg.find("-v") != std::string::npos) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void show_command_line(int argc, char* argv[]) {
+    std::string env_options = get_env_value(z80asm_env);
+    if (!env_options.empty()) {
+        std::cout << z80asm_env << "=" << env_options << std::endl;
+    }
+
+    std::string cmd = std::filesystem::path(argv[0]).stem().generic_string();
+    std::cout << "% " << cmd;
+    for (int i = 1; i < argc; ++i) {
+        std::cout << " " << argv[i];
+    }
+    std::cout << std::endl;
+}
 
 int main(int argc, char* argv[]) {
-    if (argc == 2) {
-        // assemble file
-        const char* file = argv[1];
-        SourceFile& sf = get_source_file(file);
-        std::cout << std::string(sf.file) << " has " << sf.lines.size() << " lines\n";
+    if (argc == 1) {
+        exit_show_copyright(EXIT_SUCCESS);
     }
+
+    // show command line if verbose
+    if (has_verbose(argc, argv)) {
+        show_command_line(argc, argv);
+    }
+
+    // process options from environment variable Z80ASM
+    std::istringstream ss(get_env_value(z80asm_env));
+    std::string arg;
+    while (ss >> arg) {
+        bool found_dash_dash = false;
+        if (!parse_arg(arg, found_dash_dash)) {
+            exit_invalid_option(arg);
+        }
+    }
+
+    // process command line arguments
+    bool found_dash_dash = false;
+    for (int i = 1; i < argc; ++i) {
+        if (!parse_arg(argv[i], found_dash_dash)) {
+            exit_invalid_option(argv[i]);
+        }
+    }
+
+    // detect errors from argument processing
+    if (error_count()) {
+        return EXIT_FAILURE;
+    }
+
+    if (g_input_files.empty()) {
+        error("No input files");
+        exit(EXIT_FAILURE);
+    }
+
+    // execute requested actions
+    if (g_options.preprocess_only) {
+        preprocess_only();
+    }
+    else {
+        assemble_files();
+    }
+
+    return error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
+
