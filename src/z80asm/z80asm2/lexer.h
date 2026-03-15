@@ -102,6 +102,8 @@ struct Token {
     static Token end_of_file(const SourceLoc& loc);
 };
 
+std::string tokens_to_string(const std::vector<Token>& tokens);
+
 struct SourceFile;          // forward declaration (no #include "source.h")
 void tokenize(SourceFile& source);
 std::vector<Token> tokenize_text(const std::string& text, const SourceLoc& loc);
