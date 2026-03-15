@@ -39,7 +39,7 @@ std::string resolve_include_candidate(const std::string& filename,
 
 // parse arguments and options
 bool parse_arg(const std::string& arg, bool& found_dash_dash);
-void search_source_file(const std::string& filename, const SourceLoc& loc = SourceLoc());
+void search_source_file(const std::string& filename, const SourceLoc& loc);
 
 void exit_show_copyright(int exit_code);
 void exit_show_usage(int exit_code);
