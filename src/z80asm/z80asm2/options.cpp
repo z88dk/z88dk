@@ -184,7 +184,7 @@ bool parse_arg(const std::string& arg, bool& found_dash_dash) {
     }
     else {
         // input file
-        search_source_file(arg);
+        search_source_file(arg, SourceLoc());
     }
 
     return true;
@@ -386,7 +386,7 @@ static void run_tool(const std::string& filename,
     }
 
     // process generated asm file
-    search_source_file(asm_filename);
+    search_source_file(asm_filename, loc);
 }
 
 // run m4 preprocessor
