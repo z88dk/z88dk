@@ -8,8 +8,6 @@
 
 #include "keywords.h"
 #include "source_loc.h"
-#include "utils.h"
-#include <string.h>
 
 // all strings stored in strpool for memory efficiency and fast comparisons
 
@@ -101,3 +99,6 @@ struct Token {
     static Token end_of_line(const SourceLoc& loc);
     static Token end_of_file(const SourceLoc& loc);
 };
+
+struct SourceFile;          // forward declaration (no #include "source.h")
+void tokenize(SourceFile& source);
