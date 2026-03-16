@@ -4,6 +4,11 @@
 #define ARCH_HDOS_H
 
 
+#include <sys/compiler.h>
+#include <sys/types.h>
+#include <stdint.h>
+
+
 // Get HDOS version
 //
 #define HDOS_VER_10 0x00
@@ -14,10 +19,26 @@
 extern int __LIB__ hdos_ver(void);
 
 
+// Clear console input buffer
+//
+#define hdos_clrco() asm("rst\t38h\ndefb\t7\n");
+
+
 // Load HDOS overlay number
 // on exit: !=0 if load error
 //
 extern int __LIB__ hdos_overlay(int ov) __z88dk_fastcall;
+
+
+/* HDOS channels
+ *
+ *   -1   : special -- pre-opened on the running program file.
+ *    0–5 : normal file/device channels.
+ *
+ *    In the fcntl library, range is 0..4 will be used for user files,
+ *    #5 will be kept for internal use
+ *
+ */
 
 
 ////////////////////
@@ -26,6 +47,63 @@ extern int __LIB__ hdos_overlay(int ov) __z88dk_fastcall;
 // The file fucntions will return non-zero if an error occurs
 // When no device or file extension is specified, the default values will be used
 // The channel 'ch' is in the range -1..5 (the program itself is open on channel -1).
+
+
+/* Maximum number of open files. If you want to change this then you
+ * compile your program with -pragma-define:CLIB_OPEN_MAX=xx
+ */
+#ifndef CLIB_OPEN_MAX
+extern void *_CLIB_OPEN_MAX;
+#define CLIB_OPEN_MAX (int)&_CLIB_OPEN_MAX
+#endif
+
+#define MAXFILE CLIB_OPEN_MAX
+
+/* Size of HDOS Sector */
+#define SECSIZE  256
+
+/* Flags for fcp->use */
+#define U_READ  1               /* file open for reading */
+#define U_WRITE 2               /* file open for writing */
+#define U_RDWR  3               /* open for read and write */
+
+
+struct fcb {
+    // 19 bytes
+    char    top[1];         /* reserved */
+    char    device[2];      /* disk/device name (e.g. SY) */
+    char    unit[1];        /* disk/device unit (e.g. SY1) */
+    char    name[8];        /* file name */
+    char    ext[3];         /* file type */
+    char    bottom[4];      /* reserved */
+
+    // 11 bytes used by the library
+    unsigned long rwptr;    /* read/write pointer in bytes */
+    uint8_t    use;         /* use flag */
+    uint8_t    mode;        /* TEXT/BINARY discrimination */
+    uint8_t    rnr_dirty;   /* Set if the rwptr needs to be recalculatd */
+    uint32_t   record_nr;   /* Record number that that rwptr refers to */ 
+
+    // 256+5 bytes used for caching
+    unsigned long cached_record;    /* Record number that we have cached */
+    uint8_t    dirty;       /* Set if the buffer is dirty and needs writing to disc */
+    uint8_t    buffer[SECSIZE];
+};
+
+extern struct fcb  _fcb[0]; /* Has MAXFILES entries */
+
+
+/* Get a free FCB */
+extern struct fcb __LIB__ *getfcb(void);
+
+/* Spot a free file pointer */
+extern struct fcb __LIB__ *getfcb(void);
+/* Fill up the filename stuff */
+extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
+extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
+
+
+/*  **********************  */
 
 // Default device and extension, set to "SY1TXT"
 extern char *hdos_default;
@@ -49,6 +127,12 @@ extern int __LIB__          hdos_delete(char *name) __z88dk_fastcall;
 extern int __LIB__          hdos_chflg(char *name, int flags) __smallc;
 extern int __LIB__   hdos_chflg_callee(char *name, int flags) __smallc __z88dk_callee;
 #define hdos_chflg(a,b) hdos_chflg_callee(a,b)
+
+// Decode a user specifie filespec
+//
+extern int __LIB__          hdos_decode(char *name, char *decoded) __smallc;
+extern int __LIB__   hdos_decode_callee(char *name, char *decoded) __smallc __z88dk_callee;
+#define hdos_decode(a,b) hdos_decode_callee(a,b)
 
 // Open HDOS file for reading
 //

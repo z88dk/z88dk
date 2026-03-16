@@ -2,6 +2,8 @@ target/hdos/stdio/obj/${TYPE}/fgetc_cons
 target/hdos/stdio/obj/${TYPE}/getk
 target/hdos/stdio/obj/${TYPE}/fputc_cons
 target/hdos/hdos/obj/${TYPE}/hdos_ver
+target/hdos/hdos/obj/${TYPE}/hdos_decode
+target/hdos/hdos/obj/${TYPE}/hdos_decode_callee
 target/hdos/hdos/obj/${TYPE}/hdos_default
 target/hdos/hdos/obj/${TYPE}/hdos_delete
 target/hdos/hdos/obj/${TYPE}/hdos_close
@@ -24,4 +26,7 @@ target/hdos/hdos/obj/${TYPE}/hdos_chflg
 target/hdos/hdos/obj/${TYPE}/hdos_chflg_callee
 target/hdos/fcntl/obj/${TYPE}/remove
 target/hdos/fcntl/obj/${TYPE}/rename
+target/hdos/fcntl/obj/${TYPE}/getfcb
+target/hdos/fcntl/obj/${TYPE}/setfcb
+target/hdos/fcntl/obj/${TYPE}/parsefcb
 @classic/stdio/stdio_binary.lst
