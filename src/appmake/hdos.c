@@ -561,14 +561,16 @@ int hdos_exec(char *target)
 
     fclose (fp);
 
-    /* Write disk image */
-    if (strcmp(disc_container,"raw") == 0)
-        suffix_change(filename, ".h8d");
-    else
-        suffix_change(filename, extension);
+    if (!absopt) {
+        /* Write disk image */
+        if (strcmp(disc_container,"raw") == 0)
+            suffix_change(filename, ".h8d");
+        else
+            suffix_change(filename, extension);
 
-    if (writer(h, filename) < 0) {
-        exit_log(1, "Can't write disc image\n");
+        if (writer(h, filename) < 0) {
+            exit_log(1, "Can't write disc image\n");
+        }
     }
 
     return 0;
