@@ -21,6 +21,7 @@ static char             *disc_image   = NULL;
 static char             *disc_container    = "raw";
 static int               origin       = -1;
 static char              dumb         = 0;
+static char              absopt       = 0;
 static char              help         = 0;
 
 
@@ -30,6 +31,7 @@ option_t hdos_options[] = {
     { 'h', "help",     "Display this help",           OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",          OPT_STR,   &binname },
     {  0,  "dumb",     "Do not add the ABS file header",  OPT_BOOL,  &dumb },
+    {  0,  "abs",      "Create also the ABS file",    OPT_BOOL,  &absopt },
     {  0 , "org",      "Origin of the binary",        OPT_INT,   &origin },
     { 'c', "crt0file", "crt0 file used in linking",   OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",         OPT_STR,   &outfile },
@@ -67,6 +69,7 @@ typedef struct {
     uint16_t crd, ald;
 } HDOS_DirEntry;
 
+uint8_t hdr[8];
 
 
 /* HDOS 1.6 skeleton */
@@ -119,7 +122,7 @@ unsigned char hdos_16[]={
     0x14, 0x4f, 0x14, 0xfe, 0x47, 0x41, 0x43, 0x20, 0x2f, 0x20, 0x48, 0x45, 0x41, 0x54, 0x48, 0x20,
     0x43, 0x4f, 0x2e, 0x72, 0x61, 0x6e, 0x63, 0x65, 0x20, 0x6f, 0x00, 0x17, 0xe2, 0x00, 0xdc, 0x00,
 
-	// CHARMAP
+    // CHARMAP
     0xee,
     0x9a, 0x00, 0xff, 0xff, 0xff, 0x00, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
     0x11, 0x12, 0x13, 0x14, 0xc7, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
@@ -247,9 +250,9 @@ static int insert_file(disc_handle *h, FILE *in, HDOS_Label lab, uint8_t *grt, c
                 // ABS header: 0xFF,0x00, then three big-endian words (load, length, entry)
                 memset(sec, 0, sizeof(sec));
                 sec[0] = 0xFF; sec[1] = 0x00;
-                w16le(sec + 2, (uint16_t)abs_addr);
-                w16le(sec + 4, (uint16_t)(len - 8));  // payload byte count (no header)
-                w16le(sec + 6, (uint16_t)abs_addr);
+                w16le(sec + 2, abs_addr);
+                w16le(sec + 4, (len - 8));  // payload byte count (no header)
+                w16le(sec + 6, abs_addr);
                 r = fread(sec + 8, 1, SECTOR_SIZE - 8, in);     // may be 0..(SECTOR_SIZE-8)
                 // If r < SECTOR_SIZE-8, secfer tail is already zeroed by memset above
             } else {
@@ -284,8 +287,8 @@ static int insert_file(disc_handle *h, FILE *in, HDOS_Label lab, uint8_t *grt, c
                 // printf("Identified Directory slot at offset %u\n",off);
                 // Prepare NAME.EXT in 8.3 uppercase
                 memset(blk + off, 0, 23);
-				// cpm_create_filename() could probably replace the next lines
-				// --------------
+                // cpm_create_filename() could probably replace the next lines
+                // --------------
                 char name8[8] = {0}, ext3[3] = {0};
                 const char *dot = strchr(filename, '.');
                 if (dot) {
@@ -296,7 +299,7 @@ static int insert_file(disc_handle *h, FILE *in, HDOS_Label lab, uint8_t *grt, c
                 } else {
                     memcpy(name8, filename, 8);
                 }
-				// --------------
+                // --------------
                 memcpy(blk + off,     name8, 8);
                 memcpy(blk + off + 8, ext3,  3);
 
@@ -346,8 +349,8 @@ int hdos_exec(char *target)
     char    filename[FILENAME_MAX+1];
     char    prgname[FILENAME_MAX+1];
     int     pos,len;
-    FILE    *fp,*rfp;
-	long rsize;
+    FILE    *fp,*fa,*rfp;
+    long rsize;
     int     i,j,k;
     disc_handle   *h;
     const char    *extension;
@@ -360,6 +363,10 @@ int hdos_exec(char *target)
 
     if ( binname == NULL ) {
         return -1;
+    }
+
+    if (dumb && absopt) {
+        exit_log(1,"Can't mix '--dumb' and '--abs' options\n");
     }
 
     disc_writer_func writer = disc_get_writer(disc_container, &extension);
@@ -407,44 +414,44 @@ int hdos_exec(char *target)
     c_linear = 1;
 
 
-	/***********************/
-	/* 100K H8D disk image */
-	/***********************/
+    /***********************/
+    /* 100K H8D disk image */
+    /***********************/
 
     if (disc_image) {
 
-		/* Load an external raw H8D image (40 tracks × 10 sectors × 256 B = 102400 B) */
+        /* Load an external raw H8D image (40 tracks × 10 sectors × 256 B = 102400 B) */
 
-		rfp = fopen(disc_image, "rb");
-		if (!rfp) {
-			exit_log(1, "Cannot open the reference disk image <%s>\n", disc_image);
-		}
+        rfp = fopen(disc_image, "rb");
+        if (!rfp) {
+            exit_log(1, "Cannot open the reference disk image <%s>\n", disc_image);
+        }
 
-		if (fseek(rfp, 0, SEEK_END) != 0) {
-			fclose(rfp);
-			exit_log(1, "Couldn't determine size of reference image\n");
-		}
+        if (fseek(rfp, 0, SEEK_END) != 0) {
+            fclose(rfp);
+            exit_log(1, "Couldn't determine size of reference image\n");
+        }
 
-		rsize = ftell(rfp);
-		if (rsize != (long)(40 * SPT * SECTOR_SIZE)) {
-			fclose(rfp);
-			exit_log(1,
-				"Invalid H8D size for <%s>: expected 102400 bytes, got %ld\n",
-				disc_image, rsize);
-		}
+        rsize = ftell(rfp);
+        if (rsize != (long)(40 * SPT * SECTOR_SIZE)) {
+            fclose(rfp);
+            exit_log(1,
+                "Invalid H8D size for <%s>: expected 102400 bytes, got %ld\n",
+                disc_image, rsize);
+        }
 
-		fseek(rfp, 0, SEEK_SET);
+        fseek(rfp, 0, SEEK_SET);
 
-		/* Ingest the raw sectors into our in-memory disc handle */
-		for (int i = 0; i < (40 * SPT); ++i) {
-			fread(sec, 1, SECTOR_SIZE, rfp);
-			write_sector(h, i, sec);
-		}
-		fclose(rfp);
+        /* Ingest the raw sectors into our in-memory disc handle */
+        for (int i = 0; i < (40 * SPT); ++i) {
+            fread(sec, 1, SECTOR_SIZE, rfp);
+            write_sector(h, i, sec);
+        }
+        fclose(rfp);
 
     } else {
 
-		/* Generate a simplified HDOS 1.6 skeleton */
+        /* Generate a simplified HDOS 1.6 skeleton */
 
         k = 0;
         // By default we set up an empty, formatted disk in HDOS 1.6 style
@@ -478,12 +485,12 @@ int hdos_exec(char *target)
             p += SECTOR_SIZE;
         }
 
-		// Generate "fingerprint" sector
+        // Generate "fingerprint" sector
         memset(sec, 1, sizeof(sec));
-		memset(sec + 200, 0xFF, 56); 
-		sec[0]=sec[1]=0;
-		sec[2]=sec[3]=sec[4]=0xff;
-		write_sector(h, 0x0a, sec);
+        memset(sec + 200, 0xFF, 56); 
+        sec[0]=sec[1]=0;
+        sec[2]=sec[3]=sec[4]=0xff;
+        write_sector(h, 0x0a, sec);
 
     }
 
@@ -519,6 +526,39 @@ int hdos_exec(char *target)
     /************************************/
 
     insert_file(h, fp, lab, grt_sector, prgname, pos, len);
+    
+    if (absopt) {
+        if ((fa = fopen(prgname, "wb")) == NULL) {
+            exit_log(1,"Can't open output .ABS file <%s>\n", prgname);
+        }
+        
+        fseek(fp, 0L, SEEK_SET);
+
+        /* Prepare ABS header (same format as disk-insert) */
+        hdr[0] = 0xFF;
+        hdr[1] = 0x00;
+        w16le(hdr + 2, pos);        /* load address */
+        w16le(hdr + 4, (len - 8));  /* payload length */
+        w16le(hdr + 6, pos);        /* entry point */
+
+        /* Write header */
+        fwrite(hdr, 1, 8, fa);
+
+        {
+            uint8_t buf[SECTOR_SIZE];
+            int remaining = len - 8;
+            while (remaining > 0) {
+                int chunk = (remaining > SECTOR_SIZE) ? SECTOR_SIZE : remaining;
+                int r = fread(buf, 1, chunk, fp);
+                if (r <= 0) break;
+                fwrite(buf, 1, r, fa);
+                remaining -= r;
+            }
+        }
+
+        fclose(fa);
+    }
+
     fclose (fp);
 
     /* Write disk image */
