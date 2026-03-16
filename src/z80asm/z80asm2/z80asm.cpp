@@ -6,6 +6,7 @@
 
 #include "errors.h"
 #include "options.h"
+#include "source.h"
 #include "utils.h"
 #include <filesystem>
 #include <iostream>
@@ -14,7 +15,18 @@
 
 static constexpr std::string_view z80asm_env = "Z80ASM";
 
-static void preprocess_only() {}
+static void preprocess_only() {
+    for (const std::string& filename : g_input_files) {
+        SourceFile* sf = get_source_file(filename, SourceLoc());
+        if (sf != nullptr) {
+            std::cout << "File: " << sf->file << std::endl;
+            for (const SourceLine& line : sf->lines) {
+                std::cout << tokens_to_string(line.tokens);
+            }
+        }
+    }
+}
+
 static void assemble_files() {}
 
 static bool has_verbose(int argc, char* argv[]) {

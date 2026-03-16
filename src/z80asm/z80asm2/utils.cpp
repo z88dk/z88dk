@@ -235,10 +235,12 @@ std::string int_to_hex(int value) {
         oss << value;
     }
     else if (value < 0) {
-        oss << "-$" << std::hex << std::setw(2) << std::uppercase << (-value);
+        oss << "-0x" << std::hex << std::setw(2) << std::setfill('0')
+            << std::uppercase << (-value);
     }
     else {
-        oss << "$" << std::hex << std::setw(2) << std::uppercase << value;
+        oss << "0x" << std::hex << std::setw(2) << std::setfill('0')
+            << std::uppercase << value;
     }
     return oss.str();
 }
