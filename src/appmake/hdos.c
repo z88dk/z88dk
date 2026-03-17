@@ -405,7 +405,7 @@ int hdos_exec(char *target)
         strcpy(prgname, outfile);
     }
     if (!dumb)
-        suffix_change(prgname, ".ABS");
+        suffix_change(prgname, ".abs");
     
     //uint8_t *img = (uint8_t*)must_malloc(IMAGE_SIZE);
     h = cpm_create_with_format("hz89");
