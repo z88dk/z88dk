@@ -6,7 +6,7 @@ IF CLIB_OPEN_MAX > 0
     SECTION bss_crt
     PUBLIC  __fcb
 __fcb:
-    defs    CLIB_OPEN_MAX * (256+5+11+19)	; 
+    defs    CLIB_OPEN_MAX * (256+5+12+19)	; 
 ENDIF
 
 ;     PUBLIC  defltdsk
