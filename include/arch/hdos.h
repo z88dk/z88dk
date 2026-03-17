@@ -70,14 +70,15 @@ extern void *_CLIB_OPEN_MAX;
 
 struct fcb {
     // 19 bytes
-    char    top[1];         /* reserved */
-    char    device[2];      /* disk/device name (e.g. SY) */
-    char    unit[1];        /* disk/device unit (e.g. SY1) */
-    char    name[8];        /* file name */
-    char    ext[3];         /* file type */
-    char    bottom[4];      /* reserved */
+    uint8_t    top[1];         /* reserved */
+    uint8_t    device[2];      /* disk/device name (e.g. SY) */
+    uint8_t    unit[1];        /* disk/device unit (e.g. SY1) */
+    uint8_t    name[8];        /* file name */
+    uint8_t    ext[3];         /* file type */
+    uint8_t    bottom[4];      /* reserved */
 
-    // 11 bytes used by the library
+    // 12 bytes used by the library
+    uint8_t    ch;          /* HDOS channel in use */
     unsigned long rwptr;    /* read/write pointer in bytes */
     uint8_t    use;         /* use flag */
     uint8_t    mode;        /* TEXT/BINARY discrimination */
@@ -101,6 +102,9 @@ extern struct fcb __LIB__ *getfcb(void);
 /* Fill up the filename stuff */
 extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
 extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
+
+/* Mark an FCB as being unused */
+#define clearfcb(f)  (f)->use = 0
 
 
 /*  **********************  */
