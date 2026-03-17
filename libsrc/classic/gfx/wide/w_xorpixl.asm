@@ -33,6 +33,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 w_xorpixel:
     push    hl
     call    getmaxy
+    inc     hl
     call    l_graphics_cmp
     pop     hl
     ret     nc                          ; Return if Y overflows
