@@ -18,7 +18,9 @@ extern void *_CPM_READ_CACHE_ALWAYS;
 
 ssize_t read(int fd, void *buf, size_t len)
 {
+#ifdef DEVICES
     unsigned char buffer[SECSIZE+2];
+#endif
     unsigned char uid;
     size_t cnt,size,offset;
     struct fcb *fc;
