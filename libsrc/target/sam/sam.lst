@@ -2,6 +2,7 @@ target/sam/obj/sam/**/*.o
 
 @classic/input/input_keyboard.lst
 
+classic/gfx/wide/obj/sam/w_dcircle_square
 @classic/gfx/wide/gfx_wide.lst
 
 ; Lets pull in etracker + ay emulator for the sound chip

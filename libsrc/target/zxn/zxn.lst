@@ -1,6 +1,7 @@
 target/zxn/obj/zxn/**/*.o
 @classic/stdio/ansicore.lst
 @classic/stdio/stdio.lst
+classic/gfx/wide/obj/zxn/w_dcircle_square
 @classic/gfx/wide/gfx_wide.lst
 font/fzx/obj/${TYPE}/**/*.o
 
