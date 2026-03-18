@@ -17,7 +17,7 @@ hdos_close:
 _hdos_close:
     ld     a,h
     rst    38h
-    defb   LOADO
+    defb   CLOSE
     ld     hl,1
     ret    c          ; error
     dec    hl
