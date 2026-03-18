@@ -7,7 +7,7 @@
 ;   $Id: hdos_read_callee.asm $
 ;
 
-; int hdos_read(int channel, int addr, int dataptr, int bytes);
+; int hdos_read(int channel, int dataptr, int bytes);
 
     SECTION code_clib
     PUBLIC  hdos_read_callee
