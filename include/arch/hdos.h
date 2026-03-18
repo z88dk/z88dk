@@ -89,8 +89,8 @@ struct fcb {
     uint8_t    rnr_dirty;   /* Set if the rwptr needs to be recalculatd */
     uint32_t   record_nr;   /* Record number that that rwptr refers to */ 
 
-    // 256+5 bytes used for caching
-    unsigned long cached_record;    /* Record number that we have cached */
+    // 256+3 bytes used for caching
+    uint16_t   cached_record;    /* Record number that we have cached */
     uint8_t    dirty;       /* Set if the buffer is dirty and needs writing to disc */
     uint8_t    buffer[SECSIZE];
 };
@@ -102,25 +102,15 @@ extern struct fcb  _fcb[0]; /* Has MAXFILES entries */
 extern struct fcb __LIB__ *getfcb(void);
 
 /* Internal caching calls */
-extern int __LIB__ hdos_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read);
+extern int __LIB__ hdos_cache_get(struct fcb *fcb, uint16_t record_nr, int for_read);
 extern int __LIB__ hdos_cache_flush(struct fcb *fcb);
 
 /* Fill up the filename stuff */
 extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
 extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 
-
-
-extern struct fcb __LIB__ *getfcb(void);
-/* Fill up the filename stuff */
-extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
-extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
-
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
-
-/* Write an offset as 3 bytes (when a 'long' type is ..just too long) */
-extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
 
 /*  **********************  */
 
