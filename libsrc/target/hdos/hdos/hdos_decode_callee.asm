@@ -7,7 +7,7 @@
 ;   $Id: hdos_decode_callee.asm $
 ;
 
-; int hdos_decode(char *name, int channel);
+; int hdos_decode(char *name, char *fcb);
 
     SECTION code_clib
     PUBLIC  hdos_decode_callee
