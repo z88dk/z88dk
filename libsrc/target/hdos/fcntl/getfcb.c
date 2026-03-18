@@ -20,7 +20,7 @@ struct fcb *getfcb(void)
         if ( fcb->use == 0 ) {
             fcb->use   = U_READ;
             fcb->rwptr = 0;
-            fcb->cached_record = 0xffffffff;
+            fcb->cached_record = 0xffff;
             fcb->rnr_dirty = 0;
             fcb->ch = channel;
             return fcb;
