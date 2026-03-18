@@ -9,8 +9,8 @@
     defc    SCIN      = 1      ; System Console INput
     defc    SCOUT     = 2      ; System Console OUTput
     defc    PRINT     = 3      ; Print Line on System Console
-    defc    READ      = 4      ; Write to Open File
-    defc    WRITE     = 5      ; Read From File
+    defc    WRITE     = 4      ; Read From File
+    defc    READ      = 5      ; Write to Open File
     defc    CONSL     = 6      ; Set Console Mode Bits (see below)
     defc    CLRCO     = 7      ; Clear Console Buffer
     defc    LOADO     = 8      ; Load Overlay
