@@ -7,7 +7,10 @@
 ;   $Id: hdos_posit_callee.asm $
 ;
 
-; int hdos_posit(int channel, int sector);
+;   This function goes through the sector chain in a file up to the desired sector count.
+;   
+
+; uint16_t hdos_posit(int channel, int sector);
 
     SECTION code_clib
     PUBLIC  hdos_posit_callee
@@ -28,7 +31,6 @@ asm_hdos_posit:
     ld     a,l
     rst    38h
     defb   POSIT
-    ld     hl,1
-    ret    c          ; error
-    dec    hl
+    ld     h,b
+	ld     l,c
     ret
