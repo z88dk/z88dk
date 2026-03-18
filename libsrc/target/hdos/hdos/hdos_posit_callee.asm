@@ -10,7 +10,7 @@
 ;   This function goes through the sector chain in a file up to the desired sector count.
 ;   
 
-; uint16_t hdos_posit(int channel, int sector);
+; uint16_t hdos_posit(int channel, uint16_t sector);
 
     SECTION code_clib
     PUBLIC  hdos_posit_callee
@@ -32,5 +32,5 @@ asm_hdos_posit:
     rst    38h
     defb   POSIT
     ld     h,b
-	ld     l,c
+    ld     l,c
     ret
