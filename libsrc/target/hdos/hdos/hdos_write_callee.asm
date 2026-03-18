@@ -7,7 +7,7 @@
 ;   $Id: hdos_write_callee.asm $
 ;
 
-; int hdos_write(int channel, , int dataptr, int bytes);
+; int hdos_write(int channel, int dataptr, int bytes);
 
     SECTION code_clib
     PUBLIC  hdos_write_callee
