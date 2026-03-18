@@ -66,6 +66,10 @@ extern void *_CLIB_OPEN_MAX;
 #define U_READ  1               /* file open for reading */
 #define U_WRITE 2               /* file open for writing */
 #define U_RDWR  3               /* open for read and write */
+#define U_CON   4               /* device is console */
+// #define U_RDR   5               /* device is reader */
+// #define U_PUN   6               /* device is punch */
+// #define U_LST   7               /* list device */
 
 
 struct fcb {
@@ -94,10 +98,19 @@ struct fcb {
 extern struct fcb  _fcb[0]; /* Has MAXFILES entries */
 
 
-/* Get a free FCB */
+/* Spot a free file pointer */
 extern struct fcb __LIB__ *getfcb(void);
 
-/* Spot a free file pointer */
+/* Internal caching calls */
+extern int __LIB__ hdos_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read);
+extern int __LIB__ hdos_cache_flush(struct fcb *fcb);
+
+/* Fill up the filename stuff */
+extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
+extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
+
+
+
 extern struct fcb __LIB__ *getfcb(void);
 /* Fill up the filename stuff */
 extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
@@ -106,6 +119,8 @@ extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
 
+/* Write an offset as 3 bytes (when a 'long' type is ..just too long) */
+extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
 
 /*  **********************  */
 
@@ -156,10 +171,12 @@ extern int __LIB__          hdos_open_upd(char *name, int ch) __smallc;
 extern int __LIB__   hdos_open_upd_callee(char *name, int ch) __smallc __z88dk_callee;
 #define hdos_open_upd(a,b) hdos_open_upd_callee(a,b)
 
-// Reposition the sector pointer (refer to the HDOS documentation)
-//
-extern int __LIB__          hdos_posit(int ch, int sec) __smallc;
-extern int __LIB__   hdos_posit_callee(int ch, int sec) __smallc __z88dk_callee;
+// This function goes through the sector chain in a file up to the desired sector count.
+// If the total sectors are less than the requested position, the remainder will be provided on exit.
+// To get the file length:  file_sectors = 65535-hdos_posit(ch,65535);
+// 
+extern uint16_t __LIB__          hdos_posit(int ch, uint16_t sec) __smallc;
+extern uint16_t __LIB__   hdos_posit_callee(int ch, uint16_t sec) __smallc __z88dk_callee;
 #define hdos_posit(a,b) hdos_posit_callee(a,b)
 
 // Close HDOS file on the specified channel
@@ -169,15 +186,15 @@ extern int __LIB__          hdos_close(char *name) __z88dk_fastcall;
 // Load bytes from the current sector of an open file channel
 // Byte blocks must be multiple of 256 (LDB is ignored).
 //
-extern int __LIB__          hdos_read(int ch, int bytes) __smallc;
-extern int __LIB__   hdos_read_callee(int ch, int bytes) __smallc __z88dk_callee;
+extern int __LIB__          hdos_read(int ch, uint16_t dataptr, int bytes) __smallc;
+extern int __LIB__   hdos_read_callee(int ch, uint16_t dataptr, int bytes) __smallc __z88dk_callee;
 #define hdos_read(a,b,c) hdos_read_callee(a,b,c)
 
 // Save bytes on the current sector of an open file channel
 // Byte blocks must be multiple of 256 (LDB is ignored).
 //
-extern int __LIB__          hdos_write(int ch, int bytes) __smallc;
-extern int __LIB__   hdos_write_callee(int ch, int bytes) __smallc __z88dk_callee;
+extern int __LIB__          hdos_write(int ch, uint16_t dataptr, int bytes) __smallc;
+extern int __LIB__   hdos_write_callee(int ch, uint16_t dataptr, int bytes) __smallc __z88dk_callee;
 #define hdos_write(a,b,c) hdos_write_callee(a,b,c)
 
 
