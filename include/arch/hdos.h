@@ -81,13 +81,13 @@ struct fcb {
     uint8_t    ext[3];         /* file type */
     uint8_t    bottom[4];      /* reserved */
 
-    // 12 bytes used by the library
+    // 10 bytes used by the library
     uint8_t    ch;          /* HDOS channel in use */
     unsigned long rwptr;    /* read/write pointer in bytes */
     uint8_t    use;         /* use flag */
     uint8_t    mode;        /* TEXT/BINARY discrimination */
     uint8_t    rnr_dirty;   /* Set if the rwptr needs to be recalculatd */
-    uint32_t   record_nr;   /* Record number that that rwptr refers to */ 
+    uint16_t   record_nr;   /* Record number that that rwptr refers to */ 
 
     // 256+3 bytes used for caching
     uint16_t   cached_record;    /* Record number that we have cached */
