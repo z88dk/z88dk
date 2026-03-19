@@ -19,12 +19,6 @@ jobs:
     - name: Install homebrew dependencies
       run: |
         brew install cpanminus perl dos2unix boost ragel re2c make gmp
-    - name: Install XML::Twig dependencies
-      run: |
-        export PATH=/usr/local/bin:$PATH
-        brew install expat
-        cpanm XML::Parser
-        cpanm XML::Twig
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
