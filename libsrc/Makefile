@@ -343,7 +343,7 @@ z88_clib.lib: $(TARGET_CLIB_DEPS) target-z88
 # ansi flags
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx
+zx_clib.lib: $(TARGET_CLIB_DEPS) target-zx fzx
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
@@ -361,7 +361,7 @@ zxcpm.lib:  $(TARGET_CLIB_DEPS) target-zx
 	$(MAKE) -C classic/games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS)  -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
 
-zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib target-zxn
+zxn_clib.lib: $(TARGET_CLIB_DEPS) zx_clib.lib target-zxn fzx
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
