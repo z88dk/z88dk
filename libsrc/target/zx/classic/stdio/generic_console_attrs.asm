@@ -17,7 +17,9 @@
 
 
 generic_console_set_paper:
+
   IF    FORsam
+
     ; For SAM modes, we don't do any mapping
     ld      c, a                        ;Save it for a moment
     rrca
@@ -31,7 +33,9 @@ generic_console_set_paper:
     and     @11000000
     ld      (__sam_MODE3_attr+1), a
     ld      a, c
+
   ENDIF
+
     call    conio_map_colour
     rlca
     rlca
@@ -43,11 +47,30 @@ generic_console_set_paper:
     and     @11000111
     or      c
     ld      (hl), a
+
+  IF    FORsam
+
+    ret
+
 generic_console_set_attribute:
+
+    ld      hl,@11000000
+    ld      (__sam_MODE3_attr),hl
+    ld      l,@11110000
+    ld      (__sam_MODE4_attr),hl
+
+  ELSE
+
+generic_console_set_attribute:
+
+  ENDIF
+
     ret
 
 generic_console_set_ink:
+
   IF    FORsam
+
     ; For SAM modes, we don't do any mapping
     ld      c, a                        ;Save it for a moment
     rrca
@@ -61,10 +84,13 @@ generic_console_set_ink:
     and     @11000000
     ld      (__sam_MODE3_attr+0), a
     ld      a, c
+
   ENDIF
+
   IF    FORzxn
     ld      (__zx_ink_colour), a
   ENDIF
+
     call    conio_map_colour
     and     7
     ld      c, a
