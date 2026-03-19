@@ -79,7 +79,7 @@ extern void intrinsic_ldi(void*,void*) __z88dk_callee;
 #define intrinsic_ldi(dst,src,num)  intrinsic_ldi_helper(dst,src,num)
 
 extern void intrinsic_outi(void*) __z88dk_fastcall;
-#define intrinsic_outi_helper(src,port,num)  { intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
+#define intrinsic_outi_helper(src,port,num)  { extern void intrinsic_outi_port_##port(), intrinsic_outi_num_##num(); intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
 #define intrinsic_outi(src,port,num)  intrinsic_outi_helper(src,port,num)
 
 extern void intrinsic_ini(void*) __z88dk_fastcall;

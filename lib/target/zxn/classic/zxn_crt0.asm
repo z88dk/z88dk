@@ -57,6 +57,8 @@
     defc    __CPU_CLOCK = 3500000
 
 
+    INCLUDE     "target/zxn/def/colours.def"
+
 IF __ESXDOS_DOT_COMMAND
     INCLUDE	"target/zxn/classic/dot_crt0.asm"
 ELSE
