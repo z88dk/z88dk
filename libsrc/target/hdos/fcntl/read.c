@@ -58,7 +58,7 @@ ssize_t read(int fd, void *buf, size_t len)
                 }
                 if ( size == SECSIZE && CPM_READ_CACHE_ALWAYS == 0 ) {
                     hdos_posit(fc->ch, record_nr);     // TODO: verify whether this one can be omitted
-                    if ( !hdos_read(fc->ch,buf,256) ) {
+                    if ( hdos_read(fc->ch,buf,256) ) {
                         return cnt-len;
                     }
                 } else {
