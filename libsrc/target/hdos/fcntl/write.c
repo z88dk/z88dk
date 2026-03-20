@@ -55,11 +55,11 @@ ssize_t write(int fd, void *buf, size_t len)
                 }
                 if ( size == SECSIZE ) {
                     // Write the full sector now, flush whatever we've got cached 
-                    // so we don't write out of order
+                    // so we don't write out of order (first fc->buffer, then buf)
                     hdos_cache_flush(fc);
  
                     hdos_posit(fc->ch, (unsigned int)(fc->rwptr/SECSIZE));
-                    if ( hdos_write(fc->ch,fc->buffer,256) ) {
+                    if ( hdos_write(fc->ch,buf,256) ) {
                         return cnt-len;
                     }
                 } else {  /* Not the required size, read in the record to our cache */
