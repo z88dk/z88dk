@@ -21,7 +21,7 @@ int close(int fd)
 
     if ( fc->use < U_CON ) {
         hdos_cache_flush(fc);
-		(hdos_close (fc->ch));  /* Open error */
+        hdos_close (fc->ch);
     }
     fc->use = 0;
     return 0;
