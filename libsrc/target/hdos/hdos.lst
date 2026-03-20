@@ -28,7 +28,10 @@ target/hdos/fcntl/obj/${TYPE}/creat
 target/hdos/fcntl/obj/${TYPE}/cache
 target/hdos/fcntl/obj/${TYPE}/open
 target/hdos/fcntl/obj/${TYPE}/close
+target/hdos/fcntl/obj/${TYPE}/read
 target/hdos/fcntl/obj/${TYPE}/readbyte
+target/hdos/fcntl/obj/${TYPE}/write
+target/hdos/fcntl/obj/${TYPE}/writebyte
 target/hdos/fcntl/obj/${TYPE}/remove
 target/hdos/fcntl/obj/${TYPE}/rename
 target/hdos/fcntl/obj/${TYPE}/getfcb
