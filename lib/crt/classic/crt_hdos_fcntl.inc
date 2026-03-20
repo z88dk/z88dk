@@ -1,5 +1,12 @@
 ; HDOS style file buffers
 
+    ; Read cache even for sector sized chunks
+    IFNDEF CPM_READ_CACHE_ALWAYS
+        defc    CPM_READ_CACHE_ALWAYS = 0
+    ENDIF
+    PUBLIC  __CPM_READ_CACHE_ALWAYS
+    defc    __CPM_READ_CACHE_ALWAYS = CPM_READ_CACHE_ALWAYS
+
     SECTION bss_crt
 
 IF CLIB_OPEN_MAX > 0
