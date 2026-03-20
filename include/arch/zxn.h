@@ -935,16 +935,76 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 
 // miscellaneous - spectrum display
 
-extern void __LIB__ zx_border(unsigned char colour) __smallc __z88dk_fastcall;
+/** \brief  Clear the screen with the currently set attribute
+ */
+extern void __LIB__ zx_cls(void);
 
 
-extern void __LIB__ zx_cls(unsigned char attr) __smallc __z88dk_fastcall;
+/** \brief  Clears the screen and sets the screen and current attribute to attr
+ * \param attr - The full attribute byte
+*/
+extern void __LIB__ zx_cls_attr(int attr);
+extern void __LIB__ zx_cls_attr_fastcall(int attr) __z88dk_fastcall;
+#define zx_cls_attr(a)                 zx_cls_attr_fastcall(a)
+
+/** \brief Set or unset the flash attribute for printing
+ *
+ * \param f Values 0/1
+ *
+ * This function sets the flash flag for the --generic-console screen driver
+ */
+extern void zx_setattrflash(uint f);
+extern void zx_setattrflash_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrflash(f) zx_setattrflash_fastcall(f)
+
+/** \brief Set or unset the bright attribute for printing
+ *
+ * \param f Values 0/1
+ *
+ * This function sets the bright flag for the --generic-console screen driver
+ */
+extern void zx_setattrbright(uint f);
+extern void zx_setattrbright_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrbright(f) zx_setattrbright_fastcall(f)
+
+/** \brief Set or unset the inverse attribute for printing
+ *
+ * \param f Values 0/1
+ *
+ * This function sets the inverse flag for the --generic-console screen driver
+ */
+extern void zx_setattrinverse(uint f);
+extern void zx_setattrinverse_fastcall(uint f) __z88dk_fastcall;
+#define zx_setattrinverse(f) zx_setattrinverse_fastcall(f)
+
+/** \brief Set the border color
+ *   \param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+ */
+extern void  __LIB__  zx_border(uint colour);
+extern void  __LIB__  zx_border_fastcall(uint colour) __z88dk_fastcall;
+#define zx_border(c) zx_border_fastcall(c)
+
+/** \brief Quickly set the whole screen color attributes (and set the attributes for now on)
+    \param colour Is the full attribute byte
+    \note This is the equivalent of the newlib function zx_cls_attr()
+*/
+extern void  __LIB__  zx_colour(uint colour);
+extern void  __LIB__  zx_colour_fastcall(uint colour) __z88dk_fastcall;
+#define zx_colour(a) zx_colour_fastcall(a)
 
 
-extern void __LIB__ zx_cls_attr(unsigned char attr) __smallc __z88dk_fastcall;
+// Change the ink attr from now on
+// i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+extern void zx_setink(uint i);
+extern void __LIB__ zx_setink_fastcall(uint i) __z88dk_fastcall;
+#define zx_setink(i) zx_setink_fastcall(i)
 
+// Change the paper attr from now on
+// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPERWHITE
+extern void zx_setpaper(uint p);
+extern void __LIB__ zx_setpaper_fastcall(uint p) __z88dk_fastcall;
+#define zx_setpaper(p) zx_setpaper_fastcall(p)
 
-extern void __LIB__ zx_cls_pix(unsigned char pix) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,unsigned char attr) __smallc;
