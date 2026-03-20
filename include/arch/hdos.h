@@ -149,7 +149,8 @@ extern int __LIB__          hdos_open_rd(char *name, int ch) __smallc;
 extern int __LIB__   hdos_open_rd_callee(char *name, int ch) __smallc __z88dk_callee;
 #define hdos_open_rd(a,b) hdos_open_rd_callee(a,b)
 
-// Open HDOS file for writing
+// Open HDOS file for writing.
+// On close(), an eventual existing file will be overwritten.
 //
 extern int __LIB__          hdos_open_wr(char *name, int ch) __smallc;
 extern int __LIB__   hdos_open_wr_callee(char *name, int ch) __smallc __z88dk_callee;
