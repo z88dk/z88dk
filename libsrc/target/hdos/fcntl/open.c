@@ -14,7 +14,8 @@
  *
  *      | with:
  *      O_APPEND = 256
- *      O_TRUNC = 512
+ *      O_TRUNC  = 512
+ *      O_CREAT  = 1024
  *
  * -----
  * $Id: open.c $
@@ -36,42 +37,44 @@ int open(char *name, int flags, mode_t mode)
 
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
 
-		if (flags & O_RDONLY) {
-		  if (hdos_open_rd (name, fc->ch)) goto open_error;  /* Open error */
-		  fc->use = U_READ;
-		} else {   // Writing
+        if (flags == O_TRUNC)
+            if (hdos_delete (name))
+                if ( (flags & O_CREAT) == 0) {
+                    // Truncating a non-existing file (ENOENT)
+                    clearfcb(fc);
+                    return(-1);
+                }
 
-			if (flags & O_TRUNC)
-				if (hdos_delete (name))
-					if ( (flags & O_CREAT) == 0) goto open_error;  /* Truncating a non-existing file (ENOENT) */
-			
-			if (flags & (O_APPEND | O_RDWR)) {
-				if (hdos_open_upd (name, fc->ch)) goto open_error;  /* Open error */
-				fc->use=U_RDWR;
-			} else
-				if (hdos_open_wr (name, fc->ch)) goto open_error;  /* Open error */
+        switch ( flags & 0xff ) {
+            case O_RDONLY:
+                if (hdos_open_rd (name, fc->ch))
+                {
+                    // FILE NOT FOUND
+                    clearfcb(fc);
+                    return(-1);
+                }
+                // fc->use = U_READ;   // Probably not necessary
+                break;
 
-			if (flags & (O_RDWR))
-				fc->use = U_RDWR;
-			else
-				fc->use = U_WRITE;
+            // We get here also to 'APPEND' to a non-existing file
+            case O_WRONLY:
+            case O_RDWR:
 
-		}
+                if (hdos_open_upd (name, fc->ch)) {
+                    if (hdos_open_wr (name, fc->ch))
+                    {
+                        // FILE CREATE ERROR
+                        clearfcb(fc);
+                        return(-1);
+                    }
+                }
+                break;
 
-        // fc->use = (flags + 1 ) & 0xff;
-    }
-	
-	//  TODO: move to the bottom of the file
-    //        using HDOS to verify we are getting EOF, then computing 65535-BC)
-	// if (flags & O_APPEND)
-	// 	  hdos_posit(fc->ch, 65535);
+        }
+        
+        // TODO: position the file ptr for O_APPEND
 
-    fc->mode = mode & _IOTEXT;
+        return (int)fc;
 
-    return (int)fc;
-
-open_error:
-    clearfcb(fc);
-	return -1;
-
+    } else return -1;
 }
