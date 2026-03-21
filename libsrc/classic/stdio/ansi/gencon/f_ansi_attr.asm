@@ -5,15 +5,19 @@
 ;	m - Set Graphic Rendition
 
 	MODULE __gencon_ansi_attr
-        SECTION code_clib
-	PUBLIC	__gencon_ansi_attr
 
-	EXTERN  generic_console_flags
-	EXTERN  generic_console_set_attribute
-	EXTERN  generic_console_set_ink
-	EXTERN  generic_console_set_paper
+	SECTION code_clib
+	PUBLIC __gencon_ansi_attr
 
-        SECTION code_clib
+	EXTERN generic_console_flags
+	EXTERN generic_console_set_attribute
+	EXTERN generic_console_set_ink
+	EXTERN generic_console_set_paper
+
+	EXTERN CLIB_ANSI_DEFAULT_BACKGROUND
+	EXTERN CLIB_ANSI_DEFAULT_FOREGROUND
+
+	SECTION code_clib
 
 ; 0 = reset all attributes
 ; 1 = bold on
@@ -46,46 +50,62 @@ __gencon_ansi_attr:
 	push	hl
 	ld	d,a
 	ld	hl,table
+
 loop_table:
 	ld	a,(hl)
 	cp	255
 	jr	z,table_ended
+
 	cp	d
 	jr	z,got_attribute
+
 	inc	hl
 	inc	hl
 	inc	hl
 	jr	loop_table
+
 table_ended:
-	;Lets consider colours here
+
+	; Lets consider colours here
 	ld	a,d
-	cp	30
-	jp	m,not_foreground
-	cp	37+1
-	jp	p,not_foreground
 	sub	30
-	push	bc
-	call	map_colour
-	call	generic_console_set_ink
-	pop	bc
+	jr	c,not_background	; < 30 -> skip background check
+	cp	8
+	jr	nc,not_foreground
+
+	call	set_foreground
+
 	pop	hl
 	ret
 
 not_foreground:
-	cp	40
-	jp	m,not_background
-	cp	47+1
-	jp	p,not_background
-	sub	40
-	push	bc
-	call	map_colour
-	call	generic_console_set_paper
-	pop	bc
+	sub	10
+	jr	c,not_background
+	cp	8
+	jr	nc,not_background
+
+	call	set_background
+
 not_background:
 	pop	hl
 	ret
 
 got_attribute:
+	or	a
+	jr	nz,not_reset
+
+	; reset colours
+	push	hl
+
+	ld	a,CLIB_ANSI_DEFAULT_FOREGROUND
+	call	set_foreground
+
+	ld	a,CLIB_ANSI_DEFAULT_BACKGROUND
+	call	set_background
+
+	pop	hl
+
+not_reset:
 	inc	hl
 	ld	a,(generic_console_flags)
 	and	(hl)
@@ -98,6 +118,19 @@ got_attribute:
 	pop	hl
 	ret
 
+set_foreground:
+	push	bc
+	call	map_colour
+	call	generic_console_set_ink
+	pop	bc
+	ret
+
+set_background:
+	push	bc
+	call	map_colour
+	call	generic_console_set_paper
+	pop	bc
+	ret
 
 map_colour:
 	ld	c,a
@@ -121,7 +154,7 @@ colourmap:
 	defb	3		;CYAN
 	defb	15		;WHITE
 
-	; Table to map VT100 vt attributes into gencon flags	
+	; Table to map VT100 vt attributes into gencon flags
 	; defb vt100_Code
 	; defb byte to and with flags
 	; defb byte to or with flags
@@ -171,4 +204,3 @@ table:
 	defb	@00000000
 
 	defb	255	;End marker
-

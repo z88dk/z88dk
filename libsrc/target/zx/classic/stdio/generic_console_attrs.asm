@@ -48,22 +48,7 @@ generic_console_set_paper:
     or      c
     ld      (hl), a
 
-  IF    FORsam
-
-    ret
-
 generic_console_set_attribute:
-
-    ld      hl,@11000000
-    ld      (__sam_MODE3_attr),hl
-    ld      l,@11110000
-    ld      (__sam_MODE4_attr),hl
-
-  ELSE
-
-generic_console_set_attribute:
-
-  ENDIF
 
     ret
 
