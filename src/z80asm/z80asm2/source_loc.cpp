@@ -15,7 +15,13 @@ SourceLoc::SourceLoc(int file, int ln, int col)
       column(static_cast<uint16_t>(col)) {
 }
 
-SourceLoc SourceLoc::make(const std::string& file, int line, int column) {
+SourceLoc::SourceLoc(const std::string_view file, int ln, int col)
+    : line(static_cast<uint32_t>(ln)),
+      file_id(static_cast<uint16_t>(g_strings.intern(file))),
+      column(static_cast<uint16_t>(col)) {
+}
+
+SourceLoc SourceLoc::make(const std::string_view file, int line, int column) {
     return SourceLoc(g_strings.intern(file), line, column);
 }
 

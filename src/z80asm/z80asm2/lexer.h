@@ -85,15 +85,15 @@ struct Token {
 
     SourceLoc loc;                          // 8 bytes
 
-    static Token token(TokenType type_, const std::string& text_,
+    static Token token(TokenType type_, const std::string_view text_,
                        const SourceLoc& loc);
-    static Token identifier(const std::string& text_,
+    static Token identifier(const std::string_view text_,
                             const SourceLoc& loc);
-    static Token integer(const std::string& text_, int value,
+    static Token integer(const std::string_view text_, int value,
                          const SourceLoc& loc);
-    static Token floating(const std::string& text_, double value,
+    static Token floating(const std::string_view text_, double value,
                           const SourceLoc& loc);
-    static Token string(const std::string& text_, const std::string& value,
+    static Token string(const std::string_view text_, const std::string_view value,
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
 };
@@ -101,5 +101,5 @@ struct Token {
 std::string tokens_to_string(const std::vector<Token>& tokens);
 
 struct SourceFile;          // forward declaration (no #include "source.h")
-void tokenize(SourceFile& sf, const std::string& content);
-std::vector<Token> tokenize_text(const std::string& text, const SourceLoc& loc);
+void tokenize(SourceFile& sf, const std::string_view content);
+std::vector<Token> tokenize_text(const std::string_view text, const SourceLoc& loc);
