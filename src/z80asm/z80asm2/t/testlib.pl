@@ -26,6 +26,13 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 unlink_testfiles();
 
 #------------------------------------------------------------------------------
+sub tempname {
+    my($suffix) = @_;
+    state $counter = 0;
+    return sprintf("%s_%03d%s", $test, $counter++, $suffix);
+}
+
+#------------------------------------------------------------------------------
 sub check_bin_file {
     my($got_file, $exp_bin) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
