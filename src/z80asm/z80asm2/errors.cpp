@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "source.h"
 #include "source_loc.h"
+#include "strings.h"
 #include "utils.h"
 #include <iostream>
 #include <string_view>
@@ -17,9 +18,7 @@ int error_count() {
     return error_count_;
 }
 
-static void print_source_line(const SourceLine& line, int column) {
-    std::string_view text(line.text);
-
+static void print_source_line(std::string_view text, int column) {
     std::cerr << "    " << text << std::endl;
 
     if (column <= 0) {
@@ -42,23 +41,32 @@ static void print_source_line(const SourceLine& line, int column) {
     std::cerr << "    " << marker << std::endl;
 }
 
-static void print_message(const SourceLoc& loc, const std::string& level, const std::string& msg) {
+static void print_message(const SourceLoc& loc,
+                          const std::string& level,
+                          const std::string& msg) {
     if (!loc.empty()) {
         std::cerr << loc.to_string() << ": ";
     }
+
     std::cerr << level << ": " << msg << std::endl;
 
-    SourceFile* file = get_source_file(loc.file, SourceLoc());
-    if (file != nullptr) {
-        if (loc.line >= 1 && loc.line <= static_cast<int>(file->lines.size())) {
-            const SourceLine& line = file->lines[loc.line - 1];
-            print_source_line(line, loc.column);
-        }
+    if (loc.empty()) {
+        return;
     }
-}
 
-void error(const std::string& msg) {
-    error(SourceLoc(), msg);
+    SourceFile* file = get_source_file(g_strings.to_string(loc.file_id), SourceLoc{});
+    if (!file) {
+        return;
+    }
+
+    if (loc.line < 1 || loc.line > file->line_offsets.size()) {
+        return;
+    }
+
+    std::string text = read_line(*file, loc.line - 1, loc);
+    if (!text.empty()) {
+        print_source_line(text, loc.column);
+    }
 }
 
 void error(const SourceLoc& loc, const std::string& msg) {
@@ -66,10 +74,10 @@ void error(const SourceLoc& loc, const std::string& msg) {
     print_message(loc, "error", msg);
 }
 
-void warning(const std::string& msg) {
-    warning(SourceLoc(), msg);
-}
-
 void warning(const SourceLoc& loc, const std::string& msg) {
     print_message(loc, "warning", msg);
+}
+
+void note(const SourceLoc& loc, const std::string& msg) {
+    print_message(loc, "note", msg);
 }
