@@ -136,8 +136,11 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\semantic_rewrite.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source_loc.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\strings.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
@@ -147,12 +150,16 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\scan.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\strings.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
+    <None Include="..\..\src\z80asm\z80asm2\scan.re" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

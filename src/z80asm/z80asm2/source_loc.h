@@ -6,18 +6,21 @@
 
 #pragma once
 
-#include "utils.h"
 #include <string>
+#include <cstdint>
 
-// all strings stored in strpool for memory efficiency and fast comparisons
+// all strings stored in g_strings for memory efficiency and fast comparisons
 
+// field order for efficient packing into 8 bytes (64 bits):
 struct SourceLoc {
-    const char* file = "";
-    int line = 0;
-    int column = 0;
+    uint32_t line = 0;      // 4 bytes
+    uint16_t file_id = 0;   // 2 bytes
+    uint16_t column = 0;    // 2 bytes
 
-    SourceLoc();
-    SourceLoc(const std::string& file, int line, int column);
+    SourceLoc() = default;
+    SourceLoc(int file, int ln, int col);
+
+    static SourceLoc make(const std::string& file, int line, int column);
 
     bool empty() const;
     std::string to_string() const;

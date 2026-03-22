@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 
 // Keyword flags
 static const int IS_PREPROC_DIRECTIVE = 1 << 0;
@@ -23,7 +24,7 @@ static const int IS_X_REGISTER = 1 << 10;
 static const int IS_FLAG = 1 << 11;
 
 #define X(id, text, flags) id,
-enum class Keyword {
+enum class Keyword : uint16_t {
     None = 0,
 #include "keywords.def"
 };
