@@ -42,8 +42,8 @@ static void print_source_line(std::string_view text, int column) {
 }
 
 static void print_message(const SourceLoc& loc,
-                          const std::string& level,
-                          const std::string& msg) {
+                          const std::string_view level,
+                          const std::string_view msg) {
     if (!loc.empty()) {
         std::cerr << loc.to_string() << ": ";
     }
@@ -69,15 +69,15 @@ static void print_message(const SourceLoc& loc,
     }
 }
 
-void error(const SourceLoc& loc, const std::string& msg) {
+void error(const SourceLoc& loc, const std::string_view msg) {
     error_count_++;
     print_message(loc, "error", msg);
 }
 
-void warning(const SourceLoc& loc, const std::string& msg) {
+void warning(const SourceLoc& loc, const std::string_view msg) {
     print_message(loc, "warning", msg);
 }
 
-void note(const SourceLoc& loc, const std::string& msg) {
+void note(const SourceLoc& loc, const std::string_view msg) {
     print_message(loc, "note", msg);
 }

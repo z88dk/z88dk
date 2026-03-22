@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
+#include <string_view>
 
 // all strings stored in g_strings for memory efficiency and fast comparisons
 
@@ -19,8 +20,9 @@ struct SourceLoc {
 
     SourceLoc() = default;
     SourceLoc(int file, int ln, int col);
+    SourceLoc(const std::string_view file, int ln, int col);
 
-    static SourceLoc make(const std::string& file, int line, int column);
+    static SourceLoc make(const std::string_view file, int line, int column);
 
     bool empty() const;
     std::string to_string() const;
