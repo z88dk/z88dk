@@ -9,15 +9,10 @@
 #include <filesystem>
 #include <iomanip>
 #include <sstream>
-#include <unordered_set>
+#include <cstdlib>
+#include <malloc.h>
 
 static const std::string blanks = " \t\r\n\v\f";
-
-const char* strpool(const std::string& str) {
-    static std::unordered_set<std::string> pool;
-    auto [it, _] = pool.insert(str);
-    return it->c_str();
-}
 
 std::string to_upper(const std::string& s) {
     std::string result = s;

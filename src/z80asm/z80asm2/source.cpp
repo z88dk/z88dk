@@ -5,85 +5,210 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
-#include "options.h"
+#include "lexer.h"
 #include "source.h"
 #include "source_loc.h"
+#include "strings.h"
 #include "utils.h"
+#include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <list>
+#include <sstream>
 #include <unordered_map>
 #include <utility>
 
-SourceFile* get_source_file(const std::string& file, const SourceLoc& loc) {
-    static std::unordered_map<std::string, SourceFile> cache;
+class FileHandleCache {
+public:
+    std::ifstream* get(const std::string& filename, const SourceLoc& loc) {
+        // If already cached, move to front and return
+        for (auto it = entries.begin(); it != entries.end(); ++it) {
+            if (it->filename == filename) {
+                entries.splice(entries.begin(), entries, it);
+                return &it->stream;
+            }
+        }
 
-    // exit quickly when file is empty, e.g. from an empty SouceLoc.file
-    if (file.empty()) {
-        return nullptr;
+        // Not cached: open new stream
+        entries.emplace_front();
+        auto& e = entries.front();
+        e.filename = filename;
+        e.stream.open(filename, std::ios::binary);
+        if (!e.stream) {
+            error(loc, "Failed to open file: " + filename);
+            entries.pop_front();
+            return nullptr;
+        }
+
+        // If too many, evict last
+        if (entries.size() > max_entries) {
+            entries.pop_back();
+        }
+
+        return &e.stream;
     }
 
-    // normalize path and check cache
-    std::string key = normalize_path(file);
-    if (g_options.verbose) {
-        std::cout << "Reading source file: " << key << std::endl;
-    }
-    auto it = cache.find(key);
-    if (it != cache.end()) {
+private:
+    struct Entry {
+        std::string filename;
+        std::ifstream stream;
+    };
+
+    static constexpr uint32_t max_entries = 16;
+    std::list<Entry> entries;
+};
+
+static FileHandleCache g_file_handle_cache;
+
+// Global cache: file_id -> SourceFile
+static std::unordered_map<StringInterner::Id, SourceFile> g_source_cache;
+
+// get a unique ID for a virtual file path (e.g. for included files or generated content)
+uint32_t register_virtual_file(const std::string& path) {
+    return g_strings.intern(path);
+}
+
+SourceFile* get_source_file(const std::string& filename, const SourceLoc& loc) {
+    // Normalize and intern the filename
+    std::string norm = normalize_path(filename);
+    StringInterner::Id file_id = g_strings.intern(norm);
+
+    // Already loaded?
+    auto it = g_source_cache.find(file_id);
+    if (it != g_source_cache.end()) {
         return &it->second;
     }
 
-    // read entire file into memory
-    std::string contents = read_file_to_string(key, loc);
-
-    // build SourceFile
-    SourceFile& sf = cache[key];
-    sf.file = strpool(key);
-    sf.lines = std::move(split_source_lines(key, contents));
-
-    return &sf;
-}
-
-std::string read_file_to_string(const std::string& filename, const SourceLoc& loc) {
-    std::ifstream ifs(filename, std::ios::binary);
-    if (!ifs) {
-        error(loc, "Failed to open file: " + filename);
-        return std::string();
+    // Read entire file into memory
+    std::string content;
+    if (!read_file_to_string(norm, loc, content)) {
+        // read_file_to_string() already emitted an error
+        return nullptr;
     }
 
-    return std::string((std::istreambuf_iterator<char>(ifs)),
-                       std::istreambuf_iterator<char>());
+    // Build a new SourceFile
+    SourceFile sf;
+    sf.file_id = file_id;
+
+    // Split into line offsets + lengths
+    split_source_lines(sf, content);
+
+    // Tokenize each line
+    tokenize(sf, content);
+
+    // Insert into cache and return pointer
+    auto [pos, inserted] = g_source_cache.emplace(file_id, std::move(sf));
+    return &pos->second;
+}
+
+// read one line of a file
+std::string read_line(const SourceFile& sf, uint32_t line, const SourceLoc& loc) {
+    // If line is within bounds, read normally
+    if (line < sf.line_offsets.size()) {
+        const char* filename = g_strings.c_str(sf.file_id);
+        std::ifstream* in = g_file_handle_cache.get(filename, loc);
+
+        if (!in) {
+            return "";    // cannot open file, but don't break diagnostics
+        }
+
+        in->clear();
+        in->seekg(sf.line_offsets[line]);
+
+        std::string result;
+        result.resize(sf.line_lengths[line]);
+        in->read(result.data(), sf.line_lengths[line]);
+
+        return result;
+    }
+
+    // If line == number_of_lines or beyond that, return empty line (EOF)
+    return "";
+}
+
+bool read_file_to_string(const std::string& filename,
+                         const SourceLoc& loc,
+                         std::string& out_content) {
+    std::ifstream* in = g_file_handle_cache.get(filename, loc);
+    if (!in) {
+        return false;
+    }
+
+    std::ostringstream ss;
+    ss << in->rdbuf();
+    out_content = ss.str();
+    return true;
+}
+
+static inline size_t find_line_end(const std::string& content, size_t pos) {
+    size_t n = content.size();
+    size_t end = pos;
+
+    while (end < n && content[end] != '\n' && content[end] != '\r') {
+        ++end;
+    }
+
+    return end;
+}
+
+static inline size_t skip_line_ending(const std::string& content, size_t end) {
+    size_t n = content.size();
+
+    if (end < n) {
+        if (content[end] == '\r' && end + 1 < n && content[end + 1] == '\n') {
+            return end + 2;
+        }
+        else {
+            return end + 1;
+        }
+    }
+
+    return end;
 }
 
 // split into lines, handling CR, CR-LF, and LF
-std::vector<SourceLine> split_source_lines(const std::string& filename,
-        const std::string& content) {
-    std::vector<SourceLine> lines;
-    int line_num = 1;
-    const char* p = content.c_str();
-    while (*p) {
-        const char* line_start = p;
-        while (*p && *p != '\r' && *p != '\n') {
-            ++p;
-        }
-        std::string line(line_start, p - line_start);
+void split_source_lines(SourceFile& sf, const std::string& content) {
+    const uint32_t n = static_cast<uint32_t>(content.size());
 
-        SourceLine sl;
-        sl.text = strpool(line);
-        sl.loc = SourceLoc(filename, line_num, 1);
-        lines.push_back(std::move(sl));
-        line_num++;
+    uint32_t pos = 0;
+    uint32_t line = 0;
 
-        // Handle line endings
-        if (*p == '\r') {
-            ++p;
-            if (*p == '\n') {
-                ++p;
-            }
-        }
-        else if (*p == '\n') {
-            ++p;
-        }
+    while (pos < n) {
+        size_t end = find_line_end(content, pos);
+
+        sf.line_offsets.push_back(pos);
+        sf.line_lengths.push_back(static_cast<uint32_t>(end - pos));
+
+        pos = static_cast<uint32_t>(skip_line_ending(content, end));
+        ++line;
     }
 
-    return lines;
+    // Handle final empty line if file ends with newline
+    if (pos == n) {
+        sf.line_offsets.push_back(pos);
+        sf.line_lengths.push_back(0);
+    }
+}
+
+std::vector<RawLine> split_into_lines(const std::string& content,
+                                      uint32_t file_id,
+                                      uint32_t starting_line) {
+    std::vector<RawLine> out;
+
+    uint32_t pos = 0;
+    uint32_t line = starting_line;
+
+    while (pos < content.size()) {
+        size_t end = find_line_end(content, pos);
+
+        RawLine rl;
+        rl.text = content.substr(pos, end - pos);
+        rl.loc = SourceLoc(file_id, line, 1);
+        out.push_back(std::move(rl));
+
+        pos = static_cast<uint32_t>(skip_line_ending(content, end));
+        ++line;
+    }
+
+    return out;
 }

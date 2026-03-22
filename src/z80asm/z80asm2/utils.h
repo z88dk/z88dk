@@ -9,48 +9,6 @@
 #include <cctype>
 #include <string>
 
-// global string pool
-// reuse string literals to save memory and speed up comparisons
-const char* strpool(const std::string& str);
-
-// safe ctype functions that work with signed char values
-inline bool is_space(char c) {
-    return std::isspace(static_cast<unsigned char>(c)) != 0;
-}
-
-inline bool is_alpha(char c) {
-    return std::isalpha(static_cast<unsigned char>(c)) != 0;
-}
-
-inline bool is_digit(char c) {
-    return std::isdigit(static_cast<unsigned char>(c)) != 0;
-}
-
-inline bool is_hex_digit(char c) {
-    return std::isxdigit(static_cast<unsigned char>(c)) != 0;
-}
-
-inline bool is_oct_digit(char c) {
-    return c >= '0' && c <= '7';
-}
-
-inline bool is_bin_digit(char c) {
-    return c == '0' || c == '1';
-}
-
-inline bool is_alnum(char c) {
-    return std::isalnum(static_cast<unsigned char>(c)) != 0;
-}
-
-// identifier character: letter, digit, or underscore
-inline bool is_ident_start(char c) {
-    return is_alpha(c) || c == '_';
-}
-
-inline bool is_ident_char(char c) {
-    return is_alpha(c) || is_digit(c) || c == '_';
-}
-
 // Convert string to upper/lower case
 std::string to_upper(const std::string& s);
 std::string to_lower(const std::string& s);
@@ -88,3 +46,33 @@ std::string expand_env_vars(const std::string& text);
 
 // Helper function to format integer as hex string
 std::string int_to_hex(int value);
+
+// safe ctype functions that work with signed char values
+inline bool is_space(char c) {
+    return std::isspace(static_cast<unsigned char>(c)) != 0;
+}
+
+inline bool is_alpha(char c) {
+    return std::isalpha(static_cast<unsigned char>(c)) != 0;
+}
+
+inline bool is_dec_digit(char c) {
+    return std::isdigit(static_cast<unsigned char>(c)) != 0;
+}
+
+inline bool is_hex_digit(char c) {
+    return std::isxdigit(static_cast<unsigned char>(c)) != 0;
+}
+
+inline bool is_oct_digit(char c) {
+    return c >= '0' && c <= '7';
+}
+
+inline bool is_bin_digit(char c) {
+    return c == '0' || c == '1';
+}
+
+inline bool is_alnum(char c) {
+    return std::isalnum(static_cast<unsigned char>(c)) != 0;
+}
+
