@@ -42,6 +42,15 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_expr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\strings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\semantic_rewrite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h">
@@ -68,9 +77,21 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_expr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\scan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\keywords.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\scan.re">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

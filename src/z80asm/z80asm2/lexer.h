@@ -8,12 +8,14 @@
 
 #include "keywords.h"
 #include "source_loc.h"
+#include "strings.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
-// all strings stored in strpool for memory efficiency and fast comparisons
+// all strings stored in g_strings for memory efficiency and fast comparisons
 
-enum class TokenType {
+enum class TokenType : uint8_t {
     // Literals
     Identifier,
     Integer,
@@ -63,30 +65,25 @@ enum class TokenType {
     At,             // @
     Dollar,         // $
     Backslash,      // (backslash)
+    Tick,           // for single quote '
 
-    // Assembly instruction pointer
-    ASMPC,
-
-    // disambiguate +register from +expression
-    PlusA,          // +A
-    PlusBC,         // +BC
-    PlusDE,         // +DE
-    PlusHL,         // +HL
-    PlusIX,         // +IX
-    PlusIY,         // +IY
+    ASMPC,          // Assembly instruction pointer
 
     EndOfLine,
-    EndOfFile,
 };
 
 struct Token {
-    TokenType type = TokenType::EndOfFile;
-    Keyword keyword = Keyword::None;
-    const char* text = "";
-    int int_value = 0;
-    double float_value = 0.0;
-    const char* str_value = "";
-    SourceLoc loc;
+    TokenType type = TokenType::EndOfLine;  // 1 byte
+    Keyword keyword = Keyword::None;        // 2 bytes
+    StringInterner::Id text_id;
+
+    union {                                 // 4 bytes
+        int int_value;
+        double float_value;
+        StringInterner::Id str_value_id;
+    } value;
+
+    SourceLoc loc;                          // 8 bytes
 
     static Token token(TokenType type_, const std::string& text_,
                        const SourceLoc& loc);
@@ -99,11 +96,10 @@ struct Token {
     static Token string(const std::string& text_, const std::string& value,
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
-    static Token end_of_file(const SourceLoc& loc);
 };
 
 std::string tokens_to_string(const std::vector<Token>& tokens);
 
 struct SourceFile;          // forward declaration (no #include "source.h")
-void tokenize(SourceFile& source);
+void tokenize(SourceFile& sf, const std::string& content);
 std::vector<Token> tokenize_text(const std::string& text, const SourceLoc& loc);

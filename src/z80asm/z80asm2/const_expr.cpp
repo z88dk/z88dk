@@ -6,72 +6,73 @@
 
 #include "const_expr.h"
 #include "errors.h"
+#include "lexer.h"
 #include "options.h"
+#include "source_loc.h"
+#include "strings.h"
 #include "utils.h"
 #include <iostream>
+#include <string>
+#include <vector>
 
 void ConstSymbols::clear() {
     symbols.clear();
 }
 
-void ConstSymbols::set(const std::string& name, int value, const SourceLoc& loc) {
-    const ConstSymbol* existing = get(name);
+void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& loc) {
+    const ConstSymbol* existing = get(name_id);
     if (existing != nullptr && existing->value != value) {
-        error(loc, "Constant already defined: " + name);
-        error(existing->loc, "Previous definition of constant: " + name);
+        error(loc, "Constant already defined: " + g_strings.to_string(name_id));
+        note(existing->loc, "Previous definition of constant: " + g_strings.to_string(name_id));
         return;
     }
 
     ConstSymbol sym;
-    sym.name = strpool(name);
+    sym.name_id = name_id;
     sym.value = value;
     sym.loc = loc;
-    symbols[sym.name] = sym;
+    symbols[sym.name_id] = sym;
 
     if (g_options.verbose) {
-        std::cout << "Define constant: " << name << " = " << int_to_hex(value) << std::endl;
+        std::cout << "Define constant: " << g_strings.to_string(name_id)
+                  << " = " << int_to_hex(value) << std::endl;
     }
 }
 
-const ConstSymbol* ConstSymbols::get(const std::string& name) const {
-    auto it = symbols.find(strpool(name));
+const ConstSymbol* ConstSymbols::get(StringInterner::Id name_id) const {
+    auto it = symbols.find(name_id);
     if (it != symbols.end()) {
         return &it->second;
     }
     return nullptr;
 }
 
-static const Token* peek_token(const std::vector<Token>& tokens, size_t pos) {
+void ConstSymbols::erase(StringInterner::Id name_id) {
+    symbols.erase(name_id);
+}
+
+void ConstSymbols::set(const std::string& name, int value, const SourceLoc& loc) {
+    set(g_strings.intern(name), value, loc);
+}
+
+const ConstSymbol* ConstSymbols::get(const std::string& name) const {
+    return get(g_strings.intern(name));
+}
+
+void ConstSymbols::erase(const std::string& name) {
+    erase(g_strings.intern(name));
+}
+
+static const Token* peek_token(const std::vector<Token>& tokens, uint32_t pos) {
     return pos < tokens.size() ? &tokens[pos] : nullptr;
 }
 
-static SourceLoc peek_loc(const std::vector<Token>& tokens, size_t pos) {
+static SourceLoc peek_loc(const std::vector<Token>& tokens, uint32_t pos) {
     const Token* token = peek_token(tokens, pos);
     return token != nullptr ? token->loc : SourceLoc();
 }
 
-static bool error_at_expr_pos(const std::vector<Token>& tokens, size_t pos,
-                              const std::string& msg) {
-    const Token* token = peek_token(tokens, pos);
-    if (token != nullptr) {
-        error(token->loc, msg);
-    }
-    else if (pos > 0) {
-        const Token* prev = peek_token(tokens, pos - 1);
-        if (prev != nullptr) {
-            error(prev->loc, msg + " after token " + std::string(prev->text));
-        }
-        else {
-            error(SourceLoc(), msg);
-        }
-    }
-    else {
-        error(SourceLoc(), msg);
-    }
-    return false;
-}
-
-static bool match_token(const std::vector<Token>& tokens, size_t& pos, TokenType type) {
+static bool match_token(const std::vector<Token>& tokens, uint32_t& pos, TokenType type) {
     if (pos < tokens.size() && tokens[pos].type == type) {
         pos++;
         return true;
@@ -79,49 +80,36 @@ static bool match_token(const std::vector<Token>& tokens, size_t& pos, TokenType
     return false;
 }
 
-static int int_pow(int base, int exp, const SourceLoc& loc) {
-    if (exp < 0) {
-        error(loc, "Negative exponent in constant expression");
-        return 0;
-    }
-
-    int result = 1;
-    while (exp > 0) {
-        result *= base;
-        exp--;
-    }
-    return result;
-}
-
-static bool parse_const_expr_conditional(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_conditional(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent);
 
-static bool parse_const_expr_primary(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_primary(const std::vector<Token>& tokens, uint32_t& pos,
                                      const ConstSymbols& sym, int& result, bool silent) {
     const Token* token = peek_token(tokens, pos);
     if (token == nullptr) {
-        return error_at_expr_pos(tokens, pos, "Constant expression expected");
+        error(peek_loc(tokens, pos), "Constant expression expected");
+        return false;
     }
 
     switch (token->type) {
     case TokenType::Integer:
-        result = token->int_value;
+        result = token->value.int_value;
         pos++;
         return true;
 
     case TokenType::Float:
-        result = static_cast<int>(token->float_value);
+        result = static_cast<int>(token->value.float_value);
         pos++;
         return true;
 
     case TokenType::Identifier: {
-        const ConstSymbol* s = sym.get(token->text);
+        const ConstSymbol* s = sym.get(token->text_id);
         if (s != nullptr) {
             result = s->value;
         }
         else {
             if (!silent) {
-                error(token->loc, "Undefined constant: " + std::string(token->text));
+                error(token->loc, "Undefined constant: " + g_strings.to_string(token->text_id));
             }
             result = 0;
         }
@@ -165,11 +153,12 @@ static bool parse_const_expr_primary(const std::vector<Token>& tokens, size_t& p
     }
 }
 
-static bool parse_const_expr_unary(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_unary(const std::vector<Token>& tokens, uint32_t& pos,
                                    const ConstSymbols& sym, int& result, bool silent) {
     const Token* token = peek_token(tokens, pos);
     if (token == nullptr) {
-        return error_at_expr_pos(tokens, pos, "Constant expression expected");
+        error(peek_loc(tokens, pos), "Constant expression expected");
+        return false;
     }
 
     switch (token->type) {
@@ -206,7 +195,7 @@ static bool parse_const_expr_unary(const std::vector<Token>& tokens, size_t& pos
     }
 }
 
-static bool parse_const_expr_power(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_power(const std::vector<Token>& tokens, uint32_t& pos,
                                    const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_unary(tokens, pos, sym, result, silent)) {
         return false;
@@ -223,7 +212,7 @@ static bool parse_const_expr_power(const std::vector<Token>& tokens, size_t& pos
     return true;
 }
 
-static bool parse_const_expr_multiplicative(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_multiplicative(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_power(tokens, pos, sym, result, silent)) {
         return false;
@@ -277,7 +266,7 @@ static bool parse_const_expr_multiplicative(const std::vector<Token>& tokens, si
     }
 }
 
-static bool parse_const_expr_additive(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_additive(const std::vector<Token>& tokens, uint32_t& pos,
                                       const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_multiplicative(tokens, pos, sym, result, silent)) {
         return false;
@@ -309,7 +298,7 @@ static bool parse_const_expr_additive(const std::vector<Token>& tokens, size_t& 
     }
 }
 
-static bool parse_const_expr_shift(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_shift(const std::vector<Token>& tokens, uint32_t& pos,
                                    const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_additive(tokens, pos, sym, result, silent)) {
         return false;
@@ -341,7 +330,7 @@ static bool parse_const_expr_shift(const std::vector<Token>& tokens, size_t& pos
     }
 }
 
-static bool parse_const_expr_relational(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_relational(const std::vector<Token>& tokens, uint32_t& pos,
                                         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_shift(tokens, pos, sym, result, silent)) {
         return false;
@@ -389,7 +378,7 @@ static bool parse_const_expr_relational(const std::vector<Token>& tokens, size_t
     }
 }
 
-static bool parse_const_expr_equality(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_equality(const std::vector<Token>& tokens, uint32_t& pos,
                                       const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_relational(tokens, pos, sym, result, silent)) {
         return false;
@@ -421,7 +410,7 @@ static bool parse_const_expr_equality(const std::vector<Token>& tokens, size_t& 
     }
 }
 
-static bool parse_const_expr_bitwise_and(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_bitwise_and(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_equality(tokens, pos, sym, result, silent)) {
         return false;
@@ -438,7 +427,7 @@ static bool parse_const_expr_bitwise_and(const std::vector<Token>& tokens, size_
     return true;
 }
 
-static bool parse_const_expr_bitwise_xor(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_bitwise_xor(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_bitwise_and(tokens, pos, sym, result, silent)) {
         return false;
@@ -455,7 +444,7 @@ static bool parse_const_expr_bitwise_xor(const std::vector<Token>& tokens, size_
     return true;
 }
 
-static bool parse_const_expr_bitwise_or(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_bitwise_or(const std::vector<Token>& tokens, uint32_t& pos,
                                         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_bitwise_xor(tokens, pos, sym, result, silent)) {
         return false;
@@ -472,7 +461,7 @@ static bool parse_const_expr_bitwise_or(const std::vector<Token>& tokens, size_t
     return true;
 }
 
-static bool parse_const_expr_logical_and(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_logical_and(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_bitwise_or(tokens, pos, sym, result, silent)) {
         return false;
@@ -489,7 +478,7 @@ static bool parse_const_expr_logical_and(const std::vector<Token>& tokens, size_
     return true;
 }
 
-static bool parse_const_expr_logical_xor(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_logical_xor(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_logical_and(tokens, pos, sym, result, silent)) {
         return false;
@@ -506,7 +495,7 @@ static bool parse_const_expr_logical_xor(const std::vector<Token>& tokens, size_
     return true;
 }
 
-static bool parse_const_expr_logical_or(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_logical_or(const std::vector<Token>& tokens, uint32_t& pos,
                                         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_logical_xor(tokens, pos, sym, result, silent)) {
         return false;
@@ -523,7 +512,7 @@ static bool parse_const_expr_logical_or(const std::vector<Token>& tokens, size_t
     return true;
 }
 
-static bool parse_const_expr_conditional(const std::vector<Token>& tokens, size_t& pos,
+static bool parse_const_expr_conditional(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent) {
     if (!parse_const_expr_logical_or(tokens, pos, sym, result, silent)) {
         return false;
@@ -552,17 +541,17 @@ static bool parse_const_expr_conditional(const std::vector<Token>& tokens, size_
     return true;
 }
 
-static bool eval_const_expr_impl(const std::vector<Token>& tokens, size_t& pos,
+static bool eval_const_expr_impl(const std::vector<Token>& tokens, uint32_t& pos,
                                  const ConstSymbols& sym, int& result, bool silent) {
     return parse_const_expr_conditional(tokens, pos, sym, result, silent);
 }
 
-bool eval_const_expr_silent(const std::vector<Token>& tokens, size_t& pos,
+bool eval_const_expr_silent(const std::vector<Token>& tokens, uint32_t& pos,
                             const ConstSymbols& sym, int& result) {
     return eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/true);
 }
 
-bool eval_const_expr(const std::vector<Token>& tokens, size_t& pos,
+bool eval_const_expr(const std::vector<Token>& tokens, uint32_t& pos,
                      const ConstSymbols& sym, int& result) {
     return eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/false);
 }
@@ -570,15 +559,15 @@ bool eval_const_expr(const std::vector<Token>& tokens, size_t& pos,
 bool eval_const_expr_silent(const std::string& expr, const SourceLoc& loc,
                             const ConstSymbols& sym, int& result) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
-    size_t pos = 0;
+    uint32_t pos = 0;
     if (!eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/true)) {
         return false;
     }
 
     if (pos < tokens.size() &&
-            tokens[pos].type != TokenType::EndOfLine &&
-            tokens[pos].type != TokenType::EndOfFile) {
-        error(tokens[pos].loc, "Unexpected token in constant expression: " + std::string(tokens[pos].text));
+            tokens[pos].type != TokenType::EndOfLine) {
+        error(tokens[pos].loc, "Unexpected token in expression: " +
+              g_strings.to_string(tokens[pos].text_id));
         return false;
     }
 
@@ -588,17 +577,31 @@ bool eval_const_expr_silent(const std::string& expr, const SourceLoc& loc,
 bool eval_const_expr(const std::string& expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
-    size_t pos = 0;
+    uint32_t pos = 0;
     if (!eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/false)) {
         return false;
     }
 
     if (pos < tokens.size() &&
-            tokens[pos].type != TokenType::EndOfLine &&
-            tokens[pos].type != TokenType::EndOfFile) {
-        error(tokens[pos].loc, "Unexpected token in constant expression: " + std::string(tokens[pos].text));
+            tokens[pos].type != TokenType::EndOfLine) {
+        error(tokens[pos].loc, "Unexpected token in expression: " +
+              g_strings.to_string(tokens[pos].text_id));
         return false;
     }
 
     return true;
+}
+
+int int_pow(int base, int exp, const SourceLoc& loc) {
+    if (exp < 0) {
+        error(loc, "Negative exponent in expression");
+        return 0;
+    }
+
+    int result = 1;
+    while (exp > 0) {
+        result *= base;
+        exp--;
+    }
+    return result;
 }
