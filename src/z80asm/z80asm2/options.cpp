@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "options.h"
 #include "source.h"
+#include "utils.h"
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -414,15 +415,19 @@ static void search_list_file(const std::string& list_filename, const SourceLoc& 
     }
 
     // read list file
-    std::string content = read_file_to_string(list_full_path, loc);
+    uint32_t file_id = register_virtual_file(list_full_path);
+    std::string content;
+    if (!read_file_to_string(list_full_path, loc, content)) {
+        return;
+    }
 
     // process each line
-    std::vector<SourceLine> lines = split_source_lines(list_full_path, content);
+    std::vector<RawLine> lines = split_into_lines(content, file_id, 1);
     for (auto& line : lines) {
         std::string inc_filename = line.text;
 
         // remove comments and trim
-        size_t comment_pos = inc_filename.find_first_of(";#");
+        uint32_t comment_pos = static_cast<uint32_t>(inc_filename.find_first_of(";#"));
         if (comment_pos != std::string::npos) {
             inc_filename = inc_filename.substr(0, comment_pos);
         }
@@ -500,7 +505,7 @@ static bool match_name_glob(const std::string& name, const std::string& pat) {
 static void glob_walk(const std::filesystem::path& base_fs,
                       const std::filesystem::path& anchor,
                       const std::vector<std::string>& comps,
-                      size_t idx,
+                      uint32_t idx,
                       std::vector<std::filesystem::path>& out) {
     namespace fs = std::filesystem;
 
@@ -587,7 +592,7 @@ static std::vector<std::string> expand_wildcards(const std::string& pattern) {
 
     // Build non-wildcard prefix as base (textual) until first wildcard segment
     fs::path base_prefix;
-    size_t wildcard_idx = 0;
+    uint32_t wildcard_idx = 0;
     for (; wildcard_idx < comps.size(); ++wildcard_idx) {
         const std::string& seg = comps[wildcard_idx];
         const bool seg_has_wildcard = (seg == "**") ||

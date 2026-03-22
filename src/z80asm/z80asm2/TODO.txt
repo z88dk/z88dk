@@ -1,0 +1,9 @@
+tokenize()              // raw tokens, including Tick
+preprocess()            // macros, includes, conditionals ? token stream
+apply_ix_iy_swap()      // semantic rewrite
+apply_identifier_ucase()
+apply_alt_registers()
+apply_dot_directive_merge()
+parse()                 // grammar
+semantic_analysis()     // symbol resolution, types, CPU rules
+codegen()               // final machine code
