@@ -31,7 +31,7 @@ enum class Keyword : uint16_t {
 #undef X
 
 // Convert string to Keyword enum, returns Keyword::None if not found
-Keyword keyword_lookup(const std::string& s);
+Keyword keyword_lookup(const std::string_view s);
 std::string keyword_to_string(Keyword kw);
 
 // Check if a keyword type

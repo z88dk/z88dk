@@ -17,7 +17,7 @@
 #include <string>
 #include <utility>
 
-Token Token::token(TokenType type_, const std::string& text_,
+Token Token::token(TokenType type_, const std::string_view text_,
                    const SourceLoc& loc) {
     Token t;
     t.type = type_;
@@ -26,7 +26,7 @@ Token Token::token(TokenType type_, const std::string& text_,
     return t;
 }
 
-Token Token::identifier(const std::string& text_,
+Token Token::identifier(const std::string_view text_,
                         const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Identifier;
@@ -36,7 +36,7 @@ Token Token::identifier(const std::string& text_,
     return t;
 }
 
-Token Token::integer(const std::string& text_, int value,
+Token Token::integer(const std::string_view text_, int value,
                      const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Integer;
@@ -46,7 +46,7 @@ Token Token::integer(const std::string& text_, int value,
     return t;
 }
 
-Token Token::floating(const std::string& text_, double value,
+Token Token::floating(const std::string_view text_, double value,
                       const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Float;
@@ -56,7 +56,7 @@ Token Token::floating(const std::string& text_, double value,
     return t;
 }
 
-Token Token::string(const std::string& text_, const std::string& value,
+Token Token::string(const std::string_view text_, const std::string_view value,
                     const SourceLoc& loc) {
     Token t;
     t.type = TokenType::String;
@@ -78,7 +78,7 @@ std::string tokens_to_string(const std::vector<Token>& tokens) {
         if (s1.empty() || s2.empty()) {
             return s1 + s2;
         }
-        else if (str_ends_with(s1, "##")) {   // cpp-style concatenation
+        else if (ends_with(s1, "##")) {   // cpp-style concatenation
             return s1.substr(0, s1.length() - 2) + s2;
         }
         else if (is_space(s1.back()) || is_space(s2.front())) {
@@ -141,14 +141,14 @@ static bool strip_line_continuation(std::string& line) {
 }
 
 static std::string_view get_line_view(const SourceFile& sf,
-                                      const std::string& content,
+                                      const std::string_view content,
                                       uint32_t line) {
     uint32_t off = sf.line_offsets[line];
     uint32_t len = sf.line_lengths[line];
     return std::string_view(content.data() + off, len);
 }
 
-void tokenize(SourceFile& sf, const std::string& content) {
+void tokenize(SourceFile& sf, const std::string_view content) {
     TokenizeState state;
     uint32_t num_lines = static_cast<uint32_t>(sf.line_offsets.size());
 
@@ -224,7 +224,7 @@ void tokenize(SourceFile& sf, const std::string& content) {
     }
 }
 
-std::vector<Token> tokenize_text(const std::string& text,
+std::vector<Token> tokenize_text(const std::string_view text,
                                  const SourceLoc& loc) {
     // Build a temporary merged line
     MergedLine merged;
