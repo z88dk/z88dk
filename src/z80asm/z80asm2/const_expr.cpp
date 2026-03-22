@@ -51,15 +51,15 @@ void ConstSymbols::erase(StringInterner::Id name_id) {
     symbols.erase(name_id);
 }
 
-void ConstSymbols::set(const std::string& name, int value, const SourceLoc& loc) {
+void ConstSymbols::set(const std::string_view name, int value, const SourceLoc& loc) {
     set(g_strings.intern(name), value, loc);
 }
 
-const ConstSymbol* ConstSymbols::get(const std::string& name) const {
+const ConstSymbol* ConstSymbols::get(const std::string_view name) const {
     return get(g_strings.intern(name));
 }
 
-void ConstSymbols::erase(const std::string& name) {
+void ConstSymbols::erase(const std::string_view name) {
     erase(g_strings.intern(name));
 }
 
@@ -556,7 +556,7 @@ bool eval_const_expr(const std::vector<Token>& tokens, uint32_t& pos,
     return eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/false);
 }
 
-bool eval_const_expr_silent(const std::string& expr, const SourceLoc& loc,
+bool eval_const_expr_silent(const std::string_view expr, const SourceLoc& loc,
                             const ConstSymbols& sym, int& result) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
     uint32_t pos = 0;
@@ -574,7 +574,7 @@ bool eval_const_expr_silent(const std::string& expr, const SourceLoc& loc,
     return true;
 }
 
-bool eval_const_expr(const std::string& expr, const SourceLoc& loc,
+bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
     uint32_t pos = 0;

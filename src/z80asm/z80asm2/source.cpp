@@ -15,12 +15,14 @@
 #include <iostream>
 #include <list>
 #include <sstream>
+#include <string>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 
 class FileHandleCache {
 public:
-    std::ifstream* get(const std::string& filename, const SourceLoc& loc) {
+    std::ifstream* get(const std::string_view filename, const SourceLoc& loc) {
         // If already cached, move to front and return
         for (auto it = entries.begin(); it != entries.end(); ++it) {
             if (it->filename == filename) {
@@ -33,9 +35,9 @@ public:
         entries.emplace_front();
         auto& e = entries.front();
         e.filename = filename;
-        e.stream.open(filename, std::ios::binary);
+        e.stream.open(e.filename, std::ios::binary);
         if (!e.stream) {
-            error(loc, "Failed to open file: " + filename);
+            error(loc, "Failed to open file: " + e.filename);
             entries.pop_front();
             return nullptr;
         }
@@ -64,11 +66,11 @@ static FileHandleCache g_file_handle_cache;
 static std::unordered_map<StringInterner::Id, SourceFile> g_source_cache;
 
 // get a unique ID for a virtual file path (e.g. for included files or generated content)
-uint32_t register_virtual_file(const std::string& path) {
+uint32_t register_virtual_file(const std::string_view path) {
     return g_strings.intern(path);
 }
 
-SourceFile* get_source_file(const std::string& filename, const SourceLoc& loc) {
+SourceFile* get_source_file(const std::string_view filename, const SourceLoc& loc) {
     // Normalize and intern the filename
     std::string norm = normalize_path(filename);
     StringInterner::Id file_id = g_strings.intern(norm);
@@ -126,7 +128,7 @@ std::string read_line(const SourceFile& sf, uint32_t line, const SourceLoc& loc)
     return "";
 }
 
-bool read_file_to_string(const std::string& filename,
+bool read_file_to_string(const std::string_view filename,
                          const SourceLoc& loc,
                          std::string& out_content) {
     std::ifstream* in = g_file_handle_cache.get(filename, loc);
@@ -140,7 +142,7 @@ bool read_file_to_string(const std::string& filename,
     return true;
 }
 
-static inline size_t find_line_end(const std::string& content, size_t pos) {
+static inline size_t find_line_end(const std::string_view content, size_t pos) {
     size_t n = content.size();
     size_t end = pos;
 
@@ -151,7 +153,7 @@ static inline size_t find_line_end(const std::string& content, size_t pos) {
     return end;
 }
 
-static inline size_t skip_line_ending(const std::string& content, size_t end) {
+static inline size_t skip_line_ending(const std::string_view content, size_t end) {
     size_t n = content.size();
 
     if (end < n) {
@@ -167,7 +169,7 @@ static inline size_t skip_line_ending(const std::string& content, size_t end) {
 }
 
 // split into lines, handling CR, CR-LF, and LF
-void split_source_lines(SourceFile& sf, const std::string& content) {
+void split_source_lines(SourceFile& sf, const std::string_view content) {
     const uint32_t n = static_cast<uint32_t>(content.size());
 
     uint32_t pos = 0;
@@ -190,7 +192,7 @@ void split_source_lines(SourceFile& sf, const std::string& content) {
     }
 }
 
-std::vector<RawLine> split_into_lines(const std::string& content,
+std::vector<RawLine> split_into_lines(const std::string_view content,
                                       uint32_t file_id,
                                       uint32_t starting_line) {
     std::vector<RawLine> out;

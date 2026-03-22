@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
+    <None Include="..\..\src\z80asm\z80asm2\options.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.re" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

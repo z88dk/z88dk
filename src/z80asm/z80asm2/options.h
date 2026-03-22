@@ -28,21 +28,21 @@ struct Options {
 extern Options g_options;
 extern std::vector<std::string> g_input_files;   // command line input files
 
-bool is_asm_filename(const std::string& filename);
-bool is_o_filename(const std::string& filename);
-std::string get_asm_filename(const std::string& filename);
-std::string get_o_filename(const std::string& filename);
+bool is_asm_filename(const std::string_view filename);
+bool is_o_filename(const std::string_view filename);
+std::string get_asm_filename(const std::string_view filename);
+std::string get_o_filename(const std::string_view filename);
 
 // Try candidates according to include semantics and include_paths,
 // return resolved path if found or empty string if not found.
 // including_filename: the file which contains the include directive (can be empty if unknown)
-std::string resolve_include_candidate(const std::string& filename,
-                                      const std::string& including_filename, bool is_angle);
+std::string resolve_include_candidate(const std::string_view filename,
+                                      const std::string_view including_filename, bool is_angle);
 
 // parse arguments and options
-bool parse_arg(const std::string& arg, bool& found_dash_dash);
-void search_source_file(const std::string& filename, const SourceLoc& loc);
+bool parse_arg(const std::string_view arg, bool& found_dash_dash);
+void search_source_file(const std::string_view filename, const SourceLoc& loc);
 
-void exit_show_copyright(int exit_code);
-void exit_show_usage(int exit_code);
-void exit_invalid_option(const std::string& option);
+[[noreturn]] void exit_show_copyright(int exit_code);
+[[noreturn]] void exit_show_usage(int exit_code);
+[[noreturn]] void exit_invalid_option(const std::string_view option);
