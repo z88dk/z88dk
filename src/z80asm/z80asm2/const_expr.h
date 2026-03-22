@@ -27,14 +27,14 @@ struct ConstSymbols {
     const ConstSymbol* get(StringInterner::Id name_id) const;
     void erase(StringInterner::Id name_id);
 
-    void set(const std::string& name, int value, const SourceLoc& loc);
-    const ConstSymbol* get(const std::string& name) const;
-    void erase(const std::string& name);
+    void set(const std::string_view name, int value, const SourceLoc& loc);
+    const ConstSymbol* get(const std::string_view name) const;
+    void erase(const std::string_view name);
 };
 
-bool eval_const_expr_silent(const std::string& expr, const SourceLoc& loc,
+bool eval_const_expr_silent(const std::string_view expr, const SourceLoc& loc,
                             const ConstSymbols& sym, int& result);
-bool eval_const_expr(const std::string& expr, const SourceLoc& loc,
+bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result);
 
 bool eval_const_expr_silent(const std::vector<Token>& tokens, uint32_t& pos,
