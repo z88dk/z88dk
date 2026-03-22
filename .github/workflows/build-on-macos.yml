@@ -22,6 +22,7 @@ jobs:
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
+        cpanm --force XML::Twig
         cpanm App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
       run: |
