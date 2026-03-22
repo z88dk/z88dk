@@ -7,6 +7,16 @@ Headline features for this release:
 
 More detailed, but still incomplete changelist:
 
+- [appmake] +hdos disc writing support
+- [classic] Reset escape code for gencon vt100 bridge now resets colours
+- [classic] +alphatp2 target working
+- [classic] +gal faster plotting
+- [classic] +sms now has access to newlib libraries
+- [classic] +x07 Support much improved
+- [classic] +z88 Support for 512z64 graphics
+- [ucpp] Big fixes for #line handling
+- [z88dk-dis] Support for decoding rst calls
+- [z80asm] #define now supported as alias for defc
 
 
 z88dk v2.4 - 02.10.2025
