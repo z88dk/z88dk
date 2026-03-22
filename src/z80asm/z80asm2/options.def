@@ -1,0 +1,20 @@
+//-----------------------------------------------------------------------------
+// Z80 assembler
+// Copyright (C) Paulo Custodio, 2011-2026
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+X(CPP,      "-cpp",    true,  "Pass options to cpp")
+X(DATESTAMP,"-d",      false, "Assemble only if newer")
+X(DEFINE,   "-D",      true,  "Define symbol")
+X(HELP,     "-h",      false, "Show this screen")
+X(INCLUDE,  "-I",      true,  "Add directory to search for source/include files")
+X(IXIY,     "-IXIY",   false, "Swap IX and IY registers")
+X(M4,       "-m4",     true,  "Pass options to m4")
+X(OUTPUT,   "-O",      true,  "Set directory to store output files")
+X(PERL,     "-perl",   true,  "Pass options to perl")
+X(PREPROC,  "-E",      false, "Preprocess only")
+X(UCASE,    "-ucase",  false, "Uppercase labels")
+X(VERBOSE,  "-v",      false, "Verbose output")
+
+#undef X
