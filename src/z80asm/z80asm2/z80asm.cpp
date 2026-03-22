@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 
-static const std::string z80asm_env = "Z80ASM";
+static constexpr std::string_view z80asm_env = "Z80ASM";
 
 static void preprocess_only() {}
 static void assemble_files() {}

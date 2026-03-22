@@ -12,10 +12,10 @@
 #include <cstdlib>
 #include <malloc.h>
 
-static const std::string blanks = " \t\r\n\v\f";
+static constexpr std::string_view blanks = " \t\r\n\v\f";
 
-std::string to_upper(const std::string& s) {
-    std::string result = s;
+std::string to_upper(const std::string_view s) {
+    std::string result(s);
     std::transform(result.begin(), result.end(), result.begin(),
     [](unsigned char c) {
         return static_cast<char>(std::toupper(c));
@@ -23,8 +23,8 @@ std::string to_upper(const std::string& s) {
     return result;
 }
 
-std::string to_lower(const std::string& s) {
-    std::string result = s;
+std::string to_lower(const std::string_view s) {
+    std::string result(s);
     std::transform(result.begin(), result.end(), result.begin(),
     [](unsigned char c) {
         return static_cast<char>(std::tolower(c));
@@ -32,49 +32,22 @@ std::string to_lower(const std::string& s) {
     return result;
 }
 
-std::string ltrim(const std::string& s) {
+std::string ltrim(const std::string_view s) {
     size_t start = s.find_first_not_of(blanks);
-    return (start == std::string::npos) ? "" : s.substr(start);
+    return std::string((start == std::string::npos) ? "" : s.substr(start));
 }
 
-std::string rtrim(const std::string& s) {
+std::string rtrim(const std::string_view s) {
     size_t end = s.find_last_not_of(blanks);
-    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+    return std::string((end == std::string::npos) ? "" : s.substr(0, end + 1));
 }
 
-std::string trim(const std::string& s) {
+std::string trim(const std::string_view s) {
     return ltrim(rtrim(s));
 }
 
-bool str_ends_with(const std::string& str, const std::string& ending) {
-    if (ending.length() > str.length()) {
-        return false;
-    }
-
-    // empty ending matches anything
-    if (ending.empty()) {
-        return true;
-    }
-
-    return str.compare(str.length() - ending.length(),
-                       ending.length(), ending) == 0;
-}
-
-bool str_starts_with(const std::string& str, const std::string& beginning) {
-    if (beginning.size() > str.size()) {
-        return false;
-    }
-
-    // empty beginning matches anything
-    if (beginning.empty()) {
-        return true;
-    }
-
-    return str.compare(0, beginning.size(), beginning) == 0;
-}
-
 // On Linux, lexically_normal() does not regard backslashes as path separators
-static std::string nomalize_slashes(const std::string& path) {
+static std::string nomalize_slashes(const std::string_view path) {
     std::string result;
     result.reserve(path.size());
     for (auto c : path) {
@@ -88,7 +61,7 @@ static std::string nomalize_slashes(const std::string& path) {
     return result;
 }
 
-std::string normalize_path(const std::string& path_) {
+std::string normalize_path(const std::string_view path_) {
     std::string path = nomalize_slashes(path_);
 
     if (path.empty()) {
@@ -97,7 +70,7 @@ std::string normalize_path(const std::string& path_) {
 
     // Preserve UNC prefix: if original path starts with // or \\,
     // ensure the normalized result also starts with a double slash.
-    const bool had_unc_prefix = str_starts_with(path, "//");
+    const bool had_unc_prefix = starts_with(path, "//");
 
     try {
         std::filesystem::path p(path);
@@ -106,8 +79,8 @@ std::string normalize_path(const std::string& path_) {
         if (had_unc_prefix) {
             // If normalization collapsed the leading // to / (or removed it),
             // put it back so UNC paths are preserved consistently across platforms.
-            if (!str_starts_with(result, "//")) {
-                if (str_starts_with(result, "/")) {
+            if (!starts_with(result, "//")) {
+                if (starts_with(result, "/")) {
                     result = "/" + result;  // make it begin with "//"
                 }
                 else {
@@ -122,7 +95,7 @@ std::string normalize_path(const std::string& path_) {
     }
 }
 
-std::string parent_dir(const std::string& path) {
+std::string parent_dir(const std::string_view path) {
     try {
         std::filesystem::path p(nomalize_slashes(path));
         return p.parent_path().generic_string();
@@ -132,19 +105,22 @@ std::string parent_dir(const std::string& path) {
     }
 }
 
-std::string replace_extension(const std::string& filename, const std::string& extension) {
+std::string replace_extension(const std::string_view filename, const std::string_view extension) {
     try {
         std::filesystem::path p(filename);
         p.replace_extension(extension);
         return normalize_path(p.lexically_normal().generic_string());
     }
     catch (...) {
-        return normalize_path(filename + extension);
+        return normalize_path(std::string(filename) + std::string(extension));
     }
 }
 
-std::string prepend_output_dir(const std::string& filename, const std::string& output_dir) {
+std::string prepend_output_dir(const std::string_view filename,
+                               const std::string_view output_dir_) {
     namespace fs = std::filesystem;
+
+    std::string output_dir(output_dir_);
 
     if (output_dir.empty()) {
         return normalize_path(filename);
@@ -177,7 +153,8 @@ std::string prepend_output_dir(const std::string& filename, const std::string& o
 
 // Helper: get environment variable value in a secure, cross-platform way.
 // Returns empty string if the variable is not set.
-std::string get_env_value(const std::string& name) {
+std::string get_env_value(const std::string_view name_) {
+    std::string name(name_);
 #ifdef _MSC_VER
     char* buf = nullptr;
     size_t sz = 0;
@@ -195,9 +172,9 @@ std::string get_env_value(const std::string& name) {
 
 // Expand environment variables of the form ${VAR}. Supports nesting such as ${var${param}}.
 // Unset variables expand to the empty string. Recursively expands until no patterns remain.
-std::string expand_env_vars(const std::string& text) {
+std::string expand_env_vars(const std::string_view text) {
     const size_t RUNAWAY_GUARD = 1000; // prevent infinite loops
-    std::string s = text;
+    std::string s(text);
 
     // Limit iterations to avoid infinite loops if values reintroduce placeholders cyclically.
     size_t guard = 0;
