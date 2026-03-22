@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (g_input_files.empty()) {
-        error("No input files");
+        error("No input files specified");
         exit(EXIT_FAILURE);
     }
 
@@ -91,6 +91,8 @@ int main(int argc, char* argv[]) {
         assemble_files();
     }
 
+    if (g_options.verbose) {
+        std::cout << "Assembly completed with " << error_count() << " error(s)" << std::endl;
+    }
     return error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
-

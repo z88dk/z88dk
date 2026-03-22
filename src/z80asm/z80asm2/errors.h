@@ -10,8 +10,18 @@
 #include <string>
 
 int error_count();
-void error(const std::string& msg);
 void error(const SourceLoc& loc, const std::string& msg);
-
-void warning(const std::string& msg);
 void warning(const SourceLoc& loc, const std::string& msg);
+void note(const SourceLoc& loc, const std::string& msg);
+
+inline void error(const std::string& msg) {
+    error(SourceLoc{}, msg);
+}
+
+inline void warning(const std::string& msg) {
+    warning(SourceLoc{}, msg);
+}
+
+inline void note(const std::string& msg) {
+    note(SourceLoc{}, msg);
+}
