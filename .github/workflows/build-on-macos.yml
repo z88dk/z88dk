@@ -22,8 +22,7 @@ jobs:
     - name: Install Spreadsheet::ParseXLSX
       run: |
         export PATH=/usr/local/bin:$PATH
-        cpanm --notest XML::Twig
-        cpanm --verbose Spreadsheet::ParseXLSX
+        cpanm --notest XML::Twig Spreadsheet::ParseXLSX
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
