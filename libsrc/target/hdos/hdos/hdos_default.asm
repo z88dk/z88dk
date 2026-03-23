@@ -13,6 +13,6 @@
 
 hdos_default:
 _hdos_default:
-    defm   "SY1"
+    defm   "SY0"
     defb   0,0,0   ;  null extension
     defb   0
