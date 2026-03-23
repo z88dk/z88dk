@@ -30,9 +30,9 @@ jobs:
           XML::Filter::BufferText \
           XML::Parser
         perl -V  # Show Perl version for diagnostics
-    - name: Install XML::Twig with full logs
+    - name: Install XML::Twig (skip tests)
       run: |
-        cpanm --verbose XML::Twig
+        cpanm --notest XML::Twig
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
