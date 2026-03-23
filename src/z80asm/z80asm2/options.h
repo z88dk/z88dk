@@ -17,6 +17,7 @@ struct Options {
     bool preprocess_only = false;
     bool swap_ix_iy = false;
     bool date_stamp = false;
+    bool dump_tokens = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

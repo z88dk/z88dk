@@ -1,0 +1,33 @@
+# file: t/10-lexer/input/numbers.asm
+Integer	"1"	1:1	int_value=1 
+Integer	"2d"	1:3	int_value=2 
+Integer	"3D"	1:6	int_value=3 
+EndOfLine	"\n"	1:8	
+Integer	"$1f"	2:1	int_value=31 
+Integer	"0x1f"	2:5	int_value=31 
+Integer	"0X1F"	2:10	int_value=31 
+Integer	"1fh"	2:15	int_value=31 
+Integer	"1FH"	2:19	int_value=31 
+EndOfLine	"\n"	2:22	
+Integer	"0b"	3:1	int_value=0 
+Integer	"1B"	3:4	int_value=1 
+Integer	"0b1010"	3:7	int_value=10 
+Integer	"0B1010"	3:14	int_value=10 
+Integer	"1010b"	3:21	int_value=10 
+Integer	"1010B"	3:27	int_value=10 
+Integer	"%1010"	3:33	int_value=10 
+Integer	"@1010"	3:39	int_value=10 
+Integer	"%\"#-#-\""	3:45	int_value=10 
+Integer	"@\"#-#-\""	3:53	int_value=10 
+EndOfLine	"\n"	3:60	
+Float	"1."	4:1	float_value=1 
+Float	".1"	4:4	float_value=0.1 
+Float	"1.1"	4:7	float_value=1.1 
+Float	"1.e1"	4:11	float_value=10 
+Float	"1.e-1"	4:16	float_value=0.1 
+Float	"1.e+1"	4:22	float_value=10 
+Float	".1e1"	4:28	float_value=1 
+Float	"1.e-1"	4:33	float_value=0.1 
+Float	"1.e+1"	4:39	float_value=10 
+EndOfLine	"\n"	4:44	
+EndOfLine	"\n"	5:1	
