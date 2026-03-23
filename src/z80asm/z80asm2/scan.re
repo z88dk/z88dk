@@ -98,7 +98,6 @@ static bool parse_escape(uint32_t& idx,
 
     // Hex: \xFF
     case 'x': {
-        idx++; // move past 'x'
         if (idx >= n || !is_hex_digit(line.text[idx])) {
             if (!probing) {
                 error(line.locmap[idx - 2], "Invalid hex escape");
@@ -154,7 +153,10 @@ static bool scan_quoted_content(char end_quote,
         idx++;
     }
 
-    error(line.locmap[idx - 1], "Unterminated string literal");
+    if (!probing) {
+        error(line.locmap[idx - 1], "Unterminated string literal");
+    }
+    idx = n;    // advance past the malformed string
     return false;
 }
 
@@ -193,14 +195,9 @@ static void parse_char_literal(uint32_t& idx,
                                   line,
                                   content);
 
-    if (ok) {
-        // Successfully parsed something like 'A' or '\n'
-        if (content.size() != 1) {
-            error(line.locmap[start],
-                  "character literal must contain exactly one character");
-            return;
-        }
-
+    // valid character literal if scan succeeded and consumed
+    // exactly one character
+    if (ok && content.size() == 1) {
         idx = probe; // commit
         out.push_back(Token::integer(line.text.substr(start, idx - start),
                                      static_cast<int>(content[0]),
@@ -208,19 +205,10 @@ static void parse_char_literal(uint32_t& idx,
         return;
     }
 
-    // If scan_quoted_content failed *without consuming anything*,
-    // then this is a Tick token.
-    if (probe == start) {
-        // Lone tick
-        out.push_back(Token::token(TokenType::Tick,
-                                   "'",
-                                   line.locmap[start]));
-        idx++; // consume '
-        return;
-    }
-
-    // Otherwise: malformed char literal
-    error(line.locmap[start], "Invalid character literal");
+    // Else this is a Tick token.
+    out.push_back(Token::token(TokenType::Tick, "'", line.locmap[start]));
+    idx++; // consume '
+    return;
 }
 
 static void parse_raw_string(char end_quote,
@@ -345,20 +333,20 @@ continue_lexing:
             re2c:yyfill:enable = 0;
             re2c:indent:top = 2;
 
-            ws		    = [ \t\v\f\r\n];
-            ident1 	    = [_a-zA-Z][_a-zA-Z0-9]*;
-            ident       = '@' ident1 | ident1 '@' ident1 | ident1;
-            bin		    = [0-1];
-            oct		    = [0-7];
-            dec		    = [0-9];
-            hex		    = [0-9a-fA-F];
+            ws          = [ \t\v\f\r\n];
+            ident       = [_a-zA-Z][_a-zA-Z0-9]*;
+            bin         = [0-1];
+            oct         = [0-7];
+            dec         = [0-9];
+            hex         = [0-9a-fA-F];
             decu        = dec ('_'* dec)*;
             hexu        = hex ('_'* hex)*;
             binu        = bin ('_'* bin)*;
             mantissau   = decu '.' decu* | decu* '.' decu+;
             expu        = [eE] [-+]? decu;
 
-            *       { error(current_loc(), "Unexpected character: '" + std::string(tok, p) + "'");
+            *       { error(current_loc(), "Unexpected character: '" +
+                                            std::string(tok, p) + "'");
                       return; }
 
             ws+     { continue; }
@@ -366,54 +354,65 @@ continue_lexing:
             ';'     { return; }
             '//'    { return; }
 
-            '"'     { parse_string('"', idx, line, out); continue; }
-            "'"     { parse_char_literal(idx, line, out); continue; }
+            '"'     { if (raw_strings) {
+                        parse_raw_string('"', idx, line, out);
+                      }
+                      else {
+                        parse_string('"', idx, line, out);
+                      }
+                      p = line.text.c_str() + idx;
+                      continue; }
+            "'"     { parse_char_literal(idx, line, out);
+                      p = line.text.c_str() + idx;
+                      continue; }
             '<'     { if (raw_strings) {
-                        parse_raw_string('>', idx, line, out); continue;
+                        parse_raw_string('>', idx, line, out);
+                        p = line.text.c_str() + idx;
+                        continue;
                       }
                       else {
                         emit(TokenType::LT); continue;
                       }
                     }
 
-            '!'		{ emit(TokenType::LogicalNot); continue; }
-            '!=' | '<>'	{
+            '!'     { emit(TokenType::LogicalNot); continue; }
+            '!=' | '<>' {
                       emit(TokenType::NE); continue; }
             '#'     { emit(TokenType::Hash); continue; }
             '##'    { emit(TokenType::DoubleHash); continue; }
-            '$'		{ emit(TokenType::Dollar); continue; }
-            '%'		{ emit(TokenType::Modulo); continue; }
-            '&'		{ emit(TokenType::BitwiseAnd); continue; }
-            '&&'	{ emit(TokenType::LogicalAnd); continue; }
-            '('		{ emit(TokenType::LeftParen); continue; }
-            ')'		{ emit(TokenType::RightParen); continue; }
-            '*'		{ emit(TokenType::Multiply); continue; }
-            '**'	{ emit(TokenType::Power); continue; }
+            '$'     { emit(TokenType::Dollar); continue; }
+            '%'     { emit(TokenType::Modulo); continue; }
+            '&'     { emit(TokenType::BitwiseAnd); continue; }
+            '&&'    { emit(TokenType::LogicalAnd); continue; }
+            '('     { emit(TokenType::LeftParen); continue; }
+            ')'     { emit(TokenType::RightParen); continue; }
+            '*'     { emit(TokenType::Multiply); continue; }
+            '**'    { emit(TokenType::Power); continue; }
             '+'     { emit(TokenType::Plus); continue; }
-            ','		{ emit(TokenType::Comma); continue; }
-            '-'		{ emit(TokenType::Minus); continue; }
-            '.'		{ emit(TokenType::Dot); continue; }
-            '/'		{ emit(TokenType::Divide); continue; }
+            ','     { emit(TokenType::Comma); continue; }
+            '-'     { emit(TokenType::Minus); continue; }
+            '.'     { emit(TokenType::Dot); continue; }
+            '/'     { emit(TokenType::Divide); continue; }
             ':'     { emit(TokenType::Colon); continue; }
-            '<='	{ emit(TokenType::LE); continue; }
-            '<<'	{ emit(TokenType::LeftShift); continue; }
-            '='  | '=='	{
+            '<='    { emit(TokenType::LE); continue; }
+            '<<'    { emit(TokenType::LeftShift); continue; }
+            '='  | '==' {
                       emit(TokenType::EQ); continue; }
-            '>'		{ emit(TokenType::GT); continue; }
-            '>='	{ emit(TokenType::GE); continue; }
-            '>>'	{ emit(TokenType::RightShift); continue; }
+            '>'     { emit(TokenType::GT); continue; }
+            '>='    { emit(TokenType::GE); continue; }
+            '>>'    { emit(TokenType::RightShift); continue; }
             '?'     { emit(TokenType::Question); continue; }
-            '@'		{ emit(TokenType::At); continue; }
-            '['		{ emit(TokenType::LeftBracket); continue; }
+            '@'     { emit(TokenType::At); continue; }
+            '['     { emit(TokenType::LeftBracket); continue; }
             '\\'    { emit(TokenType::Backslash); continue; }
-            ']'		{ emit(TokenType::RightBracket); continue; }
-            '^'		{ emit(TokenType::BitwiseXor); continue; }
-            '^^'	{ emit(TokenType::LogicalXor); continue; }
-            '{'		{ emit(TokenType::LeftBrace); continue; }
-            '|'		{ emit(TokenType::BitwiseOr); continue; }
-            '||'	{ emit(TokenType::LogicalOr); continue; }
-            '}'		{ emit(TokenType::RightBrace); continue; }
-            '~'		{ emit(TokenType::BitwiseNot); continue; }
+            ']'     { emit(TokenType::RightBracket); continue; }
+            '^'     { emit(TokenType::BitwiseXor); continue; }
+            '^^'    { emit(TokenType::LogicalXor); continue; }
+            '{'     { emit(TokenType::LeftBrace); continue; }
+            '|'     { emit(TokenType::BitwiseOr); continue; }
+            '||'    { emit(TokenType::LogicalOr); continue; }
+            '}'     { emit(TokenType::RightBrace); continue; }
+            '~'     { emit(TokenType::BitwiseNot); continue; }
 
         mantissau expu? {
             if (!check_trailing_char()) return;

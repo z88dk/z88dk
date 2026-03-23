@@ -34,25 +34,31 @@ sub tempname {
 
 #------------------------------------------------------------------------------
 sub check_bin_file {
-    my($got_file, $exp_bin) = @_;
+    my($got_file, $exp_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-	my $got_bin = path($got_file)->slurp;
-	eq_or_dump_diff($got_bin, $exp_bin, "bin file $got_file ok");
+	my $got_bin = path($got_file)->slurp_raw;
+	my $exp_bin = path($exp_file)->slurp_raw;
+	note "binary diff expected ($exp_file) got ($got_file)";
+	eq_or_dump_diff($exp_bin, $got_bin, "binary files are equal");
 	
 	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
 sub check_text_file {
-    my($got_file, $exp_text) = @_;
+    my($got_file, $exp_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
 	(my $got_text = path($got_file)->slurp) =~ s/\r\n/\n/g;
-	$exp_text =~ s/\r\n/\n/g;
+	(my $exp_text = path($exp_file)->slurp) =~ s/\r\n/\n/g;
 	
-	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Table'});
-	is $diff, "", "text file $got_file ok";
+	note "text diff expected ($exp_file) got ($got_file)";
+	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Unified'});
+	if ($diff ne "") {
+		note $diff;
+	}
+	ok $diff eq "", "text files are equal";
 	
 	(Test::More->builder->is_passing) or die;
 }
@@ -106,22 +112,22 @@ sub z80asm_nok {
 
 #------------------------------------------------------------------------------
 sub capture_ok {
-    my($cmd, $exp_out) = @_;
+    my($cmd, $exp_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    run_ok($cmd." > ${test}.stdout");
-    check_text_file("${test}.stdout", $exp_out);
+    run_ok($cmd." > ${test}.stdout 2>&1");
+    check_text_file("${test}.stdout", $exp_file);
 	
 	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
 sub capture_nok {
-    my($cmd, $exp_err) = @_;
+    my($cmd, $exp_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    run_nok($cmd." 2> ${test}.stderr");
-    check_text_file("${test}.stderr", $exp_err);
+    run_nok($cmd." 2> ${test}.stderr 1>&2");
+    check_text_file("${test}.stderr", $exp_file);
 	
 	(Test::More->builder->is_passing) or die;
 }

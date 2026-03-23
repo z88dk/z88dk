@@ -1,14 +1,12 @@
-#------------------------------------------------------------------------------
-# Z80 assembler
-# Copyright (C) Paulo Custodio, 2011-2026
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-#------------------------------------------------------------------------------
-
 BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
 ok 1;
+#capture_ok(
+#    "z88dk-z80asm -dump-tokens t/10-lexer/input/tokens_simple.asm",
+#    "t/10-lexer/expected/tokens_simple.txt"
+#);
 
-unlink_testfiles if Test::More->builder->is_passing;
+unlink_testfiles;
 done_testing;

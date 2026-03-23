@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+static const int option_col_width = 16 - 2;
+
 Options g_options;
 std::vector<std::string> g_input_files;   // command line input files
 
@@ -76,14 +78,17 @@ static const UsageGroup usage_layout[] = {
     {
         "Preprocessor Options",
         {
-            OptionType::IXIY, OptionType::DEFINE, OptionType::UCASE,
-            OptionType::PREPROC
+            OptionType::DEFINE, OptionType::PREPROC
         }
     },
     {
         "Assembly Options",
-        { OptionType::DATESTAMP }
+        { OptionType::IXIY, OptionType::UCASE, OptionType::DATESTAMP }
     },
+    {
+        "Diagnostic Options",
+        { OptionType::DUMP_TOKENS }
+    }
 };
 
 [[noreturn]]
@@ -93,8 +98,6 @@ void exit_show_copyright(int exit_code) {
 }
 
 static void show_option_usage(const OptionSpec& spec) {
-    static const int option_col_width = 10;
-
     std::cout << "  " << std::left << std::setw(option_col_width) << std::setfill(' ')
               << (std::string(spec.name) + (spec.takes_arg ? "=ARG" : ""))
               << spec.usage << "\n";
@@ -280,39 +283,18 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
         // 3. Dispatch based on OptionType
         // --------------------------------------------------------
         switch (spec->type) {
-        case OptionType::CPP:
-            if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
-            }
-            append_with_space(g_options.cpp_options, opt_arg);
-            return true;
-
-        case OptionType::DATESTAMP:
-            g_options.date_stamp = true;
-            return true;
-
-        case OptionType::DEFINE:
-            return parse_define(arg, spec->name);
-
         case OptionType::HELP:
             exit_show_usage(EXIT_SUCCESS);
+
+        case OptionType::VERBOSE:
+            g_options.verbose = true;
+            return true;
 
         case OptionType::INCLUDE:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
                 return false;
             }
             g_options.include_paths.push_back(opt_arg);
-            return true;
-
-        case OptionType::IXIY:
-            g_options.swap_ix_iy = true;
-            return true;
-
-        case OptionType::M4:
-            if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
-            }
-            append_with_space(g_options.m4_options, opt_arg);
             return true;
 
         case OptionType::OUTPUT:
@@ -322,6 +304,20 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
             g_options.output_dir = opt_arg;
             return true;
 
+        case OptionType::CPP:
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                return false;
+            }
+            append_with_space(g_options.cpp_options, opt_arg);
+            return true;
+
+        case OptionType::M4:
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                return false;
+            }
+            append_with_space(g_options.m4_options, opt_arg);
+            return true;
+
         case OptionType::PERL:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
                 return false;
@@ -329,17 +325,30 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
             append_with_space(g_options.perl_options, opt_arg);
             return true;
 
+        case OptionType::DEFINE:
+            return parse_define(arg, spec->name);
+
         case OptionType::PREPROC:
             g_options.preprocess_only = true;
+            return true;
+
+        case OptionType::IXIY:
+            g_options.swap_ix_iy = true;
             return true;
 
         case OptionType::UCASE:
             g_options.ucase_labels = true;
             return true;
 
-        case OptionType::VERBOSE:
-            g_options.verbose = true;
+        case OptionType::DATESTAMP:
+            g_options.date_stamp = true;
             return true;
+
+        case OptionType::DUMP_TOKENS:
+            g_options.dump_tokens = true;
+            return true;
+
+
 
         default:
             assert(0);

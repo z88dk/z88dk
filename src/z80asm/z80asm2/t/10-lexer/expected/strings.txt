@@ -1,0 +1,18 @@
+# file: t/10-lexer/input/strings.asm
+String	"\"\""	1:1	str_value="" 
+String	"\"hello\""	1:4	str_value="hello" 
+String	"\"hello world\""	1:12	str_value="hello world" 
+EndOfLine	"\n"	1:25	
+String	"\"\\t\\r\\n\""	2:1	str_value="\t\r\n" 
+String	"\"\\11\""	2:10	str_value="\t" 
+String	"\"\\x20\""	2:16	str_value=" " 
+String	"\"\\\\\""	2:23	str_value="\\" 
+String	"\"\\\"\""	2:28	str_value="\"" 
+EndOfLine	"\n"	2:32	
+Identifier	"include"	3:1	keyword=INCLUDE 
+String	"\"dir\\file\""	3:9	str_value="dir\\file" 
+EndOfLine	"\n"	3:19	
+Identifier	"binary"	4:1	keyword=BINARY 
+String	"<dir/file>"	4:8	str_value="dir/file" 
+EndOfLine	"\n"	4:18	
+EndOfLine	"\n"	5:1	
