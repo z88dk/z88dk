@@ -18,7 +18,7 @@ jobs:
         submodules: 'true'
     - name: Install homebrew dependencies
       run: |
-        brew install cpanminus perl dos2unix boost ragel re2c make gmp
+        brew install cpanminus perl dos2unix boost ragel re2c make gmp unzip
     - name: Install Spreadsheet::ParseXLSX
       run: |
         export PATH=/usr/local/bin:$PATH
