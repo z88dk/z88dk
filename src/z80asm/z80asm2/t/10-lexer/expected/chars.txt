@@ -1,0 +1,10 @@
+# file: t/10-lexer/input/chars.asm
+Integer	"'a'"	1:1	int_value=97 
+Integer	"'\\t'"	1:5	int_value=9 
+Integer	"'\\r'"	1:10	int_value=13 
+Integer	"'\\n'"	1:15	int_value=10 
+Integer	"'\\0'"	1:20	int_value=0 
+Integer	"'\\11'"	1:25	int_value=9 
+Integer	"'\\x20'"	1:31	int_value=32 
+EndOfLine	"\n"	1:37	
+EndOfLine	"\n"	2:1	

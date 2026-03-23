@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
+#include "lexer.h"
 #include "options.h"
 #include "source.h"
 #include "utils.h"
@@ -15,19 +16,34 @@
 
 static constexpr std::string_view z80asm_env = "Z80ASM";
 
-static void preprocess_only() {
-    for (const std::string& filename : g_input_files) {
-        SourceFile* sf = get_source_file(filename, SourceLoc());
-        if (sf != nullptr) {
-            std::cout << "File: " << sf->file << std::endl;
-            for (const SourceLine& line : sf->lines) {
-                std::cout << tokens_to_string(line.tokens);
-            }
-        }
+static void preprocess_only() {}
+
+static void assemble_file(const std::string_view filename) {
+    if (g_options.verbose) {
+        std::cout << "Assembling " << filename << "..." << std::endl;
+    }
+
+    SourceFile* sf = get_source_file(filename, SourceLoc());
+    if (!sf) {
+        return;     // error already reported by get_source_file
+    }
+
+    std::vector<Token> tokens;
+    for (auto& line_tokens : sf->lines_tokens) {
+        tokens.insert(tokens.end(), line_tokens.begin(), line_tokens.end());
+    }
+
+    if (g_options.dump_tokens) {
+        dump_tokens(tokens);
+        exit(EXIT_SUCCESS);
     }
 }
 
-static void assemble_files() {}
+static void assemble_files() {
+    for (const std::string& filename : g_input_files) {
+        assemble_file(filename);
+    }
+}
 
 static bool has_verbose(int argc, char* argv[]) {
     std::string env_options = get_env_value(z80asm_env);
