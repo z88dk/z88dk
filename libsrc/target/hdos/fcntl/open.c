@@ -53,27 +53,26 @@ int open(char *name, int flags, mode_t mode)
                     clearfcb(fc);
                     return(-1);
                 }
-                // fc->use = U_READ;   // Probably not necessary
+                fc->use = U_READ;
                 break;
 
             // We get here also to 'APPEND' to a non-existing file
+
             case O_WRONLY:
             case O_RDWR:
-
-                if (hdos_open_upd (name, fc->ch)) {
+                if (hdos_open_upd (name, fc->ch))
                     if (hdos_open_wr (name, fc->ch))
                     {
                         // FILE CREATE ERROR
                         clearfcb(fc);
                         return(-1);
                     }
-                }
+                fc->use = U_RDWR;
                 break;
 
         }
         
         // TODO: position the file ptr for O_APPEND
-
         return (int)fc;
 
     } else return -1;
