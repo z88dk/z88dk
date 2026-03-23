@@ -18,6 +18,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 class FileHandleCache {
@@ -65,6 +66,9 @@ static FileHandleCache g_file_handle_cache;
 // Global cache: file_id -> SourceFile
 static std::unordered_map<StringInterner::Id, SourceFile> g_source_cache;
 
+// Guard against re-entrant get_source_file during tokenization
+static std::unordered_set<StringInterner::Id> g_source_loading;
+
 // get a unique ID for a virtual file path (e.g. for included files or generated content)
 uint32_t register_virtual_file(const std::string_view path) {
     return g_strings.intern(path);
@@ -81,10 +85,20 @@ SourceFile* get_source_file(const std::string_view filename, const SourceLoc& lo
         return &it->second;
     }
 
+    // Guard: if we are already loading this file (re-entrant call from
+    // error reporting during tokenization), return nullptr to break the
+    // recursion.  The caller (print_message) will simply skip showing
+    // the source line context.
+    if (g_source_loading.count(file_id)) {
+        return nullptr;
+    }
+    g_source_loading.insert(file_id);
+
     // Read entire file into memory
     std::string content;
     if (!read_file_to_string(norm, loc, content)) {
         // read_file_to_string() already emitted an error
+        g_source_loading.erase(file_id);
         return nullptr;
     }
 
@@ -97,6 +111,9 @@ SourceFile* get_source_file(const std::string_view filename, const SourceLoc& lo
 
     // Tokenize each line
     tokenize(sf, content);
+
+    // Remove loading guard before inserting into cache
+    g_source_loading.erase(file_id);
 
     // Insert into cache and return pointer
     auto [pos, inserted] = g_source_cache.emplace(file_id, std::move(sf));
@@ -136,6 +153,8 @@ bool read_file_to_string(const std::string_view filename,
         return false;
     }
 
+    in->clear();
+    in->seekg(0);
     std::ostringstream ss;
     ss << in->rdbuf();
     out_content = ss.str();
