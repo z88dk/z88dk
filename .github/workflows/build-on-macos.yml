@@ -19,6 +19,10 @@ jobs:
     - name: Install homebrew dependencies
       run: |
         brew install cpanminus perl dos2unix boost ragel re2c make gmp
+    - name: Install Spreadsheet::ParseXLSX
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        cpanm --verbose Spreadsheet::ParseXLSX
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
