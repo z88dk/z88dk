@@ -1,0 +1,7 @@
+# file: t/10-lexer/input/tokens_simple.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"27"	1:7	int_value=27 
+EndOfLine	"\n"	1:9	
+EndOfLine	"\n"	2:1	

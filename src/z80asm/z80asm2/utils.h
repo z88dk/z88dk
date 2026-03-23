@@ -30,6 +30,9 @@ inline bool ends_with(std::string_view s, std::string_view suffix) {
            s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
+// escape special characters in a string for debug output
+std::string escape_string(const std::string_view s);
+
 // normalize path lexicographically (resolves . and .., removes redundant
 // separators)
 // returns platform-independent string with forward slashes

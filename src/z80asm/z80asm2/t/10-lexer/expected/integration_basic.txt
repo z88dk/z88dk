@@ -1,0 +1,24 @@
+# file: t/10-lexer/input/integration_basic.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+Identifier	"ld"	1:8	keyword=LD 
+Identifier	"a"	1:11	keyword=A 
+Comma	","	1:12	
+Integer	"12"	1:13	int_value=12 
+EndOfLine	"\n"	1:15	
+Dot	"."	2:1	
+Identifier	"label"	2:2	
+Identifier	"ld"	2:8	keyword=LD 
+Identifier	"a"	2:11	keyword=A 
+Comma	","	2:12	
+Integer	"12"	2:13	int_value=12 
+EndOfLine	"\n"	2:15	
+Identifier	"label"	3:1	
+Identifier	"equ"	3:7	keyword=EQU 
+Integer	"12"	3:11	int_value=12 
+EndOfLine	"\n"	3:13	
+Identifier	"label"	4:1	
+EQ	"="	4:7	
+Integer	"12"	4:9	int_value=12 
+EndOfLine	"\n"	4:11	
+EndOfLine	"\n"	5:1	

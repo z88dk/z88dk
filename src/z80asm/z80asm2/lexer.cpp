@@ -14,6 +14,7 @@
 #include "utils.h"
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -69,8 +70,50 @@ Token Token::string(const std::string_view text_, const std::string_view value,
 Token Token::end_of_line(const SourceLoc& loc) {
     Token t;
     t.type = TokenType::EndOfLine;
+    t.text_id = g_strings.intern("\n");
     t.loc = loc;
     return t;
+}
+
+// show debug-friendly representation of token
+void dump_token(const Token& token) {
+    static const std::string_view token_type_names[] = {
+#define X(id, text) #id,
+#include "tokens.def"
+    };
+
+    std::cout << token_type_names[static_cast<int>(token.type)] << "\t"
+              << escape_string(g_strings.view(token.text_id)) << "\t"
+              << token.loc.line << ":" << token.loc.column << "\t";
+
+    if (token.keyword != Keyword::None) {
+        std::cout << "keyword=" << keyword_to_string(token.keyword) << " ";
+    }
+
+    if (token.type == TokenType::Integer) {
+        std::cout << "int_value=" << token.value.int_value << " ";
+    }
+    else if (token.type == TokenType::Float) {
+        std::cout << "float_value=" << token.value.float_value << " ";
+    }
+    else if (token.type == TokenType::String) {
+        std::cout << "str_value=" <<
+                  escape_string(g_strings.view(token.value.str_value_id)) << " ";
+    }
+
+    std::cout << std::endl;
+}
+
+void dump_tokens(const std::vector<Token>& tokens) {
+    StringInterner::Id cur_file_id = static_cast<StringInterner::Id>(-1);
+    for (const Token& token : tokens) {
+        if (token.loc.file_id != cur_file_id) {
+            cur_file_id = token.loc.file_id;
+            std::cout << "# file: " <<
+                      g_strings.view(cur_file_id) << std::endl;
+        }
+        dump_token(token);
+    }
 }
 
 std::string tokens_to_string(const std::vector<Token>& tokens) {
@@ -198,21 +241,23 @@ void tokenize(SourceFile& sf, const std::string_view content) {
         std::vector<Token> tokens;
         tokenize_line(merged, state, tokens);
 
-        // Compute end-of-line SourceLoc based on last token
-        SourceLoc end_loc;
-        if (!tokens.empty()) {
-            const Token& last = tokens.back();
-            end_loc.file_id = last.loc.file_id;
-            end_loc.line = last.loc.line;   // physical line
-            end_loc.column = last.loc.column +
-                             static_cast<uint16_t>(g_strings.to_string(last.text_id).size());
-        }
-        else {
-            // No tokens: end-of-line is at column 1 of the first physical line
-            end_loc = SourceLoc(sf.file_id, logical_start + 1, 1);
-        }
+        if (!state.in_multiline_comment) {
+            // Compute end-of-line SourceLoc based on last token
+            SourceLoc end_loc;
+            if (!tokens.empty()) {
+                const Token& last = tokens.back();
+                end_loc.file_id = last.loc.file_id;
+                end_loc.line = last.loc.line;   // physical line
+                end_loc.column = last.loc.column +
+                                 static_cast<uint16_t>(g_strings.to_string(last.text_id).size());
+            }
+            else {
+                // No tokens: end-of-line is at column 1 of the first physical line
+                end_loc = SourceLoc(sf.file_id, logical_start + 1, 1);
+            }
 
-        tokens.push_back(Token::end_of_line(end_loc));
+            tokens.push_back(Token::end_of_line(end_loc));
+        }
 
         // Store tokens in the first physical line
         sf.lines_tokens[logical_start] = std::move(tokens);

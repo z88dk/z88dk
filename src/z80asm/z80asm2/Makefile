@@ -54,7 +54,7 @@ scan.cpp: scan.re Makefile
 
 
 test:: $(PROJ)$(EXE)
-	$(PERL) -S prove -j9 --state=slow,save t/*.t
+	$(PERL) -S prove -j9 --state=slow,save t/*.t t/*/*.t
 
 astyle:
 	$(ASTYLE)
