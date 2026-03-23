@@ -1,0 +1,62 @@
+//-----------------------------------------------------------------------------
+// Z80 assembler
+// Copyright (C) Paulo Custodio, 2011-2026
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+// Literals
+X(Identifier,   "Identifier")
+X(Integer,      "Integer")
+X(Float,        "Float")
+X(String,       "String")
+
+// Operators
+X(Plus,         "+")
+X(Minus,        "-")
+X(Multiply,     "*")
+X(Divide,       "/")
+X(Modulo,       "%")
+X(Power,        "**")
+
+X(BitwiseAnd,   "&")
+X(BitwiseOr,    "|")
+X(BitwiseXor,   "^")
+X(BitwiseNot,   "~")
+X(LeftShift,    "<<")
+X(RightShift,   ">>")
+
+X(LogicalAnd,   "&&")
+X(LogicalOr,    "||")
+X(LogicalXor,   "^^")
+X(LogicalNot,   "!")
+
+X(EQ,           "=")
+X(NE,           "!=")
+X(LT,           "<")
+X(LE,           "<=")
+X(GT,           ">")
+X(GE,           ">=")
+
+// Delimiters
+X(LeftParen,    "(")
+X(RightParen,   ")")
+X(LeftBracket,  "[")
+X(RightBracket, "]")
+X(LeftBrace,    "{")
+X(RightBrace,   "}")
+X(Comma,        ",")
+X(Colon,        ":")
+X(Dot,          ".")
+X(Question,     "?")
+X(Hash,         "#")
+X(DoubleHash,   "##")
+X(At,           "@")
+X(Dollar,       "$")
+X(Backslash,    "\\")
+X(Tick,         "'")
+
+X(ASMPC,        "ASMPC")
+
+X(EndOfLine,    "\n")
+
+#undef X
