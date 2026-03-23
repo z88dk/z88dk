@@ -1,0 +1,17 @@
+# file: t/10-lexer/input/local_label_shapes.asm
+Identifier	"aaa"	1:1	
+EndOfLine	"\n"	1:4	
+Identifier	"aaa"	2:1	
+At	"@"	2:4	
+Identifier	"bbb"	2:5	
+EndOfLine	"\n"	2:8	
+At	"@"	3:1	
+Identifier	"bbb"	3:2	
+EndOfLine	"\n"	3:5	
+Identifier	"aaa"	4:1	
+At	"@"	4:4	
+Identifier	"bbb"	4:5	
+At	"@"	4:8	
+Identifier	"ccc"	4:9	
+EndOfLine	"\n"	4:12	
+EndOfLine	"\n"	5:1	

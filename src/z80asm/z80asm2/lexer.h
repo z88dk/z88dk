@@ -16,66 +16,14 @@
 // all strings stored in g_strings for memory efficiency and fast comparisons
 
 enum class TokenType : uint8_t {
-    // Literals
-    Identifier,
-    Integer,
-    Float,
-    String,
-
-    // Operators
-    Plus,           // +
-    Minus,          // -
-    Multiply,       // *
-    Divide,         // /
-    Modulo,         // %
-    Power,          // **
-
-    BitwiseAnd,     // &
-    BitwiseOr,      // |
-    BitwiseXor,     // ^
-    BitwiseNot,     // ~
-    LeftShift,      // <<
-    RightShift,     // >>
-
-    LogicalAnd,     // &&
-    LogicalOr,      // ||
-    LogicalXor,     // ^^
-    LogicalNot,     // !
-
-    EQ,             // =
-    NE,             // !=
-    LT,             // <
-    LE,             // <=
-    GT,             // >
-    GE,             // >=
-
-    // Delimiters
-    LeftParen,      // (
-    RightParen,     // )
-    LeftBracket,    // [
-    RightBracket,   // ]
-    LeftBrace,      // {
-    RightBrace,     // }
-    Comma,          // ,
-    Colon,          // :
-    Dot,            // .
-    Question,       // ?
-    Hash,           // #
-    DoubleHash,     // ##
-    At,             // @
-    Dollar,         // $
-    Backslash,      // (backslash)
-    Tick,           // for single quote '
-
-    ASMPC,          // Assembly instruction pointer
-
-    EndOfLine,
+#define X(id, text) id,
+#include "tokens.def"
 };
 
 struct Token {
     TokenType type = TokenType::EndOfLine;  // 1 byte
     Keyword keyword = Keyword::None;        // 2 bytes
-    StringInterner::Id text_id;
+    StringInterner::Id text_id = 0;
 
     union {                                 // 4 bytes
         int int_value;
@@ -97,6 +45,9 @@ struct Token {
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
 };
+
+void dump_token(const Token& token);
+void dump_tokens(const std::vector<Token>& tokens);
 
 std::string tokens_to_string(const std::vector<Token>& tokens);
 

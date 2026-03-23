@@ -4,17 +4,29 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(CPP,      "-cpp",    true,  "Pass options to cpp")
-X(DATESTAMP,"-d",      false, "Assemble only if newer")
-X(DEFINE,   "-D",      true,  "Define symbol")
+// Help options
 X(HELP,     "-h",      false, "Show this screen")
-X(INCLUDE,  "-I",      true,  "Add directory to search for source/include files")
-X(IXIY,     "-IXIY",   false, "Swap IX and IY registers")
-X(M4,       "-m4",     true,  "Pass options to m4")
-X(OUTPUT,   "-O",      true,  "Set directory to store output files")
-X(PERL,     "-perl",   true,  "Pass options to perl")
-X(PREPROC,  "-E",      false, "Preprocess only")
-X(UCASE,    "-ucase",  false, "Uppercase labels")
 X(VERBOSE,  "-v",      false, "Verbose output")
+
+// File and directory options
+X(INCLUDE,  "-I",      true,  "Add directory to search for source/include files")
+X(OUTPUT,   "-O",      true,  "Set directory to store output files")
+
+// External preprocessor options
+X(CPP,      "-cpp",    true,  "Pass options to cpp")
+X(M4,       "-m4",     true,  "Pass options to m4")
+X(PERL,     "-perl",   true,  "Pass options to perl")
+
+// Preprocessor options
+X(DEFINE,   "-D",      true,  "Define symbol")
+X(PREPROC,  "-E",      false, "Preprocess only")
+
+// Assembly options
+X(IXIY,     "-IXIY",   false, "Swap IX and IY registers")
+X(UCASE,    "-ucase",  false, "Uppercase labels")
+X(DATESTAMP,"-d",      false, "Assemble only if newer")
+
+// Diagnostic options
+X(DUMP_TOKENS, "-dump-tokens", false, "Dump the lexer token stream and exit")
 
 #undef X

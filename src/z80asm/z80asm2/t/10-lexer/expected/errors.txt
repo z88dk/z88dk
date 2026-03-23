@@ -1,0 +1,19 @@
+t/10-lexer/input/errors.asm:1:1: error: Unexpected character: '`'
+t/10-lexer/input/errors.asm:2:1: error: Invalid character 'a' after literal: '%1010'
+t/10-lexer/input/errors.asm:3:13: error: Unterminated string literal
+t/10-lexer/input/errors.asm:4:1: error: Invalid character 'a' after literal: '12'
+# file: t/10-lexer/input/errors.asm
+EndOfLine	"\n"	1:1	
+EndOfLine	"\n"	2:1	
+EndOfLine	"\n"	3:1	
+EndOfLine	"\n"	4:1	
+Tick	"'"	5:1	
+Identifier	"aa"	5:2	
+Tick	"'"	5:4	
+EndOfLine	"\n"	5:5	
+Tick	"'"	6:1	
+Identifier	"unterminated"	6:2	
+EndOfLine	"\n"	6:14	
+Identifier	"good"	7:1	
+EndOfLine	"\n"	7:5	
+EndOfLine	"\n"	8:1	
