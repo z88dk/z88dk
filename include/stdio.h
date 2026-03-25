@@ -30,6 +30,11 @@
 #include <cpm.h>
 #endif
 
+#ifdef __HDOS__
+/* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
+#include <arch/hdos.h>
+#endif
+
 #ifdef __MSX__
 /* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
 #include <cpm.h>
