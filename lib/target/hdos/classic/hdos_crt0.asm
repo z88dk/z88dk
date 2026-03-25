@@ -69,28 +69,85 @@ start:
     INCLUDE "crt/classic/crt_init_heap.inc"
     INCLUDE "crt/classic/crt_init_eidi.inc"
 
-;IF CRT_ENABLE_COMMANDLINE = 1
-;    ld      hl,__hdos_command_line
-;    ld      a,(hl)
-;    ;ld      b,0
-;    ld      b,h
-;    and     a
-;    jp      z,argv_done
-;    ;inc   hl
-;    ld      c,a
-;    add     hl,bc   ;now points to the end of the command line
-;    inc     hl
-;    ld      (hl),0
-;    dec     hl
-;    dec     c
-;    INCLUDE    "crt/classic/crt_command_line.inc"
-;    push    hl ;argv
-;    push    bc ;argc
-;ELSE
+IF CRT_ENABLE_COMMANDLINE = 1
+
+    extern  hdos_default
+
+    ld      a,'A'
+    rst     38h
+    defb    2  ; SCOUT
+    ld      a,'R'
+    rst     38h
+    defb    2  ; SCOUT
+    ld      a,'G'
+    rst     38h
+    defb    2  ; SCOUT
+    ld      a,'>'
+    rst     38h
+    defb    2  ; SCOUT
+
+    ld      hl,command_line
+    ld      bc,0
+
+get_cmdline:
+    push    hl
+    push    bc
+    rst     38h
+    defb    1  ; SCIN
+    pop     bc
+    pop     hl
+    jr      c,get_cmdline
+    cp      10
+    jr      z,cmdline_rdy
+    cp      13
+    jr      z,cmdline_rdy
+
+;   cp      $7f ; RUBOUT
+;   cp      8 ; BS
+;   jr      nz,nobs
+;   push    hl
+;   push    bc
+;   ld      a,' '
+;   rst     38h
+;   defb    2  ; SCOUT
+;   ld      a,8
+;   rst     38h
+;   defb    2  ; SCOUT
+;   pop     bc
+;   pop     hl
+;   xor     a
+;   ld      (hl),a
+;   dec     hl
+;   dec     bc
+;   jr      get_cmdline
+;nobs:
+
+    ld      (hl),a
+    inc     hl
+    inc     bc
+    jr      get_cmdline
+cmdline_rdy:
+
+    ;ld      a,(hl)
+    ;ld      b,0
+    ;ld      b,h
+    ;and     a
+    ;jp      z,argv_done
+    ;inc   hl
+    ;ld      c,a
+    ;add     hl,bc   ;now points to the end of the command line
+    ;inc     hl
+    ;ld      (hl),0
+    ;dec     hl
+    ;dec     c
+    INCLUDE    "crt/classic/crt_command_line.inc"
+    push    hl ;argv
+    push    bc ;argc
+ELSE
     ld      hl,0
     push    hl  ;argv
     push    hl  ;argc
-;ENDIF
+ENDIF
     call    _main       ;Call user code
     pop     bc  ;kill argv
     pop     bc  ;kill argc
@@ -134,6 +191,14 @@ l_dcal: jp  (hl)        ;Used for call by function ptr
 ;      setup_static_fp(__stdlst,_stdlst_device)
 ;  ENDIF
 
+
+
+IF CRT_ENABLE_COMMANDLINE = 1
+
+command_line:
+    defs 150
+        
+ENDIF
 
     SECTION code_crt_init
     ;????
