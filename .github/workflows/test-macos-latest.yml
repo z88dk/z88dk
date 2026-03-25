@@ -14,6 +14,7 @@ jobs:
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
+        cpanm --notest XML::Twig Spreadsheet::ParseXLSX
         cpanm App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Crypt::Mode::CBC Crypt::Mode::ECB Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Get lastest nightly
       run: |
