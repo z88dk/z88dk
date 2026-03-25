@@ -13,20 +13,20 @@ StringInterner g_strings;
 // Reserve ID 0 for the empty string
 StringInterner::StringInterner() {
     pool.emplace_back("");                 // pool[0] = ""
-    map.emplace(std::string_view(pool[0]), 0);
+    map.emplace(std::string(""), 0);
 }
 
 // Returns an ID for the given string, interning it if needed.
 StringInterner::Id StringInterner::intern(std::string_view s) {
-    auto it = map.find(s);
+    std::string key(s);
+    auto it = map.find(key);
     if (it != map.end()) {
         return it->second;
     }
 
     Id id = static_cast<Id>(pool.size());
-    pool.emplace_back(s);                 // store std::string
-    std::string_view key(pool.back());    // view into stable storage
-    map.emplace(key, id);
+    pool.emplace_back(s);
+    map.emplace(std::move(key), id);
     return id;
 }
 
