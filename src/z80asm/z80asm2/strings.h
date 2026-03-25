@@ -36,7 +36,7 @@ public:
 
 private:
     std::vector<std::string> pool;
-    std::unordered_map<std::string_view, Id> map;
+    std::unordered_map<std::string, Id> map;
 };
 
 extern StringInterner g_strings;
