@@ -37,4 +37,10 @@ target/hdos/fcntl/obj/${TYPE}/rename
 target/hdos/fcntl/obj/${TYPE}/getfcb
 target/hdos/fcntl/obj/${TYPE}/setfcb
 target/hdos/fcntl/obj/${TYPE}/parsefcb
+target/hdos/fcntl/obj/${TYPE}/dir_move_first
+target/hdos/fcntl/obj/${TYPE}/dir_move_next
+target/hdos/fcntl/obj/${TYPE}/dir_get_entry_size
+target/hdos/fcntl/obj/${TYPE}/dir_get_entry_name
+target/hdos/fcntl/obj/${TYPE}/get_current_volume
+target/hdos/fcntl/obj/${TYPE}/is_empty_dirent
 @classic/stdio/stdio_binary.lst
