@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "source_loc.h"
-#include "strings.h"
+#include "string_interner.h"
 #include <cstdint>
 #include <string>
 
