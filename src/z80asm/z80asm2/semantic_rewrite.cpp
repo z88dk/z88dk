@@ -8,8 +8,8 @@
 #include "lexer.h"
 #include "options.h"
 #include "semantic_rewrite.h"
-#include "strings.h"
-#include "utils.h"
+#include "string_interner.h"
+#include "string_utils.h"
 #include <string>
 #include <vector>
 
