@@ -8,7 +8,7 @@
 
 #include "keywords.h"
 #include "source_loc.h"
-#include "strings.h"
+#include "string_interner.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -45,9 +45,6 @@ struct Token {
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
 };
-
-void dump_token(const Token& token);
-void dump_tokens(const std::vector<Token>& tokens);
 
 std::string tokens_to_string(const std::vector<Token>& tokens);
 

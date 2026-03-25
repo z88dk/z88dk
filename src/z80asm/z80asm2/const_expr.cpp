@@ -9,59 +9,12 @@
 #include "lexer.h"
 #include "options.h"
 #include "source_loc.h"
-#include "strings.h"
+#include "string_interner.h"
 #include "utils.h"
 #include <iostream>
 #include <string>
 #include <vector>
 
-void ConstSymbols::clear() {
-    symbols.clear();
-}
-
-void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& loc) {
-    const ConstSymbol* existing = get(name_id);
-    if (existing != nullptr && existing->value != value) {
-        error(loc, "Constant already defined: " + g_strings.to_string(name_id));
-        note(existing->loc, "Previous definition of constant: " + g_strings.to_string(name_id));
-        return;
-    }
-
-    ConstSymbol sym;
-    sym.name_id = name_id;
-    sym.value = value;
-    sym.loc = loc;
-    symbols[sym.name_id] = sym;
-
-    if (g_options.verbose) {
-        std::cout << "Define constant: " << g_strings.to_string(name_id)
-                  << " = " << int_to_hex(value) << std::endl;
-    }
-}
-
-const ConstSymbol* ConstSymbols::get(StringInterner::Id name_id) const {
-    auto it = symbols.find(name_id);
-    if (it != symbols.end()) {
-        return &it->second;
-    }
-    return nullptr;
-}
-
-void ConstSymbols::erase(StringInterner::Id name_id) {
-    symbols.erase(name_id);
-}
-
-void ConstSymbols::set(const std::string_view name, int value, const SourceLoc& loc) {
-    set(g_strings.intern(name), value, loc);
-}
-
-const ConstSymbol* ConstSymbols::get(const std::string_view name) const {
-    return get(g_strings.intern(name));
-}
-
-void ConstSymbols::erase(const std::string_view name) {
-    erase(g_strings.intern(name));
-}
 
 static const Token* peek_token(const std::vector<Token>& tokens, uint32_t pos) {
     return pos < tokens.size() ? &tokens[pos] : nullptr;
@@ -541,44 +494,18 @@ static bool parse_const_expr_conditional(const std::vector<Token>& tokens, uint3
     return true;
 }
 
-static bool eval_const_expr_impl(const std::vector<Token>& tokens, uint32_t& pos,
-                                 const ConstSymbols& sym, int& result, bool silent) {
+bool eval_const_expr(
+    const std::vector<Token>& tokens, uint32_t& pos,
+    const ConstSymbols& sym, int& result, bool silent) {
     return parse_const_expr_conditional(tokens, pos, sym, result, silent);
 }
 
-bool eval_const_expr_silent(const std::vector<Token>& tokens, uint32_t& pos,
-                            const ConstSymbols& sym, int& result) {
-    return eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/true);
-}
-
-bool eval_const_expr(const std::vector<Token>& tokens, uint32_t& pos,
-                     const ConstSymbols& sym, int& result) {
-    return eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/false);
-}
-
-bool eval_const_expr_silent(const std::string_view expr, const SourceLoc& loc,
-                            const ConstSymbols& sym, int& result) {
-    std::vector<Token> tokens = tokenize_text(expr, loc);
-    uint32_t pos = 0;
-    if (!eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/true)) {
-        return false;
-    }
-
-    if (pos < tokens.size() &&
-            tokens[pos].type != TokenType::EndOfLine) {
-        error(tokens[pos].loc, "Unexpected token in expression: " +
-              g_strings.to_string(tokens[pos].text_id));
-        return false;
-    }
-
-    return true;
-}
-
 bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
-                     const ConstSymbols& sym, int& result) {
+                     const ConstSymbols& sym, int& result,
+                     bool silent) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
     uint32_t pos = 0;
-    if (!eval_const_expr_impl(tokens, pos, sym, result, /*silent=*/false)) {
+    if (!eval_const_expr(tokens, pos, sym, result, silent)) {
         return false;
     }
 
