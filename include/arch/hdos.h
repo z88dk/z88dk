@@ -123,9 +123,9 @@ extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 
 #define HDOS_DIRENT_LEN 23
 extern unsigned char __LIB__ *hdos_dir_buf;
-extern void *hdos_dir_fp;
-extern int is_empty_dirent(unsigned char *entry);
-extern int hdos_dir_eof;
+extern void __LIB__ *hdos_dir_fp;
+extern int __LIB__ is_empty_dirent(unsigned char *entry);
+extern int __LIB__ hdos_dir_eof;
 
 /* Directory related commands (as for OSCA FLOS) */
 extern int __LIB__ dir_move_first(void);
@@ -141,7 +141,7 @@ extern int __LIB__ get_current_volume(void);
 /*******************/
 
 // Default device and extension, set to "SY1TXT"
-extern char *hdos_default;
+extern char __LIB__ hdos_default[];
 
 // Rename HDOS file, doesn't check existence of files with the same newname
 //
