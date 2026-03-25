@@ -71,6 +71,10 @@ extern void *_CLIB_OPEN_MAX;
 // #define U_PUN   6               /* device is punch */
 // #define U_LST   7               /* list device */
 
+#define __STDIO_EOFMARKER  26   /* End of file marker (^Z) */
+#define __STDIO_BINARY     1    /* We should consider binary/text differences */
+#define __STDIO_CRLF       1    /* Automatically convert between CR and CRLF */
+
 
 struct fcb {
     // 19 bytes
@@ -112,7 +116,29 @@ extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
 
-/*  **********************  */
+
+/*******************/
+/* directory stuff */
+/*******************/
+
+#define HDOS_DIRENT_LEN 23
+extern unsigned char __LIB__ *hdos_dir_buf;
+extern void *hdos_dir_fp;
+extern int is_empty_dirent(unsigned char *entry);
+extern int hdos_dir_eof;
+
+/* Directory related commands (as for OSCA FLOS) */
+extern int __LIB__ dir_move_first(void);
+extern int __LIB__ dir_move_next(void);
+extern int __LIB__ dir_get_entry_type(void);  // 0=normal, 1=directory
+extern char __LIB__ *dir_get_entry_name(void);
+extern unsigned long __LIB__ dir_get_entry_size(void);
+#define dir_get_entry_type() 0
+extern int __LIB__ get_dir_name(void);
+extern int __LIB__ get_current_volume(void);
+
+
+/*******************/
 
 // Default device and extension, set to "SY1TXT"
 extern char *hdos_default;
