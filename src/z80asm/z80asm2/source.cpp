@@ -8,7 +8,7 @@
 #include "lexer.h"
 #include "source.h"
 #include "source_loc.h"
-#include "strings.h"
+#include "string_interner.h"
 #include "utils.h"
 #include <cstdint>
 #include <fstream>

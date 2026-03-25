@@ -6,41 +6,21 @@
 
 #pragma once
 
+#include "const_symbols.h"
 #include "lexer.h"
 #include "source_loc.h"
-#include "strings.h"
+#include "string_interner.h"
 #include <string>
 #include <unordered_map>
+#include <vector>
 
-struct ConstSymbol {
-    StringInterner::Id name_id;   // interned string
-    int value;
-    SourceLoc loc;
-};
-
-struct ConstSymbols {
-    std::unordered_map<StringInterner::Id, ConstSymbol> symbols;
-
-    void clear();
-
-    void set(StringInterner::Id name_id, int value, const SourceLoc& loc);
-    const ConstSymbol* get(StringInterner::Id name_id) const;
-    void erase(StringInterner::Id name_id);
-
-    void set(const std::string_view name, int value, const SourceLoc& loc);
-    const ConstSymbol* get(const std::string_view name) const;
-    void erase(const std::string_view name);
-};
-
-bool eval_const_expr_silent(const std::string_view expr, const SourceLoc& loc,
-                            const ConstSymbols& sym, int& result);
 bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
-                     const ConstSymbols& sym, int& result);
+                     const ConstSymbols& sym, int& result,
+                     bool silent);
 
-bool eval_const_expr_silent(const std::vector<Token>& tokens, uint32_t& pos,
-                            const ConstSymbols& sym, int& result);
 bool eval_const_expr(const std::vector<Token>& tokens, uint32_t& pos,
-                     const ConstSymbols& sym, int& result);
+                     const ConstSymbols& sym, int& result,
+                     bool silent);
 
 // integer power function
 int int_pow(int base, int exp, const SourceLoc& loc);

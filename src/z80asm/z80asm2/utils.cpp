@@ -11,40 +11,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <malloc.h>
-
-static constexpr std::string_view blanks = " \t\r\n\v\f";
-
-std::string to_upper(const std::string_view s) {
-    std::string result(s);
-    std::transform(result.begin(), result.end(), result.begin(),
-    [](unsigned char c) {
-        return static_cast<char>(std::toupper(c));
-    });
-    return result;
-}
-
-std::string to_lower(const std::string_view s) {
-    std::string result(s);
-    std::transform(result.begin(), result.end(), result.begin(),
-    [](unsigned char c) {
-        return static_cast<char>(std::tolower(c));
-    });
-    return result;
-}
-
-std::string ltrim(const std::string_view s) {
-    size_t start = s.find_first_not_of(blanks);
-    return std::string((start == std::string::npos) ? "" : s.substr(start));
-}
-
-std::string rtrim(const std::string_view s) {
-    size_t end = s.find_last_not_of(blanks);
-    return std::string((end == std::string::npos) ? "" : s.substr(0, end + 1));
-}
-
-std::string trim(const std::string_view s) {
-    return ltrim(rtrim(s));
-}
+#include "string_utils.h"
 
 // On Linux, lexically_normal() does not regard backslashes as path separators
 static std::string nomalize_slashes(const std::string_view path) {
@@ -283,18 +250,3 @@ std::string expand_env_vars(const std::string_view text) {
     return s;
 }
 
-std::string int_to_hex(int value) {
-    std::ostringstream oss;
-    if (abs(value < 10)) {
-        oss << value;
-    }
-    else if (value < 0) {
-        oss << "-0x" << std::hex << std::setw(2) << std::setfill('0')
-            << std::uppercase << (-value);
-    }
-    else {
-        oss << "0x" << std::hex << std::setw(2) << std::setfill('0')
-            << std::uppercase << value;
-    }
-    return oss.str();
-}

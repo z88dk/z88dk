@@ -9,6 +9,7 @@
 #include "options.h"
 #include "source.h"
 #include "source_loc.h"
+#include "string_utils.h"
 #include "utils.h"
 #include <cassert>
 #include <cstdint>
@@ -39,7 +40,7 @@ static constexpr std::string_view cpp_extension = ".cpp";
 
 // option types
 enum class OptionType : uint8_t {
-#define X(name, str, arg, usage) name,
+#define X(name, str, takes_arg, arg_text, usage) name,
 #include "options.def"
 };
 
@@ -48,11 +49,13 @@ struct OptionSpec {
     const char* name;
     OptionType  type;
     bool        takes_arg;
+    const char* arg_text;
     const char* usage;
 };
 
 static const OptionSpec g_option_specs[] = {
-#define X(name, str, arg, usage) { str, OptionType::name, arg, usage },
+#define X(name, str, takes_arg, arg_text, usage) \
+        { str, OptionType::name, takes_arg, arg_text, usage },
 #include "options.def"
 };
 
@@ -87,7 +90,7 @@ static const UsageGroup usage_layout[] = {
     },
     {
         "Diagnostic Options",
-        { OptionType::DUMP_TOKENS }
+        { OptionType::DUMP_AFTER_TOKENIZATION }
     }
 };
 
@@ -98,8 +101,17 @@ void exit_show_copyright(int exit_code) {
 }
 
 static void show_option_usage(const OptionSpec& spec) {
-    std::cout << "  " << std::left << std::setw(option_col_width) << std::setfill(' ')
-              << (std::string(spec.name) + (spec.takes_arg ? "=ARG" : ""))
+    std::string option_text = std::string(spec.name) +
+                              (spec.takes_arg ? spec.arg_text : "");
+
+    if (option_text.size() > option_col_width) {
+        std::cout << "  " << option_text << "\n";
+        option_text = "";
+    }
+
+    std::cout << "  "
+              << std::left << std::setw(option_col_width)
+              << std::setfill(' ') << option_text
               << spec.usage << "\n";
 }
 
@@ -188,7 +200,8 @@ static bool parse_define(std::string_view arg, std::string_view opt_name) {
 
     // evaluate the expression as a constant expression
     int value = 1;
-    if (!eval_const_expr(expr_s, loc, g_options.global_defs, value)) {
+    if (!eval_const_expr(expr_s, loc, g_options.global_defs,
+                         value, /*silent=*/false)) {
         return false;   // error already reported by eval_const_expr
     }
 
@@ -344,8 +357,8 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
             g_options.date_stamp = true;
             return true;
 
-        case OptionType::DUMP_TOKENS:
-            g_options.dump_tokens = true;
+        case OptionType::DUMP_AFTER_TOKENIZATION:
+            g_options.dump_after_tokenization = true;
             return true;
 
 
