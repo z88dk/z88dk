@@ -6,7 +6,9 @@
 
 #include "errors.h"
 #include "lexer.h"
+#include "lexer_dump.h"
 #include "options.h"
+#include "preproc_driver.h"
 #include "source.h"
 #include "utils.h"
 #include <filesystem>
@@ -23,20 +25,15 @@ static void assemble_file(const std::string_view filename) {
         std::cout << "Assembling " << filename << "..." << std::endl;
     }
 
-    SourceFile* sf = get_source_file(filename, SourceLoc());
-    if (!sf) {
-        return;     // error already reported by get_source_file
+    // run tokenizer and cache tokens in SourceFile
+    if (g_options.dump_after_tokenization) {
+        dump_after_tokenization(filename);
+        // not reached
     }
 
-    std::vector<Token> tokens;
-    for (auto& line_tokens : sf->lines_tokens) {
-        tokens.insert(tokens.end(), line_tokens.begin(), line_tokens.end());
-    }
-
-    if (g_options.dump_tokens) {
-        dump_tokens(tokens);
-        exit(EXIT_SUCCESS);
-    }
+    // run preprocessor and get final token stream
+    std::vector<Token> preprocessed_tokens =
+        preprocess(filename, g_options.global_defs);
 }
 
 static void assemble_files() {

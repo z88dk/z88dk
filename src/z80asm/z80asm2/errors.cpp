@@ -7,8 +7,8 @@
 #include "errors.h"
 #include "source.h"
 #include "source_loc.h"
-#include "strings.h"
-#include "utils.h"
+#include "string_interner.h"
+#include "string_utils.h"
 #include <iostream>
 #include <string_view>
 

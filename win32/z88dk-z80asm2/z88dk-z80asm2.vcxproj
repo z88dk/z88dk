@@ -132,29 +132,47 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_expr.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_context.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_directives.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_driver.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_dump.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_expr.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_macro.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\semantic_rewrite.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source_loc.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\strings.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\string_utils.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\string_interner.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_expr.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_context.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_directives.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_driver.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_dump.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_expr.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_macro.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\scan.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\strings.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\string_utils.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\string_interner.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
   </ItemGroup>
   <ItemGroup>
