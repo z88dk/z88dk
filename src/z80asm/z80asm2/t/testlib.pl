@@ -57,6 +57,10 @@ sub check_text_file {
 	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Unified'});
 	if ($diff ne "") {
 		note $diff;
+		if ($ENV{DEBUG}) {
+			system("start \"\" '/c/Program Files (x86)/WinMerge/WinMergeU.exe' ".
+				   "$exp_file $got_file");
+		}
 	}
 	ok $diff eq "", "text files are equal";
 	
