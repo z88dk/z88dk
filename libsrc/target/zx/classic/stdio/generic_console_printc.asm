@@ -142,8 +142,8 @@ skip_control_codes:
     ld      a, (__zx_screenmode)
     bit     6, a
     jp      nz, generic_console_zxn_tile_printc
-    ; bit     7, a
-    ; jp      nz, generic_console_zxn_layer2_printc
+    bit     7, a
+    jp      nz, generic_console_zxn_layer2_printc
   ENDIF
     ld      hl, (__zx_print_routine)
     jp      (hl)
