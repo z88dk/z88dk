@@ -6,48 +6,17 @@
 
 #pragma once
 
-#include "keywords.h"
+#include "lexer_keywords.h"
+#include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>
 #include <string>
 #include <vector>
 
-// all strings stored in g_strings for memory efficiency and fast comparisons
-
-enum class TokenType : uint8_t {
-#define X(id, text) id,
-#include "tokens.def"
-};
-
-struct Token {
-    TokenType type = TokenType::EndOfLine;  // 1 byte
-    Keyword keyword = Keyword::None;        // 2 bytes
-    StringInterner::Id text_id = 0;
-
-    union {                                 // 4 bytes
-        int int_value;
-        double float_value;
-        StringInterner::Id str_value_id;
-    } value;
-
-    SourceLoc loc;                          // 8 bytes
-
-    static Token token(TokenType type_, const std::string_view text_,
-                       const SourceLoc& loc);
-    static Token identifier(const std::string_view text_,
-                            const SourceLoc& loc);
-    static Token integer(const std::string_view text_, int value,
-                         const SourceLoc& loc);
-    static Token floating(const std::string_view text_, double value,
-                          const SourceLoc& loc);
-    static Token string(const std::string_view text_, const std::string_view value,
-                        const SourceLoc& loc);
-    static Token end_of_line(const SourceLoc& loc);
-};
-
 std::string tokens_to_string(const std::vector<Token>& tokens);
 
 struct SourceFile;          // forward declaration (no #include "source.h")
 void tokenize(SourceFile& sf, const std::string_view content);
-std::vector<Token> tokenize_text(const std::string_view text, const SourceLoc& loc);
+std::vector<Token> tokenize_text(const std::string_view text,
+                                 const SourceLoc& loc);

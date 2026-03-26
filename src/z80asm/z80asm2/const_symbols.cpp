@@ -30,7 +30,7 @@ void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& l
     sym.loc = loc;
     symbols[sym.name_id] = sym;
 
-    if (g_options.verbose) {
+    if (g_args.options.verbose) {
         std::cout << "Define constant: " << g_strings.to_string(name_id)
                   << " = " << int_to_hex(value) << std::endl;
     }
