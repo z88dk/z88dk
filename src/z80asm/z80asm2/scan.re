@@ -8,7 +8,6 @@
 #include "lexer.h"
 #include "scan.h"
 #include "source_loc.h"
-#include "utils.h"
 #include <string>
 #include <vector>
 #include <charconv>

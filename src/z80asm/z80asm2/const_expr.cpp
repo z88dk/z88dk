@@ -10,11 +10,9 @@
 #include "options.h"
 #include "source_loc.h"
 #include "string_interner.h"
-#include "utils.h"
 #include <iostream>
 #include <string>
 #include <vector>
-
 
 static const Token* peek_token(const std::vector<Token>& tokens, uint32_t pos) {
     return pos < tokens.size() ? &tokens[pos] : nullptr;
@@ -36,8 +34,10 @@ static bool match_token(const std::vector<Token>& tokens, uint32_t& pos, TokenTy
 static bool parse_const_expr_conditional(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent);
 
-static bool parse_const_expr_primary(const std::vector<Token>& tokens, uint32_t& pos,
-                                     const ConstSymbols& sym, int& result, bool silent) {
+static bool parse_const_expr_primary(const std::vector<Token>& tokens,
+                                     uint32_t& pos,
+                                     const ConstSymbols& sym, int& result,
+                                     bool silent) {
     const Token* token = peek_token(tokens, pos);
     if (token == nullptr) {
         error(peek_loc(tokens, pos), "Constant expression expected");

@@ -4,13 +4,13 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "environment.h"
 #include "errors.h"
 #include "lexer.h"
 #include "lexer_dump.h"
 #include "options.h"
 #include "preproc_driver.h"
 #include "source.h"
-#include "utils.h"
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -21,23 +21,23 @@ static constexpr std::string_view z80asm_env = "Z80ASM";
 static void preprocess_only() {}
 
 static void assemble_file(const std::string_view filename) {
-    if (g_options.verbose) {
+    if (g_args.options.verbose) {
         std::cout << "Assembling " << filename << "..." << std::endl;
     }
 
     // run tokenizer and cache tokens in SourceFile
-    if (g_options.dump_after_tokenization) {
+    if (g_args.options.dump_after_tokenization) {
         dump_after_tokenization(filename);
         // not reached
     }
 
     // run preprocessor and get final token stream
     std::vector<Token> preprocessed_tokens =
-        preprocess(filename, g_options.global_defs);
+        preprocess(filename, g_args.options.global_defs);
 }
 
 static void assemble_files() {
-    for (const std::string& filename : g_input_files) {
+    for (const std::string& filename : g_args.input_files) {
         assemble_file(filename);
     }
 }
@@ -103,20 +103,20 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    if (g_input_files.empty()) {
+    if (g_args.input_files.empty()) {
         error("No input files specified");
         exit(EXIT_FAILURE);
     }
 
     // execute requested actions
-    if (g_options.preprocess_only) {
+    if (g_args.options.preprocess_only) {
         preprocess_only();
     }
     else {
         assemble_files();
     }
 
-    if (g_options.verbose) {
+    if (g_args.options.verbose) {
         std::cout << "Assembly completed with " << error_count() << " error(s)" << std::endl;
     }
     return error_count() ? EXIT_FAILURE : EXIT_SUCCESS;

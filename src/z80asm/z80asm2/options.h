@@ -26,19 +26,12 @@ struct Options {
     ConstSymbols global_defs;
 };
 
-extern Options g_options;
-extern std::vector<std::string> g_input_files;   // command line input files
+struct Args {
+    Options options;
+    std::vector<std::string> input_files;   // command line input files
+};
 
-bool is_asm_filename(const std::string_view filename);
-bool is_o_filename(const std::string_view filename);
-std::string get_asm_filename(const std::string_view filename);
-std::string get_o_filename(const std::string_view filename);
-
-// Try candidates according to include semantics and include_paths,
-// return resolved path if found or empty string if not found.
-// including_filename: the file which contains the include directive (can be empty if unknown)
-std::string resolve_include_candidate(const std::string_view filename,
-                                      const std::string_view including_filename, bool is_angle);
+extern Args g_args;
 
 // parse arguments and options
 bool parse_arg(const std::string_view arg, bool& found_dash_dash);

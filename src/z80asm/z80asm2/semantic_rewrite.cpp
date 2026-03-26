@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "keywords.h"
+#include "lexer_keywords.h"
 #include "lexer.h"
 #include "options.h"
 #include "semantic_rewrite.h"
@@ -36,7 +36,7 @@ static void swap_x_y(std::string& str) {
 }
 
 void apply_ix_iy_swap(std::vector<Token>& tokens) {
-    if (!g_options.swap_ix_iy) {
+    if (!g_args.options.swap_ix_iy) {
         return;
     }
 
@@ -51,7 +51,7 @@ void apply_ix_iy_swap(std::vector<Token>& tokens) {
 }
 
 void apply_identifier_ucase(std::vector<Token>& tokens) {
-    if (!g_options.ucase_labels) {
+    if (!g_args.options.ucase_labels) {
         return;
     }
 
