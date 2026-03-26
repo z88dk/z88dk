@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "errors.h"
 #include "utils.h"
 #include "utils2.h"
 #include "xassert.h"
@@ -107,7 +108,8 @@ vector<string> split(const string& s) {
 
 int ipow(int base, int exp) {
 	if (exp < 0) {
-		error(ErrNegativeExponent);	// negative exponent not supported in integer arithmetic
+        // negative exponent not supported in integer arithmetic
+		error(ErrNegativeExponent, NULL);
 		return 0;
 	}
 	int result = 1;
