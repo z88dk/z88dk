@@ -6,10 +6,10 @@
 
 #include "errors.h"
 #include "lexer.h"
+#include "pathnames.h"
 #include "source.h"
 #include "source_loc.h"
 #include "string_interner.h"
-#include "utils.h"
 #include <cstdint>
 #include <fstream>
 #include <iostream>

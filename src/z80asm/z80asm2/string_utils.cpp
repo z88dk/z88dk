@@ -48,6 +48,60 @@ std::string trim(const std::string_view s) {
     return ltrim(rtrim(s));
 }
 
+std::string escape_string(const std::string_view s) {
+    std::string result;
+    result.reserve(s.size() + 2);
+    result.push_back('"');
+    for (unsigned char c : s) {
+        switch (c) {
+        case '\\':
+            result += "\\\\";
+            break;
+        case '"':
+            result += "\\\"";
+            break;
+        case '\a':
+            result += "\\a";
+            break;
+        case '\b':
+            result += "\\b";
+            break;
+        case '\f':
+            result += "\\f";
+            break;
+        case '\n':
+            result += "\\n";
+            break;
+        case '\r':
+            result += "\\r";
+            break;
+        case '\t':
+            result += "\\t";
+            break;
+        case '\v':
+            result += "\\v";
+            break;
+        case '\0':
+            result += "\\x00";
+            break;
+        default:
+            if (c >= 0x20 && c < 0x7F) {
+                result.push_back(static_cast<char>(c));
+            }
+            else {
+                // non-printable: emit \xHH
+                static constexpr char hex_digits[] = "0123456789ABCDEF";
+                result += "\\x";
+                result.push_back(hex_digits[(c >> 4) & 0x0F]);
+                result.push_back(hex_digits[c & 0x0F]);
+            }
+            break;
+        }
+    }
+    result.push_back('"');
+    return result;
+}
+
 std::string int_to_hex(int value) {
     std::ostringstream oss;
     if (abs(value < 10)) {

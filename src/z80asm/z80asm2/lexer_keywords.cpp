@@ -4,14 +4,14 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "keywords.h"
+#include "lexer_keywords.h"
 #include "string_utils.h"
 #include <unordered_map>
 
 Keyword keyword_lookup(const std::string_view s) {
     static const std::unordered_map<std::string, Keyword> keyword_map = {
 #define X(id, text, flags) { text, Keyword::id },
-#include "keywords.def"
+#include "lexer_keywords.def"
     };
     auto it = keyword_map.find(to_upper(s));
     return it != keyword_map.end() ? it->second : Keyword::None;
@@ -21,7 +21,7 @@ std::string keyword_to_string(Keyword kw) {
     static const char* keyword_strings[] = {
         "None",
 #define X(id, text, flags) text,
-#include "keywords.def"
+#include "lexer_keywords.def"
     };
     return keyword_strings[static_cast<int>(kw)];
 }
@@ -29,7 +29,7 @@ std::string keyword_to_string(Keyword kw) {
 static const int keyword_flags[] = {
     0,	// None
 #define X(id, text, flags) flags,
-#include "keywords.def"
+#include "lexer_keywords.def"
 };
 
 bool keyword_is_preproc_directive(Keyword kw) {
