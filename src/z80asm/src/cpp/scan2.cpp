@@ -210,18 +210,18 @@ void ScannedLine::clear() {
 
 Token& ScannedLine::peek(int offset) {
     static Token end{ TType::End, false };
-    int index = static_cast<int>(m_pos) + offset;
-    if (index < 0 || static_cast<unsigned>(index) >= m_tokens.size())
+    std::ptrdiff_t index = static_cast<std::ptrdiff_t>(m_pos) + offset;
+    if (index < 0 || static_cast<size_t>(index) >= m_tokens.size())
         return end;
     else
-        return m_tokens[static_cast<unsigned>(index)];
+        return m_tokens[static_cast<size_t>(index)];
 }
 
 void ScannedLine::next(int n) {
-    int pos = static_cast<int>(m_pos) + n;
+    std::ptrdiff_t pos = static_cast<std::ptrdiff_t>(m_pos) + n;
     if (pos < 0)
         m_pos = 0;
-    else if (static_cast<unsigned>(pos) > m_tokens.size())
+    else if (static_cast<size_t>(pos) > m_tokens.size())
         m_pos = static_cast<unsigned>(m_tokens.size());
     else
         m_pos = static_cast<unsigned>(pos);
@@ -229,10 +229,10 @@ void ScannedLine::next(int n) {
 
 vector<Token> ScannedLine::peek_tokens(int offset) {
     vector<Token> out;
-    int index = static_cast<int>(m_pos) + offset;
+    std::ptrdiff_t index = static_cast<std::ptrdiff_t>(m_pos) + offset;
     if (index < 0)
         return out;
-    for (unsigned i = static_cast<unsigned>(index); i < m_tokens.size(); i++)
+    for (size_t i = static_cast<size_t>(index); i < m_tokens.size(); i++)
         out.push_back(m_tokens[i]);
     return out;
 }
