@@ -134,10 +134,12 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\errors.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\keywords.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_dump.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_tokens.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\pathnames.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_context.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_directives.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_driver.cpp" />
@@ -150,17 +152,19 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\source_loc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_interner.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\utils.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\environment.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\errors.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\keywords.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_dump.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_tokens.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\pathnames.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_context.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_directives.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_driver.h" />
@@ -173,13 +177,13 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_utils.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_interner.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\utils.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\z80asm\z80asm2\keywords.def" />
+    <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def" />
     <None Include="..\..\src\z80asm\z80asm2\options.def" />
     <None Include="..\..\src\z80asm\z80asm2\scan.re" />
-    <None Include="..\..\src\z80asm\z80asm2\tokens.def" />
+    <None Include="..\..\src\z80asm\z80asm2\lexer_tokens.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
