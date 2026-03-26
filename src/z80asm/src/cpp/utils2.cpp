@@ -106,8 +106,10 @@ vector<string> split(const string& s) {
 }
 
 int ipow(int base, int exp) {
-	if (exp < 0)
-		return 0;	// negative exponent not supported in integer arithmetic
+	if (exp < 0) {
+		error(ErrNegativeExponent);	// negative exponent not supported in integer arithmetic
+		return 0;
+	}
 	int result = 1;
 	for (;;) {
 		if (exp & 1)
