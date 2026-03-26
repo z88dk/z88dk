@@ -308,7 +308,7 @@ void *m_realloc_( void *memptr, size_t size, char *file, int lineno )
 			DL_APPEND(g_mem_blocks, block);
 		else
 			DL_PREPEND_ELEM(g_mem_blocks, next_block, block);
-		check( result, "memory realloc (%u bytes) failed at %s:%d", (unsigned)size, file, lineno );
+		check( result, "memory fence check failed before realloc (%u bytes) at %s:%d", (unsigned)size, file, lineno );
 	}
 
     /* reallocate and create new end fence */
