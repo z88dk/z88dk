@@ -10,7 +10,7 @@ IF FORzxn
     PUBLIC  generic_console_zxn_layer2_printc
 
     EXTERN  CLIB_BANKING_SEGMENT
-    EXTERN  CLIB_ZXN_LAYER2_BASE
+    EXTERN  __CLIB_ZXN_LAYER2_BASE
     EXTERN  __IO_NEXTREG_REG
     EXTERN  __zxn_ink_colour
     EXTERN  __zxn_paper_colour
@@ -34,7 +34,7 @@ cls_loop:
     ; Page in the right segment of the screen
     ld      a,c
     add     a
-    add     CLIB_ZXN_LAYER2_BASE
+    add     __CLIB_ZXN_LAYER2_BASE
     call    set_mmu
      
     ld      hl, +(CLIB_BANKING_SEGMENT << 14)

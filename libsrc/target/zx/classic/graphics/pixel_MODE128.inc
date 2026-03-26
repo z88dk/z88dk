@@ -7,7 +7,7 @@ IF FORzxn
 
     EXTERN  __gfx_coords
     EXTERN  CLIB_BANKING_SEGMENT
-    EXTERN  CLIB_ZXN_LAYER2_BASE
+    EXTERN  __CLIB_ZXN_LAYER2_BASE
     EXTERN  __IO_NEXTREG_REG
     EXTERN  __zxn_ink_colour
     EXTERN  __zxn_paper_colour
@@ -44,7 +44,7 @@ IF FORzxn
     rlca
     rlca
     and     @00000110
-    add     CLIB_ZXN_LAYER2_BASE
+    add     __CLIB_ZXN_LAYER2_BASE
     call    set_mmu
 
     ; Rebase the address to 0->0x3fff

@@ -53,6 +53,14 @@
         defc CLIB_FGETC_CONS_DELAY = 100
     ENDIF
 
+    ; What 8k page does the layer2 display start on?
+    IF !DEFINED_CLIB_ZXN_LAYER2_BASE
+        defc CLIB_ZXN_LAYER2_BASE = 0x12
+    ENDIF
+    PUBLIC __CLIB_ZXN_LAYER2_BASE
+    defc   __CLIB_ZXN_LAYER2_BASE = CLIB_ZXN_LAYER2_BASE
+
+
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 3500000
 
