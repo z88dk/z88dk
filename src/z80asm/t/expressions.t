@@ -161,7 +161,6 @@ q{		defb 1 << 1 +  3						}, bytes(16),
 q{		defb 1 +  2 *  3						}, bytes(7),
 q{		defb 2 *  3 ** 4						}, bytes(162),
 q{		defw 2 ** 3 ** 2						}, words(512),
-q{		defb 2 ** -3							}, bytes(0),
 q{		defb ---+--+-2							}, bytes(2),
 q{		defb 1 ? 2 : 3, 0 ? 4 : 5				}, bytes(2,5),
 q{		defb 0 ? 0 ? 2 : 3 : 0 ? 4 : 5			}, bytes(5),
@@ -192,6 +191,13 @@ z80asm_nok("", "", <<END, <<END);
 END
 $test.asm:1: error: syntax error
   ^---- out 1,a
+END
+
+z80asm_nok("", "", <<END, <<END);
+		defb 2 ** -3
+END
+$test.asm:1: error: negative exponent not supported in integer arithmetic
+  ^---- 2**-3
 END
 
 unlink_testfiles;

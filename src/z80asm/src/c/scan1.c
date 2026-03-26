@@ -24,6 +24,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "xmalloc.h"
 #include "z80asm_defs.h"
 #include <ctype.h>
+#include <limits.h>
 
 /*-----------------------------------------------------------------------------
 * 	Globals
@@ -135,6 +136,8 @@ void restore_scan_state(void)
 	init_module();
 
 	save = (ScanState *)utarray_back(scan_state);
+	if (save == NULL)
+		die("restore_scan_state: unbalanced save/restore - restore called without matching save");
 	sym = save->sym;
 	Str_set(input_buf, save->input_buf);
 	at_bol = save->at_bol;
@@ -156,6 +159,8 @@ void drop_scan_state(void)
 {
 	init_module();
 
+	if (utarray_len(scan_state) == 0)
+		die("drop_scan_state: unbalanced save/drop - drop called without matching save");
 	utarray_pop_back(scan_state);
 }
 
@@ -217,7 +222,14 @@ static long scan_num ( char *text, size_t length, int base )
 		{
 			xassert(0); /* digit out of range - should not be reached */
 		}
-		
+
+		/* check for integer overflow before accumulating */
+		if (value > (LONG_MAX - digit) / base)
+		{
+			warning(ErrIntRange, NULL);
+			value = LONG_MAX;
+			break;
+		}
 		value = value * base + digit;
 	}
 	

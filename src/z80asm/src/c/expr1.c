@@ -103,7 +103,10 @@ static long _calc_power(long base, long exp)
 	long result = 1;
 
 	if (exp < 0)
-		return 0;	/* BUG_0041 */
+	{
+        error(ErrNegativeExponent, NULL);	/* BUG_0041 */
+		return 0;
+	}
 
 	while (exp)
 	{

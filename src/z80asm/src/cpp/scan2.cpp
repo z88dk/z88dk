@@ -210,23 +210,29 @@ void ScannedLine::clear() {
 
 Token& ScannedLine::peek(int offset) {
     static Token end{ TType::End, false };
-    unsigned index = m_pos + offset;
-    if (index >= m_tokens.size())
+    int index = static_cast<int>(m_pos) + offset;
+    if (index < 0 || static_cast<unsigned>(index) >= m_tokens.size())
         return end;
     else
-        return m_tokens[index];
+        return m_tokens[static_cast<unsigned>(index)];
 }
 
 void ScannedLine::next(int n) {
-    m_pos += n;
-    if (m_pos > m_tokens.size())
+    int pos = static_cast<int>(m_pos) + n;
+    if (pos < 0)
+        m_pos = 0;
+    else if (static_cast<unsigned>(pos) > m_tokens.size())
         m_pos = static_cast<unsigned>(m_tokens.size());
+    else
+        m_pos = static_cast<unsigned>(pos);
 }
 
 vector<Token> ScannedLine::peek_tokens(int offset) {
     vector<Token> out;
-    unsigned index = m_pos + offset;
-    for (unsigned i = index; i < m_tokens.size(); i++)
+    int index = static_cast<int>(m_pos) + offset;
+    if (index < 0)
+        return out;
+    for (unsigned i = static_cast<unsigned>(index); i < m_tokens.size(); i++)
         out.push_back(m_tokens[i]);
     return out;
 }

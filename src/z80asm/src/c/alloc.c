@@ -302,7 +302,14 @@ void *m_realloc_( void *memptr, size_t size, char *file, int lineno )
 
     /* check fences */
     result = check_fences( block );
-	check( result, "memory realloc (%u bytes) failed at %s:%d", (unsigned)size, file, lineno );
+	if ( ! result ) {
+		/* re-add block to list so it is tracked and freed at exit */
+		if (next_block == NULL)
+			DL_APPEND(g_mem_blocks, block);
+		else
+			DL_PREPEND_ELEM(g_mem_blocks, next_block, block);
+		check( result, "memory realloc (%u bytes) failed at %s:%d", (unsigned)size, file, lineno );
+	}
 
     /* reallocate and create new end fence */
     block = realloc( block, BLOCK_SIZE( size ) );

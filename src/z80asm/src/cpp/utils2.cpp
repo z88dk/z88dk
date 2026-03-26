@@ -18,7 +18,7 @@
 string str_compress_escapes(const string& in) {
 	string out;
 	int base = 0, max_digits = 0, digit = 0;
-	char c;
+	unsigned char c;		// use unsigned to avoid undefined behavior when accumulating byte values 128-255
 	const char* num = nullptr;
 
 	for (const char* p = in.c_str(); *p; p++) {
@@ -97,7 +97,7 @@ string str_expand_escapes(const string& in) {
 	return out;
 }
 
-// https://www.bing.com/search?q=c%2B%2B+split+blank+delimited+string+into+vector+of+stringsd&showconv=1&sendquery=1&form=WSBQFC&qs=SW&cvid=286798d5917e488fb05cbeda30b71104&pq=c%2B%2B+split+blank+delimited+string+into+vector+of+stringsd&cc=PT&setlang=en-US&nclid=9310176510014EEEAB71B45D62C6D720&ts=1703540528160&wsso=Moderate
+// split a string on whitespace into a vector of tokens
 vector<string> split(const string& s) {
     istringstream iss(s);
     vector<string> tokens{ istream_iterator<string>{iss},
@@ -106,6 +106,8 @@ vector<string> split(const string& s) {
 }
 
 int ipow(int base, int exp) {
+	if (exp < 0)
+		return 0;	// negative exponent not supported in integer arithmetic
 	int result = 1;
 	for (;;) {
 		if (exp & 1)
