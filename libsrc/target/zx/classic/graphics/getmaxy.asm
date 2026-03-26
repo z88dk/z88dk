@@ -15,6 +15,9 @@ _getmaxy:
     and     7
     cp      6
     ret     z
+    ld      a, (__zx_screenmode)
+    bit     7,a     ;Layer2
+    ret     nz
 	; And so we're left with ZXN
     ld      hl, (__console_h)
     ld      h, 0

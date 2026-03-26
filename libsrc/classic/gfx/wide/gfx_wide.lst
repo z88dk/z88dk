@@ -51,6 +51,7 @@ classic/gfx/wide/obj/${TARGET}/w_stencil_add_point
 classic/gfx/wide/obj/${TARGET}/w_stencil_add_side
 classic/gfx/wide/obj/${TARGET}/w_stencil_init
 classic/gfx/wide/obj/${TARGET}/__generic_w_stencil_render
+classic/gfx/wide/obj/${TARGET}/__pixladdr_w_stencil_render
 classic/gfx/wide/obj/${TARGET}/w_stencil_render2
 classic/gfx/wide/obj/${TARGET}/w_uncircle
 classic/gfx/wide/obj/${TARGET}/w_uncircle_callee

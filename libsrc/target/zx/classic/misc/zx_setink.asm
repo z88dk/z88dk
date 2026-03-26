@@ -7,7 +7,7 @@
    PUBLIC   zx_setink_fastcall
    PUBLIC   _zx_setink_fastcall
    EXTERN   __zx_console_attr
-   EXTERN   __zx_ink_colour
+   EXTERN   __zxn_ink_colour
 
 zx_setink:
 _zx_setink:
@@ -18,7 +18,7 @@ zx_setink_fastcall:
 _zx_setink_fastcall:
      ld    a,l
 IF    FORzxn
-    ld      (__zx_ink_colour), a
+    ld      (__zxn_ink_colour), a
 ENDIF
     and     7
     ld      c, a

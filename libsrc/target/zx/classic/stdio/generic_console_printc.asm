@@ -19,6 +19,7 @@
     EXTERN  __zx_mode0_console_w
     EXTERN  __zx_print_routine
     EXTERN  generic_console_zxn_tile_printc
+    EXTERN  generic_console_zxn_layer2_printc
     EXTERN  __sam_printc
 
   IF    FORsam|FORz88
@@ -141,6 +142,8 @@ skip_control_codes:
     ld      a, (__zx_screenmode)
     bit     6, a
     jp      nz, generic_console_zxn_tile_printc
+    ; bit     7, a
+    ; jp      nz, generic_console_zxn_layer2_printc
   ENDIF
     ld      hl, (__zx_print_routine)
     jp      (hl)

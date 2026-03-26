@@ -10,7 +10,7 @@ IF FORzxn
 
     EXTERN  __console_w
     EXTERN  __console_h
-    EXTERN  __zx_ink_colour
+    EXTERN  __zxn_ink_colour
 
 
 ; Word for tiles:
@@ -49,7 +49,7 @@ generic_console_zxn_tile_printc:
     bit     5, a                        ;byte tile mode?
     ret     nz
     inc     hl
-    ld      a, (__zx_ink_colour)
+    ld      a, (__zxn_ink_colour)
     rrca
     rrca
     rrca

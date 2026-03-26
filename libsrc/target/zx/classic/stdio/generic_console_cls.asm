@@ -9,6 +9,7 @@ IFNDEF FORsam
     PUBLIC  generic_console_cls
 
     EXTERN  generic_console_zxn_tile_cls
+    EXTERN  generic_console_zxn_layer2_cls
 
     EXTERN  __zx_console_attr
     EXTERN  __zx_screenmode
@@ -26,10 +27,12 @@ generic_console_cls:
 
   IF    FORts2068|FORzxn
     ld      a, (__zx_screenmode)
-    IF  FORzxn
+   IF  FORzxn
+    bit     7,a
+    jp      nz, generic_console_zxn_layer2_cls
     bit     6, a
     jp      nz, generic_console_zxn_tile_cls
-    ENDIF
+   ENDIF
     cp      1
     jr      nz, clear_main_screen
     ld      hl, $6000

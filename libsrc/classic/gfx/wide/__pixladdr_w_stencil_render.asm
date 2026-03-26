@@ -8,7 +8,7 @@
 ;
 ;    Machine code version by Stefano Bodrato, 22/4/2009
 ;
-;    stencil_render(unsigned char *stencil, unsigned char intensity)
+;    _pixladdr_stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
     INCLUDE "classic/gfx/grafix.inc"
@@ -16,16 +16,14 @@
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     SECTION code_graphics
-    PUBLIC  stencil_render
-    PUBLIC  _stencil_render
-    PUBLIC  ___stencil_render
+    PUBLIC  __pixladdr_stencil_render
     EXTERN  dither_pattern
     ;EXTERN    l_graphics_cmp
 
-    ;EXTERN __gfx_vram_page_in
+    EXTERN __gfx_vram_page_in
     EXTERN  w_pixeladdress
     EXTERN  leftbitmask, rightbitmask
-    ;EXTERN __gfx_vram_page_out
+    EXTERN __gfx_vram_page_out
 	
 	EXTERN __generic_w_curx
 	EXTERN __generic_w_cury
@@ -33,7 +31,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 
 ;
-;    $Id: w_stencil_render.asm $
+;    $Id: w__pixladdr_stencil_render.asm $
 ;
 
 
@@ -42,14 +40,12 @@ stencil_exit:
     ret
 
 
-stencil_render:
-_stencil_render:
-___stencil_render:
+__pixladdr_stencil_render:
     push    ix
     ld      ix, 4
     add     ix, sp
 
-    ;call    __gfx_vram_page_in
+;    call    __gfx_vram_page_in
 
     ld      bc, _GFX_MAXY
     push    bc
