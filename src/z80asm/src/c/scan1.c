@@ -188,7 +188,7 @@ void scan_expect_operands(void)
 
 
 /*-----------------------------------------------------------------------------
-*	convert number to int, range warning if greater than LONG_MAX
+*	convert number to long, range warning if greater than LONG_MAX
 *----------------------------------------------------------------------------*/
 static long scan_num ( char *text, size_t length, int base )
 {
