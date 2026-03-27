@@ -10,6 +10,7 @@
 #include "options.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include "string_utils.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -31,6 +32,27 @@ static bool match_token(const std::vector<Token>& tokens, uint32_t& pos, TokenTy
     return false;
 }
 
+// Report an error for a missing operand. Uses the previous token's context
+// when the token stream is exhausted, per project guidelines.
+static void error_expected_operand(const std::vector<Token>& tokens, uint32_t pos) {
+    if (pos > 0 && pos >= tokens.size()) {
+        // exhausted tokens after an operator
+        const Token& prev = tokens[pos - 1];
+        error(prev.loc, "Unterminated expression after "
+              + escape_string(g_strings.view(prev.text_id)));
+    }
+    else if (pos < tokens.size()) {
+        // valid token that is not a valid operand
+        const Token& cur = tokens[pos];
+        error(cur.loc, "Expected a value, got "
+              + escape_string(g_strings.view(cur.text_id)));
+    }
+    else {
+        // empty token stream
+        error(SourceLoc(), "Empty expression");
+    }
+}
+
 static bool parse_const_expr_conditional(const std::vector<Token>& tokens, uint32_t& pos,
         const ConstSymbols& sym, int& result, bool silent);
 
@@ -40,7 +62,9 @@ static bool parse_const_expr_primary(const std::vector<Token>& tokens,
                                      bool silent) {
     const Token* token = peek_token(tokens, pos);
     if (token == nullptr) {
-        error(peek_loc(tokens, pos), "Constant expression expected");
+        if (!silent) {
+            error_expected_operand(tokens, pos);
+        }
         return false;
     }
 
@@ -70,6 +94,7 @@ static bool parse_const_expr_primary(const std::vector<Token>& tokens,
         return true;
     }
 
+    case TokenType::Dollar:
     case TokenType::ASMPC:
         error(token->loc, "ASMPC is not allowed in a constant expression");
         result = 0;
@@ -82,7 +107,10 @@ static bool parse_const_expr_primary(const std::vector<Token>& tokens,
             return false;
         }
         if (!match_token(tokens, pos, TokenType::RightParen)) {
-            error(peek_loc(tokens, pos), "Missing ')'");
+            if (!silent) {
+                error(peek_loc(tokens, pos), "Missing ')' after token "
+                      + escape_string(g_strings.view(tokens[pos - 1].text_id)));
+            }
             return false;
         }
         return true;
@@ -94,14 +122,19 @@ static bool parse_const_expr_primary(const std::vector<Token>& tokens,
             return false;
         }
         if (!match_token(tokens, pos, TokenType::RightBracket)) {
-            error(peek_loc(tokens, pos), "Missing ']'");
+            if (!silent) {
+                error(peek_loc(tokens, pos), "Missing ']' after token "
+                      + escape_string(g_strings.view(tokens[pos - 1].text_id)));
+            }
             return false;
         }
         return true;
     }
 
     default:
-        error(token->loc, "Constant expression expected");
+        if (!silent) {
+            error_expected_operand(tokens, pos);
+        }
         return false;
     }
 }
@@ -110,7 +143,9 @@ static bool parse_const_expr_unary(const std::vector<Token>& tokens, uint32_t& p
                                    const ConstSymbols& sym, int& result, bool silent) {
     const Token* token = peek_token(tokens, pos);
     if (token == nullptr) {
-        error(peek_loc(tokens, pos), "Constant expression expected");
+        if (!silent) {
+            error_expected_operand(tokens, pos);
+        }
         return false;
     }
 
@@ -481,7 +516,10 @@ static bool parse_const_expr_conditional(const std::vector<Token>& tokens, uint3
     }
 
     if (!match_token(tokens, pos, TokenType::Colon)) {
-        error(peek_loc(tokens, pos), "Missing ':' in conditional expression");
+        if (!silent) {
+            error(peek_loc(tokens, pos), "Missing ':' in ternary expression after token "
+                  + escape_string(g_strings.view(tokens[pos - 1].text_id)));
+        }
         return false;
     }
 
@@ -511,8 +549,10 @@ bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
 
     if (pos < tokens.size() &&
             tokens[pos].type != TokenType::EndOfLine) {
-        error(tokens[pos].loc, "Unexpected token in expression: " +
-              g_strings.to_string(tokens[pos].text_id));
+        error(tokens[pos].loc, "Operator expected after token "
+              + escape_string(g_strings.view(tokens[pos - 1].text_id))
+              + ", got "
+              + escape_string(g_strings.view(tokens[pos].text_id)));
         return false;
     }
 
@@ -521,8 +561,13 @@ bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
 
 int int_pow(int base, int exp, const SourceLoc& loc) {
     if (exp < 0) {
-        error(loc, "Negative exponent in expression");
+        error(loc, "Negative exponent in integer is not defined");
         return 0;
+    }
+
+    if (base == 0 && exp == 0) {
+        error(loc, "Zero raised to the power of zero is not defined");
+        return 1;   // return something nonzero to avoid cascading errors
     }
 
     int result = 1;

@@ -30,3 +30,9 @@ Diagnostic Options:
                 Dump the command line arguments and exit
   -dump-after-tokenization
                 Dump the lexer token stream and exit
+  -dump-after-directives
+                Dump the token stream after directive processing and exit
+  -dump-after-macro-expansion
+                Dump the token stream after macro expansion and exit
+  -dump-after-preprocessing
+                Dump the final preprocessed token stream and exit

@@ -1,0 +1,21 @@
+verbose	0
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+global_def	E00	5
+global_def	E01	1
+global_def	E02	$37
+global_def	E03	$2D0
+global_def	E04	$1000000
+global_def	E05	5
+global_def	E06	-5
+global_def	E07	0
+global_def	E08	0
+global_def	E09	0
