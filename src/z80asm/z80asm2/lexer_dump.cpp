@@ -9,6 +9,7 @@
 #include "source.h"
 #include "source_loc.h"
 #include "string_utils.h"
+#include <cstdlib>
 #include <iostream>
 
 // show debug-friendly representation of token
