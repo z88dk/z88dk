@@ -6,10 +6,6 @@
 
 #pragma once
 
-#include <vector>
-#include "lexer.h"
-#include "preproc_directives.h"
+#include "preproc_context.h"
 
-void dump_after_directives(const std::vector<LogicalLine>& lines);
-void dump_after_macroexpansion(const std::vector<Token>& tokens);
-void dump_after_preprocess(const std::vector<Token>& tokens);
+void dump_logical_line(const LogicalLine& line);
