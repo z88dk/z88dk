@@ -19,6 +19,9 @@ struct Options {
     bool date_stamp = false;
     bool dump_after_cmdline = false;
     bool dump_after_tokenization = false;
+    bool dump_after_directives = false;
+    bool dump_after_macro_expansion = false;
+    bool dump_after_preprocessing = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

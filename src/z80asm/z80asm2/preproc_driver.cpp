@@ -6,13 +6,16 @@
 
 #include "errors.h"
 #include "lexer.h"
+#include "lexer_dump.h"
+#include "options.h"
 #include "preproc_context.h"
 #include "preproc_directives.h"
 #include "preproc_driver.h"
 #include "preproc_dump.h"
-#include "preproc_expr.h"
 #include "preproc_macro.h"
 #include "source.h"
+#include <cstdlib>
+#include <string_view>
 
 /* -------------------------------------------------------------------------
    Preprocessor Flow (preproc_driver.cpp)
@@ -91,7 +94,6 @@
    -------------------------------------------------------------------------
    End of Preprocessor Flow
    ------------------------------------------------------------------------- */
-
 
 // -----------------------------------------------------------------------------
 // Public API (unchanged)
@@ -187,11 +189,19 @@ std::vector<Token> preprocess(std::string_view filename,
             continue;
         }
 
+        if (g_args.options.dump_after_directives) {
+            dump_logical_line(processed);
+        }
+
         // ---------------------------------------------------------------------
         // 4. Macro expansion
         // ---------------------------------------------------------------------
         std::vector<Token> expanded;
         expand_line(ctx, processed, expanded);   // may push into ctx.macro_work_queue
+
+        if (g_args.options.dump_after_macro_expansion) {
+            dump_tokens(expanded);          // <--- DUMP POINT #2
+        }
 
         // Append expanded tokens to final output
         final_tokens.insert(final_tokens.end(),
@@ -206,6 +216,15 @@ std::vector<Token> preprocess(std::string_view filename,
     }
 
     // TODO: check for unterminated classical MACRO/ENDM if needed
+
+    if (g_args.options.dump_after_preprocessing) {
+        dump_tokens(final_tokens);
+        exit(EXIT_SUCCESS);
+    }
+
+    if (g_args.options.dump_after_directives || g_args.options.dump_after_macro_expansion) {
+        exit(EXIT_SUCCESS);
+    }
 
     return final_tokens;
 }

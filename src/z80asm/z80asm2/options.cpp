@@ -80,7 +80,10 @@ static const UsageGroup usage_layout[] = {
         "Diagnostic Options",
         {
             OptionType::DUMP_AFTER_CMDLINE,
-            OptionType::DUMP_AFTER_TOKENIZATION
+            OptionType::DUMP_AFTER_TOKENIZATION,
+            OptionType::DUMP_AFTER_DIRECTIVES,
+            OptionType::DUMP_AFTER_MACRO_EXPANSION,
+            OptionType::DUMP_AFTER_PREPROCESSING,
         }
     }
 };
@@ -354,6 +357,18 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
 
         case OptionType::DUMP_AFTER_TOKENIZATION:
             g_args.options.dump_after_tokenization = true;
+            return true;
+
+        case OptionType::DUMP_AFTER_DIRECTIVES:
+            g_args.options.dump_after_directives = true;
+            return true;
+
+        case OptionType::DUMP_AFTER_MACRO_EXPANSION:
+            g_args.options.dump_after_macro_expansion = true;
+            return true;
+
+        case OptionType::DUMP_AFTER_PREPROCESSING:
+            g_args.options.dump_after_preprocessing = true;
             return true;
 
         default:

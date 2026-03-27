@@ -11,9 +11,10 @@
 #include "source.h"
 #include "string_interner.h"
 #include <deque>
-#include <string>
 #include <unordered_map>
 #include <vector>
+
+static const int MAX_EXPANSION_DEPTH = 1000;
 
 struct LogicalLine {
     std::vector<Token> tokens{};

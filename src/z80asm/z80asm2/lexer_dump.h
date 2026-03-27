@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include "lexer_tokens.h"
 #include <string_view>
+#include <vector>
 
 void dump_token(const Token& token);
 void dump_tokens(const std::vector<Token>& tokens);

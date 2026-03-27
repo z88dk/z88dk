@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
-#include "string_interner.h"
-#include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 
 std::string tokens_to_string(const std::vector<Token>& tokens);
