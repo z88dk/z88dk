@@ -8,7 +8,8 @@
 
     EXTERN  __zx_console_attr
   IF    FORzxn
-    EXTERN  __zx_ink_colour
+    EXTERN  __zxn_ink_colour
+    EXTERN  __zxn_paper_colour
   ENDIF
   IF    FORsam
     EXTERN  __sam_MODE4_attr
@@ -34,6 +35,8 @@ generic_console_set_paper:
     ld      (__sam_MODE3_attr+1), a
     ld      a, c
 
+  ELIF FORzxn
+    ld      (__zxn_paper_colour), a
   ENDIF
 
     call    conio_map_colour
@@ -70,10 +73,8 @@ generic_console_set_ink:
     ld      (__sam_MODE3_attr+0), a
     ld      a, c
 
-  ENDIF
-
-  IF    FORzxn
-    ld      (__zx_ink_colour), a
+  ELIF FORzxn
+    ld      (__zxn_ink_colour), a
   ENDIF
 
     call    conio_map_colour

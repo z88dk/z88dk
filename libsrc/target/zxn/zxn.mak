@@ -8,7 +8,8 @@ ZXN_GLOBS := $(ZX_GLOBS) \
 	"target/zxn/version/z80/*.asm" "target/zxn/version/c/sccz80/*.asm" \
 	"target/ts2068/misc/z80/*.asm" "target/ts2068/misc/c/sccz80/*.asm" \
 	"target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
-	"target/zxn/sprites/c/sccz80/*.asm" 
+	"target/zxn/sprites/c/sccz80/*.asm" \
+	"target/zxn/classic/stdio/*.asm"
 
 ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/zxn/esxdos/z80/*.asm target/zxn/esxdos/c/sccz80/*.asm \
@@ -19,7 +20,9 @@ ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 	target/zxn/version/z80/*.asm target/zxn/version/c/sccz80/*.asm \
 	target/ts2068/misc/z80/*.asm target/ts2068/misc/c/sccz80/*.asm \
 	target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
-	target/zxn/sprites/c/sccz80/*.asm 
+	target/zxn/sprites/c/sccz80/*.asm  \
+	target/zxn/classic/stdio/*.asm
+
 
 
 

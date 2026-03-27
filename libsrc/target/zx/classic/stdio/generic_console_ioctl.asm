@@ -17,6 +17,12 @@
     EXTERN  asm_zxn_copytiles
     EXTERN  generic_console_caps
 
+    EXTERN  __IO_LAYER_2_CONFIG
+    EXTERN  __IL2C_SHOW_LAYER_2
+    EXTERN  __IO_NEXTREG_REG
+
+
+
 
     PUBLIC  CLIB_GENCON_CAPS
     defc    CLIB_GENCON_CAPS=CAP_GENCON_INVERSE|CAP_GENCON_BOLD|CAP_GENCON_UNDERLINE|CAP_GENCON_CUSTOM_FONT|CAP_GENCON_UDGS|CAP_GENCON_FG_COLOUR|CAP_GENCON_BG_COLOUR
@@ -55,7 +61,8 @@ check_set_font64:
     cp      IOCTL_GENCON_SET_FONT64
     jr      nz, check_set_udg
     ld      (__zx_64col_font), bc
-    jr      success
+    and     a
+    ret
 check_set_udg:
     cp      IOCTL_GENCON_SET_UDGS
     jr      nz, check_mode
@@ -82,7 +89,7 @@ check_mode:
     jr      success
   ELIF  FORts2068|FORzxn
     cp      IOCTL_GENCON_SET_MODE
-    jr      nz, failure
+    jp      nz, failure
     ld      a, (__zx_mode0_console_w)
     ld      l, a
     ld      a, c
@@ -101,13 +108,15 @@ check_mode:
     sla     l
     cp      6
     ld      h, CLIB_GENCON_CAPS_TIMEX_HIRES
-    IF  !FORzxn
+  IF  !FORzxn
     jr      nz, failure
-    ELSE
+  ELSE
     jr      z, set_mode
 ;zxn modes
     ld      a, c
     ld      (__zx_screenmode), a
+    bit     7,a
+    jr      nz,set_layer2
     ; Mode 64 = 40 column
     ;      65 = 40 column with single byte tiles
     ;      66 = 80 column
@@ -137,8 +146,25 @@ set_tilemap_size:
     ld      bc, $8080
     call    asm_zxn_copytiles
     call    generic_console_cls
-    jr      success
-    ENDIF
+    and     a
+    ret
+
+set_layer2:
+    ; 128 = 256x192 8bpp
+    ld      hl,$1820
+    ld      (__console_w), hl
+    ld      a, CLIB_GENCON_CAPS
+    ld      (generic_console_caps), a
+
+    ; Set layer2 to visible
+    ld      a,__IL2C_SHOW_LAYER_2
+    ld      bc,__IO_LAYER_2_CONFIG
+    out     (c),a
+
+    call    generic_console_cls
+    and     a
+    ret
+  ENDIF
 set_mode:
     ld      (__zx_screenmode), a
     ld      a, h
@@ -153,7 +179,8 @@ set_mode:
     or      b
     out     ($ff), a
     call    generic_console_cls
-    jp      success
+    and     a
+    ret
   ENDIF
 failure:
     scf

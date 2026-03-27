@@ -21,6 +21,9 @@ _getmaxx:
     ld      hl, 511
     ret
 zxn_getmaxx:
+    ld      a, (__zx_screenmode)
+    bit     7,a     ;Layer2
+    ret     nz
 	; So we must be left with a ZXN screenmode
     ld      hl, (__console_w)
     ld      h, 0
