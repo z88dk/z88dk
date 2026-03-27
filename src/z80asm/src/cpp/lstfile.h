@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "preproc.h"
+#include "errors.h"
 #include <cstdint>
 #include <fstream>
 #include <iostream>

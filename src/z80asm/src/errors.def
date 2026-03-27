@@ -48,6 +48,7 @@ X(ErrSymbolRedeclaration, "symbol redeclaration")
 // expressions
 X(ErrConstExprExpected, "constant expression expected")
 X(ErrDivisionByZero, "division by zero")
+X(ErrNegativeExponent, "negative exponent not supported in integer arithmetic")
 X(ErrExprRecursion, "recursive expression")
 
 // preprocessor
