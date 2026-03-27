@@ -6,16 +6,16 @@
 
 #include "environment.h"
 #include "errors.h"
-#include "lexer.h"
 #include "lexer_dump.h"
+#include "lexer_tokens.h"
 #include "options.h"
 #include "options_dump.h"
 #include "preproc_driver.h"
-#include "source.h"
 #include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 static constexpr std::string_view z80asm_env = "Z80ASM";
 
