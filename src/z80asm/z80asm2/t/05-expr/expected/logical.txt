@@ -1,0 +1,23 @@
+verbose	0
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+global_def	E00	0
+global_def	E01	1
+global_def	E02	1
+global_def	E03	1
+global_def	E04	0
+global_def	E05	1
+global_def	E06	1
+global_def	E07	0
+global_def	E08	0
+global_def	E09	0
+global_def	E10	0
+global_def	E11	1

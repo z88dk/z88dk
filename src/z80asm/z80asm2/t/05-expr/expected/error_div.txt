@@ -1,0 +1,19 @@
+<command-line>:1:4: error: Division by zero
+<command-line>:1:5: error: Modulo by zero
+<command-line>:1:8: error: Division by zero
+verbose	0
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+global_def	A	5
+global_def	B	2
+global_def	E00	0
+global_def	E01	0
+global_def	E02	0

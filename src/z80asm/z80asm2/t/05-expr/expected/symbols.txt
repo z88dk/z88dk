@@ -1,0 +1,19 @@
+verbose	0
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+global_def	A	5
+global_def	B	2
+global_def	C	-3
+global_def	E00	7
+global_def	E01	7
+global_def	E02	-5
+global_def	E03	1
+global_def	E04	1

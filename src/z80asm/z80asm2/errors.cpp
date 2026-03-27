@@ -54,7 +54,12 @@ static void print_message(const SourceLoc& loc,
         return;
     }
 
-    SourceFile* file = get_source_file(g_strings.to_string(loc.file_id), SourceLoc{});
+    std::string_view filename = g_strings.view(loc.file_id);
+    if (filename.empty() || filename[0] == '<') {
+        // no filename or special filename (e.g. <command line>)
+        return;
+    }
+    SourceFile* file = get_source_file(filename, SourceLoc());
     if (!file) {
         return;
     }
@@ -63,7 +68,7 @@ static void print_message(const SourceLoc& loc,
         return;
     }
 
-    std::string text = read_line(*file, loc.line - 1, loc);
+    std::string text = read_line(*file, loc.line - 1, SourceLoc());
     if (!text.empty()) {
         print_source_line(text, loc.column);
     }

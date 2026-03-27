@@ -1,0 +1,19 @@
+<command-line>:1:6: error: Negative exponent in integer is not defined
+<command-line>:1:5: error: Zero raised to the power of zero is not defined
+<command-line>:1:9: error: Negative exponent in integer is not defined
+verbose	0
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+global_def	A	5
+global_def	B	2
+global_def	E00	0
+global_def	E01	1
+global_def	E02	0
