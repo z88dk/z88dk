@@ -139,6 +139,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_tokens.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\options_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\pathnames.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_context.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_directives.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_tokens.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\options_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\pathnames.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_context.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_directives.h" />

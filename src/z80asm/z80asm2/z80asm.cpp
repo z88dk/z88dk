@@ -9,6 +9,7 @@
 #include "lexer.h"
 #include "lexer_dump.h"
 #include "options.h"
+#include "options_dump.h"
 #include "preproc_driver.h"
 #include "source.h"
 #include <filesystem>
@@ -27,7 +28,7 @@ static void assemble_file(const std::string_view filename) {
 
     // run tokenizer and cache tokens in SourceFile
     if (g_args.options.dump_after_tokenization) {
-        dump_after_tokenization(filename);
+        dump_after_tokenization_and_exit(filename);
         // not reached
     }
 
@@ -106,6 +107,11 @@ int main(int argc, char* argv[]) {
     if (g_args.input_files.empty()) {
         error("No input files specified");
         exit(EXIT_FAILURE);
+    }
+
+    if (g_args.options.dump_after_cmdline) {
+        dump_after_cmdline_and_exit();
+        // not reached
     }
 
     // execute requested actions
