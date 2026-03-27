@@ -121,7 +121,8 @@ SourceFile* get_source_file(const std::string_view filename, const SourceLoc& lo
 }
 
 // read one line of a file
-std::string read_line(const SourceFile& sf, uint32_t line, const SourceLoc& loc) {
+std::string read_line(const SourceFile& sf, uint32_t line,
+                      const SourceLoc& loc) {
     // If line is within bounds, read normally
     if (line < sf.line_offsets.size()) {
         const char* filename = g_strings.c_str(sf.file_id);
