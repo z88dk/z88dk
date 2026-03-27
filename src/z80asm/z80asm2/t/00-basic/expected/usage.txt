@@ -26,5 +26,7 @@ Assembly Options:
   -d            Assemble only if newer
 
 Diagnostic Options:
+  -dump-after-cmdline
+                Dump the command line arguments and exit
   -dump-after-tokenization
                 Dump the lexer token stream and exit

@@ -6,10 +6,4 @@
 
 #pragma once
 
-#include <string_view>
-
-void dump_token(const Token& token);
-void dump_tokens(const std::vector<Token>& tokens);
-
-[[noreturn]]
-void dump_after_tokenization_and_exit(const std::string_view filename);
+[[noreturn]] void dump_after_cmdline_and_exit();
