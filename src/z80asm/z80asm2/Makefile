@@ -63,7 +63,7 @@ cloc:
 	$(PERL) -S cloc --fullpath .
 
 CLEAN_PATTERNS = *.o *.d *.i *.exe *.orig *.core *.bak *~
-CLEAN_DIRS = . t
+CLEAN_DIRS = . t t/* t/*/*
 CLEAN_FILES = \
   $(foreach d,$(CLEAN_DIRS), \
     $(foreach p,$(CLEAN_PATTERNS), \
