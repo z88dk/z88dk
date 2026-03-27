@@ -87,7 +87,8 @@ int main(int argc, char* argv[]) {
     while (ss >> arg) {
         bool found_dash_dash = false;
         if (!parse_arg(arg, found_dash_dash)) {
-            exit_invalid_option(arg);
+            error(SourceLoc("<environment>", 1, 1),
+                  "Invalid option: " + arg);
         }
     }
 
@@ -95,8 +96,14 @@ int main(int argc, char* argv[]) {
     bool found_dash_dash = false;
     for (int i = 1; i < argc; ++i) {
         if (!parse_arg(argv[i], found_dash_dash)) {
-            exit_invalid_option(argv[i]);
+            error(SourceLoc("<command-line>", 1, 1),
+                  "Invalid option: " + std::string(argv[i]));
         }
+    }
+
+    if (g_args.options.dump_after_cmdline) {
+        dump_after_cmdline_and_exit();
+        // not reached
     }
 
     // detect errors from argument processing
@@ -107,11 +114,6 @@ int main(int argc, char* argv[]) {
     if (g_args.input_files.empty()) {
         error("No input files specified");
         exit(EXIT_FAILURE);
-    }
-
-    if (g_args.options.dump_after_cmdline) {
-        dump_after_cmdline_and_exit();
-        // not reached
     }
 
     // execute requested actions
