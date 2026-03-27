@@ -142,12 +142,6 @@ void exit_show_usage(int exit_code) {
     exit(exit_code);
 }
 
-[[noreturn]]
-void exit_invalid_option(const std::string_view option) {
-    error("Invalid option: " + std::string(option));
-    exit(EXIT_FAILURE);
-}
-
 static void append_with_space(std::string& dst, std::string_view src) {
     if (!dst.empty()) {
         dst.push_back(' ');

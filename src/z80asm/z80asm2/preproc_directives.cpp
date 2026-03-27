@@ -105,17 +105,18 @@
 LineType process_directive_line(
     PreprocessorContext& ctx,
     const std::vector<Token>& input_line,
-    LogicalLine& out_line)
-{
+    LogicalLine& out_line) {
     out_line.tokens.clear();
-    out_line.loc = input_line.empty() ? SourceLoc{} : input_line[0].loc;
+    out_line.loc = input_line.empty() ? SourceLoc{} :
+                   input_line[0].loc;
 
     // ---------------------------------------------------------------------
     // 1. Find first non-EndOfLine token
     // ---------------------------------------------------------------------
     size_t i = 0;
-    while (i < input_line.size() && input_line[i].type == TokenType::EndOfLine)
+    while (i < input_line.size() && input_line[i].type == TokenType::EndOfLine) {
         ++i;
+    }
 
     if (i >= input_line.size()) {
         // Empty line -> normal line (macro expander will append EOL)
@@ -133,8 +134,9 @@ LineType process_directive_line(
     // 3. If first token is not an identifier -> normal line
     // ---------------------------------------------------------------------
     if (first.type != TokenType::Identifier) {
-        if (!cond_active)
+        if (!cond_active) {
             return LineType::Skip;
+        }
 
         out_line.tokens = input_line;   // copy as-is
         return LineType::Normal;
@@ -144,8 +146,9 @@ LineType process_directive_line(
 
     if (!keyword_is_preproc_directive(kw)) {
         // Not a directive keyword
-        if (!cond_active)
+        if (!cond_active) {
             return LineType::Skip;
+        }
 
         out_line.tokens = input_line;
         return LineType::Normal;
@@ -196,8 +199,9 @@ LineType process_directive_line(
     // ---------------------------------------------------------------------
     // If conditional block inactive, ignore all other directives
     // ---------------------------------------------------------------------
-    if (!cond_active)
+    if (!cond_active) {
         return LineType::Skip;
+    }
 
     // ---------------------------------------------------------------------
     // INCLUDE

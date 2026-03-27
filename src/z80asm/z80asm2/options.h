@@ -43,4 +43,3 @@ void search_source_file(const std::string_view filename, const SourceLoc& loc);
 
 [[noreturn]] void exit_show_copyright(int exit_code);
 [[noreturn]] void exit_show_usage(int exit_code);
-[[noreturn]] void exit_invalid_option(const std::string_view option);

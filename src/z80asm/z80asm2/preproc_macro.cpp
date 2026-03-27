@@ -126,8 +126,7 @@
 void expand_line(
     PreprocessorContext& ctx,
     const LogicalLine& in,
-    std::vector<Token>& out_tokens)
-{
+    std::vector<Token>& out_tokens) {
     out_tokens.clear();
 
     // ---------------------------------------------------------------------
@@ -142,8 +141,7 @@ void expand_line(
     // ---------------------------------------------------------------------
     // 2. Main expansion loop
     // ---------------------------------------------------------------------
-    while (true)
-    {
+    while (true) {
         if (++expansion_depth > MAX_EXPANSION_DEPTH) {
             error(in.loc, "Macro expansion limit exceeded");
             break;
@@ -154,20 +152,21 @@ void expand_line(
         // -------------------------------------------------------------
         // Scan tokens left-to-right
         // -------------------------------------------------------------
-        for (size_t i = 0; i < work.size(); ++i)
-        {
+        for (size_t i = 0; i < work.size(); ++i) {
             Token& tok = work[i];
 
             // Only identifiers can be macro names
-            if (tok.type != TokenType::Identifier)
+            if (tok.type != TokenType::Identifier) {
                 continue;
+            }
 
             StringInterner::Id name_id = tok.text_id;
 
             // Is this a macro?
             auto it = ctx.macros.find(name_id);
-            if (it == ctx.macros.end())
+            if (it == ctx.macros.end()) {
                 continue;
+            }
 
             MacroBody& macro = it->second;
 
@@ -175,8 +174,7 @@ void expand_line(
             // 2.1 Recursion prevention
             // ---------------------------------------------------------
             if (std::find(expansion_stack.begin(), expansion_stack.end(), name_id)
-                != expansion_stack.end())
-            {
+                    != expansion_stack.end()) {
                 // TODO: compat mode: skip; strict mode: error
                 continue;
             }
@@ -228,15 +226,17 @@ void expand_line(
             }
         }
 
-        if (!expanded_any)
-            break; // no more expansions possible
+        if (!expanded_any) {
+            break;    // no more expansions possible
+        }
     }
 
     // ---------------------------------------------------------------------
     // 3. Finalization: append expanded tokens + EndOfLine
     // ---------------------------------------------------------------------
-    for (const Token& t : work)
+    for (const Token& t : work) {
         out_tokens.push_back(t);
+    }
 
     Token eol;
     eol.type = TokenType::EndOfLine;

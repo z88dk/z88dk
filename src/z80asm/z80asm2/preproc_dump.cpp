@@ -9,5 +9,5 @@
 #include "lexer_dump.h"
 
 void dump_logical_line(const LogicalLine& line) {
-	dump_tokens(line.tokens);
+    dump_tokens(line.tokens);
 }
