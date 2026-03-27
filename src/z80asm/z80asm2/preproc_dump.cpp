@@ -5,3 +5,9 @@
 //-----------------------------------------------------------------------------
 
 #include "preproc_dump.h"
+#include "preproc_context.h"
+#include "lexer_dump.h"
+
+void dump_logical_line(const LogicalLine& line) {
+	dump_tokens(line.tokens);
+}

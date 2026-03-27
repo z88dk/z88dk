@@ -26,5 +26,8 @@ X(DATESTAMP,"-d",      false, "", "Assemble only if newer")
 
 // Diagnostic options
 X(DUMP_AFTER_CMDLINE, "-dump-after-cmdline", false, "", "Dump the command line arguments and exit")
+X(DUMP_AFTER_DIRECTIVES, "-dump-after-directives", false, "", "Dump the token stream after directive processing and exit")
+X(DUMP_AFTER_MACRO_EXPANSION, "-dump-after-macro-expansion", false, "", "Dump the token stream after macro expansion and exit")
+X(DUMP_AFTER_PREPROCESSING, "-dump-after-preprocessing", false, "", "Dump the final preprocessed token stream and exit")
 X(DUMP_AFTER_TOKENIZATION, "-dump-after-tokenization", false, "", "Dump the lexer token stream and exit")
 #undef X
