@@ -126,6 +126,9 @@ Z88DKTARGET_vector06c_disk = vector06c
 ZCFLAGS_vector06c_disk = -subtype=disk
 ZLDFLAGS_vector06c_disk = 
 
+Z88DKTARGET_sam_basic = sam
+ZCFLAGS_sam_basic = -subtype=basic -pragma-redirect:fputc_cons=fputc_cons_native
+ZLDFLAGS_sam_basic = 
 Z88DKTARGET_sam_allram = sam
 ZCFLAGS_sam_allram = -subtype=allram
 ZLDFLAGS_sam_allram = 
