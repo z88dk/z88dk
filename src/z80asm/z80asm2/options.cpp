@@ -78,7 +78,10 @@ static const UsageGroup usage_layout[] = {
     },
     {
         "Diagnostic Options",
-        { OptionType::DUMP_AFTER_TOKENIZATION }
+        {
+            OptionType::DUMP_AFTER_CMDLINE,
+            OptionType::DUMP_AFTER_TOKENIZATION
+        }
     }
 };
 
@@ -343,6 +346,10 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
 
         case OptionType::DATESTAMP:
             g_args.options.date_stamp = true;
+            return true;
+
+        case OptionType::DUMP_AFTER_CMDLINE:
+            g_args.options.dump_after_cmdline = true;
             return true;
 
         case OptionType::DUMP_AFTER_TOKENIZATION:
