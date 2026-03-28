@@ -42,7 +42,7 @@ $(eval $(call build_app, $(CONIO_TARGETS), world_conio.bin, world_conio.c) )
 # Testing the vt100 library
 
 ANSI_TARGETS = abc80 ace aquarius bee cpc gal mc1000 msx msx2_rom mtx mz nascom osca p2000 pc6001 \
-	pps sam sc3000 svi ti82 ti83 ti85 ti86 ti83p ts2068 vz x1 z1013 z88 zx z9001 \
+	pps sam sam_basic sam_highram sam_allram sc3000 svi ti82 ti83 ti85 ti86 ti83p ts2068 vz x1 z1013 z88 zx z9001 \
 	cpm_einstein cpm_einstein256 
 
 CFLAGS_ansitest = -clib=ansi

@@ -8,6 +8,7 @@ SAM_GLOBS := \
 	"target/sam/psg/*.asm" \
 	"target/sam/sam/*.asm" \
 	"target/sam/stdio/*.asm" \
+	"target/sam/stdio/ansi/*.asm" \
 	"target/sam/time/*.asm" \
 	"target/sam/*.asm" \
 	"target/zx/classic/graphics/rowtab.asm" \
@@ -33,6 +34,7 @@ SAM_GLOBS_ex := \
 	target/sam/psg/*.asm \
 	target/sam/sam/*.asm \
 	target/sam/stdio/*.asm \
+	target/sam/stdio/ansi/*.asm \
 	target/sam/time/*.asm \
 	target/sam/*.asm \
 	target/zx/classic/graphics/rowtab.asm \
