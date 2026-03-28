@@ -14,7 +14,7 @@
 
 class StringInterner {
 public:
-    using Id = uint32_t;
+    using Id = uint32_t;        // 4 bytes
 
     // Reserve ID 0 for the empty string
     StringInterner();
@@ -32,7 +32,7 @@ public:
     std::string to_string(Id id) const;
 
     // Optional: number of unique strings.
-    uint32_t size() const noexcept;
+    size_t size() const noexcept;
 
 private:
     std::vector<std::string> pool;

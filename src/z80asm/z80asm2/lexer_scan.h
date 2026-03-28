@@ -9,7 +9,6 @@
 #include "lexer.h"
 #include "source_loc.h"
 #include "string_utils.h"
-#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -20,7 +19,8 @@ struct TokenizeState {
 
 struct MergedLine {
     StringInterner::Id file_id = 0;
-    uint32_t logical_line = 0;      // logical line number (after merging continuations)
+    // logical line number (after merging continuations)
+    size_t logical_line = 0;
     std::string text;               // the merged characters
     std::vector<SourceLoc> locmap;  // same length as text
 };
