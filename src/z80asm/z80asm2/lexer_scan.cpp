@@ -28,11 +28,11 @@ static inline int digit_value(char c) {
 
 // Returns true on success, false on error.
 // Advances idx and writes the decoded character into out_char.
-static bool parse_escape(uint32_t& idx,
+static bool parse_escape(size_t& idx,
                          bool probing,
                          const MergedLine& line,
                          char& out_char) {
-    uint32_t n = static_cast<uint32_t>(line.text.size());
+    size_t n = line.text.size();
     if (idx + 1 >= n) {
         if (!probing) {
             error(line.locmap[idx], "Unterminated escape sequence");
@@ -92,7 +92,7 @@ static bool parse_escape(uint32_t& idx,
                 break;
             }
         }
-        out_char = static_cast<char>(value & 0xFF);
+        out_char = static_cast<char>(static_cast<unsigned char>(value & 0xFF));
         return true;
     }
 
@@ -111,7 +111,7 @@ static bool parse_escape(uint32_t& idx,
             digits++;
             idx++;
         }
-        out_char = char(value & 0xFF);
+        out_char = static_cast<char>(static_cast<unsigned char>(value & 0xFF));
         return true;
     }
 
@@ -126,10 +126,10 @@ static bool parse_escape(uint32_t& idx,
 static bool scan_quoted_content(char end_quote,
                                 bool allow_escapes,
                                 bool probing,
-                                uint32_t& idx,
+                                size_t& idx,
                                 const MergedLine& line,
                                 std::string& out_content) {
-    uint32_t n = static_cast<uint32_t>(line.text.size());
+    size_t n = line.text.size();
     idx++; // skip opening quote
 
     while (idx < n) {
@@ -161,10 +161,10 @@ static bool scan_quoted_content(char end_quote,
 }
 
 static void parse_string(char end_quote,
-                         uint32_t& idx,
+                         size_t& idx,
                          const MergedLine& line,
                          std::vector<Token>& out) {
-    uint32_t start = idx;
+    size_t start = idx;
     std::string content;
 
     if (!scan_quoted_content(end_quote,
@@ -179,11 +179,11 @@ static void parse_string(char end_quote,
                                 line.locmap[start]));
 }
 
-static void parse_char_literal(uint32_t& idx,
+static void parse_char_literal(size_t& idx,
                                const MergedLine& line,
                                std::vector<Token>& out) {
-    uint32_t start = idx;      // points at opening '
-    uint32_t probe = idx;      // speculative index
+    size_t start = idx;      // points at opening '
+    size_t probe = idx;      // speculative index
 
     std::string content;
 
@@ -212,10 +212,10 @@ static void parse_char_literal(uint32_t& idx,
 }
 
 static void parse_raw_string(char end_quote,
-                             uint32_t& idx,
+                             size_t& idx,
                              const MergedLine& line,
                              std::vector<Token>& out) {
-    uint32_t start = idx;
+    size_t start = idx;
     std::string content;
 
     if (!scan_quoted_content(end_quote,
@@ -263,8 +263,8 @@ void tokenize_line(const MergedLine& line,
 
     const char* p = line.text.c_str();
     const char* limit = p + line.text.size();
-    uint32_t idx = 0, start = 0;
-    uint32_t end = static_cast<uint32_t>(line.text.size());
+    size_t idx = 0, start = 0;
+    size_t end = line.text.size();
     auto current_loc = [&]() -> SourceLoc {
         return line.locmap[idx];
     };
@@ -285,7 +285,7 @@ void tokenize_line(const MergedLine& line,
         out.push_back(Token::token(type, token_text, current_loc()));
     };
 
-    for (; idx < end; idx = static_cast<uint32_t>(p - line.text.c_str())) {
+    for (; idx < end; idx = static_cast<size_t>(p - line.text.c_str())) {
         // ------------------------------------------------------------
         // 1. If we are inside a multi-line comment, skip until "*/"
         // ------------------------------------------------------------

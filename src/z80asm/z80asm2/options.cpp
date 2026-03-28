@@ -135,7 +135,8 @@ void exit_show_usage(int exit_code) {
     for (auto& group : usage_layout) {
         std::cout << "\n" << group.title << ":\n";
         for (auto& option_type : group.options) {
-            const OptionSpec& spec = g_option_specs[static_cast<size_t>(option_type)];
+            const OptionSpec& spec =
+                g_option_specs[static_cast<size_t>(option_type)];
             show_option_usage(spec);
         }
     }
@@ -510,7 +511,7 @@ static void search_list_file(const std::string_view list_filename,
     }
 
     // read list file
-    uint32_t file_id = register_virtual_file(list_full_path);
+    StringInterner::Id file_id = register_virtual_file(list_full_path);
     std::string content;
     if (!read_file_to_string(list_full_path, loc, content)) {
         return;
@@ -522,7 +523,7 @@ static void search_list_file(const std::string_view list_filename,
         std::string inc_filename = line.text;
 
         // remove comments and trim
-        uint32_t comment_pos = static_cast<uint32_t>(inc_filename.find_first_of(";#"));
+        size_t comment_pos = inc_filename.find_first_of(";#");
         if (comment_pos != std::string::npos) {
             inc_filename = inc_filename.substr(0, comment_pos);
         }

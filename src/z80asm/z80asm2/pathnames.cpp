@@ -260,7 +260,7 @@ static bool match_name_glob(const std::string_view name, const std::string_view 
 static void glob_walk(const std::filesystem::path& base_fs,
                       const std::filesystem::path& anchor,
                       const std::vector<std::string>& comps,
-                      uint32_t idx,
+                      size_t idx,
                       std::vector<std::filesystem::path>& out) {
     namespace fs = std::filesystem;
 
@@ -347,7 +347,7 @@ std::vector<std::string> expand_wildcards(const std::string_view pattern) {
 
     // Build non-wildcard prefix as base (textual) until first wildcard segment
     fs::path base_prefix;
-    uint32_t wildcard_idx = 0;
+    size_t wildcard_idx = 0;
     for (; wildcard_idx < comps.size(); ++wildcard_idx) {
         const std::string_view seg = comps[wildcard_idx];
         const bool seg_has_wildcard = (seg == "**") ||
