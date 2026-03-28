@@ -1,6 +1,7 @@
 SPC1000_GLOBS := \
 	"target/spc1000/*.asm" \
 	"target/spc1000/games/*.asm" \
+	"target/spc1000/graphics/*.asm" \
 	"target/spc1000/input/*.asm" \
 	"target/spc1000/psg/*.asm" \
 	"target/spc1000/stdio/*.asm" 
@@ -8,6 +9,7 @@ SPC1000_GLOBS := \
 SPC1000_GLOBS_ex := \
 	target/spc1000/*.asm \
 	target/spc1000/games/*.asm \
+	target/spc1000/graphics/*.asm \
 	target/spc1000/input/*.asm \
 	target/spc1000/psg/*.asm \
 
