@@ -120,6 +120,9 @@ endef
 
 $(eval $(call MAKE_EXE,$(PROJ),$(OBJS_ALL)))
 
+all:
+	$(MAKE) -C z80asm2
+
 $(TARGET_EXE) src/options.o: ../config.h
 
 ../config.h:
@@ -225,6 +228,7 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 test: $(TARGET_EXE) $(TARGET_LIB) $(Z80NM)
 	$(MAKE) -C dev/z80asm_lib test
 	perl -S prove --state=slow,save -j$(TASKS) t/*.t
+	$(MAKE) -C z80asm2 test
 
 $(Z80NM): $(Z80NM_DIR)/$(Z80NM)
 	cp $(Z80NM_DIR)/$(Z80NM) $(Z80NM)
@@ -302,4 +306,3 @@ retest: rebuild
 	$(MAKE) -C ../common test
 	$(MAKE) -C ../z80asm test
 	$(MAKE) -C ../zobjcopy test
-
