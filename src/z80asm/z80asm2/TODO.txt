@@ -1,0 +1,121 @@
+tokenize()              // raw tokens, including Tick
+preprocess()            // macros, includes, conditionals ? token stream
+apply_ix_iy_swap()      // semantic rewrite
+apply_identifier_ucase()
+apply_alt_registers()
+apply_dot_directive_merge()
+parse()                 // grammar
+resolve_local_labels()	// ident@ident, @ident
+semantic_analysis()     // symbol resolution, types, CPU rules
+codegen()               // final machine code
+
+tests:
+00–04: fundamental behavior (empty input, basic errors)
+05–09: command-line interface behavior
+10–19: lexical behavior
+20–29: macro semantics
+30–39: directive semantics
+40–49: syntax & grammar
+50–59: semantic rules
+60–69: output behavior
+70–79: integration
+80–89: regression
+90–99: fuzz & pathological
+
+t/<NN>-<topic>/
+t/<NN>-<topic>/<test>.t
+t/<NN>-<topic>/input/*.*
+t/<NN>-<topic>/expected/*.*
+
+t/00-fundamental/
+t/00-fundamental/empty_input.t
+t/00-fundamental/basic_error_reporting.t
+t/00-fundamental/minimal_tokenization.t
+t/00-fundamental/fundamental_behavior.t
+t/00-fundamental/input/
+t/00-fundamental/expected/
+
+t/05-cli/
+t/05-cli/basic_options.t
+t/05-cli/constant_definitions.t
+t/05-cli/wildcards.t
+t/05-cli/list_files.t
+t/05-cli/timestamp_selection.t
+t/05-cli/input/
+t/05-cli/expected/
+
+t/05-expr/
+
+t/10-lex/
+t/10-lex/identifiers.t
+t/10-lex/numeric_literals.t
+t/10-lex/comments.t
+t/10-lex/strings.t
+t/10-lex/lexical_errors.t
+t/10-lex/input/
+t/10-lex/expected/
+
+t/20-macro/
+t/20-macro/substitution.t
+t/20-macro/arguments.t
+t/20-macro/whitespace.t
+t/20-macro/nesting.t
+t/20-macro/recursion_limits.t
+t/20-macro/macro_errors.t
+t/20-macro/input/
+t/20-macro/expected/
+
+t/30-directive/
+t/30-directive/include.t
+t/30-directive/conditionals.t
+t/30-directive/alignment.t
+t/30-directive/mode_switch.t
+t/30-directive/directive_errors.t
+t/30-directive/input/
+t/30-directive/expected/
+
+t/40-parse/
+t/40-parse/instruction_forms.t
+t/40-parse/addressing_modes.t
+t/40-parse/expression_parsing.t
+t/40-parse/syntax_errors.t
+t/40-parse/input/
+t/40-parse/expected/
+
+t/50-semantic/
+t/50-semantic/symbol_resolution.t
+t/50-semantic/forward_references.t
+t/50-semantic/relocations.t
+t/50-semantic/semantic_errors.t
+t/50-semantic/input/
+t/50-semantic/expected/
+
+t/60-codegen/
+t/60-codegen/basic_encoding.t
+t/60-codegen/branch_relocations.t
+t/60-codegen/data_layout.t
+t/60-codegen/codegen_errors.t
+t/60-codegen/input/
+t/60-codegen/expected/
+
+t/70-integration/
+t/70-integration/simple.t
+t/70-integration/macros.t
+t/70-integration/directives.t
+t/70-integration/large.t
+t/70-integration/input/
+t/70-integration/expected/
+
+t/80-regression/
+t/80-regression/issue_001.t
+t/80-regression/issue_002.t
+t/80-regression/macro_loop.t
+t/80-regression/input/
+t/80-regression/expected/
+
+t/90-fuzz/
+t/90-fuzz/minimal.t
+t/90-fuzz/randomized.t
+t/90-fuzz/pathological.t
+t/90-fuzz/input/
+t/90-fuzz/expected/
