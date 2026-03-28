@@ -1,14 +1,6 @@
-target/hgmc/stdio/generic_console
-target/hgmc/stdio/generic_console_ioctl
-target/hgmc/stdio/generic_console_vpeek
-target/hgmc/stdio/CRT_FONT
-target/hgmc/stdio/fputc_cons_native
-target/hgmc/stdio/getk
-target/hgmc/stdio/fgetc_cons
+target/hgmc/obj/${TARGET}/**/*.o
 @classic/stdio/stdio.lst
 
-target/hgmc/graphics/pixladdr
-target/hgmc/graphics/clg
 ; Take the optimised bitmapped stencil render
 classic/gfx/narrow/obj/hgmc/stencil_render
 classic/gfx/narrow/obj/hgmc/putsprite

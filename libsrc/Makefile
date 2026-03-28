@@ -220,12 +220,19 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
+include target/gal/gal.mak
 include target/hector/hector.mak
+include target/hemc/hemc.mak
+include target/hgmc/hgmc.mak
+include target/krokha/krokha.mak
+include target/lynx/lynx.mak
 include target/multi8/multi8.mak
 include target/pps/pps.mak
 include target/sam/sam.mak
+include target/sc3000/sc3000.mak
 include target/sms/sms.mak
 include target/spc1000/spc1000.mak
 include target/ts2068/ts2068.mak
@@ -1376,7 +1383,7 @@ hdos_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=hdos TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhdos -x$(OUTPUT_DIRECTORY)/hdos_clib @$(TARGET_DIRECTORY)/hdos/hdos.lst
 
 # Hübler/Evert-MC - dom
-hemc_clib.lib: $(TARGET_CLIB_DEPS)
+hemc_clib.lib: $(TARGET_CLIB_DEPS) target-hemc
 	@echo ''
 	@echo '--- Building Hübler/Evert-MC Library ---'
 	@echo ''
@@ -1392,7 +1399,7 @@ kramermc_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=kramermc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkramermc -x$(OUTPUT_DIRECTORY)/kramermc_clib @$(TARGET_DIRECTORY)/kramermc/kramermc.lst
 
 # Hübler Grafik MC - dom
-hgmc_clib.lib: $(TARGET_CLIB_DEPS)
+hgmc_clib.lib: $(TARGET_CLIB_DEPS) target-hgmc
 	@echo ''
 	@echo '--- Building Hübler Grafik MC Library ---'
 	@echo ''
@@ -1840,7 +1847,7 @@ embedded_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=embedded TYPE=z80 $(LIBLINKER) -DFORembedded -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/embedded_clib @$(TARGET_DIRECTORY)/embedded/embedded.lst
 
 # Galaksija - Stefano Bodrato
-gal_clib.lib: $(TARGET_CLIB_DEPS)
+gal_clib.lib: $(TARGET_CLIB_DEPS) target-gal
 	@echo ''
 	@echo '--- Building Galaksija Library ---'
 	@echo ''
@@ -1870,7 +1877,7 @@ g850_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=g850 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(TARGET_DIRECTORY)/g800/g850b.lst
 
 # Camputers Lynx - Stefano Bodrato
-lynx_clib.lib: $(TARGET_CLIB_DEPS)
+lynx_clib.lib: $(TARGET_CLIB_DEPS) target-lynx
 	@echo ''
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
@@ -1890,7 +1897,7 @@ sms_clib.lib: $(TARGET_CLIB_DEPS) target-sms
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(TARGET_DIRECTORY)/sms/sms.lst
 
 # Sega SC-3000 - stefano
-sc3000_clib.lib: $(TARGET_CLIB_DEPS)
+sc3000_clib.lib: $(TARGET_CLIB_DEPS) target-sc3000
 	@echo ''
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
@@ -2215,7 +2222,7 @@ homelab2_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=homelab2
 	TARGET=homelab2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab2 -x$(OUTPUT_DIRECTORY)/homelab2_clib @$(TARGET_DIRECTORY)/homelab2/homelab2.lst
 
-krokha_clib.lib: $(TARGET_CLIB_DEPS)
+krokha_clib.lib: $(TARGET_CLIB_DEPS) target-krokha
 	@echo ''
 	@echo '--- Building Krokha (tiny) Library ---'
 	@echo ''
