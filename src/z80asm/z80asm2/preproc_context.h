@@ -8,7 +8,7 @@
 
 #include "const_expr.h"
 #include "lexer.h"
-#include "source.h"
+#include "source_file.h"
 #include "string_interner.h"
 #include <deque>
 #include <unordered_map>

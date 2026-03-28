@@ -137,6 +137,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_dump.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_tokens.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options_dump.cpp" />
@@ -147,9 +148,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_macro.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\semantic_rewrite.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\source.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\source_file.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source_loc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_interner.cpp" />
@@ -163,6 +163,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_dump.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_scan.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_tokens.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options_dump.h" />
@@ -173,9 +174,8 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_macro.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\scan.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\source.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\source_file.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_utils.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_interner.h" />
@@ -183,8 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def" />
+    <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re" />
     <None Include="..\..\src\z80asm\z80asm2\options.def" />
-    <None Include="..\..\src\z80asm\z80asm2\scan.re" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_tokens.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

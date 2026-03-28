@@ -7,8 +7,8 @@
 #include "errors.h"
 #include "lexer.h"
 #include "lexer_keywords.h"
-#include "scan.h"
-#include "source.h"
+#include "lexer_scan.h"
+#include "source_file.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>

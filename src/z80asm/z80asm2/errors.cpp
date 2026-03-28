@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
-#include "source.h"
+#include "source_file.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"

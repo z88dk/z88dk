@@ -21,7 +21,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\source.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\source_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_keywords.cpp">
@@ -46,9 +46,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\semantic_rewrite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\scan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_context.cpp">
@@ -87,12 +84,15 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\options_dump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_scan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\source.h">
+    <ClInclude Include="..\..\src\z80asm\z80asm2\source_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_keywords.h">
@@ -117,9 +117,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\scan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_context.h">
@@ -158,18 +155,21 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\options_dump.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_scan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\src\z80asm\z80asm2\scan.re">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\src\z80asm\z80asm2\options.def">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\src\z80asm\z80asm2\lexer_tokens.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
