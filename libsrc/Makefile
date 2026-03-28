@@ -220,11 +220,14 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
 include target/hector/hector.mak
+include target/multi8/multi8.mak
 include target/pps/pps.mak
 include target/sam/sam.mak
 include target/sms/sms.mak
+include target/spc1000/spc1000.mak
 include target/ts2068/ts2068.mak
 include target/x07/x07.mak
 include target/z88/z88.mak
@@ -1438,7 +1441,7 @@ z80tvgame_clib.lib: $(TARGET_CLIB_DEPS)
 
 
 # Mitsubishi Multi8 - dom
-multi8_clib.lib: $(TARGET_CLIB_DEPS)
+multi8_clib.lib: $(TARGET_CLIB_DEPS) target-multi8
 	@echo ''
 	@echo '--- Building Mitsubishi Multi8 Library ---'
 	@echo ''
@@ -1498,7 +1501,7 @@ alphatro_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_cpm @$(TARGET_DIRECTORY)/alphatro/alphatro_cpm.lst
 
 # SPC-1000 - dom
-spc1000_clib.lib: $(TARGET_CLIB_DEPS)
+spc1000_clib.lib: $(TARGET_CLIB_DEPS) target-spc1000
 	@echo ''
 	@echo '--- Building Samsung SPC-1000 Library ---'
 	@echo ''
@@ -2171,7 +2174,7 @@ sol20_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=sol20
 	TARGET=sol20 TYPE=8080 $(LIBLINKER) -m8080 -DFORsol20 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sol20_clib @$(TARGET_DIRECTORY)/sol20/sol20.lst
 
-agon_clib.lib: $(TARGET_CLIB_DEPS)
+agon_clib.lib: $(TARGET_CLIB_DEPS) target-agon
 	@echo ''
 	@echo '--- Building Agon Light Library ---'
 	@echo ''
