@@ -7,7 +7,7 @@
 
 #include "errors.h"
 #include "lexer.h"
-#include "scan.h"
+#include "lexer_scan.h"
 #include "source_loc.h"
 #include <string>
 #include <vector>
