@@ -9,7 +9,7 @@
 #include "source_loc.h"
 #include <string>
 
-int error_count();
+size_t error_count();
 void error(const SourceLoc& loc, const std::string_view msg);
 void warning(const SourceLoc& loc, const std::string_view msg);
 void note(const SourceLoc& loc, const std::string_view msg);

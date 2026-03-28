@@ -65,7 +65,7 @@ void apply_identifier_ucase(std::vector<Token>& tokens) {
 }
 
 void apply_alt_registers(std::vector<Token>& tokens) {
-    uint32_t i = 0;
+    size_t i = 0;
 
     while (i + 1 < tokens.size()) {
         Token& t = tokens[i];
@@ -98,7 +98,7 @@ void apply_alt_registers(std::vector<Token>& tokens) {
 }
 
 void apply_dot_directive_merge(std::vector<Token>& tokens) {
-    uint32_t i = 0;
+    size_t i = 0;
 
     while (i + 1 < tokens.size()) {
         Token& dot = tokens[i];

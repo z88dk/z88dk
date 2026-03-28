@@ -46,6 +46,6 @@ std::string StringInterner::to_string(Id id) const {
 }
 
 // Optional: number of unique strings.
-uint32_t StringInterner::size() const noexcept {
-    return static_cast<uint32_t>(pool.size());
+size_t StringInterner::size() const noexcept {
+    return pool.size();
 }

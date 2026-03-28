@@ -10,7 +10,6 @@
 #include "source_file.h"
 #include "source_loc.h"
 #include "string_interner.h"
-#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -57,7 +56,7 @@ private:
         std::ifstream stream;
     };
 
-    static constexpr uint32_t max_entries = 16;
+    static constexpr size_t max_entries = 16;
     std::list<Entry> entries;
 };
 
@@ -70,7 +69,7 @@ static std::unordered_map<StringInterner::Id, SourceFile> g_source_cache;
 static std::unordered_set<StringInterner::Id> g_source_loading;
 
 // get a unique ID for a virtual file path (e.g. for included files or generated content)
-uint32_t register_virtual_file(const std::string_view path) {
+StringInterner::Id register_virtual_file(const std::string_view path) {
     return g_strings.intern(path);
 }
 
@@ -121,7 +120,7 @@ SourceFile* get_source_file(const std::string_view filename, const SourceLoc& lo
 }
 
 // read one line of a file
-std::string read_line(const SourceFile& sf, uint32_t line,
+std::string read_line(const SourceFile& sf, size_t line,
                       const SourceLoc& loc) {
     // If line is within bounds, read normally
     if (line < sf.line_offsets.size()) {
@@ -190,18 +189,18 @@ static inline size_t skip_line_ending(const std::string_view content, size_t end
 
 // split into lines, handling CR, CR-LF, and LF
 void split_source_lines(SourceFile& sf, const std::string_view content) {
-    const uint32_t n = static_cast<uint32_t>(content.size());
+    const size_t n = content.size();
 
-    uint32_t pos = 0;
-    uint32_t line = 0;
+    size_t pos = 0;
+    size_t line = 0;
 
     while (pos < n) {
         size_t end = find_line_end(content, pos);
 
         sf.line_offsets.push_back(pos);
-        sf.line_lengths.push_back(static_cast<uint32_t>(end - pos));
+        sf.line_lengths.push_back(end - pos);
 
-        pos = static_cast<uint32_t>(skip_line_ending(content, end));
+        pos = skip_line_ending(content, end);
         ++line;
     }
 
@@ -213,12 +212,12 @@ void split_source_lines(SourceFile& sf, const std::string_view content) {
 }
 
 std::vector<RawLine> split_into_lines(const std::string_view content,
-                                      uint32_t file_id,
-                                      uint32_t starting_line) {
+                                      StringInterner::Id file_id,
+                                      size_t starting_line) {
     std::vector<RawLine> out;
 
-    uint32_t pos = 0;
-    uint32_t line = starting_line;
+    size_t pos = 0;
+    size_t line = starting_line;
 
     while (pos < content.size()) {
         size_t end = find_line_end(content, pos);
@@ -228,7 +227,7 @@ std::vector<RawLine> split_into_lines(const std::string_view content,
         rl.loc = SourceLoc(file_id, line, 1);
         out.push_back(std::move(rl));
 
-        pos = static_cast<uint32_t>(skip_line_ending(content, end));
+        pos = skip_line_ending(content, end);
         ++line;
     }
 

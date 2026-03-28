@@ -10,8 +10,6 @@
 #include <string>
 #include <string_view>
 
-// all strings stored in g_strings for memory efficiency and fast comparisons
-
 // field order for efficient packing into 8 bytes (64 bits):
 struct SourceLoc {
     uint32_t line = 0;      // 4 bytes
@@ -19,11 +17,11 @@ struct SourceLoc {
     uint16_t column = 0;    // 2 bytes
 
     SourceLoc() = default;
-    SourceLoc(int file, int ln, int col);
-    SourceLoc(const std::string_view file, int ln, int col);
+    SourceLoc(int file, size_t ln, size_t col);
+    SourceLoc(const std::string_view file, size_t ln, size_t col);
 
-    static SourceLoc make(const std::string_view file, int line, int column);
-
+    static SourceLoc make(const std::string_view file,
+                          size_t line, size_t column);
     bool empty() const;
     std::string to_string() const;
 };
