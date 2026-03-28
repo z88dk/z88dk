@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
-#include <malloc.h>
 #include <sstream>
 
 // Helper: get environment variable value in a secure, cross-platform way.
