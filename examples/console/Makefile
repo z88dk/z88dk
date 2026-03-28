@@ -20,6 +20,7 @@ WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_einstein256 cpm_attache cpm_os
 	cpm_zxplus3 cpm_bondwell cpm_bondwell2 cpm_8080 cpm_corvette cpm_nabu cpm_x820 cpm_v1050
 
 LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001
+LDFLAGS_sam_basic_world = -pragma-redirect:fputc_cons=fputc_cons_native
 
 
 OUTPUT_BINS += $(foreach target, $(WORLD_TARGETS),  build/$(target)/world.bin )
