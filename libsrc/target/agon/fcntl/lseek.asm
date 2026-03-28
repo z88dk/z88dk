@@ -35,10 +35,10 @@ ___lseek:
     jr      nz, seek_from_end
 ; Seek from current position
     MOSCALL (mos_getfil)                ;exits with hlu = file structure
-    push    .lhl
-    pop     .lix
-    ld      .lhl, (ix+fil_fptr)
-    ld      .lde, (ix+fil_fptr+2)
+    push.l  hl
+    pop.l   ix
+    ld.l    hl, (ix+fil_fptr)
+    ld.l    de, (ix+fil_fptr+2)
     call    l_long_add
     pop     bc
     jr      doseek
@@ -46,10 +46,10 @@ ___lseek:
 ; Seek from end
 seek_from_end:
     MOSCALL (mos_getfil)                ;exits with hlu = file structure
-    push    .lhl
-    pop     .lix
-    ld      .lhl, (ix+ffobjid_objsize)
-    ld      .lde, (ix+ffobjid_objsize+2)
+    push.l   hl
+    pop.l    ix
+    ld.l     hl, (ix+ffobjid_objsize)
+    ld.l     de, (ix+ffobjid_objsize+2)
     call    l_long_add
     pop     bc
 
@@ -65,11 +65,11 @@ doseek:
     ret                                 ;fail to seek
 get_position:
     MOSCALL (mos_getfil)                ;exits with hlu = file structure
-    push    .lhl
-    pop     .lix
-    ld      .lhl, (ix+fil_fptr)
-    ld      .lde, (ix+fil_fptr+2)
-    pop     ix
+    push.l   hl
+    pop.l    ix
+    ld.l     hl, (ix+fil_fptr)
+    ld.l     de, (ix+fil_fptr+2)
+    pop      ix
     ret
 
 
