@@ -5,6 +5,7 @@ GAL_GLOBS := \
 	"target/gal/interrupt/*.asm" \
 	"target/gal/psg/*.asm" \
 	"target/gal/stdio/*.asm" \
+	"target/gal/stdio/ansi/*.asm" \
 	"target/gal/time/*.asm" 
 
 GAL_GLOBS_ex := \
@@ -14,6 +15,7 @@ GAL_GLOBS_ex := \
 	target/gal/interrupt/*.asm \
 	target/gal/psg/*.asm \
 	target/gal/stdio/*.asm \
+	target/gal/stdio/ansi/*.asm \
 	target/gal/time/*.asm 
 
 
