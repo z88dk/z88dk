@@ -8,7 +8,7 @@
 #include "errors.h"
 #include "options.h"
 #include "pathnames.h"
-#include "source.h"
+#include "source_file.h"
 #include "string_utils.h"
 #include <cassert>
 #include <filesystem>
