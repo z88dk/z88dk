@@ -6,12 +6,9 @@
 
 #pragma once
 
-#include <cstdint>
 #include "lexer_keywords.h"
 #include "string_interner.h"
 #include "source_loc.h"
-
-// all strings stored in g_strings for memory efficiency and fast comparisons
 
 enum class TokenType : uint8_t {
 #define X(id, text) id,
@@ -21,9 +18,9 @@ enum class TokenType : uint8_t {
 struct Token {
     TokenType type = TokenType::EndOfLine;  // 1 byte
     Keyword keyword = Keyword::None;        // 2 bytes
-    StringInterner::Id text_id = 0;
+    StringInterner::Id text_id = 0;         // 4 bytes
 
-    union {                                 // 4 bytes
+    union {                                 // 8 bytes
         int int_value;
         double float_value;
         StringInterner::Id str_value_id;

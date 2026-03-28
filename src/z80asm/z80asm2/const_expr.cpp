@@ -17,7 +17,7 @@
 
 struct ExprParseContext {
     const std::vector<Token>& tokens;
-    uint32_t& pos;
+    size_t& pos;
     const ConstSymbols& sym;
     bool silent;
 };
@@ -531,7 +531,7 @@ static bool parse_const_expr_conditional(ExprParseContext& ctx, int& result) {
 }
 
 bool eval_const_expr(
-    const std::vector<Token>& tokens, uint32_t& pos,
+    const std::vector<Token>& tokens, size_t& pos,
     const ConstSymbols& sym, int& result, bool silent) {
     ExprParseContext ctx{ tokens, pos, sym, silent };
     return parse_const_expr_conditional(ctx, result);
@@ -541,7 +541,7 @@ bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result,
                      bool silent) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
-    uint32_t pos = 0;
+    size_t pos = 0;
     if (!eval_const_expr(tokens, pos, sym, result, silent)) {
         return false;
     }
