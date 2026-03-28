@@ -24,12 +24,7 @@ z80asm/t/test_symtab.out
 
 z80asm/test_t_*
 z80asm/z80asm
-z80asm/z80asm2
 z80asm/z88dk-z80asm
-
-z80asm2/re2c
-z80asm2/t/test
-z80asm2/z80asm2
 
 z80nm/z80nm
 z80nm/z88dk-z80nm
