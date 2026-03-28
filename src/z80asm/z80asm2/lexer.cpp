@@ -11,7 +11,6 @@
 #include "source_file.h"
 #include "source_loc.h"
 #include "string_interner.h"
-#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -86,20 +85,20 @@ static bool strip_line_continuation(std::string& line) {
 
 static std::string_view get_line_view(const SourceFile& sf,
                                       const std::string_view content,
-                                      uint32_t line) {
-    uint32_t off = sf.line_offsets[line];
-    uint32_t len = sf.line_lengths[line];
+                                      size_t line) {
+    size_t off = sf.line_offsets[line];
+    size_t len = sf.line_lengths[line];
     return std::string_view(content.data() + off, len);
 }
 
 void tokenize(SourceFile& sf, const std::string_view content) {
     TokenizeState state;
-    uint32_t num_lines = static_cast<uint32_t>(sf.line_offsets.size());
+    size_t num_lines = sf.line_offsets.size();
 
     sf.lines_tokens.resize(num_lines);
 
-    for (uint32_t i = 0; i < num_lines; ++i) {
-        uint32_t logical_start = i;
+    for (size_t i = 0; i < num_lines; ++i) {
+        size_t logical_start = i;
 
         // Build merged logical line
         MergedLine merged;
@@ -113,7 +112,7 @@ void tokenize(SourceFile& sf, const std::string_view content) {
         merged.locmap.reserve(first.size());
 
         int col = 1;
-        uint32_t physical_line = i + 1;
+        size_t physical_line = i + 1;
 
         for (char c : first) {
             merged.text.push_back(c);

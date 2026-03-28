@@ -19,7 +19,7 @@ void dump_token(const Token& token) {
 #include "lexer_tokens.def"
     };
 
-    std::cout << token_type_names[static_cast<int>(token.type)] << "\t"
+    std::cout << token_type_names[static_cast<size_t>(token.type)] << "\t"
               << escape_string(g_strings.view(token.text_id)) << "\t"
               << token.loc.line << ":" << token.loc.column << "\t";
 

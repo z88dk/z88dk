@@ -18,7 +18,7 @@ bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result,
                      bool silent);
 
-bool eval_const_expr(const std::vector<Token>& tokens, uint32_t& pos,
+bool eval_const_expr(const std::vector<Token>& tokens, size_t& pos,
                      const ConstSymbols& sym, int& result,
                      bool silent);
 

@@ -12,24 +12,24 @@
 #include <iostream>
 #include <string_view>
 
-static int error_count_ = 0;
+static size_t error_count_ = 0;
 
-int error_count() {
+size_t error_count() {
     return error_count_;
 }
 
-static void print_source_line(std::string_view text, int column) {
+static void print_source_line(std::string_view text, size_t column) {
     std::cerr << "    " << text << std::endl;
 
-    if (column <= 0) {
+    if (column == 0) {
         return;
     }
 
     std::string marker;
     marker.reserve(column);
 
-    for (int i = 0; i < column - 1; i++) {
-        if (i < static_cast<int>(text.size()) && is_space(text[i])) {
+    for (size_t i = 0; i < column - 1; i++) {
+        if (i < text.size() && is_space(text[i])) {
             marker += text[i];
         }
         else {

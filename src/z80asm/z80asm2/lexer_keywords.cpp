@@ -23,7 +23,7 @@ std::string keyword_to_string(Keyword kw) {
 #define X(id, text, flags) text,
 #include "lexer_keywords.def"
     };
-    return keyword_strings[static_cast<int>(kw)];
+    return keyword_strings[static_cast<size_t>(kw)];
 }
 
 static const int keyword_flags[] = {
@@ -33,62 +33,62 @@ static const int keyword_flags[] = {
 };
 
 bool keyword_is_preproc_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_PREPROC_DIRECTIVE) != 0;
 }
 
 bool keyword_directive_has_file_arg(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & DIRECTIVE_HAS_FILE_ARG) != 0;
 }
 
 bool keyword_is_preproc_name_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_PREPROC_NAME_DIRECTIVE) != 0;
 }
 
 bool keyword_is_asm_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_ASM_DIRECTIVE) != 0;
 }
 
 bool keyword_is_conditional_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_CONDITIONAL_DIRECTIVE) != 0;
 }
 
 bool keyword_is_hla_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_HLA_DIRECTIVE) != 0;
 }
 
 bool keyword_is_register(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_REGISTER) != 0;
 }
 
 bool keyword_is_segment_register(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_SEGMENT_REGISTER) != 0;
 }
 
 bool keyword_is_8bit_register(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_8BIT_REGISTER) != 0;
 }
 
 bool keyword_is_x_register(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_X_REGISTER) != 0;
 }
 
 bool keyword_is_flag(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_FLAG) != 0;
 }
 
 bool keyword_is_opcode(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
+    int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_OPCODE) != 0;
 }
 
