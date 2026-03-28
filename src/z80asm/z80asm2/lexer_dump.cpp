@@ -6,7 +6,7 @@
 
 #include "lexer.h"
 #include "lexer_dump.h"
-#include "source.h"
+#include "source_file.h"
 #include "source_loc.h"
 #include "string_utils.h"
 #include <cstdlib>
