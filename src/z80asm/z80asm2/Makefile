@@ -46,11 +46,11 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 # Rule to produce .cpp from .re using re2c
-$(PROJ)$(EXE): $(OBJ_DIR)/scan.o
+$(PROJ)$(EXE): $(OBJ_DIR)/lexer_scan.o
 
-scan.cpp: scan.re Makefile
-	$(RE2C) $(RE2CFLAGS) scan.re -o scan.cpp
-	$(DOS2UNIX) scan.cpp
+lexer_scan.cpp: lexer_scan.re Makefile
+	$(RE2C) $(RE2CFLAGS) lexer_scan.re -o lexer_scan.cpp
+	$(DOS2UNIX) lexer_scan.cpp
 
 
 test:: $(PROJ)$(EXE)
