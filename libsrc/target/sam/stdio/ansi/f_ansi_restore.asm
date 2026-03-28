@@ -1,12 +1,12 @@
 ;
-;       SAM Coupé C Library
+;   SAM CoupÃ© C Library
 ;
-; 	ANSI Video handling for SAM Coupé
+;   ANSI Video handling for SAM CoupÃ©
 ;
-; 	Restors the attributes to previous setting
+;   Restors the attributes to previous setting
 ;
 ;
-;	Frode Tennebø - 29/12/2002
+;   Frode TennebÃ¸ - 29/12/2002
 ;
 
     SECTION code_clib

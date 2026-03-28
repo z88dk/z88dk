@@ -1,14 +1,12 @@
 ;
-;       SAM Coupé C Library
+;   SAM CoupÃ© C Library
 ;
-; 	ANSI Video handling for SAM Coupé
+;   ANSI Video handling for SAM CoupÃ©
 ;
-;	Scrolls one line
+;   Scrolls one line
 ;
 ;
-;	Frode Tennebø - 29/12/2002
-;
-;	$Id: f_ansi_scrollup.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
+;   Frode TennebÃ¸ - 29/12/2002
 ;
 
     SECTION code_clib

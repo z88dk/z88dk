@@ -1,28 +1,25 @@
 ;
-;       SAM Coup� C Library
+;   SAM Coupé C Library
 ;
-; 	ANSI Video handling for SAM Coup�
-;
-;
-; 	Handles colors referring to current PAPER/INK/etc. settings
-;
-;	** alternate (smaller) 4bit font capability:
-;	** use the -DPACKEDFONT flag
-;	** ROM font -DROMFONT
-;
-;	set it up with:
-;	.__console_w	= max columns
-;	.__console_h	= max rows
-;	.DOTS+1		= char size
-;	.font		= font file
-;
-;	Display a char in location (__console_y),(__console_x)
-;	A=char to display
-;
-;       Frode Tenneb� - 29/12/2002
+;   ANSI Video handling for SAM Coupé
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
+;   Handles colors referring to current PAPER/INK/etc. settings
+;
+;   ** alternate (smaller) 4bit font capability:
+;   ** use the -DPACKEDFONT flag
+;   ** ROM font -DROMFONT
+;
+;   set it up with:
+;   .__console_w    = max columns
+;   .__console_h    = max rows
+;   .DOTS+1     = char size
+;   .font       = font file
+;
+;   Display a char in location (__console_y),(__console_x)
+;   A=char to display
+;
+;   Frode Tennebø - 29/12/2002
 ;
 
     SECTION code_clib
@@ -143,17 +140,17 @@ nounderline:
 ; IF ROMFONT
 ;   ld hl,15360
 ; ELSE
-; 	IF PACKEDFONT
-; 	  xor	a
-; 	  rr	b
-; 	  jr	c,even
-; 	  ld	a,4
-; 	.even
-; 	  ld	(ROLL+1),a
-; 	  ld hl,font-128
-; 	ELSE
-; 	  ld hl,font
-; 	ENDIF
+;   IF PACKEDFONT
+;     xor a
+;     rr b
+;     jr c,even
+;     ld a,4
+;   .even
+;     ld (ROLL+1),a
+;     ld hl,font-128
+;   ELSE
+;     ld hl,font
+;   ENDIF
 ; ENDIF
 
 ;   ld de,8
@@ -178,16 +175,16 @@ nounderline:
 ;   ld a,(hl)
 
 ; IF ROMFONT
-; 	; nothing here !
+;   ; nothing here !
 ; ELSE
-; 	IF PACKEDFONT
-; 	.ROLL
-; 	  jr INVRS
-; 	  rla
-; 	  rla
-; 	  rla
-; 	  rla
-; 	ENDIF
+;   IF PACKEDFONT
+;   .ROLL
+;     jr INVRS
+;     rla
+;     rla
+;     rla
+;     rla
+;   ENDIF
 ; ENDIF
 
 ; .INVRS
@@ -245,10 +242,10 @@ nounderline:
 
 
 ; IF ROMFONT
-; 	; nothing here !
+;  ; nothing here !
 ; ELSE
 ; .font
-;         BINARY  "classic/stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
+;         BINARY  "classic/stdio/ansi/F4PACK.BIN" ; <- put the FONT name here !
 ; ENDIF
 
     SECTION bss_clib

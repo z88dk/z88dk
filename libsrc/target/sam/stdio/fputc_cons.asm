@@ -1,12 +1,12 @@
 ;
-;       SAM Coup� C Library
+;   SAM Coupé C Library
 ;
-;	Print character to the screen
+;   Print character to the screen
 ;
-;       We will corrupt any register
+;   We will corrupt any register
 ;
 ;
-;	Frode Tenneb� - 29/12/2002
+;   Frode Tennebø - 29/12/2002
 
 
     SECTION code_driver
@@ -19,6 +19,7 @@
 
 
 fputc_cons_native:
+
     ld      hl, 2
     add     hl, sp
     ld      b, (hl)
@@ -29,6 +30,7 @@ fputc_cons_native:
     jr      z, continue
     dec     (hl)
     jr      direct
+
 continue:
     cp      22                          ;move to
     jr      nz, not_posn
@@ -44,6 +46,7 @@ not_lf:
     call    $014E
     ld      a, 0xfe                     ;screen
     jp      $0112
+
 direct:
     rst     16
     ld      a, 255
