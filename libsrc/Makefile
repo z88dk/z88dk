@@ -227,9 +227,13 @@ include target/gal/gal.mak
 include target/hector/hector.mak
 include target/hemc/hemc.mak
 include target/hgmc/hgmc.mak
+include target/kramermc/kramermc.mak
 include target/krokha/krokha.mak
+include target/laser500/laser500.mak
+include target/lviv/lviv.mak
 include target/lynx/lynx.mak
 include target/multi8/multi8.mak
+include target/phc25/phc25.mak
 include target/pps/pps.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
@@ -1253,7 +1257,7 @@ phc20_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=phc20 TYPE=z80 $(LIBLINKER) -DFORphc20 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc20_clib @$(TARGET_DIRECTORY)/phc20/phc20.lst
 
 # PHC-25 library 
-phc25_clib.lib: $(TARGET_CLIB_DEPS)
+phc25_clib.lib: $(TARGET_CLIB_DEPS) target-phc25
 	@echo ''
 	@echo '--- Building Sanyo PHC-25 Library ---'
 	@echo ''
@@ -1391,7 +1395,7 @@ hemc_clib.lib: $(TARGET_CLIB_DEPS) target-hemc
 	TARGET=hemc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhemc -x$(OUTPUT_DIRECTORY)/hemc_clib @$(TARGET_DIRECTORY)/hemc/hemc.lst
 
 # Kramer-MC - dom
-kramermc_clib.lib: $(TARGET_CLIB_DEPS)
+kramermc_clib.lib: $(TARGET_CLIB_DEPS) target-kramermc
 	@echo ''
 	@echo '--- Building Kramer-MC Library ---'
 	@echo ''
@@ -1467,7 +1471,7 @@ pasopia7_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(TARGET_DIRECTORY)/pasopia7/pasopia7.lst
 
 # VTech VZ700- dom
-laser500_clib.lib: $(TARGET_CLIB_DEPS)
+laser500_clib.lib: $(TARGET_CLIB_DEPS) target-laser500
 	@echo ''
 	@echo '--- Building VTech Laser 350/500/700 Library ---'
 	@echo ''
@@ -2158,7 +2162,7 @@ pk8000_clib.lib: $(TARGET_CLIB_DEPS)
 	#$(MAKE) -C classic/games TARGET=vector06c
 	TARGET=pk8000 TYPE=8080 $(LIBLINKER) -m8080 -DFORpk8000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pk8000_clib @$(TARGET_DIRECTORY)/pk8000/pk8000.lst
 
-lviv_clib.lib: $(TARGET_CLIB_DEPS)
+lviv_clib.lib: $(TARGET_CLIB_DEPS) target-lviv
 	@echo ''
 	@echo '--- Building PK-01 Lviv/Lvov Library ---'
 	@echo ''
