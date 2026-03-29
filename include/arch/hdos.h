@@ -134,8 +134,7 @@ extern int __LIB__ dir_get_entry_type(void);  // 0=normal, 1=directory
 extern char __LIB__ *dir_get_entry_name(void);
 extern unsigned long __LIB__ dir_get_entry_size(void);
 #define dir_get_entry_type() 0
-extern int __LIB__ get_dir_name(void);
-extern int __LIB__ get_current_volume(void);
+extern char __LIB__ *default_device(void);
 
 
 /*******************/
