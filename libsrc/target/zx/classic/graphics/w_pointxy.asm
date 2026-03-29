@@ -10,12 +10,12 @@
     EXTERN  pointxy_MODE64
     EXTERN  pointxy_MODE128
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     defc    NEEDpointxy=1
 
 
 w_pointxy:
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     cp      3
     jp      c, pointxy_MODE0
   IF    FORzxn

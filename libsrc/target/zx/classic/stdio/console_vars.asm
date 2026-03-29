@@ -2,8 +2,9 @@
     MODULE  console_vars
 
     PUBLIC  __zx_screenmode
-    PUBLIC  __zx_32col_font
+    PUBLIC  __zx_gfxmode
     PUBLIC  __zx_32col_udgs
+    PUBLIC  __zx_32col_font
     PUBLIC  __zx_64col_font
     PUBLIC  __zx_print_routine
 
@@ -30,6 +31,15 @@ __zx_print_routine:
 ; 2 = high colour
 ; 6 = hires
 ; bit 6 set = tilemap (ZXN)
+; bit 7 set = layer 2 (ZXN)
+;
+; On the zxn we can separate graphics mode from console mode, so this variable is used to track the current graphics mode for the console driver
+; on +zx etc, the mode is the same for both console and graphics
+__zx_gfxmode:
+IF FORzxn
+    defb    0
+ENDIF
+
 __zx_screenmode:
   IF    FORsam
     defb    3                           ;Mode 4 is the default mode

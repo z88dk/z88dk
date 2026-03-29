@@ -12,7 +12,7 @@ IF FORts2068|FORzxn
 
     PUBLIC  asm_xorclga
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
 IF    !FORts2068
     EXTERN  w_xorpixel
     EXTERN  w_area
@@ -44,7 +44,7 @@ _xorclga_callee:
 
 asm_xorclga:
 
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     and     7
     jp      z,fast_xorclga_m0
 

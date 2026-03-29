@@ -6,7 +6,7 @@
 
     PUBLIC  hl_inc_x_MODE6
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     EXTERN  __zx_console_attr
 
   IF    FORsam|FORz88
@@ -17,7 +17,7 @@
 
 
 hl_inc_x_MODE6:
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
 	and     7
   IF    FORts2068|FORzxn
     cp      6

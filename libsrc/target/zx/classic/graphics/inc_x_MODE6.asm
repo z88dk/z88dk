@@ -6,7 +6,7 @@
     PUBLIC  inc_x_MODE6
 
 IF    FORts2068|FORzxn
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
 ENDIF
     EXTERN  __zx_console_attr
 
@@ -14,7 +14,7 @@ ENDIF
 inc_x_MODE6:
 
 IF    FORts2068|FORzxn
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
 ;    and     a
 	and     7
     jr      z,_mode0

@@ -5,7 +5,7 @@
 
     SECTION code_graphics
     PUBLIC  pixeladdress_MODE6
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     EXTERN  __gfx_fatpix
 
 ; ******************************************************************

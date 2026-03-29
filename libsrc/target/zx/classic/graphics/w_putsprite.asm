@@ -8,7 +8,7 @@ IF FORts2068|FORzxn
     PUBLIC  putsprite
     PUBLIC  _putsprite
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     EXTERN  __generic_putsprite
 
     EXTERN  w_pixeladdress
@@ -28,7 +28,7 @@ ENDIF
 putsprite:
 _putsprite:
 
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     and     7
     jr      z,fast_putsprite_m0
 

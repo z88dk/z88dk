@@ -2450,6 +2450,7 @@
 #define __RTM_3MHZ  0x00
 #define __RTM_7MHZ  0x01
 #define __RTM_14MHZ  0x02
+#define __RTM_28MHZ  0x03
 
 #define __REG_PERIPHERAL_3  8
 #define __RP3_STEREO_ABC  0x00

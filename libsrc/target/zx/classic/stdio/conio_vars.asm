@@ -1,7 +1,7 @@
 ; Some console variables shared with the -clib=ansi driver
 ;
 
-    MODULE  console_vars
+    MODULE  conio_vars
 
     PUBLIC  __zx_console_attr
 

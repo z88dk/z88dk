@@ -154,6 +154,7 @@ define(`__REG_TURBO_MODE', 7)
 define(`__RTM_3MHZ', 0x00)
 define(`__RTM_7MHZ', 0x01)
 define(`__RTM_14MHZ', 0x02)
+define(`__RTM_28MHZ', 0x03)
 
 # (R/W) 0x08 (08) => Peripheral 3 setting:
 #  bit 7 = 128K paging enable (inverse of port 0x7ffd, bit 5) 
@@ -656,6 +657,7 @@ PUBLIC `__REG_TURBO_MODE'
 PUBLIC `__RTM_3MHZ'
 PUBLIC `__RTM_7MHZ'
 PUBLIC `__RTM_14MHZ'
+PUBLIC `__RTM_28MHZ'
 
 PUBLIC `__REG_PERIPHERAL_3'
 PUBLIC `__RP3_STEREO_ABC'
@@ -886,6 +888,7 @@ defc `__REG_TURBO_MODE' = __REG_TURBO_MODE
 defc `__RTM_3MHZ' = __RTM_3MHZ
 defc `__RTM_7MHZ' = __RTM_7MHZ
 defc `__RTM_14MHZ' = __RTM_14MHZ
+defc `__RTM_28MHZ' = __RTM_28MHZ
 
 defc `__REG_PERIPHERAL_3' = __REG_PERIPHERAL_3
 defc `__RP3_STEREO_ABC' = __RP3_STEREO_ABC
@@ -1116,6 +1119,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__RTM_3MHZ'  __RTM_3MHZ
 `#define' `__RTM_7MHZ'  __RTM_7MHZ
 `#define' `__RTM_14MHZ'  __RTM_14MHZ
+`#define' `__RTM_28MHZ'  __RTM_28MHZ
 
 `#define' `__REG_PERIPHERAL_3'  __REG_PERIPHERAL_3
 `#define' `__RP3_STEREO_ABC'  __RP3_STEREO_ABC

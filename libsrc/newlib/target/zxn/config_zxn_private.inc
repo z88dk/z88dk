@@ -2458,6 +2458,7 @@ defc __REG_TURBO_MODE = 7
 defc __RTM_3MHZ = 0x00
 defc __RTM_7MHZ = 0x01
 defc __RTM_14MHZ = 0x02
+defc __RTM_28MHZ = 0x03
 
 defc __REG_PERIPHERAL_3 = 8
 defc __RP3_STEREO_ABC = 0x00

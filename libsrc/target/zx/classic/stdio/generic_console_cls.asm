@@ -7,6 +7,7 @@ IFNDEF FORsam
 
     SECTION code_driver
     PUBLIC  generic_console_cls
+    PUBLIC  generic_console_cls_with_mode
 
     EXTERN  generic_console_zxn_tile_cls
     EXTERN  generic_console_zxn_layer2_cls
@@ -20,13 +21,16 @@ IFNDEF FORsam
 
 
 generic_console_cls:
+IF    FORts2068|FORzxn
+    ld      a, (__zx_screenmode)
+ENDIF
+; Entry: a = screen mode (for ZXN and TS2068)
+generic_console_cls_with_mode:
     push    de
     push    bc
     ld      hl, SCREEN_BASE
     ld      de, SCREEN_BASE+1
-
   IF    FORts2068|FORzxn
-    ld      a, (__zx_screenmode)
    IF  FORzxn
     bit     7,a
     jp      nz, generic_console_zxn_layer2_cls

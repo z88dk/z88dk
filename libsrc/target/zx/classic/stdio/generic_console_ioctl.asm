@@ -10,6 +10,7 @@
     EXTERN  __zx_64col_font
     EXTERN  __zx_32col_udgs
     EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     EXTERN  __console_w
     EXTERN  __zx_mode0_console_w
 
@@ -115,6 +116,9 @@ check_mode:
 ;zxn modes
     ld      a, c
     ld      (__zx_screenmode), a
+IF FORzxn
+    ld      (__zx_gfxmode), a
+ENDIF
     bit     7,a
     jr      nz,set_layer2
     ; Mode 64 = 40 column
@@ -167,6 +171,9 @@ set_layer2:
   ENDIF
 set_mode:
     ld      (__zx_screenmode), a
+IF FORzxn
+    ld      (__zx_gfxmode), a
+ENDIF
     ld      a, h
     ld      (generic_console_caps), a
     ld      h, $18                      ;Console height

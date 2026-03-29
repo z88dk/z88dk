@@ -12,7 +12,7 @@ IF FORts2068|FORzxn
 
     PUBLIC  asm_fillb
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
 IF    !FORts2068
     EXTERN  w_plotpixel
     EXTERN  w_area
@@ -44,7 +44,7 @@ _fillb_callee:
 
 asm_fillb:
 
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     and     7
     jp      z,fast_fillb_m0
 
