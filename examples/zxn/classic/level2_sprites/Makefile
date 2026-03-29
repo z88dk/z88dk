@@ -8,4 +8,4 @@ sprite.nex: $(FILES)
 
 
 clean:
-	$(RM) *.nex
+	$(RM) *.nex *.bin
