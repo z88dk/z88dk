@@ -628,6 +628,7 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define RTM_3MHZ  __RTM_3MHZ
 #define RTM_7MHZ  __RTM_7MHZ
 #define RTM_14MHZ  __RTM_14MHZ
+#define RTM_28MHZ  __RTM_28MHZ
 
 #define REG_PERIPHERAL_3  __REG_PERIPHERAL_3
 #define RP3_STEREO_ABC  __RP3_STEREO_ABC
@@ -1608,6 +1609,12 @@ extern int __LIB__ zx_pattern_fill_callee(unsigned char x,unsigned char y,void *
 
 // Create tilemap graphics (for lores graphics) - uses tiles 0-15
 extern void __LIB__ zxn_create_tilemap_graphics(void);
+
+// Set the grpahics mode.
+//
+// This function allows text to continue to printed to mode selected, and graphics
+// displayed on the mode selected here.
+extern void __LIB__ zxn_set_graphics_mode(int mode);
 
 
 #endif

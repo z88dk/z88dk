@@ -5,7 +5,8 @@
 
     https://en.wikipedia.org/wiki/ANSI_escape_code
 
-    zcc +sam -clib=ansi ansitest.c -o ansitest.mgt -create-app
+    zcc +sam                -clib=ansi ansitest.c -o ansitest.mgt -create-app
+    zcc +sam -subtype=basic -clib=ansi ansitest.c -o ansitest.mgt -create-app
 */
 
 #include <arch/sam.h>
@@ -22,24 +23,34 @@ static char* AnsiColor[] = {
     "White"
 };
 
-static char* AnsiPalette [] = { // libsrc/classic/stdio/ansi/gencon/f_ansi_attr.asm colourmap:
-    //    GRBIgrb
-     0, 0b0000000, // Black
-     4, 0b0100010, // Red
-     2, 0b1000100, // Green
-    14, 0b1100110, // Yellow
-     1, 0b0010001, // Blue
-     5, 0b0110011, // Magenta
-     3, 0b1010101, // Cyan
-    15, 0b1110111  // White
-};
+#if ( defined(__ALLRAM__) || defined(__HIGHRAM__) ) // see lib/config/sam.cfg
+
+    #define setPalette
+
+    static char* AnsiPalette [] = { // libsrc/classic/stdio/ansi/gencon/f_ansi_attr.asm colourmap:
+        //    GRBIgrb
+        0, 0b0000000, // Black
+        4, 0b0100010, // Red
+        2, 0b1000100, // Green
+        14, 0b1100110, // Yellow
+        1, 0b0010001, // Blue
+        5, 0b0110011, // Magenta
+        3, 0b1010101, // Cyan
+        15, 0b1110111  // White
+    };
+
+#endif
 
 void main() {
 
     int x;
 
+  #ifdef setPalette
+
     for ( x = 0; x < 8; x++ )
         sam_set_palette(  AnsiPalette[x*2], AnsiPalette[x*2+1] );
+
+  #endif
 
     // Control Sequence Introducer (CSI)
 

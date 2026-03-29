@@ -19,7 +19,7 @@
     EXTERN  generic_console_zxn_tile_scrollup
     EXTERN  generic_console_zxn_layer2_scrollup
 
-  IF    FORsam|FORz88
+  IF    FORsam|FORz88|FORzxn
     defc    NOROMCALLS=1
     EXTERN  SCREEN_BASE
     EXTERN  __sam_graphics_pagein

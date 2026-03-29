@@ -12,7 +12,7 @@ IF FORts2068|FORzxn
 
     PUBLIC  asm_clga
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
 IF    !FORts2068
     EXTERN  w_respixel
     EXTERN  w_area
@@ -44,7 +44,7 @@ _clga_callee:
 
 asm_clga:
 
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     and     7
     jp      z,fast_clga_m0
 

@@ -5,7 +5,7 @@
 
     PUBLIC  __set_zx_pixel_colour
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     EXTERN  __zx_console_attr
     EXTERN  SCREEN_BASE
 
@@ -14,7 +14,7 @@
 __set_zx_pixel_colour:
        ; Now set the attribute
     set     5, h                        ;Assume we're in mode 2
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     cp      2
     jr      z, set_colour
     ld      a, d

@@ -10,12 +10,12 @@
     EXTERN  res_MODE64
     EXTERN  res_MODE128
 
-    EXTERN  __zx_screenmode
+    EXTERN  __zx_gfxmode
     defc    NEEDres=1
 
 
 w_respixel:
-    ld      a, (__zx_screenmode)
+    ld      a, (__zx_gfxmode)
     cp      3
     jp      c, res_MODE0
   IF    FORzxn
