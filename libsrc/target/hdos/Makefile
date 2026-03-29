@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = hdos
 
-SUBDIRS = hdos stdio fcntl
+SUBDIRS = hdos stdio fcntl time
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)

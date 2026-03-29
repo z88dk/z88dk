@@ -46,4 +46,5 @@ target/hdos/fcntl/obj/${TYPE}/dir_move_next
 target/hdos/fcntl/obj/${TYPE}/dir_get_entry_size
 target/hdos/fcntl/obj/${TYPE}/dir_get_entry_name
 target/hdos/fcntl/obj/${TYPE}/is_empty_dirent
+target/hdos/time/obj/${TYPE}/clock
 @classic/stdio/stdio_binary.lst

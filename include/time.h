@@ -61,6 +61,9 @@
 #endif
 #endif
 
+#ifdef __HDOS__
+#define CLOCKS_PER_SEC 500
+#endif
 
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC 50
