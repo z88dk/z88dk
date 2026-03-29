@@ -224,6 +224,8 @@ include sound/saa1099/saa1099.mak
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
 include target/gal/gal.mak
+include target/gl/gl.mak
+include target/gl6000/gl6000.mak
 include target/hector/hector.mak
 include target/hemc/hemc.mak
 include target/hgmc/hgmc.mak
@@ -233,8 +235,10 @@ include target/laser500/laser500.mak
 include target/lviv/lviv.mak
 include target/lynx/lynx.mak
 include target/multi8/multi8.mak
+include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pps/pps.mak
+include target/rx78/rx78.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
 include target/sms/sms.mak
@@ -1423,7 +1427,7 @@ primo_clib.lib: $(TARGET_CLIB_DEPS)
 
 
 # Bandai RX78 - dom
-rx78_clib.lib: $(TARGET_CLIB_DEPS)
+rx78_clib.lib: $(TARGET_CLIB_DEPS) target-rx78
 	@echo ''
 	@echo '--- Building Bandai RX78 Library ---'
 	@echo ''
@@ -1582,7 +1586,7 @@ bit90.lib: coleco_clib.lib
 	TARGET=bit90 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORbit90 -x$(OUTPUT_DIRECTORY)/bit90 @$(TARGET_DIRECTORY)/bit90/bit90.lst
 
 # Pencil II - dom/stefano
-pencil2_clib.lib: $(TARGET_CLIB_DEPS)
+pencil2_clib.lib: $(TARGET_CLIB_DEPS) target-pencil2
 	@echo ''
 	@echo '--- Building Pencil II Library ---'
 	@echo ''
@@ -1670,7 +1674,7 @@ alphatp2_clib.lib: $(TARGET_CLIB_DEPS) target-alphatp2
 
 
 # Genius Leader 2000/4000 - dom
-gl_clib.lib: $(TARGET_CLIB_DEPS)
+gl_clib.lib: $(TARGET_CLIB_DEPS) target-gl
 	@echo ''
 	@echo '--- Building Genius Leader 2000/4000 Library ---'
 	@echo ''
@@ -1680,7 +1684,7 @@ gl_clib.lib: $(TARGET_CLIB_DEPS)
 
 
 # Genius Leader 6000 - dom
-gl6000_clib.lib: $(TARGET_CLIB_DEPS) gl_clib.lib
+gl6000_clib.lib: $(TARGET_CLIB_DEPS) gl_clib.lib target-gl6000
 	@echo ''
 	@echo '--- Building Genius Leader 6000 Library ---'
 	@echo ''
