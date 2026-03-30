@@ -241,6 +241,7 @@ include target/micro8085/micro8085.mak
 include target/mikro80/mikro80.mak
 include target/multi8/multi8.mak
 include target/myvision/myvision.mak
+include target/ondra/ondra.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pps/pps.mak
@@ -251,6 +252,7 @@ include target/rx78/rx78.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
 include target/sms/sms.mak
+include target/sol20/sol20.mak
 include target/spc1000/spc1000.mak
 include target/ts2068/ts2068.mak
 include target/vg5k/vg5k.mak
@@ -2191,7 +2193,7 @@ altair8800_clib.lib: $(TARGET_CLIB_DEPS)
 	$(call buildgeneric,altair8800,portable)
 	TARGET=altair8800 TYPE=8080 $(LIBLINKER) -m8080 -DFORaltair8800 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/altair8800_clib @$(TARGET_DIRECTORY)/altair8800/altair8800.lst
 
-sol20_clib.lib: $(TARGET_CLIB_DEPS)
+sol20_clib.lib: $(TARGET_CLIB_DEPS) $(SOL20_TARGETS)
 	@echo ''
 	@echo '--- Building SOL20 Library ---'
 	@echo ''
@@ -2214,7 +2216,7 @@ dai_clib.lib: $(TARGET_CLIB_DEPS) $(DAI_TARGETS)
 	$(call buildgeneric,dai,portable)
 	TARGET=dai TYPE=8080 $(LIBLINKER) -m8080 -DFORdai -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/dai_clib @$(TARGET_DIRECTORY)/dai/dai.lst
 
-ondra_clib.lib: $(TARGET_CLIB_DEPS)
+ondra_clib.lib: $(TARGET_CLIB_DEPS) $(ONDRA_TARGETS)
 	@echo ''
 	@echo '--- Building Ondra Library ---'
 	@echo ''
