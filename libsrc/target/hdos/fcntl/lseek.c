@@ -26,14 +26,11 @@ long lseek(int fd,long posn, int whence)
         pos = fc->rwptr + posn;
         break;
     case 2:
-		fputc_cons('/');
         if ( (fc->use == U_WRITE || fc->use == U_RDWR) && fsync(fd) != 0 ) return -1L;
 		
 		pos=(65535-hdos_posit(fc->ch,65535))*256L;
 
-		fputc_cons('.');
         if ((fc->mode & _IOTEXT) && (pos >= 256L)) { 
-		fputc_cons('!');
             do { 
                 fc->rwptr = pos-256L;
                 cnt=0; 
