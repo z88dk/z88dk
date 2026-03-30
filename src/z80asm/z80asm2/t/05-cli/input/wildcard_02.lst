@@ -1,0 +1,2 @@
+# '?' matches a single character
+t/05-cli/input/wildcard/b?.asm

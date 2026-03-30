@@ -1,10 +1,22 @@
-verbose	0
+% z88dk-z80asm -v -DE00=1+2<<3 -DE01=1+(2<<3) -DE02=1<<2+3 -DE03=(1<<2)+3 -DE04=~1&3 -DE05=~(1&3) -DE06=!1&3 -DE07=!(1&3) -dump-after-cmdline t/05-expr/input/empty.asm
+Define constant: E00 = $18
+Define constant: E01 = $11
+Define constant: E02 = $20
+Define constant: E03 = 7
+Define constant: E04 = 2
+Define constant: E05 = -2
+Define constant: E06 = 0
+Define constant: E07 = 0
+verbose	1
 ucase_labels	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
 dump_after_cmdline	1
 dump_after_tokenization	0
+dump_after_directives	0
+dump_after_macro_expansion	0
+dump_after_preprocessing	0
 m4_options	
 perl_options	
 cpp_options	
@@ -17,3 +29,4 @@ global_def	E04	2
 global_def	E05	-2
 global_def	E06	0
 global_def	E07	0
+input_file	t/05-expr/input/empty.asm

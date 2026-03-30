@@ -1,0 +1,6 @@
+	; top comment
+	# another comment
+
+	 at_files_01_a1.asm		# comment
+	 at_files_01_a2       	; no extension, resolve to .asm
+

@@ -1,10 +1,22 @@
-verbose	0
+% z88dk-z80asm -v -DA=5 -DB=2 -DC=-3 -DE00=A+B -DE01=A*B+C -DE02=A*(B+C) -DE03=A||C -DE04=C&&B -dump-after-cmdline t/05-expr/input/empty.asm
+Define constant: A = 5
+Define constant: B = 2
+Define constant: C = -3
+Define constant: E00 = 7
+Define constant: E01 = 7
+Define constant: E02 = -5
+Define constant: E03 = 1
+Define constant: E04 = 1
+verbose	1
 ucase_labels	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
 dump_after_cmdline	1
 dump_after_tokenization	0
+dump_after_directives	0
+dump_after_macro_expansion	0
+dump_after_preprocessing	0
 m4_options	
 perl_options	
 cpp_options	
@@ -17,3 +29,4 @@ global_def	E01	7
 global_def	E02	-5
 global_def	E03	1
 global_def	E04	1
+input_file	t/05-expr/input/empty.asm

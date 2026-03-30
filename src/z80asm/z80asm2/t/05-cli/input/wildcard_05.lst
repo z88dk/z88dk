@@ -1,0 +1,2 @@
+# '**' combined with '*.asm' to collect many files across subdirs
+t/05-cli/input/wildcard/**/*.asm

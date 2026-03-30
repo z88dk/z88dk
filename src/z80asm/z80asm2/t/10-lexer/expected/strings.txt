@@ -1,3 +1,5 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/strings.asm
+Assembling t/10-lexer/input/strings.asm...
 # file: t/10-lexer/input/strings.asm
 String	"\"\""	1:1	str_value="" 
 String	"\"hello\""	1:4	str_value="hello" 
