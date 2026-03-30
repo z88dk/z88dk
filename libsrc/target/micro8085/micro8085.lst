@@ -1,11 +1,2 @@
-target/micro8085/stdio/fgetc_cons
-target/micro8085/stdio/fputc_cons_native
-target/micro8085/stdio/getk
+target/micro8085/obj/${TARGET}/**/*.o
 @classic/stdio/stdio.lst
-target/micro8085/drv/ee_mem
-target/micro8085/drv/io_port
-target/micro8085/drv/spi_bus
-target/micro8085/drv/uart_putc
-target/micro8085/drv/uart_puts
-target/micro8085/drv/uart_rxbuf
-target/micro8085/drv/uart_txbuf
