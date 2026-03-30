@@ -235,8 +235,10 @@ include target/kc/kc.mak
 include target/kramermc/kramermc.mak
 include target/krokha/krokha.mak
 include target/laser500/laser500.mak
+include target/lm80c/lm80c.mak
 include target/lviv/lviv.mak
 include target/lynx/lynx.mak
+include target/mc1000/mc1000.mak
 include target/micro8085/micro8085.mak
 include target/mikro80/mikro80.mak
 include target/multi8/multi8.mak
@@ -1254,7 +1256,7 @@ mbc200.lib: cpm_clib.lib
 	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
 
 # MC-1000 library - Stefano
-mc1000_clib.lib: $(TARGET_CLIB_DEPS)
+mc1000_clib.lib: $(TARGET_CLIB_DEPS) $(MC1000_TARGETS)
 	@echo ''
 	@echo '--- Building CCE MC-1000 Library ---'
 	@echo ''
@@ -1608,13 +1610,12 @@ pencil2_clib.lib: $(TARGET_CLIB_DEPS) $(PENCIL2_TARGETS)
 	TARGET=pencil2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpencil2 -x$(OUTPUT_DIRECTORY)/pencil2_clib @$(TARGET_DIRECTORY)/pencil2/pencil2.lst
 
 # LM80C - dom/stefano
-lm80c_clib.lib: $(TARGET_CLIB_DEPS)
+lm80c_clib.lib: $(TARGET_CLIB_DEPS) $(LM80C_TARGETS)
 	@echo ''
 	@echo '--- Building LM80-C Library ---'
 	@echo ''
 	$(MAKE) -C classic/games TARGET=lm80c
 	$(call buildgeneric,lm80c)
-	$(MAKE) -C target/lm80c
 	$(MAKE) -C classic/video/tms9918 TARGET=lm80c
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(TARGET_DIRECTORY)/lm80c/lm80c.lst
 
