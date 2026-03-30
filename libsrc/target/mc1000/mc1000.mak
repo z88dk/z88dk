@@ -4,6 +4,7 @@ MC1000_GLOBS := \
 	"target/mc1000/interrupts/*.asm" \
 	"target/mc1000/psg/*.asm" \
 	"target/mc1000/stdio/*.asm" \
+	"target/mc1000/stdio/ansi/*.asm" \
 	"target/mc1000/time/*.asm" 
 
 MC1000_GLOBS_ex := \
@@ -12,6 +13,7 @@ MC1000_GLOBS_ex := \
 	target/mc1000/interrupts/*.asm \
 	target/mc1000/psg/*.asm \
 	target/mc1000/stdio/*.asm \
+	target/mc1000/stdio/ansi/*.asm \
 	target/mc1000/time/*.asm 
 
 
