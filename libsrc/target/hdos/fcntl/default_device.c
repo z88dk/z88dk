@@ -5,6 +5,7 @@
   have no concept of a default device.
 */
 
+#include <string.h>
 #include <arch/hdos.h>
 
 char *default_device()
