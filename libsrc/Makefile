@@ -246,20 +246,24 @@ include target/myvision/myvision.mak
 include target/ondra/ondra.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
+include target/pk8000/pk8000.mak
 include target/pps/pps.mak
 include target/primo/primo.mak
 include target/pv1000/pv1000.mak
 include target/pv2000/pv2000.mak
+include target/radio86/radio86.mak
 include target/rx78/rx78.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
 include target/sms/sms.mak
 include target/sol20/sol20.mak
 include target/spc1000/spc1000.mak
+include target/sv8000/sv8000.mak
 include target/ts2068/ts2068.mak
 include target/vg5k/vg5k.mak
 include target/x07/x07.mak
 include target/z88/z88.mak
+include target/z9001/z9001.mak
 include target/zx/zx.mak
 include target/zxn/zxn.mak
 
@@ -1313,7 +1317,7 @@ z1013_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(TARGET_DIRECTORY)/z1013/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
-z9001_clib.lib: $(TARGET_CLIB_DEPS)
+z9001_clib.lib: $(TARGET_CLIB_DEPS) $(Z9001_TARGETS)
 	@echo ''
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
@@ -1572,7 +1576,7 @@ myvision_clib.lib: $(TARGET_CLIB_DEPS) $(MYVISION_TARGETS)
 	TARGET=myvision TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmyvision -x$(OUTPUT_DIRECTORY)/myvision_clib @$(TARGET_DIRECTORY)/myvision/myvision.lst
 
 # Bandai Supervision 8000 - dom
-sv8000_clib.lib: $(TARGET_CLIB_DEPS)
+sv8000_clib.lib: $(TARGET_CLIB_DEPS) $(SV8000_TARGETS)
 	@echo ''
 	@echo '--- Building Bandai Supervision 8000 Library ---'
 	@echo ''
@@ -2170,7 +2174,7 @@ vector06c_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=vector06c
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(TARGET_DIRECTORY)/vector06c/vector06c.lst
 
-pk8000_clib.lib: $(TARGET_CLIB_DEPS)
+pk8000_clib.lib: $(TARGET_CLIB_DEPS) $(PK8000_TARGETS)
 	@echo ''
 	@echo '--- Building PK8000 Library ---'
 	@echo ''
@@ -2251,7 +2255,7 @@ krokha_clib.lib: $(TARGET_CLIB_DEPS) $(KROKHA_TARGETS)
 	$(MAKE) -C classic/games TARGET=krokha
 	TARGET=krokha TYPE=8080 $(LIBLINKER) -m8080 -DFORkrokha -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/krokha_clib @$(TARGET_DIRECTORY)/krokha/krokha.lst
 
-radio86_clib.lib: $(TARGET_CLIB_DEPS)
+radio86_clib.lib: $(TARGET_CLIB_DEPS) $(RADIO86_TARGETS)
 	@echo ''
 	@echo '--- Building Radio86 Library ---'
 	@echo ''
