@@ -1,25 +1,9 @@
+target/rx78/obj/${TARGET}/**/*.o
+
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 classic/stdio/obj/${TYPE}/inkey/getk
-target/rx78/stdio/generic_console
-target/rx78/stdio/generic_console_ioctl
-target/rx78/stdio/generic_console_vpeek
-target/rx78/stdio/conio_map_colour
-target/rx78/stdio/CRT_FONT
-target/rx78/stdio/fputc_cons_native
-target/rx78/stdio/conio_vars
 @classic/stdio/stdio.lst
-
-@classic/input/input_keyboard.lst
 sound/sn76489/obj/${TYPE}/**/*.o
-target/rx78/load_palette
-target/rx78/graphics/clg
-target/rx78/graphics/pixladdr
-target/rx78/graphics/plotpixl
-target/rx78/graphics/respixl
-target/rx78/graphics/xorpixl
-target/rx78/graphics/pointxy
 @classic/gfx/narrow/gfx_narrow.lst
-target/rx78/games/joystick
-target/rx78/games/keys_joystick
 @classic/games/games.lst
 

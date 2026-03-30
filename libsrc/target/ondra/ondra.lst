@@ -1,16 +1,9 @@
-target/ondra/stdio/fputc_cons_native
-target/ondra/stdio/generic_console
-target/ondra/stdio/generic_console_ioctl
-target/ondra/stdio/generic_console_vpeek
-target/ondra/stdio/CRT_FONT
-target/ondra/graphics/w_pixeladdress
+target/ondra/obj/${TARGET}/**/*.o
+
 classic/stdio/obj/${TYPE}/inkey/getk
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
-@classic/input/input_keyboard.lst
 @classic/gfx/wide/gfx_wide.lst
 
 @classic/stdio/stdio.lst
-target/ondra/games/joystick
-target/ondra/games/keys_joystick
 @classic/games/games.lst
 

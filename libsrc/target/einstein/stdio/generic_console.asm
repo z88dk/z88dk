@@ -2,6 +2,7 @@
 ;
 
 
+    MODULE  generic_console_einstein
     SECTION code_clib
 
     PUBLIC  generic_console_cls

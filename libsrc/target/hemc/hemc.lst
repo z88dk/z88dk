@@ -1,7 +1,4 @@
-target/hemc/stdio/generic_console
-target/hemc/stdio/fputc_cons_native
-target/hemc/stdio/getk
-target/hemc/stdio/fgetc_cons
+target/hemc/obj/${TARGET}/**/*.o
 @classic/stdio/stdio.lst
 @classic/gfx/gencon/gfx_gencon1.lst
 

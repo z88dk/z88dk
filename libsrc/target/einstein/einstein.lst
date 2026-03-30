@@ -1,14 +1,7 @@
+target/einstein/obj/${TARGET}/**/*.o
 @classic/stdio/ansicore.lst
-target/einstein/stdio/generic_console
-
 @classic/video/tms9918/video_tms9918.lst
 @classic/gfx/narrow/gfx_narrow.lst
-target/einstein/psg/asm_vt2_hardware_out
-target/einstein/psg/asm_wyz_hardware_out
-target/einstein/psg/psg_init
-target/einstein/psg/get_psg
-target/einstein/psg/set_psg
-target/einstein/psg/set_psg_callee
 sound/ay/obj/${TYPE}/**/*.o
 @classic/video/mc6845/mc6845.lst
 @classic/games/games_joystick.lst

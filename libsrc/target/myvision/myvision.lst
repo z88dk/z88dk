@@ -1,17 +1,12 @@
+target/myvision/obj/${TARGET}/**/*.o
+
 @classic/stdio/ansicore.lst
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 classic/stdio/obj/${TYPE}/inkey/getk
 
-@classic/input/input_keyboard.lst
 @classic/video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
-target/myvision/games/joystick.asm
 @classic/games/games.lst
-target/myvision/psg/set_psg
-target/myvision/psg/set_psg_callee
-target/myvision/psg/get_psg
-target/myvision/psg/psg_init
-target/myvision/psg/asm_wyz_hardware_out
 sound/ay/obj/${TYPE}/**/*.o
 

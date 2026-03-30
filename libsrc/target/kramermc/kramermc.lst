@@ -1,7 +1,4 @@
-target/kramermc/stdio/generic_console
-target/kramermc/stdio/fputc_cons_native
-target/kramermc/stdio/getk
-target/kramermc/stdio/fgetc_cons
+target/kramermc/obj/${TARGET}/**/*.o
 @classic/stdio/stdio.lst
 @classic/gfx/gencon/gfx_gencon1.lst
 
