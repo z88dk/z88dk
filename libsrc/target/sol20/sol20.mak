@@ -17,7 +17,7 @@ target-sol20: $(SOL20_TARGETS)
 .PHONY: target-sol20 target-sol20-clean
 
 
-$(eval $(call buildtargetasm,target/sol20,z80,sol20,-mz80,$(SOL20_GLOBS),$(SOL20_GLOBS_ex)))
+$(eval $(call buildtargetasm,target/sol20,8080,sol20,-m8080,$(SOL20_GLOBS),$(SOL20_GLOBS_ex)))
 
 target-sol20-clean:
 	$(RM) -fr target/sol20/obj
