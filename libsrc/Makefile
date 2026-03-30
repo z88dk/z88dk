@@ -223,6 +223,7 @@ include sound/saa1099/saa1099.mak
 
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
+include target/dai/dai.mak
 include target/einstein/einstein.mak
 include target/gal/gal.mak
 include target/gl/gl.mak
@@ -243,12 +244,16 @@ include target/myvision/myvision.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pps/pps.mak
+include target/primo/primo.mak
+include target/pv1000/pv1000.mak
+include target/pv2000/pv2000.mak
 include target/rx78/rx78.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
 include target/sms/sms.mak
 include target/spc1000/spc1000.mak
 include target/ts2068/ts2068.mak
+include target/vg5k/vg5k.mak
 include target/x07/x07.mak
 include target/z88/z88.mak
 include target/zx/zx.mak
@@ -1421,7 +1426,7 @@ hgmc_clib.lib: $(TARGET_CLIB_DEPS) $(HGMC_TARGETS)
 	TARGET=hgmc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhgmc -x$(OUTPUT_DIRECTORY)/hgmc_clib @$(TARGET_DIRECTORY)/hgmc/hgmc.lst
 
 # Primo A-32/64 - dom
-primo_clib.lib: $(TARGET_CLIB_DEPS)
+primo_clib.lib: $(TARGET_CLIB_DEPS) $(PRIMO_TARGETS)
 	@echo ''
 	@echo '--- Building Primo A-32/48/64 Library ---'
 	@echo ''
@@ -1532,7 +1537,7 @@ spc1000_clib.lib: $(TARGET_CLIB_DEPS) $(SPC1000_TARGETS)
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(TARGET_DIRECTORY)/spc1000/spc1000.lst
 
 # Casio PV1000 - dom
-pv1000_clib.lib: $(TARGET_CLIB_DEPS)
+pv1000_clib.lib: $(TARGET_CLIB_DEPS) $(PV1000_TARGETS)
 	@echo ''
 	@echo '--- Building Casio PV-1000 Library ---'
 	@echo ''
@@ -1541,7 +1546,7 @@ pv1000_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=pv1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv1000 -x$(OUTPUT_DIRECTORY)/pv1000_clib @$(TARGET_DIRECTORY)/pv1000/pv1000.lst
 
 # Casio PV2000 - dom/stefano
-pv2000_clib.lib: $(TARGET_CLIB_DEPS)
+pv2000_clib.lib: $(TARGET_CLIB_DEPS) $(PV2000_TARGETS)
 	@echo ''
 	@echo '--- Building Casio PV-2000 Library ---'
 	@echo ''
@@ -2085,7 +2090,7 @@ x1_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(TARGET_DIRECTORY)/x1/x1.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
-vg5k_clib.lib: $(TARGET_CLIB_DEPS)
+vg5k_clib.lib: $(TARGET_CLIB_DEPS) $(VG5K_TARGETS)
 	@echo ''
 	@echo '--- Building Philips VG5000 Library ---'
 	@echo ''
@@ -2202,7 +2207,7 @@ agon_clib.lib: $(TARGET_CLIB_DEPS) $(AGON_TARGETS)
 	$(MAKE) -C classic/games TARGET=agon
 	TARGET=agon TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -DFORagon -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/agon_clib @$(TARGET_DIRECTORY)/agon/agon.lst
 
-dai_clib.lib: $(TARGET_CLIB_DEPS)
+dai_clib.lib: $(TARGET_CLIB_DEPS) $(DAI_TARGETS)
 	@echo ''
 	@echo '--- Building DAI Library ---'
 	@echo ''

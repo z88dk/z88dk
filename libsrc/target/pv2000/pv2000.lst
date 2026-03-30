@@ -1,8 +1,9 @@
+target/pv2000/obj/${TARGET}/**/*.o
+
 @classic/stdio/ansicore.lst
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 classic/stdio/obj/${TYPE}/inkey/getk
 
-@classic/input/input_keyboard.lst
 @classic/video/tms9918/video_tms9918_nmi.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
