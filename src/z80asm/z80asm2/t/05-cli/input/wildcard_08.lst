@@ -1,0 +1,2 @@
+# List file with environment variable reference ${TEST} expands
+${${TE}${ST}}/*.asm

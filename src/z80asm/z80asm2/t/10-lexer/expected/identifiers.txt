@@ -1,3 +1,5 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/identifiers.asm
+Assembling t/10-lexer/input/identifiers.asm...
 # file: t/10-lexer/input/identifiers.asm
 Identifier	"hello"	1:1	
 Identifier	"hello"	1:7	
