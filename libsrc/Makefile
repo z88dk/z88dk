@@ -223,12 +223,14 @@ include sound/saa1099/saa1099.mak
 
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
+include target/einstein/einstein.mak
 include target/gal/gal.mak
 include target/gl/gl.mak
 include target/gl6000/gl6000.mak
 include target/hector/hector.mak
 include target/hemc/hemc.mak
 include target/hgmc/hgmc.mak
+include target/kc/kc.mak
 include target/kramermc/kramermc.mak
 include target/krokha/krokha.mak
 include target/laser500/laser500.mak
@@ -237,6 +239,7 @@ include target/lynx/lynx.mak
 include target/micro8085/micro8085.mak
 include target/mikro80/mikro80.mak
 include target/multi8/multi8.mak
+include target/myvision/myvision.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pps/pps.mak
@@ -1149,7 +1152,7 @@ gfxephr.lib: $(TARGET_CLIB_DEPS) gfxep.lib
 	TARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(TARGET_DIRECTORY)/enterprise/gfxephr.lst
 
 # Einstein library - Stefano
-einstein.lib: cpm_clib.lib
+einstein.lib: cpm_clib.lib $(EINSTEIN_TARGETS)
 	@echo ''
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
@@ -1159,7 +1162,7 @@ einstein.lib: cpm_clib.lib
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(TARGET_DIRECTORY)/einstein/einstein.lst
 
-einstein256.lib: cpm_clib.lib
+einstein256.lib: cpm_clib.lib $(EINSTEIN_TARGETS)
 	@echo ''
 	@echo '--- Building Einstein 256 video Library ---'
 	@echo ''
@@ -1375,7 +1378,7 @@ fastmath.lib: kc160_clib.lib
 
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
-kc_clib.lib: $(TARGET_CLIB_DEPS)
+kc_clib.lib: $(TARGET_CLIB_DEPS) $(KC_TARGETS)
 	@echo ''
 	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
 	@echo ''
@@ -1549,7 +1552,7 @@ pv2000_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=pv2000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv2000 -x$(OUTPUT_DIRECTORY)/pv2000_clib @$(TARGET_DIRECTORY)/pv2000/pv2000.lst
 
 # Nichibutsu My Vision- dom/stefano
-myvision_clib.lib: $(TARGET_CLIB_DEPS)
+myvision_clib.lib: $(TARGET_CLIB_DEPS) $(MYVISION_TARGETS)
 	@echo ''
 	@echo '--- Building Nichibutsu My Vision Library ---'
 	@echo ''
