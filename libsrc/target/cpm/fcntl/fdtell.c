@@ -13,6 +13,6 @@ long fdtell(int fd)
 {
     struct fcb *fc = (struct fcb *)fd;
 
-    return (fc->rwptr);
+    return ((long) fc->rwptr);
 }
 
