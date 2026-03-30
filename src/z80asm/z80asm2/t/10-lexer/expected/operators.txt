@@ -1,3 +1,5 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/operators.asm
+Assembling t/10-lexer/input/operators.asm...
 # file: t/10-lexer/input/operators.asm
 LT	"<"	1:1	
 LE	"<="	1:3	

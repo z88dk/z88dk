@@ -1,0 +1,2 @@
+# Wildcards together with -I include path: pattern resolved from include dir
+*.asm

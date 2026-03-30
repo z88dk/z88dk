@@ -1,3 +1,5 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/comments.asm
+Assembling t/10-lexer/input/comments.asm...
 # file: t/10-lexer/input/comments.asm
 Identifier	"ld"	1:1	keyword=LD 
 Identifier	"a"	1:7	keyword=A 

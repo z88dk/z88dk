@@ -1,0 +1,20 @@
+% z88dk-z80asm -v -dump-after-cmdline -It/05-cli//input/wildcard @t/05-cli//input/wildcard_06.lst
+verbose	1
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+dump_after_directives	0
+dump_after_macro_expansion	0
+dump_after_preprocessing	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+include_path	t/05-cli/input/wildcard
+input_file	t/05-cli/input/wildcard/a1.asm
+input_file	t/05-cli/input/wildcard/a2.asm
+input_file	t/05-cli/input/wildcard/bX.asm
+input_file	t/05-cli/input/wildcard/bX1.asm

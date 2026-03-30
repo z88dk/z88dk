@@ -1,3 +1,5 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/chars.asm
+Assembling t/10-lexer/input/chars.asm...
 # file: t/10-lexer/input/chars.asm
 Integer	"'a'"	1:1	int_value=97 
 Integer	"'\\t'"	1:5	int_value=9 

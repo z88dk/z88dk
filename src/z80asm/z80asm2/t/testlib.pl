@@ -68,59 +68,13 @@ sub check_text_file {
 }
 
 #------------------------------------------------------------------------------
-sub z80asm_ok {
-    my($options, $files, $exp_warn, @pairs_asm_bin) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    
-    # build $asm and $bin
-    my($asm, $bin) = ("","");
-    while (my($a, $b) = splice(@pairs_asm_bin, 0, 2)) {
-        $asm .= "$a\n";
-        $bin .= $b;
-    }
-    
-    # save asm file
-    my $asm_file = "${test}.asm";
-    my $bin_file = "${test}.bin";
-    path($asm_file)->spew($asm);
-    unlink($bin_file);
-    
-    # assemble
-    $options ||= "-b";
-    $files ||= $asm_file;
-
-    run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
-    check_bin_file($bin_file, $bin);
-    check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
-	
-	(Test::More->builder->is_passing) or die;
-}
-
-#------------------------------------------------------------------------------
-sub z80asm_nok {
-    my($options, $files, $asm, $exp_err) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    
-    # save asm file
-    my $asm_file = "${test}.asm";
-	path($asm_file)->spew($asm);
-    
-    # assemble
-    $options ||= "-b";
-    $files ||= $asm_file;
-
-    capture_nok("z88dk-z80asm $options $files", $exp_err);
-	
-	(Test::More->builder->is_passing) or die;
-}
-
-#------------------------------------------------------------------------------
 sub capture_ok {
     my($cmd, $exp_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    run_ok($cmd." > ${test}.stdout 2>&1");
-    check_text_file("${test}.stdout", $exp_file);
+    run_ok($cmd." > ${test}.out 2>&1");
+	run_ok("dos2unix ${test}.out 2> $null");
+    check_text_file("${test}.out", $exp_file);
 	
 	(Test::More->builder->is_passing) or die;
 }
@@ -130,8 +84,9 @@ sub capture_nok {
     my($cmd, $exp_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    run_nok($cmd." 2> ${test}.stderr 1>&2");
-    check_text_file("${test}.stderr", $exp_file);
+    run_nok($cmd." 2> ${test}.err 1>&2");
+	run_ok("dos2unix ${test}.err 2> $null");
+    check_text_file("${test}.err", $exp_file);
 	
 	(Test::More->builder->is_passing) or die;
 }

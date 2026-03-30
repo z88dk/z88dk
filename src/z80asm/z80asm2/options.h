@@ -39,7 +39,10 @@ extern Args g_args;
 
 // parse arguments and options
 bool parse_arg(const std::string_view arg, bool& found_dash_dash);
-void search_source_file(const std::string_view filename, const SourceLoc& loc);
+void search_source_file(const std::string_view filename,
+                        const std::string_view including_filename,
+                        const SourceLoc& loc,
+                        std::vector<SourceLoc>& loc_stack);
 
 [[noreturn]] void exit_show_copyright(int exit_code);
 [[noreturn]] void exit_show_usage(int exit_code);
