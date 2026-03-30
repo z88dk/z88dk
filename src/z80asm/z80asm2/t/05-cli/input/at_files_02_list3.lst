@@ -1,0 +1,4 @@
+; top comment
+# another comment
+
+	 at_files_02_a3       	; no extension, resolve to .asm
