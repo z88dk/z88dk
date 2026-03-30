@@ -1,1 +1,2 @@
+% z88dk-z80asm -v -d
 error: No input files specified
