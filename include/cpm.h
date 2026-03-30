@@ -63,7 +63,7 @@ struct fcb {
     uint8_t ranrec[3];      /* random record number (24 bit no. ) (R0, R1, R2) */
 
     /* Below here is used by the library */
-    // 7 bytes used by the library
+    // 12 bytes used by the library
     unsigned long rwptr;    /* read/write pointer in bytes */
     uint8_t    use;         /* use flag */
     uint8_t    uid;         /* user id belonging to this file */
