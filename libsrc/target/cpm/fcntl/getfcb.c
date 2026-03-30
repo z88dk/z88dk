@@ -3,7 +3,7 @@
  *
  *  27/1/2002 - djm
  *
- *  $Id: getfcb.c,v 1.1 2002-01-27 21:28:48 dom Exp $
+ *  $Id: getfcb.c $
  */
 
 
@@ -21,6 +21,7 @@ struct fcb *getfcb(void)
         if ( fcb->use == 0 ) {
             fcb->use   = U_READ;
             fcb->rwptr = 0;
+			fcb->record_nr = 0;
             fcb->cached_record = 0xffffffff;
             fcb->rnr_dirty = 0;
             return fcb;
