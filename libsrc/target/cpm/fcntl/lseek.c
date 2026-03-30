@@ -15,13 +15,13 @@
 long lseek(int fd,long posn, int whence)
 {
     struct fcb *fc = (struct fcb *)fd;
-    long    pos;
+    unsigned long    pos;
     int     cnt;
     char    buffer[SECSIZE];
 
     switch(whence) {
-    default:
-        pos = posn;
+    case 0:
+        pos = fc->rwptr + posn;
         break;
     case 1:
         pos = fc->rwptr + posn;
@@ -33,19 +33,22 @@ long lseek(int fd,long posn, int whence)
 
         if (fc->ranrec[2]&1) 
             pos += 8388608L; 
-        if ((fc->mode & _IOTEXT) && (pos >= 128)) { 
+        if ((fc->mode & _IOTEXT) && (pos >= 128L)) { 
             do { 
-                fc->rwptr = pos-128; 
+                fc->rwptr = pos-128L; 
                 cnt=0; 
                 if (read(fd, buffer, 128)!=-1) { 
                     while (cnt < 128 && buffer[127-cnt]==__STDIO_EOFMARKER) 
                         cnt++; 
-                    pos -= cnt; 
+                    pos -= (unsigned long)cnt; 
                 } 
-            } while (cnt == 128 && pos >= 128); 
+            } while (cnt == 128 && pos >= 128L); 
         }
         pos = pos + posn; 
-        break; 
+        break;
+    default:
+        pos = posn;
+        break;
     }
 
     if (pos < 0L)
