@@ -296,7 +296,7 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
             if (!split_option_arg(arg, spec->name, opt_arg)) {
                 return false;
             }
-            g_args.options.include_paths.push_back(opt_arg);
+            g_args.options.include_paths.push_back(normalize_path(opt_arg));
             return true;
 
         case OptionType::OUTPUT:
@@ -375,7 +375,8 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
     // ------------------------------------------------------------
     // 4. Not an option -> treat as input file
     // ------------------------------------------------------------
-    search_source_file(arg, SourceLoc());
+    std::vector<SourceLoc> empty_stack;
+    search_source_file(arg, "", SourceLoc(), empty_stack);
     return true;
 }
 
@@ -448,9 +449,11 @@ static std::string check_source(const std::string_view filename) {
 // run tool preprocessor
 static void run_tool(const std::string_view filename,
                      const std::string_view extension,
+                     const std::string_view including_filename,
                      const std::string_view tool_name_,
                      const std::string_view tool_options,
-                     const SourceLoc& loc) {
+                     const SourceLoc& loc,
+                     std::vector<SourceLoc>& loc_stack) {
     std::string tool_name(tool_name_);
 
     std::string full_path = resolve_include_candidate(filename, "",
@@ -481,69 +484,133 @@ static void run_tool(const std::string_view filename,
     }
 
     // process generated asm file
-    search_source_file(asm_filename, loc);
+    search_source_file(asm_filename, including_filename, loc, loc_stack);
 }
 
 // run m4 preprocessor
-static void run_m4(const std::string_view filename, const SourceLoc& loc) {
-    run_tool(filename, m4_extension, "m4", g_args.options.m4_options, loc);
+static void run_m4(const std::string_view filename,
+                   const std::string_view including_filename,
+                   const SourceLoc& loc,
+                   std::vector<SourceLoc>& loc_stack) {
+    run_tool(filename, m4_extension,
+             including_filename,
+             "m4", g_args.options.m4_options,
+             loc, loc_stack);
 }
 
 // run perl preprocessor
-static void run_perl(const std::string_view filename, const SourceLoc& loc) {
-    run_tool(filename, perl_extension, "perl", g_args.options.perl_options, loc);
+static void run_perl(const std::string_view filename,
+                     const std::string_view including_filename,
+                     const SourceLoc& loc,
+                     std::vector<SourceLoc>& loc_stack) {
+    run_tool(filename, perl_extension,
+             including_filename,
+             "perl", g_args.options.perl_options,
+             loc, loc_stack);
 }
 
 // run cpp preprocessor
-static void run_cpp(const std::string_view filename, const SourceLoc& loc) {
-    run_tool(filename, cpp_extension, "cpp", g_args.options.cpp_options, loc);
+static void run_cpp(const std::string_view filename,
+                    const std::string_view including_filename,
+                    const SourceLoc& loc,
+                    std::vector<SourceLoc>& loc_stack) {
+    run_tool(filename, cpp_extension,
+             including_filename,
+             "cpp", g_args.options.cpp_options,
+             loc, loc_stack);
+}
+
+// parse list file line, return filename or empty string, and SourceLoc
+static bool parse_filename_entry(const std::string_view line_,
+                                 SourceLoc& in_out_loc,
+                                 std::string& out_filename) {
+    out_filename.clear();
+
+    std::string line(line_);
+    const char* p = line.c_str();
+
+    // skip leading whitespace
+    while (*p && is_space(*p)) {
+        ++p;
+    }
+
+    if (*p == '\0' || *p == ';' || *p == '#') {
+        return true; // empty line or comment
+    }
+
+    // maybe an '@' sign
+    bool has_at = false;
+    if (*p == '@') {
+        has_at = true;
+        in_out_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+        ++p;
+        while (*p && is_space(*p)) {
+            ++p;
+        }
+    }
+
+    if (has_at && (*p == '\0' || *p == ';' || *p == '#')) {
+        error(in_out_loc, "Expected filename after '@'");
+        return false;
+    }
+
+    in_out_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+    const char* start = p;
+    while (*p && !is_space(*p)) {
+        ++p;
+    }
+
+    std::string inc_filename =
+        (has_at ? "@" : "") + std::string(start, p - start);
+
+    // check for end of line or comment
+    while(*p && is_space(*p)) {
+        ++p;
+    }
+
+    if (*p != '\0' && *p != ';' && *p != '#') {
+        error(in_out_loc, "Unexpected text after filename: " + std::string(p));
+        return false;
+    }
+
+    out_filename = inc_filename;
+    return true;
 }
 
 // search list files
 static void search_list_file(const std::string_view list_filename,
-                             const SourceLoc& loc) {
-    std::string list_full_path =
-        resolve_include_candidate(list_filename, "", false,
-                                  g_args.options.include_paths);
-    if (list_full_path.empty()) {
-        error(loc, "File not found: " + std::string(list_filename));
-        return;
-    }
-
+                             const SourceLoc& loc,
+                             std::vector<SourceLoc>& loc_stack) {
     // read list file
-    StringInterner::Id file_id = register_virtual_file(list_full_path);
+    StringInterner::Id file_id = register_virtual_file(list_filename);
     std::string content;
-    if (!read_file_to_string(list_full_path, loc, content)) {
+    if (!read_file_to_string(list_filename, loc, content)) {
         return;
     }
 
     // process each line
     std::vector<RawLine> lines = split_into_lines(content, file_id, 1);
     for (auto& line : lines) {
-        std::string inc_filename = line.text;
-
-        // remove comments and trim
-        size_t comment_pos = inc_filename.find_first_of(";#");
-        if (comment_pos != std::string::npos) {
-            inc_filename = inc_filename.substr(0, comment_pos);
+        // column will be updated by parse_filename_entry
+        SourceLoc inc_loc = line.loc;
+        std::string inc_filename;
+        if (!parse_filename_entry(line.text, inc_loc, inc_filename)) {
+            continue; // error already reported
         }
-        inc_filename = trim(inc_filename);
 
         if (inc_filename.empty()) {
-            continue;
+            continue; // empty line or comment
         }
 
-        if (inc_filename[0] == ';' || inc_filename[0] == '#') { // comment line
-            continue;
-        }
-
-        search_source_file(inc_filename, line.loc);
+        search_source_file(inc_filename, list_filename, inc_loc, loc_stack);
     }
 }
 
 // search source file in path, return empty string if not found
 void search_source_file(const std::string_view filename_,
-                        const SourceLoc& loc) {
+                        const std::string_view including_filename,
+                        const SourceLoc& loc,
+                        std::vector<SourceLoc>& loc_stack) {
     std::string filename = trim(filename_);
     filename = expand_env_vars(filename);
     std::string out_filename;
@@ -588,32 +655,54 @@ void search_source_file(const std::string_view filename_,
         }
 
         for (const auto& m : unique_matches) {
-            search_source_file(m, loc);
+            search_source_file(m, including_filename, loc, loc_stack);
         }
         return;
     }
 
     // check list files
     if (!filename.empty() && filename[0] == '@') {
-        search_list_file(filename.substr(1), loc);
+        std::string list_filename = trim(filename.substr(1));
+        std::string list_full_path =
+            resolve_include_candidate(list_filename,
+                                      including_filename,
+                                      false,
+                                      g_args.options.include_paths);
+        if (list_full_path.empty()) {
+            error(loc, "File not found: " + std::string(list_filename));
+            return;
+        }
+        StringInterner::Id file_id = register_virtual_file(list_full_path);
+
+        // check for recursive inclusion of list files
+        for (const SourceLoc& l : loc_stack) {
+            if (l.file_id == file_id) {
+                error(loc, "Recursive inclusion of list file: " + list_filename);
+                return;
+            }
+        }
+
+        loc_stack.push_back(loc);
+        search_list_file(list_full_path, loc, loc_stack);
+        loc_stack.pop_back();
         return;
     }
 
     // check m4 preprocessing
     if (ends_with(filename, m4_extension)) {
-        run_m4(filename, loc);
+        run_m4(filename, including_filename, loc, loc_stack);
         return;
     }
 
     // check perl preprocessing
     if (ends_with(filename, perl_extension)) {
-        run_perl(filename, loc);
+        run_perl(filename, including_filename, loc, loc_stack);
         return;
     }
 
     // check cpp preprocessing
     if (ends_with(filename, cpp_extension)) {
-        run_cpp(filename, loc);
+        run_cpp(filename, including_filename, loc, loc_stack);
         return;
     }
 
@@ -625,8 +714,8 @@ void search_source_file(const std::string_view filename_,
     }
 
     // check plain file in include path (and CWD)
-    out_filename = resolve_include_candidate(filename, "",
-                   false, g_args.options.include_paths);
+    out_filename = resolve_include_candidate(filename, including_filename, false,
+                   g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
@@ -644,7 +733,8 @@ void search_source_file(const std::string_view filename_,
     }
 
     // check filename with .asm extension in include path
-    out_filename = resolve_include_candidate(asm_filename, "",
+    out_filename = resolve_include_candidate(asm_filename,
+                   including_filename,
                    false, g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
@@ -663,7 +753,8 @@ void search_source_file(const std::string_view filename_,
     }
 
     // check filename with .o extension in include path
-    out_filename = resolve_include_candidate(o_filename, "",
+    out_filename = resolve_include_candidate(o_filename,
+                   including_filename,
                    false, g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
@@ -682,7 +773,8 @@ void search_source_file(const std::string_view filename_,
     }
 
     // check filename with .asm extension in include path
-    out_filename = resolve_include_candidate(asm_filename, "",
+    out_filename = resolve_include_candidate(asm_filename,
+                   including_filename,
                    false, g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
@@ -701,7 +793,8 @@ void search_source_file(const std::string_view filename_,
     }
 
     // check obejct file in output_dir in include path
-    out_filename = resolve_include_candidate(o_filename, "",
+    out_filename = resolve_include_candidate(o_filename,
+                   including_filename,
                    false, g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);

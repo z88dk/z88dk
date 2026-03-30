@@ -1,0 +1,16 @@
+% z88dk-z80asm -v -dump-after-cmdline test_t_05_cli_search_file_03_t.asm
+verbose	1
+ucase_labels	0
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+dump_after_directives	0
+dump_after_macro_expansion	0
+dump_after_preprocessing	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+input_file	test_t_05_cli_search_file_03_t.asm

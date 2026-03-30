@@ -1,3 +1,5 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/keywords.asm
+Assembling t/10-lexer/input/keywords.asm...
 # file: t/10-lexer/input/keywords.asm
 Identifier	"a"	1:1	keyword=A 
 Identifier	"a"	1:3	keyword=A 

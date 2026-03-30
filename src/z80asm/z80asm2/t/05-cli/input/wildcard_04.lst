@@ -1,0 +1,2 @@
+# '**' matches subdirectories recursively, including the top dir
+t/05-cli/input/wildcard/sub1/**/c1.asm
