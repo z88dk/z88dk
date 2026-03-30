@@ -15,17 +15,34 @@
 [[noreturn]]
 void dump_after_cmdline_and_exit() {
     std::cout
-            << "verbose\t" << g_args.options.verbose << "\n"
-            << "ucase_labels\t" << g_args.options.ucase_labels << "\n"
-            << "preprocess_only\t" << g_args.options.preprocess_only << "\n"
-            << "swap_ix_iy\t" << g_args.options.swap_ix_iy << "\n"
-            << "date_stamp\t" << g_args.options.date_stamp << "\n"
-            << "dump_after_cmdline\t" << g_args.options.dump_after_cmdline << "\n"
-            << "dump_after_tokenization\t" << g_args.options.dump_after_tokenization << "\n"
-            << "m4_options\t" << g_args.options.m4_options << "\n"
-            << "perl_options\t" << g_args.options.perl_options << "\n"
-            << "cpp_options\t" << g_args.options.cpp_options << "\n"
-            << "output_dir\t" << g_args.options.output_dir << "\n";
+            << "verbose\t"
+            << g_args.options.verbose << "\n"
+            << "ucase_labels\t"
+            << g_args.options.ucase_labels << "\n"
+            << "preprocess_only\t"
+            << g_args.options.preprocess_only << "\n"
+            << "swap_ix_iy\t"
+            << g_args.options.swap_ix_iy << "\n"
+            << "date_stamp\t"
+            << g_args.options.date_stamp << "\n"
+            << "dump_after_cmdline\t"
+            << g_args.options.dump_after_cmdline << "\n"
+            << "dump_after_tokenization\t"
+            << g_args.options.dump_after_tokenization << "\n"
+            << "dump_after_directives\t"
+            << g_args.options.dump_after_directives << "\n"
+            << "dump_after_macro_expansion\t"
+            << g_args.options.dump_after_macro_expansion << "\n"
+            << "dump_after_preprocessing\t"
+            << g_args.options.dump_after_preprocessing << "\n"
+            << "m4_options\t"
+            << g_args.options.m4_options << "\n"
+            << "perl_options\t"
+            << g_args.options.perl_options << "\n"
+            << "cpp_options\t"
+            << g_args.options.cpp_options << "\n"
+            << "output_dir\t"
+            << g_args.options.output_dir << "\n";
 
     for (auto& fullpath : g_args.options.include_paths) {
         std::cout << "include_path\t" << fullpath << "\n";
@@ -45,6 +62,11 @@ void dump_after_cmdline_and_exit() {
     for (auto* sym : sorted_defs) {
         std::cout << "global_def\t" << g_strings.view(sym->name_id)
                   << "\t" << int_to_hex(sym->value) << "\n";
+    }
+
+    // collect filenames
+    for (auto& filename : g_args.input_files) {
+        std::cout << "input_file\t" << filename << "\n";
     }
 
     exit(EXIT_SUCCESS);
