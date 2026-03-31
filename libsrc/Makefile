@@ -221,8 +221,11 @@ include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
 
+# To be replaced with a wildcard include at some point
+include target/abc80/abc80.mak
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
+include target/altair8800/altair8800.mak
 include target/dai/dai.mak
 include target/einstein/einstein.mak
 include target/gal/gal.mak
@@ -231,6 +234,8 @@ include target/gl6000/gl6000.mak
 include target/hector/hector.mak
 include target/hemc/hemc.mak
 include target/hgmc/hgmc.mak
+include target/homelab/homelab.mak
+include target/homelab2/homelab2.mak
 include target/kc/kc.mak
 include target/kramermc/kramermc.mak
 include target/krokha/krokha.mak
@@ -243,6 +248,7 @@ include target/micro8085/micro8085.mak
 include target/mikro80/mikro80.mak
 include target/multi8/multi8.mak
 include target/myvision/myvision.mak
+include target/mz/mz.mak
 include target/ondra/ondra.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
@@ -908,11 +914,10 @@ srr_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/srr_clib @$(TARGET_DIRECTORY)/srr/srr.lst
 
 # Sharp MZ lib - Stefano
-mz_clib.lib: $(TARGET_CLIB_DEPS)
+mz_clib.lib: $(TARGET_CLIB_DEPS) $(MZ_TARGETS)
 	@echo ''
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
-	$(MAKE) -C target/mz
 	$(MAKE) -C classic/games TARGET=mz
 	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(TARGET_DIRECTORY)/mz/mz.lst
@@ -927,7 +932,7 @@ mz2500_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=mz2500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz2500 -x$(OUTPUT_DIRECTORY)/mz2500_clib @$(TARGET_DIRECTORY)/mz2500/mz2500.lst
 
 # ABC80 Library - Stefano
-abc80_clib.lib: $(TARGET_CLIB_DEPS)
+abc80_clib.lib: $(TARGET_CLIB_DEPS) $(ABC80_TARGETS)
 	@echo ''
 	@echo '--- Building ABC80 Library ---'
 	@echo ''
@@ -2192,7 +2197,7 @@ lviv_clib.lib: $(TARGET_CLIB_DEPS) $(LVIV_TARGETS)
 	$(MAKE) -C classic/games TARGET=lviv
 	TARGET=lviv TYPE=8080 $(LIBLINKER) -m8080 -DFORlviv -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lviv_clib @$(TARGET_DIRECTORY)/lviv/lviv.lst
 
-altair8800_clib.lib: $(TARGET_CLIB_DEPS)
+altair8800_clib.lib: $(TARGET_CLIB_DEPS) $(ALTAIR8800_TARGETS)
 	@echo ''
 	@echo '--- Building Altair8800 Library ---'
 	@echo ''
@@ -2231,7 +2236,7 @@ ondra_clib.lib: $(TARGET_CLIB_DEPS) $(ONDRA_TARGETS)
 	TARGET=ondra TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORondra -x$(OUTPUT_DIRECTORY)/ondra_clib @$(TARGET_DIRECTORY)/ondra/ondra.lst
 
 # Homelab 3/4 - dom
-homelab_clib.lib: $(TARGET_CLIB_DEPS)
+homelab_clib.lib: $(TARGET_CLIB_DEPS) $(HOMELAB_TARGETS)
 	@echo ''
 	@echo '--- Building Homelab Library ---'
 	@echo ''
@@ -2240,7 +2245,7 @@ homelab_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=homelab TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab -x$(OUTPUT_DIRECTORY)/homelab_clib @$(TARGET_DIRECTORY)/homelab/homelab.lst
 
 # Homelab2  - dom
-homelab2_clib.lib: $(TARGET_CLIB_DEPS)
+homelab2_clib.lib: $(TARGET_CLIB_DEPS) $(HOMELAB2_TARGETS)
 	@echo ''
 	@echo '--- Building Homelab2 Library ---'
 	@echo ''
