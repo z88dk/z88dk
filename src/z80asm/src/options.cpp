@@ -553,7 +553,6 @@ bool Options::search_source(const string& filename, string& out_filename) {
             cout << "% " << m4_cmd << endl;
         if (0 != system(m4_cmd.c_str())) {
 			g_errors.error(ErrCmdFailed, m4_cmd);
-            perror("m4");
             return false;
         }
         else
