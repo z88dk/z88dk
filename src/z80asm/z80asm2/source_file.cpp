@@ -189,11 +189,11 @@ static inline size_t skip_line_ending(const std::string_view content, size_t end
 
 // split into lines, handling CR, CR-LF, and LF
 void split_source_lines(SourceFile& sf, const std::string_view content) {
-    const size_t n = content.size();
+    sf.line_offsets.clear();
+    sf.line_lengths.clear();
 
     size_t pos = 0;
-    size_t line = 0;
-
+    const size_t n = content.size();
     while (pos < n) {
         size_t end = find_line_end(content, pos);
 
@@ -201,7 +201,6 @@ void split_source_lines(SourceFile& sf, const std::string_view content) {
         sf.line_lengths.push_back(end - pos);
 
         pos = skip_line_ending(content, end);
-        ++line;
     }
 
     // Handle final empty line if file ends with newline
