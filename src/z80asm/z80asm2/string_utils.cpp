@@ -104,7 +104,7 @@ std::string escape_string(const std::string_view s) {
 
 std::string int_to_hex(int value) {
     std::ostringstream oss;
-    if (abs(value < 10)) {
+    if (abs(value) < 10) {
         oss << value;
     }
     else if (value < 0) {
