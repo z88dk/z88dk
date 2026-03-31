@@ -1,5 +1,3 @@
-target/c7420/stdio/fgetc_cons
-target/c7420/stdio/getk
-target/c7420/stdio/fputc_cons
+target/c7420/obj/${TARGET}/**/*.o
 @classic/stdio/stdio.lst
 

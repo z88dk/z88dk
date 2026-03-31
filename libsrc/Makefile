@@ -226,6 +226,7 @@ include target/abc80/abc80.mak
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
 include target/altair8800/altair8800.mak
+include target/c7420/c7420.mak
 include target/dai/dai.mak
 include target/einstein/einstein.mak
 include target/gal/gal.mak
@@ -1042,7 +1043,7 @@ gemini.lib: cpm_clib.lib
 	TARGET=gemini TYPE=z80 $(LIBLINKER) -DFORgemini -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gemini.lib @$(TARGET_DIRECTORY)/gemini/gemini.lst
 
 # Philips Videopac C7420 library - Stefano
-c7420_clib.lib: $(TARGET_CLIB_DEPS)
+c7420_clib.lib: $(TARGET_CLIB_DEPS) $(C7420_TARGETS)
 	@echo ''
 	@echo '--- Building Philips Videopac C7420 Library ---'
 	@echo ''
