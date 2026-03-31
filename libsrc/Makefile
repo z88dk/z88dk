@@ -257,9 +257,11 @@ include target/sam/sam.mak
 include target/sc3000/sc3000.mak
 include target/sms/sms.mak
 include target/sol20/sol20.mak
+include target/sos/sos.mak
 include target/spc1000/spc1000.mak
 include target/sv8000/sv8000.mak
 include target/ts2068/ts2068.mak
+include target/vector06c/vector06c.mak
 include target/vg5k/vg5k.mak
 include target/x07/x07.mak
 include target/z88/z88.mak
@@ -2106,13 +2108,12 @@ vg5k_clib.lib: $(TARGET_CLIB_DEPS) $(VG5K_TARGETS)
 	TARGET=vg5k TYPE=ixiy $(LIBLINKER) -IXIY -DFORvg5k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(TARGET_DIRECTORY)/vg5k/vg5k.lst
 
 # S-OS (The Sentinel) - Stefano
-sos_clib.lib: $(TARGET_CLIB_DEPS)
+sos_clib.lib: $(TARGET_CLIB_DEPS) $(SOS_TARGETS)
 	@echo ''
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
 	$(call buildgeneric,sos)
 	$(MAKE) -C classic/games TARGET=sos
-	$(MAKE) -C target/sos
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(TARGET_DIRECTORY)/sos/sos.lst
 
 # OSCA / FLOS - Stefano
@@ -2165,7 +2166,7 @@ m100_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=m100
 	TARGET=m100 TYPE=8085 $(LIBLINKER) -m8085 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(TARGET_DIRECTORY)/m100/m100.lst
 
-vector06c_clib.lib: $(TARGET_CLIB_DEPS)
+vector06c_clib.lib: $(TARGET_CLIB_DEPS) $(VECTOR06C_TARGETS)
 	@echo ''
 	@echo '--- Building Vector06c Library ---'
 	@echo ''
