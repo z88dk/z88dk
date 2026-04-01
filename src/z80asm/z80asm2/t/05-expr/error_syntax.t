@@ -2,10 +2,10 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+my $dir = path($0)->dirname;
 my $self = path($0)->basename(".t");
-my $options = path("t/05-expr/input/$self.txt")->slurp =~ s/\s+/ /gr;
 capture_ok(
-    "z88dk-z80asm -v $options -dump-after-cmdline t/05-expr/input/empty.asm",
+    "z88dk-z80asm -v -dump-after-cmdline \@$dir/input/$self.lst $dir/input/empty.asm",
     "t/05-expr/expected/$self.txt"
 );
 

@@ -1,11 +1,17 @@
-% z88dk-z80asm -v -DA=5 -DB=2 -DE00=1/0 -DE01=5%+0 -DE02=A/(B-B) -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/error_div.lst t/05-expr//input/empty.asm
 Define constant: A = 5
 Define constant: B = 2
-<command-line>:1:4: error: Division by zero
+t/05-expr/input/error_div.lst:3:10: error: Division by zero
+    -DE00=1/0
+             ^
 Define constant: E00 = 0
-<command-line>:1:5: error: Modulo by zero
+t/05-expr/input/error_div.lst:4:11: error: Modulo by zero
+    -DE01=5%+0
+              ^
 Define constant: E01 = 0
-<command-line>:1:8: error: Division by zero
+t/05-expr/input/error_div.lst:5:14: error: Division by zero
+    -DE02=A/(B-B)
+                 ^
 Define constant: E02 = 0
 verbose	1
 ucase_labels	0

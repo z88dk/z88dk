@@ -1,4 +1,4 @@
-% z88dk-z80asm -v -DE00=((((((5)))))) -DE01=((((1+2)*3)-4)/5) -DE02=1+2+3+4+5+6+7+8+9+10 -DE03=1*2*3*4*5*6 -DE04=((((2**3)**2)**2)**2) -DE05=--5 -DE06=-+5 -DE07=~-1 -DE08=!-1 -DE09=!-!0 -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/stress.lst t/05-expr//input/empty.asm
 Define constant: E00 = 5
 Define constant: E01 = 1
 Define constant: E02 = $37
