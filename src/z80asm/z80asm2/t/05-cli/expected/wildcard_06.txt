@@ -17,4 +17,3 @@ include_path	t/05-cli/input/wildcard
 input_file	t/05-cli/input/wildcard/a1.asm
 input_file	t/05-cli/input/wildcard/a2.asm
 input_file	t/05-cli/input/wildcard/bX.asm
-input_file	t/05-cli/input/wildcard/bX1.asm
