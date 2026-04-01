@@ -1,7 +1,10 @@
 % z88dk-z80asm -v -dump-after-cmdline @t/05-cli//input/at_files_03.lst
-t/05-cli/input/at_files_03.lst:4:2: error: Expected filename after '@'
+t/05-cli/input/at_files_03.lst:4:5: error: Expected filename after '@'
     	@ 	; missing file
-    	^
+    	  	^
+t/05-cli/input/at_files_03.lst:5:5: error: Expected filename after '@'
+    	@ 	# missing file
+    	  	^
 verbose	1
 ucase_labels	0
 preprocess_only	0

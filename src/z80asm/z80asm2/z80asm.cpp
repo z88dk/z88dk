@@ -84,21 +84,17 @@ int main(int argc, char* argv[]) {
     // process options from environment variable Z80ASM
     std::istringstream ss(get_env_value(z80asm_env));
     std::string arg;
-    while (ss >> arg) {
+    for (int i = 1; ss >> arg; ++i) {
         bool found_dash_dash = false;
-        if (!parse_arg(arg, found_dash_dash)) {
-            error(SourceLoc("<environment>", 1, 1),
-                  "Invalid option: " + arg);
-        }
+        SourceLoc loc("<environment>", i, 1);
+        parse_arg(arg, found_dash_dash, loc);
     }
 
     // process command line arguments
     bool found_dash_dash = false;
     for (int i = 1; i < argc; ++i) {
-        if (!parse_arg(argv[i], found_dash_dash)) {
-            error(SourceLoc("<command-line>", 1, 1),
-                  "Invalid option: " + std::string(argv[i]));
-        }
+        SourceLoc loc("<command-line>", i, 1);
+        parse_arg(argv[i], found_dash_dash, loc);
     }
 
     if (g_args.options.dump_after_cmdline) {
