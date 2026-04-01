@@ -1,4 +1,4 @@
-% z88dk-z80asm -v -DE00=1+2 -DE01=7-3 -DE02=2*3 -DE03=8/2 -DE04=7%3 -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/arithmetic.lst t/05-expr//input/empty.asm
 Define constant: E00 = 3
 Define constant: E01 = 4
 Define constant: E02 = 6
