@@ -1,5 +1,5 @@
 % z88dk-z80asm -v -dump-after-cmdline file_does_not_exist
-error: File not found: file_does_not_exist
+<command-line>:3:1: error: File not found: file_does_not_exist
 verbose	1
 ucase_labels	0
 preprocess_only	0
