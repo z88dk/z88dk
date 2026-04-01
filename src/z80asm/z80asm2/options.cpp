@@ -10,6 +10,7 @@
 #include "pathnames.h"
 #include "source_file.h"
 #include "string_utils.h"
+#include <algorithm>
 #include <cassert>
 #include <filesystem>
 #include <iomanip>
@@ -636,7 +637,7 @@ void search_source_file(const std::string_view filename_,
             }
         }
 
-        // Deduplicate while preserving order
+        // Deduplicate and sort to make test results predictable
         std::set<std::string> seen;
         std::vector<std::string> unique_matches;
         unique_matches.reserve(matches.size());
@@ -645,6 +646,7 @@ void search_source_file(const std::string_view filename_,
                 unique_matches.push_back(m);
             }
         }
+        std::sort(unique_matches.begin(), unique_matches.end());
 
         if (unique_matches.empty()) {
             // no matches -> report not found unless an error already exists
