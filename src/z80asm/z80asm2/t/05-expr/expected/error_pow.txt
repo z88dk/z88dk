@@ -1,11 +1,17 @@
-% z88dk-z80asm -v -DA=5 -DB=2 -DE00=2**-1 -DE01=0**0 -DE02=(-3)**-2 -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/error_pow.lst t/05-expr//input/empty.asm
 Define constant: A = 5
 Define constant: B = 2
-<command-line>:1:6: error: Negative exponent in integer is not defined
+t/05-expr/input/error_pow.lst:3:12: error: Negative exponent in integer is not defined
+    -DE00=2**-1
+               ^
 Define constant: E00 = 0
-<command-line>:1:5: error: Zero raised to the power of zero is not defined
+t/05-expr/input/error_pow.lst:4:11: error: Zero raised to the power of zero is not defined
+    -DE01=0**0
+              ^
 Define constant: E01 = 1
-<command-line>:1:9: error: Negative exponent in integer is not defined
+t/05-expr/input/error_pow.lst:5:15: error: Negative exponent in integer is not defined
+    -DE02=(-3)**-2
+                  ^
 Define constant: E02 = 0
 verbose	1
 ucase_labels	0

@@ -1,4 +1,4 @@
-% z88dk-z80asm -v -DE00=1+2*3 -DE01=(1+2)*3 -DE02=[1+2]*3 -DE03=2*3+4 -DE04=2*(3+4) -DE05=2*[3+4] -DE06=2+3<<2 -DE07=2+3<<1+1 -DE08=2&3=0 -DE09=2&(3=0) -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/precedence.lst t/05-expr//input/empty.asm
 Define constant: E00 = 7
 Define constant: E01 = 9
 Define constant: E02 = 9

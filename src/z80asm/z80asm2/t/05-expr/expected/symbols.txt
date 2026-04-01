@@ -1,4 +1,4 @@
-% z88dk-z80asm -v -DA=5 -DB=2 -DC=-3 -DE00=A+B -DE01=A*B+C -DE02=A*(B+C) -DE03=A||C -DE04=C&&B -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/symbols.lst t/05-expr//input/empty.asm
 Define constant: A = 5
 Define constant: B = 2
 Define constant: C = -3
