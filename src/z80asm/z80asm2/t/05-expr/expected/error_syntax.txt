@@ -1,24 +1,34 @@
-% z88dk-z80asm -v -DE00=1+ -DE01=*3 -DE02=1** -DE03=(1+2 -DE04=1+2) -DE05=((3) -DE06=3+(4*) -DE07=3 4 -DE08=|| 5 -DE09=2+3# -dump-after-cmdline t/05-expr/input/empty.asm
-<command-line>:1:3: error: Expected a value, got "\n"
-<command-line>:1:1: error: Invalid option: -DE00=1+
-<command-line>:1:1: error: Expected a value, got "*"
-<command-line>:1:1: error: Invalid option: -DE01=*3
-<command-line>:1:4: error: Expected a value, got "\n"
-<command-line>:1:1: error: Invalid option: -DE02=1**
-<command-line>:1:5: error: Missing ')' after token "2"
-<command-line>:1:1: error: Invalid option: -DE03=(1+2
-<command-line>:1:4: error: Operator expected after token "2", got ")"
-<command-line>:1:1: error: Invalid option: -DE04=1+2)
-<command-line>:1:5: error: Missing ')' after token ")"
-<command-line>:1:1: error: Invalid option: -DE05=((3)
-<command-line>:1:6: error: Expected a value, got ")"
-<command-line>:1:1: error: Invalid option: -DE06=3+(4*)
-<command-line>:1:3: error: Operator expected after token "3", got "4"
-<command-line>:1:1: error: Invalid option: -DE07=3 4
-<command-line>:1:1: error: Expected a value, got "||"
-<command-line>:1:1: error: Invalid option: -DE08=|| 5
-<command-line>:1:4: error: Operator expected after token "3", got "#"
-<command-line>:1:1: error: Invalid option: -DE09=2+3#
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/error_syntax.lst t/05-expr//input/empty.asm
+t/05-expr/input/error_syntax.lst:1:9: error: Expected a value, got "\n"
+    -DE00=1+
+            ^
+t/05-expr/input/error_syntax.lst:2:7: error: Expected a value, got "*"
+    -DE01=*3
+          ^
+t/05-expr/input/error_syntax.lst:3:10: error: Expected a value, got "\n"
+    -DE02=1**
+             ^
+t/05-expr/input/error_syntax.lst:4:11: error: Missing ')' after token "2"
+    -DE03=(1+2
+              ^
+t/05-expr/input/error_syntax.lst:5:10: error: Operator expected after token "2", got ")"
+    -DE04=1+2)
+             ^
+t/05-expr/input/error_syntax.lst:6:11: error: Missing ')' after token ")"
+    -DE05=((3)
+              ^
+t/05-expr/input/error_syntax.lst:7:12: error: Expected a value, got ")"
+    -DE06=3+(4*)
+               ^
+t/05-expr/input/error_syntax.lst:8:8: error: Operator expected after token "3", got "$ff"
+    -DE07=3$ff
+           ^
+t/05-expr/input/error_syntax.lst:9:7: error: Expected a value, got "||"
+    -DE08=||5
+          ^
+t/05-expr/input/error_syntax.lst:10:10: error: Operator expected after token "3", got "#"
+    -DE09=2+3#
+             ^
 verbose	1
 ucase_labels	0
 preprocess_only	0

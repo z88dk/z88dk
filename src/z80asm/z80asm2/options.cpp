@@ -151,19 +151,20 @@ static void append_with_space(std::string& dst, std::string_view src) {
     dst.append(src);
 }
 
-static bool parse_define(std::string_view arg, std::string_view opt_name) {
-    SourceLoc loc("<command-line>", 1, 1);
-
+static void parse_define(std::string_view arg, std::string_view opt_name,
+                         SourceLoc loc) {
     // Strip the "-D" prefix
     if (!starts_with(arg, opt_name)) {
-        return false;
+        return;
     }
 
     std::string_view rest = arg.substr(opt_name.size());
+    loc.column += static_cast<uint16_t>(opt_name.size());
 
     // Optional '=' after -D
     if (starts_with(rest, "=")) {
         rest.remove_prefix(1);
+        loc.column += 1;
     }
 
     // Split NAME and EXPR
@@ -177,10 +178,12 @@ static bool parse_define(std::string_view arg, std::string_view opt_name) {
     }
     else {
         name = rest.substr(0, eq);
+        loc.column += static_cast<uint16_t>(name.size());
         expr = rest.substr(eq + 1);
+        loc.column += 1; // for the '=' character
         if (expr.empty()) {
             error(loc, "Expression missing in option: " + std::string(arg));
-            return false;
+            return;
         }
     }
 
@@ -192,13 +195,11 @@ static bool parse_define(std::string_view arg, std::string_view opt_name) {
     int value = 1;
     if (!eval_const_expr(expr_s, loc, g_args.options.global_defs,
                          value, /*silent=*/false)) {
-        return false;   // error already reported by eval_const_expr
+        return;   // error already reported by eval_const_expr
     }
 
     // Hand off to your assembler’s define mechanism
     g_args.options.global_defs.set(name_s, value, loc);
-
-    return true;
 }
 
 // match longest option prefix in arg, return nullptr if no match
@@ -249,9 +250,10 @@ static bool split_option_arg(std::string_view arg,
     return true;
 }
 
-bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
+void parse_arg(const std::string_view arg,
+               bool& found_dash_dash, const SourceLoc& loc) {
     if (arg.empty()) {
-        return true;
+        return;
     }
 
     // ------------------------------------------------------------
@@ -265,7 +267,7 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
 
         if (arg == "--") {
             found_dash_dash = true;
-            return true;
+            return;
         }
 
         if (arg == "--help") {
@@ -277,7 +279,8 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
         // --------------------------------------------------------
         const OptionSpec* spec = match_option(arg);
         if (!spec) {
-            return false;
+            error(loc, "Invalid option: " + std::string(arg));
+            return;
         }
 
         std::string opt_arg;
@@ -291,85 +294,90 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
 
         case OptionType::VERBOSE:
             g_args.options.verbose = true;
-            return true;
+            return;
 
         case OptionType::INCLUDE:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
+                error(loc, "Invalid option: " + std::string(arg));
+                return;
             }
             g_args.options.include_paths.push_back(normalize_path(opt_arg));
-            return true;
+            return;
 
         case OptionType::OUTPUT:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
+                error(loc, "Invalid option: " + std::string(arg));
+                return;
             }
             g_args.options.output_dir = opt_arg;
-            return true;
+            return;
 
         case OptionType::CPP:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
+                error(loc, "Invalid option: " + std::string(arg));
+                return;
             }
             append_with_space(g_args.options.cpp_options, opt_arg);
-            return true;
+            return;
 
         case OptionType::M4:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
+                error(loc, "Invalid option: " + std::string(arg));
+                return;
             }
             append_with_space(g_args.options.m4_options, opt_arg);
-            return true;
+            return;
 
         case OptionType::PERL:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                return false;
+                error(loc, "Invalid option: " + std::string(arg));
+                return;
             }
             append_with_space(g_args.options.perl_options, opt_arg);
-            return true;
+            return;
 
         case OptionType::DEFINE:
-            return parse_define(arg, spec->name);
+            parse_define(arg, spec->name, loc);
+            return;
 
         case OptionType::PREPROC:
             g_args.options.preprocess_only = true;
-            return true;
+            return;
 
         case OptionType::IXIY:
             g_args.options.swap_ix_iy = true;
-            return true;
+            return;
 
         case OptionType::UCASE:
             g_args.options.ucase_labels = true;
-            return true;
+            return;
 
         case OptionType::DATESTAMP:
             g_args.options.date_stamp = true;
-            return true;
+            return;
 
         case OptionType::DUMP_AFTER_CMDLINE:
             g_args.options.dump_after_cmdline = true;
-            return true;
+            return;
 
         case OptionType::DUMP_AFTER_TOKENIZATION:
             g_args.options.dump_after_tokenization = true;
-            return true;
+            return;
 
         case OptionType::DUMP_AFTER_DIRECTIVES:
             g_args.options.dump_after_directives = true;
-            return true;
+            return;
 
         case OptionType::DUMP_AFTER_MACRO_EXPANSION:
             g_args.options.dump_after_macro_expansion = true;
-            return true;
+            return;
 
         case OptionType::DUMP_AFTER_PREPROCESSING:
             g_args.options.dump_after_preprocessing = true;
-            return true;
+            return;
 
         default:
             assert(0);
-            return false;
         }
     }
 
@@ -377,8 +385,7 @@ bool parse_arg(const std::string_view arg, bool& found_dash_dash) {
     // 4. Not an option -> treat as input file
     // ------------------------------------------------------------
     std::vector<SourceLoc> empty_stack;
-    search_source_file(arg, "", SourceLoc(), empty_stack);
-    return true;
+    search_source_file(arg, "", loc, empty_stack);
 }
 
 static std::string check_source(const std::string_view filename) {
@@ -551,7 +558,9 @@ static bool parse_filename_entry(const std::string_view line_,
     }
 
     if (has_at && (*p == '\0' || *p == ';' || *p == '#')) {
-        error(in_out_loc, "Expected filename after '@'");
+        SourceLoc here_loc = in_out_loc;
+        here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+        error(here_loc, "Expected filename after '@'");
         return false;
     }
 
@@ -570,7 +579,9 @@ static bool parse_filename_entry(const std::string_view line_,
     }
 
     if (*p != '\0' && *p != ';' && *p != '#') {
-        error(in_out_loc, "Unexpected text after filename: " + std::string(p));
+        SourceLoc here_loc = in_out_loc;
+        here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+        error(here_loc, "Unexpected text after filename: " + std::string(p));
         return false;
     }
 
@@ -616,7 +627,14 @@ void search_source_file(const std::string_view filename_,
     filename = expand_env_vars(filename);
     std::string out_filename;
 
-    // Expand wildcards first: process each matched file independently
+    // check for command line options first
+    if (!filename.empty() && filename[0] == '-') {
+        bool found_dash_dash = false;
+        parse_arg(filename, found_dash_dash, loc);
+        return;
+    }
+
+    // Expand wildcards: process each matched file independently
     if (has_wildcards(filename)) {
         std::vector<std::string> matches;
 
