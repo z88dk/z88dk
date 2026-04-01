@@ -1,4 +1,4 @@
-% z88dk-z80asm -v -DE00=-1+2 -DE01=~0 -DE02=!0 -DE03=!5 -DE04=~-1 -dump-after-cmdline t/05-expr/input/empty.asm
+% z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/unary.lst t/05-expr//input/empty.asm
 Define constant: E00 = 1
 Define constant: E01 = -1
 Define constant: E02 = 1
