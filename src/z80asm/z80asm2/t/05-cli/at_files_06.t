@@ -5,7 +5,7 @@ use Modern::Perl;
 my $dir = path($0)->dirname;
 my $self = path($0)->basename(".t");
 capture_ok(
-    "z88dk-z80asm -v -dump-after-cmdline -I$dir/input '\@$self.lst'",
+    "z88dk-z80asm -v -dump-after-cmdline -I$dir/input \@$self.lst",
     "$dir/expected/$self.txt"
 );
 
