@@ -267,10 +267,13 @@ include target/sol20/sol20.mak
 include target/sos/sos.mak
 include target/spc1000/spc1000.mak
 include target/sv8000/sv8000.mak
+include target/tim011/tim011.mak
 include target/ts2068/ts2068.mak
 include target/vector06c/vector06c.mak
 include target/vg5k/vg5k.mak
 include target/x07/x07.mak
+include target/z1013/z1013.mak
+include target/z80tvgame/z80tvgame.mak
 include target/z88/z88.mak
 include target/z9001/z9001.mak
 include target/zx/zx.mak
@@ -827,7 +830,7 @@ x1_cpm.lib: x1_clib.lib
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(TARGET_DIRECTORY)/x1/x1_common.lst
 
-tim011.lib: cpm_clib.lib
+tim011.lib: cpm_clib.lib $(TIM011_TARGETS)
 	@echo ''
 	@echo '--- Building Tim-011 Library ---'
 	@echo ''
@@ -1315,7 +1318,7 @@ nascom_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DFORnascomcpm -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascomcpm @$(TARGET_DIRECTORY)/nascom/nascomcpm.lst
 
 # Robotron Z1013 library - Stefano
-z1013_clib.lib: $(TARGET_CLIB_DEPS)
+z1013_clib.lib: $(TARGET_CLIB_DEPS) $(Z1013_TARGETS)
 	@echo ''
 	@echo '--- Building Robotron Z1013 Library ---'
 	@echo ''
@@ -1472,7 +1475,7 @@ fp1100_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_cpm @$(TARGET_DIRECTORY)/fp1100/fp1100_cpm.lst
 
 # Z80 TV Game
-z80tvgame_clib.lib: $(TARGET_CLIB_DEPS)
+z80tvgame_clib.lib: $(TARGET_CLIB_DEPS) $(Z80TVGAME_TARGETS)
 	@echo ''
 	@echo '--- Building Z80 TV Game Library ---'
 	@echo ''

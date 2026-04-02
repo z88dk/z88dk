@@ -1,14 +1,6 @@
-target/z80tvgame/stdio/generic_console
-target/z80tvgame/stdio/generic_console_vpeek
-target/z80tvgame/stdio/generic_console_ioctl
-target/z80tvgame/stdio/CRT_FONT
-target/z80tvgame/stdio/getk
-target/z80tvgame/stdio/fgetc_cons
-@classic/stdio/stdio.lst
+target/z80tvgame/obj/${TARGET}/**/*.o
 
-target/z80tvgame/games/joystick
+@classic/stdio/stdio.lst
 @classic/games/games.lst
-target/z80tvgame/graphics/pixladdr
-target/z80tvgame/graphics/clsgraph
 @classic/gfx/narrow/gfx_narrow.lst
 
