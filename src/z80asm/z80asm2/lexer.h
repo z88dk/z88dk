@@ -11,12 +11,8 @@
 #include "location.h"
 #include "options.h"
 #include <deque>
-#include <filesystem>
 #include <functional>
-#include <memory>
-#include <optional>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -169,77 +165,6 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-// Token cache for file-based tokenization
-//-----------------------------------------------------------------------------
-
-class TokenCache {
-public:
-    // Get cached tokens for a file. Returns nullptr if not cached or invalid.
-    // Also outputs cached preprocessor flags if available.
-    std::shared_ptr<const std::vector<TokenLine>> get(
-                const std::string& filename,
-                bool& has_pragma_once,
-                bool& has_ifndef_guard,
-                std::string& ifndef_guard_symbol);
-
-    // Store tokenized result in cache without copying the vector
-    void put(const std::string& filename,
-             std::shared_ptr<const std::vector<TokenLine>> token_lines,
-             bool has_pragma_once,
-             bool has_ifndef_guard,
-             std::string ifndef_guard_symbol);
-
-    void clear();
-
-#ifdef UNIT_TESTS
-    // Test-only methods
-    size_t cache_size() const {
-        return cache_.size();
-    }
-    bool has_cached(const std::string& filename) const {
-        auto key = make_cache_key(filename);
-        return key && cache_.find(*key) != cache_.end();
-    }
-#endif
-
-private:
-    struct CacheKey {
-        std::string filename;
-        std::filesystem::file_time_type mtime;
-        std::uintmax_t file_size;
-
-        bool operator==(const CacheKey& other) const {
-            return filename == other.filename &&
-                   mtime == other.mtime &&
-                   file_size == other.file_size;
-        }
-    };
-
-    struct CacheKeyHash {
-        size_t operator()(const CacheKey& k) const {
-            size_t h1 = std::hash<std::string> {}(k.filename);
-            size_t h2 = std::hash<std::filesystem::file_time_type::rep> {}(
-                            k.mtime.time_since_epoch().count());
-            size_t h3 = std::hash<std::uintmax_t> {}(k.file_size);
-            return h1 ^ (h2 << 1) ^ (h3 << 2);
-        }
-    };
-
-    struct CachedEntry {
-        std::shared_ptr<const std::vector<TokenLine>> token_lines;
-        Options options_snapshot;  // Cache is invalidated if options change
-        bool has_pragma_once_ = false;
-        bool has_ifndef_guard_ = false;
-        std::string ifndef_guard_symbol_;
-    };
-
-    std::optional<CacheKey> make_cache_key(const std::string& filename) const;
-    bool options_match(const Options& cached, const Options& current) const;
-
-    std::unordered_map<CacheKey, CachedEntry, CacheKeyHash> cache_;
-};
-
-//-----------------------------------------------------------------------------
 // TokenFileReader class - reads and tokenizes a source file
 //-----------------------------------------------------------------------------
 
@@ -250,21 +175,7 @@ public:
     bool open(const std::string& filename) override;
     bool next_token_line(TokenLine& token_line);
 
-#ifdef UNIT_TESTS
-    static TokenCache& get_cache_for_testing() {
-        return get_cache();
-    }
-    bool is_using_cache() const {
-        return use_cached_mode_;
-    }
-#endif
-
-    // include guard detection accessors
-    bool has_pragma_once() const;
-    bool has_ifndef_guard() const;
-    const std::string& ifndef_guard_symbol() const;
-
-    // Inject lines into the reader; they take precedence over file/cached content.
+    // Inject lines into the reader;
     void inject(const std::string& filename, size_t line_number, bool fixed_line_number,
                 const std::string& content);
     void inject_tokens(const std::vector<TokenLine>& lines);
@@ -282,18 +193,7 @@ public:
     static int g_provider_calls_in_session; // count of line provider calls in current session
 
 private:
-    // Cache-related members
-    static TokenCache& get_cache();
-    bool use_cached_mode_ = false;
-
-    // Shared cached lines (no copy)
-    std::shared_ptr<const std::vector<TokenLine>> cached_lines_ptr_;
-    size_t current_line_index_ = 0;
-
-    // Accumulated lines for eventual cache population during reading
-    std::vector<TokenLine> pending_cache_lines_;
-
-    // Existing members
+    // Members
     std::string source_line_;
     std::deque<TokenLine> output_queue_;
     bool is_injected_ = false;
@@ -305,19 +205,6 @@ private:
     // Defaults to the underlying FileReader::next_line.
     std::function<bool(std::string&)> line_provider_;
 
-    // Include guards
-    bool has_pragma_once_ = false;
-    bool has_ifndef_guard_ = false;
-    std::string ifndef_guard_symbol_;
-    enum class DetectIfndefState {
-        Initial, FoundIfndef, Final
-    };
-    DetectIfndefState detect_ifndef_state_ = DetectIfndefState::Initial;
-    enum class DetectPragmaState {
-        Initial, Final
-    };
-    DetectPragmaState detect_pragma_state_ = DetectPragmaState::Initial;
-
     bool tokenize_line(TokenLine& token_line);
     void inject(const std::string& filename, const std::string& content) override;
 
@@ -328,15 +215,7 @@ private:
                       std::deque<TokenLine>& target_queue);
     bool is_define(const TokenLine& line);
 
-    // Helper to check cache after opening
-    void check_cache();
-    void accumulate_for_cache(const TokenLine& token_line);
-    void persist_cache();
-
     // Helper used by the lexer/re2c-generated code to advance to the next physical line.
     bool next_line_from_provider();
     bool read_and_tokenize_line(TokenLine& token_line);
-
-    // Detect include guards while reading the file from the provider
-    void detect_include_guard(const TokenLine& line);
 };

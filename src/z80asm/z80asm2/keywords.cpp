@@ -36,34 +36,9 @@ std::string keyword_to_string(Keyword kw) {
 }
 #undef X
 
-bool keyword_is_preproc_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
-    return (flags & IS_PREPROC_DIRECTIVE) != 0;
-}
-
-bool keyword_directive_has_file_arg(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
-    return (flags & DIRECTIVE_HAS_FILE_ARG) != 0;
-}
-
-bool keyword_is_preproc_name_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
-    return (flags & IS_PREPROC_NAME_DIRECTIVE) != 0;
-}
-
 bool keyword_is_asm_directive(Keyword kw) {
     int flags = keyword_flags[static_cast<int>(kw)];
     return (flags & IS_ASM_DIRECTIVE) != 0;
-}
-
-bool keyword_is_conditional_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
-    return (flags & IS_CONDITIONAL_DIRECTIVE) != 0;
-}
-
-bool keyword_is_hla_directive(Keyword kw) {
-    int flags = keyword_flags[static_cast<int>(kw)];
-    return (flags & IS_HLA_DIRECTIVE) != 0;
 }
 
 bool keyword_is_register(Keyword kw) {
@@ -97,10 +72,7 @@ bool keyword_is_opcode(Keyword kw) {
 }
 
 bool keyword_is_instruction(Keyword kw) {
-    return keyword_is_preproc_directive(kw) ||
-           keyword_is_preproc_name_directive(kw) ||
-           keyword_is_conditional_directive(kw) ||
-           keyword_is_asm_directive(kw) ||
+    return keyword_is_asm_directive(kw) ||
            keyword_is_opcode(kw);
 }
 

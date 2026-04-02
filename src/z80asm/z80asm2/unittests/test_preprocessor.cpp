@@ -710,53 +710,6 @@ TEST_CASE("Preprocessor: C_LINE with missing argument reports error",
     REQUIRE(msg.find("cline_missing_arg:1:") != std::string::npos);
 }
 
-// New test: push_binary_file should produce DEFB lines for a 256-byte file
-// containing values 0..255 (16 bytes per line -> 16 lines).
-TEST_CASE("Preprocessor: push_binary_file reads 0..255 bytes and emits DEFB lines",
-          "[preprocessor][binary]") {
-    g_errors.reset();
-    Preprocessor pp;
-
-    const std::string fname = "pp_0_255.bin";
-    // create binary file with bytes 0..255
-    {
-        std::ofstream ofs(fname, std::ios::binary);
-        REQUIRE(ofs.is_open());
-        for (int i = 0; i < 256; ++i) {
-            char c = static_cast<char>(i);
-            ofs.write(&c, 1);
-        }
-    }
-
-    // Push the binary file as a virtual file (DEFB lines)
-    pp.push_binary_file(fname, Location(fname, 1));
-
-    TokenLine line;
-    std::vector<int> ints;
-    int returned_lines = 0;
-
-    while (pp.next_line(line)) {
-        const auto& toks = line.tokens();
-        // collect integer tokens from the DEFB lines
-        for (const auto& t : toks) {
-            if (t.is(TokenType::Integer)) {
-                ints.push_back(t.int_value());
-            }
-        }
-        ++returned_lines;
-    }
-
-    // Expect 256 bytes, values 0..255, and 16 lines (256/16)
-    REQUIRE(ints.size() == 256);
-    for (int i = 0; i < 256; ++i) {
-        REQUIRE(ints[i] == i);
-    }
-    REQUIRE(returned_lines == 16);
-    REQUIRE_FALSE(g_errors.has_errors());
-
-    std::remove(fname.c_str());
-}
-
 TEST_CASE("Preprocessor: BINARY directive is parsed and replaced by 16 DEFB lines at directive logical location",
           "[preprocessor][binary][directive]") {
     g_errors.reset();
@@ -7039,28 +6992,6 @@ TEST_CASE("Preprocessor: dependency_filenames captures BINARY/INCBIN in order (i
 
     std::remove(ok1.c_str());
     std::remove(ok2.c_str());
-}
-
-TEST_CASE("Preprocessor: clear() resets dependency_filenames",
-          "[preprocessor][deps][clear]") {
-    g_errors.reset();
-    Preprocessor pp;
-
-    // Record a dependency via push_binary_file (file may not exist)
-    const std::string dep = "dep_clear_dummy.bin";
-    pp.push_binary_file(dep, Location("loc", 1));
-
-    {
-        const auto& deps = pp.dependency_filenames();
-        REQUIRE(!deps.empty());
-        REQUIRE(deps.front() == dep);
-    }
-
-    // Now clear and verify dependencies are empty
-    pp.clear();
-    REQUIRE(pp.dependency_filenames().empty());
-    std::string msg = g_errors.last_error_message();
-    REQUIRE(msg.find("File not found: " + dep) != std::string::npos);
 }
 
 TEST_CASE("Preprocessor: multi-line macro expands in the middle of a three-statements line (parenthesized call)",

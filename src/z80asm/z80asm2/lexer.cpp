@@ -9,7 +9,6 @@
 #include "utils.h"
 #include <algorithm>
 #include <cassert>
-#include <filesystem>
 #include <memory>
 
 //-----------------------------------------------------------------------------
@@ -234,94 +233,10 @@ std::string TokenLine::to_string() const {
 }
 
 //-----------------------------------------------------------------------------
-// TokenCache implementation
-//-----------------------------------------------------------------------------
-
-std::optional<TokenCache::CacheKey> TokenCache::make_cache_key(
-    const std::string& filename) const {
-    try {
-        auto path = std::filesystem::path(filename);
-        if (!std::filesystem::exists(path)) {
-            return std::nullopt;
-        }
-
-        return CacheKey{
-            std::filesystem::canonical(path).string(),
-            std::filesystem::last_write_time(path),
-            std::filesystem::file_size(path)
-        };
-    }
-    catch (const std::filesystem::filesystem_error&) {
-        return std::nullopt;
-    }
-}
-
-bool TokenCache::options_match(const Options& cached,
-                               const Options& current) const {
-    return cached.ucase_labels == current.ucase_labels &&
-           cached.swap_ix_iy == current.swap_ix_iy;
-}
-
-std::shared_ptr<const std::vector<TokenLine>> TokenCache::get(
-            const std::string& filename,
-            bool& has_pragma_once,
-            bool& has_ifndef_guard,
-std::string& ifndef_guard_symbol) {
-
-    auto key_opt = make_cache_key(filename);
-    if (!key_opt) {
-        return nullptr;
-    }
-
-    auto it = cache_.find(*key_opt);
-    if (it != cache_.end()) {
-        if (options_match(it->second.options_snapshot, g_options)) {
-            has_pragma_once = it->second.has_pragma_once_;
-            has_ifndef_guard = it->second.has_ifndef_guard_;
-            ifndef_guard_symbol = it->second.ifndef_guard_symbol_;
-            return it->second.token_lines;
-        }
-        else {
-            cache_.erase(it);
-        }
-    }
-
-    return nullptr;
-}
-
-void TokenCache::put(const std::string& filename,
-                     std::shared_ptr<const std::vector<TokenLine>> token_lines,
-                     bool has_pragma_once,
-                     bool has_ifndef_guard,
-                     std::string ifndef_guard_symbol) {
-    auto key_opt = make_cache_key(filename);
-    if (!key_opt) {
-        return;
-    }
-
-    cache_[*key_opt] = CachedEntry{
-        std::move(token_lines),
-        g_options,
-        has_pragma_once,
-        has_ifndef_guard,
-        ifndef_guard_symbol
-    };
-}
-
-void TokenCache::clear() {
-    cache_.clear();
-}
-
-//-----------------------------------------------------------------------------
 // TokenFileReader implementation
 //-----------------------------------------------------------------------------
 
 int TokenFileReader::g_provider_calls_in_session = 0;
-
-TokenCache& TokenFileReader::get_cache() {
-    static TokenCache cache;
-    return cache;
-}
 
 TokenFileReader::TokenFileReader(const std::string& filename)
     : FileReader(filename) {
@@ -329,19 +244,12 @@ TokenFileReader::TokenFileReader(const std::string& filename)
 }
 
 bool TokenFileReader::open(const std::string& filename) {
-    detect_ifndef_state_ = DetectIfndefState::Initial;
-    detect_pragma_state_ = DetectPragmaState::Initial;
     is_injected_ = false;
 
     // Do not install a default provider that captures `this`.
     line_provider_ = nullptr;
 
-    bool ok = FileReader::open(filename);
-    if (ok) {
-        check_cache();
-    }
-
-    return ok;
+    return FileReader::open(filename);
 }
 
 bool TokenFileReader::next_line_from_provider() {
@@ -385,8 +293,6 @@ void TokenFileReader::set_fixed_line_number(size_t line_num) {
 
 bool TokenFileReader::read_and_tokenize_line(TokenLine& token_line) {
     if (!next_line_from_provider()) {
-        // EOF: persist cache (real files only)
-        persist_cache();
         return false;
     }
 
@@ -397,215 +303,6 @@ bool TokenFileReader::read_and_tokenize_line(TokenLine& token_line) {
         split_lines(token_line, output_queue_);
     }
     return true;
-}
-
-void TokenFileReader::detect_include_guard(const TokenLine& line) {
-    const auto& toks = line.tokens();
-    if (toks.empty()) {
-        return;
-    }
-
-    // detect pragma once
-    if (!has_pragma_once_) {
-        switch (detect_pragma_state_) {
-        case DetectPragmaState::Initial:
-            if (toks.size() >= 3 &&
-                    toks[0].is(TokenType::Hash) &&
-                    toks[1].is(Keyword::PRAGMA) &&
-                    toks[2].is(Keyword::ONCE)) {
-                has_pragma_once_ = true;
-                detect_pragma_state_ = DetectPragmaState::Final;
-                break;
-            }
-            if (toks.size() >= 2 &&
-                    toks[0].is(Keyword::PRAGMA) &&
-                    toks[1].is(Keyword::ONCE)) {
-                has_pragma_once_ = true;
-                detect_pragma_state_ = DetectPragmaState::Final;
-                break;
-            }
-            // any other pragma is ignored
-            if (toks.size() >= 2 &&
-                    toks[0].is(TokenType::Hash) &&
-                    toks[1].is(Keyword::PRAGMA)) {
-                break;
-            }
-            if (toks.size() >= 1 &&
-                    toks[0].is(Keyword::PRAGMA)) {
-                break;
-            }
-            // any other line aborts the detection
-            detect_pragma_state_ = DetectPragmaState::Final;
-            break;
-        case DetectPragmaState::Final:
-            // do nothing
-            break;
-        default:
-            assert(0);
-        }
-    }
-
-    // detect ifndef guard
-    if (!has_ifndef_guard_) {
-        switch (detect_ifndef_state_) {
-        case DetectIfndefState::Initial:
-            if (toks.size() >= 3 &&
-                    toks[0].is(TokenType::Hash) &&
-                    toks[1].is(Keyword::IFNDEF) &&
-                    toks[2].is(TokenType::Identifier)) {
-                ifndef_guard_symbol_ = toks[2].text();
-                detect_ifndef_state_ = DetectIfndefState::FoundIfndef;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(Keyword::IFNDEF) &&
-                    toks[1].is(TokenType::Identifier)) {
-                ifndef_guard_symbol_ = toks[1].text();
-                detect_ifndef_state_ = DetectIfndefState::FoundIfndef;
-                break;
-            }
-
-            // any other line aborts the detection
-            detect_ifndef_state_ = DetectIfndefState::Final;
-            break;
-
-        case DetectIfndefState::FoundIfndef:
-            if (toks.size() >= 3 &&
-                    toks[0].is(TokenType::Hash) &&
-                    toks[1].is(Keyword::DEFINE) &&
-                    toks[2].is(TokenType::Identifier) &&
-                    toks[2].text() == ifndef_guard_symbol_) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(Keyword::DEFINE) &&
-                    toks[1].is(TokenType::Identifier) &&
-                    toks[1].text() == ifndef_guard_symbol_) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(Keyword::DEFC) &&
-                    toks[1].is(TokenType::Identifier) &&
-                    toks[1].text() == ifndef_guard_symbol_) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(Keyword::EQU) &&
-                    toks[1].is(TokenType::Identifier) &&
-                    toks[1].text() == ifndef_guard_symbol_) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(TokenType::Identifier) &&
-                    toks[0].text() == ifndef_guard_symbol_ &&
-                    toks[1].is(Keyword::DEFINE)) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(TokenType::Identifier) &&
-                    toks[0].text() == ifndef_guard_symbol_ &&
-                    toks[1].is(Keyword::DEFC)) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            if (toks.size() >= 2 &&
-                    toks[0].is(TokenType::Identifier) &&
-                    toks[0].text() == ifndef_guard_symbol_ &&
-                    toks[1].is(Keyword::EQU)) {
-                has_ifndef_guard_ = true;
-                detect_ifndef_state_ = DetectIfndefState::Final;
-                break;
-            }
-
-            // any other line aborts the detection
-            detect_ifndef_state_ = DetectIfndefState::Final;
-            break;
-
-        case DetectIfndefState::Final:
-            // do nothing
-            break;
-
-        default:
-            assert(0);
-        }
-    }
-}
-
-void TokenFileReader::check_cache() {
-    use_cached_mode_ = false;
-    cached_lines_ptr_.reset();
-    current_line_index_ = 0;
-    pending_cache_lines_.clear();
-
-    if (filename_.empty() || is_injected_) {
-        return;
-    }
-
-    cached_lines_ptr_ = get_cache().get(filename_,
-                                        has_pragma_once_,
-                                        has_ifndef_guard_,
-                                        ifndef_guard_symbol_);
-    if (cached_lines_ptr_) {
-        use_cached_mode_ = true;
-    }
-    else {
-        // read first few lines to detect include guards
-        detect_ifndef_state_ = DetectIfndefState::Initial;
-        detect_pragma_state_ = DetectPragmaState::Initial;
-
-        TokenLine token_line;
-        while (true) {
-            const size_t before = output_queue_.size();
-
-            if (!read_and_tokenize_line(token_line)) {
-                break; // EOF
-            }
-
-            // Process only the newly enqueued logical lines (no re-splitting)
-            for (size_t i = before; i < output_queue_.size(); ++i) {
-                detect_include_guard(output_queue_[i]);
-            }
-
-            if (detect_ifndef_state_ == DetectIfndefState::Final &&
-                    detect_pragma_state_ == DetectPragmaState::Final) {
-                break;
-            }
-        }
-    }
-}
-
-void TokenFileReader::accumulate_for_cache(const TokenLine& token_line) {
-    // Accumulate for caching (non-injected text files)
-    if (!filename_.empty() && !is_injected_) {
-        pending_cache_lines_.push_back(token_line); // copy per produced line
-    }
-}
-
-void TokenFileReader::persist_cache() {
-    if (!filename_.empty() && !is_injected_ && !pending_cache_lines_.empty()) {
-        auto vec_ptr = std::make_shared<const std::vector<TokenLine>>(
-                           std::move(pending_cache_lines_));
-        get_cache().put(filename_, vec_ptr,
-                        has_pragma_once_, has_ifndef_guard_, ifndef_guard_symbol_);
-    }
 }
 
 bool TokenFileReader::next_token_line(TokenLine& token_line) {
@@ -619,19 +316,7 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
         return true;
     }
 
-    // 2) Cached mode
-    if (use_cached_mode_) {
-        if (cached_lines_ptr_ && current_line_index_ < cached_lines_ptr_->size()) {
-            token_line = (*cached_lines_ptr_)[current_line_index_++];
-
-            g_errors.set_location(token_line.location());
-            g_errors.set_expanded_line(token_line.to_string());
-            return true;
-        }
-        return false;
-    }
-
-    // 3) Normal path
+    // 2) Normal path
     while (true) {
         if (!output_queue_.empty()) {
             token_line = std::move(output_queue_.front());
@@ -639,7 +324,6 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
 
             g_errors.set_location(token_line.location());
             g_errors.set_expanded_line(token_line.to_string());
-            accumulate_for_cache(token_line);
             return true;
         }
 
@@ -656,19 +340,6 @@ bool TokenFileReader::next_token_line(TokenLine& token_line) {
 void TokenFileReader::inject(const std::string& filename, const std::string& content) {
     (void)filename; // uset the current filename_ instead
     inject(filename, 1, false, content);
-}
-
-// include guard detection accessors
-bool TokenFileReader::has_pragma_once() const {
-    return has_pragma_once_;
-}
-
-bool TokenFileReader::has_ifndef_guard() const {
-    return has_ifndef_guard_;
-}
-
-const std::string& TokenFileReader::ifndef_guard_symbol() const {
-    return ifndef_guard_symbol_;
 }
 
 void TokenFileReader::inject(const std::string& filename, size_t line_number,

@@ -43,26 +43,6 @@
 
 #define YYFILL() 1
 
-static void swap_x_y(std::string& str) {
-    // replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
-    for (auto& c : str) {
-        switch (c) {
-        case 'x': c = 'y'; break;
-        case 'X': c = 'Y'; break;
-        case 'y': c = 'x'; break;
-        case 'Y': c = 'X'; break;
-        default:;
-        }
-    }
-}
-
-static void swap_ix_iy(std::string& str, Keyword& keyword) {
-    if (keyword_is_x_register(keyword)) {
-        swap_x_y(str);
-        keyword = keyword_lookup(str);
-    }
-}
-
 bool TokenFileReader::tokenize_line(TokenLine& out_line) {
     const char* p = source_line_.c_str();
     const char* pe = p + source_line_.size();
@@ -350,11 +330,6 @@ main_loop:
         ident "'"?      {
             str = std::string(tok, p);
 
-            // to upper
-            if (g_options.ucase_labels) {
-                str = to_upper(str);
-            }
-
             // handle af' et all
             Keyword keyword = keyword_lookup(str);
             if (str.back() == '\'' && keyword == Keyword::None) {
@@ -362,11 +337,6 @@ main_loop:
                 str.pop_back();
                 --p;
                 keyword = keyword_lookup(str);
-            }
-
-            // check for -IXIY
-            if (g_options.swap_ix_iy) {
-                swap_ix_iy(str, keyword);
             }
 
             // check for .ASSUME
@@ -381,11 +351,6 @@ main_loop:
                 Token t(TokenType::ASMPC, str, keyword, has_space_after);
                 out_line.tokens().push_back(t);
                 continue;
-            }
-
-            // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
-            if (keyword_directive_has_file_arg(keyword)) {
-                raw_strings = true;
             }
 
             bool has_space_after = (p < pe) && is_space(*p);

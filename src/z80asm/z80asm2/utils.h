@@ -85,13 +85,5 @@ std::string absolute_path(const std::string& path);
 // accept LF, CR and CR-LF as line endings
 std::vector<std::string> split_lines(const std::string& text);
 
-// Helper: get environment variable value in a secure, cross-platform way.
-// Returns empty string if the variable is not set.
-std::string get_env_value(const std::string& name);
-
-// Expand environment variables: replaces ${VAR} with getenv("VAR") or "" if unset.
-// Supports nesting like ${var${param}} by recursively expanding inside names and values.
-std::string expand_env_vars(const std::string& text);
-
 // Helper function to format integer as hex string
 std::string int_to_hex(int value);
