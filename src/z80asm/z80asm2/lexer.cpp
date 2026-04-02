@@ -109,7 +109,7 @@ void tokenize(SourceFile& sf, const std::string_view content) {
         std::string_view first = get_line_view(sf, content, i);
 
         merged.text.reserve(first.size());
-        merged.locmap.reserve(first.size());
+        merged.locmap.reserve(first.size() + 1);
 
         int col = 1;
         size_t physical_line = i + 1;
@@ -136,6 +136,10 @@ void tokenize(SourceFile& sf, const std::string_view content) {
                 merged.locmap.emplace_back(sf.file_id, physical_line, col++);
             }
         }
+
+        // Sentinel: one past the last character, for error reporting
+        // at end-of-line
+        merged.locmap.emplace_back(sf.file_id, physical_line, col);
 
         // Tokenize merged line
         std::vector<Token> tokens;
@@ -176,12 +180,16 @@ std::vector<Token> tokenize_text(const std::string_view text,
     merged.file_id = loc.file_id;
     merged.logical_line = loc.line;   // for listing if needed
     merged.text = text;
-    merged.locmap.reserve(text.size());
+    merged.locmap.reserve(text.size() + 1);
 
     int col = loc.column;
     for ([[maybe_unused]] char c : text) {
         merged.locmap.emplace_back(loc.file_id, loc.line, col++);
     }
+
+    // Sentinel: one past the last character, for error reporting
+    // at end-of-line
+    merged.locmap.emplace_back(loc.file_id, loc.line, col);
 
     // Tokenize
     TokenizeState state;   // fresh state: no multiline comments, etc.

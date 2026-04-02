@@ -59,16 +59,8 @@ static void print_message(const SourceLoc& loc,
         // no filename or special filename (e.g. <command line>)
         return;
     }
-    SourceFile* file = get_source_file(filename, SourceLoc());
-    if (!file) {
-        return;
-    }
 
-    if (loc.line < 1 || loc.line > file->line_offsets.size()) {
-        return;
-    }
-
-    std::string text = read_line(*file, loc.line - 1, SourceLoc());
+    std::string text = get_source_line(filename, loc.line);
     if (!text.empty()) {
         print_source_line(text, loc.column);
     }
