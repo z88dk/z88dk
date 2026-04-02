@@ -18,10 +18,10 @@ jobs:
         submodules: 'true'
     - name: Install homebrew dependencies
       run: |
-        brew install cpanminus perl dos2unix boost ragel re2c make gmp
+        brew install cpanminus perl dos2unix boost ragel re2c make gmp m4
     - name: Install perl prerequisites
       run: |
-        export PATH=/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         cpanm --notest Clone XML::Twig Spreadsheet::ParseXLSX
         cpanm App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
@@ -29,24 +29,24 @@ jobs:
         eval "$(/opt/homebrew/bin/brew shellenv)"
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
-        export PATH=/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         MAKE_CONCURRENCY=-j3 ./build.sh -v -l
     - name: Build libraries
       run: |
-        export PATH=/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         MAKE_CONCURRENCY=-j1 ./build.sh -v -b
     - name: Build examples
       run: |
-        export PATH=/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         ./build.sh -v -b -l -e
     - name: Build sdcc needed for tests
       run: |
         eval "$(/opt/homebrew/bin/brew shellenv)"
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
-        export PATH=/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
     - name: Run tests
       run: |
-        export PATH=/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         ./build.sh -v -b -l -t
