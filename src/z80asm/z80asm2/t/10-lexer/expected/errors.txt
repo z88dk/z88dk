@@ -1,9 +1,17 @@
 % z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/errors.asm
 Assembling t/10-lexer/input/errors.asm...
 t/10-lexer/input/errors.asm:1:1: error: Unexpected character: '`'
-t/10-lexer/input/errors.asm:2:1: error: Invalid character 'a' after literal: '%1010'
-t/10-lexer/input/errors.asm:3:13: error: Unterminated string literal
-t/10-lexer/input/errors.asm:4:1: error: Invalid character 'a' after literal: '12'
+    ` ; invalid
+    ^
+t/10-lexer/input/errors.asm:2:6: error: Invalid character 'a' after literal: '%1010'
+    %1010a
+         ^
+t/10-lexer/input/errors.asm:3:14: error: Unterminated string literal
+    "unterminated
+                 ^
+t/10-lexer/input/errors.asm:4:3: error: Invalid character 'a' after literal: '12'
+    12a34
+      ^
 # file: t/10-lexer/input/errors.asm
 EndOfLine	"\n"	1:1	
 EndOfLine	"\n"	2:1	
