@@ -154,7 +154,7 @@ static bool scan_quoted_content(char end_quote,
     }
 
     if (!probing) {
-        error(line.locmap[idx - 1], "Unterminated string literal");
+        error(line.locmap[idx], "Unterminated string literal");
     }
     idx = n;    // advance past the malformed string
     return false;
@@ -271,10 +271,13 @@ void tokenize_line(const MergedLine& line,
 
     auto check_trailing_char = [&]() -> bool {
         if (is_ident_char(*p)) {
-            error(current_loc(),
+            std::string literal_text =
+            line.text.substr(start, p - line.text.c_str() - start);
+            SourceLoc here_loc = current_loc();
+            here_loc.column = static_cast<uint16_t>(p - line.text.c_str() + 1);
+            error(here_loc,
                   "Invalid character '" + std::string(1, *p) +
-                  "' after literal: '" +
-                  line.text.substr(start, p - line.text.c_str() - start) + "'");
+                  "' after literal: '" + literal_text + "'");
             return false;
         }
         return true;
