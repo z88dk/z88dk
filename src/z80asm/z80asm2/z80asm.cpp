@@ -78,6 +78,7 @@ int main(int argc, char* argv[]) {
 
     // show command line if verbose
     if (has_verbose(argc, argv)) {
+        g_args.options.verbose = true;
         show_command_line(argc, argv);
     }
 
