@@ -37,6 +37,13 @@ SourceFile* get_source_file(const std::string_view file, const SourceLoc& loc);
 // return an error string if file cannot be opened or line number is out of range
 std::string read_line(const SourceFile& sf, size_t line, const SourceLoc& loc);
 
+// get a source line by filename and 1-based line number
+// tries the cached SourceFile first; if unavailable (e.g. during tokenization
+// of the same file), falls back to reading the file and splitting lines
+// returns empty string if the file cannot be read or line is out of range
+std::string get_source_line(const std::string_view filename,
+                            size_t line_number);
+
 // read whole file from a string
 // issues error message if file cannot be opened
 bool read_file_to_string(const std::string_view filename, const SourceLoc& loc,
