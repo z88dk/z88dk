@@ -187,6 +187,50 @@ static inline size_t skip_line_ending(const std::string_view content, size_t end
     return end;
 }
 
+// get a source line by filename and 1-based line number
+// tries the cached SourceFile first; if unavailable (e.g. during tokenization
+// of the same file), falls back to reading the file and splitting lines
+std::string get_source_line(const std::string_view filename, size_t line_number) {
+    if (line_number == 0) {
+        return "";
+    }
+
+    // Fast path: try the cached SourceFile
+    SourceFile* file = get_source_file(filename, SourceLoc());
+    if (file) {
+        size_t index = line_number - 1;
+        if (index < file->line_offsets.size()) {
+            return read_line(*file, index, SourceLoc());
+        }
+        return "";
+    }
+
+    // Slow path: get_source_file returned nullptr (recursion guard hit).
+    // Read the file independently and split into lines.
+    std::string content;
+    if (!read_file_to_string(filename, SourceLoc(), content)) {
+        return "";
+    }
+
+    // Walk through lines until we reach the requested one
+    size_t pos = 0;
+    size_t current_line = 1;
+    const size_t n = content.size();
+
+    while (pos < n) {
+        size_t end = find_line_end(content, pos);
+
+        if (current_line == line_number) {
+            return std::string(content, pos, end - pos);
+        }
+
+        pos = skip_line_ending(content, end);
+        ++current_line;
+    }
+
+    return "";
+}
+
 // split into lines, handling CR, CR-LF, and LF
 void split_source_lines(SourceFile& sf, const std::string_view content) {
     sf.line_offsets.clear();
