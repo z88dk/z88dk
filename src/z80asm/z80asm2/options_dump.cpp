@@ -69,5 +69,9 @@ void dump_after_cmdline_and_exit() {
         std::cout << "input_file\t" << filename << "\n";
     }
 
+    for (auto& filename : g_args.obj_files) {
+        std::cout << "obj_file\t" << filename << "\n";
+    }
+
     exit(EXIT_SUCCESS);
 }

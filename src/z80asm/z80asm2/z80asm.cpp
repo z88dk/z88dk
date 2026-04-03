@@ -10,6 +10,7 @@
 #include "lexer_tokens.h"
 #include "options.h"
 #include "options_dump.h"
+#include "pathnames.h"
 #include "preproc_driver.h"
 #include <filesystem>
 #include <iostream>
@@ -39,7 +40,18 @@ static void assemble_file(const std::string_view filename) {
 
 static void assemble_files() {
     for (const std::string& filename : g_args.input_files) {
-        assemble_file(filename);
+        if (is_o_filename(filename)) {
+            if (g_args.options.verbose) {
+                std::cout << "Skipping object file " << filename
+                          << "..." << std::endl;
+            }
+            g_args.obj_files.push_back(filename);
+        }
+        else {
+            // assemble source file
+            // will push resulting object file to g_args.obj_files
+            assemble_file(filename);
+        }
     }
 }
 
