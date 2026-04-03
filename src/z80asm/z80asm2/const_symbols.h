@@ -20,8 +20,6 @@ struct ConstSymbol {
 struct ConstSymbols {
     std::unordered_map<StringInterner::Id, ConstSymbol> symbols;
 
-    void clear();
-
     void set(StringInterner::Id name_id, int value, const SourceLoc& loc);
     const ConstSymbol* get(StringInterner::Id name_id) const;
     void erase(StringInterner::Id name_id);
