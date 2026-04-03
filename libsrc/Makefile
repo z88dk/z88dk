@@ -250,6 +250,8 @@ include target/mikro80/mikro80.mak
 include target/multi8/multi8.mak
 include target/myvision/myvision.mak
 include target/mz/mz.mak
+include target/mz2500/mz2500.mak
+include target/nanos/nanos.mak
 include target/ondra/ondra.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
@@ -927,7 +929,7 @@ mz_clib.lib: $(TARGET_CLIB_DEPS) $(MZ_TARGETS)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(TARGET_DIRECTORY)/mz/mz.lst
 
 # Sharp MZ2500 lib - Stefano
-mz2500_clib.lib: $(TARGET_CLIB_DEPS)
+mz2500_clib.lib: $(TARGET_CLIB_DEPS) $(MZ2500_TARGETS)
 	@echo ''
 	@echo '--- Building Sharp MZ-2500 Library ---'
 	@echo ''
@@ -2329,7 +2331,7 @@ gfxvdm.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/gfx TARGET=altair8800 SUBTYPE=vdm FLAVOUR="gencon portable"
 	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(Z88DK_LIBSRC)/classic/video/vdm/video_vdm.lst
 
-nanos.lib: $(TARGET_CLIB_DEPS)
+nanos.lib: $(TARGET_CLIB_DEPS) $(NANOS_TARGETS)
 	@echo ''
 	@echo '--- Building Nanos Library ---'
 	@echo ''
