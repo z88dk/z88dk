@@ -121,6 +121,7 @@ static void process_BINARY(PreprocessorContext& ctx,
 static std::unordered_map<Keyword, DirectiveHandler> directive_handlers = {
     { Keyword::INCLUDE, process_INCLUDE },
     { Keyword::BINARY, process_BINARY },
+    { Keyword::INCBIN, process_BINARY },
 };
 
 //-----------------------------------------------------------------------------
