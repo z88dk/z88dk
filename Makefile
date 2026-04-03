@@ -76,6 +76,7 @@ src/config.h:
 		echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
 		fi)
 	@mkdir -p bin
+	@cp -f `which m4` bin/
 
 
 $(SDCC_PATH)/configure: $(SDCC_DEPS)
