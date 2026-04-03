@@ -10,13 +10,10 @@
 #include <string>
 #include <string_view>
 
-// Convert string to upper/lower case
+// Convert string to upper case
 std::string to_upper(const std::string_view s);
-std::string to_lower(const std::string_view s);
 
 // trim whitspace at the beginnint and at the end
-std::string ltrim(const std::string_view s);
-std::string rtrim(const std::string_view s);
 std::string trim(const std::string_view s);
 
 // check string ending
