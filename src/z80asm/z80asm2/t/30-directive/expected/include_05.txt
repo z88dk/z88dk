@@ -18,7 +18,7 @@ Identifier	"c"	1:4	keyword=C
 Comma	","	1:5	
 Integer	"1"	1:6	int_value=1 
 EndOfLine	"\n"	1:7	
-t/30-directive/input/include_05_i2.inc:2:9: error: Recursive inclusion of file: include_05_i1.inc
+t/30-directive/input/include_05_i2.inc:2:9: error: Recursive inclusion of file: t/30-directive/input/include_05_i1.inc
     include "include_05_i1.inc"
             ^
 Identifier	"ld"	3:1	keyword=LD 
