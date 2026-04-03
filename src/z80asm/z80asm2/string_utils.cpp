@@ -25,21 +25,12 @@ std::string to_upper(const std::string_view s) {
     return result;
 }
 
-std::string to_lower(const std::string_view s) {
-    std::string result(s);
-    std::transform(result.begin(), result.end(), result.begin(),
-    [](unsigned char c) {
-        return static_cast<char>(std::tolower(c));
-    });
-    return result;
-}
-
-std::string ltrim(const std::string_view s) {
+static std::string ltrim(const std::string_view s) {
     size_t start = s.find_first_not_of(blanks);
     return std::string((start == std::string::npos) ? "" : s.substr(start));
 }
 
-std::string rtrim(const std::string_view s) {
+static std::string rtrim(const std::string_view s) {
     size_t end = s.find_last_not_of(blanks);
     return std::string((end == std::string::npos) ? "" : s.substr(0, end + 1));
 }
