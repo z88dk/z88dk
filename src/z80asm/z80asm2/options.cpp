@@ -487,7 +487,6 @@ static void run_tool(const std::string_view filename,
 
     if (0 != system(cmd.c_str())) {
         error(loc, "Command failed: " + cmd);
-        perror(tool_name.c_str());
         return;
     }
 
