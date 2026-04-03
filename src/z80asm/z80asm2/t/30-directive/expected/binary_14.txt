@@ -1,0 +1,541 @@
+% z88dk-z80asm -v -dump-after-directives t/30-directive//input/binary_14.asm
+Assembling t/30-directive/input/binary_14.asm...
+# file: t/30-directive/input/binary_14.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"0"	2:9	int_value=0 
+Comma	","	2:9	
+Integer	"1"	2:9	int_value=1 
+Comma	","	2:9	
+Integer	"2"	2:9	int_value=2 
+Comma	","	2:9	
+Integer	"3"	2:9	int_value=3 
+Comma	","	2:9	
+Integer	"4"	2:9	int_value=4 
+Comma	","	2:9	
+Integer	"5"	2:9	int_value=5 
+Comma	","	2:9	
+Integer	"6"	2:9	int_value=6 
+Comma	","	2:9	
+Integer	"7"	2:9	int_value=7 
+Comma	","	2:9	
+Integer	"8"	2:9	int_value=8 
+Comma	","	2:9	
+Integer	"9"	2:9	int_value=9 
+Comma	","	2:9	
+Integer	"10"	2:9	int_value=10 
+Comma	","	2:9	
+Integer	"11"	2:9	int_value=11 
+Comma	","	2:9	
+Integer	"12"	2:9	int_value=12 
+Comma	","	2:9	
+Integer	"13"	2:9	int_value=13 
+Comma	","	2:9	
+Integer	"14"	2:9	int_value=14 
+Comma	","	2:9	
+Integer	"15"	2:9	int_value=15 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"16"	2:9	int_value=16 
+Comma	","	2:9	
+Integer	"17"	2:9	int_value=17 
+Comma	","	2:9	
+Integer	"18"	2:9	int_value=18 
+Comma	","	2:9	
+Integer	"19"	2:9	int_value=19 
+Comma	","	2:9	
+Integer	"20"	2:9	int_value=20 
+Comma	","	2:9	
+Integer	"21"	2:9	int_value=21 
+Comma	","	2:9	
+Integer	"22"	2:9	int_value=22 
+Comma	","	2:9	
+Integer	"23"	2:9	int_value=23 
+Comma	","	2:9	
+Integer	"24"	2:9	int_value=24 
+Comma	","	2:9	
+Integer	"25"	2:9	int_value=25 
+Comma	","	2:9	
+Integer	"26"	2:9	int_value=26 
+Comma	","	2:9	
+Integer	"27"	2:9	int_value=27 
+Comma	","	2:9	
+Integer	"28"	2:9	int_value=28 
+Comma	","	2:9	
+Integer	"29"	2:9	int_value=29 
+Comma	","	2:9	
+Integer	"30"	2:9	int_value=30 
+Comma	","	2:9	
+Integer	"31"	2:9	int_value=31 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"32"	2:9	int_value=32 
+Comma	","	2:9	
+Integer	"33"	2:9	int_value=33 
+Comma	","	2:9	
+Integer	"34"	2:9	int_value=34 
+Comma	","	2:9	
+Integer	"35"	2:9	int_value=35 
+Comma	","	2:9	
+Integer	"36"	2:9	int_value=36 
+Comma	","	2:9	
+Integer	"37"	2:9	int_value=37 
+Comma	","	2:9	
+Integer	"38"	2:9	int_value=38 
+Comma	","	2:9	
+Integer	"39"	2:9	int_value=39 
+Comma	","	2:9	
+Integer	"40"	2:9	int_value=40 
+Comma	","	2:9	
+Integer	"41"	2:9	int_value=41 
+Comma	","	2:9	
+Integer	"42"	2:9	int_value=42 
+Comma	","	2:9	
+Integer	"43"	2:9	int_value=43 
+Comma	","	2:9	
+Integer	"44"	2:9	int_value=44 
+Comma	","	2:9	
+Integer	"45"	2:9	int_value=45 
+Comma	","	2:9	
+Integer	"46"	2:9	int_value=46 
+Comma	","	2:9	
+Integer	"47"	2:9	int_value=47 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"48"	2:9	int_value=48 
+Comma	","	2:9	
+Integer	"49"	2:9	int_value=49 
+Comma	","	2:9	
+Integer	"50"	2:9	int_value=50 
+Comma	","	2:9	
+Integer	"51"	2:9	int_value=51 
+Comma	","	2:9	
+Integer	"52"	2:9	int_value=52 
+Comma	","	2:9	
+Integer	"53"	2:9	int_value=53 
+Comma	","	2:9	
+Integer	"54"	2:9	int_value=54 
+Comma	","	2:9	
+Integer	"55"	2:9	int_value=55 
+Comma	","	2:9	
+Integer	"56"	2:9	int_value=56 
+Comma	","	2:9	
+Integer	"57"	2:9	int_value=57 
+Comma	","	2:9	
+Integer	"58"	2:9	int_value=58 
+Comma	","	2:9	
+Integer	"59"	2:9	int_value=59 
+Comma	","	2:9	
+Integer	"60"	2:9	int_value=60 
+Comma	","	2:9	
+Integer	"61"	2:9	int_value=61 
+Comma	","	2:9	
+Integer	"62"	2:9	int_value=62 
+Comma	","	2:9	
+Integer	"63"	2:9	int_value=63 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"64"	2:9	int_value=64 
+Comma	","	2:9	
+Integer	"65"	2:9	int_value=65 
+Comma	","	2:9	
+Integer	"66"	2:9	int_value=66 
+Comma	","	2:9	
+Integer	"67"	2:9	int_value=67 
+Comma	","	2:9	
+Integer	"68"	2:9	int_value=68 
+Comma	","	2:9	
+Integer	"69"	2:9	int_value=69 
+Comma	","	2:9	
+Integer	"70"	2:9	int_value=70 
+Comma	","	2:9	
+Integer	"71"	2:9	int_value=71 
+Comma	","	2:9	
+Integer	"72"	2:9	int_value=72 
+Comma	","	2:9	
+Integer	"73"	2:9	int_value=73 
+Comma	","	2:9	
+Integer	"74"	2:9	int_value=74 
+Comma	","	2:9	
+Integer	"75"	2:9	int_value=75 
+Comma	","	2:9	
+Integer	"76"	2:9	int_value=76 
+Comma	","	2:9	
+Integer	"77"	2:9	int_value=77 
+Comma	","	2:9	
+Integer	"78"	2:9	int_value=78 
+Comma	","	2:9	
+Integer	"79"	2:9	int_value=79 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"80"	2:9	int_value=80 
+Comma	","	2:9	
+Integer	"81"	2:9	int_value=81 
+Comma	","	2:9	
+Integer	"82"	2:9	int_value=82 
+Comma	","	2:9	
+Integer	"83"	2:9	int_value=83 
+Comma	","	2:9	
+Integer	"84"	2:9	int_value=84 
+Comma	","	2:9	
+Integer	"85"	2:9	int_value=85 
+Comma	","	2:9	
+Integer	"86"	2:9	int_value=86 
+Comma	","	2:9	
+Integer	"87"	2:9	int_value=87 
+Comma	","	2:9	
+Integer	"88"	2:9	int_value=88 
+Comma	","	2:9	
+Integer	"89"	2:9	int_value=89 
+Comma	","	2:9	
+Integer	"90"	2:9	int_value=90 
+Comma	","	2:9	
+Integer	"91"	2:9	int_value=91 
+Comma	","	2:9	
+Integer	"92"	2:9	int_value=92 
+Comma	","	2:9	
+Integer	"93"	2:9	int_value=93 
+Comma	","	2:9	
+Integer	"94"	2:9	int_value=94 
+Comma	","	2:9	
+Integer	"95"	2:9	int_value=95 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"96"	2:9	int_value=96 
+Comma	","	2:9	
+Integer	"97"	2:9	int_value=97 
+Comma	","	2:9	
+Integer	"98"	2:9	int_value=98 
+Comma	","	2:9	
+Integer	"99"	2:9	int_value=99 
+Comma	","	2:9	
+Integer	"100"	2:9	int_value=100 
+Comma	","	2:9	
+Integer	"101"	2:9	int_value=101 
+Comma	","	2:9	
+Integer	"102"	2:9	int_value=102 
+Comma	","	2:9	
+Integer	"103"	2:9	int_value=103 
+Comma	","	2:9	
+Integer	"104"	2:9	int_value=104 
+Comma	","	2:9	
+Integer	"105"	2:9	int_value=105 
+Comma	","	2:9	
+Integer	"106"	2:9	int_value=106 
+Comma	","	2:9	
+Integer	"107"	2:9	int_value=107 
+Comma	","	2:9	
+Integer	"108"	2:9	int_value=108 
+Comma	","	2:9	
+Integer	"109"	2:9	int_value=109 
+Comma	","	2:9	
+Integer	"110"	2:9	int_value=110 
+Comma	","	2:9	
+Integer	"111"	2:9	int_value=111 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"112"	2:9	int_value=112 
+Comma	","	2:9	
+Integer	"113"	2:9	int_value=113 
+Comma	","	2:9	
+Integer	"114"	2:9	int_value=114 
+Comma	","	2:9	
+Integer	"115"	2:9	int_value=115 
+Comma	","	2:9	
+Integer	"116"	2:9	int_value=116 
+Comma	","	2:9	
+Integer	"117"	2:9	int_value=117 
+Comma	","	2:9	
+Integer	"118"	2:9	int_value=118 
+Comma	","	2:9	
+Integer	"119"	2:9	int_value=119 
+Comma	","	2:9	
+Integer	"120"	2:9	int_value=120 
+Comma	","	2:9	
+Integer	"121"	2:9	int_value=121 
+Comma	","	2:9	
+Integer	"122"	2:9	int_value=122 
+Comma	","	2:9	
+Integer	"123"	2:9	int_value=123 
+Comma	","	2:9	
+Integer	"124"	2:9	int_value=124 
+Comma	","	2:9	
+Integer	"125"	2:9	int_value=125 
+Comma	","	2:9	
+Integer	"126"	2:9	int_value=126 
+Comma	","	2:9	
+Integer	"127"	2:9	int_value=127 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"128"	2:9	int_value=128 
+Comma	","	2:9	
+Integer	"129"	2:9	int_value=129 
+Comma	","	2:9	
+Integer	"130"	2:9	int_value=130 
+Comma	","	2:9	
+Integer	"131"	2:9	int_value=131 
+Comma	","	2:9	
+Integer	"132"	2:9	int_value=132 
+Comma	","	2:9	
+Integer	"133"	2:9	int_value=133 
+Comma	","	2:9	
+Integer	"134"	2:9	int_value=134 
+Comma	","	2:9	
+Integer	"135"	2:9	int_value=135 
+Comma	","	2:9	
+Integer	"136"	2:9	int_value=136 
+Comma	","	2:9	
+Integer	"137"	2:9	int_value=137 
+Comma	","	2:9	
+Integer	"138"	2:9	int_value=138 
+Comma	","	2:9	
+Integer	"139"	2:9	int_value=139 
+Comma	","	2:9	
+Integer	"140"	2:9	int_value=140 
+Comma	","	2:9	
+Integer	"141"	2:9	int_value=141 
+Comma	","	2:9	
+Integer	"142"	2:9	int_value=142 
+Comma	","	2:9	
+Integer	"143"	2:9	int_value=143 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"144"	2:9	int_value=144 
+Comma	","	2:9	
+Integer	"145"	2:9	int_value=145 
+Comma	","	2:9	
+Integer	"146"	2:9	int_value=146 
+Comma	","	2:9	
+Integer	"147"	2:9	int_value=147 
+Comma	","	2:9	
+Integer	"148"	2:9	int_value=148 
+Comma	","	2:9	
+Integer	"149"	2:9	int_value=149 
+Comma	","	2:9	
+Integer	"150"	2:9	int_value=150 
+Comma	","	2:9	
+Integer	"151"	2:9	int_value=151 
+Comma	","	2:9	
+Integer	"152"	2:9	int_value=152 
+Comma	","	2:9	
+Integer	"153"	2:9	int_value=153 
+Comma	","	2:9	
+Integer	"154"	2:9	int_value=154 
+Comma	","	2:9	
+Integer	"155"	2:9	int_value=155 
+Comma	","	2:9	
+Integer	"156"	2:9	int_value=156 
+Comma	","	2:9	
+Integer	"157"	2:9	int_value=157 
+Comma	","	2:9	
+Integer	"158"	2:9	int_value=158 
+Comma	","	2:9	
+Integer	"159"	2:9	int_value=159 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"160"	2:9	int_value=160 
+Comma	","	2:9	
+Integer	"161"	2:9	int_value=161 
+Comma	","	2:9	
+Integer	"162"	2:9	int_value=162 
+Comma	","	2:9	
+Integer	"163"	2:9	int_value=163 
+Comma	","	2:9	
+Integer	"164"	2:9	int_value=164 
+Comma	","	2:9	
+Integer	"165"	2:9	int_value=165 
+Comma	","	2:9	
+Integer	"166"	2:9	int_value=166 
+Comma	","	2:9	
+Integer	"167"	2:9	int_value=167 
+Comma	","	2:9	
+Integer	"168"	2:9	int_value=168 
+Comma	","	2:9	
+Integer	"169"	2:9	int_value=169 
+Comma	","	2:9	
+Integer	"170"	2:9	int_value=170 
+Comma	","	2:9	
+Integer	"171"	2:9	int_value=171 
+Comma	","	2:9	
+Integer	"172"	2:9	int_value=172 
+Comma	","	2:9	
+Integer	"173"	2:9	int_value=173 
+Comma	","	2:9	
+Integer	"174"	2:9	int_value=174 
+Comma	","	2:9	
+Integer	"175"	2:9	int_value=175 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"176"	2:9	int_value=176 
+Comma	","	2:9	
+Integer	"177"	2:9	int_value=177 
+Comma	","	2:9	
+Integer	"178"	2:9	int_value=178 
+Comma	","	2:9	
+Integer	"179"	2:9	int_value=179 
+Comma	","	2:9	
+Integer	"180"	2:9	int_value=180 
+Comma	","	2:9	
+Integer	"181"	2:9	int_value=181 
+Comma	","	2:9	
+Integer	"182"	2:9	int_value=182 
+Comma	","	2:9	
+Integer	"183"	2:9	int_value=183 
+Comma	","	2:9	
+Integer	"184"	2:9	int_value=184 
+Comma	","	2:9	
+Integer	"185"	2:9	int_value=185 
+Comma	","	2:9	
+Integer	"186"	2:9	int_value=186 
+Comma	","	2:9	
+Integer	"187"	2:9	int_value=187 
+Comma	","	2:9	
+Integer	"188"	2:9	int_value=188 
+Comma	","	2:9	
+Integer	"189"	2:9	int_value=189 
+Comma	","	2:9	
+Integer	"190"	2:9	int_value=190 
+Comma	","	2:9	
+Integer	"191"	2:9	int_value=191 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"192"	2:9	int_value=192 
+Comma	","	2:9	
+Integer	"193"	2:9	int_value=193 
+Comma	","	2:9	
+Integer	"194"	2:9	int_value=194 
+Comma	","	2:9	
+Integer	"195"	2:9	int_value=195 
+Comma	","	2:9	
+Integer	"196"	2:9	int_value=196 
+Comma	","	2:9	
+Integer	"197"	2:9	int_value=197 
+Comma	","	2:9	
+Integer	"198"	2:9	int_value=198 
+Comma	","	2:9	
+Integer	"199"	2:9	int_value=199 
+Comma	","	2:9	
+Integer	"200"	2:9	int_value=200 
+Comma	","	2:9	
+Integer	"201"	2:9	int_value=201 
+Comma	","	2:9	
+Integer	"202"	2:9	int_value=202 
+Comma	","	2:9	
+Integer	"203"	2:9	int_value=203 
+Comma	","	2:9	
+Integer	"204"	2:9	int_value=204 
+Comma	","	2:9	
+Integer	"205"	2:9	int_value=205 
+Comma	","	2:9	
+Integer	"206"	2:9	int_value=206 
+Comma	","	2:9	
+Integer	"207"	2:9	int_value=207 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"208"	2:9	int_value=208 
+Comma	","	2:9	
+Integer	"209"	2:9	int_value=209 
+Comma	","	2:9	
+Integer	"210"	2:9	int_value=210 
+Comma	","	2:9	
+Integer	"211"	2:9	int_value=211 
+Comma	","	2:9	
+Integer	"212"	2:9	int_value=212 
+Comma	","	2:9	
+Integer	"213"	2:9	int_value=213 
+Comma	","	2:9	
+Integer	"214"	2:9	int_value=214 
+Comma	","	2:9	
+Integer	"215"	2:9	int_value=215 
+Comma	","	2:9	
+Integer	"216"	2:9	int_value=216 
+Comma	","	2:9	
+Integer	"217"	2:9	int_value=217 
+Comma	","	2:9	
+Integer	"218"	2:9	int_value=218 
+Comma	","	2:9	
+Integer	"219"	2:9	int_value=219 
+Comma	","	2:9	
+Integer	"220"	2:9	int_value=220 
+Comma	","	2:9	
+Integer	"221"	2:9	int_value=221 
+Comma	","	2:9	
+Integer	"222"	2:9	int_value=222 
+Comma	","	2:9	
+Integer	"223"	2:9	int_value=223 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"224"	2:9	int_value=224 
+Comma	","	2:9	
+Integer	"225"	2:9	int_value=225 
+Comma	","	2:9	
+Integer	"226"	2:9	int_value=226 
+Comma	","	2:9	
+Integer	"227"	2:9	int_value=227 
+Comma	","	2:9	
+Integer	"228"	2:9	int_value=228 
+Comma	","	2:9	
+Integer	"229"	2:9	int_value=229 
+Comma	","	2:9	
+Integer	"230"	2:9	int_value=230 
+Comma	","	2:9	
+Integer	"231"	2:9	int_value=231 
+Comma	","	2:9	
+Integer	"232"	2:9	int_value=232 
+Comma	","	2:9	
+Integer	"233"	2:9	int_value=233 
+Comma	","	2:9	
+Integer	"234"	2:9	int_value=234 
+Comma	","	2:9	
+Integer	"235"	2:9	int_value=235 
+Comma	","	2:9	
+Integer	"236"	2:9	int_value=236 
+Comma	","	2:9	
+Integer	"237"	2:9	int_value=237 
+Comma	","	2:9	
+Integer	"238"	2:9	int_value=238 
+Comma	","	2:9	
+Integer	"239"	2:9	int_value=239 
+EndOfLine	"\n"	2:9	
+Identifier	"DEFB"	2:9	keyword=DEFB 
+Integer	"240"	2:9	int_value=240 
+Comma	","	2:9	
+Integer	"241"	2:9	int_value=241 
+Comma	","	2:9	
+Integer	"242"	2:9	int_value=242 
+Comma	","	2:9	
+Integer	"243"	2:9	int_value=243 
+Comma	","	2:9	
+Integer	"244"	2:9	int_value=244 
+Comma	","	2:9	
+Integer	"245"	2:9	int_value=245 
+Comma	","	2:9	
+Integer	"246"	2:9	int_value=246 
+Comma	","	2:9	
+Integer	"247"	2:9	int_value=247 
+Comma	","	2:9	
+Integer	"248"	2:9	int_value=248 
+Comma	","	2:9	
+Integer	"249"	2:9	int_value=249 
+Comma	","	2:9	
+Integer	"250"	2:9	int_value=250 
+Comma	","	2:9	
+Integer	"251"	2:9	int_value=251 
+Comma	","	2:9	
+Integer	"252"	2:9	int_value=252 
+Comma	","	2:9	
+Integer	"253"	2:9	int_value=253 
+Comma	","	2:9	
+Integer	"254"	2:9	int_value=254 
+Comma	","	2:9	
+Integer	"255"	2:9	int_value=255 
+EndOfLine	"\n"	2:9	
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"2"	3:6	int_value=2 
+EndOfLine	"\n"	3:7	

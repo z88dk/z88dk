@@ -173,7 +173,8 @@ void expand_line(
             // ---------------------------------------------------------
             // 2.1 Recursion prevention
             // ---------------------------------------------------------
-            if (std::find(expansion_stack.begin(), expansion_stack.end(), name_id)
+            if (std::find(expansion_stack.begin(), expansion_stack.end(),
+                          name_id)
                     != expansion_stack.end()) {
                 // TODO: compat mode: skip; strict mode: error
                 continue;

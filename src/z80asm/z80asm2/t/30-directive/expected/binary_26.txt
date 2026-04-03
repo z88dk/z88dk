@@ -1,0 +1,36 @@
+% z88dk-z80asm -v -It/30-directive//input/library -dump-after-directives t/30-directive//input/binary_26.asm
+Assembling t/30-directive/input/binary_26.asm...
+# file: t/30-directive/input/binary_26.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:8	keyword=DEFB 
+Integer	"5"	2:8	int_value=5 
+Comma	","	2:8	
+Integer	"6"	2:8	int_value=6 
+Comma	","	2:8	
+Integer	"7"	2:8	int_value=7 
+Comma	","	2:8	
+Integer	"8"	2:8	int_value=8 
+EndOfLine	"\n"	2:8	
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"2"	3:6	int_value=2 
+EndOfLine	"\n"	3:7	
+Identifier	"DEFB"	4:8	keyword=DEFB 
+Integer	"1"	4:8	int_value=1 
+Comma	","	4:8	
+Integer	"2"	4:8	int_value=2 
+Comma	","	4:8	
+Integer	"3"	4:8	int_value=3 
+Comma	","	4:8	
+Integer	"4"	4:8	int_value=4 
+EndOfLine	"\n"	4:8	
+Identifier	"ld"	5:1	keyword=LD 
+Identifier	"a"	5:4	keyword=A 
+Comma	","	5:5	
+Integer	"3"	5:6	int_value=3 
+EndOfLine	"\n"	5:7	
