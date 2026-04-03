@@ -146,6 +146,30 @@ std::string read_line(const SourceFile& sf, size_t line,
     return "";
 }
 
+bool read_binary_file(const std::string_view filename, const SourceLoc& loc,
+                      std::vector<uint8_t>& out_content) {
+    out_content.clear();
+
+    std::ifstream in(std::string(filename), std::ios::binary | std::ios::ate);
+    if (!in) {
+        error(loc, "Failed to open file: " + std::string(filename));
+        return false;
+    }
+
+    std::streamsize size = in.tellg();
+    in.seekg(0, std::ios::beg);
+
+    out_content.resize(static_cast<size_t>(size));
+    if (size > 0 &&
+            !in.read(reinterpret_cast<char*>(out_content.data()), size)) {
+        error(loc, "Failed to read file: " + std::string(filename));
+        out_content.clear();
+        return false;
+    }
+
+    return true;
+}
+
 bool read_file_to_string(const std::string_view filename,
                          const SourceLoc& loc,
                          std::string& out_content) {
