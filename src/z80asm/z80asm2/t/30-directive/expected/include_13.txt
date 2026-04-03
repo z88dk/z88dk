@@ -1,0 +1,8 @@
+% z88dk-z80asm -v -dump-after-directives t/30-directive//input/include_13.asm
+Assembling t/30-directive/input/include_13.asm...
+t/30-directive/input/include_13.asm:1:31: error: Unexpected token after directive: extra
+    #include "file_not_found.inc" extra
+                                  ^
+t/30-directive/input/include_13.asm:1:10: error: File not found: file_not_found.inc
+    #include "file_not_found.inc" extra
+             ^

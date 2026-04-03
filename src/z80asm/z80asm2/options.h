@@ -33,6 +33,7 @@ struct Options {
 struct Args {
     Options options;
     std::vector<std::string> input_files;   // command line input files
+    std::vector<std::string> obj_files;     // resulting object files
 };
 
 extern Args g_args;

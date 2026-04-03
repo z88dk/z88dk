@@ -73,7 +73,8 @@ StringInterner::Id register_virtual_file(const std::string_view path) {
     return g_strings.intern(path);
 }
 
-SourceFile* get_source_file(const std::string_view filename, const SourceLoc& loc) {
+SourceFile* get_source_file(const std::string_view filename,
+                            const SourceLoc& loc) {
     // Normalize and intern the filename
     std::string norm = normalize_path(filename);
     StringInterner::Id file_id = g_strings.intern(norm);

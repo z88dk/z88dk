@@ -7,5 +7,7 @@
 #pragma once
 
 #include "preproc_context.h"
+#include "string_interner.h"
 
-void dump_logical_line(const LogicalLine& line);
+void dump_logical_line(const LogicalLine& line,
+                       StringInterner::Id& cur_file_id);

@@ -41,8 +41,8 @@ void dump_token(const Token& token) {
     std::cout << std::endl;
 }
 
-void dump_tokens(const std::vector<Token>& tokens) {
-    StringInterner::Id cur_file_id = static_cast<StringInterner::Id>(-1);
+void dump_tokens(const std::vector<Token>& tokens,
+                 StringInterner::Id& cur_file_id) {
     for (const Token& token : tokens) {
         if (token.loc.file_id != cur_file_id) {
             cur_file_id = token.loc.file_id;
@@ -68,6 +68,7 @@ void dump_after_tokenization_and_exit(const std::string_view filename) {
         tokens.insert(tokens.end(), line_tokens.begin(), line_tokens.end());
     }
 
-    dump_tokens(tokens);
+    StringInterner::Id cur_file_id = 0;
+    dump_tokens(tokens, cur_file_id);
     exit(EXIT_SUCCESS);
 }

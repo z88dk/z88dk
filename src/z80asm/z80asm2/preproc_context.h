@@ -37,7 +37,7 @@ struct PreprocessorContext {
         const SourceFile* file = nullptr;
         size_t current_line = 0;
         StringInterner::Id logical_file_id = 0;
-        int logical_line = 1;
+        size_t logical_line = 1;
     };
 
     std::vector<IncludeFrame> include_stack;
