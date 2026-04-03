@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/30-directive//input/binary_11.asm
+Assembling t/30-directive/input/binary_11.asm...
+t/30-directive/input/binary_11.asm:1:8: error: Expected filename after BINARY
+    #binary ; no input file
+           ^
