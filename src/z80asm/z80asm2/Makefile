@@ -69,7 +69,7 @@ cloc:
 
 # test code coverage
 coverage:
-	$(MAKE) clean
+	$(MAKE) clean astyle
 	$(MAKE) COVERAGE=1 test
 	gcov $(OBJ_DIR)/*.gcno | $(PERL) parse_gcov.pl | tee coverage.txt
 

@@ -46,7 +46,9 @@ my $count = 0;
 my $sum_coverage = 0;
 my $sum_lines = 0;
 for (@coverage) {
-	next if $_->{file} =~ m!/include/!;
+	next if $_->{file} =~ m{/include/};
+	next if $_->{file} =~ /\.h$/;
+	
 	say join("\t", $_->{coverage}.'%', $_->{lines}, $_->{file});
 	
 	$count++;
