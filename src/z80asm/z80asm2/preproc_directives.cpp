@@ -105,6 +105,23 @@
    End of Directive Processing Flow
    ------------------------------------------------------------------------- */
 
+//-----------------------------------------------------------------------------
+// dispatch table for directives
+//-----------------------------------------------------------------------------
+typedef void (*DirectiveHandler)(PreprocessorContext&,
+                                 const std::vector<Token>&, size_t&);
+
+static void process_INCLUDE(PreprocessorContext& ctx,
+                            const std::vector<Token>& input_line, size_t& pos);
+
+static std::unordered_map<Keyword, DirectiveHandler> directive_handlers = {
+    { Keyword::INCLUDE, process_INCLUDE },
+};
+
+//-----------------------------------------------------------------------------
+// directive handlers and helpers
+//-----------------------------------------------------------------------------
+
 static void check_end_of_line(const std::vector<Token>& input_line,
                               size_t& pos,
                               std::string_view directive_name) {
@@ -325,10 +342,11 @@ LineType process_directive_line(
     }
 
     // ---------------------------------------------------------------------
-    // INCLUDE
+    // Directives
     // ---------------------------------------------------------------------
-    if (kw == Keyword::INCLUDE) {
-        process_INCLUDE(ctx, input_line, pos);
+    auto it = directive_handlers.find(kw);
+    if (it != directive_handlers.end()) {
+        it->second(ctx, input_line, pos);
         return LineType::ControlOnly;
     }
 
