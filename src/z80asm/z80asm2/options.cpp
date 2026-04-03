@@ -463,16 +463,19 @@ static void run_tool(const std::string_view filename,
                      const SourceLoc& loc,
                      std::vector<SourceLoc>& loc_stack) {
     std::string tool_name(tool_name_);
-
-    std::string full_path = resolve_include_candidate(filename, "",
-                            false, g_args.options.include_paths);
+    std::string full_path =
+        resolve_include_candidate(filename,
+                                  including_filename,
+                                  false,
+                                  g_args.options.include_paths);
     if (full_path.empty()) {
         error(loc, "File not found: " + std::string(filename));
         return;
     }
 
     // file.asm
-    std::string asm_filename = full_path.substr(0, full_path.size() - extension.size());
+    std::string asm_filename =
+        full_path.substr(0, full_path.size() - extension.size());
 
     // build tool command
     std::string cmd = tool_name;
@@ -733,7 +736,9 @@ void search_source_file(const std::string_view filename_,
     }
 
     // check plain file in include path (and CWD)
-    out_filename = resolve_include_candidate(filename, including_filename, false,
+    out_filename = resolve_include_candidate(filename,
+                   including_filename,
+                   false,
                    g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
@@ -754,7 +759,8 @@ void search_source_file(const std::string_view filename_,
     // check filename with .asm extension in include path
     out_filename = resolve_include_candidate(asm_filename,
                    including_filename,
-                   false, g_args.options.include_paths);
+                   false,
+                   g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
@@ -774,7 +780,8 @@ void search_source_file(const std::string_view filename_,
     // check filename with .o extension in include path
     out_filename = resolve_include_candidate(o_filename,
                    including_filename,
-                   false, g_args.options.include_paths);
+                   false,
+                   g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
@@ -794,7 +801,8 @@ void search_source_file(const std::string_view filename_,
     // check filename with .asm extension in include path
     out_filename = resolve_include_candidate(asm_filename,
                    including_filename,
-                   false, g_args.options.include_paths);
+                   false,
+                   g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
@@ -814,7 +822,8 @@ void search_source_file(const std::string_view filename_,
     // check obejct file in output_dir in include path
     out_filename = resolve_include_candidate(o_filename,
                    including_filename,
-                   false, g_args.options.include_paths);
+                   false,
+                   g_args.options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
