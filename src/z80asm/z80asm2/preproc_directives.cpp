@@ -9,6 +9,7 @@
 #include "options.h"
 #include "pathnames.h"
 #include "preproc_directives.h"
+#include "string_utils.h"
 
 /* -------------------------------------------------------------------------
    Directive Processing Flow (preproc_directives.cpp)
@@ -105,36 +106,84 @@
    ------------------------------------------------------------------------- */
 
 static void check_end_of_line(const std::vector<Token>& input_line,
-                              size_t& pos) {
+                              size_t& pos,
+                              std::string_view directive_name) {
     while (pos < input_line.size() &&
             input_line[pos].type == TokenType::EndOfLine) {
         ++pos;
     }
+
     if (pos < input_line.size()) {
         error(input_line[pos].loc,
-              "Unexpected token after directive: " +
-              std::string(g_strings.view(input_line[pos].text_id)));
+              "Unexpected token after " + std::string(directive_name) +
+              ": " + std::string(g_strings.view(input_line[pos].text_id)));
     }
+}
+
+static bool parse_filename(const std::vector<Token>& input_line,
+                           size_t& pos,
+                           std::string_view directive_name,
+                           std::string& out_filename,
+                           bool& out_is_angle_bracket,
+                           SourceLoc& out_filename_loc) {
+    if (pos >= input_line.size() || input_line[pos].type == TokenType::EndOfLine) {
+        error(input_line[pos].loc, "Expected filename after " +
+              std::string(directive_name));
+        return false;
+    }
+
+    // accept "file" or <file>
+    if (input_line[pos].type == TokenType::String) {
+        out_filename =
+            g_strings.view(input_line[pos].value.str_value_id);
+        std::string_view quoted_filename =
+            g_strings.view(input_line[pos].text_id);
+        out_is_angle_bracket = !quoted_filename.empty() &&
+                               quoted_filename.front() == '<' && quoted_filename.back() == '>';
+        out_filename_loc = input_line[pos].loc;
+        pos++;
+        return true;
+    }
+
+    // accept sequence of tokens until a space
+    std::string_view token_text = g_strings.view(input_line[pos].text_id);
+    if (token_text.size() == 0 || is_space(token_text.front())) {
+        error(input_line[pos].loc, "Expected filename after " +
+              std::string(directive_name));
+        return false;
+    }
+
+    out_is_angle_bracket = false;
+    out_filename = token_text;
+    out_filename_loc = input_line[pos].loc;
+    size_t column = input_line[pos].loc.column + token_text.size();
+    pos++;
+
+    while (pos < input_line.size() &&
+            input_line[pos].type != TokenType::EndOfLine &&
+            input_line[pos].loc.column == column) {
+        token_text = g_strings.view(input_line[pos].text_id);
+        out_filename += token_text;
+        column = input_line[pos].loc.column + token_text.size();
+        pos++;
+    }
+
+    return true;
 }
 
 static void process_INCLUDE(PreprocessorContext& ctx,
                             const std::vector<Token>& input_line,
                             size_t& pos) {
     // parse filename token
-    if (pos >= input_line.size() || input_line[pos].type != TokenType::String) {
-        error(input_line[pos].loc, "Expected filename after INCLUDE");
-        return;
+    std::string filename;
+    bool is_angle_bracket = false;
+    SourceLoc filename_loc;
+    if (!parse_filename(input_line, pos, "INCLUDE",
+                        filename, is_angle_bracket, filename_loc)) {
+        return; // error already emitted by parse_filename()
     }
 
-    SourceLoc filename_loc = input_line[pos].loc;
-    std::string_view filename =
-        g_strings.view(input_line[pos].value.str_value_id);
-    std::string_view quoted_filename =
-        g_strings.view(input_line[pos].text_id);
-    bool is_angle_bracket = !quoted_filename.empty() &&
-                            quoted_filename.front() == '<' && quoted_filename.back() == '>';
-    pos++;
-    check_end_of_line(input_line, pos);
+    check_end_of_line(input_line, pos, "INCLUDE");
 
     // search for file
     std::string_view including_filename =
