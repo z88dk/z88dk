@@ -109,6 +109,7 @@ std::vector<Token> preprocess(std::string_view filename) {
 std::vector<Token> preprocess(std::string_view filename,
                               const ConstSymbols& initial_symbols) {
     PreprocessorContext ctx;
+    StringInterner::Id cur_file_id = 0;
 
     // Inject -DNAME=expr symbols
     ctx.const_symbols = initial_symbols;
@@ -190,7 +191,7 @@ std::vector<Token> preprocess(std::string_view filename,
         }
 
         if (g_args.options.dump_after_directives) {
-            dump_logical_line(processed);
+            dump_logical_line(processed, cur_file_id);
         }
 
         // ---------------------------------------------------------------------
@@ -200,7 +201,7 @@ std::vector<Token> preprocess(std::string_view filename,
         expand_line(ctx, processed, expanded);   // may push into ctx.macro_work_queue
 
         if (g_args.options.dump_after_macro_expansion) {
-            dump_tokens(expanded);          // <--- DUMP POINT #2
+            dump_tokens(expanded, cur_file_id);
         }
 
         // Append expanded tokens to final output
@@ -218,7 +219,7 @@ std::vector<Token> preprocess(std::string_view filename,
     // TODO: check for unterminated classical MACRO/ENDM if needed
 
     if (g_args.options.dump_after_preprocessing) {
-        dump_tokens(final_tokens);
+        dump_tokens(final_tokens, cur_file_id);
         exit(EXIT_SUCCESS);
     }
 
