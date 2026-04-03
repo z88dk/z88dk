@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 
     if (g_args.input_files.empty()) {
         error("No input files specified");
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     // execute requested actions
@@ -124,5 +124,6 @@ int main(int argc, char* argv[]) {
     if (g_args.options.verbose) {
         std::cout << "Assembly completed with " << error_count() << " error(s)" << std::endl;
     }
+
     return error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
