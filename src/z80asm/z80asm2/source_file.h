@@ -9,6 +9,7 @@
 #include "lexer.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -44,7 +45,16 @@ std::string read_line(const SourceFile& sf, size_t line, const SourceLoc& loc);
 std::string get_source_line(const std::string_view filename,
                             size_t line_number);
 
-// read whole file from a string
+// read whole file to a string
+// issues error message if file cannot be opened
+bool read_file_to_string(const std::string_view filename, const SourceLoc& loc,
+                         std::string& out_content);
+
+// read whole binary file to a vector
+// issues error message if file cannot be opened
+bool read_binary_file(const std::string_view filename, const SourceLoc& loc,
+                      std::vector<uint8_t>& out_content);
+
 // issues error message if file cannot be opened
 bool read_file_to_string(const std::string_view filename, const SourceLoc& loc,
                          std::string& out_content);
