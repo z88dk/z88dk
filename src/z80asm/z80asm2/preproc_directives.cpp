@@ -244,6 +244,7 @@ static void process_INCLUDE(PreprocessorContext& ctx,
         resolved_id,        // logical_file_id
         1                   // logical_line
     });
+    ctx.dependency_files.push_back(resolved_id);
 }
 
 static void process_BINARY(PreprocessorContext& ctx,
@@ -306,6 +307,10 @@ static void process_BINARY(PreprocessorContext& ctx,
 
         ctx.macro_work_queue.push_back(std::move(line));
     }
+
+    // generate dependency for included file
+    StringInterner::Id resolved_id = register_virtual_file(resolved);
+    ctx.dependency_files.push_back(resolved_id);
 }
 
 //-----------------------------------------------------------------------------
