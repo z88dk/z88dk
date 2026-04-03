@@ -11,6 +11,8 @@
 #include "preproc_directives.h"
 #include "string_utils.h"
 
+static const size_t BYTES_PER_LINE = 16;
+
 /* -------------------------------------------------------------------------
    Directive Processing Flow (preproc_directives.cpp)
    -------------------------------------------------------------------------
@@ -108,14 +110,17 @@
 //-----------------------------------------------------------------------------
 // dispatch table for directives
 //-----------------------------------------------------------------------------
-typedef void (*DirectiveHandler)(PreprocessorContext&,
-                                 const std::vector<Token>&, size_t&);
+using DirectiveHandler = void (*)(PreprocessorContext&,
+                                  const std::vector<Token>&, size_t&);
 
 static void process_INCLUDE(PreprocessorContext& ctx,
                             const std::vector<Token>& input_line, size_t& pos);
+static void process_BINARY(PreprocessorContext& ctx,
+                           const std::vector<Token>& input_line, size_t& pos);
 
 static std::unordered_map<Keyword, DirectiveHandler> directive_handlers = {
     { Keyword::INCLUDE, process_INCLUDE },
+    { Keyword::BINARY, process_BINARY },
 };
 
 //-----------------------------------------------------------------------------
@@ -240,6 +245,73 @@ static void process_INCLUDE(PreprocessorContext& ctx,
     });
 }
 
+static void process_BINARY(PreprocessorContext& ctx,
+                           const std::vector<Token>& input_line,
+                           size_t& pos) {
+    // parse filename token
+    std::string filename;
+    bool is_angle_bracket = false;
+    SourceLoc filename_loc;
+    if (!parse_filename(input_line, pos, "BINARY",
+                        filename, is_angle_bracket, filename_loc)) {
+        return; // error already emitted by parse_filename()
+    }
+
+    check_end_of_line(input_line, pos, "BINARY");
+
+    // search for file
+    std::string_view including_filename =
+        ctx.include_stack.empty() ? "" :
+        g_strings.view(ctx.include_stack.back().logical_file_id);
+    std::string resolved = resolve_include_candidate(filename,
+                           including_filename,
+                           is_angle_bracket,
+                           g_args.options.include_paths);
+    if (resolved.empty()) {
+        error(filename_loc, "File not found: " + std::string(filename));
+        return;
+    }
+
+    // read binary file
+    std::vector<uint8_t> data;
+    if (!read_binary_file(resolved, filename_loc, data)) {
+        return; // error already emitted by read_binary_file()
+    }
+
+    if (data.size() == 0) {
+        return; // empty file, nothing to emit
+    }
+
+    // Emit tokens for binary data: one token per byte, with value = byte value
+    for (size_t i = 0; i < data.size(); i += BYTES_PER_LINE) {
+        LogicalLine line{ {}, filename_loc };
+        line.tokens.reserve(1 + 2 * BYTES_PER_LINE + 1); // DEFB b1,...,bN <EOL>
+
+        line.tokens.push_back(Token::identifier("DEFB", filename_loc));
+
+        for (size_t j = 0; j < BYTES_PER_LINE && i + j < data.size(); ++j) {
+            if (j > 0) {
+                line.tokens.push_back(Token::token(TokenType::Comma, ",",
+                                                   filename_loc));
+            }
+
+            int value = data[i + j];
+            line.tokens.push_back(Token::integer(std::to_string(value), value,
+                                                 filename_loc));
+        }
+
+        line.tokens.push_back(Token::token(TokenType::EndOfLine, "\n",
+                                           filename_loc));
+
+        ctx.macro_work_queue.push_back(std::move(line));
+    }
+}
+
+//-----------------------------------------------------------------------------
+// main driver for directive processing:
+// classifies line and dispatches to handlers
+//-----------------------------------------------------------------------------
+
 LineType process_directive_line(
     PreprocessorContext& ctx,
     const std::vector<Token>& input_line,
@@ -342,7 +414,7 @@ LineType process_directive_line(
     }
 
     // ---------------------------------------------------------------------
-    // Directives
+    // Non-conditional directives
     // ---------------------------------------------------------------------
     auto it = directive_handlers.find(kw);
     if (it != directive_handlers.end()) {
