@@ -14,11 +14,16 @@ PROJ = z88dk-z80asm
 PERL = perl
 DOS2UNIX = dos2unix
 CXX = g++
-CXXFLAGS = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror -O3
+CXXFLAGS_BASE = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror 
+ifeq ($(COVERAGE),1)
+  CXXFLAGS = $(CXXFLAGS_BASE) --coverage -O0 -g
+else
+  CXXFLAGS = $(CXXFLAGS_BASE) -O3
+endif
 
 # re2c: generate C/C++ sources from .re files
 RE2C ?= re2c
-RE2CFLAGS ?= -W --no-debug-info --no-generation-date 
+RE2CFLAGS ?= -W --no-debug-info --no-generation-date
 
 OBJ_DIR = obj
 
@@ -61,6 +66,12 @@ astyle:
 
 cloc:
 	$(PERL) -S cloc --fullpath .
+
+# test code coverage
+coverage:
+	$(MAKE) clean
+	$(MAKE) COVERAGE=1 test
+	gcov $(OBJ_DIR)/*.gcno | $(PERL) parse_gcov.pl | tee coverage.txt
 
 CLEAN_PATTERNS = *.o *.d *.i *.exe *.orig *.core *.bak *~
 CLEAN_DIRS = . t t/* t/*/*
