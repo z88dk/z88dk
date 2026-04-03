@@ -12,10 +12,6 @@
 #include "string_utils.h"
 #include <iostream>
 
-void ConstSymbols::clear() {
-    symbols.clear();
-}
-
 void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& loc) {
     const ConstSymbol* existing = get(name_id);
     if (existing != nullptr && existing->value != value) {
