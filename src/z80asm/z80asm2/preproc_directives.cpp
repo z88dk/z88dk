@@ -6,6 +6,8 @@
 
 #include "errors.h"
 #include "lexer_keywords.h"
+#include "options.h"
+#include "pathnames.h"
 #include "preproc_directives.h"
 
 /* -------------------------------------------------------------------------
@@ -102,6 +104,76 @@
    End of Directive Processing Flow
    ------------------------------------------------------------------------- */
 
+static void check_end_of_line(const std::vector<Token>& input_line,
+                              size_t& pos) {
+    while (pos < input_line.size() &&
+            input_line[pos].type == TokenType::EndOfLine) {
+        ++pos;
+    }
+    if (pos < input_line.size()) {
+        error(input_line[pos].loc,
+              "Unexpected token after directive: " +
+              std::string(g_strings.view(input_line[pos].text_id)));
+    }
+}
+
+static void process_INCLUDE(PreprocessorContext& ctx,
+                            const std::vector<Token>& input_line,
+                            size_t& pos) {
+    // parse filename token
+    if (pos >= input_line.size() || input_line[pos].type != TokenType::String) {
+        error(input_line[pos].loc, "Expected filename after INCLUDE");
+        return;
+    }
+
+    SourceLoc filename_loc = input_line[pos].loc;
+    std::string_view filename =
+        g_strings.view(input_line[pos].value.str_value_id);
+    std::string_view quoted_filename =
+        g_strings.view(input_line[pos].text_id);
+    bool is_angle_bracket = !quoted_filename.empty() &&
+                            quoted_filename.front() == '<' && quoted_filename.back() == '>';
+    pos++;
+    check_end_of_line(input_line, pos);
+
+    // search for file
+    std::string_view including_filename =
+        ctx.include_stack.empty() ? "" :
+        g_strings.view(ctx.include_stack.back().logical_file_id);
+    std::string resolved = resolve_include_candidate(filename,
+                           including_filename,
+                           is_angle_bracket,
+                           g_args.options.include_paths);
+    if (resolved.empty()) {
+        error(filename_loc, "File not found: " + std::string(filename));
+        return;
+    }
+
+    // check for recursive inclusion
+    StringInterner::Id resolved_id = register_virtual_file(resolved);
+    for (const auto& frame : ctx.include_stack) {
+        if (frame.logical_file_id == resolved_id) {
+            error(filename_loc,
+                  "Recursive inclusion of file: " + std::string(filename));
+            return;
+        }
+    }
+
+    // push new include frame
+    const SourceFile* included_file = get_source_file(resolved, filename_loc);
+    if (!included_file) {
+        // error already emitted by get_source_file()
+        return;
+    }
+
+    ctx.include_stack.push_back({
+        included_file,
+        0,                  // current_line
+        resolved_id,        // logical_file_id
+        1                   // logical_line
+    });
+}
+
 LineType process_directive_line(
     PreprocessorContext& ctx,
     const std::vector<Token>& input_line,
@@ -113,36 +185,36 @@ LineType process_directive_line(
     // ---------------------------------------------------------------------
     // 1. Find first non-EndOfLine token
     // ---------------------------------------------------------------------
-    size_t i = 0;
-    while (i < input_line.size() && input_line[i].type == TokenType::EndOfLine) {
-        ++i;
+    size_t pos = 0;
+    while (pos < input_line.size() &&
+            input_line[pos].type == TokenType::EndOfLine) {
+        ++pos;
     }
 
-    if (i >= input_line.size()) {
+    if (pos >= input_line.size()) {
         // Empty line -> normal line (macro expander will append EOL)
         return LineType::Normal;
     }
 
-    const Token& first = input_line[i];
+    const Token& first = input_line[pos];
+    ++pos;
 
     // ---------------------------------------------------------------------
     // 2. If inside inactive conditional block, only IF/ELSEIF/ELSE/ENDIF run
     // ---------------------------------------------------------------------
-    bool cond_active = ctx.cond_stack.empty() || ctx.cond_stack.back().currently_active;
+    bool cond_active = ctx.cond_stack.empty() ||
+                       ctx.cond_stack.back().currently_active;
 
     // ---------------------------------------------------------------------
-    // 3. If first token is not an identifier -> normal line
+    // 3. Check if first token is a directive keyword (possibly after #)
     // ---------------------------------------------------------------------
-    if (first.type != TokenType::Identifier) {
-        if (!cond_active) {
-            return LineType::Skip;
-        }
-
-        out_line.tokens = input_line;   // copy as-is
-        return LineType::Normal;
-    }
-
     Keyword kw = first.keyword;
+
+    if (first.type == TokenType::Hash && pos < input_line.size() &&
+            input_line[pos].type == TokenType::Identifier) {
+        kw = input_line[pos].keyword;
+        ++pos;
+    }
 
     if (!keyword_is_preproc_directive(kw)) {
         // Not a directive keyword
@@ -207,9 +279,7 @@ LineType process_directive_line(
     // INCLUDE
     // ---------------------------------------------------------------------
     if (kw == Keyword::INCLUDE) {
-        // TODO: parse filename
-        // TODO: resolve include
-        // TODO: push IncludeFrame
+        process_INCLUDE(ctx, input_line, pos);
         return LineType::ControlOnly;
     }
 

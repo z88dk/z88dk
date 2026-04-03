@@ -8,6 +8,7 @@
 #include "preproc_context.h"
 #include "lexer_dump.h"
 
-void dump_logical_line(const LogicalLine& line) {
-    dump_tokens(line.tokens);
+void dump_logical_line(const LogicalLine& line,
+                       StringInterner::Id& cur_file_id) {
+    dump_tokens(line.tokens, cur_file_id);
 }
