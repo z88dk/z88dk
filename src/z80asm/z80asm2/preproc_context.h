@@ -75,7 +75,8 @@ struct PreprocessorContext {
     std::deque<LogicalLine> macro_work_queue;
 
     // ---------------------------------------------------------------------
-    // Options
+    // Dependency genration: set of logical file IDs encountered
+    // during preprocessing
     // ---------------------------------------------------------------------
-    bool compat_mode = true;
+    std::vector<StringInterner::Id> dependency_files;
 };
