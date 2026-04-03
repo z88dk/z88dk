@@ -194,39 +194,55 @@ static bool parse_filename(const std::vector<Token>& input_line,
     return true;
 }
 
+// Common helper: parse filename, check end of line, resolve file path.
+// Returns true on success with resolved path in out_resolved and location
+// in out_filename_loc. Reports errors and returns false on failure.
+static bool parse_and_resolve_file(PreprocessorContext& ctx,
+                                   const std::vector<Token>& input_line,
+                                   size_t& pos,
+                                   std::string_view directive_name,
+                                   std::string& out_resolved,
+                                   SourceLoc& out_filename_loc) {
+    std::string filename;
+    bool is_angle_bracket = false;
+    if (!parse_filename(input_line, pos, directive_name,
+                        filename, is_angle_bracket, out_filename_loc)) {
+        return false;
+    }
+
+    check_end_of_line(input_line, pos, directive_name);
+
+    std::string_view including_filename =
+        ctx.include_stack.empty() ? "" :
+        g_strings.view(ctx.include_stack.back().file->file_id);
+    out_resolved = resolve_include_candidate(filename,
+                   including_filename,
+                   is_angle_bracket,
+                   g_args.options.include_paths);
+    if (out_resolved.empty()) {
+        error(out_filename_loc, "File not found: " + std::string(filename));
+        return false;
+    }
+
+    return true;
+}
+
 static void process_INCLUDE(PreprocessorContext& ctx,
                             const std::vector<Token>& input_line,
                             size_t& pos) {
-    // parse filename token
-    std::string filename;
-    bool is_angle_bracket = false;
+    std::string resolved;
     SourceLoc filename_loc;
-    if (!parse_filename(input_line, pos, "INCLUDE",
-                        filename, is_angle_bracket, filename_loc)) {
-        return; // error already emitted by parse_filename()
-    }
-
-    check_end_of_line(input_line, pos, "INCLUDE");
-
-    // search for file
-    std::string_view including_filename =
-        ctx.include_stack.empty() ? "" :
-        g_strings.view(ctx.include_stack.back().logical_file_id);
-    std::string resolved = resolve_include_candidate(filename,
-                           including_filename,
-                           is_angle_bracket,
-                           g_args.options.include_paths);
-    if (resolved.empty()) {
-        error(filename_loc, "File not found: " + std::string(filename));
+    if (!parse_and_resolve_file(ctx, input_line, pos, "INCLUDE",
+                                resolved, filename_loc)) {
         return;
     }
 
     // check for recursive inclusion
     StringInterner::Id resolved_id = register_virtual_file(resolved);
     for (const auto& frame : ctx.include_stack) {
-        if (frame.logical_file_id == resolved_id) {
+        if (frame.file->file_id == resolved_id) {
             error(filename_loc,
-                  "Recursive inclusion of file: " + std::string(filename));
+                  "Recursive inclusion of file: " + resolved);
             return;
         }
     }
@@ -241,36 +257,20 @@ static void process_INCLUDE(PreprocessorContext& ctx,
     ctx.include_stack.push_back({
         included_file,
         0,                  // current_line
-        resolved_id,        // logical_file_id
-        1                   // logical_line
+        included_file->file_id, // logical_file_id
+        1,                  // logical_line
     });
-    ctx.dependency_files.push_back(resolved_id);
+
+    ctx.dependency_files.push_back(included_file->file_id);
 }
 
 static void process_BINARY(PreprocessorContext& ctx,
                            const std::vector<Token>& input_line,
                            size_t& pos) {
-    // parse filename token
-    std::string filename;
-    bool is_angle_bracket = false;
+    std::string resolved;
     SourceLoc filename_loc;
-    if (!parse_filename(input_line, pos, "BINARY",
-                        filename, is_angle_bracket, filename_loc)) {
-        return; // error already emitted by parse_filename()
-    }
-
-    check_end_of_line(input_line, pos, "BINARY");
-
-    // search for file
-    std::string_view including_filename =
-        ctx.include_stack.empty() ? "" :
-        g_strings.view(ctx.include_stack.back().logical_file_id);
-    std::string resolved = resolve_include_candidate(filename,
-                           including_filename,
-                           is_angle_bracket,
-                           g_args.options.include_paths);
-    if (resolved.empty()) {
-        error(filename_loc, "File not found: " + std::string(filename));
+    if (!parse_and_resolve_file(ctx, input_line, pos, "BINARY",
+                                resolved, filename_loc)) {
         return;
     }
 
