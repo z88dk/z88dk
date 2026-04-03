@@ -8,6 +8,9 @@
 **/*.dSYM/
 **/*.err
 **/*.exe
+**/*.gcda
+**/*.gcno
+**/*.gcov
 **/*.lis
 **/*.map
 **/*.o
