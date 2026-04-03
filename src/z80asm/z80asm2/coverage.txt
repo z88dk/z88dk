@@ -4,13 +4,10 @@ Coverag	 Lines	File
   0.00%	     3	preproc_dump.cpp
   0.00%	    42	preproc_macro.cpp
   0.00%	    69	semantic_rewrite.cpp
- 18.18%	    11	source_loc.h
  20.41%	    49	lexer_keywords.cpp
- 50.00%	     8	lexer_scan.h
- 57.14%	    49	string_utils.h
- 57.58%	    33	const_symbols.cpp
+ 63.33%	    30	const_symbols.cpp
  63.87%	   119	lexer.cpp
- 64.94%	    77	string_utils.cpp
+ 70.42%	    71	string_utils.cpp
  78.29%	   327	const_expr.cpp
  78.79%	   198	pathnames.cpp
  79.48%	   960	lexer_scan.cpp
@@ -25,5 +22,4 @@ Coverag	 Lines	File
  97.44%	    39	options_dump.cpp
  99.22%	   128	lexer_keywords.def
 100.00%	    40	lexer_tokens.cpp
-100.00%	     3	errors.h
- 82.33%	  3010	TOTAL
+ 95.04%	  2930	TOTAL
