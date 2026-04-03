@@ -133,6 +133,7 @@ std::vector<Token> preprocess(std::string_view filename,
         file->file_id,              // logical_file_id
         1                           // logical_line
     });
+    ctx.dependency_files.push_back(file->file_id);
 
     // -------------------------------------------------------------------------
     // 2. Unified input loop (files + macro-generated lines)
