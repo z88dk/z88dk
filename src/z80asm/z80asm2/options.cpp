@@ -691,7 +691,7 @@ void search_source_file(const std::string_view filename_,
                                       false,
                                       g_args.options.include_paths);
         if (list_full_path.empty()) {
-            error(loc, "File not found: " + std::string(list_filename));
+            error(loc, "File not found: " + list_filename);
             return;
         }
         StringInterner::Id file_id = register_virtual_file(list_full_path);
