@@ -24,8 +24,8 @@ struct ConstSymbols {
     const ConstSymbol* get(StringInterner::Id name_id) const;
     void erase(StringInterner::Id name_id);
 
-    void set(const std::string_view name, int value, const SourceLoc& loc);
-    const ConstSymbol* get(const std::string_view name) const;
-    void erase(const std::string_view name);
+    void set(std::string_view name, int value, const SourceLoc& loc);
+    const ConstSymbol* get(std::string_view name) const;
+    void erase(std::string_view name);
 };
 

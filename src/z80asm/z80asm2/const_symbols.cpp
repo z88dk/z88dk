@@ -44,14 +44,14 @@ void ConstSymbols::erase(StringInterner::Id name_id) {
     symbols.erase(name_id);
 }
 
-void ConstSymbols::set(const std::string_view name, int value, const SourceLoc& loc) {
+void ConstSymbols::set(std::string_view name, int value, const SourceLoc& loc) {
     set(g_strings.intern(name), value, loc);
 }
 
-const ConstSymbol* ConstSymbols::get(const std::string_view name) const {
+const ConstSymbol* ConstSymbols::get(std::string_view name) const {
     return get(g_strings.intern(name));
 }
 
-void ConstSymbols::erase(const std::string_view name) {
+void ConstSymbols::erase(std::string_view name) {
     erase(g_strings.intern(name));
 }

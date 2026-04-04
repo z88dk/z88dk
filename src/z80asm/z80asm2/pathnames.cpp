@@ -9,7 +9,7 @@
 #include <filesystem>
 
 // On Linux, lexically_normal() does not regard backslashes as path separators
-static std::string nomalize_slashes(const std::string_view path) {
+static std::string nomalize_slashes(std::string_view path) {
     std::string result;
     result.reserve(path.size());
     for (auto c : path) {
@@ -23,24 +23,24 @@ static std::string nomalize_slashes(const std::string_view path) {
     return result;
 }
 
-bool is_asm_filename(const std::string_view filename) {
+bool is_asm_filename(std::string_view filename) {
     return ends_with(filename, asm_extension);
 }
 
-bool is_o_filename(const std::string_view filename) {
+bool is_o_filename(std::string_view filename) {
     return ends_with(filename, o_extension);
 }
 
-std::string get_asm_filename(const std::string_view filename) {
+std::string get_asm_filename(std::string_view filename) {
     return replace_extension(filename, asm_extension);
 }
 
-std::string get_o_filename(const std::string_view filename,
-                           const std::string_view output_dir) {
+std::string get_o_filename(std::string_view filename,
+                           std::string_view output_dir) {
     return prepend_output_dir(replace_extension(filename, o_extension), output_dir);
 }
 
-std::string normalize_path(const std::string_view path_) {
+std::string normalize_path(std::string_view path_) {
     std::string path = nomalize_slashes(path_);
 
     if (path.empty()) {
@@ -74,7 +74,7 @@ std::string normalize_path(const std::string_view path_) {
     }
 }
 
-std::string parent_dir(const std::string_view path) {
+std::string parent_dir(std::string_view path) {
     try {
         std::filesystem::path p(nomalize_slashes(path));
         return p.parent_path().generic_string();
@@ -84,7 +84,8 @@ std::string parent_dir(const std::string_view path) {
     }
 }
 
-std::string replace_extension(const std::string_view filename, const std::string_view extension) {
+std::string replace_extension(std::string_view filename,
+                              std::string_view extension) {
     try {
         std::filesystem::path p(filename);
         p.replace_extension(extension);
@@ -95,8 +96,8 @@ std::string replace_extension(const std::string_view filename, const std::string
     }
 }
 
-std::string prepend_output_dir(const std::string_view filename,
-                               const std::string_view output_dir_) {
+std::string prepend_output_dir(std::string_view filename,
+                               std::string_view output_dir_) {
     namespace fs = std::filesystem;
 
     std::string output_dir(output_dir_);
@@ -133,8 +134,8 @@ std::string prepend_output_dir(const std::string_view filename,
 // Try candidates according to include semantics and include_paths,
 // return resolved path if found or empty string if not found.
 // including_filename: the file which contains the include directive (can be empty if unknown)
-std::string resolve_include_candidate(const std::string_view filename,
-                                      const std::string_view including_filename, bool is_angle,
+std::string resolve_include_candidate(std::string_view filename,
+                                      std::string_view including_filename, bool is_angle,
                                       const std::vector<std::string>& include_paths) {
     namespace fs = std::filesystem;
 
@@ -197,14 +198,14 @@ std::string resolve_include_candidate(const std::string_view filename,
     return std::string();
 }
 
-bool has_wildcards(const std::string_view pat) {
+bool has_wildcards(std::string_view pat) {
     return pat.find('*') != std::string::npos ||
            pat.find('?') != std::string::npos;
 }
 
 // Helper: split a path string into components, preserving "**" segments
 static std::vector<std::string> split_path_components(
-    const std::string_view path) {
+    std::string_view path) {
     std::vector<std::string> comps;
     std::string cur;
     for (char c : path) {
@@ -225,7 +226,7 @@ static std::vector<std::string> split_path_components(
 }
 
 // Helper: match a single name with '*' and '?' wildcards (non-recursive, no directory separators)
-static bool match_name_glob(const std::string_view name, const std::string_view pat) {
+static bool match_name_glob(std::string_view name, std::string_view pat) {
     size_t n = name.size(), p = pat.size();
     size_t i = 0, j = 0;
     size_t star_i = std::string::npos, star_j = std::string::npos;
@@ -272,7 +273,7 @@ static void glob_walk(const std::filesystem::path& base_fs,
         return;
     }
 
-    const std::string_view pat = comps[idx];
+    std::string_view pat = comps[idx];
 
     if (pat == "**") {
         // "**" consumes zero or more directory levels
@@ -331,7 +332,7 @@ static void glob_walk(const std::filesystem::path& base_fs,
 }
 
 // Expand wildcards using std::filesystem only: supports '*', '?', and '**'
-std::vector<std::string> expand_wildcards(const std::string_view pattern) {
+std::vector<std::string> expand_wildcards(std::string_view pattern) {
     namespace fs = std::filesystem;
 
     std::vector<std::string> results;
@@ -349,7 +350,7 @@ std::vector<std::string> expand_wildcards(const std::string_view pattern) {
     fs::path base_prefix;
     size_t wildcard_idx = 0;
     for (; wildcard_idx < comps.size(); ++wildcard_idx) {
-        const std::string_view seg = comps[wildcard_idx];
+        std::string_view seg = comps[wildcard_idx];
         const bool seg_has_wildcard = (seg == "**") ||
                                       seg.find('*') != std::string::npos ||
                                       seg.find('?') != std::string::npos;

@@ -18,9 +18,9 @@ struct SourceLoc {
 
     SourceLoc() = default;
     SourceLoc(int file, size_t ln, size_t col);
-    SourceLoc(const std::string_view file, size_t ln, size_t col);
+    SourceLoc(std::string_view file, size_t ln, size_t col);
 
-    static SourceLoc make(const std::string_view file,
+    static SourceLoc make(std::string_view file,
                           size_t line, size_t column);
     bool empty() const;
     std::string to_string() const;

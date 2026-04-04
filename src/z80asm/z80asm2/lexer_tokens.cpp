@@ -6,7 +6,7 @@
 
 #include "lexer_tokens.h"
 
-Token Token::token(TokenType type_, const std::string_view text_,
+Token Token::token(TokenType type_, std::string_view text_,
                    const SourceLoc& loc) {
     Token t;
     t.type = type_;
@@ -15,7 +15,7 @@ Token Token::token(TokenType type_, const std::string_view text_,
     return t;
 }
 
-Token Token::identifier(const std::string_view text_,
+Token Token::identifier(std::string_view text_,
                         const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Identifier;
@@ -25,7 +25,7 @@ Token Token::identifier(const std::string_view text_,
     return t;
 }
 
-Token Token::integer(const std::string_view text_, int value,
+Token Token::integer(std::string_view text_, int value,
                      const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Integer;
@@ -35,7 +35,7 @@ Token Token::integer(const std::string_view text_, int value,
     return t;
 }
 
-Token Token::floating(const std::string_view text_, double value,
+Token Token::floating(std::string_view text_, double value,
                       const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Float;
@@ -45,7 +45,7 @@ Token Token::floating(const std::string_view text_, double value,
     return t;
 }
 
-Token Token::string(const std::string_view text_, const std::string_view value,
+Token Token::string(std::string_view text_, std::string_view value,
                     const SourceLoc& loc) {
     Token t;
     t.type = TokenType::String;

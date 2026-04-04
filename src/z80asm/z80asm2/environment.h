@@ -12,9 +12,9 @@
 
 // Helper: get environment variable value in a secure, cross-platform way.
 // Returns empty string if the variable is not set.
-std::string get_env_value(const std::string_view name);
+std::string get_env_value(std::string_view name);
 
 // Expand environment variables: replaces ${VAR} with getenv("VAR") or "" if unset.
 // Supports nesting like ${var${param}} by recursively expanding inside names and values.
-std::string expand_env_vars(const std::string_view text);
+std::string expand_env_vars(std::string_view text);
 
