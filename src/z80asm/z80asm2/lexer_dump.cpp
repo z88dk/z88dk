@@ -6,7 +6,7 @@
 
 #include "lexer.h"
 #include "lexer_dump.h"
-#include "source_file.h"
+#include "file_mgr.h"
 #include "source_loc.h"
 #include "string_utils.h"
 #include <cstdlib>
@@ -57,7 +57,7 @@ void dump_tokens(const std::vector<Token>& tokens,
 void dump_after_tokenization_and_exit(std::string_view filename) {
     // get_source_file will read and tokenize the file,
     // caching the tokens in SourceFile
-    SourceFile* sf = get_source_file(filename, SourceLoc());
+    SourceFile* sf = g_file_mgr.get_source_file(filename, SourceLoc());
     if (!sf) {
         exit(EXIT_FAILURE);     // error already reported by get_source_file
     }
