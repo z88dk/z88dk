@@ -8,129 +8,29 @@
 #include "lexer_keywords.h"
 #include "options.h"
 #include "pathnames.h"
-#include "preproc_directives.h"
+#include "preproc.h"
 #include "string_utils.h"
 
 static const size_t BYTES_PER_LINE = 16;
 
-/* -------------------------------------------------------------------------
-   Directive Processing Flow (preproc_directives.cpp)
-   -------------------------------------------------------------------------
-
-   This file implements:
-
-       LineType process_directive_line(
-           PreprocessorContext& ctx,
-           const std::vector<Token>& input_line,
-           LogicalLine& out_line
-       );
-
-   Input lines may originate from:
-       - Source files (via include_stack)
-       - Macro expansion (via macro_work_queue)
-
-   The directive engine remains purely line-oriented.
-
-   -------------------------------------------------------------------------
-   1. Initial Classification
-   -------------------------------------------------------------------------
-
-   - Identify first non-EndOfLine token.
-   - If not a directive keyword:
-         If current conditional block inactive -> Skip
-         Else -> Normal
-   - If directive keyword:
-         Dispatch to directive handler.
-
-   -------------------------------------------------------------------------
-   2. Conditional Directives
-   -------------------------------------------------------------------------
-
-   IF / ELSEIF / ELSE / ENDIF
-       - Update ctx.cond_stack.
-       - Return ControlOnly.
-
-   -------------------------------------------------------------------------
-   3. Include Handling
-   -------------------------------------------------------------------------
-
-   INCLUDE "file" or <file>
-       - Resolve filename.
-       - Tokenize included file (cached).
-       - Push new IncludeFrame.
-       - Return ControlOnly.
-
-   -------------------------------------------------------------------------
-   4. Macro Definitions
-   -------------------------------------------------------------------------
-
-   DEFINE (object-like)
-   DEFINE (function-like)
-   MACRO ... ENDM (classical)
-   UNDEF
-
-       - Modify ctx.macros.
-       - Return ControlOnly.
-
-   NOTE:
-       Classical macro definitions may appear inside macro expansions.
-       This is supported and safe.
-
-   -------------------------------------------------------------------------
-   5. Line Number Rewriting
-   -------------------------------------------------------------------------
-
-   LINE / C_LINE
-       - Update logical file/line mapping.
-       - Return ControlOnly.
-
-   -------------------------------------------------------------------------
-   6. EQU and Preprocessor Symbols
-   -------------------------------------------------------------------------
-
-   name EQU <expr>
-       - Evaluate expression.
-       - Update ctx.pp_symbols.
-       - Return ControlOnly.
-
-   -------------------------------------------------------------------------
-   7. Normal Lines
-   -------------------------------------------------------------------------
-
-   - If conditional inactive -> Skip.
-   - Else:
-         * Copy tokens into out_line
-         * Apply logical file/line mapping
-         * Return Normal.
-
-   -------------------------------------------------------------------------
-   End of Directive Processing Flow
-   ------------------------------------------------------------------------- */
-
 //-----------------------------------------------------------------------------
 // dispatch table for directives
 //-----------------------------------------------------------------------------
-using DirectiveHandler = void (*)(PreprocessorContext&,
-                                  const std::vector<Token>&, size_t&);
 
-static void process_INCLUDE(PreprocessorContext& ctx,
-                            const std::vector<Token>& input_line, size_t& pos);
-static void process_BINARY(PreprocessorContext& ctx,
-                           const std::vector<Token>& input_line, size_t& pos);
-
-static std::unordered_map<Keyword, DirectiveHandler> directive_handlers = {
-    { Keyword::INCLUDE, process_INCLUDE },
-    { Keyword::BINARY, process_BINARY },
-    { Keyword::INCBIN, process_BINARY },
+std::unordered_map<Keyword, Preproc::DirectiveHandler>
+Preproc::directive_handlers_ = {
+    { Keyword::INCLUDE, &Preproc::process_INCLUDE },
+    { Keyword::BINARY,  &Preproc::process_BINARY },
+    { Keyword::INCBIN,  &Preproc::process_BINARY },
 };
 
 //-----------------------------------------------------------------------------
 // directive handlers and helpers
 //-----------------------------------------------------------------------------
 
-static void check_end_of_line(const std::vector<Token>& input_line,
-                              size_t& pos,
-                              std::string_view directive_name) {
+void Preproc::check_end_of_line(const std::vector<Token>& input_line,
+                                size_t& pos,
+                                std::string_view directive_name) {
     while (pos < input_line.size() &&
             input_line[pos].type == TokenType::EndOfLine) {
         ++pos;
@@ -143,12 +43,12 @@ static void check_end_of_line(const std::vector<Token>& input_line,
     }
 }
 
-static bool parse_filename(const std::vector<Token>& input_line,
-                           size_t& pos,
-                           std::string_view directive_name,
-                           std::string& out_filename,
-                           bool& out_is_angle_bracket,
-                           SourceLoc& out_filename_loc) {
+bool Preproc::parse_filename(const std::vector<Token>& input_line,
+                             size_t& pos,
+                             std::string_view directive_name,
+                             std::string& out_filename,
+                             bool& out_is_angle_bracket,
+                             SourceLoc& out_filename_loc) {
     if (pos >= input_line.size() || input_line[pos].type == TokenType::EndOfLine) {
         g_diag.error(input_line[pos].loc, "Expected filename after " +
                      std::string(directive_name));
@@ -197,12 +97,11 @@ static bool parse_filename(const std::vector<Token>& input_line,
 // Common helper: parse filename, check end of line, resolve file path.
 // Returns true on success with resolved path in out_resolved and location
 // in out_filename_loc. Reports errors and returns false on failure.
-static bool parse_and_resolve_file(PreprocessorContext& ctx,
-                                   const std::vector<Token>& input_line,
-                                   size_t& pos,
-                                   std::string_view directive_name,
-                                   std::string& out_resolved,
-                                   SourceLoc& out_filename_loc) {
+bool Preproc::parse_and_resolve_file(const std::vector<Token>& input_line,
+                                     size_t& pos,
+                                     std::string_view directive_name,
+                                     std::string& out_resolved,
+                                     SourceLoc& out_filename_loc) {
     std::string filename;
     bool is_angle_bracket = false;
     if (!parse_filename(input_line, pos, directive_name,
@@ -213,8 +112,8 @@ static bool parse_and_resolve_file(PreprocessorContext& ctx,
     check_end_of_line(input_line, pos, directive_name);
 
     std::string_view including_filename =
-        ctx.include_stack.empty() ? "" :
-        g_strings.view(ctx.include_stack.back().file->file_id);
+        include_stack.empty() ? "" :
+        g_strings.view(include_stack.back().file->file_id);
     out_resolved = resolve_include_candidate(filename,
                    including_filename,
                    is_angle_bracket,
@@ -227,12 +126,11 @@ static bool parse_and_resolve_file(PreprocessorContext& ctx,
     return true;
 }
 
-static void process_INCLUDE(PreprocessorContext& ctx,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
+void Preproc::process_INCLUDE(const std::vector<Token>& input_line,
+                              size_t& pos) {
     std::string resolved;
     SourceLoc filename_loc;
-    if (!parse_and_resolve_file(ctx, input_line, pos, "INCLUDE",
+    if (!parse_and_resolve_file(input_line, pos, "INCLUDE",
                                 resolved, filename_loc)) {
         return;
     }
@@ -240,7 +138,7 @@ static void process_INCLUDE(PreprocessorContext& ctx,
     // check for recursive inclusion
     StringInterner::Id resolved_id =
         g_file_mgr.register_virtual_file(resolved);
-    for (const auto& frame : ctx.include_stack) {
+    for (const auto& frame : include_stack) {
         if (frame.file->file_id == resolved_id) {
             g_diag.error(filename_loc,
                          "Recursive inclusion of file: " + resolved);
@@ -256,22 +154,21 @@ static void process_INCLUDE(PreprocessorContext& ctx,
         return;
     }
 
-    ctx.include_stack.push_back({
+    include_stack.push_back({
         included_file,
         0,                  // current_line
         included_file->file_id, // logical_file_id
         1,                  // logical_line
     });
 
-    ctx.dependency_files.push_back(included_file->file_id);
+    dependency_files.push_back(included_file->file_id);
 }
 
-static void process_BINARY(PreprocessorContext& ctx,
-                           const std::vector<Token>& input_line,
-                           size_t& pos) {
+void Preproc::process_BINARY(const std::vector<Token>& input_line,
+                             size_t& pos) {
     std::string resolved;
     SourceLoc filename_loc;
-    if (!parse_and_resolve_file(ctx, input_line, pos, "BINARY",
+    if (!parse_and_resolve_file(input_line, pos, "BINARY",
                                 resolved, filename_loc)) {
         return;
     }
@@ -308,13 +205,13 @@ static void process_BINARY(PreprocessorContext& ctx,
         line.tokens.push_back(Token::token(TokenType::EndOfLine, "\n",
                                            filename_loc));
 
-        ctx.macro_work_queue.push_back(std::move(line));
+        macro_work_queue.push_back(std::move(line));
     }
 
     // generate dependency for included file
     StringInterner::Id resolved_id =
         g_file_mgr.register_virtual_file(resolved);
-    ctx.dependency_files.push_back(resolved_id);
+    dependency_files.push_back(resolved_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -322,8 +219,7 @@ static void process_BINARY(PreprocessorContext& ctx,
 // classifies line and dispatches to handlers
 //-----------------------------------------------------------------------------
 
-LineType process_directive_line(
-    PreprocessorContext& ctx,
+Preproc::LineType Preproc::process_directive_line(
     const std::vector<Token>& input_line,
     LogicalLine& out_line) {
     out_line.tokens.clear();
@@ -350,8 +246,8 @@ LineType process_directive_line(
     // ---------------------------------------------------------------------
     // 2. If inside inactive conditional block, only IF/ELSEIF/ELSE/ENDIF run
     // ---------------------------------------------------------------------
-    bool cond_active = ctx.cond_stack.empty() ||
-                       ctx.cond_stack.back().currently_active;
+    bool cond_active = cond_stack.empty() ||
+                       cond_stack.back().currently_active;
 
     // ---------------------------------------------------------------------
     // 3. Check if first token is a directive keyword (possibly after #)
@@ -426,9 +322,9 @@ LineType process_directive_line(
     // ---------------------------------------------------------------------
     // Non-conditional directives
     // ---------------------------------------------------------------------
-    auto it = directive_handlers.find(kw);
-    if (it != directive_handlers.end()) {
-        it->second(ctx, input_line, pos);
+    auto it = directive_handlers_.find(kw);
+    if (it != directive_handlers_.end()) {
+        (this->*it->second)(input_line, pos);
         return LineType::ControlOnly;
     }
 
