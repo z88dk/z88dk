@@ -230,7 +230,7 @@ static void parse_raw_string(char end_quote,
                                 line.locmap[start]));
 }
 
-static double parse_float_from_chars(const std::string_view s) {
+static double parse_float_from_chars(std::string_view s) {
     std::string t;
     t.reserve(s.size());
     for (char c : s) {
@@ -241,7 +241,7 @@ static double parse_float_from_chars(const std::string_view s) {
     return std::stod(t);
 }
 
-static int parse_int_from_chars(const std::string_view s, int base) {
+static int parse_int_from_chars(std::string_view s, int base) {
     // Remove underscores
     std::string t;
     t.reserve(s.size());
