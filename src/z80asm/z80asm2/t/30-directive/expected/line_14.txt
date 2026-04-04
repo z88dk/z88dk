@@ -1,0 +1,24 @@
+% z88dk-z80asm -v -dump-after-directives t/30-directive//input/line_14.asm
+Assembling t/30-directive/input/line_14.asm...
+# file: t/30-directive/input/line_14.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+Identifier	"ld"	2:1	keyword=LD 
+Identifier	"a"	2:4	keyword=A 
+Comma	","	2:5	
+Integer	"2"	2:6	int_value=2 
+EndOfLine	"\n"	2:7	
+# file: t/30-directive/input/line_14.c
+Identifier	"ld"	10:1	keyword=LD 
+Identifier	"a"	10:4	keyword=A 
+Comma	","	10:5	
+Integer	"10"	10:6	int_value=10 
+EndOfLine	"\n"	10:8	
+Identifier	"ld"	11:1	keyword=LD 
+Identifier	"a"	11:4	keyword=A 
+Comma	","	11:5	
+Integer	"11"	11:6	int_value=11 
+EndOfLine	"\n"	11:8	
