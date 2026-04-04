@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "const_expr.h"
-#include "errors.h"
+#include "diag.h"
 #include "lexer.h"
 #include "options.h"
 #include "source_loc.h"
@@ -54,18 +54,18 @@ static void error_expected_operand(ExprParseContext& ctx) {
     if (ctx.pos > 0 && ctx.pos >= ctx.tokens.size()) {
         // exhausted tokens after an operator
         const Token& prev = ctx.tokens[ctx.pos - 1];
-        error(prev.loc, "Unterminated expression after "
-              + escape_string(g_strings.view(prev.text_id)));
+        g_diag.error(prev.loc, "Unterminated expression after "
+                     + escape_string(g_strings.view(prev.text_id)));
     }
     else if (ctx.pos < ctx.tokens.size()) {
         // valid token that is not a valid operand
         const Token& cur = ctx.tokens[ctx.pos];
-        error(cur.loc, "Expected a value, got "
-              + escape_string(g_strings.view(cur.text_id)));
+        g_diag.error(cur.loc, "Expected a value, got "
+                     + escape_string(g_strings.view(cur.text_id)));
     }
     else {
         // empty token stream
-        error(SourceLoc(), "Empty expression");
+        g_diag.error(SourceLoc(), "Empty expression");
     }
 }
 
@@ -98,7 +98,7 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
         }
         else {
             if (!ctx.silent) {
-                error(token->loc, "Undefined constant: " + g_strings.to_string(token->text_id));
+                g_diag.error(token->loc, "Undefined constant: " + g_strings.to_string(token->text_id));
             }
             result = 0;
         }
@@ -108,7 +108,7 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
 
     case TokenType::Dollar:
     case TokenType::ASMPC:
-        error(token->loc, "ASMPC is not allowed in a constant expression");
+        g_diag.error(token->loc, "ASMPC is not allowed in a constant expression");
         result = 0;
         ctx.pos++;
         return true;
@@ -120,8 +120,8 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
         }
         if (!match_token(ctx, TokenType::RightParen)) {
             if (!ctx.silent) {
-                error(peek_loc(ctx), "Missing ')' after token "
-                      + prev_token_text(ctx));
+                g_diag.error(peek_loc(ctx), "Missing ')' after token "
+                             + prev_token_text(ctx));
             }
             return false;
         }
@@ -135,8 +135,8 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
         }
         if (!match_token(ctx, TokenType::RightBracket)) {
             if (!ctx.silent) {
-                error(peek_loc(ctx), "Missing ']' after token "
-                      + prev_token_text(ctx));
+                g_diag.error(peek_loc(ctx), "Missing ']' after token "
+                             + prev_token_text(ctx));
             }
             return false;
         }
@@ -241,7 +241,7 @@ static bool parse_const_expr_multiplicative(ExprParseContext& ctx, int& result) 
             break;
         case TokenType::Divide:
             if (rhs == 0) {
-                error(peek_loc(ctx), "Division by zero");
+                g_diag.error(peek_loc(ctx), "Division by zero");
                 result = 0;
             }
             else {
@@ -250,7 +250,7 @@ static bool parse_const_expr_multiplicative(ExprParseContext& ctx, int& result) 
             break;
         case TokenType::Modulo:
             if (rhs == 0) {
-                error(peek_loc(ctx), "Modulo by zero");
+                g_diag.error(peek_loc(ctx), "Modulo by zero");
                 result = 0;
             }
             else {
@@ -515,8 +515,8 @@ static bool parse_const_expr_conditional(ExprParseContext& ctx, int& result) {
 
     if (!match_token(ctx, TokenType::Colon)) {
         if (!ctx.silent) {
-            error(peek_loc(ctx), "Missing ':' in ternary expression after token "
-                  + prev_token_text(ctx));
+            g_diag.error(peek_loc(ctx), "Missing ':' in ternary expression after token "
+                         + prev_token_text(ctx));
         }
         return false;
     }
@@ -549,10 +549,10 @@ bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
     if (pos < tokens.size() &&
             tokens[pos].type != TokenType::EndOfLine) {
         ExprParseContext ctx{ tokens, pos, sym, silent };
-        error(tokens[pos].loc, "Operator expected after token "
-              + prev_token_text(ctx)
-              + ", got "
-              + escape_string(g_strings.view(tokens[pos].text_id)));
+        g_diag.error(tokens[pos].loc, "Operator expected after token "
+                     + prev_token_text(ctx)
+                     + ", got "
+                     + escape_string(g_strings.view(tokens[pos].text_id)));
         return false;
     }
 
@@ -561,12 +561,12 @@ bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
 
 int int_pow(int base, int exp, const SourceLoc& loc) {
     if (exp < 0) {
-        error(loc, "Negative exponent in integer is not defined");
+        g_diag.error(loc, "Negative exponent in integer is not defined");
         return 0;
     }
 
     if (base == 0 && exp == 0) {
-        error(loc, "Zero raised to the power of zero is not defined");
+        g_diag.error(loc, "Zero raised to the power of zero is not defined");
         return 1;   // return something nonzero to avoid cascading errors
     }
 
