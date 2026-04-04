@@ -100,14 +100,14 @@ int main(int argc, char* argv[]) {
     for (int i = 1; ss >> arg; ++i) {
         bool found_dash_dash = false;
         SourceLoc loc("<environment>", i, 1);
-        parse_arg(arg, found_dash_dash, loc);
+        g_args.parse_arg(arg, found_dash_dash, loc);
     }
 
     // process command line arguments
     bool found_dash_dash = false;
     for (int i = 1; i < argc; ++i) {
         SourceLoc loc("<command-line>", i, 1);
-        parse_arg(argv[i], found_dash_dash, loc);
+        g_args.parse_arg(argv[i], found_dash_dash, loc);
     }
 
     if (g_args.options.dump_after_cmdline) {
