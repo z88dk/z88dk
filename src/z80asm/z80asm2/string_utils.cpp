@@ -16,7 +16,7 @@
 
 static constexpr std::string_view blanks = " \t\r\n\v\f";
 
-std::string to_upper(const std::string_view s) {
+std::string to_upper(std::string_view s) {
     std::string result(s);
     std::transform(result.begin(), result.end(), result.begin(),
     [](unsigned char c) {
@@ -25,21 +25,21 @@ std::string to_upper(const std::string_view s) {
     return result;
 }
 
-static std::string ltrim(const std::string_view s) {
+static std::string ltrim(std::string_view s) {
     size_t start = s.find_first_not_of(blanks);
     return std::string((start == std::string::npos) ? "" : s.substr(start));
 }
 
-static std::string rtrim(const std::string_view s) {
+static std::string rtrim(std::string_view s) {
     size_t end = s.find_last_not_of(blanks);
     return std::string((end == std::string::npos) ? "" : s.substr(0, end + 1));
 }
 
-std::string trim(const std::string_view s) {
+std::string trim(std::string_view s) {
     return ltrim(rtrim(s));
 }
 
-std::string escape_string(const std::string_view s) {
+std::string escape_string(std::string_view s) {
     std::string result;
     result.reserve(s.size() + 2);
     result.push_back('"');

@@ -13,7 +13,7 @@
 
 // Helper: get environment variable value in a secure, cross-platform way.
 // Returns empty string if the variable is not set.
-std::string get_env_value(const std::string_view name_) {
+std::string get_env_value(std::string_view name_) {
     std::string name(name_);
 #ifdef _MSC_VER
     char* buf = nullptr;
@@ -32,7 +32,7 @@ std::string get_env_value(const std::string_view name_) {
 
 // Expand environment variables of the form ${VAR}. Supports nesting such as ${var${param}}.
 // Unset variables expand to the empty string. Recursively expands until no patterns remain.
-std::string expand_env_vars(const std::string_view text) {
+std::string expand_env_vars(std::string_view text) {
     const size_t RUNAWAY_GUARD = 1000; // prevent infinite loops
     std::string s(text);
 
