@@ -8,7 +8,7 @@
 #include "errors.h"
 #include "options.h"
 #include "pathnames.h"
-#include "source_file.h"
+#include "file_mgr.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cassert>
@@ -596,14 +596,16 @@ static void search_list_file(std::string_view list_filename,
                              const SourceLoc& loc,
                              std::vector<SourceLoc>& loc_stack) {
     // read list file
-    StringInterner::Id file_id = register_virtual_file(list_filename);
+    StringInterner::Id file_id =
+        g_file_mgr.register_virtual_file(list_filename);
     std::string content;
-    if (!read_file_to_string(list_filename, loc, content)) {
+    if (!g_file_mgr.read_file_to_string(list_filename, loc, content)) {
         return;
     }
 
     // process each line
-    std::vector<RawLine> lines = split_into_lines(content, file_id, 1);
+    std::vector<RawLine> lines =
+        g_file_mgr.split_into_lines(content, file_id, 1);
     for (auto& line : lines) {
         // column will be updated by parse_filename_entry
         SourceLoc inc_loc = line.loc;
@@ -694,7 +696,8 @@ void search_source_file(std::string_view filename_,
             error(loc, "File not found: " + list_filename);
             return;
         }
-        StringInterner::Id file_id = register_virtual_file(list_full_path);
+        StringInterner::Id file_id =
+            g_file_mgr.register_virtual_file(list_full_path);
 
         // check for recursive inclusion of list files
         for (const SourceLoc& l : loc_stack) {
