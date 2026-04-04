@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <vector>
 
-bool eval_const_expr(const std::string_view expr, const SourceLoc& loc,
+bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result,
                      bool silent);
 

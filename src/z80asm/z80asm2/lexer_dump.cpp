@@ -14,7 +14,7 @@
 
 // show debug-friendly representation of token
 void dump_token(const Token& token) {
-    static const std::string_view token_type_names[] = {
+    static std::string_view token_type_names[] = {
 #define X(id, text) #id,
 #include "lexer_tokens.def"
     };
@@ -54,7 +54,7 @@ void dump_tokens(const std::vector<Token>& tokens,
 }
 
 [[noreturn]]
-void dump_after_tokenization_and_exit(const std::string_view filename) {
+void dump_after_tokenization_and_exit(std::string_view filename) {
     // get_source_file will read and tokenize the file,
     // caching the tokens in SourceFile
     SourceFile* sf = get_source_file(filename, SourceLoc());
