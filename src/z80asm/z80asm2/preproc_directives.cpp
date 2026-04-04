@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
+#include "diag.h"
 #include "lexer_keywords.h"
 #include "options.h"
 #include "pathnames.h"
@@ -137,9 +137,9 @@ static void check_end_of_line(const std::vector<Token>& input_line,
     }
 
     if (pos < input_line.size()) {
-        error(input_line[pos].loc,
-              "Unexpected token after " + std::string(directive_name) +
-              ": " + std::string(g_strings.view(input_line[pos].text_id)));
+        g_diag.error(input_line[pos].loc,
+                     "Unexpected token after " + std::string(directive_name) +
+                     ": " + std::string(g_strings.view(input_line[pos].text_id)));
     }
 }
 
@@ -150,8 +150,8 @@ static bool parse_filename(const std::vector<Token>& input_line,
                            bool& out_is_angle_bracket,
                            SourceLoc& out_filename_loc) {
     if (pos >= input_line.size() || input_line[pos].type == TokenType::EndOfLine) {
-        error(input_line[pos].loc, "Expected filename after " +
-              std::string(directive_name));
+        g_diag.error(input_line[pos].loc, "Expected filename after " +
+                     std::string(directive_name));
         return false;
     }
 
@@ -171,8 +171,8 @@ static bool parse_filename(const std::vector<Token>& input_line,
     // accept sequence of tokens until a space
     std::string_view token_text = g_strings.view(input_line[pos].text_id);
     if (token_text.size() == 0 || is_space(token_text.front())) {
-        error(input_line[pos].loc, "Expected filename after " +
-              std::string(directive_name));
+        g_diag.error(input_line[pos].loc, "Expected filename after " +
+                     std::string(directive_name));
         return false;
     }
 
@@ -220,7 +220,7 @@ static bool parse_and_resolve_file(PreprocessorContext& ctx,
                    is_angle_bracket,
                    g_args.options.include_paths);
     if (out_resolved.empty()) {
-        error(out_filename_loc, "File not found: " + std::string(filename));
+        g_diag.error(out_filename_loc, "File not found: " + std::string(filename));
         return false;
     }
 
@@ -242,8 +242,8 @@ static void process_INCLUDE(PreprocessorContext& ctx,
         g_file_mgr.register_virtual_file(resolved);
     for (const auto& frame : ctx.include_stack) {
         if (frame.file->file_id == resolved_id) {
-            error(filename_loc,
-                  "Recursive inclusion of file: " + resolved);
+            g_diag.error(filename_loc,
+                         "Recursive inclusion of file: " + resolved);
             return;
         }
     }
@@ -483,6 +483,6 @@ LineType process_directive_line(
     // ---------------------------------------------------------------------
     // Unknown directive -> error
     // ---------------------------------------------------------------------
-    error(first.loc, "Unknown preprocessor directive");
+    g_diag.error(first.loc, "Unknown preprocessor directive");
     return LineType::ControlOnly;
 }

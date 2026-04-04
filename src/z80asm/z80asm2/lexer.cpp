@@ -4,11 +4,11 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
+#include "diag.h"
+#include "file_mgr.h"
 #include "lexer.h"
 #include "lexer_keywords.h"
 #include "lexer_scan.h"
-#include "file_mgr.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstring>
@@ -168,8 +168,8 @@ void tokenize(SourceFile& sf, std::string_view content) {
     }
 
     if (state.in_multiline_comment) {
-        error(state.multiline_comment_start,
-              "Unterminated multi-line comment");
+        g_diag.error(state.multiline_comment_start,
+                     "Unterminated multi-line comment");
     }
 }
 
