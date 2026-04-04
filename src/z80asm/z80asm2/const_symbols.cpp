@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "const_symbols.h"
-#include "errors.h"
+#include "diag.h"
 #include "options.h"
 #include "source_loc.h"
 #include "string_interner.h"
@@ -15,8 +15,8 @@
 void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& loc) {
     const ConstSymbol* existing = get(name_id);
     if (existing != nullptr && existing->value != value) {
-        error(loc, "Constant already defined: " + g_strings.to_string(name_id));
-        note(existing->loc, "Previous definition of constant: " + g_strings.to_string(name_id));
+        g_diag.error(loc, "Constant already defined: " + g_strings.to_string(name_id));
+        g_diag.note(existing->loc, "Previous definition of constant: " + g_strings.to_string(name_id));
         return;
     }
 

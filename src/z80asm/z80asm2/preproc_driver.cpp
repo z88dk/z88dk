@@ -4,7 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
+#include "diag.h"
+#include "file_mgr.h"
 #include "lexer.h"
 #include "lexer_dump.h"
 #include "options.h"
@@ -13,7 +14,6 @@
 #include "preproc_driver.h"
 #include "preproc_dump.h"
 #include "preproc_macro.h"
-#include "file_mgr.h"
 #include <cstdlib>
 #include <string_view>
 
@@ -206,7 +206,7 @@ std::vector<Token> preprocess(std::string_view filename,
     // 5. Finalization checks
     // -------------------------------------------------------------------------
     if (!ctx.cond_stack.empty()) {
-        error(ctx.cond_stack.back().if_loc, "Unterminated IF block");
+        g_diag.error(ctx.cond_stack.back().if_loc, "Unterminated IF block");
     }
 
     // TODO: check for unterminated classical MACRO/ENDM if needed

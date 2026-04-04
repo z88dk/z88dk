@@ -4,11 +4,11 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "diag.h"
 #include "environment.h"
-#include "errors.h"
+#include "file_mgr.h"
 #include "options.h"
 #include "pathnames.h"
-#include "file_mgr.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cassert>
@@ -182,7 +182,7 @@ static void parse_define(std::string_view arg, std::string_view opt_name,
         expr = rest.substr(eq + 1);
         loc.column += 1; // for the '=' character
         if (expr.empty()) {
-            error(loc, "Expression missing in option: " + std::string(arg));
+            g_diag.error(loc, "Expression missing in option: " + std::string(arg));
             return;
         }
     }
@@ -198,7 +198,7 @@ static void parse_define(std::string_view arg, std::string_view opt_name,
         return;   // error already reported by eval_const_expr
     }
 
-    // Hand off to your assembler’s define mechanism
+    // Hand off to your assembler's define mechanism
     g_args.options.global_defs.set(name_s, value, loc);
 }
 
@@ -279,7 +279,7 @@ void parse_arg(std::string_view arg,
         // --------------------------------------------------------
         const OptionSpec* spec = match_option(arg);
         if (!spec) {
-            error(loc, "Invalid option: " + std::string(arg));
+            g_diag.error(loc, "Invalid option: " + std::string(arg));
             return;
         }
 
@@ -298,7 +298,7 @@ void parse_arg(std::string_view arg,
 
         case OptionType::INCLUDE:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                error(loc, "Invalid option: " + std::string(arg));
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
             g_args.options.include_paths.push_back(normalize_path(opt_arg));
@@ -306,7 +306,7 @@ void parse_arg(std::string_view arg,
 
         case OptionType::OUTPUT:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                error(loc, "Invalid option: " + std::string(arg));
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
             g_args.options.output_dir = opt_arg;
@@ -314,7 +314,7 @@ void parse_arg(std::string_view arg,
 
         case OptionType::CPP:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                error(loc, "Invalid option: " + std::string(arg));
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
             append_with_space(g_args.options.cpp_options, opt_arg);
@@ -322,7 +322,7 @@ void parse_arg(std::string_view arg,
 
         case OptionType::M4:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                error(loc, "Invalid option: " + std::string(arg));
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
             append_with_space(g_args.options.m4_options, opt_arg);
@@ -330,7 +330,7 @@ void parse_arg(std::string_view arg,
 
         case OptionType::PERL:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
-                error(loc, "Invalid option: " + std::string(arg));
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
             append_with_space(g_args.options.perl_options, opt_arg);
@@ -392,7 +392,7 @@ static std::string check_source(std::string_view filename) {
     namespace fs = std::filesystem;
 
     // avoid cascade of errors
-    if (error_count()) {
+    if (g_diag.error_count()) {
         return normalize_path(filename);
     }
 
@@ -469,7 +469,7 @@ static void run_tool(std::string_view filename,
                                   false,
                                   g_args.options.include_paths);
     if (full_path.empty()) {
-        error(loc, "File not found: " + std::string(filename));
+        g_diag.error(loc, "File not found: " + std::string(filename));
         return;
     }
 
@@ -489,7 +489,7 @@ static void run_tool(std::string_view filename,
     }
 
     if (0 != system(cmd.c_str())) {
-        error(loc, "Command failed: " + cmd);
+        g_diag.error(loc, "Command failed: " + cmd);
         return;
     }
 
@@ -562,7 +562,7 @@ static bool parse_filename_entry(std::string_view line_,
     if (has_at && (*p == '\0' || *p == ';' || *p == '#')) {
         SourceLoc here_loc = in_out_loc;
         here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
-        error(here_loc, "Expected filename after '@'");
+        g_diag.error(here_loc, "Expected filename after '@'");
         return false;
     }
 
@@ -583,7 +583,7 @@ static bool parse_filename_entry(std::string_view line_,
     if (*p != '\0' && *p != ';' && *p != '#') {
         SourceLoc here_loc = in_out_loc;
         here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
-        error(here_loc, "Unexpected text after filename: " + std::string(p));
+        g_diag.error(here_loc, "Unexpected text after filename: " + std::string(p));
         return false;
     }
 
@@ -672,8 +672,8 @@ void search_source_file(std::string_view filename_,
 
         if (unique_matches.empty()) {
             // no matches -> report not found unless an error already exists
-            if (!error_count()) {
-                error(loc, "File not found: " + filename);
+            if (!g_diag.error_count()) {
+                g_diag.error(loc, "File not found: " + filename);
             }
             return;
         }
@@ -693,7 +693,7 @@ void search_source_file(std::string_view filename_,
                                       false,
                                       g_args.options.include_paths);
         if (list_full_path.empty()) {
-            error(loc, "File not found: " + list_filename);
+            g_diag.error(loc, "File not found: " + list_filename);
             return;
         }
         StringInterner::Id file_id =
@@ -702,7 +702,7 @@ void search_source_file(std::string_view filename_,
         // check for recursive inclusion of list files
         for (const SourceLoc& l : loc_stack) {
             if (l.file_id == file_id) {
-                error(loc, "Recursive inclusion of list file: " + list_filename);
+                g_diag.error(loc, "Recursive inclusion of list file: " + list_filename);
                 return;
             }
         }
@@ -836,7 +836,7 @@ void search_source_file(std::string_view filename_,
     }
 
     // not found, avoid cascade of errors
-    if (!error_count()) {
-        error(loc, "File not found: " + filename);
+    if (!g_diag.error_count()) {
+        g_diag.error(loc, "File not found: " + filename);
     }
 }

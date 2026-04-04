@@ -4,13 +4,13 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
+#include "diag.h"
 #include "lexer.h"
 #include "lexer_scan.h"
 #include "source_loc.h"
+#include <charconv>
 #include <string>
 #include <vector>
-#include <charconv>
 
 static inline int digit_value(char c) {
     if (c >= '0' && c <= '9') {
@@ -34,7 +34,7 @@ static bool parse_escape(size_t& idx,
     size_t n = line.text.size();
     if (idx + 1 >= n) {
         if (!probing) {
-            error(line.locmap[idx], "Unterminated escape sequence");
+            g_diag.error(line.locmap[idx], "Unterminated escape sequence");
         }
         return false;
     }
@@ -99,7 +99,7 @@ static bool parse_escape(size_t& idx,
     case 'x': {
         if (idx >= n || !is_hex_digit(line.text[idx])) {
             if (!probing) {
-                error(line.locmap[idx - 2], "Invalid hex escape");
+                g_diag.error(line.locmap[idx - 2], "Invalid hex escape");
             }
             return false;
         }
@@ -116,7 +116,7 @@ static bool parse_escape(size_t& idx,
 
     default:
         if (!probing) {
-            error(line.locmap[idx - 2], std::string("Unknown escape: \\") + esc);
+            g_diag.error(line.locmap[idx - 2], std::string("Unknown escape: \\") + esc);
         }
         return false;
     }
@@ -153,7 +153,7 @@ static bool scan_quoted_content(char end_quote,
     }
 
     if (!probing) {
-        error(line.locmap[idx], "Unterminated string literal");
+        g_diag.error(line.locmap[idx], "Unterminated string literal");
     }
     idx = n;    // advance past the malformed string
     return false;
@@ -274,9 +274,9 @@ void tokenize_line(const MergedLine& line,
             line.text.substr(start, p - line.text.c_str() - start);
             SourceLoc here_loc = current_loc();
             here_loc.column = static_cast<uint16_t>(p - line.text.c_str() + 1);
-            error(here_loc,
-                  "Invalid character '" + std::string(1, *p) +
-                  "' after literal: '" + literal_text + "'");
+            g_diag.error(here_loc,
+                         "Invalid character '" + std::string(1, *p) +
+                         "' after literal: '" + literal_text + "'");
             return false;
         }
         return true;
@@ -347,7 +347,7 @@ continue_lexing:
             mantissau   = decu '.' decu* | decu* '.' decu+;
             expu        = [eE] [-+]? decu;
 
-            *       { error(current_loc(), "Unexpected character: '" +
+            *       { g_diag.error(current_loc(), "Unexpected character: '" +
                                             std::string(tok, p) + "'");
                       return; }
 

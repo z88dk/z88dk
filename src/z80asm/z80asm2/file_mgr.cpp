@@ -4,10 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
+#include "diag.h"
+#include "file_mgr.h"
 #include "lexer.h"
 #include "pathnames.h"
-#include "file_mgr.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <fstream>
@@ -37,7 +37,7 @@ public:
         e.filename = filename;
         e.stream.open(e.filename, std::ios::binary);
         if (!e.stream) {
-            error(loc, "Failed to open file: " + e.filename);
+            g_diag.error(loc, "Failed to open file: " + e.filename);
             entries.pop_front();
             return nullptr;
         }
@@ -260,7 +260,7 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     // Read file
     std::ifstream in(norm, std::ios::binary | std::ios::ate);
     if (!in) {
-        error(loc, "Failed to open file: " + norm);
+        g_diag.error(loc, "Failed to open file: " + norm);
         return nullptr;
     }
 
@@ -270,7 +270,7 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     std::vector<uint8_t> data(static_cast<size_t>(size));
     if (size > 0 &&
             !in.read(reinterpret_cast<char*>(data.data()), size)) {
-        error(loc, "Failed to read file: " + norm);
+        g_diag.error(loc, "Failed to read file: " + norm);
         return nullptr;
     }
 
