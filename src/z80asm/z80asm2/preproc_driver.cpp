@@ -13,7 +13,7 @@
 #include "preproc_driver.h"
 #include "preproc_dump.h"
 #include "preproc_macro.h"
-#include "source_file.h"
+#include "file_mgr.h"
 #include <cstdlib>
 #include <string_view>
 
@@ -96,15 +96,7 @@
    ------------------------------------------------------------------------- */
 
 // -----------------------------------------------------------------------------
-// Public API (unchanged)
-// -----------------------------------------------------------------------------
-std::vector<Token> preprocess(std::string_view filename) {
-    ConstSymbols empty;
-    return preprocess(filename, empty);
-}
-
-// -----------------------------------------------------------------------------
-// New API: accepts initial -D symbols
+// API: accepts initial -D symbols
 // -----------------------------------------------------------------------------
 std::vector<Token> preprocess(std::string_view filename,
                               const ConstSymbols& initial_symbols) {
@@ -120,7 +112,7 @@ std::vector<Token> preprocess(std::string_view filename,
     // -------------------------------------------------------------------------
     // 1. Load and tokenize the top-level file
     // -------------------------------------------------------------------------
-    const SourceFile* file = get_source_file(filename, SourceLoc());
+    const SourceFile* file = g_file_mgr.get_source_file(filename, SourceLoc());
     if (!file) {
         // error already emitted by get_source_file()
         return final_tokens;

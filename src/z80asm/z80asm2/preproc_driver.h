@@ -13,7 +13,5 @@
 #include <vector>
 #include "const_expr.h"
 
-std::vector<Token> preprocess(std::string_view filename);
-
 std::vector<Token> preprocess(std::string_view filename,
                               const ConstSymbols& initial_symbols);

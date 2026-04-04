@@ -21,7 +21,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\source_file.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\file_mgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_keywords.cpp">
@@ -92,7 +92,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\source_file.h">
+    <ClInclude Include="..\..\src\z80asm\z80asm2\file_mgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_keywords.h">
