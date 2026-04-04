@@ -27,21 +27,6 @@ static constexpr std::string_view copyright =
     "Usage: z88dk-z80asm [options] files...\n"
     "Copyright (C) Paulo Custodio, 2011-2026\n";
 
-// option types
-enum class OptionType {
-#define X(name, str, takes_arg, arg_text, usage) name,
-#include "options.def"
-};
-
-// option specification
-struct OptionSpec {
-    const char* name;
-    OptionType  type;
-    bool        takes_arg;
-    const char* arg_text;
-    const char* usage;
-};
-
 static const OptionSpec g_option_specs[] = {
 #define X(name, str, takes_arg, arg_text, usage) \
         { str, OptionType::name, takes_arg, arg_text, usage },
@@ -144,15 +129,15 @@ void exit_show_usage(int exit_code) {
     exit(exit_code);
 }
 
-static void append_with_space(std::string& dst, std::string_view src) {
+void Args::append_with_space(std::string& dst, std::string_view src) {
     if (!dst.empty()) {
         dst.push_back(' ');
     }
     dst.append(src);
 }
 
-static void parse_define(std::string_view arg, std::string_view opt_name,
-                         SourceLoc loc) {
+void Args::parse_define(std::string_view arg, std::string_view opt_name,
+                        SourceLoc loc) {
     // Strip the "-D" prefix
     if (!starts_with(arg, opt_name)) {
         return;
@@ -193,17 +178,17 @@ static void parse_define(std::string_view arg, std::string_view opt_name,
 
     // evaluate the expression as a constant expression
     int value = 1;
-    if (!eval_const_expr(expr_s, loc, g_args.options.global_defs,
+    if (!eval_const_expr(expr_s, loc, options.global_defs,
                          value, /*silent=*/false)) {
         return;   // error already reported by eval_const_expr
     }
 
     // Hand off to your assembler's define mechanism
-    g_args.options.global_defs.set(name_s, value, loc);
+    options.global_defs.set(name_s, value, loc);
 }
 
 // match longest option prefix in arg, return nullptr if no match
-const OptionSpec* match_option(std::string_view arg) {
+const OptionSpec* Args::match_option(std::string_view arg) {
     const OptionSpec* best = nullptr;
     size_t best_len = 0;
 
@@ -220,9 +205,9 @@ const OptionSpec* match_option(std::string_view arg) {
     return best; // nullptr if no match
 }
 
-static bool split_option_arg(std::string_view arg,
-                             std::string_view opt_name,
-                             std::string& out) {
+bool Args::split_option_arg(std::string_view arg,
+                            std::string_view opt_name,
+                            std::string& out) {
     // Must start with the option prefix
     if (arg.size() < opt_name.size()) {
         return false;
@@ -250,8 +235,8 @@ static bool split_option_arg(std::string_view arg,
     return true;
 }
 
-void parse_arg(std::string_view arg,
-               bool& found_dash_dash, const SourceLoc& loc) {
+void Args::parse_arg(std::string_view arg,
+                     bool& found_dash_dash, const SourceLoc& loc) {
     if (arg.empty()) {
         return;
     }
@@ -293,7 +278,7 @@ void parse_arg(std::string_view arg,
             exit_show_usage(EXIT_SUCCESS);
 
         case OptionType::VERBOSE:
-            g_args.options.verbose = true;
+            options.verbose = true;
             return;
 
         case OptionType::INCLUDE:
@@ -301,7 +286,7 @@ void parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            g_args.options.include_paths.push_back(normalize_path(opt_arg));
+            options.include_paths.push_back(normalize_path(opt_arg));
             return;
 
         case OptionType::OUTPUT:
@@ -309,7 +294,7 @@ void parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            g_args.options.output_dir = opt_arg;
+            options.output_dir = opt_arg;
             return;
 
         case OptionType::CPP:
@@ -317,7 +302,7 @@ void parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            append_with_space(g_args.options.cpp_options, opt_arg);
+            append_with_space(options.cpp_options, opt_arg);
             return;
 
         case OptionType::M4:
@@ -325,7 +310,7 @@ void parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            append_with_space(g_args.options.m4_options, opt_arg);
+            append_with_space(options.m4_options, opt_arg);
             return;
 
         case OptionType::PERL:
@@ -333,7 +318,7 @@ void parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            append_with_space(g_args.options.perl_options, opt_arg);
+            append_with_space(options.perl_options, opt_arg);
             return;
 
         case OptionType::DEFINE:
@@ -341,39 +326,39 @@ void parse_arg(std::string_view arg,
             return;
 
         case OptionType::PREPROC:
-            g_args.options.preprocess_only = true;
+            options.preprocess_only = true;
             return;
 
         case OptionType::IXIY:
-            g_args.options.swap_ix_iy = true;
+            options.swap_ix_iy = true;
             return;
 
         case OptionType::UCASE:
-            g_args.options.ucase_labels = true;
+            options.ucase_labels = true;
             return;
 
         case OptionType::DATESTAMP:
-            g_args.options.date_stamp = true;
+            options.date_stamp = true;
             return;
 
         case OptionType::DUMP_AFTER_CMDLINE:
-            g_args.options.dump_after_cmdline = true;
+            options.dump_after_cmdline = true;
             return;
 
         case OptionType::DUMP_AFTER_TOKENIZATION:
-            g_args.options.dump_after_tokenization = true;
+            options.dump_after_tokenization = true;
             return;
 
         case OptionType::DUMP_AFTER_DIRECTIVES:
-            g_args.options.dump_after_directives = true;
+            options.dump_after_directives = true;
             return;
 
         case OptionType::DUMP_AFTER_MACRO_EXPANSION:
-            g_args.options.dump_after_macro_expansion = true;
+            options.dump_after_macro_expansion = true;
             return;
 
         case OptionType::DUMP_AFTER_PREPROCESSING:
-            g_args.options.dump_after_preprocessing = true;
+            options.dump_after_preprocessing = true;
             return;
 
         default:
@@ -388,7 +373,7 @@ void parse_arg(std::string_view arg,
     search_source_file(arg, "", loc, empty_stack);
 }
 
-static std::string check_source(std::string_view filename) {
+std::string Args::check_source(std::string_view filename) {
     namespace fs = std::filesystem;
 
     // avoid cascade of errors
@@ -425,7 +410,7 @@ static std::string check_source(std::string_view filename) {
     // if both .o and .asm exist, return .asm or .o if -d and .o is newer
     // NOTE: -d must come before the file to have effect
     if (src_ok && obj_ok) {
-        if (!g_args.options.date_stamp) {
+        if (!options.date_stamp) {
             // no -d
             if (got_obj) {
                 return normalize_path(obj_file.generic_string());
@@ -434,7 +419,8 @@ static std::string check_source(std::string_view filename) {
                 return normalize_path(src_file.generic_string());
             }
         }
-        else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
+        else if (fs::last_write_time(obj_file) >=
+                 fs::last_write_time(src_file)) {
             // -d and .o is up-to-date
             return normalize_path(obj_file.generic_string());
         }
@@ -455,19 +441,19 @@ static std::string check_source(std::string_view filename) {
 }
 
 // run tool preprocessor
-static void run_tool(std::string_view filename,
-                     std::string_view extension,
-                     std::string_view including_filename,
-                     std::string_view tool_name_,
-                     std::string_view tool_options,
-                     const SourceLoc& loc,
-                     std::vector<SourceLoc>& loc_stack) {
+void Args::run_tool(std::string_view filename,
+                    std::string_view extension,
+                    std::string_view including_filename,
+                    std::string_view tool_name_,
+                    std::string_view tool_options,
+                    const SourceLoc& loc,
+                    std::vector<SourceLoc>& loc_stack) {
     std::string tool_name(tool_name_);
     std::string full_path =
         resolve_include_candidate(filename,
                                   including_filename,
                                   false,
-                                  g_args.options.include_paths);
+                                  options.include_paths);
     if (full_path.empty()) {
         g_diag.error(loc, "File not found: " + std::string(filename));
         return;
@@ -484,7 +470,7 @@ static void run_tool(std::string_view filename,
     }
     cmd += " \"" + full_path + "\" > \"" + asm_filename + "\"";
 
-    if (g_args.options.verbose) {
+    if (options.verbose) {
         std::cout << "% " << cmd << std::endl;
     }
 
@@ -498,42 +484,42 @@ static void run_tool(std::string_view filename,
 }
 
 // run m4 preprocessor
-static void run_m4(std::string_view filename,
-                   std::string_view including_filename,
-                   const SourceLoc& loc,
-                   std::vector<SourceLoc>& loc_stack) {
+void Args::run_m4(std::string_view filename,
+                  std::string_view including_filename,
+                  const SourceLoc& loc,
+                  std::vector<SourceLoc>& loc_stack) {
     run_tool(filename, m4_extension,
              including_filename,
-             "m4", g_args.options.m4_options,
+             "m4", options.m4_options,
              loc, loc_stack);
 }
 
 // run perl preprocessor
-static void run_perl(std::string_view filename,
-                     std::string_view including_filename,
-                     const SourceLoc& loc,
-                     std::vector<SourceLoc>& loc_stack) {
+void Args::run_perl(std::string_view filename,
+                    std::string_view including_filename,
+                    const SourceLoc& loc,
+                    std::vector<SourceLoc>& loc_stack) {
     run_tool(filename, perl_extension,
              including_filename,
-             "perl", g_args.options.perl_options,
+             "perl", options.perl_options,
              loc, loc_stack);
 }
 
 // run cpp preprocessor
-static void run_cpp(std::string_view filename,
-                    std::string_view including_filename,
-                    const SourceLoc& loc,
-                    std::vector<SourceLoc>& loc_stack) {
+void Args::run_cpp(std::string_view filename,
+                   std::string_view including_filename,
+                   const SourceLoc& loc,
+                   std::vector<SourceLoc>& loc_stack) {
     run_tool(filename, cpp_extension,
              including_filename,
-             "cpp", g_args.options.cpp_options,
+             "cpp", options.cpp_options,
              loc, loc_stack);
 }
 
 // parse list file line, return filename or empty string, and SourceLoc
-static bool parse_filename_entry(std::string_view line_,
-                                 SourceLoc& in_out_loc,
-                                 std::string& out_filename) {
+bool Args::parse_filename_entry(std::string_view line_,
+                                SourceLoc& in_out_loc,
+                                std::string& out_filename) {
     out_filename.clear();
 
     std::string line(line_);
@@ -592,9 +578,9 @@ static bool parse_filename_entry(std::string_view line_,
 }
 
 // search list files
-static void search_list_file(std::string_view list_filename,
-                             const SourceLoc& loc,
-                             std::vector<SourceLoc>& loc_stack) {
+void Args::search_list_file(std::string_view list_filename,
+                            const SourceLoc& loc,
+                            std::vector<SourceLoc>& loc_stack) {
     // read list file
     StringInterner::Id file_id =
         g_file_mgr.register_virtual_file(list_filename);
@@ -623,10 +609,10 @@ static void search_list_file(std::string_view list_filename,
 }
 
 // search source file in path, return empty string if not found
-void search_source_file(std::string_view filename_,
-                        std::string_view including_filename,
-                        const SourceLoc& loc,
-                        std::vector<SourceLoc>& loc_stack) {
+void Args::search_source_file(std::string_view filename_,
+                              std::string_view including_filename,
+                              const SourceLoc& loc,
+                              std::vector<SourceLoc>& loc_stack) {
     std::string filename = trim(filename_);
     filename = expand_env_vars(filename);
     std::string out_filename;
@@ -652,7 +638,7 @@ void search_source_file(std::string_view filename_,
         // This enables: z88dk-z80asm -Ipath "*.asm"
         std::filesystem::path pat_path(filename);
         if (!pat_path.is_absolute()) {
-            for (const auto& inc : g_args.options.include_paths) {
+            for (const auto& inc : options.include_paths) {
                 std::string combined = (std::filesystem::path(inc) / filename).generic_string();
                 std::vector<std::string> m = expand_wildcards(combined);
                 matches.insert(matches.end(), m.begin(), m.end());
@@ -691,7 +677,7 @@ void search_source_file(std::string_view filename_,
             resolve_include_candidate(list_filename,
                                       including_filename,
                                       false,
-                                      g_args.options.include_paths);
+                                      options.include_paths);
         if (list_full_path.empty()) {
             g_diag.error(loc, "File not found: " + list_filename);
             return;
@@ -734,7 +720,7 @@ void search_source_file(std::string_view filename_,
     // check plain filename
     out_filename = check_source(filename);
     if (!out_filename.empty()) {
-        g_args.input_files.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -742,11 +728,11 @@ void search_source_file(std::string_view filename_,
     out_filename = resolve_include_candidate(filename,
                    including_filename,
                    false,
-                   g_args.options.include_paths);
+                   options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            g_args.input_files.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -755,7 +741,7 @@ void search_source_file(std::string_view filename_,
     std::string asm_filename = filename + std::string(asm_extension);
     out_filename = check_source(asm_filename);
     if (!out_filename.empty()) {
-        g_args.input_files.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -763,11 +749,11 @@ void search_source_file(std::string_view filename_,
     out_filename = resolve_include_candidate(asm_filename,
                    including_filename,
                    false,
-                   g_args.options.include_paths);
+                   options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            g_args.input_files.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -776,7 +762,7 @@ void search_source_file(std::string_view filename_,
     std::string o_filename = filename + std::string(o_extension);
     out_filename = check_source(o_filename);
     if (!out_filename.empty()) {
-        g_args.input_files.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -784,11 +770,11 @@ void search_source_file(std::string_view filename_,
     out_filename = resolve_include_candidate(o_filename,
                    including_filename,
                    false,
-                   g_args.options.include_paths);
+                   options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            g_args.input_files.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
@@ -797,7 +783,7 @@ void search_source_file(std::string_view filename_,
     asm_filename = get_asm_filename(filename);
     out_filename = check_source(asm_filename);
     if (!out_filename.empty()) {
-        g_args.input_files.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -805,20 +791,20 @@ void search_source_file(std::string_view filename_,
     out_filename = resolve_include_candidate(asm_filename,
                    including_filename,
                    false,
-                   g_args.options.include_paths);
+                   options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            g_args.input_files.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }
 
     // check object file in output_dir
-    o_filename = get_o_filename(filename, g_args.options.output_dir);
+    o_filename = get_o_filename(filename, options.output_dir);
     out_filename = check_source(o_filename);
     if (!out_filename.empty()) {
-        g_args.input_files.push_back(out_filename);
+        input_files.push_back(out_filename);
         return;
     }
 
@@ -826,11 +812,11 @@ void search_source_file(std::string_view filename_,
     out_filename = resolve_include_candidate(o_filename,
                    including_filename,
                    false,
-                   g_args.options.include_paths);
+                   options.include_paths);
     if (!out_filename.empty()) {
         out_filename = check_source(out_filename);
         if (!out_filename.empty()) {
-            g_args.input_files.push_back(out_filename);
+            input_files.push_back(out_filename);
             return;
         }
     }

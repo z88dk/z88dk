@@ -11,6 +11,21 @@
 #include <string>
 #include <vector>
 
+// option types
+enum class OptionType {
+#define X(name, str, takes_arg, arg_text, usage) name,
+#include "options.def"
+};
+
+// option specification
+struct OptionSpec {
+    const char* name;
+    OptionType  type;
+    bool        takes_arg;
+    const char* arg_text;
+    const char* usage;
+};
+
 struct Options {
     bool verbose = false;
     bool ucase_labels = false;
@@ -34,17 +49,53 @@ struct Args {
     Options options;
     std::vector<std::string> input_files;   // command line input files
     std::vector<std::string> obj_files;     // resulting object files
+
+    // parse arguments and options
+    void parse_arg(std::string_view arg,
+                   bool& found_dash_dash, const SourceLoc& loc);
+    void search_source_file(std::string_view filename,
+                            std::string_view including_filename,
+                            const SourceLoc& loc,
+                            std::vector<SourceLoc>& loc_stack);
+
+private:
+    bool split_option_arg(std::string_view arg,
+                          std::string_view opt_name,
+                          std::string& out);
+    void append_with_space(std::string& dst, std::string_view src);
+    void parse_define(std::string_view arg, std::string_view opt_name,
+                      SourceLoc loc);
+    const OptionSpec* match_option(std::string_view arg);
+    std::string check_source(std::string_view filename);
+    void search_list_file(std::string_view list_filename,
+                          const SourceLoc& loc,
+                          std::vector<SourceLoc>& loc_stack);
+    bool parse_filename_entry(std::string_view line_,
+                              SourceLoc& in_out_loc,
+                              std::string& out_filename);
+    void run_tool(std::string_view filename,
+                  std::string_view extension,
+                  std::string_view including_filename,
+                  std::string_view tool_name_,
+                  std::string_view tool_options,
+                  const SourceLoc& loc,
+                  std::vector<SourceLoc>& loc_stack);
+    void run_m4(std::string_view filename,
+                std::string_view including_filename,
+                const SourceLoc& loc,
+                std::vector<SourceLoc>& loc_stack);
+    void run_perl(std::string_view filename,
+                  std::string_view including_filename,
+                  const SourceLoc& loc,
+                  std::vector<SourceLoc>& loc_stack);
+    void run_cpp(std::string_view filename,
+                 std::string_view including_filename,
+                 const SourceLoc& loc,
+                 std::vector<SourceLoc>& loc_stack);
 };
 
 extern Args g_args;
 
-// parse arguments and options
-void parse_arg(std::string_view arg,
-               bool& found_dash_dash, const SourceLoc& loc);
-void search_source_file(std::string_view filename,
-                        std::string_view including_filename,
-                        const SourceLoc& loc,
-                        std::vector<SourceLoc>& loc_stack);
 
 [[noreturn]] void exit_show_copyright(int exit_code);
 [[noreturn]] void exit_show_usage(int exit_code);
