@@ -35,9 +35,22 @@ struct Preproc {
     // ---------------------------------------------------------------------
     struct IncludeFrame {
         const SourceFile* file = nullptr;
-        size_t current_line = 0;
         StringInterner::Id logical_file_id = 0;
-        size_t logical_line = 1;
+        size_t current_line = 0;
+        bool logical_line_fixed = false;        // for C_LINE
+        ptrdiff_t logical_line_offset = 0;      // for LINE, C_LINE
+
+        size_t logical_line() const {
+            if (logical_line_fixed) {
+                return logical_line_offset;
+            }
+            else if (file != nullptr) {
+                return current_line + logical_line_offset + 1;
+            }
+            else {
+                return 0;
+            }
+        }
     };
 
     std::vector<IncludeFrame> include_stack;
@@ -128,9 +141,15 @@ private:
                                 std::string_view directive_name,
                                 std::string& out_resolved,
                                 SourceLoc& out_filename_loc);
+    bool parse_LINE_args(const std::vector<Token>& input_line, size_t& pos,
+                         std::string_view directive_name,
+                         size_t& out_linenum, std::string& out_filename);
+    void rewrite_logical_line(LogicalLine& line);
 
     void process_INCLUDE(const std::vector<Token>& input_line, size_t& pos);
     void process_BINARY(const std::vector<Token>& input_line, size_t& pos);
+    void process_LINE(const std::vector<Token>& input_line, size_t& pos);
+    void process_C_LINE(const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
