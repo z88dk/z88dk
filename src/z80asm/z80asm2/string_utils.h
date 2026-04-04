@@ -11,10 +11,10 @@
 #include <string_view>
 
 // Convert string to upper case
-std::string to_upper(const std::string_view s);
+std::string to_upper(std::string_view s);
 
 // trim whitspace at the beginnint and at the end
-std::string trim(const std::string_view s);
+std::string trim(std::string_view s);
 
 // check string ending
 inline bool starts_with(std::string_view s, std::string_view prefix) {
@@ -28,7 +28,7 @@ inline bool ends_with(std::string_view s, std::string_view suffix) {
 }
 
 // escape special characters in a string for debug output
-std::string escape_string(const std::string_view s);
+std::string escape_string(std::string_view s);
 
 // Helper function to format integer as hex string
 std::string int_to_hex(int value);

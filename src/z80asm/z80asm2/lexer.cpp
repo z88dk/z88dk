@@ -84,14 +84,14 @@ static bool strip_line_continuation(std::string& line) {
 }
 
 static std::string_view get_line_view(const SourceFile& sf,
-                                      const std::string_view content,
+                                      std::string_view content,
                                       size_t line) {
     size_t off = sf.line_offsets[line];
     size_t len = sf.line_lengths[line];
     return std::string_view(content.data() + off, len);
 }
 
-void tokenize(SourceFile& sf, const std::string_view content) {
+void tokenize(SourceFile& sf, std::string_view content) {
     TokenizeState state;
     size_t num_lines = sf.line_offsets.size();
 
@@ -173,7 +173,7 @@ void tokenize(SourceFile& sf, const std::string_view content) {
     }
 }
 
-std::vector<Token> tokenize_text(const std::string_view text,
+std::vector<Token> tokenize_text(std::string_view text,
                                  const SourceLoc& loc) {
     // Build a temporary merged line
     MergedLine merged;

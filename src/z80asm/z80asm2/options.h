@@ -39,10 +39,10 @@ struct Args {
 extern Args g_args;
 
 // parse arguments and options
-void parse_arg(const std::string_view arg,
+void parse_arg(std::string_view arg,
                bool& found_dash_dash, const SourceLoc& loc);
-void search_source_file(const std::string_view filename,
-                        const std::string_view including_filename,
+void search_source_file(std::string_view filename,
+                        std::string_view including_filename,
                         const SourceLoc& loc,
                         std::vector<SourceLoc>& loc_stack);
 

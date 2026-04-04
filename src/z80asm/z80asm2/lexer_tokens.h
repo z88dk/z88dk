@@ -28,15 +28,15 @@ struct Token {
 
     SourceLoc loc;                          // 8 bytes
 
-    static Token token(TokenType type_, const std::string_view text_,
+    static Token token(TokenType type_, std::string_view text_,
                        const SourceLoc& loc);
-    static Token identifier(const std::string_view text_,
+    static Token identifier(std::string_view text_,
                             const SourceLoc& loc);
-    static Token integer(const std::string_view text_, int value,
+    static Token integer(std::string_view text_, int value,
                          const SourceLoc& loc);
-    static Token floating(const std::string_view text_, double value,
+    static Token floating(std::string_view text_, double value,
                           const SourceLoc& loc);
-    static Token string(const std::string_view text_, const std::string_view value,
+    static Token string(std::string_view text_, std::string_view value,
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
 };

@@ -15,4 +15,4 @@ void dump_tokens(const std::vector<Token>& tokens,
                  StringInterner::Id& cur_file_id);
 
 [[noreturn]]
-void dump_after_tokenization_and_exit(const std::string_view filename);
+void dump_after_tokenization_and_exit(std::string_view filename);
