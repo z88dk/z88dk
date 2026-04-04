@@ -8,7 +8,7 @@
 #include "lexer.h"
 #include "lexer_keywords.h"
 #include "lexer_scan.h"
-#include "source_file.h"
+#include "file_mgr.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstring>

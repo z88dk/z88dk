@@ -14,7 +14,7 @@
 
 std::string tokens_to_string(const std::vector<Token>& tokens);
 
-struct SourceFile;          // forward declaration (no #include "source_file.h")
+struct SourceFile;          // forward declaration (no #include "file_mgr.h")
 void tokenize(SourceFile& sf, std::string_view content);
 std::vector<Token> tokenize_text(std::string_view text,
                                  const SourceLoc& loc);

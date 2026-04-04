@@ -149,7 +149,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_macro.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\semantic_rewrite.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\source_file.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\file_mgr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\source_loc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_interner.cpp" />
@@ -175,7 +175,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc_macro.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\source_file.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\file_mgr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_utils.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_interner.h" />
