@@ -22,6 +22,8 @@ Preproc::directive_handlers_ = {
     { Keyword::INCLUDE, &Preproc::process_INCLUDE },
     { Keyword::BINARY,  &Preproc::process_BINARY },
     { Keyword::INCBIN,  &Preproc::process_BINARY },
+    { Keyword::LINE,    &Preproc::process_LINE },
+    { Keyword::C_LINE,  &Preproc::process_C_LINE },
 };
 
 //-----------------------------------------------------------------------------
@@ -49,7 +51,8 @@ bool Preproc::parse_filename(const std::vector<Token>& input_line,
                              std::string& out_filename,
                              bool& out_is_angle_bracket,
                              SourceLoc& out_filename_loc) {
-    if (pos >= input_line.size() || input_line[pos].type == TokenType::EndOfLine) {
+    if (pos >= input_line.size() ||
+            input_line[pos].type == TokenType::EndOfLine) {
         g_diag.error(input_line[pos].loc, "Expected filename after " +
                      std::string(directive_name));
         return false;
@@ -91,6 +94,18 @@ bool Preproc::parse_filename(const std::vector<Token>& input_line,
         pos++;
     }
 
+    if (!out_filename.empty() &&
+            out_filename.front() == '<' && out_filename.back() == '>') {
+        out_is_angle_bracket = true;
+        out_filename = out_filename.substr(1, out_filename.size() - 2);
+    }
+
+    if (!out_filename.empty() &&
+            out_filename.front() == '"' && out_filename.back() == '"') {
+        out_is_angle_bracket = false;
+        out_filename = out_filename.substr(1, out_filename.size() - 2);
+    }
+
     return true;
 }
 
@@ -126,6 +141,101 @@ bool Preproc::parse_and_resolve_file(const std::vector<Token>& input_line,
     return true;
 }
 
+bool Preproc::parse_LINE_args(const std::vector<Token>& input_line,
+                              size_t& pos,
+                              std::string_view directive_name,
+                              size_t& out_linenum,
+                              std::string& out_filename) {
+    out_linenum = 0;
+    out_filename.clear();
+
+    // accept line number
+    if (pos >= input_line.size() ||
+            input_line[pos].type != TokenType::Integer) {
+        g_diag.error(input_line[pos].loc, "Expected line number after " +
+                     std::string(directive_name));
+        return false;
+    }
+
+    out_linenum = static_cast<size_t>(input_line[pos].value.int_value);
+    pos++;
+
+    // skip optional comma
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::Comma) {
+        pos++;
+    }
+
+    if (pos >= input_line.size() ||
+            input_line[pos].type == TokenType::EndOfLine) {
+        return true;    // no filename, but that's fine
+    }
+
+    // accept optional filename
+    std::string_view token_text = g_strings.view(input_line[pos].text_id);
+    if (!token_text.empty() && !is_space(token_text.front())) {
+        bool is_angle_bracket = false;
+        SourceLoc filename_loc;
+        if (!parse_filename(input_line, pos, directive_name,
+                            out_filename, is_angle_bracket, filename_loc)) {
+            return false;   // error already reported by parse_filename()
+        }
+
+        // try to resolve the filename against include paths
+        std::string_view including_filename =
+            include_stack.empty() ? "" :
+            g_strings.view(include_stack.back().file->file_id);
+        std::string resolved = resolve_include_candidate(
+                                   out_filename,
+                                   including_filename,
+                                   is_angle_bracket,
+                                   g_args.options.include_paths);
+        if (!resolved.empty()) {
+            out_filename = resolved;
+        }
+    }
+
+    // cpp outputs other parameters after the filename, but we ignore them.
+    return true;
+}
+
+void Preproc::rewrite_logical_line(LogicalLine& line) {
+    if (include_stack.empty()) {
+        return;
+    }
+
+    IncludeFrame& frame = include_stack.back();
+    if (!frame.logical_line_fixed && frame.logical_line_offset == 0) {
+        return; // no change needed
+    }
+
+    {
+        SourceLine physical_loc(line.loc);
+        if (frame.logical_line_fixed) {
+            line.loc.line = static_cast<uint32_t>(frame.logical_line_offset);
+        }
+        else {
+            line.loc.line += static_cast<uint32_t>(frame.logical_line_offset);
+        }
+        line.loc.file_id = static_cast<uint16_t>(frame.logical_file_id);
+        SourceLine logical_loc(line.loc);
+        g_diag.add_mapping(logical_loc, physical_loc);
+    }
+
+    for (Token& tok : line.tokens) {
+        SourceLine physical_loc(tok.loc);
+        if (frame.logical_line_fixed) {
+            tok.loc.line = static_cast<uint32_t>(frame.logical_line_offset);
+        }
+        else {
+            tok.loc.line += static_cast<uint32_t>(frame.logical_line_offset);
+        }
+        tok.loc.file_id = static_cast<uint16_t>(frame.logical_file_id);
+        SourceLine logical_loc(tok.loc);
+        g_diag.add_mapping(logical_loc, physical_loc);
+    }
+}
+
 void Preproc::process_INCLUDE(const std::vector<Token>& input_line,
                               size_t& pos) {
     std::string resolved;
@@ -156,11 +266,13 @@ void Preproc::process_INCLUDE(const std::vector<Token>& input_line,
 
     include_stack.push_back({
         included_file,
-        0,                  // current_line
         included_file->file_id, // logical_file_id
-        1,                  // logical_line
+        0,                  // current_line
+        false,              // logical_line_fixed
+        0                   // logical_line_offset
     });
 
+    // add to dependency files for generation of .d file
     dependency_files.push_back(included_file->file_id);
 }
 
@@ -214,6 +326,56 @@ void Preproc::process_BINARY(const std::vector<Token>& input_line,
     dependency_files.push_back(resolved_id);
 }
 
+void Preproc::process_LINE(const std::vector<Token>& input_line, size_t& pos) {
+    size_t line = 0;
+    std::string filename;
+    if (!parse_LINE_args(input_line, pos, "LINE", line, filename)) {
+        return; // error already emitted by parse_LINE_args()
+    }
+
+    if (include_stack.empty()) {
+        g_diag.error(input_line[pos].loc,
+                     "LINE directive not allowed in global scope");
+        return;
+    }
+
+    IncludeFrame& frame = include_stack.back();
+    frame.logical_line_fixed = false;
+    frame.logical_line_offset =
+        static_cast<ptrdiff_t>(line) -
+        static_cast<ptrdiff_t>(frame.current_line + 1);
+
+    if (!filename.empty()) {
+        StringInterner::Id filename_id =
+            g_file_mgr.register_virtual_file(filename);
+        frame.logical_file_id = filename_id;
+    }
+}
+
+void Preproc::process_C_LINE(const std::vector<Token>& input_line, size_t& pos) {
+    size_t line = 0;
+    std::string filename;
+    if (!parse_LINE_args(input_line, pos, "C_LINE", line, filename)) {
+        return; // error already emitted by parse_LINE_args()
+    }
+
+    if (include_stack.empty()) {
+        g_diag.error(input_line[pos].loc,
+                     "C_LINE directive not allowed in global scope");
+        return;
+    }
+
+    IncludeFrame& frame = include_stack.back();
+    frame.logical_line_fixed = true;
+    frame.logical_line_offset = static_cast<ptrdiff_t>(line);
+
+    if (!filename.empty()) {
+        StringInterner::Id filename_id =
+            g_file_mgr.register_virtual_file(filename);
+        frame.logical_file_id = filename_id;
+    }
+}
+
 //-----------------------------------------------------------------------------
 // main driver for directive processing:
 // classifies line and dispatches to handlers
@@ -254,6 +416,14 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     Keyword kw = first.keyword;
 
+    // Support cpp style line markers:
+    // "# <nr>" or "# <nr> , <filename>" or "# <nr> <filename>"
+    // Treat them as synonyms of "#line <nr> [ , filename ]"
+    if (first.type == TokenType::Hash && pos < input_line.size() &&
+            input_line[pos].type == TokenType::Integer) {
+        kw = Keyword::LINE;
+    }
+
     if (first.type == TokenType::Hash && pos < input_line.size() &&
             input_line[pos].type == TokenType::Identifier) {
         kw = input_line[pos].keyword;
@@ -267,6 +437,7 @@ Preproc::LineType Preproc::process_directive_line(
         }
 
         out_line.tokens = input_line;
+        rewrite_logical_line(out_line);
         return LineType::Normal;
     }
 

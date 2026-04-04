@@ -12,6 +12,9 @@ while (my $next = $iter->()) {
 	next if $next =~ /\.bak$/;
 	if ($next =~ /$from_text/) {
 		my $new = path($next =~ s/$from_text/$to_text/gr);
+		if (-f $new) {
+			die "error: $new exists\n";
+		}
 		say $new;
 		$new->parent->mkdir;
 		my $content = $next->slurp_raw;

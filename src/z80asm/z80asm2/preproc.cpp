@@ -35,9 +35,10 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
     // Push initial include frame
     include_stack.push_back({
         file,
-        0,                          // current_line
         file->file_id,              // logical_file_id
-        1                           // logical_line
+        0,                          // current_line
+        false,                      // logical_line_fixed
+        0                           // logical_line_offset
     });
 
     // add to dependency files for generation of .d file
