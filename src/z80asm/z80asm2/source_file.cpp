@@ -22,7 +22,7 @@
 
 class FileHandleCache {
 public:
-    std::ifstream* get(const std::string_view filename, const SourceLoc& loc) {
+    std::ifstream* get(std::string_view filename, const SourceLoc& loc) {
         // If already cached, move to front and return
         for (auto it = entries.begin(); it != entries.end(); ++it) {
             if (it->filename == filename) {
@@ -69,11 +69,11 @@ static std::unordered_map<StringInterner::Id, SourceFile> g_source_cache;
 static std::unordered_set<StringInterner::Id> g_source_loading;
 
 // get a unique ID for a virtual file path (e.g. for included files or generated content)
-StringInterner::Id register_virtual_file(const std::string_view path) {
+StringInterner::Id register_virtual_file(std::string_view path) {
     return g_strings.intern(path);
 }
 
-SourceFile* get_source_file(const std::string_view filename,
+SourceFile* get_source_file(std::string_view filename,
                             const SourceLoc& loc) {
     // Normalize and intern the filename
     std::string norm = normalize_path(filename);
@@ -146,7 +146,7 @@ std::string read_line(const SourceFile& sf, size_t line,
     return "";
 }
 
-bool read_binary_file(const std::string_view filename, const SourceLoc& loc,
+bool read_binary_file(std::string_view filename, const SourceLoc& loc,
                       std::vector<uint8_t>& out_content) {
     out_content.clear();
 
@@ -170,7 +170,7 @@ bool read_binary_file(const std::string_view filename, const SourceLoc& loc,
     return true;
 }
 
-bool read_file_to_string(const std::string_view filename,
+bool read_file_to_string(std::string_view filename,
                          const SourceLoc& loc,
                          std::string& out_content) {
     std::ifstream* in = g_file_handle_cache.get(filename, loc);
@@ -186,7 +186,7 @@ bool read_file_to_string(const std::string_view filename,
     return true;
 }
 
-static inline size_t find_line_end(const std::string_view content, size_t pos) {
+static inline size_t find_line_end(std::string_view content, size_t pos) {
     size_t n = content.size();
     size_t end = pos;
 
@@ -197,7 +197,7 @@ static inline size_t find_line_end(const std::string_view content, size_t pos) {
     return end;
 }
 
-static inline size_t skip_line_ending(const std::string_view content, size_t end) {
+static inline size_t skip_line_ending(std::string_view content, size_t end) {
     size_t n = content.size();
 
     if (end < n) {
@@ -215,7 +215,7 @@ static inline size_t skip_line_ending(const std::string_view content, size_t end
 // get a source line by filename and 1-based line number
 // tries the cached SourceFile first; if unavailable (e.g. during tokenization
 // of the same file), falls back to reading the file and splitting lines
-std::string get_source_line(const std::string_view filename, size_t line_number) {
+std::string get_source_line(std::string_view filename, size_t line_number) {
     if (line_number == 0) {
         return "";
     }
@@ -257,7 +257,7 @@ std::string get_source_line(const std::string_view filename, size_t line_number)
 }
 
 // split into lines, handling CR, CR-LF, and LF
-void split_source_lines(SourceFile& sf, const std::string_view content) {
+void split_source_lines(SourceFile& sf, std::string_view content) {
     sf.line_offsets.clear();
     sf.line_lengths.clear();
 
@@ -279,7 +279,7 @@ void split_source_lines(SourceFile& sf, const std::string_view content) {
     }
 }
 
-std::vector<RawLine> split_into_lines(const std::string_view content,
+std::vector<RawLine> split_into_lines(std::string_view content,
                                       StringInterner::Id file_id,
                                       size_t starting_line) {
     std::vector<RawLine> out;
