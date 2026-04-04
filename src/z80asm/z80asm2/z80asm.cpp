@@ -4,8 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "diag.h"
 #include "environment.h"
-#include "errors.h"
 #include "lexer_dump.h"
 #include "lexer_tokens.h"
 #include "options.h"
@@ -116,12 +116,12 @@ int main(int argc, char* argv[]) {
     }
 
     // detect errors from argument processing
-    if (error_count()) {
+    if (g_diag.error_count()) {
         return EXIT_FAILURE;
     }
 
     if (g_args.input_files.empty()) {
-        error("No input files specified");
+        g_diag.error(SourceLoc("<command-line>", 0, 0), "No input files specified");
         return EXIT_FAILURE;
     }
 
@@ -134,8 +134,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (g_args.options.verbose) {
-        std::cout << "Assembly completed with " << error_count() << " error(s)" << std::endl;
+        std::cout << "Assembly completed with " << g_diag.error_count() << " error(s)" << std::endl;
     }
 
-    return error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
+    return g_diag.error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
 }

@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
+#include "diag.h"
 #include "lexer_tokens.h"
 #include "preproc_macro.h"
 #include "string_interner.h"
@@ -143,7 +143,7 @@ void expand_line(
     // ---------------------------------------------------------------------
     while (true) {
         if (++expansion_depth > MAX_EXPANSION_DEPTH) {
-            error(in.loc, "Macro expansion limit exceeded");
+            g_diag.error(in.loc, "Macro expansion limit exceeded");
             break;
         }
 
