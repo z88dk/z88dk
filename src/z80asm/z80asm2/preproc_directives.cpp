@@ -238,7 +238,8 @@ static void process_INCLUDE(PreprocessorContext& ctx,
     }
 
     // check for recursive inclusion
-    StringInterner::Id resolved_id = register_virtual_file(resolved);
+    StringInterner::Id resolved_id =
+        g_file_mgr.register_virtual_file(resolved);
     for (const auto& frame : ctx.include_stack) {
         if (frame.file->file_id == resolved_id) {
             error(filename_loc,
@@ -248,7 +249,8 @@ static void process_INCLUDE(PreprocessorContext& ctx,
     }
 
     // push new include frame
-    const SourceFile* included_file = get_source_file(resolved, filename_loc);
+    const SourceFile* included_file =
+        g_file_mgr.get_source_file(resolved, filename_loc);
     if (!included_file) {
         // error already emitted by get_source_file()
         return;
@@ -274,30 +276,31 @@ static void process_BINARY(PreprocessorContext& ctx,
         return;
     }
 
-    // read binary file
-    std::vector<uint8_t> data;
-    if (!read_binary_file(resolved, filename_loc, data)) {
+    // read binary file (cached)
+    const std::vector<uint8_t>* data =
+        g_file_mgr.read_binary_file(resolved, filename_loc);
+    if (!data) {
         return; // error already emitted by read_binary_file()
     }
 
-    if (data.size() == 0) {
+    if (data->empty()) {
         return; // empty file, nothing to emit
     }
 
     // Emit tokens for binary data: one token per byte, with value = byte value
-    for (size_t i = 0; i < data.size(); i += BYTES_PER_LINE) {
+    for (size_t i = 0; i < data->size(); i += BYTES_PER_LINE) {
         LogicalLine line{ {}, filename_loc };
         line.tokens.reserve(1 + 2 * BYTES_PER_LINE + 1); // DEFB b1,...,bN <EOL>
 
         line.tokens.push_back(Token::identifier("DEFB", filename_loc));
 
-        for (size_t j = 0; j < BYTES_PER_LINE && i + j < data.size(); ++j) {
+        for (size_t j = 0; j < BYTES_PER_LINE && i + j < data->size(); ++j) {
             if (j > 0) {
                 line.tokens.push_back(Token::token(TokenType::Comma, ",",
                                                    filename_loc));
             }
 
-            int value = data[i + j];
+            int value = (*data)[i + j];
             line.tokens.push_back(Token::integer(std::to_string(value), value,
                                                  filename_loc));
         }
@@ -309,7 +312,8 @@ static void process_BINARY(PreprocessorContext& ctx,
     }
 
     // generate dependency for included file
-    StringInterner::Id resolved_id = register_virtual_file(resolved);
+    StringInterner::Id resolved_id =
+        g_file_mgr.register_virtual_file(resolved);
     ctx.dependency_files.push_back(resolved_id);
 }
 

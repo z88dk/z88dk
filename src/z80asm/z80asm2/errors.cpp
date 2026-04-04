@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "errors.h"
-#include "source_file.h"
+#include "file_mgr.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
@@ -60,7 +60,7 @@ static void print_message(const SourceLoc& loc,
         return;
     }
 
-    std::string text = get_source_line(filename, loc.line);
+    std::string text = g_file_mgr.get_source_line(filename, loc.line);
     if (!text.empty()) {
         print_source_line(text, loc.column);
     }
