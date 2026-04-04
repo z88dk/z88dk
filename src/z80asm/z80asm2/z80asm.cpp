@@ -11,7 +11,7 @@
 #include "options.h"
 #include "options_dump.h"
 #include "pathnames.h"
-#include "preproc_driver.h"
+#include "preproc.h"
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -34,8 +34,9 @@ static void assemble_file(std::string_view filename) {
     }
 
     // run preprocessor and get final token stream
-    std::vector<Token> preprocessed_tokens =
-        preprocess(filename, g_args.options.global_defs);
+    Preproc preproc;
+    preproc.set_const_symbols(g_args.options.global_defs);
+    std::vector<Token> preprocessed_tokens = preproc.preprocess(filename);
 }
 
 static void assemble_files() {

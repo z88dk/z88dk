@@ -6,19 +6,19 @@
 
 #pragma once
 
-#include "const_expr.h"
-#include "lexer.h"
+#include "const_symbols.h"
 #include "file_mgr.h"
+#include "lexer_tokens.h"
+#include "preproc.h"
+#include "source_loc.h"
 #include "string_interner.h"
 #include <deque>
-#include <unordered_map>
+#include <string_view>
 #include <vector>
 
-static const int MAX_EXPANSION_DEPTH = 1000;
-
 struct LogicalLine {
-    std::vector<Token> tokens{};
-    SourceLoc loc{};
+    std::vector<Token> tokens;
+    SourceLoc loc;
 };
 
 struct MacroBody {
@@ -29,7 +29,7 @@ struct MacroBody {
     bool is_multiline = false;
 };
 
-struct PreprocessorContext {
+struct Preproc {
     // ---------------------------------------------------------------------
     // Include stack: tracks nested file inclusion
     // ---------------------------------------------------------------------
@@ -79,4 +79,68 @@ struct PreprocessorContext {
     // during preprocessing
     // ---------------------------------------------------------------------
     std::vector<StringInterner::Id> dependency_files;
+
+
+    // ---------------------------------------------------------------------
+    // Methods
+    // ---------------------------------------------------------------------
+
+    // copy defines from options, command line, or global scope
+    void set_const_symbols(const ConstSymbols& defs);
+
+    // main entry point: preprocess file and return vector of tokens
+    // for assembler
+    std::vector<Token> preprocess(std::string_view filename);
+
+private:
+
+    // ---------------------------------------------------------------------
+    // Directive processing: classification and dispatch
+    // ---------------------------------------------------------------------
+
+    // dispatch table for directive handlers
+    using DirectiveHandler =
+        void (Preproc::*)(const std::vector<Token>&, size_t&);
+    static std::unordered_map<Keyword, DirectiveHandler> directive_handlers_;
+
+    // main driver for directive processing: classifies line and
+    // dispatches to handlers
+    enum class LineType {
+        Normal,
+        Skip,
+        ControlOnly
+    };
+    LineType process_directive_line(const std::vector<Token>& input_line,
+                                    LogicalLine& out_line
+                                   );
+
+    void check_end_of_line(const std::vector<Token>& input_line,
+                           size_t& pos,
+                           std::string_view directive_name);
+    bool parse_filename(const std::vector<Token>& input_line,
+                        size_t& pos,
+                        std::string_view directive_name,
+                        std::string& out_filename,
+                        bool& out_is_angle_bracket,
+                        SourceLoc& out_filename_loc);
+    bool parse_and_resolve_file(const std::vector<Token>& input_line,
+                                size_t& pos,
+                                std::string_view directive_name,
+                                std::string& out_resolved,
+                                SourceLoc& out_filename_loc);
+
+    void process_INCLUDE(const std::vector<Token>& input_line, size_t& pos);
+    void process_BINARY(const std::vector<Token>& input_line, size_t& pos);
+
+    // ---------------------------------------------------------------------
+    // Macro expansion: classification and dispatch
+    // ---------------------------------------------------------------------
+
+    // macro expansion: takes a logical line with macro invocation tokens and
+    // expands it, pushing resulting lines to macro_work_queue
+    void expand_line(const LogicalLine& in, std::vector<Token>& out_tokens);
+
+    // helper for dumping logical lines during debugging
+    void dump_logical_line(const LogicalLine& line,
+                           StringInterner::Id& cur_file_id);
 };
