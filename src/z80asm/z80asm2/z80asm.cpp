@@ -22,7 +22,7 @@ static constexpr std::string_view z80asm_env = "Z80ASM";
 
 static void preprocess_only() {}
 
-static void assemble_file(const std::string_view filename) {
+static void assemble_file(std::string_view filename) {
     if (g_args.options.verbose) {
         std::cout << "Assembling " << filename << "..." << std::endl;
     }

@@ -250,7 +250,7 @@ static bool split_option_arg(std::string_view arg,
     return true;
 }
 
-void parse_arg(const std::string_view arg,
+void parse_arg(std::string_view arg,
                bool& found_dash_dash, const SourceLoc& loc) {
     if (arg.empty()) {
         return;
@@ -388,7 +388,7 @@ void parse_arg(const std::string_view arg,
     search_source_file(arg, "", loc, empty_stack);
 }
 
-static std::string check_source(const std::string_view filename) {
+static std::string check_source(std::string_view filename) {
     namespace fs = std::filesystem;
 
     // avoid cascade of errors
@@ -455,11 +455,11 @@ static std::string check_source(const std::string_view filename) {
 }
 
 // run tool preprocessor
-static void run_tool(const std::string_view filename,
-                     const std::string_view extension,
-                     const std::string_view including_filename,
-                     const std::string_view tool_name_,
-                     const std::string_view tool_options,
+static void run_tool(std::string_view filename,
+                     std::string_view extension,
+                     std::string_view including_filename,
+                     std::string_view tool_name_,
+                     std::string_view tool_options,
                      const SourceLoc& loc,
                      std::vector<SourceLoc>& loc_stack) {
     std::string tool_name(tool_name_);
@@ -498,8 +498,8 @@ static void run_tool(const std::string_view filename,
 }
 
 // run m4 preprocessor
-static void run_m4(const std::string_view filename,
-                   const std::string_view including_filename,
+static void run_m4(std::string_view filename,
+                   std::string_view including_filename,
                    const SourceLoc& loc,
                    std::vector<SourceLoc>& loc_stack) {
     run_tool(filename, m4_extension,
@@ -509,8 +509,8 @@ static void run_m4(const std::string_view filename,
 }
 
 // run perl preprocessor
-static void run_perl(const std::string_view filename,
-                     const std::string_view including_filename,
+static void run_perl(std::string_view filename,
+                     std::string_view including_filename,
                      const SourceLoc& loc,
                      std::vector<SourceLoc>& loc_stack) {
     run_tool(filename, perl_extension,
@@ -520,8 +520,8 @@ static void run_perl(const std::string_view filename,
 }
 
 // run cpp preprocessor
-static void run_cpp(const std::string_view filename,
-                    const std::string_view including_filename,
+static void run_cpp(std::string_view filename,
+                    std::string_view including_filename,
                     const SourceLoc& loc,
                     std::vector<SourceLoc>& loc_stack) {
     run_tool(filename, cpp_extension,
@@ -531,7 +531,7 @@ static void run_cpp(const std::string_view filename,
 }
 
 // parse list file line, return filename or empty string, and SourceLoc
-static bool parse_filename_entry(const std::string_view line_,
+static bool parse_filename_entry(std::string_view line_,
                                  SourceLoc& in_out_loc,
                                  std::string& out_filename) {
     out_filename.clear();
@@ -592,7 +592,7 @@ static bool parse_filename_entry(const std::string_view line_,
 }
 
 // search list files
-static void search_list_file(const std::string_view list_filename,
+static void search_list_file(std::string_view list_filename,
                              const SourceLoc& loc,
                              std::vector<SourceLoc>& loc_stack) {
     // read list file
@@ -621,8 +621,8 @@ static void search_list_file(const std::string_view list_filename,
 }
 
 // search source file in path, return empty string if not found
-void search_source_file(const std::string_view filename_,
-                        const std::string_view including_filename,
+void search_source_file(std::string_view filename_,
+                        std::string_view including_filename,
                         const SourceLoc& loc,
                         std::vector<SourceLoc>& loc_stack) {
     std::string filename = trim(filename_);

@@ -10,18 +10,18 @@
 #include <string>
 
 size_t error_count();
-void error(const SourceLoc& loc, const std::string_view msg);
-void warning(const SourceLoc& loc, const std::string_view msg);
-void note(const SourceLoc& loc, const std::string_view msg);
+void error(const SourceLoc& loc, std::string_view msg);
+void warning(const SourceLoc& loc, std::string_view msg);
+void note(const SourceLoc& loc, std::string_view msg);
 
-inline void error(const std::string_view msg) {
+inline void error(std::string_view msg) {
     error(SourceLoc{}, msg);
 }
 
-inline void warning(const std::string_view msg) {
+inline void warning(std::string_view msg) {
     warning(SourceLoc{}, msg);
 }
 
-inline void note(const std::string_view msg) {
+inline void note(std::string_view msg) {
     note(SourceLoc{}, msg);
 }

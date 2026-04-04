@@ -8,7 +8,7 @@
 #include "string_utils.h"
 #include <unordered_map>
 
-Keyword keyword_lookup(const std::string_view s) {
+Keyword keyword_lookup(std::string_view s) {
     static const std::unordered_map<std::string, Keyword> keyword_map = {
 #define X(id, text, flags) { text, Keyword::id },
 #include "lexer_keywords.def"
