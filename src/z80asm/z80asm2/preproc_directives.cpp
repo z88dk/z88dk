@@ -313,6 +313,68 @@ bool Preproc::parse_parameters(const std::vector<Token>& input_line,
     return true;
 }
 
+void Preproc::parse_asm_definitions(const std::vector<Token>& tokens) {
+    bool have_definition = false;
+    StringInterner::Id name_id = 0;
+    SourceLoc name_loc;
+    size_t pos = 0;
+
+    // (DEFC|EQU) name [=] expr
+    if (pos + 2 < tokens.size() &&
+            (tokens[0].keyword == Keyword::DEFC ||
+             tokens[0].keyword == Keyword::EQU) &&
+            tokens[1].type == TokenType::Identifier) {
+        have_definition = true;
+        name_id = tokens[1].text_id;
+        name_loc = tokens[1].loc;
+        pos = 2;
+    }
+    // name (DEFC|EQU) [=] expr
+    else if (pos + 2 < tokens.size() &&
+             tokens[0].type == TokenType::Identifier &&
+             (tokens[1].keyword == Keyword::DEFC ||
+              tokens[1].keyword == Keyword::EQU)) {
+        have_definition = true;
+        name_id = tokens[0].text_id;
+        name_loc = tokens[0].loc;
+        pos = 2;
+    }
+    // name = expr
+    else if (pos + 2 < tokens.size() &&
+             tokens[0].type == TokenType::Identifier &&
+             tokens[1].type == TokenType::EQ) {
+        have_definition = true;
+        name_id = tokens[0].text_id;
+        name_loc = tokens[0].loc;
+        pos = 1;    // '=' will be skipped in next step
+    }
+
+    if (!have_definition) {
+        return; // not a definition line
+    }
+
+    // scan optional '='
+    if (pos < tokens.size() &&
+            tokens[pos].type == TokenType::EQ) {
+        pos++; // skip '='
+    }
+
+    if (pos >= tokens.size() || tokens[pos].type == TokenType::EndOfLine) {
+        return; // no expression, nothing to evaluate
+    }
+
+    // macros are already expanded at this point, so we only expect
+    // constant expressions. Try to evaluate the expression and if it
+    // succeeds, store in const_symbols for use in future expressions.
+    int result = 0;
+    if (eval_const_expr(tokens, pos,
+                        const_symbols, result, /*silent=*/true) &&
+            pos < tokens.size() &&
+            tokens[pos].type == TokenType::EndOfLine) {
+        const_symbols.set(name_id, result, name_loc);
+    }
+}
+
 void Preproc::rewrite_logical_line(LogicalLine& line) {
     if (include_stack.empty()) {
         return;
@@ -553,7 +615,7 @@ void Preproc::do_DEFINE(const Macro& macro,
         return;
     }
 
-    // scan optional '=' for compatibility
+    // scan optional '='
     if (pos < input_line.size() &&
             input_line[pos].type == TokenType::EQ) {
         pos++; // skip '='
@@ -759,15 +821,6 @@ Preproc::LineType Preproc::process_directive_line(
     }
 
     // ---------------------------------------------------------------------
-    // DEFINE (object-like or function-like)
-    // ---------------------------------------------------------------------
-    if (kw == Keyword::DEFINE) {
-        // TODO: parse name + replacement tokens
-        // TODO: update ctx.macros
-        return LineType::ControlOnly;
-    }
-
-    // ---------------------------------------------------------------------
     // UNDEF
     // ---------------------------------------------------------------------
     if (kw == Keyword::UNDEF) {
@@ -783,26 +836,6 @@ Preproc::LineType Preproc::process_directive_line(
         // TODO: parse macro header
         // TODO: read lines until ENDM (driver handles EOF)
         // TODO: store in ctx.macros
-        return LineType::ControlOnly;
-    }
-
-    // ---------------------------------------------------------------------
-    // LINE / C_LINE
-    // ---------------------------------------------------------------------
-    if (kw == Keyword::LINE || kw == Keyword::C_LINE) {
-        // TODO: parse filename + line number
-        // TODO: update ctx.include_stack.back().logical_file_id / logical_line
-        return LineType::ControlOnly;
-    }
-
-    // ---------------------------------------------------------------------
-    // EQU
-    // ---------------------------------------------------------------------
-    if (kw == Keyword::EQU) {
-        // TODO: parse name
-        // TODO: parse expression
-        // TODO: eval_const_expr()
-        // TODO: ctx.const_symbols.set(name_id, value, first.loc)
         return LineType::ControlOnly;
     }
 
