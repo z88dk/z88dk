@@ -103,7 +103,8 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
         }
         else {
             if (!ctx.silent) {
-                g_diag.error(token->loc, "Undefined constant: " + g_strings.to_string(token->text_id));
+                g_diag.error(token->loc, "Undefined constant: " +
+                             g_strings.to_string(token->text_id));
             }
             result = 0;
             ctx.pos++;
@@ -115,10 +116,13 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
 
     case TokenType::Dollar:
     case TokenType::ASMPC:
-        g_diag.error(token->loc, "ASMPC is not allowed in a constant expression");
+        if (!ctx.silent) {
+            g_diag.error(token->loc,
+                         "ASMPC is not allowed in a constant expression");
+        }
         result = 0;
         ctx.pos++;
-        return true;
+        return false;
 
     case TokenType::LeftParen: {
         ctx.pos++;
