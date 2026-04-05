@@ -34,11 +34,13 @@ Preproc::directive_handlers_ = {
     { Keyword::LINE,    &Preproc::process_LINE },
     { Keyword::C_LINE,  &Preproc::process_C_LINE },
     { Keyword::DEFINE,  &Preproc::process_DEFINE },
+    { Keyword::UNDEF,   &Preproc::process_UNDEF },
 };
 
 std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
 Preproc::name_directive_handlers_ = {
     { Keyword::DEFINE, &Preproc::process_name_DEFINE },
+    { Keyword::UNDEF,  &Preproc::process_name_UNDEF },
 };
 
 
@@ -669,6 +671,34 @@ void Preproc::do_DEFINE(const Macro& macro,
     macros[new_macro.name_id] = std::move(new_macro);
 }
 
+void Preproc::process_UNDEF(const std::vector<Token>& input_line, size_t& pos) {
+    if (pos >= input_line.size() ||
+            input_line[pos].type != TokenType::Identifier) {
+        g_diag.error(input_line[pos].loc, "Expected macro name after UNDEF");
+        return;
+    }
+
+    StringInterner::Id name_id = input_line[pos].text_id;
+    pos++;
+
+    check_end_of_line(input_line, pos, "UNDEF");
+
+    // remove from macro table
+    macros.erase(name_id);
+}
+
+void Preproc::process_name_UNDEF(std::string_view name,
+                                 const SourceLoc&,
+                                 const std::vector<Token>& input_line,
+                                 size_t& pos) {
+    StringInterner::Id name_id = g_strings.intern(name);
+
+    check_end_of_line(input_line, pos, "UNDEF");
+
+    // remove from macro table
+    macros.erase(name_id);
+}
+
 //-----------------------------------------------------------------------------
 // main driver for directive processing:
 // classifies line and dispatches to handlers
@@ -818,15 +848,6 @@ Preproc::LineType Preproc::process_directive_line(
             (this->*it->second)(input_line, pos);
             return LineType::ControlOnly;
         }
-    }
-
-    // ---------------------------------------------------------------------
-    // UNDEF
-    // ---------------------------------------------------------------------
-    if (kw == Keyword::UNDEF) {
-        // TODO: parse name
-        // TODO: ctx.macros.erase(name)
-        return LineType::ControlOnly;
     }
 
     // ---------------------------------------------------------------------
