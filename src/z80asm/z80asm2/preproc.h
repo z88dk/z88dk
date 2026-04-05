@@ -180,6 +180,10 @@ private:
                              const std::vector<Token>& input_line, size_t& pos);
     void do_DEFINE(const Macro& macro,
                    const std::vector<Token>& input_line, size_t& pos);
+    void process_UNDEF(const std::vector<Token>& input_line, size_t& pos);
+    void process_name_UNDEF(std::string_view name, const SourceLoc& name_loc,
+                            const std::vector<Token>& input_line, size_t& pos);
+
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
     // ---------------------------------------------------------------------
