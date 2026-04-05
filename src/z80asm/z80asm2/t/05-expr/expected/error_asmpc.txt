@@ -2,11 +2,9 @@
 t/05-expr/input/error_asmpc.lst:1:9: error: ASMPC is not allowed in a constant expression
     -DE00=2+ASMPC
             ^
-Define constant: E00 = 2
 t/05-expr/input/error_asmpc.lst:2:7: error: ASMPC is not allowed in a constant expression
     -DE01=$-4
           ^
-Define constant: E01 = -4
 verbose	1
 ucase_labels	0
 preprocess_only	0
@@ -21,6 +19,4 @@ m4_options
 perl_options	
 cpp_options	
 output_dir	
-global_def	E00	2
-global_def	E01	-4
 input_file	t/05-expr/input/empty.asm
