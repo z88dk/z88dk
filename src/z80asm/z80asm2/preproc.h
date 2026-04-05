@@ -168,6 +168,7 @@ private:
         const std::vector<StringInterner::Id>& params,
         const std::vector<std::vector<Token>>& args,
         const SourceLoc& call_loc);
+    void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
 
     void process_INCLUDE(const std::vector<Token>& input_line, size_t& pos);
