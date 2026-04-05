@@ -20,6 +20,7 @@ struct ExprParseContext {
     size_t& pos;
     const ConstSymbols& sym;
     bool silent;
+    bool undefined_is_zero;     // true: IF mode, false: strict const expr
 };
 
 static const Token* peek_token(ExprParseContext& ctx) {
@@ -96,11 +97,17 @@ static bool parse_const_expr_primary(ExprParseContext& ctx, int& result) {
         if (s != nullptr) {
             result = s->value;
         }
+        else if (ctx.undefined_is_zero) {
+            // IF mode: undefined identifiers are silently zero
+            result = 0;
+        }
         else {
             if (!ctx.silent) {
                 g_diag.error(token->loc, "Undefined constant: " + g_strings.to_string(token->text_id));
             }
             result = 0;
+            ctx.pos++;
+            return false;
         }
         ctx.pos++;
         return true;
@@ -530,25 +537,29 @@ static bool parse_const_expr_conditional(ExprParseContext& ctx, int& result) {
     return true;
 }
 
-bool eval_const_expr(
+// Internal: shared implementation for both token-based overloads
+static bool eval_expr_impl(
     const std::vector<Token>& tokens, size_t& pos,
-    const ConstSymbols& sym, int& result, bool silent) {
-    ExprParseContext ctx{ tokens, pos, sym, silent };
+    const ConstSymbols& sym, int& result, bool silent,
+    bool undefined_is_zero) {
+    ExprParseContext ctx{ tokens, pos, sym, silent, undefined_is_zero };
     return parse_const_expr_conditional(ctx, result);
 }
 
-bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
-                     const ConstSymbols& sym, int& result,
-                     bool silent) {
+// Internal: shared implementation for both string-based overloads
+static bool eval_expr_text_impl(
+    std::string_view expr, const SourceLoc& loc,
+    const ConstSymbols& sym, int& result, bool silent,
+    bool undefined_is_zero) {
     std::vector<Token> tokens = tokenize_text(expr, loc);
     size_t pos = 0;
-    if (!eval_const_expr(tokens, pos, sym, result, silent)) {
+    if (!eval_expr_impl(tokens, pos, sym, result, silent, undefined_is_zero)) {
         return false;
     }
 
     if (pos < tokens.size() &&
             tokens[pos].type != TokenType::EndOfLine) {
-        ExprParseContext ctx{ tokens, pos, sym, silent };
+        ExprParseContext ctx{ tokens, pos, sym, silent, undefined_is_zero };
         g_diag.error(tokens[pos].loc, "Operator expected after token "
                      + prev_token_text(ctx)
                      + ", got "
@@ -557,6 +568,32 @@ bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
     }
 
     return true;
+}
+
+// Strict constant expression: undefined identifiers cause failure
+bool eval_const_expr(
+    const std::vector<Token>& tokens, size_t& pos,
+    const ConstSymbols& sym, int& result, bool silent) {
+    return eval_expr_impl(tokens, pos, sym, result, silent, false);
+}
+
+bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
+                     const ConstSymbols& sym, int& result,
+                     bool silent) {
+    return eval_expr_text_impl(expr, loc, sym, result, silent, false);
+}
+
+// IF condition: undefined identifiers are silently zero
+bool eval_if_condition(
+    const std::vector<Token>& tokens, size_t& pos,
+    const ConstSymbols& sym, int& result, bool silent) {
+    return eval_expr_impl(tokens, pos, sym, result, silent, true);
+}
+
+bool eval_if_condition(std::string_view expr, const SourceLoc& loc,
+                       const ConstSymbols& sym, int& result,
+                       bool silent) {
+    return eval_expr_text_impl(expr, loc, sym, result, silent, true);
 }
 
 int int_pow(int base, int exp, const SourceLoc& loc) {

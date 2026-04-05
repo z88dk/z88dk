@@ -2,15 +2,12 @@
 t/05-expr/input/error_undef.lst:1:7: error: Undefined constant: FOO
     -DE00=FOO
           ^
-Define constant: E00 = 0
 t/05-expr/input/error_undef.lst:2:9: error: Undefined constant: BAR
     -DE01=1+BAR
             ^
-Define constant: E01 = 1
 t/05-expr/input/error_undef.lst:3:7: error: Undefined constant: BAZ
     -DE02=BAZ*3
           ^
-Define constant: E02 = 0
 verbose	1
 ucase_labels	0
 preprocess_only	0
@@ -25,7 +22,4 @@ m4_options
 perl_options	
 cpp_options	
 output_dir	
-global_def	E00	0
-global_def	E01	1
-global_def	E02	0
 input_file	t/05-expr/input/empty.asm

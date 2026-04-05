@@ -5,13 +5,202 @@
 //-----------------------------------------------------------------------------
 
 #include "diag.h"
+#include "lexer.h"
 #include "lexer_tokens.h"
 #include "preproc.h"
 #include "string_interner.h"
+#include "string_utils.h"
 #include <algorithm>
+#include <string>
 #include <vector>
 
 static const int MAX_EXPANSION_DEPTH = 1000;
+
+// Collect comma-separated arguments from tokens[pos] onward.
+// Expects tokens[pos-1] was '('. Handles nested parentheses.
+// Advances pos past the closing ')'.
+// Returns false on error (missing ')').
+bool Preproc::collect_args(const std::vector<Token>& tokens, size_t& pos,
+                           std::vector<std::vector<Token>>& args) {
+    args.clear();
+
+    // Handle empty argument list: immediately closed
+    if (pos < tokens.size() && tokens[pos].type == TokenType::RightParen) {
+        pos++;
+        return true;
+    }
+
+    std::vector<Token> current_arg;
+    int paren_depth = 0;
+
+    while (pos < tokens.size()) {
+        const Token& tok = tokens[pos];
+
+        if (tok.type == TokenType::EndOfLine) {
+            break; // unterminated
+        }
+
+        if (tok.type == TokenType::LeftParen) {
+            paren_depth++;
+            current_arg.push_back(tok);
+            pos++;
+        }
+        else if (tok.type == TokenType::RightParen) {
+            if (paren_depth == 0) {
+                // End of arguments
+                args.push_back(std::move(current_arg));
+                pos++; // consume ')'
+                return true;
+            }
+            paren_depth--;
+            current_arg.push_back(tok);
+            pos++;
+        }
+        else if (tok.type == TokenType::Comma && paren_depth == 0) {
+            args.push_back(std::move(current_arg));
+            current_arg.clear();
+            pos++; // consume ','
+        }
+        else {
+            current_arg.push_back(tok);
+            pos++;
+        }
+    }
+
+    return false; // missing ')'
+}
+
+// Substitute macro parameters in a token list.
+// For each token that matches a parameter name, replace with the
+// corresponding argument tokens. Handles # (stringification) and
+// ## (token pasting).
+std::vector<Token> Preproc::substitute_params(
+    const std::vector<Token>& body,
+    const std::vector<StringInterner::Id>& params,
+    const std::vector<std::vector<Token>>& args,
+    const SourceLoc& call_loc) {
+
+    std::vector<Token> result;
+    size_t n = body.size();
+
+    for (size_t i = 0; i < n; ++i) {
+        const Token& tok = body[i];
+
+        // -------------------------------------------------------
+        // # operator (stringification): # PARAM -> string literal
+        // -------------------------------------------------------
+        if (tok.type == TokenType::Hash && i + 1 < n &&
+                body[i + 1].type == TokenType::Identifier) {
+            auto pit = std::find(params.begin(), params.end(),
+                                 body[i + 1].text_id);
+            if (pit != params.end()) {
+                size_t param_idx =
+                    static_cast<size_t>(pit - params.begin());
+                ++i; // consume the parameter identifier
+
+                // Build stringified value from argument tokens
+                std::string text;
+                if (param_idx < args.size()) {
+                    for (const Token& at : args[param_idx]) {
+                        if (!text.empty()) {
+                            text += ' ';
+                        }
+                        text += g_strings.to_string(at.text_id);
+                    }
+                }
+
+                std::string quoted = escape_string(text);
+                result.push_back(
+                    Token::string(quoted, text, call_loc));
+                continue;
+            }
+        }
+
+        // -------------------------------------------------------
+        // ## operator (token pasting)
+        // -------------------------------------------------------
+        if (tok.type == TokenType::DoubleHash) {
+            // Remove trailing whitespace-like tokens from result (none
+            // expected, but be safe)
+            // Paste: concatenate text of LHS and RHS
+            if (result.empty() || i + 1 >= n) {
+                continue; // malformed, skip
+            }
+
+            // Get the RHS token (may be a param to substitute)
+            const Token& rhs_tok = body[i + 1];
+            ++i; // consume RHS
+
+            std::string rhs_text;
+            if (rhs_tok.type == TokenType::Identifier) {
+                auto pit = std::find(params.begin(), params.end(),
+                                     rhs_tok.text_id);
+                if (pit != params.end()) {
+                    size_t param_idx =
+                        static_cast<size_t>(pit - params.begin());
+                    if (param_idx < args.size()) {
+                        for (const Token& at : args[param_idx]) {
+                            rhs_text +=
+                                g_strings.to_string(at.text_id);
+                        }
+                    }
+                }
+                else {
+                    rhs_text = g_strings.to_string(rhs_tok.text_id);
+                }
+            }
+            else {
+                rhs_text = g_strings.to_string(rhs_tok.text_id);
+            }
+
+            // Concatenate with LHS
+            std::string lhs_text =
+                g_strings.to_string(result.back().text_id);
+            std::string pasted = lhs_text + rhs_text;
+
+            // Re-tokenize the pasted text to get proper token type
+            std::vector<Token> pasted_tokens =
+                tokenize_text(pasted, call_loc);
+            // Remove trailing EndOfLine from tokenize_text output
+            while (!pasted_tokens.empty() &&
+                    pasted_tokens.back().type == TokenType::EndOfLine) {
+                pasted_tokens.pop_back();
+            }
+
+            result.pop_back(); // remove LHS
+            for (const Token& pt : pasted_tokens) {
+                result.push_back(pt);
+            }
+            continue;
+        }
+
+        // -------------------------------------------------------
+        // Parameter substitution
+        // -------------------------------------------------------
+        if (tok.type == TokenType::Identifier) {
+            auto pit = std::find(params.begin(), params.end(),
+                                 tok.text_id);
+            if (pit != params.end()) {
+                size_t param_idx =
+                    static_cast<size_t>(pit - params.begin());
+                if (param_idx < args.size()) {
+                    for (const Token& at : args[param_idx]) {
+                        result.push_back(at);
+                    }
+                }
+                // else: missing argument, substitute nothing
+                continue;
+            }
+        }
+
+        // -------------------------------------------------------
+        // Regular token: copy as-is
+        // -------------------------------------------------------
+        result.push_back(tok);
+    }
+
+    return result;
+}
 
 void Preproc::expand_line(const LogicalLine& in,
                           std::vector<Token>& out_tokens) {
@@ -22,20 +211,26 @@ void Preproc::expand_line(const LogicalLine& in,
     // ---------------------------------------------------------------------
     std::vector<Token> work = in.tokens;
 
-    // Expansion recursion tracking
+    // Per-token hide set: macros that have already been expanded to
+    // produce this token. Prevents re-expansion of the same macro in
+    // its own output, while allowing the same macro to appear
+    // independently elsewhere on the line (e.g. "DEFB X, X").
+    std::vector<std::vector<StringInterner::Id>> hide_sets(work.size());
+
+    // Expansion iteration tracking
     int expansion_depth = 0;
-    std::vector<StringInterner::Id> expansion_stack;
 
     // ---------------------------------------------------------------------
-    // 2. Main expansion loop
+    // 2. Main expansion loop: repeat until no more expansions
     // ---------------------------------------------------------------------
-    while (true) {
+    bool expanded_any = true;
+    while (expanded_any) {
         if (++expansion_depth > MAX_EXPANSION_DEPTH) {
             g_diag.error(in.loc, "Macro expansion limit exceeded");
             break;
         }
 
-        bool expanded_any = false;
+        expanded_any = false;
 
         // -------------------------------------------------------------
         // Scan tokens left-to-right
@@ -50,85 +245,261 @@ void Preproc::expand_line(const LogicalLine& in,
 
             StringInterner::Id name_id = tok.text_id;
 
-            // Is this a macro?
+            // Is this a defined macro?
             auto it = macros.find(name_id);
             if (it == macros.end()) {
                 continue;
             }
 
-            MacroBody& macro = it->second;
+            Macro& macro = it->second;
 
             // ---------------------------------------------------------
-            // 2.1 Recursion prevention
+            // Recursion prevention: check this token's hide set
             // ---------------------------------------------------------
-            if (std::find(expansion_stack.begin(), expansion_stack.end(),
-                          name_id)
-                    != expansion_stack.end()) {
-                // TODO: compat mode: skip; strict mode: error
+            if (std::find(hide_sets[i].begin(),
+                          hide_sets[i].end(),
+                          name_id) != hide_sets[i].end()) {
+                // This token was already produced by expanding this
+                // macro; do not expand again (breaks direct and
+                // indirect recursion like A->B->A)
                 continue;
             }
 
-            expansion_stack.push_back(name_id);
-
             // ---------------------------------------------------------
-            // 2.2 Function-like macro
-            // ---------------------------------------------------------
-            if (macro.is_function_like) {
-                // TODO:
-                // - Check for '(' with no whitespace gap
-                // - Parse argument list
-                // - Substitute parameters
-                // - Handle # and ##
-                // - Replace invocation in 'work'
-                expanded_any = true;
-                expansion_stack.pop_back();
-                break; // restart scanning
-            }
-
-            // ---------------------------------------------------------
-            // 2.3 Classical multi-line macro
+            // Classical multi-line macro
             // ---------------------------------------------------------
             if (macro.is_multiline) {
-                // TODO:
-                // - Only expand if identifier is in opcode position
-                // - For each macro line:
-                //       LogicalLine ll = ...
-                //       If ll starts with directive:
-                //           ctx.macro_work_queue.push_back(ll)
-                //       else:
-                //           ctx.macro_work_queue.push_back(ll)
-                //
-                // - Classical macros replace the entire line
-                expansion_stack.pop_back();
-                return; // done with this line
+                // Emit any tokens before the macro name as a separate
+                // line (e.g. a label definition like "foo: MYMACRO arg")
+                if (i > 0) {
+                    LogicalLine prefix;
+                    prefix.tokens.insert(prefix.tokens.end(),
+                                         work.begin(),
+                                         work.begin() + i);
+                    prefix.tokens.push_back(Token::end_of_line(tok.loc));
+                    prefix.loc = work[0].loc;
+                    macro_work_queue.push_back(std::move(prefix));
+                }
+
+                // Collect arguments from tokens after the macro name
+                size_t arg_pos = i + 1;
+                std::vector<std::vector<Token>> args;
+
+                // Skip whitespace/EndOfLine between name and args
+                while (arg_pos < work.size() &&
+                        work[arg_pos].type == TokenType::EndOfLine) {
+                    ++arg_pos;
+                }
+
+                // Collect comma-separated arguments until EndOfLine
+                {
+                    std::vector<Token> current_arg;
+                    int paren_depth = 0;
+
+                    while (arg_pos < work.size() &&
+                            work[arg_pos].type != TokenType::EndOfLine) {
+                        const Token& at = work[arg_pos];
+                        if (at.type == TokenType::LeftParen) {
+                            paren_depth++;
+                            current_arg.push_back(at);
+                        }
+                        else if (at.type == TokenType::RightParen) {
+                            paren_depth--;
+                            current_arg.push_back(at);
+                        }
+                        else if (at.type == TokenType::Comma &&
+                                 paren_depth == 0) {
+                            args.push_back(std::move(current_arg));
+                            current_arg.clear();
+                        }
+                        else {
+                            current_arg.push_back(at);
+                        }
+                        arg_pos++;
+                    }
+                    if (!current_arg.empty()) {
+                        args.push_back(std::move(current_arg));
+                    }
+                }
+
+                // Check argument count
+                if (args.size() != macro.params.size()) {
+                    g_diag.error(tok.loc,
+                                 "Macro '" +
+                                 g_strings.to_string(name_id) +
+                                 "' expects " +
+                                 std::to_string(macro.params.size()) +
+                                 " arguments, got " +
+                                 std::to_string(args.size()));
+                    out_tokens.push_back(Token::end_of_line(tok.loc));
+                    return;
+                }
+
+                // Expand each macro body line and push to work queue
+                for (const auto& body_line : macro.lines) {
+                    std::vector<Token> substituted =
+                        substitute_params(body_line, macro.params,
+                                          args, tok.loc);
+
+                    LogicalLine ll;
+                    ll.tokens = std::move(substituted);
+                    ll.tokens.push_back(Token::end_of_line(tok.loc));
+                    ll.loc = tok.loc;
+
+                    macro_work_queue.push_back(std::move(ll));
+                }
+
+                // Multi-line macros consume the entire line
+                out_tokens.push_back(Token::end_of_line(tok.loc));
+                return;
             }
 
             // ---------------------------------------------------------
-            // 2.4 Object-like macro
+            // Function-like macro
+            // ---------------------------------------------------------
+            if (macro.is_function_like) {
+                // Must have '(' immediately following (no spaces)
+                size_t paren_pos = i + 1;
+                if (paren_pos >= work.size() ||
+                        work[paren_pos].type != TokenType::LeftParen) {
+                    // Not a macro invocation, just an identifier
+                    continue;
+                }
+
+                // Reject "NAME (" — the '(' must be adjacent to the identifier
+                size_t ident_end = tok.loc.column +
+                                   g_strings.view(tok.text_id).size();
+                if (work[paren_pos].loc.column != ident_end) {
+                    // Space between identifier and '(', not a macro call
+                    continue;
+                }
+
+                // Consume '('
+                paren_pos++;
+
+                // Collect arguments
+                std::vector<std::vector<Token>> args;
+                if (!collect_args(work, paren_pos, args)) {
+                    g_diag.error(work[paren_pos].loc,
+                                 "Missing ')' in macro invocation: " +
+                                 g_strings.to_string(name_id));
+                    continue;
+                }
+
+                // Check argument count
+                if (args.size() != macro.params.size()) {
+                    g_diag.error(tok.loc,
+                                 "Macro '" +
+                                 g_strings.to_string(name_id) +
+                                 "' expects " +
+                                 std::to_string(macro.params.size()) +
+                                 " arguments, got " +
+                                 std::to_string(args.size()));
+                    continue;
+                }
+
+                // Substitute parameters in macro body
+                std::vector<Token> substituted =
+                    substitute_params(macro.tokens, macro.params,
+                                      args, tok.loc);
+
+                // Build the new hide set for replacement tokens:
+                // inherit the hide set of the invocation token + add
+                // the macro we just expanded
+                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                new_hide.push_back(name_id);
+
+                // Replace tokens[i..paren_pos) with substituted
+                size_t new_count = substituted.size();
+
+                std::vector<Token> new_work;
+                new_work.reserve(i + new_count + (work.size() - paren_pos));
+                new_work.insert(new_work.end(),
+                                work.begin(), work.begin() + i);
+                new_work.insert(new_work.end(),
+                                substituted.begin(),
+                                substituted.end());
+                new_work.insert(new_work.end(),
+                                work.begin() + paren_pos,
+                                work.end());
+
+                // Rebuild hide sets
+                std::vector<std::vector<StringInterner::Id>> new_hides;
+                new_hides.reserve(new_work.size());
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin(),
+                                 hide_sets.begin() + i);
+                new_hides.insert(new_hides.end(), new_count, new_hide);
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin() + paren_pos,
+                                 hide_sets.end());
+
+                work = std::move(new_work);
+                hide_sets = std::move(new_hides);
+
+                expanded_any = true;
+                break; // restart scanning from the beginning
+            }
+
+            // ---------------------------------------------------------
+            // Object-like macro
             // ---------------------------------------------------------
             {
-                // TODO:
-                // - Replace identifier token with macro.tokens
+                // Build the new hide set for replacement tokens:
+                // inherit the hide set of the invocation token + add
+                // the macro we just expanded
+                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                new_hide.push_back(name_id);
+
+                size_t new_count = macro.tokens.size();
+
+                // Replace token at position i with macro.tokens
+                std::vector<Token> new_work;
+                new_work.reserve(i + new_count + (work.size() - i - 1));
+                new_work.insert(new_work.end(),
+                                work.begin(), work.begin() + i);
+                new_work.insert(new_work.end(),
+                                macro.tokens.begin(),
+                                macro.tokens.end());
+                new_work.insert(new_work.end(),
+                                work.begin() + i + 1,
+                                work.end());
+
+                // Rebuild hide sets
+                std::vector<std::vector<StringInterner::Id>> new_hides;
+                new_hides.reserve(new_work.size());
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin(),
+                                 hide_sets.begin() + i);
+                new_hides.insert(new_hides.end(), new_count, new_hide);
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin() + i + 1,
+                                 hide_sets.end());
+
+                work = std::move(new_work);
+                hide_sets = std::move(new_hides);
+
                 expanded_any = true;
-                expansion_stack.pop_back();
-                break; // restart scanning
+                break; // restart scanning from the beginning
             }
         }
+    }
 
-        if (!expanded_any) {
-            break;    // no more expansions possible
+    // ---------------------------------------------------------------------
+    // 3. Finalization: copy expanded tokens + EndOfLine
+    // ---------------------------------------------------------------------
+    out_tokens.reserve(work.size() + 1);
+    out_tokens.insert(out_tokens.end(), work.begin(), work.end());
+
+    // Ensure line ends with EndOfLine
+    if (out_tokens.empty() ||
+            out_tokens.back().type != TokenType::EndOfLine) {
+        SourceLoc end_loc = in.loc;
+        if (!out_tokens.empty()) {
+            end_loc = out_tokens.back().loc;
+            end_loc.column += static_cast<uint16_t>(
+                                  g_strings.to_string(out_tokens.back().text_id).size());
         }
+        out_tokens.push_back(Token::end_of_line(end_loc));
     }
-
-    // ---------------------------------------------------------------------
-    // 3. Finalization: append expanded tokens + EndOfLine
-    // ---------------------------------------------------------------------
-    for (const Token& t : work) {
-        out_tokens.push_back(t);
-    }
-
-    Token eol;
-    eol.type = TokenType::EndOfLine;
-    eol.loc = in.loc;
-    out_tokens.push_back(eol);
 }
