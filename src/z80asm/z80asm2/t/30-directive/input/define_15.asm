@@ -1,2 +1,2 @@
-define M1(a) #a
+#define M1(a) #a
 defb M1(hello world)

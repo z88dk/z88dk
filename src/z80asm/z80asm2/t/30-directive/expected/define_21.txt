@@ -1,0 +1,68 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/define_21.asm
+Assembling t/30-directive/input/define_21.asm...
+t/30-directive/input/define_21.asm:1:7: error: Expected macro name after DEFINE
+    define ; no name
+          ^
+# file: t/30-directive/input/define_21.asm
+Identifier	"DEFC"	2:9	keyword=DEFC 
+Identifier	"X"	2:14	keyword=X 
+EQ	"="	2:16	
+Integer	"1"	2:18	int_value=1 
+EndOfLine	"\n"	2:19	
+Define constant: X = 1
+t/30-directive/input/define_21.asm:3:1: error: Macro redefinition: X
+    X define ; duplicate definition
+    ^
+t/30-directive/input/define_21.asm:2:1: note: Previous definition
+    X define
+    ^
+Identifier	"DEFC"	4:9	keyword=DEFC 
+Identifier	"Y"	4:14	
+EQ	"="	4:16	
+Integer	"1"	4:18	int_value=1 
+EndOfLine	"\n"	4:19	
+Define constant: Y = 1
+t/30-directive/input/define_21.asm:5:8: error: Macro redefinition: Y
+    define Y(p1) ; duplicate definition
+           ^
+t/30-directive/input/define_21.asm:4:1: note: Previous definition
+    Y define
+    ^
+Identifier	"defb"	9:1	keyword=DEFB 
+Identifier	"M7"	8:11	
+EndOfLine	"\n"	9:8	
+Identifier	"defb"	10:1	keyword=DEFB 
+Integer	"1"	2:9	int_value=1 
+Comma	","	10:7	
+Integer	"1"	2:9	int_value=1 
+Comma	","	10:9	
+Integer	"1"	4:9	int_value=1 
+Comma	","	10:11	
+Integer	"1"	4:9	int_value=1 
+EndOfLine	"\n"	10:13	
+EndOfLine	"\n"	11:1	
+# file: t/30-directive/input/define_21.asm
+Identifier	"DEFINE"	6:1	keyword=DEFINE 
+Identifier	"M7"	6:1	
+EQ	"="	6:1	
+Identifier	"M8"	6:11	
+# file: t/30-directive/input/define_21.asm
+Identifier	"DEFINE"	7:1	keyword=DEFINE 
+Identifier	"M8"	7:1	
+EQ	"="	7:1	
+Identifier	"M9"	7:11	
+# file: t/30-directive/input/define_21.asm
+Identifier	"DEFINE"	8:1	keyword=DEFINE 
+Identifier	"M9"	8:1	
+EQ	"="	8:1	
+Identifier	"M7"	8:11	
+# file: t/30-directive/input/define_21.asm
+Identifier	"DEFINE"	2:1	keyword=DEFINE 
+Identifier	"X"	2:1	keyword=X 
+EQ	"="	2:1	
+Integer	"1"	2:9	int_value=1 
+# file: t/30-directive/input/define_21.asm
+Identifier	"DEFINE"	4:1	keyword=DEFINE 
+Identifier	"Y"	4:1	
+EQ	"="	4:1	
+Integer	"1"	4:9	int_value=1 
