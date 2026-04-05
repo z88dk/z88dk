@@ -366,7 +366,7 @@ void Preproc::expand_line(const LogicalLine& in,
                     continue;
                 }
 
-                // Reject "NAME (" — the '(' must be adjacent to the identifier
+                // Reject "NAME (" - the '(' must be adjacent to the identifier
                 size_t ident_end = tok.loc.column +
                                    g_strings.view(tok.text_id).size();
                 if (work[paren_pos].loc.column != ident_end) {
