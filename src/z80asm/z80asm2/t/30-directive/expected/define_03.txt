@@ -1,0 +1,129 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/define_03.asm
+Assembling t/30-directive/input/define_03.asm...
+# file: t/30-directive/input/define_03.asm
+Identifier	"defb"	2:1	keyword=DEFB 
+LeftParen	"("	1:16	
+Integer	"2"	2:9	int_value=2 
+Plus	"+"	1:18	
+Integer	"3"	2:11	int_value=3 
+RightParen	")"	1:20	
+EndOfLine	"\n"	2:13	
+Identifier	"defb"	4:1	keyword=DEFB 
+LeftParen	"("	3:18	
+Integer	"4"	4:9	int_value=4 
+Minus	"-"	3:20	
+Integer	"5"	4:11	int_value=5 
+RightParen	")"	3:22	
+EndOfLine	"\n"	4:13	
+Identifier	"defb"	6:1	keyword=DEFB 
+LeftParen	"("	5:16	
+LeftParen	"("	1:16	
+Integer	"6"	6:9	int_value=6 
+Plus	"+"	1:18	
+Integer	"7"	6:11	int_value=7 
+RightParen	")"	1:20	
+Plus	"+"	5:24	
+LeftParen	"("	3:18	
+Integer	"6"	6:9	int_value=6 
+Minus	"-"	3:20	
+Integer	"7"	6:11	int_value=7 
+RightParen	")"	3:22	
+RightParen	")"	5:32	
+Multiply	"*"	5:33	
+Integer	"3"	5:34	int_value=3 
+EndOfLine	"\n"	6:13	
+Identifier	"defb"	8:1	keyword=DEFB 
+LeftParen	"("	7:18	
+LeftParen	"("	5:16	
+LeftParen	"("	1:16	
+Integer	"8"	8:9	int_value=8 
+Plus	"+"	1:18	
+Integer	"9"	8:11	int_value=9 
+RightParen	")"	1:20	
+Plus	"+"	5:24	
+LeftParen	"("	3:18	
+Integer	"8"	8:9	int_value=8 
+Minus	"-"	3:20	
+Integer	"9"	8:11	int_value=9 
+RightParen	")"	3:22	
+RightParen	")"	5:32	
+Multiply	"*"	5:33	
+Integer	"3"	5:34	int_value=3 
+RightParen	")"	7:26	
+Multiply	"*"	7:27	
+Integer	"3"	7:28	int_value=3 
+EndOfLine	"\n"	8:13	
+EndOfLine	"\n"	9:1	
+# file: t/30-directive/input/define_03.asm
+Identifier	"DEFINE"	1:8	keyword=DEFINE 
+Identifier	"M1"	1:8	
+LeftParen	"("	1:8	
+Identifier	"a"	1:8	keyword=A 
+Comma	","	1:8	
+Identifier	"b"	1:8	keyword=B 
+RightParen	")"	1:8	
+EQ	"="	1:8	
+LeftParen	"("	1:16	
+Identifier	"a"	1:17	keyword=A 
+Plus	"+"	1:18	
+Identifier	"b"	1:19	keyword=B 
+RightParen	")"	1:20	
+# file: t/30-directive/input/define_03.asm
+Identifier	"DEFINE"	3:8	keyword=DEFINE 
+Identifier	"M2"	3:8	
+LeftParen	"("	3:8	
+Identifier	"a"	3:8	keyword=A 
+Comma	","	3:8	
+Identifier	"b"	3:8	keyword=B 
+RightParen	")"	3:8	
+EQ	"="	3:8	
+LeftParen	"("	3:18	
+Identifier	"a"	3:19	keyword=A 
+Minus	"-"	3:20	
+Identifier	"b"	3:21	keyword=B 
+RightParen	")"	3:22	
+# file: t/30-directive/input/define_03.asm
+Identifier	"DEFINE"	5:8	keyword=DEFINE 
+Identifier	"M3"	5:8	
+LeftParen	"("	5:8	
+Identifier	"a"	5:8	keyword=A 
+Comma	","	5:8	
+Identifier	"b"	5:8	keyword=B 
+RightParen	")"	5:8	
+EQ	"="	5:8	
+LeftParen	"("	5:16	
+Identifier	"M1"	5:17	
+LeftParen	"("	5:19	
+Identifier	"a"	5:20	keyword=A 
+Comma	","	5:21	
+Identifier	"b"	5:22	keyword=B 
+RightParen	")"	5:23	
+Plus	"+"	5:24	
+Identifier	"M2"	5:25	
+LeftParen	"("	5:27	
+Identifier	"a"	5:28	keyword=A 
+Comma	","	5:29	
+Identifier	"b"	5:30	keyword=B 
+RightParen	")"	5:31	
+RightParen	")"	5:32	
+Multiply	"*"	5:33	
+Integer	"3"	5:34	int_value=3 
+# file: t/30-directive/input/define_03.asm
+Identifier	"DEFINE"	7:8	keyword=DEFINE 
+Identifier	"M4"	7:8	
+LeftParen	"("	7:8	
+Identifier	"a"	7:8	keyword=A 
+Comma	","	7:8	
+Identifier	"b"	7:8	keyword=B 
+RightParen	")"	7:8	
+EQ	"="	7:8	
+LeftParen	"("	7:18	
+Identifier	"M3"	7:19	
+LeftParen	"("	7:21	
+Identifier	"a"	7:22	keyword=A 
+Comma	","	7:23	
+Identifier	"b"	7:24	keyword=B 
+RightParen	")"	7:25	
+RightParen	")"	7:26	
+Multiply	"*"	7:27	
+Integer	"3"	7:28	int_value=3 

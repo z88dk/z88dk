@@ -4,12 +4,21 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "const_expr.h"
+#include "const_symbols.h"
 #include "diag.h"
+#include "file_mgr.h"
+#include "lexer.h"
 #include "lexer_keywords.h"
 #include "options.h"
 #include "pathnames.h"
 #include "preproc.h"
+#include "source_loc.h"
+#include "string_interner.h"
 #include "string_utils.h"
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
 
 static const size_t BYTES_PER_LINE = 16;
 
@@ -24,7 +33,14 @@ Preproc::directive_handlers_ = {
     { Keyword::INCBIN,  &Preproc::process_BINARY },
     { Keyword::LINE,    &Preproc::process_LINE },
     { Keyword::C_LINE,  &Preproc::process_C_LINE },
+    { Keyword::DEFINE,  &Preproc::process_DEFINE },
 };
+
+std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
+Preproc::name_directive_handlers_ = {
+    { Keyword::DEFINE, &Preproc::process_name_DEFINE },
+};
+
 
 //-----------------------------------------------------------------------------
 // directive handlers and helpers
@@ -196,6 +212,104 @@ bool Preproc::parse_LINE_args(const std::vector<Token>& input_line,
     }
 
     // cpp outputs other parameters after the filename, but we ignore them.
+    return true;
+}
+
+bool Preproc::parse_parameters(const std::vector<Token>& input_line,
+                               size_t& pos,
+                               std::vector<StringInterner::Id>& out_params) {
+    out_params.clear();
+    bool has_parens = false;
+
+    // Helper: report failure with a message and clear out_params
+    auto fail = [&](std::string_view message) {
+        g_diag.error(input_line[pos].loc, message);
+        out_params.clear();
+        return false;
+    };
+
+    // Helper: add a parameter name ensuring duplicates inside the same
+    // list are rejected
+    auto add_param = [&](StringInterner::Id name_id) -> bool {
+        if (std::find(out_params.begin(), out_params.end(), name_id) !=
+                out_params.end()) {
+            return fail("Parameter redefined: " +
+                        g_strings.to_string(name_id));
+        }
+        out_params.push_back(name_id);
+        return true;
+    };
+
+    // Optional opening parenthesis
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::LeftParen) {
+        has_parens = true;
+        pos++; // consume '('
+
+        // Empty list "()"
+        if (pos < input_line.size() &&
+                input_line[pos].type == TokenType::RightParen) {
+            pos++;
+            return true;
+        }
+
+        // If right after '(' we don't have an identifier, it's a syntax error
+        if (pos >= input_line.size() ||
+                input_line[pos].type != TokenType::Identifier) {
+            return fail("Identifier expected");
+        }
+    }
+
+    // If not in parens and next token is not an identifier, treat as empty list
+    if (!has_parens) {
+        if (pos >= input_line.size() ||
+                input_line[pos].type != TokenType::Identifier) {
+            // Empty parameter list without parentheses;
+            // success with index unchanged
+            return true;
+        }
+    }
+
+    // Parse first identifier
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::Identifier) {
+        if (!add_param(input_line[pos].text_id)) {
+            return false;
+        }
+        pos++;
+    }
+    else {
+        // Guard: should not happen due to checks above
+        return fail("Identifier expected");
+    }
+
+    // Parse subsequent ", identifier" pairs
+    while (pos < input_line.size() &&
+            input_line[pos].type == TokenType::Comma) {
+        pos++; // skip comma
+        if (pos < input_line.size() &&
+                input_line[pos].type == TokenType::Identifier) {
+            if (!add_param(input_line[pos].text_id)) {
+                return false;
+            }
+            pos++;
+        }
+        else {
+            return fail("Identifier expected");
+        }
+    }
+
+    // If we started with '(', we must end with ')'
+    if (has_parens) {
+        if (pos < input_line.size() &&
+                input_line[pos].type == TokenType::RightParen) {
+            pos++;
+        }
+        else {
+            return fail("Right parenthesis or comma expected");
+        }
+    }
+
     return true;
 }
 
@@ -376,6 +490,123 @@ void Preproc::process_C_LINE(const std::vector<Token>& input_line, size_t& pos) 
     }
 }
 
+void Preproc::process_DEFINE(const std::vector<Token>& input_line, size_t& pos) {
+    if (pos >= input_line.size() ||
+            input_line[pos].type != TokenType::Identifier) {
+        g_diag.error(input_line[pos].loc, "Expected macro name after DEFINE");
+        return;
+    }
+    StringInterner::Id name_id = input_line[pos].text_id;
+    SourceLoc name_loc = input_line[pos].loc;
+    pos++;
+
+    // check if it's a function-like macro, i.e. if next token is '('
+    // without space
+    bool is_function_like = false;
+    std::vector<StringInterner::Id> params;
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::LeftParen &&
+            input_line[pos].loc.column ==
+            name_loc.column + g_strings.view(name_id).size()) {
+        is_function_like = true;
+        if (!parse_parameters(input_line, pos, params)) {
+            return; // error already emitted by parse_parameters()
+        }
+    }
+
+    // create the macro and delegate to do_DEFINE
+    Macro macro;
+    macro.name_id = name_id;
+    macro.loc = name_loc;
+    macro.params = std::move(params);
+    macro.is_function_like = is_function_like;
+    macro.is_multiline = false;
+
+    do_DEFINE(macro, input_line, pos);
+}
+
+void Preproc::process_name_DEFINE(std::string_view name,
+                                  const SourceLoc& name_loc,
+                                  const std::vector<Token>& input_line,
+                                  size_t& pos) {
+    StringInterner::Id name_id = g_strings.intern(name);
+
+    Macro macro;
+    macro.name_id = name_id;
+    macro.loc = name_loc;
+    macro.params.clear();
+    macro.is_function_like = false;
+    macro.is_multiline = false;
+
+    do_DEFINE(macro, input_line, pos);
+}
+
+void Preproc::do_DEFINE(const Macro& macro,
+                        const std::vector<Token>& input_line, size_t& pos) {
+    // check for redefinition
+    auto it = macros.find(macro.name_id);
+    if (it != macros.end()) {
+        g_diag.error(macro.loc,
+                     "Macro redefinition: " +
+                     g_strings.to_string(macro.name_id));
+        g_diag.note(it->second.loc, "Previous definition");
+        return;
+    }
+
+    // scan optional '=' for compatibility
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::EQ) {
+        pos++; // skip '='
+    }
+
+    // The rest of the line is the replacement list (can be empty)
+    std::vector<Token> replacement;
+    replacement.reserve(input_line.size() - pos);
+    while (pos < input_line.size() &&
+            input_line[pos].type != TokenType::EndOfLine) {
+        replacement.push_back(input_line[pos]);
+        pos++;
+    }
+
+    // if macro is empty, add a default "1" token
+    if (replacement.empty()) {
+        replacement.push_back(Token::integer("1", 1, input_line.back().loc));
+    }
+
+    // if replacement is a constant expression, define a DEFC so that
+    // the symbol in known at link time
+    if (!macro.is_function_like) {
+        // expand macros in the replacement list
+        LogicalLine line{ replacement, replacement.front().loc };
+        std::vector<Token> expanded;
+        expand_line(line, expanded);
+
+        // evaluate the expression and check if it's a constant expression
+        // with no extra tokens
+        size_t expr_pos = 0;
+        int result = 0;
+        if (!expanded.empty() &&
+                eval_const_expr(expanded, expr_pos,
+                                const_symbols, result, /*silent=*/true) &&
+                expr_pos < expanded.size() &&
+                expanded[expr_pos].type == TokenType::EndOfLine) {
+            std::string defc_str =
+                "DEFC " +
+                g_strings.to_string(macro.name_id) + " = " +
+                std::to_string(result);
+            std::vector<Token> defc_tokens = tokenize_text(defc_str, line.loc);
+            LogicalLine defc_line{ {}, line.loc };
+            defc_line.tokens = std::move(defc_tokens);
+            assembler_output_queue.push_back(std::move(defc_line));
+        }
+    }
+
+    // create the macro and insert into the macro table
+    Macro new_macro = macro;
+    new_macro.tokens = std::move(replacement);
+    macros[new_macro.name_id] = std::move(new_macro);
+}
+
 //-----------------------------------------------------------------------------
 // main driver for directive processing:
 // classifies line and dispatches to handlers
@@ -424,13 +655,29 @@ Preproc::LineType Preproc::process_directive_line(
         kw = Keyword::LINE;
     }
 
+    // support cpp style directives with #, e.g. "# define X 1"
     if (first.type == TokenType::Hash && pos < input_line.size() &&
             input_line[pos].type == TokenType::Identifier) {
         kw = input_line[pos].keyword;
         ++pos;
     }
 
-    if (!keyword_is_preproc_directive(kw)) {
+    // support "name DEFINE 1" as synonym of "#define name 1"
+    bool has_name = false;
+    std::string name;
+    SourceLoc name_loc;
+    if (first.type == TokenType::Identifier && pos < input_line.size() &&
+            input_line[pos].type == TokenType::Identifier &&
+            keyword_is_preproc_name_directive(input_line[pos].keyword)) {
+        has_name = true;
+        name = g_strings.view(first.text_id);
+        name_loc = first.loc;
+        kw = input_line[pos].keyword;
+        pos++; // consume the directive keyword
+    }
+
+    if (!keyword_is_preproc_directive(kw) &&
+            !keyword_is_preproc_name_directive(kw)) {
         // Not a directive keyword
         if (!cond_active) {
             return LineType::Skip;
@@ -493,10 +740,22 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     // Non-conditional directives
     // ---------------------------------------------------------------------
-    auto it = directive_handlers_.find(kw);
-    if (it != directive_handlers_.end()) {
-        (this->*it->second)(input_line, pos);
-        return LineType::ControlOnly;
+    if (has_name) {
+        // Handle "name DEFINE 1" style directives with name
+        // before directive keyword
+        auto it = name_directive_handlers_.find(kw);
+        if (it != name_directive_handlers_.end()) {
+            (this->*it->second)(name, name_loc, input_line, pos);
+            return LineType::ControlOnly;
+        }
+    }
+    else {
+        // Handle normal directives starting with directive keyword
+        auto it = directive_handlers_.find(kw);
+        if (it != directive_handlers_.end()) {
+            (this->*it->second)(input_line, pos);
+            return LineType::ControlOnly;
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -550,6 +809,7 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     // Unknown directive -> error
     // ---------------------------------------------------------------------
-    g_diag.error(first.loc, "Unknown preprocessor directive");
+    g_diag.error(first.loc, "Unknown preprocessor directive: " +
+                 keyword_to_string(kw));
     return LineType::ControlOnly;
 }

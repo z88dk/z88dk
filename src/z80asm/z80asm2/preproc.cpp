@@ -50,17 +50,27 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
     while (true) {
         LogicalLine ll;
         bool have_line = false;
+        bool is_assembler_output = false;
 
         // -----------------------------------------------------
-        // 2a. Macro feedback queue has priority
+        // 2a. Assembler output queue has priority
         // -----------------------------------------------------
-        if (!macro_work_queue.empty()) {
+        if (!assembler_output_queue.empty()) {
+            ll = assembler_output_queue.front();
+            assembler_output_queue.pop_front();
+            have_line = true;
+            is_assembler_output = true;
+        }
+        // -----------------------------------------------------
+        // 2b. Macro feedback queue comes next
+        // -----------------------------------------------------
+        else if (!macro_work_queue.empty()) {
             ll = macro_work_queue.front();
             macro_work_queue.pop_front();
             have_line = true;
         }
         // -----------------------------------------------------
-        // 2b. Otherwise read from include stack
+        // 2c. Otherwise read from include stack
         // -----------------------------------------------------
         else if (!include_stack.empty()) {
             auto& frame = include_stack.back();
@@ -89,7 +99,17 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
         // 3. Directive processing
         // ---------------------------------------------------------------------
         LogicalLine processed;
-        LineType type = process_directive_line(ll.tokens, processed);
+        LineType type;
+        if (is_assembler_output) {
+            // Lines from assembler_output_queue are already processed
+            // and should not go through directive processing again
+            // (e.g. DEFINE X=1 -> DEFC X=1 should not be processed again
+            processed = ll;
+            type = LineType::Normal;
+        }
+        else {
+            type = process_directive_line(ll.tokens, processed);
+        }
 
         if (type == LineType::Skip) {
             continue;
@@ -107,7 +127,15 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
         // 4. Macro expansion
         // ---------------------------------------------------------------------
         std::vector<Token> expanded;
-        expand_line(processed, expanded);   // may push into macro_work_queue
+        if (is_assembler_output) {
+            // Lines from assembler_output_queue should not be macro expanded
+            // (e.g. DEFINE X=1 -> DEFC X=1 should not have X replaced by 1)
+            expanded = processed.tokens;
+        }
+        else {
+            // may push into macro_work_queue
+            expand_line(processed, expanded);
+        }
 
         if (g_args.options.dump_after_macro_expansion) {
             dump_tokens(expanded, cur_file_id);
@@ -132,7 +160,12 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
         exit(EXIT_SUCCESS);
     }
 
-    if (g_args.options.dump_after_directives || g_args.options.dump_after_macro_expansion) {
+    if (g_args.options.dump_after_macro_expansion) {
+        dump_macros();
+        exit(EXIT_SUCCESS);
+    }
+
+    if (g_args.options.dump_after_directives) {
         exit(EXIT_SUCCESS);
     }
 

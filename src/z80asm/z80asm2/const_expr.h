@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <vector>
 
+// Evaluate a constant expression.
+// Undefined identifiers cause the evaluation to fail.
 bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result,
                      bool silent);
@@ -21,6 +23,17 @@ bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
 bool eval_const_expr(const std::vector<Token>& tokens, size_t& pos,
                      const ConstSymbols& sym, int& result,
                      bool silent);
+
+// Evaluate an IF condition expression.
+// Undefined identifiers are silently treated as zero and the evaluation
+// succeeds.
+bool eval_if_condition(std::string_view expr, const SourceLoc& loc,
+                       const ConstSymbols& sym, int& result,
+                       bool silent);
+
+bool eval_if_condition(const std::vector<Token>& tokens, size_t& pos,
+                       const ConstSymbols& sym, int& result,
+                       bool silent);
 
 // integer power function
 int int_pow(int base, int exp, const SourceLoc& loc);
