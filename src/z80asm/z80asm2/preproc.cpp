@@ -141,6 +141,11 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
             dump_tokens(expanded, cur_file_id);
         }
 
+        // Hook: need to parse DEFC, EQU and = so that assembly symbols
+        // are known in the preprocessor and can be used in IF expressions.
+        // e.g. X EQU 1 // IF X --> show know the value of X
+        parse_asm_definitions(expanded);
+
         // Append expanded tokens to final output
         final_tokens.insert(final_tokens.end(),
                             expanded.begin(), expanded.end());
