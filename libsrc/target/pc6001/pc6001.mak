@@ -1,10 +1,12 @@
 PC6001_GLOBS := \
+	"target/pc6001/games/*.asm" \
 	"target/pc6001/graphics/*.asm" \
 	"target/pc6001/psg/*.asm" \
 	"target/pc6001/stdio/*.asm" \
 	"target/pc6001/stdio/ansi/*.asm" 
 
 PC6001_GLOBS_ex := \
+	target/pc6001/games/*.asm \
 	target/pc6001/graphics/*.asm \
 	target/pc6001/psg/*.asm \
 	target/pc6001/stdio/*.asm \
