@@ -230,6 +230,7 @@ include target/c7420/c7420.mak
 include target/dai/dai.mak
 include target/einstein/einstein.mak
 include target/gal/gal.mak
+include target/gemini/gemini.mak
 include target/gl/gl.mak
 include target/gl6000/gl6000.mak
 include target/hector/hector.mak
@@ -1039,7 +1040,7 @@ microbee.lib: cpm_clib.lib
 	TARGET=beehr512 TYPE=z80 $(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(TARGET_DIRECTORY)/bee/beegfxhr512.lst
 
 # Gemini Galaxy library - Stefano
-gemini.lib: cpm_clib.lib
+gemini.lib: cpm_clib.lib $(GEMINI_TARGETS)
 	@echo ''
 	@echo '--- Building Gemini Galaxy Library (CP/M & graphics) ---'
 	@echo ''
