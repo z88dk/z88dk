@@ -35,14 +35,15 @@ Preproc::directive_handlers_ = {
     { Keyword::C_LINE,  &Preproc::process_C_LINE },
     { Keyword::DEFINE,  &Preproc::process_DEFINE },
     { Keyword::UNDEF,   &Preproc::process_UNDEF },
+    { Keyword::UNDEFINE,&Preproc::process_UNDEF },
 };
 
 std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
 Preproc::name_directive_handlers_ = {
-    { Keyword::DEFINE, &Preproc::process_name_DEFINE },
-    { Keyword::UNDEF,  &Preproc::process_name_UNDEF },
+    { Keyword::DEFINE,  &Preproc::process_name_DEFINE },
+    { Keyword::UNDEF,   &Preproc::process_name_UNDEF },
+    { Keyword::UNDEFINE,&Preproc::process_name_UNDEF },
 };
-
 
 //-----------------------------------------------------------------------------
 // directive handlers and helpers
