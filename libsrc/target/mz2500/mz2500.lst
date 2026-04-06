@@ -1,7 +1,3 @@
-target/mz2500/stdio/fgetc_cons
-target/mz2500/stdio/fputc_cons_native
-target/mz2500/stdio/getk
-target/mz2500/stdio/conio_map_colour
-target/mz2500/stdio/generic_console
+target/mz2500/obj/${TARGET}/**/*.o
 @classic/stdio/stdio.lst
 @classic/games/games.lst

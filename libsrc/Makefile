@@ -230,6 +230,7 @@ include target/c7420/c7420.mak
 include target/dai/dai.mak
 include target/einstein/einstein.mak
 include target/gal/gal.mak
+include target/gemini/gemini.mak
 include target/gl/gl.mak
 include target/gl6000/gl6000.mak
 include target/hector/hector.mak
@@ -250,6 +251,8 @@ include target/mikro80/mikro80.mak
 include target/multi8/multi8.mak
 include target/myvision/myvision.mak
 include target/mz/mz.mak
+include target/mz2500/mz2500.mak
+include target/nanos/nanos.mak
 include target/ondra/ondra.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
@@ -267,10 +270,13 @@ include target/sol20/sol20.mak
 include target/sos/sos.mak
 include target/spc1000/spc1000.mak
 include target/sv8000/sv8000.mak
+include target/tim011/tim011.mak
 include target/ts2068/ts2068.mak
 include target/vector06c/vector06c.mak
 include target/vg5k/vg5k.mak
 include target/x07/x07.mak
+include target/z1013/z1013.mak
+include target/z80tvgame/z80tvgame.mak
 include target/z88/z88.mak
 include target/z9001/z9001.mak
 include target/zx/zx.mak
@@ -827,7 +833,7 @@ x1_cpm.lib: x1_clib.lib
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(TARGET_DIRECTORY)/x1/x1_common.lst
 
-tim011.lib: cpm_clib.lib
+tim011.lib: cpm_clib.lib $(TIM011_TARGETS)
 	@echo ''
 	@echo '--- Building Tim-011 Library ---'
 	@echo ''
@@ -924,7 +930,7 @@ mz_clib.lib: $(TARGET_CLIB_DEPS) $(MZ_TARGETS)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(TARGET_DIRECTORY)/mz/mz.lst
 
 # Sharp MZ2500 lib - Stefano
-mz2500_clib.lib: $(TARGET_CLIB_DEPS)
+mz2500_clib.lib: $(TARGET_CLIB_DEPS) $(MZ2500_TARGETS)
 	@echo ''
 	@echo '--- Building Sharp MZ-2500 Library ---'
 	@echo ''
@@ -1034,7 +1040,7 @@ microbee.lib: cpm_clib.lib
 	TARGET=beehr512 TYPE=z80 $(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(TARGET_DIRECTORY)/bee/beegfxhr512.lst
 
 # Gemini Galaxy library - Stefano
-gemini.lib: cpm_clib.lib
+gemini.lib: cpm_clib.lib $(GEMINI_TARGETS)
 	@echo ''
 	@echo '--- Building Gemini Galaxy Library (CP/M & graphics) ---'
 	@echo ''
@@ -1315,7 +1321,7 @@ nascom_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DFORnascomcpm -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascomcpm @$(TARGET_DIRECTORY)/nascom/nascomcpm.lst
 
 # Robotron Z1013 library - Stefano
-z1013_clib.lib: $(TARGET_CLIB_DEPS)
+z1013_clib.lib: $(TARGET_CLIB_DEPS) $(Z1013_TARGETS)
 	@echo ''
 	@echo '--- Building Robotron Z1013 Library ---'
 	@echo ''
@@ -1472,7 +1478,7 @@ fp1100_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_cpm @$(TARGET_DIRECTORY)/fp1100/fp1100_cpm.lst
 
 # Z80 TV Game
-z80tvgame_clib.lib: $(TARGET_CLIB_DEPS)
+z80tvgame_clib.lib: $(TARGET_CLIB_DEPS) $(Z80TVGAME_TARGETS)
 	@echo ''
 	@echo '--- Building Z80 TV Game Library ---'
 	@echo ''
@@ -2326,7 +2332,7 @@ gfxvdm.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/gfx TARGET=altair8800 SUBTYPE=vdm FLAVOUR="gencon portable"
 	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(Z88DK_LIBSRC)/classic/video/vdm/video_vdm.lst
 
-nanos.lib: $(TARGET_CLIB_DEPS)
+nanos.lib: $(TARGET_CLIB_DEPS) $(NANOS_TARGETS)
 	@echo ''
 	@echo '--- Building Nanos Library ---'
 	@echo ''
