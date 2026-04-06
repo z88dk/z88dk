@@ -12,7 +12,7 @@
 //#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
 
 
 int tape_load_block(void *addr, size_t len, unsigned char type)

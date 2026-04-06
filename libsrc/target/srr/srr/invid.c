@@ -8,7 +8,7 @@
         0xfc00 through to 0xffff).
 */
 
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
 
 void invid()
 {
