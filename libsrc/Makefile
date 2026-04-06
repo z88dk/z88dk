@@ -255,6 +255,7 @@ include target/mz2500/mz2500.mak
 include target/nanos/nanos.mak
 include target/ondra/ondra.mak
 include target/pc6001/pc6001.mak
+include target/pc88/pc88.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pk8000/pk8000.mak
@@ -489,7 +490,7 @@ pc6001_clib.lib: $(TARGET_CLIB_DEPS) $(PC6001_TARGETS)
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(TARGET_DIRECTORY)/pc6001/pc6001.lst
 
 # PC8801 lib - Stefano
-pc88_clib.lib: $(TARGET_CLIB_DEPS)
+pc88_clib.lib: $(TARGET_CLIB_DEPS) $(PC88_TARGETS)
 	@echo ''
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
