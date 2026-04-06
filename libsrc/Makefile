@@ -254,6 +254,7 @@ include target/mz/mz.mak
 include target/mz2500/mz2500.mak
 include target/nanos/nanos.mak
 include target/ondra/ondra.mak
+include target/pc6001/pc6001.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pk8000/pk8000.mak
@@ -269,6 +270,7 @@ include target/sms/sms.mak
 include target/sol20/sol20.mak
 include target/sos/sos.mak
 include target/spc1000/spc1000.mak
+include target/srr/srr.mak
 include target/sv8000/sv8000.mak
 include target/tim011/tim011.mak
 include target/ts2068/ts2068.mak
@@ -477,7 +479,7 @@ p2000_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(TARGET_DIRECTORY)/p2000/p2000.lst
 
 # PC6001 lib - Stefano
-pc6001_clib.lib: $(TARGET_CLIB_DEPS)
+pc6001_clib.lib: $(TARGET_CLIB_DEPS) $(PC6001_TARGETS)
 	@echo ''
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
@@ -911,7 +913,7 @@ cpmdevice_z180.lib: cpmz180_clib.lib
 	TARGET=cpm TYPE=z180 DEVICE=device $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/cpmdevice_z180 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
 
 # Sorcerer Exidy lib - Stefano
-srr_clib.lib: $(TARGET_CLIB_DEPS)
+srr_clib.lib: $(TARGET_CLIB_DEPS) $(SRR_TARGETS)
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''

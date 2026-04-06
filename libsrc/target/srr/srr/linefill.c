@@ -13,7 +13,7 @@
         Returns the cursor address.
 */
  
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
 
 int linefill(int mode, char *s)
  
