@@ -35,14 +35,16 @@ Preproc::directive_handlers_ = {
     { Keyword::C_LINE,  &Preproc::process_C_LINE },
     { Keyword::DEFINE,  &Preproc::process_DEFINE },
     { Keyword::UNDEF,   &Preproc::process_UNDEF },
-    { Keyword::UNDEFINE,&Preproc::process_UNDEF },
+    { Keyword::UNDEFINE, &Preproc::process_UNDEF },
+    { Keyword::DEFL,    &Preproc::process_DEFL },
 };
 
 std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
 Preproc::name_directive_handlers_ = {
     { Keyword::DEFINE,  &Preproc::process_name_DEFINE },
     { Keyword::UNDEF,   &Preproc::process_name_UNDEF },
-    { Keyword::UNDEFINE,&Preproc::process_name_UNDEF },
+    { Keyword::UNDEFINE, &Preproc::process_name_UNDEF },
+    { Keyword::DEFL,    &Preproc::process_name_DEFL },
 };
 
 //-----------------------------------------------------------------------------
@@ -683,9 +685,7 @@ void Preproc::process_UNDEF(const std::vector<Token>& input_line, size_t& pos) {
     pos++;
 
     check_end_of_line(input_line, pos, "UNDEF");
-
-    // remove from macro table
-    macros.erase(name_id);
+    do_UNDEF(name_id);
 }
 
 void Preproc::process_name_UNDEF(std::string_view name,
@@ -695,9 +695,131 @@ void Preproc::process_name_UNDEF(std::string_view name,
     StringInterner::Id name_id = g_strings.intern(name);
 
     check_end_of_line(input_line, pos, "UNDEF");
+    do_UNDEF(name_id);
+}
 
+void Preproc::do_UNDEF(StringInterner::Id name_id) {
     // remove from macro table
     macros.erase(name_id);
+}
+
+void Preproc::process_DEFL(const std::vector<Token>& input_line, size_t& pos) {
+    if (pos >= input_line.size() ||
+            input_line[pos].type != TokenType::Identifier) {
+        g_diag.error(input_line[pos].loc, "Expected macro name after DEFL");
+        return;
+    }
+    StringInterner::Id name_id = input_line[pos].text_id;
+    SourceLoc name_loc = input_line[pos].loc;
+    pos++;
+
+    // check if it's a function-like macro, i.e. if next token is '('
+    // without space
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::LeftParen &&
+            input_line[pos].loc.column ==
+            name_loc.column + g_strings.view(name_id).size()) {
+        g_diag.error(input_line[pos].loc, "DEFL macro cannot be function-like");
+        return;
+    }
+
+    // create the macro and delegate to do_DEFINE
+    Macro macro;
+    macro.name_id = name_id;
+    macro.loc = name_loc;
+    macro.params.clear();
+    macro.is_function_like = false;
+    macro.is_multiline = false;
+
+    do_DEFL(macro, input_line, pos);
+}
+
+void Preproc::process_name_DEFL(std::string_view name,
+                                const SourceLoc& name_loc,
+                                const std::vector<Token>& input_line, size_t& pos) {
+    StringInterner::Id name_id = g_strings.intern(name);
+
+    Macro macro;
+    macro.name_id = name_id;
+    macro.loc = name_loc;
+    macro.params.clear();
+    macro.is_function_like = false;
+    macro.is_multiline = false;
+
+    do_DEFL(macro, input_line, pos);
+}
+
+void Preproc::do_DEFL(const Macro& macro,
+                      const std::vector<Token>& input_line, size_t& pos) {
+    // Predefine name as an empty macro if it does not exist, so that
+    // occurrences of <name> in the body expand to the previous value (if any)
+    // or to empty otherwise.
+    auto it = macros.find(macro.name_id);
+    if (it == macros.end()) {
+        Macro empty_macro = macro;
+        empty_macro.tokens.clear();
+        macros[macro.name_id] = std::move(empty_macro);
+    }
+
+    // make sure pre-existing macro (if any) is not function-like,
+    // since DEFL cannot redefine a function-like macro
+    it = macros.find(macro.name_id);
+    if (it != macros.end() && it->second.is_function_like) {
+        g_diag.error(macro.loc,
+                     "DEFL cannot redefine function-like macro: " +
+                     g_strings.to_string(macro.name_id));
+        g_diag.note(it->second.loc, "Previous definition");
+        return;
+    }
+
+    // scan optional '='
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::EQ) {
+        pos++; // skip '='
+    }
+
+    // The rest of the line is the replacement list (can be empty)
+    std::vector<Token> replacement;
+    replacement.reserve(input_line.size() - pos);
+    while (pos < input_line.size() &&
+            input_line[pos].type != TokenType::EndOfLine) {
+        replacement.push_back(input_line[pos]);
+        pos++;
+    }
+
+    // if macro is empty, add a default "1" token
+    if (replacement.empty()) {
+        replacement.push_back(Token::integer("1", 1, input_line.back().loc));
+    }
+
+    // Expand body so stored value reflects current expansions
+    // (including previous value of <name> if referenced).
+    LogicalLine line{ replacement, replacement.front().loc };
+    std::vector<Token> expanded;
+    expand_line(line, expanded);
+
+    // if replacement is a constant expression, replace it by its value
+    size_t expr_pos = 0;
+    int result = 0;
+    if (!expanded.empty() &&
+            eval_const_expr(expanded, expr_pos,
+                            const_symbols, result, /*silent=*/true) &&
+            expr_pos < expanded.size() &&
+            expanded[expr_pos].type == TokenType::EndOfLine) {
+        expanded.clear();
+        expanded.push_back(Token::integer(std::to_string(result),
+                                          result, line.loc));
+    }
+
+    // remove end-of-line inserted by expand_line
+    if (!expanded.empty() && expanded.back().type == TokenType::EndOfLine) {
+        expanded.pop_back();
+    }
+
+    // create the macro and insert into the macro table
+    Macro new_macro = macro;
+    new_macro.tokens = std::move(expanded);
+    macros[new_macro.name_id] = std::move(new_macro);
 }
 
 //-----------------------------------------------------------------------------
