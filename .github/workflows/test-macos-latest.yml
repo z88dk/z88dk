@@ -10,7 +10,7 @@ jobs:
     steps:
     - name: Install homebrew dependencies
       run: |
-        brew install cpanminus perl
+        brew install cpanminus perl m4
     - name: Install perl prerequisites
       run: |
         export PATH=/usr/local/bin:$PATH
