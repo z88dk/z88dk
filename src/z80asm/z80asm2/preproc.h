@@ -183,6 +183,12 @@ private:
     void process_UNDEF(const std::vector<Token>& input_line, size_t& pos);
     void process_name_UNDEF(std::string_view name, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
+    void do_UNDEF(StringInterner::Id name_id);
+    void process_DEFL(const std::vector<Token>& input_line, size_t& pos);
+    void process_name_DEFL(std::string_view name, const SourceLoc& name_loc,
+                           const std::vector<Token>& input_line, size_t& pos);
+    void do_DEFL(const Macro& macro,
+                 const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch

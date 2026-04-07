@@ -1,0 +1,24 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/defl_01.asm
+Assembling t/30-directive/input/defl_01.asm...
+t/30-directive/input/defl_01.asm:1:5: error: Expected macro name after DEFL
+    defl ; no name
+        ^
+t/30-directive/input/defl_01.asm:2:7: error: DEFL macro cannot be function-like
+    defl X(p1) ; cannot be function macro
+          ^
+t/30-directive/input/defl_01.asm:4:6: error: DEFL cannot redefine function-like macro: Y
+    defl Y ; cannot redefine function macro
+         ^
+t/30-directive/input/defl_01.asm:3:8: note: Previous definition
+    define Y(p1)
+           ^
+# file: t/30-directive/input/defl_01.asm
+EndOfLine	"\n"	5:1	
+# file: t/30-directive/input/defl_01.asm
+Identifier	"DEFINE"	3:8	keyword=DEFINE 
+Identifier	"Y"	3:8	
+LeftParen	"("	3:8	
+Identifier	"p1"	3:8	
+RightParen	")"	3:8	
+EQ	"="	3:8	
+Integer	"1"	3:13	int_value=1 
