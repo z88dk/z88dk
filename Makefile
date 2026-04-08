@@ -10,8 +10,10 @@
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
   EXESUFFIX 	:= .exe
+  EXTRA_ALL     := bin/m4$(EXESUFFIX)
 else
   EXESUFFIX 	?=
+  EXTRA_ALL     :=
 endif
 
 PREFIX ?= /usr/local
@@ -55,7 +57,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
 	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX)
 
-ALL = bin/m4$(EXESUFFIX) $(BINS) testsuite
+ALL = $(EXTRA_ALL) $(BINS) testsuite
 
 ALL_EXT = bin/z88dk-zsdcc$(EXESUFFIX)
 
@@ -79,6 +81,8 @@ src/config.h: | bin
 bin:
 	@mkdir -p bin
 
+# This rule is for windows/msys etc. We need to copy the
+# m4 binary into bin/ when building from source.
 bin/m4$(EXESUFFIX): | bin
 	@cp -f `which m4` bin/m4$(EXESUFFIX)
 
