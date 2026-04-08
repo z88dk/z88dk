@@ -1,0 +1,34 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/continuations.asm
+Assembling t/10-lexer/input/continuations.asm...
+# file: t/10-lexer/input/continuations.asm
+EndOfLine	"\n"	1:1	
+Identifier	"ld"	2:1	keyword=LD 
+Identifier	"a"	2:4	keyword=A 
+Comma	","	2:5	
+Integer	"1"	2:7	int_value=1 
+EndOfLine	"\n"	2:8	
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"2"	3:7	int_value=2 
+EndOfLine	"\n"	3:8	
+Identifier	"ld"	4:1	keyword=LD 
+Identifier	"a"	4:4	keyword=A 
+Comma	","	4:5	
+Integer	"3"	4:7	int_value=3 
+EndOfLine	"\n"	4:8	
+Identifier	"ld"	5:1	keyword=LD 
+Identifier	"a"	5:4	keyword=A 
+Comma	","	5:5	
+Integer	"4"	7:3	int_value=4 
+EndOfLine	"\n"	7:4	
+EndOfLine	"\n"	6:1	
+EndOfLine	"\n"	7:4	
+Identifier	"ld"	8:1	keyword=LD 
+Identifier	"a"	9:1	keyword=A 
+Comma	","	9:2	
+Integer	"5"	10:1	int_value=5 
+EndOfLine	"\n"	10:2	
+EndOfLine	"\n"	9:5	
+EndOfLine	"\n"	10:2	
+EndOfLine	"\n"	11:1	

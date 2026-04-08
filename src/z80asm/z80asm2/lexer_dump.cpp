@@ -53,6 +53,18 @@ void dump_tokens(const std::vector<Token>& tokens,
     }
 }
 
+void dump_logical_line(const LogicalLine& line,
+                       StringInterner::Id& cur_file_id) {
+    dump_tokens(line.tokens, cur_file_id);
+}
+
+void dump_logical_lines(const std::vector<LogicalLine>& lines,
+                        StringInterner::Id& cur_file_id) {
+    for (const auto& line : lines) {
+        dump_logical_line(line, cur_file_id);
+    }
+}
+
 [[noreturn]]
 void dump_after_tokenization_and_exit(std::string_view filename) {
     // get_source_file will read and tokenize the file,
@@ -63,12 +75,7 @@ void dump_after_tokenization_and_exit(std::string_view filename) {
     }
 
     // serialize tokens from all lines into a single vector for dumping
-    std::vector<Token> tokens;
-    for (auto& line_tokens : sf->lines_tokens) {
-        tokens.insert(tokens.end(), line_tokens.begin(), line_tokens.end());
-    }
-
     StringInterner::Id cur_file_id = 0;
-    dump_tokens(tokens, cur_file_id);
+    dump_logical_lines(sf->lines, cur_file_id);
     exit(EXIT_SUCCESS);
 }
