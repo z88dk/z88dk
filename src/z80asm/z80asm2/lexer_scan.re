@@ -29,7 +29,7 @@ static inline int digit_value(char c) {
 // Advances idx and writes the decoded character into out_char.
 static bool parse_escape(size_t& idx,
                          bool probing,
-                         const MergedLine& line,
+                         const ScanLine& line,
                          char& out_char) {
     size_t n = line.text.size();
     if (idx + 1 >= n) {
@@ -126,7 +126,7 @@ static bool scan_quoted_content(char end_quote,
                                 bool allow_escapes,
                                 bool probing,
                                 size_t& idx,
-                                const MergedLine& line,
+                                const ScanLine& line,
                                 std::string& out_content) {
     size_t n = line.text.size();
     idx++; // skip opening quote
@@ -161,7 +161,7 @@ static bool scan_quoted_content(char end_quote,
 
 static void parse_string(char end_quote,
                          size_t& idx,
-                         const MergedLine& line,
+                         const ScanLine& line,
                          std::vector<Token>& out) {
     size_t start = idx;
     std::string content;
@@ -179,7 +179,7 @@ static void parse_string(char end_quote,
 }
 
 static void parse_char_literal(size_t& idx,
-                               const MergedLine& line,
+                               const ScanLine& line,
                                std::vector<Token>& out) {
     size_t start = idx;      // points at opening '
     size_t probe = idx;      // speculative index
@@ -212,7 +212,7 @@ static void parse_char_literal(size_t& idx,
 
 static void parse_raw_string(char end_quote,
                              size_t& idx,
-                             const MergedLine& line,
+                             const ScanLine& line,
                              std::vector<Token>& out) {
     size_t start = idx;
     std::string content;
@@ -255,9 +255,9 @@ static int parse_int_from_chars(std::string_view s, int base) {
     return value;
 }
 
-void tokenize_line(const MergedLine& line,
-                   TokenizeState& state,
-                   std::vector<Token>& out) {
+void tokenize_scan_line(const ScanLine& line,
+                        TokenizeState& state,
+                        std::vector<Token>& out) {
     bool raw_strings = false;  // whether to treat string literals as raw (no escapes)
 
     const char* p = line.text.c_str();
