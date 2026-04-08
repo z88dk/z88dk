@@ -1,13 +1,9 @@
-- add tests to verify correct line numbers after continuation lines
-- add tests to verify correct line numbers after multi-line comments
-- add tests to verify correct line numbers after LINE and continuation lines
-- add tests to verify correct line numbers after LINE and multi-line comments
 - use vector<TokenLine> everywhere in the pipeline instead of vector<vector<Token>>
   in the lexer and vector<Token> after preprocessing
 
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
-[-] preprocess()            // macros, includes, conditionals & token stream
+[.] preprocess()            // macros, includes, conditionals & token stream
 [ ] apply_ix_iy_swap()      // semantic rewrite
 [ ] apply_identifier_ucase()
 [ ] apply_alt_registers()

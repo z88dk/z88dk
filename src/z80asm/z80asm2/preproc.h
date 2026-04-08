@@ -16,11 +16,6 @@
 #include <string_view>
 #include <vector>
 
-struct LogicalLine {
-    std::vector<Token> tokens;
-    SourceLoc loc;
-};
-
 struct Macro {
     StringInterner::Id name_id;                 // interned identifier
     SourceLoc loc;                              // where it was defined
@@ -114,6 +109,13 @@ struct Preproc {
     // main entry point: preprocess file and return vector of tokens
     // for assembler
     std::vector<Token> preprocess(std::string_view filename);
+
+    // ---------------------------------------------------------------------
+    // Logical line source interface: driver loop calls next_logical_line()
+    // to get the next line from one of the sources (file stack,
+    // macro feedback queue, assembler output queue)
+    // ---------------------------------------------------------------------
+    bool next_logical_line(LogicalLine& out);
 
 private:
 
