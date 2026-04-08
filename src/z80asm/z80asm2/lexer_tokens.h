@@ -41,3 +41,18 @@ struct Token {
     static Token end_of_line(const SourceLoc& loc);
 };
 
+enum class LineOrigin {
+    RawInput,          // from file stack
+    MacroFeedback,     // from macro engine
+    ReadyToAssemble    // already expanded, do NOT expand again
+};
+
+struct LogicalLine {
+    SourceLoc loc;
+    std::vector<Token> tokens;
+    LineOrigin origin = LineOrigin::RawInput;
+
+    LogicalLine() = default;
+    LogicalLine(const SourceLoc& loc_,
+        LineOrigin origin_ = LineOrigin::RawInput);
+};
