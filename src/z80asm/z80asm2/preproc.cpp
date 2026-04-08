@@ -12,6 +12,52 @@
 #include "source_loc.h"
 #include "string_interner.h"
 
+bool Preproc::next_logical_line(LogicalLine& out) {
+    // -----------------------------------------------------
+    // Assembler output queue has priority
+    // -----------------------------------------------------
+    if (!assembler_output_queue.empty()) {
+        out = assembler_output_queue.front();
+        assembler_output_queue.pop_front();
+
+        out.origin = LineOrigin::ReadyToAssemble;
+        return true;
+    }
+
+    // -----------------------------------------------------
+    // Macro feedback queue comes next
+    // -----------------------------------------------------
+    if (!macro_work_queue.empty()) {
+        out = macro_work_queue.front();
+        macro_work_queue.pop_front();
+        out.origin = LineOrigin::MacroFeedback;
+        return true;
+    }
+
+    // -----------------------------------------------------
+    // Otherwise read from include stack
+    // -----------------------------------------------------
+    while (!include_stack.empty()) {
+        auto& frame = include_stack.back();
+
+        if (frame.current_line >= frame.file->lines_tokens.size()) {
+            // End of this file
+            include_stack.pop_back();
+            continue;
+        }
+
+        const auto& raw_line =
+            frame.file->lines_tokens[frame.current_line++];
+        out.tokens = raw_line;
+        out.loc = raw_line.empty() ? SourceLoc() : raw_line[0].loc;
+        out.origin = LineOrigin::RawInput;
+        return true;
+    }
+
+    // no more input
+    return false;
+}
+
 void Preproc::set_const_symbols(const ConstSymbols& defs) {
     const_symbols = defs;
 }
@@ -47,60 +93,15 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
     // -------------------------------------------------------------------------
     // 2. Unified input loop (files + macro-generated lines)
     // -------------------------------------------------------------------------
-    while (true) {
-        LogicalLine ll;
-        bool have_line = false;
-        bool is_assembler_output = false;
-
-        // -----------------------------------------------------
-        // 2a. Assembler output queue has priority
-        // -----------------------------------------------------
-        if (!assembler_output_queue.empty()) {
-            ll = assembler_output_queue.front();
-            assembler_output_queue.pop_front();
-            have_line = true;
-            is_assembler_output = true;
-        }
-        // -----------------------------------------------------
-        // 2b. Macro feedback queue comes next
-        // -----------------------------------------------------
-        else if (!macro_work_queue.empty()) {
-            ll = macro_work_queue.front();
-            macro_work_queue.pop_front();
-            have_line = true;
-        }
-        // -----------------------------------------------------
-        // 2c. Otherwise read from include stack
-        // -----------------------------------------------------
-        else if (!include_stack.empty()) {
-            auto& frame = include_stack.back();
-
-            if (frame.current_line >= frame.file->lines_tokens.size()) {
-                // End of this file
-                include_stack.pop_back();
-                continue;
-            }
-
-            const auto& raw_line =
-                frame.file->lines_tokens[frame.current_line++];
-            ll.tokens = raw_line;
-            ll.loc = raw_line.empty() ? SourceLoc() : raw_line[0].loc;
-            have_line = true;
-        }
-
-        // -----------------------------------------------------
-        // 2c. No more input
-        // -----------------------------------------------------
-        if (!have_line) {
-            break;
-        }
+    LogicalLine ll;
+    while (next_logical_line(ll)) {
 
         // ---------------------------------------------------------------------
         // 3. Directive processing
         // ---------------------------------------------------------------------
         LogicalLine processed;
         LineType type;
-        if (is_assembler_output) {
+        if (ll.origin == LineOrigin::ReadyToAssemble) {
             // Lines from assembler_output_queue are already processed
             // and should not go through directive processing again
             // (e.g. DEFINE X=1 -> DEFC X=1 should not be processed again
@@ -127,7 +128,7 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
         // 4. Macro expansion
         // ---------------------------------------------------------------------
         std::vector<Token> expanded;
-        if (is_assembler_output) {
+        if (ll.origin == LineOrigin::ReadyToAssemble) {
             // Lines from assembler_output_queue should not be macro expanded
             // (e.g. DEFINE X=1 -> DEFC X=1 should not have X replaced by 1)
             expanded = processed.tokens;
@@ -176,3 +177,4 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
 
     return final_tokens;
 }
+
