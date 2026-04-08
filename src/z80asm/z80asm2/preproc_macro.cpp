@@ -14,8 +14,6 @@
 #include <string>
 #include <vector>
 
-static const int MAX_EXPANSION_DEPTH = 1000;
-
 // Collect comma-separated arguments from tokens[pos] onward.
 // Expects tokens[pos-1] was '('. Handles nested parentheses.
 // Advances pos past the closing ')'.
