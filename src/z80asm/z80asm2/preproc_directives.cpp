@@ -479,7 +479,7 @@ void Preproc::process_BINARY(const std::vector<Token>& input_line,
 
     // Emit tokens for binary data: one token per byte, with value = byte value
     for (size_t i = 0; i < data->size(); i += BYTES_PER_LINE) {
-        LogicalLine line{ {}, filename_loc };
+        LogicalLine line(filename_loc);
         line.tokens.reserve(1 + 2 * BYTES_PER_LINE + 1); // DEFB b1,...,bN <EOL>
 
         line.tokens.push_back(Token::identifier("DEFB", filename_loc));
@@ -644,7 +644,8 @@ void Preproc::do_DEFINE(const Macro& macro,
     // the symbol in known at link time
     if (!macro.is_function_like) {
         // expand macros in the replacement list
-        LogicalLine line{ replacement, replacement.front().loc };
+        LogicalLine line{ replacement.front().loc };
+        line.tokens = replacement;
         std::vector<Token> expanded;
         expand_line(line, expanded);
 
@@ -662,7 +663,7 @@ void Preproc::do_DEFINE(const Macro& macro,
                 g_strings.to_string(macro.name_id) + " = " +
                 std::to_string(result);
             std::vector<Token> defc_tokens = tokenize_text(defc_str, line.loc);
-            LogicalLine defc_line{ {}, line.loc };
+            LogicalLine defc_line(line.loc);
             defc_line.tokens = std::move(defc_tokens);
             assembler_output_queue.push_back(std::move(defc_line));
         }
@@ -674,7 +675,8 @@ void Preproc::do_DEFINE(const Macro& macro,
     macros[new_macro.name_id] = std::move(new_macro);
 }
 
-void Preproc::process_UNDEF(const std::vector<Token>& input_line, size_t& pos) {
+void Preproc::process_UNDEF(const std::vector<Token>& input_line,
+    size_t& pos) {
     if (pos >= input_line.size() ||
             input_line[pos].type != TokenType::Identifier) {
         g_diag.error(input_line[pos].loc, "Expected macro name after UNDEF");
@@ -794,7 +796,8 @@ void Preproc::do_DEFL(const Macro& macro,
 
     // Expand body so stored value reflects current expansions
     // (including previous value of <name> if referenced).
-    LogicalLine line{ replacement, replacement.front().loc };
+    LogicalLine line(replacement.front().loc);
+    line.tokens = replacement;
     std::vector<Token> expanded;
     expand_line(line, expanded);
 
