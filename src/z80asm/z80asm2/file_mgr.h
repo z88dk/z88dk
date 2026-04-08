@@ -7,6 +7,7 @@
 #pragma once
 
 #include "lexer.h"
+#include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>
@@ -16,15 +17,15 @@
 #include <vector>
 
 struct RawLine {
-    std::string text;
     SourceLoc loc;   // physical line + file_id
+    std::string text;
 };
 
 struct SourceFile {
     StringInterner::Id file_id = 0;
-    std::vector<size_t> line_offsets; // byte offset of each line start
-    std::vector<size_t> line_lengths; // length of each line (excluding EOL)
-    std::vector<std::vector<Token>> lines_tokens; // tokens per line
+    std::vector<size_t> line_offsets;   // byte offset of each line start
+    std::vector<size_t> line_lengths;   // length of each line (excluding EOL)
+    std::vector<LogicalLine> lines;     // tokens per line
 };
 
 class FileManager {

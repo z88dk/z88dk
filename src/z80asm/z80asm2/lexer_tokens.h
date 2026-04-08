@@ -54,5 +54,5 @@ struct LogicalLine {
 
     LogicalLine() = default;
     LogicalLine(const SourceLoc& loc_,
-        LineOrigin origin_ = LineOrigin::RawInput);
+                LineOrigin origin_ = LineOrigin::RawInput);
 };
