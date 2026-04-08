@@ -11,6 +11,7 @@
 #include "lexer_scan.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <cassert>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -72,17 +73,6 @@ std::string tokens_to_string(const std::vector<Token>& tokens) {
     return out;
 }
 
-static bool strip_line_continuation(std::string& line) {
-    if (!line.empty() && line.back() == '\\') {
-        // result must be the same size so that locmap stays correct,
-        // so replace backslash with space
-        line.pop_back();
-        line.push_back(' ');
-        return true;
-    }
-    return false;
-}
-
 static std::string_view get_line_view(const SourceFile& sf,
                                       std::string_view content,
                                       size_t line) {
@@ -91,110 +81,26 @@ static std::string_view get_line_view(const SourceFile& sf,
     return std::string_view(content.data() + off, len);
 }
 
-void tokenize(SourceFile& sf, std::string_view content) {
-    TokenizeState state;
-    size_t num_lines = sf.line_offsets.size();
-
-    sf.lines_tokens.resize(num_lines);
-
-    for (size_t i = 0; i < num_lines; ++i) {
-        size_t logical_start = i;
-
-        // Build merged logical line
-        MergedLine merged;
-        merged.file_id = sf.file_id;
-        merged.logical_line = logical_start + 1;
-
-        // First physical line
-        std::string_view first = get_line_view(sf, content, i);
-
-        merged.text.reserve(first.size());
-        merged.locmap.reserve(first.size() + 1);
-
-        int col = 1;
-        size_t physical_line = i + 1;
-
-        for (char c : first) {
-            merged.text.push_back(c);
-            merged.locmap.emplace_back(sf.file_id, physical_line, col++);
-        }
-
-        // Handle continuation lines
-        while (strip_line_continuation(merged.text)) {
-            if (i + 1 >= num_lines) {
-                break;
-            }
-
-            ++i;
-            std::string_view next = get_line_view(sf, content, i);
-
-            physical_line = i + 1;
-            col = 1;
-
-            for (char c : next) {
-                merged.text.push_back(c);
-                merged.locmap.emplace_back(sf.file_id, physical_line, col++);
-            }
-        }
-
-        // Sentinel: one past the last character, for error reporting
-        // at end-of-line
-        merged.locmap.emplace_back(sf.file_id, physical_line, col);
-
-        // Tokenize merged line
-        std::vector<Token> tokens;
-        tokenize_line(merged, state, tokens);
-
-        if (!state.in_multiline_comment) {
-            // Compute end-of-line SourceLoc based on last token
-            SourceLoc end_loc;
-            if (!tokens.empty()) {
-                const Token& last = tokens.back();
-                end_loc.file_id = last.loc.file_id;
-                end_loc.line = last.loc.line;   // physical line
-                end_loc.column = last.loc.column +
-                                 static_cast<uint16_t>(g_strings.to_string(last.text_id).size());
-            }
-            else {
-                // No tokens: end-of-line is at column 1 of the first physical line
-                end_loc = SourceLoc(sf.file_id, logical_start + 1, 1);
-            }
-
-            tokens.push_back(Token::end_of_line(end_loc));
-        }
-
-        // Store tokens in the first physical line
-        sf.lines_tokens[logical_start] = std::move(tokens);
-    }
-
-    if (state.in_multiline_comment) {
-        g_diag.error(state.multiline_comment_start,
-                     "Unterminated multi-line comment");
-    }
-}
-
-std::vector<Token> tokenize_text(std::string_view text,
-                                 const SourceLoc& loc) {
-    // Build a temporary merged line
-    MergedLine merged;
-    merged.file_id = loc.file_id;
-    merged.logical_line = loc.line;   // for listing if needed
-    merged.text = text;
-    merged.locmap.reserve(text.size() + 1);
+static std::vector<Token> tokenize_line(TokenizeState& state,
+                                        std::string_view text,
+                                        const SourceLoc& loc) {
+    // Build a temporary line
+    ScanLine line;
+    line.text = text;
+    line.locmap.reserve(text.size() + 1);
 
     int col = loc.column;
     for ([[maybe_unused]] char c : text) {
-        merged.locmap.emplace_back(loc.file_id, loc.line, col++);
+        line.locmap.emplace_back(loc.file_id, loc.line, col++);
     }
 
     // Sentinel: one past the last character, for error reporting
     // at end-of-line
-    merged.locmap.emplace_back(loc.file_id, loc.line, col);
+    line.locmap.emplace_back(loc.file_id, loc.line, col);
 
     // Tokenize
-    TokenizeState state;   // fresh state: no multiline comments, etc.
     std::vector<Token> tokens;
-    tokenize_line(merged, state, tokens);
+    tokenize_scan_line(line, state, tokens);
 
     // End-of-line token: after last token
     SourceLoc end_loc;
@@ -211,4 +117,135 @@ std::vector<Token> tokenize_text(std::string_view text,
 
     tokens.push_back(Token::end_of_line(end_loc));
     return tokens;
+}
+
+void tokenize(SourceFile& sf, std::string_view content) {
+    TokenizeState state;
+    size_t num_lines = sf.line_offsets.size();
+
+    sf.lines.resize(num_lines);
+
+    // Per-line flag: true if scanning started inside a multi-line comment.
+    // Such lines must be merged into the line that opened the comment.
+    std::vector<bool> started_in_comment(num_lines, false);
+
+    // Need to tokenize first, and detect continuations afterwards,
+    // as a backslash at the end of a line is not a continuation if it's inside
+    // a comment
+    for (size_t i = 0; i < num_lines; ++i) {
+        SourceLoc loc(sf.file_id, i + 1, 1);
+        std::string_view text = get_line_view(sf, content, i);
+
+        // Record whether we are inside a comment before scanning
+        started_in_comment[i] = state.in_multiline_comment;
+
+        // Use tokenize_line with shared state so multi-line comments
+        // are tracked correctly; tokenize_line always appends EndOfLine
+        std::vector<Token> tokens = tokenize_line(state, text, loc);
+
+        // store tokens in the line
+        sf.lines[i].loc = loc;
+        sf.lines[i].tokens = std::move(tokens);
+        sf.lines[i].origin = LineOrigin::RawInput;
+    }
+
+    if (state.in_multiline_comment) {
+        g_diag.error(state.multiline_comment_start,
+                     "Unterminated multi-line comment");
+    }
+
+    // Now merge lines connected by multi-line comments or backslash
+    // continuations.
+    //
+    // A line that started inside a multi-line comment must be merged
+    // into the preceding non-comment line, because the tokens before
+    // the /* and after the */ belong to the same logical statement.
+    //
+    // Example:  ld a, /*       -> line 1: LD A ,  EndOfLine
+    //           comment        -> line 2: EndOfLine  (started_in_comment)
+    //           */4            -> line 3: 4 EndOfLine (started_in_comment)
+    //
+    // After merge: line 1: LD A , 4 EndOfLine
+    //              line 2: EndOfLine
+    //              line 3: EndOfLine
+
+    for (size_t i = 0; i < num_lines; ++i) {
+        auto& tokens = sf.lines[i].tokens;
+        assert(!tokens.empty() &&
+               tokens.back().type == TokenType::EndOfLine);
+
+        size_t j = i + 1;
+
+        // Merge following lines that started inside a multi-line comment
+        if (j < num_lines && started_in_comment[j]) {
+            // Remove EndOfLine from current line once
+            tokens.pop_back();
+
+            while (j < num_lines && started_in_comment[j]) {
+                // Append non-EndOfLine tokens from the next line
+                auto& next_tokens = sf.lines[j].tokens;
+                assert(!next_tokens.empty() &&
+                       next_tokens.back().type == TokenType::EndOfLine);
+
+                // Copy everything except the EndOfLine from next line
+                tokens.insert(tokens.end(),
+                              next_tokens.begin(),
+                              next_tokens.end() - 1);
+
+                // Clear next line to just EndOfLine
+                Token eol = next_tokens.back();
+                next_tokens.clear();
+                next_tokens.push_back(eol);
+
+                j++;
+            }
+
+            // Re-add EndOfLine
+            SourceLoc end_loc;
+            if (!tokens.empty()) {
+                const Token& last = tokens.back();
+                end_loc.file_id = last.loc.file_id;
+                end_loc.line = last.loc.line;
+                end_loc.column = last.loc.column +
+                                 static_cast<uint16_t>(g_strings.to_string(last.text_id).size());
+            }
+            else {
+                end_loc = sf.lines[i].loc;
+            }
+            tokens.push_back(Token::end_of_line(end_loc));
+        }
+
+        // Now check for backslash continuation on the (possibly merged) line
+        size_t num_tokens = tokens.size();
+        while (num_tokens >= 2 &&
+                tokens[num_tokens - 2].type == TokenType::Backslash &&
+                j < num_lines) {
+            // Line ends with a backslash token: continuation line.
+            tokens.pop_back();   // remove EndOfLine
+            tokens.pop_back();   // remove Backslash
+
+            // copy tokens from next line
+            auto& next_tokens = sf.lines[j].tokens;
+            assert(!next_tokens.empty() &&
+                   next_tokens.back().type == TokenType::EndOfLine);
+            tokens.insert(tokens.end(),
+                          next_tokens.begin(),
+                          next_tokens.end());
+
+            // clear next line tokens except for EndOfLine
+            next_tokens.erase(next_tokens.begin(),
+                              next_tokens.end() - 1);
+
+            num_tokens = tokens.size();
+            j++;
+        }
+
+        i = j - 1;   // skip merged lines
+    }
+}
+
+std::vector<Token> tokenize_text(std::string_view text,
+                                 const SourceLoc& loc) {
+    TokenizeState state;   // fresh state: no multiline comments, etc.
+    return tokenize_line(state, text, loc);
 }
