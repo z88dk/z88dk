@@ -93,8 +93,22 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
     // -------------------------------------------------------------------------
     // 2. Unified input loop (files + macro-generated lines)
     // -------------------------------------------------------------------------
+
+    // Expansion iteration tracking
+    int expansion_depth = 0;
+
     LogicalLine ll;
     while (next_logical_line(ll)) {
+
+        // safeguard against infinite macro expansion loops if we see too many
+        // consecutive macro feedback lines without returning to raw input
+        if (ll.origin == LineOrigin::RawInput) {
+            expansion_depth = 0; // reset expansion depth for new input line
+        }
+        else if (++expansion_depth > MAX_EXPANSION_DEPTH) {
+            g_diag.error(ll.loc, "Macro expansion limit exceeded");
+            break;
+        }
 
         // ---------------------------------------------------------------------
         // 3. Directive processing
