@@ -40,16 +40,13 @@ bool Preproc::next_logical_line(LogicalLine& out) {
     while (!include_stack.empty()) {
         auto& frame = include_stack.back();
 
-        if (frame.current_line >= frame.file->lines_tokens.size()) {
+        if (frame.current_line >= frame.file->lines.size()) {
             // End of this file
             include_stack.pop_back();
             continue;
         }
 
-        const auto& raw_line =
-            frame.file->lines_tokens[frame.current_line++];
-        out.tokens = raw_line;
-        out.loc = raw_line.empty() ? SourceLoc() : raw_line[0].loc;
+        out = frame.file->lines[frame.current_line++];
         out.origin = LineOrigin::RawInput;
         return true;
     }

@@ -17,12 +17,11 @@ struct TokenizeState {
     SourceLoc multiline_comment_start;
 };
 
-struct MergedLine {
-    StringInterner::Id file_id = 0;
-    // logical line number (after merging continuations)
-    size_t logical_line = 0;
+struct ScanLine {
     std::string text;               // the merged characters
-    std::vector<SourceLoc> locmap;  // same length as text
+    std::vector<SourceLoc> locmap;  /* same length as text+1 sentinel,
+                                       maps each character to its
+                                       original SourceLoc */
 };
 
 // identifier character: letter, digit, or underscore
@@ -34,6 +33,6 @@ inline bool is_ident_char(char c) {
     return is_alpha(c) || is_dec_digit(c) || c == '_';
 }
 
-void tokenize_line(const MergedLine& line,
-                   TokenizeState& state,
-                   std::vector<Token>& out);
+void tokenize_scan_line(const ScanLine& line,
+                        TokenizeState& state,
+                        std::vector<Token>& out);

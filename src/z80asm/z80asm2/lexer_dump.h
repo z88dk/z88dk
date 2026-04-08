@@ -13,6 +13,10 @@
 void dump_token(const Token& token);
 void dump_tokens(const std::vector<Token>& tokens,
                  StringInterner::Id& cur_file_id);
+void dump_logical_line(const LogicalLine& line,
+                       StringInterner::Id& cur_file_id);
+void dump_logical_lines(const std::vector<LogicalLine>& lines,
+                        StringInterner::Id& cur_file_id);
 
 [[noreturn]]
 void dump_after_tokenization_and_exit(std::string_view filename);

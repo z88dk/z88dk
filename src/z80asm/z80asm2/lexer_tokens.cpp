@@ -63,6 +63,6 @@ Token Token::end_of_line(const SourceLoc& loc) {
     return t;
 }
 
-LogicalLine::LogicalLine(const SourceLoc& loc_, LineOrigin origin_) 
-	: loc(loc_), origin(origin_) {
+LogicalLine::LogicalLine(const SourceLoc& loc_, LineOrigin origin_)
+    : loc(loc_), origin(origin_) {
 }
