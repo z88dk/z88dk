@@ -16,6 +16,8 @@
 #include <string_view>
 #include <vector>
 
+static const int MAX_EXPANSION_DEPTH = 1000;
+
 struct Macro {
     StringInterner::Id name_id;                 // interned identifier
     SourceLoc loc;                              // where it was defined
