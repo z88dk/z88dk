@@ -676,7 +676,7 @@ void Preproc::do_DEFINE(const Macro& macro,
 }
 
 void Preproc::process_UNDEF(const std::vector<Token>& input_line,
-    size_t& pos) {
+                            size_t& pos) {
     if (pos >= input_line.size() ||
             input_line[pos].type != TokenType::Identifier) {
         g_diag.error(input_line[pos].loc, "Expected macro name after UNDEF");

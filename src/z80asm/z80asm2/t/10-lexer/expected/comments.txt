@@ -28,10 +28,15 @@ Identifier	"a"	7:4	keyword=A
 Comma	","	7:5	
 Integer	"12"	10:10	int_value=12 
 EndOfLine	"\n"	10:12	
+EndOfLine	"\n"	8:1	
+EndOfLine	"\n"	9:1	
+EndOfLine	"\n"	10:12	
 Identifier	"ld"	11:1	keyword=LD 
 Identifier	"a"	11:4	keyword=A 
 Comma	","	11:5	
 Integer	"12"	13:1	int_value=12 
+EndOfLine	"\n"	13:3	
+EndOfLine	"\n"	12:2	
 EndOfLine	"\n"	13:3	
 String	"\"string /* with */ comment;\""	14:1	str_value="string /* with */ comment;" 
 EndOfLine	"\n"	14:29	
