@@ -1,26 +1,34 @@
-tokenize()              // raw tokens, including Tick
-preprocess()            // macros, includes, conditionals ? token stream
-apply_ix_iy_swap()      // semantic rewrite
-apply_identifier_ucase()
-apply_alt_registers()
-apply_dot_directive_merge()
-parse()                 // grammar
-resolve_local_labels()	// ident@ident, @ident
-semantic_analysis()     // symbol resolution, types, CPU rules
-codegen()               // final machine code
+- add tests to verify correct line numbers after continuation lines
+- add tests to verify correct line numbers after multi-line comments
+- add tests to verify correct line numbers after LINE and continuation lines
+- add tests to verify correct line numbers after LINE and multi-line comments
+- use vector<TokenLine> everywhere in the pipeline instead of vector<vector<Token>>
+  in the lexer and vector<Token> after preprocessing
+
+Pipeline:
+[x] tokenize()              // raw tokens, including Tick
+[-] preprocess()            // macros, includes, conditionals & token stream
+[ ] apply_ix_iy_swap()      // semantic rewrite
+[ ] apply_identifier_ucase()
+[ ] apply_alt_registers()
+[ ] apply_dot_directive_merge()
+[ ] parse()                 // grammar
+[ ] resolve_local_labels()	// ident@ident, @ident
+[ ] semantic_analysis()     // symbol resolution, types, CPU rules
+[ ] codegen()               // final machine code
 
 tests:
-00–04: fundamental behavior (empty input, basic errors)
-05–09: command-line interface behavior
-10–19: lexical behavior
-20–29: macro semantics
-30–39: directive semantics
-40–49: syntax & grammar
-50–59: semantic rules
-60–69: output behavior
-70–79: integration
-80–89: regression
-90–99: fuzz & pathological
+00â€“04: fundamental behavior (empty input, basic errors)
+05â€“09: command-line interface behavior
+10â€“19: lexical behavior
+20â€“29: macro semantics
+30â€“39: directive semantics
+40â€“49: syntax & grammar
+50â€“59: semantic rules
+60â€“69: output behavior
+70â€“79: integration
+80â€“89: regression
+90â€“99: fuzz & pathological
 
 t/<NN>-<topic>/
 t/<NN>-<topic>/<test>.t
