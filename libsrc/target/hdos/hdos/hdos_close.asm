@@ -15,7 +15,7 @@
 
 hdos_close:
 _hdos_close:
-    ld     a,h
+    ld     a,l
     rst    38h
     defb   CLOSE
     ld     hl,1
