@@ -278,6 +278,7 @@ include target/tim011/tim011.mak
 include target/ts2068/ts2068.mak
 include target/vector06c/vector06c.mak
 include target/vg5k/vg5k.mak
+include target/vz/vz.mak
 include target/x07/x07.mak
 include target/z1013/z1013.mak
 include target/z80tvgame/z80tvgame.mak
@@ -551,7 +552,7 @@ gfx1050udg.lib: $(TARGET_CLIB_DEPS)
 	TARGET=v1050udg TYPE=z80 $(LIBLINKER) -DFORv1050udg -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gfx1050udg.lib @$(TARGET_DIRECTORY)/v1050/gfx1050udg.lst
 
 # VZ200/300 lib - Stefano
-vz_clib.lib: $(TARGET_CLIB_DEPS)
+vz_clib.lib: $(TARGET_CLIB_DEPS) $(VZ_TARGETS)
 	@echo ''
 	@echo '--- Building VZ200/300 Library ---'
 	@echo ''
