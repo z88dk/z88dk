@@ -21,14 +21,18 @@ Identifier	"ld"	5:1	keyword=LD
 Identifier	"a"	5:4	keyword=A 
 Comma	","	5:5	
 Integer	"4"	7:3	int_value=4 
-EndOfLine	"\n"	7:4	
+Plus	"+"	7:4	
+Integer	"4"	9:3	int_value=4 
+EndOfLine	"\n"	9:4	
 EndOfLine	"\n"	6:1	
-EndOfLine	"\n"	7:4	
-Identifier	"ld"	8:1	keyword=LD 
-Identifier	"a"	9:1	keyword=A 
-Comma	","	9:2	
-Integer	"5"	10:1	int_value=5 
-EndOfLine	"\n"	10:2	
-EndOfLine	"\n"	9:5	
-EndOfLine	"\n"	10:2	
-EndOfLine	"\n"	11:1	
+EndOfLine	"\n"	7:5	
+EndOfLine	"\n"	8:1	
+EndOfLine	"\n"	9:4	
+Identifier	"ld"	10:1	keyword=LD 
+Identifier	"a"	11:1	keyword=A 
+Comma	","	11:2	
+Integer	"5"	12:1	int_value=5 
+EndOfLine	"\n"	12:2	
+EndOfLine	"\n"	11:5	
+EndOfLine	"\n"	12:2	
+EndOfLine	"\n"	13:1	
