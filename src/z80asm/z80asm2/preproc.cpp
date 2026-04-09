@@ -59,12 +59,12 @@ void Preproc::set_const_symbols(const ConstSymbols& defs) {
     const_symbols = defs;
 }
 
-std::vector<Token> Preproc::preprocess(std::string_view filename) {
+std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // used for dumping tokens after tokenization, if requested
     StringInterner::Id cur_file_id = 0;
 
-    // Final output token stream
-    std::vector<Token> final_tokens;
+    // Final output logical line stream
+    std::vector<LogicalLine> final_lines;
 
     // -------------------------------------------------------------------------
     // 1. Load and tokenize the top-level file
@@ -72,7 +72,7 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
     const SourceFile* file = g_file_mgr.get_source_file(filename, SourceLoc());
     if (!file) {
         // error already emitted by get_source_file()
-        return final_tokens;
+        return final_lines;
     }
 
     // Push initial include frame
@@ -159,8 +159,9 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
         parse_asm_definitions(expanded);
 
         // Append expanded tokens to final output
-        final_tokens.insert(final_tokens.end(),
-                            expanded.begin(), expanded.end());
+		LogicalLine final_line(ll.loc);
+		final_line.tokens = std::move(expanded);
+        final_lines.push_back(std::move(final_line));
     }
 
     // -------------------------------------------------------------------------
@@ -173,7 +174,7 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
     // TODO: check for unterminated classical MACRO/ENDM if needed
 
     if (g_args.options.dump_after_preprocessing) {
-        dump_tokens(final_tokens, cur_file_id);
+        dump_logical_lines(final_lines, cur_file_id);
         exit(EXIT_SUCCESS);
     }
 
@@ -186,6 +187,6 @@ std::vector<Token> Preproc::preprocess(std::string_view filename) {
         exit(EXIT_SUCCESS);
     }
 
-    return final_tokens;
+    return final_lines;
 }
 
