@@ -733,7 +733,7 @@ attache.lib: cpm_clib.lib $(ATTACHE_TARGETS)
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(TARGET_DIRECTORY)/attache/attache.lst
 
-bondwell.lib: cpm_clib.lib
+bondwell.lib: cpm_clib.lib $(BONDWELL_TARGETS)
 	@echo ''
 	@echo '--- Building Bondwell 12/14 Library ---'
 	@echo ''
@@ -742,7 +742,7 @@ bondwell.lib: cpm_clib.lib
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
 	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(TARGET_DIRECTORY)/bondwell/bw.lst
 
-bondwell2.lib: cpm_clib.lib
+bondwell2.lib: cpm_clib.lib $(BONDWELL2_TARGETS)
 	@echo ''
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
