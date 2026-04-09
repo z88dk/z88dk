@@ -4,6 +4,8 @@ ld a, 2  // comment \
 ld a, 3
 ld a, /* comment \
 comment continued 
+*/4+/* comment
+comment
 */4
 ld \
 a, \
