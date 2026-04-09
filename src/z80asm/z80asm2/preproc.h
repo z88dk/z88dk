@@ -22,13 +22,25 @@ struct Macro {
     StringInterner::Id name_id;                 // interned identifier
     SourceLoc loc;                              // where it was defined
     std::vector<Token> tokens;                  // object/function-like
-    std::vector<std::vector<Token>> lines;      // classical multi-line
+    std::vector<LogicalLine> lines;      		// classical multi-line
     std::vector<StringInterner::Id> params;     // interned identifiers
     bool is_function_like = false;
     bool is_multiline = false;
 };
 
-struct Preproc {
+class Preproc {
+public:
+	Preproc() = default;
+
+    // copy defines from options, command line, or global scope
+    void set_const_symbols(const ConstSymbols& defs);
+
+    // main entry point: preprocess file and return vector of tokens
+    // for assembler
+    std::vector<LogicalLine> preprocess(std::string_view filename);
+
+private:
+	
     // ---------------------------------------------------------------------
     // Include stack: tracks nested file inclusion
     // ---------------------------------------------------------------------
@@ -100,17 +112,9 @@ struct Preproc {
     // ---------------------------------------------------------------------
     std::vector<StringInterner::Id> dependency_files;
 
-
     // ---------------------------------------------------------------------
     // Methods
     // ---------------------------------------------------------------------
-
-    // copy defines from options, command line, or global scope
-    void set_const_symbols(const ConstSymbols& defs);
-
-    // main entry point: preprocess file and return vector of tokens
-    // for assembler
-    std::vector<Token> preprocess(std::string_view filename);
 
     // ---------------------------------------------------------------------
     // Logical line source interface: driver loop calls next_logical_line()
@@ -118,8 +122,6 @@ struct Preproc {
     // macro feedback queue, assembler output queue)
     // ---------------------------------------------------------------------
     bool next_logical_line(LogicalLine& out);
-
-private:
 
     // ---------------------------------------------------------------------
     // Directive processing: classification and dispatch

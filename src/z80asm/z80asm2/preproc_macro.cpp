@@ -336,7 +336,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 // Expand each macro body line and push to work queue
                 for (const auto& body_line : macro.lines) {
                     std::vector<Token> substituted =
-                        substitute_params(body_line, macro.params,
+                        substitute_params(body_line.tokens, macro.params,
                                           args, tok.loc);
 
                     LogicalLine ll;
