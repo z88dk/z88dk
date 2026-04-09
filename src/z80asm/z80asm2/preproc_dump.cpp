@@ -30,9 +30,7 @@ void Preproc::dump_macro(const Macro& macro,
         dump_tokens(header_tokens, cur_file_id);
 
         for (const auto& line : macro.lines) {
-            LogicalLine ll(line.front().loc);
-            ll.tokens = line;
-            dump_logical_line(ll, cur_file_id);
+            dump_logical_line(line, cur_file_id);
         }
 
         std::vector<Token> endm_tokens;
