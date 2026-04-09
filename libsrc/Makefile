@@ -222,71 +222,7 @@ include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
 
 # To be replaced with a wildcard include at some point
-include target/abc80/abc80.mak
-include target/agon/agon.mak
-include target/alphatp2/alphatp2.mak
-include target/altair8800/altair8800.mak
-include target/c7420/c7420.mak
-include target/dai/dai.mak
-include target/einstein/einstein.mak
-include target/gal/gal.mak
-include target/gemini/gemini.mak
-include target/gl/gl.mak
-include target/gl6000/gl6000.mak
-include target/hector/hector.mak
-include target/hemc/hemc.mak
-include target/hgmc/hgmc.mak
-include target/homelab/homelab.mak
-include target/homelab2/homelab2.mak
-include target/kc/kc.mak
-include target/kramermc/kramermc.mak
-include target/krokha/krokha.mak
-include target/laser500/laser500.mak
-include target/lm80c/lm80c.mak
-include target/lviv/lviv.mak
-include target/lynx/lynx.mak
-include target/mc1000/mc1000.mak
-include target/micro8085/micro8085.mak
-include target/mikro80/mikro80.mak
-include target/mtx/mtx.mak
-include target/multi8/multi8.mak
-include target/myvision/myvision.mak
-include target/mz/mz.mak
-include target/mz2500/mz2500.mak
-include target/nanos/nanos.mak
-include target/ondra/ondra.mak
-include target/pc6001/pc6001.mak
-include target/pc88/pc88.mak
-include target/pencil2/pencil2.mak
-include target/phc25/phc25.mak
-include target/pk8000/pk8000.mak
-include target/pps/pps.mak
-include target/primo/primo.mak
-include target/pv1000/pv1000.mak
-include target/pv2000/pv2000.mak
-include target/radio86/radio86.mak
-include target/rx78/rx78.mak
-include target/sam/sam.mak
-include target/sc3000/sc3000.mak
-include target/sms/sms.mak
-include target/sol20/sol20.mak
-include target/sos/sos.mak
-include target/spc1000/spc1000.mak
-include target/srr/srr.mak
-include target/sv8000/sv8000.mak
-include target/tim011/tim011.mak
-include target/ts2068/ts2068.mak
-include target/vector06c/vector06c.mak
-include target/vg5k/vg5k.mak
-include target/vz/vz.mak
-include target/x07/x07.mak
-include target/z1013/z1013.mak
-include target/z80tvgame/z80tvgame.mak
-include target/z88/z88.mak
-include target/z9001/z9001.mak
-include target/zx/zx.mak
-include target/zxn/zxn.mak
-
+include target/*/*.mak
 
 # Targets depend on some common code + target specific (include stdio in here)
 TARGET_CLIB_DEPS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS) $(SOUND_SAA1099_TARGETS) $(SOUND_AY_TARGETS) $(SOUND_SN76489_TARGETS) $(TIME_TARGETS)
@@ -510,7 +446,7 @@ pps_clib.lib: $(TARGET_CLIB_DEPS) $(PPS_TARGETS)
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(TARGET_DIRECTORY)/pps/pps.lst
 
 # Apple II SoftCard CP/M lib - Stefano
-apple2.lib: cpm_clib.lib
+apple2.lib: cpm_clib.lib $(APPLE2_TARGETS)
 	@echo ''
 	@echo '--- Building Apple II SoftCard Library ---'
 	@echo ''
@@ -789,7 +725,7 @@ gfxkp.lib: cpm_clib.lib $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro83
 	TARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(TARGET_DIRECTORY)/kaypro83/gfxkp83.lst
 
-attache.lib: cpm_clib.lib
+attache.lib: cpm_clib.lib $(ATTACHE_TARGETS)
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
@@ -952,7 +888,7 @@ abc80_clib.lib: $(TARGET_CLIB_DEPS) $(ABC80_TARGETS)
 	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(TARGET_DIRECTORY)/abc80/abc80.lst
 
 # ABC800 library - Stefano
-abc800_clib.lib: $(TARGET_CLIB_DEPS) abc80_clib.lib
+abc800_clib.lib: $(TARGET_CLIB_DEPS) $(ABC800_TARGETS)
 	@echo ''
 	@echo '--- Building ABC800 Library ---'
 	@echo ''
@@ -1229,7 +1165,7 @@ smc777_cpm.lib: smc777_clib.lib
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(TARGET_DIRECTORY)/smc777/smc777_cpm.lst
 
 # A5105 library
-bic.lib: cpm_clib.lib
+bic.lib: cpm_clib.lib $(BIC_TARGETS)
 	@echo ''
 	@echo '--- Building A5105 Library ---'
 	@echo ''
