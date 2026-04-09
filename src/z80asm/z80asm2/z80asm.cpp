@@ -36,7 +36,7 @@ static void assemble_file(std::string_view filename) {
     // run preprocessor and get final token stream
     Preproc preproc;
     preproc.set_const_symbols(g_args.options.global_defs);
-    std::vector<Token> preprocessed_tokens = preproc.preprocess(filename);
+    std::vector<LogicalLine> preprocessed_tokens = preproc.preprocess(filename);
 }
 
 static void assemble_files() {
