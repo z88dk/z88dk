@@ -1,14 +1,8 @@
-target/mtx/stdio/fputc_cons
-target/mtx/stdio/fgetc_cons
-target/mtx/stdio/getk
+target/mtx/obj/**/*.o
 @classic/stdio/ansicore.lst
-
-target/mtx/time/clock
 @classic/video/tms9918/video_tms9918.lst
 @classic/stdio/stdio.lst
 @classic/gfx/narrow/gfx_narrow.lst
-target/mtx/games/joystick
 sound/sn76489/obj/${TYPE}_latch/**/*.o
 @classic/games/games.lst
-@target/mtx/rs232/rs232.lst
 

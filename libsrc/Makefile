@@ -248,6 +248,7 @@ include target/lynx/lynx.mak
 include target/mc1000/mc1000.mak
 include target/micro8085/micro8085.mak
 include target/mikro80/mikro80.mak
+include target/mtx/mtx.mak
 include target/multi8/multi8.mak
 include target/myvision/myvision.mak
 include target/mz/mz.mak
@@ -1123,12 +1124,11 @@ msx2.lib:
 	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
 
 # MTX library - Stefano
-mtx_clib.lib: $(TARGET_CLIB_DEPS)
+mtx_clib.lib: $(TARGET_CLIB_DEPS) $(MTX_TARGETS)
 	@echo ''
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(call buildgeneric,mtx)
-	$(MAKE) -C target/mtx
 	$(MAKE) -C classic/games TARGET=mtx
 	$(MAKE) -C classic/video/tms9918 TARGET=mtx
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(TARGET_DIRECTORY)/mtx/mtx.lst
