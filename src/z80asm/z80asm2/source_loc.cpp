@@ -21,6 +21,12 @@ SourceLoc::SourceLoc(std::string_view file, size_t ln, size_t col)
       column(static_cast<uint16_t>(col)) {
 }
 
+void SourceLoc::clear() {
+    file_id = 0;
+    line = 0;
+    column = 0;
+}
+
 bool SourceLoc::empty() const {
     return file_id == 0 && line == 0 && column == 0;
 }
