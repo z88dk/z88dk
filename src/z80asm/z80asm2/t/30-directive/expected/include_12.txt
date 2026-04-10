@@ -3,6 +3,3 @@ Assembling t/30-directive/input/include_12.asm...
 t/30-directive/input/include_12.asm:1:13: error: Unexpected token after INCLUDE: input
     #include no input file
                 ^
-t/30-directive/input/include_12.asm:1:10: error: File not found: no
-    #include no input file
-             ^

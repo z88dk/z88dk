@@ -21,11 +21,21 @@ void Preproc::dump_macro(const Macro& macro,
         header_tokens.push_back(Token::identifier("MACRO", macro.loc));
         header_tokens.push_back(Token::identifier(g_strings.view(macro.name_id),
                                 macro.loc));
+        if (macro.has_parenthesized_params) {
+            header_tokens.push_back(Token::token(
+                                        TokenType::LeftParen, "(", macro.loc));
+        }
 
         for (const auto& param_id : macro.params) {
             header_tokens.push_back(Token::identifier(g_strings.view(param_id),
                                     macro.loc));
         }
+
+        if (macro.has_parenthesized_params) {
+            header_tokens.push_back(Token::token(
+                                        TokenType::RightParen, ")", macro.loc));
+        }
+        header_tokens.push_back(Token::end_of_line(macro.loc));
 
         dump_tokens(header_tokens, cur_file_id);
 

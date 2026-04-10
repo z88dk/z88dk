@@ -104,7 +104,10 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         }
         else if (++expansion_depth > MAX_EXPANSION_DEPTH) {
             g_diag.error(ll.loc, "Macro expansion limit exceeded");
-            break;
+            // Drain all pending macro feedback to recover and
+            // continue processing remaining raw input lines
+            macro_work_queue.clear();
+            continue;
         }
 
         // ---------------------------------------------------------------------
@@ -158,10 +161,14 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         // e.g. X EQU 1 // IF X --> show know the value of X
         parse_asm_definitions(expanded);
 
-        // Append expanded tokens to final output
-        LogicalLine final_line(ll.loc);
-        final_line.tokens = std::move(expanded);
-        final_lines.push_back(std::move(final_line));
+        // Append expanded tokens to final output (skip empty lines
+        // produced by multi-line macro invocations that were fully
+        // consumed into the work queue)
+        if (!expanded.empty()) {
+            LogicalLine final_line(ll.loc);
+            final_line.tokens = std::move(expanded);
+            final_lines.push_back(std::move(final_line));
+        }
     }
 
     // -------------------------------------------------------------------------
