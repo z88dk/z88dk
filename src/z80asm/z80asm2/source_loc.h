@@ -21,6 +21,7 @@ struct SourceLoc {
     SourceLoc(StringInterner::Id file, size_t ln, size_t col);
     SourceLoc(std::string_view file, size_t ln, size_t col);
 
+    void clear();
     bool empty() const;
     std::string to_string() const;
 };

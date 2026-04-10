@@ -3,6 +3,3 @@ Assembling t/30-directive/input/binary_12.asm...
 t/30-directive/input/binary_12.asm:1:28: error: Unexpected token after BINARY: extra
     #binary file-not-found.bin extra
                                ^
-t/30-directive/input/binary_12.asm:1:9: error: File not found: file-not-found.bin
-    #binary file-not-found.bin extra
-            ^
