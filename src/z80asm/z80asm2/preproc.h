@@ -30,7 +30,7 @@ struct Macro {
 
 class Preproc {
 public:
-	Preproc() = default;
+    Preproc() = default;
 
     // copy defines from options, command line, or global scope
     void set_const_symbols(const ConstSymbols& defs);
@@ -40,7 +40,7 @@ public:
     std::vector<LogicalLine> preprocess(std::string_view filename);
 
 private:
-	
+
     // ---------------------------------------------------------------------
     // Include stack: tracks nested file inclusion
     // ---------------------------------------------------------------------
@@ -204,10 +204,14 @@ private:
     // expands it, pushing resulting lines to macro_work_queue
     void expand_line(const LogicalLine& in, std::vector<Token>& out_tokens);
 
+    // ---------------------------------------------------------------------
     // helpers for dumping state
+    // ---------------------------------------------------------------------
+
     void dump_logical_line(const LogicalLine& line,
                            StringInterner::Id& cur_file_id);
     void dump_macro(const Macro& macro,
                     StringInterner::Id& cur_file_id);
     void dump_macros();
+    void dump_symbols();
 };

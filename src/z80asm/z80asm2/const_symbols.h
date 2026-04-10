@@ -27,5 +27,7 @@ struct ConstSymbols {
     void set(std::string_view name, int value, const SourceLoc& loc);
     const ConstSymbol* get(std::string_view name) const;
     void erase(std::string_view name);
+
+    void dump_symbols() const;
 };
 

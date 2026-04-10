@@ -159,3 +159,5 @@ Identifier	"DEFINE"	4:9	keyword=DEFINE
 Identifier	"Y"	4:9	
 EQ	"="	4:9	
 Integer	"1"	4:10	int_value=1 
+symbol	X	1	(defined at t/30-directive/input/define_11.asm:2:15)
+symbol	Y	1	(defined at t/30-directive/input/define_11.asm:4:15)
