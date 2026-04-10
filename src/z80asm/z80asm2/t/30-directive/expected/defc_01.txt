@@ -32,3 +32,6 @@ EQ	"="	5:11
 Identifier	"external"	5:13	
 EndOfLine	"\n"	5:21	
 EndOfLine	"\n"	6:1	
+symbol	sym1	1	(defined at t/30-directive/input/defc_01.asm:1:6)
+symbol	sym2	6	(defined at t/30-directive/input/defc_01.asm:2:6)
+symbol	sym3	$14	(defined at t/30-directive/input/defc_01.asm:3:6)
