@@ -2746,7 +2746,7 @@ void SH_QUIT()
 	if (i_GetCh() == 'Y')
 	{
 		/* save */
-		fpsave=fopen("adv_a.sav","wb");
+		fpsave=fopen("adva.sav","wb");
 		fwrite(GVARS, sizeof(GVARS),1, fpsave);
 #ifdef COMPUTE_SCORE
 		fwrite(&nScore, sizeof(nScore),1, fpsave);
@@ -3141,7 +3141,7 @@ int main()
 		if (i_GetCh() == 'Y')
 		{
 		/* restore */
-			fpsave=fopen("adv_a.sav","rb");
+			fpsave=fopen("adva.sav","rb");
 			fread(GVARS, sizeof(GVARS),1, fpsave);
 #ifdef COMPUTE_SCORE
 			fread(&nScore, sizeof(nScore),1, fpsave);

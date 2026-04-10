@@ -1,6 +1,7 @@
 target/hdos/stdio/obj/${TYPE}/fgetc_cons
 target/hdos/stdio/obj/${TYPE}/getk
 target/hdos/stdio/obj/${TYPE}/fputc_cons
+target/hdos/stdio/obj/${TYPE}/generic_console
 target/hdos/hdos/obj/${TYPE}/hdos_ver
 target/hdos/hdos/obj/${TYPE}/hdos_decode
 target/hdos/hdos/obj/${TYPE}/hdos_decode_callee
