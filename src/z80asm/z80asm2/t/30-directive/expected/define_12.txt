@@ -84,3 +84,7 @@ Identifier	"M3"	7:15
 RightParen	")"	7:17	
 Multiply	"*"	7:18	
 Integer	"3"	7:19	int_value=3 
+symbol	M1	1	(defined at t/30-directive/input/define_12.asm:1:16)
+symbol	M2	1	(defined at t/30-directive/input/define_12.asm:3:18)
+symbol	M3	6	(defined at t/30-directive/input/define_12.asm:5:17)
+symbol	M4	$12	(defined at t/30-directive/input/define_12.asm:7:19)
