@@ -3,6 +3,3 @@ Assembling t/30-directive/input/include_23.asm...
 t/30-directive/input/include_23.asm:1:28: error: Unexpected token after INCLUDE: extra
     include file_not_found.inc extra
                                ^
-t/30-directive/input/include_23.asm:1:9: error: File not found: file_not_found.inc
-    include file_not_found.inc extra
-            ^

@@ -26,6 +26,7 @@ struct Macro {
     std::vector<StringInterner::Id> params;     // interned identifiers
     bool is_function_like = false;
     bool is_multiline = false;
+    bool has_parenthesized_params = false;      // defined with (p1,p2) vs p1,p2
 };
 
 class Preproc {
@@ -148,7 +149,12 @@ private:
                                     LogicalLine& out_line
                                    );
 
-    void check_end_of_line(const std::vector<Token>& input_line,
+    bool is_directive(const std::vector<Token>& input_line,
+                      size_t& pos,
+                      Keyword& out_kw,
+                      std::string& out_name,
+                      SourceLoc& out_name_loc);
+    bool check_end_of_line(const std::vector<Token>& input_line,
                            size_t& pos,
                            std::string_view directive_name);
     bool parse_filename(const std::vector<Token>& input_line,
@@ -165,15 +171,15 @@ private:
     bool parse_LINE_args(const std::vector<Token>& input_line, size_t& pos,
                          std::string_view directive_name,
                          size_t& out_linenum, std::string& out_filename);
-    bool parse_parameters(const std::vector<Token>& input_line, size_t& pos,
-                          std::vector<StringInterner::Id>& out_params);
-    bool collect_args(const std::vector<Token>& tokens, size_t& pos,
-                      std::vector<std::vector<Token>>& args);
-    std::vector<Token> substitute_params(
-        const std::vector<Token>& body,
-        const std::vector<StringInterner::Id>& params,
-        const std::vector<std::vector<Token>>& args,
-        const SourceLoc& call_loc);
+    bool parse_params(const std::vector<Token>& input_line,
+                      size_t& pos,
+                      std::vector<StringInterner::Id>& out_params,
+                      bool& out_has_parens);
+    bool read_macro_body(const SourceLoc& macro_loc,
+                         Keyword start_kw,
+                         Keyword end_kw,
+                         std::vector<LogicalLine>& out_lines);
+
     void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
 
@@ -195,10 +201,24 @@ private:
                            const std::vector<Token>& input_line, size_t& pos);
     void do_DEFL(const Macro& macro,
                  const std::vector<Token>& input_line, size_t& pos);
+    void process_MACRO(const std::vector<Token>& input_line, size_t& pos);
+    void process_name_MACRO(std::string_view name, const SourceLoc& name_loc,
+                            const std::vector<Token>& input_line, size_t& pos);
+    void do_MACRO(const Macro& macro);
+    void process_ENDM(const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
     // ---------------------------------------------------------------------
+
+    bool collect_args(const std::vector<Token>& tokens, size_t& pos,
+                      std::vector<std::vector<Token>>& args);
+    std::vector<Token> substitute_params(const std::vector<Token>& body,
+                                         const std::vector<StringInterner::Id>&
+                                         params,
+                                         const std::vector<std::vector<Token>>&
+                                         args,
+                                         const SourceLoc& call_loc);
 
     // macro expansion: takes a logical line with macro invocation tokens and
     // expands it, pushing resulting lines to macro_work_queue
