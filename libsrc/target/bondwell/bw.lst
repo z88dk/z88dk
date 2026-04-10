@@ -1,10 +1,5 @@
-target/bondwell/graphics/cleargraphics
-target/bondwell/graphics/textpixl6
-target/bondwell/ioctl/generic_console
-target/bondwell/ioctl/generic_console_scrollup
-target/bondwell/ioctl/generic_console_xypos
-target/bondwell/ioctl/generic_console_ioctl
-target/bondwell/playzb4
+target/bondwell/obj/${TARGET}/**/*.o
+
 @classic/gfx/gencon/gfx_gencon6.lst
 @classic/games/games.lst
 @classic/video/mc6845/mc6845.lst
