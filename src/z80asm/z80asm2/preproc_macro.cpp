@@ -289,8 +289,30 @@ void Preproc::expand_line(const LogicalLine& in,
                     ++arg_pos;
                 }
 
-                // Collect comma-separated arguments until EndOfLine
-                {
+                if (macro.has_parenthesized_params) {
+                    // Parenthesized form: M6(arg1, arg2)
+                    // Expect '(' immediately after name
+                    if (arg_pos >= work.size() ||
+                            work[arg_pos].type != TokenType::LeftParen) {
+                        g_diag.error(tok.loc,
+                                     "Expected '(' after macro '" +
+                                     g_strings.to_string(name_id) + "'");
+                        out_tokens.clear();
+                        return;
+                    }
+                    arg_pos++; // consume '('
+
+                    if (!collect_args(work, arg_pos, args)) {
+                        g_diag.error(tok.loc,
+                                     "Missing ')' in macro invocation: " +
+                                     g_strings.to_string(name_id));
+                        out_tokens.clear();
+                        return;
+                    }
+                }
+                else {
+                    // Bare form: M6 arg1, arg2
+                    // Collect comma-separated arguments until EndOfLine
                     std::vector<Token> current_arg;
                     int paren_depth = 0;
 
@@ -329,14 +351,23 @@ void Preproc::expand_line(const LogicalLine& in,
                                  std::to_string(macro.params.size()) +
                                  " arguments, got " +
                                  std::to_string(args.size()));
-                    out_tokens.push_back(Token::end_of_line(tok.loc));
+                    out_tokens.clear();
                     return;
                 }
 
                 // Expand each macro body line and push to work queue
                 for (const auto& body_line : macro.lines) {
+                    // Strip trailing EndOfLine from body tokens before
+                    // substitution; a fresh EndOfLine is appended below
+                    // so that parameter tokens get the call-site location.
+                    std::vector<Token> body_tokens = body_line.tokens;
+                    while (!body_tokens.empty() &&
+                            body_tokens.back().type == TokenType::EndOfLine) {
+                        body_tokens.pop_back();
+                    }
+
                     std::vector<Token> substituted =
-                        substitute_params(body_line.tokens, macro.params,
+                        substitute_params(body_tokens, macro.params,
                                           args, tok.loc);
 
                     LogicalLine ll;
@@ -347,8 +378,11 @@ void Preproc::expand_line(const LogicalLine& in,
                     macro_work_queue.push_back(std::move(ll));
                 }
 
-                // Multi-line macros consume the entire line
-                out_tokens.push_back(Token::end_of_line(tok.loc));
+                // Multi-line macros consume the entire line;
+                // the expanded body lines are in the work queue
+                // and will be emitted by next_logical_line.
+                // Return empty output for the invocation line.
+                out_tokens.clear();
                 return;
             }
 
