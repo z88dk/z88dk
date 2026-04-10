@@ -87,3 +87,7 @@ void Preproc::dump_macros() {
         dump_macro(*m, cur_file_id);
     }
 }
+
+void Preproc::dump_symbols() {
+    const_symbols.dump_symbols();
+}

@@ -10,6 +10,7 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
+#include <algorithm>
 #include <iostream>
 
 void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& loc) {
@@ -54,4 +55,25 @@ const ConstSymbol* ConstSymbols::get(std::string_view name) const {
 
 void ConstSymbols::erase(std::string_view name) {
     erase(g_strings.intern(name));
+}
+
+void ConstSymbols::dump_symbols() const {
+    // collect entries and sort by name
+    std::vector<const ConstSymbol*> sorted;
+    sorted.reserve(symbols.size());
+    for (const auto& pair : symbols) {
+        sorted.push_back(&pair.second);
+    }
+    std::sort(sorted.begin(), sorted.end(),
+    [](const ConstSymbol * a, const ConstSymbol * b) {
+        return g_strings.view(a->name_id) <
+               g_strings.view(b->name_id);
+    });
+
+    for (const ConstSymbol* sym : sorted) {
+        std::cout << "symbol\t" << g_strings.view(sym->name_id)
+                  << "\t" << int_to_hex(sym->value)
+                  << "\t(defined at " << sym->loc.to_string() << ")"
+                  << std::endl;
+    }
 }

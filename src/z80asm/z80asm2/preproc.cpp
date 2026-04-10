@@ -159,8 +159,8 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         parse_asm_definitions(expanded);
 
         // Append expanded tokens to final output
-		LogicalLine final_line(ll.loc);
-		final_line.tokens = std::move(expanded);
+        LogicalLine final_line(ll.loc);
+        final_line.tokens = std::move(expanded);
         final_lines.push_back(std::move(final_line));
     }
 
@@ -175,11 +175,13 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
 
     if (g_args.options.dump_after_preprocessing) {
         dump_logical_lines(final_lines, cur_file_id);
+        dump_symbols();
         exit(EXIT_SUCCESS);
     }
 
     if (g_args.options.dump_after_macro_expansion) {
         dump_macros();
+        dump_symbols();
         exit(EXIT_SUCCESS);
     }
 
@@ -189,4 +191,3 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
 
     return final_lines;
 }
-
