@@ -175,9 +175,8 @@ private:
                       size_t& pos,
                       std::vector<StringInterner::Id>& out_params,
                       bool& out_has_parens);
-    bool read_macro_body(const SourceLoc& macro_loc,
-                         Keyword start_kw,
-                         Keyword end_kw,
+    bool read_macro_body(Keyword start_kw,
+                         const SourceLoc& macro_loc,
                          std::vector<LogicalLine>& out_lines);
 
     void parse_asm_definitions(const std::vector<Token>& tokens);
@@ -204,15 +203,34 @@ private:
     void process_MACRO(const std::vector<Token>& input_line, size_t& pos);
     void process_name_MACRO(std::string_view name, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
-    void do_MACRO(const Macro& macro);
+    void do_MACRO(const Macro& macro, SourceLoc& kw_macro_loc);
     void process_ENDM(const std::vector<Token>& input_line, size_t& pos);
+    void process_REPT(const std::vector<Token>& input_line, size_t& pos);
+    void process_ENDR(const std::vector<Token>& input_line, size_t& pos);
+    void process_REPTI(const std::vector<Token>& input_line, size_t& pos);
+    void process_name_REPTI(std::string_view iter_name,
+                            const SourceLoc& kw_loc,
+                            const std::vector<Token>& input_line, size_t& pos);
+    void do_REPTI(std::string_view iter_name, const SourceLoc& kw_loc,
+                  const std::vector<Token>& input_line, size_t& pos);
+    void process_REPTC(const std::vector<Token>& input_line, size_t& pos);
+    void process_name_REPTC(std::string_view iter_name,
+                            const SourceLoc& kw_loc,
+                            const std::vector<Token>& input_line, size_t& pos);
+    void do_REPTC(std::string_view iter_name, const SourceLoc& kw_loc,
+                  const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
     // ---------------------------------------------------------------------
 
-    bool collect_args(const std::vector<Token>& tokens, size_t& pos,
-                      std::vector<std::vector<Token>>& args);
+    bool collect_args_impl(const std::vector<Token>& tokens, size_t& pos,
+                           std::vector<std::vector<Token>>& args,
+                           bool parenthesized);
+    bool collect_parens_args(const std::vector<Token>& tokens, size_t& pos,
+                             std::vector<std::vector<Token>>& args);
+    bool collect_bare_args(const std::vector<Token>& tokens, size_t& pos,
+                           std::vector<std::vector<Token>>& args);
     std::vector<Token> substitute_params(const std::vector<Token>& body,
                                          const std::vector<StringInterner::Id>&
                                          params,
