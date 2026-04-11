@@ -12,6 +12,27 @@
 #include "source_loc.h"
 #include "string_interner.h"
 
+void Preproc::push_macro_expansion(StringInterner::Id name_id,
+                                   std::deque<LogicalLine> lines) {
+    MacroExpansionFrame frame;
+    frame.name_id = name_id;
+    frame.exited = false;
+    frame.lines = std::move(lines);
+    macro_expansion_stack.push_back(std::move(frame));
+}
+
+bool Preproc::is_macro_exited() const {
+    // Walk the stack top-down to find the innermost frame whose
+    // exited flag is set
+    for (auto it = macro_expansion_stack.rbegin();
+            it != macro_expansion_stack.rend(); ++it) {
+        if (it->exited) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Preproc::next_logical_line(LogicalLine& out) {
     // -----------------------------------------------------
     // Assembler output queue has priority
@@ -25,11 +46,18 @@ bool Preproc::next_logical_line(LogicalLine& out) {
     }
 
     // -----------------------------------------------------
-    // Macro feedback queue comes next
+    // Macro expansion stack comes next: pop lines from the
+    // topmost frame; when a frame is exhausted, pop it
     // -----------------------------------------------------
-    if (!macro_work_queue.empty()) {
-        out = macro_work_queue.front();
-        macro_work_queue.pop_front();
+    while (!macro_expansion_stack.empty()) {
+        auto& top = macro_expansion_stack.back();
+        if (top.lines.empty()) {
+            macro_expansion_stack.pop_back();
+            continue;
+        }
+
+        out = top.lines.front();
+        top.lines.pop_front();
         out.origin = LineOrigin::MacroFeedback;
         return true;
     }
@@ -106,7 +134,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
             g_diag.error(ll.loc, "Macro expansion limit exceeded");
             // Drain all pending macro feedback to recover and
             // continue processing remaining raw input lines
-            macro_work_queue.clear();
+            macro_expansion_stack.clear();
             continue;
         }
 
@@ -148,7 +176,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
             expanded = processed.tokens;
         }
         else {
-            // may push into macro_work_queue
+            // may push into macro_expansion_stack
             expand_line(processed, expanded);
         }
 

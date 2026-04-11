@@ -1,0 +1,36 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/exitm_01.asm
+Assembling t/30-directive/input/exitm_01.asm...
+t/30-directive/input/exitm_01.asm:1:1: error: EXITM outside of macro expansion
+    exitm ; outside macro
+    ^
+t/30-directive/input/exitm_01.asm:3:8: error: Unexpected token after EXITM: extra
+    	exitm extra ; extra input
+    	      ^
+t/30-directive/input/exitm_01.asm:7:2: error: EXITM outside of macro expansion
+    	exitm ; outside macro
+    	^
+t/30-directive/input/exitm_01.asm:7:2: error: EXITM outside of macro expansion
+    	exitm ; outside macro
+    	^
+t/30-directive/input/exitm_01.asm:10:2: error: EXITM outside of macro expansion
+    	exitm ; outside macro
+    	^
+t/30-directive/input/exitm_01.asm:10:2: error: EXITM outside of macro expansion
+    	exitm ; outside macro
+    	^
+t/30-directive/input/exitm_01.asm:13:2: error: EXITM outside of macro expansion
+    	exitm ; outside macro
+    	^
+t/30-directive/input/exitm_01.asm:13:2: error: EXITM outside of macro expansion
+    	exitm ; outside macro
+    	^
+# file: t/30-directive/input/exitm_01.asm
+EndOfLine	"\n"	15:1	
+# file: t/30-directive/input/exitm_01.asm
+Identifier	"MACRO"	2:7	keyword=MACRO 
+Identifier	"X"	2:7	keyword=X 
+EndOfLine	"\n"	2:7	
+Identifier	"exitm"	3:2	keyword=EXITM 
+Identifier	"extra"	3:8	
+EndOfLine	"\n"	3:13	
+Identifier	"ENDM"	2:7	keyword=ENDM 
