@@ -58,7 +58,7 @@ sub check_text_file {
 	if ($diff ne "") {
 		diag $diff;
 		if ($ENV{DEBUG}) {
-			system("start \"\" '/c/Program Files (x86)/WinMerge/WinMergeU.exe' ".
+			system("start \"\" '/c/Program Files/WinMerge/WinMergeU.exe' ".
 				   "$exp_file $got_file");
 		}
 	}

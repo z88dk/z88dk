@@ -9,7 +9,6 @@
 #include "const_symbols.h"
 #include "file_mgr.h"
 #include "lexer_tokens.h"
-#include "preproc.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <deque>
@@ -82,13 +81,15 @@ private:
     // Conditional stack: IF / ELSEIF / ELSE / ENDIF
     // ---------------------------------------------------------------------
     struct ConditionalFrame {
-        bool parent_active = true;
-        bool this_branch_taken = false;
-        bool currently_active = true;
-        SourceLoc if_loc;   // for error reporting
+        SourceLoc if_loc;           // location of the IF/ELIF/ELSE
+        bool branch_active = false; // whether this level currently includes text
+        bool any_taken = false;     // whether any previous branch in this chain matched
+        bool seen_else = false;     // whether ELSE already occurred
     };
 
     std::vector<ConditionalFrame> cond_stack;
+
+    bool is_cond_active() const;
 
     // ---------------------------------------------------------------------
     // Macro expansion stack:
@@ -197,6 +198,8 @@ private:
                          const SourceLoc& macro_loc,
                          std::vector<LogicalLine>& out_lines,
                          std::vector<StringInterner::Id>& out_locals);
+    bool eval_if_expr(const std::vector<Token>& input_line, size_t& pos,
+                      Keyword kw);
 
     void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
@@ -243,6 +246,10 @@ private:
                             const SourceLoc& kw_loc,
                             const std::vector<Token>& input_line, size_t& pos);
     void process_EXITM(const std::vector<Token>& input_line, size_t& pos);
+    void process_IF(const std::vector<Token>& input_line, size_t& pos);
+    void process_ELSEIF(const std::vector<Token>& input_line, size_t& pos);
+    void process_ELSE(const std::vector<Token>& input_line, size_t& pos);
+    void process_ENDIF(const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
