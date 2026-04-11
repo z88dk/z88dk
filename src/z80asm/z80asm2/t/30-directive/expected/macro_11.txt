@@ -89,9 +89,6 @@ t/30-directive/input/macro_11.asm:27:2: error: Unexpected ENDM directive
 t/30-directive/input/macro_11.asm:32:9: error: Expected '(' after macro 'M5'
     .label1 M5 1,2 ; expect parens
             ^
-Dot	"."	32:1	
-Identifier	"label1"	32:2	
-EndOfLine	"\n"	32:9	
 Dot	"."	33:1	
 Identifier	"label2"	33:2	
 EndOfLine	"\n"	33:9	
@@ -121,33 +118,18 @@ EndOfLine	"\n"	38:9
 t/30-directive/input/macro_11.asm:39:9: error: Macro 'M6' expects 2 arguments, got 1
     .label4 M6 (1,2) ; only one argmnent
             ^
-Dot	"."	39:1	
-Identifier	"label4"	39:2	
-EndOfLine	"\n"	39:9	
 t/30-directive/input/macro_11.asm:40:9: error: Macro 'M6' expects 2 arguments, got 0
     .label5 M6 ; wrong number of arguments
             ^
-Dot	"."	40:1	
-Identifier	"label5"	40:2	
-EndOfLine	"\n"	40:9	
 t/30-directive/input/macro_11.asm:41:11: error: Unmatched '('
     .label6 M6( ; missing ')'
               ^
-Dot	"."	41:1	
-Identifier	"label6"	41:2	
-EndOfLine	"\n"	41:9	
 t/30-directive/input/macro_11.asm:42:13: error: Unmatched ')'
     .label6 M6 1) ; missing '('
                 ^
-Dot	"."	42:1	
-Identifier	"label6"	42:2	
-EndOfLine	"\n"	42:9	
 t/30-directive/input/macro_11.asm:43:9: error: Macro 'M6' expects 2 arguments, got 3
     .label7 M6 1,2,3 ; argument mismatch
             ^
-Dot	"."	43:1	
-Identifier	"label7"	43:2	
-EndOfLine	"\n"	43:9	
 Dot	"."	44:1	
 Identifier	"label8"	44:2	
 EndOfLine	"\n"	44:9	

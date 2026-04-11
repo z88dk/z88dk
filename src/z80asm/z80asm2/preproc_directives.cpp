@@ -44,6 +44,7 @@ Preproc::directive_handlers_ = {
     { Keyword::REPTI,    &Preproc::process_REPTI },
     { Keyword::REPTC,    &Preproc::process_REPTC },
     { Keyword::ENDR,     &Preproc::process_ENDR },
+    { Keyword::EXITM,    &Preproc::process_EXITM },
 };
 
 std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
@@ -669,6 +670,7 @@ void Preproc::process_BINARY(const std::vector<Token>& input_line,
     }
 
     // Emit tokens for binary data: one token per byte, with value = byte value
+    std::deque<LogicalLine> binary_lines;
     for (size_t i = 0; i < data->size(); i += BYTES_PER_LINE) {
         LogicalLine line(filename_loc);
         line.tokens.reserve(1 + 2 * BYTES_PER_LINE + 1); // DEFB b1,...,bN <EOL>
@@ -688,8 +690,9 @@ void Preproc::process_BINARY(const std::vector<Token>& input_line,
 
         line.tokens.push_back(Token::end_of_line(filename_loc));
 
-        macro_work_queue.push_back(std::move(line));
+        binary_lines.push_back(std::move(line));
     }
+    push_macro_expansion(0, std::move(binary_lines));
 
     // generate dependency for included file
     StringInterner::Id resolved_id =
@@ -1189,6 +1192,7 @@ void Preproc::process_REPT(const std::vector<Token>& input_line,
     // Push the body lines repeated repeat_count times to the work queue
     std::vector<StringInterner::Id> no_params;
     std::vector<std::vector<Token>> no_args;
+    std::deque<LogicalLine> rept_lines;
     for (int i = 0; i < repeat_count; ++i) {
         for (const auto& body_line : body) {
             std::vector<Token> substituted =
@@ -1203,9 +1207,10 @@ void Preproc::process_REPT(const std::vector<Token>& input_line,
             }
             ll.loc = kw_loc;
 
-            macro_work_queue.push_back(std::move(ll));
+            rept_lines.push_back(std::move(ll));
         }
     }
+    push_macro_expansion(0, std::move(rept_lines));
 }
 
 void Preproc::process_ENDR(const std::vector<Token>& input_line,
@@ -1280,9 +1285,8 @@ void Preproc::do_REPTI(std::string_view iter_name,
     StringInterner::Id iter_id = g_strings.intern(iter_name);
     std::vector<StringInterner::Id> params = { iter_id };
 
-    // Expand the body once per argument, replacing iter_name with
-    // the tokens of each argument. Reuses substitute_params from
-    // the macro expansion engine.
+    // Expand the body once per argument
+    std::deque<LogicalLine> repti_lines;
     for (const auto& arg : args) {
         std::vector<std::vector<Token>> single_arg = { arg };
 
@@ -1299,9 +1303,10 @@ void Preproc::do_REPTI(std::string_view iter_name,
             }
             ll.loc = kw_loc;
 
-            macro_work_queue.push_back(std::move(ll));
+            repti_lines.push_back(std::move(ll));
         }
     }
+    push_macro_expansion(0, std::move(repti_lines));
 }
 
 void Preproc::process_REPTC(const std::vector<Token>& input_line,
@@ -1397,8 +1402,8 @@ void Preproc::do_REPTC(std::string_view iter_name,
     StringInterner::Id iter_id = g_strings.intern(iter_name);
     std::vector<StringInterner::Id> params = { iter_id };
 
-    // Iterate over each character, replacing iter_name with an integer
-    // token whose value is the character code
+    // Iterate over each character
+    std::deque<LogicalLine> reptc_lines;
     for (char ch : chars) {
         int char_val = static_cast<unsigned char>(ch);
         Token char_token = Token::integer(std::to_string(char_val),
@@ -1418,9 +1423,10 @@ void Preproc::do_REPTC(std::string_view iter_name,
             }
             ll.loc = kw_loc;
 
-            macro_work_queue.push_back(std::move(ll));
+            reptc_lines.push_back(std::move(ll));
         }
     }
+    push_macro_expansion(0, std::move(reptc_lines));
 }
 
 void Preproc::process_LOCAL(const std::vector<Token>& input_line,
@@ -1435,6 +1441,28 @@ void Preproc::process_name_LOCAL(std::string_view,
                                  const std::vector<Token>&,
                                  size_t&) {
     g_diag.error(kw_loc, "Unexpected LOCAL directive");
+}
+
+void Preproc::process_EXITM(const std::vector<Token>& input_line,
+                            size_t& pos) {
+    assert(pos > 0 && input_line[pos - 1].keyword == Keyword::EXITM);
+    SourceLoc kw_loc = input_line[pos - 1].loc;
+
+    if (!check_end_of_line(input_line, pos, "EXITM")) {
+        return;
+    }
+
+    // Search the expansion stack top-down for the first frame
+    // created by a macro invocation (name_id != 0)
+    for (auto it = macro_expansion_stack.rbegin();
+            it != macro_expansion_stack.rend(); ++it) {
+        if (it->name_id != 0) {
+            it->exited = true;
+            return;
+        }
+    }
+
+    g_diag.error(kw_loc, "EXITM outside of macro expansion");
 }
 
 //-----------------------------------------------------------------------------
@@ -1466,10 +1494,12 @@ Preproc::LineType Preproc::process_directive_line(
     const Token& first_tok = input_line[pos];
 
     // ---------------------------------------------------------------------
-    // 2. If inside inactive conditional block, only IF/ELSEIF/ELSE/ENDIF run
+    // 2. If inside inactive conditional block or exited macro,
+    //    only IF/ELSEIF/ELSE/ENDIF run
     // ---------------------------------------------------------------------
-    bool cond_active = cond_stack.empty() ||
-                       cond_stack.back().currently_active;
+    bool cond_active = (cond_stack.empty() ||
+                        cond_stack.back().currently_active) &&
+                       !is_macro_exited();
 
     // ---------------------------------------------------------------------
     // 3. Check if first token is a directive keyword (possibly after #)
