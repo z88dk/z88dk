@@ -15,15 +15,20 @@
 #include <vector>
 
 // Collect comma-separated arguments from tokens[pos] onward.
-// Expects tokens[pos-1] was '('. Handles nested parentheses.
-// Advances pos past the closing ')'.
-// Returns false on error (missing ')').
-bool Preproc::collect_args(const std::vector<Token>& tokens, size_t& pos,
-                           std::vector<std::vector<Token>>& args) {
+// If parenthesized is true, expects tokens[pos-1] was '(' and collects
+// until the matching ')'. Returns false on error (missing ')').
+// If parenthesized is false, collects bare arguments until EndOfLine.
+// Returns false on error (unbalanced parentheses).
+// Handles nested parentheses in both modes.
+bool Preproc::collect_args_impl(const std::vector<Token>& tokens, size_t& pos,
+                                std::vector<std::vector<Token>>& args,
+                                bool parenthesized) {
     args.clear();
 
-    // Handle empty argument list: immediately closed
-    if (pos < tokens.size() && tokens[pos].type == TokenType::RightParen) {
+    // Handle empty parenthesized argument list: immediately closed
+    if (parenthesized &&
+            pos < tokens.size() &&
+            tokens[pos].type == TokenType::RightParen) {
         pos++;
         return true;
     }
@@ -35,7 +40,7 @@ bool Preproc::collect_args(const std::vector<Token>& tokens, size_t& pos,
         const Token& tok = tokens[pos];
 
         if (tok.type == TokenType::EndOfLine) {
-            break; // unterminated
+            break;
         }
 
         if (tok.type == TokenType::LeftParen) {
@@ -44,11 +49,16 @@ bool Preproc::collect_args(const std::vector<Token>& tokens, size_t& pos,
             pos++;
         }
         else if (tok.type == TokenType::RightParen) {
-            if (paren_depth == 0) {
-                // End of arguments
+            if (parenthesized && paren_depth == 0) {
+                // End of parenthesized arguments
                 args.push_back(std::move(current_arg));
                 pos++; // consume ')'
                 return true;
+            }
+            if (paren_depth == 0) {
+                // Unmatched ')' in bare mode
+                g_diag.error(tok.loc, "Unmatched ')'");
+                return false;
             }
             paren_depth--;
             current_arg.push_back(tok);
@@ -65,7 +75,33 @@ bool Preproc::collect_args(const std::vector<Token>& tokens, size_t& pos,
         }
     }
 
-    return false; // missing ')'
+    // Bare mode: check for unbalanced '('
+    if (!parenthesized) {
+        if (paren_depth > 0) {
+            // Find the location of the unmatched '(' for the error
+            // Use the last token's location as a fallback
+            SourceLoc err_loc = (pos > 0 && pos <= tokens.size())
+                                ? tokens[pos - 1].loc : SourceLoc();
+            g_diag.error(err_loc, "Unmatched '('");
+            return false;
+        }
+        if (!current_arg.empty()) {
+            args.push_back(std::move(current_arg));
+        }
+        return true;
+    }
+
+    return false; // parenthesized mode: missing ')'
+}
+
+bool Preproc::collect_parens_args(const std::vector<Token>& tokens, size_t& pos,
+                                  std::vector<std::vector<Token>>& args) {
+    return collect_args_impl(tokens, pos, args, true);
+}
+
+bool Preproc::collect_bare_args(const std::vector<Token>& tokens, size_t& pos,
+                                std::vector<std::vector<Token>>& args) {
+    return collect_args_impl(tokens, pos, args, false);
 }
 
 // Substitute macro parameters in a token list.
@@ -302,7 +338,7 @@ void Preproc::expand_line(const LogicalLine& in,
                     }
                     arg_pos++; // consume '('
 
-                    if (!collect_args(work, arg_pos, args)) {
+                    if (!collect_parens_args(work, arg_pos, args)) {
                         g_diag.error(tok.loc,
                                      "Missing ')' in macro invocation: " +
                                      g_strings.to_string(name_id));
@@ -312,33 +348,9 @@ void Preproc::expand_line(const LogicalLine& in,
                 }
                 else {
                     // Bare form: M6 arg1, arg2
-                    // Collect comma-separated arguments until EndOfLine
-                    std::vector<Token> current_arg;
-                    int paren_depth = 0;
-
-                    while (arg_pos < work.size() &&
-                            work[arg_pos].type != TokenType::EndOfLine) {
-                        const Token& at = work[arg_pos];
-                        if (at.type == TokenType::LeftParen) {
-                            paren_depth++;
-                            current_arg.push_back(at);
-                        }
-                        else if (at.type == TokenType::RightParen) {
-                            paren_depth--;
-                            current_arg.push_back(at);
-                        }
-                        else if (at.type == TokenType::Comma &&
-                                 paren_depth == 0) {
-                            args.push_back(std::move(current_arg));
-                            current_arg.clear();
-                        }
-                        else {
-                            current_arg.push_back(at);
-                        }
-                        arg_pos++;
-                    }
-                    if (!current_arg.empty()) {
-                        args.push_back(std::move(current_arg));
+                    if (!collect_bare_args(work, arg_pos, args)) {
+                        out_tokens.clear();
+                        return; // error already emitted by collect_bare_args()
                     }
                 }
 
@@ -411,7 +423,7 @@ void Preproc::expand_line(const LogicalLine& in,
 
                 // Collect arguments
                 std::vector<std::vector<Token>> args;
-                if (!collect_args(work, paren_pos, args)) {
+                if (!collect_parens_args(work, paren_pos, args)) {
                     g_diag.error(work[paren_pos].loc,
                                  "Missing ')' in macro invocation: " +
                                  g_strings.to_string(name_id));
