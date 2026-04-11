@@ -1,0 +1,144 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/local_02.asm
+Assembling t/30-directive/input/local_02.asm...
+# file: t/30-directive/input/local_02.asm
+Identifier	"L1_1"	4:1	
+Colon	":"	4:3	
+Identifier	"jr"	4:5	keyword=JR 
+Identifier	"L1_1"	4:8	
+EndOfLine	"\n"	8:1	
+Identifier	"L2_2"	5:1	
+Colon	":"	5:3	
+Identifier	"jr"	5:5	keyword=JR 
+Identifier	"L2_2"	5:8	
+EndOfLine	"\n"	8:1	
+Identifier	"L3"	6:1	
+Colon	":"	6:3	
+Identifier	"jr"	6:5	keyword=JR 
+Identifier	"L3"	6:8	
+EndOfLine	"\n"	8:1	
+Identifier	"L1_4"	4:1	
+Colon	":"	4:3	
+Identifier	"jr"	4:5	keyword=JR 
+Identifier	"L1_4"	4:8	
+EndOfLine	"\n"	9:1	
+Identifier	"L2_5"	5:1	
+Colon	":"	5:3	
+Identifier	"jr"	5:5	keyword=JR 
+Identifier	"L2_5"	5:8	
+EndOfLine	"\n"	9:1	
+Identifier	"L3"	6:1	
+Colon	":"	6:3	
+Identifier	"jr"	6:5	keyword=JR 
+Identifier	"L3"	6:8	
+EndOfLine	"\n"	9:1	
+Identifier	"L1_7"	13:1	
+Colon	":"	13:3	
+Identifier	"jr"	13:5	keyword=JR 
+Identifier	"L1_7"	13:8	
+EndOfLine	"\n"	13:10	
+Identifier	"L2_8"	14:1	
+Colon	":"	14:3	
+Identifier	"jr"	14:5	keyword=JR 
+Identifier	"L2_8"	14:8	
+EndOfLine	"\n"	14:10	
+Identifier	"L3"	15:1	
+Colon	":"	15:3	
+Identifier	"jr"	15:5	keyword=JR 
+Identifier	"L3"	15:8	
+EndOfLine	"\n"	15:10	
+Identifier	"L1_10"	13:1	
+Colon	":"	13:3	
+Identifier	"jr"	13:5	keyword=JR 
+Identifier	"L1_10"	13:8	
+EndOfLine	"\n"	13:10	
+Identifier	"L2_11"	14:1	
+Colon	":"	14:3	
+Identifier	"jr"	14:5	keyword=JR 
+Identifier	"L2_11"	14:8	
+EndOfLine	"\n"	14:10	
+Identifier	"L3"	15:1	
+Colon	":"	15:3	
+Identifier	"jr"	15:5	keyword=JR 
+Identifier	"L3"	15:8	
+EndOfLine	"\n"	15:10	
+Identifier	"L1_13"	20:1	
+Colon	":"	20:3	
+Identifier	"jr"	20:5	keyword=JR 
+Identifier	"L1_13"	20:8	
+EndOfLine	"\n"	20:10	
+Identifier	"L2_14"	21:1	
+Colon	":"	21:3	
+Identifier	"jr"	21:5	keyword=JR 
+Identifier	"L2_14"	21:8	
+EndOfLine	"\n"	21:10	
+Identifier	"L3"	22:1	
+Colon	":"	22:3	
+Identifier	"jr"	22:5	keyword=JR 
+Identifier	"L3"	22:8	
+EndOfLine	"\n"	22:10	
+Identifier	"L1_16"	20:1	
+Colon	":"	20:3	
+Identifier	"jr"	20:5	keyword=JR 
+Identifier	"L1_16"	20:8	
+EndOfLine	"\n"	20:10	
+Identifier	"L2_17"	21:1	
+Colon	":"	21:3	
+Identifier	"jr"	21:5	keyword=JR 
+Identifier	"L2_17"	21:8	
+EndOfLine	"\n"	21:10	
+Identifier	"L3"	22:1	
+Colon	":"	22:3	
+Identifier	"jr"	22:5	keyword=JR 
+Identifier	"L3"	22:8	
+EndOfLine	"\n"	22:10	
+Identifier	"L1_19"	27:1	
+Colon	":"	27:3	
+Identifier	"jr"	27:5	keyword=JR 
+Identifier	"L1_19"	27:8	
+EndOfLine	"\n"	27:10	
+Identifier	"L2_20"	28:1	
+Colon	":"	28:3	
+Identifier	"jr"	28:5	keyword=JR 
+Identifier	"L2_20"	28:8	
+EndOfLine	"\n"	28:10	
+Identifier	"L3"	29:1	
+Colon	":"	29:3	
+Identifier	"jr"	29:5	keyword=JR 
+Identifier	"L3"	29:8	
+EndOfLine	"\n"	29:10	
+Identifier	"L1_22"	27:1	
+Colon	":"	27:3	
+Identifier	"jr"	27:5	keyword=JR 
+Identifier	"L1_22"	27:8	
+EndOfLine	"\n"	27:10	
+Identifier	"L2_23"	28:1	
+Colon	":"	28:3	
+Identifier	"jr"	28:5	keyword=JR 
+Identifier	"L2_23"	28:8	
+EndOfLine	"\n"	28:10	
+Identifier	"L3"	29:1	
+Colon	":"	29:3	
+Identifier	"jr"	29:5	keyword=JR 
+Identifier	"L3"	29:8	
+EndOfLine	"\n"	29:10	
+EndOfLine	"\n"	31:1	
+# file: t/30-directive/input/local_02.asm
+Identifier	"MACRO"	1:7	keyword=MACRO 
+Identifier	"M1"	1:7	
+EndOfLine	"\n"	1:7	
+Identifier	"L1"	4:1	
+Colon	":"	4:3	
+Identifier	"jr"	4:5	keyword=JR 
+Identifier	"L1"	4:8	
+EndOfLine	"\n"	4:10	
+Identifier	"L2"	5:1	
+Colon	":"	5:3	
+Identifier	"jr"	5:5	keyword=JR 
+Identifier	"L2"	5:8	
+EndOfLine	"\n"	5:10	
+Identifier	"L3"	6:1	
+Colon	":"	6:3	
+Identifier	"jr"	6:5	keyword=JR 
+Identifier	"L3"	6:8	
+EndOfLine	"\n"	6:10	
+Identifier	"ENDM"	1:7	keyword=ENDM 
