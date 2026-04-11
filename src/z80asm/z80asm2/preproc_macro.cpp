@@ -331,18 +331,6 @@ void Preproc::expand_line(const LogicalLine& in,
             // Classical multi-line macro
             // ---------------------------------------------------------
             if (macro.is_multiline) {
-                // Emit any tokens before the macro name as a separate
-                // line (e.g. a label definition like "foo: MYMACRO arg")
-                if (i > 0) {
-                    LogicalLine prefix;
-                    prefix.tokens.insert(prefix.tokens.end(),
-                                         work.begin(),
-                                         work.begin() + i);
-                    prefix.tokens.push_back(Token::end_of_line(tok.loc));
-                    prefix.loc = work[0].loc;
-                    macro_work_queue.push_back(std::move(prefix));
-                }
-
                 // Collect arguments from tokens after the macro name
                 size_t arg_pos = i + 1;
                 std::vector<std::vector<Token>> args;
@@ -395,7 +383,22 @@ void Preproc::expand_line(const LogicalLine& in,
                     return;
                 }
 
-                // Expand each macro body line and push to work queue
+                // Build all expanded lines in a single deque
+                std::deque<LogicalLine> expanded_lines;
+
+                // Emit any tokens before the macro name as a separate
+                // line (e.g. a label definition like "foo: MYMACRO arg")
+                if (i > 0) {
+                    LogicalLine prefix;
+                    prefix.tokens.insert(prefix.tokens.end(),
+                                         work.begin(),
+                                         work.begin() + i);
+                    prefix.tokens.push_back(Token::end_of_line(tok.loc));
+                    prefix.loc = work[0].loc;
+                    expanded_lines.push_back(std::move(prefix));
+                }
+
+                // Expand each macro body line
                 for (const auto& body_line : macro.lines) {
                     // Strip trailing EndOfLine from body tokens before
                     // substitution; a fresh EndOfLine is appended below
@@ -415,8 +418,10 @@ void Preproc::expand_line(const LogicalLine& in,
                     ll.tokens.push_back(Token::end_of_line(tok.loc));
                     ll.loc = tok.loc;
 
-                    macro_work_queue.push_back(std::move(ll));
+                    expanded_lines.push_back(std::move(ll));
                 }
+
+                push_macro_expansion(name_id, std::move(expanded_lines));
 
                 // Multi-line macros consume the entire line;
                 // the expanded body lines are in the work queue
