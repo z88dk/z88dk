@@ -108,11 +108,28 @@ bool Preproc::collect_bare_args(const std::vector<Token>& tokens, size_t& pos,
 // For each token that matches a parameter name, replace with the
 // corresponding argument tokens. Handles # (stringification) and
 // ## (token pasting).
+// If locals is non-empty, each local label name is replaced by
+// name_N where N is a unique counter incremented per invocation.
 std::vector<Token> Preproc::substitute_params(
     const std::vector<Token>& body,
     const std::vector<StringInterner::Id>& params,
     const std::vector<std::vector<Token>>& args,
-    const SourceLoc& call_loc) {
+    const SourceLoc& call_loc,
+    const std::vector<StringInterner::Id>& locals) {
+
+    // Build local label replacement map: name -> name_N
+    // The counter is static so that each expansion site gets a unique suffix
+    static int local_counter = 0;
+
+    std::unordered_map<StringInterner::Id, StringInterner::Id> local_map;
+    if (!locals.empty()) {
+        ++local_counter;
+        std::string suffix = "_" + std::to_string(local_counter);
+        for (StringInterner::Id id : locals) {
+            std::string replacement = g_strings.to_string(id) + suffix;
+            local_map[id] = g_strings.intern(replacement);
+        }
+    }
 
     std::vector<Token> result;
     size_t n = body.size();
@@ -223,6 +240,17 @@ std::vector<Token> Preproc::substitute_params(
                     }
                 }
                 // else: missing argument, substitute nothing
+                continue;
+            }
+
+            // ---------------------------------------------------
+            // Local label substitution
+            // ---------------------------------------------------
+            auto lit = local_map.find(tok.text_id);
+            if (lit != local_map.end()) {
+                Token replaced = tok;
+                replaced.text_id = lit->second;
+                result.push_back(replaced);
                 continue;
             }
         }
@@ -380,7 +408,7 @@ void Preproc::expand_line(const LogicalLine& in,
 
                     std::vector<Token> substituted =
                         substitute_params(body_tokens, macro.params,
-                                          args, tok.loc);
+                                          args, tok.loc, macro.locals);
 
                     LogicalLine ll;
                     ll.tokens = std::move(substituted);
@@ -445,7 +473,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 // Substitute parameters in macro body
                 std::vector<Token> substituted =
                     substitute_params(macro.tokens, macro.params,
-                                      args, tok.loc);
+                                      args, tok.loc, macro.locals);
 
                 // Build the new hide set for replacement tokens:
                 // inherit the hide set of the invocation token + add

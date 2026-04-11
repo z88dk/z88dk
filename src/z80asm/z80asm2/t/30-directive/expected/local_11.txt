@@ -1,0 +1,39 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/local_11.asm
+Assembling t/30-directive/input/local_11.asm...
+t/30-directive/input/local_11.asm:1:1: error: Unknown preprocessor directive: LOCAL
+    #local ; outside macro
+    ^
+t/30-directive/input/local_11.asm:2:1: error: Unknown preprocessor directive: LOCAL
+    #local X; outside macro
+    ^
+t/30-directive/input/local_11.asm:7:9: error: Unexpected token after LOCAL: 12
+    	#local 12 ; no variable
+    	       ^
+t/30-directive/input/local_11.asm:8:2: error: Unexpected ENDM directive
+    #endm
+     ^
+t/30-directive/input/local_11.asm:10:15: error: Identifier expected
+    	#local label, ; missing variable
+    	             ^
+t/30-directive/input/local_11.asm:11:2: error: Unexpected ENDM directive
+    #endm
+     ^
+t/30-directive/input/local_11.asm:13:15: error: Unexpected token after LOCAL: extra
+    	#local l1,l2 extra ; extra input
+    	             ^
+t/30-directive/input/local_11.asm:14:2: error: Unexpected ENDM directive
+    #endm
+     ^
+t/30-directive/input/local_11.asm:16:12: error: Parameter redefined: l1
+    	#local l1,l1 ; duplicate parameter
+    	          ^
+t/30-directive/input/local_11.asm:17:2: error: Unexpected ENDM directive
+    #endm
+     ^
+# file: t/30-directive/input/local_11.asm
+EndOfLine	"\n"	18:1	
+# file: t/30-directive/input/local_11.asm
+Identifier	"MACRO"	3:8	keyword=MACRO 
+Identifier	"M1"	3:8	
+EndOfLine	"\n"	3:8	
+Identifier	"ENDM"	3:8	keyword=ENDM 
