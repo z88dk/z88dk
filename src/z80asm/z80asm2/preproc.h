@@ -22,8 +22,9 @@ struct Macro {
     StringInterner::Id name_id;                 // interned identifier
     SourceLoc loc;                              // where it was defined
     std::vector<Token> tokens;                  // object/function-like
-    std::vector<LogicalLine> lines;      		// classical multi-line
+    std::vector<LogicalLine> lines;             // classical multi-line
     std::vector<StringInterner::Id> params;     // interned identifiers
+    std::vector<StringInterner::Id> locals;     // LOCAL label names
     bool is_function_like = false;
     bool is_multiline = false;
     bool has_parenthesized_params = false;      // defined with (p1,p2) vs p1,p2
@@ -177,7 +178,8 @@ private:
                       bool& out_has_parens);
     bool read_macro_body(Keyword start_kw,
                          const SourceLoc& macro_loc,
-                         std::vector<LogicalLine>& out_lines);
+                         std::vector<LogicalLine>& out_lines,
+                         std::vector<StringInterner::Id>& out_locals);
 
     void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
@@ -219,6 +221,10 @@ private:
                             const std::vector<Token>& input_line, size_t& pos);
     void do_REPTC(std::string_view iter_name, const SourceLoc& kw_loc,
                   const std::vector<Token>& input_line, size_t& pos);
+    void process_LOCAL(const std::vector<Token>& input_line, size_t& pos);
+    void process_name_LOCAL(std::string_view iter_name,
+                            const SourceLoc& kw_loc,
+                            const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
@@ -236,7 +242,9 @@ private:
                                          params,
                                          const std::vector<std::vector<Token>>&
                                          args,
-                                         const SourceLoc& call_loc);
+                                         const SourceLoc& call_loc,
+                                         const std::vector<StringInterner::Id>&
+                                         locals);
 
     // macro expansion: takes a logical line with macro invocation tokens and
     // expands it, pushing resulting lines to macro_work_queue
