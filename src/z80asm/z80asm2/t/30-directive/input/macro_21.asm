@@ -39,6 +39,7 @@ endm
 .label4 M6 (1,2) ; only one argmnent
 .label5 M6 ; wrong number of arguments
 .label6 M6( ; missing ')'
+.label6 M6 1) ; missing '('
 .label7 M6 1,2,3 ; argument mismatch
 .label8 M6 1,(2,3) ; ok
 M10 macro 

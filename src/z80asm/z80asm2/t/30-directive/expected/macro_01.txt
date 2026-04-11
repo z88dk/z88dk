@@ -15,9 +15,9 @@ Identifier	"a"	6:5	keyword=A
 Comma	","	6:6	
 Integer	"2"	6:8	int_value=2 
 EndOfLine	"\n"	6:9	
-t/30-directive/input/macro_01.asm:7:5: error: Unexpected ENDM directive
+t/30-directive/input/macro_01.asm:7:1: error: Unexpected ENDM directive
     endm
-        ^
+    ^
 t/30-directive/input/macro_01.asm:11:7: error: Macro redefinition: Y
     macro Y(p1) ; duplicate definition
           ^
@@ -29,9 +29,9 @@ Identifier	"a"	12:5	keyword=A
 Comma	","	12:6	
 Integer	"4"	12:8	int_value=4 
 EndOfLine	"\n"	12:9	
-t/30-directive/input/macro_01.asm:13:5: error: Unexpected ENDM directive
+t/30-directive/input/macro_01.asm:13:1: error: Unexpected ENDM directive
     endm
-        ^
+    ^
 t/30-directive/input/macro_01.asm:14:10: error: Identifier expected
     macro M1( ; missing close paren
              ^
@@ -40,9 +40,9 @@ Identifier	"a"	15:5	keyword=A
 Comma	","	15:6	
 Integer	"5"	15:8	int_value=5 
 EndOfLine	"\n"	15:9	
-t/30-directive/input/macro_01.asm:16:5: error: Unexpected ENDM directive
+t/30-directive/input/macro_01.asm:16:1: error: Unexpected ENDM directive
     endm
-        ^
+    ^
 t/30-directive/input/macro_01.asm:17:10: error: Identifier expected
     macro M2(21 ; missing parameter
              ^
@@ -51,9 +51,9 @@ Identifier	"a"	18:5	keyword=A
 Comma	","	18:6	
 Integer	"6"	18:8	int_value=6 
 EndOfLine	"\n"	18:9	
-t/30-directive/input/macro_01.asm:19:5: error: Unexpected ENDM directive
+t/30-directive/input/macro_01.asm:19:1: error: Unexpected ENDM directive
     endm
-        ^
+    ^
 t/30-directive/input/macro_01.asm:20:13: error: Right parenthesis or comma expected
     macro M3(p1 p2 ; missing comma
                 ^
@@ -67,9 +67,9 @@ Identifier	"b"	22:5	keyword=B
 Comma	","	22:6	
 Identifier	"p2"	22:8	
 EndOfLine	"\n"	22:10	
-t/30-directive/input/macro_01.asm:23:5: error: Unexpected ENDM directive
+t/30-directive/input/macro_01.asm:23:1: error: Unexpected ENDM directive
     endm
-        ^
+    ^
 t/30-directive/input/macro_01.asm:24:13: error: Parameter redefined: p1
     macro M4(p1,p1) ; duplicate parameters
                 ^
@@ -83,9 +83,9 @@ Identifier	"b"	26:5	keyword=B
 Comma	","	26:6	
 Identifier	"p1"	26:8	
 EndOfLine	"\n"	26:10	
-t/30-directive/input/macro_01.asm:27:5: error: Unexpected ENDM directive
+t/30-directive/input/macro_01.asm:27:1: error: Unexpected ENDM directive
     endm
-        ^
+    ^
 t/30-directive/input/macro_01.asm:32:9: error: Expected '(' after macro 'M5'
     .label1 M5 1,2 ; expect parens
             ^
@@ -130,41 +130,59 @@ t/30-directive/input/macro_01.asm:40:9: error: Macro 'M6' expects 2 arguments, g
 Dot	"."	40:1	
 Identifier	"label5"	40:2	
 EndOfLine	"\n"	40:9	
-t/30-directive/input/macro_01.asm:41:9: error: Macro 'M6' expects 2 arguments, got 1
+t/30-directive/input/macro_01.asm:41:11: error: Unmatched '('
     .label6 M6( ; missing ')'
-            ^
+              ^
 Dot	"."	41:1	
 Identifier	"label6"	41:2	
 EndOfLine	"\n"	41:9	
-t/30-directive/input/macro_01.asm:42:9: error: Macro 'M6' expects 2 arguments, got 3
+t/30-directive/input/macro_01.asm:42:13: error: Unmatched ')'
+    .label6 M6 2) ; missing '('
+                ^
+Dot	"."	42:1	
+Identifier	"label6"	42:2	
+EndOfLine	"\n"	42:9	
+t/30-directive/input/macro_01.asm:43:9: error: Macro 'M6' expects 2 arguments, got 3
     .label7 M6 1,2,3 ; argument mismatch
             ^
-Dot	"."	42:1	
-Identifier	"label7"	42:2	
-EndOfLine	"\n"	42:9	
 Dot	"."	43:1	
-Identifier	"label8"	43:2	
+Identifier	"label7"	43:2	
 EndOfLine	"\n"	43:9	
+Dot	"."	44:1	
+Identifier	"label8"	44:2	
+EndOfLine	"\n"	44:9	
 Identifier	"ld"	35:2	keyword=LD 
 Identifier	"a"	35:5	keyword=A 
 Comma	","	35:6	
-Integer	"1"	43:12	int_value=1 
-EndOfLine	"\n"	43:9	
+Integer	"1"	44:12	int_value=1 
+EndOfLine	"\n"	44:9	
 Identifier	"ld"	36:2	keyword=LD 
 Identifier	"b"	36:5	keyword=B 
 Comma	","	36:6	
-LeftParen	"("	43:14	
-Integer	"2"	43:15	int_value=2 
-Comma	","	43:16	
-Integer	"3"	43:17	int_value=3 
-RightParen	")"	43:18	
-EndOfLine	"\n"	43:9	
-t/30-directive/input/macro_01.asm:46:6: error: Unexpected token after ENDM: extra
+LeftParen	"("	44:14	
+Integer	"2"	44:15	int_value=2 
+Comma	","	44:16	
+Integer	"3"	44:17	int_value=3 
+RightParen	")"	44:18	
+EndOfLine	"\n"	44:9	
+t/30-directive/input/macro_01.asm:47:6: error: Unexpected token after ENDM: extra
     endm extra
          ^
-t/30-directive/input/macro_01.asm:47:7: error: Unexpected end of file while reading macro body; missing ENDM directive
-    macro M11
-          ^
+t/30-directive/input/macro_01.asm:50:1: error: ENDM does not match REPT
+    endm
+    ^
+t/30-directive/input/macro_01.asm:49:2: note: REPT defined here
+    	rept 10
+    	^
+t/30-directive/input/macro_01.asm:55:1: error: ENDM does not match REPT
+    endm
+    ^
+t/30-directive/input/macro_01.asm:52:2: note: REPT defined here
+    	rept 10
+    	^
+t/30-directive/input/macro_01.asm:56:1: error: Unexpected end of file; missing ENDM for MACRO
+    macro M13
+    ^
 # file: t/30-directive/input/macro_01.asm
 Identifier	"MACRO"	28:7	keyword=MACRO 
 Identifier	"M5"	28:7	

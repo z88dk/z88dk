@@ -39,11 +39,20 @@ endm
 .label4 M6 (1,2) ; only one argmnent
 .label5 M6 ; wrong number of arguments
 .label6 M6( ; missing ')'
+.label6 M6 2) ; missing '('
 .label7 M6 1,2,3 ; argument mismatch
 .label8 M6 1,(2,3) ; ok
 macro M10
 	ld a,10
 endm extra
 macro M11
+	rept 10
+endm
+macro M12
+	rept 10
+		repti v, a, b, c
+		endr
+endm
+macro M13
 	ld a,11
 extra endm
