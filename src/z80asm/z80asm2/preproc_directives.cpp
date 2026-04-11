@@ -45,6 +45,11 @@ Preproc::directive_handlers_ = {
     { Keyword::REPTC,    &Preproc::process_REPTC },
     { Keyword::ENDR,     &Preproc::process_ENDR },
     { Keyword::EXITM,    &Preproc::process_EXITM },
+    { Keyword::IF,       &Preproc::process_IF },
+    { Keyword::ELSEIF,   &Preproc::process_ELSEIF },
+    { Keyword::ELIF,     &Preproc::process_ELSEIF },
+    { Keyword::ELSE,     &Preproc::process_ELSE },
+    { Keyword::ENDIF,    &Preproc::process_ENDIF },
 };
 
 std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
@@ -510,6 +515,54 @@ bool Preproc::read_macro_body(Keyword start_kw,
     return false;
 }
 
+bool Preproc::eval_if_expr(const std::vector<Token>& input_line,
+                           size_t& pos, Keyword kw) {
+    // the rest of the line is the expression to evaluate
+    std::vector<Token> expr_tokens;
+    expr_tokens.reserve(input_line.size() - pos);
+    while (pos < input_line.size() &&
+            input_line[pos].type != TokenType::EndOfLine) {
+        expr_tokens.push_back(input_line[pos]);
+        pos++;
+    }
+
+    if (expr_tokens.empty()) {
+        g_diag.error(input_line.back().loc, "Expected expression after " +
+                     keyword_to_string(kw) + " directive");
+        return false;
+    }
+
+    // Expand macros in expression
+    LogicalLine line(expr_tokens.front().loc);
+    line.tokens = std::move(expr_tokens);
+    std::vector<Token> expanded;
+    expand_line(line, expanded);
+
+    if (expanded.empty()) {
+        g_diag.error(input_line.back().loc, "Expected expression after " +
+                     keyword_to_string(kw) + " directive");
+        return false;
+    }
+
+    // evaluate the if condition
+    size_t expr_pos = 0;
+    int result = 0;
+    if (!eval_if_condition(expanded, expr_pos,
+                           const_symbols, result, /*silent=*/false)) {
+        // error already reported by eval_const_expr
+        return false;
+    }
+
+    if (expr_pos >= expanded.size() ||
+            expanded[expr_pos].type != TokenType::EndOfLine) {
+        g_diag.error(input_line.back().loc, "Expected expression after " +
+                     keyword_to_string(kw) + " directive");
+        return false;
+    }
+
+    return static_cast<bool>(result);
+}
+
 void Preproc::parse_asm_definitions(const std::vector<Token>& tokens) {
     bool have_definition = false;
     StringInterner::Id name_id = 0;
@@ -928,7 +981,7 @@ void Preproc::process_DEFL(const std::vector<Token>& input_line,
         return;
     }
 
-    // create the macro and delegate to do_DEFINE
+    // create the macro and delegate to do_DEFL
     Macro macro;
     macro.name_id = name_id;
     macro.loc = name_loc;
@@ -1465,6 +1518,91 @@ void Preproc::process_EXITM(const std::vector<Token>& input_line,
     g_diag.error(kw_loc, "EXITM outside of macro expansion");
 }
 
+void Preproc::process_IF(const std::vector<Token>& input_line,
+                         size_t& pos) {
+    assert(pos > 0 && input_line[pos - 1].keyword == Keyword::IF);
+    SourceLoc kw_loc = input_line[pos - 1].loc;
+
+    bool cond_value = eval_if_expr(input_line, pos, input_line[pos - 1].keyword);
+
+    ConditionalFrame frame;
+    frame.if_loc = kw_loc;
+    frame.branch_active = cond_value;
+    frame.any_taken = cond_value;
+    frame.seen_else = false;
+    cond_stack.push_back(frame);
+}
+
+void Preproc::process_ELSEIF(const std::vector<Token>& input_line,
+                             size_t& pos) {
+    assert(pos > 0 && (input_line[pos - 1].keyword == Keyword::ELSEIF ||
+                       input_line[pos - 1].keyword == Keyword::ELIF));
+    Keyword directive_kw = input_line[pos - 1].keyword;
+    SourceLoc kw_loc = input_line[pos - 1].loc;
+
+    if (cond_stack.empty()) {
+        g_diag.error(kw_loc,
+                     "Unexpected " + keyword_to_string(directive_kw) +
+                     " directive without matching IF");
+        return;
+    }
+
+    ConditionalFrame& frame = cond_stack.back();
+    if (frame.seen_else) {
+        g_diag.error(kw_loc,
+                     "Unexpected " + keyword_to_string(directive_kw) +
+                     " directive after ELSE");
+        return;
+    }
+
+    bool cond_value = eval_if_expr(input_line, pos, directive_kw);
+    bool active_now = (!frame.any_taken) && cond_value;
+    frame.branch_active = active_now;
+    if (active_now) {
+        frame.any_taken = true;
+    }
+}
+
+void Preproc::process_ELSE(const std::vector<Token>& input_line,
+                           size_t& pos) {
+    assert(pos > 0 && input_line[pos - 1].keyword == Keyword::ELSE);
+    SourceLoc kw_loc = input_line[pos - 1].loc;
+
+    if (cond_stack.empty()) {
+        g_diag.error(kw_loc, "Unexpected ELSE directive without matching IF");
+        return;
+    }
+
+    ConditionalFrame& frame = cond_stack.back();
+    if (!check_end_of_line(input_line, pos, "ELSE")) {
+        return;
+    }
+
+    if (frame.seen_else) {
+        g_diag.error(kw_loc, "Multiple ELSE in IF block");
+    }
+
+    frame.branch_active = !frame.any_taken;
+    frame.any_taken = true;
+    frame.seen_else = true;
+}
+
+void Preproc::process_ENDIF(const std::vector<Token>& input_line, size_t& pos) {
+    assert(pos > 0 && input_line[pos - 1].keyword == Keyword::ENDIF);
+    SourceLoc kw_loc = input_line[pos - 1].loc;
+
+    if (cond_stack.empty()) {
+        g_diag.error(kw_loc, "Unexpected ENDIF directive without matching IF");
+        return;
+    }
+
+    if (!check_end_of_line(input_line, pos, "ENDIF")) {
+        return;
+    }
+
+    cond_stack.pop_back();
+}
+
 //-----------------------------------------------------------------------------
 // main driver for directive processing:
 // classifies line and dispatches to handlers
@@ -1497,9 +1635,7 @@ Preproc::LineType Preproc::process_directive_line(
     // 2. If inside inactive conditional block or exited macro,
     //    only IF/ELSEIF/ELSE/ENDIF run
     // ---------------------------------------------------------------------
-    bool cond_active = (cond_stack.empty() ||
-                        cond_stack.back().currently_active) &&
-                       !is_macro_exited();
+    bool cond_active = is_cond_active() && !is_macro_exited();
 
     // ---------------------------------------------------------------------
     // 3. Check if first token is a directive keyword (possibly after #)
@@ -1523,48 +1659,10 @@ Preproc::LineType Preproc::process_directive_line(
     // 4. Dispatch to directive handlers
     // ---------------------------------------------------------------------
 
-    // -------------------------
-    // IF
-    // -------------------------
-    if (kw == Keyword::IF) {   // TODO: define Keyword::IF
-        // TODO: parse expression tokens
-        // TODO: call eval_const_expr()
-        // TODO: push ConditionalFrame with if_loc = first.loc
-        return LineType::ControlOnly;
-    }
-
-    // -------------------------
-    // ELSEIF
-    // -------------------------
-    if (kw == Keyword::ELSEIF) {
-        // TODO: validate ctx.cond_stack not empty
-        // TODO: evaluate expression
-        // TODO: update ConditionalFrame
-        return LineType::ControlOnly;
-    }
-
-    // -------------------------
-    // ELSE
-    // -------------------------
-    if (kw == Keyword::ELSE) {
-        // TODO: validate ctx.cond_stack not empty
-        // TODO: update ConditionalFrame
-        return LineType::ControlOnly;
-    }
-
-    // -------------------------
-    // ENDIF
-    // -------------------------
-    if (kw == Keyword::ENDIF) {
-        // TODO: validate ctx.cond_stack not empty
-        // TODO: pop
-        return LineType::ControlOnly;
-    }
-
     // ---------------------------------------------------------------------
     // If conditional block inactive, ignore all other directives
     // ---------------------------------------------------------------------
-    if (!cond_active) {
+    if (!keyword_is_conditional_directive(kw) && !cond_active) {
         return LineType::Skip;
     }
 
