@@ -1,0 +1,29 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/rept_01.asm
+Assembling t/30-directive/input/rept_01.asm...
+t/30-directive/input/rept_01.asm:1:1: error: Expected repeat count after REPT
+    rept ; no expression
+    ^
+t/30-directive/input/rept_01.asm:2:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/30-directive/input/rept_01.asm:3:6: error: Expected a value, got "*"
+    rept *3 ; syntax error in expression
+         ^
+t/30-directive/input/rept_01.asm:4:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/30-directive/input/rept_01.asm:5:6: error: ASMPC is not allowed in a constant expression
+    rept ASMPC ; not constant expression
+         ^
+t/30-directive/input/rept_01.asm:6:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/30-directive/input/rept_01.asm:7:8: error: Unexpected token after REPT count: extra
+    rept 1 extra ; extra tokens after expression
+           ^
+t/30-directive/input/rept_01.asm:8:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/30-directive/input/rept_01.asm:9:1: error: Unexpected end of file; missing ENDR for REPT
+    rept 1 ; no endr
+    ^
