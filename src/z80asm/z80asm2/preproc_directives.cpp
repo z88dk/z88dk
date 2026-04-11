@@ -388,8 +388,10 @@ bool Preproc::parse_params(const std::vector<Token>& input_line,
 
 bool Preproc::read_macro_body(Keyword start_kw,
                               const SourceLoc& start_kw_loc,
-                              std::vector<LogicalLine>& out_lines) {
+                              std::vector<LogicalLine>& out_lines,
+                              std::vector<StringInterner::Id>& out_locals) {
     out_lines.clear();
+    out_locals.clear();
 
     // Stack of open block structures. Each entry is the keyword that
     // opened the block, used to match against the corresponding closing
@@ -460,6 +462,38 @@ bool Preproc::read_macro_body(Keyword start_kw,
                 if (nesting_stack.empty()) {
                     return true;
                 }
+            }
+            // LOCAL directive: only process at the outermost nesting level
+            else if (kw == Keyword::LOCAL && nesting_stack.size() == 1) {
+                // "label1 LOCAL" syntax: name was parsed by is_directive
+                if (!name.empty()) {
+                    StringInterner::Id id = g_strings.intern(name);
+                    if (std::find(out_locals.begin(), out_locals.end(), id) ==
+                            out_locals.end()) {
+                        out_locals.push_back(id);
+                    }
+                }
+
+                // "LOCAL label1, label2, ..." syntax: parse identifier list
+                std::vector<StringInterner::Id> params;
+                bool has_parens = false;
+                if (!parse_params(line.tokens, pos, params, has_parens)) {
+                    return false; // error already reported
+                }
+
+                for (StringInterner::Id id : params) {
+                    if (std::find(out_locals.begin(), out_locals.end(), id) ==
+                            out_locals.end()) {
+                        out_locals.push_back(id);
+                    }
+                }
+
+                if (!check_end_of_line(line.tokens, pos, "LOCAL")) {
+                    return false;
+                }
+
+                // LOCAL lines are consumed; do NOT add to out_lines
+                continue;
             }
         }
 
@@ -1076,7 +1110,8 @@ void Preproc::do_MACRO(const Macro& macro, SourceLoc& kw_macro_loc) {
 
     // read lines until ENDM
     std::vector<LogicalLine> lines;
-    if (!read_macro_body(Keyword::MACRO, kw_macro_loc, lines)) {
+    std::vector<StringInterner::Id> locals;
+    if (!read_macro_body(Keyword::MACRO, kw_macro_loc, lines, locals)) {
         return; // error already emitted by read_macro_body()
     }
 
@@ -1084,6 +1119,7 @@ void Preproc::do_MACRO(const Macro& macro, SourceLoc& kw_macro_loc) {
     Macro new_macro = macro;
     new_macro.tokens.clear(); // not used for multiline macros
     new_macro.lines = std::move(lines);
+    new_macro.locals = std::move(locals);
     macros[new_macro.name_id] = std::move(new_macro);
 }
 
@@ -1145,14 +1181,29 @@ void Preproc::process_REPT(const std::vector<Token>& input_line,
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
-    if (!read_macro_body(Keyword::REPT, kw_loc, body)) {
+    std::vector<StringInterner::Id> locals;
+    if (!read_macro_body(Keyword::REPT, kw_loc, body, locals)) {
         return; // error already emitted by read_macro_body()
     }
 
     // Push the body lines repeated repeat_count times to the work queue
+    std::vector<StringInterner::Id> no_params;
+    std::vector<std::vector<Token>> no_args;
     for (int i = 0; i < repeat_count; ++i) {
         for (const auto& body_line : body) {
-            macro_work_queue.push_back(body_line);
+            std::vector<Token> substituted =
+                substitute_params(body_line.tokens, no_params,
+                                  no_args, kw_loc, locals);
+
+            LogicalLine ll;
+            ll.tokens = std::move(substituted);
+            if (ll.tokens.empty() ||
+                    ll.tokens.back().type != TokenType::EndOfLine) {
+                ll.tokens.push_back(Token::end_of_line(kw_loc));
+            }
+            ll.loc = kw_loc;
+
+            macro_work_queue.push_back(std::move(ll));
         }
     }
 }
@@ -1220,7 +1271,8 @@ void Preproc::do_REPTI(std::string_view iter_name,
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
-    if (!read_macro_body(Keyword::REPTI, kw_loc, body)) {
+    std::vector<StringInterner::Id> locals;
+    if (!read_macro_body(Keyword::REPTI, kw_loc, body, locals)) {
         return; // error already emitted by read_macro_body()
     }
 
@@ -1237,7 +1289,7 @@ void Preproc::do_REPTI(std::string_view iter_name,
         for (const auto& body_line : body) {
             std::vector<Token> substituted =
                 substitute_params(body_line.tokens, params,
-                                  single_arg, kw_loc);
+                                  single_arg, kw_loc, locals);
 
             LogicalLine ll;
             ll.tokens = std::move(substituted);
@@ -1312,7 +1364,8 @@ void Preproc::do_REPTC(std::string_view iter_name,
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
-    if (!read_macro_body(Keyword::REPTC, kw_loc, body)) {
+    std::vector<StringInterner::Id> locals;
+    if (!read_macro_body(Keyword::REPTC, kw_loc, body, locals)) {
         return; // error already emitted by read_macro_body()
     }
 
@@ -1355,7 +1408,7 @@ void Preproc::do_REPTC(std::string_view iter_name,
         for (const auto& body_line : body) {
             std::vector<Token> substituted =
                 substitute_params(body_line.tokens, params,
-                                  single_arg, kw_loc);
+                                  single_arg, kw_loc, locals);
 
             LogicalLine ll;
             ll.tokens = std::move(substituted);
@@ -1368,6 +1421,20 @@ void Preproc::do_REPTC(std::string_view iter_name,
             macro_work_queue.push_back(std::move(ll));
         }
     }
+}
+
+void Preproc::process_LOCAL(const std::vector<Token>& input_line,
+                            size_t& pos) {
+    assert(pos > 0 && input_line[pos - 1].keyword == Keyword::LOCAL);
+    SourceLoc kw_loc = input_line[pos - 1].loc;
+    g_diag.error(kw_loc, "Unexpected LOCAL directive");
+}
+
+void Preproc::process_name_LOCAL(std::string_view,
+                                 const SourceLoc& kw_loc,
+                                 const std::vector<Token>&,
+                                 size_t&) {
+    g_diag.error(kw_loc, "Unexpected LOCAL directive");
 }
 
 //-----------------------------------------------------------------------------
