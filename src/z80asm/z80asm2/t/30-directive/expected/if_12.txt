@@ -1,0 +1,46 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/if_12.asm
+Assembling t/30-directive/input/if_12.asm...
+# file: t/30-directive/input/if_12.asm
+Identifier	"DEFC"	1:14	keyword=DEFC 
+Identifier	"expr"	1:19	
+EQ	"="	1:24	
+Integer	"1"	1:26	int_value=1 
+EndOfLine	"\n"	1:27	
+Define constant: expr = 1
+EndOfLine	"\n"	2:1	
+Identifier	"ld"	4:2	keyword=LD 
+Identifier	"a"	4:5	keyword=A 
+Comma	","	4:6	
+Integer	"1"	4:8	int_value=1 
+EndOfLine	"\n"	4:9	
+EndOfLine	"\n"	8:1	
+Identifier	"ld"	12:2	keyword=LD 
+Identifier	"a"	12:5	keyword=A 
+Comma	","	12:6	
+Integer	"2"	12:8	int_value=2 
+EndOfLine	"\n"	12:9	
+EndOfLine	"\n"	14:1	
+Identifier	"ld"	18:2	keyword=LD 
+Identifier	"a"	18:5	keyword=A 
+Comma	","	18:6	
+Integer	"3"	18:8	int_value=3 
+EndOfLine	"\n"	18:9	
+EndOfLine	"\n"	22:1	
+Identifier	"ld"	26:2	keyword=LD 
+Identifier	"a"	26:5	keyword=A 
+Comma	","	26:6	
+Integer	"4"	26:8	int_value=4 
+EndOfLine	"\n"	26:9	
+EndOfLine	"\n"	30:1	
+Identifier	"ld"	34:4	keyword=LD 
+Identifier	"a"	34:7	keyword=A 
+Comma	","	34:8	
+Integer	"5"	34:10	int_value=5 
+EndOfLine	"\n"	34:11	
+EndOfLine	"\n"	44:1	
+# file: t/30-directive/input/if_12.asm
+Identifier	"DEFINE"	1:9	keyword=DEFINE 
+Identifier	"expr"	1:9	
+EQ	"="	1:9	
+Integer	"1"	1:14	int_value=1 
+symbol	expr	1	(defined at t/30-directive/input/if_12.asm:1:19)
