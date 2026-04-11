@@ -1162,7 +1162,7 @@ void Preproc::process_REPT(const std::vector<Token>& input_line,
         return;
     }
 
-    // Evaluate constant expression (not silent — errors are reported)
+    // Evaluate constant expression (not silent -> errors are reported)
     size_t expr_pos = 0;
     int repeat_count = 0;
     if (!eval_const_expr(expanded, expr_pos,
