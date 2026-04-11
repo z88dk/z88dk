@@ -12,6 +12,15 @@
 #include "source_loc.h"
 #include "string_interner.h"
 
+bool Preproc::is_cond_active() const {
+    for (auto& cond : cond_stack) {
+        if (!cond.branch_active) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Preproc::push_macro_expansion(StringInterner::Id name_id,
                                    std::deque<LogicalLine> lines) {
     MacroExpansionFrame frame;
