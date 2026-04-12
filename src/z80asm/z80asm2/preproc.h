@@ -8,6 +8,7 @@
 
 #include "const_symbols.h"
 #include "file_mgr.h"
+#include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
@@ -149,12 +150,14 @@ private:
 
     // dispatch tables for directive handlers
     using DirectiveHandler =
-        void (Preproc::*)(const std::vector<Token>&, size_t&);
+        void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
+                          const std::vector<Token>& imput_line, size_t& pos);
     static std::unordered_map<Keyword, DirectiveHandler> directive_handlers_;
 
     using NameDirectiveHandler =
-        void (Preproc::*)(std::string_view, const SourceLoc&,
-                          const std::vector<Token>&, size_t&);
+        void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
+                          StringInterner::Id name_id, const SourceLoc& name_loc,
+                          const std::vector<Token>& imput_line, size_t& pos);
     static std::unordered_map<Keyword, NameDirectiveHandler> name_directive_handlers_;
 
     // main driver for directive processing: classifies line and
@@ -165,30 +168,29 @@ private:
         ControlOnly
     };
     LineType process_directive_line(const std::vector<Token>& input_line,
-                                    LogicalLine& out_line
-                                   );
+                                    LogicalLine& out_line);
 
-    bool is_directive(const std::vector<Token>& input_line,
-                      size_t& pos,
+    bool is_directive(const std::vector<Token>& input_line, size_t& pos,
                       Keyword& out_kw,
-                      std::string& out_name,
+                      SourceLoc& out_kw_loc,
+                      StringInterner::Id& out_name_id,
                       SourceLoc& out_name_loc);
     bool check_end_of_line(const std::vector<Token>& input_line,
                            size_t& pos,
-                           std::string_view directive_name);
+                           Keyword kw);
     bool parse_filename(const std::vector<Token>& input_line,
                         size_t& pos,
-                        std::string_view directive_name,
+                        Keyword kw,
                         std::string& out_filename,
                         bool& out_is_angle_bracket,
                         SourceLoc& out_filename_loc);
     bool parse_and_resolve_file(const std::vector<Token>& input_line,
                                 size_t& pos,
-                                std::string_view directive_name,
+                                Keyword kw,
                                 std::string& out_resolved,
                                 SourceLoc& out_filename_loc);
     bool parse_LINE_args(const std::vector<Token>& input_line, size_t& pos,
-                         std::string_view directive_name,
+                         Keyword kw,
                          size_t& out_linenum, std::string& out_filename);
     bool parse_params(const std::vector<Token>& input_line,
                       size_t& pos,
@@ -200,56 +202,98 @@ private:
                          std::vector<StringInterner::Id>& out_locals);
     bool eval_if_expr(const std::vector<Token>& input_line, size_t& pos,
                       Keyword kw);
+    bool eval_ifdef_name(const std::vector<Token>& input_line, size_t& pos,
+                         bool negated, Keyword keyword);
 
     void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
 
-    void process_INCLUDE(const std::vector<Token>& input_line, size_t& pos);
-    void process_BINARY(const std::vector<Token>& input_line, size_t& pos);
-    void process_LINE(const std::vector<Token>& input_line, size_t& pos);
-    void process_C_LINE(const std::vector<Token>& input_line, size_t& pos);
-    void process_DEFINE(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_DEFINE(std::string_view name, const SourceLoc& name_loc,
+    void process_INCLUDE(Keyword kw, const SourceLoc& kw_loc,
+                         const std::vector<Token>& input_line, size_t& pos);
+    void process_BINARY(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
+    void process_LINE(Keyword kw, const SourceLoc& kw_loc,
+                      const std::vector<Token>& input_line, size_t& pos);
+    void process_C_LINE(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
+    void process_DEFINE(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
+    void process_name_DEFINE(Keyword kw, const SourceLoc& kw_loc,
+                             StringInterner::Id name_id, const SourceLoc& name_loc,
                              const std::vector<Token>& input_line, size_t& pos);
     void do_DEFINE(const Macro& macro,
                    const std::vector<Token>& input_line, size_t& pos);
-    void process_UNDEF(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_UNDEF(std::string_view name, const SourceLoc& name_loc,
+    void process_UNDEF(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_name_UNDEF(Keyword kw, const SourceLoc& kw_loc,
+                            StringInterner::Id name_id, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
     void do_UNDEF(StringInterner::Id name_id);
-    void process_DEFL(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_DEFL(std::string_view name, const SourceLoc& name_loc,
+    void process_DEFL(Keyword kw, const SourceLoc& kw_loc,
+                      const std::vector<Token>& input_line, size_t& pos);
+    void process_name_DEFL(Keyword kw, const SourceLoc& kw_loc,
+                           StringInterner::Id name_id, const SourceLoc& name_loc,
                            const std::vector<Token>& input_line, size_t& pos);
     void do_DEFL(const Macro& macro,
                  const std::vector<Token>& input_line, size_t& pos);
-    void process_MACRO(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_MACRO(std::string_view name, const SourceLoc& name_loc,
+    void process_MACRO(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_name_MACRO(Keyword kw, const SourceLoc& kw_loc,
+                            StringInterner::Id name_id, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
-    void do_MACRO(const Macro& macro, SourceLoc& kw_macro_loc);
-    void process_ENDM(const std::vector<Token>& input_line, size_t& pos);
-    void process_REPT(const std::vector<Token>& input_line, size_t& pos);
-    void process_ENDR(const std::vector<Token>& input_line, size_t& pos);
-    void process_REPTI(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_REPTI(std::string_view iter_name,
-                            const SourceLoc& kw_loc,
+    void do_MACRO(Keyword kw, const SourceLoc& kw_loc,
+                  const Macro& macro);
+    void process_ENDM(Keyword kw, const SourceLoc& kw_loc,
+                      const std::vector<Token>& input_line, size_t& pos);
+    void process_REPT(Keyword kw, const SourceLoc& kw_loc,
+                      const std::vector<Token>& input_line, size_t& pos);
+    void process_ENDR(Keyword kw, const SourceLoc& kw_loc,
+                      const std::vector<Token>& input_line, size_t& pos);
+    void process_REPTI(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_name_REPTI(Keyword kw, const SourceLoc& kw_loc,
+                            StringInterner::Id name_id, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
-    void do_REPTI(std::string_view iter_name, const SourceLoc& kw_loc,
+    void do_REPTI(Keyword kw, const SourceLoc& kw_loc,
+                  StringInterner::Id name_id, const SourceLoc& name_loc,
                   const std::vector<Token>& input_line, size_t& pos);
-    void process_REPTC(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_REPTC(std::string_view iter_name,
-                            const SourceLoc& kw_loc,
+    void process_REPTC(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
+                            StringInterner::Id name_id, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
-    void do_REPTC(std::string_view iter_name, const SourceLoc& kw_loc,
+    void do_REPTC(Keyword kw, const SourceLoc& kw_loc,
+                  StringInterner::Id name_id, const SourceLoc& name_loc,
                   const std::vector<Token>& input_line, size_t& pos);
-    void process_LOCAL(const std::vector<Token>& input_line, size_t& pos);
-    void process_name_LOCAL(std::string_view iter_name,
-                            const SourceLoc& kw_loc,
+    void process_LOCAL(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
+                            StringInterner::Id name_id, const SourceLoc& name_loc,
                             const std::vector<Token>& input_line, size_t& pos);
-    void process_EXITM(const std::vector<Token>& input_line, size_t& pos);
-    void process_IF(const std::vector<Token>& input_line, size_t& pos);
-    void process_ELSEIF(const std::vector<Token>& input_line, size_t& pos);
-    void process_ELSE(const std::vector<Token>& input_line, size_t& pos);
-    void process_ENDIF(const std::vector<Token>& input_line, size_t& pos);
+    void process_EXITM(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_IF(Keyword kw, const SourceLoc& kw_loc,
+                    const std::vector<Token>& input_line, size_t& pos);
+    void process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
+    void process_ELSE(Keyword kw, const SourceLoc& kw_loc,
+                      const std::vector<Token>& input_line, size_t& pos);
+    void process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_IFDEF(Keyword kw, const SourceLoc& kw_loc,
+                       const std::vector<Token>& input_line, size_t& pos);
+    void process_IFNDEF(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
+    void do_IFDEF_IFNDEF(bool negated,
+                         Keyword kw, const SourceLoc& kw_loc,
+                         const std::vector<Token>& input_line, size_t& pos);
+    void process_ELSEIFDEF(Keyword kw, const SourceLoc& kw_loc,
+                           const std::vector<Token>& input_line, size_t& pos);
+    void process_ELSEIFNDEF(Keyword kw, const SourceLoc& kw_loc,
+                            const std::vector<Token>& input_line, size_t& pos);
+    void do_ELSEIFDEF_ELSEIFNDEF(bool negated,
+                                 Keyword kw, const SourceLoc& kw_loc,
+                                 const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
