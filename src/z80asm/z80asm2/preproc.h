@@ -301,6 +301,8 @@ private:
                                  const std::vector<Token>& input_line, size_t& pos);
     void process_PRAGMA(Keyword kw, const SourceLoc& kw_loc,
                         const std::vector<Token>& input_line, size_t& pos);
+    void process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
