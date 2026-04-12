@@ -35,6 +35,7 @@ Preproc::directive_handlers_ = {
     { Keyword::INCBIN,     &Preproc::process_BINARY },
     { Keyword::PRAGMA,     &Preproc::process_PRAGMA },
     { Keyword::ASSERT,     &Preproc::process_ASSERT },
+    { Keyword::ERROR,      &Preproc::process_ERROR },
     { Keyword::LINE,       &Preproc::process_LINE },
     { Keyword::C_LINE,     &Preproc::process_C_LINE },
     { Keyword::DEFINE,     &Preproc::process_DEFINE },
@@ -1846,6 +1847,29 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
 
     // Assertion failed
     g_diag.error(expr_loc, message.empty() ? "Assertion failed" : message);
+}
+
+void Preproc::process_ERROR(Keyword kw, const SourceLoc&,
+                            const std::vector<Token>& input_line,
+                            size_t& pos) {
+    // Optional: ERROR "message"
+    std::string message = "User specified error";
+    SourceLoc err_loc = (pos < input_line.size()) ? input_line[pos].loc
+                        : (input_line.empty() ? SourceLoc{} : input_line.back().loc);
+
+    if (pos < input_line.size() &&
+            input_line[pos].type == TokenType::String) {
+        message = g_strings.to_string(input_line[pos].value.str_value_id);
+        err_loc = input_line[pos].loc;
+        ++pos;
+    }
+
+    // Must end at EOL (or only have EOL tokens left)
+    if (!check_end_of_line(input_line, pos, kw)) {
+        return;
+    }
+
+    g_diag.error(err_loc, message);
 }
 
 //-----------------------------------------------------------------------------
