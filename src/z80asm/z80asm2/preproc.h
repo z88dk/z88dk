@@ -130,6 +130,11 @@ private:
     std::vector<StringInterner::Id> dependency_files;
 
     // ---------------------------------------------------------------------
+    // PRAGMA ONCE tracking: file_ids that already requested one-time include
+    // ---------------------------------------------------------------------
+    std::vector<StringInterner::Id> pragma_once_files;
+
+    // ---------------------------------------------------------------------
     // Methods
     // ---------------------------------------------------------------------
 
@@ -294,6 +299,8 @@ private:
     void do_ELSEIFDEF_ELSEIFNDEF(bool negated,
                                  Keyword kw, const SourceLoc& kw_loc,
                                  const std::vector<Token>& input_line, size_t& pos);
+    void process_PRAGMA(Keyword kw, const SourceLoc& kw_loc,
+                        const std::vector<Token>& input_line, size_t& pos);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
