@@ -47,6 +47,6 @@ EndOfLine	"\n"	13:9
 t/30-directive/input/repti_01.asm:14:1: error: Unexpected ENDR directive
     endr
     ^
-t/30-directive/input/repti_01.asm:15:1: error: Unexpected end of file; missing ENDR for REPTI
+t/30-directive/input/repti_01.asm:15:1: error: Unexpected end of file, missing ENDR for REPTI
     repti v, a, b, c ; no endr
     ^

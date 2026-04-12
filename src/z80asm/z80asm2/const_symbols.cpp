@@ -45,18 +45,6 @@ void ConstSymbols::erase(StringInterner::Id name_id) {
     symbols.erase(name_id);
 }
 
-void ConstSymbols::set(std::string_view name, int value, const SourceLoc& loc) {
-    set(g_strings.intern(name), value, loc);
-}
-
-const ConstSymbol* ConstSymbols::get(std::string_view name) const {
-    return get(g_strings.intern(name));
-}
-
-void ConstSymbols::erase(std::string_view name) {
-    erase(g_strings.intern(name));
-}
-
 void ConstSymbols::dump_symbols() const {
     // collect entries and sort by name
     std::vector<const ConstSymbol*> sorted;

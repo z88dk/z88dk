@@ -24,6 +24,6 @@ t/30-directive/input/reptc_11.asm:7:10: error: Expected text after REPTC
 t/30-directive/input/reptc_11.asm:8:2: error: Unexpected ENDR directive
     #endr
      ^
-t/30-directive/input/reptc_11.asm:9:2: error: Unexpected end of file; missing ENDR for REPTC
+t/30-directive/input/reptc_11.asm:9:2: error: Unexpected end of file, missing ENDR for REPTC
     #reptc v, a, b, c ; no endr
      ^
