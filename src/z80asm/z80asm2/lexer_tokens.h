@@ -7,8 +7,10 @@
 #pragma once
 
 #include "lexer_keywords.h"
-#include "string_interner.h"
 #include "source_loc.h"
+#include "string_interner.h"
+#include <string_view>
+#include <vector>
 
 enum class TokenType : uint8_t {
 #define X(id, text) id,
@@ -55,4 +57,14 @@ struct LogicalLine {
     LogicalLine() = default;
     LogicalLine(const SourceLoc& loc_,
                 LineOrigin origin_ = LineOrigin::RawInput);
+};
+
+// reference to tokens being parsed, with current position and error reporting
+struct ParseLine {
+    const std::vector<Token>& tokens;
+    size_t pos = 0;
+
+    ParseLine(const std::vector<Token>& tokens_);
+    const Token& peek(size_t offset = 0) const;
+    void error(std::string_view message) const;
 };
