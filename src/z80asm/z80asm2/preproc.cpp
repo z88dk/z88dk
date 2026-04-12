@@ -11,6 +11,7 @@
 #include "preproc.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <vector>
 
 bool Preproc::is_cond_active() const {
     for (auto& cond : cond_stack) {
@@ -99,6 +100,14 @@ void Preproc::set_const_symbols(const ConstSymbols& defs) {
 std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // used for dumping tokens after tokenization, if requested
     StringInterner::Id cur_file_id = 0;
+
+    // reset per-run registries and state
+    include_stack.clear();
+    cond_stack.clear();
+    macro_expansion_stack.clear();
+    assembler_output_queue.clear();
+    dependency_files.clear();
+    pragma_once_files.clear();
 
     // Final output logical line stream
     std::vector<LogicalLine> final_lines;

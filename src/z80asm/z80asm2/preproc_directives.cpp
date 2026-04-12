@@ -33,6 +33,7 @@ Preproc::directive_handlers_ = {
     { Keyword::INCLUDE,    &Preproc::process_INCLUDE },
     { Keyword::BINARY,     &Preproc::process_BINARY },
     { Keyword::INCBIN,     &Preproc::process_BINARY },
+    { Keyword::PRAGMA,     &Preproc::process_PRAGMA },
     { Keyword::LINE,       &Preproc::process_LINE },
     { Keyword::C_LINE,     &Preproc::process_C_LINE },
     { Keyword::DEFINE,     &Preproc::process_DEFINE },
@@ -1732,6 +1733,43 @@ void Preproc::do_ELSEIFDEF_ELSEIFNDEF(bool negated,
     frame.branch_active = active_now;
     if (active_now) {
         frame.any_taken = true;
+    }
+}
+
+void Preproc::process_PRAGMA(Keyword kw, const SourceLoc&,
+                             const std::vector<Token>& input_line,
+                             size_t& pos) {
+    // Reserve PRAGMA for future extensions:
+    // only handle "PRAGMA ONCE", ignore anything else.
+    if (pos >= input_line.size() ||
+            input_line[pos].type != TokenType::Identifier ||
+            input_line[pos].keyword != Keyword::ONCE) {
+        return;
+    }
+
+    // consume ONCE
+    pos++;
+
+    // PRAGMA ONCE must have no extra tokens
+    if (!check_end_of_line(input_line, pos, kw)) {
+        return;
+    }
+
+    // PRAGMA ONCE in current file
+    if (include_stack.empty() || include_stack.back().file == nullptr) {
+        return;
+    }
+
+    StringInterner::Id file_id = include_stack.back().file->file_id;
+    auto it = std::find(pragma_once_files.begin(), pragma_once_files.end(), file_id);
+
+    if (it != pragma_once_files.end()) {
+        // file already marked once -> skip remaining lines of this file
+        include_stack.pop_back();
+    }
+    else {
+        // first time this file requests PRAGMA ONCE
+        pragma_once_files.push_back(file_id);
     }
 }
 
