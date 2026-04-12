@@ -34,6 +34,7 @@ Preproc::directive_handlers_ = {
     { Keyword::BINARY,     &Preproc::process_BINARY },
     { Keyword::INCBIN,     &Preproc::process_BINARY },
     { Keyword::PRAGMA,     &Preproc::process_PRAGMA },
+    { Keyword::ASSERT,     &Preproc::process_ASSERT },
     { Keyword::LINE,       &Preproc::process_LINE },
     { Keyword::C_LINE,     &Preproc::process_C_LINE },
     { Keyword::DEFINE,     &Preproc::process_DEFINE },
@@ -1771,6 +1772,80 @@ void Preproc::process_PRAGMA(Keyword kw, const SourceLoc&,
         // first time this file requests PRAGMA ONCE
         pragma_once_files.push_back(file_id);
     }
+}
+
+void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
+                             const std::vector<Token>& input_line,
+                             size_t& pos) {
+    // Collect everything after ASSERT until EndOfLine
+    std::vector<Token> raw_tokens;
+    while (pos < input_line.size() &&
+            input_line[pos].type != TokenType::EndOfLine) {
+        raw_tokens.push_back(input_line[pos]);
+        pos++;
+    }
+
+    if (raw_tokens.empty()) {
+        g_diag.error(kw_loc, "Expected expression after " +
+                     keyword_to_string(kw));
+        return;
+    }
+
+    // Expand macros in ASSERT arguments
+    LogicalLine expr_line(raw_tokens.front().loc);
+    expr_line.tokens = std::move(raw_tokens);
+    std::vector<Token> expanded;
+    expand_line(expr_line, expanded);
+
+    if (expanded.empty() ||
+            (expanded.size() == 1 &&
+             expanded[0].type == TokenType::EndOfLine)) {
+        g_diag.error(kw_loc, "Expected expression after " +
+                     keyword_to_string(kw));
+        return;
+    }
+
+    // Evaluate constant expression
+    const SourceLoc expr_loc = expanded.front().loc;
+    size_t expr_pos = 0;
+    int result = 0;
+    if (!eval_const_expr(expanded, expr_pos,
+                         const_symbols, result, /*silent=*/false)) {
+        // syntax/non-constant errors already reported
+        return;
+    }
+
+    // Optional: , "message"
+    std::string message;
+    if (expr_pos < expanded.size() &&
+            expanded[expr_pos].type == TokenType::Comma) {
+        ++expr_pos;
+
+        if (expr_pos >= expanded.size() ||
+                expanded[expr_pos].type != TokenType::String) {
+            g_diag.error(expr_pos >= expanded.size() ? expanded.back().loc :
+                         expanded[expr_pos].loc,
+                         "Expected string after comma in " +
+                         keyword_to_string(kw));
+            return;
+        }
+
+        message = g_strings.to_string(expanded[expr_pos].value.str_value_id);
+        ++expr_pos;
+    }
+
+    // Must end at EOL
+    if (!check_end_of_line(expanded, expr_pos, kw)) {
+        return;
+    }
+
+    // Assertion passed
+    if (result != 0) {
+        return;
+    }
+
+    // Assertion failed
+    g_diag.error(expr_loc, message.empty() ? "Assertion failed" : message);
 }
 
 //-----------------------------------------------------------------------------
