@@ -1,11 +1,11 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/local_21.asm
 Assembling t/30-directive/input/local_21.asm...
-t/30-directive/input/local_21.asm:1:1: error: Unknown preprocessor directive: LOCAL
+t/30-directive/input/local_21.asm:1:1: error: Unexpected LOCAL directive
     local ; outside macro
     ^
-t/30-directive/input/local_21.asm:2:1: error: Unknown preprocessor directive: LOCAL
+t/30-directive/input/local_21.asm:2:3: error: Unexpected LOCAL directive
     X local; outside macro
-    ^
+      ^
 t/30-directive/input/local_21.asm:7:14: error: Unexpected token after LOCAL: 12
     	label local 12 ; extra input
     	            ^
