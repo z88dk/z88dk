@@ -79,8 +79,7 @@ Preproc::name_directive_handlers_ = {
 // directive handlers and helpers
 //-----------------------------------------------------------------------------
 
-bool Preproc::is_directive(const std::vector<Token>& input_line,
-                           size_t& pos,
+bool Preproc::is_directive(ParseLine& input_line,
                            Keyword& out_kw,
                            SourceLoc& out_kw_loc,
                            StringInterner::Id& out_name_id,
@@ -91,120 +90,110 @@ bool Preproc::is_directive(const std::vector<Token>& input_line,
     out_name_loc.clear();
 
     // DIRECTIVE
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::Identifier &&
-            keyword_is_preproc_directive(input_line[pos].keyword)) {
-        out_kw = input_line[pos].keyword;
-        out_kw_loc = input_line[pos].loc;
-        pos++; // consume directive keyword
+    if (input_line.peek().type == TokenType::Identifier &&
+            keyword_is_preproc_directive(input_line.peek().keyword)) {
+        out_kw = input_line.peek().keyword;
+        out_kw_loc = input_line.peek().loc;
+        input_line.pos++; // consume directive keyword
         return true;
     }
 
     // # DIRECTIVE
-    if (pos + 1 < input_line.size() &&
-            input_line[pos].type == TokenType::Hash &&
-            input_line[pos + 1].type == TokenType::Identifier &&
-            keyword_is_preproc_directive(input_line[pos + 1].keyword)) {
-        out_kw = input_line[pos + 1].keyword;
-        out_kw_loc = input_line[pos + 1].loc;
-        pos += 2; // consume '#' and directive keyword
+    if (input_line.peek().type == TokenType::Hash &&
+            input_line.peek(1).type == TokenType::Identifier &&
+            keyword_is_preproc_directive(input_line.peek(1).keyword)) {
+        out_kw = input_line.peek(1).keyword;
+        out_kw_loc = input_line.peek(1).loc;
+        input_line.pos += 2; // consume '#' and directive keyword
         return true;
     }
 
     // # LINE_NUMBER
-    if (pos + 1 < input_line.size() &&
-            input_line[pos].type == TokenType::Hash &&
-            input_line[pos + 1].type == TokenType::Integer) {
+    if (input_line.peek().type == TokenType::Hash &&
+            input_line.peek(1).type == TokenType::Integer) {
         out_kw = Keyword::LINE;
-        out_kw_loc = input_line[pos].loc;
-        pos++; // consume '#'
+        out_kw_loc = input_line.peek().loc;
+        input_line.pos++; // consume '#'
         return true;
     }
 
     // name DIRECTIVE
-    if (pos + 1 < input_line.size() &&
-            input_line[pos].type == TokenType::Identifier &&
-            input_line[pos + 1].type == TokenType::Identifier &&
-            keyword_is_preproc_name_directive(input_line[pos + 1].keyword)) {
-        out_kw = input_line[pos + 1].keyword;
-        out_kw_loc = input_line[pos + 1].loc;
-        out_name_id = input_line[pos].text_id;
-        out_name_loc = input_line[pos].loc;
-        pos += 2; // consume name and directive keyword
+    if (input_line.peek().type == TokenType::Identifier &&
+            input_line.peek(1).type == TokenType::Identifier &&
+            keyword_is_preproc_name_directive(input_line.peek(1).keyword)) {
+        out_kw = input_line.peek(1).keyword;
+        out_kw_loc = input_line.peek(1).loc;
+        out_name_id = input_line.peek().text_id;
+        out_name_loc = input_line.peek().loc;
+        input_line.pos += 2; // consume name and directive keyword
         return true;
     }
 
     return false;
 }
 
-bool Preproc::check_end_of_line(const std::vector<Token>& input_line,
-                                size_t& pos,
+bool Preproc::check_end_of_line(ParseLine& input_line,
                                 Keyword kw) {
-    while (pos < input_line.size() &&
-            input_line[pos].type == TokenType::EndOfLine) {
-        ++pos;
+    while (input_line.peek().type == TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        ++input_line.pos;
     }
 
-    if (pos < input_line.size()) {
-        g_diag.error(input_line[pos].loc,
+    if (input_line.pos < input_line.tokens.size()) {
+        g_diag.error(input_line.peek().loc,
                      "Unexpected token after " +
                      keyword_to_string(kw) +
-                     ": " + g_strings.to_string(input_line[pos].text_id));
+                     ": " + g_strings.to_string(input_line.peek().text_id));
         return false;
     }
 
     return true;
 }
 
-bool Preproc::parse_filename(const std::vector<Token>& input_line,
-                             size_t& pos,
+bool Preproc::parse_filename(ParseLine& input_line,
                              Keyword kw,
                              std::string& out_filename,
                              bool& out_is_angle_bracket,
                              SourceLoc& out_filename_loc) {
-    if (pos >= input_line.size() ||
-            input_line[pos].type == TokenType::EndOfLine) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected filename after " +
-                     keyword_to_string(kw));
+    if (input_line.peek().type == TokenType::EndOfLine) {
+        input_line.error("Expected filename after " +
+                         keyword_to_string(kw));
         return false;
     }
 
     // accept "file" or <file>
-    if (input_line[pos].type == TokenType::String) {
+    if (input_line.peek().type == TokenType::String) {
         out_filename =
-            g_strings.view(input_line[pos].value.str_value_id);
+            g_strings.view(input_line.peek().value.str_value_id);
         std::string_view quoted_filename =
-            g_strings.view(input_line[pos].text_id);
+            g_strings.view(input_line.peek().text_id);
         out_is_angle_bracket = !quoted_filename.empty() &&
                                quoted_filename.front() == '<' && quoted_filename.back() == '>';
-        out_filename_loc = input_line[pos].loc;
-        pos++;
+        out_filename_loc = input_line.peek().loc;
+        input_line.pos++;
         return true;
     }
 
     // accept sequence of tokens until a space
-    std::string_view token_text = g_strings.view(input_line[pos].text_id);
+    std::string_view token_text = g_strings.view(input_line.peek().text_id);
     if (token_text.size() == 0 || is_space(token_text.front())) {
-        g_diag.error(input_line[pos].loc, "Expected filename after " +
-                     keyword_to_string(kw));
+        input_line.error("Expected filename after " +
+                         keyword_to_string(kw));
         return false;
     }
 
     out_is_angle_bracket = false;
     out_filename = token_text;
-    out_filename_loc = input_line[pos].loc;
-    size_t column = input_line[pos].loc.column + token_text.size();
-    pos++;
+    out_filename_loc = input_line.peek().loc;
+    size_t column = input_line.peek().loc.column + token_text.size();
+    input_line.pos++;
 
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine &&
-            input_line[pos].loc.column == column) {
-        token_text = g_strings.view(input_line[pos].text_id);
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.peek().loc.column == column) {
+        token_text = g_strings.view(input_line.peek().text_id);
         out_filename += token_text;
-        column = input_line[pos].loc.column + token_text.size();
-        pos++;
+        column = input_line.peek().loc.column + token_text.size();
+        input_line.pos++;
     }
 
     if (!out_filename.empty() &&
@@ -225,19 +214,18 @@ bool Preproc::parse_filename(const std::vector<Token>& input_line,
 // Common helper: parse filename, check end of line, resolve file path.
 // Returns true on success with resolved path in out_resolved and location
 // in out_filename_loc. Reports errors and returns false on failure.
-bool Preproc::parse_and_resolve_file(const std::vector<Token>& input_line,
-                                     size_t& pos,
+bool Preproc::parse_and_resolve_file(ParseLine& input_line,
                                      Keyword kw,
                                      std::string& out_resolved,
                                      SourceLoc& out_filename_loc) {
     std::string filename;
     bool is_angle_bracket = false;
-    if (!parse_filename(input_line, pos, kw,
+    if (!parse_filename(input_line, kw,
                         filename, is_angle_bracket, out_filename_loc)) {
         return false;
     }
 
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return false;   // error already reported
     }
 
@@ -257,8 +245,7 @@ bool Preproc::parse_and_resolve_file(const std::vector<Token>& input_line,
     return true;
 }
 
-bool Preproc::parse_LINE_args(const std::vector<Token>& input_line,
-                              size_t& pos,
+bool Preproc::parse_LINE_args(ParseLine& input_line,
                               Keyword kw,
                               size_t& out_linenum,
                               std::string& out_filename) {
@@ -266,35 +253,30 @@ bool Preproc::parse_LINE_args(const std::vector<Token>& input_line,
     out_filename.clear();
 
     // accept line number
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Integer) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected line number after " +
-                     keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Integer) {
+        input_line.error("Expected line number after " +
+                         keyword_to_string(kw));
         return false;
     }
 
-    out_linenum = static_cast<size_t>(input_line[pos].value.int_value);
-    pos++;
+    out_linenum = static_cast<size_t>(input_line.peek().value.int_value);
+    input_line.pos++;
 
     // skip optional comma
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::Comma) {
-        pos++;
+    if (input_line.peek().type == TokenType::Comma) {
+        input_line.pos++;
     }
 
-    if (pos >= input_line.size() ||
-            input_line[pos].type == TokenType::EndOfLine) {
+    if (input_line.peek().type == TokenType::EndOfLine) {
         return true;    // no filename, but that's fine
     }
 
     // accept optional filename
-    std::string_view token_text = g_strings.view(input_line[pos].text_id);
+    std::string_view token_text = g_strings.view(input_line.peek().text_id);
     if (!token_text.empty() && !is_space(token_text.front())) {
         bool is_angle_bracket = false;
         SourceLoc filename_loc;
-        if (!parse_filename(input_line, pos, kw,
+        if (!parse_filename(input_line, kw,
                             out_filename, is_angle_bracket, filename_loc)) {
             return false;   // error already reported by parse_filename()
         }
@@ -317,8 +299,7 @@ bool Preproc::parse_LINE_args(const std::vector<Token>& input_line,
     return true;
 }
 
-bool Preproc::parse_params(const std::vector<Token>& input_line,
-                           size_t& pos,
+bool Preproc::parse_params(ParseLine& input_line,
                            std::vector<StringInterner::Id>& out_params,
                            bool& out_has_parens) {
     out_params.clear();
@@ -326,8 +307,7 @@ bool Preproc::parse_params(const std::vector<Token>& input_line,
 
     // Helper: report failure with a message and clear out_params
     auto fail = [&](std::string_view message) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc, message);
+        input_line.error(message);
         out_params.clear();
         return false;
     };
@@ -345,29 +325,25 @@ bool Preproc::parse_params(const std::vector<Token>& input_line,
     };
 
     // Optional opening parenthesis
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::LeftParen) {
+    if (input_line.peek().type == TokenType::LeftParen) {
         out_has_parens = true;
-        pos++; // consume '('
+        input_line.pos++; // consume '('
 
         // Empty list "()"
-        if (pos < input_line.size() &&
-                input_line[pos].type == TokenType::RightParen) {
-            pos++;
+        if (input_line.peek().type == TokenType::RightParen) {
+            input_line.pos++;
             return true;
         }
 
         // If right after '(' we don't have an identifier, it's a syntax error
-        if (pos >= input_line.size() ||
-                input_line[pos].type != TokenType::Identifier) {
+        if (input_line.peek().type != TokenType::Identifier) {
             return fail("Identifier expected");
         }
     }
 
     // If not in parens and next token is not an identifier, treat as empty list
     if (!out_has_parens) {
-        if (pos >= input_line.size() ||
-                input_line[pos].type != TokenType::Identifier) {
+        if (input_line.peek().type != TokenType::Identifier) {
             // Empty parameter list without parentheses;
             // success with index unchanged
             return true;
@@ -375,12 +351,11 @@ bool Preproc::parse_params(const std::vector<Token>& input_line,
     }
 
     // Parse first identifier
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::Identifier) {
-        if (!add_param(input_line[pos].text_id)) {
+    if (input_line.peek().type == TokenType::Identifier) {
+        if (!add_param(input_line.peek().text_id)) {
             return false;
         }
-        pos++;
+        input_line.pos++;
     }
     else {
         // Guard: should not happen due to checks above
@@ -388,15 +363,13 @@ bool Preproc::parse_params(const std::vector<Token>& input_line,
     }
 
     // Parse subsequent ", identifier" pairs
-    while (pos < input_line.size() &&
-            input_line[pos].type == TokenType::Comma) {
-        pos++; // skip comma
-        if (pos < input_line.size() &&
-                input_line[pos].type == TokenType::Identifier) {
-            if (!add_param(input_line[pos].text_id)) {
+    while (input_line.peek().type == TokenType::Comma) {
+        input_line.pos++; // skip comma
+        if (input_line.peek().type == TokenType::Identifier) {
+            if (!add_param(input_line.peek().text_id)) {
                 return false;
             }
-            pos++;
+            input_line.pos++;
         }
         else {
             return fail("Identifier expected");
@@ -405,9 +378,8 @@ bool Preproc::parse_params(const std::vector<Token>& input_line,
 
     // If we started with '(', we must end with ')'
     if (out_has_parens) {
-        if (pos < input_line.size() &&
-                input_line[pos].type == TokenType::RightParen) {
-            pos++;
+        if (input_line.peek().type == TokenType::RightParen) {
+            input_line.pos++;
         }
         else {
             return fail("Right parenthesis or comma expected");
@@ -436,9 +408,9 @@ bool Preproc::read_macro_body(Keyword start_kw,
         SourceLoc kw_loc;
         StringInterner::Id name_id;
         SourceLoc name_loc;
-        size_t pos = 0;
+        ParseLine pl(line.tokens);
 
-        if (is_directive(line.tokens, pos, kw, kw_loc, name_id, name_loc)) {
+        if (is_directive(pl, kw, kw_loc, name_id, name_loc)) {
             // Opening keywords: push onto nesting stack
             if (kw == Keyword::MACRO ||
                     kw == Keyword::REPT ||
@@ -448,7 +420,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
             }
             // Closing keywords: validate and pop
             else if (kw == Keyword::ENDM || kw == Keyword::ENDR) {
-                if (!check_end_of_line(line.tokens, pos, kw)) {
+                if (!check_end_of_line(pl, kw)) {
                     return false;
                 }
 
@@ -504,7 +476,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
                 // "LOCAL label1, label2, ..." syntax: parse identifier list
                 std::vector<StringInterner::Id> params;
                 bool has_parens = false;
-                if (!parse_params(line.tokens, pos, params, has_parens)) {
+                if (!parse_params(pl, params, has_parens)) {
                     return false; // error already reported
                 }
 
@@ -515,7 +487,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
                     }
                 }
 
-                if (!check_end_of_line(line.tokens, pos, kw)) {
+                if (!check_end_of_line(pl, kw)) {
                     return false;
                 }
 
@@ -537,20 +509,20 @@ bool Preproc::read_macro_body(Keyword start_kw,
     return false;
 }
 
-bool Preproc::eval_if_expr(const std::vector<Token>& input_line,
-                           size_t& pos, Keyword kw) {
+bool Preproc::eval_if_expr(ParseLine& input_line,
+                           Keyword kw) {
     // the rest of the line is the expression to evaluate
     std::vector<Token> expr_tokens;
-    expr_tokens.reserve(input_line.size() - pos);
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine) {
-        expr_tokens.push_back(input_line[pos]);
-        pos++;
+    expr_tokens.reserve(input_line.tokens.size() - input_line.pos);
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        expr_tokens.push_back(input_line.peek());
+        input_line.pos++;
     }
 
     if (expr_tokens.empty()) {
-        g_diag.error(input_line.back().loc, "Expected expression after " +
-                     keyword_to_string(kw) + " directive");
+        input_line.error("Expected expression after " +
+                         keyword_to_string(kw) + " directive");
         return false;
     }
 
@@ -561,8 +533,8 @@ bool Preproc::eval_if_expr(const std::vector<Token>& input_line,
     expand_line(line, expanded);
 
     if (expanded.empty()) {
-        g_diag.error(input_line.back().loc, "Expected expression after " +
-                     keyword_to_string(kw) + " directive");
+        input_line.error("Expected expression after " +
+                         keyword_to_string(kw) + " directive");
         return false;
     }
 
@@ -577,30 +549,26 @@ bool Preproc::eval_if_expr(const std::vector<Token>& input_line,
 
     if (expr_pos >= expanded.size() ||
             expanded[expr_pos].type != TokenType::EndOfLine) {
-        g_diag.error(input_line.back().loc, "Expected expression after " +
-                     keyword_to_string(kw) + " directive");
+        input_line.error("Expected expression after " +
+                         keyword_to_string(kw) + " directive");
         return false;
     }
 
     return static_cast<bool>(result);
 }
 
-bool Preproc::eval_ifdef_name(const std::vector<Token>& input_line,
-                              size_t& pos,
+bool Preproc::eval_ifdef_name(ParseLine& input_line,
                               bool negated,
                               Keyword kw) {
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " + keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " + keyword_to_string(kw));
         return false;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    input_line.pos++;
 
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return false;   // error already reported
     }
 
@@ -715,11 +683,10 @@ void Preproc::rewrite_logical_line(LogicalLine& line) {
 }
 
 void Preproc::process_INCLUDE(Keyword kw, const SourceLoc&,
-                              const std::vector<Token>& input_line,
-                              size_t& pos) {
+                              ParseLine& input_line) {
     std::string resolved;
     SourceLoc filename_loc;
-    if (!parse_and_resolve_file(input_line, pos, kw,
+    if (!parse_and_resolve_file(input_line, kw,
                                 resolved, filename_loc)) {
         return;
     }
@@ -755,11 +722,10 @@ void Preproc::process_INCLUDE(Keyword kw, const SourceLoc&,
 }
 
 void Preproc::process_BINARY(Keyword kw, const SourceLoc&,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
+                             ParseLine& input_line) {
     std::string resolved;
     SourceLoc filename_loc;
-    if (!parse_and_resolve_file(input_line, pos, kw,
+    if (!parse_and_resolve_file(input_line, kw,
                                 resolved, filename_loc)) {
         return;
     }
@@ -807,11 +773,10 @@ void Preproc::process_BINARY(Keyword kw, const SourceLoc&,
 }
 
 void Preproc::process_LINE(Keyword kw, const SourceLoc& kw_loc,
-                           const std::vector<Token>& input_line,
-                           size_t& pos) {
+                           ParseLine& input_line) {
     size_t line = 0;
     std::string filename;
-    if (!parse_LINE_args(input_line, pos, kw, line, filename)) {
+    if (!parse_LINE_args(input_line, kw, line, filename)) {
         return; // error already emitted by parse_LINE_args()
     }
 
@@ -836,11 +801,10 @@ void Preproc::process_LINE(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_C_LINE(Keyword kw, const SourceLoc& kw_loc,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
+                             ParseLine& input_line) {
     size_t line = 0;
     std::string filename;
-    if (!parse_LINE_args(input_line, pos, kw, line, filename)) {
+    if (!parse_LINE_args(input_line, kw, line, filename)) {
         return; // error already emitted by parse_LINE_args()
     }
 
@@ -863,32 +827,27 @@ void Preproc::process_C_LINE(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " +
-                     keyword_to_string(kw));
+                             ParseLine& input_line) {
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " +
+                         keyword_to_string(kw));
         return;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    SourceLoc name_loc = input_line[pos].loc;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    SourceLoc name_loc = input_line.peek().loc;
+    input_line.pos++;
 
     // check if it's a function-like macro, i.e. if next token is '('
     // without space
     bool is_function_like = false;
     bool has_parens = false;
     std::vector<StringInterner::Id> params;
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::LeftParen &&
-            input_line[pos].loc.column ==
+    if (input_line.peek().type == TokenType::LeftParen &&
+            input_line.peek().loc.column ==
             name_loc.column + g_strings.view(name_id).size()) {
         is_function_like = true;
-        if (!parse_params(input_line, pos, params, has_parens)) {
+        if (!parse_params(input_line, params, has_parens)) {
             return; // error already emitted by parse_params()
         }
     }
@@ -902,13 +861,12 @@ void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
     macro.is_multiline = false;
     macro.has_parenthesized_params =
         is_function_like && !macro.params.empty() && has_parens;
-    do_DEFINE(macro, input_line, pos);
+    do_DEFINE(macro, input_line);
 }
 
 void Preproc::process_name_DEFINE(Keyword, const SourceLoc&,
                                   StringInterner::Id name_id, const SourceLoc& name_loc,
-                                  const std::vector<Token>& input_line,
-                                  size_t& pos) {
+                                  ParseLine& input_line) {
     // create the macro and delegate to do_DEFINE
     Macro macro;
     macro.name_id = name_id;
@@ -917,11 +875,11 @@ void Preproc::process_name_DEFINE(Keyword, const SourceLoc&,
     macro.is_function_like = false;
     macro.is_multiline = false;
 
-    do_DEFINE(macro, input_line, pos);
+    do_DEFINE(macro, input_line);
 }
 
 void Preproc::do_DEFINE(const Macro& macro,
-                        const std::vector<Token>& input_line, size_t& pos) {
+                        ParseLine& input_line) {
     // check for redefinition
     auto it = macros.find(macro.name_id);
     if (it != macros.end()) {
@@ -933,23 +891,22 @@ void Preproc::do_DEFINE(const Macro& macro,
     }
 
     // scan optional '='
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::EQ) {
-        pos++; // skip '='
+    if (input_line.peek().type == TokenType::EQ) {
+        input_line.pos++; // skip '='
     }
 
     // The rest of the line is the replacement list (can be empty)
     std::vector<Token> replacement;
-    replacement.reserve(input_line.size() - pos);
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine) {
-        replacement.push_back(input_line[pos]);
-        pos++;
+    replacement.reserve(input_line.tokens.size() - input_line.pos);
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        replacement.push_back(input_line.peek());
+        input_line.pos++;
     }
 
     // if macro is empty, add a default "1" token
     if (replacement.empty()) {
-        replacement.push_back(Token::integer("1", 1, input_line.back().loc));
+        replacement.push_back(Token::integer("1", 1, input_line.peek().loc));
     }
 
     // if replacement is a constant expression, define a DEFC so that
@@ -988,21 +945,17 @@ void Preproc::do_DEFINE(const Macro& macro,
 }
 
 void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " +
-                     keyword_to_string(kw));
+                            ParseLine& input_line) {
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " +
+                         keyword_to_string(kw));
         return;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    input_line.pos++;
 
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return; // error already reported
     }
 
@@ -1011,9 +964,8 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
 
 void Preproc::process_name_UNDEF(Keyword kw, const SourceLoc&,
                                  StringInterner::Id name_id, const SourceLoc&,
-                                 const std::vector<Token>& input_line,
-                                 size_t& pos) {
-    if (!check_end_of_line(input_line, pos, kw)) {
+                                 ParseLine& input_line) {
+    if (!check_end_of_line(input_line, kw)) {
         return; // error already reported
     }
 
@@ -1026,28 +978,23 @@ void Preproc::do_UNDEF(StringInterner::Id name_id) {
 }
 
 void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
-                           const std::vector<Token>& input_line,
-                           size_t& pos) {
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " +
-                     keyword_to_string(kw));
+                           ParseLine& input_line) {
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " +
+                         keyword_to_string(kw));
         return;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    SourceLoc name_loc = input_line[pos].loc;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    SourceLoc name_loc = input_line.peek().loc;
+    input_line.pos++;
 
     // check if it's a function-like macro, i.e. if next token is '('
     // without space
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::LeftParen &&
-            input_line[pos].loc.column ==
+    if (input_line.peek().type == TokenType::LeftParen &&
+            input_line.peek().loc.column ==
             name_loc.column + g_strings.view(name_id).size()) {
-        g_diag.error(input_line[pos].loc,
+        g_diag.error(input_line.peek().loc,
                      keyword_to_string(kw) +
                      " macro cannot be function-like");
         return;
@@ -1061,13 +1008,12 @@ void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
     macro.is_function_like = false;
     macro.is_multiline = false;
 
-    do_DEFL(macro, input_line, pos);
+    do_DEFL(macro, input_line);
 }
 
 void Preproc::process_name_DEFL(Keyword, const SourceLoc&,
                                 StringInterner::Id name_id, const SourceLoc& name_loc,
-                                const std::vector<Token>& input_line,
-                                size_t& pos) {
+                                ParseLine& input_line) {
     Macro macro;
     macro.name_id = name_id;
     macro.loc = name_loc;
@@ -1075,12 +1021,11 @@ void Preproc::process_name_DEFL(Keyword, const SourceLoc&,
     macro.is_function_like = false;
     macro.is_multiline = false;
 
-    do_DEFL(macro, input_line, pos);
+    do_DEFL(macro, input_line);
 }
 
 void Preproc::do_DEFL(const Macro& macro,
-                      const std::vector<Token>& input_line,
-                      size_t& pos) {
+                      ParseLine& input_line) {
     // Predefine name as an empty macro if it does not exist, so that
     // occurrences of <name> in the body expand to the previous value (if any)
     // or to empty otherwise.
@@ -1103,23 +1048,22 @@ void Preproc::do_DEFL(const Macro& macro,
     }
 
     // scan optional '='
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::EQ) {
-        pos++; // skip '='
+    if (input_line.peek().type == TokenType::EQ) {
+        input_line.pos++; // skip '='
     }
 
     // The rest of the line is the replacement list (can be empty)
     std::vector<Token> replacement;
-    replacement.reserve(input_line.size() - pos);
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine) {
-        replacement.push_back(input_line[pos]);
-        pos++;
+    replacement.reserve(input_line.tokens.size() - input_line.pos);
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        replacement.push_back(input_line.peek());
+        input_line.pos++;
     }
 
     // if macro is empty, add a default "1" token
     if (replacement.empty()) {
-        replacement.push_back(Token::integer("1", 1, input_line.back().loc));
+        replacement.push_back(Token::integer("1", 1, input_line.peek().loc));
     }
 
     // Expand body so stored value reflects current expansions
@@ -1154,31 +1098,27 @@ void Preproc::do_DEFL(const Macro& macro,
 }
 
 void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
+                            ParseLine& input_line) {
     // parse name
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " +
-                     keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " +
+                         keyword_to_string(kw));
         return;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    SourceLoc name_loc = input_line[pos].loc;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    SourceLoc name_loc = input_line.peek().loc;
+    input_line.pos++;
 
     // parse optional parameters
     std::vector<StringInterner::Id> params;
     bool has_parens = false;
-    if (!parse_params(input_line, pos, params, has_parens)) {
+    if (!parse_params(input_line, params, has_parens)) {
         return; // error already emitted by parse_params()
     }
 
     // check for end of line
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return; // error already reported
     }
 
@@ -1196,17 +1136,16 @@ void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
 
 void Preproc::process_name_MACRO(Keyword kw, const SourceLoc& kw_loc,
                                  StringInterner::Id name_id, const SourceLoc& name_loc,
-                                 const std::vector<Token>& input_line,
-                                 size_t& pos) {
+                                 ParseLine& input_line) {
     // parse optional parameters
     std::vector<StringInterner::Id> params;
     bool has_parens = false;
-    if (!parse_params(input_line, pos, params, has_parens)) {
+    if (!parse_params(input_line, params, has_parens)) {
         return; // error already emitted by parse_params()
     }
 
     // check for end of line
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return; // error already reported
     }
 
@@ -1250,20 +1189,19 @@ void Preproc::do_MACRO(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_ENDM(Keyword kw, const SourceLoc& kw_loc,
-                           const std::vector<Token>&, size_t&) {
+                           ParseLine&) {
     g_diag.error(kw_loc,
                  "Unexpected " + keyword_to_string(kw) + " directive");
 }
 
 void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
-                           const std::vector<Token>& input_line,
-                           size_t& pos) {
+                           ParseLine& input_line) {
     // Collect remaining tokens after REPT as the count expression
     std::vector<Token> expr_tokens;
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine) {
-        expr_tokens.push_back(input_line[pos]);
-        pos++;
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        expr_tokens.push_back(input_line.peek());
+        input_line.pos++;
     }
 
     if (expr_tokens.empty()) {
@@ -1339,57 +1277,51 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_ENDR(Keyword kw, const SourceLoc& kw_loc,
-                           const std::vector<Token>&, size_t&) {
+                           ParseLine&) {
     g_diag.error(kw_loc,
                  "Unexpected " + keyword_to_string(kw) + " directive");
 }
 
 void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
+                            ParseLine& input_line) {
     // read identifier for iteration variable
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " +
-                     keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " +
+                         keyword_to_string(kw));
         return;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    SourceLoc name_loc = input_line[pos].loc;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    SourceLoc name_loc = input_line.peek().loc;
+    input_line.pos++;
 
     // read comma after identifier
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Comma) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected comma after identifier in " +
-                     keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Comma) {
+        input_line.error("Expected comma after identifier in " +
+                         keyword_to_string(kw));
         return;
     }
-    pos++;
+    input_line.pos++;
 
-    do_REPTI(kw, kw_loc, name_id, name_loc, input_line, pos);
+    do_REPTI(kw, kw_loc, name_id, name_loc, input_line);
 }
 
 void Preproc::process_name_REPTI(Keyword kw, const SourceLoc& kw_loc,
                                  StringInterner::Id name_id, const SourceLoc& name_loc,
-                                 const std::vector<Token>& input_line, size_t& pos) {
+                                 ParseLine& input_line) {
 
-    do_REPTI(kw, kw_loc, name_id, name_loc, input_line, pos);
+    do_REPTI(kw, kw_loc, name_id, name_loc, input_line);
 }
 
 void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
                        StringInterner::Id name_id, const SourceLoc&,
-                       const std::vector<Token>& input_line, size_t& pos) {
-    SourceLoc args_loc = pos < input_line.size() ? input_line[pos].loc : kw_loc;
+                       ParseLine& input_line) {
+    SourceLoc args_loc = input_line.peek().loc;
 
     // Parse comma-separated macro arguments until EndOfLine.
+    // collect_bare_args still uses raw vector+pos; extract them from ParseLine.
     std::vector<std::vector<Token>> args;
-    if (!collect_bare_args(input_line, pos, args)) {
+    if (!collect_bare_args(input_line.tokens, input_line.pos, args)) {
         return; // error already emitted by collect_bare_args()
     }
 
@@ -1400,7 +1332,7 @@ void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // Check end of line
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return;
     }
 
@@ -1439,53 +1371,44 @@ void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_REPTC(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
+                            ParseLine& input_line) {
     // read identifier for iteration variable
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected identifier after " + keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Identifier) {
+        input_line.error("Expected identifier after " + keyword_to_string(kw));
         return;
     }
 
-    StringInterner::Id name_id = input_line[pos].text_id;
-    SourceLoc name_loc = input_line[pos].loc;
-    pos++;
+    StringInterner::Id name_id = input_line.peek().text_id;
+    SourceLoc name_loc = input_line.peek().loc;
+    input_line.pos++;
 
     // read comma after identifier
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Comma) {
-        g_diag.error(pos >= input_line.size() ? input_line.back().loc :
-                     input_line[pos].loc,
-                     "Expected comma after identifier in " + keyword_to_string(kw));
+    if (input_line.peek().type != TokenType::Comma) {
+        input_line.error("Expected comma after identifier in " + keyword_to_string(kw));
         return;
     }
-    pos++;
+    input_line.pos++;
 
-    do_REPTC(kw, kw_loc, name_id, name_loc, input_line, pos);
+    do_REPTC(kw, kw_loc, name_id, name_loc, input_line);
 }
 
 void Preproc::process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
                                  StringInterner::Id name_id, const SourceLoc& name_loc,
-                                 const std::vector<Token>& input_line,
-                                 size_t& pos) {
-    do_REPTC(kw, kw_loc, name_id, name_loc, input_line, pos);
+                                 ParseLine& input_line) {
+    do_REPTC(kw, kw_loc, name_id, name_loc, input_line);
 }
 
 void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
                        StringInterner::Id name_id, const SourceLoc&,
-                       const std::vector<Token>& input_line,
-                       size_t& pos) {
-    SourceLoc args_loc = pos < input_line.size() ? input_line[pos].loc : kw_loc;
+                       ParseLine& input_line) {
+    SourceLoc args_loc = input_line.peek().loc;
 
     // Collect all tokens until EndOfLine
     std::vector<Token> raw_tokens;
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine) {
-        raw_tokens.push_back(input_line[pos]);
-        pos++;
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        raw_tokens.push_back(input_line.peek());
+        input_line.pos++;
     }
 
     if (raw_tokens.empty()) {
@@ -1562,23 +1485,21 @@ void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_LOCAL(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>&, size_t&) {
+                            ParseLine&) {
     g_diag.error(kw_loc,
                  "Unexpected " + keyword_to_string(kw) + " directive");
 }
 
 void Preproc::process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
                                  StringInterner::Id, const SourceLoc&,
-                                 const std::vector<Token>&,
-                                 size_t&) {
+                                 ParseLine&) {
     g_diag.error(kw_loc,
                  "Unexpected " + keyword_to_string(kw) + " directive");
 }
 
 void Preproc::process_EXITM(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
-    if (!check_end_of_line(input_line, pos, kw)) {
+                            ParseLine& input_line) {
+    if (!check_end_of_line(input_line, kw)) {
         return;
     }
 
@@ -1597,9 +1518,8 @@ void Preproc::process_EXITM(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_IF(Keyword kw, const SourceLoc& kw_loc,
-                         const std::vector<Token>& input_line,
-                         size_t& pos) {
-    bool cond_value = eval_if_expr(input_line, pos, kw);
+                         ParseLine& input_line) {
+    bool cond_value = eval_if_expr(input_line, kw);
 
     ConditionalFrame frame;
     frame.if_loc = kw_loc;
@@ -1610,8 +1530,7 @@ void Preproc::process_IF(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
+                             ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
                      "Unexpected " + keyword_to_string(kw) +
@@ -1627,7 +1546,7 @@ void Preproc::process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    bool cond_value = eval_if_expr(input_line, pos, kw);
+    bool cond_value = eval_if_expr(input_line, kw);
     bool active_now = (!frame.any_taken) && cond_value;
     frame.branch_active = active_now;
     if (active_now) {
@@ -1636,8 +1555,7 @@ void Preproc::process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_ELSE(Keyword kw, const SourceLoc& kw_loc,
-                           const std::vector<Token>& input_line,
-                           size_t& pos) {
+                           ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
                      "Unexpected " + keyword_to_string(kw) +
@@ -1646,7 +1564,7 @@ void Preproc::process_ELSE(Keyword kw, const SourceLoc& kw_loc,
     }
 
     ConditionalFrame& frame = cond_stack.back();
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return;
     }
 
@@ -1660,7 +1578,7 @@ void Preproc::process_ELSE(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>& input_line, size_t& pos) {
+                            ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
                      "Unexpected " + keyword_to_string(kw) +
@@ -1668,7 +1586,7 @@ void Preproc::process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return;
     }
 
@@ -1676,21 +1594,19 @@ void Preproc::process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_IFDEF(Keyword kw, const SourceLoc& kw_loc,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
-    do_IFDEF_IFNDEF(false, kw, kw_loc, input_line, pos);
+                            ParseLine& input_line) {
+    do_IFDEF_IFNDEF(false, kw, kw_loc, input_line);
 }
 
 void Preproc::process_IFNDEF(Keyword kw, const SourceLoc& kw_loc,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
-    do_IFDEF_IFNDEF(true, kw, kw_loc, input_line, pos);
+                             ParseLine& input_line) {
+    do_IFDEF_IFNDEF(true, kw, kw_loc, input_line);
 }
 
 void Preproc::do_IFDEF_IFNDEF(bool negated,
                               Keyword kw, const SourceLoc& kw_loc,
-                              const std::vector<Token>& input_line, size_t& pos) {
-    bool cond = eval_ifdef_name(input_line, pos, negated, kw);
+                              ParseLine& input_line) {
+    bool cond = eval_ifdef_name(input_line, negated, kw);
 
     ConditionalFrame frame;
     frame.if_loc = kw_loc;
@@ -1701,20 +1617,18 @@ void Preproc::do_IFDEF_IFNDEF(bool negated,
 }
 
 void Preproc::process_ELSEIFDEF(Keyword kw, const SourceLoc& kw_loc,
-                                const std::vector<Token>& input_line,
-                                size_t& pos) {
-    do_ELSEIFDEF_ELSEIFNDEF(false, kw, kw_loc, input_line, pos);
+                                ParseLine& input_line) {
+    do_ELSEIFDEF_ELSEIFNDEF(false, kw, kw_loc, input_line);
 }
 
 void Preproc::process_ELSEIFNDEF(Keyword kw, const SourceLoc& kw_loc,
-                                 const std::vector<Token>& input_line,
-                                 size_t& pos) {
-    do_ELSEIFDEF_ELSEIFNDEF(true, kw, kw_loc, input_line, pos);
+                                 ParseLine& input_line) {
+    do_ELSEIFDEF_ELSEIFNDEF(true, kw, kw_loc, input_line);
 }
 
 void Preproc::do_ELSEIFDEF_ELSEIFNDEF(bool negated,
                                       Keyword kw, const SourceLoc& kw_loc,
-                                      const std::vector<Token>& input_line, size_t& pos) {
+                                      ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
                      "Unexpected " + keyword_to_string(kw) +
@@ -1730,7 +1644,7 @@ void Preproc::do_ELSEIFDEF_ELSEIFNDEF(bool negated,
         return;
     }
 
-    bool cond = eval_ifdef_name(input_line, pos, negated, kw);
+    bool cond = eval_ifdef_name(input_line, negated, kw);
     bool active_now = (!frame.any_taken) && cond;
     frame.branch_active = active_now;
     if (active_now) {
@@ -1739,21 +1653,19 @@ void Preproc::do_ELSEIFDEF_ELSEIFNDEF(bool negated,
 }
 
 void Preproc::process_PRAGMA(Keyword kw, const SourceLoc&,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
+                             ParseLine& input_line) {
     // Reserve PRAGMA for future extensions:
     // only handle "PRAGMA ONCE", ignore anything else.
-    if (pos >= input_line.size() ||
-            input_line[pos].type != TokenType::Identifier ||
-            input_line[pos].keyword != Keyword::ONCE) {
+    if (input_line.peek().type != TokenType::Identifier ||
+            input_line.peek().keyword != Keyword::ONCE) {
         return;
     }
 
     // consume ONCE
-    pos++;
+    input_line.pos++;
 
     // PRAGMA ONCE must have no extra tokens
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return;
     }
 
@@ -1776,14 +1688,13 @@ void Preproc::process_PRAGMA(Keyword kw, const SourceLoc&,
 }
 
 void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
-                             const std::vector<Token>& input_line,
-                             size_t& pos) {
+                             ParseLine& input_line) {
     // Collect everything after ASSERT until EndOfLine
     std::vector<Token> raw_tokens;
-    while (pos < input_line.size() &&
-            input_line[pos].type != TokenType::EndOfLine) {
-        raw_tokens.push_back(input_line[pos]);
-        pos++;
+    while (input_line.peek().type != TokenType::EndOfLine &&
+            input_line.pos < input_line.tokens.size()) {
+        raw_tokens.push_back(input_line.peek());
+        input_line.pos++;
     }
 
     if (raw_tokens.empty()) {
@@ -1824,8 +1735,10 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
 
         if (expr_pos >= expanded.size() ||
                 expanded[expr_pos].type != TokenType::String) {
-            g_diag.error(expr_pos >= expanded.size() ? expanded.back().loc :
-                         expanded[expr_pos].loc,
+            SourceLoc err_loc = (expr_pos < expanded.size())
+                                ? expanded[expr_pos].loc
+                                : expanded.back().loc;
+            g_diag.error(err_loc,
                          "Expected string after comma in " +
                          keyword_to_string(kw));
             return;
@@ -1836,8 +1749,12 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // Must end at EOL
-    if (!check_end_of_line(expanded, expr_pos, kw)) {
-        return;
+    {
+        ParseLine expanded_pl(expanded);
+        expanded_pl.pos = expr_pos;
+        if (!check_end_of_line(expanded_pl, kw)) {
+            return;
+        }
     }
 
     // Assertion passed
@@ -1850,22 +1767,19 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_ERROR(Keyword kw, const SourceLoc&,
-                            const std::vector<Token>& input_line,
-                            size_t& pos) {
+                            ParseLine& input_line) {
     // Optional: ERROR "message"
     std::string message = "User specified error";
-    SourceLoc err_loc = (pos < input_line.size()) ? input_line[pos].loc
-                        : (input_line.empty() ? SourceLoc{} : input_line.back().loc);
+    SourceLoc err_loc = input_line.peek().loc;
 
-    if (pos < input_line.size() &&
-            input_line[pos].type == TokenType::String) {
-        message = g_strings.to_string(input_line[pos].value.str_value_id);
-        err_loc = input_line[pos].loc;
-        ++pos;
+    if (input_line.peek().type == TokenType::String) {
+        message = g_strings.to_string(input_line.peek().value.str_value_id);
+        err_loc = input_line.peek().loc;
+        ++input_line.pos;
     }
 
     // Must end at EOL (or only have EOL tokens left)
-    if (!check_end_of_line(input_line, pos, kw)) {
+    if (!check_end_of_line(input_line, kw)) {
         return;
     }
 
@@ -1887,18 +1801,18 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     // 1. Find first non-EndOfLine token
     // ---------------------------------------------------------------------
-    size_t pos = 0;
-    while (pos < input_line.size() &&
-            input_line[pos].type == TokenType::EndOfLine) {
-        ++pos;
+    ParseLine pl(input_line);
+    while (pl.peek().type == TokenType::EndOfLine &&
+            pl.pos < pl.tokens.size()) {
+        ++pl.pos;
     }
 
-    if (pos >= input_line.size()) {
+    if (pl.pos >= pl.tokens.size()) {
         // Empty line -> normal line (macro expander will append EOL)
         return LineType::Normal;
     }
 
-    const Token& first_tok = input_line[pos];
+    const Token& first_tok = pl.peek();
 
     // ---------------------------------------------------------------------
     // 2. If inside inactive conditional block or exited macro,
@@ -1914,7 +1828,7 @@ Preproc::LineType Preproc::process_directive_line(
     StringInterner::Id name_id = 0;
     SourceLoc name_loc;
 
-    if (!is_directive(input_line, pos, kw, kw_loc, name_id, name_loc)) {
+    if (!is_directive(pl, kw, kw_loc, name_id, name_loc)) {
         // Not a directive
         if (!cond_active) {
             return LineType::Skip;
@@ -1943,7 +1857,7 @@ Preproc::LineType Preproc::process_directive_line(
         // Handle normal directives starting with directive keyword
         auto it = directive_handlers_.find(kw);
         if (it != directive_handlers_.end()) {
-            (this->*it->second)(kw, kw_loc, input_line, pos);
+            (this->*it->second)(kw, kw_loc, pl);
             return LineType::ControlOnly;
         }
     }
@@ -1952,7 +1866,7 @@ Preproc::LineType Preproc::process_directive_line(
         // before directive keyword
         auto it = name_directive_handlers_.find(kw);
         if (it != name_directive_handlers_.end()) {
-            (this->*it->second)(kw, kw_loc, name_id, name_loc, input_line, pos);
+            (this->*it->second)(kw, kw_loc, name_id, name_loc, pl);
             return LineType::ControlOnly;
         }
     }
