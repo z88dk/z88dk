@@ -195,7 +195,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
 
         // Hook: need to parse DEFC, EQU and = so that assembly symbols
         // are known in the preprocessor and can be used in IF expressions.
-        // e.g. X EQU 1 // IF X --> show know the value of X
+        // e.g. X EQU 1 // IF X --> needs to know the value of X
         parse_asm_definitions(expanded);
 
         // Append expanded tokens to final output (skip empty lines
