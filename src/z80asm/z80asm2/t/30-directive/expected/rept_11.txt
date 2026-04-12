@@ -24,6 +24,6 @@ t/30-directive/input/rept_11.asm:7:9: error: Unexpected token after REPT count: 
 t/30-directive/input/rept_11.asm:8:2: error: Unexpected ENDR directive
     #endr
      ^
-t/30-directive/input/rept_11.asm:9:2: error: Unexpected end of file; missing ENDR for REPT
+t/30-directive/input/rept_11.asm:9:2: error: Unexpected end of file, missing ENDR for REPT
     #rept 1 ; no endr
      ^

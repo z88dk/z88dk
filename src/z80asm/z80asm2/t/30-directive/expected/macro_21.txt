@@ -1,6 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/30-directive//input/macro_21.asm
 Assembling t/30-directive/input/macro_21.asm...
-t/30-directive/input/macro_21.asm:1:6: error: Expected macro name after MACRO
+t/30-directive/input/macro_21.asm:1:6: error: Expected identifier after MACRO
     macro ; no name
          ^
 t/30-directive/input/macro_21.asm:5:1: error: Macro redefinition: X
@@ -150,7 +150,7 @@ EndOfLine	"\n"	44:9
 t/30-directive/input/macro_21.asm:47:6: error: Unexpected token after ENDM: extra
     endm extra
          ^
-t/30-directive/input/macro_21.asm:48:5: error: Unexpected end of file; missing ENDM for MACRO
+t/30-directive/input/macro_21.asm:48:5: error: Unexpected end of file, missing ENDM for MACRO
     M11 macro 
         ^
 # file: t/30-directive/input/macro_21.asm

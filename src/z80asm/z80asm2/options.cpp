@@ -174,6 +174,7 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
 
     // Convert to std::string for your symbol table
     std::string name_s(name);
+    StringInterner::Id name_id = g_strings.intern(name_s);
     std::string expr_s(expr);
 
     // evaluate the expression as a constant expression
@@ -184,7 +185,7 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
     }
 
     // Hand off to your assembler's define mechanism
-    options.global_defs.set(name_s, value, loc);
+    options.global_defs.set(name_id, value, loc);
 }
 
 // match longest option prefix in arg, return nullptr if no match
