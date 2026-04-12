@@ -4,7 +4,14 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "diag.h"
+#include "lexer_keywords.h"
 #include "lexer_tokens.h"
+#include "source_loc.h"
+#include "string_interner.h"
+#include "string_utils.h"
+#include <string>
+#include <string_view>
 
 Token Token::token(TokenType type_, std::string_view text_,
                    const SourceLoc& loc) {
@@ -65,4 +72,23 @@ Token Token::end_of_line(const SourceLoc& loc) {
 
 LogicalLine::LogicalLine(const SourceLoc& loc_, LineOrigin origin_)
     : loc(loc_), origin(origin_) {
+}
+
+ParseLine::ParseLine(const std::vector<Token>& tokens_)
+    : tokens(tokens_), pos(0) {
+}
+
+const Token& ParseLine::peek(size_t offset) const {
+    if (pos + offset < tokens.size()) {
+        return tokens[pos + offset];
+    }
+
+    static Token eof_token =
+        Token::end_of_line(tokens.empty() ?
+                           SourceLoc() : tokens.back().loc);
+    return eof_token;
+}
+
+void ParseLine::error(std::string_view message) const {
+    g_diag.error(peek().loc, message);
 }
