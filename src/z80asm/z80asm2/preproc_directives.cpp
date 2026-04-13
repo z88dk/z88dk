@@ -509,33 +509,55 @@ bool Preproc::read_macro_body(Keyword start_kw,
     return false;
 }
 
-bool Preproc::eval_if_expr(ParseLine& input_line,
-                           Keyword kw) {
-    // the rest of the line is the expression to evaluate
-    std::vector<Token> expr_tokens;
-    expr_tokens.reserve(input_line.tokens.size() - input_line.pos);
+// Helper: collect remaining tokens until EndOfLine, expand macros.
+// Returns expanded tokens, or empty vector on error (with error reported).
+std::vector<Token> Preproc::collect_and_expand_line(
+    ParseLine& input_line,
+    Keyword kw,
+    std::string_view what) {
+
+    SourceLoc start_loc = input_line.peek().loc;
+
+    // Collect tokens until EndOfLine
+    std::vector<Token> raw_tokens;
     while (input_line.peek().type != TokenType::EndOfLine &&
             input_line.pos < input_line.tokens.size()) {
-        expr_tokens.push_back(input_line.peek());
+        raw_tokens.push_back(input_line.peek());
         input_line.pos++;
     }
 
-    if (expr_tokens.empty()) {
-        input_line.error("Expected expression after " +
-                         keyword_to_string(kw) + " directive");
-        return false;
+    if (raw_tokens.empty()) {
+        g_diag.error(start_loc,
+                     "Expected " + std::string(what) +
+                     " after " + keyword_to_string(kw));
+        return {};
     }
 
-    // Expand macros in expression
-    LogicalLine line(expr_tokens.front().loc);
-    line.tokens = std::move(expr_tokens);
+    // Expand macros
+    LogicalLine line(raw_tokens.front().loc);
+    line.tokens = std::move(raw_tokens);
     std::vector<Token> expanded;
     expand_line(line, expanded);
 
+    // Check that expansion produced something besides EndOfLine
+    if (expanded.empty() ||
+            (expanded.size() == 1 && expanded[0].type == TokenType::EndOfLine)) {
+        g_diag.error(start_loc,
+                     "Expected " + std::string(what) +
+                     " after " + keyword_to_string(kw));
+        return {};
+    }
+
+    return expanded;
+}
+
+bool Preproc::eval_if_expr(ParseLine& input_line,
+                           Keyword kw) {
+    std::vector<Token> expanded =
+        collect_and_expand_line(input_line, kw, "expression");
+
     if (expanded.empty()) {
-        input_line.error("Expected expression after " +
-                         keyword_to_string(kw) + " directive");
-        return false;
+        return false;  // error already reported
     }
 
     // evaluate the if condition
@@ -543,14 +565,14 @@ bool Preproc::eval_if_expr(ParseLine& input_line,
     int result = 0;
     if (!eval_if_condition(expanded, expr_pos,
                            const_symbols, result, /*silent=*/false)) {
-        // error already reported by eval_const_expr
-        return false;
+        return false;  // error already reported by eval_if_condition
     }
 
     if (expr_pos >= expanded.size() ||
             expanded[expr_pos].type != TokenType::EndOfLine) {
-        input_line.error("Expected expression after " +
-                         keyword_to_string(kw) + " directive");
+        g_diag.error(expanded[0].loc,
+                     "Unexpected token after " +
+                     keyword_to_string(kw) + " expression");
         return false;
     }
 
@@ -1196,34 +1218,12 @@ void Preproc::process_ENDM(Keyword kw, const SourceLoc& kw_loc,
 
 void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
                            ParseLine& input_line) {
-    // Collect remaining tokens after REPT as the count expression
-    std::vector<Token> expr_tokens;
-    while (input_line.peek().type != TokenType::EndOfLine &&
-            input_line.pos < input_line.tokens.size()) {
-        expr_tokens.push_back(input_line.peek());
-        input_line.pos++;
-    }
+    // Collect and expand the count expression
+    std::vector<Token> expanded =
+        collect_and_expand_line(input_line, kw, "repeat count");
 
-    if (expr_tokens.empty()) {
-        g_diag.error(kw_loc,
-                     "Expected repeat count after " + keyword_to_string(kw));
-        return;
-    }
-
-    // Macro-expand the expression tokens
-    LogicalLine expr_line(expr_tokens.front().loc);
-    expr_line.tokens = std::move(expr_tokens);
-    std::vector<Token> expanded;
-    expand_line(expr_line, expanded);
-
-    // Check that expansion produced something besides EndOfLine
-    if (expanded.empty() ||
-            (expanded.size() == 1 &&
-             expanded[0].type == TokenType::EndOfLine)) {
-        g_diag.error(kw_loc,
-                     "Expected repeat count after " +
-                     keyword_to_string(kw));
-        return;
+    if (expanded.empty()) {
+        return;  // error already reported
     }
 
     // Evaluate constant expression (not silent -> errors are reported)
@@ -1231,7 +1231,7 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
     int repeat_count = 0;
     if (!eval_const_expr(expanded, expr_pos,
                          const_symbols, repeat_count, /*silent=*/false)) {
-        return; // error already reported by eval_const_expr
+        return;  // error already reported by eval_const_expr
     }
 
     // Check no extra tokens after the expression
@@ -1249,7 +1249,7 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
     std::vector<LogicalLine> body;
     std::vector<StringInterner::Id> locals;
     if (!read_macro_body(kw, kw_loc, body, locals)) {
-        return; // error already emitted by read_macro_body()
+        return;  // error already emitted by read_macro_body()
     }
 
     // Push the body lines repeated repeat_count times to the work queue
@@ -1401,33 +1401,19 @@ void Preproc::process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
 void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
                        StringInterner::Id name_id, const SourceLoc&,
                        ParseLine& input_line) {
-    SourceLoc args_loc = input_line.peek().loc;
+    // Collect and expand the text expression
+    std::vector<Token> expanded =
+        collect_and_expand_line(input_line, kw, "text");
 
-    // Collect all tokens until EndOfLine
-    std::vector<Token> raw_tokens;
-    while (input_line.peek().type != TokenType::EndOfLine &&
-            input_line.pos < input_line.tokens.size()) {
-        raw_tokens.push_back(input_line.peek());
-        input_line.pos++;
+    if (expanded.empty()) {
+        return;  // error already reported
     }
-
-    if (raw_tokens.empty()) {
-        g_diag.error(args_loc,
-                     "Expected text after " + keyword_to_string(kw));
-        return;
-    }
-
-    // Macro-expand the collected tokens
-    LogicalLine expr_line(raw_tokens.front().loc);
-    expr_line.tokens = std::move(raw_tokens);
-    std::vector<Token> expanded;
-    expand_line(expr_line, expanded);
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
     std::vector<StringInterner::Id> locals;
     if (!read_macro_body(kw, kw_loc, body, locals)) {
-        return; // error already emitted by read_macro_body()
+        return;  // error already emitted by read_macro_body()
     }
 
     // Build the character string by concatenating the text representation
@@ -1451,7 +1437,7 @@ void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
     }
 
     if (chars.empty()) {
-        return; // nothing to iterate
+        return;  // nothing to iterate
     }
 
     // The iteration variable is the single parameter for substitution
@@ -1687,34 +1673,14 @@ void Preproc::process_PRAGMA(Keyword kw, const SourceLoc&,
     }
 }
 
-void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
+void Preproc::process_ASSERT(Keyword kw, const SourceLoc&,
                              ParseLine& input_line) {
-    // Collect everything after ASSERT until EndOfLine
-    std::vector<Token> raw_tokens;
-    while (input_line.peek().type != TokenType::EndOfLine &&
-            input_line.pos < input_line.tokens.size()) {
-        raw_tokens.push_back(input_line.peek());
-        input_line.pos++;
-    }
+    // Collect and expand the assertion expression
+    std::vector<Token> expanded =
+        collect_and_expand_line(input_line, kw, "expression");
 
-    if (raw_tokens.empty()) {
-        g_diag.error(kw_loc, "Expected expression after " +
-                     keyword_to_string(kw));
-        return;
-    }
-
-    // Expand macros in ASSERT arguments
-    LogicalLine expr_line(raw_tokens.front().loc);
-    expr_line.tokens = std::move(raw_tokens);
-    std::vector<Token> expanded;
-    expand_line(expr_line, expanded);
-
-    if (expanded.empty() ||
-            (expanded.size() == 1 &&
-             expanded[0].type == TokenType::EndOfLine)) {
-        g_diag.error(kw_loc, "Expected expression after " +
-                     keyword_to_string(kw));
-        return;
+    if (expanded.empty()) {
+        return;  // error already reported
     }
 
     // Evaluate constant expression
@@ -1723,8 +1689,7 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
     int result = 0;
     if (!eval_const_expr(expanded, expr_pos,
                          const_symbols, result, /*silent=*/false)) {
-        // syntax/non-constant errors already reported
-        return;
+        return;  // syntax/non-constant errors already reported
     }
 
     // Optional: , "message"
@@ -1749,12 +1714,11 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // Must end at EOL
-    {
-        ParseLine expanded_pl(expanded);
-        expanded_pl.pos = expr_pos;
-        if (!check_end_of_line(expanded_pl, kw)) {
-            return;
-        }
+    if (expr_pos < expanded.size() &&
+            expanded[expr_pos].type != TokenType::EndOfLine) {
+        g_diag.error(expanded[expr_pos].loc,
+                     "Unexpected token after " + keyword_to_string(kw));
+        return;
     }
 
     // Assertion passed
