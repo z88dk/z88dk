@@ -201,6 +201,9 @@ private:
                          const SourceLoc& macro_loc,
                          std::vector<LogicalLine>& out_lines,
                          std::vector<StringInterner::Id>& out_locals);
+    std::vector<Token> collect_and_expand_line(ParseLine& input_line,
+            Keyword kw,
+            std::string_view what);
     bool eval_if_expr(ParseLine& input_line,
                       Keyword kw);
     bool eval_ifdef_name(ParseLine& input_line,

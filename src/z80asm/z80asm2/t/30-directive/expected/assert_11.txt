@@ -12,9 +12,9 @@ Identifier	"a"	2:4	keyword=A
 Comma	","	2:5	
 Integer	"1"	2:7	int_value=1 
 EndOfLine	"\n"	2:8	
-t/30-directive/input/assert_11.asm:3:2: error: Expected expression after ASSERT
+t/30-directive/input/assert_11.asm:3:8: error: Expected expression after ASSERT
     #assert ; no arguments
-     ^
+           ^
 Identifier	"ld"	4:1	keyword=LD 
 Identifier	"a"	4:4	keyword=A 
 Comma	","	4:5	
@@ -28,7 +28,7 @@ Identifier	"a"	6:4	keyword=A
 Comma	","	6:5	
 Integer	"3"	6:7	int_value=3 
 EndOfLine	"\n"	6:8	
-t/30-directive/input/assert_11.asm:7:11: error: Unexpected token after ASSERT: extra
+t/30-directive/input/assert_11.asm:7:11: error: Unexpected token after ASSERT
     #assert X extra
               ^
 Identifier	"ld"	8:1	keyword=LD 
@@ -44,7 +44,7 @@ Identifier	"a"	10:4	keyword=A
 Comma	","	10:5	
 Integer	"5"	10:7	int_value=5 
 EndOfLine	"\n"	10:8	
-t/30-directive/input/assert_11.asm:11:21: error: Unexpected token after ASSERT: extra
+t/30-directive/input/assert_11.asm:11:21: error: Unexpected token after ASSERT
     #assert X , "hello" extra
                         ^
 Identifier	"ld"	12:1	keyword=LD 
