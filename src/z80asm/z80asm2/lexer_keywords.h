@@ -21,7 +21,8 @@ static const int IS_REGISTER = 1 << 7;
 static const int IS_SEGMENT_REGISTER = 1 << 8;
 static const int IS_8BIT_REGISTER = 1 << 9;
 static const int IS_X_REGISTER = 1 << 10;
-static const int IS_FLAG = 1 << 11;
+static const int IS_HLA_DJNZ_REGISTER = 1 << 11;
+static const int IS_FLAG = 1 << 12;
 
 #define X(id, text, flags) id,
 enum class Keyword : uint16_t {
@@ -45,6 +46,9 @@ bool keyword_is_register(Keyword kw);
 bool keyword_is_segment_register(Keyword kw);
 bool keyword_is_8bit_register(Keyword kw);
 bool keyword_is_x_register(Keyword kw);
+bool keyword_is_hla_djnz_register(Keyword kw);
 bool keyword_is_flag(Keyword kw);
 bool keyword_is_opcode(Keyword kw);
 bool keyword_is_instruction(Keyword kw);
+
+Keyword keyword_invert_flag_condition(Keyword kw);

@@ -99,8 +99,8 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
     StringInterner::Id file_id = g_strings.intern(norm);
 
     // Already loaded?
-    auto it = source_cache_.find(file_id);
-    if (it != source_cache_.end()) {
+    auto it = source_cache.find(file_id);
+    if (it != source_cache.end()) {
         return &it->second;
     }
 
@@ -108,16 +108,16 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
     // error reporting during tokenization), return nullptr to break the
     // recursion.  The caller (print_message) will simply skip showing
     // the source line context.
-    if (source_loading_.count(file_id)) {
+    if (source_loading.count(file_id)) {
         return nullptr;
     }
-    source_loading_.insert(file_id);
+    source_loading.insert(file_id);
 
     // Read entire file into memory
     std::string content;
     if (!read_file_to_string(norm, loc, content)) {
         // read_file_to_string() already emitted an error
-        source_loading_.erase(file_id);
+        source_loading.erase(file_id);
         return nullptr;
     }
 
@@ -132,10 +132,10 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
     tokenize(sf, content);
 
     // Remove loading guard before inserting into cache
-    source_loading_.erase(file_id);
+    source_loading.erase(file_id);
 
     // Insert into cache and return pointer
-    auto [pos, inserted] = source_cache_.emplace(file_id, std::move(sf));
+    auto [pos, inserted] = source_cache.emplace(file_id, std::move(sf));
     return &pos->second;
 }
 
@@ -252,8 +252,8 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     StringInterner::Id file_id = g_strings.intern(norm);
 
     // Return from cache if already loaded
-    auto it = binary_cache_.find(file_id);
-    if (it != binary_cache_.end()) {
+    auto it = binary_cache.find(file_id);
+    if (it != binary_cache.end()) {
         return &it->second;
     }
 
@@ -275,7 +275,7 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     }
 
     // Insert into cache and return pointer
-    auto result = binary_cache_.emplace(file_id, std::move(data));
+    auto result = binary_cache.emplace(file_id, std::move(data));
     return &result.first->second;
 }
 

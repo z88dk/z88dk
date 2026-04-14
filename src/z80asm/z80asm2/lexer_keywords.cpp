@@ -6,6 +6,7 @@
 
 #include "lexer_keywords.h"
 #include "string_utils.h"
+#include <cassert>
 #include <unordered_map>
 
 Keyword keyword_lookup(std::string_view s) {
@@ -82,6 +83,11 @@ bool keyword_is_x_register(Keyword kw) {
     return (flags & IS_X_REGISTER) != 0;
 }
 
+bool keyword_is_hla_djnz_register(Keyword kw) {
+    int flags = keyword_flags[static_cast<size_t>(kw)];
+    return (flags & IS_HLA_DJNZ_REGISTER) != 0;
+}
+
 bool keyword_is_flag(Keyword kw) {
     int flags = keyword_flags[static_cast<size_t>(kw)];
     return (flags & IS_FLAG) != 0;
@@ -98,5 +104,65 @@ bool keyword_is_instruction(Keyword kw) {
            keyword_is_conditional_directive(kw) ||
            keyword_is_asm_directive(kw) ||
            keyword_is_opcode(kw);
+}
+
+Keyword keyword_invert_flag_condition(Keyword kw) {
+    switch (kw) {
+    case Keyword::C:
+        return Keyword::NC;
+    case Keyword::EQ:
+        return Keyword::NE;
+    case Keyword::GE:
+        return Keyword::LT;
+    case Keyword::GEU:
+        return Keyword::LTU;
+    case Keyword::GT:
+        return Keyword::LE;
+    case Keyword::GTU:
+        return Keyword::LEU;
+    case Keyword::K:
+        return Keyword::NK;
+    case Keyword::LE:
+        return Keyword::GT;
+    case Keyword::LEU:
+        return Keyword::GTU;
+    case Keyword::LO:
+        return Keyword::LZ;
+    case Keyword::LT:
+        return Keyword::GE;
+    case Keyword::LTU:
+        return Keyword::GEU;
+    case Keyword::LZ:
+        return Keyword::LO;
+    case Keyword::M:
+        return Keyword::P;
+    case Keyword::NC:
+        return Keyword::C;
+    case Keyword::NE:
+        return Keyword::EQ;
+    case Keyword::NK:
+        return Keyword::K;
+    case Keyword::NV:
+        return Keyword::V;
+    case Keyword::NX5:
+        return Keyword::X5;
+    case Keyword::NZ:
+        return Keyword::Z;
+    case Keyword::P:
+        return Keyword::M;
+    case Keyword::PE:
+        return Keyword::PO;
+    case Keyword::PO:
+        return Keyword::PE;
+    case Keyword::V:
+        return Keyword::NV;
+    case Keyword::X5:
+        return Keyword::NX5;
+    case Keyword::Z:
+        return Keyword::NZ;
+    default:
+        assert(0);
+        return Keyword::None;
+    }
 }
 
