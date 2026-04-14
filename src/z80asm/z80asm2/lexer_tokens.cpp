@@ -74,8 +74,8 @@ LogicalLine::LogicalLine(const SourceLoc& loc_, LineOrigin origin_)
     : loc(loc_), origin(origin_) {
 }
 
-ParseLine::ParseLine(const std::vector<Token>& tokens_)
-    : tokens(tokens_), pos(0) {
+ParseLine::ParseLine(const std::vector<Token>& tokens_, size_t pos_)
+    : tokens(tokens_), pos(pos_) {
 }
 
 const Token& ParseLine::peek(size_t offset) const {
@@ -91,4 +91,21 @@ const Token& ParseLine::peek(size_t offset) const {
 
 void ParseLine::error(std::string_view message) const {
     g_diag.error(peek().loc, message);
+}
+
+bool ParseLine::check_end_of_line(Keyword kw) {
+    while (pos < tokens.size() &&
+            peek().type == TokenType::EndOfLine) {
+        ++pos;
+    }
+
+    if (pos < tokens.size()) {
+        g_diag.error(peek().loc,
+                     "Unexpected token after " +
+                     keyword_to_string(kw) +
+                     ": " + g_strings.to_string(peek().text_id));
+        return false;
+    }
+
+    return true;
 }

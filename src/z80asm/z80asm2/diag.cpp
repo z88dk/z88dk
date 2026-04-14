@@ -13,7 +13,7 @@
 Diagnostics g_diag;
 
 void Diagnostics::error(const SourceLoc& loc, std::string_view msg) {
-    error_count_++;
+    error_count++;
     print_message(loc, "error", msg);
 }
 
@@ -27,11 +27,11 @@ void Diagnostics::note(const SourceLoc& loc, std::string_view msg) {
 
 void Diagnostics::add_mapping(const SourceLine& logical_line,
                               const SourceLine& physical_loc) {
-    line_mappings_[logical_line] = physical_loc;
+    line_mappings[logical_line] = physical_loc;
 }
 
-size_t Diagnostics::error_count() const {
-    return error_count_;
+size_t Diagnostics::get_error_count() const {
+    return error_count;
 }
 
 void Diagnostics::print_message(const SourceLoc& loc,
@@ -62,8 +62,8 @@ void Diagnostics::print_message(const SourceLoc& loc,
 
     // print the physical location if different from the logical location
     SourceLine logical_line(loc);
-    auto it = line_mappings_.find(logical_line);
-    if (it == line_mappings_.end()) {
+    auto it = line_mappings.find(logical_line);
+    if (it == line_mappings.end()) {
         return;
     }
 
