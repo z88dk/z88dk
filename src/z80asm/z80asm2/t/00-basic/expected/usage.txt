@@ -35,4 +35,6 @@ Diagnostic Options:
   -dump-after-macro-expansion
                 Dump the token stream after macro expansion and exit
   -dump-after-preprocessing
-                Dump the final preprocessed token stream and exit
+                Dump the token stream after preprocessing and exit
+  -dump-after-hla
+                Dump the token stream after High-Level-Assembly processing and exit

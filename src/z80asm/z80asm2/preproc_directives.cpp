@@ -132,24 +132,6 @@ bool Preproc::is_directive(ParseLine& input_line,
     return false;
 }
 
-bool Preproc::check_end_of_line(ParseLine& input_line,
-                                Keyword kw) {
-    while (input_line.peek().type == TokenType::EndOfLine &&
-            input_line.pos < input_line.tokens.size()) {
-        ++input_line.pos;
-    }
-
-    if (input_line.pos < input_line.tokens.size()) {
-        g_diag.error(input_line.peek().loc,
-                     "Unexpected token after " +
-                     keyword_to_string(kw) +
-                     ": " + g_strings.to_string(input_line.peek().text_id));
-        return false;
-    }
-
-    return true;
-}
-
 bool Preproc::parse_filename(ParseLine& input_line,
                              Keyword kw,
                              std::string& out_filename,
@@ -225,7 +207,7 @@ bool Preproc::parse_and_resolve_file(ParseLine& input_line,
         return false;
     }
 
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return false;   // error already reported
     }
 
@@ -420,7 +402,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
             }
             // Closing keywords: validate and pop
             else if (kw == Keyword::ENDM || kw == Keyword::ENDR) {
-                if (!check_end_of_line(pl, kw)) {
+                if (!pl.check_end_of_line(kw)) {
                     return false;
                 }
 
@@ -487,7 +469,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
                     }
                 }
 
-                if (!check_end_of_line(pl, kw)) {
+                if (!pl.check_end_of_line(kw)) {
                     return false;
                 }
 
@@ -590,7 +572,7 @@ bool Preproc::eval_ifdef_name(ParseLine& input_line,
     StringInterner::Id name_id = input_line.peek().text_id;
     input_line.pos++;
 
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return false;   // error already reported
     }
 
@@ -977,7 +959,7 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
     StringInterner::Id name_id = input_line.peek().text_id;
     input_line.pos++;
 
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return; // error already reported
     }
 
@@ -987,7 +969,7 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
 void Preproc::process_name_UNDEF(Keyword kw, const SourceLoc&,
                                  StringInterner::Id name_id, const SourceLoc&,
                                  ParseLine& input_line) {
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return; // error already reported
     }
 
@@ -1140,7 +1122,7 @@ void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // check for end of line
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return; // error already reported
     }
 
@@ -1167,7 +1149,7 @@ void Preproc::process_name_MACRO(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // check for end of line
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return; // error already reported
     }
 
@@ -1332,7 +1314,7 @@ void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // Check end of line
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return;
     }
 
@@ -1485,7 +1467,7 @@ void Preproc::process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
 
 void Preproc::process_EXITM(Keyword kw, const SourceLoc& kw_loc,
                             ParseLine& input_line) {
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return;
     }
 
@@ -1550,7 +1532,7 @@ void Preproc::process_ELSE(Keyword kw, const SourceLoc& kw_loc,
     }
 
     ConditionalFrame& frame = cond_stack.back();
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return;
     }
 
@@ -1572,7 +1554,7 @@ void Preproc::process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return;
     }
 
@@ -1651,7 +1633,7 @@ void Preproc::process_PRAGMA(Keyword kw, const SourceLoc&,
     input_line.pos++;
 
     // PRAGMA ONCE must have no extra tokens
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return;
     }
 
@@ -1743,7 +1725,7 @@ void Preproc::process_ERROR(Keyword kw, const SourceLoc&,
     }
 
     // Must end at EOL (or only have EOL tokens left)
-    if (!check_end_of_line(input_line, kw)) {
+    if (!input_line.check_end_of_line(kw)) {
         return;
     }
 
