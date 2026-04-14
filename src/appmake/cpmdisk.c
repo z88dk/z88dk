@@ -271,7 +271,8 @@ void xorblock(uint8_t *pos, int count, int mask)
  *  on HDOS (not supported by cpmdisk) it is the vol number of the disk label
  */
 
-static uint8_t h17_checksum(const uint8_t *buf, size_t n, uint8_t d) {
+static uint8_t h17_checksum(const uint8_t *buf, size_t n) {
+  uint8_t d = 0;
   for (size_t k=0; k<n; ++k) {
     d ^= buf[k];             // XOR
     d = (d << 1) | (d >> 7); // RLC
@@ -361,19 +362,18 @@ int disc_write_h17(disc_handle* h, const char* filename)
 
                meta[5]  = 0xFD;        // Sync
 
-               uint8_t vol = 0;                // CP/M: always 0
-               /* UNUSED HACK: if we have c_linear (no skew), we assume it is HDOS */
-               // if (c_linear && i) vol = 88;    // HDOS: 0 on track 0, otherwise "volume number"
-               
+               uint8_t vol = 0;        // CP/M: 0; HDOS: ?
                meta[6]  = vol;
                meta[7]  = i;
                meta[8]  = j;           // sector number in headers (0..9)
 
                // header checksum (vol,trk,sec)
-               meta[9]  = h17_checksum((uint8_t[]){vol,i,j}, 3, 0xfD);
+               meta[9]  = h17_checksum((uint8_t[]){vol,i,j}, 3);
+
                meta[10] = 0xFD;        // Sync
+               
                uint8_t *sp = h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size);
-               meta[11] = h17_checksum(sp, h->spec.sector_size, 0);
+               meta[11] = h17_checksum(sp, h->spec.sector_size);
   
                // on H17 the sector size should always be 256
                meta[12] = h->spec.sector_size & 0xFF;
@@ -397,28 +397,28 @@ static void h17raw_write_sector_frame(FILE *fp, uint8_t vol, uint8_t track, uint
     int i;
     
     /* --- Header: 00..00, FD, VOL/TRK/SEC/HCK --- */
-    for (i = 0; i < 10; ++i) fputc(0x00, fp);      // zero padding before the 0xFD header sync
+    for (i = 0; i < 10; ++i) fputc(0x00, fp);             // zero padding before the 0xFD header sync
     fputc(0xFD, fp);  /* sync header */
 
     fputc(vol,   fp);
     fputc(track, fp);
     fputc(j,fp);
 
-    b = h17_checksum((const uint8_t[]){vol,track,j}, 3, 0xFD);  // header checksum on [VOL,TRK,SEC]
+    b = h17_checksum((const uint8_t[]){vol,track,j}, 3);  // header checksum on [VOL,TRK,SEC]
     fputc(b, fp);
 
     /* --- Data: 00..00, FD, 256 bytes, DCK --- */
-    for (i = 0; i < 10; ++i) fputc(0x00, fp);      // Zero padding before the 0xFD data sync
+    for (i = 0; i < 10; ++i) fputc(0x00, fp);             // Zero padding before the 0xFD data sync
     fputc(0xFD, fp);  /* sync data */
 
-    fwrite(payload256, 1, 256, fp);                // 256 data bytes payload
+    fwrite(payload256, 1, 256, fp);                       // 256 data bytes payload
 
-    b = h17_checksum(payload256, 256, 0);          // data bytes checksum
+    b = h17_checksum(payload256, 256);                    // data bytes checksum
     fputc(b, fp);
 
     /* Gap between sectors */
-    for (i = 0; i < 3; ++i) fputc(0x00, fp);       // Post data zeroes
-    for (i = 0; i < 34; ++i) fputc(0xFF, fp);      // 0xFF filler between sectors
+    for (i = 0; i < 3; ++i) fputc(0x00, fp);     // Post data zeroes
+    for (i = 0; i < 34; ++i) fputc(0xFF, fp);    // 0xFF filler between sectors
 }
 
 
@@ -436,19 +436,17 @@ int disc_write_h17raw(disc_handle *h, const char *filename)
     for (i = 0; i < h->spec.tracks; ++i) {
         for (int s = 0; s < h->spec.sides; ++s) {
 
-           size_t offs = track_offset(h, i, s);
+            size_t offs = track_offset(h, i, s);
 
-           /* Sectors are in "physical" order 0..(N-1) */
-           for (j = 0; j < h->spec.sectors_per_track; ++j) {
+            /* Sectors are in "physical" order 0..(N-1) */
+            for (j = 0; j < h->spec.sectors_per_track; ++j) {
 
-               uint8_t vol = 0;                  // CP/M: always 0
-               /* UNUSED HACK: if we have c_linear (no skew), we assume it is HDOS */
-               // if (c_linear && i) vol = 88;    // HDOS: 0 on track 0, otherwise "volume number"
+                uint8_t vol = 0;   // CP/M: 0; HDOS: ?
 
-               /* Write the full frame (header + data + gap) */
-               /* 'skew' the sector data only */
-               h17raw_write_sector_frame(fp, vol, i, j, h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size));
-           }
+                /* Write the full frame (header + data + gap) */
+                /* 'skew' the sector data only */
+                h17raw_write_sector_frame(fp, vol, i, j, h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size));
+            }
         }
     }
 
@@ -772,7 +770,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
             // 'Unable to determine interleave' and rearrange the sector numbers into a simple sequential list."
             // In most of the situations the sequential map is the best choice, but on the MZ80A/MZ80B which are
             // currently the only case with the disk sides swapped.
-            // At the moment we use "spec.inverted_sides" to apply the skew map properly.
+            // At the moment we use "spec.inverted_sides" to trigger an accurete skew map.
 
             if (h->spec.inverted_sides) {
                 for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
