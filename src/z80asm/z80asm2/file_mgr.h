@@ -66,13 +66,13 @@ public:
 
 private:
     // Global cache: file_id -> SourceFile
-    std::unordered_map<StringInterner::Id, SourceFile> source_cache_;
+    std::unordered_map<StringInterner::Id, SourceFile> source_cache;
 
     // Guard against re-entrant get_source_file during tokenization
-    std::unordered_set<StringInterner::Id> source_loading_;
+    std::unordered_set<StringInterner::Id> source_loading;
 
     // Cache: file_id -> binary file contents
-    std::unordered_map<StringInterner::Id, std::vector<uint8_t>> binary_cache_;
+    std::unordered_map<StringInterner::Id, std::vector<uint8_t>> binary_cache;
 
     // read one line of a file
     // return an error string if file cannot be opened or line number
