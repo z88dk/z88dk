@@ -134,6 +134,10 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\diag.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_ast.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_builder.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\hla_impl.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_keywords.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_dump.cpp" />
@@ -158,6 +162,10 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\diag.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\hla.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\hla_ast.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\hla_builder.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\hla_impl.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_keywords.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_dump.h" />

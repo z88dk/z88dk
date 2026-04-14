@@ -37,6 +37,7 @@ struct Options {
     bool dump_after_directives = false;
     bool dump_after_macro_expansion = false;
     bool dump_after_preprocessing = false;
+    bool dump_after_hla = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

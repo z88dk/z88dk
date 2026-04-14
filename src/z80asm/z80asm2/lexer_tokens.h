@@ -64,7 +64,8 @@ struct ParseLine {
     const std::vector<Token>& tokens;
     size_t pos = 0;
 
-    ParseLine(const std::vector<Token>& tokens_);
+    ParseLine(const std::vector<Token>& tokens_, size_t pos_ = 0);
     const Token& peek(size_t offset = 0) const;
     void error(std::string_view message) const;
+    bool check_end_of_line(Keyword kw);
 };

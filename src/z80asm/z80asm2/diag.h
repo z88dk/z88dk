@@ -18,11 +18,11 @@ public:
 
     void add_mapping(const SourceLine& logical_line,
                      const SourceLine& physical_loc);
-    size_t error_count() const;
+    size_t get_error_count() const;
 
 private:
-    size_t error_count_ = 0;
-    std::unordered_map<SourceLine, SourceLine, SourceLineHash> line_mappings_;
+    size_t error_count = 0;
+    std::unordered_map<SourceLine, SourceLine, SourceLineHash> line_mappings;
 
     void print_message(const SourceLoc& loc,
                        std::string_view level,

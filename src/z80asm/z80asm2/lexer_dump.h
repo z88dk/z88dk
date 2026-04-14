@@ -20,3 +20,7 @@ void dump_logical_lines(const std::vector<LogicalLine>& lines,
 
 [[noreturn]]
 void dump_after_tokenization_and_exit(std::string_view filename);
+
+[[noreturn]]
+void dump_after_hla_and_exit(const std::vector<LogicalLine>& lines);
+

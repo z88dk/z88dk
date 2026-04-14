@@ -70,6 +70,7 @@ static const UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_DIRECTIVES,
             OptionType::DUMP_AFTER_MACRO_EXPANSION,
             OptionType::DUMP_AFTER_PREPROCESSING,
+            OptionType::DUMP_AFTER_HLA,
         }
     }
 };
@@ -378,7 +379,7 @@ std::string Args::check_source(std::string_view filename) {
     namespace fs = std::filesystem;
 
     // avoid cascade of errors
-    if (g_diag.error_count()) {
+    if (g_diag.get_error_count()) {
         return normalize_path(filename);
     }
 
@@ -659,7 +660,7 @@ void Args::search_source_file(std::string_view filename_,
 
         if (unique_matches.empty()) {
             // no matches -> report not found unless an error already exists
-            if (!g_diag.error_count()) {
+            if (!g_diag.get_error_count()) {
                 g_diag.error(loc, "File not found: " + filename);
             }
             return;
@@ -823,7 +824,7 @@ void Args::search_source_file(std::string_view filename_,
     }
 
     // not found, avoid cascade of errors
-    if (!g_diag.error_count()) {
+    if (!g_diag.get_error_count()) {
         g_diag.error(loc, "File not found: " + filename);
     }
 }
