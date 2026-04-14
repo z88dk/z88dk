@@ -6,6 +6,7 @@
 
 #include "diag.h"
 #include "environment.h"
+#include "hla.h"
 #include "lexer_dump.h"
 #include "lexer_tokens.h"
 #include "options.h"
@@ -37,6 +38,13 @@ static void assemble_file(std::string_view filename) {
     Preproc preproc;
     preproc.set_const_symbols(g_args.options.global_defs);
     std::vector<LogicalLine> preprocessed_tokens = preproc.preprocess(filename);
+
+    // process High-Level-Assembly instructions
+    std::vector<LogicalLine> hla_lines = hla_process(preprocessed_tokens);
+    if (g_args.options.dump_after_hla) {
+        dump_after_hla_and_exit(hla_lines);
+        // not reached
+    }
 }
 
 static void assemble_files() {
@@ -117,7 +125,7 @@ int main(int argc, char* argv[]) {
     }
 
     // detect errors from argument processing
-    if (g_diag.error_count()) {
+    if (g_diag.get_error_count()) {
         return EXIT_FAILURE;
     }
 
@@ -135,8 +143,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (g_args.options.verbose) {
-        std::cout << "Assembly completed with " << g_diag.error_count() << " error(s)" << std::endl;
+        std::cout << "Assembly completed with " << g_diag.get_error_count() << " error(s)" << std::endl;
     }
 
-    return g_diag.error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
+    return g_diag.get_error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
 }

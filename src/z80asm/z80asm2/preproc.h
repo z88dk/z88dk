@@ -180,8 +180,6 @@ private:
                       SourceLoc& out_kw_loc,
                       StringInterner::Id& out_name_id,
                       SourceLoc& out_name_loc);
-    bool check_end_of_line(ParseLine& input_line,
-                           Keyword kw);
     bool parse_filename(ParseLine& input_line,
                         Keyword kw,
                         std::string& out_filename,
