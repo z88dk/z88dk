@@ -79,3 +79,10 @@ void dump_after_tokenization_and_exit(std::string_view filename) {
     dump_logical_lines(sf->lines, cur_file_id);
     exit(EXIT_SUCCESS);
 }
+
+[[noreturn]]
+void dump_after_hla_and_exit(const std::vector<LogicalLine>& lines) {
+    StringInterner::Id cur_file_id = 0;
+    dump_logical_lines(lines, cur_file_id);
+    exit(EXIT_SUCCESS);
+}
