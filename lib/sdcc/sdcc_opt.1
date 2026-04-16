@@ -424,6 +424,21 @@ ENDIF
 =
 %1%0:
 
+%title Remove sdcc cdb labels
+%"[ \t]*"0%1==%"[ \t]*"2.
+=
+
+
+%title Remove sdcc cdb labels v2
+%"[ \t]*"0%1=%"[ \t]*"2.
+=
+
+
+%title Remove global C lines
+%"[ \t]*"0GLOBAL%"[ \t]*"1C%2.c%3
+=
+
+
 ;;
 ;; define constants
 ;;

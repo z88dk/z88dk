@@ -1407,8 +1407,7 @@ int main(int argc, char **argv)
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
 
-                // And map in cdb contents
-                zsdcc_embed_adb(i);
+       
 
                 /* filter comments out of asz80 asm file see issue #801 on github */
                 if (peepholeopt) zsdcc_asm_filter_comments(i, ".op1");
@@ -1457,6 +1456,9 @@ int main(int argc, char **argv)
                         rules[num_rules++] = c_coptrules_user;
                     }
                 }
+
+                // And map in cdb contents
+                if (peepholeopt) zsdcc_embed_adb(i);
 
                 if (peepholeopt == 0)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
@@ -1829,7 +1831,7 @@ static void encode_cdbstring(char *dest, int destlen, const char *toencode)
     int offs = 0;
 
     while ( ( c = *toencode++) != 0 ) {
-        if ( isalpha(c)) {
+        if ( isalpha(c) || isspace(c)) {
             offs += snprintf(dest+offs,destlen-offs, "%c", c);
         } else {
             offs += snprintf(dest+offs,destlen-offs, "_%02x", c);
@@ -1840,8 +1842,8 @@ static void encode_cdbstring(char *dest, int destlen, const char *toencode)
 
 static void zsdcc_embed_adb(int filenumber)
 {
-    char buffer[FILENAME_MAX + 1];
-    char buffer2[FILENAME_MAX + 1];
+    char buffer[16384 + 1];
+    char buffer2[16384 + 1];
     FILE *fasm;
     FILE *fcdb;
     char *cdbfile, *asmfile;
@@ -1849,13 +1851,21 @@ static void zsdcc_embed_adb(int filenumber)
     cdbfile = changesuffix(temporary_filenames[filenumber], ".adb");
     if ( (fcdb = fopen(cdbfile, "r")) != NULL ) {
         if ( (fasm = fopen(filelist[filenumber], "a")) != NULL ) {
+            char *tcfile = replace_str(changesuffix(filelist[filenumber], ""), "/", "_");
+            char *ocfile = replace_str(changesuffix(original_filenames[filenumber], ""), "/", "_");
             fprintf(fasm, "\n\n; Embedding adb file\n");
 
+
             while ( fgets(buffer, sizeof(buffer), fcdb) != NULL ) {
-                encode_cdbstring(buffer2, sizeof(buffer2), buffer);
-                fprintf(fasm, "PUBLIC %s\n", buffer2);
-                fprintf(fasm, "defc %s = 1\n",buffer2);
+                buffer[strlen(buffer)-1] = 0;
+                char *outline = replace_str(buffer, tcfile, ocfile);
+
+                encode_cdbstring(buffer2, sizeof(buffer2), outline);
+                fprintf(fasm, "PUBLIC __CDBINFO__%s\ndefc __CDBINFO__%s=1\n\n", buffer2,buffer2);
+                free(outline);
             }
+            free(tcfile);
+            free(ocfile);
             fclose(fasm);
         }
         fclose(fcdb);
