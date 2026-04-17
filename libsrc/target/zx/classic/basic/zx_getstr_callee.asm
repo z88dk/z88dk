@@ -1,15 +1,15 @@
 ;
-;	ZX Spectrum specific routines
-;	by Stefano Bodrato, 22/06/2006
-;	Fixed by Antonio Schifano, Dec 2008
+;   ZX Spectrum specific routines
+;   by Stefano Bodrato, 22/06/2006
+;   Fixed by Antonio Schifano, Dec 2008
 ;
-;	Copy a variable from basic
+;   Copy a variable from basic
 ;
-;	int __CALLEE__ zx_getstr_callee(char variable, char *value);
+;   int __CALLEE__ zx_getstr_callee(char variable, char *value);
 ;
-;	Debugged version by Antonio Schifano, 29/12/2008
+;   Debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_getstr_callee.asm $
+;   $Id: zx_getstr_callee.asm $
 ;
 
     SECTION code_clib
@@ -30,6 +30,7 @@ _zx_getstr_callee:
 ;          e = char variable
 
 asm_zx_getstr:
+    push    ix                          ;save callers ix (iy on zx81) - rom may corrupt it
 
     ld      a, e
     and     95
@@ -71,6 +72,7 @@ found:
     jr      z, zerolen
     ldir
 zerolen:
+    pop     ix
     xor     a
     ld      (de), a
     ld      h, a
@@ -79,7 +81,6 @@ zerolen:
 
 notfound:
     pop     hl
+    pop     ix
     ld      hl, -1
     ret
-
-
