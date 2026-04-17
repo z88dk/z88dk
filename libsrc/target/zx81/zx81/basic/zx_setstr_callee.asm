@@ -28,15 +28,15 @@ _zx_setstr_callee:
 ;          e = char variable
 
 asm_zx_setstr:
-
+    push    ix                          ;save callers ix (iy on zx81) - rom may corrupt it
     ld      a, e
 
     and     31
     add     69
 
-
-    ld      (morevar+1), a
-    ld      (pointer+1), hl
+    ld      d, a
+    push    hl
+    push    de
 
     ld      hl, ($4010)                 ; VARS
 
@@ -44,15 +44,26 @@ loop:
 
     ld      a, (hl)
     cp      128
-    jr      nz, morevar
 
-    jr      store                       ; variable not found
+    jr      z, store                    ; variable not found
 
 morevar:
 
-    cp      0
-    jr      nz, nextvar
+    cp      d
+    jr      z, found
 
+  IF    FORlambda
+    EXTERN  __lambda_next_one
+    call    __lambda_next_one
+  ELSE
+    call    $09F2                       ;get next variable start
+  ENDIF
+    ex      de, hl
+    pop     de
+    push    de
+    jr      loop
+
+found:
   IF    FORlambda
     EXTERN  __lambda_next_one
     call    __lambda_next_one
@@ -65,20 +76,23 @@ morevar:
 
 store:
 
-    ld      bc, 0
-
-pointer:
-
-    ld      de, 0                       ; point to the string
+    pop     af                          ; swap var name and str. ptr into stack
+    pop     de
+    push    af
     push    de
+    xor     a
+    ld      b, a
+    ld      c, a
+    ex      de, hl
+    cpir                                ; scan for zero
+    ex      de, hl
 
-lenloop:
-
-    inc     bc                          ; string length counter
-    inc     de
-    ld      a, (de)
-    and     a
-    jr      nz, lenloop
+    ld      a, b
+    cpl
+    ld      b, a
+    ld      a, c
+    cpl
+    ld      c, a                        ; bc=str len
 
     push    hl
     push    bc
@@ -94,14 +108,22 @@ lenloop:
     pop     bc
     pop     hl
 
-    ld      a, (morevar+1)
+    pop     de                          ; get back str. ptr
+    pop     af                          ; and var name
     ld      (hl), a
     inc     hl
     ld      (hl), c
     inc     hl
     ld      (hl), b
+
+    ld      a, b                        ; handle 0 lenght strings (thank you Siggi!)
+    or      c
+
+    pop     ix
+
+	ret     z
+	
     inc     hl
-    pop     de
 
     ex      de, hl
 	;ldir
@@ -118,15 +140,4 @@ outloop:
 ;------------------------------
 
     ret
-
-nextvar:
-
-  IF    FORlambda
-    EXTERN  __lambda_next_one
-    call    __lambda_next_one
-  ELSE
-    call    $09F2                       ;get next variable start
-  ENDIF
-    ex      de, hl
-    jr      loop
 
