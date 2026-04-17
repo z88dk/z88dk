@@ -1,13 +1,13 @@
 ;
-;	ZX 81 specific routines
-;	by Stefano Bodrato, Oct 2007
+;   ZX 81 specific routines
+;   by Stefano Bodrato, Oct 2007
 ;
-;	Copy a variable from basic
+;   Copy a variable from basic
 ;
-;	int __CALLEE__ zx_getstr_callee(char variable, char *value);
+;   int __CALLEE__ zx_getstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_getstr_callee.asm $
+;   $Id: zx_getstr_callee.asm $
 ;
 
     SECTION code_clib
@@ -28,32 +28,50 @@ _zx_getstr_callee:
 ;          e = char variable
 
 asm_zx_getstr:
+    push    ix                          ;save callers ix (iy on zx81) - rom may corrupt it
 
     ld      a, e
 
     and     31
     add     69
 
-    ld      (morevar+1), a
-    ld      (pointer+1), hl
+    ld      d, a
+    push    hl                          ; save destination
 
     ld      hl, ($4010)                 ; VARS
+
 loop:
     ld      a, (hl)
     cp      128
-    jr      nz, morevar
-    ld      hl, -1                      ; variable not found
-    ret
-morevar:
-    cp      0
-    jr      nz, nextvar
+    jr      z, notfound                 ;  n.b. z => nc
+
+    cp      d
+    jr      z, found
+
+    push    de
+  IF    FORlambda
+    EXTERN  __lambda_next_one
+    call    __lambda_next_one
+  ELSE
+    call    $09F2                       ;get next variable start
+  ENDIF
+    ex      de, hl
+    pop     de
+    jr      loop
+
+
+found:
     inc     hl
     ld      c, (hl)
+    ld      a, c
     inc     hl
     ld      b, (hl)
+    or      b
     inc     hl
-pointer:
-    ld      de, 0
+
+    pop     de
+    jr      z, zerolen
+;    ldir
 ;-----------------------------
 outloop:
     call    zx81toasc
@@ -65,20 +83,16 @@ outloop:
     or      c
     jr      nz, outloop
 ;------------------------------
-;	ldir
+zerolen:
+    pop     ix
     xor     a
     ld      (de), a
-
-    ld      hl, 0
+    ld      h, a
+    ld      l, a
     ret
 
-nextvar:
-  IF    FORlambda
-    EXTERN  __lambda_next_one
-    call    __lambda_next_one
-  ELSE
-    call    $09F2                       ;get next variable start
-  ENDIF
-    ex      de, hl
-    jr      loop
-
+notfound:
+    pop     hl
+    pop     ix
+    ld      hl, -1
+    ret
