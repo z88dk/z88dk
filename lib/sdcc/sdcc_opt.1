@@ -229,6 +229,7 @@
 ;;
 ;; Convert n$: -> @__sdcc_local_n:
 ;;
+%title Convert n$: -> @__sdcc_local_n:
 %"[ \t]*"1%"[0-9]+"0$:%2
 =
 %1@__sdcc_local_%0:%2
@@ -295,8 +296,29 @@
 =
 %0%1%7%8%9
 
+%title Transform C line
+%"[ \t]*"0C$%1$%2$%3=%4
+=
+C_LINE %2,"%1"
+
+%title Remove sdcc cdb labels
+%"[ \t]*"0%1==%"[ \t]*"2.
+=
+
+
+%title Remove sdcc cdb labels v2
+%"[ \t]*"0%1=%"[ \t]*"2.
+=
+
+
+%title Remove global C lines
+%"[ \t]*"0.globl%"[ \t]*"1%2$%3
+=
+
+
 ;; must be last
 
+%title Remove $ from labels 
 %"[^$;\"]*"0$%1
 =
 %0%1
@@ -423,20 +445,6 @@ ENDIF
 %"[ \t]*"1%"[A-Za-z0-9_]"0%"[ \t]*"2=%"[ \t]*"3.
 =
 %1%0:
-
-%title Remove sdcc cdb labels
-%"[ \t]*"0%1==%"[ \t]*"2.
-=
-
-
-%title Remove sdcc cdb labels v2
-%"[ \t]*"0%1=%"[ \t]*"2.
-=
-
-
-%title Remove global C lines
-%"[ \t]*"0GLOBAL%"[ \t]*"1C%2.c%3
-=
 
 
 ;;
