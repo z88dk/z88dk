@@ -1,13 +1,13 @@
 ;
-;	ZX 81 specific routines
-;	by Stefano Bodrato, Oct 2007
+;   ZX 81 specific routines
+;   by Stefano Bodrato, Oct 2007
 ;
-;	Copy a string to a BASIC variable
+;   Copy a string to a BASIC variable
 ;
-;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
+;   int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setstr_callee.asm $
+;   $Id: zx_setstr_callee.asm $
 ;
 
     SECTION code_clib
@@ -121,12 +121,12 @@ store:
 
     pop     ix
 
-	ret     z
-	
+    ret     z
+    
     inc     hl
 
     ex      de, hl
-	;ldir
+    ;ldir
 ;-----------------------------
 outloop:
     call    asctozx81
