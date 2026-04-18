@@ -433,7 +433,8 @@ int main(int argc, char **argv)
             } else if ( strncmp(ptr, "-no-expandz88", 9) == 0 ) {
                 write_defined("CRT_Z88_EXPANDED", 0, 0);
             } else {
-                printf("%s\n",buf);
+                printf("%s",buf);
+                ol = 0;
             }
             if ( ol ) {
                 fputs("\n",stdout);
