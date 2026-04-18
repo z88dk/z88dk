@@ -1,4 +1,4 @@
-/*
+    /*
 *      Front End for The Small C+ Compiler
 *
 *      Based on the frontend from zcc096 but substantially
@@ -197,6 +197,7 @@ static void            configure_maths_library(char **libstring);
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
+static void            zsdcc_embed_adb(int filenumber);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
@@ -1406,6 +1407,8 @@ int main(int argc, char **argv)
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
 
+       
+
                 /* filter comments out of asz80 asm file see issue #801 on github */
                 if (peepholeopt) zsdcc_asm_filter_comments(i, ".op1");
 
@@ -1417,6 +1420,8 @@ int main(int argc, char **argv)
                     apply_copt_rules(i, 1, rules, ".op1", ".opt", ".opt");
                     zsdcc_asm_filter_sections(i, ".op1");
                 }
+
+    
 
                 /* sdcc_opt.9 bugfixes critical sections and implements RST substitution */
                 /* rules[num_rules++] = c_sdccopt9;                                      */
@@ -1451,6 +1456,9 @@ int main(int argc, char **argv)
                         rules[num_rules++] = c_coptrules_user;
                     }
                 }
+
+                // And map in cdb contents
+                if (peepholeopt) zsdcc_embed_adb(i);
 
                 if (peepholeopt == 0)
                     apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
@@ -1674,11 +1682,11 @@ int main(int argc, char **argv)
         if (nfiles > 1) outputfile = NULL;
         copy_output_files_to_destdir(".asm", 1);
         copy_output_files_to_destdir(".s", 1);
-        copy_output_files_to_destdir(".adb", 1);
+       // copy_output_files_to_destdir(".adb", 1);
         copy_output_files_to_destdir(".d", 1);
         exit(0);
     }
-    copy_output_files_to_destdir(".adb", 1);
+    //copy_output_files_to_destdir(".adb", 1);
 
     {
         char *tempofile = outputfile;
@@ -1768,10 +1776,6 @@ int main(int argc, char **argv)
             status = 1;
         }
 
-        if (c_generate_debug_info && compiler_type == CC_SDCC && copy_file(c_crt0, ".adb", filenamebuf, ".adb")) {
-            // Ignore error
-        }
-
         if (createapp) {
             /* Building an application - run the appmake command on it */
 			/* z80asm now generates map file with same basename as output binary, i.e. a.map */
@@ -1819,6 +1823,54 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
+}
+
+static void encode_cdbstring(char *dest, int destlen, const char *toencode)
+{
+    char c;
+    int offs = 0;
+
+    while ( ( c = *toencode++) != 0 ) {
+        if ( isalpha(c) || isspace(c)) {
+            offs += snprintf(dest+offs,destlen-offs, "%c", c);
+        } else {
+            offs += snprintf(dest+offs,destlen-offs, "_%02x", c);
+        }
+    }    
+}
+
+
+static void zsdcc_embed_adb(int filenumber)
+{
+    char buffer[16384 + 1];
+    char buffer2[16384 + 1];
+    FILE *fasm;
+    FILE *fcdb;
+    char *cdbfile, *asmfile;
+
+    cdbfile = changesuffix(temporary_filenames[filenumber], ".adb");
+    if ( (fcdb = fopen(cdbfile, "r")) != NULL ) {
+        if ( (fasm = fopen(filelist[filenumber], "a")) != NULL ) {
+            char *tcfile = replace_str(changesuffix(filelist[filenumber], ""), "/", "_");
+            char *ocfile = replace_str(changesuffix(original_filenames[filenumber], ""), "/", "_");
+            fprintf(fasm, "\n\n; Embedding adb file\n");
+
+
+            while ( fgets(buffer, sizeof(buffer), fcdb) != NULL ) {
+                buffer[strlen(buffer)-1] = 0;
+                char *outline = replace_str(buffer, tcfile, ocfile);
+
+                encode_cdbstring(buffer2, sizeof(buffer2), outline);
+                fprintf(fasm, "PUBLIC __CDBINFO__%s\ndefc __CDBINFO__%s=1\n\n", buffer2,buffer2);
+                free(outline);
+            }
+            free(tcfile);
+            free(ocfile);
+            fclose(fasm);
+        }
+        fclose(fcdb);
+    }
+    free(cdbfile);
 }
 
 
