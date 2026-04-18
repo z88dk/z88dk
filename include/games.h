@@ -509,9 +509,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __Z80TVGAME__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick" };
+	const unsigned char *joystick_type[] = { "Joystick", "Joystick 2" };
 #endif
-	#define GAME_DEVICES 1
+	#define GAME_DEVICES 2
 #endif
 
 #ifdef __Z1013__

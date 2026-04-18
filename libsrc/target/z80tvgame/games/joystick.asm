@@ -12,13 +12,19 @@
 ; 4 = #define MOVE_FIRE  16
 ; 5 = #define MOVE_FIRE2 32
 
-; Joystick on port 0
+; Joystick on port 0 and port 1 (z80tvgame2)
 ; MSB LSB
 ; . . F2 F1 R L D U
 
 joystick:
 _joystick:
-    in      a, (0)
+    ld      bc,0
+    ld      a,l
+    cp      1
+    jr      z,read_joystick
+    ld      bc,1
+read_joystick:
+    in      a, (bc)
     ld      hl, 0
     rrca
     jr      c, not_up
