@@ -1,0 +1,33 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/continue_03.asm
+Assembling t/30-hla/input/continue_03.asm...
+# file: t/30-hla/input/continue_03.asm
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"ld"	2:2	keyword=LD 
+Identifier	"a"	2:5	keyword=A 
+Comma	","	2:6	
+Integer	"1"	2:8	int_value=1 
+EndOfLine	"\n"	2:9	
+Identifier	"JR"	3:3	keyword=JR 
+Identifier	"__HLA_3"	3:6	
+EndOfLine	"\n"	3:13	
+Identifier	"ld"	4:2	keyword=LD 
+Identifier	"a"	4:5	keyword=A 
+Comma	","	4:6	
+Integer	"2"	4:8	int_value=2 
+EndOfLine	"\n"	4:9	
+Identifier	"__HLA_3"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"CP"	5:8	keyword=CP 
+Integer	"1"	5:11	int_value=1 
+EndOfLine	"\n"	5:12	
+Identifier	"JR"	5:8	keyword=JR 
+Identifier	"NE"	5:11	keyword=NE 
+Comma	","	5:13	
+Identifier	"__HLA_1"	5:15	
+EndOfLine	"\n"	5:22	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	

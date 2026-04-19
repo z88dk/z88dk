@@ -1,0 +1,17 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/repeat_06.asm
+Assembling t/30-hla/input/repeat_06.asm...
+# file: t/30-hla/input/repeat_06.asm
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"nop"	2:2	keyword=NOP 
+EndOfLine	"\n"	2:5	
+Identifier	"__HLA_3"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"DJNZ"	1:2	keyword=DJNZ 
+Identifier	"__HLA_1"	1:7	
+EndOfLine	"\n"	1:14	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	

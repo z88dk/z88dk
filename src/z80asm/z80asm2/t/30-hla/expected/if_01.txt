@@ -1,0 +1,63 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/if_01.asm
+Assembling t/30-hla/input/if_01.asm...
+t/30-hla/input/if_01.asm:2:4: error: Unexpected token in condition: 
+
+    %if
+       ^
+t/30-hla/input/if_01.asm:3:10: error: Unexpected token after IF: extra
+    %if true extra
+             ^
+t/30-hla/input/if_01.asm:4:7: error: Unexpected token after IF: extra
+    %if z extra
+          ^
+t/30-hla/input/if_01.asm:5:5: error: Only register A is supported in comparisons
+    %if bc>3
+        ^
+t/30-hla/input/if_01.asm:6:7: error: Expected expression
+    %if a>
+          ^
+t/30-hla/input/if_01.asm:7:2: error: ELSE without IF
+    %else
+     ^
+t/30-hla/input/if_01.asm:8:2: error: ELSEIF without IF
+    %elseif
+     ^
+t/30-hla/input/if_01.asm:9:2: error: ELIF without IF
+    %elif
+     ^
+t/30-hla/input/if_01.asm:10:2: error: ENDIF without IF
+    %endif
+     ^
+t/30-hla/input/if_01.asm:13:11: error: Unexpected token after ELSEIF: extra
+    %elseif z extra
+              ^
+t/30-hla/input/if_01.asm:14:9: error: Unexpected token after ELIF: extra
+    %elif z extra
+            ^
+t/30-hla/input/if_01.asm:15:7: error: Unexpected token after ELSE: extra
+    %else extra
+          ^
+t/30-hla/input/if_01.asm:16:8: error: Unexpected token after ENDIF: extra
+    %endif extra
+           ^
+t/30-hla/input/if_01.asm:21:2: error: ELSE already defined
+    %else
+     ^
+t/30-hla/input/if_01.asm:20:2: note: Previous definition
+    %else
+     ^
+t/30-hla/input/if_01.asm:26:2: error: ELSEIF invalid after ELSE
+    %elseif z
+     ^
+t/30-hla/input/if_01.asm:25:2: note: ELSE definition
+    %else
+     ^
+t/30-hla/input/if_01.asm:27:2: error: ELIF invalid after ELSE
+    %elif z
+     ^
+t/30-hla/input/if_01.asm:25:2: note: ELSE definition
+    %else
+     ^
+t/30-hla/input/if_01.asm:30:2: error: Unclosed HLA construct IF
+    %if z
+     ^

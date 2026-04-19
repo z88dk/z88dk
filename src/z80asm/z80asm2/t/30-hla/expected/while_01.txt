@@ -1,0 +1,24 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/while_01.asm
+Assembling t/30-hla/input/while_01.asm...
+t/30-hla/input/while_01.asm:1:7: error: Unexpected token in condition: 
+
+    %while
+          ^
+t/30-hla/input/while_01.asm:2:13: error: Unexpected token after WHILE: extra
+    %while true extra
+                ^
+t/30-hla/input/while_01.asm:3:10: error: Unexpected token after WHILE: extra
+    %while z extra
+             ^
+t/30-hla/input/while_01.asm:4:8: error: Only register A is supported in comparisons
+    %while bc>3
+           ^
+t/30-hla/input/while_01.asm:5:10: error: Expected expression
+    %while a>
+             ^
+t/30-hla/input/while_01.asm:6:2: error: ENDWHILE without WHILE
+    %endwhile
+     ^
+t/30-hla/input/while_01.asm:8:2: error: Unclosed HLA construct WHILE
+    %while z
+     ^

@@ -1,0 +1,3 @@
+%repeat
+	nop
+%until false

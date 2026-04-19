@@ -24,14 +24,11 @@ HLA_ProgramBuilder::directive_handlers = {
     { Keyword::ELSEIF,   &HLA_ProgramBuilder::handle_elseif },
     { Keyword::ELSE,     &HLA_ProgramBuilder::handle_else },
     { Keyword::ENDIF,    &HLA_ProgramBuilder::handle_endif },
-
     { Keyword::WHILE,    &HLA_ProgramBuilder::handle_while },
     { Keyword::ENDWHILE, &HLA_ProgramBuilder::handle_endwhile },
-
     { Keyword::REPEAT,   &HLA_ProgramBuilder::handle_repeat },
     { Keyword::UNTIL,    &HLA_ProgramBuilder::handle_until },
     { Keyword::DJNZ,     &HLA_ProgramBuilder::handle_djnz },
-
     { Keyword::BREAK,    &HLA_ProgramBuilder::handle_break },
     { Keyword::CONTINUE, &HLA_ProgramBuilder::handle_continue },
 };
@@ -203,6 +200,7 @@ void HLA_ProgramBuilder::handle_while(Keyword kw, const SourceLoc& kw_loc,
     auto node = std::make_unique<HLA_While>();
     node->kw = kw;
     node->loc = kw_loc;
+    node->condition = std::move(condition);
     auto* body = &node->body;
 
     auto* node_ptr = node.get();                            // save before move
@@ -264,6 +262,8 @@ void HLA_ProgramBuilder::handle_until(Keyword kw, const SourceLoc& kw_loc,
     assert(node);
     node->type = RepeatType::UntilExpr;
     node->condition = std::move(condition);
+
+    stack.pop_back(); // close REPEAT block
 }
 
 void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
@@ -294,6 +294,8 @@ void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
     assert(node);
     node->type = RepeatType::DjnzReg;
     node->reg_kw = reg_kw;
+
+    stack.pop_back(); // close REPEAT block
 }
 
 void HLA_ProgramBuilder::handle_break(Keyword kw, const SourceLoc& kw_loc,

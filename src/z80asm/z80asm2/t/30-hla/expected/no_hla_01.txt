@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/no_hla_01.asm
+Assembling t/30-hla/input/no_hla_01.asm...
+# file: t/30-hla/input/no_hla_01.asm
+Identifier	"nop"	1:1	keyword=NOP 
+EndOfLine	"\n"	1:4	

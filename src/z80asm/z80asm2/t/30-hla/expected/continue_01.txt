@@ -1,0 +1,11 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/continue_01.asm
+Assembling t/30-hla/input/continue_01.asm...
+t/30-hla/input/continue_01.asm:1:2: error: CONTINUE without WHILE or REPEAT
+    %continue
+     ^
+t/30-hla/input/continue_01.asm:3:3: error: CONTINUE without WHILE or REPEAT
+    	%continue
+    	 ^
+t/30-hla/input/continue_01.asm:6:12: error: Unexpected token after CONTINUE: extra
+    	%continue extra
+    	          ^

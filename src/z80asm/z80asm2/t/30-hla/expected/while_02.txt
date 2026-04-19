@@ -1,0 +1,17 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/while_02.asm
+Assembling t/30-hla/input/while_02.asm...
+# file: t/30-hla/input/while_02.asm
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"ld"	2:2	keyword=LD 
+Identifier	"a"	2:5	keyword=A 
+Comma	","	2:6	
+Integer	"1"	2:8	int_value=1 
+EndOfLine	"\n"	2:9	
+Identifier	"JR"	1:2	keyword=JR 
+Identifier	"__HLA_1"	1:5	
+EndOfLine	"\n"	1:12	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
