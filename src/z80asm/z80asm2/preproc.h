@@ -327,6 +327,10 @@ private:
     // expands it, pushing resulting lines to macro_work_queue
     void expand_line(const LogicalLine& in, std::vector<Token>& out_tokens);
 
+    // split lines on colons and backslashes
+    void split_lines(const std::vector<Token>& tokens, const SourceLoc& loc,
+                     std::vector<LogicalLine>& out_lines);
+
     // ---------------------------------------------------------------------
     // helpers for dumping state
     // ---------------------------------------------------------------------
