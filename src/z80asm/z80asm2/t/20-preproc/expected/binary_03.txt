@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/binary_03.asm
+Assembling t/20-preproc/input/binary_03.asm...
+t/20-preproc/input/binary_03.asm:1:29: error: Unexpected token after BINARY: extra
+    binary "file_not_found.bin" extra
+                                ^

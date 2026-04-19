@@ -1,0 +1,16 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/define_05.asm
+Assembling t/20-preproc/input/define_05.asm...
+# file: t/20-preproc/input/define_05.asm
+Identifier	"defb"	2:1	keyword=DEFB 
+String	"\"hello world\""	2:6	str_value="hello world" 
+EndOfLine	"\n"	2:21	
+EndOfLine	"\n"	3:1	
+# file: t/20-preproc/input/define_05.asm
+Identifier	"DEFINE"	1:8	keyword=DEFINE 
+Identifier	"M1"	1:8	
+LeftParen	"("	1:8	
+Identifier	"a"	1:8	keyword=A 
+RightParen	")"	1:8	
+EQ	"="	1:8	
+Hash	"#"	1:14	
+Identifier	"a"	1:15	keyword=A 

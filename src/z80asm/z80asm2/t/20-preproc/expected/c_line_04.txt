@@ -1,0 +1,64 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/c_line_04.asm
+Assembling t/20-preproc/input/c_line_04.asm...
+# file: t/20-preproc/input/c_line_04.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+Identifier	"ld"	2:1	keyword=LD 
+Identifier	"a"	2:4	keyword=A 
+Comma	","	2:5	
+Integer	"2"	2:6	int_value=2 
+EndOfLine	"\n"	2:7	
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"3"	3:6	int_value=3 
+Colon	":"	3:8	
+Identifier	"ld"	3:10	keyword=LD 
+Identifier	"a"	3:13	keyword=A 
+Comma	","	3:14	
+Integer	"5"	5:3	int_value=5 
+EndOfLine	"\n"	5:4	
+Identifier	"ld"	6:1	keyword=LD 
+Identifier	"a"	6:4	keyword=A 
+Comma	","	6:5	
+Integer	"6"	6:6	int_value=6 
+Colon	":"	6:8	
+Identifier	"ld"	6:10	keyword=LD 
+Identifier	"a"	6:13	keyword=A 
+Comma	","	6:14	
+Integer	"8"	8:1	int_value=8 
+EndOfLine	"\n"	8:2	
+# file: t/20-preproc/input/c_line_04.c
+Identifier	"ld"	20:1	keyword=LD 
+Identifier	"a"	20:4	keyword=A 
+Comma	","	20:5	
+Integer	"20"	20:6	int_value=20 
+EndOfLine	"\n"	20:8	
+Identifier	"ld"	20:1	keyword=LD 
+Identifier	"a"	20:4	keyword=A 
+Comma	","	20:5	
+Integer	"21"	20:6	int_value=21 
+EndOfLine	"\n"	20:8	
+Identifier	"ld"	20:1	keyword=LD 
+Identifier	"a"	20:4	keyword=A 
+Comma	","	20:5	
+Integer	"22"	20:6	int_value=22 
+Colon	":"	20:9	
+Identifier	"ld"	20:11	keyword=LD 
+Identifier	"a"	20:14	keyword=A 
+Comma	","	20:15	
+Integer	"24"	20:3	int_value=24 
+EndOfLine	"\n"	20:5	
+Identifier	"ld"	20:1	keyword=LD 
+Identifier	"a"	20:4	keyword=A 
+Comma	","	20:5	
+Integer	"25"	20:6	int_value=25 
+Colon	":"	20:9	
+Identifier	"ld"	20:11	keyword=LD 
+Identifier	"a"	20:14	keyword=A 
+Comma	","	20:15	
+Integer	"27"	20:1	int_value=27 
+EndOfLine	"\n"	20:3	

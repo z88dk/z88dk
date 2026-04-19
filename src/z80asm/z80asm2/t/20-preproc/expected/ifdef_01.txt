@@ -1,0 +1,34 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/ifdef_01.asm
+Assembling t/20-preproc/input/ifdef_01.asm...
+t/20-preproc/input/ifdef_01.asm:1:6: error: Expected identifier after IFDEF
+    ifdef ; no symbol
+         ^
+t/20-preproc/input/ifdef_01.asm:3:7: error: Expected identifier after IFDEF
+    ifdef 23 ; no symbol
+          ^
+t/20-preproc/input/ifdef_01.asm:5:9: error: Unexpected token after IFDEF: extra
+    ifdef X extra ; extra input
+            ^
+t/20-preproc/input/ifdef_01.asm:7:1: error: Unexpected ELSE directive without matching IF
+    else ; else without if
+    ^
+t/20-preproc/input/ifdef_01.asm:8:1: error: Unexpected ELSEIFDEF directive without matching IF
+    elseifdef ; elseifdef without if
+    ^
+t/20-preproc/input/ifdef_01.asm:9:1: error: Unexpected ELIFDEF directive without matching IF
+    elifdef ; elifdef without if
+    ^
+t/20-preproc/input/ifdef_01.asm:10:1: error: Unexpected ENDIF directive without matching IF
+    endif ; endif without if
+    ^
+t/20-preproc/input/ifdef_01.asm:13:1: error: Multiple ELSE in IF block
+    else ; two elses
+    ^
+t/20-preproc/input/ifdef_01.asm:17:1: error: Unexpected ELSEIFDEF directive after ELSE
+    elseifdef ; elseifdef after else
+    ^
+t/20-preproc/input/ifdef_01.asm:21:1: error: Unexpected ELIFDEF directive after ELSE
+    elifdef ; elifdef after else
+    ^
+# file: t/20-preproc/input/ifdef_01.asm
+EndOfLine	"\n"	23:1	

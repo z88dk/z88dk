@@ -1,0 +1,39 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/rept_12.asm
+Assembling t/20-preproc/input/rept_12.asm...
+# file: t/20-preproc/input/rept_12.asm
+Identifier	"ld"	8:2	keyword=LD 
+Identifier	"a"	8:5	keyword=A 
+Comma	","	8:6	
+Integer	"1"	8:8	int_value=1 
+EndOfLine	"\n"	8:9	
+Identifier	"ld"	11:2	keyword=LD 
+Identifier	"a"	11:5	keyword=A 
+Comma	","	11:6	
+Integer	"2"	11:8	int_value=2 
+EndOfLine	"\n"	11:9	
+Identifier	"ld"	11:2	keyword=LD 
+Identifier	"a"	11:5	keyword=A 
+Comma	","	11:6	
+Integer	"2"	11:8	int_value=2 
+EndOfLine	"\n"	11:9	
+Identifier	"ld"	15:3	keyword=LD 
+Identifier	"a"	15:6	keyword=A 
+Comma	","	15:7	
+Integer	"4"	15:9	int_value=4 
+EndOfLine	"\n"	15:10	
+Identifier	"ld"	15:3	keyword=LD 
+Identifier	"a"	15:6	keyword=A 
+Comma	","	15:7	
+Integer	"4"	15:9	int_value=4 
+EndOfLine	"\n"	15:10	
+Identifier	"ld"	15:3	keyword=LD 
+Identifier	"a"	15:6	keyword=A 
+Comma	","	15:7	
+Integer	"4"	15:9	int_value=4 
+EndOfLine	"\n"	15:10	
+Identifier	"ld"	15:3	keyword=LD 
+Identifier	"a"	15:6	keyword=A 
+Comma	","	15:7	
+Integer	"4"	15:9	int_value=4 
+EndOfLine	"\n"	15:10	
+EndOfLine	"\n"	18:1	

@@ -1,8 +1,7 @@
-- to verify there is no space between tokens must compare both line and column
-
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
-[.] preprocess()            // macros, includes, conditionals & token stream
+[x] preprocess()            // macros, includes, conditionals & token stream
+[.] HLA
 [ ] apply_ix_iy_swap()      // semantic rewrite
 [ ] apply_identifier_ucase()
 [ ] apply_alt_registers()

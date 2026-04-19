@@ -1,0 +1,37 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/exitm_11.asm
+Assembling t/20-preproc/input/exitm_11.asm...
+t/20-preproc/input/exitm_11.asm:1:2: error: EXITM outside of macro expansion
+    #exitm ; outside macro
+     ^
+t/20-preproc/input/exitm_11.asm:3:9: error: Unexpected token after EXITM: extra
+    	#exitm extra ; extra input
+    	       ^
+t/20-preproc/input/exitm_11.asm:7:3: error: EXITM outside of macro expansion
+    	#exitm ; outside macro
+    	 ^
+t/20-preproc/input/exitm_11.asm:7:3: error: EXITM outside of macro expansion
+    	#exitm ; outside macro
+    	 ^
+t/20-preproc/input/exitm_11.asm:10:3: error: EXITM outside of macro expansion
+    	#exitm ; outside macro
+    	 ^
+t/20-preproc/input/exitm_11.asm:10:3: error: EXITM outside of macro expansion
+    	#exitm ; outside macro
+    	 ^
+t/20-preproc/input/exitm_11.asm:13:3: error: EXITM outside of macro expansion
+    	#exitm ; outside macro
+    	 ^
+t/20-preproc/input/exitm_11.asm:13:3: error: EXITM outside of macro expansion
+    	#exitm ; outside macro
+    	 ^
+# file: t/20-preproc/input/exitm_11.asm
+EndOfLine	"\n"	15:1	
+# file: t/20-preproc/input/exitm_11.asm
+Identifier	"MACRO"	2:8	keyword=MACRO 
+Identifier	"X"	2:8	keyword=X 
+EndOfLine	"\n"	2:8	
+Hash	"#"	3:2	
+Identifier	"exitm"	3:3	keyword=EXITM 
+Identifier	"extra"	3:9	
+EndOfLine	"\n"	3:14	
+Identifier	"ENDM"	2:8	keyword=ENDM 

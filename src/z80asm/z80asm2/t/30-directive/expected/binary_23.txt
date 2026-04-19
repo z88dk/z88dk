@@ -1,5 +1,0 @@
-% z88dk-z80asm -v -dump-after-directives t/30-directive//input/binary_23.asm
-Assembling t/30-directive/input/binary_23.asm...
-t/30-directive/input/binary_23.asm:1:27: error: Unexpected token after BINARY: extra
-    binary file_not_found.bin extra
-                              ^
