@@ -1,0 +1,30 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/repeat_14.asm
+Assembling t/30-hla/input/repeat_14.asm...
+# file: t/30-hla/input/repeat_14.asm
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"nop"	2:2	keyword=NOP 
+EndOfLine	"\n"	2:5	
+Identifier	"__HLA_3"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"DEC"	1:2	keyword=DEC 
+Identifier	"HL"	1:6	keyword=HL 
+EndOfLine	"\n"	1:8	
+Identifier	"LD"	1:2	keyword=LD 
+Identifier	"A"	1:5	keyword=A 
+Comma	","	1:6	
+Identifier	"H"	1:8	keyword=H 
+EndOfLine	"\n"	1:9	
+Identifier	"OR"	1:2	keyword=OR 
+Identifier	"L"	1:5	keyword=L 
+EndOfLine	"\n"	1:6	
+Identifier	"JR"	1:2	keyword=JR 
+Identifier	"NZ"	1:5	keyword=NZ 
+Comma	","	1:7	
+Identifier	"__HLA_1"	1:9	
+EndOfLine	"\n"	1:16	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	

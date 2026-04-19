@@ -1,0 +1,11 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/if_05.asm
+Assembling t/30-hla/input/if_05.asm...
+# file: t/30-hla/input/if_05.asm
+Identifier	"ld"	4:2	keyword=LD 
+Identifier	"a"	4:5	keyword=A 
+Comma	","	4:6	
+Integer	"2"	4:8	int_value=2 
+EndOfLine	"\n"	4:9	
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
