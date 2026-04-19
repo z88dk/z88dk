@@ -1,0 +1,13 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/undef_12.asm
+Assembling t/20-preproc/input/undef_12.asm...
+# file: t/20-preproc/input/undef_12.asm
+Identifier	"defb"	2:1	keyword=DEFB 
+Identifier	"hello"	1:11	
+EndOfLine	"\n"	2:7	
+Identifier	"defb"	4:1	keyword=DEFB 
+Identifier	"X"	4:6	keyword=X 
+EndOfLine	"\n"	4:7	
+Identifier	"defb"	6:1	keyword=DEFB 
+Identifier	"X"	6:6	keyword=X 
+EndOfLine	"\n"	6:7	
+EndOfLine	"\n"	7:1	

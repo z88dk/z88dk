@@ -1,0 +1,49 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/incbin_25.asm
+Assembling t/20-preproc/input/incbin_25.asm...
+# file: t/20-preproc/input/incbin_25.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:8	keyword=DEFB 
+Integer	"0"	2:8	int_value=0 
+Comma	","	2:8	
+Integer	"1"	2:8	int_value=1 
+Comma	","	2:8	
+Integer	"2"	2:8	int_value=2 
+Comma	","	2:8	
+Integer	"3"	2:8	int_value=3 
+Comma	","	2:8	
+Integer	"4"	2:8	int_value=4 
+Comma	","	2:8	
+Integer	"5"	2:8	int_value=5 
+Comma	","	2:8	
+Integer	"6"	2:8	int_value=6 
+Comma	","	2:8	
+Integer	"7"	2:8	int_value=7 
+Comma	","	2:8	
+Integer	"8"	2:8	int_value=8 
+Comma	","	2:8	
+Integer	"9"	2:8	int_value=9 
+Comma	","	2:8	
+Integer	"10"	2:8	int_value=10 
+Comma	","	2:8	
+Integer	"11"	2:8	int_value=11 
+Comma	","	2:8	
+Integer	"12"	2:8	int_value=12 
+Comma	","	2:8	
+Integer	"13"	2:8	int_value=13 
+Comma	","	2:8	
+Integer	"14"	2:8	int_value=14 
+Comma	","	2:8	
+Integer	"15"	2:8	int_value=15 
+EndOfLine	"\n"	2:8	
+Identifier	"DEFB"	2:8	keyword=DEFB 
+Integer	"16"	2:8	int_value=16 
+EndOfLine	"\n"	2:8	
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"2"	3:6	int_value=2 
+EndOfLine	"\n"	3:7	
