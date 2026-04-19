@@ -1,10 +1,8 @@
-- split lines with colons and backslashes before running the preprocessor
 - HLA level must translate JR EQ to JR Z
-- HLA level must remove unused labels
 
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
-[x] preprocess()            // macros, includes, conditionals & token stream
+[x] preprocess()            // macros, includes, conditionals & token stream, split lines
 [.] HLA
 [ ] apply_ix_iy_swap()      // semantic rewrite
 [ ] apply_identifier_ucase()
