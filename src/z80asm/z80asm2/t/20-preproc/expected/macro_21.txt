@@ -1,0 +1,211 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/macro_21.asm
+Assembling t/20-preproc/input/macro_21.asm...
+t/20-preproc/input/macro_21.asm:1:6: error: Expected identifier after MACRO
+    macro ; no name
+         ^
+t/20-preproc/input/macro_21.asm:5:1: error: Macro redefinition: X
+    X macro ; duplicate definition
+    ^
+t/20-preproc/input/macro_21.asm:2:1: note: Previous definition
+    X macro
+    ^
+# file: t/20-preproc/input/macro_21.asm
+Identifier	"ld"	6:2	keyword=LD 
+Identifier	"a"	6:5	keyword=A 
+Comma	","	6:6	
+Integer	"2"	6:8	int_value=2 
+EndOfLine	"\n"	6:9	
+t/20-preproc/input/macro_21.asm:7:1: error: Unexpected ENDM directive
+    endm
+    ^
+t/20-preproc/input/macro_21.asm:11:1: error: Macro redefinition: Y
+    Y macro (p1) ; duplicate definition
+    ^
+t/20-preproc/input/macro_21.asm:8:1: note: Previous definition
+    Y macro
+    ^
+Identifier	"ld"	12:2	keyword=LD 
+Identifier	"a"	12:5	keyword=A 
+Comma	","	12:6	
+Integer	"4"	12:8	int_value=4 
+EndOfLine	"\n"	12:9	
+t/20-preproc/input/macro_21.asm:13:1: error: Unexpected ENDM directive
+    endm
+    ^
+t/20-preproc/input/macro_21.asm:14:11: error: Identifier expected
+    M1 macro ( ; missing close paren
+              ^
+Identifier	"ld"	15:2	keyword=LD 
+Identifier	"a"	15:5	keyword=A 
+Comma	","	15:6	
+Integer	"5"	15:8	int_value=5 
+EndOfLine	"\n"	15:9	
+t/20-preproc/input/macro_21.asm:16:1: error: Unexpected ENDM directive
+    endm
+    ^
+t/20-preproc/input/macro_21.asm:17:11: error: Identifier expected
+    M2 macro (21 ; missing parameter
+              ^
+Identifier	"ld"	18:2	keyword=LD 
+Identifier	"a"	18:5	keyword=A 
+Comma	","	18:6	
+Integer	"6"	18:8	int_value=6 
+EndOfLine	"\n"	18:9	
+t/20-preproc/input/macro_21.asm:19:1: error: Unexpected ENDM directive
+    endm
+    ^
+t/20-preproc/input/macro_21.asm:20:14: error: Right parenthesis or comma expected
+    M3 macro (p1 p2 ; missing comma
+                 ^
+Identifier	"ld"	21:2	keyword=LD 
+Identifier	"a"	21:5	keyword=A 
+Comma	","	21:6	
+Identifier	"p1"	21:8	
+EndOfLine	"\n"	21:10	
+Identifier	"ld"	22:2	keyword=LD 
+Identifier	"b"	22:5	keyword=B 
+Comma	","	22:6	
+Identifier	"p2"	22:8	
+EndOfLine	"\n"	22:10	
+t/20-preproc/input/macro_21.asm:23:1: error: Unexpected ENDM directive
+    endm
+    ^
+t/20-preproc/input/macro_21.asm:24:14: error: Parameter redefined: p1
+    M4 macro (p1,p1) ; duplicate parameters
+                 ^
+Identifier	"ld"	25:2	keyword=LD 
+Identifier	"a"	25:5	keyword=A 
+Comma	","	25:6	
+Identifier	"p1"	25:8	
+EndOfLine	"\n"	25:10	
+Identifier	"ld"	26:2	keyword=LD 
+Identifier	"b"	26:5	keyword=B 
+Comma	","	26:6	
+Identifier	"p1"	26:8	
+EndOfLine	"\n"	26:10	
+t/20-preproc/input/macro_21.asm:27:1: error: Unexpected ENDM directive
+    endm
+    ^
+t/20-preproc/input/macro_21.asm:32:9: error: Expected '(' after macro 'M5'
+    .label1 M5 1,2 ; expect parens
+            ^
+Dot	"."	33:1	
+Identifier	"label2"	33:2	
+EndOfLine	"\n"	33:9	
+Identifier	"ld"	29:2	keyword=LD 
+Identifier	"a"	29:5	keyword=A 
+Comma	","	29:6	
+Integer	"1"	33:13	int_value=1 
+EndOfLine	"\n"	33:9	
+Identifier	"ld"	30:2	keyword=LD 
+Identifier	"b"	30:5	keyword=B 
+Comma	","	30:6	
+Integer	"2"	33:15	int_value=2 
+EndOfLine	"\n"	33:9	
+Dot	"."	38:1	
+Identifier	"label3"	38:2	
+EndOfLine	"\n"	38:9	
+Identifier	"ld"	35:2	keyword=LD 
+Identifier	"a"	35:5	keyword=A 
+Comma	","	35:6	
+Integer	"1"	38:12	int_value=1 
+EndOfLine	"\n"	38:9	
+Identifier	"ld"	36:2	keyword=LD 
+Identifier	"b"	36:5	keyword=B 
+Comma	","	36:6	
+Integer	"2"	38:14	int_value=2 
+EndOfLine	"\n"	38:9	
+t/20-preproc/input/macro_21.asm:39:9: error: Macro 'M6' expects 2 arguments, got 1
+    .label4 M6 (1,2) ; only one argmnent
+            ^
+t/20-preproc/input/macro_21.asm:40:9: error: Macro 'M6' expects 2 arguments, got 0
+    .label5 M6 ; wrong number of arguments
+            ^
+t/20-preproc/input/macro_21.asm:41:11: error: Unmatched '('
+    .label6 M6( ; missing ')'
+              ^
+t/20-preproc/input/macro_21.asm:42:13: error: Unmatched ')'
+    .label6 M6 1) ; missing '('
+                ^
+t/20-preproc/input/macro_21.asm:43:9: error: Macro 'M6' expects 2 arguments, got 3
+    .label7 M6 1,2,3 ; argument mismatch
+            ^
+Dot	"."	44:1	
+Identifier	"label8"	44:2	
+EndOfLine	"\n"	44:9	
+Identifier	"ld"	35:2	keyword=LD 
+Identifier	"a"	35:5	keyword=A 
+Comma	","	35:6	
+Integer	"1"	44:12	int_value=1 
+EndOfLine	"\n"	44:9	
+Identifier	"ld"	36:2	keyword=LD 
+Identifier	"b"	36:5	keyword=B 
+Comma	","	36:6	
+LeftParen	"("	44:14	
+Integer	"2"	44:15	int_value=2 
+Comma	","	44:16	
+Integer	"3"	44:17	int_value=3 
+RightParen	")"	44:18	
+EndOfLine	"\n"	44:9	
+t/20-preproc/input/macro_21.asm:47:6: error: Unexpected token after ENDM: extra
+    endm extra
+         ^
+t/20-preproc/input/macro_21.asm:48:5: error: Unexpected end of file, missing ENDM for MACRO
+    M11 macro 
+        ^
+# file: t/20-preproc/input/macro_21.asm
+Identifier	"MACRO"	28:1	keyword=MACRO 
+Identifier	"M5"	28:1	
+LeftParen	"("	28:1	
+Identifier	"p1"	28:1	
+Identifier	"p2"	28:1	
+RightParen	")"	28:1	
+EndOfLine	"\n"	28:1	
+Identifier	"ld"	29:2	keyword=LD 
+Identifier	"a"	29:5	keyword=A 
+Comma	","	29:6	
+Identifier	"p1"	29:8	
+EndOfLine	"\n"	29:10	
+Identifier	"ld"	30:2	keyword=LD 
+Identifier	"b"	30:5	keyword=B 
+Comma	","	30:6	
+Identifier	"p2"	30:8	
+EndOfLine	"\n"	30:10	
+Identifier	"ENDM"	28:1	keyword=ENDM 
+# file: t/20-preproc/input/macro_21.asm
+Identifier	"MACRO"	34:1	keyword=MACRO 
+Identifier	"M6"	34:1	
+Identifier	"p1"	34:1	
+Identifier	"p2"	34:1	
+EndOfLine	"\n"	34:1	
+Identifier	"ld"	35:2	keyword=LD 
+Identifier	"a"	35:5	keyword=A 
+Comma	","	35:6	
+Identifier	"p1"	35:8	
+EndOfLine	"\n"	35:10	
+Identifier	"ld"	36:2	keyword=LD 
+Identifier	"b"	36:5	keyword=B 
+Comma	","	36:6	
+Identifier	"p2"	36:8	
+EndOfLine	"\n"	36:10	
+Identifier	"ENDM"	34:1	keyword=ENDM 
+# file: t/20-preproc/input/macro_21.asm
+Identifier	"MACRO"	2:1	keyword=MACRO 
+Identifier	"X"	2:1	keyword=X 
+EndOfLine	"\n"	2:1	
+Identifier	"ld"	3:2	keyword=LD 
+Identifier	"a"	3:5	keyword=A 
+Comma	","	3:6	
+Integer	"1"	3:8	int_value=1 
+EndOfLine	"\n"	3:9	
+Identifier	"ENDM"	2:1	keyword=ENDM 
+# file: t/20-preproc/input/macro_21.asm
+Identifier	"MACRO"	8:1	keyword=MACRO 
+Identifier	"Y"	8:1	
+EndOfLine	"\n"	8:1	
+Identifier	"ld"	9:2	keyword=LD 
+Identifier	"a"	9:5	keyword=A 
+Comma	","	9:6	
+Integer	"3"	9:8	int_value=3 
+EndOfLine	"\n"	9:9	
+Identifier	"ENDM"	8:1	keyword=ENDM 
