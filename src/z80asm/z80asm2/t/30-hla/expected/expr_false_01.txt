@@ -1,0 +1,6 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_false_01.asm
+Assembling t/30-hla/input/expr_false_01.asm...
+# file: t/30-hla/input/expr_false_01.asm
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	

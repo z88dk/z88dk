@@ -192,6 +192,7 @@ void emit_djnz(Keyword reg_kw, HLA_Label label,
     case Keyword::B:
         code.push_back("DJNZ " + label.to_string());
         break;
+    case Keyword::A:
     case Keyword::C:
     case Keyword::D:
     case Keyword::E:
@@ -223,6 +224,16 @@ void emit_djnz(Keyword reg_kw, HLA_Label label,
         ll.tokens = tokenize_text(text, loc);
         out.push_back(std::move(ll));
     }
+}
+
+static void emit_cmp(const HLA_CompareExpr& cmp, const SourceLoc& loc,
+                     std::vector<LogicalLine>& out) {
+    assert(cmp.left.keyword == Keyword::A);
+
+    std::string text = "CP " + tokens_to_string(cmp.right);
+    LogicalLine ll(loc);
+    ll.tokens = tokenize_text(text, loc);
+    out.push_back(std::move(ll));
 }
 
 static void place_label(HLA_Label label, const SourceLoc& loc,
@@ -366,7 +377,30 @@ void hla_emit_cond(const HLA_Expr& e,
             return;
         }
 
-        // Case 2: both labels real
+        // Case 2: only Lfalse is real -> short-circuit true path
+        if (!Ltrue.is_valid()) {
+            HLA_Label Ldone;
+
+            // If left is true -> done (expression true)
+            // If left is false -> evaluate right
+            hla_emit_cond(*o->left,
+                          /*Ltrue=*/Ldone,
+                          /*Lfalse=*/NoLabel,
+                          /*prefer_true_fallthrough=*/false,
+                          out);
+
+            // Now only right can make expression false
+            hla_emit_cond(*o->right,
+                          /*Ltrue=*/NoLabel,
+                          Lfalse,
+                          /*prefer_true_fallthrough=*/true,
+                          out);
+
+            place_label(Ldone, e.loc, out);
+            return;
+        }
+
+        // Case 3: both labels real
         HLA_Label Lmid;
 
         // If A is true -> jump to Ltrue
@@ -428,6 +462,8 @@ void hla_emit_cond(const HLA_Expr& e,
         auto cond = compare_to_condition(*cmp); // your helper
         auto inverted = keyword_invert_flag_condition(cond);
 
+        emit_cmp(*cmp, e.loc, out);
+
         if (!Ltrue.is_valid()) {
             // Only false label is real -> jump on NOT cond
             emit_jcc(inverted, Lfalse, e.loc, out);
@@ -458,7 +494,8 @@ void hla_emit_cond(const HLA_Expr& e,
 
 // Loop context for break/continue
 struct LoopContext {
-    const HLA_Loop* loop;
+    HLA_Label break_label;
+    HLA_Label continue_label;
 };
 
 static thread_local std::vector<LoopContext> g_loop_stack;
@@ -471,6 +508,7 @@ static void hla_lower_node(const HLA_Node& n, std::vector<LogicalLine>& out);
 // ------------------------------------------------------------
 static void hla_lower_if(const HLA_If& node, std::vector<LogicalLine>& out) {
     const bool has_else = !node.else_body.empty();
+    bool chain_terminated = false; // set when a branch is known-always-true
 
     // Lower IF / ELSEIF branches
     for (size_t i = 0; i < node.branches.size(); ++i) {
@@ -493,17 +531,25 @@ static void hla_lower_if(const HLA_If& node, std::vector<LogicalLine>& out) {
         // Body of this branch
         hla_lower_body(br.body, out);
 
-        // If this is NOT the last branch without ELSE, jump to end
         const bool is_last_branch = (i + 1 == node.branches.size());
-        if (!(is_last_branch && !has_else)) {
+
+        // Skip unconditional jump when branch is compile-time true:
+        // we terminate chain and fall through directly to end_label.
+        if (!br.is_always_true && !(is_last_branch && !has_else)) {
             emit_jmp(node.end_label, node.loc, out);
+        }
+
+        // If condition is always true, no later branch/ELSE can be reached.
+        if (br.is_always_true) {
+            chain_terminated = true;
+            break;
         }
 
         place_label(br.next_label, br.loc, out);
     }
 
-    // ELSE body (if present)
-    if (has_else) {
+    // ELSE body (if present and not proven unreachable)
+    if (has_else && !chain_terminated) {
         hla_lower_body(node.else_body, out);
     }
 
@@ -531,7 +577,7 @@ static void hla_lower_while(const HLA_While& node, std::vector<LogicalLine>& out
     }
 
     // Body
-    g_loop_stack.push_back({ &node });
+    g_loop_stack.push_back({ node.break_label, node.top_label });
     hla_lower_body(node.body, out);
     g_loop_stack.pop_back();
 
@@ -547,15 +593,19 @@ static void hla_lower_while(const HLA_While& node, std::vector<LogicalLine>& out
 static void hla_lower_repeat(const HLA_Repeat& node, std::vector<LogicalLine>& out) {
     place_label(node.top_label, node.loc, out);
 
-    g_loop_stack.push_back({ &node });
+    // Continue inside REPEAT must jump to the bottom test/decrement point.
+    HLA_Label continue_label;
+
+    g_loop_stack.push_back({ node.break_label, continue_label });
     hla_lower_body(node.body, out);
     g_loop_stack.pop_back();
+
+    place_label(continue_label, node.loc, out);
 
     switch (node.type) {
     case RepeatType::UntilExpr:
         if (node.runs_only_once) {
             // REPEAT ... UNTIL TRUE -> run once, then break
-            // fall through to brk
             break;
         }
         if (node.is_forever) {
@@ -569,7 +619,7 @@ static void hla_lower_repeat(const HLA_Repeat& node, std::vector<LogicalLine>& o
             hla_emit_cond(*node.condition,
                           /*Ltrue=*/node.break_label,
                           /*Lfalse=*/node.top_label,
-                          /*prefer_true_fallthrough=*/false,
+                          /*prefer_true_fallthrough=*/true,
                           out);
         }
         break;
@@ -588,14 +638,12 @@ static void hla_lower_repeat(const HLA_Repeat& node, std::vector<LogicalLine>& o
 // ------------------------------------------------------------
 static void hla_lower_break(const HLA_Break& n, std::vector<LogicalLine>& out) {
     assert(!g_loop_stack.empty());
-    const HLA_Loop* loop = g_loop_stack.back().loop;
-    emit_jmp(loop->break_label, n.loc, out);
+    emit_jmp(g_loop_stack.back().break_label, n.loc, out);
 }
 
 static void hla_lower_continue(const HLA_Continue& n, std::vector<LogicalLine>& out) {
     assert(!g_loop_stack.empty());
-    const HLA_Loop* loop = g_loop_stack.back().loop;
-    emit_jmp(loop->top_label, n.loc, out);
+    emit_jmp(g_loop_stack.back().continue_label, n.loc, out);
 }
 
 // ------------------------------------------------------------
