@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/include_03.asm
+Assembling t/20-preproc/input/include_03.asm...
+t/20-preproc/input/include_03.asm:1:30: error: Unexpected token after INCLUDE: extra
+    include "file_not_found.inc" extra
+                                 ^

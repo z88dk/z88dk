@@ -1,0 +1,166 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/reptc_12.asm
+Assembling t/20-preproc/input/reptc_12.asm...
+# file: t/20-preproc/input/reptc_12.asm
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"104"	1:2	int_value=104 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"101"	1:2	int_value=101 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"108"	1:2	int_value=108 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"108"	1:2	int_value=108 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"111"	1:2	int_value=111 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"32"	1:2	int_value=32 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"119"	1:2	int_value=119 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"111"	1:2	int_value=111 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"114"	1:2	int_value=114 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"108"	1:2	int_value=108 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	2:2	keyword=DEFB 
+Integer	"100"	1:2	int_value=100 
+EndOfLine	"\n"	2:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"104"	4:2	int_value=104 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"101"	4:2	int_value=101 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"108"	4:2	int_value=108 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"108"	4:2	int_value=108 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"111"	4:2	int_value=111 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"32"	4:2	int_value=32 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"119"	4:2	int_value=119 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"111"	4:2	int_value=111 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"114"	4:2	int_value=114 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"108"	4:2	int_value=108 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	5:2	keyword=DEFB 
+Integer	"100"	4:2	int_value=100 
+EndOfLine	"\n"	5:8	
+Identifier	"defb"	8:2	keyword=DEFB 
+Integer	"49"	7:2	int_value=49 
+EndOfLine	"\n"	8:8	
+Identifier	"defb"	8:2	keyword=DEFB 
+Integer	"50"	7:2	int_value=50 
+EndOfLine	"\n"	8:8	
+Identifier	"defb"	8:2	keyword=DEFB 
+Integer	"51"	7:2	int_value=51 
+EndOfLine	"\n"	8:8	
+Identifier	"defb"	8:2	keyword=DEFB 
+Integer	"52"	7:2	int_value=52 
+EndOfLine	"\n"	8:8	
+Identifier	"defb"	8:2	keyword=DEFB 
+Integer	"53"	7:2	int_value=53 
+EndOfLine	"\n"	8:8	
+Identifier	"defb"	8:2	keyword=DEFB 
+Integer	"54"	7:2	int_value=54 
+EndOfLine	"\n"	8:8	
+Identifier	"DEFC"	10:19	keyword=DEFC 
+Identifier	"version"	10:24	
+EQ	"="	10:32	
+Integer	"123"	10:34	int_value=123 
+EndOfLine	"\n"	10:37	
+Define constant: version = $7B
+Identifier	"defb"	12:2	keyword=DEFB 
+Integer	"49"	11:2	int_value=49 
+EndOfLine	"\n"	12:8	
+Identifier	"defb"	12:2	keyword=DEFB 
+Integer	"50"	11:2	int_value=50 
+EndOfLine	"\n"	12:8	
+Identifier	"defb"	12:2	keyword=DEFB 
+Integer	"51"	11:2	int_value=51 
+EndOfLine	"\n"	12:8	
+Identifier	"defb"	15:2	keyword=DEFB 
+Integer	"49"	14:2	int_value=49 
+EndOfLine	"\n"	15:8	
+Identifier	"defb"	15:2	keyword=DEFB 
+Integer	"46"	14:2	int_value=46 
+EndOfLine	"\n"	15:8	
+Identifier	"defb"	15:2	keyword=DEFB 
+Integer	"50"	14:2	int_value=50 
+EndOfLine	"\n"	15:8	
+Identifier	"defb"	15:2	keyword=DEFB 
+Integer	"51"	14:2	int_value=51 
+EndOfLine	"\n"	15:8	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"49"	17:2	int_value=49 
+Comma	","	19:10	
+Integer	"52"	18:3	int_value=52 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"49"	17:2	int_value=49 
+Comma	","	19:10	
+Integer	"53"	18:3	int_value=53 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"49"	17:2	int_value=49 
+Comma	","	19:10	
+Integer	"54"	18:3	int_value=54 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"50"	17:2	int_value=50 
+Comma	","	19:10	
+Integer	"52"	18:3	int_value=52 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"50"	17:2	int_value=50 
+Comma	","	19:10	
+Integer	"53"	18:3	int_value=53 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"50"	17:2	int_value=50 
+Comma	","	19:10	
+Integer	"54"	18:3	int_value=54 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"51"	17:2	int_value=51 
+Comma	","	19:10	
+Integer	"52"	18:3	int_value=52 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"51"	17:2	int_value=51 
+Comma	","	19:10	
+Integer	"53"	18:3	int_value=53 
+EndOfLine	"\n"	19:14	
+Identifier	"defb"	19:3	keyword=DEFB 
+Integer	"51"	17:2	int_value=51 
+Comma	","	19:10	
+Integer	"54"	18:3	int_value=54 
+EndOfLine	"\n"	19:14	
+EndOfLine	"\n"	22:1	
+# file: t/20-preproc/input/reptc_12.asm
+Identifier	"DEFINE"	10:9	keyword=DEFINE 
+Identifier	"version"	10:9	
+EQ	"="	10:9	
+Integer	"123"	10:19	int_value=123 
+symbol	version	$7B	(defined at t/20-preproc/input/reptc_12.asm:10:24)

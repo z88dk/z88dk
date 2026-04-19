@@ -1,0 +1,40 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/error_11.asm
+Assembling t/20-preproc/input/error_11.asm...
+# file: t/20-preproc/input/error_11.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:7	int_value=1 
+EndOfLine	"\n"	1:8	
+t/20-preproc/input/error_11.asm:2:8: error: Unexpected token after ERROR: 25
+    #error 25 ; expects string
+           ^
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"2"	3:7	int_value=2 
+EndOfLine	"\n"	3:8	
+t/20-preproc/input/error_11.asm:4:16: error: Unexpected token after ERROR: extra
+    #error "hello" extra ; expects eol
+                   ^
+Identifier	"ld"	5:1	keyword=LD 
+Identifier	"a"	5:4	keyword=A 
+Comma	","	5:5	
+Integer	"3"	5:7	int_value=3 
+EndOfLine	"\n"	5:8	
+t/20-preproc/input/error_11.asm:6:7: error: User specified error
+    #error ; no arguments, error
+          ^
+Identifier	"ld"	7:1	keyword=LD 
+Identifier	"a"	7:4	keyword=A 
+Comma	","	7:5	
+Integer	"4"	7:7	int_value=4 
+EndOfLine	"\n"	7:8	
+t/20-preproc/input/error_11.asm:8:8: error: user error
+    #error "user error" ; error
+           ^
+Identifier	"ld"	9:1	keyword=LD 
+Identifier	"a"	9:4	keyword=A 
+Comma	","	9:5	
+Integer	"5"	9:7	int_value=5 
+EndOfLine	"\n"	9:8	

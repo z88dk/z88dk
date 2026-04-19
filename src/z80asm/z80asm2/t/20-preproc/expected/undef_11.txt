@@ -1,0 +1,10 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/undef_11.asm
+Assembling t/20-preproc/input/undef_11.asm...
+t/20-preproc/input/undef_11.asm:1:7: error: Expected identifier after UNDEF
+    #undef ; no name
+          ^
+t/20-preproc/input/undef_11.asm:2:14: error: Unexpected token after UNDEF: world
+    #undef hello world ; extra tokens
+                 ^
+# file: t/20-preproc/input/undef_11.asm
+EndOfLine	"\n"	3:1	

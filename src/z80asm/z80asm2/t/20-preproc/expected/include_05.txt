@@ -1,0 +1,40 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/include_05.asm
+Assembling t/20-preproc/input/include_05.asm...
+# file: t/20-preproc/input/include_05.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+# file: t/20-preproc/input/include_05_i1.inc
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"b"	1:4	keyword=B 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+# file: t/20-preproc/input/include_05_i2.inc
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"c"	1:4	keyword=C 
+Comma	","	1:5	
+Integer	"1"	1:6	int_value=1 
+EndOfLine	"\n"	1:7	
+t/20-preproc/input/include_05_i2.inc:2:9: error: Recursive inclusion of file: t/20-preproc/input/include_05_i1.inc
+    include "include_05_i1.inc"
+            ^
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"c"	3:4	keyword=C 
+Comma	","	3:5	
+Integer	"2"	3:6	int_value=2 
+EndOfLine	"\n"	3:7	
+# file: t/20-preproc/input/include_05_i1.inc
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"b"	3:4	keyword=B 
+Comma	","	3:5	
+Integer	"2"	3:6	int_value=2 
+EndOfLine	"\n"	3:7	
+# file: t/20-preproc/input/include_05.asm
+Identifier	"ld"	3:1	keyword=LD 
+Identifier	"a"	3:4	keyword=A 
+Comma	","	3:5	
+Integer	"2"	3:6	int_value=2 
+EndOfLine	"\n"	3:7	

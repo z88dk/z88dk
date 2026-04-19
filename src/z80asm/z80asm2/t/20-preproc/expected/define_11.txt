@@ -1,0 +1,163 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/define_11.asm
+Assembling t/20-preproc/input/define_11.asm...
+t/20-preproc/input/define_11.asm:1:8: error: Expected identifier after DEFINE
+    #define ; no name
+           ^
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFC"	2:10	keyword=DEFC 
+Identifier	"X"	2:15	keyword=X 
+EQ	"="	2:17	
+Integer	"1"	2:19	int_value=1 
+EndOfLine	"\n"	2:20	
+Define constant: X = 1
+t/20-preproc/input/define_11.asm:3:9: error: Macro redefinition: X
+    #define X ; duplicate definition
+            ^
+t/20-preproc/input/define_11.asm:2:9: note: Previous definition
+    #define X
+            ^
+Identifier	"DEFC"	4:10	keyword=DEFC 
+Identifier	"Y"	4:15	
+EQ	"="	4:17	
+Integer	"1"	4:19	int_value=1 
+EndOfLine	"\n"	4:20	
+Define constant: Y = 1
+t/20-preproc/input/define_11.asm:5:9: error: Macro redefinition: Y
+    #define Y(p1) ; duplicate definition
+            ^
+t/20-preproc/input/define_11.asm:4:9: note: Previous definition
+    #define Y
+            ^
+t/20-preproc/input/define_11.asm:6:12: error: Identifier expected
+    #define M1( ; missing close paren
+               ^
+t/20-preproc/input/define_11.asm:7:12: error: Identifier expected
+    #define M2(21 ; missing parameter
+               ^
+t/20-preproc/input/define_11.asm:8:15: error: Right parenthesis or comma expected
+    #define M3(p1 p2 ; missing comma
+                  ^
+t/20-preproc/input/define_11.asm:9:15: error: Parameter redefined: p1
+    #define M4(p1,p1) ; duplicate parameters
+                  ^
+Identifier	"defb"	11:1	keyword=DEFB 
+LeftParen	"("	10:12	
+Identifier	"p1"	10:13	
+Comma	","	10:15	
+Identifier	"p2"	10:16	
+RightParen	")"	10:18	
+LeftParen	"("	11:8	
+Integer	"1"	11:9	int_value=1 
+Comma	","	11:10	
+Integer	"2"	11:11	int_value=2 
+RightParen	")"	11:12	
+EndOfLine	"\n"	11:13	
+Identifier	"defb"	12:1	keyword=DEFB 
+LeftParen	"("	10:12	
+Identifier	"p1"	10:13	
+Comma	","	10:15	
+Identifier	"p2"	10:16	
+RightParen	")"	10:18	
+LeftParen	"("	12:9	
+Integer	"1"	12:10	int_value=1 
+Comma	","	12:11	
+Integer	"2"	12:12	int_value=2 
+RightParen	")"	12:13	
+EndOfLine	"\n"	12:14	
+Identifier	"defb"	14:1	keyword=DEFB 
+Identifier	"M6"	14:6	
+EndOfLine	"\n"	14:8	
+t/20-preproc/input/define_11.asm:15:9: error: Missing ')' in macro invocation: M6
+    defb M6( ; missing ')'
+            ^
+Identifier	"defb"	15:1	keyword=DEFB 
+Identifier	"M6"	15:6	
+LeftParen	"("	15:8	
+EndOfLine	"\n"	15:9	
+t/20-preproc/input/define_11.asm:16:6: error: Macro 'M6' expects 2 arguments, got 3
+    defb M6(1,2,3) ; argument mismatch
+         ^
+Identifier	"defb"	16:1	keyword=DEFB 
+Identifier	"M6"	16:6	
+LeftParen	"("	16:8	
+Integer	"1"	16:9	int_value=1 
+Comma	","	16:10	
+Integer	"2"	16:11	int_value=2 
+Comma	","	16:12	
+Integer	"3"	16:13	int_value=3 
+RightParen	")"	16:14	
+EndOfLine	"\n"	16:15	
+Identifier	"defb"	17:1	keyword=DEFB 
+LeftParen	"("	13:19	
+Integer	"1"	17:9	int_value=1 
+Plus	"+"	13:22	
+LeftParen	"("	17:11	
+Integer	"2"	17:12	int_value=2 
+Comma	","	17:13	
+Integer	"3"	17:14	int_value=3 
+RightParen	")"	17:15	
+RightParen	")"	13:25	
+EndOfLine	"\n"	17:17	
+Identifier	"defb"	21:1	keyword=DEFB 
+Identifier	"M7"	20:12	
+EndOfLine	"\n"	21:8	
+Identifier	"defb"	22:1	keyword=DEFB 
+Integer	"1"	2:10	int_value=1 
+Comma	","	22:7	
+Integer	"1"	2:10	int_value=1 
+Comma	","	22:9	
+Integer	"1"	4:10	int_value=1 
+Comma	","	22:11	
+Integer	"1"	4:10	int_value=1 
+EndOfLine	"\n"	22:13	
+EndOfLine	"\n"	23:1	
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	10:9	keyword=DEFINE 
+Identifier	"M5"	10:9	
+EQ	"="	10:9	
+LeftParen	"("	10:12	
+Identifier	"p1"	10:13	
+Comma	","	10:15	
+Identifier	"p2"	10:16	
+RightParen	")"	10:18	
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	13:9	keyword=DEFINE 
+Identifier	"M6"	13:9	
+LeftParen	"("	13:9	
+Identifier	"p1"	13:9	
+Comma	","	13:9	
+Identifier	"p2"	13:9	
+RightParen	")"	13:9	
+EQ	"="	13:9	
+LeftParen	"("	13:19	
+Identifier	"p1"	13:20	
+Plus	"+"	13:22	
+Identifier	"p2"	13:23	
+RightParen	")"	13:25	
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	18:9	keyword=DEFINE 
+Identifier	"M7"	18:9	
+EQ	"="	18:9	
+Identifier	"M8"	18:12	
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	19:9	keyword=DEFINE 
+Identifier	"M8"	19:9	
+EQ	"="	19:9	
+Identifier	"M9"	19:12	
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	20:9	keyword=DEFINE 
+Identifier	"M9"	20:9	
+EQ	"="	20:9	
+Identifier	"M7"	20:12	
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	2:9	keyword=DEFINE 
+Identifier	"X"	2:9	keyword=X 
+EQ	"="	2:9	
+Integer	"1"	2:10	int_value=1 
+# file: t/20-preproc/input/define_11.asm
+Identifier	"DEFINE"	4:9	keyword=DEFINE 
+Identifier	"Y"	4:9	
+EQ	"="	4:9	
+Integer	"1"	4:10	int_value=1 
+symbol	X	1	(defined at t/20-preproc/input/define_11.asm:2:15)
+symbol	Y	1	(defined at t/20-preproc/input/define_11.asm:4:15)

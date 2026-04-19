@@ -1,0 +1,31 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/macro_12.asm
+Assembling t/20-preproc/input/macro_12.asm...
+# file: t/20-preproc/input/macro_12.asm
+EndOfLine	"\n"	1:1	
+t/20-preproc/input/macro_12.asm:3:2: error: Macro expansion limit exceeded
+    	M2
+    	^
+Identifier	"halt"	12:1	keyword=HALT 
+EndOfLine	"\n"	12:5	
+EndOfLine	"\n"	13:1	
+# file: t/20-preproc/input/macro_12.asm
+Identifier	"MACRO"	2:8	keyword=MACRO 
+Identifier	"M1"	2:8	
+EndOfLine	"\n"	2:8	
+Identifier	"M2"	3:2	
+EndOfLine	"\n"	3:4	
+Identifier	"ENDM"	2:8	keyword=ENDM 
+# file: t/20-preproc/input/macro_12.asm
+Identifier	"MACRO"	5:8	keyword=MACRO 
+Identifier	"M2"	5:8	
+EndOfLine	"\n"	5:8	
+Identifier	"M3"	6:2	
+EndOfLine	"\n"	6:4	
+Identifier	"ENDM"	5:8	keyword=ENDM 
+# file: t/20-preproc/input/macro_12.asm
+Identifier	"MACRO"	8:8	keyword=MACRO 
+Identifier	"M3"	8:8	
+EndOfLine	"\n"	8:8	
+Identifier	"M1"	9:2	
+EndOfLine	"\n"	9:4	
+Identifier	"ENDM"	8:8	keyword=ENDM 
