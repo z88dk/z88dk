@@ -1,0 +1,29 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/reptc_01.asm
+Assembling t/20-preproc/input/reptc_01.asm...
+t/20-preproc/input/reptc_01.asm:1:6: error: Expected identifier after REPTC
+    reptc ; no identifier
+         ^
+t/20-preproc/input/reptc_01.asm:2:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/20-preproc/input/reptc_01.asm:3:7: error: Expected identifier after REPTC
+    reptc 27 ; no identifier
+          ^
+t/20-preproc/input/reptc_01.asm:4:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/20-preproc/input/reptc_01.asm:5:8: error: Expected comma after identifier in REPTC
+    reptc v ; no comma
+           ^
+t/20-preproc/input/reptc_01.asm:6:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/20-preproc/input/reptc_01.asm:7:9: error: Expected text after REPTC
+    reptc v, ; no arguments
+            ^
+t/20-preproc/input/reptc_01.asm:8:1: error: Unexpected ENDR directive
+    endr
+    ^
+t/20-preproc/input/reptc_01.asm:9:1: error: Unexpected end of file, missing ENDR for REPTC
+    reptc v, a, b, c ; no endr
+    ^

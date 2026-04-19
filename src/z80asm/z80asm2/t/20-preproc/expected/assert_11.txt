@@ -1,0 +1,80 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/assert_11.asm
+Assembling t/20-preproc/input/assert_11.asm...
+# file: t/20-preproc/input/assert_11.asm
+Identifier	"DEFC"	1:10	keyword=DEFC 
+Identifier	"X"	1:15	keyword=X 
+EQ	"="	1:17	
+Integer	"1"	1:19	int_value=1 
+EndOfLine	"\n"	1:20	
+Define constant: X = 1
+Identifier	"ld"	2:1	keyword=LD 
+Identifier	"a"	2:4	keyword=A 
+Comma	","	2:5	
+Integer	"1"	2:7	int_value=1 
+EndOfLine	"\n"	2:8	
+t/20-preproc/input/assert_11.asm:3:8: error: Expected expression after ASSERT
+    #assert ; no arguments
+           ^
+Identifier	"ld"	4:1	keyword=LD 
+Identifier	"a"	4:4	keyword=A 
+Comma	","	4:5	
+Integer	"2"	4:7	int_value=2 
+EndOfLine	"\n"	4:8	
+t/20-preproc/input/assert_11.asm:5:9: error: ASMPC is not allowed in a constant expression
+    #assert asmpc ; not constant
+            ^
+Identifier	"ld"	6:1	keyword=LD 
+Identifier	"a"	6:4	keyword=A 
+Comma	","	6:5	
+Integer	"3"	6:7	int_value=3 
+EndOfLine	"\n"	6:8	
+t/20-preproc/input/assert_11.asm:7:11: error: Unexpected token after ASSERT
+    #assert X extra
+              ^
+Identifier	"ld"	8:1	keyword=LD 
+Identifier	"a"	8:4	keyword=A 
+Comma	","	8:5	
+Integer	"4"	8:7	int_value=4 
+EndOfLine	"\n"	8:8	
+t/20-preproc/input/assert_11.asm:9:13: error: Expected string after comma in ASSERT
+    #assert X , extra
+                ^
+Identifier	"ld"	10:1	keyword=LD 
+Identifier	"a"	10:4	keyword=A 
+Comma	","	10:5	
+Integer	"5"	10:7	int_value=5 
+EndOfLine	"\n"	10:8	
+t/20-preproc/input/assert_11.asm:11:21: error: Unexpected token after ASSERT
+    #assert X , "hello" extra
+                        ^
+Identifier	"ld"	12:1	keyword=LD 
+Identifier	"a"	12:4	keyword=A 
+Comma	","	12:5	
+Integer	"6"	12:7	int_value=6 
+EndOfLine	"\n"	12:8	
+Identifier	"ld"	14:1	keyword=LD 
+Identifier	"a"	14:4	keyword=A 
+Comma	","	14:5	
+Integer	"7"	14:7	int_value=7 
+EndOfLine	"\n"	14:8	
+t/20-preproc/input/assert_11.asm:15:9: error: Assertion failed
+    #assert !X ; error
+            ^
+Identifier	"ld"	16:1	keyword=LD 
+Identifier	"a"	16:4	keyword=A 
+Comma	","	16:5	
+Integer	"8"	16:7	int_value=8 
+EndOfLine	"\n"	16:8	
+Identifier	"ld"	18:1	keyword=LD 
+Identifier	"a"	18:4	keyword=A 
+Comma	","	18:5	
+Integer	"9"	18:7	int_value=9 
+EndOfLine	"\n"	18:8	
+t/20-preproc/input/assert_11.asm:19:9: error: user error
+    #assert !X, "user error" ; error
+            ^
+Identifier	"ld"	20:1	keyword=LD 
+Identifier	"a"	20:4	keyword=A 
+Comma	","	20:5	
+Integer	"10"	20:7	int_value=10 
+EndOfLine	"\n"	20:9	
