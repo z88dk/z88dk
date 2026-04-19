@@ -202,11 +202,6 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
             dump_tokens(expanded, cur_file_id);
         }
 
-        // Hook: need to parse DEFC, EQU and = so that assembly symbols
-        // are known in the preprocessor and can be used in IF expressions.
-        // e.g. X EQU 1 // IF X --> needs to know the value of X
-        parse_asm_definitions(expanded);
-
         // Append expanded tokens to final output (skip empty lines
         // produced by multi-line macro invocations that were fully
         // consumed into the work queue)
@@ -216,9 +211,22 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         if (expanded.size() == 1 && expanded[0].type == TokenType::EndOfLine) {
             continue;
         }
-        LogicalLine final_line(ll.loc);
-        final_line.tokens = std::move(expanded);
-        final_lines.push_back(std::move(final_line));
+
+        // split lines on colons and backslashes, except for the special case of a
+        // label definition at the start of the line (Identifier followed by Colon),
+        // and the colon that is part of a ternary condition ?:
+        std::vector<LogicalLine> split;
+        split_lines(expanded, ll.loc, split);
+
+        // Hook: need to parse DEFC, EQU and = so that assembly symbols
+        // are known in the preprocessor and can be used in IF expressions.
+        // e.g. X EQU 1 // IF X --> needs to know the value of X
+        for (const auto& line : split) {
+            parse_asm_definitions(line.tokens);
+        }
+
+        // insert split into final output
+        final_lines.insert(final_lines.end(), split.begin(), split.end());
     }
 
     // -------------------------------------------------------------------------
@@ -227,8 +235,6 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     if (!cond_stack.empty()) {
         g_diag.error(cond_stack.back().if_loc, "Unterminated IF block");
     }
-
-    // TODO: check for unterminated classical MACRO/ENDM if needed
 
     if (g_args.options.dump_after_preprocessing) {
         dump_logical_lines(final_lines, cur_file_id);
@@ -247,4 +253,78 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     }
 
     return final_lines;
+}
+
+void Preproc::split_lines(const std::vector<Token>& tokens, const SourceLoc& loc,
+                          std::vector<LogicalLine>& out_lines) {
+    if (tokens.empty()) {
+        return;
+    }
+
+    std::vector<Token> current_statement;
+    int ternary_depth = 0; // tracks ? without matching :
+
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        const Token& tok = tokens[i];
+
+        // Check for label definition exception: Identifier followed by Colon at start
+        if (i == 0 && tok.type == TokenType::Identifier &&
+                i + 1 < tokens.size() && tokens[i + 1].type == TokenType::Colon) {
+            // Add both identifier and colon, don't split
+            current_statement.push_back(tok);
+            current_statement.push_back(tokens[i + 1]);
+            i++; // skip the colon since we've already processed it
+            continue;
+        }
+
+        // Track ternary depth
+        if (tok.type == TokenType::Question) {
+            ternary_depth++;
+        }
+
+        // Check if this is a splitting token
+        bool is_splitter = false;
+        if (tok.type == TokenType::Backslash) {
+            is_splitter = true;
+        }
+        else if (tok.type == TokenType::Colon) {
+            // Only split on colon if not inside a ternary expression
+            if (ternary_depth > 0) {
+                ternary_depth--;
+            }
+            else {
+                is_splitter = true;
+            }
+        }
+
+        if (is_splitter) {
+            // Push current statement with EndOfLine
+            if (!current_statement.empty()) {
+                current_statement.push_back(Token::end_of_line(tok.loc));
+                LogicalLine line(current_statement.empty() ? loc : current_statement[0].loc);
+                line.tokens = std::move(current_statement);
+                out_lines.push_back(std::move(line));
+                current_statement.clear();
+            }
+        }
+        else {
+            // Add token to current statement
+            current_statement.push_back(tok);
+        }
+    }
+
+    // Push any remaining statement
+    if (!current_statement.empty()) {
+        // Ensure the statement ends with EndOfLine
+        if (current_statement.back().type != TokenType::EndOfLine) {
+            const Token& last = current_statement.back();
+            std::string_view text = g_strings.view(last.text_id);
+            SourceLoc eol_loc = last.loc;
+            eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+            current_statement.push_back(Token::end_of_line(eol_loc));
+        }
+        LogicalLine line(current_statement[0].loc);
+        line.tokens = std::move(current_statement);
+        out_lines.push_back(std::move(line));
+    }
 }

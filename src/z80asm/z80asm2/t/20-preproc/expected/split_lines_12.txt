@@ -1,0 +1,17 @@
+% z88dk-z80asm -v -dump-after-preprocessing t/20-preproc//input/split_lines_12.asm
+Assembling t/20-preproc/input/split_lines_12.asm...
+# file: t/20-preproc/input/split_lines_12.asm
+Identifier	"nop"	1:1	keyword=NOP 
+Colon	":"	1:4	
+Identifier	"cond"	1:5	
+Question	"?"	1:9	
+Identifier	"true"	1:10	keyword=TRUE 
+Colon	":"	1:14	
+Identifier	"cond"	1:15	
+Question	"?"	1:19	
+Identifier	"true"	1:20	keyword=TRUE 
+Colon	":"	1:24	
+Identifier	"false"	1:25	keyword=FALSE 
+EndOfLine	"\n"	1:30	
+Identifier	"nop"	1:31	keyword=NOP 
+EndOfLine	"\n"	1:34	

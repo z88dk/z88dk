@@ -1,0 +1,10 @@
+% z88dk-z80asm -v -dump-after-preprocessing t/20-preproc//input/split_lines_01.asm
+Assembling t/20-preproc/input/split_lines_01.asm...
+# file: t/20-preproc/input/split_lines_01.asm
+Identifier	"nop"	1:1	keyword=NOP 
+Colon	":"	1:4	
+Identifier	"nop"	1:5	keyword=NOP 
+EndOfLine	"\n"	1:8	
+Identifier	"nop"	1:9	keyword=NOP 
+EndOfLine	"\n"	1:12	
+EndOfLine	"\n"	1:13	
