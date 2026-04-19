@@ -1,0 +1,11 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/break_01.asm
+Assembling t/30-hla/input/break_01.asm...
+t/30-hla/input/break_01.asm:1:2: error: BREAK without WHILE or REPEAT
+    %break
+     ^
+t/30-hla/input/break_01.asm:3:3: error: BREAK without WHILE or REPEAT
+    	%break
+    	 ^
+t/30-hla/input/break_01.asm:6:9: error: Unexpected token after BREAK: extra
+    	%break extra
+    	       ^
