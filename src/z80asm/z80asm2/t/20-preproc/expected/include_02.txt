@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/include_02.asm
+Assembling t/20-preproc/input/include_02.asm...
+t/20-preproc/input/include_02.asm:1:28: error: Unexpected token after INCLUDE: extra
+    include file-not-found.asm extra
+                               ^
