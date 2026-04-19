@@ -1,5 +1,0 @@
-% z88dk-z80asm -v -dump-after-directives t/30-directive//input/c_line_12.asm
-Assembling t/30-directive/input/c_line_12.asm...
-t/30-directive/input/c_line_12.asm:1:9: error: Expected line number after C_LINE
-    #c_line -10 ; no c_line number
-            ^

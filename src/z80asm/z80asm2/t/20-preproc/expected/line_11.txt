@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/line_11.asm
+Assembling t/20-preproc/input/line_11.asm...
+t/20-preproc/input/line_11.asm:1:6: error: Expected line number after LINE
+    #line ; no line number
+         ^

@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/include_21.asm
+Assembling t/20-preproc/input/include_21.asm...
+t/20-preproc/input/include_21.asm:1:8: error: Expected filename after INCLUDE
+    include ; no input file
+           ^

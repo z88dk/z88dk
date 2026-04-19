@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/incbin_13.asm
+Assembling t/20-preproc/input/incbin_13.asm...
+t/20-preproc/input/incbin_13.asm:1:30: error: Unexpected token after INCBIN: extra
+    #incbin "file_not_found.bin" extra
+                                 ^
