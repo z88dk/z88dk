@@ -1,0 +1,27 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/repeat_01.asm
+Assembling t/30-hla/input/repeat_01.asm...
+t/30-hla/input/repeat_01.asm:1:9: error: Unexpected token after REPEAT: extra
+    %repeat extra
+            ^
+t/30-hla/input/repeat_01.asm:4:7: error: Unexpected token in condition: 
+
+    %until
+          ^
+t/30-hla/input/repeat_01.asm:7:6: error: Expected register after DJNZ
+    %djnz
+         ^
+t/30-hla/input/repeat_01.asm:10:13: error: Unexpected token after UNTIL: extra
+    %until true extra
+                ^
+t/30-hla/input/repeat_01.asm:13:7: error: Invalid register for DJNZ
+    %djnz z
+          ^
+t/30-hla/input/repeat_01.asm:16:7: error: Invalid register for DJNZ
+    %djnz ix
+          ^
+t/30-hla/input/repeat_01.asm:19:9: error: Unexpected token after DJNZ: extra
+    %djnz a extra
+            ^
+t/30-hla/input/repeat_01.asm:21:2: error: Unclosed HLA construct REPEAT
+    %repeat
+     ^

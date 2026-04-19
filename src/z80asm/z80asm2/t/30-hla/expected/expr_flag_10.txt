@@ -1,0 +1,19 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_flag_10.asm
+Assembling t/30-hla/input/expr_flag_10.asm...
+# file: t/30-hla/input/expr_flag_10.asm
+Identifier	"JR"	1:5	keyword=JR 
+Identifier	"P"	1:8	keyword=P 
+Comma	","	1:9	
+Identifier	"__HLA_2"	1:11	
+EndOfLine	"\n"	1:18	
+Identifier	"ld"	2:2	keyword=LD 
+Identifier	"a"	2:5	keyword=A 
+Comma	","	2:6	
+Integer	"1"	2:8	int_value=1 
+EndOfLine	"\n"	2:9	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
