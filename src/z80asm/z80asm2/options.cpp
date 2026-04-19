@@ -363,6 +363,10 @@ void Args::parse_arg(std::string_view arg,
             options.dump_after_preprocessing = true;
             return;
 
+        case OptionType::DUMP_AFTER_HLA:
+            options.dump_after_hla = true;
+            return;
+
         default:
             assert(0);
         }

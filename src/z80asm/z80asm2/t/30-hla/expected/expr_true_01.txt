@@ -1,0 +1,11 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_true_01.asm
+Assembling t/30-hla/input/expr_true_01.asm...
+# file: t/30-hla/input/expr_true_01.asm
+Identifier	"ld"	2:2	keyword=LD 
+Identifier	"a"	2:5	keyword=A 
+Comma	","	2:6	
+Integer	"1"	2:8	int_value=1 
+EndOfLine	"\n"	2:9	
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	

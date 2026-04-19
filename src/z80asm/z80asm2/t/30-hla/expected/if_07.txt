@@ -1,0 +1,27 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/if_07.asm
+Assembling t/30-hla/input/if_07.asm...
+# file: t/30-hla/input/if_07.asm
+Identifier	"JR"	1:6	keyword=JR 
+Identifier	"Z"	1:9	keyword=Z 
+Comma	","	1:10	
+Identifier	"__HLA_2"	1:12	
+EndOfLine	"\n"	1:19	
+Identifier	"ld"	2:2	keyword=LD 
+Identifier	"a"	2:5	keyword=A 
+Comma	","	2:6	
+Integer	"3"	2:8	int_value=3 
+EndOfLine	"\n"	2:9	
+Identifier	"JR"	1:2	keyword=JR 
+Identifier	"__HLA_1"	1:5	
+EndOfLine	"\n"	1:12	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"ld"	8:2	keyword=LD 
+Identifier	"a"	8:5	keyword=A 
+Comma	","	8:6	
+Integer	"4"	8:8	int_value=4 
+EndOfLine	"\n"	8:9	
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	

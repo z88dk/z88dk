@@ -210,11 +210,15 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         // Append expanded tokens to final output (skip empty lines
         // produced by multi-line macro invocations that were fully
         // consumed into the work queue)
-        if (!expanded.empty()) {
-            LogicalLine final_line(ll.loc);
-            final_line.tokens = std::move(expanded);
-            final_lines.push_back(std::move(final_line));
+        if (expanded.empty()) {
+            continue;
         }
+        if (expanded.size() == 1 && expanded[0].type == TokenType::EndOfLine) {
+            continue;
+        }
+        LogicalLine final_line(ll.loc);
+        final_line.tokens = std::move(expanded);
+        final_lines.push_back(std::move(final_line));
     }
 
     // -------------------------------------------------------------------------
