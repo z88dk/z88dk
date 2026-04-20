@@ -1432,6 +1432,7 @@ do_include_next:
 		}
 		/* file was found, but it is useless to include it again */
 		freemem(fname);
+		ls->line++;
 		ls->oline++;
 		return 0;
 	}
