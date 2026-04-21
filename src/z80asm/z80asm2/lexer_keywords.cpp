@@ -7,6 +7,8 @@
 #include "lexer_keywords.h"
 #include "string_utils.h"
 #include <cassert>
+#include <string>
+#include <string_view>
 #include <unordered_map>
 
 Keyword keyword_lookup(std::string_view s) {
@@ -20,7 +22,6 @@ Keyword keyword_lookup(std::string_view s) {
 
 std::string keyword_to_string(Keyword kw) {
     static const char* keyword_strings[] = {
-        "None",
 #define X(id, text, flags) text,
 #include "lexer_keywords.def"
     };
@@ -28,7 +29,6 @@ std::string keyword_to_string(Keyword kw) {
 }
 
 static const int keyword_flags[] = {
-    0,	// None
 #define X(id, text, flags) flags,
 #include "lexer_keywords.def"
 };
