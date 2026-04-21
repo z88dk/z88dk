@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+X(None, "", 0)
+
 X(A, "A", IS_REGISTER | IS_SEGMENT_REGISTER | IS_8BIT_REGISTER | IS_HLA_DJNZ_REGISTER)
 X(A_, "A'", IS_REGISTER)
 X(ABC, "ABC", IS_REGISTER)

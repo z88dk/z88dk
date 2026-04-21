@@ -1,11 +1,21 @@
+- Make -E output
 - HLA level must translate JR EQ to JR Z
+- HLA: add reg8, (hl), (addr) to comparison operand - LD A, operand 
+- HLA: add %BREAK IF condition
+- HLA: add %CONTINUE IF condition
+- Tokenizer: recognize A' as TokenType::AltA, CCF' as Keyword::CCF, TokenType::Tick
+- Tokenizer: recognize (HL) as TokenType::IndirectHL
+- Make AST node for jumps to allow promtion JR->JP (if -optimize-speed or jump too far)
+  or demotion JP->JR (if -optimize-size)
 
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
 [x] preprocess()            // macros, includes, conditionals & token stream, split lines
-[.] HLA
 [ ] apply_ix_iy_swap()      // semantic rewrite
 [ ] apply_identifier_ucase()
+[.] HLA
+[ ] Synthetic opcodes
+[ ] Generate .i preprocessor output file
 [ ] apply_alt_registers()
 [ ] apply_dot_directive_merge()
 [ ] parse()                 // grammar
