@@ -62,6 +62,7 @@ TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 TOCREATE += $(call check_target,homelab,homelab_clib.lib)
 TOCREATE += $(call check_target,homelab2,homelab2_clib.lib)
 TOCREATE += $(call check_target,kaypro,gfxkp.lib $(CPMLIBS))
+TOCREATE += $(call check_target,kaypro83,gfxkp83.lib $(CPMLIBS))
 TOCREATE += $(call check_target,kc,kc_clib.lib)
 TOCREATE += $(call check_target,kramermc,kramermc_clib.lib)
 TOCREATE += $(call check_target,krokha,krokha_clib.lib)
@@ -722,6 +723,8 @@ gfxkp.lib: cpm_clib.lib $(TARGET_CLIB_DEPS)
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro
 	TARGET=kaypro TYPE=z80 $(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(TARGET_DIRECTORY)/kaypro84/gfxkp.lst
+
+gfxkp83.lib: cpm_clib.lib $(KAYPRO83_TARGETS)
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro83
 	TARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(TARGET_DIRECTORY)/kaypro83/gfxkp83.lst
 
