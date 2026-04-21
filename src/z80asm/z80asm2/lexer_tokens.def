@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+X(None,         "")             // used in lookup tables
+
 // Literals
 X(Identifier,   "Identifier")
 X(Integer,      "Integer")
@@ -55,8 +57,13 @@ X(Dollar,       "$")
 X(Backslash,    "\\")
 X(Tick,         "'")
 
+// Operands
+X(Expr,         "Expr")         // used in lookup tables
+X(IndirectExpr, "IndirectExpr") // used in lookup tables
+
 X(ASMPC,        "ASMPC")
 
+// Delimiters
 X(EndOfLine,    "\n")
 
 #undef X

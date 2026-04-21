@@ -26,7 +26,6 @@ static const int IS_FLAG = 1 << 12;
 
 #define X(id, text, flags) id,
 enum class Keyword : uint16_t {
-    None = 0,
 #include "lexer_keywords.def"
 };
 #undef X
