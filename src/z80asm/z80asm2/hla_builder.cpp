@@ -407,7 +407,10 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
         return node;
     }
 
-    if (keyword_is_flag(line.peek().keyword)) {
+    // we need to look-ahead to distinguish C - carry flag from C - register
+    // C > 4 is register; C && Z is flag
+    if (keyword_is_flag(line.peek().keyword) &&
+            !is_compare_operator(line.peek(1))) {
         auto node = std::make_unique<HLA_FlagExpr>();
         node->loc = line.peek().loc;
         node->flag_token = line.peek();
@@ -415,7 +418,8 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
         return node;
     }
 
-    if (keyword_is_register(line.peek().keyword)) {
+    if (keyword_is_register(line.peek().keyword) ||
+            line.peek().keyword == Keyword::MEM) {
         auto node = parse_comparison(line);
         return node;
     }
@@ -443,14 +447,12 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) 
     auto node = std::make_unique<HLA_CompareExpr>();
 
     // get left hand side
-    if (line.peek().keyword != Keyword::A) {
-        line.error("Only register A is supported in comparisons");
+    node->loc = line.peek().loc;
+    node->left = collect_operand_tokens(line);
+    if (node->left.empty()) {
+        line.error("Expected expression");
         return nullptr;
     }
-
-    node->loc = line.peek().loc;
-    node->left = line.peek();
-    line.pos++;
 
     // get comparison operator
     if (line.peek().type == TokenType::LT) {
@@ -504,28 +506,59 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) 
     }
 
     // get right hand side
-    std::vector<Token> right;
+    node->right = collect_operand_tokens(line);
+    if (node->right.empty()) {
+        line.error("Expected expression");
+        return nullptr;
+    }
+
+    return node;
+}
+
+std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(
+    ParseLine& line)const {
+
+    std::vector<Token> tokens;
     int depth = 0;
+
     while (line.peek().type != TokenType::EndOfLine) {
-        if (line.peek().type == TokenType::LeftParen) {
+        const Token& tok = line.peek();
+
+        // Check for stopping conditions (excluding these tokens)
+        if (is_compare_operator(tok)) {
+            break;
+        }
+
+        // Track parentheses depth
+        if (tok.type == TokenType::LeftParen) {
             depth++;
         }
-        else if (line.peek().type == TokenType::RightParen) {
+        else if (tok.type == TokenType::RightParen) {
             depth--;
+            // Stop before depth becomes negative
             if (depth < 0) {
                 break;
             }
         }
 
-        right.push_back(line.peek());
+        if (tok.keyword == Keyword::MEM) {  // MEM(hl) for indirect memory access
+            line.pos++;
+            continue;
+        }
+
+        tokens.push_back(tok);
         line.pos++;
     }
 
-    if (right.empty()) {
-        line.error("Expected expression");
-        return nullptr;
-    }
+    return tokens;
+}
 
-    node->right = std::move(right);
-    return node;
+bool HLA_ProgramBuilder::is_compare_operator(const Token& tok) const {
+    return tok.type == TokenType::LT ||
+           tok.type == TokenType::LE ||
+           tok.type == TokenType::GT ||
+           tok.type == TokenType::GE ||
+           tok.type == TokenType::EQ ||
+           tok.type == TokenType::NE ||
+           tok.keyword == Keyword::S;
 }
