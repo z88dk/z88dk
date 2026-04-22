@@ -1,0 +1,38 @@
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/break_05.asm
+Assembling t/30-hla/input/break_05.asm...
+# file: t/30-hla/input/break_05.asm
+Identifier	"__HLA_1"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"ld"	2:2	keyword=LD 
+Identifier	"a"	2:5	keyword=A 
+Comma	","	2:6	
+Integer	"1"	2:8	int_value=1 
+EndOfLine	"\n"	2:9	
+Identifier	"CP"	3:16	keyword=CP 
+Identifier	"b"	3:16	keyword=B 
+EndOfLine	"\n"	3:17	
+Identifier	"JR"	3:12	keyword=JR 
+Identifier	"LTU"	3:15	keyword=LTU 
+Comma	","	3:18	
+Identifier	"__HLA_2"	3:20	
+EndOfLine	"\n"	3:27	
+Identifier	"ld"	4:2	keyword=LD 
+Identifier	"a"	4:5	keyword=A 
+Comma	","	4:6	
+Integer	"2"	4:8	int_value=2 
+EndOfLine	"\n"	4:9	
+Identifier	"__HLA_3"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
+Identifier	"CP"	5:11	keyword=CP 
+Integer	"1"	5:11	int_value=1 
+EndOfLine	"\n"	5:12	
+Identifier	"JR"	5:8	keyword=JR 
+Identifier	"NE"	5:11	keyword=NE 
+Comma	","	5:13	
+Identifier	"__HLA_1"	5:15	
+EndOfLine	"\n"	5:22	
+Identifier	"__HLA_2"	1:2	
+Colon	":"	1:9	
+EndOfLine	"\n"	1:10	
