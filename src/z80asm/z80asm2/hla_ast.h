@@ -66,9 +66,9 @@ struct HLA_CompareExpr : HLA_Expr {
         EQ,             // == | =
         NE,             // != | <>
     };
+    std::vector<Token> left;    // expression
     Type op;                    // operation
-    Token left;                 // register
-    std::vector<Token> right;   // assembly expression
+    std::vector<Token> right;   // expression
 };
 
 // Direct flag tests: Z, NZ, C, NC, etc.

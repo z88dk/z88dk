@@ -9,7 +9,7 @@ EndOfLine	"\n"	2:5
 Identifier	"__HLA_3"	1:2	
 Colon	":"	1:9	
 EndOfLine	"\n"	1:10	
-Identifier	"CP"	3:8	keyword=CP 
+Identifier	"CP"	3:11	keyword=CP 
 Integer	"1"	3:11	int_value=1 
 EndOfLine	"\n"	3:12	
 Identifier	"JR"	3:8	keyword=JR 

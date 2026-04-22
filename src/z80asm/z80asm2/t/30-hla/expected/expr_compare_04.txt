@@ -1,9 +1,9 @@
 % z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_compare_04.asm
 Assembling t/30-hla/input/expr_compare_04.asm...
 # file: t/30-hla/input/expr_compare_04.asm
-Identifier	"CP"	1:5	keyword=CP 
-Integer	"1"	1:8	int_value=1 
-EndOfLine	"\n"	1:9	
+Identifier	"CP"	1:10	keyword=CP 
+Integer	"1"	1:10	int_value=1 
+EndOfLine	"\n"	1:11	
 Identifier	"JR"	1:5	keyword=JR 
 Identifier	"LTU"	1:8	keyword=LTU 
 Comma	","	1:11	
