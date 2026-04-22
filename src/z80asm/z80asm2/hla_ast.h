@@ -158,9 +158,13 @@ struct HLA_Repeat : HLA_Loop {
     }
 };
 
-struct HLA_Break : HLA_Node {};
+struct HLA_Break : HLA_Node {
+    std::unique_ptr<HLA_Expr> condition;  // nullptr for unconditional break
+};
 
-struct HLA_Continue : HLA_Node {};
+struct HLA_Continue : HLA_Node {
+    std::unique_ptr<HLA_Expr> condition;  // nullptr for unconditional continue
+};
 
 struct HLA_Program {
     std::vector<std::unique_ptr<HLA_Node>> nodes;

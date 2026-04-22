@@ -681,12 +681,36 @@ static void hla_lower_repeat(const HLA_Repeat& node, std::vector<LogicalLine>& o
 // ------------------------------------------------------------
 static void hla_lower_break(const HLA_Break& n, std::vector<LogicalLine>& out) {
     assert(!g_loop_stack.empty());
-    emit_jmp(g_loop_stack.back().break_label, n.loc, out);
+
+    if (n.condition) {
+        // Conditional break: jump to break label if condition is true
+        hla_emit_cond(*n.condition,
+                      /*Ltrue=*/g_loop_stack.back().break_label,
+                      /*Lfalse=*/NoLabel,
+                      /*prefer_true_fallthrough=*/false,
+                      out);
+    }
+    else {
+        // Unconditional break
+        emit_jmp(g_loop_stack.back().break_label, n.loc, out);
+    }
 }
 
 static void hla_lower_continue(const HLA_Continue& n, std::vector<LogicalLine>& out) {
     assert(!g_loop_stack.empty());
-    emit_jmp(g_loop_stack.back().continue_label, n.loc, out);
+
+    if (n.condition) {
+        // Conditional continue: jump to continue label if condition is true
+        hla_emit_cond(*n.condition,
+                      /*Ltrue=*/g_loop_stack.back().continue_label,
+                      /*Lfalse=*/NoLabel,
+                      /*prefer_true_fallthrough=*/false,
+                      out);
+    }
+    else {
+        // Unconditional continue
+        emit_jmp(g_loop_stack.back().continue_label, n.loc, out);
+    }
 }
 
 // ------------------------------------------------------------
