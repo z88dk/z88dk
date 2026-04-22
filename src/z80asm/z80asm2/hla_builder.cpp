@@ -305,13 +305,23 @@ void HLA_ProgramBuilder::handle_break(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
+    auto node = std::make_unique<HLA_Break>();
+    node->kw = kw;
+    node->loc = kw_loc;
+
+    // Check for optional IF condition
+    if (line.peek().keyword == Keyword::IF) {
+        line.pos++; // consume IF
+        node->condition = parse_condition(line);
+        if (!node->condition) {
+            return; // error already reported by parse_condition
+        }
+    }
+
     if (!line.check_end_of_line(kw)) {
         return; // error already reported by check_end_of_line
     }
 
-    auto node = std::make_unique<HLA_Break>();
-    node->kw = kw;
-    node->loc = kw_loc;
     current_body()->push_back(std::move(node));             // transfer ownership
 }
 
@@ -322,13 +332,23 @@ void HLA_ProgramBuilder::handle_continue(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
+    auto node = std::make_unique<HLA_Continue>();
+    node->kw = kw;
+    node->loc = kw_loc;
+
+    // Check for optional IF condition
+    if (line.peek().keyword == Keyword::IF) {
+        line.pos++; // consume IF
+        node->condition = parse_condition(line);
+        if (!node->condition) {
+            return; // error already reported by parse_condition
+        }
+    }
+
     if (!line.check_end_of_line(kw)) {
         return; // error already reported by check_end_of_line
     }
 
-    auto node = std::make_unique<HLA_Continue>();
-    node->kw = kw;
-    node->loc = kw_loc;
     current_body()->push_back(std::move(node));             // transfer ownership
 }
 
