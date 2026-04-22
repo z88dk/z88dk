@@ -1,11 +1,16 @@
-% z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_compare_06.asm
-Assembling t/30-hla/input/expr_compare_06.asm...
-# file: t/30-hla/input/expr_compare_06.asm
+% z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_compare_24.asm
+Assembling t/30-hla/input/expr_compare_24.asm...
+# file: t/30-hla/input/expr_compare_24.asm
+Identifier	"LD"	1:5	keyword=LD 
+Identifier	"A"	1:5	keyword=A 
+Comma	","	1:5	
+Identifier	"e"	1:5	keyword=E 
+EndOfLine	"\n"	1:6	
 Identifier	"CP"	1:10	keyword=CP 
 Integer	"1"	1:10	int_value=1 
 EndOfLine	"\n"	1:11	
 Identifier	"JR"	1:5	keyword=JR 
-Identifier	"GTU"	1:8	keyword=GTU 
+Identifier	"LTU"	1:8	keyword=LTU 
 Comma	","	1:11	
 Identifier	"__HLA_2"	1:13	
 EndOfLine	"\n"	1:20	

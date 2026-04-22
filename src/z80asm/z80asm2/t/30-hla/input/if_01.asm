@@ -2,7 +2,6 @@
 %if
 %if true extra
 %if z extra
-%if bc>3
 %if a>
 %else
 %elseif

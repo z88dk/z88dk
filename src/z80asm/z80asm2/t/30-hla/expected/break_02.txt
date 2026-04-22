@@ -4,7 +4,7 @@ Assembling t/30-hla/input/break_02.asm...
 Identifier	"__HLA_1"	1:2	
 Colon	":"	1:9	
 EndOfLine	"\n"	1:10	
-Identifier	"CP"	1:8	keyword=CP 
+Identifier	"CP"	1:11	keyword=CP 
 Integer	"1"	1:11	int_value=1 
 EndOfLine	"\n"	1:12	
 Identifier	"JR"	1:8	keyword=JR 
