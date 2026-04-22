@@ -1,10 +1,6 @@
-- Make -E output
-- HLA level must translate JR EQ to JR Z
-- HLA: add reg8, (hl), (addr) to comparison operand - LD A, operand 
+- Make -E output with synthetic opcodes expansion and JR promotion done
 - HLA: add %BREAK IF condition
 - HLA: add %CONTINUE IF condition
-- Tokenizer: recognize A' as TokenType::AltA, CCF' as Keyword::CCF, TokenType::Tick
-- Tokenizer: recognize (HL) as TokenType::IndirectHL
 - Make AST node for jumps to allow promtion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
 

@@ -228,11 +228,54 @@ void emit_djnz(Keyword reg_kw, HLA_Label label,
 
 static void emit_cmp(const HLA_CompareExpr& cmp, const SourceLoc& loc,
                      std::vector<LogicalLine>& out) {
-    assert(cmp.left.keyword == Keyword::A);
+    if (!(cmp.left.size() == 1 && cmp.left[0].keyword == Keyword::A)) {
+        // Build LD A, <expr> preserving original token locations
+        LogicalLine ll(loc);
+        SourceLoc expr_loc = cmp.left.empty() ? loc : cmp.left[0].loc;
 
-    std::string text = "CP " + tokens_to_string(cmp.right);
+        ll.tokens.push_back(Token::identifier("LD", expr_loc));
+        ll.tokens.push_back(Token::identifier("A", expr_loc));
+        ll.tokens.push_back(Token::token(TokenType::Comma, ",", expr_loc));
+
+        // Append the original expression tokens
+        for (const auto& tok : cmp.left) {
+            ll.tokens.push_back(tok);
+        }
+
+        // Calculate EndOfLine location after the last token
+        SourceLoc eol_loc = expr_loc;
+        if (!cmp.left.empty()) {
+            const Token& last = cmp.left.back();
+            std::string_view text = g_strings.view(last.text_id);
+            eol_loc = last.loc;
+            eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+        }
+
+        ll.tokens.push_back(Token::end_of_line(eol_loc));
+        out.push_back(std::move(ll));
+    }
+
+    // Build CP <expr> preserving original token locations
     LogicalLine ll(loc);
-    ll.tokens = tokenize_text(text, loc);
+    SourceLoc expr_loc = cmp.right.empty() ? loc : cmp.right[0].loc;
+
+    ll.tokens.push_back(Token::identifier("CP", expr_loc));
+
+    // Append the original expression tokens
+    for (const auto& tok : cmp.right) {
+        ll.tokens.push_back(tok);
+    }
+
+    // Calculate EndOfLine location after the last token
+    SourceLoc eol_loc = expr_loc;
+    if (!cmp.right.empty()) {
+        const Token& last = cmp.right.back();
+        std::string_view text = g_strings.view(last.text_id);
+        eol_loc = last.loc;
+        eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+    }
+
+    ll.tokens.push_back(Token::end_of_line(eol_loc));
     out.push_back(std::move(ll));
 }
 
