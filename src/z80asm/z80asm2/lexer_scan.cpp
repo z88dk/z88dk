@@ -941,6 +941,11 @@ yy44: {
                 std::string ident = std::string(tok, p);
                 Keyword keyword = keyword_lookup(ident);
 
+                // check for -ucase
+                if (g_args.options.ucase_symbols) {
+                    ident = to_upper(ident);
+                }
+
                 // check for -IXIY
                 if (g_args.options.swap_ix_iy) {
                     swap_ix_iy(ident, keyword);

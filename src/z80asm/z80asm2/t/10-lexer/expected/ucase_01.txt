@@ -1,0 +1,20 @@
+% z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/ucase_01.asm
+Assembling t/10-lexer/input/ucase_01.asm...
+# file: t/10-lexer/input/ucase_01.asm
+Identifier	"hello"	1:1	
+Identifier	"hello"	1:7	
+EndOfLine	"\n"	1:12	
+Identifier	"Hello"	2:1	
+Identifier	"WORLD"	2:7	
+EndOfLine	"\n"	2:12	
+Identifier	"_hello"	3:1	
+Identifier	"_"	3:8	
+Identifier	"hello_"	3:10	
+Identifier	"_123"	3:17	
+EndOfLine	"\n"	3:21	
+Identifier	"ld"	4:1	keyword=LD 
+Identifier	"a"	4:4	keyword=A 
+Comma	","	4:5	
+Integer	"3"	4:7	int_value=3 
+EndOfLine	"\n"	4:8	
+EndOfLine	"\n"	5:1	

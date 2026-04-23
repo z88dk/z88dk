@@ -14,7 +14,7 @@ t/05-expr/input/error_div.lst:5:14: error: Division by zero
                  ^
 Define constant: E02 = 0
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0

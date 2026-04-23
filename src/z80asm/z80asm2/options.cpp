@@ -336,7 +336,7 @@ void Args::parse_arg(std::string_view arg,
             return;
 
         case OptionType::UCASE:
-            options.ucase_labels = true;
+            options.ucase_symbols = true;
             return;
 
         case OptionType::DEFINE:
