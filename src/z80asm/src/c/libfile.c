@@ -65,7 +65,7 @@ static bool add_object_modules(FILE* lib_fp, strtable_t* st) {
 
         bool include = true;
         if (option_lib_for_all_cpus()) {
-            if (file->objs->cpu_id == option_cpu() && !!file->objs->swap_ixiy == !!option_swap_ixiy())
+            if (file->objs->cpu_id == option_cpu() && file->objs->swap_ixiy == option_swap_ixiy())
                 include = true;
             else
                 include = false;
