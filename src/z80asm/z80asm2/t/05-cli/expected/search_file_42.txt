@@ -1,6 +1,6 @@
 % z88dk-z80asm -v -d -dump-after-cmdline test_t_05_cli_search_file_42_t
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	1

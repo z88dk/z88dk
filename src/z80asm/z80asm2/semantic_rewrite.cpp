@@ -13,20 +13,6 @@
 #include <string>
 #include <vector>
 
-void apply_identifier_ucase(std::vector<Token>& tokens) {
-    if (!g_args.options.ucase_labels) {
-        return;
-    }
-
-    for (Token& t : tokens) {
-        if (t.type == TokenType::Identifier) {
-            std::string s = g_strings.to_string(t.text_id);
-            s = to_upper(s);
-            t.text_id = g_strings.intern(s);
-        }
-    }
-}
-
 void apply_alt_registers(std::vector<Token>& tokens) {
     size_t i = 0;
 

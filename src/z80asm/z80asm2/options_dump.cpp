@@ -17,8 +17,8 @@ void dump_after_cmdline_and_exit() {
     std::cout
             << "verbose\t"
             << g_args.options.verbose << "\n"
-            << "ucase_labels\t"
-            << g_args.options.ucase_labels << "\n"
+            << "ucase_symbols\t"
+            << g_args.options.ucase_symbols << "\n"
             << "preprocess_only\t"
             << g_args.options.preprocess_only << "\n"
             << "swap_ix_iy\t"
