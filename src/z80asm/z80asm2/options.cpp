@@ -12,11 +12,14 @@
 #include "string_utils.h"
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <filesystem>
+#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <set>
 #include <string>
+#include <string_view>
 #include <vector>
 
 Args g_args;
@@ -55,12 +58,17 @@ static const UsageGroup usage_layout[] = {
     {
         "Preprocessor Options",
         {
-            OptionType::DEFINE, OptionType::PREPROC
+            OptionType::IXIY,
+            OptionType::UCASE,
+            OptionType::DEFINE,
+            OptionType::PREPROC
         }
     },
     {
         "Assembly Options",
-        { OptionType::IXIY, OptionType::UCASE, OptionType::DATESTAMP }
+        {
+            OptionType::DATESTAMP
+        }
     },
     {
         "Diagnostic Options",
@@ -323,20 +331,20 @@ void Args::parse_arg(std::string_view arg,
             append_with_space(options.perl_options, opt_arg);
             return;
 
-        case OptionType::DEFINE:
-            parse_define(arg, spec->name, loc);
-            return;
-
-        case OptionType::PREPROC:
-            options.preprocess_only = true;
-            return;
-
         case OptionType::IXIY:
             options.swap_ix_iy = true;
             return;
 
         case OptionType::UCASE:
             options.ucase_labels = true;
+            return;
+
+        case OptionType::DEFINE:
+            parse_define(arg, spec->name, loc);
+            return;
+
+        case OptionType::PREPROC:
+            options.preprocess_only = true;
             return;
 
         case OptionType::DATESTAMP:
@@ -830,5 +838,14 @@ void Args::search_source_file(std::string_view filename_,
     // not found, avoid cascade of errors
     if (!g_diag.get_error_count()) {
         g_diag.error(loc, "File not found: " + filename);
+    }
+}
+
+void Args::define_constants_from_cpu_and_ixiy() {
+    // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
+    StringInterner::Id swap_id = g_strings.intern("__SWAP_IX_IY__");
+    options.global_defs.erase(swap_id);
+    if (options.swap_ix_iy) {
+        options.global_defs.set(swap_id, 1, SourceLoc());
     }
 }

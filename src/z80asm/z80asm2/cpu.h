@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "lexer.h"
-#include <vector>
+#include "lexer_keywords.h"
+#include <string>
 
-void apply_identifier_ucase(std::vector<Token>& tokens);
-void apply_alt_registers(std::vector<Token>& tokens);
-void apply_dot_directive_merge(std::vector<Token>& tokens);
+Keyword cpu_invert_flag_condition(Keyword kw);
+void swap_ix_iy(std::string& inout_text, Keyword& inout_kw);
+
