@@ -8,7 +8,7 @@ Define constant: E02 = -5
 Define constant: E03 = 1
 Define constant: E04 = 1
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0

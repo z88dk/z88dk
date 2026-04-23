@@ -1,6 +1,6 @@
 % z88dk-z80asm -v -dump-after-cmdline @t/05-cli//input/at_files_01.lst
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
