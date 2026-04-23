@@ -29,7 +29,7 @@ struct OptionSpec {
 
 struct Options {
     bool verbose = false;
-    bool ucase_labels = false;
+    bool ucase_symbols = false;
     bool preprocess_only = false;
     bool swap_ix_iy = false;
     bool date_stamp = false;
