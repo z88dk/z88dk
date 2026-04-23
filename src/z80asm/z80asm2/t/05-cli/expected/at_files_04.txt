@@ -3,7 +3,7 @@ t/05-cli/input/at_files_04_list3.lst:4:5: error: Recursive inclusion of list fil
     	@ 	at_files_04_list1.lst
     	  	^
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0

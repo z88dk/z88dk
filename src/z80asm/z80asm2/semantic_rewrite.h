@@ -9,6 +9,5 @@
 #include "lexer.h"
 #include <vector>
 
-void apply_identifier_ucase(std::vector<Token>& tokens);
 void apply_alt_registers(std::vector<Token>& tokens);
 void apply_dot_directive_merge(std::vector<Token>& tokens);

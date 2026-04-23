@@ -17,7 +17,7 @@ X(M4,       "-m4",     true, "=OPTS", "Pass options to m4")
 X(PERL,     "-perl",   true, "=OPTS", "Pass options to perl")
 // Preprocessor options
 X(IXIY,     "-IXIY",   false, "", "Swap IX and IY registers")
-X(UCASE,    "-ucase",  false, "", "Uppercase labels")
+X(UCASE,    "-ucase",  false, "", "Uppercase symbols")
 X(DEFINE,   "-D",      true, "=NAME[=EXPR]", "Define symbol")
 X(PREPROC,  "-E",      false, "", "Preprocess only")
 

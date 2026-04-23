@@ -1,8 +1,9 @@
-% z88dk-z80asm -v -dump-after-cmdline -It/05-cli//input @at_files_06.lst
+% z88dk-z80asm -v -IXIY -dump-after-cmdline t/05-cli//input/empty.asm
+Define constant: __SWAP_IX_IY__ = 1
 verbose	1
 ucase_symbols	0
 preprocess_only	0
-swap_ix_iy	0
+swap_ix_iy	1
 date_stamp	0
 dump_after_cmdline	1
 dump_after_tokenization	0
@@ -13,6 +14,5 @@ m4_options
 perl_options	
 cpp_options	
 output_dir	
-include_path	t/05-cli/input
-input_file	t/05-cli/input/at_files_06_a1.asm
-input_file	t/05-cli/input/at_files_06_a2.asm
+global_def	__SWAP_IX_IY__	1
+input_file	t/05-cli/input/empty.asm

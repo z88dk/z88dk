@@ -18,7 +18,7 @@ External Preprocessor Options:
 
 Preprocessor Options:
   -IXIY         Swap IX and IY registers
-  -ucase        Uppercase labels
+  -ucase        Uppercase symbols
   -D=NAME[=EXPR]Define symbol
   -E            Preprocess only
 

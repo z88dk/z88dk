@@ -9,7 +9,7 @@ t/05-expr/input/error_undef.lst:3:7: error: Undefined constant: BAZ
     -DE02=BAZ*3
           ^
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
