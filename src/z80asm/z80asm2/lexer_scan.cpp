@@ -5,9 +5,11 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "cpu.h"
 #include "diag.h"
 #include "lexer.h"
 #include "lexer_scan.h"
+#include "options.h"
 #include "source_loc.h"
 #include <charconv>
 #include <string>
@@ -938,6 +940,11 @@ yy43:
 yy44: {
                 std::string ident = std::string(tok, p);
                 Keyword keyword = keyword_lookup(ident);
+
+                // check for -IXIY
+                if (g_args.options.swap_ix_iy) {
+                    swap_ix_iy(ident, keyword);
+                }
 
                 // check for ASMPC
                 if (keyword == Keyword::ASMPC) {
