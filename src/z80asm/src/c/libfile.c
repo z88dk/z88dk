@@ -65,7 +65,7 @@ static bool add_object_modules(FILE* lib_fp, strtable_t* st) {
 
         bool include = true;
         if (option_lib_for_all_cpus()) {
-            if (file->objs->cpu_id == option_cpu() && file->objs->swap_ixiy == option_swap_ixiy())
+            if (file->objs->cpu_id == option_cpu() && !!file->objs->swap_ixiy == !!option_swap_ixiy())
                 include = true;
             else
                 include = false;
@@ -125,18 +125,9 @@ void make_library(const char *lib_filename) {
     xfwrite_dword(-1, fp);              // placeholder for string table address
 
     if (option_lib_for_all_cpus()) {
-        // libraries have no_swap and swap object files
-        // libraries built with -IXIY-soft have only soft-swap object files
-        swap_ixiy_t current_swap_ixiy = option_swap_ixiy();
-        swap_ixiy_t first_ixiy, last_ixiy;
-        if (current_swap_ixiy == IXIY_SOFT_SWAP) {
-            first_ixiy = last_ixiy = IXIY_SOFT_SWAP;
-        }
-        else {
-            first_ixiy = IXIY_NO_SWAP;
-            last_ixiy = IXIY_SWAP;
-        }
-
+        int current_cpu = option_cpu();
+		bool current_swap_ixiy = option_swap_ixiy();
+		
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
             // only include non-strict cpus in library
@@ -145,7 +136,8 @@ void make_library(const char *lib_filename) {
 
             option_set_cpu(*cpu);
 
-            for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
+			for (int ixiy_count = 0; ixiy_count < 2; ixiy_count++) {
+				bool ixiy = ixiy_count==1;
                 option_set_swap_ixiy(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++) {
@@ -171,6 +163,9 @@ void make_library(const char *lib_filename) {
                     printf("\n");
             }
         }
+		
+		option_set_cpu(current_cpu);
+		option_set_swap_ixiy(current_swap_ixiy);
     }
     else {
         /* already assembled in main(), write each object file */

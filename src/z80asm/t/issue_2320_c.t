@@ -368,6 +368,8 @@ Writing object file 'test_t_issue_2320_c_t.b.o'
 Adding test_t_issue_2320_c_t.a.o to library
 Adding test_t_issue_2320_c_t.b.o to library
 
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<'END');

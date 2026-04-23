@@ -129,7 +129,7 @@ typedef struct objfile_s
 	int			version;
 	int			global_org;
     cpu_t       cpu_id;
-    swap_ixiy_t swap_ixiy;
+    bool 		swap_ixiy;
 	argv_t*     externs;
 	section_t*  sections;
     strtable_t* st;

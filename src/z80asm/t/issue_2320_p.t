@@ -352,14 +352,14 @@ Object  file test_t_issue_2320_p_t.1.lib at $20EC: Z80RMF18
 
 END
 
-	for my $code_ixiy ("", "-IXIY", "-IXIY-soft") {
+	for my $code_ixiy ("", "-IXIY") {
 		for my $code_cpu (@CPUS) {
             (my $linked_cpu = $code_cpu) =~ s/_strict$//;
 			unlink("$test.bin");
 			capture_ok("z88dk-z80asm -b -m$code_cpu $code_ixiy ".
 							   "-l$test.1.lib $test.asm", "");
 			ok -f "$test.bin", "$test.bin created";
-			my %CODE_IXIY = (""=>"", "-IXIY"=>"-IXIY ", "-IXIY-soft"=>"");
+			my %CODE_IXIY = (""=>"", "-IXIY"=>"-IXIY ");
 			check_bin_file("$test.bin", bytes(42).$linked_cpu." ".$CODE_IXIY{$code_ixiy});
 		}
 	}

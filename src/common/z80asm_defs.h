@@ -75,15 +75,8 @@ extern const int* cpu_ids();
 // check if a code cpu is compatible with a library cpu
 extern bool cpu_compatible(cpu_t code_cpu_id, cpu_t lib_cpu_id);
 
-
 // IXIY
-typedef enum {
-    IXIY_NO_SWAP,           // no swap
-    IXIY_SWAP,              // swap IX and IY
-    IXIY_SOFT_SWAP,         // swap IX and IY, but save object file with no swap
-} swap_ixiy_t;
-
-extern bool ixiy_compatible(swap_ixiy_t code_swap_ixiy, swap_ixiy_t lib_swap_ixiy);
+extern bool ixiy_compatible(bool code_swap_ixiy, bool lib_swap_ixiy);
 
 //-----------------------------------------------------------------------------
 // Opcodes

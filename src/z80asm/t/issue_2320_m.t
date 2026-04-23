@@ -2030,6 +2030,8 @@ Skipping test_t_issue_2320_m_t.kc160_z80-IXIY.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m_t.kc160_z80_strict.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_m_t.kc160_z80_strict-IXIY.o - different CPU-IXIY combination
 
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
 END
 
 	capture_ok("z88dk-z80nm -a $test.1.lib", <<'END');

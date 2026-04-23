@@ -809,7 +809,7 @@ static bool module_same_cpu(obj_file_t* obj, int fpos) {
         return false;
     }
 
-    swap_ixiy_t swap_ixiy = parse_obj_file_int(obj);
+    bool swap_ixiy = !!parse_obj_file_int(obj);
     if (!ixiy_compatible(option_swap_ixiy(), swap_ixiy)) {
         obj->i = fpos0;
         return false;

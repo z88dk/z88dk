@@ -312,7 +312,7 @@ objfile_t* objfile_new()
     self->version = -1;
     self->global_org = ORG_NOT_DEFINED;
     self->cpu_id = CPU_Z80;
-    self->swap_ixiy = IXIY_NO_SWAP;
+    self->swap_ixiy = false;
 	self->externs = argv_new();
 
 	section_t* section = section_new();			// section "" must exist
@@ -740,7 +740,7 @@ void objfile_read(objfile_t* obj, FILE* fp)
     // CPU
     if (obj->version >= 18) {
         obj->cpu_id = xfread_dword(fp);
-        obj->swap_ixiy = xfread_dword(fp);
+        obj->swap_ixiy = !!xfread_dword(fp);
     }
 
     // global ORG (for old versions)
@@ -792,11 +792,8 @@ void objfile_read(objfile_t* obj, FILE* fp)
         else
             printf("  CPU:  (invalid %d) ", obj->cpu_id);
 
-        switch (obj->swap_ixiy) {
-        case IXIY_NO_SWAP: break;
-        case IXIY_SWAP: printf("(-IXIY)"); break;
-        case IXIY_SOFT_SWAP: printf("(-IXIY-soft)"); break;
-        default: xassert(0);
+        if (obj->swap_ixiy) {
+			printf("(-IXIY)");
         }
         printf("\n");
     }

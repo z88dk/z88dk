@@ -176,6 +176,8 @@ Predefined constant: __SWAP_IX_IY__ = 1
 Skipping test_t_issue_2320_a_t.a.o - different CPU-IXIY combination
 Skipping test_t_issue_2320_a_t.b.o - different CPU-IXIY combination
 
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
 END
 
 capture_ok("z88dk-z80nm -a $test.lib", <<'END');

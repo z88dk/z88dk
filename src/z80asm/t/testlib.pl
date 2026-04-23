@@ -621,12 +621,6 @@ sub ixiy_compatible {
 	if ($code_ixiy eq $lib_ixiy) {
 		return 1;
 	}
-	elsif ($code_ixiy eq "" && $lib_ixiy eq "-IXIY-soft") {
-		return 1;
-	}
-	elsif ($code_ixiy eq "-IXIY-soft" && $lib_ixiy eq "") {
-		return 1;
-	}
 	else {
 		return 0;
 	}
