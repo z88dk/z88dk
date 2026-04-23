@@ -7,6 +7,7 @@
 #pragma once
 
 #include "const_expr.h"
+#include "const_symbols.h"
 #include "source_loc.h"
 #include <string>
 #include <vector>
@@ -58,6 +59,8 @@ struct Args {
                             std::string_view including_filename,
                             const SourceLoc& loc,
                             std::vector<SourceLoc>& loc_stack);
+    // define variables from cpu and -IXIY options
+    void define_constants_from_cpu_and_ixiy();
 
 private:
     bool split_option_arg(std::string_view arg,
