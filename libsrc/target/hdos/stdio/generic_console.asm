@@ -104,20 +104,20 @@ cls_1:
     ld  (hl),32
     inc hl
     djnz    cls_1
-    ;ld a,10
-    ;rst    38h
-    ;defb   SCOUT
+
+    ld a,10
+    rst    38h
+    defb   SCOUT
     ;ld a,13
     ;rst    38h
     ;defb   SCOUT
 
-    
-    ld a,27
-    rst 38h
-    defb SCOUT
-    ld a,'D'
-    rst 38h
-    defb SCOUT
+    ;ld a,27
+    ;rst 38h
+    ;defb SCOUT
+    ;ld a,'D'
+    ;rst 38h
+    ;defb SCOUT
 
     pop bc
     pop hl
