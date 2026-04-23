@@ -1,6 +1,6 @@
 % z88dk-z80asm -v -dump-after-cmdline -It/05-cli//input/wildcard @t/05-cli//input/wildcard_06.lst
 verbose	1
-ucase_labels	0
+ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
