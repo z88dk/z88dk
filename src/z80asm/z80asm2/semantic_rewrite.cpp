@@ -13,43 +13,6 @@
 #include <string>
 #include <vector>
 
-// replace IX<->IY, IXH<->IYH, AIX<->AIY, XIX<->YIY
-static void swap_x_y(std::string& str) {
-    for (auto& c : str) {
-        switch (c) {
-        case 'x':
-            c = 'y';
-            break;
-        case 'X':
-            c = 'Y';
-            break;
-        case 'y':
-            c = 'x';
-            break;
-        case 'Y':
-            c = 'X';
-            break;
-        default:
-            ;
-        }
-    }
-}
-
-void apply_ix_iy_swap(std::vector<Token>& tokens) {
-    if (!g_args.options.swap_ix_iy) {
-        return;
-    }
-
-    for (Token& t : tokens) {
-        if (keyword_is_x_register(t.keyword)) {
-            std::string s = g_strings.to_string(t.text_id);
-            swap_x_y(s);
-            t.text_id = g_strings.intern(s);
-            t.keyword = keyword_lookup(s);
-        }
-    }
-}
-
 void apply_identifier_ucase(std::vector<Token>& tokens) {
     if (!g_args.options.ucase_labels) {
         return;

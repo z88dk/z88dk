@@ -1,11 +1,10 @@
 - Make -E output with synthetic opcodes expansion and JR promotion done
-- Make AST node for jumps to allow promtion JR->JP (if -optimize-speed or jump too far)
+- Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
 
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
 [x] preprocess()            // macros, includes, conditionals & token stream, split lines
-[ ] apply_ix_iy_swap()      // semantic rewrite
 [ ] apply_identifier_ucase()
 [.] HLA
 [ ] Synthetic opcodes

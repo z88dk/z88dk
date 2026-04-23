@@ -13,10 +13,13 @@
 #include "options_dump.h"
 #include "pathnames.h"
 #include "preproc.h"
+#include "source_loc.h"
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 static constexpr std::string_view z80asm_env = "Z80ASM";
@@ -118,6 +121,9 @@ int main(int argc, char* argv[]) {
         SourceLoc loc("<command-line>", i, 1);
         g_args.parse_arg(argv[i], found_dash_dash, loc);
     }
+
+    // define global defines from command line options
+    g_args.define_constants_from_cpu_and_ixiy();
 
     if (g_args.options.dump_after_cmdline) {
         dump_after_cmdline_and_exit();
