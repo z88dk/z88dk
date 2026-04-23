@@ -17,12 +17,12 @@ External Preprocessor Options:
   -perl=OPTS    Pass options to perl
 
 Preprocessor Options:
+  -IXIY         Swap IX and IY registers
+  -ucase        Uppercase labels
   -D=NAME[=EXPR]Define symbol
   -E            Preprocess only
 
 Assembly Options:
-  -IXIY         Swap IX and IY registers
-  -ucase        Uppercase labels
   -d            Assemble only if newer
 
 Diagnostic Options:

@@ -50,4 +50,3 @@ bool keyword_is_flag(Keyword kw);
 bool keyword_is_opcode(Keyword kw);
 bool keyword_is_instruction(Keyword kw);
 
-Keyword keyword_invert_flag_condition(Keyword kw);

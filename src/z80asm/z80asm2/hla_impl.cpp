@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "cpu.h"
 #include "hla_ast.h"
 #include "hla_builder.h"
 #include "hla_impl.h"
@@ -471,7 +472,7 @@ void hla_emit_cond(const HLA_Expr& e,
     if (auto* fl = dynamic_cast<const HLA_FlagExpr*>(&e)) {
 
         auto cond = fl->flag_token.keyword;
-        auto inverted = keyword_invert_flag_condition(cond);
+        auto inverted = cpu_invert_flag_condition(cond);
 
         if (!Ltrue.is_valid()) {
             // Only false label is real -> jump on NOT cond
@@ -503,7 +504,7 @@ void hla_emit_cond(const HLA_Expr& e,
     if (auto* cmp = dynamic_cast<const HLA_CompareExpr*>(&e)) {
 
         auto cond = compare_to_condition(*cmp); // your helper
-        auto inverted = keyword_invert_flag_condition(cond);
+        auto inverted = cpu_invert_flag_condition(cond);
 
         emit_cmp(*cmp, e.loc, out);
 

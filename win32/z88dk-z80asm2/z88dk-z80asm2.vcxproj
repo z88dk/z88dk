@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\diag.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\hla.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\hla_ast.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\diag.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\hla.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\hla_ast.h" />
