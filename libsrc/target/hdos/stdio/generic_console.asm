@@ -17,13 +17,17 @@
     PUBLIC      generic_console_set_ink
     PUBLIC      generic_console_set_paper
     PUBLIC      generic_console_set_attribute
+    PUBLIC      generic_console_plotc
+    PUBLIC      h19_backbuffer
 
     EXTERN      CONSOLE_COLUMNS
     EXTERN      CONSOLE_ROWS
 
-    INCLUDE "target/hdos/def/hdos.def"
+    EXTERN      hdos_default
 
+    INCLUDE     "target/hdos/def/hdos.def"
     INCLUDE     "ioctl.def"
+
     PUBLIC      CLIB_GENCON_CAPS
     defc        CLIB_GENCON_CAPS = 0
 
@@ -39,24 +43,59 @@ generic_console_set_paper:
     ret
 
 generic_console_cls:
-    ld  hl,screen_copy
-    ld  de,screen_copy+1
+
+    LD   A, I_CONWI     ; "Console Width" attribute index
+    LD   B, 255         ; No WIDTH constraints = 255
+    LD   C, 0xFF        ; mask
+    RST  38h
+    DEFB CONSL
+
+    LD   A, I_CONTY     ; No character translation to terminal
+    LD   B, 0
+    LD   C, 0xFF        ; mask
+    RST  38h
+    DEFB CONSL
+
+    ld  hl,h19_backbuffer
+    ld  de,h19_backbuffer+1
     ld  bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS) - 1
     ld  (hl),0
     ldir
+
     ld  a,27        ;clear screen/home cursor
     rst    38h
     defb   SCOUT
     ld  a,'E'
     rst    38h
     defb   SCOUT
+
+; TODO: hiding the cursor messes up the "output buffer"
+;       i.e. the missing printed characters are displayed in the following output
+
+;   ; CHARACTER MODE
+;   LD    A, I_CSLMD
+;   LD    B, CSL_CHR
+;   LD    C, CSL_CHR
+;   RST  38h
+;   DEFB CONSL
+;
+;   ld  a,27        ;hide cursor
+;   rst    38h
+;   defb   SCOUT
+;   ld  a,'x'
+;   rst    38h
+;   defb   SCOUT
+;   ld  a,'5'
+;   rst    38h
+;   defb   SCOUT
+
     ret
 
 generic_console_scrollup:
     push    de
     push    bc
-    ld  hl,screen_copy + CONSOLE_COLUMNS
-    ld  de,screen_copy
+    ld  hl,h19_backbuffer + CONSOLE_COLUMNS
+    ld  de,h19_backbuffer
     ld  bc,+((CONSOLE_ROWS-1) * CONSOLE_COLUMNS)
     ldir
     ex  de,hl
@@ -72,6 +111,7 @@ cls_1:
     ;rst    38h
     ;defb   SCOUT
 
+    
     ld a,27
     rst 38h
     defb SCOUT
@@ -85,37 +125,93 @@ cls_1:
 
 ; c = x
 ; b = y
-; a = d = character to print
+; a = character to print
 ; e = raw
 generic_console_printc:
-    push    bc
     push    af
+    push    bc
     call    xypos
-    ld  (hl),a
-    pop af
-    pop bc
-    ld  hl,prchar_char
-    ld  (hl),a
-    dec hl
-    ld  a,c
-    add 32
-    ld  (hl),a
-    dec hl
-    ld  a,b
-    add 32
-    ld  (hl),a
-    ; And now print the message
-    ld  hl,prchar
-loop:
-    ld  a,(hl)
-    cp  255
-    ret z
-    push    hl
+    ld      (hl),a
+;
+;   ; cursor home
+    ld      a, 27
     rst    38h
     defb   SCOUT
-    pop hl
-    inc hl
-    jr  loop
+    ld      a, 'H'
+    rst    38h
+    defb   SCOUT
+
+;    pop    bc
+;    push   bc
+;
+;    xor a
+;    or b
+;    jr z,row0
+;yloop:
+;    xor a
+;    rst    38h
+;    defb   SCOUT
+;    push   bc
+;    ld     a, 27
+;    rst    38h
+;    defb   SCOUT
+;    ld      a, 'B'
+;    rst    38h
+;    defb   SCOUT
+;    pop    bc
+;    dec b
+;    jr nz,yloop
+;
+;row0:
+;
+;    pop    bc
+;    xor a
+;    or c
+;    jr z,column0
+;xloop:
+;    xor a
+;    rst    38h
+;    defb   SCOUT
+;    push   bc
+;    ld     a, 27
+;    rst    38h
+;    defb   SCOUT
+;    ld      a, 'C'
+;    rst    38h
+;    defb   SCOUT
+;    pop    bc
+;    dec c
+;    jr nz,xloop
+;
+;column0:
+
+
+   ; cursor pos
+    ld     a, 27
+    rst    38h
+    defb   SCOUT
+    ld      a, 'Y'
+    rst    38h
+    defb   SCOUT
+
+    pop    bc
+    push   bc
+    ld     a,32
+    add    b
+    rst    38h
+    defb   SCOUT
+
+    pop    bc
+    ld     a,32
+    add    c
+    rst    38h
+    defb   SCOUT
+
+    ; send actual character
+    pop     af
+    rst    38h
+    defb   SCOUT
+    ret
 
 ;Entry: c = x,
 ;       b = y
@@ -129,8 +225,17 @@ generic_console_vpeek:
     and a
     ret
 
+; c = x
+; b = y
+; a = d = character to print
+; e = raw
+generic_console_plotc:
+    call    xypos
+    ld      (hl), d
+    ret
+
 xypos:
-    ld      hl,screen_copy - CONSOLE_COLUMNS
+    ld      hl,h19_backbuffer - CONSOLE_COLUMNS
     ld      de,CONSOLE_COLUMNS
     inc     b
 generic_console_printc_1:
@@ -140,21 +245,24 @@ generic_console_printc_3:
     add     hl,bc                   ;hl now points to address in display
     ret
 
+
+
     SECTION data_clib
 
-prchar:
+xy_sequence:
     defb    27
     defb    'Y'
     defb    0
+xy_sequence_bottom:
     defb    0
-prchar_char:
-    defb    0
+;prchar_char:
     defb    255
+
 
 
     SECTION bss_clib
 
-screen_copy:    
+h19_backbuffer:    
     defs    80 * 25
 
 
