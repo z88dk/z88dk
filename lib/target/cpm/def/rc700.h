@@ -1,0 +1,4 @@
+
+#define IO_RC700_SEM702_CHAR 0xd1
+#define IO_RC700_SEM702_LINE 0xd2
+#define IO_RC700_SEM702_DATA 0xd3
