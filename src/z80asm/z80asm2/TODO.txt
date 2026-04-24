@@ -5,8 +5,7 @@
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
 [x] preprocess()            // macros, includes, conditionals & token stream, split lines
-[ ] apply_identifier_ucase()
-[.] HLA
+[x] HLA
 [ ] Synthetic opcodes
 [ ] Generate .i preprocessor output file
 [ ] apply_alt_registers()
