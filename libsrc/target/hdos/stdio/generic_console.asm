@@ -29,11 +29,25 @@
     INCLUDE     "ioctl.def"
 
     PUBLIC      CLIB_GENCON_CAPS
-    defc        CLIB_GENCON_CAPS = 0
+    defc        CLIB_GENCON_CAPS = CAP_GENCON_INVERSE
+
+generic_console_set_attribute:
+        ; Set text attribute (underline, inverse)
+    rra
+    ld      a,'q'
+    jr      nc, noinv
+    dec     a
+noinv:
+    push    af
+    ld      a,27
+    rst     38h
+    defb    SCOUT
+    pop     af
+    rst     38h
+    defb    SCOUT
 
 generic_console_ioctl:
     scf
-generic_console_set_attribute:
     ret
 
 generic_console_set_ink:
@@ -128,6 +142,7 @@ cls_1:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+
     push    af
     push    bc
     call    xypos
@@ -208,10 +223,36 @@ generic_console_printc:
     defb   SCOUT
 
     ; send actual character
-    pop     af
+    pop    af
+    cp     128
+    jr     nc,graphics
     rst    38h
     defb   SCOUT
     ret
+
+graphics:
+    push   af
+    ld      a, 27                       ; ESC
+    rst     38h
+    defb    SCOUT
+    ld      a, 'F'                      ; "enter graphics mode"
+    rst     38h
+    defb    SCOUT
+
+    pop     af
+    sub     34                          ; remap to graphics symbols. 128 -> 94, and so on
+    rst     38h
+    defb    SCOUT
+    
+
+    ld      a, 27                       ; ESC
+    rst     38h
+    defb    SCOUT
+    ld      a, 'G'                      ; "exit graphics mode"
+    rst     38h
+    defb    SCOUT
+    ret
+    
 
 ;Entry: c = x,
 ;       b = y
@@ -257,8 +298,6 @@ xy_sequence_bottom:
     defb    0
 ;prchar_char:
     defb    255
-
-
 
     SECTION bss_clib
 
