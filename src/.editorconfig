@@ -12,6 +12,10 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
+[*.re]
+# Treat .re files as C++
+file_type = cpp
+
 [Makefile]
 indent_style = tab
 indent_size = 8
