@@ -14,6 +14,7 @@
     PUBLIC  _cleargraphics
     EXTERN  generic_console_cls
     EXTERN  __bdos
+    EXTERN  RC700_DISPLAY
     
 
     INCLUDE "classic/gfx/grafix.inc"
@@ -23,10 +24,10 @@ _cleargraphics:
     ld      e,12
     ld      c,2
     call    __bdos
-    ld      e,148
-    ld      c,2
-    jp     __bdos
-
+    ld      a,132
+    ld      (RC700_DISPLAY),a
+    ret
+    
 
 
 

@@ -761,12 +761,12 @@ gfxosborne1.lib: cpm_clib.lib $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=osborne1
 	TARGET=osborne1 TYPE=z80 $(LIBLINKER) -DFORosborne1 -x$(OUTPUT_DIRECTORY)/gfxosborne1 @$(TARGET_DIRECTORY)/osborne1/gfxosborne1.lst
 
-rc700.lib: cpm_clib.lib
+rc700.lib: cpm_clib.lib $(RC700_TARGETS)
 	@echo ''
 	@echo '--- Building RC-700 Library ---'
 	@echo ''
 	$(MAKE) -C classic/games TARGET=cpm SUBTYPE=rc700
-	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="text6 narrow" SUBTYPE=rc700
+	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="portable narrow gencon" SUBTYPE=rc700
 	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(TARGET_DIRECTORY)/rc700/rc700.lst
 
 x1_cpm.lib: x1_clib.lib

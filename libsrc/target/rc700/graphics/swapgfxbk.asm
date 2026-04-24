@@ -19,7 +19,7 @@
 
     PUBLIC  __gfx_vram_page_out
     PUBLIC  ___gfx_vram_page_out
-
+    EXTERN  RC700_DISPLAY
 
 __gfx_vram_page_in:
 ___gfx_vram_page_in:
@@ -31,19 +31,6 @@ ___gfx_vram_page_in:
 
 __gfx_vram_page_out:
 ___gfx_vram_page_out:
-extern __bdos
-
-    ld      e,6         ; Home cursor
-    ld      c,2
-    call    __bdos
-    ld      e,32
-    ld      c,2
-    call    __bdos
-    ld      e,32
-    ld      c,2
-    call    __bdos
-
-    ld      e,148       ; Force graphics character set
-    ld      c,2
-    jp     __bdos
-
+    ld      a, 132      ;Force graphics mode
+    ld      (RC700_DISPLAY),a
+    ret

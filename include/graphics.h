@@ -18,7 +18,11 @@
 #include <arch/z88/z88.h>
 #endif
 
-
+#ifdef __RC700__
+// RC700 needs to use portable graphics desspite being a z80.
+// Unsure whether this a genuine problem with the RC700 or an emulator issue.
+#define __GRAPHICS_NO_CALLEE 1
+#endif
 
 
 /* Fills an area */
@@ -27,44 +31,54 @@ __ZPROTO2(void,,fill,int,x,int,y)
 /* Plot a pixel to screen */
 __ZPROTO2(void,,plot,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ plot_callee(int x, int y) __smallc __z88dk_callee;
 #define plot(a,b)           plot_callee(a,b)
+#endif
 #endif
 
 /* Unplot a pixel */
 __ZPROTO2(void,,unplot,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ unplot_callee(int x, int y) __smallc __z88dk_callee;
 #define unplot(a,b)           unplot_callee(a,b)
+#endif
 #endif
 
 /* XORs a pixel on screen */
 __ZPROTO2(void,,xorplot,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ xorplot_callee(int x, int y) __smallc __z88dk_callee;
 #define xorplot(a,b)           xorplot_callee(a,b)
+#endif
 #endif
 
 
 /* Get pixel status */
 __ZPROTO2(void,,point,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern bool_t __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
 #define point(a,b)           point_callee(a,b)
+#endif
 #endif
 
 /* Get horizontal or vertical pixel bar, up to 16 pixel long */
 __ZPROTO4(int,,multipoint,int,hv,int,length,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern int __LIB__ multipoint_callee(int hv, int length, int x, int y) __smallc __z88dk_callee;
 #define multipoint(a,b,c,d)           multipoint_callee(a,b,c,d)
+#endif
 #endif
 
 
 /* Draw a line */
 __ZPROTO4(void,,draw,int,x1,int,y1,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ draw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define draw(a,b,c,d)           draw_callee(a,b,c,d)
 #endif
@@ -73,7 +87,7 @@ extern void __LIB__ draw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk
 /* Draw a line in 'XOR' mode */
 __ZPROTO4(void,,xordraw,int,x1,int,y1,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ xordraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define xordraw(a,b,c,d)           xordraw_callee(a,b,c,d)
 #endif
@@ -82,7 +96,7 @@ extern void __LIB__ xordraw_callee(int x1, int y1, int x2, int y2) __smallc __z8
 /* Remove a line */
 __ZPROTO4(void,,undraw,int,x1,int,y1,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ undraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define undraw(a,b,c,d)           undraw_callee(a,b,c,d)
 #endif
@@ -91,7 +105,7 @@ extern void __LIB__ undraw_callee(int x1, int y1, int x2, int y2) __smallc __z88
 /* Relative draw */
 __ZPROTO2(void,,drawr,int,px,int,py)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ drawr_callee(int px, int py) __smallc __z88dk_callee;
 #define drawr(a,b)           drawr_callee(a,b)
 #endif
@@ -100,7 +114,7 @@ extern void __LIB__ drawr_callee(int px, int py) __smallc __z88dk_callee;
 /* Relative draw in XOR mode*/
 __ZPROTO2(void,,xordrawr,int,px,int,py)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ xordrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define xordrawr(a,b)           xordrawr_callee(a,b)
 #endif
@@ -109,29 +123,37 @@ extern void __LIB__ xordrawr_callee(int px, int py) __smallc __z88dk_callee;
 /* Remove a relative draw */
 __ZPROTO2(void,,undrawr,int,px,int,py)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ undrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define undrawr(a,b)           undrawr_callee(a,b)
+#endif
 #endif
 
 /* Draw up to a specified point */
 __ZPROTO2(void,,drawto,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define drawto(a,b)           drawto_callee(a,b)
+#endif
 #endif
 
 /* Draw up to a specified point in XOR mode*/
 __ZPROTO2(void,,xordrawto,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ xordrawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define xordrawto(a,b)           xordrawto_callee(a,b)
+#endif
 #endif
 
 /* Undraw up to a specified point */
 __ZPROTO2(void,,undrawto,int,x2,int,y2)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ undrawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define undrawto(a,b)           undrawto_callee(a,b)
+#endif
 #endif
 
 
@@ -147,8 +169,10 @@ __ZPROTO2(void,,move,int,px,int,py)
 /* Set absolute position of graphics cursor */
 __ZPROTO2(void,,setpos,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__ setpos_callee(int px, int py) __smallc __z88dk_callee;
 #define setpos(a,b)           setpos_callee(a,b)
+#endif
 #endif
 
 /* Get current X position of graphics cursor */
@@ -158,7 +182,7 @@ extern int __LIB__ gety(void);
 /* Draw a box (minimum size: 3x3) */
 __ZPROTO4(void,,drawb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ drawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define drawb(a,b,c,d)           drawb_callee(a,b,c,d)
 #endif
@@ -167,7 +191,7 @@ extern void __LIB__ drawb_callee(int tlx, int tly, int width, int height) __smal
 /* Draw a box in XOR mode (minimum size: 3x3) */
 __ZPROTO4(void,,xordrawb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ xordrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define xordrawb(a,b,c,d)           xordrawb_callee(a,b,c,d)
 #endif
@@ -176,7 +200,7 @@ extern void __LIB__ xordrawb_callee(int tlx, int tly, int width, int height) __s
 /* Undraw a box (minimum size: 3x3) */
 __ZPROTO4(void,,undrawtodrawb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ undrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define undrawb(a,b,c,d)           undrawb_callee(a,b,c,d)
 #endif
@@ -185,7 +209,7 @@ extern void __LIB__ undrawb_callee(int tlx, int tly, int width, int height) __sm
 /* Draw a dotted border */
 __ZPROTO4(void,,xorborder,int,tlx,int,yly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ xorborder_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define xorborder(a,b,c,d)           xorborder_callee(a,b,c,d)
 #endif
@@ -195,7 +219,7 @@ extern void __LIB__ xorborder_callee(int tlx, int tly, int width, int height) __
 /* Draw a circle */
 __ZPROTO4(void,,circle,int,x,int,y,int,radius,int,skip)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ circle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define circle(a,b,c,d)           circle_callee(a,b,c,d)
 #endif
@@ -204,7 +228,7 @@ extern void __LIB__ circle_callee(int x, int y, int radius, int skip) __smallc _
 /* Undraw a circle */
 __ZPROTO4(void,,uncircle,int,x,int,y,int,radius,int,skip)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ uncircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define uncircle(a,b,c,d)           uncircle_callee(a,b,c,d)
 #endif
@@ -213,7 +237,7 @@ extern void __LIB__ uncircle_callee(int x, int y, int radius, int skip) __smallc
 /* Draw a circle in XOR mode */
 __ZPROTO4(void,,xorcircle,int,x,int,y,int,radius,int,skip)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define xorcircle(a,b,c,d)           xorcircle_callee(a,b,c,d)
 #endif
@@ -257,7 +281,7 @@ extern void __LIB__  scrollup_4px(void);
 /* Clear area of graphics map */
 __ZPROTO4(void,,clga,int,tlx,int,tly,int,tlx2,int,tly2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ clga_callee(int tlx, int tly, int tlx2, int tly2) __smallc __z88dk_callee;
 #define clga(a,b,c,d)           clga_callee(a,b,c,d)
 #endif
@@ -266,7 +290,7 @@ extern void __LIB__ clga_callee(int tlx, int tly, int tlx2, int tly2) __smallc _
 /* Invert an area in the graphics map */
 __ZPROTO4(void,,xorclga,int,tlx,int,tly,int,tlx2,int,tly2)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ xorclga_callee(int tlx, int tly, int tlx2, int tly2) __smallc __z88dk_callee;
 #define xorclga(a,b,c,d)           xorclga_callee(a,b,c,d)
 #endif
@@ -275,7 +299,7 @@ extern void __LIB__ xorclga_callee(int tlx, int tly, int tlx2, int tly2) __small
 /* Draw a filled box in the graphics map */
 __ZPROTO4(void,,fillb,int,tlx,int,tly,int,width,int,height)
 #ifndef __STDC_ABI_ONLY
-#if !__GBZ80 && !__8080 && !__8085
+#if !__GBZ80 && !__8080 && !__8085 && !__GRAPHICS_NO_CALLEE
 extern void __LIB__ fillb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define fillb(a,b,c,d)           fillb_callee(a,b,c,d)
 #endif
@@ -352,17 +376,20 @@ extern void __LIB__ cclg(void) __smallc;
 /* Plot a pixel to screen */
 __ZPROTO3(void,,cplot,int,x,int,y,int,c)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern void __LIB__    cplot_callee(int x, int y, int c) __smallc __z88dk_callee;
 #define cplot(a,b,c)           cplot_callee(a,b,c)
+#endif
 #endif
 
 /* Get a pixel from screen */
 __ZPROTO2(int,,cpoint,int,x,int,y)
 #ifndef __STDC_ABI_ONLY
+#ifndef __GRAPHICS_NO_CALLEE
 extern int __LIB__    cpoint_callee(int x, int y) __smallc __z88dk_callee;
 #define cpoint(a,b)            cpoint_callee(a,b)
 #endif
-
+#endif
 
 #endif
 

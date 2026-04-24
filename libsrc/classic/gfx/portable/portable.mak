@@ -6,6 +6,7 @@ GFXPORTABLE_AFILES := $(notdir $(wildcard classic/gfx/portable/*.asm))
 GFXPORTABLE_OBJECTS := $(GFXPORTABLE_CFILES:.c=.o) $(GFXPORTABLE_AFILES:.asm=.o)
 
 GFXPORTABLE_OBJS := $(addprefix classic/gfx/portable/obj/ixiy/,$(GFXPORTABLE_OBJECTS)) \
+	$(addprefix classic/gfx/portable/obj/z80/,$(GFXPORTABLE_OBJECTS)) \
 	$(addprefix classic/gfx/portable/obj/8080/,$(GFXPORTABLE_OBJECTS)) \
 	$(addprefix classic/gfx/portable/obj/8085/,$(GFXPORTABLE_OBJECTS)) \
 	$(addprefix classic/gfx/portable/obj/z180/,$(GFXPORTABLE_OBJECTS)) \
