@@ -12,9 +12,9 @@ use Modern::Perl;
 #------------------------------------------------------------------------------
 
 unlink_testfiles;
-for my $lib_ixiy ("", "-IXIY", "-IXIY-soft") {
+for my $lib_ixiy ("", "-IXIY") {
 	my $lib_ixiy_cpu = $lib_ixiy ? "($lib_ixiy)" : "";
-	my %IXIY_ERROR = (""=>"(no option)", "-IXIY"=>"-IXIY", "-IXIY-soft"=>"-IXIY-soft");
+	my %IXIY_ERROR = (""=>"(no option)", "-IXIY"=>"-IXIY");
 		
 	for my $lib_cpu (@CPUS) {
 
@@ -59,7 +59,7 @@ END
 				defb the_answer
 END
 
-		for my $code_ixiy ("", "-IXIY", "-IXIY-soft") {
+		for my $code_ixiy ("", "-IXIY") {
 			for my $code_cpu (@CPUS) {
 
 				note "Library: $lib_ixiy $lib_cpu Code: $code_ixiy $code_cpu";

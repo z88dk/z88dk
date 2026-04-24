@@ -111,7 +111,7 @@ string Token::to_string() const {
     case TType::String:
         return string_bytes(m_svalue);
     default:
-        if (g_options.get_swap_ixiy() != IXIY_NO_SWAP)
+        if (g_options.get_swap_ixiy())
             return str_swap_x_y(tokens[static_cast<int>(m_type)]);
         else
             return tokens[static_cast<int>(m_type)];
@@ -1018,7 +1018,7 @@ yy56:
                               }
 
                               // check for -IXIY
-                              if (g_options.get_swap_ixiy() != IXIY_NO_SWAP) {
+                              if (g_options.get_swap_ixiy()) {
                                 switch (keyword) {
                                 case Keyword::IX: case Keyword::IXH: case Keyword::IXL:
                                 case Keyword::IY: case Keyword::IYH: case Keyword::IYL:

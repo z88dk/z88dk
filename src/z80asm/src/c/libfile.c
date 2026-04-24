@@ -11,11 +11,11 @@
 #include "libfile.h"
 #include "modlink.h"
 #include "options.h"
-#include "utlist.h"
 #include "xmalloc.h"
 #include "z80asm_defs.h"
 #include "z80asm1.h"
 #include "zobjfile.h"
+#include <stdlib.h>
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
@@ -117,7 +117,11 @@ void make_library(const char *lib_filename) {
     if (option_verbose())
 		printf("Creating library '%s'\n", path_canon(lib_filename));
 
-	// write library header
+    // save current cpu-ixiy options to restore after library is built
+    int current_cpu = option_cpu();
+    bool current_swap_ixiy = option_swap_ixiy();
+
+    // write library header
     FILE* fp = xfopen(utstring_body(temp_filename), "wb");
 	xfwrite_cstr(libfile_header(), fp);
 
@@ -125,18 +129,6 @@ void make_library(const char *lib_filename) {
     xfwrite_dword(-1, fp);              // placeholder for string table address
 
     if (option_lib_for_all_cpus()) {
-        // libraries have no_swap and swap object files
-        // libraries built with -IXIY-soft have only soft-swap object files
-        swap_ixiy_t current_swap_ixiy = option_swap_ixiy();
-        swap_ixiy_t first_ixiy, last_ixiy;
-        if (current_swap_ixiy == IXIY_SOFT_SWAP) {
-            first_ixiy = last_ixiy = IXIY_SOFT_SWAP;
-        }
-        else {
-            first_ixiy = IXIY_NO_SWAP;
-            last_ixiy = IXIY_SWAP;
-        }
-
         // assemble or include object for each cpu-ixiy combination and append to library
         for (const int* cpu = cpu_ids(); *cpu > 0; cpu++) {
             // only include non-strict cpus in library
@@ -145,7 +137,8 @@ void make_library(const char *lib_filename) {
 
             option_set_cpu(*cpu);
 
-            for (swap_ixiy_t ixiy = first_ixiy; ixiy <= last_ixiy; ixiy++) {
+			for (int ixiy_count = 0; ixiy_count < 2; ixiy_count++) {
+				bool ixiy = ixiy_count==1;
                 option_set_swap_ixiy(ixiy);
 
                 for (size_t i = 0; i < option_files_size(); i++) {
@@ -205,6 +198,13 @@ void make_library(const char *lib_filename) {
     }
 
 cleanup_and_return:
+    if (option_cpu() != current_cpu) {
+        option_set_cpu(current_cpu);
+    }
+    if (option_swap_ixiy() != current_swap_ixiy) {
+        option_set_swap_ixiy(current_swap_ixiy);
+    }
+
     strtable_free(st);
     utstring_free(temp_filename);
 }

@@ -221,16 +221,16 @@ void error_illegal_cpu(const char* filename, cpu_t got_cpu_id) {
     g_errors.error(ErrCPUInvalid, error.str());
 }
 
-static const char* ixiy_to_string(swap_ixiy_t swap_ixiy) {
-    switch (swap_ixiy) {
-    case IXIY_NO_SWAP: return "(no option)";
-    case IXIY_SWAP: return "-IXIY";
-    case IXIY_SOFT_SWAP: return "-IXIY-soft";
-    default: xassert(0); return "";
-    }
+static const char* ixiy_to_string(bool swap_ixiy) {
+    if (swap_ixiy) {
+		return "-IXIY";
+	}
+	else {
+		return "(no option)";
+	}
 }
 
-void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy) {
+void error_incompatible_ixiy(const char* filename, bool swap_ixiy) {
     ostringstream error;
     error << "file " << filename << " compiled with " << ixiy_to_string(swap_ixiy)
         << ", incompatible with " << ixiy_to_string(g_options.get_swap_ixiy());

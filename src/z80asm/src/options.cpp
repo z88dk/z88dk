@@ -132,21 +132,12 @@ void Options::parse_args(const vector<string>& args) {
 	post_parsing_actions();
 }
 
-void Options::set_swap_ixiy(swap_ixiy_t swap_ixiy) {
+void Options::set_swap_ixiy(bool swap_ixiy) {
     m_swap_ixiy = swap_ixiy;
-
     undefine_static_symbol("__SWAP_IX_IY__");
-
-    switch (m_swap_ixiy) {
-    case IXIY_NO_SWAP:
-        break;
-    case IXIY_SWAP:
-    case IXIY_SOFT_SWAP:
-        define_static_symbol("__SWAP_IX_IY__");
-        break;
-    default:
-        xassert(0);
-    }
+    if (m_swap_ixiy) {
+		define_static_symbol("__SWAP_IX_IY__");
+	}
 }
 
 string Options::prepend_output_dir(const string& filename) {
@@ -1150,11 +1141,11 @@ bool option_verbose() {
 	return g_options.verbose;
 }
 
-swap_ixiy_t option_swap_ixiy() {
+bool option_swap_ixiy() {
 	return g_options.get_swap_ixiy();
 }
 
-void option_set_swap_ixiy(swap_ixiy_t swap_ixiy) {
+void option_set_swap_ixiy(bool swap_ixiy) {
     g_options.set_swap_ixiy(swap_ixiy);
 }
 

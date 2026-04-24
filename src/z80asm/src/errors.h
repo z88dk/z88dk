@@ -86,7 +86,7 @@ extern "C" {
     void error_invalid_library_file_version(const char* filename, int found_version, int expected_version);
     void error_incompatible_cpu(const char* filename, cpu_t got_cpu_id);
     void error_illegal_cpu(const char* filename, cpu_t got_cpu_id);
-    void error_incompatible_ixiy(const char* filename, swap_ixiy_t swap_ixiy);
+    void error_incompatible_ixiy(const char* filename, bool swap_ixiy);
     void warning(int err_code, const char* arg);
     void warning_hex2(int err_code, int hex_value);
     void warning_org_ignored(const char* filename, const char* section);

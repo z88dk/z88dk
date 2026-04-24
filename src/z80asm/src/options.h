@@ -51,8 +51,8 @@ public:
     vector<string>	input_files;				// command line files
 
     // options with side effects
-    void set_swap_ixiy(swap_ixiy_t swap_ixiy);
-    swap_ixiy_t get_swap_ixiy() const { return m_swap_ixiy; }
+    void set_swap_ixiy(bool swap_ixiy);
+    bool get_swap_ixiy() const { return m_swap_ixiy; }
 
     void set_cpu(int cpu);
 	cpu_t get_cpu() const { return m_cpu; }
@@ -80,7 +80,7 @@ public:
 
 private:
 	// options with side-effects when changed
-    swap_ixiy_t     m_swap_ixiy{ IXIY_NO_SWAP };// -IXIY, -IXIY-soft options
+    bool     		m_swap_ixiy{ false };		// -IXIY options
 	cpu_t			m_cpu{ CPU_Z80 };	        // -m option
 	bool			m_ti83{ false };			// -mti83 option
 	bool			m_ti83plus{ false };		// -mti83plus option
@@ -139,8 +139,8 @@ extern "C" {
     // C interface
     bool option_verbose();
 
-    swap_ixiy_t option_swap_ixiy();
-    void option_set_swap_ixiy(swap_ixiy_t swap_ixiy);
+    bool option_swap_ixiy();
+    void option_set_swap_ixiy(bool swap_ixiy);
     cpu_t option_cpu();
     bool option_no_synth();
     void option_set_cpu(int cpu);
