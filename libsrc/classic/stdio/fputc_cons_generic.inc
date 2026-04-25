@@ -55,6 +55,8 @@
     EXTERN        __console_w
     EXTERN        __console_h
 
+    PUBLIC        generic_console_printc_incx
+
 
 
 ; extern int __LIB__ fputc_cons(char c);
@@ -129,6 +131,7 @@ handle_character_no_scroll:
     push    bc        ;save coordinates
     call    generic_console_printc
     pop     bc    
+generic_console_printc_incx:
     inc     c
     ld      a,(__console_w)
     cp    c
