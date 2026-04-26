@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/eq_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/eq_01.asm...
 # file: t/20-preproc/input/eq_01.asm
 Identifier	"sym1"	1:1	
@@ -29,6 +31,8 @@ EQ	"="	5:6
 Identifier	"external"	5:8	
 EndOfLine	"\n"	5:16	
 EndOfLine	"\n"	6:1	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )
 symbol	sym1	1	(defined at t/20-preproc/input/eq_01.asm:1:1)
 symbol	sym2	6	(defined at t/20-preproc/input/eq_01.asm:2:1)
 symbol	sym3	$14	(defined at t/20-preproc/input/eq_01.asm:3:1)

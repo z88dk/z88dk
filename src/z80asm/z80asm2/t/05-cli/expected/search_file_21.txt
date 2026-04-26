@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -Itest_t_05_cli_search_file_21_t.dir -dump-after-cmdline test_t_05_cli_search_file_21_t
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 verbose	1
 ucase_symbols	0
 preprocess_only	0
@@ -14,4 +16,6 @@ perl_options
 cpp_options	
 output_dir	
 include_path	test_t_05_cli_search_file_21_t.dir
+global_def	__CPU_Z80__	1
+global_def	__CPU_ZILOG__	1
 input_file	test_t_05_cli_search_file_21_t.dir/test_t_05_cli_search_file_21_t.asm

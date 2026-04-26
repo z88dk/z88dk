@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/undefine_22.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/undefine_22.asm...
 # file: t/20-preproc/input/undefine_22.asm
 Identifier	"defb"	2:1	keyword=DEFB 
@@ -11,3 +13,5 @@ Identifier	"defb"	6:1	keyword=DEFB
 Identifier	"X"	6:6	keyword=X 
 EndOfLine	"\n"	6:7	
 EndOfLine	"\n"	7:1	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

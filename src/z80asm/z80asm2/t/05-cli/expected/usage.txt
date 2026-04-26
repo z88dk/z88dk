@@ -23,6 +23,7 @@ Preprocessor Options:
   -E            Preprocess only
 
 Assembly Options:
+  -m=CPU        Set target CPU (e.g. z80, z180)
   -d            Assemble only if newer
 
 Diagnostic Options:

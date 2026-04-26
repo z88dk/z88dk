@@ -9,6 +9,8 @@ Define constant: E06 = $14
 Define constant: E07 = $14
 Define constant: E08 = 0
 Define constant: E09 = 0
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 verbose	1
 ucase_symbols	0
 preprocess_only	0
@@ -33,4 +35,6 @@ global_def	E06	$14
 global_def	E07	$14
 global_def	E08	0
 global_def	E09	0
+global_def	__CPU_Z80__	1
+global_def	__CPU_ZILOG__	1
 input_file	t/05-expr/input/empty.asm
