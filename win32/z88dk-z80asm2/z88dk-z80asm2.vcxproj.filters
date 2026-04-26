@@ -181,5 +181,8 @@
     <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\src\z80asm\z80asm2\cpu.def">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
