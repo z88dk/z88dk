@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/ifndef_12.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/ifndef_12.asm...
 # file: t/20-preproc/input/ifndef_12.asm
 Identifier	"DEFC"	1:11	keyword=DEFC 
@@ -56,3 +58,5 @@ Integer	"1"	1:11	int_value=1
 symbol	X	1	(defined at t/20-preproc/input/ifndef_12.asm:1:16)
 symbol	Y	2	(defined at t/20-preproc/input/ifndef_12.asm:2:1)
 symbol	Z	3	(defined at t/20-preproc/input/ifndef_12.asm:3:1)
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

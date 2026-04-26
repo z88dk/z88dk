@@ -9,6 +9,7 @@
 #include "lexer_keywords.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <cstdint>
 #include <string_view>
 #include <vector>
 

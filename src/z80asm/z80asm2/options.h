@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include "const_expr.h"
 #include "const_symbols.h"
+#include "cpu.h"
 #include "source_loc.h"
 #include <string>
+#include <string_view>
 #include <vector>
 
 // option types
@@ -31,6 +32,7 @@ struct Options {
     bool verbose = false;
     bool ucase_symbols = false;
     bool preprocess_only = false;
+    CPU  cpu_id{ CPU::z80 }; // default CPU is Z80
     bool swap_ix_iy = false;
     bool date_stamp = false;
     bool dump_after_cmdline = false;

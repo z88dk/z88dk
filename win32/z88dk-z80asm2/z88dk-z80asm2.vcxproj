@@ -185,6 +185,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm\z80asm2\cpu.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re" />
     <None Include="..\..\src\z80asm\z80asm2\options.def" />

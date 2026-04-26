@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/reptc_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/reptc_01.asm...
 t/20-preproc/input/reptc_01.asm:1:6: error: Expected identifier after REPTC
     reptc ; no identifier
@@ -27,3 +29,5 @@ t/20-preproc/input/reptc_01.asm:8:1: error: Unexpected ENDR directive
 t/20-preproc/input/reptc_01.asm:9:1: error: Unexpected end of file, missing ENDR for REPTC
     reptc v, a, b, c ; no endr
     ^
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

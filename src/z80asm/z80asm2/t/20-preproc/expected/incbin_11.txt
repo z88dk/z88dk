@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-directives t/20-preproc//input/incbin_11.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/incbin_11.asm...
 t/20-preproc/input/incbin_11.asm:1:8: error: Expected filename after INCBIN
     #incbin ; no input file

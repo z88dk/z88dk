@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "const_expr.h"
+#include "cpu.h"
 #include "diag.h"
 #include "environment.h"
 #include "file_mgr.h"
@@ -26,7 +28,7 @@ Args g_args;
 
 static const int option_col_width = 16 - 2;
 
-static constexpr std::string_view copyright =
+static const std::string_view copyright =
     "Usage: z88dk-z80asm [options] files...\n"
     "Copyright (C) Paulo Custodio, 2011-2026\n";
 
@@ -67,6 +69,7 @@ static const UsageGroup usage_layout[] = {
     {
         "Assembly Options",
         {
+            OptionType::CPU,
             OptionType::DATESTAMP
         }
     },
@@ -347,6 +350,27 @@ void Args::parse_arg(std::string_view arg,
             options.preprocess_only = true;
             return;
 
+        case OptionType::CPU: {
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
+                return;
+            }
+            CPU cpu_id = cpu_lookup(opt_arg);
+            if (cpu_id == CPU::none) {
+                g_diag.error(loc, "Invalid cpu: " + opt_arg);
+                std::string valid_cpus;
+                for (const auto& name : cpu_names()) {
+                    if (!valid_cpus.empty()) {
+                        valid_cpus += ", ";
+                    }
+                    valid_cpus += name;
+                }
+                g_diag.note(loc, "Valid CPUs are: " + valid_cpus);
+                return;
+            }
+            options.cpu_id = cpu_id;
+            return;
+        }
         case OptionType::DATESTAMP:
             options.date_stamp = true;
             return;
@@ -842,6 +866,17 @@ void Args::search_source_file(std::string_view filename_,
 }
 
 void Args::define_constants_from_cpu_and_ixiy() {
+    // define constants for CPU
+    for (auto& var : cpu_all_defines()) {
+        StringInterner::Id var_id = g_strings.intern(var);
+        options.global_defs.erase(var_id);
+    }
+
+    for (auto& var : cpu_defines(options.cpu_id)) {
+        StringInterner::Id var_id = g_strings.intern(var);
+        options.global_defs.set(var_id, 1, SourceLoc());
+    }
+
     // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
     StringInterner::Id swap_id = g_strings.intern("__SWAP_IX_IY__");
     options.global_defs.erase(swap_id);

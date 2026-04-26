@@ -5,6 +5,8 @@ t/05-cli/input/at_files_03.lst:4:5: error: Expected filename after '@'
 t/05-cli/input/at_files_03.lst:5:5: error: Expected filename after '@'
     	@ 	# missing file
     	  	^
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 verbose	1
 ucase_symbols	0
 preprocess_only	0
@@ -19,3 +21,5 @@ m4_options
 perl_options	
 cpp_options	
 output_dir	
+global_def	__CPU_Z80__	1
+global_def	__CPU_ZILOG__	1
