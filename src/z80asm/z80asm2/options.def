@@ -22,6 +22,7 @@ X(DEFINE,   "-D",      true, "=NAME[=EXPR]", "Define symbol")
 X(PREPROC,  "-E",      false, "", "Preprocess only")
 
 // Assembly options
+X(CPU,      "-m",      true, "=CPU", "Set target CPU (e.g. z80, z180)")
 X(DATESTAMP,"-d",      false, "", "Assemble only if newer")
 
 // Diagnostic options

@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_flag_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/30-hla/input/expr_flag_01.asm...
 # file: t/30-hla/input/expr_flag_01.asm
 Identifier	"JR"	1:5	keyword=JR 

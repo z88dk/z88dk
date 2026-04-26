@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/undefine_21.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/undefine_21.asm...
 t/20-preproc/input/undefine_21.asm:1:9: error: Expected identifier after UNDEFINE
     undefine ; no name
@@ -8,3 +10,5 @@ t/20-preproc/input/undefine_21.asm:2:16: error: Unexpected token after UNDEFINE:
                    ^
 # file: t/20-preproc/input/undefine_21.asm
 EndOfLine	"\n"	3:1	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

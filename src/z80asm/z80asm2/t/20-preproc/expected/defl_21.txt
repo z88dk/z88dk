@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/defl_21.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/defl_21.asm...
 t/20-preproc/input/defl_21.asm:1:5: error: Expected identifier after DEFL
     defl ; no name
@@ -22,3 +24,5 @@ Identifier	"p1"	3:8
 RightParen	")"	3:8	
 EQ	"="	3:8	
 Integer	"1"	3:13	int_value=1 
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )
