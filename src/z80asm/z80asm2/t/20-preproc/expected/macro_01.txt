@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/macro_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/macro_01.asm...
 t/20-preproc/input/macro_01.asm:1:6: error: Expected identifier after MACRO
     macro ; no name
@@ -221,3 +223,5 @@ Comma	","	9:6
 Integer	"3"	9:8	int_value=3 
 EndOfLine	"\n"	9:9	
 Identifier	"ENDM"	8:7	keyword=ENDM 
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

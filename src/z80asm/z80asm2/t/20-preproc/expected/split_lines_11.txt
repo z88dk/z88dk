@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-preprocessing t/20-preproc//input/split_lines_11.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/split_lines_11.asm...
 # file: t/20-preproc/input/split_lines_11.asm
 Identifier	"nop"	1:1	keyword=NOP 
@@ -7,3 +9,5 @@ Identifier	"nop"	1:5	keyword=NOP
 EndOfLine	"\n"	1:8	
 Identifier	"nop"	1:9	keyword=NOP 
 EndOfLine	"\n"	1:12	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

@@ -4,17 +4,20 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "file_mgr.h"
 #include "lexer.h"
 #include "lexer_dump.h"
-#include "file_mgr.h"
+#include "lexer_keywords.h"
+#include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_utils.h"
 #include <cstdlib>
 #include <iostream>
+#include <string_view>
 
 // show debug-friendly representation of token
 void dump_token(const Token& token) {
-    static std::string_view token_type_names[] = {
+    static const std::string_view token_type_names[] = {
 #define X(id, text) #id,
 #include "lexer_tokens.def"
     };
