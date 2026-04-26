@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/define_11.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/define_11.asm...
 t/20-preproc/input/define_11.asm:1:8: error: Expected identifier after DEFINE
     #define ; no name
@@ -161,3 +163,5 @@ EQ	"="	4:9
 Integer	"1"	4:10	int_value=1 
 symbol	X	1	(defined at t/20-preproc/input/define_11.asm:2:15)
 symbol	Y	1	(defined at t/20-preproc/input/define_11.asm:4:15)
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

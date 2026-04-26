@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/rept_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/rept_02.asm...
 # file: t/20-preproc/input/rept_02.asm
 Identifier	"ld"	8:2	keyword=LD 
@@ -37,3 +39,5 @@ Comma	","	15:7
 Integer	"4"	15:9	int_value=4 
 EndOfLine	"\n"	15:10	
 EndOfLine	"\n"	18:1	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

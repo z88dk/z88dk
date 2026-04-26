@@ -4,6 +4,8 @@ Define constant: E01 = 7
 Define constant: E02 = 4
 Define constant: E03 = 8
 Define constant: E04 = 4
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 verbose	1
 ucase_symbols	0
 preprocess_only	0
@@ -23,4 +25,6 @@ global_def	E01	7
 global_def	E02	4
 global_def	E03	8
 global_def	E04	4
+global_def	__CPU_Z80__	1
+global_def	__CPU_ZILOG__	1
 input_file	t/05-expr/input/empty.asm
