@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/define_05.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/define_05.asm...
 # file: t/20-preproc/input/define_05.asm
 Identifier	"defb"	2:1	keyword=DEFB 
@@ -14,3 +16,5 @@ RightParen	")"	1:8
 EQ	"="	1:8	
 Hash	"#"	1:14	
 Identifier	"a"	1:15	keyword=A 
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/local_12.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/local_12.asm...
 # file: t/20-preproc/input/local_12.asm
 Identifier	"L1_1"	4:1	
@@ -142,3 +144,5 @@ Identifier	"jr"	6:5	keyword=JR
 Identifier	"L3"	6:8	
 EndOfLine	"\n"	6:10	
 Identifier	"ENDM"	1:8	keyword=ENDM 
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

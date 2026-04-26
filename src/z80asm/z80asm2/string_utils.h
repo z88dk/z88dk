@@ -11,6 +11,7 @@
 #include <string_view>
 
 // Convert string to upper case
+std::string to_lower(std::string_view s);
 std::string to_upper(std::string_view s);
 
 // trim whitspace at the beginnint and at the end

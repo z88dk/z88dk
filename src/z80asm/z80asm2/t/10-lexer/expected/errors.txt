@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-tokenization t/10-lexer/input/errors.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/10-lexer/input/errors.asm...
 t/10-lexer/input/errors.asm:1:1: error: Unexpected character: '`'
     ` ; invalid

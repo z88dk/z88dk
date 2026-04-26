@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/exitm_11.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/exitm_11.asm...
 t/20-preproc/input/exitm_11.asm:1:2: error: EXITM outside of macro expansion
     #exitm ; outside macro
@@ -35,3 +37,5 @@ Identifier	"exitm"	3:3	keyword=EXITM
 Identifier	"extra"	3:9	
 EndOfLine	"\n"	3:14	
 Identifier	"ENDM"	2:8	keyword=ENDM 
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )

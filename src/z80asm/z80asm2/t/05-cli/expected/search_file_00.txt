@@ -1,5 +1,7 @@
 % z88dk-z80asm -v -dump-after-cmdline file_does_not_exist
 <command-line>:3:1: error: File not found: file_does_not_exist
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 verbose	1
 ucase_symbols	0
 preprocess_only	0
@@ -14,3 +16,5 @@ m4_options
 perl_options	
 cpp_options	
 output_dir	
+global_def	__CPU_Z80__	1
+global_def	__CPU_ZILOG__	1

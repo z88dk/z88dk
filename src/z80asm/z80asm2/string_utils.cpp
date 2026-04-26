@@ -16,6 +16,15 @@
 
 static constexpr std::string_view blanks = " \t\r\n\v\f";
 
+std::string to_lower(std::string_view s) {
+    std::string result(s);
+    std::transform(result.begin(), result.end(), result.begin(),
+    [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+    return result;
+}
+
 std::string to_upper(std::string_view s) {
     std::string result(s);
     std::transform(result.begin(), result.end(), result.begin(),

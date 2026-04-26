@@ -1,4 +1,6 @@
 % z88dk-z80asm -v -dump-after-hla t/30-hla//input/expr_compare_25.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
 Assembling t/30-hla/input/expr_compare_25.asm...
 # file: t/30-hla/input/expr_compare_25.asm
 Identifier	"LD"	1:5	keyword=LD 
