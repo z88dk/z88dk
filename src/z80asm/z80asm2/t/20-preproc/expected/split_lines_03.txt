@@ -1,0 +1,12 @@
+% z88dk-z80asm -v -dump-after-preprocessing t/20-preproc//input/split_lines_03.asm
+Assembling t/20-preproc/input/split_lines_03.asm...
+# file: t/20-preproc/input/split_lines_03.asm
+Integer	"1"	1:10	int_value=1 
+EndOfLine	"\n"	1:11	
+Identifier	"DEFINE"	1:12	keyword=DEFINE 
+Identifier	"B"	1:19	keyword=B 
+EQ	"="	1:20	
+Integer	"2"	1:21	int_value=2 
+EndOfLine	"\n"	2:2	
+Identifier	"B"	3:1	keyword=B 
+EndOfLine	"\n"	3:2	
