@@ -144,6 +144,9 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_scan.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\lexer_tokens.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_synth_trie.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_trie_token.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\pathnames.cpp" />
@@ -173,6 +176,9 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_scan.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_tokens.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_synth_trie.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_trie_token.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\pathnames.h" />
