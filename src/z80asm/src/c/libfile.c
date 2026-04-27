@@ -42,7 +42,13 @@ static bool add_object_modules(FILE* lib_fp, strtable_t* st) {
         size_t fptr = ftell(lib_fp);
 
         // read object file blob
-        const char* obj_filename = get_o_filename(option_file(i));
+        // if the file is already an object file, use it directly;
+        // otherwise get the corresponding object file name
+        const char* obj_filename;
+        if (strcmp(option_file(i) + strlen(option_file(i)) - strlen(EXT_O), EXT_O) == 0)
+            obj_filename = option_file(i);
+        else
+            obj_filename = get_o_filename(option_file(i));
 
         int obj_size = file_size(obj_filename);
         if (obj_size < 0) {
