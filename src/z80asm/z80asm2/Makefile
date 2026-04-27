@@ -11,8 +11,6 @@ endif
 
 PROJ = z88dk-z80asm
 
-PERL = perl
-DOS2UNIX = dos2unix
 CXX = g++
 CXXFLAGS_BASE = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror 
 ifeq ($(COVERAGE),1)
@@ -55,23 +53,34 @@ $(PROJ)$(EXE): $(OBJ_DIR)/lexer_scan.o
 
 lexer_scan.cpp: lexer_scan.re Makefile
 	$(RE2C) $(RE2CFLAGS) lexer_scan.re -o lexer_scan.cpp
-	$(DOS2UNIX) lexer_scan.cpp
+	dos2unix lexer_scan.cpp
 
+# Rules to generate opcodes tables
+$(PROJ)$(EXE): $(OBJ_DIR)/opcodes.o $(OBJ_DIR)/opcodes_trie_token.o
+$(OBJ_DIR)/opcodes.o: opcodes_trie_token.h
+$(OBJ_DIR)/opcodes_trie_token.o: opcodes_trie_token.cpp opcodes_trie_token.h
+
+opcodes_trie_token.h opcodes_trie_token.cpp \
+opcodes_synth_trie.h opcodes_synth_trie.cpp &: \
+		$(wildcard *.def) \
+		$(wildcard cpu/*.dat cpu/*.pl cpu/*.pm) \
+		Makefile cpu/Makefile 
+	$(MAKE) -C cpu
 
 test:: $(PROJ)$(EXE)
-	$(PERL) -S prove -j9 --state=slow,save t/*.t t/*/*.t
+	perl -S prove -j9 --state=slow,save t/*.t t/*/*.t
 
 astyle:
 	$(ASTYLE)
 
 cloc:
-	$(PERL) -S cloc --fullpath .
+	perl -S cloc --fullpath .
 
 # test code coverage
 coverage:
 	$(MAKE) clean astyle
 	$(MAKE) COVERAGE=1 test
-	gcov $(OBJ_DIR)/*.gcno | $(PERL) parse_gcov.pl | tee coverage.txt
+	gcov $(OBJ_DIR)/*.gcno | perl parse_gcov.pl | tee coverage.txt
 
 CLEAN_PATTERNS = *.o *.d *.i *.gcov *.exe *.orig *.core *.bak *~
 CLEAN_DIRS = . t t/* t/*/*

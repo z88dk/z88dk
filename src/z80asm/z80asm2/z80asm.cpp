@@ -9,6 +9,7 @@
 #include "hla.h"
 #include "lexer_dump.h"
 #include "lexer_tokens.h"
+#include "opcodes.h"
 #include "options.h"
 #include "options_dump.h"
 #include "pathnames.h"
@@ -23,8 +24,6 @@
 #include <vector>
 
 static constexpr std::string_view z80asm_env = "Z80ASM";
-
-static void preprocess_only() {}
 
 static void assemble_file(std::string_view filename) {
     if (g_args.options.verbose) {
@@ -48,6 +47,10 @@ static void assemble_file(std::string_view filename) {
         dump_after_hla_and_exit(hla_lines);
         // not reached
     }
+
+    // process synthetic instructions and rewrite tokens
+    // to their final form for the assembler
+    std::vector<LogicalLine> asm_lines = synthetic_expand(hla_lines);
 }
 
 static void assemble_files() {
@@ -141,12 +144,7 @@ int main(int argc, char* argv[]) {
     }
 
     // execute requested actions
-    if (g_args.options.preprocess_only) {
-        preprocess_only();
-    }
-    else {
-        assemble_files();
-    }
+    assemble_files();
 
     if (g_args.options.verbose) {
         std::cout << "Assembly completed with " << g_diag.get_error_count() << " error(s)" << std::endl;
