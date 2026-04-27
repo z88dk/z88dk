@@ -96,6 +96,15 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_trie_token.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_synth_trie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
@@ -165,6 +174,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_trie_token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_synth_trie.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
