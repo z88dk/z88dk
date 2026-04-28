@@ -39,10 +39,17 @@ static bool add_object_modules(FILE* lib_fp, strtable_t* st) {
     char* obj_file_data = NULL;
 
     for (size_t i = 0; i < option_files_size(); i++) {
+		const char* filename = option_file(i);
         size_t fptr = ftell(lib_fp);
 
         // read object file blob
-        const char* obj_filename = get_o_filename(option_file(i));
+        // if the file is already an object file, use it directly;
+        // otherwise get the corresponding object file name
+        const char* obj_filename = NULL;
+        if (strcmp(filename + strlen(filename) - strlen(EXT_O), EXT_O) == 0)
+            obj_filename = filename;
+        else
+            obj_filename = get_o_filename(filename);
 
         int obj_size = file_size(obj_filename);
         if (obj_size < 0) {
@@ -145,7 +152,7 @@ void make_library(const char *lib_filename) {
                     const char* filename = option_file(i);
                     bool got_asm = strcmp(filename + strlen(filename) - strlen(EXT_O), EXT_O) != 0;
                     if (got_asm)
-                        assemble_file(option_file(i));
+                        assemble_file(filename);
 
                     if (get_error_count()) {
                         xfclose(fp);			/* error */
