@@ -1487,7 +1487,6 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     modstk(0, vartype, NO,YES);
 
     if (callee_cleanup) {
-        int bcused = 0;
 
         // TODO: LONGLONG stuffed pointer
 

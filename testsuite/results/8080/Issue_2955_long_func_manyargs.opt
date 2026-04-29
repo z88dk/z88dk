@@ -1,0 +1,57 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	EXTERN	saved_hl
+	SECTION	code_compiler
+
+._test
+	ld	hl,0	;const
+	push	hl
+	inc	hl
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	ld	l,3
+	push	hl
+	ld	hl,4	;const
+	push	hl
+	ld	l,5
+	push	hl
+	ld	hl,6	;const
+	push	hl
+	call	_myfunc
+	ld	b,h
+	ld	c,l
+	ld	hl,14	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	h,b
+	ld	l,c
+	push	de
+	push	hl
+	pop	bc
+	pop	bc
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_myfunc
+	GLOBAL	_test
+
+
+
+
