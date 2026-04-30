@@ -15,11 +15,18 @@
 #include <pthread.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <signal.h>
 #include <utstring.h>
+
+// Enabling this flag makes the debugger log all conversions between IDE and debugger,
+// helping to debug integration issues.
+
+//#define DEBUGGER_MI2_CONSOLE_LOG
 
 #ifdef WIN32
 #include <windows.h>
 #else
+#include <fcntl.h>
 #include <unistd.h>
 #endif
 
@@ -31,8 +38,8 @@ typedef struct {
 } mi2_var;
 
 static mi2_var* mi2_vars = NULL;
-static uint8_t report_connected = 0;
 static uint8_t report_execution_stopped = 0;
+static uint8_t debugger_binary_upload_after_stopped = 0;
 static char connect_flow[64] = "";
 
 typedef struct {
@@ -44,6 +51,7 @@ static void cmd_exit(const char* flow, int argc, char **argv);
 static void cmd_do_nothing(const char* flow, int argc, char **argv);
 static void cmd_target_select(const char* flow, int argc, char **argv);
 static void cmd_target_detach(const char* flow, int argc, char **argv);
+static void cmd_target_download(const char* flow, int argc, char **argv);
 static void cmd_show(const char* flow, int argc, char **argv);
 static void cmd_info(const char* flow, int argc, char **argv);
 static void cmd_maintenance(const char* flow, int argc, char **argv);
@@ -79,6 +87,7 @@ static command mi2_commands[] = {
     {"-gdb-set",                    cmd_do_nothing},
     {"-gdb-show",                   cmd_show},
     {"-enable-pretty-printing",     cmd_do_nothing},
+    {"-environment-cd",             cmd_do_nothing},
     {"info",                        cmd_info},
     {"maintenance",                 cmd_maintenance},
     {"-exec-continue",              cmd_continue},
@@ -89,6 +98,7 @@ static command mi2_commands[] = {
     {"-exec-finish",                cmd_fin},
     {"-target-select",              cmd_target_select},
     {"-target-detach",              cmd_target_detach},
+    {"-target-download",            cmd_target_download},
     {"-file-exec-and-symbols",      cmd_file_exec_and_symbols},
     {"-break-insert",               cmd_break_insert},
     {"-break-delete",               cmd_break_delete},
@@ -111,9 +121,97 @@ static command mi2_commands[] = {
     { NULL, NULL }
 };
 
+#ifdef DEBUGGER_MI2_CONSOLE_LOG
+static const char mi2_debug_log_path[] =
+    "/tmp/.ticks-mi2-log.txt";
+
+static FILE* mi2_debug_log_file(void) {
+    static FILE* log_file = NULL;
+
+    if (log_file == NULL) {
+        log_file = fopen(mi2_debug_log_path, "a");
+    }
+
+    return log_file;
+}
+
+static void mi2_debug_log_text(const char* text) {
+    FILE* log_file = mi2_debug_log_file();
+
+    if (log_file == NULL) {
+        return;
+    }
+
+    fputs(text, log_file);
+    fflush(log_file);
+}
+
+static void mi2_debug_log_input(const char* line) {
+    mi2_debug_log_text(line);
+    if (strchr(line, '\n') == NULL) {
+        mi2_debug_log_text("\n");
+    }
+}
+
+static void mi2_emit(const char* buffer)
+{
+    fputs(buffer, stdout);
+    mi2_debug_log_text(buffer);
+}
+#else
+static void mi2_emit(const char* buffer)
+{
+    fputs(buffer, stdout);
+}
+#endif
+
+void mi2_printf_log(const char *fmt, ...)
+{
+    va_list args;
+    va_list args2;
+    int len;
+    char* buffer;
+
+    va_start(args, fmt);
+    va_copy(args2, args);
+    len = vsnprintf(NULL, 0, fmt, args2);
+    va_end(args2);
+
+    if (len < 0) {
+        va_end(args);
+        return;
+    }
+
+    buffer = malloc((size_t)len + 1);
+    if (buffer == NULL) {
+        va_end(args);
+        return;
+    }
+
+    vsnprintf(buffer, (size_t)len + 1, fmt, args);
+    va_end(args);
+
+    mi2_emit(buffer);
+    free(buffer);
+}
+
+static uint8_t ensure_exec_ready(const char* flow) {
+    if (bk.is_remote_connected && !bk.is_remote_connected()) {
+        mi2_printf_error(flow, "Not connected to remote target");
+        return 0;
+    }
+
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return 0;
+    }
+
+    return 1;
+}
+
 static void report_continue() {
     debugger_active = 0;
-    mi2_printf_async("running,thread-id=\"all\"")
+    mi2_printf_async("running,thread-id=\"all\"");
 }
 
 static void cmd_exit(const char* flow, int argc, char **argv) {
@@ -266,6 +364,9 @@ static void cmd_info(const char* flow, int argc, char **argv) {
     const char* section = argv[1];
     if (strcmp(section, "pretty-printer") == 0) {
         bk.debug("pretty-printing is not supported\n");
+    } else if (strcmp(section, "inferiors") == 0) {
+        bk.console("  Num  Description       Connection           Executable\n");
+        bk.console("* 1    <null>            1 (remote target)    <null>\n");
     } else {
         bk.debug("unknown info section: %s\n", section);
     }
@@ -274,18 +375,23 @@ static void cmd_info(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_maintenance(const char* flow, int argc, char **argv) {
-    if (argc < 3) {
+    if (argc < 2) {
         mi2_printf_error(flow, "please specify section");
         return;
     }
 
-    const char* section = argv[2];
+    const char* section = argv[1];
     if (strcmp(section, "sections") == 0) {
         bk.console("Exec file:");
         bk.console("    `program', file type z80.");
         bk.console(" [0]      0x000000000->0x00000FFFF at 0x00000000: .text ALLOC LOAD CODE HAS_CONTENTS");
     } else if (strcmp(section, "print") == 0) {
-        const char* target = argv[3];
+        if (argc < 3) {
+            mi2_printf_error(flow, "please specify maintenance print target");
+            return;
+        }
+
+        const char* target = argv[2];
         if (strcmp(target, "register-groups") == 0) {
             UT_string* registers;
             utstring_new(registers);
@@ -296,9 +402,11 @@ static void cmd_maintenance(const char* flow, int argc, char **argv) {
 
             bk.console("Group all:%s", utstring_body(registers));
             utstring_free(registers);
+        } else {
+            bk.debug("unknown maintenance print target: %s\n", target);
         }
     } else {
-        bk.debug("unknown info section: %s\n", section);
+        bk.debug("unknown maintenance section: %s\n", section);
     }
 
     mi2_printf_response(flow, "done");
@@ -1127,10 +1235,29 @@ static void cmd_show(const char* flow, int argc, char **argv) {
         return;
     }
 
+    if (strcmp(variable, "architecture") == 0) {
+        mi2_printf_response(flow, "done,value=\"z80\"");
+        return;
+    }
+
+    if (strcmp(variable, "disassembly-flavor") == 0) {
+        mi2_printf_response(flow, "done,value=\"default\"");
+        return;
+    }
+
+    if (strcmp(variable, "scheduler-locking") == 0) {
+        mi2_printf_response(flow, "done,value=\"off\"");
+        return;
+    }
+
     mi2_printf_response(flow, "done,value=\"unknown\"");
 }
 
 static void cmd_continue(const char* flow, int argc, char **argv) {
+    if (!ensure_exec_ready(flow)) {
+        return;
+    }
+
     bk.resume();
     mi2_printf_response(flow, "running");
     report_continue();
@@ -1248,7 +1375,7 @@ static void cmd_target_select(const char* flow, int argc, char **argv) {
         return;
     }
 
-    report_connected = 1;
+    mi2_printf_response(connect_flow, "connected");
     report_execution_stopped = 1;
 }
 
@@ -1256,6 +1383,23 @@ static void cmd_target_detach(const char* flow, int argc, char **argv)
 {
     delete_all_breakpoints();
     bk.detach();
+    mi2_printf_response(flow, "done");
+}
+
+static void cmd_target_download(const char* flow, int argc, char **argv)
+{
+    if (bk.is_remote_connected && !bk.is_remote_connected()) {
+        mi2_printf_error(flow, "Not connected to remote target");
+        return;
+    }
+
+    if (debugger_active == 0) {
+        debugger_binary_upload_after_stopped = 1;
+        mi2_printf_response(flow, "done");
+        return;
+    }
+
+    debugger_restore_pending_binary_file();
     mi2_printf_response(flow, "done");
 }
 
@@ -1344,6 +1488,11 @@ typedef struct mi2_command_execution {
 static void mi2_execution_stopped(int code) {
     debugger_active = 1;
 
+    if (debugger_binary_upload_after_stopped) {
+        debugger_binary_upload_after_stopped = 0;
+        debugger_restore_pending_binary_file();
+    }
+
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -1382,6 +1531,7 @@ static void mi2_execution_stopped(int code) {
         report_thread = 0;
         mi2_printf_thread("thread-group-started,id=\"i1\",pid=\"1\"");
         mi2_printf_thread("thread-created,id=\"1\",group-id=\"i1\"");
+        mi2_printf_thread("thread-selected,id=\"1\"");
     }
 
     breakpoint *breakpoint_hit = NULL;
@@ -1436,14 +1586,7 @@ static void mi2_execution_stopped(int code) {
         }
     }
 
-    if (report_connected) {
-        report_connected = 0;
-
-        mi2_printf_response(connect_flow, "connected");
-        mi2_printf_prompt();
-
-        debugger_restore_pending_binary_file();
-    }
+    mi2_printf_prompt();
 
     utstring_free(frame);
 }
@@ -1471,6 +1614,10 @@ static void* debugger_mi2_console_loop(void* arg) {
         execute_on_main_thread(execute_prompt, NULL, NULL);
 
         while (fgets(debugger_line, 1024, stdin) == 0) ;
+
+#ifdef DEBUGGER_MI2_CONSOLE_LOG
+        mi2_debug_log_input(debugger_line);
+#endif
 
         int argc;
         char **argv = parse_words(debugger_line, &argc);
@@ -1612,9 +1759,63 @@ static void mi2_console_printf(const char *fmt, ...) {
         formatted = slash(formatted);
 
         /* Call the wrapped function using the formatted output and return */
-        printf("~\"%s\"\n", utstring_body(formatted));
+        mi2_printf_log("~\"%s\"\n", utstring_body(formatted));
+
         utstring_free(formatted);
     }
+}
+
+static void mi2_console_raw(const char *str, size_t len)
+{
+    UT_string* formatted;
+    utstring_new(formatted);
+    uint8_t in_ansi_escape = 0;
+
+    for (size_t i = 0; i < len; i++) {
+        unsigned char c = (unsigned char)str[i];
+
+        if (in_ansi_escape) {
+            if ((c >= '@' && c <= '~') || isalpha(c)) {
+                in_ansi_escape = 0;
+            }
+            continue;
+        }
+
+        switch (c) {
+            case 0x1b:
+                in_ansi_escape = 1;
+                break;
+            case '\n':
+                utstring_printf(formatted, "\\n");
+                break;
+            case '\t':
+                utstring_printf(formatted, "\\t");
+                break;
+            case '\r':
+                utstring_printf(formatted, "\\r");
+                break;
+            case '\\':
+                utstring_printf(formatted, "\\\\");
+                break;
+            case '"':
+                utstring_printf(formatted, "\\\"");
+                break;
+            default:
+                if (isprint(c)) {
+                    utstring_printf(formatted, "%c", c);
+                } else {
+                    utstring_printf(formatted, "\\%03o", c);
+                }
+                break;
+        }
+    }
+
+    UT_string* record;
+    utstring_new(record);
+    utstring_printf(record, "@\"%s\"\n", utstring_body(formatted));
+    mi2_emit(utstring_body(record));
+    utstring_free(record);
+    utstring_free(formatted);
 }
 
 static void mi2_internal_printf(const char *fmt, ...) {
@@ -1652,7 +1853,7 @@ static void mi2_internal_printf(const char *fmt, ...) {
         formatted = slash(formatted);
 
         /* Call the wrapped function using the formatted output and return */
-        printf("&\"%s\"\n", utstring_body(formatted));
+        mi2_printf_log("&\"%s\"\n", utstring_body(formatted));
         utstring_free(formatted);
     }
 }
@@ -1668,8 +1869,20 @@ static void mi2_break(uint8_t temporary)
 
 static void mi2_remote_closed()
 {
-    mi2_printf_error("N", "Remote communication error. Target disconnected.");
-    mi2_printf_thread("=thread-group-exited,id=\"i1\"");
+    bk.debug("Remote communication error. Target disconnected.\n");
+    mi2_printf_thread("thread-group-exited,id=\"i1\"");
+    mi2_printf_prompt();
+}
+
+static uint8_t mi2_should_download_binary_on_connect()
+{
+    // in mi2 mode, we do not upload binary automatically, unless IDE issues -target-download
+    if (getenv("GDB_FORCE_DOWNLOAD_AFTER_CONNECT") != NULL)
+    {
+        // unless forced with GDB_FORCE_DOWNLOAD_AFTER_CONNECT
+        return 1;
+    }
+    return 0;
 }
 
 void debugger_mi2_init()
@@ -1678,10 +1891,12 @@ void debugger_mi2_init()
     setbuf(stdout, NULL);
 
     bk.console = mi2_console_printf;
+    bk.console_raw = mi2_console_raw;
     bk.debug = mi2_internal_printf;
     bk.execution_stopped = mi2_execution_stopped;
     bk.break_ = mi2_break;
     bk.remote_closed = mi2_remote_closed;
+    bk.should_download_binary_on_connect = mi2_should_download_binary_on_connect;
 
     {
         pthread_t id;

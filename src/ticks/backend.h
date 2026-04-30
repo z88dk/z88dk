@@ -25,6 +25,7 @@ typedef void (*step_cb)(uint8_t add_bp);
 typedef uint8_t (*uint8_t_cb)();
 typedef uint32_t (*uint32_t_cb)();
 typedef void (*log_cb)(const char *fmt, ...);
+typedef void (*console_raw_cb)(const char *str, size_t len);
 typedef uint8_t (*breakpoints_check_cb)();
 
 typedef enum
@@ -37,6 +38,7 @@ typedef enum
 
 typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
 typedef uint8_t (*connect_cb)(const char* address);
+typedef void (*send_remote_command_cb)(const char* cmd);
 
 typedef struct {
     get_longlong_cb st;
@@ -68,14 +70,17 @@ typedef struct {
     breakpoints_check_cb breakpoints_check;
     uint8_t_cb is_verbose;
     log_cb console;
+    console_raw_cb console_raw;
     log_cb debug;
     connect_cb remote_connect;
     uint8_t_cb is_remote_connected;
+    send_remote_command_cb send_remote_command;
     execution_stopped_cb execution_stopped;
     void_cb ctrl_c;
     uint32_t_cb time;
 	get_charp_cb script_filename;
     void_cb remote_closed;
+    uint8_t_cb should_download_binary_on_connect;
 } backend_t;
 
 extern backend_t bk;
