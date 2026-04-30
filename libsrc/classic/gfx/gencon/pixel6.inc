@@ -1,6 +1,7 @@
 ;
-;       Generic pseudo graphics routines for text-only platforms
-;	Version for the 2x3 graphics symbols using generic console
+;   Generic pseudo graphics routines for text-only platforms
+;   Version for the 2x3 graphics symbols using generic console
+:   To limit to 1x3, add "defc _GFX_GENCON_PIXEL3 = 1" in grafix.inc
 ;
 
   IF    !__CPU_GBZ80__
@@ -40,10 +41,12 @@
         ld      h, 0                    ;l = y
         add     hl, de
         ld      b, (hl)                 ; y / 3
+    IF  !_GFX_GENCON_PIXEL3
         and     a                       ; x/2
         ld      a, c
         rra
         ld      c, a
+    ENDIF
         push    bc                      ;Save reduced coordinates
     IF  _GFX_GENCON_USEPLOTC
         call    generic_console_pointxy
@@ -87,19 +90,26 @@ chfound:
     ; Now values 1 or 2
         jr      c, is1
         add     a
+    IF  !_GFX_GENCON_PIXEL3
         add     a
+    ENDIF
 is1:
         add     a
+    IF  !_GFX_GENCON_PIXEL3
         add     a
+    ENDIF
 iszero:
-        ld      h, a                    ;Save pixel to set for a moment
 
+    IF  !_GFX_GENCON_PIXEL3
+        ld      h, a                    ;Save pixel to set for a moment
         ld      a, (__gfx_coords+1)     ;original x
         rrca
         ld      a, h
         jr      nc, evencol
         add     a
 evencol:
+    ENDIF
+
     IF  NEEDplot
         or      e
     ENDIF
@@ -114,6 +124,7 @@ evencol:
         and     e
         pop     bc                      ;Dump reduced coordinates
     ELSE
+
       IF    _GFX_TEXT_USE_INDEX
     ; The character is the index
       ELSE
