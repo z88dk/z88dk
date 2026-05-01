@@ -4,26 +4,22 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-OPCODES  = opcodes.dat
-PERL     = perl
-DOS2UNIX = $(PERL) ../../tools/posix.pl dos2unix
-
-all: $(OPCODES)
+all: opcodes.dat
 $(OPCODES): make_opcodes.pl Opcodes.pm $(wildcard opcodes_*.pl) Makefile
-	$(PERL) make_opcodes.pl $(OPCODES) 
-	$(DOS2UNIX) $(OPCODES)
+	perl make_opcodes.pl opcodes.dat 
+	dos2unix opcodes.dat
 
 all: opcodes.txt
-opcodes.txt: $(OPCODES) dump_opcodes.pl Opcodes.pm Makefile
-	$(PERL) dump_opcodes.pl $(OPCODES) opcodes.txt 
-	$(DOS2UNIX) opcodes.txt
+opcodes.txt: opcodes.dat dump_opcodes.pl Opcodes.pm Makefile
+	perl dump_opcodes.pl opcodes.dat opcodes.txt 
+	dos2unix opcodes.txt
 
 all: cpu_test_z80_ok.asm
-cpu_test_z80_ok.asm: $(OPCODES) make_cpu_test.pl Opcodes.pm Makefile
-	$(PERL) make_cpu_test.pl $(OPCODES) cpu_test 
-	$(DOS2UNIX) cpu_test_*.asm
+cpu_test_z80_ok.asm: opcodes.dat make_cpu_test.pl Opcodes.pm Makefile
+	perl make_cpu_test.pl opcodes.dat cpu_test 
+	dos2unix cpu_test_*.asm
 
 all: cpu_rules.h
-cpu_rules.h: $(OPCODES) make_cpu_rules.pl Opcodes.pm Makefile
-	$(PERL) make_cpu_rules.pl $(OPCODES) cpu_rules.h 
-	$(DOS2UNIX) cpu_rules.h
+cpu_rules.h: opcodes.dat make_cpu_rules.pl Opcodes.pm Makefile
+	perl make_cpu_rules.pl opcodes.dat cpu_rules.h 
+	dos2unix cpu_rules.h

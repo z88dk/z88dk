@@ -4,16 +4,6 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-# windows portability layer
-PERL     = perl
-CP       = $(PERL) tools/posix.pl cp
-RM       = $(PERL) tools/posix.pl rm
-MV       = $(PERL) tools/posix.pl mv
-MKDIR    = $(PERL) tools/posix.pl mkdir
-TOUCH    = $(PERL) tools/posix.pl touch
-INSTALL  = $(PERL) tools/posix.pl install
-DOS2UNIX = $(PERL) tools/posix.pl dos2unix
-
 ifeq ($(OS),Windows_NT)
   EXESUFFIX := .exe
 else
@@ -66,7 +56,7 @@ ifeq ($(findstring m68k, $(CC)), m68k)
 endif
 
 # link boost::filesystem if needed
-LDFLAGS 	+= $(shell $(PERL) tools/build_ldflags.pl $(CXX) $(CROSS)) 
+LDFLAGS 	+= $(shell perl tools/build_ldflags.pl $(CXX) $(CROSS)) 
 
 # needed for stack_trace
 UNAME = $(shell uname)
@@ -101,7 +91,7 @@ $(1)$(EXESUFFIX): $(2)
 	$(CXX) $(CXXFLAGS) $(2) $(LDFLAGS) -o $(1)$(EXESUFFIX)
 	
 clean::
-	$(RM) -f $(1) $(1)$(EXESUFFIX) $(2)
+	$(RM) $(1) $(1)$(EXESUFFIX) $(2)
 endef
 
 %.o: %.c
@@ -120,7 +110,7 @@ $(TARGET_EXE): $(1).o
 ifeq ($(DEVELOPER),1)
 $(1).cpp: $(1).re $(1).def Makefile
 	$(RE2C) -o $(1).cpp $(1).re
-	$(DOS2UNIX) $(1).cpp
+	dos2unix $(1).cpp
 endif
 endef
 
@@ -152,18 +142,18 @@ all: $(TARGET_LIB)
 $(TARGET_LIB): $(TARGET_EXE)
 ifeq ($(CROSS),0)
   ifeq ($(DEVELOPER),1)
-	$(PERL) asmstyle.pl dev/z80asm_lib/*.asm
+	perl asmstyle.pl dev/z80asm_lib/*.asm
   endif
 	$(MAKE) TASKS=$(TASKS) -C dev/z80asm_lib
-	$(CP) dev/z80asm_lib/$(TARGET_LIB) .
+	cp dev/z80asm_lib/$(TARGET_LIB) .
   ifdef ZCCCFG
-	$(CP) dev/z80asm_lib/$(TARGET_LIB) $(ZCCCFG)/../
+	cp dev/z80asm_lib/$(TARGET_LIB) $(ZCCCFG)/../
   endif
 endif
 
 clean::
 	$(MAKE) -C dev/z80asm_lib clean
-	$(RM) -f $(TARGET_LIB)
+	$(RM) $(TARGET_LIB)
 
 #------------------------------------------------------------------------------
 # generated files
@@ -177,8 +167,8 @@ src/c/scan1.o: src/c/scan_rules.h
 ifeq ($(DEVELOPER),1)
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				tools/parse_ragel.pl Makefile 
-	$(PERL) tools/parse_ragel.pl src/c/scan_rules.rl
-	$(DOS2UNIX) src/c/scan_rules.h
+	perl tools/parse_ragel.pl src/c/scan_rules.rl
+	dos2unix src/c/scan_rules.h
 endif
 
 $(TARGET_EXE): src/c/parse_rules.h
@@ -189,14 +179,14 @@ ifeq ($(DEVELOPER),1)
 src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				tools/parse_ragel.pl Makefile \
 				src/c/cpu_rules.h
-	$(PERL) tools/parse_ragel.pl src/c/parse_rules.rl
-	$(DOS2UNIX) src/c/parse_rules.h
+	perl tools/parse_ragel.pl src/c/parse_rules.rl
+	dos2unix src/c/parse_rules.h
 endif
 
 ifeq ($(DEVELOPER),1)
 src/c/tokens.h : tools/make_tokens.pl Makefile
-	$(PERL) tools/make_tokens.pl > src/c/tokens.h
-	$(DOS2UNIX) src/c/tokens.h
+	perl tools/make_tokens.pl > src/c/tokens.h
+	dos2unix src/c/tokens.h
 endif
 
 # opcode tables generator
@@ -207,9 +197,9 @@ src/c/cpu_rules.h src/c/cpu_rules_action.c src/c/cpu_rules_action.h: \
 			$(wildcard dev/cpu/*.pl dev/cpu/*.pm dev/cpu/*.dat) \
 			dev/cpu/Makefile Makefile
 	$(MAKE) -C dev/cpu
-	$(CP) dev/cpu/cpu_rules.h src/c/cpu_rules.h
-	$(CP) dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c
-	$(CP) dev/cpu/cpu_rules_action.h src/c/cpu_rules_action.h
+	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
+	cp dev/cpu/cpu_rules_action.c src/c/cpu_rules_action.c
+	cp dev/cpu/cpu_rules_action.h src/c/cpu_rules_action.h
 endif
 
 # reloc routine
@@ -221,9 +211,9 @@ RELOC_DIR = dev/reloc_code
 src/c/reloc_code.c: $(RELOC_DIR)/reloc_code.asm $(RELOC_DIR)/make_reloc_code.pl \
 		Makefile $(RELOC_DIR)/Makefile
 	$(MAKE) -C $(RELOC_DIR)
-	$(DOS2UNIX) $(RELOC_DIR)/reloc_code.c $(RELOC_DIR)/reloc_code.h
-	$(MV) $(RELOC_DIR)/reloc_code.c src/c/
-	$(MV) $(RELOC_DIR)/reloc_code.h src/c/
+	dos2unix $(RELOC_DIR)/reloc_code.c $(RELOC_DIR)/reloc_code.h
+	mv $(RELOC_DIR)/reloc_code.c src/c/
+	mv $(RELOC_DIR)/reloc_code.h src/c/
 endif
 
 # re2c
@@ -234,10 +224,10 @@ $(eval $(call MAKE_RE2C,src/cpp/scan2))
 #------------------------------------------------------------------------------
 test: $(TARGET_EXE) $(TARGET_LIB) $(Z80NM)
 	$(MAKE) -C dev/z80asm_lib test
-	$(PERL) -S prove --state=slow,save -j$(TASKS) t/*.t
+	perl -S prove --state=slow,save -j$(TASKS) t/*.t
 
 $(Z80NM): $(Z80NM_DIR)/$(Z80NM)
-	$(CP) $(Z80NM_DIR)/$(Z80NM) $(Z80NM)
+	cp $(Z80NM_DIR)/$(Z80NM) $(Z80NM)
 
 $(Z80NM_DIR)/$(Z80NM): $(wildcard $(Z80NM_DIR)/*.c $(Z80NM_DIR)/*.h)
 	$(MAKE) -C $(Z80NM_DIR)
@@ -264,22 +254,22 @@ endif
 # clean
 #------------------------------------------------------------------------------
 clean::
-	$(PERL) tools/del_temps.pl
-	$(RM) -rf Debug Release x1 x2 x3
-	$(RM) -f $(OBJS) $(TEST_SRC_LIB:.c=.o)
-	$(RM) -f zcc_opt.def zcc_proj.lst
-	$(RM) -f zcc_opt.def microman.bin microman.tap
-	$(RM) -f zcc_opt.def mandel.bin   mandel.tap
-	$(RM) -rf *.dSYM
-	$(RM) -rf $(TARGET_EXE) test*.dir
-	$(RM) -f $(TARGET_EXE) test*
-	$(RM) -f t/*.tmp t/dev/*.tmp
+	perl tools/del_temps.pl
+	$(RM) -r Debug Release x1 x2 x3
+	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
+	$(RM) zcc_opt.def zcc_proj.lst
+	$(RM) zcc_opt.def microman.bin microman.tap
+	$(RM) zcc_opt.def mandel.bin   mandel.tap
+	$(RM) -r *.dSYM
+	$(RM) -r $(TARGET_EXE) test*.dir
+	$(RM) $(TARGET_EXE) test*
+	$(RM) t/*.tmp t/dev/*.tmp
 
 #------------------------------------------------------------------------------
 # Dependencies
 #------------------------------------------------------------------------------
 clean::
-	$(RM) -f $(DEPENDS)
+	$(RM) $(DEPENDS)
 
 -include $(DEPENDS)
 
@@ -288,25 +278,25 @@ clean::
 #------------------------------------------------------------------------------
 
 rebuild: clean
-	$(RM) -f ../z80asm/dev/z80asm_lib/$(TARGET_LIB)
-	$(RM) -f ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
-	$(TOUCH) ../z80asm/Makefile ../z80asm/dev/z80asm_lib/Makefile ../z80asm/dev/cpu/Makefile
-	$(TOUCH) ../z80asm/src/c/*.rl
+	$(RM) ../z80asm/dev/z80asm_lib/$(TARGET_LIB)
+	$(RM) ../z80asm/dev/z80asm_lib/z88dk-z80asm_lib.lst
+	touch ../z80asm/Makefile ../z80asm/dev/z80asm_lib/Makefile ../z80asm/dev/cpu/Makefile
+	touch ../z80asm/src/c/*.rl
 	$(MAKE) -C ../common
 	$(MAKE) -C ../z80asm
-	$(CP) ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
+	cp ../z80asm/z88dk-z80asm$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../z80nm
-	$(CP) ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
+	cp ../z80nm/z88dk-z80nm$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../sccz80
-	$(CP) ../sccz80/sccz80$(EXESUFFIX) ../../bin/z88dk-sccz80$(EXESUFFIX)
+	cp ../sccz80/sccz80$(EXESUFFIX) ../../bin/z88dk-sccz80$(EXESUFFIX)
 	$(MAKE) -C ../zcc
-	$(CP) ../zcc/zcc$(EXESUFFIX) ../../bin/zcc$(EXESUFFIX)
+	cp ../zcc/zcc$(EXESUFFIX) ../../bin/zcc$(EXESUFFIX)
 	$(MAKE) -C ../ticks all
-	$(CP) ../ticks/z88dk-dis$(EXESUFFIX) ../../bin/
-	$(CP) ../ticks/z88dk-ticks$(EXESUFFIX) ../../bin/
-	$(CP) ../ticks/z88dk-gdb$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-dis$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-ticks$(EXESUFFIX) ../../bin/
+	cp ../ticks/z88dk-gdb$(EXESUFFIX) ../../bin/
 	$(MAKE) -C ../zobjcopy all
-	$(CP) $(TARGET_EXE) ../../bin/
+	cp $(TARGET_EXE) ../../bin/
 
 retest: rebuild
 	$(MAKE) -C ../common test
