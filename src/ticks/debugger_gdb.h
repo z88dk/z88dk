@@ -44,6 +44,8 @@ extern const char* register_mapping_names[];
 extern void execute_on_main_thread(trapped_action_t call, const void* data, void* response);
 extern void execute_on_main_thread_no_response(trapped_action_t call, const void* data);
 extern char *mem2hex(const uint8_t *mem, char *buf, uint32_t count);
+extern uint8_t *hex2mem(const char *buf, uint8_t *mem, uint32_t count);
+extern void send_monitor_command(const char* cmd);
 
 extern void debugger_gdb_break(uint8_t temporary);
 

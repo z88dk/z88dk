@@ -47,3 +47,5 @@ win32/ipch/
 win32/z88dk.VC.VC.opendb
 win32/z88dk.VC.db
 win32/.github/copilot-instructions.md
+
+.idea

@@ -14,6 +14,15 @@
 #include "backend.h"
 #include "debugger_gdb_packets.h"
 
+// Compatibility layer for file operations (following pattern from gist)
+#ifdef WIN32
+#define compat_read(f, b, s) _read(f, b, s)
+#define compat_write(f, b, s) _write(f, b, s)
+#else
+#define compat_read(f, b, s) read(f, b, s)
+#define compat_write(f, b, s) write(f, b, s)
+#endif
+
 struct packet_buf
 {
     uint8_t buf[PACKET_BUF_SIZE];
@@ -45,7 +54,8 @@ void inbuf_reset()
 
 void pktbuf_insert(struct packet_buf *pkt, const uint8_t *buf, ssize_t len)
 {
-    if (pkt->end + len >= sizeof(pkt->buf))
+    // Fix: use > instead of >= to leave room for null terminator
+    if (pkt->end + len > sizeof(pkt->buf) - 1)
     {
         puts("Packet buffer overflow");
         exit(-2);
@@ -57,6 +67,11 @@ void pktbuf_insert(struct packet_buf *pkt, const uint8_t *buf, ssize_t len)
 
 void pktbuf_erase_head(struct packet_buf *pkt, ssize_t end)
 {
+    if (end > pkt->end)
+    {
+        end = pkt->end;
+    }
+
     memmove(pkt->buf, pkt->buf + end, pkt->end - end);
     pkt->end -= (int)end;
     pkt->buf[pkt->end] = 0;
@@ -72,12 +87,16 @@ int read_data_once(sock_t sockfd)
     ssize_t nread;
     uint8_t buf[4096];
 
-#ifndef WIN32
-    // On Unix, use read() for both sockets and serial devices (sockets are file descriptors)
-    nread = read(sockfd, buf, sizeof(buf));
+#ifdef WIN32
+    // On Windows, use recv() for sockets, compat_read() for serial devices
+    if (is_connection_serial()) {
+        nread = compat_read(sockfd, buf, sizeof(buf));
+    } else {
+        nread = recv(sockfd, buf, sizeof(buf), 0);
+    }
 #else
-    // On Windows, use recv() for sockets
-    nread = recv(sockfd, buf, sizeof(buf), 0);
+    // On Unix, use compat_read() for both sockets and serial devices (sockets are file descriptors)
+    nread = compat_read(sockfd, buf, sizeof(buf));
 #endif
     if (nread <= 0)
     {

@@ -141,6 +141,7 @@ static int cmd_del_break(int argc, char **argv);
 static int cmd_restore(int argc, char **argv);
 static int cmd_restore_pc(int argc, char **argv);
 static int cmd_typeof(int argc, char **argv);
+static int cmd_monitor(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots(void);
@@ -184,6 +185,7 @@ static command commands[] = {
     { "whatis/rmt",cmd_typeof,      "",                     NULL },
     { "restore",   cmd_restore,     "<path> [<address>]",   "Upload binary into machine memory, keep PC intact"},
     { "restore_pc",cmd_restore_pc,  "<path> [<address>]",   "Upload binary into machine memory and set PC to that address"},
+    { "monitor",   cmd_monitor,     "<command>",            "Send \"monitor\" command to remote target (command-line execution)"},
     { "quit",      cmd_quit,        "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
@@ -298,41 +300,87 @@ void debugger_init() {
 }
 
 uint8_t debugger_read_symbol_file(char* symbol_file) {
-    if (access(symbol_file, F_OK)) {
+    UT_string* nearby_map = NULL;
+    char* resolved_symbol_file = symbol_file;
+    char* filename = zbasename(symbol_file);
+    char* ext = strrchr(filename, '.');
+    uint8_t symbol_file_is_binary = ext && strcmp(ext, ".bin") == 0;
+
+    if (symbol_file_is_binary) {
+        int filename_w_ext_len = (int)(ext - filename);
+        char* symbol_file_dir = strdup(symbol_file);
+        char* dir = zdirname(symbol_file_dir);
+
+        utstring_new(nearby_map);
+        utstring_printf(nearby_map, "%s/%.*s.map", dir, filename_w_ext_len, filename);
+        free(symbol_file_dir);
+
+        if (access(utstring_body(nearby_map), F_OK) == 0) {
+            bk.debug("symbol file %s is a binary, loading nearby map %s instead\n",
+                symbol_file, utstring_body(nearby_map));
+            resolved_symbol_file = utstring_body(nearby_map);
+        }
+    }
+
+    bk.debug("reading symbol file %s", resolved_symbol_file);
+
+    if (access(resolved_symbol_file, F_OK)) {
+        if (nearby_map) {
+            utstring_free(nearby_map);
+        }
         return 1;
     }
 
-    read_symbol_file(symbol_file);
+    read_symbol_file(resolved_symbol_file);
 
-    char* filename = zbasename(symbol_file);
-    char* ext;
-    if ((ext = strrchr(filename, '.'))) {
-        int filename_w_ext_len = (int)(ext - filename);
-        char* dir = zdirname(symbol_file);
-        if (pending_executable_binary) {
-            utstring_free(pending_executable_binary);
-        }
+    if (pending_executable_binary) {
+        utstring_free(pending_executable_binary);
+    }
 
-        // test <path>/<file>.bin first
+    if (symbol_file_is_binary) {
         utstring_new(pending_executable_binary);
-        utstring_printf(pending_executable_binary, "%s/%.*s.bin", dir, filename_w_ext_len, filename);
-        if (access(utstring_body(pending_executable_binary), F_OK)) {
-            // test <path>/<file> first
-            utstring_clear(pending_executable_binary);
-            utstring_printf(pending_executable_binary, "%s/%.*s", dir, filename_w_ext_len, filename);
-            if (access(utstring_body(pending_executable_binary), F_OK)) {
-                // neither of those passed
-                utstring_free(pending_executable_binary);
-                pending_executable_binary = NULL;
-            }
-        }
+        utstring_printf(pending_executable_binary, "%s", symbol_file);
+    } else {
+        filename = zbasename(resolved_symbol_file);
+        ext = strrchr(filename, '.');
+        if (ext) {
+            int filename_w_ext_len = (int)(ext - filename);
+            char* resolved_symbol_file_dir = strdup(resolved_symbol_file);
+            char* dir = zdirname(resolved_symbol_file_dir);
 
-        if (bk.is_remote_connected()) {
-            debugger_restore_pending_binary_file();
-        } else {
-            bk.debug("debug file %s has a binary %s nearby, going to upload it after the connect\n",
-                symbol_file, utstring_body(pending_executable_binary));
+            // test <path>/<file>.bin first
+            utstring_new(pending_executable_binary);
+            utstring_printf(pending_executable_binary, "%s/%.*s.bin", dir, filename_w_ext_len, filename);
+            if (access(utstring_body(pending_executable_binary), F_OK)) {
+                // test <path>/<file> first
+                utstring_clear(pending_executable_binary);
+                utstring_printf(pending_executable_binary, "%s/%.*s", dir, filename_w_ext_len, filename);
+                if (access(utstring_body(pending_executable_binary), F_OK)) {
+                    // neither of those passed
+                    utstring_free(pending_executable_binary);
+                    pending_executable_binary = NULL;
+                }
+            }
+            free(resolved_symbol_file_dir);
         }
+    }
+
+    if (bk.is_remote_connected()) {
+        if (bk.should_download_binary_on_connect())
+        {
+            debugger_restore_pending_binary_file();
+        }
+        else
+        {
+            bk.debug("Not uploading binary on connect in this mode, define GDB_FORCE_DOWNLOAD_AFTER_CONNECT env to do so");
+        }
+    } else if (pending_executable_binary) {
+        bk.debug("debug file %s has a binary %s nearby, pending downloading to target\n",
+            resolved_symbol_file, utstring_body(pending_executable_binary));
+    }
+
+    if (nearby_map) {
+        utstring_free(nearby_map);
     }
     return  0;
 }
@@ -1858,6 +1906,41 @@ static int cmd_typeof(int argc, char **argv)
     return 0;
 }
 
+static int cmd_monitor(int argc, char **argv)
+{
+    if (argc < 2) {
+        bk.console("Warning: monitor command is not specified\n");
+        return 0;
+    }
+
+    if (!bk.is_remote_connected()) {
+        bk.console("Error: not connected to remote target\n");
+        return 0;
+    }
+
+    // reconstruct the command string from argv (handle spaces)
+    static char cmd[1024] = {0};
+
+    // reset
+    cmd[0] = '\0';
+    
+    for (int i = 1; i < argc; i++) {
+        if (i > 1) {
+            strcat(cmd, " ");
+        }
+        strcat(cmd, argv[i]);
+    }
+
+    if (bk.send_remote_command == NULL) {
+        bk.console("Error: send_remote_command not available\n");
+        return 0;
+    }
+
+    bk.send_remote_command(cmd);
+
+    return 0;
+}
+
 static int cmd_set(int argc, char **argv)
 {
     struct reg *search = &registers[0];
@@ -2053,8 +2136,12 @@ int get_restore_address(char* address_text)
     } else {
         int address = symbol_resolve("__head", NULL);
         if (address == -1) {
-            bk.debug("Warning: could not resolve starting address and no address is provided.\n");
-            return 0;
+            // fallback to start symbol
+            address = symbol_resolve("start", NULL);
+            if (address == -1) {
+                bk.debug("Warning: could not resolve starting address and no address is provided.\n");
+                return 0;
+            }
         }
         return address;
     }
@@ -2197,4 +2284,10 @@ void stdout_log(const char *fmt, ...)
         printf("%s", utstring_body(formatted));
         utstring_free(formatted);
     }
+}
+
+void stdout_log_raw(const char *str, size_t len)
+{
+    fwrite(str, len, 1, stdout);
+    fflush(stdout);
 }

@@ -21,6 +21,7 @@ int debugger_evaluate(char* line);
 extern void debugger_request_a_break();
 
 void stdout_log(const char *fmt, ...);
+void stdout_log_raw(const char *str, size_t len);
 
 extern const char *resolve_to_label(int addr);
 extern int get_restore_address(char* address_text);

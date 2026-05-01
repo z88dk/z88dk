@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <termios.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 #endif
 
 #include <fcntl.h>
@@ -60,7 +61,7 @@ struct scheduled_action_t
 };
 
 static struct scheduled_action_t* first_scheduled_action = NULL;
-static char request_response[1024];
+static char request_response[PACKET_BUF_SIZE];
 static uint8_t write_request = 0;
 static pthread_mutex_t req_response_mutex;
 static pthread_cond_t req_response_cond;
@@ -200,6 +201,79 @@ uint8_t *hex2mem(const char *buf, uint8_t *mem, uint32_t count)
         *(mem++) = (char)ch;
     }
     return (mem);
+}
+
+void send_monitor_command(const char* cmd)
+{
+    if (connection_socket == 0) {
+        bk.console("Error: not connected to remote target\n");
+        return;
+    }
+
+    // Construct qRcmd,<hex-encoded-command>
+    size_t cmd_len = strlen(cmd);
+    char hex_buf[2048];
+    char req[4096];
+    
+    mem2hex((const uint8_t*)cmd, hex_buf, (uint32_t)cmd_len);
+    snprintf(req, sizeof(req), "qRcmd,%s", hex_buf);
+    
+    const char* response = send_request(req);
+    if (response == NULL) {
+        bk.console("Error: failed to send monitor command\n");
+        return;
+    }
+
+    static uint8_t decoded_response[1024];
+
+    // qRcmd responses: "OK" (no output), "OK<hex>" (success with output), or "E<hex>" (error)
+    if (strncmp(response, "OK", 2) == 0) {
+        if (strlen(response) > 2) {
+            // Decode hex-encoded output after "OK"
+            const char* hex_data = response + 2;
+            size_t hex_len = strlen(hex_data);
+            if (hex_len > 0 && hex_len % 2 == 0) {
+                size_t decoded_len = hex_len / 2;
+                if (decoded_len < sizeof(decoded_response)) {
+                    hex2mem(hex_data, decoded_response, (uint32_t)decoded_len);
+                    decoded_response[decoded_len] = '\0';
+                    bk.console("%s\n", (char*)decoded_response);
+                } else {
+                    bk.console("%s\n", hex_data);
+                }
+            } else {
+                bk.console("%s\n", hex_data);
+            }
+        } else {
+            bk.console("OK\n");
+        }
+    } else if (response[0] == 'E' && strlen(response) > 1) {
+        // Error response: decode hex-encoded error message
+        const char* hex_data = response + 1;
+        size_t hex_len = strlen(hex_data);
+        if (hex_len > 0 && hex_len % 2 == 0) {
+            size_t decoded_len = hex_len / 2;
+            if (decoded_len < sizeof(decoded_response)) {
+                hex2mem(hex_data, decoded_response, (uint32_t)decoded_len);
+                decoded_response[decoded_len] = '\0';
+                bk.console("Error: %s\n", (char*)decoded_response);
+            } else {
+                bk.console("Error: %s\n", hex_data);
+            }
+        } else {
+            bk.console("Error: %s\n", hex_data);
+        }
+    } else {
+        // Unknown response format, print as-is
+        bk.console("%s\n", response);
+    }
+
+    // give a bit of time for response
+#ifdef WIN32
+    Sleep(100);
+#else
+    usleep(100000);
+#endif
 }
 
 static struct debugger_regs_t* fetch_registers()
@@ -788,7 +862,7 @@ void remote_execution_stopped(const void* data, void* response)
 {
     const int* code = data;
     bk.execution_stopped(*code);
-    free(response);
+    free((void*)data);
 }
 
 static uint8_t process_packet()
@@ -834,22 +908,23 @@ static uint8_t process_packet()
         return 1;
     }
 
-    char recv_data[1024];
-    strcpy(recv_data, (char*)&inbuf[1]);
-    inbuf_erase_head(packetend + 3);
-
-    pthread_mutex_lock(&req_response_mutex);
-
-    if (waiting_for_response)
-    {
-        waiting_for_response = 0;
-        strcpy(request_response, recv_data);
-        pthread_cond_signal(&req_response_cond);
-        pthread_mutex_unlock(&req_response_mutex);
-        return 1;
+    // Calculate actual packet payload size (excluding '$' and '#XX')
+    int payload_size = packetend - 1; // -1 to exclude the '$' at position 0
+    
+    // Use static buffer sized to match packet buffer
+    static char recv_data[PACKET_BUF_SIZE];
+    
+    // Bounds check before copying
+    if (payload_size >= sizeof(recv_data)) {
+        bk.debug("Warning: packet too large (%d bytes), truncating\n", payload_size);
+        payload_size = sizeof(recv_data) - 1;
     }
-
-    pthread_mutex_unlock(&req_response_mutex);
+    
+    // Use memcpy with bounds checking instead of strcpy
+    memcpy(recv_data, &inbuf[1], payload_size);
+    recv_data[payload_size] = '\0';
+    
+    inbuf_erase_head(packetend + 3);
 
     char request = recv_data[0];
     char *payload = (char *)&recv_data[1];
@@ -863,9 +938,56 @@ static uint8_t process_packet()
             *code = strtol(payload, NULL, 10);
             execute_on_main_thread_no_response(&remote_execution_stopped, code);
 
-            break;
+            return 1;
+        }
+        case 'O':
+        {
+            if (strcmp(recv_data, "OK") == 0) {
+                break;
+            }
+
+            // O packets contain hex-encoded console output from the target
+            static uint8_t decoded[513];
+            size_t hex_len = strlen(payload);
+            if (hex_len > 0 && hex_len % 2 == 0) {
+                size_t decoded_len = hex_len / 2;
+                const char* hex_ptr = payload;
+                size_t remaining = decoded_len;
+                
+                while (remaining > 0) {
+                    size_t chunk_size = (remaining < (sizeof(decoded) - 1)) ? remaining : (sizeof(decoded) - 1);
+                    size_t hex_chunk_size = chunk_size * 2;
+                    
+                    hex2mem(hex_ptr, decoded, (uint32_t)chunk_size);
+
+                    // Write decoded bytes directly using console_raw
+                    bk.console_raw((const char*)decoded, chunk_size);
+                    
+                    hex_ptr += hex_chunk_size;
+                    remaining -= chunk_size;
+                }
+            }
+            return 1;
         }
     }
+
+    pthread_mutex_lock(&req_response_mutex);
+
+    if (waiting_for_response)
+    {
+        waiting_for_response = 0;
+        // Bounds check for request_response too
+        if (payload_size >= sizeof(request_response)) {
+            payload_size = sizeof(request_response) - 1;
+        }
+        memcpy(request_response, recv_data, payload_size);
+        request_response[payload_size] = '\0';
+        pthread_cond_signal(&req_response_cond);
+        pthread_mutex_unlock(&req_response_mutex);
+        return 1;
+    }
+
+    pthread_mutex_unlock(&req_response_mutex);
 
     return 1;
 }
@@ -1334,6 +1456,10 @@ static void gdb_remote_closed() {
     exit(1);
 }
 
+static uint8_t gdb_should_download_binary_on_connect() {
+    return 1;
+}
+
 uint32_t gdb_profiler_time() {
     if (has_clock_register) {
         /*
@@ -1380,6 +1506,9 @@ static backend_t gdb_backend = {
     .step = &debugger_step,
     .confirm_detach_w_breakpoints = 1,
     .detach = &debugger_detach,
+    .console = stdout_log,
+    .console_raw = stdout_log_raw,
+    .debug = stdout_log,
     .restore = &debugger_restore,
     .add_breakpoint = &gdb_add_breakpoint,
     .remove_breakpoint = &gdb_remove_breakpoint,
@@ -1389,13 +1518,13 @@ static backend_t gdb_backend = {
     .is_verbose = is_verbose,
     .remote_connect = connect_remote,
     .is_remote_connected = is_gdbserver_connected,
-    .console = stdout_log,
-    .debug = stdout_log,
+    .send_remote_command = send_monitor_command,
     .execution_stopped = gdb_execution_stopped,
     .ctrl_c = ctrl_c,
     .time = gdb_profiler_time,
 	.script_filename = script_filename,
     .remote_closed = gdb_remote_closed,
+    .should_download_binary_on_connect = gdb_should_download_binary_on_connect,
 };
 
 static void process_scheduled_actions()
@@ -1585,4 +1714,3 @@ int israbbit6k(void)
 {
     return 0;
 }
-
