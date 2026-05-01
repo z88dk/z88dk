@@ -47,8 +47,9 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 					if (/^@(\w+)/) {
 						push @patch, [$addr, $1];
 						$bin[$addr++] = 0;
+					}
+					elsif (/^x$/) {
 						$bin[$addr++] = 0;
-						$bin[$addr++] = 0 if $cpu eq 'ez80';
 					}
 					else {
 						$bin[$addr++] = hex($_);							

@@ -1,6 +1,12 @@
 #!/usr/bin/env perl
 
 #------------------------------------------------------------------------------
+# Z80 assembler
+# Copyright (C) Paulo Custodio, 2011-2026
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 # Build CPU tables
 # asm placeholders:
 #	%n	unsigned byte
@@ -13,7 +19,7 @@
 #	%J	jre offset
 #	%c	constant (im, bit, rst, ...)
 #	%d	signed byte
-#	%D	%d+1						TODO: should be %d1 for consistency
+#	%d1 %d+1
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
@@ -53,6 +59,7 @@ sub RP {
 sub XRP {
 	return ''.{'bc'=>0, 'de'=>1, 'ix'=>2, 'iy'=>3}->{lc($_[0])};
 } 
+
 sub F {
 	return ''.{'nz'=>0, 'z'=>1, 'nc'=>2, 'c'=>3, 
 			   'po'=>4, 'pe'=>5, 'p'=>6, 'm'=>7,
@@ -4430,6 +4437,7 @@ require "opcodes_rabbit.pl";
 # syntetic opcodes
 #------------------------------------------------------------------------------
 do "opcodes_synth.pl";
+$@ and die $@;
 
 #------------------------------------------------------------------------------
 # write file

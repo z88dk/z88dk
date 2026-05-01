@@ -1,18 +1,25 @@
 package Opcode;
 
 #------------------------------------------------------------------------------
+# Z80 assembler
+# Copyright (C) Paulo Custodio, 2011-2026
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 # Build CPU tables
 # asm placeholders:
 #	%n	unsigned byte
 #   %h  high page offset
 #	%m	unsigned word - 16, 24 or 32 bits
 #	%m1	%m+1
+# 	%x	segment, 8 or 16 bits
 #	%M	unsigned word, big-endian
 #	%j	jr offset
 #	%J	jre offset
 #	%c	constant (im, bit, rst, ...)
 #	%d	signed byte
-#	%D	%d+1						TODO: should be %d1 for consistency
+#	%d1	%d+1
 #	%t	temp jump label to end of statement; %t3 to end of statement - 3
 #------------------------------------------------------------------------------
 
@@ -253,14 +260,20 @@ sub add_emul {
 	}
 
 	if (!$self->exists($cpu, $asm)) {
+        my @call_ops = @{ $self->opcodes->{"call %m"}{$cpu}{ops} };
+        my @call_op = @{ shift @call_ops }; # CD %m %m  or  CD %m %m %m
+        $call_op[0] == 0xCD or die;
+        $call_op[1] =~ s/%m/'@'.$func/e or die;
+        for (@call_op) { s/%m/x/; }         # CD @func x  or  CD @func x x
+
 		if (@args) {
 			$self->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
-								   ops=>[[0xCD, '@'.$func, ''], \@args],
+								   ops=>[ \@call_op, \@args ],
 								   synth=>1));
 		}
 		else {
 			$self->add(Opcode->new(asm=>$asm, cpu=>$cpu, 
-								   ops=>[[0xCD, '@'.$func, '']],
+								   ops=>[ \@call_op ],
 								   synth=>1));
 		}
 	}
@@ -333,11 +346,11 @@ sub search_opcode {
 		}
 	}
 	
-	# replace %D by %d
-	if (($asm1 = $asm) =~ s/%D/%d/) {
+	# replace %d1 by %d
+	if (($asm1 = $asm) =~ s/%d1/%d/) {
 		my $opcode = $self->opcodes->{$asm1}{$cpu};
 		if ($opcode) {
-			return $self->_replace_opcode_text($opcode, '%d', '%D');
+			return $self->_replace_opcode_text($opcode, '%d', '%d1');
 		}
 	}
 	

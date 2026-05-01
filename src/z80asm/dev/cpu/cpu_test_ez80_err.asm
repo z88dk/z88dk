@@ -1147,8 +1147,6 @@
  altd cpl                       ; Error
  altd cpl a                     ; Error
  altd dec (hl)                  ; Error
- altd dec (hl+)                 ; Error
- altd dec (hl-)                 ; Error
  altd dec (ix)                  ; Error
  altd dec (ix+0)                ; Error
  altd dec (ix+126)              ; Error
@@ -1200,8 +1198,6 @@
  altd fsyscall                  ; Error
  altd ibox a                    ; Error
  altd inc (hl)                  ; Error
- altd inc (hl+)                 ; Error
- altd inc (hl-)                 ; Error
  altd inc (ix)                  ; Error
  altd inc (ix+0)                ; Error
  altd inc (ix+126)              ; Error
@@ -1454,8 +1450,6 @@
  altd ioe cp jkhl, (iy+126)     ; Error
  altd ioe cp jkhl, (iy-128)     ; Error
  altd ioe dec (hl)              ; Error
- altd ioe dec (hl+)             ; Error
- altd ioe dec (hl-)             ; Error
  altd ioe dec (ix)              ; Error
  altd ioe dec (ix+0)            ; Error
  altd ioe dec (ix+126)          ; Error
@@ -1465,8 +1459,6 @@
  altd ioe dec (iy+126)          ; Error
  altd ioe dec (iy-128)          ; Error
  altd ioe inc (hl)              ; Error
- altd ioe inc (hl+)             ; Error
- altd ioe inc (hl-)             ; Error
  altd ioe inc (ix)              ; Error
  altd ioe inc (ix+0)            ; Error
  altd ioe inc (ix+126)          ; Error
@@ -2177,8 +2169,6 @@
  altd ioi cp jkhl, (iy+126)     ; Error
  altd ioi cp jkhl, (iy-128)     ; Error
  altd ioi dec (hl)              ; Error
- altd ioi dec (hl+)             ; Error
- altd ioi dec (hl-)             ; Error
  altd ioi dec (ix)              ; Error
  altd ioi dec (ix+0)            ; Error
  altd ioi dec (ix+126)          ; Error
@@ -2188,8 +2178,6 @@
  altd ioi dec (iy+126)          ; Error
  altd ioi dec (iy-128)          ; Error
  altd ioi inc (hl)              ; Error
- altd ioi inc (hl+)             ; Error
- altd ioi inc (hl-)             ; Error
  altd ioi inc (ix)              ; Error
  altd ioi inc (ix+0)            ; Error
  altd ioi inc (ix+126)          ; Error
@@ -8639,8 +8627,6 @@
  ioe altd cp jkhl, (iy+126)     ; Error
  ioe altd cp jkhl, (iy-128)     ; Error
  ioe altd dec (hl)              ; Error
- ioe altd dec (hl+)             ; Error
- ioe altd dec (hl-)             ; Error
  ioe altd dec (ix)              ; Error
  ioe altd dec (ix+0)            ; Error
  ioe altd dec (ix+126)          ; Error
@@ -8650,8 +8636,6 @@
  ioe altd dec (iy+126)          ; Error
  ioe altd dec (iy-128)          ; Error
  ioe altd inc (hl)              ; Error
- ioe altd inc (hl+)             ; Error
- ioe altd inc (hl-)             ; Error
  ioe altd inc (ix)              ; Error
  ioe altd inc (ix+0)            ; Error
  ioe altd inc (ix+126)          ; Error
@@ -11164,8 +11148,6 @@
  ioi altd cp jkhl, (iy+126)     ; Error
  ioi altd cp jkhl, (iy-128)     ; Error
  ioi altd dec (hl)              ; Error
- ioi altd dec (hl+)             ; Error
- ioi altd dec (hl-)             ; Error
  ioi altd dec (ix)              ; Error
  ioi altd dec (ix+0)            ; Error
  ioi altd dec (ix+126)          ; Error
@@ -11175,8 +11157,6 @@
  ioi altd dec (iy+126)          ; Error
  ioi altd dec (iy-128)          ; Error
  ioi altd inc (hl)              ; Error
- ioi altd inc (hl+)             ; Error
- ioi altd inc (hl-)             ; Error
  ioi altd inc (ix)              ; Error
  ioi altd inc (ix+0)            ; Error
  ioi altd inc (ix+126)          ; Error

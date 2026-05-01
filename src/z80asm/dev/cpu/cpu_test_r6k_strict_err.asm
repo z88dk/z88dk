@@ -727,10 +727,6 @@
  altd cp a, e                   ; Error
  altd cp a, h                   ; Error
  altd cp a, l                   ; Error
- altd dec (hl+)                 ; Error
- altd dec (hl-)                 ; Error
- altd inc (hl+)                 ; Error
- altd inc (hl-)                 ; Error
  altd ioe adc (hl)              ; Error
  altd ioe adc (hl+)             ; Error
  altd ioe adc (hl-)             ; Error
@@ -823,10 +819,6 @@
  altd ioe cp a, (iy+0)          ; Error
  altd ioe cp a, (iy+126)        ; Error
  altd ioe cp a, (iy-128)        ; Error
- altd ioe dec (hl+)             ; Error
- altd ioe dec (hl-)             ; Error
- altd ioe inc (hl+)             ; Error
- altd ioe inc (hl-)             ; Error
  altd ioe ld a, (bc+)           ; Error
  altd ioe ld a, (bc-)           ; Error
  altd ioe ld a, (de+)           ; Error
@@ -1057,10 +1049,6 @@
  altd ioi cp a, (iy+0)          ; Error
  altd ioi cp a, (iy+126)        ; Error
  altd ioi cp a, (iy-128)        ; Error
- altd ioi dec (hl+)             ; Error
- altd ioi dec (hl-)             ; Error
- altd ioi inc (hl+)             ; Error
- altd ioi inc (hl-)             ; Error
  altd ioi ld a, (bc+)           ; Error
  altd ioi ld a, (bc-)           ; Error
  altd ioi ld a, (de+)           ; Error
@@ -4005,10 +3993,6 @@
  ioe altd cp a, (iy+0)          ; Error
  ioe altd cp a, (iy+126)        ; Error
  ioe altd cp a, (iy-128)        ; Error
- ioe altd dec (hl+)             ; Error
- ioe altd dec (hl-)             ; Error
- ioe altd inc (hl+)             ; Error
- ioe altd inc (hl-)             ; Error
  ioe altd ld a, (bc+)           ; Error
  ioe altd ld a, (bc-)           ; Error
  ioe altd ld a, (de+)           ; Error
@@ -4689,10 +4673,6 @@
  ioi altd cp a, (iy+0)          ; Error
  ioi altd cp a, (iy+126)        ; Error
  ioi altd cp a, (iy-128)        ; Error
- ioi altd dec (hl+)             ; Error
- ioi altd dec (hl-)             ; Error
- ioi altd inc (hl+)             ; Error
- ioi altd inc (hl-)             ; Error
  ioi altd ld a, (bc+)           ; Error
  ioi altd ld a, (bc-)           ; Error
  ioi altd ld a, (de+)           ; Error

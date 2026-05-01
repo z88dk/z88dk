@@ -392,15 +392,15 @@ sub parse_code {
 			"}";
 	}
 	# handle ld dd,(ix+d) -> ld ddl,(ix+d) : ld ddh, (ix+d+1)
-	elsif ($bytes =~ /%D/) {
+	elsif ($bytes =~ /%d1/) {
 		for my $i (0 .. $#ops) {
-			if (($ops[$i][2]//'') eq '%d' && ($ops[$i+1][2]//'') eq '%D') {
+			if (($ops[$i][2]//'') eq '%d' && ($ops[$i+1][2]//'') eq '%d1') {
 				my $opcode0 = ($ops[$i+0][0] << 8) + $ops[$i+0][1];
 				my $opcode1 = ($ops[$i+1][0] << 8) + $ops[$i+1][1];
 				push @code, 
 					"DO_stmt_idx_idx1(".sprintf("0x%04XLL, 0x%04XLL", $opcode0, $opcode1).");";
 			}
-			elsif ($ops[$i][2]//'' eq '%D') {
+			elsif ($ops[$i][2]//'' eq '%d1') {
 				# handled above
 			}
 			else {

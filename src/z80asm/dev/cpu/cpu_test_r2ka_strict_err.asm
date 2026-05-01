@@ -1075,8 +1075,6 @@
  altd cp jkhl, px               ; Error
  altd cp jkhl, py               ; Error
  altd cp jkhl, pz               ; Error
- altd dec (hl+)                 ; Error
- altd dec (hl-)                 ; Error
  altd dec (pw)                  ; Error
  altd dec (pw+0)                ; Error
  altd dec (pw+126)              ; Error
@@ -1103,8 +1101,6 @@
  altd ex jkhl, bcde'            ; Error
  altd fsyscall                  ; Error
  altd ibox a                    ; Error
- altd inc (hl+)                 ; Error
- altd inc (hl-)                 ; Error
  altd inc (pw)                  ; Error
  altd inc (pw+0)                ; Error
  altd inc (pw+126)              ; Error
@@ -1229,10 +1225,6 @@
  altd ioe cp jkhl, (iy+0)       ; Error
  altd ioe cp jkhl, (iy+126)     ; Error
  altd ioe cp jkhl, (iy-128)     ; Error
- altd ioe dec (hl+)             ; Error
- altd ioe dec (hl-)             ; Error
- altd ioe inc (hl+)             ; Error
- altd ioe inc (hl-)             ; Error
  altd ioe ld a, (bc+)           ; Error
  altd ioe ld a, (bc-)           ; Error
  altd ioe ld a, (de+)           ; Error
@@ -1502,10 +1494,6 @@
  altd ioi cp jkhl, (iy+0)       ; Error
  altd ioi cp jkhl, (iy+126)     ; Error
  altd ioi cp jkhl, (iy-128)     ; Error
- altd ioi dec (hl+)             ; Error
- altd ioi dec (hl-)             ; Error
- altd ioi inc (hl+)             ; Error
- altd ioi inc (hl-)             ; Error
  altd ioi ld a, (bc+)           ; Error
  altd ioi ld a, (bc-)           ; Error
  altd ioi ld a, (de+)           ; Error
@@ -7580,10 +7568,6 @@
  ioe altd cp jkhl, (iy+0)       ; Error
  ioe altd cp jkhl, (iy+126)     ; Error
  ioe altd cp jkhl, (iy-128)     ; Error
- ioe altd dec (hl+)             ; Error
- ioe altd dec (hl-)             ; Error
- ioe altd inc (hl+)             ; Error
- ioe altd inc (hl-)             ; Error
  ioe altd ld a, (bc+)           ; Error
  ioe altd ld a, (bc-)           ; Error
  ioe altd ld a, (de+)           ; Error
@@ -8979,10 +8963,6 @@
  ioi altd cp jkhl, (iy+0)       ; Error
  ioi altd cp jkhl, (iy+126)     ; Error
  ioi altd cp jkhl, (iy-128)     ; Error
- ioi altd dec (hl+)             ; Error
- ioi altd dec (hl-)             ; Error
- ioi altd inc (hl+)             ; Error
- ioi altd inc (hl-)             ; Error
  ioi altd ld a, (bc+)           ; Error
  ioi altd ld a, (bc-)           ; Error
  ioi altd ld a, (de+)           ; Error

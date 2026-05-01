@@ -1,4 +1,10 @@
 #------------------------------------------------------------------------------
+# Z80 assembler
+# Copyright (C) Paulo Custodio, 2011-2026
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 # Synthetic opcodes
 #------------------------------------------------------------------------------
 
@@ -147,9 +153,13 @@ for my $cpu (Opcode->cpus) {
 	add_synth($cpu, "r_ltu", "rc");
 	
 	# JP|CALL|RET GTU, NN
+	add_synth($cpu, "jgtu %m", "jr z, %t", "jp nc, %m");
 	add_synth($cpu, "jgtu %m", "jz %t", "jnc %m");
+
+	add_synth($cpu, "j_gtu %m", "jr z, %t", "jp nc, %m");
 	add_synth($cpu, "j_gtu %m", "jz %t", "jnc %m");
-	add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
+
+    add_synth($cpu, "jr gtu, %j", "jr z, %t", "jr nc, %j");
 	add_synth($cpu, "jre gtu, %J", "jr z, %t", "jre nc, %J");
 	add_synth($cpu, "jp3 gtu, %m", "jr z, %t", "jp3 nc, %m");
 	add_synth($cpu, "cgtu %m", "jr z, %t", "call nc, %m");
@@ -545,21 +555,21 @@ for my $cpu (Opcode->cpus) {
 
 	# LD (IX+d), BC|DE|HL|IX|IY
 	for my $x ('ix', 'iy') {
-		add_synth($cpu, "ld ($x+%d), bc", "ld ($x+%d), c", "ld ($x+%D), b");
+		add_synth($cpu, "ld ($x+%d), bc", "ld ($x+%d), c", "ld ($x+%d1), b");
 		add_synth($cpu, "ld ($x), bc", "ld ($x), c", "ld ($x+0x01), b");
 
-		add_synth($cpu, "ld ($x+%d), de", "ld ($x+%d), e", "ld ($x+%D), d");
+		add_synth($cpu, "ld ($x+%d), de", "ld ($x+%d), e", "ld ($x+%d1), d");
 		add_synth($cpu, "ld ($x), de", "ld ($x), e", "ld ($x+0x01), d");
 
 		if ($cpu !~ /^r\dk/) {	# not yet for Rabbits
-			add_synth($cpu, "ld ($x+%d), hl", "ld ($x+%d), l", "ld ($x+%D), h");
+			add_synth($cpu, "ld ($x+%d), hl", "ld ($x+%d), l", "ld ($x+%d1), h");
 			add_synth($cpu, "ld ($x), hl", "ld ($x), l", "ld ($x+0x01), h");
 		}
 
 		for my $x1 ('ix', 'iy') {
 			add_synth($cpu, "ld ($x+%d), $x1",
 					  "push $x1", "ex (sp), hl",
-					  "ld ($x+%d), l", "ld ($x+%D), h",
+					  "ld ($x+%d), l", "ld ($x+%d1), h",
 					  "ex (sp), hl", "pop $x1");
 			add_synth($cpu, "ld ($x), $x1",
 					  "push $x1", "ex (sp), hl",
@@ -634,19 +644,19 @@ for my $cpu (Opcode->cpus) {
 	
 	# LD BC|DE|HL|IX, (IX+d)
 	for my $x ('ix', 'iy') {
-		add_synth($cpu, "ld bc, ($x+%d)", "ld c, ($x+%d)", "ld b, ($x+%D)");
+		add_synth($cpu, "ld bc, ($x+%d)", "ld c, ($x+%d)", "ld b, ($x+%d1)");
 		add_synth($cpu, "ld bc, ($x)", "ld c, ($x)", "ld b, ($x+0x01)");
 
-		add_synth($cpu, "ld de, ($x+%d)", "ld e, ($x+%d)", "ld d, ($x+%D)");
+		add_synth($cpu, "ld de, ($x+%d)", "ld e, ($x+%d)", "ld d, ($x+%d1)");
 		add_synth($cpu, "ld de, ($x)", "ld e, ($x)", "ld d, ($x+0x01)");
 
-		add_synth($cpu, "ld hl, ($x+%d)", "ld l, ($x+%d)", "ld h, ($x+%D)");
+		add_synth($cpu, "ld hl, ($x+%d)", "ld l, ($x+%d)", "ld h, ($x+%d1)");
 		add_synth($cpu, "ld hl, ($x)", "ld l, ($x)", "ld h, ($x+0x01)");
 
 		for my $x1 ('ix', 'iy') {
 			add_synth($cpu, "ld $x1, ($x+%d)",
 					  "push $x1", "ex (sp), hl",
-					  "ld l, ($x+%d)", "ld h, ($x+%D)",
+					  "ld l, ($x+%d)", "ld h, ($x+%d1)",
 					  "ex (sp), hl", "pop $x1");
 			add_synth($cpu, "ld $x1, ($x)",
 					  "push $x1", "ex (sp), hl",
@@ -901,6 +911,7 @@ for my $cpu (Opcode->cpus) {
 	# INC / DEC
 	for my $op ('inc', 'dec') {
 		for my $pref (@rabbit_prefixes) {
+			next if $pref =~ /alt/;		# altd inc (hl+) does not exist
 			for my $suf (@ez80_suffixes) {
 				add_synth($cpu, "$pref$op$suf (hl+)", "$pref$op$suf (hl)", "inc$suf hl"); 
 				add_synth($cpu, "$pref$op$suf (hl-)", "$pref$op$suf (hl)", "dec$suf hl"); 

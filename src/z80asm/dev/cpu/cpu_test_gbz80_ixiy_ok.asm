@@ -26,10 +26,10 @@
  adc d                          ; 8A
  adc e                          ; 8B
  adc h                          ; 8C
- adc hl, bc                     ; CD @__z80asm__adc_hl_bc
- adc hl, de                     ; CD @__z80asm__adc_hl_de
- adc hl, hl                     ; CD @__z80asm__adc_hl_hl
- adc hl, sp                     ; CD @__z80asm__adc_hl_sp
+ adc hl, bc                     ; CD @__z80asm__adc_hl_bc x
+ adc hl, de                     ; CD @__z80asm__adc_hl_de x
+ adc hl, hl                     ; CD @__z80asm__adc_hl_hl x
+ adc hl, sp                     ; CD @__z80asm__adc_hl_sp x
  adc l                          ; 8D
  adc m                          ; 8E
  add (hl)                       ; 86
@@ -54,15 +54,15 @@
  add a, l                       ; 85
  add b                          ; 80
  add bc, 0x1234                 ; E5 21 34 12 09 44 4D E1
- add bc, a                      ; CD @__z80asm__add_bc_a
+ add bc, a                      ; CD @__z80asm__add_bc_a x
  add c                          ; 81
  add d                          ; 82
  add de, 0x1234                 ; E5 21 34 12 19 54 5D E1
- add de, a                      ; CD @__z80asm__add_de_a
+ add de, a                      ; CD @__z80asm__add_de_a x
  add e                          ; 83
  add h                          ; 84
  add hl, 0x1234                 ; D5 11 34 12 19 D1
- add hl, a                      ; CD @__z80asm__add_hl_a
+ add hl, a                      ; CD @__z80asm__add_hl_a x
  add hl, bc                     ; 09
  add hl, de                     ; 19
  add hl, hl                     ; 29
@@ -196,7 +196,7 @@
  c_ne 0x1234                    ; C4 34 12
  c_nz 0x1234                    ; C4 34 12
  c_z 0x1234                     ; CC 34 12
- call (hl)                      ; CD @__z80asm__call_hl
+ call (hl)                      ; CD @__z80asm__call_hl x
  call 0x1234                    ; CD 34 12
  call c, 0x1234                 ; DC 34 12
  call eq, 0x1234                ; CC 34 12
@@ -284,13 +284,13 @@
  cp e                           ; BB
  cp h                           ; BC
  cp l                           ; BD
- cpd                            ; CD @__z80asm__cpd
- cpdr                           ; CD @__z80asm__cpdr
- cpi                            ; CD @__z80asm__cpi
+ cpd                            ; CD @__z80asm__cpd x
+ cpdr                           ; CD @__z80asm__cpdr x
+ cpi                            ; CD @__z80asm__cpi x
  cpi 0                          ; FE 00
  cpi 127                        ; FE 7F
  cpi 255                        ; FE FF
- cpir                           ; CD @__z80asm__cpir
+ cpir                           ; CD @__z80asm__cpir x
  cpl                            ; 2F
  cpl a                          ; 2F
  cz 0x1234                      ; CC 34 12
@@ -334,9 +334,9 @@
  di                             ; F3
  djnz ASMPC                     ; 05 20 FD
  djnz b, ASMPC                  ; 05 20 FD
- dsub                           ; CD @__z80asm__sub_hl_bc
+ dsub                           ; CD @__z80asm__sub_hl_bc x
  ei                             ; FB
- ex (sp), hl                    ; CD @__z80asm__ex_sp_hl
+ ex (sp), hl                    ; CD @__z80asm__ex_sp_hl x
  ex bc, hl                      ; E5 C5 E1 C1
  ex de, hl                      ; E5 D5 E1 D1
  ex hl, bc                      ; E5 C5 E1 C1
@@ -375,7 +375,7 @@
  j_c 0x1234                     ; DA 34 12
  j_eq 0x1234                    ; CA 34 12
  j_geu 0x1234                   ; D2 34 12
- j_gtu 0x1234                   ; CA FC 02 D2 34 12
+ j_gtu 0x1234                   ; 28 03 D2 34 12
  j_leu 0x1234                   ; CA 34 12 DA 34 12
  j_ltu 0x1234                   ; DA 34 12
  j_nc 0x1234                    ; D2 34 12
@@ -385,7 +385,7 @@
  jc 0x1234                      ; DA 34 12
  jeq 0x1234                     ; CA 34 12
  jgeu 0x1234                    ; D2 34 12
- jgtu 0x1234                    ; CA 20 03 D2 34 12
+ jgtu 0x1234                    ; 28 03 D2 34 12
  jleu 0x1234                    ; CA 34 12 DA 34 12
  jltu 0x1234                    ; DA 34 12
  jmp (bc)                       ; C5 C9
@@ -645,7 +645,7 @@
  ldax bc                        ; 0A
  ldax d                         ; 1A
  ldax de                        ; 1A
- ldd                            ; CD @__z80asm__ldd
+ ldd                            ; CD @__z80asm__ldd x
  ldd (bc), a                    ; 02 0B
  ldd (de), a                    ; 12 1B
  ldd (hl), 0                    ; 36 00 2B
@@ -667,7 +667,7 @@
  ldd e, (hl)                    ; 5E 2B
  ldd h, (hl)                    ; 66 2B
  ldd l, (hl)                    ; 6E 2B
- lddr                           ; CD @__z80asm__lddr
+ lddr                           ; CD @__z80asm__lddr x
  ldh (0), a                     ; E0 00
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
@@ -682,7 +682,7 @@
  ldhl sp, -128                  ; F8 80
  ldhl sp, 0                     ; F8 00
  ldhl sp, 126                   ; F8 7E
- ldi                            ; CD @__z80asm__ldi
+ ldi                            ; CD @__z80asm__ldi x
  ldi (bc), a                    ; 02 03
  ldi (de), a                    ; 12 13
  ldi (hl), 0                    ; 36 00 23
@@ -709,7 +709,7 @@
  ldi e, (hl)                    ; 5E 23
  ldi h, (hl)                    ; 66 23
  ldi l, (hl)                    ; 6E 23
- ldir                           ; CD @__z80asm__ldir
+ ldir                           ; CD @__z80asm__ldir x
  ldsi 0                         ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
  ldsi 127                       ; E5 D5 E1 D1 21 7F 00 39 E5 D5 E1 D1
  ldsi 255                       ; E5 D5 E1 D1 21 FF 00 39 E5 D5 E1 D1
@@ -993,7 +993,7 @@
  rlc h                          ; CB 04
  rlc l                          ; CB 05
  rlca                           ; 07
- rld                            ; CD @__z80asm__rld
+ rld                            ; CD @__z80asm__rld x
  rlde                           ; CB 13 CB 12
  rleu                           ; C8 D8
  rltu                           ; D8
@@ -1022,7 +1022,7 @@
  rrc h                          ; CB 0C
  rrc l                          ; CB 0D
  rrca                           ; 0F
- rrd                            ; CD @__z80asm__rrd
+ rrd                            ; CD @__z80asm__rrd x
  rrhl                           ; CB 2C CB 1D
  rst 0                          ; C7
  rst 16                         ; D7
@@ -1066,10 +1066,10 @@
  sbc d                          ; 9A
  sbc e                          ; 9B
  sbc h                          ; 9C
- sbc hl, bc                     ; CD @__z80asm__sbc_hl_bc
- sbc hl, de                     ; CD @__z80asm__sbc_hl_de
- sbc hl, hl                     ; CD @__z80asm__sbc_hl_hl
- sbc hl, sp                     ; CD @__z80asm__sbc_hl_sp
+ sbc hl, bc                     ; CD @__z80asm__sbc_hl_bc x
+ sbc hl, de                     ; CD @__z80asm__sbc_hl_de x
+ sbc hl, hl                     ; CD @__z80asm__sbc_hl_hl x
+ sbc hl, sp                     ; CD @__z80asm__sbc_hl_sp x
  sbc l                          ; 9D
  sbi 0                          ; DE 00
  sbi 127                        ; DE 7F
@@ -1202,10 +1202,10 @@
  sub d                          ; 92
  sub e                          ; 93
  sub h                          ; 94
- sub hl, bc                     ; CD @__z80asm__sub_hl_bc
- sub hl, de                     ; CD @__z80asm__sub_hl_de
- sub hl, hl                     ; CD @__z80asm__sub_hl_hl
- sub hl, sp                     ; CD @__z80asm__sub_hl_sp
+ sub hl, bc                     ; CD @__z80asm__sub_hl_bc x
+ sub hl, de                     ; CD @__z80asm__sub_hl_de x
+ sub hl, hl                     ; CD @__z80asm__sub_hl_hl x
+ sub hl, sp                     ; CD @__z80asm__sub_hl_sp x
  sub l                          ; 95
  sub m                          ; 96
  sui 0                          ; D6 00
@@ -1259,4 +1259,4 @@
  xri 0                          ; EE 00
  xri 127                        ; EE 7F
  xri 255                        ; EE FF
- xthl                           ; CD @__z80asm__ex_sp_hl
+ xthl                           ; CD @__z80asm__ex_sp_hl x

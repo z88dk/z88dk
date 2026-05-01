@@ -116,29 +116,29 @@ sub add {
 		$opcode1->{done_ldh} = 1;
 		add($cpu, $opcode1);
 	}
-	elsif ($asm =~ /%d/) {
+	elsif ($asm =~ /%d1?/) {
 		my $state = 0;	
 		add($cpu, $opcode->clone(sub {s/%d/-128/; s/\+-/-/}, 
 								 sub {
-									if (/%[ds]/) {
+									if (/%[ds]\b/) {
 										if    ($state == 0 && s/%d/0x80/e) { $state = 1; }
 										elsif ($state == 1 && s/%s/0xFF/e) { $state = 2; }
 										elsif ($state == 2 && s/%s/0xFF/e) { $state = 3; }
 									}
-									elsif (/%D/) {
-										s/%D/0x81/e;
+									elsif (/%d1/) {
+										s/%d1/0x81/e;
 									}
 								 }));
 		$state = 0;
 		add($cpu, $opcode->clone(sub {s/%d/0/}, 
 								 sub {
-									if (/%[ds]/) {
+									if (/%[ds]\b/) {
 										if    ($state == 0 && s/%d/0x00/e) { $state = 1; }
 										elsif ($state == 1 && s/%s/0x00/e) { $state = 2; }
 										elsif ($state == 2 && s/%s/0x00/e) { $state = 3; }
 									}
-									elsif (/%D/) {
-										s/%D/0x01/e;
+									elsif (/%d1/) {
+										s/%d1/0x01/e;
 									}
 								 }));
 
@@ -148,13 +148,13 @@ sub add {
 		$state = 0;
 		add($cpu, $opcode->clone(sub {s/%d/126/}, 
 								 sub {
-									if (/%[ds]/) {
+									if (/%[ds]\b/) {
 										if    ($state == 0 && s/%d/0x7E/e) { $state = 1; }
 										elsif ($state == 1 && s/%s/0x00/e) { $state = 2; }
 										elsif ($state == 2 && s/%s/0x00/e) { $state = 3; }
 									}
-									elsif (/%D/) {
-										s/%D/0x7F/e;
+									elsif (/%d1/) {
+										s/%d1/0x7F/e;
 									}
 								 }));
 	}
@@ -324,14 +324,6 @@ sub compute_labels {
 		my($asm, $bytes) = split(/;/, $_, 2);
 		my @bytes = split ' ', $bytes;
 		my $num_bytes = scalar(@bytes);
-		if ($bytes =~ /\@/) {
-			if ($cpu eq 'ez80') {
-				$num_bytes += 2;
-			}
-			else {
-				$num_bytes += 1;
-			}
-		}
 		
 		while ($bytes =~ /%t(\d*) %t\1 %t\1/) {
 			my $before = $`; my @before = split ' ', $before;
