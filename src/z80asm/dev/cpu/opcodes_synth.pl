@@ -58,7 +58,7 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "c$f %m", "$jump $nf, %t", "call %m") if $f ne 'p';
 		add_synth($cpu, "c$nf %m", "$jump $f, %t", "call %m") if $nf ne 'p';
 
-		# C<F> NN
+		# C_<F> NN
 		add_synth($cpu, "c_$f %m", "$jump $nf, %t", "call %m");
 		add_synth($cpu, "c_$nf %m", "$jump $f, %t", "call %m");
 
@@ -188,9 +188,10 @@ for my $cpu (Opcode->cpus) {
 		if ($call_opcode) {
 			$call_size = scalar($call_opcode->bytes);
 		}
-	
+		my $call3_size = 5;		# kc160 size
+		
 		add_synth($cpu, "cleu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
-		add_synth($cpu, "call3 leu, %m", "jr z, %t$call_size", "jr nc, %t", "call3 %m");
+		add_synth($cpu, "call3 leu, %m", "jr z, %t$call3_size", "jr nc, %t", "call3 %m");
 		add_synth($cpu, "c_leu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
 
 		add_synth($cpu, "jp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");

@@ -1039,7 +1039,7 @@
  call v, 0x1234                 ; EC 34 12
  call z, 0x1234                 ; CC 34 12
  call3 0x123456                 ; ED 4C 56 34 12
- call3 leu, 0x123456            ; 28 04 30 05 ED 4C 56 34 12
+ call3 leu, 0x123456            ; 28 02 30 05 ED 4C 56 34 12
  cc 0x1234                      ; DC 34 12
  ccf                            ; 3F
  ceq 0x1234                     ; CC 34 12

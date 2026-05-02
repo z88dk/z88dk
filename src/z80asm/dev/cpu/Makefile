@@ -4,14 +4,13 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-all: opcodes.dat
-$(OPCODES): make_opcodes.pl Opcodes.pm $(wildcard opcodes_*.pl) Makefile
-	perl make_opcodes.pl opcodes.dat 
+all: opcodes.dat opcodes.txt
+opcodes.dat: make_opcodes.pl Opcodes.pm $(wildcard opcodes*.pl) Makefile
+	perl make_opcodes.pl opcodes.dat
 	dos2unix opcodes.dat
 
-all: opcodes.txt
-opcodes.txt: opcodes.dat dump_opcodes.pl Opcodes.pm Makefile
-	perl dump_opcodes.pl opcodes.dat opcodes.txt 
+opcodes.txt: dump_opcodes.pl opcodes.dat Opcodes.pm Makefile
+	perl dump_opcodes.pl opcodes.dat opcodes.txt
 	dos2unix opcodes.txt
 
 all: cpu_test_z80_ok.asm

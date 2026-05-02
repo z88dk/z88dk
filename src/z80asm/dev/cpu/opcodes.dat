@@ -20926,7 +20926,7 @@ call.sis z, %m|ez80_z80|_||40;CC %m %m
 call.sis z, %m|ez80_z80_strict|_||40;CC %m %m
 call3 %m|kc160|_||ED 4C %m %m %m
 call3 %m|kc160_strict|_||ED 4C %m %m %m
-call3 leu, %m|kc160|X||28 %t3;30 %t;ED 4C %m %m %m
+call3 leu, %m|kc160|X||28 %t5;30 %t;ED 4C %m %m %m
 cbm %n|r4k|_||ED 00 %n
 cbm %n|r4k_strict|_||ED 00 %n
 cbm %n|r5k|_||ED 00 %n
