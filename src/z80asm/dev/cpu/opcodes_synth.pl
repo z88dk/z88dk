@@ -194,8 +194,15 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "call3 leu, %m", "jr z, %t$call3_size", "jr nc, %t", "call3 %m");
 		add_synth($cpu, "c_leu %m", "jr z, %t$call_size", "jr nc, %t", "call %m");
 
-		add_synth($cpu, "jp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
-		add_synth($cpu, "jmp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
+		# r4k, r5k and r6k have jp gtu
+		if ($cpu =~ /r[456]k/) {
+			add_synth($cpu, "jp$suf leu, %m", "jp$suf gtu, %t", "jp$suf %m");
+			add_synth($cpu, "jmp$suf leu, %m", "jp$suf gtu, %t", "jp$suf %m");
+		}
+		else {
+			add_synth($cpu, "jp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
+			add_synth($cpu, "jmp$suf leu, %m", "jp$suf z, %m", "jp$suf c, %m");
+		}
 		add_synth($cpu, "call$suf leu, %m", "jr z, %t$call_size", "jr nc, %t", "call$suf %m");
 		add_synth($cpu, "ret$suf leu", "ret$suf z", "ret$suf c");
 	}

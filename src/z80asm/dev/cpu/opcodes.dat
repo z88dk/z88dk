@@ -42954,9 +42954,9 @@ jmp leu, %m|kc160|X||CA %m %m;DA %m %m
 jmp leu, %m|kc160_z80|X||CA %m %m;DA %m %m
 jmp leu, %m|r2ka|X||CA %m %m;DA %m %m
 jmp leu, %m|r3k|X||CA %m %m;DA %m %m
-jmp leu, %m|r4k|X||CA %m %m;DA %m %m
-jmp leu, %m|r5k|X||CA %m %m;DA %m %m
-jmp leu, %m|r6k|X||CA %m %m;DA %m %m
+jmp leu, %m|r4k|X||AA %t %t;C3 %m %m
+jmp leu, %m|r5k|X||AA %t %t;C3 %m %m
+jmp leu, %m|r6k|X||AA %t %t;C3 %m %m
 jmp leu, %m|r800|X||CA %m %m;DA %m %m
 jmp leu, %m|z180|X||CA %m %m;DA %m %m
 jmp leu, %m|z80|X||CA %m %m;DA %m %m

@@ -7473,7 +7473,7 @@
  jmp geu, 0x1234                ; D2 34 12
  jmp gt, 0x1234                 ; A2 34 12
  jmp gtu, 0x1234                ; AA 34 12
- jmp leu, 0x1234                ; CA 34 12 DA 34 12
+ jmp leu, 0x1234                ; AA 45 7B C3 34 12
  jmp lo, 0x1234                 ; EA 34 12
  jmp lt, 0x1234                 ; B2 34 12
  jmp ltu, 0x1234                ; DA 34 12
