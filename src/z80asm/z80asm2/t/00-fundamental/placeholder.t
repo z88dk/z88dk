@@ -3,6 +3,7 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 ok 1;
+
 #my $dir = path($0)->dirname;
 #my $self = path($0)->basename(".t");
 #capture_ok(
