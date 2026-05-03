@@ -4967,7 +4967,7 @@
  ret3 eq                        ; 20 02 ED 5C
  ret3 geu                       ; 38 02 ED 5C
  ret3 gtu                       ; 28 04 38 02 ED 5C
- ret3 leu                       ; 20 04 30 02 ED 5C
+ ret3 leu                       ; 28 02 30 02 ED 5C
  ret3 ltu                       ; 30 02 ED 5C
  ret3 m                         ; F2 E1 44 ED 5C
  ret3 nc                        ; 38 02 ED 5C

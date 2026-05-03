@@ -72659,7 +72659,7 @@ ret3 c|kc160|X||30 %t;ED 5C
 ret3 eq|kc160|X||20 %t;ED 5C
 ret3 geu|kc160|X||38 %t;ED 5C
 ret3 gtu|kc160|X||28 %t;38 %t;ED 5C
-ret3 leu|kc160|X||20 %t;30 %t;ED 5C
+ret3 leu|kc160|X||28 %t2;30 %t;ED 5C
 ret3 ltu|kc160|X||30 %t;ED 5C
 ret3 m|kc160|X||F2 %t %t;ED 5C
 ret3 nc|kc160|X||38 %t;ED 5C

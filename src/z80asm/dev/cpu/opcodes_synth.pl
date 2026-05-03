@@ -207,7 +207,7 @@ for my $cpu (Opcode->cpus) {
 		add_synth($cpu, "ret$suf leu", "ret$suf z", "ret$suf c");
 	}
 	add_synth($cpu, "rleu", "rz", "rc");
-	add_synth($cpu, "ret3 leu", "jr nz, %t", "jr nc, %t", "ret3");
+	add_synth($cpu, "ret3 leu", "jr z, %t2", "jr nc, %t", "ret3");
 	add_synth($cpu, "r_leu", "rz", "rc");
 
 	# JP|CALL|RET NV, NN
