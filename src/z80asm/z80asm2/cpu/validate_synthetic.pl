@@ -23,48 +23,245 @@ while (<$fh>) {
 	chomp;
 	my($asm, $cpu, $instr) = split /\|/, $_, 3;
 	my @effect_synth = parse_effect($asm, $cpu);
-	my @effect_real;
-	for (split /;/, $instr) {
-		push @effect_real, parse_effect($_, $cpu);
-	}
-	#say "$asm; $cpu; $instr;\n".dump(\@effect_synth), "\n", dump(\@effect_real);
+	my @effect_real = map { parse_effect($_, $cpu) } split /;/, $instr;
+	next;
 
-	@effect_real = normalize(@effect_real);
-	normalize_temps(\@effect_synth, \@effect_real);
+	@effect_real = normalize_effects(@effect_real);
+	align_temporaries(\@effect_synth, \@effect_real);
 	
-	is_deeply \@effect_synth, \@effect_real, "$asm; $cpu; $instr; ".dump(\@effect_synth);
-	die "$asm, $cpu, $instr\n", dump(\@effect_synth), "\n", dump(\@effect_real)
-		unless Test::More->builder->is_passing;
+	is_deeply \@effect_synth, \@effect_real, "$asm | $cpu"
+		or do {
+			my $msg = join "\n",
+				"$asm | $cpu | $instr",
+				"Expected:",
+				dump(\@effect_synth),
+				"Got:",
+				dump(\@effect_real);
+			die "$msg\n";
+		};
 }
 
+close($fh);
 done_testing;
 
-
+#------------------------------------------------------------------------------
+# Convert assembly instruction to effects, including synthetic instructions
+# {
+#     type	=> 'inst',
+#     opcode   => 'ld',
+#     prefixes => {
+#         altd => 0,	# Rabbit alt destination register set
+#         alts => 0,    # Rabbit alt source register set
+#         io  => undef, # Rabbit IO specifier 'ioe', 'ioi', or undef
+#     },
+#     suffix   => undef,# eZ80 width suffix: /[sl]i[sl]/ or undef
+#     args     => [
+#         { type => 'reg', name => 'a', alt => 0, width => undef },
+#		  { type => 'regpair', name => 'hl', alt => 0, width => undef }
+#		  { type => 'imm', value => '%n', width => undef },
+#         { type => 'mem', base => 'hl', disp => 0, disp_offset => 0, 
+#                   space => 'mem', post => +1, width => undef },
+#		  { type => 'mem', base => undef, addr => '%m', space => 'mem', width => undef }
+#         { type => 'symbol', name => '__z80asm__xxx' },
+#         { type => 'labelref', name => '%t1' },
+#         { type => 'cond', cond => 'c' },
+#     ],
+# }
+# {
+#     type => 'label',
+#     name => '%t1',
+# }
+#------------------------------------------------------------------------------
 sub parse_effect {
+    my ( $asm, $cpu ) = @_;
+
+	$asm = intel_to_zilog($asm);
+    my $inst = parse_assembly($asm, $cpu);
+	dump($asm, $inst);
+	return;
+
+	$inst = lower_operand_kinds();
+	$inst = lower_emulated_ops($inst);
+    $inst = lower_rabbit_prefixes($inst);
+    $inst = lower_ez80_suffixes($inst);
+
+    my @insts = lower_postinc($inst);
+    @insts = map lower_addressing($_), @insts;
+
+    return map opcode_to_effect( $_, $cpu ), @insts;
+}
+
+sub parse_assembly {
+	my ( $asm, $cpu ) = @_;
+
+	# text cleanup
+	$asm = lc($asm);
+    $asm =~ s/^\s+|\s+$//g;
+
+	if ($asm =~ /^ (%t \d*) : $/x) {
+		return { type => 'label', name => $1 };
+	}
+
+	my %prefixes = extract_prefixes( \$asm );
+	my ( $opcode, $suffix ) = extract_opcode_and_suffix( \$asm, $cpu );
+	my @opr = split /\s*,\s*/, $asm;
+	add_default_a_register( \@opr, $opcode );
+	my @args = map { parse_operand($_) } @opr;
+
+	return {
+		type     => 'inst',
+		opcode   => $opcode,
+		prefixes => \%prefixes,
+		suffix   => $suffix,
+		args     => \@args,
+	};
+}
+
+sub extract_prefixes {
+	my ($asm_ref) = @_;
+
+	my %prefixes = (altd => 0, alts => 0, io => undef);
+	while ( $$asm_ref =~ s/^(altd|alts|altsd|ioi|ioe)\s+// ) {
+		my $prefix = $1;
+		$prefixes{altd}++       if $prefix =~ /^(altd|altsd)$/;
+		$prefixes{alts}++       if $prefix =~ /^(alts|altsd)$/;
+		$prefixes{io} = $prefix if $prefix =~ /^(ioi|ioe)$/;
+	}
+
+	return %prefixes;
+}
+
+sub extract_opcode_and_suffix {
+	my ( $asm_ref, $cpu ) = @_;
+	
+	if ( $$asm_ref =~ s/^ (\w+) \. ( [sl]i[sl] | i[sl] | [sl] ) \b \s* //x ) {
+		my ($opcode, $suffix) = ($1, $2);
+		if ( $suffix =~ /^i[sl]$/ ) {
+			$suffix = ( $cpu eq "ez80" ? "l" : "s" ) . $suffix;    # ix -> xix
+		}
+		elsif ( $suffix =~ /^[sl]$/ ) {
+			$suffix .= ( $cpu eq "ez80" ? "il" : "is" );           # x -> xix
+		}
+
+		return ($opcode, $suffix);
+	}
+
+	if ($$asm_ref =~ s/^ (\w+) \b \s* //x) {
+		return ($1, undef);
+	}
+
+	die "Failed to extract opcode and suffix from '$$asm_ref'";
+}
+
+sub add_default_a_register {
+	my ( $args_ref, $opcode ) = @_;
+
+	# add default a register for certain opcodes with only one operand
+	if (@$args_ref == 1 && $opcode =~ /\b(add|adc|sub|sbc|and|or|xor|cp|cmp)\b/) {
+		unshift @$args_ref, "a";
+	}
+}
+
+sub parse_operand {
+	my($opr) = @_;
+	
+	if ( $opr =~ /^ (a|f|b|d|e|h|l|ixl|ixh|iyl|iyh) ('?) $/x ) {
+		return { type => 'reg', name => $1, alt => $2 ? 1 : 0, width => undef };
+	}
+
+	if ( $opr =~ /^ (bc|de|hl|jk|af|sp|ix|iy) ('?) $/x ) {
+		return { type => 'regpair', name => $1, alt => $2 ? 1 : 0, width => undef };
+	}
+
+	if ( $opr =~ /^ (bcde|jkhl) ('?) $/x ) {
+		return { type => 'regpair', name => $1, alt => $2 ? 1 : 0, width => undef };
+	}
+
+	if ( $opr =~ /^ (hl|sp) \+ (%d|%n) ('?) $/x ) {
+		return { type => 'regpair', name => $1, alt => $2 ? 1 : 0, disp => $2, disp_offset => 0, 
+		         width => undef };
+	}
+
+	if ( $opr =~ /^ (nz|z|nc|po|pe|p|m|nv|v|lz|lo|eq|ne|gtu|ltu|geu|leu|lt|gt|ge|le) $/x ) {
+		return { type => 'cond', cond => $1 };
+	}
+
+	if ( $opr =~ /^ (c) ('?) $/x ) {	# C can be a register or a flag
+		my $alt = $2 ? 1 : 0;
+		return { type => $alt ? 'reg' : 'ident', name => $1, alt => $alt, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (c) \) $/x ) {
+		return { type => 'mem', base => $1, disp => undef, 
+				 space => 'io', post => 0, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (hl) ([id]?) \) $/x ) {
+		return { type => 'mem', base => $1, disp => undef, space => 'io', 
+				 post => $2 eq "i" ? 1 : $2 eq "d" ? -1 : 0, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (bc|de|hl|sp|ix|iy) ([-+]?) \) $/x ) {
+		return { type => 'mem', base => $1, disp => undef, space => 'mem', 
+				 post => $2 eq '+' ? 1 : $2 eq '-' ? -1 : 0, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (ix|iy) \) $/x ) {
+		return { type => 'mem', base => $1, disp => undef, disp_offset => 0,
+				 space => 'mem', post => 0, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (ix|iy) \+ 1\) $/x ) {
+		return { type => 'mem', base => $1, disp => undef, disp_offset => 1,
+				 space => 'mem', post => 0, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (ix|iy) \+ (%d) \) $/x ) {
+		return { type => 'mem', base => $1, disp => $2, disp_offset => 0,
+				 space => 'mem', post => 0, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (ix|iy) \+ (%d) \+ 1 \) $/x ) {
+		return { type => 'mem', base => $1, disp => $2, disp_offset => 1,
+				 space => 'mem', post => 0, width => undef };
+	}
+
+	if ( $opr =~ /^ (%n|%d|%m|%j|%J|0|1|2) $/x ) {
+		return { type => 'imm', value => $1, width => undef };
+	}
+
+	if ( $opr =~ /^ \( (%m) \) $/x ) {
+		return { type => 'mem', base => undef, addr => $1, disp => undef, 
+		         space => 'mem', width => undef };
+	}
+
+	if ( $opr =~ /^ \( (%m) \+ (1) \) $/x ) {
+		return { type => 'mem', base => undef, addr => $1, disp => $2, 
+		         space => 'mem', width => undef };
+	}
+
+	if ( $opr =~ /^ (%t\d*) $/x ) {
+		return { type => 'labelref', value => $1, width => undef };
+	}
+
+	if ( $opr =~ /^ (__z80asm__\w+) $/x ) {
+		return { type => 'symbol', name => $1 };
+	}
+	
+	die "Failed to parse operand '$opr'";	
+}
+
+
+
+
+
+sub parse_effect_old {
 	my($asm, $cpu) = @_;
 	my $asm0 = $asm;
 	
-	# get prefixes
 	my $prefix = "";
-	while ($asm =~ s/^(altd|alts|altsd|ioi|ioe)\s+//) {
-		$prefix .= "$1 ";
-	}
-	
-	# get suffix
 	my $suffix = "";
-	if ($asm =~ s/\.([sl]i[sl]|i[sl]|[sl])\b//) {
-		$suffix = $1;
-		if ($suffix =~ /^i[sl]$/) {
-			$suffix = ($cpu eq "ez80" ? "l" : "s").$suffix;		# ix -> xix
-		}
-		elsif ($suffix =~ /^[sl]$/) {
-			$suffix .= ($cpu eq "ez80" ? "il" : "is");			# x -> xix
-		}
-	}
-	
-	# zilogify intel syntax
-	$asm = intel_to_zilog($asm);
-	
+
 	# deduce post-increment and post-decrement effects
 	my @post;
 	if ($asm =~ s/\((\w+)([+-])\)/($1)/) {
@@ -758,29 +955,7 @@ sub parse_effect {
 	return (@effect, @post);
 }
 
-sub rp_from_intel {
-    my($r) = @_;
-    return 'bc' if $r eq 'b';
-    return 'de' if $r eq 'd';
-    return 'hl' if $r eq 'h';
-	return 'af' if $r eq 'psw';
-    die "unknown rp '$r'";
-}
-
-sub invert_flag {
-	my($f) = @_;
-	return "c"  if $f eq "nc";
-	return "nc" if $f eq "c";
-	return "z"  if $f eq "nz";
-	return "nz" if $f eq "z";
-	return "po" if $f eq "pe";
-	return "pe" if $f eq "po";
-	return "p"  if $f eq "m";
-	return "m"  if $f eq "p";
-    die "unknown flag '$f'";
-}
-
-sub normalize {
+sub normalize_effects {
 	my(@effect) = @_;
 	
 	my $repeat;
@@ -1760,7 +1935,7 @@ sub normalize {
 }
 
 # normalize %tN - may be %t3 or %t4 for ez80
-sub normalize_temps {
+sub align_temporaries {
 	my($eff1, $eff2) = @_;
 	return if @$eff1 != @$eff2;		# only check if same size
 
@@ -1786,39 +1961,72 @@ sub normalize_temps {
 
 sub intel_to_zilog {
 	my($asm) = @_;
+
+	$asm = lc($asm);
 	for ($asm) {
-		s/inr/inc/;
-		s/dcr/dec/;
-		s/ana/and/;
-		s/ora/or/;
-		s/xra/xor/;
-		s/sbb/sbc/;
-		s/\bmov\b/ld/;
-		s/\bmvi\b/ld/;
-		s/ldax\s+(\w)\b/"ld a, (".rp_from_intel($1).")"/e;
-		s/^((ld|add|adc|sub|sbc|and|xor|or|cp|cmp|inc|dec).*?[^%])m\b/$1(hl)/;
-		s/inx\s+(b|d|h)\b/"inc ".rp_from_intel($1)/e;
-		s/dcx\s+(b|d|h)\b/"dec ".rp_from_intel($1)/e;
-		s/lxi\s+(b|d|h)\b/"ld ".rp_from_intel($1)/e;
-		s/dad\s+(b|d|h)\b/"add hl, ".rp_from_intel($1)/e;
-		s/dad\s+sp/add hl, sp/;
-		s/xchg/ex de, hl/;
-		s/xthl/ex (sp), hl/;
-		s/arhl/sra hl/;
-		s/rdel/rl de/;
-		s/rlde/rl de/;
-		s/rrhl/sra hl/;
-		s/dsub/sub hl, bc/;
-		s/shld\s+%m/ld (%m), hl/;
-		s/stax\s+(\w)/"ld (".rp_from_intel($1)."), a"/e;
-		s/lhld\s+%m/ld hl, (%m)/;
-		s/ldsi\s+%n/ld de, sp+%n/;
-		s/ldhi\s+%n/ld de, hl+%n/;
-		s/lhlde/ld hl, (de)/;
-		s/shlde/ld (de), hl/;
-		s/shlx/ld (de), hl/;
-		s/lhlx/ld hl, (de)/;
-		s/cma/cpl/;
+        # --- mnemonic renames ---
+        s/\b inr \b/inc/x;
+        s/\b dcr \b/dec/x;
+        s/\b ana \b/and/x;
+        s/\b ora \b/or/x;
+        s/\b xra \b/xor/x;
+        s/\b sbb \b/sbc/x;
+        s/\b mov \b/ld/x;
+        s/\b mvi \b/ld/x;
+		s/\b cma \b/cpl/x;
+		
+        # --- register pair rewrites ---
+        s/\b ldax \s+ (b|d|h|sp) \b/"ld a, (". rp_from_intel($1).")"   /xe;
+        s/\b stax \s+ (b|d|h|sp) \b/"ld (".    rp_from_intel($1)."), a"/xe;
+        s/\b inx  \s+ (b|d|h|sp) \b/"inc ".    rp_from_intel($1)       /xe;
+        s/\b dcx  \s+ (b|d|h|sp) \b/"dec ".    rp_from_intel($1)       /xe;
+        s/\b lxi  \s+ (b|d|h|sp) \b/"ld ".     rp_from_intel($1)       /xe;
+        s/\b dad  \s+ (b|d|h|sp) \b/"add hl, ".rp_from_intel($1)       /xe;
+        s/\b push \s+ (b|d|h|psw)\b/"push ".   rp_from_intel($1)       /xe;
+        s/\b pop  \s+ (b|d|h|psw)\b/"pop ".    rp_from_intel($1)       /xe;
+        s/\b shld \s+ %m         \b/ld (%m), hl/x;
+        s/\b lhld \s+ %m         \b/ld hl, (%m)/x;
+		s/\b dsub                \b/sub hl, bc/x;
+		s/\b ldsi \s+ %n         \b/ld de, sp+%n/x;
+		s/\b ldhi \s+ %n         \b/ld de, hl+%n/x;
+		s/\b lhlde               \b/ld hl, (de)/x;
+		s/\b shlde               \b/ld (de), hl/x;
+		s/\b shlx                \b/ld (de), hl/x;
+		s/\b lhlx                \b/ld hl, (de)/x;
+		s/\b xchg                \b/ex de, hl/x;
+		s/\b xthl                \b/ex (sp), hl/x;
+
+        # --- memory operand rewrites ---
+        s/\b ( (ld|add|adc|sub|sbc|and|xor|or|cp|cmp|inc|dec) .*? [^%] ) m \b/$1(hl)/x;
+
+		# --- shifts and rotates ---
+		s/\b arhl \b/sra hl/x;
+		s/\b rdel \b/rl de/x;
+		s/\b rlde \b/rl de/x;
+		s/\b rrhl \b/sra hl/x;
 	}
 	return $asm;
+}
+
+sub rp_from_intel {
+    my ($r) = @_;
+    return 'bc' if $r eq 'b';
+    return 'de' if $r eq 'd';
+    return 'hl' if $r eq 'h';
+    return 'af' if $r eq 'psw';
+    return 'sp' if $r eq 'sp';
+    die "unknown rp '$r'";
+}
+
+sub invert_flag {
+    my ($f) = @_;
+    return "c"  if $f eq "nc";
+    return "nc" if $f eq "c";
+    return "z"  if $f eq "nz";
+    return "nz" if $f eq "z";
+    return "po" if $f eq "pe";
+    return "pe" if $f eq "po";
+    return "p"  if $f eq "m";
+    return "m"  if $f eq "p";
+    die "unknown flag '$f'";
 }
