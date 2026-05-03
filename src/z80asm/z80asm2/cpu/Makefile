@@ -18,9 +18,11 @@ opcodes.txt: dump_opcodes.pl opcodes.dat Opcodes.pm Makefile
 	dos2unix opcodes.txt
 
 synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
-	perl make_synthetic.pl opcodes.dat synthetic.dat
-	dos2unix synthetic.dat
-	perl validate_synthetic.pl synthetic.dat
+	$(RM) synthetic.dat
+	perl make_synthetic.pl opcodes.dat synthetic.dat.tmp
+	dos2unix synthetic.dat.tmp
+	perl validate_synthetic.pl synthetic.dat.tmp
+	mv synthetic.dat.tmp synthetic.dat
 
 ../opcodes_trie_token.h ../opcodes_trie_token.cpp &: \
 		make_trie_token.pl Makefile \

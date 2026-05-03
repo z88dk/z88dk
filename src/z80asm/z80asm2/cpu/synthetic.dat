@@ -12350,28 +12350,28 @@ neg hl|z80|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
 neg hl|z80n|push af;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;pop af
 neg ix|ez80|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
 neg ix|ez80_z80|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
-neg ix|kc160|push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl
-neg ix|kc160_z80|push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl
-neg ix|r2ka|push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl
-neg ix|r3k|push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl
-neg ix|r4k|push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl
-neg ix|r5k|push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl
-neg ix|r6k|push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl
+neg ix|kc160|push af;push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
+neg ix|kc160_z80|push af;push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
+neg ix|r2ka|push af;push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
+neg ix|r3k|push af;push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
+neg ix|r4k|push af;push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
+neg ix|r5k|push af;push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
+neg ix|r6k|push af;push hl;push ix;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
 neg ix|r800|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
-neg ix|z180|push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl
+neg ix|z180|push af;push hl;push ix;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop ix;pop hl;pop af
 neg ix|z80|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
 neg ix|z80n|push af;ld a, ixh;cpl;ld ixh, a;ld a, ixl;cpl;ld ixl, a;inc ix;pop af
 neg iy|ez80|push af;ld a, iyh;cpl;ld iyh, a;ld a, iyl;cpl;ld iyl, a;inc iy;pop af
 neg iy|ez80_z80|push af;ld a, iyh;cpl;ld iyh, a;ld a, iyl;cpl;ld iyl, a;inc iy;pop af
-neg iy|kc160|push hl;push iy;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop iy;pop hl
-neg iy|kc160_z80|push hl;push iy;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop iy;pop hl
-neg iy|r2ka|push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl
-neg iy|r3k|push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl
-neg iy|r4k|push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl
-neg iy|r5k|push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl
-neg iy|r6k|push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl
+neg iy|kc160|push af;push hl;push iy;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
+neg iy|kc160_z80|push af;push hl;push iy;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
+neg iy|r2ka|push af;push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
+neg iy|r3k|push af;push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
+neg iy|r4k|push af;push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
+neg iy|r5k|push af;push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
+neg iy|r6k|push af;push hl;push iy;pop hl;ld a, h;cpl a;ld h, a;ld a, l;cpl a;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
 neg iy|r800|push af;ld a, iyh;cpl;ld iyh, a;ld a, iyl;cpl;ld iyl, a;inc iy;pop af
-neg iy|z180|push hl;push iy;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop iy;pop hl
+neg iy|z180|push af;push hl;push iy;pop hl;ld a, h;cpl;ld h, a;ld a, l;cpl;ld l, a;inc hl;push hl;pop iy;pop hl;pop af
 neg iy|z80|push af;ld a, iyh;cpl;ld iyh, a;ld a, iyl;cpl;ld iyl, a;inc iy;pop af
 neg iy|z80n|push af;ld a, iyh;cpl;ld iyh, a;ld a, iyl;cpl;ld iyl, a;inc iy;pop af
 neg l|8080|push psw;mov a, l;cma;mov l, a;inr l;pop psw
