@@ -9,12 +9,9 @@ mkdir("$test.dir");
 unlink("$test.dir/$test.asm");
 path("$test.dir/$test.o")->spew("");
 
-my $dir = path($0)->dirname;
+my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
-capture_ok(
-    "z88dk-z80asm -v -I$test.dir -dump-after-cmdline $test.asm",
-    "$dir/expected/$self.txt"
-);
+capture_ok( "z88dk-z80asm -v -I$test.dir -dump-after-cmdline $test.asm", "$dir/expected/$self.txt" );
 
 path("$test.dir")->remove_tree;
 unlink_testfiles;

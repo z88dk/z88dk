@@ -35,7 +35,8 @@ DEPENDS := $(OBJS:.o=.d)
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
 		  --max-code-length=100 --lineend=linux --formatted \
-		  --recursive "*.cpp" "*.h" "*.re"
+		  --recursive
+PERLTIDY = perltidy --indent-columns=4 --continuation-indentation=4 --maximum-line-length=120 -b
 
 all: $(PROJ)$(EXE)
 
@@ -70,8 +71,9 @@ opcodes_synth_trie.h opcodes_synth_trie.cpp &: \
 test:: $(PROJ)$(EXE)
 	perl -S prove -j9 --state=slow,save t/*.t t/*/*.t
 
-astyle:
-	$(ASTYLE)
+tidy:
+	$(ASTYLE) "*.cpp" "*.h" "*.re"
+	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) -exec $(PERLTIDY) -b {} +
 
 cloc:
 	perl -S cloc --fullpath .
