@@ -18,8 +18,9 @@
     PUBLIC      generic_console_set_paper
     PUBLIC      generic_console_set_attribute
     PUBLIC      generic_console_plotc
-    PUBLIC      h19_backbuffer
-    PUBLIC      h19_xypos
+    PUBLIC      generic_console_pointxy
+    ;PUBLIC      h19_backbuffer
+    ;PUBLIC      h19_xypos
 
     EXTERN      CONSOLE_COLUMNS
     EXTERN      CONSOLE_ROWS
@@ -35,9 +36,9 @@
 generic_console_set_attribute:
         ; Set text attribute (underline, inverse)
     rra
-    ld      a,'q'
+    ld      a,'q'      ; Inverse OFF
     jr      nc, noinv
-    dec     a
+    dec     a          ; Inverse ON
 noinv:
     push    af
     ld      a,27
@@ -76,6 +77,13 @@ generic_console_cls:
     ld  bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS) - 1
     ld  (hl),0
     ldir
+
+    ld      a,27
+    rst     38h
+    defb    SCOUT
+    ld      a,'q'      ; Inverse OFF
+    rst     38h
+    defb    SCOUT
 
     ld  a,27        ; clear screen/home cursor
     rst    38h
@@ -259,59 +267,6 @@ generic_console_printc:
     push    bc
     call    h19_xypos
     ld      (hl),a
-;
-;   ; cursor home
-    ld      a, 27
-    rst    38h
-    defb   SCOUT
-    ld      a, 'H'
-    rst    38h
-    defb   SCOUT
-
-;    pop    bc
-;    push   bc
-;
-;    xor a
-;    or b
-;    jr z,row0
-;yloop:
-;    xor a
-;    rst    38h
-;    defb   SCOUT
-;    push   bc
-;    ld     a, 27
-;    rst    38h
-;    defb   SCOUT
-;    ld      a, 'B'
-;    rst    38h
-;    defb   SCOUT
-;    pop    bc
-;    dec b
-;    jr nz,yloop
-;
-;row0:
-;
-;    pop    bc
-;    xor a
-;    or c
-;    jr z,column0
-;xloop:
-;    xor a
-;    rst    38h
-;    defb   SCOUT
-;    push   bc
-;    ld     a, 27
-;    rst    38h
-;    defb   SCOUT
-;    ld      a, 'C'
-;    rst    38h
-;    defb   SCOUT
-;    pop    bc
-;    dec c
-;    jr nz,xloop
-;
-;column0:
-
 
    ; cursor pos
     ld     a, 27
@@ -372,20 +327,103 @@ graphics:
 ;Exit:  nc = success
 ;        a = character,
 ;        c = failure
+generic_console_pointxy:
 generic_console_vpeek:
     call    h19_xypos
     ld  a,(hl)
     and a
     ret
 
+
 ; c = x
 ; b = y
 ; a = d = character to print
 ; e = raw
 generic_console_plotc:
+    push    af
+    push    bc
     call    h19_xypos
-    ld      (hl), d
+    ld      (hl),a
+
+   ; cursor pos
+    ld     a, 27
+    rst    38h
+    defb   SCOUT
+    ld      a, 'Y'
+    rst    38h
+    defb   SCOUT
+
+    pop    bc
+    push   bc
+    ld     a,32
+    add    b
+    rst    38h
+    defb   SCOUT
+
+    pop    bc
+    ld     a,32
+    add    c
+    rst    38h
+    defb   SCOUT
+
+    ; inverse ON/OFF
+    ld      a,27
+    rst    38h
+    defb   SCOUT
+
+    pop    af
+    ; Test inverse symbol flag (for graphics we use bit 6)
+    ld     e,a
+    and    64
+    push   de
+    ld      a,'q'  ; Inverse OFF
+    jr     z,no_inv
+    dec    a       ; Inverse ON
+no_inv:
+    rst    38h
+    defb   SCOUT
+    pop    de
+    ld     a,e
+
+    ; Now remove the 'inverse' flag and deal with the character/symbol
+    and    10111111b  ; reset bit 6
+
+    cp     128
+    jr     nc,g_graphics
+    rst    38h
+    defb   SCOUT
+    
+    ;ld      a,'q'  ; Inverse OFF
+    ;rst    38h
+    ;defb   SCOUT
     ret
+
+g_graphics:
+    push   af
+    ld      a, 27                       ; ESC
+    rst     38h
+    defb    SCOUT
+    ld      a, 'F'                      ; "enter graphics mode"
+    rst     38h
+    defb    SCOUT
+
+    pop     af
+    sub     34                          ; remap to graphics symbols. 128 -> 94, and so on
+    rst     38h
+    defb    SCOUT
+    
+    ld      a, 27                       ; ESC
+    rst     38h
+    defb    SCOUT
+    ld      a, 'G'                      ; "exit graphics mode"
+    rst     38h
+    defb    SCOUT
+    ;ld      a,'q'  ; Inverse OFF
+    ;rst    38h
+    ;defb   SCOUT
+    ret
+
+
 
 h19_xypos:
     ld      hl,h19_backbuffer - CONSOLE_COLUMNS
@@ -399,9 +437,8 @@ generic_console_printc_3:
     ret
 
 
+
     SECTION bss_clib
 
 h19_backbuffer:    
     defs    80 * 25
-
-
