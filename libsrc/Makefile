@@ -1360,7 +1360,7 @@ hdos_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building Heath/Zenith HDOS ---'
 	@echo ''
-	$(call buildgeneric,hdos,"gencon narrow")
+	$(call buildgeneric,hdos,"gencon text6 narrow")
 	$(MAKE) -C target/hdos
 	TARGET=hdos TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhdos -x$(OUTPUT_DIRECTORY)/hdos_clib @$(TARGET_DIRECTORY)/hdos/hdos.lst
 
