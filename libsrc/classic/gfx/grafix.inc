@@ -223,16 +223,25 @@ IF FORgeminihr
 ENDIF
 
 
-
 IF FORgl6000
     defc    _GFX_MAXX    = 240
     defc    _GFX_MAXY    = 100
 ENDIF
 
+
 IF FORh19
     defc    _GFX_MAXX    = 80
     defc    _GFX_MAXY    = 72
 ENDIF
+
+IF FORhdos
+    defc    _GFX_MAXX    = 80
+    defc    _GFX_MAXY    = 75
+    defc    _GFX_TEXT_BLANK_CHAR = 32
+    defc    _GFX_GENCON_USEPLOTC  = 1        ; We call generic_console_plotc, not _printc for text mode
+    defc    _GFX_GENCON_PIXEL3    = 1
+ENDIF
+
 
 IF FORhector1
    DEFINE  _GFX_LINE_NOCLIP
