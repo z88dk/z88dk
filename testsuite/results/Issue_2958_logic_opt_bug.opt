@@ -1,0 +1,156 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._main
+	ld	hl,_processed_chars+1
+	ld	d,h
+	ld	e,l
+	ld	a,2
+	ld	(de),a
+	ld	hl,__sgoioblk+10
+	push	hl
+	ld	hl,i_1+0
+	push	hl
+	ld	hl,(_local_use_cb)
+	push	hl
+	ld	a,(_processed_chars)
+	cp	1
+	jp	nz,i_6	;
+	ld	a,(_processed_chars+1)
+	and	a
+	jp	nz,i_6	;
+	ld	hl,1	;const
+	jp	i_6_i_7
+.i_6
+	ld	hl,0
+	jp	i_8
+.i_6_i_7
+	ld	hl,i_1+19
+	jp	i_9	;
+.i_8
+	ld	hl,i_1+18
+.i_9
+	push	hl
+	ld	a,4
+	call	fprintf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+	SECTION	rodata_compiler
+.i_1
+	defm	" %d-bit character%s"
+	defb	0
+
+
+
+	SECTION	bss_compiler
+._processed_chars	defs	2
+._local_use_cb	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	getarg
+	GLOBAL	open
+	GLOBAL	creat
+	GLOBAL	close
+	GLOBAL	read
+	GLOBAL	write
+	GLOBAL	lseek
+	GLOBAL	readbyte
+	GLOBAL	writebyte
+	GLOBAL	fsync
+	GLOBAL	getcwd
+	GLOBAL	chdir
+	GLOBAL	getwd
+	GLOBAL	rmdir
+	GLOBAL	__RND_BLOCKSIZE
+	GLOBAL	rnd_loadblock
+	GLOBAL	rnd_saveblock
+	GLOBAL	rnd_erase
+	GLOBAL	rnd_erase_fastcall
+	GLOBAL	__FOPEN_MAX
+	GLOBAL	__sgoioblk
+	GLOBAL	__sgoioblk_end
+	GLOBAL	fopen_zsock
+	GLOBAL	fileno
+	GLOBAL	fopen
+	GLOBAL	freopen
+	GLOBAL	fdopen
+	GLOBAL	_freopen1
+	GLOBAL	fmemopen
+	GLOBAL	funopen
+	GLOBAL	fclose
+	GLOBAL	fflush
+	GLOBAL	closeall
+	GLOBAL	fgets
+	GLOBAL	fputs
+	GLOBAL	fputs_callee
+	GLOBAL	fputc
+	GLOBAL	fputc_callee
+	GLOBAL	fgetc
+	GLOBAL	ungetc
+	GLOBAL	feof
+	GLOBAL	feof_fastcall
+	GLOBAL	ferror
+	GLOBAL	ferror_fastcall
+	GLOBAL	puts
+	GLOBAL	ftell
+	GLOBAL	fgetpos
+	GLOBAL	fseek
+	GLOBAL	fread
+	GLOBAL	fwrite
+	GLOBAL	gets
+	GLOBAL	printf
+	GLOBAL	fprintf
+	GLOBAL	sprintf
+	GLOBAL	snprintf
+	GLOBAL	vfprintf
+	GLOBAL	vsnprintf
+	GLOBAL	sprintff
+	GLOBAL	snprintff
+	GLOBAL	vsnprintff
+	GLOBAL	printn
+	GLOBAL	scanf
+	GLOBAL	fscanf
+	GLOBAL	sscanf
+	GLOBAL	vfscanf
+	GLOBAL	vsscanf
+	GLOBAL	fchkstd
+	GLOBAL	fgetc_cons
+	GLOBAL	fgetc_cons_inkey
+	GLOBAL	fputc_cons
+	GLOBAL	fgets_cons
+	GLOBAL	puts_cons
+	GLOBAL	fabandon
+	GLOBAL	fdtell
+	GLOBAL	fdgetpos
+	GLOBAL	rename
+	GLOBAL	remove
+	GLOBAL	getk
+	GLOBAL	getk_inkey
+	GLOBAL	printk
+	GLOBAL	perror
+	GLOBAL	set_fputc_cons
+	GLOBAL	fputc_cons_native
+	GLOBAL	fputc_cons_generic
+	GLOBAL	fputc_cons_ansi
+	GLOBAL	_main
+
+
+
+

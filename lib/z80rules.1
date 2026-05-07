@@ -4094,6 +4094,7 @@ $notcpu 8085
 	jp	%2,%3	;%5
 	ld	hl,%4
 
+%title Cleanup for comparison
 	call	l_gchar
 	ld	a,l
 	cp	%1
@@ -7305,3 +7306,38 @@ $notcpu 8085
 	ld	e,l
 	inc	hl
 	inc	hl
+
+%title Bitfields top 4 bits
+	ld	de,%1	;const
+	ex	de,hl
+	ld	a,l
+	rrca
+	rrca
+	rrca
+	rrca
+	and	240
+	ld	l,a
+	ld	a,(de)
+	and	15
+	or	l
+	ld	(de),a
+=
+	ld	a,(hl)
+	and	15
+	or	%eval(%1 16 * 256 %% 240 &)
+	ld	(hl),a
+
+%title Cleanup boolean (introduced via 2958)
+	ld	hl,1	;const
+	jr	%1
+.%2
+	ld	hl,0	;const
+.%1
+	jp	nc,%4	;
+=
+	ld	hl,1	;const
+	jp	%2_%1
+.%2
+	ld	hl,0
+	jp	%4
+.%2_%1
