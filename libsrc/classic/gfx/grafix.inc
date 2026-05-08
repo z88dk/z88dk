@@ -235,13 +235,14 @@ IF FORh19
 ENDIF
 
 IF FORhdos
-    defc    _GFX_MAXX    = 80
-    defc    _GFX_MAXY    = 75
+;    defc    _GFX_MAXX    = 80
+;    defc    _GFX_MAXY    = 75
+;    defc    _GFX_GENCON_PIXEL3    = 1
+    defc    _GFX_MAXX    = 160
+    defc    _GFX_MAXY    = 50
     defc    _GFX_TEXT_BLANK_CHAR = 32
     defc    _GFX_GENCON_USEPLOTC  = 1        ; We call generic_console_plotc, not _printc for text mode
-    defc    _GFX_GENCON_PIXEL3    = 1
 ENDIF
-
 
 IF FORhector1
    DEFINE  _GFX_LINE_NOCLIP
