@@ -50,5 +50,5 @@ target/hdos/fcntl/obj/${TYPE}/is_empty_dirent
 target/hdos/time/obj/${TYPE}/clock
 target/hdos/time/obj/${TYPE}/time
 @classic/stdio/stdio_binary.lst
-target/hdos/graphics/obj/${TYPE}/textpixl3
-@classic/gfx/gencon/gfx_gencon6.lst
+target/hdos/graphics/obj/${TYPE}/textpixl
+@classic/gfx/gencon/gfx_gencon.lst
