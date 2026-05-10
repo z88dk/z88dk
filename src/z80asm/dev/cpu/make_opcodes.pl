@@ -117,9 +117,6 @@ sub cpu_flags {
 	if ($cpu =~ /gbz80/) {
 		return ('nz', 'z', 'nc', 'c');
 	}
-	elsif ($cpu =~ /r[23]]k/) {
-		return ('nz', 'z', 'nc', 'c', 'po', 'pe', 'lz', 'lo', 'nv', 'v', 'p', 'm');
-	}
 	elsif ($cpu =~ /r\dk/) {
 		return ('nz', 'z', 'nc', 'c', 'po', 'pe', 'lz', 'lo', 'p', 'm');
 	}
