@@ -749,9 +749,11 @@ for my $cpu (Opcode->cpus) {
 					"ld a, ${x}h : cpl : ld ${x}h, a : ld a, ${x}l : cpl : ld ${x}l, a : inc $x",
 					"pop af");
 		add_synth($cpu, "neg $x", 
+                    "push af",
 					"push hl : push $x : pop hl",
 					"ld a, h : cpl : ld h, a : ld a, l : cpl : ld l, a : inc hl",
-					"push hl : pop $x : pop hl");
+					"push hl : pop $x : pop hl",
+					"pop af");
 	}
 
 	# DAA

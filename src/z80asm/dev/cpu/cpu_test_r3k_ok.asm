@@ -7748,8 +7748,8 @@
  neg e                          ; F5 7B 2F 5F 1C F1
  neg h                          ; F5 7C 2F 67 24 F1
  neg hl                         ; F5 7C 2F 67 7D 2F 6F 23 F1
- neg ix                         ; E5 DD E5 E1 7C 2F 67 7D 2F 6F 23 E5 DD E1 E1
- neg iy                         ; E5 FD E5 E1 7C 2F 67 7D 2F 6F 23 E5 FD E1 E1
+ neg ix                         ; F5 E5 DD E5 E1 7C 2F 67 7D 2F 6F 23 E5 DD E1 E1 F1
+ neg iy                         ; F5 E5 FD E5 E1 7C 2F 67 7D 2F 6F 23 E5 FD E1 E1 F1
  neg l                          ; F5 7D 2F 6F 2C F1
  nop                            ; 00
  or (hl)                        ; B6

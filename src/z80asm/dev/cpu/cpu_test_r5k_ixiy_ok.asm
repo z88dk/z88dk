@@ -9736,8 +9736,8 @@
  neg h                          ; F5 7F 7C 2F 7F 67 24 F1
  neg hl                         ; 4D
  neg hl'                        ; 76 4D
- neg ix                         ; E5 FD E5 E1 7F 7C 2F 7F 67 7F 7D 2F 7F 6F 23 E5 FD E1 E1
- neg iy                         ; E5 DD E5 E1 7F 7C 2F 7F 67 7F 7D 2F 7F 6F 23 E5 DD E1 E1
+ neg ix                         ; F5 E5 FD E5 E1 7F 7C 2F 7F 67 7F 7D 2F 7F 6F 23 E5 FD E1 E1 F1
+ neg iy                         ; F5 E5 DD E5 E1 7F 7C 2F 7F 67 7F 7D 2F 7F 6F 23 E5 DD E1 E1 F1
  neg jkhl                       ; FD 4D
  neg jkhl'                      ; 76 FD 4D
  neg l                          ; F5 7F 7D 2F 7F 6F 2C F1
@@ -9892,12 +9892,12 @@
  r_m                            ; F8
  r_nc                           ; D0
  r_ne                           ; C0
- r_nv                           ; BA 56 99 C9
+ r_nv                           ; BA 5A 99 C9
  r_nz                           ; C0
  r_p                            ; F0
  r_pe                           ; E8
  r_po                           ; E0
- r_v                            ; BA 5F 99 18 01 C9
+ r_v                            ; BA 63 99 18 01 C9
  r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
@@ -10101,12 +10101,12 @@
  ret m                          ; F8
  ret nc                         ; D0
  ret ne                         ; C0
- ret nv                         ; BA A3 9B C9
+ ret nv                         ; BA A7 9B C9
  ret nz                         ; C0
  ret p                          ; F0
  ret pe                         ; E8
  ret po                         ; E0
- ret v                          ; BA AC 9B 18 01 C9
+ ret v                          ; BA B0 9B 18 01 C9
  ret z                          ; C8
  reti                           ; ED 4D
  rgeu                           ; D0
@@ -10209,7 +10209,7 @@
  rm                             ; F8
  rnc                            ; D0
  rne                            ; C0
- rnv                            ; BA A8 9C C9
+ rnv                            ; BA AC 9C C9
  rnz                            ; C0
  rp                             ; F0
  rpe                            ; E8
@@ -10312,7 +10312,7 @@
  rst 32                         ; E7
  rst 40                         ; EF
  rst 56                         ; FF
- rv                             ; BA A5 9D 18 01 C9
+ rv                             ; BA A9 9D 18 01 C9
  rz                             ; C8
  sbb a                          ; 7F 9F
  sbb b                          ; 7F 98
