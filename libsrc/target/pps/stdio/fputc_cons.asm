@@ -35,16 +35,15 @@ fputc_cons_native:
     rst     $10
     jr      fputc_exit
 fputc_cons1:
-  IF    STANDARDESCAPECHARS
-    cp      10
-  ELSE
-    cp      13
-  ENDIF
+    ; DSS PUTCHAR treats CR and LF as independent cursor controls.
+    ; C '\n' is LF with the +pps default -Cc-standard-escape-chars;
+    ; emit CR first so the next line starts at column 0.
+    cp      10                          ;LF?
     jr      nz, fputc_cons2
-    ld      a, 10
+    ld      a, 13
     ld      c, $5b                      ;PUTCHAR
     rst     $10
-    ld      a, 13
+    ld      a, 10
 fputc_cons2:
     ld      c, $5b                      ;PUTCHAR
     rst     $10
