@@ -25,7 +25,7 @@ $(BUILD_DIR)/clear: clear_screen.c | $(BUILD_DIR)
 	$(ZCC) +pps $(ZCFLAGS) $< -o $@
 
 $(BUILD_DIR)/hello_low: hello.c | $(BUILD_DIR)
-	$(ZCC) +pps_low $(ZCFLAGS) $< -o $@
+	$(ZCC) +pps -subtype=low $(ZCFLAGS) $< -o $@
 
 clean:
 	$(RM) -r $(BUILD_DIR)

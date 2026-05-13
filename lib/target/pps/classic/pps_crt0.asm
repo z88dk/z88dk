@@ -28,14 +28,6 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $8100
 ENDIF
 
-; CRT_STACK is the SP value DSS loads before calling our entry point.
-; The default stack at the top of WIN2 matches the standard $8100
-; layout. Low-memory builds in WIN1 can override it to keep the stack
-; in memory owned by the program.
-IF      !DEFINED_CRT_STACK
-	defc    CRT_STACK = $BFFF
-ENDIF
-
     defc    CONSOLE_ROWS = 32
     defc    CONSOLE_COLUMNS = 80
 
@@ -45,7 +37,8 @@ ENDIF
     ; changes the user's current console colours.
     defc	TAR__fputc_cons_generic = 0
     defc    TAR__clib_exit_stack_size = 32
-    defc    TAR__register_sp = -1
+    ; REGISTER_SP is also written into the DSS EXE header below.
+    defc    TAR__register_sp = $BFFF
     defc	__CPU_CLOCK = 6000000
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -60,7 +53,7 @@ ENDIF
     defw    0       ;Reserved
     defw    start       ;Loading address
     defw    start       ;Starting address
-    defw    CRT_STACK   ;Stack
+    defw    __register_sp ;Stack
     defs    490         ;Reserved space
 
 

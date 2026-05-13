@@ -17,12 +17,12 @@ Copy the result to a DSS disk image or FAT media as an 8.3 EXE name.
 | Target | Code | Stack | Use case |
 | ------ | ---- | ----- | -------- |
 | `+pps` | `$8100` | `$BFFF` | Default program loaded into WIN2. |
-| `+pps_low` | `$4100` | `$7FFF` | Low-origin layout starting in WIN1. |
+| `+pps -subtype=low` | `$4100` | `$7FFF` | Low-origin layout starting in WIN1. |
 
-`+pps_low` is the same crt0 with:
+The `low` subtype applies:
 
 ```sh
--pragma-define:CRT_ORG_CODE=0x4100 -pragma-define:CRT_STACK=0x7FFF
+-pragma-define:CRT_ORG_CODE=0x4100 -pragma-define:REGISTER_SP=0x7FFF
 ```
 
 This only changes where the program starts and where the initial stack
@@ -34,13 +34,13 @@ one 16 KB window, choose the stack address explicitly. For example:
 ```sh
 zcc +pps -clib=default -create-app \
     -pragma-define:CRT_ORG_CODE=0x4100 \
-    -pragma-define:CRT_STACK=0xBFFF \
+    -pragma-define:REGISTER_SP=0xBFFF \
     big.c -o big
 ```
 
-The important part is not the exact value above, but that `CRT_STACK`
+The important part is not the exact value above, but that `REGISTER_SP`
 must be compatible with the program's code, data and heap. If the image
-or heap can grow through `$7FFF`, do not use the `+pps_low` stack
+or heap can grow through `$7FFF`, do not use the `low` subtype stack
 unchanged.
 
 ## Startup Screen
