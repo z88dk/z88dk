@@ -1,32 +1,32 @@
 % z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/error_syntax.lst t/05-expr//input/empty.asm
-t/05-expr/input/error_syntax.lst:1:9: error: Expected a value, got "\n"
+t/05-expr/input/error_syntax.lst:1:8: error: Unterminated expression after "+"
     -DE00=1+
-            ^
+           ^
 t/05-expr/input/error_syntax.lst:2:7: error: Expected a value, got "*"
     -DE01=*3
           ^
-t/05-expr/input/error_syntax.lst:3:10: error: Expected a value, got "\n"
+t/05-expr/input/error_syntax.lst:3:8: error: Unterminated expression after "**"
     -DE02=1**
-             ^
-t/05-expr/input/error_syntax.lst:4:11: error: Missing ')' after token "2"
+           ^
+t/05-expr/input/error_syntax.lst:4:10: error: Missing ')' after token "2"
     -DE03=(1+2
-              ^
-t/05-expr/input/error_syntax.lst:5:10: error: Operator expected after token "2", got ")"
+             ^
+t/05-expr/input/error_syntax.lst:5:10: error: Unexpected token after expression: ")"
     -DE04=1+2)
              ^
-t/05-expr/input/error_syntax.lst:6:11: error: Missing ')' after token ")"
+t/05-expr/input/error_syntax.lst:6:10: error: Missing ')' after token ")"
     -DE05=((3)
-              ^
-t/05-expr/input/error_syntax.lst:7:12: error: Expected a value, got ")"
+             ^
+t/05-expr/input/error_syntax.lst:7:11: error: Unterminated expression after "*"
     -DE06=3+(4*)
-               ^
-t/05-expr/input/error_syntax.lst:8:8: error: Operator expected after token "3", got "$ff"
+              ^
+t/05-expr/input/error_syntax.lst:8:8: error: Unexpected token after expression: "$ff"
     -DE07=3$ff
            ^
 t/05-expr/input/error_syntax.lst:9:7: error: Expected a value, got "||"
     -DE08=||5
           ^
-t/05-expr/input/error_syntax.lst:10:10: error: Operator expected after token "3", got "#"
+t/05-expr/input/error_syntax.lst:10:10: error: Unexpected token after expression: "#"
     -DE09=2+3#
              ^
 Define constant: __CPU_ZILOG__ = 1

@@ -31,8 +31,8 @@ synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
 	dos2unix ../opcodes_trie_token.h ../opcodes_trie_token.cpp
 
 ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp &: \
-		make_synth_trie.pl Makefile \
+		make_synth_trie.pl synthetic.dat ../opcodes_trie_token.h Trie.pm Makefile \
 		../opcodes_trie_token.h \
 		opcodes.dat
-	perl make_synth_trie.pl opcodes_synth_trie
+	perl make_synth_trie.pl synthetic.dat ../opcodes_trie_token.h opcodes_synth_trie
 	dos2unix ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp
