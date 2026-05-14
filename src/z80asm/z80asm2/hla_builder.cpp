@@ -50,7 +50,7 @@ bool HLA_ProgramBuilder::handle_directive(ParseLine& line) {
     line.pos++; // consume directive
     auto it = HLA_ProgramBuilder::directive_handlers.find(kw);
     if (it == HLA_ProgramBuilder::directive_handlers.end()) {
-        g_diag.error(kw_loc, "Unsupported HLA directive: " + keyword_to_string(kw));
+        g_diag.error(kw_loc, "Unsupported HLA directive: " + to_string(kw));
         return false;
     }
 
@@ -63,7 +63,7 @@ std::unique_ptr<HLA_Program> HLA_ProgramBuilder::finish() {
     if (!stack.empty()) {
         auto node = stack.back().node;
         g_diag.error(node->loc,
-                     "Unclosed HLA construct " + keyword_to_string(node->kw));
+                     "Unclosed HLA construct " + to_string(node->kw));
     }
 
     auto program = std::make_unique<HLA_Program>();
@@ -121,14 +121,14 @@ void HLA_ProgramBuilder::handle_if(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_elseif(Keyword kw, const SourceLoc& kw_loc,
                                        ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_if()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without IF");
+        g_diag.error(kw_loc, to_string(kw) + " without IF");
         return;
     }
 
     auto node = dynamic_cast<HLA_If*>(stack.back().node);
     assert(node);
     if (node->found_else) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " invalid after ELSE");
+        g_diag.error(kw_loc, to_string(kw) + " invalid after ELSE");
         g_diag.note(node->else_loc, "ELSE definition");
         return;
     }
@@ -153,7 +153,7 @@ void HLA_ProgramBuilder::handle_elseif(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_else(Keyword kw, const SourceLoc& kw_loc,
                                      ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_if()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without IF");
+        g_diag.error(kw_loc, to_string(kw) + " without IF");
         return;
     }
     if (!line.check_end_of_line(kw)) {
@@ -163,7 +163,7 @@ void HLA_ProgramBuilder::handle_else(Keyword kw, const SourceLoc& kw_loc,
     auto node = dynamic_cast<HLA_If*>(stack.back().node);
     assert(node);
     if (node->found_else) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " already defined");
+        g_diag.error(kw_loc, to_string(kw) + " already defined");
         g_diag.note(node->else_loc, "Previous definition");
         return;
     }
@@ -175,7 +175,7 @@ void HLA_ProgramBuilder::handle_else(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_endif(Keyword kw, const SourceLoc& kw_loc,
                                       ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_if()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without IF");
+        g_diag.error(kw_loc, to_string(kw) + " without IF");
         return;
     }
 
@@ -213,7 +213,7 @@ void HLA_ProgramBuilder::handle_while(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_endwhile(Keyword kw, const SourceLoc& kw_loc,
         ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_while()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without WHILE");
+        g_diag.error(kw_loc, to_string(kw) + " without WHILE");
         return;
     }
 
@@ -245,7 +245,7 @@ void HLA_ProgramBuilder::handle_repeat(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_until(Keyword kw, const SourceLoc& kw_loc,
                                       ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_repeat()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without REPEAT");
+        g_diag.error(kw_loc, to_string(kw) + " without REPEAT");
         return;
     }
 
@@ -269,7 +269,7 @@ void HLA_ProgramBuilder::handle_until(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
                                      ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_repeat()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without REPEAT");
+        g_diag.error(kw_loc, to_string(kw) + " without REPEAT");
         return;
     }
 
@@ -279,7 +279,7 @@ void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
     }
 
     if (!keyword_is_hla_djnz_register(line.peek().keyword)) {
-        line.error("Invalid register for " + keyword_to_string(kw));
+        line.error("Invalid register for " + to_string(kw));
         return;
     }
 
@@ -301,7 +301,7 @@ void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_break(Keyword kw, const SourceLoc& kw_loc,
                                       ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_loop()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without WHILE or REPEAT");
+        g_diag.error(kw_loc, to_string(kw) + " without WHILE or REPEAT");
         return;
     }
 
@@ -328,7 +328,7 @@ void HLA_ProgramBuilder::handle_break(Keyword kw, const SourceLoc& kw_loc,
 void HLA_ProgramBuilder::handle_continue(Keyword kw, const SourceLoc& kw_loc,
         ParseLine& line) {
     if (stack.empty() || !stack.back().node->is_loop()) {
-        g_diag.error(kw_loc, keyword_to_string(kw) + " without WHILE or REPEAT");
+        g_diag.error(kw_loc, to_string(kw) + " without WHILE or REPEAT");
         return;
     }
 

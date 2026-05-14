@@ -13,6 +13,14 @@
 #include <string>
 #include <string_view>
 
+std::string to_string(TokenType token_type) {
+    static const std::string_view lut[] = {
+#define X(id, text) text,
+#include "lexer_tokens.def"
+    };
+    return std::string(lut[static_cast<size_t>(token_type)]);
+}
+
 Token Token::token(TokenType type_, std::string_view text_,
                    const SourceLoc& loc) {
     Token t;
@@ -89,6 +97,16 @@ const Token& ParseLine::peek(size_t offset) const {
     return eof_token;
 }
 
+void ParseLine::advance() {
+    if (pos < tokens.size()) {
+        ++pos;
+    }
+}
+
+bool ParseLine::eof() const {
+    return pos >= tokens.size();
+}
+
 void ParseLine::error(std::string_view message) const {
     g_diag.error(peek().loc, message);
 }
@@ -102,10 +120,18 @@ bool ParseLine::check_end_of_line(Keyword kw) {
     if (pos < tokens.size()) {
         g_diag.error(peek().loc,
                      "Unexpected token after " +
-                     keyword_to_string(kw) +
+                     to_string(kw) +
                      ": " + g_strings.to_string(peek().text_id));
         return false;
     }
 
     return true;
 }
+
+std::string ParseLine::prev_token_text() const {
+    if (pos > 0 && pos - 1 < tokens.size()) {
+        return escape_string(g_strings.view(tokens[pos - 1].text_id));
+    }
+    return "";
+}
+

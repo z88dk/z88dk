@@ -10,6 +10,7 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -17,6 +18,8 @@ enum class TokenType : uint8_t {
 #define X(id, text) id,
 #include "lexer_tokens.def"
 };
+
+std::string to_string(TokenType token_type);
 
 struct Token {
     TokenType type = TokenType::EndOfLine;  // 1 byte
@@ -67,6 +70,9 @@ struct ParseLine {
 
     ParseLine(const std::vector<Token>& tokens_, size_t pos_ = 0);
     const Token& peek(size_t offset = 0) const;
+    void advance();
+    bool eof() const;
     void error(std::string_view message) const;
     bool check_end_of_line(Keyword kw);
+    std::string prev_token_text() const;
 };

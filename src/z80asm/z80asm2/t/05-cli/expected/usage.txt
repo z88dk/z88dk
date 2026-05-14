@@ -39,3 +39,5 @@ Diagnostic Options:
                 Dump the token stream after preprocessing and exit
   -dump-after-hla-expansion
                 Dump the token stream after High-Level-Assembly processing and exit
+  -dump-after-synth-expansion
+                Dump the token stream after synthetic opcode expansion and exit

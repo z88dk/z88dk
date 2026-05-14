@@ -1,6 +1,8 @@
 - Make -E output with synthetic opcodes expansion and JR promotion done
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
+- eval_const_expr / eval_if_condition : receive ParseLine instead of tokens+pos,
+  then ExprParseContext may be removed, it is the same as ParseLine
 
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick

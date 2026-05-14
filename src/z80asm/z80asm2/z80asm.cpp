@@ -44,13 +44,18 @@ static void assemble_file(std::string_view filename) {
     // process High-Level-Assembly instructions
     std::vector<LogicalLine> hla_lines = hla_process(preprocessed_tokens);
     if (g_args.options.dump_after_hla) {
-        dump_after_hla_and_exit(hla_lines);
+        dump_logical_lines_and_exit(hla_lines);
         // not reached
     }
 
     // process synthetic instructions and rewrite tokens
     // to their final form for the assembler
     std::vector<LogicalLine> asm_lines = synthetic_expand(hla_lines);
+    if (g_args.options.dump_after_synth_expansion) {
+        dump_logical_lines_and_exit(asm_lines);
+        // not reached
+    }
+
 }
 
 static void assemble_files() {

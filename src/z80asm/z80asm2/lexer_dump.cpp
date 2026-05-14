@@ -27,7 +27,7 @@ void dump_token(const Token& token) {
               << token.loc.line << ":" << token.loc.column << "\t";
 
     if (token.keyword != Keyword::None) {
-        std::cout << "keyword=" << keyword_to_string(token.keyword) << " ";
+        std::cout << "keyword=" << to_string(token.keyword) << " ";
     }
 
     if (token.type == TokenType::Integer) {
@@ -84,7 +84,7 @@ void dump_after_tokenization_and_exit(std::string_view filename) {
 }
 
 [[noreturn]]
-void dump_after_hla_and_exit(const std::vector<LogicalLine>& lines) {
+void dump_logical_lines_and_exit(const std::vector<LogicalLine>& lines) {
     StringInterner::Id cur_file_id = 0;
     dump_logical_lines(lines, cur_file_id);
     exit(EXIT_SUCCESS);

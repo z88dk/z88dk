@@ -180,7 +180,7 @@ static void emit_jmp(HLA_Label label, const SourceLoc& loc,
 
 static void emit_jcc(Keyword cond, HLA_Label label, const SourceLoc& loc,
                      std::vector<LogicalLine>& out) {
-    std::string text = "JR " + keyword_to_string(cond) + ", " + label.to_string();
+    std::string text = "JR " + to_string(cond) + ", " + label.to_string();
     LogicalLine ll(loc);
     ll.tokens = tokenize_text(text, loc);
     out.push_back(std::move(ll));
@@ -199,13 +199,13 @@ void emit_djnz(Keyword reg_kw, HLA_Label label,
     case Keyword::E:
     case Keyword::H:
     case Keyword::L:
-        code.push_back("DEC " + keyword_to_string(reg_kw));
+        code.push_back("DEC " + to_string(reg_kw));
         code.push_back("JR NZ, " + label.to_string());
         break;
     case Keyword::BC:
     case Keyword::DE:
     case Keyword::HL: {
-        std::string register_pair = keyword_to_string(reg_kw);
+        std::string register_pair = to_string(reg_kw);
         assert(register_pair.size() == 2); // sanity check
         std::string reg1(1, register_pair[0]);
         std::string reg2(1, register_pair[1]);

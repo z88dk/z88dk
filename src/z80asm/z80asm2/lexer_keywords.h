@@ -32,7 +32,7 @@ enum class Keyword : uint16_t {
 
 // Convert string to Keyword enum, returns Keyword::None if not found
 Keyword keyword_lookup(std::string_view s);
-std::string keyword_to_string(Keyword kw);
+std::string to_string(Keyword kw);
 
 // Check if a keyword type
 bool keyword_is_preproc_directive(Keyword kw);

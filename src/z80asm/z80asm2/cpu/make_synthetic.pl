@@ -626,7 +626,7 @@ ops:
         if ( @{ $ops[0] } == 3 && $ops[0][1] eq '%m1' && $ops[0][2] eq '%m1' ) {
             my @flat = ( $ops[0][0], '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/%m+1/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/+(%m)+1/r =~ s/\+\+/+/r;
             push @instr, $instr;
             shift @ops;
             next ops;
@@ -637,7 +637,7 @@ ops:
         {
             my @flat = ( $ops[0][0], $ops[0][1], '%d' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%d/%d+1/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%d/+(%d)+1/r =~ s/\+\+/+/r;
             push @instr, $instr;
             shift @ops;
             next ops;
