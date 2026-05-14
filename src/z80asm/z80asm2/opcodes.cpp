@@ -5,37 +5,265 @@
 //-----------------------------------------------------------------------------
 
 #include "cpu.h"
+#include "expr.h"
+#include "hla_ast.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "opcodes.h"
+#include "opcodes_synth_trie.h"
 #include "opcodes_trie_token.h"
+#include "options.h"
+#include "source_loc.h"
+#include "string_interner.h"
+#include <algorithm>
 #include <cassert>
+#include <cstdint>
+#include <string>
 #include <vector>
 
-TrieToken get_trie_token(CPU cpu_id) {
-    auto it = cpu_to_trie_token_lu.find(cpu_id);
-    if (it == cpu_to_trie_token_lu.end()) {
-        assert(0);
-    }
-    return it->second;
-}
+void collect_label_tokens(ParseLine& pline, std::vector<Token>& out) {
+    out.clear();
 
-TrieToken get_trie_token(TokenType tt) {
-    auto it = token_type_to_trie_token_lu.find(tt);
-    if (it == token_type_to_trie_token_lu.end()) {
-        assert(0);
+    // .label
+    if (pline.peek().type == TokenType::Dot && pline.peek(1).type == TokenType::Identifier) {
+        out.push_back(pline.peek());
+        pline.advance();
+        out.push_back(pline.peek());
+        pline.advance();
+        return;
     }
-    return it->second;
-}
 
-TrieToken get_trie_token(Keyword kw) {
-    auto it = keyword_to_trie_token_lu.find(kw);
-    if (it == keyword_to_trie_token_lu.end()) {
-        assert(0);
+    // label:
+    if (pline.peek().type == TokenType::Identifier && pline.peek(1).type == TokenType::Colon) {
+        out.push_back(pline.peek());
+        pline.advance();
+        out.push_back(pline.peek());
+        pline.advance();
+        return;
     }
-    return it->second;
 }
 
 std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>& lines) {
-    return lines;
+    std::vector<LogicalLine> out;
+
+    for (auto const& line : lines) {
+        auto m = recognize_synthetic(line);
+        if (!m.matched) {
+            out.push_back(line);
+            continue;
+        }
+        interpret_synth_bytecode(m, line, out);
+    }
+    return out;
 }
+
+static const TrieTransition* binary_search_transition(uint16_t node, TrieToken key) {
+    const TrieNode& nd = opcodes_synth_trie_nodes[node];
+
+    uint16_t base = nd.first_transition;
+    uint16_t count = nd.count;
+
+    if (count == 0) {
+        return nullptr;
+    }
+
+    const TrieTransition* begin = &opcodes_synth_trie_transitions[base];
+    const TrieTransition* end = begin + count;
+
+    // Early-out: key outside range
+    if (key < begin->token || key > (end - 1)->token) {
+        return nullptr;
+    }
+
+    // Use STL lower_bound
+    auto it = std::lower_bound(
+                  begin, end,
+                  key,
+    [](const TrieTransition & tr, TrieToken k) {
+        return tr.token < k;
+    }
+              );
+
+    if (it != end && it->token == key) {
+        return it;
+    }
+
+    return nullptr;
+}
+
+SynthMatch recognize_synthetic(const LogicalLine& line) {
+    ParseLine pline(line.tokens);
+    SynthMatch res;
+    uint16_t node = 0;
+    const TrieTransition* tr = nullptr;
+
+    // collect label tokens at the start of the line
+    collect_label_tokens(pline, res.label_tokens);
+
+    // first transition on CPU
+    TrieToken cpu_tt = to_trie_token(g_args.options.cpu_id);
+    tr = binary_search_transition(node, cpu_tt);
+    if (!tr) {
+        return res;    // no match
+    }
+    node = tr->next_transition;
+
+    // next transitions on tokens
+    while (pline.pos < pline.tokens.size()) {
+        const Token& token = pline.peek();
+
+        // check keyword transition first
+        if (token.keyword != Keyword::None) {
+            TrieToken kw_tt = to_trie_token(token.keyword);
+            tr = binary_search_transition(node, kw_tt);
+            if (tr) {
+                ++pline.pos;
+                node = tr->next_transition;
+                continue;
+            }
+        }
+
+        // then check token type transition
+        TrieToken tt_tt = to_trie_token(token.type);
+        tr = binary_search_transition(node, tt_tt);
+        if (tr) {
+            ++pline.pos;
+            node = tr->next_transition;
+            continue;
+        }
+
+        // finally check expression transition
+        tr = binary_search_transition(node, TrieToken::Expr);
+        if (tr) {
+            size_t start = pline.pos;
+            if (!parse_expression_span(pline)) {
+                return res;    // no match
+            }
+            size_t end = pline.pos;
+            if (end == start) {
+                return res;    // no match
+            }
+
+            res.expr_spans.push_back({start, end});
+            pline.pos = end;
+            node = tr->next_transition;
+            continue;
+        }
+
+        // No match
+        break;
+    }
+
+    const TrieNode& n = opcodes_synth_trie_nodes[node];
+    if (n.accept_id >= 0) {
+        res.matched = true;
+        res.accept_id = n.accept_id;
+    }
+    return res;
+}
+
+void interpret_synth_bytecode(const SynthMatch& match,
+                              const LogicalLine& line, std::vector<LogicalLine>& out) {
+    LogicalLine cur;
+
+    // copy label tokens
+    cur.tokens.insert(cur.tokens.end(), match.label_tokens.begin(), match.label_tokens.end());
+
+    // create temporary labels as needed
+    std::vector<HLA_Label> labels;
+
+    // lambda to get location at end of current line
+    auto get_end_loc = [&]() {
+        SourceLoc loc;
+        if (cur.tokens.empty()) {
+            loc = line.loc;
+        }
+        else {
+            loc = cur.tokens.back().loc;
+            loc.column += static_cast<uint16_t>(g_strings.view(cur.tokens.back().text_id).size());
+        }
+        return loc;
+    };
+
+    // find range of tokens for the expanded opcodes
+    assert(match.accept_id >= 0);
+    const SynthTrieAction& ta = opcodes_synth_trie_actions[match.accept_id];
+    for (uint16_t i = ta.first_bytecode; i < ta.first_bytecode + ta.count; i++) {
+        const SynthBytecode& bc = opcodes_synth_trie_bytecode[i];
+
+        // get location at end of current line
+        SourceLoc loc = get_end_loc();
+
+        switch (bc.op) {
+        case SynthOp::EmitToken: {
+            TrieToken trie_token = static_cast<TrieToken>(bc.operand);
+            TokenType token_type = to_token_type(trie_token);
+            if (token_type != TokenType::None) {
+                Token t = Token::token(token_type, to_string(token_type), loc);
+                cur.tokens.push_back(t);
+            }
+            else {
+                Keyword kw = to_keyword(trie_token);
+                if (kw != Keyword::None) {
+                    Token t = Token::identifier(to_string(kw), loc);
+                    cur.tokens.push_back(t);
+                }
+                else {
+                    // Invalid trie token
+                    assert(0);
+                }
+            }
+            break;
+        }
+        case SynthOp::EmitInteger: {
+            int value = bc.operand;
+            Token t = Token::integer(std::to_string(value), value, loc);
+            cur.tokens.push_back(t);
+            break;
+        }
+        case SynthOp::EmitExprRef: {
+            uint16_t expr_index = bc.operand;
+            assert(expr_index < match.expr_spans.size());
+            auto [start, end] = match.expr_spans[expr_index];
+            for (size_t j = start; j < end; j++) {
+                cur.tokens.push_back(line.tokens[j]);
+            }
+            break;
+        }
+        case SynthOp::EmitLabelRef: {
+            // create temporary labels as needed
+            uint16_t label_id = bc.operand;
+            while (label_id >= labels.size()) {
+                labels.emplace_back();
+            }
+
+            // emit label reference token
+            Token t = Token::identifier(labels[label_id].to_string(), loc);
+            cur.tokens.push_back(t);
+            break;
+        }
+        case SynthOp::EmitLineBreak: {
+            if (!cur.tokens.empty()) {
+                Token t = Token::end_of_line(loc);
+                cur.tokens.push_back(t);
+                out.push_back(cur);
+                cur.tokens.clear();
+            }
+            break;
+        }
+        default:
+            assert(0);
+        }
+    }
+
+    // emit end of line
+    if (!cur.tokens.empty()) {
+        // get location at end of current line
+        SourceLoc loc = get_end_loc();
+
+        Token t = Token::end_of_line(loc);
+        cur.tokens.push_back(t);
+        out.push_back(cur);
+    }
+}
+

@@ -4,9 +4,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "const_expr.h"
 #include "const_symbols.h"
 #include "diag.h"
+#include "expr.h"
 #include "file_mgr.h"
 #include "lexer.h"
 #include "lexer_keywords.h"
@@ -139,7 +139,7 @@ bool Preproc::parse_filename(ParseLine& input_line,
                              SourceLoc& out_filename_loc) {
     if (input_line.peek().type == TokenType::EndOfLine) {
         input_line.error("Expected filename after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return false;
     }
 
@@ -160,7 +160,7 @@ bool Preproc::parse_filename(ParseLine& input_line,
     std::string_view token_text = g_strings.view(input_line.peek().text_id);
     if (token_text.size() == 0 || is_space(token_text.front())) {
         input_line.error("Expected filename after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return false;
     }
 
@@ -237,7 +237,7 @@ bool Preproc::parse_LINE_args(ParseLine& input_line,
     // accept line number
     if (input_line.peek().type != TokenType::Integer) {
         input_line.error("Expected line number after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return false;
     }
 
@@ -409,7 +409,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
                 if (nesting_stack.empty()) {
                     g_diag.error(kw_loc,
                                  "Unexpected " +
-                                 keyword_to_string(kw) +
+                                 to_string(kw) +
                                  " directive");
                     return false;
                 }
@@ -430,10 +430,10 @@ bool Preproc::read_macro_body(Keyword start_kw,
 
                 if (!matched) {
                     g_diag.error(kw_loc,
-                                 keyword_to_string(kw) +
+                                 to_string(kw) +
                                  " does not match " +
-                                 keyword_to_string(open_kw));
-                    g_diag.note(open_loc, keyword_to_string(open_kw) +
+                                 to_string(open_kw));
+                    g_diag.note(open_loc, to_string(open_kw) +
                                 " defined here");
                     return false;
                 }
@@ -485,9 +485,9 @@ bool Preproc::read_macro_body(Keyword start_kw,
     auto& top = nesting_stack.back();
     g_diag.error(top.second,
                  "Unexpected end of file, missing " +
-                 keyword_to_string(top.first == Keyword::MACRO ?
-                                   Keyword::ENDM : Keyword::ENDR) +
-                 " for " + keyword_to_string(top.first));
+                 to_string(top.first == Keyword::MACRO ?
+                           Keyword::ENDM : Keyword::ENDR) +
+                 " for " + to_string(top.first));
     return false;
 }
 
@@ -511,7 +511,7 @@ std::vector<Token> Preproc::collect_and_expand_line(
     if (raw_tokens.empty()) {
         g_diag.error(start_loc,
                      "Expected " + std::string(what) +
-                     " after " + keyword_to_string(kw));
+                     " after " + to_string(kw));
         return {};
     }
 
@@ -526,7 +526,7 @@ std::vector<Token> Preproc::collect_and_expand_line(
             (expanded.size() == 1 && expanded[0].type == TokenType::EndOfLine)) {
         g_diag.error(start_loc,
                      "Expected " + std::string(what) +
-                     " after " + keyword_to_string(kw));
+                     " after " + to_string(kw));
         return {};
     }
 
@@ -554,7 +554,7 @@ bool Preproc::eval_if_expr(ParseLine& input_line,
             expanded[expr_pos].type != TokenType::EndOfLine) {
         g_diag.error(expanded[0].loc,
                      "Unexpected token after " +
-                     keyword_to_string(kw) + " expression");
+                     to_string(kw) + " expression");
         return false;
     }
 
@@ -565,7 +565,7 @@ bool Preproc::eval_ifdef_name(ParseLine& input_line,
                               bool negated,
                               Keyword kw) {
     if (input_line.peek().type != TokenType::Identifier) {
-        input_line.error("Expected identifier after " + keyword_to_string(kw));
+        input_line.error("Expected identifier after " + to_string(kw));
         return false;
     }
 
@@ -786,7 +786,7 @@ void Preproc::process_LINE(Keyword kw, const SourceLoc& kw_loc,
 
     if (include_stack.empty()) {
         g_diag.error(kw_loc,
-                     keyword_to_string(kw) +
+                     to_string(kw) +
                      " directive not allowed in global scope");
         return;
     }
@@ -814,7 +814,7 @@ void Preproc::process_C_LINE(Keyword kw, const SourceLoc& kw_loc,
 
     if (include_stack.empty()) {
         g_diag.error(kw_loc,
-                     keyword_to_string(kw) +
+                     to_string(kw) +
                      " directive not allowed in global scope");
         return;
     }
@@ -834,7 +834,7 @@ void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
                              ParseLine& input_line) {
     if (input_line.peek().type != TokenType::Identifier) {
         input_line.error("Expected identifier after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return;
     }
 
@@ -952,7 +952,7 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
                             ParseLine& input_line) {
     if (input_line.peek().type != TokenType::Identifier) {
         input_line.error("Expected identifier after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return;
     }
 
@@ -985,7 +985,7 @@ void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
                            ParseLine& input_line) {
     if (input_line.peek().type != TokenType::Identifier) {
         input_line.error("Expected identifier after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return;
     }
 
@@ -999,7 +999,7 @@ void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
             input_line.peek().loc.column ==
             name_loc.column + g_strings.view(name_id).size()) {
         g_diag.error(input_line.peek().loc,
-                     keyword_to_string(kw) +
+                     to_string(kw) +
                      " macro cannot be function-like");
         return;
     }
@@ -1106,7 +1106,7 @@ void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
     // parse name
     if (input_line.peek().type != TokenType::Identifier) {
         input_line.error("Expected identifier after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return;
     }
 
@@ -1195,7 +1195,7 @@ void Preproc::do_MACRO(Keyword kw, const SourceLoc& kw_loc,
 void Preproc::process_ENDM(Keyword kw, const SourceLoc& kw_loc,
                            ParseLine&) {
     g_diag.error(kw_loc,
-                 "Unexpected " + keyword_to_string(kw) + " directive");
+                 "Unexpected " + to_string(kw) + " directive");
 }
 
 void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
@@ -1221,7 +1221,7 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
             expanded[expr_pos].type != TokenType::EndOfLine) {
         g_diag.error(expanded[expr_pos].loc,
                      "Unexpected token after " +
-                     keyword_to_string(kw) +
+                     to_string(kw) +
                      " count: " +
                      g_strings.to_string(expanded[expr_pos].text_id));
         return;
@@ -1261,7 +1261,7 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
 void Preproc::process_ENDR(Keyword kw, const SourceLoc& kw_loc,
                            ParseLine&) {
     g_diag.error(kw_loc,
-                 "Unexpected " + keyword_to_string(kw) + " directive");
+                 "Unexpected " + to_string(kw) + " directive");
 }
 
 void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
@@ -1269,7 +1269,7 @@ void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
     // read identifier for iteration variable
     if (input_line.peek().type != TokenType::Identifier) {
         input_line.error("Expected identifier after " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return;
     }
 
@@ -1280,7 +1280,7 @@ void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
     // read comma after identifier
     if (input_line.peek().type != TokenType::Comma) {
         input_line.error("Expected comma after identifier in " +
-                         keyword_to_string(kw));
+                         to_string(kw));
         return;
     }
     input_line.pos++;
@@ -1309,7 +1309,7 @@ void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
 
     if (args.empty()) {
         g_diag.error(args_loc,
-                     "Expected arguments after " + keyword_to_string(kw));
+                     "Expected arguments after " + to_string(kw));
         return;
     }
 
@@ -1356,7 +1356,7 @@ void Preproc::process_REPTC(Keyword kw, const SourceLoc& kw_loc,
                             ParseLine& input_line) {
     // read identifier for iteration variable
     if (input_line.peek().type != TokenType::Identifier) {
-        input_line.error("Expected identifier after " + keyword_to_string(kw));
+        input_line.error("Expected identifier after " + to_string(kw));
         return;
     }
 
@@ -1366,7 +1366,7 @@ void Preproc::process_REPTC(Keyword kw, const SourceLoc& kw_loc,
 
     // read comma after identifier
     if (input_line.peek().type != TokenType::Comma) {
-        input_line.error("Expected comma after identifier in " + keyword_to_string(kw));
+        input_line.error("Expected comma after identifier in " + to_string(kw));
         return;
     }
     input_line.pos++;
@@ -1455,14 +1455,14 @@ void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
 void Preproc::process_LOCAL(Keyword kw, const SourceLoc& kw_loc,
                             ParseLine&) {
     g_diag.error(kw_loc,
-                 "Unexpected " + keyword_to_string(kw) + " directive");
+                 "Unexpected " + to_string(kw) + " directive");
 }
 
 void Preproc::process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
                                  StringInterner::Id, const SourceLoc&,
                                  ParseLine&) {
     g_diag.error(kw_loc,
-                 "Unexpected " + keyword_to_string(kw) + " directive");
+                 "Unexpected " + to_string(kw) + " directive");
 }
 
 void Preproc::process_EXITM(Keyword kw, const SourceLoc& kw_loc,
@@ -1482,7 +1482,7 @@ void Preproc::process_EXITM(Keyword kw, const SourceLoc& kw_loc,
     }
 
     g_diag.error(kw_loc,
-                 keyword_to_string(kw) + " outside of macro expansion");
+                 to_string(kw) + " outside of macro expansion");
 }
 
 void Preproc::process_IF(Keyword kw, const SourceLoc& kw_loc,
@@ -1501,7 +1501,7 @@ void Preproc::process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
                              ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
-                     "Unexpected " + keyword_to_string(kw) +
+                     "Unexpected " + to_string(kw) +
                      " directive without matching IF");
         return;
     }
@@ -1509,7 +1509,7 @@ void Preproc::process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
     ConditionalFrame& frame = cond_stack.back();
     if (frame.seen_else) {
         g_diag.error(kw_loc,
-                     "Unexpected " + keyword_to_string(kw) +
+                     "Unexpected " + to_string(kw) +
                      " directive after ELSE");
         return;
     }
@@ -1526,7 +1526,7 @@ void Preproc::process_ELSE(Keyword kw, const SourceLoc& kw_loc,
                            ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
-                     "Unexpected " + keyword_to_string(kw) +
+                     "Unexpected " + to_string(kw) +
                      " directive without matching IF");
         return;
     }
@@ -1537,7 +1537,7 @@ void Preproc::process_ELSE(Keyword kw, const SourceLoc& kw_loc,
     }
 
     if (frame.seen_else) {
-        g_diag.error(kw_loc, "Multiple " + keyword_to_string(kw) + " in IF block");
+        g_diag.error(kw_loc, "Multiple " + to_string(kw) + " in IF block");
     }
 
     frame.branch_active = !frame.any_taken;
@@ -1549,7 +1549,7 @@ void Preproc::process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
                             ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
-                     "Unexpected " + keyword_to_string(kw) +
+                     "Unexpected " + to_string(kw) +
                      " directive without matching IF");
         return;
     }
@@ -1599,7 +1599,7 @@ void Preproc::do_ELSEIFDEF_ELSEIFNDEF(bool negated,
                                       ParseLine& input_line) {
     if (cond_stack.empty()) {
         g_diag.error(kw_loc,
-                     "Unexpected " + keyword_to_string(kw) +
+                     "Unexpected " + to_string(kw) +
                      " directive without matching IF");
         return;
     }
@@ -1607,7 +1607,7 @@ void Preproc::do_ELSEIFDEF_ELSEIFNDEF(bool negated,
     ConditionalFrame& frame = cond_stack.back();
     if (frame.seen_else) {
         g_diag.error(kw_loc,
-                     "Unexpected " + keyword_to_string(kw) +
+                     "Unexpected " + to_string(kw) +
                      " directive after ELSE");
         return;
     }
@@ -1687,7 +1687,7 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc&,
                                 : expanded.back().loc;
             g_diag.error(err_loc,
                          "Expected string after comma in " +
-                         keyword_to_string(kw));
+                         to_string(kw));
             return;
         }
 
@@ -1699,7 +1699,7 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc&,
     if (expr_pos < expanded.size() &&
             expanded[expr_pos].type != TokenType::EndOfLine) {
         g_diag.error(expanded[expr_pos].loc,
-                     "Unexpected token after " + keyword_to_string(kw));
+                     "Unexpected token after " + to_string(kw));
         return;
     }
 
@@ -1821,6 +1821,6 @@ Preproc::LineType Preproc::process_directive_line(
     // Unknown directive -> error
     // ---------------------------------------------------------------------
     g_diag.error(first_tok.loc, "Unknown preprocessor directive: " +
-                 keyword_to_string(kw));
+                 to_string(kw));
     return LineType::ControlOnly;
 }

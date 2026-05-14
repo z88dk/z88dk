@@ -4,13 +4,14 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "const_expr.h"
 #include "cpu.h"
 #include "diag.h"
 #include "environment.h"
+#include "expr.h"
 #include "file_mgr.h"
 #include "options.h"
 #include "pathnames.h"
+#include "string_interner.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cassert>
@@ -82,6 +83,7 @@ static const UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_MACRO_EXPANSION,
             OptionType::DUMP_AFTER_PREPROCESSING,
             OptionType::DUMP_AFTER_HLA_EXPANSION,
+            OptionType::DUMP_AFTER_SYNTH_EXPANSION,
         }
     }
 };
@@ -397,6 +399,10 @@ void Args::parse_arg(std::string_view arg,
 
         case OptionType::DUMP_AFTER_HLA_EXPANSION:
             options.dump_after_hla = true;
+            return;
+
+        case OptionType::DUMP_AFTER_SYNTH_EXPANSION:
+            options.dump_after_synth_expansion = true;
             return;
 
         default:
