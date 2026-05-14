@@ -3,687 +3,2924 @@
 #include "cpu.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
-#include <unordered_map>
-const std::unordered_map<CPU, TrieToken> cpu_to_trie_token_lu = {
-    { CPU::z80, TrieToken::cpu_z80 },
-    { CPU::z80_strict, TrieToken::cpu_z80_strict },
-    { CPU::z180, TrieToken::cpu_z180 },
-    { CPU::ez80_z80, TrieToken::cpu_ez80_z80 },
-    { CPU::ez80, TrieToken::cpu_ez80 },
-    { CPU::z80n, TrieToken::cpu_z80n },
-    { CPU::r2ka, TrieToken::cpu_r2ka },
-    { CPU::r3k, TrieToken::cpu_r3k },
-    { CPU::gbz80, TrieToken::cpu_gbz80 },
-    { CPU::i8080, TrieToken::cpu_i8080 },
-    { CPU::i8085, TrieToken::cpu_i8085 },
-    { CPU::r800, TrieToken::cpu_r800 },
-    { CPU::r4k, TrieToken::cpu_r4k },
-    { CPU::r5k, TrieToken::cpu_r5k },
-    { CPU::kc160, TrieToken::cpu_kc160 },
-    { CPU::kc160_z80, TrieToken::cpu_kc160_z80 },
-    { CPU::i8080_strict, TrieToken::cpu_i8080_strict },
-    { CPU::i8085_strict, TrieToken::cpu_i8085_strict },
-    { CPU::gbz80_strict, TrieToken::cpu_gbz80_strict },
-    { CPU::z180_strict, TrieToken::cpu_z180_strict },
-    { CPU::z80n_strict, TrieToken::cpu_z80n_strict },
-    { CPU::ez80_z80_strict, TrieToken::cpu_ez80_z80_strict },
-    { CPU::ez80_strict, TrieToken::cpu_ez80_strict },
-    { CPU::r800_strict, TrieToken::cpu_r800_strict },
-    { CPU::kc160_strict, TrieToken::cpu_kc160_strict },
-    { CPU::kc160_z80_strict, TrieToken::cpu_kc160_z80_strict },
-    { CPU::r2ka_strict, TrieToken::cpu_r2ka_strict },
-    { CPU::r3k_strict, TrieToken::cpu_r3k_strict },
-    { CPU::r4k_strict, TrieToken::cpu_r4k_strict },
-    { CPU::r5k_strict, TrieToken::cpu_r5k_strict },
-    { CPU::r6k, TrieToken::cpu_r6k },
-    { CPU::r6k_strict, TrieToken::cpu_r6k_strict },
-};
-const std::unordered_map<TokenType, TrieToken> token_type_to_trie_token_lu = {
-    { TokenType::Identifier, TrieToken::TK_Identifier },
-    { TokenType::Integer, TrieToken::TK_Integer },
-    { TokenType::Float, TrieToken::TK_Float },
-    { TokenType::String, TrieToken::TK_String },
-    { TokenType::Plus, TrieToken::TK_Plus },
-    { TokenType::Minus, TrieToken::TK_Minus },
-    { TokenType::Multiply, TrieToken::TK_Multiply },
-    { TokenType::Divide, TrieToken::TK_Divide },
-    { TokenType::Modulo, TrieToken::TK_Modulo },
-    { TokenType::Power, TrieToken::TK_Power },
-    { TokenType::BitwiseAnd, TrieToken::TK_BitwiseAnd },
-    { TokenType::BitwiseOr, TrieToken::TK_BitwiseOr },
-    { TokenType::BitwiseXor, TrieToken::TK_BitwiseXor },
-    { TokenType::BitwiseNot, TrieToken::TK_BitwiseNot },
-    { TokenType::LeftShift, TrieToken::TK_LeftShift },
-    { TokenType::RightShift, TrieToken::TK_RightShift },
-    { TokenType::LogicalAnd, TrieToken::TK_LogicalAnd },
-    { TokenType::LogicalOr, TrieToken::TK_LogicalOr },
-    { TokenType::LogicalXor, TrieToken::TK_LogicalXor },
-    { TokenType::LogicalNot, TrieToken::TK_LogicalNot },
-    { TokenType::EQ, TrieToken::TK_EQ },
-    { TokenType::NE, TrieToken::TK_NE },
-    { TokenType::LT, TrieToken::TK_LT },
-    { TokenType::LE, TrieToken::TK_LE },
-    { TokenType::GT, TrieToken::TK_GT },
-    { TokenType::GE, TrieToken::TK_GE },
-    { TokenType::LeftParen, TrieToken::TK_LeftParen },
-    { TokenType::RightParen, TrieToken::TK_RightParen },
-    { TokenType::LeftBracket, TrieToken::TK_LeftBracket },
-    { TokenType::RightBracket, TrieToken::TK_RightBracket },
-    { TokenType::LeftBrace, TrieToken::TK_LeftBrace },
-    { TokenType::RightBrace, TrieToken::TK_RightBrace },
-    { TokenType::Comma, TrieToken::TK_Comma },
-    { TokenType::Colon, TrieToken::TK_Colon },
-    { TokenType::Dot, TrieToken::TK_Dot },
-    { TokenType::Question, TrieToken::TK_Question },
-    { TokenType::Hash, TrieToken::TK_Hash },
-    { TokenType::DoubleHash, TrieToken::TK_DoubleHash },
-    { TokenType::At, TrieToken::TK_At },
-    { TokenType::Dollar, TrieToken::TK_Dollar },
-    { TokenType::Backslash, TrieToken::TK_Backslash },
-    { TokenType::Tick, TrieToken::TK_Tick },
-    { TokenType::ASMPC, TrieToken::TK_ASMPC },
-    { TokenType::EndOfLine, TrieToken::TK_EndOfLine },
-};
-const std::unordered_map<Keyword, TrieToken> keyword_to_trie_token_lu = {
-    { Keyword::A, TrieToken::KW_A },
-    { Keyword::ABC, TrieToken::KW_ABC },
-    { Keyword::ACI, TrieToken::KW_ACI },
-    { Keyword::ADC, TrieToken::KW_ADC },
-    { Keyword::ADD, TrieToken::KW_ADD },
-    { Keyword::ADE, TrieToken::KW_ADE },
-    { Keyword::ADI, TrieToken::KW_ADI },
-    { Keyword::AESIMC, TrieToken::KW_AESIMC },
-    { Keyword::AESISR, TrieToken::KW_AESISR },
-    { Keyword::AESMC, TrieToken::KW_AESMC },
-    { Keyword::AESSR, TrieToken::KW_AESSR },
-    { Keyword::AF, TrieToken::KW_AF },
-    { Keyword::AHL, TrieToken::KW_AHL },
-    { Keyword::AIX, TrieToken::KW_AIX },
-    { Keyword::AIY, TrieToken::KW_AIY },
-    { Keyword::ALTD, TrieToken::KW_ALTD },
-    { Keyword::ALTS, TrieToken::KW_ALTS },
-    { Keyword::ALTSD, TrieToken::KW_ALTSD },
-    { Keyword::ANA, TrieToken::KW_ANA },
-    { Keyword::AND, TrieToken::KW_AND },
-    { Keyword::ANI, TrieToken::KW_ANI },
-    { Keyword::ARHL, TrieToken::KW_ARHL },
-    { Keyword::ASMPC, TrieToken::KW_ASMPC },
-    { Keyword::ASP, TrieToken::KW_ASP },
-    { Keyword::ASSERT, TrieToken::KW_ASSERT },
-    { Keyword::ASSUME, TrieToken::KW_ASSUME },
-    { Keyword::B, TrieToken::KW_B },
-    { Keyword::BC, TrieToken::KW_BC },
-    { Keyword::BCDE, TrieToken::KW_BCDE },
-    { Keyword::BINARY, TrieToken::KW_BINARY },
-    { Keyword::BIT, TrieToken::KW_BIT },
-    { Keyword::BOOL, TrieToken::KW_BOOL },
-    { Keyword::BREAK, TrieToken::KW_BREAK },
-    { Keyword::BRLC, TrieToken::KW_BRLC },
-    { Keyword::BSLA, TrieToken::KW_BSLA },
-    { Keyword::BSRA, TrieToken::KW_BSRA },
-    { Keyword::BSRF, TrieToken::KW_BSRF },
-    { Keyword::BSRL, TrieToken::KW_BSRL },
-    { Keyword::BYTE, TrieToken::KW_BYTE },
-    { Keyword::C, TrieToken::KW_C },
-    { Keyword::C_C, TrieToken::KW_C_C },
-    { Keyword::C_EQ, TrieToken::KW_C_EQ },
-    { Keyword::C_GEU, TrieToken::KW_C_GEU },
-    { Keyword::C_GTU, TrieToken::KW_C_GTU },
-    { Keyword::C_LEU, TrieToken::KW_C_LEU },
-    { Keyword::C_LINE, TrieToken::KW_C_LINE },
-    { Keyword::C_LO, TrieToken::KW_C_LO },
-    { Keyword::C_LTU, TrieToken::KW_C_LTU },
-    { Keyword::C_LZ, TrieToken::KW_C_LZ },
-    { Keyword::C_M, TrieToken::KW_C_M },
-    { Keyword::C_NC, TrieToken::KW_C_NC },
-    { Keyword::C_NE, TrieToken::KW_C_NE },
-    { Keyword::C_NV, TrieToken::KW_C_NV },
-    { Keyword::C_NZ, TrieToken::KW_C_NZ },
-    { Keyword::C_P, TrieToken::KW_C_P },
-    { Keyword::C_PE, TrieToken::KW_C_PE },
-    { Keyword::C_PO, TrieToken::KW_C_PO },
-    { Keyword::C_V, TrieToken::KW_C_V },
-    { Keyword::C_Z, TrieToken::KW_C_Z },
-    { Keyword::CALL, TrieToken::KW_CALL },
-    { Keyword::CALL3, TrieToken::KW_CALL3 },
-    { Keyword::CBM, TrieToken::KW_CBM },
-    { Keyword::CC, TrieToken::KW_CC },
-    { Keyword::CCF, TrieToken::KW_CCF },
-    { Keyword::CEQ, TrieToken::KW_CEQ },
-    { Keyword::CGEU, TrieToken::KW_CGEU },
-    { Keyword::CGTU, TrieToken::KW_CGTU },
-    { Keyword::CLEU, TrieToken::KW_CLEU },
-    { Keyword::CLO, TrieToken::KW_CLO },
-    { Keyword::CLR, TrieToken::KW_CLR },
-    { Keyword::CLTU, TrieToken::KW_CLTU },
-    { Keyword::CLZ, TrieToken::KW_CLZ },
-    { Keyword::CM, TrieToken::KW_CM },
-    { Keyword::CMA, TrieToken::KW_CMA },
-    { Keyword::CMC, TrieToken::KW_CMC },
-    { Keyword::CMP, TrieToken::KW_CMP },
-    { Keyword::CNC, TrieToken::KW_CNC },
-    { Keyword::CNE, TrieToken::KW_CNE },
-    { Keyword::CNV, TrieToken::KW_CNV },
-    { Keyword::CNVC, TrieToken::KW_CNVC },
-    { Keyword::CNVD, TrieToken::KW_CNVD },
-    { Keyword::CNZ, TrieToken::KW_CNZ },
-    { Keyword::CONTINUE, TrieToken::KW_CONTINUE },
-    { Keyword::CONVC, TrieToken::KW_CONVC },
-    { Keyword::CONVD, TrieToken::KW_CONVD },
-    { Keyword::COPY, TrieToken::KW_COPY },
-    { Keyword::COPYR, TrieToken::KW_COPYR },
-    { Keyword::CP, TrieToken::KW_CP },
-    { Keyword::CPD, TrieToken::KW_CPD },
-    { Keyword::CPDR, TrieToken::KW_CPDR },
-    { Keyword::CPE, TrieToken::KW_CPE },
-    { Keyword::CPI, TrieToken::KW_CPI },
-    { Keyword::CPIR, TrieToken::KW_CPIR },
-    { Keyword::CPL, TrieToken::KW_CPL },
-    { Keyword::CPO, TrieToken::KW_CPO },
-    { Keyword::CV, TrieToken::KW_CV },
-    { Keyword::CZ, TrieToken::KW_CZ },
-    { Keyword::D, TrieToken::KW_D },
-    { Keyword::DAA, TrieToken::KW_DAA },
-    { Keyword::DAD, TrieToken::KW_DAD },
-    { Keyword::DB, TrieToken::KW_DB },
-    { Keyword::DCR, TrieToken::KW_DCR },
-    { Keyword::DCX, TrieToken::KW_DCX },
-    { Keyword::DDB, TrieToken::KW_DDB },
-    { Keyword::DE, TrieToken::KW_DE },
-    { Keyword::DEC, TrieToken::KW_DEC },
-    { Keyword::DEFB, TrieToken::KW_DEFB },
-    { Keyword::DEFC, TrieToken::KW_DEFC },
-    { Keyword::DEFDB, TrieToken::KW_DEFDB },
-    { Keyword::DEFINE, TrieToken::KW_DEFINE },
-    { Keyword::DEFL, TrieToken::KW_DEFL },
-    { Keyword::DEFM, TrieToken::KW_DEFM },
-    { Keyword::DEFP, TrieToken::KW_DEFP },
-    { Keyword::DEFQ, TrieToken::KW_DEFQ },
-    { Keyword::DEFS, TrieToken::KW_DEFS },
-    { Keyword::DEFW, TrieToken::KW_DEFW },
-    { Keyword::DEFW_BE, TrieToken::KW_DEFW_BE },
-    { Keyword::DEHL, TrieToken::KW_DEHL },
-    { Keyword::DI, TrieToken::KW_DI },
-    { Keyword::DIV, TrieToken::KW_DIV },
-    { Keyword::DIVS, TrieToken::KW_DIVS },
-    { Keyword::DJNZ, TrieToken::KW_DJNZ },
-    { Keyword::DM, TrieToken::KW_DM },
-    { Keyword::DP, TrieToken::KW_DP },
-    { Keyword::DQ, TrieToken::KW_DQ },
-    { Keyword::DS, TrieToken::KW_DS },
-    { Keyword::DSUB, TrieToken::KW_DSUB },
-    { Keyword::DW, TrieToken::KW_DW },
-    { Keyword::DW_BE, TrieToken::KW_DW_BE },
-    { Keyword::DWJNZ, TrieToken::KW_DWJNZ },
-    { Keyword::DWORD, TrieToken::KW_DWORD },
-    { Keyword::E, TrieToken::KW_E },
-    { Keyword::EI, TrieToken::KW_EI },
-    { Keyword::EIR, TrieToken::KW_EIR },
-    { Keyword::ELIF, TrieToken::KW_ELIF },
-    { Keyword::ELIFDEF, TrieToken::KW_ELIFDEF },
-    { Keyword::ELIFNDEF, TrieToken::KW_ELIFNDEF },
-    { Keyword::ELSE, TrieToken::KW_ELSE },
-    { Keyword::ELSEIF, TrieToken::KW_ELSEIF },
-    { Keyword::ELSEIFDEF, TrieToken::KW_ELSEIFDEF },
-    { Keyword::ELSEIFNDEF, TrieToken::KW_ELSEIFNDEF },
-    { Keyword::ENDIF, TrieToken::KW_ENDIF },
-    { Keyword::ENDM, TrieToken::KW_ENDM },
-    { Keyword::ENDR, TrieToken::KW_ENDR },
-    { Keyword::ENDWHILE, TrieToken::KW_ENDWHILE },
-    { Keyword::EQ, TrieToken::KW_EQ },
-    { Keyword::EQU, TrieToken::KW_EQU },
-    { Keyword::ERROR, TrieToken::KW_ERROR },
-    { Keyword::EX, TrieToken::KW_EX },
-    { Keyword::EXITM, TrieToken::KW_EXITM },
-    { Keyword::EXP, TrieToken::KW_EXP },
-    { Keyword::EXX, TrieToken::KW_EXX },
-    { Keyword::F, TrieToken::KW_F },
-    { Keyword::FALSE, TrieToken::KW_FALSE },
-    { Keyword::FLAG, TrieToken::KW_FLAG },
-    { Keyword::FSYSCALL, TrieToken::KW_FSYSCALL },
-    { Keyword::GE, TrieToken::KW_GE },
-    { Keyword::GEU, TrieToken::KW_GEU },
-    { Keyword::GT, TrieToken::KW_GT },
-    { Keyword::GTU, TrieToken::KW_GTU },
-    { Keyword::H, TrieToken::KW_H },
-    { Keyword::HALT, TrieToken::KW_HALT },
-    { Keyword::HL, TrieToken::KW_HL },
-    { Keyword::HLD, TrieToken::KW_HLD },
-    { Keyword::HLI, TrieToken::KW_HLI },
-    { Keyword::HLT, TrieToken::KW_HLT },
-    { Keyword::HTR, TrieToken::KW_HTR },
-    { Keyword::I, TrieToken::KW_I },
-    { Keyword::IBOX, TrieToken::KW_IBOX },
-    { Keyword::IDET, TrieToken::KW_IDET },
-    { Keyword::IF, TrieToken::KW_IF },
-    { Keyword::IFDEF, TrieToken::KW_IFDEF },
-    { Keyword::IFNDEF, TrieToken::KW_IFNDEF },
-    { Keyword::IIR, TrieToken::KW_IIR },
-    { Keyword::IL, TrieToken::KW_IL },
-    { Keyword::IM, TrieToken::KW_IM },
-    { Keyword::IN, TrieToken::KW_IN },
-    { Keyword::IN0, TrieToken::KW_IN0 },
-    { Keyword::INC, TrieToken::KW_INC },
-    { Keyword::INCBIN, TrieToken::KW_INCBIN },
-    { Keyword::INCLUDE, TrieToken::KW_INCLUDE },
-    { Keyword::IND, TrieToken::KW_IND },
-    { Keyword::IND2, TrieToken::KW_IND2 },
-    { Keyword::IND2R, TrieToken::KW_IND2R },
-    { Keyword::INDM, TrieToken::KW_INDM },
-    { Keyword::INDMR, TrieToken::KW_INDMR },
-    { Keyword::INDR, TrieToken::KW_INDR },
-    { Keyword::INDRX, TrieToken::KW_INDRX },
-    { Keyword::INI, TrieToken::KW_INI },
-    { Keyword::INI2, TrieToken::KW_INI2 },
-    { Keyword::INI2R, TrieToken::KW_INI2R },
-    { Keyword::INIM, TrieToken::KW_INIM },
-    { Keyword::INIMR, TrieToken::KW_INIMR },
-    { Keyword::INIR, TrieToken::KW_INIR },
-    { Keyword::INIRX, TrieToken::KW_INIRX },
-    { Keyword::INR, TrieToken::KW_INR },
-    { Keyword::INX, TrieToken::KW_INX },
-    { Keyword::IOE, TrieToken::KW_IOE },
-    { Keyword::IOI, TrieToken::KW_IOI },
-    { Keyword::IP, TrieToken::KW_IP },
-    { Keyword::IPRES, TrieToken::KW_IPRES },
-    { Keyword::IPSET, TrieToken::KW_IPSET },
-    { Keyword::IS, TrieToken::KW_IS },
-    { Keyword::IX, TrieToken::KW_IX },
-    { Keyword::IXH, TrieToken::KW_IXH },
-    { Keyword::IXL, TrieToken::KW_IXL },
-    { Keyword::IY, TrieToken::KW_IY },
-    { Keyword::IYH, TrieToken::KW_IYH },
-    { Keyword::IYL, TrieToken::KW_IYL },
-    { Keyword::J_C, TrieToken::KW_J_C },
-    { Keyword::J_EQ, TrieToken::KW_J_EQ },
-    { Keyword::J_GE, TrieToken::KW_J_GE },
-    { Keyword::J_GEU, TrieToken::KW_J_GEU },
-    { Keyword::J_GT, TrieToken::KW_J_GT },
-    { Keyword::J_GTU, TrieToken::KW_J_GTU },
-    { Keyword::J_LE, TrieToken::KW_J_LE },
-    { Keyword::J_LEU, TrieToken::KW_J_LEU },
-    { Keyword::J_LO, TrieToken::KW_J_LO },
-    { Keyword::J_LT, TrieToken::KW_J_LT },
-    { Keyword::J_LTU, TrieToken::KW_J_LTU },
-    { Keyword::J_LZ, TrieToken::KW_J_LZ },
-    { Keyword::J_M, TrieToken::KW_J_M },
-    { Keyword::J_NC, TrieToken::KW_J_NC },
-    { Keyword::J_NE, TrieToken::KW_J_NE },
-    { Keyword::J_NV, TrieToken::KW_J_NV },
-    { Keyword::J_NZ, TrieToken::KW_J_NZ },
-    { Keyword::J_P, TrieToken::KW_J_P },
-    { Keyword::J_PE, TrieToken::KW_J_PE },
-    { Keyword::J_PO, TrieToken::KW_J_PO },
-    { Keyword::J_V, TrieToken::KW_J_V },
-    { Keyword::J_Z, TrieToken::KW_J_Z },
-    { Keyword::JC, TrieToken::KW_JC },
-    { Keyword::JEQ, TrieToken::KW_JEQ },
-    { Keyword::JGE, TrieToken::KW_JGE },
-    { Keyword::JGEU, TrieToken::KW_JGEU },
-    { Keyword::JGT, TrieToken::KW_JGT },
-    { Keyword::JGTU, TrieToken::KW_JGTU },
-    { Keyword::JK, TrieToken::KW_JK },
-    { Keyword::JKHL, TrieToken::KW_JKHL },
-    { Keyword::JLE, TrieToken::KW_JLE },
-    { Keyword::JLEU, TrieToken::KW_JLEU },
-    { Keyword::JLO, TrieToken::KW_JLO },
-    { Keyword::JLT, TrieToken::KW_JLT },
-    { Keyword::JLTU, TrieToken::KW_JLTU },
-    { Keyword::JLZ, TrieToken::KW_JLZ },
-    { Keyword::JM, TrieToken::KW_JM },
-    { Keyword::JMP, TrieToken::KW_JMP },
-    { Keyword::JNC, TrieToken::KW_JNC },
-    { Keyword::JNE, TrieToken::KW_JNE },
-    { Keyword::JNK, TrieToken::KW_JNK },
-    { Keyword::JNV, TrieToken::KW_JNV },
-    { Keyword::JNX5, TrieToken::KW_JNX5 },
-    { Keyword::JNZ, TrieToken::KW_JNZ },
-    { Keyword::JP, TrieToken::KW_JP },
-    { Keyword::JP3, TrieToken::KW_JP3 },
-    { Keyword::JPE, TrieToken::KW_JPE },
-    { Keyword::JPO, TrieToken::KW_JPO },
-    { Keyword::JR, TrieToken::KW_JR },
-    { Keyword::JRE, TrieToken::KW_JRE },
-    { Keyword::JV, TrieToken::KW_JV },
-    { Keyword::JX5, TrieToken::KW_JX5 },
-    { Keyword::JZ, TrieToken::KW_JZ },
-    { Keyword::K, TrieToken::KW_K },
-    { Keyword::L, TrieToken::KW_L },
-    { Keyword::LCALL, TrieToken::KW_LCALL },
-    { Keyword::LD, TrieToken::KW_LD },
-    { Keyword::LDA, TrieToken::KW_LDA },
-    { Keyword::LDAX, TrieToken::KW_LDAX },
-    { Keyword::LDD, TrieToken::KW_LDD },
-    { Keyword::LDDR, TrieToken::KW_LDDR },
-    { Keyword::LDDRX, TrieToken::KW_LDDRX },
-    { Keyword::LDDSR, TrieToken::KW_LDDSR },
-    { Keyword::LDDX, TrieToken::KW_LDDX },
-    { Keyword::LDF, TrieToken::KW_LDF },
-    { Keyword::LDH, TrieToken::KW_LDH },
-    { Keyword::LDHI, TrieToken::KW_LDHI },
-    { Keyword::LDHL, TrieToken::KW_LDHL },
-    { Keyword::LDI, TrieToken::KW_LDI },
-    { Keyword::LDIR, TrieToken::KW_LDIR },
-    { Keyword::LDIRX, TrieToken::KW_LDIRX },
-    { Keyword::LDISR, TrieToken::KW_LDISR },
-    { Keyword::LDIX, TrieToken::KW_LDIX },
-    { Keyword::LDL, TrieToken::KW_LDL },
-    { Keyword::LDP, TrieToken::KW_LDP },
-    { Keyword::LDPIRX, TrieToken::KW_LDPIRX },
-    { Keyword::LDRX, TrieToken::KW_LDRX },
-    { Keyword::LDSI, TrieToken::KW_LDSI },
-    { Keyword::LDWS, TrieToken::KW_LDWS },
-    { Keyword::LE, TrieToken::KW_LE },
-    { Keyword::LEA, TrieToken::KW_LEA },
-    { Keyword::LEU, TrieToken::KW_LEU },
-    { Keyword::LHLD, TrieToken::KW_LHLD },
-    { Keyword::LHLDE, TrieToken::KW_LHLDE },
-    { Keyword::LHLX, TrieToken::KW_LHLX },
-    { Keyword::LIL, TrieToken::KW_LIL },
-    { Keyword::LINE, TrieToken::KW_LINE },
-    { Keyword::LIRX, TrieToken::KW_LIRX },
-    { Keyword::LIS, TrieToken::KW_LIS },
-    { Keyword::LJP, TrieToken::KW_LJP },
-    { Keyword::LLCALL, TrieToken::KW_LLCALL },
-    { Keyword::LLJP, TrieToken::KW_LLJP },
-    { Keyword::LLRET, TrieToken::KW_LLRET },
-    { Keyword::LO, TrieToken::KW_LO },
-    { Keyword::LOCAL, TrieToken::KW_LOCAL },
-    { Keyword::LPRX, TrieToken::KW_LPRX },
-    { Keyword::LRET, TrieToken::KW_LRET },
-    { Keyword::LSDDR, TrieToken::KW_LSDDR },
-    { Keyword::LSDR, TrieToken::KW_LSDR },
-    { Keyword::LSIDR, TrieToken::KW_LSIDR },
-    { Keyword::LSIR, TrieToken::KW_LSIR },
-    { Keyword::LT, TrieToken::KW_LT },
-    { Keyword::LTU, TrieToken::KW_LTU },
-    { Keyword::LXI, TrieToken::KW_LXI },
-    { Keyword::LXPC, TrieToken::KW_LXPC },
-    { Keyword::LZ, TrieToken::KW_LZ },
-    { Keyword::M, TrieToken::KW_M },
-    { Keyword::MACRO, TrieToken::KW_MACRO },
-    { Keyword::MB, TrieToken::KW_MB },
-    { Keyword::MD5F1, TrieToken::KW_MD5F1 },
-    { Keyword::MD5F2, TrieToken::KW_MD5F2 },
-    { Keyword::MD5F3, TrieToken::KW_MD5F3 },
-    { Keyword::MEM, TrieToken::KW_MEM },
-    { Keyword::MIRR, TrieToken::KW_MIRR },
-    { Keyword::MIRROR, TrieToken::KW_MIRROR },
-    { Keyword::MLT, TrieToken::KW_MLT },
-    { Keyword::MMU, TrieToken::KW_MMU },
-    { Keyword::MMU0, TrieToken::KW_MMU0 },
-    { Keyword::MMU1, TrieToken::KW_MMU1 },
-    { Keyword::MMU2, TrieToken::KW_MMU2 },
-    { Keyword::MMU3, TrieToken::KW_MMU3 },
-    { Keyword::MMU4, TrieToken::KW_MMU4 },
-    { Keyword::MMU5, TrieToken::KW_MMU5 },
-    { Keyword::MMU6, TrieToken::KW_MMU6 },
-    { Keyword::MMU7, TrieToken::KW_MMU7 },
-    { Keyword::MOV, TrieToken::KW_MOV },
-    { Keyword::MUL, TrieToken::KW_MUL },
-    { Keyword::MULS, TrieToken::KW_MULS },
-    { Keyword::MULU, TrieToken::KW_MULU },
-    { Keyword::MULUB, TrieToken::KW_MULUB },
-    { Keyword::MULUW, TrieToken::KW_MULUW },
-    { Keyword::MVI, TrieToken::KW_MVI },
-    { Keyword::NC, TrieToken::KW_NC },
-    { Keyword::NE, TrieToken::KW_NE },
-    { Keyword::NEG, TrieToken::KW_NEG },
-    { Keyword::NEXTREG, TrieToken::KW_NEXTREG },
-    { Keyword::NK, TrieToken::KW_NK },
-    { Keyword::NOP, TrieToken::KW_NOP },
-    { Keyword::NREG, TrieToken::KW_NREG },
-    { Keyword::NV, TrieToken::KW_NV },
-    { Keyword::NX5, TrieToken::KW_NX5 },
-    { Keyword::NZ, TrieToken::KW_NZ },
-    { Keyword::ONCE, TrieToken::KW_ONCE },
-    { Keyword::OR, TrieToken::KW_OR },
-    { Keyword::ORA, TrieToken::KW_ORA },
-    { Keyword::ORI, TrieToken::KW_ORI },
-    { Keyword::OTD2R, TrieToken::KW_OTD2R },
-    { Keyword::OTDM, TrieToken::KW_OTDM },
-    { Keyword::OTDMR, TrieToken::KW_OTDMR },
-    { Keyword::OTDR, TrieToken::KW_OTDR },
-    { Keyword::OTDRX, TrieToken::KW_OTDRX },
-    { Keyword::OTI2R, TrieToken::KW_OTI2R },
-    { Keyword::OTIB, TrieToken::KW_OTIB },
-    { Keyword::OTIM, TrieToken::KW_OTIM },
-    { Keyword::OTIMR, TrieToken::KW_OTIMR },
-    { Keyword::OTIR, TrieToken::KW_OTIR },
-    { Keyword::OTIRX, TrieToken::KW_OTIRX },
-    { Keyword::OUT, TrieToken::KW_OUT },
-    { Keyword::OUT0, TrieToken::KW_OUT0 },
-    { Keyword::OUTD, TrieToken::KW_OUTD },
-    { Keyword::OUTD2, TrieToken::KW_OUTD2 },
-    { Keyword::OUTI, TrieToken::KW_OUTI },
-    { Keyword::OUTI2, TrieToken::KW_OUTI2 },
-    { Keyword::OUTINB, TrieToken::KW_OUTINB },
-    { Keyword::OVRST8, TrieToken::KW_OVRST8 },
-    { Keyword::P, TrieToken::KW_P },
-    { Keyword::PBC, TrieToken::KW_PBC },
-    { Keyword::PCHL, TrieToken::KW_PCHL },
-    { Keyword::PDE, TrieToken::KW_PDE },
-    { Keyword::PE, TrieToken::KW_PE },
-    { Keyword::PEA, TrieToken::KW_PEA },
-    { Keyword::PHL, TrieToken::KW_PHL },
-    { Keyword::PIX, TrieToken::KW_PIX },
-    { Keyword::PIXELAD, TrieToken::KW_PIXELAD },
-    { Keyword::PIXELDN, TrieToken::KW_PIXELDN },
-    { Keyword::PIY, TrieToken::KW_PIY },
-    { Keyword::PLDD, TrieToken::KW_PLDD },
-    { Keyword::PLDDR, TrieToken::KW_PLDDR },
-    { Keyword::PLDDSR, TrieToken::KW_PLDDSR },
-    { Keyword::PLDI, TrieToken::KW_PLDI },
-    { Keyword::PLDIR, TrieToken::KW_PLDIR },
-    { Keyword::PLDISR, TrieToken::KW_PLDISR },
-    { Keyword::PLSDDR, TrieToken::KW_PLSDDR },
-    { Keyword::PLSDR, TrieToken::KW_PLSDR },
-    { Keyword::PLSIDR, TrieToken::KW_PLSIDR },
-    { Keyword::PLSIR, TrieToken::KW_PLSIR },
-    { Keyword::PO, TrieToken::KW_PO },
-    { Keyword::POP, TrieToken::KW_POP },
-    { Keyword::PP, TrieToken::KW_PP },
-    { Keyword::PRAGMA, TrieToken::KW_PRAGMA },
-    { Keyword::PSW, TrieToken::KW_PSW },
-    { Keyword::PTR, TrieToken::KW_PTR },
-    { Keyword::PUMA, TrieToken::KW_PUMA },
-    { Keyword::PUMS, TrieToken::KW_PUMS },
-    { Keyword::PUSH, TrieToken::KW_PUSH },
-    { Keyword::PW, TrieToken::KW_PW },
-    { Keyword::PX, TrieToken::KW_PX },
-    { Keyword::PXAD, TrieToken::KW_PXAD },
-    { Keyword::PXDN, TrieToken::KW_PXDN },
-    { Keyword::PY, TrieToken::KW_PY },
-    { Keyword::PZ, TrieToken::KW_PZ },
-    { Keyword::R, TrieToken::KW_R },
-    { Keyword::R_C, TrieToken::KW_R_C },
-    { Keyword::R_EQ, TrieToken::KW_R_EQ },
-    { Keyword::R_GEU, TrieToken::KW_R_GEU },
-    { Keyword::R_GTU, TrieToken::KW_R_GTU },
-    { Keyword::R_LEU, TrieToken::KW_R_LEU },
-    { Keyword::R_LO, TrieToken::KW_R_LO },
-    { Keyword::R_LTU, TrieToken::KW_R_LTU },
-    { Keyword::R_LZ, TrieToken::KW_R_LZ },
-    { Keyword::R_M, TrieToken::KW_R_M },
-    { Keyword::R_NC, TrieToken::KW_R_NC },
-    { Keyword::R_NE, TrieToken::KW_R_NE },
-    { Keyword::R_NV, TrieToken::KW_R_NV },
-    { Keyword::R_NZ, TrieToken::KW_R_NZ },
-    { Keyword::R_P, TrieToken::KW_R_P },
-    { Keyword::R_PE, TrieToken::KW_R_PE },
-    { Keyword::R_PO, TrieToken::KW_R_PO },
-    { Keyword::R_V, TrieToken::KW_R_V },
-    { Keyword::R_Z, TrieToken::KW_R_Z },
-    { Keyword::RAL, TrieToken::KW_RAL },
-    { Keyword::RAR, TrieToken::KW_RAR },
-    { Keyword::RC, TrieToken::KW_RC },
-    { Keyword::RDEL, TrieToken::KW_RDEL },
-    { Keyword::RDMODE, TrieToken::KW_RDMODE },
-    { Keyword::REPEAT, TrieToken::KW_REPEAT },
-    { Keyword::REPT, TrieToken::KW_REPT },
-    { Keyword::REPTC, TrieToken::KW_REPTC },
-    { Keyword::REPTI, TrieToken::KW_REPTI },
-    { Keyword::REQ, TrieToken::KW_REQ },
-    { Keyword::RES, TrieToken::KW_RES },
-    { Keyword::RET, TrieToken::KW_RET },
-    { Keyword::RET3, TrieToken::KW_RET3 },
-    { Keyword::RETI, TrieToken::KW_RETI },
-    { Keyword::RETN, TrieToken::KW_RETN },
-    { Keyword::RETN3, TrieToken::KW_RETN3 },
-    { Keyword::RGEU, TrieToken::KW_RGEU },
-    { Keyword::RGTU, TrieToken::KW_RGTU },
-    { Keyword::RIM, TrieToken::KW_RIM },
-    { Keyword::RL, TrieToken::KW_RL },
-    { Keyword::RL1REG, TrieToken::KW_RL1REG },
-    { Keyword::RL2REG, TrieToken::KW_RL2REG },
-    { Keyword::RL3REG, TrieToken::KW_RL3REG },
-    { Keyword::RL4REG, TrieToken::KW_RL4REG },
-    { Keyword::RL5REG, TrieToken::KW_RL5REG },
-    { Keyword::RL6REG, TrieToken::KW_RL6REG },
-    { Keyword::RL7REG, TrieToken::KW_RL7REG },
-    { Keyword::RL8REG, TrieToken::KW_RL8REG },
-    { Keyword::RLA, TrieToken::KW_RLA },
-    { Keyword::RLB, TrieToken::KW_RLB },
-    { Keyword::RLC, TrieToken::KW_RLC },
-    { Keyword::RLCA, TrieToken::KW_RLCA },
-    { Keyword::RLD, TrieToken::KW_RLD },
-    { Keyword::RLDE, TrieToken::KW_RLDE },
-    { Keyword::RLEU, TrieToken::KW_RLEU },
-    { Keyword::RLO, TrieToken::KW_RLO },
-    { Keyword::RLTU, TrieToken::KW_RLTU },
-    { Keyword::RLZ, TrieToken::KW_RLZ },
-    { Keyword::RM, TrieToken::KW_RM },
-    { Keyword::RNC, TrieToken::KW_RNC },
-    { Keyword::RNE, TrieToken::KW_RNE },
-    { Keyword::RNV, TrieToken::KW_RNV },
-    { Keyword::RNZ, TrieToken::KW_RNZ },
-    { Keyword::RP, TrieToken::KW_RP },
-    { Keyword::RPE, TrieToken::KW_RPE },
-    { Keyword::RPO, TrieToken::KW_RPO },
-    { Keyword::RR, TrieToken::KW_RR },
-    { Keyword::RR1REG, TrieToken::KW_RR1REG },
-    { Keyword::RR2REG, TrieToken::KW_RR2REG },
-    { Keyword::RR3REG, TrieToken::KW_RR3REG },
-    { Keyword::RR4REG, TrieToken::KW_RR4REG },
-    { Keyword::RR5REG, TrieToken::KW_RR5REG },
-    { Keyword::RR6REG, TrieToken::KW_RR6REG },
-    { Keyword::RR7REG, TrieToken::KW_RR7REG },
-    { Keyword::RR8REG, TrieToken::KW_RR8REG },
-    { Keyword::RRA, TrieToken::KW_RRA },
-    { Keyword::RRB, TrieToken::KW_RRB },
-    { Keyword::RRC, TrieToken::KW_RRC },
-    { Keyword::RRCA, TrieToken::KW_RRCA },
-    { Keyword::RRD, TrieToken::KW_RRD },
-    { Keyword::RRHL, TrieToken::KW_RRHL },
-    { Keyword::RSMIX, TrieToken::KW_RSMIX },
-    { Keyword::RST, TrieToken::KW_RST },
-    { Keyword::RSTV, TrieToken::KW_RSTV },
-    { Keyword::RV, TrieToken::KW_RV },
-    { Keyword::RZ, TrieToken::KW_RZ },
-    { Keyword::S, TrieToken::KW_S },
-    { Keyword::SBB, TrieToken::KW_SBB },
-    { Keyword::SBC, TrieToken::KW_SBC },
-    { Keyword::SBI, TrieToken::KW_SBI },
-    { Keyword::SBOX, TrieToken::KW_SBOX },
-    { Keyword::SCALL, TrieToken::KW_SCALL },
-    { Keyword::SCF, TrieToken::KW_SCF },
-    { Keyword::SET, TrieToken::KW_SET },
-    { Keyword::SETAE, TrieToken::KW_SETAE },
-    { Keyword::SETSYSP, TrieToken::KW_SETSYSP },
-    { Keyword::SETUSR, TrieToken::KW_SETUSR },
-    { Keyword::SETUSRP, TrieToken::KW_SETUSRP },
-    { Keyword::SHAF1, TrieToken::KW_SHAF1 },
-    { Keyword::SHAF2, TrieToken::KW_SHAF2 },
-    { Keyword::SHAF3, TrieToken::KW_SHAF3 },
-    { Keyword::SHLD, TrieToken::KW_SHLD },
-    { Keyword::SHLDE, TrieToken::KW_SHLDE },
-    { Keyword::SHLX, TrieToken::KW_SHLX },
-    { Keyword::SIL, TrieToken::KW_SIL },
-    { Keyword::SIM, TrieToken::KW_SIM },
-    { Keyword::SIS, TrieToken::KW_SIS },
-    { Keyword::SL1REG, TrieToken::KW_SL1REG },
-    { Keyword::SL2REG, TrieToken::KW_SL2REG },
-    { Keyword::SL3REG, TrieToken::KW_SL3REG },
-    { Keyword::SL4REG, TrieToken::KW_SL4REG },
-    { Keyword::SL5REG, TrieToken::KW_SL5REG },
-    { Keyword::SL6REG, TrieToken::KW_SL6REG },
-    { Keyword::SL7REG, TrieToken::KW_SL7REG },
-    { Keyword::SL8REG, TrieToken::KW_SL8REG },
-    { Keyword::SLA, TrieToken::KW_SLA },
-    { Keyword::SLI, TrieToken::KW_SLI },
-    { Keyword::SLL, TrieToken::KW_SLL },
-    { Keyword::SLP, TrieToken::KW_SLP },
-    { Keyword::SLS, TrieToken::KW_SLS },
-    { Keyword::SP, TrieToken::KW_SP },
-    { Keyword::SPHL, TrieToken::KW_SPHL },
-    { Keyword::SR1REG, TrieToken::KW_SR1REG },
-    { Keyword::SR2REG, TrieToken::KW_SR2REG },
-    { Keyword::SR3REG, TrieToken::KW_SR3REG },
-    { Keyword::SR4REG, TrieToken::KW_SR4REG },
-    { Keyword::SR5REG, TrieToken::KW_SR5REG },
-    { Keyword::SR6REG, TrieToken::KW_SR6REG },
-    { Keyword::SR7REG, TrieToken::KW_SR7REG },
-    { Keyword::SR8REG, TrieToken::KW_SR8REG },
-    { Keyword::SRA, TrieToken::KW_SRA },
-    { Keyword::SRET, TrieToken::KW_SRET },
-    { Keyword::SRL, TrieToken::KW_SRL },
-    { Keyword::STA, TrieToken::KW_STA },
-    { Keyword::STAE, TrieToken::KW_STAE },
-    { Keyword::STAX, TrieToken::KW_STAX },
-    { Keyword::STC, TrieToken::KW_STC },
-    { Keyword::STMIX, TrieToken::KW_STMIX },
-    { Keyword::STOP, TrieToken::KW_STOP },
-    { Keyword::SU, TrieToken::KW_SU },
-    { Keyword::SUB, TrieToken::KW_SUB },
-    { Keyword::SUI, TrieToken::KW_SUI },
-    { Keyword::SURES, TrieToken::KW_SURES },
-    { Keyword::SWAP, TrieToken::KW_SWAP },
-    { Keyword::SWAPNIB, TrieToken::KW_SWAPNIB },
-    { Keyword::SYSCALL, TrieToken::KW_SYSCALL },
-    { Keyword::SYSRET, TrieToken::KW_SYSRET },
-    { Keyword::TEST, TrieToken::KW_TEST },
-    { Keyword::TRA, TrieToken::KW_TRA },
-    { Keyword::TRUE, TrieToken::KW_TRUE },
-    { Keyword::TST, TrieToken::KW_TST },
-    { Keyword::TSTIO, TrieToken::KW_TSTIO },
-    { Keyword::TSTNULL, TrieToken::KW_TSTNULL },
-    { Keyword::UMA, TrieToken::KW_UMA },
-    { Keyword::UMS, TrieToken::KW_UMS },
-    { Keyword::UNDEF, TrieToken::KW_UNDEF },
-    { Keyword::UNDEFINE, TrieToken::KW_UNDEFINE },
-    { Keyword::UNTIL, TrieToken::KW_UNTIL },
-    { Keyword::V, TrieToken::KW_V },
-    { Keyword::WHILE, TrieToken::KW_WHILE },
-    { Keyword::WORD, TrieToken::KW_WORD },
-    { Keyword::X, TrieToken::KW_X },
-    { Keyword::X5, TrieToken::KW_X5 },
-    { Keyword::XBC, TrieToken::KW_XBC },
-    { Keyword::XCHG, TrieToken::KW_XCHG },
-    { Keyword::XDE, TrieToken::KW_XDE },
-    { Keyword::XHL, TrieToken::KW_XHL },
-    { Keyword::XIX, TrieToken::KW_XIX },
-    { Keyword::XIY, TrieToken::KW_XIY },
-    { Keyword::XOR, TrieToken::KW_XOR },
-    { Keyword::XP, TrieToken::KW_XP },
-    { Keyword::XPC, TrieToken::KW_XPC },
-    { Keyword::XRA, TrieToken::KW_XRA },
-    { Keyword::XRI, TrieToken::KW_XRI },
-    { Keyword::XSP, TrieToken::KW_XSP },
-    { Keyword::XTHL, TrieToken::KW_XTHL },
-    { Keyword::XY, TrieToken::KW_XY },
-    { Keyword::YBC, TrieToken::KW_YBC },
-    { Keyword::YDE, TrieToken::KW_YDE },
-    { Keyword::YHL, TrieToken::KW_YHL },
-    { Keyword::YIX, TrieToken::KW_YIX },
-    { Keyword::YIY, TrieToken::KW_YIY },
-    { Keyword::YP, TrieToken::KW_YP },
-    { Keyword::YSP, TrieToken::KW_YSP },
-    { Keyword::Z, TrieToken::KW_Z },
-    { Keyword::ZBC, TrieToken::KW_ZBC },
-    { Keyword::ZDE, TrieToken::KW_ZDE },
-    { Keyword::ZHL, TrieToken::KW_ZHL },
-    { Keyword::ZIX, TrieToken::KW_ZIX },
-    { Keyword::ZIY, TrieToken::KW_ZIY },
-    { Keyword::ZP, TrieToken::KW_ZP },
-    { Keyword::ZSP, TrieToken::KW_ZSP },
-};
+
+TrieToken to_trie_token(CPU cpu) {
+    static const TrieToken lut[33] = {
+        TrieToken::None, // CPU::none = 0
+        TrieToken::cpu_z80, // CPU::z80 = 1
+        TrieToken::cpu_z80_strict, // CPU::z80_strict = 2
+        TrieToken::cpu_z180, // CPU::z180 = 3
+        TrieToken::cpu_ez80_z80, // CPU::ez80_z80 = 4
+        TrieToken::cpu_ez80, // CPU::ez80 = 5
+        TrieToken::cpu_z80n, // CPU::z80n = 6
+        TrieToken::cpu_r2ka, // CPU::r2ka = 7
+        TrieToken::cpu_r3k, // CPU::r3k = 8
+        TrieToken::cpu_gbz80, // CPU::gbz80 = 9
+        TrieToken::cpu_i8080, // CPU::i8080 = 10
+        TrieToken::cpu_i8085, // CPU::i8085 = 11
+        TrieToken::cpu_r800, // CPU::r800 = 12
+        TrieToken::cpu_r4k, // CPU::r4k = 13
+        TrieToken::cpu_r5k, // CPU::r5k = 14
+        TrieToken::cpu_kc160, // CPU::kc160 = 15
+        TrieToken::cpu_kc160_z80, // CPU::kc160_z80 = 16
+        TrieToken::cpu_i8080_strict, // CPU::i8080_strict = 17
+        TrieToken::cpu_i8085_strict, // CPU::i8085_strict = 18
+        TrieToken::cpu_gbz80_strict, // CPU::gbz80_strict = 19
+        TrieToken::cpu_z180_strict, // CPU::z180_strict = 20
+        TrieToken::cpu_z80n_strict, // CPU::z80n_strict = 21
+        TrieToken::cpu_ez80_z80_strict, // CPU::ez80_z80_strict = 22
+        TrieToken::cpu_ez80_strict, // CPU::ez80_strict = 23
+        TrieToken::cpu_r800_strict, // CPU::r800_strict = 24
+        TrieToken::cpu_kc160_strict, // CPU::kc160_strict = 25
+        TrieToken::cpu_kc160_z80_strict, // CPU::kc160_z80_strict = 26
+        TrieToken::cpu_r2ka_strict, // CPU::r2ka_strict = 27
+        TrieToken::cpu_r3k_strict, // CPU::r3k_strict = 28
+        TrieToken::cpu_r4k_strict, // CPU::r4k_strict = 29
+        TrieToken::cpu_r5k_strict, // CPU::r5k_strict = 30
+        TrieToken::cpu_r6k, // CPU::r6k = 31
+        TrieToken::cpu_r6k_strict, // CPU::r6k_strict = 32
+    };
+    return lut[static_cast<size_t>(cpu)];
+}
+
+CPU to_cpu(TrieToken trie_token) {
+    static const CPU lut[721] = {
+        CPU::none, // TrieToken::None = 0
+        CPU::none, // TrieToken::Expr = 1
+        CPU::none, // TrieToken::Label = 2
+        CPU::z80, // TrieToken::cpu_z80 = 3
+        CPU::z80_strict, // TrieToken::cpu_z80_strict = 4
+        CPU::z180, // TrieToken::cpu_z180 = 5
+        CPU::ez80_z80, // TrieToken::cpu_ez80_z80 = 6
+        CPU::ez80, // TrieToken::cpu_ez80 = 7
+        CPU::z80n, // TrieToken::cpu_z80n = 8
+        CPU::r2ka, // TrieToken::cpu_r2ka = 9
+        CPU::r3k, // TrieToken::cpu_r3k = 10
+        CPU::gbz80, // TrieToken::cpu_gbz80 = 11
+        CPU::i8080, // TrieToken::cpu_i8080 = 12
+        CPU::i8085, // TrieToken::cpu_i8085 = 13
+        CPU::r800, // TrieToken::cpu_r800 = 14
+        CPU::r4k, // TrieToken::cpu_r4k = 15
+        CPU::r5k, // TrieToken::cpu_r5k = 16
+        CPU::kc160, // TrieToken::cpu_kc160 = 17
+        CPU::kc160_z80, // TrieToken::cpu_kc160_z80 = 18
+        CPU::i8080_strict, // TrieToken::cpu_i8080_strict = 19
+        CPU::i8085_strict, // TrieToken::cpu_i8085_strict = 20
+        CPU::gbz80_strict, // TrieToken::cpu_gbz80_strict = 21
+        CPU::z180_strict, // TrieToken::cpu_z180_strict = 22
+        CPU::z80n_strict, // TrieToken::cpu_z80n_strict = 23
+        CPU::ez80_z80_strict, // TrieToken::cpu_ez80_z80_strict = 24
+        CPU::ez80_strict, // TrieToken::cpu_ez80_strict = 25
+        CPU::r800_strict, // TrieToken::cpu_r800_strict = 26
+        CPU::kc160_strict, // TrieToken::cpu_kc160_strict = 27
+        CPU::kc160_z80_strict, // TrieToken::cpu_kc160_z80_strict = 28
+        CPU::r2ka_strict, // TrieToken::cpu_r2ka_strict = 29
+        CPU::r3k_strict, // TrieToken::cpu_r3k_strict = 30
+        CPU::r4k_strict, // TrieToken::cpu_r4k_strict = 31
+        CPU::r5k_strict, // TrieToken::cpu_r5k_strict = 32
+        CPU::r6k, // TrieToken::cpu_r6k = 33
+        CPU::r6k_strict, // TrieToken::cpu_r6k_strict = 34
+        CPU::none, // TrieToken::TK_Identifier = 35
+        CPU::none, // TrieToken::TK_Integer = 36
+        CPU::none, // TrieToken::TK_Float = 37
+        CPU::none, // TrieToken::TK_String = 38
+        CPU::none, // TrieToken::TK_Plus = 39
+        CPU::none, // TrieToken::TK_Minus = 40
+        CPU::none, // TrieToken::TK_Multiply = 41
+        CPU::none, // TrieToken::TK_Divide = 42
+        CPU::none, // TrieToken::TK_Modulo = 43
+        CPU::none, // TrieToken::TK_Power = 44
+        CPU::none, // TrieToken::TK_BitwiseAnd = 45
+        CPU::none, // TrieToken::TK_BitwiseOr = 46
+        CPU::none, // TrieToken::TK_BitwiseXor = 47
+        CPU::none, // TrieToken::TK_BitwiseNot = 48
+        CPU::none, // TrieToken::TK_LeftShift = 49
+        CPU::none, // TrieToken::TK_RightShift = 50
+        CPU::none, // TrieToken::TK_LogicalAnd = 51
+        CPU::none, // TrieToken::TK_LogicalOr = 52
+        CPU::none, // TrieToken::TK_LogicalXor = 53
+        CPU::none, // TrieToken::TK_LogicalNot = 54
+        CPU::none, // TrieToken::TK_EQ = 55
+        CPU::none, // TrieToken::TK_NE = 56
+        CPU::none, // TrieToken::TK_LT = 57
+        CPU::none, // TrieToken::TK_LE = 58
+        CPU::none, // TrieToken::TK_GT = 59
+        CPU::none, // TrieToken::TK_GE = 60
+        CPU::none, // TrieToken::TK_LeftParen = 61
+        CPU::none, // TrieToken::TK_RightParen = 62
+        CPU::none, // TrieToken::TK_LeftBracket = 63
+        CPU::none, // TrieToken::TK_RightBracket = 64
+        CPU::none, // TrieToken::TK_LeftBrace = 65
+        CPU::none, // TrieToken::TK_RightBrace = 66
+        CPU::none, // TrieToken::TK_Comma = 67
+        CPU::none, // TrieToken::TK_Colon = 68
+        CPU::none, // TrieToken::TK_Dot = 69
+        CPU::none, // TrieToken::TK_Question = 70
+        CPU::none, // TrieToken::TK_Hash = 71
+        CPU::none, // TrieToken::TK_DoubleHash = 72
+        CPU::none, // TrieToken::TK_At = 73
+        CPU::none, // TrieToken::TK_Dollar = 74
+        CPU::none, // TrieToken::TK_Backslash = 75
+        CPU::none, // TrieToken::TK_Tick = 76
+        CPU::none, // TrieToken::TK_ASMPC = 77
+        CPU::none, // TrieToken::TK_EndOfLine = 78
+        CPU::none, // TrieToken::KW_A = 79
+        CPU::none, // TrieToken::KW_ABC = 80
+        CPU::none, // TrieToken::KW_ACI = 81
+        CPU::none, // TrieToken::KW_ADC = 82
+        CPU::none, // TrieToken::KW_ADD = 83
+        CPU::none, // TrieToken::KW_ADE = 84
+        CPU::none, // TrieToken::KW_ADI = 85
+        CPU::none, // TrieToken::KW_AESIMC = 86
+        CPU::none, // TrieToken::KW_AESISR = 87
+        CPU::none, // TrieToken::KW_AESMC = 88
+        CPU::none, // TrieToken::KW_AESSR = 89
+        CPU::none, // TrieToken::KW_AF = 90
+        CPU::none, // TrieToken::KW_AHL = 91
+        CPU::none, // TrieToken::KW_AIX = 92
+        CPU::none, // TrieToken::KW_AIY = 93
+        CPU::none, // TrieToken::KW_ALTD = 94
+        CPU::none, // TrieToken::KW_ALTS = 95
+        CPU::none, // TrieToken::KW_ALTSD = 96
+        CPU::none, // TrieToken::KW_ANA = 97
+        CPU::none, // TrieToken::KW_AND = 98
+        CPU::none, // TrieToken::KW_ANI = 99
+        CPU::none, // TrieToken::KW_ARHL = 100
+        CPU::none, // TrieToken::KW_ASMPC = 101
+        CPU::none, // TrieToken::KW_ASP = 102
+        CPU::none, // TrieToken::KW_ASSERT = 103
+        CPU::none, // TrieToken::KW_ASSUME = 104
+        CPU::none, // TrieToken::KW_B = 105
+        CPU::none, // TrieToken::KW_BC = 106
+        CPU::none, // TrieToken::KW_BCDE = 107
+        CPU::none, // TrieToken::KW_BINARY = 108
+        CPU::none, // TrieToken::KW_BIT = 109
+        CPU::none, // TrieToken::KW_BOOL = 110
+        CPU::none, // TrieToken::KW_BREAK = 111
+        CPU::none, // TrieToken::KW_BRLC = 112
+        CPU::none, // TrieToken::KW_BSLA = 113
+        CPU::none, // TrieToken::KW_BSRA = 114
+        CPU::none, // TrieToken::KW_BSRF = 115
+        CPU::none, // TrieToken::KW_BSRL = 116
+        CPU::none, // TrieToken::KW_BYTE = 117
+        CPU::none, // TrieToken::KW_C = 118
+        CPU::none, // TrieToken::KW_CALL = 119
+        CPU::none, // TrieToken::KW_CALL3 = 120
+        CPU::none, // TrieToken::KW_CBM = 121
+        CPU::none, // TrieToken::KW_CC = 122
+        CPU::none, // TrieToken::KW_CCF = 123
+        CPU::none, // TrieToken::KW_CEQ = 124
+        CPU::none, // TrieToken::KW_CGEU = 125
+        CPU::none, // TrieToken::KW_CGTU = 126
+        CPU::none, // TrieToken::KW_CLEU = 127
+        CPU::none, // TrieToken::KW_CLO = 128
+        CPU::none, // TrieToken::KW_CLR = 129
+        CPU::none, // TrieToken::KW_CLTU = 130
+        CPU::none, // TrieToken::KW_CLZ = 131
+        CPU::none, // TrieToken::KW_CM = 132
+        CPU::none, // TrieToken::KW_CMA = 133
+        CPU::none, // TrieToken::KW_CMC = 134
+        CPU::none, // TrieToken::KW_CMP = 135
+        CPU::none, // TrieToken::KW_CNC = 136
+        CPU::none, // TrieToken::KW_CNE = 137
+        CPU::none, // TrieToken::KW_CNV = 138
+        CPU::none, // TrieToken::KW_CNVC = 139
+        CPU::none, // TrieToken::KW_CNVD = 140
+        CPU::none, // TrieToken::KW_CNZ = 141
+        CPU::none, // TrieToken::KW_CONTINUE = 142
+        CPU::none, // TrieToken::KW_CONVC = 143
+        CPU::none, // TrieToken::KW_CONVD = 144
+        CPU::none, // TrieToken::KW_COPY = 145
+        CPU::none, // TrieToken::KW_COPYR = 146
+        CPU::none, // TrieToken::KW_CP = 147
+        CPU::none, // TrieToken::KW_CPD = 148
+        CPU::none, // TrieToken::KW_CPDR = 149
+        CPU::none, // TrieToken::KW_CPE = 150
+        CPU::none, // TrieToken::KW_CPI = 151
+        CPU::none, // TrieToken::KW_CPIR = 152
+        CPU::none, // TrieToken::KW_CPL = 153
+        CPU::none, // TrieToken::KW_CPO = 154
+        CPU::none, // TrieToken::KW_CV = 155
+        CPU::none, // TrieToken::KW_CZ = 156
+        CPU::none, // TrieToken::KW_C_C = 157
+        CPU::none, // TrieToken::KW_C_EQ = 158
+        CPU::none, // TrieToken::KW_C_GEU = 159
+        CPU::none, // TrieToken::KW_C_GTU = 160
+        CPU::none, // TrieToken::KW_C_LEU = 161
+        CPU::none, // TrieToken::KW_C_LINE = 162
+        CPU::none, // TrieToken::KW_C_LO = 163
+        CPU::none, // TrieToken::KW_C_LTU = 164
+        CPU::none, // TrieToken::KW_C_LZ = 165
+        CPU::none, // TrieToken::KW_C_M = 166
+        CPU::none, // TrieToken::KW_C_NC = 167
+        CPU::none, // TrieToken::KW_C_NE = 168
+        CPU::none, // TrieToken::KW_C_NV = 169
+        CPU::none, // TrieToken::KW_C_NZ = 170
+        CPU::none, // TrieToken::KW_C_P = 171
+        CPU::none, // TrieToken::KW_C_PE = 172
+        CPU::none, // TrieToken::KW_C_PO = 173
+        CPU::none, // TrieToken::KW_C_V = 174
+        CPU::none, // TrieToken::KW_C_Z = 175
+        CPU::none, // TrieToken::KW_D = 176
+        CPU::none, // TrieToken::KW_DAA = 177
+        CPU::none, // TrieToken::KW_DAD = 178
+        CPU::none, // TrieToken::KW_DB = 179
+        CPU::none, // TrieToken::KW_DCR = 180
+        CPU::none, // TrieToken::KW_DCX = 181
+        CPU::none, // TrieToken::KW_DDB = 182
+        CPU::none, // TrieToken::KW_DE = 183
+        CPU::none, // TrieToken::KW_DEC = 184
+        CPU::none, // TrieToken::KW_DEFB = 185
+        CPU::none, // TrieToken::KW_DEFC = 186
+        CPU::none, // TrieToken::KW_DEFDB = 187
+        CPU::none, // TrieToken::KW_DEFINE = 188
+        CPU::none, // TrieToken::KW_DEFL = 189
+        CPU::none, // TrieToken::KW_DEFM = 190
+        CPU::none, // TrieToken::KW_DEFP = 191
+        CPU::none, // TrieToken::KW_DEFQ = 192
+        CPU::none, // TrieToken::KW_DEFS = 193
+        CPU::none, // TrieToken::KW_DEFW = 194
+        CPU::none, // TrieToken::KW_DEFW_BE = 195
+        CPU::none, // TrieToken::KW_DEHL = 196
+        CPU::none, // TrieToken::KW_DI = 197
+        CPU::none, // TrieToken::KW_DIV = 198
+        CPU::none, // TrieToken::KW_DIVS = 199
+        CPU::none, // TrieToken::KW_DJNZ = 200
+        CPU::none, // TrieToken::KW_DM = 201
+        CPU::none, // TrieToken::KW_DP = 202
+        CPU::none, // TrieToken::KW_DQ = 203
+        CPU::none, // TrieToken::KW_DS = 204
+        CPU::none, // TrieToken::KW_DSUB = 205
+        CPU::none, // TrieToken::KW_DW = 206
+        CPU::none, // TrieToken::KW_DWJNZ = 207
+        CPU::none, // TrieToken::KW_DWORD = 208
+        CPU::none, // TrieToken::KW_DW_BE = 209
+        CPU::none, // TrieToken::KW_E = 210
+        CPU::none, // TrieToken::KW_EI = 211
+        CPU::none, // TrieToken::KW_EIR = 212
+        CPU::none, // TrieToken::KW_ELIF = 213
+        CPU::none, // TrieToken::KW_ELIFDEF = 214
+        CPU::none, // TrieToken::KW_ELIFNDEF = 215
+        CPU::none, // TrieToken::KW_ELSE = 216
+        CPU::none, // TrieToken::KW_ELSEIF = 217
+        CPU::none, // TrieToken::KW_ELSEIFDEF = 218
+        CPU::none, // TrieToken::KW_ELSEIFNDEF = 219
+        CPU::none, // TrieToken::KW_ENDIF = 220
+        CPU::none, // TrieToken::KW_ENDM = 221
+        CPU::none, // TrieToken::KW_ENDR = 222
+        CPU::none, // TrieToken::KW_ENDWHILE = 223
+        CPU::none, // TrieToken::KW_EQ = 224
+        CPU::none, // TrieToken::KW_EQU = 225
+        CPU::none, // TrieToken::KW_ERROR = 226
+        CPU::none, // TrieToken::KW_EX = 227
+        CPU::none, // TrieToken::KW_EXITM = 228
+        CPU::none, // TrieToken::KW_EXP = 229
+        CPU::none, // TrieToken::KW_EXTERN = 230
+        CPU::none, // TrieToken::KW_EXX = 231
+        CPU::none, // TrieToken::KW_F = 232
+        CPU::none, // TrieToken::KW_FALSE = 233
+        CPU::none, // TrieToken::KW_FLAG = 234
+        CPU::none, // TrieToken::KW_FSYSCALL = 235
+        CPU::none, // TrieToken::KW_GE = 236
+        CPU::none, // TrieToken::KW_GEU = 237
+        CPU::none, // TrieToken::KW_GT = 238
+        CPU::none, // TrieToken::KW_GTU = 239
+        CPU::none, // TrieToken::KW_H = 240
+        CPU::none, // TrieToken::KW_HALT = 241
+        CPU::none, // TrieToken::KW_HL = 242
+        CPU::none, // TrieToken::KW_HLD = 243
+        CPU::none, // TrieToken::KW_HLI = 244
+        CPU::none, // TrieToken::KW_HLT = 245
+        CPU::none, // TrieToken::KW_HTR = 246
+        CPU::none, // TrieToken::KW_I = 247
+        CPU::none, // TrieToken::KW_IBOX = 248
+        CPU::none, // TrieToken::KW_IDET = 249
+        CPU::none, // TrieToken::KW_IF = 250
+        CPU::none, // TrieToken::KW_IFDEF = 251
+        CPU::none, // TrieToken::KW_IFNDEF = 252
+        CPU::none, // TrieToken::KW_IIR = 253
+        CPU::none, // TrieToken::KW_IL = 254
+        CPU::none, // TrieToken::KW_IM = 255
+        CPU::none, // TrieToken::KW_IN = 256
+        CPU::none, // TrieToken::KW_IN0 = 257
+        CPU::none, // TrieToken::KW_INC = 258
+        CPU::none, // TrieToken::KW_INCBIN = 259
+        CPU::none, // TrieToken::KW_INCLUDE = 260
+        CPU::none, // TrieToken::KW_IND = 261
+        CPU::none, // TrieToken::KW_IND2 = 262
+        CPU::none, // TrieToken::KW_IND2R = 263
+        CPU::none, // TrieToken::KW_INDM = 264
+        CPU::none, // TrieToken::KW_INDMR = 265
+        CPU::none, // TrieToken::KW_INDR = 266
+        CPU::none, // TrieToken::KW_INDRX = 267
+        CPU::none, // TrieToken::KW_INI = 268
+        CPU::none, // TrieToken::KW_INI2 = 269
+        CPU::none, // TrieToken::KW_INI2R = 270
+        CPU::none, // TrieToken::KW_INIM = 271
+        CPU::none, // TrieToken::KW_INIMR = 272
+        CPU::none, // TrieToken::KW_INIR = 273
+        CPU::none, // TrieToken::KW_INIRX = 274
+        CPU::none, // TrieToken::KW_INR = 275
+        CPU::none, // TrieToken::KW_INX = 276
+        CPU::none, // TrieToken::KW_IOE = 277
+        CPU::none, // TrieToken::KW_IOI = 278
+        CPU::none, // TrieToken::KW_IP = 279
+        CPU::none, // TrieToken::KW_IPRES = 280
+        CPU::none, // TrieToken::KW_IPSET = 281
+        CPU::none, // TrieToken::KW_IS = 282
+        CPU::none, // TrieToken::KW_IX = 283
+        CPU::none, // TrieToken::KW_IXH = 284
+        CPU::none, // TrieToken::KW_IXL = 285
+        CPU::none, // TrieToken::KW_IY = 286
+        CPU::none, // TrieToken::KW_IYH = 287
+        CPU::none, // TrieToken::KW_IYL = 288
+        CPU::none, // TrieToken::KW_JC = 289
+        CPU::none, // TrieToken::KW_JEQ = 290
+        CPU::none, // TrieToken::KW_JGE = 291
+        CPU::none, // TrieToken::KW_JGEU = 292
+        CPU::none, // TrieToken::KW_JGT = 293
+        CPU::none, // TrieToken::KW_JGTU = 294
+        CPU::none, // TrieToken::KW_JK = 295
+        CPU::none, // TrieToken::KW_JKHL = 296
+        CPU::none, // TrieToken::KW_JLE = 297
+        CPU::none, // TrieToken::KW_JLEU = 298
+        CPU::none, // TrieToken::KW_JLO = 299
+        CPU::none, // TrieToken::KW_JLT = 300
+        CPU::none, // TrieToken::KW_JLTU = 301
+        CPU::none, // TrieToken::KW_JLZ = 302
+        CPU::none, // TrieToken::KW_JM = 303
+        CPU::none, // TrieToken::KW_JMP = 304
+        CPU::none, // TrieToken::KW_JNC = 305
+        CPU::none, // TrieToken::KW_JNE = 306
+        CPU::none, // TrieToken::KW_JNK = 307
+        CPU::none, // TrieToken::KW_JNV = 308
+        CPU::none, // TrieToken::KW_JNX5 = 309
+        CPU::none, // TrieToken::KW_JNZ = 310
+        CPU::none, // TrieToken::KW_JP = 311
+        CPU::none, // TrieToken::KW_JP3 = 312
+        CPU::none, // TrieToken::KW_JPE = 313
+        CPU::none, // TrieToken::KW_JPO = 314
+        CPU::none, // TrieToken::KW_JR = 315
+        CPU::none, // TrieToken::KW_JRE = 316
+        CPU::none, // TrieToken::KW_JV = 317
+        CPU::none, // TrieToken::KW_JX5 = 318
+        CPU::none, // TrieToken::KW_JZ = 319
+        CPU::none, // TrieToken::KW_J_C = 320
+        CPU::none, // TrieToken::KW_J_EQ = 321
+        CPU::none, // TrieToken::KW_J_GE = 322
+        CPU::none, // TrieToken::KW_J_GEU = 323
+        CPU::none, // TrieToken::KW_J_GT = 324
+        CPU::none, // TrieToken::KW_J_GTU = 325
+        CPU::none, // TrieToken::KW_J_LE = 326
+        CPU::none, // TrieToken::KW_J_LEU = 327
+        CPU::none, // TrieToken::KW_J_LO = 328
+        CPU::none, // TrieToken::KW_J_LT = 329
+        CPU::none, // TrieToken::KW_J_LTU = 330
+        CPU::none, // TrieToken::KW_J_LZ = 331
+        CPU::none, // TrieToken::KW_J_M = 332
+        CPU::none, // TrieToken::KW_J_NC = 333
+        CPU::none, // TrieToken::KW_J_NE = 334
+        CPU::none, // TrieToken::KW_J_NV = 335
+        CPU::none, // TrieToken::KW_J_NZ = 336
+        CPU::none, // TrieToken::KW_J_P = 337
+        CPU::none, // TrieToken::KW_J_PE = 338
+        CPU::none, // TrieToken::KW_J_PO = 339
+        CPU::none, // TrieToken::KW_J_V = 340
+        CPU::none, // TrieToken::KW_J_Z = 341
+        CPU::none, // TrieToken::KW_K = 342
+        CPU::none, // TrieToken::KW_L = 343
+        CPU::none, // TrieToken::KW_LCALL = 344
+        CPU::none, // TrieToken::KW_LD = 345
+        CPU::none, // TrieToken::KW_LDA = 346
+        CPU::none, // TrieToken::KW_LDAX = 347
+        CPU::none, // TrieToken::KW_LDD = 348
+        CPU::none, // TrieToken::KW_LDDR = 349
+        CPU::none, // TrieToken::KW_LDDRX = 350
+        CPU::none, // TrieToken::KW_LDDSR = 351
+        CPU::none, // TrieToken::KW_LDDX = 352
+        CPU::none, // TrieToken::KW_LDF = 353
+        CPU::none, // TrieToken::KW_LDH = 354
+        CPU::none, // TrieToken::KW_LDHI = 355
+        CPU::none, // TrieToken::KW_LDHL = 356
+        CPU::none, // TrieToken::KW_LDI = 357
+        CPU::none, // TrieToken::KW_LDIR = 358
+        CPU::none, // TrieToken::KW_LDIRX = 359
+        CPU::none, // TrieToken::KW_LDISR = 360
+        CPU::none, // TrieToken::KW_LDIX = 361
+        CPU::none, // TrieToken::KW_LDL = 362
+        CPU::none, // TrieToken::KW_LDP = 363
+        CPU::none, // TrieToken::KW_LDPIRX = 364
+        CPU::none, // TrieToken::KW_LDRX = 365
+        CPU::none, // TrieToken::KW_LDSI = 366
+        CPU::none, // TrieToken::KW_LDWS = 367
+        CPU::none, // TrieToken::KW_LE = 368
+        CPU::none, // TrieToken::KW_LEA = 369
+        CPU::none, // TrieToken::KW_LEU = 370
+        CPU::none, // TrieToken::KW_LHLD = 371
+        CPU::none, // TrieToken::KW_LHLDE = 372
+        CPU::none, // TrieToken::KW_LHLX = 373
+        CPU::none, // TrieToken::KW_LIL = 374
+        CPU::none, // TrieToken::KW_LINE = 375
+        CPU::none, // TrieToken::KW_LIRX = 376
+        CPU::none, // TrieToken::KW_LIS = 377
+        CPU::none, // TrieToken::KW_LJP = 378
+        CPU::none, // TrieToken::KW_LLCALL = 379
+        CPU::none, // TrieToken::KW_LLJP = 380
+        CPU::none, // TrieToken::KW_LLRET = 381
+        CPU::none, // TrieToken::KW_LO = 382
+        CPU::none, // TrieToken::KW_LOCAL = 383
+        CPU::none, // TrieToken::KW_LPRX = 384
+        CPU::none, // TrieToken::KW_LRET = 385
+        CPU::none, // TrieToken::KW_LSDDR = 386
+        CPU::none, // TrieToken::KW_LSDR = 387
+        CPU::none, // TrieToken::KW_LSIDR = 388
+        CPU::none, // TrieToken::KW_LSIR = 389
+        CPU::none, // TrieToken::KW_LT = 390
+        CPU::none, // TrieToken::KW_LTU = 391
+        CPU::none, // TrieToken::KW_LXI = 392
+        CPU::none, // TrieToken::KW_LXPC = 393
+        CPU::none, // TrieToken::KW_LZ = 394
+        CPU::none, // TrieToken::KW_M = 395
+        CPU::none, // TrieToken::KW_MACRO = 396
+        CPU::none, // TrieToken::KW_MB = 397
+        CPU::none, // TrieToken::KW_MD5F1 = 398
+        CPU::none, // TrieToken::KW_MD5F2 = 399
+        CPU::none, // TrieToken::KW_MD5F3 = 400
+        CPU::none, // TrieToken::KW_MEM = 401
+        CPU::none, // TrieToken::KW_MIRR = 402
+        CPU::none, // TrieToken::KW_MIRROR = 403
+        CPU::none, // TrieToken::KW_MLT = 404
+        CPU::none, // TrieToken::KW_MMU = 405
+        CPU::none, // TrieToken::KW_MMU0 = 406
+        CPU::none, // TrieToken::KW_MMU1 = 407
+        CPU::none, // TrieToken::KW_MMU2 = 408
+        CPU::none, // TrieToken::KW_MMU3 = 409
+        CPU::none, // TrieToken::KW_MMU4 = 410
+        CPU::none, // TrieToken::KW_MMU5 = 411
+        CPU::none, // TrieToken::KW_MMU6 = 412
+        CPU::none, // TrieToken::KW_MMU7 = 413
+        CPU::none, // TrieToken::KW_MOV = 414
+        CPU::none, // TrieToken::KW_MUL = 415
+        CPU::none, // TrieToken::KW_MULS = 416
+        CPU::none, // TrieToken::KW_MULU = 417
+        CPU::none, // TrieToken::KW_MULUB = 418
+        CPU::none, // TrieToken::KW_MULUW = 419
+        CPU::none, // TrieToken::KW_MVI = 420
+        CPU::none, // TrieToken::KW_NC = 421
+        CPU::none, // TrieToken::KW_NE = 422
+        CPU::none, // TrieToken::KW_NEG = 423
+        CPU::none, // TrieToken::KW_NEXTREG = 424
+        CPU::none, // TrieToken::KW_NK = 425
+        CPU::none, // TrieToken::KW_NOP = 426
+        CPU::none, // TrieToken::KW_NREG = 427
+        CPU::none, // TrieToken::KW_NV = 428
+        CPU::none, // TrieToken::KW_NX5 = 429
+        CPU::none, // TrieToken::KW_NZ = 430
+        CPU::none, // TrieToken::KW_ONCE = 431
+        CPU::none, // TrieToken::KW_OR = 432
+        CPU::none, // TrieToken::KW_ORA = 433
+        CPU::none, // TrieToken::KW_ORI = 434
+        CPU::none, // TrieToken::KW_OTD2R = 435
+        CPU::none, // TrieToken::KW_OTDM = 436
+        CPU::none, // TrieToken::KW_OTDMR = 437
+        CPU::none, // TrieToken::KW_OTDR = 438
+        CPU::none, // TrieToken::KW_OTDRX = 439
+        CPU::none, // TrieToken::KW_OTI2R = 440
+        CPU::none, // TrieToken::KW_OTIB = 441
+        CPU::none, // TrieToken::KW_OTIM = 442
+        CPU::none, // TrieToken::KW_OTIMR = 443
+        CPU::none, // TrieToken::KW_OTIR = 444
+        CPU::none, // TrieToken::KW_OTIRX = 445
+        CPU::none, // TrieToken::KW_OUT = 446
+        CPU::none, // TrieToken::KW_OUT0 = 447
+        CPU::none, // TrieToken::KW_OUTD = 448
+        CPU::none, // TrieToken::KW_OUTD2 = 449
+        CPU::none, // TrieToken::KW_OUTI = 450
+        CPU::none, // TrieToken::KW_OUTI2 = 451
+        CPU::none, // TrieToken::KW_OUTINB = 452
+        CPU::none, // TrieToken::KW_OVRST8 = 453
+        CPU::none, // TrieToken::KW_P = 454
+        CPU::none, // TrieToken::KW_PBC = 455
+        CPU::none, // TrieToken::KW_PCHL = 456
+        CPU::none, // TrieToken::KW_PDE = 457
+        CPU::none, // TrieToken::KW_PE = 458
+        CPU::none, // TrieToken::KW_PEA = 459
+        CPU::none, // TrieToken::KW_PHL = 460
+        CPU::none, // TrieToken::KW_PIX = 461
+        CPU::none, // TrieToken::KW_PIXELAD = 462
+        CPU::none, // TrieToken::KW_PIXELDN = 463
+        CPU::none, // TrieToken::KW_PIY = 464
+        CPU::none, // TrieToken::KW_PLDD = 465
+        CPU::none, // TrieToken::KW_PLDDR = 466
+        CPU::none, // TrieToken::KW_PLDDSR = 467
+        CPU::none, // TrieToken::KW_PLDI = 468
+        CPU::none, // TrieToken::KW_PLDIR = 469
+        CPU::none, // TrieToken::KW_PLDISR = 470
+        CPU::none, // TrieToken::KW_PLSDDR = 471
+        CPU::none, // TrieToken::KW_PLSDR = 472
+        CPU::none, // TrieToken::KW_PLSIDR = 473
+        CPU::none, // TrieToken::KW_PLSIR = 474
+        CPU::none, // TrieToken::KW_PO = 475
+        CPU::none, // TrieToken::KW_POP = 476
+        CPU::none, // TrieToken::KW_PP = 477
+        CPU::none, // TrieToken::KW_PRAGMA = 478
+        CPU::none, // TrieToken::KW_PSW = 479
+        CPU::none, // TrieToken::KW_PTR = 480
+        CPU::none, // TrieToken::KW_PUMA = 481
+        CPU::none, // TrieToken::KW_PUMS = 482
+        CPU::none, // TrieToken::KW_PUSH = 483
+        CPU::none, // TrieToken::KW_PW = 484
+        CPU::none, // TrieToken::KW_PX = 485
+        CPU::none, // TrieToken::KW_PXAD = 486
+        CPU::none, // TrieToken::KW_PXDN = 487
+        CPU::none, // TrieToken::KW_PY = 488
+        CPU::none, // TrieToken::KW_PZ = 489
+        CPU::none, // TrieToken::KW_R = 490
+        CPU::none, // TrieToken::KW_RAL = 491
+        CPU::none, // TrieToken::KW_RAR = 492
+        CPU::none, // TrieToken::KW_RC = 493
+        CPU::none, // TrieToken::KW_RDEL = 494
+        CPU::none, // TrieToken::KW_RDMODE = 495
+        CPU::none, // TrieToken::KW_REPEAT = 496
+        CPU::none, // TrieToken::KW_REPT = 497
+        CPU::none, // TrieToken::KW_REPTC = 498
+        CPU::none, // TrieToken::KW_REPTI = 499
+        CPU::none, // TrieToken::KW_REQ = 500
+        CPU::none, // TrieToken::KW_RES = 501
+        CPU::none, // TrieToken::KW_RET = 502
+        CPU::none, // TrieToken::KW_RET3 = 503
+        CPU::none, // TrieToken::KW_RETI = 504
+        CPU::none, // TrieToken::KW_RETN = 505
+        CPU::none, // TrieToken::KW_RETN3 = 506
+        CPU::none, // TrieToken::KW_RGEU = 507
+        CPU::none, // TrieToken::KW_RGTU = 508
+        CPU::none, // TrieToken::KW_RIM = 509
+        CPU::none, // TrieToken::KW_RL = 510
+        CPU::none, // TrieToken::KW_RL1REG = 511
+        CPU::none, // TrieToken::KW_RL2REG = 512
+        CPU::none, // TrieToken::KW_RL3REG = 513
+        CPU::none, // TrieToken::KW_RL4REG = 514
+        CPU::none, // TrieToken::KW_RL5REG = 515
+        CPU::none, // TrieToken::KW_RL6REG = 516
+        CPU::none, // TrieToken::KW_RL7REG = 517
+        CPU::none, // TrieToken::KW_RL8REG = 518
+        CPU::none, // TrieToken::KW_RLA = 519
+        CPU::none, // TrieToken::KW_RLB = 520
+        CPU::none, // TrieToken::KW_RLC = 521
+        CPU::none, // TrieToken::KW_RLCA = 522
+        CPU::none, // TrieToken::KW_RLD = 523
+        CPU::none, // TrieToken::KW_RLDE = 524
+        CPU::none, // TrieToken::KW_RLEU = 525
+        CPU::none, // TrieToken::KW_RLO = 526
+        CPU::none, // TrieToken::KW_RLTU = 527
+        CPU::none, // TrieToken::KW_RLZ = 528
+        CPU::none, // TrieToken::KW_RM = 529
+        CPU::none, // TrieToken::KW_RNC = 530
+        CPU::none, // TrieToken::KW_RNE = 531
+        CPU::none, // TrieToken::KW_RNV = 532
+        CPU::none, // TrieToken::KW_RNZ = 533
+        CPU::none, // TrieToken::KW_RP = 534
+        CPU::none, // TrieToken::KW_RPE = 535
+        CPU::none, // TrieToken::KW_RPO = 536
+        CPU::none, // TrieToken::KW_RR = 537
+        CPU::none, // TrieToken::KW_RR1REG = 538
+        CPU::none, // TrieToken::KW_RR2REG = 539
+        CPU::none, // TrieToken::KW_RR3REG = 540
+        CPU::none, // TrieToken::KW_RR4REG = 541
+        CPU::none, // TrieToken::KW_RR5REG = 542
+        CPU::none, // TrieToken::KW_RR6REG = 543
+        CPU::none, // TrieToken::KW_RR7REG = 544
+        CPU::none, // TrieToken::KW_RR8REG = 545
+        CPU::none, // TrieToken::KW_RRA = 546
+        CPU::none, // TrieToken::KW_RRB = 547
+        CPU::none, // TrieToken::KW_RRC = 548
+        CPU::none, // TrieToken::KW_RRCA = 549
+        CPU::none, // TrieToken::KW_RRD = 550
+        CPU::none, // TrieToken::KW_RRHL = 551
+        CPU::none, // TrieToken::KW_RSMIX = 552
+        CPU::none, // TrieToken::KW_RST = 553
+        CPU::none, // TrieToken::KW_RSTV = 554
+        CPU::none, // TrieToken::KW_RV = 555
+        CPU::none, // TrieToken::KW_RZ = 556
+        CPU::none, // TrieToken::KW_R_C = 557
+        CPU::none, // TrieToken::KW_R_EQ = 558
+        CPU::none, // TrieToken::KW_R_GEU = 559
+        CPU::none, // TrieToken::KW_R_GTU = 560
+        CPU::none, // TrieToken::KW_R_LEU = 561
+        CPU::none, // TrieToken::KW_R_LO = 562
+        CPU::none, // TrieToken::KW_R_LTU = 563
+        CPU::none, // TrieToken::KW_R_LZ = 564
+        CPU::none, // TrieToken::KW_R_M = 565
+        CPU::none, // TrieToken::KW_R_NC = 566
+        CPU::none, // TrieToken::KW_R_NE = 567
+        CPU::none, // TrieToken::KW_R_NV = 568
+        CPU::none, // TrieToken::KW_R_NZ = 569
+        CPU::none, // TrieToken::KW_R_P = 570
+        CPU::none, // TrieToken::KW_R_PE = 571
+        CPU::none, // TrieToken::KW_R_PO = 572
+        CPU::none, // TrieToken::KW_R_V = 573
+        CPU::none, // TrieToken::KW_R_Z = 574
+        CPU::none, // TrieToken::KW_S = 575
+        CPU::none, // TrieToken::KW_SBB = 576
+        CPU::none, // TrieToken::KW_SBC = 577
+        CPU::none, // TrieToken::KW_SBI = 578
+        CPU::none, // TrieToken::KW_SBOX = 579
+        CPU::none, // TrieToken::KW_SCALL = 580
+        CPU::none, // TrieToken::KW_SCF = 581
+        CPU::none, // TrieToken::KW_SET = 582
+        CPU::none, // TrieToken::KW_SETAE = 583
+        CPU::none, // TrieToken::KW_SETSYSP = 584
+        CPU::none, // TrieToken::KW_SETUSR = 585
+        CPU::none, // TrieToken::KW_SETUSRP = 586
+        CPU::none, // TrieToken::KW_SHAF1 = 587
+        CPU::none, // TrieToken::KW_SHAF2 = 588
+        CPU::none, // TrieToken::KW_SHAF3 = 589
+        CPU::none, // TrieToken::KW_SHLD = 590
+        CPU::none, // TrieToken::KW_SHLDE = 591
+        CPU::none, // TrieToken::KW_SHLX = 592
+        CPU::none, // TrieToken::KW_SIL = 593
+        CPU::none, // TrieToken::KW_SIM = 594
+        CPU::none, // TrieToken::KW_SIS = 595
+        CPU::none, // TrieToken::KW_SL1REG = 596
+        CPU::none, // TrieToken::KW_SL2REG = 597
+        CPU::none, // TrieToken::KW_SL3REG = 598
+        CPU::none, // TrieToken::KW_SL4REG = 599
+        CPU::none, // TrieToken::KW_SL5REG = 600
+        CPU::none, // TrieToken::KW_SL6REG = 601
+        CPU::none, // TrieToken::KW_SL7REG = 602
+        CPU::none, // TrieToken::KW_SL8REG = 603
+        CPU::none, // TrieToken::KW_SLA = 604
+        CPU::none, // TrieToken::KW_SLI = 605
+        CPU::none, // TrieToken::KW_SLL = 606
+        CPU::none, // TrieToken::KW_SLP = 607
+        CPU::none, // TrieToken::KW_SLS = 608
+        CPU::none, // TrieToken::KW_SP = 609
+        CPU::none, // TrieToken::KW_SPHL = 610
+        CPU::none, // TrieToken::KW_SR1REG = 611
+        CPU::none, // TrieToken::KW_SR2REG = 612
+        CPU::none, // TrieToken::KW_SR3REG = 613
+        CPU::none, // TrieToken::KW_SR4REG = 614
+        CPU::none, // TrieToken::KW_SR5REG = 615
+        CPU::none, // TrieToken::KW_SR6REG = 616
+        CPU::none, // TrieToken::KW_SR7REG = 617
+        CPU::none, // TrieToken::KW_SR8REG = 618
+        CPU::none, // TrieToken::KW_SRA = 619
+        CPU::none, // TrieToken::KW_SRET = 620
+        CPU::none, // TrieToken::KW_SRL = 621
+        CPU::none, // TrieToken::KW_STA = 622
+        CPU::none, // TrieToken::KW_STAE = 623
+        CPU::none, // TrieToken::KW_STAX = 624
+        CPU::none, // TrieToken::KW_STC = 625
+        CPU::none, // TrieToken::KW_STMIX = 626
+        CPU::none, // TrieToken::KW_STOP = 627
+        CPU::none, // TrieToken::KW_SU = 628
+        CPU::none, // TrieToken::KW_SUB = 629
+        CPU::none, // TrieToken::KW_SUI = 630
+        CPU::none, // TrieToken::KW_SURES = 631
+        CPU::none, // TrieToken::KW_SWAP = 632
+        CPU::none, // TrieToken::KW_SWAPNIB = 633
+        CPU::none, // TrieToken::KW_SYSCALL = 634
+        CPU::none, // TrieToken::KW_SYSRET = 635
+        CPU::none, // TrieToken::KW_TEST = 636
+        CPU::none, // TrieToken::KW_TRA = 637
+        CPU::none, // TrieToken::KW_TRUE = 638
+        CPU::none, // TrieToken::KW_TST = 639
+        CPU::none, // TrieToken::KW_TSTIO = 640
+        CPU::none, // TrieToken::KW_TSTNULL = 641
+        CPU::none, // TrieToken::KW_UMA = 642
+        CPU::none, // TrieToken::KW_UMS = 643
+        CPU::none, // TrieToken::KW_UNDEF = 644
+        CPU::none, // TrieToken::KW_UNDEFINE = 645
+        CPU::none, // TrieToken::KW_UNTIL = 646
+        CPU::none, // TrieToken::KW_V = 647
+        CPU::none, // TrieToken::KW_WHILE = 648
+        CPU::none, // TrieToken::KW_WORD = 649
+        CPU::none, // TrieToken::KW_X = 650
+        CPU::none, // TrieToken::KW_X5 = 651
+        CPU::none, // TrieToken::KW_XBC = 652
+        CPU::none, // TrieToken::KW_XCHG = 653
+        CPU::none, // TrieToken::KW_XDE = 654
+        CPU::none, // TrieToken::KW_XHL = 655
+        CPU::none, // TrieToken::KW_XIX = 656
+        CPU::none, // TrieToken::KW_XIY = 657
+        CPU::none, // TrieToken::KW_XOR = 658
+        CPU::none, // TrieToken::KW_XP = 659
+        CPU::none, // TrieToken::KW_XPC = 660
+        CPU::none, // TrieToken::KW_XRA = 661
+        CPU::none, // TrieToken::KW_XRI = 662
+        CPU::none, // TrieToken::KW_XSP = 663
+        CPU::none, // TrieToken::KW_XTHL = 664
+        CPU::none, // TrieToken::KW_XY = 665
+        CPU::none, // TrieToken::KW_YBC = 666
+        CPU::none, // TrieToken::KW_YDE = 667
+        CPU::none, // TrieToken::KW_YHL = 668
+        CPU::none, // TrieToken::KW_YIX = 669
+        CPU::none, // TrieToken::KW_YIY = 670
+        CPU::none, // TrieToken::KW_YP = 671
+        CPU::none, // TrieToken::KW_YSP = 672
+        CPU::none, // TrieToken::KW_Z = 673
+        CPU::none, // TrieToken::KW_ZBC = 674
+        CPU::none, // TrieToken::KW_ZDE = 675
+        CPU::none, // TrieToken::KW_ZHL = 676
+        CPU::none, // TrieToken::KW_ZIX = 677
+        CPU::none, // TrieToken::KW_ZIY = 678
+        CPU::none, // TrieToken::KW_ZP = 679
+        CPU::none, // TrieToken::KW_ZSP = 680
+        CPU::none, // TrieToken::KW___Z80ASM__ADC_HL_BC = 681
+        CPU::none, // TrieToken::KW___Z80ASM__ADC_HL_DE = 682
+        CPU::none, // TrieToken::KW___Z80ASM__ADC_HL_HL = 683
+        CPU::none, // TrieToken::KW___Z80ASM__ADC_HL_SP = 684
+        CPU::none, // TrieToken::KW___Z80ASM__ADD_BC_A = 685
+        CPU::none, // TrieToken::KW___Z80ASM__ADD_DE_A = 686
+        CPU::none, // TrieToken::KW___Z80ASM__ADD_HL_A = 687
+        CPU::none, // TrieToken::KW___Z80ASM__ADD_SP_D = 688
+        CPU::none, // TrieToken::KW___Z80ASM__CALL_HL = 689
+        CPU::none, // TrieToken::KW___Z80ASM__CALL_IX = 690
+        CPU::none, // TrieToken::KW___Z80ASM__CALL_IY = 691
+        CPU::none, // TrieToken::KW___Z80ASM__CPD = 692
+        CPU::none, // TrieToken::KW___Z80ASM__CPDR = 693
+        CPU::none, // TrieToken::KW___Z80ASM__CPI = 694
+        CPU::none, // TrieToken::KW___Z80ASM__CPIR = 695
+        CPU::none, // TrieToken::KW___Z80ASM__DAA = 696
+        CPU::none, // TrieToken::KW___Z80ASM__EX_SP_HL = 697
+        CPU::none, // TrieToken::KW___Z80ASM__LDD = 698
+        CPU::none, // TrieToken::KW___Z80ASM__LDDR = 699
+        CPU::none, // TrieToken::KW___Z80ASM__LDI = 700
+        CPU::none, // TrieToken::KW___Z80ASM__LDIR = 701
+        CPU::none, // TrieToken::KW___Z80ASM__RLD = 702
+        CPU::none, // TrieToken::KW___Z80ASM__RL_BC = 703
+        CPU::none, // TrieToken::KW___Z80ASM__RL_DE = 704
+        CPU::none, // TrieToken::KW___Z80ASM__RL_HL = 705
+        CPU::none, // TrieToken::KW___Z80ASM__RRD = 706
+        CPU::none, // TrieToken::KW___Z80ASM__RR_BC = 707
+        CPU::none, // TrieToken::KW___Z80ASM__RR_DE = 708
+        CPU::none, // TrieToken::KW___Z80ASM__RR_HL = 709
+        CPU::none, // TrieToken::KW___Z80ASM__SBC_HL_BC = 710
+        CPU::none, // TrieToken::KW___Z80ASM__SBC_HL_DE = 711
+        CPU::none, // TrieToken::KW___Z80ASM__SBC_HL_HL = 712
+        CPU::none, // TrieToken::KW___Z80ASM__SBC_HL_SP = 713
+        CPU::none, // TrieToken::KW___Z80ASM__SRA_BC = 714
+        CPU::none, // TrieToken::KW___Z80ASM__SRA_DE = 715
+        CPU::none, // TrieToken::KW___Z80ASM__SRA_HL = 716
+        CPU::none, // TrieToken::KW___Z80ASM__SUB_HL_BC = 717
+        CPU::none, // TrieToken::KW___Z80ASM__SUB_HL_DE = 718
+        CPU::none, // TrieToken::KW___Z80ASM__SUB_HL_HL = 719
+        CPU::none, // TrieToken::KW___Z80ASM__SUB_HL_SP = 720
+    };
+    return lut[static_cast<size_t>(trie_token)];
+}
+
+TrieToken to_trie_token(TokenType token_type) {
+    static const TrieToken lut[45] = {
+        TrieToken::None, // TokenType::None = 0
+        TrieToken::TK_Identifier, // TokenType::Identifier = 1
+        TrieToken::TK_Integer, // TokenType::Integer = 2
+        TrieToken::TK_Float, // TokenType::Float = 3
+        TrieToken::TK_String, // TokenType::String = 4
+        TrieToken::TK_Plus, // TokenType::Plus = 5
+        TrieToken::TK_Minus, // TokenType::Minus = 6
+        TrieToken::TK_Multiply, // TokenType::Multiply = 7
+        TrieToken::TK_Divide, // TokenType::Divide = 8
+        TrieToken::TK_Modulo, // TokenType::Modulo = 9
+        TrieToken::TK_Power, // TokenType::Power = 10
+        TrieToken::TK_BitwiseAnd, // TokenType::BitwiseAnd = 11
+        TrieToken::TK_BitwiseOr, // TokenType::BitwiseOr = 12
+        TrieToken::TK_BitwiseXor, // TokenType::BitwiseXor = 13
+        TrieToken::TK_BitwiseNot, // TokenType::BitwiseNot = 14
+        TrieToken::TK_LeftShift, // TokenType::LeftShift = 15
+        TrieToken::TK_RightShift, // TokenType::RightShift = 16
+        TrieToken::TK_LogicalAnd, // TokenType::LogicalAnd = 17
+        TrieToken::TK_LogicalOr, // TokenType::LogicalOr = 18
+        TrieToken::TK_LogicalXor, // TokenType::LogicalXor = 19
+        TrieToken::TK_LogicalNot, // TokenType::LogicalNot = 20
+        TrieToken::TK_EQ, // TokenType::EQ = 21
+        TrieToken::TK_NE, // TokenType::NE = 22
+        TrieToken::TK_LT, // TokenType::LT = 23
+        TrieToken::TK_LE, // TokenType::LE = 24
+        TrieToken::TK_GT, // TokenType::GT = 25
+        TrieToken::TK_GE, // TokenType::GE = 26
+        TrieToken::TK_LeftParen, // TokenType::LeftParen = 27
+        TrieToken::TK_RightParen, // TokenType::RightParen = 28
+        TrieToken::TK_LeftBracket, // TokenType::LeftBracket = 29
+        TrieToken::TK_RightBracket, // TokenType::RightBracket = 30
+        TrieToken::TK_LeftBrace, // TokenType::LeftBrace = 31
+        TrieToken::TK_RightBrace, // TokenType::RightBrace = 32
+        TrieToken::TK_Comma, // TokenType::Comma = 33
+        TrieToken::TK_Colon, // TokenType::Colon = 34
+        TrieToken::TK_Dot, // TokenType::Dot = 35
+        TrieToken::TK_Question, // TokenType::Question = 36
+        TrieToken::TK_Hash, // TokenType::Hash = 37
+        TrieToken::TK_DoubleHash, // TokenType::DoubleHash = 38
+        TrieToken::TK_At, // TokenType::At = 39
+        TrieToken::TK_Dollar, // TokenType::Dollar = 40
+        TrieToken::TK_Backslash, // TokenType::Backslash = 41
+        TrieToken::TK_Tick, // TokenType::Tick = 42
+        TrieToken::TK_ASMPC, // TokenType::ASMPC = 43
+        TrieToken::TK_EndOfLine, // TokenType::EndOfLine = 44
+    };
+    return lut[static_cast<size_t>(token_type)];
+}
+
+TokenType to_token_type(TrieToken trie_token) {
+    static const TokenType lut[721] = {
+        TokenType::None, // TrieToken::None = 0
+        TokenType::None, // TrieToken::Expr = 1
+        TokenType::None, // TrieToken::Label = 2
+        TokenType::None, // TrieToken::cpu_z80 = 3
+        TokenType::None, // TrieToken::cpu_z80_strict = 4
+        TokenType::None, // TrieToken::cpu_z180 = 5
+        TokenType::None, // TrieToken::cpu_ez80_z80 = 6
+        TokenType::None, // TrieToken::cpu_ez80 = 7
+        TokenType::None, // TrieToken::cpu_z80n = 8
+        TokenType::None, // TrieToken::cpu_r2ka = 9
+        TokenType::None, // TrieToken::cpu_r3k = 10
+        TokenType::None, // TrieToken::cpu_gbz80 = 11
+        TokenType::None, // TrieToken::cpu_i8080 = 12
+        TokenType::None, // TrieToken::cpu_i8085 = 13
+        TokenType::None, // TrieToken::cpu_r800 = 14
+        TokenType::None, // TrieToken::cpu_r4k = 15
+        TokenType::None, // TrieToken::cpu_r5k = 16
+        TokenType::None, // TrieToken::cpu_kc160 = 17
+        TokenType::None, // TrieToken::cpu_kc160_z80 = 18
+        TokenType::None, // TrieToken::cpu_i8080_strict = 19
+        TokenType::None, // TrieToken::cpu_i8085_strict = 20
+        TokenType::None, // TrieToken::cpu_gbz80_strict = 21
+        TokenType::None, // TrieToken::cpu_z180_strict = 22
+        TokenType::None, // TrieToken::cpu_z80n_strict = 23
+        TokenType::None, // TrieToken::cpu_ez80_z80_strict = 24
+        TokenType::None, // TrieToken::cpu_ez80_strict = 25
+        TokenType::None, // TrieToken::cpu_r800_strict = 26
+        TokenType::None, // TrieToken::cpu_kc160_strict = 27
+        TokenType::None, // TrieToken::cpu_kc160_z80_strict = 28
+        TokenType::None, // TrieToken::cpu_r2ka_strict = 29
+        TokenType::None, // TrieToken::cpu_r3k_strict = 30
+        TokenType::None, // TrieToken::cpu_r4k_strict = 31
+        TokenType::None, // TrieToken::cpu_r5k_strict = 32
+        TokenType::None, // TrieToken::cpu_r6k = 33
+        TokenType::None, // TrieToken::cpu_r6k_strict = 34
+        TokenType::Identifier, // TrieToken::TK_Identifier = 35
+        TokenType::Integer, // TrieToken::TK_Integer = 36
+        TokenType::Float, // TrieToken::TK_Float = 37
+        TokenType::String, // TrieToken::TK_String = 38
+        TokenType::Plus, // TrieToken::TK_Plus = 39
+        TokenType::Minus, // TrieToken::TK_Minus = 40
+        TokenType::Multiply, // TrieToken::TK_Multiply = 41
+        TokenType::Divide, // TrieToken::TK_Divide = 42
+        TokenType::Modulo, // TrieToken::TK_Modulo = 43
+        TokenType::Power, // TrieToken::TK_Power = 44
+        TokenType::BitwiseAnd, // TrieToken::TK_BitwiseAnd = 45
+        TokenType::BitwiseOr, // TrieToken::TK_BitwiseOr = 46
+        TokenType::BitwiseXor, // TrieToken::TK_BitwiseXor = 47
+        TokenType::BitwiseNot, // TrieToken::TK_BitwiseNot = 48
+        TokenType::LeftShift, // TrieToken::TK_LeftShift = 49
+        TokenType::RightShift, // TrieToken::TK_RightShift = 50
+        TokenType::LogicalAnd, // TrieToken::TK_LogicalAnd = 51
+        TokenType::LogicalOr, // TrieToken::TK_LogicalOr = 52
+        TokenType::LogicalXor, // TrieToken::TK_LogicalXor = 53
+        TokenType::LogicalNot, // TrieToken::TK_LogicalNot = 54
+        TokenType::EQ, // TrieToken::TK_EQ = 55
+        TokenType::NE, // TrieToken::TK_NE = 56
+        TokenType::LT, // TrieToken::TK_LT = 57
+        TokenType::LE, // TrieToken::TK_LE = 58
+        TokenType::GT, // TrieToken::TK_GT = 59
+        TokenType::GE, // TrieToken::TK_GE = 60
+        TokenType::LeftParen, // TrieToken::TK_LeftParen = 61
+        TokenType::RightParen, // TrieToken::TK_RightParen = 62
+        TokenType::LeftBracket, // TrieToken::TK_LeftBracket = 63
+        TokenType::RightBracket, // TrieToken::TK_RightBracket = 64
+        TokenType::LeftBrace, // TrieToken::TK_LeftBrace = 65
+        TokenType::RightBrace, // TrieToken::TK_RightBrace = 66
+        TokenType::Comma, // TrieToken::TK_Comma = 67
+        TokenType::Colon, // TrieToken::TK_Colon = 68
+        TokenType::Dot, // TrieToken::TK_Dot = 69
+        TokenType::Question, // TrieToken::TK_Question = 70
+        TokenType::Hash, // TrieToken::TK_Hash = 71
+        TokenType::DoubleHash, // TrieToken::TK_DoubleHash = 72
+        TokenType::At, // TrieToken::TK_At = 73
+        TokenType::Dollar, // TrieToken::TK_Dollar = 74
+        TokenType::Backslash, // TrieToken::TK_Backslash = 75
+        TokenType::Tick, // TrieToken::TK_Tick = 76
+        TokenType::ASMPC, // TrieToken::TK_ASMPC = 77
+        TokenType::EndOfLine, // TrieToken::TK_EndOfLine = 78
+        TokenType::None, // TrieToken::KW_A = 79
+        TokenType::None, // TrieToken::KW_ABC = 80
+        TokenType::None, // TrieToken::KW_ACI = 81
+        TokenType::None, // TrieToken::KW_ADC = 82
+        TokenType::None, // TrieToken::KW_ADD = 83
+        TokenType::None, // TrieToken::KW_ADE = 84
+        TokenType::None, // TrieToken::KW_ADI = 85
+        TokenType::None, // TrieToken::KW_AESIMC = 86
+        TokenType::None, // TrieToken::KW_AESISR = 87
+        TokenType::None, // TrieToken::KW_AESMC = 88
+        TokenType::None, // TrieToken::KW_AESSR = 89
+        TokenType::None, // TrieToken::KW_AF = 90
+        TokenType::None, // TrieToken::KW_AHL = 91
+        TokenType::None, // TrieToken::KW_AIX = 92
+        TokenType::None, // TrieToken::KW_AIY = 93
+        TokenType::None, // TrieToken::KW_ALTD = 94
+        TokenType::None, // TrieToken::KW_ALTS = 95
+        TokenType::None, // TrieToken::KW_ALTSD = 96
+        TokenType::None, // TrieToken::KW_ANA = 97
+        TokenType::None, // TrieToken::KW_AND = 98
+        TokenType::None, // TrieToken::KW_ANI = 99
+        TokenType::None, // TrieToken::KW_ARHL = 100
+        TokenType::None, // TrieToken::KW_ASMPC = 101
+        TokenType::None, // TrieToken::KW_ASP = 102
+        TokenType::None, // TrieToken::KW_ASSERT = 103
+        TokenType::None, // TrieToken::KW_ASSUME = 104
+        TokenType::None, // TrieToken::KW_B = 105
+        TokenType::None, // TrieToken::KW_BC = 106
+        TokenType::None, // TrieToken::KW_BCDE = 107
+        TokenType::None, // TrieToken::KW_BINARY = 108
+        TokenType::None, // TrieToken::KW_BIT = 109
+        TokenType::None, // TrieToken::KW_BOOL = 110
+        TokenType::None, // TrieToken::KW_BREAK = 111
+        TokenType::None, // TrieToken::KW_BRLC = 112
+        TokenType::None, // TrieToken::KW_BSLA = 113
+        TokenType::None, // TrieToken::KW_BSRA = 114
+        TokenType::None, // TrieToken::KW_BSRF = 115
+        TokenType::None, // TrieToken::KW_BSRL = 116
+        TokenType::None, // TrieToken::KW_BYTE = 117
+        TokenType::None, // TrieToken::KW_C = 118
+        TokenType::None, // TrieToken::KW_CALL = 119
+        TokenType::None, // TrieToken::KW_CALL3 = 120
+        TokenType::None, // TrieToken::KW_CBM = 121
+        TokenType::None, // TrieToken::KW_CC = 122
+        TokenType::None, // TrieToken::KW_CCF = 123
+        TokenType::None, // TrieToken::KW_CEQ = 124
+        TokenType::None, // TrieToken::KW_CGEU = 125
+        TokenType::None, // TrieToken::KW_CGTU = 126
+        TokenType::None, // TrieToken::KW_CLEU = 127
+        TokenType::None, // TrieToken::KW_CLO = 128
+        TokenType::None, // TrieToken::KW_CLR = 129
+        TokenType::None, // TrieToken::KW_CLTU = 130
+        TokenType::None, // TrieToken::KW_CLZ = 131
+        TokenType::None, // TrieToken::KW_CM = 132
+        TokenType::None, // TrieToken::KW_CMA = 133
+        TokenType::None, // TrieToken::KW_CMC = 134
+        TokenType::None, // TrieToken::KW_CMP = 135
+        TokenType::None, // TrieToken::KW_CNC = 136
+        TokenType::None, // TrieToken::KW_CNE = 137
+        TokenType::None, // TrieToken::KW_CNV = 138
+        TokenType::None, // TrieToken::KW_CNVC = 139
+        TokenType::None, // TrieToken::KW_CNVD = 140
+        TokenType::None, // TrieToken::KW_CNZ = 141
+        TokenType::None, // TrieToken::KW_CONTINUE = 142
+        TokenType::None, // TrieToken::KW_CONVC = 143
+        TokenType::None, // TrieToken::KW_CONVD = 144
+        TokenType::None, // TrieToken::KW_COPY = 145
+        TokenType::None, // TrieToken::KW_COPYR = 146
+        TokenType::None, // TrieToken::KW_CP = 147
+        TokenType::None, // TrieToken::KW_CPD = 148
+        TokenType::None, // TrieToken::KW_CPDR = 149
+        TokenType::None, // TrieToken::KW_CPE = 150
+        TokenType::None, // TrieToken::KW_CPI = 151
+        TokenType::None, // TrieToken::KW_CPIR = 152
+        TokenType::None, // TrieToken::KW_CPL = 153
+        TokenType::None, // TrieToken::KW_CPO = 154
+        TokenType::None, // TrieToken::KW_CV = 155
+        TokenType::None, // TrieToken::KW_CZ = 156
+        TokenType::None, // TrieToken::KW_C_C = 157
+        TokenType::None, // TrieToken::KW_C_EQ = 158
+        TokenType::None, // TrieToken::KW_C_GEU = 159
+        TokenType::None, // TrieToken::KW_C_GTU = 160
+        TokenType::None, // TrieToken::KW_C_LEU = 161
+        TokenType::None, // TrieToken::KW_C_LINE = 162
+        TokenType::None, // TrieToken::KW_C_LO = 163
+        TokenType::None, // TrieToken::KW_C_LTU = 164
+        TokenType::None, // TrieToken::KW_C_LZ = 165
+        TokenType::None, // TrieToken::KW_C_M = 166
+        TokenType::None, // TrieToken::KW_C_NC = 167
+        TokenType::None, // TrieToken::KW_C_NE = 168
+        TokenType::None, // TrieToken::KW_C_NV = 169
+        TokenType::None, // TrieToken::KW_C_NZ = 170
+        TokenType::None, // TrieToken::KW_C_P = 171
+        TokenType::None, // TrieToken::KW_C_PE = 172
+        TokenType::None, // TrieToken::KW_C_PO = 173
+        TokenType::None, // TrieToken::KW_C_V = 174
+        TokenType::None, // TrieToken::KW_C_Z = 175
+        TokenType::None, // TrieToken::KW_D = 176
+        TokenType::None, // TrieToken::KW_DAA = 177
+        TokenType::None, // TrieToken::KW_DAD = 178
+        TokenType::None, // TrieToken::KW_DB = 179
+        TokenType::None, // TrieToken::KW_DCR = 180
+        TokenType::None, // TrieToken::KW_DCX = 181
+        TokenType::None, // TrieToken::KW_DDB = 182
+        TokenType::None, // TrieToken::KW_DE = 183
+        TokenType::None, // TrieToken::KW_DEC = 184
+        TokenType::None, // TrieToken::KW_DEFB = 185
+        TokenType::None, // TrieToken::KW_DEFC = 186
+        TokenType::None, // TrieToken::KW_DEFDB = 187
+        TokenType::None, // TrieToken::KW_DEFINE = 188
+        TokenType::None, // TrieToken::KW_DEFL = 189
+        TokenType::None, // TrieToken::KW_DEFM = 190
+        TokenType::None, // TrieToken::KW_DEFP = 191
+        TokenType::None, // TrieToken::KW_DEFQ = 192
+        TokenType::None, // TrieToken::KW_DEFS = 193
+        TokenType::None, // TrieToken::KW_DEFW = 194
+        TokenType::None, // TrieToken::KW_DEFW_BE = 195
+        TokenType::None, // TrieToken::KW_DEHL = 196
+        TokenType::None, // TrieToken::KW_DI = 197
+        TokenType::None, // TrieToken::KW_DIV = 198
+        TokenType::None, // TrieToken::KW_DIVS = 199
+        TokenType::None, // TrieToken::KW_DJNZ = 200
+        TokenType::None, // TrieToken::KW_DM = 201
+        TokenType::None, // TrieToken::KW_DP = 202
+        TokenType::None, // TrieToken::KW_DQ = 203
+        TokenType::None, // TrieToken::KW_DS = 204
+        TokenType::None, // TrieToken::KW_DSUB = 205
+        TokenType::None, // TrieToken::KW_DW = 206
+        TokenType::None, // TrieToken::KW_DWJNZ = 207
+        TokenType::None, // TrieToken::KW_DWORD = 208
+        TokenType::None, // TrieToken::KW_DW_BE = 209
+        TokenType::None, // TrieToken::KW_E = 210
+        TokenType::None, // TrieToken::KW_EI = 211
+        TokenType::None, // TrieToken::KW_EIR = 212
+        TokenType::None, // TrieToken::KW_ELIF = 213
+        TokenType::None, // TrieToken::KW_ELIFDEF = 214
+        TokenType::None, // TrieToken::KW_ELIFNDEF = 215
+        TokenType::None, // TrieToken::KW_ELSE = 216
+        TokenType::None, // TrieToken::KW_ELSEIF = 217
+        TokenType::None, // TrieToken::KW_ELSEIFDEF = 218
+        TokenType::None, // TrieToken::KW_ELSEIFNDEF = 219
+        TokenType::None, // TrieToken::KW_ENDIF = 220
+        TokenType::None, // TrieToken::KW_ENDM = 221
+        TokenType::None, // TrieToken::KW_ENDR = 222
+        TokenType::None, // TrieToken::KW_ENDWHILE = 223
+        TokenType::None, // TrieToken::KW_EQ = 224
+        TokenType::None, // TrieToken::KW_EQU = 225
+        TokenType::None, // TrieToken::KW_ERROR = 226
+        TokenType::None, // TrieToken::KW_EX = 227
+        TokenType::None, // TrieToken::KW_EXITM = 228
+        TokenType::None, // TrieToken::KW_EXP = 229
+        TokenType::None, // TrieToken::KW_EXTERN = 230
+        TokenType::None, // TrieToken::KW_EXX = 231
+        TokenType::None, // TrieToken::KW_F = 232
+        TokenType::None, // TrieToken::KW_FALSE = 233
+        TokenType::None, // TrieToken::KW_FLAG = 234
+        TokenType::None, // TrieToken::KW_FSYSCALL = 235
+        TokenType::None, // TrieToken::KW_GE = 236
+        TokenType::None, // TrieToken::KW_GEU = 237
+        TokenType::None, // TrieToken::KW_GT = 238
+        TokenType::None, // TrieToken::KW_GTU = 239
+        TokenType::None, // TrieToken::KW_H = 240
+        TokenType::None, // TrieToken::KW_HALT = 241
+        TokenType::None, // TrieToken::KW_HL = 242
+        TokenType::None, // TrieToken::KW_HLD = 243
+        TokenType::None, // TrieToken::KW_HLI = 244
+        TokenType::None, // TrieToken::KW_HLT = 245
+        TokenType::None, // TrieToken::KW_HTR = 246
+        TokenType::None, // TrieToken::KW_I = 247
+        TokenType::None, // TrieToken::KW_IBOX = 248
+        TokenType::None, // TrieToken::KW_IDET = 249
+        TokenType::None, // TrieToken::KW_IF = 250
+        TokenType::None, // TrieToken::KW_IFDEF = 251
+        TokenType::None, // TrieToken::KW_IFNDEF = 252
+        TokenType::None, // TrieToken::KW_IIR = 253
+        TokenType::None, // TrieToken::KW_IL = 254
+        TokenType::None, // TrieToken::KW_IM = 255
+        TokenType::None, // TrieToken::KW_IN = 256
+        TokenType::None, // TrieToken::KW_IN0 = 257
+        TokenType::None, // TrieToken::KW_INC = 258
+        TokenType::None, // TrieToken::KW_INCBIN = 259
+        TokenType::None, // TrieToken::KW_INCLUDE = 260
+        TokenType::None, // TrieToken::KW_IND = 261
+        TokenType::None, // TrieToken::KW_IND2 = 262
+        TokenType::None, // TrieToken::KW_IND2R = 263
+        TokenType::None, // TrieToken::KW_INDM = 264
+        TokenType::None, // TrieToken::KW_INDMR = 265
+        TokenType::None, // TrieToken::KW_INDR = 266
+        TokenType::None, // TrieToken::KW_INDRX = 267
+        TokenType::None, // TrieToken::KW_INI = 268
+        TokenType::None, // TrieToken::KW_INI2 = 269
+        TokenType::None, // TrieToken::KW_INI2R = 270
+        TokenType::None, // TrieToken::KW_INIM = 271
+        TokenType::None, // TrieToken::KW_INIMR = 272
+        TokenType::None, // TrieToken::KW_INIR = 273
+        TokenType::None, // TrieToken::KW_INIRX = 274
+        TokenType::None, // TrieToken::KW_INR = 275
+        TokenType::None, // TrieToken::KW_INX = 276
+        TokenType::None, // TrieToken::KW_IOE = 277
+        TokenType::None, // TrieToken::KW_IOI = 278
+        TokenType::None, // TrieToken::KW_IP = 279
+        TokenType::None, // TrieToken::KW_IPRES = 280
+        TokenType::None, // TrieToken::KW_IPSET = 281
+        TokenType::None, // TrieToken::KW_IS = 282
+        TokenType::None, // TrieToken::KW_IX = 283
+        TokenType::None, // TrieToken::KW_IXH = 284
+        TokenType::None, // TrieToken::KW_IXL = 285
+        TokenType::None, // TrieToken::KW_IY = 286
+        TokenType::None, // TrieToken::KW_IYH = 287
+        TokenType::None, // TrieToken::KW_IYL = 288
+        TokenType::None, // TrieToken::KW_JC = 289
+        TokenType::None, // TrieToken::KW_JEQ = 290
+        TokenType::None, // TrieToken::KW_JGE = 291
+        TokenType::None, // TrieToken::KW_JGEU = 292
+        TokenType::None, // TrieToken::KW_JGT = 293
+        TokenType::None, // TrieToken::KW_JGTU = 294
+        TokenType::None, // TrieToken::KW_JK = 295
+        TokenType::None, // TrieToken::KW_JKHL = 296
+        TokenType::None, // TrieToken::KW_JLE = 297
+        TokenType::None, // TrieToken::KW_JLEU = 298
+        TokenType::None, // TrieToken::KW_JLO = 299
+        TokenType::None, // TrieToken::KW_JLT = 300
+        TokenType::None, // TrieToken::KW_JLTU = 301
+        TokenType::None, // TrieToken::KW_JLZ = 302
+        TokenType::None, // TrieToken::KW_JM = 303
+        TokenType::None, // TrieToken::KW_JMP = 304
+        TokenType::None, // TrieToken::KW_JNC = 305
+        TokenType::None, // TrieToken::KW_JNE = 306
+        TokenType::None, // TrieToken::KW_JNK = 307
+        TokenType::None, // TrieToken::KW_JNV = 308
+        TokenType::None, // TrieToken::KW_JNX5 = 309
+        TokenType::None, // TrieToken::KW_JNZ = 310
+        TokenType::None, // TrieToken::KW_JP = 311
+        TokenType::None, // TrieToken::KW_JP3 = 312
+        TokenType::None, // TrieToken::KW_JPE = 313
+        TokenType::None, // TrieToken::KW_JPO = 314
+        TokenType::None, // TrieToken::KW_JR = 315
+        TokenType::None, // TrieToken::KW_JRE = 316
+        TokenType::None, // TrieToken::KW_JV = 317
+        TokenType::None, // TrieToken::KW_JX5 = 318
+        TokenType::None, // TrieToken::KW_JZ = 319
+        TokenType::None, // TrieToken::KW_J_C = 320
+        TokenType::None, // TrieToken::KW_J_EQ = 321
+        TokenType::None, // TrieToken::KW_J_GE = 322
+        TokenType::None, // TrieToken::KW_J_GEU = 323
+        TokenType::None, // TrieToken::KW_J_GT = 324
+        TokenType::None, // TrieToken::KW_J_GTU = 325
+        TokenType::None, // TrieToken::KW_J_LE = 326
+        TokenType::None, // TrieToken::KW_J_LEU = 327
+        TokenType::None, // TrieToken::KW_J_LO = 328
+        TokenType::None, // TrieToken::KW_J_LT = 329
+        TokenType::None, // TrieToken::KW_J_LTU = 330
+        TokenType::None, // TrieToken::KW_J_LZ = 331
+        TokenType::None, // TrieToken::KW_J_M = 332
+        TokenType::None, // TrieToken::KW_J_NC = 333
+        TokenType::None, // TrieToken::KW_J_NE = 334
+        TokenType::None, // TrieToken::KW_J_NV = 335
+        TokenType::None, // TrieToken::KW_J_NZ = 336
+        TokenType::None, // TrieToken::KW_J_P = 337
+        TokenType::None, // TrieToken::KW_J_PE = 338
+        TokenType::None, // TrieToken::KW_J_PO = 339
+        TokenType::None, // TrieToken::KW_J_V = 340
+        TokenType::None, // TrieToken::KW_J_Z = 341
+        TokenType::None, // TrieToken::KW_K = 342
+        TokenType::None, // TrieToken::KW_L = 343
+        TokenType::None, // TrieToken::KW_LCALL = 344
+        TokenType::None, // TrieToken::KW_LD = 345
+        TokenType::None, // TrieToken::KW_LDA = 346
+        TokenType::None, // TrieToken::KW_LDAX = 347
+        TokenType::None, // TrieToken::KW_LDD = 348
+        TokenType::None, // TrieToken::KW_LDDR = 349
+        TokenType::None, // TrieToken::KW_LDDRX = 350
+        TokenType::None, // TrieToken::KW_LDDSR = 351
+        TokenType::None, // TrieToken::KW_LDDX = 352
+        TokenType::None, // TrieToken::KW_LDF = 353
+        TokenType::None, // TrieToken::KW_LDH = 354
+        TokenType::None, // TrieToken::KW_LDHI = 355
+        TokenType::None, // TrieToken::KW_LDHL = 356
+        TokenType::None, // TrieToken::KW_LDI = 357
+        TokenType::None, // TrieToken::KW_LDIR = 358
+        TokenType::None, // TrieToken::KW_LDIRX = 359
+        TokenType::None, // TrieToken::KW_LDISR = 360
+        TokenType::None, // TrieToken::KW_LDIX = 361
+        TokenType::None, // TrieToken::KW_LDL = 362
+        TokenType::None, // TrieToken::KW_LDP = 363
+        TokenType::None, // TrieToken::KW_LDPIRX = 364
+        TokenType::None, // TrieToken::KW_LDRX = 365
+        TokenType::None, // TrieToken::KW_LDSI = 366
+        TokenType::None, // TrieToken::KW_LDWS = 367
+        TokenType::None, // TrieToken::KW_LE = 368
+        TokenType::None, // TrieToken::KW_LEA = 369
+        TokenType::None, // TrieToken::KW_LEU = 370
+        TokenType::None, // TrieToken::KW_LHLD = 371
+        TokenType::None, // TrieToken::KW_LHLDE = 372
+        TokenType::None, // TrieToken::KW_LHLX = 373
+        TokenType::None, // TrieToken::KW_LIL = 374
+        TokenType::None, // TrieToken::KW_LINE = 375
+        TokenType::None, // TrieToken::KW_LIRX = 376
+        TokenType::None, // TrieToken::KW_LIS = 377
+        TokenType::None, // TrieToken::KW_LJP = 378
+        TokenType::None, // TrieToken::KW_LLCALL = 379
+        TokenType::None, // TrieToken::KW_LLJP = 380
+        TokenType::None, // TrieToken::KW_LLRET = 381
+        TokenType::None, // TrieToken::KW_LO = 382
+        TokenType::None, // TrieToken::KW_LOCAL = 383
+        TokenType::None, // TrieToken::KW_LPRX = 384
+        TokenType::None, // TrieToken::KW_LRET = 385
+        TokenType::None, // TrieToken::KW_LSDDR = 386
+        TokenType::None, // TrieToken::KW_LSDR = 387
+        TokenType::None, // TrieToken::KW_LSIDR = 388
+        TokenType::None, // TrieToken::KW_LSIR = 389
+        TokenType::None, // TrieToken::KW_LT = 390
+        TokenType::None, // TrieToken::KW_LTU = 391
+        TokenType::None, // TrieToken::KW_LXI = 392
+        TokenType::None, // TrieToken::KW_LXPC = 393
+        TokenType::None, // TrieToken::KW_LZ = 394
+        TokenType::None, // TrieToken::KW_M = 395
+        TokenType::None, // TrieToken::KW_MACRO = 396
+        TokenType::None, // TrieToken::KW_MB = 397
+        TokenType::None, // TrieToken::KW_MD5F1 = 398
+        TokenType::None, // TrieToken::KW_MD5F2 = 399
+        TokenType::None, // TrieToken::KW_MD5F3 = 400
+        TokenType::None, // TrieToken::KW_MEM = 401
+        TokenType::None, // TrieToken::KW_MIRR = 402
+        TokenType::None, // TrieToken::KW_MIRROR = 403
+        TokenType::None, // TrieToken::KW_MLT = 404
+        TokenType::None, // TrieToken::KW_MMU = 405
+        TokenType::None, // TrieToken::KW_MMU0 = 406
+        TokenType::None, // TrieToken::KW_MMU1 = 407
+        TokenType::None, // TrieToken::KW_MMU2 = 408
+        TokenType::None, // TrieToken::KW_MMU3 = 409
+        TokenType::None, // TrieToken::KW_MMU4 = 410
+        TokenType::None, // TrieToken::KW_MMU5 = 411
+        TokenType::None, // TrieToken::KW_MMU6 = 412
+        TokenType::None, // TrieToken::KW_MMU7 = 413
+        TokenType::None, // TrieToken::KW_MOV = 414
+        TokenType::None, // TrieToken::KW_MUL = 415
+        TokenType::None, // TrieToken::KW_MULS = 416
+        TokenType::None, // TrieToken::KW_MULU = 417
+        TokenType::None, // TrieToken::KW_MULUB = 418
+        TokenType::None, // TrieToken::KW_MULUW = 419
+        TokenType::None, // TrieToken::KW_MVI = 420
+        TokenType::None, // TrieToken::KW_NC = 421
+        TokenType::None, // TrieToken::KW_NE = 422
+        TokenType::None, // TrieToken::KW_NEG = 423
+        TokenType::None, // TrieToken::KW_NEXTREG = 424
+        TokenType::None, // TrieToken::KW_NK = 425
+        TokenType::None, // TrieToken::KW_NOP = 426
+        TokenType::None, // TrieToken::KW_NREG = 427
+        TokenType::None, // TrieToken::KW_NV = 428
+        TokenType::None, // TrieToken::KW_NX5 = 429
+        TokenType::None, // TrieToken::KW_NZ = 430
+        TokenType::None, // TrieToken::KW_ONCE = 431
+        TokenType::None, // TrieToken::KW_OR = 432
+        TokenType::None, // TrieToken::KW_ORA = 433
+        TokenType::None, // TrieToken::KW_ORI = 434
+        TokenType::None, // TrieToken::KW_OTD2R = 435
+        TokenType::None, // TrieToken::KW_OTDM = 436
+        TokenType::None, // TrieToken::KW_OTDMR = 437
+        TokenType::None, // TrieToken::KW_OTDR = 438
+        TokenType::None, // TrieToken::KW_OTDRX = 439
+        TokenType::None, // TrieToken::KW_OTI2R = 440
+        TokenType::None, // TrieToken::KW_OTIB = 441
+        TokenType::None, // TrieToken::KW_OTIM = 442
+        TokenType::None, // TrieToken::KW_OTIMR = 443
+        TokenType::None, // TrieToken::KW_OTIR = 444
+        TokenType::None, // TrieToken::KW_OTIRX = 445
+        TokenType::None, // TrieToken::KW_OUT = 446
+        TokenType::None, // TrieToken::KW_OUT0 = 447
+        TokenType::None, // TrieToken::KW_OUTD = 448
+        TokenType::None, // TrieToken::KW_OUTD2 = 449
+        TokenType::None, // TrieToken::KW_OUTI = 450
+        TokenType::None, // TrieToken::KW_OUTI2 = 451
+        TokenType::None, // TrieToken::KW_OUTINB = 452
+        TokenType::None, // TrieToken::KW_OVRST8 = 453
+        TokenType::None, // TrieToken::KW_P = 454
+        TokenType::None, // TrieToken::KW_PBC = 455
+        TokenType::None, // TrieToken::KW_PCHL = 456
+        TokenType::None, // TrieToken::KW_PDE = 457
+        TokenType::None, // TrieToken::KW_PE = 458
+        TokenType::None, // TrieToken::KW_PEA = 459
+        TokenType::None, // TrieToken::KW_PHL = 460
+        TokenType::None, // TrieToken::KW_PIX = 461
+        TokenType::None, // TrieToken::KW_PIXELAD = 462
+        TokenType::None, // TrieToken::KW_PIXELDN = 463
+        TokenType::None, // TrieToken::KW_PIY = 464
+        TokenType::None, // TrieToken::KW_PLDD = 465
+        TokenType::None, // TrieToken::KW_PLDDR = 466
+        TokenType::None, // TrieToken::KW_PLDDSR = 467
+        TokenType::None, // TrieToken::KW_PLDI = 468
+        TokenType::None, // TrieToken::KW_PLDIR = 469
+        TokenType::None, // TrieToken::KW_PLDISR = 470
+        TokenType::None, // TrieToken::KW_PLSDDR = 471
+        TokenType::None, // TrieToken::KW_PLSDR = 472
+        TokenType::None, // TrieToken::KW_PLSIDR = 473
+        TokenType::None, // TrieToken::KW_PLSIR = 474
+        TokenType::None, // TrieToken::KW_PO = 475
+        TokenType::None, // TrieToken::KW_POP = 476
+        TokenType::None, // TrieToken::KW_PP = 477
+        TokenType::None, // TrieToken::KW_PRAGMA = 478
+        TokenType::None, // TrieToken::KW_PSW = 479
+        TokenType::None, // TrieToken::KW_PTR = 480
+        TokenType::None, // TrieToken::KW_PUMA = 481
+        TokenType::None, // TrieToken::KW_PUMS = 482
+        TokenType::None, // TrieToken::KW_PUSH = 483
+        TokenType::None, // TrieToken::KW_PW = 484
+        TokenType::None, // TrieToken::KW_PX = 485
+        TokenType::None, // TrieToken::KW_PXAD = 486
+        TokenType::None, // TrieToken::KW_PXDN = 487
+        TokenType::None, // TrieToken::KW_PY = 488
+        TokenType::None, // TrieToken::KW_PZ = 489
+        TokenType::None, // TrieToken::KW_R = 490
+        TokenType::None, // TrieToken::KW_RAL = 491
+        TokenType::None, // TrieToken::KW_RAR = 492
+        TokenType::None, // TrieToken::KW_RC = 493
+        TokenType::None, // TrieToken::KW_RDEL = 494
+        TokenType::None, // TrieToken::KW_RDMODE = 495
+        TokenType::None, // TrieToken::KW_REPEAT = 496
+        TokenType::None, // TrieToken::KW_REPT = 497
+        TokenType::None, // TrieToken::KW_REPTC = 498
+        TokenType::None, // TrieToken::KW_REPTI = 499
+        TokenType::None, // TrieToken::KW_REQ = 500
+        TokenType::None, // TrieToken::KW_RES = 501
+        TokenType::None, // TrieToken::KW_RET = 502
+        TokenType::None, // TrieToken::KW_RET3 = 503
+        TokenType::None, // TrieToken::KW_RETI = 504
+        TokenType::None, // TrieToken::KW_RETN = 505
+        TokenType::None, // TrieToken::KW_RETN3 = 506
+        TokenType::None, // TrieToken::KW_RGEU = 507
+        TokenType::None, // TrieToken::KW_RGTU = 508
+        TokenType::None, // TrieToken::KW_RIM = 509
+        TokenType::None, // TrieToken::KW_RL = 510
+        TokenType::None, // TrieToken::KW_RL1REG = 511
+        TokenType::None, // TrieToken::KW_RL2REG = 512
+        TokenType::None, // TrieToken::KW_RL3REG = 513
+        TokenType::None, // TrieToken::KW_RL4REG = 514
+        TokenType::None, // TrieToken::KW_RL5REG = 515
+        TokenType::None, // TrieToken::KW_RL6REG = 516
+        TokenType::None, // TrieToken::KW_RL7REG = 517
+        TokenType::None, // TrieToken::KW_RL8REG = 518
+        TokenType::None, // TrieToken::KW_RLA = 519
+        TokenType::None, // TrieToken::KW_RLB = 520
+        TokenType::None, // TrieToken::KW_RLC = 521
+        TokenType::None, // TrieToken::KW_RLCA = 522
+        TokenType::None, // TrieToken::KW_RLD = 523
+        TokenType::None, // TrieToken::KW_RLDE = 524
+        TokenType::None, // TrieToken::KW_RLEU = 525
+        TokenType::None, // TrieToken::KW_RLO = 526
+        TokenType::None, // TrieToken::KW_RLTU = 527
+        TokenType::None, // TrieToken::KW_RLZ = 528
+        TokenType::None, // TrieToken::KW_RM = 529
+        TokenType::None, // TrieToken::KW_RNC = 530
+        TokenType::None, // TrieToken::KW_RNE = 531
+        TokenType::None, // TrieToken::KW_RNV = 532
+        TokenType::None, // TrieToken::KW_RNZ = 533
+        TokenType::None, // TrieToken::KW_RP = 534
+        TokenType::None, // TrieToken::KW_RPE = 535
+        TokenType::None, // TrieToken::KW_RPO = 536
+        TokenType::None, // TrieToken::KW_RR = 537
+        TokenType::None, // TrieToken::KW_RR1REG = 538
+        TokenType::None, // TrieToken::KW_RR2REG = 539
+        TokenType::None, // TrieToken::KW_RR3REG = 540
+        TokenType::None, // TrieToken::KW_RR4REG = 541
+        TokenType::None, // TrieToken::KW_RR5REG = 542
+        TokenType::None, // TrieToken::KW_RR6REG = 543
+        TokenType::None, // TrieToken::KW_RR7REG = 544
+        TokenType::None, // TrieToken::KW_RR8REG = 545
+        TokenType::None, // TrieToken::KW_RRA = 546
+        TokenType::None, // TrieToken::KW_RRB = 547
+        TokenType::None, // TrieToken::KW_RRC = 548
+        TokenType::None, // TrieToken::KW_RRCA = 549
+        TokenType::None, // TrieToken::KW_RRD = 550
+        TokenType::None, // TrieToken::KW_RRHL = 551
+        TokenType::None, // TrieToken::KW_RSMIX = 552
+        TokenType::None, // TrieToken::KW_RST = 553
+        TokenType::None, // TrieToken::KW_RSTV = 554
+        TokenType::None, // TrieToken::KW_RV = 555
+        TokenType::None, // TrieToken::KW_RZ = 556
+        TokenType::None, // TrieToken::KW_R_C = 557
+        TokenType::None, // TrieToken::KW_R_EQ = 558
+        TokenType::None, // TrieToken::KW_R_GEU = 559
+        TokenType::None, // TrieToken::KW_R_GTU = 560
+        TokenType::None, // TrieToken::KW_R_LEU = 561
+        TokenType::None, // TrieToken::KW_R_LO = 562
+        TokenType::None, // TrieToken::KW_R_LTU = 563
+        TokenType::None, // TrieToken::KW_R_LZ = 564
+        TokenType::None, // TrieToken::KW_R_M = 565
+        TokenType::None, // TrieToken::KW_R_NC = 566
+        TokenType::None, // TrieToken::KW_R_NE = 567
+        TokenType::None, // TrieToken::KW_R_NV = 568
+        TokenType::None, // TrieToken::KW_R_NZ = 569
+        TokenType::None, // TrieToken::KW_R_P = 570
+        TokenType::None, // TrieToken::KW_R_PE = 571
+        TokenType::None, // TrieToken::KW_R_PO = 572
+        TokenType::None, // TrieToken::KW_R_V = 573
+        TokenType::None, // TrieToken::KW_R_Z = 574
+        TokenType::None, // TrieToken::KW_S = 575
+        TokenType::None, // TrieToken::KW_SBB = 576
+        TokenType::None, // TrieToken::KW_SBC = 577
+        TokenType::None, // TrieToken::KW_SBI = 578
+        TokenType::None, // TrieToken::KW_SBOX = 579
+        TokenType::None, // TrieToken::KW_SCALL = 580
+        TokenType::None, // TrieToken::KW_SCF = 581
+        TokenType::None, // TrieToken::KW_SET = 582
+        TokenType::None, // TrieToken::KW_SETAE = 583
+        TokenType::None, // TrieToken::KW_SETSYSP = 584
+        TokenType::None, // TrieToken::KW_SETUSR = 585
+        TokenType::None, // TrieToken::KW_SETUSRP = 586
+        TokenType::None, // TrieToken::KW_SHAF1 = 587
+        TokenType::None, // TrieToken::KW_SHAF2 = 588
+        TokenType::None, // TrieToken::KW_SHAF3 = 589
+        TokenType::None, // TrieToken::KW_SHLD = 590
+        TokenType::None, // TrieToken::KW_SHLDE = 591
+        TokenType::None, // TrieToken::KW_SHLX = 592
+        TokenType::None, // TrieToken::KW_SIL = 593
+        TokenType::None, // TrieToken::KW_SIM = 594
+        TokenType::None, // TrieToken::KW_SIS = 595
+        TokenType::None, // TrieToken::KW_SL1REG = 596
+        TokenType::None, // TrieToken::KW_SL2REG = 597
+        TokenType::None, // TrieToken::KW_SL3REG = 598
+        TokenType::None, // TrieToken::KW_SL4REG = 599
+        TokenType::None, // TrieToken::KW_SL5REG = 600
+        TokenType::None, // TrieToken::KW_SL6REG = 601
+        TokenType::None, // TrieToken::KW_SL7REG = 602
+        TokenType::None, // TrieToken::KW_SL8REG = 603
+        TokenType::None, // TrieToken::KW_SLA = 604
+        TokenType::None, // TrieToken::KW_SLI = 605
+        TokenType::None, // TrieToken::KW_SLL = 606
+        TokenType::None, // TrieToken::KW_SLP = 607
+        TokenType::None, // TrieToken::KW_SLS = 608
+        TokenType::None, // TrieToken::KW_SP = 609
+        TokenType::None, // TrieToken::KW_SPHL = 610
+        TokenType::None, // TrieToken::KW_SR1REG = 611
+        TokenType::None, // TrieToken::KW_SR2REG = 612
+        TokenType::None, // TrieToken::KW_SR3REG = 613
+        TokenType::None, // TrieToken::KW_SR4REG = 614
+        TokenType::None, // TrieToken::KW_SR5REG = 615
+        TokenType::None, // TrieToken::KW_SR6REG = 616
+        TokenType::None, // TrieToken::KW_SR7REG = 617
+        TokenType::None, // TrieToken::KW_SR8REG = 618
+        TokenType::None, // TrieToken::KW_SRA = 619
+        TokenType::None, // TrieToken::KW_SRET = 620
+        TokenType::None, // TrieToken::KW_SRL = 621
+        TokenType::None, // TrieToken::KW_STA = 622
+        TokenType::None, // TrieToken::KW_STAE = 623
+        TokenType::None, // TrieToken::KW_STAX = 624
+        TokenType::None, // TrieToken::KW_STC = 625
+        TokenType::None, // TrieToken::KW_STMIX = 626
+        TokenType::None, // TrieToken::KW_STOP = 627
+        TokenType::None, // TrieToken::KW_SU = 628
+        TokenType::None, // TrieToken::KW_SUB = 629
+        TokenType::None, // TrieToken::KW_SUI = 630
+        TokenType::None, // TrieToken::KW_SURES = 631
+        TokenType::None, // TrieToken::KW_SWAP = 632
+        TokenType::None, // TrieToken::KW_SWAPNIB = 633
+        TokenType::None, // TrieToken::KW_SYSCALL = 634
+        TokenType::None, // TrieToken::KW_SYSRET = 635
+        TokenType::None, // TrieToken::KW_TEST = 636
+        TokenType::None, // TrieToken::KW_TRA = 637
+        TokenType::None, // TrieToken::KW_TRUE = 638
+        TokenType::None, // TrieToken::KW_TST = 639
+        TokenType::None, // TrieToken::KW_TSTIO = 640
+        TokenType::None, // TrieToken::KW_TSTNULL = 641
+        TokenType::None, // TrieToken::KW_UMA = 642
+        TokenType::None, // TrieToken::KW_UMS = 643
+        TokenType::None, // TrieToken::KW_UNDEF = 644
+        TokenType::None, // TrieToken::KW_UNDEFINE = 645
+        TokenType::None, // TrieToken::KW_UNTIL = 646
+        TokenType::None, // TrieToken::KW_V = 647
+        TokenType::None, // TrieToken::KW_WHILE = 648
+        TokenType::None, // TrieToken::KW_WORD = 649
+        TokenType::None, // TrieToken::KW_X = 650
+        TokenType::None, // TrieToken::KW_X5 = 651
+        TokenType::None, // TrieToken::KW_XBC = 652
+        TokenType::None, // TrieToken::KW_XCHG = 653
+        TokenType::None, // TrieToken::KW_XDE = 654
+        TokenType::None, // TrieToken::KW_XHL = 655
+        TokenType::None, // TrieToken::KW_XIX = 656
+        TokenType::None, // TrieToken::KW_XIY = 657
+        TokenType::None, // TrieToken::KW_XOR = 658
+        TokenType::None, // TrieToken::KW_XP = 659
+        TokenType::None, // TrieToken::KW_XPC = 660
+        TokenType::None, // TrieToken::KW_XRA = 661
+        TokenType::None, // TrieToken::KW_XRI = 662
+        TokenType::None, // TrieToken::KW_XSP = 663
+        TokenType::None, // TrieToken::KW_XTHL = 664
+        TokenType::None, // TrieToken::KW_XY = 665
+        TokenType::None, // TrieToken::KW_YBC = 666
+        TokenType::None, // TrieToken::KW_YDE = 667
+        TokenType::None, // TrieToken::KW_YHL = 668
+        TokenType::None, // TrieToken::KW_YIX = 669
+        TokenType::None, // TrieToken::KW_YIY = 670
+        TokenType::None, // TrieToken::KW_YP = 671
+        TokenType::None, // TrieToken::KW_YSP = 672
+        TokenType::None, // TrieToken::KW_Z = 673
+        TokenType::None, // TrieToken::KW_ZBC = 674
+        TokenType::None, // TrieToken::KW_ZDE = 675
+        TokenType::None, // TrieToken::KW_ZHL = 676
+        TokenType::None, // TrieToken::KW_ZIX = 677
+        TokenType::None, // TrieToken::KW_ZIY = 678
+        TokenType::None, // TrieToken::KW_ZP = 679
+        TokenType::None, // TrieToken::KW_ZSP = 680
+        TokenType::None, // TrieToken::KW___Z80ASM__ADC_HL_BC = 681
+        TokenType::None, // TrieToken::KW___Z80ASM__ADC_HL_DE = 682
+        TokenType::None, // TrieToken::KW___Z80ASM__ADC_HL_HL = 683
+        TokenType::None, // TrieToken::KW___Z80ASM__ADC_HL_SP = 684
+        TokenType::None, // TrieToken::KW___Z80ASM__ADD_BC_A = 685
+        TokenType::None, // TrieToken::KW___Z80ASM__ADD_DE_A = 686
+        TokenType::None, // TrieToken::KW___Z80ASM__ADD_HL_A = 687
+        TokenType::None, // TrieToken::KW___Z80ASM__ADD_SP_D = 688
+        TokenType::None, // TrieToken::KW___Z80ASM__CALL_HL = 689
+        TokenType::None, // TrieToken::KW___Z80ASM__CALL_IX = 690
+        TokenType::None, // TrieToken::KW___Z80ASM__CALL_IY = 691
+        TokenType::None, // TrieToken::KW___Z80ASM__CPD = 692
+        TokenType::None, // TrieToken::KW___Z80ASM__CPDR = 693
+        TokenType::None, // TrieToken::KW___Z80ASM__CPI = 694
+        TokenType::None, // TrieToken::KW___Z80ASM__CPIR = 695
+        TokenType::None, // TrieToken::KW___Z80ASM__DAA = 696
+        TokenType::None, // TrieToken::KW___Z80ASM__EX_SP_HL = 697
+        TokenType::None, // TrieToken::KW___Z80ASM__LDD = 698
+        TokenType::None, // TrieToken::KW___Z80ASM__LDDR = 699
+        TokenType::None, // TrieToken::KW___Z80ASM__LDI = 700
+        TokenType::None, // TrieToken::KW___Z80ASM__LDIR = 701
+        TokenType::None, // TrieToken::KW___Z80ASM__RLD = 702
+        TokenType::None, // TrieToken::KW___Z80ASM__RL_BC = 703
+        TokenType::None, // TrieToken::KW___Z80ASM__RL_DE = 704
+        TokenType::None, // TrieToken::KW___Z80ASM__RL_HL = 705
+        TokenType::None, // TrieToken::KW___Z80ASM__RRD = 706
+        TokenType::None, // TrieToken::KW___Z80ASM__RR_BC = 707
+        TokenType::None, // TrieToken::KW___Z80ASM__RR_DE = 708
+        TokenType::None, // TrieToken::KW___Z80ASM__RR_HL = 709
+        TokenType::None, // TrieToken::KW___Z80ASM__SBC_HL_BC = 710
+        TokenType::None, // TrieToken::KW___Z80ASM__SBC_HL_DE = 711
+        TokenType::None, // TrieToken::KW___Z80ASM__SBC_HL_HL = 712
+        TokenType::None, // TrieToken::KW___Z80ASM__SBC_HL_SP = 713
+        TokenType::None, // TrieToken::KW___Z80ASM__SRA_BC = 714
+        TokenType::None, // TrieToken::KW___Z80ASM__SRA_DE = 715
+        TokenType::None, // TrieToken::KW___Z80ASM__SRA_HL = 716
+        TokenType::None, // TrieToken::KW___Z80ASM__SUB_HL_BC = 717
+        TokenType::None, // TrieToken::KW___Z80ASM__SUB_HL_DE = 718
+        TokenType::None, // TrieToken::KW___Z80ASM__SUB_HL_HL = 719
+        TokenType::None, // TrieToken::KW___Z80ASM__SUB_HL_SP = 720
+    };
+    return lut[static_cast<size_t>(trie_token)];
+}
+
+TrieToken to_trie_token(Keyword keyword) {
+    static const TrieToken lut[643] = {
+        TrieToken::None, // Keyword::None = 0
+        TrieToken::KW_A, // Keyword::A = 1
+        TrieToken::KW_ABC, // Keyword::ABC = 2
+        TrieToken::KW_ACI, // Keyword::ACI = 3
+        TrieToken::KW_ADC, // Keyword::ADC = 4
+        TrieToken::KW_ADD, // Keyword::ADD = 5
+        TrieToken::KW_ADE, // Keyword::ADE = 6
+        TrieToken::KW_ADI, // Keyword::ADI = 7
+        TrieToken::KW_AESIMC, // Keyword::AESIMC = 8
+        TrieToken::KW_AESISR, // Keyword::AESISR = 9
+        TrieToken::KW_AESMC, // Keyword::AESMC = 10
+        TrieToken::KW_AESSR, // Keyword::AESSR = 11
+        TrieToken::KW_AF, // Keyword::AF = 12
+        TrieToken::KW_AHL, // Keyword::AHL = 13
+        TrieToken::KW_AIX, // Keyword::AIX = 14
+        TrieToken::KW_AIY, // Keyword::AIY = 15
+        TrieToken::KW_ALTD, // Keyword::ALTD = 16
+        TrieToken::KW_ALTS, // Keyword::ALTS = 17
+        TrieToken::KW_ALTSD, // Keyword::ALTSD = 18
+        TrieToken::KW_ANA, // Keyword::ANA = 19
+        TrieToken::KW_AND, // Keyword::AND = 20
+        TrieToken::KW_ANI, // Keyword::ANI = 21
+        TrieToken::KW_ARHL, // Keyword::ARHL = 22
+        TrieToken::KW_ASMPC, // Keyword::ASMPC = 23
+        TrieToken::KW_ASP, // Keyword::ASP = 24
+        TrieToken::KW_ASSERT, // Keyword::ASSERT = 25
+        TrieToken::KW_ASSUME, // Keyword::ASSUME = 26
+        TrieToken::KW_B, // Keyword::B = 27
+        TrieToken::KW_BC, // Keyword::BC = 28
+        TrieToken::KW_BCDE, // Keyword::BCDE = 29
+        TrieToken::KW_BINARY, // Keyword::BINARY = 30
+        TrieToken::KW_BIT, // Keyword::BIT = 31
+        TrieToken::KW_BOOL, // Keyword::BOOL = 32
+        TrieToken::KW_BREAK, // Keyword::BREAK = 33
+        TrieToken::KW_BRLC, // Keyword::BRLC = 34
+        TrieToken::KW_BSLA, // Keyword::BSLA = 35
+        TrieToken::KW_BSRA, // Keyword::BSRA = 36
+        TrieToken::KW_BSRF, // Keyword::BSRF = 37
+        TrieToken::KW_BSRL, // Keyword::BSRL = 38
+        TrieToken::KW_BYTE, // Keyword::BYTE = 39
+        TrieToken::KW_C, // Keyword::C = 40
+        TrieToken::KW_CALL, // Keyword::CALL = 41
+        TrieToken::KW_CALL3, // Keyword::CALL3 = 42
+        TrieToken::KW_CBM, // Keyword::CBM = 43
+        TrieToken::KW_CC, // Keyword::CC = 44
+        TrieToken::KW_CCF, // Keyword::CCF = 45
+        TrieToken::KW_CEQ, // Keyword::CEQ = 46
+        TrieToken::KW_CGEU, // Keyword::CGEU = 47
+        TrieToken::KW_CGTU, // Keyword::CGTU = 48
+        TrieToken::KW_CLEU, // Keyword::CLEU = 49
+        TrieToken::KW_CLO, // Keyword::CLO = 50
+        TrieToken::KW_CLR, // Keyword::CLR = 51
+        TrieToken::KW_CLTU, // Keyword::CLTU = 52
+        TrieToken::KW_CLZ, // Keyword::CLZ = 53
+        TrieToken::KW_CM, // Keyword::CM = 54
+        TrieToken::KW_CMA, // Keyword::CMA = 55
+        TrieToken::KW_CMC, // Keyword::CMC = 56
+        TrieToken::KW_CMP, // Keyword::CMP = 57
+        TrieToken::KW_CNC, // Keyword::CNC = 58
+        TrieToken::KW_CNE, // Keyword::CNE = 59
+        TrieToken::KW_CNV, // Keyword::CNV = 60
+        TrieToken::KW_CNVC, // Keyword::CNVC = 61
+        TrieToken::KW_CNVD, // Keyword::CNVD = 62
+        TrieToken::KW_CNZ, // Keyword::CNZ = 63
+        TrieToken::KW_CONTINUE, // Keyword::CONTINUE = 64
+        TrieToken::KW_CONVC, // Keyword::CONVC = 65
+        TrieToken::KW_CONVD, // Keyword::CONVD = 66
+        TrieToken::KW_COPY, // Keyword::COPY = 67
+        TrieToken::KW_COPYR, // Keyword::COPYR = 68
+        TrieToken::KW_CP, // Keyword::CP = 69
+        TrieToken::KW_CPD, // Keyword::CPD = 70
+        TrieToken::KW_CPDR, // Keyword::CPDR = 71
+        TrieToken::KW_CPE, // Keyword::CPE = 72
+        TrieToken::KW_CPI, // Keyword::CPI = 73
+        TrieToken::KW_CPIR, // Keyword::CPIR = 74
+        TrieToken::KW_CPL, // Keyword::CPL = 75
+        TrieToken::KW_CPO, // Keyword::CPO = 76
+        TrieToken::KW_CV, // Keyword::CV = 77
+        TrieToken::KW_CZ, // Keyword::CZ = 78
+        TrieToken::KW_C_C, // Keyword::C_C = 79
+        TrieToken::KW_C_EQ, // Keyword::C_EQ = 80
+        TrieToken::KW_C_GEU, // Keyword::C_GEU = 81
+        TrieToken::KW_C_GTU, // Keyword::C_GTU = 82
+        TrieToken::KW_C_LEU, // Keyword::C_LEU = 83
+        TrieToken::KW_C_LINE, // Keyword::C_LINE = 84
+        TrieToken::KW_C_LO, // Keyword::C_LO = 85
+        TrieToken::KW_C_LTU, // Keyword::C_LTU = 86
+        TrieToken::KW_C_LZ, // Keyword::C_LZ = 87
+        TrieToken::KW_C_M, // Keyword::C_M = 88
+        TrieToken::KW_C_NC, // Keyword::C_NC = 89
+        TrieToken::KW_C_NE, // Keyword::C_NE = 90
+        TrieToken::KW_C_NV, // Keyword::C_NV = 91
+        TrieToken::KW_C_NZ, // Keyword::C_NZ = 92
+        TrieToken::KW_C_P, // Keyword::C_P = 93
+        TrieToken::KW_C_PE, // Keyword::C_PE = 94
+        TrieToken::KW_C_PO, // Keyword::C_PO = 95
+        TrieToken::KW_C_V, // Keyword::C_V = 96
+        TrieToken::KW_C_Z, // Keyword::C_Z = 97
+        TrieToken::KW_D, // Keyword::D = 98
+        TrieToken::KW_DAA, // Keyword::DAA = 99
+        TrieToken::KW_DAD, // Keyword::DAD = 100
+        TrieToken::KW_DB, // Keyword::DB = 101
+        TrieToken::KW_DCR, // Keyword::DCR = 102
+        TrieToken::KW_DCX, // Keyword::DCX = 103
+        TrieToken::KW_DDB, // Keyword::DDB = 104
+        TrieToken::KW_DE, // Keyword::DE = 105
+        TrieToken::KW_DEC, // Keyword::DEC = 106
+        TrieToken::KW_DEFB, // Keyword::DEFB = 107
+        TrieToken::KW_DEFC, // Keyword::DEFC = 108
+        TrieToken::KW_DEFDB, // Keyword::DEFDB = 109
+        TrieToken::KW_DEFINE, // Keyword::DEFINE = 110
+        TrieToken::KW_DEFL, // Keyword::DEFL = 111
+        TrieToken::KW_DEFM, // Keyword::DEFM = 112
+        TrieToken::KW_DEFP, // Keyword::DEFP = 113
+        TrieToken::KW_DEFQ, // Keyword::DEFQ = 114
+        TrieToken::KW_DEFS, // Keyword::DEFS = 115
+        TrieToken::KW_DEFW, // Keyword::DEFW = 116
+        TrieToken::KW_DEFW_BE, // Keyword::DEFW_BE = 117
+        TrieToken::KW_DEHL, // Keyword::DEHL = 118
+        TrieToken::KW_DI, // Keyword::DI = 119
+        TrieToken::KW_DIV, // Keyword::DIV = 120
+        TrieToken::KW_DIVS, // Keyword::DIVS = 121
+        TrieToken::KW_DJNZ, // Keyword::DJNZ = 122
+        TrieToken::KW_DM, // Keyword::DM = 123
+        TrieToken::KW_DP, // Keyword::DP = 124
+        TrieToken::KW_DQ, // Keyword::DQ = 125
+        TrieToken::KW_DS, // Keyword::DS = 126
+        TrieToken::KW_DSUB, // Keyword::DSUB = 127
+        TrieToken::KW_DW, // Keyword::DW = 128
+        TrieToken::KW_DWJNZ, // Keyword::DWJNZ = 129
+        TrieToken::KW_DWORD, // Keyword::DWORD = 130
+        TrieToken::KW_DW_BE, // Keyword::DW_BE = 131
+        TrieToken::KW_E, // Keyword::E = 132
+        TrieToken::KW_EI, // Keyword::EI = 133
+        TrieToken::KW_EIR, // Keyword::EIR = 134
+        TrieToken::KW_ELIF, // Keyword::ELIF = 135
+        TrieToken::KW_ELIFDEF, // Keyword::ELIFDEF = 136
+        TrieToken::KW_ELIFNDEF, // Keyword::ELIFNDEF = 137
+        TrieToken::KW_ELSE, // Keyword::ELSE = 138
+        TrieToken::KW_ELSEIF, // Keyword::ELSEIF = 139
+        TrieToken::KW_ELSEIFDEF, // Keyword::ELSEIFDEF = 140
+        TrieToken::KW_ELSEIFNDEF, // Keyword::ELSEIFNDEF = 141
+        TrieToken::KW_ENDIF, // Keyword::ENDIF = 142
+        TrieToken::KW_ENDM, // Keyword::ENDM = 143
+        TrieToken::KW_ENDR, // Keyword::ENDR = 144
+        TrieToken::KW_ENDWHILE, // Keyword::ENDWHILE = 145
+        TrieToken::KW_EQ, // Keyword::EQ = 146
+        TrieToken::KW_EQU, // Keyword::EQU = 147
+        TrieToken::KW_ERROR, // Keyword::ERROR = 148
+        TrieToken::KW_EX, // Keyword::EX = 149
+        TrieToken::KW_EXITM, // Keyword::EXITM = 150
+        TrieToken::KW_EXP, // Keyword::EXP = 151
+        TrieToken::KW_EXTERN, // Keyword::EXTERN = 152
+        TrieToken::KW_EXX, // Keyword::EXX = 153
+        TrieToken::KW_F, // Keyword::F = 154
+        TrieToken::KW_FALSE, // Keyword::FALSE = 155
+        TrieToken::KW_FLAG, // Keyword::FLAG = 156
+        TrieToken::KW_FSYSCALL, // Keyword::FSYSCALL = 157
+        TrieToken::KW_GE, // Keyword::GE = 158
+        TrieToken::KW_GEU, // Keyword::GEU = 159
+        TrieToken::KW_GT, // Keyword::GT = 160
+        TrieToken::KW_GTU, // Keyword::GTU = 161
+        TrieToken::KW_H, // Keyword::H = 162
+        TrieToken::KW_HALT, // Keyword::HALT = 163
+        TrieToken::KW_HL, // Keyword::HL = 164
+        TrieToken::KW_HLD, // Keyword::HLD = 165
+        TrieToken::KW_HLI, // Keyword::HLI = 166
+        TrieToken::KW_HLT, // Keyword::HLT = 167
+        TrieToken::KW_HTR, // Keyword::HTR = 168
+        TrieToken::KW_I, // Keyword::I = 169
+        TrieToken::KW_IBOX, // Keyword::IBOX = 170
+        TrieToken::KW_IDET, // Keyword::IDET = 171
+        TrieToken::KW_IF, // Keyword::IF = 172
+        TrieToken::KW_IFDEF, // Keyword::IFDEF = 173
+        TrieToken::KW_IFNDEF, // Keyword::IFNDEF = 174
+        TrieToken::KW_IIR, // Keyword::IIR = 175
+        TrieToken::KW_IL, // Keyword::IL = 176
+        TrieToken::KW_IM, // Keyword::IM = 177
+        TrieToken::KW_IN, // Keyword::IN = 178
+        TrieToken::KW_IN0, // Keyword::IN0 = 179
+        TrieToken::KW_INC, // Keyword::INC = 180
+        TrieToken::KW_INCBIN, // Keyword::INCBIN = 181
+        TrieToken::KW_INCLUDE, // Keyword::INCLUDE = 182
+        TrieToken::KW_IND, // Keyword::IND = 183
+        TrieToken::KW_IND2, // Keyword::IND2 = 184
+        TrieToken::KW_IND2R, // Keyword::IND2R = 185
+        TrieToken::KW_INDM, // Keyword::INDM = 186
+        TrieToken::KW_INDMR, // Keyword::INDMR = 187
+        TrieToken::KW_INDR, // Keyword::INDR = 188
+        TrieToken::KW_INDRX, // Keyword::INDRX = 189
+        TrieToken::KW_INI, // Keyword::INI = 190
+        TrieToken::KW_INI2, // Keyword::INI2 = 191
+        TrieToken::KW_INI2R, // Keyword::INI2R = 192
+        TrieToken::KW_INIM, // Keyword::INIM = 193
+        TrieToken::KW_INIMR, // Keyword::INIMR = 194
+        TrieToken::KW_INIR, // Keyword::INIR = 195
+        TrieToken::KW_INIRX, // Keyword::INIRX = 196
+        TrieToken::KW_INR, // Keyword::INR = 197
+        TrieToken::KW_INX, // Keyword::INX = 198
+        TrieToken::KW_IOE, // Keyword::IOE = 199
+        TrieToken::KW_IOI, // Keyword::IOI = 200
+        TrieToken::KW_IP, // Keyword::IP = 201
+        TrieToken::KW_IPRES, // Keyword::IPRES = 202
+        TrieToken::KW_IPSET, // Keyword::IPSET = 203
+        TrieToken::KW_IS, // Keyword::IS = 204
+        TrieToken::KW_IX, // Keyword::IX = 205
+        TrieToken::KW_IXH, // Keyword::IXH = 206
+        TrieToken::KW_IXL, // Keyword::IXL = 207
+        TrieToken::KW_IY, // Keyword::IY = 208
+        TrieToken::KW_IYH, // Keyword::IYH = 209
+        TrieToken::KW_IYL, // Keyword::IYL = 210
+        TrieToken::KW_JC, // Keyword::JC = 211
+        TrieToken::KW_JEQ, // Keyword::JEQ = 212
+        TrieToken::KW_JGE, // Keyword::JGE = 213
+        TrieToken::KW_JGEU, // Keyword::JGEU = 214
+        TrieToken::KW_JGT, // Keyword::JGT = 215
+        TrieToken::KW_JGTU, // Keyword::JGTU = 216
+        TrieToken::KW_JK, // Keyword::JK = 217
+        TrieToken::KW_JKHL, // Keyword::JKHL = 218
+        TrieToken::KW_JLE, // Keyword::JLE = 219
+        TrieToken::KW_JLEU, // Keyword::JLEU = 220
+        TrieToken::KW_JLO, // Keyword::JLO = 221
+        TrieToken::KW_JLT, // Keyword::JLT = 222
+        TrieToken::KW_JLTU, // Keyword::JLTU = 223
+        TrieToken::KW_JLZ, // Keyword::JLZ = 224
+        TrieToken::KW_JM, // Keyword::JM = 225
+        TrieToken::KW_JMP, // Keyword::JMP = 226
+        TrieToken::KW_JNC, // Keyword::JNC = 227
+        TrieToken::KW_JNE, // Keyword::JNE = 228
+        TrieToken::KW_JNK, // Keyword::JNK = 229
+        TrieToken::KW_JNV, // Keyword::JNV = 230
+        TrieToken::KW_JNX5, // Keyword::JNX5 = 231
+        TrieToken::KW_JNZ, // Keyword::JNZ = 232
+        TrieToken::KW_JP, // Keyword::JP = 233
+        TrieToken::KW_JP3, // Keyword::JP3 = 234
+        TrieToken::KW_JPE, // Keyword::JPE = 235
+        TrieToken::KW_JPO, // Keyword::JPO = 236
+        TrieToken::KW_JR, // Keyword::JR = 237
+        TrieToken::KW_JRE, // Keyword::JRE = 238
+        TrieToken::KW_JV, // Keyword::JV = 239
+        TrieToken::KW_JX5, // Keyword::JX5 = 240
+        TrieToken::KW_JZ, // Keyword::JZ = 241
+        TrieToken::KW_J_C, // Keyword::J_C = 242
+        TrieToken::KW_J_EQ, // Keyword::J_EQ = 243
+        TrieToken::KW_J_GE, // Keyword::J_GE = 244
+        TrieToken::KW_J_GEU, // Keyword::J_GEU = 245
+        TrieToken::KW_J_GT, // Keyword::J_GT = 246
+        TrieToken::KW_J_GTU, // Keyword::J_GTU = 247
+        TrieToken::KW_J_LE, // Keyword::J_LE = 248
+        TrieToken::KW_J_LEU, // Keyword::J_LEU = 249
+        TrieToken::KW_J_LO, // Keyword::J_LO = 250
+        TrieToken::KW_J_LT, // Keyword::J_LT = 251
+        TrieToken::KW_J_LTU, // Keyword::J_LTU = 252
+        TrieToken::KW_J_LZ, // Keyword::J_LZ = 253
+        TrieToken::KW_J_M, // Keyword::J_M = 254
+        TrieToken::KW_J_NC, // Keyword::J_NC = 255
+        TrieToken::KW_J_NE, // Keyword::J_NE = 256
+        TrieToken::KW_J_NV, // Keyword::J_NV = 257
+        TrieToken::KW_J_NZ, // Keyword::J_NZ = 258
+        TrieToken::KW_J_P, // Keyword::J_P = 259
+        TrieToken::KW_J_PE, // Keyword::J_PE = 260
+        TrieToken::KW_J_PO, // Keyword::J_PO = 261
+        TrieToken::KW_J_V, // Keyword::J_V = 262
+        TrieToken::KW_J_Z, // Keyword::J_Z = 263
+        TrieToken::KW_K, // Keyword::K = 264
+        TrieToken::KW_L, // Keyword::L = 265
+        TrieToken::KW_LCALL, // Keyword::LCALL = 266
+        TrieToken::KW_LD, // Keyword::LD = 267
+        TrieToken::KW_LDA, // Keyword::LDA = 268
+        TrieToken::KW_LDAX, // Keyword::LDAX = 269
+        TrieToken::KW_LDD, // Keyword::LDD = 270
+        TrieToken::KW_LDDR, // Keyword::LDDR = 271
+        TrieToken::KW_LDDRX, // Keyword::LDDRX = 272
+        TrieToken::KW_LDDSR, // Keyword::LDDSR = 273
+        TrieToken::KW_LDDX, // Keyword::LDDX = 274
+        TrieToken::KW_LDF, // Keyword::LDF = 275
+        TrieToken::KW_LDH, // Keyword::LDH = 276
+        TrieToken::KW_LDHI, // Keyword::LDHI = 277
+        TrieToken::KW_LDHL, // Keyword::LDHL = 278
+        TrieToken::KW_LDI, // Keyword::LDI = 279
+        TrieToken::KW_LDIR, // Keyword::LDIR = 280
+        TrieToken::KW_LDIRX, // Keyword::LDIRX = 281
+        TrieToken::KW_LDISR, // Keyword::LDISR = 282
+        TrieToken::KW_LDIX, // Keyword::LDIX = 283
+        TrieToken::KW_LDL, // Keyword::LDL = 284
+        TrieToken::KW_LDP, // Keyword::LDP = 285
+        TrieToken::KW_LDPIRX, // Keyword::LDPIRX = 286
+        TrieToken::KW_LDRX, // Keyword::LDRX = 287
+        TrieToken::KW_LDSI, // Keyword::LDSI = 288
+        TrieToken::KW_LDWS, // Keyword::LDWS = 289
+        TrieToken::KW_LE, // Keyword::LE = 290
+        TrieToken::KW_LEA, // Keyword::LEA = 291
+        TrieToken::KW_LEU, // Keyword::LEU = 292
+        TrieToken::KW_LHLD, // Keyword::LHLD = 293
+        TrieToken::KW_LHLDE, // Keyword::LHLDE = 294
+        TrieToken::KW_LHLX, // Keyword::LHLX = 295
+        TrieToken::KW_LIL, // Keyword::LIL = 296
+        TrieToken::KW_LINE, // Keyword::LINE = 297
+        TrieToken::KW_LIRX, // Keyword::LIRX = 298
+        TrieToken::KW_LIS, // Keyword::LIS = 299
+        TrieToken::KW_LJP, // Keyword::LJP = 300
+        TrieToken::KW_LLCALL, // Keyword::LLCALL = 301
+        TrieToken::KW_LLJP, // Keyword::LLJP = 302
+        TrieToken::KW_LLRET, // Keyword::LLRET = 303
+        TrieToken::KW_LO, // Keyword::LO = 304
+        TrieToken::KW_LOCAL, // Keyword::LOCAL = 305
+        TrieToken::KW_LPRX, // Keyword::LPRX = 306
+        TrieToken::KW_LRET, // Keyword::LRET = 307
+        TrieToken::KW_LSDDR, // Keyword::LSDDR = 308
+        TrieToken::KW_LSDR, // Keyword::LSDR = 309
+        TrieToken::KW_LSIDR, // Keyword::LSIDR = 310
+        TrieToken::KW_LSIR, // Keyword::LSIR = 311
+        TrieToken::KW_LT, // Keyword::LT = 312
+        TrieToken::KW_LTU, // Keyword::LTU = 313
+        TrieToken::KW_LXI, // Keyword::LXI = 314
+        TrieToken::KW_LXPC, // Keyword::LXPC = 315
+        TrieToken::KW_LZ, // Keyword::LZ = 316
+        TrieToken::KW_M, // Keyword::M = 317
+        TrieToken::KW_MACRO, // Keyword::MACRO = 318
+        TrieToken::KW_MB, // Keyword::MB = 319
+        TrieToken::KW_MD5F1, // Keyword::MD5F1 = 320
+        TrieToken::KW_MD5F2, // Keyword::MD5F2 = 321
+        TrieToken::KW_MD5F3, // Keyword::MD5F3 = 322
+        TrieToken::KW_MEM, // Keyword::MEM = 323
+        TrieToken::KW_MIRR, // Keyword::MIRR = 324
+        TrieToken::KW_MIRROR, // Keyword::MIRROR = 325
+        TrieToken::KW_MLT, // Keyword::MLT = 326
+        TrieToken::KW_MMU, // Keyword::MMU = 327
+        TrieToken::KW_MMU0, // Keyword::MMU0 = 328
+        TrieToken::KW_MMU1, // Keyword::MMU1 = 329
+        TrieToken::KW_MMU2, // Keyword::MMU2 = 330
+        TrieToken::KW_MMU3, // Keyword::MMU3 = 331
+        TrieToken::KW_MMU4, // Keyword::MMU4 = 332
+        TrieToken::KW_MMU5, // Keyword::MMU5 = 333
+        TrieToken::KW_MMU6, // Keyword::MMU6 = 334
+        TrieToken::KW_MMU7, // Keyword::MMU7 = 335
+        TrieToken::KW_MOV, // Keyword::MOV = 336
+        TrieToken::KW_MUL, // Keyword::MUL = 337
+        TrieToken::KW_MULS, // Keyword::MULS = 338
+        TrieToken::KW_MULU, // Keyword::MULU = 339
+        TrieToken::KW_MULUB, // Keyword::MULUB = 340
+        TrieToken::KW_MULUW, // Keyword::MULUW = 341
+        TrieToken::KW_MVI, // Keyword::MVI = 342
+        TrieToken::KW_NC, // Keyword::NC = 343
+        TrieToken::KW_NE, // Keyword::NE = 344
+        TrieToken::KW_NEG, // Keyword::NEG = 345
+        TrieToken::KW_NEXTREG, // Keyword::NEXTREG = 346
+        TrieToken::KW_NK, // Keyword::NK = 347
+        TrieToken::KW_NOP, // Keyword::NOP = 348
+        TrieToken::KW_NREG, // Keyword::NREG = 349
+        TrieToken::KW_NV, // Keyword::NV = 350
+        TrieToken::KW_NX5, // Keyword::NX5 = 351
+        TrieToken::KW_NZ, // Keyword::NZ = 352
+        TrieToken::KW_ONCE, // Keyword::ONCE = 353
+        TrieToken::KW_OR, // Keyword::OR = 354
+        TrieToken::KW_ORA, // Keyword::ORA = 355
+        TrieToken::KW_ORI, // Keyword::ORI = 356
+        TrieToken::KW_OTD2R, // Keyword::OTD2R = 357
+        TrieToken::KW_OTDM, // Keyword::OTDM = 358
+        TrieToken::KW_OTDMR, // Keyword::OTDMR = 359
+        TrieToken::KW_OTDR, // Keyword::OTDR = 360
+        TrieToken::KW_OTDRX, // Keyword::OTDRX = 361
+        TrieToken::KW_OTI2R, // Keyword::OTI2R = 362
+        TrieToken::KW_OTIB, // Keyword::OTIB = 363
+        TrieToken::KW_OTIM, // Keyword::OTIM = 364
+        TrieToken::KW_OTIMR, // Keyword::OTIMR = 365
+        TrieToken::KW_OTIR, // Keyword::OTIR = 366
+        TrieToken::KW_OTIRX, // Keyword::OTIRX = 367
+        TrieToken::KW_OUT, // Keyword::OUT = 368
+        TrieToken::KW_OUT0, // Keyword::OUT0 = 369
+        TrieToken::KW_OUTD, // Keyword::OUTD = 370
+        TrieToken::KW_OUTD2, // Keyword::OUTD2 = 371
+        TrieToken::KW_OUTI, // Keyword::OUTI = 372
+        TrieToken::KW_OUTI2, // Keyword::OUTI2 = 373
+        TrieToken::KW_OUTINB, // Keyword::OUTINB = 374
+        TrieToken::KW_OVRST8, // Keyword::OVRST8 = 375
+        TrieToken::KW_P, // Keyword::P = 376
+        TrieToken::KW_PBC, // Keyword::PBC = 377
+        TrieToken::KW_PCHL, // Keyword::PCHL = 378
+        TrieToken::KW_PDE, // Keyword::PDE = 379
+        TrieToken::KW_PE, // Keyword::PE = 380
+        TrieToken::KW_PEA, // Keyword::PEA = 381
+        TrieToken::KW_PHL, // Keyword::PHL = 382
+        TrieToken::KW_PIX, // Keyword::PIX = 383
+        TrieToken::KW_PIXELAD, // Keyword::PIXELAD = 384
+        TrieToken::KW_PIXELDN, // Keyword::PIXELDN = 385
+        TrieToken::KW_PIY, // Keyword::PIY = 386
+        TrieToken::KW_PLDD, // Keyword::PLDD = 387
+        TrieToken::KW_PLDDR, // Keyword::PLDDR = 388
+        TrieToken::KW_PLDDSR, // Keyword::PLDDSR = 389
+        TrieToken::KW_PLDI, // Keyword::PLDI = 390
+        TrieToken::KW_PLDIR, // Keyword::PLDIR = 391
+        TrieToken::KW_PLDISR, // Keyword::PLDISR = 392
+        TrieToken::KW_PLSDDR, // Keyword::PLSDDR = 393
+        TrieToken::KW_PLSDR, // Keyword::PLSDR = 394
+        TrieToken::KW_PLSIDR, // Keyword::PLSIDR = 395
+        TrieToken::KW_PLSIR, // Keyword::PLSIR = 396
+        TrieToken::KW_PO, // Keyword::PO = 397
+        TrieToken::KW_POP, // Keyword::POP = 398
+        TrieToken::KW_PP, // Keyword::PP = 399
+        TrieToken::KW_PRAGMA, // Keyword::PRAGMA = 400
+        TrieToken::KW_PSW, // Keyword::PSW = 401
+        TrieToken::KW_PTR, // Keyword::PTR = 402
+        TrieToken::KW_PUMA, // Keyword::PUMA = 403
+        TrieToken::KW_PUMS, // Keyword::PUMS = 404
+        TrieToken::KW_PUSH, // Keyword::PUSH = 405
+        TrieToken::KW_PW, // Keyword::PW = 406
+        TrieToken::KW_PX, // Keyword::PX = 407
+        TrieToken::KW_PXAD, // Keyword::PXAD = 408
+        TrieToken::KW_PXDN, // Keyword::PXDN = 409
+        TrieToken::KW_PY, // Keyword::PY = 410
+        TrieToken::KW_PZ, // Keyword::PZ = 411
+        TrieToken::KW_R, // Keyword::R = 412
+        TrieToken::KW_RAL, // Keyword::RAL = 413
+        TrieToken::KW_RAR, // Keyword::RAR = 414
+        TrieToken::KW_RC, // Keyword::RC = 415
+        TrieToken::KW_RDEL, // Keyword::RDEL = 416
+        TrieToken::KW_RDMODE, // Keyword::RDMODE = 417
+        TrieToken::KW_REPEAT, // Keyword::REPEAT = 418
+        TrieToken::KW_REPT, // Keyword::REPT = 419
+        TrieToken::KW_REPTC, // Keyword::REPTC = 420
+        TrieToken::KW_REPTI, // Keyword::REPTI = 421
+        TrieToken::KW_REQ, // Keyword::REQ = 422
+        TrieToken::KW_RES, // Keyword::RES = 423
+        TrieToken::KW_RET, // Keyword::RET = 424
+        TrieToken::KW_RET3, // Keyword::RET3 = 425
+        TrieToken::KW_RETI, // Keyword::RETI = 426
+        TrieToken::KW_RETN, // Keyword::RETN = 427
+        TrieToken::KW_RETN3, // Keyword::RETN3 = 428
+        TrieToken::KW_RGEU, // Keyword::RGEU = 429
+        TrieToken::KW_RGTU, // Keyword::RGTU = 430
+        TrieToken::KW_RIM, // Keyword::RIM = 431
+        TrieToken::KW_RL, // Keyword::RL = 432
+        TrieToken::KW_RL1REG, // Keyword::RL1REG = 433
+        TrieToken::KW_RL2REG, // Keyword::RL2REG = 434
+        TrieToken::KW_RL3REG, // Keyword::RL3REG = 435
+        TrieToken::KW_RL4REG, // Keyword::RL4REG = 436
+        TrieToken::KW_RL5REG, // Keyword::RL5REG = 437
+        TrieToken::KW_RL6REG, // Keyword::RL6REG = 438
+        TrieToken::KW_RL7REG, // Keyword::RL7REG = 439
+        TrieToken::KW_RL8REG, // Keyword::RL8REG = 440
+        TrieToken::KW_RLA, // Keyword::RLA = 441
+        TrieToken::KW_RLB, // Keyword::RLB = 442
+        TrieToken::KW_RLC, // Keyword::RLC = 443
+        TrieToken::KW_RLCA, // Keyword::RLCA = 444
+        TrieToken::KW_RLD, // Keyword::RLD = 445
+        TrieToken::KW_RLDE, // Keyword::RLDE = 446
+        TrieToken::KW_RLEU, // Keyword::RLEU = 447
+        TrieToken::KW_RLO, // Keyword::RLO = 448
+        TrieToken::KW_RLTU, // Keyword::RLTU = 449
+        TrieToken::KW_RLZ, // Keyword::RLZ = 450
+        TrieToken::KW_RM, // Keyword::RM = 451
+        TrieToken::KW_RNC, // Keyword::RNC = 452
+        TrieToken::KW_RNE, // Keyword::RNE = 453
+        TrieToken::KW_RNV, // Keyword::RNV = 454
+        TrieToken::KW_RNZ, // Keyword::RNZ = 455
+        TrieToken::KW_RP, // Keyword::RP = 456
+        TrieToken::KW_RPE, // Keyword::RPE = 457
+        TrieToken::KW_RPO, // Keyword::RPO = 458
+        TrieToken::KW_RR, // Keyword::RR = 459
+        TrieToken::KW_RR1REG, // Keyword::RR1REG = 460
+        TrieToken::KW_RR2REG, // Keyword::RR2REG = 461
+        TrieToken::KW_RR3REG, // Keyword::RR3REG = 462
+        TrieToken::KW_RR4REG, // Keyword::RR4REG = 463
+        TrieToken::KW_RR5REG, // Keyword::RR5REG = 464
+        TrieToken::KW_RR6REG, // Keyword::RR6REG = 465
+        TrieToken::KW_RR7REG, // Keyword::RR7REG = 466
+        TrieToken::KW_RR8REG, // Keyword::RR8REG = 467
+        TrieToken::KW_RRA, // Keyword::RRA = 468
+        TrieToken::KW_RRB, // Keyword::RRB = 469
+        TrieToken::KW_RRC, // Keyword::RRC = 470
+        TrieToken::KW_RRCA, // Keyword::RRCA = 471
+        TrieToken::KW_RRD, // Keyword::RRD = 472
+        TrieToken::KW_RRHL, // Keyword::RRHL = 473
+        TrieToken::KW_RSMIX, // Keyword::RSMIX = 474
+        TrieToken::KW_RST, // Keyword::RST = 475
+        TrieToken::KW_RSTV, // Keyword::RSTV = 476
+        TrieToken::KW_RV, // Keyword::RV = 477
+        TrieToken::KW_RZ, // Keyword::RZ = 478
+        TrieToken::KW_R_C, // Keyword::R_C = 479
+        TrieToken::KW_R_EQ, // Keyword::R_EQ = 480
+        TrieToken::KW_R_GEU, // Keyword::R_GEU = 481
+        TrieToken::KW_R_GTU, // Keyword::R_GTU = 482
+        TrieToken::KW_R_LEU, // Keyword::R_LEU = 483
+        TrieToken::KW_R_LO, // Keyword::R_LO = 484
+        TrieToken::KW_R_LTU, // Keyword::R_LTU = 485
+        TrieToken::KW_R_LZ, // Keyword::R_LZ = 486
+        TrieToken::KW_R_M, // Keyword::R_M = 487
+        TrieToken::KW_R_NC, // Keyword::R_NC = 488
+        TrieToken::KW_R_NE, // Keyword::R_NE = 489
+        TrieToken::KW_R_NV, // Keyword::R_NV = 490
+        TrieToken::KW_R_NZ, // Keyword::R_NZ = 491
+        TrieToken::KW_R_P, // Keyword::R_P = 492
+        TrieToken::KW_R_PE, // Keyword::R_PE = 493
+        TrieToken::KW_R_PO, // Keyword::R_PO = 494
+        TrieToken::KW_R_V, // Keyword::R_V = 495
+        TrieToken::KW_R_Z, // Keyword::R_Z = 496
+        TrieToken::KW_S, // Keyword::S = 497
+        TrieToken::KW_SBB, // Keyword::SBB = 498
+        TrieToken::KW_SBC, // Keyword::SBC = 499
+        TrieToken::KW_SBI, // Keyword::SBI = 500
+        TrieToken::KW_SBOX, // Keyword::SBOX = 501
+        TrieToken::KW_SCALL, // Keyword::SCALL = 502
+        TrieToken::KW_SCF, // Keyword::SCF = 503
+        TrieToken::KW_SET, // Keyword::SET = 504
+        TrieToken::KW_SETAE, // Keyword::SETAE = 505
+        TrieToken::KW_SETSYSP, // Keyword::SETSYSP = 506
+        TrieToken::KW_SETUSR, // Keyword::SETUSR = 507
+        TrieToken::KW_SETUSRP, // Keyword::SETUSRP = 508
+        TrieToken::KW_SHAF1, // Keyword::SHAF1 = 509
+        TrieToken::KW_SHAF2, // Keyword::SHAF2 = 510
+        TrieToken::KW_SHAF3, // Keyword::SHAF3 = 511
+        TrieToken::KW_SHLD, // Keyword::SHLD = 512
+        TrieToken::KW_SHLDE, // Keyword::SHLDE = 513
+        TrieToken::KW_SHLX, // Keyword::SHLX = 514
+        TrieToken::KW_SIL, // Keyword::SIL = 515
+        TrieToken::KW_SIM, // Keyword::SIM = 516
+        TrieToken::KW_SIS, // Keyword::SIS = 517
+        TrieToken::KW_SL1REG, // Keyword::SL1REG = 518
+        TrieToken::KW_SL2REG, // Keyword::SL2REG = 519
+        TrieToken::KW_SL3REG, // Keyword::SL3REG = 520
+        TrieToken::KW_SL4REG, // Keyword::SL4REG = 521
+        TrieToken::KW_SL5REG, // Keyword::SL5REG = 522
+        TrieToken::KW_SL6REG, // Keyword::SL6REG = 523
+        TrieToken::KW_SL7REG, // Keyword::SL7REG = 524
+        TrieToken::KW_SL8REG, // Keyword::SL8REG = 525
+        TrieToken::KW_SLA, // Keyword::SLA = 526
+        TrieToken::KW_SLI, // Keyword::SLI = 527
+        TrieToken::KW_SLL, // Keyword::SLL = 528
+        TrieToken::KW_SLP, // Keyword::SLP = 529
+        TrieToken::KW_SLS, // Keyword::SLS = 530
+        TrieToken::KW_SP, // Keyword::SP = 531
+        TrieToken::KW_SPHL, // Keyword::SPHL = 532
+        TrieToken::KW_SR1REG, // Keyword::SR1REG = 533
+        TrieToken::KW_SR2REG, // Keyword::SR2REG = 534
+        TrieToken::KW_SR3REG, // Keyword::SR3REG = 535
+        TrieToken::KW_SR4REG, // Keyword::SR4REG = 536
+        TrieToken::KW_SR5REG, // Keyword::SR5REG = 537
+        TrieToken::KW_SR6REG, // Keyword::SR6REG = 538
+        TrieToken::KW_SR7REG, // Keyword::SR7REG = 539
+        TrieToken::KW_SR8REG, // Keyword::SR8REG = 540
+        TrieToken::KW_SRA, // Keyword::SRA = 541
+        TrieToken::KW_SRET, // Keyword::SRET = 542
+        TrieToken::KW_SRL, // Keyword::SRL = 543
+        TrieToken::KW_STA, // Keyword::STA = 544
+        TrieToken::KW_STAE, // Keyword::STAE = 545
+        TrieToken::KW_STAX, // Keyword::STAX = 546
+        TrieToken::KW_STC, // Keyword::STC = 547
+        TrieToken::KW_STMIX, // Keyword::STMIX = 548
+        TrieToken::KW_STOP, // Keyword::STOP = 549
+        TrieToken::KW_SU, // Keyword::SU = 550
+        TrieToken::KW_SUB, // Keyword::SUB = 551
+        TrieToken::KW_SUI, // Keyword::SUI = 552
+        TrieToken::KW_SURES, // Keyword::SURES = 553
+        TrieToken::KW_SWAP, // Keyword::SWAP = 554
+        TrieToken::KW_SWAPNIB, // Keyword::SWAPNIB = 555
+        TrieToken::KW_SYSCALL, // Keyword::SYSCALL = 556
+        TrieToken::KW_SYSRET, // Keyword::SYSRET = 557
+        TrieToken::KW_TEST, // Keyword::TEST = 558
+        TrieToken::KW_TRA, // Keyword::TRA = 559
+        TrieToken::KW_TRUE, // Keyword::TRUE = 560
+        TrieToken::KW_TST, // Keyword::TST = 561
+        TrieToken::KW_TSTIO, // Keyword::TSTIO = 562
+        TrieToken::KW_TSTNULL, // Keyword::TSTNULL = 563
+        TrieToken::KW_UMA, // Keyword::UMA = 564
+        TrieToken::KW_UMS, // Keyword::UMS = 565
+        TrieToken::KW_UNDEF, // Keyword::UNDEF = 566
+        TrieToken::KW_UNDEFINE, // Keyword::UNDEFINE = 567
+        TrieToken::KW_UNTIL, // Keyword::UNTIL = 568
+        TrieToken::KW_V, // Keyword::V = 569
+        TrieToken::KW_WHILE, // Keyword::WHILE = 570
+        TrieToken::KW_WORD, // Keyword::WORD = 571
+        TrieToken::KW_X, // Keyword::X = 572
+        TrieToken::KW_X5, // Keyword::X5 = 573
+        TrieToken::KW_XBC, // Keyword::XBC = 574
+        TrieToken::KW_XCHG, // Keyword::XCHG = 575
+        TrieToken::KW_XDE, // Keyword::XDE = 576
+        TrieToken::KW_XHL, // Keyword::XHL = 577
+        TrieToken::KW_XIX, // Keyword::XIX = 578
+        TrieToken::KW_XIY, // Keyword::XIY = 579
+        TrieToken::KW_XOR, // Keyword::XOR = 580
+        TrieToken::KW_XP, // Keyword::XP = 581
+        TrieToken::KW_XPC, // Keyword::XPC = 582
+        TrieToken::KW_XRA, // Keyword::XRA = 583
+        TrieToken::KW_XRI, // Keyword::XRI = 584
+        TrieToken::KW_XSP, // Keyword::XSP = 585
+        TrieToken::KW_XTHL, // Keyword::XTHL = 586
+        TrieToken::KW_XY, // Keyword::XY = 587
+        TrieToken::KW_YBC, // Keyword::YBC = 588
+        TrieToken::KW_YDE, // Keyword::YDE = 589
+        TrieToken::KW_YHL, // Keyword::YHL = 590
+        TrieToken::KW_YIX, // Keyword::YIX = 591
+        TrieToken::KW_YIY, // Keyword::YIY = 592
+        TrieToken::KW_YP, // Keyword::YP = 593
+        TrieToken::KW_YSP, // Keyword::YSP = 594
+        TrieToken::KW_Z, // Keyword::Z = 595
+        TrieToken::KW_ZBC, // Keyword::ZBC = 596
+        TrieToken::KW_ZDE, // Keyword::ZDE = 597
+        TrieToken::KW_ZHL, // Keyword::ZHL = 598
+        TrieToken::KW_ZIX, // Keyword::ZIX = 599
+        TrieToken::KW_ZIY, // Keyword::ZIY = 600
+        TrieToken::KW_ZP, // Keyword::ZP = 601
+        TrieToken::KW_ZSP, // Keyword::ZSP = 602
+        TrieToken::KW___Z80ASM__ADC_HL_BC, // Keyword::__Z80ASM__ADC_HL_BC = 603
+        TrieToken::KW___Z80ASM__ADC_HL_DE, // Keyword::__Z80ASM__ADC_HL_DE = 604
+        TrieToken::KW___Z80ASM__ADC_HL_HL, // Keyword::__Z80ASM__ADC_HL_HL = 605
+        TrieToken::KW___Z80ASM__ADC_HL_SP, // Keyword::__Z80ASM__ADC_HL_SP = 606
+        TrieToken::KW___Z80ASM__ADD_BC_A, // Keyword::__Z80ASM__ADD_BC_A = 607
+        TrieToken::KW___Z80ASM__ADD_DE_A, // Keyword::__Z80ASM__ADD_DE_A = 608
+        TrieToken::KW___Z80ASM__ADD_HL_A, // Keyword::__Z80ASM__ADD_HL_A = 609
+        TrieToken::KW___Z80ASM__ADD_SP_D, // Keyword::__Z80ASM__ADD_SP_D = 610
+        TrieToken::KW___Z80ASM__CALL_HL, // Keyword::__Z80ASM__CALL_HL = 611
+        TrieToken::KW___Z80ASM__CALL_IX, // Keyword::__Z80ASM__CALL_IX = 612
+        TrieToken::KW___Z80ASM__CALL_IY, // Keyword::__Z80ASM__CALL_IY = 613
+        TrieToken::KW___Z80ASM__CPD, // Keyword::__Z80ASM__CPD = 614
+        TrieToken::KW___Z80ASM__CPDR, // Keyword::__Z80ASM__CPDR = 615
+        TrieToken::KW___Z80ASM__CPI, // Keyword::__Z80ASM__CPI = 616
+        TrieToken::KW___Z80ASM__CPIR, // Keyword::__Z80ASM__CPIR = 617
+        TrieToken::KW___Z80ASM__DAA, // Keyword::__Z80ASM__DAA = 618
+        TrieToken::KW___Z80ASM__EX_SP_HL, // Keyword::__Z80ASM__EX_SP_HL = 619
+        TrieToken::KW___Z80ASM__LDD, // Keyword::__Z80ASM__LDD = 620
+        TrieToken::KW___Z80ASM__LDDR, // Keyword::__Z80ASM__LDDR = 621
+        TrieToken::KW___Z80ASM__LDI, // Keyword::__Z80ASM__LDI = 622
+        TrieToken::KW___Z80ASM__LDIR, // Keyword::__Z80ASM__LDIR = 623
+        TrieToken::KW___Z80ASM__RLD, // Keyword::__Z80ASM__RLD = 624
+        TrieToken::KW___Z80ASM__RL_BC, // Keyword::__Z80ASM__RL_BC = 625
+        TrieToken::KW___Z80ASM__RL_DE, // Keyword::__Z80ASM__RL_DE = 626
+        TrieToken::KW___Z80ASM__RL_HL, // Keyword::__Z80ASM__RL_HL = 627
+        TrieToken::KW___Z80ASM__RRD, // Keyword::__Z80ASM__RRD = 628
+        TrieToken::KW___Z80ASM__RR_BC, // Keyword::__Z80ASM__RR_BC = 629
+        TrieToken::KW___Z80ASM__RR_DE, // Keyword::__Z80ASM__RR_DE = 630
+        TrieToken::KW___Z80ASM__RR_HL, // Keyword::__Z80ASM__RR_HL = 631
+        TrieToken::KW___Z80ASM__SBC_HL_BC, // Keyword::__Z80ASM__SBC_HL_BC = 632
+        TrieToken::KW___Z80ASM__SBC_HL_DE, // Keyword::__Z80ASM__SBC_HL_DE = 633
+        TrieToken::KW___Z80ASM__SBC_HL_HL, // Keyword::__Z80ASM__SBC_HL_HL = 634
+        TrieToken::KW___Z80ASM__SBC_HL_SP, // Keyword::__Z80ASM__SBC_HL_SP = 635
+        TrieToken::KW___Z80ASM__SRA_BC, // Keyword::__Z80ASM__SRA_BC = 636
+        TrieToken::KW___Z80ASM__SRA_DE, // Keyword::__Z80ASM__SRA_DE = 637
+        TrieToken::KW___Z80ASM__SRA_HL, // Keyword::__Z80ASM__SRA_HL = 638
+        TrieToken::KW___Z80ASM__SUB_HL_BC, // Keyword::__Z80ASM__SUB_HL_BC = 639
+        TrieToken::KW___Z80ASM__SUB_HL_DE, // Keyword::__Z80ASM__SUB_HL_DE = 640
+        TrieToken::KW___Z80ASM__SUB_HL_HL, // Keyword::__Z80ASM__SUB_HL_HL = 641
+        TrieToken::KW___Z80ASM__SUB_HL_SP, // Keyword::__Z80ASM__SUB_HL_SP = 642
+    };
+    return lut[static_cast<size_t>(keyword)];
+}
+
+Keyword to_keyword(TrieToken trie_token) {
+    static const Keyword lut[721] = {
+        Keyword::None, // TrieToken::None = 0
+        Keyword::None, // TrieToken::Expr = 1
+        Keyword::None, // TrieToken::Label = 2
+        Keyword::None, // TrieToken::cpu_z80 = 3
+        Keyword::None, // TrieToken::cpu_z80_strict = 4
+        Keyword::None, // TrieToken::cpu_z180 = 5
+        Keyword::None, // TrieToken::cpu_ez80_z80 = 6
+        Keyword::None, // TrieToken::cpu_ez80 = 7
+        Keyword::None, // TrieToken::cpu_z80n = 8
+        Keyword::None, // TrieToken::cpu_r2ka = 9
+        Keyword::None, // TrieToken::cpu_r3k = 10
+        Keyword::None, // TrieToken::cpu_gbz80 = 11
+        Keyword::None, // TrieToken::cpu_i8080 = 12
+        Keyword::None, // TrieToken::cpu_i8085 = 13
+        Keyword::None, // TrieToken::cpu_r800 = 14
+        Keyword::None, // TrieToken::cpu_r4k = 15
+        Keyword::None, // TrieToken::cpu_r5k = 16
+        Keyword::None, // TrieToken::cpu_kc160 = 17
+        Keyword::None, // TrieToken::cpu_kc160_z80 = 18
+        Keyword::None, // TrieToken::cpu_i8080_strict = 19
+        Keyword::None, // TrieToken::cpu_i8085_strict = 20
+        Keyword::None, // TrieToken::cpu_gbz80_strict = 21
+        Keyword::None, // TrieToken::cpu_z180_strict = 22
+        Keyword::None, // TrieToken::cpu_z80n_strict = 23
+        Keyword::None, // TrieToken::cpu_ez80_z80_strict = 24
+        Keyword::None, // TrieToken::cpu_ez80_strict = 25
+        Keyword::None, // TrieToken::cpu_r800_strict = 26
+        Keyword::None, // TrieToken::cpu_kc160_strict = 27
+        Keyword::None, // TrieToken::cpu_kc160_z80_strict = 28
+        Keyword::None, // TrieToken::cpu_r2ka_strict = 29
+        Keyword::None, // TrieToken::cpu_r3k_strict = 30
+        Keyword::None, // TrieToken::cpu_r4k_strict = 31
+        Keyword::None, // TrieToken::cpu_r5k_strict = 32
+        Keyword::None, // TrieToken::cpu_r6k = 33
+        Keyword::None, // TrieToken::cpu_r6k_strict = 34
+        Keyword::None, // TrieToken::TK_Identifier = 35
+        Keyword::None, // TrieToken::TK_Integer = 36
+        Keyword::None, // TrieToken::TK_Float = 37
+        Keyword::None, // TrieToken::TK_String = 38
+        Keyword::None, // TrieToken::TK_Plus = 39
+        Keyword::None, // TrieToken::TK_Minus = 40
+        Keyword::None, // TrieToken::TK_Multiply = 41
+        Keyword::None, // TrieToken::TK_Divide = 42
+        Keyword::None, // TrieToken::TK_Modulo = 43
+        Keyword::None, // TrieToken::TK_Power = 44
+        Keyword::None, // TrieToken::TK_BitwiseAnd = 45
+        Keyword::None, // TrieToken::TK_BitwiseOr = 46
+        Keyword::None, // TrieToken::TK_BitwiseXor = 47
+        Keyword::None, // TrieToken::TK_BitwiseNot = 48
+        Keyword::None, // TrieToken::TK_LeftShift = 49
+        Keyword::None, // TrieToken::TK_RightShift = 50
+        Keyword::None, // TrieToken::TK_LogicalAnd = 51
+        Keyword::None, // TrieToken::TK_LogicalOr = 52
+        Keyword::None, // TrieToken::TK_LogicalXor = 53
+        Keyword::None, // TrieToken::TK_LogicalNot = 54
+        Keyword::None, // TrieToken::TK_EQ = 55
+        Keyword::None, // TrieToken::TK_NE = 56
+        Keyword::None, // TrieToken::TK_LT = 57
+        Keyword::None, // TrieToken::TK_LE = 58
+        Keyword::None, // TrieToken::TK_GT = 59
+        Keyword::None, // TrieToken::TK_GE = 60
+        Keyword::None, // TrieToken::TK_LeftParen = 61
+        Keyword::None, // TrieToken::TK_RightParen = 62
+        Keyword::None, // TrieToken::TK_LeftBracket = 63
+        Keyword::None, // TrieToken::TK_RightBracket = 64
+        Keyword::None, // TrieToken::TK_LeftBrace = 65
+        Keyword::None, // TrieToken::TK_RightBrace = 66
+        Keyword::None, // TrieToken::TK_Comma = 67
+        Keyword::None, // TrieToken::TK_Colon = 68
+        Keyword::None, // TrieToken::TK_Dot = 69
+        Keyword::None, // TrieToken::TK_Question = 70
+        Keyword::None, // TrieToken::TK_Hash = 71
+        Keyword::None, // TrieToken::TK_DoubleHash = 72
+        Keyword::None, // TrieToken::TK_At = 73
+        Keyword::None, // TrieToken::TK_Dollar = 74
+        Keyword::None, // TrieToken::TK_Backslash = 75
+        Keyword::None, // TrieToken::TK_Tick = 76
+        Keyword::None, // TrieToken::TK_ASMPC = 77
+        Keyword::None, // TrieToken::TK_EndOfLine = 78
+        Keyword::A, // TrieToken::KW_A = 79
+        Keyword::ABC, // TrieToken::KW_ABC = 80
+        Keyword::ACI, // TrieToken::KW_ACI = 81
+        Keyword::ADC, // TrieToken::KW_ADC = 82
+        Keyword::ADD, // TrieToken::KW_ADD = 83
+        Keyword::ADE, // TrieToken::KW_ADE = 84
+        Keyword::ADI, // TrieToken::KW_ADI = 85
+        Keyword::AESIMC, // TrieToken::KW_AESIMC = 86
+        Keyword::AESISR, // TrieToken::KW_AESISR = 87
+        Keyword::AESMC, // TrieToken::KW_AESMC = 88
+        Keyword::AESSR, // TrieToken::KW_AESSR = 89
+        Keyword::AF, // TrieToken::KW_AF = 90
+        Keyword::AHL, // TrieToken::KW_AHL = 91
+        Keyword::AIX, // TrieToken::KW_AIX = 92
+        Keyword::AIY, // TrieToken::KW_AIY = 93
+        Keyword::ALTD, // TrieToken::KW_ALTD = 94
+        Keyword::ALTS, // TrieToken::KW_ALTS = 95
+        Keyword::ALTSD, // TrieToken::KW_ALTSD = 96
+        Keyword::ANA, // TrieToken::KW_ANA = 97
+        Keyword::AND, // TrieToken::KW_AND = 98
+        Keyword::ANI, // TrieToken::KW_ANI = 99
+        Keyword::ARHL, // TrieToken::KW_ARHL = 100
+        Keyword::ASMPC, // TrieToken::KW_ASMPC = 101
+        Keyword::ASP, // TrieToken::KW_ASP = 102
+        Keyword::ASSERT, // TrieToken::KW_ASSERT = 103
+        Keyword::ASSUME, // TrieToken::KW_ASSUME = 104
+        Keyword::B, // TrieToken::KW_B = 105
+        Keyword::BC, // TrieToken::KW_BC = 106
+        Keyword::BCDE, // TrieToken::KW_BCDE = 107
+        Keyword::BINARY, // TrieToken::KW_BINARY = 108
+        Keyword::BIT, // TrieToken::KW_BIT = 109
+        Keyword::BOOL, // TrieToken::KW_BOOL = 110
+        Keyword::BREAK, // TrieToken::KW_BREAK = 111
+        Keyword::BRLC, // TrieToken::KW_BRLC = 112
+        Keyword::BSLA, // TrieToken::KW_BSLA = 113
+        Keyword::BSRA, // TrieToken::KW_BSRA = 114
+        Keyword::BSRF, // TrieToken::KW_BSRF = 115
+        Keyword::BSRL, // TrieToken::KW_BSRL = 116
+        Keyword::BYTE, // TrieToken::KW_BYTE = 117
+        Keyword::C, // TrieToken::KW_C = 118
+        Keyword::CALL, // TrieToken::KW_CALL = 119
+        Keyword::CALL3, // TrieToken::KW_CALL3 = 120
+        Keyword::CBM, // TrieToken::KW_CBM = 121
+        Keyword::CC, // TrieToken::KW_CC = 122
+        Keyword::CCF, // TrieToken::KW_CCF = 123
+        Keyword::CEQ, // TrieToken::KW_CEQ = 124
+        Keyword::CGEU, // TrieToken::KW_CGEU = 125
+        Keyword::CGTU, // TrieToken::KW_CGTU = 126
+        Keyword::CLEU, // TrieToken::KW_CLEU = 127
+        Keyword::CLO, // TrieToken::KW_CLO = 128
+        Keyword::CLR, // TrieToken::KW_CLR = 129
+        Keyword::CLTU, // TrieToken::KW_CLTU = 130
+        Keyword::CLZ, // TrieToken::KW_CLZ = 131
+        Keyword::CM, // TrieToken::KW_CM = 132
+        Keyword::CMA, // TrieToken::KW_CMA = 133
+        Keyword::CMC, // TrieToken::KW_CMC = 134
+        Keyword::CMP, // TrieToken::KW_CMP = 135
+        Keyword::CNC, // TrieToken::KW_CNC = 136
+        Keyword::CNE, // TrieToken::KW_CNE = 137
+        Keyword::CNV, // TrieToken::KW_CNV = 138
+        Keyword::CNVC, // TrieToken::KW_CNVC = 139
+        Keyword::CNVD, // TrieToken::KW_CNVD = 140
+        Keyword::CNZ, // TrieToken::KW_CNZ = 141
+        Keyword::CONTINUE, // TrieToken::KW_CONTINUE = 142
+        Keyword::CONVC, // TrieToken::KW_CONVC = 143
+        Keyword::CONVD, // TrieToken::KW_CONVD = 144
+        Keyword::COPY, // TrieToken::KW_COPY = 145
+        Keyword::COPYR, // TrieToken::KW_COPYR = 146
+        Keyword::CP, // TrieToken::KW_CP = 147
+        Keyword::CPD, // TrieToken::KW_CPD = 148
+        Keyword::CPDR, // TrieToken::KW_CPDR = 149
+        Keyword::CPE, // TrieToken::KW_CPE = 150
+        Keyword::CPI, // TrieToken::KW_CPI = 151
+        Keyword::CPIR, // TrieToken::KW_CPIR = 152
+        Keyword::CPL, // TrieToken::KW_CPL = 153
+        Keyword::CPO, // TrieToken::KW_CPO = 154
+        Keyword::CV, // TrieToken::KW_CV = 155
+        Keyword::CZ, // TrieToken::KW_CZ = 156
+        Keyword::C_C, // TrieToken::KW_C_C = 157
+        Keyword::C_EQ, // TrieToken::KW_C_EQ = 158
+        Keyword::C_GEU, // TrieToken::KW_C_GEU = 159
+        Keyword::C_GTU, // TrieToken::KW_C_GTU = 160
+        Keyword::C_LEU, // TrieToken::KW_C_LEU = 161
+        Keyword::C_LINE, // TrieToken::KW_C_LINE = 162
+        Keyword::C_LO, // TrieToken::KW_C_LO = 163
+        Keyword::C_LTU, // TrieToken::KW_C_LTU = 164
+        Keyword::C_LZ, // TrieToken::KW_C_LZ = 165
+        Keyword::C_M, // TrieToken::KW_C_M = 166
+        Keyword::C_NC, // TrieToken::KW_C_NC = 167
+        Keyword::C_NE, // TrieToken::KW_C_NE = 168
+        Keyword::C_NV, // TrieToken::KW_C_NV = 169
+        Keyword::C_NZ, // TrieToken::KW_C_NZ = 170
+        Keyword::C_P, // TrieToken::KW_C_P = 171
+        Keyword::C_PE, // TrieToken::KW_C_PE = 172
+        Keyword::C_PO, // TrieToken::KW_C_PO = 173
+        Keyword::C_V, // TrieToken::KW_C_V = 174
+        Keyword::C_Z, // TrieToken::KW_C_Z = 175
+        Keyword::D, // TrieToken::KW_D = 176
+        Keyword::DAA, // TrieToken::KW_DAA = 177
+        Keyword::DAD, // TrieToken::KW_DAD = 178
+        Keyword::DB, // TrieToken::KW_DB = 179
+        Keyword::DCR, // TrieToken::KW_DCR = 180
+        Keyword::DCX, // TrieToken::KW_DCX = 181
+        Keyword::DDB, // TrieToken::KW_DDB = 182
+        Keyword::DE, // TrieToken::KW_DE = 183
+        Keyword::DEC, // TrieToken::KW_DEC = 184
+        Keyword::DEFB, // TrieToken::KW_DEFB = 185
+        Keyword::DEFC, // TrieToken::KW_DEFC = 186
+        Keyword::DEFDB, // TrieToken::KW_DEFDB = 187
+        Keyword::DEFINE, // TrieToken::KW_DEFINE = 188
+        Keyword::DEFL, // TrieToken::KW_DEFL = 189
+        Keyword::DEFM, // TrieToken::KW_DEFM = 190
+        Keyword::DEFP, // TrieToken::KW_DEFP = 191
+        Keyword::DEFQ, // TrieToken::KW_DEFQ = 192
+        Keyword::DEFS, // TrieToken::KW_DEFS = 193
+        Keyword::DEFW, // TrieToken::KW_DEFW = 194
+        Keyword::DEFW_BE, // TrieToken::KW_DEFW_BE = 195
+        Keyword::DEHL, // TrieToken::KW_DEHL = 196
+        Keyword::DI, // TrieToken::KW_DI = 197
+        Keyword::DIV, // TrieToken::KW_DIV = 198
+        Keyword::DIVS, // TrieToken::KW_DIVS = 199
+        Keyword::DJNZ, // TrieToken::KW_DJNZ = 200
+        Keyword::DM, // TrieToken::KW_DM = 201
+        Keyword::DP, // TrieToken::KW_DP = 202
+        Keyword::DQ, // TrieToken::KW_DQ = 203
+        Keyword::DS, // TrieToken::KW_DS = 204
+        Keyword::DSUB, // TrieToken::KW_DSUB = 205
+        Keyword::DW, // TrieToken::KW_DW = 206
+        Keyword::DWJNZ, // TrieToken::KW_DWJNZ = 207
+        Keyword::DWORD, // TrieToken::KW_DWORD = 208
+        Keyword::DW_BE, // TrieToken::KW_DW_BE = 209
+        Keyword::E, // TrieToken::KW_E = 210
+        Keyword::EI, // TrieToken::KW_EI = 211
+        Keyword::EIR, // TrieToken::KW_EIR = 212
+        Keyword::ELIF, // TrieToken::KW_ELIF = 213
+        Keyword::ELIFDEF, // TrieToken::KW_ELIFDEF = 214
+        Keyword::ELIFNDEF, // TrieToken::KW_ELIFNDEF = 215
+        Keyword::ELSE, // TrieToken::KW_ELSE = 216
+        Keyword::ELSEIF, // TrieToken::KW_ELSEIF = 217
+        Keyword::ELSEIFDEF, // TrieToken::KW_ELSEIFDEF = 218
+        Keyword::ELSEIFNDEF, // TrieToken::KW_ELSEIFNDEF = 219
+        Keyword::ENDIF, // TrieToken::KW_ENDIF = 220
+        Keyword::ENDM, // TrieToken::KW_ENDM = 221
+        Keyword::ENDR, // TrieToken::KW_ENDR = 222
+        Keyword::ENDWHILE, // TrieToken::KW_ENDWHILE = 223
+        Keyword::EQ, // TrieToken::KW_EQ = 224
+        Keyword::EQU, // TrieToken::KW_EQU = 225
+        Keyword::ERROR, // TrieToken::KW_ERROR = 226
+        Keyword::EX, // TrieToken::KW_EX = 227
+        Keyword::EXITM, // TrieToken::KW_EXITM = 228
+        Keyword::EXP, // TrieToken::KW_EXP = 229
+        Keyword::EXTERN, // TrieToken::KW_EXTERN = 230
+        Keyword::EXX, // TrieToken::KW_EXX = 231
+        Keyword::F, // TrieToken::KW_F = 232
+        Keyword::FALSE, // TrieToken::KW_FALSE = 233
+        Keyword::FLAG, // TrieToken::KW_FLAG = 234
+        Keyword::FSYSCALL, // TrieToken::KW_FSYSCALL = 235
+        Keyword::GE, // TrieToken::KW_GE = 236
+        Keyword::GEU, // TrieToken::KW_GEU = 237
+        Keyword::GT, // TrieToken::KW_GT = 238
+        Keyword::GTU, // TrieToken::KW_GTU = 239
+        Keyword::H, // TrieToken::KW_H = 240
+        Keyword::HALT, // TrieToken::KW_HALT = 241
+        Keyword::HL, // TrieToken::KW_HL = 242
+        Keyword::HLD, // TrieToken::KW_HLD = 243
+        Keyword::HLI, // TrieToken::KW_HLI = 244
+        Keyword::HLT, // TrieToken::KW_HLT = 245
+        Keyword::HTR, // TrieToken::KW_HTR = 246
+        Keyword::I, // TrieToken::KW_I = 247
+        Keyword::IBOX, // TrieToken::KW_IBOX = 248
+        Keyword::IDET, // TrieToken::KW_IDET = 249
+        Keyword::IF, // TrieToken::KW_IF = 250
+        Keyword::IFDEF, // TrieToken::KW_IFDEF = 251
+        Keyword::IFNDEF, // TrieToken::KW_IFNDEF = 252
+        Keyword::IIR, // TrieToken::KW_IIR = 253
+        Keyword::IL, // TrieToken::KW_IL = 254
+        Keyword::IM, // TrieToken::KW_IM = 255
+        Keyword::IN, // TrieToken::KW_IN = 256
+        Keyword::IN0, // TrieToken::KW_IN0 = 257
+        Keyword::INC, // TrieToken::KW_INC = 258
+        Keyword::INCBIN, // TrieToken::KW_INCBIN = 259
+        Keyword::INCLUDE, // TrieToken::KW_INCLUDE = 260
+        Keyword::IND, // TrieToken::KW_IND = 261
+        Keyword::IND2, // TrieToken::KW_IND2 = 262
+        Keyword::IND2R, // TrieToken::KW_IND2R = 263
+        Keyword::INDM, // TrieToken::KW_INDM = 264
+        Keyword::INDMR, // TrieToken::KW_INDMR = 265
+        Keyword::INDR, // TrieToken::KW_INDR = 266
+        Keyword::INDRX, // TrieToken::KW_INDRX = 267
+        Keyword::INI, // TrieToken::KW_INI = 268
+        Keyword::INI2, // TrieToken::KW_INI2 = 269
+        Keyword::INI2R, // TrieToken::KW_INI2R = 270
+        Keyword::INIM, // TrieToken::KW_INIM = 271
+        Keyword::INIMR, // TrieToken::KW_INIMR = 272
+        Keyword::INIR, // TrieToken::KW_INIR = 273
+        Keyword::INIRX, // TrieToken::KW_INIRX = 274
+        Keyword::INR, // TrieToken::KW_INR = 275
+        Keyword::INX, // TrieToken::KW_INX = 276
+        Keyword::IOE, // TrieToken::KW_IOE = 277
+        Keyword::IOI, // TrieToken::KW_IOI = 278
+        Keyword::IP, // TrieToken::KW_IP = 279
+        Keyword::IPRES, // TrieToken::KW_IPRES = 280
+        Keyword::IPSET, // TrieToken::KW_IPSET = 281
+        Keyword::IS, // TrieToken::KW_IS = 282
+        Keyword::IX, // TrieToken::KW_IX = 283
+        Keyword::IXH, // TrieToken::KW_IXH = 284
+        Keyword::IXL, // TrieToken::KW_IXL = 285
+        Keyword::IY, // TrieToken::KW_IY = 286
+        Keyword::IYH, // TrieToken::KW_IYH = 287
+        Keyword::IYL, // TrieToken::KW_IYL = 288
+        Keyword::JC, // TrieToken::KW_JC = 289
+        Keyword::JEQ, // TrieToken::KW_JEQ = 290
+        Keyword::JGE, // TrieToken::KW_JGE = 291
+        Keyword::JGEU, // TrieToken::KW_JGEU = 292
+        Keyword::JGT, // TrieToken::KW_JGT = 293
+        Keyword::JGTU, // TrieToken::KW_JGTU = 294
+        Keyword::JK, // TrieToken::KW_JK = 295
+        Keyword::JKHL, // TrieToken::KW_JKHL = 296
+        Keyword::JLE, // TrieToken::KW_JLE = 297
+        Keyword::JLEU, // TrieToken::KW_JLEU = 298
+        Keyword::JLO, // TrieToken::KW_JLO = 299
+        Keyword::JLT, // TrieToken::KW_JLT = 300
+        Keyword::JLTU, // TrieToken::KW_JLTU = 301
+        Keyword::JLZ, // TrieToken::KW_JLZ = 302
+        Keyword::JM, // TrieToken::KW_JM = 303
+        Keyword::JMP, // TrieToken::KW_JMP = 304
+        Keyword::JNC, // TrieToken::KW_JNC = 305
+        Keyword::JNE, // TrieToken::KW_JNE = 306
+        Keyword::JNK, // TrieToken::KW_JNK = 307
+        Keyword::JNV, // TrieToken::KW_JNV = 308
+        Keyword::JNX5, // TrieToken::KW_JNX5 = 309
+        Keyword::JNZ, // TrieToken::KW_JNZ = 310
+        Keyword::JP, // TrieToken::KW_JP = 311
+        Keyword::JP3, // TrieToken::KW_JP3 = 312
+        Keyword::JPE, // TrieToken::KW_JPE = 313
+        Keyword::JPO, // TrieToken::KW_JPO = 314
+        Keyword::JR, // TrieToken::KW_JR = 315
+        Keyword::JRE, // TrieToken::KW_JRE = 316
+        Keyword::JV, // TrieToken::KW_JV = 317
+        Keyword::JX5, // TrieToken::KW_JX5 = 318
+        Keyword::JZ, // TrieToken::KW_JZ = 319
+        Keyword::J_C, // TrieToken::KW_J_C = 320
+        Keyword::J_EQ, // TrieToken::KW_J_EQ = 321
+        Keyword::J_GE, // TrieToken::KW_J_GE = 322
+        Keyword::J_GEU, // TrieToken::KW_J_GEU = 323
+        Keyword::J_GT, // TrieToken::KW_J_GT = 324
+        Keyword::J_GTU, // TrieToken::KW_J_GTU = 325
+        Keyword::J_LE, // TrieToken::KW_J_LE = 326
+        Keyword::J_LEU, // TrieToken::KW_J_LEU = 327
+        Keyword::J_LO, // TrieToken::KW_J_LO = 328
+        Keyword::J_LT, // TrieToken::KW_J_LT = 329
+        Keyword::J_LTU, // TrieToken::KW_J_LTU = 330
+        Keyword::J_LZ, // TrieToken::KW_J_LZ = 331
+        Keyword::J_M, // TrieToken::KW_J_M = 332
+        Keyword::J_NC, // TrieToken::KW_J_NC = 333
+        Keyword::J_NE, // TrieToken::KW_J_NE = 334
+        Keyword::J_NV, // TrieToken::KW_J_NV = 335
+        Keyword::J_NZ, // TrieToken::KW_J_NZ = 336
+        Keyword::J_P, // TrieToken::KW_J_P = 337
+        Keyword::J_PE, // TrieToken::KW_J_PE = 338
+        Keyword::J_PO, // TrieToken::KW_J_PO = 339
+        Keyword::J_V, // TrieToken::KW_J_V = 340
+        Keyword::J_Z, // TrieToken::KW_J_Z = 341
+        Keyword::K, // TrieToken::KW_K = 342
+        Keyword::L, // TrieToken::KW_L = 343
+        Keyword::LCALL, // TrieToken::KW_LCALL = 344
+        Keyword::LD, // TrieToken::KW_LD = 345
+        Keyword::LDA, // TrieToken::KW_LDA = 346
+        Keyword::LDAX, // TrieToken::KW_LDAX = 347
+        Keyword::LDD, // TrieToken::KW_LDD = 348
+        Keyword::LDDR, // TrieToken::KW_LDDR = 349
+        Keyword::LDDRX, // TrieToken::KW_LDDRX = 350
+        Keyword::LDDSR, // TrieToken::KW_LDDSR = 351
+        Keyword::LDDX, // TrieToken::KW_LDDX = 352
+        Keyword::LDF, // TrieToken::KW_LDF = 353
+        Keyword::LDH, // TrieToken::KW_LDH = 354
+        Keyword::LDHI, // TrieToken::KW_LDHI = 355
+        Keyword::LDHL, // TrieToken::KW_LDHL = 356
+        Keyword::LDI, // TrieToken::KW_LDI = 357
+        Keyword::LDIR, // TrieToken::KW_LDIR = 358
+        Keyword::LDIRX, // TrieToken::KW_LDIRX = 359
+        Keyword::LDISR, // TrieToken::KW_LDISR = 360
+        Keyword::LDIX, // TrieToken::KW_LDIX = 361
+        Keyword::LDL, // TrieToken::KW_LDL = 362
+        Keyword::LDP, // TrieToken::KW_LDP = 363
+        Keyword::LDPIRX, // TrieToken::KW_LDPIRX = 364
+        Keyword::LDRX, // TrieToken::KW_LDRX = 365
+        Keyword::LDSI, // TrieToken::KW_LDSI = 366
+        Keyword::LDWS, // TrieToken::KW_LDWS = 367
+        Keyword::LE, // TrieToken::KW_LE = 368
+        Keyword::LEA, // TrieToken::KW_LEA = 369
+        Keyword::LEU, // TrieToken::KW_LEU = 370
+        Keyword::LHLD, // TrieToken::KW_LHLD = 371
+        Keyword::LHLDE, // TrieToken::KW_LHLDE = 372
+        Keyword::LHLX, // TrieToken::KW_LHLX = 373
+        Keyword::LIL, // TrieToken::KW_LIL = 374
+        Keyword::LINE, // TrieToken::KW_LINE = 375
+        Keyword::LIRX, // TrieToken::KW_LIRX = 376
+        Keyword::LIS, // TrieToken::KW_LIS = 377
+        Keyword::LJP, // TrieToken::KW_LJP = 378
+        Keyword::LLCALL, // TrieToken::KW_LLCALL = 379
+        Keyword::LLJP, // TrieToken::KW_LLJP = 380
+        Keyword::LLRET, // TrieToken::KW_LLRET = 381
+        Keyword::LO, // TrieToken::KW_LO = 382
+        Keyword::LOCAL, // TrieToken::KW_LOCAL = 383
+        Keyword::LPRX, // TrieToken::KW_LPRX = 384
+        Keyword::LRET, // TrieToken::KW_LRET = 385
+        Keyword::LSDDR, // TrieToken::KW_LSDDR = 386
+        Keyword::LSDR, // TrieToken::KW_LSDR = 387
+        Keyword::LSIDR, // TrieToken::KW_LSIDR = 388
+        Keyword::LSIR, // TrieToken::KW_LSIR = 389
+        Keyword::LT, // TrieToken::KW_LT = 390
+        Keyword::LTU, // TrieToken::KW_LTU = 391
+        Keyword::LXI, // TrieToken::KW_LXI = 392
+        Keyword::LXPC, // TrieToken::KW_LXPC = 393
+        Keyword::LZ, // TrieToken::KW_LZ = 394
+        Keyword::M, // TrieToken::KW_M = 395
+        Keyword::MACRO, // TrieToken::KW_MACRO = 396
+        Keyword::MB, // TrieToken::KW_MB = 397
+        Keyword::MD5F1, // TrieToken::KW_MD5F1 = 398
+        Keyword::MD5F2, // TrieToken::KW_MD5F2 = 399
+        Keyword::MD5F3, // TrieToken::KW_MD5F3 = 400
+        Keyword::MEM, // TrieToken::KW_MEM = 401
+        Keyword::MIRR, // TrieToken::KW_MIRR = 402
+        Keyword::MIRROR, // TrieToken::KW_MIRROR = 403
+        Keyword::MLT, // TrieToken::KW_MLT = 404
+        Keyword::MMU, // TrieToken::KW_MMU = 405
+        Keyword::MMU0, // TrieToken::KW_MMU0 = 406
+        Keyword::MMU1, // TrieToken::KW_MMU1 = 407
+        Keyword::MMU2, // TrieToken::KW_MMU2 = 408
+        Keyword::MMU3, // TrieToken::KW_MMU3 = 409
+        Keyword::MMU4, // TrieToken::KW_MMU4 = 410
+        Keyword::MMU5, // TrieToken::KW_MMU5 = 411
+        Keyword::MMU6, // TrieToken::KW_MMU6 = 412
+        Keyword::MMU7, // TrieToken::KW_MMU7 = 413
+        Keyword::MOV, // TrieToken::KW_MOV = 414
+        Keyword::MUL, // TrieToken::KW_MUL = 415
+        Keyword::MULS, // TrieToken::KW_MULS = 416
+        Keyword::MULU, // TrieToken::KW_MULU = 417
+        Keyword::MULUB, // TrieToken::KW_MULUB = 418
+        Keyword::MULUW, // TrieToken::KW_MULUW = 419
+        Keyword::MVI, // TrieToken::KW_MVI = 420
+        Keyword::NC, // TrieToken::KW_NC = 421
+        Keyword::NE, // TrieToken::KW_NE = 422
+        Keyword::NEG, // TrieToken::KW_NEG = 423
+        Keyword::NEXTREG, // TrieToken::KW_NEXTREG = 424
+        Keyword::NK, // TrieToken::KW_NK = 425
+        Keyword::NOP, // TrieToken::KW_NOP = 426
+        Keyword::NREG, // TrieToken::KW_NREG = 427
+        Keyword::NV, // TrieToken::KW_NV = 428
+        Keyword::NX5, // TrieToken::KW_NX5 = 429
+        Keyword::NZ, // TrieToken::KW_NZ = 430
+        Keyword::ONCE, // TrieToken::KW_ONCE = 431
+        Keyword::OR, // TrieToken::KW_OR = 432
+        Keyword::ORA, // TrieToken::KW_ORA = 433
+        Keyword::ORI, // TrieToken::KW_ORI = 434
+        Keyword::OTD2R, // TrieToken::KW_OTD2R = 435
+        Keyword::OTDM, // TrieToken::KW_OTDM = 436
+        Keyword::OTDMR, // TrieToken::KW_OTDMR = 437
+        Keyword::OTDR, // TrieToken::KW_OTDR = 438
+        Keyword::OTDRX, // TrieToken::KW_OTDRX = 439
+        Keyword::OTI2R, // TrieToken::KW_OTI2R = 440
+        Keyword::OTIB, // TrieToken::KW_OTIB = 441
+        Keyword::OTIM, // TrieToken::KW_OTIM = 442
+        Keyword::OTIMR, // TrieToken::KW_OTIMR = 443
+        Keyword::OTIR, // TrieToken::KW_OTIR = 444
+        Keyword::OTIRX, // TrieToken::KW_OTIRX = 445
+        Keyword::OUT, // TrieToken::KW_OUT = 446
+        Keyword::OUT0, // TrieToken::KW_OUT0 = 447
+        Keyword::OUTD, // TrieToken::KW_OUTD = 448
+        Keyword::OUTD2, // TrieToken::KW_OUTD2 = 449
+        Keyword::OUTI, // TrieToken::KW_OUTI = 450
+        Keyword::OUTI2, // TrieToken::KW_OUTI2 = 451
+        Keyword::OUTINB, // TrieToken::KW_OUTINB = 452
+        Keyword::OVRST8, // TrieToken::KW_OVRST8 = 453
+        Keyword::P, // TrieToken::KW_P = 454
+        Keyword::PBC, // TrieToken::KW_PBC = 455
+        Keyword::PCHL, // TrieToken::KW_PCHL = 456
+        Keyword::PDE, // TrieToken::KW_PDE = 457
+        Keyword::PE, // TrieToken::KW_PE = 458
+        Keyword::PEA, // TrieToken::KW_PEA = 459
+        Keyword::PHL, // TrieToken::KW_PHL = 460
+        Keyword::PIX, // TrieToken::KW_PIX = 461
+        Keyword::PIXELAD, // TrieToken::KW_PIXELAD = 462
+        Keyword::PIXELDN, // TrieToken::KW_PIXELDN = 463
+        Keyword::PIY, // TrieToken::KW_PIY = 464
+        Keyword::PLDD, // TrieToken::KW_PLDD = 465
+        Keyword::PLDDR, // TrieToken::KW_PLDDR = 466
+        Keyword::PLDDSR, // TrieToken::KW_PLDDSR = 467
+        Keyword::PLDI, // TrieToken::KW_PLDI = 468
+        Keyword::PLDIR, // TrieToken::KW_PLDIR = 469
+        Keyword::PLDISR, // TrieToken::KW_PLDISR = 470
+        Keyword::PLSDDR, // TrieToken::KW_PLSDDR = 471
+        Keyword::PLSDR, // TrieToken::KW_PLSDR = 472
+        Keyword::PLSIDR, // TrieToken::KW_PLSIDR = 473
+        Keyword::PLSIR, // TrieToken::KW_PLSIR = 474
+        Keyword::PO, // TrieToken::KW_PO = 475
+        Keyword::POP, // TrieToken::KW_POP = 476
+        Keyword::PP, // TrieToken::KW_PP = 477
+        Keyword::PRAGMA, // TrieToken::KW_PRAGMA = 478
+        Keyword::PSW, // TrieToken::KW_PSW = 479
+        Keyword::PTR, // TrieToken::KW_PTR = 480
+        Keyword::PUMA, // TrieToken::KW_PUMA = 481
+        Keyword::PUMS, // TrieToken::KW_PUMS = 482
+        Keyword::PUSH, // TrieToken::KW_PUSH = 483
+        Keyword::PW, // TrieToken::KW_PW = 484
+        Keyword::PX, // TrieToken::KW_PX = 485
+        Keyword::PXAD, // TrieToken::KW_PXAD = 486
+        Keyword::PXDN, // TrieToken::KW_PXDN = 487
+        Keyword::PY, // TrieToken::KW_PY = 488
+        Keyword::PZ, // TrieToken::KW_PZ = 489
+        Keyword::R, // TrieToken::KW_R = 490
+        Keyword::RAL, // TrieToken::KW_RAL = 491
+        Keyword::RAR, // TrieToken::KW_RAR = 492
+        Keyword::RC, // TrieToken::KW_RC = 493
+        Keyword::RDEL, // TrieToken::KW_RDEL = 494
+        Keyword::RDMODE, // TrieToken::KW_RDMODE = 495
+        Keyword::REPEAT, // TrieToken::KW_REPEAT = 496
+        Keyword::REPT, // TrieToken::KW_REPT = 497
+        Keyword::REPTC, // TrieToken::KW_REPTC = 498
+        Keyword::REPTI, // TrieToken::KW_REPTI = 499
+        Keyword::REQ, // TrieToken::KW_REQ = 500
+        Keyword::RES, // TrieToken::KW_RES = 501
+        Keyword::RET, // TrieToken::KW_RET = 502
+        Keyword::RET3, // TrieToken::KW_RET3 = 503
+        Keyword::RETI, // TrieToken::KW_RETI = 504
+        Keyword::RETN, // TrieToken::KW_RETN = 505
+        Keyword::RETN3, // TrieToken::KW_RETN3 = 506
+        Keyword::RGEU, // TrieToken::KW_RGEU = 507
+        Keyword::RGTU, // TrieToken::KW_RGTU = 508
+        Keyword::RIM, // TrieToken::KW_RIM = 509
+        Keyword::RL, // TrieToken::KW_RL = 510
+        Keyword::RL1REG, // TrieToken::KW_RL1REG = 511
+        Keyword::RL2REG, // TrieToken::KW_RL2REG = 512
+        Keyword::RL3REG, // TrieToken::KW_RL3REG = 513
+        Keyword::RL4REG, // TrieToken::KW_RL4REG = 514
+        Keyword::RL5REG, // TrieToken::KW_RL5REG = 515
+        Keyword::RL6REG, // TrieToken::KW_RL6REG = 516
+        Keyword::RL7REG, // TrieToken::KW_RL7REG = 517
+        Keyword::RL8REG, // TrieToken::KW_RL8REG = 518
+        Keyword::RLA, // TrieToken::KW_RLA = 519
+        Keyword::RLB, // TrieToken::KW_RLB = 520
+        Keyword::RLC, // TrieToken::KW_RLC = 521
+        Keyword::RLCA, // TrieToken::KW_RLCA = 522
+        Keyword::RLD, // TrieToken::KW_RLD = 523
+        Keyword::RLDE, // TrieToken::KW_RLDE = 524
+        Keyword::RLEU, // TrieToken::KW_RLEU = 525
+        Keyword::RLO, // TrieToken::KW_RLO = 526
+        Keyword::RLTU, // TrieToken::KW_RLTU = 527
+        Keyword::RLZ, // TrieToken::KW_RLZ = 528
+        Keyword::RM, // TrieToken::KW_RM = 529
+        Keyword::RNC, // TrieToken::KW_RNC = 530
+        Keyword::RNE, // TrieToken::KW_RNE = 531
+        Keyword::RNV, // TrieToken::KW_RNV = 532
+        Keyword::RNZ, // TrieToken::KW_RNZ = 533
+        Keyword::RP, // TrieToken::KW_RP = 534
+        Keyword::RPE, // TrieToken::KW_RPE = 535
+        Keyword::RPO, // TrieToken::KW_RPO = 536
+        Keyword::RR, // TrieToken::KW_RR = 537
+        Keyword::RR1REG, // TrieToken::KW_RR1REG = 538
+        Keyword::RR2REG, // TrieToken::KW_RR2REG = 539
+        Keyword::RR3REG, // TrieToken::KW_RR3REG = 540
+        Keyword::RR4REG, // TrieToken::KW_RR4REG = 541
+        Keyword::RR5REG, // TrieToken::KW_RR5REG = 542
+        Keyword::RR6REG, // TrieToken::KW_RR6REG = 543
+        Keyword::RR7REG, // TrieToken::KW_RR7REG = 544
+        Keyword::RR8REG, // TrieToken::KW_RR8REG = 545
+        Keyword::RRA, // TrieToken::KW_RRA = 546
+        Keyword::RRB, // TrieToken::KW_RRB = 547
+        Keyword::RRC, // TrieToken::KW_RRC = 548
+        Keyword::RRCA, // TrieToken::KW_RRCA = 549
+        Keyword::RRD, // TrieToken::KW_RRD = 550
+        Keyword::RRHL, // TrieToken::KW_RRHL = 551
+        Keyword::RSMIX, // TrieToken::KW_RSMIX = 552
+        Keyword::RST, // TrieToken::KW_RST = 553
+        Keyword::RSTV, // TrieToken::KW_RSTV = 554
+        Keyword::RV, // TrieToken::KW_RV = 555
+        Keyword::RZ, // TrieToken::KW_RZ = 556
+        Keyword::R_C, // TrieToken::KW_R_C = 557
+        Keyword::R_EQ, // TrieToken::KW_R_EQ = 558
+        Keyword::R_GEU, // TrieToken::KW_R_GEU = 559
+        Keyword::R_GTU, // TrieToken::KW_R_GTU = 560
+        Keyword::R_LEU, // TrieToken::KW_R_LEU = 561
+        Keyword::R_LO, // TrieToken::KW_R_LO = 562
+        Keyword::R_LTU, // TrieToken::KW_R_LTU = 563
+        Keyword::R_LZ, // TrieToken::KW_R_LZ = 564
+        Keyword::R_M, // TrieToken::KW_R_M = 565
+        Keyword::R_NC, // TrieToken::KW_R_NC = 566
+        Keyword::R_NE, // TrieToken::KW_R_NE = 567
+        Keyword::R_NV, // TrieToken::KW_R_NV = 568
+        Keyword::R_NZ, // TrieToken::KW_R_NZ = 569
+        Keyword::R_P, // TrieToken::KW_R_P = 570
+        Keyword::R_PE, // TrieToken::KW_R_PE = 571
+        Keyword::R_PO, // TrieToken::KW_R_PO = 572
+        Keyword::R_V, // TrieToken::KW_R_V = 573
+        Keyword::R_Z, // TrieToken::KW_R_Z = 574
+        Keyword::S, // TrieToken::KW_S = 575
+        Keyword::SBB, // TrieToken::KW_SBB = 576
+        Keyword::SBC, // TrieToken::KW_SBC = 577
+        Keyword::SBI, // TrieToken::KW_SBI = 578
+        Keyword::SBOX, // TrieToken::KW_SBOX = 579
+        Keyword::SCALL, // TrieToken::KW_SCALL = 580
+        Keyword::SCF, // TrieToken::KW_SCF = 581
+        Keyword::SET, // TrieToken::KW_SET = 582
+        Keyword::SETAE, // TrieToken::KW_SETAE = 583
+        Keyword::SETSYSP, // TrieToken::KW_SETSYSP = 584
+        Keyword::SETUSR, // TrieToken::KW_SETUSR = 585
+        Keyword::SETUSRP, // TrieToken::KW_SETUSRP = 586
+        Keyword::SHAF1, // TrieToken::KW_SHAF1 = 587
+        Keyword::SHAF2, // TrieToken::KW_SHAF2 = 588
+        Keyword::SHAF3, // TrieToken::KW_SHAF3 = 589
+        Keyword::SHLD, // TrieToken::KW_SHLD = 590
+        Keyword::SHLDE, // TrieToken::KW_SHLDE = 591
+        Keyword::SHLX, // TrieToken::KW_SHLX = 592
+        Keyword::SIL, // TrieToken::KW_SIL = 593
+        Keyword::SIM, // TrieToken::KW_SIM = 594
+        Keyword::SIS, // TrieToken::KW_SIS = 595
+        Keyword::SL1REG, // TrieToken::KW_SL1REG = 596
+        Keyword::SL2REG, // TrieToken::KW_SL2REG = 597
+        Keyword::SL3REG, // TrieToken::KW_SL3REG = 598
+        Keyword::SL4REG, // TrieToken::KW_SL4REG = 599
+        Keyword::SL5REG, // TrieToken::KW_SL5REG = 600
+        Keyword::SL6REG, // TrieToken::KW_SL6REG = 601
+        Keyword::SL7REG, // TrieToken::KW_SL7REG = 602
+        Keyword::SL8REG, // TrieToken::KW_SL8REG = 603
+        Keyword::SLA, // TrieToken::KW_SLA = 604
+        Keyword::SLI, // TrieToken::KW_SLI = 605
+        Keyword::SLL, // TrieToken::KW_SLL = 606
+        Keyword::SLP, // TrieToken::KW_SLP = 607
+        Keyword::SLS, // TrieToken::KW_SLS = 608
+        Keyword::SP, // TrieToken::KW_SP = 609
+        Keyword::SPHL, // TrieToken::KW_SPHL = 610
+        Keyword::SR1REG, // TrieToken::KW_SR1REG = 611
+        Keyword::SR2REG, // TrieToken::KW_SR2REG = 612
+        Keyword::SR3REG, // TrieToken::KW_SR3REG = 613
+        Keyword::SR4REG, // TrieToken::KW_SR4REG = 614
+        Keyword::SR5REG, // TrieToken::KW_SR5REG = 615
+        Keyword::SR6REG, // TrieToken::KW_SR6REG = 616
+        Keyword::SR7REG, // TrieToken::KW_SR7REG = 617
+        Keyword::SR8REG, // TrieToken::KW_SR8REG = 618
+        Keyword::SRA, // TrieToken::KW_SRA = 619
+        Keyword::SRET, // TrieToken::KW_SRET = 620
+        Keyword::SRL, // TrieToken::KW_SRL = 621
+        Keyword::STA, // TrieToken::KW_STA = 622
+        Keyword::STAE, // TrieToken::KW_STAE = 623
+        Keyword::STAX, // TrieToken::KW_STAX = 624
+        Keyword::STC, // TrieToken::KW_STC = 625
+        Keyword::STMIX, // TrieToken::KW_STMIX = 626
+        Keyword::STOP, // TrieToken::KW_STOP = 627
+        Keyword::SU, // TrieToken::KW_SU = 628
+        Keyword::SUB, // TrieToken::KW_SUB = 629
+        Keyword::SUI, // TrieToken::KW_SUI = 630
+        Keyword::SURES, // TrieToken::KW_SURES = 631
+        Keyword::SWAP, // TrieToken::KW_SWAP = 632
+        Keyword::SWAPNIB, // TrieToken::KW_SWAPNIB = 633
+        Keyword::SYSCALL, // TrieToken::KW_SYSCALL = 634
+        Keyword::SYSRET, // TrieToken::KW_SYSRET = 635
+        Keyword::TEST, // TrieToken::KW_TEST = 636
+        Keyword::TRA, // TrieToken::KW_TRA = 637
+        Keyword::TRUE, // TrieToken::KW_TRUE = 638
+        Keyword::TST, // TrieToken::KW_TST = 639
+        Keyword::TSTIO, // TrieToken::KW_TSTIO = 640
+        Keyword::TSTNULL, // TrieToken::KW_TSTNULL = 641
+        Keyword::UMA, // TrieToken::KW_UMA = 642
+        Keyword::UMS, // TrieToken::KW_UMS = 643
+        Keyword::UNDEF, // TrieToken::KW_UNDEF = 644
+        Keyword::UNDEFINE, // TrieToken::KW_UNDEFINE = 645
+        Keyword::UNTIL, // TrieToken::KW_UNTIL = 646
+        Keyword::V, // TrieToken::KW_V = 647
+        Keyword::WHILE, // TrieToken::KW_WHILE = 648
+        Keyword::WORD, // TrieToken::KW_WORD = 649
+        Keyword::X, // TrieToken::KW_X = 650
+        Keyword::X5, // TrieToken::KW_X5 = 651
+        Keyword::XBC, // TrieToken::KW_XBC = 652
+        Keyword::XCHG, // TrieToken::KW_XCHG = 653
+        Keyword::XDE, // TrieToken::KW_XDE = 654
+        Keyword::XHL, // TrieToken::KW_XHL = 655
+        Keyword::XIX, // TrieToken::KW_XIX = 656
+        Keyword::XIY, // TrieToken::KW_XIY = 657
+        Keyword::XOR, // TrieToken::KW_XOR = 658
+        Keyword::XP, // TrieToken::KW_XP = 659
+        Keyword::XPC, // TrieToken::KW_XPC = 660
+        Keyword::XRA, // TrieToken::KW_XRA = 661
+        Keyword::XRI, // TrieToken::KW_XRI = 662
+        Keyword::XSP, // TrieToken::KW_XSP = 663
+        Keyword::XTHL, // TrieToken::KW_XTHL = 664
+        Keyword::XY, // TrieToken::KW_XY = 665
+        Keyword::YBC, // TrieToken::KW_YBC = 666
+        Keyword::YDE, // TrieToken::KW_YDE = 667
+        Keyword::YHL, // TrieToken::KW_YHL = 668
+        Keyword::YIX, // TrieToken::KW_YIX = 669
+        Keyword::YIY, // TrieToken::KW_YIY = 670
+        Keyword::YP, // TrieToken::KW_YP = 671
+        Keyword::YSP, // TrieToken::KW_YSP = 672
+        Keyword::Z, // TrieToken::KW_Z = 673
+        Keyword::ZBC, // TrieToken::KW_ZBC = 674
+        Keyword::ZDE, // TrieToken::KW_ZDE = 675
+        Keyword::ZHL, // TrieToken::KW_ZHL = 676
+        Keyword::ZIX, // TrieToken::KW_ZIX = 677
+        Keyword::ZIY, // TrieToken::KW_ZIY = 678
+        Keyword::ZP, // TrieToken::KW_ZP = 679
+        Keyword::ZSP, // TrieToken::KW_ZSP = 680
+        Keyword::__Z80ASM__ADC_HL_BC, // TrieToken::KW___Z80ASM__ADC_HL_BC = 681
+        Keyword::__Z80ASM__ADC_HL_DE, // TrieToken::KW___Z80ASM__ADC_HL_DE = 682
+        Keyword::__Z80ASM__ADC_HL_HL, // TrieToken::KW___Z80ASM__ADC_HL_HL = 683
+        Keyword::__Z80ASM__ADC_HL_SP, // TrieToken::KW___Z80ASM__ADC_HL_SP = 684
+        Keyword::__Z80ASM__ADD_BC_A, // TrieToken::KW___Z80ASM__ADD_BC_A = 685
+        Keyword::__Z80ASM__ADD_DE_A, // TrieToken::KW___Z80ASM__ADD_DE_A = 686
+        Keyword::__Z80ASM__ADD_HL_A, // TrieToken::KW___Z80ASM__ADD_HL_A = 687
+        Keyword::__Z80ASM__ADD_SP_D, // TrieToken::KW___Z80ASM__ADD_SP_D = 688
+        Keyword::__Z80ASM__CALL_HL, // TrieToken::KW___Z80ASM__CALL_HL = 689
+        Keyword::__Z80ASM__CALL_IX, // TrieToken::KW___Z80ASM__CALL_IX = 690
+        Keyword::__Z80ASM__CALL_IY, // TrieToken::KW___Z80ASM__CALL_IY = 691
+        Keyword::__Z80ASM__CPD, // TrieToken::KW___Z80ASM__CPD = 692
+        Keyword::__Z80ASM__CPDR, // TrieToken::KW___Z80ASM__CPDR = 693
+        Keyword::__Z80ASM__CPI, // TrieToken::KW___Z80ASM__CPI = 694
+        Keyword::__Z80ASM__CPIR, // TrieToken::KW___Z80ASM__CPIR = 695
+        Keyword::__Z80ASM__DAA, // TrieToken::KW___Z80ASM__DAA = 696
+        Keyword::__Z80ASM__EX_SP_HL, // TrieToken::KW___Z80ASM__EX_SP_HL = 697
+        Keyword::__Z80ASM__LDD, // TrieToken::KW___Z80ASM__LDD = 698
+        Keyword::__Z80ASM__LDDR, // TrieToken::KW___Z80ASM__LDDR = 699
+        Keyword::__Z80ASM__LDI, // TrieToken::KW___Z80ASM__LDI = 700
+        Keyword::__Z80ASM__LDIR, // TrieToken::KW___Z80ASM__LDIR = 701
+        Keyword::__Z80ASM__RLD, // TrieToken::KW___Z80ASM__RLD = 702
+        Keyword::__Z80ASM__RL_BC, // TrieToken::KW___Z80ASM__RL_BC = 703
+        Keyword::__Z80ASM__RL_DE, // TrieToken::KW___Z80ASM__RL_DE = 704
+        Keyword::__Z80ASM__RL_HL, // TrieToken::KW___Z80ASM__RL_HL = 705
+        Keyword::__Z80ASM__RRD, // TrieToken::KW___Z80ASM__RRD = 706
+        Keyword::__Z80ASM__RR_BC, // TrieToken::KW___Z80ASM__RR_BC = 707
+        Keyword::__Z80ASM__RR_DE, // TrieToken::KW___Z80ASM__RR_DE = 708
+        Keyword::__Z80ASM__RR_HL, // TrieToken::KW___Z80ASM__RR_HL = 709
+        Keyword::__Z80ASM__SBC_HL_BC, // TrieToken::KW___Z80ASM__SBC_HL_BC = 710
+        Keyword::__Z80ASM__SBC_HL_DE, // TrieToken::KW___Z80ASM__SBC_HL_DE = 711
+        Keyword::__Z80ASM__SBC_HL_HL, // TrieToken::KW___Z80ASM__SBC_HL_HL = 712
+        Keyword::__Z80ASM__SBC_HL_SP, // TrieToken::KW___Z80ASM__SBC_HL_SP = 713
+        Keyword::__Z80ASM__SRA_BC, // TrieToken::KW___Z80ASM__SRA_BC = 714
+        Keyword::__Z80ASM__SRA_DE, // TrieToken::KW___Z80ASM__SRA_DE = 715
+        Keyword::__Z80ASM__SRA_HL, // TrieToken::KW___Z80ASM__SRA_HL = 716
+        Keyword::__Z80ASM__SUB_HL_BC, // TrieToken::KW___Z80ASM__SUB_HL_BC = 717
+        Keyword::__Z80ASM__SUB_HL_DE, // TrieToken::KW___Z80ASM__SUB_HL_DE = 718
+        Keyword::__Z80ASM__SUB_HL_HL, // TrieToken::KW___Z80ASM__SUB_HL_HL = 719
+        Keyword::__Z80ASM__SUB_HL_SP, // TrieToken::KW___Z80ASM__SUB_HL_SP = 720
+    };
+    return lut[static_cast<size_t>(trie_token)];
+}
+
