@@ -1,17 +1,17 @@
 % z88dk-z80asm -v -dump-after-cmdline @t/05-expr//input/error_pow.lst t/05-expr//input/empty.asm
 Define constant: A = 5
 Define constant: B = 2
-t/05-expr/input/error_pow.lst:3:12: error: Negative exponent in integer is not defined
+t/05-expr/input/error_pow.lst:3:10: error: Negative exponent in integer is not defined
     -DE00=2**-1
-               ^
+             ^
 Define constant: E00 = 0
-t/05-expr/input/error_pow.lst:4:11: error: Zero raised to the power of zero is not defined
+t/05-expr/input/error_pow.lst:4:10: error: Zero raised to the power of zero is not defined
     -DE01=0**0
-              ^
+             ^
 Define constant: E01 = 1
-t/05-expr/input/error_pow.lst:5:15: error: Negative exponent in integer is not defined
+t/05-expr/input/error_pow.lst:5:13: error: Negative exponent in integer is not defined
     -DE02=(-3)**-2
-                  ^
+                ^
 Define constant: E02 = 0
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1

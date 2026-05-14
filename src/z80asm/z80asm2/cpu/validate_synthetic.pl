@@ -278,7 +278,7 @@ sub parse_operand {
         };
     }
 
-    if ( $opr =~ /^ \( (ix|iy) \+ (%d) \+ 1 \) $/x ) {
+    if ( $opr =~ /^ \( (ix|iy) \+ \( (%d) \) \+ 1 \) $/x ) {
         return {
             type        => 'mem',
             base        => $1,
@@ -306,7 +306,7 @@ sub parse_operand {
         };
     }
 
-    if ( $opr =~ /^ \( (%m) \+ (1) \) $/x ) {
+    if ( $opr =~ /^ \( \+ \( (%m) \) \+ (1) \) $/x ) {
         return {
             type        => 'mem',
             base        => undef,

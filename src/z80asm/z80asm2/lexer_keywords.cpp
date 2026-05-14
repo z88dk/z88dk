@@ -20,7 +20,7 @@ Keyword keyword_lookup(std::string_view s) {
     return it != keyword_map.end() ? it->second : Keyword::None;
 }
 
-std::string keyword_to_string(Keyword kw) {
+std::string to_string(Keyword kw) {
     static const char* keyword_strings[] = {
 #define X(id, text, flags) text,
 #include "lexer_keywords.def"
