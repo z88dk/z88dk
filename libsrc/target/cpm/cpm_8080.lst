@@ -4,7 +4,6 @@ target/cpm/stdio/obj/${TYPE}/fputc_cons
 target/cpm/stdio/obj/${TYPE}/generic_console
 target/cpm/stdio/obj/${TYPE}/generic_console_vt52
 target/cpm/stdio/obj/${TYPE}/generic_console_h19
-target/cpm/cpm/obj/${TYPE}/cpm_platform_init
 target/cpm/cpm/obj/${TYPE}/__bdos
 @classic/stdio/stdio_binary.lst
 
