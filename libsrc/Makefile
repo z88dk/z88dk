@@ -2328,7 +2328,7 @@ gfxh19.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building Heath/Zenith H19 graphics Library ---'
 	@echo ''
-	$(MAKE) -C classic/gfx TARGET=cpm SUBTYPE=h19 FLAVOUR="narrow"
+	$(MAKE) -C classic/gfx TARGET=cpm SUBTYPE=h19 FLAVOUR="gencon text narrow"
 	TARGET=h19 TYPE=z80 $(LIBLINKER) -DFORh19 -x$(OUTPUT_DIRECTORY)/gfxh19 @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19.lst
 
 gfxvio.lib: $(TARGET_CLIB_DEPS)
