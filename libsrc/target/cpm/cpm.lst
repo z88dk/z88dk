@@ -2,6 +2,8 @@ target/cpm/stdio/obj/${TYPE}/fgetc_cons
 target/cpm/stdio/obj/${TYPE}/getk
 target/cpm/stdio/obj/${TYPE}/fputc_cons
 target/cpm/stdio/obj/${TYPE}/generic_console
+target/cpm/stdio/obj/${TYPE}/generic_console_vt52
+target/cpm/stdio/obj/${TYPE}/generic_console_h19
 target/cpm/stdio/obj/${TYPE}/stdpun_dev
 target/cpm/stdio/obj/${TYPE}/stdrdr_dev
 target/cpm/stdio/obj/${TYPE}/stdlst_dev
