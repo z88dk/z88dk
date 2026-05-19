@@ -93,7 +93,7 @@ generic_console_cls_h19:
     ld    a,CONSOLE_ROWS
     cp    25
     jr    nz,no_25
-    ld  e,27       ;25 rows mode
+    ld  e,27
     ld  c,2
     call    __bdos
     ld  e,'x'
@@ -140,7 +140,7 @@ cls_1:
     djnz    cls_1
     
 ;  ; cursor pos
-    ld  e,27       ;25 rows mode
+    ld  e,27
     ld  c,2
     call    __bdos
     ld  e,'Y'
@@ -173,7 +173,7 @@ bottom_loop:
     cp     128
     jr     c,skip_graphics
     push   af
-    ld  e,27        ;25 rows mode
+    ld  e,27
     ld  c,2
     call    __bdos
     ld  e,'F'       ; "enter graphics mode"
@@ -203,7 +203,7 @@ skip_graphics:
     djnz  bottom_loop
 
 ;  Wipe 25th row
-    ld  e,27       ;25 rows mode
+    ld  e,27
     ld  c,2
     call    __bdos
     ld  e,'Y'
@@ -292,7 +292,6 @@ graphics:
     ld  c,2
     call    __bdos
     
-    push   af
     ld  e,27
     ld  c,2
     call    __bdos
@@ -327,7 +326,7 @@ generic_console_plotc:
     ld      (hl),a
 
    ; cursor pos
-    ld  e,27       ;25 rows mode
+    ld  e,27
     ld  c,2
     call    __bdos
     ld  e,'Y'
@@ -422,6 +421,27 @@ generic_console_printc_3:
     add     hl,bc                   ;hl now points to address in display
     ret
 
+
+;; h19_sendchar:
+;; _h19_sendchar:
+;; 
+;; ; ..using the BIOS
+;;     push    bc
+;;     push    de
+;; 
+;;     ld      c, l
+;;     ld      de, 9                       ; shift ptr to CONOUT
+;;     ld      hl, (1)                     ; WBOOT (BIOS)
+;;     add     hl, de
+;;     call    __chl
+;; 
+;; ret_addr:
+;;     pop     de
+;;     pop     bc
+;;     ret
+;; 
+;; __chl:
+;;     jp      (hl)
 
 
 
