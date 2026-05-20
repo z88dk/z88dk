@@ -340,6 +340,8 @@ ENDIF
     INCLUDE "crt/classic/crt_runtime_selection.inc"
     INCLUDE	"crt/classic/crt_section.inc"
     INCLUDE "crt/classic/crt_cpm_fcntl.inc"
+    INCLUDE "crt/classic/crt_cpm_gencon_selection.inc"
+
 
 IF __HAVE_TMS99X8
     ; And include handling disabling screenmodes
