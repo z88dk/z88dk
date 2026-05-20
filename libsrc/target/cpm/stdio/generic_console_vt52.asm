@@ -25,8 +25,8 @@
     EXTERN      __bdos
 
     INCLUDE     "ioctl.def"
-    PUBLIC      CLIB_GENCON_CAPS
-    defc        CLIB_GENCON_CAPS = CAP_GENCON_INVERSE
+    PUBLIC      CLIB_GENCON_CAPS_vt52
+    defc        CLIB_GENCON_CAPS_vt52 = CAP_GENCON_INVERSE
 
 
     ;; defc        generic_console_cls = generic_console_cls_vt52

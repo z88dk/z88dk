@@ -20,16 +20,16 @@
     PUBLIC      generic_console_set_paper_h19
     PUBLIC      generic_console_set_attribute_h19
 
-    PUBLIC      generic_console_plotc
-    PUBLIC      generic_console_pointxy
+    PUBLIC      generic_console_plotc_h19
+    PUBLIC      generic_console_pointxy_h19
 
     EXTERN      CONSOLE_COLUMNS
     EXTERN      CONSOLE_ROWS
     EXTERN      __bdos
 
     INCLUDE     "ioctl.def"
-    PUBLIC      CLIB_GENCON_CAPS
-    defc        CLIB_GENCON_CAPS = CAP_GENCON_INVERSE
+    PUBLIC      CLIB_GENCON_CAPS_h19
+    defc        CLIB_GENCON_CAPS_h19 = CAP_GENCON_INVERSE
 
 
 ;;    defc        generic_console_cls = generic_console_cls_h19
@@ -307,7 +307,7 @@ graphics:
 ;Exit:  nc = success
 ;        a = character,
 ;        c = failure
-generic_console_pointxy:
+generic_console_pointxy_h19:
 generic_console_vpeek_h19:
     call    h19_xypos
     ld  a,(hl)
@@ -319,7 +319,7 @@ generic_console_vpeek_h19:
 ; b = y
 ; a = d = character to print
 ; e = raw
-generic_console_plotc:
+generic_console_plotc_h19:
     push    af
     push    bc
     call    h19_xypos
