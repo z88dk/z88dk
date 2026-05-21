@@ -5031,23 +5031,6 @@ $notcpu 8085
 	add	hl,sp
 	ld	a,(hl)
 
-%eval 0 = %2 %1 - !
-.i_%1
-	jp	i_%2	;%5
-=
-%activate
-.i_%1
-	jp	i_%2	;%5
-=
-%once
-	jp	i_%2	;%5
-%activate
-; --- Start of Optimiser additions ---
-=
-%once
-; --- Start of Optimiser additions ---
-	defc	i_%1 = i_%2
-
 	jr	i_%2
 	jp	i_%3	;%5
 =
@@ -6776,6 +6759,31 @@ $notcpu 8085
 %once
 ; --- Start of Optimiser additions ---
 	defc	i_%2 = i_%1
+%activate
+.i_%1
+	jp	i_%2	;%%5
+=
+%once
+.i_%1
+	jp	i_%1	;%%5
+
+%title Label-jp fusion (moved after De-dupe — Issue 2963)
+%eval 0 = %2 %1 - !
+.i_%1
+	jp	i_%2	;%5
+=
+%activate
+.i_%1
+	jp	i_%2	;%5
+=
+%once
+	jp	i_%2	;%5
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
+	defc	i_%1 = i_%2
 
 %title Remove circular defc aliases
 	defc	i_%1 = i_%2
