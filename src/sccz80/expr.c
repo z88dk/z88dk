@@ -240,8 +240,16 @@ int heir1a(LVALUE* lval)
             return k;
         }
 
-        /* test condition, jump to false expression evaluation if necessary */
-        if (check_lastop_was_testjump(lval)) {
+        /* test condition, jump to false expression evaluation if necessary.
+           ||/&& chains produce HL=0/1 via `vconst` with `binop = dummy`
+           (see plunge.c::skim) and carry is NOT meaningful — must use
+           the explicit zero-test path. Mirrors plunge.c::dropout's
+           dual check. */
+        if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
+            if (lval->binop == dummy) {
+                lval->val_type = KIND_INT;
+                lval->ltype = type_int;
+            }
             testjump(lval, falselab = getlabel());
             /* evaluate 'true' expression */
             if (heir1(&lval2))

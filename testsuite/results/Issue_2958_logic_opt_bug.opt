@@ -26,12 +26,7 @@
 	ld	a,(_processed_chars+1)
 	and	a
 	jp	nz,i_6	;
-	ld	hl,1	;const
-	jp	i_6_i_7
-.i_6
-	ld	hl,0
-	jp	i_8
-.i_6_i_7
+.i_7_i_6
 	ld	hl,i_1+19
 	jp	i_9	;
 .i_8
@@ -49,6 +44,7 @@
 
 	SECTION	bss_compiler
 	SECTION	code_compiler
+	defc	i_6 = i_8
 
 	SECTION	rodata_compiler
 .i_1
