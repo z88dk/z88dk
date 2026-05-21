@@ -1,6 +1,5 @@
 
 
-    MODULE  m2_generic_console
     SECTION code_clib
 
     PUBLIC  generic_console_cls
@@ -9,8 +8,8 @@
     PUBLIC  generic_console_scrollup
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
-    PUBLIC  generic_console_set_attribute
     PUBLIC  generic_console_ioctl
+    PUBLIC  generic_console_set_attribute
 
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
@@ -20,16 +19,26 @@
 
     EXTERN  base_graphics
 
+    INCLUDE     "ioctl.def"
     PUBLIC      CLIB_GENCON_CAPS
-	defc        CLIB_GENCON_CAPS = 0
+    defc        CLIB_GENCON_CAPS = CAP_GENCON_INVERSE
 
     defc    CHAR_TABLE=0xF800
+
 
 generic_console_ioctl:
     scf
 generic_console_set_ink:
+    ret
+
 generic_console_set_paper:
 generic_console_set_attribute:
+    rra
+    ld      a,0
+    jr      nc, noinv
+    ld      a,128
+noinv:
+    ld      (m2_attribute),a
     ret
 
 generic_console_cls:
@@ -52,6 +61,9 @@ generic_console_printc:
     call    xypos
     pop     de
     ld      d, a
+    ld      a,(m2_attribute)
+    add     d
+    ld      d, a
     call    __gfx_vram_page_in
     ld      (hl), d
     jp      __gfx_vram_page_out
@@ -67,13 +79,13 @@ generic_console_vpeek:
     ld      a, e
     call    xypos
     ld      e, a
-	push    de
+    push    de
     call    __gfx_vram_page_in
-	pop     de
+    pop     de
     ld      d, (hl)
-	push    de
+    push    de
     call    __gfx_vram_page_out
-	pop     de
+    pop     de
     rr      e
     call    nc, vpeek_unmap
     ld      a, d
@@ -121,6 +133,9 @@ generic_console_scrollup_3:
     ret
 
     SECTION bss_clib
+m2_attribute:
+    defb    0
+
 
 
     SECTION code_crt_init
