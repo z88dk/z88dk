@@ -31,10 +31,10 @@
 
 	SECTION	bss_compiler
 	SECTION	code_compiler
+	defc	i_5 = i_8
 	defc	i_2 = i_5
 	defc	i_3 = i_5
 	defc	i_8 = i_6
-	defc	i_5 = i_8
 
 
 
