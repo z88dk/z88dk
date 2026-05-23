@@ -81,7 +81,7 @@ static const UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_DIRECTIVES,
             OptionType::DUMP_AFTER_MACRO_EXPANSION,
             OptionType::DUMP_AFTER_PREPROCESSING,
-            OptionType::DUMP_AFTER_HLA,
+            OptionType::DUMP_AFTER_HLA_EXPANSION,
         }
     }
 };
@@ -395,7 +395,7 @@ void Args::parse_arg(std::string_view arg,
             options.dump_after_preprocessing = true;
             return;
 
-        case OptionType::DUMP_AFTER_HLA:
+        case OptionType::DUMP_AFTER_HLA_EXPANSION:
             options.dump_after_hla = true;
             return;
 
