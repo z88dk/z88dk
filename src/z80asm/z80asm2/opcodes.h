@@ -31,6 +31,7 @@ enum class SynthOp : uint8_t {
     EmitToken,      // emit a token, followed by TrieToken value
     EmitInteger,    // emit an integer literal, followed by integer value
     EmitExprRef,    // emit an expression reference, followed by expression index
+    EmitDispExprRef,// emit a displacement expression reference, followed by expression index
     EmitLabelRef,   // emit a label reference, followed by label index
     EmitLineBreak,  // emit a line break (end of logical line)
 };

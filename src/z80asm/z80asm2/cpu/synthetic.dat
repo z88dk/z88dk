@@ -2290,7 +2290,22 @@ call.sis ltu, %m|ez80_z80|call.sis c, %m
 call.sis ne, %m|ez80_z80|call.sis nz, %m
 call.sis nv, %m|ez80_z80|call.sis po, %m
 call.sis v, %m|ez80_z80|call.sis pe, %m
+call3 c, %m|kc160|jr nc, %t;call3 %m;%t:
+call3 eq, %m|kc160|jr nz, %t;call3 %m;%t:
+call3 geu, %m|kc160|jr c, %t;call3 %m;%t:
+call3 gtu, %m|kc160|jr z, %t;jr c, %t;call3 %m;%t:
 call3 leu, %m|kc160|jr z, %t5;jr nc, %t;%t5:;call3 %m;%t:
+call3 ltu, %m|kc160|jr nc, %t;call3 %m;%t:
+call3 m, %m|kc160|jp p, %t;call3 %m;%t:
+call3 nc, %m|kc160|jr c, %t;call3 %m;%t:
+call3 ne, %m|kc160|jr z, %t;call3 %m;%t:
+call3 nv, %m|kc160|jp pe, %t;call3 %m;%t:
+call3 nz, %m|kc160|jr z, %t;call3 %m;%t:
+call3 p, %m|kc160|jp m, %t;call3 %m;%t:
+call3 pe, %m|kc160|jp po, %t;call3 %m;%t:
+call3 po, %m|kc160|jp pe, %t;call3 %m;%t:
+call3 v, %m|kc160|jp po, %t;call3 %m;%t:
+call3 z, %m|kc160|jr nz, %t;call3 %m;%t:
 cc %m|r2ka|jr nc, %t;call %m;%t:
 cc %m|r3k|jr nc, %t;call %m;%t:
 cc %m|r4k|jr nc, %t;call %m;%t:
@@ -6945,7 +6960,13 @@ jp3 geu, %m|kc160|jp3 nc, %m
 jp3 gtu, %m|kc160|jr z, %t;jp3 nc, %m;%t:
 jp3 leu, %m|kc160|jp3 z, %m;jp3 c, %m
 jp3 ltu, %m|kc160|jp3 c, %m
+jp3 m, %m|kc160|jp p, %t;jp3 %m;%t:
 jp3 ne, %m|kc160|jp3 nz, %m
+jp3 nv, %m|kc160|jp pe, %t;jp3 %m;%t:
+jp3 p, %m|kc160|jp m, %t;jp3 %m;%t:
+jp3 pe, %m|kc160|jp po, %t;jp3 %m;%t:
+jp3 po, %m|kc160|jp pe, %t;jp3 %m;%t:
+jp3 v, %m|kc160|jp po, %t;jp3 %m;%t:
 jr %j|8080|jp %j
 jr %j|8085|jp %j
 jr c, %j|8080|jc %j
