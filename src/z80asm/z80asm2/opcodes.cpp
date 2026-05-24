@@ -111,6 +111,9 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
     // next transitions on tokens
     while (pline.pos < pline.tokens.size()) {
         const Token& token = pline.peek();
+        if (token.type == TokenType::EndOfLine) {
+            break;
+        }
 
         // check keyword transition first
         if (token.keyword != Keyword::None) {
@@ -128,6 +131,28 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
         tr = binary_search_transition(node, tt_tt);
         if (tr) {
             ++pline.pos;
+            node = tr->next_transition;
+            continue;
+        }
+
+        // check for DispExpr transition, i.e. a '+' or '-' followed by an expression
+        tr = binary_search_transition(node, TrieToken::DispExpr);
+        if (tr) {
+            size_t start = pline.pos;
+            if (token.type != TokenType::Plus && token.type != TokenType::Minus) {
+                return res;    // no match
+            }
+            // include the '+' or '-' in the expression span
+            if (!parse_expression_span(pline)) {
+                return res;    // no match
+            }
+            size_t end = pline.pos;
+            if (end == start) {
+                return res;    // no match
+            }
+
+            res.expr_spans.push_back({ start, end });
+            pline.pos = end;
             node = tr->next_transition;
             continue;
         }
@@ -150,8 +175,7 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
             continue;
         }
 
-        // No match
-        break;
+        return res;    // no match
     }
 
     const TrieNode& n = opcodes_synth_trie_nodes[node];
@@ -191,21 +215,18 @@ void interpret_synth_bytecode(const SynthMatch& match,
     for (uint16_t i = ta.first_bytecode; i < ta.first_bytecode + ta.count; i++) {
         const SynthBytecode& bc = opcodes_synth_trie_bytecode[i];
 
-        // get location at end of current line
-        SourceLoc loc = get_end_loc();
-
         switch (bc.op) {
         case SynthOp::EmitToken: {
             TrieToken trie_token = static_cast<TrieToken>(bc.operand);
             TokenType token_type = to_token_type(trie_token);
             if (token_type != TokenType::None) {
-                Token t = Token::token(token_type, to_string(token_type), loc);
+                Token t = Token::token(token_type, to_string(token_type), get_end_loc());
                 cur.tokens.push_back(t);
             }
             else {
                 Keyword kw = to_keyword(trie_token);
                 if (kw != Keyword::None) {
-                    Token t = Token::identifier(to_string(kw), loc);
+                    Token t = Token::identifier(to_string(kw), get_end_loc());
                     cur.tokens.push_back(t);
                 }
                 else {
@@ -217,7 +238,7 @@ void interpret_synth_bytecode(const SynthMatch& match,
         }
         case SynthOp::EmitInteger: {
             int value = bc.operand;
-            Token t = Token::integer(std::to_string(value), value, loc);
+            Token t = Token::integer(std::to_string(value), value, get_end_loc());
             cur.tokens.push_back(t);
             break;
         }
@@ -230,6 +251,20 @@ void interpret_synth_bytecode(const SynthMatch& match,
             }
             break;
         }
+        case SynthOp::EmitDispExprRef: {
+            cur.tokens.push_back(Token::token(TokenType::Plus, "+", get_end_loc()));
+            cur.tokens.push_back(Token::token(TokenType::LeftParen, "(", get_end_loc()));
+            {
+                uint16_t expr_index = bc.operand;
+                assert(expr_index < match.expr_spans.size());
+                auto [start, end] = match.expr_spans[expr_index];
+                for (size_t j = start; j < end; j++) {
+                    cur.tokens.push_back(line.tokens[j]);
+                }
+            }
+            cur.tokens.push_back(Token::token(TokenType::RightParen, ")", get_end_loc()));
+            break;
+        }
         case SynthOp::EmitLabelRef: {
             // create temporary labels as needed
             uint16_t label_id = bc.operand;
@@ -238,14 +273,13 @@ void interpret_synth_bytecode(const SynthMatch& match,
             }
 
             // emit label reference token
-            Token t = Token::identifier(labels[label_id].to_string(), loc);
+            Token t = Token::identifier(labels[label_id].to_string(), get_end_loc());
             cur.tokens.push_back(t);
             break;
         }
         case SynthOp::EmitLineBreak: {
             if (!cur.tokens.empty()) {
-                Token t = Token::end_of_line(loc);
-                cur.tokens.push_back(t);
+                cur.tokens.push_back(Token::end_of_line(get_end_loc()));
                 out.push_back(cur);
                 cur.tokens.clear();
             }
@@ -258,11 +292,7 @@ void interpret_synth_bytecode(const SynthMatch& match,
 
     // emit end of line
     if (!cur.tokens.empty()) {
-        // get location at end of current line
-        SourceLoc loc = get_end_loc();
-
-        Token t = Token::end_of_line(loc);
-        cur.tokens.push_back(t);
+        cur.tokens.push_back(Token::end_of_line(get_end_loc()));
         out.push_back(cur);
     }
 }

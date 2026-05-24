@@ -57,7 +57,7 @@ while (<$fh>) {
 my @TrieToken;
 my %TrieMap;
 
-for my $trie (qw( None Expr Label )) {
+for my $trie (qw( None Expr DispExpr Label )) {
     my $id = scalar(@TrieToken);
     push @TrieToken, $trie;
     $TrieMap{$trie} = $id;
