@@ -193,7 +193,8 @@ sub add {
     if (   $self->opcodes->{$asm}
         && $self->opcodes->{$asm}{$cpu} )
     {
-        die "opcode already exists: ", $self->opcodes->{$asm}{$cpu}->to_string, " ",
+        die "opcode already exists: ",
+            $self->opcodes->{$asm}{$cpu}->to_string, " ",
             $opcode->to_string;
     }
 

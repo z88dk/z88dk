@@ -7,6 +7,7 @@
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
+use Data::Dump 'dump';
 use FindBin;
 use lib "$FindBin::Bin";    # adjust to find modules
 use Trie;
@@ -64,7 +65,7 @@ sub build_actions {
         my %asm_exprs;
         for (@asm_tokens) {
             my ( $token, $token_value ) = @$_;
-            if ( $token eq "TrieToken::Expr" ) {
+            if ( $token eq "TrieToken::Expr" || $token eq "TrieToken::DispExpr" ) {
 
                 # expressions must be unique
                 if ( exists $asm_exprs{$token_value} ) {
@@ -113,6 +114,11 @@ sub build_actions {
             elsif ( $token eq "TrieToken::Expr" ) {
                 my $expr_index = $asm_exprs{$token_value};
                 push @{ $trie->bytecode }, { op => "SynthOp::EmitExprRef", value => $expr_index };
+            }
+            elsif ( $token eq "TrieToken::DispExpr" ) {
+                my $expr_index = $asm_exprs{$token_value};
+                push @{ $trie->bytecode },
+                    { op => "SynthOp::EmitDispExprRef", value => $expr_index };
             }
             elsif ( $token eq "TrieToken::Label" ) {
                 my $label_index = $synth_labels{$token_value};
