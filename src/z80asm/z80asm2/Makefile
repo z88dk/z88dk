@@ -75,7 +75,7 @@ test:: $(PROJ)$(EXE)
 
 tidy:
 	$(ASTYLE) "*.cpp" "*.h" "*.re"
-	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) -exec $(PERLTIDY) -b {} +
+	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) -exec $(PERLTIDY) {} +
 
 cloc:
 	perl -S cloc --fullpath .
