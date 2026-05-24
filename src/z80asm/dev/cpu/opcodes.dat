@@ -20926,7 +20926,22 @@ call.sis z, %m|ez80_z80|_||40;CC %m %m
 call.sis z, %m|ez80_z80_strict|_||40;CC %m %m
 call3 %m|kc160|_||ED 4C %m %m %m
 call3 %m|kc160_strict|_||ED 4C %m %m %m
+call3 c, %m|kc160|X||30 %t;ED 4C %m %m %m
+call3 eq, %m|kc160|X||20 %t;ED 4C %m %m %m
+call3 geu, %m|kc160|X||38 %t;ED 4C %m %m %m
+call3 gtu, %m|kc160|X||28 %t;38 %t;ED 4C %m %m %m
 call3 leu, %m|kc160|X||28 %t5;30 %t;ED 4C %m %m %m
+call3 ltu, %m|kc160|X||30 %t;ED 4C %m %m %m
+call3 m, %m|kc160|X||F2 %t %t;ED 4C %m %m %m
+call3 nc, %m|kc160|X||38 %t;ED 4C %m %m %m
+call3 ne, %m|kc160|X||28 %t;ED 4C %m %m %m
+call3 nv, %m|kc160|X||EA %t %t;ED 4C %m %m %m
+call3 nz, %m|kc160|X||28 %t;ED 4C %m %m %m
+call3 p, %m|kc160|X||FA %t %t;ED 4C %m %m %m
+call3 pe, %m|kc160|X||E2 %t %t;ED 4C %m %m %m
+call3 po, %m|kc160|X||EA %t %t;ED 4C %m %m %m
+call3 v, %m|kc160|X||E2 %t %t;ED 4C %m %m %m
+call3 z, %m|kc160|X||20 %t;ED 4C %m %m %m
 cbm %n|r4k|_||ED 00 %n
 cbm %n|r4k_strict|_||ED 00 %n
 cbm %n|r5k|_||ED 00 %n
@@ -44030,11 +44045,17 @@ jp3 geu, %m|kc160|X||ED D2 %m %m %m
 jp3 gtu, %m|kc160|X||28 %t;ED D2 %m %m %m
 jp3 leu, %m|kc160|X||ED CA %m %m %m;ED DA %m %m %m
 jp3 ltu, %m|kc160|X||ED DA %m %m %m
+jp3 m, %m|kc160|X||F2 %t %t;ED C3 %m %m %m
 jp3 nc, %m|kc160|_||ED D2 %m %m %m
 jp3 nc, %m|kc160_strict|_||ED D2 %m %m %m
 jp3 ne, %m|kc160|X||ED C2 %m %m %m
+jp3 nv, %m|kc160|X||EA %t %t;ED C3 %m %m %m
 jp3 nz, %m|kc160|_||ED C2 %m %m %m
 jp3 nz, %m|kc160_strict|_||ED C2 %m %m %m
+jp3 p, %m|kc160|X||FA %t %t;ED C3 %m %m %m
+jp3 pe, %m|kc160|X||E2 %t %t;ED C3 %m %m %m
+jp3 po, %m|kc160|X||EA %t %t;ED C3 %m %m %m
+jp3 v, %m|kc160|X||E2 %t %t;ED C3 %m %m %m
 jp3 z, %m|kc160|_||ED CA %m %m %m
 jp3 z, %m|kc160_strict|_||ED CA %m %m %m
 jpe %m|8080|_||EA %m %m

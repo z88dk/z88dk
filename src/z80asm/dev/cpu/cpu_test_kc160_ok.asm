@@ -1039,7 +1039,22 @@
  call v, 0x1234                 ; EC 34 12
  call z, 0x1234                 ; CC 34 12
  call3 0x123456                 ; ED 4C 56 34 12
+ call3 c, 0x123456              ; 30 05 ED 4C 56 34 12
+ call3 eq, 0x123456             ; 20 05 ED 4C 56 34 12
+ call3 geu, 0x123456            ; 38 05 ED 4C 56 34 12
+ call3 gtu, 0x123456            ; 28 07 38 05 ED 4C 56 34 12
  call3 leu, 0x123456            ; 28 02 30 05 ED 4C 56 34 12
+ call3 ltu, 0x123456            ; 30 05 ED 4C 56 34 12
+ call3 m, 0x123456              ; F2 58 0F ED 4C 56 34 12
+ call3 nc, 0x123456             ; 38 05 ED 4C 56 34 12
+ call3 ne, 0x123456             ; 28 05 ED 4C 56 34 12
+ call3 nv, 0x123456             ; EA 6E 0F ED 4C 56 34 12
+ call3 nz, 0x123456             ; 28 05 ED 4C 56 34 12
+ call3 p, 0x123456              ; FA 7D 0F ED 4C 56 34 12
+ call3 pe, 0x123456             ; E2 85 0F ED 4C 56 34 12
+ call3 po, 0x123456             ; EA 8D 0F ED 4C 56 34 12
+ call3 v, 0x123456              ; E2 95 0F ED 4C 56 34 12
+ call3 z, 0x123456              ; 20 05 ED 4C 56 34 12
  cc 0x1234                      ; DC 34 12
  ccf                            ; 3F
  ceq 0x1234                     ; CC 34 12
@@ -1743,9 +1758,15 @@
  jp3 gtu, 0x123456              ; 28 05 ED D2 56 34 12
  jp3 leu, 0x123456              ; ED CA 56 34 12 ED DA 56 34 12
  jp3 ltu, 0x123456              ; ED DA 56 34 12
+ jp3 m, 0x123456                ; F2 83 17 ED C3 56 34 12
  jp3 nc, 0x123456               ; ED D2 56 34 12
  jp3 ne, 0x123456               ; ED C2 56 34 12
+ jp3 nv, 0x123456               ; EA 95 17 ED C3 56 34 12
  jp3 nz, 0x123456               ; ED C2 56 34 12
+ jp3 p, 0x123456                ; FA A2 17 ED C3 56 34 12
+ jp3 pe, 0x123456               ; E2 AA 17 ED C3 56 34 12
+ jp3 po, 0x123456               ; EA B2 17 ED C3 56 34 12
+ jp3 v, 0x123456                ; E2 BA 17 ED C3 56 34 12
  jp3 z, 0x123456                ; ED CA 56 34 12
  jpe 0x1234                     ; EA 34 12
  jpo 0x1234                     ; E2 34 12
@@ -4969,15 +4990,15 @@
  ret3 gtu                       ; 28 04 38 02 ED 5C
  ret3 leu                       ; 28 02 30 02 ED 5C
  ret3 ltu                       ; 30 02 ED 5C
- ret3 m                         ; F2 E5 44 ED 5C
+ ret3 m                         ; F2 86 45 ED 5C
  ret3 nc                        ; 38 02 ED 5C
  ret3 ne                        ; 28 02 ED 5C
- ret3 nv                        ; EA F2 44 ED 5C
+ ret3 nv                        ; EA 93 45 ED 5C
  ret3 nz                        ; 28 02 ED 5C
- ret3 p                         ; FA FB 44 ED 5C
- ret3 pe                        ; E2 00 45 ED 5C
- ret3 po                        ; EA 05 45 ED 5C
- ret3 v                         ; E2 0A 45 ED 5C
+ ret3 p                         ; FA 9C 45 ED 5C
+ ret3 pe                        ; E2 A1 45 ED 5C
+ ret3 po                        ; EA A6 45 ED 5C
+ ret3 v                         ; E2 AB 45 ED 5C
  ret3 z                         ; 20 02 ED 5C
  reti                           ; ED 4D
  retn                           ; ED 45

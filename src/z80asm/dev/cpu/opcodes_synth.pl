@@ -60,6 +60,10 @@ for my $cpu ( Opcode->cpus ) {
         add_synth( $cpu, "call $f, %m",  "$jump $nf, %t", "call %m" );
         add_synth( $cpu, "call $nf, %m", "$jump $f, %t",  "call %m" );
 
+        # CALL3 <F>, NN
+        add_synth( $cpu, "call3 $f, %m",  "$jump $nf, %t", "call3 %m" );
+        add_synth( $cpu, "call3 $nf, %m", "$jump $f, %t",  "call3 %m" );
+
         # C<F> NN
         add_synth( $cpu, "c$f %m",  "$jump $nf, %t", "call %m" ) if $f ne 'p';
         add_synth( $cpu, "c$nf %m", "$jump $f, %t",  "call %m" ) if $nf ne 'p';
@@ -71,6 +75,10 @@ for my $cpu ( Opcode->cpus ) {
         # RET3 <F>
         add_synth( $cpu, "ret3 $f",  "$jump $nf, %t", "ret3" );
         add_synth( $cpu, "ret3 $nf", "$jump $f, %t",  "ret3" );
+
+        # JP3 <F>, NN
+        add_synth( $cpu, "jp3 $f, %m",  "$jump $nf, %t", "jp3 %m" );
+        add_synth( $cpu, "jp3 $nf, %m", "$jump $f, %t",  "jp3 %m" );
     }
 
     for ( [ 'gt', 'le' ], [ 'gtu', 'leu' ], [ 'lt', 'ge' ], [ 'v', 'nv' ] ) {
