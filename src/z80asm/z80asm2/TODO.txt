@@ -3,6 +3,7 @@
   or demotion JP->JR (if -optimize-size)
 - eval_const_expr / eval_if_condition : receive ParseLine instead of tokens+pos,
   then ExprParseContext may be removed, it is the same as ParseLine
+- run asmstyle on all asm sources
 
 Pipeline:
 [x] tokenize()              // raw tokens, including Tick
