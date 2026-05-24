@@ -74,6 +74,10 @@ sub lex {
             push @tokens, [ "TrieToken::Expr", $1 ];
             next;
         }
+        if ( $asm =~ s/^\+(%\w+)// ) {
+            push @tokens, [ "TrieToken::DispExpr", $1 ];
+            next;
+        }
         if ( $asm =~ s/^\(// ) {
             push @tokens, [ "TrieToken::TK_LeftParen", "(" ];
             next;

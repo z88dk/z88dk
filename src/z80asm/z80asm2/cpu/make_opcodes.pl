@@ -1578,8 +1578,8 @@ sub add_opcodes {
             for my $asm ( 'jx5 %m', 'jk %m', 'jp x5, %m', 'jp k, %m', 'jmp x5, %m', 'jmp k, %m' ) {
                 add_opcode( $cpu, $asm, [ 0xFD, '%m', '%m' ] );
             }
-            for my $asm ( 'jnx5 %m', 'jnk %m', 'jp nx5, %m', 'jp nk, %m', 'jmp nx5, %m',
-                'jmp nk, %m' )
+            for my $asm ( 'jnx5 %m', 'jnk %m', 'jp nx5, %m', 'jp nk, %m',
+                'jmp nx5, %m', 'jmp nk, %m' )
             {
                 add_opcode( $cpu, $asm, [ 0xDD, '%m', '%m' ] );
             }

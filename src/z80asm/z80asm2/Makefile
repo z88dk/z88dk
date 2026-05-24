@@ -82,11 +82,11 @@ cloc:
 
 # test code coverage
 coverage:
-	$(MAKE) clean astyle
+	$(MAKE) clean tidy
 	$(MAKE) COVERAGE=1 test
-	gcov $(OBJ_DIR)/*.gcno | perl parse_gcov.pl | tee coverage.txt
+	gcov $(OBJ_DIR)/*.gcno | perl tools/parse_gcov.pl | tee coverage.txt
 
-CLEAN_PATTERNS = *.o *.d *.i *.gcov *.exe *.orig *.core *.bak *~
+CLEAN_PATTERNS = *.o *.d *.i *.gcov *.exe *.orig *.core *.bak *.new *~
 CLEAN_DIRS = . t t/* t/*/*
 CLEAN_FILES = \
   $(foreach d,$(CLEAN_DIRS), \
