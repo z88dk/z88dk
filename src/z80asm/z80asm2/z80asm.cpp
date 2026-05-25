@@ -43,7 +43,7 @@ static void assemble_file(std::string_view filename) {
 
     // process High-Level-Assembly instructions
     std::vector<LogicalLine> hla_lines = hla_process(preprocessed_tokens);
-    if (g_args.options.dump_after_hla) {
+    if (g_args.options.dump_after_hla_expansion) {
         dump_logical_lines_and_exit(hla_lines);
         // not reached
     }
