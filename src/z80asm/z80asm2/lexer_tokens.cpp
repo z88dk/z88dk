@@ -6,12 +6,17 @@
 
 #include "diag.h"
 #include "lexer_keywords.h"
+#include "lexer_scan.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
-#include <string>
+#include <cassert>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string_view>
+#include <string>
 
 std::string to_string(TokenType token_type) {
     static const std::string_view lut[] = {
@@ -76,6 +81,83 @@ Token Token::end_of_line(const SourceLoc& loc) {
     t.text_id = g_strings.intern("\n");
     t.loc = loc;
     return t;
+}
+
+std::string to_string(Token token) {
+    switch (token.type) {
+    case TokenType::Identifier:
+        return g_strings.to_string(token.text_id);
+    case TokenType::Integer: {
+        int value = token.value.int_value;
+        std::ostringstream oss;
+        if (abs(value) < 10) {
+            oss << value;
+            return oss.str();
+        }
+        else {
+            std::string sign = "";
+            if (value < 0) {
+                sign = "-";
+                value = -value;
+            }
+            oss << sign << "0x" << std::setfill('0') << std::setw(2) << std::hex << value;
+            return oss.str();
+        }
+    }
+    case TokenType::Float:
+        return std::to_string(token.value.float_value);
+    case TokenType::String:
+        return escape_string(g_strings.view(token.value.str_value_id));
+    default:
+        return to_string(token.type);
+    }
+}
+
+std::string to_string(const std::vector<Token>& tokens) {
+    auto concat = [](const std::string & s1, const std::string & s2) {
+        if (s1.empty() || s2.empty()) {
+            return s1 + s2;
+        }
+        else if (ends_with(s1, "##")) {   // cpp-style concatenation
+            return s1.substr(0, s1.length() - 2) + s2;
+        }
+        else if (is_space(s1.back()) || is_space(s2.front())) {
+            return s1 + s2;
+        }
+        else if (is_ident_char(s1.back()) && is_ident_char(s2.front())) {
+            return s1 + " " + s2;
+        }
+        else if (is_ident_char(s1.back()) && s2.front() == '@') {
+            return s1 + " " + s2;
+        }
+        else if (s1.back() == '$' && is_hex_digit(s2.front())) {
+            return s1 + " " + s2;
+        }
+        else if ((s1.back() == '%' || s1.back() == '@') &&
+                 (is_dec_digit(s2.front()) || s2.front() == '"' || is_ident_start(s2.front()))) {
+            return s1 + " " + s2;
+        }
+        else if ((s1.back() == '&' && s2.front() == '&') ||
+                 (s1.back() == '|' && s2.front() == '|') ||
+                 (s1.back() == '^' && s2.front() == '^') ||
+                 (s1.back() == '*' && s2.front() == '*') ||
+                 (s1.back() == '<' && (s2.front() == '=' || s2.front() == '<' || s2.front() == '>')) ||
+                 (s1.back() == '>' && (s2.front() == '=' || s2.front() == '>')) ||
+                 (s1.back() == '=' && s2.front() == '=') ||
+                 (s1.back() == '!' && s2.front() == '=') ||
+                 (s1.back() == '#' && s2.front() == '#')) {
+            return s1 + " " + s2;
+        }
+        else {
+            return s1 + s2;
+        }
+    };
+
+    std::string out;
+    for (const Token& token : tokens) {
+        out = concat(out, to_string(token));
+    }
+    return out;
 }
 
 LogicalLine::LogicalLine(const SourceLoc& loc_, LineOrigin origin_)

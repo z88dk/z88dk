@@ -342,3 +342,5 @@ private:
     void dump_macros();
     void dump_symbols();
 };
+
+void output_preproc_output(std::string_view filename, const std::vector<LogicalLine>& lines);

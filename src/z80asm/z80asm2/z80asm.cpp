@@ -56,6 +56,13 @@ static void assemble_file(std::string_view filename) {
         // not reached
     }
 
+    // generate -E output if requested
+    if (g_args.options.preprocess_only) {
+        std::string i_filename = get_i_filename(filename);
+        output_preproc_output(i_filename, asm_lines);
+        return;
+    }
+
 }
 
 static void assemble_files() {
@@ -153,6 +160,11 @@ int main(int argc, char* argv[]) {
 
     if (g_args.options.verbose) {
         std::cout << "Assembly completed with " << g_diag.get_error_count() << " error(s)" << std::endl;
+    }
+
+    // if preprocess-only, exit
+    if (g_args.options.preprocess_only) {
+        return g_diag.get_error_count() ? EXIT_FAILURE : EXIT_SUCCESS;
     }
 
     return g_diag.get_error_count() ? EXIT_FAILURE : EXIT_SUCCESS;

@@ -17,62 +17,6 @@
 #include <string>
 #include <utility>
 
-std::string tokens_to_string(const std::vector<Token>& tokens) {
-    auto concat = [](const std::string & s1, const std::string & s2) {
-        if (s1.empty() || s2.empty()) {
-            return s1 + s2;
-        }
-        else if (ends_with(s1, "##")) {   // cpp-style concatenation
-            return s1.substr(0, s1.length() - 2) + s2;
-        }
-        else if (is_space(s1.back()) || is_space(s2.front())) {
-            return s1 + s2;
-        }
-        else if (is_ident_char(s1.back()) && is_ident_char(s2.front())) {
-            return s1 + " " + s2;
-        }
-        else if (is_ident_char(s1.back()) && s2.front() == '@') {
-            return s1 + " " + s2;
-        }
-        else if (s1.back() == '$' && is_hex_digit(s2.front())) {
-            return s1 + " " + s2;
-        }
-        else if ((s1.back() == '%' || s1.back() == '@') &&
-                 (is_dec_digit(s2.front()) || s2.front() == '"' || is_ident_start(s2.front()))) {
-            return s1 + " " + s2;
-        }
-        else if ((s1.back() == '&' && s2.front() == '&') ||
-                 (s1.back() == '|' && s2.front() == '|') ||
-                 (s1.back() == '^' && s2.front() == '^') ||
-                 (s1.back() == '*' && s2.front() == '*') ||
-                 (s1.back() == '<' && (s2.front() == '=' || s2.front() == '<' || s2.front() == '>')) ||
-                 (s1.back() == '>' && (s2.front() == '=' || s2.front() == '>')) ||
-                 (s1.back() == '=' && s2.front() == '=') ||
-                 (s1.back() == '!' && s2.front() == '=') ||
-                 (s1.back() == '#' && s2.front() == '#')) {
-            return s1 + " " + s2;
-        }
-        else {
-            return s1 + s2;
-        }
-    };
-
-    std::string out;
-    for (const Token& token : tokens) {
-        switch (token.type) {
-        case TokenType::EndOfLine:
-            out += '\n';
-            break;
-
-        default:
-            out = concat(out, g_strings.to_string(token.text_id));
-            break;
-        }
-    }
-
-    return out;
-}
-
 static std::string_view get_line_view(const SourceFile& sf,
                                       std::string_view content,
                                       size_t line) {
