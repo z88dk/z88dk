@@ -11,6 +11,8 @@ dump_after_cmdline	1
 dump_after_tokenization	0
 dump_after_directives	0
 dump_after_macro_expansion	0
+dump_after_hla_expansion	0
+dump_after_synth_expansion	0
 dump_after_preprocessing	0
 m4_options	
 perl_options	-w -Mstrict
