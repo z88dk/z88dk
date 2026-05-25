@@ -40,6 +40,10 @@ std::string get_o_filename(std::string_view filename,
     return prepend_output_dir(replace_extension(filename, o_extension), output_dir);
 }
 
+std::string get_i_filename(std::string_view filename) {
+    return replace_extension(filename, i_extension);
+}
+
 std::string normalize_path(std::string_view path_) {
     std::string path = nomalize_slashes(path_);
 
