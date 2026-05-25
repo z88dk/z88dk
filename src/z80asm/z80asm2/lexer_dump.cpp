@@ -58,6 +58,11 @@ void dump_tokens(const std::vector<Token>& tokens,
 
 void dump_logical_line(const LogicalLine& line,
                        StringInterner::Id& cur_file_id) {
+    if (line.loc.file_id != cur_file_id) {
+        cur_file_id = line.loc.file_id;
+        std::cout << "# file: " <<
+                  g_strings.view(cur_file_id) << std::endl;
+    }
     dump_tokens(line.tokens, cur_file_id);
 }
 
