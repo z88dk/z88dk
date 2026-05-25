@@ -47,6 +47,9 @@ struct Token {
     static Token end_of_line(const SourceLoc& loc);
 };
 
+std::string to_string(Token token);
+std::string to_string(const std::vector<Token>& tokens);
+
 enum class LineOrigin {
     RawInput,          // from file stack
     MacroFeedback,     // from macro engine

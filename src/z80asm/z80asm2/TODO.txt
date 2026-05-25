@@ -1,4 +1,3 @@
-- Make -E output with synthetic opcodes expansion and JR promotion done
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
 - eval_const_expr / eval_if_condition : receive ParseLine instead of tokens+pos,
@@ -15,32 +14,49 @@
   The boolean condition parser (&&, ||, !) remains unchanged and wraps comparisons
   as before.
 
-Pipeline:
-[x] tokenize()              // raw tokens, including Tick
-[x] preprocess()            // macros, includes, conditionals & token stream, split lines
-[x] HLA
-[x] Synthetic opcodes
-[ ] JR promotion
-[ ] Generate .i preprocessor output file
-[ ] apply_alt_registers()
-[ ] apply_dot_directive_merge()
-[ ] parse()                 // grammar
-[ ] resolve_local_labels()	// ident@ident, @ident
-[ ] semantic_analysis()     // symbol resolution, types, CPU rules
-[ ] codegen()               // final machine code
+## Assembler Pipeline
+- [x] Token stream normalization (lowercasing, whitespace, comment removal)
+- [x] Line?continuation joining (backslash at end of line)
+- [x] Macro expansion (object?like, function?like, variadic, recursive)
+- [x] Conditional?assembly evaluation (#if/#elif/#else/#endif)
+- [x] Include resolution and file?stack management
+- [x] Preprocessor directives handling
+- [x] High-Level-Assembly constructs
+- [x] Synthetic?opcode expansion
+- [x] Output of preprocessed text with -E option
+- [ ] AST construction for instructions and expressions
+- [ ] AST validation and semantic checks
+- [ ] Module and segment?switching annotation
+- [ ] Collection of symbols into symbol tables
+- [ ] Size computation and JR promotion (iterative until stable)
+- [ ] Freeze of segment offsets
+- [ ] Fixup classification (absolute / relocatable / external)
+- [ ] Relocation record generation
+- [ ] Expression evaluation and patching or postponing to linker
+- [ ] Final byte emission with relocation placeholders
+- [ ] Emission of Object file format
+
+## Linker Pipeline
+- [ ] Loading of input modules
+- [ ] Searching libraries for undefined symbols
+- [ ] Global symbol resolution (multiple definitions, extern/public)
+- [ ] Segment layout and address assignment
+- [ ] Expression evaluation and patching (apply relocations)
+- [ ] Emission of Binary format
+
 
 tests:
-00–04: fundamental behavior (empty input, basic errors)
-05–09: command-line interface behavior
-10–19: lexical behavior
-20–29: macro semantics
-30–39: directive semantics
-40–49: syntax & grammar
-50–59: semantic rules
-60–69: output behavior
-70–79: integration
-80–89: regression
-90–99: fuzz & pathological
+00-04: fundamental behavior (empty input, basic errors)
+05-09: command-line interface behavior
+10-19: lexical behavior
+20-29: macro semantics
+30-39: directive semantics
+40-49: syntax & grammar
+50-59: semantic rules
+60-69: output behavior
+70-79: integration
+80-89: regression
+90-99: fuzz & pathological
 
 t/<NN>-<topic>/
 t/<NN>-<topic>/<test>.t

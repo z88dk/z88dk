@@ -1,0 +1,6 @@
+% z88dk-z80asm -v -E t/35-preproc-only//input/preproc_only_09.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/35-preproc-only/input/preproc_only_09.asm...
+Writing t/35-preproc-only/input/preproc_only_09.i...
+Assembly completed with 0 error(s)
