@@ -188,7 +188,7 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
 
 void interpret_synth_bytecode(const SynthMatch& match,
                               const LogicalLine& line, std::vector<LogicalLine>& out) {
-    LogicalLine cur;
+    LogicalLine cur(line.loc);
 
     // copy label tokens
     cur.tokens.insert(cur.tokens.end(), match.label_tokens.begin(), match.label_tokens.end());
