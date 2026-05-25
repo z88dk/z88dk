@@ -398,7 +398,7 @@ void Args::parse_arg(std::string_view arg,
             return;
 
         case OptionType::DUMP_AFTER_HLA_EXPANSION:
-            options.dump_after_hla = true;
+            options.dump_after_hla_expansion = true;
             return;
 
         case OptionType::DUMP_AFTER_SYNTH_EXPANSION:
