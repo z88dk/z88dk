@@ -1,0 +1,15 @@
+# 3 "t/35-preproc-only/input/preproc_only_10.asm"
+ ld a,0x68
+ rst 0x10
+# 3
+ ld a,0x65
+ rst 0x10
+# 3
+ ld a,0x6c
+ rst 0x10
+# 3
+ ld a,0x6c
+ rst 0x10
+# 3
+ ld a,0x6f
+ rst 0x10
