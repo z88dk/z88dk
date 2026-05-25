@@ -545,7 +545,7 @@ std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(
         const Token& tok = line.peek();
 
         // Check for stopping conditions (excluding these tokens)
-        if (is_compare_operator(tok)) {
+        if (is_compare_operator(tok) || is_logical_operator(tok)) {
             break;
         }
 
@@ -581,4 +581,10 @@ bool HLA_ProgramBuilder::is_compare_operator(const Token& tok) const {
            tok.type == TokenType::EQ ||
            tok.type == TokenType::NE ||
            tok.keyword == Keyword::S;
+}
+
+bool HLA_ProgramBuilder::is_logical_operator(const Token& tok) const {
+    return tok.type == TokenType::LogicalAnd ||
+           tok.type == TokenType::LogicalOr ||
+           tok.type == TokenType::LogicalNot;
 }
