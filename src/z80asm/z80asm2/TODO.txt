@@ -9,6 +9,7 @@ Pipeline:
 [x] preprocess()            // macros, includes, conditionals & token stream, split lines
 [x] HLA
 [x] Synthetic opcodes
+[ ] JR promotion
 [ ] Generate .i preprocessor output file
 [ ] apply_alt_registers()
 [ ] apply_dot_directive_merge()
