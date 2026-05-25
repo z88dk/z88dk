@@ -1,0 +1,13 @@
+% z88dk-z80asm -v -mz80_strict -dump-after-synth-expansion t/30-synthetic//input/strict_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80_STRICT__ = 1
+Assembling t/30-synthetic/input/strict_01.asm...
+# file: t/30-synthetic/input/strict_01.asm
+Identifier	"ld"	1:1	keyword=LD 
+Identifier	"a"	1:4	keyword=A 
+Comma	","	1:5	
+LeftParen	"("	1:7	
+Identifier	"hl"	1:8	keyword=HL 
+Plus	"+"	1:10	
+RightParen	")"	1:11	
+EndOfLine	"\n"	1:12	
