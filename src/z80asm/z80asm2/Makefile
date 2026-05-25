@@ -84,7 +84,7 @@ cloc:
 coverage:
 	$(MAKE) clean tidy
 	$(MAKE) COVERAGE=1 test
-	gcov $(OBJ_DIR)/*.gcno | perl tools/parse_gcov.pl | tee coverage.txt
+	gcov $(OBJ_DIR)/*.gcno | perl tools/parse_gcov.pl | tee tools/coverage.txt
 
 CLEAN_PATTERNS = *.o *.d *.i *.gcov *.exe *.orig *.core *.bak *.new *~
 CLEAN_DIRS = . t t/* t/*/*
