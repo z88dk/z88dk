@@ -6,9 +6,9 @@ Coverag	 Lines	File
  73.49%	   249	expr.cpp
  74.55%	    55	diag.cpp
  75.61%	    41	source_loc.cpp
- 79.56%	   964	lexer_scan.cpp
  80.30%	   198	pathnames.cpp
  81.40%	   129	cpu.cpp
+ 81.46%	   793	lexer_scan.cpp
  83.33%	    12	opcodes_trie_token.cpp
  86.30%	    73	z80asm.cpp
  86.58%	   149	file_mgr.cpp
@@ -24,10 +24,8 @@ Coverag	 Lines	File
  94.65%	  1009	preproc_directives.cpp
  95.12%	    41	options_dump.cpp
  95.58%	   294	preproc_macro.cpp
- 96.97%	    33	cpu.def
  97.50%	    40	lexer_dump.cpp
- 99.22%	   128	lexer_keywords.def
 100.00%	     8	hla.cpp
 100.00%	    10	hla_ast.cpp
 100.00%	    63	preproc_dump.cpp
-152.61%	  5447	TOTAL
+ 87.02%	  5115	TOTAL
