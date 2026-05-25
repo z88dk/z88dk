@@ -59,4 +59,5 @@ private:
 
     std::vector<Token> collect_operand_tokens(ParseLine& line) const;
     bool is_compare_operator(const Token& tok) const;
+    bool is_logical_operator(const Token& tok) const;
 };
