@@ -11,6 +11,8 @@
 #include "preproc.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <fstream>
+#include <iostream>
 #include <vector>
 
 bool Preproc::is_cond_active() const {
@@ -326,5 +328,44 @@ void Preproc::split_lines(const std::vector<Token>& tokens, const SourceLoc& loc
         LogicalLine line(current_statement[0].loc);
         line.tokens = std::move(current_statement);
         out_lines.push_back(std::move(line));
+    }
+}
+
+void output_preproc_output(std::string_view filename, const std::vector<LogicalLine>& lines) {
+    std::string filename_s(filename);
+    std::ofstream ofs(filename_s, std::ios::binary);
+    if (!ofs.is_open()) {
+        g_diag.error(SourceLoc(), "Cannot write file: " + filename_s);
+        return;
+    }
+
+    if (g_args.options.verbose) {
+        std::cout << "Writing " << filename_s << "..." << std::endl;
+    }
+
+    SourceLoc loc;
+    for (auto& line : lines) {
+        // write # line "file" - if needed
+        if (line.loc.file_id != loc.file_id) {
+            ofs << "# " << line.loc.line << " \"" << g_strings.view(line.loc.file_id) << "\"" << std::endl;
+            loc = SourceLoc(line.loc.file_id, line.loc.line, 1);
+        }
+        else if (loc.line > line.loc.line) {
+            ofs << "# " << line.loc.line << std::endl;
+            loc.line = line.loc.line;
+        }
+
+        // advance to current line
+        while (loc.line < line.loc.line) {
+            ofs << std::endl;
+            loc.line++;
+        }
+
+        // write line tokens
+        if (!line.tokens.empty() && line.tokens.front().loc.column > 1) {
+            ofs << " ";
+        }
+        ofs << to_string(line.tokens);
+        loc.line++;
     }
 }
