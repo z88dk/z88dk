@@ -48,6 +48,7 @@ my $sum_lines    = 0;
 for (@coverage) {
     next if $_->{file} =~ m{/include/};
     next if $_->{file} =~ /\.h$/;
+    next if $_->{file} =~ /\.def$/;
 
     say join( "\t", $_->{coverage} . '%', $_->{lines}, $_->{file} );
 
@@ -55,6 +56,5 @@ for (@coverage) {
     $sum_coverage += $_->{lines} * $_->{coverage} / 100;
     $sum_lines    += $_->{lines};
 }
-if ($count) {
-    say sprintf( "%6.2f%%\t%6d\tTOTAL", $sum_coverage / $count, $sum_lines );
-}
+say sprintf( "%6.2f%%\t%6d\tTOTAL",
+    $sum_lines > 0 ? $sum_coverage / $sum_lines * 100 : 0, $sum_lines );
