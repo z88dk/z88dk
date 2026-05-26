@@ -7,15 +7,15 @@
 #include "diag.h"
 #include "file_mgr.h"
 #include "lexer.h"
-#include "lexer_keywords.h"
 #include "lexer_scan.h"
+#include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cassert>
-#include <cstring>
-#include <iostream>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 static std::string_view get_line_view(const SourceFile& sf,
                                       std::string_view content,
