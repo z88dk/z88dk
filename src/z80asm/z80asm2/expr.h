@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <string_view>
+#include "lexer_keywords.h"
 
 // integer power function
 int int_pow(int base, int exp, const SourceLoc& loc);
@@ -35,9 +36,11 @@ struct ConstEvalSem {
     void unary(TokenType op, const SourceLoc& loc);
     void binary(TokenType op, const SourceLoc& loc);
     void ternary(const SourceLoc& loc);
+    void call_unary(Keyword, const SourceLoc&) {}
     void begin_group() {}
     void end_group() {}
     void error_expected_operand(const ParseLine& pline) const;
+    void error_missing_lparen(const ParseLine& pline) const;
     void error_missing_rparen(const ParseLine& pline) const;
     void error_missing_rbracket(const ParseLine& pline) const;
     void error_missing_colon(const ParseLine& pline) const;
@@ -61,9 +64,11 @@ struct SpanSem {
     void unary(TokenType, const SourceLoc&) {}
     void binary(TokenType, const SourceLoc&) {}
     void ternary(const SourceLoc&) {}
+    void call_unary(Keyword, const SourceLoc&) {}
     void begin_group() {}
     void end_group() {}
     void error_expected_operand(const ParseLine&) const {}
+    void error_missing_lparen(const ParseLine&) const {}
     void error_missing_rparen(const ParseLine&) const {}
     void error_missing_rbracket(const ParseLine&) const {}
     void error_missing_colon(const ParseLine&) const {}
@@ -80,7 +85,8 @@ struct ASTSem;
 //-----------------------------------------------------------------------------
 
 enum {
-    BP_NONE = 0,
+    BP_SENTINEL        = -1,
+    BP_NONE            = 0,
     BP_LOGICAL_OR      = 10,
     BP_LOGICAL_XOR     = 20,
     BP_LOGICAL_AND     = 30,
@@ -102,15 +108,40 @@ struct OpInfo {
     int rbp;
 };
 
-OpInfo infix_table(TokenType t);
+OpInfo infix_table(TokenType t, bool restricted);
 
 template <typename Sem>
-bool nud(ParseLine& pline, Sem& sem) {
+bool nud(ParseLine& pline, Sem& sem, bool restricted) {
     const Token& tok = pline.peek();
 
     if (tok.type == TokenType::EndOfLine) {
         sem.error_expected_operand(pline);
         return false;
+    }
+
+    // MEM(...) function - only in restricted mode
+    if (restricted && tok.keyword == Keyword::MEM) {
+        SourceLoc loc = tok.loc;
+        pline.advance(); // consume MEM
+
+        if (pline.peek().type != TokenType::LeftParen) {
+            sem.error_missing_lparen(pline);
+            return false;
+        }
+        pline.advance(); // consume '('
+
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+            return false;
+        }
+
+        if (pline.peek().type != TokenType::RightParen) {
+            sem.error_missing_rparen(pline);
+            return false;
+        }
+        pline.advance(); // consume ')'
+
+        sem.call_unary(Keyword::MEM, loc);
+        return true;
     }
 
     switch (tok.type) {
@@ -140,7 +171,7 @@ bool nud(ParseLine& pline, Sem& sem) {
     case TokenType::LogicalNot:
     case TokenType::BitwiseNot:
         pline.advance();
-        if (!parse_expr_bp_dynamic(pline, sem, BP_UNARY)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_UNARY, restricted)) {
             return false;
         }
         sem.unary(tok.type, tok.loc);
@@ -156,7 +187,7 @@ bool nud(ParseLine& pline, Sem& sem) {
 
         sem.begin_group();
 
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
             return false;
         }
 
@@ -182,13 +213,13 @@ bool nud(ParseLine& pline, Sem& sem) {
 }
 
 template <typename Sem>
-bool led(ParseLine& pline, Sem& sem, Token op) {
+bool led(ParseLine& pline, Sem& sem, Token op, bool restricted) {
 
     // ternary operator
     if (op.type == TokenType::Question) {
 
         // true branch
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
             return false;
         }
 
@@ -200,7 +231,7 @@ bool led(ParseLine& pline, Sem& sem, Token op) {
         pline.advance();
 
         // false branch
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
             return false;
         }
 
@@ -209,11 +240,11 @@ bool led(ParseLine& pline, Sem& sem, Token op) {
     }
 
     // binary operators
-    OpInfo info = infix_table(op.type);
+    OpInfo info = infix_table(op.type, restricted);
 
     Token expr_start_tok = pline.peek();
 
-    if (!parse_expr_bp_dynamic(pline, sem, info.rbp)) {
+    if (!parse_expr_bp_dynamic(pline, sem, info.rbp, restricted)) {
         return false;
     }
 
@@ -222,15 +253,15 @@ bool led(ParseLine& pline, Sem& sem, Token op) {
 }
 
 template <typename Sem>
-bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp) {
+bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp, bool restricted) {
 
-    if (!nud(pline, sem)) {
+    if (!nud(pline, sem, restricted)) {
         return false;
     }
 
     while (true) {
         Token op = pline.peek();
-        OpInfo info = infix_table(op.type);
+        OpInfo info = infix_table(op.type, restricted);
 
         if (info.lbp < min_bp) {
             break;
@@ -238,7 +269,7 @@ bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp) {
 
         pline.advance();
 
-        if (!led(pline, sem, op)) {
+        if (!led(pline, sem, op, restricted)) {
             return false;
         }
     }
@@ -247,8 +278,13 @@ bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp) {
 }
 
 template <typename Sem>
-bool parse_expr(ParseLine& pline, Sem& sem) {
-    return parse_expr_bp_dynamic(pline, sem, BP_NONE);
+bool parse_full_expr(ParseLine& pline, Sem& sem) {
+    return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/false);
+}
+
+template <typename Sem>
+bool parse_restricted_expr(ParseLine& pline, Sem& sem) {
+    return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/true);
 }
 
 //-----------------------------------------------------------------------------
