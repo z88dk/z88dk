@@ -173,10 +173,18 @@ const Token& ParseLine::peek(size_t offset) const {
         return tokens[pos + offset];
     }
 
-    static Token eof_token =
-        Token::end_of_line(tokens.empty() ?
-                           SourceLoc() : tokens.back().loc);
-    return eof_token;
+    // to return a reference when out of bounds
+    static Token eol_token = Token::end_of_line(SourceLoc());
+    if (tokens.empty()) {
+        eol_token.loc = SourceLoc();
+    }
+    else {
+        // point to after last token for better error messages when the expression is exhausted
+        eol_token.loc = tokens.back().loc;
+        eol_token.loc.column += static_cast<uint16_t>(g_strings.view(tokens.back().text_id).size());
+    }
+
+    return eol_token;
 }
 
 void ParseLine::advance() {
