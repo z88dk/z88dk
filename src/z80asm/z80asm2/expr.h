@@ -17,21 +17,6 @@
 int int_pow(int base, int exp, const SourceLoc& loc);
 
 //-----------------------------------------------------------------------------
-// Expression parse context
-//-----------------------------------------------------------------------------
-
-struct ExprParseContext {
-    const std::vector<Token>& tokens;
-    size_t& pos;
-
-    ExprParseContext(const std::vector<Token>& toks, size_t& p);
-    const Token& peek() const;
-    void advance();
-    bool eof() const;
-    std::string prev_token_text() const;
-};
-
-//-----------------------------------------------------------------------------
 // Semantic context for constant expression evaluation
 //-----------------------------------------------------------------------------
 
@@ -52,10 +37,10 @@ struct ConstEvalSem {
     void ternary(const SourceLoc& loc);
     void begin_group() {}
     void end_group() {}
-    void error_expected_operand(ExprParseContext& ctx) const;
-    void error_missing_rparen(ExprParseContext& ctx) const;
-    void error_missing_rbracket(ExprParseContext& ctx) const;
-    void error_missing_colon(ExprParseContext& ctx) const;
+    void error_expected_operand(const ParseLine& pline) const;
+    void error_missing_rparen(const ParseLine& pline) const;
+    void error_missing_rbracket(const ParseLine& pline) const;
+    void error_missing_colon(const ParseLine& pline) const;
 
 private:
     void push(int value);
@@ -78,10 +63,10 @@ struct SpanSem {
     void ternary(const SourceLoc&) {}
     void begin_group() {}
     void end_group() {}
-    void error_expected_operand(ExprParseContext&) const {}
-    void error_missing_rparen(ExprParseContext&) const {}
-    void error_missing_rbracket(ExprParseContext&) const {}
-    void error_missing_colon(ExprParseContext&) const {}
+    void error_expected_operand(const ParseLine&) const {}
+    void error_missing_rparen(const ParseLine&) const {}
+    void error_missing_rbracket(const ParseLine&) const {}
+    void error_missing_colon(const ParseLine&) const {}
 };
 
 //-----------------------------------------------------------------------------
@@ -95,13 +80,13 @@ struct ASTSem;
 //-----------------------------------------------------------------------------
 
 template <typename Sem>
-bool parse_expr_conditional(ExprParseContext& ctx, Sem& sem);
+bool parse_expr_conditional(ParseLine& pline, Sem& sem);
 
 template <typename Sem>
-bool parse_expr_primary(ExprParseContext& ctx, Sem& sem) {
-    const Token& tok = ctx.peek();
+bool parse_expr_primary(ParseLine& pline, Sem& sem) {
+    const Token& tok = pline.peek();
     if (tok.type == TokenType::EndOfLine) {
-        sem.error_expected_operand(ctx);
+        sem.error_expected_operand(pline);
         return false;
     }
 
@@ -109,17 +94,17 @@ bool parse_expr_primary(ExprParseContext& ctx, Sem& sem) {
 
     case TokenType::Integer:
         sem.literal_integer(tok);
-        ctx.advance();
+        pline.advance();
         return true;
 
     case TokenType::Float:
         sem.literal_float(tok);
-        ctx.advance();
+        pline.advance();
         return true;
 
     case TokenType::Identifier:
         if (sem.symbol(tok)) {
-            ctx.advance();
+            pline.advance();
             return true;
         }
         return false;
@@ -127,51 +112,51 @@ bool parse_expr_primary(ExprParseContext& ctx, Sem& sem) {
     case TokenType::Dollar:
     case TokenType::ASMPC:
         if (sem.literal_asmpc(tok)) {
-            ctx.advance();
+            pline.advance();
             return true;
         }
         return false;
 
     case TokenType::LeftParen:
-        ctx.advance();
+        pline.advance();
         sem.begin_group();
-        if (!parse_expr_conditional(ctx, sem)) {
+        if (!parse_expr_conditional(pline, sem)) {
             return false;
         }
-        if (ctx.peek().type != TokenType::RightParen) {
-            sem.error_missing_rparen(ctx);
+        if (pline.peek().type != TokenType::RightParen) {
+            sem.error_missing_rparen(pline);
             return false;
         }
-        ctx.advance();
+        pline.advance();
         sem.end_group();
         return true;
 
     case TokenType::LeftBracket:
-        ctx.advance();
+        pline.advance();
         sem.begin_group();
-        if (!parse_expr_conditional(ctx, sem)) {
+        if (!parse_expr_conditional(pline, sem)) {
             return false;
         }
-        if (ctx.peek().type != TokenType::RightBracket) {
-            sem.error_missing_rbracket(ctx);
+        if (pline.peek().type != TokenType::RightBracket) {
+            sem.error_missing_rbracket(pline);
             return false;
         }
-        ctx.advance();
+        pline.advance();
         sem.end_group();
         return true;
 
     default:
-        sem.error_expected_operand(ctx);
+        sem.error_expected_operand(pline);
         return false;
     }
 }
 
 template <typename Sem>
-bool parse_expr_unary(ExprParseContext& ctx, Sem& sem) {
-    const Token& tok = ctx.peek();
+bool parse_expr_unary(ParseLine& pline, Sem& sem) {
+    const Token& tok = pline.peek();
     TokenType op = tok.type;
     if (op == TokenType::EndOfLine) {
-        sem.error_expected_operand(ctx);
+        sem.error_expected_operand(pline);
         return false;
     }
 
@@ -180,28 +165,28 @@ bool parse_expr_unary(ExprParseContext& ctx, Sem& sem) {
     case TokenType::Minus:
     case TokenType::LogicalNot:
     case TokenType::BitwiseNot:
-        ctx.advance();
-        if (parse_expr_unary(ctx, sem)) {
+        pline.advance();
+        if (parse_expr_unary(pline, sem)) {
             sem.unary(op, tok.loc);
             return true;
         }
         return false;   // error already output
 
     default:
-        return parse_expr_primary(ctx, sem);
+        return parse_expr_primary(pline, sem);
     }
 }
 
 template <typename Sem>
-bool parse_expr_power(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_unary(ctx, sem)) {
+bool parse_expr_power(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_unary(pline, sem)) {
         return false;
     }
 
-    if (ctx.peek().type == TokenType::Power) {
-        ctx.advance();
-        Token expr_start_tok = ctx.peek();
-        if (!parse_expr_power(ctx, sem)) {
+    if (pline.peek().type == TokenType::Power) {
+        pline.advance();
+        Token expr_start_tok = pline.peek();
+        if (!parse_expr_power(pline, sem)) {
             return false;
         }
         sem.binary(TokenType::Power, expr_start_tok.loc);
@@ -211,21 +196,21 @@ bool parse_expr_power(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_multiplicative(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_power(ctx, sem)) {
+bool parse_expr_multiplicative(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_power(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::Multiply:
         case TokenType::Divide:
         case TokenType::Modulo: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_power(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_power(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -238,20 +223,20 @@ bool parse_expr_multiplicative(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_additive(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_multiplicative(ctx, sem)) {
+bool parse_expr_additive(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_multiplicative(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::Plus:
         case TokenType::Minus: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_multiplicative(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_multiplicative(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -264,20 +249,20 @@ bool parse_expr_additive(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_shift(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_additive(ctx, sem)) {
+bool parse_expr_shift(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_additive(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::LeftShift:
         case TokenType::RightShift: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_additive(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_additive(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -290,22 +275,22 @@ bool parse_expr_shift(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_relational(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_shift(ctx, sem)) {
+bool parse_expr_relational(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_shift(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::LT:
         case TokenType::LE:
         case TokenType::GT:
         case TokenType::GE: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_shift(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_shift(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -318,20 +303,20 @@ bool parse_expr_relational(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_equality(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_relational(ctx, sem)) {
+bool parse_expr_equality(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_relational(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::EQ:
         case TokenType::NE: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_relational(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_relational(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -344,19 +329,19 @@ bool parse_expr_equality(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_bitwise_and(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_equality(ctx, sem)) {
+bool parse_expr_bitwise_and(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_equality(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::BitwiseAnd: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_equality(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_equality(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -369,19 +354,19 @@ bool parse_expr_bitwise_and(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_bitwise_xor(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_bitwise_and(ctx, sem)) {
+bool parse_expr_bitwise_xor(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_bitwise_and(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::BitwiseXor: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_bitwise_and(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_bitwise_and(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -394,19 +379,19 @@ bool parse_expr_bitwise_xor(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_bitwise_or(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_bitwise_xor(ctx, sem)) {
+bool parse_expr_bitwise_or(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_bitwise_xor(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::BitwiseOr: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_bitwise_xor(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_bitwise_xor(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -419,19 +404,19 @@ bool parse_expr_bitwise_or(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_logical_and(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_bitwise_or(ctx, sem)) {
+bool parse_expr_logical_and(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_bitwise_or(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::LogicalAnd: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_bitwise_or(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_bitwise_or(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -444,19 +429,19 @@ bool parse_expr_logical_and(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_logical_xor(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_logical_and(ctx, sem)) {
+bool parse_expr_logical_xor(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_logical_and(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::LogicalXor: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_logical_and(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_logical_and(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -469,19 +454,19 @@ bool parse_expr_logical_xor(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_logical_or(ExprParseContext& ctx, Sem& sem) {
-    if (!parse_expr_logical_xor(ctx, sem)) {
+bool parse_expr_logical_or(ParseLine& pline, Sem& sem) {
+    if (!parse_expr_logical_xor(pline, sem)) {
         return false;
     }
 
     while (true) {
-        const Token& tok = ctx.peek();
+        const Token& tok = pline.peek();
         TokenType op = tok.type;
         switch (op) {
         case TokenType::LogicalOr: {
-            ctx.advance();  // consume operator
-            Token expr_start_tok = ctx.peek();
-            if (!parse_expr_logical_xor(ctx, sem)) {
+            pline.advance();  // consume operator
+            Token expr_start_tok = pline.peek();
+            if (!parse_expr_logical_xor(pline, sem)) {
                 return false;
             }
             sem.binary(op, expr_start_tok.loc);
@@ -494,35 +479,35 @@ bool parse_expr_logical_or(ExprParseContext& ctx, Sem& sem) {
 }
 
 template <typename Sem>
-bool parse_expr_conditional(ExprParseContext& ctx, Sem& sem) {
+bool parse_expr_conditional(ParseLine& pline, Sem& sem) {
     // Parse the condition (logical-or level)
-    if (!parse_expr_logical_or(ctx, sem)) {
+    if (!parse_expr_logical_or(pline, sem)) {
         return false;
     }
 
     // If no '?', this is just a logical-or expression
-    if (ctx.peek().type != TokenType::Question) {
+    if (pline.peek().type != TokenType::Question) {
         return true;
     }
 
     // Capture operator location BEFORE consuming
-    Token op_tok = ctx.peek();
-    ctx.advance(); // consume '?'
+    Token op_tok = pline.peek();
+    pline.advance(); // consume '?'
 
     // Parse true-branch (full expression, not conditional)
-    if (!parse_expr_conditional(ctx, sem)) {
+    if (!parse_expr_conditional(pline, sem)) {
         return false;
     }
 
     // Expect ':'
-    if (ctx.peek().type != TokenType::Colon) {
-        sem.error_missing_colon(ctx);
+    if (pline.peek().type != TokenType::Colon) {
+        sem.error_missing_colon(pline);
         return false;
     }
-    ctx.advance(); // consume ':'
+    pline.advance(); // consume ':'
 
     // Parse false-branch (conditional)
-    if (!parse_expr_conditional(ctx, sem)) {
+    if (!parse_expr_conditional(pline, sem)) {
         return false;
     }
 
@@ -541,7 +526,7 @@ bool eval_const_expr(std::string_view expr, const SourceLoc& loc,
                      const ConstSymbols& sym, int& result,
                      bool silent);
 
-bool eval_const_expr(const std::vector<Token>& tokens, size_t& pos,
+bool eval_const_expr(ParseLine& pline,
                      const ConstSymbols& sym, int& result,
                      bool silent);
 
@@ -552,7 +537,7 @@ bool eval_if_condition(std::string_view expr, const SourceLoc& loc,
                        const ConstSymbols& sym, int& result,
                        bool silent);
 
-bool eval_if_condition(const std::vector<Token>& tokens, size_t& pos,
+bool eval_if_condition(ParseLine& pline,
                        const ConstSymbols& sym, int& result,
                        bool silent);
 

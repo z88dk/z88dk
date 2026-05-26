@@ -543,15 +543,15 @@ bool Preproc::eval_if_expr(ParseLine& input_line,
     }
 
     // evaluate the if condition
-    size_t expr_pos = 0;
+    ParseLine expr_pline(expanded);
     int result = 0;
-    if (!eval_if_condition(expanded, expr_pos,
+    if (!eval_if_condition(expr_pline,
                            const_symbols, result, /*silent=*/false)) {
         return false;  // error already reported by eval_if_condition
     }
 
-    if (expr_pos >= expanded.size() ||
-            expanded[expr_pos].type != TokenType::EndOfLine) {
+    if (expr_pline.pos >= expanded.size() ||
+            expanded[expr_pline.pos].type != TokenType::EndOfLine) {
         g_diag.error(expanded[0].loc,
                      "Unexpected token after " +
                      to_string(kw) + " expression");
@@ -640,11 +640,12 @@ void Preproc::parse_asm_definitions(const std::vector<Token>& tokens) {
     // macros are already expanded at this point, so we only expect
     // constant expressions. Try to evaluate the expression and if it
     // succeeds, store in const_symbols for use in future expressions.
+    ParseLine expr_pline(tokens, pos);
     int result = 0;
-    if (eval_const_expr(tokens, pos,
+    if (eval_const_expr(expr_pline,
                         const_symbols, result, /*silent=*/true) &&
-            pos < tokens.size() &&
-            tokens[pos].type == TokenType::EndOfLine) {
+            expr_pline.pos < tokens.size() &&
+            tokens[expr_pline.pos].type == TokenType::EndOfLine) {
         const_symbols.set(name_id, result, name_loc);
     }
 }
@@ -924,13 +925,13 @@ void Preproc::do_DEFINE(const Macro& macro,
 
         // evaluate the expression and check if it's a constant expression
         // with no extra tokens
-        size_t expr_pos = 0;
+        ParseLine expr_pline(expanded);
         int result = 0;
         if (!expanded.empty() &&
-                eval_const_expr(expanded, expr_pos,
+                eval_const_expr(expr_pline,
                                 const_symbols, result, /*silent=*/true) &&
-                expr_pos < expanded.size() &&
-                expanded[expr_pos].type == TokenType::EndOfLine) {
+                expr_pline.pos < expanded.size() &&
+                expanded[expr_pline.pos].type == TokenType::EndOfLine) {
             std::string defc_str =
                 "DEFC " +
                 g_strings.to_string(macro.name_id) + " = " +
@@ -1078,13 +1079,13 @@ void Preproc::do_DEFL(const Macro& macro,
     expand_line(line, expanded);
 
     // if replacement is a constant expression, replace it by its value
-    size_t expr_pos = 0;
+    ParseLine expr_pline(expanded);
     int result = 0;
     if (!expanded.empty() &&
-            eval_const_expr(expanded, expr_pos,
+            eval_const_expr(expr_pline,
                             const_symbols, result, /*silent=*/true) &&
-            expr_pos < expanded.size() &&
-            expanded[expr_pos].type == TokenType::EndOfLine) {
+            expr_pline.pos < expanded.size() &&
+            expanded[expr_pline.pos].type == TokenType::EndOfLine) {
         expanded.clear();
         expanded.push_back(Token::integer(std::to_string(result),
                                           result, line.loc));
@@ -1209,21 +1210,21 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // Evaluate constant expression (not silent -> errors are reported)
-    size_t expr_pos = 0;
+    ParseLine expr_pline(expanded);
     int repeat_count = 0;
-    if (!eval_const_expr(expanded, expr_pos,
+    if (!eval_const_expr(expr_pline,
                          const_symbols, repeat_count, /*silent=*/false)) {
         return;  // error already reported by eval_const_expr
     }
 
     // Check no extra tokens after the expression
-    if (expr_pos < expanded.size() &&
-            expanded[expr_pos].type != TokenType::EndOfLine) {
-        g_diag.error(expanded[expr_pos].loc,
+    if (expr_pline.pos < expanded.size() &&
+            expanded[expr_pline.pos].type != TokenType::EndOfLine) {
+        g_diag.error(expanded[expr_pline.pos].loc,
                      "Unexpected token after " +
                      to_string(kw) +
                      " count: " +
-                     g_strings.to_string(expanded[expr_pos].text_id));
+                     g_strings.to_string(expanded[expr_pline.pos].text_id));
         return;
     }
 
@@ -1667,23 +1668,23 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc&,
 
     // Evaluate constant expression
     const SourceLoc expr_loc = expanded.front().loc;
-    size_t expr_pos = 0;
+    ParseLine expr_pline(expanded);
     int result = 0;
-    if (!eval_const_expr(expanded, expr_pos,
+    if (!eval_const_expr(expr_pline,
                          const_symbols, result, /*silent=*/false)) {
         return;  // syntax/non-constant errors already reported
     }
 
     // Optional: , "message"
     std::string message;
-    if (expr_pos < expanded.size() &&
-            expanded[expr_pos].type == TokenType::Comma) {
-        ++expr_pos;
+    if (expr_pline.pos < expanded.size() &&
+            expanded[expr_pline.pos].type == TokenType::Comma) {
+        ++expr_pline.pos;
 
-        if (expr_pos >= expanded.size() ||
-                expanded[expr_pos].type != TokenType::String) {
-            SourceLoc err_loc = (expr_pos < expanded.size())
-                                ? expanded[expr_pos].loc
+        if (expr_pline.pos >= expanded.size() ||
+                expanded[expr_pline.pos].type != TokenType::String) {
+            SourceLoc err_loc = (expr_pline.pos < expanded.size())
+                                ? expanded[expr_pline.pos].loc
                                 : expanded.back().loc;
             g_diag.error(err_loc,
                          "Expected string after comma in " +
@@ -1691,14 +1692,14 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc&,
             return;
         }
 
-        message = g_strings.to_string(expanded[expr_pos].value.str_value_id);
-        ++expr_pos;
+        message = g_strings.to_string(expanded[expr_pline.pos].value.str_value_id);
+        ++expr_pline.pos;
     }
 
     // Must end at EOL
-    if (expr_pos < expanded.size() &&
-            expanded[expr_pos].type != TokenType::EndOfLine) {
-        g_diag.error(expanded[expr_pos].loc,
+    if (expr_pline.pos < expanded.size() &&
+            expanded[expr_pline.pos].type != TokenType::EndOfLine) {
+        g_diag.error(expanded[expr_pline.pos].loc,
                      "Unexpected token after " + to_string(kw));
         return;
     }
