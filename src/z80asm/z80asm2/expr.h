@@ -76,15 +76,38 @@ struct SpanSem {
 struct ASTSem;
 
 //-----------------------------------------------------------------------------
-// Pluggable expression parsing
+// Pluggable expression parsing - Pratt parser
 //-----------------------------------------------------------------------------
 
-template <typename Sem>
-bool parse_expr_conditional(ParseLine& pline, Sem& sem);
+enum {
+    BP_NONE = 0,
+    BP_LOGICAL_OR      = 10,
+    BP_LOGICAL_XOR     = 20,
+    BP_LOGICAL_AND     = 30,
+    BP_BITWISE_OR      = 40,
+    BP_BITWISE_XOR     = 50,
+    BP_BITWISE_AND     = 60,
+    BP_EQUALITY        = 70,
+    BP_RELATIONAL      = 80,
+    BP_SHIFT           = 90,
+    BP_ADDITIVE        = 100,
+    BP_MULTIPLICATIVE  = 110,
+    BP_POWER           = 120,
+    BP_UNARY           = 130,
+    BP_PRIMARY         = 140,
+};
+
+struct OpInfo {
+    int lbp;
+    int rbp;
+};
+
+OpInfo infix_table(TokenType t);
 
 template <typename Sem>
-bool parse_expr_primary(ParseLine& pline, Sem& sem) {
+bool nud(ParseLine& pline, Sem& sem) {
     const Token& tok = pline.peek();
+
     if (tok.type == TokenType::EndOfLine) {
         sem.error_expected_operand(pline);
         return false;
@@ -93,427 +116,139 @@ bool parse_expr_primary(ParseLine& pline, Sem& sem) {
     switch (tok.type) {
 
     case TokenType::Integer:
-        sem.literal_integer(tok);
         pline.advance();
+        sem.literal_integer(tok);
         return true;
 
     case TokenType::Float:
-        sem.literal_float(tok);
         pline.advance();
+        sem.literal_float(tok);
         return true;
 
     case TokenType::Identifier:
-        if (sem.symbol(tok)) {
-            pline.advance();
-            return true;
-        }
-        return false;
+        pline.advance();
+        return sem.symbol(tok);
 
     case TokenType::Dollar:
     case TokenType::ASMPC:
-        if (sem.literal_asmpc(tok)) {
-            pline.advance();
-            return true;
-        }
-        return false;
-
-    case TokenType::LeftParen:
         pline.advance();
-        sem.begin_group();
-        if (!parse_expr_conditional(pline, sem)) {
-            return false;
-        }
-        if (pline.peek().type != TokenType::RightParen) {
-            sem.error_missing_rparen(pline);
-            return false;
-        }
-        pline.advance();
-        sem.end_group();
-        return true;
+        return sem.literal_asmpc(tok);
 
-    case TokenType::LeftBracket:
-        pline.advance();
-        sem.begin_group();
-        if (!parse_expr_conditional(pline, sem)) {
-            return false;
-        }
-        if (pline.peek().type != TokenType::RightBracket) {
-            sem.error_missing_rbracket(pline);
-            return false;
-        }
-        pline.advance();
-        sem.end_group();
-        return true;
-
-    default:
-        sem.error_expected_operand(pline);
-        return false;
-    }
-}
-
-template <typename Sem>
-bool parse_expr_unary(ParseLine& pline, Sem& sem) {
-    const Token& tok = pline.peek();
-    TokenType op = tok.type;
-    if (op == TokenType::EndOfLine) {
-        sem.error_expected_operand(pline);
-        return false;
-    }
-
-    switch (op) {
+    // prefix unary
     case TokenType::Plus:
     case TokenType::Minus:
     case TokenType::LogicalNot:
     case TokenType::BitwiseNot:
         pline.advance();
-        if (parse_expr_unary(pline, sem)) {
-            sem.unary(op, tok.loc);
-            return true;
-        }
-        return false;   // error already output
-
-    default:
-        return parse_expr_primary(pline, sem);
-    }
-}
-
-template <typename Sem>
-bool parse_expr_power(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_unary(pline, sem)) {
-        return false;
-    }
-
-    if (pline.peek().type == TokenType::Power) {
-        pline.advance();
-        Token expr_start_tok = pline.peek();
-        if (!parse_expr_power(pline, sem)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_UNARY)) {
             return false;
         }
-        sem.binary(TokenType::Power, expr_start_tok.loc);
-    }
+        sem.unary(tok.type, tok.loc);
+        return true;
 
-    return true;
-}
+    case TokenType::LeftParen:
+    case TokenType::LeftBracket: {
+        pline.advance();
+        TokenType close =
+            (tok.type == TokenType::LeftParen)
+            ? TokenType::RightParen
+            : TokenType::RightBracket;
 
-template <typename Sem>
-bool parse_expr_multiplicative(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_power(pline, sem)) {
-        return false;
-    }
+        sem.begin_group();
 
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::Multiply:
-        case TokenType::Divide:
-        case TokenType::Modulo: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_power(pline, sem)) {
-                return false;
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE)) {
+            return false;
+        }
+
+        if (pline.peek().type != close) {
+            if (close == TokenType::RightParen) {
+                sem.error_missing_rparen(pline);
             }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;  // no more multiplicative operators
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_additive(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_multiplicative(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::Plus:
-        case TokenType::Minus: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_multiplicative(pline, sem)) {
-                return false;
+            else {
+                sem.error_missing_rbracket(pline);
             }
-            sem.binary(op, expr_start_tok.loc);
-            break;
+            return false;
         }
-        default:
-            return true;  // no more multiplicative operators
-        }
-    }
-}
 
-template <typename Sem>
-bool parse_expr_shift(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_additive(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::LeftShift:
-        case TokenType::RightShift: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_additive(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;  // no more multiplicative operators
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_relational(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_shift(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::LT:
-        case TokenType::LE:
-        case TokenType::GT:
-        case TokenType::GE: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_shift(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_equality(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_relational(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::EQ:
-        case TokenType::NE: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_relational(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_bitwise_and(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_equality(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::BitwiseAnd: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_equality(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_bitwise_xor(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_bitwise_and(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::BitwiseXor: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_bitwise_and(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_bitwise_or(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_bitwise_xor(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::BitwiseOr: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_bitwise_xor(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_logical_and(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_bitwise_or(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::LogicalAnd: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_bitwise_or(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_logical_xor(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_logical_and(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::LogicalXor: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_logical_and(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_logical_or(ParseLine& pline, Sem& sem) {
-    if (!parse_expr_logical_xor(pline, sem)) {
-        return false;
-    }
-
-    while (true) {
-        const Token& tok = pline.peek();
-        TokenType op = tok.type;
-        switch (op) {
-        case TokenType::LogicalOr: {
-            pline.advance();  // consume operator
-            Token expr_start_tok = pline.peek();
-            if (!parse_expr_logical_xor(pline, sem)) {
-                return false;
-            }
-            sem.binary(op, expr_start_tok.loc);
-            break;
-        }
-        default:
-            return true;
-        }
-    }
-}
-
-template <typename Sem>
-bool parse_expr_conditional(ParseLine& pline, Sem& sem) {
-    // Parse the condition (logical-or level)
-    if (!parse_expr_logical_or(pline, sem)) {
-        return false;
-    }
-
-    // If no '?', this is just a logical-or expression
-    if (pline.peek().type != TokenType::Question) {
+        pline.advance();
+        sem.end_group();
         return true;
     }
 
-    // Capture operator location BEFORE consuming
-    Token op_tok = pline.peek();
-    pline.advance(); // consume '?'
+    default:
+        sem.error_expected_operand(pline);
+        return false;
+    }
+}
 
-    // Parse true-branch (full expression, not conditional)
-    if (!parse_expr_conditional(pline, sem)) {
+template <typename Sem>
+bool led(ParseLine& pline, Sem& sem, Token op) {
+
+    // ternary operator
+    if (op.type == TokenType::Question) {
+
+        // true branch
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE)) {
+            return false;
+        }
+
+        if (pline.peek().type != TokenType::Colon) {
+            sem.error_missing_colon(pline);
+            return false;
+        }
+
+        pline.advance();
+
+        // false branch
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE)) {
+            return false;
+        }
+
+        sem.ternary(op.loc);
+        return true;
+    }
+
+    // binary operators
+    OpInfo info = infix_table(op.type);
+
+    Token expr_start_tok = pline.peek();
+
+    if (!parse_expr_bp_dynamic(pline, sem, info.rbp)) {
         return false;
     }
 
-    // Expect ':'
-    if (pline.peek().type != TokenType::Colon) {
-        sem.error_missing_colon(pline);
-        return false;
-    }
-    pline.advance(); // consume ':'
-
-    // Parse false-branch (conditional)
-    if (!parse_expr_conditional(pline, sem)) {
-        return false;
-    }
-
-    // Apply semantic action
-    sem.ternary(op_tok.loc);
+    sem.binary(op.type, expr_start_tok.loc);
     return true;
+}
+
+template <typename Sem>
+bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp) {
+
+    if (!nud(pline, sem)) {
+        return false;
+    }
+
+    while (true) {
+        Token op = pline.peek();
+        OpInfo info = infix_table(op.type);
+
+        if (info.lbp < min_bp) {
+            break;
+        }
+
+        pline.advance();
+
+        if (!led(pline, sem, op)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template <typename Sem>
+bool parse_expr(ParseLine& pline, Sem& sem) {
+    return parse_expr_bp_dynamic(pline, sem, BP_NONE);
 }
 
 //-----------------------------------------------------------------------------
