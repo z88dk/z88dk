@@ -8052,7 +8052,22 @@
  call.sis v, 0x1234             ; Error
  call.sis z, 0x1234             ; Error
  call3 0x123456                 ; Error
+ call3 c, 0x123456              ; Error
+ call3 eq, 0x123456             ; Error
+ call3 geu, 0x123456            ; Error
+ call3 gtu, 0x123456            ; Error
  call3 leu, 0x123456            ; Error
+ call3 ltu, 0x123456            ; Error
+ call3 m, 0x123456              ; Error
+ call3 nc, 0x123456             ; Error
+ call3 ne, 0x123456             ; Error
+ call3 nv, 0x123456             ; Error
+ call3 nz, 0x123456             ; Error
+ call3 p, 0x123456              ; Error
+ call3 pe, 0x123456             ; Error
+ call3 po, 0x123456             ; Error
+ call3 v, 0x123456              ; Error
+ call3 z, 0x123456              ; Error
  cbm 0                          ; Error
  cbm 127                        ; Error
  cbm 255                        ; Error
@@ -14649,9 +14664,15 @@
  jp3 gtu, 0x123456              ; Error
  jp3 leu, 0x123456              ; Error
  jp3 ltu, 0x123456              ; Error
+ jp3 m, 0x123456                ; Error
  jp3 nc, 0x123456               ; Error
  jp3 ne, 0x123456               ; Error
+ jp3 nv, 0x123456               ; Error
  jp3 nz, 0x123456               ; Error
+ jp3 p, 0x123456                ; Error
+ jp3 pe, 0x123456               ; Error
+ jp3 po, 0x123456               ; Error
+ jp3 v, 0x123456                ; Error
  jp3 z, 0x123456                ; Error
  jpe 0x1234                     ; Error
  jpe 0x123456                   ; Error
