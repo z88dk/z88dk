@@ -58,6 +58,5 @@ private:
     std::unique_ptr<HLA_Expr> parse_comparison(ParseLine& line);
 
     std::vector<Token> collect_operand_tokens(ParseLine& line) const;
-    bool is_compare_operator(const Token& tok) const;
-    bool is_logical_operator(const Token& tok) const;
+    bool is_compare_operator(const ParseLine& line, size_t offset) const;
 };

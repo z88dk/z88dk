@@ -39,7 +39,7 @@ int int_pow(int base, int exp, const SourceLoc& loc) {
 // Pluggable expression parsing - Pratt parser
 //-----------------------------------------------------------------------------
 
-OpInfo infix_table(TokenType t) {
+OpInfo infix_table(TokenType t, bool restricted) {
     switch (t) {
     case TokenType::Power:
         return {BP_POWER, BP_POWER}; // right-assoc
@@ -61,11 +61,17 @@ OpInfo infix_table(TokenType t) {
     case TokenType::LE:
     case TokenType::GT:
     case TokenType::GE:
-        return {BP_RELATIONAL, BP_RELATIONAL + 1};
+        if (restricted)
+            return { BP_SENTINEL, BP_SENTINEL }; // not allowed in restricted mode
+        else
+            return { BP_RELATIONAL, BP_RELATIONAL + 1 };
 
     case TokenType::EQ:
     case TokenType::NE:
-        return {BP_EQUALITY, BP_EQUALITY + 1};
+        if (restricted)
+            return { BP_SENTINEL, BP_SENTINEL }; // not allowed in restricted mode
+        else
+            return {BP_EQUALITY, BP_EQUALITY + 1};
 
     case TokenType::BitwiseAnd:
         return {BP_BITWISE_AND, BP_BITWISE_AND + 1};
@@ -75,17 +81,26 @@ OpInfo infix_table(TokenType t) {
         return {BP_BITWISE_OR,  BP_BITWISE_OR + 1};
 
     case TokenType::LogicalAnd:
-        return {BP_LOGICAL_AND, BP_LOGICAL_AND + 1};
+        if (restricted)
+            return { BP_SENTINEL, BP_SENTINEL }; // not allowed in restricted mode
+        else
+            return {BP_LOGICAL_AND, BP_LOGICAL_AND + 1};
     case TokenType::LogicalXor:
-        return {BP_LOGICAL_XOR, BP_LOGICAL_XOR + 1};
+        if (restricted)
+            return { BP_SENTINEL, BP_SENTINEL }; // not allowed in restricted mode
+        else
+            return {BP_LOGICAL_XOR, BP_LOGICAL_XOR + 1};
     case TokenType::LogicalOr:
-        return {BP_LOGICAL_OR,  BP_LOGICAL_OR + 1};
+        if (restricted)
+            return { BP_SENTINEL, BP_SENTINEL }; // not allowed in restricted mode
+        else
+            return {BP_LOGICAL_OR,  BP_LOGICAL_OR + 1};
 
     case TokenType::Question:
         return {5, 4}; // special: ternary
 
     default:
-        return {-1, -1}; // sentinel for non-operators
+        return {BP_SENTINEL, BP_SENTINEL}; // sentinel for non-operators
     }
 }
 
@@ -278,6 +293,15 @@ void ConstEvalSem::error_expected_operand(const ParseLine& pline) const {
 
 }
 
+void ConstEvalSem::error_missing_lparen(const ParseLine& pline) const {
+    if (!silent) {
+        const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                            pline.tokens[pline.pos - 1] : Token{};
+        g_diag.error(prev.loc, "Missing '(' after token "
+                     + escape_string(g_strings.view(prev.text_id)));
+    }
+}
+
 void ConstEvalSem::error_missing_rparen(const ParseLine& pline) const {
     if (!silent) {
         const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
@@ -328,7 +352,7 @@ static bool eval_expr_impl(ParseLine& pline,
     sem.silent = silent;
     sem.undefined_is_zero = undefined_is_zero;
 
-    if (!parse_expr(pline, sem)) {
+    if (!parse_full_expr(pline, sem)) {
         return false;
     }
 
@@ -402,7 +426,7 @@ bool SpanSem::symbol(const Token&) {
 bool parse_expression_span(ParseLine& pline) {
     size_t pos0 = pline.pos;
     SpanSem sem;
-    if (!parse_expr(pline, sem)) {
+    if (!parse_full_expr(pline, sem)) {
         pline.pos = pos0;
         return false;
     }

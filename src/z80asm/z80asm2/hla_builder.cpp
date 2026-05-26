@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "diag.h"
+#include "expr.h"
 #include "hla_ast.h"
 #include "hla_builder.h"
 #include "lexer_keywords.h"
@@ -430,7 +431,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
     // we need to look-ahead to distinguish C - carry flag from C - register
     // C > 4 is register; C && Z is flag
     if (keyword_is_flag(line.peek().keyword) &&
-            !is_compare_operator(line.peek(1))) {
+            !is_compare_operator(line, 1)) {
         auto node = std::make_unique<HLA_FlagExpr>();
         node->loc = line.peek().loc;
         node->flag_token = line.peek();
@@ -475,54 +476,76 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) 
     }
 
     // get comparison operator
-    if (line.peek().type == TokenType::LT) {
+    const Token& op_tok = line.peek();
+
+    auto invalid_op = [&]() -> std::unique_ptr<HLA_Expr> {
+        line.error("Invalid comparison operator: " +
+                   g_strings.to_string(op_tok.text_id));
+        return nullptr;
+    };
+
+    switch (op_tok.type) {
+    case TokenType::LT:
         node->op = HLA_CompareExpr::Type::UnsignedLT;
         line.pos++;
-    }
-    else if (line.peek().type == TokenType::LE) {
+        break;
+
+    case TokenType::LE:
         node->op = HLA_CompareExpr::Type::UnsignedLE;
         line.pos++;
-    }
-    else if (line.peek().type == TokenType::GT) {
+        break;
+
+    case TokenType::GT:
         node->op = HLA_CompareExpr::Type::UnsignedGT;
         line.pos++;
-    }
-    else if (line.peek().type == TokenType::GE) {
+        break;
+
+    case TokenType::GE:
         node->op = HLA_CompareExpr::Type::UnsignedGE;
         line.pos++;
-    }
-    else if (line.peek().keyword == Keyword::S &&
-             line.peek(1).type == TokenType::LT) {
-        node->op = HLA_CompareExpr::Type::SignedLT;
-        line.pos += 2;
-    }
-    else if (line.peek().keyword == Keyword::S &&
-             line.peek(1).type == TokenType::LE) {
-        node->op = HLA_CompareExpr::Type::SignedLE;
-        line.pos += 2;
-    }
-    else if (line.peek().keyword == Keyword::S &&
-             line.peek(1).type == TokenType::GT) {
-        node->op = HLA_CompareExpr::Type::SignedGT;
-        line.pos += 2;
-    }
-    else if (line.peek().keyword == Keyword::S &&
-             line.peek(1).type == TokenType::GE) {
-        node->op = HLA_CompareExpr::Type::SignedGE;
-        line.pos += 2;
-    }
-    else if (line.peek().type == TokenType::EQ) {
+        break;
+
+    case TokenType::EQ:
         node->op = HLA_CompareExpr::Type::EQ;
         line.pos++;
-    }
-    else if (line.peek().type == TokenType::NE) {
+        break;
+
+    case TokenType::NE:
         node->op = HLA_CompareExpr::Type::NE;
         line.pos++;
-    }
-    else {
-        line.error("Invalid comparison operator: " +
-                   g_strings.to_string(line.peek().text_id));
-        return nullptr;
+        break;
+
+    case TokenType::Identifier:
+        if (op_tok.keyword == Keyword::S) {
+            const Token& next_tok = line.peek(1);
+            switch (next_tok.type) {
+            case TokenType::LT:
+                node->op = HLA_CompareExpr::Type::SignedLT;
+                line.pos += 2;
+                break;
+            case TokenType::LE:
+                node->op = HLA_CompareExpr::Type::SignedLE;
+                line.pos += 2;
+                break;
+            case TokenType::GT:
+                node->op = HLA_CompareExpr::Type::SignedGT;
+                line.pos += 2;
+                break;
+            case TokenType::GE:
+                node->op = HLA_CompareExpr::Type::SignedGE;
+                line.pos += 2;
+                break;
+            default:
+                return invalid_op();
+            }
+        }
+        else {
+            return invalid_op();
+        }
+        break;
+
+    default:
+        return invalid_op();
     }
 
     // get right hand side
@@ -535,56 +558,46 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) 
     return node;
 }
 
-std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(
-    ParseLine& line)const {
-
-    std::vector<Token> tokens;
-    int depth = 0;
-
-    while (line.peek().type != TokenType::EndOfLine) {
-        const Token& tok = line.peek();
-
-        // Check for stopping conditions (excluding these tokens)
-        if (is_compare_operator(tok) || is_logical_operator(tok)) {
-            break;
-        }
-
-        // Track parentheses depth
-        if (tok.type == TokenType::LeftParen) {
-            depth++;
-        }
-        else if (tok.type == TokenType::RightParen) {
-            depth--;
-            // Stop before depth becomes negative
-            if (depth < 0) {
-                break;
-            }
-        }
-
-        if (tok.keyword == Keyword::MEM) {  // MEM(hl) for indirect memory access
-            line.pos++;
-            continue;
-        }
-
-        tokens.push_back(tok);
-        line.pos++;
+std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(ParseLine& line) const {
+    // get the expression span
+    SpanSem sem;
+    size_t pos0 = line.pos;
+    if (!parse_restricted_expr(line, sem)) {
+        return {};  // error reprted in caller
     }
 
+    // copy the spanned tokens, filtering out MEM keyword
+    std::vector<Token> tokens;
+    for (size_t i = pos0; i < line.pos; i++) {
+        if (line.tokens[i].keyword != Keyword::MEM) {
+            tokens.push_back(line.tokens[i]);
+        }
+    }
     return tokens;
 }
 
-bool HLA_ProgramBuilder::is_compare_operator(const Token& tok) const {
-    return tok.type == TokenType::LT ||
-           tok.type == TokenType::LE ||
-           tok.type == TokenType::GT ||
-           tok.type == TokenType::GE ||
-           tok.type == TokenType::EQ ||
-           tok.type == TokenType::NE ||
-           tok.keyword == Keyword::S;
-}
+bool HLA_ProgramBuilder::is_compare_operator(const ParseLine& line,
+        size_t offset) const {
+    const Token& tok = line.peek(offset);
 
-bool HLA_ProgramBuilder::is_logical_operator(const Token& tok) const {
-    return tok.type == TokenType::LogicalAnd ||
-           tok.type == TokenType::LogicalOr ||
-           tok.type == TokenType::LogicalNot;
+    // Simple comparison operators
+    if (tok.type == TokenType::LT ||
+            tok.type == TokenType::LE ||
+            tok.type == TokenType::GT ||
+            tok.type == TokenType::GE ||
+            tok.type == TokenType::EQ ||
+            tok.type == TokenType::NE) {
+        return true;
+    }
+
+    // Signed comparison: S followed by comparison operator
+    if (tok.keyword == Keyword::S) {
+        const Token& next = line.peek(offset + 1);
+        return next.type == TokenType::LT ||
+               next.type == TokenType::LE ||
+               next.type == TokenType::GT ||
+               next.type == TokenType::GE;
+    }
+
+    return false;
 }

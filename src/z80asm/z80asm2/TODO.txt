@@ -1,17 +1,6 @@
 ## Pending issues
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
-- Bug:  
-  HLA_ProgramBuilder::collect_operand_tokens() tries to heuristically guess where a
-  comparison operand ends inside %IF conditions, and may consume too many tokens
-  (e.g., parsing A > (10 && A) instead of stopping at &&).
-  Fix:  
-  Replace the heuristic token collector with a restricted expression RD parser that
-  accepts the full expression grammar minus comparison and logical operators. 
-  This parser becomes the operand grammar for %IF comparisons:
-  comparison := restricted_expr cmp_op restricted_expr
-  The boolean condition parser (&&, ||, !) remains unchanged and wraps comparisons
-  as before.
 - Add -MD to generate .d file
 
 ## Assembler Pipeline
