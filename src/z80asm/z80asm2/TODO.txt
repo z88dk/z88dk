@@ -1,7 +1,6 @@
+## Pending issues
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
-- eval_const_expr / eval_if_condition : receive ParseLine instead of tokens+pos,
-  then ExprParseContext may be removed, it is the same as ParseLine
 - Bug:  
   HLA_ProgramBuilder::collect_operand_tokens() tries to heuristically guess where a
   comparison operand ends inside %IF conditions, and may consume too many tokens
@@ -13,6 +12,7 @@
   comparison := restricted_expr cmp_op restricted_expr
   The boolean condition parser (&&, ||, !) remains unchanged and wraps comparisons
   as before.
+- Add -MD to generate .d file
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)
@@ -44,8 +44,7 @@
 - [ ] Expression evaluation and patching (apply relocations)
 - [ ] Emission of Binary format
 
-
-tests:
+## Test structure
 00-04: fundamental behavior (empty input, basic errors)
 05-09: command-line interface behavior
 10-19: lexical behavior
