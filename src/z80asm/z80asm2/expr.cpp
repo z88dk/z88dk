@@ -36,6 +36,60 @@ int int_pow(int base, int exp, const SourceLoc& loc) {
 }
 
 //-----------------------------------------------------------------------------
+// Pluggable expression parsing - Pratt parser
+//-----------------------------------------------------------------------------
+
+OpInfo infix_table(TokenType t) {
+    switch (t) {
+    case TokenType::Power:
+        return {BP_POWER, BP_POWER}; // right-assoc
+
+    case TokenType::Multiply:
+    case TokenType::Divide:
+    case TokenType::Modulo:
+        return {BP_MULTIPLICATIVE, BP_MULTIPLICATIVE + 1};
+
+    case TokenType::Plus:
+    case TokenType::Minus:
+        return {BP_ADDITIVE, BP_ADDITIVE + 1};
+
+    case TokenType::LeftShift:
+    case TokenType::RightShift:
+        return {BP_SHIFT, BP_SHIFT + 1};
+
+    case TokenType::LT:
+    case TokenType::LE:
+    case TokenType::GT:
+    case TokenType::GE:
+        return {BP_RELATIONAL, BP_RELATIONAL + 1};
+
+    case TokenType::EQ:
+    case TokenType::NE:
+        return {BP_EQUALITY, BP_EQUALITY + 1};
+
+    case TokenType::BitwiseAnd:
+        return {BP_BITWISE_AND, BP_BITWISE_AND + 1};
+    case TokenType::BitwiseXor:
+        return {BP_BITWISE_XOR, BP_BITWISE_XOR + 1};
+    case TokenType::BitwiseOr:
+        return {BP_BITWISE_OR,  BP_BITWISE_OR + 1};
+
+    case TokenType::LogicalAnd:
+        return {BP_LOGICAL_AND, BP_LOGICAL_AND + 1};
+    case TokenType::LogicalXor:
+        return {BP_LOGICAL_XOR, BP_LOGICAL_XOR + 1};
+    case TokenType::LogicalOr:
+        return {BP_LOGICAL_OR,  BP_LOGICAL_OR + 1};
+
+    case TokenType::Question:
+        return {5, 4}; // special: ternary
+
+    default:
+        return {-1, -1}; // sentinel for non-operators
+    }
+}
+
+//-----------------------------------------------------------------------------
 // Semantic context for constant expression evaluation
 //-----------------------------------------------------------------------------
 
@@ -274,7 +328,7 @@ static bool eval_expr_impl(ParseLine& pline,
     sem.silent = silent;
     sem.undefined_is_zero = undefined_is_zero;
 
-    if (!parse_expr_conditional(pline, sem)) {
+    if (!parse_expr(pline, sem)) {
         return false;
     }
 
@@ -348,7 +402,7 @@ bool SpanSem::symbol(const Token&) {
 bool parse_expression_span(ParseLine& pline) {
     size_t pos0 = pline.pos;
     SpanSem sem;
-    if (!parse_expr_conditional(pline, sem)) {
+    if (!parse_expr(pline, sem)) {
         pline.pos = pos0;
         return false;
     }
