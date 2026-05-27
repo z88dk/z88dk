@@ -11,6 +11,9 @@
     PUBLIC  generic_console_ioctl
     PUBLIC  generic_console_set_attribute
 
+    PUBLIC      generic_console_plotc
+    PUBLIC      generic_console_pointxy
+
     EXTERN  CONSOLE_COLUMNS
     EXTERN  CONSOLE_ROWS
 
@@ -52,20 +55,30 @@ generic_console_cls:
     ldir
     jp      __gfx_vram_page_out
 
+
+generic_console_plotc:
+    call    xypos
+    call    __gfx_vram_page_in
+    ld      (hl), a
+    jp      __gfx_vram_page_out
+
 ; c = x
 ; b = y
 ; a = character to print
 ; e = raw
 generic_console_printc:
-    push    de
     call    xypos
-    pop     de
+
+    rr      e
+    jr      c, rawmode
+
     ld      d, a
     ld      a,(m2_attribute)
     add     d
-    ld      d, a
+
+rawmode:
     call    __gfx_vram_page_in
-    ld      (hl), d
+    ld      (hl), a
     jp      __gfx_vram_page_out
 
 
@@ -75,46 +88,50 @@ generic_console_printc:
 ;Exit:  nc = success
 ;        a = character,
 ;        c = failure
-generic_console_vpeek:
-    ld      a, e
+generic_console_pointxy:
     call    xypos
-    ld      e, a
-    push    de
     call    __gfx_vram_page_in
-    pop     de
-    ld      d, (hl)
-    push    de
+    ld      a, (hl)
     call    __gfx_vram_page_out
-    pop     de
+    and     a
+    ret
+
+generic_console_vpeek:
+    call    xypos
+    call    __gfx_vram_page_in
+    ld      a, (hl)
+    call    __gfx_vram_page_out
     rr      e
     call    nc, vpeek_unmap
-    ld      a, d
     and     a
     ret
 
 vpeek_unmap:
-    ld      a, d
     cp      160
     ret     c
-    res     7, d
+    and     $7f
     ret
 
+
 xypos:
+    push    de
     ld      hl, (base_graphics)
     ld      de, CONSOLE_COLUMNS
     inc     b
+	and     a
     sbc     hl, de
 generic_console_printc_1:
     add     hl, de
     djnz    generic_console_printc_1
 generic_console_printc_3:
     add     hl, bc                      ;hl now points to address in display
+	pop     de
     ret
 
 
 generic_console_scrollup:
-    push    de
-    push    bc
+    ;push    de
+    ;push    bc
     call    __gfx_vram_page_in
     ld      hl, CONSOLE_COLUMNS
     ld      de, (base_graphics)
@@ -128,8 +145,8 @@ generic_console_scrollup_3:
     inc     hl
     djnz    generic_console_scrollup_3
     call    __gfx_vram_page_out
-    pop     bc
-    pop     de
+    ;pop     bc
+    ;pop     de
     ret
 
     SECTION bss_clib
