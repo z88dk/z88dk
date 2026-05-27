@@ -18,7 +18,6 @@
         EXTERN  __gfx_coords
 
 
-
         ld      a, (__console_w)
     IF  !_GFX_GENCON_PIXEL3
         add     a
@@ -44,7 +43,7 @@
         add     hl, de
         ld      b, (hl)                 ; y / 3
     IF  !_GFX_GENCON_PIXEL3
-        and     a                       ; x/2
+        sub     a                       ; x/2
         ld      a, c
         rra
         ld      c, a
@@ -57,7 +56,11 @@
         call    generic_console_vpeek
     ENDIF
     IF  _GFX_TEXT_USE_INDEX
+      IF  _GFX_GENCON_PIXEL3
+        cp      8
+      ELSE
         cp      64
+      ENDIF
         jr      c, inrange
         xor     a
 inrange:
@@ -65,7 +68,11 @@ inrange:
     ELSE
         ld      hl, textpixl
         ld      e, 0
-        ld      b, 64                   ; whole symbol table size
+      IF  _GFX_GENCON_PIXEL3
+        ld      b, 8                    ; whole symbol table size (1*3)
+      ELSE
+        ld      b, 64                   ; whole symbol table size (2*3)
+      ENDIF
 ckmap:
         cp      (hl)                    ; compare symbol with the one in map
         jr      z, chfound
@@ -125,6 +132,7 @@ evencol:
     IF  NEEDpoint
         and     e
         pop     bc                      ;Dump reduced coordinates
+
     ELSE
 
       IF    _GFX_TEXT_USE_INDEX
@@ -146,7 +154,9 @@ evencol:
         ld      e, 1                    ;raw mode
         call    generic_console_printc
       ENDIF
+
     ENDIF
+
         pop     bc                      ;restore callers
         ret
 
