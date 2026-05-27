@@ -612,8 +612,8 @@ ENDIF
 IF FORtrs80m2
     defc    _GFX_MAXX    = 80
     defc    _GFX_MAXY    = 72
-    defc    _GFX_TEXT_BLANK_CHAR    = 32
-    defc GFXTEXT3 = 1
+    defc    _GFX_GENCON_PIXEL3    = 1
+    defc    _GFX_TEXT_BLANK_CHAR  = 32
     defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
