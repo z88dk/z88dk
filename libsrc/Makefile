@@ -1427,11 +1427,10 @@ kc_clib.lib: $(TARGET_CLIB_DEPS) $(KC_TARGETS)
 	TARGET=kc TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(TARGET_DIRECTORY)/kc/kc.lst
 
 # Heath/Zenith HDOS - Stefano
-hdos_clib.lib: $(TARGET_CLIB_DEPS)
+hdos_clib.lib: $(TARGET_CLIB_DEPS) gfxh19.lib
 	@echo ''
 	@echo '--- Building Heath/Zenith HDOS ---'
 	@echo ''
-	$(call buildgeneric,hdos,"gencon text narrow")
 	$(MAKE) -C target/hdos
 	TARGET=hdos TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhdos -x$(OUTPUT_DIRECTORY)/hdos_clib @$(TARGET_DIRECTORY)/hdos/hdos.lst
 
@@ -2058,7 +2057,7 @@ gfxtrs80m2.lib: $(TARGET_CLIB_DEPS) gfxtrs80.lib
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C classic/video/mc6845 TARGET=trs80m2
-	$(MAKE) -C classic/gfx TARGET=trs80 FLAVOUR="text6 narrow" SUBTYPE=trs80m2
+	$(MAKE) -C classic/gfx TARGET=trs80 FLAVOUR="gencon text6 narrow" SUBTYPE=trs80m2
 	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
 
 gfxtrs80m4.lib: $(TARGET_CLIB_DEPS) gfxtrs80m2.lib
@@ -2330,6 +2329,8 @@ gfxh19.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=cpm SUBTYPE=h19 FLAVOUR="gencon text narrow"
 	TARGET=h19 TYPE=z80 $(LIBLINKER) -DFORh19 -x$(OUTPUT_DIRECTORY)/gfxh19 @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19.lst
+	$(MAKE) -C classic/gfx TARGET=cpm SUBTYPE=h19alt FLAVOUR="gencon text6 narrow"
+	TARGET=h19alt TYPE=z80 $(LIBLINKER) -DFORh19alt -x$(OUTPUT_DIRECTORY)/gfxh19alt @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19alt.lst
 
 gfxvio.lib: $(TARGET_CLIB_DEPS)
 	@echo ''

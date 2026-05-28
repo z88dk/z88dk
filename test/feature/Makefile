@@ -7,7 +7,7 @@ include ../../support/multitarget_build/Makefile
 # Hello world 
 FEATURE_TARGETS = abc80 abc800 ace adam agon alphatp2 alphatro altair8800 aquarius aquarius_rom aqplus bee c128 c7420 coleco bit90 cpc cpm dai \
 	eg2000 enterprise excali64 fp1100 g800 gal galplus gamegear gb gl gl4000 gl6000  \
-	hector hectorhr \
+	hdos hector hectorhr \
 	hemc hgmc homelab homelab2 kc kramermc krokha lambda laser500 lm80c lviv lynx m5 m100 m100_optrom m10 m10_optrom kc85 kc85_optrom pc8201 \
 	map1010 mc1000 micro8085 mikro80 \
 	msx msx_msxdos1 msx_msxdos2 msx_rom msx2_rom mtx multi8 myvision mz mz2500 nabu nascom nc nc200 newbrain ondra osca oz p2000 pacman pasopia7 pc6001 pc6001_rom pc88 pc88_disk \
@@ -30,16 +30,24 @@ LDFLAGS_osca_feature = -lflosdos
 LDFLAGS_zx_feature = -lp3
 LDFLAGS_zxn_feature = -lesxdos
 
-# Just need a graphics library for CP/M on TRS80
-LDFLAGS_cpm_ptcpm_feature = -lgfxtrs80
-LDFLAGS_cpm_fmgcpm_feature = -lgfxtrs80
+# Need a graphics library for few CP/M targets
+
 LDFLAGS_cpm_holmes_feature = -lgfxtrs80
-LDFLAGS_cpm_lifeboat_feature = -lgfxtrs80
 LDFLAGS_cpm_lnw80_feature = -lgfxtrs80
 LDFLAGS_cpm_max80_feature = -lgfxtrs80
 LDFLAGS_cpm_merchant_feature = -lgfxtrs80
 LDFLAGS_cpm_montezuma_feature = -lgfxtrs80
 LDFLAGS_cpm_m4cpm3_feature = -lgfxtrs80
+
+LDFLAGS_cpm_lifeboat_feature = -lgfxtrs80m2
+LDFLAGS_cpm_fmgcpm_feature = -lgfxtrs80m2
+LDFLAGS_cpm_ptcpm_feature = -lgfxtrs80m2
+
+LDFLAGS_cpm_hz89_feature = -lgfxh19
+LDFLAGS_cpm_magnolia_feature = -lgfxh19
+
+# Don't know if H19 really works on the Zenith 100
+LDFLAGS_cpm_hz100_feature = -lgfxh19
 
 
 

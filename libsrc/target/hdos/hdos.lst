@@ -2,6 +2,7 @@ target/hdos/stdio/obj/${TYPE}/fgetc_cons
 target/hdos/stdio/obj/${TYPE}/getk
 target/hdos/stdio/obj/${TYPE}/fputc_cons
 target/hdos/stdio/obj/${TYPE}/generic_console
+target/hdos/stdio/obj/${TYPE}/joystick
 target/hdos/hdos/obj/${TYPE}/hdos_ver
 target/hdos/hdos/obj/${TYPE}/hdos_decode
 target/hdos/hdos/obj/${TYPE}/hdos_decode_callee
@@ -50,5 +51,3 @@ target/hdos/fcntl/obj/${TYPE}/is_empty_dirent
 target/hdos/time/obj/${TYPE}/clock
 target/hdos/time/obj/${TYPE}/time
 @classic/stdio/stdio_binary.lst
-target/hdos/graphics/obj/${TYPE}/textpixl
-@classic/gfx/gencon/gfx_gencon.lst
