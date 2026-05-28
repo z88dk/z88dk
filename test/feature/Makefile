@@ -44,6 +44,7 @@ LDFLAGS_cpm_fmgcpm_feature = -lgfxtrs80m2
 LDFLAGS_cpm_ptcpm_feature = -lgfxtrs80m2
 
 LDFLAGS_cpm_hz89_feature = -lgfxh19
+LDFLAGS_cpm_hz100_feature = -lgfxh19
 
 
 
