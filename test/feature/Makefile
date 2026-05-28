@@ -44,6 +44,9 @@ LDFLAGS_cpm_fmgcpm_feature = -lgfxtrs80m2
 LDFLAGS_cpm_ptcpm_feature = -lgfxtrs80m2
 
 LDFLAGS_cpm_hz89_feature = -lgfxh19
+LDFLAGS_cpm_magnolia_feature = -lgfxh19
+
+# Don't know if H19 really works on the Zenith 100
 LDFLAGS_cpm_hz100_feature = -lgfxh19
 
 
