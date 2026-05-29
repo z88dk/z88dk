@@ -42,6 +42,7 @@ struct Options {
     bool dump_after_hla_expansion = false;
     bool dump_after_synth_expansion = false;
     bool dump_after_preprocessing = false;
+    bool dump_after_parse = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

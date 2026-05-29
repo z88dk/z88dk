@@ -77,6 +77,6 @@ struct ParseLine {
     void advance();
     bool eof() const;
     void error(std::string_view message) const;
-    bool check_end_of_line(Keyword kw);
+    bool check_end_of_line();
     std::string prev_token_text() const;
 };

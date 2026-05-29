@@ -33,5 +33,6 @@ X(DUMP_AFTER_MACRO_EXPANSION, "-dump-after-macro-expansion", false, "", "Dump th
 X(DUMP_AFTER_PREPROCESSING, "-dump-after-preprocessing", false, "", "Dump the token stream after preprocessing and exit")
 X(DUMP_AFTER_HLA_EXPANSION, "-dump-after-hla-expansion", false, "", "Dump the token stream after High-Level-Assembly processing and exit")
 X(DUMP_AFTER_SYNTH_EXPANSION, "-dump-after-synth-expansion", false, "", "Dump the token stream after synthetic opcode expansion and exit")
+X(DUMP_AFTER_PARSE, "-dump-after-parse", false, "", "Dump the AST after parsing and exit")
 
 #undef X

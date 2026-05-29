@@ -5,7 +5,7 @@ Assembling t/20-preproc/input/exitm_11.asm...
 t/20-preproc/input/exitm_11.asm:1:2: error: EXITM outside of macro expansion
     #exitm ; outside macro
      ^
-t/20-preproc/input/exitm_11.asm:3:9: error: Unexpected token after EXITM: extra
+t/20-preproc/input/exitm_11.asm:3:9: error: Unexpected token: "extra"
     	#exitm extra ; extra input
     	       ^
 t/20-preproc/input/exitm_11.asm:7:3: error: EXITM outside of macro expansion
