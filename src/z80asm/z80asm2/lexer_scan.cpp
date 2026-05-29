@@ -290,6 +290,35 @@ void tokenize_scan_line(const ScanLine& line,
         out.push_back(Token::token(type, token_text, current_loc()));
     };
 
+    auto emit_ident = [&](std::string_view ident) {
+        std::string ident_s(ident);
+        Keyword keyword = keyword_lookup(ident_s);
+
+        // check for -ucase
+        if (g_args.options.ucase_symbols) {
+            ident_s = to_upper(ident_s);
+        }
+
+        // check for -IXIY
+        if (g_args.options.swap_ix_iy ) {
+            swap_ix_iy(ident_s, keyword);
+        }
+
+        // check for ASMPC
+        if (keyword == Keyword::ASMPC ) {
+            out.push_back(Token::token(TokenType::ASMPC, ident_s, current_loc()));
+            return;
+        }
+
+        // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
+        if (keyword_directive_has_file_arg(keyword)) {
+            raw_strings = true;
+        }
+
+        Token t = Token::identifier(ident_s, current_loc());
+        out.push_back(t);
+    };
+
     for (; idx < end; idx = static_cast<size_t>(p - line.text.c_str())) {
         // ------------------------------------------------------------
         // 1. If we are inside a multi-line comment, skip until "*/"
@@ -471,7 +500,7 @@ continue_lexing:
                 goto yy54;
             default:
                 if (limit <= p) {
-                    goto yy102;
+                    goto yy107;
                 }
                 goto yy1;
             }
@@ -860,6 +889,60 @@ yy41:
             case '0':
             case '1':
                 goto yy61;
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+            case '_':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+                goto yy84;
             default:
                 goto yy42;
             }
@@ -868,7 +951,8 @@ yy42: {
                 continue;
             }
 yy43:
-            yych = *++p;
+            yyaccept = 3;
+            yych = *(marker = ++p);
             switch (yych) {
             case '0':
             case '1':
@@ -934,35 +1018,14 @@ yy43:
             case 'y':
             case 'z':
                 goto yy43;
+            case '@':
+                goto yy86;
             default:
                 goto yy44;
             }
 yy44: {
-                std::string ident = std::string(tok, p);
-                Keyword keyword = keyword_lookup(ident);
-
-                // check for -ucase
-                if (g_args.options.ucase_symbols) {
-                    ident = to_upper(ident);
-                }
-
-                // check for -IXIY
-                if (g_args.options.swap_ix_iy) {
-                    swap_ix_iy(ident, keyword);
-                }
-
-                // check for ASMPC
-                if (keyword == Keyword::ASMPC) {
-                    out.push_back(Token::token(TokenType::ASMPC, ident, current_loc()));
-                    continue;
-                }
-
-                // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
-                if (keyword_directive_has_file_arg(keyword)) {
-                    raw_strings = true;
-                }
-
-                out.push_back(Token::identifier(ident, current_loc()));
+                std::string ident = std::string(tok, p);;
+                emit_ident(ident);
                 continue;
             }
 yy45:
@@ -987,7 +1050,7 @@ yy48:
             yych = *++p;
             switch (yych) {
             case '^':
-                goto yy84;
+                goto yy87;
             default:
                 goto yy49;
             }
@@ -1005,7 +1068,7 @@ yy51:
             yych = *++p;
             switch (yych) {
             case '|':
-                goto yy85;
+                goto yy88;
             default:
                 goto yy52;
             }
@@ -1038,7 +1101,7 @@ yy56:
                 continue;
             }
 yy57:
-            yyaccept = 3;
+            yyaccept = 4;
             yych = *(marker = ++p);
             switch (yych) {
             case '0':
@@ -1065,7 +1128,7 @@ yy57:
             case 'f':
                 goto yy57;
             case '_':
-                goto yy86;
+                goto yy89;
             default:
                 goto yy58;
             }
@@ -1082,7 +1145,7 @@ yy59:
             yych = *++p;
             switch (yych) {
             case '"':
-                goto yy87;
+                goto yy90;
             case '#':
             case '-':
                 goto yy59;
@@ -1099,27 +1162,29 @@ yy60:
             case 2:
                 goto yy42;
             case 3:
-                goto yy58;
+                goto yy44;
             case 4:
-                goto yy62;
+                goto yy58;
             case 5:
-                goto yy67;
+                goto yy62;
             case 6:
-                goto yy72;
+                goto yy67;
             case 7:
-                goto yy94;
+                goto yy72;
+            case 8:
+                goto yy97;
             default:
-                goto yy96;
+                goto yy99;
             }
 yy61:
-            yyaccept = 4;
+            yyaccept = 5;
             yych = *(marker = ++p);
             switch (yych) {
             case '0':
             case '1':
                 goto yy61;
             case '_':
-                goto yy88;
+                goto yy91;
             default:
                 goto yy62;
             }
@@ -1145,7 +1210,7 @@ yy64:
                 continue;
             }
 yy65:
-            yyaccept = 5;
+            yyaccept = 6;
             yych = *(marker = ++p);
 yy66:
             switch (yych) {
@@ -1162,9 +1227,9 @@ yy66:
                 goto yy65;
             case 'E':
             case 'e':
-                goto yy89;
+                goto yy92;
             case '_':
-                goto yy90;
+                goto yy93;
             default:
                 goto yy67;
             }
@@ -1183,7 +1248,7 @@ yy68:
                 return;
             }
 yy69:
-            yyaccept = 5;
+            yyaccept = 6;
             yych = *(marker = ++p);
             switch (yych) {
             case 0x00:
@@ -1222,12 +1287,12 @@ yy70:
             case 'h':
                 goto yy74;
             case '_':
-                goto yy91;
+                goto yy94;
             default:
                 goto yy60;
             }
 yy71:
-            yyaccept = 6;
+            yyaccept = 7;
             yych = *(marker = ++p);
             switch (yych) {
             case '0':
@@ -1254,9 +1319,9 @@ yy71:
             case 'e':
             case 'f':
             case 'h':
-                goto yy93;
+                goto yy96;
             case '_':
-                goto yy91;
+                goto yy94;
             default:
                 goto yy72;
             }
@@ -1300,7 +1365,7 @@ yy73:
             case 'h':
                 goto yy74;
             case '_':
-                goto yy91;
+                goto yy94;
             default:
                 goto yy28;
             }
@@ -1340,7 +1405,7 @@ yy75:
             case 'd':
             case 'e':
             case 'f':
-                goto yy95;
+                goto yy98;
             default:
                 goto yy60;
             }
@@ -1378,7 +1443,7 @@ yy76:
                 goto yy60;
             }
 yy77:
-            yyaccept = 6;
+            yyaccept = 7;
             yych = *(marker = ++p);
             switch (yych) {
             case '0':
@@ -1408,7 +1473,7 @@ yy77:
             case 'h':
                 goto yy74;
             case '_':
-                goto yy91;
+                goto yy94;
             default:
                 goto yy72;
             }
@@ -1472,18 +1537,153 @@ yy83:
                 continue;
             }
 yy84:
+            yych = *++p;
+            switch (yych) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+            case '_':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+                goto yy84;
+            default:
+                goto yy85;
+            }
+yy85: {
+                std::string ident = std::string(tok, p);;
+                emit_ident(ident);
+                continue;
+            }
+yy86:
+            yych = *++p;
+            switch (yych) {
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+            case '_':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+                goto yy100;
+            default:
+                goto yy60;
+            }
+yy87:
             ++p;
             {
                 emit(TokenType::LogicalXor);
                 continue;
             }
-yy85:
+yy88:
             ++p;
             {
                 emit(TokenType::LogicalOr);
                 continue;
             }
-yy86:
+yy89:
             yych = *++p;
             switch (yych) {
             case '0':
@@ -1510,11 +1710,11 @@ yy86:
             case 'f':
                 goto yy57;
             case '_':
-                goto yy86;
+                goto yy89;
             default:
                 goto yy60;
             }
-yy87:
+yy90:
             ++p;
             {
                 int value = 0;
@@ -1527,23 +1727,23 @@ yy87:
                 out.push_back(Token::integer(std::string(tok, p), value, current_loc()));
                 continue;
             }
-yy88:
+yy91:
             yych = *++p;
             switch (yych) {
             case '0':
             case '1':
                 goto yy61;
             case '_':
-                goto yy88;
+                goto yy91;
             default:
                 goto yy60;
             }
-yy89:
+yy92:
             yych = *++p;
             switch (yych) {
             case '+':
             case '-':
-                goto yy97;
+                goto yy102;
             case '0':
             case '1':
             case '2':
@@ -1554,11 +1754,11 @@ yy89:
             case '7':
             case '8':
             case '9':
-                goto yy98;
+                goto yy103;
             default:
                 goto yy60;
             }
-yy90:
+yy93:
             yych = *++p;
             switch (yych) {
             case '0':
@@ -1573,11 +1773,11 @@ yy90:
             case '9':
                 goto yy65;
             case '_':
-                goto yy90;
+                goto yy93;
             default:
                 goto yy60;
             }
-yy91:
+yy94:
             yych = *++p;
             switch (yych) {
             case '0':
@@ -1604,18 +1804,18 @@ yy91:
             case 'f':
                 goto yy70;
             case '_':
-                goto yy91;
+                goto yy94;
             default:
                 goto yy60;
             }
-yy92:
-            yyaccept = 7;
+yy95:
+            yyaccept = 8;
             yych = *(marker = ++p);
-yy93:
+yy96:
             switch (yych) {
             case '0':
             case '1':
-                goto yy92;
+                goto yy95;
             case '2':
             case '3':
             case '4':
@@ -1641,11 +1841,11 @@ yy93:
             case 'h':
                 goto yy74;
             case '_':
-                goto yy99;
+                goto yy104;
             default:
-                goto yy94;
+                goto yy97;
             }
-yy94: {
+yy97: {
                 if (!check_trailing_char()) {
                     return;
                 }
@@ -1654,8 +1854,8 @@ yy94: {
                 out.push_back(Token::integer(std::string(tok, p), value, current_loc()));
                 continue;
             }
-yy95:
-            yyaccept = 8;
+yy98:
+            yyaccept = 9;
             yych = *(marker = ++p);
             switch (yych) {
             case '0':
@@ -1680,13 +1880,13 @@ yy95:
             case 'd':
             case 'e':
             case 'f':
-                goto yy95;
+                goto yy98;
             case '_':
-                goto yy100;
+                goto yy105;
             default:
-                goto yy96;
+                goto yy99;
             }
-yy96: {
+yy99: {
                 if (!check_trailing_char()) {
                     return;
                 }
@@ -1695,7 +1895,7 @@ yy96: {
                 out.push_back(Token::integer(std::string(tok, p), value, current_loc()));
                 continue;
             }
-yy97:
+yy100:
             yych = *++p;
             switch (yych) {
             case '0':
@@ -1708,12 +1908,87 @@ yy97:
             case '7':
             case '8':
             case '9':
-                goto yy98;
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+            case '_':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+                goto yy100;
+            default:
+                goto yy101;
+            }
+yy101: {
+                std::string ident = std::string(tok, p);;
+                emit_ident(ident);
+                continue;
+            }
+yy102:
+            yych = *++p;
+            switch (yych) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                goto yy103;
             default:
                 goto yy60;
             }
-yy98:
-            yyaccept = 5;
+yy103:
+            yyaccept = 6;
             yych = *(marker = ++p);
             switch (yych) {
             case '0':
@@ -1726,18 +2001,18 @@ yy98:
             case '7':
             case '8':
             case '9':
-                goto yy98;
+                goto yy103;
             case '_':
-                goto yy101;
+                goto yy106;
             default:
                 goto yy67;
             }
-yy99:
+yy104:
             yych = *++p;
             switch (yych) {
             case '0':
             case '1':
-                goto yy92;
+                goto yy95;
             case '2':
             case '3':
             case '4':
@@ -1760,11 +2035,11 @@ yy99:
             case 'f':
                 goto yy70;
             case '_':
-                goto yy99;
+                goto yy104;
             default:
                 goto yy60;
             }
-yy100:
+yy105:
             yych = *++p;
             switch (yych) {
             case '0':
@@ -1789,13 +2064,13 @@ yy100:
             case 'd':
             case 'e':
             case 'f':
-                goto yy95;
+                goto yy98;
             case '_':
-                goto yy100;
+                goto yy105;
             default:
                 goto yy60;
             }
-yy101:
+yy106:
             yych = *++p;
             switch (yych) {
             case '0':
@@ -1808,13 +2083,13 @@ yy101:
             case '7':
             case '8':
             case '9':
-                goto yy98;
+                goto yy103;
             case '_':
-                goto yy101;
+                goto yy106;
             default:
                 goto yy60;
             }
-yy102: {
+yy107: {
                 return;
             }
         }
