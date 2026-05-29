@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "ast.h"
 #include "diag.h"
 #include "environment.h"
 #include "hla.h"
@@ -12,12 +13,14 @@
 #include "opcodes.h"
 #include "options.h"
 #include "options_dump.h"
+#include "parser.h"
 #include "pathnames.h"
 #include "preproc.h"
 #include "source_loc.h"
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -56,13 +59,19 @@ static void assemble_file(std::string_view filename) {
         // not reached
     }
 
-    // generate -E output if requested
+    // generate -E output and terminate assembly, if requested
     if (g_args.options.preprocess_only) {
         std::string i_filename = get_i_filename(filename);
         output_preproc_output(i_filename, asm_lines);
         return;
     }
 
+    // parse source code
+    std::unique_ptr<Program> prog = parse(asm_lines);
+    if (g_args.options.dump_after_parse) {
+        dump_ast_and_exit(prog);
+        // not reached
+    }
 }
 
 static void assemble_files() {

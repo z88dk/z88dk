@@ -39,6 +39,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.dump_after_synth_expansion << "\n"
             << "dump_after_preprocessing\t"
             << g_args.options.dump_after_preprocessing << "\n"
+            << "dump_after_parse\t"
+            << g_args.options.dump_after_parse << "\n"
             << "m4_options\t"
             << g_args.options.m4_options << "\n"
             << "perl_options\t"

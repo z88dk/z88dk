@@ -8,7 +8,7 @@ Identifier	"a"	1:4	keyword=A
 Comma	","	1:5	
 Integer	"1"	1:7	int_value=1 
 EndOfLine	"\n"	1:8	
-t/20-preproc/input/error_01.asm:2:7: error: Unexpected token after ERROR: 25
+t/20-preproc/input/error_01.asm:2:7: error: Unexpected token: "25"
     error 25 ; expects string
           ^
 Identifier	"ld"	3:1	keyword=LD 
@@ -16,7 +16,7 @@ Identifier	"a"	3:4	keyword=A
 Comma	","	3:5	
 Integer	"2"	3:7	int_value=2 
 EndOfLine	"\n"	3:8	
-t/20-preproc/input/error_01.asm:4:15: error: Unexpected token after ERROR: extra
+t/20-preproc/input/error_01.asm:4:15: error: Unexpected token: "extra"
     error "hello" extra ; expects eol
                   ^
 Identifier	"ld"	5:1	keyword=LD 

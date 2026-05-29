@@ -2,17 +2,16 @@
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/25-hla/input/repeat_01.asm...
-t/25-hla/input/repeat_01.asm:1:9: error: Unexpected token after REPEAT: extra
+t/25-hla/input/repeat_01.asm:1:9: error: Unexpected token: "extra"
     %repeat extra
             ^
-t/25-hla/input/repeat_01.asm:4:7: error: Unexpected token in condition: 
-
+t/25-hla/input/repeat_01.asm:4:7: error: Unexpected token in condition: "\n"
     %until
           ^
 t/25-hla/input/repeat_01.asm:7:6: error: Expected register after DJNZ
     %djnz
          ^
-t/25-hla/input/repeat_01.asm:10:13: error: Unexpected token after UNTIL: extra
+t/25-hla/input/repeat_01.asm:10:13: error: Unexpected token: "extra"
     %until true extra
                 ^
 t/25-hla/input/repeat_01.asm:13:7: error: Invalid register for DJNZ
@@ -21,7 +20,7 @@ t/25-hla/input/repeat_01.asm:13:7: error: Invalid register for DJNZ
 t/25-hla/input/repeat_01.asm:16:7: error: Invalid register for DJNZ
     %djnz ix
           ^
-t/25-hla/input/repeat_01.asm:19:9: error: Unexpected token after DJNZ: extra
+t/25-hla/input/repeat_01.asm:19:9: error: Unexpected token: "extra"
     %djnz a extra
             ^
 t/25-hla/input/repeat_01.asm:21:2: error: Unclosed HLA construct REPEAT

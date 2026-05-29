@@ -20,7 +20,7 @@ t/20-preproc/input/rept_11.asm:5:7: error: ASMPC is not allowed in a constant ex
 t/20-preproc/input/rept_11.asm:6:2: error: Unexpected ENDR directive
     #endr
      ^
-t/20-preproc/input/rept_11.asm:7:9: error: Unexpected token after REPT count: extra
+t/20-preproc/input/rept_11.asm:7:9: error: Unexpected token after REPT count: "extra"
     #rept 1 extra ; extra tokens after expression
             ^
 t/20-preproc/input/rept_11.asm:8:2: error: Unexpected ENDR directive

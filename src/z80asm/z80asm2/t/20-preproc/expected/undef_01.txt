@@ -5,7 +5,7 @@ Assembling t/20-preproc/input/undef_01.asm...
 t/20-preproc/input/undef_01.asm:1:6: error: Expected identifier after UNDEF
     undef ; no name
          ^
-t/20-preproc/input/undef_01.asm:2:13: error: Unexpected token after UNDEF: world
+t/20-preproc/input/undef_01.asm:2:13: error: Unexpected token: "world"
     undef hello world ; extra tokens
                 ^
 # file: t/20-preproc/input/undef_01.asm

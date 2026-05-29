@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "cpu.h"
-#include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "opcodes_trie_token.h"
 #include <vector>
