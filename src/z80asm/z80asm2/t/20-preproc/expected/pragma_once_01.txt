@@ -23,7 +23,7 @@ Identifier	"a"	7:4	keyword=A
 Comma	","	7:5	
 Integer	"4"	7:7	int_value=4 
 EndOfLine	"\n"	7:8	
-t/20-preproc/input/pragma_once_01.asm:8:13: error: Unexpected token after PRAGMA: extra
+t/20-preproc/input/pragma_once_01.asm:8:13: error: Unexpected token: "extra"
     pragma once extra
                 ^
 Identifier	"ld"	9:1	keyword=LD 

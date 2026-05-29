@@ -8,7 +8,7 @@ t/20-preproc/input/local_01.asm:1:1: error: Unexpected LOCAL directive
 t/20-preproc/input/local_01.asm:2:1: error: Unexpected LOCAL directive
     local X; outside macro
     ^
-t/20-preproc/input/local_01.asm:7:8: error: Unexpected token after LOCAL: 12
+t/20-preproc/input/local_01.asm:7:8: error: Unexpected token: "12"
     	local 12 ; no variable
     	      ^
 t/20-preproc/input/local_01.asm:8:1: error: Unexpected ENDM directive
@@ -20,7 +20,7 @@ t/20-preproc/input/local_01.asm:10:14: error: Identifier expected
 t/20-preproc/input/local_01.asm:11:1: error: Unexpected ENDM directive
     endm
     ^
-t/20-preproc/input/local_01.asm:13:14: error: Unexpected token after LOCAL: extra
+t/20-preproc/input/local_01.asm:13:14: error: Unexpected token: "extra"
     	local l1,l2 extra ; extra input
     	            ^
 t/20-preproc/input/local_01.asm:14:1: error: Unexpected ENDM directive

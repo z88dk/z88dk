@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "ast.h"
 #include "diag.h"
 #include "expr.h"
 #include "lexer.h"
@@ -12,9 +13,10 @@
 #include "string_interner.h"
 #include "string_utils.h"
 #include <cassert>
-#include <cstdint>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 int int_pow(int base, int exp, const SourceLoc& loc) {
     if (exp < 0) {
@@ -264,11 +266,7 @@ void ConstEvalSem::ternary(const SourceLoc&) {
     push(cond ? true_val : false_val);
 }
 
-void ConstEvalSem::error_expected_operand(const ParseLine& pline) const {
-    if (silent) {
-        return;
-    }
-
+static void error_expected_operand(const ParseLine& pline) {
     if (pline.pos > 0 && pline.pos - 1 < pline.tokens.size()) {
         // exhausted tokens after an operator
         const Token& prev = pline.tokens[pline.pos - 1];
@@ -290,42 +288,63 @@ void ConstEvalSem::error_expected_operand(const ParseLine& pline) const {
         // empty token stream
         g_diag.error(SourceLoc(), "Empty expression");
     }
+}
 
+static void error_missing_lparen(const ParseLine& pline) {
+    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                        pline.tokens[pline.pos - 1] : Token{};
+    g_diag.error(prev.loc, "Missing '(' after token "
+                 + escape_string(g_strings.view(prev.text_id)));
+}
+
+static void error_missing_rparen(const ParseLine& pline) {
+    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                        pline.tokens[pline.pos - 1] : Token{};
+    g_diag.error(prev.loc, "Missing ')' after token "
+                 + escape_string(g_strings.view(prev.text_id)));
+}
+
+static void error_missing_rbracket(const ParseLine& pline) {
+    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                        pline.tokens[pline.pos - 1] : Token{};
+    g_diag.error(prev.loc, "Missing ']' after token "
+                 + escape_string(g_strings.view(prev.text_id)));
+}
+
+static void error_missing_colon(const ParseLine& pline) {
+    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                        pline.tokens[pline.pos - 1] : Token{};
+    g_diag.error(prev.loc, "Missing ':' after token "
+                 + escape_string(g_strings.view(prev.text_id)));
+}
+
+void ConstEvalSem::error_expected_operand(const ParseLine& pline) const {
+    if (!silent) {
+        ::error_expected_operand(pline);
+    }
 }
 
 void ConstEvalSem::error_missing_lparen(const ParseLine& pline) const {
     if (!silent) {
-        const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                            pline.tokens[pline.pos - 1] : Token{};
-        g_diag.error(prev.loc, "Missing '(' after token "
-                     + escape_string(g_strings.view(prev.text_id)));
+        ::error_missing_lparen(pline);
     }
 }
 
 void ConstEvalSem::error_missing_rparen(const ParseLine& pline) const {
     if (!silent) {
-        const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                            pline.tokens[pline.pos - 1] : Token{};
-        g_diag.error(prev.loc, "Missing ')' after token "
-                     + escape_string(g_strings.view(prev.text_id)));
+        ::error_missing_rparen(pline);
     }
 }
 
 void ConstEvalSem::error_missing_rbracket(const ParseLine& pline) const {
     if (!silent) {
-        const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                            pline.tokens[pline.pos - 1] : Token{};
-        g_diag.error(prev.loc, "Missing ']' after token "
-                     + escape_string(g_strings.view(prev.text_id)));
+        ::error_missing_rbracket(pline);
     }
 }
 
 void ConstEvalSem::error_missing_colon(const ParseLine& pline) const {
     if (!silent) {
-        const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                            pline.tokens[pline.pos - 1] : Token{};
-        g_diag.error(prev.loc, "Missing ':' after token "
-                     + escape_string(g_strings.view(prev.text_id)));
+        ::error_missing_colon(pline);
     }
 }
 
@@ -374,8 +393,8 @@ static bool eval_expr_text_impl(
     if (pline.pos < tokens.size() &&
             tokens[pline.pos].type != TokenType::EndOfLine) {
         if (!silent) {
-            g_diag.error(tokens[pline.pos].loc, "Unexpected token after expression: "
-                         + escape_string(g_strings.view(tokens[pline.pos].text_id)));
+            g_diag.error(tokens[pline.pos].loc, "Unexpected token after expression: " +
+                         escape_string(g_strings.view(tokens[pline.pos].text_id)));
         }
         return false;
     }
@@ -432,4 +451,77 @@ bool parse_expression_span(ParseLine& pline) {
     }
 
     return true;
+}
+
+//-----------------------------------------------------------------------------
+// Semantic context for AST builder expression parsing
+//-----------------------------------------------------------------------------
+
+std::unique_ptr<Expr> ExprSem::result() {
+    return std::move(stack.back());
+}
+
+void ExprSem::literal_integer(const Token& tok) {
+    stack.push_back(std::make_unique<ExprLiteralInt>(tok.value.int_value, tok.loc));
+}
+
+void ExprSem::literal_float(const Token& tok) {
+    stack.push_back(std::make_unique<ExprLiteralFloat>(tok.value.float_value, tok.loc));
+}
+
+bool ExprSem::literal_asmpc(const Token& tok) {
+    stack.push_back(std::make_unique<ExprLiteralAsmpc>(tok.loc));
+    return true;
+}
+
+bool ExprSem::symbol(const Token& tok) {
+    stack.push_back(std::make_unique<ExprSymbol>(tok.text_id, tok.loc));
+    return true;
+}
+
+void ExprSem::unary(TokenType op, const SourceLoc& loc) {
+    auto rhs = pop();
+    stack.push_back(std::make_unique<ExprUnary>(op, std::move(rhs), loc));
+}
+
+void ExprSem::binary(TokenType op, const SourceLoc& loc) {
+    auto rhs = pop();
+    auto lhs = pop();
+    stack.push_back(std::make_unique<ExprBinary>(op, std::move(lhs), std::move(rhs), loc));
+}
+
+void ExprSem::ternary(const SourceLoc& loc) {
+    auto e = pop();
+    auto t = pop();
+    auto c = pop();
+    stack.push_back(std::make_unique<ExprTernary>(std::move(c), std::move(t), std::move(e), loc));
+}
+
+void ExprSem::error_expected_operand(const ParseLine& pline) const {
+    ::error_expected_operand(pline);
+}
+
+void ExprSem::error_missing_lparen(const ParseLine& pline) const {
+    ::error_missing_lparen(pline);
+}
+
+void ExprSem::error_missing_rparen(const ParseLine& pline) const {
+    ::error_missing_rparen(pline);
+}
+
+void ExprSem::error_missing_rbracket(const ParseLine& pline) const {
+    ::error_missing_rbracket(pline);
+}
+
+void ExprSem::error_missing_colon(const ParseLine& pline) const {
+    ::error_missing_colon(pline);
+}
+
+std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline) {
+    ExprSem sem;
+    if (!parse_full_expr(pline, sem)) {
+        return nullptr; // error already reported
+    }
+
+    return sem.result();
 }

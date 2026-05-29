@@ -149,7 +149,7 @@ Comma	","	44:16
 Integer	"3"	44:17	int_value=3 
 RightParen	")"	44:18	
 EndOfLine	"\n"	44:9	
-t/20-preproc/input/macro_11.asm:47:7: error: Unexpected token after ENDM: extra
+t/20-preproc/input/macro_11.asm:47:7: error: Unexpected token: "extra"
     #endm extra
           ^
 t/20-preproc/input/macro_11.asm:48:2: error: Unexpected end of file, missing ENDM for MACRO

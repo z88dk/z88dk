@@ -6,13 +6,15 @@
 
 #pragma once
 
+#include "ast.h"
 #include "const_symbols.h"
+#include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
-#include <string>
-#include <vector>
+#include <memory>
 #include <string_view>
-#include "lexer_keywords.h"
+#include <utility>
+#include <vector>
 
 // integer power function
 int int_pow(int base, int exp, const SourceLoc& loc);
@@ -37,8 +39,6 @@ struct ConstEvalSem {
     void binary(TokenType op, const SourceLoc& loc);
     void ternary(const SourceLoc& loc);
     void call_unary(Keyword, const SourceLoc&) {}
-    void begin_group() {}
-    void end_group() {}
     void error_expected_operand(const ParseLine& pline) const;
     void error_missing_lparen(const ParseLine& pline) const;
     void error_missing_rparen(const ParseLine& pline) const;
@@ -55,7 +55,6 @@ private:
 //-----------------------------------------------------------------------------
 
 struct SpanSem {
-    explicit SpanSem() {}
     int result() const;
     void literal_integer(const Token&) {}
     void literal_float(const Token&) {}
@@ -65,8 +64,6 @@ struct SpanSem {
     void binary(TokenType, const SourceLoc&) {}
     void ternary(const SourceLoc&) {}
     void call_unary(Keyword, const SourceLoc&) {}
-    void begin_group() {}
-    void end_group() {}
     void error_expected_operand(const ParseLine&) const {}
     void error_missing_lparen(const ParseLine&) const {}
     void error_missing_rparen(const ParseLine&) const {}
@@ -78,7 +75,31 @@ struct SpanSem {
 // Semantic context for AST builder expression parsing
 //-----------------------------------------------------------------------------
 
-struct ASTSem;
+struct ExprSem {
+    std::vector<std::unique_ptr<Expr>> stack;
+
+    std::unique_ptr<Expr> result();
+    void literal_integer(const Token& tok);
+    void literal_float(const Token& tok);
+    bool literal_asmpc(const Token& tok);
+    bool symbol(const Token& tok);
+    void unary(TokenType op, const SourceLoc& loc);
+    void binary(TokenType op, const SourceLoc& loc);
+    void ternary(const SourceLoc& loc);
+    void call_unary(Keyword, const SourceLoc&) {}
+    void error_expected_operand(const ParseLine& pline) const;
+    void error_missing_lparen(const ParseLine& pline) const;
+    void error_missing_rparen(const ParseLine& pline) const;
+    void error_missing_rbracket(const ParseLine& pline) const;
+    void error_missing_colon(const ParseLine& pline) const;
+
+private:
+    std::unique_ptr<Expr> pop() {
+        std::unique_ptr<Expr> n = std::move(stack.back());
+        stack.pop_back();
+        return n;
+    }
+};
 
 //-----------------------------------------------------------------------------
 // Pluggable expression parsing - Pratt parser
@@ -185,8 +206,6 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
             ? TokenType::RightParen
             : TokenType::RightBracket;
 
-        sem.begin_group();
-
         if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
             return false;
         }
@@ -202,7 +221,6 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
         }
 
         pline.advance();
-        sem.end_group();
         return true;
     }
 
@@ -317,3 +335,9 @@ bool eval_if_condition(ParseLine& pline,
 //-----------------------------------------------------------------------------
 
 bool parse_expression_span(ParseLine& pline);
+
+//-----------------------------------------------------------------------------
+// Semantic context for AST builder expression parsing
+//-----------------------------------------------------------------------------
+
+std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline);
