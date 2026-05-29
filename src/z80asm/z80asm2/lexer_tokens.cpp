@@ -26,50 +26,49 @@ std::string to_string(TokenType token_type) {
     return std::string(lut[static_cast<size_t>(token_type)]);
 }
 
-Token Token::token(TokenType type_, std::string_view text_,
+Token Token::token(TokenType type_, std::string_view text,
                    const SourceLoc& loc) {
     Token t;
     t.type = type_;
-    t.text_id = g_strings.intern(text_);
+    t.text_id = g_strings.intern(text);
     t.loc = loc;
     return t;
 }
 
-Token Token::identifier(std::string_view text_,
-                        const SourceLoc& loc) {
+Token Token::identifier(std::string_view ident, const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Identifier;
-    t.keyword = keyword_lookup(text_);
-    t.text_id = g_strings.intern(text_);
+    t.keyword = keyword_lookup(ident);
+    t.text_id = g_strings.intern(ident);
     t.loc = loc;
     return t;
 }
 
-Token Token::integer(std::string_view text_, int value,
+Token Token::integer(std::string_view text, int value,
                      const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Integer;
-    t.text_id = g_strings.intern(text_);
+    t.text_id = g_strings.intern(text);
     t.value.int_value = value;
     t.loc = loc;
     return t;
 }
 
-Token Token::floating(std::string_view text_, double value,
+Token Token::floating(std::string_view text, double value,
                       const SourceLoc& loc) {
     Token t;
     t.type = TokenType::Float;
-    t.text_id = g_strings.intern(text_);
+    t.text_id = g_strings.intern(text);
     t.value.float_value = value;
     t.loc = loc;
     return t;
 }
 
-Token Token::string(std::string_view text_, std::string_view value,
+Token Token::string(std::string_view text, std::string_view value,
                     const SourceLoc& loc) {
     Token t;
     t.type = TokenType::String;
-    t.text_id = g_strings.intern(text_);
+    t.text_id = g_strings.intern(text);
     t.value.str_value_id = g_strings.intern(value);
     t.loc = loc;
     return t;
