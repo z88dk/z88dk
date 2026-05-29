@@ -458,10 +458,10 @@ L03B2:  LD      A,$40           ; substitute ASCII '@'
 ;  | 48  H | 49  I | 4A  J | 4B  K | 4C  L | 4D  M | 4E  N | 4F  O |
 ;  | 50  P | 51  Q | 52  R | 53  S | 54  T | 55  U | 56  V | 57  W |
 ;  | 58  X | 59  Y | 5A  Z | 5B  [ | 5C  \ | 5D  ] | 5E  ^ | 5F  _ |
-;  | 60  £ | 61  a | 62  b | 63  c | 64  d | 65  e | 66  f | 67  g |
+;  | 60 pnd| 61  a | 62  b | 63  c | 64  d | 65  e | 66  f | 67  g |
 ;  | 68  h | 69  i | 6A  j | 6B  k | 6C  l | 6D  m | 6E  n | 6F  o |
 ;  | 70  p | 71  q | 72  r | 73  s | 74  t | 75  u | 76  v | 77  w |
-;  | 78  x | 79  y | 7A  z | 7B  { | 7C  | | 7D  } | 7E  ~ | 7F  © |
+;  | 78  x | 79  y | 7A  z | 7B  { | 7C  | | 7D  } | 7E  ~ | 7F cpy|
 ;  | 80 128| 81 129| 82 130| 83 131| 84 132| 85 133| 86 134| 87 135|
 ;  | 88 136| 89 137| 8A 138| 8B 139| 8C 140| 8D 141| 8E 142| 8F 143|
 ;  | 90 [A]| 91 [B]| 92 [C]| 93 [D]| 94 [E]| 95 [F]| 96 [G]| 97 [H]|
@@ -484,6 +484,6 @@ L03B2:  LD      A,$40           ; substitute ASCII '@'
 ;   ASCII DEL, $7F, has been made a copyright symbol.
 ;   Also $60, '`', not used in BASIC but used in other languages, has been
 ;   allocated the local currency symbol for the relevant country -
-;    £  in most Spectrums.
+;   pnd in most Spectrums.
 
 ; ------------------------------------------------------------------------

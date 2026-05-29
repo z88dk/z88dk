@@ -1573,7 +1573,7 @@ Define keywords for special symbols ASMSIZE, ASMTAIL
          Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
          compile with "z80asm -t4 -b test.asm"
          fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
-                      Error in expression +\A6+\B2+-;\BE?.\B9ҦҲ\D9+v\DDF\DDV\DD^\DDx\A6 \DD@\DDH\DDP\DD".
+                      Error in expression +\A6+\B2+-;\BE?.\B9??\D9+v\DDF\DDV\DD^\DDx\A6 \DD@\DDH\DDP\DD".
 
          Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
          When the expression is read from the OBJ file at the link phase,

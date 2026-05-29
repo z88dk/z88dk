@@ -32,7 +32,7 @@ static const int BytesWidth = 16;
 void LstFile::open(const string& filename) {
 	close();
 	if (option_list_file()) {			// if -l option
-		m_ofs.open(filename);
+		m_ofs.open(filename, ios::binary);
 		if (!m_ofs.is_open())
 			error_file_open(filename.c_str());
 		else {

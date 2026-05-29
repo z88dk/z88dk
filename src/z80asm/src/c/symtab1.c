@@ -627,7 +627,7 @@ static void _write_symbol_file(const char *filename, Module1 *module, bool(*cond
 	if (option_verbose())
 		printf("Creating file '%s'\n", path_canon(filename));
 
-	file = xfopen(filename, "w");
+	file = xfopen(filename, "wb");
 
 	symbols = select_module_symbols(module, cond);
 

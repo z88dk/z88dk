@@ -708,7 +708,7 @@ L3D00:  DEFB    @00000000
         DEFB    @00000000
         DEFB    @11111111
 
-; $60 - Character: ' £ '        CHR$(96)
+; $60 - Character: 'pnd'        CHR$(96)
 
         DEFB    @00000000
         DEFB    @00011100
@@ -1049,7 +1049,7 @@ L3D00:  DEFB    @00000000
         DEFB    @00000000
         DEFB    @00000000
 
-; $7F - Character: ' © '        CHR$(127)
+; $7F - Character: 'cpy'        CHR$(127)
 
         DEFB    @00111100
         DEFB    @01000010

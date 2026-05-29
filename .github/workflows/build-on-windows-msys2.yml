@@ -53,29 +53,7 @@ jobs:
       shell: cmd
       run: |
         set PATH=C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%
-        cpanm --notest ^
-            Archive::Zip ^
-            Array::Compare ^
-            CPU::Z80::Assembler ^
-            Capture::Tiny ^
-            Clone ^
-            Data::Dump ^
-            Data::HexDump ^
-            File::Path ^
-            List::Uniq ^
-            Modern::Perl ^
-            Object::Tiny ^
-            Object::Tiny::RW ^
-            Params::Util ^
-            Path::Tiny ^
-            Regexp::Common ^
-            Spreadsheet::ParseXLSX ^
-            Test::Harness ^
-            Test::HexDifferences ^
-            Text::Diff ^
-            Text::Table ^
-            Win32::Autoglob ^
-            YAML::Tiny
+        cpanm --notest Archive::Zip Array::Compare CPU::Z80::Assembler Capture::Tiny Clone Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Params::Util Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table Win32::Autoglob YAML::Tiny
     - name: Bootstrap cpanm for MinGW Perl
       shell: msys2 {0}
       run: |
