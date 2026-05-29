@@ -13,6 +13,7 @@
 #include "opcodes_synth_trie.h"
 #include "opcodes_trie_token.h"
 #include "options.h"
+#include "parser.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <algorithm>
@@ -22,24 +23,10 @@
 #include <vector>
 
 void collect_label_tokens(ParseLine& pline, std::vector<Token>& out) {
-    out.clear();
-
-    // .label
-    if (pline.peek().type == TokenType::Dot && pline.peek(1).type == TokenType::Identifier) {
-        out.push_back(pline.peek());
-        pline.advance();
-        out.push_back(pline.peek());
-        pline.advance();
-        return;
-    }
-
-    // label:
-    if (pline.peek().type == TokenType::Identifier && pline.peek(1).type == TokenType::Colon) {
-        out.push_back(pline.peek());
-        pline.advance();
-        out.push_back(pline.peek());
-        pline.advance();
-        return;
+    size_t pos0 = pline.pos;
+    auto label = parse_label(pline);
+    if (label) {
+        out.insert(out.end(), pline.tokens.begin() + pos0, pline.tokens.begin() + pline.pos);
     }
 }
 

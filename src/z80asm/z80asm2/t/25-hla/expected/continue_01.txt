@@ -8,6 +8,6 @@ t/25-hla/input/continue_01.asm:1:2: error: CONTINUE without WHILE or REPEAT
 t/25-hla/input/continue_01.asm:3:3: error: CONTINUE without WHILE or REPEAT
     	%continue
     	 ^
-t/25-hla/input/continue_01.asm:6:12: error: Unexpected token after CONTINUE: extra
+t/25-hla/input/continue_01.asm:6:12: error: Unexpected token: "extra"
     	%continue extra
     	          ^

@@ -2,14 +2,13 @@
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/25-hla/input/if_01.asm...
-t/25-hla/input/if_01.asm:2:4: error: Unexpected token in condition: 
-
+t/25-hla/input/if_01.asm:2:4: error: Unexpected token in condition: "\n"
     %if
        ^
-t/25-hla/input/if_01.asm:3:10: error: Unexpected token after IF: extra
+t/25-hla/input/if_01.asm:3:10: error: Unexpected token: "extra"
     %if true extra
              ^
-t/25-hla/input/if_01.asm:4:7: error: Unexpected token after IF: extra
+t/25-hla/input/if_01.asm:4:7: error: Unexpected token: "extra"
     %if z extra
           ^
 t/25-hla/input/if_01.asm:5:7: error: Expected expression
@@ -27,16 +26,16 @@ t/25-hla/input/if_01.asm:8:2: error: ELIF without IF
 t/25-hla/input/if_01.asm:9:2: error: ENDIF without IF
     %endif
      ^
-t/25-hla/input/if_01.asm:12:11: error: Unexpected token after ELSEIF: extra
+t/25-hla/input/if_01.asm:12:11: error: Unexpected token: "extra"
     %elseif z extra
               ^
-t/25-hla/input/if_01.asm:13:9: error: Unexpected token after ELIF: extra
+t/25-hla/input/if_01.asm:13:9: error: Unexpected token: "extra"
     %elif z extra
             ^
-t/25-hla/input/if_01.asm:14:7: error: Unexpected token after ELSE: extra
+t/25-hla/input/if_01.asm:14:7: error: Unexpected token: "extra"
     %else extra
           ^
-t/25-hla/input/if_01.asm:15:8: error: Unexpected token after ENDIF: extra
+t/25-hla/input/if_01.asm:15:8: error: Unexpected token: "extra"
     %endif extra
            ^
 t/25-hla/input/if_01.asm:20:2: error: ELSE already defined
