@@ -41,3 +41,5 @@ Diagnostic Options:
                 Dump the token stream after High-Level-Assembly processing and exit
   -dump-after-synth-expansion
                 Dump the token stream after synthetic opcode expansion and exit
+  -dump-after-parse
+                Dump the AST after parsing and exit

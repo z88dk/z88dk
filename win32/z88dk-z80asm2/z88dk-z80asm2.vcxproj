@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\diag.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_trie_token.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options_dump.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\pathnames.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_directives.cpp" />
@@ -163,6 +165,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\diag.h" />
@@ -181,6 +184,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_trie_token.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options_dump.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\pathnames.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h" />

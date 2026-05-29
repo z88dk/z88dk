@@ -8,6 +8,6 @@ t/25-hla/input/break_01.asm:1:2: error: BREAK without WHILE or REPEAT
 t/25-hla/input/break_01.asm:3:3: error: BREAK without WHILE or REPEAT
     	%break
     	 ^
-t/25-hla/input/break_01.asm:6:9: error: Unexpected token after BREAK: extra
+t/25-hla/input/break_01.asm:6:9: error: Unexpected token: "extra"
     	%break extra
     	       ^
