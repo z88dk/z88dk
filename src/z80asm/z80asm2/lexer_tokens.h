@@ -7,6 +7,7 @@
 #pragma once
 
 #include "lexer_keywords.h"
+#include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>
@@ -30,19 +31,19 @@ struct Token {
         int int_value;
         double float_value;
         StringInterner::Id str_value_id;
-    } value;
+    } value = {};
 
     SourceLoc loc;                          // 8 bytes
 
-    static Token token(TokenType type_, std::string_view text_,
+    static Token token(TokenType type_, std::string_view text,
                        const SourceLoc& loc);
-    static Token identifier(std::string_view text_,
+    static Token identifier(std::string_view ident,
                             const SourceLoc& loc);
-    static Token integer(std::string_view text_, int value,
+    static Token integer(std::string_view text, int value,
                          const SourceLoc& loc);
-    static Token floating(std::string_view text_, double value,
+    static Token floating(std::string_view text, double value,
                           const SourceLoc& loc);
-    static Token string(std::string_view text_, std::string_view value,
+    static Token string(std::string_view text, std::string_view value,
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
 };

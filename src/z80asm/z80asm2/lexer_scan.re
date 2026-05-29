@@ -289,6 +289,35 @@ void tokenize_scan_line(const ScanLine& line,
         out.push_back(Token::token(type, token_text, current_loc()));
     };
 
+    auto emit_ident = [&](std::string_view ident) {
+        std::string ident_s(ident);
+        Keyword keyword = keyword_lookup(ident_s);
+
+        // check for -ucase
+        if (g_args.options.ucase_symbols) {
+            ident_s = to_upper(ident_s);
+        }
+
+        // check for -IXIY
+        if (g_args.options.swap_ix_iy ) {
+            swap_ix_iy(ident_s, keyword);
+        }
+
+        // check for ASMPC
+        if (keyword == Keyword::ASMPC ) {
+            out.push_back(Token::token(TokenType::ASMPC, ident_s, current_loc()));
+            return;
+        }
+
+        // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
+        if (keyword_directive_has_file_arg(keyword)) {
+            raw_strings = true;
+        }
+
+        Token t = Token::identifier(ident_s, current_loc());
+        out.push_back(t);
+    };
+
     for (; idx < end; idx = static_cast<size_t>(p - line.text.c_str())) {
         // ------------------------------------------------------------
         // 1. If we are inside a multi-line comment, skip until "*/"
@@ -496,33 +525,23 @@ continue_lexing:
         }
 
         ident {
-            std::string ident = std::string(tok, p);
-            Keyword keyword = keyword_lookup(ident);
-
-            // check for -ucase
-            if (g_args.options.ucase_symbols) {
-                ident = to_upper(ident);
-            }
-
-            // check for -IXIY
-            if (g_args.options.swap_ix_iy) {
-                swap_ix_iy(ident, keyword);
-            }
-
-            // check for ASMPC
-            if (keyword == Keyword::ASMPC) {
-                out.push_back(Token::token(TokenType::ASMPC, ident, current_loc()));
-                continue;
-            }
-
-            // need raw strings after INCLUDE, BINARY, INCBIN, LINE, C_LINE
-            if (keyword_directive_has_file_arg(keyword)) {
-                raw_strings = true;
-            }
-
-            out.push_back(Token::identifier(ident, current_loc()));
+            std::string ident = std::string(tok, p);;
+            emit_ident(ident);
             continue;
         }
+
+        ident '@' ident {
+            std::string ident = std::string(tok, p);;
+            emit_ident(ident);
+            continue;
+        }
+
+        '@' ident {
+            std::string ident = std::string(tok, p);;
+            emit_ident(ident);
+            continue;
+        }
+
         */
     }
 }
