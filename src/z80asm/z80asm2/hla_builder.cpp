@@ -11,6 +11,7 @@
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
+#include "string_utils.h"
 #include <cassert>
 #include <memory>
 #include <unordered_map>
@@ -97,7 +98,7 @@ void HLA_ProgramBuilder::handle_if(Keyword kw, const SourceLoc& kw_loc,
     if (!condition) {
         return; // error already reported by parse_condition
     }
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -138,7 +139,7 @@ void HLA_ProgramBuilder::handle_elseif(Keyword kw, const SourceLoc& kw_loc,
     if (!condition) {
         return; // error already reported by parse_condition
     }
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -157,7 +158,7 @@ void HLA_ProgramBuilder::handle_else(Keyword kw, const SourceLoc& kw_loc,
         g_diag.error(kw_loc, to_string(kw) + " without IF");
         return;
     }
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -180,7 +181,7 @@ void HLA_ProgramBuilder::handle_endif(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -194,7 +195,7 @@ void HLA_ProgramBuilder::handle_while(Keyword kw, const SourceLoc& kw_loc,
         return; // error already reported by parse_condition
     }
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -218,7 +219,7 @@ void HLA_ProgramBuilder::handle_endwhile(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -227,7 +228,7 @@ void HLA_ProgramBuilder::handle_endwhile(Keyword kw, const SourceLoc& kw_loc,
 
 void HLA_ProgramBuilder::handle_repeat(Keyword kw, const SourceLoc& kw_loc,
                                        ParseLine& line) {
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -255,7 +256,7 @@ void HLA_ProgramBuilder::handle_until(Keyword kw, const SourceLoc& kw_loc,
         return; // error already reported by parse_condition
     }
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -287,7 +288,7 @@ void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
     Keyword reg_kw = line.peek().keyword;
     line.pos++;
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -319,7 +320,7 @@ void HLA_ProgramBuilder::handle_break(Keyword kw, const SourceLoc& kw_loc,
         }
     }
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -346,7 +347,7 @@ void HLA_ProgramBuilder::handle_continue(Keyword kw, const SourceLoc& kw_loc,
         }
     }
 
-    if (!line.check_end_of_line(kw)) {
+    if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
@@ -460,7 +461,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
     }
 
     line.error("Unexpected token in condition: " +
-               g_strings.to_string(line.peek().text_id));
+               escape_string(g_strings.to_string(line.peek().text_id)));
     return nullptr;
 }
 

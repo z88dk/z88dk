@@ -14,6 +14,7 @@ dump_after_macro_expansion	0
 dump_after_hla_expansion	0
 dump_after_synth_expansion	0
 dump_after_preprocessing	0
+dump_after_parse	0
 m4_options	-DOP=nop -DDUMMY=1
 perl_options	
 cpp_options	

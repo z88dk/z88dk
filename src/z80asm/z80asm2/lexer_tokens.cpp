@@ -11,12 +11,11 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
-#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 std::string to_string(TokenType token_type) {
     static const std::string_view lut[] = {
@@ -200,7 +199,7 @@ void ParseLine::error(std::string_view message) const {
     g_diag.error(peek().loc, message);
 }
 
-bool ParseLine::check_end_of_line(Keyword kw) {
+bool ParseLine::check_end_of_line() {
     while (pos < tokens.size() &&
             peek().type == TokenType::EndOfLine) {
         ++pos;
@@ -208,9 +207,8 @@ bool ParseLine::check_end_of_line(Keyword kw) {
 
     if (pos < tokens.size()) {
         g_diag.error(peek().loc,
-                     "Unexpected token after " +
-                     to_string(kw) +
-                     ": " + g_strings.to_string(peek().text_id));
+                     "Unexpected token: " +
+                     escape_string(g_strings.to_string(peek().text_id)));
         return false;
     }
 

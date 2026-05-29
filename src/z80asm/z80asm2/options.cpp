@@ -84,6 +84,7 @@ static const UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_PREPROCESSING,
             OptionType::DUMP_AFTER_HLA_EXPANSION,
             OptionType::DUMP_AFTER_SYNTH_EXPANSION,
+            OptionType::DUMP_AFTER_PARSE,
         }
     }
 };
@@ -393,16 +394,20 @@ void Args::parse_arg(std::string_view arg,
             options.dump_after_macro_expansion = true;
             return;
 
-        case OptionType::DUMP_AFTER_PREPROCESSING:
-            options.dump_after_preprocessing = true;
-            return;
-
         case OptionType::DUMP_AFTER_HLA_EXPANSION:
             options.dump_after_hla_expansion = true;
             return;
 
         case OptionType::DUMP_AFTER_SYNTH_EXPANSION:
             options.dump_after_synth_expansion = true;
+            return;
+
+        case OptionType::DUMP_AFTER_PREPROCESSING:
+            options.dump_after_preprocessing = true;
+            return;
+
+        case OptionType::DUMP_AFTER_PARSE:
+            options.dump_after_parse = true;
             return;
 
         default:
@@ -613,7 +618,8 @@ bool Args::parse_filename_entry(std::string_view line_,
     if (*p != '\0' && *p != ';' && *p != '#') {
         SourceLoc here_loc = in_out_loc;
         here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
-        g_diag.error(here_loc, "Unexpected text after filename: " + std::string(p));
+        g_diag.error(here_loc, "Unexpected text after filename: " +
+                     escape_string(std::string(p)));
         return false;
     }
 

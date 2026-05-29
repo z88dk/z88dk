@@ -8,7 +8,7 @@ t/20-preproc/input/ifdef_11.asm:1:7: error: Expected identifier after IFDEF
 t/20-preproc/input/ifdef_11.asm:3:8: error: Expected identifier after IFDEF
     #ifdef 23 ; no symbol
            ^
-t/20-preproc/input/ifdef_11.asm:5:10: error: Unexpected token after IFDEF: extra
+t/20-preproc/input/ifdef_11.asm:5:10: error: Unexpected token: "extra"
     #ifdef X extra ; extra input
              ^
 t/20-preproc/input/ifdef_11.asm:7:2: error: Unexpected ELSE directive without matching IF

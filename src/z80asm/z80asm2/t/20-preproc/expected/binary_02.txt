@@ -2,6 +2,6 @@
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/binary_02.asm...
-t/20-preproc/input/binary_02.asm:1:27: error: Unexpected token after BINARY: extra
+t/20-preproc/input/binary_02.asm:1:27: error: Unexpected token: "extra"
     binary file-not-found.bin extra
                               ^

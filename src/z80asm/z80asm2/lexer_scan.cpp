@@ -11,6 +11,7 @@
 #include "lexer_scan.h"
 #include "options.h"
 #include "source_loc.h"
+#include "string_utils.h"
 #include <charconv>
 #include <string>
 #include <vector>
@@ -507,8 +508,8 @@ continue_lexing:
 yy1:
             ++p;
             {
-                g_diag.error(current_loc(), "Unexpected character: '" +
-                             std::string(tok, p) + "'");
+                g_diag.error(current_loc(), "Unexpected character: " +
+                             escape_string(std::string(tok, p)));
                 return;
             }
 yy2:
