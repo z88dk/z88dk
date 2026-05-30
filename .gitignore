@@ -49,4 +49,4 @@ win32/z88dk.VC.db
 win32/.github/copilot-instructions.md
 
 .idea
-src/z80nm/.tidy-stamp
+**/.tidy-stamp

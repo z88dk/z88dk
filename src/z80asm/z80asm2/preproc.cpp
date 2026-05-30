@@ -8,9 +8,11 @@
 #include "file_mgr.h"
 #include "lexer_dump.h"
 #include "options.h"
+#include "parser.h"
 #include "preproc.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -263,21 +265,37 @@ void Preproc::split_lines(const std::vector<Token>& tokens, const SourceLoc& loc
         return;
     }
 
-    std::vector<Token> current_statement;
+    // skip leading label definition if present (Identifier followed by Colon at start)
+    ParseLine pline(tokens);
+    size_t start_pos = pline.pos; // start of the current statement
+    auto label = parse_label(pline);
+
+    // now split on colons and backslashes, except for colons that are part of ternary conditions
     int ternary_depth = 0; // tracks ? without matching :
 
-    for (size_t i = 0; i < tokens.size(); ++i) {
-        const Token& tok = tokens[i];
+    auto push_statement = [&](size_t end_pos) {
+        std::vector<Token> current_statement;
+        current_statement.insert(current_statement.end(),
+                                 pline.tokens.begin() + start_pos, pline.tokens.begin() + end_pos);
 
-        // Check for label definition exception: Identifier followed by Colon at start
-        if (i == 0 && tok.type == TokenType::Identifier &&
-                i + 1 < tokens.size() && tokens[i + 1].type == TokenType::Colon) {
-            // Add both identifier and colon, don't split
-            current_statement.push_back(tok);
-            current_statement.push_back(tokens[i + 1]);
-            i++; // skip the colon since we've already processed it
-            continue;
+        if (current_statement.empty()) {
+            current_statement.push_back(Token::end_of_line(loc));
         }
+        else if (current_statement.back().type != TokenType::EndOfLine) {
+            const Token& last = current_statement.back();
+            std::string_view text = g_strings.view(last.text_id);
+            SourceLoc eol_loc = last.loc;
+            eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+            current_statement.push_back(Token::end_of_line(eol_loc));
+        }
+
+        LogicalLine line(current_statement.empty() ? loc : current_statement[0].loc);
+        line.tokens = std::move(current_statement);
+        out_lines.push_back(std::move(line));
+    };
+
+    while (pline.pos < pline.tokens.size()) {
+        const Token& tok = pline.peek();
 
         // Track ternary depth
         if (tok.type == TokenType::Question) {
@@ -300,34 +318,15 @@ void Preproc::split_lines(const std::vector<Token>& tokens, const SourceLoc& loc
         }
 
         if (is_splitter) {
-            // Push current statement with EndOfLine
-            if (!current_statement.empty()) {
-                current_statement.push_back(Token::end_of_line(tok.loc));
-                LogicalLine line(current_statement.empty() ? loc : current_statement[0].loc);
-                line.tokens = std::move(current_statement);
-                out_lines.push_back(std::move(line));
-                current_statement.clear();
-            }
+            push_statement(pline.pos);
+            start_pos = pline.pos + 1; // start of next statement is after the splitter
         }
-        else {
-            // Add token to current statement
-            current_statement.push_back(tok);
-        }
+        pline.advance();
     }
 
-    // Push any remaining statement
-    if (!current_statement.empty()) {
-        // Ensure the statement ends with EndOfLine
-        if (current_statement.back().type != TokenType::EndOfLine) {
-            const Token& last = current_statement.back();
-            std::string_view text = g_strings.view(last.text_id);
-            SourceLoc eol_loc = last.loc;
-            eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
-            current_statement.push_back(Token::end_of_line(eol_loc));
-        }
-        LogicalLine line(current_statement[0].loc);
-        line.tokens = std::move(current_statement);
-        out_lines.push_back(std::move(line));
+    if (pline.pos > start_pos) {
+        // Push the last statement after the final splitter
+        push_statement(pline.pos);
     }
 }
 
