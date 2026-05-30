@@ -43,6 +43,15 @@ Token Token::identifier(std::string_view ident, const SourceLoc& loc) {
     return t;
 }
 
+Token Token::local_label(std::string_view ident, size_t at_pos, const SourceLoc& loc) {
+    Token t;
+    t.type = TokenType::LocalLabel;
+    t.text_id = g_strings.intern(ident);
+    t.value.label_at_pos = at_pos;
+    t.loc = loc;
+    return t;
+}
+
 Token Token::integer(std::string_view text, int value,
                      const SourceLoc& loc) {
     Token t;
