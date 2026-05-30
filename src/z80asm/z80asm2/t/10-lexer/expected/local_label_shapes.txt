@@ -5,11 +5,11 @@ Assembling t/10-lexer/input/local_label_shapes.asm...
 # file: t/10-lexer/input/local_label_shapes.asm
 Identifier	"aaa"	1:1	
 EndOfLine	"\n"	1:4	
-Identifier	"aaa@bbb"	2:1	
+LocalLabel	"aaa@bbb"	2:1	label_at_pos=3 
 EndOfLine	"\n"	2:8	
-Identifier	"@bbb"	3:1	
+LocalLabel	"@bbb"	3:1	label_at_pos=0 
 EndOfLine	"\n"	3:5	
-Identifier	"aaa@bbb"	4:1	
-Identifier	"@ccc"	4:8	
+LocalLabel	"aaa@bbb"	4:1	label_at_pos=3 
+LocalLabel	"@ccc"	4:8	label_at_pos=0 
 EndOfLine	"\n"	4:12	
 EndOfLine	"\n"	5:1	

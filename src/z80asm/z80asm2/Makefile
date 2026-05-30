@@ -21,7 +21,7 @@ endif
 
 # re2c: generate C/C++ sources from .re files
 RE2C ?= re2c
-RE2CFLAGS ?= -W --no-debug-info --no-generation-date
+RE2CFLAGS ?= -W --no-debug-info --no-generation-date --tags
 
 OBJ_DIR = obj
 
@@ -35,10 +35,10 @@ DEPENDS := $(OBJS:.o=.d)
 STYLE_WIDTH = 100
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
-		  --max-code-length=$(STYLE_WIDTH) --lineend=linux --formatted \
-		  --recursive
+		  --max-code-length=$(STYLE_WIDTH) --lineend=linux --formatted 
 PERLTIDY = perltidy --indent-columns=4 --continuation-indentation=4 \
 		  --maximum-line-length=$(STYLE_WIDTH) -b
+TIDY_STAMP = .tidy-stamp
 
 all: $(PROJ)$(EXE)
 
@@ -74,8 +74,12 @@ test:: $(PROJ)$(EXE)
 	perl -S prove -j9 --state=slow,save t/*.t t/*/*.t
 
 tidy:
-	$(ASTYLE) "*.cpp" "*.h" "*.re"
-	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) -exec $(PERLTIDY) {} +
+	@[ -f $(TIDY_STAMP) ] || touch -t 197001010000 $(TIDY_STAMP)
+	find . \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.re' \) \
+		-newer $(TIDY_STAMP) -exec $(ASTYLE) {} +
+	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) \
+		-newer $(TIDY_STAMP) -exec $(PERLTIDY) {} +
+	touch $(TIDY_STAMP)
 
 cloc:
 	perl -S cloc --fullpath .
@@ -96,7 +100,7 @@ CLEAN_FILES = \
   )
 
 clean:
-	$(RM) $(PROJ) $(PROJ)$(EXE) $(CLEAN_FILES)
+	$(RM) $(PROJ) $(PROJ)$(EXE) $(CLEAN_FILES) $(TIDY_STAMP)
 	$(RM) -r $(OBJ_DIR)
 
 -include $(DEPENDS)

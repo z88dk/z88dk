@@ -265,6 +265,8 @@ void tokenize_scan_line(const ScanLine& line,
 
     const char* p = line.text.c_str();
     const char* limit = p + line.text.size();
+    const char* p1 = p;
+    const char* yyt1 = p;
     size_t idx = 0, start = 0;
     size_t end = line.text.size();
     auto current_loc = [&]() -> SourceLoc {
@@ -316,6 +318,18 @@ void tokenize_scan_line(const ScanLine& line,
         }
 
         Token t = Token::identifier(ident_s, current_loc());
+        out.push_back(t);
+    };
+
+    auto emit_local_label = [&](std::string_view ident, size_t at_pos) {
+        std::string ident_s(ident);
+
+        // check for -ucase
+        if (g_args.options.ucase_symbols) {
+            ident_s = to_upper(ident_s);
+        }
+
+        Token t = Token::local_label(ident_s, at_pos, current_loc());
         out.push_back(t);
     };
 
@@ -526,20 +540,21 @@ continue_lexing:
         }
 
         ident {
-            std::string ident = std::string(tok, p);;
+            std::string ident = std::string(tok, p);
             emit_ident(ident);
             continue;
         }
 
-        ident '@' ident {
-            std::string ident = std::string(tok, p);;
-            emit_ident(ident);
+        ident @p1 '@' ident {
+            std::string ident = std::string(tok, p);
+            size_t at_pos = static_cast<size_t>(p1 - tok);
+            emit_local_label(ident, at_pos);
             continue;
         }
 
         '@' ident {
-            std::string ident = std::string(tok, p);;
-            emit_ident(ident);
+            std::string ident = std::string(tok, p);
+            emit_local_label(ident, 0);
             continue;
         }
 
