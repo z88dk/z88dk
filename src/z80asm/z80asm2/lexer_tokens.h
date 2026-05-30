@@ -31,6 +31,7 @@ struct Token {
         int int_value;
         double float_value;
         StringInterner::Id str_value_id;
+        size_t label_at_pos;                // position of '@' in text_id
     } value = {};
 
     SourceLoc loc;                          // 8 bytes
@@ -39,6 +40,8 @@ struct Token {
                        const SourceLoc& loc);
     static Token identifier(std::string_view ident,
                             const SourceLoc& loc);
+    static Token local_label(std::string_view ident, size_t at_pos,
+                             const SourceLoc& loc);
     static Token integer(std::string_view text, int value,
                          const SourceLoc& loc);
     static Token floating(std::string_view text, double value,

@@ -12,12 +12,15 @@ Program
     Stmt
         Location: t/40-syntax/input/label_01.asm:3:1
         Label: global@local1
+        Local part: @local1
     Stmt
         Location: t/40-syntax/input/label_01.asm:4:1
         Label: global@local2
+        Local part: @local2
     Stmt
         Location: t/40-syntax/input/label_01.asm:5:1
         Label: @local3
+        Local part: @local3
     Stmt
         Location: t/40-syntax/input/label_01.asm:6:1
         Label: local4
