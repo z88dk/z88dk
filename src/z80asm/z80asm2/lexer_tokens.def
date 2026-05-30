@@ -8,6 +8,7 @@ X(None,         "")
 
 // Literals
 X(Identifier,   "Identifier")
+X(LocalLabel,   "LocalLabel")
 X(Integer,      "Integer")
 X(Float,        "Float")
 X(String,       "String")
