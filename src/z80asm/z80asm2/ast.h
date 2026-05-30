@@ -60,6 +60,14 @@ struct ExprSymbol : Expr {
     void dump(DumpContext ctx) const override;
 };
 
+struct ExprLocalLabel : Expr {
+    StringInterner::Id name_id;
+    size_t at_pos;  // position of '@' in the original identifier
+    ExprLocalLabel(StringInterner::Id name_id_, size_t at_pos_, const SourceLoc& loc)
+        : Expr(loc), name_id(name_id_), at_pos(at_pos_) {}
+    void dump(DumpContext ctx) const override;
+};
+
 struct ExprUnary : Expr {
     TokenType op;
     std::unique_ptr<Expr> rhs;
@@ -96,6 +104,8 @@ struct Stmt : AstNode {
 
 struct LabelStmt : Stmt {
     StringInterner::Id text_id;
+    bool is_local = false;  // whether this is a local label (has '@')
+    size_t at_pos = 0;      // position of '@' in the original identifier, if local
 
     LabelStmt(StringInterner::Id text_id_, const SourceLoc& loc_);
     virtual ~LabelStmt() = default;

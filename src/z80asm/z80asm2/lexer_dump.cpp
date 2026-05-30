@@ -40,6 +40,10 @@ void dump_token(const Token& token) {
         std::cout << "str_value=" <<
                   escape_string(g_strings.view(token.value.str_value_id)) << " ";
     }
+    else if (token.type == TokenType::LocalLabel) {
+        std::cout << "label_at_pos=" <<
+                  std::to_string(token.value.label_at_pos) << " ";
+    }
 
     std::cout << std::endl;
 }

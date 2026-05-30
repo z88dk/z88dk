@@ -35,6 +35,7 @@ struct ConstEvalSem {
     void literal_float(const Token& tok);
     bool literal_asmpc(const Token& tok);
     bool symbol(const Token& tok);
+    bool local_label(const Token& tok);
     void unary(TokenType op, const SourceLoc& loc);
     void binary(TokenType op, const SourceLoc& loc);
     void ternary(const SourceLoc& loc);
@@ -60,6 +61,7 @@ struct SpanSem {
     void literal_float(const Token&) {}
     bool literal_asmpc(const Token&);
     bool symbol(const Token&);
+    bool local_label(const Token&);
     void unary(TokenType, const SourceLoc&) {}
     void binary(TokenType, const SourceLoc&) {}
     void ternary(const SourceLoc&) {}
@@ -83,6 +85,7 @@ struct ExprSem {
     void literal_float(const Token& tok);
     bool literal_asmpc(const Token& tok);
     bool symbol(const Token& tok);
+    bool local_label(const Token& tok);
     void unary(TokenType op, const SourceLoc& loc);
     void binary(TokenType op, const SourceLoc& loc);
     void ternary(const SourceLoc& loc);
@@ -180,6 +183,10 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
     case TokenType::Identifier:
         pline.advance();
         return sem.symbol(tok);
+
+    case TokenType::LocalLabel:
+        pline.advance();
+        return sem.local_label(tok);
 
     case TokenType::Dollar:
     case TokenType::ASMPC:

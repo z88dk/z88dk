@@ -38,7 +38,11 @@ LabelStmt::LabelStmt(StringInterner::Id text_id_, const SourceLoc& loc_)
 void LabelStmt::dump(DumpContext ctx) const {
     Stmt::dump(ctx);
     auto c = ctx.child();
-    c.line("Label: " + g_strings.to_string(text_id));
+    std::string ident_str = g_strings.to_string(text_id);
+    c.line("Label: " + ident_str);
+    if (is_local) {
+        c.line("Local part: " + ident_str.substr(at_pos));
+    }
 }
 
 void Program::dump(DumpContext ctx) const {
@@ -71,6 +75,10 @@ void ExprSymbol::dump(DumpContext ctx) const {
     ctx.line("ExprSymbol: " + g_strings.to_string(name_id));
 }
 
+void ExprLocalLabel::dump(DumpContext ctx) const {
+    ctx.line("ExprLocalLabel: " + g_strings.to_string(name_id) + " @ " + std::to_string(at_pos));
+}
+
 void ExprUnary::dump(DumpContext ctx) const {
     ctx.line("ExprUnary: " + to_string(op));
     auto c = ctx.child();
@@ -97,3 +105,4 @@ void ExprTernary::dump(DumpContext ctx) const {
     c.line("Else:");
     else_expr->dump(c.child());
 }
+

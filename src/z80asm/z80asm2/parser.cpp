@@ -21,9 +21,29 @@ std::unique_ptr<LabelStmt> parse_label(ParseLine& pline) {
         return label;
     }
 
+    // .label@local
+    if (pline.peek().type == TokenType::Dot && pline.peek(1).type == TokenType::LocalLabel) {
+        auto label = std::make_unique<LabelStmt>(pline.peek(1).text_id, pline.peek().loc);
+        label->is_local = true;
+        label->at_pos = pline.peek(1).value.label_at_pos;
+        pline.advance();
+        pline.advance();
+        return label;
+    }
+
     // label:
     if (pline.peek().type == TokenType::Identifier && pline.peek(1).type == TokenType::Colon) {
         auto label = std::make_unique<LabelStmt>(pline.peek().text_id, pline.peek().loc);
+        pline.advance();
+        pline.advance();
+        return label;
+    }
+
+    // label@local:
+    if (pline.peek().type == TokenType::LocalLabel && pline.peek(1).type == TokenType::Colon) {
+        auto label = std::make_unique<LabelStmt>(pline.peek().text_id, pline.peek().loc);
+        label->is_local = true;
+        label->at_pos = pline.peek().value.label_at_pos;
         pline.advance();
         pline.advance();
         return label;

@@ -156,6 +156,14 @@ bool ConstEvalSem::symbol(const Token& tok) {
     }
 }
 
+bool ConstEvalSem::local_label(const Token& tok) {
+    if (!silent) {
+        g_diag.error(tok.loc, "Local labels are not allowed in a constant expression");
+    }
+    push(0);
+    return false;
+}
+
 void ConstEvalSem::unary(TokenType op, const SourceLoc& ) {
     int v = pop();
     switch (op) {
@@ -442,6 +450,10 @@ bool SpanSem::symbol(const Token&) {
     return true;
 }
 
+bool SpanSem::local_label(const Token&) {
+    return true;
+}
+
 bool parse_expression_span(ParseLine& pline) {
     size_t pos0 = pline.pos;
     SpanSem sem;
@@ -476,6 +488,11 @@ bool ExprSem::literal_asmpc(const Token& tok) {
 
 bool ExprSem::symbol(const Token& tok) {
     stack.push_back(std::make_unique<ExprSymbol>(tok.text_id, tok.loc));
+    return true;
+}
+
+bool ExprSem::local_label(const Token& tok) {
+    stack.push_back(std::make_unique<ExprLocalLabel>(tok.text_id, tok.value.label_at_pos, tok.loc));
     return true;
 }
 
