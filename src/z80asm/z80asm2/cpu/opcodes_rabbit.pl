@@ -901,8 +901,7 @@ sub parse_r6k_opcode {
             $data->{ops}[$i] = oct( "0b" . $data->{ops}[$i] );
             $data->{ops}[$i] = $data->{ops}[$i] . "+(%c<8?%c*8:%c)";
             $data->{asm} =~ s/\bv\b/%c/;
-            $data->{const} = [ 2,    3,    4,    5,    7,
-                               0x10, 0x18, 0x20, 0x28, 0x38 ];
+            $data->{const} = [ 2, 3, 4, 5, 7, 0x10, 0x18, 0x20, 0x28, 0x38 ];
             return parse_r6k_opcode( $opcodes, $cpu, $data );
         }
         elsif ( $data->{ops}[$i] =~ /[01]{2}-b-[01]{3}/ ) {

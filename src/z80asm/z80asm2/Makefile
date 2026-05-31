@@ -64,7 +64,8 @@ $(OBJ_DIR)/opcodes.o: opcodes_trie_token.h
 $(OBJ_DIR)/opcodes_trie_token.o: opcodes_trie_token.cpp opcodes_trie_token.h
 
 opcodes_trie_token.h opcodes_trie_token.cpp \
-opcodes_synth_trie.h opcodes_synth_trie.cpp &: \
+opcodes_synth_trie.h opcodes_synth_trie.cpp \
+opcodes_parse_trie.h opcodes_parse_trie.cpp &: \
 		$(wildcard *.def) \
 		$(wildcard cpu/*.dat cpu/*.pl cpu/*.pm) \
 		Makefile cpu/Makefile 

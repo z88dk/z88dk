@@ -200,8 +200,8 @@ void ParseLine::advance() {
     }
 }
 
-bool ParseLine::eof() const {
-    return pos >= tokens.size();
+bool ParseLine::eol() const {
+    return pos >= tokens.size() || peek().type == TokenType::EndOfLine;
 }
 
 void ParseLine::error(std::string_view message) const {
