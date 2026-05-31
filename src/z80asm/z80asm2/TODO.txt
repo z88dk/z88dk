@@ -2,9 +2,6 @@
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
 - Add -MD to generate .d file
-- Keywords must be stored in lower case, for sythetic opcodes to be valid
-  EXTERN __Z80ASM__ADD_BC_A : CALL __Z80ASM__ADD_BC_A ; is not valid, as the library has 
-  lower case function names
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)

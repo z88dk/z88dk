@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include "string_utils.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -213,7 +214,7 @@ void interpret_synth_bytecode(const SynthMatch& match,
             else {
                 Keyword kw = to_keyword(trie_token);
                 if (kw != Keyword::None) {
-                    Token t = Token::identifier(to_string(kw), get_end_loc());
+                    Token t = Token::identifier(to_lower(to_string(kw)), get_end_loc());
                     cur.tokens.push_back(t);
                 }
                 else {
