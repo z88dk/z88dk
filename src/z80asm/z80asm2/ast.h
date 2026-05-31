@@ -9,6 +9,7 @@
 #include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <string_view>
@@ -101,12 +102,81 @@ struct ExprCallUnary : Expr {
     void dump(DumpContext ctx) const override;
 };
 
+// check range of contant expression
+enum class CheckRange : uint8_t {
+    Is_any,
+    Is_0,
+    Is_0_1_2,
+    Is_0_1_2_3,
+    Is_0_1_2_3_4_5_6_7,
+    Is_1_2_3_4_5_6_7_0_8_10_18_20_28_30_38,
+    Is_2_3_4_5_7_10_18_20_28_38,
+    Is_1_2_4,
+    Is_1_2_4_8,
+    Is_40,
+    Is_8,
+};
+
+// formula for constant expression patching in opcodes
+enum class ExprFormula : uint8_t {
+    None,                           // no patching needed
+    ScaleBelowThreshold,            // A+(%c<8?%c*8:%c), followed by A
+    AddScaled,                      // A+B*%c, followed by A, B
+    SelectOrAdd,                    // %c==A?B:C+%c, followed by A, B, C
+    Select2,                        // %c==A?B:%c==C?D:E, followed by A, B, C, D, E
+    Select3,                        // %c==A?B:%c==C?D:%c==E?F:G, followed by A, B, C, D, E, F, G
+};
+
+// type of patch
+enum class PatchType : uint8_t {
+    Unsigned,                       // unsigned, default
+    Signed,                         // signed
+    HighByte,                       // ldh a, (%h) of gbz80
+    BigEndian,                      // push %M of z80n
+    PCrelative,                     // JR or JRE
+};
+
+// class for patches
+struct Patch : Expr {
+    virtual ~Patch();
+
+    std::unique_ptr<Expr> inner;    // inner expression
+    uint8_t offset = 0;             // offset into opcode
+    uint8_t size = 0;               // byte width of expression
+
+    bool is_constant = false;       // true for %c patches, e.g. IM %c or BIT %c, r
+
+    PatchType type = PatchType::Unsigned;       // type of patch
+    CheckRange validation = CheckRange::Is_any; // validation rule for constant expressions
+    ExprFormula formula = ExprFormula::None;    // formula constant expressions
+    std::vector<uint8_t> coefs;                 // coeficients for formula A..G
+
+    uint8_t alt_offset = 0;         // alternative offset of long jump
+    uint8_t alt_size = 0;           // alternative size of long jump
+    std::vector<uint8_t> alt_bytes; // alternative opcode of long jump
+
+    Patch(std::unique_ptr<Expr> expr, const SourceLoc& loc)
+        : Expr(loc), inner(std::move(expr)) {}
+    void dump(DumpContext ctx) const override;
+};
+
 // base class for all statements
 struct Stmt : AstNode {
     SourceLoc loc;
 
     explicit Stmt(const SourceLoc& loc_) : loc(loc_) {}
     virtual ~Stmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct OpcodeStmt : Stmt {
+    uint32_t address = 0;           // defined after layout
+    bool is_short_jump = false;     // true if patches has a short jump
+
+    std::vector<uint8_t> bytes;     // opcode bytes, including placeholders for expressions
+    std::vector<std::unique_ptr<Patch>> patches;    // instruction patches
+
+    OpcodeStmt(const SourceLoc& loc) : Stmt(loc) {}
     void dump(DumpContext ctx) const override;
 };
 

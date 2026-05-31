@@ -3,24 +3,24 @@ Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/40-syntax/input/label_01.asm...
 Program
-    Stmt
+    LabelStmt
         Location: t/40-syntax/input/label_01.asm:1:1
         Label: label1
-    Stmt
+    LabelStmt
         Location: t/40-syntax/input/label_01.asm:2:1
         Label: label2
-    Stmt
+    LabelStmt
         Location: t/40-syntax/input/label_01.asm:3:1
         Label: global@local1
         Local part: @local1
-    Stmt
+    LabelStmt
         Location: t/40-syntax/input/label_01.asm:4:1
         Label: global@local2
         Local part: @local2
-    Stmt
+    LabelStmt
         Location: t/40-syntax/input/label_01.asm:5:1
         Label: @local3
         Local part: @local3
-    Stmt
+    LabelStmt
         Location: t/40-syntax/input/label_01.asm:6:1
         Label: local4

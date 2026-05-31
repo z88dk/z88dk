@@ -201,10 +201,11 @@ sub output_cpp {
                 or die "accepting node $node->{_id} has no value\n" . dump($node);
             $first_transition_id = 0;     # not used, but set to a valid value for consistency
         }
-        $cpp .= "    { $first_transition_id, $num_transitions, $value_id }, "
-            . "// node $node->{_id}: $node->{_path};$value_id_str\n";
+        $cpp .=
+              "    /* node $node->{_id} */ { $first_transition_id, $num_transitions, $value_id }, "
+            . "// $node->{_path},$value_id_str\n";
     }
-    $cpp .= "};\n";
+    $cpp .= "};\n\n";
 
     # TrieTransition table
     my $num_transitions = @{ $self->transitions };
@@ -212,15 +213,13 @@ sub output_cpp {
     for my $trans ( @{ $self->transitions } ) {
         my $node_from = $self->nodes->[ $trans->{from} ];
         my $node_to   = $self->nodes->[ $trans->{to} ];
-        my $key       = $trans->{token} =~ s/TrieToken:://r;
 
         if ( $trans->{first} ) {
-            $cpp .= "    // transitions $trans->{id}... "
-                . "from node $trans->{from} ($node_from->{_path})\n";
+            $cpp .= "\n    // from node $trans->{from} ($node_from->{_path})\n";
         }
-        $cpp .= "    { $trans->{token}, $trans->{to} }, // to node $trans->{to} on $key\n";
+        $cpp .= "    /* trans $trans->{id} */ { $trans->{token}, $trans->{to} },\n";
     }
-    $cpp .= "};\n";
+    $cpp .= "};\n\n";
 
     return $cpp;
 }
