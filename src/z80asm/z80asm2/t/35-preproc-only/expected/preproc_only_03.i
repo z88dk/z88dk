@@ -1,16 +1,16 @@
 # 2 "t/35-preproc-only/input/preproc_only_03.asm"
  push bc
 # 2
- LD B,D
+ ld b,d
 # 2
- LD C,E
+ ld c,e
 # 2
- LD D,H
+ ld d,h
 # 2
- LD E,L
+ ld e,l
 # 2
- LD H,B
+ ld h,b
 # 2
- LD L,C
+ ld l,c
 # 2
  pop bc
