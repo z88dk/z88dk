@@ -1,0 +1,501 @@
+% z88dk-z80asm -v -mr4k -dump-after-parse t/40-syntax//input/opcodes_01.asm
+Define constant: __CPU_RABBIT__ = 1
+Define constant: __CPU_R4K__ = 1
+Assembling t/40-syntax/input/opcodes_01.asm...
+t/40-syntax/input/opcodes_01.asm:9:1: error: Unrecognized instruction or directive
+    out (bc), 0             ; Is_0, None
+    ^
+t/40-syntax/input/opcodes_01.asm:10:1: error: Unrecognized instruction or directive
+    im 1                    ; Is_0_1_2, Is_0_1_2_3, Select2, Select3
+    ^
+t/40-syntax/input/opcodes_01.asm:15:6: error: Unrecognized instruction or directive
+    rst v, $40              ; Is_40, None
+         ^
+t/40-syntax/input/opcodes_01.asm:16:5: error: Unrecognized instruction or directive
+    rla 8, bcde             ; Is_8, None
+        ^
+t/40-syntax/input/opcodes_01.asm:23:1: error: Unrecognized instruction or directive
+    ldh (0x01), a           ; HighByte
+    ^
+t/40-syntax/input/opcodes_01.asm:24:1: error: Unrecognized instruction or directive
+    ldh (0xFF01), a         ; HighByte
+    ^
+Program
+    LabelStmt
+        Location: t/40-syntax/input/opcodes_01.asm:1:1
+        Label: label
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:1:1
+        Address: 0
+        Bytes: 0
+    LabelStmt
+        Location: t/40-syntax/input/opcodes_01.asm:2:1
+        Label: label
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:2:1
+        Address: 0
+        Bytes: 0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:3:1
+        Address: 0
+        Bytes: 0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:4:1
+        Address: 0
+        Bytes: $7F $78
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:5:1
+        Address: 0
+        Bytes: $3E 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprBinary: +
+                        LHS:
+                            ExprSymbol: b
+                        RHS:
+                            ExprLiteralInt: 1
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:6:1
+        Address: 0
+        Bytes: $76 $DB $DD $CB 0 0
+        Patches:
+            Patch
+                Offset: 5, Size: 1
+                Constant patch
+                Type: Unsigned
+                Validation: 0-7
+                Formula: AddScaled
+                Coefficients: $46, 8
+                Inner expression:
+                    ExprLiteralInt: 0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:7:1
+        Address: 0
+        Bytes: $ED $B0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:8:1
+        Address: 0
+        Is short jump
+        Bytes: $ED $10 0
+        Patches:
+            Patch
+                Offset: 2, Size: 1
+                Type: PCrelative
+                Validation: Any
+                Formula: None
+                Short jump (alt offset: 2, alt size: 2)
+                Alt bytes: $0B $C2 0 0
+                Inner expression:
+                    ExprSymbol: label
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:11:1
+        Address: 0
+        Bytes: $CB 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Constant patch
+                Type: Unsigned
+                Validation: 0-7
+                Formula: AddScaled
+                Coefficients: $47, 8
+                Inner expression:
+                    ExprLiteralInt: 0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:12:1
+        Address: 0
+        Bytes: 0
+        Patches:
+            Patch
+                Offset: 0, Size: 1
+                Constant patch
+                Type: Unsigned
+                Validation: 2-5,7,10,18,20,28,38
+                Formula: ScaleBelowThreshold
+                Coefficients: $C7
+                Inner expression:
+                    ExprLiteralInt: $20
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:13:1
+        Address: 0
+        Bytes: $DD 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Constant patch
+                Type: Unsigned
+                Validation: 1,2,4
+                Formula: AddScaled
+                Coefficients: $67, 1
+                Inner expression:
+                    ExprLiteralInt: 4
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:14:1
+        Address: 0
+        Bytes: $DD 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Constant patch
+                Type: Unsigned
+                Validation: 1,2,4,8
+                Formula: SelectOrAdd
+                Coefficients: 8, $4F, $47
+                Inner expression:
+                    ExprLiteralInt: 8
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:17:1
+        Address: 0
+        Bytes: $DD 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Constant patch
+                Type: Unsigned
+                Validation: 1,2,4,8
+                Formula: SelectOrAdd
+                Coefficients: 8, $4F, $47
+                Inner expression:
+                    ExprLiteralInt: 1
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:18:1
+        Address: 0
+        Bytes: $3E 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprBinary: +
+                        LHS:
+                            ExprLiteralInt: 1
+                        RHS:
+                            ExprBinary: *
+                                LHS:
+                                    ExprLiteralInt: 2
+                                RHS:
+                                    ExprLiteralInt: 3
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:19:1
+        Address: 0
+        Bytes: $3A 0 0
+        Patches:
+            Patch
+                Offset: 1, Size: 2
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprBinary: +
+                        LHS:
+                            ExprLiteralInt: 1
+                        RHS:
+                            ExprBinary: *
+                                LHS:
+                                    ExprLiteralInt: 2
+                                RHS:
+                                    ExprLiteralInt: 3
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:20:1
+        Address: 0
+        Bytes: $DD $7E 0
+        Patches:
+            Patch
+                Offset: 2, Size: 1
+                Type: Signed
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprBinary: +
+                        LHS:
+                            ExprUnary: +
+                                RHS:
+                                    ExprLiteralInt: 1
+                        RHS:
+                            ExprBinary: *
+                                LHS:
+                                    ExprLiteralInt: 2
+                                RHS:
+                                    ExprLiteralInt: 3
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:21:1
+        Address: 0
+        Bytes: $7E
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:22:1
+        Address: 0
+        Bytes: $0A
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:25:1
+        Address: 0
+        Bytes: $ED $A5 0 0
+        Patches:
+            Patch
+                Offset: 2, Size: 2
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: $1234
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:26:1
+        Address: 0
+        Is short jump
+        Bytes: $18 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: PCrelative
+                Validation: Any
+                Formula: None
+                Short jump (alt offset: 1, alt size: 2)
+                Alt bytes: $C3 0 0
+                Inner expression:
+                    ExprSymbol: label
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:27:1
+        Address: 0
+        Is short jump
+        Bytes: $30 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: PCrelative
+                Validation: Any
+                Formula: None
+                Short jump (alt offset: 1, alt size: 2)
+                Alt bytes: $D2 0 0
+                Inner expression:
+                    ExprSymbol: label
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:28:1
+        Address: 0
+        Bytes: $98 0 0
+        Patches:
+            Patch
+                Offset: 1, Size: 2
+                Type: PCrelative
+                Validation: Any
+                Formula: None
+                Short jump (alt offset: 0, alt size: 0)
+                Inner expression:
+                    ExprSymbol: label
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:29:1
+        Address: 0
+        Bytes: $DD $71 0
+        Patches:
+            Patch
+                Offset: 2, Size: 1
+                Type: Signed
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprUnary: +
+                        RHS:
+                            ExprBinary: +
+                                LHS:
+                                    ExprUnary: +
+                                        RHS:
+                                            ExprLiteralInt: 1
+                                RHS:
+                                    ExprBinary: *
+                                        LHS:
+                                            ExprLiteralInt: 2
+                                        RHS:
+                                            ExprLiteralInt: 3
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:29:1
+        Address: 0
+        Bytes: $DD $70 0
+        Patches:
+            Patch
+                Offset: 2, Size: 1
+                Type: Signed
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprUnary: +
+                        RHS:
+                            ExprCallUnary: SIGNED8
+                                Arg:
+                                    ExprBinary: +
+                                        LHS:
+                                            ExprBinary: +
+                                                LHS:
+                                                    ExprUnary: +
+                                                        RHS:
+                                                            ExprLiteralInt: 1
+                                                RHS:
+                                                    ExprBinary: *
+                                                        LHS:
+                                                            ExprLiteralInt: 2
+                                                        RHS:
+                                                            ExprLiteralInt: 3
+                                        RHS:
+                                            ExprLiteralInt: 1
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:30:1
+        Address: 0
+        Bytes: $EB
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:30:1
+        Address: 0
+        Bytes: $21 0 0
+        Patches:
+            Patch
+                Offset: 1, Size: 2
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprCallUnary: UNSIGNED8
+                        Arg:
+                            ExprBinary: +
+                                LHS:
+                                    ExprUnary: +
+                                        RHS:
+                                            ExprLiteralInt: 1
+                                RHS:
+                                    ExprBinary: *
+                                        LHS:
+                                            ExprLiteralInt: 2
+                                        RHS:
+                                            ExprLiteralInt: 3
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:30:1
+        Address: 0
+        Bytes: $39
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:30:1
+        Address: 0
+        Bytes: $EB
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:31:1
+        Address: 0
+        Bytes: $7E
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:32:1
+        Address: 0
+        Bytes: $DD $7E 0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:33:1
+        Address: 0
+        Bytes: $3A 0 0
+        Patches:
+            Patch
+                Offset: 1, Size: 2
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprBinary: +
+                        LHS:
+                            ExprSymbol: b
+                        RHS:
+                            ExprSymbol: c
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:34:1
+        Address: 0
+        Bytes: $3E 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprUnary: -
+                        RHS:
+                            ExprLiteralInt: 1
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:35:1
+        Address: 0
+        Bytes: $3E 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprUnary: ~
+                        RHS:
+                            ExprLiteralInt: 1
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:36:1
+        Address: 0
+        Bytes: $DD $7E 0
+        Patches:
+            Patch
+                Offset: 2, Size: 1
+                Type: Signed
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprUnary: -
+                        RHS:
+                            ExprLiteralInt: 3
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:37:1
+        Address: 0
+        Bytes: $FD $7E 0
+        Patches:
+            Patch
+                Offset: 2, Size: 1
+                Type: Signed
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprUnary: +
+                        RHS:
+                            ExprUnary: -
+                                RHS:
+                                    ExprLiteralInt: 2
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:38:1
+        Address: 0
+        Bytes: $E9
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:39:1
+        Address: 0
+        Bytes: $DD $E9
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:40:1
+        Address: 0
+        Bytes: $C3 0 0
+        Patches:
+            Patch
+                Offset: 1, Size: 2
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: $4D2
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:41:1
+        Address: 0
+        Bytes: $C9
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:42:1
+        Address: 0
+        Bytes: $C0
+    OpcodeStmt
+        Location: t/40-syntax/input/opcodes_01.asm:43:1
+        Address: 0
+        Bytes: $3E 0
+        Patches:
+            Patch
+                Offset: 1, Size: 1
+                Type: Unsigned
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: $1234
