@@ -514,6 +514,11 @@ void ExprSem::ternary(const SourceLoc& loc) {
     stack.push_back(std::make_unique<ExprTernary>(std::move(c), std::move(t), std::move(e), loc));
 }
 
+void ExprSem::call_unary(Keyword keyword, const SourceLoc& loc) {
+    auto arg = pop();
+    stack.push_back(std::make_unique<ExprCallUnary>(keyword, std::move(arg), loc));
+}
+
 void ExprSem::error_expected_operand(const ParseLine& pline) const {
     ::error_expected_operand(pline);
 }

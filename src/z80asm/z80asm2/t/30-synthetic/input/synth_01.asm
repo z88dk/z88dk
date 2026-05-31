@@ -1,18 +1,18 @@
-adc (hl-)
 adc (hl+)
-adc a', (hl-)
+adc (hl-)
 adc a', (hl+)
+adc a', (hl-)
 adc hl, bc
-adc.l a, (hl-)
 adc.l a, (hl+)
+adc.l a, (hl-)
 add bc, 1+2*3
 add bc, a
 add hl, 1+2*3
 add sp, 1+2*3
 adi hl, 1+2*3
 adi sp, 1+2*3
-altd adc a, (hl-)
 altd adc a, (hl+)
+altd adc a, (hl-)
 altd clr hl
 altd ld a, (de+)
 altd ld bc, de
@@ -62,8 +62,8 @@ djnz b, lbl1
 djnz lbl1
 dsub
 ex (sp), hl
-ex af, af
 ex af', af
+ex af, af
 ex bc, hl
 ex de, hl
 ex hl', de
@@ -119,19 +119,20 @@ ld (1+2*3), de
 ld (de), 1+2*3
 ld (de), a
 ld (de), hl
-ld (hl-), 1+2*3
 ld (hl+), 1+2*3
 ld (hl+), bc
+ld (hl-), 1+2*3
 ld (ix+1+2*3), bc
 ld (iy-1-2*3), de
+ld a', (bc-)
 ld a, (bc+)
 ld a, (hld)
 ld a, (hli)
-ld a', (bc-)
+ld bc', de ;'
 ld bc, (1+2*3)
 ld bc, (hl)
-ld bc', de ;'
 ld hl, bc
+ld hl, sp+1+2*3
 ld ix, iy
 ld.l (bc+), a
 ld.l (de+), 1+2*3
