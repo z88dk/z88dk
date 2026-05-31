@@ -106,3 +106,9 @@ void ExprTernary::dump(DumpContext ctx) const {
     else_expr->dump(c.child());
 }
 
+void ExprCallUnary::dump(DumpContext ctx) const {
+    ctx.line("ExprCallUnary: " + to_string(keyword));
+    auto c = ctx.child();
+    c.line("Arg:");
+    arg->dump(c.child());
+}

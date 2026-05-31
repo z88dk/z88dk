@@ -278,7 +278,7 @@ sub parse_operand {
         };
     }
 
-    if ( $opr =~ /^ \( (ix|iy) \+ \( (%d) \) \+ 1 \) $/x ) {
+    if ( $opr =~ /^ \( (ix|iy) \+ signed8 \( \( (%d) \) \+ 1 \) \) $/x ) {
         return {
             type        => 'mem',
             base        => $1,
@@ -291,6 +291,14 @@ sub parse_operand {
     }
 
     if ( $opr =~ /^ (%n|%d|%m|%j|%J|0|1|2) $/x ) {
+        return { type => 'imm', value => $1, width => undef };
+    }
+
+    if ( $opr =~ /^ signed8 \( (%d) \) $/x ) {
+        return { type => 'imm', value => $1, width => undef };
+    }
+
+    if ( $opr =~ /^ unsigned8 \( (%n) \) $/x ) {
         return { type => 'imm', value => $1, width => undef };
     }
 

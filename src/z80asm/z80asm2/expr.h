@@ -89,7 +89,7 @@ struct ExprSem {
     void unary(TokenType op, const SourceLoc& loc);
     void binary(TokenType op, const SourceLoc& loc);
     void ternary(const SourceLoc& loc);
-    void call_unary(Keyword, const SourceLoc&) {}
+    void call_unary(Keyword, const SourceLoc&);
     void error_expected_operand(const ParseLine& pline) const;
     void error_missing_lparen(const ParseLine& pline) const;
     void error_missing_rparen(const ParseLine& pline) const;
@@ -165,6 +165,32 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
         pline.advance(); // consume ')'
 
         sem.call_unary(Keyword::MEM, loc);
+        return true;
+    }
+
+    // SIGNED8/SIGNED16/UNSIGNED8/UNSIGNED16 type casts
+    if (tok.keyword == Keyword::SIGNED8 || tok.keyword == Keyword::SIGNED16 ||
+            tok.keyword == Keyword::UNSIGNED8 || tok.keyword == Keyword::UNSIGNED16) {
+        SourceLoc loc = tok.loc;
+        pline.advance(); // consume type cast keyword
+
+        if (pline.peek().type != TokenType::LeftParen) {
+            sem.error_missing_lparen(pline);
+            return false;
+        }
+        pline.advance(); // consume '('
+
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+            return false;
+        }
+
+        if (pline.peek().type != TokenType::RightParen) {
+            sem.error_missing_rparen(pline);
+            return false;
+        }
+        pline.advance(); // consume ')'
+
+        sem.call_unary(tok.keyword, loc);
         return true;
     }
 
